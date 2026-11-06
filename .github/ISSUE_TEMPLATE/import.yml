@@ -1,0 +1,23 @@
+name: Importer une ressource
+description: Suivre un module candidat à l'import
+title: "[Import] "
+labels: []
+body:
+  - type: textarea
+    id: source
+    attributes:
+      label: Source et édition exactes
+      description: URL, éditeur, version, versification, identifiant SWORD
+    validations:
+      required: true
+  - type: textarea
+    id: rights
+    attributes:
+      label: Droits de redistribution et de modification
+      description: Joindre les preuves spécifiques à l'édition
+    validations:
+      required: true
+  - type: textarea
+    id: audit
+    attributes:
+      label: Anomalies et contrôles nécessaires

@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "id": "example-commentary",
+  "sword_id": "ExampleCom",
+  "title": {
+    "en": "Example commentary"
+  },
+  "category": "commentary",
+  "language": "en",
+  "version": "0.1.0",
+  "versification": "KJV",
+  "origin": {
+    "publisher": "Original publisher",
+    "url": "https://example.org/source",
+    "source_revision": "unknown"
+  },
+  "rights": {
+    "license": "Pending verification",
+    "evidence_url": "https://example.org/rights",
+    "redistribution_allowed": false,
+    "derivatives_allowed": false,
+    "reviewed_by": "PENDING"
+  },
+  "quality": {
+    "status": "draft",
+    "edition": "faithful",
+    "reviewed_by": "PENDING",
+    "smoke_key": "Gen 1:1"
+  }
+}

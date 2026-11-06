@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+"""Validate metadata, rights and safe SWORD payload structure. Fail closed."""
+from pathlib import Path, PurePosixPath
+import json
+import sys
+import re
+from jsonschema import Draft202012Validator, FormatChecker
+
+ROOT = Path(__file__).resolve().parents[1]
+DRIVERS = {"RawText","zText","RawCom","RawCom4","zCom","RawLD","RawLD4","zLD","RawGenBook"}
+ALLOWED = {"bible":{"RawText","zText"},"commentary":{"RawCom","RawCom4","zCom"},
+           "dictionary":{"RawLD","RawLD4","zLD"},"general_book":{"RawGenBook"}}
+
+def parse_conf(path):
+    lines = path.read_text(encoding="utf-8-sig").splitlines()
+    values = {}; section = None
+    for line in lines:
+        line=line.strip()
+        if not line or line.startswith(("#",";")): continue
+        if line.startswith("[") and line.endswith("]"):
+            if section is not None: raise ValueError("multiple SWORD sections")
+            section=line[1:-1]
+        elif "=" in line and section is not None:
+            k,v=line.split("=",1)
+            values.setdefault(k.strip(),v.strip())
+        else: raise ValueError("malformed SWORD configuration")
+    if not section: raise ValueError("missing SWORD module identifier")
+    return section,values
+
+def validate(root=ROOT):
+    errors=[]; modules=[]; seen=set()
+    schema=json.loads((root/"schemas/module.schema.json").read_text(encoding="utf-8"))
+    validator=Draft202012Validator(schema,format_checker=FormatChecker())
+    for d in sorted((root/"modules").iterdir()):
+        if d.name.startswith("."): continue
+        if d.is_symlink() or not d.is_dir():
+            errors.append(f"{d.name}: not a real module directory"); continue
+        try: m=json.loads((d/"metadata.json").read_text(encoding="utf-8"))
+        except Exception as e: errors.append(f"{d.name}: unreadable metadata: {e}");continue
+        issues=list(validator.iter_errors(m))
+        if issues:
+            errors.extend(f"{d.name}: {e.message}" for e in issues);continue
+        if m["id"] != d.name: errors.append(f"{d.name}: folder / id mismatch")
+        if m["sword_id"].casefold() in seen: errors.append(f"{d.name}: duplicate SWORD id")
+        seen.add(m["sword_id"].casefold())
+        modules.append((d,m))
+        payload=d/"payload"
+        approved=m["quality"]["status"]=="approved"
+        if not approved:
+            if payload.exists(): errors.append(f"{d.name}: unapproved payload must not be committed")
+            continue
+        rights=m["rights"]
+        if not rights["redistribution_allowed"] or rights["reviewed_by"].upper()=="PENDING":
+            errors.append(f"{d.name}: redistribution not approved")
+        if m["quality"]["reviewed_by"].upper()=="PENDING":
+            errors.append(f"{d.name}: editorial review missing")
+        if m["quality"]["edition"]=="reader_optimized" and not rights["derivatives_allowed"]:
+            errors.append(f"{d.name}: derivative rights missing")
+        if "example." in rights["evidence_url"]:
+            errors.append(f"{d.name}: example is not a rights authorization")
+        if not (d/"EDITORIAL.md").is_file(): errors.append(f"{d.name}: editorial changelog required")
+        if payload.is_symlink() or not payload.is_dir():
+            errors.append(f"{d.name}: no safe payload");continue
+        confs=list((payload/"mods.d").glob("*.conf"))
+        if len(confs)!=1: errors.append(f"{d.name}: exactly one .conf expected");continue
+        for p in payload.rglob("*"):
+            if p.is_symlink(): errors.append(f"{d.name}: payload symlink forbidden")
+            if p.is_file() and p.stat().st_mode & 0o111:
+                errors.append(f"{d.name}: executable payload forbidden")
+        try: section,conf=parse_conf(confs[0])
+        except (OSError,ValueError,UnicodeError) as e:
+            errors.append(f"{d.name}: bad configuration: {e}");continue
+        if section != m["sword_id"]: errors.append(f"{d.name}: module name mismatch")
+        if confs[0].name != section.lower()+".conf": errors.append(f"{d.name}: .conf filename mismatch")
+        driver=conf.get("ModDrv")
+        if driver not in DRIVERS or driver not in ALLOWED.get(m["category"],set()):
+            errors.append(f"{d.name}: unsupported or mismatched driver")
+        if conf.get("Encoding")!="UTF-8": errors.append(f"{d.name}: UTF-8 required")
+        if conf.get("Lang")!=m["language"]: errors.append(f"{d.name}: language mismatch")
+        if m["category"] in ("bible","commentary") and conf.get("Versification")!=m.get("versification"):
+            errors.append(f"{d.name}: versification mismatch")
+        for field in ("SourceType","DistributionLicense","TextSource","Version","Description","DataPath"):
+            if not conf.get(field):errors.append(f"{d.name}: missing {field}")
+        data=conf.get("DataPath","")
+        rel=data[2:] if data.startswith("./") else ""
+        pure=PurePosixPath(rel)
+        if not rel.startswith("modules/") or pure.is_absolute() or ".." in pure.parts:
+            errors.append(f"{d.name}: invalid DataPath")
+        else:
+            target=(payload/rel).resolve(); base=(payload/"modules").resolve()
+            if not target.is_relative_to(base): errors.append(f"{d.name}: escaping DataPath")
+            elif not target.exists() and not list(target.parent.glob(target.name+"*")):
+                errors.append(f"{d.name}: no SWORD data")
+    return modules, errors
+
+def main():
+    modules, errors=validate()
+    for e in errors: print("ERROR",e,file=sys.stderr)
+    if errors:return 1
+    print(f"Validated {len(modules)} entries; approved {sum(m['quality']['status']=='approved' for _,m in modules)}")
+    return 0
+
+if __name__=="__main__":raise SystemExit(main())

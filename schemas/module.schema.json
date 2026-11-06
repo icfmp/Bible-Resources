@@ -1,0 +1,212 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Bible Resources module manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "sword_id",
+    "title",
+    "category",
+    "language",
+    "version",
+    "origin",
+    "rights",
+    "quality"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,63}$"
+    },
+    "sword_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]{1,39}$"
+    },
+    "title": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "category": {
+      "enum": [
+        "bible",
+        "commentary",
+        "dictionary",
+        "general_book"
+      ]
+    },
+    "language": {
+      "type": "string",
+      "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]+)*$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$"
+    },
+    "versification": {
+      "type": "string"
+    },
+    "origin": {
+      "type": "object",
+      "required": [
+        "publisher",
+        "url",
+        "source_revision"
+      ],
+      "properties": {
+        "publisher": {
+          "type": "string",
+          "minLength": 2
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "source_revision": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "rights": {
+      "type": "object",
+      "required": [
+        "license",
+        "evidence_url",
+        "redistribution_allowed",
+        "derivatives_allowed",
+        "reviewed_by"
+      ],
+      "properties": {
+        "license": {
+          "type": "string",
+          "minLength": 2
+        },
+        "evidence_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "redistribution_allowed": {
+          "type": "boolean"
+        },
+        "derivatives_allowed": {
+          "type": "boolean"
+        },
+        "reviewed_by": {
+          "type": "string",
+          "minLength": 3
+        }
+      }
+    },
+    "quality": {
+      "type": "object",
+      "required": [
+        "status",
+        "edition",
+        "reviewed_by",
+        "smoke_key"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "draft",
+            "in_review",
+            "restricted",
+            "approved"
+          ]
+        },
+        "edition": {
+          "enum": [
+            "faithful",
+            "reader_optimized"
+          ]
+        },
+        "reviewed_by": {
+          "type": "string",
+          "minLength": 3
+        },
+        "smoke_key": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "category": {
+            "enum": [
+              "bible",
+              "commentary"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "versification"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "quality": {
+            "properties": {
+              "status": {
+                "const": "approved"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "rights": {
+            "properties": {
+              "redistribution_allowed": {
+                "const": true
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "quality": {
+            "properties": {
+              "edition": {
+                "const": "reader_optimized"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "rights": {
+            "properties": {
+              "derivatives_allowed": {
+                "const": true
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

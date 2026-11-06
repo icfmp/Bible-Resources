@@ -1,0 +1,16 @@
+name: Anomalie de mise en forme
+description: Signaler une anomalie de ressource biblique
+title: "[Formatting] "
+body:
+  - type: input
+    id: module
+    attributes:
+      label: Module, version et passage
+    validations:
+      required: true
+  - type: textarea
+    id: before
+    attributes:
+      label: Problème observé et rendu attendu
+    validations:
+      required: true
