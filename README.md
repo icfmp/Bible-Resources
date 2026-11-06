@@ -46,9 +46,9 @@ python scripts/build.py --output dist --base-url https://icfmp.github.io/Bible-R
 
 The generated `dist/` contains a stable machine catalogue at `catalog/v1/catalog.json`, and a SWORD repository under `sword/`. To test actual SWORD-module behaviour, install `diatheke`, then run `python scripts/smoke.py --dist dist`. CI performs this before deploying when modules exist.
 
-## GitHub bootstrap
+## GitHub Pages and branch rules
 
-For repository creation, push, Pages activation and branch rules, see [INSTALLATION_FR.md](INSTALLATION_FR.md). This project is currently prepared locally and is not necessarily deployed remotely.
+For repository creation, push, Pages activation and branch rules, see [INSTALLATION_FR.md](INSTALLATION_FR.md). The source repository is live at https://github.com/icfmp/Bible-Resources. GitHub Pages must be activated in the repository Settings before the public catalogue endpoint will work.
 
 ## Documentation
 
