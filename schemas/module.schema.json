@@ -140,6 +140,41 @@
           "minLength": 1
         }
       }
+    },
+    "upstreams": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "provider",
+          "module_id",
+          "last_integrated_version"
+        ],
+        "properties": {
+          "provider": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]+$"
+          },
+          "module_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]{1,39}$"
+          },
+          "last_integrated_version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "last_integrated_conf_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "conf_filename": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]+\\.conf$"
+          }
+        }
+      }
     }
   },
   "allOf": [

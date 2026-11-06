@@ -46,6 +46,12 @@ python scripts/build.py --output dist --base-url https://icfmp.github.io/Bible-R
 
 The generated `dist/` contains a stable machine catalogue at `catalog/v1/catalog.json`, and a SWORD repository under `sword/`. To test actual SWORD-module behaviour, install `diatheke`, then run `python scripts/smoke.py --dist dist`. CI performs this before deploying when modules exist.
 
+## Upstream version monitoring
+
+Bible Resources monitors **three separate versions** (installed in SWORD, curated in Bible Resources, and source/original). The daily read-only GitHub Action checks CrossWire and eBible catalogue metadata; OpenBible is reserved pending identification of a verifiable catalogue. The checker never automatically republishes a module. See [Updating resources](docs/UPDATES.md).
+
+To check a local installation: `python scripts/check_updates.py --installed-root ~/.sword`.
+
 ## GitHub Pages and branch rules
 
 For repository creation, push, Pages activation and branch rules, see [INSTALLATION_FR.md](INSTALLATION_FR.md). The source repository is live at https://github.com/icfmp/Bible-Resources. GitHub Pages must be activated in the repository Settings before the public catalogue endpoint will work.
@@ -60,6 +66,7 @@ For repository creation, push, Pages activation and branch rules, see [INSTALLAT
 - [Upstream contribution](docs/UPSTREAM.md)
 - [Release procedure](docs/PUBLISHING.md)
 - [Import roadmap](docs/ROADMAP.md)
+- [Upstream version tracking and updates](docs/UPDATES.md)
 
 ## Licenses
 
