@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "providers": [
+    {
+      "id": "crosswire",
+      "name": "CrossWire official SWORD",
+      "kind": "sword",
+      "enabled": true,
+      "base_url": "https://www.crosswire.org/ftpmirror/pub/sword/raw/",
+      "notes": "Published modules. Availability does not imply redistribution permission."
+    },
+    {
+      "id": "ebible",
+      "name": "eBible.org SWORD",
+      "kind": "sword",
+      "enabled": true,
+      "base_url": "https://ebible.org/sword/",
+      "notes": "mods.d/*.conf can be newer than mods.d.tar.gz; check watched modules individually."
+    },
+    {
+      "id": "openbible",
+      "name": "OpenBible — precise provider to identify",
+      "kind": "unverified",
+      "enabled": false,
+      "base_url": null,
+      "notes": "Do not invent a SWORD endpoint; confirm which project and official catalogue to use."
+    }
+  ]
+}
