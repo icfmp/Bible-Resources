@@ -125,13 +125,13 @@ third-party binaries, with:
 
 ## Who is responsible?
 
-- **Codex:** archive retrieval in an authorized environment, source
-  fingerprinting, automated audit and verification harness, SWORD build,
-  test fixtures, and GTK screenshots/logs.
-- **Product Owner / assistant:** diagnose ambiguous breaks, find and
-  compare source editions, propose standard-conformant editorial rules,
-  and review failed import cases.
-- **Simon:** final approval of material editorial adaptations and scope.
+- **Assistant (Bible Resources developer):** own source acquisition,
+  fingerprinting, normalizer, source-to-binary checks, generic tests, real
+  SWORD reader verification, source comparison and editorial diagnosis.
+  Maintain the technical and editorial change log; report any blocked case.
+- **Codex:** independent audit and targeted support when a technical task
+  cannot be completed safely by the assistant; not the default executor.
+- **Simon:** choose scope and approve material editorial adaptations.
 
 ## Current technical blockers
 
@@ -147,3 +147,49 @@ third-party binaries, with:
 
 No passing unit test on synthetic fixtures can replace the **real
 cross-client SWORD verification** required for these two modules.
+
+## Prepared first-pass commands (no content modifications)
+
+The tested *preparation* lives in these scripts:
+
+- \`config/pilot-sources.json\`: the two exact allowlisted module IDs and
+  HTTPS upstream ZIP URLs, plus test passage keys.
+- \`scripts/pilot_fetch.py\`: HTTPS-only streaming source download with a
+  file-size limit and redirect allowlist into a private temporary directory;
+  refuses overwriting existing data.
+- \`scripts/pilot_preflight.py\`: checks ZIP safety, module identity/driver,
+  .conf metadata, SHA-256 and sizes **without extracting text**. If a step
+  fails, the JSON result is marked blocked rather than recycling a success.
+- \`scripts/pilot_runtime.py\`: re-checks ZIP structure, unpacks only
+  preflighted members to a disposable workspace, and calls real
+  \`diatheke\` on the registered example keys. It records result presence
+  and hashes, **not the returned passage text**.
+- \`scripts/probe_official_osis.py\`: checks the real CrossWire schema
+  location, digest, imports/includes and offline XMLSchema compilation.
+  It **does not** silently set \`schema_status=reviewed\`.
+
+The workflow \`.github/workflows/pilot-preflight.yml\` is
+**manual only**. To start LSG deliberately, go to GitHub Actions →
+**Pilot source preflight (on demand, read-only)** → Run workflow →
+\`pilot=lsg\`. It will fetch the exact eBible SWORD and USFM ZIPs to
+the runner's temporary directory, inspect both, read sample SWORD verses,
+and attach **only JSON diagnostics**; never a distributable Bible package.
+Choose \`pilot=mhc\` separately when the MHC turn begins.
+
+A local equivalent after installing \`diatheke\` is:
+
+    python scripts/pilot_fetch.py --pilot lsg --directory /tmp/bible-pilot
+    python scripts/pilot_preflight.py --pilot lsg \
+      --sword-zip /tmp/bible-pilot/sword.zip \
+      --authored-zip /tmp/bible-pilot/authored.zip \
+      --report reports/pilot-preflight.json
+    python scripts/pilot_runtime.py --pilot lsg \
+      --sword-zip /tmp/bible-pilot/sword.zip \
+      --report reports/pilot-reader.json
+
+These are **inspection and runtime-preflight tools**, not an
+editorial/source fidelity test. The actual comparison of all source
+verses, notes, formatting and commentary entries, OSIS XSD pinning,
+display before/after, correction decisions, SWORD recompilation and
+approval will take place during the pilot itself. The first pilot must
+not be declared normalized merely because this metadata preflight passes.
