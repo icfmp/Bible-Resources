@@ -85,7 +85,7 @@ def source_gate_errors(directory, source_type, root, category=None):
 
 
 def validate(root=ROOT):
-    errors=[]; modules=[]; seen=set()
+    errors=[]; modules=[]; seen=set(); edition_variants=set(); edition_details={}
     schema=json.loads((root/"schemas/module.schema.json").read_text(encoding="utf-8"))
     validator=Draft202012Validator(schema,format_checker=FormatChecker())
     for d in sorted((root/"modules").iterdir()):
@@ -103,6 +103,17 @@ def validate(root=ROOT):
         modules.append((d,m))
         payload=d/"payload"
         approved=m["quality"]["status"]=="approved"
+        if approved:
+            canonical=m.get("canonical_edition_id")
+            if canonical:
+                identity=(m["category"],m["language"])
+                previous=edition_details.setdefault(canonical,identity)
+                if previous!=identity:
+                    errors.append(f"{d.name}: canonical edition identity conflicts with a different category/language")
+                variant=(canonical,m["quality"]["edition"])
+                if variant in edition_variants:
+                    errors.append(f"{d.name}: duplicate curated edition variant {canonical}/{variant[1]}; only one module per edition and variant")
+                edition_variants.add(variant)
         if not approved:
             if payload.exists(): errors.append(f"{d.name}: unapproved payload must not be committed")
             continue
