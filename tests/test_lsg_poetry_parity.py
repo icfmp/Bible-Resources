@@ -25,6 +25,24 @@ def analyze(source_poetry: str, generated_poetry: str):
 
 
 class PoetryParityTests(unittest.TestCase):
+    def test_line_open_before_verse_start_is_counted_in_global_inventory(self):
+        raw=('<usfx><book id="GEN"><c id="1"/>'
+             '<q level="1"><v id="1"/>Alpha<ve id="1"/></q>'
+             '</book></usfx>')
+        xml=(f'<osis xmlns="{NS}"><osisText>'
+             '<div type="book" osisID="Gen"><chapter osisID="Gen.1">'
+             '<lg><l level="1"><verse sID="Gen.1.1"/>Alpha'
+             '<verse eID="Gen.1.1"/></l></lg></chapter></div>'
+             '</osisText></osis>')
+        report=audit_poetry(etree.fromstring(raw.encode()),
+                            etree.fromstring(xml.encode()),
+                            {"GEN":"Gen"},[("GEN",1,1)])
+        self.assertEqual(report["all_original_usfx_q_elements"],1)
+        self.assertEqual(report["all_candidate_osis_l_elements"],1)
+        self.assertEqual(report["source_q_elements_with_nested_verse_start"],1)
+        self.assertEqual(report["source_q_elements_not_counted_in_active_verses"],1)
+        self.assertEqual(report["candidate_l_elements_not_counted_in_active_verses"],1)
+
     def test_equal_source_and_candidate_lines(self):
         report=analyze('<q level="1">Alpha</q>',
                        '<lg><l level="1">Alpha</l></lg>')
