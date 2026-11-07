@@ -67,11 +67,11 @@ jobs:
                       dst.parent.mkdir(parents=True,exist_ok=True)
                       with archive.open(name) as src,dst.open('xb') as out:
                           shutil.copyfileobj(src,out,length=262144)
-              for ref in ['Gen 1:1','Ps 23:2','John 5:4','Acts 8:37']:
+              for ref in ['Gen 1','Ps 23','Gen 1:1','Ps 23:2','John 5:4','Acts 8:37']:
                   for fmt in ['plain','internal']:
                       code,body=query('fraLSG1910eb',ref,fmt=fmt,root=root,exe='diatheke')
                       print('SWORD sample',ref,fmt,'status',code,'bytes',len(body),
-                            'prefix',repr(body[:430].decode('utf-8',errors='replace')))
+                            'prefix',repr(body[:1800 if ref in ('Gen 1','Ps 23') else 430].decode('utf-8',errors='replace')))
           PY
       - name: Upload only the text-free diagnostic report
         if: always()
