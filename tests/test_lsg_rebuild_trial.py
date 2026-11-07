@@ -32,6 +32,7 @@ class LSGRebuildTrialTests(unittest.TestCase):
             "exact_normalized_word_sequences":66,
             "matching_verse_note_counts":66,
             "matching_verse_poetry_line_counts":65,
+            "unconverted_usfm_markup_diagnostic":{"no_unconverted_usfm_markup":True},
             "source_to_candidate_poetry_verse_owned_audit":{
                 "all_poetry_segments_and_levels_verified":True,
                 "all_selah_text_and_verse_positions_verified":True,
