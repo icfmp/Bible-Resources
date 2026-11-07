@@ -11,6 +11,7 @@ from __future__ import annotations
 from collections import Counter,defaultdict
 import difflib
 import hashlib
+import os
 from pathlib import Path
 import re
 import unicodedata
@@ -223,6 +224,17 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
         generated=osis_body.get(osis_ref)
         if original is None or generated is None:
             raise PilotError(f"Reference missing from source/OSIS body extraction: {code}.{chapter}.{verse}")
+        # Tiny, opt-in, public-domain edition excerpts in ephemeral CI logs
+        # for distinguishing converter leaks from genuine source variations.
+        # Never include these original/converted words in uploaded artifacts.
+        if os.getenv("LSG_SAMPLE_DEBUG")=="1" and (code,chapter,verse) in {
+            ("GEN",29,14),("DEU",32,6),("ISA",25,2),
+            ("ACT",13,35),("JOB",4,11),
+        }:
+            def preview(value: str) -> str:
+                return repr(value[:115]+" … "+value[-115:] if len(value)>240 else value[:240])
+            print("USFX_OSIS_DIFF_SAMPLE",f"{code}.{chapter}.{verse}",
+                  "original=",preview(original),"converted=",preview(generated))
         old_words=source_words.get(key,[])
         new_words=osis_words.get(osis_ref,[])
         original_notes=source_notes[key]
