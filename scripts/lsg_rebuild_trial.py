@@ -73,7 +73,7 @@ def _malformed_xml_diagnostic(path: Path, exc: etree.XMLSyntaxError) -> dict:
     stack=[]
     orphan=[]
     for n, raw_line in enumerate(lines[:line+1],1):
-        for match in re.finditer(r"<(/?)div\\b([^>]*)>",raw_line):
+        for match in re.finditer(r"<(/?)div\b([^>]*)>",raw_line):
             closing, raw_attrs=match.groups()
             if closing:
                 before=len(stack)
@@ -83,8 +83,8 @@ def _malformed_xml_diagnostic(path: Path, exc: etree.XMLSyntaxError) -> dict:
                 if not prior:
                     orphan.append(n)
             else:
-                kind=re.search(r'\\btype="([^"]{1,60})"',raw_attrs)
-                osis_id=re.search(r'\\bosisID="([^"]{1,50})"',raw_attrs)
+                kind=re.search(r'\btype="([^"]{1,60})"',raw_attrs)
+                osis_id=re.search(r'\bosisID="([^"]{1,50})"',raw_attrs)
                 record={"line":n,"type":kind[1] if kind else "",
                         "osis_id":osis_id[1] if osis_id else ""}
                 stack.append(record)
