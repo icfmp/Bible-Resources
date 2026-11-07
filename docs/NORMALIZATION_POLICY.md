@@ -22,6 +22,12 @@
 9. Keep theology, original readings, numbering, canons, versification, publisher attributions, and rights notices intact.
 10. A compliant XML source is **not** proof the compiled SWORD module matches it; text and structure round-trip comparison plus a real SWORD smoke test remain separate release requirements.
 
+## Readability improvements backed by another edition
+
+When the exact print edition is unavailable, a verified **different edition of the same work** may legitimately guide a cleaner paragraph, stanza or commentary-section layout. This is a reviewed **reader-optimized editorial adaptation**, not evidence of the original source formatting. Use the matching edition first where possible, but never retain a clearly unreadable or malformed structure merely to avoid consulting a related edition.
+
+Preserve every word, punctuation mark, verse/entry association, note and meaningful authorial structure from the module actually being normalized. Record the reference edition and pages, explain deviations, obtain derivative rights, and add tests for the approved transformation. A proposed reflow still must be accepted before a deterministic script applies it; unknown or ambiguous structures remain blocking. This does not relax the official OSIS XSD or source-integrity gates. See [EDITORIAL_RULES.md](EDITORIAL_RULES.md).
+
 ## Current implementation versus future transformation
 
 \`scripts/guard_osis.py\` is the **read-only first gate**. It checks XML parsing, the pinned official XSD, our explicitly approved OSIS element subset, poetry levels, reviewed emphasis types, and correctly paired sID/eID milestones. It produces either:
