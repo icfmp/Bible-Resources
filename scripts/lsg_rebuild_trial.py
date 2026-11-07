@@ -26,6 +26,7 @@ from lsg_source_compare import (
 )
 from pilot_preflight import PilotError, inspect_archive
 from pilot_subprocess import MAX_OUTPUT
+from lsg_osis_parity import compare as compare_osis
 
 
 CONVERTER_COMMIT = "dde28bc545e8d8697fa5496c243187847ec55d31"
@@ -275,17 +276,30 @@ def run(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) -> dict:
             report["jhn_source_intro_diagnostic"]=_original_usfm_intro_markers(usfm_zip,"JHN")
             return report
         report["osis_schema"]=_schema_proof(candidate,schema)
+        report["source_to_generated_osis"]=compare_osis(candidate,original_xml)
         report["structure_key_sets_equal"]=(
            report["osis_candidate"]["verse_keys_missing_from_converted"]==0
            and report["osis_candidate"]["verse_keys_unexpected_in_converted"]==0
         )
         # Keep the entire candidate private. No temporary OSIS source or
         # third-party data is uploaded, even if XSD or content check fails.
+        parity=report["source_to_generated_osis"]
+        report["canonical_verse_text_parity"]=(
+            parity["exact_normalized_verse_text_matches"]==parity["total_source_verse_keys"]
+        )
+        report["source_marker_counts_parity"]=(
+            parity["exact_normalized_word_sequences"]==parity["total_source_verse_keys"]
+            and parity["matching_verse_note_counts"]==parity["total_source_verse_keys"]
+            and parity["matching_verse_poetry_line_counts"]==parity["total_source_verse_keys"]
+        )
         report["status"]=(
-            "candidate_source_keys_and_xsd_validated_not_approved"
+            "candidate_verse_text_and_marker_parity_checked_not_approved"
             if report["structure_key_sets_equal"]
                and report["osis_schema"]["xsd_status"]=="validated"
-            else "candidate_conversion_blocked_pending_review"
+               and report["osis_schema"]["policy_status"]=="validated"
+               and report["canonical_verse_text_parity"]
+               and report["source_marker_counts_parity"]
+            else "candidate_parity_mismatch_or_schema_blocked"
         )
     return report
 
@@ -300,7 +314,7 @@ def main(argv=None) -> int:
     args=ap.parse_args(argv)
     try:
         result=run(args.usfm_zip,args.usfx_zip,args.converter,args.schema)
-        code=0 if result["status"]=="candidate_source_keys_and_xsd_validated_not_approved" else 1
+        code=0 if result["status"]=="candidate_verse_text_and_marker_parity_checked_not_approved" else 1
     except (OSError,ValueError,StructureFailure,etree.XMLSyntaxError,
             subprocess.TimeoutExpired,zipfile.BadZipFile) as exc:
         result={"status":"blocked","category":type(exc).__name__,
