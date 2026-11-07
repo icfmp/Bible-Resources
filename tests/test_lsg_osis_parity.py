@@ -45,6 +45,8 @@ class FullSourceOsisParityTests(unittest.TestCase):
                 "status"],"not_modeled_due_unverified_note_identity_or_structure")
             self.assertNotIn("remaining_spaced_text_mismatch_verse_refs",
                              result["source_to_candidate_note_spacing_dryrun"])
+            self.assertEqual(result["source_to_candidate_speech_spacing_dryrun"][
+                "status"],"not_run_due_unverified_note_model")
             self.assertEqual(result["matching_verse_poetry_line_counts"],66)
             poetry=result["source_to_candidate_poetry_structure_audit"]
             self.assertEqual(poetry["matching_per_verse_line_counts"],66)
