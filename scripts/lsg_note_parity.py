@@ -170,6 +170,8 @@ def _collect_usfx(root) -> tuple[dict, int]:
 
 
 def _collect_osis(root) -> tuple[dict, int]:
+    if isinstance(root, etree._ElementTree):
+        root = root.getroot()
     if root.tag != OSIS + "osis":
         raise PilotError("Note audit requires the generated OSIS document")
     notes = defaultdict(list)
