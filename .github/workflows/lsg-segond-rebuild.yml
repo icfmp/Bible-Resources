@@ -58,7 +58,9 @@ jobs:
           sudo apt-get install -y libsword-utils diatheke >/dev/null
           command -v osis2mod
           command -v diatheke
-      - name: Test complete source conversion; no Scripture committed, uploaded or published
+      - name: Test complete source conversion; no full Scripture module committed, uploaded or published
+        env:
+          LSG_SAMPLE_DEBUG: '1'
         run: |
           python scripts/lsg_rebuild_trial.py \
             --usfm-zip "${{ runner.temp }}/original/usfm.zip" \
