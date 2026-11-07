@@ -2,9 +2,10 @@
 
 **Tracking:** [issue #12](https://github.com/icfmp/Bible-Resources/issues/12).
 
-**Status as of 2026-11-07:** candidates, license declarations and **online
-layout reference examples** reviewed; source archives and compiled SWORD
-modules **not yet downloaded, checked, transformed, or published**. This
+**Status as of 2026-11-07:** preparation scripts and manual read-only pilot
+workflow implemented; official CrossWire/W3C XSD pair verified and pinned;
+source archives and compiled SWORD modules **not yet fetched, compared,
+normalized, or published**. This
 document is a reproducible pilot protocol, **not a completed trial**.
 
 ## Source selection and rights
@@ -140,8 +141,9 @@ third-party binaries, with:
 - The deterministic SWORD importer / content-normalizer, authoritative
   round-trip checker and actual GTK visual comparison harness are not
   implemented.
-- This project has not yet retrieved and executed the two original
-  full modules. Online excerpts are presentation references only.
+- The manual preflight can fetch and check original modules on request,
+  but **the LSG/MHC module ZIPs have not yet been run through it**.
+  Online excerpts remain presentation references only.
 - GitHub Pages needs explicit repository-side activation before any
   public catalogue publication.
 
