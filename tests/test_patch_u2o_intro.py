@@ -80,6 +80,15 @@ def note_replace(text):
 ''' + module.OLD_CALLER_OUTPUT +
 '''    return NOTERE.sub(simplerepl,text)
 '''
+
++ '''
+def reflow(text):
+    return text
+
+def doconvert(text: str, log_level: int) -> tuple[str, ...]:
+    newtext=text
+    return (reflow(newtext),)
+'''
 ).encode("utf-8")
 
 
@@ -181,6 +190,27 @@ class U2OIntroTests(unittest.TestCase):
             self.assertIn(expected,after)
             self.assertEqual(before.replace('>',' '+expected+'>',1),after)
             self.assertIn("Ref 1:1.",after)
+
+
+    def test_bare_poetry_marker_is_joined_only_to_immediately_following_verse(self):
+        original=SOURCE
+        with mock_patch.object(module,"EXPECTED_UPSTREAM_SHA256",hashlib.sha256(original).hexdigest()):
+            reviewed=module.patch(original)
+        before={}
+        after={}
+        exec(compile(original,"original-bare-poetry.py","exec"),before)
+        exec(compile(reviewed,"reviewed-bare-poetry.py","exec"),after)
+        example="\\c 11\n\\q1\n\\v 1 First words\n\\q1 Second words"
+        self.assertEqual(before["doconvert"](example,0)[0],example)
+        transformed=after["doconvert"](example,0)[0]
+        self.assertEqual(transformed,
+            "\\c 11\n\\q1 \\v 1 First words\n\\q1 Second words")
+        self.assertEqual(after["doconvert"]("\\q1\n\\p Prose",0)[0],
+                         "\\q1\n\\p Prose")
+        self.assertEqual(after["doconvert"]("\\q2\n\\v 1 Text",0)[0],
+                         "\\q2 \\v 1 Text")
+        self.assertEqual(after["doconvert"]("\\q1\n\n\\v 1 Text",0)[0],
+                         "\\q1\n\n\\v 1 Text")
 
     def test_upstream_sha_change_fails_closed(self):
         with self.assertRaisesRegex(module.ConverterPatchError,"SHA-256 changed"):
