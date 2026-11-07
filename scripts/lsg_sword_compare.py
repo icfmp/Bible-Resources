@@ -63,6 +63,10 @@ FOOTER = re.compile(r"\n\([A-Za-z][A-Za-z0-9_]*\)\s*\Z")
 # eBible places chapter/section headings and cross-reference headings after
 # the first verse marker; blindly joining all XML text yielded a false alarm.
 NON_VERSE_TEXT_ELEMENTS={"x","f","fig","s","r","toc","h","id"}
+# USFX represents USFM section references such as \r in a generic
+# <p sfm="r" style="r">, not in a separate <r> element. Preserve those
+# paragraphs as apparatus, never append them to adjacent verse words.
+NON_VERSE_PARAGRAPH_STYLES={"r","s","s1","s2","s3","s4","sr","h","toc1","toc2","toc3"}
 
 
 def plain(value: str) -> str:
@@ -112,9 +116,11 @@ def usfx_text_by_verse(source:bytes, *, filter_books: set[str]) -> tuple[dict, d
                 current=None
             if name in {"w","x","q","p","s","d","note","reference"} and current:
                 counts[(current,name)]+=1
-            if name not in NON_VERSE_TEXT_ELEMENTS and current is not None and node.text:
+            skip=(name in NON_VERSE_TEXT_ELEMENTS or
+                  (name=="p" and (node.get("sfm") or node.get("style")) in NON_VERSE_PARAGRAPH_STYLES))
+            if not skip and current is not None and node.text:
                 chunks[current].append(node.text)
-            if name not in NON_VERSE_TEXT_ELEMENTS:
+            if not skip:
                 for child in node:
                     walk(child)
                     if current is not None and child.tail:
