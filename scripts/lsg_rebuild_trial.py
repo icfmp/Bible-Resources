@@ -292,6 +292,7 @@ def _marker_evidence(parity: dict) -> dict:
     lexical_and_notes=(
         parity["exact_normalized_word_sequences"]==expected
         and parity["matching_verse_note_counts"]==expected
+        and parity["unconverted_usfm_markup_diagnostic"]["no_unconverted_usfm_markup"]
     )
     lyric=poetry["all_poetry_segments_and_levels_verified"]
     selah=poetry["all_selah_text_and_verse_positions_verified"]
