@@ -88,6 +88,13 @@ def _osis_verses(path: Path) -> tuple[dict,dict,dict,dict]:
         current=None
         def walk(node):
             nonlocal current
+            # u2o records source paragraph/heading markers in XML comments
+            # such as <!-- s1 --> and <!-- r -->. XML comments are NOT
+            # Scripture text and must not become canonical verse words.
+            if isinstance(node, etree._Comment):
+                return
+            if not isinstance(node.tag,str):
+                raise PilotError("Unreviewed non-element node in converted OSIS verse")
             name=_node_name(node)
             if name=="verse":
                 opening=node.get("osisID") or node.get("sID")
