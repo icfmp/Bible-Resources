@@ -25,6 +25,7 @@ from lsg_sword_compare import (usfx_text_by_verse, plain,
 from pilot_preflight import PilotError
 from lsg_note_parity import audit_notes
 from lsg_note_space_dryrun import simulate_source_note_spaces
+from lsg_speech_space_dryrun import simulate_source_speech_spaces
 from lsg_poetry_parity import audit_poetry
 from lsg_poetry_segments import audit_segments
 
@@ -374,6 +375,8 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
     source_body,_=usfx_text_by_verse(publisher_usfx,filter_books=set(source_codes))
     # In-memory, reversible diagnostic only: do not use this hypothetical
     # document as the conversion candidate or alter the original OSIS file.
+    speech_space_model={"status":"not_run_due_unverified_note_model",
+                        "approved_for_publication":False}
     try:
         modeled_tree,note_space_model=simulate_source_note_spaces(
             original_doc,doc,mapping)
@@ -411,6 +414,28 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
             for edit in classify_spacing_edits(original,rendered):
                 residual_types[(edit["action"],edit["left_context"],
                                 edit["right_context"])]+=1
+        # Stage 2: only source-authenticated Jesus-speech spans may contribute
+        # a following display separator, and only in a second isolated clone.
+        spoken_tree,speech_space_model=simulate_source_speech_spaces(
+            original_doc,modeled_tree,mapping)
+        with tempfile.TemporaryDirectory(prefix="lsg-speech-space-dryrun-") as folder:
+            speech_path=Path(folder)/"unsaved-speech-model.osis.xml"
+            speech_path.write_bytes(etree.tostring(
+                spoken_tree,encoding="utf-8",xml_declaration=True))
+            spoken_text,_,_,_=_osis_verses(speech_path)
+        speech_matches=sum(
+            source_body[key]==spoken_text[f"{mapping[key[0]]}.{key[1]}.{key[2]}"]
+            for key in all_source_keys)
+        if any("".join(source_body[key].split())!="".join(
+            spoken_text[f"{mapping[key[0]]}.{key[1]}.{key[2]}"].split())
+            for key in all_source_keys):
+            raise PilotError("Speech-space model altered original Scripture symbols")
+        speech_space_model.update({
+            "source_verse_text_matches_after_both_models":speech_matches,
+            "total_source_verse_keys":len(all_source_keys),
+            "all_source_symbols_preserved":True,
+            "approved_for_publication":False,
+        })
         note_space_model.update({
             "remaining_spaced_text_mismatches_by_book":
                 dict(sorted(residual_books.items())),
@@ -610,6 +635,7 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
         "source_cross_reference_note_markers":sum(source_notes.values()),
         "source_to_candidate_note_content_audit":note_audit,
         "source_to_candidate_note_spacing_dryrun":note_space_model,
+        "source_to_candidate_speech_spacing_dryrun":speech_space_model,
         "all_textual_note_references_verified":
             note_audit["textual_target_references_verified"],
         "all_note_editorial_details_verified":
