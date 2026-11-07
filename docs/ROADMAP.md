@@ -7,3 +7,10 @@
 5. Implement a future API without replacing the existing SWORD distribution structure.
 
 Pilot #1 is [Louis Segond 1910 (eBible) and full Matthew Henry (CrossWire)](PILOT_SEGOND_MHC.md), with official SWORD versification/omission policy in [VERSIFICATION_POLICY.md](VERSIFICATION_POLICY.md). This pilot is **not complete** until source archives, actual module metadata, source-to-SWORD round trips and Bible GTK visual comparisons have been verified.
+
+For issue #3, the source audit and reviewer-approved, reversible OSIS
+layout editing code is implemented and has synthetic regression tests.
+The real LSG/MHC module metadata/representative keys were checked
+**read-only**, with evidence in [the source audit](evidence/normalizer-3/real-pilot-source-signals.json).
+Do not claim the complete normalizer has passed full-source/SWORD or
+GNOME visual acceptance: those checks belong to the real pilot #12.
