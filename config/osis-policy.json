@@ -3,8 +3,8 @@
   "description": "Reviewed OSIS 2.1.1 structure gate, not a replacement for the official XSD.",
   "official_specification": "https://wiki.crosswire.org/OSIS_Bibles",
   "schema_url": "https://www.crosswire.org/~dmsmith/osis/osisCore.2.1.1-cw-latest.xsd",
-  "schema_sha256": null,
-  "schema_status": "awaiting_pinned_official_copy",
+  "schema_sha256": "bee01a2e957e9128a60328639761922b7aa701edad5efa5c8e885f762ff1baa2",
+  "schema_status": "reviewed",
   "namespace": "http://www.bibletechnologies.net/2003/OSIS/namespace",
   "supported_elements": [
     "osis",
@@ -49,5 +49,21 @@
     "divineName": "preserve_divine_name_markup",
     "note": "preserve_note_type_and_reference",
     "verse": "preserve_verse_identifiers_and_milestones"
-  }
+  },
+  "schema_review": {
+    "reviewed_on": "2026-11-07",
+    "source": "https://www.crosswire.org/~dmsmith/osis/osisCore.2.1.1-cw-latest.xsd",
+    "reported_upstream_modified": "2016-02-18",
+    "verified_from": "HTTPS official publisher, SHA-256 and import manifest inspected by GitHub Actions",
+    "note": "Approval covers the pinned schema bytes and single W3C XML dependency only. It does not approve any source module or normalizer rule."
+  },
+  "schema_dependencies": [
+    {
+      "namespace": "http://www.w3.org/XML/1998/namespace",
+      "schema_location": "http://www.w3.org/2001/xml.xsd",
+      "download_url": "https://www.w3.org/2001/xml.xsd",
+      "local_filename": "xml.xsd",
+      "sha256": "61960fb3131e38022caad5360e2f33a3382578ab3c80cd58bd74320ede61b20c"
+    }
+  ]
 }

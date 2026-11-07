@@ -7,3 +7,6 @@ Before changing a module to approved, ensure its original source was checked by 
 
 
 OSIS commentaries require an additional `guard_commentary.py` review of official `annotateType` / `annotateRef` mappings. A successful generic XML/OSIS check does **not** qualify as reviewed commentary source provenance; the commentary-specific policy checksum and annotation proof must match. No source text, embedded Bible quotation, heading, or annotation target may be silently dropped.
+
+
+The official CrossWire OSIS 2.1.1 XSD and its W3C XML-namespace dependency are now SHA-256 pinned in `config/osis-policy.json`. Download them with `scripts/fetch_reviewed_schema.py` and validate without network. This makes the **schema available**, not any Bible/commentary eligible: real source files, structure allowlist, source-to-SWORD fidelity and reader behavior still require separate approval.

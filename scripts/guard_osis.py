@@ -89,15 +89,72 @@ def _schema(policy: dict, schema_path: Path):
         raise StructureFailure(schema_path, 1, "SCHEMA_HASH_MISMATCH",
                                f"Schema digest {digest} does not match the reviewed pinned checksum {pinned}")
     document = parse_xml(schema_path, content, "SCHEMA_XML_INVALID")
-    # Local schema dependencies must themselves be reviewed and pinned; do not
-    # implicitly trust an arbitrary imported XSD through the filesystem.
+    # Only explicitly pinned official XSD dependencies can be resolved
+    # locally; XMLSchema compilation must never fetch arbitrary import URLs.
     xsd_ns = "{http://www.w3.org/2001/XMLSchema}"
+    deps = policy.get("schema_dependencies", [])
+    if not isinstance(deps, list):
+        raise StructureFailure(POLICY_PATH, 1, "SCHEMA_DEPENDENCY_UNREVIEWED",
+                               "Schema dependency policy must be a list")
+    expected = {}
+    for dep in deps:
+        if not isinstance(dep, dict):
+            raise StructureFailure(POLICY_PATH, 1, "SCHEMA_DEPENDENCY_UNREVIEWED",
+                                   "Malformed pinned schema dependency")
+        location, filename, namespace, pin = (
+            dep.get("schema_location"), dep.get("local_filename"),
+            dep.get("namespace"), dep.get("sha256")
+        )
+        if (not isinstance(location, str) or location not in {
+                "http://www.w3.org/2001/xml.xsd"
+            } or filename != "xml.xsd" or
+            namespace != "http://www.w3.org/XML/1998/namespace" or
+            not isinstance(pin, str) or not SHA256.fullmatch(pin) or
+            location in expected):
+            raise StructureFailure(POLICY_PATH, 1, "SCHEMA_DEPENDENCY_UNREVIEWED",
+                                   "Only the exact reviewed W3C xml.xsd import is allowed")
+        local = schema_path.parent / filename
+        dep_data = require_regular_file(local, MAX_SCHEMA_BYTES, "SCHEMA_DEPENDENCY_MISSING")
+        if hashlib.sha256(dep_data).hexdigest() != pin:
+            raise StructureFailure(local, 1, "SCHEMA_DEPENDENCY_HASH_MISMATCH",
+                                   "The pinned W3C xml.xsd checksum changed")
+        dep_document = parse_xml(local, dep_data, "SCHEMA_DEPENDENCY_XML_INVALID")
+        if (dep_document.getroot().tag != xsd_ns + "schema" or
+                dep_document.getroot().get("targetNamespace") != namespace):
+            raise StructureFailure(local, 1, "SCHEMA_DEPENDENCY_INVALID",
+                                   "Unexpected W3C XML schema namespace")
+        if any(node.tag in {xsd_ns + n for n in ("import", "include", "redefine", "override")}
+               for node in dep_document.iter()):
+            raise StructureFailure(local, 1, "SCHEMA_DEPENDENCY_UNREVIEWED",
+                                   "Nested schema dependency needs separate review")
+        expected[location] = local
+
+    actual = []
     for node in document.iter():
         if node.tag in {xsd_ns + n for n in ("import", "include", "redefine", "override")}:
-            raise StructureFailure(schema_path, node.sourceline or 1, "SCHEMA_DEPENDENCY_UNREVIEWED",
-                                   "Referenced schemas require an explicit reviewed dependency manifest")
+            location = node.get("schemaLocation")
+            if (node.tag != xsd_ns + "import" or location not in expected or
+                    node.get("namespace") != "http://www.w3.org/XML/1998/namespace"):
+                raise StructureFailure(schema_path, node.sourceline or 1, "SCHEMA_DEPENDENCY_UNREVIEWED",
+                                       "Schema references an unreviewed dependency")
+            actual.append(location)
+    if set(actual) != set(expected) or len(actual) != len(expected):
+        raise StructureFailure(schema_path, 1, "SCHEMA_DEPENDENCY_UNREVIEWED",
+                               "Schema imports do not match the pinned dependency manifest")
+
+    class PinnedResolver(etree.Resolver):
+        def resolve(self, url, pubid, context):
+            if url in expected:
+                return self.resolve_filename(str(expected[url]), context)
+            raise OSError("Unreviewed XML schema location: " + str(url))
+
+    parser = etree.XMLParser(resolve_entities=False, load_dtd=False,
+                             no_network=True, recover=False, huge_tree=False)
+    parser.resolvers.add(PinnedResolver())
     try:
-        return etree.XMLSchema(document), digest
+        tree = etree.ElementTree(etree.fromstring(content, parser=parser,
+                                                base_url=schema_path.as_uri()))
+        return etree.XMLSchema(tree), digest
     except etree.XMLSchemaParseError as exc:
         entry = exc.error_log.last_error
         raise StructureFailure(schema_path, entry.line if entry else 1,

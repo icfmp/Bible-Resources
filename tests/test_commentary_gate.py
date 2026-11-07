@@ -28,6 +28,7 @@ class CommentaryGateTests(unittest.TestCase):
         osis = json.loads((ROOT / "config/osis-policy.json").read_text(encoding="utf-8"))
         osis["schema_status"] = "reviewed"  # Only a synthetic unit-test schema
         osis["schema_sha256"] = hashlib.sha256(TEST_ONLY_SCHEMA).hexdigest()
+        osis["schema_dependencies"] = []  # Synthetic fixture has no imports
         self.osis_policy.write_text(json.dumps(osis), encoding="utf-8")
         self.commentary_policy = self.root / "commentary-policy.json"
         self.commentary_policy.write_bytes((ROOT / "config/commentary-policy.json").read_bytes())
