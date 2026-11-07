@@ -70,6 +70,84 @@ class Tests(unittest.TestCase):
         errors = validate(self.root)[1]
         self.assertFalse(any("duplicate curated edition variant" in e for e in errors))
 
+    def test_reconciliation_must_reference_accepted_contribution(self):
+        self.m["upstreams"] = [{
+            "provider": "crosswire", "module_id": "MHCC",
+            "last_integrated_version": "1.0",
+            "contributions": [{
+                "url": "https://example.org/pull/3",
+                "state": "submitted", "patch_sha256": "a" * 64
+            }],
+            "reconciliations": [{
+                "upstream_version": "1.1",
+                "upstream_conf_sha256": "b" * 64,
+                "upstream_content_sha256": "c" * 64,
+                "curated_content_sha256": "d" * 64,
+                "result": "equivalent_to_curated",
+                "contribution_url": "https://example.org/pull/3",
+                "evidence_url": "https://example.org/review",
+                "reviewed_by": "editor"
+            }]
+        }]
+        self.create()
+        errors = validate(self.root)[1]
+        self.assertTrue(any("accepted/released contribution" in e for e in errors))
+
+    def test_reconciliation_requires_real_reviewer(self):
+        self.m["upstreams"] = [{
+            "provider": "crosswire", "module_id": "MHCC",
+            "last_integrated_version": "1.0",
+            "contributions": [{
+                "url": "https://example.org/pull/3",
+                "state": "accepted", "patch_sha256": "a" * 64
+            }],
+            "reconciliations": [{
+                "upstream_version": "1.1",
+                "upstream_conf_sha256": "b" * 64,
+                "upstream_content_sha256": "c" * 64,
+                "curated_content_sha256": "d" * 64,
+                "result": "equivalent_to_curated",
+                "contribution_url": "https://example.org/pull/3",
+                "evidence_url": "https://example.org/review",
+                "reviewed_by": "PENDING"
+            }]
+        }]
+        self.create()
+        errors = validate(self.root)[1]
+        self.assertTrue(any("real reviewer" in e for e in errors))
+
+    def test_reconciliation_revisions_must_not_be_duplicated(self):
+        self.m["upstreams"] = [{
+            "provider": "crosswire", "module_id": "MHCC",
+            "last_integrated_version": "1.0",
+            "contributions": [{
+                "url": "https://example.org/pull/3",
+                "state": "accepted", "patch_sha256": "a" * 64
+            }],
+            "reconciliations": [{
+                "upstream_version": "1.1",
+                "upstream_conf_sha256": "b" * 64,
+                "upstream_content_sha256": "c" * 64,
+                "curated_content_sha256": "d" * 64,
+                "result": "equivalent_to_curated",
+                "contribution_url": "https://example.org/pull/3",
+                "evidence_url": "https://example.org/review",
+                "reviewed_by": "editor"
+            }, {
+                "upstream_version": "1.1",
+                "upstream_conf_sha256": "b" * 64,
+                "upstream_content_sha256": "e" * 64,
+                "curated_content_sha256": "d" * 64,
+                "result": "contains_other_changes",
+                "contribution_url": "https://example.org/pull/3",
+                "evidence_url": "https://example.org/review",
+                "reviewed_by": "editor"
+            }]
+        }]
+        self.create()
+        errors = validate(self.root)[1]
+        self.assertTrue(any("duplicate reconciliation" in e for e in errors))
+
     def test_identical_build(self):
         build(self.root,self.root/"dist","https://example.org/")
         one=(self.root/"dist/sword/mods.d.tar.gz").read_bytes()
