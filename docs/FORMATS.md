@@ -6,3 +6,8 @@ Use standard SWORD drivers (RawText/zText, RawCom/RawCom4/zCom, RawLD/zLD, RawGe
 ## Source structure standard and fail-closed gate
 
 Use **official OSIS 2.1.1** (validated against the reviewed CrossWire XSD) for marked-up Bibles and commentaries, and a separately validated official TEI format for dictionaries when implemented. Do not invent a Bible Resources XML dialect or pretend SWORD binary data is itself an OSIS XML document. Source format validation precedes any transformation or compilation. The currently approved importer gate is described in [NORMALIZATION_POLICY.md](NORMALIZATION_POLICY.md); unknown markup halts processing rather than silently being stripped or approximated. Other legacy input formats cannot be approved until their dedicated standards-based converters and tests exist.
+
+
+## OSIS commentary semantics
+
+CrossWire OSIS commentaries use `<div annotateType="commentary" annotateRef="...">` rather than the Bible text `<verse osisID="...">` as the authoritative key for the entry. A commentary's `annotateRef` can be a single reference, range, or discontinuous list. Such relationships must not be guessed or derived from visible body quotations. Validated source checks are separate from later SWORD driver compilation; see [COMMENTARY_POLICY.md](COMMENTARY_POLICY.md).
