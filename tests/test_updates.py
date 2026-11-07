@@ -42,6 +42,88 @@ class UpdateTests(unittest.TestCase):
         self.assertEqual(compare_link(base, {"version": "1.1", "conf_sha256": "b" * 64}), "upstream_metadata_changed")
         self.assertEqual(compare_link(base, None), "missing_upstream")
 
+    def test_our_accepted_fix_returning_upstream_is_not_a_new_update(self):
+        link = {"last_integrated_version": "1.0",
+                "contributions": [{"url": "https://example.org/pull/4",
+                                   "state": "accepted", "patch_sha256": "a" * 64}],
+                "reconciliations": [{
+                    "upstream_version": "1.1", "upstream_conf_sha256": "b" * 64,
+                    "upstream_content_sha256": "c" * 64,
+                    "curated_content_sha256": "d" * 64,
+                    "result": "equivalent_to_curated",
+                    "contribution_url": "https://example.org/pull/4",
+                    "evidence_url": "https://example.org/comparison/1.1",
+                    "reviewed_by": "editor"}]}
+        remote = {"version": "1.1", "conf_sha256": "b" * 64}
+        self.assertEqual(compare_link(link, remote), "our_contribution_returned_upstream")
+        # A later release or different conf cannot piggyback on the prior review.
+        self.assertEqual(compare_link(link, {"version": "1.2", "conf_sha256": "e" * 64}),
+                         "upstream_update_available")
+        self.assertEqual(compare_link(link, {"version": "1.1", "conf_sha256": "e" * 64}),
+                         "upstream_update_available")
+
+    def test_accepted_pr_does_not_prove_a_released_source_is_equivalent(self):
+        link = {"last_integrated_version": "1.0",
+                "contributions": [{"url": "https://example.org/pull/4", "state": "accepted",
+                                   "patch_sha256": "a" * 64}]}
+        self.assertEqual(compare_link(link, {"version": "1.1", "conf_sha256": "b" * 64}),
+                         "upstream_update_available")
+
+    def test_upstream_includes_our_fix_but_other_changes_still_require_review(self):
+        link = {"last_integrated_version": "1.0",
+                "contributions": [{"url": "https://example.org/pull/4", "state": "released",
+                                   "patch_sha256": "a" * 64}],
+                "reconciliations": [{
+                    "upstream_version": "1.1", "upstream_conf_sha256": "b" * 64,
+                    "upstream_content_sha256": "c" * 64,
+                    "curated_content_sha256": "d" * 64,
+                    "result": "contains_other_changes",
+                    "contribution_url": "https://example.org/pull/4",
+                    "evidence_url": "https://example.org/review",
+                    "reviewed_by": "editor"}]}
+        self.assertEqual(compare_link(link, {"version": "1.1", "conf_sha256": "b" * 64}),
+                         "upstream_update_available")
+
+    def test_report_marks_self_contribution_candidate_without_claiming_match(self):
+        provider = {"id": "crosswire", "enabled": True, "base_url": "https://example.test/"}
+        link = {"provider": "crosswire", "module_id": "KJV",
+                "last_integrated_version": "1.0",
+                "contributions": [{"url": "https://example.org/pull/4", "state": "accepted",
+                                   "patch_sha256": "a" * 64}]}
+        manifest = {"id": "kjv", "sword_id": "KJV", "version": "1.0.0",
+                    "upstreams": [link]}
+        report = check([provider], [manifest], {}, fetch_catalog=lambda _: {},
+                       fetch_conf=lambda *_: {"version": "1.1", "conf_sha256": "b" * 64})
+        row = report["modules"][0]["upstreams"][0]
+        self.assertEqual(row["status"], "upstream_update_available")
+        self.assertTrue(row["possible_return_of_our_contribution"])
+        self.assertTrue(row["review_required"])
+        self.assertEqual(row["our_contributions"][0]["state"], "accepted")
+
+    def test_report_marks_exact_reviewed_equivalence_and_provenance(self):
+        provider = {"id": "crosswire", "enabled": True, "base_url": "https://example.test/"}
+        link = {"provider": "crosswire", "module_id": "KJV",
+                "last_integrated_version": "1.0",
+                "contributions": [{"url": "https://example.org/pull/4", "state": "released",
+                                   "patch_sha256": "a" * 64}],
+                "reconciliations": [{
+                    "upstream_version": "1.1", "upstream_conf_sha256": "b" * 64,
+                    "upstream_content_sha256": "c" * 64,
+                    "curated_content_sha256": "d" * 64,
+                    "result": "equivalent_to_curated",
+                    "contribution_url": "https://example.org/pull/4",
+                    "evidence_url": "https://example.org/full-diff",
+                    "reviewed_by": "editor"}]}
+        manifest = {"id": "kjv", "sword_id": "KJV", "version": "1.0.0",
+                    "upstreams": [link]}
+        report = check([provider], [manifest], {}, fetch_catalog=lambda _: {},
+                       fetch_conf=lambda *_: {"version": "1.1", "conf_sha256": "b" * 64})
+        row = report["modules"][0]["upstreams"][0]
+        self.assertEqual(row["status"], "our_contribution_returned_upstream")
+        self.assertFalse(row.get("review_required", False))
+        self.assertEqual(row["reviewed_reconciliation"]["evidence_url"],
+                         "https://example.org/full-diff")
+
     def test_three_version_lines_are_separate(self):
         p = {"id": "crosswire", "enabled": True, "base_url": "https://example.test/"}
         m = {"id": "some-kjv", "sword_id": "KJV", "version": "4.0.0",
