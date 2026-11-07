@@ -16,6 +16,7 @@ import tempfile
 import zipfile
 
 from pilot_preflight import ROOT, inspect_archive, PilotError
+from pilot_subprocess import query, present_key
 
 
 def run_reader(pilot: str, archive_path: Path, *, config: dict,
@@ -43,24 +44,17 @@ def run_reader(pilot: str, archive_path: Path, *, config: dict,
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 with archive.open(member) as src, destination.open("xb") as dst:
                     shutil.copyfileobj(src, dst, length=256 * 1024)
-        environment = dict(os.environ)
-        environment["SWORD_PATH"] = str(target)
         for reference in entry["sample_references"]:
-            result = subprocess.run(
-                [exe, "-b", entry["module_id"], "-k", reference, "-f", "plain"],
-                env=environment, capture_output=True, timeout=30, check=False,
+            return_code, body = query(
+                entry["module_id"], reference, fmt="plain", root=target, exe=exe
             )
-            body = result.stdout
-            success = result.returncode == 0 and bool(body.strip()) and (
-                b"not found" not in body.lower() and b"not a valid" not in body.lower()
-            )
+            success = present_key(reference, body, return_code)
             checks.append({
                 "reference": reference,
-                "diatheke_returncode": result.returncode,
+                "diatheke_returncode": return_code,
                 "has_readable_content": success,
                 "output_sha256": hashlib.sha256(body).hexdigest(),
                 "output_bytes": len(body),
-                "stderr_preview": result.stderr.decode("utf-8", errors="replace")[:220],
             })
     return {
         "pilot": pilot,
