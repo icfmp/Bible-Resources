@@ -294,7 +294,8 @@ def audit_notes(source_root, osis_root, book_mapping: dict[str, str]) -> dict:
             matched_anchor += checks["word_anchor"]
             matched_caller += checks["caller"]
             matched_kind += checks["kind"]
-            matched_links += checks["explicit_link"]
+            # Empty source/target link lists are not proof of any link.
+            matched_links += bool(a["source_link_count"] or b["target_link_count"]) and checks["explicit_link"]
             for label, matches in checks.items():
                 if not matches:
                     mismatch_counts[label] += 1
@@ -344,7 +345,8 @@ def audit_notes(source_root, osis_root, book_mapping: dict[str, str]) -> dict:
         "matching_note_word_anchors": matched_anchor,
         "matching_note_caller_markers": matched_caller,
         "matching_note_kinds": matched_kind,
-        "matching_explicit_machine_links": matched_links,
+        "matching_explicit_machine_link_note_slots": matched_links,
+        "explicit_machine_target_verification_applicable": source_link_count > 0,
         "source_explicit_link_count": source_link_count,
         "candidate_explicit_link_count": target_link_count,
         "source_notes_with_caller_marker": caller_count,
