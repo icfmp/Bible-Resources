@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit the actual eBible LSG USFM and OSIS authoring archives.
+"""Audit the actual eBible LSG USFM, USFX and optional OSIS authoring archives.
 
 No normalized source is created. Do not confuse an authoring source archive
 with the compiled SWORD module, or a successful XML parse with OSIS approval.
@@ -39,16 +39,16 @@ def read_source_xml(archive_path: Path) -> tuple[bytes, dict]:
             if member.is_dir():
                 continue
             lower = member.filename.casefold()
-            if lower.endswith((".xml", ".osis")):
+            if lower.endswith((".xml", ".osis", ".usfx")):
                 candidate_names.append(member.filename)
         if not candidate_names:
-            raise PilotError("No XML/OSIS source file in eBible OSIS archive")
+            raise PilotError("No XML/USFX/OSIS source in registered publisher archive")
         if len(candidate_names) != 1:
-            raise PilotError("Multiple OSIS source XML candidates; manual selection required")
+            raise PilotError("Multiple XML authoring source candidates; manual selection required")
         name = candidate_names[0]
         info = z.getinfo(name)
         if info.file_size > MAX_SOURCE_BYTES:
-            raise PilotError("Original OSIS XML exceeds reviewed parser size limit")
+            raise PilotError("Original authoring XML exceeds reviewed parser size limit")
         source = z.read(info)
     return source, {"path":name,"bytes":len(source),
                      "sha256":hashlib.sha256(source).hexdigest(),
@@ -116,6 +116,132 @@ def scan_osis(raw: bytes) -> tuple[dict, list]:
         "poetry_line_counts_by_book":dict(sorted(poetry_lines_by_book.items())),
     }
     return result, list(verse_keys)
+
+
+def scan_usfx(raw: bytes) -> tuple[dict, list[tuple[str,int,int]]]:
+    """Read USFX verse openings; USFX is *not* an OSIS XML document."""
+    if re.search(rb"<!DOCTYPE\b", raw, re.IGNORECASE):
+        raise PilotError("Untrusted authoring XML includes a DOCTYPE")
+    parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
+                            no_network=True,recover=False,huge_tree=False)
+    root=etree.fromstring(raw,parser)
+    if etree.QName(root).localname!="usfx":
+        raise PilotError(f"Unexpected USFX source root: {root.tag!r}")
+    books=[]
+    per_book={}
+    keys=[]
+    tags=Counter()
+    attributes=Counter()
+    bad=[]
+    duplicates=[]
+    for book in root.iter():
+        if not isinstance(book.tag,str) or etree.QName(book).localname!="book":
+            continue
+        code=book.get("id")
+        if not code or code in books:
+            raise PilotError(f"Missing or duplicate USFX book ID: {code!r}")
+        books.append(code)
+        chapter=None
+        seen=set()
+        for node in book.iter():
+            if not isinstance(node.tag,str):
+                continue
+            kind=etree.QName(node).localname
+            tags[kind]+=1
+            attributes.update(etree.QName(k).localname for k in node.attrib)
+            if kind=="c":
+                value=node.get("id")
+                if not value or not value.isdigit() or int(value)<1:
+                    raise PilotError(f"Unexpected USFX chapter key: {code}:{value}")
+                chapter=int(value)
+            elif kind=="v":
+                value=node.get("id")
+                if not chapter or not value:
+                    raise PilotError(f"USFX verse before chapter or no key in {code}")
+                match=re.fullmatch(r"(\d+)(?:-(\d+))?",value)
+                if not match:
+                    bad.append(f"{code}.{chapter}.{value}"[:100])
+                    continue
+                start=int(match[1]);stop=int(match[2] or start)
+                if not start or stop<start or stop-start>50:
+                    raise PilotError(f"Invalid USFX verse range {code}.{chapter}.{value}")
+                for verse in range(start,stop+1):
+                    key=(code,chapter,verse)
+                    if key in seen:
+                        duplicates.append(f"{code}.{chapter}.{verse}")
+                    seen.add(key)
+                    keys.append(key)
+        per_book[code]=len(seen)
+    return {
+        "root":etree.QName(root).localname,
+        "version":root.get("version"),
+        "original_books":books,
+        "book_count":len(books),
+        "verse_openings":len(keys),
+        "verse_keys_by_book":per_book,
+        "source_elements":dict(sorted(tags.items())),
+        "source_attribute_names":dict(sorted(attributes.items())),
+        "duplicate_verse_ids":duplicates[:50],
+        "nonstandard_verse_identifiers":bad[:50],
+        "warning":"Valid XML/USFX structure is not itself a validated CrossWire OSIS source.",
+    },keys
+
+
+def compare_usfm_usfx(usfm:dict,usfx:dict,keys:list[tuple[str,int,int]]) -> dict:
+    if len(usfm["_book_order"])!=len(usfx["original_books"]):
+        return {"status":"books_do_not_align",
+                "usfm_books":len(usfm["_book_order"]),
+                "usfx_books":len(usfx["original_books"])}
+    if usfm["_book_order"]!=usfx["original_books"]:
+        return {"status":"book_order_or_identifier_mismatch",
+                "pairs":[{"usfm":a,"usfx":b} for a,b in zip(usfm["_book_order"],usfx["original_books"])]}
+    usfx_by_book={}
+    for book,chap,verse in keys:
+        usfx_by_book.setdefault(book,set()).add((chap,verse))
+    differences=[]
+    for i,book in enumerate(usfm["_book_order"]):
+        left=usfm["_keys"][i]
+        right=usfx_by_book.get(book,set())
+        if left!=right:
+            differences.append({
+                "book":book,
+                "usfm_only_count":len(left-right),
+                "usfx_only_count":len(right-left),
+                "usfm_only_first_30":[f"{book}.{a}.{b}" for a,b in sorted(left-right)[:30]],
+                "usfx_only_first_30":[f"{book}.{a}.{b}" for a,b in sorted(right-left)[:30]],
+            })
+    return {
+        "status":"verse_key_sets_equal" if not differences else "verse_key_difference_needs_review",
+        "books_compared":len(usfm["_book_order"]),
+        "books_with_different_verse_keys":differences,
+        "limitation":"Same chapter/verse indices do not prove identical text, punctuation, notes or binary fidelity."
+    }
+
+
+def run_usfx(usfx_zip:Path,usfm_zip:Path) -> dict:
+    raw,source=read_source_xml(usfx_zip)
+    usfx,keys=scan_usfx(raw)
+    usfm=scan_usfm(usfm_zip)
+    return {
+        "schema_version":1,
+        "resource":"Louis Segond 1910 (eBible fraLSG)",
+        "status":"read_only_authoring_source_comparison",
+        "usfx_source":source,
+        "usfx_structure":usfx,
+        "usfm_source":{
+            "archive_sha256":usfm["archive_sha256"],
+            "book_count":usfm["book_count"],
+            "totals":usfm["summary"],
+            "books":usfm["books"],
+            "duplicate_verse_keys":usfm["duplicate_verse_keys"],
+        },
+        "usfm_usfx_verse_keys":compare_usfm_usfx(usfm,usfx,keys),
+        "source_content_unchanged":True,
+        "authoring_source_osis_schema_validated":False,
+        "source_vs_compiled_sword_full_text_checked":False,
+        "approved_for_publication":False,
+        "caveat":"USFX source is compared as USFX, not falsely submitted as OSIS to the CrossWire XSD."
+    }
 
 
 def scan_usfm(archive_path: Path) -> dict:
@@ -266,23 +392,31 @@ def run(osis_zip: Path, usfm_zip: Path, schema_dir: Path) -> dict:
 
 def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--osis-zip",type=Path,required=True)
+    group=p.add_mutually_exclusive_group(required=True)
+    group.add_argument("--osis-zip",type=Path)
+    group.add_argument("--usfx-zip",type=Path)
     p.add_argument("--usfm-zip",type=Path,required=True)
-    p.add_argument("--schema-dir",type=Path,required=True)
+    p.add_argument("--schema-dir",type=Path)
     p.add_argument("--report",type=Path,required=True)
     args=p.parse_args(argv)
     try:
-        report=run(args.osis_zip,args.usfm_zip,args.schema_dir)
+        if args.usfx_zip:
+            result=run_usfx(args.usfx_zip,args.usfm_zip)
+        elif args.schema_dir:
+            result=run(args.osis_zip,args.usfm_zip,args.schema_dir)
+        else:
+            raise PilotError("Official pinned schema directory required for original OSIS")
+        status=0 if result["status"].startswith("read_only_") else 1
     except (OSError,ValueError,zipfile.BadZipFile,etree.XMLSyntaxError) as exc:
-        report={"status":"blocked","reason":str(exc),
+        result={"status":"blocked","reason":str(exc),
                 "source_content_unchanged":True,"approved_for_publication":False}
+        status=1
     args.report.parent.mkdir(parents=True,exist_ok=True)
-    args.report.write_text(json.dumps(report,ensure_ascii=False,indent=2,sort_keys=True)+"\n",encoding="utf-8")
-    print(f"LSG original authoring sources: {report['status']}; {args.report}")
-    if report["status"]=="blocked":
-        print(report["reason"],file=sys.stderr)
-        return 1
-    return 0
+    args.report.write_text(json.dumps(result,ensure_ascii=False,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+    print(f"Publisher authoring source comparison: {result['status']}; {args.report}")
+    if status:
+        print(result["reason"],file=sys.stderr)
+    return status
 
 
 if __name__=="__main__":
