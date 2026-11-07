@@ -9,6 +9,7 @@ on:
       - 'scripts/lsg_osis_parity.py'
       - 'scripts/lsg_sword_rebuild.py'
       - 'tests/test_lsg_osis_parity.py'
+      - 'tests/test_lsg_sword_rebuild.py'
   workflow_dispatch:
 permissions:
   contents: read
