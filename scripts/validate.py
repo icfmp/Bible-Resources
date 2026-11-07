@@ -8,8 +8,8 @@ import re
 from jsonschema import Draft202012Validator, FormatChecker
 
 ROOT = Path(__file__).resolve().parents[1]
-DRIVERS = {"RawText","zText","RawCom","RawCom4","zCom","RawLD","RawLD4","zLD","RawGenBook"}
-ALLOWED = {"bible":{"RawText","zText"},"commentary":{"RawCom","RawCom4","zCom"},
+DRIVERS = {"RawText","zText","RawCom","RawCom4","zCom","zCom4","RawLD","RawLD4","zLD","RawGenBook"}
+ALLOWED = {"bible":{"RawText","zText"},"commentary":{"RawCom","RawCom4","zCom","zCom4"},
            "dictionary":{"RawLD","RawLD4","zLD"},"general_book":{"RawGenBook"}}
 
 def parse_conf(path):
