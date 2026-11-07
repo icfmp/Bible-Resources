@@ -85,6 +85,49 @@ class StrictOsisTests(unittest.TestCase):
         self.assertTrue(report["no_transformation_performed"])
         self.assertEqual(original, self.source.read_bytes())
 
+    def test_reviewed_standard_metadata_tables_and_lists_survive_source_gate(self):
+        self.write([
+            f'<osis xmlns="{NAMESPACE}">',
+            ' <osisText>',
+            '  <header><revisionDesc><date>2026-11-07</date><p>Revision record</p></revisionDesc>',
+            '   <work><description>Full provenance</description><identifier type="OSIS">Bible.Test</identifier>',
+            '   <type type="OSIS">Bible</type><refSystem>Bible</refSystem></work></header>',
+            '  <div type="book" osisID="John"><div type="introduction">',
+            '   <list><item>Outline heading</item></list>',
+            '   <table><row><cell>Heading</cell><cell>Column</cell></row>',
+            '   <row><cell>First</cell><cell>Entry</cell></row></table>',
+            '  </div><chapter osisID="John.1"><verse osisID="John.1.1"/>Verse text</chapter></div>',
+            ' </osisText></osis>',
+        ])
+        before=self.source.read_bytes()
+        report=self.validate()
+        self.assertEqual(report["elements"]["cell"],4)
+        self.assertEqual(report["elements"]["table"],1)
+        self.assertEqual(report["elements"]["revisionDesc"],1)
+        self.assertEqual(report["elements"]["list"],1)
+        self.assertEqual(self.source.read_bytes(),before)
+
+    def test_bounded_original_xml_comments_are_preserved_without_approval_of_scripts(self):
+        self.write([
+            f'<osis xmlns="{NAMESPACE}">',
+            '  <!-- USFM source provenance: keep as XML comment -->',
+            '  <osisText><p>Original words<!-- converter marker --> unchanged</p></osisText>',
+            '</osis>',
+        ])
+        original=self.source.read_bytes()
+        r=self.validate()
+        self.assertEqual(r["elements"]["xml_comment"],2)
+        self.assertEqual(original,self.source.read_bytes())
+        self.assertEqual(hashlib.sha256(original).hexdigest(),r["source_sha256"])
+
+    def test_processing_instruction_is_still_blocked(self):
+        self.write([f'<osis xmlns="{NAMESPACE}">',' <?dangerous step?>', '</osis>'])
+        self.assert_problem("UNREVIEWED_NODE",2)
+
+    def test_large_comment_requires_review(self):
+        self.write([f'<osis xmlns="{NAMESPACE}">', '<!-- '+("x"*4097)+' -->', '</osis>'])
+        self.assert_problem("UNREVIEWED_COMMENT_SIZE",2)
+
     def test_valid_but_unreviewed_element_fails_at_line(self):
         self.write([f'<osis xmlns="{NAMESPACE}">', ' <custom>Do not discard</custom>', '</osis>'])
         self.assert_problem("UNREVIEWED_ELEMENT", 2)

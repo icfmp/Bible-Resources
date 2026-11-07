@@ -1,0 +1,71 @@
+"""Synthetic 66-book fixture verifies complete text/word/note/poetry parity."""
+from pathlib import Path
+import tempfile
+import unittest
+import sys
+ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/"scripts"))
+from lsg_osis_parity import compare
+
+NS="http://www.bibletechnologies.net/2003/OSIS/namespace"
+
+
+def fixture(*,change_word=False,missing_note=False):
+    original=["<usfx>"]
+    converted=[f'<osis xmlns="{NS}"><osisText>']
+    for n in range(1,67):
+        original.append(f'<book id="B{n:02}"><c id="1"/><p><v id="1"/>'
+                        f'Alpha <w s="H123">Word{n}</w>'
+                        f'<x><xo>1</xo><xt>Ps 1</xt></x> '
+                        f'<q level="1">End.</q><ve id="1"/></p></book>')
+        word=("Different" if n==30 and change_word else f"Word{n}")
+        note="" if n==30 and missing_note else f'<note><reference osisRef="Ps.1.1">Ps 1</reference></note>'
+        converted.append(f'<div type="book" osisID="Book{n}"><chapter osisID="Book{n}.1">'
+                         f'<p><verse osisID="Book{n}.1.1" sID="Book{n}.1.1"/>'
+                         f'Alpha <w lemma="strong:H123">{word}</w>{note} '
+                         f'<lg><l level="1">End.</l></lg>'
+                         f'<verse eID="Book{n}.1.1"/></p></chapter></div>')
+    original.append("</usfx>")
+    converted.append("</osisText></osis>")
+    return "".join(original).encode(),"".join(converted).encode()
+
+
+class FullSourceOsisParityTests(unittest.TestCase):
+    def test_all_verses_words_note_placement_and_poetry_unchanged(self):
+        raw,xml=fixture()
+        with tempfile.TemporaryDirectory() as temp:
+            source=Path(temp)/"candidate.xml"
+            source.write_bytes(xml)
+            result=compare(source,raw)
+            self.assertEqual(result["total_source_verse_keys"],66)
+            self.assertEqual(result["exact_normalized_verse_text_matches"],66)
+            self.assertEqual(result["exact_normalized_word_sequences"],66)
+            self.assertEqual(result["matching_verse_note_counts"],66)
+            self.assertEqual(result["matching_verse_poetry_line_counts"],66)
+            self.assertEqual(result["source_word_markers"],66)
+            self.assertEqual(result["converted_word_markers"],66)
+            self.assertFalse(result["all_note_text_and_reference_targets_verified"])
+
+    def test_word_text_change_rejected_even_when_reference_keys_match(self):
+        raw,xml=fixture(change_word=True)
+        with tempfile.TemporaryDirectory() as temp:
+            source=Path(temp)/"candidate.xml"
+            source.write_bytes(xml)
+            result=compare(source,raw)
+            self.assertEqual(result["exact_normalized_word_sequences"],65)
+            self.assertEqual(result["exact_normalized_verse_text_matches"],65)
+            self.assertTrue(result["first_differences"])
+            self.assertEqual(result["first_differences"][0]["reference"],"B30.1.1")
+
+    def test_dropped_note_cannot_pass_counts(self):
+        raw,xml=fixture(missing_note=True)
+        with tempfile.TemporaryDirectory() as temp:
+            source=Path(temp)/"candidate.xml"
+            source.write_bytes(xml)
+            result=compare(source,raw)
+            self.assertEqual(result["matching_verse_note_counts"],65)
+            self.assertEqual(result["converted_note_markers"],65)
+
+
+if __name__=="__main__":
+    unittest.main()
