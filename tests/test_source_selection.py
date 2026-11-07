@@ -53,6 +53,12 @@ def verified(*aliases, edition_id="kjv-1769-en", category="bible", language="en"
 
 class SourcePriorityTests(unittest.TestCase):
     def select(self, catalogs, aliases=None, statuses=None, providers=None):
+        # An available but empty catalogue is different from an unavailable one.
+        # Explicitly supply empty inventories when a fixture declares status=ok.
+        catalogs = dict(catalogs)
+        for pid, state in (statuses or {}).items():
+            if state == "ok":
+                catalogs.setdefault(pid, {})
         return select_sources(
             providers or PROVIDERS, catalogs,
             aliases if aliases is not None else EMPTY_REGISTRY,
