@@ -12,6 +12,7 @@ import patch_u2o_intro as module
 
 SOURCE=(
 '''import re
+from unicodedata import normalize
 
 def markintroend(lines):
     newlines = []
@@ -57,6 +58,27 @@ def relocate_poetry_end(lines):
         with suppress(IndexError):
 ''' + module.OLD_MULTILINE_MOVE + module.OLD_POETRY_MOVE +
 '''    return lines
+'''
+
++ '''
+# Minimal executable USFM note extraction using the pinned upstream anchors.
+NOTERE = re.compile(
+    r"""
+        (?P<tag>\\x)
+        \s+
+''' + module.OLD_CALLER_CAPTURE +
+'''     \s+
+        (?P<osis>.*?)
+        (?P=tag)\*
+    """, re.U | re.VERBOSE | re.S
+)
+
+def note_replace(text):
+    def simplerepl(match):
+        tag=('<note type="crossReference">','</note>')
+        notetext=match.group("osis").replace("\\n"," ")
+''' + module.OLD_CALLER_OUTPUT +
+'''    return NOTERE.sub(simplerepl,text)
 '''
 ).encode("utf-8")
 
@@ -141,6 +163,24 @@ class U2OIntroTests(unittest.TestCase):
         ]
         self.assertNotEqual(before["relocate_poetry_end"](verse.copy()),verse)
         self.assertEqual(after["relocate_poetry_end"](verse.copy()),verse)
+
+
+    def test_original_note_caller_is_preserved_and_xml_escaped(self):
+        source=SOURCE
+        with mock_patch.object(module,"EXPECTED_UPSTREAM_SHA256",hashlib.sha256(source).hexdigest()):
+            reviewed=module.patch(source)
+        original={}
+        patched={}
+        exec(compile(source,"note-callout-original.py","exec"),original)
+        exec(compile(reviewed,"note-callout-reviewed.py","exec"),patched)
+        for glyph, expected in (("a",'n="a"'),("+",'n="+"'),("&",'n="&amp;"')):
+            raw="\\x "+glyph+" \\xo 1.1 \\xt Ref 1:1.\\x*"
+            before=original["note_replace"](raw)
+            after=patched["note_replace"](raw)
+            self.assertNotIn(" n=",before)
+            self.assertIn(expected,after)
+            self.assertEqual(before.replace('>',' '+expected+'>',1),after)
+            self.assertIn("Ref 1:1.",after)
 
     def test_upstream_sha_change_fails_closed(self):
         with self.assertRaisesRegex(module.ConverterPatchError,"SHA-256 changed"):
