@@ -49,8 +49,10 @@ def simulate_source_note_spaces(source_root, target_root, mapping):
     """Return a modified *copy* plus machine-safe metadata (not a saved OSIS).
 
     Requires all source note labels, kind, order and word anchors to match.
-    Existing source metadata is never changed. Source tabs/newlines and
-    candidate-added spaces remain explicit unreviewed editorial differences.
+    Existing source metadata is never changed. Source tabs/newlines may be
+    represented by one ASCII space in the cloned *diagnostic* rendering,
+    but that does not claim exact preservation of source editorial whitespace.
+    Candidate-added spaces remain explicit unreviewed differences.
     """
     initial=audit_notes(source_root,target_root,mapping)
     count=initial["source_note_count"]
@@ -84,11 +86,19 @@ def simulate_source_note_spaces(source_root, target_root, mapping):
             new_space=generated["space_immediately_before_note"]
             if old_space and not new_space:
                 raw=_predecessor_text(original["_xml_node"])
-                if not raw.endswith(" "):
-                    cases["non_ascii_source_separator_requires_review"]+=1
-                    continue
+                if not raw or not raw[-1].isspace():
+                    raise PilotError("Source note separator audit does not match the XML")
+                kind=(
+                    "ascii_space" if raw[-1]==" " else
+                    "newline" if raw[-1] in "\r\n" else
+                    "tab" if raw[-1]=="\t" else
+                    "other_unicode_space"
+                )
+                # This is a visual normalization *only in the clone*:
+                # retain the exact source character in the original USFX.
                 _append_before(generated["_xml_node"]," ")
-                cases["source_ascii_space_restored_in_memory"]+=1
+                cases["source_space_modeled_in_memory"]+=1
+                cases["source_separator_"+kind]+=1
                 if len(insertions)<50:
                     insertions.append({
                         "reference":f"{book}.{chapter}.{verse}",
@@ -124,7 +134,9 @@ def simulate_source_note_spaces(source_root, target_root, mapping):
             new_audit["preceding_note_separator_presence_cases"].get(
                 "missing_from_candidate",0),
         "full_note_editorial_metadata_approved":False,
-        "limitation":"Only known source ASCII spaces before notes are modeled. "
-                     "The candidate has not been rewritten; original note "
-                     "internal whitespace and SWORD indexing remain separate gates.",
+        "limitation":"Source-authored whitespace immediately before notes "
+                     "is visualized as one ASCII space in an isolated copy, "
+                     "not restored byte-for-byte. XML originals and candidate "
+                     "are unchanged; editorial whitespace, note text formatting "
+                     "and SWORD indexing remain separate review gates.",
     }
