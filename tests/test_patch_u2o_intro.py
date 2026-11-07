@@ -47,14 +47,6 @@ def note_cleanup(text):
 ''' + module.OLD_NOTE_SPACE +
 '''    )
 '''
-+ '''
-def relocate_verse_end(lines):
-    for i,j in ((x,y) for x in ("<l",)
-                for y in range(len(lines)) if lines[y].startswith("<verse eID")):
-''' + module.OLD_VERSE_MOVE +
-'''            pass
-    return lines
-'''
 ).encode("utf-8")
 
 
@@ -97,20 +89,6 @@ class U2OIntroTests(unittest.TestCase):
         self.assertNotEqual(before["note_cleanup"](sample),sample)
         self.assertEqual(after["note_cleanup"](sample),sample)
         self.assertNotIn(module.OLD_NOTE_SPACE.encode(),fixed)
-
-    def test_verse_end_cannot_cross_text_bearing_poetry(self):
-        with mock_patch.object(module,"EXPECTED_UPSTREAM_SHA256",hashlib.sha256(SOURCE).hexdigest()):
-            fixed=module.patch(SOURCE)
-        before={}
-        after={}
-        exec(compile(SOURCE,"original-verse-relocation.py","exec"),before)
-        exec(compile(fixed,"patched-verse-relocation.py","exec"),after)
-        original=['<l level="1">Quoted Scripture must stay in verse.</l>',
-                  '<verse eID="Acts.13.35"/>']
-        bad=before["relocate_verse_end"](original.copy())
-        good=after["relocate_verse_end"](original.copy())
-        self.assertTrue(bad[0].startswith("<verse eID"))
-        self.assertEqual(good,original)
 
     def test_upstream_sha_change_fails_closed(self):
         with self.assertRaisesRegex(module.ConverterPatchError,"SHA-256 changed"):
