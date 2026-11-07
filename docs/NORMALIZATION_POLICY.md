@@ -43,22 +43,37 @@ TEI dictionaries and other source formats require their *own* schema-pinned, tes
 
 ## Pinning the official schema
 
-\`config/osis-policy.json\` currently contains the documented CrossWire OSIS 2.1.1 schema URL, but its digest is intentionally \`null\` and \`schema_status\` is not \`reviewed\`. **Until a maintainer retrieves, inspects and pins the real official schema, all real source processing and module approvals are blocked.** The test suite uses a clearly labelled **synthetic** XSD only to test the guard, never to claim real-world OSIS conformance.
+On 2026-11-07, the CrossWire OSIS 2.1.1 XSD and the W3C XML-namespace
+schema it imports were retrieved from their official HTTPS sources, fingerprinted,
+reviewed for imports, and successfully compiled **offline** on GitHub Actions.
 
-To enable the official schema:
+- CrossWire osisCore.2.1.1-cw-latest.xsd:
+  SHA-256 bee01a2e957e9128a60328639761922b7aa701edad5efa5c8e885f762ff1baa2
+- W3C xml.xsd (the single approved import):
+  SHA-256 61960fb3131e38022caad5360e2f33a3382578ab3c80cd58bd74320ede61b20c
 
-1. Obtain \`osisCore.2.1.1-cw-latest.xsd\` from the CrossWire URL recorded in policy through an authorized workflow.
-2. Inspect and record its actual SHA-256 in \`config/osis-policy.json\`, change \`schema_status\` to \`reviewed\` after human review, and record its fetch date and upstream revision in the pull request.
-3. If that XSD references auxiliary XSDs, pin the **entire** dependency set and extend the validator to support it explicitly; current code refuses unreviewed imports/includes.
-4. Do not silently substitute an ad-hoc XML schema, Internet-hosted live schema, or “best effort” validation.
+The source URL, SHA-256 values and dependency contract are recorded in
+config/osis-policy.json. The validator never fetches an XSD while processing
+a resource. It resolves only the local, hash-verified W3C dependency, and
+rejects any unreviewed or changed imports.
 
-Then run (the XSD is supplied locally, not fetched by the tool):
+Fetch both checked XSDs into a disposable local cache:
+
+    python scripts/fetch_reviewed_schema.py --directory /tmp/reviewed-osis
+
+Then validate a real original OSIS source:
 
     python scripts/guard_osis.py path/to/original.osis.xml \
       --schema /tmp/reviewed-osis/osisCore.2.1.1-cw-latest.xsd \
       --report path/to/SOURCE_VALIDATION.json
 
-The command returns exit code **0** on success and **1** on a stop condition. A blocked report replaces any prior success report so CI cannot misread a stale result.
+The command exits 0 only for a schema- and policy-valid source. A blocked
+report replaces stale successes. If upstream changes either XSD, a fresh
+explicit review and pin are required.
+
+**This is only schema readiness.** It does not establish that any real Bible
+or commentary passes the source gate, nor authorize any normalization or
+publication. Real LSG and MHC checks remain pending.
 
 ## How to handle a new special case
 
