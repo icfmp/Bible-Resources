@@ -6,6 +6,9 @@ on:
       - 'scripts/lsg_rebuild_trial.py'
       - 'scripts/patch_u2o_intro.py'
       - 'tests/test_lsg_rebuild_trial.py'
+      - 'scripts/lsg_osis_parity.py'
+      - 'scripts/lsg_sword_rebuild.py'
+      - 'tests/test_lsg_osis_parity.py'
   workflow_dispatch:
 permissions:
   contents: read
@@ -48,6 +51,12 @@ jobs:
           PY
       - name: Fetch and locally verify pinned official CrossWire/W3C XSD pair
         run: python scripts/fetch_reviewed_schema.py --directory "${{ runner.temp }}/reviewed-osis"
+      - name: Install official SWORD compiler and isolated reader for diagnostic only
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libsword-utils diatheke >/dev/null
+          command -v osis2mod
+          command -v diatheke
       - name: Test complete source conversion; no Scripture committed, uploaded or published
         run: |
           python scripts/lsg_rebuild_trial.py \
@@ -69,5 +78,5 @@ jobs:
         run: |
           echo '## Candidate LSG USFM → OSIS (inspection only)' >> "$GITHUB_STEP_SUMMARY"
           echo 'Immutable third-party converter version, original sources and two pinned official XSDs.' >> "$GITHUB_STEP_SUMMARY"
-          echo 'No module rebuilt from real Scripture and no content uploaded or published by this workflow.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'If schemas pass, a real-source module is compiled ONLY in runner temporary storage, never uploaded/published.' >> "$GITHUB_STEP_SUMMARY"
           echo 'Real full verse-text, notes, xrefs and SWORD round-trip remain separate gates.' >> "$GITHUB_STEP_SUMMARY"
