@@ -47,6 +47,17 @@ def note_cleanup(text):
 ''' + module.OLD_NOTE_SPACE +
 '''    )
 '''
+
++ '''
+import re
+from contextlib import suppress
+
+def relocate_poetry_end(lines):
+    for i in (_ for _ in range(len(lines)) if lines[_].startswith("<verse eID")):
+        with suppress(IndexError):
+''' + module.OLD_POETRY_MOVE +
+'''    return lines
+'''
 ).encode("utf-8")
 
 
@@ -89,6 +100,31 @@ class U2OIntroTests(unittest.TestCase):
         self.assertNotEqual(before["note_cleanup"](sample),sample)
         self.assertEqual(after["note_cleanup"](sample),sample)
         self.assertNotIn(module.OLD_NOTE_SPACE.encode(),fixed)
+
+    def test_verse_end_stays_after_text_bearing_poetry_line(self):
+        original=SOURCE
+        with mock_patch.object(module,"EXPECTED_UPSTREAM_SHA256",hashlib.sha256(original).hexdigest()):
+            fixed=module.patch(original)
+        before={}
+        after={}
+        exec(compile(original,"unpatched-verse-fixture.py","exec"),before)
+        exec(compile(fixed,"reviewed-verse-fixture.py","exec"),after)
+        quoted=[
+            "</p>","<lg>",
+            '<l level="1"><w lemma="strong:G1">Quoted words</w>.</l>',
+            '<verse eID="Acts.13.35"/>',
+            '<verse sID="Acts.13.36"/>',
+        ]
+        broken=before["relocate_poetry_end"](quoted.copy())
+        preserved=after["relocate_poetry_end"](quoted.copy())
+        self.assertTrue(broken[0].startswith("<verse eID"))
+        self.assertEqual(preserved,quoted)
+        # Keep the original legitimate movement when no verse text is crossed.
+        empty=[
+            "</p>","<lg>",'<l level="1">',
+            '<verse eID="Acts.13.35"/>','<verse sID="Acts.13.36"/>',
+        ]
+        self.assertTrue(after["relocate_poetry_end"](empty.copy())[0].startswith("<verse eID"))
 
     def test_upstream_sha_change_fails_closed(self):
         with self.assertRaisesRegex(module.ConverterPatchError,"SHA-256 changed"):
