@@ -77,9 +77,9 @@ class SourcePriorityTests(unittest.TestCase):
         self.assertTrue(result["complete"])
 
     def test_prefer_provider_rank_not_version_number(self):
-        catalog = inventory(ebible=[conf("A", version="99.0")],
-                            step=[conf("B", version="1.0")])
-        identity = registry(verified(("ebible", "A"), ("step", "B")))
+        catalog = inventory(ebible=[conf("AA", version="99.0")],
+                            step=[conf("BB", version="1.0")])
+        identity = registry(verified(("ebible", "AA"), ("step", "BB")))
         statuses = {pid: "ok" for pid in PRIORITY["priority"]}
         result = self.select(catalog, identity, statuses)
         self.assertEqual(result["selected"][0]["source"]["provider"], "ebible")
@@ -109,13 +109,13 @@ class SourcePriorityTests(unittest.TestCase):
         self.assertFalse(result["blocked"])
 
     def test_verified_distinct_editions_can_share_display_title(self):
-        catalog = inventory(crosswire=[conf("A", title="Same title")],
-                            ebible=[conf("B", title="Same title")],
-                            step=[conf("C", title="Same title")],
-                            andbible=[conf("D", title="Same title")])
+        catalog = inventory(crosswire=[conf("AA", title="Same title")],
+                            ebible=[conf("BB", title="Same title")],
+                            step=[conf("CC", title="Same title")],
+                            andbible=[conf("DD", title="Same title")])
         identities = registry(
-            verified(("crosswire", "A"), ("step", "C"), edition_id="edition-one"),
-            verified(("ebible", "B"), ("andbible", "D"), edition_id="edition-two"),
+            verified(("crosswire", "AA"), ("step", "CC"), edition_id="edition-one"),
+            verified(("ebible", "BB"), ("andbible", "DD"), edition_id="edition-two"),
         )
         result = self.select(catalog, identities, {pid: "ok" for pid in PRIORITY["priority"]})
         self.assertEqual(len(result["selected"]), 2)
@@ -123,13 +123,13 @@ class SourcePriorityTests(unittest.TestCase):
         self.assertEqual(len(result["blocked"]), 0)
 
     def test_lower_used_if_higher_confirmed_absent(self):
-        catalog = inventory(crosswire=[], ebible=[conf("A")])
-        identities = registry(verified(("crosswire", "A"), ("ebible", "A")))
+        catalog = inventory(crosswire=[], ebible=[conf("AA")])
+        identities = registry(verified(("crosswire", "AA"), ("ebible", "AA")))
         result = self.select(catalog, identities, {pid: "ok" for pid in PRIORITY["priority"]})
         self.assertEqual(result["selected"][0]["source"]["provider"], "ebible")
 
     def test_unavailable_higher_blocks_lower_instead_of_fallback(self):
-        catalog = inventory(ebible=[conf("A")])
+        catalog = inventory(ebible=[conf("AA")])
         statuses = {pid: "ok" for pid in PRIORITY["priority"]}
         statuses["crosswire"] = "unavailable"
         result = self.select(catalog, statuses=statuses)
@@ -137,7 +137,7 @@ class SourcePriorityTests(unittest.TestCase):
         self.assertIn("higher_priority_catalog_unavailable", result["blocked"][0]["reasons"])
 
     def test_unavailable_lower_does_not_undo_preferred_crosswire_selection(self):
-        catalog = inventory(crosswire=[conf("A")])
+        catalog = inventory(crosswire=[conf("AA")])
         statuses = {pid: "ok" for pid in PRIORITY["priority"]}
         statuses["andbible-extra"] = "unavailable"
         result = self.select(catalog, statuses=statuses)
@@ -147,29 +147,29 @@ class SourcePriorityTests(unittest.TestCase):
 
     def test_disabled_provider_is_excluded(self):
         sources = [dict(p, enabled=False) if p["id"] == "crosswire" else p for p in PROVIDERS]
-        catalog = inventory(ebible=[conf("A")])
+        catalog = inventory(ebible=[conf("AA")])
         statuses = {pid: "ok" for pid in PRIORITY["priority"]}
         statuses["crosswire"] = "disabled"
         result = self.select(catalog, statuses=statuses, providers=sources)
         self.assertEqual(result["selected"][0]["source"]["provider"], "ebible")
 
     def test_verified_identity_conflicting_language_blocks(self):
-        catalog = inventory(crosswire=[conf("A", lang="fr")],
-                            ebible=[conf("B", lang="en")])
-        identities = registry(verified(("crosswire", "A"), ("ebible", "B")))
+        catalog = inventory(crosswire=[conf("AA", lang="fr")],
+                            ebible=[conf("BB", lang="en")])
+        identities = registry(verified(("crosswire", "AA"), ("ebible", "BB")))
         result = self.select(catalog, identities, {pid: "ok" for pid in PRIORITY["priority"]})
         self.assertIn("verified_identity_metadata_mismatch", result["blocked"][0]["reasons"])
 
     def test_reviewer_cannot_reuse_one_alias_in_two_editions(self):
         identity = registry(
-            verified(("crosswire", "A"), ("ebible", "B"), edition_id="edition-one"),
-            verified(("crosswire", "A"), ("step", "C"), edition_id="edition-two"),
+            verified(("crosswire", "AA"), ("ebible", "BB"), edition_id="edition-one"),
+            verified(("crosswire", "AA"), ("step", "CC"), edition_id="edition-two"),
         )
         with self.assertRaisesRegex(ValueError, "conflicting source alias"):
             self.select({}, identity)
 
     def test_pending_verification_does_not_authorize_de_duplication(self):
-        identity = verified(("crosswire", "A"), ("ebible", "B"))
+        identity = verified(("crosswire", "AA"), ("ebible", "BB"))
         identity["verified_by"] = "PENDING"
         with self.assertRaisesRegex(ValueError, "verified reviewer"):
             self.select({}, registry(identity))
@@ -180,7 +180,7 @@ class SourcePriorityTests(unittest.TestCase):
             select_sources(PROVIDERS, {}, EMPTY_REGISTRY, incorrect)
 
     def test_unknown_driver_blocked(self):
-        item = conf("X", category="unknown")
+        item = conf("XX", category="unknown")
         result = self.select(inventory(crosswire=[item]),
                              statuses={pid: "ok" for pid in PRIORITY["priority"]})
         self.assertIn("unsupported_module_category", result["blocked"][0]["reasons"])
