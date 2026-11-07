@@ -116,7 +116,7 @@ class NoteParityTests(unittest.TestCase):
 
     def test_extra_out_of_verse_note_fails_closed(self):
         source,candidate=example()
-        inserted=etree.SubElement(candidate.find(f".//{{{NS}}}chapter"),NS+"note")
+        inserted=etree.SubElement(candidate.find(f".//{{{NS}}}chapter"),f"{{{NS}}}note")
         inserted.set("type","crossReference")
         result=audit_notes(source,candidate,{"GEN":"Gen","EXO":"Exod"})
         self.assertEqual(result["candidate_notes_outside_verses"],1)
