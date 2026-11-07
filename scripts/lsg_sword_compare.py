@@ -77,6 +77,17 @@ def hash_text(value:str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
+def explain_wrapper(reference_text: str, sword_text: str) -> str | None:
+    """Only match an exact complete *visual* wrapper; never normalize arbitrary *.
+
+    This is diagnostic equivalence, not authorization to mutate original
+    Scripture, metadata or compiled SWORD bytes.
+    """
+    if sword_text == "* " + reference_text + " *":
+        return "sword_balanced_asterisk_emphasis"
+    return None
+
+
 def usfx_text_by_verse(source:bytes, *, filter_books: set[str]) -> tuple[dict, dict]:
     parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
                             no_network=True,recover=False,huge_tree=False)
@@ -170,6 +181,7 @@ def run(sword_archive:Path,usfx_archive:Path,*,diatheke="diatheke",full:bool=Fal
     totals=Counter()
     differences=[]
     books_text={}
+    display_wrappers=[]
     with tempfile.TemporaryDirectory(prefix="bible-lsg-sword-source-") as tmp:
         root=Path(tmp)
         with zipfile.ZipFile(sword_archive) as source_zip:
@@ -185,6 +197,7 @@ def run(sword_archive:Path,usfx_archive:Path,*,diatheke="diatheke",full:bool=Fal
         for code,(alias,numbers) in planned.items():
             source_parts=[]
             sword_parts=[]
+            sword_parts_without_exact_wrappers=[]
             for chapter in numbers:
                 ref=f"{alias} {chapter}"
                 ret,body=query("fraLSG1910eb",ref,fmt="plain",root=root,exe=diatheke)
@@ -195,6 +208,17 @@ def run(sword_archive:Path,usfx_archive:Path,*,diatheke="diatheke",full:bool=Fal
                           if b==code and c==chapter}
                 source_parts.extend(expected[v] for v in sorted(expected))
                 sword_parts.extend(sword[v] for v in sorted(sword))
+                for v in sorted(sword):
+                    reference_text = expected.get(v)
+                    applied = explain_wrapper(reference_text, sword[v]) if reference_text is not None else None
+                    if applied:
+                        display_wrappers.append({
+                            "reference":f"{code}.{chapter}.{v}",
+                            "classification":applied,
+                        })
+                        sword_parts_without_exact_wrappers.append(reference_text)
+                    else:
+                        sword_parts_without_exact_wrappers.append(sword[v])
                 missing=sorted(set(expected)-set(sword))
                 extra=sorted(set(sword)-set(expected))
                 common=sorted(set(expected)&set(sword))
@@ -233,12 +257,15 @@ def run(sword_archive:Path,usfx_archive:Path,*,diatheke="diatheke",full:bool=Fal
                 })
             full_source=plain(" ".join(source_parts))
             full_sword=plain(" ".join(sword_parts))
+            full_sword_visual=plain(" ".join(sword_parts_without_exact_wrappers))
             books_text[code]={
                 "source_normalized_characters":len(full_source),
                 "sword_normalized_characters":len(full_sword),
                 "text_equal_when_verse_boundaries_ignored":full_source==full_sword,
+                "text_equal_after_verified_display_wrappers_removed":full_source==full_sword_visual,
                 "source_normalized_sha256":hash_text(full_source),
                 "sword_normalized_sha256":hash_text(full_sword),
+                "sword_display_wrapper_stripped_sha256":hash_text(full_sword_visual),
                 "interpretation":"Text equality is separate from reference/verse index correctness. Headings, notes and other USFX apparatus are checked separately.",
             }
     return {
@@ -256,6 +283,10 @@ def run(sword_archive:Path,usfx_archive:Path,*,diatheke="diatheke",full:bool=Fal
         "book_content_checks":books_text,
         "books_with_identical_continuous_scripture_text":
             sum(item["text_equal_when_verse_boundaries_ignored"] for item in books_text.values()),
+        "books_with_equivalent_continuous_scripture_text_after_verified_display_wrappers":
+            sum(item["text_equal_after_verified_display_wrappers_removed"] for item in books_text.values()),
+        "verified_exact_sword_display_wrappers":len(display_wrappers),
+        "display_wrapper_examples":display_wrappers[:80],
         "first_text_differences":differences,
         "source_unmodified":True,
         "sword_unmodified":True,
@@ -265,7 +296,7 @@ def run(sword_archive:Path,usfx_archive:Path,*,diatheke="diatheke",full:bool=Fal
         "annotations_compared_to_sword":False,
         "published":False,
         "notes":[
-            "Text is compared after NFC and whitespace collapsing; raw punctuation remains significant.",
+            "Text is compared after NFC and whitespace collapsing; raw punctuation remains significant. Verified balanced asterisk wrappers are classified as display-only and source + SWORD digests retained.",
             "USFX headings, section references, footnotes and apparatus are retained in the source but excluded from plain-verse word comparison; their compiled preservation is audited separately.",
             "A mismatch is a diagnostic, not permission to edit or relocate Scripture.",
         ],
