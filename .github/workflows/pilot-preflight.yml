@@ -1,0 +1,60 @@
+name: Pilot source preflight (on demand, read-only)
+on:
+  workflow_dispatch:
+    inputs:
+      pilot:
+        description: 'Pilot to inspect, without publishing or modifying module text'
+        required: true
+        default: lsg
+        type: choice
+        options:
+          - lsg
+          - mhc
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch only the allowlisted upstream archives
+        env:
+          PILOT: ${{ inputs.pilot }}
+        run: |
+          python scripts/pilot_fetch.py --pilot "$PILOT" --directory "${{ runner.temp }}/pilot-inputs"
+      - name: Inspect SWORD structure and source ZIP without extraction
+        env:
+          PILOT: ${{ inputs.pilot }}
+        run: |
+          if [ "$PILOT" = lsg ]; then
+            python scripts/pilot_preflight.py --pilot lsg \
+              --sword-zip "${{ runner.temp }}/pilot-inputs/sword.zip" \
+              --authored-zip "${{ runner.temp }}/pilot-inputs/authored.zip" \
+              --report reports/pilot-preflight.json
+          elif [ "$PILOT" = mhc ]; then
+            python scripts/pilot_preflight.py --pilot mhc \
+              --sword-zip "${{ runner.temp }}/pilot-inputs/sword.zip" \
+              --report reports/pilot-preflight.json
+          else
+            echo "Unsupported pilot" >&2
+            exit 1
+          fi
+      - name: Attach metadata report only (never original archives)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pilot-${{ inputs.pilot }}-metadata-report
+          path: reports/pilot-preflight.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Explain limits
+        if: always()
+        run: |
+          echo '## Bible Resources pilot metadata preflight' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Inspection-only: hashes, archive paths, SWORD conf fields.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Not yet: source-text comparison, OSIS schema approval, rendering, normalization, publication.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'No third-party archive is included in artifacts or the repository.' >> "$GITHUB_STEP_SUMMARY"
