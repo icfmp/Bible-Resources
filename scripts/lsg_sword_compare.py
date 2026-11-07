@@ -83,7 +83,7 @@ def explain_wrapper(reference_text: str, sword_text: str) -> str | None:
     This is diagnostic equivalence, not authorization to mutate original
     Scripture, metadata or compiled SWORD bytes.
     """
-    if sword_text == "* " + reference_text + " *":
+    if reference_text and "*" not in reference_text and sword_text == "* " + reference_text + " *":
         return "sword_balanced_asterisk_emphasis"
     return None
 
