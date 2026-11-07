@@ -43,6 +43,7 @@ def full_index_roundtrip(source: bytes, *, root: Path, reader: str) -> dict:
     source_verses,_=usfx_text_by_verse(source,filter_books=set(plan))
     totals=Counter()
     examples=[]
+    index_key_mismatches=[]
     books=[]
     for code,(book_name,chapters) in plan.items():
         book_checks=Counter()
@@ -69,6 +70,12 @@ def full_index_roundtrip(source: bytes, *, root: Path, reader: str) -> dict:
                 "exact_normalized_text_matches":exact,
                 "content_matches_ignoring_whitespace":no_spaces,
             })
+            if (source_only or sword_only) and len(index_key_mismatches)<60:
+                index_key_mismatches.append({
+                    "book":code,"chapter":chapter,
+                    "source_only_reference_keys":sorted(source_only)[:25],
+                    "sword_only_reference_keys":sorted(sword_only)[:25],
+                })
             if len(examples)<75 and (source_only or sword_only or exact!=len(same)):
                 examples.append({
                     "book":code,"chapter":chapter,
@@ -94,6 +101,7 @@ def full_index_roundtrip(source: bytes, *, root: Path, reader: str) -> dict:
         "totals":dict(totals),
         "books":books,
         "first_diagnostic_chapters":examples,
+        "all_index_key_mismatch_chapters":index_key_mismatches,
         "source_key_count_matches":totals["source_keys_missing"]==0
           and totals["sword_keys_unexpected"]==0
           and totals["source_verses"]==len(keys)
@@ -182,6 +190,12 @@ def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke", sou
             # NEVER be taken as a successful reader round trip.
             content=decoded[len(heading):] if matched else decoded
             has_text=bool(content.strip()) or bool(heading[len(header):].strip())
+            # Distinguish real OSIS markup from rendered canonical text.
+            # These diagnostics contain no original Scripture words.
+            xml_tags=re.findall(r"<(/?)([A-Za-z][A-Za-z0-9]*)\\b",decoded)
+            tag_counts={name:sum(tag==name for _,tag in xml_tags)
+                        for name in ("w","note","reference","hi","l","lg","p","verse")}
+            mark_bodies=re.findall(r"(?:strong|lemma|morph)(?:=|:)",decoded,re.I)
             probes.append({
                 "requested":key,
                 "reader_return_code":code,
@@ -189,6 +203,8 @@ def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke", sou
                 "has_nonempty_verse_body":has_text and present_key(key,body,code),
                 "output_sha256":_sha(body),
                 "output_bytes":len(body),
+                "visible_xml_tag_counts":tag_counts,
+                "morph_or_lemma_markup_markers":len(mark_bodies),
             })
         report["reader_probes"]=probes
         report["all_sample_keys_have_text"]=all(
