@@ -175,6 +175,14 @@ def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke", sou
             "Encoding=UTF-8\n"
             "Lang=fr\n"
             "SourceType=OSIS\n"
+            # SWORD cannot hide OSIS apparatus or Strong labels in plain
+            # reader output unless the module advertises its option filters.
+            # They change display only; the compiled source stays intact.
+            "GlobalOptionFilter=OSISLemma\n"
+            "GlobalOptionFilter=OSISStrongs\n"
+            "GlobalOptionFilter=OSISFootnotes\n"
+            "GlobalOptionFilter=OSISScripref\n"
+            "GlobalOptionFilter=OSISHeadings\n"
             "Versification=Segond\n"
             "DistributionLicense=Public Domain\n",
             encoding="utf-8",
