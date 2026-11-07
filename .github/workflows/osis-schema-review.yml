@@ -1,0 +1,36 @@
+name: Inspect official OSIS schema provenance
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/probe_official_osis.py'
+      - '.github/workflows/osis-schema-review.yml'
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install XML schema parser
+        run: python -m pip install -r requirements.txt
+      - name: Probe exact CrossWire schema URL read-only
+        run: python scripts/probe_official_osis.py --report reports/official-osis-schema.json
+      - name: Attach only schema provenance report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: official-osis-schema-audit
+          path: reports/official-osis-schema.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Manual review reminder
+        if: always()
+        run: |
+          echo '## OSIS schema provenance' >> "$GITHUB_STEP_SUMMARY"
+          echo 'The probe reports the official CrossWire XSD hash and external dependencies.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'It does not approve or pin any schema automatically.' >> "$GITHUB_STEP_SUMMARY"
