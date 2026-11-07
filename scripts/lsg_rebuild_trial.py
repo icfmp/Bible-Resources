@@ -70,8 +70,8 @@ def _debug_usfm_verse_markers(files: list[Path]) -> None:
     No raw USFM is included in the JSON report, artifacts or repository.
     Match chapters and verse openings rather than guessing from content.
     """
-    targets={("GEN",29,14),("DEU",32,6),("JOB",4,11),
-             ("ISA",25,2),("ACT",13,35)}
+    targets={("ISA",25,2),("MAT",13,14),("ACT",4,11),
+             ("ROM",3,4),("1CO",1,19),("HEB",3,15)}
     for file in files:
         content=file.read_text(encoding="utf-8-sig")
         match=re.search(r"(?m)^\\id\s+([A-Z0-9]{3})\b",content)
@@ -99,8 +99,8 @@ def _debug_converted_verse_markup(path: Path) -> None:
     XML or biblical text is written to GitHub artifacts or source control.
     """
     xml=path.read_text(encoding="utf-8")
-    for reference in ("Acts.13.35","Heb.2.13","1Pet.4.8",
-                      "Isa.25.2","Jer.26.18"):
+    for reference in ("Isa.25.2","Matt.13.14","Acts.4.11",
+                      "Rom.3.4","1Cor.1.19","Heb.3.15","2Cor.9.10"):
         marker=f'sID="{reference}"'
         index=xml.find(marker)
         if index<0:
@@ -110,6 +110,10 @@ def _debug_converted_verse_markup(path: Path) -> None:
         start=max(0,opening-80)
         excerpt=xml[start:min(len(xml),index+650)]
         print("OSIS_VERSE_MARKUP_SAMPLE",reference,repr(excerpt))
+        closing=xml.find(f'eID="{reference}"',index)
+        if closing>=0:
+            print("OSIS_VERSE_END_SAMPLE",reference,
+                  repr(xml[max(0,closing-240):min(len(xml),closing+300)]))
 
 
 def _original_usfm_intro_markers(archive: Path, target_id: str) -> dict:
