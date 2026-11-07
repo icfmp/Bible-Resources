@@ -237,25 +237,25 @@ class U2OIntroTests(unittest.TestCase):
         raw="\\v 1 <w>sera</w> \\x f \\xo 1.1 \\xt Ps 1:1.\\x*<w>vengé</w>"
         before_conversion=before["doconvert"](raw,0)[0]
         guarded_conversion=after["doconvert"](raw,0)[0]
-        self.assertNotIn("\\ue000",before_conversion)
-        self.assertIn("\\ue000",guarded_conversion)
+        self.assertNotIn("\ue000",before_conversion)
+        self.assertIn("\ue000",guarded_conversion)
         # Simulate a converter stage that trims normal ASCII whitespace
         # before a note marker. The protected separator must survive it.
-        trim=lambda text:text.replace(" \\\\x", "\\\\x")
-        self.assertNotIn("<w>sera</w> \\\\x",trim(before_conversion))
+        trim=lambda text:text.replace(" \\x", "\\x")
+        self.assertNotIn("<w>sera</w> \\x",trim(before_conversion))
         final=after["final_note_spacing"](trim(guarded_conversion))
-        self.assertIn("<w>sera</w> \\\\x",final)
-        self.assertNotIn("\\ue000",final)
+        self.assertIn("<w>sera</w> \\x",final)
+        self.assertNotIn("\ue000",final)
         # Preserve notes with no original separating space unchanged.
-        raw_attached="Text\\\\x f \\\\xo 1.1 \\\\xt Ref\\\\x*next"
+        raw_attached="Text\\x f \\xo 1.1 \\xt Ref\\x*next"
         output=after["final_note_spacing"](after["doconvert"](raw_attached,0)[0])
         self.assertEqual(output,raw_attached)
         # Distinct authorial spacing is not silently normalized away.
-        spaced="Text  \\\\x f \\\\xo 1.1 \\\\xt Ref\\\\x*next"
+        spaced="Text  \\x f \\xo 1.1 \\xt Ref\\x*next"
         self.assertEqual(after["final_note_spacing"](
             after["doconvert"](spaced,0)[0]),spaced)
         with self.assertRaisesRegex(ValueError,"reserved note-space marker"):
-            after["doconvert"]("Text\\ue000\\\\x f \\\\xo 1.1 \\\\xt Ref\\\\x*",0)
+            after["doconvert"]("Text\ue000\\x f \\xo 1.1 \\xt Ref\\x*",0)
 
     def test_upstream_sha_change_fails_closed(self):
         with self.assertRaisesRegex(module.ConverterPatchError,"SHA-256 changed"):
