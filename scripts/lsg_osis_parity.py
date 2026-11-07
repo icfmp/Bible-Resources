@@ -124,6 +124,42 @@ def _audit_global_strong_ids(source_root, target_root) -> dict:
         "caveat":"Only lexical Strong H/G IDs: not morphological tags, arbitrary lemmas, or other word annotations.",
     }
 
+
+UNCONVERTED_USFM_CONTROL = re.compile(
+    r"\\(?P<tag>q(?:m)?[1-4]?|qr|qc|qd|v|c|s[1-5]?|p|m|x|w)(?=\s|$)"
+)
+
+
+def detect_unconverted_usfm_markup(root) -> dict:
+    """Catch literal USFM control sequences leaked into otherwise valid OSIS.
+
+    Do not examine XML comment *content* (provenance) or element attributes.
+    Report metadata only. Bible word tokens are never serialized.
+    """
+    counts=Counter()
+    by_container=Counter()
+    for node in root.iter():
+        if isinstance(node,etree._Comment):
+            fields=(node.tail,)
+            location="comment_tail"
+        elif isinstance(node.tag,str):
+            fields=(node.text,node.tail)
+            location=_node_name(node)
+        else:
+            raise PilotError("Unexpected non-element in OSIS control-marker audit")
+        for value in fields:
+            if not value:
+                continue
+            for match in UNCONVERTED_USFM_CONTROL.finditer(value):
+                counts[match.group("tag")]+=1
+                by_container[location]+=1
+    return {
+        "total_unconverted_control_markers":sum(counts.values()),
+        "unconverted_marker_names":dict(sorted(counts.items())),
+        "containers_with_unconverted_markers":dict(sorted(by_container.items())),
+        "no_unconverted_usfm_markup":not counts,
+    }
+
 def _node_name(node) -> str:
     return etree.QName(node).localname if isinstance(node.tag,str) else ""
 
@@ -268,6 +304,7 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
                             for node in doc.iter(OSIS+"w")]
     overall_word_sequence_identical=authored_global_words==generated_global_words
     strong_id_audit=_audit_global_strong_ids(original_doc,doc)
+    unconverted_usfm=detect_unconverted_usfm_markup(doc)
     mapping=dict(zip(source_codes,osis_codes))
     note_audit=audit_notes(original_doc,doc,mapping)
     poetry_audit=audit_poetry(original_doc,doc,mapping,all_source_keys)
@@ -426,6 +463,7 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
         "converted_global_word_count":len(generated_global_words),
         "full_original_ordered_word_text_sequence_equal":overall_word_sequence_identical,
         "source_to_candidate_strong_id_audit":strong_id_audit,
+        "unconverted_usfm_markup_diagnostic":unconverted_usfm,
         "global_word_text_sha256":_hash("\\x1f".join(authored_global_words)),
         "converted_global_word_text_sha256":_hash("\\x1f".join(generated_global_words)),
         "source_word_markers":total_source_words,
