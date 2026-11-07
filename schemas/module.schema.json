@@ -172,6 +172,95 @@
           "conf_filename": {
             "type": "string",
             "pattern": "^[A-Za-z0-9_-]+\\.conf$"
+          },
+          "contributions": {
+            "type": "array",
+            "uniqueItems": true,
+            "description": "Our contributions submitted to upstream maintainers; acceptance does not imply a released change or content equivalence.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "url",
+                "state",
+                "patch_sha256"
+              ],
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "format": "uri",
+                  "pattern": "^https://"
+                },
+                "state": {
+                  "enum": [
+                    "submitted",
+                    "accepted",
+                    "released"
+                  ]
+                },
+                "patch_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              }
+            }
+          },
+          "reconciliations": {
+            "type": "array",
+            "uniqueItems": true,
+            "description": "Human-reviewed upstream releases checked against our curated source; never inferred from .conf version alone.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "upstream_version",
+                "upstream_conf_sha256",
+                "upstream_content_sha256",
+                "curated_content_sha256",
+                "result",
+                "contribution_url",
+                "evidence_url",
+                "reviewed_by"
+              ],
+              "properties": {
+                "upstream_version": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "upstream_conf_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "upstream_content_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "curated_content_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "result": {
+                  "enum": [
+                    "equivalent_to_curated",
+                    "contains_other_changes"
+                  ]
+                },
+                "contribution_url": {
+                  "type": "string",
+                  "format": "uri",
+                  "pattern": "^https://"
+                },
+                "evidence_url": {
+                  "type": "string",
+                  "format": "uri",
+                  "pattern": "^https://"
+                },
+                "reviewed_by": {
+                  "type": "string",
+                  "minLength": 2
+                }
+              }
+            }
           }
         }
       }
