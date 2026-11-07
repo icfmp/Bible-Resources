@@ -57,6 +57,19 @@ class FullSourceOsisParityTests(unittest.TestCase):
             self.assertTrue(result["first_differences"])
             self.assertEqual(result["first_differences"][0]["reference"],"B30.1.1")
 
+    def test_xml_editorial_comments_are_not_added_to_verse_text(self):
+        raw,xml=fixture()
+        # u2o emits these marker comments at section/poetry boundaries.
+        # Count canonical words only, while leaving the XML source intact.
+        xml=xml.replace(b"Alpha <w",b"<!-- s1 --><!-- r -->Alpha <w")
+        with tempfile.TemporaryDirectory() as temp:
+            source=Path(temp)/"candidate.xml"
+            source.write_bytes(xml)
+            result=compare(source,raw)
+            self.assertEqual(result["exact_normalized_verse_text_matches"],66)
+            self.assertEqual(result["verse_text_matches_ignoring_only_unicode_whitespace"],66)
+            self.assertEqual(result["exact_normalized_word_sequences"],66)
+
     def test_non_whitespace_diagnostics_are_text_free_and_classified(self):
         changed=describe_symbol_edits("Au commencement, Dieu.", "Au commencement Dieu.")
         self.assertEqual(len(changed),1)
