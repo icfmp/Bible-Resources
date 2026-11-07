@@ -80,3 +80,8 @@ or publish a release.
 6. Never redistribute a resource until its independent rights review is approved.
 
 Related: [UPDATES.md](UPDATES.md) and [Bible's affiliated-source audit](https://github.com/icfmp/Bible/blob/main/docs/SOURCES_AFFILIEES_11.md).
+
+
+## Edition-level duplicate selection
+
+For Bibles and commentaries available through several SWORD providers, check [source priority](SOURCE_PRIORITY.md). The read-only `scripts/select_sources.py` command reports one preferred candidate per *verified identical edition*, lower-priority copies to skip, and unresolved same-ID/title collisions that need review. Priority is a separate policy from the live declaration parity check; a provider can remain registered for Bible even if its copies lose selection to a higher-priority upstream. The source audit uploads a distinct `source-selection.json` report and never imports or deletes content.
