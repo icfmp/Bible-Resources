@@ -14,6 +14,7 @@ import hashlib
 import os
 from pathlib import Path
 import re
+import tempfile
 import unicodedata
 
 from lxml import etree
@@ -23,6 +24,7 @@ from lsg_sword_compare import (usfx_text_by_verse, plain,
     NON_VERSE_TEXT_ELEMENTS, NON_VERSE_PARAGRAPH_STYLES)
 from pilot_preflight import PilotError
 from lsg_note_parity import audit_notes
+from lsg_note_space_dryrun import simulate_source_note_spaces
 from lsg_poetry_parity import audit_poetry
 from lsg_poetry_segments import audit_segments
 
@@ -370,6 +372,41 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
     poetry_audit=audit_poetry(original_doc,doc,mapping,all_source_keys)
     poetry_owned_audit=audit_segments(original_doc,doc,mapping,all_source_keys)
     source_body,_=usfx_text_by_verse(publisher_usfx,filter_books=set(source_codes))
+    # In-memory, reversible diagnostic only: do not use this hypothetical
+    # document as the conversion candidate or alter the original OSIS file.
+    try:
+        modeled_tree,note_space_model=simulate_source_note_spaces(
+            original_doc,doc,mapping)
+        with tempfile.TemporaryDirectory(prefix="lsg-note-space-dryrun-") as folder:
+            simulated_path=Path(folder)/"unsaved-model.osis.xml"
+            simulated_path.write_bytes(etree.tostring(
+                modeled_tree,encoding="utf-8",xml_declaration=True))
+            modeled_text,_,_,_=_osis_verses(simulated_path)
+        modeled_matches=sum(
+            source_body[key]==modeled_text.get(
+                f"{mapping[key[0]]}.{key[1]}.{key[2]}")
+            for key in all_source_keys
+        )
+        unchanged_symbol_stream=sum(
+            "".join(source_body[key].split())=="".join(
+                modeled_text.get(f"{mapping[key[0]]}.{key[1]}.{key[2]}","").split())
+            for key in all_source_keys
+        )
+        if unchanged_symbol_stream!=len(all_source_keys):
+            raise PilotError("Dry-run spaces must not change any Scripture symbol")
+        note_space_model.update({
+            "status":"simulated_and_compared_without_writing_candidate",
+            "source_verse_text_matches_after_model":modeled_matches,
+            "total_source_verse_keys":len(all_source_keys),
+            "all_source_symbols_preserved":True,
+            "candidate_ready_for_publication":False,
+        })
+    except PilotError as exc:
+        note_space_model={
+            "status":"not_modeled_due_unverified_note_identity_or_structure",
+            "reason":str(exc)[:170],
+            "candidate_ready_for_publication":False,
+        }
     source_words,source_notes,source_lines=_source_words(publisher_usfx)
     body_equal=0
     word_equal=0
@@ -547,6 +584,7 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
         "converted_word_markers":total_osis_words,
         "source_cross_reference_note_markers":sum(source_notes.values()),
         "source_to_candidate_note_content_audit":note_audit,
+        "source_to_candidate_note_spacing_dryrun":note_space_model,
         "all_textual_note_references_verified":
             note_audit["textual_target_references_verified"],
         "all_note_editorial_details_verified":
