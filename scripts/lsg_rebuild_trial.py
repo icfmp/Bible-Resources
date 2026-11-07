@@ -60,6 +60,26 @@ def _safe_files(usfm_zip: Path, destination: Path) -> list[Path]:
     return sorted(files)
 
 
+def _malformed_xml_diagnostic(path: Path, exc: etree.XMLSyntaxError) -> dict:
+    """Only report local markup skeleton; never include actual biblical text."""
+    line=max(1,int(exc.position[0]))
+    # Read through the source once; no raw lines or attribute values leave
+    # the temporary runner.
+    lines=path.read_text(encoding="utf-8",errors="replace").splitlines()
+    near=[]
+    for n in range(max(1,line-12),min(len(lines),line+12)+1):
+        tags=re.findall(r"<\s*(/?)\s*([A-Za-z][A-Za-z0-9:_-]*)\b",lines[n-1])
+        if tags:
+            near.append({"line":n,"tags":[("/" if closed else "")+tag for closed,tag in tags[:30]]})
+    return {
+        "line":line,"column":int(exc.position[1]),
+        "error_kind":"misnested_or_malformed_XML",
+        "nearby_element_names_only":near,
+        "source_xml_sha256":_sha(path.read_bytes()),
+        "corrective_action":"review_converter_and_original_USFM_not_silent_XML_recovery",
+    }
+
+
 def _osis_summary(output: Path, original_usfx: bytes, expected_books: list[str]) -> dict:
     size=output.stat().st_size if output.exists() else 0
     if not size or size>MAX_COMPILED_BYTES:
@@ -178,7 +198,12 @@ def run(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) -> dict:
             report["status"]="blocked_converter_failure"
             report["converter_diagnostics_last_line"]="(omitted: original text may be present)"
             return report
-        report["osis_candidate"]=_osis_summary(candidate,original_xml,source["_book_order"])
+        try:
+            report["osis_candidate"]=_osis_summary(candidate,original_xml,source["_book_order"])
+        except etree.XMLSyntaxError as exc:
+            report["status"]="blocked_malformed_converted_osis"
+            report["conversion_xml_diagnostic"]=_malformed_xml_diagnostic(candidate,exc)
+            return report
         report["osis_schema"]=_schema_proof(candidate,schema)
         report["structure_key_sets_equal"]=(
            report["osis_candidate"]["verse_keys_missing_from_converted"]==0
