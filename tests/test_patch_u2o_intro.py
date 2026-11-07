@@ -64,7 +64,7 @@ def relocate_poetry_end(lines):
 # Minimal executable USFM note extraction using the pinned upstream anchors.
 NOTERE = re.compile(
     r"""
-        (?P<tag>\\x)
+        (?P<tag>\\\\x)
         \s+
 ''' + module.OLD_CALLER_CAPTURE +
 '''     \s+
