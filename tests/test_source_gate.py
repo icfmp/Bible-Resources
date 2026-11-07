@@ -8,7 +8,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from validate import source_gate_errors
+from validate import source_gate_errors, normalization_report_errors
 
 
 class PublicationGateTests(unittest.TestCase):
@@ -45,6 +45,41 @@ class PublicationGateTests(unittest.TestCase):
         (self.module / "SOURCE_VALIDATION.json").write_text(
             json.dumps(self.report), encoding="utf-8"
         )
+
+    def normalizer_proof(self):
+        return {
+            "status":"structural_edit_verified_not_published",
+            "kind":"bible","edition":"reader_optimized",
+            "full_text_exactly_preserved":True,
+            "inline_semantic_tags_preserved":True,
+            "original_source_unchanged":True,
+            "schema_sha256":self.policy["schema_sha256"],
+            "source_sha256":"c"*64,
+            "output_sha256":self.report["source_sha256"],
+            "plan_sha256":"d"*64,
+            "diff_sha256":"e"*64,
+            "review_asserted_by_plan":"Human reviewer",
+            "operations":[{"operation":"split_paragraph", "source_reference":"Gen.1.1"}],
+        }
+
+    def test_reader_optimized_publication_requires_editorial_proof(self):
+        errors = normalization_report_errors(self.module, "reader_optimized", "bible", self.policy["schema_sha256"])
+        self.assertTrue(any("NORMALIZATION_REPORT_MISSING" in e for e in errors))
+        path=self.module/"NORMALIZATION_REPORT.json"
+        path.write_text(json.dumps(self.normalizer_proof()),encoding="utf-8")
+        self.assertEqual(normalization_report_errors(self.module,"reader_optimized","bible",
+                                                    self.policy["schema_sha256"]), [])
+
+    def test_reject_normalized_output_not_matching_source_validation(self):
+        proof=self.normalizer_proof()
+        proof["output_sha256"]="f"*64
+        (self.module/"NORMALIZATION_REPORT.json").write_text(json.dumps(proof),encoding="utf-8")
+        errors=normalization_report_errors(self.module,"reader_optimized","bible",self.policy["schema_sha256"])
+        self.assertTrue(any("NORMALIZATION_OUTPUT_MISMATCH" in e for e in errors))
+
+    def test_unchanged_faithful_source_does_not_require_edit_report(self):
+        self.assertEqual(normalization_report_errors(self.module,"faithful","bible",
+                                                    self.policy["schema_sha256"]), [])
 
     def test_valid_osis_provenance_gate(self):
         self.assertEqual(source_gate_errors(self.module, "OSIS", self.root), [])
