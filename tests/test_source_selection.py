@@ -128,6 +128,17 @@ class SourcePriorityTests(unittest.TestCase):
         self.assertEqual(len(result["skipped_lower_priority"]), 2)
         self.assertEqual(len(result["blocked"]), 0)
 
+    def test_two_verified_single_source_editions_can_share_title(self):
+        catalog = inventory(crosswire=[conf("AA", title="Same generic title")],
+                            ebible=[conf("BB", title="Same generic title")])
+        identities = registry(
+            verified(("crosswire", "AA"), edition_id="edition-one"),
+            verified(("ebible", "BB"), edition_id="edition-two"),
+        )
+        result = self.select(catalog, identities, {pid: "ok" for pid in PRIORITY["priority"]})
+        self.assertEqual(len(result["selected"]), 2)
+        self.assertFalse(result["blocked"])
+
     def test_lower_used_if_higher_confirmed_absent(self):
         catalog = inventory(crosswire=[], ebible=[conf("AA")])
         identities = registry(verified(("crosswire", "AA"), ("ebible", "AA")))
