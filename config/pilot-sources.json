@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "description": "Allowlisted first-pilot sources; URLs are exact; no import or publication is implied.",
+  "pilots": {
+    "lsg": {
+      "label": "Louis Segond 1910 (eBible)",
+      "provider": "ebible",
+      "module_id": "fraLSG1910eb",
+      "category": "bible",
+      "source_url": "https://ebible.org/find/details.php?all=1&id=fraLSG",
+      "sword_zip_url": "https://ebible.org/sword/zip/fraLSG1910eb.zip",
+      "authored_zip_url": "https://ebible.org/Scriptures/fraLSG_usfm.zip",
+      "authored_format": "USFM",
+      "sample_references": [
+        "Gen 1:1",
+        "Ps 23",
+        "Ps 119",
+        "John 5:4",
+        "Acts 8:37"
+      ]
+    },
+    "mhc": {
+      "label": "Matthew Henry Complete Commentary (CrossWire)",
+      "provider": "crosswire",
+      "module_id": "MHC",
+      "category": "commentary",
+      "source_url": "https://www.crosswire.org/sword/modules/ModInfo.jsp?modName=MHC",
+      "sword_zip_url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/MHC.zip",
+      "authored_zip_url": null,
+      "authored_format": null,
+      "editorial_reference_url": "https://www.ccel.org/ccel/henry/mhc1.Gen.i.html",
+      "sample_references": [
+        "Gen 1",
+        "Gen 1:1",
+        "Ps 23"
+      ]
+    }
+  }
+}
