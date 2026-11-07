@@ -84,6 +84,54 @@ def source_gate_errors(directory, source_type, root, category=None):
     return errors
 
 
+def normalization_report_errors(directory, edition, category, pinned_schema):
+    """Publishing guard for a declared, reviewed source-layout transformation.
+
+    These reports remain reviewer assertions, not cryptographic attestations
+    of remote source identity. The release auditor verifies original archives.
+    """
+    errors=[]
+    path=directory/"NORMALIZATION_REPORT.json"
+    if not path.exists() and edition=="faithful":
+        return errors  # Exact-source faithful edition, no transformation claimed.
+    if not path.is_file() or path.is_symlink() or path.stat().st_size>1024*1024:
+        return [f"{path}: [NORMALIZATION_REPORT_MISSING] Reviewed structural edit proof required"]
+    try:
+        proof=json.loads(path.read_text(encoding="utf-8"))
+    except (OSError,ValueError,UnicodeError) as exc:
+        return [f"{path}: [NORMALIZATION_REPORT_INVALID] {exc}"]
+    if not isinstance(proof,dict):
+        return [f"{path}: [NORMALIZATION_REPORT_INVALID] Expected JSON object"]
+    required={
+        "status":"structural_edit_verified_not_published",
+        "edition":edition,"kind":category,
+        "full_text_exactly_preserved":True,
+        "inline_semantic_tags_preserved":True,
+        "original_source_unchanged":True,
+        "schema_sha256":pinned_schema,
+    }
+    for key,value in required.items():
+        if proof.get(key)!=value:
+            errors.append(f"{path}: [NORMALIZATION_PROOF_MISMATCH] {key} does not match reviewed source proof")
+    for key in ("source_sha256","output_sha256","plan_sha256","diff_sha256"):
+        if not isinstance(proof.get(key),str) or not re.fullmatch("[a-f0-9]{64}",proof[key]):
+            errors.append(f"{path}: [NORMALIZATION_PROOF_INVALID] Missing {key} checksum")
+    if not isinstance(proof.get("operations"),list) or not proof["operations"]:
+        errors.append(f"{path}: [NORMALIZATION_PROOF_INVALID] No reviewed edits")
+    if not isinstance(proof.get("review_asserted_by_plan"),str) or len(proof["review_asserted_by_plan"].strip())<2:
+        errors.append(f"{path}: [NORMALIZATION_PROOF_INVALID] Missing editorial sign-off assertion")
+    validation=directory/"SOURCE_VALIDATION.json"
+    try:
+        source_proof=json.loads(validation.read_text(encoding="utf-8"))
+    except (OSError,ValueError,UnicodeError) as exc:
+        errors.append(f"{path}: [NORMALIZATION_PROOF_MISSING_OUTPUT] {exc}")
+    else:
+        if (not isinstance(source_proof,dict) or
+                proof.get("output_sha256")!=source_proof.get("source_sha256")):
+            errors.append(f"{path}: [NORMALIZATION_OUTPUT_MISMATCH] Normalized output checksum differs from OSIS source validation")
+    return errors
+
+
 def validate(root=ROOT):
     errors=[]; modules=[]; seen=set(); edition_variants=set(); edition_details={}
     schema=json.loads((root/"schemas/module.schema.json").read_text(encoding="utf-8"))
@@ -137,6 +185,10 @@ def validate(root=ROOT):
             errors.append(f"{d.name}: editorial review missing")
         if m["quality"]["edition"]=="reader_optimized" and not rights["derivatives_allowed"]:
             errors.append(f"{d.name}: derivative rights missing")
+        if m["category"] in ("bible","commentary"):
+            policy=json.loads((root/"config/osis-policy.json").read_text(encoding="utf-8"))
+            errors.extend(normalization_report_errors(
+                d,m["quality"]["edition"],m["category"],policy.get("schema_sha256")))
         if "example." in rights["evidence_url"]:
             errors.append(f"{d.name}: example is not a rights authorization")
         if not (d/"EDITORIAL.md").is_file(): errors.append(f"{d.name}: editorial changelog required")
