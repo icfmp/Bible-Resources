@@ -36,6 +36,23 @@ def _sha(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
+
+def _raw_space_difference(source_parts, candidate_parts) -> str:
+    """Explain raw note differences without discarding their significance."""
+    if source_parts == candidate_parts:
+        return "exact"
+    if (len(source_parts) != len(candidate_parts)
+            or [x[0] for x in source_parts] != [x[0] for x in candidate_parts]):
+        return "changed_component_structure"
+    if all(a[1].strip() == b[1].strip()
+           for a, b in zip(source_parts, candidate_parts)):
+        return "leading_or_trailing_whitespace_only"
+    if all(_space(a[1]) == _space(b[1])
+           for a, b in zip(source_parts, candidate_parts)):
+        return "internal_whitespace_changed"
+    return "content_changed"
+
+
 def _read_note(node, *, usfx: bool, word_index: int) -> dict:
     """Keep text private. Compare only independently labeled note components."""
     parts = []
@@ -243,6 +260,7 @@ def audit_notes(source_root, osis_root, book_mapping: dict[str, str]) -> dict:
     caller_count = 0
     unknown_count = 0
     mismatch_counts = Counter()
+    note_whitespace_classes = Counter()
     samples = []
     for key in sorted(all_refs):
         code, chapter, verse = key
@@ -269,6 +287,8 @@ def audit_notes(source_root, osis_root, book_mapping: dict[str, str]) -> dict:
                 "reviewed_markup": not (a["unknown"] or b["unknown"]
                                        or a["extra_attrs"] or b["extra_attrs"]),
             }
+            note_whitespace_classes[_raw_space_difference(
+                a["raw_parts"], b["raw_parts"])] += 1
             matched_parts += checks["component_text"]
             raw_parts_equal += checks["raw_component_text"]
             matched_anchor += checks["word_anchor"]
@@ -330,6 +350,7 @@ def audit_notes(source_root, osis_root, book_mapping: dict[str, str]) -> dict:
         "source_notes_with_caller_marker": caller_count,
         "unsupported_note_substructures": unknown_count,
         "mismatch_counts": dict(sorted(mismatch_counts.items())),
+        "raw_note_difference_categories": dict(sorted(note_whitespace_classes.items())),
         "first_mismatches": samples,
         "all_note_contents_metadata_and_positions_verified": strict_success,
         "textual_target_references_verified": (
