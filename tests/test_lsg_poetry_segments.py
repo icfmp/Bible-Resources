@@ -84,6 +84,29 @@ class PoetrySegmentOwnershipTests(unittest.TestCase):
         result=audit(src,dst,verses=(1,))
         self.assertEqual(result["matching_verse_line_indentation_levels"],1)
 
+    def test_selah_inline_style_is_not_an_extra_poetic_line(self):
+        src=('<q sfm="q1"><v id="1"/>Prayer '
+             '<qs>Selah</qs><ve id="1"/></q>')
+        dst=('<lg><l level="1"><verse sID="Gen.1.1"/>Prayer</l>'
+             '<l type="selah">Selah<verse eID="Gen.1.1"/></l></lg>')
+        result=audit(src,dst,verses=(1,))
+        self.assertEqual(result["matching_verse_line_counts_with_text_ownership"],1)
+        self.assertEqual(result["matching_verse_line_text_sequences_ignoring_whitespace"],1)
+        self.assertEqual(result["source_poetry"]["selah_marker_nodes"],1)
+        self.assertEqual(result["candidate_poetry"]["selah_marker_nodes"],1)
+        self.assertTrue(result["all_selah_text_and_verse_positions_verified"])
+        self.assertFalse(result["full_editorial_poetry_layout_verified"])
+
+    def test_changed_selah_text_is_not_ignored(self):
+        src=('<q sfm="q1"><v id="1"/>Prayer <qs>Selah</qs>'
+             '<ve id="1"/></q>')
+        dst=('<lg><l level="1"><verse sID="Gen.1.1"/>Prayer</l>'
+             '<l type="selah">Changed<verse eID="Gen.1.1"/></l></lg>')
+        result=audit(src,dst,verses=(1,))
+        self.assertEqual(result["matching_verse_line_counts_with_text_ownership"],1)
+        self.assertFalse(result["all_selah_text_and_verse_positions_verified"])
+        self.assertNotIn("Changed",repr(result))
+
     def test_actual_new_line_break_is_not_dismissed(self):
         src=('<q sfm="q1"><v id="1"/>FirstSecond<ve id="1"/></q>')
         dst=('<lg><l level="1"><verse sID="Gen.1.1"/>First</l>'
