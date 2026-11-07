@@ -28,7 +28,7 @@ def parse_conf(path):
     if not section: raise ValueError("missing SWORD module identifier")
     return section,values
 
-def source_gate_errors(directory, source_type, root):
+def source_gate_errors(directory, source_type, root, category=None):
     """Published modules require reviewed schema provenance, not an unchecked audit."""
     errors = []
     policy_path = root / "config/osis-policy.json"
@@ -55,8 +55,32 @@ def source_gate_errors(directory, source_type, root):
         errors.append(f"{proof_path}:1: [SOURCE_VALIDATION_INVALID] Source validation did not pass")
     if proof.get("schema_sha256") != pinned or proof.get("policy_sha256") != expected_policy_hash:
         errors.append(f"{proof_path}:1: [SOURCE_VALIDATION_STALE] Proof does not match current reviewed schema and policy")
-    if not re.fullmatch("[a-f0-9]{64}", proof.get("source_sha256", "")):
+    if not isinstance(proof.get("source_sha256"), str) or not re.fullmatch("[a-f0-9]{64}", proof["source_sha256"]):
         errors.append(f"{proof_path}:1: [SOURCE_VALIDATION_INVALID] Missing original source digest")
+
+    if category == "commentary":
+        commentary_policy_path = root / "config/commentary-policy.json"
+        try:
+            commentary_policy = json.loads(commentary_policy_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            errors.append(f"{commentary_policy_path}:1: [COMMENTARY_POLICY_MISSING] {exc}")
+        else:
+            digest = hashlib.sha256(
+                json.dumps(commentary_policy, sort_keys=True, ensure_ascii=False).encode("utf-8")
+            ).hexdigest()
+            if commentary_policy.get("schema_version") != 1:
+                errors.append(f"{commentary_policy_path}:1: [COMMENTARY_POLICY_INVALID] Unknown commentary policy version")
+            if proof.get("source_kind") != "commentary":
+                errors.append(f"{proof_path}:1: [COMMENTARY_PROOF_MISSING] Generic OSIS proof does not validate a commentary's annotated references")
+            if proof.get("commentary_policy_sha256") != digest:
+                errors.append(f"{proof_path}:1: [COMMENTARY_PROOF_STALE] Missing or stale commentary-specific review")
+            if type(proof.get("annotation_count")) is not int or proof["annotation_count"] < 1:
+                errors.append(f"{proof_path}:1: [COMMENTARY_PROOF_INVALID] No reviewed commentary entries")
+            if not isinstance(proof.get("annotation_reference_sha256"), str) or not re.fullmatch(
+                    "[a-f0-9]{64}", proof["annotation_reference_sha256"]):
+                errors.append(f"{proof_path}:1: [COMMENTARY_PROOF_INVALID] Missing reference mapping checksum")
+    elif category == "bible" and proof.get("source_kind") not in (None, "bible"):
+        errors.append(f"{proof_path}:1: [BIBLE_PROOF_MISMATCH] Commentary proof cannot validate a Bible text")
     return errors
 
 
@@ -109,7 +133,7 @@ def validate(root=ROOT):
         if driver not in DRIVERS or driver not in ALLOWED.get(m["category"],set()):
             errors.append(f"{d.name}: unsupported or mismatched driver")
         if conf.get("Encoding")!="UTF-8": errors.append(f"{d.name}: UTF-8 required")
-        errors.extend(source_gate_errors(d, conf.get("SourceType"), root))
+        errors.extend(source_gate_errors(d, conf.get("SourceType"), root, m["category"]))
         if conf.get("Lang")!=m["language"]: errors.append(f"{d.name}: language mismatch")
         if m["category"] in ("bible","commentary") and conf.get("Versification")!=m.get("versification"):
             errors.append(f"{d.name}: versification mismatch")
