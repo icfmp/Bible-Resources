@@ -53,6 +53,8 @@ class NoteParityTests(unittest.TestCase):
         self.assertEqual(result["matching_note_component_text"],1)
         self.assertEqual(result["matching_note_word_anchors"],1)
         self.assertEqual(result["matching_note_caller_markers"],1)
+        self.assertEqual(result["matching_explicit_machine_link_note_slots"],0)
+        self.assertFalse(result["explicit_machine_target_verification_applicable"])
         self.assertTrue(result["all_note_contents_metadata_and_positions_verified"])
         self.assertTrue(result["textual_target_references_verified"])
         self.assertNotIn("SPECIAL_NOTE_TEXT_SECRET",repr(result))
@@ -118,14 +120,15 @@ class NoteParityTests(unittest.TestCase):
             '<reference osisRef="Ps.1.1">Ps 1:1. SPECIAL_NOTE_TEXT_SECRET</reference>'
             '</note>')
         result=run(source_note=source,target_note=candidate)
-        self.assertEqual(result["matching_explicit_machine_links"],1)
+        self.assertEqual(result["matching_explicit_machine_link_note_slots"],1)
+        self.assertTrue(result["explicit_machine_target_verification_applicable"])
         self.assertEqual(result["source_explicit_link_count"],1)
         self.assertEqual(result["candidate_explicit_link_count"],1)
         self.assertTrue(result["all_note_contents_metadata_and_positions_verified"])
         candidate=candidate.replace('osisRef="Ps.1.1"','osisRef="Ps.1.2"')
         result=run(source_note=source,target_note=candidate)
         self.assertEqual(result["matching_note_component_text"],1)
-        self.assertEqual(result["matching_explicit_machine_links"],0)
+        self.assertEqual(result["matching_explicit_machine_link_note_slots"],0)
         self.assertFalse(result["all_note_contents_metadata_and_positions_verified"])
 
     def test_extra_out_of_verse_note_fails_closed(self):
