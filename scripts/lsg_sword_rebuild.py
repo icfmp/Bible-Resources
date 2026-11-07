@@ -192,6 +192,12 @@ def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke", sou
             has_text=bool(content.strip()) or bool(heading[len(header):].strip())
             # Distinguish real OSIS markup from rendered canonical text.
             # These diagnostics contain no original Scripture words.
+            if os.getenv("LSG_SAMPLE_DEBUG")=="1" and key in (
+                "Genesis 1:1","Exodus 7:26","Psalms 23:1","John 3:16"
+            ):
+                # Public-domain LSG, tiny samples in ephemeral CI logs for
+                # converter analysis; never include full modules in artifacts.
+                print("READBACK_SAMPLE",key,repr(decoded[:480]))
             xml_tags=re.findall(r"<(/?)([A-Za-z][A-Za-z0-9]*)\\b",decoded)
             tag_counts={name:sum(tag==name for _,tag in xml_tags)
                         for name in ("w","note","reference","hi","l","lg","p","verse")}
