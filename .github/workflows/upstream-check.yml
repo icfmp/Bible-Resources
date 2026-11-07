@@ -1,9 +1,16 @@
-name: Monitor upstream SWORD editions
+name: Monitor Bible source inventory and upstream SWORD editions
 
 on:
   workflow_dispatch:
   schedule:
     - cron: '27 6 * * *'
+  pull_request:
+    paths:
+      - 'config/upstreams.json'
+      - 'scripts/check_provider_parity.py'
+      - 'scripts/check_updates.py'
+      - 'tests/test_provider_parity.py'
+      - '.github/workflows/upstream-check.yml'
 
 permissions:
   contents: read
@@ -16,30 +23,62 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - name: Compare curated baselines with upstreams
+          python-version: '3.12'
+      - name: Compare provider declarations with Bible main
+        id: parity
+        continue-on-error: true
+        run: python scripts/check_provider_parity.py --output reports/source-parity.json
+      - name: Compare curated baselines with upstream SWORD catalogues
         run: python scripts/check_updates.py --output reports/upstream-status.json
       - name: Upload read-only report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: upstream-status
-          path: reports/upstream-status.json
+          name: source-and-upstream-status
+          path: reports/*.json
+          if-no-files-found: warn
           retention-days: 30
       - name: Display summary
+        if: always()
         shell: bash
         run: |
           python - <<'PY'
           import json, os
-          data=json.load(open('reports/upstream-status.json',encoding='utf-8'))
-          lines=['## Upstream update report', '', '| Provider | Status | Modules indexed |','|---|---|---:|']
-          for k,v in data['providers'].items():
-              lines.append(f"| {k} | {v['status']} | {v.get('modules_in_catalog', '—')} |")
-          lines.extend(['','| Module | Upstream | Status |','|---|---|---|'])
-          for m in data['modules']:
-              for src in m['upstreams']:
-                  lines.append(f"| {m['id']} | {src['provider']} | {src['status']} |")
-          lines.append('')
-          lines.append('Read-only monitoring: no modules downloaded or published.')
-          with open(os.environ['GITHUB_STEP_SUMMARY'],'a',encoding='utf-8') as f:
-              f.write('\n'.join(lines)+'\n')
+          from pathlib import Path
+          lines = ['## Bible source inventory and upstream updates', '']
+          parity = Path('reports/source-parity.json')
+          if parity.exists():
+              data = json.loads(parity.read_text(encoding='utf-8'))
+              lines.append('**Bible source parity:** ' + data['status'])
+              for error in data.get('errors', []):
+                  lines.append('- ' + error)
+          else:
+              lines.append('**Bible source parity:** no report generated')
+          lines.extend(['', '| SWORD provider | Status | Modules indexed |',
+                        '|---|---|---:|'])
+          upstream = Path('reports/upstream-status.json')
+          if upstream.exists():
+              data = json.loads(upstream.read_text(encoding='utf-8'))
+              for key, val in data.get('providers', {}).items():
+                  lines.append(f"| {key} | {val['status']} | {val.get('modules_in_catalog', '—')} |")
+              lines.extend(['', '| Other Bible sources | Status |', '|---|---|'])
+              for key, val in data.get('external_sources', {}).items():
+                  lines.append(f"| {key} | {val['status']} ({val['kind']}) |")
+              lines.extend(['', '| Curated module | Upstream | Status |',
+                            '|---|---|---|'])
+              for module in data.get('modules', []):
+                  for source in module['upstreams']:
+                      lines.append(f"| {module['id']} | {source['provider']} | {source['status']} |")
+          else:
+              lines.append('No upstream catalogue report generated')
+          lines.extend(['', 'Read-only monitoring. No module text is downloaded, '
+                        'modified or republished; external sources marked inventory_only '
+                        'are not yet checked for content updates.'])
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as output:
+              output.write('\n'.join(lines) + '\n')
           PY
+      - name: Fail on Bible provider inventory drift
+        if: always() && steps.parity.outcome != 'success'
+        run: |
+          echo 'Bible source inventory is missing or differs from Bible main.' >&2
+          exit 1
