@@ -37,7 +37,12 @@ SAMPLES = {
 }
 HEADER = re.compile(r"(?m)^(?P<book>[1-4]?[A-Za-z][A-Za-z0-9 .'-]{0,75}) (?P<chapter>\d+):(?P<verse>\d+):[ \t]*")
 FOOTER = re.compile(r"\n\([A-Za-z][A-Za-z0-9_]*\)\s*\Z")
-NOTE_ELEMENTS={"x","f","fig"}
+# These are original authoring *apparatus*, not part of a verse's canonical
+# spoken text. They stay in the original USFX archive and must be checked
+# separately for preservation in the compiled SWORD module. In Acts 8:1,
+# eBible places chapter/section headings and cross-reference headings after
+# the first verse marker; blindly joining all XML text yielded a false alarm.
+NON_VERSE_TEXT_ELEMENTS={"x","f","fig","s","r","toc","h","id"}
 
 
 def plain(value: str) -> str:
@@ -87,9 +92,9 @@ def usfx_text_by_verse(source:bytes, *, filter_books: set[str]) -> tuple[dict, d
                 current=None
             if name in {"w","x","q","p","s","d","note","reference"} and current:
                 counts[(current,name)]+=1
-            if name not in NOTE_ELEMENTS and current is not None and node.text:
+            if name not in NON_VERSE_TEXT_ELEMENTS and current is not None and node.text:
                 chunks[current].append(node.text)
-            if name not in NOTE_ELEMENTS:
+            if name not in NON_VERSE_TEXT_ELEMENTS:
                 for child in node:
                     walk(child)
                     if current is not None and child.tail:
@@ -213,7 +218,7 @@ def run(sword_archive:Path,usfx_archive:Path,*,diatheke="diatheke") -> dict:
         "published":False,
         "notes":[
             "Text is compared after NFC and whitespace collapsing; raw punctuation remains significant.",
-            "Source paragraph/poetry/Strong/note structures are not compared by the plain format and require separate rich markup checks.",
+            "USFX headings, section references, footnotes and apparatus are retained in the source but excluded from plain-verse word comparison; their compiled preservation is audited separately.",
             "A mismatch is a diagnostic, not permission to edit or relocate Scripture.",
         ],
     }
