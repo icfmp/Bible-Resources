@@ -196,3 +196,17 @@ verses, notes, formatting and commentary entries, OSIS source validation,
 display before/after, correction decisions, SWORD recompilation and
 approval will take place during the pilot itself. The first pilot must
 not be declared normalized merely because this metadata preflight passes.
+
+## Baseline source fingerprints (read-only, 2026-11-07)
+
+[Original SWORD/USFM source evidence](evidence/normalizer-3/real-pilot-source-signals.json)
+was gathered from the real eBible `fraLSG1910eb` SWORD and USFM ZIPs and
+the actual CrossWire full `MHC` ZIP in GitHub Actions. Requests now put
+the SWORD `-k` key **last**, with bounded output and timeout: earlier
+unbounded-key reports were **invalid** and must not be reused. The LSG
+module actually declares `Versification=NRSV` (`zText`, version `100.0`),
+and the MHC module declares `Versification=KJV` (`zCom4`, version `2.2`).
+LSG Psalm 23/119 entries contain poetry-line signals; MHC Genesis
+entries contain paragraph signals. **This is not** an all-verses text
+comparison, MHC authored XML inspection or actual candidate normalization.
+No source or compiled module was changed.
