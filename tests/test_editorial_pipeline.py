@@ -134,6 +134,46 @@ class EditorialPipelineTests(unittest.TestCase):
         self.assertTrue(result["full_text_exactly_preserved"])
         self.assertEqual(len(etree.parse(str(self.output)).findall(".//"+NS+"q")),1)
 
+    def test_split_at_inline_child_preserves_strongs_notes_and_quotation(self):
+        self.write('<p>The introduction leads to '
+                   '<hi type="italic">a point</hi> that follows '
+                   '<w lemma="strong:H7225">commencement</w>'
+                   '<note type="translation">Footnote body</note>.</p>')
+        p = self.p()
+        edit = {"operation":"split_before_child",
+                "node_path":element_address(p),
+                "expected_element_sha256":element_hash(p),
+                "child_index":1,
+                "reason":"Authorial edition starts a new paragraph before this inline term.",
+                "source_reference":"Gen.1.1"}
+        self.plan(edit)
+        before=self.source.read_bytes()
+        result=self.run_plan()
+        self.assertTrue(result["inline_semantic_tags_preserved"])
+        self.assertTrue(result["full_text_exactly_preserved"])
+        doc=etree.parse(str(self.output))
+        self.assertEqual(len(doc.findall(".//"+NS+"note")),1)
+        self.assertEqual(doc.find(".//"+NS+"w").get("lemma"),"strong:H7225")
+        self.assertEqual(self.source.read_bytes(),before)
+        self.assertEqual(len(doc.findall(".//"+NS+"p")),2)
+
+    def test_poetry_group_retains_verse_milestones_and_notes(self):
+        self.write('<p><verse sID="p23v1" osisID="Ps.23.1"/>'
+                   'The Lord is my shepherd; <note type="translation">Note</note>'
+                   '</p><p><verse eID="p23v1"/>I shall not want.</p>')
+        first,second=self.p(0),self.p(1)
+        combo=b"\0".join(etree.tostring(n, encoding="UTF-8", with_tail=False)
+                       for n in (first,second))
+        self.plan({"operation":"group_poetry_lines",
+                   "node_paths":[element_address(first),element_address(second)],
+                   "expected_element_sha256":checksum(combo),
+                   "reason":"Line breaks were flattened despite the source edition.",
+                   "source_reference":"Ps.23.1"})
+        result=self.run_plan()
+        self.assertTrue(result["full_text_exactly_preserved"])
+        self.assertEqual(len(etree.parse(str(self.output)).findall(".//"+NS+"verse")),2)
+        self.assertEqual(len(etree.parse(str(self.output)).findall(".//"+NS+"note")),1)
+
     def test_stale_source_hash_blocks_and_preserves_output(self):
         self.write('<p>Alpha. Beta.</p>')
         p = self.p()
