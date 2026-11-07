@@ -41,7 +41,7 @@ class NoteSpaceDryrunTests(unittest.TestCase):
         original_source=etree.tostring(source)
         cloned,report=simulate_source_note_spaces(source,target,{"GEN":"Gen"})
         self.assertEqual(report["by_category"],
-                         {"source_ascii_space_restored_in_memory":1})
+                         {"source_space_modeled_in_memory":1,"source_separator_ascii_space":1})
         self.assertEqual(report["notes_with_missing_preceding_space_after_dryrun"],0)
         self.assertEqual(report["source_note_count"],1)
         self.assertTrue(report["original_candidate_unchanged"])
@@ -74,13 +74,29 @@ class NoteSpaceDryrunTests(unittest.TestCase):
         self.assertEqual(report["by_category"],{"candidate_only_space_not_removed":1})
         self.assertEqual(etree.tostring(cloned),etree.tostring(target))
 
-    def test_tabs_are_not_converted_to_spaces_without_review(self):
+    def test_tab_is_normalized_in_clone_but_original_tabs_remain(self):
         source,target=fixture(source_space="\t")
+        original_source=etree.tostring(source)
+        original_target=etree.tostring(target)
         cloned,report=simulate_source_note_spaces(source,target,{"GEN":"Gen"})
         self.assertEqual(report["by_category"],
-                         {"non_ascii_source_separator_requires_review":1})
-        self.assertEqual(report["notes_with_missing_preceding_space_after_dryrun"],1)
-        self.assertEqual(etree.tostring(cloned),etree.tostring(target))
+                         {"source_space_modeled_in_memory":1,"source_separator_tab":1})
+        self.assertEqual(report["notes_with_missing_preceding_space_after_dryrun"],0)
+        self.assertIn(b'sera</w> <note',etree.tostring(cloned))
+        self.assertEqual(etree.tostring(source),original_source)
+        self.assertEqual(etree.tostring(target),original_target)
+        self.assertFalse(report["full_note_editorial_metadata_approved"])
+
+    def test_newline_is_normalized_only_in_cloned_candidate(self):
+        source,target=fixture(source_space="\n")
+        original_source=etree.tostring(source)
+        cloned,report=simulate_source_note_spaces(source,target,{"GEN":"Gen"})
+        self.assertEqual(report["by_category"],
+                         {"source_space_modeled_in_memory":1,"source_separator_newline":1})
+        self.assertEqual(report["notes_with_missing_preceding_space_after_dryrun"],0)
+        self.assertIn(b'sera</w> <note',etree.tostring(cloned))
+        self.assertEqual(etree.tostring(source),original_source)
+        self.assertFalse(report["full_note_editorial_metadata_approved"])
 
     def test_mismatched_reference_text_blocks_before_modeling(self):
         source,target=fixture(changed_note=True)
