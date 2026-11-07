@@ -55,7 +55,7 @@ from contextlib import suppress
 def relocate_poetry_end(lines):
     for i in (_ for _ in range(len(lines)) if lines[_].startswith("<verse eID")):
         with suppress(IndexError):
-''' + module.OLD_STANZA_MOVE + module.OLD_POETRY_MOVE +
+''' + module.OLD_MULTILINE_MOVE + module.OLD_STANZA_MOVE + module.OLD_POETRY_MOVE +
 '''    return lines
 '''
 ).encode("utf-8")
@@ -143,6 +143,22 @@ class U2OIntroTests(unittest.TestCase):
         ]
         self.assertNotEqual(before["relocate_poetry_end"](quoted.copy()),quoted)
         self.assertEqual(after["relocate_poetry_end"](quoted.copy()),quoted)
+
+    def test_end_marker_never_skips_last_text_bearing_poetry_line(self):
+        with mock_patch.object(module,"EXPECTED_UPSTREAM_SHA256",hashlib.sha256(SOURCE).hexdigest()):
+            reviewed=module.patch(SOURCE)
+        before={}
+        after={}
+        exec(compile(SOURCE,"original-multiline.py","exec"),before)
+        exec(compile(reviewed,"reviewed-multiline.py","exec"),after)
+        verse=[
+            '<l level="1"><w lemma="strong:H1">First line</w>.</l>',
+            '<l level="1"><w lemma="strong:H2">Final line</w>.</l>',
+            '<verse eID="Isa.25.2"/>',
+            '<verse sID="Isa.25.3"/>',
+        ]
+        self.assertNotEqual(before["relocate_poetry_end"](verse.copy()),verse)
+        self.assertEqual(after["relocate_poetry_end"](verse.copy()),verse)
 
     def test_upstream_sha_change_fails_closed(self):
         with self.assertRaisesRegex(module.ConverterPatchError,"SHA-256 changed"):
