@@ -16,7 +16,8 @@
         27,
         28,
         29
-      ]
+      ],
+      "sword_book": "Exodus"
     },
     {
       "source_usfx_book": "PSA",
@@ -25,7 +26,8 @@
       "verses": [
         8,
         9
-      ]
+      ],
+      "sword_book": "Psalms"
     }
   ]
 }
