@@ -10,6 +10,8 @@ on:
       - 'scripts/lsg_note_parity.py'
       - 'scripts/lsg_poetry_parity.py'
       - 'tests/test_lsg_poetry_parity.py'
+      - 'scripts/lsg_poetry_segments.py'
+      - 'tests/test_lsg_poetry_segments.py'
       - 'tests/test_lsg_note_parity.py'
       - 'scripts/lsg_sword_rebuild.py'
       - 'tests/test_lsg_osis_parity.py'
