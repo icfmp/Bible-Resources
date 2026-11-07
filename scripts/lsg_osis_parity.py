@@ -152,6 +152,7 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
     source_words,source_notes,source_lines=_source_words(publisher_usfx)
     body_equal=0
     word_equal=0
+    no_whitespace_equal=0
     notes_equal=0
     poetry_equal=0
     other=Counter()
@@ -161,6 +162,9 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
     text_edit_kinds=Counter()
     total_source_words=0
     total_osis_words=0
+    same_body_except_spaces=Counter()
+    source_book_stream=defaultdict(list)
+    target_book_stream=defaultdict(list)
     for key in all_source_keys:
         code,chapter,verse=key
         osis_ref=f"{mapping[code]}.{chapter}.{verse}"
@@ -175,6 +179,14 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
         old_lines=source_lines[key]
         new_lines=osis_lines[osis_ref]
         body_equal+=(original==generated)
+        same_symbols=("".join(original.split())=="".join(generated.split()))
+        no_whitespace_equal+=same_symbols
+        source_book_stream[code].append(original)
+        target_book_stream[code].append(generated)
+        if original != generated and same_symbols:
+            same_body_except_spaces["spacing_only_verses"]+=1
+        elif original != generated:
+            same_body_except_spaces["content_symbols_differ_verses"]+=1
         word_equal+=(old_words==new_words)
         notes_equal+=(original_notes==generated_notes)
         poetry_equal+=(old_lines==new_lines)
@@ -243,6 +255,13 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
         "total_source_verse_keys":total,
         "total_converted_verse_keys":len(osis_body),
         "exact_normalized_verse_text_matches":body_equal,
+        "verse_text_matches_ignoring_only_unicode_whitespace":no_whitespace_equal,
+        "source_to_candidate_text_difference_categories":dict(same_body_except_spaces),
+        "continuous_book_text_matches_ignoring_all_whitespace":{
+          code:"".join("".join(x.split()) for x in source_book_stream[code])==
+               "".join("".join(x.split()) for x in target_book_stream[code])
+          for code in source_codes
+        },
         "exact_normalized_word_sequences":word_equal,
         "matching_verse_note_counts":notes_equal,
         "matching_verse_poetry_line_counts":poetry_equal,
