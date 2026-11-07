@@ -2,6 +2,8 @@
 
 A resource moves through draft → in_review → approved, or restricted when rights prohibit redistribution. Approval requires a real reviewer, provenance, explicit permissions, a precise edition, a documented editorial change record, valid SWORD configuration and an executable reader test. Automated lint is necessary but not sufficient.
 
+Every approved resource must have an accurately attributed reader-facing profile, with evidence-linked claims for any displayed strengths or cautions. Unsubstantiated theological or historical allegations must not be published; draft claims remain internal. See [resource presentation and evidence policy](RESOURCE_PROFILES.md).
+
 Never substitute editorial taste for original intent. Index by the original versification; never silently map variants or invent Bible verse boundaries. Missing original text, malformed files and uncertainty must become review findings.
 
 
