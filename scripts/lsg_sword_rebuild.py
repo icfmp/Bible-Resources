@@ -21,6 +21,9 @@ from lsg_source_compare import scan_usfx
 
 MAX_COMPILER_LOG=6*1024*1024
 MAX_COMPILE_SECONDS=180
+# Verified in the publisher's original eBible fraLSG1910eb SWORD .conf.
+# Do not infer the SWORD reference system from the translation's French name.
+PUBLISHER_V11N="NRSV"
 SAMPLES=[
     ("Genesis 1:1","Genesis 1:1:"),
     ("Exodus 7:26","Exodus 7:26:"),
@@ -119,7 +122,7 @@ def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke", sou
         "source_file_unchanged":True,
         "published":False,
         "approved_for_publication":False,
-        "versification":"Segond",
+        "versification":PUBLISHER_V11N,
         "module_id":"fraLSG1910eb",
         "real_module_rebuilt_in_temporary_directory":False,
         "all_source_verses_and_annotations_checked":False,
@@ -129,7 +132,7 @@ def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke", sou
         data=root/"modules/texts/rawtext/fralsg1910eb"
         data.mkdir(parents=True)
         result=subprocess.run(
-            [compiler,str(data),str(osis),"-v","Segond"],
+            [compiler,str(data),str(osis),"-v",PUBLISHER_V11N],
             capture_output=True,check=False,timeout=MAX_COMPILE_SECONDS,
         )
         logs=result.stdout+result.stderr
@@ -153,7 +156,8 @@ def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke", sou
             "fatal":len(re.findall(rb"(?m)(?:^|\n)FATAL\(",logs)),
             "error":len(re.findall(rb"(?m)(?:^|\n)ERROR\(",logs)),
             "warning":len(re.findall(rb"(?m)(?:^|\n)WARNING\(",logs)),
-            "v11n_outside":len(re.findall(rb"not in the Segond versification",logs)),
+            "v11n_outside":len(re.findall(
+                rb"not in the "+PUBLISHER_V11N.encode("ascii")+rb" versification",logs)),
         }
         files=[p for p in data.rglob("*") if p.is_file()]
         report["module_file_count"]=len(files)
@@ -183,7 +187,7 @@ def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke", sou
             "GlobalOptionFilter=OSISFootnotes\n"
             "GlobalOptionFilter=OSISScripref\n"
             "GlobalOptionFilter=OSISHeadings\n"
-            "Versification=Segond\n"
+            f"Versification={PUBLISHER_V11N}\n"
             "DistributionLicense=Public Domain\n",
             encoding="utf-8",
         )
