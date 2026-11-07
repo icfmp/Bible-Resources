@@ -76,6 +76,9 @@ def parse_xml(path: Path, content: bytes, code: str):
 
 
 def _schema(policy: dict, schema_path: Path):
+    if policy.get("schema_status") != "reviewed":
+        raise StructureFailure(POLICY_PATH, 1, "SCHEMA_NOT_REVIEWED",
+                               "Official OSIS schema and its pinned digest must be reviewed before any real import")
     pinned = policy.get("schema_sha256")
     if not isinstance(pinned, str) or not SHA256.fullmatch(pinned):
         raise StructureFailure(POLICY_PATH, 1, "UNPINNED_SCHEMA",
