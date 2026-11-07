@@ -279,6 +279,31 @@ def _schema_proof(output: Path, schema: Path) -> dict:
     return proof
 
 
+
+def _marker_evidence(parity: dict) -> dict:
+    """Separate obsolete at-line-opening counts from verified verse ownership.
+
+    A <l>/<q> can span multiple sID/eID milestones and Selah is an inline
+    character style rather than a poetic line. The old opener counter remains
+    reported but cannot itself veto independently verified source structure.
+    """
+    expected=parity["total_source_verse_keys"]
+    poetry=parity["source_to_candidate_poetry_verse_owned_audit"]
+    lexical_and_notes=(
+        parity["exact_normalized_word_sequences"]==expected
+        and parity["matching_verse_note_counts"]==expected
+    )
+    lyric=poetry["all_poetry_segments_and_levels_verified"]
+    selah=poetry["all_selah_text_and_verse_positions_verified"]
+    return {
+        "legacy_poetry_opening_position_counts_equal":
+            parity["matching_verse_poetry_line_counts"]==expected,
+        "source_owned_poetry_segments_and_levels_equal":lyric,
+        "source_selah_marker_text_and_verse_equal":selah,
+        "source_marker_counts_parity":lexical_and_notes and lyric and selah,
+        "full_poetry_editorial_layout_approved":False,
+    }
+
 def run(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) -> dict:
     source=scan_usfm(usfm_zip)
     original_xml,original_meta=read_source_xml(usfx_zip,source_format="usfx")
@@ -357,11 +382,7 @@ def run(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) -> dict:
         report["canonical_verse_text_parity"]=(
             parity["exact_normalized_verse_text_matches"]==parity["total_source_verse_keys"]
         )
-        report["source_marker_counts_parity"]=(
-            parity["exact_normalized_word_sequences"]==parity["total_source_verse_keys"]
-            and parity["matching_verse_note_counts"]==parity["total_source_verse_keys"]
-            and parity["matching_verse_poetry_line_counts"]==parity["total_source_verse_keys"]
-        )
+        report.update(_marker_evidence(parity))
         report["status"]=(
             "candidate_verse_text_and_marker_parity_checked_not_approved"
             if report["structure_key_sets_equal"]
