@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "description": "Reviewed OSIS 2.1.1 structure gate, not a replacement for the official XSD.",
+  "official_specification": "https://wiki.crosswire.org/OSIS_Bibles",
+  "schema_url": "https://www.crosswire.org/~dmsmith/osis/osisCore.2.1.1-cw-latest.xsd",
+  "schema_sha256": null,
+  "schema_status": "awaiting_pinned_official_copy",
+  "namespace": "http://www.bibletechnologies.net/2003/OSIS/namespace",
+  "supported_elements": [
+    "osis",
+    "osisText",
+    "header",
+    "work",
+    "title",
+    "div",
+    "chapter",
+    "verse",
+    "p",
+    "lg",
+    "l",
+    "q",
+    "hi",
+    "transChange",
+    "divineName",
+    "note",
+    "reference",
+    "w",
+    "seg",
+    "lb",
+    "milestone",
+    "speaker"
+  ],
+  "reviewed_hi_types": [
+    "italic",
+    "bold",
+    "bolditalic",
+    "small-caps",
+    "super",
+    "sub",
+    "underline",
+    "emphasis"
+  ],
+  "semantics": {
+    "lg": "preserve_stanza_boundaries",
+    "l": "preserve_line_level",
+    "q": "preserve_quote_structure",
+    "hi": "preserve_authored_emphasis",
+    "transChange": "preserve_translation_conventions",
+    "divineName": "preserve_divine_name_markup",
+    "note": "preserve_note_type_and_reference",
+    "verse": "preserve_verse_identifiers_and_milestones"
+  }
+}

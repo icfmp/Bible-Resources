@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Validate metadata, rights and safe SWORD payload structure. Fail closed."""
 from pathlib import Path, PurePosixPath
+import hashlib
 import json
 import sys
 import re
@@ -26,6 +27,38 @@ def parse_conf(path):
         else: raise ValueError("malformed SWORD configuration")
     if not section: raise ValueError("missing SWORD module identifier")
     return section,values
+
+def source_gate_errors(directory, source_type, root):
+    """Published modules require reviewed schema provenance, not an unchecked audit."""
+    errors = []
+    policy_path = root / "config/osis-policy.json"
+    try:
+        policy = json.loads(policy_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        return [f"{policy_path}:1: [SOURCE_POLICY_MISSING] {exc}"]
+    pinned = policy.get("schema_sha256")
+    if policy.get("schema_status") != "reviewed" or not isinstance(pinned, str) or not re.fullmatch("[a-f0-9]{64}", pinned):
+        errors.append(f"{policy_path}:1: [SCHEMA_NOT_REVIEWED] Official OSIS schema must be pinned and reviewed before approval")
+    if source_type != "OSIS":
+        errors.append(f"{directory}/payload/mods.d:1: [UNSUPPORTED_SOURCE_FORMAT] No approved structural validator for SourceType={source_type!r}; use the official standard's validated importer")
+    proof_path = directory / "SOURCE_VALIDATION.json"
+    try:
+        proof = json.loads(proof_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        return errors + [f"{proof_path}:1: [SOURCE_VALIDATION_MISSING] {exc}"]
+    if not isinstance(proof, dict):
+        return errors + [f"{proof_path}:1: [SOURCE_VALIDATION_INVALID] Expected a JSON object"]
+    expected_policy_hash = hashlib.sha256(
+        json.dumps(policy, sort_keys=True, ensure_ascii=False).encode("utf-8")
+    ).hexdigest()
+    if proof.get("status") != "validated" or proof.get("no_transformation_performed") is not True:
+        errors.append(f"{proof_path}:1: [SOURCE_VALIDATION_INVALID] Source validation did not pass")
+    if proof.get("schema_sha256") != pinned or proof.get("policy_sha256") != expected_policy_hash:
+        errors.append(f"{proof_path}:1: [SOURCE_VALIDATION_STALE] Proof does not match current reviewed schema and policy")
+    if not re.fullmatch("[a-f0-9]{64}", proof.get("source_sha256", "")):
+        errors.append(f"{proof_path}:1: [SOURCE_VALIDATION_INVALID] Missing original source digest")
+    return errors
+
 
 def validate(root=ROOT):
     errors=[]; modules=[]; seen=set()
@@ -76,6 +109,7 @@ def validate(root=ROOT):
         if driver not in DRIVERS or driver not in ALLOWED.get(m["category"],set()):
             errors.append(f"{d.name}: unsupported or mismatched driver")
         if conf.get("Encoding")!="UTF-8": errors.append(f"{d.name}: UTF-8 required")
+        errors.extend(source_gate_errors(d, conf.get("SourceType"), root))
         if conf.get("Lang")!=m["language"]: errors.append(f"{d.name}: language mismatch")
         if m["category"] in ("bible","commentary") and conf.get("Versification")!=m.get("versification"):
             errors.append(f"{d.name}: versification mismatch")
