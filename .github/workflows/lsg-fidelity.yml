@@ -72,6 +72,16 @@ jobs:
                       code,body=query('fraLSG1910eb',ref,fmt=fmt,root=root,exe='diatheke')
                       print('SWORD sample',ref,fmt,'status',code,'bytes',len(body),
                             'prefix',repr(body[:1800 if ref in ('Gen 1','Ps 23') else 430].decode('utf-8',errors='replace')))
+              from lsg_source_compare import read_source_xml
+              from lsg_sword_compare import usfx_text_by_verse,parse_sword_chapter
+              raw,_=read_source_xml(home/'usfx.zip',source_format='usfx')
+              by_verse,_=usfx_text_by_verse(raw,filter_books={'ACT'})
+              _,actual=query('fraLSG1910eb','Acts 8',fmt='plain',root=root,exe='diatheke')
+              actual_by_verse=parse_sword_chapter(actual,8,'fraLSG1910eb')
+              print('Act 8:1 source (PD):',repr(by_verse[('ACT',8,1)][:600]))
+              print('Act 8:1 SWORD (PD):',repr(actual_by_verse[1][:600]))
+              print('Act 8:2 source (PD):',repr(by_verse[('ACT',8,2)][:200]))
+              print('Act 8:2 SWORD (PD):',repr(actual_by_verse[2][:200]))
           PY
       - name: Compare selected LSG SWORD verses with independently parsed USFX
         run: |
