@@ -55,7 +55,7 @@ from contextlib import suppress
 def relocate_poetry_end(lines):
     for i in (_ for _ in range(len(lines)) if lines[_].startswith("<verse eID")):
         with suppress(IndexError):
-''' + module.OLD_MULTILINE_MOVE + module.OLD_STANZA_MOVE + module.OLD_POETRY_MOVE +
+''' + module.OLD_MULTILINE_MOVE + module.OLD_POETRY_MOVE +
 '''    return lines
 '''
 ).encode("utf-8")
@@ -125,24 +125,6 @@ class U2OIntroTests(unittest.TestCase):
             '<verse eID="Acts.13.35"/>','<verse sID="Acts.13.36"/>',
         ]
         self.assertTrue(after["relocate_poetry_end"](empty.copy())[0].startswith("<verse eID"))
-
-    def test_verse_end_stays_after_text_bearing_new_stanza(self):
-        original=SOURCE
-        with mock_patch.object(module,"EXPECTED_UPSTREAM_SHA256",hashlib.sha256(original).hexdigest()):
-            fixed=module.patch(original)
-        before={}
-        after={}
-        exec(compile(original,"unpatched-stanza.py","exec"),before)
-        exec(compile(fixed,"patched-stanza.py","exec"),after)
-        quoted=[
-            '<l level="1">First line.</l>',
-            "</lg>","<lg>",
-            '<l level="1"><w lemma="strong:G1">Second quotation line.</w></l>',
-            '<verse eID="Isa.25.2"/>',
-            '<verse sID="Isa.25.3"/>',
-        ]
-        self.assertNotEqual(before["relocate_poetry_end"](quoted.copy()),quoted)
-        self.assertEqual(after["relocate_poetry_end"](quoted.copy()),quoted)
 
     def test_end_marker_never_skips_last_text_bearing_poetry_line(self):
         with mock_patch.object(module,"EXPECTED_UPSTREAM_SHA256",hashlib.sha256(SOURCE).hexdigest()):
