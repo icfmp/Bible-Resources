@@ -136,8 +136,9 @@ third-party binaries, with:
 
 ## Current technical blockers
 
-- The official OSIS 2.1.1 XSD is not yet SHA-256-pinned and reviewed;
-  \`guard_osis.py\` intentionally blocks real processing.
+- The official CrossWire OSIS 2.1.1 XSD and its W3C xml.xsd import
+  are now reviewed, pinned, and compiled offline. Real module content
+  has **not yet** passed the OSIS source gate.
 - The deterministic SWORD importer / content-normalizer, authoritative
   round-trip checker and actual GTK visual comparison harness are not
   implemented.
@@ -191,7 +192,7 @@ A local equivalent after installing \`diatheke\` is:
 
 These are **inspection and runtime-preflight tools**, not an
 editorial/source fidelity test. The actual comparison of all source
-verses, notes, formatting and commentary entries, OSIS XSD pinning,
+verses, notes, formatting and commentary entries, OSIS source validation,
 display before/after, correction decisions, SWORD recompilation and
 approval will take place during the pilot itself. The first pilot must
 not be declared normalized merely because this metadata preflight passes.
