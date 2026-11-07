@@ -44,7 +44,7 @@ class StrictOsisTests(unittest.TestCase):
         self.policy = self.root / "policy.json"
         policy = json.loads((ROOT / "config/osis-policy.json").read_text(encoding="utf-8"))
         policy["schema_sha256"] = hashlib.sha256(TEST_ONLY_SCHEMA).hexdigest()
-        policy["schema_status"] = "test_fixture_only"
+        policy["schema_status"] = "reviewed"  # Fixture exercises code; NOT the official XSD
         self.policy.write_text(json.dumps(policy), encoding="utf-8")
 
     def write(self, lines):
