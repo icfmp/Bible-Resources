@@ -36,13 +36,37 @@ def _no_space(text):
     return "".join(unicodedata.normalize("NFC",text).split())
 
 
-def _level(node, source):
-    if source:
-        style=node.get("sfm") or node.get("style")
-        match=re.fullmatch(r"q([1-4])?",style or "")
-        if match:
-            return match.group(1) or "1"
-    return node.get("level")
+POETRY_STYLES=re.compile(r"^(?:q[1-4]?|qm[1-4]?|qr|qc|qd)$")
+
+
+def _source_poetry_style(node):
+    """A poetic paragraph is identified by USFX marker/style, never guesswork."""
+    name=_name(node)
+    marker=node.get("sfm") or node.get("style") or name
+    if name not in {"q","qr","qc","qd","qm","p"}:
+        return None
+    if not POETRY_STYLES.fullmatch(marker):
+        if name in {"q","qr","qc","qd","qm"} or marker.startswith("q"):
+            raise PilotError("Unreviewed source poetry paragraph style")
+        return None
+    if marker in {"qr","qc","qd"}:
+        return {"qr":"right","qc":"center","qd":"hebrew-end"}[marker]
+    embedded=marker.startswith("qm")
+    level=marker[2:] if embedded else marker[1:]
+    return ("embedded" if embedded else "indent") + ":" + (level or "1")
+
+
+def _candidate_poetry_style(node):
+    kind=node.get("type")
+    if kind in {"x-right","x-center","x-usfm-qd"}:
+        return {"x-right":"right","x-center":"center",
+                "x-usfm-qd":"hebrew-end"}[kind]
+    if kind not in (None,"x-embedded"):
+        return "unsupported-type:"+kind
+    level=node.get("level")
+    if not level or not level.isdecimal():
+        return "unsupported-level:"+str(level)
+    return ("embedded" if kind=="x-embedded" else "indent")+":"+level
 
 
 def _read(root, *, source):
@@ -57,6 +81,7 @@ def _read(root, *, source):
     with_text_unowned=0
     empty_nodes=0
     multiverse_nodes=0
+    styles=Counter()
     for book in book_iterator:
         code=book.get("id") if source else book.get("osisID")
         if not code:
@@ -117,12 +142,15 @@ def _read(root, *, source):
                         raise PilotError("Unknown OSIS verse marker in poetry segment audit")
                 if kind in SKIP_TARGET:
                     return
-            is_poetic_line=(kind==("q" if source else "l"))
+            style=_source_poetry_style(node) if source else (
+                _candidate_poetry_style(node) if kind=="l" else None)
+            is_poetic_line=(style is not None)
             if is_poetic_line:
                 if active_lines:
                     raise PilotError("Nested poetry line nodes require editorial review")
                 total_nodes+=1
-                active_lines.append({"level":_level(node,source),
+                styles[style]+=1
+                active_lines.append({"level":style,
                                      "parts":defaultdict(list),"unowned_text":0})
             emit(node.text)
             for child in node:
@@ -156,6 +184,7 @@ def _read(root, *, source):
         "line_nodes_containing_nonverse_text":with_text_unowned,
         "empty_poetry_line_nodes":empty_nodes,
         "line_nodes_spanning_multiple_verses":multiverse_nodes,
+        "poetry_line_style_counts":dict(sorted(styles.items())),
     }
 
 
