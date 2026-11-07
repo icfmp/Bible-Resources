@@ -60,6 +60,30 @@ class PoetrySegmentOwnershipTests(unittest.TestCase):
         self.assertEqual(result["matching_verse_line_text_sequences_ignoring_whitespace"],2)
         self.assertEqual(result["matching_verse_line_indentation_levels"],2)
 
+    def test_right_aligned_line_is_not_misclassified_as_added(self):
+        src=('<qr><v id="1"/>Refrain<ve id="1"/></qr>')
+        dst=('<lg><l type="x-right"><verse sID="Gen.1.1"/>Refrain'
+             '<verse eID="Gen.1.1"/></l></lg>')
+        result=audit(src,dst,verses=(1,))
+        self.assertEqual(result["matching_verse_line_counts_with_text_ownership"],1)
+        self.assertEqual(result["matching_verse_line_indentation_levels"],1)
+        self.assertTrue(result["all_poetry_segments_and_levels_verified"])
+
+    def test_centered_poetry_from_usfx_paragraph_style_is_preserved(self):
+        src=('<p sfm="qc"><v id="1"/>Amen<ve id="1"/></p>')
+        dst=('<lg><l type="x-center"><verse sID="Gen.1.1"/>Amen'
+             '<verse eID="Gen.1.1"/></l></lg>')
+        result=audit(src,dst,verses=(1,))
+        self.assertEqual(result["matching_verse_line_indentation_levels"],1)
+
+    def test_embedded_poetry_indent_level_is_verified(self):
+        src=('<q sfm="qm2"><v id="1"/>Quoted<ve id="1"/></q>')
+        dst=('<lg><l type="x-embedded" level="2">'
+             '<verse sID="Gen.1.1"/>Quoted<verse eID="Gen.1.1"/>'
+             '</l></lg>')
+        result=audit(src,dst,verses=(1,))
+        self.assertEqual(result["matching_verse_line_indentation_levels"],1)
+
     def test_actual_new_line_break_is_not_dismissed(self):
         src=('<q sfm="q1"><v id="1"/>FirstSecond<ve id="1"/></q>')
         dst=('<lg><l level="1"><verse sID="Gen.1.1"/>First</l>'
