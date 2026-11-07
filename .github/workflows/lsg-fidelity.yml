@@ -101,6 +101,32 @@ jobs:
                             'SOURCE',repr(source[mismatch][:270]),
                             'SWORD',repr(parsed[mismatch][:270]))
           PY
+      - name: Diagnose USFX apparatus parent tags at references (temporary)
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import sys
+          sys.path.insert(0,'scripts')
+          from lxml import etree
+          from lsg_source_compare import read_source_xml
+          raw,_=read_source_xml(Path('${{ runner.temp }}/lsg/usfx.zip'),source_format='usfx')
+          parser=etree.XMLParser(resolve_entities=False,load_dtd=False,no_network=True)
+          root=etree.fromstring(raw,parser)
+          for needle in ['V. 1-13: cf.', 'V. 15-30: cf.', 'V. 37-50: cf.']:
+              found=[]
+              for node in root.iter():
+                  if node.text and needle in node.text:
+                      chain=[]
+                      cur=node
+                      for _ in range(5):
+                          if cur is None:break
+                          chain.append(etree.QName(cur).localname)
+                          cur=cur.getparent()
+                      found.append({'chain':chain,'attrib':dict(node.attrib),
+                                    'text':node.text[:190]})
+                      if len(found)>=3:break
+              print('USFX APPARATUS STRUCTURE',needle,found)
+          PY
       - name: Upload only the text-free diagnostic report
         if: always()
         uses: actions/upload-artifact@v4
