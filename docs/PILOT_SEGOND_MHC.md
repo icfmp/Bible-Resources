@@ -12,12 +12,12 @@ document is a reproducible pilot protocol, **not a completed trial**.
 
 | Resource | Selected for pilot | Evidence | Caution |
 |---|---|---|---|
-| Segond 1910 | eBible \`fraLSG1910eb\`, source \`fraLSG\` | [eBible details with SWORD, USFM/USFX, OSIS and public-domain declaration](https://ebible.org/find/details.php?all=1&id=fraLSG) | Verify actual SWORD \`.conf\` and individual file rights; do not infer SWORD v11n from title |
-| Matthew Henry **complete** | CrossWire \`MHC\` version **2.2**, \`zCom4\` | [CrossWire official listing](https://www.crosswire.org/sword/modules/ModInfo.jsp?modName=MHC) | **Not** concise \`MHCC\`. Check original \`.conf\`, CCEL correspondence and rights before publishing |
+| Segond 1910 | eBible `fraLSG1910eb`, source `fraLSG` | [eBible details with SWORD, USFM/USFX, OSIS and public-domain declaration](https://ebible.org/find/details.php?all=1&id=fraLSG) | Verify actual SWORD `.conf` and individual file rights; do not infer SWORD v11n from title |
+| Matthew Henry **complete** | CrossWire `MHC` version **2.2**, `zCom4` | [CrossWire official listing](https://www.crosswire.org/sword/modules/ModInfo.jsp?modName=MHC) | **Not** concise `MHCC`. Check original `.conf`, CCEL correspondence and rights before publishing |
 
-**Important upstream exception:** CrossWire also hosts \`FreSegond1910\`,
+**Important upstream exception:** CrossWire also hosts `FreSegond1910`,
 version **4.0**, enhanced with Strong's numbers, declared
-\`Copyrighted; Permission to distribute granted to CrossWire\`. The
+`Copyrighted; Permission to distribute granted to CrossWire`. The
 underlying historical text may be public domain, but the **module as packaged
 and annotated is not automatically ours to redistribute or alter**.
 Do not bypass the five-source priority policy: record the CrossWire
@@ -62,11 +62,11 @@ Genesis introduction, the text is divided into successive paragraphs,
 rather than a single giant paragraph. This gives us a preliminary reference
 for restoring **lost** paragraph boundaries if the corresponding SWORD
 entry has flattened them. This observation alone is *not* proof that the
-SWORD module lacks those boundaries; actual \`diatheke\` / OSIS export
+SWORD module lacks those boundaries; actual `diatheke` / OSIS export
 inspection is still needed.
 
 **Pilot check:** verify boundaries, authorial headings, nested sections,
-entry ranges (\`annotateRef\`), KJV scripture blocks and embedded Bible
+entry ranges (`annotateRef`), KJV scripture blocks and embedded Bible
 citations. Preserve all quotations. We may tag clearly identified
 introductory Scripture quotations for **optional UI folding** only after
 validating OSIS conventions and verifying boundaries. Never remove a
@@ -77,13 +77,13 @@ quotation that Henry uses in his argument.
 Official SWORD v11n data, **not one mapping per translation**:
 [VERSIFICATION_POLICY.md](VERSIFICATION_POLICY.md).
 
-- Confirm *actual* \`Versification\` value in each downloaded module's
-  \`mods.d/*.conf\` (CrossWire lists MHC as KJV in several source records,
+- Confirm *actual* `Versification` value in each downloaded module's
+  `mods.d/*.conf` (CrossWire lists MHC as KJV in several source records,
   but we must verify its actual packaged config).
 - Verify the installed SWORD engine supports each value. The official
-  registry includes French \`Segond\` and English \`KJV\`; this does not
-  imply that every Segond module declares \`Segond\`.
-- Run \`emptyvss\` and audit any missing slots. Distinguish actual
+  registry includes French `Segond` and English `KJV`; this does not
+  imply that every Segond module declares `Segond`.
+- Run `emptyvss` and audit any missing slots. Distinguish actual
   deliberate text-critical omissions from different numbering and
   accidental import errors.
 - For a confirmed omission **within its existing v11n**, keep the empty
@@ -111,7 +111,7 @@ third-party binaries, with:
 3. Diff of full source text and markup before/after; separate typography,
    verse-key, editorial note, Strong/morph, and annotation checks.
 4. Representative before/after visual evidence in **Bible GTK** and
-   \`diatheke\` output for Psalm 23, Psalm 119, Genesis 1 and a long
+   `diatheke` output for Psalm 23, Psalm 119, Genesis 1 and a long
    MHC chapter/section.
 5. Every automatic transformation rule with its official format
    justification, original-source path and line or SWORD verse/entry key,
@@ -155,31 +155,31 @@ cross-client SWORD verification** required for these two modules.
 
 The tested *preparation* lives in these scripts:
 
-- \`config/pilot-sources.json\`: the two exact allowlisted module IDs and
+- `config/pilot-sources.json`: the two exact allowlisted module IDs and
   HTTPS upstream ZIP URLs, plus test passage keys.
-- \`scripts/pilot_fetch.py\`: HTTPS-only streaming source download with a
+- `scripts/pilot_fetch.py`: HTTPS-only streaming source download with a
   file-size limit and redirect allowlist into a private temporary directory;
   refuses overwriting existing data.
-- \`scripts/pilot_preflight.py\`: checks ZIP safety, module identity/driver,
+- `scripts/pilot_preflight.py`: checks ZIP safety, module identity/driver,
   .conf metadata, SHA-256 and sizes **without extracting text**. If a step
   fails, the JSON result is marked blocked rather than recycling a success.
-- \`scripts/pilot_runtime.py\`: re-checks ZIP structure, unpacks only
+- `scripts/pilot_runtime.py`: re-checks ZIP structure, unpacks only
   preflighted members to a disposable workspace, and calls real
-  \`diatheke\` on the registered example keys. It records result presence
+  `diatheke` on the registered example keys. It records result presence
   and hashes, **not the returned passage text**.
-- \`scripts/probe_official_osis.py\`: checks the real CrossWire schema
+- `scripts/probe_official_osis.py`: checks the real CrossWire schema
   location, digest, imports/includes and offline XMLSchema compilation.
-  It **does not** silently set \`schema_status=reviewed\`.
+  It **does not** silently set `schema_status=reviewed`.
 
-The workflow \`.github/workflows/pilot-preflight.yml\` is
+The workflow `.github/workflows/pilot-preflight.yml` is
 **manual only**. To start LSG deliberately, go to GitHub Actions →
 **Pilot source preflight (on demand, read-only)** → Run workflow →
-\`pilot=lsg\`. It will fetch the exact eBible SWORD and USFM ZIPs to
+`pilot=lsg`. It will fetch the exact eBible SWORD and USFM ZIPs to
 the runner's temporary directory, inspect both, read sample SWORD verses,
 and attach **only JSON diagnostics**; never a distributable Bible package.
-Choose \`pilot=mhc\` separately when the MHC turn begins.
+Choose `pilot=mhc` separately when the MHC turn begins.
 
-A local equivalent after installing \`diatheke\` is:
+A local equivalent after installing `diatheke` is:
 
     python scripts/pilot_fetch.py --pilot lsg --directory /tmp/bible-pilot
     python scripts/pilot_preflight.py --pilot lsg \
