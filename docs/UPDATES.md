@@ -30,7 +30,9 @@ The report records the local SWORD conf Version, curated metadata version, origi
 
 Supported statuses: upstream_update_available, up_to_date, upstream_metadata_changed, upstream_older_than_baseline, needs_review, upstream_unavailable, missing_upstream, provider_disabled_or_unknown.
 
-CrossWire and eBible are configured for read-only HTTPS monitoring. OpenBible remains disabled until its **exact project, authorized catalogue endpoint, and resource formats** are confirmed. Additional providers require explicit adapters and documented source identity.
+All five active SWORD repositories in Bible (CrossWire, AndBible Extra, AndBible, STEP and eBible) are registered for read-only HTTPS catalogue monitoring. YouVersion is an API source, and OpenBible.info supplies **two datasets** (cross-references and topic scores), not SWORD modules. These three external sources are explicitly reported as `inventory_only`; no API access, dataset-generation comparison, or automatic download is implied. Bible already manages separately versioned, SHA-256-pinned OpenBible study data; see [SOURCE_INVENTORY.md](SOURCE_INVENTORY.md).
+
+The scheduled check also runs `scripts/check_provider_parity.py` against the current `icfmp/Bible` provider declarations to detect added/removed sources or changed URLs. This comparison can fail because GitHub is unavailable, in which case the result is **unavailable**, not falsely current.
 
 This checker does **not** download module binaries, automatically import upstream resources, remove or modify any installed modules, or confer rights to republish third-party texts. A conf file hash cannot prove module data bytes are unchanged: source/binary comparison belongs in the review pipeline.
 
