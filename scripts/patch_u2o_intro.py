@@ -50,6 +50,28 @@ NEW_POETRY_MOVE = "            if (\n                lines[i + 1].startswith(\"<
 OLD_MULTILINE_MOVE = "            if (\n                lines[i + 1].startswith(\"<verse sID\")\n                and lines[i - 1].startswith(\"<l \")\n                and lines[i - 2].endswith(\"</l>\")\n            ):\n                tmp = lines[i - 2].rpartition(\"<\")\n                lines[i - 2], lines[i] = (f\"{tmp[0]}{lines[i]}<{tmp[2]}\", \"\")\n"
 NEW_MULTILINE_MOVE = "            if (\n                lines[i + 1].startswith(\"<verse sID\")\n                and lines[i - 1].startswith(\"<l \")\n                and lines[i - 2].endswith(\"</l>\")\n                # A populated next poetry line still belongs to the verse\n                # ending here. Do not move its end before that line.\n                and re.fullmatch(r\"<l\\b[^<>]*>\", lines[i - 1]) is not None\n            ):\n                tmp = lines[i - 2].rpartition(\"<\")\n                lines[i - 2], lines[i] = (f\"{tmp[0]}{lines[i]}<{tmp[2]}\", \"\")\n"
 
+
+OLD_CALLER_IMPORT = "from unicodedata import normalize\n"
+NEW_CALLER_IMPORT = OLD_CALLER_IMPORT + "from xml.sax.saxutils import quoteattr\n"
+
+OLD_CALLER_CAPTURE = (
+    "        # footnote caller (currently ignored by this script)\n"
+    "        \\S\n"
+)
+NEW_CALLER_CAPTURE = (
+    "        # Preserve the exact source caller as an independent note attribute.\n"
+    "        (?P<caller>\\S)\n"
+)
+
+OLD_CALLER_OUTPUT = '        return f"{tag[0]}{notetext}{tag[1]}"\n'
+NEW_CALLER_OUTPUT = (
+    "        # Preserve source callout labels without inserting them into note text.\n"
+    "        # XML-escape even unusual single-character editorial glyphs.\n"
+    "        opening = tag[0].replace(\">\", "
+    "f\" n={quoteattr(match.group('caller'))}>\", 1)\n"
+    '        return f"{opening}{notetext}{tag[1]}"\n'
+)
+
 class ConverterPatchError(ValueError):
     pass
 
@@ -62,14 +84,18 @@ def patch(source: bytes) -> bytes:
     if sha(source)!=EXPECTED_UPSTREAM_SHA256:
         raise ConverterPatchError("Upstream converter SHA-256 changed: manual review required")
     original=source.decode("utf-8")
-    for needle in (OLD_END,OLD_TABLE,OLD_NOTE_SPACE,OLD_POETRY_MOVE,OLD_MULTILINE_MOVE):
+    for needle in (OLD_END,OLD_TABLE,OLD_NOTE_SPACE,OLD_POETRY_MOVE,OLD_MULTILINE_MOVE,
+                   OLD_CALLER_IMPORT,OLD_CALLER_CAPTURE,OLD_CALLER_OUTPUT):
         if original.count(needle)!=1:
             raise ConverterPatchError("Reviewed converter patch anchor is missing or ambiguous")
     converted=(original.replace(OLD_END,NEW_END)
                .replace(OLD_TABLE,NEW_TABLE)
                .replace(OLD_NOTE_SPACE,"")
                .replace(OLD_POETRY_MOVE,NEW_POETRY_MOVE)
-               .replace(OLD_MULTILINE_MOVE,NEW_MULTILINE_MOVE))
+               .replace(OLD_MULTILINE_MOVE,NEW_MULTILINE_MOVE)
+               .replace(OLD_CALLER_IMPORT,NEW_CALLER_IMPORT)
+               .replace(OLD_CALLER_CAPTURE,NEW_CALLER_CAPTURE)
+               .replace(OLD_CALLER_OUTPUT,NEW_CALLER_OUTPUT))
     if converted==original or converted.count("def markintroend(")!=1:
         raise ConverterPatchError("Generic introductory table patch not applied")
     return converted.encode("utf-8")
@@ -86,7 +112,7 @@ def main(argv=None):
     fixed=patch(original)
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_bytes(fixed)
-    print(f"u2o reviewed intro/note/verse-boundary fixes: original SHA-256 {sha(original)}, patched SHA-256 {sha(fixed)}")
+    print(f"u2o reviewed intro/note/callout/verse-boundary fixes: original SHA-256 {sha(original)}, patched SHA-256 {sha(fixed)}")
     return 0
 
 
