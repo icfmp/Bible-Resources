@@ -16,6 +16,8 @@ import tempfile
 
 from pilot_preflight import PilotError
 from pilot_subprocess import query,present_key
+from lsg_sword_compare import chapter_plan,parse_sword_chapter,usfx_text_by_verse,plain
+from lsg_source_compare import scan_usfx
 
 MAX_COMPILER_LOG=6*1024*1024
 MAX_COMPILE_SECONDS=180
@@ -33,7 +35,75 @@ def _sha(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
 
 
-def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke") -> dict:
+def full_index_roundtrip(source: bytes, *, root: Path, reader: str) -> dict:
+    """Read all source chapters in rebuilt module; never export their text."""
+    from collections import Counter
+    usfx,keys=scan_usfx(source)
+    plan=chapter_plan(keys,full=True)
+    source_verses,_=usfx_text_by_verse(source,filter_books=set(plan))
+    totals=Counter()
+    examples=[]
+    books=[]
+    for code,(book_name,chapters) in plan.items():
+        book_checks=Counter()
+        source_continuous=[]
+        sword_continuous=[]
+        for chapter in chapters:
+            ref=f"{book_name} {chapter}"
+            exit_code,body=query("fraLSG1910eb",ref,
+                fmt="plain",root=root,exe=reader,limit=4*1024*1024,timeout=30)
+            if not present_key(ref,body,exit_code):
+                raise PilotError(f"Full SWORD index has no readable chapter: {ref}")
+            actual=parse_sword_chapter(body,chapter,"fraLSG1910eb")
+            expected={v:text for (b,c,v),text in source_verses.items()
+                      if b==code and c==chapter}
+            source_only=set(expected)-set(actual)
+            sword_only=set(actual)-set(expected)
+            same=set(expected)&set(actual)
+            exact=sum(expected[v]==actual[v] for v in same)
+            no_spaces=sum("".join(expected[v].split())=="".join(actual[v].split())
+                          for v in same)
+            book_checks.update({
+                "chapters":1,"source_verses":len(expected),"sword_verses":len(actual),
+                "source_keys_missing":len(source_only),"sword_keys_unexpected":len(sword_only),
+                "exact_normalized_text_matches":exact,
+                "content_matches_ignoring_whitespace":no_spaces,
+            })
+            if len(examples)<75 and (source_only or sword_only or exact!=len(same)):
+                examples.append({
+                    "book":code,"chapter":chapter,
+                    "missing_source_keys":sorted(source_only)[:15],
+                    "unexpected_sword_keys":sorted(sword_only)[:15],
+                    "same_reference_text_differences":len(same)-exact,
+                })
+            source_continuous.extend(expected[v] for v in sorted(expected))
+            sword_continuous.extend(actual[v] for v in sorted(actual))
+        totals.update(book_checks)
+        books.append({
+            "book":code,**book_checks,
+            "continuous_source_vs_compiled_scripture_exact":
+               plain(" ".join(source_continuous))==plain(" ".join(sword_continuous)),
+            "continuous_source_vs_compiled_scripture_without_whitespace":
+               "".join("".join(v.split()) for v in source_continuous)==
+               "".join("".join(v.split()) for v in sword_continuous),
+        })
+    return {
+        "status":"all_canonical_source_chapters_read_for_diagnostics",
+        "expected_chapters":1189,
+        "total_source_verse_keys":len(keys),
+        "totals":dict(totals),
+        "books":books,
+        "first_diagnostic_chapters":examples,
+        "source_key_count_matches":totals["source_keys_missing"]==0
+          and totals["sword_keys_unexpected"]==0
+          and totals["source_verses"]==len(keys)
+          and totals["sword_verses"]==len(keys),
+        "complete_text_and_note_parity_verified":False,
+        "module_not_published":True,
+    }
+
+
+def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke", source_usfx: bytes | None=None) -> dict:
     before=osis.read_bytes()
     report={
         "status":"rebuild_probe_not_approved",
@@ -132,6 +202,21 @@ def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke") -> 
             )
             else "compiled_but_sample_or_v11n_errors_block"
         )
+        if source_usfx is not None and report["all_sample_keys_have_text"]:
+            try:
+                report["full_source_verse_roundtrip"]=full_index_roundtrip(
+                    source_usfx,root=root,reader=reader
+                )
+            except (OSError,ValueError) as exc:
+                report["full_source_verse_roundtrip"]={
+                    "status":"blocked",
+                    "error_type":type(exc).__name__,
+                    "error":str(exc)[:180],
+                    "full_source_parity_unverified":True,
+                }
+            if (report["full_source_verse_roundtrip"].get("source_key_count_matches")
+                    is not True):
+                report["status"]="compiled_but_full_reference_index_mismatch"
         report["source_file_unchanged"]=_sha(osis.read_bytes())==report["original_osis_sha256"]
         if not report["source_file_unchanged"]:
             raise PilotError("Original OSIS source modified during compiler trial")
