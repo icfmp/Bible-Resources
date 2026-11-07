@@ -18,7 +18,8 @@ import unicodedata
 from lxml import etree
 
 from lsg_source_compare import scan_usfx
-from lsg_sword_compare import usfx_text_by_verse,plain
+from lsg_sword_compare import (usfx_text_by_verse, plain,
+    NON_VERSE_TEXT_ELEMENTS, NON_VERSE_PARAGRAPH_STYLES)
 from pilot_preflight import PilotError
 
 OSIS="{http://www.bibletechnologies.net/2003/OSIS/namespace}"
@@ -121,15 +122,22 @@ def _source_words(raw: bytes) -> tuple[dict,dict,dict]:
                 current=(code,chapter,int(node.get("id")))
             elif name=="ve":
                 current=None
+            if current and name=="x":
+                # Count the annotation once, but exclude its enclosed words
+                # and any section apparatus from canonical verse-word parity.
+                notes[current]+=1
+            skip=(name in NON_VERSE_TEXT_ELEMENTS or
+                  (name=="p" and (node.get("sfm") or node.get("style"))
+                   in NON_VERSE_PARAGRAPH_STYLES))
+            if skip:
+                # Match usfx_text_by_verse: the text audit must not compare
+                # annotation/heading words with canonical verse words.
+                return
             if current and name=="w":
                 words[current].append(plain("".join(node.itertext())))
-            if current and name=="x":
-                notes[current]+=1
             if current and name=="q":
                 poetry[current]+=1
             for child in node:
-                # Cross-reference notes are handled as complete objects, not
-                # canonical words, but they remain counted for preservation.
                 walk(child)
         walk(book)
     return words,notes,poetry
