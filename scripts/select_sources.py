@@ -67,8 +67,8 @@ def _edition_map(registry: dict, provider_ids: set[str]) -> tuple[dict, dict]:
                 or not entry["evidence_url"].startswith("https://")):
             raise ValueError(f"{edition_id}: verified reviewer and HTTPS evidence required")
         aliases = entry.get("sources")
-        if not isinstance(aliases, list) or len(aliases) < 2:
-            raise ValueError(f"{edition_id}: at least two verified source aliases required")
+        if not isinstance(aliases, list) or not aliases:
+            raise ValueError(f"{edition_id}: at least one verified source identity required")
         seen_in_group = set()
         for alias in aliases:
             if not isinstance(alias, dict):
