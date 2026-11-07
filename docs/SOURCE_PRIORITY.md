@@ -64,6 +64,8 @@ that these two modules have been compared):
       ]
     }
 
+A verified identity can contain **one** source (to distinguish two different editions with similar titles) or several confirmed copies of one identical edition. The same canonical edition identity must never group different revisions or translations.
+
 The actual registry starts **empty**. Every mapping needs deliberate human
 verification and evidence; merely sharing an identifier or a title is not
 enough. Two *verified different editions* may legitimately share a display
