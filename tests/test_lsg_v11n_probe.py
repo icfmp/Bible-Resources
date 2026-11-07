@@ -47,7 +47,7 @@ class LSGVersificationFixtureTests(unittest.TestCase):
             "key=sys.argv[-1].split()\n"
             "book='Exod' if key[0]=='Exodus' else 'Ps'\n"
             "chapter,verse=key[-1].split(':')\n"
-            "print(f'SYNTHETIC_{book}_{chapter}_{verse}')\n"
+            "print(f'{sys.argv[-1]}: SYNTHETIC_{book}_{chapter}_{verse}')\n"
         )
         self.fake_reader.chmod(0o700)
         self.archive=self.root/"usfx.zip"
@@ -87,6 +87,7 @@ class LSGVersificationFixtureTests(unittest.TestCase):
         self.assertTrue(result["preferred_scheme_not_approved"])
         self.assertTrue(result["schemes"][0]["reader_was_checked"])
         self.assertTrue(result["schemes"][0]["reader_key_evidence"][0]["marker_for_original_key_present"])
+        self.assertTrue(result["schemes"][0]["reader_key_evidence"][0]["requested_reference_preserved"])
         self.assertFalse(result["real_module_recompiled"])
         self.assertFalse(result["source_text_modified"])
         self.assertEqual(result["schemes"][0]["sample_out_of_range_source_keys"],
