@@ -154,7 +154,8 @@ def compare(config: dict, sources: dict[str, str]) -> dict:
                     "base_url": directory,
                 }
             elif identifier == "youversion":
-                checks = {"kind": "api", "catalogue_url": original["catalogue_url"]}
+                checks = {"kind": "api", "source_url": original["source_url"],
+                          "catalogue_url": original["catalogue_url"]}
             else:
                 checks = {"kind": "dataset", "source_url": original["source_url"],
                           "download_url": original["download_url"]}
