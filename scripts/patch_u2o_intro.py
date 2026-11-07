@@ -79,6 +79,13 @@ NEW_CALLER_OUTPUT = (
 OLD_CHAP_REGEX = "        r\"\"\"(\\\\c +\\w+)\\s*\"\"\",\n"
 NEW_CHAP_REGEX = "        r\"\"\"(\\\\c +\\w+)[ \\t]*\"\"\",\n"
 
+OLD_NOTE_SPACE_PROTECTION_ENTRY = "def doconvert(text: str, log_level: int) -> tuple[str, ...]:\n"
+NEW_NOTE_SPACE_PROTECTION_ENTRY = "def _mark_note_leading_spaces(text: str) -> str:\n    \"\"\"Protect source-authored spaces before notes through converter cleanup.\n\n    The source USFM is immutable; only this in-memory converter input is\n    marked. The private-use character is restored to a space at output,\n    and an existing occurrence fails closed to avoid silent substitution.\n    \"\"\"\n    marker=\"\\ue000\"\n    if marker in text:\n        raise ValueError(\"Input already contains reserved note-space marker\")\n    for note in reversed(list(NOTERE.finditer(text))):\n        offset=note.start()\n        if offset and text[offset-1]==\" \":\n            text=text[:offset-1]+marker+text[offset:]\n    return text\n\n\ndef doconvert(text: str, log_level: int) -> tuple[str, ...]:\n"
+OLD_NOTE_SPACE_INPUT = 'reflow(newtext)'
+NEW_NOTE_SPACE_INPUT = 'reflow(_mark_note_leading_spaces(newtext))'
+OLD_NOTE_SPACE_RESTORE = "            .replace(\"</w><w\", \"</w> <w\")\n"
+NEW_NOTE_SPACE_RESTORE = "            .replace(\"\\ue000\", \" \")\n            .replace(\"</w><w\", \"</w> <w\")\n"
+
 class ConverterPatchError(ValueError):
     pass
 
@@ -93,7 +100,8 @@ def patch(source: bytes) -> bytes:
     original=source.decode("utf-8")
     for needle in (OLD_END,OLD_TABLE,OLD_NOTE_SPACE,OLD_POETRY_MOVE,OLD_MULTILINE_MOVE,
                    OLD_CALLER_IMPORT,OLD_CALLER_CAPTURE,OLD_CALLER_OUTPUT,
-                   OLD_CHAP_REGEX):
+                   OLD_CHAP_REGEX,OLD_NOTE_SPACE_PROTECTION_ENTRY,
+                   OLD_NOTE_SPACE_INPUT,OLD_NOTE_SPACE_RESTORE):
         if original.count(needle)!=1:
             raise ConverterPatchError("Reviewed converter patch anchor is missing or ambiguous")
     converted=(original.replace(OLD_END,NEW_END)
@@ -104,7 +112,10 @@ def patch(source: bytes) -> bytes:
                .replace(OLD_CALLER_IMPORT,NEW_CALLER_IMPORT)
                .replace(OLD_CALLER_CAPTURE,NEW_CALLER_CAPTURE)
                .replace(OLD_CALLER_OUTPUT,NEW_CALLER_OUTPUT)
-               .replace(OLD_CHAP_REGEX,NEW_CHAP_REGEX))
+               .replace(OLD_CHAP_REGEX,NEW_CHAP_REGEX)
+               .replace(OLD_NOTE_SPACE_PROTECTION_ENTRY,NEW_NOTE_SPACE_PROTECTION_ENTRY)
+               .replace(OLD_NOTE_SPACE_INPUT,NEW_NOTE_SPACE_INPUT)
+               .replace(OLD_NOTE_SPACE_RESTORE,NEW_NOTE_SPACE_RESTORE))
     if converted==original or converted.count("def markintroend(")!=1:
         raise ConverterPatchError("Generic introductory table patch not applied")
     return converted.encode("utf-8")
@@ -121,7 +132,7 @@ def main(argv=None):
     fixed=patch(original)
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_bytes(fixed)
-    print(f"u2o reviewed intro/note/callout/poetry/verse-boundary fixes: original SHA-256 {sha(original)}, patched SHA-256 {sha(fixed)}")
+    print(f"u2o reviewed intro/note/callout/whitespace/poetry/verse-boundary fixes: original SHA-256 {sha(original)}, patched SHA-256 {sha(fixed)}")
     return 0
 
 
