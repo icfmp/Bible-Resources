@@ -27,6 +27,7 @@ from lsg_source_compare import (
 from pilot_preflight import PilotError, inspect_archive
 from pilot_subprocess import MAX_OUTPUT
 from lsg_osis_parity import compare as compare_osis
+from lsg_sword_rebuild import compile_candidate
 
 
 CONVERTER_COMMIT = "dde28bc545e8d8697fa5496c243187847ec55d31"
@@ -277,6 +278,12 @@ def run(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) -> dict:
             return report
         report["osis_schema"]=_schema_proof(candidate,schema)
         report["source_to_generated_osis"]=compare_osis(candidate,original_xml)
+        # Real, disposable diagnostic compilation is allowed only after the
+        # full original OSIS document passes both the official pinned XSD
+        # and the separately reviewed structural policy.
+        if (report["osis_schema"]["xsd_status"]=="validated"
+                and report["osis_schema"]["policy_status"]=="validated"):
+            report["real_segond_sword_trial"]=compile_candidate(candidate)
         report["structure_key_sets_equal"]=(
            report["osis_candidate"]["verse_keys_missing_from_converted"]==0
            and report["osis_candidate"]["verse_keys_unexpected_in_converted"]==0
