@@ -48,3 +48,47 @@ https://wiki.crosswire.org/Official_and_Affiliated_Module_Repositories
 ## Duplicate sources and canonical editions
 
 The five SWORD repositories can redistribute the same edition. The separately reviewed [priority policy](SOURCE_PRIORITY.md) decides a **single preferred import source**, while maintaining the ability to monitor alternate upstream copies. Do not create multiple curated modules or version streams merely because an identical edition appears in several catalogues. Explicit alias verification matters: module ID and title coincidences alone are not sufficient. `scripts/select_sources.py` produces a read-only selection report with blocked ambiguities and unavailable-provider fail-closed behavior. It does not automatically change upstream links or existing installed resources.
+
+## Avoiding the upstream-return loop for our own fixes
+
+If Bible Resources sends a reviewed OSIS, metadata or cross-reference correction
+back to CrossWire or another source, a subsequent upstream release may consist
+entirely of **our own improvement**. A new version is not automatically a
+meaningful new import for our curated edition.
+
+For each curated \`upstreams[]\` entry:
+
+- \`contributions[]\` records the submitted upstream issue/PR URL, its
+  \`submitted\` / \`accepted\` / \`released\` state, and SHA-256 of the patch.
+  Acceptance is **not** proof that a released SWORD module contains the fix.
+- \`reconciliations[]\` records a **human-reviewed exact upstream version**
+  and its \`.conf\` SHA-256, original and curated content checksums, a comparison
+  evidence URL, reviewer, linked contribution, and whether it is
+  \`equivalent_to_curated\` or \`contains_other_changes\`.
+
+The scheduled metadata checker **cannot establish content equivalence**: it
+reads catalogues / \`.conf\` entries, not the full released module bytes.
+Therefore a mere version bump, merged PR or matching description is never
+sufficient to dismiss an upstream update.
+
+When a reviewer has verified that the *specific released upstream content* is
+already equivalent to our curated edition, the checker emits
+\`our_contribution_returned_upstream\` instead of
+\`upstream_update_available\`. Keep \`last_integrated_version\` unchanged:
+it records the actual source revision imported into Bible Resources, not
+the newest upstream release.
+
+If the upstream release also has other changes, it remains
+\`upstream_update_available\` and must be reviewed. An accepted/released
+contribution without reviewed correspondence merely adds
+\`possible_return_of_our_contribution: true\`; it never skips the review.
+
+The prior review applies only to **one exact upstream version + .conf hash**.
+A changed version or configuration forces reevaluation. A publisher may also
+change binary content in-place without updating its .conf; such a change
+cannot be detected with metadata monitoring alone, so full payload verification
+remains mandatory before any real import.
+
+The provider's rights, actual module identity, source provenance and
+normalization gates are unchanged. This feature does not import or download
+module text and does not alter installed users' Bibles.
