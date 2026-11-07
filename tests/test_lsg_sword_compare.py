@@ -5,7 +5,7 @@ import unittest
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
-from lsg_sword_compare import usfx_text_by_verse,parse_sword_chapter,plain
+from lsg_sword_compare import usfx_text_by_verse,parse_sword_chapter,plain,explain_wrapper
 from pilot_preflight import PilotError
 
 
@@ -45,6 +45,15 @@ class LsgTextParityTests(unittest.TestCase):
         self.assertEqual(plain(" ".join(source)),plain(" ".join(sword)))
         # Text parity must not be confused with exact verse-key parity.
         self.assertNotEqual(len(source),len(sword))
+
+    def test_diatheke_balanced_asterisks_are_only_diagnostic_wrappers(self):
+        self.assertEqual(explain_wrapper("Bonjour.", "* Bonjour. *"),
+                         "sword_balanced_asterisk_emphasis")
+        self.assertIsNone(explain_wrapper("Bonjour.", "* Bonjour."))
+        self.assertIsNone(explain_wrapper("Bonjour.", "Bonjour. *"))
+        self.assertIsNone(explain_wrapper("A *sign* is part of the text.",
+                                          "* A *sign* is part of the text. *"))
+        self.assertIsNone(explain_wrapper("Bonjour.", "Bonjour."))
 
     def test_duplicate_sword_verse_cannot_pass(self):
         output=b"Genesis 1:1: Hello\nGenesis 1:1: repeated\n(fraLSG1910eb)\n"
