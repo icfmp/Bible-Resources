@@ -60,7 +60,7 @@ jobs:
           command -v diatheke
       - name: Test complete source conversion; no full Scripture module committed, uploaded or published
         env:
-          LSG_SAMPLE_DEBUG: '0'
+          LSG_SAMPLE_DEBUG: '1'
         run: |
           python scripts/lsg_rebuild_trial.py \
             --usfm-zip "${{ runner.temp }}/original/usfm.zip" \
