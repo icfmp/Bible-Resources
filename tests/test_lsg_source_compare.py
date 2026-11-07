@@ -49,7 +49,7 @@ class LsgSourceTests(unittest.TestCase):
             with zipfile.ZipFile(path,"w") as z:
                 z.writestr("one.xml","<osis/>")
                 z.writestr("two.xml","<osis/>")
-            with self.assertRaisesRegex(PilotError,"Multiple OSIS"):
+            with self.assertRaisesRegex(PilotError,"Multiple osis"):
                 read_source_xml(path)
 
     def test_malformed_or_external_doctype_fails_closed(self):
