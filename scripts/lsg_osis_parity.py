@@ -9,6 +9,7 @@ generated OSIS remain separate provenance layers.
 from __future__ import annotations
 
 from collections import Counter,defaultdict
+import difflib
 import hashlib
 from pathlib import Path
 import re
@@ -155,6 +156,9 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
     poetry_equal=0
     other=Counter()
     differences=[]
+    category_samples=defaultdict(list)
+    punctuation_diffs=Counter()
+    text_edit_kinds=Counter()
     total_source_words=0
     total_osis_words=0
     for key in all_source_keys:
@@ -178,6 +182,34 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
         total_osis_words+=len(new_words)
         if (original!=generated or old_words!=new_words or
                 original_notes!=generated_notes or old_lines!=new_lines):
+            kind_flags={
+                "verse_text":original!=generated,
+                "word_sequence":old_words!=new_words,
+                "note_placement":original_notes!=generated_notes,
+                "poetry_line_placement":old_lines!=new_lines,
+            }
+            detail={
+                "reference":f"{code}.{chapter}.{verse}",
+                "source_chars":len(original),"generated_chars":len(generated),
+                "source_words":len(old_words),"generated_words":len(new_words),
+                "source_notes":original_notes,"generated_notes":generated_notes,
+                "source_poetry_lines":old_lines,"generated_poetry_lines":new_lines,
+            }
+            for category,flag in kind_flags.items():
+                if flag and len(category_samples[category])<45:
+                    category_samples[category].append(detail)
+            if original!=generated:
+                sequence=difflib.SequenceMatcher(None,original,generated,autojunk=False)
+                for tag,i,j,k,l in sequence.get_opcodes():
+                    if tag=="equal":
+                        continue
+                    text_edit_kinds[tag]+=1
+                    src,dst=original[i:j],generated[k:l]
+                    # Punctuation-only tiny edits can be described without
+                    # emitting any source words or full Bible text.
+                    if (len(src)<=5 and len(dst)<=5 and
+                            not any(x.isalpha() or x.isdigit() for x in src+dst)):
+                        punctuation_diffs[(tag,src,dst)]+=1
             if len(differences)<80:
                 differences.append({
                     "reference":f"{code}.{chapter}.{verse}",
@@ -221,6 +253,13 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
         "source_poetry_line_markers_in_verses":sum(source_lines.values()),
         "converted_poetry_line_markers_in_verses":sum(osis_lines.values()),
         "differences":dict(other),
+        "first_per_category":dict(category_samples),
+        "text_edit_kinds":dict(text_edit_kinds),
+        "punctuation_only_changes":[
+            {"kind":key[0],"source_symbols":key[1],"target_symbols":key[2],
+             "count":num}
+            for key,num in punctuation_diffs.most_common(35)
+        ],
         "first_differences":differences,
         "source_text_modified":False,
         "all_note_text_and_reference_targets_verified":False,
