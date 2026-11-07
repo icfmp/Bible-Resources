@@ -26,5 +26,6 @@
     "edition": "faithful",
     "reviewed_by": "PENDING",
     "smoke_key": "Gen 1:1"
-  }
+  },
+  "canonical_edition_id": "example-commentary-edition-verified"
 }
