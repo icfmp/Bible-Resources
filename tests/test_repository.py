@@ -43,6 +43,7 @@ class Tests(unittest.TestCase):
     def test_approved_modules_need_canonical_edition(self):
         self.m["quality"]["status"] = "approved"
         self.m["rights"]["redistribution_allowed"] = True
+        self.m.pop("canonical_edition_id", None)
         self.create()
         errors = validate(self.root)[1]
         self.assertTrue(any("canonical_edition_id" in e for e in errors))
