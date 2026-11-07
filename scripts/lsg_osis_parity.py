@@ -403,8 +403,8 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
         # for distinguishing converter leaks from genuine source variations.
         # Never include these original/converted words in uploaded artifacts.
         if os.getenv("LSG_SAMPLE_DEBUG")=="1" and (code,chapter,verse) in {
-            ("GEN",29,14),("DEU",32,6),("ISA",25,2),
-            ("ACT",13,35),("JOB",4,11),
+            ("GEN",4,24),("GEN",10,1),("GEN",10,6),
+            ("GEN",49,7),("EXO",25,10),
         }:
             def preview(value: str) -> str:
                 return repr(value[:115]+" … "+value[-115:] if len(value)>240 else value[:240])
