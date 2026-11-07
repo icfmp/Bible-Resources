@@ -51,7 +51,7 @@ def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke") -> 
         data=root/"modules/texts/rawtext/fralsg1910eb"
         data.mkdir(parents=True)
         result=subprocess.run(
-            [compiler,str(data),str(osis),"-v","Segond","-s","4"],
+            [compiler,str(data),str(osis),"-v","Segond"],
             capture_output=True,check=False,timeout=MAX_COMPILE_SECONDS,
         )
         logs=result.stdout+result.stderr
