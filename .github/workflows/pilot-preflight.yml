@@ -21,6 +21,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install real SWORD reader (no user module installation)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y diatheke
       - name: Fetch only the allowlisted upstream archives
         env:
           PILOT: ${{ inputs.pilot }}
@@ -43,18 +47,27 @@ jobs:
             echo "Unsupported pilot" >&2
             exit 1
           fi
+      - name: Check representative keys using isolated SWORD runtime
+        env:
+          PILOT: ${{ inputs.pilot }}
+        run: |
+          python scripts/pilot_runtime.py --pilot "$PILOT" \
+            --sword-zip "${{ runner.temp }}/pilot-inputs/sword.zip" \
+            --report reports/pilot-reader.json
       - name: Attach metadata report only (never original archives)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: pilot-${{ inputs.pilot }}-metadata-report
-          path: reports/pilot-preflight.json
+          path: |
+            reports/pilot-preflight.json
+            reports/pilot-reader.json
           if-no-files-found: warn
           retention-days: 30
       - name: Explain limits
         if: always()
         run: |
           echo '## Bible Resources pilot metadata preflight' >> "$GITHUB_STEP_SUMMARY"
-          echo 'Inspection-only: hashes, archive paths, SWORD conf fields.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Inspection-only: hashes, archive paths, SWORD conf fields, representative diatheke keys.' >> "$GITHUB_STEP_SUMMARY"
           echo 'Not yet: source-text comparison, OSIS schema approval, rendering, normalization, publication.' >> "$GITHUB_STEP_SUMMARY"
           echo 'No third-party archive is included in artifacts or the repository.' >> "$GITHUB_STEP_SUMMARY"
