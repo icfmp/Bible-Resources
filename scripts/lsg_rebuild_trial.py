@@ -283,7 +283,7 @@ def run(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) -> dict:
         # and the separately reviewed structural policy.
         if (report["osis_schema"]["xsd_status"]=="validated"
                 and report["osis_schema"]["policy_status"]=="validated"):
-            report["real_segond_sword_trial"]=compile_candidate(candidate)
+            report["real_segond_sword_trial"]=compile_candidate(candidate,source_usfx=original_xml)
         report["structure_key_sets_equal"]=(
            report["osis_candidate"]["verse_keys_missing_from_converted"]==0
            and report["osis_candidate"]["verse_keys_unexpected_in_converted"]==0
