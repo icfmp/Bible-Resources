@@ -13,7 +13,7 @@ permissions:
 jobs:
   lsg:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -42,53 +42,25 @@ jobs:
             --usfx-zip "${{ runner.temp }}/lsg/usfx.zip" \
             --usfm-zip "${{ runner.temp }}/lsg/usfm.zip" \
             --report reports/lsg-authoring-structure.json
-      - name: Inspect the actual SWORD output format on three public-domain sample verses
+      - name: Install SWORD reader and fetch the official eBible compiled module
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y diatheke >/dev/null
           python - <<'PY'
-          import sys,tempfile,zipfile,shutil,os
-          from pathlib import Path, PurePosixPath
+          import sys
+          from pathlib import Path
           sys.path.insert(0,'scripts')
           from pilot_fetch import fetch
-          from pilot_preflight import inspect_archive
-          from pilot_subprocess import query
-          home=Path('${{ runner.temp }}/lsg')
-          fetch('https://ebible.org/sword/zip/fraLSG1910eb.zip',home/'sword.zip','lsg')
-          info=inspect_archive(home/'sword.zip',source_kind='sword',
-              expected_module_id='fraLSG1910eb',expected_category='bible')
-          with tempfile.TemporaryDirectory() as tmp:
-              root=Path(tmp)
-              with zipfile.ZipFile(home/'sword.zip') as archive:
-                  for item in info['members']:
-                      name=item['name']
-                      if name.endswith('/'):continue
-                      dst=root/PurePosixPath(name)
-                      dst.parent.mkdir(parents=True,exist_ok=True)
-                      with archive.open(name) as src,dst.open('xb') as out:
-                          shutil.copyfileobj(src,out,length=262144)
-              for ref in ['Gen 1','Ps 23','Gen 1:1','Ps 23:2','John 5:4','Acts 8:37']:
-                  for fmt in ['plain','internal']:
-                      code,body=query('fraLSG1910eb',ref,fmt=fmt,root=root,exe='diatheke')
-                      print('SWORD sample',ref,fmt,'status',code,'bytes',len(body),
-                            'prefix',repr(body[:1800 if ref in ('Gen 1','Ps 23') else 430].decode('utf-8',errors='replace')))
-              from lsg_source_compare import read_source_xml
-              from lsg_sword_compare import usfx_text_by_verse,parse_sword_chapter
-              raw,_=read_source_xml(home/'usfx.zip',source_format='usfx')
-              by_verse,_=usfx_text_by_verse(raw,filter_books={'ACT'})
-              _,actual=query('fraLSG1910eb','Acts 8',fmt='plain',root=root,exe='diatheke')
-              actual_by_verse=parse_sword_chapter(actual,8,'fraLSG1910eb')
-              print('Act 8:1 source (PD):',repr(by_verse[('ACT',8,1)][:600]))
-              print('Act 8:1 SWORD (PD):',repr(actual_by_verse[1][:600]))
-              print('Act 8:2 source (PD):',repr(by_verse[('ACT',8,2)][:200]))
-              print('Act 8:2 SWORD (PD):',repr(actual_by_verse[2][:200]))
+          destination=Path('${{ runner.temp }}/lsg/sword.zip')
+          print(fetch('https://ebible.org/sword/zip/fraLSG1910eb.zip',destination,'lsg'))
           PY
-      - name: Compare selected LSG SWORD verses with independently parsed USFX
+      - name: Compare ALL 66 books / 1189 chapters of LSG SWORD to USFX
         run: |
           python scripts/lsg_sword_compare.py \
             --sword-zip "${{ runner.temp }}/lsg/sword.zip" \
             --usfx-zip "${{ runner.temp }}/lsg/usfx.zip" \
-            --report reports/lsg-usfx-sword-verse-parity.json
+            --report reports/lsg-usfx-sword-verse-parity.json \
+            --full
       - name: Upload only the text-free diagnostic report
         if: always()
         uses: actions/upload-artifact@v4
