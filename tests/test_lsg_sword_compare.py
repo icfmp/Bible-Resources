@@ -1,0 +1,69 @@
+"""Offline parser fixtures for LSG USFX/diatheke sampled chapter fidelity."""
+import sys
+from pathlib import Path
+import unittest
+
+ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/"scripts"))
+from lsg_sword_compare import usfx_text_by_verse,parse_sword_chapter,plain,explain_wrapper
+from pilot_preflight import PilotError
+
+
+class LsgTextParityTests(unittest.TestCase):
+    def test_usfx_verse_text_and_word_annotations_preserved_while_xrefs_excluded(self):
+        xml=b"""<usfx><book id="PSA"><c id="23"/><p>
+        <v id="1"/>Cantique de David. <w s="H123">L'Eternel</w> est mon berger:
+        <s level="1">Editorial heading, not part of canonical verse.</s>
+        <r>V.1-13 related passages</r>
+        <x><xo>23:1</xo><xt>other reference</xt></x> je ne manquerai de rien.<ve id="1"/>
+        <v id="2"/>Il me dirige pres des eaux paisibles.<ve id="2"/>
+        </p></book></usfx>"""
+        verse,features=usfx_text_by_verse(xml,filter_books={"PSA"})
+        self.assertEqual(verse[("PSA",23,1)],
+                         "Cantique de David. L'Eternel est mon berger: je ne manquerai de rien.")
+        self.assertEqual(features[("PSA",23,1)]["w"],1)
+        self.assertEqual(features[("PSA",23,1)]["x"],1)
+        self.assertEqual(features[("PSA",23,1)]["s"],1)
+        self.assertEqual(verse[("PSA",23,2)],"Il me dirige pres des eaux paisibles.")
+
+    def test_usfx_p_sfm_r_cross_reference_heading_not_in_verse_body(self):
+        source=b'<usfx><book id="ACT"><c id="8"/><p><v id="1"/>Saul had agreed. </p><p sfm="r" style="r">V. 1-13: cf. Acts 11:19-21.</p><p>The disciples fled.<ve id="1"/></p></book></usfx>'
+        verses,_=usfx_text_by_verse(source,filter_books={"ACT"})
+        self.assertEqual(verses[("ACT",8,1)],"Saul had agreed. The disciples fled.")
+
+    def test_diatheke_chapter_multiple_verses_are_parsed_without_folding_poetry(self):
+        output=("Psalms 23:1: Cantique de David. \nL'Eternel est mon berger.\n"
+                "Psalms 23:2: Il me fait reposer,\nIl me dirige.\n"
+                "\n(fraLSG1910eb)\n").encode()
+        pieces=parse_sword_chapter(output,23,"fraLSG1910eb")
+        self.assertEqual(pieces[1],"Cantique de David. L'Eternel est mon berger.")
+        self.assertEqual(pieces[2],"Il me fait reposer, Il me dirige.")
+
+    def test_full_book_text_can_match_even_when_verse_boundaries_are_wrong(self):
+        source=["Alpha beta.", "Gamma delta."]
+        sword=["Alpha beta. Gamma delta."]
+        self.assertEqual(plain(" ".join(source)),plain(" ".join(sword)))
+        # Text parity must not be confused with exact verse-key parity.
+        self.assertNotEqual(len(source),len(sword))
+
+    def test_diatheke_balanced_asterisks_are_only_diagnostic_wrappers(self):
+        self.assertEqual(explain_wrapper("Bonjour.", "* Bonjour. *"),
+                         "sword_balanced_asterisk_emphasis")
+        self.assertIsNone(explain_wrapper("Bonjour.", "* Bonjour."))
+        self.assertIsNone(explain_wrapper("Bonjour.", "Bonjour. *"))
+        self.assertIsNone(explain_wrapper("A *sign* is part of the text.",
+                                          "* A *sign* is part of the text. *"))
+        self.assertIsNone(explain_wrapper("Bonjour.", "Bonjour."))
+
+    def test_duplicate_sword_verse_cannot_pass(self):
+        output=b"Genesis 1:1: Hello\nGenesis 1:1: repeated\n(fraLSG1910eb)\n"
+        with self.assertRaisesRegex(PilotError,"Duplicate"):
+            parse_sword_chapter(output,1,"fraLSG1910eb")
+
+    def test_diatheke_non_verse_garbage_fails(self):
+        with self.assertRaisesRegex(PilotError,"no per-verse"):
+            parse_sword_chapter(b"Usage: diatheke",1,"fraLSG1910eb")
+
+
+if __name__=="__main__":
+    unittest.main()

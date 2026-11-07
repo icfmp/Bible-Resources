@@ -1,0 +1,161 @@
+name: LSG authored-source fidelity pilot
+on:
+  pull_request:
+    paths:
+      - 'scripts/lsg_source_compare.py'
+      - '.github/workflows/lsg-fidelity.yml'
+      - 'scripts/lsg_sword_compare.py'
+      - 'tests/test_lsg_source_compare.py'
+      - 'tests/test_lsg_sword_compare.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  lsg:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install source parsers
+        run: python -m pip install -r requirements.txt
+      - name: Download the signed-off publisher source files to temporary storage
+        run: |
+          mkdir -p "${{ runner.temp }}/lsg"
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from pilot_fetch import fetch
+          target=Path('${{ runner.temp }}/lsg')
+          for key,url in [
+              ('usfx','https://ebible.org/Scriptures/fraLSG_usfx.zip'),
+              ('usfm','https://ebible.org/Scriptures/fraLSG_usfm.zip')]:
+              result=fetch(url,target/(key+'.zip'),'lsg')
+              print(key, result['bytes'], result['sha256'])
+          PY
+      - name: Compare the original LSG USFM/USFX structures
+        run: |
+          python scripts/lsg_source_compare.py \
+            --usfx-zip "${{ runner.temp }}/lsg/usfx.zip" \
+            --usfm-zip "${{ runner.temp }}/lsg/usfm.zip" \
+            --report reports/lsg-authoring-structure.json
+      - name: Install SWORD reader and fetch the official eBible compiled module
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y diatheke >/dev/null
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from pilot_fetch import fetch
+          destination=Path('${{ runner.temp }}/lsg/sword.zip')
+          print(fetch('https://ebible.org/sword/zip/fraLSG1910eb.zip',destination,'lsg'))
+          PY
+      - name: Compare ALL 66 books / 1189 chapters of LSG SWORD to USFX
+        run: |
+          python scripts/lsg_sword_compare.py \
+            --sword-zip "${{ runner.temp }}/lsg/sword.zip" \
+            --usfx-zip "${{ runner.temp }}/lsg/usfx.zip" \
+            --report reports/lsg-usfx-sword-verse-parity.json \
+            --full
+      - name: Diagnose first actual per-book differences (temporary public-domain excerpts)
+        run: |
+          python - <<'PY'
+          import json,shutil,sys,tempfile,zipfile
+          from pathlib import Path,PurePosixPath
+          sys.path.insert(0,'scripts')
+          from lsg_source_compare import read_source_xml
+          from lsg_sword_compare import usfx_text_by_verse,parse_sword_chapter
+          from pilot_preflight import inspect_archive
+          from pilot_subprocess import query
+          home=Path('${{ runner.temp }}/lsg')
+          report=json.loads(Path('reports/lsg-usfx-sword-verse-parity.json').read_text())
+          targets={}
+          for row in report['sample_chapters']:
+              if row['different_normalized_text'] and row['source_book'] not in targets:
+                  targets[row['source_book']]=(row['source_chapter'],row['sword_key'])
+          raw,_=read_source_xml(home/'usfx.zip',source_format='usfx')
+          authored,_=usfx_text_by_verse(raw,filter_books=set(targets))
+          inspected=inspect_archive(home/'sword.zip',source_kind='sword',
+              expected_module_id='fraLSG1910eb',expected_category='bible')
+          with tempfile.TemporaryDirectory(prefix='lsg-diagnostics-') as d:
+              root=Path(d)
+              with zipfile.ZipFile(home/'sword.zip') as z:
+                  for item in inspected['members']:
+                      name=item['name']
+                      if name.endswith('/'):continue
+                      target=root/PurePosixPath(name)
+                      target.parent.mkdir(parents=True,exist_ok=True)
+                      with z.open(name) as src,target.open('xb') as out:
+                          shutil.copyfileobj(src,out,length=262144)
+              # Ezra contains source/SWORD asterisk differences. Inspect
+              # only the unmatched verses, never rewrite any source bytes.
+              ezr_keys=['Ezra 4','Ezra 5','Ezra 6','Ezra 7']
+              for query_key in ezr_keys:
+                  chapter=int(query_key.rsplit(' ',1)[1])
+                  ret,data=query('fraLSG1910eb',query_key,fmt='plain',root=root,exe='diatheke')
+                  parsed=parse_sword_chapter(data,chapter,'fraLSG1910eb')
+                  expected={v:txt for (b,c,v),txt in authored.items()
+                            if b=='EZR' and c==chapter}
+                  for verse in sorted(set(parsed)&set(expected)):
+                      if parsed[verse] != expected[verse]:
+                          print('EZR-WRAPPER-SHAPE',chapter,verse,
+                                'SOURCE',repr(expected[verse][:210]),
+                                'SWORD',repr(parsed[verse][:210]),
+                                'TAIL',repr(parsed[verse][-70:]))
+              for book,(chapter,key) in targets.items():
+                  ret,data=query('fraLSG1910eb',key,fmt='plain',root=root,exe='diatheke')
+                  parsed=parse_sword_chapter(data,chapter,'fraLSG1910eb')
+                  source={v:txt for (b,c,v),txt in authored.items() if b==book and c==chapter}
+                  mismatch=next((v for v in sorted(set(source)&set(parsed)) if source[v]!=parsed[v]),None)
+                  if mismatch is not None:
+                      print('FIRST-MISMATCH',book,chapter,mismatch,
+                            'SOURCE',repr(source[mismatch][:270]),
+                            'SWORD',repr(parsed[mismatch][:270]))
+          PY
+      - name: Diagnose USFX apparatus parent tags at references (temporary)
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import sys
+          sys.path.insert(0,'scripts')
+          from lxml import etree
+          from lsg_source_compare import read_source_xml
+          raw,_=read_source_xml(Path('${{ runner.temp }}/lsg/usfx.zip'),source_format='usfx')
+          parser=etree.XMLParser(resolve_entities=False,load_dtd=False,no_network=True)
+          root=etree.fromstring(raw,parser)
+          for needle in ['V. 1-13: cf.', 'V. 15-30: cf.', 'V. 37-50: cf.']:
+              found=[]
+              for node in root.iter():
+                  if node.text and needle in node.text:
+                      chain=[]
+                      cur=node
+                      for _ in range(5):
+                          if cur is None:break
+                          chain.append(etree.QName(cur).localname)
+                          cur=cur.getparent()
+                      found.append({'chain':chain,'attrib':dict(node.attrib),
+                                    'text':node.text[:190]})
+                      if len(found)>=3:break
+              print('USFX APPARATUS STRUCTURE',needle,found)
+          PY
+      - name: Upload only the text-free diagnostic report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lsg-authoring-fidelity-report
+          path: |
+            reports/lsg-authoring-structure.json
+            reports/lsg-usfx-sword-verse-parity.json
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Summary
+        if: always()
+        run: |
+          echo '## Louis Segond 1910 source comparison' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Private publisher ZIPs were held only in runner temporary storage.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'The uploaded JSON records book/verse structure and XSD compatibility, never Bible text.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'No module was rewritten or published.' >> "$GITHUB_STEP_SUMMARY"
