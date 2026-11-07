@@ -18,6 +18,7 @@ from lxml import etree
 from guard_osis import MAX_SCHEMA_BYTES, parse_xml, StructureFailure, ROOT
 
 SCHEMA_URL = "https://www.crosswire.org/~dmsmith/osis/osisCore.2.1.1-cw-latest.xsd"
+XML_SCHEMA_URL = "https://www.w3.org/2001/xml.xsd"
 XSD_NS = "{http://www.w3.org/2001/XMLSchema}"
 
 
@@ -76,6 +77,29 @@ def main(argv=None):
                 raise ValueError("Unexpected schema download redirect")
             raw = response.read(MAX_SCHEMA_BYTES + 1)
         report = inspect_bytes(raw, origin="https://www.crosswire.org (read-only)")
+        # Inspect the single W3C dependency explicitly. No source validation is
+        # authorized until the two hashes are manually reviewed and pinned.
+        if (len(report["schema_dependencies"]) == 1
+                and report["schema_dependencies"][0]["kind"] == "import"
+                and report["schema_dependencies"][0]["namespace"] ==
+                    "http://www.w3.org/XML/1998/namespace"
+                and report["schema_dependencies"][0]["schema_location"] ==
+                    "http://www.w3.org/2001/xml.xsd"):
+            dependency_request = urllib.request.Request(XML_SCHEMA_URL, headers={
+                "User-Agent": "BibleResources-OSIS-SchemaReview/1.0"})
+            with urllib.request.urlopen(dependency_request, timeout=40) as response:
+                if urlsplit(response.url).scheme != "https" or urlsplit(response.url).hostname != "www.w3.org":
+                    raise ValueError("Unexpected W3C dependency download redirect")
+                content = response.read(MAX_SCHEMA_BYTES + 1)
+            dependency = inspect_bytes(content, origin="https://www.w3.org (read-only)")
+            report["official_xml_dependency"] = {
+                "url": XML_SCHEMA_URL,
+                "sha256": dependency["sha256"],
+                "bytes": dependency["size_bytes"],
+                "target_namespace": dependency["target_namespace"],
+                "dependencies": dependency["schema_dependencies"],
+                "standalone_compiles": dependency["ready_to_pin"],
+            }
         report["status"] = "schema_inspected_not_approved"
     except (OSError, ValueError, etree.XMLSyntaxError) as exc:
         report = {"status": "blocked", "error": str(exc), "ready_to_pin": False}
