@@ -73,6 +73,31 @@ class NoteParityTests(unittest.TestCase):
                                   (("target","Ps 1:2"),)),
             "content_changed")
 
+    def test_missing_space_before_note_is_detected_without_rewriting_text(self):
+        source_note=(
+            ' <x caller="a"><xo>1.1</xo>'
+            '<xt>Ps 1:1. SPECIAL_NOTE_TEXT_SECRET</xt></x>')
+        result=run(source_note=source_note)
+        self.assertEqual(result["source_note_count"],1)
+        self.assertEqual(result["matching_note_component_text"],1)
+        self.assertEqual(result["matching_note_word_anchors"],1)
+        self.assertEqual(result["preceding_note_separator_presence_cases"],
+                         {"missing_from_candidate":1})
+        self.assertFalse(result["all_note_contents_metadata_and_positions_verified"])
+        self.assertEqual(result["first_missing_preceding_note_separators"][0]["reference"],"GEN.1.1")
+        self.assertNotIn("SPECIAL_NOTE_TEXT_SECRET",repr(result))
+
+    def test_source_and_candidate_spaces_before_notes_match_without_changes(self):
+        source_note=' <x caller="a"><xo>1.1</xo><xt>Ref</xt></x>'
+        target_note=(
+            ' <note type="crossReference" n="a">'
+            '<reference type="annotateRef" subType="x-origin">1.1</reference>'
+            '<reference>Ref</reference></note>')
+        result=run(source_note=source_note,target_note=target_note)
+        self.assertEqual(result["preceding_note_separator_presence_cases"],
+                         {"present_in_both":1})
+        self.assertTrue(result["all_note_contents_metadata_and_positions_verified"])
+
     def test_changed_target_text_fails_without_count_difference(self):
         altered=(
             '<note type="crossReference" n="a">'
