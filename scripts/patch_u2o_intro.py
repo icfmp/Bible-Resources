@@ -46,8 +46,6 @@ OLD_NOTE_SPACE = '            .replace(" <note", "<note")\n'
 OLD_POETRY_MOVE = "            if (\n                lines[i + 1].startswith(\"<verse sID\")\n                and lines[i - 1].startswith(\"<l \")\n                and lines[i - 2].startswith(\"<lg\")\n                and lines[i - 3] == \"</p>\"\n            ):\n                lines.insert(i - 3, lines.pop(i))\n"
 NEW_POETRY_MOVE = "            if (\n                lines[i + 1].startswith(\"<verse sID\")\n                and lines[i - 1].startswith(\"<l \")\n                and lines[i - 2].startswith(\"<lg\")\n                and lines[i - 3] == \"</p>\"\n                # Reposition only across an EMPTY opening <l>. When the\n                # line contains quotation text, moving eID before the\n                # paragraph would orphan canonical words and references.\n                and re.fullmatch(r\"<l\\b[^<>]*>\", lines[i - 1]) is not None\n            ):\n                lines.insert(i - 3, lines.pop(i))\n"
 
-OLD_STANZA_MOVE = "            if (\n                lines[i + 1].startswith(\"<verse sID\")\n                and lines[i - 1].startswith(\"<l \")\n                and lines[i - 2].startswith(\"<lg\")\n                and lines[i - 3].startswith(\"</lg\")\n                and lines[i - 4].endswith(\"</l>\")\n            ):\n                tmp = lines[i - 4].rpartition(\"<\")\n                lines[i - 4], lines[i] = (f\"{tmp[0]}{lines[i]}<{tmp[2]}\", \"\")\n"
-NEW_STANZA_MOVE = "            if (\n                lines[i + 1].startswith(\"<verse sID\")\n                and lines[i - 1].startswith(\"<l \")\n                and lines[i - 2].startswith(\"<lg\")\n                and lines[i - 3].startswith(\"</lg\")\n                and lines[i - 4].endswith(\"</l>\")\n                # A new stanza may already contain Scripture assigned to\n                # the preceding verse. Never move its end marker across\n                # that populated poetry line.\n                and re.fullmatch(r\"<l\\b[^<>]*>\", lines[i - 1]) is not None\n            ):\n                tmp = lines[i - 4].rpartition(\"<\")\n                lines[i - 4], lines[i] = (f\"{tmp[0]}{lines[i]}<{tmp[2]}\", \"\")\n"
 
 OLD_MULTILINE_MOVE = "            if (\n                lines[i + 1].startswith(\"<verse sID\")\n                and lines[i - 1].startswith(\"<l \")\n                and lines[i - 2].endswith(\"</l>\")\n            ):\n                tmp = lines[i - 2].rpartition(\"<\")\n                lines[i - 2], lines[i] = (f\"{tmp[0]}{lines[i]}<{tmp[2]}\", \"\")\n"
 NEW_MULTILINE_MOVE = "            if (\n                lines[i + 1].startswith(\"<verse sID\")\n                and lines[i - 1].startswith(\"<l \")\n                and lines[i - 2].endswith(\"</l>\")\n                # A populated next poetry line still belongs to the verse\n                # ending here. Do not move its end before that line.\n                and re.fullmatch(r\"<l\\b[^<>]*>\", lines[i - 1]) is not None\n            ):\n                tmp = lines[i - 2].rpartition(\"<\")\n                lines[i - 2], lines[i] = (f\"{tmp[0]}{lines[i]}<{tmp[2]}\", \"\")\n"
@@ -64,14 +62,13 @@ def patch(source: bytes) -> bytes:
     if sha(source)!=EXPECTED_UPSTREAM_SHA256:
         raise ConverterPatchError("Upstream converter SHA-256 changed: manual review required")
     original=source.decode("utf-8")
-    for needle in (OLD_END,OLD_TABLE,OLD_NOTE_SPACE,OLD_POETRY_MOVE,OLD_STANZA_MOVE,OLD_MULTILINE_MOVE):
+    for needle in (OLD_END,OLD_TABLE,OLD_NOTE_SPACE,OLD_POETRY_MOVE,OLD_MULTILINE_MOVE):
         if original.count(needle)!=1:
             raise ConverterPatchError("Reviewed converter patch anchor is missing or ambiguous")
     converted=(original.replace(OLD_END,NEW_END)
                .replace(OLD_TABLE,NEW_TABLE)
                .replace(OLD_NOTE_SPACE,"")
                .replace(OLD_POETRY_MOVE,NEW_POETRY_MOVE)
-               .replace(OLD_STANZA_MOVE,NEW_STANZA_MOVE)
                .replace(OLD_MULTILINE_MOVE,NEW_MULTILINE_MOVE))
     if converted==original or converted.count("def markintroend(")!=1:
         raise ConverterPatchError("Generic introductory table patch not applied")
