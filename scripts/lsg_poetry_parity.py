@@ -44,10 +44,21 @@ def _line_signature(node, *, source: bool) -> dict:
     text=_canonical_line_text(node)
     compact="".join(text.split())
     boundary_tags={"v","ve"} if source else {"verse"}
-    crossing=any(_name(n) in boundary_tags
-                 for n in node.iterdescendants() if isinstance(n.tag,str))
+    markers=[n for n in node.iterdescendants()
+             if isinstance(n.tag,str) and _name(n) in boundary_tags]
+    crossing=bool(markers)
     return {
-        "level": node.get("level"),
+        "level": node.get("level") or node.get("sfm") or node.get("style"),
+        "verse_start_markers":tuple(
+            (item.get("id") if source else item.get("osisID") or item.get("sID"))
+            for item in markers if (item.get("id") if source
+                                    else item.get("osisID") or item.get("sID"))
+        ),
+        "verse_end_markers":tuple(
+            (item.get("id") if source else item.get("eID"))
+            for item in markers if ((not source and item.get("eID"))
+                                    or (source and _name(item)=="ve" and item.get("id")))
+        ),
         "characters_without_whitespace":len(compact),
         "has_text":bool(compact),
         "text_sha256":hashlib.sha256(compact.encode("utf-8")).hexdigest(),
@@ -136,6 +147,11 @@ def audit_poetry(source_root, candidate_root, mapping, all_source_keys) -> dict:
         candidate_root=candidate_root.getroot()
     source=_extract_source(source_root)
     candidate=_extract_candidate(candidate_root)
+    source_all_q=[n for book in source_root.iter("book")
+                  for n in book.iter("q")]
+    candidate_all_l=[n for book in candidate_root.iter(OSIS+"div")
+                     if book.get("type")=="book"
+                     for n in book.iter(OSIS+"l")]
     delta_hist=Counter()
     per_book=Counter()
     categories=Counter()
@@ -184,6 +200,12 @@ def audit_poetry(source_root, candidate_root, mapping, all_source_keys) -> dict:
                 "candidate_empty_line_count":dst_empty,
                 "source_levels":[item["level"] for item in original],
                 "candidate_levels":[item["level"] for item in converted],
+                "source_line_nested_verse_starts":[
+                    list(item["verse_start_markers"]) for item in original],
+                "candidate_line_nested_verse_starts":[
+                    list(item["verse_start_markers"]) for item in converted],
+                "candidate_line_nested_verse_ends":[
+                    list(item["verse_end_markers"]) for item in converted],
                 "source_line_text_hashes":[item["text_sha256"] for item in original],
                 "candidate_line_text_hashes":[item["text_sha256"] for item in converted],
                 "source_lines_with_embedded_verse_marker":sum(
@@ -196,6 +218,21 @@ def audit_poetry(source_root, candidate_root, mapping, all_source_keys) -> dict:
     return {
         "source_poetry_line_count":original_total,
         "candidate_poetry_line_count":converted_total,
+        "all_original_usfx_q_elements":len(source_all_q),
+        "all_candidate_osis_l_elements":len(candidate_all_l),
+        "source_q_elements_with_nested_verse_start":sum(
+            any(_name(child)=="v" for child in q.iterdescendants()
+                if isinstance(child.tag,str))
+            for q in source_all_q),
+        "candidate_l_elements_with_nested_verse_start":sum(
+            any(_name(child)=="verse" and
+                (child.get("osisID") or child.get("sID"))
+                for child in line.iterdescendants() if isinstance(child.tag,str))
+            for line in candidate_all_l),
+        "source_q_elements_not_counted_in_active_verses":
+            len(source_all_q)-original_total,
+        "candidate_l_elements_not_counted_in_active_verses":
+            len(candidate_all_l)-converted_total,
         "source_empty_poetry_line_count":source_empty,
         "candidate_empty_poetry_line_count":target_empty,
         "matching_per_verse_line_counts":matches,
