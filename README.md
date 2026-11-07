@@ -29,6 +29,7 @@ scripts/validate.py               metadata and structure checks
 scripts/audit_text.py              non-destructive editorial warnings
 scripts/guard_osis.py               schema-pinned OSIS structure gate; no rewrites
 scripts/guard_commentary.py         strict OSIS commentary entry-reference guard
+scripts/select_sources.py           prioritized SWORD catalogue deduplication (read-only)
 scripts/build.py                   deterministic repo + catalogue builder
 scripts/smoke.py                   actual SWORD runtime smoke test
 .github/workflows/                 CI and GitHub Pages publication
@@ -54,6 +55,8 @@ Bible Resources monitors **three separate versions** (installed in SWORD, curate
 
 To check a local installation: `python scripts/check_updates.py --installed-root ~/.sword`.
 
+**Duplicate upstream editions:** the operational source order is CrossWire → eBible → STEP → AndBible → AndBible Extra. Only *verified same-edition* aliases are automatically consolidated; possible matches block import for human identity review. Run `python scripts/select_sources.py --report-only --output reports/source-selection.json`. This is a read-only candidate report; the future importer is not yet connected. See [SWORD source priority and deduplication](docs/SOURCE_PRIORITY.md).
+
 ## GitHub Pages and branch rules
 
 For repository creation, push, Pages activation and branch rules, see [INSTALLATION_FR.md](INSTALLATION_FR.md). The source repository is live at https://github.com/icfmp/Bible-Resources. GitHub Pages must be activated in the repository Settings before the public catalogue endpoint will work.
@@ -61,6 +64,7 @@ For repository creation, push, Pages activation and branch rules, see [INSTALLAT
 ## Documentation
 
 - [Architecture & distribution](docs/ARCHITECTURE.md)
+- [SWORD source priority and duplicate-edition policy](docs/SOURCE_PRIORITY.md)
 - [Quality policy](docs/QUALITY_POLICY.md)
 - [Editorial rules](docs/EDITORIAL_RULES.md)
 - [Strict OSIS source normalization contract](docs/NORMALIZATION_POLICY.md)
