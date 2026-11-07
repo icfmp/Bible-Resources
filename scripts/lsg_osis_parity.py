@@ -22,6 +22,7 @@ from lsg_source_compare import scan_usfx
 from lsg_sword_compare import (usfx_text_by_verse, plain,
     NON_VERSE_TEXT_ELEMENTS, NON_VERSE_PARAGRAPH_STYLES)
 from pilot_preflight import PilotError
+from lsg_note_parity import audit_notes
 
 OSIS="{http://www.bibletechnologies.net/2003/OSIS/namespace}"
 
@@ -266,6 +267,7 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
     overall_word_sequence_identical=authored_global_words==generated_global_words
     strong_id_audit=_audit_global_strong_ids(original_doc,doc)
     mapping=dict(zip(source_codes,osis_codes))
+    note_audit=audit_notes(original_doc,doc,mapping)
     source_body,_=usfx_text_by_verse(publisher_usfx,filter_books=set(source_codes))
     source_words,source_notes,source_lines=_source_words(publisher_usfx)
     body_equal=0
@@ -417,6 +419,11 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
         "source_word_markers":total_source_words,
         "converted_word_markers":total_osis_words,
         "source_cross_reference_note_markers":sum(source_notes.values()),
+        "source_to_candidate_note_content_audit":note_audit,
+        "all_textual_note_references_verified":
+            note_audit["textual_target_references_verified"],
+        "all_note_editorial_details_verified":
+            note_audit["all_note_contents_metadata_and_positions_verified"],
         "converted_note_markers":sum(osis_notes.values()),
         "source_poetry_line_markers_in_verses":sum(source_lines.values()),
         "converted_poetry_line_markers_in_verses":sum(osis_lines.values()),
@@ -436,6 +443,8 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
         ],
         "first_differences":differences,
         "source_text_modified":False,
+        # Textual labels are checked above, but target-link semantics
+        # and note metadata must remain separate editorial gates.
         "all_note_text_and_reference_targets_verified":False,
         "all_strong_attributes_verified":strong_id_audit["full_source_strong_id_sequence_verified"],
         "all_source_layout_markup_verified":False,
