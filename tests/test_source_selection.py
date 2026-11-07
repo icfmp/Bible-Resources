@@ -193,7 +193,7 @@ class SourcePriorityTests(unittest.TestCase):
         result = scan(PROVIDERS, EMPTY_REGISTRY, PRIORITY, fetch_catalog=fake_fetch)
         self.assertEqual(len(result["selected"]), 1)
         self.assertTrue(result["complete"])
-        self.assertIn("No", result["note"])
+        self.assertIn("not import", result["note"])
 
     def test_no_candidates_with_unavailable_provider_is_incomplete(self):
         statuses = {pid: "ok" for pid in PRIORITY["priority"]}
