@@ -34,6 +34,13 @@ class LsgTextParityTests(unittest.TestCase):
         self.assertEqual(pieces[1],"Cantique de David. L'Eternel est mon berger.")
         self.assertEqual(pieces[2],"Il me fait reposer, Il me dirige.")
 
+    def test_full_book_text_can_match_even_when_verse_boundaries_are_wrong(self):
+        source=["Alpha beta.", "Gamma delta."]
+        sword=["Alpha beta. Gamma delta."]
+        self.assertEqual(plain(" ".join(source)),plain(" ".join(sword)))
+        # Text parity must not be confused with exact verse-key parity.
+        self.assertNotEqual(len(source),len(sword))
+
     def test_duplicate_sword_verse_cannot_pass(self):
         output=b"Genesis 1:1: Hello\nGenesis 1:1: repeated\n(fraLSG1910eb)\n"
         with self.assertRaisesRegex(PilotError,"Duplicate"):
