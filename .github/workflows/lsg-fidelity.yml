@@ -73,12 +73,20 @@ jobs:
                       print('SWORD sample',ref,fmt,'status',code,'bytes',len(body),
                             'prefix',repr(body[:1800 if ref in ('Gen 1','Ps 23') else 430].decode('utf-8',errors='replace')))
           PY
+      - name: Compare selected LSG SWORD verses with independently parsed USFX
+        run: |
+          python scripts/lsg_sword_compare.py \
+            --sword-zip "${{ runner.temp }}/lsg/sword.zip" \
+            --usfx-zip "${{ runner.temp }}/lsg/usfx.zip" \
+            --report reports/lsg-usfx-sword-verse-parity.json
       - name: Upload only the text-free diagnostic report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: lsg-authoring-fidelity-report
-          path: reports/lsg-authoring-structure.json
+          path: |
+            reports/lsg-authoring-structure.json
+            reports/lsg-usfx-sword-verse-parity.json
           retention-days: 30
           if-no-files-found: warn
       - name: Summary
