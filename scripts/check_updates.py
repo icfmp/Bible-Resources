@@ -52,11 +52,29 @@ def parse_conf(data: bytes) -> dict:
             values.setdefault(key.strip(), value.strip())
     if not module_id or not ID_PATTERN.fullmatch(module_id):
         raise ValueError("Invalid SWORD module identifier")
+    # Metadata for read-only cross-repository candidate comparison. These
+    # values are clues, never proof that two SWORD modules contain the same
+    # copyrighted edition or the same binary data.
+    driver = values.get("ModDrv", "")
+    category = (
+        "bible" if driver in {"RawText", "RawText4", "zText", "zText4"} else
+        "commentary" if driver in {"RawCom", "RawCom4", "zCom", "zCom4", "HREFCom"} else
+        "dictionary" if driver in {"RawLD", "RawLD4", "zLD"} else
+        "general_book" if driver in {"RawGenBook", "RawFiles"} else "unknown"
+    )
     return {
         "module_id": module_id,
         "version": values.get("Version"),
         "conf_sha256": hashlib.sha256(data).hexdigest(),
         "install_source": values.get("InstallSourceID") or values.get("InstallSourceCaption"),
+        "category": category,
+        "description": values.get("Description"),
+        "language": values.get("Lang"),
+        "versification": values.get("Versification"),
+        "driver": driver,
+        "source_type": values.get("SourceType"),
+        "text_source": values.get("TextSource"),
+        "distribution_license": values.get("DistributionLicense"),
     }
 
 
