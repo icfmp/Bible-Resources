@@ -9,7 +9,7 @@ and from annotations/versification checks.
 from __future__ import annotations
 
 import argparse
-from collections import Counter
+from collections import Counter, defaultdict
 import hashlib
 import json
 from pathlib import Path, PurePosixPath
@@ -35,6 +35,26 @@ SAMPLES = {
     "ROM":("Rom",[8]),
     "REV":("Rev",[22]),
 }
+BOOK_ALIASES_PATH = Path(__file__).resolve().parents[1] / "config/diatheke-usfm-book-aliases.json"
+
+def chapter_plan(all_keys, *, full: bool) -> dict[str,tuple[str,list[int]]]:
+    if not full:
+        return SAMPLES
+    config=json.loads(BOOK_ALIASES_PATH.read_text(encoding="utf-8"))
+    aliases=config.get("aliases")
+    if config.get("schema_version")!=1 or not isinstance(aliases,dict) or len(aliases)!=66:
+        raise PilotError("Unreviewed 66-book SWORD query alias table")
+    found=defaultdict(set)
+    for code,chapter,verse in all_keys:
+        if code not in aliases:
+            raise PilotError(f"Unknown USFM-to-SWORD book alias: {code}")
+        found[code].add(chapter)
+    if set(found)!=set(aliases):
+        raise PilotError("Publisher USFX book list changed; do not infer omitted books")
+    return {code:(aliases[code],sorted(chapters))
+            for code,chapters in found.items()}
+
+
 HEADER = re.compile(r"(?m)^(?P<book>[1-4]?[A-Za-z][A-Za-z0-9 .'-]{0,75}) (?P<chapter>\d+):(?P<verse>\d+):[ \t]*")
 FOOTER = re.compile(r"\n\([A-Za-z][A-Za-z0-9_]*\)\s*\Z")
 # These are original authoring *apparatus*, not part of a verse's canonical
@@ -130,7 +150,7 @@ def parse_sword_chapter(data:bytes, expected_chapter:int, module_id:str) -> dict
     return verses
 
 
-def run(sword_archive:Path,usfx_archive:Path,*,diatheke="diatheke") -> dict:
+def run(sword_archive:Path,usfx_archive:Path,*,diatheke="diatheke",full:bool=False) -> dict:
     inspected=inspect_archive(sword_archive,source_kind="sword",
                                 expected_module_id="fraLSG1910eb",
                                 expected_category="bible")
@@ -138,7 +158,8 @@ def run(sword_archive:Path,usfx_archive:Path,*,diatheke="diatheke") -> dict:
         raise PilotError("LSG SWORD v11n changed; must review sample reference mapping")
     raw,source_meta=read_source_xml(usfx_archive,source_format="usfx")
     usfx_structure,all_keys=scan_usfx(raw)
-    authored,authored_features=usfx_text_by_verse(raw,filter_books=set(SAMPLES))
+    planned=chapter_plan(all_keys,full=full)
+    authored,authored_features=usfx_text_by_verse(raw,filter_books=set(planned))
     chapters=[]
     totals=Counter()
     differences=[]
@@ -154,7 +175,7 @@ def run(sword_archive:Path,usfx_archive:Path,*,diatheke="diatheke") -> dict:
                 dest.parent.mkdir(parents=True,exist_ok=True)
                 with source_zip.open(name) as inp,dest.open("xb") as out:
                     shutil.copyfileobj(inp,out,length=262144)
-        for code,(alias,numbers) in SAMPLES.items():
+        for code,(alias,numbers) in planned.items():
             for chapter in numbers:
                 ref=f"{alias} {chapter}"
                 ret,body=query("fraLSG1910eb",ref,fmt="plain",root=root,exe=diatheke)
@@ -200,7 +221,8 @@ def run(sword_archive:Path,usfx_archive:Path,*,diatheke="diatheke") -> dict:
                                                              for v in expected),
                 })
     return {
-        "schema_version":1,"status":"sample_comparison_requires_review",
+        "schema_version":1,"status":("full_chapter_text_scan_completed_not_published"
+                                           if full else "sample_comparison_requires_review"),
         "source":"eBible fraLSG USFX (original)",
         "source_xml_sha256":source_meta["sha256"],
         "source_archive_sha256":source_meta["archive_sha256"],
@@ -213,7 +235,7 @@ def run(sword_archive:Path,usfx_archive:Path,*,diatheke="diatheke") -> dict:
         "first_text_differences":differences,
         "source_unmodified":True,
         "sword_unmodified":True,
-        "whole_bible_comparison_completed":False,
+        "whole_bible_comparison_completed":full and totals["chapters"]==1189 and totals["verses_source"]==len(all_keys) and totals["verses_sword"]==len(all_keys),
         "annotations_compared_to_sword":False,
         "published":False,
         "notes":[
@@ -229,9 +251,10 @@ def main(argv=None)->int:
     p.add_argument("--sword-zip",type=Path,required=True)
     p.add_argument("--usfx-zip",type=Path,required=True)
     p.add_argument("--report",type=Path,required=True)
+    p.add_argument("--full",action="store_true",help="Run all 66 books and all original source chapters")
     args=p.parse_args(argv)
     try:
-        result=run(args.sword_zip,args.usfx_zip)
+        result=run(args.sword_zip,args.usfx_zip,full=args.full)
         status=0
     except (OSError,ValueError,zipfile.BadZipFile,etree.XMLSyntaxError) as exc:
         result={"status":"blocked","reason":str(exc),"published":False}
