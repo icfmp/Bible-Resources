@@ -61,6 +61,11 @@ def _read_note(node, *, usfx: bool, word_index: int) -> dict:
     source_link_count = 0
     target_link_count = 0
     links = []
+    predecessor = node.getprevious()
+    preceding_text = (predecessor.tail if predecessor is not None
+                      else node.getparent().text if node.getparent() is not None
+                      else None)
+    before_note_spacing = bool(preceding_text) and preceding_text[-1].isspace()
     extra_attrs = sorted(k for k in node.attrib
                          if k not in (("caller",) if usfx
                                       else ("type", "subType", "placement", "n", "marker")))
@@ -134,6 +139,7 @@ def _read_note(node, *, usfx: bool, word_index: int) -> dict:
         "source_link_count": source_link_count,
         "target_link_count": target_link_count,
         "word_index": word_index,
+        "space_immediately_before_note":before_note_spacing,
     }
 
 
@@ -261,6 +267,8 @@ def audit_notes(source_root, osis_root, book_mapping: dict[str, str]) -> dict:
     unknown_count = 0
     mismatch_counts = Counter()
     note_whitespace_classes = Counter()
+    before_note_separator_cases=Counter()
+    first_missing_note_separators=[]
     samples = []
     for key in sorted(all_refs):
         code, chapter, verse = key
@@ -276,7 +284,26 @@ def audit_notes(source_root, osis_root, book_mapping: dict[str, str]) -> dict:
             target_link_count += b["target_link_count"]
             caller_count += (a["caller"] is not None)
             unknown_count += len(a["unknown"]) + len(b["unknown"])
+            has_source_space=a["space_immediately_before_note"]
+            has_candidate_space=b["space_immediately_before_note"]
+            if has_source_space and has_candidate_space:
+                prefix="present_in_both"
+            elif has_source_space:
+                prefix="missing_from_candidate"
+                if len(first_missing_note_separators)<50:
+                    first_missing_note_separators.append({
+                        "reference":f"{code}.{chapter}.{verse}",
+                        "note_ordinal":position,
+                        "source_word_anchor":a["word_index"],
+                        "candidate_word_anchor":b["word_index"],
+                    })
+            elif has_candidate_space:
+                prefix="added_in_candidate"
+            else:
+                prefix="absent_in_both"
+            before_note_separator_cases[prefix]+=1
             checks = {
+                "preceding_separator_presence":has_source_space==has_candidate_space,
                 "component_text": a["parts"] == b["parts"],
                 "raw_component_text": a["raw_parts"] == b["raw_parts"],
                 "word_anchor": a["word_index"] == b["word_index"],
@@ -353,6 +380,8 @@ def audit_notes(source_root, osis_root, book_mapping: dict[str, str]) -> dict:
         "unsupported_note_substructures": unknown_count,
         "mismatch_counts": dict(sorted(mismatch_counts.items())),
         "raw_note_difference_categories": dict(sorted(note_whitespace_classes.items())),
+        "preceding_note_separator_presence_cases":dict(sorted(before_note_separator_cases.items())),
+        "first_missing_preceding_note_separators":first_missing_note_separators,
         "first_mismatches": samples,
         "all_note_contents_metadata_and_positions_verified": strict_success,
         "textual_target_references_verified": (
