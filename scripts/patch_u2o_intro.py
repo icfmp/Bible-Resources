@@ -40,6 +40,8 @@ NEW_TABLE = '''            r"\\is",
 '''
 
 
+OLD_NOTE_SPACE = '            .replace(" <note", "<note")\n'
+
 class ConverterPatchError(ValueError):
     pass
 
@@ -52,10 +54,12 @@ def patch(source: bytes) -> bytes:
     if sha(source)!=EXPECTED_UPSTREAM_SHA256:
         raise ConverterPatchError("Upstream converter SHA-256 changed: manual review required")
     original=source.decode("utf-8")
-    for needle in (OLD_END,OLD_TABLE):
+    for needle in (OLD_END,OLD_TABLE,OLD_NOTE_SPACE):
         if original.count(needle)!=1:
-            raise ConverterPatchError("Reviewed intro state anchor is missing or ambiguous")
-    converted=original.replace(OLD_END,NEW_END).replace(OLD_TABLE,NEW_TABLE)
+            raise ConverterPatchError("Reviewed converter patch anchor is missing or ambiguous")
+    converted=(original.replace(OLD_END,NEW_END)
+               .replace(OLD_TABLE,NEW_TABLE)
+               .replace(OLD_NOTE_SPACE,""))
     if converted==original or converted.count("def markintroend(")!=1:
         raise ConverterPatchError("Generic introductory table patch not applied")
     return converted.encode("utf-8")
@@ -72,7 +76,7 @@ def main(argv=None):
     fixed=patch(original)
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_bytes(fixed)
-    print(f"u2o generic intro fix: original SHA-256 {sha(original)}, patched SHA-256 {sha(fixed)}")
+    print(f"u2o reviewed intro/note whitespace fixes: original SHA-256 {sha(original)}, patched SHA-256 {sha(fixed)}")
     return 0
 
 
