@@ -27,6 +27,7 @@ modules/<slug>/EDITORIAL.md        transformation / review record
 schemas/module.schema.json         machine-readable format contract
 scripts/validate.py               metadata and structure checks
 scripts/audit_text.py              non-destructive editorial warnings
+scripts/guard_osis.py               schema-pinned OSIS structure gate; no rewrites
 scripts/build.py                   deterministic repo + catalogue builder
 scripts/smoke.py                   actual SWORD runtime smoke test
 .github/workflows/                 CI and GitHub Pages publication
@@ -61,6 +62,7 @@ For repository creation, push, Pages activation and branch rules, see [INSTALLAT
 - [Architecture & distribution](docs/ARCHITECTURE.md)
 - [Quality policy](docs/QUALITY_POLICY.md)
 - [Editorial rules](docs/EDITORIAL_RULES.md)
+- [Strict OSIS source normalization contract](docs/NORMALIZATION_POLICY.md)
 - [SWORD and metadata conventions](docs/FORMATS.md)
 - [Licensing & provenance](docs/RIGHTS.md)
 - [Upstream contribution](docs/UPSTREAM.md)
