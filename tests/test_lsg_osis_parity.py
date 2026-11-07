@@ -5,7 +5,7 @@ import unittest
 import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
-from lsg_osis_parity import compare
+from lsg_osis_parity import compare, _source_words
 
 NS="http://www.bibletechnologies.net/2003/OSIS/namespace"
 
@@ -56,6 +56,21 @@ class FullSourceOsisParityTests(unittest.TestCase):
             self.assertEqual(result["exact_normalized_verse_text_matches"],65)
             self.assertTrue(result["first_differences"])
             self.assertEqual(result["first_differences"][0]["reference"],"B30.1.1")
+
+    def test_note_and_section_heading_words_are_not_verse_words(self):
+        # USFX plain-verse extraction already excludes editorial subtrees.
+        # Do not invent word or poetry mismatches by counting them here.
+        original=(b'<usfx><book id="GEN"><c id="1"/>'
+                  b'<p><v id="1"/>Text <w s="H1">canonical</w>'
+                  b'<x><w s="H2">annotation</w><q>quoted line</q></x>'
+                  b'<s><w s="H3">section title</w></s>'
+                  b'<p sfm="r"><w s="H4">reference heading</w></p>'
+                  b'<q level="1">poetic line</q><ve id="1"/></p>'
+                  b'</book></usfx>')
+        words, notes, poetry = _source_words(original)
+        self.assertEqual(words[("GEN",1,1)], ["canonical"])
+        self.assertEqual(notes[("GEN",1,1)], 1)
+        self.assertEqual(poetry[("GEN",1,1)], 1)
 
     def test_dropped_note_cannot_pass_counts(self):
         raw,xml=fixture(missing_note=True)
