@@ -17,8 +17,8 @@ CONFIG={
   "schema_version":1,
   "schemes":["NRSV","Segond"],
   "cases":[
-    {"source_usfx_book":"EXO","osis_book":"Exod","chapter":7,"verses":[25,26,27,28,29]},
-    {"source_usfx_book":"PSA","osis_book":"Ps","chapter":3,"verses":[8,9]},
+    {"source_usfx_book":"EXO","osis_book":"Exod","sword_book":"Exodus","chapter":7,"verses":[25,26,27,28,29]},
+    {"source_usfx_book":"PSA","osis_book":"Ps","sword_book":"Psalms","chapter":3,"verses":[8,9]},
   ],
 }
 KEYS=[("EXO",7,i) for i in range(25,30)]+[("PSA",3,i) for i in (8,9)]
@@ -40,6 +40,16 @@ class LSGVersificationFixtureTests(unittest.TestCase):
               "  print('INFO(V11N): Exod.7.26 is not in NRSV versification. Appending content to Exod.7.25')\n"
               "  print('INFO(V11N): Ps.3.9 is not in NRSV versification. Appending content to Ps.3.8')\n")
         self.fake.chmod(0o700)
+        self.fake_reader=self.root/"diatheke"
+        self.fake_reader.write_text(
+            "#!/usr/bin/env python3\n"
+            "import sys\n"
+            "key=sys.argv[-1].split()\n"
+            "book='Exod' if key[0]=='Exodus' else 'Ps'\n"
+            "chapter,verse=key[-1].split(':')\n"
+            "print(f'SYNTHETIC_{book}_{chapter}_{verse}')\n"
+        )
+        self.fake_reader.chmod(0o700)
         self.archive=self.root/"usfx.zip"
         xml=b'<usfx><book id="EXO"><c id="7"/>'+b''.join(
             b'<v id="'+str(i).encode()+b'"/>TEST<ve id="'+str(i).encode()+b'"/>'
@@ -72,9 +82,11 @@ class LSGVersificationFixtureTests(unittest.TestCase):
         self.assertEqual(b["v11n_diagnostics"],{})
 
     def test_generated_report_never_claims_the_actual_bible_is_fixed(self):
-        result=run(self.archive,CONFIG,compiler=str(self.fake))
+        result=run(self.archive,CONFIG,compiler=str(self.fake),reader=str(self.fake_reader))
         self.assertEqual(result["source_verse_keys"],7)
         self.assertTrue(result["preferred_scheme_not_approved"])
+        self.assertTrue(result["schemes"][0]["reader_was_checked"])
+        self.assertTrue(result["schemes"][0]["reader_key_evidence"][0]["marker_for_original_key_present"])
         self.assertFalse(result["real_module_recompiled"])
         self.assertFalse(result["source_text_modified"])
         self.assertEqual(result["schemes"][0]["sample_out_of_range_source_keys"],
