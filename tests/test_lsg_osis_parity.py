@@ -63,7 +63,7 @@ class FullSourceOsisParityTests(unittest.TestCase):
         self.assertEqual(changed[0]["operation"],"delete")
         self.assertEqual(changed[0]["source_alphanumeric"],0)
         self.assertEqual(changed[0]["source_codepoints"],1)
-        self.assertNotIn(",",str(changed))
+        self.assertNotIn("commencement",str(changed))
         self.assertEqual(describe_symbol_edits("Alpha  beta", "Alpha beta"),[])
         changed=describe_symbol_edits("Alpha beta", "Alpha betta")
         self.assertTrue(any(x["generated_alphanumeric"]>0 for x in changed))
