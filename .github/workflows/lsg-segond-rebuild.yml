@@ -4,6 +4,7 @@ on:
     paths:
       - '.github/workflows/lsg-segond-rebuild.yml'
       - 'scripts/lsg_rebuild_trial.py'
+      - 'scripts/patch_u2o_intro.py'
       - 'tests/test_lsg_rebuild_trial.py'
   workflow_dispatch:
 permissions:
@@ -24,6 +25,11 @@ jobs:
           git clone --quiet https://github.com/adyeths/u2o.git "${{ runner.temp }}/u2o"
           git -C "${{ runner.temp }}/u2o" checkout -q --detach dde28bc545e8d8697fa5496c243187847ec55d31
           test "$(git -C "${{ runner.temp }}/u2o" rev-parse HEAD)" = dde28bc545e8d8697fa5496c243187847ec55d31
+      - name: Apply reviewed generic intro-table fix to pinned converter COPY
+        run: |
+          python scripts/patch_u2o_intro.py \
+            --original "${{ runner.temp }}/u2o/u2o.py" \
+            --output "${{ runner.temp }}/u2o-reviewed/u2o.py"
       - name: Fetch matching publisher USFM and USFX original sources to temporary storage
         run: |
           mkdir -p "${{ runner.temp }}/original"
@@ -47,7 +53,7 @@ jobs:
           python scripts/lsg_rebuild_trial.py \
             --usfm-zip "${{ runner.temp }}/original/usfm.zip" \
             --usfx-zip "${{ runner.temp }}/original/usfx.zip" \
-            --converter "${{ runner.temp }}/u2o/u2o.py" \
+            --converter "${{ runner.temp }}/u2o-reviewed/u2o.py" \
             --schema "${{ runner.temp }}/reviewed-osis/osisCore.2.1.1-cw-latest.xsd" \
             --report reports/lsg-conversion-candidate.json
       - name: Upload ONLY diagnostic JSON, never OSIS XML, USFM, USFX or binary
