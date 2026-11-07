@@ -91,6 +91,21 @@ jobs:
                       target.parent.mkdir(parents=True,exist_ok=True)
                       with z.open(name) as src,target.open('xb') as out:
                           shutil.copyfileobj(src,out,length=262144)
+              # Ezra contains source/SWORD asterisk differences. Inspect
+              # only the unmatched verses, never rewrite any source bytes.
+              ezr_keys=['Ezra 4','Ezra 5','Ezra 6','Ezra 7']
+              for query_key in ezr_keys:
+                  chapter=int(query_key.rsplit(' ',1)[1])
+                  ret,data=query('fraLSG1910eb',query_key,fmt='plain',root=root,exe='diatheke')
+                  parsed=parse_sword_chapter(data,chapter,'fraLSG1910eb')
+                  expected={v:txt for (b,c,v),txt in authored.items()
+                            if b=='EZR' and c==chapter}
+                  for verse in sorted(set(parsed)&set(expected)):
+                      if parsed[verse] != expected[verse]:
+                          print('EZR-WRAPPER-SHAPE',chapter,verse,
+                                'SOURCE',repr(expected[verse][:210]),
+                                'SWORD',repr(parsed[verse][:210]),
+                                'TAIL',repr(parsed[verse][-70:]))
               for book,(chapter,key) in targets.items():
                   ret,data=query('fraLSG1910eb',key,fmt='plain',root=root,exe='diatheke')
                   parsed=parse_sword_chapter(data,chapter,'fraLSG1910eb')
