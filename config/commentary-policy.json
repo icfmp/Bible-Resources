@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "format": "OSIS 2.1.1 commentary annotations",
+  "official_documentation": "https://wiki.crosswire.org/OSIS_Commentaries",
+  "annotation_element": "div",
+  "annotation_type": "commentary",
+  "annotation_attribute": "annotateRef",
+  "allowed_reference_parts": [
+    "book",
+    "chapter",
+    "verse"
+  ],
+  "accept_whitespace_separated_references": true,
+  "accept_same_book_ranges": true,
+  "cross_book_ranges": "require_reviewed_versification_order",
+  "work_prefixes": "forbidden_by_current_SWORD_commentary_importer",
+  "unknown_or_ambiguous": "block_with_file_and_line",
+  "preserve": [
+    "canonical_references",
+    "section_hierarchy",
+    "authored_headings",
+    "paragraphs",
+    "emphasis",
+    "quotations",
+    "embedded_scripture",
+    "notes",
+    "word_markup",
+    "verse_boundaries",
+    "provenance"
+  ],
+  "never_automatic": [
+    "delete_embedded_bible_quotes",
+    "convert_quotes_to_plain_prose",
+    "remove_authorial_capitals_or_bold",
+    "guess_commentary_reference",
+    "reassign_section_to_nearest_verse",
+    "flatten_sections",
+    "replace_official_OSIS_structure"
+  ]
+}
