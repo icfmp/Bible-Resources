@@ -45,6 +45,9 @@ class FullSourceOsisParityTests(unittest.TestCase):
             poetry=result["source_to_candidate_poetry_structure_audit"]
             self.assertEqual(poetry["matching_per_verse_line_counts"],66)
             self.assertFalse(poetry["all_poetry_layout_verified"])
+            owned=result["source_to_candidate_poetry_verse_owned_audit"]
+            self.assertEqual(owned["matching_verse_line_counts_with_text_ownership"],66)
+            self.assertEqual(owned["matching_verse_line_text_sequences_ignoring_whitespace"],66)
             self.assertEqual(result["source_word_markers"],66)
             self.assertEqual(result["converted_word_markers"],66)
             self.assertFalse(result["all_note_text_and_reference_targets_verified"])
