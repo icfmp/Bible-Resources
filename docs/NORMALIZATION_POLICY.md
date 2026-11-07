@@ -70,6 +70,14 @@ Do not modify the source to make the test pass. Instead:
 
 The allowlist in \`config/osis-policy.json\` will grow only this way.
 
+## Compiled SWORD modules without an original XML source
+
+A downloaded \`zText\`, \`zCom\`, or other compiled SWORD module is **not** the original OSIS/TEI source file. There is no reliable original source **line number** inside its binary indexes. Never invent one. The raw module must be accessed through SWORD, not parsed by guessing the private binary layout.
+
+If the publisher's authoring source is available, validate that actual file and report \`file:line[:column]\`. If only a compiled module exists, the discovery/extraction step must identify the **provider, module ID, and SWORD key/verse or entry** where an unexpected structure occurs. If a reviewed intermediate XML export is created, report its generated filename/line *as such*, never as an original-source line. Stop and request a real source or an explicitly reviewed importer before normalizing anything.
+
+This is also why the current source guard is only one prerequisite: a proper SWORD-to-structured-source extraction adapter and a fidelity/round-trip validator still need to be built.
+
 ## Publication gate
 
 \`scripts/validate.py\` refuses an approved module if:
