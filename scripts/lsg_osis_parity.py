@@ -147,6 +147,16 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
             osis_codes.append(node.get("osisID"))
     if len(source_codes)!=66 or len(osis_codes)!=66 or len(set(osis_codes))!=66:
         raise PilotError("Cannot trust conversion book order or duplicate canonical identity")
+    # A converter can conserve all word elements but accidentally move
+    # their verse boundaries. Establish whole-corpus lexical identity
+    # independently from verse placement, without publishing any words.
+    original_doc=etree.fromstring(publisher_usfx,parser=etree.XMLParser(
+        resolve_entities=False,load_dtd=False,no_network=True))
+    authored_global_words=[plain("".join(node.itertext()))
+                           for node in original_doc.iter("w")]
+    generated_global_words=[plain("".join(node.itertext()))
+                            for node in doc.iter(OSIS+"w")]
+    overall_word_sequence_identical=authored_global_words==generated_global_words
     mapping=dict(zip(source_codes,osis_codes))
     source_body,_=usfx_text_by_verse(publisher_usfx,filter_books=set(source_codes))
     source_words,source_notes,source_lines=_source_words(publisher_usfx)
@@ -265,6 +275,11 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
         "exact_normalized_word_sequences":word_equal,
         "matching_verse_note_counts":notes_equal,
         "matching_verse_poetry_line_counts":poetry_equal,
+        "original_global_word_count":len(authored_global_words),
+        "converted_global_word_count":len(generated_global_words),
+        "full_original_ordered_word_text_sequence_equal":overall_word_sequence_identical,
+        "global_word_text_sha256":_hash("\\x1f".join(authored_global_words)),
+        "converted_global_word_text_sha256":_hash("\\x1f".join(generated_global_words)),
         "source_word_markers":total_source_words,
         "converted_word_markers":total_osis_words,
         "source_cross_reference_note_markers":sum(source_notes.values()),
