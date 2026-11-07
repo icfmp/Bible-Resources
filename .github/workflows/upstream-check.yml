@@ -7,9 +7,13 @@ on:
   pull_request:
     paths:
       - 'config/upstreams.json'
+      - 'config/source-priority.json'
+      - 'config/edition-identities.json'
       - 'scripts/check_provider_parity.py'
       - 'scripts/check_updates.py'
+      - 'scripts/select_sources.py'
       - 'tests/test_provider_parity.py'
+      - 'tests/test_source_selection.py'
       - '.github/workflows/upstream-check.yml'
 
 permissions:
@@ -30,6 +34,8 @@ jobs:
         run: python scripts/check_provider_parity.py --output reports/source-parity.json
       - name: Compare curated baselines with upstream SWORD catalogues
         run: python scripts/check_updates.py --output reports/upstream-status.json
+      - name: Review source priority and duplicate-edition candidates
+        run: python scripts/select_sources.py --report-only --output reports/source-selection.json
       - name: Upload read-only report
         if: always()
         uses: actions/upload-artifact@v4
@@ -71,8 +77,28 @@ jobs:
                       lines.append(f"| {module['id']} | {source['provider']} | {source['status']} |")
           else:
               lines.append('No upstream catalogue report generated')
+          lines.extend(['', '### Preferred SWORD source selection', ''])
+          selection = Path('reports/source-selection.json')
+          if selection.exists():
+              report = json.loads(selection.read_text(encoding='utf-8'))
+              counts = report['counts']
+              lines.append('**Priority:** ' + ' > '.join(report['priority']))
+              lines.append(f"**Candidates for review:** {counts['selected_candidates']}; "
+                           f"**lower-priority duplicates skipped:** {counts['lower_priority_skipped']}; "
+                           f"**blocked candidate groups:** {counts['blocked_groups']}")
+              if report['unavailable_providers']:
+                  lines.append('**Unavailable upstreams (incomplete inventory):** ' +
+                               ', '.join(report['unavailable_providers']))
+              lines.append('**Fully resolved:** ' + ('yes' if report['complete'] else 'no'))
+              for item in report['blocked'][:8]:
+                  names = ', '.join(r['provider'] + '/' + r['module_id'] for r in item['candidates'])
+                  lines.append('- ' + names + ': ' + ', '.join(item['reasons']))
+              if len(report['blocked']) > 8:
+                  lines.append(f"- … and {len(report['blocked']) - 8} more blocked groups in JSON artifact")
+          else:
+              lines.append('Priority selection report unavailable; do not infer that there are no duplicates.')
           lines.extend(['', 'Read-only monitoring. No module text is downloaded, '
-                        'modified or republished; external sources marked inventory_only '
+                        'modified or republished; source selection is a read-only proposal; external sources marked inventory_only '
                         'are not yet checked for content updates.'])
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as output:
               output.write('\n'.join(lines) + '\n')
