@@ -70,8 +70,8 @@ def _debug_usfm_verse_markers(files: list[Path]) -> None:
     No raw USFM is included in the JSON report, artifacts or repository.
     Match chapters and verse openings rather than guessing from content.
     """
-    targets={("PRO",11,1),("JOB",17,1),("ISA",9,1),
-             ("SNG",2,1),("MAL",3,1)}
+    targets={("GEN",4,24),("GEN",10,1),("GEN",10,6),
+             ("GEN",49,7),("EXO",25,10)}
     for file in files:
         content=file.read_text(encoding="utf-8-sig")
         match=re.search(r"(?m)^\\id\s+([A-Z0-9]{3})\b",content)
@@ -99,8 +99,8 @@ def _debug_converted_verse_markup(path: Path) -> None:
     XML or biblical text is written to GitHub artifacts or source control.
     """
     xml=path.read_text(encoding="utf-8")
-    for reference in ("Prov.11.1","Job.17.1","Isa.9.1",
-                      "Song.2.1","Mal.3.1"):
+    for reference in ("Gen.4.24","Gen.10.1","Gen.10.6",
+                      "Gen.49.7","Exod.25.10"):
         marker=f'sID="{reference}"'
         index=xml.find(marker)
         if index<0:
