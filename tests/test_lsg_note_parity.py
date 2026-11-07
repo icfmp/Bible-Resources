@@ -7,7 +7,7 @@ from lxml import etree
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
-from lsg_note_parity import audit_notes
+from lsg_note_parity import audit_notes, _raw_space_difference
 
 NS="http://www.bibletechnologies.net/2003/OSIS/namespace"
 
@@ -56,6 +56,20 @@ class NoteParityTests(unittest.TestCase):
         self.assertTrue(result["all_note_contents_metadata_and_positions_verified"])
         self.assertTrue(result["textual_target_references_verified"])
         self.assertNotIn("SPECIAL_NOTE_TEXT_SECRET",repr(result))
+
+    def test_whitespace_changes_are_classified_not_silently_waived(self):
+        self.assertEqual(
+            _raw_space_difference((("target"," Psalms 1:1 "),),
+                                  (("target","Psalms 1:1"),)),
+            "leading_or_trailing_whitespace_only")
+        self.assertEqual(
+            _raw_space_difference((("target","Ps  1:1"),),
+                                  (("target","Ps 1:1"),)),
+            "internal_whitespace_changed")
+        self.assertEqual(
+            _raw_space_difference((("target","Ps 1:1"),),
+                                  (("target","Ps 1:2"),)),
+            "content_changed")
 
     def test_changed_target_text_fails_without_count_difference(self):
         altered=(
