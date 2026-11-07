@@ -19,6 +19,7 @@ from xml.etree import ElementTree as ET
 
 from lsg_source_compare import read_source_xml, scan_usfx
 from pilot_preflight import PilotError, ROOT
+from pilot_subprocess import query, present_key
 
 NS="http://www.bibletechnologies.net/2003/OSIS/namespace"
 BOOK=re.compile(r"^[1-4]?[A-Za-z][A-Za-z0-9]*$")
@@ -46,10 +47,12 @@ def make_fixture(spec:dict, actual_keys:list[tuple[str,int,int]]) -> tuple[bytes
     for entry in cases:
         book=entry.get("source_usfx_book")
         osis_id=entry.get("osis_book")
+        sword_name=entry.get("sword_book")
         chapter=entry.get("chapter")
         verses=entry.get("verses")
         if (not isinstance(book,str) or not isinstance(osis_id,str)
                 or not BOOK.fullmatch(osis_id)
+                or not isinstance(sword_name,str) or not sword_name.strip()
                 or type(chapter) is not int or chapter<1
                 or not isinstance(verses,list) or not verses):
             raise PilotError("Invalid or ambiguous SWORD source key probe")
@@ -66,7 +69,7 @@ def make_fixture(spec:dict, actual_keys:list[tuple[str,int,int]]) -> tuple[bytes
                 raise PilotError("Duplicated source reference in probe")
             seen.add(key)
             # Explicitly synthetic marker, NOT copied Scripture.
-            ET.SubElement(chap,f"{{{NS}}}verse",{"osisID":key}).text="SYNTHETIC"
+            ET.SubElement(chap,f"{{{NS}}}verse",{"osisID":key}).text="SYNTHETIC_"+osis_id+"_"+str(chapter)+"_"+str(verse)
             references.append(key)
             count+=1
             if count>MAX_KEYS:
@@ -75,14 +78,15 @@ def make_fixture(spec:dict, actual_keys:list[tuple[str,int,int]]) -> tuple[bytes
     return result,references
 
 
-def compile_probe(fixture:bytes, scheme:str, *, exe:str="osis2mod") -> dict:
+def compile_probe(fixture:bytes, scheme:str, *, exe:str="osis2mod",
+                  reader:str="diatheke", checks:list[dict] | None=None) -> dict:
     if scheme not in ("NRSV","Segond"):
         raise PilotError("Unsupported experimental versification")
     with tempfile.TemporaryDirectory(prefix="bible-v11n-fixture-") as workspace:
         root=Path(workspace)
         source=root/"synthetic.osis.xml"
-        target=root/"module"
-        target.mkdir()
+        target=root/"modules/texts/rawtext/v11nprobe"
+        target.mkdir(parents=True)
         source.write_bytes(fixture)
         proc=subprocess.run(
             [exe,str(target),str(source),"-v",scheme],
@@ -108,6 +112,35 @@ def compile_probe(fixture:bytes, scheme:str, *, exe:str="osis2mod") -> dict:
                 if len(invalid)<5:
                     invalid.append(line.split(":",1)[0][:120])
         files=[p for p in target.rglob("*") if p.is_file()]
+        evidence=[]
+        if checks is not None and proc.returncode==0 and files:
+            conf=root/"mods.d/v11nprobe.conf"
+            conf.parent.mkdir(parents=True,exist_ok=True)
+            conf.write_text(
+                "[V11NPROBE]\\n"
+                "Description=Synthetic SWORD verse reference probe\\n"
+                "Version=1.0\\n"
+                "ModDrv=RawText\\n"
+                "DataPath=./modules/texts/rawtext/v11nprobe/\\n"
+                "Encoding=UTF-8\\n"
+                "SourceType=OSIS\\n"
+                "Lang=en\\n"
+                f"Versification={scheme}\\n",
+                encoding="utf-8",
+            )
+            marker_pattern=re.compile(r"SYNTHETIC_[A-Za-z0-9]+_\\d+_\\d+")
+            for item in checks:
+                return_code,content=query("V11NPROBE",item["request"],
+                    fmt="plain",root=root,exe=reader,limit=4096,timeout=12)
+                markers=sorted(set(marker_pattern.findall(content.decode("utf-8",errors="replace"))))
+                evidence.append({
+                    "source_reference":item["source_key"],
+                    "sword_query":item["request"],
+                    "reader_return_code":return_code,
+                    "key_found_in_output":present_key(item["request"],content,return_code),
+                    "marker_for_original_key_present":item["marker"] in markers,
+                    "synthetic_markers_in_returned_entry":markers,
+                })
         return {
             "scheme":scheme,
             "tool_return_code":proc.returncode,
@@ -117,16 +150,25 @@ def compile_probe(fixture:bytes, scheme:str, *, exe:str="osis2mod") -> dict:
             "v11n_diagnostics":dict(counts),
             "sample_out_of_range_source_keys":outside,
             "tool_error_prefixes":invalid,
+            "reader_key_evidence":evidence,
+            "reader_was_checked":checks is not None,
             "complete_source_text_checked":False,
             "candidate_text_approval":False,
         }
 
 
-def run(archive:Path,config:dict,*,compiler="osis2mod") -> dict:
+def run(archive:Path,config:dict,*,compiler="osis2mod",reader="diatheke") -> dict:
     raw, source=read_source_xml(archive,source_format="usfx")
     structure,actual_keys=scan_usfx(raw)
     fixture,refs=make_fixture(config,actual_keys)
-    evaluations=[compile_probe(fixture,scheme,exe=compiler)
+    checks=[
+        {"source_key":f'{entry["osis_book"]}.{entry["chapter"]}.{v}',
+         "request":f'{entry["sword_book"]} {entry["chapter"]}:{v}',
+         "marker":f'SYNTHETIC_{entry["osis_book"]}_{entry["chapter"]}_{v}'}
+        for entry in config["cases"] for v in entry["verses"]
+    ]
+    evaluations=[compile_probe(fixture,scheme,exe=compiler,
+                               reader=reader,checks=checks)
                  for scheme in config["schemes"]]
     return {
         "schema_version":1,
@@ -152,7 +194,10 @@ def main(argv=None)->int:
     try:
         config=json.loads(args.config.read_text(encoding="utf-8"))
         result=run(args.usfx_zip,config)
-        code=0 if all(x["tool_return_code"]==0 and x["module_created"] for x in result["schemes"]) else 1
+        code=0 if all(x["tool_return_code"]==0 and x["module_created"] and
+                      x["reader_was_checked"] and any(z["marker_for_original_key_present"]
+                                                     for z in x["reader_key_evidence"])
+                      for x in result["schemes"]) else 1
     except (OSError,ValueError,subprocess.TimeoutExpired) as exc:
         result={"status":"blocked","error":str(exc),"source_text_modified":False}
         code=1
