@@ -58,6 +58,10 @@ def _source_poetry_style(node):
 
 def _candidate_poetry_style(node):
     kind=node.get("type")
+    if kind=="selah":
+        # OSIS uses a separate <l> for the USFM inline \qs marker.
+        # Audit it as editorial text, never as an ordinary poetic line.
+        return None
     if kind in {"x-right","x-center","x-usfm-qd"}:
         return {"x-right":"right","x-center":"center",
                 "x-usfm-qd":"hebrew-end"}[kind]
@@ -77,6 +81,9 @@ def _read(root, *, source):
     book_iterator=root.iter("book") if source else (
         node for node in root.iter(OSIS+"div") if node.get("type")=="book")
     assigned=defaultdict(list)
+    selah_by_verse=defaultdict(list)
+    selah_nodes=0
+    selah_unowned_nodes=0
     total_nodes=0
     with_text_unowned=0
     empty_nodes=0
@@ -89,10 +96,19 @@ def _read(root, *, source):
         chapter=None
         current=None
         active_lines=[]
+        active_selah=[]
 
         def emit(value):
-            nonlocal with_text_unowned
-            if not value or not value.strip() or not active_lines:
+            if not value or not value.strip():
+                return
+            if active_selah:
+                marker=active_selah[-1]
+                if current is None:
+                    marker["unowned_text"]+=len(_no_space(value))
+                else:
+                    marker["parts"][current].append(value)
+                return
+            if not active_lines:
                 return
             line=active_lines[-1]
             if current is None:
@@ -102,6 +118,7 @@ def _read(root, *, source):
 
         def walk(node):
             nonlocal chapter,current,total_nodes,empty_nodes,multiverse_nodes,with_text_unowned
+            nonlocal selah_nodes,selah_unowned_nodes
             if isinstance(node,etree._Comment):
                 return
             if not isinstance(node.tag,str):
@@ -142,6 +159,13 @@ def _read(root, *, source):
                         raise PilotError("Unknown OSIS verse marker in poetry segment audit")
                 if kind in SKIP_TARGET:
                     return
+            is_selah=(kind=="qs" if source else
+                      kind=="l" and node.get("type")=="selah")
+            if is_selah:
+                if active_selah:
+                    raise PilotError("Nested Selah markers require editorial review")
+                selah_nodes+=1
+                active_selah.append({"parts":defaultdict(list),"unowned_text":0})
             style=_source_poetry_style(node) if source else (
                 _candidate_poetry_style(node) if kind=="l" else None)
             is_poetic_line=(style is not None)
@@ -174,30 +198,44 @@ def _read(root, *, source):
                         "text_sha256":_hash(compact),
                         "chars":len(compact),
                     })
+            if is_selah:
+                marker=active_selah.pop()
+                if marker["unowned_text"]:
+                    selah_unowned_nodes+=1
+                for ref, chunks in marker["parts"].items():
+                    compact=_no_space("".join(chunks))
+                    selah_by_verse[ref].append({
+                        "text_sha256":_hash(compact),"chars":len(compact)})
         walk(book)
+        if active_selah:
+            raise PilotError("Open Selah marker in poetry audit")
         if active_lines:
             raise PilotError("Open poetry line in source XML")
         if not source and current is not None:
             raise PilotError("Open OSIS verse at end of poetry audit book")
     return assigned, {
         "all_poetry_line_nodes":total_nodes,
+        "selah_marker_nodes":selah_nodes,
+        "selah_marker_nodes_outside_verse":selah_unowned_nodes,
         "line_nodes_containing_nonverse_text":with_text_unowned,
         "empty_poetry_line_nodes":empty_nodes,
         "line_nodes_spanning_multiple_verses":multiverse_nodes,
         "poetry_line_style_counts":dict(sorted(styles.items())),
-    }
+    },selah_by_verse
 
 
 def audit_segments(source_root, candidate_root, mapping, source_keys):
     if isinstance(candidate_root,etree._ElementTree):
         candidate_root=candidate_root.getroot()
-    authored,source_meta=_read(source_root,source=True)
-    converted,target_meta=_read(candidate_root,source=False)
+    authored,source_meta,source_selah=_read(source_root,source=True)
+    converted,target_meta,target_selah=_read(candidate_root,source=False)
     hist=Counter()
     mismatching_books=Counter()
     discrepancies=Counter()
     first=[]
     equal_counts=equal_text=equal_levels=0
+    equal_selah=0
+    first_selah_differences=[]
     for book,chapter,verse in source_keys:
         key=(book,chapter,verse)
         target_key=f"{mapping[book]}.{chapter}.{verse}"
@@ -205,6 +243,18 @@ def audit_segments(source_root, candidate_root, mapping, source_keys):
         b=converted.get(target_key,())
         delta=len(b)-len(a)
         hist[delta]+=1
+        selah_a=source_selah.get(key,())
+        selah_b=target_selah.get(target_key,())
+        if selah_a==selah_b:
+            equal_selah+=1
+        elif len(first_selah_differences)<35:
+            first_selah_differences.append({
+                "reference":f"{book}.{chapter}.{verse}",
+                "source_selah_count":len(selah_a),
+                "candidate_selah_count":len(selah_b),
+                "source_text_hashes":[x["text_sha256"] for x in selah_a],
+                "candidate_text_hashes":[x["text_sha256"] for x in selah_b],
+            })
         same_count=(delta==0)
         same_text=(same_count and
                    [x["text_sha256"] for x in a]==
@@ -247,6 +297,13 @@ def audit_segments(source_root, candidate_root, mapping, source_keys):
         "matching_verse_line_counts_with_text_ownership":equal_counts,
         "matching_verse_line_text_sequences_ignoring_whitespace":equal_text,
         "matching_verse_line_indentation_levels":equal_levels,
+        "matching_verse_selah_marker_text_sequences":equal_selah,
+        "first_selah_differences":first_selah_differences,
+        "all_selah_text_and_verse_positions_verified":(
+            equal_selah==total
+            and source_meta["selah_marker_nodes"]==target_meta["selah_marker_nodes"]
+            and not source_meta["selah_marker_nodes_outside_verse"]
+            and not target_meta["selah_marker_nodes_outside_verse"]),
         "line_delta_histogram":dict(sorted(hist.items())),
         "mismatching_books":dict(sorted(mismatching_books.items())),
         "difference_categories":dict(sorted(discrepancies.items())),
@@ -261,6 +318,8 @@ def audit_segments(source_root, candidate_root, mapping, source_keys):
         ),
         "full_editorial_poetry_layout_verified":False,
         "limitation":"Independent content-owner audit handles lines spanning milestones. "
+                     "USFM inline \\qs and OSIS <l type=selah> are compared separately; "
+                     "their presentation is not automatically equivalent. "
                      "Line grouping (<lg>), blank stanzas, headings and presentation "
                      "must still be reviewed; no original body text is exported.",
     }
