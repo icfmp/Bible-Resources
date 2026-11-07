@@ -163,6 +163,7 @@ def run(sword_archive:Path,usfx_archive:Path,*,diatheke="diatheke",full:bool=Fal
     chapters=[]
     totals=Counter()
     differences=[]
+    books_text={}
     with tempfile.TemporaryDirectory(prefix="bible-lsg-sword-source-") as tmp:
         root=Path(tmp)
         with zipfile.ZipFile(sword_archive) as source_zip:
@@ -176,6 +177,8 @@ def run(sword_archive:Path,usfx_archive:Path,*,diatheke="diatheke",full:bool=Fal
                 with source_zip.open(name) as inp,dest.open("xb") as out:
                     shutil.copyfileobj(inp,out,length=262144)
         for code,(alias,numbers) in planned.items():
+            source_parts=[]
+            sword_parts=[]
             for chapter in numbers:
                 ref=f"{alias} {chapter}"
                 ret,body=query("fraLSG1910eb",ref,fmt="plain",root=root,exe=diatheke)
@@ -184,6 +187,8 @@ def run(sword_archive:Path,usfx_archive:Path,*,diatheke="diatheke",full:bool=Fal
                 sword=parse_sword_chapter(body,chapter,"fraLSG1910eb")
                 expected={v:text for (b,c,v),text in authored.items()
                           if b==code and c==chapter}
+                source_parts.extend(expected[v] for v in sorted(expected))
+                sword_parts.extend(sword[v] for v in sorted(sword))
                 missing=sorted(set(expected)-set(sword))
                 extra=sorted(set(sword)-set(expected))
                 common=sorted(set(expected)&set(sword))
@@ -220,6 +225,16 @@ def run(sword_archive:Path,usfx_archive:Path,*,diatheke="diatheke",full:bool=Fal
                     "source_cross_reference_annotations":sum(authored_features.get((code,chapter,v),{}).get("x",0)
                                                              for v in expected),
                 })
+            full_source=plain(" ".join(source_parts))
+            full_sword=plain(" ".join(sword_parts))
+            books_text[code]={
+                "source_normalized_characters":len(full_source),
+                "sword_normalized_characters":len(full_sword),
+                "text_equal_when_verse_boundaries_ignored":full_source==full_sword,
+                "source_normalized_sha256":hash_text(full_source),
+                "sword_normalized_sha256":hash_text(full_sword),
+                "interpretation":"Text equality is separate from reference/verse index correctness. Headings, notes and other USFX apparatus are checked separately.",
+            }
     return {
         "schema_version":1,"status":("full_chapter_text_scan_completed_not_published"
                                            if full else "sample_comparison_requires_review"),
@@ -232,10 +247,15 @@ def run(sword_archive:Path,usfx_archive:Path,*,diatheke="diatheke",full:bool=Fal
         "authored_verse_keys_all_books":len(all_keys),
         "sample_totals":dict(totals),
         "sample_chapters":chapters,
+        "book_content_checks":books_text,
+        "books_with_identical_continuous_scripture_text":
+            sum(item["text_equal_when_verse_boundaries_ignored"] for item in books_text.values()),
         "first_text_differences":differences,
         "source_unmodified":True,
         "sword_unmodified":True,
-        "whole_bible_comparison_completed":full and totals["chapters"]==1189 and totals["verses_source"]==len(all_keys) and totals["verses_sword"]==len(all_keys),
+        "all_original_chapters_scanned":full and totals["chapters"]==1189 and totals["verses_source"]==len(all_keys),
+        "source_to_sword_reference_numbers_exactly_match":
+            totals["verse_keys_missing_in_sword"]==0 and totals["verse_keys_unexpected_in_sword"]==0,
         "annotations_compared_to_sword":False,
         "published":False,
         "notes":[
