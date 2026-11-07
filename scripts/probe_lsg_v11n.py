@@ -117,18 +117,18 @@ def compile_probe(fixture:bytes, scheme:str, *, exe:str="osis2mod",
             conf=root/"mods.d/v11nprobe.conf"
             conf.parent.mkdir(parents=True,exist_ok=True)
             conf.write_text(
-                "[V11NPROBE]\\n"
-                "Description=Synthetic SWORD verse reference probe\\n"
-                "Version=1.0\\n"
-                "ModDrv=RawText\\n"
-                "DataPath=./modules/texts/rawtext/v11nprobe/\\n"
-                "Encoding=UTF-8\\n"
-                "SourceType=OSIS\\n"
-                "Lang=en\\n"
-                f"Versification={scheme}\\n",
+                "[V11NPROBE]\n"
+                "Description=Synthetic SWORD verse reference probe\n"
+                "Version=1.0\n"
+                "ModDrv=RawText\n"
+                "DataPath=./modules/texts/rawtext/v11nprobe/\n"
+                "Encoding=UTF-8\n"
+                "SourceType=OSIS\n"
+                "Lang=en\n"
+                f"Versification={scheme}\n",
                 encoding="utf-8",
             )
-            marker_pattern=re.compile(r"SYNTHETIC_[A-Za-z0-9]+_\\d+_\\d+")
+            marker_pattern=re.compile(r"SYNTHETIC_[A-Za-z0-9]+_\d+_\d+")
             for item in checks:
                 return_code,content=query("V11NPROBE",item["request"],
                     fmt="plain",root=root,exe=reader,limit=4096,timeout=12)
