@@ -42,6 +42,10 @@ NEW_TABLE = '''            r"\\is",
 
 OLD_NOTE_SPACE = '            .replace(" <note", "<note")\n'
 
+
+OLD_POETRY_MOVE = "            if (\n                lines[i + 1].startswith(\"<verse sID\")\n                and lines[i - 1].startswith(\"<l \")\n                and lines[i - 2].startswith(\"<lg\")\n                and lines[i - 3] == \"</p>\"\n            ):\n                lines.insert(i - 3, lines.pop(i))\n"
+NEW_POETRY_MOVE = "            if (\n                lines[i + 1].startswith(\"<verse sID\")\n                and lines[i - 1].startswith(\"<l \")\n                and lines[i - 2].startswith(\"<lg\")\n                and lines[i - 3] == \"</p>\"\n                # Reposition only across an EMPTY opening <l>. When the\n                # line contains quotation text, moving eID before the\n                # paragraph would orphan canonical words and references.\n                and re.fullmatch(r\"<l\\b[^<>]*>\", lines[i - 1]) is not None\n            ):\n                lines.insert(i - 3, lines.pop(i))\n"
+
 class ConverterPatchError(ValueError):
     pass
 
@@ -54,12 +58,13 @@ def patch(source: bytes) -> bytes:
     if sha(source)!=EXPECTED_UPSTREAM_SHA256:
         raise ConverterPatchError("Upstream converter SHA-256 changed: manual review required")
     original=source.decode("utf-8")
-    for needle in (OLD_END,OLD_TABLE,OLD_NOTE_SPACE):
+    for needle in (OLD_END,OLD_TABLE,OLD_NOTE_SPACE,OLD_POETRY_MOVE):
         if original.count(needle)!=1:
             raise ConverterPatchError("Reviewed converter patch anchor is missing or ambiguous")
     converted=(original.replace(OLD_END,NEW_END)
                .replace(OLD_TABLE,NEW_TABLE)
-               .replace(OLD_NOTE_SPACE,""))
+               .replace(OLD_NOTE_SPACE,"")
+               .replace(OLD_POETRY_MOVE,NEW_POETRY_MOVE))
     if converted==original or converted.count("def markintroend(")!=1:
         raise ConverterPatchError("Generic introductory table patch not applied")
     return converted.encode("utf-8")
@@ -76,7 +81,7 @@ def main(argv=None):
     fixed=patch(original)
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_bytes(fixed)
-    print(f"u2o reviewed intro/note whitespace fixes: original SHA-256 {sha(original)}, patched SHA-256 {sha(fixed)}")
+    print(f"u2o reviewed intro/note/verse-boundary fixes: original SHA-256 {sha(original)}, patched SHA-256 {sha(fixed)}")
     return 0
 
 
