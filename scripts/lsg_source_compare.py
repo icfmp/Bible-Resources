@@ -31,7 +31,7 @@ REF = re.compile(r"^([1-4]?[A-Za-z][A-Za-z0-9]*)\.(\d+)\.(\d+)$")
 COMPONENT_NAMES = {"lg", "l", "p", "title", "note", "reference", "hi", "q", "verse", "chapter", "div", "w"}
 
 
-def read_source_xml(archive_path: Path) -> tuple[bytes, dict]:
+def read_source_xml(archive_path: Path, *, source_format: str = "osis") -> tuple[bytes, dict]:
     validated = inspect_archive(archive_path, source_kind="authored")
     candidate_names = []
     with zipfile.ZipFile(archive_path) as z:
@@ -41,10 +41,17 @@ def read_source_xml(archive_path: Path) -> tuple[bytes, dict]:
             lower = member.filename.casefold()
             if lower.endswith((".xml", ".osis", ".usfx")):
                 candidate_names.append(member.filename)
+        if source_format == "usfx":
+            # eBible USFX archives also contain BookNames, metadata and
+            # publication parameter XML: none of those are Scripture sources.
+            candidate_names = [name for name in candidate_names
+                               if Path(name).name.casefold().endswith("_usfx.xml")]
+        elif source_format != "osis":
+            raise PilotError("Unreviewed XML source format selector")
         if not candidate_names:
-            raise PilotError("No XML/USFX/OSIS source in registered publisher archive")
+            raise PilotError(f"No actual {source_format} Scripture source in publisher archive")
         if len(candidate_names) != 1:
-            raise PilotError(f"Multiple XML authoring sources ({len(candidate_names)}): {candidate_names[:20]!r}; explicit file-selection rule needed")
+            raise PilotError(f"Multiple {source_format} source candidates ({len(candidate_names)}): {candidate_names[:20]!r}")
         name = candidate_names[0]
         info = z.getinfo(name)
         if info.file_size > MAX_SOURCE_BYTES:
@@ -219,7 +226,7 @@ def compare_usfm_usfx(usfm:dict,usfx:dict,keys:list[tuple[str,int,int]]) -> dict
 
 
 def run_usfx(usfx_zip:Path,usfm_zip:Path) -> dict:
-    raw,source=read_source_xml(usfx_zip)
+    raw,source=read_source_xml(usfx_zip,source_format="usfx")
     usfx,keys=scan_usfx(raw)
     usfm=scan_usfm(usfm_zip)
     return {
