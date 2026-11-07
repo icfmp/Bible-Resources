@@ -91,6 +91,25 @@ Do not modify the source to make the test pass. Instead:
 
 The allowlist in \`config/osis-policy.json\` will grow only this way.
 
+## Reviewed source-to-source normalizer
+
+A generic *explicitly reviewed* editor now exists at
+`scripts/normalize_osis.py` (with a read-only diagnostic
+`scripts/audit_osis.py`). Only these markup-preserving structural operations
+are recognized: split a plain paragraph, split before an entire inline child,
+and group reviewed consecutive poetic lines. Full character data, commentary
+keys and semantic inline tags are kept unchanged, and the official pinned XSD
+validates source and result. No unreviewed heuristics rewrite Scripture.
+All changes require a source SHA-256 bound plan, editorial review and
+derivative-rights evidence, and a private before/after diff. The original
+remains the immutable rollback copy.
+
+Usage and precise limitations: [EDITORIAL_AUDIT_WORKFLOW.md](EDITORIAL_AUDIT_WORKFLOW.md).
+The genuine `LSG` and `MHC` SWORD archives have now been inspected
+**read-only** through bounded per-key SWORD calls, but they have **not**
+been edited, recompilated or visually approved in Bible. Source-to-compiled
+round-trip and actual original-MHC-OSIS reconstruction are separate blockers.
+
 ## Compiled SWORD modules without an original XML source
 
 A downloaded \`zText\`, \`zCom\`, or other compiled SWORD module is **not** the original OSIS/TEI source file. There is no reliable original source **line number** inside its binary indexes. Never invent one. The raw module must be accessed through SWORD, not parsed by guessing the private binary layout.

@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "run_id": 42362111699,
+  "workflow_url": "https://github.com/icfmp/Bible-Resources/actions/runs/42362111699",
+  "inspected_at": "2026-11-07",
+  "method": "Publisher ZIPs downloaded in GitHub Actions to temporary storage; SWORD entries read through diatheke -f internal with query key last, hard 4MiB output limit. USFM source counted separately. No text copied into this file.",
+  "lsq": {
+    "source": "eBible fraLSG1910eb",
+    "sword_sha256": "d612662a34330a3fcf1dede496503a8617732dab400ba2d3dc3877b038be16bf",
+    "sword_version": "100.0",
+    "driver": "zText",
+    "versification": "NRSV",
+    "source_type": "OSIS",
+    "language": "fr",
+    "authored_usfm_sha256": "64c4fe2a84d92f958deb0d1add4247d126a21c8a51e5b3058338f661a42d4900",
+    "authored_usfm": {
+      "files": 66,
+      "verse_markers": 31170,
+      "poetry_q1_markers": 23917,
+      "paragraph_markers": 2594,
+      "cross_reference_x_markers": 19502
+    },
+    "sample_output": {
+      "Gen_1_1": {
+        "bytes": 306,
+        "paragraph_signals": 1,
+        "poetry_line_signals": 0,
+        "word_tags": 7
+      },
+      "Psalm_23": {
+        "bytes": 4983,
+        "poetry_line_signals": 30,
+        "word_tags": 117
+      },
+      "Psalm_119": {
+        "bytes": 89771,
+        "poetry_line_signals": 528,
+        "word_tags": 2045
+      }
+    }
+  },
+  "mhc": {
+    "source": "CrossWire MHC (full)",
+    "sword_sha256": "6bcb936873ca144e317805e5c1677940fd86e2403f7c14517752e44f25c8882b",
+    "sword_version": "2.2",
+    "driver": "zCom4",
+    "versification": "KJV",
+    "source_type": "OSIS",
+    "language": "en",
+    "sample_output": {
+      "Genesis_1": {
+        "bytes": 230685,
+        "paragraph_signals": 277,
+        "reference_signals": 414,
+        "emphasis_signals": 622
+      },
+      "Genesis_1_1": {
+        "bytes": 13115,
+        "paragraph_signals": 24,
+        "reference_signals": 25,
+        "emphasis_signals": 27
+      },
+      "Psalm_23": {
+        "bytes": 114594,
+        "paragraph_signals": 150,
+        "reference_signals": 126,
+        "emphasis_signals": 276
+      }
+    }
+  },
+  "limits": [
+    "These are diatheke internal rendering signals, not validated original authoring OSIS XML or full-document structural guarantees.",
+    "LSG published USFM and compiled SWORD may be different revisions; full text and note correspondence not yet established.",
+    "MHC has no verified original full OSIS authoring file in this test; full-source diff is not possible from these binary samples alone.",
+    "No paragraph or stanza transformation of either real module has been proposed, applied, validated in Bible GTK or published.",
+    "Prior preliminary runs erroneously emitted whole-module data due flag order; their results are invalid, superseded by this bounded query evidence.",
+    "Do not infer whether John 5:4 or Acts 8:37 are present/empty from raw output byte count."
+  ]
+}

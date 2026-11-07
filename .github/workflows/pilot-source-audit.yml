@@ -1,0 +1,59 @@
+name: Pilot source structure audit (read-only)
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit_real_pilot.py'
+      - 'scripts/audit_osis.py'
+      - 'scripts/normalize_osis.py'
+      - '.github/workflows/pilot-source-audit.yml'
+      - 'config/pilot-sources.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_audit:
+    strategy:
+      fail-fast: false
+      matrix:
+        pilot: [lsg, mhc]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install SWORD reader
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y diatheke
+      - name: Fetch exact primary source archives to runner-only temporary storage
+        run: |
+          python scripts/pilot_fetch.py --pilot "${{ matrix.pilot }}" --directory "${{ runner.temp }}/inputs"
+      - name: Audit source structure without changing Bible or commentary
+        run: |
+          if [ "${{ matrix.pilot }}" = lsg ]; then
+            python scripts/audit_real_pilot.py --pilot lsg \
+              --sword-zip "${{ runner.temp }}/inputs/sword.zip" \
+              --authored-zip "${{ runner.temp }}/inputs/authored.zip" \
+              --report reports/lsg-source-audit.json
+          else
+            python scripts/audit_real_pilot.py --pilot mhc \
+              --sword-zip "${{ runner.temp }}/inputs/sword.zip" \
+              --report reports/mhc-source-audit.json
+          fi
+      - name: Preserve only content-free structural metadata report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.pilot }}-original-source-structure
+          path: reports/*-source-audit.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Report pilot boundaries
+        if: always()
+        run: |
+          echo '## Original ${{ matrix.pilot }} source structure' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Downloaded to temporary storage and inspected only; no content was edited or published.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'The JSON contains fingerprints and markup counts, never original verse/commentary text.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'This is not a full source-to-compiled SWORD round trip.' >> "$GITHUB_STEP_SUMMARY"

@@ -16,3 +16,16 @@ If a source is structurally atypical or initially unsupported, stop and request 
 ## Verse omissions and versification
 
 Use SWORD's actual official versification systems (not a unique map invented for every Bible). An intentional editorial/text-critical omission does not authorize filling a blank verse with another translation's words. If the chosen v11n contains the slot, retain a structurally empty verse and an evidence-backed editorial note. Test first-empty-verse handling in actual SWORD clients. A different verse number or a corrupt import must not be mislabeled as an intentional omission. See [VERSIFICATION_POLICY.md](VERSIFICATION_POLICY.md).
+
+## Actual reversible editorial workflow
+
+The source-level diagnostic `scripts/audit_osis.py` and reviewer-gated
+`scripts/normalize_osis.py` implement candidate warning reports and
+lossless structural changes to a **separate OSIS output**. The original
+source remains immutable, with a SHA-256-based review plan and optional
+private diff. See [EDITORIAL_AUDIT_WORKFLOW.md](EDITORIAL_AUDIT_WORKFLOW.md).
+Do not treat an audit as proof a SWORD module's display is wrong: real
+LSG/Psalms and MHC/Genesis key probes already contain line/paragraph
+signals. Check Bible GTK rendering before touching an otherwise structured
+module. No actual imported/published reader-optimized resource is approved
+merely by this tool.
