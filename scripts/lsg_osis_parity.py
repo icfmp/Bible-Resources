@@ -29,6 +29,36 @@ def _hash(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
+
+def describe_symbol_edits(source: str, generated: str) -> list[dict]:
+    """Describe real non-whitespace changes without exporting Bible words.
+
+    Every edit contains character-category counts and cryptographic hashes,
+    never source or generated text. Whitespace-only formatting differences
+    remain outside this diagnostic; their parity gate is independent.
+    """
+    a="".join(source.split())
+    b="".join(generated.split())
+    changes=[]
+    for operation,i,j,k,l in difflib.SequenceMatcher(
+            None,a,b,autojunk=False).get_opcodes():
+        if operation=="equal":
+            continue
+        before=a[i:j]
+        after=b[k:l]
+        changes.append({
+            "operation":operation,
+            "source_codepoints":len(before),
+            "generated_codepoints":len(after),
+            "source_alphanumeric":sum(c.isalnum() for c in before),
+            "generated_alphanumeric":sum(c.isalnum() for c in after),
+            "source_non_alphanumeric":sum(not c.isalnum() for c in before),
+            "generated_non_alphanumeric":sum(not c.isalnum() for c in after),
+            "source_sha256":_hash(before),
+            "generated_sha256":_hash(after),
+        })
+    return changes
+
 def _node_name(node) -> str:
     return etree.QName(node).localname if isinstance(node.tag,str) else ""
 
@@ -178,6 +208,9 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
     category_samples=defaultdict(list)
     punctuation_diffs=Counter()
     text_edit_kinds=Counter()
+    nonwhitespace_edits=Counter()
+    nonwhitespace_by_book=Counter()
+    nonwhitespace_samples=[]
     total_source_words=0
     total_osis_words=0
     same_body_except_spaces=Counter()
@@ -205,6 +238,17 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
             same_body_except_spaces["spacing_only_verses"]+=1
         elif original != generated:
             same_body_except_spaces["content_symbols_differ_verses"]+=1
+            nonwhitespace_by_book[code]+=1
+            for item in describe_symbol_edits(original,generated):
+                kind=("contains_letters_or_digits"
+                      if item["source_alphanumeric"] or item["generated_alphanumeric"]
+                      else "punctuation_or_symbols_only")
+                nonwhitespace_edits[(item["operation"],kind)]+=1
+                if len(nonwhitespace_samples)<80:
+                    nonwhitespace_samples.append({
+                        "reference":f"{code}.{chapter}.{verse}",
+                        "category":kind,**item,
+                    })
         word_equal+=(old_words==new_words)
         notes_equal+=(original_notes==generated_notes)
         poetry_equal+=(old_lines==new_lines)
@@ -297,6 +341,12 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
         "differences":dict(other),
         "first_per_category":dict(category_samples),
         "text_edit_kinds":dict(text_edit_kinds),
+        "non_whitespace_symbol_edit_categories":[
+            {"operation":op,"category":kind,"count":count}
+            for (op,kind),count in sorted(nonwhitespace_edits.items())
+        ],
+        "non_whitespace_verse_mismatches_by_book":dict(sorted(nonwhitespace_by_book.items())),
+        "first_non_whitespace_symbol_edits":nonwhitespace_samples,
         "punctuation_only_changes":[
             {"kind":key[0],"source_symbols":key[1],"target_symbols":key[2],
              "count":num}
