@@ -60,6 +60,67 @@ def describe_symbol_edits(source: str, generated: str) -> list[dict]:
         })
     return changes
 
+
+STRONG_ID = re.compile(r"^[GH][0-9]+[a-z]?$", re.IGNORECASE)
+
+
+def _strong_ids(raw: str | None, *, osis: bool) -> tuple[str, ...] | None:
+    """Read only lexical Strong IDs; unknown notation remains unverified.
+
+    USFX <w s="H123,G456"> maps to OSIS <w lemma="strong:H123
+    strong:G456">. This does not certify morphology or unrelated lemmas.
+    """
+    if not raw:
+        return ()
+    if osis:
+        chunks = raw.split()
+        values = []
+        for chunk in chunks:
+            if chunk.startswith("strong:"):
+                values.append(chunk.removeprefix("strong:"))
+            elif chunk.startswith("lemma:"):
+                # Distinct lexical metadata: checked by other editorial gate.
+                continue
+            else:
+                return None
+    else:
+        values = [x for x in re.split(r"[\s,]+", raw) if x]
+    if any(STRONG_ID.fullmatch(x) is None for x in values):
+        return None
+    return tuple(values)
+
+
+def _audit_global_strong_ids(source_root, target_root) -> dict:
+    source = [_strong_ids(n.get("s"), osis=False)
+              for n in source_root.iter("w")]
+    target = [_strong_ids(n.get("lemma"), osis=True)
+              for n in target_root.iter(OSIS+"w")]
+    matching = 0
+    unparsed = 0
+    disagreements = []
+    for i, (a,b) in enumerate(zip(source,target),1):
+        if a is None or b is None:
+            unparsed += 1
+        elif a == b:
+            matching += 1
+        elif len(disagreements) < 40:
+            disagreements.append({
+                "word_position":i,
+                "source_id_count":len(a),"candidate_id_count":len(b),
+                "source_id_sha256":_hash("|".join(a)),
+                "candidate_id_sha256":_hash("|".join(b)),
+            })
+    complete = len(source)==len(target) and unparsed==0 and matching==len(source)
+    return {
+        "source_word_count":len(source),
+        "candidate_word_count":len(target),
+        "matching_ordered_word_strong_ids":matching,
+        "unparseable_strong_id_slots":unparsed,
+        "first_mismatching_strong_id_slots":disagreements,
+        "full_source_strong_id_sequence_verified":complete,
+        "caveat":"Only lexical Strong H/G IDs: not morphological tags, arbitrary lemmas, or other word annotations.",
+    }
+
 def _node_name(node) -> str:
     return etree.QName(node).localname if isinstance(node.tag,str) else ""
 
@@ -203,6 +264,7 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
     generated_global_words=[plain("".join(node.itertext()))
                             for node in doc.iter(OSIS+"w")]
     overall_word_sequence_identical=authored_global_words==generated_global_words
+    strong_id_audit=_audit_global_strong_ids(original_doc,doc)
     mapping=dict(zip(source_codes,osis_codes))
     source_body,_=usfx_text_by_verse(publisher_usfx,filter_books=set(source_codes))
     source_words,source_notes,source_lines=_source_words(publisher_usfx)
@@ -349,6 +411,7 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
         "original_global_word_count":len(authored_global_words),
         "converted_global_word_count":len(generated_global_words),
         "full_original_ordered_word_text_sequence_equal":overall_word_sequence_identical,
+        "source_to_candidate_strong_id_audit":strong_id_audit,
         "global_word_text_sha256":_hash("\\x1f".join(authored_global_words)),
         "converted_global_word_text_sha256":_hash("\\x1f".join(generated_global_words)),
         "source_word_markers":total_source_words,
@@ -374,8 +437,8 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
         "first_differences":differences,
         "source_text_modified":False,
         "all_note_text_and_reference_targets_verified":False,
-        "all_strong_attributes_verified":False,
+        "all_strong_attributes_verified":strong_id_audit["full_source_strong_id_sequence_verified"],
         "all_source_layout_markup_verified":False,
         "approved_for_publication":False,
-        "caveat":"NFC+whitespace verse-body comparison, ordered word text and marker counts; not identity of USFM annotations, intro text, note content, strong IDs or SWORD recompiled module.",
+        "caveat":"NFC+whitespace verse-body comparison, ordered word text, lexical Strong IDs and marker counts; not identity of USFM intro text, note content, morphology, other metadata or recompiled SWORD module.",
     }
