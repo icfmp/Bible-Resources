@@ -24,6 +24,7 @@ from lsg_sword_compare import (usfx_text_by_verse, plain,
 from pilot_preflight import PilotError
 from lsg_note_parity import audit_notes
 from lsg_poetry_parity import audit_poetry
+from lsg_poetry_segments import audit_segments
 
 OSIS="{http://www.bibletechnologies.net/2003/OSIS/namespace}"
 
@@ -270,6 +271,7 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
     mapping=dict(zip(source_codes,osis_codes))
     note_audit=audit_notes(original_doc,doc,mapping)
     poetry_audit=audit_poetry(original_doc,doc,mapping,all_source_keys)
+    poetry_owned_audit=audit_segments(original_doc,doc,mapping,all_source_keys)
     source_body,_=usfx_text_by_verse(publisher_usfx,filter_books=set(source_codes))
     source_words,source_notes,source_lines=_source_words(publisher_usfx)
     body_equal=0
@@ -419,6 +421,7 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
         "matching_verse_note_counts":notes_equal,
         "matching_verse_poetry_line_counts":poetry_equal,
         "source_to_candidate_poetry_structure_audit":poetry_audit,
+        "source_to_candidate_poetry_verse_owned_audit":poetry_owned_audit,
         "original_global_word_count":len(authored_global_words),
         "converted_global_word_count":len(generated_global_words),
         "full_original_ordered_word_text_sequence_equal":overall_word_sequence_identical,
