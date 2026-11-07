@@ -51,8 +51,8 @@ def _line_signature(node, *, source: bool) -> dict:
         "level": node.get("level") or node.get("sfm") or node.get("style"),
         "verse_start_markers":tuple(
             (item.get("id") if source else item.get("osisID") or item.get("sID"))
-            for item in markers if (item.get("id") if source
-                                    else item.get("osisID") or item.get("sID"))
+            for item in markers if ((source and _name(item)=="v" and item.get("id"))
+                                    or (not source and (item.get("osisID") or item.get("sID"))))
         ),
         "verse_end_markers":tuple(
             (item.get("id") if source else item.get("eID"))
