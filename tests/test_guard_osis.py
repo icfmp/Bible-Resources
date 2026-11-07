@@ -85,6 +85,28 @@ class StrictOsisTests(unittest.TestCase):
         self.assertTrue(report["no_transformation_performed"])
         self.assertEqual(original, self.source.read_bytes())
 
+    def test_reviewed_standard_metadata_tables_and_lists_survive_source_gate(self):
+        self.write([
+            f'<osis xmlns="{NAMESPACE}">',
+            ' <osisText>',
+            '  <header><revisionDesc><date>2026-11-07</date><p>Revision record</p></revisionDesc>',
+            '   <work><description>Full provenance</description><identifier type="OSIS">Bible.Test</identifier>',
+            '   <type type="OSIS">Bible</type><refSystem>Bible</refSystem></work></header>',
+            '  <div type="book" osisID="John"><div type="introduction">',
+            '   <list><item>Outline heading</item></list>',
+            '   <table><row><cell>Heading</cell><cell>Column</cell></row>',
+            '   <row><cell>First</cell><cell>Entry</cell></row></table>',
+            '  </div><chapter osisID="John.1"><verse osisID="John.1.1"/>Verse text</chapter></div>',
+            ' </osisText></osis>',
+        ])
+        before=self.source.read_bytes()
+        report=self.validate()
+        self.assertEqual(report["elements"]["cell"],4)
+        self.assertEqual(report["elements"]["table"],1)
+        self.assertEqual(report["elements"]["revisionDesc"],1)
+        self.assertEqual(report["elements"]["list"],1)
+        self.assertEqual(self.source.read_bytes(),before)
+
     def test_valid_but_unreviewed_element_fails_at_line(self):
         self.write([f'<osis xmlns="{NAMESPACE}">', ' <custom>Do not discard</custom>', '</osis>'])
         self.assert_problem("UNREVIEWED_ELEMENT", 2)
