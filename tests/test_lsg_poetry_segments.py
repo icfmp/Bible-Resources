@@ -107,6 +107,20 @@ class PoetrySegmentOwnershipTests(unittest.TestCase):
         self.assertFalse(result["all_selah_text_and_verse_positions_verified"])
         self.assertNotIn("Changed",repr(result))
 
+    def test_missing_first_line_is_distinguished_from_other_line_changes(self):
+        src=('<q sfm="q1"><v id="1"/>First</q>'
+             '<q sfm="q1">Second<ve id="1"/></q>')
+        dst=('<p><verse sID="Gen.1.1"/>First</p>'
+             '<lg><l level="1">Second<verse eID="Gen.1.1"/></l></lg>')
+        result=audit(src,dst,verses=(1,))
+        self.assertEqual(result["missing_line_pattern_classification"],
+                         {"missing_first_source_line_other_lines_intact":1})
+        self.assertTrue(result["first_source_line_loss_references"][0]
+                        ["chapter_first_verse"])
+        self.assertEqual(result["first_source_line_loss_references"][0]
+                         ["missing_line_text_characters"],5)
+        self.assertNotIn("First",repr(result))
+
     def test_actual_new_line_break_is_not_dismissed(self):
         src=('<q sfm="q1"><v id="1"/>FirstSecond<ve id="1"/></q>')
         dst=('<lg><l level="1"><verse sID="Gen.1.1"/>First</l>'
