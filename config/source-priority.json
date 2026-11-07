@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "priority": [
+    "crosswire",
+    "ebible",
+    "step",
+    "andbible",
+    "andbible-extra"
+  ],
+  "rules": {
+    "identity": "only reviewer-verified same-edition aliases can be silently deduplicated",
+    "unverified_same_id_or_title": "block_for_identity_review",
+    "higher_priority_unavailable": "block_instead_of_falling_back",
+    "known_absent_in_available_higher_catalog": "allow_lower_priority",
+    "same_priority_multiple_aliases": "block_for_review",
+    "rights": "verify independently for chosen source",
+    "disabled_provider": "does_not_override_enabled_source",
+    "same_work_different_edition": "keep_distinct_only_after_verified_identification",
+    "discovery_only": "no_automatic_download_or_import"
+  },
+  "notes": "Order is an explicit operational default, not a quality, recency, ownership or rights ranking. Lower-priority sources are never imported when an identified identical edition exists above them."
+}

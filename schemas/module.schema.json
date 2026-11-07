@@ -175,6 +175,11 @@
           }
         }
       }
+    },
+    "canonical_edition_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,100}$",
+      "description": "Stable, human-reviewed edition identity independent of the SWORD module ID or upstream provider. Required for approved modules."
     }
   },
   "allOf": [
@@ -216,7 +221,10 @@
               }
             }
           }
-        }
+        },
+        "required": [
+          "canonical_edition_id"
+        ]
       }
     },
     {

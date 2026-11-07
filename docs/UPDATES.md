@@ -43,3 +43,8 @@ The Bible application should fetch the official Bible Resources catalogue only u
 See issue #5 and the CrossWire documentation:
 https://wiki.crosswire.org/SWORD_Module_Source_Discovery_and_Module_Updating
 https://wiki.crosswire.org/Official_and_Affiliated_Module_Repositories
+
+
+## Duplicate sources and canonical editions
+
+The five SWORD repositories can redistribute the same edition. The separately reviewed [priority policy](SOURCE_PRIORITY.md) decides a **single preferred import source**, while maintaining the ability to monitor alternate upstream copies. Do not create multiple curated modules or version streams merely because an identical edition appears in several catalogues. Explicit alias verification matters: module ID and title coincidences alone are not sufficient. `scripts/select_sources.py` produces a read-only selection report with blocked ambiguities and unavailable-provider fail-closed behavior. It does not automatically change upstream links or existing installed resources.
