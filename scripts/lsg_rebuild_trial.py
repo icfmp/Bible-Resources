@@ -92,6 +92,15 @@ def _malformed_xml_diagnostic(path: Path, exc: etree.XMLSyntaxError) -> dict:
                                    "opens_after":len(stack)})
         if len(div_events)>25:
             div_events=div_events[-25:]
+    suspect=next((event["line"] for event in reversed(div_events)
+                  if event["event"]=="close"
+                  and (event.get("matching_open") or {}).get("type")=="book"),None)
+    if suspect and suspect < line-30:
+        for n in range(max(1,suspect-18),min(len(lines),suspect+18)+1):
+            tags=re.findall(r"<\s*(/?)\s*([A-Za-z][A-Za-z0-9:_-]*)\b",lines[n-1])
+            if tags:
+                near.append({"line":n,"section":"last_book_close",
+                             "tags":[("/" if closed else "")+tag for closed,tag in tags[:45]]})
     for n in range(max(1,line-12),min(len(lines),line+12)+1):
         tags=re.findall(r"<\s*(/?)\s*([A-Za-z][A-Za-z0-9:_-]*)\b",lines[n-1])
         if tags:
