@@ -23,6 +23,7 @@ from lsg_sword_compare import (usfx_text_by_verse, plain,
     NON_VERSE_TEXT_ELEMENTS, NON_VERSE_PARAGRAPH_STYLES)
 from pilot_preflight import PilotError
 from lsg_note_parity import audit_notes
+from lsg_poetry_parity import audit_poetry
 
 OSIS="{http://www.bibletechnologies.net/2003/OSIS/namespace}"
 
@@ -268,6 +269,7 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
     strong_id_audit=_audit_global_strong_ids(original_doc,doc)
     mapping=dict(zip(source_codes,osis_codes))
     note_audit=audit_notes(original_doc,doc,mapping)
+    poetry_audit=audit_poetry(original_doc,doc,mapping,all_source_keys)
     source_body,_=usfx_text_by_verse(publisher_usfx,filter_books=set(source_codes))
     source_words,source_notes,source_lines=_source_words(publisher_usfx)
     body_equal=0
@@ -394,6 +396,12 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
         if old_lines!=new_lines:
             other["poetry_line_count_differences"]+=1
     total=len(all_source_keys)
+    # Independent line walker must agree with the existing strict per-verse
+    # line counter. Disagreements are bugs in the auditing layer itself.
+    if (poetry_audit["source_poetry_line_count"] != sum(source_lines.values())
+            or poetry_audit["candidate_poetry_line_count"] != sum(osis_lines.values())
+            or poetry_audit["matching_per_verse_line_counts"] != poetry_equal):
+        raise PilotError("Independent poetry segmenter disagrees with parity count")
     return {
         "schema_version":1,
         "status":"real_original_to_converted_osis_diagnostic",
@@ -410,6 +418,7 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
         "exact_normalized_word_sequences":word_equal,
         "matching_verse_note_counts":notes_equal,
         "matching_verse_poetry_line_counts":poetry_equal,
+        "source_to_candidate_poetry_structure_audit":poetry_audit,
         "original_global_word_count":len(authored_global_words),
         "converted_global_word_count":len(generated_global_words),
         "full_original_ordered_word_text_sequence_equal":overall_word_sequence_identical,
