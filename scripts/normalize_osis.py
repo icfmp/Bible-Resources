@@ -33,7 +33,11 @@ NS = "{http://www.bibletechnologies.net/2003/OSIS/namespace}"
 HEX = re.compile(r"^[0-9a-f]{64}$")
 URL = re.compile(r"^https://[^/\s]+/.+")
 NON_STRUCTURAL = {"p", "lg", "l"}  # Only these containers may be added/replaced.
-OPERATIONS = {"split_paragraph", "group_poetry_lines"}
+OPERATIONS = {"split_paragraph", "split_before_child", "group_poetry_lines"}
+SAFE_LINE_CHILDREN = {NS + name for name in {
+    "verse", "hi", "note", "reference", "q", "w", "transChange",
+    "divineName", "seg", "lb", "milestone", "speaker",
+}}
 
 
 class EditorialError(ValueError):
@@ -112,8 +116,9 @@ def _approved_plan(plan: dict, original: bytes, kind: str) -> None:
         if (not isinstance(edit.get("expected_element_sha256"), str)
                 or not HEX.fullmatch(edit["expected_element_sha256"])):
             raise EditorialError(f"Edit {idx} needs SHA-256 anchored to source subtree")
-        paths = ([edit.get("node_path")] if edit["operation"] == "split_paragraph"
-                 else edit.get("node_paths"))
+        paths = ([edit.get("node_path")] if edit["operation"] in {
+                    "split_paragraph", "split_before_child"
+                 } else edit.get("node_paths"))
         if not isinstance(paths, list) or not paths:
             raise EditorialError(f"Edit {idx} has no positional source paths")
         for path in paths:
@@ -173,6 +178,36 @@ def _split_paragraph(root, edit) -> dict:
             "left_characters": len(left), "right_characters": len(right)}
 
 
+def _split_before_child(root, edit) -> dict:
+    node = _locate(root, edit.get("node_path"))
+    if node.tag != NS + "p" or node.attrib:
+        raise EditorialError("split_before_child requires an unannotated paragraph")
+    _check_node(edit, node, operation="split_before_child")
+    child_index = edit.get("child_index")
+    if type(child_index) is not int or not 0 <= child_index < len(node):
+        raise EditorialError("split_before_child needs an existing direct child_index")
+    # Move complete inline subtrees, never split or reassign notes, words,
+    # references or verse milestones. The full source and schema gates
+    # additionally prohibit invalid line/paragraph nesting.
+    if any(child.tag not in SAFE_LINE_CHILDREN for child in node):
+        raise EditorialError("Unreviewed paragraph child for structural split")
+    parent = node.getparent()
+    if parent is None:
+        raise EditorialError("Cannot split document root")
+    sibling = etree.Element(NS + "p")
+    sibling.tail = node.tail
+    node.tail = None
+    for child in list(node)[child_index:]:
+        sibling.append(child)
+    if (not "".join(node.itertext()).strip() or
+            not "".join(sibling.itertext()).strip()):
+        raise EditorialError("Refusing empty paragraph after splitting inline nodes")
+    parent.insert(parent.index(node) + 1, sibling)
+    return {"operation":"split_before_child",
+            "source_reference":edit["source_reference"],
+            "moved_child_nodes":len(sibling)}
+
+
 def _group_poetry(root, edit) -> dict:
     paths = edit.get("node_paths")
     if not isinstance(paths, list) or not 2 <= len(paths) <= 100:
@@ -180,9 +215,10 @@ def _group_poetry(root, edit) -> dict:
     nodes = [_locate(root, addr) for addr in paths]
     if len({id(node) for node in nodes}) != len(nodes):
         raise EditorialError("Repeated poetry nodes")
-    if any(node.tag != NS + "p" or node.attrib or len(node) or
-           not node.text or not node.text.strip() for node in nodes):
-        raise EditorialError("Poetry grouping requires plain paragraphs, no attributes or child markup")
+    if any(node.tag != NS + "p" or node.attrib or
+           any(child.tag not in SAFE_LINE_CHILDREN for child in node) or
+           not "".join(node.itertext()).strip() for node in nodes):
+        raise EditorialError("Poetry grouping needs unannotated paragraphs with only reviewed inline markup")
     # The hash is over all selected direct paragraphs in their original order.
     combined = b"\0".join(etree.tostring(n, encoding="UTF-8", with_tail=False) for n in nodes)
     if checksum(combined) != edit["expected_element_sha256"]:
@@ -198,6 +234,8 @@ def _group_poetry(root, edit) -> dict:
     for index, node in enumerate(nodes):
         line = etree.SubElement(stanza, NS + "l")
         line.text = node.text
+        for child in list(node):
+            line.append(child)
         line.tail = node.tail if index < len(nodes) - 1 else None
     stanza.tail = last_tail
     for node in nodes:
@@ -240,6 +278,8 @@ def apply_plan(source_path: Path, plan_path: Path, output_path: Path,
     for edit in plan["edits"]:
         if edit["operation"] == "split_paragraph":
             operations.append(_split_paragraph(doc.getroot(), edit))
+        elif edit["operation"] == "split_before_child":
+            operations.append(_split_before_child(doc.getroot(), edit))
         else:
             operations.append(_group_poetry(doc.getroot(), edit))
     after_text, after_items = _fingerprint(doc)
