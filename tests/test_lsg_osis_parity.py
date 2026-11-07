@@ -41,6 +41,8 @@ class FullSourceOsisParityTests(unittest.TestCase):
             self.assertEqual(result["exact_normalized_verse_text_matches"],66)
             self.assertEqual(result["exact_normalized_word_sequences"],66)
             self.assertEqual(result["matching_verse_note_counts"],66)
+            self.assertEqual(result["source_to_candidate_note_spacing_dryrun"][
+                "status"],"not_modeled_due_unverified_note_identity_or_structure")
             self.assertEqual(result["matching_verse_poetry_line_counts"],66)
             poetry=result["source_to_candidate_poetry_structure_audit"]
             self.assertEqual(poetry["matching_per_verse_line_counts"],66)
