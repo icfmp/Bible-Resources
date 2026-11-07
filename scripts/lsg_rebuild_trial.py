@@ -336,6 +336,11 @@ def run(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) -> dict:
         if os.getenv("LSG_SAMPLE_DEBUG")=="1":
             _debug_converted_verse_markup(candidate)
         report["source_to_generated_osis"]=compare_osis(candidate,original_xml)
+        note_audit=report["source_to_generated_osis"]["source_to_candidate_note_content_audit"]
+        report["note_content_and_reference_text_parity"]=note_audit[
+            "textual_target_references_verified"]
+        report["note_editorial_metadata_parity"]=note_audit[
+            "all_note_contents_metadata_and_positions_verified"]
         # Real, disposable diagnostic compilation is allowed only after the
         # full original OSIS document passes both the official pinned XSD
         # and the separately reviewed structural policy.
