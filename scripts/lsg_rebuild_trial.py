@@ -60,6 +60,38 @@ def _safe_files(usfm_zip: Path, destination: Path) -> list[Path]:
     return sorted(files)
 
 
+def _original_usfm_intro_markers(archive: Path, target_id: str) -> dict:
+    """Find introductory source markers without exposing their text."""
+    with zipfile.ZipFile(archive) as source:
+        matches=[]
+        for record in source.infolist():
+            if not record.filename.casefold().endswith((".usfm",".sfm")):
+                continue
+            sample=source.read(record).decode("utf-8-sig")
+            found=re.search(r"(?m)^\\id\s+(\S+)",sample)
+            if found and found.group(1)==target_id:
+                matches.append((record.filename,sample))
+        if len(matches)!=1:
+            raise PilotError(f"Expected unique source USFM book ID {target_id}")
+        path,content=matches[0]
+    intro=re.split(r"(?m)^\\c\s+1\b",content,maxsplit=1)[0]
+    marker_events=[]
+    totals=Counter()
+    for i,line in enumerate(intro.splitlines(),1):
+        marks=re.findall(r"\\([A-Za-z][A-Za-z0-9_+-]*)(?:\*|\b)",line)
+        totals.update(marks)
+        if marks:
+            marker_events.append({"line":i,"markers":marks[:30]})
+    return {
+        "source_file_name":path,
+        "source_sha256":_sha(content.encode("utf-8-sig")),
+        "lines_before_first_chapter":len(intro.splitlines()),
+        "marker_counts":dict(sorted(totals.items())),
+        "last_intro_markers":marker_events[-60:],
+        "source_content_not_published":True,
+    }
+
+
 def _malformed_xml_diagnostic(path: Path, exc: etree.XMLSyntaxError) -> dict:
     """Only report local markup skeleton; never include actual biblical text."""
     line=max(1,int(exc.position[0]))
@@ -240,6 +272,7 @@ def run(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) -> dict:
         except etree.XMLSyntaxError as exc:
             report["status"]="blocked_malformed_converted_osis"
             report["conversion_xml_diagnostic"]=_malformed_xml_diagnostic(candidate,exc)
+            report["jhn_source_intro_diagnostic"]=_original_usfm_intro_markers(usfm_zip,"JHN")
             return report
         report["osis_schema"]=_schema_proof(candidate,schema)
         report["structure_key_sets_equal"]=(
