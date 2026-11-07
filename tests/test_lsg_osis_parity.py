@@ -5,7 +5,7 @@ import unittest
 import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
-from lsg_osis_parity import compare, _source_words
+from lsg_osis_parity import compare, _source_words, describe_symbol_edits
 
 NS="http://www.bibletechnologies.net/2003/OSIS/namespace"
 
@@ -56,6 +56,19 @@ class FullSourceOsisParityTests(unittest.TestCase):
             self.assertEqual(result["exact_normalized_verse_text_matches"],65)
             self.assertTrue(result["first_differences"])
             self.assertEqual(result["first_differences"][0]["reference"],"B30.1.1")
+
+    def test_non_whitespace_diagnostics_are_text_free_and_classified(self):
+        changed=describe_symbol_edits("Au commencement, Dieu.", "Au commencement Dieu.")
+        self.assertEqual(len(changed),1)
+        self.assertEqual(changed[0]["operation"],"delete")
+        self.assertEqual(changed[0]["source_alphanumeric"],0)
+        self.assertEqual(changed[0]["source_codepoints"],1)
+        self.assertNotIn(",",str(changed))
+        self.assertEqual(describe_symbol_edits("Alpha  beta", "Alpha beta"),[])
+        changed=describe_symbol_edits("Alpha beta", "Alpha betta")
+        self.assertTrue(any(x["generated_alphanumeric"]>0 for x in changed))
+        self.assertNotIn("betta",str(changed))
+        self.assertNotIn("beta",str(changed))
 
     def test_note_and_section_heading_words_are_not_verse_words(self):
         # USFX plain-verse extraction already excludes editorial subtrees.
