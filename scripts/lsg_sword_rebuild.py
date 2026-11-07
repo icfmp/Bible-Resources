@@ -58,6 +58,19 @@ def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke") -> 
         report["compiler_exit_code"]=result.returncode
         report["compiler_output_sha256"]=_sha(logs)
         report["compiler_output_bytes"]=len(logs)
+        # Record only canonical source references in compiler messages;
+        # never upload raw compiler logs that may contain Bible text.
+        known_refs=sorted(set(m.decode("ascii") for m in re.findall(
+            rb"\b(?:Gen|Exod|Lev|Num|Deut|Josh|Judg|Ruth|1Sam|2Sam|"
+            rb"1Kgs|2Kgs|1Chr|2Chr|Ezra|Neh|Esth|Job|Ps|Prov|Eccl|Song|"
+            rb"Isa|Jer|Lam|Ezek|Dan|Hos|Joel|Amos|Obad|Jonah|Mic|"
+            rb"Nah|Hab|Zeph|Hag|Zech|Mal|Matt|Mark|Luke|John|Acts|"
+            rb"Rom|1Cor|2Cor|Gal|Eph|Phil|Col|1Thess|2Thess|"
+            rb"1Tim|2Tim|Titus|Phlm|Heb|Jas|1Pet|2Pet|1John|"
+            rb"2John|3John|Jude|Rev)\.\d+\.\d+\b",
+            logs,
+        )))
+        report["compiler_source_ref_mentions"]=known_refs[:70]
         report["compiler_diagnostics_count"]={
             "fatal":len(re.findall(rb"(?m)(?:^|\n)FATAL\(",logs)),
             "error":len(re.findall(rb"(?m)(?:^|\n)ERROR\(",logs)),
