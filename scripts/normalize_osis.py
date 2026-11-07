@@ -340,15 +340,29 @@ def apply_plan(source_path: Path, plan_path: Path, output_path: Path,
         raise EditorialError("Original source unexpectedly changed")
     # Atomic publication of *local candidate file*, never of a module.
     # No existing file is overwritten. Both audit paths are private/local.
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    with output_path.open("xb") as stream:
-        stream.write(result_bytes)
-        stream.flush()
-        os.fsync(stream.fileno())
-    if diff_path is not None:
-        diff_path.parent.mkdir(parents=True, exist_ok=True)
-        with diff_path.open("x", encoding="utf-8") as stream:
-            stream.write(diff)
+    wrote_output = False
+    wrote_diff = False
+    try:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        with output_path.open("xb") as stream:
+            wrote_output = True
+            stream.write(result_bytes)
+            stream.flush()
+            os.fsync(stream.fileno())
+        if diff_path is not None:
+            diff_path.parent.mkdir(parents=True, exist_ok=True)
+            with diff_path.open("x", encoding="utf-8") as stream:
+                wrote_diff = True
+                stream.write(diff)
+                stream.flush()
+                os.fsync(stream.fileno())
+    except Exception:
+        # Never leave an incomplete candidate after a diff/write error.
+        if wrote_diff:
+            diff_path.unlink(missing_ok=True)
+        if wrote_output:
+            output_path.unlink(missing_ok=True)
+        raise
     return report
 
 
