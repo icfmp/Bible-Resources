@@ -22,7 +22,7 @@ class LSGSegondRebuildTests(unittest.TestCase):
           "#!/usr/bin/env python3\n"
           "from pathlib import Path\n"
           "import sys\n"
-          "assert sys.argv[-4:]==['-v','Segond','-s','4']\n"
+          "assert sys.argv[-2:]==['-v','Segond']\n"
           "Path(sys.argv[1],'ot').write_bytes(b'NON_BIBLICAL_TEST_DATA')\n")
         self.compiler.chmod(0o700)
         self.reader.write_text(
