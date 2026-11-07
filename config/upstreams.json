@@ -65,7 +65,8 @@
       "kind": "api",
       "catalogue_url": "https://bible.youversionapi.com/3.1/configuration.json",
       "monitoring": "inventory_only",
-      "notes": "Not a SWORD repository. Availability, API permissions and rights must be verified separately; no unauthenticated automatic extraction."
+      "notes": "Not a SWORD repository. Availability, API permissions and rights must be verified separately; no unauthenticated automatic extraction.",
+      "source_url": "https://www.bible.com/"
     },
     {
       "id": "openbible-cross-references",
