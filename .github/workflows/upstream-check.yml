@@ -74,7 +74,10 @@ jobs:
                             '|---|---|---|'])
               for module in data.get('modules', []):
                   for source in module['upstreams']:
-                      lines.append(f"| {module['id']} | {source['provider']} | {source['status']} |")
+                      status = source['status']
+                      if source.get('possible_return_of_our_contribution'):
+                          status += ' (possible return of our fix; review required)'
+                      lines.append(f"| {module['id']} | {source['provider']} | {status} |")
           else:
               lines.append('No upstream catalogue report generated')
           lines.extend(['', '### Preferred SWORD source selection', ''])
