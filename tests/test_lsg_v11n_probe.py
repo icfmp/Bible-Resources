@@ -47,7 +47,8 @@ class LSGVersificationFixtureTests(unittest.TestCase):
             "key=sys.argv[-1].split()\n"
             "book='Exod' if key[0]=='Exodus' else 'Ps'\n"
             "chapter,verse=key[-1].split(':')\n"
-            "print(f'{sys.argv[-1]}: SYNTHETIC_{book}_{chapter}_{verse}')\n"
+            "print(f'{sys.argv[-1]}:')\n"
+            "print(f'SYNTHETIC_{book}_{chapter}_{verse}')\n"
         )
         self.fake_reader.chmod(0o700)
         self.archive=self.root/"usfx.zip"
