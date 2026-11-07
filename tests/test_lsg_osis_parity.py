@@ -45,6 +45,20 @@ class FullSourceOsisParityTests(unittest.TestCase):
             self.assertEqual(result["source_word_markers"],66)
             self.assertEqual(result["converted_word_markers"],66)
             self.assertFalse(result["all_note_text_and_reference_targets_verified"])
+            self.assertTrue(result["all_strong_attributes_verified"])
+            self.assertEqual(result["source_to_candidate_strong_id_audit"]["matching_ordered_word_strong_ids"],66)
+
+    def test_strong_id_change_detected_despite_identical_bible_words(self):
+        raw,xml=fixture()
+        xml=xml.replace(b"strong:H123",b"strong:H999",1)
+        with tempfile.TemporaryDirectory() as temp:
+            source=Path(temp)/"candidate.xml"
+            source.write_bytes(xml)
+            result=compare(source,raw)
+            self.assertEqual(result["exact_normalized_word_sequences"],66)
+            self.assertFalse(result["all_strong_attributes_verified"])
+            self.assertEqual(result["source_to_candidate_strong_id_audit"]["matching_ordered_word_strong_ids"],65)
+            self.assertEqual(len(result["source_to_candidate_strong_id_audit"]["first_mismatching_strong_id_slots"]),1)
 
     def test_word_text_change_rejected_even_when_reference_keys_match(self):
         raw,xml=fixture(change_word=True)
