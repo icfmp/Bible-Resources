@@ -140,3 +140,18 @@ has been implemented.
 Source selection belongs to Bible Resources. The Bible application's existing
 downloader is **not** changed by this policy; client migration must be an
 explicit, separately reviewed integration task.
+
+## Curated publication identity gate
+
+Every `approved` manifest must carry a stable `canonical_edition_id`
+independent of the provider and SWORD ID. The publisher refuses two approved
+modules with the same canonical ID **and edition variant** (`faithful` or
+`reader_optimized`), even if their module IDs differ. Explicitly reviewed
+faithful and reader-optimized variants may coexist; those are editorial
+variants, not duplicate provider imports. Canonical IDs must be created from
+verified work, language and edition identity, never guessed from titles.
+
+The publication schema/validator prevents **declared** duplicate IDs. It
+cannot prove that a curator has not mistakenly assigned two different IDs
+to the same edition. The import-review workflow therefore must reconcile
+each new edition with the full existing identity catalogue before approval.
