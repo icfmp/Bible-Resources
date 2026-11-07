@@ -88,7 +88,7 @@ CHAPFIXRE = re.compile(
 )
 
 def reflow(text):
-    return CHAPFIXRE.sub("\ufdd0\\1\ufdd0", text)
+    return CHAPFIXRE.sub("\\ufdd0\\\\1\\ufdd0", text)
 
 def doconvert(text: str, log_level: int) -> tuple[str, ...]:
     newtext=text
