@@ -234,6 +234,8 @@ def audit_segments(source_root, candidate_root, mapping, source_keys):
     discrepancies=Counter()
     first=[]
     equal_counts=equal_text=equal_levels=0
+    missing_line_patterns=Counter()
+    initial_line_loss_refs=[]
     equal_selah=0
     first_selah_differences=[]
     for book,chapter,verse in source_keys:
@@ -243,6 +245,26 @@ def audit_segments(source_root, candidate_root, mapping, source_keys):
         b=converted.get(target_key,())
         delta=len(b)-len(a)
         hist[delta]+=1
+        if delta<0:
+            matching_suffix=(
+                [x["text_sha256"] for x in b]
+                ==[x["text_sha256"] for x in a[-len(b):]]
+                if b else True
+            )
+            if (delta==-1 and matching_suffix
+                    and [x["level"] for x in b]
+                    ==[x["level"] for x in a[1:]]):
+                pattern="missing_first_source_line_other_lines_intact"
+                if len(initial_line_loss_refs)<60:
+                    initial_line_loss_refs.append({
+                        "reference":f"{book}.{chapter}.{verse}",
+                        "missing_line_text_sha256":a[0]["text_sha256"],
+                        "missing_line_text_characters":a[0]["chars"],
+                        "chapter_first_verse":verse==1,
+                    })
+            else:
+                pattern="other_missing_line_or_merged_text"
+            missing_line_patterns[pattern]+=1
         selah_a=source_selah.get(key,())
         selah_b=target_selah.get(target_key,())
         if selah_a==selah_b:
@@ -305,6 +327,8 @@ def audit_segments(source_root, candidate_root, mapping, source_keys):
             and not source_meta["selah_marker_nodes_outside_verse"]
             and not target_meta["selah_marker_nodes_outside_verse"]),
         "line_delta_histogram":dict(sorted(hist.items())),
+        "missing_line_pattern_classification":dict(sorted(missing_line_patterns.items())),
+        "first_source_line_loss_references":initial_line_loss_refs,
         "mismatching_books":dict(sorted(mismatching_books.items())),
         "difference_categories":dict(sorted(discrepancies.items())),
         "source_poetry_keys_outside_verse_index":missing_source_keys,
