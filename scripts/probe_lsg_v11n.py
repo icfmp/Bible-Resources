@@ -132,15 +132,21 @@ def compile_probe(fixture:bytes, scheme:str, *, exe:str="osis2mod",
             for item in checks:
                 return_code,content=query("V11NPROBE",item["request"],
                     fmt="plain",root=root,exe=reader,limit=4096,timeout=12)
-                markers=sorted(set(marker_pattern.findall(content.decode("utf-8",errors="replace"))))
+                decoded=content.decode("utf-8",errors="replace")
+                markers=sorted(set(marker_pattern.findall(decoded)))
+                lines=decoded.splitlines()
+                first_line=lines[0].strip() if lines else ""
+                canonical=re.match(r"^(.+? \d+:\d+):$", first_line)
+                reported=canonical.group(1) if canonical else None
                 evidence.append({
                     "source_reference":item["source_key"],
                     "sword_query":item["request"],
                     "reader_return_code":return_code,
                     "key_found_in_output":present_key(item["request"],content,return_code),
+                    "canonical_reference_reported":reported,
+                    "requested_reference_preserved":reported==item["request"],
                     "marker_for_original_key_present":item["marker"] in markers,
                     "synthetic_markers_in_returned_entry":markers,
-                    "synthetic_reader_preview":content.decode("utf-8",errors="replace")[:180],
                 })
         return {
             "scheme":scheme,
@@ -151,9 +157,14 @@ def compile_probe(fixture:bytes, scheme:str, *, exe:str="osis2mod",
             "v11n_diagnostics":dict(counts),
             "sample_out_of_range_source_keys":outside,
             "tool_error_prefixes":invalid,
-            "synthetic_compiler_preview":diagnostics[:12],
             "reader_key_evidence":evidence,
             "reader_was_checked":checks is not None,
+            "source_key_slots_retained":bool(evidence) and all(
+                x["requested_reference_preserved"] for x in evidence
+            ),
+            "source_content_recovered_from_test_module":bool(evidence) and all(
+                x["marker_for_original_key_present"] for x in evidence
+            ),
             "complete_source_text_checked":False,
             "candidate_text_approval":False,
         }
@@ -196,10 +207,14 @@ def main(argv=None)->int:
     try:
         config=json.loads(args.config.read_text(encoding="utf-8"))
         result=run(args.usfx_zip,config)
-        code=0 if all(x["tool_return_code"]==0 and x["module_created"] and
-                      x["reader_was_checked"] and any(z["marker_for_original_key_present"]
-                                                     for z in x["reader_key_evidence"])
-                      for x in result["schemes"]) else 1
+        code=0 if all(
+            x["tool_return_code"]==0 and x["module_created"]
+            and x["reader_was_checked"]
+            and len(x["reader_key_evidence"])==len(result["synthetic_keys"])
+            and all(z["reader_return_code"]==0 and z["canonical_reference_reported"]
+                    for z in x["reader_key_evidence"])
+            for x in result["schemes"]
+        ) else 1
     except (OSError,ValueError,subprocess.TimeoutExpired) as exc:
         result={"status":"blocked","error":str(exc),"source_text_modified":False}
         code=1
