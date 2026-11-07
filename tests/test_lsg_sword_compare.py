@@ -26,6 +26,11 @@ class LsgTextParityTests(unittest.TestCase):
         self.assertEqual(features[("PSA",23,1)]["s"],1)
         self.assertEqual(verse[("PSA",23,2)],"Il me dirige pres des eaux paisibles.")
 
+    def test_usfx_p_sfm_r_cross_reference_heading_not_in_verse_body(self):
+        source=b'<usfx><book id="ACT"><c id="8"/><p><v id="1"/>Saul had agreed. </p><p sfm="r" style="r">V. 1-13: cf. Acts 11:19-21.</p><p>The disciples fled.<ve id="1"/></p></book></usfx>'
+        verses,_=usfx_text_by_verse(source,filter_books={"ACT"})
+        self.assertEqual(verses[("ACT",8,1)],"Saul had agreed. The disciples fled.")
+
     def test_diatheke_chapter_multiple_verses_are_parsed_without_folding_poetry(self):
         output=("Psalms 23:1: Cantique de David. \nL'Eternel est mon berger.\n"
                 "Psalms 23:2: Il me fait reposer,\nIl me dirige.\n"
