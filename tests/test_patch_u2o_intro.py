@@ -82,8 +82,13 @@ def note_replace(text):
 '''
 
 + '''
+CHAPFIXRE = re.compile(
+''' + module.OLD_CHAP_REGEX +
+'''    re.U,
+)
+
 def reflow(text):
-    return text
+    return CHAPFIXRE.sub("\ufdd0\\1\ufdd0", text)
 
 def doconvert(text: str, log_level: int) -> tuple[str, ...]:
     newtext=text
@@ -192,25 +197,25 @@ class U2OIntroTests(unittest.TestCase):
             self.assertIn("Ref 1:1.",after)
 
 
-    def test_bare_poetry_marker_is_joined_only_to_immediately_following_verse(self):
-        original=SOURCE
-        with mock_patch.object(module,"EXPECTED_UPSTREAM_SHA256",hashlib.sha256(original).hexdigest()):
-            reviewed=module.patch(original)
+    def test_chapter_separator_does_not_absorb_poetry_paragraph_newline(self):
+        source=SOURCE
+        with mock_patch.object(module,"EXPECTED_UPSTREAM_SHA256",hashlib.sha256(source).hexdigest()):
+            reviewed=module.patch(source)
         before={}
         after={}
-        exec(compile(original,"original-bare-poetry.py","exec"),before)
-        exec(compile(reviewed,"reviewed-bare-poetry.py","exec"),after)
-        example="\\c 11\n\\q1\n\\v 1 First words\n\\q1 Second words"
-        self.assertEqual(before["doconvert"](example,0)[0],example)
-        transformed=after["doconvert"](example,0)[0]
-        self.assertEqual(transformed,
-            "\\c 11\n\\q1 \\v 1 First words\n\\q1 Second words")
-        self.assertEqual(after["doconvert"]("\\q1\n\\p Prose",0)[0],
-                         "\\q1\n\\p Prose")
-        self.assertEqual(after["doconvert"]("\\q2\n\\v 1 Text",0)[0],
-                         "\\q2 \\v 1 Text")
-        self.assertEqual(after["doconvert"]("\\q1\n\n\\v 1 Text",0)[0],
-                         "\\q1\n\n\\v 1 Text")
+        exec(compile(source,"original-chap-regex.py","exec"),before)
+        exec(compile(reviewed,"reviewed-chap-regex.py","exec"),after)
+        original="\\c 11\n\\q1\n\\v 1 First words\n\\q1 Second words"
+        old_output=before["doconvert"](original,0)[0]
+        new_output=after["doconvert"](original,0)[0]
+        self.assertIn("\ufdd0\\c 11\ufdd0\\q1",old_output)
+        self.assertIn("\ufdd0\\c 11\ufdd0\n\\q1",new_output)
+        self.assertEqual(old_output.replace("\ufdd0\\q1","\ufdd0\n\\q1"),
+                         new_output)
+        self.assertEqual(before["doconvert"]("\\c 5  \n\\p Prose",0)[0]
+                         .count("\n"),0)
+        self.assertIn("\n\\p Prose",
+                      after["doconvert"]("\\c 5  \n\\p Prose",0)[0])
 
     def test_upstream_sha_change_fails_closed(self):
         with self.assertRaisesRegex(module.ConverterPatchError,"SHA-256 changed"):
