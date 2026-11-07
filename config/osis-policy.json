@@ -28,7 +28,18 @@
     "seg",
     "lb",
     "milestone",
-    "speaker"
+    "speaker",
+    "revisionDesc",
+    "date",
+    "description",
+    "identifier",
+    "refSystem",
+    "type",
+    "list",
+    "item",
+    "table",
+    "row",
+    "cell"
   ],
   "reviewed_hi_types": [
     "italic",
@@ -48,7 +59,13 @@
     "transChange": "preserve_translation_conventions",
     "divineName": "preserve_divine_name_markup",
     "note": "preserve_note_type_and_reference",
-    "verse": "preserve_verse_identifiers_and_milestones"
+    "verse": "preserve_verse_identifiers_and_milestones",
+    "metadata_header": "OSIS work/revision metadata; preserve exactly and never treat as canonical Scripture",
+    "list": "Preserve introduction and authorial list hierarchy and item boundaries",
+    "item": "Preserve original list item text and sequence",
+    "table": "Preserve source authorial table, including introduction tables",
+    "row": "Preserve row order and semantics within tables",
+    "cell": "Preserve table cell order, column/row attributes and contents"
   },
   "schema_review": {
     "reviewed_on": "2026-11-07",
@@ -65,5 +82,6 @@
       "local_filename": "xml.xsd",
       "sha256": "61960fb3131e38022caad5360e2f33a3382578ab3c80cd58bd74320ede61b20c"
     }
-  ]
+  ],
+  "note": "Expanded element allowlist after validating actual eBible LSG's u2o-generated output against official pinned CrossWire XSD. Structure is accepted only for inspection; publication still requires full fidelity review."
 }
