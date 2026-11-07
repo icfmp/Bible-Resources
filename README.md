@@ -48,7 +48,7 @@ The generated `dist/` contains a stable machine catalogue at `catalog/v1/catalog
 
 ## Upstream version monitoring
 
-Bible Resources monitors **three separate versions** (installed in SWORD, curated in Bible Resources, and source/original). The daily read-only GitHub Action checks CrossWire and eBible catalogue metadata; OpenBible is reserved pending identification of a verifiable catalogue. The checker never automatically republishes a module. See [Updating resources](docs/UPDATES.md).
+Bible Resources monitors **three separate versions** (installed in SWORD, curated in Bible Resources, and source/original). The daily read-only GitHub Action checks all five SWORD catalogues declared by Bible: CrossWire, AndBible Extra, AndBible, STEP and eBible. YouVersion and the two OpenBible datasets are documented separately as inventory-only sources, not SWORD catalogues. The same Action compares the registered providers and endpoint URLs with Bible's current source declarations and fails on drift. The checker never automatically republishes a module. See [Updating resources](docs/UPDATES.md).
 
 To check a local installation: `python scripts/check_updates.py --installed-root ~/.sword`.
 
@@ -67,6 +67,7 @@ For repository creation, push, Pages activation and branch rules, see [INSTALLAT
 - [Release procedure](docs/PUBLISHING.md)
 - [Import roadmap](docs/ROADMAP.md)
 - [Upstream version tracking and updates](docs/UPDATES.md)
+- [Complete Bible source inventory and drift checks](docs/SOURCE_INVENTORY.md)
 
 ## Licenses
 

@@ -126,7 +126,7 @@ def read_manifests(root: Path) -> list[dict]:
 
 
 def provider_catalog(provider: dict) -> dict[str, dict]:
-    return archive_catalog(https_read(urljoin(provider["base_url"], "mods.d.tar.gz"), MAX_ARCHIVE))
+    return archive_catalog(https_read(provider.get("catalogue_url") or urljoin(provider["base_url"], "mods.d.tar.gz"), MAX_ARCHIVE))
 
 
 def fetch_direct_conf(provider: dict, module_id: str, conf_filename: str | None = None) -> dict:
@@ -155,7 +155,8 @@ def compare_link(link: dict, remote: dict | None) -> str:
 
 
 def check(providers: list[dict], manifests: list[dict], installed: dict,
-          *, fetch_catalog=provider_catalog, fetch_conf=fetch_direct_conf) -> dict:
+          *, fetch_catalog=provider_catalog, fetch_conf=fetch_direct_conf,
+          external_sources: list[dict] | None = None) -> dict:
     status, inventories, rows = {}, {}, []
     lookup = {p["id"]: p for p in providers}
     for provider in providers:
@@ -214,6 +215,10 @@ def check(providers: list[dict], manifests: list[dict], installed: dict,
         "schema_version": 1,
         "checked_at": datetime.now(timezone.utc).isoformat(),
         "providers": status,
+        "external_sources": {source["id"]: {
+            "kind": source["kind"], "status": source["monitoring"],
+            "reason": source.get("notes", "")
+        } for source in (external_sources or [])},
         "modules": rows,
     }
 
@@ -228,7 +233,8 @@ def main(argv=None) -> int:
     config = json.loads((args.root / "config/upstreams.json").read_text(encoding="utf-8"))
     providers = [x for x in config["providers"] if not args.provider or x["id"] in args.provider]
     installed, warnings = installed_catalog(args.installed_root)
-    report = check(providers, read_manifests(args.root), installed)
+    report = check(providers, read_manifests(args.root), installed,
+                   external_sources=config.get("external_sources", []))
     report["local_warnings"] = warnings
     result = json.dumps(report, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
     if args.output:
