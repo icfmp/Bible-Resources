@@ -101,6 +101,19 @@ def validate(root=ROOT):
         if m["sword_id"].casefold() in seen: errors.append(f"{d.name}: duplicate SWORD id")
         seen.add(m["sword_id"].casefold())
         modules.append((d,m))
+        for upstream in m.get("upstreams", []):
+            accepted = {c["url"] for c in upstream.get("contributions", [])
+                        if c["state"] in {"accepted", "released"}}
+            recorded = set()
+            for review in upstream.get("reconciliations", []):
+                revision = (review["upstream_version"], review["upstream_conf_sha256"])
+                if revision in recorded:
+                    errors.append(f"{d.name}: duplicate reconciliation for upstream revision {revision[0]}")
+                recorded.add(revision)
+                if review["contribution_url"] not in accepted:
+                    errors.append(f"{d.name}: reconciliation must cite an accepted/released contribution from the same upstream")
+                if review["reviewed_by"].strip().upper() == "PENDING":
+                    errors.append(f"{d.name}: upstream reconciliation requires a real reviewer")
         payload=d/"payload"
         approved=m["quality"]["status"]=="approved"
         if approved:
