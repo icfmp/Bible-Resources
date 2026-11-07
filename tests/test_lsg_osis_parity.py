@@ -54,6 +54,19 @@ class FullSourceOsisParityTests(unittest.TestCase):
             self.assertTrue(result["all_strong_attributes_verified"])
             self.assertEqual(result["source_to_candidate_strong_id_audit"]["matching_ordered_word_strong_ids"],66)
 
+    def test_unconverted_paragraph_marker_outside_verse_is_detected(self):
+        raw,xml=fixture()
+        xml=xml.replace(b'<p><verse',b'<p>\\q1 <verse',1)
+        with tempfile.TemporaryDirectory() as temp:
+            path=Path(temp)/"candidate.xml"
+            path.write_bytes(xml)
+            result=compare(path,raw)
+        leaks=result["unconverted_usfm_markup_diagnostic"]
+        self.assertEqual(leaks["total_unconverted_control_markers"],1)
+        self.assertEqual(leaks["unconverted_marker_names"],{"q1":1})
+        self.assertFalse(leaks["no_unconverted_usfm_markup"])
+        self.assertEqual(result["verse_text_matches_ignoring_only_unicode_whitespace"],66)
+
     def test_strong_id_change_detected_despite_identical_bible_words(self):
         raw,xml=fixture()
         xml=xml.replace(b"strong:H123",b"strong:H999",1)
