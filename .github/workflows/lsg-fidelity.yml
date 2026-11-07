@@ -31,19 +31,16 @@ jobs:
           from pilot_fetch import fetch
           target=Path('${{ runner.temp }}/lsg')
           for key,url in [
-              ('osis','https://ebible.org/Scriptures/fraLSG_osis.zip'),
+              ('usfx','https://ebible.org/Scriptures/fraLSG_usfx.zip'),
               ('usfm','https://ebible.org/Scriptures/fraLSG_usfm.zip')]:
               result=fetch(url,target/(key+'.zip'),'lsg')
               print(key, result['bytes'], result['sha256'])
           PY
-      - name: Verify offline pinned official CrossWire and W3C schemas
-        run: python scripts/fetch_reviewed_schema.py --directory "${{ runner.temp }}/reviewed-osis"
-      - name: Compare the original LSG USFM/OSIS structures
+      - name: Compare the original LSG USFM/USFX structures
         run: |
           python scripts/lsg_source_compare.py \
-            --osis-zip "${{ runner.temp }}/lsg/osis.zip" \
+            --usfx-zip "${{ runner.temp }}/lsg/usfx.zip" \
             --usfm-zip "${{ runner.temp }}/lsg/usfm.zip" \
-            --schema-dir "${{ runner.temp }}/reviewed-osis" \
             --report reports/lsg-authoring-structure.json
       - name: Upload only the text-free diagnostic report
         if: always()
