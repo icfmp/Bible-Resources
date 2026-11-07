@@ -14,7 +14,9 @@ class Tests(unittest.TestCase):
         self.root=Path(self.tmp.name)
         (self.root/"modules").mkdir()
         (self.root/"schemas").mkdir()
+        (self.root/"config").mkdir()
         shutil.copyfile(ROOT/"schemas/module.schema.json",self.root/"schemas/module.schema.json")
+        shutil.copyfile(ROOT/"config/osis-policy.json",self.root/"config/osis-policy.json")
         self.m=json.loads((ROOT/"examples/metadata.template.json").read_text())
     def create(self):
         d=self.root/"modules"/self.m["id"];d.mkdir()
