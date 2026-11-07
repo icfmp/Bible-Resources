@@ -77,6 +77,7 @@ For repository creation, push, Pages activation and branch rules, see [INSTALLAT
 - [SWORD source priority and duplicate-edition policy](docs/SOURCE_PRIORITY.md)
 - [Official versification and omitted verses](docs/VERSIFICATION_POLICY.md)
 - [Pilot: Louis Segond 1910 and Matthew Henry Complete](docs/PILOT_SEGOND_MHC.md)
+- [Reversible editorial source audit and normalizer](docs/EDITORIAL_AUDIT_WORKFLOW.md)
 - [Quality policy](docs/QUALITY_POLICY.md)
 - [Editorial rules](docs/EDITORIAL_RULES.md)
 - [Strict OSIS source normalization contract](docs/NORMALIZATION_POLICY.md)
