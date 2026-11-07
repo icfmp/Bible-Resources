@@ -38,6 +38,13 @@ SOURCE=(
         newlines.append("\\ufde1")
     return newlines
 '''
++ '''
+def note_cleanup(text):
+    return (
+        text
+''' + module.OLD_NOTE_SPACE +
+'''    )
+'''
 ).encode("utf-8")
 
 
@@ -67,6 +74,19 @@ class U2OIntroTests(unittest.TestCase):
         self.assertIn(lines[-2],after)
         self.assertEqual([x for x in after if x in lines],lines)
         self.assertNotEqual(source,result)
+
+    def test_note_preceding_space_is_not_removed(self):
+        source=SOURCE
+        with mock_patch.object(module,"EXPECTED_UPSTREAM_SHA256",hashlib.sha256(source).hexdigest()):
+            fixed=module.patch(source)
+        before={}
+        after={}
+        exec(compile(source,"original-fixture.py","exec"),before)
+        exec(compile(fixed,"patched-fixture.py","exec"),after)
+        sample='Au <note type="crossReference">citation</note>commencement'
+        self.assertNotEqual(before["note_cleanup"](sample),sample)
+        self.assertEqual(after["note_cleanup"](sample),sample)
+        self.assertNotIn(module.OLD_NOTE_SPACE.encode(),fixed)
 
     def test_upstream_sha_change_fails_closed(self):
         with self.assertRaisesRegex(module.ConverterPatchError,"SHA-256 changed"):
