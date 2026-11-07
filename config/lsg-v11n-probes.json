@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "description": "Small, source-verified out-of-range reference probes. Not a hardcoded normalization map or permission to remap verse text.",
+  "schemes": [
+    "NRSV",
+    "Segond"
+  ],
+  "cases": [
+    {
+      "source_usfx_book": "EXO",
+      "osis_book": "Exod",
+      "chapter": 7,
+      "verses": [
+        25,
+        26,
+        27,
+        28,
+        29
+      ],
+      "sword_book": "Exodus"
+    },
+    {
+      "source_usfx_book": "PSA",
+      "osis_book": "Ps",
+      "chapter": 3,
+      "verses": [
+        8,
+        9
+      ],
+      "sword_book": "Psalms"
+    }
+  ]
+}

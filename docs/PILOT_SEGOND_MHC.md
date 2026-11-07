@@ -210,3 +210,64 @@ LSG Psalm 23/119 entries contain poetry-line signals; MHC Genesis
 entries contain paragraph signals. **This is not** an all-verses text
 comparison, MHC authored XML inspection or actual candidate normalization.
 No source or compiled module was changed.
+
+
+## LSG full-authoring / SWORD trial — 7 November 2026
+
+The live [PR #16](https://github.com/icfmp/Bible-Resources/pull/16) was
+**merged** after a successful real run with 165 Python tests and a separate
+source-to-compiled comparison of all 1,189 chapters. eBible's genuine
+public-domain `fraLSG` USFM and USFX archives contain the same 31,170
+verse references, in the same 66-book order. The original compiled
+`fraLSG1910eb` SWORD module (v100.0, `zText`) instead declares
+`Versification=NRSV` and exposes 31,104 verse keys in `diatheke`
+chapter output. The audit lists **112 original-only** and **46
+SWORD-only** keys. These are *reference-index mismatches*, not a
+conclusion that any original Scripture content should be removed.
+
+After comparing continuous Scripture text per book with NFC and whitespace
+normalization (without silently dropping original punctuation),
+**65/66 books** have equal text checksums. Ezra is the remaining exception;
+some of its discrepancies are diatheke asterisk-emphasis wrappers, and
+others still require source-by-source review. Matching entire books do not
+prove correct **verse boundaries**: examples include Exod 7.26–29 being
+appended to the output of Exod 7.25. CrossWire documents that `osis2mod`
+may append verses outside the selected canonical scheme to the last
+accepted entry, losing their individual references. This behavior is
+NOT a textual criticism decision or an intentional omitted verse.
+
+CrossWire publishes an official `Segond` versification for French
+Louis Segond 1910. It is an explicit **candidate** for rebuilding the
+index; never change only `mods.d/*.conf` without rebuilding and
+confirming every verse boundary, note and reference. The separate
+synthetic-source-key compiler check in PR #17 compares actual
+`osis2mod -v NRSV` and `-v Segond` behavior but is not a publication.
+
+**Source formats:** USFM and USFX are verified and inspected; the
+publisher's older advertised `fraLSG_osis.zip` endpoint currently returns
+HTTP 404. USFX is not OSIS and cannot be fed directly to the CrossWire
+OSIS XSD. An exact, rights-cleared and auditable USFM/USFX → OSIS
+conversion will be needed if no genuine matching OSIS source is
+recoverable. The real SWORD module's translation notes, cross references,
+word markup and Bible GTK visual presentation have **not** yet been
+verified after a rebuild. No real Scripture was edited or published.
+
+The complete actual trial artifacts, including reference counts and
+private text-free hashes, are retained with the successful
+[LSG authored-source fidelity workflow](https://github.com/icfmp/Bible-Resources/actions/runs/42365912858).
+
+### Official SWORD canonical-slot probe (not Scripture conversion)
+
+[The source-verified 7-key `osis2mod` / `diatheke` evidence](evidence/normalizer-3/lsg-versification-canonical-reference-probe.json)
+used only fabricated marker words and the installed SWORD 1.9.0 canonical
+index. Under `NRSV`, querying Exod 7.26–29 resolved to Exod 8.1–4,
+and Ps 3.9 resolved to Ps 4.1. Under `Segond`, all seven original
+source references were returned with their unchanged chapter/verse keys.
+This confirms that `Segond` has the expected **canonical slots** for
+these cases, whereas `NRSV` cannot address them directly.
+
+This is **not yet proof that a compiled real LSG text and its notes will
+survive reconstruction**. The experimental source fixture did not produce
+usable verse-body content, so only the reader's canonical reference headers
+are used as evidence. A complete actual-text import / text and annotation
+round trip must be separately demonstrated before any public resource release.

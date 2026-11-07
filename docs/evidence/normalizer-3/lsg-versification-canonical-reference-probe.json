@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "pilot": "fraLSG1910eb",
+  "source": "eBible fraLSG USFX",
+  "source_usfx_sha256": "90a53c3a61f0c07a329d8fc19c593b8c353f2b3e5a6830dbf4c53d2b08fd2141",
+  "ci_artifact_url": "https://github.com/icfmp/Bible-Resources/actions/runs/42367332660",
+  "ci_probe_status": "compiler_and_reader_success_on_synthetic_references",
+  "reference_matches": {
+    "NRSV": [
+      [
+        "Exod.7.25",
+        "Exodus 7:25"
+      ],
+      [
+        "Exod.7.26",
+        "Exodus 8:1"
+      ],
+      [
+        "Exod.7.27",
+        "Exodus 8:2"
+      ],
+      [
+        "Exod.7.28",
+        "Exodus 8:3"
+      ],
+      [
+        "Exod.7.29",
+        "Exodus 8:4"
+      ],
+      [
+        "Ps.3.8",
+        "Psalms 3:8"
+      ],
+      [
+        "Ps.3.9",
+        "Psalms 4:1"
+      ]
+    ],
+    "Segond": [
+      [
+        "Exod.7.25",
+        "Exodus 7:25"
+      ],
+      [
+        "Exod.7.26",
+        "Exodus 7:26"
+      ],
+      [
+        "Exod.7.27",
+        "Exodus 7:27"
+      ],
+      [
+        "Exod.7.28",
+        "Exodus 7:28"
+      ],
+      [
+        "Exod.7.29",
+        "Exodus 7:29"
+      ],
+      [
+        "Ps.3.8",
+        "Psalms 3:8"
+      ],
+      [
+        "Ps.3.9",
+        "Psalms 3:9"
+      ]
+    ]
+  },
+  "conclusion": "All seven tested publisher source-reference slots remain addressable by their original chapter/verse numbers with the official Segond v11n; five of these seven are normalized to different references under NRSV.",
+  "evidence_scope": "Synthetic placeholder-only OSIS reference index probe using osis2mod and diatheke from Ubuntu SWORD 1.9.0; this does not establish that a real Segond 1910 OSIS conversion or completed SWORD module can reproduce original text, notes, styling and indexes.",
+  "real_source_modified": false,
+  "any_biblical_text_published": false,
+  "module_rebuilt_from_actual_scripture": false,
+  "release_approved": false
+}
