@@ -86,3 +86,8 @@ This is also why the current source guard is only one prerequisite: a proper SWO
 - the source validation report is missing, blocked, mismatched, or stale.
 
 The actual SWORD payload still needs the standard metadata, legal review, editorial log, layout validation, and reader smoke test. Existing draft modules are unaffected.
+
+
+## Commentary entry mapping
+
+Commentaries also use the official OSIS XSD, but require a separate check of `<div annotateType="commentary" annotateRef="...">` entries rather than treating them as Bible verses. The policy and its dedicated validator are in [COMMENTARY_POLICY.md](COMMENTARY_POLICY.md). This preserves references, independently authored sections, embedded quotations and intentional formatting, with file-and-line diagnostics for unreviewed annotations. A generic OSIS validation report alone is **not** sufficient to approve a commentary.
