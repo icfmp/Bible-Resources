@@ -180,7 +180,7 @@ def audit_segments(source_root, candidate_root, mapping, source_keys):
         same_text=(same_count and
                    [x["text_sha256"] for x in a]==
                    [x["text_sha256"] for x in b])
-        known_levels=all(x["level"] is not None for x in a+b)
+        known_levels=all(x["level"] is not None for x in (*a,*b))
         same_levels=(same_count and known_levels
                      and [x["level"] for x in a]==[x["level"] for x in b])
         equal_counts+=same_count
