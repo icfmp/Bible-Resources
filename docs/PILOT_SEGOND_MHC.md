@@ -255,3 +255,19 @@ verified after a rebuild. No real Scripture was edited or published.
 The complete actual trial artifacts, including reference counts and
 private text-free hashes, are retained with the successful
 [LSG authored-source fidelity workflow](https://github.com/icfmp/Bible-Resources/actions/runs/42365912858).
+
+### Official SWORD canonical-slot probe (not Scripture conversion)
+
+[The source-verified 7-key `osis2mod` / `diatheke` evidence](evidence/normalizer-3/lsg-versification-canonical-reference-probe.json)
+used only fabricated marker words and the installed SWORD 1.9.0 canonical
+index. Under `NRSV`, querying Exod 7.26–29 resolved to Exod 8.1–4,
+and Ps 3.9 resolved to Ps 4.1. Under `Segond`, all seven original
+source references were returned with their unchanged chapter/verse keys.
+This confirms that `Segond` has the expected **canonical slots** for
+these cases, whereas `NRSV` cannot address them directly.
+
+This is **not yet proof that a compiled real LSG text and its notes will
+survive reconstruction**. The experimental source fixture did not produce
+usable verse-body content, so only the reader's canonical reference headers
+are used as evidence. A complete actual-text import / text and annotation
+round trip must be separately demonstrated before any public resource release.
