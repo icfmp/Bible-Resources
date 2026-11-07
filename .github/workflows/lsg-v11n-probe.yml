@@ -23,7 +23,8 @@ jobs:
       - name: Install SWORD's official compiler
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y libsword-utils >/dev/null
+          sudo apt-get install -y libsword-utils diatheke >/dev/null
+          command -v diatheke
           command -v osis2mod
       - name: Fetch publisher's source references to temporary storage
         run: |
