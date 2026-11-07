@@ -6,7 +6,7 @@ import unittest
 import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
-from lsg_rebuild_trial import _osis_summary,_safe_files
+from lsg_rebuild_trial import _osis_summary,_safe_files,_marker_evidence
 from pilot_preflight import PilotError
 
 NS="http://www.bibletechnologies.net/2003/OSIS/namespace"
@@ -26,6 +26,25 @@ def sample_sources(drop_osis_verse=False):
 
 
 class LSGRebuildTrialTests(unittest.TestCase):
+    def test_editorial_marker_gate_uses_content_ownership_not_opening_position(self):
+        report={
+            "total_source_verse_keys":66,
+            "exact_normalized_word_sequences":66,
+            "matching_verse_note_counts":66,
+            "matching_verse_poetry_line_counts":65,
+            "source_to_candidate_poetry_verse_owned_audit":{
+                "all_poetry_segments_and_levels_verified":True,
+                "all_selah_text_and_verse_positions_verified":True,
+            },
+        }
+        evidence=_marker_evidence(report)
+        self.assertFalse(evidence["legacy_poetry_opening_position_counts_equal"])
+        self.assertTrue(evidence["source_marker_counts_parity"])
+        self.assertFalse(evidence["full_poetry_editorial_layout_approved"])
+        report["source_to_candidate_poetry_verse_owned_audit"][
+            "all_selah_text_and_verse_positions_verified"]=False
+        self.assertFalse(_marker_evidence(report)["source_marker_counts_parity"])
+
     def test_source_key_parity_requires_all_books_and_all_verses(self):
         with tempfile.TemporaryDirectory() as folder:
             path=Path(folder)/"candidate.xml"
