@@ -72,6 +72,28 @@ NEW_CALLER_OUTPUT = (
     '        return f"{opening}{notetext}{tag[1]}"\n'
 )
 
+
+# A bare USFM poetry marker preceding a verse opening is an active paragraph
+# style, not Scripture content. Source example: \q1 + newline + \v 1.
+# u2o's reflow can strand \q1 as literal text after a chapter milestone.
+OLD_POETRY_HEADER_ANCHOR = "def doconvert(text: str, log_level: int) -> tuple[str, ...]:\n"
+NEW_POETRY_HEADER_ANCHOR = r'''def _attach_bare_poetry_before_verse(text: str) -> str:
+    """Keep an empty-line poetry style attached to the following verse.
+
+    Pure converter-input formatting. The original USFM is never rewritten.
+    A marker is joined only if the very next line starts a verse.
+    """
+    return re.sub(
+        r"(?m)^(\\(?:q[1-4]?|qm[1-4]?|qr|qc|qd))[ \t]*\r?\n(?=[ \t]*\\v[ \t]+)",
+        r"\1 ",
+        text,
+    )
+
+
+''' + OLD_POETRY_HEADER_ANCHOR
+OLD_POETRY_INPUT_ANCHOR = "reflow(newtext)"
+NEW_POETRY_INPUT_ANCHOR = "reflow(_attach_bare_poetry_before_verse(newtext))"
+
 class ConverterPatchError(ValueError):
     pass
 
@@ -85,7 +107,8 @@ def patch(source: bytes) -> bytes:
         raise ConverterPatchError("Upstream converter SHA-256 changed: manual review required")
     original=source.decode("utf-8")
     for needle in (OLD_END,OLD_TABLE,OLD_NOTE_SPACE,OLD_POETRY_MOVE,OLD_MULTILINE_MOVE,
-                   OLD_CALLER_IMPORT,OLD_CALLER_CAPTURE,OLD_CALLER_OUTPUT):
+                   OLD_CALLER_IMPORT,OLD_CALLER_CAPTURE,OLD_CALLER_OUTPUT,
+                   OLD_POETRY_HEADER_ANCHOR,OLD_POETRY_INPUT_ANCHOR):
         if original.count(needle)!=1:
             raise ConverterPatchError("Reviewed converter patch anchor is missing or ambiguous")
     converted=(original.replace(OLD_END,NEW_END)
@@ -95,7 +118,9 @@ def patch(source: bytes) -> bytes:
                .replace(OLD_MULTILINE_MOVE,NEW_MULTILINE_MOVE)
                .replace(OLD_CALLER_IMPORT,NEW_CALLER_IMPORT)
                .replace(OLD_CALLER_CAPTURE,NEW_CALLER_CAPTURE)
-               .replace(OLD_CALLER_OUTPUT,NEW_CALLER_OUTPUT))
+               .replace(OLD_CALLER_OUTPUT,NEW_CALLER_OUTPUT)
+               .replace(OLD_POETRY_HEADER_ANCHOR,NEW_POETRY_HEADER_ANCHOR)
+               .replace(OLD_POETRY_INPUT_ANCHOR,NEW_POETRY_INPUT_ANCHOR))
     if converted==original or converted.count("def markintroend(")!=1:
         raise ConverterPatchError("Generic introductory table patch not applied")
     return converted.encode("utf-8")
@@ -112,7 +137,7 @@ def main(argv=None):
     fixed=patch(original)
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_bytes(fixed)
-    print(f"u2o reviewed intro/note/callout/verse-boundary fixes: original SHA-256 {sha(original)}, patched SHA-256 {sha(fixed)}")
+    print(f"u2o reviewed intro/note/callout/poetry/verse-boundary fixes: original SHA-256 {sha(original)}, patched SHA-256 {sha(fixed)}")
     return 0
 
 
