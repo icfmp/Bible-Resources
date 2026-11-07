@@ -64,6 +64,66 @@ def describe_symbol_edits(source: str, generated: str) -> list[dict]:
     return changes
 
 
+
+def _whitespace_gaps(value: str) -> tuple[str, list[str]]:
+    """Align whitespace to non-whitespace characters, without word guessing.
+
+    The non-whitespace sequence remains the exact canonical comparison key;
+    gaps carry only spaces and are indexed at codepoint boundaries.
+    """
+    letters=[]
+    gaps=[]
+    pending=[]
+    for char in value:
+        if char.isspace():
+            pending.append(char)
+        else:
+            gaps.append("".join(pending))
+            pending.clear()
+            letters.append(char)
+    gaps.append("".join(pending))
+    return "".join(letters),gaps
+
+
+def classify_spacing_edits(source: str, candidate: str) -> list[dict]:
+    """Describe positional Unicode whitespace edits without exporting Bible text.
+
+    This explicitly catches a deleted separator BETWEEN letters, a higher-
+    impact rendering change than removing a space adjacent to punctuation.
+    It must not classify non-whitespace differences as editorial spacing.
+    """
+    source_body,source_gaps=_whitespace_gaps(source)
+    target_body,target_gaps=_whitespace_gaps(candidate)
+    if source_body!=target_body:
+        raise ValueError("Cannot classify spacing until Scripture symbols match")
+    edits=[]
+    for position,(left,right) in enumerate(zip(source_gaps,target_gaps)):
+        if left==right:
+            continue
+        if left and not right:
+            action="removed"
+        elif right and not left:
+            action="inserted"
+        else:
+            action="altered"
+        preceding=source_body[position-1] if position else None
+        following=source_body[position] if position<len(source_body) else None
+        def classify(char):
+            if char is None:
+                return "verse_edge"
+            return "alphanumeric" if char.isalnum() else "punctuation_or_symbol"
+        edits.append({
+            "action":action,
+            "left_context":classify(preceding),
+            "right_context":classify(following),
+            "source_whitespace_characters":len(left),
+            "candidate_whitespace_characters":len(right),
+            "source_whitespace_sha256":_hash(left),
+            "candidate_whitespace_sha256":_hash(right),
+            "nonwhitespace_codepoint_position":position,
+        })
+    return edits
+
 STRONG_ID = re.compile(r"^[GH][0-9]+[a-z]?$", re.IGNORECASE)
 
 
@@ -327,6 +387,9 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
     total_source_words=0
     total_osis_words=0
     same_body_except_spaces=Counter()
+    whitespace_edits=Counter()
+    whitespace_books=Counter()
+    first_whitespace_edits=[]
     source_book_stream=defaultdict(list)
     target_book_stream=defaultdict(list)
     for key in all_source_keys:
@@ -360,6 +423,13 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
         target_book_stream[code].append(generated)
         if original != generated and same_symbols:
             same_body_except_spaces["spacing_only_verses"]+=1
+            whitespace_books[code]+=1
+            for edit in classify_spacing_edits(original,generated):
+                kind=(edit["action"],edit["left_context"],edit["right_context"])
+                whitespace_edits[kind]+=1
+                if len(first_whitespace_edits)<80:
+                    first_whitespace_edits.append({
+                        "reference":f"{code}.{chapter}.{verse}",**edit})
         elif original != generated:
             same_body_except_spaces["content_symbols_differ_verses"]+=1
             nonwhitespace_by_book[code]+=1
@@ -449,6 +519,13 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
         "exact_normalized_verse_text_matches":body_equal,
         "verse_text_matches_ignoring_only_unicode_whitespace":no_whitespace_equal,
         "source_to_candidate_text_difference_categories":dict(same_body_except_spaces),
+        "whitespace_edits_by_type":[
+            {"action":kind[0],"left_context":kind[1],
+             "right_context":kind[2],"count":count}
+            for kind,count in sorted(whitespace_edits.items())
+        ],
+        "whitespace_affected_verses_by_book":dict(sorted(whitespace_books.items())),
+        "first_whitespace_edits":first_whitespace_edits,
         "continuous_book_text_matches_ignoring_all_whitespace":{
           code:"".join("".join(x.split()) for x in source_book_stream[code])==
                "".join("".join(x.split()) for x in target_book_stream[code])
