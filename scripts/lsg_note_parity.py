@@ -140,6 +140,9 @@ def _read_note(node, *, usfx: bool, word_index: int) -> dict:
         "target_link_count": target_link_count,
         "word_index": word_index,
         "space_immediately_before_note":before_note_spacing,
+        # Internal-only DOM reference for read-only structural diagnostics.
+        # audit_notes never serializes this element into its public report.
+        "_xml_node":node,
     }
 
 
