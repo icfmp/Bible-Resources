@@ -13,6 +13,8 @@ class LsgTextParityTests(unittest.TestCase):
     def test_usfx_verse_text_and_word_annotations_preserved_while_xrefs_excluded(self):
         xml=b"""<usfx><book id="PSA"><c id="23"/><p>
         <v id="1"/>Cantique de David. <w s="H123">L'Eternel</w> est mon berger:
+        <s level="1">Editorial heading, not part of canonical verse.</s>
+        <r>V.1-13 related passages</r>
         <x><xo>23:1</xo><xt>other reference</xt></x> je ne manquerai de rien.<ve id="1"/>
         <v id="2"/>Il me dirige pres des eaux paisibles.<ve id="2"/>
         </p></book></usfx>"""
@@ -21,6 +23,7 @@ class LsgTextParityTests(unittest.TestCase):
                          "Cantique de David. L'Eternel est mon berger: je ne manquerai de rien.")
         self.assertEqual(features[("PSA",23,1)]["w"],1)
         self.assertEqual(features[("PSA",23,1)]["x"],1)
+        self.assertEqual(features[("PSA",23,1)]["s"],1)
         self.assertEqual(verse[("PSA",23,2)],"Il me dirige pres des eaux paisibles.")
 
     def test_diatheke_chapter_multiple_verses_are_parsed_without_folding_poetry(self):
