@@ -48,6 +48,18 @@ class PoetrySegmentOwnershipTests(unittest.TestCase):
         self.assertEqual(result["candidate_poetry"]["line_nodes_spanning_multiple_verses"],1)
         self.assertTrue(result["all_poetry_segments_and_levels_verified"])
 
+    def test_verses_without_any_poetry_do_not_break_audit(self):
+        src=('<q sfm="q1"><v id="1"/>One<ve id="1"/></q>'
+             '<p><v id="2"/>Plain prose<ve id="2"/></p>')
+        dst=('<lg><l level="1"><verse sID="Gen.1.1"/>One'
+             '<verse eID="Gen.1.1"/></l></lg>'
+             '<p><verse sID="Gen.1.2"/>Plain prose'
+             '<verse eID="Gen.1.2"/></p>')
+        result=audit(src,dst)
+        self.assertEqual(result["matching_verse_line_counts_with_text_ownership"],2)
+        self.assertEqual(result["matching_verse_line_text_sequences_ignoring_whitespace"],2)
+        self.assertEqual(result["matching_verse_line_indentation_levels"],2)
+
     def test_actual_new_line_break_is_not_dismissed(self):
         src=('<q sfm="q1"><v id="1"/>FirstSecond<ve id="1"/></q>')
         dst=('<lg><l level="1"><verse sID="Gen.1.1"/>First</l>'
