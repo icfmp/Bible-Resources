@@ -231,6 +231,22 @@ class EditorialPipelineTests(unittest.TestCase):
         with self.assertRaisesRegex(EditorialError,"exactly once"):
             self.run_plan()
 
+    def test_failed_diff_write_rolls_back_output_without_touching_original(self):
+        self.write('<p>Alpha. Beta.</p>')
+        p=self.p()
+        self.plan({"operation":"split_paragraph","node_path":element_address(p),
+                   "expected_element_sha256":element_hash(p),
+                   "right_starts_with":"Beta.",
+                   "reason":"Printed source verifies paragraph division.",
+                   "source_reference":"Gen.1.1"})
+        original=self.source.read_bytes()
+        blocker=self.root/"blocker"
+        blocker.write_text("not a folder")
+        with self.assertRaises(OSError):
+            self.run_plan(diff=blocker/"private.diff")
+        self.assertFalse(self.output.exists())
+        self.assertEqual(self.source.read_bytes(),original)
+
     def test_existing_output_is_never_overwritten(self):
         self.write('<p>Alpha. Beta.</p>')
         p=self.p()
