@@ -157,16 +157,34 @@ def fetch_direct_conf(provider: dict, module_id: str, conf_filename: str | None 
     return result
 
 
+def reviewed_upstream_reconciliation(link: dict, remote: dict | None) -> dict | None:
+    """Match an explicitly reviewed *exact upstream release*, not PR status.
+
+    SWORD .conf version/hash only identifies the release recorded during manual
+    content review. The scheduled checker does NOT fetch or rehash binaries.
+    """
+    if not remote:
+        return None
+    for entry in link.get("reconciliations", []):
+        if (entry.get("upstream_version") == remote.get("version")
+                and entry.get("upstream_conf_sha256") == remote.get("conf_sha256")):
+            return entry
+    return None
+
+
 def compare_link(link: dict, remote: dict | None) -> str:
     if remote is None:
         return "missing_upstream"
     comparison = version_cmp(remote.get("version"), link["last_integrated_version"])
     if comparison is None:
         return "needs_review"
-    if comparison > 0:
-        return "upstream_update_available"
     if comparison < 0:
         return "upstream_older_than_baseline"
+    reconciliation = reviewed_upstream_reconciliation(link, remote)
+    if reconciliation and reconciliation.get("result") == "equivalent_to_curated":
+        return "our_contribution_returned_upstream"
+    if comparison > 0:
+        return "upstream_update_available"
     if link.get("last_integrated_conf_sha256") and link["last_integrated_conf_sha256"] != remote["conf_sha256"]:
         return "upstream_metadata_changed"
     return "up_to_date"
@@ -227,6 +245,31 @@ def check(providers: list[dict], manifests: list[dict], installed: dict,
                 item["status"] = compare_link(link, remote)
             item["upstream_version"] = remote.get("version") if remote else None
             item["upstream_conf_sha256"] = remote.get("conf_sha256") if remote else None
+            contributions = link.get("contributions", [])
+            if contributions:
+                item["our_contributions"] = [
+                    {"url": c["url"], "state": c["state"]}
+                    for c in contributions
+                ]
+            reconciliation = reviewed_upstream_reconciliation(link, remote)
+            if reconciliation and item["status"] not in {
+                "upstream_unavailable", "provider_disabled_or_unknown", "upstream_older_than_baseline"
+            }:
+                item["reviewed_reconciliation"] = {
+                    "result": reconciliation["result"],
+                    "contribution_url": reconciliation["contribution_url"],
+                    "evidence_url": reconciliation["evidence_url"],
+                    "reviewed_by": reconciliation["reviewed_by"],
+                    "review_scope": "recorded_exact_upstream_version_and_conf",
+                }
+            if (item["status"] in {"upstream_update_available", "upstream_metadata_changed"}
+                    and any(c.get("state") in {"accepted", "released"} for c in contributions)):
+                item["possible_return_of_our_contribution"] = True
+                item["review_required"] = True
+            if reconciliation and reconciliation.get("result") == "contains_other_changes":
+                # Our change may be present, but all additional changes still
+                # need ordinary edition/source/rights/fidelity review.
+                item["review_required"] = True
             row["upstreams"].append(item)
         rows.append(row)
     return {
