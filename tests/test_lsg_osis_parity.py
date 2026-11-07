@@ -5,7 +5,7 @@ import unittest
 import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
-from lsg_osis_parity import compare, _source_words, describe_symbol_edits
+from lsg_osis_parity import compare, _source_words, describe_symbol_edits, classify_spacing_edits
 
 NS="http://www.bibletechnologies.net/2003/OSIS/namespace"
 
@@ -115,6 +115,22 @@ class FullSourceOsisParityTests(unittest.TestCase):
         self.assertTrue(any(x["generated_alphanumeric"]>0 for x in changed))
         self.assertNotIn("betta",str(changed))
         self.assertNotIn("beta",str(changed))
+
+    def test_whitespace_edits_are_positionally_classified_without_words(self):
+        edits=classify_spacing_edits("Au commencement", "Aucommencement")
+        self.assertEqual(len(edits),1)
+        self.assertEqual(edits[0]["action"],"removed")
+        self.assertEqual(edits[0]["left_context"],"alphanumeric")
+        self.assertEqual(edits[0]["right_context"],"alphanumeric")
+        self.assertNotIn("commencement",str(edits))
+        punct=classify_spacing_edits("Alpha, beta.", "Alpha,beta.")
+        self.assertEqual(len(punct),1)
+        self.assertEqual(punct[0]["left_context"],"punctuation_or_symbol")
+        self.assertEqual(punct[0]["right_context"],"alphanumeric")
+        self.assertEqual(classify_spacing_edits("One  two", "One two")[0]["action"],"altered")
+        self.assertEqual(classify_spacing_edits("identique", "identique"),[])
+        with self.assertRaisesRegex(ValueError,"Scripture symbols match"):
+            classify_spacing_edits("test A","test B")
 
     def test_note_and_section_heading_words_are_not_verse_words(self):
         # USFX plain-verse extraction already excludes editorial subtrees.
