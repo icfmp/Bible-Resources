@@ -6,7 +6,7 @@ import sys
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
-from lsg_sword_rebuild import compile_candidate,SAMPLES
+from lsg_sword_rebuild import compile_candidate,SAMPLES,PUBLISHER_V11N
 
 
 class LSGSegondRebuildTests(unittest.TestCase):
@@ -22,7 +22,7 @@ class LSGSegondRebuildTests(unittest.TestCase):
           "#!/usr/bin/env python3\n"
           "from pathlib import Path\n"
           "import sys\n"
-          "assert sys.argv[-2:]==['-v','Segond']\n"
+          "assert sys.argv[-2:]==['-v','NRSV']\n"
           "Path(sys.argv[1],'ot').write_bytes(b'NON_BIBLICAL_TEST_DATA')\n")
         self.compiler.chmod(0o700)
         self.reader.write_text(
@@ -43,6 +43,8 @@ class LSGSegondRebuildTests(unittest.TestCase):
         self.assertEqual(r["status"],"actual_text_module_compiled_and_samples_read_not_approved")
         self.assertEqual(len(r["reader_probes"]),len(SAMPLES))
         self.assertTrue(r["all_sample_keys_have_text"])
+        self.assertEqual(r["versification"],"NRSV")
+        self.assertEqual(PUBLISHER_V11N,"NRSV")
         self.assertTrue(r["source_file_unchanged"])
         self.assertFalse(r["approved_for_publication"])
         self.assertEqual(self.source.read_bytes(),original)
