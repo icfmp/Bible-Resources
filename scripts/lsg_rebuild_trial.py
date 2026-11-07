@@ -11,6 +11,7 @@ import argparse
 from collections import Counter
 import hashlib
 import json
+import os
 from pathlib import Path, PurePosixPath
 import re
 import subprocess
@@ -60,6 +61,34 @@ def _safe_files(usfm_zip: Path, destination: Path) -> list[Path]:
     if len(files)!=66:
         raise PilotError(f"Source USFM must contain exactly 66 books, found {len(files)}")
     return sorted(files)
+
+
+
+def _debug_usfm_verse_markers(files: list[Path]) -> None:
+    """Emit a few bounded public-domain authoring snippets to CI logs only.
+
+    No raw USFM is included in the JSON report, artifacts or repository.
+    Match chapters and verse openings rather than guessing from content.
+    """
+    targets={("GEN",29,14),("DEU",32,6),("JOB",4,11),
+             ("ISA",25,2),("ACT",13,35)}
+    for file in files:
+        content=file.read_text(encoding="utf-8-sig")
+        match=re.search(r"(?m)^\\id\s+([A-Z0-9]{3})\b",content)
+        if match is None:
+            continue
+        book=match.group(1)
+        if not any(item[0]==book for item in targets):
+            continue
+        chapter=None
+        for marker in re.finditer(r"(?m)^[ \t]*\\(c|v)\s+(\d+)\b",content):
+            if marker.group(1)=="c":
+                chapter=int(marker.group(2))
+            elif chapter is not None:
+                key=(book,chapter,int(marker.group(2)))
+                if key in targets:
+                    snippet=content[max(0,marker.start()-75):marker.start()+260]
+                    print("USFM_SOURCE_MARKER_SAMPLE",f"{book}.{chapter}.{key[2]}",repr(snippet))
 
 
 def _original_usfm_intro_markers(archive: Path, target_id: str) -> dict:
@@ -255,6 +284,8 @@ def run(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) -> dict:
     with tempfile.TemporaryDirectory(prefix="bible-lsg-real-import-") as tmp:
         root=Path(tmp)
         usfm_files=_safe_files(usfm_zip,root/"usfm")
+        if os.getenv("LSG_SAMPLE_DEBUG")=="1":
+            _debug_usfm_verse_markers(usfm_files)
         candidate=root/"candidate.osis.xml"
         command=[sys.executable,str(converter),"Bible.fraLSG1910eb",
                  "-l","fr","-x","-o",str(candidate),*map(str,usfm_files)]
