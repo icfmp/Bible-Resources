@@ -20,6 +20,7 @@ import tempfile
 import zipfile
 
 from pilot_preflight import ROOT, inspect_archive, PilotError
+from pilot_subprocess import query, present_key
 
 USFM_MARKER = re.compile(r"\\(id|c|v|p|m|q[1-9]?|s[1-9]?|f|x)\b")
 # These labels are *heuristic* output-format signals; the 'internal' format
@@ -93,20 +94,17 @@ def scan_sword_entries(pilot: str, archive_path: Path, *,
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 with archive.open(name) as input_file, destination.open("xb") as output_file:
                     shutil.copyfileobj(input_file, output_file, length=262144)
-        env = dict(os.environ, SWORD_PATH=str(root))
         for key in conf["sample_references"]:
-            proc = subprocess.run(
-                [exe, "-b", conf["module_id"], "-k", key, "-f", "internal"],
-                capture_output=True, check=False, timeout=30, env=env,
+            return_code, data = query(
+                conf["module_id"], key, fmt="internal", root=root, exe=exe
             )
-            # Do NOT emit raw text or stderr: these may contain the entire
-            # entry. Hash only and report a boolean check for accessible keys.
-            data = proc.stdout
+            # Do NOT emit raw text or stderr. A single key must not trigger
+            # an unbounded full-module dump; query() enforces the limit.
             decoded = data.decode("utf-8", errors="replace")
             samples.append({
                 "reference": key,
-                "successful": proc.returncode == 0 and bool(data.strip()),
-                "return_code": proc.returncode,
+                "successful": present_key(key, data, return_code),
+                "return_code": return_code,
                 "bytes": len(data),
                 "sha256": hashlib.sha256(data).hexdigest(),
                 "render_markup_signal_counts": {
