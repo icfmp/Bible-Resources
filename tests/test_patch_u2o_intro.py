@@ -94,6 +94,14 @@ def doconvert(text: str, log_level: int) -> tuple[str, ...]:
     newtext=text
     return (reflow(newtext),)
 '''
+
++ '''
+def final_note_spacing(text):
+    return (
+        text
+''' + module.OLD_NOTE_SPACE_RESTORE +
+'''    )
+'''
 ).encode("utf-8")
 
 
@@ -216,6 +224,38 @@ class U2OIntroTests(unittest.TestCase):
                          .count("\n"),0)
         self.assertIn("\n\\p Prose",
                       after["doconvert"]("\\c 5  \n\\p Prose",0)[0])
+
+
+    def test_note_spacing_sentinel_survives_strip_and_restores_original_separator(self):
+        source=SOURCE
+        with mock_patch.object(module,"EXPECTED_UPSTREAM_SHA256",
+                               hashlib.sha256(source).hexdigest()):
+            reviewed=module.patch(source)
+        before,after={},{}
+        exec(compile(source,"note-space-original.py","exec"),before)
+        exec(compile(reviewed,"note-space-reviewed.py","exec"),after)
+        raw="\\v 1 <w>sera</w> \\x f \\xo 1.1 \\xt Ps 1:1.\\x*<w>vengé</w>"
+        before_conversion=before["doconvert"](raw,0)[0]
+        guarded_conversion=after["doconvert"](raw,0)[0]
+        self.assertNotIn("\\ue000",before_conversion)
+        self.assertIn("\\ue000",guarded_conversion)
+        # Simulate a converter stage that trims normal ASCII whitespace
+        # before a note marker. The protected separator must survive it.
+        trim=lambda text:text.replace(" \\\\x", "\\\\x")
+        self.assertNotIn("<w>sera</w> \\\\x",trim(before_conversion))
+        final=after["final_note_spacing"](trim(guarded_conversion))
+        self.assertIn("<w>sera</w> \\\\x",final)
+        self.assertNotIn("\\ue000",final)
+        # Preserve notes with no original separating space unchanged.
+        raw_attached="Text\\\\x f \\\\xo 1.1 \\\\xt Ref\\\\x*next"
+        output=after["final_note_spacing"](after["doconvert"](raw_attached,0)[0])
+        self.assertEqual(output,raw_attached)
+        # Distinct authorial spacing is not silently normalized away.
+        spaced="Text  \\\\x f \\\\xo 1.1 \\\\xt Ref\\\\x*next"
+        self.assertEqual(after["final_note_spacing"](
+            after["doconvert"](spaced,0)[0]),spaced)
+        with self.assertRaisesRegex(ValueError,"reserved note-space marker"):
+            after["doconvert"]("Text\\ue000\\\\x f \\\\xo 1.1 \\\\xt Ref\\\\x*",0)
 
     def test_upstream_sha_change_fails_closed(self):
         with self.assertRaisesRegex(module.ConverterPatchError,"SHA-256 changed"):
