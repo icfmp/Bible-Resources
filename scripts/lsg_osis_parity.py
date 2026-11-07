@@ -394,7 +394,32 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
         )
         if unchanged_symbol_stream!=len(all_source_keys):
             raise PilotError("Dry-run spaces must not change any Scripture symbol")
+        # A source-bound note-space model may still leave unrelated losses.
+        # Keep a bounded residual list (references, classes, hashes only).
+        residual_refs=[]
+        residual_types=Counter()
+        residual_books=Counter()
+        for book,chapter,verse in all_source_keys:
+            key=(book,chapter,verse)
+            rendered=modeled_text[f"{mapping[book]}.{chapter}.{verse}"]
+            original=source_body[key]
+            if original==rendered:
+                continue
+            residual_books[book]+=1
+            if len(residual_refs)<80:
+                residual_refs.append(f"{book}.{chapter}.{verse}")
+            for edit in classify_spacing_edits(original,rendered):
+                residual_types[(edit["action"],edit["left_context"],
+                                edit["right_context"])]+=1
         note_space_model.update({
+            "remaining_spaced_text_mismatches_by_book":
+                dict(sorted(residual_books.items())),
+            "remaining_spaced_text_mismatch_verse_refs":residual_refs,
+            "remaining_spaced_text_edit_classes":[
+                {"action":cat[0],"left_context":cat[1],
+                 "right_context":cat[2],"count":count}
+                for cat,count in sorted(residual_types.items())
+            ],
             "status":"simulated_and_compared_without_writing_candidate",
             "source_verse_text_matches_after_model":modeled_matches,
             "total_source_verse_keys":len(all_source_keys),
