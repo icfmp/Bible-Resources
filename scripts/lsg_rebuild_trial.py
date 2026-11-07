@@ -91,6 +91,27 @@ def _debug_usfm_verse_markers(files: list[Path]) -> None:
                     print("USFM_SOURCE_MARKER_SAMPLE",f"{book}.{chapter}.{key[2]}",repr(snippet))
 
 
+
+def _debug_converted_verse_markup(path: Path) -> None:
+    """Show bounded, opt-in OSIS fragments only in temporary CI logs.
+
+    These are public-domain pilot excerpts to explain verse boundaries; no
+    XML or biblical text is written to GitHub artifacts or source control.
+    """
+    xml=path.read_text(encoding="utf-8")
+    for reference in ("Acts.13.35","Heb.2.13","1Pet.4.8",
+                      "Isa.25.2","Jer.26.18"):
+        marker=f'sID="{reference}"'
+        index=xml.find(marker)
+        if index<0:
+            print("OSIS_VERSE_MARKUP_SAMPLE",reference,"missing_opening_marker")
+            continue
+        opening=xml.rfind("<verse",0,index)
+        start=max(0,opening-80)
+        excerpt=xml[start:min(len(xml),index+650)]
+        print("OSIS_VERSE_MARKUP_SAMPLE",reference,repr(excerpt))
+
+
 def _original_usfm_intro_markers(archive: Path, target_id: str) -> dict:
     """Find introductory source markers without exposing their text."""
     with zipfile.ZipFile(archive) as source:
@@ -308,6 +329,8 @@ def run(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) -> dict:
             report["jhn_source_intro_diagnostic"]=_original_usfm_intro_markers(usfm_zip,"JHN")
             return report
         report["osis_schema"]=_schema_proof(candidate,schema)
+        if os.getenv("LSG_SAMPLE_DEBUG")=="1":
+            _debug_converted_verse_markup(candidate)
         report["source_to_generated_osis"]=compare_osis(candidate,original_xml)
         # Real, disposable diagnostic compilation is allowed only after the
         # full original OSIS document passes both the official pinned XSD
