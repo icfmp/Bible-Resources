@@ -57,6 +57,16 @@ To check a local installation: `python scripts/check_updates.py --installed-root
 
 **Duplicate upstream editions:** the operational source order is CrossWire → eBible → STEP → AndBible → AndBible Extra. Only *verified same-edition* aliases are automatically consolidated; possible matches block import for human identity review. Run `python scripts/select_sources.py --report-only --output reports/source-selection.json`. This is a read-only candidate report; the future importer is not yet connected. See [SWORD source priority and deduplication](docs/SOURCE_PRIORITY.md).
 
+## LSG + full MHC pilot (manual, read-only)
+
+The preparation scripts and manual GitHub Actions workflow are described in
+[pilot #1](docs/PILOT_SEGOND_MHC.md). The registered `lsg` source is
+eBible `fraLSG1910eb`; `mhc` means CrossWire **full MHC**, not
+`MHCC`. The preflight checks ZIP safety, source hashes, SWORD metadata
+and representative `diatheke` keys **without publishing or normalizing
+any module**. The separate official OSIS schema probe records provenance
+but does not approve the schema by itself.
+
 ## GitHub Pages and branch rules
 
 For repository creation, push, Pages activation and branch rules, see [INSTALLATION_FR.md](INSTALLATION_FR.md). The source repository is live at https://github.com/icfmp/Bible-Resources. GitHub Pages must be activated in the repository Settings before the public catalogue endpoint will work.
