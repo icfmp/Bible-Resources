@@ -55,7 +55,7 @@ To enable the official schema:
 Then run (the XSD is supplied locally, not fetched by the tool):
 
     python scripts/guard_osis.py path/to/original.osis.xml \
-      --schema path/to/reviewed/osisCore.2.1.1-cw-latest.xsd \
+      --schema /tmp/reviewed-osis/osisCore.2.1.1-cw-latest.xsd \
       --report path/to/SOURCE_VALIDATION.json
 
 The command returns exit code **0** on success and **1** on a stop condition. A blocked report replaces any prior success report so CI cannot misread a stale result.
