@@ -80,6 +80,7 @@ For repository creation, push, Pages activation and branch rules, see [INSTALLAT
 - [Reversible editorial source audit and normalizer](docs/EDITORIAL_AUDIT_WORKFLOW.md)
 - [Quality policy](docs/QUALITY_POLICY.md)
 - [Editorial rules](docs/EDITORIAL_RULES.md)
+- [Resource presentation and evidence-backed strengths/cautions](docs/RESOURCE_PROFILES.md)
 - [Strict OSIS source normalization contract](docs/NORMALIZATION_POLICY.md)
 - [Strict commentary annotation and reference rules](docs/COMMENTARY_POLICY.md)
 - [SWORD and metadata conventions](docs/FORMATS.md)
