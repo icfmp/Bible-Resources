@@ -61,6 +61,46 @@ jobs:
             --usfx-zip "${{ runner.temp }}/lsg/usfx.zip" \
             --report reports/lsg-usfx-sword-verse-parity.json \
             --full
+      - name: Diagnose first actual per-book differences (temporary public-domain excerpts)
+        run: |
+          python - <<'PY'
+          import json,shutil,sys,tempfile,zipfile
+          from pathlib import Path,PurePosixPath
+          sys.path.insert(0,'scripts')
+          from lsg_source_compare import read_source_xml
+          from lsg_sword_compare import usfx_text_by_verse,parse_sword_chapter
+          from pilot_preflight import inspect_archive
+          from pilot_subprocess import query
+          home=Path('${{ runner.temp }}/lsg')
+          report=json.loads(Path('reports/lsg-usfx-sword-verse-parity.json').read_text())
+          targets={}
+          for row in report['sample_chapters']:
+              if row['different_normalized_text'] and row['source_book'] not in targets:
+                  targets[row['source_book']]=(row['source_chapter'],row['sword_key'])
+          raw,_=read_source_xml(home/'usfx.zip',source_format='usfx')
+          authored,_=usfx_text_by_verse(raw,filter_books=set(targets))
+          inspected=inspect_archive(home/'sword.zip',source_kind='sword',
+              expected_module_id='fraLSG1910eb',expected_category='bible')
+          with tempfile.TemporaryDirectory(prefix='lsg-diagnostics-') as d:
+              root=Path(d)
+              with zipfile.ZipFile(home/'sword.zip') as z:
+                  for item in inspected['members']:
+                      name=item['name']
+                      if name.endswith('/'):continue
+                      target=root/PurePosixPath(name)
+                      target.parent.mkdir(parents=True,exist_ok=True)
+                      with z.open(name) as src,target.open('xb') as out:
+                          shutil.copyfileobj(src,out,length=262144)
+              for book,(chapter,key) in targets.items():
+                  ret,data=query('fraLSG1910eb',key,fmt='plain',root=root,exe='diatheke')
+                  parsed=parse_sword_chapter(data,chapter,'fraLSG1910eb')
+                  source={v:txt for (b,c,v),txt in authored.items() if b==book and c==chapter}
+                  mismatch=next((v for v in sorted(set(source)&set(parsed)) if source[v]!=parsed[v]),None)
+                  if mismatch is not None:
+                      print('FIRST-MISMATCH',book,chapter,mismatch,
+                            'SOURCE',repr(source[mismatch][:270]),
+                            'SWORD',repr(parsed[mismatch][:270]))
+          PY
       - name: Upload only the text-free diagnostic report
         if: always()
         uses: actions/upload-artifact@v4
