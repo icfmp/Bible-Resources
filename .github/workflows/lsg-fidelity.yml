@@ -1,0 +1,62 @@
+name: LSG authored-source fidelity pilot
+on:
+  pull_request:
+    paths:
+      - 'scripts/lsg_source_compare.py'
+      - '.github/workflows/lsg-fidelity.yml'
+      - 'scripts/lsg_sword_compare.py'
+      - 'tests/test_lsg_source_compare.py'
+      - 'tests/test_lsg_sword_compare.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  lsg:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install source parsers
+        run: python -m pip install -r requirements.txt
+      - name: Download the signed-off publisher source files to temporary storage
+        run: |
+          mkdir -p "${{ runner.temp }}/lsg"
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from pilot_fetch import fetch
+          target=Path('${{ runner.temp }}/lsg')
+          for key,url in [
+              ('osis','https://ebible.org/Scriptures/fraLSG_osis.zip'),
+              ('usfm','https://ebible.org/Scriptures/fraLSG_usfm.zip')]:
+              result=fetch(url,target/(key+'.zip'),'lsg')
+              print(key, result['bytes'], result['sha256'])
+          PY
+      - name: Verify offline pinned official CrossWire and W3C schemas
+        run: python scripts/fetch_reviewed_schema.py --directory "${{ runner.temp }}/reviewed-osis"
+      - name: Compare the original LSG USFM/OSIS structures
+        run: |
+          python scripts/lsg_source_compare.py \
+            --osis-zip "${{ runner.temp }}/lsg/osis.zip" \
+            --usfm-zip "${{ runner.temp }}/lsg/usfm.zip" \
+            --schema-dir "${{ runner.temp }}/reviewed-osis" \
+            --report reports/lsg-authoring-structure.json
+      - name: Upload only the text-free diagnostic report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lsg-authoring-fidelity-report
+          path: reports/lsg-authoring-structure.json
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Summary
+        if: always()
+        run: |
+          echo '## Louis Segond 1910 source comparison' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Private publisher ZIPs were held only in runner temporary storage.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'The uploaded JSON records book/verse structure and XSD compatibility, never Bible text.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'No module was rewritten or published.' >> "$GITHUB_STEP_SUMMARY"
