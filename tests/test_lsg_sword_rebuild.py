@@ -27,8 +27,13 @@ class LSGSegondRebuildTests(unittest.TestCase):
         self.compiler.chmod(0o700)
         self.reader.write_text(
           "#!/usr/bin/env python3\n"
-          "import sys\n"
+          "import os,sys\n"
+          "from pathlib import Path\n"
           "assert sys.argv[5]=='-k'\n"
+          "conf=(Path(os.environ['SWORD_PATH'])/'mods.d/fralsg1910eb.conf').read_text()\n"
+          "for feature in ('OSISLemma','OSISStrongs','OSISFootnotes',"
+          "'OSISScripref','OSISHeadings'):\n"
+          "    assert 'GlobalOptionFilter='+feature+'\\n' in conf\n"
           "print(sys.argv[-1]+': Synthetic words')\n")
         self.reader.chmod(0o700)
 
