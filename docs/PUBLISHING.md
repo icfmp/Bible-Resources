@@ -4,3 +4,6 @@ Every pull request must pass automated schema and file validation. Human editori
 
 
 Before changing a module to approved, ensure its original source was checked by a schema-pinned standards validator and the corresponding `SOURCE_VALIDATION.json` exists for the reviewed policy version. A missing or stale report blocks `scripts/validate.py`, and therefore the published catalogue. A source gate result is not itself permission to republish or a proof that a compiled binary round-trips faithfully.
+
+
+OSIS commentaries require an additional `guard_commentary.py` review of official `annotateType` / `annotateRef` mappings. A successful generic XML/OSIS check does **not** qualify as reviewed commentary source provenance; the commentary-specific policy checksum and annotation proof must match. No source text, embedded Bible quotation, heading, or annotation target may be silently dropped.
