@@ -40,6 +40,35 @@ class Tests(unittest.TestCase):
         text="\n".join("> **1** Verse" for _ in range(6))
         self.assertIn("scripture_block_candidate",[x["type"] for x in audit(text)])
         self.assertEqual(len(text.splitlines()),6)
+    def test_approved_modules_need_canonical_edition(self):
+        self.m["quality"]["status"] = "approved"
+        self.m["rights"]["redistribution_allowed"] = True
+        self.create()
+        errors = validate(self.root)[1]
+        self.assertTrue(any("canonical_edition_id" in e for e in errors))
+
+    def test_no_duplicate_canonical_edition_variant_in_catalogue(self):
+        self.m["quality"]["status"] = "approved"
+        self.m["rights"]["redistribution_allowed"] = True
+        self.m["canonical_edition_id"] = "matthew-henry-en-concise-verified"
+        self.create()
+        self.m = dict(self.m, id="second-copy", sword_id="OtherCom")
+        self.create()
+        errors = validate(self.root)[1]
+        self.assertTrue(any("duplicate curated edition variant" in e for e in errors))
+
+    def test_same_canonical_edition_can_have_separate_reading_variant(self):
+        self.m["quality"]["status"] = "approved"
+        self.m["rights"]["redistribution_allowed"] = True
+        self.m["canonical_edition_id"] = "matthew-henry-en-concise-verified"
+        self.create()
+        self.m = dict(self.m, id="optimized-copy", sword_id="OtherCom")
+        self.m["quality"] = dict(self.m["quality"], edition="reader_optimized")
+        self.m["rights"] = dict(self.m["rights"], derivatives_allowed=True)
+        self.create()
+        errors = validate(self.root)[1]
+        self.assertFalse(any("duplicate curated edition variant" in e for e in errors))
+
     def test_identical_build(self):
         build(self.root,self.root/"dist","https://example.org/")
         one=(self.root/"dist/sword/mods.d.tar.gz").read_bytes()
