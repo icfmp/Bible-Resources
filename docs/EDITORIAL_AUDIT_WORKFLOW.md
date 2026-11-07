@@ -110,6 +110,14 @@ keys, operations, diffs and proof hashes. The source file is the rollback;
 it must remain available with its checksum. The unified diff contains
 copyrightable text: **keep it private** until cleared for publication.
 
+The repository's publication validator now rejects an approved
+`reader_optimized` Bible or commentary unless the module includes
+`NORMALIZATION_REPORT.json` with verified checksums, approved structural
+operations, the recorded reviewer assertion, and an output checksum matching
+the separately checked `SOURCE_VALIDATION.json`. If an approved `faithful`
+edition declares any structural change report, it is validated under the
+same rules. An unchanged faithful original requires no edit report.
+
 This is NOT sufficient to publish a new SWORD module. The later source-to-
 compiled module round-trip, SWORD versification/index review, complete
 source notes and reference correspondence, Bible GTK visual inspection,
