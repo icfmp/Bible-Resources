@@ -44,7 +44,7 @@ def read_source_xml(archive_path: Path) -> tuple[bytes, dict]:
         if not candidate_names:
             raise PilotError("No XML/USFX/OSIS source in registered publisher archive")
         if len(candidate_names) != 1:
-            raise PilotError("Multiple XML authoring source candidates; manual selection required")
+            raise PilotError(f"Multiple XML authoring sources ({len(candidate_names)}): {candidate_names[:20]!r}; explicit file-selection rule needed")
         name = candidate_names[0]
         info = z.getinfo(name)
         if info.file_size > MAX_SOURCE_BYTES:
