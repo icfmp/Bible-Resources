@@ -67,6 +67,31 @@ def _malformed_xml_diagnostic(path: Path, exc: etree.XMLSyntaxError) -> dict:
     # the temporary runner.
     lines=path.read_text(encoding="utf-8",errors="replace").splitlines()
     near=[]
+    # Diagnose a structural converter problem without copying any Scripture.
+    # This is a simple tag-stack *diagnostic* only; never repairs XML.
+    div_events=[]
+    stack=[]
+    orphan=[]
+    for n, raw_line in enumerate(lines[:line+1],1):
+        for match in re.finditer(r"<(/?)div\\b([^>]*)>",raw_line):
+            closing, raw_attrs=match.groups()
+            if closing:
+                before=len(stack)
+                prior=stack.pop() if stack else None
+                div_events.append({"line":n,"event":"close",
+                                   "opens_before":before,"matching_open":prior})
+                if not prior:
+                    orphan.append(n)
+            else:
+                kind=re.search(r'\\btype="([^"]{1,60})"',raw_attrs)
+                osis_id=re.search(r'\\bosisID="([^"]{1,50})"',raw_attrs)
+                record={"line":n,"type":kind[1] if kind else "",
+                        "osis_id":osis_id[1] if osis_id else ""}
+                stack.append(record)
+                div_events.append({"line":n,"event":"open","node":record,
+                                   "opens_after":len(stack)})
+        if len(div_events)>25:
+            div_events=div_events[-25:]
     for n in range(max(1,line-12),min(len(lines),line+12)+1):
         tags=re.findall(r"<\s*(/?)\s*([A-Za-z][A-Za-z0-9:_-]*)\b",lines[n-1])
         if tags:
@@ -75,6 +100,9 @@ def _malformed_xml_diagnostic(path: Path, exc: etree.XMLSyntaxError) -> dict:
         "line":line,"column":int(exc.position[1]),
         "error_kind":"misnested_or_malformed_XML",
         "nearby_element_names_only":near,
+        "last_div_events":div_events[-25:],
+        "first_orphan_div_close":orphan[0] if orphan else None,
+        "current_div_stack_tail":stack[-10:],
         "source_xml_sha256":_sha(path.read_bytes()),
         "corrective_action":"review_converter_and_original_USFM_not_silent_XML_recovery",
     }
