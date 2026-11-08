@@ -24,6 +24,7 @@ on:
       - 'scripts/lsg_source_v11n_delta.py'
       - 'scripts/lsg_ephemeral_osis_candidate.py'
       - 'scripts/lsg_dynamic_sword_trial.py'
+      - 'scripts/sword_raw_markup_counts.cpp'
       - 'tests/test_lsg_source_v11n_delta.py'
       - 'tests/test_lsg_ephemeral_osis_candidate.py'
       - 'scripts/sword_v11n_ceilings.cpp'
@@ -98,12 +99,20 @@ jobs:
           cmake --install "${{ runner.temp }}/sword-build" >/dev/null
           test -x "${{ runner.temp }}/sword-head-install/bin/osis2mod"
           test -x "${{ runner.temp }}/sword-head-install/bin/diatheke"
+          prefix="${{ runner.temp }}/sword-head-install"
+          g++ -std=c++17 -O2 -Wall -Wextra \
+            -I"$prefix/include" -I"$prefix/include/sword" \
+            scripts/sword_raw_markup_counts.cpp \
+            -L"$prefix/lib" -lsword \
+            -o "${{ runner.temp }}/sword-raw-markup-inspector"
+          test -x "${{ runner.temp }}/sword-raw-markup-inspector"
       - name: Test complete source conversion; no full Scripture module committed, uploaded or published
         env:
           LSG_SAMPLE_DEBUG: '0'
           LSG_COMPARE_CALVIN_V11N: '0'
           LSG_V11N_CEILINGS_BIN: ${{ runner.temp }}/sword-v11n-ceilings
           LSG_SWORD_HEAD_PREFIX: ${{ runner.temp }}/sword-head-install
+          LSG_SWORD_RAW_INSPECTOR: ${{ runner.temp }}/sword-raw-markup-inspector
         run: |
           python scripts/lsg_rebuild_trial.py \
             --usfm-zip "${{ runner.temp }}/original/usfm.zip" \
