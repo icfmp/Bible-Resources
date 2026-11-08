@@ -160,15 +160,76 @@ def proof_errors(module_directory: Path, versification: str,
     if not isinstance(data, dict):
         return [f"{path}: [SWORD_COMPATIBILITY_INVALID] Expected object"]
     errors = []
-    if (data.get("status") != "stable_reference_index_verified"
-            or data.get("exact_reference_key_parity") is not True
-            or data.get("outside_registered_versification_count") != 0
-            or data.get("source_references_unreachable_count") != 0
-            or data.get("unexpected_populated_reader_references_count") != 0
-            or type(data.get("source_reference_count")) is not int
-            or data["source_reference_count"] < 1
-            or data.get("source_reference_count") != data.get("resolved_reader_reference_count")):
-        errors.append(f"{path}: [SWORD_INDEX_NOT_VERIFIED] Full source-versus-reader key equality required")
+    exact_mode = (
+        data.get("status") == "stable_reference_index_verified"
+        and data.get("exact_reference_key_parity") is True
+        and data.get("outside_registered_versification_count") == 0
+        and data.get("source_references_unreachable_count") == 0
+        and data.get("unexpected_populated_reader_references_count") == 0
+        and type(data.get("source_reference_count")) is int
+        and data["source_reference_count"] > 0
+        and data.get("source_reference_count") == data.get("resolved_reader_reference_count")
+        and data.get("reviewed_merge_count",0) == 0
+    )
+    merged_mode = data.get("status") == "stable_reference_index_verified_with_reviewed_merges"
+    if merged_mode:
+        approved = data.get("reviewed_merges")
+        count = data.get("reviewed_merge_count")
+        good_count = (
+            isinstance(approved,list) and 0 < len(approved) <= 200
+            and type(count) is int and count == len(approved)
+            and type(data.get("source_reference_count")) is int
+            and data["source_reference_count"] > count
+            and data.get("resolved_reader_reference_count")
+                == data["source_reference_count"] - count
+            and data.get("source_references_unreachable_count") == count
+            and data.get("outside_registered_versification_count") == count
+            and data.get("unexpected_populated_reader_references_count") == 0
+            and data.get("reviewed_index_compromise_verified") is True
+            and data.get("exact_reference_key_parity") is False
+        )
+        if not good_count:
+            errors.append(f"{path}: [SWORD_MERGE_INDEX_UNVERIFIED] Indexed merge count or reader keys mismatch")
+        if (data.get("full_source_chapter_character_streams_verified") is not True
+                or type(data.get("full_readback_chapter_count")) is not int
+                or data.get("full_readback_chapter_count") < 1
+                or not isinstance(data.get("full_readback_evidence_sha256"),str)
+                or not SHA.fullmatch(data["full_readback_evidence_sha256"])):
+            errors.append(f"{path}: [SWORD_MERGED_BODY_UNVERIFIED] Full independent body readback required")
+        policy_path = module_directory / "SOURCE_REFERENCE_MERGES.json"
+        try:
+            if (policy_path.is_symlink() or not policy_path.is_file()
+                    or policy_path.stat().st_size > 100_000):
+                raise ValueError("unsafe or missing source-bound approval policy")
+            raw = policy_path.read_bytes()
+            policy = json.loads(raw)
+            hashval = hashlib.sha256(raw).hexdigest()
+            if (not isinstance(policy,dict)
+                or policy.get("schema_version") != 1
+                or policy.get("versification") != versification
+                or not isinstance(policy.get("source_document_sha256"),str)
+                or not SHA.fullmatch(policy["source_document_sha256"])
+                or policy.get("authorization",{}).get("who")
+                    != "Bible Resources project owner"
+                or policy.get("policy")
+                    != "approved_explicit_temporary_adjacent_verse_index_merge"
+                or not isinstance(policy.get("allowed_merges"),list)):
+                raise ValueError("invalid approved-merge policy metadata")
+            expected = sorted(
+                (e["osis_source_key"],e["osis_reader_key"])
+                for e in policy["allowed_merges"])
+            observed = sorted(
+                (e["original_osis_ref"],e["stock_reader_osis_ref"])
+                for e in approved) if isinstance(approved,list) else []
+            if (expected!=observed or len(expected)!=count
+                or data.get("reviewed_merge_policy_sha256")!=hashval
+                or data.get("original_publisher_document_sha256")
+                    !=policy["source_document_sha256"]):
+                raise ValueError("reviewed merger differs from recorded source decision")
+        except (OSError,ValueError,UnicodeError,KeyError,TypeError,AttributeError) as exc:
+            errors.append(f"{path}: [SWORD_MERGE_REVIEW_STALE] {exc}")
+    if not exact_mode and not merged_mode:
+        errors.append(f"{path}: [SWORD_INDEX_NOT_VERIFIED] Exact keys or source-reviewed merged keys required")
     if (data.get("versification") != versification
             or data.get("reader_engine") != "libsword"
             or not isinstance(data.get("reader_version"), str)
