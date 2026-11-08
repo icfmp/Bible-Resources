@@ -22,6 +22,8 @@ from lsg_rebuild_trial import (_safe_files, _osis_summary, _schema_proof,
                                CONVERTER_COMMIT, MAX_CONVERTER_SECONDS)
 from lsg_ephemeral_osis_candidate import prepare_ephemeral_source_spaced_osis
 from lsg_sword_rebuild import compile_candidate
+from reviewed_reference_merges import (load_reviewed_merges, assess_reviewed_merges,
+                                       annotate_editorial_label)
 
 APPEND = "readback_preceding_slot_contains_both_verse_character_streams"
 EMPTY = "empty_readback_verse_slot"
@@ -176,15 +178,30 @@ def run_stable(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) ->
         improved = home / "attested-display.osis.xml"
         report["source_attested_spacing"] = prepare_ephemeral_source_spaced_osis(
             raw, original_xml, improved, schema)
+        # The textual source remains immutable. A separately tracked,
+        # exact-source authorization allows the *standard SWORD compiler*
+        # to combine adjacent entries when its official v11n has no key.
+        policy = Path(__file__).resolve().parents[1] / "config/lsg-reviewed-verse-merges.json"
+        decisions, policy_digest = load_reviewed_merges(
+            policy, source_digest=digest, source_keys=keys, versification="Segond")
+        labeled = home / "editorially-labeled.osis.xml"
+        report["osis_editorial_range_label"] = annotate_editorial_label(
+            improved, labeled, decisions, schema_proof=lambda p: _schema_proof(p, schema))
+        summary_labeled = _osis_summary(labeled, original_xml, usfm["_book_order"])
+        if (summary_labeled["verse_keys_missing_from_converted"]
+                or summary_labeled["verse_keys_unexpected_in_converted"]):
+            raise PilotError("OSIS editorial metadata changed the original verse keys")
         report["stock_sword_compiled_candidate"] = compile_candidate(
-            improved, source_usfx=original_xml, versification="Segond")
+            labeled, source_usfx=original_xml, versification="Segond")
         compiled = report["stock_sword_compiled_candidate"]
         if (not compiled.get("real_module_rebuilt_in_temporary_directory")
                 or "full_source_verse_roundtrip" not in compiled):
             raise PilotError("Stock osis2mod or full diatheke readback failed")
         report["stock_sword_reference_assessment"] = assess_stock_readback(
             compiled["full_source_verse_roundtrip"])
-        report["status"] = report["stock_sword_reference_assessment"]["status"]
+        report["authorized_editorial_index_compromise"] = assess_reviewed_merges(
+            decisions, policy_digest, report["stock_sword_reference_assessment"])
+        report["status"] = "authorized_stable_sword_index_compromise_not_published"
         if hashlib.sha256(original_xml).hexdigest() != digest:
             raise PilotError("Publisher original source changed during trial")
     return report
@@ -207,7 +224,7 @@ def main(argv=None) -> int:
                                       ensure_ascii=False, indent=2) + "\n",
                            encoding="utf-8")
     print("Stock SWORD Segond:", report["status"])
-    return int(report["status"] != "stock_segond_limitations_classified_not_approved")
+    return int(report["status"] != "authorized_stable_sword_index_compromise_not_published")
 
 if __name__ == "__main__":
     raise SystemExit(main())
