@@ -8,7 +8,8 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 from lsg_sword_rebuild import (
     compile_candidate,SAMPLES,PROBE_V11N,ALTERNATE_PROBE_V11N,
-    PUBLISHER_DECLARED_V11N, classify_chapter_slot_differences
+    PUBLISHER_DECLARED_V11N, classify_chapter_slot_differences,
+    classify_chapter_readback_wrappers
 )
 
 
@@ -78,6 +79,26 @@ class LSGSegondRebuildTests(unittest.TestCase):
         with self.assertRaisesRegex(PilotError,"Unreviewed SWORD versification"):
             compile_candidate(self.source,compiler=str(self.compiler),
                               reader=str(self.reader),versification="unknown")
+
+    def test_entire_visual_wrapper_can_be_distinguished_from_changed_scripture(self):
+        original={1:"Alpha.",2:"Beta."}
+        wrapped={1:"* Alpha. *",2:"Beta."}
+        report=classify_chapter_readback_wrappers(original,wrapped)
+        self.assertFalse(report["source_and_reader_character_stream_equal"])
+        self.assertTrue(report["character_stream_equal_after_exact_display_wrappers"])
+        self.assertEqual(report["exact_whole_verse_visual_wrappers"],1)
+        self.assertFalse(report["approved_for_publication"])
+        self.assertNotIn("Alpha",repr(report))
+
+    def test_unsafe_or_partial_display_wrapper_stays_unexplained(self):
+        original={1:"Alpha.",2:"Beta."}
+        for rendered in (
+            {1:"* Alpha.",2:"Beta."},
+            {1:"* Alpha. * plus",2:"Beta."},
+            {1:"Alpha.",2:"Different Beta."},
+        ):
+            result=classify_chapter_readback_wrappers(original,rendered)
+            self.assertFalse(result["character_stream_equal_after_exact_display_wrappers"])
 
     def test_extra_blank_reader_registry_slot_is_not_mistaken_for_scripture(self):
         audit=classify_chapter_slot_differences(
