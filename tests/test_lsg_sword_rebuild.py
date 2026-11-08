@@ -7,8 +7,8 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 from lsg_sword_rebuild import (
-    compile_candidate,SAMPLES,PROBE_V11N,PUBLISHER_DECLARED_V11N,
-    classify_chapter_slot_differences
+    compile_candidate,SAMPLES,PROBE_V11N,ALTERNATE_PROBE_V11N,
+    PUBLISHER_DECLARED_V11N, classify_chapter_slot_differences
 )
 
 
@@ -56,6 +56,28 @@ class LSGSegondRebuildTests(unittest.TestCase):
         self.assertFalse(r["approved_for_publication"])
         self.assertEqual(self.source.read_bytes(),original)
         self.assertEqual(list(self.root.glob("**/*.conf")),[])
+
+    def test_calvin_uses_an_independent_temporary_module_not_source_rewrites(self):
+        # Exercise the same script with an alternative reviewed SWORD v11n.
+        script=self.compiler.read_text()
+        self.compiler.write_text(script.replace("['-v','Segond']",
+                                                "['-v','Calvin']"))
+        result=compile_candidate(self.source,compiler=str(self.compiler),
+                                 reader=str(self.reader),versification="Calvin")
+        self.assertTrue(result["real_module_rebuilt_in_temporary_directory"])
+        self.assertEqual(result["versification"],"Calvin")
+        self.assertEqual(ALTERNATE_PROBE_V11N,"Calvin")
+        self.assertFalse(result["approved_for_publication"])
+        self.assertFalse(result["versification_approved"])
+        self.assertFalse(result["publisher_v11n_matches_diagnostic_probe"])
+        self.assertEqual(self.source.read_bytes(),
+                         b"<osis>SIMULATED PUBLIC TEST ONLY</osis>")
+
+    def test_unreviewed_v11n_is_rejected_before_compilation(self):
+        from pilot_preflight import PilotError
+        with self.assertRaisesRegex(PilotError,"Unreviewed SWORD versification"):
+            compile_candidate(self.source,compiler=str(self.compiler),
+                              reader=str(self.reader),versification="unknown")
 
     def test_extra_blank_reader_registry_slot_is_not_mistaken_for_scripture(self):
         audit=classify_chapter_slot_differences(
