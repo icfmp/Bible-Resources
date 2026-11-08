@@ -165,6 +165,109 @@ def audit_compiled_internal_markup(candidate: Path, source: bytes,
     }
 
 
+
+def audit_sword_unfiltered_raw_verse_entries(
+    original_candidate: Path,
+    publisher_usfx: bytes,
+    *,
+    sword_root: Path,
+    head_prefix: Path,
+    inspector: Path,
+    temp_dir: Path,
+) -> dict:
+    """Compare actual compiled RAW OSIS verse markup without diatheke filters.
+
+    Requires the unfiltered SWORD C++ getRawEntry() API and verified exact
+    publisher verse keys. Only numeric tag counters and verse identifiers
+    leave the C++ inspector. This still does not prove note text or clickable
+    machine destinations.
+    """
+    from lsg_osis_parity import _osis_verses
+    from lsg_sword_compare import chapter_plan
+
+    source,keys=scan_usfx(publisher_usfx)
+    plan=chapter_plan(keys,full=True)
+    by_book={}
+    tree=etree.parse(str(original_candidate),parser=etree.XMLParser(
+        resolve_entities=False,load_dtd=False,no_network=True,recover=False))
+    source_books=source["original_books"]
+    converted_books=[e.get("osisID") for e in tree.iter(OSIS+"div")
+                     if e.get("type")=="book"]
+    if len(source_books)!=66 or len(converted_books)!=66:
+        raise PilotError("Unreviewed book identity for raw compiled-entry audit")
+    mapping=dict(zip(source_books,converted_books))
+    _,words,notes,lines=_osis_verses(original_candidate)
+    input_refs=[]
+    osis_refs=[]
+    for code,(name,chapters) in plan.items():
+        canonical=mapping[code]
+        for chapter in chapters:
+            for verse in sorted(v for bk,ch,v in keys if bk==code and ch==chapter):
+                input_refs.append(f"{name} {chapter}:{verse}")
+                osis_refs.append(f"{canonical}.{chapter}.{verse}")
+    if len(input_refs)!=len(keys):
+        raise PilotError("Raw-reader source reference count differs")
+    source_file=temp_dir/"original-verse-queries.txt"
+    source_file.write_text("\n".join(input_refs)+"\n",encoding="utf-8")
+    with head_sword_library(head_prefix):
+        env=dict(os.environ,SWORD_PATH=str(sword_root))
+        process=subprocess.run(
+            [str(inspector),MODULE_ID,str(source_file)],
+            capture_output=True,text=True,env=env,timeout=150,check=False,
+        )
+    if process.returncode or process.stderr.strip() or len(process.stdout)>8_000_000:
+        raise PilotError("Raw SWORD verse inspector failed or returned unbounded data")
+    rows=process.stdout.splitlines()
+    if len(rows)!=len(input_refs):
+        raise PilotError("Raw SWORD verse inspector skipped source keys")
+    total=Counter()
+    matching_w=0
+    matching_notes=0
+    note_mismatch=[]
+    word_mismatch=[]
+    for i,line in enumerate(rows):
+        cells=line.split("\t")
+        if len(cells)!=6 or cells[0]!=input_refs[i]:
+            raise PilotError("Malformed or out-of-order SWORD raw verse counts")
+        try:
+            w,n,r,l,q=map(int,cells[1:])
+        except ValueError as exc:
+            raise PilotError("Invalid SWORD raw markup numeric count") from exc
+        if any(x<0 or x>5000 for x in (w,n,r,l,q)):
+            raise PilotError("SWORD raw markup counter out of allowed range")
+        ref=osis_refs[i]
+        expected_w=len(words.get(ref,()))
+        expected_n=notes.get(ref,0)
+        matching_w+=w==expected_w
+        matching_notes+=n==expected_n
+        if w!=expected_w and len(word_mismatch)<30:
+            word_mismatch.append({"source_ref":ref,
+                                  "source":expected_w,"compiled_raw":w})
+        if n!=expected_n and len(note_mismatch)<30:
+            note_mismatch.append({"source_ref":ref,
+                                  "source":expected_n,"compiled_raw":n})
+        total.update({"w":w,"note":n,"reference":r,"l":l,"q":q})
+    return {
+        "original_verse_keys":len(keys),
+        "compiled_raw_verse_keys_checked":len(rows),
+        "source_ordered_word_count":sum(map(len,words.values())),
+        "compiled_raw_word_tag_count":total["w"],
+        "source_cross_reference_note_count":sum(notes.values()),
+        "compiled_raw_note_tag_count":total["note"],
+        "word_tag_count_by_verse_matching":matching_w,
+        "note_tag_count_by_verse_matching":matching_notes,
+        "first_word_marker_mismatches":word_mismatch,
+        "first_note_marker_mismatches":note_mismatch,
+        "compiled_raw_reference_tag_count":total["reference"],
+        "compiled_raw_poetry_line_tag_count":total["l"],
+        "all_source_word_counts_preserved":matching_w==len(keys),
+        "all_source_note_counts_preserved":matching_notes==len(keys),
+        "note_content_targets_and_raw_verse_markup_approved":False,
+        "original_candidate_unchanged":True,
+        "published":False,
+    }
+
+
 def experiment(publisher_usfx: bytes, raw_candidate: Path, schema: Path,
                *, head_prefix: Path, installed_registry_helper: Path) -> dict:
     """Run entire source-to-SWORD chain in TemporaryDirectory; metadata only."""
@@ -293,6 +396,13 @@ def experiment(publisher_usfx: bytes, raw_candidate: Path, schema: Path,
                     "reason":str(exc)[:170],
                     "approved_for_publication":False,
                 }
+            inspector=os.getenv("LSG_SWORD_RAW_INSPECTOR")
+            if inspector:
+                report["source_to_compiled_raw_markup_audit"]=(
+                    audit_sword_unfiltered_raw_verse_entries(
+                        improved,publisher_usfx,sword_root=sword_root,
+                        head_prefix=prefix,inspector=Path(inspector),
+                        temp_dir=home))
             report["all_compiled_note_text_targets_strongs_poetry_verified"]=False
         report["status"]="complete_private_xml_v11n_head_reader_trial"
         report["generated_module_file_count"]=sum(
