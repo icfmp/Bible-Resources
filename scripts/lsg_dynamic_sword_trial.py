@@ -61,6 +61,110 @@ def summarize_internal_markup(raw: bytes) -> dict:
     }
 
 
+
+def audit_compiled_internal_markup(candidate: Path, source: bytes,
+                                   *, sword_root: Path, reader: str) -> dict:
+    """Compare *all* compiled note and word tags with original OSIS by verse.
+
+    Internal reader tags are an independent SWORD compiler round-trip, not a
+    claim about xref target clickability or exact rendered layout in Xiphos.
+    Poetry tag counts are compared by entire book, to avoid milestone split
+    ambiguity when <l> spans multiple verses.
+    """
+    from collections import Counter
+    from lsg_osis_parity import _osis_verses
+    from lsg_sword_compare import chapter_plan, parse_sword_chapter
+    original_text,source_keys=scan_usfx(source)
+    plan=chapter_plan(source_keys,full=True)
+    original_words=original_text["original_books"]
+    osis_root=etree.parse(str(candidate),parser=etree.XMLParser(
+        resolve_entities=False,load_dtd=False,no_network=True,recover=False))
+    converted_books=[n.get("osisID") for n in osis_root.iter(OSIS+"div")
+                     if n.get("type")=="book"]
+    if len(original_words)!=len(converted_books) or len(original_words)!=66:
+        raise PilotError("Cannot align authorial and converted book order for markup")
+    mapping=dict(zip(original_words,converted_books))
+    _,words,notes,lines=_osis_verses(candidate)
+    expected_words=sum(len(v) for v in words.values())
+    expected_notes=sum(notes.values())
+    # The XML tag <l> opener may occur in one verse and close in another,
+    # so compare by book across the independently compiled output.
+    expected_lines_by_book=Counter()
+    for k,count in lines.items():
+        expected_lines_by_book[k.split(".")[0]]+=count
+    found=Counter()
+    note_slots_equal=0
+    word_slots_equal=0
+    differences=[]
+    lines_by_book=Counter()
+    for code,(book_name,chapters) in plan.items():
+        canonical=mapping[code]
+        for chapter in chapters:
+            ref=f"{book_name} {chapter}"
+            rc,content=query(MODULE_ID,ref,fmt="internal",
+                             root=sword_root,exe=reader,
+                             timeout=30,limit=4*1024*1024)
+            if not present_key(ref,content,rc):
+                raise PilotError("SWORD cannot read source chapter in internal markup audit")
+            # The rendered verse-heading parser may normalize whitespace
+            # but must never normalize or delete markup opening tags.
+            rendered=parse_sword_chapter(content,chapter,MODULE_ID)
+            authored={v for (b,c,v) in source_keys if b==code and c==chapter}
+            if set(rendered)!=authored:
+                raise PilotError("SWORD internal markup readback changed verse keys")
+            for verse,fragment in rendered.items():
+                reference=f"{canonical}.{chapter}.{verse}"
+                tags=Counter(re.findall(r"<([A-Za-z][A-Za-z0-9]*)\b",fragment))
+                got_words=tags["w"]
+                got_notes=tags["note"]
+                got_lines=tags["l"]
+                expected_w=len(words.get(reference,[]))
+                expected_n=notes.get(reference,0)
+                word_slots_equal+=got_words==expected_w
+                note_slots_equal+=got_notes==expected_n
+                found.update({"reader_word_tags":got_words,
+                              "reader_note_tags":got_notes,
+                              "reader_line_tags":got_lines,
+                              "verses":1})
+                lines_by_book[canonical]+=got_lines
+                if ((got_words!=expected_w or got_notes!=expected_n)
+                        and len(differences)<70):
+                    differences.append({
+                        "reference":f"{code}.{chapter}.{verse}",
+                        "expected_word_tags":expected_w,
+                        "compiled_word_tags":got_words,
+                        "expected_note_tags":expected_n,
+                        "compiled_note_tags":got_notes,
+                    })
+    poem_equal=sum(
+        lines_by_book[book]==expected_lines_by_book.get(book,0)
+        for book in mapping.values()
+    )
+    return {
+        "source_verse_count":len(source_keys),
+        "verses_checked":found["verses"],
+        "expected_ordered_word_tags":expected_words,
+        "compiled_word_tags":found["reader_word_tags"],
+        "per_verse_word_tag_counts_equal":word_slots_equal,
+        "expected_cross_reference_notes":expected_notes,
+        "compiled_cross_reference_notes":found["reader_note_tags"],
+        "per_verse_note_tag_counts_equal":note_slots_equal,
+        "compiled_poetry_line_tag_count":found["reader_line_tags"],
+        "original_poetry_line_tag_count":sum(lines.values()),
+        "books_with_equal_poetry_line_tag_counts":poem_equal,
+        "sample_mismatches":differences,
+        "full_compiled_word_count_parity":
+            word_slots_equal==len(source_keys) and
+            found["reader_word_tags"]==expected_words,
+        "full_compiled_note_count_parity":
+            note_slots_equal==len(source_keys) and
+            found["reader_note_tags"]==expected_notes,
+        "full_compiled_poetry_counts_parity":poem_equal==len(mapping),
+        "note_reference_targets_and_markers_approved":False,
+        "editorial_approval":False,
+    }
+
+
 def experiment(publisher_usfx: bytes, raw_candidate: Path, schema: Path,
                *, head_prefix: Path, installed_registry_helper: Path) -> dict:
     """Run entire source-to-SWORD chain in TemporaryDirectory; metadata only."""
@@ -176,6 +280,10 @@ def experiment(publisher_usfx: bytes, raw_candidate: Path, schema: Path,
                     **summarize_internal_markup(body),
                 }
             report["source_to_compiled_internal_markup_samples"]=per_verse_internal
+            report["source_to_compiled_internal_markup_full_audit"]=(
+                audit_compiled_internal_markup(
+                    improved,publisher_usfx,sword_root=sword_root,
+                    reader=str(reader)))
             report["all_compiled_note_text_targets_strongs_poetry_verified"]=False
         report["status"]="complete_private_xml_v11n_head_reader_trial"
         report["generated_module_file_count"]=sum(
