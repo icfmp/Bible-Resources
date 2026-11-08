@@ -90,8 +90,7 @@ def prepare_ephemeral_source_spaced_osis(
         "matching_source_verse_texts":matching,
         "paired_source_notes":notes,
         "note_spaces_inferred_from_publisher":note_report[
-            "source_space_modeled_in_memory"] if "source_space_modeled_in_memory"
-            in note_report else note_report.get("modeled_note_boundaries",0),
+            "by_category"]["source_space_modeled_in_memory"],
         "modeled_xml_structure_validation":checked,
         "speech_model_status":speech_report.get("status","not_reported"),
         "original_bytes_preserved":True,
