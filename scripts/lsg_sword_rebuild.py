@@ -271,11 +271,16 @@ def full_index_roundtrip(source: bytes, *, root: Path, reader: str,
 
 def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke",
                       source_usfx: bytes | None=None, versification: str=PROBE_V11N,
-                      after_full_readback=None) -> dict:
+                      after_full_readback=None, module_info_note: str | None=None) -> dict:
     # Explicit, reviewed registry allowlist: this is diagnostic, not a
     # request to rewrite source IDs or to publish a second edition.
     if versification not in {PROBE_V11N, ALTERNATE_PROBE_V11N}:
         raise PilotError("Unreviewed SWORD versification in LSG trial")
+    if module_info_note is not None and (
+            not isinstance(module_info_note,str) or len(module_info_note)>600
+            or any(c in module_info_note for c in ("\r","\n","\x00"))
+            or not module_info_note.strip()):
+        raise PilotError("Unsafe or empty SWORD module About metadata")
     before=osis.read_bytes()
     report={
         "status":"rebuild_probe_not_approved",
@@ -290,6 +295,7 @@ def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke",
         "module_id":"fraLSG1910eb",
         "real_module_rebuilt_in_temporary_directory":False,
         "all_source_verses_and_annotations_checked":False,
+        "editorial_module_about_notice_requested":module_info_note is not None,
     }
     with tempfile.TemporaryDirectory(prefix="bible-lsg-segond-real-") as home:
         root=Path(home)
@@ -352,7 +358,8 @@ def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke",
             "GlobalOptionFilter=OSISScripref\n"
             "GlobalOptionFilter=OSISHeadings\n"
             f"Versification={versification}\n"
-            "DistributionLicense=Public Domain\n",
+            "DistributionLicense=Public Domain\n"
+            + (f"About={module_info_note}\n" if module_info_note else ""),
             encoding="utf-8",
         )
         probes=[]
