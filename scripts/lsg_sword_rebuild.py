@@ -270,7 +270,8 @@ def full_index_roundtrip(source: bytes, *, root: Path, reader: str,
 
 
 def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke",
-                      source_usfx: bytes | None=None, versification: str=PROBE_V11N) -> dict:
+                      source_usfx: bytes | None=None, versification: str=PROBE_V11N,
+                      after_full_readback=None) -> dict:
     # Explicit, reviewed registry allowlist: this is diagnostic, not a
     # request to rewrite source IDs or to publish a second edition.
     if versification not in {PROBE_V11N, ALTERNATE_PROBE_V11N}:
@@ -416,6 +417,17 @@ def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke",
             if (report["full_source_verse_roundtrip"].get("source_key_count_matches")
                     is not True):
                 report["status"]="compiled_but_full_reference_index_mismatch"
+        if after_full_readback is not None:
+            if not callable(after_full_readback):
+                raise PilotError("Invalid SWORD post-compilation verifier")
+            if (source_usfx is None or
+                not isinstance(report.get("full_source_verse_roundtrip"), dict) or
+                report["full_source_verse_roundtrip"].get(
+                    "all_chapter_content_preserved_without_spaces") is not True):
+                raise PilotError("Cannot audit raw compiled markup before full body readback")
+            report["compiled_raw_markup_review"]=after_full_readback(
+                root, "fraLSG1910eb", report["full_source_verse_roundtrip"]
+            )
         report["source_file_unchanged"]=_sha(osis.read_bytes())==report["original_osis_sha256"]
         if not report["source_file_unchanged"]:
             raise PilotError("Original OSIS source modified during compiler trial")
