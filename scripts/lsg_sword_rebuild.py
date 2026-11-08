@@ -41,6 +41,65 @@ def _sha(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
 
 
+
+def _no_whitespace(value: str) -> str:
+    """Diagnostic character equality; never permission to reassign a verse."""
+    return "".join(value.split())
+
+
+def classify_chapter_slot_differences(expected: dict[int,str],
+                                      actual: dict[int,str]) -> dict:
+    """Distinguish empty v11n reader slots and possible adjacent verse merges.
+
+    Compare existing real strings only. No synthetic verse is fabricated and
+    all proposed associations remain unapproved until publisher v11n review.
+    """
+    source_only=sorted(set(expected)-set(actual))
+    reader_only=sorted(set(actual)-set(expected))
+    classes=[]
+    for v in source_only:
+        prev=v-1
+        can_compare=prev in expected and prev in actual
+        adjacent_merged=(
+            _no_whitespace(actual[prev])
+            ==_no_whitespace(expected[prev])+_no_whitespace(expected[v])
+            if can_compare else False
+        )
+        classes.append({
+            "verse":v,
+            "side":"source_only",
+            "classification":(
+                "readback_preceding_slot_contains_both_verse_character_streams"
+                if adjacent_merged else "unresolved_missing_verse_index"
+            ),
+            "preceding_slot_compared":can_compare,
+            "no_reversification_applied":True,
+        })
+    for v in reader_only:
+        classes.append({
+            "verse":v,
+            "side":"reader_only",
+            "classification":(
+                "empty_readback_verse_slot"
+                if not actual[v].strip() else "unexpected_populated_reader_slot"
+            ),
+            "no_reversification_applied":True,
+        })
+    source_stream=_no_whitespace("".join(expected[k] for k in sorted(expected)))
+    reader_stream=_no_whitespace("".join(actual[k] for k in sorted(actual)))
+    return {
+        "source_only_verses":source_only,
+        "reader_only_verses":reader_only,
+        "complete_chapter_character_stream_equal_ignoring_whitespace":
+            source_stream==reader_stream,
+        "source_characters_excluding_whitespace":len(source_stream),
+        "reader_characters_excluding_whitespace":len(reader_stream),
+        "diagnostic_slot_classes":classes,
+        "all_verse_reference_slots_verified":not source_only and not reader_only,
+        "editorial_and_versification_approved":False,
+    }
+
+
 def full_index_roundtrip(source: bytes, *, root: Path, reader: str) -> dict:
     """Read all source chapters in rebuilt module; never export their text."""
     from collections import Counter
@@ -50,6 +109,8 @@ def full_index_roundtrip(source: bytes, *, root: Path, reader: str) -> dict:
     totals=Counter()
     examples=[]
     index_key_mismatches=[]
+    unmatched_slot_classes=[]
+    chapter_stream_parity=0
     books=[]
     for code,(book_name,chapters) in plan.items():
         book_checks=Counter()
@@ -66,6 +127,13 @@ def full_index_roundtrip(source: bytes, *, root: Path, reader: str) -> dict:
                       if b==code and c==chapter}
             source_only=set(expected)-set(actual)
             sword_only=set(actual)-set(expected)
+            chapter_slot_audit=classify_chapter_slot_differences(expected,actual)
+            chapter_stream_parity+=chapter_slot_audit[
+                "complete_chapter_character_stream_equal_ignoring_whitespace"]
+            if (source_only or sword_only) and len(unmatched_slot_classes)<70:
+                unmatched_slot_classes.append({
+                    "book":code,"chapter":chapter,**chapter_slot_audit,
+                })
             same=set(expected)&set(actual)
             exact=sum(expected[v]==actual[v] for v in same)
             no_spaces=sum("".join(expected[v].split())=="".join(actual[v].split())
@@ -108,6 +176,9 @@ def full_index_roundtrip(source: bytes, *, root: Path, reader: str) -> dict:
         "books":books,
         "first_diagnostic_chapters":examples,
         "all_index_key_mismatch_chapters":index_key_mismatches,
+        "unmatched_verse_slot_classification":unmatched_slot_classes,
+        "chapters_with_equal_continuous_text_ignoring_whitespace":chapter_stream_parity,
+        "all_chapter_content_preserved_without_spaces":chapter_stream_parity==1189,
         "source_key_count_matches":totals["source_keys_missing"]==0
           and totals["sword_keys_unexpected"]==0
           and totals["source_verses"]==len(keys)
