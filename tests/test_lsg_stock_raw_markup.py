@@ -42,7 +42,7 @@ class RawStockReaderTests(unittest.TestCase):
     def test_changed_poetry_count_blocks_raw_markup(self):
         self.rows[0]="Mark 1:1\t3\t2\t0\t0\t0"
         result=self.run_audit()
-        self.assertFalse(result["source_to_compiled_poetry_line_counts_verified"])
+        self.assertFalse(result["source_global_raw_markup_counts_match_compiled"])
         self.assertEqual(result["status"],"blocked_compiled_raw_markup_mismatch")
     def test_misaligned_or_missing_raw_entries_are_fatal(self):
         for rows in ([],self.rows[:1],
