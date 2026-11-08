@@ -212,7 +212,7 @@ def run_stable(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) ->
             decisions, policy_digest, report["stock_sword_reference_assessment"])
         raw_audit=compiled.get("compiled_raw_markup_review")
         if (not isinstance(raw_audit,dict) or
-                raw_audit.get("status") != "raw_stock_sword_word_note_poetry_counts_verified"):
+                raw_audit.get("status") != "raw_stock_sword_global_markers_verified_with_interverse_diagnostics"):
             report["status"]="blocked_compiled_raw_markup_mismatch"
         else:
             report["status"] = "authorized_stable_sword_index_compromise_not_published"
