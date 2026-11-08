@@ -21,6 +21,11 @@ on:
       - 'tests/test_lsg_note_parity.py'
       - 'scripts/lsg_sword_rebuild.py'
       - 'scripts/lsg_v11n_coverage.py'
+      - 'scripts/lsg_source_v11n_delta.py'
+      - 'scripts/lsg_ephemeral_osis_candidate.py'
+      - 'scripts/lsg_dynamic_sword_trial.py'
+      - 'tests/test_lsg_source_v11n_delta.py'
+      - 'tests/test_lsg_ephemeral_osis_candidate.py'
       - 'scripts/sword_v11n_ceilings.cpp'
       - 'tests/test_lsg_v11n_coverage.py'
       - 'tests/test_lsg_osis_parity.py'
@@ -78,11 +83,27 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -I/usr/include/sword scripts/sword_v11n_ceilings.cpp \
             -lsword -o "${{ runner.temp }}/sword-v11n-ceilings"
           test -x "${{ runner.temp }}/sword-v11n-ceilings"
+      - name: Build pinned experimental CrossWire XML-v11n SWORD HEAD in temporary prefix
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y cmake g++ libcurl4-openssl-dev zlib1g-dev libbz2-dev liblzma-dev libicu-dev >/dev/null
+          git clone --quiet https://git.crosswire.org/main/sword.git "${{ runner.temp }}/sword-head"
+          git -C "${{ runner.temp }}/sword-head" checkout --detach -q a376e42938580f446f53a4cb20e7161355fa9110
+          test "$(git -C "${{ runner.temp }}/sword-head" rev-parse HEAD)" = a376e42938580f446f53a4cb20e7161355fa9110
+          cmake -S "${{ runner.temp }}/sword-head" -B "${{ runner.temp }}/sword-build" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="${{ runner.temp }}/sword-head-install" \
+            -DWITH_CURL=OFF > /dev/null
+          cmake --build "${{ runner.temp }}/sword-build" --parallel 3 >/dev/null
+          cmake --install "${{ runner.temp }}/sword-build" >/dev/null
+          test -x "${{ runner.temp }}/sword-head-install/bin/osis2mod"
+          test -x "${{ runner.temp }}/sword-head-install/bin/diatheke"
       - name: Test complete source conversion; no full Scripture module committed, uploaded or published
         env:
           LSG_SAMPLE_DEBUG: '0'
           LSG_COMPARE_CALVIN_V11N: '0'
           LSG_V11N_CEILINGS_BIN: ${{ runner.temp }}/sword-v11n-ceilings
+          LSG_SWORD_HEAD_PREFIX: ${{ runner.temp }}/sword-head-install
         run: |
           python scripts/lsg_rebuild_trial.py \
             --usfm-zip "${{ runner.temp }}/original/usfm.zip" \
