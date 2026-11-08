@@ -75,7 +75,7 @@ jobs:
           command -v diatheke
       - name: Build temporary C++ reader of SWORD's canonical registry ceilings
         run: |
-          g++ -std=c++17 -O2 -Wall -Wextra scripts/sword_v11n_ceilings.cpp \
+          g++ -std=c++17 -O2 -Wall -Wextra -I/usr/include/sword scripts/sword_v11n_ceilings.cpp \
             -lsword -o "${{ runner.temp }}/sword-v11n-ceilings"
           test -x "${{ runner.temp }}/sword-v11n-ceilings"
       - name: Test complete source conversion; no full Scripture module committed, uploaded or published
