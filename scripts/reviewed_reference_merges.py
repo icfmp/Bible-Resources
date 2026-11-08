@@ -151,14 +151,20 @@ def annotate_editorial_label(source: Path, target: Path,
         no_network=True,load_dtd=False,resolve_entities=False,recover=False))
     starts={}
     for v in root.iter(OSIS+"verse"):
-        ident=v.get("osisID") or v.get("sID")
+        ident=v.get("sID") or v.get("osisID")
         if ident and (v.get("sID") or v.get("osisID")):
             starts.setdefault(ident,[]).append(v)
     for d in decisions:
         ident=d["osis_reader_key"]
         verse=starts.get(ident,[])
-        if len(verse)!=1 or verse[0].get("n"):
-            raise PilotError("Cannot safely attach editorial range label to verse")
+        existing=verse[0].get("n") if len(verse)==1 else None
+        expected_base=str(key_parts(ident,OSISKEY)[2])
+        if len(verse)!=1 or existing not in (None, expected_base,
+                                                d["preferred_display_label"]):
+            raise PilotError(
+                f"Cannot safely attach editorial range label to {ident}: "
+                f"opening_milestones={len(verse)}, existing_n={existing!r}"
+            )
         verse[0].set("n",d["preferred_display_label"])
     with target.open("xb") as f:
         f.write(etree.tostring(root,encoding="utf-8",xml_declaration=True))
