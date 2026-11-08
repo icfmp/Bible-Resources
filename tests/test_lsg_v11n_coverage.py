@@ -56,6 +56,12 @@ class AllRegisteredV11nCoverageTests(unittest.TestCase):
         self.assertTrue(all(r["source_chapters_not_in_registry"]==1
                             for r in report["candidate_registry_comparisons"]))
 
+    def test_numbered_canonical_books_are_valid_sword_osis_names(self):
+        rows="Segond\\t1Sam\\t1\\t28\\nNRSV\\t2Kgs\\t1\\t18\\n"
+        result=parse_ceilings(rows.encode().decode("unicode_escape"))
+        self.assertEqual(result["Segond"][("1Sam",1)],28)
+        self.assertEqual(result["NRSV"][("2Kgs",1)],18)
+
     def test_malformed_or_duplicate_register_rows_fail_closed(self):
         for invalid in (
             "",
