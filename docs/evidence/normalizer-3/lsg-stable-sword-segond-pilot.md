@@ -76,3 +76,24 @@ Before any distribution:
 Links: [PR #18](https://github.com/icfmp/Bible-Resources/pull/18),
 [release gate PR #23](https://github.com/icfmp/Bible-Resources/pull/23),
 [pilot issue #12](https://github.com/icfmp/Bible-Resources/issues/12).
+
+## Verified stock-SWORD full-corpus checkpoint — 2026-11-08
+
+- Workflow: https://github.com/icfmp/Bible-Resources/actions/runs/42525834984 (**success**)
+- General `Validate`: https://github.com/icfmp/Bible-Resources/actions/runs/42525835034 (**success**)
+- eBible USFM ZIP SHA-256: `64c4fe2a84d92f958deb0d1add4247d126a21c8a51e5b3058338f661a42d4900`
+- eBible USFX ZIP SHA-256: `fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e`
+- Original 66-book USFX: **31,170 authored verse keys / 1,189 chapters**; the independently validated, temporary OSIS model matches **31,170/31,170** authorial verse strings after source-evidenced display spacing. Original source bytes were not edited.
+- **Released `osis2mod -v Segond` succeeded**, zero fatal/error diagnostics and **one outside-versification diagnostic**. Stock `diatheke` read all **1,189/1,189** chapters.
+- **Exactly one source-only verse**: `Mark.10.53`. The complete original stream of 10:52+10:53 is found in stable SWORD's 10:52 entry; 10:53 cannot be queried independently.
+- **Exactly one additional empty registry slot**: `Job.34.37`. It is not filled with invented Scripture.
+- All **1,189/1,189** chapter character streams retain the source codepoints except separately identified display-only asterisks and whitespace, using the existing conservative reader classifier.
+- The reader-only residual asterisk cases are `Ezra.4` (**4**), `Ezra.5` (**10**), and `Ezra.7` (**4**). These are explicitly logged visual differences, **not claimed to match source-authorial markup**.
+- The workflow runs entirely on runner temporary data; uploads only text-free diagnostic JSON. **No Bible module, sources or publication generated.**
+
+**Interpretation:** the officially documented SWORD *stable* import behavior is now
+reproduced and classified on the original real corpus. This is not an
+editorial approval to lose independent access to a source verse. The PR #23
+strict release gate remains blocking until an explicitly approved
+interoperable edition strategy and complete compiled markup/annotation
+review exist. Do not merge or publish based on this checkpoint alone.
