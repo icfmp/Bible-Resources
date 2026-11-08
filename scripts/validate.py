@@ -6,6 +6,7 @@ import json
 import sys
 import re
 from jsonschema import Draft202012Validator, FormatChecker
+from stable_sword_refs import proof_errors as stable_sword_proof_errors
 
 ROOT = Path(__file__).resolve().parents[1]
 DRIVERS = {"RawText","zText","RawCom","RawCom4","zCom","zCom4","RawLD","RawLD4","zLD","RawGenBook"}
@@ -213,6 +214,22 @@ def validate(root=ROOT):
         if conf.get("Lang")!=m["language"]: errors.append(f"{d.name}: language mismatch")
         if m["category"] in ("bible","commentary") and conf.get("Versification")!=m.get("versification"):
             errors.append(f"{d.name}: versification mismatch")
+        if m["category"] == "bible":
+            # Release-time gate: a successful osis2mod build or experimental
+            # XML-v11n read is not proof of standard SWORD compatibility.
+            # The independent text-free report must match both the validated
+            # OSIS source and the exact compiled module payload.
+            try:
+                source_proof = json.loads(
+                    (d / "SOURCE_VALIDATION.json").read_text(encoding="utf-8")
+                )
+                source_digest = (source_proof.get("source_sha256", "")
+                                 if isinstance(source_proof, dict) else "")
+            except (OSError, ValueError, UnicodeError):
+                source_digest = ""
+            errors.extend(stable_sword_proof_errors(
+                d, conf.get("Versification", ""), source_digest
+            ))
         for field in ("SourceType","DistributionLicense","TextSource","Version","Description","DataPath"):
             if not conf.get(field):errors.append(f"{d.name}: missing {field}")
         data=conf.get("DataPath","")
