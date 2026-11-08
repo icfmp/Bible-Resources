@@ -15,7 +15,7 @@ class RawStockReaderTests(unittest.TestCase):
             "Mark.1.1":Counter({"w":3,"note":2,"l":1,"verses":2}),
             "Mark.1.2":Counter({"w":2,"note":0,"l":1,"verses":1}),
         }
-        self.poetry={"Mark":2}
+        self.poetry={"Mark":Counter({"w":5,"note":2,"l":2})}
         self.rows=[
             "Mark 1:1\t3\t2\t0\t1\t0",
             "Mark 1:2\t2\t0\t3\t1\t0",
@@ -24,14 +24,14 @@ class RawStockReaderTests(unittest.TestCase):
         return compare_raw_rows(self.rows,self.keys,self.expected,self.poetry)
     def test_verified_merge_raw_markup_has_no_extra_words_or_notes(self):
         result=self.run_audit()
-        self.assertEqual(result["status"],"raw_stock_sword_word_note_poetry_counts_verified")
+        self.assertEqual(result["status"],"raw_stock_sword_global_markers_verified_with_interverse_diagnostics")
         self.assertEqual(result["checked_reader_entries"],2)
-        self.assertEqual(result["expected_source_word_tags"],5)
-        self.assertEqual(result["compiled_note_tags"],2)
+        self.assertEqual(result["source_global_word_tags"],5)
+        self.assertEqual(result["compiled_raw_note_tags"],2)
         self.assertEqual(result["compiled_cross_reference_tag_count"],3)
-        self.assertTrue(result["source_to_compiled_word_tag_counts_verified"])
-        self.assertTrue(result["source_to_compiled_note_tag_counts_verified"])
-        self.assertTrue(result["source_to_compiled_poetry_line_counts_verified"])
+        self.assertTrue(result["source_global_raw_markup_counts_match_compiled"])
+        self.assertTrue(result["source_global_raw_markup_counts_match_compiled"])
+        self.assertTrue(result["source_global_raw_markup_counts_match_compiled"])
         self.assertFalse(result["compiled_note_text_targets_verified"])
     def test_missing_word_or_note_blocks_raw_markup(self):
         for row in ("Mark 1:1\t2\t2\t0\t1\t0",
