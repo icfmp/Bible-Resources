@@ -99,3 +99,15 @@ Code, tooling and documentation: **GPL-3.0-or-later** (see `COPYING`). **Modules
 - [CrossWire module repository structure](https://wiki.crosswire.org/Creating_and_Maintaining_a_Module_Repository)
 - [SWORD module configuration fields](https://wiki.crosswire.org/DevTools:conf_Files)
 - [CrossWire module submission](https://wiki.crosswire.org/Module_Submission)
+
+## Stable SWORD interoperability
+
+Approved Bibles must have a source- and payload-bound proof that their
+original verse keys remain individually accessible in an **unmodified,
+released SWORD engine**. A successful `osis2mod` build or test with an
+experimental library does not satisfy this gate. See
+[Stable SWORD interoperability](docs/INTEROPERABILITY_POLICY.md).
+
+The Segond 1910 pilot has an unresolved eBible/print versification discrepancy
+and is **not** approved or published. It will not be silently renumbered to
+fit a particular frontend.
