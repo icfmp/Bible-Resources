@@ -9,6 +9,7 @@ This is not a Bible-text, notes, formatting, or visual fidelity assertion.
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 import hashlib
 import json
 from pathlib import Path
@@ -92,11 +93,10 @@ def inspect_references(source: set[tuple[str, int, int]],
                      if ref[2] > registry.get((ref[0], ref[1]), 0))
     missing = sorted(source - resolved_reader)
     unexpected = sorted(resolved_reader - source)
-    unused_slots = sum(
-        maximum - sum(1 for book, chapter, verse in source
-                      if (book, chapter) == key and verse <= maximum)
-        for key, maximum in registry.items()
-    )
+    occupied = Counter((book, chapter) for book, chapter, verse in source
+                       if verse <= registry.get((book, chapter), 0))
+    unused_slots = sum(maximum - occupied.get(key, 0)
+                       for key, maximum in registry.items())
     return {
         "status": ("stable_reference_index_verified"
                    if not (outside or missing or unexpected) else "blocked"),
