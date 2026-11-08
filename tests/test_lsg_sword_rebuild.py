@@ -9,7 +9,7 @@ sys.path.insert(0,str(ROOT/"scripts"))
 from lsg_sword_rebuild import (
     compile_candidate,SAMPLES,PROBE_V11N,ALTERNATE_PROBE_V11N,
     PUBLISHER_DECLARED_V11N, classify_chapter_slot_differences,
-    classify_chapter_readback_wrappers
+    classify_chapter_readback_wrappers, count_reader_only_asterisks
 )
 
 
@@ -99,6 +99,19 @@ class LSGSegondRebuildTests(unittest.TestCase):
         ):
             result=classify_chapter_readback_wrappers(original,rendered)
             self.assertFalse(result["character_stream_equal_after_exact_display_wrappers"])
+
+    def test_residual_reader_asterisks_are_classified_without_erasing_scripture(self):
+        self.assertEqual(count_reader_only_asterisks("AB.CD","*AB.*CD*"),3)
+        self.assertIsNone(count_reader_only_asterisks("AB.CD","*AB.CE*"))
+        self.assertIsNone(count_reader_only_asterisks("AB.CD","ABCD"))
+        self.assertIsNone(count_reader_only_asterisks("AB.CD","AB.CD!"))
+        self.assertEqual(count_reader_only_asterisks("AB.CD","AB.CD"),0)
+        a=classify_chapter_readback_wrappers(
+            {1:"AB.CD"},{1:"*AB.*CD*"})
+        self.assertTrue(a["remaining_changes_consist_only_of_added_reader_asterisks"])
+        self.assertEqual(a["reader_only_residual_asterisk_count"],3)
+        self.assertFalse(a["approved_for_publication"])
+        self.assertNotIn("AB.CD",repr(a))
 
     def test_extra_blank_reader_registry_slot_is_not_mistaken_for_scripture(self):
         audit=classify_chapter_slot_differences(
