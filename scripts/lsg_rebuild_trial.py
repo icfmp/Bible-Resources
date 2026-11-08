@@ -29,6 +29,7 @@ from pilot_preflight import PilotError, inspect_archive
 from pilot_subprocess import MAX_OUTPUT
 from lsg_osis_parity import compare as compare_osis
 from lsg_sword_rebuild import compile_candidate
+from lsg_dynamic_sword_trial import experiment as experimental_head_trial
 from lsg_v11n_coverage import audit_publisher_usfx_against_installed_sword
 
 
@@ -391,6 +392,22 @@ def run(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) -> dict:
             if os.getenv("LSG_COMPARE_CALVIN_V11N")=="1":
                 report["real_calvin_sword_trial"]=compile_candidate(
                     candidate,source_usfx=original_xml,versification="Calvin")
+            if os.getenv("LSG_SWORD_HEAD_PREFIX"):
+                # A separate, complete, source-derived exact-reference SWORD
+                # prototype. It is destroyed at exit, not a publishable module.
+                try:
+                    report["real_source_v11n_sword_head_trial"]=experimental_head_trial(
+                        original_xml,candidate,schema,
+                        head_prefix=Path(os.environ["LSG_SWORD_HEAD_PREFIX"]),
+                        installed_registry_helper=Path(
+                            os.environ["LSG_V11N_CEILINGS_BIN"]))
+                except PilotError as exc:
+                    report["real_source_v11n_sword_head_trial"]={
+                        "status":"experimental_trial_blocked",
+                        "error_type":type(exc).__name__,
+                        "reason":str(exc)[:190],
+                        "published":False,
+                    }
         report["structure_key_sets_equal"]=(
            report["osis_candidate"]["verse_keys_missing_from_converted"]==0
            and report["osis_candidate"]["verse_keys_unexpected_in_converted"]==0
