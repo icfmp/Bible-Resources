@@ -319,7 +319,9 @@ def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke",
             )
             else "compiled_but_sample_or_v11n_errors_block"
         )
-        if source_usfx is not None and report["all_sample_keys_have_text"]:
+        # A failed spot-check must not suppress a full index diagnostic:
+        # alternate French registries can expose different verse maxima.
+        if source_usfx is not None and report["real_module_rebuilt_in_temporary_directory"]:
             try:
                 report["full_source_verse_roundtrip"]=full_index_roundtrip(
                     source_usfx,root=root,reader=reader
