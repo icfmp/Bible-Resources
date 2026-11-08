@@ -53,6 +53,35 @@ class StockSwordCandidateTests(unittest.TestCase):
         r["first_unexplained_chapter_character_streams"] = [{"book": "Other", "chapter": 2}]
         self.assertEqual(assess_stock_readback(r)["status"],
                          "blocked_unexplained_scripture_or_reference_change")
+    def test_independent_visual_asterisk_evidence_is_reported_not_erased(self):
+        r = example()
+        r["first_unexplained_chapter_character_streams"] = [{
+            "book": "Other", "chapter": 2,
+            "remaining_changes_consist_only_of_added_reader_asterisks": True,
+            "reader_only_residual_asterisk_count": 3,
+        }]
+        result = assess_stock_readback(r)
+        self.assertEqual(result["status"], "stock_segond_limitations_classified_not_approved")
+        self.assertEqual(result["reader_display_asterisk_only_chapters"], [{
+            "book": "Other", "chapter": 2, "added_visual_asterisk_count": 3,
+        }])
+        self.assertTrue(result["visual_artifacts_are_not_approved_as_authorial_text"])
+        self.assertFalse(result["approved_for_publication"])
+
+    def test_unverified_or_zero_display_asterisk_evidence_blocks(self):
+        for evidence in (
+            {"remaining_changes_consist_only_of_added_reader_asterisks": False,
+             "reader_only_residual_asterisk_count": 3},
+            {"remaining_changes_consist_only_of_added_reader_asterisks": True,
+             "reader_only_residual_asterisk_count": 0},
+            {"remaining_changes_consist_only_of_added_reader_asterisks": True},
+        ):
+            with self.subTest(evidence=evidence):
+                r = example()
+                r["first_unexplained_chapter_character_streams"] = [evidence]
+                self.assertEqual(assess_stock_readback(r)["status"],
+                                 "blocked_unexplained_scripture_or_reference_change")
+
     def test_unexplained_source_verse_loss_is_blocked(self):
         r = example()
         r["unmatched_verse_slot_classification"][0]["diagnostic_slot_classes"][0][
