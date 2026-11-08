@@ -83,23 +83,55 @@ def module_payload_digest(module_directory: Path) -> str:
 
 def inspect_references(source: set[tuple[str, int, int]],
                        resolved_reader: set[tuple[str, int, int]],
-                       registry: dict[tuple[str, int], int]) -> dict:
-    """Reject inaccessible, merged or noncanonical verse indices.
+                       registry: dict[tuple[str, int], int],
+                       approved_merges: list[tuple[str,str]] | None = None) -> dict:
+    """Screen exact source keys or *explicitly reviewed* adjacent merges.
 
-    Extra unused *registry* slots are reported, not filled with Scripture.
-    An extra populated reader key is different and blocks release.
+    A source-only, out-of-v11n verse may be appended only to an adjacent
+    authored and readable prior verse, and only when separately approved.
+    Original Scripture text is audited independently; this index proof
+    alone NEVER grants publication.
     """
     outside = sorted(ref for ref in source
                      if ref[2] > registry.get((ref[0], ref[1]), 0))
     missing = sorted(source - resolved_reader)
     unexpected = sorted(resolved_reader - source)
+    merge_map = {}
+    approvals = approved_merges or []
+    if not isinstance(approvals,list):
+        raise ValueError("Reviewed SWORD merge manifest must be a list")
+    for src,dst in approvals:
+        src_parsed = parse_keys(src)
+        dst_parsed = parse_keys(dst)
+        if len(src_parsed)!=1 or len(dst_parsed)!=1:
+            raise ValueError("Malformed reviewed SWORD merge reference")
+        sref = next(iter(src_parsed))
+        dref = next(iter(dst_parsed))
+        if (sref in merge_map or sref not in source or dref not in source
+            or dref not in resolved_reader or sref[:2]!=dref[:2]
+            or sref[2]!=dref[2]+1
+            or registry.get(sref[:2],0)!=dref[2]
+            or any(k[0]==sref[0] and k[1]==sref[1] and k[2]>sref[2]
+                   for k in source)):
+            raise ValueError("Unreviewed, non-final or nonadjacent verse merge")
+        merge_map[sref]=dref
+    tolerated=set(merge_map)
+    valid_merges=(set(missing)==tolerated and set(outside)==tolerated
+                  and not unexpected)
+    exact=not (outside or missing or unexpected)
+    status = ("stable_reference_index_verified" if exact and not merge_map
+              else "stable_reference_index_verified_with_reviewed_merges"
+              if valid_merges and bool(merge_map) else "blocked")
     occupied = Counter((book, chapter) for book, chapter, verse in source
                        if verse <= registry.get((book, chapter), 0))
     unused_slots = sum(maximum - occupied.get(key, 0)
                        for key, maximum in registry.items())
     return {
-        "status": ("stable_reference_index_verified"
-                   if not (outside or missing or unexpected) else "blocked"),
+        "status": status,
+        "reviewed_merge_count":len(merge_map),
+        "reviewed_merges":[{"original_osis_ref":"%s.%d.%d" % k,
+                            "stock_reader_osis_ref":"%s.%d.%d" % v}
+                           for k,v in sorted(merge_map.items())],
         "source_reference_count": len(source),
         "resolved_reader_reference_count": len(resolved_reader),
         "outside_registered_versification_count": len(outside),
@@ -109,7 +141,8 @@ def inspect_references(source: set[tuple[str, int, int]],
         "first_outside_refs": ["%s.%d.%d" % x for x in outside[:20]],
         "first_unreachable_refs": ["%s.%d.%d" % x for x in missing[:20]],
         "first_unexpected_reader_refs": ["%s.%d.%d" % x for x in unexpected[:20]],
-        "exact_reference_key_parity": not (outside or missing or unexpected),
+        "exact_reference_key_parity": exact,
+        "reviewed_index_compromise_verified":valid_merges and bool(merge_map),
         "text_notes_markup_and_visuals_verified": False,
     }
 
