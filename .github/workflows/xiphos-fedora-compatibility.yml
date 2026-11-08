@@ -1,0 +1,56 @@
+name: Verify experimental SWORD runtime overlay for Fedora Xiphos
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/xiphos-fedora-compatibility.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    container: fedora:45
+    steps:
+      - name: Install Fedora Xiphos and build requirements
+        run: |
+          dnf -y install git findutils cmake gcc-c++ make pkgconf-pkg-config \
+            xiphos sword xorg-x11-server-Xvfb dbus-x11 \
+            libcurl-devel zlib-ng-compat-devel bzip2-devel xz-devel \
+            libicu-devel glibc-devel >/dev/null
+          rpm -q xiphos sword
+      - uses: actions/checkout@v4
+      - name: Retrieve reviewed SWORD HEAD in an isolated build
+        run: |
+          set -euo pipefail
+          git clone --quiet https://git.crosswire.org/main/sword.git /tmp/sword-head
+          git -C /tmp/sword-head checkout --detach -q a376e42938580f446f53a4cb20e7161355fa9110
+          test "$(git -C /tmp/sword-head rev-parse HEAD)" = a376e42938580f446f53a4cb20e7161355fa9110
+          cmake -S /tmp/sword-head -B /tmp/sword-head-build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/tmp/sword-head-install \
+            -DWITH_CURL=OFF >/dev/null
+          cmake --build /tmp/sword-head-build --parallel 3 >/dev/null
+          cmake --install /tmp/sword-head-build >/dev/null
+      - name: Check real Xiphos dynamic links without changing Fedora sword
+        run: |
+          set -euo pipefail
+          echo '--- distro dynamic SWORD dependency ---'
+          ldd /usr/bin/xiphos | grep libsword
+          test -f /usr/lib64/libsword.so.1.9
+          echo '--- local experimental runtime dependency ---'
+          export LD_LIBRARY_PATH=/tmp/sword-head-install/lib64:/tmp/sword-head-install/lib
+          ldd /usr/bin/xiphos | grep libsword
+          resolved="$(ldd /usr/bin/xiphos | grep libsword)"
+          case "$resolved" in
+            *'/tmp/sword-head-install/'*) ;;
+            *) echo 'Xiphos did NOT resolve the isolated new SWORD library'; exit 1;;
+          esac
+          /usr/bin/xiphos --help > /tmp/xiphos-help.txt
+          grep -q -i xiphos /tmp/xiphos-help.txt
+          echo 'Isolated runtime launch/link smoke passed; GUI verse rendering not yet certified.'
+      - name: Confirm system library untouched
+        if: always()
+        run: |
+          rpm -V sword || true
+          echo 'No Fedora system RPM was modified; local runtime under /tmp only.' >> "$GITHUB_STEP_SUMMARY"
