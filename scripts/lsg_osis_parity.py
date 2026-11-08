@@ -28,6 +28,7 @@ from lsg_note_space_dryrun import simulate_source_note_spaces
 from lsg_speech_space_dryrun import simulate_source_speech_spaces
 from lsg_poetry_parity import audit_poetry
 from lsg_poetry_segments import audit_segments
+from lsg_model_validation import validate_modeled_clone
 
 OSIS="{http://www.bibletechnologies.net/2003/OSIS/namespace}"
 
@@ -344,7 +345,8 @@ def _source_words(raw: bytes) -> tuple[dict,dict,dict]:
     return words,notes,poetry
 
 
-def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
+def compare(osis_path: Path, publisher_usfx: bytes, *,
+            model_schema_path: Path | None = None) -> dict:
     structure,all_source_keys=scan_usfx(publisher_usfx)
     osis_body,osis_words,osis_notes,osis_lines=_osis_verses(osis_path)
     source_codes=structure["original_books"]
@@ -423,6 +425,12 @@ def compare(osis_path: Path, publisher_usfx: bytes) -> dict:
             speech_path.write_bytes(etree.tostring(
                 spoken_tree,encoding="utf-8",xml_declaration=True))
             spoken_text,_,_,_=_osis_verses(speech_path)
+            # The normalized clone is *not* the actual conversion output.
+            # Validate the copy independently against the official schema
+            # and structural policy, and prove it only added ASCII spaces.
+            model_integrity=validate_modeled_clone(
+                doc,spoken_tree,speech_path,model_schema_path)
+        speech_space_model["model_schema_and_integrity_audit"]=model_integrity
         speech_matches=sum(
             source_body[key]==spoken_text[f"{mapping[key[0]]}.{key[1]}.{key[2]}"]
             for key in all_source_keys)
