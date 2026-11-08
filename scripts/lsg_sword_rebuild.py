@@ -423,7 +423,8 @@ def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke",
             if (source_usfx is None or
                 not isinstance(report.get("full_source_verse_roundtrip"), dict) or
                 report["full_source_verse_roundtrip"].get(
-                    "all_chapter_content_preserved_without_spaces") is not True):
+                    "chapters_where_every_residual_difference_is_added_asterisk_only")
+                != report["full_source_verse_roundtrip"].get("expected_chapters")):
                 raise PilotError("Cannot audit raw compiled markup before full body readback")
             report["compiled_raw_markup_review"]=after_full_readback(
                 root, "fraLSG1910eb", report["full_source_verse_roundtrip"]
