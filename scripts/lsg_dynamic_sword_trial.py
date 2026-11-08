@@ -50,7 +50,7 @@ def summarize_internal_markup(raw: bytes) -> dict:
     """Count OSIS-like opening tags without logging any Scripture text."""
     counts=Counter(
         tag.decode("ascii") for tag in re.findall(
-            rb"<([A-Za-z][A-Za-z0-9]*)\\b",raw)
+            rb"<([A-Za-z][A-Za-z0-9]*)\b",raw)
     )
     return {
         "tag_counts":{name:counts.get(name,0) for name in (
