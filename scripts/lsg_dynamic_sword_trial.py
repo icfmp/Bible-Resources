@@ -280,10 +280,19 @@ def experiment(publisher_usfx: bytes, raw_candidate: Path, schema: Path,
                     **summarize_internal_markup(body),
                 }
             report["source_to_compiled_internal_markup_samples"]=per_verse_internal
-            report["source_to_compiled_internal_markup_full_audit"]=(
-                audit_compiled_internal_markup(
-                    improved,publisher_usfx,sword_root=sword_root,
-                    reader=str(reader)))
+            try:
+                report["source_to_compiled_internal_markup_full_audit"]=(
+                    audit_compiled_internal_markup(
+                        improved,publisher_usfx,sword_root=sword_root,
+                        reader=str(reader)))
+            except PilotError as exc:
+                # The -o flags can change diatheke's headings. This is a
+                # *reader* diagnostic; keep the independent raw-entry gate.
+                report["source_to_compiled_internal_markup_full_audit"]={
+                    "status":"reader_output_not_machine_parsable",
+                    "reason":str(exc)[:170],
+                    "approved_for_publication":False,
+                }
             report["all_compiled_note_text_targets_strongs_poetry_verified"]=False
         report["status"]="complete_private_xml_v11n_head_reader_trial"
         report["generated_module_file_count"]=sum(
