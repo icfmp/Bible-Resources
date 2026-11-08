@@ -20,6 +20,9 @@ on:
       - 'tests/test_lsg_poetry_segments.py'
       - 'tests/test_lsg_note_parity.py'
       - 'scripts/lsg_sword_rebuild.py'
+      - 'scripts/lsg_v11n_coverage.py'
+      - 'scripts/sword_v11n_ceilings.cpp'
+      - 'tests/test_lsg_v11n_coverage.py'
       - 'tests/test_lsg_osis_parity.py'
       - 'tests/test_lsg_sword_rebuild.py'
   workflow_dispatch:
@@ -67,13 +70,19 @@ jobs:
       - name: Install official SWORD compiler and isolated reader for diagnostic only
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y libsword-utils diatheke >/dev/null
+          sudo apt-get install -y libsword-utils diatheke libsword-dev >/dev/null
           command -v osis2mod
           command -v diatheke
+      - name: Build temporary C++ reader of SWORD's canonical registry ceilings
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra scripts/sword_v11n_ceilings.cpp \
+            -lsword -o "${{ runner.temp }}/sword-v11n-ceilings"
+          test -x "${{ runner.temp }}/sword-v11n-ceilings"
       - name: Test complete source conversion; no full Scripture module committed, uploaded or published
         env:
           LSG_SAMPLE_DEBUG: '0'
           LSG_COMPARE_CALVIN_V11N: '0'
+          LSG_V11N_CEILINGS_BIN: ${{ runner.temp }}/sword-v11n-ceilings
         run: |
           python scripts/lsg_rebuild_trial.py \
             --usfm-zip "${{ runner.temp }}/original/usfm.zip" \
