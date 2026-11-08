@@ -17,8 +17,8 @@ class RawStockReaderTests(unittest.TestCase):
         }
         self.poetry={"Mark":Counter({"w":5,"note":2,"l":2})}
         self.rows=[
-            "Mark 1:1\t3\t2\t0\t1\t0",
-            "Mark 1:2\t2\t0\t3\t1\t0",
+            "Mark 1:1\t3\t2\t0\t1\t1\t0",
+            "Mark 1:2\t2\t0\t3\t1\t1\t0",
         ]
     def run_audit(self):
         return compare_raw_rows(self.rows,self.keys,self.expected,self.poetry)
@@ -34,20 +34,20 @@ class RawStockReaderTests(unittest.TestCase):
         self.assertTrue(result["source_global_raw_markup_counts_match_compiled"])
         self.assertFalse(result["compiled_note_text_targets_verified"])
     def test_missing_word_or_note_blocks_raw_markup(self):
-        for row in ("Mark 1:1\t2\t2\t0\t1\t0",
-                    "Mark 1:1\t3\t1\t0\t1\t0"):
+        for row in ("Mark 1:1\t2\t2\t0\t1\t1\t0",
+                    "Mark 1:1\t3\t1\t0\t1\t1\t0"):
             with self.subTest(row=row):
                 self.rows[0]=row
                 self.assertEqual(self.run_audit()["status"],"blocked_compiled_raw_markup_mismatch")
     def test_changed_poetry_count_blocks_raw_markup(self):
-        self.rows[0]="Mark 1:1\t3\t2\t0\t0\t0"
+        self.rows[0]="Mark 1:1\t3\t2\t0\t0\t1\t0"
         result=self.run_audit()
         self.assertFalse(result["source_global_raw_markup_counts_match_compiled"])
         self.assertEqual(result["status"],"blocked_compiled_raw_markup_mismatch")
     def test_misaligned_or_missing_raw_entries_are_fatal(self):
         for rows in ([],self.rows[:1],
-                     ["Mark 1:2\t3\t2\t0\t1\t0",self.rows[1]],
-                     ["Mark 1:1\tbroken\t2\t0\t1\t0",self.rows[1]]):
+                     ["Mark 1:2\t3\t2\t0\t1\t1\t0",self.rows[1]],
+                     ["Mark 1:1\tbroken\t2\t0\t1\t1\t0",self.rows[1]]):
             with self.subTest(rows=rows), self.assertRaises(PilotError):
                 compare_raw_rows(rows,self.keys,self.expected,self.poetry)
 
