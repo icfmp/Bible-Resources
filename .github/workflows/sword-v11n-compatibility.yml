@@ -1,0 +1,49 @@
+name: Examine upstream XML versification and Xiphos-compatible SWORD
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/sword-v11n-compatibility.yml'
+      - 'scripts/sword_xml_v11n_probe.py'
+      - 'tests/test_sword_xml_v11n_probe.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify system SWORD version and options
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libsword-dev libsword-utils diatheke pkg-config >/dev/null
+          pkg-config --modversion sword || true
+          osis2mod --help 2>&1 | head -40 || true
+      - name: Retrieve official CrossWire development documentation (read only)
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import urllib.request
+          from urllib.error import URLError, HTTPError
+          u='https://git.crosswire.org/main/sword/-/raw/master/doc/v11n-xml.md'
+          with urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':'Bible-Resources-CI/1.0'}),timeout=25) as response:
+              raw=response.read(100000)
+              print('DOCUMENT',response.geturl(),'HTTP',response.status,'BYTES',len(raw))
+          from pathlib import Path
+          Path('/tmp/sword-v11n-xml.md').write_bytes(raw)
+          print(raw[:18000].decode('utf-8',errors='replace'))
+          PY
+      - name: Inspect CrossWire development V11N source interfaces
+        run: |
+          set -euo pipefail
+          git clone --depth=1 --quiet https://git.crosswire.org/main/sword.git /tmp/sword-head
+          git -C /tmp/sword-head rev-parse HEAD
+          test -f /tmp/sword-head/doc/v11n-xml.md
+          git -C /tmp/sword-head grep -n -E 'loadVersification|xml.*[vV]ersification|v11n-xml|registerVersificationSystem' -- src/mgr/versificationmgr.cpp include/versificationmgr.h | head -90 || true
+          echo '--- XML docs link material ---'
+          git -C /tmp/sword-head ls-files '*v11n*.xml' '*versification*.xml' | head -30
+      - name: Record scope without publishing
+        if: always()
+        run: |
+          echo 'XML v11n compatibility research only. No Bible text downloaded or published.' >> "$GITHUB_STEP_SUMMARY"
