@@ -80,3 +80,11 @@ verified. Do not ship a misleading literal ellipsis as Scripture.
 This is an editorial and QA policy. **No automatic blank-verse insertion,
 note creation or cross-versification mapping is implemented yet.** See the
 Segond + MHC pilot in [PILOT_SEGOND_MHC.md](PILOT_SEGOND_MHC.md).
+
+## Standard-reader compatibility gate
+
+An approved Bible requires independent source-to-compiled verse-key equality
+on a **released, stock SWORD engine**. An experimental XML-defined v11n or a
+successful compiler exit is not sufficient. See
+[Stable SWORD interoperability](INTEROPERABILITY_POLICY.md) and the
+`SWORD_COMPATIBILITY.json` release proof checked by `scripts/validate.py`.
