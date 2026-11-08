@@ -39,10 +39,23 @@ jobs:
           set -euo pipefail
           git clone --depth=1 --quiet https://git.crosswire.org/main/sword.git /tmp/sword-head
           git -C /tmp/sword-head rev-parse HEAD
+          test "$(git -C /tmp/sword-head rev-parse HEAD)" = a376e42938580f446f53a4cb20e7161355fa9110
           test -f /tmp/sword-head/doc/v11n-xml.md
           git -C /tmp/sword-head grep -n -E 'loadVersification|xml.*[vV]ersification|v11n-xml|registerVersificationSystem' -- src/mgr/versificationmgr.cpp include/versificationmgr.h | head -90 || true
           echo '--- XML docs link material ---'
           git -C /tmp/sword-head ls-files '*v11n*.xml' '*versification*.xml' | head -30
+      - name: Build pinned SWORD HEAD in isolated temporary prefix
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y cmake make g++ libcurl4-openssl-dev zlib1g-dev libbz2-dev liblzma-dev libicu-dev >/dev/null
+          cmake -S /tmp/sword-head -B /tmp/sword-head-build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/tmp/sword-head-install \
+            -DWITH_CURL=OFF
+          cmake --build /tmp/sword-head-build --parallel 3
+          cmake --install /tmp/sword-head-build
+          find /tmp/sword-head-install -type f \( -name osis2mod -o -name diatheke -o -name v11ndump \) -print
+          find /tmp/sword-head-build -type f -name v11ndump -print
       - name: Record scope without publishing
         if: always()
         run: |
