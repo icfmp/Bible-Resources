@@ -1,0 +1,733 @@
+{
+  "ancient_contexts": {
+    "a15257a": {
+      "descriptions": {
+        "en": "city in the Middle East, holy to the three Abrahamic religions",
+        "fr": "ville du Proche-Orient, sainte pour les trois religions abrahamiques"
+      },
+      "gaps": [],
+      "images": [
+        {
+          "author": "askii",
+          "bytes": 230592,
+          "caption": {
+            "und": "Dome of the Rock seen from the Mount of Olives (12395649153) (cropped).jpg"
+          },
+          "changes": "Wikimedia thumbnail; original source caption/file title retained.",
+          "commons_revision_timestamp": "2024-11-07T21:16:43Z",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:Dome_of_the_Rock_seen_from_the_Mount_of_Olives_(12395649153)_(cropped).jpg",
+          "height": 486,
+          "license": "CC BY-SA 2.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/2.0",
+          "original_sha1": "dcfad854858bd512e69c3c0c82da2aaf8f28b861",
+          "pageid": 154641343,
+          "sha256": "4fcf697ce4d9605241f5412b6951823546f688b52ec890a5a7804e98092cb501",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/86/Dome_of_the_Rock_seen_from_the_Mount_of_Olives_%2812395649153%29_%28cropped%29.jpg/960px-Dome_of_the_Rock_seen_from_the_Mount_of_Olives_%2812395649153%29_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "width": 960
+        }
+      ],
+      "introductions": {
+        "en": {
+          "changes": "Complete source-service introductory extract; no translation or generated summary.",
+          "language": "en",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "name": "Jerusalem",
+          "text": "Jerusalem is a city in the Southern Levant, on a plateau in the Judaean Mountains between the Mediterranean and the Dead Sea. It is one of the oldest cities in the world and is considered a holy city to the three major Abrahamic religions: Judaism, Christianity and Islam. Both Israel and Palestine claim Jerusalem as their capital city; Israel maintains its primary governmental institutions there, while Palestine ultimately foresees it as its seat of power. Neither claim is widely recognised internationally.",
+          "url": "https://en.wikipedia.org/w/index.php?oldid=1382513533"
+        },
+        "fr": {
+          "changes": "Complete source-service introductory extract; no translation or generated summary.",
+          "language": "fr",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "name": "Jérusalem",
+          "text": "Jérusalem, en hébreu : יְרוּשָׁלַיִם, Yerushaláyim ; en arabe : القدس, al Quds  ou اورشليم, Ûrshalîm, est une ville du Proche-Orient ; sa vieille ville occupe une place centrale dans les religions juive et chrétienne, et une place importante dans la religion musulmane ainsi que dans le conflit en cours depuis la création d'Israël en 1948.",
+          "url": "https://fr.wikipedia.org/w/index.php?oldid=241055466"
+        }
+      },
+      "labels": {
+        "en": "Jerusalem",
+        "fr": "Jérusalem"
+      },
+      "scope": "ancient-place",
+      "source_url": "https://www.wikidata.org/w/index.php?oldid=2564203125",
+      "wikidata": "Q1218",
+      "wikidata_revision": 2564203125
+    }
+  },
+  "coverage": {
+    "modern_sites": 11,
+    "photographs": 8,
+    "places_with_context": 10,
+    "requested_places": 12,
+    "source_languages": [
+      "en",
+      "fr"
+    ]
+  },
+  "database_terms": "https://opendatacommons.org/licenses/odbl/1-0/",
+  "gaps": [
+    {
+      "place": "a1ad8e1",
+      "reason": "No explicit source identity supplied"
+    },
+    {
+      "place": "a308715",
+      "reason": "No explicit source identity supplied"
+    }
+  ],
+  "generation": "2026-11-08",
+  "identity_registry": {
+    "ancient_places": {
+      "a15257a": {
+        "evidence": [
+          "https://www.openbible.info/geo/ancient/a15257a/jerusalem",
+          "https://www.wikidata.org/w/index.php?oldid=2564203125",
+          "https://en.wikipedia.org/w/index.php?oldid=1382952817"
+        ],
+        "openbible_name": "Jerusalem",
+        "review": "Preserves the explicit identity documented in Bible alpha27's place-context resource; no name-based inference.",
+        "scope": "ancient-place",
+        "wikidata": "Q1218"
+      }
+    },
+    "schema": 1
+  },
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "places": {
+    "a112427": {
+      "modern_ids": [
+        "m9b8daa"
+      ],
+      "openbible_name": "Bethlehem 1"
+    },
+    "a15257a": {
+      "modern_ids": [],
+      "openbible_name": "Jerusalem"
+    },
+    "a1ad8e1": {
+      "modern_ids": [],
+      "openbible_name": "Nod"
+    },
+    "a308715": {
+      "modern_ids": [],
+      "openbible_name": "Bethlehem 2"
+    },
+    "a30e967": {
+      "modern_ids": [
+        "m846c1f"
+      ],
+      "openbible_name": "Mount Gerizim"
+    },
+    "a38ad9f": {
+      "modern_ids": [
+        "m657590"
+      ],
+      "openbible_name": "Moreh 1"
+    },
+    "a772880": {
+      "modern_ids": [
+        "m43ae95"
+      ],
+      "openbible_name": "Moreh 2"
+    },
+    "ab1a343": {
+      "modern_ids": [
+        "m9b8daa"
+      ],
+      "openbible_name": "Bethlehem 3"
+    },
+    "adf74d4": {
+      "modern_ids": [
+        "m657590"
+      ],
+      "openbible_name": "Shechem"
+    },
+    "ae7274b": {
+      "modern_ids": [
+        "m7539ea",
+        "m77574e",
+        "mb94c78",
+        "md414e6"
+      ],
+      "openbible_name": "Emmaus"
+    },
+    "af2161c": {
+      "modern_ids": [
+        "m51f0e2",
+        "m66efd0"
+      ],
+      "openbible_name": "Capernaum"
+    },
+    "af5884f": {
+      "modern_ids": [
+        "mb3f688"
+      ],
+      "openbible_name": "Nazareth"
+    }
+  },
+  "revision": "2026-11-08.cb7420768236",
+  "schema": 2,
+  "sites": {
+    "m43ae95": {
+      "descriptions": {
+        "en": "mountain in Israel",
+        "fr": "montagne israélienne"
+      },
+      "gaps": [
+        {
+          "image": "Givatamore.jpg",
+          "reason": "Image license not supported or not verified"
+        }
+      ],
+      "images": [],
+      "introductions": {
+        "en": {
+          "changes": "Complete source-service introductory extract; no translation or generated summary.",
+          "language": "en",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "name": "Givat HaMoreh",
+          "text": "Givat HaMoreh is a hill in northern Israel on the northeast side of the Jezreel Valley. The highest peak reaches an altitude of 515 metres (1,690 ft), while the bottom of the Jezreel Valley is situated at an altitude of 50–100 metres (160–330 ft). North of it are the plains of the Lower Galilee and Mount Tabor. To the east, Giv'at HaMoreh connects to the Issachar Plateau. To the southeast it descends into the Harod Valley, where the 'Ain Jalut flows eastwards into the Jordan Valley.",
+          "url": "https://en.wikipedia.org/w/index.php?oldid=1350016534"
+        },
+        "fr": {
+          "changes": "Complete source-service introductory extract; no translation or generated summary.",
+          "language": "fr",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "name": "Mont Moréh",
+          "text": "Le mont Moréh est une montagne située au nord-est de la vallée de Jezréel dont le point culminant s'élève à une hauteur de 517 m.",
+          "url": "https://fr.wikipedia.org/w/index.php?oldid=225415903"
+        }
+      },
+      "labels": {
+        "en": "Givat HaMoreh",
+        "fr": "mont Moréh"
+      },
+      "scope": "coordinate-source-entity",
+      "source_url": "https://www.wikidata.org/w/index.php?oldid=2565462024",
+      "wikidata": "Q1092415",
+      "wikidata_revision": 2565462024
+    },
+    "m51f0e2": {
+      "descriptions": {
+        "en": "8th-century Islamic palace in Israel"
+      },
+      "gaps": [
+        {
+          "image": "Tabgha Ein Sheva 1903.jpg",
+          "reason": "Image license not supported or not verified"
+        }
+      ],
+      "images": [
+        {
+          "author": "Owenglyndur",
+          "bytes": 529464,
+          "caption": {
+            "und": "Khirbet Al Minya Gateway.jpg"
+          },
+          "changes": "Wikimedia thumbnail; original source caption/file title retained.",
+          "commons_revision_timestamp": "2024-02-28T15:08:55Z",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:Khirbet_Al_Minya_Gateway.jpg",
+          "height": 1280,
+          "license": "CC BY 4.0",
+          "license_url": "https://creativecommons.org/licenses/by/4.0",
+          "original_sha1": "6d0bffc2b3f5c75e0f38e929e05b25214c554c71",
+          "pageid": 145917653,
+          "sha256": "bda7a5c81493906e3a3828ba807119b80eeb57e9109d511713b18846ab2de3d0",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/Khirbet_Al_Minya_Gateway.jpg/960px-Khirbet_Al_Minya_Gateway.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "width": 960
+        }
+      ],
+      "introductions": {
+        "en": {
+          "changes": "Complete source-service introductory extract; no translation or generated summary.",
+          "language": "en",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "name": "Khirbet Minya",
+          "text": "Khirbet Minya, also known as Qasr al-Minya or Ayn Minyat Hisham in Arabic and Horvat/Hurvat Minnim in Hebrew, is an Umayyad-built qasr (palace) in eastern Galilee, Israel, about 200 meters (660 ft) west of the northern end of Lake Tiberias. It was erected as a qasr complex, with a palace, mosque, and bath built by a single patron.",
+          "url": "https://en.wikipedia.org/w/index.php?oldid=1364715538"
+        },
+        "fr": {
+          "changes": "Complete source-service introductory extract; no translation or generated summary.",
+          "language": "fr",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "name": "Khirbat al-Minya",
+          "text": "Khirbat al-Minya est un palais construit par les Omeyyades, situé à l'est de la Galilée, à 200 m de la rive nord du lac de Tibériade, en Israël. Il a été construit dans le cadre d'un ksar pendant le règne de Al-Walīd Ier (705-715) ; le palais inclut également une mosquée et des bains.",
+          "url": "https://fr.wikipedia.org/w/index.php?oldid=217817203"
+        }
+      },
+      "labels": {
+        "en": "Khirbat al-Minya",
+        "fr": "Khirbat al-Minya"
+      },
+      "scope": "coordinate-source-entity",
+      "source_url": "https://www.wikidata.org/w/index.php?oldid=2543673192",
+      "wikidata": "Q2915281",
+      "wikidata_revision": 2543673192
+    },
+    "m657590": {
+      "descriptions": {
+        "en": "ancient Canaanite and Israelite city in central Samaria in the West Bank",
+        "fr": "ville antique du centre de la Samarie"
+      },
+      "gaps": [],
+      "images": [
+        {
+          "author": "Ibrahim Dwaikat",
+          "bytes": 104620,
+          "caption": {
+            "und": "Shechem.jpg"
+          },
+          "changes": "Wikimedia thumbnail; original source caption/file title retained.",
+          "commons_revision_timestamp": "2014-09-17T09:42:58Z",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:Shechem.jpg",
+          "height": 640,
+          "license": "CC BY-SA 3.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+          "original_sha1": "e7e9f25cbb5ccf1af9929c920159fbfdcbbbc917",
+          "pageid": 35430516,
+          "sha256": "8da124b9987ebc57955936a0c58e7236eb8d87102275ac0d2c456ebf140bdef5",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8c/Shechem.jpg/960px-Shechem.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "width": 960
+        }
+      ],
+      "introductions": {
+        "en": {
+          "changes": "Complete source-service introductory extract; no translation or generated summary.",
+          "language": "en",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "name": "Shechem",
+          "text": "Shechem, also spelled Sichem and other variants, was an ancient city in the Southern Levant. Described in ancient Egyptian inscriptions from the 19th century BC as a part of Retjenu, it is also recorded as a Canaanite city in the 14th century BC Amarna letters.",
+          "url": "https://en.wikipedia.org/w/index.php?oldid=1376299242"
+        },
+        "fr": {
+          "changes": "Complete source-service introductory extract; no translation or generated summary.",
+          "language": "fr",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "name": "Sichem",
+          "text": "Sichem est une ancienne ville du Levant. C'est aujourd'hui un site archéologique proche de la ville de Naplouse en Cisjordanie.",
+          "url": "https://fr.wikipedia.org/w/index.php?oldid=238195259"
+        }
+      },
+      "labels": {
+        "en": "Shechem",
+        "fr": "Sichem"
+      },
+      "scope": "coordinate-source-entity",
+      "source_url": "https://www.wikidata.org/w/index.php?oldid=2542498618",
+      "wikidata": "Q7951237",
+      "wikidata_revision": 2542498618
+    },
+    "m66efd0": {
+      "descriptions": {
+        "en": "village at Lake Tiberias in the north of historical Judea, associated with Jesus",
+        "fr": "village situé sur les rives du lac de Tibériade au nord d'Israël, associé à Jésus dans l'Évangile de Matthieu"
+      },
+      "gaps": [
+        {
+          "image": "Kafarnaum BW 7.JPG",
+          "reason": "Image license not supported or not verified"
+        }
+      ],
+      "images": [],
+      "introductions": {
+        "en": {
+          "changes": "Complete source-service introductory extract; no translation or generated summary.",
+          "language": "en",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "name": "Capernaum",
+          "text": "Capernaum was a fishing village established during the time of the Hasmoneans in Israel, located on the northern shore of the Sea of Galilee. It had a population of about 1,500 in the 1st century AD. Archaeological excavations have revealed two ancient synagogues built successively at the same spot. A house progressively turned into a church during the 4th and 5th centuries is held by Christian tradition to have been the home of Saint Peter.",
+          "url": "https://en.wikipedia.org/w/index.php?oldid=1371958696"
+        },
+        "fr": {
+          "changes": "Complete source-service introductory extract; no translation or generated summary.",
+          "language": "fr",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "name": "Capharnaüm",
+          "text": "Capharnaüm ou Capernaüm est un ancien village de pêcheurs de Galilée, sur la rive nord-ouest du lac de Tibériade dans le nord d'Israël. Sous la dynastie des Hasmonéens, ce village faisait de 6 à 10 hectares et sa population avoisinait les 1 700 personnes.",
+          "url": "https://fr.wikipedia.org/w/index.php?oldid=240758953"
+        }
+      },
+      "labels": {
+        "en": "Capernaum",
+        "fr": "Capharnaüm"
+      },
+      "scope": "coordinate-source-entity",
+      "source_url": "https://www.wikidata.org/w/index.php?oldid=2522187575",
+      "wikidata": "Q59174",
+      "wikidata_revision": 2522187575
+    },
+    "m7539ea": {
+      "descriptions": {
+        "en": "village council in Bethlehem Governorate",
+        "fr": "ville de Palestine en Cisjordanie"
+      },
+      "gaps": [],
+      "images": [
+        {
+          "author": "Bukvoed",
+          "bytes": 177654,
+          "caption": {
+            "und": "Artas-Monastery-923.jpg"
+          },
+          "changes": "Wikimedia thumbnail; original source caption/file title retained.",
+          "commons_revision_timestamp": "2019-01-08T11:44:30Z",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:Artas-Monastery-923.jpg",
+          "height": 507,
+          "license": "CC BY 4.0",
+          "license_url": "https://creativecommons.org/licenses/by/4.0",
+          "original_sha1": "410dd9dc3c05da8aef802ecac86f5e4f08a75f53",
+          "pageid": 75682499,
+          "sha256": "2146681afc4e725e2b7f0ac19d24a785be211da30940c33b590cc9265bd9c232",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/Artas-Monastery-923.jpg/960px-Artas-Monastery-923.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "width": 960
+        }
+      ],
+      "introductions": {
+        "en": {
+          "changes": "Complete source-service introductory extract; no translation or generated summary.",
+          "language": "en",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "name": "Artas, Bethlehem",
+          "text": "Artas is a Palestinian village located four kilometers southwest of Bethlehem in the Bethlehem Governorate of Palestine, in the central West Bank. According to the Palestinian Central Bureau of Statistics, the village council had a population of 5,745 in 2017.",
+          "url": "https://en.wikipedia.org/w/index.php?oldid=1383054428"
+        },
+        "fr": {
+          "changes": "Complete source-service introductory extract; no translation or generated summary.",
+          "language": "fr",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "name": "Artas (Bethléem)",
+          "text": "Artas, en arabe : أرطاس, est un village du gouvernorat de Bethléem en Palestine, situé à 4 km au sud-ouest de Bethléem, en Cisjordanie.",
+          "url": "https://fr.wikipedia.org/w/index.php?oldid=237443696"
+        }
+      },
+      "labels": {
+        "en": "Artas, Bethlehem",
+        "fr": "Artas (Bethléem)"
+      },
+      "scope": "coordinate-source-entity",
+      "source_url": "https://www.wikidata.org/w/index.php?oldid=2504038822",
+      "wikidata": "Q3624069",
+      "wikidata_revision": 2504038822
+    },
+    "m77574e": {
+      "descriptions": {
+        "en": "human settlement",
+        "fr": "site archéologique"
+      },
+      "gaps": [
+        {
+          "language": "en",
+          "reason": "Wikipedia identity ambiguous or mismatched"
+        }
+      ],
+      "images": [
+        {
+          "author": "Emmaus",
+          "bytes": 65326,
+          "caption": {
+            "und": "Emmaus Nicopolis basilica.JPG"
+          },
+          "changes": "Wikimedia thumbnail; original source caption/file title retained.",
+          "commons_revision_timestamp": "2008-06-11T08:03:21Z",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:Emmaus_Nicopolis_basilica.JPG",
+          "height": 960,
+          "license": "CC BY-SA 3.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+          "original_sha1": "81877d6e015f41626af11014bf3ffacc35625e5b",
+          "pageid": 4199878,
+          "sha256": "97fc6de0ddfdcdbad075929bc945db62ac12e369e2a17ace0ad7e031a01d88c5",
+          "url": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Emmaus_Nicopolis_basilica.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+          "width": 960
+        }
+      ],
+      "introductions": {
+        "fr": {
+          "changes": "Complete source-service introductory extract; no translation or generated summary.",
+          "language": "fr",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "name": "Emmaüs Nicopolis",
+          "text": "Emmaüs est un site archéologique de Cisjordanie, à environ trente kilomètres à l'ouest de Jérusalem, à la frontière entre les monts de Judée et la vallée d'Ayalon, près de l'endroit où la route menant de Jaffa à Jérusalem, se divise en deux : la voie du nord et celle du sud. L'importance de la localité a varié au cours des siècles : centre administratif régional dès le Ier siècle av. J.-C., elle est dévastée par les romains en -4 et retrouve alors un statut de simple village ; la ville redevient une cité sous l'Empire byzantin, du IIIe au VIIe siècle, avant de décliner à nouveau après sa conquête par les troupes arabo-musulmanes.",
+          "url": "https://fr.wikipedia.org/w/index.php?oldid=232091891"
+        }
+      },
+      "labels": {
+        "en": "Emmaus Nicopolis",
+        "fr": "Emmaüs Nicopolis"
+      },
+      "scope": "coordinate-source-entity",
+      "source_url": "https://www.wikidata.org/w/index.php?oldid=2521360764",
+      "wikidata": "Q847246",
+      "wikidata_revision": 2521360764
+    },
+    "m846c1f": {
+      "descriptions": {
+        "en": "mountain in Judea and Samaria Area, Palestine",
+        "fr": "montagne de Cisjordanie près de Naplouse, Palestine"
+      },
+      "gaps": [],
+      "images": [
+        {
+          "author": "יאיר דב",
+          "bytes": 274967,
+          "caption": {
+            "en": "Mount Gerizim overlooking the Palestinian city of Nablus in the West Bank, seen from Mount Ebal, July 2020.",
+            "fr": "Le mont Garizim surplombant la ville palestinienne de Naplouse, en Cisjordanie, vu depuis le mont Ebal, juillet 2020."
+          },
+          "changes": "Wikimedia thumbnail; original source caption/file title retained.",
+          "commons_revision_timestamp": "2021-01-17T10:44:08Z",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:%D7%A8%D7%9B%D7%A1_%D7%94%D7%A8_%D7%92%D7%A8%D7%99%D7%96%D7%99%D7%9D.jpg",
+          "height": 640,
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+          "original_sha1": "71a9b17ac4f22e140d468dbb07d0d3d0c9d10902",
+          "pageid": 98931010,
+          "sha256": "4e3489e87b101ce0037f098c66e248faa19d4e1f709be05b59ea67457b818076",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d5/%D7%A8%D7%9B%D7%A1_%D7%94%D7%A8_%D7%92%D7%A8%D7%99%D7%96%D7%99%D7%9D.jpg/960px-%D7%A8%D7%9B%D7%A1_%D7%94%D7%A8_%D7%92%D7%A8%D7%99%D7%96%D7%99%D7%9D.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "width": 960
+        }
+      ],
+      "introductions": {
+        "en": {
+          "changes": "Complete source-service introductory extract; no translation or generated summary.",
+          "language": "en",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "name": "Mount Gerizim",
+          "text": "Mount Gerizim is one of two mountains near the Palestinian city of Nablus and the biblical city of Shechem, located in the north of Palestine's West Bank. It forms the southern side of the valley in which Nablus is situated, the northern side being formed by Mount Ebal. The mountain is one of the highest peaks in the West Bank and rises to 881 m (2,890 ft) above sea level, 70 m (230 ft) lower than Mount Ebal. The mountain is particularly steep on the northern side, is sparsely covered at the top with shrubbery, and lower down there is a spring with a high yield of fresh water. The mountain is mentioned in the Hebrew Bible as the place where, upon first entering the Promised Land after the Exodus, the Israelites performed ceremonies of blessings, as they had been instructed by Moses.",
+          "url": "https://en.wikipedia.org/w/index.php?oldid=1382955467"
+        },
+        "fr": {
+          "changes": "Complete source-service introductory extract; no translation or generated summary.",
+          "language": "fr",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "name": "Mont Garizim",
+          "text": "Le mont Garizim ou Gerizim est une montagne de Cisjordanie près de Naplouse, dans la région historique de la Samarie. Cette montagne est un lieu saint pour les Samaritains, qui peuvent faire valoir qu'elle est citée plusieurs fois dans la Torah dans sa transcription samaritaine. Le site est situé en zone C, territoire palestinien sous occupation israélienne depuis 1967.",
+          "url": "https://fr.wikipedia.org/w/index.php?oldid=236998316"
+        }
+      },
+      "labels": {
+        "en": "Mount Gerizim",
+        "fr": "mont Garizim"
+      },
+      "scope": "coordinate-source-entity",
+      "source_url": "https://www.wikidata.org/w/index.php?oldid=2522185728",
+      "wikidata": "Q1288751",
+      "wikidata_revision": 2522185728
+    },
+    "m9b8daa": {
+      "descriptions": {
+        "en": "basilica in Bethlehem",
+        "fr": "basilique chrétienne située sur le lieu présumé de naissance du Christ"
+      },
+      "gaps": [],
+      "images": [
+        {
+          "author": "Neil Ward",
+          "bytes": 145202,
+          "caption": {
+            "und": "Church of the Nativity (7703592746).jpg"
+          },
+          "changes": "Wikimedia thumbnail; original source caption/file title retained.",
+          "commons_revision_timestamp": "2014-10-16T02:46:00Z",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:Church_of_the_Nativity_(7703592746).jpg",
+          "height": 638,
+          "license": "CC BY 2.0",
+          "license_url": "https://creativecommons.org/licenses/by/2.0",
+          "original_sha1": "d001c6d97af5fa90ce099c23dacbc560f3dd614f",
+          "pageid": 36174492,
+          "sha256": "320d1d2b6e741efe056bcbc776412964d03f476c3485ee5c6581b187a6b4b7f0",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/61/Church_of_the_Nativity_%287703592746%29.jpg/960px-Church_of_the_Nativity_%287703592746%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "width": 960
+        }
+      ],
+      "introductions": {
+        "en": {
+          "changes": "Complete source-service introductory extract; no translation or generated summary.",
+          "language": "en",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "name": "Church of the Nativity",
+          "text": "The Church of the Nativity, or Basilica of the Nativity, is a basilica located in Bethlehem, West Bank, Palestine. The grotto holds a prominent religious significance to Christians of various denominations as the birthplace of Jesus. The grotto is the oldest site continuously used as a place of worship in Christianity, and the basilica is the oldest major church in the Holy Land.",
+          "url": "https://en.wikipedia.org/w/index.php?oldid=1367240928"
+        },
+        "fr": {
+          "changes": "Complete source-service introductory extract; no translation or generated summary.",
+          "language": "fr",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "name": "Basilique de la Nativité de Bethléem",
+          "text": "La basilique de la Nativité à Bethléem, de nos jours en Cisjordanie, dans les Territoires palestiniens occupés, est l'une des plus vieilles églises du monde, bâtie selon la tradition, sur le lieu présumé de la naissance de Jésus de Nazareth. Elle a été érigée au IVe siècle par l'empereur romain Constantin Ier et restaurée sous Justinien au VIe siècle.",
+          "url": "https://fr.wikipedia.org/w/index.php?oldid=239721463"
+        }
+      },
+      "labels": {
+        "en": "Church of the Nativity",
+        "fr": "basilique de la Nativité de Bethléem"
+      },
+      "scope": "coordinate-source-entity",
+      "source_url": "https://www.wikidata.org/w/index.php?oldid=2522327985",
+      "wikidata": "Q194504",
+      "wikidata_revision": 2522327985
+    },
+    "mb3f688": {
+      "descriptions": {
+        "en": "minor basilica"
+      },
+      "gaps": [
+        {
+          "image": "Nazaret Verkuendigungsbasilika BW 16.JPG",
+          "reason": "Image license not supported or not verified"
+        }
+      ],
+      "images": [],
+      "introductions": {
+        "en": {
+          "changes": "Complete source-service introductory extract; no translation or generated summary.",
+          "language": "en",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "name": "Basilica of the Annunciation",
+          "text": "The Church of the Annunciation, sometimes also referred to as the Basilica of the Annunciation, is a Catholic church in Nazareth, in northern Israel. It is one of two claimants to the site of the Annunciation – in which angel Gabriel appeared to the Virgin Mary and announced that she would give birth to Jesus – the other being the Greek Orthodox Church of the Annunciation.",
+          "url": "https://en.wikipedia.org/w/index.php?oldid=1366820485"
+        },
+        "fr": {
+          "changes": "Complete source-service introductory extract; no translation or generated summary.",
+          "language": "fr",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "name": "Basilique de l'Annonciation de Nazareth",
+          "text": "La basilique de l'Annonciation est une basilique catholique érigée au milieu du XXe siècle à Nazareth au nord d'Israël, sur le site que la tradition chrétienne catholique, depuis l'époque byzantine, a associé à celui de l'apparition de l'archange Gabriel à Marie. La tradition chrétienne orthodoxe situe l'événement dans l'église Saint-Gabriel à l'emplacement de la fontaine de Marie.",
+          "url": "https://fr.wikipedia.org/w/index.php?oldid=240503127"
+        }
+      },
+      "labels": {
+        "en": "Basilica of the Annunciation",
+        "fr": "basilique de l’Annonciation"
+      },
+      "scope": "coordinate-source-entity",
+      "source_url": "https://www.wikidata.org/w/index.php?oldid=2517400652",
+      "wikidata": "Q130815",
+      "wikidata_revision": 2517400652
+    },
+    "mb94c78": {
+      "descriptions": {
+        "en": "church building in Abu Ghosh, Israel"
+      },
+      "gaps": [
+        {
+          "image": "וCrusader Church in Abu Ghosh.jpg",
+          "reason": "Image license not supported or not verified"
+        }
+      ],
+      "images": [],
+      "introductions": {
+        "en": {
+          "changes": "Complete source-service introductory extract; no translation or generated summary.",
+          "language": "en",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "name": "Church of the Resurrection, Abu Ghosh",
+          "text": "The Resurrection Church, or the Church of the Crusaders in Abu Gosh, is the name given to a Catholic religious building consisting of a structure of the time of the Crusaders who belonged to the Knights Hospitaller, and today is a part of the Benedictine monastery in Abu Ghosh, in central Israel.",
+          "url": "https://en.wikipedia.org/w/index.php?oldid=1363752817"
+        }
+      },
+      "labels": {
+        "en": "Resurrection Church, Abu Ghosh"
+      },
+      "scope": "coordinate-source-entity",
+      "source_url": "https://www.wikidata.org/w/index.php?oldid=2550116492",
+      "wikidata": "Q759606",
+      "wikidata_revision": 2550116492
+    },
+    "md414e6": {
+      "descriptions": {
+        "en": "small Palestinian town"
+      },
+      "gaps": [],
+      "images": [
+        {
+          "author": "KlausFoehl",
+          "bytes": 136347,
+          "caption": {
+            "und": "Qubeiba view01 2012-03-17.jpg"
+          },
+          "changes": "Wikimedia thumbnail; original source caption/file title retained.",
+          "commons_revision_timestamp": "2012-04-30T16:28:04Z",
+          "descriptionurl": "https://commons.wikimedia.org/wiki/File:Qubeiba_view01_2012-03-17.jpg",
+          "height": 533,
+          "license": "CC BY-SA 3.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+          "original_sha1": "b13d1a6602ca8a68bb2e4fcd85bceb9036c67477",
+          "pageid": 19272460,
+          "sha256": "b8d4df9ff64c8cb7d3f47d63aaa006d649243c30213f903c927edc31d2721e73",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/Qubeiba_view01_2012-03-17.jpg/960px-Qubeiba_view01_2012-03-17.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+          "width": 960
+        }
+      ],
+      "introductions": {
+        "en": {
+          "changes": "Complete source-service introductory extract; no translation or generated summary.",
+          "language": "en",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "name": "Al-Qubeiba, Jerusalem",
+          "text": "Al-Qubeiba is a Palestinian town in the Jerusalem Governorate of Palestine, located 2 kilometers northwest of Jerusalem in the central West Bank. According to the Palestinian Central Bureau of Statistics in 2017, the village had a population of 3,876. Al-Qubeiba lies at an altitude of 783m to 795m above sea-level. It is located in a conflict area near the border with Israel between Ramallah and Jerusalem. The settlement of Giv'on HaHadashah lies 5 km southeast of al-Qubeiba. It is surrounded by the town of Biddu (east), Beit 'Anan (northwest), Qatanna (southwest), and Kharayib Umm al-Lahim (west). Unlike the surrounding region, al-Qubeiba has large areas covered with pine and olive trees.",
+          "url": "https://en.wikipedia.org/w/index.php?oldid=1373984707"
+        },
+        "fr": {
+          "changes": "Complete source-service introductory extract; no translation or generated summary.",
+          "language": "fr",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "name": "Al-Qubeiba",
+          "text": "Al-Qubeiba est un village palestinien du gouvernorat de Jérusalem situé à 11 kilomètres au nord-ouest de Jérusalem, dans le nord de la Cisjordanie. Al-Queiba se trouve à une altitude de 783 à 795 m. Situé dans une zone de conflit, proche de la frontière entre Ramallah et Jérusalem, le village est entouré des villes de Biddu à l'est, de Beit 'Anan au nord-ouest, de Qatanna au sud-ouest, de Kharayib Umm al-Lahim à l'ouest et de la colonie de Giv'on HaHadashah au sud-est. Contrairement à la région environnante, désertique, les 3 321 habitants peuvent profiter de vastes zones couvertes de pins et d'oliviers qui font d'al-Qubeiba, une véritable oasis.",
+          "url": "https://fr.wikipedia.org/w/index.php?oldid=234295538"
+        }
+      },
+      "labels": {
+        "en": "Al-Qubayba, Jerusalem",
+        "fr": "Al-Qubeiba"
+      },
+      "scope": "coordinate-source-entity",
+      "source_url": "https://www.wikidata.org/w/index.php?oldid=2502869285",
+      "wikidata": "Q6041947",
+      "wikidata_revision": 2502869285
+    }
+  },
+  "source": "OpenBible.info explicit proposed modern-site identities",
+  "source_inputs": {
+    "database_terms": "https://opendatacommons.org/licenses/odbl/1-0/",
+    "files": {
+      "ancient": {
+        "limit": 25165824,
+        "sha256": "b8187aa4737e8517ccc090f765d2be11da4c548cd2a59d3cdcb62e952cb8c0f2",
+        "url": "https://raw.githubusercontent.com/openbibleinfo/Bible-Geocoding-Data/7eb18a5ee62f27b9b93bd6689ea272d76dd23b8f/data/ancient.jsonl"
+      },
+      "modern": {
+        "limit": 8388608,
+        "sha256": "da731f6e110bac4ea66a9f037a0a31cfb11c4f1efc1206aa9e109092b2c60087",
+        "url": "https://raw.githubusercontent.com/openbibleinfo/Bible-Geocoding-Data/7eb18a5ee62f27b9b93bd6689ea272d76dd23b8f/data/modern.jsonl"
+      }
+    },
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "openbible_commit": "7eb18a5ee62f27b9b93bd6689ea272d76dd23b8f",
+    "schema": 1
+  },
+  "source_url": "https://www.openbible.info/geo/",
+  "wikidata_license": "CC0 1.0",
+  "wikidata_license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+}

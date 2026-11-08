@@ -64,6 +64,17 @@ def build(root=ROOT, output=None, base_url="https://icfmp.github.io/Bible-Resour
     manifest={"schema_version":1,"repository":"Bible Resources","repository_url":base_url,
               "modules":catalog}
     (output/"catalog/v1/catalog.json").write_text(json.dumps(manifest,ensure_ascii=False,sort_keys=True,indent=2)+"\n",encoding="utf-8")
+    context=root/'datasets/place-context-v2.json'
+    if context.is_file():
+        from build_place_context import validate_dataset
+        data=context.read_bytes();value=validate_dataset(data)
+        digest=hashlib.sha256(data).hexdigest()
+        target=output/'place-context/v1';target.mkdir(parents=True)
+        filename='place-context-'+digest+'.json'
+        (target/filename).write_bytes(data)
+        metadata=dict(revision=value['revision'],generation=value['generation'],sha256=digest,
+                      size=len(data),format='bible-place-context-v2',url=base_url+'place-context/v1/'+filename)
+        (target/'catalog.json').write_text(json.dumps(dict(schema=1,resources={'place-context':metadata}),sort_keys=True,indent=2)+'\n')
     (output/".nojekyll").write_text("")
     (output/"index.html").write_text('<!doctype html><html lang="en"><meta charset="utf-8"><title>Bible Resources</title><h1>Bible Resources</h1><p>Curated SWORD modules; unapproved resources are never published.</p><a href="catalog/v1/catalog.json">JSON catalogue</a></html>\n',encoding="utf-8")
     if sum(p.stat().st_size for p in output.rglob("*") if p.is_file())>400*1024*1024:
