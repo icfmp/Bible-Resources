@@ -55,16 +55,28 @@ any decision; no automated verse split or text relocation is authorized.
 
 ## Release and interoperability
 
-This **stable SWORD pilot is intentionally not yet a publishable module**.
-The stock binary follows official behavior but cannot preserve the
-authorial Mark 10:53 address. That is an explicitly recorded loss of index
-fidelity, not lost continuous Scripture text. It remains blocked by the
-strict independent-reference publication gate in PR #23.
+**Updated editorial decision (2026-11-08):** the project owner explicitly
+authorized grouping the original source verses 52 and 53 under stable SWORD
+reader Mark 10:52, with every original Scripture character preserved and the
+source archives untouched. This is a **reviewed, temporary index exception**,
+not accidental corruption, a new versification, or a general license to merge
+different Bible references. Machine-readable authorization:
+`config/lsg-reviewed-verse-merges.json`. A generic source-bound readback
+verifier checks the exact two source-to-reader keys and rejects any unreviewed
+merge. Source-backed OSIS `n="52–53"` metadata is validated, but regular
+SWORD frontends may ignore it; no fake text is inserted into Scripture.
+
+The compromise **removes the categorical rejection of this known index
+difference only**. A faithful full-binary notes/Strong/poetry/structure audit,
+real reader validation, rights and final editorial review are still mandatory
+before publication. PR #23's general release gate requires an explicit,
+source- and binary-bound reviewed-merge provision to reflect this decision.
 
 Before any distribution:
-- Decide the editorial treatment of the inaccessible reference with the
-  publisher/CrossWire and obtain explicit approval; do not insert a visible
-  fake reference or claim an independent verse 53.
+- Keep the owner's approved source→reader 52–53 merge strictly bounded to
+  the recorded immutable source revision. No publisher/CrossWire outreach
+  is required or authorized as a dependency. Avoid fake inline verse labels
+  or claiming independent verse 53 access.
 - Independently validate **all** compiled word/Strong, notes/cross-reference
   targets, poetry, titles, paragraphs and user-visible presentation.
 - Demonstrate real standard-client interoperability, exact legal rights and
@@ -91,9 +103,10 @@ Links: [PR #18](https://github.com/icfmp/Bible-Resources/pull/18),
 - The reader-only residual asterisk cases are `Ezra.4` (**4**), `Ezra.5` (**10**), and `Ezra.7` (**4**). These are explicitly logged visual differences, **not claimed to match source-authorial markup**.
 - The workflow runs entirely on runner temporary data; uploads only text-free diagnostic JSON. **No Bible module, sources or publication generated.**
 
-**Interpretation:** the officially documented SWORD *stable* import behavior is now
-reproduced and classified on the original real corpus. This is not an
-editorial approval to lose independent access to a source verse. The PR #23
-strict release gate remains blocking until an explicitly approved
-interoperable edition strategy and complete compiled markup/annotation
-review exist. Do not merge or publish based on this checkpoint alone.
+**Interpretation (superseded by the explicit owner decision):** the official
+SWORD stable merge is now an *authorized* **temporary** deviation from exact
+individual verse-key access, provided independent readback proves that every
+source codepoint and annotation remains. This is not an approval of the
+entire module. The compiled binary remains under review until full markup,
+rights, edition and visual gate checks are complete. See
+[upstream limitations](../../UPSTREAM_LIMITATIONS.md).
