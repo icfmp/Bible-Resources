@@ -4,6 +4,8 @@ on:
     paths:
       - '.github/workflows/sword-v11n-compatibility.yml'
       - 'scripts/sword_xml_v11n_probe.py'
+      - 'scripts/lsg_source_v11n_delta.py'
+      - 'tests/test_lsg_source_v11n_delta.py'
       - 'tests/test_sword_xml_v11n_probe.py'
   workflow_dispatch:
 permissions:
@@ -56,6 +58,12 @@ jobs:
           cmake --install /tmp/sword-head-build
           find /tmp/sword-head-install -type f \( -name osis2mod -o -name diatheke -o -name v11ndump \) -print
           find /tmp/sword-head-build -type f -name v11ndump -print
+      - name: Test synthetic XML-versified module in development and stable readers
+        run: |
+          set -euo pipefail
+          python scripts/sword_xml_v11n_probe.py \
+            --head-prefix /tmp/sword-head-install \
+            --stable-diatheke /usr/bin/diatheke
       - name: Record scope without publishing
         if: always()
         run: |
