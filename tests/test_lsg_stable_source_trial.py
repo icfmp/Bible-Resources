@@ -83,8 +83,15 @@ class StockSwordCandidateTests(unittest.TestCase):
                             "verse": 2, "side": "reader_only",
                             "classification": "empty_readback_verse_slot",
                             "no_reversification_applied": True})
-                self.assertEqual(assess_stock_readback(r)["status"],
-                                 "blocked_unexplained_scripture_or_reference_change")
+                if variant == "unreported-slot":
+                    # Structurally malformed evidence is rejected at the
+                    # boundary, before any status can be claimed.
+                    from pilot_preflight import PilotError
+                    with self.assertRaises(PilotError):
+                        assess_stock_readback(r)
+                else:
+                    self.assertEqual(assess_stock_readback(r)["status"],
+                                     "blocked_unexplained_scripture_or_reference_change")
     def test_exact_index_requires_no_difference(self):
         r = example()
         r["totals"]["source_keys_missing"] = 0
