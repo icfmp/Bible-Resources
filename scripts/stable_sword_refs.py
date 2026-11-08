@@ -143,7 +143,8 @@ def proof_errors(module_directory: Path, versification: str,
             or data.get("engine_release") != "stable"
             or data.get("registry_source") != "installed_sword_versification_mgr"):
         errors.append(f"{path}: [SWORD_UNSUPPORTED_RUNTIME] Released standard SWORD registry proof required")
-    if (not SHA.fullmatch(source_osis_sha256)
+    if (not isinstance(source_osis_sha256, str)
+            or not SHA.fullmatch(source_osis_sha256)
             or data.get("source_osis_sha256") != source_osis_sha256):
         errors.append(f"{path}: [SWORD_SOURCE_PROOF_STALE] Source digest does not match validated OSIS")
     try:
