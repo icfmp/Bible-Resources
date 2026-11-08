@@ -7,6 +7,8 @@ on:
       - 'scripts/patch_u2o_intro.py'
       - 'tests/test_lsg_rebuild_trial.py'
       - 'scripts/lsg_osis_parity.py'
+      - 'scripts/lsg_model_validation.py'
+      - 'tests/test_lsg_model_validation.py'
       - 'scripts/lsg_note_parity.py'
       - 'scripts/lsg_note_space_dryrun.py'
       - 'scripts/lsg_speech_space_dryrun.py'
