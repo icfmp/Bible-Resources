@@ -14,7 +14,11 @@ Wikidata sitelinks select Wikipedia articles. A summary is accepted only when it
 
 ## Distribution and updates
 
-The normal reviewed Pages build publishes `place-context/v1/catalog.json` and an immutable, SHA-256-named JSON payload. The application ships a small generated seed for offline use and discovers updates through the existing explicit Library refresh. Installing the optional context resource replaces only its own checked JSON, atomically; it does not rewrite the OpenBible index, notes, translations or preferences. Content expansion needs a reviewed resource update, not an application release. No full photograph archive is bundled. Image acquisition remains an explicit user action with the existing bounded verified image cache and individual attribution.
+The normal reviewed build prepares `place-context/v1/catalog.json` and an immutable, SHA-256-named JSON payload. GitHub Pages is not enabled in the current repository (publication run 42478460725 failed at configure-pages with HTTP 404). Distribution therefore uses the committed `datasets/place-context-catalogue.json` through raw.githubusercontent.com/main. Its payload URL pins the full dataset source commit. After committing a changed dataset, run `python scripts/prepare_place_manifest.py --source <full-commit>` and commit the resulting manifest. The build rejects stale manifests. This preserves independent, reviewed updates without changing repository administration. Pages output remains available if the repository owner enables it later.
+
+The module checker can likewise read the official generated `catalog/v1/catalog.json` snapshot through raw.githubusercontent.com/main; the build rejects a snapshot that differs from the approved module set. The present snapshot accurately contains zero modules; it does not offer nonfunctional package downloads.
+
+The application ships a small generated seed for offline use and discovers updates through the existing explicit Library refresh. Installing the optional context resource replaces only its own checked JSON, atomically; it does not rewrite the OpenBible index, notes, translations or preferences. Content expansion needs a reviewed resource update, not an application release. No full photograph archive is bundled. Image acquisition remains an explicit user action with the existing bounded verified image cache and individual attribution.
 
 The metadata manifest is not an assertion that curated Bible modules are approved: the separate module catalogue still contains zero approved imports.
 
