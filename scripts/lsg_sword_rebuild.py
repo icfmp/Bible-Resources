@@ -102,6 +102,28 @@ def classify_chapter_slot_differences(expected: dict[int,str],
 
 
 
+
+def count_reader_only_asterisks(source: str, rendered: str) -> int | None:
+    """Conservatively count only inserted literal '*' codepoints.
+
+    The original entire source character stream must be a left-to-right
+    subsequence of reader output. Missing/altered source punctuation, digits
+    or letters cannot pass. Does not infer a safe transformation.
+    """
+    i=j=0
+    extra=0
+    while j<len(rendered):
+        if i<len(source) and source[i]==rendered[j]:
+            i+=1
+            j+=1
+        elif rendered[j]=="*":
+            extra+=1
+            j+=1
+        else:
+            return None
+    return extra if i==len(source) else None
+
+
 def classify_chapter_readback_wrappers(expected: dict[int,str],
                                        actual: dict[int,str]) -> dict:
     """Check known whole-verse diatheke emphasis wrappers without editing text.
@@ -120,10 +142,14 @@ def classify_chapter_readback_wrappers(expected: dict[int,str],
             count+=1
         corrected.append(rendered)
     stripped=_no_whitespace("".join(corrected))
+    residual_stars=count_reader_only_asterisks(source,stripped)
     return {
         "source_and_reader_character_stream_equal":source==raw,
         "character_stream_equal_after_exact_display_wrappers":source==stripped,
         "exact_whole_verse_visual_wrappers":count,
+        "remaining_changes_consist_only_of_added_reader_asterisks":
+            residual_stars is not None,
+        "reader_only_residual_asterisk_count":residual_stars,
         "source_non_whitespace_characters":len(source),
         "reader_non_whitespace_characters":len(raw),
         "source_sha256":_sha(source.encode("utf-8")),
@@ -145,6 +171,7 @@ def full_index_roundtrip(source: bytes, *, root: Path, reader: str) -> dict:
     chapter_stream_parity=0
     wrapper_stream_parity=0
     verified_visual_wrappers=0
+    chapters_matching_after_asterisk_only_diagnostic=0
     first_unexplained_chapter_streams=[]
     books=[]
     for code,(book_name,chapters) in plan.items():
@@ -170,6 +197,8 @@ def full_index_roundtrip(source: bytes, *, root: Path, reader: str) -> dict:
                 "character_stream_equal_after_exact_display_wrappers"]
             verified_visual_wrappers+=display_audit[
                 "exact_whole_verse_visual_wrappers"]
+            chapters_matching_after_asterisk_only_diagnostic+=display_audit[
+                "remaining_changes_consist_only_of_added_reader_asterisks"]
             if (not display_audit[
                     "character_stream_equal_after_exact_display_wrappers"]
                     and len(first_unexplained_chapter_streams)<50):
@@ -227,6 +256,8 @@ def full_index_roundtrip(source: bytes, *, root: Path, reader: str) -> dict:
         "all_chapter_content_preserved_without_spaces":chapter_stream_parity==1189,
         "chapters_matching_after_exact_visual_wrappers":wrapper_stream_parity,
         "recognized_whole_verse_reader_emphasis_wrappers":verified_visual_wrappers,
+        "chapters_where_every_residual_difference_is_added_asterisk_only":
+            chapters_matching_after_asterisk_only_diagnostic,
         "first_unexplained_chapter_character_streams":first_unexplained_chapter_streams,
         "source_key_count_matches":totals["source_keys_missing"]==0
           and totals["sword_keys_unexpected"]==0
