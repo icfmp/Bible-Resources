@@ -21,12 +21,19 @@ TIMEOUT = 40
 
 def query(module_id: str, reference: str, *, fmt: str, root: Path,
           exe: str = "diatheke", limit: int = MAX_OUTPUT,
-          timeout: int = TIMEOUT) -> tuple[int, bytes]:
+          timeout: int = TIMEOUT, options: str = "") -> tuple[int, bytes]:
     if fmt not in {"internal", "plain"} or not isinstance(module_id,str) or not module_id:
         raise PilotError("Unreviewed SWORD reader request")
     if not isinstance(reference,str) or not reference or len(reference) > 120:
         raise PilotError("Invalid bounded SWORD key")
-    cmd = [exe, "-b", module_id, "-f", fmt, "-k", reference]  # -k MUST BE LAST!
+    allowed_options = set("nfmhcvalsrbwgeixtM")
+    if not isinstance(options,str) or not set(options).issubset(allowed_options) or (
+            len(options) != len(set(options))):
+        raise PilotError("Invalid explicit SWORD filter request")
+    cmd = [exe, "-b", module_id, "-f", fmt]
+    if options:
+        cmd.extend(("-o", options))
+    cmd.extend(("-k", reference))  # -k MUST BE LAST!
     environment = dict(os.environ, SWORD_PATH=str(root))
     process = subprocess.Popen(
         cmd, env=environment, stdin=subprocess.DEVNULL,
