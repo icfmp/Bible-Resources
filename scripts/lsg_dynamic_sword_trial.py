@@ -103,7 +103,7 @@ def audit_compiled_internal_markup(candidate: Path, source: bytes,
             ref=f"{book_name} {chapter}"
             rc,content=query(MODULE_ID,ref,fmt="internal",
                              root=sword_root,exe=reader,
-                             timeout=30,limit=4*1024*1024)
+                             timeout=30,limit=4*1024*1024,options="sfnhl")
             if not present_key(ref,content,rc):
                 raise PilotError("SWORD cannot read source chapter in internal markup audit")
             # The rendered verse-heading parser may normalize whitespace
@@ -274,7 +274,7 @@ def experiment(publisher_usfx: bytes, raw_candidate: Path, schema: Path,
                         "Psalms 23:1","Acts 8:37"):
                 rc,body=query(MODULE_ID,ref,fmt="internal",
                               root=sword_root,exe=str(reader),
-                              timeout=30,limit=256*1024)
+                              timeout=30,limit=256*1024,options="sfnhl")
                 per_verse_internal[ref]={
                     "query_return_code":rc,
                     **summarize_internal_markup(body),
