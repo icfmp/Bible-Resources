@@ -39,11 +39,20 @@ jobs:
           ldd /usr/bin/xiphos | grep libsword
           test -f /usr/lib64/libsword.so.1.9
           echo '--- local experimental runtime dependency ---'
-          export LD_LIBRARY_PATH=/tmp/sword-head-install/lib64:/tmp/sword-head-install/lib
+          echo '--- inspect newly compiled library and its SONAME ---'
+          find /tmp/sword-head-install -name 'libsword.so*' -print
+          candidate="$(find /tmp/sword-head-install -type f -name 'libsword.so*' | head -1)"
+          test -n "$candidate"
+          readelf -d "$candidate" | grep SONAME || true
+          # Fedora Xiphos specifically requests libsword.so.1.9.
+          # Map only the independent temporary overlay; never touch /usr/lib64.
+          mkdir -p /tmp/sword-xiphos-overlay
+          cp -L "$candidate" /tmp/sword-xiphos-overlay/libsword.so.1.9
+          export LD_LIBRARY_PATH=/tmp/sword-xiphos-overlay
           ldd /usr/bin/xiphos | grep libsword
           resolved="$(ldd /usr/bin/xiphos | grep libsword)"
           case "$resolved" in
-            *'/tmp/sword-head-install/'*) ;;
+            *'/tmp/sword-xiphos-overlay/libsword.so.1.9'*) ;;
             *) echo 'Xiphos did NOT resolve the isolated new SWORD library'; exit 1;;
           esac
           /usr/bin/xiphos --help > /tmp/xiphos-help.txt
