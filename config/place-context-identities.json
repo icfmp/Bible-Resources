@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "ancient_places": {
+    "a15257a": {
+      "openbible_name": "Jerusalem",
+      "wikidata": "Q1218",
+      "scope": "ancient-place",
+      "evidence": [
+        "https://www.openbible.info/geo/ancient/a15257a/jerusalem",
+        "https://www.wikidata.org/w/index.php?oldid=2564203125",
+        "https://en.wikipedia.org/w/index.php?oldid=1382952817"
+      ],
+      "review": "Preserves the explicit identity documented in Bible alpha27's place-context resource; no name-based inference."
+    }
+  }
+}
