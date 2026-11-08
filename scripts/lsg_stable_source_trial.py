@@ -196,8 +196,15 @@ def run_stable(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) ->
         inspector=os.environ.get("LSG_STOCK_RAW_INSPECTOR")
         if not inspector:
             raise PilotError("Unfiltered stable SWORD raw markup audit executable is required")
+        # Standard SWORD About metadata may be visible in the module details
+        # even if frontends render the canonical verse key as plain "52".
+        module_notice = "Note de versification : " + "; ".join(
+            f"{d['osis_reader_key']} regroupe les versets {d['preferred_display_label']}"
+            for d in decisions
+        ) + ". Le texte biblique original est intégralement conservé."
         report["stock_sword_compiled_candidate"] = compile_candidate(
             labeled, source_usfx=original_xml, versification="Segond",
+            module_info_note=module_notice,
             after_full_readback=lambda root,module_id,roundtrip:
                 audit_stock_raw_markup(
                     original_xml,labeled,decisions,sword_root=root,
