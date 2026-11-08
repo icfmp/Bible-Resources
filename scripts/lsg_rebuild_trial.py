@@ -29,6 +29,7 @@ from pilot_preflight import PilotError, inspect_archive
 from pilot_subprocess import MAX_OUTPUT
 from lsg_osis_parity import compare as compare_osis
 from lsg_sword_rebuild import compile_candidate
+from lsg_v11n_coverage import audit_publisher_usfx_against_installed_sword
 
 
 CONVERTER_COMMIT = "dde28bc545e8d8697fa5496c243187847ec55d31"
@@ -363,6 +364,14 @@ def run(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) -> dict:
             _debug_converted_verse_markup(candidate)
         report["source_to_generated_osis"]=compare_osis(
             candidate,original_xml,model_schema_path=schema)
+        # Inspect *all installed* canonical SWORD chapter maxima, without
+        # compiling or reading any biblical text in this separate proof.
+        # This is a coverage screen, not publication or verse-boundary proof.
+        helper=os.getenv("LSG_V11N_CEILINGS_BIN")
+        if helper:
+            report["registered_sword_versification_coverage"]=(
+                audit_publisher_usfx_against_installed_sword(
+                    original_xml,candidate,Path(helper)))
         note_audit=report["source_to_generated_osis"]["source_to_candidate_note_content_audit"]
         report["note_content_and_reference_text_parity"]=note_audit[
             "textual_target_references_verified"]
