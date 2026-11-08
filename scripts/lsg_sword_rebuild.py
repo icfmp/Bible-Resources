@@ -16,7 +16,7 @@ import tempfile
 
 from pilot_preflight import PilotError
 from pilot_subprocess import query,present_key
-from lsg_sword_compare import chapter_plan,parse_sword_chapter,usfx_text_by_verse,plain
+from lsg_sword_compare import chapter_plan,parse_sword_chapter,usfx_text_by_verse,plain,explain_wrapper
 from lsg_source_compare import scan_usfx
 
 MAX_COMPILER_LOG=6*1024*1024
@@ -101,6 +101,37 @@ def classify_chapter_slot_differences(expected: dict[int,str],
     }
 
 
+
+def classify_chapter_readback_wrappers(expected: dict[int,str],
+                                       actual: dict[int,str]) -> dict:
+    """Check known whole-verse diatheke emphasis wrappers without editing text.
+
+    Only an exact balanced '* <verse> *' wrapper, around a verse without
+    source asterisks, can be diagnosed as *visual*. Other changes stay red.
+    """
+    source=_no_whitespace("".join(expected[v] for v in sorted(expected)))
+    raw=_no_whitespace("".join(actual[v] for v in sorted(actual)))
+    corrected=[]
+    count=0
+    for v in sorted(actual):
+        rendered=actual[v]
+        if v in expected and explain_wrapper(expected[v],rendered):
+            rendered=expected[v]
+            count+=1
+        corrected.append(rendered)
+    stripped=_no_whitespace("".join(corrected))
+    return {
+        "source_and_reader_character_stream_equal":source==raw,
+        "character_stream_equal_after_exact_display_wrappers":source==stripped,
+        "exact_whole_verse_visual_wrappers":count,
+        "source_non_whitespace_characters":len(source),
+        "reader_non_whitespace_characters":len(raw),
+        "source_sha256":_sha(source.encode("utf-8")),
+        "reader_sha256":_sha(raw.encode("utf-8")),
+        "approved_for_publication":False,
+    }
+
+
 def full_index_roundtrip(source: bytes, *, root: Path, reader: str) -> dict:
     """Read all source chapters in rebuilt module; never export their text."""
     from collections import Counter
@@ -112,6 +143,9 @@ def full_index_roundtrip(source: bytes, *, root: Path, reader: str) -> dict:
     index_key_mismatches=[]
     unmatched_slot_classes=[]
     chapter_stream_parity=0
+    wrapper_stream_parity=0
+    verified_visual_wrappers=0
+    first_unexplained_chapter_streams=[]
     books=[]
     for code,(book_name,chapters) in plan.items():
         book_checks=Counter()
@@ -131,6 +165,17 @@ def full_index_roundtrip(source: bytes, *, root: Path, reader: str) -> dict:
             chapter_slot_audit=classify_chapter_slot_differences(expected,actual)
             chapter_stream_parity+=chapter_slot_audit[
                 "complete_chapter_character_stream_equal_ignoring_whitespace"]
+            display_audit=classify_chapter_readback_wrappers(expected,actual)
+            wrapper_stream_parity+=display_audit[
+                "character_stream_equal_after_exact_display_wrappers"]
+            verified_visual_wrappers+=display_audit[
+                "exact_whole_verse_visual_wrappers"]
+            if (not display_audit[
+                    "character_stream_equal_after_exact_display_wrappers"]
+                    and len(first_unexplained_chapter_streams)<50):
+                first_unexplained_chapter_streams.append({
+                    "book":code,"chapter":chapter,**display_audit,
+                })
             if (source_only or sword_only) and len(unmatched_slot_classes)<70:
                 unmatched_slot_classes.append({
                     "book":code,"chapter":chapter,**chapter_slot_audit,
@@ -180,6 +225,9 @@ def full_index_roundtrip(source: bytes, *, root: Path, reader: str) -> dict:
         "unmatched_verse_slot_classification":unmatched_slot_classes,
         "chapters_with_equal_continuous_text_ignoring_whitespace":chapter_stream_parity,
         "all_chapter_content_preserved_without_spaces":chapter_stream_parity==1189,
+        "chapters_matching_after_exact_visual_wrappers":wrapper_stream_parity,
+        "recognized_whole_verse_reader_emphasis_wrappers":verified_visual_wrappers,
+        "first_unexplained_chapter_character_streams":first_unexplained_chapter_streams,
         "source_key_count_matches":totals["source_keys_missing"]==0
           and totals["sword_keys_unexpected"]==0
           and totals["source_verses"]==len(keys)
