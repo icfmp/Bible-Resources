@@ -12,14 +12,17 @@ formats. A module compiling with `osis2mod` is not automatically portable.
 2. Enumerate numeric verse capacities from the **actual released** CrossWire
    SWORD registry (not an invented or inferred edition-specific v11n).
 3. Check each authored book/chapter/verse reference against the registry;
-   unknown, out-of-range and duplicate keys block publication. Keep genuine
-   source omissions as omissions; report empty registry positions, never
-   fill them with invented Scripture.
+   unknown, out-of-range and duplicate keys block publication **unless an
+   exact adjacent end-of-chapter merge has specific source-bound project-owner
+   approval**. Keep genuine source omissions as omissions; report empty
+   registry positions, never fill them with invented Scripture.
 4. Compile with a released, supported `osis2mod` and read the compiled
    module independently with the released SWORD engine. The *resolved* and
-   *populated* verse key inventory must match the source references exactly.
-   Do not reconstruct the reader-key inventory from the input or assume that
-   a successful query proves a key is independently addressable.
+   *populated* verse key inventory must match the source references exactly,
+   **except for a specifically reviewed and proven adjacent merge** with
+   source bodies fully preserved in the correct order. Do not reconstruct
+   the reader-key inventory from the input or assume that a successful query
+   proves a key is independently addressable.
 5. Run separate, complete source-to-compiled **text, punctuation, notes,
    cross-references, Strong's, poetry, headings and chapter navigation**
    audits. Test representative real frontends, including a SWORD C++ client
@@ -61,6 +64,43 @@ published binary, not by reusing the input list. Release builds must also
 verify its provenance. The tool refuses a negative comparison and cannot
 substitute for a whole-module readback.
 
+
+### Explicitly reviewed adjacent verse merges
+
+When a released stock SWORD versification cannot index an original source's
+last verse of a chapter, the project owner may authorize a **temporary,
+reversible, edition- and source-revision-bound** compromise. It is not a
+blanket permission to renumber Scriptures, insert an annotation into biblical
+prose or silently change a source file. The source USFM/USFX and original
+OSIS verse milestones remain immutable; the actual compiler and reader
+behavior is independently inspected.
+
+The module stages `SOURCE_REFERENCE_MERGES.json` (a reviewed source digest,
+exact OSIS source→reader key pairs, rationale and approval). The publication
+report must include that exact file's SHA-256, its original publisher
+source digest, a complete source→compiled chapter-body comparison and a
+cryptographic report digest. `stable_sword_refs.py` accepts the review
+file using `--reviewed-merge-policy` and the independent original source
+fingerprint using `--publisher-document-sha256`. It **never** marks the
+body comparison or human sign-off as passed on its own; the release auditor
+must verify those separately.
+
+Even a validated index exception is not a release on its own. The compiled
+notes, original Strong and other lemma values, headings, poetry, reference
+targets, rights, formatting and application renderings require their own
+independent review. OSIS `verse@n` supports editorial numbering metadata,
+but normal `osis2mod` does not guarantee visible range numbers in every
+frontend. A range label must never be inserted as an invented sentence in
+the Bible text.
+
+For the current Segond 1910 pilot, the owner explicitly authorized the
+**Mark 10:52–53 merge on 2026-11-08**, preserving both verse bodies in a
+single stock `Segond` entry. The decision is source-bound in
+[config/lsg-reviewed-verse-merges.json](https://github.com/icfmp/Bible-Resources/blob/test/lsg-stable-segond-candidate/config/lsg-reviewed-verse-merges.json),
+and the known original-software limitations are recorded in
+[UPSTREAM_LIMITATIONS.md](https://github.com/icfmp/Bible-Resources/blob/test/lsg-stable-segond-candidate/docs/UPSTREAM_LIMITATIONS.md).
+This is **not** contingent upon a CrossWire fix or an upstream request.
+
 ## Segond 1910 pilot: edition evidence, not a silent correction
 
 The original eBible `fraLSG` USFM/USFX source has **31,170** unique verse
@@ -92,16 +132,21 @@ they do not authorize an automated edit. Locate and inspect the original
 the eBible verse-36/37 split is an upstream digitization defect or a
 documented edition variant. Other discrepancies could still exist.
 
-Do not silently split `Job.34.36`, merge `Mark.10.53`, insert verses,
-renumber this edition, or claim that another SWORD edition's license covers
-our redistribution. Report a confirmed source defect upstream first and
-keep both original files and all proposed corrections auditable.
+Do not silently split `Job.34.36`, insert verses, renumber this edition,
+or claim that another SWORD edition's license covers our redistribution.
+The **explicitly authorized** Mark 10:52–53 combined entry is a documented
+exception to *individual verse indexing only*: both original texts are
+retained, and no Scripture text is inserted or rewritten. Keep all original
+files and proposed corrections auditable; a possible Job source issue
+is logged internally without requiring upstream contact.
 
 A pinned development SWORD XML-v11n experiment can address both source
 keys exactly; stock SWORD 1.9 cannot. **That experiment is R&D only, not
-the stable distribution solution.** No Segond module is approved, published,
-or downloadable from this repository until the exact released-runtime
-reference and full editorial gates pass.
+the stable distribution solution.** The ordinary `Segond` importer plus
+the approved, source-verified merged index is the temporary stable route.
+No Segond module is approved, published, or downloadable from this
+repository until the remaining compiled markup, rights, visual and
+editorial gates pass.
 
 Official CrossWire documentation:
 - https://wiki.crosswire.org/Alternate_Versification
