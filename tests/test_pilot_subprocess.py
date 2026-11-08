@@ -37,9 +37,9 @@ class BoundedReaderTests(unittest.TestCase):
 
     def test_explicit_note_and_xref_options_precede_terminal_key(self):
         self.executable(
-            "import sys\\n"
-            "assert sys.argv[1:7]==['-b','MHC','-f','internal','-o','sfnhl']\\n"
-            "assert sys.argv[7:]==['-k','Gen 1:1']\\n"
+            "import sys\n"
+            "assert sys.argv[1:7]==['-b','MHC','-f','internal','-o','sfnhl']\n"
+            "assert sys.argv[7:]==['-k','Gen 1:1']\n"
             "print('Synthetic note markup')"
         )
         code,body=query("MHC","Gen 1:1",fmt="internal",root=self.root,
