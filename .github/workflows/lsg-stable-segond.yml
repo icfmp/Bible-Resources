@@ -4,6 +4,9 @@ on:
     paths:
       - '.github/workflows/lsg-stable-segond.yml'
       - 'scripts/lsg_stable_source_trial.py'
+      - 'scripts/reviewed_reference_merges.py'
+      - 'tests/test_reviewed_reference_merges.py'
+      - 'config/lsg-reviewed-verse-merges.json'
       - 'tests/test_lsg_stable_source_trial.py'
       - 'scripts/lsg_rebuild_trial.py'
       - 'scripts/patch_u2o_intro.py'
@@ -111,4 +114,4 @@ jobs:
           echo '## Real LSG via stock SWORD Segond' >> "$GITHUB_STEP_SUMMARY"
           echo 'Uses released osis2mod -v Segond and diatheke, not SWORD HEAD or custom XML v11n.' >> "$GITHUB_STEP_SUMMARY"
           echo 'Original publisher source, temporary OSIS and binary are not published or uploaded.' >> "$GITHUB_STEP_SUMMARY"
-          echo 'Green diagnosis means known CrossWire reference limitations have been classified. It is NOT editorial approval or permission to distribute a misindexed edition.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Project owner explicitly authorized one source-bound, verified Mark 10:52–53 index merge. Full markup and final release gates remain outstanding.' >> "$GITHUB_STEP_SUMMARY"
