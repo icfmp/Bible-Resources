@@ -255,6 +255,44 @@ def proof_errors(module_directory: Path, versification: str,
     return errors
 
 
+def load_approved_merge_policy(
+        path: Path, *, publisher_digest: str, versification: str
+) -> tuple[list[tuple[str,str]],str]:
+    """Source-bound owner review; source/reader address changes only."""
+    if (path.is_symlink() or not path.is_file()
+            or path.stat().st_size>100_000):
+        raise ValueError("Unsafe or missing approved SWORD merge policy")
+    raw=path.read_bytes()
+    try:
+        p=json.loads(raw)
+    except (ValueError, UnicodeError) as exc:
+        raise ValueError("Malformed reviewed SWORD merge policy") from exc
+    if (not isinstance(p,dict) or p.get("schema_version")!=1
+            or p.get("source_document_sha256")!=publisher_digest
+            or not isinstance(publisher_digest,str)
+            or not SHA.fullmatch(publisher_digest)
+            or p.get("versification")!=versification
+            or p.get("policy")
+               !="approved_explicit_temporary_adjacent_verse_index_merge"
+            or not isinstance(p.get("authorization"),dict)
+            or p["authorization"].get("who")
+               !="Bible Resources project owner"):
+        raise ValueError("Publisher source, SWORD registry or authorization differs")
+    entries=p.get("allowed_merges")
+    if not isinstance(entries,list) or not entries or len(entries)>200:
+        raise ValueError("No approved source-bound verse mergers")
+    refs=[]
+    for item in entries:
+        if (not isinstance(item,dict)
+            or item.get("source_content_preserved") is not True
+            or item.get("independent_reference_access_lost") is not True
+            or item.get("reversible") is not True
+            or item.get("status")!="temporarily_authorized_versification_compromise"):
+            raise ValueError("Invalid source-bound merged verse approval")
+        refs.append((item["osis_source_key"],item["osis_reader_key"]))
+    return refs,hashlib.sha256(raw).hexdigest()
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-keys", type=Path, required=True)
@@ -264,6 +302,10 @@ def main() -> int:
     parser.add_argument("--reader-version", required=True)
     parser.add_argument("--source-osis-sha256", required=True)
     parser.add_argument("--module-directory", type=Path, required=True)
+    parser.add_argument("--reviewed-merge-policy", type=Path,
+                        help="Source-bound owner approval; not a publication waiver")
+    parser.add_argument("--publisher-document-sha256",
+                        help="Independent original publisher USFX digest")
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args()
     if not STABLE_VERSION.fullmatch(args.reader_version):
@@ -276,9 +318,23 @@ def main() -> int:
         registry = parse_registry(args.registry_tsv.read_text(encoding="utf-8"),
                                   args.versification)
         payload_hash = module_payload_digest(args.module_directory)
-    except (ValueError, OSError, UnicodeError) as exc:
+        merge_refs=[]
+        review_digest=None
+        if args.reviewed_merge_policy is not None:
+            if not args.publisher_document_sha256:
+                raise ValueError("Publisher source digest required for a merged index")
+            expected=(args.module_directory / "SOURCE_REFERENCE_MERGES.json").resolve()
+            if args.reviewed_merge_policy.resolve()!=expected:
+                raise ValueError("Approved merger must be attached to this module")
+            merge_refs,review_digest=load_approved_merge_policy(
+                args.reviewed_merge_policy,
+                publisher_digest=args.publisher_document_sha256,
+                versification=args.versification)
+        elif args.publisher_document_sha256 is not None:
+            raise ValueError("Publisher digest alone is not a reviewed merger")
+    except (ValueError, OSError, UnicodeError,KeyError,TypeError) as exc:
         parser.error(str(exc))
-    report = inspect_references(src, reader, registry)
+    report = inspect_references(src, reader, registry, merge_refs)
     report.update({
         "versification": args.versification,
         "reader_engine": "libsword",
@@ -288,12 +344,21 @@ def main() -> int:
         "source_osis_sha256": args.source_osis_sha256,
         "module_payload_sha256": payload_hash,
         "reviewed_by": "PENDING",
+        "reviewed_merge_policy_sha256": review_digest,
+        "original_publisher_document_sha256": args.publisher_document_sha256,
+        # Independent source/body proof must be attached and audited later.
+        "full_source_chapter_character_streams_verified": False,
+        "full_readback_chapter_count": 0,
+        "full_readback_evidence_sha256": None,
     })
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(report, sort_keys=True, indent=2) + "\n",
                            encoding="utf-8")
     print("SWORD stable reference index:", report["status"])
-    return 0 if report["status"] == "stable_reference_index_verified" else 1
+    return 0 if report["status"] in {
+        "stable_reference_index_verified",
+        "stable_reference_index_verified_with_reviewed_merges",
+    } else 1
 
 
 if __name__ == "__main__":
