@@ -22,7 +22,7 @@ class OriginalSourceVerseGridTests(unittest.TestCase):
         keys,names,baseline,order=self.fixture()
         args={"keys":keys,"names":names,"baseline":baseline,
               "book_order":order,"base_name":"Segond",
-              "edition_id":"BRLSGTest"}
+              "edition_id":"BRLSGTest","new_testament_first":"Mark"}
         args.update(override)
         return build_v11n_delta(**args)
 
