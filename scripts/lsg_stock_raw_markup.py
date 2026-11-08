@@ -102,13 +102,6 @@ def compare_raw_rows(rows: list[str], ordered_refs: list[tuple[str,str]],
                 "expected_word_tags":e["w"],"compiled_word_tags":w,
                 "expected_note_tags":e["note"],"compiled_note_tags":n})
         checked+=1
-    words_equal=(
-        source_count["word"]==compiled_count["word"]
-        and not any("word" in k for mismatch in differences for k in ())
-        and all(r["expected_word_tags"]==r["compiled_word_tags"] for r in differences))
-    notes_equal=(
-        source_count["note"]==compiled_count["note"]
-        and all(r["expected_note_tags"]==r["compiled_note_tags"] for r in differences))
     # Count every verse by itself, not merely global tag totals.
     per_verse_words_equal=sum(
         1 for line,(osis_ref,_) in zip(rows,ordered_refs)
