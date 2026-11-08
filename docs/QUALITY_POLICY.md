@@ -29,3 +29,12 @@ LSG/Psalms and MHC/Genesis key probes already contain line/paragraph
 signals. Check Bible GTK rendering before touching an otherwise structured
 module. No actual imported/published reader-optimized resource is approved
 merely by this tool.
+
+## Interoperable binary evidence
+
+For every approved Bible, require the text-free, source/payload-bound
+`SWORD_COMPATIBILITY.json` evidence from a released SWORD reader. Its
+index proof is **not** a replacement for separate whole-text, punctuation,
+notes, structural, reader-visual and rights approvals. Experimental
+versification modules must remain unpublished. See
+[interoperability policy](INTEROPERABILITY_POLICY.md).
