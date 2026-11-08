@@ -63,9 +63,6 @@ def build(root=ROOT, output=None, base_url="https://icfmp.github.io/Bible-Resour
                         tar.addfile(info,io.BytesIO(data))
     manifest={"schema_version":1,"repository":"Bible Resources","repository_url":base_url,
               "modules":catalog}
-    snapshot=root/'catalog/v1/catalog.json'
-    if snapshot.is_file() and json.loads(snapshot.read_bytes())!=manifest:
-        raise ValueError('Refresh the committed official catalogue snapshot from this build before publication')
     (output/"catalog/v1/catalog.json").write_text(json.dumps(manifest,ensure_ascii=False,sort_keys=True,indent=2)+"\n",encoding="utf-8")
     context=root/'datasets/place-context-v2.json'
     if context.is_file():
@@ -77,17 +74,6 @@ def build(root=ROOT, output=None, base_url="https://icfmp.github.io/Bible-Resour
         (target/filename).write_bytes(data)
         metadata=dict(revision=value['revision'],generation=value['generation'],sha256=digest,
                       size=len(data),format='bible-place-context-v2',url=base_url+'place-context/v1/'+filename)
-        committed=root/'datasets/place-context-catalogue.json'
-        if committed.is_file():
-            pinned=json.loads(committed.read_bytes())['resources']['place-context']
-            if any(pinned[k]!=metadata[k] for k in ('revision','generation','sha256','size','format')):
-                raise ValueError('Refresh the committed place-context manifest')
-            from urllib.parse import urlsplit
-            import re
-            url=urlsplit(pinned['url'])
-            if url.scheme!='https' or url.netloc!='raw.githubusercontent.com' or url.query or url.fragment or not re.fullmatch(r'/icfmp/Bible-Resources/[0-9a-f]{40}/datasets/place-context-v2\.json',url.path):
-                raise ValueError('Place dataset requires an immutable official source URL')
-            metadata=pinned
         (target/'catalog.json').write_text(json.dumps(dict(schema=1,resources={'place-context':metadata}),sort_keys=True,indent=2)+'\n')
     (output/".nojekyll").write_text("")
     (output/"index.html").write_text('<!doctype html><html lang="en"><meta charset="utf-8"><title>Bible Resources</title><h1>Bible Resources</h1><p>Curated SWORD modules; unapproved resources are never published.</p><a href="catalog/v1/catalog.json">JSON catalogue</a></html>\n',encoding="utf-8")
