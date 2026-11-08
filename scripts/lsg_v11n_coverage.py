@@ -18,7 +18,8 @@ from pilot_preflight import PilotError
 from lsg_source_compare import scan_usfx
 
 OSIS="{http://www.bibletechnologies.net/2003/OSIS/namespace}"
-IDENTIFIER=re.compile(r"^[A-Za-z][A-Za-z0-9]{0,31}$")
+REGISTRY_NAME=re.compile(r"^[A-Za-z][A-Za-z0-9]{0,31}$")
+OSIS_BOOK_NAME=re.compile(r"^[1-4]?[A-Za-z][A-Za-z0-9]{0,31}$")
 
 
 def parse_ceilings(output: str) -> dict[str,dict[tuple[str,int],int]]:
@@ -29,7 +30,7 @@ def parse_ceilings(output: str) -> dict[str,dict[tuple[str,int],int]]:
         if len(cols)!=4:
             raise PilotError(f"Malformed SWORD v11n line {line_number}")
         v11n,book,chapter,verse_max=cols
-        if not IDENTIFIER.fullmatch(v11n) or not IDENTIFIER.fullmatch(book):
+        if not REGISTRY_NAME.fullmatch(v11n) or not OSIS_BOOK_NAME.fullmatch(book):
             raise PilotError(f"Unreviewed SWORD registry/book at line {line_number}")
         if not chapter.isdecimal() or not verse_max.isdecimal():
             raise PilotError(f"Non-numeric SWORD v11n chapter at line {line_number}")
