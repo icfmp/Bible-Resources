@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import hashlib
 import os
+import re
+from collections import Counter
 from pathlib import Path
 import subprocess
 import tempfile
@@ -42,6 +44,21 @@ def head_sword_library(prefix: Path):
             os.environ.pop("LD_LIBRARY_PATH",None)
         else:
             os.environ["LD_LIBRARY_PATH"]=old
+
+
+def summarize_internal_markup(raw: bytes) -> dict:
+    """Count OSIS-like opening tags without logging any Scripture text."""
+    counts=Counter(
+        tag.decode("ascii") for tag in re.findall(
+            rb"<([A-Za-z][A-Za-z0-9]*)\\b",raw)
+    )
+    return {
+        "tag_counts":{name:counts.get(name,0) for name in (
+            "w","note","reference","l","lg","q","hi","title"
+        )},
+        "returned_bytes":len(raw),
+        "returned_sha256":hashlib.sha256(raw).hexdigest(),
+    }
 
 
 def experiment(publisher_usfx: bytes, raw_candidate: Path, schema: Path,
@@ -145,6 +162,21 @@ def experiment(publisher_usfx: bytes, raw_candidate: Path, schema: Path,
                 publisher_usfx,root=sword_root,reader=str(reader),
                 module_id=MODULE_ID,
             )
+            # Distinguish plain-reader text parity from compiled markup
+            # preservation. Internal format may be renderer-specific; this
+            # initial bounded probe is *not* full apparatus certification.
+            per_verse_internal={}
+            for ref in ("Mark 10:53","Job 34:36","John 3:16",
+                        "Psalms 23:1","Acts 8:37"):
+                rc,body=query(MODULE_ID,ref,fmt="internal",
+                              root=sword_root,exe=str(reader),
+                              timeout=30,limit=256*1024)
+                per_verse_internal[ref]={
+                    "query_return_code":rc,
+                    **summarize_internal_markup(body),
+                }
+            report["source_to_compiled_internal_markup_samples"]=per_verse_internal
+            report["all_compiled_note_text_targets_strongs_poetry_verified"]=False
         report["status"]="complete_private_xml_v11n_head_reader_trial"
         report["generated_module_file_count"]=sum(
             p.is_file() for p in data.rglob("*"))
