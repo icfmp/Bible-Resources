@@ -55,7 +55,6 @@ def experiment(publisher_usfx: bytes, raw_candidate: Path, schema: Path,
         "published":False,
         "approved_for_publication":False,
     }
-    _,keys=scan_usfx(publisher_usfx)
     source,keys=scan_usfx(publisher_usfx)
     book_order=source["original_books"]
     root=etree.parse(str(raw_candidate),parser=etree.XMLParser(
