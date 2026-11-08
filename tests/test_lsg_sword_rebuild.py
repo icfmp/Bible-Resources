@@ -6,7 +6,10 @@ import sys
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
-from lsg_sword_rebuild import compile_candidate,SAMPLES,PROBE_V11N,PUBLISHER_DECLARED_V11N
+from lsg_sword_rebuild import (
+    compile_candidate,SAMPLES,PROBE_V11N,PUBLISHER_DECLARED_V11N,
+    classify_chapter_slot_differences
+)
 
 
 class LSGSegondRebuildTests(unittest.TestCase):
@@ -53,6 +56,42 @@ class LSGSegondRebuildTests(unittest.TestCase):
         self.assertFalse(r["approved_for_publication"])
         self.assertEqual(self.source.read_bytes(),original)
         self.assertEqual(list(self.root.glob("**/*.conf")),[])
+
+    def test_extra_blank_reader_registry_slot_is_not_mistaken_for_scripture(self):
+        audit=classify_chapter_slot_differences(
+            {35:"Source verse.",36:"Authorial final verse."},
+            {35:"Source verse.",36:"Authorial final verse.",37:""}
+        )
+        self.assertEqual(audit["diagnostic_slot_classes"][0]["classification"],
+                         "empty_readback_verse_slot")
+        self.assertTrue(audit["complete_chapter_character_stream_equal_ignoring_whitespace"])
+        self.assertFalse(audit["all_verse_reference_slots_verified"])
+        self.assertFalse(audit["editorial_and_versification_approved"])
+        self.assertNotIn("Authorial",repr(audit))
+
+    def test_source_extra_verse_merged_into_previous_reader_slot_is_classified(self):
+        audit=classify_chapter_slot_differences(
+            {51:"First.",52:"Second.",53:"Last."},
+            {51:"First.",52:"Second. Last."})
+        self.assertEqual(audit["source_only_verses"],[53])
+        self.assertEqual(audit["diagnostic_slot_classes"][0]["classification"],
+                         "readback_preceding_slot_contains_both_verse_character_streams")
+        self.assertTrue(audit["complete_chapter_character_stream_equal_ignoring_whitespace"])
+        self.assertFalse(audit["editorial_and_versification_approved"])
+
+    def test_true_missing_scripture_cannot_be_misclassified_as_index_only(self):
+        audit=classify_chapter_slot_differences(
+            {51:"First.",52:"Second.",53:"Last."},
+            {51:"First.",52:"Second."})
+        self.assertEqual(audit["diagnostic_slot_classes"][0]["classification"],
+                         "unresolved_missing_verse_index")
+        self.assertFalse(audit["complete_chapter_character_stream_equal_ignoring_whitespace"])
+        audit=classify_chapter_slot_differences(
+            {35:"A.",36:"B."},
+            {35:"A.",36:"B.",37:"Unreviewed!"})
+        self.assertEqual(audit["diagnostic_slot_classes"][0]["classification"],
+                         "unexpected_populated_reader_slot")
+        self.assertFalse(audit["complete_chapter_character_stream_equal_ignoring_whitespace"])
 
     def test_missing_compiled_data_is_not_mistaken_for_a_module(self):
         self.compiler.write_text("#!/usr/bin/env python3\npass\n")
