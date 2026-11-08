@@ -104,22 +104,23 @@ def compare_raw_rows(rows: list[str], ordered_refs: list[tuple[str,str]],
     per_verse_words_exact=0
     for line,(osis_ref,query) in zip(rows,ordered_refs):
         cols=line.split("\t")
-        if len(cols)!=6 or cols[0]!=query:
+        if len(cols)!=7 or cols[0]!=query:
             raise PilotError("Raw compiled SWORD row does not match requested key")
         try:
-            w,n,xref,poetry,q=map(int,cols[1:])
+            w,n,xref,poetry,poetry_end,q=map(int,cols[1:])
         except (TypeError,ValueError) as exc:
             raise PilotError("Malformed unfiltered SWORD markup counter") from exc
-        if any(v<0 or v>5000 for v in (w,n,xref,poetry,q)):
+        if any(v<0 or v>5000 for v in (w,n,xref,poetry,poetry_end,q)):
             raise PilotError("Out-of-range unfiltered SWORD markup counter")
         book=osis_ref.split(".")[0]
         inside=expected[osis_ref]
         expected_inside.update({"w":inside["w"],"note":inside["note"],"l":inside["l"]})
         expected_inside_by_book[book].update({"w":inside["w"],"note":inside["note"],
                                                "l":inside["l"]})
-        compiled_counts.update({"w":w,"note":n,"l":poetry,"q":q,"reference":xref})
+        compiled_counts.update({"w":w,"note":n,"l":poetry,"l_end":poetry_end,
+                                "q":q,"reference":xref})
         compiled_by_book[book].update({"w":w,"note":n,"l":poetry,
-                                        "q":q,"reference":xref})
+                                        "l_end":poetry_end,"q":q,"reference":xref})
         per_verse_notes_equal+=n==inside["note"]
         per_verse_words_at_least+=w>=inside["w"]
         per_verse_words_exact+=w==inside["w"]
@@ -178,6 +179,7 @@ def compare_raw_rows(rows: list[str], ordered_refs: list[tuple[str,str]],
         "compiled_raw_note_tags":compiled_counts["note"],
         "source_global_poetry_line_tags":global_expected["l"],
         "compiled_raw_poetry_line_tags":compiled_counts["l"],
+        "compiled_raw_poetry_line_end_milestones":compiled_counts["l_end"],
         "words_matching_exact_source_verse_milestone_counts":per_verse_words_exact,
         "verses_with_no_source_word_tag_loss":per_verse_words_at_least,
         "per_verse_note_tag_matches":per_verse_notes_equal,
