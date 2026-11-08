@@ -44,6 +44,24 @@ def build_stock_markup_plan(source: bytes, candidate: Path,
             or source_ref in remap or source_ref==dest_ref):
             raise PilotError("Invalid approved raw-markup reference merger")
         remap[source_ref]=dest_ref
+    # A verse-milestoned OSIS document can legitimately put <w> or <l>
+    # outside a verse's current sID/eID span (titles, linked poetry lines).
+    # Record independent *whole-book* source counts instead of pretending
+    # all original tags belong to the nearest verse.
+    source_global={}
+    for book in tree.iter(OSIS+"div"):
+        if book.get("type")!="book":
+            continue
+        book_id=book.get("osisID")
+        source_global[book_id]=Counter({
+            "w":sum(1 for _ in book.iter(OSIS+"w")),
+            "note":sum(1 for _ in book.iter(OSIS+"note")),
+            "l":sum(1 for _ in book.iter(OSIS+"l")),
+            "q":sum(1 for _ in book.iter(OSIS+"q")),
+            "reference":sum(1 for _ in book.iter(OSIS+"reference")),
+        })
+    if set(source_global)!=set(book_ids):
+        raise PilotError("Cannot independently count every source OSIS book")
     compiled_expected=defaultdict(Counter)
     reader_names={}
     for code,ch,verse in authorial_keys:
@@ -68,76 +86,116 @@ def build_stock_markup_plan(source: bytes, candidate: Path,
         raise PilotError("Compiled reader index does not match authorized merged slots")
     aliases=[(reader_ref,reader_names[reader_ref])
              for reader_ref in sorted(compiled_expected)]
-    expected_poetry=Counter()
-    for ref,counts in compiled_expected.items():
-        expected_poetry[ref.split(".")[0]]+=counts["l"]
-    return aliases,compiled_expected,expected_poetry
+    return aliases,compiled_expected,source_global
 
 def compare_raw_rows(rows: list[str], ordered_refs: list[tuple[str,str]],
-                     expected: dict, poetry_by_book: dict) -> dict:
+                     expected: dict, source_global_by_book: dict) -> dict:
+    """Count each actual reader key and conservatively classify interverse tags."""
     if not ordered_refs or len(rows)!=len(ordered_refs):
         raise PilotError("Compiled raw SWORD inspector skipped or inserted reader keys")
     differences=[]
-    source_count=Counter()
-    compiled_count=Counter()
-    compiled_lines=Counter()
+    expected_inside=Counter()
+    compiled_counts=Counter()
+    compiled_by_book=defaultdict(Counter)
+    expected_inside_by_book=defaultdict(Counter)
     checked=0
+    per_verse_notes_equal=0
+    per_verse_words_at_least=0
+    per_verse_words_exact=0
     for line,(osis_ref,query) in zip(rows,ordered_refs):
         cols=line.split("\t")
         if len(cols)!=6 or cols[0]!=query:
-            raise PilotError("Raw compiled SWORD row ref does not match requested key")
+            raise PilotError("Raw compiled SWORD row does not match requested key")
         try:
             w,n,xref,poetry,q=map(int,cols[1:])
         except (TypeError,ValueError) as exc:
-            raise PilotError("Malformed raw SWORD markup counter") from exc
-        if any(val<0 or val>5000 for val in (w,n,xref,poetry,q)):
-            raise PilotError("Unexpected unfiltered SWORD counter")
-        e=expected[osis_ref]
-        source_count.update({"word":e["w"],"note":e["note"],"poetry":e["l"]})
-        compiled_count.update({"word":w,"note":n,"poetry":poetry,"reference":xref,"q":q})
-        compiled_lines[osis_ref.split(".")[0]]+=poetry
-        if (w,n)!=(e["w"],e["note"]) and len(differences)<50:
+            raise PilotError("Malformed unfiltered SWORD markup counter") from exc
+        if any(v<0 or v>5000 for v in (w,n,xref,poetry,q)):
+            raise PilotError("Out-of-range unfiltered SWORD markup counter")
+        book=osis_ref.split(".")[0]
+        inside=expected[osis_ref]
+        expected_inside.update({"w":inside["w"],"note":inside["note"],"l":inside["l"]})
+        expected_inside_by_book[book].update({"w":inside["w"],"note":inside["note"],
+                                               "l":inside["l"]})
+        compiled_counts.update({"w":w,"note":n,"l":poetry,"q":q,"reference":xref})
+        compiled_by_book[book].update({"w":w,"note":n,"l":poetry,
+                                        "q":q,"reference":xref})
+        per_verse_notes_equal+=n==inside["note"]
+        per_verse_words_at_least+=w>=inside["w"]
+        per_verse_words_exact+=w==inside["w"]
+        if (w!=inside["w"] or n!=inside["note"]) and len(differences)<50:
             differences.append({
                 "osis_ref":osis_ref,
-                "expected_word_tags":e["w"],"compiled_word_tags":w,
-                "expected_note_tags":e["note"],"compiled_note_tags":n})
+                "inside_original_word_tags":inside["w"],
+                "compiled_raw_word_tags":w,
+                "source_note_tags":inside["note"],
+                "compiled_raw_note_tags":n,
+                "possible_interverse_word_tags":max(0,w-inside["w"]),
+            })
         checked+=1
-    # Count every verse by itself, not merely global tag totals.
-    per_verse_words_equal=sum(
-        1 for line,(osis_ref,_) in zip(rows,ordered_refs)
-        if int(line.split("\t")[1])==expected[osis_ref]["w"])
-    per_verse_notes_equal=sum(
-        1 for line,(osis_ref,_) in zip(rows,ordered_refs)
-        if int(line.split("\t")[2])==expected[osis_ref]["note"])
-    all_book_names=set(poetry_by_book)|set(compiled_lines)
-    poetry_equal=all(compiled_lines[b]==poetry_by_book.get(b,0)
-                     for b in all_book_names)
+    by_book=[]
+    books=set(source_global_by_book)|set(compiled_by_book)
+    all_book_tags_equal=True
+    only_documented_relocations=True
+    for book in sorted(books):
+        source=source_global_by_book.get(book,Counter())
+        raw=compiled_by_book.get(book,Counter())
+        inside=expected_inside_by_book.get(book,Counter())
+        # The compiler may attach <w> tags occurring *outside* verse milestones
+        # to neighboring entries. Their source authorial words remain in
+        # scope; a missing or newly created tag would break global parity.
+        total_equal=all(source[k]==raw[k] for k in ("w","note","l"))
+        outside=max(0,source["w"]-inside["w"])
+        attached=raw["w"]-inside["w"]
+        only_documented_relocations &= (attached==outside and outside>=0)
+        all_book_tags_equal &= total_equal
+        if not total_equal or outside or attached:
+            by_book.append({
+                "book":book,
+                "source_whole_book_word_tags":source["w"],
+                "compiled_word_tags":raw["w"],
+                "word_tags_outside_source_verse_milestones":outside,
+                "word_tags_attached_during_compilation":attached,
+                "source_whole_book_note_tags":source["note"],
+                "compiled_note_tags":raw["note"],
+                "source_whole_book_poetry_line_tags":source["l"],
+                "compiled_poetry_line_tags":raw["l"],
+                "word_note_poetry_totals_equal":total_equal,
+            })
+    verified=(all_book_tags_equal and only_documented_relocations
+              and per_verse_words_at_least==checked
+              and per_verse_notes_equal==checked)
+    global_expected=Counter()
+    for counts in source_global_by_book.values():
+        global_expected.update(counts)
     return {
-        "status": ("raw_stock_sword_word_note_poetry_counts_verified"
-                   if (per_verse_words_equal==checked and
-                       per_verse_notes_equal==checked and poetry_equal)
-                   else "blocked_compiled_raw_markup_mismatch"),
+        "status":("raw_stock_sword_global_markers_verified_with_interverse_diagnostics"
+                  if verified else "blocked_compiled_raw_markup_mismatch"),
         "checked_reader_entries":checked,
-        "expected_source_word_tags":source_count["word"],
-        "compiled_word_tags":compiled_count["word"],
-        "expected_source_note_tags":source_count["note"],
-        "compiled_note_tags":compiled_count["note"],
-        "expected_source_poetry_line_tags":source_count["poetry"],
-        "compiled_poetry_line_tags":compiled_count["poetry"],
-        "per_verse_word_tag_matches":per_verse_words_equal,
+        "source_global_word_tags":global_expected["w"],
+        "compiled_raw_word_tags":compiled_counts["w"],
+        "source_global_note_tags":global_expected["note"],
+        "compiled_raw_note_tags":compiled_counts["note"],
+        "source_global_poetry_line_tags":global_expected["l"],
+        "compiled_raw_poetry_line_tags":compiled_counts["l"],
+        "words_matching_exact_source_verse_milestone_counts":per_verse_words_exact,
+        "verses_with_no_source_word_tag_loss":per_verse_words_at_least,
         "per_verse_note_tag_matches":per_verse_notes_equal,
-        "books_with_matching_poetry_line_tags":sum(
-            compiled_lines[b]==poetry_by_book.get(b,0) for b in all_book_names),
-        "books_compared":len(all_book_names),
-        "source_to_compiled_word_tag_counts_verified":per_verse_words_equal==checked,
-        "source_to_compiled_note_tag_counts_verified":per_verse_notes_equal==checked,
-        "source_to_compiled_poetry_line_counts_verified":poetry_equal,
-        "compiled_cross_reference_tag_count":compiled_count["reference"],
-        "compiled_q_tag_count":compiled_count["q"],
-        "first_mismatches":differences,
+        "books_compared":len(books),
+        "books_with_matching_full_word_note_poetry_tag_counts":sum(
+            all(source_global_by_book[b][k]==compiled_by_book[b][k]
+                for k in ("w","note","l"))
+            for b in books if b in source_global_by_book and b in compiled_by_book),
+        "source_global_raw_markup_counts_match_compiled":all_book_tags_equal,
+        "all_outside_verse_word_markers_accounted_for":only_documented_relocations,
+        "first_interverse_word_relocations_or_mismatches":differences,
+        "book_level_diagnostics":by_book[:66],
+        "compiled_cross_reference_tag_count":compiled_counts["reference"],
+        "compiled_quote_tag_count":compiled_counts["q"],
         "compiled_note_text_targets_verified":False,
         "compiled_lemma_id_values_verified":False,
-        "original_source_modified":False,
+        "interverse_marker_placement_editorially_approved":False,
+        "source_modified":False,
         "published":False,
     }
 
@@ -146,7 +204,7 @@ def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
                            module_id: str, inspector: Path) -> dict:
     if not inspector.is_file() or inspector.is_symlink():
         raise PilotError("Stock SWORD raw verifier executable not found")
-    aliases,expected,expected_poetry=build_stock_markup_plan(
+    aliases,expected,source_global=build_stock_markup_plan(
         publisher_usfx,candidate,decisions)
     with tempfile.TemporaryDirectory(prefix="stock-sword-raw-") as temp:
         refs=Path(temp)/"reader-keys.txt"
@@ -160,7 +218,7 @@ def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
         if (proc.returncode or proc.stderr.strip()
             or len(proc.stdout)>8_000_000):
             raise PilotError("Stock SWORD raw markup inspection failed")
-        report=compare_raw_rows(proc.stdout.splitlines(),aliases,expected,expected_poetry)
+        report=compare_raw_rows(proc.stdout.splitlines(),aliases,expected,source_global)
     report["source_reader_merge_count"]=len(decisions)
     report["compiled_module_id"]=module_id
     return report
