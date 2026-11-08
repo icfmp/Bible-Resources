@@ -27,6 +27,7 @@ MAX_COMPILE_SECONDS=180
 # mismatched verse slots). Neither choice is publication-approved.
 PUBLISHER_DECLARED_V11N="NRSV"
 PROBE_V11N="Segond"
+ALTERNATE_PROBE_V11N="Calvin"
 SAMPLES=[
     ("Genesis 1:1","Genesis 1:1:"),
     ("Exodus 7:26","Exodus 7:26:"),
@@ -188,7 +189,12 @@ def full_index_roundtrip(source: bytes, *, root: Path, reader: str) -> dict:
     }
 
 
-def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke", source_usfx: bytes | None=None) -> dict:
+def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke",
+                      source_usfx: bytes | None=None, versification: str=PROBE_V11N) -> dict:
+    # Explicit, reviewed registry allowlist: this is diagnostic, not a
+    # request to rewrite source IDs or to publish a second edition.
+    if versification not in {PROBE_V11N, ALTERNATE_PROBE_V11N}:
+        raise PilotError("Unreviewed SWORD versification in LSG trial")
     before=osis.read_bytes()
     report={
         "status":"rebuild_probe_not_approved",
@@ -196,9 +202,9 @@ def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke", sou
         "source_file_unchanged":True,
         "published":False,
         "approved_for_publication":False,
-        "versification":PROBE_V11N,
+        "versification":versification,
         "publisher_declared_versification":PUBLISHER_DECLARED_V11N,
-        "publisher_v11n_matches_diagnostic_probe":PROBE_V11N==PUBLISHER_DECLARED_V11N,
+        "publisher_v11n_matches_diagnostic_probe":versification==PUBLISHER_DECLARED_V11N,
         "versification_approved":False,
         "module_id":"fraLSG1910eb",
         "real_module_rebuilt_in_temporary_directory":False,
@@ -209,7 +215,7 @@ def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke", sou
         data=root/"modules/texts/rawtext/fralsg1910eb"
         data.mkdir(parents=True)
         result=subprocess.run(
-            [compiler,str(data),str(osis),"-v",PROBE_V11N],
+            [compiler,str(data),str(osis),"-v",versification],
             capture_output=True,check=False,timeout=MAX_COMPILE_SECONDS,
         )
         logs=result.stdout+result.stderr
@@ -234,7 +240,7 @@ def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke", sou
             "error":len(re.findall(rb"(?m)(?:^|\n)ERROR\(",logs)),
             "warning":len(re.findall(rb"(?m)(?:^|\n)WARNING\(",logs)),
             "v11n_outside":len(re.findall(
-                rb"not in the "+PROBE_V11N.encode("ascii")+rb" versification",logs)),
+                rb"not in the "+versification.encode("ascii")+rb" versification",logs)),
         }
         files=[p for p in data.rglob("*") if p.is_file()]
         report["module_file_count"]=len(files)
@@ -264,7 +270,7 @@ def compile_candidate(osis: Path, *, compiler="osis2mod", reader="diatheke", sou
             "GlobalOptionFilter=OSISFootnotes\n"
             "GlobalOptionFilter=OSISScripref\n"
             "GlobalOptionFilter=OSISHeadings\n"
-            f"Versification={PROBE_V11N}\n"
+            f"Versification={versification}\n"
             "DistributionLicense=Public Domain\n",
             encoding="utf-8",
         )
