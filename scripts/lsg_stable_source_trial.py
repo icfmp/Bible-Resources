@@ -22,6 +22,8 @@ from lsg_rebuild_trial import (_safe_files, _osis_summary, _schema_proof,
                                CONVERTER_COMMIT, MAX_CONVERTER_SECONDS)
 from lsg_ephemeral_osis_candidate import prepare_ephemeral_source_spaced_osis
 from lsg_sword_rebuild import compile_candidate
+from lsg_stock_raw_markup import audit_stock_raw_markup
+import os
 from reviewed_reference_merges import (load_reviewed_merges, assess_reviewed_merges,
                                        annotate_editorial_label)
 
@@ -191,8 +193,15 @@ def run_stable(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) ->
         if (summary_labeled["verse_keys_missing_from_converted"]
                 or summary_labeled["verse_keys_unexpected_in_converted"]):
             raise PilotError("OSIS editorial metadata changed the original verse keys")
+        inspector=os.environ.get("LSG_STOCK_RAW_INSPECTOR")
+        if not inspector:
+            raise PilotError("Unfiltered stable SWORD raw markup audit executable is required")
         report["stock_sword_compiled_candidate"] = compile_candidate(
-            labeled, source_usfx=original_xml, versification="Segond")
+            labeled, source_usfx=original_xml, versification="Segond",
+            after_full_readback=lambda root,module_id,roundtrip:
+                audit_stock_raw_markup(
+                    original_xml,labeled,decisions,sword_root=root,
+                    module_id=module_id,inspector=Path(inspector)))
         compiled = report["stock_sword_compiled_candidate"]
         if (not compiled.get("real_module_rebuilt_in_temporary_directory")
                 or "full_source_verse_roundtrip" not in compiled):
@@ -201,7 +210,12 @@ def run_stable(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) ->
             compiled["full_source_verse_roundtrip"])
         report["authorized_editorial_index_compromise"] = assess_reviewed_merges(
             decisions, policy_digest, report["stock_sword_reference_assessment"])
-        report["status"] = "authorized_stable_sword_index_compromise_not_published"
+        raw_audit=compiled.get("compiled_raw_markup_review")
+        if (not isinstance(raw_audit,dict) or
+                raw_audit.get("status") != "raw_stock_sword_word_note_poetry_counts_verified"):
+            report["status"]="blocked_compiled_raw_markup_mismatch"
+        else:
+            report["status"] = "authorized_stable_sword_index_compromise_not_published"
         if hashlib.sha256(original_xml).hexdigest() != digest:
             raise PilotError("Publisher original source changed during trial")
     return report
