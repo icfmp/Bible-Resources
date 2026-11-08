@@ -158,7 +158,8 @@ def classify_chapter_readback_wrappers(expected: dict[int,str],
     }
 
 
-def full_index_roundtrip(source: bytes, *, root: Path, reader: str) -> dict:
+def full_index_roundtrip(source: bytes, *, root: Path, reader: str,
+                         module_id: str="fraLSG1910eb") -> dict:
     """Read all source chapters in rebuilt module; never export their text."""
     from collections import Counter
     usfx,keys=scan_usfx(source)
@@ -180,11 +181,11 @@ def full_index_roundtrip(source: bytes, *, root: Path, reader: str) -> dict:
         sword_continuous=[]
         for chapter in chapters:
             ref=f"{book_name} {chapter}"
-            exit_code,body=query("fraLSG1910eb",ref,
+            exit_code,body=query(module_id,ref,
                 fmt="plain",root=root,exe=reader,limit=4*1024*1024,timeout=30)
             if not present_key(ref,body,exit_code):
                 raise PilotError(f"Full SWORD index has no readable chapter: {ref}")
-            actual=parse_sword_chapter(body,chapter,"fraLSG1910eb")
+            actual=parse_sword_chapter(body,chapter,module_id)
             expected={v:text for (b,c,v),text in source_verses.items()
                       if b==code and c==chapter}
             source_only=set(expected)-set(actual)
