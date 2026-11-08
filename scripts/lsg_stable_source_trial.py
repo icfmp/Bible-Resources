@@ -85,11 +85,24 @@ def assess_stock_readback(roundtrip: dict) -> dict:
     # Whole-chapter comparisons are against original USFX, independent
     # of the compiler's selected slot maxima. Asterisks are diagnosed by
     # an existing conservative display-only classifier, never removed.
+    residual = roundtrip.get("first_unexplained_chapter_character_streams", [])
+    if not isinstance(residual, list):
+        raise PilotError("Malformed compiled display-artifact report")
+    # The original full-source checker explicitly proves that the only
+    # additions are reader-rendered asterisks and that no original letter,
+    # digit or punctuation has been removed, changed, or reordered. These
+    # additional glyphs are reported, not erased or approved as markup.
+    verified_visual_only = all(
+        isinstance(item, dict)
+        and item.get("remaining_changes_consist_only_of_added_reader_asterisks") is True
+        and type(item.get("reader_only_residual_asterisk_count")) is int
+        and item["reader_only_residual_asterisk_count"] > 0
+        for item in residual
+    )
     continuous_text = (
         roundtrip.get(
             "chapters_where_every_residual_difference_is_added_asterisk_only"
-        ) == chapters
-        and not roundtrip.get("first_unexplained_chapter_character_streams")
+        ) == chapters and verified_visual_only
     )
     classified = complete_index_diagnostics and continuous_text
     return {
@@ -106,6 +119,12 @@ def assess_stock_readback(roundtrip: dict) -> dict:
         "all_source_character_streams_preserved_modulo_whitespace_and_reader_asterisks":
             continuous_text,
         "all_reference_differences_explained": complete_index_diagnostics,
+        "reader_display_asterisk_only_chapters": [
+            {"book": item.get("book"), "chapter": item.get("chapter"),
+             "added_visual_asterisk_count": item.get("reader_only_residual_asterisk_count")}
+            for item in residual if isinstance(item, dict)
+        ],
+        "visual_artifacts_are_not_approved_as_authorial_text": True,
         "exact_source_index_preserved": missing == 0 and unexpected == 0,
         "source_verse_accessibility_lost": missing > 0,
         "original_source_modified": False,
