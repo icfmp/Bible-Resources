@@ -2,6 +2,8 @@
 
 A resource moves through draft → in_review → approved, or restricted when rights prohibit redistribution. Approval requires a real reviewer, provenance, explicit permissions, a precise edition, a documented editorial change record, valid SWORD configuration and an executable reader test. Automated lint is necessary but not sufficient.
 
+An approved SWORD resource and an approved reader-facing profile are distinct editorial decisions. Every new public description should identify exact edition, acquisition source, curated release, rights and independently sourced strengths or cautions. Unverified historical or doctrinal allegations must remain labelled as research and must not be surfaced as established findings. See [resource presentation and evidence policy](RESOURCE_PROFILES.md). This documentation rule is not yet a machine-enforced catalogue profile gate.
+
 Never substitute editorial taste for original intent. Index by the original versification; never silently map variants or invent Bible verse boundaries. Missing original text, malformed files and uncertainty must become review findings.
 
 
