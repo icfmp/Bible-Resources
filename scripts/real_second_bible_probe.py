@@ -53,7 +53,9 @@ def _safe_single_module(zip_path: Path, root: Path) -> str:
             target.write_bytes(raw)
     if module_payload_digest(root) == "":
         raise SecondBibleError("Empty installed SWORD module digest")
-    return name
+    return {"module_id": name, "original_version": conf.get("version"),
+            "original_driver": conf["driver"],
+            "original_versification": conf.get("versification") or "KJV"}
 
 
 def _source_counts_by_order(usfx_raw: bytes) -> tuple[dict, list[dict]]:
@@ -86,14 +88,16 @@ def _reader_counts_by_order(keys_text: str) -> list[dict]:
     # SWORD reader plan is independently ordered in its newline inventory.
     ordered = []
     seen = set()
+    last_book = None
     for row in keys_text.splitlines():
         book, chapter, verse = row.split(".")
-        if book not in seen:
-            if ordered and any(x["osis_book_id"] == book for x in ordered):
+        if book != last_book:
+            if book in seen:
                 raise SecondBibleError("Noncontiguous native reader book")
             ordered.append({"osis_book_id": book, "occupied_verse_count": len(counts[book]),
                             "occupied_chapter_count": len(set(c for c, v in counts[book]))})
             seen.add(book)
+            last_book = book
     return ordered
 
 
@@ -104,9 +108,9 @@ def inspect_real_source_and_native_reader(
     original, original_groups = _source_counts_by_order(raw)
     with tempfile.TemporaryDirectory(prefix="independent-real-sword-") as tmp:
         installed = Path(tmp) / "original_module"
-        module_id = _safe_single_module(compiled_sword_zip, installed)
+        original_conf = _safe_single_module(compiled_sword_zip, installed)
         keys, registry, native = collect_native_inventory(
-            native_inspector, installed, module_id, timeout=240)
+            native_inspector, installed, original_conf["module_id"], timeout=240)
     engine_registry = parse_registry(registry, native["native_versification"])
     reader_groups = _reader_counts_by_order(keys)
     source_book_count = len(original_groups)
@@ -138,8 +142,8 @@ def inspect_real_source_and_native_reader(
         "publisher_source_xml_book_codes": [x["usfx_book_id"] for x in original_groups],
         "publisher_sword_zip_sha256": sha256(compiled_sword_zip.read_bytes()).hexdigest(),
         "publisher_original_sword_id": native["module_id"],
-        "publisher_original_sword_version": native["reader_version"],
-        "publisher_declared_versification": native["native_versification"],
+        "publisher_original_sword_version": original_conf["original_version"],
+        "publisher_declared_versification": original_conf["original_versification"],
         "publisher_native_driver": native["module_driver"],
         "actual_native_reader_version": native["reader_version"],
         "native_compiled_payload_sha256": native["module_payload_sha256"],
