@@ -19,6 +19,7 @@ The workflow:
 
 1. Downloads the independently published USFX and original SWORD ZIPs over HTTPS, with no access credentials.
 2. Validates safe paths/limits and reads actual original **USFX** books/chapter/verse openings and content fingerprint, without asserting that USFX is OSIS.
+2a. Reports all original USFX book identifiers, including any **unnumbered introduction/front-matter books**, as authorial source evidence. Such books are not fabricated into missing verse IDs or silently discarded: their complete text/structure remains an explicit outstanding audit, and they are excluded only from numerical **diagnostics** against ordinary native Bible verse keys.
 3. Installs only the independently acquired original provider ZIP into a **private temporary SWORD root** after a complete bounded archive inspection.
 4. Compiles the existing generic native SWORD reader against the released system `libsword-dev`; enumerates **real native occupied verse keys**, installed chapter registry and distinct introduction slots. The test requires that this second real source uses `zText`, thereby exercising a different driver from the published LSG `RawText`.
 5. Reports book/chapter/verse totals and source-vs-native ordinal count diagnostics; does **not** assume USFM/USFX book codes match OSIS names or that matching counts prove true index/content fidelity. An exact reviewed book mapping is still required for full authorial-reference parity.
