@@ -45,7 +45,7 @@ class RawStockReaderTests(unittest.TestCase):
         self.assertFalse(result["source_global_raw_markup_counts_match_compiled"])
         self.assertEqual(result["status"],"blocked_compiled_raw_markup_mismatch")
     def test_poetry_start_end_asymmetry_is_reported_without_forgiving_loss(self):
-        self.rows[0]="Mark 1:1\\t3\\t2\\t0\\t0\\t1\\t0"
+        self.rows[0]="Mark 1:1\t3\t2\t0\t0\t1\t0"
         report=self.run_audit()
         self.assertEqual(report["status"],"blocked_compiled_raw_markup_mismatch")
         self.assertEqual(report["poetry_asymmetric_reader_entry_count"],1)
