@@ -237,7 +237,7 @@ def run_stable(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) ->
                 approved = assess_stock_readback(roundtrip)
                 reviewed = assess_reviewed_merges(decisions,policy_digest,approved)
                 if (approved["status"]!="stock_segond_limitations_classified_not_approved"
-                    or reviewed.get("status")!="owner_reviewed_index_compromise_verified"):
+                    or reviewed.get("status")!="source_bound_owner_authorized_index_compromise"):
                     raise PilotError("Index compromise was not source-authorized")
                 report["xiphos_test_preview_package"] = create_xiphos_preview(
                     root,Path(preview),original_usfx_sha256=digest)
