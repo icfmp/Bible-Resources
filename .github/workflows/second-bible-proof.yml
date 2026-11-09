@@ -10,6 +10,9 @@ on:
       - scripts/sword_native_raw_entry.cpp
       - scripts/sword_missing_verse_witness.py
       - tests/test_sword_missing_verse_witness.py
+      - scripts/sword_native_raw_corpus.cpp
+      - scripts/sword_native_raw_corpus_inventory.py
+      - tests/test_sword_native_raw_corpus_inventory.py
   workflow_dispatch:
 permissions:
   contents: read
@@ -40,6 +43,13 @@ jobs:
           g++ -std=c++17 -O2 -I/usr/include/sword \
             scripts/sword_native_raw_entry.cpp \
             -o "${RUNNER_TEMP}/sword-native-raw-entry" -lsword
+      - name: Build captured-only full native raw-corpus inspector
+        shell: bash
+        run: |
+          set -euo pipefail
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_raw_corpus.cpp \
+            -o "${RUNNER_TEMP}/sword-native-raw-corpus" -lsword
       - name: Fetch official immutable-for-this-run private research inputs
         shell: bash
         run: |
@@ -70,6 +80,7 @@ jobs:
             --source-usfx-zip "${RUNNER_TEMP}/original-engwebp-usfx.zip" \
             --original-sword-zip "${RUNNER_TEMP}/original-engwebp-sword.zip" \
             --native-inspector "${RUNNER_TEMP}/sword-native-index" \
+            --native-corpus-inspector "${RUNNER_TEMP}/sword-native-raw-corpus" \
             --report "${RUNNER_TEMP}/second-bible-metadata-only.json"
           python - <<'PY'
           import json
@@ -81,6 +92,15 @@ jobs:
           assert proof["actual_reader_book_count"] >= 60, "Wrong/incomplete original SWORD module"
           assert proof["publisher_native_driver"] == "zText", "This real trial must exercise a different stock-SWORD driver from LSG"
           assert proof["actual_reader_occupied_numbered_verses"] > 20000
+          full_raw = proof["independent_full_native_raw_corpus_digest"]
+          assert full_raw["exact_all_occupied_native_keys_matched_independent_index"]
+          assert full_raw["actual_occupied_numbered_entry_count"] == proof["actual_reader_occupied_numbered_verses"]
+          assert full_raw["actual_occupied_intro_entry_count"] == proof["actual_native_verse_zero_intros"]
+          assert full_raw["actual_occupied_anonymous_top_entry_count"] == proof["actual_native_anonymous_top_records"]
+          assert full_raw["module_driver"] == "zText"
+          assert full_raw["source_original_authorial_text_compared"] is False
+          assert full_raw["rights_and_editorial_approval"] is False
+          print("Verified private whole-zText-corpus native raw SHA:", full_raw["all_native_raw_entries_ordered_sha256"])
           scoped = proof["explicit_standard_book_scope_reference_audit"]
           assert scoped["mapped_book_count"] == 66, "Expected explicitly reviewed standard 66-book scope"
           assert scoped["source_mapped_book_count"] == 66, "Source lacks canonical books"

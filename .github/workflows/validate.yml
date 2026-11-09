@@ -54,6 +54,36 @@ jobs:
           assert len(parse_registry((Path(os.environ["RUNNER_TEMP"]) / "sword-registry.tsv").read_text(), "Segond")) == trial["expected_chapters"]
           print("Independent stock SWORD native source-index readback agrees with original published LSG audit.")
           PY
+      - name: Privately hash the complete actual approved LSG SWORD raw corpus
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Raw Bible text moves only through the private captured pipe from
+          # stock libsword into the Python hasher; never log stdout directly.
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_raw_corpus.cpp \
+            -o "${RUNNER_TEMP}/sword-native-raw-corpus" -lsword
+          python scripts/sword_native_raw_corpus_inventory.py \
+            --module-directory modules/lsg-1910 \
+            --module-id BRLSG1910 \
+            --native-raw-binary "${RUNNER_TEMP}/sword-native-raw-corpus" \
+            --native-index-binary "${RUNNER_TEMP}/sword-native-index" \
+            --report "${RUNNER_TEMP}/lsg-entire-native-raw-corpus.json"
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"])
+          corpus = json.loads((root / "lsg-entire-native-raw-corpus.json").read_text())
+          index = json.loads((root / "sword-native-index-proof.json").read_text())
+          assert corpus["exact_all_occupied_native_keys_matched_independent_index"]
+          assert corpus["actual_occupied_numbered_entry_count"] == index["native_occupied_numbered_verse_count"]
+          assert corpus["actual_occupied_intro_entry_count"] == index["native_occupied_verse_zero_intro_count"]
+          assert corpus["actual_occupied_anonymous_top_entry_count"] == index["native_nonaddressable_populated_top_count"]
+          assert len(corpus["all_native_raw_entries_ordered_sha256"]) == 64
+          assert corpus["source_original_authorial_text_compared"] is False
+          assert corpus["rights_and_editorial_approval"] is False
+          print("Actual LSG full-corpus unfiltered stock-SWORD raw-entry SHA inventory passed without text disclosure")
+          PY
       - name: Verify local approved LSG payload is byte-identical to itself (read-only update audit)
         shell: bash
         run: |

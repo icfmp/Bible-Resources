@@ -20,6 +20,7 @@ from check_updates import parse_conf
 from diff_sword_snapshots import _read_snapshot, SnapshotError
 from lsg_source_compare import read_source_xml, scan_usfx
 from sword_native_inventory import collect_native_inventory, NativeIndexError
+from sword_native_raw_corpus_inventory import inspect_native_raw_corpus
 from stable_sword_refs import parse_keys, parse_registry, module_payload_digest
 from source_native_scope import compare_mapped_scope, read_crosswalk
 
@@ -108,7 +109,7 @@ def _reader_counts_by_order(keys_text: str) -> list[dict]:
 
 def inspect_real_source_and_native_reader(
     original_usfx_zip: Path, compiled_sword_zip: Path, native_inspector: Path,
-    crosswalk: Path | None = None
+    crosswalk: Path | None = None, native_corpus_inspector: Path | None = None
 ) -> dict:
     raw, original_receipt = read_source_xml(original_usfx_zip, source_format="usfx")
     original, original_groups = _source_counts_by_order(raw)
@@ -117,6 +118,12 @@ def inspect_real_source_and_native_reader(
         original_conf = _safe_single_module(compiled_sword_zip, installed)
         keys, registry, native = collect_native_inventory(
             native_inspector, installed, original_conf["module_id"], timeout=240)
+        whole_corpus = (
+            inspect_native_raw_corpus(
+                installed, original_conf["module_id"],
+                native_corpus_inspector, native_inspector)
+            if native_corpus_inspector is not None else None
+        )
     engine_registry = parse_registry(registry, native["native_versification"])
     reader_groups = _reader_counts_by_order(keys)
     # Independently map standard USFM book identifiers to *native* OSIS IDs;
@@ -153,6 +160,7 @@ def inspect_real_source_and_native_reader(
     return {
         "schema_version": 1,
         "status": "real_second_bible_independent_source_and_native_reader_inventoried",
+        "independent_full_native_raw_corpus_digest": whole_corpus,
         "publisher_original_source_format": "USFX",
         "publisher_original_usfx_zip_sha256": original_receipt["archive_sha256"],
         "publisher_original_usfx_xml_sha256": original_receipt["sha256"],
@@ -203,13 +211,15 @@ def main() -> int:
     p.add_argument("--source-usfx-zip", type=Path, required=True)
     p.add_argument("--original-sword-zip", type=Path, required=True)
     p.add_argument("--native-inspector", type=Path, required=True)
+    p.add_argument("--native-corpus-inspector", type=Path)
     p.add_argument("--report", type=Path, required=True)
     args = p.parse_args()
     if args.report.exists() or args.report.is_symlink() or not args.report.parent.is_dir():
         p.error("Refusing existing/unsafe output path")
     try:
         result = inspect_real_source_and_native_reader(
-            args.source_usfx_zip, args.original_sword_zip, args.native_inspector)
+            args.source_usfx_zip, args.original_sword_zip, args.native_inspector,
+            native_corpus_inspector=args.native_corpus_inspector)
     except (OSError, ValueError, zipfile.BadZipFile) as exc:
         p.error(str(exc))
     args.report.write_text(
