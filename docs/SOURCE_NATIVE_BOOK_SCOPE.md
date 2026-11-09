@@ -17,6 +17,18 @@ An explicit scoped canonical **verse-key match**, should it occur, is only an in
 
 The mapping is subject to the real native reader's recorded original book names and order. If a different released SWORD scheme uses different aliases, this audit **fails closed** rather than adding a one-edition exception to get green tests. A separately reviewed mapping/schema version would be required.
 
+## Actual second-edition result (2026-11-09)
+
+The exact source/native-identifier audit completed against the **real, previously SHA-pinned WEBP publisher files** in [Actions run #42715163009](https://github.com/icfmp/Bible-Resources/actions/runs/42715163009). The normal repository [Validate run #42715162781](https://github.com/icfmp/Bible-Resources/actions/runs/42715162781) also passed.
+
+- All **66 standard canonical source books** are present in the source and the SWORD native index, with their identifier mapping and order verified.
+- **31,103** actual original USFX numbered keys are present in the mapped 66-book scope; the original eBible zText reader exposes **31,100** occupied keys.
+- The **only three source-only canonical IDs** are `Rom.14.24`, `Rom.14.25` and `Rom.14.26`. No unexpected occupied compiled native verse keys were observed. The reference-index scope remains **BLOCKED**, not certified.
+- The complete original USFX archive retains **17 additional source book sections** outside the mapped 66 books (15 with numbered verses and two unnumbered `FRT`/`GLO`). None is removed, renumbered or represented as missing Scripture.
+- [eBible's WEB text](https://ebible.org/engwebp/ROM14.htm) places the doxology in Romans 14:24–26 and its note explains its alternate placement after Romans 16:24. [CrossWire's osis2mod documentation](https://wiki.crosswire.org/Osis2mod) states that a source verse outside a selected native KJV versification can be appended to the preceding registered verse. **That describes a possible mechanism, not an observation that these three text bodies were actually preserved in the tested ZIP.** An independently audited actual native raw-entry readback and full original-content comparison remain necessary.
+
+This result **does not** justify adding an exception, relocating the doxology or marking the SWORD payload faithful. All source and reader original byte SHA-256 values are preserved in the private metadata receipt; source rights, actual compiled note/text/structure equality, and complete extra-book retention are unverified. The author's position of Romans 14:24–26 remains untouched.
+
 ## Future required release proof
 
 1. Independently determine the source archive and module's exact edition revisions and book-scope relationship; a canonical subset is not necessarily the complete source.
