@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "id": "lsg-1910",
+  "sword_id": "BRLSG1910",
+  "title": {
+    "fr": "Louis Segond 1910",
+    "en": "Louis Segond 1910"
+  },
+  "category": "bible",
+  "language": "fr",
+  "version": "0.1.0",
+  "versification": "Segond",
+  "canonical_edition_id": "louis-segond-1910-ebible",
+  "origin": {
+    "publisher": "eBible.org / Louis Segond",
+    "url": "https://ebible.org/Scriptures/details.php?id=fraLSG",
+    "source_revision": "fraLSG USFM 64c4fe2a84d92f958deb0d1add4247d126a21c8a51e5b3058338f661a42d4900; USFX fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e"
+  },
+  "rights": {
+    "license": "Public Domain",
+    "evidence_url": "https://ebible.org/fraLSG/copyright.htm",
+    "redistribution_allowed": true,
+    "derivatives_allowed": true,
+    "reviewed_by": "Bible Resources project owner, approval 2026-11-09"
+  },
+  "quality": {
+    "status": "in_review",
+    "edition": "reader_optimized",
+    "reviewed_by": "Bible Resources project owner, release approval 2026-11-09",
+    "smoke_key": "John 3:16"
+  },
+  "upstreams": [
+    {
+      "provider": "ebible",
+      "module_id": "fraLSG1910eb",
+      "last_integrated_version": "2026-10-29"
+    }
+  ]
+}
