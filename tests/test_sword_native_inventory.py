@@ -23,7 +23,7 @@ VALID = (
     "I\tAlpha.1.0\n"
     "R\tKJV\tBeta\t1\t1\n"
     "K\tBeta.1.1\n"
-    "S\t2\t3\t2\n"
+    "S\t2\t3\t2\t0\n"
 )
 
 
@@ -39,6 +39,20 @@ class NativeIndexParsingTests(unittest.TestCase):
         self.assertFalse(receipt["source_text_notes_markup_fidelity_verified"])
         self.assertFalse(receipt["published"])
 
+    def test_occupied_anonymous_top_intro_is_preserved_as_unresolved(self):
+        native = VALID.replace("I\tAlpha.0.0\n", "U\tTOP\nI\tAlpha.0.0\n")
+        native = native.replace("S\t2\t3\t2\t0", "S\t2\t3\t2\t1")
+        keys, registry, report = parse_native_rows(native, "Fixture")
+        self.assertEqual(report["native_nonaddressable_populated_top_count"], 1)
+        self.assertFalse(report["native_anonymous_top_content_parity_verified"])
+        self.assertEqual(len(keys.splitlines()), 3)
+
+    def test_duplicate_anonymous_top_intro_fails(self):
+        native = VALID.replace("I\tAlpha.0.0\n", "U\tTOP\nU\tTOP\nI\tAlpha.0.0\n")
+        native = native.replace("S\t2\t3\t2\t0", "S\t2\t3\t2\t2")
+        with self.assertRaisesRegex(NativeIndexError, "Duplicate"):
+            parse_native_rows(native, "Fixture")
+
     def test_wrong_module_identity_blocked(self):
         with self.assertRaisesRegex(NativeIndexError, "header"):
             parse_native_rows(VALID, "Different")
@@ -51,9 +65,9 @@ class NativeIndexParsingTests(unittest.TestCase):
                 parse_native_rows(changed, "Fixture")
 
     def test_corrupt_counter_or_missing_terminal_blocked(self):
-        for changed in (VALID.replace("S\t2\t3\t2", "S\t2\t4\t2"),
-                        VALID.replace("S\t2\t3\t2\n", ""),
-                        VALID.replace("S\t2\t3\t2", "S\twrong\t3\t2")):
+        for changed in (VALID.replace("S\t2\t3\t2\t0", "S\t2\t4\t2\t0"),
+                        VALID.replace("S\t2\t3\t2\t0\n", ""),
+                        VALID.replace("S\t2\t3\t2\t0", "S\twrong\t3\t2\t0")):
             with self.subTest(changed=changed[-70:]), self.assertRaises(NativeIndexError):
                 parse_native_rows(changed, "Fixture")
 
