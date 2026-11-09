@@ -119,7 +119,7 @@ class StableLemmaParityTests(unittest.TestCase):
     def test_duplicate_reader_key_and_chapter_gap_are_rejected(self):
         for altered in (
             self.aliases + [("Gen.1.1", "Genesis 1:1")],
-            [x for x in self.aliases if x[0] != "Gen.1.1"]
+            [x for x in self.aliases if x[0] != "Gen.2.1"]
             + [("Gen.3.1", "Genesis 3:1")],
         ):
             with self.subTest(altered=altered), self.assertRaises(PilotError):
