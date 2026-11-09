@@ -29,6 +29,7 @@ from lsg_stock_note_anchors import (
 from lsg_stock_layout_markers import audit_compiled_layout_markers
 from lsg_stock_layout_positions import audit_compiled_layout_start_positions
 from lsg_stock_layout_boundaries import audit_compiled_layout_boundaries
+from private_sword_bundle import audit_private_sword_installation
 
 def build_stock_markup_plan(source: bytes, candidate: Path,
                             decisions: list[dict]) -> tuple[list[tuple[str, str]],dict,dict]:
@@ -467,6 +468,11 @@ def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
         elif (report["compiled_layout_boundary_word_position_diagnostic"]["status"]
               !="compiled_book_global_layout_boundaries_verified"):
             report["status"]="blocked_compiled_layout_boundary_parity"
+        # Verify that our isolated compiled module is genuinely installable
+        # as a standard mods.d/ + modules/ ZIP, without making that ZIP
+        # available as a public workflow artifact or a catalogue resource.
+        report["private_sword_zip_installation_review"]=audit_private_sword_installation(
+            sword_root,module_id,reader="diatheke")
     report["source_reader_merge_count"]=len(decisions)
     report["compiled_module_id"]=module_id
     return report
