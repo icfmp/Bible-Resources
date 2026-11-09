@@ -7,6 +7,8 @@ on:
       - 'scripts/reviewed_reference_merges.py'
       - 'scripts/lsg_stock_raw_markup.py'
       - 'scripts/lsg_stock_lemma_parity.py'
+      - 'scripts/lsg_stock_reference_parity.py'
+      - 'tests/test_lsg_stock_reference_parity.py'
       - 'scripts/sword_raw_lemma_values.cpp'
       - 'scripts/sword_note_attribute_probe.cpp'
       - 'scripts/lsg_stock_note_probe.py'
@@ -109,6 +111,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_reviewed_reference_merges.py' -v
           python -m unittest discover -s tests -p 'test_lsg_stock_raw_markup.py' -v
           python -m unittest discover -s tests -p 'test_lsg_stock_lemma_parity.py' -v
+          python -m unittest discover -s tests -p 'test_lsg_stock_reference_parity.py' -v
           python -m unittest discover -s tests -p 'test_lsg_stock_note_probe.py' -v
           python -m unittest discover -s tests -p 'test_lsg_stock_note_text.py' -v
           python -m unittest discover -s tests -p 'test_lsg_stock_note_anchors.py' -v
@@ -116,7 +119,7 @@ jobs:
         run: |
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_raw_markup_logical_lines.cpp -o "${{ runner.temp }}/sword-raw-audit" -lsword
           test -x "${{ runner.temp }}/sword-raw-audit"
-      - name: Build stable SWORD lemma-value inspector (no Scripture words)
+      - name: Build stable SWORD lexical/reference attribute inspector (no Scripture words)
         run: |
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_raw_lemma_values.cpp -o "${{ runner.temp }}/sword-lemma-audit" -lsword
           test -x "${{ runner.temp }}/sword-lemma-audit"
