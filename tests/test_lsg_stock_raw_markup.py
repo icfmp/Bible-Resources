@@ -63,8 +63,8 @@ class RawStockReaderTests(unittest.TestCase):
 
     def test_chapter_zero_poetry_marker_probe_is_separate_and_text_free(self):
         queries=[("Mark 1:0","Mark"),("Mark 0:0","Mark")]
-        rows=["\\t".join(("Mark 1:0","0","0","0","2","0","0")),
-              "\\t".join(("Mark 0:0","0","0","0","1","0","0"))]
+        rows=["\t".join(("Mark 1:0","0","0","0","2","0","0")),
+              "\t".join(("Mark 0:0","0","0","0","1","0","0"))]
         report=summarize_intro_rows(rows,queries)
         self.assertEqual(report["total_marker_counts"]["poetry_start"],3)
         self.assertEqual(report["total_marker_counts"]["poetry_end"],0)
@@ -74,7 +74,7 @@ class RawStockReaderTests(unittest.TestCase):
     def test_invalid_intro_reference_row_fails_closed(self):
         with self.assertRaises(PilotError):
             summarize_intro_rows(
-                ["\\t".join(("Mark 1:1","0","0","0","1","0","0"))],
+                ["\t".join(("Mark 1:1","0","0","0","1","0","0"))],
                 [("Mark 1:0","Mark")])
 
     def test_misaligned_or_missing_raw_entries_are_fatal(self):
