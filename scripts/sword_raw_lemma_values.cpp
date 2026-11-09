@@ -1,4 +1,5 @@
-// Read *only* <w lemma=""> attributes from stable SWORD raw entries.
+// Read only <w lemma> or <reference osisRef> attributes from stable SWORD
+// raw entries. The mode determines which tag and attribute are audited.
 // Scripture words, raw note bodies and entire OSIS fragments are never emitted.
 // The record format is UTF-8: source-book-OSIS-ID<TAB>lemma-attribute<LF>.
 // Each input line: normal-reader-key<TAB>source-book-OSIS-ID<TAB>0-or-1-intro.
@@ -24,14 +25,22 @@ int main(int argc, char **argv) {
     if (!refs) return 5;
     std::ofstream output(argv[3], std::ios::binary | std::ios::trunc);
     if (!output) return 6;
-    if (std::string(argv[4]) != "--word-lemmas-only") return 7;
+    const std::string mode(argv[4]);
+    const bool reference_mode = mode == "--reference-targets-only";
+    if (!reference_mode && mode != "--word-lemmas-only") return 7;
 
-    const std::regex word_tag(R"mark(<w\b([^>]*)>)mark");
-    const std::regex lemma_attr(R"mark(\blemma\s*=\s*(["'])(.*?)\1)mark");
-    const std::regex lemma_name(R"mark(\blemma\b)mark");
+    const std::regex selected_tag(reference_mode
+        ? R"mark(<reference\b([^>]*)>)mark"
+        : R"mark(<w\b([^>]*)>)mark");
+    const std::regex selected_attr(reference_mode
+        ? R"mark(\bosisRef\s*=\s*(["'])(.*?)\1)mark"
+        : R"mark(\blemma\s*=\s*(["'])(.*?)\1)mark");
+    const std::regex selected_name(reference_mode
+        ? R"mark(\bosisRef\b)mark"
+        : R"mark(\blemma\b)mark");
     std::string row;
     size_t entries = 0;
-    size_t words = 0;
+    size_t markers = 0;
     while (std::getline(refs, row)) {
         const auto first = row.find('\t');
         const auto second = first == std::string::npos ? first : row.find('\t', first + 1);
@@ -49,25 +58,25 @@ int main(int argc, char **argv) {
         const char *raw = module->getRawEntry();
         if (!raw) return 11;
         const std::string xml(raw);
-        for (auto it = std::sregex_iterator(xml.begin(), xml.end(), word_tag);
+        for (auto it = std::sregex_iterator(xml.begin(), xml.end(), selected_tag);
              it != std::sregex_iterator(); ++it) {
             const std::string attrs = (*it)[1].str();
-            std::string lemma;
-            auto match_begin = std::sregex_iterator(attrs.begin(), attrs.end(), lemma_attr);
+            std::string value;
+            auto match_begin = std::sregex_iterator(attrs.begin(), attrs.end(), selected_attr);
             auto match_end = std::sregex_iterator();
             if (match_begin != match_end) {
-                lemma = (*match_begin)[2].str();
+                value = (*match_begin)[2].str();
                 if (++match_begin != match_end) return 12; // duplicate attributes
-            } else if (std::regex_search(attrs, lemma_name)) {
+            } else if (std::regex_search(attrs, selected_name)) {
                 return 13; // unknown quoting/unsupported lemma syntax
             }
-            if (lemma.find('\t') != std::string::npos || lemma.find('\n') != std::string::npos
-                || lemma.find('\r') != std::string::npos) return 14;
-            output << book << '\t' << lemma << '\n';
-            if (++words > 5000000) return 15;
+            if (value.find('\t') != std::string::npos || value.find('\n') != std::string::npos
+                || value.find('\r') != std::string::npos) return 14;
+            output << book << '\t' << value << '\n';
+            if (++markers > 5000000) return 15;
         }
         if (++entries > 150000) return 16;
     }
-    if (!refs.eof() || entries == 0 || words == 0 || !output.good()) return 17;
+    if (!refs.eof() || entries == 0 || markers == 0 || !output.good()) return 17;
     return 0;
 }
