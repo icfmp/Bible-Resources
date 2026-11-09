@@ -19,8 +19,41 @@ jobs:
         run: |
           python -m pip install -r requirements.txt
           sudo apt-get update
-          sudo apt-get install -y diatheke
+          sudo apt-get install -y diatheke libsword-dev
       - run: python -m unittest discover -s tests -v
+      - name: Independently scan the exact published SWORD module's native verse-index
+        shell: bash
+        run: |
+          set -euo pipefail
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp -o "${RUNNER_TEMP}/sword-native-index" -lsword
+          python scripts/sword_native_inventory.py \
+            --inspector "${RUNNER_TEMP}/sword-native-index" \
+            --module-directory modules/lsg-1910 \
+            --module-id BRLSG1910 \
+            --reader-keys-output "${RUNNER_TEMP}/sword-reader-keys.txt" \
+            --registry-tsv-output "${RUNNER_TEMP}/sword-registry.tsv" \
+            --report "${RUNNER_TEMP}/sword-native-index-proof.json"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import os
+          from sys import path
+          path.insert(0, "scripts")
+          from stable_sword_refs import parse_keys, parse_registry
+          audit = json.loads(Path("modules/lsg-1910/SOURCE_AUDIT.json").read_text())
+          proof = json.loads((Path(os.environ["RUNNER_TEMP"]) / "sword-native-index-proof.json").read_text())
+          trial = audit["stock_sword_compiled_candidate"]["full_source_verse_roundtrip"]
+          original_source_count = trial["total_source_verse_keys"]
+          approved_reader_merges = trial["totals"]["source_keys_missing"]
+          expected_reader_count = original_source_count - approved_reader_merges
+          assert proof["native_occupied_numbered_verse_count"] == expected_reader_count, (
+              "Actual native SWORD occupied reference index has drifted from the independently attested release")
+          assert proof["native_registry_chapter_count"] == trial["expected_chapters"], (
+              "Installed stock SWORD registry differs from approved Segond audit")
+          assert len(parse_keys((Path(os.environ["RUNNER_TEMP"]) / "sword-reader-keys.txt").read_text())) == expected_reader_count
+          assert len(parse_registry((Path(os.environ["RUNNER_TEMP"]) / "sword-registry.tsv").read_text(), "Segond")) == trial["expected_chapters"]
+          print("Independent stock SWORD native source-index readback agrees with original published LSG audit.")
+          PY
       - run: python scripts/validate.py
       - run: python scripts/build.py --output dist
       - run: python scripts/smoke.py
