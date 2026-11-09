@@ -1,0 +1,30 @@
+{
+  "diff_format": "text-free structural change manifest, not a text-bearing patch",
+  "diff_sha256": "a2d4e96395615079146c8a01172d41337dd8ec8b1616b0630326ebb7b5228696",
+  "edition": "reader_optimized",
+  "full_text_exactly_preserved": true,
+  "inline_semantic_tags_preserved": true,
+  "kind": "bible",
+  "operations": [
+    {
+      "count": 2786,
+      "kind": "retype_verified_targetless_parallel_heading"
+    },
+    {
+      "count": 25,
+      "kind": "retype_verified_targetless_scope_heading"
+    },
+    {
+      "count": 1,
+      "kind": "add_reviewed_mark_10_52_53_reader_index_label"
+    }
+  ],
+  "original_source_unchanged": true,
+  "output_sha256": "d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0",
+  "plan_sha256": "71df871646f7e80fd40e1dd59da4ca3b4923194ebceee71f518a7223810d2d03",
+  "provenance_audit_sha256": "f602d9305ee3a7dd008cd127ae7e66f16e9fb9ba39b51b7c7ddb879866cddcca",
+  "review_asserted_by_plan": "Bible Resources project owner on 2026-11-09",
+  "schema_sha256": "bee01a2e957e9128a60328639761922b7aa701edad5efa5c8e885f762ff1baa2",
+  "source_sha256": "1752ea16f7c8b5ddbca3570b53110086243e0bb40a517af17ee11cce78cd2830",
+  "status": "structural_edit_verified_not_published"
+}

@@ -1,0 +1,10 @@
+{
+  "no_transformation_performed": true,
+  "note": "Validation-only proof of the final temporary OSIS candidate; publisher originals remain immutable.",
+  "policy_sha256": "15f875c19b94fc84ae123afad312164ca8631a302c2e03d980b934adf221a34f",
+  "provenance_audit_sha256": "f602d9305ee3a7dd008cd127ae7e66f16e9fb9ba39b51b7c7ddb879866cddcca",
+  "schema_sha256": "bee01a2e957e9128a60328639761922b7aa701edad5efa5c8e885f762ff1baa2",
+  "source_kind": "bible",
+  "source_sha256": "d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0",
+  "status": "validated"
+}

@@ -1,5 +1,24 @@
 {
-  "modules": [],
+  "modules": [
+    {
+      "category": "bible",
+      "download": {
+        "sha256": "f3f74a1016f708e10263b5628e606a73b727c0e80fbb7e131d195c4b11d86c51",
+        "size_bytes": 4042088,
+        "url": "https://icfmp.github.io/Bible-Resources/sword/packages/BRLSG1910.zip"
+      },
+      "edition": "reader_optimized",
+      "id": "lsg-1910",
+      "language": "fr",
+      "sword_id": "BRLSG1910",
+      "title": {
+        "en": "Louis Segond 1910",
+        "fr": "Louis Segond 1910"
+      },
+      "versification": "Segond",
+      "version": "0.1.0"
+    }
+  ],
   "repository": "Bible Resources",
   "repository_url": "https://icfmp.github.io/Bible-Resources/",
   "schema_version": 1

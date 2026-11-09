@@ -1,0 +1,12 @@
+{
+  "canonical_xml_inverse_byte_equal": true,
+  "final_labeled_osis_sha256": "d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0",
+  "generated_original_osis_sha256": "1752ea16f7c8b5ddbca3570b53110086243e0bb40a517af17ee11cce78cd2830",
+  "heading_retyped_osis_sha256": "1a248d27291f6f041a4642e6f97831d4951584cf76331d8b069a7a91179fc233",
+  "original_note_whitespace_not_byte_identical": true,
+  "original_source_text_unchanged": true,
+  "parallel_titles_retyped": 2786,
+  "provenance_audit_sha256": "f602d9305ee3a7dd008cd127ae7e66f16e9fb9ba39b51b7c7ddb879866cddcca",
+  "scope_titles_retyped": 25,
+  "source_mark_10_53_to_reader_10_52_owner_authorized": true
+}
