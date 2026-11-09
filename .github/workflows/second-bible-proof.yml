@@ -1,0 +1,85 @@
+name: Review second real Bible (WEBP source and SWORD index)
+on:
+  pull_request:
+    paths:
+      - .github/workflows/second-bible-proof.yml
+      - scripts/real_second_bible_probe.py
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  second-real-edition:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install parser and released SWORD C++ library
+        run: |
+          python -m pip install -r requirements.txt
+          sudo apt-get update
+          sudo apt-get install -y libsword-dev
+      - name: Build generic independent native SWORD reader
+        run: |
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_index.cpp \
+            -o "${RUNNER_TEMP}/sword-native-index" -lsword
+      - name: Fetch official immutable-for-this-run private research inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location --retry 3 \
+            --connect-timeout 20 --max-time 180 \
+            --proto '=https' --proto-redir '=https' \
+            https://ebible.org/Scriptures/engwebp_usfx.zip \
+            --output "${RUNNER_TEMP}/original-engwebp-usfx.zip"
+          curl --fail --silent --show-error --location --retry 3 \
+            --connect-timeout 20 --max-time 180 \
+            --proto '=https' --proto-redir '=https' \
+            https://ebible.org/sword/zip/engweb2025peb.zip \
+            --output "${RUNNER_TEMP}/original-engwebp-sword.zip"
+          # These hashes were established by the independent real first run.
+          # A changed upstream file is NOT silently treated as the same edition.
+          printf '%s  %s\n' \
+            66f99b22a380d8ef8dbd9d401806fc02be3650e5fe3dbb0cec4d9693b53e1e44 \
+            "${RUNNER_TEMP}/original-engwebp-usfx.zip" | sha256sum --check -
+          printf '%s  %s\n' \
+            53d45377d1aa376f483aded415b6d122b7cbe6795baddc49dae6574e304b8810 \
+            "${RUNNER_TEMP}/original-engwebp-sword.zip" | sha256sum --check -
+      - name: Independently scan the real USFX source and real native zText reader
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/real_second_bible_probe.py \
+            --source-usfx-zip "${RUNNER_TEMP}/original-engwebp-usfx.zip" \
+            --original-sword-zip "${RUNNER_TEMP}/original-engwebp-sword.zip" \
+            --native-inspector "${RUNNER_TEMP}/sword-native-index" \
+            --report "${RUNNER_TEMP}/second-bible-metadata-only.json"
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          proof = json.loads((Path(os.environ["RUNNER_TEMP"]) /
+                              "second-bible-metadata-only.json").read_text())
+          assert proof["publisher_original_book_count"] >= 60, "Wrong/incomplete official source edition"
+          assert proof["actual_reader_book_count"] >= 60, "Wrong/incomplete original SWORD module"
+          assert proof["publisher_native_driver"] == "zText", "This real trial must exercise a different stock-SWORD driver from LSG"
+          assert proof["actual_reader_occupied_numbered_verses"] > 20000
+          assert proof["source_to_sword_exact_words_punctuation_verified"] is False
+          assert proof["source_to_sword_fidelity_gate"] in {
+              "blocked_canon_scope_mismatch_requires_edition_review",
+              "not_verified_requires_independent_book_mapping_and_full_content_probe",
+          }
+          assert proof["edition_for_publication_approved"] is False
+          assert proof["published"] is False
+          print("Independent real zText reader index and original USFX source inspected; full text parity NOT certified")
+          PY
+      - name: Upload metadata-only source/reader evidence (no Scripture content)
+        uses: actions/upload-artifact@v4
+        with:
+          name: second-real-bible-source-and-reader-inventory
+          path: ${{ runner.temp }}/second-bible-metadata-only.json
+          retention-days: 30
