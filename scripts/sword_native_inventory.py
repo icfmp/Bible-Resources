@@ -22,7 +22,7 @@ from stable_sword_refs import (
 )
 
 MODULE_ID = re.compile(r"^[A-Za-z][A-Za-z0-9_]{0,79}$")
-INTRO = re.compile(r"^([1-4]?[A-Za-z][A-Za-z0-9]*)\.(0|[1-9][0-9]*)\.0$")
+INTRO = re.compile(r"^[1-4]?[A-Za-z][A-Za-z0-9]*(?:\.0\.0|\.[1-9][0-9]*(?:\.0)?)?$")
 MAX_INDEX_ROWS = 350_000
 MAX_STDOUT_BYTES = 16 * 1024 * 1024
 
