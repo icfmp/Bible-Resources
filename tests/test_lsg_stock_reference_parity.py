@@ -55,6 +55,24 @@ class CompiledReferenceValueTests(unittest.TestCase):
                 self.assertEqual(report["status"],
                                  "blocked_compiled_explicit_osisref_mismatch")
 
+    def test_xml_entity_is_decoded_once_not_twice(self):
+        # The authoritative parsed XML value contains literal "&amp;".
+        # The raw compiled attribute must preserve the same XML escaping
+        # depth. An incorrectly unescaped raw value must be rejected.
+        original=self.osis.read_text(encoding="utf-8")
+        self.osis.write_text(
+            original.replace('osisRef="Gen.2.1"',
+                             'osisRef="Gen.2.1&amp;amp;"'),
+            encoding="utf-8")
+        expected=["Gen\tGen.2.1&amp;amp;","Gen\t","Exod\tExod.3.2"]
+        result=compare_compiled_explicit_reference_targets(self.osis,expected)
+        self.assertEqual(result["status"],
+                         "compiled_ordered_explicit_osisref_values_verified")
+        wrong=["Gen\tGen.2.1&amp;","Gen\t","Exod\tExod.3.2"]
+        result=compare_compiled_explicit_reference_targets(self.osis,wrong)
+        self.assertEqual(result["status"],
+                         "blocked_compiled_explicit_osisref_mismatch")
+
     def test_bad_rows_fail_closed(self):
         for changed in (
             ["Lev\tGen.2.1"], ["Gen"], ["Gen\tGen.2.1\textra"],
