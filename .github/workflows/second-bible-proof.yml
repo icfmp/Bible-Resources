@@ -7,6 +7,9 @@ on:
       - scripts/source_native_scope.py
       - config/standard_usfm_osis_66.json
       - tests/test_source_native_scope.py
+      - scripts/sword_native_raw_entry.cpp
+      - scripts/sword_missing_verse_witness.py
+      - tests/test_sword_missing_verse_witness.py
   workflow_dispatch:
 permissions:
   contents: read
@@ -30,6 +33,13 @@ jobs:
           g++ -std=c++17 -O2 -I/usr/include/sword \
             scripts/sword_native_index.cpp \
             -o "${RUNNER_TEMP}/sword-native-index" -lsword
+      - name: Build private captured-only native raw-entry reader
+        shell: bash
+        run: |
+          set -euo pipefail
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_raw_entry.cpp \
+            -o "${RUNNER_TEMP}/sword-native-raw-entry" -lsword
       - name: Fetch official immutable-for-this-run private research inputs
         shell: bash
         run: |
@@ -94,9 +104,43 @@ jobs:
           assert proof["published"] is False
           print("Independent real zText reader index and original USFX source inspected; full text parity NOT certified")
           PY
+      - name: Inspect actual native raw-entry lexical witnesses without logging any Bible text
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The helper emits unfiltered Scripture bytes only to a captured
+          # Python subprocess pipe. NEVER invoke the helper directly in CI.
+          python scripts/sword_missing_verse_witness.py \
+            --source-usfx-zip "${RUNNER_TEMP}/original-engwebp-usfx.zip" \
+            --original-sword-zip "${RUNNER_TEMP}/original-engwebp-sword.zip" \
+            --native-index-inspector "${RUNNER_TEMP}/sword-native-index" \
+            --native-raw-inspector "${RUNNER_TEMP}/sword-native-raw-entry" \
+            --crosswalk config/standard_usfm_osis_66.json \
+            --report "${RUNNER_TEMP}/second-bible-native-raw-witness.json"
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          report = json.loads((Path(os.environ["RUNNER_TEMP"]) /
+                               "second-bible-native-raw-witness.json").read_text())
+          assert report["native_sword_driver"] == "zText"
+          # This checks the *actual pinned researched source*, not a
+          # generic code exception or editorial verse restoration.
+          assert report["source_scope_missing_native_verse_count"] == 3
+          assert report["source_to_compiled_exact_punctuation_verified"] is False
+          assert report["note_callers_bodies_anchors_verified"] is False
+          assert report["authorial_complete_text_preservation_verified"] is False
+          assert report["approved_for_publication"] is False
+          assert report["published"] is False
+          for row in report["source_missing_native_verses"]:
+              print(row["unindexed_original_source_ref"],
+                    row["diagnostic"],
+                    "native", row["preceding_occupied_native_ref"])
+          PY
       - name: Upload metadata-only source/reader evidence (no Scripture content)
         uses: actions/upload-artifact@v4
         with:
           name: second-real-bible-source-and-reader-inventory
-          path: ${{ runner.temp }}/second-bible-metadata-only.json
+          path: |
+            ${{ runner.temp }}/second-bible-metadata-only.json
+            ${{ runner.temp }}/second-bible-native-raw-witness.json
           retention-days: 30
