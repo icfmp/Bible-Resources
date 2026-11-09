@@ -41,6 +41,8 @@ on:
       - 'scripts/lsg_note_parity.py'
       - 'scripts/lsg_note_space_dryrun.py'
       - 'scripts/lsg_note_whitespace_diagnostics.py'
+      - 'scripts/lsg_stock_publisher_note_parity.py'
+      - 'tests/test_lsg_stock_publisher_note_parity.py'
       - 'tests/test_lsg_note_whitespace_diagnostics.py'
       - 'scripts/lsg_speech_space_dryrun.py'
       - 'tests/test_lsg_speech_space_dryrun.py'
@@ -127,6 +129,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_lsg_stock_note_probe.py' -v
           python -m unittest discover -s tests -p 'test_lsg_stock_note_text.py' -v
           python -m unittest discover -s tests -p 'test_lsg_note_whitespace_diagnostics.py' -v
+          python -m unittest discover -s tests -p 'test_lsg_stock_publisher_note_parity.py' -v
           python -m unittest discover -s tests -p 'test_lsg_stock_note_anchors.py' -v
       - name: Build raw SWORD C++ per-entry structure inspector against installed stable libsword
         run: |
