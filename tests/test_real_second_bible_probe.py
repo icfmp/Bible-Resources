@@ -28,6 +28,15 @@ class RealSecondBibleProbeTests(unittest.TestCase):
         self.assertEqual(source["original_books"], ["GEN", "EXO"])
         self.assertEqual([g["authored_verse_count"] for g in groups], [2, 1])
 
+    def test_authorial_unnumbered_book_is_not_fabricated_as_missing_verse(self):
+        usfx = (b'<usfx><book id="FRT"><p>Publisher introduction.</p></book>'
+                b'<book id="GEN"><c id="1"/><v id="1"/>One</book></usfx>')
+        metadata, groups = _source_counts_by_order(usfx)
+        self.assertEqual(metadata["original_books"], ["FRT", "GEN"])
+        self.assertEqual([g["authored_verse_count"] for g in groups], [0, 1])
+        self.assertTrue(groups[0]["requires_unnumbered_intro_content_audit"])
+        self.assertFalse(groups[1]["requires_unnumbered_intro_content_audit"])
+
     def test_reader_book_counts_preserve_real_native_inventory_order(self):
         keys = "Gen.1.1\nGen.1.2\nExod.1.1\nExod.1.2\nExod.2.1\n"
         groups = _reader_counts_by_order(keys)
