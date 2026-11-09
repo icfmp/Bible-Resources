@@ -12,9 +12,13 @@
 #include <map>
 #include <regex>
 #include <string>
+#include <vector>
 
 int main(int argc, char **argv) {
-    if (argc!=5 || std::string(argv[4])!="--layout-markers-only") return 2;
+    if (argc!=5) return 2;
+    const std::string mode(argv[4]);
+    const bool positions = mode=="--layout-start-word-positions-only";
+    if (!positions && mode!="--layout-markers-only") return 2;
     sword::SWMgr manager;
     sword::SWModule *module=manager.getModule(argv[1]);
     if (!module) return 3;
@@ -51,20 +55,38 @@ int main(int argc, char **argv) {
         if (!raw) return 9;
         const std::string xml(raw);
         std::map<std::string,unsigned> starts,ends;
+        unsigned words=0;
+        std::vector<std::string> events;
         for (auto it=std::sregex_iterator(xml.begin(),xml.end(),tags);
              it!=std::sregex_iterator();++it) {
             std::string tag=(*it)[1].str();
             const std::string attrs=(*it)[2].str();
+            if (tag=="w") {
+                if (++words>5000) return 13;
+                continue;
+            }
             if (tag=="div" && std::regex_search(attrs,paragraph_div)) tag="p";
             if (tag!="p" && tag!="title" && tag!="lg" && tag!="q") continue;
             const bool start=std::regex_search(attrs,sid);
             const bool end=std::regex_search(attrs,eid);
             if (start && end) return 10;
-            if (end) ++ends[tag]; else ++starts[tag];
+            if (end) ++ends[tag]; else {
+                ++starts[tag];
+                events.push_back(tag+":"+std::to_string(words));
+                if (events.size()>5000) return 14;
+            }
         }
         destination<<book<<'\t'<<ref;
-        for (const char *tag:{"p","title","lg","q"}) {
-            destination<<'\t'<<starts[tag]<<'\t'<<ends[tag];
+        if (positions) {
+            destination<<'\t'<<words<<'\t';
+            for (size_t i=0;i<events.size();++i) {
+                if (i) destination<<',';
+                destination<<events[i];
+            }
+        } else {
+            for (const char *tag:{"p","title","lg","q"}) {
+                destination<<'\t'<<starts[tag]<<'\t'<<ends[tag];
+            }
         }
         destination<<'\n';
         if (++entries>150000) return 11;
