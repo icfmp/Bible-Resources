@@ -122,10 +122,10 @@ def compare_note_anchors(candidate: Path, aliases: list[tuple[str,str]],
                         "source_word_offset":s,
                         "compiled_word_offset":t,
                         "issue":"unexpected_note_word_position_change"})
-    extra_notes=sum(len(anchors) for (book,query),(words,anchors)
-                    in compiled.items()
-                    if (book,query) not in {
-                        (ref.split(".",1)[0],q) for ref,q in aliases})
+    ordinary_reader_locations={
+        (ref.split(".",1)[0],q) for ref,q in aliases}
+    extra_notes=sum(len(anchors) for location,(_words,anchors)
+                    in compiled.items() if location not in ordinary_reader_locations)
     if outside or extra_notes:
         hard_mismatch+=outside+extra_notes
     complete=(hard_mismatch==0 and verified+unresolved==source_note_count)
