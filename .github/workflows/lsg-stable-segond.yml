@@ -11,6 +11,8 @@ on:
       - 'scripts/sword_raw_layout_markers.cpp'
       - 'scripts/lsg_stock_layout_markers.py'
       - 'scripts/lsg_stock_layout_positions.py'
+      - 'scripts/lsg_stock_layout_boundaries.py'
+      - 'tests/test_lsg_stock_layout_boundaries.py'
       - 'tests/test_lsg_stock_layout_positions.py'
       - 'tests/test_lsg_stock_layout_markers.py'
       - 'tests/test_lsg_stock_reference_parity.py'
@@ -119,6 +121,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_lsg_stock_reference_parity.py' -v
           python -m unittest discover -s tests -p 'test_lsg_stock_layout_markers.py' -v
           python -m unittest discover -s tests -p 'test_lsg_stock_layout_positions.py' -v
+          python -m unittest discover -s tests -p 'test_lsg_stock_layout_boundaries.py' -v
           python -m unittest discover -s tests -p 'test_lsg_stock_note_probe.py' -v
           python -m unittest discover -s tests -p 'test_lsg_stock_note_text.py' -v
           python -m unittest discover -s tests -p 'test_lsg_stock_note_anchors.py' -v
