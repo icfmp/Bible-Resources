@@ -49,6 +49,30 @@ class PrivateSwordBundleTests(unittest.TestCase):
             self.assertTrue(all(name.startswith(("mods.d/","modules/"))
                                 for name in z.namelist()))
 
+    def test_repeated_standard_global_option_filters_are_allowed(self):
+        self.conf.write_text(
+            "[PrivateExample]\n"
+            "DataPath=./modules/texts/rawtext/privateexample/\n"
+            "ModDrv=RawText\n"
+            "GlobalOptionFilter=OSISLemma\n"
+            "GlobalOptionFilter=OSISFootnotes\n"
+            "GlobalOptionFilter=OSISHeadings\n",
+            encoding="utf-8")
+        result=_validate_package_files(self.root,self.id)
+        self.assertEqual(len(result),3)
+
+    def test_duplicate_critical_config_fields_are_rejected(self):
+        self.conf.write_text(
+            "[PrivateExample]\n"
+            "DataPath=./modules/texts/rawtext/privateexample/\n"
+            "DataPath=./modules/texts/rawtext/privateexample/\n"
+            "ModDrv=RawText\n"
+            "GlobalOptionFilter=OSISLemma\n"
+            "GlobalOptionFilter=OSISFootnotes\n",
+            encoding="utf-8")
+        with self.assertRaises(PilotError):
+            _validate_package_files(self.root,self.id)
+
     def test_unsafe_absolute_or_parent_data_path_rejected(self):
         for path in ("../../etc/","./modules/../outside/",
                      "/tmp/modules/"):
