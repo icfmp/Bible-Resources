@@ -15,7 +15,7 @@ Bible Resources is an **independent community project**, not an official CrossWi
 
 ## Status
 
-**First public module:** [Louis Segond 1910 — Bible Resources 0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/lsg-0.1.0), a stock-SWORD ZIP provided as a GitHub Release after source-audited packaging and reader validation. Its [release note](docs/releases/LSG-0.1.0.md) details known limitations. The release is not yet an entry in the public SWORD/Pages catalogue; this must be configured and verified separately. `modules/` remains empty until the curated catalogue importer is ready. In particular, a French Matthew Henry translation is **not** licensed for republication merely because a supplied JSON archive advertises CC0.
+**First published module:** [Louis Segond 1910 — Bible Resources 0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/lsg-0.1.0). Its [source-audited files, rights and editorial record](modules/lsg-1910) are now in `main` with approved status. The [JSON catalogue](https://icfmp.github.io/Bible-Resources/catalog/v1/catalog.json) and standard [SWORD repository](https://icfmp.github.io/Bible-Resources/sword/) are deployed by GitHub Pages; the first module is `BRLSG1910`. The [release note](docs/releases/LSG-0.1.0.md) documents known limitations. A French Matthew Henry translation is **not** licensed for republication merely because a supplied JSON archive advertises CC0.
 
 ## What lives here?
 
