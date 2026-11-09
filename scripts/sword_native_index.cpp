@@ -85,11 +85,11 @@ int main(int argc, char** argv) {
                 valid = true;
             if (!valid) {
                 std::cerr << "Unrecognized native intro key: " << id
-                          << " (chapter " << chapter << ", verse " << verse << ")\\n";
+                          << " (chapter " << chapter << ", verse " << verse << ")\n";
                 return 7;
             }
             if (module->hasEntry(&current)) {
-                std::cout << "I\\t" << id << '\\n';
+                std::cout << "I\t" << id << '\n';
                 ++intros;
             }
             current.increment();
