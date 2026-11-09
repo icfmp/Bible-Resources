@@ -435,8 +435,10 @@ def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
             candidate,aliases,sword_root=sword_root,
             module_id=module_id,inspector=note_anchor_inspector)
         report["compiled_note_book_global_word_anchor_review"]=global_note_anchors
-        # Layout is a separate, non-approving diagnostic because a compiler
-        # can replace container elements with sID/eID milestones.
+        # Raw tag counts remain a non-approving diagnostic: the compiler can
+        # replace containers with sID/eID. Book-global ordered start/end
+        # offsets are now a mandatory fidelity gate after independent
+        # validation on all 66 books.
         report["compiled_layout_marker_diagnostic"]=audit_compiled_layout_markers(
             candidate,aliases,sword_root=sword_root,
             module_id=module_id,inspector=layout_inspector)
@@ -458,6 +460,12 @@ def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
             report["status"]="blocked_compiled_note_book_global_word_anchor_parity"
         elif ref_values["status"]!="compiled_ordered_explicit_osisref_values_verified":
             report["status"]="blocked_compiled_explicit_reference_osisref_parity"
+        elif (report["compiled_layout_start_word_position_diagnostic"]["status"]
+              !="compiled_book_global_layout_start_positions_verified"):
+            report["status"]="blocked_compiled_layout_start_word_offset_parity"
+        elif (report["compiled_layout_boundary_word_position_diagnostic"]["status"]
+              !="compiled_book_global_layout_boundaries_verified"):
+            report["status"]="blocked_compiled_layout_boundary_parity"
     report["source_reader_merge_count"]=len(decisions)
     report["compiled_module_id"]=module_id
     return report
