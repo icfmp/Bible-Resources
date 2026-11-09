@@ -76,6 +76,37 @@ class StockNoteTextTests(unittest.TestCase):
         self.assertEqual(report["source_note_count"],2)
         self.assertTrue(report["first_note_count_mismatches"])
 
+    def test_type_and_caller_values_are_checked_independently(self):
+        rows=list(self.rows)
+        for number,caller in (("1","a"),("2","b")):
+            rows.append(encoded_row("Gen","Genesis 1:1",number,"type",
+                                    "crossReference"))
+            rows.append(encoded_row("Gen","Genesis 1:1",number,"n",caller))
+        report=compare_compiled_notes(self.source,self.aliases,[],rows)
+        self.assertEqual(report["matching_compiled_note_type_values"],2)
+        self.assertEqual(report["matching_compiled_note_caller_values"],2)
+        self.assertTrue(report["available_note_type_and_caller_values_match"])
+        self.assertEqual(report["raw_text_difference_categories"]["exact"],2)
+
+    def test_changed_caller_is_detected_without_exposing_its_value(self):
+        rows=list(self.rows)
+        rows.extend([
+            encoded_row("Gen","Genesis 1:1","1","n","changed-marker"),
+            encoded_row("Gen","Genesis 1:1","2","n","b"),
+        ])
+        report=compare_compiled_notes(self.source,self.aliases,[],rows)
+        self.assertEqual(report["matching_compiled_note_caller_values"],1)
+        self.assertFalse(report["available_note_type_and_caller_values_match"])
+        self.assertNotIn("changed-marker",str(report))
+
+    def test_only_boundary_whitespace_is_separately_classified(self):
+        rows=list(self.rows)
+        rows[0]=encoded_row("Gen","Genesis 1:1","1","body"," first note ")
+        report=compare_compiled_notes(self.source,self.aliases,[],rows)
+        self.assertEqual(report["matching_normalized_note_body_text"],2)
+        self.assertEqual(report["raw_text_difference_categories"]
+                         ["leading_or_trailing_only"],1)
+
     def test_duplicate_attribute_and_unexpected_book_are_errors(self):
         with self.assertRaises(PilotError):
             load_private_note_rows([self.rows[0],self.rows[0]],{"Gen"})
