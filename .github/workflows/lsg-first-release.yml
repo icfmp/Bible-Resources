@@ -1,0 +1,114 @@
+name: Publish first Louis Segond 1910 module
+
+# One-time bootstrap from the fully source-audited, hash-pinned private build.
+# This intentionally does NOT merge unfinished experimental source workflows.
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/lsg-first-release.yml'
+      - 'scripts/promote_sword_preview.py'
+      - 'tests/test_promote_sword_preview.py'
+      - 'config/lsg-0.1.0.conf'
+      - 'docs/releases/LSG-0.1.0.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: lsg-initial-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test the generic, source-byte-preserving SWORD promotion
+        run: python -m unittest discover -s tests -p 'test_promote_sword_preview.py' -v
+
+      - name: Download the exact source-attested, privately tested module
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "${{ runner.temp }}/private" "${{ runner.temp }}/proof" "${{ runner.temp }}/release"
+          gh run download 42632394004 --repo "$GITHUB_REPOSITORY" \
+            --name BRLSG1910Preview3-test-only --dir "${{ runner.temp }}/private"
+          gh run download 42632394004 --repo "$GITHUB_REPOSITORY" \
+            --name lsg-stock-sword-segond-report --dir "${{ runner.temp }}/proof"
+
+      - name: Verify original content identity and full source-fidelity report
+        run: |
+          cd "${{ runner.temp }}/private"
+          echo '053b65d73d39f4268610ca743cccb605baff8860a612d7a987b99273bca3807e  BRLSG1910Preview3.zip' | sha256sum -c
+          sha256sum -c SHA256SUMS.txt
+          cd "$GITHUB_WORKSPACE"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          report=json.loads((Path(os.environ['RUNNER_TEMP'])/'proof/lsg-stable-segond.json').read_text())
+          assert report['status']=='authorized_stable_sword_index_compromise_not_published'
+          assert report['original_usfx_sha256']=='90a53c3a61f0c07a329d8fc19c593b8c353f2b3e5a6830dbf4c53d2b08fd2141'
+          assert report['raw_osis_schema']['xsd_status']=='validated'
+          assert report['raw_osis_schema']['policy_status']=='validated'
+          markers=report['text_only_parallel_heading_review']
+          assert markers['inverse_reconstruction_canonical_xml_byte_equal'] is True
+          assert markers['text_only_parallel_reference_elements_retyped']==2786
+          assert markers['text_only_scope_reference_elements_retyped']==25
+          audit=report['stock_sword_compiled_candidate']['compiled_raw_markup_review']
+          assert audit['status']=='raw_stock_sword_full_scope_markers_verified_including_intros'
+          merge=report['authorized_editorial_index_compromise']
+          assert merge['status']=='source_bound_owner_authorized_index_compromise'
+          assert merge['authorized_merge_count']==1
+          assert merge['observed_source_to_reader_keys_exactly_match_authorization'] is True
+          preview=report['xiphos_test_preview_package']
+          assert preview['status']=='private_stock_sword_zip_reinstall_readback_verified'
+          assert preview['zip_sha256']=='053b65d73d39f4268610ca743cccb605baff8860a612d7a987b99273bca3807e'
+          assert preview['text_payload_files_byte_identical_to_verified_module'] is True
+          print('Verified source, SWORD boundaries, notes, independent reinstallation and one approved index compromise')
+          PY
+
+      - name: Promote exact validated data into the first stable module identity
+        run: |
+          python scripts/promote_sword_preview.py \
+            --source "${{ runner.temp }}/private/BRLSG1910Preview3.zip" \
+            --expected-sha256 053b65d73d39f4268610ca743cccb605baff8860a612d7a987b99273bca3807e \
+            --source-id BRLSG1910Preview3 \
+            --module-id BRLSG1910 \
+            --config config/lsg-0.1.0.conf \
+            --output "${{ runner.temp }}/release/BRLSG1910-0.1.0.zip"
+          cd "${{ runner.temp }}/release"
+          echo 'af2f80ea84f40a6bf62993c9e65c2e2061e1ec20b34b0772a4eb775dd47723c1  BRLSG1910-0.1.0.zip' | sha256sum -c
+          sha256sum BRLSG1910-0.1.0.zip > SHA256SUMS.txt
+
+      - name: Verify real SWORD readback of the repackaged release in isolation
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y diatheke unzip >/dev/null
+          mkdir -p "${{ runner.temp }}/isolated-sword"
+          unzip -q "${{ runner.temp }}/release/BRLSG1910-0.1.0.zip" -d "${{ runner.temp }}/isolated-sword"
+          for passage in 'Genesis 1:1' 'Psalms 23:1' 'Mark 10:52' 'Ecclesiastes 12:1' 'John 3:16'; do
+            SWORD_PATH="${{ runner.temp }}/isolated-sword" diatheke -b BRLSG1910 -k "$passage" -f plain > "${{ runner.temp }}/readback.txt"
+            test -s "${{ runner.temp }}/readback.txt"
+            grep -q ':' "${{ runner.temp }}/readback.txt"
+          done
+
+      - name: Publish immutable first release (project owner approved)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view lsg-0.1.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'Release already exists; immutable first edition must not be replaced.'
+            exit 1
+          fi
+          gh release create lsg-0.1.0 \
+            "${{ runner.temp }}/release/BRLSG1910-0.1.0.zip" \
+            "${{ runner.temp }}/release/SHA256SUMS.txt" \
+            "${{ runner.temp }}/proof/lsg-stable-segond.json" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title 'Louis Segond 1910 — Bible Resources 0.1.0' \
+            --notes-file docs/releases/LSG-0.1.0.md
