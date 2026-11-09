@@ -1,7 +1,10 @@
 // Count lexical word markers preceding each raw SWORD note in every entry.
 // Input: reader-key<TAB>osis-book-id<TAB>intro-flag.
-// Output: book<TAB>reader-key<TAB>word-tags-outside-notes<TAB>
+// Output: book<TAB>reader-key<TAB>word-tag-count<TAB>
 //         comma-separated-word-offsets-of-raw-note-start-tags
+// --note-word-anchors-only counts words outside note bodies, relative to
+// individual reader entries. --book-global-note-word-anchors counts ALL
+// word tags, including nested note words, preserving book-level order.
 // No Scripture text, note text, XML fragments or identities are exported.
 #include <sword/swmgr.h>
 #include <sword/swmodule.h>
@@ -13,7 +16,10 @@
 #include <iostream>
 
 int main(int argc, char **argv) {
-    if (argc!=5 || std::string(argv[4])!="--note-word-anchors-only") return 2;
+    if (argc!=5) return 2;
+    const std::string mode(argv[4]);
+    const bool book_global = mode=="--book-global-note-word-anchors";
+    if (!book_global && mode!="--note-word-anchors-only") return 2;
     sword::SWMgr manager;
     sword::SWModule *module=manager.getModule(argv[1]);
     if (!module) return 3;
@@ -63,7 +69,7 @@ int main(int argc, char **argv) {
                     if (note_depth==0) anchors.push_back(word_count);
                     if (!self_closing) ++note_depth;
                 }
-            } else if (tag=="w" && !end && note_depth==0) {
+            } else if (tag=="w" && !end && (book_global || note_depth==0)) {
                 ++word_count;
             }
         }
