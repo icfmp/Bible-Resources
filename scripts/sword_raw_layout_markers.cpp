@@ -18,7 +18,8 @@ int main(int argc, char **argv) {
     if (argc!=5) return 2;
     const std::string mode(argv[4]);
     const bool positions = mode=="--layout-start-word-positions-only";
-    if (!positions && mode!="--layout-markers-only") return 2;
+    const bool boundaries = mode=="--layout-boundary-word-positions-only";
+    if (!positions && !boundaries && mode!="--layout-markers-only") return 2;
     sword::SWMgr manager;
     sword::SWModule *module=manager.getModule(argv[1]);
     if (!module) return 3;
@@ -29,7 +30,7 @@ int main(int argc, char **argv) {
     std::ifstream source(argv[2]);
     std::ofstream destination(argv[3],std::ios::trunc);
     if (!source || !destination) return 5;
-    const std::regex tags(R"tag(<([A-Za-z][A-Za-z0-9]*)\b([^>]*)>)tag");
+    const std::regex tags(R"tag(<(/?)([A-Za-z][A-Za-z0-9]*)\b([^>]*)>)tag");
     const std::regex sid(R"tag(\bsID\s*=)tag");
     const std::regex eid(R"tag(\beID\s*=)tag");
     // Released osis2mod replaces non-milestoneable <p> with
@@ -59,10 +60,11 @@ int main(int argc, char **argv) {
         std::vector<std::string> events;
         for (auto it=std::sregex_iterator(xml.begin(),xml.end(),tags);
              it!=std::sregex_iterator();++it) {
-            std::string tag=(*it)[1].str();
-            const std::string attrs=(*it)[2].str();
+            const bool closing=(*it)[1].str()=="/";
+            std::string tag=(*it)[2].str();
+            const std::string attrs=(*it)[3].str();
             if (tag=="w") {
-                if (++words>5000) return 13;
+                if (!closing && ++words>5000) return 13;
                 continue;
             }
             if (tag=="div" && std::regex_search(attrs,paragraph_div)) tag="p";
@@ -70,14 +72,25 @@ int main(int argc, char **argv) {
             const bool start=std::regex_search(attrs,sid);
             const bool end=std::regex_search(attrs,eid);
             if (start && end) return 10;
-            if (end) ++ends[tag]; else {
+            const auto last=attrs.find_last_not_of(" \r\n\t");
+            const bool self_closing=last!=std::string::npos && attrs[last]=='/';
+            if (closing && (start || end || self_closing)) return 15;
+            if (closing || end) {
+                ++ends[tag];
+                if (boundaries) events.push_back("-"+tag+":"+std::to_string(words));
+            } else {
                 ++starts[tag];
-                events.push_back(tag+":"+std::to_string(words));
-                if (events.size()>5000) return 14;
+                if (boundaries) events.push_back("+"+tag+":"+std::to_string(words));
+                else events.push_back(tag+":"+std::to_string(words));
+                if (self_closing && !start) {
+                    ++ends[tag];
+                    if (boundaries) events.push_back("-"+tag+":"+std::to_string(words));
+                }
             }
+            if (events.size()>5000) return 14;
         }
         destination<<book<<'\t'<<ref;
-        if (positions) {
+        if (positions || boundaries) {
             destination<<'\t'<<words<<'\t';
             for (size_t i=0;i<events.size();++i) {
                 if (i) destination<<',';
