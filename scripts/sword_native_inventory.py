@@ -183,7 +183,7 @@ def collect_native_inventory(
         # Expose only safe numeric/identifier metadata from our own inspector,
         # never raw SWORD stderr or module Scripture/annotation content.
         diagnostic = result.stderr.decode("utf-8", errors="replace")
-        match = re.search(r"Unrecognized native key: ([A-Za-z0-9._ -]{1,120}) \\(chapter ([0-9]+), verse ([0-9]+)\\)", diagnostic)
+        match = re.search(r"Unrecognized native key: ([A-Za-z0-9._ -]{1,120}) \(chapter ([0-9]+), verse ([0-9]+)\)", diagnostic)
         suffix = f"; unsupported VerseKey={match.group(1)} ch={match.group(2)} verse={match.group(3)}" if match else ""
         raise NativeIndexError(f"Stock-SWORD native inspector blocked (exit {result.returncode}){suffix}")
     if len(result.stdout) > MAX_STDOUT_BYTES or len(result.stderr) > 256_000:
