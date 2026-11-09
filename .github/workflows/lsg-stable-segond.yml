@@ -8,6 +8,9 @@ on:
       - 'scripts/lsg_stock_raw_markup.py'
       - 'scripts/lsg_stock_lemma_parity.py'
       - 'scripts/lsg_stock_reference_parity.py'
+      - 'scripts/sword_raw_layout_markers.cpp'
+      - 'scripts/lsg_stock_layout_markers.py'
+      - 'tests/test_lsg_stock_layout_markers.py'
       - 'tests/test_lsg_stock_reference_parity.py'
       - 'scripts/sword_raw_lemma_values.cpp'
       - 'scripts/sword_note_attribute_probe.cpp'
@@ -112,6 +115,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_lsg_stock_raw_markup.py' -v
           python -m unittest discover -s tests -p 'test_lsg_stock_lemma_parity.py' -v
           python -m unittest discover -s tests -p 'test_lsg_stock_reference_parity.py' -v
+          python -m unittest discover -s tests -p 'test_lsg_stock_layout_markers.py' -v
           python -m unittest discover -s tests -p 'test_lsg_stock_note_probe.py' -v
           python -m unittest discover -s tests -p 'test_lsg_stock_note_text.py' -v
           python -m unittest discover -s tests -p 'test_lsg_stock_note_anchors.py' -v
@@ -135,6 +139,10 @@ jobs:
         run: |
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_note_word_anchors.cpp -o "${{ runner.temp }}/sword-note-word-anchors" -lsword
           test -x "${{ runner.temp }}/sword-note-word-anchors"
+      - name: Build released SWORD paragraph/title/poetry layout inspector
+        run: |
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_raw_layout_markers.cpp -o "${{ runner.temp }}/sword-layout-audit" -lsword
+          test -x "${{ runner.temp }}/sword-layout-audit"
       - name: Compile real source-attested OSIS via stable SWORD and classify every chapter
         env:
           LSG_SAMPLE_DEBUG: '0'
@@ -143,6 +151,7 @@ jobs:
           LSG_STOCK_NOTE_INSPECTOR: ${{ runner.temp }}/sword-note-probe
           LSG_STOCK_NOTE_TEXT_INSPECTOR: ${{ runner.temp }}/sword-note-text-audit
           LSG_STOCK_NOTE_ANCHOR_INSPECTOR: ${{ runner.temp }}/sword-note-word-anchors
+          LSG_STOCK_LAYOUT_INSPECTOR: ${{ runner.temp }}/sword-layout-audit
         run: |
           python scripts/lsg_stable_source_trial.py \
             --usfm-zip "${{ runner.temp }}/original/usfm.zip" \
