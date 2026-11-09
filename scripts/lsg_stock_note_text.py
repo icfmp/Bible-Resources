@@ -130,7 +130,9 @@ def compare_compiled_notes(candidate: Path,
         for index,(note,identifier) in enumerate(zip(notes,ordered),1):
             total_pairs+=1
             attrs=targets[identifier]
-            attribute_names.update(attrs)
+            # Counter.update(mapping) would COPY attribute VALUES into the
+            # report; only count non-sensitive attribute NAMES, never bodies.
+            attribute_names.update(attrs.keys())
             body=attrs.get("body")
             if not body:
                 missing_body_count+=1
