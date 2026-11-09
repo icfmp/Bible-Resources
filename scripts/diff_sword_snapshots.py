@@ -98,7 +98,7 @@ def _read_snapshot(path: Path) -> tuple[dict[str, dict], bytes]:
                 raise SnapshotError("Expected precisely one bounded .conf file")
             with source() as stream:
                 config_bytes = stream.read(MAX_CONF + 1)
-            if len(config_bytes) != size:
+            if len(config_bytes) != size or sha256(config_bytes).hexdigest() != checksum:
                 raise SnapshotError("SWORD .conf changed while reading")
 
     if path.is_dir():
@@ -237,6 +237,12 @@ def main() -> int:
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args()
     try:
+        resolved_report = args.report.resolve()
+        for source in (args.previous, args.candidate):
+            resolved_source = source.resolve()
+            if (resolved_report == resolved_source
+                    or (source.is_dir() and resolved_report.is_relative_to(resolved_source))):
+                raise SnapshotError("Evidence output must not modify a source snapshot")
         if args.report.exists() or args.report.is_symlink():
             raise SnapshotError("Refusing to overwrite an existing evidence report")
         if not args.report.parent.is_dir() or args.report.parent.is_symlink():
