@@ -69,6 +69,32 @@ int main(int argc, char** argv) {
             current.increment();
             continue;
         }
+        if (verse == 0 && !id.empty()) {
+            // Standard SWORD book and chapter introductions can have bare
+            // OSISRef forms, e.g. "Gen" at book 0:0 or "Gen.1" at 1:0.
+            // Preserve the *native* identifier, never invent a Bible verse.
+            const std::regex bookId("[1-4]?[A-Za-z][A-Za-z0-9]*");
+            const std::regex chapterIntro("([1-4]?[A-Za-z][A-Za-z0-9]*)\\.([1-9][0-9]*)(\\.0)?");
+            std::smatch match;
+            bool valid = chapter == 0 && std::regex_match(id, bookId);
+            if (!valid && chapter > 0 && std::regex_match(id, match, chapterIntro)) {
+                valid = std::stol(match[2].str()) == chapter;
+            }
+            if (!valid && chapter == 0 &&
+                std::regex_match(id, std::regex("[1-4]?[A-Za-z][A-Za-z0-9]*\\.0\\.0")))
+                valid = true;
+            if (!valid) {
+                std::cerr << "Unrecognized native intro key: " << id
+                          << " (chapter " << chapter << ", verse " << verse << ")\\n";
+                return 7;
+            }
+            if (module->hasEntry(&current)) {
+                std::cout << "I\\t" << id << '\\n';
+                ++intros;
+            }
+            current.increment();
+            continue;
+        }
         const std::size_t dot1 = id.find('.');
         const std::size_t dot2 = id.find('.', dot1 == std::string::npos ? 0 : dot1 + 1);
         if (dot1 == std::string::npos || dot2 == std::string::npos
