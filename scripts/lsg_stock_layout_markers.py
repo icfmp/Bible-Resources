@@ -39,6 +39,11 @@ def compare_compiled_layout_marker_rows(
             if not isinstance(node.tag,str) or not node.tag.startswith(OSIS):
                 continue
             name=node.tag[len(OSIS):]
+            # CrossWire's standard milestone representation of an OSIS
+            # paragraph is <div type="x-p">; treat it as the same logical
+            # paragraph, whether present in the original or compiled XML.
+            if name=="div" and node.get("type") in ("x-p","paragraph"):
+                name="p"
             if name not in MARKERS:
                 continue
             if node.get("sID") is not None and node.get("eID") is not None:
@@ -92,6 +97,7 @@ def compare_compiled_layout_marker_rows(
         "actual_paragraph_content_and_boundaries_verified":False,
         "actual_poetry_group_semantic_placement_verified":False,
         "frontend_visual_rendering_verified":False,
+        "sword_x_p_paragraph_milestones_normalized":True,
         "source_modified":False,
         "published":False,
     }
