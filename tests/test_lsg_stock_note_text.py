@@ -107,6 +107,29 @@ class StockNoteTextTests(unittest.TestCase):
         self.assertEqual(report["raw_text_difference_categories"]
                          ["leading_or_trailing_only"],1)
 
+    def test_internal_line_break_change_reports_metadata_not_note_words(self):
+        rows=list(self.rows)
+        rows[0]=encoded_row("Gen","Genesis 1:1","1","body","first\nnote")
+        report=compare_compiled_notes(self.source,self.aliases,[],rows)
+        profile=report["source_osis_to_stock_sword_whitespace_detail"]
+        self.assertEqual(profile["classification_counts"]["internal_whitespace_only"],1)
+        self.assertEqual(profile["changed_whitespace_run_features"]
+                         ["compiled_newline_runs_changed"],1)
+        self.assertFalse(profile["source_editorial_whitespace_approved"])
+        self.assertNotIn("first\nnote",str(profile))
+        self.assertNotIn("first note",str(profile))
+        self.assertEqual(report["matching_normalized_note_body_text"],2)
+
+    def test_unicode_nbsp_change_is_reported_for_editorial_review(self):
+        rows=list(self.rows)
+        rows[0]=encoded_row("Gen","Genesis 1:1","1","body","first\u00a0note")
+        report=compare_compiled_notes(self.source,self.aliases,[],rows)
+        profile=report["source_osis_to_stock_sword_whitespace_detail"]
+        self.assertEqual(profile["changed_whitespace_run_features"]
+                         ["compiled_unicode_space_runs_changed"],1)
+        self.assertFalse(profile["compiled_whitespace_matches_exactly"])
+        self.assertEqual(report["matching_normalized_note_body_text"],2)
+
     def test_duplicate_attribute_and_unexpected_book_are_errors(self):
         with self.assertRaises(PilotError):
             load_private_note_rows([self.rows[0],self.rows[0]],{"Gen"})
