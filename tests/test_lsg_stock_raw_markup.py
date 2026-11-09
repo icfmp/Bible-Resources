@@ -44,6 +44,23 @@ class RawStockReaderTests(unittest.TestCase):
         result=self.run_audit()
         self.assertFalse(result["source_global_raw_markup_counts_match_compiled"])
         self.assertEqual(result["status"],"blocked_compiled_raw_markup_mismatch")
+    def test_poetry_start_end_asymmetry_is_reported_without_forgiving_loss(self):
+        self.rows[0]="Mark 1:1\\t3\\t2\\t0\\t0\\t1\\t0"
+        report=self.run_audit()
+        self.assertEqual(report["status"],"blocked_compiled_raw_markup_mismatch")
+        self.assertEqual(report["poetry_asymmetric_reader_entry_count"],1)
+        self.assertEqual(report["poetry_reader_entries_with_fewer_start_markers_than_source_inside"],1)
+        self.assertFalse(report["poetry_start_end_milestones_balanced"])
+        self.assertTrue(report["poetry_end_milestones_match_source_line_count"])
+        self.assertEqual(report["first_poetry_marker_location_diagnostics"][0]["osis_ref"],"Mark.1.1")
+        self.assertEqual(report["book_level_diagnostics"][0]["compiled_poetry_end_minus_start"],1)
+
+    def test_balanced_source_poetry_has_no_location_diagnostics(self):
+        report=self.run_audit()
+        self.assertTrue(report["poetry_start_end_milestones_balanced"])
+        self.assertTrue(report["poetry_end_milestones_match_source_line_count"])
+        self.assertEqual(report["first_poetry_marker_location_diagnostics"],[])
+
     def test_misaligned_or_missing_raw_entries_are_fatal(self):
         for rows in ([],self.rows[:1],
                      ["Mark 1:2\t3\t2\t0\t1\t1\t0",self.rows[1]],
