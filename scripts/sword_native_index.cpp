@@ -55,8 +55,13 @@ int main(int argc, char** argv) {
         const std::size_t dot1 = id.find('.');
         const std::size_t dot2 = id.find('.', dot1 == std::string::npos ? 0 : dot1 + 1);
         if (dot1 == std::string::npos || dot2 == std::string::npos
-            || id.find('.', dot2 + 1) != std::string::npos)
+            || id.find('.', dot2 + 1) != std::string::npos) {
+            // Only identifiers and numeric metadata, never original text.
+            std::cerr << "Unrecognized native key: " << id
+                      << " (chapter " << current.getChapter()
+                      << ", verse " << current.getVerse() << ")\n";
             return 7;
+        }
         const std::string book = id.substr(0, dot1);
         const std::string ch = id.substr(dot1 + 1, dot2 - dot1 - 1);
         const int chapter = current.getChapter();
