@@ -458,6 +458,11 @@ def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
             report["status"]="blocked_compiled_lemma_attributes_mismatch"
         elif note_text["status"]!="compiled_note_normalized_body_text_verified_only":
             report["status"]="blocked_compiled_note_body_text_parity"
+        elif (note_text.get("publisher_usfx_to_compiled_note_text_review",{}).get("status")
+              !="publisher_usfx_to_compiled_sword_notes_normalized_match"):
+            # The immutable publisher source, not our intermediate OSIS
+            # conversion, is the authoritative note wording and punctuation.
+            report["status"]="blocked_publisher_usfx_to_compiled_note_text_parity"
         elif global_note_anchors["status"]!="compiled_book_global_note_word_offsets_verified":
             report["status"]="blocked_compiled_note_book_global_word_anchor_parity"
         elif ref_values["status"]!="compiled_ordered_explicit_osisref_values_verified":
