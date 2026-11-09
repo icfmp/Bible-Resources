@@ -82,7 +82,7 @@ class NativeRawWitnessTests(unittest.TestCase):
 
     def test_real_native_raw_xml_fragment_html_entities_and_notes(self):
         source = b'<hi>Word</hi> &amp; <w lemma="x">word</w><note>private</note>.'
-        self.assertEqual(native_main_tokens(source), ["word", "word", "word"])
+        self.assertEqual(native_main_tokens(source), ["word", "word"])
         self.assertNotIn("private", native_main_tokens(source))
 
     def test_short_authorial_text_is_inconclusive_not_proof(self):
