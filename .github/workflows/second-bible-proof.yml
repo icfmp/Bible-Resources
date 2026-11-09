@@ -41,6 +41,14 @@ jobs:
             --proto '=https' --proto-redir '=https' \
             https://ebible.org/sword/zip/engweb2025peb.zip \
             --output "${RUNNER_TEMP}/original-engwebp-sword.zip"
+          # These hashes were established by the independent real first run.
+          # A changed upstream file is NOT silently treated as the same edition.
+          printf '%s  %s\n' \
+            66f99b22a380d8ef8dbd9d401806fc02be3650e5fe3dbb0cec4d9693b53e1e44 \
+            "${RUNNER_TEMP}/original-engwebp-usfx.zip" | sha256sum --check -
+          printf '%s  %s\n' \
+            53d45377d1aa376f483aded415b6d122b7cbe6795baddc49dae6574e304b8810 \
+            "${RUNNER_TEMP}/original-engwebp-sword.zip" | sha256sum --check -
       - name: Independently scan the real USFX source and real native zText reader
         shell: bash
         run: |
@@ -61,6 +69,10 @@ jobs:
           assert proof["publisher_native_driver"] == "zText", "This real trial must exercise a different stock-SWORD driver from LSG"
           assert proof["actual_reader_occupied_numbered_verses"] > 20000
           assert proof["source_to_sword_exact_words_punctuation_verified"] is False
+          assert proof["source_to_sword_fidelity_gate"] in {
+              "blocked_canon_scope_mismatch_requires_edition_review",
+              "not_verified_requires_independent_book_mapping_and_full_content_probe",
+          }
           assert proof["edition_for_publication_approved"] is False
           assert proof["published"] is False
           print("Independent real zText reader index and original USFX source inspected; full text parity NOT certified")
