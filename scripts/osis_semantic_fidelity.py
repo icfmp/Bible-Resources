@@ -82,8 +82,12 @@ def _book_semantics(book: etree._Element) -> dict:
         nonlocal main_chars, note_chars, words
         if depth > 256:
             raise FidelityError(f"{name}: OSIS nesting exceeds safe bound")
-        if not isinstance(node.tag, str) or not node.tag.startswith(OSIS):
-            raise FidelityError(f"{name}: unexpected foreign or non-element XML markup")
+        if not isinstance(node.tag, str):
+            # XML comments/processing instructions are part of the immutable
+            # original byte SHA, but not authored Bible text or OSIS markup.
+            return
+        if not node.tag.startswith(OSIS):
+            raise FidelityError(f"{name}: unexpected foreign OSIS markup")
         local = etree.QName(node).localname
         nested_note = local == "note"
         if nested_note and in_note:
@@ -96,10 +100,14 @@ def _book_semantics(book: etree._Element) -> dict:
         # lexical-word ordinal and exact text offset. Preserve milestone
         # start/end direction and ID; no automatic OSIS canonicalization.
         is_marker = local in STRUCTURE
-        opening = not (node.get("eID") and not node.get("sID"))
-        closing = not (node.get("sID") and not node.get("eID"))
-        if node.get("sID") and node.get("eID"):
+        has_sid = "sID" in node.attrib
+        has_eid = "eID" in node.attrib
+        if has_sid and has_eid:
             raise FidelityError(f"{name}: simultaneous sID and eID")
+        if (has_sid and not node.get("sID")) or (has_eid and not node.get("eID")):
+            raise FidelityError(f"{name}: empty structural milestone identifier")
+        opening = not has_eid
+        closing = not has_sid
         if is_marker:
             lanes["ordered_structure_boundaries"].append(
                 ["+" if opening else "-", local, words, main_chars, attrs])
