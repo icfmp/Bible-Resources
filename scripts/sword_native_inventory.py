@@ -77,9 +77,9 @@ def parse_native_rows(text: str, expected_module: str) -> tuple[str, str, dict]:
                 raise NativeIndexError("Unordered or cross-chapter native populated key")
             populated.append(cells[1])
             last_ref = pos[2]
-        elif kind == "U" and cells == ["U", "TOP"]:
-            if opaque_top:
-                raise NativeIndexError("Duplicate populated anonymous TOP sentinel")
+        elif kind == "U" and len(cells) == 3 and cells[1] == "TOP":
+            if cells[2] != str(len(opaque_top) + 1):
+                raise NativeIndexError("Duplicate or skipped anonymous native TOP ordinal")
             opaque_top.append("TOP")
         elif kind == "I" and len(cells) == 2:
             if not INTRO.fullmatch(cells[1]) or cells[1] in last_intro:
