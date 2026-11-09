@@ -6,6 +6,9 @@ on:
       - 'scripts/lsg_stable_source_trial.py'
       - 'scripts/reviewed_reference_merges.py'
       - 'scripts/lsg_stock_raw_markup.py'
+      - 'scripts/lsg_stock_lemma_parity.py'
+      - 'scripts/sword_raw_lemma_values.cpp'
+      - 'tests/test_lsg_stock_lemma_parity.py'
       - 'scripts/sword_raw_markup_logical_lines.cpp'
       - 'tests/test_lsg_stock_raw_markup.py'
       - 'tests/test_reviewed_reference_merges.py'
@@ -96,14 +99,20 @@ jobs:
           python -m unittest discover -s tests -p 'test_lsg_stable_source_trial.py' -v
           python -m unittest discover -s tests -p 'test_reviewed_reference_merges.py' -v
           python -m unittest discover -s tests -p 'test_lsg_stock_raw_markup.py' -v
+          python -m unittest discover -s tests -p 'test_lsg_stock_lemma_parity.py' -v
       - name: Build raw SWORD C++ per-entry structure inspector against installed stable libsword
         run: |
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_raw_markup_logical_lines.cpp -o "${{ runner.temp }}/sword-raw-audit" -lsword
           test -x "${{ runner.temp }}/sword-raw-audit"
+      - name: Build stable SWORD lemma-value inspector (no Scripture words)
+        run: |
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_raw_lemma_values.cpp -o "${{ runner.temp }}/sword-lemma-audit" -lsword
+          test -x "${{ runner.temp }}/sword-lemma-audit"
       - name: Compile real source-attested OSIS via stable SWORD and classify every chapter
         env:
           LSG_SAMPLE_DEBUG: '0'
           LSG_STOCK_RAW_INSPECTOR: ${{ runner.temp }}/sword-raw-audit
+          LSG_STOCK_LEMMA_INSPECTOR: ${{ runner.temp }}/sword-lemma-audit
         run: |
           python scripts/lsg_stable_source_trial.py \
             --usfm-zip "${{ runner.temp }}/original/usfm.zip" \
