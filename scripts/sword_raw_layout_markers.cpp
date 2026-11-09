@@ -28,6 +28,9 @@ int main(int argc, char **argv) {
     const std::regex tags(R"tag(<([A-Za-z][A-Za-z0-9]*)\b([^>]*)>)tag");
     const std::regex sid(R"tag(\bsID\s*=)tag");
     const std::regex eid(R"tag(\beID\s*=)tag");
+    // Released osis2mod replaces non-milestoneable <p> with
+    // <div type="x-p" sID="..."/> and matching eID milestones.
+    const std::regex paragraph_div(R"tag(\btype\s*=\s*(["'])(x-p|paragraph)\1)tag");
     std::string row;
     size_t entries=0;
     while (std::getline(source,row)) {
@@ -50,9 +53,10 @@ int main(int argc, char **argv) {
         std::map<std::string,unsigned> starts,ends;
         for (auto it=std::sregex_iterator(xml.begin(),xml.end(),tags);
              it!=std::sregex_iterator();++it) {
-            const std::string tag=(*it)[1].str();
-            if (tag!="p" && tag!="title" && tag!="lg" && tag!="q") continue;
+            std::string tag=(*it)[1].str();
             const std::string attrs=(*it)[2].str();
+            if (tag=="div" && std::regex_search(attrs,paragraph_div)) tag="p";
+            if (tag!="p" && tag!="title" && tag!="lg" && tag!="q") continue;
             const bool start=std::regex_search(attrs,sid);
             const bool end=std::regex_search(attrs,eid);
             if (start && end) return 10;
