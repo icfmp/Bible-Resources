@@ -42,6 +42,10 @@ python scripts/smoke.py
 
 The real repository CI installs stock `diatheke` and performs those tests. Tests reject mutated files, missing approvals, stale source/audit/payload fingerprints and independently unclassified changes. Production module bytes and the published package are never rewritten by this gate.
 
+## Independent authorial OSIS index producer (first stage)
+
+The new [source OSIS inventory](SOURCE_OSIS_INVENTORY.md) provides a source-only, text-free `book.chapter.verse` key list and SHA-bound receipt after the independently validated OSIS source is available. It supports container and milestone verses with fail-closed duplicate/missing milestone detection and preserves editorial numeric gaps. It **does not** claim an original USFM/USFX-to-OSIS audit or stock-SWORD reader-key extraction; those and a second real edition remain pending in #28.
+
 ## Remaining multi-translation work
 
 The reusable guard is now implemented, but a separate generic *producer* must still capture source and reader inventories from original and compiled real modules; test a second Bible with different notes/driver/versification; and expand full original content, annotation and layout fidelity checks. Follow [issue #28](https://github.com/icfmp/Bible-Resources/issues/28). Do not claim these future capabilities already exist.

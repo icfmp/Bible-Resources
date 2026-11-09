@@ -28,7 +28,8 @@ References: [First LSG release](releases/LSG-0.1.0.md), [full LSG research PR #2
 - Use main-branch read-only tools: **scripts/audit_osis.py** and **scripts/guard_osis.py** (official pinned OSIS 2.1.1 XSD).
 - Apply **scripts/normalize_osis.py** only with approved source/SHA-bound reversible structural plans. No automatic source rewrites.
 - If input is USFM or USFX, apply a reviewed standards-based conversion and verify exact original verse keys, titles, paragraphs, poetry, note order and introductions.
-- Compare all source chapter/verse keys with the real compiled SWORD registry, including blank/omitted verses and the full verse-zero inventory. Distinguish source omission, alternate numbering, inaccessible key and actual missing data.
+- For a separately validated original OSIS document, run **`scripts/source_osis_inventory.py`** to produce the edition-independent, SHA-bound authorial key list. It rejects duplicate, non-ordered, ranged or unclosed source verse milestones, but does not prove the USFM/USFX conversion or actual compiled reader inventory. See [SOURCE_OSIS_INVENTORY.md](SOURCE_OSIS_INVENTORY.md).
+- Compare all source chapter/verse keys with the real compiled SWORD registry, including blank/omitted verses and the full verse-zero inventory.- Compare all source chapter/verse keys with the real compiled SWORD registry, including blank/omitted verses and the full verse-zero inventory. Distinguish source omission, alternate numbering, inaccessible key and actual missing data.
 - Any unavoidable source-index merge must be documented in an explicit, edition-bound, reviewer-authorized, reversible manifest. LSG's one special Mark merge does not justify a universal merge rule.
 
 ### C. Compiled SWORD fidelity
