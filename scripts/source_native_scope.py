@@ -14,7 +14,7 @@ import re
 
 from stable_sword_refs import parse_keys
 
-USFM_BOOK = re.compile(r"^[0-9]?[A-Z][A-Z0-9]{2}$")
+USFM_BOOK = re.compile(r"^(?:[1-4][A-Z][A-Z0-9]|[A-Z][A-Z0-9]{2})$")
 SWORD_BOOK = re.compile(r"^[1-4]?[A-Za-z][A-Za-z0-9]*$")
 
 
