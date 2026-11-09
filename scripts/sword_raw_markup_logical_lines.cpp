@@ -3,6 +3,7 @@
 // they are ONE logical source poetry line represented by TWO milestones.
 #include <sword/swmgr.h>
 #include <sword/swmodule.h>
+#include <sword/versekey.h>
 #include <fstream>
 #include <iostream>
 #include <regex>
@@ -10,10 +11,18 @@
 #include <map>
 
 int main(int argc,char **argv) {
-    if (argc!=3) return 2;
+    if (argc!=3 && argc!=4) return 2;
+    const bool intros=argc==4 && std::string(argv[3])=="--intros";
+    if (argc==4 && !intros) return 2;
     sword::SWMgr manager;
     sword::SWModule *module=manager.getModule(argv[1]);
     if (!module) return 3;
+    if (intros) {
+        auto *key=dynamic_cast<sword::VerseKey*>(module->getKey());
+        if (!key) return 11;
+        key->setIntros(true);
+        key->setAutoNormalize(false);
+    }
     std::ifstream refs(argv[2]);
     if (!refs) return 4;
     const std::regex tags("<([A-Za-z][A-Za-z0-9]*)\\b([^>]*)>");
@@ -25,6 +34,10 @@ int main(int argc,char **argv) {
         if (ref.empty()||ref.size()>120||ref.find('\t')!=std::string::npos)
             return 5;
         if (module->setKey(ref.c_str())) return 6;
+        if (intros) {
+            auto *key=dynamic_cast<sword::VerseKey*>(module->getKey());
+            if (!key || key->getVerse()!=0) return 12;
+        }
         const char *raw=module->getRawEntry();
         if (!raw) return 7;
         const std::string xml(raw);
