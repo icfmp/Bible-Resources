@@ -38,6 +38,7 @@ References: [First LSG release](releases/LSG-0.1.0.md), [full LSG research PR #2
 - Report exact/NFC/whitespace-normalized differences separately and flag escaped formatting residues (the LSG case left three literal backslash-i sequences in introductions).
 - Compare real upstream compiled data before claiming editorial improvements. Fail closed on unexplained differences.
 - **Current limit:** These exhaustive checks are predominantly **LSG-specific scripts in research PR #24**, not yet a generic one-command source-to-SWORD tool on main. Reuse their algorithms, not LSG-specific numbers or book IDs. Tracked in [#28](https://github.com/icfmp/Bible-Resources/issues/28).
+- **Recovered reusable aids:** `scripts/private_sword_bundle.py` tests a bounded, edition-parameterized SWORD ZIP in an isolated reader installation; `scripts/note_whitespace_diagnostics.py` records non-content-only note whitespace differences for explicit review. They were extracted from #24; neither performs the entire original-source-to-compiled full-canon audit. See [LSG audit research handoff](LSG_AUDIT_RESEARCH_HANDOFF.md).
 
 ### D. Reader matrix and release
 
