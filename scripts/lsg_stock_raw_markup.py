@@ -28,6 +28,7 @@ from lsg_stock_note_anchors import (
 )
 from lsg_stock_layout_markers import audit_compiled_layout_markers
 from lsg_stock_layout_positions import audit_compiled_layout_start_positions
+from lsg_stock_layout_boundaries import audit_compiled_layout_boundaries
 
 def build_stock_markup_plan(source: bytes, candidate: Path,
                             decisions: list[dict]) -> tuple[list[tuple[str, str]],dict,dict]:
@@ -441,6 +442,12 @@ def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
             module_id=module_id,inspector=layout_inspector)
         report["compiled_layout_start_word_position_diagnostic"]=(
             audit_compiled_layout_start_positions(
+                candidate,aliases,sword_root=sword_root,
+                module_id=module_id,inspector=layout_inspector))
+        # The start count/position gates do not imply paragraph and poetry
+        # closures are faithful. Diagnose all *end* boundaries independently.
+        report["compiled_layout_boundary_word_position_diagnostic"]=(
+            audit_compiled_layout_boundaries(
                 candidate,aliases,sword_root=sword_root,
                 module_id=module_id,inspector=layout_inspector))
         if lemma_review["status"]!="compiled_ordered_lemma_attributes_verified":
