@@ -54,6 +54,26 @@ jobs:
           assert len(parse_registry((Path(os.environ["RUNNER_TEMP"]) / "sword-registry.tsv").read_text(), "Segond")) == trial["expected_chapters"]
           print("Independent stock SWORD native source-index readback agrees with original published LSG audit.")
           PY
+      - name: Verify local approved LSG payload is byte-identical to itself (read-only update audit)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/diff_sword_snapshots.py \
+            --module-id BRLSG1910 \
+            --previous modules/lsg-1910/payload \
+            --candidate modules/lsg-1910/payload \
+            --report "${RUNNER_TEMP}/approved-module-snapshot-identity.json"
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          report = json.loads((Path(os.environ["RUNNER_TEMP"]) /
+                               "approved-module-snapshot-identity.json").read_text())
+          assert report["status"] == "file_bytes_identical_not_source_equivalence"
+          assert report["changed_file_count"] == report["added_file_count"] == report["removed_file_count"] == 0
+          assert report["actual_binary_files_changed"] is False
+          assert report["published"] is False and report["editorial_approval"] is False
+          print("Existing approved LSG SWORD payload read-only identity scan passed.")
+          PY
       - run: python scripts/validate.py
       - run: python scripts/build.py --output dist
       - run: python scripts/smoke.py
