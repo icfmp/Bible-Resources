@@ -20,6 +20,7 @@ from lsg_source_compare import scan_usfx
 from lsg_sword_compare import chapter_plan
 from lsg_osis_parity import _osis_verses, OSIS
 from lsg_stock_lemma_parity import audit_compiled_lemma_values
+from lsg_stock_reference_parity import audit_compiled_explicit_reference_targets
 from lsg_stock_note_probe import probe_compiled_note_storage
 from lsg_stock_note_text import audit_compiled_note_bodies
 from lsg_stock_note_anchors import (
@@ -410,6 +411,10 @@ def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
             candidate,aliases,sword_root=sword_root,module_id=module_id,
             inspector=lemma_inspector)
         report["compiled_ordered_lemma_attribute_review"]=lemma_review
+        ref_values=audit_compiled_explicit_reference_targets(
+            candidate,aliases,sword_root=sword_root,module_id=module_id,
+            inspector=lemma_inspector)
+        report["compiled_explicit_reference_osisref_attribute_review"]=ref_values
         # SWORD can store footnote bodies in entry attributes, not inline
         # in raw verse markup. This is diagnostic only, never sign-off.
         report["compiled_note_entry_attribute_probe"]=probe_compiled_note_storage(
@@ -432,6 +437,8 @@ def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
             report["status"]="blocked_compiled_note_body_text_parity"
         elif global_note_anchors["status"]!="compiled_book_global_note_word_offsets_verified":
             report["status"]="blocked_compiled_note_book_global_word_anchor_parity"
+        elif ref_values["status"]!="compiled_ordered_explicit_osisref_values_verified":
+            report["status"]="blocked_compiled_explicit_reference_osisref_parity"
     report["source_reader_merge_count"]=len(decisions)
     report["compiled_module_id"]=module_id
     return report
