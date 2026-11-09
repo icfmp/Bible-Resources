@@ -146,8 +146,9 @@ def _validate_payload(module: Path, module_id: str) -> tuple[Path, str, str]:
     conf_dir = payload / "mods.d"
     if conf_dir.is_symlink() or not conf_dir.is_dir():
         raise NativeIndexError("Missing or symlinked SWORD configuration directory")
-    configs = [p for p in conf_dir.iterdir() if p.is_file() and not p.is_symlink()]
-    if len(configs) != 1 or configs[0].name != module_id.lower() + ".conf":
+    configs = list(conf_dir.iterdir())
+    if (len(configs) != 1 or configs[0].is_symlink() or not configs[0].is_file()
+            or configs[0].name != module_id.lower() + ".conf"):
         raise NativeIndexError("Expected exactly one matching native SWORD module config")
     conf = configs[0].read_text(encoding="utf-8-sig")
     if f"[{module_id}]" not in conf.splitlines():
@@ -214,8 +215,9 @@ def collect_native_inventory(
 
 def _write_evidence(files: list[tuple[Path, bytes]], module: Path) -> None:
     dests = [p.resolve() for p, _ in files]
-    if len(dests) != len(set(dests)) or any(p == module.resolve() for p in dests):
-        raise NativeIndexError("Duplicate or unsafe evidence output paths")
+    module_root = module.resolve(strict=True)
+    if len(dests) != len(set(dests)) or any(p.is_relative_to(module_root) for p in dests):
+        raise NativeIndexError("Duplicate or source-module-overwriting evidence output paths")
     if any(p.exists() or p.is_symlink() for p, _ in files):
         raise NativeIndexError("Refusing to overwrite existing index proof")
     if any(p.parent.is_symlink() or not p.parent.is_dir() for p, _ in files):
