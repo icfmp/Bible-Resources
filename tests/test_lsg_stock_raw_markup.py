@@ -5,7 +5,8 @@ import sys
 import unittest
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
-from lsg_stock_raw_markup import compare_raw_rows, summarize_intro_rows
+from lsg_stock_raw_markup import (compare_raw_rows, summarize_intro_rows,
+                                 reconcile_full_stock_markup)
 from pilot_preflight import PilotError
 
 class RawStockReaderTests(unittest.TestCase):
@@ -76,6 +77,46 @@ class RawStockReaderTests(unittest.TestCase):
             summarize_intro_rows(
                 ["\t".join(("Mark 1:1","0","0","0","1","0","0"))],
                 [("Mark 1:0","Mark")])
+
+    def test_full_scope_reconciles_poetry_opener_in_real_intro_slot(self):
+        # An opener outside a standard verse must not be declared lost.
+        self.rows[0]=chr(9).join(("Mark 1:1","3","2","0","0","1","0"))
+        main=self.run_audit()
+        intro=summarize_intro_rows(
+            [chr(9).join(("Mark 1:0","0","0","0","1","0","0"))],
+            [("Mark 1:0","Mark")])
+        source={"Mark":Counter({"w":5,"note":2,"l":2,"reference":3})}
+        review=reconcile_full_stock_markup(main,intro,source)
+        self.assertEqual(review["status"],
+                         "full_stock_sword_word_note_poetry_reference_counts_match")
+        self.assertEqual(review["source_marker_totals"],
+                         review["compiled_with_intros_marker_totals"])
+        self.assertFalse(review["source_content_verified"])
+
+    def test_full_scope_blocks_missing_poetry_or_changed_reference_target_count(self):
+        main=self.run_audit()
+        empty_intro=summarize_intro_rows(
+            [chr(9).join(("Mark 1:0","0","0","0","0","0","0"))],
+            [("Mark 1:0","Mark")])
+        source={"Mark":Counter({"w":5,"note":2,"l":2,"reference":3})}
+        self.rows[0]=chr(9).join(("Mark 1:1","3","2","0","0","1","0"))
+        missing=reconcile_full_stock_markup(self.run_audit(),empty_intro,source)
+        self.assertEqual(missing["status"],"blocked_full_scope_marker_mismatch")
+        self.assertEqual(missing["mismatching_books"][0]["book"],"Mark")
+        changed={"Mark":Counter({"w":5,"note":2,"l":2,"reference":2})}
+        mismatch=reconcile_full_stock_markup(main,empty_intro,changed)
+        self.assertEqual(mismatch["status"],"blocked_full_scope_marker_mismatch")
+
+    def test_full_scope_rejects_incomplete_intro_inventory(self):
+        with self.assertRaises(PilotError):
+            reconcile_full_stock_markup(self.run_audit(),
+                {"status":"verse_zero_markup_counted_not_release_approved",
+                 "book_marker_counts":{}},
+                {"Mark":Counter({"w":5,"note":2,"l":2,"reference":3})})
+        blocked=reconcile_full_stock_markup(self.run_audit(),
+            {"status":"intro_probe_failed"},
+            {"Mark":Counter({"w":5,"note":2,"l":2,"reference":3})})
+        self.assertEqual(blocked["status"],"blocked_incomplete_verse_zero_inspection")
 
     def test_misaligned_or_missing_raw_entries_are_fatal(self):
         for rows in ([],self.rows[:1],
