@@ -11,6 +11,9 @@ on:
       - 'scripts/sword_note_attribute_probe.cpp'
       - 'scripts/lsg_stock_note_probe.py'
       - 'tests/test_lsg_stock_note_probe.py'
+      - 'scripts/sword_note_attribute_private.cpp'
+      - 'scripts/lsg_stock_note_text.py'
+      - 'tests/test_lsg_stock_note_text.py'
       - 'tests/test_lsg_stock_lemma_parity.py'
       - 'scripts/sword_raw_markup_logical_lines.cpp'
       - 'tests/test_lsg_stock_raw_markup.py'
@@ -104,6 +107,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_lsg_stock_raw_markup.py' -v
           python -m unittest discover -s tests -p 'test_lsg_stock_lemma_parity.py' -v
           python -m unittest discover -s tests -p 'test_lsg_stock_note_probe.py' -v
+          python -m unittest discover -s tests -p 'test_lsg_stock_note_text.py' -v
       - name: Build raw SWORD C++ per-entry structure inspector against installed stable libsword
         run: |
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_raw_markup_logical_lines.cpp -o "${{ runner.temp }}/sword-raw-audit" -lsword
@@ -116,12 +120,17 @@ jobs:
         run: |
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_note_attribute_probe.cpp -o "${{ runner.temp }}/sword-note-probe" -lsword
           test -x "${{ runner.temp }}/sword-note-probe"
+      - name: Build isolated private note-attribute reader against released SWORD
+        run: |
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_note_attribute_private.cpp -o "${{ runner.temp }}/sword-note-text-audit" -lsword
+          test -x "${{ runner.temp }}/sword-note-text-audit"
       - name: Compile real source-attested OSIS via stable SWORD and classify every chapter
         env:
           LSG_SAMPLE_DEBUG: '0'
           LSG_STOCK_RAW_INSPECTOR: ${{ runner.temp }}/sword-raw-audit
           LSG_STOCK_LEMMA_INSPECTOR: ${{ runner.temp }}/sword-lemma-audit
           LSG_STOCK_NOTE_INSPECTOR: ${{ runner.temp }}/sword-note-probe
+          LSG_STOCK_NOTE_TEXT_INSPECTOR: ${{ runner.temp }}/sword-note-text-audit
         run: |
           python scripts/lsg_stable_source_trial.py \
             --usfm-zip "${{ runner.temp }}/original/usfm.zip" \
