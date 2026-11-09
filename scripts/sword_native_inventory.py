@@ -43,7 +43,7 @@ def parse_native_rows(text: str, expected_module: str) -> tuple[str, str, dict]:
         raise NativeIndexError("Missing or unsupported native module/engine header")
     _, module_id, system, version, driver = meta
     trailer = lines[-1].split("\t")
-    if len(trailer) != 4 or trailer[0] != "S":
+    if len(trailer) != 5 or trailer[0] != "S":
         raise NativeIndexError("Missing terminal complete-inventory counts")
     try:
         counts = tuple(int(v) for v in trailer[1:])
@@ -54,6 +54,7 @@ def parse_native_rows(text: str, expected_module: str) -> tuple[str, str, dict]:
     registry: list[str] = []
     populated: list[str] = []
     intros: list[str] = []
+    opaque_top: list[str] = []
     active: tuple[str, int, int] | None = None
     last_ref = 0
     last_intro = set()
@@ -76,6 +77,10 @@ def parse_native_rows(text: str, expected_module: str) -> tuple[str, str, dict]:
                 raise NativeIndexError("Unordered or cross-chapter native populated key")
             populated.append(cells[1])
             last_ref = pos[2]
+        elif kind == "U" and cells == ["U", "TOP"]:
+            if opaque_top:
+                raise NativeIndexError("Duplicate populated anonymous TOP sentinel")
+            opaque_top.append("TOP")
         elif kind == "I" and len(cells) == 2:
             if not INTRO.fullmatch(cells[1]) or cells[1] in last_intro:
                 raise NativeIndexError("Malformed or duplicate native intro key")
@@ -97,7 +102,7 @@ def parse_native_rows(text: str, expected_module: str) -> tuple[str, str, dict]:
     keys = parse_keys(populated_text)
     if (len(parsed_registry) != len(registry)
             or len(keys) != len(populated)
-            or counts != (len(registry), len(populated), len(intros))):
+            or counts != (len(registry), len(populated), len(intros), len(opaque_top))):
         raise NativeIndexError("Native reader registry/key/intron totals disagree")
     for book, chapter, verse in keys:
         if verse > parsed_registry.get((book, chapter), 0):
@@ -117,6 +122,8 @@ def parse_native_rows(text: str, expected_module: str) -> tuple[str, str, dict]:
         "native_registry_chapter_count": len(parsed_registry),
         "native_occupied_numbered_verse_count": len(populated),
         "native_occupied_verse_zero_intro_count": len(intros),
+        "native_nonaddressable_populated_top_count": len(opaque_top),
+        "native_anonymous_top_content_parity_verified": False,
         "native_occupied_intro_references": intros,
         "native_reader_keys_sha256": sha256(populated_text.encode()).hexdigest(),
         "native_registry_sha256": sha256(registry_text.encode()).hexdigest(),
