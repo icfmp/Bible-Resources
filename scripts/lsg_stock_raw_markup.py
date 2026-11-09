@@ -425,8 +425,9 @@ def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
             candidate,aliases,sword_root=sword_root,module_id=module_id,
             inspector=note_inspector)
         note_text=audit_compiled_note_bodies(
-            candidate,aliases,decisions,sword_root=sword_root,
-            module_id=module_id,inspector=note_text_inspector)
+            candidate,aliases,decisions,publisher_usfx=publisher_usfx,
+            sword_root=sword_root,module_id=module_id,
+            inspector=note_text_inspector)
         report["compiled_note_body_text_review"]=note_text
         report["compiled_note_word_anchor_review"]=audit_compiled_note_anchors(
             candidate,aliases,decisions,expected,sword_root=sword_root,
