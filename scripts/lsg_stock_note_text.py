@@ -23,6 +23,7 @@ from lsg_note_parity import _collect_osis
 from lsg_stock_lemma_parity import ordered_lemma_reader_plan
 from lsg_osis_parity import OSIS
 from lsg_note_whitespace_diagnostics import classify_note_whitespace
+from lsg_stock_publisher_note_parity import compare_publisher_usfx_to_compiled_notes
 from pilot_preflight import PilotError
 
 _MAX_PRIVATE_BYTES=120_000_000
@@ -85,7 +86,8 @@ def load_private_note_rows(rows: list[str], valid_books: set[str]) -> dict:
 def compare_compiled_notes(candidate: Path,
                            aliases: list[tuple[str,str]],
                            decisions: list[dict],
-                           rows: list[str]) -> dict:
+                           rows: list[str],
+                           publisher_usfx: bytes | None = None) -> dict:
     plan,books=ordered_lemma_reader_plan(candidate,aliases)
     allowed={(book,ref) for ref,book,_intro in plan}
     original=etree.parse(str(candidate),parser=etree.XMLParser(
@@ -247,7 +249,7 @@ def compare_compiled_notes(candidate: Path,
            and outside==0 and not count_mismatches
            and normalized_matches==source_count and parse_errors==0
            and missing_body_count==0 and not nonnumeric_id_groups)
-    return {
+    result={
         "status":("compiled_note_normalized_body_text_verified_only" if equal
                   else "blocked_or_unresolved_compiled_note_text_parity"),
         "source_note_count":source_count,
@@ -290,10 +292,16 @@ def compare_compiled_notes(candidate: Path,
         "original_whitespace_identity_verified":raw_matches==source_count,
         "published":False,
     }
+    if publisher_usfx is not None:
+        result["publisher_usfx_to_compiled_note_text_review"]=(
+            compare_publisher_usfx_to_compiled_notes(
+                publisher_usfx,candidate,aliases,decisions,compiled))
+    return result
 
 
 def audit_compiled_note_bodies(candidate: Path, aliases: list[tuple[str,str]],
-                               decisions: list[dict], *, sword_root: Path,
+                               decisions: list[dict], *, publisher_usfx: bytes | None = None,
+                               sword_root: Path,
                                module_id: str, inspector: Path) -> dict:
     if not inspector.is_file() or inspector.is_symlink():
         raise PilotError("Private compiled SWORD note inspector missing")
@@ -324,7 +332,8 @@ def audit_compiled_note_bodies(candidate: Path, aliases: list[tuple[str,str]],
         if private.stat().st_size>_MAX_PRIVATE_BYTES:
             raise PilotError("Temporary SWORD note values exceed hard size bound")
         rows=private.read_text(encoding="utf-8").splitlines()
-        report=compare_compiled_notes(candidate,aliases,decisions,rows)
+        report=compare_compiled_notes(
+            candidate,aliases,decisions,rows,publisher_usfx=publisher_usfx)
     report["reader_entries_inspected"]=len(plan)
     report["source_modified"]=False
     return report
