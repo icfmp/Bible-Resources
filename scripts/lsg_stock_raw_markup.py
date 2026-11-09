@@ -209,6 +209,10 @@ def compare_raw_rows(rows: list[str], ordered_refs: list[tuple[str,str]],
         "verses_with_no_source_word_tag_loss":per_verse_words_at_least,
         "per_verse_note_tag_matches":per_verse_notes_equal,
         "books_compared":len(books),
+        "reader_verse_book_marker_counts":{
+            book:{key:int(raw[key]) for key in ("w","note","l","l_end","reference","q")}
+            for book,raw in sorted(compiled_by_book.items())
+        },
         "books_with_matching_full_word_note_poetry_tag_counts":sum(
             all(source_global_by_book[b][k]==compiled_by_book[b][k]
                 for k in ("w","note","l"))
@@ -254,6 +258,11 @@ def summarize_intro_rows(rows: list[str], queries: list[tuple[str,str]]) -> dict
         "inspected_verse_zero_entries":len(queries),
         "entries_with_markup":populated,
         "total_marker_counts":dict(totals),
+        "book_marker_counts":{
+            book:{key:int(c[key]) for key in ("word","note","cross_reference",
+                   "poetry_start","poetry_end","quotation")}
+            for book,c in sorted(by_book.items())
+        },
         "by_book_with_poetry_markers":[
             {"book":book, "poetry_start":c["poetry_start"],
              "poetry_end":c["poetry_end"],
@@ -263,6 +272,66 @@ def summarize_intro_rows(rows: list[str], queries: list[tuple[str,str]]) -> dict
         ],
         "source_content_verified":False,
         "intro_rendering_verified":False,
+    }
+
+
+def reconcile_full_stock_markup(main: dict, intro: dict,
+                                source_by_book: dict) -> dict:
+    """Verify every source marker in reader verses AND book/chapter intros.
+
+    SWORD stores structural markers before verse one in verse-zero records.
+    Compare independently by book; a matching global total alone cannot hide
+    book-to-book relocation. This is tag-count parity only, NOT lemma/note
+    content, heading fidelity, frontend rendering or editorial approval.
+    """
+    if intro.get("status")!="verse_zero_markup_counted_not_release_approved":
+        return {"status":"blocked_incomplete_verse_zero_inspection",
+                "source_content_verified":False,"published":False}
+    regular=main.get("reader_verse_book_marker_counts",{})
+    introductions=intro.get("book_marker_counts",{})
+    if (not isinstance(regular,dict) or not isinstance(introductions,dict)
+        or set(regular)!=set(source_by_book)
+        or set(introductions)!=set(source_by_book)):
+        raise PilotError("Incomplete source/SWORD book-level raw marker inventory")
+    source_totals=Counter()
+    compiled_totals=Counter()
+    mismatches=[]
+    for book in sorted(source_by_book):
+        source=source_by_book[book]
+        verse=regular[book]
+        entry=introductions[book]
+        actual={
+            "w":verse["w"]+entry["word"],
+            "note":verse["note"]+entry["note"],
+            "l":verse["l"]+entry["poetry_start"],
+            "l_end":verse["l_end"]+entry["poetry_end"],
+            "reference":verse["reference"]+entry["cross_reference"],
+        }
+        wanted={
+            "w":source["w"],"note":source["note"],
+            "l":source["l"],"l_end":source["l"],
+            "reference":source["reference"],
+        }
+        source_totals.update(wanted)
+        compiled_totals.update(actual)
+        if actual!=wanted:
+            mismatches.append({
+                "book":book,
+                "source_marker_counts":wanted,
+                "compiled_with_intros_marker_counts":actual,
+            })
+    return {
+        "status":("full_stock_sword_word_note_poetry_reference_counts_match"
+                  if not mismatches else "blocked_full_scope_marker_mismatch"),
+        "books_checked":len(source_by_book),
+        "source_marker_totals":dict(source_totals),
+        "compiled_with_intros_marker_totals":dict(compiled_totals),
+        "mismatching_books":mismatches,
+        "source_content_verified":False,
+        "compiled_lemma_id_values_verified":False,
+        "compiled_note_targets_verified":False,
+        "poetry_visual_rendering_verified":False,
+        "published":False,
     }
 
 
@@ -314,8 +383,16 @@ def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
             or len(proc.stdout)>8_000_000):
             raise PilotError("Stock SWORD raw markup inspection failed")
         report=compare_raw_rows(proc.stdout.splitlines(),aliases,expected,source_global)
-        report["sword_verse_zero_intro_diagnostic"]=probe_stock_intros(
-            inspector,module_id,aliases,Path(temp),env)
+        intro=probe_stock_intros(inspector,module_id,aliases,Path(temp),env)
+        report["sword_verse_zero_intro_diagnostic"]=intro
+        scope=reconcile_full_stock_markup(report,intro,source_global)
+        report["source_to_compiled_full_scope_marker_review"]=scope
+        report["verse_entries_only_status"]=report["status"]
+        if (scope["status"]=="full_stock_sword_word_note_poetry_reference_counts_match"
+            and report["all_outside_verse_word_markers_accounted_for"]
+            and report["verses_with_no_source_word_tag_loss"]==len(aliases)
+            and report["per_verse_note_tag_matches"]==len(aliases)):
+            report["status"]="raw_stock_sword_full_scope_markers_verified_including_intros"
     report["source_reader_merge_count"]=len(decisions)
     report["compiled_module_id"]=module_id
     return report
