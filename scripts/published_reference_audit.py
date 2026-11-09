@@ -60,6 +60,11 @@ def archived_release_errors(module: Path, root: Path, manifest_name: str,
                 or manifest.get("metadata_path") != (module.relative_to(root) / "metadata.json").as_posix()
                 or metadata["quality"]["status"] != "approved"
                 or not SHA.fullmatch(manifest.get("release_zip_sha256", ""))
+                or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{1,127}", manifest.get("release_tag", ""))
+                or not re.fullmatch(r"20[0-9]{2}-[01][0-9]-[0-3][0-9]",
+                                    manifest.get("editorial_approval", {}).get("date", ""))
+                or not isinstance(manifest.get("editorial_approval", {}).get("scope"), str)
+                or len(manifest["editorial_approval"]["scope"].strip()) < 10
                 or manifest.get("editorial_approval", {}).get("approved_by") !=
                     "Bible Resources project owner"):
             raise ValueError("Release/module identity or editorial approval mismatch")
@@ -117,6 +122,15 @@ def archived_release_errors(module: Path, root: Path, manifest_name: str,
         mismatches = trial["unmatched_verse_slot_classification"]
         if not isinstance(mismatches, list):
             raise ValueError("Missing original per-chapter discrepancy classifications")
+        reported = {
+            (entry["book"], entry["chapter"])
+            for entry in trial["all_index_key_mismatch_chapters"]
+        }
+        actual_chapters = {(entry["book"], entry["chapter"]) for entry in mismatches}
+        if (len(reported) != len(trial["all_index_key_mismatch_chapters"])
+                or len(actual_chapters) != len(mismatches)
+                or reported != actual_chapters):
+            raise ValueError("Unclassified chapters with differing source/reader keys")
         for chapter in mismatches:
             if chapter.get("complete_chapter_character_stream_equal_ignoring_whitespace") is not True:
                 raise ValueError("Unexplained text change in mismatched chapter")
@@ -206,7 +220,11 @@ def archived_release_errors(module: Path, root: Path, manifest_name: str,
         preview = audit["xiphos_test_preview_package"]
         if (preview.get("status") != "private_stock_sword_zip_reinstall_readback_verified"
                 or preview.get("text_payload_files_byte_identical_to_verified_module") is not True
-                or preview.get("publisher_original_usfx_sha256") != audit["original_usfx_sha256"]):
+                or preview.get("publisher_original_usfx_sha256") != audit["original_usfx_sha256"]
+                or not isinstance(preview.get("independent_passage_readbacks"), list)
+                or not preview["independent_passage_readbacks"]
+                or not all(item.get("readback_identical_to_unpacked_module") is True
+                           for item in preview["independent_passage_readbacks"])):
             raise ValueError("Released file chain lacks original independently reinstalled reader evidence")
     except (OSError, ValueError, KeyError, TypeError, AttributeError, IndexError) as exc:
         errors.append(f"{module}/SOURCE_AUDIT.json: [PUBLISHED_SWORD_INDEX_UNVERIFIED] {exc}")
