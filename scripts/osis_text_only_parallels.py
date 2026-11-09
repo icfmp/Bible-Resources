@@ -76,8 +76,6 @@ def convert_unresolved_parallel_headings(
             changes+=1
     if changes!=original_refs:
         raise PilotError("Unresolved parallel reference count changed")
-    if changes==0:
-        raise PilotError("No matching unresolved parallel reference tags in source")
     clone=etree.fromstring(etree.tostring(candidate),parser=_parser())
     for seg in clone.iter(OSIS+"seg"):
         if seg.get("type")!=UNLINKED_SEG_TYPE:
