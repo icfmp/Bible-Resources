@@ -196,6 +196,9 @@ def run_stable(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) ->
         inspector=os.environ.get("LSG_STOCK_RAW_INSPECTOR")
         if not inspector:
             raise PilotError("Unfiltered stable SWORD raw markup audit executable is required")
+        lemma_inspector=os.environ.get("LSG_STOCK_LEMMA_INSPECTOR")
+        if not lemma_inspector:
+            raise PilotError("Stable SWORD compiled word-lemma verification is required")
         # Standard SWORD About metadata may be visible in the module details
         # even if frontends render the canonical verse key as plain "52".
         module_notice = "Note de versification : " + "; ".join(
@@ -208,7 +211,8 @@ def run_stable(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) ->
             after_full_readback=lambda root,module_id,roundtrip:
                 audit_stock_raw_markup(
                     original_xml,labeled,decisions,sword_root=root,
-                    module_id=module_id,inspector=Path(inspector)))
+                    module_id=module_id,inspector=Path(inspector),
+                    lemma_inspector=Path(lemma_inspector)))
         compiled = report["stock_sword_compiled_candidate"]
         if (not compiled.get("real_module_rebuilt_in_temporary_directory")
                 or "full_source_verse_roundtrip" not in compiled):
