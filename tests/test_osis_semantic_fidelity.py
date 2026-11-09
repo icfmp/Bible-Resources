@@ -113,8 +113,7 @@ class SemanticOsisTests(unittest.TestCase):
 
     def test_note_body_changed_without_main_text_change(self):
         old = rich_document()
-        changed = old.replace(b"translator note", b"translator notes") if False \
-            else old.replace(b"a note ", b"a changed note ")
+        changed = old.replace(b"a note ", b"a changed note ")
         report = self.expect_block(old, changed, "note_bodies_callers_positions")
         self.assertNotIn("main_text_exact_utf8_sha256_after_xml_entity_decoding",
                          report["different_lanes_book_counts"])
