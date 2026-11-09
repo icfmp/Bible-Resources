@@ -3,16 +3,10 @@ name: Register attested LSG 0.1.0 in SWORD catalogue
 # One-time bootstrap of the already published, source-audited binary.
 # Keep this separate from still-open research PRs #18/#24. The published
 # GitHub Release is an immutable source; never recompile Scripture here.
+# Bootstrap completed for immutable LSG 0.1.0; never retry on normal pushes.
+# Explicit manual invocation still checks/rejects republication of the same release.
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/register-lsg-in-catalogue.yml'
-      - 'scripts/materialize_attested_lsg_release.py'
-      - 'config/catalogue-import-lsg-0.1.0.json'
-      - 'modules/lsg-1910/metadata.json'
   workflow_dispatch:
-
 permissions:
   contents: write
   pages: write

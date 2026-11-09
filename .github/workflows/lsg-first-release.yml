@@ -2,17 +2,10 @@ name: Publish first Louis Segond 1910 module
 
 # One-time bootstrap from the fully source-audited, hash-pinned private build.
 # This intentionally does NOT merge unfinished experimental source workflows.
+# Bootstrap completed for immutable LSG 0.1.0; never retry on normal pushes.
+# Explicit manual invocation still checks/rejects republication of the same release.
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/lsg-first-release.yml'
-      - 'scripts/promote_sword_preview.py'
-      - 'tests/test_promote_sword_preview.py'
-      - 'config/lsg-0.1.0.conf'
-      - 'docs/releases/LSG-0.1.0.md'
   workflow_dispatch:
-
 permissions:
   contents: write
   actions: read
