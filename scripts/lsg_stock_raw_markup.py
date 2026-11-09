@@ -19,6 +19,7 @@ from pilot_preflight import PilotError
 from lsg_source_compare import scan_usfx
 from lsg_sword_compare import chapter_plan
 from lsg_osis_parity import _osis_verses, OSIS
+from lsg_stock_lemma_parity import audit_compiled_lemma_values
 
 def build_stock_markup_plan(source: bytes, candidate: Path,
                             decisions: list[dict]) -> tuple[list[tuple[str, str]],dict,dict]:
@@ -365,7 +366,8 @@ def probe_stock_intros(inspector: Path, module_id: str,
 
 def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
                            decisions: list[dict], *, sword_root: Path,
-                           module_id: str, inspector: Path) -> dict:
+                           module_id: str, inspector: Path,
+                           lemma_inspector: Path) -> dict:
     if not inspector.is_file() or inspector.is_symlink():
         raise PilotError("Stock SWORD raw verifier executable not found")
     aliases,expected,source_global=build_stock_markup_plan(
@@ -393,6 +395,15 @@ def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
             and report["verses_with_no_source_word_tag_loss"]==len(aliases)
             and report["per_verse_note_tag_matches"]==len(aliases)):
             report["status"]="raw_stock_sword_full_scope_markers_verified_including_intros"
+        # Values, not only counts: obtain all word lemma attributes from
+        # the real stable binary. The transient TSV never leaves this temp
+        # directory; published diagnostics contain hashes and counts only.
+        lemma_review=audit_compiled_lemma_values(
+            candidate,aliases,sword_root=sword_root,module_id=module_id,
+            inspector=lemma_inspector)
+        report["compiled_ordered_lemma_attribute_review"]=lemma_review
+        if lemma_review["status"]!="compiled_ordered_lemma_attributes_verified":
+            report["status"]="blocked_compiled_lemma_attributes_mismatch"
     report["source_reader_merge_count"]=len(decisions)
     report["compiled_module_id"]=module_id
     return report
