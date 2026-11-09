@@ -27,6 +27,7 @@ from lsg_stock_note_anchors import (
     audit_compiled_note_anchors, audit_book_global_note_anchors
 )
 from lsg_stock_layout_markers import audit_compiled_layout_markers
+from lsg_stock_layout_positions import audit_compiled_layout_start_positions
 
 def build_stock_markup_plan(source: bytes, candidate: Path,
                             decisions: list[dict]) -> tuple[list[tuple[str, str]],dict,dict]:
@@ -438,6 +439,10 @@ def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
         report["compiled_layout_marker_diagnostic"]=audit_compiled_layout_markers(
             candidate,aliases,sword_root=sword_root,
             module_id=module_id,inspector=layout_inspector)
+        report["compiled_layout_start_word_position_diagnostic"]=(
+            audit_compiled_layout_start_positions(
+                candidate,aliases,sword_root=sword_root,
+                module_id=module_id,inspector=layout_inspector))
         if lemma_review["status"]!="compiled_ordered_lemma_attributes_verified":
             report["status"]="blocked_compiled_lemma_attributes_mismatch"
         elif note_text["status"]!="compiled_note_normalized_body_text_verified_only":
