@@ -148,7 +148,7 @@ def inspect_real_source_and_native_reader(
                                                for x in original_groups),
         "publisher_original_book_count": source_book_count,
         "publisher_original_books_with_numbered_verses": len(numbered_source_groups),
-        "publisher_unumbered_intro_or_nonverse_book_codes_needing_review": unnumbered_groups,
+        "publisher_unnumbered_intro_or_nonverse_book_codes_needing_review": unnumbered_groups,
         "publisher_unnumbered_book_text_structure_verified": False,
         "publisher_source_xml_book_codes": [x["usfx_book_id"] for x in original_groups],
         "publisher_sword_zip_sha256": sha256(compiled_sword_zip.read_bytes()).hexdigest(),
