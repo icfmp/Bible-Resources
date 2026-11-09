@@ -200,9 +200,18 @@ def inspect(source_path: Path, schema_path: Path, policy_path: Path = POLICY_PAT
     used = set()
     counts = Counter()
     for elem in doc.iter():
+        if isinstance(elem, etree._Comment):
+            # Preserve provenance/editorial comments as authored. Processing
+            # instructions remain blocked and cannot be treated as comments.
+            if len(elem.text or "") > 4096:
+                raise StructureFailure(source_path, elem.sourceline or 1,
+                                       "UNREVIEWED_COMMENT_SIZE",
+                                       "Overlong XML comment requires explicit human review")
+            counts["xml_comment"] += 1
+            continue
         if not isinstance(elem.tag, str):
             raise StructureFailure(source_path, elem.sourceline or 1, "UNREVIEWED_NODE",
-                                   "XML comments or processing instructions require explicit review")
+                                   "XML processing instructions or non-element nodes require review")
         if not elem.tag.startswith(namespace):
             raise StructureFailure(source_path, elem.sourceline or 1, "UNREVIEWED_NAMESPACE",
                                    f"Unexpected namespaced element {elem.tag}")
