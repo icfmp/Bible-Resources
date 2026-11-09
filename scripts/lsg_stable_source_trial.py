@@ -24,6 +24,7 @@ from lsg_ephemeral_osis_candidate import prepare_ephemeral_source_spaced_osis
 from lsg_sword_rebuild import compile_candidate
 from lsg_stock_raw_markup import audit_stock_raw_markup
 from lsg_xiphos_preview import create_xiphos_preview
+from osis_text_only_parallels import convert_unresolved_parallel_headings
 import os
 from reviewed_reference_merges import (load_reviewed_merges, assess_reviewed_merges,
                                        annotate_editorial_label)
@@ -187,9 +188,18 @@ def run_stable(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) ->
         policy = Path(__file__).resolve().parents[1] / "config/lsg-reviewed-verse-merges.json"
         decisions, policy_digest = load_reviewed_merges(
             policy, source_digest=digest, source_keys=keys, versification="Segond")
+        # The unlinked publisher parallel-passage references are ordinary
+        # editorial text, not source-authorized hyperlinks. Replace their
+        # generated OSIS *reference elements only*, reversibly, with inline
+        # text-only seg markers. Source text, semantic title, punctuation and
+        # the exact authoring/XML input remain untouched. Official schema
+        # and full SWORD readback must still accept the resulting candidate.
+        text_only = home / "text-only-parallel-headings.osis.xml"
+        report["text_only_parallel_heading_review"] = convert_unresolved_parallel_headings(
+            improved, text_only, schema_proof=lambda p: _schema_proof(p, schema))
         labeled = home / "editorially-labeled.osis.xml"
         report["osis_editorial_range_label"] = annotate_editorial_label(
-            improved, labeled, decisions, schema_proof=lambda p: _schema_proof(p, schema))
+            text_only, labeled, decisions, schema_proof=lambda p: _schema_proof(p, schema))
         summary_labeled = _osis_summary(labeled, original_xml, usfm["_book_order"])
         if (summary_labeled["verse_keys_missing_from_converted"]
                 or summary_labeled["verse_keys_unexpected_in_converted"]):
