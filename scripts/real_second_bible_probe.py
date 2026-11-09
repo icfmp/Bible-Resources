@@ -167,6 +167,11 @@ def inspect_real_source_and_native_reader(
         "source_and_reader_verse_counts_by_order_equal_diagnostic_only": same_count_per_ordered_book,
         "publisher_source_and_compiled_canon_scope_review_required": not both_have_same_number_of_books,
         "source_to_sword_exact_edition_identity_verified": False,
+        "source_to_sword_fidelity_gate": (
+            "blocked_canon_scope_mismatch_requires_edition_review"
+            if not both_have_same_number_of_books
+            else "not_verified_requires_independent_book_mapping_and_full_content_probe"
+        ),
         "first_ordinal_book_count_differences_needing_review": first_diffs,
         "canonical_usfx_to_osis_book_mapping_verified": False,
         "source_verse_numbering_against_native_reader_verified": False,
