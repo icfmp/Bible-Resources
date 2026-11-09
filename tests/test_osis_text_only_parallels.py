@@ -95,7 +95,7 @@ class ParallelHeadingTests(unittest.TestCase):
             convert_unresolved_parallel_headings(self.src,self.dest,schema_proof=self.valid)
         self.assertEqual(self.dest.read_bytes(),b"existing")
 
-    def test_no_matching_parallel_references_requires_source_review(self):
+    def test_no_matching_parallel_references_is_safe_noop(self):
         self.src.write_text(self.original.replace(
             '<reference type="parallel">Jn 1:6-12, 19-34.</reference>',
             '<reference type="parallel" osisRef="John.1.6">Jn 1:6-12, 19-34.</reference>'
@@ -103,10 +103,11 @@ class ParallelHeadingTests(unittest.TestCase):
             '<reference type="parallel">Mc 16:15, 16.</reference>',
             '<reference type="parallel" osisRef="Mark.16.15">Mc 16:15, 16.</reference>'),
             encoding="utf-8")
-        with self.assertRaises(PilotError):
-            convert_unresolved_parallel_headings(
-                self.src,self.dest,schema_proof=self.valid)
-        self.assertFalse(self.dest.exists())
+        result=convert_unresolved_parallel_headings(
+            self.src,self.dest,schema_proof=self.valid)
+        self.assertEqual(result["text_only_parallel_reference_elements_retyped"],0)
+        self.assertTrue(result["inverse_reconstruction_canonical_xml_byte_equal"])
+        self.assertTrue(self.dest.exists())
 
 
 if __name__=="__main__":
