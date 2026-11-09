@@ -1,5 +1,34 @@
 # Resource versions and upstream updates
 
+## Ownership: Resources versus the Bible application (9 November 2026)
+
+**This repository owns upstream and curated-edition lineage, read-only change detection, publisher-source comparison and new approved resource releases.** Do not mix this with the user's installed edition. Application-side catalogue integration is tracked in [Bible#253](https://github.com/icfmp/Bible/issues/253); opt-in installed-module updates, staged installation, data preservation and rollback are tracked in [Bible#233](https://github.com/icfmp/Bible/issues/233). Both application issues remain open; they do not block completion of this repository's separate monitoring work.
+
+### Compare actual module file bytes, not just SWORD Version
+
+`scripts/check_updates.py` continues to run the metadata-only provider checks. A changed compiled payload **without a changed `.conf` Version or hash** is invisible to that scheduled metadata monitor. For independently acquired and reviewed snapshots of the **same upstream SWORD module ID**, use the additional *private, read-only* comparator:
+
+```sh
+mkdir -p /tmp/bible-update-audit
+python scripts/diff_sword_snapshots.py \
+  --module-id ExampleModule \
+  --previous /private/extracted-old-sword-root-or-zip \
+  --candidate /private/extracted-new-sword-root-or-zip \
+  --report /tmp/bible-update-audit/module-diff.json
+```
+
+Inputs must contain a single standard SWORD module `mods.d/*.conf` plus `modules/...` files, either as unchanged directories or ZIP archives. Archive *compression/layout bytes* are not the comparison unit: the tool hashes every bounded original **member file**, checking safe paths, duplicate/case-colliding names, nonregular/symlink members, oversized data and module identity. It writes a new metadata-only receipt containing the previous/candidate file-manifest SHA-256, exact conf fingerprints, original native `Version`/driver/versification, and bounded added/removed/modified filenames. It does **not** print or publish any Scripture or notes, install anything, edit source snapshots, or fetch unknown remote packages. It refuses to overwrite the previous report.
+
+Statuses intentionally mark every change as **requiring review**: same-version binary changes, same-version metadata-only changes, newer/older versions, non-comparable versions, or changed driver/versification. Byte-identical files are marked `file_bytes_identical_not_source_equivalence`, **not** claimed to be the same original textual edition or publication-ready. A false `up_to_date` status cannot be inferred from matching `.conf` alone.
+
+**Real release regression:** normal CI runs this comparator against the exact approved local LSG 0.1.0 payload as a read-only reference and checks that it reports byte identity. Offline synthetic fixtures exercise changed actual data under the *same* version and unchanged conf, altered v11n, bad ZIPs, changed versions, missing files and the differences between compressed/uncompressed package ZIPs. This is not a genuine new upstream revision and does not meet the remaining real-lineage acceptance criterion.
+
+### Important baseline ambiguity: original source versus upstream compiled ZIP
+
+The current published LSG `modules/lsg-1910/metadata.json` links eBible `fraLSG1910eb` with `last_integrated_version=2026-10-29`, while the **separately observed upstream compiled zText module** in the original [real-source pilot](evidence/normalizer-3/real-pilot-source-signals.json) declares `Version=100.0`. The curated LSG was built from **source-attested original USFM/USFX archives**, not that provider's NRSV-indexed compiled zText payload. Therefore the snapshot date **must not be compared numerically to the compiled SWORD version, nor silently replaced with `100.0`**. This remains a source-lineage/provenance issue in [#5](https://github.com/icfmp/Bible-Resources/issues/5).
+
+Before automatically classifying a real upstream change, record the exact source revision type, matching publisher source archive hash, **separate** upstream SWORD `.conf` version and hash, its own package hash, and evidence that each belongs to the same edition/snapshot. Merely seeing a newer remote `Version` never proves that the compiled text differs or that our curated source should be changed.
+
 Bible Resources tracks three independent version lines: (1) a module **installed locally** in Bible/SWORD; (2) our **normalized, published** edition; and (3) the original **upstream** edition at its provider.
 
 Never compare the numeric values of (2) and (3) as though they were the same release series. A newly detected upstream version is a **review candidate**: verify source changes and redistribution rights, reapply editorial rules, test the result, then publish a separate new curated version.
