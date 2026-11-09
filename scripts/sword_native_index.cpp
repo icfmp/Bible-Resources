@@ -63,8 +63,8 @@ int main(int argc, char** argv) {
             // as an authored verse or normal verse-zero key. Account for it
             // separately; the full original-content audit remains pending.
             if (module->hasEntry(&current)) {
-                if (++anonymousTop > 1) return 12;
-                std::cout << "U\tTOP\n";
+                if (++anonymousTop > 10000) return 12;
+                std::cout << "U\tTOP\t" << anonymousTop << '\n';
             }
             current.increment();
             continue;
