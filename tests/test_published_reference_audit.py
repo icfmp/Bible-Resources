@@ -68,6 +68,7 @@ class HistoricalIndexProofTests(unittest.TestCase):
                           {"book": "BET", "chapters": 1, "source_verses": 1}],
                 "totals": {"chapters": 2, "source_verses": 4,
                            "source_keys_missing": 1, "sword_keys_unexpected": 1},
+                "all_index_key_mismatch_chapters": [{"book": "ALP", "chapter": 2}, {"book": "BET", "chapter": 1}],
                 "unmatched_verse_slot_classification": [
                     {"book": "ALP", "chapter": 2,
                      "source_only_verses": [3], "reader_only_verses": [],
@@ -109,7 +110,9 @@ class HistoricalIndexProofTests(unittest.TestCase):
             "xiphos_test_preview_package": {
                 "status": "private_stock_sword_zip_reinstall_readback_verified",
                 "text_payload_files_byte_identical_to_verified_module": True,
-                "publisher_original_usfx_sha256": self.pub_sha
+                "publisher_original_usfx_sha256": self.pub_sha,
+                "independent_passage_readbacks": [
+                    {"reference": "Alpha 2:2", "readback_identical_to_unpacked_module": True}]
             },
         }
         self.write_fixture()
@@ -131,9 +134,11 @@ class HistoricalIndexProofTests(unittest.TestCase):
         manifest = {
             "release_audit_sha256": sha(raw_audit),
             "release_zip_sha256": "f" * 64,
+            "release_tag": "synthetic-0.1.0",
             "module_id": self.metadata["sword_id"],
             "metadata_path": "modules/synthetic/metadata.json",
-            "editorial_approval": {"approved_by": "Bible Resources project owner"},
+            "editorial_approval": {"approved_by": "Bible Resources project owner",
+                                   "date": "2026-11-09", "scope": "Synthetic reusable index proof"},
             "provenance": {"final_candidate_osis_sha256": self.source_sha},
             "source_usfm_zip_sha256": "c" * 64,
             "source_usfx_zip_sha256": "d" * 64,
