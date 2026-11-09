@@ -22,6 +22,7 @@ from lsg_osis_parity import _osis_verses, OSIS
 from lsg_stock_lemma_parity import audit_compiled_lemma_values
 from lsg_stock_note_probe import probe_compiled_note_storage
 from lsg_stock_note_text import audit_compiled_note_bodies
+from lsg_stock_note_anchors import audit_compiled_note_anchors
 
 def build_stock_markup_plan(source: bytes, candidate: Path,
                             decisions: list[dict]) -> tuple[list[tuple[str, str]],dict,dict]:
@@ -371,7 +372,8 @@ def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
                            module_id: str, inspector: Path,
                            lemma_inspector: Path,
                            note_inspector: Path,
-                           note_text_inspector: Path) -> dict:
+                           note_text_inspector: Path,
+                           note_anchor_inspector: Path) -> dict:
     if not inspector.is_file() or inspector.is_symlink():
         raise PilotError("Stock SWORD raw verifier executable not found")
     aliases,expected,source_global=build_stock_markup_plan(
@@ -415,6 +417,9 @@ def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
             candidate,aliases,decisions,sword_root=sword_root,
             module_id=module_id,inspector=note_text_inspector)
         report["compiled_note_body_text_review"]=note_text
+        report["compiled_note_word_anchor_review"]=audit_compiled_note_anchors(
+            candidate,aliases,decisions,expected,sword_root=sword_root,
+            module_id=module_id,inspector=note_anchor_inspector)
         if lemma_review["status"]!="compiled_ordered_lemma_attributes_verified":
             report["status"]="blocked_compiled_lemma_attributes_mismatch"
         elif note_text["status"]!="compiled_note_normalized_body_text_verified_only":
