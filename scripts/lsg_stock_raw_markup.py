@@ -226,6 +226,74 @@ def compare_raw_rows(rows: list[str], ordered_refs: list[tuple[str,str]],
         "published":False,
     }
 
+def summarize_intro_rows(rows: list[str], queries: list[tuple[str,str]]) -> dict:
+    """Summarize only metadata for SWORD book/chapter verse-zero entries."""
+    if not queries or len(rows)!=len(queries):
+        raise PilotError("Intro probe did not return every requested SWORD index")
+    totals=Counter()
+    by_book=defaultdict(Counter)
+    populated=0
+    for row,(query,book) in zip(rows,queries):
+        cols=row.split("\t")
+        if len(cols)!=7 or cols[0]!=query:
+            raise PilotError("SWORD intro probe returned a different reference")
+        try:
+            counts=list(map(int,cols[1:]))
+        except ValueError as exc:
+            raise PilotError("SWORD intro probe returned malformed counts") from exc
+        if any(n<0 or n>5000 for n in counts):
+            raise PilotError("SWORD intro probe returned implausible marker counts")
+        metrics=Counter(dict(zip(("word","note","cross_reference","poetry_start",
+                                 "poetry_end","quotation"),counts)))
+        if any(counts):
+            populated+=1
+        totals.update(metrics)
+        by_book[book].update(metrics)
+    return {
+        "status":"verse_zero_markup_counted_not_release_approved",
+        "inspected_verse_zero_entries":len(queries),
+        "entries_with_markup":populated,
+        "total_marker_counts":dict(totals),
+        "by_book_with_poetry_markers":[
+            {"book":book, "poetry_start":c["poetry_start"],
+             "poetry_end":c["poetry_end"],
+             "word":c["word"],"note":c["note"]}
+            for book,c in sorted(by_book.items())
+            if c["poetry_start"] or c["poetry_end"]
+        ],
+        "source_content_verified":False,
+        "intro_rendering_verified":False,
+    }
+
+
+def probe_stock_intros(inspector: Path, module_id: str,
+                       aliases: list[tuple[str,str]], temporary: Path,
+                       env: dict) -> dict:
+    """Research-only probe: no conclusions about where markup was authored."""
+    queries={}
+    for osis_ref,reader_query in aliases:
+        book=osis_ref.split(".",1)[0]
+        chapter_query=reader_query.rsplit(":",1)[0]
+        book_query=chapter_query.rsplit(" ",1)[0]
+        for query in (chapter_query+":0",book_query+" 0:0"):
+            if query in queries and queries[query]!=book:
+                raise PilotError("Ambiguous canonical SWORD intro probe")
+            queries[query]=book
+    ordered=sorted(queries.items())
+    path=temporary/"intro-keys.txt"
+    path.write_text("\n".join(q for q,_ in ordered)+"\n",encoding="utf-8")
+    try:
+        proc=subprocess.run(
+            [str(inspector),module_id,str(path),"--intros"],
+            env=env,capture_output=True,text=True,timeout=90,check=False)
+    except subprocess.TimeoutExpired:
+        return {"status":"intro_probe_timed_out", "release_verified":False}
+    if proc.returncode or proc.stderr.strip() or len(proc.stdout)>500_000:
+        return {"status":"intro_probe_failed", "exit_code":proc.returncode,
+                "stderr_bytes":len(proc.stderr), "release_verified":False}
+    return summarize_intro_rows(proc.stdout.splitlines(),ordered)
+
+
 def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
                            decisions: list[dict], *, sword_root: Path,
                            module_id: str, inspector: Path) -> dict:
@@ -246,6 +314,8 @@ def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
             or len(proc.stdout)>8_000_000):
             raise PilotError("Stock SWORD raw markup inspection failed")
         report=compare_raw_rows(proc.stdout.splitlines(),aliases,expected,source_global)
+        report["sword_verse_zero_intro_diagnostic"]=probe_stock_intros(
+            inspector,module_id,aliases,Path(temp),env)
     report["source_reader_merge_count"]=len(decisions)
     report["compiled_module_id"]=module_id
     return report
