@@ -165,6 +165,8 @@ def inspect_real_source_and_native_reader(
         "actual_native_anonymous_top_records": native["native_nonaddressable_populated_top_count"],
         "source_and_reader_book_counts_equal_diagnostic_only": both_have_same_number_of_books,
         "source_and_reader_verse_counts_by_order_equal_diagnostic_only": same_count_per_ordered_book,
+        "publisher_source_and_compiled_canon_scope_review_required": not both_have_same_number_of_books,
+        "source_to_sword_exact_edition_identity_verified": False,
         "first_ordinal_book_count_differences_needing_review": first_diffs,
         "canonical_usfx_to_osis_book_mapping_verified": False,
         "source_verse_numbering_against_native_reader_verified": False,
