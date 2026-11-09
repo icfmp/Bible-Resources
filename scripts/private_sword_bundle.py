@@ -135,7 +135,8 @@ def _extract_into_isolated_sword_home(archive:Path,target:Path,
 def audit_private_sword_installation(
     root:Path,module_id:str,*, reader:str="diatheke",
     samples:tuple[str,...]=("Genesis 1:1","Psalms 23:1",
-                            "John 3:16","Mark 10:52")
+                            "John 3:16","Mark 10:52"),
+    output_archive:Path | None=None
 ) -> dict:
     """Prove standard ZIP layout and engine readback; discard ZIP immediately."""
     if not samples:
@@ -169,6 +170,14 @@ def audit_private_sword_installation(
                 })
             if not all(p["readback_identical_to_unpacked_module"] for p in probes):
                 raise PilotError("Isolated ZIP reinstall changed SWORD reader output")
+        if output_archive is not None:
+            if output_archive.exists() or output_archive.is_symlink():
+                raise PilotError("Refusing to overwrite an existing test module ZIP")
+            output_archive.parent.mkdir(parents=True,exist_ok=True)
+            shutil.copy2(archive,output_archive)
+            if _sha(output_archive)!=build["zip_sha256"]:
+                output_archive.unlink(missing_ok=True)
+                raise PilotError("Exported preview ZIP digest differs from validated ZIP")
     return {
         "status":"private_stock_sword_zip_reinstall_readback_verified",
         "module_id":module_id,
@@ -184,6 +193,7 @@ def audit_private_sword_installation(
         "packaged_to_standard_mods_d_and_modules_paths":True,
         "standard_frontend_visual_rendering_verified":False,
         "rights_and_editorial_release_approved":False,
-        "zip_discarded_without_upload_or_publication":True,
+        "zip_discarded_without_upload_or_publication":output_archive is None,
+        "test_zip_retained_for_owner_review":output_archive is not None,
         "published":False,
     }
