@@ -94,6 +94,9 @@ def compare_raw_rows(rows: list[str], ordered_refs: list[tuple[str,str]],
     if not ordered_refs or len(rows)!=len(ordered_refs):
         raise PilotError("Compiled raw SWORD inspector skipped or inserted reader keys")
     differences=[]
+    poetry_diagnostics=[]
+    poetry_asymmetric_entry_count=0
+    poetry_source_start_deficit_entry_count=0
     expected_inside=Counter()
     compiled_counts=Counter()
     compiled_by_book=defaultdict(Counter)
@@ -124,6 +127,18 @@ def compare_raw_rows(rows: list[str], ordered_refs: list[tuple[str,str]],
         per_verse_notes_equal+=n==inside["note"]
         per_verse_words_at_least+=w>=inside["w"]
         per_verse_words_exact+=w==inside["w"]
+        if poetry!=poetry_end or poetry<inside["l"]:
+            if poetry!=poetry_end:
+                poetry_asymmetric_entry_count+=1
+            if poetry<inside["l"]:
+                poetry_source_start_deficit_entry_count+=1
+            if len(poetry_diagnostics)<160:
+                poetry_diagnostics.append({
+                    "osis_ref":osis_ref,
+                    "source_lines_opened_inside_verse":inside["l"],
+                    "compiled_line_start_markers":poetry,
+                    "compiled_line_end_markers":poetry_end,
+                })
         if (w!=inside["w"] or n!=inside["note"]) and len(differences)<50:
             differences.append({
                 "osis_ref":osis_ref,
@@ -161,6 +176,8 @@ def compare_raw_rows(rows: list[str], ordered_refs: list[tuple[str,str]],
                 "compiled_note_tags":raw["note"],
                 "source_whole_book_poetry_line_tags":source["l"],
                 "compiled_poetry_line_tags":raw["l"],
+                "compiled_poetry_end_milestones":raw["l_end"],
+                "compiled_poetry_end_minus_start":raw["l_end"]-raw["l"],
                 "word_note_poetry_totals_equal":total_equal,
             })
     verified=(all_book_tags_equal and only_documented_relocations
@@ -180,6 +197,14 @@ def compare_raw_rows(rows: list[str], ordered_refs: list[tuple[str,str]],
         "source_global_poetry_line_tags":global_expected["l"],
         "compiled_raw_poetry_line_tags":compiled_counts["l"],
         "compiled_raw_poetry_line_end_milestones":compiled_counts["l_end"],
+        "poetry_end_milestones_match_source_line_count":(
+            compiled_counts["l_end"]==global_expected["l"]),
+        "poetry_start_end_milestones_balanced":(
+            compiled_counts["l"]==compiled_counts["l_end"]),
+        "poetry_asymmetric_reader_entry_count":poetry_asymmetric_entry_count,
+        "poetry_reader_entries_with_fewer_start_markers_than_source_inside":
+            poetry_source_start_deficit_entry_count,
+        "first_poetry_marker_location_diagnostics":poetry_diagnostics,
         "words_matching_exact_source_verse_milestone_counts":per_verse_words_exact,
         "verses_with_no_source_word_tag_loss":per_verse_words_at_least,
         "per_verse_note_tag_matches":per_verse_notes_equal,
