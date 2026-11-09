@@ -26,6 +26,7 @@ from lsg_stock_note_text import audit_compiled_note_bodies
 from lsg_stock_note_anchors import (
     audit_compiled_note_anchors, audit_book_global_note_anchors
 )
+from lsg_stock_layout_markers import audit_compiled_layout_markers
 
 def build_stock_markup_plan(source: bytes, candidate: Path,
                             decisions: list[dict]) -> tuple[list[tuple[str, str]],dict,dict]:
@@ -376,7 +377,8 @@ def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
                            lemma_inspector: Path,
                            note_inspector: Path,
                            note_text_inspector: Path,
-                           note_anchor_inspector: Path) -> dict:
+                           note_anchor_inspector: Path,
+                           layout_inspector: Path) -> dict:
     if not inspector.is_file() or inspector.is_symlink():
         raise PilotError("Stock SWORD raw verifier executable not found")
     aliases,expected,source_global=build_stock_markup_plan(
@@ -431,6 +433,11 @@ def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
             candidate,aliases,sword_root=sword_root,
             module_id=module_id,inspector=note_anchor_inspector)
         report["compiled_note_book_global_word_anchor_review"]=global_note_anchors
+        # Layout is a separate, non-approving diagnostic because a compiler
+        # can replace container elements with sID/eID milestones.
+        report["compiled_layout_marker_diagnostic"]=audit_compiled_layout_markers(
+            candidate,aliases,sword_root=sword_root,
+            module_id=module_id,inspector=layout_inspector)
         if lemma_review["status"]!="compiled_ordered_lemma_attributes_verified":
             report["status"]="blocked_compiled_lemma_attributes_mismatch"
         elif note_text["status"]!="compiled_note_normalized_body_text_verified_only":
