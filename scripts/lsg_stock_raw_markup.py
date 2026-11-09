@@ -22,7 +22,9 @@ from lsg_osis_parity import _osis_verses, OSIS
 from lsg_stock_lemma_parity import audit_compiled_lemma_values
 from lsg_stock_note_probe import probe_compiled_note_storage
 from lsg_stock_note_text import audit_compiled_note_bodies
-from lsg_stock_note_anchors import audit_compiled_note_anchors
+from lsg_stock_note_anchors import (
+    audit_compiled_note_anchors, audit_book_global_note_anchors
+)
 
 def build_stock_markup_plan(source: bytes, candidate: Path,
                             decisions: list[dict]) -> tuple[list[tuple[str, str]],dict,dict]:
@@ -420,10 +422,16 @@ def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
         report["compiled_note_word_anchor_review"]=audit_compiled_note_anchors(
             candidate,aliases,decisions,expected,sword_root=sword_root,
             module_id=module_id,inspector=note_anchor_inspector)
+        global_note_anchors=audit_book_global_note_anchors(
+            candidate,aliases,sword_root=sword_root,
+            module_id=module_id,inspector=note_anchor_inspector)
+        report["compiled_note_book_global_word_anchor_review"]=global_note_anchors
         if lemma_review["status"]!="compiled_ordered_lemma_attributes_verified":
             report["status"]="blocked_compiled_lemma_attributes_mismatch"
         elif note_text["status"]!="compiled_note_normalized_body_text_verified_only":
             report["status"]="blocked_compiled_note_body_text_parity"
+        elif global_note_anchors["status"]!="compiled_book_global_note_word_offsets_verified":
+            report["status"]="blocked_compiled_note_book_global_word_anchor_parity"
     report["source_reader_merge_count"]=len(decisions)
     report["compiled_module_id"]=module_id
     return report
