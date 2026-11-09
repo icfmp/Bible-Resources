@@ -18,8 +18,8 @@ from pilot_preflight import PilotError
 from private_sword_bundle import audit_private_sword_installation, _validate_package_files
 
 SOURCE_ID = "fraLSG1910eb"
-TRIAL_ID = "BRLSG1910Preview2"
-STORAGE_NAME = "brlsg1910preview2"
+TRIAL_ID = "BRLSG1910Preview3"
+STORAGE_NAME = "brlsg1910preview3"
 
 
 def _hash(path: Path) -> str:
@@ -68,12 +68,12 @@ def create_xiphos_preview(source_root: Path, destination: Path, *,
         conf.parent.mkdir(parents=True)
         conf.write_text(
             "["+TRIAL_ID+"]\n"
-            "Description=Louis Segond 1910 - Bible Resources (PREVIEW 2)\n"
+            "Description=Louis Segond 1910 - Bible Resources (PREVIEW 3)\n"
             "About=PREVIEW de test non publiee. Segond 1910 eBible. "
             "Marc 10:52 contient aussi le verset 53 de la source. "
             "Conserver la source originale. "
             "La numerotation peut afficher seulement 52.\n"
-            "Version=0.0.2-preview\n"
+            "Version=0.0.3-preview\n"
             "DataPath=./modules/texts/rawtext/"+STORAGE_NAME+"/\n"
             "ModDrv=RawText\n"
             "Encoding=UTF-8\n"
