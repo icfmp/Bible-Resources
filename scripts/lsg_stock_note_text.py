@@ -22,6 +22,7 @@ from lxml import etree
 from lsg_note_parity import _collect_osis
 from lsg_stock_lemma_parity import ordered_lemma_reader_plan
 from lsg_osis_parity import OSIS
+from lsg_note_whitespace_diagnostics import classify_note_whitespace
 from pilot_preflight import PilotError
 
 _MAX_PRIVATE_BYTES=120_000_000
@@ -117,6 +118,10 @@ def compare_compiled_notes(candidate: Path,
     missing_body_count=0
     attribute_names=Counter()
     whitespace_classes=Counter()
+    whitespace_detail_classes=Counter()
+    whitespace_changed_run_features=Counter()
+    whitespace_changed_book_notes=Counter()
+    whitespace_review_samples=[]
     source_type_slots=matching_type_slots=0
     source_caller_slots=matching_caller_slots=0
     compiled_nonempty_ref_lists=0
@@ -189,6 +194,46 @@ def compare_compiled_notes(candidate: Path,
                 whitespace_classes["internal_whitespace_only"]+=1
             else:
                 whitespace_classes["not_only_whitespace"]+=1
+            # Preserve the distinction between exact editorial layout,
+            # merely normalized visible words, and changed line breaks or
+            # Unicode spaces. Do not include any text or whitespace literal
+            # in the uploaded report.
+            profile=classify_note_whitespace(original_raw,rendered_raw)
+            whitespace_detail_classes[profile["class"]]+=1
+            if not profile["exact"]:
+                whitespace_changed_book_notes[location[0]]+=1
+                whitespace_changed_run_features.update({
+                    k:v for k,v in profile.items()
+                    if k in (
+                        "changed_whitespace_runs","changed_internal_runs",
+                        "changed_boundary_runs","source_newline_runs_changed",
+                        "compiled_newline_runs_changed","source_tab_runs_changed",
+                        "compiled_tab_runs_changed",
+                        "source_unicode_space_runs_changed",
+                        "compiled_unicode_space_runs_changed",
+                        "changed_runs_entirely_ascii_spaces",
+                        "changed_runs_increased_length",
+                        "changed_runs_decreased_length",
+                        "changed_runs_same_length",
+                    )
+                })
+                if len(whitespace_review_samples)<75:
+                    whitespace_review_samples.append({
+                        "book":location[0],
+                        "reader_reference":location[1],
+                        "note_ordinal":index,
+                        "category":profile["class"],
+                        "changed_internal_runs":profile.get("changed_internal_runs",0),
+                        "changed_boundary_runs":profile.get("changed_boundary_runs",0),
+                        "source_newline_runs_changed":profile.get(
+                            "source_newline_runs_changed",0),
+                        "compiled_newline_runs_changed":profile.get(
+                            "compiled_newline_runs_changed",0),
+                        "source_unicode_space_runs_changed":profile.get(
+                            "source_unicode_space_runs_changed",0),
+                        "compiled_unicode_space_runs_changed":profile.get(
+                            "compiled_unicode_space_runs_changed",0),
+                    })
             if original_norm!=rendered_norm and len(text_mismatches)<60:
                 text_mismatches.append({
                     "book":location[0],
@@ -218,6 +263,18 @@ def compare_compiled_notes(candidate: Path,
         "first_normalized_text_or_parse_mismatches":text_mismatches,
         "compiled_footnote_attribute_names":dict(sorted(attribute_names.items())),
         "raw_text_difference_categories":dict(sorted(whitespace_classes.items())),
+        "source_osis_to_stock_sword_whitespace_detail":{
+            "source_document_stage":"validated_generated_osis_not_original_usfx",
+            "classification_counts":dict(sorted(whitespace_detail_classes.items())),
+            "changed_whitespace_run_features":dict(
+                sorted(whitespace_changed_run_features.items())),
+            "notes_with_changed_whitespace_by_book":dict(
+                sorted(whitespace_changed_book_notes.items())),
+            "first_whitespace_review_cases":whitespace_review_samples,
+            "source_editorial_whitespace_approved":False,
+            "compiled_whitespace_matches_exactly":raw_matches==source_count,
+            "publisher_usfx_to_generated_osis_whitespace_review_is_separate":True,
+        },
         "source_notes_with_explicit_type":source_type_slots,
         "matching_compiled_note_type_values":matching_type_slots,
         "source_notes_with_caller":source_caller_slots,
