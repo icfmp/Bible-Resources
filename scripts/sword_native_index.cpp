@@ -8,7 +8,8 @@
 // R<TAB>native-versification<TAB>osis-book<TAB>chapter<TAB>last-registry-verse
 // K<TAB>populated-native-osis-book.chapter.verse
 // I<TAB>populated-native-verse-zero-intro-reference
-// S<TAB>number-of-registry-chapters<TAB>populated-ordinary-verses<TAB>populated-intros
+// U<TAB>TOP (present but non-addressable engine sentinel; never discard data)
+// S<TAB>registry-chapters<TAB>populated-verses<TAB>populated-intros<TAB>nonaddressable-TOP
 #include <sword/swmgr.h>
 #include <sword/swmodule.h>
 #include <sword/versekey.h>
@@ -47,6 +48,7 @@ int main(int argc, char** argv) {
     unsigned long registryChapters = 0;
     unsigned long populated = 0;
     unsigned long intros = 0;
+    unsigned long anonymousTop = 0;
     unsigned long scanned = 0;
     std::string lastChapter;
     while (!current.popError()) {
@@ -57,9 +59,12 @@ int main(int argc, char** argv) {
         // libSWORD's TOP iterator sentinel may have no OSISRef at 0:0.
         // Skip it only when no actual module entry is stored there.
         if (id.empty() && chapter == 0 && verse == 0) {
+            // An actually occupied opaque TOP record cannot be represented
+            // as an authored verse or normal verse-zero key. Account for it
+            // separately; the full original-content audit remains pending.
             if (module->hasEntry(&current)) {
-                std::cerr << "Nonaddressable populated SWORD TOP introduction" << '\n';
-                return 12;
+                if (++anonymousTop > 1) return 12;
+                std::cout << "U\tTOP\n";
             }
             current.increment();
             continue;
@@ -101,6 +106,6 @@ int main(int argc, char** argv) {
     }
     if (!registryChapters || !populated || !std::cout.good()) return 10;
     std::cout << "S\t" << registryChapters << '\t' << populated
-              << '\t' << intros << '\n';
+              << '\t' << intros << '\t' << anonymousTop << '\n';
     return std::cout.good() ? 0 : 11;
 }
