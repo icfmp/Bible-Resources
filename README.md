@@ -49,9 +49,15 @@ python scripts/build.py --output dist --base-url https://icfmp.github.io/Bible-R
 
 The generated `dist/` contains a stable machine catalogue at `catalog/v1/catalog.json`, and a SWORD repository under `sword/`. To test actual SWORD-module behaviour, install `diatheke`, then run `python scripts/smoke.py --dist dist`. CI performs this before deploying when modules exist.
 
+## Curated module update discovery
+
+The stable [public HTTPS catalogue](https://icfmp.github.io/Bible-Resources/catalog/v1/catalog.json) provides the current, **approved** Bible Resources release for each curated module, including its stable package identity, reviewed canonical edition lineage, exact SWORD module ID and version, download URL, package size and SHA-256. The generated ZIP contains a SWORD `Version` value that the publication validator requires to match the curated catalogue version. No private server or custom update protocol is needed. The public JSON is the discovery contract; an upstream publisher's newer source is not advertised as a curated update until its own edition has been approved and published.
+
+See the [v1 catalogue update contract](docs/CATALOGUE_UPDATE_PROTOCOL.md) for version semantics, checksum validation, caching and the limits of the current mutable latest-package URLs.
+
 ## Upstream version monitoring
 
-Bible Resources monitors **three separate versions** (installed in SWORD, curated in Bible Resources, and source/original). The daily read-only GitHub Action checks all five SWORD catalogues declared by Bible: CrossWire, AndBible Extra, AndBible, STEP and eBible. YouVersion and the two OpenBible datasets are documented separately as inventory-only sources, not SWORD catalogues. The same Action compares the registered providers and endpoint URLs with Bible's current source declarations and fails on drift. The checker never automatically republishes a module. See [Updating resources](docs/UPDATES.md).
+Bible Resources monitors the **original upstream** editions and their correspondence to our **curated published** editions. Its optional local CLI also reads an installed SWORD configuration for diagnostics; actual installation state and user-facing updating remain outside this repository. The daily read-only GitHub Action checks all five SWORD catalogues declared by Bible: CrossWire, AndBible Extra, AndBible, STEP and eBible. YouVersion and the two OpenBible datasets are documented separately as inventory-only sources, not SWORD catalogues. The same Action compares the registered providers and endpoint URLs with Bible's current source declarations and fails on drift. The checker never automatically republishes a module. See [Updating resources](docs/UPDATES.md).
 
 To check a local installation: `python scripts/check_updates.py --installed-root ~/.sword`.
 

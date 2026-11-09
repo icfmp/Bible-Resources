@@ -234,6 +234,12 @@ def validate(root=ROOT):
             errors.append(f"{d.name}: versification mismatch")
         for field in ("SourceType","DistributionLicense","TextSource","Version","Description","DataPath"):
             if not conf.get(field):errors.append(f"{d.name}: missing {field}")
+        if conf.get("Version") != m["version"]:
+            errors.append(
+                f"{d.name}: SWORD .conf Version {conf.get('Version')!r} "
+                f"does not match curated metadata version {m['version']!r}; "
+                "catalogue updates must never advertise a different installed version"
+            )
         data=conf.get("DataPath","")
         rel=data[2:] if data.startswith("./") else ""
         pure=PurePosixPath(rel)
