@@ -54,6 +54,8 @@ class PlaceContextTests(unittest.TestCase):
             self.assertEqual(manifest['sha256'],hashlib.sha256(data).hexdigest())
             self.assertEqual((output/'place-context/v1'/('place-context-'+manifest['sha256']+'.json')).read_bytes(),data)
             self.assertRegex(manifest['url'],r'https://raw\.githubusercontent\.com/icfmp/Bible-Resources/[0-9a-f]{40}/datasets/place-context-v2\.json')
-            self.assertEqual(json.loads((output/'catalog/v1/catalog.json').read_bytes())['modules'],[])
+            expected=json.loads((ROOT/'catalog/v1/catalog.json').read_bytes())['modules']
+            actual=json.loads((output/'catalog/v1/catalog.json').read_bytes())['modules']
+            self.assertEqual(actual,expected)  # Place dataset never changes curated Bible inventory.
         bad=deepcopy(value);bad['sites']['m657590']['scope']='ancient-place'
         with self.assertRaises(ValueError):validate_dataset(json.dumps(bad).encode())
