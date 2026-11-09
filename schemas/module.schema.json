@@ -269,6 +269,63 @@
       "type": "string",
       "pattern": "^[a-z0-9][a-z0-9._-]{2,100}$",
       "description": "Stable, human-reviewed edition identity independent of the SWORD module ID or upstream provider. Required for approved modules."
+    },
+    "index_audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "stock_reader_keys",
+            "published_source_audit"
+          ]
+        },
+        "manifest": {
+          "type": "string",
+          "pattern": "^config/[A-Za-z0-9._-]+\\.json$"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "published_source_audit"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "required": [
+              "manifest"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "stock_reader_keys"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "not": {
+              "required": [
+                "manifest"
+              ]
+            }
+          }
+        }
+      ]
     }
   },
   "allOf": [
@@ -338,6 +395,34 @@
             }
           }
         }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "category": {
+            "const": "bible"
+          },
+          "quality": {
+            "properties": {
+              "status": {
+                "const": "approved"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          }
+        },
+        "required": [
+          "category",
+          "quality"
+        ]
+      },
+      "then": {
+        "required": [
+          "index_audit"
+        ]
       }
     }
   ]
