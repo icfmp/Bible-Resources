@@ -44,6 +44,8 @@ on:
       - 'scripts/lsg_stock_publisher_note_parity.py'
       - 'scripts/private_sword_bundle.py'
       - 'scripts/lsg_xiphos_preview.py'
+      - 'scripts/osis_text_only_parallels.py'
+      - 'tests/test_osis_text_only_parallels.py'
       - 'tests/test_private_sword_bundle.py'
       - 'tests/test_lsg_stock_publisher_note_parity.py'
       - 'tests/test_lsg_note_whitespace_diagnostics.py'
@@ -133,6 +135,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_lsg_stock_note_text.py' -v
           python -m unittest discover -s tests -p 'test_lsg_note_whitespace_diagnostics.py' -v
           python -m unittest discover -s tests -p 'test_lsg_stock_publisher_note_parity.py' -v
+          python -m unittest discover -s tests -p 'test_osis_text_only_parallels.py' -v
           python -m unittest discover -s tests -p 'test_private_sword_bundle.py' -v
           python -m unittest discover -s tests -p 'test_lsg_stock_note_anchors.py' -v
       - name: Build raw SWORD C++ per-entry structure inspector against installed stable libsword
@@ -162,7 +165,7 @@ jobs:
       - name: Compile real source-attested OSIS via stable SWORD and classify every chapter
         env:
           LSG_SAMPLE_DEBUG: '0'
-          LSG_PREVIEW_TEST_PACKAGE_PATH: ${{ runner.temp }}/xiphos-preview/BRLSG1910Preview.zip
+          LSG_PREVIEW_TEST_PACKAGE_PATH: ${{ runner.temp }}/xiphos-preview/BRLSG1910Preview2.zip
           LSG_STOCK_RAW_INSPECTOR: ${{ runner.temp }}/sword-raw-audit
           LSG_STOCK_LEMMA_INSPECTOR: ${{ runner.temp }}/sword-lemma-audit
           LSG_STOCK_NOTE_INSPECTOR: ${{ runner.temp }}/sword-note-probe
@@ -182,16 +185,16 @@ jobs:
       - name: Record owner-requested Xiphos preview checksum
         if: success() && github.event_name == 'pull_request' && github.head_ref == 'test/lsg-stable-segond-candidate'
         run: |
-          test -s "${{ runner.temp }}/xiphos-preview/BRLSG1910Preview.zip"
+          test -s "${{ runner.temp }}/xiphos-preview/BRLSG1910Preview2.zip"
           cd "${{ runner.temp }}/xiphos-preview"
-          sha256sum BRLSG1910Preview.zip > SHA256SUMS.txt
+          sha256sum BRLSG1910Preview2.zip > SHA256SUMS.txt
       - name: Share short-lived owner preview ZIP (NOT a release)
         if: success() && github.event_name == 'pull_request' && github.head_ref == 'test/lsg-stable-segond-candidate'
         uses: actions/upload-artifact@v4
         with:
-          name: BRLSG1910Preview-test-only
+          name: BRLSG1910Preview2-test-only
           path: |
-            ${{ runner.temp }}/xiphos-preview/BRLSG1910Preview.zip
+            ${{ runner.temp }}/xiphos-preview/BRLSG1910Preview2.zip
             ${{ runner.temp }}/xiphos-preview/SHA256SUMS.txt
           retention-days: 3
           if-no-files-found: error
