@@ -39,6 +39,15 @@ class NativeIndexParsingTests(unittest.TestCase):
         self.assertFalse(receipt["source_text_notes_markup_fidelity_verified"])
         self.assertFalse(receipt["published"])
 
+    def test_actual_native_bare_book_and_chapter_intro_ids(self):
+        native = VALID.replace("I\tAlpha.0.0", "I\tAlpha").replace(
+            "I\tAlpha.1.0", "I\tAlpha.1")
+        keys, registry, report = parse_native_rows(native, "Fixture")
+        self.assertEqual(report["native_occupied_verse_zero_intro_count"], 2)
+        self.assertEqual(report["native_occupied_intro_references"],
+                         ["Alpha", "Alpha.1"])
+        self.assertEqual(len(keys.splitlines()), 3)
+
     def test_occupied_anonymous_top_intro_is_preserved_as_unresolved(self):
         native = VALID.replace("I\tAlpha.0.0\n", "U\tTOP\nI\tAlpha.0.0\n")
         native = native.replace("S\t2\t3\t2\t0", "S\t2\t3\t2\t1")
