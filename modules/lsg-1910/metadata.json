@@ -35,5 +35,9 @@
     }
   ],
   "versification": "Segond",
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "index_audit": {
+    "mode": "published_source_audit",
+    "manifest": "config/catalogue-import-lsg-0.1.0.json"
+  }
 }

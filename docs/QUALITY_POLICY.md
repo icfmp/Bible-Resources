@@ -29,3 +29,7 @@ LSG/Psalms and MHC/Genesis key probes already contain line/paragraph
 signals. Check Bible GTK rendering before touching an otherwise structured
 module. No actual imported/published reader-optimized resource is approved
 merely by this tool.
+
+## Mandatory SWORD reference-index attestation
+
+Every approved Bible must declare an `index_audit` strategy. New editions use independently collected authorial and actual released-SWORD reader inventories with `SWORD_COMPATIBILITY.json`; historic already-published editions may reuse a hash-pinned full original source/stock-SWORD audit bound to the exact released payload and its original source-bound reviewed merge policy. Neither mode grants editorial approval automatically, and a clean compiler exit or absence of a frontend crash never proves reference parity. See [STABLE_SWORD_REFERENCE_AUDIT.md](STABLE_SWORD_REFERENCE_AUDIT.md). Additional source/notes/layout fidelity and second-edition generalization remain tracked in #28.

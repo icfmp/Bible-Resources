@@ -80,3 +80,7 @@ verified. Do not ship a misleading literal ellipsis as Scripture.
 This is an editorial and QA policy. **No automatic blank-verse insertion,
 note creation or cross-versification mapping is implemented yet.** See the
 Segond + MHC pilot in [PILOT_SEGOND_MHC.md](PILOT_SEGOND_MHC.md).
+
+## Enforced publication index evidence
+
+The generic validation path now requires an explicit `index_audit` declaration for every approved Bible. A new release needs a reviewed authorial-source versus native released-SWORD reader-key proof; merely specifying `Versification` in a .conf is insufficient. An already-published edition with independently completed source/reader validation may use the exact immutable original audit and release file hashes, without pretending the historical experiment ran again. No verse is inserted or silently renumbered. If an adjacent terminal source verse is unavailable as a stock SWORD key, its complete body can only be indexed with the preceding verse after original-source-bound authorization, independent text-fidelity readback and explicit disclosure. See [STABLE_SWORD_REFERENCE_AUDIT.md](STABLE_SWORD_REFERENCE_AUDIT.md); the cross-translation audit producer remains issue #28.
