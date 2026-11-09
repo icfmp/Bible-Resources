@@ -4,6 +4,9 @@ on:
     paths:
       - .github/workflows/second-bible-proof.yml
       - scripts/real_second_bible_probe.py
+      - scripts/source_native_scope.py
+      - config/standard_usfm_osis_66.json
+      - tests/test_source_native_scope.py
   workflow_dispatch:
 permissions:
   contents: read
@@ -68,6 +71,20 @@ jobs:
           assert proof["actual_reader_book_count"] >= 60, "Wrong/incomplete original SWORD module"
           assert proof["publisher_native_driver"] == "zText", "This real trial must exercise a different stock-SWORD driver from LSG"
           assert proof["actual_reader_occupied_numbered_verses"] > 20000
+          scoped = proof["explicit_standard_book_scope_reference_audit"]
+          assert scoped["mapped_book_count"] == 66, "Expected explicitly reviewed standard 66-book scope"
+          assert scoped["source_mapped_book_count"] == 66, "Source lacks canonical books"
+          assert scoped["source_canonical_book_order_verified"], "Authored canonical order changed"
+          assert scoped["native_canonical_book_order_verified"], "Native canonical book order changed"
+          assert scoped["authorial_full_source_to_compiled_scope_fidelity_verified"] is False
+          assert scoped["source_to_compiled_text_notes_lexical_and_layout_verified"] is False
+          assert scoped["rights_and_publication_approved"] is False
+          print("Mapped canonical scope status:", scoped["status"])
+          print("Original additional source books:",
+                scoped["additional_original_source_book_count"])
+          print("Canonical key differences:",
+                scoped["source_canonical_refs_unreachable_in_reader_count"],
+                scoped["native_canonical_refs_not_authored_in_source_count"])
           assert proof["source_to_sword_exact_words_punctuation_verified"] is False
           assert proof["source_to_sword_fidelity_gate"] in {
               "blocked_canon_scope_mismatch_requires_edition_review",

@@ -1,0 +1,275 @@
+{
+  "schema_version": 1,
+  "scope": "protestant_66_standard_usfm_to_stock_sword_osis",
+  "references": [
+    "https://docs.usfm.bible/usfm/3.2/doc/books.html",
+    "https://crosswire.org/osis/"
+  ],
+  "notes": "An explicit canonical-book identifier crosswalk for independent source↔native-index comparisons. It is not an edition's permission to omit noncanonical or introductory books, not a versification table, and not proof of same edition or content. Fail closed if the native engine uses a different book inventory.",
+  "books": [
+    {
+      "usfm": "GEN",
+      "osis": "Gen"
+    },
+    {
+      "usfm": "EXO",
+      "osis": "Exod"
+    },
+    {
+      "usfm": "LEV",
+      "osis": "Lev"
+    },
+    {
+      "usfm": "NUM",
+      "osis": "Num"
+    },
+    {
+      "usfm": "DEU",
+      "osis": "Deut"
+    },
+    {
+      "usfm": "JOS",
+      "osis": "Josh"
+    },
+    {
+      "usfm": "JDG",
+      "osis": "Judg"
+    },
+    {
+      "usfm": "RUT",
+      "osis": "Ruth"
+    },
+    {
+      "usfm": "1SA",
+      "osis": "1Sam"
+    },
+    {
+      "usfm": "2SA",
+      "osis": "2Sam"
+    },
+    {
+      "usfm": "1KI",
+      "osis": "1Kgs"
+    },
+    {
+      "usfm": "2KI",
+      "osis": "2Kgs"
+    },
+    {
+      "usfm": "1CH",
+      "osis": "1Chr"
+    },
+    {
+      "usfm": "2CH",
+      "osis": "2Chr"
+    },
+    {
+      "usfm": "EZR",
+      "osis": "Ezra"
+    },
+    {
+      "usfm": "NEH",
+      "osis": "Neh"
+    },
+    {
+      "usfm": "EST",
+      "osis": "Esth"
+    },
+    {
+      "usfm": "JOB",
+      "osis": "Job"
+    },
+    {
+      "usfm": "PSA",
+      "osis": "Ps"
+    },
+    {
+      "usfm": "PRO",
+      "osis": "Prov"
+    },
+    {
+      "usfm": "ECC",
+      "osis": "Eccl"
+    },
+    {
+      "usfm": "SNG",
+      "osis": "Song"
+    },
+    {
+      "usfm": "ISA",
+      "osis": "Isa"
+    },
+    {
+      "usfm": "JER",
+      "osis": "Jer"
+    },
+    {
+      "usfm": "LAM",
+      "osis": "Lam"
+    },
+    {
+      "usfm": "EZK",
+      "osis": "Ezek"
+    },
+    {
+      "usfm": "DAN",
+      "osis": "Dan"
+    },
+    {
+      "usfm": "HOS",
+      "osis": "Hos"
+    },
+    {
+      "usfm": "JOL",
+      "osis": "Joel"
+    },
+    {
+      "usfm": "AMO",
+      "osis": "Amos"
+    },
+    {
+      "usfm": "OBA",
+      "osis": "Obad"
+    },
+    {
+      "usfm": "JON",
+      "osis": "Jonah"
+    },
+    {
+      "usfm": "MIC",
+      "osis": "Mic"
+    },
+    {
+      "usfm": "NAM",
+      "osis": "Nah"
+    },
+    {
+      "usfm": "HAB",
+      "osis": "Hab"
+    },
+    {
+      "usfm": "ZEP",
+      "osis": "Zeph"
+    },
+    {
+      "usfm": "HAG",
+      "osis": "Hag"
+    },
+    {
+      "usfm": "ZEC",
+      "osis": "Zech"
+    },
+    {
+      "usfm": "MAL",
+      "osis": "Mal"
+    },
+    {
+      "usfm": "MAT",
+      "osis": "Matt"
+    },
+    {
+      "usfm": "MRK",
+      "osis": "Mark"
+    },
+    {
+      "usfm": "LUK",
+      "osis": "Luke"
+    },
+    {
+      "usfm": "JHN",
+      "osis": "John"
+    },
+    {
+      "usfm": "ACT",
+      "osis": "Acts"
+    },
+    {
+      "usfm": "ROM",
+      "osis": "Rom"
+    },
+    {
+      "usfm": "1CO",
+      "osis": "1Cor"
+    },
+    {
+      "usfm": "2CO",
+      "osis": "2Cor"
+    },
+    {
+      "usfm": "GAL",
+      "osis": "Gal"
+    },
+    {
+      "usfm": "EPH",
+      "osis": "Eph"
+    },
+    {
+      "usfm": "PHP",
+      "osis": "Phil"
+    },
+    {
+      "usfm": "COL",
+      "osis": "Col"
+    },
+    {
+      "usfm": "1TH",
+      "osis": "1Thess"
+    },
+    {
+      "usfm": "2TH",
+      "osis": "2Thess"
+    },
+    {
+      "usfm": "1TI",
+      "osis": "1Tim"
+    },
+    {
+      "usfm": "2TI",
+      "osis": "2Tim"
+    },
+    {
+      "usfm": "TIT",
+      "osis": "Titus"
+    },
+    {
+      "usfm": "PHM",
+      "osis": "Phlm"
+    },
+    {
+      "usfm": "HEB",
+      "osis": "Heb"
+    },
+    {
+      "usfm": "JAS",
+      "osis": "Jas"
+    },
+    {
+      "usfm": "1PE",
+      "osis": "1Pet"
+    },
+    {
+      "usfm": "2PE",
+      "osis": "2Pet"
+    },
+    {
+      "usfm": "1JN",
+      "osis": "1John"
+    },
+    {
+      "usfm": "2JN",
+      "osis": "2John"
+    },
+    {
+      "usfm": "3JN",
+      "osis": "3John"
+    },
+    {
+      "usfm": "JUD",
+      "osis": "Jude"
+    },
+    {
+      "usfm": "REV",
+      "osis": "Rev"
+    }
+  ]
+}

@@ -40,6 +40,12 @@ Those archive contents do **not** have an independently verified one-to-one book
 
 The research workflow now **pins both exact upstream ZIP SHA-256 values** above. If eBible changes either archive, the experiment blocks and requires a reviewed new baseline rather than silently treating changed publisher data as the same tested source. The report explicitly marks `source_to_sword_fidelity_gate=blocked_canon_scope_mismatch_requires_edition_review` when original numbered-book count differs from the native occupied-book count, and keeps `source_to_sword_exact_edition_identity_verified=false`, `source_verse_numbering_against_native_reader_verified=false` and all content/notes/rights/approval booleans `false`. This is a successful **independent real zText instrumentation trial**, not a completed #28 source-to-compiled audit.
 
+### Canonical-book crosswalk versus the complete authorial source
+
+The follow-up [standard USFM→SWORD native book-scope audit](SOURCE_NATIVE_BOOK_SCOPE.md) adds an **explicit source book-code mapping** for the standard 66 books. Instead of assuming that the ordinal 40th USFX book is the ordinal 40th native reader book after extra source books, it checks every mapped **chapter and verse identifier** by book code.
+
+It preserves a separate enumerated list of **all additional authorial USFX books and their numbered verse counts**, including unnumbered `FRT` and `GLO`. It never silently removes or merges those sections. The experiment reports canonical-key parity or precise mismatched references as a **scoped index diagnostic**, while leaving complete source-to-compiled correspondence and literary/editorial equivalence **unverified**. Even an exact canonical key subset cannot justify treating the larger source as a proven edition-identical 66-book module.
+
 ### Remaining proof requirements
 
 This private smoke can prove the generic native inventory works on a different real module, and can audit the independent original authorial USFX file. **It cannot** certify exact original USFM/USFX → OSIS conversion, note/word/Strong/reference/structure preservation in a compiled module, an Xiphos/AndBible frontend, an approved source version, redistribution of modified text, or another published resource.

@@ -21,6 +21,7 @@ from diff_sword_snapshots import _read_snapshot, SnapshotError
 from lsg_source_compare import read_source_xml, scan_usfx
 from sword_native_inventory import collect_native_inventory, NativeIndexError
 from stable_sword_refs import parse_keys, parse_registry, module_payload_digest
+from source_native_scope import compare_mapped_scope, read_crosswalk
 
 
 class SecondBibleError(ValueError):
@@ -106,7 +107,8 @@ def _reader_counts_by_order(keys_text: str) -> list[dict]:
 
 
 def inspect_real_source_and_native_reader(
-    original_usfx_zip: Path, compiled_sword_zip: Path, native_inspector: Path
+    original_usfx_zip: Path, compiled_sword_zip: Path, native_inspector: Path,
+    crosswalk: Path | None = None
 ) -> dict:
     raw, original_receipt = read_source_xml(original_usfx_zip, source_format="usfx")
     original, original_groups = _source_counts_by_order(raw)
@@ -117,6 +119,16 @@ def inspect_real_source_and_native_reader(
             native_inspector, installed, original_conf["module_id"], timeout=240)
     engine_registry = parse_registry(registry, native["native_versification"])
     reader_groups = _reader_counts_by_order(keys)
+    # Independently map standard USFM book identifiers to *native* OSIS IDs;
+    # never infer 66-book equivalence by ordinal after deuterocanon insertion.
+    crosswalk = crosswalk or (Path(__file__).resolve().parents[1]
+                              / "config/standard_usfm_osis_66.json")
+    pairs = read_crosswalk(crosswalk)
+    original_again, source_keys = scan_usfx(raw)
+    if original_again["original_books"] != original["original_books"]:
+        raise SecondBibleError("Original USFX book inventory changed between reads")
+    canon_scope = compare_mapped_scope(original["original_books"],
+                                      source_keys, keys, pairs)
     source_book_count = len(original_groups)
     numbered_source_groups = [group for group in original_groups
                               if group["authored_verse_count"] > 0]
@@ -164,6 +176,8 @@ def inspect_real_source_and_native_reader(
         "actual_native_verse_zero_intros": native["native_occupied_verse_zero_intro_count"],
         "actual_native_anonymous_top_records": native["native_nonaddressable_populated_top_count"],
         "source_and_reader_book_counts_equal_diagnostic_only": both_have_same_number_of_books,
+        "standard_66_book_crosswalk_sha256": sha256(crosswalk.read_bytes()).hexdigest(),
+        "explicit_standard_book_scope_reference_audit": canon_scope,
         "source_and_reader_verse_counts_by_order_equal_diagnostic_only": same_count_per_ordered_book,
         "publisher_source_and_compiled_canon_scope_review_required": not both_have_same_number_of_books,
         "source_to_sword_exact_edition_identity_verified": False,
