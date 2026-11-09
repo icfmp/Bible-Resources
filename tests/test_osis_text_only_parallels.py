@@ -9,7 +9,8 @@ from lxml import etree
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 from osis_text_only_parallels import (
-    OSIS,UNLINKED_SEG_TYPE,convert_unresolved_parallel_headings)
+    OSIS,UNLINKED_SEG_TYPE,UNLINKED_SCOPE_SEG_TYPE,
+    convert_unresolved_parallel_headings)
 from pilot_preflight import PilotError
 
 
@@ -59,6 +60,75 @@ class ParallelHeadingTests(unittest.TestCase):
         self.assertEqual(len(segments),2)
         self.assertTrue(all(s.get("type")==UNLINKED_SEG_TYPE for s in segments))
         self.assertEqual(report["machine_bible_links_invented"],0)
+
+    def test_scope_heading_is_text_only_and_keeps_editorial_line(self):
+        # Regression for Genesis 1:1: a targetless reference in a *scope*
+        # title is not a machine link even if the reader paints it blue.
+        self.src.write_text(self.original.replace(
+            '<title type="parallel">V. 22-36:',
+            '<title type="scope"><reference>Ch. 1 à 11: 9. (Ac 17:24-28.)'
+            '</reference></title>\n   <title type="parallel">V. 22-36:'
+        ),encoding="utf-8")
+        before=etree.parse(str(self.src))
+        report=convert_unresolved_parallel_headings(
+            self.src,self.dest,schema_proof=self.valid)
+        after=etree.parse(str(self.dest))
+        self.assertEqual(report["total_source_scope_titles"],1)
+        self.assertEqual(report["text_only_scope_reference_elements_retyped"],1)
+        self.assertEqual(report["text_only_parallel_reference_elements_retyped"],2)
+        self.assertEqual(report["total_text_only_heading_references_retyped"],3)
+        self.assertTrue(report["inverse_reconstruction_canonical_xml_byte_equal"])
+        self.assertEqual("".join(before.getroot().itertext()),
+                         "".join(after.getroot().itertext()))
+        self.assertEqual(len(after.findall(".//"+OSIS+"reference")),1)
+        scope=after.find(".//"+OSIS+'title[@type="scope"]')
+        self.assertIsNotNone(scope)
+        self.assertIsNone(scope.find(OSIS+"reference"))
+        seg=scope.find(OSIS+"seg")
+        self.assertIsNotNone(seg)
+        self.assertEqual(seg.get("type"),UNLINKED_SCOPE_SEG_TYPE)
+        self.assertEqual(seg.text,"Ch. 1 à 11: 9. (Ac 17:24-28.)")
+        self.assertEqual(report["machine_bible_links_invented"],0)
+
+    def test_real_machine_link_inside_scope_is_never_retyped(self):
+        self.src.write_text(self.original.replace(
+            '<title type="parallel">V. 22-36:',
+            '<title type="scope"><reference osisRef="Gen.1.1-Gen.11.9">'
+            'Ch. 1 à 11: 9. (Ac 17:24-28.)'
+            '</reference></title>\n   <title type="parallel">V. 22-36:'
+        ),encoding="utf-8")
+        report=convert_unresolved_parallel_headings(
+            self.src,self.dest,schema_proof=self.valid)
+        self.assertEqual(report["total_source_scope_titles"],1)
+        self.assertEqual(report["text_only_scope_reference_elements_retyped"],0)
+        scope=etree.parse(str(self.dest)).find(".//"+OSIS+'title[@type="scope"]')
+        ref=scope.find(OSIS+"reference")
+        self.assertIsNotNone(ref)
+        self.assertEqual(ref.get("osisRef"),"Gen.1.1-Gen.11.9")
+
+    def test_scope_reference_with_unexpected_metadata_fails_closed(self):
+        self.src.write_text(self.original.replace(
+            '<title type="parallel">V. 22-36:',
+            '<title type="scope"><reference type="parallel">'
+            'Ch. 1 à 11: 9.</reference></title>\n   <title type="parallel">V. 22-36:'
+        ),encoding="utf-8")
+        with self.assertRaises(PilotError):
+            convert_unresolved_parallel_headings(
+                self.src,self.dest,schema_proof=self.valid)
+        self.assertFalse(self.dest.exists())
+
+    def test_note_references_remain_real_references(self):
+        self.src.write_text(self.original.replace(
+            '<verse sID="John.3.22"/>',
+            '<note type="crossReference"><reference>'
+            'Actes 22:20.</reference></note><verse sID="John.3.22"/>'
+        ),encoding="utf-8")
+        report=convert_unresolved_parallel_headings(
+            self.src,self.dest,schema_proof=self.valid)
+        self.assertEqual(report["text_only_parallel_reference_elements_retyped"],2)
+        self.assertEqual(report["text_only_scope_reference_elements_retyped"],0)
+        note=etree.parse(str(self.dest)).find(".//"+OSIS+"note")
+        self.assertIsNotNone(note.find(OSIS+"reference"))
 
     def test_no_targets_lost_even_with_multiple_biblical_refs(self):
         self.src.write_text(self.original.replace(
