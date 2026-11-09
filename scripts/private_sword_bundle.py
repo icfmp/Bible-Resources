@@ -42,7 +42,21 @@ def _validate_package_files(root:Path,module_id:str) -> list[tuple[str,Path]]:
     if not conf.is_file() or conf.is_symlink():
         raise PilotError("SWORD module configuration is absent or symlinked")
     text=conf.read_text(encoding="utf-8")
-    parser=configparser.ConfigParser(interpolation=None,strict=True)
+    # SWORD configurations legitimately repeat GlobalOptionFilter.
+    # Preserve those without accepting duplicate security-sensitive keys.
+    from collections import Counter
+    critical=Counter()
+    for line in text.splitlines():
+        stripped=line.strip()
+        if not stripped or stripped.startswith(("#",";","[")):
+            continue
+        key=stripped.split("=",1)[0].strip().casefold()
+        if key in {"datapath","moddrv","versification","distributionlicense"}:
+            critical[key]+=1
+    if (critical["datapath"]!=1 or critical["moddrv"]!=1
+            or any(count>1 for count in critical.values())):
+        raise PilotError("Duplicate or missing required SWORD config field")
+    parser=configparser.ConfigParser(interpolation=None,strict=False)
     parser.optionxform=str
     try:
         parser.read_string(text)
