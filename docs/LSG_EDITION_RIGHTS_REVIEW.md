@@ -65,6 +65,37 @@ its direct note-body equality and original whitespace results are a
 separate check, **not yet an editorial waiver**. Neither stage rewrites
 the original source or implicitly approves spacing changes.
 
+## Direct publisher-to-compiled proof — verified 2026-11-09
+
+[Real stock-SWORD test 42601802531](https://github.com/icfmp/Bible-Resources/actions/runs/42601802531)
+reports the following from the immutable, source-hash-pinned eBible USFX
+against the private compiled SWORD footnote bodies:
+
+- **9,751/9,751** notes retain identical word and punctuation sequences
+  after Unicode NFC/whitespace normalization, with no added or missing note.
+- **0/9,751** raw flattened note-body strings are byte/Unicode identical
+  including authoring whitespace. These must **not** be described as
+  exactly identical original footnote typography.
+- **13,159** whitespace runs differ, including **11,929 source runs with
+  line breaks**, **9,751 internal changes** and **3,408 boundary changes**
+  (overlapping categories; the run count is the 13,159 total).
+  No words or punctuation changed. The original source XML is unchanged.
+- The separate OSIS-to-SWORD leg has only **681/9,751** non-identical
+  note bodies, all involving exactly three shortened newline-bearing
+  whitespace runs each. The substantial upstream source-to-OSIS
+  formatting differences therefore remain the main editorial review.
+- The source note wording/punctuation parity is now an explicit CI
+  fail-closed condition. **Whitespace exactness is not approved by it.**
+
+The same real CI run generated a private, standard-structure ZIP:
+5 package members (the module .conf plus four data files), **3,879,596
+bytes** compressed from **29,513,931 bytes**. It extracted the package
+into a separate SWORD_PATH root, compared original and reinstalled file
+digests and validated four independent diatheke passage readbacks
+(Genesis 1:1, Psalm 23:1, John 3:16, Mark 10:52). The test ZIP was
+destroyed by the runner; **no binary has been published or supplied to
+Xiphos users**.
+
 ## Before publishing an installable SWORD module
 
 1. Review both source USFX-to-OSIS and OSIS-to-compiled note whitespace
