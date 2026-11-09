@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "release_tag": "lsg-0.1.0",
+  "module_id": "BRLSG1910",
+  "metadata_path": "modules/lsg-1910/metadata.json",
+  "release_zip_sha256": "af2f80ea84f40a6bf62993c9e65c2e2061e1ec20b34b0772a4eb775dd47723c1",
+  "release_audit_sha256": "f602d9305ee3a7dd008cd127ae7e66f16e9fb9ba39b51b7c7ddb879866cddcca",
+  "source_usfm_zip_sha256": "64c4fe2a84d92f958deb0d1add4247d126a21c8a51e5b3058338f661a42d4900",
+  "source_usfx_zip_sha256": "fe059525d3167c70c22777e6cb6d578eb1e63095904f61fed0a857c4f643ac0e",
+  "files": {
+    "mods.d/brlsg1910.conf": "a3936b7996d072b9a6a76e5255cc4d4980c2b064ff10098f0341df74b9cb680f",
+    "modules/texts/rawtext/brlsg1910/nt": "d68285e7b754368cf7e98ec1ceada1766b5e8b87288bf21033c514685f5aaa32",
+    "modules/texts/rawtext/brlsg1910/nt.vss": "6c126e66abd371a139118e5f76eb3171187133a2a310b7a234cedfe5f655cf8e",
+    "modules/texts/rawtext/brlsg1910/ot": "69eae79ce599933b93fbcdc4e875b24fbccb698be18a5bbf3a48b1490eca9854",
+    "modules/texts/rawtext/brlsg1910/ot.vss": "f2993be2663216aae697e0e44eaf5e384160d1398b8f8f226fbe20c9f65bdbae"
+  },
+  "editorial_approval": {
+    "approved_by": "Bible Resources project owner",
+    "date": "2026-11-09",
+    "scope": "First public LSG 0.1.0; reversible Mark 10:52–53 index compromise and note/heading formatting caveats disclosed in release notes"
+  },
+  "provenance": {
+    "source_research_commit": "7f675b4d621e5c0aba5fd78f0cb3cb468eb2cd26",
+    "source_osis_sha256": "1752ea16f7c8b5ddbca3570b53110086243e0bb40a517af17ee11cce78cd2830",
+    "final_candidate_osis_sha256": "d6abd7416d026c86ce2e9577e3bfe7a10159c5c78d236913359c7fab013449d0",
+    "retyped_markup_osis_sha256": "1a248d27291f6f041a4642e6f97831d4951584cf76331d8b069a7a91179fc233"
+  }
+}
