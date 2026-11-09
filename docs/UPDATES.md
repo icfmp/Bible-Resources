@@ -1,5 +1,7 @@
 # Resource versions and upstream updates
 
+The published, machine-readable interface for discovering **approved Bible Resources updates** is [Catalogue update protocol v1](CATALOGUE_UPDATE_PROTOCOL.md). This stable HTTPS JSON endpoint contains the curated module version, canonical edition ID, actual download SHA-256 and size; it is distinct from the upstream-monitoring reports below. The publication gate checks the advertised version against the released SWORD .conf Version.
+
 ## Ownership: Resources versus the Bible application (9 November 2026)
 
 **This repository owns upstream and curated-edition lineage, read-only change detection, publisher-source comparison and new approved resource releases.** Do not mix this with the user's installed edition. Application-side catalogue integration is tracked in [Bible#253](https://github.com/icfmp/Bible/issues/253); opt-in installed-module updates, staged installation, data preservation and rollback are tracked in [Bible#233](https://github.com/icfmp/Bible/issues/233). Both application issues remain open; they do not block completion of this repository's separate monitoring work.
@@ -29,7 +31,7 @@ The current published LSG `modules/lsg-1910/metadata.json` links eBible `fraLSG1
 
 Before automatically classifying a real upstream change, record the exact source revision type, matching publisher source archive hash, **separate** upstream SWORD `.conf` version and hash, its own package hash, and evidence that each belongs to the same edition/snapshot. Merely seeing a newer remote `Version` never proves that the compiled text differs or that our curated source should be changed.
 
-Bible Resources tracks three independent version lines: (1) a module **installed locally** in Bible/SWORD; (2) our **normalized, published** edition; and (3) the original **upstream** edition at its provider.
+There are three independent version lines: (1) a module **installed locally** in a SWORD reader (owned by that reader); (2) the **approved, published Bible Resources** edition (owned by this repository); and (3) the original **upstream** edition at its provider (monitored and reviewed here). This repository does not manage an end user's installed resource.
 
 Never compare the numeric values of (2) and (3) as though they were the same release series. A newly detected upstream version is a **review candidate**: verify source changes and redistribution rights, reapply editorial rules, test the result, then publish a separate new curated version.
 
