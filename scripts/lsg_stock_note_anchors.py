@@ -174,3 +174,139 @@ def audit_compiled_note_anchors(candidate: Path, aliases: list[tuple[str,str]],
         report=compare_note_anchors(candidate,aliases,decisions,expected,rows)
     report["reader_entries_inspected"]=len(plan)
     return report
+
+
+def compare_book_global_note_anchors(
+    candidate: Path, aliases: list[tuple[str, str]], rows: list[str]
+) -> dict:
+    """Compare note positions in the ordered *whole-book* stream of OSIS words.
+
+    The stable compiler can attach interverse words to a following or
+    preceding VerseKey. Counting source/compiled word tags across the entire
+    book avoids treating those structural relocations as note movement.
+
+    This comparison is valid as a source-position proof only *together with*
+    the independent full-book ordered lemma-value and per-reader note
+    text/type/caller parity gates. A matching count alone is not sufficient.
+    """
+    plan, books = ordered_lemma_reader_plan(candidate, aliases)
+    compiled = read_anchor_rows(rows, plan)
+    original = etree.parse(str(candidate), parser=etree.XMLParser(
+        resolve_entities=False, load_dtd=False, no_network=True,
+        recover=False, huge_tree=False))
+
+    source_offsets: dict[str, list[int]] = {}
+    source_words: dict[str, int] = {}
+    for book in original.iter(OSIS + "div"):
+        if book.get("type") != "book":
+            continue
+        book_id = book.get("osisID")
+        if not book_id or book_id in source_offsets:
+            raise PilotError("Repeated or invalid OSIS book in global note audit")
+        words = 0
+        anchors: list[int] = []
+        for element in book.iter():
+            if element.tag == OSIS + "note":
+                anchors.append(words)
+            elif element.tag == OSIS + "w":
+                words += 1
+        source_offsets[book_id] = anchors
+        source_words[book_id] = words
+
+    book_ids = [book.get("osisID") for book in books]
+    if set(source_offsets) != set(book_ids) or len(book_ids) != len(source_offsets):
+        raise PilotError("Source OSIS book inventory differs in global note audit")
+    offsets: dict[str, list[tuple[int, str]]] = defaultdict(list)
+    compiled_words: dict[str, int] = defaultdict(int)
+    for query, book_id, _intro in plan:
+        word_count, anchor_offsets = compiled[(book_id, query)]
+        prefix = compiled_words[book_id]
+        for position in anchor_offsets:
+            offsets[book_id].append((prefix + position, query))
+        compiled_words[book_id] += word_count
+
+    mismatches: list[dict] = []
+    book_differences: list[dict] = []
+    source_total = compiled_total = exact = 0
+    for book_id in book_ids:
+        expected = source_offsets[book_id]
+        actual = offsets[book_id]
+        source_total += len(expected)
+        compiled_total += len(actual)
+        if source_words[book_id] != compiled_words[book_id]:
+            book_differences.append({
+                "book": book_id,
+                "source_word_tags": source_words[book_id],
+                "compiled_word_tags": compiled_words[book_id],
+            })
+        for i, (s, t) in enumerate(zip(expected, actual), 1):
+            if s == t[0]:
+                exact += 1
+            elif len(mismatches) < 80:
+                mismatches.append({
+                    "book": book_id, "note_ordinal_in_book": i,
+                    "source_book_word_offset": s,
+                    "compiled_book_word_offset": t[0],
+                    "compiled_reader_reference": t[1],
+                })
+        if len(expected) != len(actual):
+            book_differences.append({
+                "book": book_id,
+                "source_note_count": len(expected),
+                "compiled_note_count": len(actual),
+            })
+    verified = (source_total == compiled_total == exact
+                and not book_differences and not mismatches)
+    return {
+        "status": ("compiled_book_global_note_word_offsets_verified"
+                   if verified else "blocked_book_global_note_word_offset_mismatch"),
+        "books_compared": len(book_ids),
+        "source_notes": source_total,
+        "compiled_notes": compiled_total,
+        "notes_with_exact_source_book_global_word_offset": exact,
+        "unmatched_note_word_offsets": max(source_total, compiled_total) - exact,
+        "first_global_note_offset_mismatches": mismatches,
+        "first_book_word_or_note_count_mismatches": book_differences,
+        "lexical_value_sequence_required_as_independent_gate": True,
+        "note_text_type_caller_required_as_independent_gate": True,
+        "note_rendered_visual_position_verified": False,
+        "published": False,
+    }
+
+
+def audit_book_global_note_anchors(
+    candidate: Path, aliases: list[tuple[str, str]], *,
+    sword_root: Path, module_id: str, inspector: Path
+) -> dict:
+    """Probe all SWORD introduction and verse entries, no exported text."""
+    if not inspector.is_file() or inspector.is_symlink():
+        raise PilotError("Compiled book-global note word-offset tool missing")
+    plan, _books = ordered_lemma_reader_plan(candidate, aliases)
+    with tempfile.TemporaryDirectory(prefix="sword-book-note-anchors-") as tmp:
+        root = Path(tmp)
+        keys = root / "refs.tsv"
+        report_path = root / "global-note-offsets.tsv"
+        keys.write_text(
+            "".join("\t".join(row) + "\n" for row in plan),
+            encoding="utf-8"
+        )
+        try:
+            process = subprocess.run(
+                [str(inspector), module_id, str(keys), str(report_path),
+                 "--book-global-note-word-anchors"],
+                env=dict(os.environ, SWORD_PATH=str(sword_root)),
+                capture_output=True, text=True, timeout=180, check=False
+            )
+        except subprocess.TimeoutExpired as exc:
+            raise PilotError("Book-global SWORD note inspection timed out") from exc
+        if (process.returncode or process.stderr or process.stdout
+                or not report_path.is_file()
+                or report_path.stat().st_size > 4_000_000):
+            raise PilotError(
+                "Book-global SWORD note probe failed (exit code "
+                f"{process.returncode})"
+            )
+        rows = report_path.read_text(encoding="utf-8").splitlines()
+        result = compare_book_global_note_anchors(candidate, aliases, rows)
+    result["reader_entries_inspected"] = len(plan)
+    return result
