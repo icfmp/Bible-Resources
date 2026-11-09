@@ -5,7 +5,7 @@ import sys
 import unittest
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
-from lsg_stock_raw_markup import compare_raw_rows
+from lsg_stock_raw_markup import compare_raw_rows, summarize_intro_rows
 from pilot_preflight import PilotError
 
 class RawStockReaderTests(unittest.TestCase):
@@ -60,6 +60,22 @@ class RawStockReaderTests(unittest.TestCase):
         self.assertTrue(report["poetry_start_end_milestones_balanced"])
         self.assertTrue(report["poetry_end_milestones_match_source_line_count"])
         self.assertEqual(report["first_poetry_marker_location_diagnostics"],[])
+
+    def test_chapter_zero_poetry_marker_probe_is_separate_and_text_free(self):
+        queries=[("Mark 1:0","Mark"),("Mark 0:0","Mark")]
+        rows=["Mark 1:0\\t0\\t0\\t0\\t2\\t0\\t0",
+              "Mark 0:0\\t0\\t0\\t0\\t1\\t0\\t0"]
+        rows=[row.replace("\\\\t","\\t") for row in rows]
+        report=summarize_intro_rows(rows,queries)
+        self.assertEqual(report["total_marker_counts"]["poetry_start"],3)
+        self.assertEqual(report["total_marker_counts"]["poetry_end"],0)
+        self.assertEqual(report["inspected_verse_zero_entries"],2)
+        self.assertFalse(report["intro_rendering_verified"])
+
+    def test_invalid_intro_reference_row_fails_closed(self):
+        with self.assertRaises(PilotError):
+            summarize_intro_rows(["Mark 1:1\\t0\\t0\\t0\\t1\\t0\\t0".replace("\\\\t","\\t")],
+                                 [("Mark 1:0","Mark")])
 
     def test_misaligned_or_missing_raw_entries_are_fatal(self):
         for rows in ([],self.rows[:1],
