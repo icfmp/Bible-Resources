@@ -52,6 +52,18 @@ int main(int argc, char** argv) {
     while (!current.popError()) {
         if (++scanned > 300000) return 6;
         const std::string id = current.getOSISRef();
+        const int chapter = current.getChapter();
+        const int verse = current.getVerse();
+        // libSWORD's TOP iterator sentinel may have no OSISRef at 0:0.
+        // Skip it only when no actual module entry is stored there.
+        if (id.empty() && chapter == 0 && verse == 0) {
+            if (module->hasEntry(&current)) {
+                std::cerr << "Nonaddressable populated SWORD TOP introduction" << '\n';
+                return 12;
+            }
+            current.increment();
+            continue;
+        }
         const std::size_t dot1 = id.find('.');
         const std::size_t dot2 = id.find('.', dot1 == std::string::npos ? 0 : dot1 + 1);
         if (dot1 == std::string::npos || dot2 == std::string::npos
@@ -64,8 +76,6 @@ int main(int argc, char** argv) {
         }
         const std::string book = id.substr(0, dot1);
         const std::string ch = id.substr(dot1 + 1, dot2 - dot1 - 1);
-        const int chapter = current.getChapter();
-        const int verse = current.getVerse();
         if (chapter < 0 || verse < 0) return 8;
         if (chapter > 0 && verse > 0) {
             const int limit = current.getVerseMax();
