@@ -126,6 +126,18 @@ jobs:
           # This checks the *actual pinned researched source*, not a
           # generic code exception or editorial verse restoration.
           assert report["source_scope_missing_native_verse_count"] == 3
+          # Regression only for these SHA-pinned original publisher inputs.
+          # Proves a native raw-entry lexical presence witness, never authorial
+          # versification, note/layout or punctuation completeness.
+          assert all(
+              row.get("source_word_run_found_contiguously_in_native_entry") is True
+              for row in report["source_missing_native_verses"]
+          ), "Previously witnessed source-only word run disappeared from original native raw entry"
+          assert all(
+              group["all_missing_source_word_runs_found"] and
+              group["missing_source_word_runs_in_source_order"]
+              for group in report["grouped_preceding_native_entries"]
+          ), "Source-only word runs are not all present in their authored order"
           assert report["source_to_compiled_exact_punctuation_verified"] is False
           assert report["note_callers_bodies_anchors_verified"] is False
           assert report["authorial_complete_text_preservation_verified"] is False
