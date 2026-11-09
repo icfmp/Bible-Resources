@@ -17,11 +17,11 @@ int main(int argc,char **argv) {
     sword::SWMgr manager;
     sword::SWModule *module=manager.getModule(argv[1]);
     if (!module) return 3;
+    auto *intro_key=intros ? dynamic_cast<sword::VerseKey*>(module->getKey()) : nullptr;
     if (intros) {
-        auto *key=dynamic_cast<sword::VerseKey*>(module->getKey());
-        if (!key) return 11;
-        key->setIntros(true);
-        key->setAutoNormalize(false);
+        if (!intro_key) return 11;
+        intro_key->setIntros(true);
+        intro_key->setAutoNormalize(false);
     }
     std::ifstream refs(argv[2]);
     if (!refs) return 4;
@@ -33,11 +33,13 @@ int main(int argc,char **argv) {
     while (std::getline(refs,ref)) {
         if (ref.empty()||ref.size()>120||ref.find('\t')!=std::string::npos)
             return 5;
-        if (module->setKey(ref.c_str())) return 6;
         if (intros) {
-            auto *key=dynamic_cast<sword::VerseKey*>(module->getKey());
-            if (!key || key->getVerse()!=0) return 12;
+            // Preserve the module's configured VerseKey with intros enabled.
+            // setKey(char*) can construct a fresh normalizing key and map :0 to :1.
+            *intro_key=ref.c_str();
+            if (intro_key->getVerse()!=0) return 12;
         }
+        else if (module->setKey(ref.c_str())) return 6;
         const char *raw=module->getRawEntry();
         if (!raw) return 7;
         const std::string xml(raw);
