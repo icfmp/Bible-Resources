@@ -133,6 +133,18 @@ class NativeModuleIdentityTests(unittest.TestCase):
         with self.assertRaises(NativeIndexError):
             _validate_payload(self.module, "Fixture")
 
+    def test_extra_symlinked_module_conf_fails_closed(self):
+        extra = self.module / "payload/mods.d/another.conf"
+        extra.symlink_to(self.config)
+        with self.assertRaises(NativeIndexError):
+            _validate_payload(self.module, "Fixture")
+
+    def test_evidence_refuses_to_mutate_module_directory(self):
+        bad = self.module / "payload/native-index-report.json"
+        with self.assertRaisesRegex(NativeIndexError, "source-module-overwriting"):
+            _write_evidence([(bad, b"{}")], self.module)
+        self.assertFalse(bad.exists())
+
     def test_repeated_versification_declaration_blocks(self):
         self.config.write_text(self.config.read_text() + "Versification=Segond\n",
                                encoding="utf-8")
