@@ -24,7 +24,9 @@ from pilot_preflight import PilotError
 
 
 def _value(value: str) -> str:
-    return unicodedata.normalize("NFC", unescape(value))
+    # lxml has ALREADY decoded source XML entities. Decoding that value a
+    # second time could hide a missing entity-escaping layer in the binary.
+    return unicodedata.normalize("NFC", value)
 
 
 def _digest(values: list[str]) -> str:
@@ -47,7 +49,8 @@ def compare_compiled_explicit_reference_targets(
         parts = row.split("\t")
         if len(parts) != 2 or parts[0] not in book_ids:
             raise PilotError("Malformed compiled reference target inventory")
-        compiled[parts[0]].append(_value(parts[1]))
+        # Raw SWORD markup still contains XML escapes; decode exactly once.
+        compiled[parts[0]].append(_value(unescape(parts[1])))
 
     matched_books = 0
     source_tags = compiled_tags = 0
