@@ -29,6 +29,14 @@ python scripts/sword_missing_verse_witness.py \
 
 The complete authorial source XML and compiled SWORD content are **not** exported by the workflow; only the metadata-only witness report and independent original source/native index report are uploaded. Source/SWORD text differences in other books, omitted introductions and all 17 extra original USFX sections remain outside this narrow diagnostic.
 
+## Confirmed real original-WEBP result — 2026-11-09
+
+The first independent [real zText native raw-entry run #42717724283](https://github.com/icfmp/Bible-Resources/actions/runs/42717724283) **passed** on the two previously SHA-pinned original eBible source/SWORD archives, with released system libSWORD. For the **exact three source-only canonical IDs** `Rom.14.24`, `Rom.14.25`, `Rom.14.26`, the generic audit selected **one occupied neighboring native entry: `Rom.14.23`**. It captured that entry's original **unfiltered native OSIS markup** privately, with no source text in the Actions logs or uploaded artifact.
+
+The independent comparison found a **full contiguous source-verse word-token sequence for each of the three authored verses inside the `Rom.14.23` raw entry**. This is verified observed lexical-word presence in that precise compiled SWORD module, not an inference from CrossWire documentation. An identical native package recheck will now require all three found word runs to remain **in their source order**.
+
+What is **not** proved: the original source's separately addressable `14.24–26` slots still do not exist in the tested module's KJV native registry; exact punctuation and letter case are not checked by the token witness; original footnote bodies/anchors, internal explicit reference targets, exact formatting and text position, original source-vs-SWORD source revision and full remaining book corpus are not certified. This audit does not warrant a statement of total literal equality, permission to renumber, a new approved edition or publishing the original WEB under our own module name.
+
 ## Limits and follow-up
 
 A positive word-run match is **evidence of lexical presence in a native raw entry**, not full text fidelity. The project still needs exact original-edition/revision provenance, authorial USFM/USFX→OSIS conversion fidelity, complete SWORD character/punctuation/word-ordinal/note body/anchor/explicit target/ordered structural boundary and verse-zero audits, and separate human/editorial and reader acceptance. No text is renumbered, merged, removed, introduced or authorised for publication by this experiment. Both the original public LSG 0.1.0 module and the public catalogue remain unchanged.
