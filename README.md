@@ -78,6 +78,7 @@ For repository creation, push, Pages activation and branch rules, see [INSTALLAT
 - [Official versification and omitted verses](docs/VERSIFICATION_POLICY.md)
 - [Pilot: Louis Segond 1910 and Matthew Henry Complete](docs/PILOT_SEGOND_MHC.md)
 - [Reversible editorial source audit and normalizer](docs/EDITORIAL_AUDIT_WORKFLOW.md)
+- [Resource onboarding playbook and LSG pilot lessons](docs/RESOURCE_ONBOARDING_PLAYBOOK.md)
 - [Quality policy](docs/QUALITY_POLICY.md)
 - [Editorial rules](docs/EDITORIAL_RULES.md)
 - [Strict OSIS source normalization contract](docs/NORMALIZATION_POLICY.md)
