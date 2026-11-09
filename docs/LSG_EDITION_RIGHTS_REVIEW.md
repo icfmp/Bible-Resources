@@ -46,11 +46,24 @@ callers, lexical attribute order, and source-authored reference markup.
 **Do not equate normalized text equality with typographic identity.**
 The source USFX-to-OSIS note audit reports raw note component spacing and
 pre-note separator changes. The existing source-bound separator-restoration
-tool is a dry run only. Separately, OSIS-to-compiled-SWORD previously had
-681 note bodies that matched after whitespace collapsing but were not raw
-identical. The new note-whitespace inspector classifies these cases by
-changed whitespace runs, line breaks, tabs and Unicode spaces; it does
-not approve or rewrite any change.
+tool is a dry run only.
+
+The real stable-SWORD whitespace classification in GitHub Actions
+[run 42600072255](https://github.com/icfmp/Bible-Resources/actions/runs/42600072255)
+found **681/9,751** OSIS-to-compiled notes with a consistent pattern:
+**2,043 shortened whitespace segments**, comprising **1,362 boundary
+segments** and **681 internal segments**. Every changed segment contained
+a newline in the generated OSIS but none in the compiled note. No altered
+Unicode spaces, tabs, words or punctuation were detected, and all the
+2,043 segments became shorter rather than longer. **9,070 note texts were
+raw-identical at this stage**. This evidence alone does not establish that
+all line breaks were merely converter formatting; the source USFX-to-binary
+comparison must establish the publisher's intended layout separately.
+
+The new publisher-USFX-to-compiled-SWORD audit runs before package testing:
+its direct note-body equality and original whitespace results are a
+separate check, **not yet an editorial waiver**. Neither stage rewrites
+the original source or implicitly approves spacing changes.
 
 ## Before publishing an installable SWORD module
 
