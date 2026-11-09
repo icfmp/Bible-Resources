@@ -23,6 +23,7 @@ from lsg_rebuild_trial import (_safe_files, _osis_summary, _schema_proof,
 from lsg_ephemeral_osis_candidate import prepare_ephemeral_source_spaced_osis
 from lsg_sword_rebuild import compile_candidate
 from lsg_stock_raw_markup import audit_stock_raw_markup
+from lsg_xiphos_preview import create_xiphos_preview
 import os
 from reviewed_reference_merges import (load_reviewed_merges, assess_reviewed_merges,
                                        annotate_editorial_label)
@@ -217,18 +218,35 @@ def run_stable(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) ->
             f"{d['osis_reader_key']} regroupe les versets {d['preferred_display_label']}"
             for d in decisions
         ) + ". Le texte biblique original est intégralement conservé."
+        def verified_readback(root: Path, module_id: str, roundtrip: dict) -> dict:
+            audit = audit_stock_raw_markup(
+                original_xml,labeled,decisions,sword_root=root,
+                module_id=module_id,inspector=Path(inspector),
+                lemma_inspector=Path(lemma_inspector),
+                note_inspector=Path(note_inspector),
+                note_text_inspector=Path(note_text_inspector),
+                note_anchor_inspector=Path(note_anchor_inspector),
+                layout_inspector=Path(layout_inspector))
+            # This explicit Xiphos *test* export exists only because the
+            # project owner requested a downloadable preview. Never stage
+            # a binary unless all source/compiled lexical, note, reference
+            # and layout gates have succeeded on the actual SWORD module.
+            preview = os.environ.get("LSG_PREVIEW_TEST_PACKAGE_PATH")
+            if preview and audit.get("status") == (
+                    "raw_stock_sword_full_scope_markers_verified_including_intros"):
+                approved = assess_stock_readback(roundtrip)
+                reviewed = assess_reviewed_merges(decisions,policy_digest,approved)
+                if (approved["status"]!="stock_segond_limitations_classified_not_approved"
+                    or reviewed.get("status")!="owner_reviewed_index_compromise_verified"):
+                    raise PilotError("Index compromise was not source-authorized")
+                report["xiphos_test_preview_package"] = create_xiphos_preview(
+                    root,Path(preview),original_usfx_sha256=digest)
+            return audit
+
         report["stock_sword_compiled_candidate"] = compile_candidate(
             labeled, source_usfx=original_xml, versification="Segond",
             module_info_note=module_notice,
-            after_full_readback=lambda root,module_id,roundtrip:
-                audit_stock_raw_markup(
-                    original_xml,labeled,decisions,sword_root=root,
-                    module_id=module_id,inspector=Path(inspector),
-                    lemma_inspector=Path(lemma_inspector),
-                    note_inspector=Path(note_inspector),
-                    note_text_inspector=Path(note_text_inspector),
-                    note_anchor_inspector=Path(note_anchor_inspector),
-                    layout_inspector=Path(layout_inspector)))
+            after_full_readback=verified_readback)
         compiled = report["stock_sword_compiled_candidate"]
         if (not compiled.get("real_module_rebuilt_in_temporary_directory")
                 or "full_source_verse_roundtrip" not in compiled):
