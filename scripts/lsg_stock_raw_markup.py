@@ -20,6 +20,7 @@ from lsg_source_compare import scan_usfx
 from lsg_sword_compare import chapter_plan
 from lsg_osis_parity import _osis_verses, OSIS
 from lsg_stock_lemma_parity import audit_compiled_lemma_values
+from lsg_stock_note_probe import probe_compiled_note_storage
 
 def build_stock_markup_plan(source: bytes, candidate: Path,
                             decisions: list[dict]) -> tuple[list[tuple[str, str]],dict,dict]:
@@ -367,7 +368,8 @@ def probe_stock_intros(inspector: Path, module_id: str,
 def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
                            decisions: list[dict], *, sword_root: Path,
                            module_id: str, inspector: Path,
-                           lemma_inspector: Path) -> dict:
+                           lemma_inspector: Path,
+                           note_inspector: Path) -> dict:
     if not inspector.is_file() or inspector.is_symlink():
         raise PilotError("Stock SWORD raw verifier executable not found")
     aliases,expected,source_global=build_stock_markup_plan(
@@ -402,6 +404,11 @@ def audit_stock_raw_markup(publisher_usfx: bytes,candidate: Path,
             candidate,aliases,sword_root=sword_root,module_id=module_id,
             inspector=lemma_inspector)
         report["compiled_ordered_lemma_attribute_review"]=lemma_review
+        # SWORD can store footnote bodies in entry attributes, not inline
+        # in raw verse markup. This is diagnostic only, never sign-off.
+        report["compiled_note_entry_attribute_probe"]=probe_compiled_note_storage(
+            candidate,aliases,sword_root=sword_root,module_id=module_id,
+            inspector=note_inspector)
         if lemma_review["status"]!="compiled_ordered_lemma_attributes_verified":
             report["status"]="blocked_compiled_lemma_attributes_mismatch"
     report["source_reader_merge_count"]=len(decisions)
