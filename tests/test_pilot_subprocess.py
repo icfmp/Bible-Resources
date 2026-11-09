@@ -35,6 +35,23 @@ class BoundedReaderTests(unittest.TestCase):
         self.assertIn(b"Correct entry",body)
         self.assertTrue(present_key("Gen 1:1",body,code))
 
+    def test_explicit_note_and_xref_options_precede_terminal_key(self):
+        self.executable(
+            "import sys\n"
+            "assert sys.argv[1:7]==['-b','MHC','-f','internal','-o','sfnhl']\n"
+            "assert sys.argv[7:]==['-k','Gen 1:1']\n"
+            "print('Synthetic note markup')"
+        )
+        code,body=query("MHC","Gen 1:1",fmt="internal",root=self.root,
+                        exe=str(self.fake),options="sfnhl")
+        self.assertEqual(code,0)
+        self.assertIn(b"Synthetic",body)
+        for invalid in ("not-valid","sffff","s!!","*"):
+            with self.subTest(options=invalid):
+                with self.assertRaisesRegex(PilotError,"Invalid explicit"):
+                    query("MHC","Gen 1:1",fmt="internal",root=self.root,
+                          exe=str(self.fake),options=invalid)
+
     def test_full_module_dump_is_blocked_at_small_cap(self):
         self.executable("import sys\nsys.stdout.write('X'*1000000)")
         with self.assertRaisesRegex(PilotError,"more than 4096 bytes"):

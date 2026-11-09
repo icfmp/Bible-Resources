@@ -85,6 +85,27 @@ class StrictOsisTests(unittest.TestCase):
         self.assertTrue(report["no_transformation_performed"])
         self.assertEqual(original, self.source.read_bytes())
 
+    def test_bounded_original_xml_comments_are_preserved_without_approval_of_scripts(self):
+        self.write([
+            f'<osis xmlns="{NAMESPACE}">',
+            '  <!-- USFM source provenance: keep as XML comment -->',
+            '  <osisText><p>Original words<!-- converter marker --> unchanged</p></osisText>',
+            '</osis>',
+        ])
+        original=self.source.read_bytes()
+        r=self.validate()
+        self.assertEqual(r["elements"]["xml_comment"],2)
+        self.assertEqual(original,self.source.read_bytes())
+        self.assertEqual(hashlib.sha256(original).hexdigest(),r["source_sha256"])
+
+    def test_processing_instruction_is_still_blocked(self):
+        self.write([f'<osis xmlns="{NAMESPACE}">',' <?dangerous step?>', '</osis>'])
+        self.assert_problem("UNREVIEWED_NODE",2)
+
+    def test_large_comment_requires_review(self):
+        self.write([f'<osis xmlns="{NAMESPACE}">', '<!-- '+("x"*4097)+' -->', '</osis>'])
+        self.assert_problem("UNREVIEWED_COMMENT_SIZE",2)
+
     def test_valid_but_unreviewed_element_fails_at_line(self):
         self.write([f'<osis xmlns="{NAMESPACE}">', ' <custom>Do not discard</custom>', '</osis>'])
         self.assert_problem("UNREVIEWED_ELEMENT", 2)
