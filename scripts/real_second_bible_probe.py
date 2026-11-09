@@ -70,11 +70,15 @@ def _source_counts_by_order(usfx_raw: bytes) -> tuple[dict, list[dict]]:
         if chapter < 1 or verse < 1:
             raise SecondBibleError("Nonpositive original source reference")
         groups.setdefault(code, set()).add((chapter, verse))
-    if set(groups) != set(books):
-        raise SecondBibleError("Original source includes empty/extra book groups")
+    if not set(groups).issubset(set(books)):
+        raise SecondBibleError("Original source verse IDs outside declared books")
+    # An authorial USFX document may include introduction/front-matter
+    # sections with no numbered verse. Never fabricate verse IDs, nor
+    # erase those source elements as if they lacked content.
     summary = [
-        {"usfx_book_id": name, "authored_verse_count": len(groups[name]),
-         "authored_chapter_count": len(set(c for c, _ in groups[name]))}
+        {"usfx_book_id": name, "authored_verse_count": len(groups.get(name, set())),
+         "authored_chapter_count": len(set(c for c, _ in groups.get(name, set()))),
+         "requires_unnumbered_intro_content_audit": name not in groups}
         for name in books
     ]
     return metadata, summary
@@ -114,14 +118,18 @@ def inspect_real_source_and_native_reader(
     engine_registry = parse_registry(registry, native["native_versification"])
     reader_groups = _reader_counts_by_order(keys)
     source_book_count = len(original_groups)
+    numbered_source_groups = [group for group in original_groups
+                              if group["authored_verse_count"] > 0]
+    unnumbered_groups = [group["usfx_book_id"] for group in original_groups
+                         if group["authored_verse_count"] == 0]
     reader_book_count = len(reader_groups)
-    both_have_same_number_of_books = source_book_count == reader_book_count
+    both_have_same_number_of_books = len(numbered_source_groups) == reader_book_count
     same_count_per_ordered_book = (
         both_have_same_number_of_books
         and all(source["authored_verse_count"] == reader["occupied_verse_count"]
-                for source, reader in zip(original_groups, reader_groups)))
+                for source, reader in zip(numbered_source_groups, reader_groups)))
     first_diffs = []
-    for index, (source, reader) in enumerate(zip(original_groups, reader_groups), 1):
+    for index, (source, reader) in enumerate(zip(numbered_source_groups, reader_groups), 1):
         if source["authored_verse_count"] != reader["occupied_verse_count"] and len(first_diffs) < 40:
             first_diffs.append({
                 "book_ordinal": index,
@@ -139,6 +147,9 @@ def inspect_real_source_and_native_reader(
         "publisher_original_verse_count": sum(x["authored_verse_count"]
                                                for x in original_groups),
         "publisher_original_book_count": source_book_count,
+        "publisher_original_books_with_numbered_verses": len(numbered_source_groups),
+        "publisher_unumbered_intro_or_nonverse_book_codes_needing_review": unnumbered_groups,
+        "publisher_unnumbered_book_text_structure_verified": False,
         "publisher_source_xml_book_codes": [x["usfx_book_id"] for x in original_groups],
         "publisher_sword_zip_sha256": sha256(compiled_sword_zip.read_bytes()).hexdigest(),
         "publisher_original_sword_id": native["module_id"],
