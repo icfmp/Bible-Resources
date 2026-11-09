@@ -205,6 +205,9 @@ def run_stable(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) ->
         note_text_inspector=os.environ.get("LSG_STOCK_NOTE_TEXT_INSPECTOR")
         if not note_text_inspector:
             raise PilotError("Stable SWORD note-text semantic inspector is required")
+        note_anchor_inspector=os.environ.get("LSG_STOCK_NOTE_ANCHOR_INSPECTOR")
+        if not note_anchor_inspector:
+            raise PilotError("Stable SWORD note anchor inspector is required")
         # Standard SWORD About metadata may be visible in the module details
         # even if frontends render the canonical verse key as plain "52".
         module_notice = "Note de versification : " + "; ".join(
@@ -220,7 +223,8 @@ def run_stable(usfm_zip: Path, usfx_zip: Path, converter: Path, schema: Path) ->
                     module_id=module_id,inspector=Path(inspector),
                     lemma_inspector=Path(lemma_inspector),
                     note_inspector=Path(note_inspector),
-                    note_text_inspector=Path(note_text_inspector)))
+                    note_text_inspector=Path(note_text_inspector),
+                    note_anchor_inspector=Path(note_anchor_inspector)))
         compiled = report["stock_sword_compiled_candidate"]
         if (not compiled.get("real_module_rebuilt_in_temporary_directory")
                 or "full_source_verse_roundtrip" not in compiled):
