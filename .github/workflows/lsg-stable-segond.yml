@@ -43,6 +43,7 @@ on:
       - 'scripts/lsg_note_whitespace_diagnostics.py'
       - 'scripts/lsg_stock_publisher_note_parity.py'
       - 'scripts/private_sword_bundle.py'
+      - 'scripts/lsg_xiphos_preview.py'
       - 'tests/test_private_sword_bundle.py'
       - 'tests/test_lsg_stock_publisher_note_parity.py'
       - 'tests/test_lsg_note_whitespace_diagnostics.py'
@@ -161,6 +162,7 @@ jobs:
       - name: Compile real source-attested OSIS via stable SWORD and classify every chapter
         env:
           LSG_SAMPLE_DEBUG: '0'
+          LSG_PREVIEW_TEST_PACKAGE_PATH: ${{ runner.temp }}/xiphos-preview/BRLSG1910Preview.zip
           LSG_STOCK_RAW_INSPECTOR: ${{ runner.temp }}/sword-raw-audit
           LSG_STOCK_LEMMA_INSPECTOR: ${{ runner.temp }}/sword-lemma-audit
           LSG_STOCK_NOTE_INSPECTOR: ${{ runner.temp }}/sword-note-probe
@@ -174,7 +176,26 @@ jobs:
             --converter "${{ runner.temp }}/u2o-reviewed/u2o.py" \
             --schema "${{ runner.temp }}/reviewed-osis/osisCore.2.1.1-cw-latest.xsd" \
             --report reports/lsg-stable-segond.json
-      - name: Upload ONLY text-free metadata, never source OSIS or SWORD binary
+      # A user explicitly requested a private-before-release download.
+      # This is a short-lived Actions TEST artifact on the pilot branch,
+      # NOT a release, catalogue resource or commit to the main branch.
+      - name: Record owner-requested Xiphos preview checksum
+        if: success() && github.event_name == 'pull_request' && github.head_ref == 'test/lsg-stable-segond-candidate'
+        run: |
+          test -s "${{ runner.temp }}/xiphos-preview/BRLSG1910Preview.zip"
+          cd "${{ runner.temp }}/xiphos-preview"
+          sha256sum BRLSG1910Preview.zip > SHA256SUMS.txt
+      - name: Share short-lived owner preview ZIP (NOT a release)
+        if: success() && github.event_name == 'pull_request' && github.head_ref == 'test/lsg-stable-segond-candidate'
+        uses: actions/upload-artifact@v4
+        with:
+          name: BRLSG1910Preview-test-only
+          path: |
+            ${{ runner.temp }}/xiphos-preview/BRLSG1910Preview.zip
+            ${{ runner.temp }}/xiphos-preview/SHA256SUMS.txt
+          retention-days: 3
+          if-no-files-found: error
+      - name: Upload ONLY text-free metadata (normal research report)
         if: always()
         uses: actions/upload-artifact@v4
         with:
