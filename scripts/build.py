@@ -47,7 +47,9 @@ def build(root=ROOT, output=None, base_url="https://icfmp.github.io/Bible-Resour
                 info.compress_type=zipfile.ZIP_DEFLATED
                 info.external_attr=0o100644<<16
                 z.writestr(info,src.read_bytes())
-        catalog.append({"id":m["id"],"sword_id":m["sword_id"],"title":m["title"],
+        catalog.append({"id":m["id"],"sword_id":m["sword_id"],
+                        "canonical_edition_id":m["canonical_edition_id"],
+                        "title":m["title"],
                         "category":m["category"],"language":m["language"],"version":m["version"],
                         "versification":m.get("versification"),"edition":m["quality"]["edition"],
                         "download":{"url":base_url+"sword/packages/"+pkg.name,
