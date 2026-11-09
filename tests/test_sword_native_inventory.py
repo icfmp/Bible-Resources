@@ -49,7 +49,7 @@ class NativeIndexParsingTests(unittest.TestCase):
         self.assertEqual(len(keys.splitlines()), 3)
 
     def test_occupied_anonymous_top_intro_is_preserved_as_unresolved(self):
-        native = VALID.replace("I\tAlpha.0.0\n", "U\tTOP\nI\tAlpha.0.0\n")
+        native = VALID.replace("I\tAlpha.0.0\n", "U\tTOP\t1\nI\tAlpha.0.0\n")
         native = native.replace("S\t2\t3\t2\t0", "S\t2\t3\t2\t1")
         keys, registry, report = parse_native_rows(native, "Fixture")
         self.assertEqual(report["native_nonaddressable_populated_top_count"], 1)
@@ -57,7 +57,7 @@ class NativeIndexParsingTests(unittest.TestCase):
         self.assertEqual(len(keys.splitlines()), 3)
 
     def test_duplicate_anonymous_top_intro_fails(self):
-        native = VALID.replace("I\tAlpha.0.0\n", "U\tTOP\nU\tTOP\nI\tAlpha.0.0\n")
+        native = VALID.replace("I\tAlpha.0.0\n", "U\tTOP\t1\nU\tTOP\t1\nI\tAlpha.0.0\n")
         native = native.replace("S\t2\t3\t2\t0", "S\t2\t3\t2\t2")
         with self.assertRaisesRegex(NativeIndexError, "Duplicate"):
             parse_native_rows(native, "Fixture")
