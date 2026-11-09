@@ -64,6 +64,24 @@ class LayoutMarkupTests(unittest.TestCase):
         self.assertEqual(report["compiled_global_layout_marker_counts"]
                          ["p_ends"],1)
 
+    def test_source_paragraph_div_milestones_are_logically_paragraphs(self):
+        original=self.source.read_text(encoding="utf-8")
+        source=original.replace(
+            '<p><verse sID="Gen.1.1"/>',
+            '<div type="x-p" sID="p1"/><verse sID="Gen.1.1"/>'
+        ).replace('</p></div></osisText>',
+                  '<div type="x-p" eID="p1"/></div></osisText>')
+        self.assertNotEqual(source,original)
+        self.source.write_text(source,encoding="utf-8")
+        compiled=list(self.rows)
+        compiled[2]="Gen\tGenesis 1:1\t1\t1\t0\t0\t1\t0\t1\t0"
+        report=compare_compiled_layout_marker_rows(
+            self.source,self.plan,compiled)
+        self.assertEqual(report["status"],
+                         "compiled_source_layout_start_marker_counts_match")
+        self.assertEqual(report["books_matching_all_explicit_end_milestones"],1)
+        self.assertTrue(report["sword_x_p_paragraph_milestones_normalized"])
+
     def test_missing_or_reordered_rows_fail(self):
         for rows in (self.rows[:2], self.rows[::-1],
                      ["Gen\tGenesis 0:0\tbad\t0\t0\t0\t0\t0\t0\t0"]
