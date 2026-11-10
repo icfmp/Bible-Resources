@@ -338,6 +338,34 @@ on structural `div`, `l`, `lg`, `milestone`, `p`, `q`, `lb`.
 issues are reviewed. Stage 5 retains source-native note/caller/target and
 final typography checks. No change to published Bible modules or rights.
 
+## Source USFX pre-chapter paragraphs versus native book intros
+
+Before asserting paragraph parity, stage 4c must separately inventory
+original paragraphs **before the first chapter of each book**. A plain
+`all source p` versus `native div type=x-p` pair count may otherwise
+incorrectly treat an authorial book preface as a missing numbered paragraph.
+
+The read-only `source_native_book_prefaces.py` scans the original pinned
+USFX in its document order, distinguishes **empty p markers** from p
+elements containing original authored words, and records whether any
+original prechapter p has nested markup. It independently observes **actual
+stock SWORD book-level intro records** (not chapter 1 verse-zero or an
+ordinary numbered entry) with the same strict private XML parser used for
+compiled milestone checks, counting native intro structural elements.
+The receipt reports only counts and bounded *book codes* for unresolved
+source-preface-to-native-intro content presence. No original preface
+words, comments, note bodies, unknown native attribute values or raw XML
+are ever logged.
+
+A private *substring after whitespace folding* is at most weak evidence
+that original prefatory words appear somewhere in a compiled book intro:
+it **does not verify** event order, x-p wrapping, exact authorial
+paragraph boundaries or publishers' prose. Missing or unparseable book
+intros remain explicit findings. Never assume a prefatory p is empty
+because a native x-p count is one lower; inspect its actual source content.
+This analysis is edition-independent and must not automatically approve
+source/editorial equivalence or publication.
+
 ## OSIS overlapping hierarchies and typed paragraph milestones
 
 **Do not treat every `div` in a SWORD fragment as an authorial paragraph.**
