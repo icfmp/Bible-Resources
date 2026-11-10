@@ -115,8 +115,24 @@ class NativeMilestonePairTests(unittest.TestCase):
         check.observe("K","Gen.1.1",b'<div eID="a"/><div eID="b"/>')
         report=check.finish()
         self.assertEqual(report["native_milestone_pairing_findings"][
-            "same_tag_overlapping_milestone_ranges"],1)
+            "same_tag_same_type_overlapping_milestones"],1)
         self.assertNotEqual(report["status"],"compiled_milestone_pairs_verified_only")
+
+    def test_two_div_semantic_types_may_interleave_but_need_review(self):
+        check=NativeMilestonePairAudit()
+        check.observe("I","Gen.1",b'<div type="x-p" sID="paragraph"/>'
+                                   b'<div type="x-milestone" sID="tech"/>')
+        check.observe("K","Gen.1.1",b'<div type="x-p" eID="paragraph"/>'
+                                     b'<div type="x-milestone" eID="tech"/>')
+        r=check.finish()
+        self.assertEqual(r["native_milestone_pair_categories"][
+            "same_tag_different_type_interleaving_review"],1)
+        self.assertNotIn("same_tag_same_type_overlapping_milestones",
+                         r["native_milestone_pairing_findings"])
+        self.assertEqual(r["paired_div_types_allowlisted"]["x-p"],1)
+        self.assertEqual(r["paired_div_types_allowlisted"]["x-milestone"],1)
+        self.assertEqual(check.native_x_p_pairs_by_book(),{"Gen":1})
+        self.assertFalse(r["source_to_compiled_same_type_event_order_verified"])
 
     def test_osis2mod_paragraph_vs_preverse_div_types_not_conflated(self):
         check=NativeMilestonePairAudit()
