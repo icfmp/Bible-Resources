@@ -237,6 +237,8 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
                       "maintext":rows,
                       "maintext_scope_classification":witness,
                       "notes":notes,
+                      "note_anchor_positions":receipt[
+                          "private_numbered_source_native_note_anchor_position_diagnostic"],
                       "source_scope":receipt["source_book_scope"],
                       "absorbed_verse_groups":receipt["source_only_verse_grouped_native_maintext_witness"]})
     if schema is None or not schema.is_file():
@@ -321,14 +323,28 @@ def run_stage(manifest: dict, stage: int, temp: Path, *, opener=None,
         if stage == 5:
             if "notes" in result["evidence"]:
                 evidence = result["evidence"]
+                note_positions = evidence.get("note_anchor_positions", {})
+                position_match = (note_positions.get(
+                    "all_numbered_note_nonspace_anchor_positions_match") is True)
+                verified = [
+                    "Original/natively compiled numbered-verse note body and raw annotation comparisons executed"]
+                missing = [
+                    "Exact caller labels, original reference targets and resolved navigation",
+                    "Absorbed/non-numbered note ownership and note body typography",
+                    "Full original paragraph, poetry, title, quotation and verse-zero structure",
+                    "Strong values/ordinals if the original edition supplies them",
+                    "Human editorial acceptance of all differences",
+                ]
+                if position_match:
+                    verified.append(
+                        "All original numbered-note caller nonspace codepoint positions match actual stock SWORD")
+                else:
+                    missing.insert(0, "Original/native numbered-note caller positional parity failed or unverified")
                 result = _status("PARTIAL",
-                    verified=["Original/natively compiled numbered-verse note body and raw annotation comparisons executed"],
-                    missing=["Exact caller/word-anchor positions, absorbed-verse notes and target resolution",
-                             "Full source paragraph, poetry, title, quotation and verse-zero structure",
-                             "Strong values/ordinals if the original edition supplies them",
-                             "Human editorial acceptance of all differences"],
+                    verified=verified, missing=missing,
                     evidence={"original_archives":receipts,
                               "notes":evidence["notes"],
+                              "note_anchor_positions":note_positions,
                               "source_scope":evidence["source_scope"]})
             else:
                 result = _status("BLOCKED",verified=[],
