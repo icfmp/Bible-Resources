@@ -536,6 +536,53 @@ must never be suppressed merely to make CI green.
 The original pinned eBible archives remain untouched, and no module is
 published by this audit.
 
+## Stage 4c — source/native paragraph + poetry *opening AND closing* word positions
+
+The generic read-only `scripts/source_native_word_boundaries.py` extends
+the prior source/native **opening-kind order** test with real positions and
+semantic intervals:
+
+- It independently traverses the original SHA-pinned **USFX XML** in its
+  authorial order. Each main-text `p` or `q` **open and XML close** gets
+  a source book, adjacent numbered verse/intro scope, and **book-wide lexical
+  word ordinal**. Generated verse/chapter labels, editorial headings, notes
+  and the **separately checked** prechapter `mt` title are not counted as
+  Bible main text. The independent original per-verse text collector
+  cross-checks every verse exactly; a parsing discrepancy blocks this
+  structural subcheck.
+- During the existing whole original-stock SWORD reader scan, the same
+  diagnostics independently inspect actual native `div type="x-p"`
+  and `l` `sID/eID` *open and close* milestones. Native generated
+  identifier values are paired **only privately**, never exported.
+  Book/chapter intro markup is included as structure, but its header
+  text is excluded from numbered Scripture word positions.
+- A positive word-boundary result requires matching original/native word
+  sequences, mapped books, p/q event kinds and **both** event endpoint
+  ordinals. It rejects a moved opening, prematurely closed paragraph,
+  unpaired/duplicated native endpoint, a source/native word split or
+  unsupported anonymous native structural record. Controlled synthetic
+  errors are covered by `tests/test_source_native_word_boundaries.py`.
+- The public report carries only aggregate classifications, word ordinals,
+  SHA-256 of structural ordinal sequences, and at most 24 safe
+  book/verse reference examples. All original Scripture, note/title prose,
+  arbitrary original attributes, stock raw XML and generated `sID`
+  strings remain private and are discarded with the runner.
+- **Important scope boundary:** matching *word ordinal* positions is not
+  evidence of exact character/punctuation placement, original whitespace,
+  linebreaks, original paragraph SFM/style hierarchy, cross-verse
+  presentation in a specific reader, caller positions or resolved links.
+  Multiple authored boundaries between the same pair of words may have
+  different whitespace or punctuation offsets. They remain subjects of
+  subsequent editorial/source-relative acceptance, never silently
+  normalized.
+
+If a source or native record cannot be safely mapped, the new subcheck
+returns a privacy-safe **unverified/blocked** diagnostic without declaring
+identical structure or overriding the existing full-text and milestone
+audits. Only reviewed machine checks may be treated as mechanically
+verified; the human acceptance, stage 5 and publication gates remain
+independent. This is generic and not tailored to the 66-book Darby source.
+
 ## Safety and publication separation
 
 - GitHub workflow uses `contents: read` for the audit job.
