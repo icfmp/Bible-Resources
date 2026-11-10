@@ -178,6 +178,13 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
             "Mapped indexed main-text has unresolved non-whitespace word/punctuation or reference differences"])
         if witness["source_verses_with_whitespace_only_changes"]:
             missing.append("Original main-text whitespace differs; verse/poetry/paragraph layout preservation not yet verified")
+        boundary_screen = rows.get("source_native_body_boundary_word_position_screen", {})
+        if boundary_screen.get("all_mapped_book_p_q_start_end_word_ordinals_match") is True:
+            verified.append("Source/native body p/q OPEN and CLOSE word ordinals match per book (NOT whitespace/punctuation positions)")
+        elif boundary_screen:
+            missing.append("Source/native paragraph/poetry opening or closing word ordinals remain different or unverified; see private-structure diagnostic")
+        else:
+            missing.append("No independent source/native paragraph/poetry start-and-end word position result")
         body_order = rows.get("source_native_ordered_body_kind_screen", {})
         if body_order.get("status") == "blocked_original_authorial_source_scope_or_structure":
             missing.append("Source-native p/q ordered event check explicitly BLOCKED by original book/structure scope; do not infer matching order")
