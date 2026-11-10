@@ -1,23 +1,62 @@
-name: Importer une ressource
-description: Suivre un module candidat à l'import
+name: Import a Bible resource
+description: Track one candidate resource through seven auditable checkpoints
 title: "[Import] "
 labels: []
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Use the [7-stage Bible onboarding workflow](https://github.com/icfmp/Bible-Resources/blob/main/docs/BIBLE_7_STAGE_WORKFLOW.md).
+        Keep this issue as the single progress tracker. A stage is complete only after
+        its exact evidence and validation have been linked; don't assume a green
+        CI badge proves editorial approval. For commentaries, use the appropriate
+        specialized review and do not claim a Bible-specific gate applies.
+  - type: textarea
+    id: candidate
+    attributes:
+      label: Exact resource candidate
+      description: Name, source project, edition, language and why we are considering it. Unknown details can be researched at stage 1.
+      placeholder: "e.g. An identified publisher edition; source and version to verify"
+    validations:
+      required: true
   - type: textarea
     id: source
     attributes:
-      label: Source et édition exactes
-      description: URL, éditeur, version, versification, identifiant SWORD
+      label: Upstream sources, module alternatives and edition details
+      description: Add URLs, versions, rights references and immutable SHA-256 when verified. Leave unknown fields explicitly pending.
     validations:
-      required: true
+      required: false
   - type: textarea
     id: rights
     attributes:
-      label: Droits de redistribution et de modification
-      description: Joindre les preuves spécifiques à l'édition
+      label: Text, notes and enrichment redistribution rights
+      description: Record separately reviewed original evidence; rights not verified means no redistribution.
+    validations:
+      required: false
+  - type: textarea
+    id: checkpoints
+    attributes:
+      label: Seven-step progress tracker (update this field after each checkpoint)
+      value: |
+        Progress: 0/7 DONE — current stage 1/7
+        Status: IN_PROGRESS
+        Last verified checkpoint: none
+        Next action: Identify edition and upstream/rights sources
+        Blocker: none yet
+
+        - [ ] 1/7 Select edition and verify rights
+        - [ ] 2/7 Acquire and SHA-pin original sources
+        - [ ] 3/7 Validate source structure and conversion if applicable
+        - [ ] 4/7 Compare SWORD index and full main text
+        - [ ] 5/7 Verify notes, cross-references, layout and optional Strong
+        - [ ] 6/7 Test actual reader package and record limitations
+        - [ ] 7/7 Obtain owner approval, publish and verify delivery
     validations:
       required: true
   - type: textarea
-    id: audit
+    id: current-findings
     attributes:
-      label: Anomalies et contrôles nécessaires
+      label: Known findings and next technical decision
+      description: Short summary only; put detailed reports and successful test links in checkpoint comments.
+    validations:
+      required: false
