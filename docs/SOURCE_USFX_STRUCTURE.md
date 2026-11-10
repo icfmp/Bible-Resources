@@ -37,11 +37,15 @@ investigate a source revision without distributing the authored Scripture.
 
 ## Evidence **not** certified by this inventory
 
-- eBible's [USFX format documentation](https://ebible.org/usfx/) points to
-  an [official XSD](https://ebible.org/usfx.xsd). That mutable upstream XSD
-  must first be independently retrieved, fingerprinted and reviewed before
-  the project may claim **official XSD validation**. Mere successful XML
-  parsing and the original element inventory are **not** XSD validity.
+- eBible's [USFX format documentation](https://ebible.org/usfx/) identifies
+  the [official XSD](https://ebible.org/usfx.xsd). The exact 67,661-byte
+  upstream snapshot was observed and compiled offline in
+  [GitHub Actions run 42812816320](https://github.com/icfmp/Bible-Resources/actions/runs/42812816320),
+  then SHA-256 pinned in `config/usfx-schema-policy.json`. Stage 3 now
+  downloads and checks the pinned snapshot before validating the original
+  source; changed upstream bytes **block**, never silently update the
+  approved standard. An XML parser or element-counter success alone remains
+  insufficient.
 - Note body/caller and text-position equivalence to a compiled SWORD module
   is still part of stages 4 and 5. This stage cannot prove them.
 - The publisher's exact edition/revision must be independently evidenced;
