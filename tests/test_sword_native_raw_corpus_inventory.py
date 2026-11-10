@@ -12,7 +12,8 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from sword_native_raw_corpus_inventory import (
-    parse_native_raw_corpus, RawCorpusError, write_new_metadata_report
+    parse_native_raw_corpus, RawCorpusError, write_new_metadata_report,
+    verify_independent_raw_spotchecks,
 )
 
 
@@ -34,6 +35,42 @@ def sample():
 
 
 class NativeWholeCorpusTests(unittest.TestCase):
+    def test_independent_exact_key_reader_catches_static_stale_cursor(self):
+        from hashlib import sha256
+        one = b"<w>alpha</w>"
+        two = b"<w>beta</w>"
+        expected = {
+            "Gen.1.1": sha256(one).hexdigest(),
+            "Gen.1.2": sha256(two).hexdigest(),
+        }
+        lookup = {"Gen.1.1": one, "Gen.1.2": two}
+        verified = verify_independent_raw_spotchecks(expected, lookup.__getitem__)
+        self.assertTrue(verified["verified"])
+        self.assertEqual(verified["sampled_exact_key_count"], 2)
+        # The original bug enumerated different verse IDs but read the same
+        # (stale module cursor) content for every frame. It must now BLOCK.
+        static_wrong_corpus = {
+            "Gen.1.1": sha256(one).hexdigest(),
+            "Gen.1.2": sha256(one).hexdigest(),
+        }
+        with self.assertRaisesRegex(RawCorpusError, "cursor"):
+            verify_independent_raw_spotchecks(static_wrong_corpus, lookup.__getitem__)
+        self.assertNotIn("alpha", json.dumps(verified))
+        self.assertNotIn("beta", json.dumps(verified))
+
+    def test_raw_spotcheck_rejects_invalid_evidence_and_bad_reader(self):
+        from hashlib import sha256
+        valid = {"Gen.1.1": sha256(b"a").hexdigest()}
+        with self.assertRaises(RawCorpusError):
+            verify_independent_raw_spotchecks({}, lambda x: b"a")
+        with self.assertRaises(RawCorpusError):
+            verify_independent_raw_spotchecks({"../bad": sha256(b"a").hexdigest()},
+                                              lambda x: b"a")
+        with self.assertRaises(RawCorpusError):
+            verify_independent_raw_spotchecks(valid, lambda x: "not bytes")
+        with self.assertRaises(RawCorpusError):
+            verify_independent_raw_spotchecks(valid, lambda x: b"wrong")
+
     def test_private_stream_hashes_every_real_frame_and_intros(self):
         report, ordinary, intros, anonymous = parse_native_raw_corpus(io.BytesIO(sample()))
         self.assertEqual(ordinary, ["Gen.1.1", "Gen.1.2", "Exod.1.1"])
