@@ -171,39 +171,88 @@ def parse_audit_comment(body: str) -> tuple[str, int]:
     return match.group(1), int(match.group(2))
 
 
-def observe_current_upstream(resource_id: str, *, opener=None) -> dict:
-    """Metadata-only *unapproved* remote identity discovery for human re-pinning.
+def parse_observe_comment(body: str) -> str:
+    """Read-only owner-command grammar, with no shell interpolation."""
+    if not isinstance(body, str) or len(body) > 150 or "\\n" in body or "\\r" in body:
+        raise IntakeError("Expected one bounded /bible-observe command")
+    match = re.fullmatch(r"/bible-observe ([a-z][a-z0-9-]{1,63})", body.strip())
+    if not match:
+        raise IntakeError("Expected /bible-observe <resource-id>")
+    return match.group(1)
 
-    Never writes, redistributes, extracts or trusts these archives as equivalent.
-    Only the separately reviewed manifest may authorize pinned acquisition.
+
+def observe_current_upstream(resource_id: str, *, opener=None) -> dict:
+    """Privately fingerprint and structurally inspect mutable upstream ZIPs.
+
+    This is an UNAPPROVED observation, not pinning, edition equivalence or
+    acquisition of approved inputs. Original bytes are discarded at function
+    exit; only hashes, bounded counts and original SWORD .conf fields return.
     """
     m = load_manifest(resource_id)
     opener = opener or build_opener(ProviderRedirects(m["provider"]))
     reports = {}
-    for label in ("source","sword"):
-        url = m[label]["url"]
-        _safe_url(url,m["provider"])
-        digest = sha256()
-        total = 0
-        req = Request(url,headers={"User-Agent":"BibleResources-UpstreamRevisionObservation/1.0"})
-        with closing(opener.open(req,timeout=75)) as response:
-            _safe_url(response.geturl(),m["provider"])
-            while chunk := response.read(256*1024):
-                total += len(chunk)
-                if total > MAX_ARCHIVE_BYTES:
-                    raise IntakeError("Unapproved remote source exceeds inspection size limit")
-                digest.update(chunk)
-        if not total:
-            raise IntakeError("Empty upstream observation cannot become a release pin")
-        reports[label] = {
-            "observed_sha256":digest.hexdigest(),
-            "observed_bytes":total,
-            "previously_pinned_sha256":m[label]["sha256"],
-            "still_pinned":digest.hexdigest()==m[label]["sha256"],
-            "rights_or_edition_equivalence_verified":False,
-        }
-    return {"schema_version":1,"resource_id":resource_id,"status":"remote_observation_only_needs_source_review",
-            "archives":reports,"published":False,"source_zip_not_retained":True}
+    with tempfile.TemporaryDirectory(prefix="bible-observe-") as td:
+        for label in ("source", "sword"):
+            url = m[label]["url"]
+            _safe_url(url, m["provider"])
+            digest = sha256()
+            total = 0
+            original = Path(td) / f"{label}-observed.zip"
+            req = Request(url, headers={"User-Agent": "BibleResources-UpstreamRevisionObservation/1.0"})
+            with original.open("xb") as out:
+                with closing(opener.open(req, timeout=75)) as response:
+                    _safe_url(response.geturl(), m["provider"])
+                    while chunk := response.read(256 * 1024):
+                        total += len(chunk)
+                        if total > MAX_ARCHIVE_BYTES:
+                            raise IntakeError("Unapproved remote source exceeds inspection size limit")
+                        digest.update(chunk)
+                        out.write(chunk)
+            if not total:
+                raise IntakeError("Empty upstream observation cannot become a release pin")
+            from pilot_preflight import inspect_archive
+            checked = inspect_archive(original, source_kind="sword" if label == "sword" else "authored",
+                                      expected_category="bible" if label == "sword" else None)
+            if checked["archive_sha256"] != digest.hexdigest():
+                raise IntakeError("Observation checksum differs from isolated ZIP preflight")
+            stored_pin = m[label].get("sha256")
+            receipt = {
+                "observed_sha256": digest.hexdigest(),
+                "observed_bytes": total,
+                "previously_pinned_sha256": stored_pin,
+                "still_pinned": stored_pin == digest.hexdigest(),
+                "safe_original_zip_structure_verified": True,
+                "original_zip_member_count": checked["member_count"],
+                "original_zip_unpacked_bytes": checked["total_unpacked_bytes"],
+                "rights_or_edition_equivalence_verified": False,
+            }
+            if label == "sword":
+                conf = checked["sword_conf"]
+                receipt["sword_conf"] = {
+                    k: conf[k] for k in (
+                        "module_id", "version", "driver", "category", "versification",
+                        "language", "distribution_license", "text_source", "conf_sha256"
+                    )
+                }
+                if conf["category"] != "bible":
+                    raise IntakeError("Original module is not a Bible")
+            else:
+                receipt["source_xml_members"] = [
+                    x["name"] for x in checked["members"]
+                    if x["name"].lower().endswith((".xml", ".usfx"))
+                ][:20]
+            reports[label] = receipt
+    return {
+        "schema_version": 1,
+        "resource_id": resource_id,
+        "status": "remote_observation_only_needs_source_review",
+        "archives": reports,
+        "published": False,
+        "source_zip_not_retained": True,
+        "exact_edition_content_equivalence_verified": False,
+        "safe_to_acquire_without_approved_pins": False,
+    }
+
 
 
 def main(argv=None) -> int:
