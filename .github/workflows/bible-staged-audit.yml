@@ -33,6 +33,8 @@ on:
       - "tests/test_source_native_paragraph_counts.py"
       - "tests/test_native_milestone_pair_audit.py"
       - "scripts/source_native_layout_anchors.py"
+      - "scripts/source_native_book_prefaces.py"
+      - "tests/test_source_native_book_prefaces.py"
       - "tests/test_source_native_layout_anchors.py"
       - "docs/BIBLE_7_STAGE_WORKFLOW.md"
       - "tests/test_native_sword_markup_census.py"
@@ -104,6 +106,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_native_milestone_pair_audit.py' -v
           python -m unittest discover -s tests -p 'test_source_native_paragraph_counts.py' -v
           python -m unittest discover -s tests -p 'test_source_native_layout_anchors.py' -v
+          python -m unittest discover -s tests -p 'test_source_native_book_prefaces.py' -v
           python -c 'import os, sys; sys.path.insert(0, "scripts"); from bible_intake import load_manifest; m=load_manifest(os.environ["RESOURCE_ID"]); print("Reviewed research manifest:", m["resource_id"], m["purpose"], m["source"]["format"])'
       - name: Observe official eBible USFX schema fingerprint (research only, no auto-approval)
         if: github.event_name == 'pull_request'
