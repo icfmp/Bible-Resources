@@ -1,0 +1,88 @@
+"""Source p versus typed compiled x-p milestone count, never Bible words."""
+import sys
+import unittest
+from pathlib import Path
+
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
+from source_native_paragraph_counts import compare_authored_native_paragraphs, ParagraphAuditError
+
+MAPPING=[("GEN","Gen"),("EXO","Exod")]
+
+
+class TypedParagraphBookTests(unittest.TestCase):
+    def test_identifies_per_book_one_paragraph_differences_without_edition_exceptions(self):
+        source=(b'<usfx>'
+                b'<book id="GEN"><c id="1"/>'
+                b'<p><v id="1"/>PRIVATE SOURCE A</p>'
+                b'<p><v id="2"/>PRIVATE SOURCE B</p></book>'
+                b'<book id="EXO"><c id="1"/>'
+                b'<p><v id="1"/>PRIVATE SOURCE C</p>'
+                b'<p><v id="2"/>PRIVATE SOURCE D</p>'
+                b'</book></usfx>')
+        result=compare_authored_native_paragraphs(source,MAPPING,
+                                                   {"Gen":1,"Exod":1})
+        self.assertEqual(result["source_original_book_count"],2)
+        self.assertEqual(result["authorial_native_typed_paragraph_totals"][
+            "authorial_p_events"],4)
+        self.assertEqual(result["authorial_native_typed_paragraph_totals"][
+            "native_typed_x_p_pairs"],2)
+        self.assertEqual(result["authorial_native_typed_paragraph_totals"][
+            "books_with_p_pair_count_mismatch"],2)
+        self.assertTrue(result["every_original_book_has_one_extra_p_vs_compiled"])
+        self.assertEqual(result["original_p_position_class_counts"][
+            "original_p_before_first_book_verse"],2)
+        self.assertFalse(result["source_to_compiled_exact_paragraph_position_equivalence_verified"])
+        self.assertFalse(result["publication_approved"])
+        self.assertNotIn("PRIVATE",str(result))
+        self.assertNotIn("SOURCE",str(result))
+
+    def test_exact_count_is_not_exact_position_fidelity(self):
+        source=(b'<usfx><book id="GEN"><c id="1"/>'
+                b'<p><v id="1"/>A</p><p><v id="2"/>B</p></book></usfx>')
+        result=compare_authored_native_paragraphs(source,[("GEN","Gen")],
+                                                   {"Gen":2})
+        self.assertEqual(result["authorial_native_typed_paragraph_totals"][
+            "books_with_exact_p_pair_count"],1)
+        self.assertEqual(result["authorial_native_typed_paragraph_totals"][
+            "books_with_p_pair_count_mismatch"],0)
+        self.assertFalse(result["source_to_compiled_exact_paragraph_position_equivalence_verified"])
+
+    def test_paragraph_inside_note_remains_visible_not_counted_as_main_text(self):
+        source=(b'<usfx><book id="GEN"><c id="1"/>'
+                b'<v id="1"/>A<f><p>PRIVATE NOTE</p></f></book></usfx>')
+        result=compare_authored_native_paragraphs(source,[("GEN","Gen")],{})
+        self.assertEqual(result["original_p_position_class_counts"][
+            "original_p_nested_in_note"],1)
+        self.assertEqual(result["authorial_native_typed_paragraph_totals"][
+            "authorial_p_events"],1)
+        self.assertFalse(result["source_to_compiled_exact_paragraph_position_equivalence_verified"])
+        self.assertNotIn("PRIVATE",str(result))
+
+    def test_source_books_or_crosswalk_must_not_be_silently_dropped(self):
+        source=(b'<usfx><book id="GEN"><c id="1"/><p><v id="1"/>A</p>'
+                b'</book></usfx>')
+        with self.assertRaises(ParagraphAuditError):
+            compare_authored_native_paragraphs(source,[("GEN","Gen"),("EXO","Exod")],
+                                               {"Gen":1})
+        with self.assertRaises(ParagraphAuditError):
+            compare_authored_native_paragraphs(source,[("GEN","Gen")],
+                                               {"Other":1})
+        with self.assertRaises(ParagraphAuditError):
+            compare_authored_native_paragraphs(source,[("GEN","Gen"),("GEN","Exod")],
+                                               {"Gen":1})
+
+    def test_source_extra_paragraph_at_book_intro_is_tracked(self):
+        source=(b'<usfx><book id="GEN"><p>PRIVATE INTRO</p>'
+                b'<c id="1"/><p><v id="1"/>A</p></book></usfx>')
+        result=compare_authored_native_paragraphs(source,[("GEN","Gen")],
+                                                   {"Gen":1})
+        self.assertEqual(result["original_p_position_class_counts"][
+            "original_p_before_first_chapter"],1)
+        self.assertEqual(result["original_p_position_class_counts"][
+            "original_p_before_first_book_verse"],2)
+        self.assertEqual(result["first_per_book_mismatches_no_text"][0][
+            "signed_difference"],1)
+
+
+if __name__=="__main__":
+    unittest.main()
