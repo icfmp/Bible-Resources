@@ -90,9 +90,8 @@ class IndexCommandTests(unittest.TestCase):
         self.assertEqual(r["status"], "blocked_source_osis_native_verse_key_difference")
         self.assertEqual(r["comparison"]["source_references_unreachable_count"], 1)
 
-    def test_incorrect_declared_native_versification_blocks(self):
-        r = self.run_audit(self.reader(
-            registry="Synthetic\tAlpha\t1\t1\nSynthetic\tBeta\t1\t0\n"))
+    def test_incomplete_native_versification_registry_blocks(self):
+        r = self.run_audit(self.reader(registry="Synthetic\tAlpha\t1\t1\n"))
         self.assertEqual(r["status"], "blocked_source_osis_native_verse_key_difference")
 
     def test_report_integrity_blocks_wrong_receipts(self):
