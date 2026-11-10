@@ -77,6 +77,7 @@ class NativeMilestonePairAudit:
         self._total = Counter()
         self._per_tag = Counter()
         self._per_div_type = Counter()
+        self._per_book_native_paragraph_pairs = Counter()
         self._cross_book_examples = []
         self._classifications = Counter()
         self._bad_refs = {}
@@ -155,6 +156,8 @@ class NativeMilestonePairAudit:
                 self._per_tag[f"{tag}:paired"] += 1
                 if tag == "div":
                     self._per_div_type[_safe_div_type(start_type)] += 1
+                    if start_type == "x-p":
+                        self._per_book_native_paragraph_pairs[from_book] += 1
                 if from_book != book:
                     self._classifications["pair_spans_multiple_books_review_scope"] += 1
                     if len(self._cross_book_examples) < MAX_EXAMPLES:
@@ -172,11 +175,25 @@ class NativeMilestonePairAudit:
                     if key in self._stack:
                         index = self._stack.index(key)
                         nested_above = self._stack[index+1:]
-                        if any(other_tag == tag for other_tag, _identifier in nested_above):
-                            self._issue("same_tag_overlapping_milestone_ranges", ref)
+                        same_tag_above = [
+                            other for other in nested_above if other[0] == tag
+                        ]
+                        if same_tag_above:
+                            same_semantic_type_above = [
+                                other for other in same_tag_above
+                                if self._active.get(other, (None,None,None,None,None))[3]
+                                   == start_type
+                            ]
+                            if same_semantic_type_above:
+                                self._issue("same_tag_same_type_overlapping_milestones", ref)
+                            else:
+                                # Different generated div TYPE values can
+                                # represent distinct overlapping hierarchies
+                                # (x-p authorial vs x-milestone interverse).
+                                # Still requires source/editorial review.
+                                self._classifications[
+                                    "same_tag_different_type_interleaving_review"] += 1
                         else:
-                            # Overlap between DIFFERENT structural hierarchies
-                            # is permitted by OSIS; not an unpaired-ID finding.
                             self._classifications["different_tag_interleaving_diagnostic"] += 1
                         self._stack.pop(index)
                     else:
@@ -196,6 +213,10 @@ class NativeMilestonePairAudit:
                 else:
                     self._classifications["pairs_spanning_multiple_entries"] += 1
 
+    def native_x_p_pairs_by_book(self) -> dict[str,int]:
+        """Private typed original-stock paragraph counts, no ID or text."""
+        return dict(self._per_book_native_paragraph_pairs)
+
     def finish(self):
         dangling = Counter(tag for tag, _identifier in self._active)
         for tag, _identifier in self._active:
@@ -209,7 +230,7 @@ class NativeMilestonePairAudit:
                 "duplicate_active_sID",
                 "orphan_eID_without_matching_active_sID",
                 "matched_id_has_conflicting_types",
-                "same_tag_overlapping_milestone_ranges",
+                "same_tag_same_type_overlapping_milestones",
                 "active_id_missing_from_order_stack",
                 "unparseable_anonymous_TOP_fragment",
                 "unparseable_native_fragment",
