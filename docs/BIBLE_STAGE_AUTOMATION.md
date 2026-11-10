@@ -171,7 +171,7 @@ helper. Source and original SWORD binary never appear in the artifact.
 | --- | --- | --- |
 | 1. Edition / rights | Config field validation and official provider URL review | **Human** textual/edition identity, duplicate baseline, legal/notes/Strong rights |
 | 2. Originals | Bounded HTTPS acquisition, redirect allowlist, exact SHA-256 and safe source/SWORD ZIP preflight | Human verification of publisher source selection when first pinned |
-| 3. Authorial source | USFX/USFM source inventory; original OSIS schema/XSD and verse inventory | Source-format conversion parity when needed, complete title/notes/poetry and exact edition determination |
+| 3. Authorial source | Original USFX full source-native structure and verse inventory, exact pinned official USFX XSD; USFM source inventory; original OSIS XSD and verse inventory | Full authorial publisher-edition review, conversion parity if transformation is actually used |
 | 4. Native vs original | Actual native `RawText`/`zText` whole-corpus comparison for **USFX** with explicit book crosswalk; OSIS native index comparison | A generic USFM conversion and full OSIS→SWORD semantic comparator; edition/canon and source-only verse conflicts |
 | 5. Editorial structure | USFX numbered-note body/type/target **diagnostics** on the real native corpus | Word-position anchors, resolved source links, book introductions, poetry, Strong ordinals if present, authoritative signoff |
 | 6. Reader trial | Isolated standard SWORD ZIP installation and deterministic stock `diatheke` readbacks | Another independent reader and manual visual/parallel acceptance |
