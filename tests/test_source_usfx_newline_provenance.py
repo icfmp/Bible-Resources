@@ -117,7 +117,7 @@ class OriginalXmlNewlineProvenanceTests(unittest.TestCase):
             {"Gen.1.1": {5: frozenset({"PRIVATE_UNKNOWN_STYLE"})}},
             {"Gen.1.1": {5: frozenset()}},
             {"Gen.1.1": {5: frozenset({"text_within_paragraph_element"}),
-                         6: frozenset({"text_within_paragraph_element"})},
+                         6: frozenset({"text_within_paragraph_element"})}},
         ):
             with self.subTest(corrupted=bool(corrupted)), self.assertRaises(
                 StructuralWhitespaceError
