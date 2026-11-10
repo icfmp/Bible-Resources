@@ -20,6 +20,19 @@ from source_native_paragraph_counts import classify_prefatory_p_sfm
 from stable_sword_refs import KEY
 
 MAX_SOURCE_VERSE = 2 * 1024 * 1024
+SOURCE_NEWLINE_ORIGIN_LABELS = frozenset({
+    "tail_after_numbering_milestone",
+    "tail_after_poetry_element",
+    "tail_after_paragraph_element",
+    "tail_after_annotation_element",
+    "tail_after_inline_element",
+    "tail_after_other_or_unreviewed_element",
+    "text_within_poetry_element",
+    "text_within_paragraph_element",
+    "text_within_inline_element",
+    "text_within_other_or_unreviewed_element",
+})
+
 
 
 class SourceNewlineProvenanceError(ValueError):
