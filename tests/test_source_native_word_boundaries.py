@@ -62,7 +62,7 @@ class SourceNativeWordBoundaryTests(unittest.TestCase):
         self.assertEqual(counts["native_q_closes"],1)
         self.assertEqual(counts["same_kind_event_word_start_and_end_positions_match"],3)
         self.assertFalse(result["source_native_original_style_and_linebreak_fidelity_unverified"] is False)
-        for forbidden in ("PRIVATE", "alpha", "beta", "gamma", "delta", "line", "p1", "p2"):
+        for forbidden in ("PRIVATE", "alpha", "beta", "gamma", "delta", "sID=\\\"line\\\"", "p1", "p2"):
             self.assertNotIn(forbidden,str(result))
 
     def test_early_paragraph_closure_detected_even_if_counts_and_words_match(self):
