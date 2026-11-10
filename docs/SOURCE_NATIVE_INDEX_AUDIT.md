@@ -3,19 +3,19 @@
 Issue [#28](https://github.com/icfmp/Bible-Resources/issues/28) requires a
 repeatable source→compiled pipeline rather than hand-paired evidence.
 
-The read-only \`scripts/source_native_index_audit.py\` composes the existing
-**independent** \`source_osis_inventory.py\` and actual stock-engine
-\`sword_native_inventory.py\` producers, using the generic
-\`stable_sword_refs.py\` checker. This stage audits **only exact numbered
+The read-only `scripts/source_native_index_audit.py` composes the existing
+**independent** `source_osis_inventory.py` and actual stock-engine
+`sword_native_inventory.py` producers, using the generic
+`stable_sword_refs.py` checker. This stage audits **only exact numbered
 verse-key parity**. It does not fix or add missing verses.
 
 ## Use
 
 Start from a **separately validated source OSIS** and an actual isolated SWORD
-module tree containing a \`payload/\` directory. Compile the already-reviewed
+module tree containing a `payload/` directory. Compile the already-reviewed
 stock index inspector against a released libsword:
 
-\`\`\`sh
+```sh
 g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp \
   -o /private/sword-native-index -lsword
 python scripts/source_native_index_audit.py \
@@ -24,7 +24,7 @@ python scripts/source_native_index_audit.py \
   --module-id MODULE_ID \
   --native-index-binary /private/sword-native-index \
   --report /private/new-index-receipt.json
-\`\`\`
+```
 
 The report must not already exist and cannot be placed inside the compiled
 module. It includes the exact source OSIS SHA, independent source key digest,
