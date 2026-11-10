@@ -299,6 +299,9 @@ def main(argv=None) -> int:
     except (OSError,ValueError) as exc:
         parser.error("Failed to write safe checkpoint report: "+type(exc).__name__)
     print(f"Bible audit {args.resource_id}: stage {args.stage}/7 — {result['status']}")
+    if result["status"] == "BLOCKED":
+        for item in result["missing"][:3]:
+            print("BLOCKED:", item)
     return 1 if failed else 0
 
 
