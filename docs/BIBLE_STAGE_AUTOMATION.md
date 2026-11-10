@@ -380,6 +380,38 @@ relative event/order audit and editorial gate must still be reviewed
 before checking 4c or 4/7. Never patch source or hash pins just to pass
 a test.
 
+## Typed authorial `p` versus stock SWORD `x-p` — per-book research
+
+A complete numbered-text and correctly paired native-ID inventory is still
+insufficient to prove every original USFX paragraph survived conversion.
+The [documented osis2mod mapping](https://wiki.crosswire.org/Osis2mod)
+turns `p` into *typed* `div type="x-p"`; it also generates technical
+`div type="x-milestone"` wrappers. Never compare the source `p` total
+with **all** native `div` elements or claim the mere presence of a
+neighboring `div` proves an original paragraph was retained.
+
+The generic `source_native_paragraph_counts.py` audibly counts all
+authorial `p` nodes **per original book**, explicitly inventories
+those before the first book verse, before the chapter, at chapter starts
+and inside footnotes, then compares each with **exact `x-p` paired-ID
+counts in the stock SWORD original reader**. It outputs aggregate counts,
+one bounded per-book anomaly example for each mismatched book and a
+metadata-only deterministic book-distribution digest. No biblical words,
+source note bodies, arbitrary types, markup values or ZIPs are retained.
+
+Matching per-book counts are only **necessary**, never sufficient:
+paragraph event order, relative word position, source type semantics,
+verse-zero/non-numbered titles and paragraph start/end spans need
+independent source-grounded checks. A source/stock difference of exactly
+one paragraph per book is an **investigation finding**, not permission
+to insert invented paragraphs or waive the discrepancy.
+
+The simultaneous native overlap diagnostic distinguishes same-tag /
+same-type overlapping milestone ranges from same-tag / *different*
+type overlaps (`x-p` versus `x-milestone`). The latter are
+explicit review findings, not automatic proof of corruption or faithful
+markup. The **seven-stage progress and stage 4c gate remain unchanged**.
+
 ## Safety and publication separation
 
 - GitHub workflow uses `contents: read` for the audit job.
