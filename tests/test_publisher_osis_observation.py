@@ -1,13 +1,15 @@
 """Offline tests for guarded publisher OSIS observation and privacy."""
 import io
 import json
+from hashlib import sha256
+from unittest.mock import patch
 import sys
 import unittest
 from pathlib import Path
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from publisher_osis_observation import (
-    _source_config, _verified_url, _download, inspect_official_osis,
+    _source_config, _verified_url, _download, inspect_official_osis, observe,
     PublisherOSISObservationError,
 )
 
@@ -42,6 +44,23 @@ class PublisherOSISObservationTests(unittest.TestCase):
         cfg = _source_config("frajnd-2024")
         self.assertEqual(cfg["official_source_url"],URL)
         self.assertEqual(cfg["status"],"research_only")
+
+    def test_observe_checks_reviewed_sha_and_refuses_revised_source(self):
+        xml=example("a")
+        cfg={
+            "resource_id":"frajnd-2024",
+            "edition":"Synthetic publisher research only",
+            "official_source_url":URL,
+            "status":"research_only",
+            "sha256":sha256(xml).hexdigest(),
+            "size_bytes":len(xml),
+        }
+        with patch("publisher_osis_observation._source_config",return_value=cfg):
+            good=observe("frajnd-2024",opener=FakeOpener(xml))
+            self.assertTrue(good["source_sha256_pin_reverified"])
+            with self.assertRaisesRegex(
+                    PublisherOSISObservationError,"no longer matches reviewed"):
+                observe("frajnd-2024",opener=FakeOpener(example("b")))
 
     def test_reject_unapproved_urls_and_resource_ids(self):
         for x in (
