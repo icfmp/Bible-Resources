@@ -30,6 +30,7 @@ from native_milestone_pair_audit import NativeMilestonePairAudit
 from source_native_paragraph_counts import compare_authored_native_paragraphs, audit_usfx_book_prefaces
 from native_book_intro_screen import private_original_preface_text, NativeBookIntroScreen
 from source_native_layout_anchors import source_usfx_layout_start_anchors, compare_start_anchors
+from source_native_ordered_body import original_body_opening_sequences, compare_ordered_body_openings
 from stable_sword_refs import module_payload_digest
 from sword_native_raw_corpus_inventory import (
     inspect_native_raw_corpus, write_new_metadata_report,
@@ -378,6 +379,7 @@ def run_real_usfx_sword_text_probe(
     mapping = read_crosswalk(crosswalk)
     source_text, scope = authored_usfx_main_text(raw, mapping)
     source_layout = source_usfx_layout_start_anchors(raw, mapping)
+    source_body_openings, source_body_opening_counts = original_body_opening_sequences(raw, mapping)
     private_prefaces, checked_prefaces = private_original_preface_text(raw, mapping)
     source_note_attributes = {}
     source_notes, source_note_scope = collect_usfx_numbered_notes(
@@ -505,6 +507,11 @@ def run_real_usfx_sword_text_probe(
             "maintext_whitespace_patterns": whitespace_patterns.finish(),
             "native_raw_structural_markup_inventory": native_markup.finish(),
             "native_crossentry_milestone_pair_audit": native_pairs.finish(),
+            "source_native_ordered_body_kind_screen":
+                compare_ordered_body_openings(
+                    source_body_openings,
+                    native_pairs.private_ordered_body_openings(),
+                    source_body_opening_counts),
             "source_prefatory_p_structure_classification": checked_prefaces,
             "source_native_book_intro_preface_screen":
                 native_book_intro.finish(private_prefaces, checked_prefaces),
