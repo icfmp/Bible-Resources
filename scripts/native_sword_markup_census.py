@@ -95,6 +95,7 @@ class NativeMarkupCensus:
         self._native_structural_positions = Counter()
         self._native_endpoint_types = Counter()
         self._unknown_styles = 0
+        self._verse_refs_by_layout = {"div":set(), "line":set()}
 
     def observe(self, ref: str, parsed_root: etree._Element):
         if not REF.fullmatch(ref):
@@ -142,6 +143,11 @@ class NativeMarkupCensus:
             if len(self._samples[category]) < MAX_SAMPLE_REFS:
                 self._samples[category].append(ref)
         for element, position in _relative_word_positions(parsed_root):
+            kind = etree.QName(element).localname
+            if kind == "div":
+                self._verse_refs_by_layout["div"].add(ref)
+            if kind in {"l", "lg", "lb"}:
+                self._verse_refs_by_layout["line"].add(ref)
             tag = etree.QName(element).localname
             endpoint = _endpoint(element)
             style = _style(element.get("type", ""))
@@ -154,6 +160,12 @@ class NativeMarkupCensus:
             self._native_endpoint_types[f"{tag}:{endpoint}"] += 1
             self._native_structural_positions[
                 f"{tag}:{endpoint}:{position}"] += 1
+
+    def verse_refs_for(self, category: str) -> frozenset[str]:
+        """Private references for source/native co-occurrence diagnostics."""
+        if category not in self._verse_refs_by_layout:
+            raise ValueError("Unsupported native structural category")
+        return frozenset(self._verse_refs_by_layout[category])
 
     def finish(self):
         return {
