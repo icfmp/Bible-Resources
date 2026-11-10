@@ -78,6 +78,8 @@ class NativeMilestonePairAudit:
         self._per_tag = Counter()
         self._per_div_type = Counter()
         self._per_book_native_paragraph_pairs = Counter()
+        self._per_book_native_other_div_pairs = Counter()
+        self._other_div_pair_opening_positions = Counter()
         self._cross_book_examples = []
         self._classifications = Counter()
         self._bad_refs = {}
@@ -158,6 +160,13 @@ class NativeMilestonePairAudit:
                     self._per_div_type[_safe_div_type(start_type)] += 1
                     if start_type == "x-p":
                         self._per_book_native_paragraph_pairs[from_book] += 1
+                    elif _safe_div_type(start_type) == "other_unreviewed_type":
+                        self._per_book_native_other_div_pairs[from_book] += 1
+                        self._other_div_pair_opening_positions[
+                            "book_intro" if start_ref == from_book
+                            else "chapter_intro" if from_kind == "I"
+                            else "numbered_verse" if from_kind == "K"
+                            else "unclassified"] += 1
                 if from_book != book:
                     self._classifications["pair_spans_multiple_books_review_scope"] += 1
                     if len(self._cross_book_examples) < MAX_EXAMPLES:
@@ -217,6 +226,10 @@ class NativeMilestonePairAudit:
         """Private typed original-stock paragraph counts, no ID or text."""
         return dict(self._per_book_native_paragraph_pairs)
 
+    def native_other_div_pairs_by_book(self) -> dict[str,int]:
+        """Private original stock other-type div ranges per source book."""
+        return dict(self._per_book_native_other_div_pairs)
+
     def finish(self):
         dangling = Counter(tag for tag, _identifier in self._active)
         for tag, _identifier in self._active:
@@ -245,6 +258,8 @@ class NativeMilestonePairAudit:
             "native_numbered_intro_scan_counts": dict(sorted(self._total.items())),
             "native_milestone_tag_counts": dict(sorted(self._per_tag.items())),
             "paired_div_types_allowlisted": dict(sorted(self._per_div_type.items())),
+            "unknown_type_div_opening_location_classes": dict(
+                sorted(self._other_div_pair_opening_positions.items())),
             "cross_book_pair_reference_samples_no_ids": self._cross_book_examples,
             "different_tag_interleavings_are_diagnostic_not_nesting_defects": True,
             "native_milestone_pair_categories": dict(sorted(self._classifications.items())),
