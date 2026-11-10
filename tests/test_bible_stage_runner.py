@@ -12,7 +12,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
-from bible_intake import IntakeError, ProviderRedirects, acquire, fetch_pinned, load_manifest, _safe_url
+from bible_intake import IntakeError, ProviderRedirects, acquire, fetch_pinned, load_manifest, _safe_url, parse_audit_comment
 from bible_stage_runner import run_stage, _write_report, STAGES
 
 
@@ -90,6 +90,17 @@ class BibleIntakeTests(unittest.TestCase):
         redirect=ProviderRedirects("ebible")
         with self.assertRaises(IntakeError):
             redirect.redirect_request(None,None,302,"Move",{},"https://evil.example/a.zip")
+
+    def test_authenticated_comment_command_parser_is_strict(self):
+        self.assertEqual(parse_audit_comment("/bible-audit next-bible-1910 4"),
+                         ("next-bible-1910",4))
+        for command in ("/bible-audit ../outside 4",
+                        "/bible-audit safe 8",
+                        "/bible-audit safe 4; rm -rf /",
+                        "/bible-audit safe 4\\nother",
+                        "/bible-audit safe 04"):
+            with self.subTest(command=command),self.assertRaises(IntakeError):
+                parse_audit_comment(command)
 
     def test_streaming_download_and_hash_pinning(self):
         dest=self.folder/"source.zip"
