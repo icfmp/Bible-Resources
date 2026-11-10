@@ -30,6 +30,7 @@ on:
       - "scripts/native_sword_markup_census.py"
       - "scripts/native_milestone_pair_audit.py"
       - "scripts/source_native_paragraph_counts.py"
+      - "scripts/source_native_maintext_probe.py"
       - "tests/test_source_native_paragraph_counts.py"
       - "tests/test_native_milestone_pair_audit.py"
       - "scripts/source_native_layout_anchors.py"
