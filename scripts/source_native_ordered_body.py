@@ -168,8 +168,8 @@ def compare_ordered_body_openings(source_by_book, native_by_book, source_counts)
             and counts["books_with_body_opening_kind_difference"] == 0
         ),
         "first_mismatch_book_references_no_scripture":examples,
-        "only_source_authorial_mt_book_titles_excluded_from_body_sequence":True,
-        "source_title_elements_verified_in_separate_gate_not_here":False,
+        "explicit_prechapter_book_title_styles_separately_accounted_for":True,
+        "original_to_native_book_title_match_not_verified_by_this_screen":True,
         "source_native_exact_word_positions_or_boundary_spans_verified":False,
         "source_native_whitespace_or_full_editorial_layout_verified":False,
         "no_scripture_or_native_milestone_identifiers_in_report":True,
