@@ -9,22 +9,29 @@
 - **Title:** Louis Segond 1910
 - **Language:** French (`fr`)
 - **Category:** Bible; 66-book Protestant canon
-- **Work:** A French Protestant translation associated with Louis Segond; the 1910 revision must not be represented as his original unrevised text
+- **Work:** Louis Segond's French translation of the Hebrew and Greek Scriptures, in the **posthumously revised 1910 edition** issued by the British and Foreign Bible Society. The 1910 editors must not be presented as Louis Segond himself.
 - **Curated module:** `BRLSG1910` version `0.1.0` (Bible Resources)
 - **Versification:** SWORD `Segond` (standard installed registry)
-- **Reader introduction, draft:** A historical French Protestant Bible made available as a standard SWORD module. Bible Resources' first curated release retains the eBible source text and explicitly documents formatting and verse-index compromises. It is suitable for ongoing reading and review, but not certified as typographically identical to a particular printed copy.
-- **Strengths:** No editorially approved strengths have been added to the reader card yet.
-- **Points of attention:** See evidenced technical limitations below; this draft does not propose a theological rating.
+- **Reader introduction (`fr`, draft):** « La Bible Louis Segond 1910 est une édition révisée, publiée après la mort de Louis Segond, de sa traduction française de l'Ancien et du Nouveau Testament. Cette traduction historique, réalisée d'après l'hébreu et le grec, est proposée ici à partir de la source numérique eBible. Certaines particularités de présentation et de numérotation sont documentées ; le module n'est pas certifié identique à un exemplaire imprimé de 1910. »
+- **Strengths (factual candidates; pending approval):** Original translation from Hebrew and Greek (1910 title page); historically identifiable revised edition (1910 title and preface); underlying text declared public domain by eBible. These are documented features, not a ranking of translation accuracy.
+- **Points of attention (draft):** The edited 1910 text is not identical to Segond's unrevised work; this digitized SWORD release has the evidenced verse-index and layout limitations below. No theological rating is proposed.
 
 ## Three distinct provenance layers
 
 | Layer | Attested identity and provenance | Limitation |
 |---|---|---|
-| Original work and edition | Louis Segond 1910, French | Precise 1910 printed-edition comparison and editorial history are not certified |
+| Original work and edition | Louis Segond's translation, **1910 posthumously revised edition**, Paris, British and Foreign Bible Society; printed title and preface verified below | Exact word-for-word and typographical equivalence of the eBible digitization to the scanned 1910 printing has **not** been certified |
 | Acquired source | eBible `fraLSG`, publisher revision identified in the curated metadata as `2026-10-29`; source details and source hashes are recorded in the [release note](../releases/LSG-0.1.0.md) | Do not treat eBible's separately compiled NRSV-indexed SWORD package as the same curated binary |
 | Curated edition | Bible Resources `BRLSG1910` `0.1.0`, standard SWORD `RawText`, `OSIS` SourceType, `Segond` versification; [editorial record](../../modules/lsg-1910/EDITORIAL.md), [approved release](https://github.com/icfmp/Bible-Resources/releases/tag/lsg-0.1.0) | First, provisional publication; not exhaustive source-to-printed-page certification |
 
 **Rights:** eBible identifies the underlying translation as [Public Domain](https://ebible.org/fraLSG/copyright.htm). The rights and separate editorial approval of the curated resource are in [module metadata](../../modules/lsg-1910/metadata.json). That declaration does not independently authorize unrelated lexical enrichment, commentary or annotations.
+
+## Original 1910 printed-edition evidence (primary witness)
+
+- **Title page:** *La Sainte Bible ... par Louis Segond, docteur en théologie. Nouvelle édition revue avec parallèles*, Paris, 1910. [Digitized facsimile, printed page 1](https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/1); [full facsimile metadata](https://fr.wikisource.org/wiki/Fichier:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu).
+- **Publisher's original preface:** the [1910 *Avertissement*, printed page 3](https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/3) dates the original Old Testament and New Testament publications to 1873 and 1880 respectively, describes Segond's 1880 permission for posthumous editing, and attributes the proposed corrections to pastors and theology professors from France and Switzerland acting at the Society's request. It does **not** name every reviser.
+- **Editorial context, not an accusation:** the same 1910 preface states that its editors omitted certain earlier notes, including notes expressing theological opinions or commentary, consistent with the Society's editorial policy. It also explains the newly emphasized parallel-reference apparatus. This describes the **printed 1910 edition**, not a proven loss of particular notes during eBible→SWORD conversion.
+- **Limit of this witness:** a scan of a 1910 printing establishes its title and what its editors said; it does **not** establish complete character-by-character equivalence between that printing, eBible's `fraLSG` transcription and the curated `BRLSG1910` module. They remain separate provenance layers.
 
 ## Evidence-backed technical observations
 
@@ -63,10 +70,11 @@
 
 - [x] Curated SWORD 0.1.0 release identity, source hashes, rights evidence and first-publication review linked
 - [x] Documented, reader-relevant versification limitations separated from theological claims
-- [ ] Confirm historical printed-edition attribution and exact editorial/reviser history with primary evidence
-- [ ] Approve concise strengths with edition-specific sources, if any
+- [x] Confirm 1910 title page and *Avertissement* against a printed-edition facsimile; identify this as a posthumous revision and do not assume named individual revisers
+- [ ] Verify any more specific named-editor/revision attributions before publishing them
+- [ ] Approve or reject the source-backed concise factual strengths
 - [ ] Review contested variants with appropriate scholarly/primary material
-- [ ] Approve reader-facing summary and all displayed cautions separately from module `quality.status`
+- [ ] **Owner editorial approval pending:** approve reader-facing French introduction and each visible strength/caution separately from module `quality.status`
 - [ ] Decide how the application/catalogue represents approved profile revisions and retains attribution offline
 
 **Editorial rule:** the already-published 0.1.0 Scripture and its immutable release hashes are not changed by edits to this profile. See [resource profile evidence policy](../RESOURCE_PROFILES.md).
