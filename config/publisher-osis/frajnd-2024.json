@@ -2,5 +2,7 @@
   "resource_id": "frajnd-2024",
   "edition": "BPC JND 2024 revision 2.0 (public domain)",
   "official_source_url": "https://cdn.editeurbpc.com/bible/osis/JND/bible_jnd_2_0.xml",
-  "status": "research_only"
+  "status": "research_only",
+  "sha256": "2204629e3efb3024dceb392780ef5e61f4296ea832c90e3dd2a5c3224179c1d3",
+  "size_bytes": 9307610
 }
