@@ -53,12 +53,15 @@ g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp \
   -o /private/sword-native-index -lsword
 g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp \
   -o /private/sword-native-raw-corpus -lsword
+g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_entry.cpp \
+  -o /private/sword-native-raw-entry -lsword
 python scripts/source_native_maintext_probe.py \
   --source-usfx-zip /private/original-authorial-usfx.zip \
   --original-sword-zip /private/original-compiled-sword.zip \
   --crosswalk config/standard_usfm_osis_66.json \
   --native-index-inspector /private/sword-native-index \
   --native-raw-inspector /private/sword-native-raw-corpus \
+  --native-entry-inspector /private/sword-native-raw-entry \
   --report /private/new-maintext-metadata-only.json
 ```
 
@@ -94,3 +97,26 @@ source fidelity** even when some indexed verse characters match.
 
 No full edition or third-party text is authorized for public redistribution
 by the mere existence of this diagnostic.
+
+## Independent reader cross-check
+
+The full-corpus reader is independently anchored to a *second* exact-key
+native inspector in CI. Pass `--native-entry-inspector
+/private/sword-native-raw-entry` (build with `-lsword` from
+`scripts/sword_native_raw_entry.cpp`) for this additional proof.
+The report has
+`independent_native_exact_key_raw_spotcheck_verified`; when this is
+false, the raw stream's reference-to-text positioning is **not**
+independently certified. A historical cursor bug in PR #48 repeated the
+same first raw verse despite correct enumerated verse keys; the
+separately sampled exact-key check now rejects such a stream.
+
+The pinned WEBP run after fixing the cursor produced an **initial**
+diagnostic of 31,066 whitespace-only indexed source/compiled
+differences, 28 changed word-sequence classifications, 6 raw XML
+fragments requiring manual parser/markup review, 3 original references
+without native indexed slots, and 17 additional original authorial
+book sections. These are *diagnostic classifications, not statements
+that either publisher edition has an error or final same-edition
+fidelity clearance.* Review source revision identity and the unparsed
+fragments before interpreting differences editorially.
