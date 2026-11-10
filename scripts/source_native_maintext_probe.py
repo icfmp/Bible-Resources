@@ -31,6 +31,10 @@ from source_native_paragraph_counts import compare_authored_native_paragraphs, a
 from native_book_intro_screen import private_original_preface_text, NativeBookIntroScreen
 from source_native_layout_anchors import source_usfx_layout_start_anchors, compare_start_anchors
 from source_native_ordered_body import original_body_opening_sequences, compare_ordered_body_openings, OrderedStructureError
+from source_native_word_boundaries import (
+    BoundaryAuditError, NativeBodyBoundaries, original_usfx_body_boundaries,
+    compare_body_boundary_word_positions,
+)
 from stable_sword_refs import module_payload_digest
 from sword_native_raw_corpus_inventory import (
     inspect_native_raw_corpus, write_new_metadata_report,
@@ -378,6 +382,15 @@ def run_real_usfx_sword_text_probe(
     raw, publisher = read_source_xml(source_usfx_zip, source_format="usfx")
     mapping = read_crosswalk(crosswalk)
     source_text, scope = authored_usfx_main_text(raw, mapping)
+    try:
+        source_boundaries, source_boundary_counts = original_usfx_body_boundaries(
+            raw, mapping, source_text)
+        source_boundary_blocker = None
+    except BoundaryAuditError:
+        # A source that cannot be independently anchored is not equivalent
+        # to an empty source with matching layout. Keep its other audits.
+        source_boundaries, source_boundary_counts = None, None
+        source_boundary_blocker = "authorial_source_boundary_scope_unverified"
     source_layout = source_usfx_layout_start_anchors(raw, mapping)
     try:
         source_body_openings, source_body_opening_counts = original_body_opening_sequences(raw, mapping)
@@ -421,9 +434,19 @@ def run_real_usfx_sword_text_probe(
         native_markup = NativeMarkupCensus()
         native_pairs = NativeMilestonePairAudit()
         native_book_intro = NativeBookIntroScreen()
+        native_boundaries = NativeBodyBoundaries() if source_boundaries is not None else None
+        native_boundary_error = None
 
         def on_entry(kind, ref, bytes_):
+            nonlocal native_boundary_error
             native_pairs.observe(kind, ref, bytes_)
+            if native_boundaries is not None and native_boundary_error is None:
+                try:
+                    native_boundaries.observe(kind, ref, bytes_)
+                except BoundaryAuditError:
+                    # Never publish a third-party XML exception or silently
+                    # infer successful structural correspondence.
+                    native_boundary_error = "native_boundary_scope_unverified"
             native_book_intro.observe(kind, ref, bytes_)
             if kind == "I":
                 native_markup.observe_intro(ref, bytes_)
@@ -504,6 +527,31 @@ def run_real_usfx_sword_text_probe(
         exact = bool(source_text and len(native_keys) == len(source_text)
                      and not missing and counts["exact_semantic_characters"] == len(source_text)
                      and not counts["native_verse_without_same_indexed_source_key"])
+        if source_boundary_blocker is not None:
+            body_boundary = {
+                "schema_version":1, "status":source_boundary_blocker,
+                "all_mapped_book_p_q_start_end_word_ordinals_match":False,
+                "no_source_text_note_content_or_native_ids_exposed":True,
+            }
+        elif native_boundary_error is not None:
+            body_boundary = {
+                "schema_version":1, "status":native_boundary_error,
+                "all_mapped_book_p_q_start_end_word_ordinals_match":False,
+                "no_source_text_note_content_or_native_ids_exposed":True,
+            }
+        else:
+            try:
+                native_boundary_data, native_boundary_counts = native_boundaries.finish()
+                body_boundary = compare_body_boundary_word_positions(
+                    source_boundaries, native_boundary_data,
+                    source_boundary_counts, native_boundary_counts)
+            except BoundaryAuditError:
+                body_boundary = {
+                    "schema_version":1,
+                    "status":"source_native_boundary_comparison_unverified",
+                    "all_mapped_book_p_q_start_end_word_ordinals_match":False,
+                    "no_source_text_note_content_or_native_ids_exposed":True,
+                }
         comparison = {
             "status": ("all_mapped_numbered_maintext_characters_match_index_only"
                        if exact else "blocked_full_mapped_numbered_maintext_parity"),
@@ -525,6 +573,7 @@ def run_real_usfx_sword_text_probe(
             "maintext_whitespace_patterns": whitespace_patterns.finish(),
             "native_raw_structural_markup_inventory": native_markup.finish(),
             "native_crossentry_milestone_pair_audit": native_pairs.finish(),
+            "source_native_body_boundary_word_position_screen": body_boundary,
             "source_native_ordered_body_kind_screen": (
                 source_body_order_block if source_body_order_block is not None
                 else compare_ordered_body_openings(
