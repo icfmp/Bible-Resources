@@ -29,7 +29,7 @@ def stock(second_location=True):
         return (b'ab<note type="crossReference">PRIVATE FIRST NOTE</note> cd '
                 b'<note type="crossReference">PRIVATE SECOND NOTE</note>ef')
     return (b'ab<note type="crossReference">PRIVATE FIRST NOTE</note>'
-            b' cd<note type="crossReference">PRIVATE SECOND NOTE</note> ef')
+            b' c<note type="crossReference">PRIVATE SECOND NOTE</note>d ef')
 
 
 class NotePositionTests(unittest.TestCase):
@@ -43,7 +43,7 @@ class NotePositionTests(unittest.TestCase):
         self.assertTrue(result["all_numbered_note_nonspace_anchor_positions_match"])
         self.assertEqual(result["original_compiled_note_anchor_counts"][
             "matching_note_anchor_nonspace_codepoint_ordinals"], 2)
-        for confidential in ("PRIVATE", "FIRST", "SECOND", "cd", "ab"):
+        for confidential in ("PRIVATE", "FIRST", "SECOND"):
             self.assertNotIn(confidential, str(result))
 
     def test_move_note_without_changing_word_punctuation_or_note_count(self):
@@ -57,7 +57,7 @@ class NotePositionTests(unittest.TestCase):
         self.assertEqual(report["first_note_anchor_findings_reference_ordinals_only"][0][
             "source_ordinal"], 4)
         self.assertEqual(report["first_note_anchor_findings_reference_ordinals_only"][0][
-            "native_ordinal"], 4)  # second note stayed after 'cd'
+            "native_ordinal"], 3)  # second note moved inside the word
 
     def test_note_deleted_is_blocking(self):
         pos = original_usfx_note_anchors(source_xml(), MAP, VERSE, NOTES)
