@@ -40,7 +40,9 @@ class NativeMarkupCensusTests(unittest.TestCase):
         self.assertFalse(result["source_to_compiled_structure_fidelity_verified"])
         self.assertFalse(result["editorial_or_publication_approved"])
         self.assertNotIn("PRIVATE", str(result))
-        self.assertNotIn("x-q1", str(result))
+        self.assertEqual(result["native_structure_style_counts_allowlisted"]["milestone:x-q1"], 1)
+        self.assertNotIn("PRIVATE_CALLER", str(result))
+        self.assertNotIn("PRIVATE_TARGET", str(result))
 
     def test_other_element_and_attribute_values_are_never_leaked(self):
         inspector = NativeMarkupCensus()
