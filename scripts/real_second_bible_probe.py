@@ -109,7 +109,8 @@ def _reader_counts_by_order(keys_text: str) -> list[dict]:
 
 def inspect_real_source_and_native_reader(
     original_usfx_zip: Path, compiled_sword_zip: Path, native_inspector: Path,
-    crosswalk: Path | None = None, native_corpus_inspector: Path | None = None
+    crosswalk: Path | None = None, native_corpus_inspector: Path | None = None,
+    native_entry_inspector: Path | None = None
 ) -> dict:
     raw, original_receipt = read_source_xml(original_usfx_zip, source_format="usfx")
     original, original_groups = _source_counts_by_order(raw)
@@ -121,7 +122,8 @@ def inspect_real_source_and_native_reader(
         whole_corpus = (
             inspect_native_raw_corpus(
                 installed, original_conf["module_id"],
-                native_corpus_inspector, native_inspector)
+                native_corpus_inspector, native_inspector,
+                native_entry_binary=native_entry_inspector)
             if native_corpus_inspector is not None else None
         )
     engine_registry = parse_registry(registry, native["native_versification"])
@@ -212,6 +214,7 @@ def main() -> int:
     p.add_argument("--original-sword-zip", type=Path, required=True)
     p.add_argument("--native-inspector", type=Path, required=True)
     p.add_argument("--native-corpus-inspector", type=Path)
+    p.add_argument("--native-entry-inspector", type=Path)
     p.add_argument("--report", type=Path, required=True)
     args = p.parse_args()
     if args.report.exists() or args.report.is_symlink() or not args.report.parent.is_dir():
@@ -219,7 +222,8 @@ def main() -> int:
     try:
         result = inspect_real_source_and_native_reader(
             args.source_usfx_zip, args.original_sword_zip, args.native_inspector,
-            native_corpus_inspector=args.native_corpus_inspector)
+            native_corpus_inspector=args.native_corpus_inspector,
+            native_entry_inspector=args.native_entry_inspector)
     except (OSError, ValueError, zipfile.BadZipFile) as exc:
         p.error(str(exc))
     args.report.write_text(

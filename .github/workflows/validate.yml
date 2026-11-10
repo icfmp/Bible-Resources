@@ -9,6 +9,7 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -16,6 +17,7 @@ jobs:
           python-version: "3.12"
           cache: pip
       - name: Install dependencies and SWORD reader
+        timeout-minutes: 8
         run: |
           python -m pip install -r requirements.txt
           sudo apt-get update
@@ -63,11 +65,15 @@ jobs:
           g++ -std=c++17 -O2 -I/usr/include/sword \
             scripts/sword_native_raw_corpus.cpp \
             -o "${RUNNER_TEMP}/sword-native-raw-corpus" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_raw_entry.cpp \
+            -o "${RUNNER_TEMP}/sword-native-raw-entry" -lsword
           python scripts/sword_native_raw_corpus_inventory.py \
             --module-directory modules/lsg-1910 \
             --module-id BRLSG1910 \
             --native-raw-binary "${RUNNER_TEMP}/sword-native-raw-corpus" \
             --native-index-binary "${RUNNER_TEMP}/sword-native-index" \
+            --native-entry-binary "${RUNNER_TEMP}/sword-native-raw-entry" \
             --report "${RUNNER_TEMP}/lsg-entire-native-raw-corpus.json"
           python - <<'PY'
           import json, os
@@ -76,6 +82,8 @@ jobs:
           corpus = json.loads((root / "lsg-entire-native-raw-corpus.json").read_text())
           index = json.loads((root / "sword-native-index-proof.json").read_text())
           assert corpus["exact_all_occupied_native_keys_matched_independent_index"]
+          assert corpus["independent_native_exact_key_raw_spotcheck_verified"]
+          assert len(corpus["independent_native_exact_key_raw_spotcheck_refs"]) >= 2
           assert corpus["actual_occupied_numbered_entry_count"] == index["native_occupied_numbered_verse_count"]
           assert corpus["actual_occupied_intro_entry_count"] == index["native_occupied_verse_zero_intro_count"]
           assert corpus["actual_occupied_anonymous_top_entry_count"] == index["native_nonaddressable_populated_top_count"]
