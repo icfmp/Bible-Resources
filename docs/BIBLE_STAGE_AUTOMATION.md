@@ -725,6 +725,17 @@ For each numbered verse, the script:
   a preserved printed newline or a known-acceptable correction.
   Changed runs with **no p/q marker** also require review; they are
   not automatically assumed harmless.
+  The next cross-tab also separates **verse-start**, **verse-internal**
+  and **verse-end** whitespace changes for every marker class and
+  newline category. In particular, a source newline absent from
+  native verse text **without a p/q marker within a numbered verse**
+  receives a dedicated `unmarked_internal_source_newline_review`
+  category, while a source newline **at the end of a numbered verse**
+  without p/q markup is recorded as a different
+  `unmarked_source_verse_end_newline_candidate`. Neither is
+  automatically approved: an XML serialization newline is not
+  evidence of intended poetic linebreak, and an unmarked internal
+  newline still needs source/editorial investigation.
 - Existing source `p/q` typed-count, pairing, full book word order,
   character codepoint boundary, note and real SWORD native inspector
   checks remain independent. Synthetic regressions include missing
