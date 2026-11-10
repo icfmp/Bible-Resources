@@ -52,6 +52,42 @@ checks still apply**. For an edition without Strong's numbers, don't create
 them; record the Strong check as N/A, not as a passed lexical audit. A lack
 of source-level evidence is a blocker, never proof of equivalence.
 
+## Step 4/7: four bounded internal checkpoints (still ONE of seven stages)
+
+Experience with the second real Bible (BPC Darby 2024) showed that `4/7`
+is too heavy to execute, review, and troubleshoot as one indivisible pass.
+Keep **seven top-level stages**, but track four **internal subchecks** under
+the single existing stage-4 checkbox on each resource issue:
+
+| Subcheck | Evidence | Must be demonstrated before it can be checked |
+| --- | --- | --- |
+| **4a. Native module and reference registry** | Original stock ZIP, `.conf`, engine/native v11n, source↔native book mapping and every numbered key | Stable module identity and complete source/native index; no missing, duplicate, reordered or silently merged references |
+| **4b. Full-corpus numbered main text** | Original↔native every-verse words, punctuation, case and exact SHA-based provenance; excluded notes and headings counted independently | No undocumented non-whitespace differences; any exact character differences classified rather than auto-corrected |
+| **4c. Whitespace and structure triage** | Actual source/native newline and spaces, paragraph/poetry/intro markers, positions and cross-verse scope | No unexplained *material* loss; if a native representation differs, record precisely why and defer detailed editorial positioning to stage 5 |
+| **4d. Reuse-or-rebuild decision** | Exact upstream/module fingerprints, relevant test runs and documented differences/risks | Justified stock-module reuse or a separate, source-faithful rebuild plan; no exception invented for this edition, no owner publication approval implied |
+
+Only after **all four subchecks** have evidence may the parent issue's
+`4/7` checkbox be ticked. Individual internal successes can be recorded
+in the import issue without incrementing the `X/7` total. A subcheck can
+be `DONE`, `PARTIAL` or `BLOCKED`; preserve the evidence and report the
+next *one* concrete action. Prefer one small generic PR or read-only Action
+per independent issue rather than repeatedly modifying all four subchecks.
+
+**Boundary with step 5:** step 4 assesses integrity and suitability of the
+SWORD text/index package. It does **not** sign off all original note bodies,
+callers, lexical positions, explicit link targets, paragraph/poetry exact
+boundaries, or full verse-zero presentation: those detailed, source-relative
+editorial comparisons belong to **step 5/7**. A flagged risk in 4c must remain
+visible and block the *relevant* acceptance gate in 5, even when a limited
+step-4 SWORD text/index check can be approved.
+
+**Future editions:** use the same four subchecks for any translation and
+native `RawText`/`zText` driver, never add hard-coded Darby/Segond
+reference counts or re-label a legitimate source difference as a formatting
+fix. Additional internal breakdowns should be introduced **only when a
+repeatable bottleneck is demonstrated**; do not inflate the seven-stage
+workflow itself.
+
 ## One progress tracker — no mystery number of steps
 
 Create **one GitHub issue per Bible** using the
