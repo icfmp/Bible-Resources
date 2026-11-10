@@ -59,6 +59,7 @@ def source_usfx_layout_start_anchors(xml: bytes, mapping: list[tuple[str,str]]) 
         raise SourceLayoutError("Cannot parse original source for layout anchors") from exc
     totals = Counter()
     source_anchors = {"paragraph":set(), "poetry":set()}
+    private_start_events = []  # ref-only, never returned directly in stage report
     samples = {}
     hashers = {kind:sha256() for kind in source_anchors}
     unanchored = Counter()
@@ -96,6 +97,7 @@ def source_usfx_layout_start_anchors(xml: bytes, mapping: list[tuple[str,str]]) 
                 for kind, prior in pending:
                     totals[f"{kind}_start_events"] += 1
                     source_anchors[kind].add(ref)
+                    private_start_events.append((kind, prior, ref))
                     payload = f"{kind}:{prior or 'before_verse'}:{ref}".encode("ascii")
                     hashers[kind].update(len(payload).to_bytes(4,"big")+payload)
                     if len(samples.setdefault(kind, [])) < MAX_EXAMPLES:
@@ -108,6 +110,7 @@ def source_usfx_layout_start_anchors(xml: bytes, mapping: list[tuple[str,str]]) 
                     raise SourceLayoutError("Too many source layout markers")
                 pending.append(("paragraph" if tag=="p" else "poetry",last_ref))
         for kind, prior in pending:
+            private_start_events.append((kind,prior,None))
             unanchored[f"{kind}_without_later_numbered_verse"] += 1
             totals[f"{kind}_start_events_after_last_verse"] += 1
             if len(samples.setdefault(kind+"_trailing", [])) < MAX_EXAMPLES:
@@ -118,6 +121,7 @@ def source_usfx_layout_start_anchors(xml: bytes, mapping: list[tuple[str,str]]) 
         "original_usfx_sha256":sha256(xml).hexdigest(),
         "source_start_event_counts":dict(sorted(totals.items())),
         "source_start_ref_sets_private":source_anchors,
+        "source_start_events_private":private_start_events,
         "source_start_order_sha256":{
             k:v.hexdigest() for k,v in sorted(hashers.items())
         },
@@ -136,7 +140,33 @@ def compare_start_anchors(source:dict, native_census) ->dict:
     line = native_census.verse_refs_for("line")
     missing_para = sorted(para-div)
     missing_poetry = sorted(poetry-line)
+    adjacent = Counter()
+    prior_examples = {"paragraph":[], "poetry":[]}
+    neither_examples = {"paragraph":[], "poetry":[]}
+    # A source start belongs to the interval between two numbered verses;
+    # markers at either neighboring native slot may be related, but matching
+    # a neighbor cannot alone prove event type, order or exact word position.
+    for kind, preceding, following in source["source_start_events_private"]:
+        native = div if kind == "paragraph" else line
+        if following is not None and following in native:
+            adjacent[f"{kind}_native_marker_at_next_numbered_ref"] += 1
+        elif preceding is not None and preceding in native:
+            adjacent[f"{kind}_native_marker_at_previous_numbered_ref_only"] += 1
+            if len(prior_examples[kind]) < MAX_EXAMPLES:
+                prior_examples[kind].append({
+                    "previous_ref":preceding, "next_ref":following
+                })
+        else:
+            adjacent[f"{kind}_no_native_marker_at_either_neighbor"] += 1
+            if len(neither_examples[kind]) < MAX_EXAMPLES:
+                neither_examples[kind].append({
+                    "previous_ref":preceding, "next_ref":following
+                })
     return {
+        "interval_adjacency_coverage_not_equivalence":dict(sorted(adjacent.items())),
+        "sample_previous_neighbor_only_refs":prior_examples,
+        "sample_no_neighbor_marker_refs":neither_examples,
+        "source_adjacent_marker_matches_are_not_position_or_type_proof":True,
         "schema_version":1,
         "source_start_event_counts":source["source_start_event_counts"],
         "source_start_order_sha256":source["source_start_order_sha256"],
