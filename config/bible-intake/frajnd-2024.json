@@ -10,23 +10,24 @@
   "rights": {
     "status": "reviewed_for_research",
     "evidence_url": "https://editeurbpc.com/telechargements",
-    "note": "BPC declares its 2024 JND v2.0 edition Public Domain. Original annotations and any later lexical enrichment still need their own scope audit. Excludes separately revised 2026 DarbyR (CC BY-NC-ND). No redistribution permission asserted for uninspected third-party ZIP contents."
+    "note": "BPC identifies the 2024 JND v2.0 edition as Public Domain; source/notes still need audit. No external Strong data included. CrossWire FreJND is Strong-enriched, not proven identical to eBible. Hashes and stock conf observed in Actions run 42808540898; no release or derivative rights approval."
   },
   "source": {
     "format": "USFX",
     "url": "https://ebible.org/Scriptures/frajnd_usfx.zip",
-    "sha256": null
+    "sha256": "e9b5d0988edd38a69a0997162137524c2a113885d6c32b37a36398ab3124cfdb"
   },
   "sword": {
     "url": "https://ebible.org/sword/zip/frajnd2024eb.zip",
-    "sha256": null,
-    "module_id": null,
-    "driver": null,
+    "sha256": "4536eb58de99338aa5371578c472d9a9485e8f8d64d0fc76adf5ed8357810f65",
+    "module_id": "frajnd2024eb",
+    "driver": "zText",
     "sample_references": [
       "Gen 1:1",
       "Ps 23:1",
       "John 3:16"
-    ]
+    ],
+    "versification": "Luther"
   },
   "crosswalk": "config/standard_usfm_osis_66.json"
 }
