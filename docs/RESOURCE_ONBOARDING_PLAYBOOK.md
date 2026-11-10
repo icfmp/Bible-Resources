@@ -4,6 +4,18 @@ Status: **operational guidance, not a claim that all gates are automated**. This
 
 References: [First LSG release](releases/LSG-0.1.0.md), [full LSG research PR #24](https://github.com/icfmp/Bible-Resources/pull/24), [generalization backlog #28](https://github.com/icfmp/Bible-Resources/issues/28), [normalizer issue #3](https://github.com/icfmp/Bible-Resources/issues/3).
 
+## Operational checkpoint tracking for the next Bible
+
+Use the [seven-stage resumable Bible workflow](BIBLE_7_STAGE_WORKFLOW.md)
+**before starting a new edition**. It is the day-to-day sequence and issue
+progress tracker; the checklists below are detailed technical evidence
+requirements inside those seven stages, **not dozens of extra steps**.
+After each successful stage, record a GitHub issue checkpoint with the
+exact approved inputs, merged PR/commit, tests, remaining gaps and next
+action. Never mark a stage complete on a pending CI run or an unmerged
+branch. The full source→SWORD audit remains under development in
+[issue #28](https://github.com/icfmp/Bible-Resources/issues/28).
+
 ## Eight lessons that change our process
 
 1. **Upstream before rebuilding.** Compare the publisher's original text/USFM/OSIS, any publisher-compiled SWORD package and the candidate **before writing new conversion code**. In LSG, the original SWORD module preserved the same lexical alignments and note words. The measurable value of our rebuild was source-verse addressability and selective display compatibility, not new Bible wording.
@@ -30,7 +42,7 @@ References: [First LSG release](releases/LSG-0.1.0.md), [full LSG research PR #2
 - If input is USFM or USFX, apply a reviewed standards-based conversion and verify exact original verse keys, titles, paragraphs, poetry, note order and introductions.
 - For a separately validated original OSIS document, run **`scripts/source_osis_inventory.py`** to produce the edition-independent, SHA-bound authorial key list. It rejects duplicate, non-ordered, ranged or unclosed source verse milestones, but does not prove the USFM/USFX conversion or actual compiled reader inventory. See [SOURCE_OSIS_INVENTORY.md](SOURCE_OSIS_INVENTORY.md).
 - Independently inventory **actual native stock-SWORD occupied reader keys**, chapter ceilings and verse-zero intro keys with `scripts/sword_native_index.cpp` / `scripts/sword_native_inventory.py` against an isolated exact compiled payload. See [NATIVE_SWORD_INDEX_INVENTORY.md](NATIVE_SWORD_INDEX_INVENTORY.md). This is not a source text or note parity test.
-- Compare all source chapter/verse keys with the real compiled SWORD registry- Compare all source chapter/verse keys with the real compiled SWORD registry, including blank/omitted verses and the full verse-zero inventory.- Compare all source chapter/verse keys with the real compiled SWORD registry, including blank/omitted verses and the full verse-zero inventory. Distinguish source omission, alternate numbering, inaccessible key and actual missing data.
+- Compare source chapter/verse keys with actual compiled SWORD reader slots and registry, including empty/omitted verses and all verse-zero material. Distinguish source omission, alternative numbering, inaccessible keys and actual missing data.
 - Any unavoidable source-index merge must be documented in an explicit, edition-bound, reviewer-authorized, reversible manifest. LSG's one special Mark merge does not justify a universal merge rule.
 
 ### C. Compiled SWORD fidelity
@@ -58,7 +70,7 @@ References: [First LSG release](releases/LSG-0.1.0.md), [full LSG research PR #2
 | OSIS official schema guard, source audit, reversible layout normalizer | Implemented on main |
 | Manifest/rights validator, deterministic catalogue builder, SWORD smoke | Implemented on main; LSG 0.1.0 is approved and the Pages SWORD/JSON catalogue deployment succeeded |
 | Hash-locked first-release packaging and regressions | Implemented on main for the first RawText/Segond recipe |
-| Full source-to-stock-SWORD verse, lexical, note, layout audits | Tested on LSG research PR #24; NOT generic or on main |
+| Native SWORD reference-index, full-corpus raw scan and USFX/SWORD main-text diagnostics | Reusable, read-only tools now on main; tested on real LSG and WEBP sources, but not yet a complete source-to-release acceptance gate (#28) |\n| Note body/type/caller/explicit raw-target diagnostics | Available on main; actual positions, resolved reference targets, source-only note relocation and full editorial structure remain unverified (#28) |
 | Source-aware multi-reader end-to-end acceptance matrix | Partially manual, not yet a CI gate |
 | Generic zText/RawText source-to-published-module framework | Pending, tracked in #28 |
 
