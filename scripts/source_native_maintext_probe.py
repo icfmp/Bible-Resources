@@ -23,6 +23,7 @@ from lsg_source_compare import read_source_xml, scan_usfx
 from real_second_bible_probe import _safe_single_module
 from native_absorbed_verse_groups import inspect_absorbed_source_verse_groups
 from source_native_notes_audit import collect_usfx_numbered_notes, NoteAudit
+from source_native_note_positions import (original_usfx_note_anchors, NumberedNoteAnchorAudit)
 from source_native_scope import read_crosswalk
 from maintext_whitespace_patterns import MainTextWhitespacePatterns
 from native_sword_markup_census import NativeMarkupCensus
@@ -443,6 +444,9 @@ def run_real_usfx_sword_text_probe(
         raw, mapping, attributes_out=source_note_attributes)
     if not set(source_notes).issubset(source_text):
         raise MainTextParityError("Source note inventory includes unknown numbered verses")
+    original_note_anchor_positions = original_usfx_note_anchors(
+        raw, mapping, source_text, source_notes)
+    note_anchor_audit = NumberedNoteAnchorAudit(original_note_anchor_positions, source_text)
     note_audit = NoteAudit(source_notes, source_attributes=source_note_attributes)
     with tempfile.TemporaryDirectory(prefix="private-maintext-") as root:
         module = Path(root) / "original"
@@ -489,6 +493,8 @@ def run_real_usfx_sword_text_probe(
                 raise MainTextParityError("Duplicate native verse during compiled scan")
             native_keys.add(ref)
             note_audit.inspect(ref, bytes_)
+            if ref in source_text:
+                note_anchor_audit.observe(ref, bytes_)
             if ref not in source_text:
                 counts["native_verse_without_same_indexed_source_key"] += 1
                 return
@@ -717,6 +723,7 @@ def run_real_usfx_sword_text_probe(
             "source_book_scope": scope,
             "original_source_note_scope": source_note_scope,
             "private_numbered_source_native_note_body_diagnostic": note_audit.finish(),
+            "private_numbered_source_native_note_anchor_position_diagnostic": note_anchor_audit.finish(),
             "mapped_numbered_text_comparison": comparison,
             "source_only_verse_grouped_native_maintext_witness":
                 absorbed_group_witness,
