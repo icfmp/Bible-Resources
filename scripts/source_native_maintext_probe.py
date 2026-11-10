@@ -63,7 +63,10 @@ def authored_usfx_main_text(xml: bytes, mapping: list[tuple[str, str]]):
     Heading and note bodies are separately counted but NOT mixed into main
     Scripture. The complete authored source may include unmapped books.
     """
-    metadata, authored_keys = scan_usfx(xml)
+    try:
+        metadata, authored_keys = scan_usfx(xml)
+    except (etree.XMLSyntaxError, ValueError) as exc:
+        raise MainTextParityError("Malformed or unsupported original USFX XML") from exc
     if metadata["duplicate_verse_ids"] or metadata["nonstandard_verse_identifiers"]:
         raise MainTextParityError("Ambiguous authored USFX keys")
     root = _tree(xml, "usfx")
@@ -244,6 +247,8 @@ def compare_private_main_text(
                 "classification": classification,
                 "source_character_count": len(src),
                 "compiled_character_count": len(native),
+                "source_word_count": len(WORD.findall(src)),
+                "compiled_word_count": len(WORD.findall(native)),
                 "source_utf8_sha256": sha256(src.encode("utf-8")).hexdigest(),
                 "compiled_utf8_sha256": sha256(native.encode("utf-8")).hexdigest(),
             })
@@ -318,6 +323,8 @@ def run_real_usfx_sword_text_probe(
                     "native_ref": ref, "classification": category,
                     "source_character_count": len(authored),
                     "compiled_character_count": len(actual),
+                    "source_word_count": len(WORD.findall(authored)),
+                    "compiled_word_count": len(WORD.findall(actual)),
                     "source_utf8_sha256": sha256(authored.encode()).hexdigest(),
                     "compiled_utf8_sha256": sha256(actual.encode()).hexdigest(),
                 })
