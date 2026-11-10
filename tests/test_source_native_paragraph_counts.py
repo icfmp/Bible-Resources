@@ -71,6 +71,23 @@ class TypedParagraphBookTests(unittest.TestCase):
             compare_authored_native_paragraphs(source,[("GEN","Gen"),("GEN","Exod")],
                                                {"Gen":1})
 
+    def test_unmapped_extra_authorial_book_is_reported_not_silently_dropped(self):
+        raw=(b'<usfx><book id="GEN"><c id="1"/>'
+             b'<p><v id="1"/>PRIVATE MAPPED</p></book>'
+             b'<book id="GLO"><c id="1"/>'
+             b'<p><v id="1"/>PRIVATE EXTRA</p></book></usfx>')
+        result=compare_authored_native_paragraphs(raw,[("GEN","Gen")],
+                                                   {"Gen":1})
+        self.assertEqual(result["source_original_book_count"],2)
+        self.assertEqual(result["source_mapped_book_count"],1)
+        totals=result["authorial_native_typed_paragraph_totals"]
+        self.assertEqual(totals["unmapped_source_book_count"],1)
+        self.assertEqual(totals["unmapped_source_p_element_count"],1)
+        self.assertTrue(result["unmapped_original_book_scope_requires_separate_review"])
+        self.assertFalse(result["source_to_compiled_exact_paragraph_position_equivalence_verified"])
+        self.assertFalse(result["every_original_book_has_one_extra_p_vs_compiled"])
+        self.assertNotIn("PRIVATE",str(result))
+
     def test_source_extra_paragraph_at_book_intro_is_tracked(self):
         source=(b'<usfx><book id="GEN"><p>PRIVATE INTRO</p>'
                 b'<c id="1"/><p><v id="1"/>A</p></book></usfx>')
