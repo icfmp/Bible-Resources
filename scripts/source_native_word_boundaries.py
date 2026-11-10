@@ -356,6 +356,8 @@ def compare_body_boundary_word_positions(source, native, original_counts, native
                   "books_with_different_original_and_compiled_word_sequences"):
         counts.setdefault(field,0)
     complete=(len(source)>0 and set(source)==set(native)
+              and not counts["unaddressable_native_top_records"]
+              and not counts["native_body_container_without_milestone"]
               and not any(counts[k] for k in (
                   "opening_word_position_mismatches","closing_word_position_mismatches",
                   "event_kind_mismatches","events_with_boundary_inside_lexical_word",
@@ -374,6 +376,7 @@ def compare_body_boundary_word_positions(source, native, original_counts, native
         "word_position_only_not_character_punctuation_or_whitespace_fidelity":True,
         "source_native_verse_zero_intro_representation_review_still_required":True,
         "source_native_original_style_and_linebreak_fidelity_unverified":True,
+        "unaddressable_native_records_or_unmilestoned_body_blocks_cannot_pass":True,
         "no_source_text_note_content_or_native_ids_exposed":True,
         "originals_unchanged_no_publication":True,
     }
