@@ -35,7 +35,7 @@ class OriginalNativeBookIntroTests(unittest.TestCase):
         self.assertEqual(counts["text_detected_at_first_chapter_scope_only"],1)
         self.assertEqual(counts["native_book_div_type_book"],1)
         self.assertEqual(counts["preface_prose_exactly_equals_one_native_book_title"],1)
-        self.assertEqual(counts.get("preface_prose_in_intro_but_not_in_any_native_book_title",0),0)
+        self.assertEqual(counts["preface_prose_in_intro_but_not_in_any_native_book_title"],1)
         # An Exod chapter-one title is NOT a book-level title. The generic
         # receipt retains only the weaker chapter-one intro lexical evidence.
         self.assertFalse(result["source_native_prefatory_paragraph_position_parity_verified"])
