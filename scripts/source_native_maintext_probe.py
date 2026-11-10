@@ -213,6 +213,33 @@ def native_raw_main_text(raw: bytes) -> tuple[str, dict]:
     return "".join(chars), dict(excluded)
 
 
+def _tolerant_fragment_lexical_diagnostic(raw: bytes, authored: str) -> dict:
+    """Secondary lexical *diagnostic* for non-self-contained native markup.
+
+    HTMLParser can tokenize a malformed/unbalanced raw fragment; this is
+    never treated as proof of XML structure, notes or main-text fidelity.
+    Original authored and native words stay inside private memory.
+    """
+    from sword_missing_verse_witness import (
+        MissingVerseWitnessError, _tokens, native_main_tokens,
+    )
+    try:
+        native_words = native_main_tokens(raw)
+    except (MissingVerseWitnessError, UnicodeError, ValueError):
+        return {"status": "tolerant_token_reader_unavailable",
+                "lexical_fidelity_verified": False}
+    authored_words = _tokens(authored)
+    return {
+        "status": ("tolerant_word_sequence_matches_diagnostic_only"
+                   if native_words == authored_words
+                   else "tolerant_word_sequence_differs_diagnostic_only"),
+        "authored_word_count": len(authored_words),
+        "native_word_count": len(native_words),
+        "lexical_fidelity_verified": False,
+        "native_xml_structure_fidelity_verified": False,
+    }
+
+
 def _fold_whitespace(value: str) -> str:
     return " ".join(unicodedata.normalize("NFC", value).split())
 
@@ -346,6 +373,7 @@ def run_real_usfx_sword_text_probe(
         native_keys = set()
         counts = Counter()
         samples = {}
+        material = []
         skipped_native = Counter()
 
         def on_entry(kind, ref, bytes_):
@@ -362,6 +390,14 @@ def run_real_usfx_sword_text_probe(
                 actual, excluded = native_raw_main_text(bytes_)
             except MainTextParityError:
                 counts["native_raw_not_parseable_as_self_contained_xml"] += 1
+                diagnostic = _tolerant_fragment_lexical_diagnostic(
+                    bytes_, source_text[ref])
+                if len(material) < 60:
+                    material.append({
+                        "native_ref": ref,
+                        "classification": "native_raw_fragment_requires_review",
+                        "secondary_tolerant_lexical_diagnostic": diagnostic,
+                    })
                 _add_sample(samples, "native_raw_fragment_requires_review",
                             {"native_ref": ref,
                              "classification": "native_raw_fragment_requires_review"})
@@ -370,6 +406,17 @@ def run_real_usfx_sword_text_probe(
             authored = source_text[ref]
             category = _classify(authored, actual)
             counts[category] += 1
+            if (category in {
+                    "word_sequence_differs",
+                    "case_or_punctuation_differs_same_folded_words",
+                    "word_sequence_same_punctuation_or_spacing_differs",
+                    } and len(material) < 60):
+                material.append({
+                    "native_ref": ref,
+                    "classification": category,
+                    "source_word_count": len(WORD.findall(authored)),
+                    "native_word_count": len(WORD.findall(actual)),
+                })
             if category != "exact_semantic_characters":
                 _add_sample(samples, category, {
                     "native_ref": ref, "classification": category,
@@ -400,6 +447,13 @@ def run_real_usfx_sword_text_probe(
             "source_mapped_numbered_verse_count": len(source_text),
             "native_numbered_verse_count": len(native_keys),
             "classifications": dict(sorted(counts.items())),
+            "material_difference_metadata_no_scripture": material,
+            "material_differences_metadata_truncated": (
+                counts["word_sequence_differs"] +
+                counts["case_or_punctuation_differs_same_folded_words"] +
+                counts["word_sequence_same_punctuation_or_spacing_differs"] +
+                counts["native_raw_not_parseable_as_self_contained_xml"]
+            ) > len(material),
             "first_differences_no_scripture":
                 _prioritized_samples(samples, MAX_MISMATCHES),
             "first_source_only_refs": missing[:MAX_MISMATCHES],
