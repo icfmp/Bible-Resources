@@ -1,8 +1,8 @@
 # Louis Segond 1910 — reader-facing resource profile
 
-**DRAFT — READER TEXT REVIEWED, NOT YET APPROVED FOR APP/CATALOGUE PROFILE PUBLICATION**
+**EDITORIALLY APPROVED READER TEXT (2026-11-10) — NOT YET PUBLISHED TO APP/CATALOGUE**
 
-**Important distinction:** Bible Resources' SWORD module `BRLSG1910` **version 0.1.0 is already published and owner-approved as an initial reading edition**. The reader text was revised following the project owner's review on 2026-11-10; publication to app/catalogue, including evidence records for contested variants, remains gated separately. This draft status does not revoke or alter the release.
+**Important distinction:** Bible Resources' SWORD module `BRLSG1910` **version 0.1.0 is already published and owner-approved as an initial reading edition**. The project owner approved the short and long reader-facing French texts, including their stated strengths and points of attention, on 2026-11-10. The remaining machine catalogue/app integration, provenance and separate evidence checks are tracked in issue #37; this source document is not itself a live profile. This draft status does not revoke or alter the release.
 
 ## Présentation courte — bibliothèque (texte soumis à validation éditoriale)
 
@@ -125,9 +125,9 @@ Ces particularités sont documentées et ne constituent pas une modification des
 
 - [Avertissement des éditeurs de 1910](https://fr.wikisource.org/wiki/Bible_Segond_1910/Avertissement).
 - [Avant-propos de Louis Segond au Nouveau Testament (édition 1899)](https://fr.wikisource.org/wiki/Bible_Segond_1899/Avant-propos), pour la méthode critique déclarée par Segond ; ne pas confondre cette édition antérieure avec la révision de 1910.
-- [Texte eBible de 1 Timothée 3.16](https://ebible.org/pdf/fraLSG/fraLSG_1TI.pdf).
-- [Texte de la Segond 1910 en Actes 20.28](https://lire.la-bible.net/bible/LSG/ACT.20).
-- [Texte de la Segond 1910 en Jean 1.18](https://biblia.com/reference/Jn2.18-21?resourceName=lsg).
+- [Texte eBible de 1 Timothée 3.16](https://ebible.org/fraLSG/1TI03.htm).
+- [Texte eBible de la Segond 1910 en Actes 20.28](https://ebible.org/fraLSG/ACT20.htm).
+- [Texte eBible de la Segond 1910 en Jean 1.18](https://ebible.org/fraLSG/JHN01.htm).
 - [Comparaison de variantes en 1 Timothée 3.16 — NET Bible, note textuelle](https://classic.net.bible.org/passage.php?passage=1Ti+3%3A16).
 - [Source numérique eBible](https://ebible.org/Scriptures/details.php?id=fraLSG).
 - [Déclaration de domaine public](https://ebible.org/fraLSG/copyright.htm).
@@ -191,7 +191,7 @@ Ces particularités sont documentées et ne constituent pas une modification des
 - [x] Documented, reader-relevant versification limitations separated from theological claims
 - [x] Confirm 1910 title page and *Avertissement* against a printed-edition facsimile; identify this as a posthumous revision and do not assume named individual revisers
 - [ ] Verify any more specific named-editor/revision attributions before publishing them
-- [x] Project owner reviewed the reader-facing short and long wording, requesting removal of an interpretive conclusion about translator intent (2026-11-10). Publication remains gated below.
+- [x] Project owner explicitly approved the complete short and long reader presentations and their caution wording on 2026-11-10; the speculative translator-intent conclusion was removed. Public catalogue/app integration remains a separate task.
 - [ ] Review contested variants with appropriate scholarly/primary material
 - [ ] Complete edition-specific variant evidence review (including Greek witnesses and 1910 revision provenance), then explicitly approve the profile's machine/public display separately from the existing module `quality.status`
 - [ ] Decide how the application/catalogue represents approved profile revisions and retains attribution offline
