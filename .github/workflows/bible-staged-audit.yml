@@ -26,6 +26,10 @@ on:
       - "scripts/bible_intake.py"
       - "scripts/bible_stage_runner.py"
       - "scripts/maintext_fidelity_classification.py"
+      - "scripts/maintext_whitespace_patterns.py"
+      - "scripts/source_native_maintext_probe.py"
+      - "scripts/note_whitespace_diagnostics.py"
+      - "tests/test_maintext_whitespace_patterns.py"
       - "tests/test_maintext_fidelity_classification.py"
       - "scripts/source_usfx_structure.py"
       - "scripts/usfx_schema_gate.py"
@@ -86,6 +90,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_source_usfx_structure.py' -v
           python -m unittest discover -s tests -p 'test_usfx_schema_gate.py' -v
           python -m unittest discover -s tests -p 'test_maintext_fidelity_classification.py' -v
+          python -m unittest discover -s tests -p 'test_maintext_whitespace_patterns.py' -v
           python -c 'import os, sys; sys.path.insert(0, "scripts"); from bible_intake import load_manifest; m=load_manifest(os.environ["RESOURCE_ID"]); print("Reviewed research manifest:", m["resource_id"], m["purpose"], m["source"]["format"])'
       - name: Observe official eBible USFX schema fingerprint (research only, no auto-approval)
         if: github.event_name == 'pull_request'
