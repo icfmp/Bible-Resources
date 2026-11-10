@@ -42,3 +42,37 @@ What is **not** proved: the original source's separately addressable `14.24–26
 A positive word-run match is **evidence of lexical presence in a native raw entry**, not full text fidelity. The project still needs exact original-edition/revision provenance, authorial USFM/USFX→OSIS conversion fidelity, complete SWORD character/punctuation/word-ordinal/note body/anchor/explicit target/ordered structural boundary and verse-zero audits, and separate human/editorial and reader acceptance. No text is renumbered, merged, removed, introduced or authorised for publication by this experiment. Both the original public LSG 0.1.0 module and the public catalogue remain unchanged.
 
 See CrossWire's official [osis2mod](https://wiki.crosswire.org/Osis2mod) documentation for the *possible* append behavior with an out-of-versification source key. Its general behavior does not replace an **actual module readback**.
+
+## Follow-on: compare entire *group* of source verses, not isolated word runs
+
+The generic `scripts/native_absorbed_verse_groups.py` now takes the
+publisher's authorial USFX main-verse strings (already extracted and
+bound to the original archive), the **independently inventoried**
+native SWORD keys, and a bounded, privately captured mismatch
+readback from the corrected full raw-corpus pipeline.
+
+For each **consecutive same-chapter** source-only verse sequence
+immediately after an actually occupied native entry, it concatenates
+the original text from the preceding numbered authorial verse and
+**all** following source-only verses, then compares that entire authored
+word order against the actual SWORD reader's corresponding single
+native raw entry. It separately records exact Unicode characters,
+NFC-normalized characters, and whitespace-normalized characters;
+**word parity never implies punctuation or authorial numbering
+parity**. An unsupported interval, missing neighboring native entry,
+incomplete private capture or changed words remains blocked. No code
+creates a substitute native verse number, changes the original file or
+publishes full source/compiled text in logs.
+
+This is stronger than finding the source-only verse words as individual
+substrings: it can catch lost/duplicated/reordered text **between**
+the appended verses and the preceding native verse. However, it still
+does **not** verify separate source verse slots, note locations,
+original full-book headings/poetry, Strong attributes, editorial
+revision equality or redistribution rights. Report statuses cannot
+authorize release.
+
+The SHA-pinned independent real-WEBP zText workflow now emits
+**metadata-only grouped evidence** as part of the source-to-native
+main-text audit; exact proof classification must be read from the
+run rather than presumed.
