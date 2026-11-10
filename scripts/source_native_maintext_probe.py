@@ -28,6 +28,7 @@ from maintext_whitespace_patterns import MainTextWhitespacePatterns
 from native_sword_markup_census import NativeMarkupCensus
 from native_milestone_pair_audit import NativeMilestonePairAudit
 from source_native_paragraph_counts import compare_authored_native_paragraphs, audit_usfx_book_prefaces
+from native_book_intro_screen import private_original_preface_text, NativeBookIntroScreen
 from source_native_layout_anchors import source_usfx_layout_start_anchors, compare_start_anchors
 from stable_sword_refs import module_payload_digest
 from sword_native_raw_corpus_inventory import (
@@ -377,6 +378,7 @@ def run_real_usfx_sword_text_probe(
     mapping = read_crosswalk(crosswalk)
     source_text, scope = authored_usfx_main_text(raw, mapping)
     source_layout = source_usfx_layout_start_anchors(raw, mapping)
+    private_prefaces, checked_prefaces = private_original_preface_text(raw, mapping)
     source_note_attributes = {}
     source_notes, source_note_scope = collect_usfx_numbered_notes(
         raw, mapping, attributes_out=source_note_attributes)
@@ -398,9 +400,11 @@ def run_real_usfx_sword_text_probe(
         whitespace_patterns = MainTextWhitespacePatterns()
         native_markup = NativeMarkupCensus()
         native_pairs = NativeMilestonePairAudit()
+        native_book_intro = NativeBookIntroScreen()
 
         def on_entry(kind, ref, bytes_):
             native_pairs.observe(kind, ref, bytes_)
+            native_book_intro.observe(kind, ref, bytes_)
             if kind == "I":
                 native_markup.observe_intro(ref, bytes_)
                 return
@@ -501,7 +505,9 @@ def run_real_usfx_sword_text_probe(
             "maintext_whitespace_patterns": whitespace_patterns.finish(),
             "native_raw_structural_markup_inventory": native_markup.finish(),
             "native_crossentry_milestone_pair_audit": native_pairs.finish(),
-            "source_prefatory_p_structure_classification": audit_usfx_book_prefaces(raw, mapping),
+            "source_prefatory_p_structure_classification": checked_prefaces,
+            "source_native_book_intro_preface_screen":
+                native_book_intro.finish(private_prefaces, checked_prefaces),
             "source_native_typed_paragraph_book_comparison":
                 compare_authored_native_paragraphs(
                     raw, mapping, native_pairs.native_x_p_pairs_by_book()),
