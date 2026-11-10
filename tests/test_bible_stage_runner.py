@@ -153,12 +153,14 @@ class BibleIntakeTests(unittest.TestCase):
         self.assertEqual(result["status"],"REVIEW_REQUIRED")
         self.assertTrue(any("Rights" in x for x in result["missing"]))
 
-    def test_provisional_real_intake_stage_one_never_fetches_without_sha_pins(self):
+    def test_provisional_stage_one_never_fetches_without_sha_pins(self):
+        # A fixture deliberately left unpinned in memory, independent of a
+        # real import's progress from observation to approved fingerprints.
         manifest = load_manifest("frajnd-2024")
-        self.assertIsNone(manifest["source"]["sha256"])
-        self.assertIsNone(manifest["sword"]["sha256"])
-        self.assertIsNone(manifest["sword"]["module_id"])
-        self.assertIsNone(manifest["sword"]["driver"])
+        manifest["source"]["sha256"] = None
+        manifest["sword"]["sha256"] = None
+        manifest["sword"]["module_id"] = None
+        manifest["sword"]["driver"] = None
         with patch("bible_stage_runner.acquire", side_effect=AssertionError("Network must not be attempted")) as fetch:
             stage_one = run_stage(manifest, 1, self.folder)
             stage_two = run_stage(manifest, 2, self.folder)
