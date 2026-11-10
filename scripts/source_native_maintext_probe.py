@@ -21,6 +21,7 @@ from lxml import etree
 
 from lsg_source_compare import read_source_xml, scan_usfx
 from real_second_bible_probe import _safe_single_module
+from native_absorbed_verse_groups import inspect_absorbed_source_verse_groups
 from source_native_scope import read_crosswalk
 from stable_sword_refs import module_payload_digest
 from sword_native_raw_corpus_inventory import (
@@ -374,6 +375,7 @@ def run_real_usfx_sword_text_probe(
         counts = Counter()
         samples = {}
         material = []
+        privately_captured_mismatch_text = {}
         skipped_native = Counter()
 
         def on_entry(kind, ref, bytes_):
@@ -406,6 +408,12 @@ def run_real_usfx_sword_text_probe(
             authored = source_text[ref]
             category = _classify(authored, actual)
             counts[category] += 1
+            # Keep bounded unmatched *actual* Bible prose in private memory,
+            # never in JSON or CI. A later scoped checker can test whether
+            # missing numbered source verses were appended to this slot.
+            if (category == "word_sequence_differs"
+                    and len(privately_captured_mismatch_text) < 60):
+                privately_captured_mismatch_text[ref] = actual
             if (category in {
                     "word_sequence_differs",
                     "case_or_punctuation_differs_same_folded_words",
@@ -438,6 +446,8 @@ def run_real_usfx_sword_text_probe(
             raise MainTextParityError("Original publisher archive changed during audit")
         missing = sorted(set(source_text) - native_keys)
         counts["source_verses_without_native_indexed_entry"] = len(missing)
+        absorbed_group_witness = inspect_absorbed_source_verse_groups(
+            source_text, native_keys, privately_captured_mismatch_text)
         exact = bool(source_text and len(native_keys) == len(source_text)
                      and not missing and counts["exact_semantic_characters"] == len(source_text)
                      and not counts["native_verse_without_same_indexed_source_key"])
@@ -482,6 +492,8 @@ def run_real_usfx_sword_text_probe(
                 corpus["independent_native_exact_key_raw_spotcheck_verified"],
             "source_book_scope": scope,
             "mapped_numbered_text_comparison": comparison,
+            "source_only_verse_grouped_native_maintext_witness":
+                absorbed_group_witness,
             "source_usfx_to_osis_conversion_verified": False,
             "exact_publisher_revision_identity_verified": False,
             "full_original_source_including_extra_books_and_intros_verified": False,
