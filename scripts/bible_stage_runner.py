@@ -185,6 +185,14 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
             missing.append("Source/native paragraph/poetry opening or closing word ordinals remain different or unverified; see private-structure diagnostic")
         else:
             missing.append("No independent source/native paragraph/poetry start-and-end word position result")
+        scope_triage = rows.get("source_native_body_record_scope_triage", {})
+        if scope_triage.get("status") == "record_scope_candidate_classification_requires_editorial_review":
+            verified.append("All source/native record-scope shifts classified at original word/verse boundaries as candidates only")
+            missing.append("Candidate source/native prior/next verse and intro serialization rules require editorial verification; no layout equivalence signoff")
+        elif scope_triage.get("status") == "some_record_scope_shifts_remain_unclassified":
+            missing.append("Some source/native paragraph/poetry record-scope shifts are nonadjacent or ambiguous despite matching word ordinals")
+        else:
+            missing.append("Source/native p/q record-scope classification could not run; prerequisite/source mapping unverified")
         body_order = rows.get("source_native_ordered_body_kind_screen", {})
         if body_order.get("status") == "blocked_original_authorial_source_scope_or_structure":
             missing.append("Source-native p/q ordered event check explicitly BLOCKED by original book/structure scope; do not infer matching order")

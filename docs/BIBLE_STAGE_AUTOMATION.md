@@ -589,6 +589,54 @@ audits. Only reviewed machine checks may be treated as mechanically
 verified; the human acceptance, stage 5 and publication gates remain
 independent. This is generic and not tailored to the 66-book Darby source.
 
+## Stage 4c — authored verse boundaries versus compiled record anchors
+
+`scripts/source_native_record_scope_triage.py` follows the independently
+verified source-to-compiled **9,089 p/q opening+closing word positions**.
+A source USFX structural marker may be serialized after a preceding
+`v/ve` verse milestone while compiled SWORD places the identical
+book-word boundary in the following numbered key or chapter intro.
+
+The new *reusable* classifier reconstructs actual original verse start/end
+**lexical ordinals** from all original indexed source-verse characters and
+checks the exact original book word stream for consistency. It analyzes
+both opening and closing endpoints, separately, and never executes when
+the source/native book/word/start+end structural prerequisite failed:
+
+- Distinguishes identical source/native references, the same reference
+  with differing source-versus-native *scope tags*, original preceding
+  versus compiled following numbered verses (and vice versa), actual
+  book/chapter/verse-zero intro aliases, and source book-title boundaries.
+  A shift across the same **authored interverse word boundary** is
+  classified as a **possible encoding representation**, *not* an approved
+  transformation.
+- Keeps every unknown/ambiguous case visible: different serialized
+  entry inside an authored verse, record names outside the immediate
+  original word-boundary neighbors, or source zero-word/empty verses
+  that make verse ownership ambiguous. Such evidence remains for
+  investigation rather than being force-matched.
+- Counts per-category **open and close** events and number of structural
+  pairs with any record/scope discrepancy. Only up to 32 canonical
+  book/verse IDs, event indices and **integer lexical ordinals** may
+  appear in the resulting report; source Scripture, punctuation, notes,
+  title words and original native-generated `sID/eID` values never do.
+  A stable hash of metadata-only difference coordinates permits
+  reproducible unchanged-source checks.
+- **Do not silently approve the 9,083 originally observed
+  different-scope pairs** merely because the lexical ordinal matches.
+  This audit establishes which shifts can be *explained as candidates*
+  by original authorial `v/ve` boundaries; it cannot establish exact
+  spaces/newlines/punctuation, word-relative character offsets or
+  graphical reader layout. Those require independent checks.
+  Editorial source→compiled equivalence and publication remain
+  reviewer-controlled gates.
+
+Generic corruption fixtures include a moved native marker inside an
+original verse, a nonadjacent key, a zero-word verse, a mislabeled
+original reference, a swapped structural kind, changed word positions
+and a conflicting original verse-key order. No Darby-specific
+counting rule, source change or compiler normalization is introduced.
+
 ## Safety and publication separation
 
 - GitHub workflow uses `contents: read` for the audit job.

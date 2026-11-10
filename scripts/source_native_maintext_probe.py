@@ -35,6 +35,9 @@ from source_native_word_boundaries import (
     BoundaryAuditError, NativeBodyBoundaries, original_usfx_body_boundaries,
     compare_body_boundary_word_positions,
 )
+from source_native_record_scope_triage import (
+    ScopeTriageError, compare_body_record_scopes,
+)
 from stable_sword_refs import module_payload_digest
 from sword_native_raw_corpus_inventory import (
     inspect_native_raw_corpus, write_new_metadata_report,
@@ -552,6 +555,31 @@ def run_real_usfx_sword_text_probe(
                     "all_mapped_book_p_q_start_end_word_ordinals_match":False,
                     "no_source_text_note_content_or_native_ids_exposed":True,
                 }
+        # A word-position-equal structure can be serialized in a prior
+        # USFX verse but a following native SWORD verse/intro. Classify the
+        # *original* authored verse-boundary geometry, rather than treating
+        # all differing record names as 9,083 arbitrary editorial errors.
+        # The private source/native scanners are the only inputs. Never
+        # accept a record-shift interpretation if actual word positions
+        # failed the independently run start+end comparison.
+        if body_boundary.get("all_mapped_book_p_q_start_end_word_ordinals_match") is True:
+            try:
+                body_record_scope = compare_body_record_scopes(
+                    source_boundaries, native_boundary_data, source_text)
+            except ScopeTriageError:
+                body_record_scope = {
+                    "schema_version":1,
+                    "status":"blocked_original_verse_boundaries_or_native_record_scope",
+                    "source_to_native_record_scope_equivalence_verified":False,
+                    "no_scripture_or_native_identifier_values_in_report":True,
+                }
+        else:
+            body_record_scope = {
+                "schema_version":1,
+                "status":"blocked_prerequisite_source_native_p_q_word_boundaries",
+                "source_to_native_record_scope_equivalence_verified":False,
+                "no_scripture_or_native_identifier_values_in_report":True,
+            }
         comparison = {
             "status": ("all_mapped_numbered_maintext_characters_match_index_only"
                        if exact else "blocked_full_mapped_numbered_maintext_parity"),
@@ -574,6 +602,7 @@ def run_real_usfx_sword_text_probe(
             "native_raw_structural_markup_inventory": native_markup.finish(),
             "native_crossentry_milestone_pair_audit": native_pairs.finish(),
             "source_native_body_boundary_word_position_screen": body_boundary,
+            "source_native_body_record_scope_triage": body_record_scope,
             "source_native_ordered_body_kind_screen": (
                 source_body_order_block if source_body_order_block is not None
                 else compare_ordered_body_openings(
