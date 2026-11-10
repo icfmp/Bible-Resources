@@ -15,6 +15,9 @@ on:
       - tests/test_sword_native_raw_corpus_inventory.py
       - scripts/source_native_maintext_probe.py
       - tests/test_source_native_maintext_probe.py
+      - scripts/source_native_notes_audit.py
+      - tests/test_source_native_notes_audit.py
+      - docs/SOURCE_NATIVE_NOTES_AUDIT.md
       - scripts/native_absorbed_verse_groups.py
       - tests/test_native_absorbed_verse_groups.py
   workflow_dispatch:
@@ -197,6 +200,14 @@ jobs:
           scope = report["source_book_scope"]
           comparison = report["mapped_numbered_text_comparison"]
           classes = comparison["classifications"]
+          notes = report["private_numbered_source_native_note_body_diagnostic"]
+          assert notes["source_numbered_note_count"] >= 0
+          assert notes["classifications"]["both_without_numbered_notes"] > 0
+          assert not notes["source_note_body_exact_full_parity_verified"]
+          assert not notes["source_note_callers_anchors_types_and_crossreference_targets_verified"]
+          assert not notes["published_or_editorially_approved"]
+          assert not report["original_source_note_scope"][
+              "source_note_caller_type_anchor_reference_target_verified"]
           assert report["independent_native_whole_corpus_scan_completed"]
           assert report["independent_native_exact_key_raw_spotcheck_verified"]
           assert report["module_native_driver"] == "zText"
@@ -236,6 +247,10 @@ jobs:
           ])
           print("Unresolved source-only refs:", groups.get("unresolved_source_verse_refs", []))
           print("Whole-corpus source/native indexed main text classifications:", classes)
+          print("Original source/native numbered note BODY diagnostic:", notes["classifications"])
+          print("Source note count:", notes["source_numbered_note_count"])
+          print("Native parseable numbered note count:", notes["native_parseable_numbered_note_count"])
+          print("Note findings (IDs/counts only):", notes["first_findings_without_note_text"][:8])
           print("Numeric-only first mismatch examples:", [
               (row["native_ref"], row["classification"],
                row.get("source_character_count"), row.get("compiled_character_count"),

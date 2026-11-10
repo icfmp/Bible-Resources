@@ -22,6 +22,7 @@ from lxml import etree
 from lsg_source_compare import read_source_xml, scan_usfx
 from real_second_bible_probe import _safe_single_module
 from native_absorbed_verse_groups import inspect_absorbed_source_verse_groups
+from source_native_notes_audit import collect_usfx_numbered_notes, NoteAudit
 from source_native_scope import read_crosswalk
 from stable_sword_refs import module_payload_digest
 from sword_native_raw_corpus_inventory import (
@@ -365,6 +366,10 @@ def run_real_usfx_sword_text_probe(
     raw, publisher = read_source_xml(source_usfx_zip, source_format="usfx")
     mapping = read_crosswalk(crosswalk)
     source_text, scope = authored_usfx_main_text(raw, mapping)
+    source_notes, source_note_scope = collect_usfx_numbered_notes(raw, mapping)
+    if not set(source_notes).issubset(source_text):
+        raise MainTextParityError("Source note inventory includes unknown numbered verses")
+    note_audit = NoteAudit(source_notes)
     with tempfile.TemporaryDirectory(prefix="private-maintext-") as root:
         module = Path(root) / "original"
         conf = _safe_single_module(original_sword_zip, module)
@@ -384,6 +389,7 @@ def run_real_usfx_sword_text_probe(
             if ref in native_keys:
                 raise MainTextParityError("Duplicate native verse during compiled scan")
             native_keys.add(ref)
+            note_audit.inspect(ref, bytes_)
             if ref not in source_text:
                 counts["native_verse_without_same_indexed_source_key"] += 1
                 return
@@ -491,6 +497,8 @@ def run_real_usfx_sword_text_probe(
             "independent_native_exact_key_raw_spotcheck_verified":
                 corpus["independent_native_exact_key_raw_spotcheck_verified"],
             "source_book_scope": scope,
+            "original_source_note_scope": source_note_scope,
+            "private_numbered_source_native_note_body_diagnostic": note_audit.finish(),
             "mapped_numbered_text_comparison": comparison,
             "source_only_verse_grouped_native_maintext_witness":
                 absorbed_group_witness,
