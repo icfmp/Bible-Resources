@@ -230,6 +230,18 @@ whitespace-only. The report is included in the metadata-only stage-4 Action
 receipt. This enables a precise decision about whether boundary trimming is
 a stock compiler behavior or whether source-internal layout was altered.
 
+The separate `scripts/native_sword_markup_census.py` also inspects the
+**actual safely parsed raw SWORD XML entries** in the existing private
+full-corpus pass. It counts known original compiled XML tags, attributes by
+**name only**, paragraph/line/poetry/milestone/title/note/reference groups,
+and how many numbered verse entries contain each group. Unknown tag and
+attribute names are reported as counts only; original attributes (including
+note callers and raw reference targets), Scripture and raw XML are never
+uploaded. The markups recorded here describe **compiled evidence**, not a
+claim that an authored USFX `q` or `p` was preserved with the same
+boundaries or position. Cross-verse structures and verse-zero introductions
+still need their own audit and manual editorial review.
+
 **Stage 4 stays `PARTIAL`** while any original whitespace/layout remains
 unverified, including when all words and punctuation match. Stage 5 must
 evaluate editorial paragraphs/poetry and note caller/anchor/target parity.
