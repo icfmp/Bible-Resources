@@ -37,7 +37,10 @@ def _fold(value):
     return " ".join(unicodedata.normalize("NFC", value).split())
 
 
-def collect_usfx_numbered_notes(xml: bytes, mapping: list[tuple[str, str]]) -> tuple[dict, dict]:
+def collect_usfx_numbered_notes(
+    xml: bytes, mapping: list[tuple[str, str]],
+    *, attributes_out: dict | None = None,
+) -> tuple[dict, dict]:
     """Inventory notes by source verse without merging or inventing verse IDs.
 
     Count notes outside numbered verses separately. No content escapes.
@@ -94,6 +97,17 @@ def collect_usfx_numbered_notes(xml: bytes, mapping: list[tuple[str, str]]) -> t
                     extra["notes_outside_numbered_verses"] += 1
                 else:
                     notes.setdefault(active, []).append((tag, body))
+                    if attributes_out is not None:
+                        attributes_out.setdefault(active, []).append({
+                            "source_tag": tag,
+                            "caller": node.get("caller"),
+                            "explicit_targets": tuple(
+                                child.get("tgt") for child in node.iterdescendants()
+                                if isinstance(child.tag, str)
+                                and etree.QName(child).localname == "ref"
+                                and child.get("tgt")
+                            ),
+                        })
                 return
             if (tag in USFX_HEAD or tag in USFX_LABELS or
                     (tag == "p" and style in USFX_SPEAKER_P_STYLES)):
@@ -131,7 +145,9 @@ def collect_usfx_numbered_notes(xml: bytes, mapping: list[tuple[str, str]]) -> t
     }
 
 
-def parse_native_numbered_notes(raw: bytes) -> list[tuple[str, str]]:
+def parse_native_numbered_notes(
+    raw: bytes, *, attributes_out: list | None = None,
+) -> list[tuple[str, str]]:
     """Strict raw XML; reject non-self-contained fragments, never repair them."""
     if len(raw) > MAX_VERSE or b"<!DOCTYPE" in raw.upper() or b"<?xml" in raw.lower():
         raise NoteEvidenceError("Untrusted or oversized native raw fragment")
@@ -151,6 +167,18 @@ def parse_native_numbered_notes(raw: bytes) -> list[tuple[str, str]]:
             if len(body.encode("utf-8")) > MAX_VERSE:
                 raise NoteEvidenceError("Oversized native note")
             out.append(("note", body))
+            if attributes_out is not None:
+                attributes_out.append({
+                    "osis_type": node.get("type"),
+                    "n": node.get("n"),
+                    "explicit_targets": tuple(
+                        child.get("osisRef") for child in node.iterdescendants()
+                        if isinstance(child.tag, str)
+                        and etree.QName(child).localname == "reference"
+                        and child.get("osisRef")
+                        and child.get("type") != "annotateRef"
+                    ),
+                })
             if len(out) > MAX_NOTES:
                 raise NoteEvidenceError("Too many native notes")
     return out
@@ -159,8 +187,20 @@ def parse_native_numbered_notes(raw: bytes) -> list[tuple[str, str]]:
 class NoteAudit:
     """Bounded private comparison; no original note content in result."""
 
-    def __init__(self, source_notes: dict[str, list[tuple[str, str]]]):
+    def __init__(
+        self, source_notes: dict[str, list[tuple[str, str]]],
+        *, source_attributes: dict | None = None,
+    ):
         self.source_notes = source_notes
+        self.source_attributes = source_attributes
+        if source_attributes is not None:
+            if set(source_attributes) != set(source_notes):
+                raise NoteEvidenceError("Source note/annotation owner inventories disagree")
+            if any(len(source_attributes[k]) != len(v)
+                   for k, v in source_notes.items()):
+                raise NoteEvidenceError("Source note/annotation counts disagree")
+        self.annotation_counts = Counter()
+        self.annotation_findings = {}
         self.counts = Counter()
         self.findings = {}
         self.native_seen = set()
@@ -171,8 +211,9 @@ class NoteAudit:
             raise NoteEvidenceError("Duplicate native numbered verse")
         self.native_seen.add(ref)
         src = self.source_notes.get(ref, [])
+        native_attributes = [] if self.source_attributes is not None else None
         try:
-            native = parse_native_numbered_notes(raw)
+            native = parse_native_numbered_notes(raw, attributes_out=native_attributes)
         except NoteEvidenceError:
             self.counts["native_fragment_unparseable_notes_unverified"] += 1
             self._finding("native_fragment_unparseable_notes_unverified", {
@@ -181,6 +222,9 @@ class NoteAudit:
             })
             return
         self.native_note_count += len(native)
+        if self.source_attributes is not None:
+            self._inspect_annotation_attributes(
+                ref, self.source_attributes.get(ref, ()), native_attributes)
         if self.native_note_count > MAX_NOTES:
             raise NoteEvidenceError("Native note total exceeds safe bound")
         if not src and not native:
@@ -201,6 +245,78 @@ class NoteAudit:
                 "ref": ref, "kind": kind,
                 "source_note_count": len(src), "native_note_count": len(native),
             })
+
+    def _annotation_finding(self, category, ref, source_count, native_count):
+        bucket = self.annotation_findings.setdefault(category, [])
+        if len(bucket) < 4:
+            bucket.append({
+                "ref": ref, "kind": category,
+                "source_note_count": source_count,
+                "native_note_count": native_count,
+            })
+
+    def _inspect_annotation_attributes(self, ref, source, native):
+        if len(source) != len(native):
+            self.annotation_counts["note_count_alignment_unavailable"] += 1
+            self._annotation_finding(
+                "note_count_alignment_unavailable", ref, len(source), len(native))
+            return
+        for authored, compiled in zip(source, native):
+            original_kind = authored["source_tag"]
+            # USFX x/ex are dedicated cross-reference notes. The other
+            # source styles are NOT assumed equivalent to arbitrary OSIS
+            # note categories, but crossReference vs non-crossReference
+            # can be independently observed in both representations.
+            if original_kind in {"x", "ex"}:
+                source_is_crossref = True
+            elif original_kind in {"f", "fe", "ef"}:
+                source_is_crossref = False
+            else:
+                source_is_crossref = None
+            native_is_crossref = compiled["osis_type"] == "crossReference"
+            if source_is_crossref is None:
+                self.annotation_counts["source_note_type_unknown"] += 1
+            elif source_is_crossref == native_is_crossref:
+                self.annotation_counts["cross_reference_class_agrees"] += 1
+            else:
+                self.annotation_counts["cross_reference_class_differs"] += 1
+                self._annotation_finding(
+                    "cross_reference_class_differs", ref, len(source), len(native))
+            caller, printed = authored["caller"], compiled["n"]
+            # "+" and "-" select automatic/no marker in USFM; never
+            # compare them literally with SWORD's generated note label.
+            if caller in {None, "", "+", "-"}:
+                self.annotation_counts["source_caller_automatic_absent_or_unverifiable"] += 1
+            elif not printed:
+                self.annotation_counts["literal_source_caller_no_native_n"] += 1
+                self._annotation_finding(
+                    "literal_source_caller_no_native_n", ref, len(source), len(native))
+            elif caller == printed:
+                self.annotation_counts["literal_caller_string_equal"] += 1
+            else:
+                self.annotation_counts["literal_caller_string_differs"] += 1
+                self._annotation_finding(
+                    "literal_caller_string_differs", ref, len(source), len(native))
+            source_targets = authored["explicit_targets"]
+            native_targets = compiled["explicit_targets"]
+            if not source_targets and not native_targets:
+                self.annotation_counts["neither_side_has_explicit_machine_target"] += 1
+            elif source_targets == native_targets:
+                # Same raw strings do not prove resolved canonical verse
+                # targets, conversion mapping or SWORD link navigation.
+                self.annotation_counts["explicit_target_raw_strings_equal"] += 1
+            elif source_targets and not native_targets:
+                self.annotation_counts["authored_explicit_target_absent_in_native"] += 1
+                self._annotation_finding(
+                    "authored_explicit_target_absent_in_native", ref,
+                    len(source), len(native))
+            elif native_targets and not source_targets:
+                self.annotation_counts["native_target_without_authorial_machine_target"] += 1
+            else:
+                self.annotation_counts["explicit_target_raw_strings_differ"] += 1
+                self._annotation_finding(
+                    "explicit_target_raw_strings_differ", ref,
+                    len(source), len(native))
 
     def _finding(self, category, row):
         bucket = self.findings.setdefault(category, [])
@@ -225,6 +341,25 @@ class NoteAudit:
             "source_note_body_exact_full_parity_verified": False,
             "source_note_callers_anchors_types_and_crossreference_targets_verified": False,
             "source_note_position_within_verse_verified": False,
+            "note_annotation_structure_diagnostic": {
+                "classifications": dict(sorted(self.annotation_counts.items())),
+                "first_material_findings_no_note_text": [
+                    item
+                    for category in (
+                        "cross_reference_class_differs",
+                        "literal_caller_string_differs",
+                        "literal_source_caller_no_native_n",
+                        "authored_explicit_target_absent_in_native",
+                        "explicit_target_raw_strings_differ",
+                        "note_count_alignment_unavailable",
+                    )
+                    for item in self.annotation_findings.get(category, [])
+                ][:MAX_FINDINGS],
+                "source_note_type_equivalence_verified": False,
+                "source_callers_and_note_anchor_positions_verified": False,
+                "source_to_compiled_reference_targets_resolved_verified": False,
+                "note_reordering_or_absorbed_verse_notes_verified": False,
+            },
             "unmapped_books_and_intros_verified": False,
             "published_or_editorially_approved": False,
         }

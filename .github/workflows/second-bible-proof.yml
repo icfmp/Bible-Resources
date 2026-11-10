@@ -201,6 +201,12 @@ jobs:
           comparison = report["mapped_numbered_text_comparison"]
           classes = comparison["classifications"]
           notes = report["private_numbered_source_native_note_body_diagnostic"]
+          annotation = notes["note_annotation_structure_diagnostic"]
+          assert not annotation["source_note_type_equivalence_verified"]
+          assert not annotation["source_callers_and_note_anchor_positions_verified"]
+          assert not annotation["source_to_compiled_reference_targets_resolved_verified"]
+          assert not annotation["note_reordering_or_absorbed_verse_notes_verified"]
+          assert sum(annotation["classifications"].values()) > 0
           assert notes["source_numbered_note_count"] >= 0
           assert notes["classifications"]["both_without_numbered_notes"] > 0
           assert not notes["source_note_body_exact_full_parity_verified"]
@@ -248,6 +254,10 @@ jobs:
           print("Unresolved source-only refs:", groups.get("unresolved_source_verse_refs", []))
           print("Whole-corpus source/native indexed main text classifications:", classes)
           print("Original source/native numbered note BODY diagnostic:", notes["classifications"])
+          print("Source/native note type/caller/explicit-target diagnostic:",
+                annotation["classifications"])
+          print("First structural mismatches (reference IDs and class only):",
+                annotation["first_material_findings_no_note_text"][:8])
           print("Source note count:", notes["source_numbered_note_count"])
           print("Native parseable numbered note count:", notes["native_parseable_numbered_note_count"])
           print("Note findings (IDs/counts only):", notes["first_findings_without_note_text"][:8])

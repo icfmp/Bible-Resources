@@ -111,6 +111,96 @@ class NotesTests(unittest.TestCase):
                          "ordered_note_bodies_differ")
         self.assertNotIn("changed words", json.dumps(result))
 
+    def test_metadata_crossref_caller_and_machine_targets_are_inspected(self):
+        text = source(
+            '<x caller="+"><xt><ref tgt="GEN.1.2">do not log me</ref></xt></x>')
+        attrs = {}
+        notes, _ = collect_usfx_numbered_notes(text, MAP, attributes_out=attrs)
+        audit = NoteAudit(notes, source_attributes=attrs)
+        audit.inspect(
+            "Alpha.1.1",
+            b'<note type="crossReference" n="a">'
+            b'<reference osisRef="GEN.1.2">another private text</reference></note>')
+        out = audit.finish()["note_annotation_structure_diagnostic"]
+        counts = out["classifications"]
+        self.assertEqual(counts["cross_reference_class_agrees"], 1)
+        self.assertEqual(counts["source_caller_automatic_absent_or_unverifiable"], 1)
+        self.assertEqual(counts["explicit_target_raw_strings_equal"], 1)
+        self.assertFalse(out["source_to_compiled_reference_targets_resolved_verified"])
+        self.assertNotIn("GEN.1.2", json.dumps(out))
+        self.assertNotIn("do not log", json.dumps(out))
+
+    def test_crossref_type_mismatch_is_not_hidden_by_same_note_body(self):
+        attrs = {}
+        notes, _ = collect_usfx_numbered_notes(source('<x>same</x>'), MAP, attributes_out=attrs)
+        audit = NoteAudit(notes, source_attributes=attrs)
+        audit.inspect("Alpha.1.1", b'<note>same</note>')
+        out = audit.finish()
+        self.assertEqual(out["classifications"]["ordered_note_body_characters_equal"], 1)
+        structural = out["note_annotation_structure_diagnostic"]
+        self.assertEqual(structural["classifications"]["cross_reference_class_differs"], 1)
+        self.assertEqual(structural["first_material_findings_no_note_text"][0]["ref"], "Alpha.1.1")
+
+    def test_literal_caller_mismatch_is_reported_without_values(self):
+        attrs = {}
+        notes, _ = collect_usfx_numbered_notes(
+            source('<f caller="SOURCE_SECRET">same</f>'), MAP, attributes_out=attrs)
+        audit = NoteAudit(notes, source_attributes=attrs)
+        audit.inspect("Alpha.1.1", b'<note n="NATIVE_SECRET">same</note>')
+        out = audit.finish()["note_annotation_structure_diagnostic"]
+        self.assertEqual(out["classifications"]["literal_caller_string_differs"], 1)
+        self.assertNotIn("SOURCE_SECRET", json.dumps(out))
+        self.assertNotIn("NATIVE_SECRET", json.dumps(out))
+
+    def test_source_machine_target_disappeared_in_native(self):
+        attrs = {}
+        notes, _ = collect_usfx_numbered_notes(
+            source('<x><ref tgt="AUTHORED_SECRET">cross</ref></x>'),
+            MAP, attributes_out=attrs)
+        audit = NoteAudit(notes, source_attributes=attrs)
+        audit.inspect("Alpha.1.1", b'<note type="crossReference">cross</note>')
+        out = audit.finish()["note_annotation_structure_diagnostic"]
+        self.assertEqual(
+            out["classifications"]["authored_explicit_target_absent_in_native"], 1)
+        self.assertNotIn("AUTHORED_SECRET", json.dumps(out))
+
+    def test_generated_annotate_ref_not_counted_as_crossreference_target(self):
+        attrs = {}
+        notes, _ = collect_usfx_numbered_notes(
+            source('<f>same</f>'), MAP, attributes_out=attrs)
+        audit = NoteAudit(notes, source_attributes=attrs)
+        audit.inspect("Alpha.1.1", b'<note><reference type="annotateRef" '
+                      b'osisRef="Gen.1.1">1:1</reference>same</note>')
+        out = audit.finish()["note_annotation_structure_diagnostic"]
+        self.assertEqual(
+            out["classifications"]["neither_side_has_explicit_machine_target"], 1)
+
+    def test_note_count_mismatch_blocks_attribute_pairing(self):
+        attrs = {}
+        notes, _ = collect_usfx_numbered_notes(
+            source('<f>one</f><f>two</f>'), MAP, attributes_out=attrs)
+        audit = NoteAudit(notes, source_attributes=attrs)
+        audit.inspect("Alpha.1.1", b'<note>one</note>')
+        out = audit.finish()["note_annotation_structure_diagnostic"]
+        self.assertEqual(out["classifications"]["note_count_alignment_unavailable"], 1)
+        self.assertNotIn("cross_reference_class_agrees", out["classifications"])
+
+    def test_annotation_inventory_cannot_disagree_with_source_notes(self):
+        with self.assertRaises(NoteEvidenceError):
+            NoteAudit({"Alpha.1.1": [("f", "word")]}, source_attributes={})
+
+    def test_malformed_native_note_has_no_false_structural_evidence(self):
+        attrs = {}
+        notes, _ = collect_usfx_numbered_notes(
+            source('<x>same</x>'), MAP, attributes_out=attrs)
+        audit = NoteAudit(notes, source_attributes=attrs)
+        audit.inspect("Alpha.1.1", b'<note type="crossReference">broken')
+        result = audit.finish()
+        self.assertEqual(
+            result["classifications"]["native_fragment_unparseable_notes_unverified"], 1)
+        self.assertEqual(
+            result["note_annotation_structure_diagnostic"]["classifications"], {})
+
     def test_duplicate_native_verse_is_rejected(self):
         audit = NoteAudit({})
         audit.inspect("Alpha.1.1", b'word')
