@@ -65,18 +65,39 @@ def _run_source(manifest: dict, archives: dict, work: Path, *, schema: Path | No
     source_format = manifest["source"]["format"]
     if source_format == "USFX":
         from lsg_source_compare import read_source_xml, scan_usfx
+        from source_usfx_structure import audit_source_usfx
         raw, receipt = read_source_xml(archives["source"], source_format="usfx")
         counts, refs = scan_usfx(raw)
+        inventory = audit_source_usfx(raw)
+        # Independent source-native scanners must not silently disagree about
+        # the same original books or numbered references. No text is output.
+        if (inventory["source_book_count"] != len(counts["original_books"])
+                or inventory["numbered_source_reference_count"] != len(refs)
+                or [b["code"] for b in inventory["all_original_books"]]
+                   != counts["original_books"]):
+            return _status("BLOCKED", verified=[],
+                missing=["Independent original USFX verse/book inventory disagreement"],
+                evidence={"source_member_sha256":receipt["sha256"]})
+        findings = inventory["source_structural_issues"]
+        if counts["duplicate_verse_ids"] or counts["nonstandard_verse_identifiers"]:
+            return _status("BLOCKED", verified=[],
+                missing=["Original source has duplicate or unrecognized verse IDs"],
+                evidence={"source_member_sha256":receipt["sha256"],
+                          "source_inventory": inventory})
         return _status(
-            "PARTIAL",
+            "BLOCKED" if findings else "PARTIAL",
             verified=["Original pinned USFX parsed read-only",
-                      "Authorial source verse inventory enumerated"],
-            missing=["Official source-to-OSIS conversion and full notes/layout equivalence",
-                     "Human edition/revision provenance review"],
+                      "Independent authorial book/verse inventories agree",
+                      "All original element, note type/caller, heading, poetry and paragraph events counted and fingerprinted"],
+            missing=(["Original source structural findings require investigation"] if findings else [])
+                    + ["Official USFX XSD validation not yet independently completed",
+                       "Original source structural metadata are not compiled-note/layout fidelity",
+                       "Human publisher edition/revision provenance review",
+                       "USFX→OSIS conversion parity if conversion is actually required; not assumed for stock-SWORD reuse"],
             evidence={"source_member_sha256":receipt["sha256"],
-                      "original_source_book_count":len(counts.get("original_books", [])),
-                      "numbered_source_reference_count":len(refs),
-                      "source_format":"USFX"})
+                      "source_format":"USFX", "source_inventory":inventory,
+                      "conversion_performed":False,
+                      "conversion_applicability_reviewed":False})
     if source_format == "USFM":
         from lsg_source_compare import scan_usfm
         report = scan_usfm(archives["source"])
