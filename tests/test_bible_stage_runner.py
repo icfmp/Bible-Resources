@@ -12,7 +12,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
-from bible_intake import IntakeError, ProviderRedirects, acquire, fetch_pinned, load_manifest, _safe_url, parse_audit_comment, observe_current_upstream
+from bible_intake import IntakeError, ProviderRedirects, acquire, fetch_pinned, load_manifest, _safe_url, parse_audit_comment, parse_observe_comment, observe_current_upstream
 from bible_stage_runner import run_stage, _write_report, STAGES
 
 
@@ -102,6 +102,14 @@ class BibleIntakeTests(unittest.TestCase):
             with self.subTest(command=command),self.assertRaises(IntakeError):
                 parse_audit_comment(command)
 
+    def test_observe_comment_parser_does_not_accept_script_or_multiple_lines(self):
+        self.assertEqual(parse_observe_comment("/bible-observe frajnd-2024"), "frajnd-2024")
+        for candidate in ("/bible-observe ../file", "/bible-observe frajnd-2024 3",
+                          "/bible-observe frajnd-2024\\nother",
+                          "/bible-observe frajnd-2024; echo unsafe"):
+            with self.subTest(command=candidate), self.assertRaises(IntakeError):
+                parse_observe_comment(candidate)
+
     def test_observe_upstream_hashes_without_authorizing_revision(self):
         with patch("bible_intake.load_manifest",return_value=self.cfg):
             report=observe_current_upstream("webp-research",opener=self.opener)
@@ -110,6 +118,12 @@ class BibleIntakeTests(unittest.TestCase):
         self.assertTrue(report["archives"]["source"]["still_pinned"])
         self.assertTrue(report["archives"]["sword"]["still_pinned"])
         self.assertFalse(report["archives"]["source"]["rights_or_edition_equivalence_verified"])
+        self.assertEqual(report["archives"]["sword"]["sword_conf"]["module_id"], "TestMod")
+        self.assertEqual(report["archives"]["sword"]["sword_conf"]["driver"], "RawText")
+        self.assertTrue(report["archives"]["sword"]["safe_original_zip_structure_verified"])
+        self.assertEqual(report["archives"]["source"]["source_xml_members"], ["authorial_usfx.xml"])
+        self.assertFalse(report["safe_to_acquire_without_approved_pins"])
+        self.assertFalse(report["exact_edition_content_equivalence_verified"])
         self.assertFalse((self.folder/"source.zip").exists())
 
     def test_streaming_download_and_hash_pinning(self):

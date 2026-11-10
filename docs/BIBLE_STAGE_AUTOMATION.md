@@ -75,6 +75,29 @@ same as the historical experiment, nor a curated revision or a publication
 authorization. A real future candidate must use its own reviewed
 manifest and independent edition/source review before anything is released.
 
+## Observe unknown source fingerprints without trusting mutable upstream bytes
+
+A **separate read-only observation** is available before committing a real
+SHA-256 pin. On an open `[Import]` issue, the repository owner posts:
+
+```text
+/bible-observe frajnd-2024
+```
+
+The [original-archive observation workflow](../.github/workflows/bible-observe-originals.yml)
+downloads both declared HTTPS archives into disposable runner storage, verifies
+ZIP safety, records their exact SHA-256 and stock SWORD `.conf` metadata, then
+discards all original bytes. Only metadata are uploaded, and the workflow
+automatically posts a permanent **UNAPPROVED OBSERVATION** report to the issue.
+No publisher text is logged or published. The report identifies *observed*
+upstream bytes, not verified editorial equivalence or a new public release.
+
+**Review the publisher edition and this receipt before updating the
+research manifest.** A changed upstream ZIP is not silently an equivalent
+revision. A later stage 2 re-downloads both originals with strict SHA-256
+checking; drift blocks the run. Do not manually tick stage 1 merely because
+the fingerprint-observation workflow succeeded.
+
 ## Run it
 
 **Recommended — start from the Bible's issue (including from ChatGPT):**
