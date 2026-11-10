@@ -46,15 +46,20 @@ class USFXStructureTests(unittest.TestCase):
                 self.assertTrue(report["source_structural_issues"])
 
     def test_invalid_reference_or_embedded_verse_in_note_blocks(self):
-        cases = [
+        # With no valid numbered verse at all, source scope is unprovable:
+        # fail closed with an exception, not a falsely valid report.
+        for case in (
             b'<usfx><book id="GEN"><v id="1"/></book></usfx>',
             b'<usfx><book id="GEN"><c id="1"/><v id="1a"/></book></usfx>',
-            b'<usfx><book id="GEN"><c id="1"/><v id="1"/><f><v id="2"/></f></book></usfx>',
-        ]
-        for case in cases:
-            with self.subTest(case=case):
-                report = audit_source_usfx(case)
-                self.assertEqual(report["status"], "blocked_source_structure_findings")
+        ):
+            with self.subTest(case=case), self.assertRaises(USFXAuditError):
+                audit_source_usfx(case)
+        # A valid source key plus a malformed nested note marker is counted
+        # and explicitly blocks the structural audit.
+        case = b'<usfx><book id="GEN"><c id="1"/><v id="1"/><f><v id="2"/></f></book></usfx>'
+        report = audit_source_usfx(case)
+        self.assertEqual(report["status"], "blocked_source_structure_findings")
+        self.assertIn("note_contains_chapter_or_verse_marker", report["source_structural_issues"])
 
     def test_malformed_unsafe_xml_rejected_without_recovery(self):
         for raw in (
