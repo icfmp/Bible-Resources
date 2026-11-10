@@ -435,6 +435,19 @@ private native corpus reader. It uses strict XML parsing and records:
 - Bounded original/native book IDs whose original preface prose was not
   found in inspected intro locations.
 
+A further scope-specific check looks **inside each native book-intro
+`title` element**, rather than claiming that any adjacent intro text
+proves preservation. It separates the following outcomes with metadata-only
+counts and bounded book codes: exactly one title containing precisely the
+source prefatory prose (after whitespace-only folding), a title containing
+it with additional text, duplicate matching titles, source prose present
+only elsewhere in the book intro, or prose not found at all. Original
+authorial text, title contents and unknown native attribute values remain
+private. Even a one-to-one lexical match to a native title **does not**
+establish that source `p` paragraph *style*, heading hierarchy,
+source-relative placement or authorial typography were preserved: those
+remain editorial checks for stage 4c/5.
+
 **A contiguous text occurrence is not an exact structural parity
 certificate**: a heading may be moved, duplicated, rewrapped, placed in
 another (uninspected) scope or rendered differently. Missing intro text is

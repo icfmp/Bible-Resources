@@ -34,6 +34,10 @@ class OriginalNativeBookIntroTests(unittest.TestCase):
         self.assertEqual(counts["text_detected_at_book_scope"],1)
         self.assertEqual(counts["text_detected_at_first_chapter_scope_only"],1)
         self.assertEqual(counts["native_book_div_type_book"],1)
+        self.assertEqual(counts["preface_prose_exactly_equals_one_native_book_title"],1)
+        self.assertEqual(counts["preface_prose_in_intro_but_not_in_any_native_book_title"],1)
+        # An Exod chapter-one title is NOT a book-level title. The generic
+        # receipt retains only the weaker chapter-one intro lexical evidence.
         self.assertFalse(result["source_native_prefatory_paragraph_position_parity_verified"])
         self.assertFalse(result["editorial_or_publication_approved"])
         for word in ("PRIVATE","BOOK INTRO","VERSE"):
@@ -100,6 +104,42 @@ class OriginalNativeBookIntroTests(unittest.TestCase):
             "source_preface_paragraph_without_non_note_text"],1)
         self.assertNotIn("preface_text_detected_in_book_or_first_chapter_intro",
                          report["source_prefatory_paragraph_vs_native_intro_counts"])
+
+
+    def test_intro_text_only_outside_title_is_not_claimed_as_title_equivalent(self):
+        pre, classified = private_original_preface_text(self.source(),MAPPING)
+        witness=NativeBookIntroScreen()
+        witness.observe("I","Gen",b'<title>DIFFERENT TITLE</title>'
+                        b'<div type="book">PRIVATE BOOK INTRO A</div>')
+        report=witness.finish(pre,classified)
+        counts=report["source_prefatory_paragraph_vs_native_intro_counts"]
+        self.assertEqual(counts["preface_prose_in_intro_but_not_in_any_native_book_title"],1)
+        self.assertEqual(report["first_unmatched_preface_book_codes_only"],[
+            {"book":"Exod","classification":"no_contiguous_whitespace_folded_intro_match"},
+            {"book":"Gen","classification":"intro_text_exists_but_not_in_native_title"},
+        ])
+        self.assertFalse(report["source_native_prefatory_paragraph_position_parity_verified"])
+        self.assertNotIn("PRIVATE",str(report))
+
+    def test_native_title_contains_preface_with_extra_intro_words(self):
+        pre, classified = private_original_preface_text(self.source(),MAPPING)
+        witness=NativeBookIntroScreen()
+        witness.observe("I","Gen",b'<title>AN EXTRA INTRO PRIVATE BOOK INTRO A</title>')
+        report=witness.finish(pre,classified)
+        count=report["source_prefatory_paragraph_vs_native_intro_counts"]
+        self.assertEqual(count["preface_prose_contained_in_one_native_book_title"],1)
+        self.assertNotIn("AN EXTRA",str(report))
+        self.assertFalse(report["editorial_or_publication_approved"])
+
+    def test_duplicate_native_titles_are_not_accepted_as_unique(self):
+        pre, classified = private_original_preface_text(self.source(),MAPPING)
+        witness=NativeBookIntroScreen()
+        witness.observe("I","Gen",b'<title>PRIVATE BOOK INTRO A</title>'
+                        b'<title>PRIVATE BOOK INTRO A</title>')
+        result=witness.finish(pre,classified)
+        count=result["source_prefatory_paragraph_vs_native_intro_counts"]
+        self.assertEqual(count["preface_prose_duplicates_native_book_titles"],1)
+        self.assertNotIn("PRIVATE",str(result))
 
 
 if __name__ == "__main__":
