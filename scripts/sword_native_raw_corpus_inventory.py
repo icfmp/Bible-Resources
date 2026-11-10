@@ -42,7 +42,7 @@ def _ordered_manifest_entry(type_: str, name: str, raw: bytes) -> bytes:
     return b"".join(len(p).to_bytes(4, "big") + p for p in parts)
 
 
-def parse_native_raw_corpus(stream) -> tuple[dict, list[str], list[str], list[str]]:
+def parse_native_raw_corpus(stream, *, on_entry=None) -> tuple[dict, list[str], list[str], list[str]]:
     """Stream actual unfiltered native raw bytes. Never write those to logs."""
     total = Counter()
     unique = {"K": set(), "I": set(), "U": set()}
@@ -107,6 +107,11 @@ def parse_native_raw_corpus(stream) -> tuple[dict, list[str], list[str], list[st
             raw.decode("utf-8", errors="strict")
         except UnicodeError as exc:
             raise RawCorpusError("Non-UTF-8 native raw Scripture entry") from exc
+        # Private hook: raw bytes are never logged or written to the report.
+        # Caller may compare semantic text in memory; its exception blocks
+        # publication of an incomplete or untrusted scan.
+        if on_entry is not None:
+            on_entry(type_, reference, raw)
         total_raw_bytes += size
         total[type_] += 1
         if type_ == "K":
@@ -162,7 +167,7 @@ def parse_native_raw_corpus(stream) -> tuple[dict, list[str], list[str], list[st
 
 def inspect_native_raw_corpus(
     module: Path, module_id: str, native_raw_binary: Path,
-    native_index_binary: Path
+    native_index_binary: Path, *, on_entry=None
 ) -> dict:
     if native_raw_binary.is_symlink() or not native_raw_binary.is_file():
         raise RawCorpusError("Missing or linked trusted full-native-raw binary")
@@ -179,7 +184,7 @@ def inspect_native_raw_corpus(
             stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env=env)
         if process.stdout is None:
             raise RawCorpusError("Cannot privately capture native raw content stream")
-        report, ordinary, intros, anonymous = parse_native_raw_corpus(process.stdout)
+        report, ordinary, intros, anonymous = parse_native_raw_corpus(process.stdout, on_entry=on_entry)
         process.stdout.close()
         try:
             status = process.wait(timeout=240)
