@@ -42,8 +42,8 @@ jobs:
     env:
       RESOURCE_ID: ${{ github.event_name == 'pull_request' && 'webp-research' || inputs.resource_id }}
       STAGE: ${{ github.event_name == 'pull_request' && '4' || inputs.stage }}
-      REPORT_DIR: ${{ runner.temp }}/bible-audit-report
-      INSPECTOR_DIR: ${{ runner.temp }}/sword-audit-bin
+      REPORT_DIR: /tmp/bible-audit-report
+      INSPECTOR_DIR: /tmp/sword-audit-bin
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -112,8 +112,8 @@ jobs:
         with:
           name: bible-stage-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
-            ${{ runner.temp }}/bible-audit-report/stage-report.json
-            ${{ runner.temp }}/bible-audit-report/stage-summary.md
+            /tmp/bible-audit-report/stage-report.json
+            /tmp/bible-audit-report/stage-summary.md
           retention-days: 90
           if-no-files-found: warn
 
