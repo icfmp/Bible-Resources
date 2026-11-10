@@ -208,6 +208,33 @@ def _classify(source: str, native: str) -> str:
     return "word_sequence_differs"
 
 
+# Preserve a few examples of EACH classification, prioritizing the
+# material word/markup findings over ubiquitous whitespace differences.
+# We cannot retain 25 first-verses-only whitespace rows and hide all real
+# substantive mismatches.
+SAMPLE_ORDER = (
+    "word_sequence_differs",
+    "native_raw_fragment_requires_review",
+    "case_or_punctuation_differs_same_folded_words",
+    "word_sequence_same_punctuation_or_spacing_differs",
+    "whitespace_only",
+    "unicode_normalization_only",
+)
+
+
+def _add_sample(buckets: dict[str, list[dict]], category: str, row: dict) -> None:
+    rows = buckets.setdefault(category, [])
+    if len(rows) < 4:
+        rows.append(row)
+
+
+def _prioritized_samples(buckets: dict[str, list[dict]], max_rows: int) -> list[dict]:
+    if not 0 < max_rows <= MAX_MISMATCHES:
+        raise MainTextParityError("Unsafe sample count")
+    return [row for category in SAMPLE_ORDER
+            for row in buckets.get(category, [])][:max_rows]
+
+
 def compare_private_main_text(
     source: dict[str, str], mapped_source: dict, native_records: list[tuple[str, bytes]],
     *, max_examples: int = MAX_MISMATCHES,
@@ -216,7 +243,7 @@ def compare_private_main_text(
     if not 0 < max_examples <= MAX_MISMATCHES:
         raise MainTextParityError("Unsafe mismatch sample bound")
     counts = Counter()
-    samples = []
+    samples = {}
     seen = set()
     native_keys = set()
     skipped_native = Counter()
@@ -233,16 +260,16 @@ def compare_private_main_text(
             native, excluded = native_raw_main_text(raw)
         except MainTextParityError:
             counts["native_raw_not_parseable_as_self_contained_xml"] += 1
-            if len(samples) < max_examples:
-                samples.append({"native_ref": reference,
-                                "classification": "native_raw_fragment_requires_review"})
+            _add_sample(samples, "native_raw_fragment_requires_review",
+                        {"native_ref": reference,
+                         "classification": "native_raw_fragment_requires_review"})
             continue
         skipped_native.update(excluded)
         src = source[reference]
         classification = _classify(src, native)
         counts[classification] += 1
-        if classification != "exact_semantic_characters" and len(samples) < max_examples:
-            samples.append({
+        if classification != "exact_semantic_characters":
+            _add_sample(samples, classification, {
                 "native_ref": reference,
                 "classification": classification,
                 "source_character_count": len(src),
@@ -264,7 +291,7 @@ def compare_private_main_text(
         "source_mapped_numbered_verse_count": len(source),
         "native_mapped_numbered_verse_count": len(native_keys),
         "classifications": dict(sorted(counts.items())),
-        "first_differences_no_scripture": samples,
+        "first_differences_no_scripture": _prioritized_samples(samples, max_examples),
         "first_source_only_refs": missing[:max_examples],
         "native_excluded_note_or_title_elements": dict(sorted(skipped_native.items())),
         "excluded_authored_note_and_title_body_parity_verified": False,
@@ -294,7 +321,7 @@ def run_real_usfx_sword_text_probe(
         # No Scripture content is returned, printed or written to disk.
         native_keys = set()
         counts = Counter()
-        samples = []
+        samples = {}
         skipped_native = Counter()
 
         def on_entry(kind, ref, bytes_):
@@ -311,16 +338,16 @@ def run_real_usfx_sword_text_probe(
                 actual, excluded = native_raw_main_text(bytes_)
             except MainTextParityError:
                 counts["native_raw_not_parseable_as_self_contained_xml"] += 1
-                if len(samples) < MAX_MISMATCHES:
-                    samples.append({"native_ref": ref,
-                                    "classification": "native_raw_fragment_requires_review"})
+                _add_sample(samples, "native_raw_fragment_requires_review",
+                            {"native_ref": ref,
+                             "classification": "native_raw_fragment_requires_review"})
                 return
             skipped_native.update(excluded)
             authored = source_text[ref]
             category = _classify(authored, actual)
             counts[category] += 1
-            if category != "exact_semantic_characters" and len(samples) < MAX_MISMATCHES:
-                samples.append({
+            if category != "exact_semantic_characters":
+                _add_sample(samples, category, {
                     "native_ref": ref, "classification": category,
                     "source_character_count": len(authored),
                     "compiled_character_count": len(actual),
@@ -349,7 +376,8 @@ def run_real_usfx_sword_text_probe(
             "source_mapped_numbered_verse_count": len(source_text),
             "native_numbered_verse_count": len(native_keys),
             "classifications": dict(sorted(counts.items())),
-            "first_differences_no_scripture": samples,
+            "first_differences_no_scripture":
+                _prioritized_samples(samples, MAX_MISMATCHES),
             "first_source_only_refs": missing[:MAX_MISMATCHES],
             "native_excluded_note_or_title_elements": dict(sorted(skipped_native.items())),
             "mapped_numbered_maintext_exact_semantic_characters_verified": exact,
