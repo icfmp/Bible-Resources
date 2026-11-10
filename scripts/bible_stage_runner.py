@@ -210,6 +210,12 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
             missing.append("Original/native whitespace provenance triage blocked or incomplete; do not infer layout parity")
         else:
             missing.append("No independent original/native p/q-aware whitespace gap classification")
+        if whitespace_gaps and whitespace_gaps.get(
+            "source_xml_fragment_newline_gap_coverage_verified") is True:
+            verified.append("Original USFX numbered newline gaps independently mapped to XML node.text/child.tail fragment origins (NOT editorial intent)")
+            missing.append("Original XML text/tail provenance does not establish intentional poetry/paragraph linebreaks or native reader layout")
+        elif whitespace_gaps:
+            missing.append("Original USFX newline XML fragment provenance is incomplete or unavailable")
         body_order = rows.get("source_native_ordered_body_kind_screen", {})
         if body_order.get("status") == "blocked_original_authorial_source_scope_or_structure":
             missing.append("Source-native p/q ordered event check explicitly BLOCKED by original book/structure scope; do not infer matching order")
