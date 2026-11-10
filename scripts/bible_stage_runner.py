@@ -242,8 +242,8 @@ def _write_report(report_dir: Path, report: dict) -> None:
                            encoding="utf-8")
     state=report["status"]
     lines=[f"### Bible audit stage {report['stage']}/7 — {state}",
-           f"Resource: \`{report['resource_id']}\` — {report['stage_name']}",
-           f"GitHub commit: \`{report['git_sha']}\`",
+           f"Resource: `{report['resource_id']}` — {report['stage_name']}",
+           f"GitHub commit: `{report['git_sha']}`",
            f"Workflow run: {report['run_url'] or 'local only'}",
            "",
            "**Verified**"]
@@ -276,12 +276,13 @@ def main(argv=None) -> int:
                              raw_binary=args.native_raw_binary,entry_binary=args.native_entry_binary,
                              schema=args.osis_schema)
         failed=False
-    except (OSError,ValueError,RuntimeError,subprocess.SubprocessError,
-            zipfile.BadZipFile, KeyError, TypeError) as exc:
-        # Never include original text or raw XML from an exception in public CI.
+    except Exception as exc:
+        # Third-party parser error strings may contain actual text.
+        # Only our own fixed IntakeError message can appear in public logs.
+        reason = (str(exc)[:180] if isinstance(exc, IntakeError)
+                  else type(exc).__name__ + " (review pinned input privately)")
         result=_status("BLOCKED",verified=[],
-            missing=["Run failed: " + type(exc).__name__ + ". Inspect pinned sources and local logs privately."],
-            evidence={})
+            missing=["Run failed: " + reason], evidence={})
         failed=True
     report={"schema_version":1,"resource_id":args.resource_id,"stage":args.stage,
             "stage_name":STAGES[args.stage],
