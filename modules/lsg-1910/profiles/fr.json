@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "module_id": "lsg-1910",
+  "sword_id": "BRLSG1910",
+  "module_version": "0.1.0",
+  "locale": "fr",
+  "revision": "2026-11-10.1",
+  "approved_at": "2026-11-10",
+  "approved_by": "Bible Resources project owner",
+  "approval_url": "https://github.com/icfmp/Bible-Resources/pull/55",
+  "source_path": "docs/profiles/fr-segond-1910.md",
+  "source_git_blob_sha1": "9d13c0735a079f8853c0169270b2a31493621eab",
+  "sections": {
+    "short": "## Présentation courte — bibliothèque (texte soumis à validation éditoriale)",
+    "long": "## Présentation longue — détails de la ressource (texte soumis à validation éditoriale)",
+    "end": "## Three distinct provenance layers"
+  },
+  "evidence_urls": {
+    "printed_1910_title": "https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/1",
+    "printed_1910_preface": "https://fr.wikisource.org/wiki/Page:La_Sainte_Bible,_trad._Segond,_ed._1910.djvu/3",
+    "translator_textual_method": "https://fr.wikisource.org/wiki/Bible_Segond_1899/Avant-propos",
+    "one_timothy_3_16": "https://ebible.org/fraLSG/1TI03.htm",
+    "acts_20_28": "https://ebible.org/fraLSG/ACT20.htm",
+    "john_1_18": "https://ebible.org/fraLSG/JHN01.htm",
+    "original_source_rights": "https://ebible.org/fraLSG/copyright.htm",
+    "curated_release": "https://github.com/icfmp/Bible-Resources/releases/tag/lsg-0.1.0"
+  }
+}

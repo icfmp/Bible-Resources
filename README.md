@@ -87,7 +87,7 @@ For repository creation, push, Pages activation and branch rules, see [INSTALLAT
 - [Resource onboarding playbook and LSG pilot lessons](docs/RESOURCE_ONBOARDING_PLAYBOOK.md)
 - [Quality policy](docs/QUALITY_POLICY.md)
 - [Evidence-backed resource profiles and reader-facing cautions](docs/RESOURCE_PROFILES.md)
-- [Louis Segond 1910 profile (editorial draft)](docs/profiles/fr-segond-1910.md)
+- [Louis Segond 1910 profile (approved, published independently in catalogue)](docs/profiles/fr-segond-1910.md)
 - [Editorial rules](docs/EDITORIAL_RULES.md)
 - [Strict OSIS source normalization contract](docs/NORMALIZATION_POLICY.md)
 - [Strict commentary annotation and reference rules](docs/COMMENTARY_POLICY.md)
