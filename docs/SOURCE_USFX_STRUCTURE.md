@@ -59,9 +59,13 @@ investigate a source revision without distributing the authored Scripture.
   omitted. The 2024 JND eBible `Versification=Luther` is retained as source
   evidence and native reader registry comparison is still pending.
 
-Until the independent schema and editorial-source gates are satisfied,
-`bible_stage_runner.py` returns **PARTIAL** for a structurally clean USFX
-source, not `DONE`. The seven-stage checklist must remain unchecked.
+Even after the official XSD validates, `bible_stage_runner.py` reports
+**PARTIAL** until the publisher's edition provenance and applicability of a
+conversion are reviewed by the project maintainer. A successful stock-SWORD
+reuse path may document `USFX→OSIS conversion: N/A (not performed)`, but
+cannot infer original-to-binary text or annotation equivalence: those gates
+belong to stages 4 and 5. The seven-stage checkbox stays unchecked until
+the remaining authorial source review is complete.
 
 ## Reproduce offline
 
