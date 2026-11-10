@@ -412,6 +412,40 @@ type overlaps (`x-p` versus `x-milestone`). The latter are
 explicit review findings, not automatic proof of corruption or faithful
 markup. The **seven-stage progress and stage 4c gate remain unchanged**.
 
+## Source pre-chapter prose against actual stock SWORD book introductions
+
+The source-only `audit_usfx_book_prefaces` records whether every USFX
+paragraph **before chapter one** contains authorial words, markup, notes or
+attributes, without exposing text. The original BPC Darby 2024 test showed
+**66 nonempty original prefatory p elements**, one per book; these may not
+be silently ignored as empty paragraph markers simply because the compiled
+`div type=x-p` count is 66 lower.
+
+`scripts/native_book_intro_screen.py` reuses that source-only classifier
+and independently inspects **actual stock SWORD book-level** and
+**first-chapter verse-zero** intro records already extracted by the
+private native corpus reader. It uses strict XML parsing and records:
+- Actual native intro presence, parse failures and allowlisted div/title
+  structures; unknown native attribute values are categorized, not leaked.
+- Whether original prechapter paragraph prose appears **contiguously**
+  in either raw native intro text after **whitespace-only folding**;
+  no case, punctuation, word or character substitution is accepted by this
+  weak comparison. Original preface and native title/note contents remain
+  private and are discarded.
+- Bounded original/native book IDs whose original preface prose was not
+  found in inspected intro locations.
+
+**A contiguous text occurrence is not an exact structural parity
+certificate**: a heading may be moved, duplicated, rewrapped, placed in
+another (uninspected) scope or rendered differently. Missing intro text is
+an investigation finding, not proof that the user-visible Bible has no
+book heading. The 4c and step-5 editorial gates remain open pending an
+actual source-relative position/order/type review, including verse-zero.
+
+This is generic across edition/versification and does not modify original
+USFX/SWORD archives, publication content, references, source hashes or
+reader behavior.
+
 ## Safety and publication separation
 
 - GitHub workflow uses `contents: read` for the audit job.
