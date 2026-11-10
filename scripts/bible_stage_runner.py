@@ -161,15 +161,28 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
         rows = receipt["mapped_numbered_text_comparison"]
         counts = rows["classifications"]
         notes = receipt["private_numbered_source_native_note_body_diagnostic"]
-        equal = rows["mapped_numbered_maintext_exact_semantic_characters_verified"]
-        return _status("PARTIAL" if equal else "BLOCKED",
-            verified=["Actual independently read stock-SWORD zText/RawText full native corpus inventoried",
-                      "Original USFX mapped main-text compared character-by-character",
-                      "Original and compiled note-body/annotation diagnostics collected"],
-            missing=([] if equal else ["Mapped indexed main-text has unresolved non-identical entries"])
-                    + ["Full publisher edition/canon/extra-book equivalence and original-source conversion",
-                       "Full verse-zero structure, Strong, note anchors and resolved reference targets",
-                       "Independent legal/editorial acceptance"],
+        from maintext_fidelity_classification import classify_compiled_numbered_maintext
+        witness = classify_compiled_numbered_maintext(
+            rows, receipt["source_book_scope"],
+            receipt["source_only_verse_grouped_native_maintext_witness"],
+            full_native_scan_verified=receipt["independent_native_whole_corpus_scan_completed"],
+            exact_entry_spotcheck_verified=receipt["independent_native_exact_key_raw_spotcheck_verified"])
+        text_preserved = witness[
+            "all_mapped_numbered_words_case_punctuation_preserved_after_whitespace_folding"]
+        verified = ["Actual independently read stock-SWORD zText/RawText full native corpus inventoried",
+                    "Original USFX mapped main-text compared character-by-character",
+                    "Original and compiled note-body/annotation diagnostics collected"]
+        if text_preserved:
+            verified.append("All mapped numbered words/case/punctuation preserved in exact source order after whitespace folding")
+        missing = ([] if text_preserved else [
+            "Mapped indexed main-text has unresolved non-whitespace word/punctuation or reference differences"])
+        if witness["source_verses_with_whitespace_only_changes"]:
+            missing.append("Original main-text whitespace differs; verse/poetry/paragraph layout preservation not yet verified")
+        missing += ["Exact publisher edition identity and original book/intro order not independently signed off",
+                    "Original note callers, word anchors, resolved reference targets and verse-zero/poetry structure unverified",
+                    "Rights/editorial publication approval remains separate"]
+        return _status("PARTIAL" if text_preserved else "BLOCKED",
+            verified=verified, missing=missing,
             evidence={"source_format":"USFX","native_driver":receipt["module_native_driver"],
                       "native_versification":receipt["module_versification"],
                       "actual_native_raw_manifest_sha256":
@@ -177,6 +190,7 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
                       "source_archive_sha256":receipt["publisher_original_usfx_zip_sha256"],
                       "stock_archive_sha256":receipt["publisher_compiled_sword_zip_sha256"],
                       "maintext":rows,
+                      "maintext_scope_classification":witness,
                       "notes":notes,
                       "source_scope":receipt["source_book_scope"],
                       "absorbed_verse_groups":receipt["source_only_verse_grouped_native_maintext_witness"]})
