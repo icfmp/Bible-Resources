@@ -9,12 +9,45 @@ from __future__ import annotations
 from collections import Counter
 from hashlib import sha256
 import json
+import re
 from lxml import etree
 
 from source_usfx_structure import audit_source_usfx
 
 MAX_EXAMPLES = 24
 IGNORE_CONTAINER = frozenset({"f", "fe", "x", "ef", "ex", "note"})
+
+# Original USFX <p> can describe headings and book titles as well as body
+# paragraphs: the source's own SFM style must not be silently discarded.
+# Published USFM style codes are allowlisted. Unknown authored values never
+# enter metadata artifacts (and are never classified as harmless prose).
+_BOOK_TITLE_STYLE = re.compile(r"^(?:mt|mte|imt|imte|toc)[1-4]?$")
+_SECTION_HEADING_STYLE = re.compile(r"^(?:s|ms|is|io)[1-4]?$")
+_OTHER_HEADING_STYLE = frozenset({"h", "sr", "r", "d", "cl"})
+_BODY_PARAGRAPH_STYLE = re.compile(
+    r"^(?:p|m|mi|pi|pm|pc|ph|pr|nb|b|cls|sp|ps|psi)[1-4]?$"
+)
+
+
+def classify_prefatory_p_sfm(sfm: str | None) -> tuple[str, str]:
+    """Return a public style *family* and an allowlisted code only.
+
+    This is a semantic clue from the author's markup, not publisher or
+    stock-SWORD editorial approval. Never return unknown literal values.
+    """
+    if sfm is None:
+        return "implicit_p", "implicit_p"
+    if not isinstance(sfm, str):
+        raise ParagraphAuditError("Unsupported source paragraph style type")
+    if _BOOK_TITLE_STYLE.fullmatch(sfm):
+        return "book_title_style", sfm
+    if _SECTION_HEADING_STYLE.fullmatch(sfm):
+        return "section_heading_style", sfm
+    if sfm in _OTHER_HEADING_STYLE:
+        return "other_heading_style", sfm
+    if _BODY_PARAGRAPH_STYLE.fullmatch(sfm):
+        return "body_paragraph_style", sfm
+    return "unreviewed_sfm_value", "other_unreviewed_style"
 
 
 class ParagraphAuditError(ValueError):
@@ -178,6 +211,8 @@ def audit_usfx_book_prefaces(xml: bytes, mapping: list[tuple[str, str]]) -> dict
         raise ParagraphAuditError("Unparseable original prefatory structure") from exc
     totals = Counter()
     examples = []
+    style_totals = Counter()
+    style_examples = []
     seen = set()
     for book in root.iter("book"):
         source_id = book.get("id")
@@ -237,6 +272,29 @@ def audit_usfx_book_prefaces(xml: bytes, mapping: list[tuple[str, str]]) -> dict
                 totals["prefatory_p_with_chapter_or_verse_marker"] += 1
             if attrs:
                 totals["prefatory_p_with_attributes"] += 1
+
+            sfm = p.get("sfm")
+            family, allowlisted_code = classify_prefatory_p_sfm(sfm)
+            style_totals[f"family_{family}"] += 1
+            style_totals[f"sfm_{allowlisted_code}"] += 1
+            if sfm is not None:
+                style_totals["with_explicit_sfm"] += 1
+            if "style" in p.attrib:
+                # Original USFX "style" is a separate attribute. Do not
+                # assume it is interchangeable with "sfm" or print it.
+                style_totals["with_separate_style_attribute"] += 1
+                if sfm is not None and p.get("style") != sfm:
+                    style_totals["sfm_and_style_differ"] += 1
+            if "level" in p.attrib:
+                style_totals["with_level_attribute"] += 1
+            if len(style_examples) < MAX_EXAMPLES:
+                style_examples.append({
+                    "native_book":native_book,
+                    "sfm_family":family,
+                    "allowlisted_sfm_code":allowlisted_code,
+                    "has_separate_style_attribute":"style" in p.attrib,
+                    "has_level_attribute":"level" in p.attrib,
+                })
             if len(examples) < MAX_EXAMPLES:
                 examples.append({
                     "native_book": native_book,
@@ -253,6 +311,14 @@ def audit_usfx_book_prefaces(xml: bytes, mapping: list[tuple[str, str]]) -> dict
         "schema_version": 1,
         "prefatory_source_p_class_counts": dict(sorted(totals.items())),
         "first_prefatory_p_classifications_no_text": examples,
+        "prefatory_p_sfm_style_counts": dict(sorted(style_totals.items())),
+        "first_prefatory_p_sfm_styles_no_text": style_examples,
+        "all_prefatory_p_have_allowlisted_book_title_sfm": bool(
+            totals["prefatory_p_elements"]
+            and style_totals["family_book_title_style"] == totals["prefatory_p_elements"]
+        ),
+        "unknown_sfm_values_are_not_exposed": True,
+        "source_sfm_to_native_title_semantics_verified": False,
         "all_mapped_original_books_checked": totals["mapped_original_books"] == len(crosswalk),
         "compiled_book_intro_structure_verified": False,
         "prefatory_source_native_position_equivalence_verified": False,
