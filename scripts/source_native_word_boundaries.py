@@ -221,8 +221,8 @@ class NativeBodyBoundaries:
                 tag = etree.QName(node).localname
                 if tag in {"title","note"}:
                     return
-                is_body=(tag=="l" or
-                         (tag=="div" and node.get("type")=="x-p"))
+                is_body=(tag in {"p","q","l","lg"} or
+                         (tag=="div" and node.get("type") in {"x-p","paragraph"}))
                 if is_body:
                     self.counts["unaddressable_top_body_event_occurrences"] += 1
                 for child in node:
