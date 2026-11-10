@@ -56,8 +56,11 @@ class NativeMilestonePairTests(unittest.TestCase):
         check.observe("I","Gen.1",b'<div sID="parent"/><lg sID="child"/>')
         check.observe("K","Gen.1.1",b'<div eID="parent"/><lg eID="child"/>')
         result = check.finish()
-        self.assertEqual(result["native_milestone_pairing_findings"][
-            "crossing_or_non_lifo_structural_ranges"],1)
+        self.assertEqual(result["native_milestone_pair_categories"][
+            "different_tag_interleaving_diagnostic"],1)
+        self.assertNotIn("same_tag_overlapping_milestone_ranges",
+                         result["native_milestone_pairing_findings"])
+        self.assertTrue(result["different_tag_interleavings_are_diagnostic_not_nesting_defects"])
         self.assertEqual(result["native_milestone_tag_counts"]["div:paired"],1)
         self.assertEqual(result["native_milestone_tag_counts"]["lg:paired"],1)
 
@@ -66,7 +69,11 @@ class NativeMilestonePairTests(unittest.TestCase):
         check.observe("I","Gen",b'<div type="paragraph" sID="p"/>')
         check.observe("K","Exod.1.1",b'<div type="poetry" eID="p"/>')
         result=check.finish()
-        self.assertEqual(result["native_milestone_pairing_findings"]["matched_id_crosses_books"],1)
+        self.assertEqual(result["native_milestone_pair_categories"][
+            "pair_spans_multiple_books_review_scope"],1)
+        self.assertEqual(result["cross_book_pair_reference_samples_no_ids"],[
+            {"start_ref":"Gen","end_ref":"Exod.1.1","structural_tag":"div",
+             "opening_type_allowlisted":"paragraph"}])
         self.assertEqual(result["native_milestone_pairing_findings"][
             "matched_id_has_conflicting_types"],1)
 
@@ -79,6 +86,8 @@ class NativeMilestonePairTests(unittest.TestCase):
             "unaddressable_TOP_entries_unverified"],1)
         self.assertEqual(result["native_milestone_pairing_findings"][
             "unparseable_native_fragment"],1)
+        self.assertEqual(result["native_numbered_intro_scan_counts"][
+            "unaddressable_TOP_milestone_events_unverified"],1)
         self.assertNotEqual(result["status"],"compiled_milestone_pairs_verified_only")
 
     def test_source_words_and_note_values_never_escape(self):
@@ -99,6 +108,39 @@ class NativeMilestonePairTests(unittest.TestCase):
         check.observe("K","Gen.1.1",b'<div sID="x"/>')
         with self.assertRaises(NativeMilestoneAuditError):
             check.observe("K","Gen.1.1",b'<div eID="x"/>')
+
+    def test_same_tag_crossing_is_not_excused_by_other_tag_interleaving(self):
+        check=NativeMilestonePairAudit()
+        check.observe("I","Gen",b'<div sID="a"/><div sID="b"/>')
+        check.observe("K","Gen.1.1",b'<div eID="a"/><div eID="b"/>')
+        report=check.finish()
+        self.assertEqual(report["native_milestone_pairing_findings"][
+            "same_tag_overlapping_milestone_ranges"],1)
+        self.assertNotEqual(report["status"],"compiled_milestone_pairs_verified_only")
+
+    def test_osis2mod_paragraph_vs_preverse_div_types_not_conflated(self):
+        check=NativeMilestonePairAudit()
+        check.observe("I","Gen.1",
+                      b'<div type="x-p" sID="paragraph-one"/>'
+                      b'<div type="x-milestone" subType="x-preverse" sID="technical"/>')
+        check.observe("K","Gen.1.1",
+                      b'<div type="x-milestone" subType="x-preverse" eID="technical"/>'
+                      b'<div type="x-p" eID="paragraph-one"/>')
+        r=check.finish()
+        self.assertEqual(r["paired_div_types_allowlisted"]["x-p"],1)
+        self.assertEqual(r["paired_div_types_allowlisted"]["x-milestone"],1)
+        self.assertEqual(r["native_milestone_tag_counts"]["div:paired"],2)
+        self.assertNotIn("technical",str(r))
+        self.assertNotIn("paragraph-one",str(r))
+
+    def test_untrusted_div_type_remains_categorized_and_not_disclosed(self):
+        check=NativeMilestonePairAudit()
+        check.observe("K","Gen.1.1",
+                      b'<div type="private-super-sensitive-type" sID="x"/>'
+                      b'<div type="private-super-sensitive-type" eID="x"/>')
+        r=check.finish()
+        self.assertEqual(r["paired_div_types_allowlisted"]["other_unreviewed_type"],1)
+        self.assertNotIn("private-super-sensitive-type",str(r))
 
     def test_reused_identifier_after_prior_close_is_allowed(self):
         check=NativeMilestonePairAudit()
