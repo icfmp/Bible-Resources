@@ -135,6 +135,28 @@ class RawNativeCharacterTests(unittest.TestCase):
         self.assertFalse(out["notes_strong_references_poetry_layout_verified"])
         self.assertNotIn("first, beta!", json.dumps(out))
 
+    def test_prioritize_material_word_mismatch_over_repetitive_whitespace_examples(self):
+        # Thirty whitespace differences must not push the single actual
+        # word difference out of the bounded metadata-only sample set.
+        source = {f"Alpha.1.{v}": f"word {v} original"
+                  for v in range(1, 33)}
+        native = [
+            (f"Alpha.1.{v}",
+             (f"word  {v} original" if v < 32
+              else f"word {v} altered").encode())
+            for v in range(1, 33)
+        ]
+        report = compare_private_main_text(source, {}, native)
+        self.assertEqual(
+            report["classifications"]["whitespace_only"], 31)
+        self.assertEqual(
+            report["classifications"]["word_sequence_differs"], 1)
+        rows = report["first_differences_no_scripture"]
+        self.assertEqual(rows[0]["native_ref"], "Alpha.1.32")
+        self.assertEqual(rows[0]["classification"], "word_sequence_differs")
+        self.assertLessEqual(len(rows), 25)
+        self.assertNotIn("altered", json.dumps(report))
+
     def test_source_only_and_native_only_differ_never_silently_pass(self):
         source = {"Alpha.1.1": "first", "Alpha.1.2": "second"}
         out = compare_private_main_text(source, {}, [
