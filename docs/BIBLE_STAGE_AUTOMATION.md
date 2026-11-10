@@ -459,6 +459,34 @@ This is generic across edition/versification and does not modify original
 USFX/SWORD archives, publication content, references, source hashes or
 reader behavior.
 
+## Original USFX prechapter `p` styles versus compiled SWORD book titles
+
+The [official eBible USFX XSD documentation](https://ebible.org/usfx/usfx_xsd.html)
+specifies that a `<p>` element can mean a normal paragraph **or a heading
+or title**, according to its original `sfm` attribute. Counting all
+`p` as ordinary paragraphs silently loses authorial style semantics.
+
+The generic `audit_usfx_book_prefaces` in
+`scripts/source_native_paragraph_counts.py` now inventories the original
+source `sfm` for each paragraph **before the first chapter**. It preserves
+only an allowlisted public USFM code or an explicit
+`other_unreviewed_style` category; the original `style` attribute
+content, unrecognized `sfm` values and Scripture/title words never appear
+in artifacts. Styles are grouped conservatively as known *book title*,
+*section heading*, *other heading*, *body paragraph*, *implicit p*, or
+*unreviewed*. The original `style` and `level` attribute **presence**
+and potentially conflicting `sfm` vs `style` values are counted without
+publishing those values. An explicit title-family SFM is useful source
+evidence, **not** automatic authorization to transform that element into a
+SWORD `title`. Missing or unknown styles stay visible and require review.
+
+The original/compiled book-intro title **prose** is compared separately in
+`scripts/native_book_intro_screen.py`. A successful 66/66 lexical title
+match is not by itself proof of source-style equivalence or of ordered
+paragraph and poetry boundaries. The remaining source→compiled
+position/typography review in 4c and 5 is not waived. No original file or
+native SWORD module is modified.
+
 ## Safety and publication separation
 
 - GitHub workflow uses `contents: read` for the audit job.
