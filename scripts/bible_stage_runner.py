@@ -254,7 +254,8 @@ def _write_report(report_dir: Path, report: dict) -> None:
     lines.extend("- "+v for v in report["missing"])
     if not report["missing"]:
         lines.append("- None for this stage's narrow technical scope")
-    lines.extend(["","No Scripture text, notes or original archives are uploaded.",
+    lines.extend(["", "**Next action**", report["next_action"], "",
+                  "No Scripture text, notes or original archives are uploaded.",
                   "**This report is not publication or editorial approval.**"])
     summary.write_text("\n".join(lines)+"\n",encoding="utf-8")
 
@@ -284,6 +285,10 @@ def main(argv=None) -> int:
         result=_status("BLOCKED",verified=[],
             missing=["Run failed: " + reason], evidence={})
         failed=True
+    if result["status"] == "DONE" and args.stage < 7:
+        next_action = f"Review this evidence and proceed to stage {args.stage+1}/7 only when the full gate is documented"
+    else:
+        next_action = f"Resolve the first missing gate, then repeat stage {args.stage}/7"
     report={"schema_version":1,"resource_id":args.resource_id,"stage":args.stage,
             "stage_name":STAGES[args.stage],
             "git_sha":os.environ.get("GITHUB_SHA","local"),
@@ -291,6 +296,7 @@ def main(argv=None) -> int:
                 os.environ.get("GITHUB_REPOSITORY","")+"/actions/runs/"+
                 os.environ.get("GITHUB_RUN_ID","") if os.environ.get("GITHUB_RUN_ID") else None,
             "status":result["status"],"gate_completed":result["status"]=="DONE",
+            "next_action":next_action,
             "verified":result["verified"],"missing":result["missing"],
             "evidence":result["evidence"],"reusable_for_pub_approval":False,
             "script_did_not_publish":True}
