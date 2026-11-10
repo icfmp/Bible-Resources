@@ -139,6 +139,26 @@ class BibleIntakeTests(unittest.TestCase):
         self.assertEqual(result["status"],"REVIEW_REQUIRED")
         self.assertTrue(any("Rights" in x for x in result["missing"]))
 
+    def test_provisional_real_intake_stage_one_never_fetches_without_sha_pins(self):
+        manifest = load_manifest("frajnd-2024")
+        self.assertIsNone(manifest["source"]["sha256"])
+        self.assertIsNone(manifest["sword"]["sha256"])
+        self.assertIsNone(manifest["sword"]["module_id"])
+        self.assertIsNone(manifest["sword"]["driver"])
+        with patch("bible_stage_runner.acquire", side_effect=AssertionError("Network must not be attempted")) as fetch:
+            stage_one = run_stage(manifest, 1, self.folder)
+            stage_two = run_stage(manifest, 2, self.folder)
+            stage_three = run_stage(manifest, 3, self.folder)
+        fetch.assert_not_called()
+        self.assertEqual(stage_one["status"], "REVIEW_REQUIRED")
+        self.assertTrue(any("SHA-256 not yet" in field for field in stage_one["missing"]))
+        self.assertEqual(stage_two["status"], "BLOCKED")
+        self.assertEqual(stage_three["status"], "BLOCKED")
+        with self.assertRaisesRegex(IntakeError, "Invalid expected SHA-256"):
+            fetch_pinned(manifest["source"]["url"], None, "ebible",
+                         self.folder/"forbidden.zip", opener=_Opener({}))
+        self.assertFalse((self.folder/"forbidden.zip").exists())
+
     def test_stage_two_proves_both_original_archives_and_sword_driver(self):
         result=run_stage(self.cfg,2,self.folder,opener=self.opener)
         self.assertEqual(result["status"],"DONE")
