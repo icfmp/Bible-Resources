@@ -57,9 +57,18 @@ def compare_authored_native_paragraphs(xml: bytes, mapping: list[tuple[str,str]]
     seen=set()
     for book in root.iter("book"):
         src=book.get("id")
-        if not src or src in seen or src not in crosswalk:
-            raise ParagraphAuditError("Original source book not mapped or duplicated")
+        if not src or src in seen:
+            raise ParagraphAuditError("Missing or duplicated original source book")
         seen.add(src)
+        if src not in crosswalk:
+            # Never silently discard additional authorial books. The existing
+            # full-corpus source/native scope checker separately blocks
+            # unrepresented books; this audit must still return evidence.
+            totals["unmapped_source_book_count"] += 1
+            totals["unmapped_source_p_element_count"] += sum(
+                1 for node in book.iter()
+                if isinstance(node.tag,str) and etree.QName(node).localname=="p")
+            continue
         code=crosswalk[src]
         counters=Counter()
         before_first_verse=True
@@ -108,9 +117,11 @@ def compare_authored_native_paragraphs(xml: bytes, mapping: list[tuple[str,str]]
                 })
         else:
             totals["books_with_exact_p_pair_count"]+=1
-    if len(seen)!=proof["source_book_count"] or len(seen)!=len(mapping):
-        raise ParagraphAuditError("Original source book inventory disagrees with mapping")
-    if overall["all_original_p_elements"] != proof["source_element_counts"].get("p",0):
+    if len(seen)!=proof["source_book_count"] or not set(crosswalk).issubset(seen):
+        raise ParagraphAuditError("Original source book inventory disagrees with declared mapping")
+    if (overall["all_original_p_elements"] +
+            totals["unmapped_source_p_element_count"] !=
+            proof["source_element_counts"].get("p",0)):
         raise ParagraphAuditError("Original USFX paragraph scanners disagree")
     # Keep zero-count result fields stable; absence of findings must be an
     # explicit checked zero rather than an omitted machine-report key.
@@ -124,13 +135,17 @@ def compare_authored_native_paragraphs(xml: bytes, mapping: list[tuple[str,str]]
     return {
         "schema_version":1,
         "source_original_book_count":len(seen),
+        "source_mapped_book_count":len(by_book),
+        "unmapped_original_book_scope_requires_separate_review":bool(
+            totals["unmapped_source_book_count"]),
         "authorial_native_typed_paragraph_totals":dict(sorted(totals.items())),
         "original_p_position_class_counts":dict(sorted(overall.items())),
         "first_per_book_mismatches_no_text":findings,
         "original_authorial_book_paragraph_distribution_sha256":original_distribution,
         "every_original_book_has_one_extra_p_vs_compiled":bool(
-            len(seen)>0 and totals["books_with_p_pair_count_mismatch"]==len(seen)
-            and totals["signed_authorial_minus_native_paragraph_pair_difference"]==len(seen)
+            len(by_book)>0 and not totals["unmapped_source_book_count"]
+            and totals["books_with_p_pair_count_mismatch"]==len(by_book)
+            and totals["signed_authorial_minus_native_paragraph_pair_difference"]==len(by_book)
             and all(by_book[code]["all_original_p_elements"]-
                     native_x_p_by_book.get(code,0)==1 for code in by_book)),
         "mismatched_paragraph_counts_are_anomalies_not_proven_text_loss":True,
