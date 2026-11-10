@@ -25,6 +25,8 @@ on:
       - ".github/workflows/bible-staged-audit.yml"
       - "scripts/bible_intake.py"
       - "scripts/bible_stage_runner.py"
+      - "scripts/maintext_fidelity_classification.py"
+      - "tests/test_maintext_fidelity_classification.py"
       - "scripts/source_usfx_structure.py"
       - "scripts/usfx_schema_gate.py"
       - "config/usfx-schema-policy.json"
@@ -83,6 +85,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_bible_stage_runner.py' -v
           python -m unittest discover -s tests -p 'test_source_usfx_structure.py' -v
           python -m unittest discover -s tests -p 'test_usfx_schema_gate.py' -v
+          python -m unittest discover -s tests -p 'test_maintext_fidelity_classification.py' -v
           python -c 'import os, sys; sys.path.insert(0, "scripts"); from bible_intake import load_manifest; m=load_manifest(os.environ["RESOURCE_ID"]); print("Reviewed research manifest:", m["resource_id"], m["purpose"], m["source"]["format"])'
       - name: Observe official eBible USFX schema fingerprint (research only, no auto-approval)
         if: github.event_name == 'pull_request'
