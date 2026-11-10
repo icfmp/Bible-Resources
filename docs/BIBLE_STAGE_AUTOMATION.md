@@ -338,6 +338,48 @@ on structural `div`, `l`, `lg`, `milestone`, `p`, `q`, `lb`.
 issues are reviewed. Stage 5 retains source-native note/caller/target and
 final typography checks. No change to published Bible modules or rights.
 
+## OSIS overlapping hierarchies and typed paragraph milestones
+
+**Do not treat every `div` in a SWORD fragment as an authorial paragraph.**
+CrossWire's [osis2mod transformation documentation](
+https://wiki.crosswire.org/Osis2mod) distinguishes:
+
+- original paragraph `p` converted to `div type="x-p"` with generated
+  `sID/eID` endpoints;
+- compiler-generated `div type="x-milestone" subType="x-preverse"`
+  delimiting inter-verse/prepended content, **not a source paragraph**;
+- optional book/book-group divisions and other typed editorial containers.
+
+The [CrossWire OSIS milestone documentation](
+https://wiki.crosswire.org/OSIS_Bibles#OSIS_Milestones) also describes
+the **overlap** of verse and document hierarchies. An all-tag global stack
+may see valid `div`/poetry/verse interleavings as "non-LIFO"; this alone
+does not prove a malformed compiled module.
+
+The compiled ID audit now distinguishes **interleaving between different
+element tags** (report-only evidence) from **overlapping ranges of the
+same tag** (explicit structural review finding); it records exact
+`sID/eID` matches independently of both. Cross-book ranges are
+reported with bounded *opening and closing reference IDs* plus
+allowlisted type categories, because top-level book-group or testament
+regions may legitimately span several books. Such scopes still require
+an independent authorial/compiled source comparison.
+
+For `div`, the audit separately counts matched **allowlisted**
+`x-p` paragraph pairs, `x-milestone` technical/preverse pairs,
+`book` and `bookGroup` divisions, and unknown types. Unknown
+original attribute **values** are never copied to public reports.
+The two anonymous native TOP entries are parsed privately to distinguish
+actual structural milestones from other non-addressable content; neither
+entry is used to invent a source reference.
+
+**This remains a compiled-side diagnosis.** A complete match of all
+native IDs cannot alone establish that original USFX paragraphs, headings,
+poetry or notes were preserved at the correct word positions. The source
+relative event/order audit and editorial gate must still be reviewed
+before checking 4c or 4/7. Never patch source or hash pins just to pass
+a test.
+
 ## Safety and publication separation
 
 - GitHub workflow uses `contents: read` for the audit job.
