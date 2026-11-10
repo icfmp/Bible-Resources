@@ -165,9 +165,36 @@ def parse_native_raw_corpus(stream, *, on_entry=None) -> tuple[dict, list[str], 
     return report, ordinary, introductions, anonymous
 
 
+def verify_independent_raw_spotchecks(
+    expected_digests: dict[str, str], fetch_raw
+) -> dict:
+    """A second stock-engine reader must return the same exact native bytes.
+
+    This catches a full-corpus inspector iterating VerseKey while accidentally
+    leaving SWModule's current key parked on a different verse (historical
+    regression in #28). Only checked reference IDs and hashes are retained.
+    """
+    if not 1 <= len(expected_digests) <= 4:
+        raise RawCorpusError("Independent native raw spot-check set is empty or oversized")
+    for ref, expected in expected_digests.items():
+        if KEY.fullmatch(ref) is None or not re.fullmatch(r"[0-9a-f]{64}", expected):
+            raise RawCorpusError("Invalid independent raw spot-check reference/hash")
+        actual = fetch_raw(ref)
+        if not isinstance(actual, bytes) or len(actual) > MAX_RAW_ENTRY:
+            raise RawCorpusError("Independent raw entry inspector returned invalid bytes")
+        if sha256(actual).hexdigest() != expected:
+            raise RawCorpusError("Stock SWORD raw corpus cursor did not match independent exact-key reader")
+    return {
+        "verified": True,
+        "sampled_numbered_native_refs": list(expected_digests),
+        "sampled_exact_key_count": len(expected_digests),
+    }
+
+
 def inspect_native_raw_corpus(
     module: Path, module_id: str, native_raw_binary: Path,
-    native_index_binary: Path, *, on_entry=None
+    native_index_binary: Path, *, on_entry=None,
+    native_entry_binary: Path | None = None
 ) -> dict:
     if native_raw_binary.is_symlink() or not native_raw_binary.is_file():
         raise RawCorpusError("Missing or linked trusted full-native-raw binary")
@@ -176,6 +203,22 @@ def inspect_native_raw_corpus(
     # Independently collect the true native index from a separate C++ helper.
     keys, _registry, proof = collect_native_inventory(
         native_index_binary, module, module_id, timeout=240)
+    samples = {}
+    if native_entry_binary is not None:
+        if native_entry_binary.is_symlink() or not native_entry_binary.is_file():
+            raise RawCorpusError("Missing or linked independent native entry binary")
+        lines = keys.splitlines()
+        offsets = sorted(set((0, len(lines) // 3, 2 * len(lines) // 3,
+                              len(lines) - 1)))
+        samples = {lines[i]: None for i in offsets}
+    captured = {}
+
+    def private_capture(kind, ref, raw):
+        if kind == "K" and ref in samples:
+            captured[ref] = sha256(raw).hexdigest()
+        if on_entry is not None:
+            on_entry(kind, ref, raw)
+
     env = dict(os.environ, SWORD_PATH=str(payload.resolve(strict=True)))
     process = None
     try:
@@ -184,7 +227,7 @@ def inspect_native_raw_corpus(
             stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env=env)
         if process.stdout is None:
             raise RawCorpusError("Cannot privately capture native raw content stream")
-        report, ordinary, intros, anonymous = parse_native_raw_corpus(process.stdout, on_entry=on_entry)
+        report, ordinary, intros, anonymous = parse_native_raw_corpus(process.stdout, on_entry=private_capture)
         process.stdout.close()
         try:
             status = process.wait(timeout=240)
@@ -203,6 +246,31 @@ def inspect_native_raw_corpus(
             or report["actual_occupied_numbered_entry_count"] !=
                 proof["native_occupied_numbered_verse_count"]):
         raise RawCorpusError("Native full corpus diverges from independently inventoried reader keys")
+    # Verify selected exact-key readbacks from a separate native inspector.
+    # This is NOT inferred from the corpus stream's own key headers.
+    report["independent_native_exact_key_raw_spotcheck_verified"] = False
+    if native_entry_binary is not None:
+        if set(captured) != set(samples):
+            raise RawCorpusError("Missing independent raw sample in full stream")
+
+        def fetch_exact(ref):
+            try:
+                result = subprocess.run(
+                    [str(native_entry_binary.resolve(strict=True)), module_id, ref],
+                    env=env, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                    timeout=60, check=False)
+            except (OSError, subprocess.TimeoutExpired) as exc:
+                raise RawCorpusError("Independent native exact-key reader unavailable") from exc
+            if result.returncode != 0:
+                raise RawCorpusError("Independent native exact-key reader failed")
+            return result.stdout
+
+        proof_check = verify_independent_raw_spotchecks(captured, fetch_exact)
+        report["independent_native_exact_key_raw_spotcheck_verified"] = True
+        report["independent_native_exact_key_raw_spotcheck_refs"] = (
+            proof_check["sampled_numbered_native_refs"])
+        report["independent_native_exact_key_binary_sha256"] = sha256(
+            native_entry_binary.read_bytes()).hexdigest()
     if before != module_payload_digest(module):
         raise RawCorpusError("Actual compiled SWORD module changed during raw inventory")
     report["module_id"] = module_id
@@ -244,12 +312,15 @@ def main() -> int:
     p.add_argument("--module-id", required=True)
     p.add_argument("--native-raw-binary", required=True, type=Path)
     p.add_argument("--native-index-binary", required=True, type=Path)
+    p.add_argument("--native-entry-binary", type=Path,
+                   help="Independent exact-key reader; verifies sampled raw bytes")
     p.add_argument("--report", required=True, type=Path)
     args = p.parse_args()
     try:
         report = inspect_native_raw_corpus(
             args.module_directory, args.module_id,
-            args.native_raw_binary, args.native_index_binary)
+            args.native_raw_binary, args.native_index_binary,
+            native_entry_binary=args.native_entry_binary)
         write_new_metadata_report(args.report, args.module_directory, report)
     except (OSError, ValueError, UnicodeError) as exc:
         p.error(str(exc))
