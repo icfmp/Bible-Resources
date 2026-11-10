@@ -331,6 +331,25 @@ def compare_body_boundary_word_positions(source, native, original_counts, native
                 problem="different_close_word_ordinal"
             else:
                 counts["same_kind_event_word_start_and_end_positions_match"] += 1
+                if (a["open"]["reference"] != b["open"]["reference"]
+                        or a["close"]["reference"] != b["close"]["reference"]
+                        or a["open"]["record_scope"] != b["open"]["record_scope"]
+                        or a["close"]["record_scope"] != b["close"]["record_scope"]):
+                    # Moving a boundary across a verse or into chapter-zero
+                    # can be a compilation representation difference.
+                    # Preserve that fact for editorial examination rather
+                    # than calling it an exact source location match.
+                    counts["same_word_ordinals_but_original_native_record_scope_differs"] += 1
+                    if len(samples) < MAX_SAMPLES:
+                        samples.append({
+                            "book":book, "one_based_event":index,
+                            "kind":a["kind"],
+                            "problem":"matching_word_ordinals_different_record_scope",
+                            "source_open_ref":a["open"]["reference"],
+                            "native_open_ref":b["open"]["reference"],
+                            "source_close_ref":a["close"]["reference"],
+                            "native_close_ref":b["close"]["reference"],
+                        })
                 continue
             different=True
             if len(samples)<MAX_SAMPLES:
@@ -374,6 +393,7 @@ def compare_body_boundary_word_positions(source, native, original_counts, native
         "native_word_boundary_event_sequence_sha256":native_digest.hexdigest(),
         "all_mapped_book_p_q_start_end_word_ordinals_match":complete,
         "word_position_only_not_character_punctuation_or_whitespace_fidelity":True,
+        "identical_book_word_ordinals_not_exact_verse_record_or_markup_placement":True,
         "source_native_verse_zero_intro_representation_review_still_required":True,
         "source_native_original_style_and_linebreak_fidelity_unverified":True,
         "unaddressable_native_records_or_unmilestoned_body_blocks_cannot_pass":True,
