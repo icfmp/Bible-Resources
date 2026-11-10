@@ -36,7 +36,7 @@ SAFE_STRUCTURE_STYLES = frozenset({
     "x-intro", "x-title", "x-verse", "x-chapter",
 })
 STRUCTURAL_TAGS = frozenset({"div", "p", "milestone", "l", "lg", "lb", "q"})
-_WORDS = re.compile(r"[^\\W_]+(?:['\\u2019][^\\W_]+)*", re.UNICODE)
+_WORDS = re.compile(r"[^\W_]+(?:['\u2019][^\W_]+)*", re.UNICODE)
 
 
 def _style(value):
