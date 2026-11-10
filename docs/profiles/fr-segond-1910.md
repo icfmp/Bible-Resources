@@ -1,20 +1,139 @@
 # Louis Segond 1910 — reader-facing resource profile
 
-**DRAFT — NOT APPROVED FOR APP/CATALOGUE PROFILE PUBLICATION**
+**DRAFT — READER TEXT REVIEWED, NOT YET APPROVED FOR APP/CATALOGUE PROFILE PUBLICATION**
 
-**Important distinction:** Bible Resources' SWORD module `BRLSG1910` **version 0.1.0 is already published and owner-approved as an initial reading edition**. This separate descriptive profile has *not* received final editorial approval. Its draft status does not revoke or alter that release.
+**Important distinction:** Bible Resources' SWORD module `BRLSG1910` **version 0.1.0 is already published and owner-approved as an initial reading edition**. The reader text was revised following the project owner's review on 2026-11-10; publication to app/catalogue, including evidence records for contested variants, remains gated separately. This draft status does not revoke or alter the release.
 
-## Proposed concise reader card
+## Présentation courte — bibliothèque (texte soumis à validation éditoriale)
 
-- **Title:** Louis Segond 1910
-- **Language:** French (`fr`)
-- **Category:** Bible; 66-book Protestant canon
-- **Work:** Louis Segond's French translation of the Hebrew and Greek Scriptures, in the **posthumously revised 1910 edition** issued by the British and Foreign Bible Society. The 1910 editors must not be presented as Louis Segond himself.
-- **Curated module:** `BRLSG1910` version `0.1.0` (Bible Resources)
-- **Versification:** SWORD `Segond` (standard installed registry)
-- **Reader introduction (`fr`, draft):** « La Bible Louis Segond 1910 est une édition révisée, publiée après la mort de Louis Segond, de sa traduction française de l'Ancien et du Nouveau Testament. Cette traduction historique, réalisée d'après l'hébreu et le grec, est proposée ici à partir de la source numérique eBible. Certaines particularités de présentation et de numérotation sont documentées ; le module n'est pas certifié identique à un exemplaire imprimé de 1910. »
-- **Strengths (factual candidates; pending approval):** Original translation from Hebrew and Greek (1910 title page); historically identifiable revised edition (1910 title and preface); underlying text declared public domain by eBible. These are documented features, not a ranking of translation accuracy.
-- **Points of attention (draft):** The edited 1910 text is not identical to Segond's unrevised work; this digitized SWORD release has the evidenced verse-index and layout limitations below. No theological rating is proposed.
+### Louis Segond 1910
+
+**Bible · Français · 66 livres · Domaine public**
+
+La Bible Louis Segond 1910 est une traduction protestante historique des Écritures, réalisée à partir des textes hébreu et grec. Publiée dans une édition révisée en 1910, après la mort de Louis Segond, elle conserve le style caractéristique du français biblique de son époque.
+
+Cette édition, préparée par Bible Resources à partir de la source eBible, est proposée au format SWORD pour la lecture et l'étude biblique.
+
+**Points forts**
+
+- Traduction réalisée à partir des langues originales.
+- Traduction historique permettant d'étudier le vocabulaire biblique traditionnel.
+- Texte libre de droits, accessible gratuitement.
+
+**Points d'attention**
+
+- Certaines expressions et tournures appartiennent au français du XIXᵉ siècle.
+- L'édition de 1910 est une révision de la traduction originale de Louis Segond.
+- Certains choix de variantes du Nouveau Testament retiennent des formulations moins explicites concernant la divinité de Jésus-Christ que d'autres lectures manuscrites, notamment en 1 Timothée 3.16 et Actes 20.28 (voir les références et précautions de méthode ci-dessous).
+
+**Source :** eBible · **Version Bible Resources :** 0.1.0
+
+## Présentation longue — détails de la ressource (texte soumis à validation éditoriale)
+
+### Bible Louis Segond 1910
+
+**Traduction française de la Bible — Louis Segond, édition révisée de 1910**
+
+#### Présentation
+
+La Bible Louis Segond 1910 est une traduction protestante historique de l'Ancien et du Nouveau Testament, réalisée à partir des langues originales hébraïque et grecque.
+
+Elle est issue du travail de Louis Segond (1810–1885), théologien et pasteur suisse. Sa traduction de l'Ancien Testament fut publiée en 1873, puis celle du Nouveau Testament en 1880.
+
+L'édition de 1910 constitue une révision posthume de cette traduction. Elle conserve l'essentiel du travail de Louis Segond tout en intégrant des modifications apportées avec le concours de pasteurs et de professeurs de théologie français et suisses.
+
+Par son vocabulaire et ses formulations, elle témoigne d'une étape importante de l'histoire des traductions protestantes françaises.
+
+#### Histoire de l'édition de 1910
+
+Louis Segond avait autorisé, dès 1880, la Société biblique britannique et étrangère à modifier sa traduction après sa mort.
+
+La révision publiée en 1910 conserve principalement son texte, avec certaines corrections jugées importantes par les responsables de l'édition.
+
+L'un des apports particuliers de cette édition est son système de références bibliques parallèles, destiné à faciliter les rapprochements entre différents passages de l'Écriture.
+
+Les éditeurs ont également adapté l'appareil de notes, notamment en écartant certaines annotations de nature théologique ou explicative, conformément à la politique éditoriale de la Société biblique.
+
+#### Caractéristiques de la traduction
+
+- **Une traduction depuis les langues originales :** l'Ancien Testament est traduit de l'hébreu et le Nouveau Testament du grec.
+- **Un français historique :** la traduction emploie un vocabulaire et des constructions caractéristiques de son époque.
+- **Une édition protestante :** elle comprend les 66 livres du canon protestant.
+- **Une révision identifiable :** le texte de 1910 doit être distingué des premières éditions publiées par Louis Segond au XIXᵉ siècle.
+
+Cette version peut être utilisée pour la lecture personnelle, l'étude biblique et la comparaison avec d'autres traductions françaises.
+
+#### Points forts
+
+1. **Une traduction historique.** Elle permet de découvrir une traduction française ancienne et d'étudier les formulations bibliques transmises dans le protestantisme francophone.
+2. **Une traduction fondée sur les langues originales.** Le travail de traduction repose sur les textes hébreu et grec, plutôt que sur la traduction d'une autre Bible moderne.
+3. **Un intérêt pour l'étude comparative.** Son vocabulaire et ses choix de traduction offrent un point de comparaison utile avec les versions françaises plus récentes.
+4. **Une ressource librement accessible.** Le texte de cette édition appartient au domaine public et peut être lu, étudié et redistribué conformément aux droits applicables.
+
+#### Points d'attention
+
+1. **Un français parfois ancien.** Certains mots, expressions ou constructions grammaticales peuvent paraître inhabituels aux lecteurs contemporains. Une traduction moderne peut compléter utilement la lecture.
+2. **Une traduction révisée.** La version de 1910 n'est pas exactement celle que Louis Segond avait publiée de son vivant. Elle intègre des décisions éditoriales prises après sa mort.
+3. **Des choix textuels propres à son époque.** Certaines formulations diffèrent d'autres traductions fondées sur d'autres éditions du texte grec. La comparaison passage par passage aide à comprendre ces différences.
+
+#### Choix textuels concernant la divinité du Christ
+
+Louis Segond indique dans l'avant-propos à son Nouveau Testament qu'il a principalement utilisé l'édition critique grecque de Tischendorf, tout en se réservant le droit de retenir d'autres leçons lorsqu'elles lui semblaient mieux attestées.
+
+Dans la Segond 1910, plusieurs passages retiennent des formulations moins explicites concernant la divinité de Jésus-Christ que des lectures transmises par d'autres témoins ou éditions grecques :
+
+- **1 Timothée 3.16 :** « celui qui a été manifesté en chair », alors qu'une autre lecture porte « Dieu a été manifesté en chair ».
+- **Actes 20.28 :** « l'Église du Seigneur », alors qu'une autre lecture porte « l'Église de Dieu ».
+- **Jean 1.18 :** « le Fils unique », alors que certains témoins grecs portent une expression traduite « Dieu unique » ou « le Dieu unique ».
+
+Ces variantes peuvent être examinées dans les textes grecs et les apparats critiques. Chaque passage possède sa propre histoire textuelle ; la fiche présente les choix observables sans attribuer d'intention aux traducteurs ou aux réviseurs.
+
+#### À propos de cette édition numérique
+
+Cette ressource est préparée et distribuée par **Bible Resources**, à partir du texte numérique de la Louis Segond 1910 proposé par **eBible**.
+
+Elle est fournie au format standard SWORD, permettant son utilisation dans les logiciels bibliques compatibles.
+
+Le travail de Bible Resources vise à préserver le texte de la source, sa ponctuation, ses références et ses informations éditoriales, tout en améliorant sa présentation et sa compatibilité avec les outils de lecture. Cette première publication a fait l'objet de contrôles automatisés étendus ainsi que de tests de lecture.
+
+**Particularités techniques connues**
+
+- **Marc 10.52–53 :** la source eBible distingue ces deux numéros, mais le système de versification SWORD utilisé ne permet pas de les adresser séparément. Les deux textes sont conservés dans une même entrée, sous Marc 10.52.
+- **Job 34.37 :** la source eBible ne contient pas de verset distinct à cette référence. Aucun texte n'a été ajouté artificiellement.
+- **Présentation :** certains éléments de mise en page, notamment des notes et des introductions, peuvent être présentés différemment selon les logiciels de lecture.
+
+Ces particularités sont documentées et ne constituent pas une modification des mots bibliques de notre source.
+
+#### Informations techniques et provenance
+
+| Propriété | Information |
+|---|---|
+| Titre | Louis Segond 1910 |
+| Traducteur | Louis Segond |
+| Édition | Révision de 1910 |
+| Langue | Français |
+| Canon | Protestant, 66 livres |
+| Source numérique | eBible — fraLSG |
+| Format | SWORD / OSIS |
+| Versification | Segond |
+| Module | BRLSG1910 |
+| Version | 0.1.0 |
+| Licence du texte | Domaine public |
+| Distribution | Bible Resources |
+
+#### Sources et documentation de la présentation
+
+- [Avertissement des éditeurs de 1910](https://fr.wikisource.org/wiki/Bible_Segond_1910/Avertissement).
+- [Avant-propos de Louis Segond au Nouveau Testament (édition 1899)](https://fr.wikisource.org/wiki/Bible_Segond_1899/Avant-propos), pour la méthode critique déclarée par Segond ; ne pas confondre cette édition antérieure avec la révision de 1910.
+- [Texte eBible de 1 Timothée 3.16](https://ebible.org/pdf/fraLSG/fraLSG_1TI.pdf).
+- [Texte de la Segond 1910 en Actes 20.28](https://lire.la-bible.net/bible/LSG/ACT.20).
+- [Texte de la Segond 1910 en Jean 1.18](https://biblia.com/reference/Jn2.18-21?resourceName=lsg).
+- [Comparaison de variantes en 1 Timothée 3.16 — NET Bible, note textuelle](https://classic.net.bible.org/passage.php?passage=1Ti+3%3A16).
+- [Source numérique eBible](https://ebible.org/Scriptures/details.php?id=fraLSG).
+- [Déclaration de domaine public](https://ebible.org/fraLSG/copyright.htm).
+- [Publication Bible Resources 0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/lsg-0.1.0).
+
+**Édition numérique :** Bible Resources 0.1.0, novembre 2026.
 
 ## Three distinct provenance layers
 
@@ -72,9 +191,9 @@
 - [x] Documented, reader-relevant versification limitations separated from theological claims
 - [x] Confirm 1910 title page and *Avertissement* against a printed-edition facsimile; identify this as a posthumous revision and do not assume named individual revisers
 - [ ] Verify any more specific named-editor/revision attributions before publishing them
-- [ ] Approve or reject the source-backed concise factual strengths
+- [x] Project owner reviewed the reader-facing short and long wording, requesting removal of an interpretive conclusion about translator intent (2026-11-10). Publication remains gated below.
 - [ ] Review contested variants with appropriate scholarly/primary material
-- [ ] **Owner editorial approval pending:** approve reader-facing French introduction and each visible strength/caution separately from module `quality.status`
+- [ ] Complete edition-specific variant evidence review (including Greek witnesses and 1910 revision provenance), then explicitly approve the profile's machine/public display separately from the existing module `quality.status`
 - [ ] Decide how the application/catalogue represents approved profile revisions and retains attribution offline
 
 **Editorial rule:** the already-published 0.1.0 Scripture and its immutable release hashes are not changed by edits to this profile. See [resource profile evidence policy](../RESOURCE_PROFILES.md).
