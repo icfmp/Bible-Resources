@@ -142,5 +142,45 @@ class SourceNativeWordBoundaryTests(unittest.TestCase):
         self.assertNotIn("PRIVATE",str(r))
 
 
+    def test_moving_boundary_to_next_verse_is_visible_even_if_word_ordinals_match(self):
+        first=(b'alpha <l sID="line"/>beta<l eID="line"/> gamma ')
+        second=(b'<div type="x-p" eID="p1"/>'
+                b'<div type="x-p" sID="p2"/>'
+                b'delta <div type="x-p" eID="p2"/>')
+        receipt=compare(first=first,second=second)
+        self.assertTrue(receipt["all_mapped_book_p_q_start_end_word_ordinals_match"])
+        c=receipt["original_vs_compiled_event_word_position_counts"]
+        self.assertGreater(c["same_word_ordinals_but_original_native_record_scope_differs"],0)
+        self.assertIn("matching_word_ordinals_different_record_scope",
+                      [x["problem"] for x in
+                       receipt["first_source_native_boundary_findings_reference_ordinals_only"]])
+        self.assertTrue(receipt[
+            "identical_book_word_ordinals_not_exact_verse_record_or_markup_placement"])
+
+    def test_moving_second_same_kind_paragraph_start_one_word_earlier_is_found(self):
+        early=(b'alpha <l sID="line"/>beta<l eID="line"/>'
+               b'<div type="x-p" eID="p1"/>'
+               b'<div type="x-p" sID="p2"/> gamma ')
+        receipt=compare(first=early)
+        self.assertEqual(receipt["original_vs_compiled_event_word_position_counts"][
+            "opening_word_position_mismatches"],1)
+        self.assertFalse(receipt["all_mapped_book_p_q_start_end_word_ordinals_match"])
+
+    def test_unaddressable_native_top_never_certifies_complete_boundary_proof(self):
+        a,sc=original()
+        native=NativeBodyBoundaries()
+        native.observe("U","TOP:1",b'<div type="x-p" sID="unmapped"/>')
+        native.observe("I","Gen.1",b'<div type="x-p" sID="p1"/>')
+        native.observe("K","Gen.1.1",b'alpha <l sID="line"/>beta'
+                       b'<l eID="line"/> gamma <div type="x-p" eID="p1"/>'
+                       b'<div type="x-p" sID="p2"/>')
+        native.observe("K","Gen.1.2",b'delta <div type="x-p" eID="p2"/>')
+        b,nc=native.finish()
+        receipt=compare_body_boundary_word_positions(a,b,sc,nc)
+        self.assertFalse(receipt["all_mapped_book_p_q_start_end_word_ordinals_match"])
+        self.assertEqual(receipt["original_vs_compiled_event_word_position_counts"][
+            "unaddressable_native_top_records"],1)
+
+
 if __name__ == "__main__":
     unittest.main()
