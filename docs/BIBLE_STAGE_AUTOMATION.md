@@ -685,6 +685,61 @@ This analysis is independent of any specific edition, Greek/Hebrew
 script, punctuation mark or predetermined event count. It is metadata-only
 research, not publisher identity/rights or publication permission.
 
+## Stage 4c — source-authored main-text whitespace / p-q structural gap triage
+
+`scripts/source_native_structural_whitespace.py` performs another
+**generic read-only** source-to-stock-SWORD comparison after independent
+complete p/q opening+closing punctuation-sensitive proof. It reuses the
+actual original authorial USFX indexed verse strings, the independently
+decoded native verse strings and **original source p/q open and close
+non-whitespace Unicode codepoint ordinals**. No extra archive is acquired
+during the already-running full-corpus scan.
+
+For each numbered verse, the script:
+
+- Requires **exact identical non-whitespace source and compiled characters**
+  (case, accents, punctuation, codepoint sequence). Non-whitespace
+  differences **BLOCK** the whitespace classification; they are never
+  normalized away to pass.
+- Compares each raw Unicode **whitespace run** at the same within-verse
+  **non-whitespace character gap**. It categorizes whether a changed
+  run sits at an original **poetry `q` opening/closing**, an original
+  paragraph `p` opening/closing, a verse start/end or a gap without
+  a tracked p/q marker; and whether a source newline is absent in
+  native **verse text**, a compiled newline is absent in source,
+  both retain some newline but differ in run, or spaces/tabs/Unicode
+  whitespace differ. It separately counts changes at verse boundaries.
+- Reports only totals, a stable **hash of bounded classification
+  coordinates**, and at most **24** canonical book/verse IDs and
+  integer gap ordinals. It never outputs source Scripture, note bodies,
+  raw whitespace strings, external input archives or native IDs.
+- **Critical:** The source verse text has only the whitespace that
+  the independent authored USFX reader actually collects into a
+  numbered verse. It does not include the **synthetic newlines added
+  as verse separators** by `_BookWords`, and cannot by itself
+  determine if an XML whitespace character was intentional authorial
+  indentation or publisher serialization. Likewise SWORD may express
+  a poetry break with `<l sID/eID>` rather than a literal newline.
+  A changed whitespace run at a matched p/q marker is therefore a
+  **possible structural representation candidate**, NOT evidence of
+  a preserved printed newline or a known-acceptable correction.
+  Changed runs with **no p/q marker** also require review; they are
+  not automatically assumed harmless.
+- Existing source `p/q` typed-count, pairing, full book word order,
+  character codepoint boundary, note and real SWORD native inspector
+  checks remain independent. Synthetic regressions include missing
+  newlines at original q opens, q closes, unmarked inline breaks,
+  changed spaces, modified punctuation, altered verse identity,
+  excluded source note/title prose and exact source/native whitespace.
+
+The scope is limited to **numbered main-text verse strings** and
+original `p/q` *character gap coincidences*. It does NOT audit
+verse-zero intro prose whitespace, exact source paragraph/stanza
+rendering, stylistic indentation, cross-verse whitespace deliberately
+outside numbered verse strings, note caller/links, or reader appearance.
+Those remain explicit stage 4c / 5 / 6 editorial gates. No source
+or published SWORD module is ever modified.
+
 ## Safety and publication separation
 
 - GitHub workflow uses `contents: read` for the audit job.
