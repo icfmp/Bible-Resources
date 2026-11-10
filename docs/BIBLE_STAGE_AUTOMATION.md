@@ -268,6 +268,14 @@ source-relative paragraph and poetry proof:
   allowlisted `div`/`milestone` structural `type`/`subType` categories,
   actual start/end vs container markup, and whether markers occur before the
   first, inside, or after the last numbered main-text word.
+- Source start markers between two numbered references also require an
+  **interval screen**, not only an exact next-reference match. A native marker
+  might be attached to the preceding numbered verse, or a verse-zero/intro
+  entry (the latter remains out of scope for this screen). The report counts
+  next-verse, previous-neighbor-only, and neither-neighbor cases, with only
+  bounded source reference IDs. A neighboring native marker is **never**
+  claimed to be the corresponding authored event without validating the
+  exact type/word position/order and cross-verse semantics.
 - Source next-verse anchors are screened against the set of native verses
   containing `div` or `l`/`lg`/`lb`. A corresponding verse key is **not
   proof** of matching markup semantic meaning, source layout position or
