@@ -131,5 +131,54 @@ class TypedParagraphBookTests(unittest.TestCase):
         with self.assertRaises(ParagraphAuditError):
             audit_usfx_book_prefaces(xml,[("GEN","Gen"),("LEV","Lev")])
 
+    def test_source_preface_explicit_title_style_never_conflated_with_plain_p(self):
+        from source_native_paragraph_counts import audit_usfx_book_prefaces
+        xml=(b'<usfx>'
+             b'<book id="GEN"><p sfm="mt1">PRIVATE BOOK TITLE</p>'
+             b'<c id="1"/><v id="1"/>VERSE</book>'
+             b'<book id="EXO"><p>PRIVATE BODY INTRO</p>'
+             b'<c id="1"/><v id="1"/>VERSE</book>'
+             b'</usfx>')
+        result=audit_usfx_book_prefaces(xml,MAPPING)
+        counts=result["prefatory_p_sfm_style_counts"]
+        self.assertEqual(counts["family_book_title_style"],1)
+        self.assertEqual(counts["family_implicit_p"],1)
+        self.assertEqual(counts["sfm_mt1"],1)
+        self.assertEqual(counts["sfm_implicit_p"],1)
+        self.assertFalse(result["all_prefatory_p_have_allowlisted_book_title_sfm"])
+        self.assertFalse(result["source_sfm_to_native_title_semantics_verified"])
+        self.assertTrue(result["unknown_sfm_values_are_not_exposed"])
+        self.assertNotIn("PRIVATE",str(result))
+
+    def test_unknown_sfm_and_private_css_values_are_never_disclosed(self):
+        from source_native_paragraph_counts import audit_usfx_book_prefaces
+        xml=(b'<usfx><book id="GEN">'
+             b'<p sfm="PRIVATE_UNKNOWN_SFM" style="PRIVATE_CSS_CLASS" level="3">'
+             b'PRIVATE ORIGINAL TITLE</p><c id="1"/><v id="1"/>VERSE'
+             b'</book></usfx>')
+        receipt=audit_usfx_book_prefaces(xml,[("GEN","Gen")])
+        c=receipt["prefatory_p_sfm_style_counts"]
+        self.assertEqual(c["family_unreviewed_sfm_value"],1)
+        self.assertEqual(c["sfm_other_unreviewed_style"],1)
+        self.assertEqual(c["with_separate_style_attribute"],1)
+        self.assertEqual(c["sfm_and_style_differ"],1)
+        self.assertEqual(c["with_level_attribute"],1)
+        self.assertFalse(receipt["all_prefatory_p_have_allowlisted_book_title_sfm"])
+        self.assertEqual(receipt["first_prefatory_p_sfm_styles_no_text"][0][
+            "allowlisted_sfm_code"],"other_unreviewed_style")
+        for value in ("PRIVATE_UNKNOWN_SFM","PRIVATE_CSS_CLASS","PRIVATE ORIGINAL TITLE"):
+            self.assertNotIn(value,str(receipt))
+
+    def test_known_style_codes_and_unreviewed_values_classify_conservatively(self):
+        from source_native_paragraph_counts import classify_prefatory_p_sfm
+        self.assertEqual(classify_prefatory_p_sfm("mt"),("book_title_style","mt"))
+        self.assertEqual(classify_prefatory_p_sfm("imt2"),("book_title_style","imt2"))
+        self.assertEqual(classify_prefatory_p_sfm("s1"),("section_heading_style","s1"))
+        self.assertEqual(classify_prefatory_p_sfm("p"),("body_paragraph_style","p"))
+        self.assertEqual(classify_prefatory_p_sfm("sp"),("body_paragraph_style","sp"))
+        self.assertEqual(classify_prefatory_p_sfm(None),("implicit_p","implicit_p"))
+        self.assertEqual(classify_prefatory_p_sfm("A_NEW_STYLE"),
+                         ("unreviewed_sfm_value","other_unreviewed_style"))
+
 if __name__=="__main__":
     unittest.main()
