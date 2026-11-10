@@ -103,5 +103,37 @@ class StartAnchorTests(unittest.TestCase):
         self.assertFalse(r["source_to_compiled_structure_fidelity_verified"])
 
 
+    def test_marker_between_two_verses_can_be_seen_at_preceding_native_ref(self):
+        authored=(b'<usfx><book id="GEN"><c id="1"/><v id="1"/>A'
+                  b'<p><v id="2"/>B</p></book></usfx>')
+        source=source_usfx_layout_start_anchors(authored,MAPPING)
+        native=NativeMarkupCensus()
+        native_raw_main_text(b'<div type="paragraph">A</div>',
+                             markup_census=native,reference="Gen.1.1")
+        native_raw_main_text(b'B',markup_census=native,reference="Gen.1.2")
+        receipt=compare_start_anchors(source,native)
+        self.assertEqual(receipt["source_paragraph_next_verse_refs_without_native_div"],1)
+        self.assertEqual(receipt["interval_adjacency_coverage_not_equivalence"][
+            "paragraph_native_marker_at_previous_numbered_ref_only"],1)
+        self.assertEqual(receipt["sample_previous_neighbor_only_refs"]["paragraph"],[
+            {"previous_ref":"Gen.1.1","next_ref":"Gen.1.2"}])
+        self.assertTrue(receipt["source_adjacent_marker_matches_are_not_position_or_type_proof"])
+        self.assertFalse(receipt["direct_event_or_exact_position_equivalence_verified"])
+
+    def test_missing_markers_at_both_neighbors_remain_visible(self):
+        authored=(b'<usfx><book id="GEN"><c id="1"/><v id="1"/>A'
+                  b'<p><v id="2"/>B</p></book></usfx>')
+        source=source_usfx_layout_start_anchors(authored,MAPPING)
+        native=NativeMarkupCensus()
+        native_raw_main_text(b'A',markup_census=native,reference="Gen.1.1")
+        native_raw_main_text(b'B',markup_census=native,reference="Gen.1.2")
+        receipt=compare_start_anchors(source,native)
+        self.assertEqual(receipt["interval_adjacency_coverage_not_equivalence"][
+            "paragraph_no_native_marker_at_either_neighbor"],1)
+        self.assertEqual(receipt["sample_no_neighbor_marker_refs"]["paragraph"],[
+            {"previous_ref":"Gen.1.1","next_ref":"Gen.1.2"}])
+        self.assertFalse(receipt["editorial_layout_or_publication_approved"])
+
+
 if __name__=="__main__":
     unittest.main()
