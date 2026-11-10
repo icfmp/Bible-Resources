@@ -26,6 +26,7 @@ from source_native_notes_audit import collect_usfx_numbered_notes, NoteAudit
 from source_native_scope import read_crosswalk
 from maintext_whitespace_patterns import MainTextWhitespacePatterns
 from native_sword_markup_census import NativeMarkupCensus
+from source_native_layout_anchors import source_usfx_layout_start_anchors, compare_start_anchors
 from stable_sword_refs import module_payload_digest
 from sword_native_raw_corpus_inventory import (
     inspect_native_raw_corpus, write_new_metadata_report,
@@ -373,6 +374,7 @@ def run_real_usfx_sword_text_probe(
     raw, publisher = read_source_xml(source_usfx_zip, source_format="usfx")
     mapping = read_crosswalk(crosswalk)
     source_text, scope = authored_usfx_main_text(raw, mapping)
+    source_layout = source_usfx_layout_start_anchors(raw, mapping)
     source_note_attributes = {}
     source_notes, source_note_scope = collect_usfx_numbered_notes(
         raw, mapping, attributes_out=source_note_attributes)
@@ -491,6 +493,8 @@ def run_real_usfx_sword_text_probe(
             "mapped_numbered_maintext_exact_semantic_characters_verified": exact,
             "maintext_whitespace_patterns": whitespace_patterns.finish(),
             "native_raw_structural_markup_inventory": native_markup.finish(),
+            "source_native_layout_start_anchor_screen":
+                compare_start_anchors(source_layout, native_markup),
         }
         return {
             "schema_version": 1,
