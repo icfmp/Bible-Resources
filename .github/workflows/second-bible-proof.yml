@@ -204,6 +204,12 @@ jobs:
           # passing CI proves the diagnostic ran, NOT full edition parity.
           assert comparison["status"] == "blocked_full_mapped_numbered_maintext_parity"
           print("Whole-corpus source/native indexed main text classifications:", classes)
+          print("Numeric-only first mismatch examples:", [
+              (row["native_ref"], row["classification"],
+               row.get("source_character_count"), row.get("compiled_character_count"),
+               row.get("source_word_count"), row.get("compiled_word_count"))
+              for row in comparison["first_differences_no_scripture"][:4]
+          ])
           print("Additional source books remain unverified:", scope["unmapped_authored_book_count"])
           PY
       - name: Upload metadata-only source/reader evidence (no Scripture content)
