@@ -169,3 +169,57 @@ def parse_audit_comment(body: str) -> tuple[str, int]:
     if not match:
         raise IntakeError("Expected /bible-audit <resource-id> <stage 1-7>")
     return match.group(1), int(match.group(2))
+
+
+def observe_current_upstream(resource_id: str, *, opener=None) -> dict:
+    """Metadata-only *unapproved* remote identity discovery for human re-pinning.
+
+    Never writes, redistributes, extracts or trusts these archives as equivalent.
+    Only the separately reviewed manifest may authorize pinned acquisition.
+    """
+    m = load_manifest(resource_id)
+    opener = opener or build_opener(ProviderRedirects(m["provider"]))
+    reports = {}
+    for label in ("source","sword"):
+        url = m[label]["url"]
+        _safe_url(url,m["provider"])
+        digest = sha256()
+        total = 0
+        req = Request(url,headers={"User-Agent":"BibleResources-UpstreamRevisionObservation/1.0"})
+        with closing(opener.open(req,timeout=75)) as response:
+            _safe_url(response.geturl(),m["provider"])
+            while chunk := response.read(256*1024):
+                total += len(chunk)
+                if total > MAX_ARCHIVE_BYTES:
+                    raise IntakeError("Unapproved remote source exceeds inspection size limit")
+                digest.update(chunk)
+        if not total:
+            raise IntakeError("Empty upstream observation cannot become a release pin")
+        reports[label] = {
+            "observed_sha256":digest.hexdigest(),
+            "observed_bytes":total,
+            "previously_pinned_sha256":m[label]["sha256"],
+            "still_pinned":digest.hexdigest()==m[label]["sha256"],
+            "rights_or_edition_equivalence_verified":False,
+        }
+    return {"schema_version":1,"resource_id":resource_id,"status":"remote_observation_only_needs_source_review",
+            "archives":reports,"published":False,"source_zip_not_retained":True}
+
+
+def main(argv=None) -> int:
+    import argparse
+    parser=argparse.ArgumentParser(description="Observe original upstream archive identities without repinning them")
+    parser.add_argument("--resource-id",required=True)
+    parser.add_argument("--observe-only",action="store_true",required=True)
+    args=parser.parse_args(argv)
+    try:
+        report=observe_current_upstream(args.resource_id)
+    except Exception as exc:
+        # Preserve no unexpected third-party content in public error messages.
+        parser.error(str(exc)[:200] if isinstance(exc,IntakeError) else type(exc).__name__)
+    print(json.dumps(report,indent=2,sort_keys=True))
+    return 0
+
+
+if __name__=="__main__":
+    raise SystemExit(main())
