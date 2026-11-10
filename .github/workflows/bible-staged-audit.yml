@@ -1,0 +1,161 @@
+name: Audit one Bible onboarding stage (read-only)
+
+on:
+  workflow_dispatch:
+    inputs:
+      resource_id:
+        description: "ID of reviewed config/bible-intake/<id>.json"
+        type: string
+        required: true
+        default: webp-research
+      stage:
+        description: "One of the seven fixed onboarding gates; one run per stage"
+        type: choice
+        required: true
+        options: ["1", "2", "3", "4", "5", "6", "7"]
+        default: "2"
+      issue_number:
+        description: "Optional [Import] GitHub issue number for permanent evidence comment"
+        type: string
+        required: false
+  pull_request:
+    paths:
+      - ".github/workflows/bible-staged-audit.yml"
+      - "scripts/bible_intake.py"
+      - "scripts/bible_stage_runner.py"
+      - "schemas/bible-intake.schema.json"
+      - "config/bible-intake/**"
+      - "tests/test_bible_stage_runner.py"
+      - "docs/BIBLE_STAGE_AUTOMATION.md"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bible-audit-${{ github.event_name }}-${{ github.ref }}-${{ inputs.resource_id || 'webp-research' }}-${{ inputs.stage || 'research' }}
+  cancel-in-progress: false
+
+jobs:
+  single-stage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      RESOURCE_ID: ${{ github.event_name == 'pull_request' && 'webp-research' || inputs.resource_id }}
+      STAGE: ${{ github.event_name == 'pull_request' && '4' || inputs.stage }}
+      REPORT_DIR: ${{ runner.temp }}/bible-audit-report
+      INSPECTOR_DIR: ${{ runner.temp }}/sword-audit-bin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install tested Python dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Validate manifest and run regression tests (offline)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest -v tests/test_bible_stage_runner.py
+          python -c 'import os, sys; sys.path.insert(0, "scripts"); from bible_intake import load_manifest; m=load_manifest(os.environ["RESOURCE_ID"]); print("Reviewed research manifest:", m["resource_id"], m["purpose"], m["source"]["format"])'
+      - name: Install stock SWORD binaries only if this stage needs them
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$STAGE" == "4" || "$STAGE" == "5" || "$STAGE" == "6" ]]; then
+            sudo apt-get update
+            sudo apt-get install -y diatheke
+          fi
+          if [[ "$STAGE" == "4" || "$STAGE" == "5" ]]; then
+            sudo apt-get install -y libsword-dev
+            mkdir -p "$INSPECTOR_DIR"
+            g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp -o "$INSPECTOR_DIR/sword-native-index" -lsword
+            g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp -o "$INSPECTOR_DIR/sword-native-raw-corpus" -lsword
+            g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_entry.cpp -o "$INSPECTOR_DIR/sword-native-raw-entry" -lsword
+          fi
+      - name: Obtain independently SHA-verified official OSIS schema if relevant
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$STAGE" == "3" || "$STAGE" == "4" || "$STAGE" == "5" ]]; then
+            if [[ "$(python -c 'import os,sys; sys.path.insert(0,"scripts"); from bible_intake import load_manifest; print(load_manifest(os.environ["RESOURCE_ID"])["source"]["format"])')" == "OSIS" ]]; then
+              python scripts/fetch_reviewed_schema.py --directory "${RUNNER_TEMP}/osis-xsd"
+            fi
+          fi
+      - name: Run exactly one research checkpoint (NO publication or source modifications)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$REPORT_DIR"
+          args=(--resource-id "$RESOURCE_ID" --stage "$STAGE" --report-dir "$REPORT_DIR")
+          if [[ "$STAGE" == "4" || "$STAGE" == "5" ]]; then
+            args+=(--native-index-binary "$INSPECTOR_DIR/sword-native-index")
+            args+=(--native-raw-binary "$INSPECTOR_DIR/sword-native-raw-corpus")
+            args+=(--native-entry-binary "$INSPECTOR_DIR/sword-native-raw-entry")
+          fi
+          if [[ -f "${RUNNER_TEMP}/osis-xsd/osisCore.2.1.1-cw-latest.xsd" ]]; then
+            args+=(--osis-schema "${RUNNER_TEMP}/osis-xsd/osisCore.2.1.1-cw-latest.xsd")
+          fi
+          python scripts/bible_stage_runner.py "${args[@]}"
+      - name: Show bounded checkpoint and unverified gates in Actions summary
+        if: always()
+        shell: bash
+        run: |
+          if [[ -f "$REPORT_DIR/stage-summary.md" ]]; then
+            cat "$REPORT_DIR/stage-summary.md" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Stage stopped before the metadata report was generated; this is BLOCKED, not DONE." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload only metadata-only evidence (no Bible source, private ZIP or raw notes)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bible-stage-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/bible-audit-report/stage-report.json
+            ${{ runner.temp }}/bible-audit-report/stage-summary.md
+          retention-days: 90
+          if-no-files-found: warn
+
+  persistent-issue-checkpoint:
+    if: ${{ always() && github.event_name == 'workflow_dispatch' && inputs.issue_number != '' }}
+    needs: single-stage
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Download metadata-only stage receipt
+        uses: actions/download-artifact@v4
+        with:
+          name: bible-stage-${{ github.run_id }}-${{ github.run_attempt }}
+          path: stage-report
+      - name: Comment on the resource issue without falsely ticking the stage
+        uses: actions/github-script@v7
+        env:
+          RESOURCE_ID: ${{ inputs.resource_id }}
+          STAGE: ${{ inputs.stage }}
+          ISSUE_NUMBER: ${{ inputs.issue_number }}
+        with:
+          script: |
+            const fs = require('fs');
+            const issueNumber = process.env.ISSUE_NUMBER;
+            if (!/^[1-9][0-9]{0,8}$/.test(issueNumber)) {
+              core.setFailed('Invalid issue number');
+              return;
+            }
+            const issue = await github.rest.issues.get({
+              ...context.repo, issue_number: Number(issueNumber)
+            });
+            if (issue.data.state !== 'open' || !issue.data.title.startsWith('[Import]')) {
+              core.setFailed('Destination must be an open [Import] resource issue');
+              return;
+            }
+            const markdown = fs.readFileSync('stage-report/stage-summary.md','utf8');
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = markdown +
+              '\n\n---\nAutomated evidence: ' + runUrl +
+              '\nThis report **does not** certify full stage closure or publisher/editorial approval. Update the seven-stage issue checklist only after every gate is reviewed.\n';
+            await github.rest.issues.createComment({
+              ...context.repo, issue_number: Number(issueNumber), body
+            });
