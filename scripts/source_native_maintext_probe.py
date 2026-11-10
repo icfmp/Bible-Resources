@@ -44,6 +44,9 @@ from source_native_nonspace_boundaries import (
 from source_native_structural_whitespace import (
     MainTextStructuralWhitespaceTriage, StructuralWhitespaceError,
 )
+from source_usfx_newline_provenance import (
+    SourceNewlineProvenanceError, classify_source_newline_gaps,
+)
 from stable_sword_refs import module_payload_digest
 from sword_native_raw_corpus_inventory import (
     inspect_native_raw_corpus, write_new_metadata_report,
@@ -400,6 +403,20 @@ def run_real_usfx_sword_text_probe(
         # to an empty source with matching layout. Keep its other audits.
         source_boundaries, source_boundary_counts = None, None
         source_boundary_blocker = "authorial_source_boundary_scope_unverified"
+    if source_boundaries is not None:
+        try:
+            source_xml_newline_origins = classify_source_newline_gaps(
+                raw, mapping, source_text)
+            source_xml_newline_provenance_status = (
+                "independent_exact_verse_text_and_all_source_newline_gaps_mapped")
+        except SourceNewlineProvenanceError:
+            source_xml_newline_origins = None
+            source_xml_newline_provenance_status = (
+                "blocked_original_xml_fragment_newline_provenance_unverified")
+    else:
+        source_xml_newline_origins = None
+        source_xml_newline_provenance_status = (
+            "blocked_prerequisite_original_source_p_q_structural_boundaries")
     source_layout = source_usfx_layout_start_anchors(raw, mapping)
     try:
         source_body_openings, source_body_opening_counts = original_body_opening_sequences(raw, mapping)
@@ -441,7 +458,9 @@ def run_real_usfx_sword_text_probe(
         skipped_native = Counter()
         whitespace_patterns = MainTextWhitespacePatterns()
         structural_whitespace = (
-            MainTextStructuralWhitespaceTriage(source_text, source_boundaries)
+            MainTextStructuralWhitespaceTriage(
+                source_text, source_boundaries,
+                source_xml_newline_origins=source_xml_newline_origins)
             if source_boundaries is not None else None)
         structural_whitespace_error = None
         native_markup = NativeMarkupCensus()
@@ -658,6 +677,8 @@ def run_real_usfx_sword_text_probe(
             "source_native_body_record_scope_triage": body_record_scope,
             "source_native_nonwhitespace_codepoint_boundary_screen": body_nonspace,
             "source_native_structural_whitespace_gap_triage": body_whitespace_gaps,
+            "source_xml_newline_provenance_status":
+                source_xml_newline_provenance_status,
             "source_native_ordered_body_kind_screen": (
                 source_body_order_block if source_body_order_block is not None
                 else compare_ordered_body_openings(
