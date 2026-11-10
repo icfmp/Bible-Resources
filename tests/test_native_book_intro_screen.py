@@ -34,7 +34,10 @@ class OriginalNativeBookIntroTests(unittest.TestCase):
         self.assertEqual(counts["text_detected_at_book_scope"],1)
         self.assertEqual(counts["text_detected_at_first_chapter_scope_only"],1)
         self.assertEqual(counts["native_book_div_type_book"],1)
-        self.assertEqual(counts["preface_prose_exactly_equals_one_native_book_title"],2)
+        self.assertEqual(counts["preface_prose_exactly_equals_one_native_book_title"],1)
+        self.assertEqual(counts.get("preface_prose_in_intro_but_not_in_any_native_book_title",0),0)
+        # An Exod chapter-one title is NOT a book-level title. The generic
+        # receipt retains only the weaker chapter-one intro lexical evidence.
         self.assertFalse(result["source_native_prefatory_paragraph_position_parity_verified"])
         self.assertFalse(result["editorial_or_publication_approved"])
         for word in ("PRIVATE","BOOK INTRO","VERSE"):
@@ -112,8 +115,8 @@ class OriginalNativeBookIntroTests(unittest.TestCase):
         counts=report["source_prefatory_paragraph_vs_native_intro_counts"]
         self.assertEqual(counts["preface_prose_in_intro_but_not_in_any_native_book_title"],1)
         self.assertEqual(report["first_unmatched_preface_book_codes_only"],[
-            {"book":"Gen","classification":"intro_text_exists_but_not_in_native_title"},
             {"book":"Exod","classification":"no_contiguous_whitespace_folded_intro_match"},
+            {"book":"Gen","classification":"intro_text_exists_but_not_in_native_title"},
         ])
         self.assertFalse(report["source_native_prefatory_paragraph_position_parity_verified"])
         self.assertNotIn("PRIVATE",str(report))
