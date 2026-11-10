@@ -52,6 +52,13 @@ class OriginalXmlNewlineProvenanceTests(unittest.TestCase):
             {sample["source_xml_fragment_origin"] for sample in origin_samples},
             {"text_within_inline_element", "tail_after_inline_element"})
         self.assertTrue(all(sample["reference"] == "Gen.1.1" for sample in origin_samples))
+        self.assertTrue(all(
+            sample["same_position_as_explicit_authorial_p_q_boundary"] is False
+            for sample in origin_samples))
+        self.assertTrue(all(
+            type(sample["nearest_explicit_authorial_p_q_boundary_distance_codepoints"]) is int
+            and sample["nearest_explicit_authorial_p_q_boundary_distance_codepoints"] >= 0
+            for sample in origin_samples))
         self.assertFalse(receipt["source_native_original_whitespace_layout_verified"])
         self.assertTrue(receipt["source_xml_fragment_origin_does_not_prove_editorial_linebreak"])
         for secret in ("alpha", "beta", "gamma", "delta", "PRIVATE", "\n"):
