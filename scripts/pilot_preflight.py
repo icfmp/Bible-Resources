@@ -101,7 +101,7 @@ def inspect_archive(path: Path, *, source_kind: str, expected_module_id: str | N
                 parsed = parse_conf(archive.read(conf))
             except (UnicodeError, ValueError) as exc:
                 raise PilotError(f"sword: invalid .conf ({exc})") from exc
-            if parsed["module_id"].casefold() != expected_module_id.casefold():
+            if expected_module_id is not None and parsed["module_id"].casefold() != expected_module_id.casefold():
                 raise PilotError(f"sword: module ID mismatch: {parsed['module_id']!r}, expected {expected_module_id!r}")
             if parsed["category"] != expected_category or parsed["driver"] not in APPROVED_DRIVERS.get(expected_category, set()):
                 raise PilotError(f"sword: unexpected category or driver: {parsed['category']}/{parsed['driver']}")
