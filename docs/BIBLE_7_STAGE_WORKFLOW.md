@@ -12,6 +12,23 @@ RESOURCE_ONBOARDING_PLAYBOOK.md) and [generalization issue #28](
 https://github.com/icfmp/Bible-Resources/issues/28). It **does not**
 claim that the full generic fidelity pipeline is already implemented.
 
+## GitHub Actions execution and recovery
+
+Use the [staged Bible audit GitHub Action](BIBLE_STAGE_AUTOMATION.md) to run
+**one** checkpoint remotely, preserving the original resources in runner
+temporary storage and uploading only metadata-only evidence. The operator
+provides a reviewed `config/bible-intake/<resource_id>.json` manifest,
+chooses an individual stage (1–7), and optionally an `[Import]` issue
+number for an automatically posted permanent checkpoint comment.
+
+Some existing automated components are **diagnostics, not yet complete
+gates**, especially USFM/USFX→OSIS conversion parity, source/native note
+anchors, resolved reference targets, Strong ordinal/poetry boundaries,
+second-reader visual acceptance and final owner editorial approval.
+A completed Actions execution can therefore report `PARTIAL`,
+`BLOCKED` or `REVIEW_REQUIRED`; the issue progress checkbox must not
+be checked until the **whole gate** is independently evidenced.
+
 ## The seven checkpoints
 
 | # | Stage | Deliverable to save on GitHub | Gate before advancing |
