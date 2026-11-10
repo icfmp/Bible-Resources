@@ -24,6 +24,7 @@ from real_second_bible_probe import _safe_single_module
 from native_absorbed_verse_groups import inspect_absorbed_source_verse_groups
 from source_native_notes_audit import collect_usfx_numbered_notes, NoteAudit
 from source_native_scope import read_crosswalk
+from maintext_whitespace_patterns import MainTextWhitespacePatterns
 from stable_sword_refs import module_payload_digest
 from sword_native_raw_corpus_inventory import (
     inspect_native_raw_corpus, write_new_metadata_report,
@@ -384,6 +385,7 @@ def run_real_usfx_sword_text_probe(
         material = []
         privately_captured_mismatch_text = {}
         skipped_native = Counter()
+        whitespace_patterns = MainTextWhitespacePatterns()
 
         def on_entry(kind, ref, bytes_):
             if kind != "K":
@@ -416,6 +418,8 @@ def run_real_usfx_sword_text_probe(
             authored = source_text[ref]
             category = _classify(authored, actual)
             counts[category] += 1
+            if category == "whitespace_only":
+                whitespace_patterns.observe(ref, authored, actual)
             # Keep bounded unmatched *actual* Bible prose in private memory,
             # never in JSON or CI. A later scoped checker can test whether
             # missing numbered source verses were appended to this slot.
@@ -477,6 +481,7 @@ def run_real_usfx_sword_text_probe(
             "first_source_only_refs": missing[:MAX_MISMATCHES],
             "native_excluded_note_or_title_elements": dict(sorted(skipped_native.items())),
             "mapped_numbered_maintext_exact_semantic_characters_verified": exact,
+            "maintext_whitespace_patterns": whitespace_patterns.finish(),
         }
         return {
             "schema_version": 1,
