@@ -25,6 +25,7 @@ from native_absorbed_verse_groups import inspect_absorbed_source_verse_groups
 from source_native_notes_audit import collect_usfx_numbered_notes, NoteAudit
 from source_native_scope import read_crosswalk
 from maintext_whitespace_patterns import MainTextWhitespacePatterns
+from native_sword_markup_census import NativeMarkupCensus
 from stable_sword_refs import module_payload_digest
 from sword_native_raw_corpus_inventory import (
     inspect_native_raw_corpus, write_new_metadata_report,
@@ -177,7 +178,8 @@ def authored_usfx_main_text(xml: bytes, mapping: list[tuple[str, str]]):
     }
 
 
-def native_raw_main_text(raw: bytes) -> tuple[str, dict]:
+def native_raw_main_text(raw: bytes, *, markup_census: NativeMarkupCensus | None = None,
+                         reference: str | None = None) -> tuple[str, dict]:
     """Strictly parse a complete raw XML fragment; never 'repair' bad tags.
 
     Note text and headings are not Scripture. XML entity decoding is done
@@ -196,6 +198,10 @@ def native_raw_main_text(raw: bytes) -> tuple[str, dict]:
         raise MainTextParityError("Stock SWORD raw entry is not a self-contained XML fragment") from exc
     if any(isinstance(x, etree._Entity) for x in root.iter()):
         raise MainTextParityError("Unresolved native XML entity")
+    if markup_census is not None:
+        if reference is None:
+            raise MainTextParityError("Native markup census needs an actual reader reference")
+        markup_census.observe(reference, root)
     chars = []
     excluded = Counter()
 
@@ -386,6 +392,7 @@ def run_real_usfx_sword_text_probe(
         privately_captured_mismatch_text = {}
         skipped_native = Counter()
         whitespace_patterns = MainTextWhitespacePatterns()
+        native_markup = NativeMarkupCensus()
 
         def on_entry(kind, ref, bytes_):
             if kind != "K":
@@ -399,7 +406,8 @@ def run_real_usfx_sword_text_probe(
                 return
             counts["matching_indexed_keys_checked"] += 1
             try:
-                actual, excluded = native_raw_main_text(bytes_)
+                actual, excluded = native_raw_main_text(
+                    bytes_, markup_census=native_markup, reference=ref)
             except MainTextParityError:
                 counts["native_raw_not_parseable_as_self_contained_xml"] += 1
                 diagnostic = _tolerant_fragment_lexical_diagnostic(
@@ -482,6 +490,7 @@ def run_real_usfx_sword_text_probe(
             "native_excluded_note_or_title_elements": dict(sorted(skipped_native.items())),
             "mapped_numbered_maintext_exact_semantic_characters_verified": exact,
             "maintext_whitespace_patterns": whitespace_patterns.finish(),
+            "native_raw_structural_markup_inventory": native_markup.finish(),
         }
         return {
             "schema_version": 1,
