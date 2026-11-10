@@ -24,6 +24,21 @@ MAX_BYTES = 128 * 1024 * 1024
 SAFE_RESOURCE = re.compile(r"[a-z0-9][a-z0-9-]{1,48}\Z")
 ALLOWLIST_HOSTS = frozenset({"cdn.editeurbpc.com"})
 SAFE_TYPES = frozenset({"book", "chapter", "paragraph", "section", "x-p", "crossReference", "translation", "study", "variant", "x-unknown"})
+SAFE_ELEMENTS = frozenset({
+    "osis", "osisText", "header", "work", "title", "identifier",
+    "creator", "date", "language", "description", "rights", "scope",
+    "refSystem", "div", "chapter", "verse", "p", "lg", "l", "lb",
+    "note", "reference", "hi", "seg", "transChange", "divineName",
+    "q", "w", "milestone", "catchWord", "abbr", "table", "row",
+    "cell", "figure", "item", "list", "inscription", "foreign",
+    "closer", "salute", "speaker", "osisCorpus", "osisTextWork",
+})
+SAFE_ATTRIBUTES = frozenset({
+    "osisID", "osisRef", "osisIDWork", "osisRefWork", "type", "subType",
+    "n", "sID", "eID", "lang", "lemma", "morph", "who", "marker",
+    "canonical", "resp", "id", "refSystem", "osisWork", "level",
+    "xml", "role", "subType", "source", "value", "annotateType",
+})
 
 
 class PublisherOSISObservationError(ValueError):
@@ -127,8 +142,10 @@ def inspect_official_osis(xml):
         tag = _name(node)
         if not tag:
             continue
-        elements[tag] += 1
-        attributes.update(etree.QName(a).localname for a in node.attrib)
+        elements[tag if tag in SAFE_ELEMENTS else "unknown_or_unreviewed_elements"] += 1
+        attributes.update(
+            name if name in SAFE_ATTRIBUTES else "unknown_or_unreviewed_attributes"
+            for name in (etree.QName(a).localname for a in node.attrib))
         if tag == "note":
             n = node.get("n")
             if n is None or n == "":
