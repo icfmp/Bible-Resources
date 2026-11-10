@@ -30,9 +30,17 @@ from sword_native_raw_corpus_inventory import (
 MAX_XML = 128 * 1024 * 1024
 MAX_VERSE = 2 * 1024 * 1024
 MAX_MISMATCHES = 25
-USFX_NOTE = {"f", "fe", "x", "note"}
+# USFX p[@sfm="sp"] is a *speaker identification* (not a
+# Scripture verse); see eBible's USFX schema and USFM/USX paragraph styles.
+# Skip only an unambiguous heading node, never a whole paragraph carrying
+# numbered Scripture verse markers. All excluded nodes remain in the source.
+USFX_SPEAKER_P_STYLES = {"sp"}
+USFX_NOTE = {"f", "fe", "x", "note", "ef", "ex"}
 USFX_HEAD = {"s", "s1", "s2", "s3", "s4", "ms", "ms1", "ms2",
              "mt", "mt1", "mt2", "mr", "d", "cl", "r", "rem"}
+# Generated verse/chapter labels and alternatives are not authored
+# Scripture prose. A <ve> milestone also explicitly ends the verse.
+USFX_LABELS = {"vp", "va", "cp", "ca"}
 NATIVE_SKIP = {"note", "title"}
 WORD = re.compile(r"[^\W_]+(?:['\u2019][^\W_]+)*", re.UNICODE)
 USFM_ID = re.compile(r"^[1-4]?[A-Z][A-Z0-9]{1,4}$")
@@ -104,8 +112,20 @@ def authored_usfx_main_text(xml: bytes, mapping: list[tuple[str, str]]):
             if not isinstance(node.tag, str):
                 return
             kind = etree.QName(node).localname
-            if kind in USFX_NOTE or kind in USFX_HEAD:
-                skipped[kind] += 1
+            style = node.get("sfm", "")
+            if ((kind == "p" and style in USFX_SPEAKER_P_STYLES)
+                    or kind in USFX_NOTE or kind in USFX_HEAD
+                    or kind in USFX_LABELS):
+                if any(isinstance(child.tag, str)
+                       and etree.QName(child).localname in {"c", "v"}
+                       for child in node.iterdescendants()):
+                    raise MainTextParityError(
+                        "Editorial/source-note container encloses numbered text markers")
+                skipped[f"{kind}:{style}" if kind == "p" else kind] += 1
+                return
+            if kind == "ve":
+                skipped["ve"] += 1
+                active = None
                 return
             if kind == "book" and depth:
                 raise MainTextParityError("Nested source books are unsupported")
@@ -122,7 +142,11 @@ def authored_usfx_main_text(xml: bytes, mapping: list[tuple[str, str]]):
                 if active in observed:
                     raise MainTextParityError("Repeated canonical authored verse")
                 observed[active] = []
-            append(node.text)
+            # USFX v is a *starting milestone*, and its optional text is
+            # the GENERATED/PRINTED verse marker, not a Scripture word.
+            # USFX c is likewise a chapter marker, not main verse prose.
+            if kind not in {"v", "c"}:
+                append(node.text)
             for child in node:
                 visit(child, depth + 1)
                 append(child.tail)
