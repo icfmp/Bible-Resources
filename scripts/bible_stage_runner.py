@@ -401,7 +401,7 @@ def _write_report(report_dir: Path, report: dict) -> None:
                           "These do NOT prove layout equivalence."])
             for ref, origin, gap, distance in safe:
                 lines.append(
-                    f"- \`{ref}\` — \`{origin}\`, source gap {gap}, "
+                    f"- `{ref}` — `{origin}`, source gap {gap}, "
                     f"nearest p/q boundary {distance} codepoints away")
     lines.extend(["","**Still missing / blocking**"])
     lines.extend("- "+v for v in report["missing"])
