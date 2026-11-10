@@ -78,6 +78,7 @@ class NativeMilestonePairAudit:
         self._per_tag = Counter()
         self._per_div_type = Counter()
         self._per_book_native_paragraph_pairs = Counter()
+        self._body_openings_by_book = {}  # private p/q reference order, no words/IDs
         self._cross_book_examples = []
         self._classifications = Counter()
         self._bad_refs = {}
@@ -146,6 +147,10 @@ class NativeMilestonePairAudit:
                     continue
                 self._active[key] = (book, ref, kind, open_type, self._sequence)
                 self._stack.append(key)
+                if tag == "div" and open_type == "x-p":
+                    self._body_openings_by_book.setdefault(book, []).append(("p", ref))
+                elif tag == "l":
+                    self._body_openings_by_book.setdefault(book, []).append(("q", ref))
             else:
                 opened = self._active.pop(key, None)
                 if opened is None:
@@ -216,6 +221,15 @@ class NativeMilestonePairAudit:
     def native_x_p_pairs_by_book(self) -> dict[str,int]:
         """Private typed original-stock paragraph counts, no ID or text."""
         return dict(self._per_book_native_paragraph_pairs)
+
+    def private_ordered_body_openings(self) -> dict[str, list[tuple[str,str]]]:
+        """Original compiled x-p and l opening kinds in native-reader order.
+
+        Not a public report. Never return SWORD-generated sID values, text,
+        attributes, or markers that are not verified by existing ID pairing.
+        """
+        return {book:list(events) for book, events
+                in self._body_openings_by_book.items()}
 
     def finish(self):
         dangling = Counter(tag for tag, _identifier in self._active)
