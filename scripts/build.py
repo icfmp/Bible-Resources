@@ -11,6 +11,7 @@ import tarfile
 import zipfile
 from urllib.parse import urlparse
 from validate import ROOT,validate
+from catalogue_profiles import approved_profiles
 
 def sha256(p):
     return hashlib.sha256(p.read_bytes()).hexdigest()
@@ -47,13 +48,17 @@ def build(root=ROOT, output=None, base_url="https://icfmp.github.io/Bible-Resour
                 info.compress_type=zipfile.ZIP_DEFLATED
                 info.external_attr=0o100644<<16
                 z.writestr(info,src.read_bytes())
-        catalog.append({"id":m["id"],"sword_id":m["sword_id"],
-                        "canonical_edition_id":m["canonical_edition_id"],
-                        "title":m["title"],
-                        "category":m["category"],"language":m["language"],"version":m["version"],
-                        "versification":m.get("versification"),"edition":m["quality"]["edition"],
-                        "download":{"url":base_url+"sword/packages/"+pkg.name,
-                                    "sha256":sha256(pkg),"size_bytes":pkg.stat().st_size}})
+        entry={"id":m["id"],"sword_id":m["sword_id"],
+               "canonical_edition_id":m["canonical_edition_id"],
+               "title":m["title"],
+               "category":m["category"],"language":m["language"],"version":m["version"],
+               "versification":m.get("versification"),"edition":m["quality"]["edition"],
+               "download":{"url":base_url+"sword/packages/"+pkg.name,
+                           "sha256":sha256(pkg),"size_bytes":pkg.stat().st_size}}
+        profiles=approved_profiles(root,d,m)
+        if profiles:
+            entry["profiles"]=profiles
+        catalog.append(entry)
     catalog.sort(key=lambda x:x["id"])
     with (sword/"mods.d.tar.gz").open("wb") as out:
         with gzip.GzipFile(filename="",fileobj=out,mode="wb",mtime=0) as gz:
