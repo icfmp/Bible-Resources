@@ -11,8 +11,8 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from source_native_maintext_probe import (
-    _classify, authored_usfx_main_text, compare_private_main_text,
-    native_raw_main_text, MainTextParityError,
+    _classify, _tolerant_fragment_lexical_diagnostic, authored_usfx_main_text,
+    compare_private_main_text, native_raw_main_text, MainTextParityError,
 )
 from sword_native_raw_corpus_inventory import parse_native_raw_corpus
 
@@ -133,6 +133,23 @@ class RawNativeCharacterTests(unittest.TestCase):
         chars, skipped = native_raw_main_text(raw)
         self.assertEqual(chars, "first, beta! tail")
         self.assertEqual(skipped, {"title": 1, "note": 1})
+
+    def test_unclosed_native_inline_tag_has_only_tolerant_diagnostic(self):
+        raw = b"<hi>synthetic words"  # Native OSIS fragment is incomplete.
+        with self.assertRaises(MainTextParityError):
+            native_raw_main_text(raw)
+        compatible = _tolerant_fragment_lexical_diagnostic(
+            raw, "synthetic words")
+        self.assertEqual(compatible["status"],
+                         "tolerant_word_sequence_matches_diagnostic_only")
+        self.assertFalse(compatible["lexical_fidelity_verified"])
+        self.assertFalse(compatible["native_xml_structure_fidelity_verified"])
+        different = _tolerant_fragment_lexical_diagnostic(
+            raw, "different source text")
+        self.assertEqual(different["status"],
+                         "tolerant_word_sequence_differs_diagnostic_only")
+        self.assertNotIn("synthetic", json.dumps(compatible))
+        self.assertNotIn("different", json.dumps(different))
 
     def test_punctuation_mutation_not_exact_even_if_words_unchanged(self):
         self.assertEqual(_classify("first, beta!", "first; beta!"),
