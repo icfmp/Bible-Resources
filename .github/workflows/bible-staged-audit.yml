@@ -25,6 +25,8 @@ on:
       - ".github/workflows/bible-staged-audit.yml"
       - "scripts/bible_intake.py"
       - "scripts/bible_stage_runner.py"
+      - "scripts/source_usfx_structure.py"
+      - "tests/test_source_usfx_structure.py"
       - "schemas/bible-intake.schema.json"
       - "config/bible-intake/**"
       - "tests/test_bible_stage_runner.py"
@@ -76,6 +78,7 @@ jobs:
         run: |
           set -euo pipefail
           python -m unittest discover -s tests -p 'test_bible_stage_runner.py' -v
+          python -m unittest discover -s tests -p 'test_source_usfx_structure.py' -v
           python -c 'import os, sys; sys.path.insert(0, "scripts"); from bible_intake import load_manifest; m=load_manifest(os.environ["RESOURCE_ID"]); print("Reviewed research manifest:", m["resource_id"], m["purpose"], m["source"]["format"])'
       - name: Observe the current upstream WEBP bytes (SHA-256 only; never auto-repin)
         if: github.event_name == 'pull_request'
