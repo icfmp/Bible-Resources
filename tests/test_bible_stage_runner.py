@@ -165,6 +165,7 @@ class BibleIntakeTests(unittest.TestCase):
         report={
           "resource_id":"fixture","stage":2,"stage_name":STAGES[2],
           "status":"DONE","git_sha":"abc123","run_url":None,
+          "next_action":"Proceed to stage 3/7",
           "verified":["pinned SHA passed"],"missing":[],
           "evidence":{"original_archives":{"source":{"sha256":"a"*64}}},
           "reusable_for_pub_approval":False,
