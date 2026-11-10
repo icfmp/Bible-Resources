@@ -112,6 +112,12 @@ def compare_authored_native_paragraphs(xml: bytes, mapping: list[tuple[str,str]]
         raise ParagraphAuditError("Original source book inventory disagrees with mapping")
     if overall["all_original_p_elements"] != proof["source_element_counts"].get("p",0):
         raise ParagraphAuditError("Original USFX paragraph scanners disagree")
+    # Keep zero-count result fields stable; absence of findings must be an
+    # explicit checked zero rather than an omitted machine-report key.
+    for field in ("books_with_p_pair_count_mismatch",
+                  "books_with_exact_p_pair_count",
+                  "signed_authorial_minus_native_paragraph_pair_difference"):
+        totals.setdefault(field, 0)
     ordered={k:by_book[k] for k in sorted(by_book)}
     original_distribution=sha256(json.dumps(ordered,sort_keys=True,
         separators=(",",":")).encode("ascii")).hexdigest()
