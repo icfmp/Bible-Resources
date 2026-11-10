@@ -80,11 +80,15 @@ def _source_config(resource_id):
     except (ValueError, UnicodeError) as exc:
         raise PublisherOSISObservationError("Invalid reviewed OSIS candidate manifest") from exc
     if (not isinstance(cfg, dict) or set(cfg) != {
-            "resource_id", "edition", "official_source_url", "status"}
+            "resource_id", "edition", "official_source_url", "status", "sha256", "size_bytes"}
             or cfg.get("resource_id") != resource_id
             or cfg.get("status") != "research_only"
             or not isinstance(cfg.get("edition"), str)
-            or not 2 <= len(cfg["edition"]) <= 128):
+            or not 2 <= len(cfg["edition"]) <= 128
+            or not isinstance(cfg.get("sha256"), str)
+            or re.fullmatch(r"[a-f0-9]{64}", cfg["sha256"]) is None
+            or type(cfg.get("size_bytes")) is not int
+            or not 128 <= cfg["size_bytes"] <= MAX_BYTES):
         raise PublisherOSISObservationError("Unsafe official OSIS candidate manifest")
     _verified_url(cfg["official_source_url"])
     return cfg
@@ -186,7 +190,11 @@ def inspect_official_osis(xml):
 def observe(resource_id, *, opener=None):
     cfg = _source_config(resource_id)
     xml = _download(cfg["official_source_url"], opener=opener)
+    if len(xml) != cfg["size_bytes"] or sha256(xml).hexdigest() != cfg["sha256"]:
+        raise PublisherOSISObservationError(
+            "Official publisher OSIS content no longer matches reviewed source pin")
     report = inspect_official_osis(xml)
+    report["source_sha256_pin_reverified"] = True
     report["resource_id"] = cfg["resource_id"]
     report["official_source_url"] = cfg["official_source_url"]
     report["declared_edition"] = cfg["edition"]
