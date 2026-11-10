@@ -36,6 +36,8 @@ on:
       - "scripts/source_native_nonspace_boundaries.py"
       - "scripts/source_native_structural_whitespace.py"
       - "scripts/source_usfx_newline_provenance.py"
+      - "scripts/source_native_notes_audit.py"
+      - "tests/test_source_native_notes_audit.py"
       - "scripts/source_native_note_positions.py"
       - "tests/test_source_native_note_positions.py"
       - "tests/test_source_usfx_newline_provenance.py"
@@ -126,6 +128,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_source_native_nonspace_boundaries.py' -v
           python -m unittest discover -s tests -p 'test_source_native_structural_whitespace.py' -v
           python -m unittest discover -s tests -p 'test_source_usfx_newline_provenance.py' -v
+          python -m unittest discover -s tests -p 'test_source_native_notes_audit.py' -v
           python -m unittest discover -s tests -p 'test_source_native_note_positions.py' -v
           python -m unittest discover -s tests -p 'test_native_book_intro_screen.py' -v
           python -m unittest discover -s tests -p 'test_source_native_layout_anchors.py' -v
