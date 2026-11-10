@@ -15,6 +15,7 @@ from hashlib import sha256
 import json
 
 from stable_sword_refs import KEY
+from source_usfx_newline_provenance import SOURCE_NEWLINE_ORIGIN_LABELS
 
 MAX_SAMPLES = 24
 MAX_SAMPLES_PER_CATEGORY = 3
@@ -71,10 +72,14 @@ def _structural_category(positions: set[str]) -> str:
 class MainTextStructuralWhitespaceTriage:
     """Streaming verse analyzer; no full compiled Bible stored or exposed."""
 
-    def __init__(self, source_verses: dict[str, str], source_boundaries: dict):
+    def __init__(
+        self, source_verses: dict[str, str], source_boundaries: dict,
+        source_xml_newline_origins: dict | None = None,
+    ):
         if not source_verses or not source_boundaries:
             raise StructuralWhitespaceError("Missing original indexed source or p/q evidence")
         self._source = source_verses
+        self._provenance = source_xml_newline_origins
         self._seen = set()
         self._ranges = {}
         self._positions = defaultdict(lambda: defaultdict(set))
@@ -98,6 +103,23 @@ class MainTextStructuralWhitespaceTriage:
             self._ranges[ref] = (book, start, len(characters))
         if set(book_offsets) != set(source_boundaries):
             raise StructuralWhitespaceError("Original structure and text book sets differ")
+        # Never accept a partial source XML fragment-origin inventory.
+        # Each original numbered-verse newline gap must have been mapped
+        # to one or more explicitly allowlisted original node/tail kinds.
+        if self._provenance is not None:
+            if not isinstance(self._provenance, dict) or set(self._provenance) != set(source_verses):
+                raise StructuralWhitespaceError("Incomplete source XML newline provenance")
+            for ref, verse in source_verses.items():
+                _chars, gaps = _runs_by_nonspace_offset(verse)
+                expected = {index for index, run in gaps.items()
+                            if any(char in run for char in "\r\n\u2028\u2029")}
+                origins = self._provenance[ref]
+                if not isinstance(origins, dict) or set(origins) != expected:
+                    raise StructuralWhitespaceError("Original source newline gap coverage differs")
+                for labels in origins.values():
+                    if (not isinstance(labels, (set, frozenset)) or not labels
+                            or not labels <= SOURCE_NEWLINE_ORIGIN_LABELS):
+                        raise StructuralWhitespaceError("Unsafe XML newline origin category")
         for book,(words,events) in source_boundaries.items():
             if not isinstance(words,list) or not isinstance(events,list):
                 raise StructuralWhitespaceError("Untrusted authorial source structural receipt")
@@ -165,6 +187,25 @@ class MainTextStructuralWhitespaceTriage:
                         # Stronger review priority than a serialized
                         # XML newline at the end of a numbered verse.
                         self._counts["unmarked_internal_source_newline_review"] += 1
+                        if self._provenance is None:
+                            origin = "source_xml_fragment_origin_unverified"
+                        else:
+                            origins = self._provenance[ref].get(position)
+                            if not origins:
+                                raise StructuralWhitespaceError(
+                                    "Source newline fragment origin missing at internal gap")
+                            origin = (next(iter(origins)) if len(origins) == 1
+                                      else "mixed_source_xml_text_and_tail_fragments")
+                        self._counts[f"unmarked_internal_newline_origin_{origin}"] += 1
+                        if len(self._category_samples[
+                                f"internal_origin:{origin}"]) < MAX_SAMPLES_PER_CATEGORY:
+                            self._category_samples[f"internal_origin:{origin}"].append({
+                                "reference":ref,
+                                "original_verse_nonspace_codepoint_gap":position,
+                                "original_book_nonspace_codepoint_gap":global_ordinal,
+                                "source_xml_fragment_origin":origin,
+                                "editorial_linebreak_intent_unverified":True,
+                            })
                     elif scope == "verse_end":
                         self._counts["unmarked_source_verse_end_newline_candidate"] += 1
             payload = json.dumps(
@@ -206,7 +247,10 @@ class MainTextStructuralWhitespaceTriage:
                 row for label in sorted(self._category_samples)
                 for row in self._category_samples[label]][:MAX_SAMPLES],
             "whitespace_gap_classification_sha256":self._fingerprint.hexdigest(),
+            "source_xml_fragment_newline_gap_coverage_verified":
+                self._provenance is not None,
             "source_original_newline_provenance_vs_xml_serialization_unverified":True,
+            "source_xml_fragment_origin_does_not_prove_editorial_linebreak":True,
             "native_poetry_milestone_semantics_are_independent_of_raw_newlines":True,
             "matching_p_q_nonspace_anchor_is_prerequisite_not_full_whitespace_parity":True,
             "source_native_original_whitespace_layout_verified":False,
