@@ -162,7 +162,7 @@ class NoteAudit:
     def __init__(self, source_notes: dict[str, list[tuple[str, str]]]):
         self.source_notes = source_notes
         self.counts = Counter()
-        self.findings = []
+        self.findings = {}
         self.native_seen = set()
         self.native_note_count = 0
 
@@ -175,9 +175,10 @@ class NoteAudit:
             native = parse_native_numbered_notes(raw)
         except NoteEvidenceError:
             self.counts["native_fragment_unparseable_notes_unverified"] += 1
-            if len(self.findings) < MAX_FINDINGS and src:
-                self.findings.append({"ref": ref, "kind": "source_notes_native_fragment_unparseable",
-                                      "source_note_count": len(src)})
+            self._finding("native_fragment_unparseable_notes_unverified", {
+                "ref": ref, "kind": "native_fragment_unparseable_notes_unverified",
+                "source_note_count": len(src),
+            })
             return
         self.native_note_count += len(native)
         if self.native_note_count > MAX_NOTES:
@@ -195,21 +196,31 @@ class NoteAudit:
         else:
             kind = "ordered_note_bodies_differ"
         self.counts[kind] += 1
-        if kind != "ordered_note_body_characters_equal" and len(self.findings) < MAX_FINDINGS:
-            self.findings.append({
+        if kind != "ordered_note_body_characters_equal":
+            self._finding(kind, {
                 "ref": ref, "kind": kind,
                 "source_note_count": len(src), "native_note_count": len(native),
             })
 
+    def _finding(self, category, row):
+        bucket = self.findings.setdefault(category, [])
+        if len(bucket) < 6:
+            bucket.append(row)
+
     def finish(self):
         source_only = sorted(set(self.source_notes) - self.native_seen)
+        priority = ("note_count_differs", "ordered_note_bodies_differ",
+                    "native_fragment_unparseable_notes_unverified",
+                    "ordered_note_bodies_equal_after_whitespace_folding")
+        findings = [row for kind in priority for row in self.findings.get(kind, [])]
+        findings = findings[:MAX_FINDINGS]
         self.counts["source_note_bearing_verses_without_native_slot"] = len(source_only)
         return {
             "status": "numbered_source_to_native_note_body_diagnostic_not_editorial_approval",
             "source_numbered_note_count": sum(map(len, self.source_notes.values())),
             "native_parseable_numbered_note_count": self.native_note_count,
             "classifications": dict(sorted(self.counts.items())),
-            "first_findings_without_note_text": self.findings,
+            "first_findings_without_note_text": findings,
             "source_note_bearing_refs_without_native_slots": source_only[:MAX_FINDINGS],
             "source_note_body_exact_full_parity_verified": False,
             "source_note_callers_anchors_types_and_crossreference_targets_verified": False,
