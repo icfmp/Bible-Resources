@@ -503,7 +503,8 @@ def run_real_usfx_sword_text_probe(
             "native_crossentry_milestone_pair_audit": native_pairs.finish(),
             "source_native_typed_paragraph_book_comparison":
                 compare_authored_native_paragraphs(
-                    raw, mapping, native_pairs.native_x_p_pairs_by_book()),
+                    raw, mapping, native_pairs.native_x_p_pairs_by_book(),
+                    native_other_div_by_book=native_pairs.native_other_div_pairs_by_book()),
             "source_native_layout_start_anchor_screen":
                 compare_start_anchors(source_layout, native_markup),
         }
