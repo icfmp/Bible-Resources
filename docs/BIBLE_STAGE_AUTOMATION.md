@@ -780,7 +780,14 @@ it classifies the source gap by a fixed, privacy-safe category:
 The resulting metadata-only report carries counts by source fragment
 category, limited original book/verse reference IDs and integer
 character-gap coordinates, plus the prior immutable SHA-bound overall
-structural and whitespace evidence. **No original words, note bodies,
+structural and whitespace evidence. An **independent, bounded per-origin
+sample list** (`first_unmarked_internal_newline_xml_origin_references_only`)
+retains at most three safe original book/verse + gap references for
+each allowlisted fragment-origin category, so rare source `p/q`
+`node.text` cases are not pushed out by thousands of more frequent
+verse-end or inline-tail gap samples. Its reference samples are for
+**editorial investigation**, not a claimed automatic approval.
+**No original words, note bodies,
 unknown original tag names/attribute values, native generated IDs or
 raw whitespace strings leave private memory.** The synthetic fixtures
 check source-verse text tampering, missing/extra newline origins,

@@ -85,6 +85,7 @@ class MainTextStructuralWhitespaceTriage:
         self._positions = defaultdict(lambda: defaultdict(set))
         self._counts = Counter()
         self._category_samples = defaultdict(list)
+        self._newline_origin_samples = defaultdict(list)
         self._fingerprint = sha256()
         book_offsets = Counter()
         book_last = {}
@@ -197,9 +198,12 @@ class MainTextStructuralWhitespaceTriage:
                             origin = (next(iter(origins)) if len(origins) == 1
                                       else "mixed_source_xml_text_and_tail_fragments")
                         self._counts[f"unmarked_internal_newline_origin_{origin}"] += 1
-                        if len(self._category_samples[
-                                f"internal_origin:{origin}"]) < MAX_SAMPLES_PER_CATEGORY:
-                            self._category_samples[f"internal_origin:{origin}"].append({
+                        # Keep a second independent bounded sample group.
+                        # The generic gap samples are dominated by verse-end
+                        # observations, otherwise rare original paragraph
+                        # or poetic node.text cases may not be discoverable.
+                        if len(self._newline_origin_samples[origin]) < MAX_SAMPLES_PER_CATEGORY:
+                            self._newline_origin_samples[origin].append({
                                 "reference":ref,
                                 "original_verse_nonspace_codepoint_gap":position,
                                 "original_book_nonspace_codepoint_gap":global_ordinal,
@@ -246,6 +250,9 @@ class MainTextStructuralWhitespaceTriage:
             "first_whitespace_gap_metadata_references_only":[
                 row for label in sorted(self._category_samples)
                 for row in self._category_samples[label]][:MAX_SAMPLES],
+            "first_unmarked_internal_newline_xml_origin_references_only":[
+                sample for origin in sorted(self._newline_origin_samples)
+                for sample in self._newline_origin_samples[origin]][:MAX_SAMPLES],
             "whitespace_gap_classification_sha256":self._fingerprint.hexdigest(),
             "source_xml_fragment_newline_gap_coverage_verified":
                 self._provenance is not None,
