@@ -824,3 +824,42 @@ spaces/newlines to manufacture success.
 - Audit artifacts contain counts, hashes, code and reference IDs only.
   They are evidence of *which controls ran*, not independent certification
   of the publisher's identity or ownership.
+
+
+## Independent publisher OSIS observation (when stock SWORD loses editorial metadata)
+
+Some curated editions have an official publisher OSIS file *in addition to* the
+eBible USFX archive and prebuilt SWORD module. Never assume these are exactly
+the same edition or that independently authored OSIS has matching notes and
+versification. An original compiled module may retain every Bible word but
+lose original footnote caller labels.
+
+For a reviewed publisher source, create a **research-only** manifest
+`config/publisher-osis/<resource_id>.json` with its exact edition and official
+HTTPS OSIS URL. The generic [publisher OSIS observer](../.github/workflows/publisher-osis-observation.yml)
+can be initiated by the repository owner on the open `[Import]` issue:
+
+```text
+/bible-osis-observe frajnd-2024
+```
+
+This action downloads the official OSIS XML into the disposable runner, applies
+strict HTTPS host/redirect checks and safe XML parsing, records the *observed*
+SHA-256, byte length, element categories and note caller attribute categories,
+and uploads **only metadata**. It publishes one permanent research observation
+comment to the import issue, never a publisher manuscript, note body, arbitrary
+attribute values or original archive. Add additional publisher hosts to the
+explicit allowlist through a reviewed PR, not by accepting arbitrary URLs.
+
+**Observations are NOT source pins or editorial approvals.** Compare the exact
+publisher-edition OSIS with the separately SHA-pinned eBible original USFX and
+actual stock SWORD: all verses, notes, caller `n` attributes, word anchors,
+reference targets, paragraphs, poetry and verse-zero. An OSIS rebuild using
+`osis2mod` is justified only after parity and rights are independently
+verified; do not blindly choose an OSIS revision or reintroduce publisher
+content that diverges from the selected edition.
+
+Historical original stock artifacts and earlier audit results are retained.
+If a later gate reveals missing authorial metadata, reopen the previously
+conditional reuse-or-rebuild decision instead of publishing a module with a
+known editorial loss.
