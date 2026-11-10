@@ -522,6 +522,17 @@ stock SWORD `sID` opening stream from
   stage **4c** remains **PARTIAL** until those gates are considered.
   Stage 5 separately verifies note bodies/callers/word anchors and links.
 
+When an independently inventoried source has unresolved book/verse
+structure or an ambiguous crosswalk (for example, a historical research
+fixture), this **additional order check** returns an explicit, text-free
+`blocked_original_authorial_source_scope_or_structure` diagnostic.
+It does **not** substitute an empty sequence, silently omit original
+books, invent ordering, or stop unrelated existing full-source tests.
+The stage-four machine result lists that missing structural gate and
+cannot be interpreted as source-to-compiled order fidelity. Original
+source discrepancies require investigation under the generic issue and
+must never be suppressed merely to make CI green.
+
 The original pinned eBible archives remain untouched, and no module is
 published by this audit.
 
