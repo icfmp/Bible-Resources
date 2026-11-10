@@ -43,7 +43,7 @@ class AuthoredMainTextTests(unittest.TestCase):
             facts["excluded_source_heading_or_note_element_counts"],
             {"f": 1, "s": 1})
         self.assertNotIn("unrelated note", json.dumps(facts))
-        self.assertNotIn("heading", json.dumps(facts))
+        self.assertNotIn('"heading"', json.dumps(facts))
 
     def test_characters_change_without_verse_count_change(self):
         a, _ = authored_usfx_main_text(original(), PAIR)
