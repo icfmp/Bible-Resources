@@ -12,7 +12,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
-from bible_intake import IntakeError, ProviderRedirects, acquire, fetch_pinned, load_manifest, _safe_url, parse_audit_comment
+from bible_intake import IntakeError, ProviderRedirects, acquire, fetch_pinned, load_manifest, _safe_url, parse_audit_comment, observe_current_upstream
 from bible_stage_runner import run_stage, _write_report, STAGES
 
 
@@ -101,6 +101,16 @@ class BibleIntakeTests(unittest.TestCase):
                         "/bible-audit safe 04"):
             with self.subTest(command=command),self.assertRaises(IntakeError):
                 parse_audit_comment(command)
+
+    def test_observe_upstream_hashes_without_authorizing_revision(self):
+        with patch("bible_intake.load_manifest",return_value=self.cfg):
+            report=observe_current_upstream("webp-research",opener=self.opener)
+        self.assertFalse(report["published"])
+        self.assertTrue(report["source_zip_not_retained"])
+        self.assertTrue(report["archives"]["source"]["still_pinned"])
+        self.assertTrue(report["archives"]["sword"]["still_pinned"])
+        self.assertFalse(report["archives"]["source"]["rights_or_edition_equivalence_verified"])
+        self.assertFalse((self.folder/"source.zip").exists())
 
     def test_streaming_download_and_hash_pinning(self):
         dest=self.folder/"source.zip"
