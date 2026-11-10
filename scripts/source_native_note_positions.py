@@ -35,7 +35,7 @@ def _parse(data: bytes, root_name: str, *, fragment=False):
     if not isinstance(data, bytes) or not 0 < len(data) <= (
             MAX_VERSE if fragment else MAX_XML):
         raise NoteAnchorError("Empty or excessive source/native XML")
-    if b"<!DOCTYPE" in data.upper() or b"<?xml" in data.lower():
+    if b"<!DOCTYPE" in data.upper() or (fragment and b"<?xml" in data.lower()):
         raise NoteAnchorError("Unreviewed source/native declarations")
     if fragment:
         data = b"<private_root>" + data + b"</private_root>"
