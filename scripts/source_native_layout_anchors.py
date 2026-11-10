@@ -138,6 +138,16 @@ def compare_start_anchors(source:dict, native_census) ->dict:
     poetry = source["source_start_ref_sets_private"]["poetry"]
     div = native_census.verse_refs_for("div")
     line = native_census.verse_refs_for("line")
+    intro_div = native_census.intro_refs_for("div")
+    intro_line = native_census.intro_refs_for("line")
+    def intro_candidates(reference):
+        if reference is None:
+            return set()
+        book, chapter, _verse = reference.rsplit(".", 2)
+        candidates = {f"{book}.{chapter}.0", f"{book}.{chapter}"}
+        if chapter == "1":
+            candidates.update({book, f"{book}.0.0"})
+        return candidates
     missing_para = sorted(para-div)
     missing_poetry = sorted(poetry-line)
     adjacent = Counter()
@@ -158,6 +168,14 @@ def compare_start_anchors(source:dict, native_census) ->dict:
                 })
         else:
             adjacent[f"{kind}_no_native_marker_at_either_neighbor"] += 1
+            if preceding is None:
+                native_intro = intro_div if kind == "paragraph" else intro_line
+                if intro_candidates(following) & native_intro:
+                    adjacent[f"{kind}_chapter_or_book_opening_native_intro_marker_found"] += 1
+                else:
+                    adjacent[f"{kind}_chapter_or_book_opening_without_parseable_intro_marker"] += 1
+            else:
+                adjacent[f"{kind}_inside_book_or_chapter_no_numbered_neighbor_marker"] += 1
             if len(neither_examples[kind]) < MAX_EXAMPLES:
                 neither_examples[kind].append({
                     "previous_ref":preceding, "next_ref":following
@@ -166,6 +184,11 @@ def compare_start_anchors(source:dict, native_census) ->dict:
         "interval_adjacency_coverage_not_equivalence":dict(sorted(adjacent.items())),
         "sample_previous_neighbor_only_refs":prior_examples,
         "sample_no_neighbor_marker_refs":neither_examples,
+        "native_intro_parseable_marker_references_checked":True,
+        "native_intro_parse_errors_may_hide_markup":(
+            native_census.finish()["original_native_intro_scan_counts"].get(
+                "unparseable_native_intro_records",0)>0
+        ),
         "source_adjacent_marker_matches_are_not_position_or_type_proof":True,
         "schema_version":1,
         "source_start_event_counts":source["source_start_event_counts"],

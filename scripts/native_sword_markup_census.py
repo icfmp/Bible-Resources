@@ -12,6 +12,8 @@ import re
 
 from lxml import etree
 
+from sword_native_inventory import INTRO
+
 KNOWN_TAGS = frozenset({
     "abbr", "chapter", "catchWord", "div", "foreign", "hi", "inscription",
     "l", "lb", "lg", "list", "milestone", "name", "note", "p", "q",
@@ -96,6 +98,10 @@ class NativeMarkupCensus:
         self._native_endpoint_types = Counter()
         self._unknown_styles = 0
         self._verse_refs_by_layout = {"div":set(), "line":set()}
+        self._intro_refs_by_layout = {"div":set(), "line":set()}
+        self._intro_totals = Counter()
+        self._intro_markup_counts = Counter()
+        self._intro_samples = defaultdict(list)
 
     def observe(self, ref: str, parsed_root: etree._Element):
         if not REF.fullmatch(ref):
@@ -161,6 +167,51 @@ class NativeMarkupCensus:
             self._native_structural_positions[
                 f"{tag}:{endpoint}:{position}"] += 1
 
+    def observe_intro(self, ref: str, raw: bytes) -> None:
+        """Inspect original native verse-zero/book-intro XML without publishing it.
+
+        A malformed fragment is reported as *unverified*, never parsed using
+        recovery or treated as evidence of preserved or lost authored layout.
+        """
+        if not INTRO.fullmatch(ref) or len(raw) > 2 * 1024 * 1024:
+            raise ValueError("Invalid or oversized native intro record")
+        self._intro_totals["original_native_intro_records"] += 1
+        if b"<!DOCTYPE" in raw.upper() or b"<?xml" in raw.lower():
+            self._intro_totals["unparseable_native_intro_records"] += 1
+            return
+        parser = etree.XMLParser(resolve_entities=False, load_dtd=False,
+                                 no_network=True, recover=False, huge_tree=False)
+        try:
+            root = etree.fromstring(b"<private_root>" + raw + b"</private_root>",parser)
+        except (etree.XMLSyntaxError, UnicodeError, ValueError):
+            self._intro_totals["unparseable_native_intro_records"] += 1
+            return
+        if any(isinstance(x, etree._Entity) for x in root.iter()):
+            self._intro_totals["unparseable_native_intro_records"] += 1
+            return
+        self._intro_totals["parseable_native_intro_records"] += 1
+        categories = set()
+        for element in root.iterdescendants():
+            if not isinstance(element.tag, str):
+                continue
+            tag = etree.QName(element).localname
+            if tag in {"div", "p"}:
+                categories.add("div")
+            if tag in {"l", "lg", "lb", "q"}:
+                categories.add("line")
+            if tag in STRUCTURAL_TAGS:
+                safe_type = _style(element.get("type", ""))
+                self._intro_markup_counts[f"{tag}:{safe_type}"] += 1
+        for category in sorted(categories):
+            self._intro_refs_by_layout[category].add(ref)
+            if len(self._intro_samples[category]) < MAX_SAMPLE_REFS:
+                self._intro_samples[category].append(ref)
+
+    def intro_refs_for(self, category: str) -> frozenset[str]:
+        if category not in self._intro_refs_by_layout:
+            raise ValueError("Unsupported native intro structure category")
+        return frozenset(self._intro_refs_by_layout[category])
+
     def verse_refs_for(self, category: str) -> frozenset[str]:
         """Private references for source/native co-occurrence diagnostics."""
         if category not in self._verse_refs_by_layout:
@@ -171,6 +222,12 @@ class NativeMarkupCensus:
         return {
             "schema_version": 1,
             "native_numbered_verse_fragments_inspected": self._verses,
+            "original_native_intro_scan_counts": dict(sorted(self._intro_totals.items())),
+            "native_intro_layout_style_counts_allowlisted":
+                dict(sorted(self._intro_markup_counts.items())),
+            "native_intro_markup_first_reference_ids_only":
+                dict(sorted(self._intro_samples.items())),
+            "native_intro_markup_parser_recovery_used": False,
             "native_raw_element_counts": dict(sorted(self._tags.items())),
             "native_raw_attribute_name_counts": dict(sorted(self._attributes.items())),
             "native_structural_category_element_counts": dict(sorted(self._categories.items())),

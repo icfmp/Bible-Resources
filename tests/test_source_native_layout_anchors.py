@@ -135,5 +135,41 @@ class StartAnchorTests(unittest.TestCase):
         self.assertFalse(receipt["editorial_layout_or_publication_approved"])
 
 
+    def test_chapter_opening_source_paragraph_can_have_native_verse_zero_div(self):
+        source=source_usfx_layout_start_anchors(
+            b'<usfx><book id="GEN"><c id="2"/>'
+            b'<p><v id="1"/>PRIVATE SOURCE VERSE</p></book></usfx>',MAPPING)
+        native=NativeMarkupCensus()
+        native.observe_intro("Gen.2.0", b'<div type="paragraph">'
+                             b'PRIVATE INTRO HEADING</div>')
+        native_raw_main_text(b'PRIVATE VERSE',
+                             markup_census=native,reference="Gen.2.1")
+        witness=compare_start_anchors(source,native)
+        self.assertEqual(witness["interval_adjacency_coverage_not_equivalence"][
+            "paragraph_chapter_or_book_opening_native_intro_marker_found"],1)
+        self.assertEqual(native.finish()["original_native_intro_scan_counts"][
+            "parseable_native_intro_records"],1)
+        self.assertEqual(native.finish()["native_intro_layout_style_counts_allowlisted"][
+            "div:paragraph"],1)
+        self.assertFalse(witness["direct_event_or_exact_position_equivalence_verified"])
+        self.assertNotIn("PRIVATE",str(witness))
+        self.assertNotIn("PRIVATE",str(native.finish()))
+
+    def test_unparseable_native_intro_does_not_fake_layout_correspondence(self):
+        source=source_usfx_layout_start_anchors(
+            b'<usfx><book id="GEN"><c id="2"/>'
+            b'<p><v id="1"/>A</p></book></usfx>',MAPPING)
+        native=NativeMarkupCensus()
+        native.observe_intro("Gen.2.0", b'<div type="paragraph">BROKEN')
+        native_raw_main_text(b'A',markup_census=native,reference="Gen.2.1")
+        witness=compare_start_anchors(source,native)
+        self.assertEqual(witness["interval_adjacency_coverage_not_equivalence"][
+            "paragraph_chapter_or_book_opening_without_parseable_intro_marker"],1)
+        self.assertTrue(witness["native_intro_parse_errors_may_hide_markup"])
+        self.assertEqual(native.finish()["original_native_intro_scan_counts"][
+            "unparseable_native_intro_records"],1)
+        self.assertFalse(native.finish()["native_intro_markup_parser_recovery_used"])
+
+
 if __name__=="__main__":
     unittest.main()

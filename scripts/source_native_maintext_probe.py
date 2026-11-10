@@ -397,6 +397,9 @@ def run_real_usfx_sword_text_probe(
         native_markup = NativeMarkupCensus()
 
         def on_entry(kind, ref, bytes_):
+            if kind == "I":
+                native_markup.observe_intro(ref, bytes_)
+                return
             if kind != "K":
                 return
             if ref in native_keys:
