@@ -280,7 +280,8 @@ def compare_private_main_text(
 
 def run_real_usfx_sword_text_probe(
     source_usfx_zip: Path, original_sword_zip: Path, crosswalk: Path,
-    native_index_binary: Path, native_raw_binary: Path
+    native_index_binary: Path, native_raw_binary: Path,
+    native_entry_binary: Path | None = None
 ) -> dict:
     raw, publisher = read_source_xml(source_usfx_zip, source_format="usfx")
     mapping = read_crosswalk(crosswalk)
@@ -331,7 +332,7 @@ def run_real_usfx_sword_text_probe(
 
         corpus = inspect_native_raw_corpus(
             module, conf["module_id"], native_raw_binary, native_index_binary,
-            on_entry=on_entry)
+            on_entry=on_entry, native_entry_binary=native_entry_binary)
         if before != module_payload_digest(module) or before != corpus["module_payload_sha256"]:
             raise MainTextParityError("Native module mutated during private content scan")
         # Read original source ZIP again to reject a source replacement mid-audit.
@@ -371,6 +372,8 @@ def run_real_usfx_sword_text_probe(
             "native_raw_inspector_sha256": corpus["native_raw_inspector_sha256"],
             "independent_native_whole_corpus_scan_completed":
                 corpus["exact_all_occupied_native_keys_matched_independent_index"],
+            "independent_native_exact_key_raw_spotcheck_verified":
+                corpus["independent_native_exact_key_raw_spotcheck_verified"],
             "source_book_scope": scope,
             "mapped_numbered_text_comparison": comparison,
             "source_usfx_to_osis_conversion_verified": False,
@@ -390,6 +393,7 @@ def main() -> int:
     p.add_argument("--crosswalk", type=Path, required=True)
     p.add_argument("--native-index-inspector", type=Path, required=True)
     p.add_argument("--native-raw-inspector", type=Path, required=True)
+    p.add_argument("--native-entry-inspector", type=Path)
     p.add_argument("--report", type=Path, required=True)
     args = p.parse_args()
     if (args.report.exists() or args.report.is_symlink()
@@ -400,7 +404,8 @@ def main() -> int:
     try:
         report = run_real_usfx_sword_text_probe(
             args.source_usfx_zip, args.original_sword_zip, args.crosswalk,
-            args.native_index_inspector, args.native_raw_inspector)
+            args.native_index_inspector, args.native_raw_inspector,
+            native_entry_binary=args.native_entry_inspector)
         write_new_metadata_report(args.report, args.original_sword_zip, report)
     except (ValueError, OSError, UnicodeError) as exc:
         p.error(str(exc))
