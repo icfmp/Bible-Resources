@@ -152,6 +152,27 @@ class NotesTests(unittest.TestCase):
         self.assertNotIn("SOURCE_SECRET", json.dumps(out))
         self.assertNotIn("NATIVE_SECRET", json.dumps(out))
 
+    def test_caller_shapes_are_metadata_only(self):
+        examples = (("a", "single_lowercase_ascii_letter"),
+                    ("Z", "single_uppercase_ascii_letter"),
+                    ("12", "ascii_decimal"),
+                    ("*", "single_symbol"),
+                    ("SECRET_PRIVATE_CALLER", "other_unreviewed_literal"))
+        for label, shape in examples:
+            with self.subTest(shape=shape):
+                attrs = {}
+                notes, _ = collect_usfx_numbered_notes(
+                    source(f'<f caller="{label}">same</f>'),
+                    MAP, attributes_out=attrs)
+                audit = NoteAudit(notes, source_attributes=attrs)
+                audit.inspect("Alpha.1.1", b'<note>same</note>')
+                receipt = audit.finish()["note_annotation_structure_diagnostic"]
+                counts = receipt["classifications"]
+                self.assertEqual(counts["source_caller_shape_" + shape], 1)
+                self.assertEqual(counts["native_note_n_absent"], 1)
+                if len(label) > 4:
+                    self.assertNotIn(label, json.dumps(receipt))
+
     def test_source_machine_target_disappeared_in_native(self):
         attrs = {}
         notes, _ = collect_usfx_numbered_notes(
