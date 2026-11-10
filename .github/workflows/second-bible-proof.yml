@@ -13,7 +13,6 @@ on:
       - scripts/sword_native_raw_corpus.cpp
       - scripts/sword_native_raw_corpus_inventory.py
       - tests/test_sword_native_raw_corpus_inventory.py
-      - scripts/sword_native_raw_corpus.cpp
       - scripts/source_native_maintext_probe.py
       - tests/test_source_native_maintext_probe.py
   workflow_dispatch:
@@ -30,6 +29,7 @@ jobs:
           python-version: "3.12"
           cache: pip
       - name: Install parser and released SWORD C++ library
+        timeout-minutes: 8
         run: |
           python -m pip install -r requirements.txt
           sudo apt-get update
@@ -215,6 +215,15 @@ jobs:
                row.get("source_word_count"), row.get("compiled_word_count"))
               for row in comparison["first_differences_no_scripture"][:4]
           ])
+          print("Material source/native mismatches (reference IDs and classification only):", [
+              (row["native_ref"], row["classification"],
+               row.get("source_word_count"), row.get("native_word_count"),
+               row.get("secondary_tolerant_lexical_diagnostic", {}).get("status"))
+              for row in comparison["material_difference_metadata_no_scripture"]
+          ])
+          print("Material metadata truncated:", comparison["material_differences_metadata_truncated"])
+          print("USFX explicitly excluded editorial element counts:",
+                scope["excluded_source_heading_or_note_element_counts"])
           print("Additional source books remain unverified:", scope["unmapped_authored_book_count"])
           PY
       - name: Upload metadata-only source/reader evidence (no Scripture content)

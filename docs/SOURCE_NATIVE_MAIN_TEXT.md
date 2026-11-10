@@ -120,3 +120,38 @@ book sections. These are *diagnostic classifications, not statements
 that either publisher edition has an error or final same-edition
 fidelity clearance.* Review source revision identity and the unparsed
 fragments before interpreting differences editorially.
+
+## USFX editorial marker discipline (next generic checkpoint)
+
+The eBible **USFX schema** documents that `v` and `c` contain
+automatically generated verse/chapter labels rather than the verse text,
+and that `ve` closes a verse. The USFM/USX speaker style `sp`
+identifies a speaker (especially in Job and Song of Songs), **not** a
+word spoken in the actual verse. A source paragraph `<p sfm="sp">`
+without nested chapter/verse markers is therefore excluded from the
+*main numbered Scripture* comparison, and counted as editorial content
+that remains to be separately verified. The original source XML and
+compiled payload are never modified. Any excluded editorial container
+which embeds a real `c` or `v` marker is rejected as ambiguous,
+not silently discarded.
+
+The metadata-only diagnostic now retains a bounded list (max 60) of
+the *reference IDs* of all material changes and non-self-contained
+native XML fragments, with word counts but **no Bible text**. For a
+native XML fragment which cannot be parsed in isolation, a secondary
+tolerant HTML-token reader may report whether the **word tokens**
+appear in order; that diagnostic **does not establish a correctly
+formed native OSIS fragment, preserved footnotes, or text fidelity**,
+and cannot change the original blocking classification.
+
+References:
+- [eBible original USFX schema](https://ebible.org/usfx/usfx_xsd.html)
+  (chapter/verse markers and alternative labels)
+- [USFM/USX paragraph style `sp`](https://ubsicap.github.io/usx/parastyles.html)
+  (speaker identification)
+
+The actual pinned-WEBP run must be interpreted anew after this parser
+fix: older numbers included generated editorial markers in the
+comparison. Differences in authorial source and compiled editions
+still require independent editorial review; these are not grounds to
+rewrite or reindex verses.

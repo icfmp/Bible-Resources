@@ -11,8 +11,8 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from source_native_maintext_probe import (
-    _classify, authored_usfx_main_text, compare_private_main_text,
-    native_raw_main_text, MainTextParityError,
+    _classify, _tolerant_fragment_lexical_diagnostic, authored_usfx_main_text,
+    compare_private_main_text, native_raw_main_text, MainTextParityError,
 )
 from sword_native_raw_corpus_inventory import parse_native_raw_corpus
 
@@ -77,6 +77,45 @@ class AuthoredMainTextTests(unittest.TestCase):
             authored_usfx_main_text(original().replace(
                 b"</usfx>", b"</wrong>"), PAIR)
 
+    def test_speaker_identifier_is_editorial_not_authorial_verse_words(self):
+        xml = (b'<usfx><book id="AAA"><c id="1"/>'
+               b'<v id="1"/> first'
+               b'<p sfm="sp">Speaker heading</p>'
+               b'<v id="2"/> second</book></usfx>')
+        result, facts = authored_usfx_main_text(xml, PAIR)
+        self.assertEqual(result["Alpha.1.1"], " first")
+        self.assertEqual(result["Alpha.1.2"], " second")
+        self.assertEqual(facts["excluded_source_heading_or_note_element_counts"]["p:sp"], 1)
+        self.assertNotIn("Speaker heading", json.dumps(result))
+
+    def test_ambiguous_speaker_heading_containing_real_verse_blocks(self):
+        xml = (b'<usfx><book id="AAA"><c id="1"/>'
+               b'<p sfm="sp">speaker <v id="1"/> REAL SCRIPTURE</p>'
+               b'</book></usfx>')
+        with self.assertRaisesRegex(MainTextParityError, "container encloses"):
+            authored_usfx_main_text(xml, PAIR)
+
+    def test_verse_and_chapter_labels_not_scripture_and_verse_end_stops_capture(self):
+        xml = (b'<usfx><book id="AAA"><c id="1">Chapter one</c>'
+               b'<cp>Chapter</cp><p><v id="1">1</v> real'
+               b'<vp>First</vp><va>1a</va><ca>one</ca>'
+               b'<ve>end marker not Scripture</ve> trailing outside verse'
+               b'<v id="2">2</v> next</p></book></usfx>')
+        content, facts = authored_usfx_main_text(xml, PAIR)
+        self.assertEqual(content, {"Alpha.1.1": " real",
+                                   "Alpha.1.2": " next"})
+        self.assertEqual(facts["excluded_source_heading_or_note_element_counts"]["ve"], 1)
+        self.assertEqual(facts["excluded_source_heading_or_note_element_counts"]["vp"], 1)
+
+    def test_extended_note_and_crossref_bodies_never_count_as_maintext(self):
+        xml = (b'<usfx><book id="AAA"><c id="1"/>'
+               b'<v id="1"/>main<ef>extended footnote</ef>'
+               b'<ex>extended reference</ex> tail</book></usfx>')
+        texts, facts = authored_usfx_main_text(xml, PAIR)
+        self.assertEqual(texts["Alpha.1.1"], "main tail")
+        self.assertEqual(facts["excluded_source_heading_or_note_element_counts"]["ef"], 1)
+        self.assertEqual(facts["excluded_source_heading_or_note_element_counts"]["ex"], 1)
+
     def test_extra_authorial_numbered_book_remains_visible_in_counts(self):
         raw = original().replace(
             b'<book id="GLO"><p>other authored introduction</p></book>',
@@ -94,6 +133,23 @@ class RawNativeCharacterTests(unittest.TestCase):
         chars, skipped = native_raw_main_text(raw)
         self.assertEqual(chars, "first, beta! tail")
         self.assertEqual(skipped, {"title": 1, "note": 1})
+
+    def test_unclosed_native_inline_tag_has_only_tolerant_diagnostic(self):
+        raw = b"<hi>synthetic words"  # Native OSIS fragment is incomplete.
+        with self.assertRaises(MainTextParityError):
+            native_raw_main_text(raw)
+        compatible = _tolerant_fragment_lexical_diagnostic(
+            raw, "synthetic words")
+        self.assertEqual(compatible["status"],
+                         "tolerant_word_sequence_matches_diagnostic_only")
+        self.assertFalse(compatible["lexical_fidelity_verified"])
+        self.assertFalse(compatible["native_xml_structure_fidelity_verified"])
+        different = _tolerant_fragment_lexical_diagnostic(
+            raw, "different source text")
+        self.assertEqual(different["status"],
+                         "tolerant_word_sequence_differs_diagnostic_only")
+        self.assertNotIn("synthetic", json.dumps(compatible))
+        self.assertNotIn("different", json.dumps(different))
 
     def test_punctuation_mutation_not_exact_even_if_words_unchanged(self):
         self.assertEqual(_classify("first, beta!", "first; beta!"),
