@@ -41,6 +41,9 @@ from source_native_record_scope_triage import (
 from source_native_nonspace_boundaries import (
     NonspaceBoundaryError, compare_punctuation_sensitive_boundaries,
 )
+from source_native_structural_whitespace import (
+    MainTextStructuralWhitespaceTriage, StructuralWhitespaceError,
+)
 from stable_sword_refs import module_payload_digest
 from sword_native_raw_corpus_inventory import (
     inspect_native_raw_corpus, write_new_metadata_report,
@@ -437,6 +440,10 @@ def run_real_usfx_sword_text_probe(
         privately_captured_mismatch_text = {}
         skipped_native = Counter()
         whitespace_patterns = MainTextWhitespacePatterns()
+        structural_whitespace = (
+            MainTextStructuralWhitespaceTriage(source_text, source_boundaries)
+            if source_boundaries is not None else None)
+        structural_whitespace_error = None
         native_markup = NativeMarkupCensus()
         native_pairs = NativeMilestonePairAudit()
         native_book_intro = NativeBookIntroScreen()
@@ -444,7 +451,7 @@ def run_real_usfx_sword_text_probe(
         native_boundary_error = None
 
         def on_entry(kind, ref, bytes_):
-            nonlocal native_boundary_error
+            nonlocal native_boundary_error, structural_whitespace_error
             native_pairs.observe(kind, ref, bytes_)
             if native_boundaries is not None and native_boundary_error is None:
                 try:
@@ -488,6 +495,11 @@ def run_real_usfx_sword_text_probe(
             authored = source_text[ref]
             category = _classify(authored, actual)
             counts[category] += 1
+            if structural_whitespace is not None and structural_whitespace_error is None:
+                try:
+                    structural_whitespace.observe(ref, actual)
+                except StructuralWhitespaceError:
+                    structural_whitespace_error = "blocked_original_native_whitespace_scope"
             if category == "whitespace_only":
                 whitespace_patterns.observe(ref, authored, actual)
             # Keep bounded unmatched *actual* Bible prose in private memory,
@@ -601,6 +613,26 @@ def run_real_usfx_sword_text_probe(
                 "all_p_q_source_native_nonwhitespace_codepoint_boundaries_match":False,
                 "no_original_text_notes_native_markup_or_sids_in_receipt":True,
             }
+        if (body_nonspace.get(
+                "all_p_q_source_native_nonwhitespace_codepoint_boundaries_match") is True
+                and structural_whitespace is not None
+                and structural_whitespace_error is None):
+            try:
+                body_whitespace_gaps = structural_whitespace.finish()
+            except StructuralWhitespaceError:
+                body_whitespace_gaps = {
+                    "schema_version":1,
+                    "status":"blocked_incomplete_original_native_verse_gap_coverage",
+                    "source_native_original_whitespace_layout_verified":False,
+                    "no_bible_text_note_content_or_raw_whitespace_in_report":True,
+                }
+        else:
+            body_whitespace_gaps = {
+                "schema_version":1,
+                "status":"blocked_structural_or_punctuation_sensitive_prerequisite",
+                "source_native_original_whitespace_layout_verified":False,
+                "no_bible_text_note_content_or_raw_whitespace_in_report":True,
+            }
         comparison = {
             "status": ("all_mapped_numbered_maintext_characters_match_index_only"
                        if exact else "blocked_full_mapped_numbered_maintext_parity"),
@@ -625,6 +657,7 @@ def run_real_usfx_sword_text_probe(
             "source_native_body_boundary_word_position_screen": body_boundary,
             "source_native_body_record_scope_triage": body_record_scope,
             "source_native_nonwhitespace_codepoint_boundary_screen": body_nonspace,
+            "source_native_structural_whitespace_gap_triage": body_whitespace_gaps,
             "source_native_ordered_body_kind_screen": (
                 source_body_order_block if source_body_order_block is not None
                 else compare_ordered_body_openings(

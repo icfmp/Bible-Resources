@@ -34,6 +34,8 @@ on:
       - "scripts/source_native_word_boundaries.py"
       - "scripts/source_native_record_scope_triage.py"
       - "scripts/source_native_nonspace_boundaries.py"
+      - "scripts/source_native_structural_whitespace.py"
+      - "tests/test_source_native_structural_whitespace.py"
       - "tests/test_source_native_nonspace_boundaries.py"
       - "tests/test_source_native_record_scope_triage.py"
       - "tests/test_source_native_word_boundaries.py"
@@ -118,6 +120,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_source_native_word_boundaries.py' -v
           python -m unittest discover -s tests -p 'test_source_native_record_scope_triage.py' -v
           python -m unittest discover -s tests -p 'test_source_native_nonspace_boundaries.py' -v
+          python -m unittest discover -s tests -p 'test_source_native_structural_whitespace.py' -v
           python -m unittest discover -s tests -p 'test_native_book_intro_screen.py' -v
           python -m unittest discover -s tests -p 'test_source_native_layout_anchors.py' -v
           python -c 'import os, sys; sys.path.insert(0, "scripts"); from bible_intake import load_manifest; m=load_manifest(os.environ["RESOURCE_ID"]); print("Reviewed research manifest:", m["resource_id"], m["purpose"], m["source"]["format"])'

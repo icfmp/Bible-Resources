@@ -202,6 +202,14 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
             missing.append("Source-native punctuation-sensitive paragraph/poetry boundary positions differ or remain unverified")
         else:
             missing.append("No independent source-native punctuation-relative p/q boundary audit")
+        whitespace_gaps = rows.get("source_native_structural_whitespace_gap_triage", {})
+        if whitespace_gaps.get("status") == "whitespace_differences_classified_not_editorially_approved":
+            verified.append("Source/native main-text whitespace differences classified by original p/q boundaries and source newline presence (not editorial layout approval)")
+            missing.append("Original whitespace/newline runs differ; p/q layout semantics and actual reader presentation need review")
+        elif whitespace_gaps:
+            missing.append("Original/native whitespace provenance triage blocked or incomplete; do not infer layout parity")
+        else:
+            missing.append("No independent original/native p/q-aware whitespace gap classification")
         body_order = rows.get("source_native_ordered_body_kind_screen", {})
         if body_order.get("status") == "blocked_original_authorial_source_scope_or_structure":
             missing.append("Source-native p/q ordered event check explicitly BLOCKED by original book/structure scope; do not infer matching order")
