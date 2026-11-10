@@ -366,10 +366,12 @@ def run_real_usfx_sword_text_probe(
     raw, publisher = read_source_xml(source_usfx_zip, source_format="usfx")
     mapping = read_crosswalk(crosswalk)
     source_text, scope = authored_usfx_main_text(raw, mapping)
-    source_notes, source_note_scope = collect_usfx_numbered_notes(raw, mapping)
+    source_note_attributes = {}
+    source_notes, source_note_scope = collect_usfx_numbered_notes(
+        raw, mapping, attributes_out=source_note_attributes)
     if not set(source_notes).issubset(source_text):
         raise MainTextParityError("Source note inventory includes unknown numbered verses")
-    note_audit = NoteAudit(source_notes)
+    note_audit = NoteAudit(source_notes, source_attributes=source_note_attributes)
     with tempfile.TemporaryDirectory(prefix="private-maintext-") as root:
         module = Path(root) / "original"
         conf = _safe_single_module(original_sword_zip, module)
