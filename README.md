@@ -51,8 +51,10 @@ moving on. Publication still requires separate rights/editorial approval.
 ## Automated, resumable Bible source audits
 
 Bible Resources runs the seven fixed [onboarding checkpoints](docs/BIBLE_7_STAGE_WORKFLOW.md)
-on **independent GitHub Actions runs**. A SHA-pinned research manifest selects
-an exact original Bible source/official SWORD pair. Run just one stage at a
+on **independent GitHub Actions runs**. Stage 1 can start with an explicit
+unverified research manifest (no download). Stages 2–6 require SHA-pinned
+original Bible source/official SWORD archives and independently inspected
+module identity before network acquisition. Run just one stage at a
 time and use its metadata-only report to resume safely after interruptions;
 the original archives are never uploaded or published.
 

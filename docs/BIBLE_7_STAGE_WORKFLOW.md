@@ -20,6 +20,10 @@ temporary storage and uploading only metadata-only evidence. The operator
 provides a reviewed `config/bible-intake/<resource_id>.json` manifest,
 chooses an individual stage (1–7), and optionally an `[Import]` issue
 number for an automatically posted permanent checkpoint comment.
+**Stage 1 may use explicit `null` placeholders for archive SHA-256 and
+uninspected SWORD ID/driver**, because this stage performs no network
+acquisition. All stages 2–6 reject those provisional identities **before
+any download**; never fabricate hashes simply to start stage 1.
 
 Some existing automated components are **diagnostics, not yet complete
 gates**, especially USFM/USFX→OSIS conversion parity, source/native note

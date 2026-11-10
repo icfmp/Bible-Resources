@@ -94,7 +94,7 @@ def load_manifest(resource_id: str, *, root: Path = ROOT) -> dict:
 def fetch_pinned(url: str, expected_sha256: str, provider: str, destination: Path, *, opener=None) -> dict:
     """Stream a pinned upstream archive into a new private path, never overwrite."""
     _safe_url(url, provider)
-    if not SHA.fullmatch(expected_sha256):
+    if not isinstance(expected_sha256, str) or not SHA.fullmatch(expected_sha256):
         raise IntakeError("Invalid expected SHA-256")
     if destination.is_symlink() or destination.exists() or destination.parent.is_symlink():
         raise IntakeError("Refuse to overwrite source archives or symlink paths")

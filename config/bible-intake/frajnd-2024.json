@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "resource_id": "frajnd-2024",
+  "category": "bible",
+  "title": "Bible J. N. Darby (BPC 2024, eBible)",
+  "language": "fr",
+  "edition": "BPC JND edition 2024, revision 2.0; eBible frajnd listing updated 2025-05-02",
+  "provider": "ebible",
+  "purpose": "research_only",
+  "rights": {
+    "status": "reviewed_for_research",
+    "evidence_url": "https://editeurbpc.com/telechargements",
+    "note": "BPC declares its 2024 JND v2.0 edition Public Domain. Original annotations and any later lexical enrichment still need their own scope audit. Excludes separately revised 2026 DarbyR (CC BY-NC-ND). No redistribution permission asserted for uninspected third-party ZIP contents."
+  },
+  "source": {
+    "format": "USFX",
+    "url": "https://ebible.org/Scriptures/frajnd_usfx.zip",
+    "sha256": null
+  },
+  "sword": {
+    "url": "https://ebible.org/sword/zip/frajnd2024eb.zip",
+    "sha256": null,
+    "module_id": null,
+    "driver": null,
+    "sample_references": [
+      "Gen 1:1",
+      "Ps 23:1",
+      "John 3:16"
+    ]
+  },
+  "crosswalk": "config/standard_usfm_osis_66.json"
+}

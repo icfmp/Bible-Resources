@@ -18,7 +18,7 @@ import subprocess
 import tempfile
 import zipfile
 
-from bible_intake import ROOT, IntakeError, acquire, load_manifest
+from bible_intake import ROOT, IntakeError, SHA, acquire, load_manifest
 from pilot_preflight import inspect_archive
 from pilot_runtime import run_reader
 
@@ -172,17 +172,44 @@ def run_stage(manifest: dict, stage: int, temp: Path, *, opener=None,
     if stage not in STAGES:
         raise IntakeError("Unknown stage")
     if stage == 1:
+        pending = [
+            f"{kind} original archive SHA-256 not yet independently pinned"
+            for kind in ("source", "sword")
+            if not isinstance(manifest[kind].get("sha256"), str)
+        ]
+        if manifest["sword"].get("module_id") is None:
+            pending.append("Original SWORD module ID not yet independently inspected")
+        if manifest["sword"].get("driver") is None:
+            pending.append("Original SWORD driver not yet independently inspected")
         return _status("REVIEW_REQUIRED",
-            verified=["Manifest schema, approved provider endpoints and exact SHA-256 syntax validated"],
+            verified=["Manifest schema and approved provider HTTPS endpoints validated",
+                      "Supplied SHA-256 syntax validated where a pin is present",
+                      "Stage 1 performed no download or content publication"],
             missing=["Human edition identity and competing upstream baseline",
                      "Rights review for text, notes, derivative enrichments",
-                     "Reviewer decision whether to reuse official SWORD or rebuild"])
+                     "Reviewer decision whether to reuse official SWORD or rebuild"] + pending)
     if stage == 7:
         return _status("REVIEW_REQUIRED",
             verified=["Publication is disabled in read-only research workflow"],
             missing=["Owner's explicit edition/rights/editorial signoff",
                      "Verified results of all seven independent gates",
                      "Publication PR, release and external Pages delivery proof"])
+    # Stage-one manifests may explicitly record unknown original identities.
+    # Never permit those provisional manifests to acquire remote archives.
+    missing_pins = []
+    for kind in ("source", "sword"):
+        pin = manifest[kind].get("sha256")
+        if not isinstance(pin, str) or not SHA.fullmatch(pin):
+            missing_pins.append(f"Original {kind} archive SHA-256 is not pinned")
+    if not isinstance(manifest["sword"].get("module_id"), str):
+        missing_pins.append("Original SWORD module ID is not verified")
+    if manifest["sword"].get("driver") not in ("RawText", "zText"):
+        missing_pins.append("Original SWORD driver is not verified")
+    if missing_pins:
+        return _status("BLOCKED", verified=[],
+                       missing=missing_pins +
+                       ["A stage-one research manifest cannot acquire original archives"])
+
     want_source,want_sword = _needs(stage)
     receipts, archives = acquire(manifest,temp,source=want_source,sword=want_sword,opener=opener)
     if stage == 2:
