@@ -178,6 +178,13 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
             "Mapped indexed main-text has unresolved non-whitespace word/punctuation or reference differences"])
         if witness["source_verses_with_whitespace_only_changes"]:
             missing.append("Original main-text whitespace differs; verse/poetry/paragraph layout preservation not yet verified")
+        body_order = rows.get("source_native_ordered_body_kind_screen", {})
+        if body_order.get("status") == "blocked_original_authorial_source_scope_or_structure":
+            missing.append("Source-native p/q ordered event check explicitly BLOCKED by original book/structure scope; do not infer matching order")
+        elif body_order and body_order.get("same_order_and_kind_in_every_mapped_book") is False:
+            missing.append("Original p/q versus native x-p/l body event order or counts differ; structural correspondence requires review")
+        elif body_order.get("same_order_and_kind_in_every_mapped_book") is True:
+            verified.append("Original p/q vs compiled x-p/l opening kind order matched per book (NOT exact word-position parity)")
         missing += ["Exact publisher edition identity and original book/intro order not independently signed off",
                     "Original note callers, word anchors, resolved reference targets and verse-zero/poetry structure unverified",
                     "Rights/editorial publication approval remains separate"]

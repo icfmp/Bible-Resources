@@ -487,6 +487,55 @@ paragraph and poetry boundaries. The remaining source→compiled
 position/typography review in 4c and 5 is not waived. No original file or
 native SWORD module is modified.
 
+## Stage-4c source↔native *ordered body event-kind* comparison
+
+`scripts/source_native_ordered_body.py` compares original USFX main-text
+structural **opening order** by original mapped book against the actual
+stock SWORD `sID` opening stream from
+`native_milestone_pair_audit.py`:
+
+- Authorial **`<p>`** body paragraph starts map to compiled
+  **`<div type="x-p" sID="...">`** openings. Authorial **`<q>`**
+  poetic-line starts map to compiled **`<l sID="...">`** openings.
+  It compares entire ordered sequences of these two **types** within
+  each original book, not only their total counts. Native values of
+  generated structural IDs are never returned.
+- Original `p` **before chapter one** is excluded from the *body sequence*
+  **only** when its original `sfm` is an explicitly recognized book-title
+  style. Its exact original text and its native SWORD `title` match are
+  independently inspected, and the exclusion is counted. An ordinary or
+  unknown-styled original prefatory `p` is never silently discarded.
+  Paragraphs inside annotation notes are counted in their own category,
+  not confused with main Scripture body structure.
+- The report records complete per-book kind-sequence equality status,
+  source/native event count totals, source/native kind-sequence hashes,
+  and at most 24 reference-only examples of missing/extra/reordered
+  openings. It publishes **no** verse words, title/footnote bodies,
+  native generated structural IDs or unknown XML attribute values.
+  Ordered book mismatches remain review candidates: they are **not**
+  automatically corrected to satisfy a test.
+- This is strictly **order and kind**, *not* a certificate of exact
+  source/native word-relative starts/ends, individual paragraph span,
+  stanza boundaries, line/verse-zero placement, full source SFM styles,
+  typography, whitespace or CrossWire reader rendering. These require
+  independent source-bound positional proof and editorial acceptance;
+  stage **4c** remains **PARTIAL** until those gates are considered.
+  Stage 5 separately verifies note bodies/callers/word anchors and links.
+
+When an independently inventoried source has unresolved book/verse
+structure or an ambiguous crosswalk (for example, a historical research
+fixture), this **additional order check** returns an explicit, text-free
+`blocked_original_authorial_source_scope_or_structure` diagnostic.
+It does **not** substitute an empty sequence, silently omit original
+books, invent ordering, or stop unrelated existing full-source tests.
+The stage-four machine result lists that missing structural gate and
+cannot be interpreted as source-to-compiled order fidelity. Original
+source discrepancies require investigation under the generic issue and
+must never be suppressed merely to make CI green.
+
+The original pinned eBible archives remain untouched, and no module is
+published by this audit.
+
 ## Safety and publication separation
 
 - GitHub workflow uses `contents: read` for the audit job.
