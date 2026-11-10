@@ -132,6 +132,15 @@ jobs:
               python scripts/fetch_reviewed_schema.py --directory "${RUNNER_TEMP}/osis-xsd"
             fi
           fi
+      - name: Obtain exact SHA-pinned official USFX XSD when stage 3 audits USFX
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$STAGE" == "3" ]]; then
+            if [[ "$(python -c 'import os,sys; sys.path.insert(0,"scripts"); from bible_intake import load_manifest; print(load_manifest(os.environ["RESOURCE_ID"])["source"]["format"])')" == "USFX" ]]; then
+              python scripts/usfx_schema_gate.py --download-pinned --directory "${RUNNER_TEMP}/usfx-xsd"
+            fi
+          fi
       - name: Run exactly one research checkpoint (NO publication or source modifications)
         shell: bash
         run: |
@@ -145,6 +154,9 @@ jobs:
           fi
           if [[ -f "${RUNNER_TEMP}/osis-xsd/osisCore.2.1.1-cw-latest.xsd" ]]; then
             args+=(--osis-schema "${RUNNER_TEMP}/osis-xsd/osisCore.2.1.1-cw-latest.xsd")
+          fi
+          if [[ -f "${RUNNER_TEMP}/usfx-xsd/usfx.xsd" ]]; then
+            args+=(--usfx-schema "${RUNNER_TEMP}/usfx-xsd/usfx.xsd")
           fi
           python scripts/bible_stage_runner.py "${args[@]}"
       - name: Show bounded checkpoint and unverified gates in Actions summary
