@@ -57,3 +57,22 @@ gate. Follow-up work must separately audit note type/caller/anchor,
 explicit reference targets, original verse position and ordered
 paragraph/poetry/quotation structure. The published LSG 0.1.0 release
 remains untouched.
+
+## Initial pinned WEBP source/reader diagnostic (not editorial clearance)
+
+The original SHA-pinned WEBP USFX and independently released zText reader
+showed **1,568 authored notes** in mapped numbered source verses and
+**1,571 notes** in parseable occupied native numbered entries. Among the
+31,100 occupied native verse entries, 1,403 note-bearing entries had the
+same ordered note-body text after Unicode/whitespace folding, four had
+note-count mismatches, four had differing ordered note bodies, six raw
+fragments could not be parsed strictly, and one authored note-bearing
+verse had no independently addressable native key. The diagnostic is
+conservative: these totals **do not** mean three authorial notes were
+inserted or deleted; source-only verse-group storage, title/intro
+storage, XML fragment validity and note caller/reference conventions
+must be examined before editorial conclusions.
+
+The bounded report deliberately prioritizes count/content mismatches
+and unparseable fragments over routine whitespace-only differences,
+without revealing the underlying note text.
