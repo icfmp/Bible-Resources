@@ -100,7 +100,10 @@
           "pattern": "^https://"
         },
         "sha256": {
-          "type": "string",
+          "type": [
+            "string",
+            "null"
+          ],
           "pattern": "^[a-f0-9]{64}$"
         },
         "member": {
@@ -126,17 +129,24 @@
           "pattern": "^https://"
         },
         "sha256": {
-          "type": "string",
+          "type": [
+            "string",
+            "null"
+          ],
           "pattern": "^[a-f0-9]{64}$"
         },
         "module_id": {
-          "type": "string",
+          "type": [
+            "string",
+            "null"
+          ],
           "pattern": "^[A-Za-z][A-Za-z0-9_]{1,39}$"
         },
         "driver": {
           "enum": [
             "RawText",
-            "zText"
+            "zText",
+            null
           ]
         },
         "versification": {
