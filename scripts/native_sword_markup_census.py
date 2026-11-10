@@ -30,7 +30,8 @@ MAX_SAMPLE_REFS = 4
 # Approved OSIS/SWORD structural style identifiers only. Unknown values are
 # counted as "other" rather than copied into public GitHub reports.
 SAFE_STRUCTURE_STYLES = frozenset({
-    "", "book", "chapter", "section", "paragraph", "poetry", "preverse",
+    "", "book", "bookGroup", "chapter", "section", "paragraph", "poetry",
+    "preverse", "x-milestone", "x-preverse",
     "x-p", "x-m", "x-mi", "x-pi", "x-pm", "x-pc", "x-pr",
     "x-q", "x-q1", "x-q2", "x-q3", "x-q4",
     "x-qm", "x-qm1", "x-qm2", "x-qr", "x-qc",
