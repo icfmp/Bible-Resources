@@ -154,3 +154,108 @@ def compare_authored_native_paragraphs(xml: bytes, mapping: list[tuple[str,str]]
         "source_or_compiled_modified":False,
         "publication_approved":False,
     }
+
+
+def audit_usfx_book_prefaces(xml: bytes, mapping: list[tuple[str, str]]) -> dict:
+    """Classify every authored pre-first-chapter p without leaking its content.
+
+    This is a source-only diagnostic. Text within notes/headings is counted
+    separately rather than silently called Scripture. No assertion that
+    native SWORD preserves any paragraph is made here.
+    """
+    proof = audit_source_usfx(xml)
+    if proof["source_structural_issues"]:
+        raise ParagraphAuditError("Original source structure unresolved")
+    crosswalk = dict(mapping)
+    if (not mapping or len(crosswalk) != len(mapping)
+            or len(set(crosswalk.values())) != len(mapping)):
+        raise ParagraphAuditError("Ambiguous book mapping")
+    parser = etree.XMLParser(resolve_entities=False, load_dtd=False,
+                             no_network=True, recover=False, huge_tree=False)
+    try:
+        root = etree.fromstring(xml, parser)
+    except (etree.XMLSyntaxError, ValueError) as exc:
+        raise ParagraphAuditError("Unparseable original prefatory structure") from exc
+    totals = Counter()
+    examples = []
+    seen = set()
+    for book in root.iter("book"):
+        source_id = book.get("id")
+        if not source_id or source_id in seen:
+            raise ParagraphAuditError("Missing or duplicate original book")
+        seen.add(source_id)
+        if source_id not in crosswalk:
+            totals["unmapped_original_books"] += 1
+            continue
+        native_book = crosswalk[source_id]
+        totals["mapped_original_books"] += 1
+        prefatory = []
+        # Iterate in *document order*; nested headings/notes are not lost.
+        for node in book.iter():
+            if not isinstance(node.tag, str):
+                continue
+            tag = etree.QName(node).localname
+            if tag == "c":
+                break
+            if tag == "p":
+                prefatory.append(node)
+        totals["prefatory_p_elements"] += len(prefatory)
+        if len(prefatory) != 1:
+            totals["books_without_exactly_one_prefatory_p"] += 1
+        for p in prefatory:
+            nested_in_note = _within_note(p, book)
+            if nested_in_note:
+                totals["prefatory_p_nested_in_note"] += 1
+            # Exclude note/heading branches from the distinct main-content
+            # signal; this is only a classification of authored XML text.
+            def text_outside_annotations(node):
+                if not isinstance(node.tag, str):
+                    return ""
+                local = etree.QName(node).localname
+                if local in IGNORE_CONTAINER or local in {
+                    "s", "mt", "ms", "r", "d", "cl", "toc", "rem"
+                }:
+                    return ""
+                output = node.text or ""
+                for child in node:
+                    output += text_outside_annotations(child)
+                    output += child.tail or ""
+                return output
+            any_text = any(t.strip() for t in p.itertext())
+            main_text = bool(text_outside_annotations(p).strip())
+            descendants = [etree.QName(ch).localname for ch in p.iterdescendants()
+                           if isinstance(ch.tag, str)]
+            has_markers = any(t in {"c", "v", "ve"} for t in descendants)
+            attrs = bool(p.attrib)
+            totals["prefatory_p_with_any_descendant_text" if any_text
+                   else "prefatory_p_without_descendant_text"] += 1
+            totals["prefatory_p_with_non_annotation_text" if main_text
+                   else "prefatory_p_without_non_annotation_text"] += 1
+            if descendants:
+                totals["prefatory_p_with_child_markup"] += 1
+            if has_markers:
+                totals["prefatory_p_with_chapter_or_verse_marker"] += 1
+            if attrs:
+                totals["prefatory_p_with_attributes"] += 1
+            if len(examples) < MAX_EXAMPLES:
+                examples.append({
+                    "native_book": native_book,
+                    "has_descendant_text": any_text,
+                    "has_non_annotation_text": main_text,
+                    "has_child_markup": bool(descendants),
+                    "has_chapter_or_verse_marker": has_markers,
+                    "has_attributes": attrs,
+                    "nested_in_note": nested_in_note,
+                })
+    if not set(crosswalk).issubset(seen):
+        raise ParagraphAuditError("Missing mapped original book")
+    return {
+        "schema_version": 1,
+        "prefatory_source_p_class_counts": dict(sorted(totals.items())),
+        "first_prefatory_p_classifications_no_text": examples,
+        "all_mapped_original_books_checked": totals["mapped_original_books"] == len(crosswalk),
+        "compiled_book_intro_structure_verified": False,
+        "prefatory_source_native_position_equivalence_verified": False,
+        "source_or_compiled_modified": False,
+        "publication_approved": False,
+    }
