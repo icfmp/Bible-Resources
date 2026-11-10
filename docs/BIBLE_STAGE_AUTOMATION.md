@@ -39,6 +39,27 @@ historically audited WEBP USFX and original eBible zText archives. Existing
 source-only verse and note/canon differences are *expected to block full
 fidelity*, not to be hidden by special cases.
 
+## Observed upstream revision drift — nonpublishing WEBP test fixture
+
+The source archives used in the 2026-11-09 WEBP research **changed on the
+eBible server**. The initial pinned fixture correctly failed instead of
+accepting changed material as identical. A read-only, HTTPS-allowlisted
+observational run ([PR #59, workflow #42799441256](
+https://github.com/icfmp/Bible-Resources/actions/runs/42799441256))
+recorded only file sizes and SHA-256 values:
+
+| Archive | Historical SHA-256 (2026-11-09) | Newly observed SHA-256 (2026-11-10) |
+| --- | --- | --- |
+| Original `engwebp_usfx.zip` | `66f99b22a380d8ef8dbd9d401806fc02be3650e5fe3dbb0cec4d9693b53e1e44` | `f678047c4177451b476c7f25e18ac3798d6722c25d474a56440b0ab8e2d7d84e` |
+| Original `engweb2025peb.zip` | `53d45377d1aa376f483aded415b6d122b7cbe6795baddc49dae6574e304b8810` | `341fa8898cdbcdd28b743d3c28b663abb181644d3a5ec4420467fad487ba7ce8` |
+
+The **research-only fixture** was deliberately updated to the observed
+2026-11-10 hashes to exercise the orchestrator. This is **not**
+proof that either publisher edition, words, notes or canon remained the
+same as the historical experiment, nor a curated revision or a publication
+authorization. A real future candidate must use its own reviewed
+manifest and independent edition/source review before anything is released.
+
 ## Run it
 
 **Recommended — start from the Bible's issue (including from ChatGPT):**
