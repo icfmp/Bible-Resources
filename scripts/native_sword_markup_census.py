@@ -25,6 +25,62 @@ KNOWN_ATTRIBUTES = frozenset({
 })
 REF = re.compile(r"^[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*\.[1-9][0-9]*$")
 MAX_SAMPLE_REFS = 4
+# Approved OSIS/SWORD structural style identifiers only. Unknown values are
+# counted as "other" rather than copied into public GitHub reports.
+SAFE_STRUCTURE_STYLES = frozenset({
+    "", "book", "chapter", "section", "paragraph", "poetry", "preverse",
+    "x-p", "x-m", "x-mi", "x-pi", "x-pm", "x-pc", "x-pr",
+    "x-q", "x-q1", "x-q2", "x-q3", "x-q4",
+    "x-qm", "x-qm1", "x-qm2", "x-qr", "x-qc",
+    "x-s", "x-s1", "x-s2", "x-s3", "x-ms", "x-mt",
+    "x-intro", "x-title", "x-verse", "x-chapter",
+})
+STRUCTURAL_TAGS = frozenset({"div", "p", "milestone", "l", "lg", "lb", "q"})
+_WORDS = re.compile(r"[^\W_]+(?:['\u2019][^\W_]+)*", re.UNICODE)
+
+
+def _style(value):
+    return value if value in SAFE_STRUCTURE_STYLES else "other_unreviewed_style"
+
+
+def _endpoint(element):
+    opening, closing = "sID" in element.attrib, "eID" in element.attrib
+    if opening and closing:
+        raise ValueError("Ambiguous native structural milestone with both sID and eID")
+    return "open_sID" if opening else "close_eID" if closing else "container_or_standalone"
+
+
+def _relative_word_positions(root):
+    """Recognize starts/end milestones relative to independently parsed text.
+
+    Word ordinals are a diagnostic, not a claim of source layout equivalence.
+    Original text is transient and never returned.
+    """
+    text = []
+    marks = []
+
+    def walk(node):
+        if not isinstance(node.tag, str):
+            return
+        tag = etree.QName(node).localname
+        if node is not root and tag in STRUCTURAL_TAGS:
+            marks.append((node, len(_WORDS.findall("".join(text)))))
+        if node is not root and tag in {"note", "title"}:
+            return
+        if node.text:
+            text.append(node.text)
+        for child in node:
+            walk(child)
+            if child.tail:
+                text.append(child.tail)
+
+    walk(root)
+    n = len(_WORDS.findall("".join(text)))
+    for element, words_before in marks:
+        pos = ("before_first_word" if words_before == 0
+               else "after_last_word" if words_before >= n
+               else "inside_verse")
+        yield element, pos
 
 
 class NativeMarkupCensus:
@@ -35,6 +91,11 @@ class NativeMarkupCensus:
         self._categories = Counter()
         self._verses_with = Counter()
         self._samples = defaultdict(list)
+        self._native_styles = Counter()
+        self._native_structural_positions = Counter()
+        self._native_endpoint_types = Counter()
+        self._unknown_styles = 0
+        self._verse_refs_by_layout = {"div":set(), "line":set()}
 
     def observe(self, ref: str, parsed_root: etree._Element):
         if not REF.fullmatch(ref):
@@ -81,6 +142,30 @@ class NativeMarkupCensus:
             self._verses_with[category] += 1
             if len(self._samples[category]) < MAX_SAMPLE_REFS:
                 self._samples[category].append(ref)
+        for element, position in _relative_word_positions(parsed_root):
+            kind = etree.QName(element).localname
+            if kind == "div":
+                self._verse_refs_by_layout["div"].add(ref)
+            if kind in {"l", "lg", "lb"}:
+                self._verse_refs_by_layout["line"].add(ref)
+            tag = etree.QName(element).localname
+            endpoint = _endpoint(element)
+            style = _style(element.get("type", ""))
+            subtype = _style(element.get("subType", ""))
+            self._native_styles[f"{tag}:{style}"] += 1
+            if subtype not in ("", "other_unreviewed_style"):
+                self._native_styles[f"{tag}:subType:{subtype}"] += 1
+            if style == "other_unreviewed_style" or subtype == "other_unreviewed_style":
+                self._unknown_styles += 1
+            self._native_endpoint_types[f"{tag}:{endpoint}"] += 1
+            self._native_structural_positions[
+                f"{tag}:{endpoint}:{position}"] += 1
+
+    def verse_refs_for(self, category: str) -> frozenset[str]:
+        """Private references for source/native co-occurrence diagnostics."""
+        if category not in self._verse_refs_by_layout:
+            raise ValueError("Unsupported native structural category")
+        return frozenset(self._verse_refs_by_layout[category])
 
     def finish(self):
         return {
@@ -91,6 +176,12 @@ class NativeMarkupCensus:
             "native_structural_category_element_counts": dict(sorted(self._categories.items())),
             "native_numbered_verses_with_structural_category": dict(sorted(self._verses_with.items())),
             "first_reference_ids_without_scripture": dict(sorted(self._samples.items())),
+            "native_structure_style_counts_allowlisted": dict(sorted(self._native_styles.items())),
+            "native_structure_endpoint_counts": dict(sorted(self._native_endpoint_types.items())),
+            "native_structure_relative_word_position_counts":
+                dict(sorted(self._native_structural_positions.items())),
+            "unrecognized_native_structural_style_occurrences": self._unknown_styles,
+            "relative_positions_are_diagnostic_not_source_parity": True,
             "raw_markup_content_or_attribute_values_exposed": False,
             "aggregate_counts_are_not_original_layout_parity": True,
             "cross_verse_markers_and_verse_zero_positions_verified": False,

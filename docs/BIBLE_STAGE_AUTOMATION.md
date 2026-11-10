@@ -250,6 +250,41 @@ mapping exceptions to obtain a green report. Any later acceptance needs
 the exact report link and source-scoped explanation recorded on the import
 issue.
 
+## Stage-4 subchecks and provisional source/native structural anchors
+
+Step 4 is split **internally** into 4a (stock identity / complete reference
+index), 4b (full numbered main text), 4c (whitespace and major editorial
+structure triage), and 4d (stock reuse versus source-faithful rebuild decision).
+The top-level workflow, issue checklist and user-facing progress remain **seven
+stages**. See [the bounded 4a–4d checklist](BIBLE_7_STAGE_WORKFLOW.md).
+
+The original-USFX structural anchor probe is a *diagnostic precursor* to a
+source-relative paragraph and poetry proof:
+
+- It inventories source USFX `p` and `q` **start markers**, preserving the
+  preceding and next actual numbered verse reference as evidence, without
+  assuming the marker lies within the next verse.
+- The independently decoded, actual original stock SWORD raw XML records
+  allowlisted `div`/`milestone` structural `type`/`subType` categories,
+  actual start/end vs container markup, and whether markers occur before the
+  first, inside, or after the last numbered main-text word.
+- Source next-verse anchors are screened against the set of native verses
+  containing `div` or `l`/`lg`/`lb`. A corresponding verse key is **not
+  proof** of matching markup semantic meaning, source layout position or
+  cross-verse scope. Any apparent missing marker is a *review candidate*,
+  not automatically a data corruption.
+- Only allowlisted markup styles, bounded reference IDs and aggregate counts
+  appear in the report; unknown raw `type`, `subType`, note values, Scripture
+  and raw XML never appear in a GitHub artifact.
+- Missing source/native correspondence, verse-zero/intro scope and exact
+  original paragraph/stanza boundaries still require more complete
+  **source-grounded proofs** and human editorial review. This screen never
+  returns publication/editorial approval or changes source text.
+
+The step-4 stage stays **PARTIAL** until the whole stage gate is reviewed.
+Step 5 retains detailed caller/anchor/target and exact editorial structure
+comparison; a read-only diagnostic does not waive those requirements.
+
 ## Safety and publication separation
 
 - GitHub workflow uses `contents: read` for the audit job.
