@@ -30,8 +30,11 @@ def _within_note(node, book):
     return False
 
 
-def compare_authored_native_paragraphs(xml: bytes, mapping: list[tuple[str,str]],
-                                      native_x_p_by_book: dict[str,int]) -> dict:
+def compare_authored_native_paragraphs(
+    xml: bytes, mapping: list[tuple[str,str]],
+    native_x_p_by_book: dict[str,int],
+    *, native_other_div_by_book: dict[str,int] | None = None
+) -> dict:
     """Inspect original USFX book positions, never return paragraph text/notes."""
     proof = audit_source_usfx(xml)
     if proof["source_structural_issues"]:
@@ -40,10 +43,10 @@ def compare_authored_native_paragraphs(xml: bytes, mapping: list[tuple[str,str]]
             or len({b for a,b in mapping}) != len(mapping)):
         raise ParagraphAuditError("Ambiguous original/native book mapping")
     crosswalk=dict(mapping)
-    if set(crosswalk.values()) != set(native_x_p_by_book) and (
-        not set(native_x_p_by_book).issubset(set(crosswalk.values()))
-    ):
-        raise ParagraphAuditError("Unexpected compiled paragraph book outside source crosswalk")
+    native_other_div_by_book = native_other_div_by_book or {}
+    if (not set(native_x_p_by_book).issubset(set(crosswalk.values()))
+            or not set(native_other_div_by_book).issubset(set(crosswalk.values()))):
+        raise ParagraphAuditError("Unexpected compiled structural book outside source crosswalk")
     parser=etree.XMLParser(resolve_entities=False,load_dtd=False,no_network=True,
                            recover=False,huge_tree=False)
     try:
@@ -92,12 +95,32 @@ def compare_authored_native_paragraphs(xml: bytes, mapping: list[tuple[str,str]]
                     counters["original_p_before_first_book_verse"]+=1
                 if not chapter_seen:
                     counters["original_p_before_first_chapter"]+=1
+                    # Never report original title/introduction text or
+                    # literal authorial attributes; classify existence only.
+                    contains_words = any(part.strip() for part in element.itertext())
+                    counters[
+                        "original_prefatory_p_has_nonwhitespace_text" if contains_words
+                        else "original_prefatory_p_whitespace_or_empty"] += 1
+                    if any(isinstance(child.tag,str) for child in element):
+                        counters["original_prefatory_p_has_inline_elements"] += 1
+                    style = element.get("sfm","")
+                    counters[
+                        "original_prefatory_p_speaker_sp_style" if style == "sp"
+                        else "original_prefatory_p_standard_p_style" if style in ("","p")
+                        else "original_prefatory_p_other_style"] += 1
                 elif not chapter_has_verse:
                     counters["original_p_before_first_verse_of_chapter"]+=1
         by_book[code]=dict(counters)
         overall.update(counters)
         authored=counters["all_original_p_elements"]
         compiled=native_x_p_by_book.get(code,0)
+        native_other_div = native_other_div_by_book.get(code,0)
+        if native_other_div_by_book:
+            totals["native_other_type_div_pairs"] += native_other_div
+            if counters["original_p_before_first_chapter"] == native_other_div:
+                totals["books_where_prefatory_p_count_matches_other_div_pairs"] += 1
+            else:
+                totals["books_where_prefatory_p_count_differs_from_other_div_pairs"] += 1
         totals["authorial_p_events"]+=authored
         totals["native_typed_x_p_pairs"]+=compiled
         if authored!=compiled:
@@ -127,7 +150,10 @@ def compare_authored_native_paragraphs(xml: bytes, mapping: list[tuple[str,str]]
     # explicit checked zero rather than an omitted machine-report key.
     for field in ("books_with_p_pair_count_mismatch",
                   "books_with_exact_p_pair_count",
-                  "signed_authorial_minus_native_paragraph_pair_difference"):
+                  "signed_authorial_minus_native_paragraph_pair_difference",
+                  "native_other_type_div_pairs",
+                  "books_where_prefatory_p_count_matches_other_div_pairs",
+                  "books_where_prefatory_p_count_differs_from_other_div_pairs"):
         totals.setdefault(field, 0)
     ordered={k:by_book[k] for k in sorted(by_book)}
     original_distribution=sha256(json.dumps(ordered,sort_keys=True,
@@ -138,6 +164,8 @@ def compare_authored_native_paragraphs(xml: bytes, mapping: list[tuple[str,str]]
         "source_mapped_book_count":len(by_book),
         "unmapped_original_book_scope_requires_separate_review":bool(
             totals["unmapped_source_book_count"]),
+        "other_native_div_pairs_compared_by_book":bool(native_other_div_by_book),
+        "matching_prefatory_counts_do_not_prove_corresponding_intro_content":True,
         "authorial_native_typed_paragraph_totals":dict(sorted(totals.items())),
         "original_p_position_class_counts":dict(sorted(overall.items())),
         "first_per_book_mismatches_no_text":findings,
