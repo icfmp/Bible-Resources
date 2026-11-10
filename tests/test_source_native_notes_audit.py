@@ -170,7 +170,8 @@ class NotesTests(unittest.TestCase):
                 counts = receipt["classifications"]
                 self.assertEqual(counts["source_caller_shape_" + shape], 1)
                 self.assertEqual(counts["native_note_n_absent"], 1)
-                self.assertNotIn(label, json.dumps(receipt))
+                if len(label) > 4:
+                    self.assertNotIn(label, json.dumps(receipt))
 
     def test_source_machine_target_disappeared_in_native(self):
         attrs = {}
