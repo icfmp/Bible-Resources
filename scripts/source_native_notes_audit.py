@@ -37,6 +37,22 @@ def _fold(value):
     return " ".join(unicodedata.normalize("NFC", value).split())
 
 
+def _caller_shape(value):
+    """Allowlisted categorical original caller shape; never reveal labels."""
+    if value in (None, "", "+", "-"):
+        return "automatic_or_unspecified"
+    if len(value) == 1 and "a" <= value <= "z":
+        return "single_lowercase_ascii_letter"
+    if len(value) == 1 and "A" <= value <= "Z":
+        return "single_uppercase_ascii_letter"
+    if value.isascii() and value.isdecimal():
+        return "ascii_decimal"
+    if len(value) == 1 and not value.isalnum():
+        return "single_symbol"
+    return "other_unreviewed_literal"
+
+
+
 def collect_usfx_numbered_notes(
     xml: bytes, mapping: list[tuple[str, str]],
     *, attributes_out: dict | None = None,
@@ -283,6 +299,10 @@ class NoteAudit:
                 self._annotation_finding(
                     "cross_reference_class_differs", ref, len(source), len(native))
             caller, printed = authored["caller"], compiled["n"]
+            self.annotation_counts[
+                "source_caller_shape_" + _caller_shape(caller)] += 1
+            self.annotation_counts[
+                "native_note_n_present" if printed else "native_note_n_absent"] += 1
             # "+" and "-" select automatic/no marker in USFM; never
             # compare them literally with SWORD's generated note label.
             if caller in {None, "", "+", "-"}:
