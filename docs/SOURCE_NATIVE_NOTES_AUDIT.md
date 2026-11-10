@@ -76,3 +76,41 @@ must be examined before editorial conclusions.
 The bounded report deliberately prioritizes count/content mismatches
 and unparseable fragments over routine whitespace-only differences,
 without revealing the underlying note text.
+
+## Read-only note annotation metadata lane
+
+The same USFX source walk can optionally capture *private* note annotation
+metadata in original order, separately from its text: source marker type
+(`f`/`fe`/`ef` versus `x`/`ex`), `caller`, and explicit
+machine-readable `ref[@tgt]` values. The native stock-SWORD raw reader
+captures `note[@type]`, `note[@n]` and nested
+`reference[@osisRef]` attributes. Native `reference[@type=annotateRef]`
+labels indicate a note's annotation source, **not a target cross-reference**
+and are excluded from the explicit-target lane.
+
+When both sides have the same number of notes for a canonical numbered key,
+the diagnostic independently classifies:
+
+- Whether the source's dedicated cross-reference note class agrees with
+  native OSIS `type="crossReference"`.
+- Whether a *literal* source caller equals the native `n` string.
+  USFM/USFX `caller="+"` or `"-"` (automatic or no marker) and absent
+  callers are **not** treated as literal labels to compare.
+- Whether ordered, explicitly machine-readable target **raw strings**
+  match or are absent on either side. A matching raw attribute string is
+  *not* proof of a resolved canonical target.
+- Note-count mismatches: **no positional note pairing is asserted**.
+  Fragments that cannot be parsed remain unknown.
+
+Original note body text, caller strings and machine-readable reference
+values are kept private. Public outputs include only classification counts
+and a bounded selection of affected canonical source/native **verse IDs**.
+If a source note has only a textual cross-reference label (`xt`, `xo`,
+etc.) without a target attribute, the target is **not** inferred from
+language-dependent prose. No source note is silently relabelled.
+
+This lane deliberately **does not** certify note attribute equivalence,
+source-to-native caller correspondence, anchor position within the verse,
+resolved cross-reference navigation, preservation of original note styles,
+or notes absorbed into reader-unaddressable source-only verses. It remains
+an evidence-producing research check, not an automatic publication gate.
