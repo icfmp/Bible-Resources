@@ -186,6 +186,32 @@ class BibleIntakeTests(unittest.TestCase):
         with self.assertRaisesRegex(IntakeError,"driver differs"):
             run_stage(self.cfg,2,self.folder,opener=self.opener)
 
+    def test_stage_three_source_requires_reviewed_usfx_schema_and_no_text_output(self):
+        # Original-SWORD reuse does not require a fabricated USFX→OSIS conversion.
+        raw=(b'<usfx><book id="GEN"><c id="1"/><p><v id="1"/>'
+             b'PRIVATE AUTHORIAL WORDS<f caller="+"><ft>PRIVATE NOTE</ft></f>'
+             b'</p></book></usfx>')
+        archived=self.folder/"original.zip"
+        archived.write_bytes(_zip({"fixture_usfx.xml":raw}))
+        schema=self.folder/"usfx.xsd"
+        schema.write_bytes(b"schema-byte-placeholder")
+        with patch("bible_stage_runner.acquire",
+                   return_value=({"source":{"sha256":"a"*64}},{"source":archived})):
+            missing=run_stage(self.cfg,3,self.folder)
+            self.assertEqual(missing["status"],"BLOCKED")
+            self.assertTrue(any("USFX XSD" in s for s in missing["missing"]))
+            with patch("usfx_schema_gate.validate_source_with_pinned_schema",
+                       return_value={"official_usfx_schema_validated":True,
+                                     "status":"official_usfx_xsd_validated"}):
+                reviewed=run_stage(self.cfg,3,self.folder,usfx_schema=schema)
+        self.assertEqual(reviewed["status"],"PARTIAL")
+        self.assertEqual(reviewed["evidence"]["source_inventory"]["source_note_types"],{"f":1})
+        self.assertFalse(reviewed["evidence"]["conversion_performed"])
+        self.assertFalse(reviewed["evidence"]["conversion_applicability_reviewed"])
+        self.assertNotIn("PRIVATE",str(reviewed))
+        self.assertIn("Exact official pinned USFX XSD validated the complete original source",
+                      reviewed["verified"])
+
     def test_stage_four_without_stock_native_inspector_is_blocked(self):
         with patch("bible_stage_runner.acquire",return_value=({"source":{},"sword":{}},{})):
             result=run_stage(self.cfg,4,self.folder)

@@ -39,14 +39,15 @@ It must satisfy `schemas/bible-intake.schema.json` and contain:
   is mandatory**: even after a technical report passes, this file does
   not grant redistribution or editorial permission.
 
-The `frajnd-2024` file begins as a **stage-one-only preliminary manifest**:
-its archive SHA-256 fields, SWORD ID and driver are deliberately `null`,
-not falsely pinned. It permits the stage-one `/bible-audit frajnd-2024 1`
-command, but stages 2–6 **must block** until the actual source and SWORD
-archives have been independently fingerprinted and their module identity
-reviewed in a committed manifest. eBible's currently linked source is USFX;
-the original publisher BPC separately provides 2024 OSIS XML for source
-cross-checking. The revised 2026 DarbyR must not be substituted.
+The `frajnd-2024` file **began** as a stage-one-only preliminary manifest
+with explicit `null` SHA-256 and uninspected SWORD identity. Its original
+USFX/SWORD hashes and actual `zText`/`Luther` stock identity were subsequently
+observed by [Action 42808540898](https://github.com/icfmp/Bible-Resources/actions/runs/42808540898),
+pinned in [PR #65](https://github.com/icfmp/Bible-Resources/pull/65) and independently reacquired in
+[stage-2 Action 42809483184](https://github.com/icfmp/Bible-Resources/actions/runs/42809483184).
+eBible's linked authorial source is USFX; original publisher BPC separately
+provides 2024 OSIS XML as an independent editorial cross-check. The revised
+2026 DarbyR is excluded.
 
 The existing `webp-research` file is an archived **research example**,
 not a second Bible approved for public release. It is pinned to the
@@ -170,7 +171,7 @@ helper. Source and original SWORD binary never appear in the artifact.
 | --- | --- | --- |
 | 1. Edition / rights | Config field validation and official provider URL review | **Human** textual/edition identity, duplicate baseline, legal/notes/Strong rights |
 | 2. Originals | Bounded HTTPS acquisition, redirect allowlist, exact SHA-256 and safe source/SWORD ZIP preflight | Human verification of publisher source selection when first pinned |
-| 3. Authorial source | USFX/USFM source inventory; original OSIS schema/XSD and verse inventory | Source-format conversion parity when needed, complete title/notes/poetry and exact edition determination |
+| 3. Authorial source | Original USFX full source-native structure and verse inventory, exact pinned official USFX XSD; USFM source inventory; original OSIS XSD and verse inventory | Full authorial publisher-edition review, conversion parity if transformation is actually used |
 | 4. Native vs original | Actual native `RawText`/`zText` whole-corpus comparison for **USFX** with explicit book crosswalk; OSIS native index comparison | A generic USFM conversion and full OSIS→SWORD semantic comparator; edition/canon and source-only verse conflicts |
 | 5. Editorial structure | USFX numbered-note body/type/target **diagnostics** on the real native corpus | Word-position anchors, resolved source links, book introductions, poetry, Strong ordinals if present, authoritative signoff |
 | 6. Reader trial | Isolated standard SWORD ZIP installation and deterministic stock `diatheke` readbacks | Another independent reader and manual visual/parallel acceptance |

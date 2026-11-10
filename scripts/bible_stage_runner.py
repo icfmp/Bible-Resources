@@ -61,7 +61,8 @@ def _osis_source(archive: Path, name: str, destination: Path) -> Path:
     return destination
 
 
-def _run_source(manifest: dict, archives: dict, work: Path, *, schema: Path | None) -> dict:
+def _run_source(manifest: dict, archives: dict, work: Path, *, schema: Path | None,
+                usfx_schema: Path | None = None) -> dict:
     source_format = manifest["source"]["format"]
     if source_format == "USFX":
         from lsg_source_compare import read_source_xml, scan_usfx
@@ -84,20 +85,33 @@ def _run_source(manifest: dict, archives: dict, work: Path, *, schema: Path | No
                 missing=["Original source has duplicate or unrecognized verse IDs"],
                 evidence={"source_member_sha256":receipt["sha256"],
                           "source_inventory": inventory})
-        return _status(
-            "BLOCKED" if findings else "PARTIAL",
-            verified=["Original pinned USFX parsed read-only",
-                      "Independent authorial book/verse inventories agree",
-                      "All original element, note type/caller, heading, poetry and paragraph events counted and fingerprinted"],
-            missing=(["Original source structural findings require investigation"] if findings else [])
-                    + ["Official USFX XSD validation not yet independently completed",
-                       "Original source structural metadata are not compiled-note/layout fidelity",
-                       "Human publisher edition/revision provenance review",
-                       "USFX→OSIS conversion parity if conversion is actually required; not assumed for stock-SWORD reuse"],
-            evidence={"source_member_sha256":receipt["sha256"],
-                      "source_format":"USFX", "source_inventory":inventory,
-                      "conversion_performed":False,
-                      "conversion_applicability_reviewed":False})
+        verified = ["Original pinned USFX parsed read-only",
+                    "Independent authorial book/verse inventories agree",
+                    "All source elements, notes, heading, poetry and paragraph events inventoried"]
+        missing = ["Original source structure does not itself prove native SWORD text, notes or layout fidelity",
+                   "Publisher edition/revision human evidence review",
+                   "Conversion not performed; N/A for exact stock-SWORD reuse only after review"]
+        evidence = {"source_member_sha256":receipt["sha256"],
+                    "source_format":"USFX", "source_inventory":inventory,
+                    "conversion_performed":False,
+                    "conversion_applicability_reviewed":False}
+        if findings:
+            missing.insert(0, "Original source structural findings require investigation")
+            return _status("BLOCKED", verified=verified, missing=missing, evidence=evidence)
+        if usfx_schema is None or not usfx_schema.is_file():
+            missing.insert(0, "Independently SHA-pinned official USFX XSD required")
+            return _status("BLOCKED", verified=verified, missing=missing, evidence=evidence)
+        from usfx_schema_gate import validate_source_with_pinned_schema
+        policy = json.loads((ROOT / "config/usfx-schema-policy.json").read_text(encoding="utf-8"))
+        xsd_report = validate_source_with_pinned_schema(raw, usfx_schema.read_bytes(), policy)
+        evidence["official_usfx_xsd"] = xsd_report
+        if not xsd_report["official_usfx_schema_validated"]:
+            return _status("BLOCKED", verified=verified,
+                missing=["Original XML failed official independently SHA-pinned USFX XSD validation"] + missing,
+                evidence=evidence)
+        verified.append("Exact official pinned USFX XSD validated the complete original source")
+        return _status("PARTIAL", verified=verified,
+                       missing=missing, evidence=evidence)
     if source_format == "USFM":
         from lsg_source_compare import scan_usfm
         report = scan_usfm(archives["source"])
@@ -189,7 +203,8 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
 
 def run_stage(manifest: dict, stage: int, temp: Path, *, opener=None,
               index_binary: Path | None = None, raw_binary: Path | None = None,
-              entry_binary: Path | None = None, schema: Path | None = None) -> dict:
+              entry_binary: Path | None = None, schema: Path | None = None,
+              usfx_schema: Path | None = None) -> dict:
     if stage not in STAGES:
         raise IntakeError("Unknown stage")
     if stage == 1:
@@ -240,7 +255,7 @@ def run_stage(manifest: dict, stage: int, temp: Path, *, opener=None,
             missing=[],
             evidence={"original_archives":receipts})
     if stage == 3:
-        result = _run_source(manifest,archives,temp,schema=schema)
+        result = _run_source(manifest,archives,temp,schema=schema,usfx_schema=usfx_schema)
     elif stage in (4,5):
         result = _run_fidelity(manifest,archives,temp,index_binary=index_binary,
                                raw_binary=raw_binary,entry_binary=entry_binary,schema=schema)
@@ -317,13 +332,14 @@ def main(argv=None) -> int:
     parser.add_argument("--native-raw-binary",type=Path)
     parser.add_argument("--native-entry-binary",type=Path)
     parser.add_argument("--osis-schema",type=Path)
+    parser.add_argument("--usfx-schema",type=Path)
     args=parser.parse_args(argv)
     try:
         manifest=load_manifest(args.resource_id)
         with tempfile.TemporaryDirectory(prefix="bible-research-stage-") as td:
             result=run_stage(manifest,args.stage,Path(td),index_binary=args.native_index_binary,
                              raw_binary=args.native_raw_binary,entry_binary=args.native_entry_binary,
-                             schema=args.osis_schema)
+                             schema=args.osis_schema,usfx_schema=args.usfx_schema)
         failed=False
     except Exception as exc:
         # Third-party parser error strings may contain actual text.

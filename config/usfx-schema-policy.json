@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "schema_status": "reviewed",
+  "format": "USFX",
+  "download_url": "https://ebible.org/usfx.xsd",
+  "sha256": "c174b7d72715094318dfac13324d69ee18a01099ff4017b7737b8dcd15d4300e",
+  "bytes": 67661,
+  "observed_at": "2026-11-10",
+  "evidence_run": "https://github.com/icfmp/Bible-Resources/actions/runs/42812816320",
+  "publisher_documentation": "https://ebible.org/usfx/",
+  "license_notice": "eBible USFX XSD: LGPL or Common Public License, per publisher licensing statement",
+  "notes": "Pinned official XML Schema for validation of original USFX only. No source/text or schema bytes committed. New upstream revision must be independently reviewed before repinning; success is not edition or SWORD fidelity approval."
+}
