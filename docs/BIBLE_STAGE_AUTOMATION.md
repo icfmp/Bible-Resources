@@ -41,6 +41,27 @@ fidelity*, not to be hidden by special cases.
 
 ## Run it
 
+**Recommended — start from the Bible's issue (including from ChatGPT):**
+
+Post the following exact command as a new top-level comment in an **open
+`[Import]` issue**, from the repository owner's GitHub account:
+
+```text
+/bible-audit webp-research 4
+```
+
+The workflow listens for owner-authored `issue_comment` events on
+`main`, verifies the issue type, and parses only a strict resource ID
+and integer stage 1–7. It then runs without keeping the ChatGPT session
+open and automatically posts the metadata-only summary back to that
+issue. Replies by other users, malformed commands, comments on PRs, and
+non-import issues are ignored. The GitHub connection used here posts
+comments as the repository owner, so the assistant can initiate an
+approved stage through the same issue-comment action; it need not have
+a direct `workflow_dispatch` permission.
+
+**Alternative — manual dispatch through GitHub Actions:**
+
 Open [Actions → Audit one Bible onboarding stage (read-only)](
 https://github.com/icfmp/Bible-Resources/actions/workflows/bible-staged-audit.yml),
 select **Run workflow** on `main`, and provide:
@@ -110,13 +131,14 @@ stock-SWORD extraction was performed correctly.
    update the checkbox **only once all requirements of that stage are met**.
 
 A ChatGPT session is **not** kept alive and is not automatically notified
-at the end of an Action. A following session can inspect the GitHub run,
-artifact and issue checkpoint and continue from the first outstanding
-gate. Current GitHub connector tools can read/retry Actions but do not
-expose a direct `workflow_dispatch` call. The GitHub UI can dispatch a
-stage manually; normal changes to the workflow/scripts trigger the
-automatic, pinned WEBP research proof via a PR. No heavy research step
-should be run in a long-lived chat.
+at the end of an Action. The assistant can **start** an eligible run by
+posting an owner-authored `/bible-audit <resource-id> <stage>` comment
+in the appropriate issue, but a later message is required for the
+assistant to return and interpret the completed action. The issue and
+run URLs preserve the exact checkpoint for the next conversation. A
+normal PR touching this automation triggers the existing pinned WEBP
+research proof, without approving its original edition. No heavy
+research step should be run in a long-lived chat.
 
 ## Safety and publication separation
 
