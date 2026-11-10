@@ -8,6 +8,7 @@ import re
 from jsonschema import Draft202012Validator, FormatChecker
 from stable_sword_refs import proof_errors as stable_sword_proof_errors
 from published_reference_audit import archived_release_errors
+from catalogue_profiles import approved_profiles, ProfileError
 
 ROOT = Path(__file__).resolve().parents[1]
 DRIVERS = {"RawText","zText","RawCom","RawCom4","zCom","zCom4","RawLD","RawLD4","zLD","RawGenBook"}
@@ -179,7 +180,13 @@ def validate(root=ROOT):
                 edition_variants.add(variant)
         if not approved:
             if payload.exists(): errors.append(f"{d.name}: unapproved payload must not be committed")
+            if (d/"profiles").exists():
+                errors.append(f"{d.name}: unapproved module cannot publish reader profiles")
             continue
+        try:
+            approved_profiles(root,d,m)
+        except ProfileError as exc:
+            errors.append(f"{d.name}: [PROFILE_APPROVAL_INVALID] {exc}")
         rights=m["rights"]
         if not rights["redistribution_allowed"] or rights["reviewed_by"].upper()=="PENDING":
             errors.append(f"{d.name}: redistribution not approved")
