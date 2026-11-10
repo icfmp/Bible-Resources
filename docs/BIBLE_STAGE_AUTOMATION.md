@@ -559,9 +559,15 @@ semantic intervals:
 - A positive word-boundary result requires matching original/native word
   sequences, mapped books, p/q event kinds and **both** event endpoint
   ordinals. It rejects a moved opening, prematurely closed paragraph,
-  unpaired/duplicated native endpoint, a source/native word split or
-  unsupported anonymous native structural record. Controlled synthetic
-  errors are covered by `tests/test_source_native_word_boundaries.py`.
+  unpaired/duplicated native endpoint or a source/native word split.
+  Anonymous `TOP:N` records are independently parsed **strictly** and
+  inspected for actual p/q, line/stanza and body-paragraph markup. An
+  unaddressable record carrying body structure **blocks** the positional
+  proof; a parseable record carrying only *other* metadata does not
+  automatically invalidate already source-bound p/q word positions.
+  Unknown TOP content remains separately subject to general editorial
+  and native-milestone review, never globally approved. Controlled
+  synthetic errors are covered by `tests/test_source_native_word_boundaries.py`.
 - The public report carries only aggregate classifications, word ordinals,
   SHA-256 of structural ordinal sequences, and at most 24 safe
   book/verse reference examples. All original Scripture, note/title prose,

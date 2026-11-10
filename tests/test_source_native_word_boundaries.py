@@ -180,6 +180,46 @@ class SourceNativeWordBoundaryTests(unittest.TestCase):
         self.assertFalse(receipt["all_mapped_book_p_q_start_end_word_ordinals_match"])
         self.assertEqual(receipt["original_vs_compiled_event_word_position_counts"][
             "unaddressable_native_top_records"],1)
+        self.assertEqual(receipt["original_vs_compiled_event_word_position_counts"][
+            "unaddressable_top_body_event_occurrences"],1)
+
+
+    def test_anonymous_nonbody_top_does_not_block_only_p_q_word_boundaries(self):
+        source, source_counts=original()
+        observer=NativeBodyBoundaries()
+        observer.observe("U","TOP:1",
+                         b'<div type="x-milestone" sID="PRIVATE_NONBODY"/>'
+                         b'<title>PRIVATE BOOK HEADER</title>')
+        observer.observe("I","Gen.1",b'<div type="x-p" sID="p1"/>')
+        observer.observe("K","Gen.1.1",b'alpha <l sID="line"/>beta'
+                         b'<l eID="line"/> gamma <div type="x-p" eID="p1"/>'
+                         b'<div type="x-p" sID="p2"/>')
+        observer.observe("K","Gen.1.2",b'delta <div type="x-p" eID="p2"/>')
+        native,native_counts=observer.finish()
+        report=compare_body_boundary_word_positions(
+            source,native,source_counts,native_counts)
+        self.assertTrue(report["all_mapped_book_p_q_start_end_word_ordinals_match"])
+        c=report["original_vs_compiled_event_word_position_counts"]
+        self.assertEqual(c["unaddressable_native_top_records"],1)
+        self.assertEqual(c["parseable_native_top_records"],1)
+        self.assertEqual(c.get("unaddressable_top_body_event_occurrences",0),0)
+        self.assertTrue(report[
+            "top_records_only_screened_for_p_q_body_markup_not_all_editorial_content"])
+        self.assertNotIn("PRIVATE",str(report))
+
+    def test_unparseable_anonymous_native_top_fails_closed(self):
+        audit=NativeBodyBoundaries()
+        with self.assertRaises(BoundaryAuditError):
+            audit.observe("U","TOP:1",b'<div type="x-p" sID="BROKEN"')
+        with self.assertRaises(BoundaryAuditError):
+            audit.observe("U","BAD:1",b'<div/>')
+
+    def test_note_subtree_in_top_not_confused_with_body_markup(self):
+        audit=NativeBodyBoundaries()
+        audit.observe("U","TOP:1",
+                      b'<note><l sID="PRIVATE_NOTE_ONLY"/></note>')
+        self.assertEqual(audit.counts["parseable_native_top_records"],1)
+        self.assertEqual(audit.counts["unaddressable_top_body_event_occurrences"],0)
 
 
 if __name__ == "__main__":

@@ -16,7 +16,7 @@ import re
 
 from lxml import etree
 
-from native_milestone_pair_audit import _strict_root, NativeMilestoneAuditError
+from native_milestone_pair_audit import _strict_root, NativeMilestoneAuditError, TOP
 from source_native_paragraph_counts import classify_prefatory_p_sfm
 from source_usfx_structure import audit_source_usfx
 from stable_sword_refs import KEY
@@ -201,7 +201,34 @@ class NativeBodyBoundaries:
         if record_kind not in {"I","K","U"}:
             raise BoundaryAuditError("Unknown native record kind")
         if record_kind == "U":
+            if not TOP.fullmatch(ref) or (record_kind,ref) in self.seen:
+                raise BoundaryAuditError("Untrusted or duplicated native TOP reference")
+            self.seen.add((record_kind,ref))
             self.counts["unaddressable_native_top_records"] += 1
+            # TOP records are part of the original SWORD iterator. They
+            # cannot be silently dropped: independently inspect whether
+            # they actually contain body p/q openings, closings or containers.
+            # A TOP holding only unrelated root/intro metadata is not a
+            # missing Scripture body boundary.
+            try:
+                top = _strict_root(raw)
+            except NativeMilestoneAuditError as exc:
+                raise BoundaryAuditError("Unparseable original TOP fragment") from exc
+
+            def walk_top(node):
+                if not isinstance(node.tag,str):
+                    return
+                tag = etree.QName(node).localname
+                if tag in {"title","note"}:
+                    return
+                is_body=(tag in {"p","q","l","lg"} or
+                         (tag=="div" and node.get("type") in {"x-p","paragraph"}))
+                if is_body:
+                    self.counts["unaddressable_top_body_event_occurrences"] += 1
+                for child in node:
+                    walk_top(child)
+            walk_top(top)
+            self.counts["parseable_native_top_records"] += 1
             return
         if ((record_kind == "I" and not INTRO.fullmatch(ref))
                 or (record_kind == "K" and not KEY.fullmatch(ref))
@@ -375,7 +402,9 @@ def compare_body_boundary_word_positions(source, native, original_counts, native
                   "books_with_different_original_and_compiled_word_sequences"):
         counts.setdefault(field,0)
     complete=(len(source)>0 and set(source)==set(native)
-              and not counts["unaddressable_native_top_records"]
+              and not counts["unaddressable_top_body_event_occurrences"]
+              and (counts["parseable_native_top_records"] ==
+                   counts["unaddressable_native_top_records"])
               and not counts["native_body_container_without_milestone"]
               and not any(counts[k] for k in (
                   "opening_word_position_mismatches","closing_word_position_mismatches",
@@ -396,7 +425,8 @@ def compare_body_boundary_word_positions(source, native, original_counts, native
         "identical_book_word_ordinals_not_exact_verse_record_or_markup_placement":True,
         "source_native_verse_zero_intro_representation_review_still_required":True,
         "source_native_original_style_and_linebreak_fidelity_unverified":True,
-        "unaddressable_native_records_or_unmilestoned_body_blocks_cannot_pass":True,
+        "unaddressable_native_top_body_markup_or_unmilestoned_blocks_cannot_pass":True,
+        "top_records_only_screened_for_p_q_body_markup_not_all_editorial_content":True,
         "no_source_text_note_content_or_native_ids_exposed":True,
         "originals_unchanged_no_publication":True,
     }
