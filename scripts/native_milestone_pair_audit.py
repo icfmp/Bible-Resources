@@ -24,6 +24,13 @@ MAX_ENTRY = 2 * 1024 * 1024
 MAX_EXAMPLES = 12
 MAX_IDENTIFIER = 256
 TOP = re.compile(r"TOP:[1-9][0-9]*\Z")
+# Documented OSIS/osis2mod styles only; unknown original attribute values stay private.
+PUBLIC_DIV_TYPES = frozenset({"", "book", "bookGroup", "section", "paragraph",
+                              "x-p", "x-milestone", "x-preverse"})
+
+
+def _safe_div_type(raw: str) -> str:
+    return raw if raw in PUBLIC_DIV_TYPES else "other_unreviewed_type"
 
 
 class NativeMilestoneAuditError(ValueError):
@@ -69,6 +76,8 @@ class NativeMilestonePairAudit:
         self._stack = []
         self._total = Counter()
         self._per_tag = Counter()
+        self._per_div_type = Counter()
+        self._cross_book_examples = []
         self._classifications = Counter()
         self._bad_refs = {}
         self._seen_refs = set()
@@ -92,9 +101,17 @@ class NativeMilestonePairAudit:
         self._seen_refs.add((kind, ref))
         self._total[f"observed_{kind}_entries"] += 1
         if kind == "U":
-            # Anonymous TOP records lack an addressable canonical book; do not
-            # pretend a structural marker in one belongs to a known source book.
+            # Anonymous TOP records are still privately parsed. A structural
+            # sID/eID there cannot be assigned a source-book anchor.
             self._total["unaddressable_TOP_entries_unverified"] += 1
+            try:
+                top = _strict_root(raw)
+            except NativeMilestoneAuditError:
+                self._issue("unparseable_anonymous_TOP_fragment", ref)
+                return
+            self._total["parseable_anonymous_TOP_entries"] += 1
+            self._total["unaddressable_TOP_milestone_events_unverified"] += sum(
+                1 for _ in _events(top))
             return
         book = ref.split(".", 1)[0]
         try:
@@ -136,14 +153,34 @@ class NativeMilestonePairAudit:
                 from_book, start_ref, from_kind, start_type, start_seq = opened
                 self._total["paired_matching_sID_eID"] += 1
                 self._per_tag[f"{tag}:paired"] += 1
+                if tag == "div":
+                    self._per_div_type[_safe_div_type(start_type)] += 1
                 if from_book != book:
-                    self._issue("matched_id_crosses_books", ref)
+                    self._classifications["pair_spans_multiple_books_review_scope"] += 1
+                    if len(self._cross_book_examples) < MAX_EXAMPLES:
+                        self._cross_book_examples.append({
+                            "start_ref":start_ref,
+                            "end_ref":ref,
+                            "structural_tag":tag,
+                            "opening_type_allowlisted":(
+                                _safe_div_type(start_type) if tag == "div" else "")
+                        })
                 if start_type and open_type and start_type != open_type:
                     self._issue("matched_id_has_conflicting_types", ref)
                 if not self._stack or self._stack[-1] != key:
-                    self._issue("crossing_or_non_lifo_structural_ranges", ref)
+                    self._classifications["globally_non_lifo_milestone_pairs"] += 1
                     if key in self._stack:
-                        self._stack.remove(key)
+                        index = self._stack.index(key)
+                        nested_above = self._stack[index+1:]
+                        if any(other_tag == tag for other_tag, _identifier in nested_above):
+                            self._issue("same_tag_overlapping_milestone_ranges", ref)
+                        else:
+                            # Overlap between DIFFERENT structural hierarchies
+                            # is permitted by OSIS; not an unpaired-ID finding.
+                            self._classifications["different_tag_interleaving_diagnostic"] += 1
+                        self._stack.pop(index)
+                    else:
+                        self._issue("active_id_missing_from_order_stack", ref)
                 else:
                     self._stack.pop()
                 if from_kind == "I" and kind == "K":
@@ -171,9 +208,10 @@ class NativeMilestonePairAudit:
                 "empty_or_unsafe_milestone_identifier",
                 "duplicate_active_sID",
                 "orphan_eID_without_matching_active_sID",
-                "matched_id_crosses_books",
                 "matched_id_has_conflicting_types",
-                "crossing_or_non_lifo_structural_ranges",
+                "same_tag_overlapping_milestone_ranges",
+                "active_id_missing_from_order_stack",
+                "unparseable_anonymous_TOP_fragment",
                 "unparseable_native_fragment",
                 "unclosed_sID_at_end_of_native_corpus",
             } and v
@@ -185,6 +223,9 @@ class NativeMilestonePairAudit:
                        else "compiled_milestone_pairs_verified_only"),
             "native_numbered_intro_scan_counts": dict(sorted(self._total.items())),
             "native_milestone_tag_counts": dict(sorted(self._per_tag.items())),
+            "paired_div_types_allowlisted": dict(sorted(self._per_div_type.items())),
+            "cross_book_pair_reference_samples_no_ids": self._cross_book_examples,
+            "different_tag_interleavings_are_diagnostic_not_nesting_defects": True,
             "native_milestone_pair_categories": dict(sorted(self._classifications.items())),
             "native_milestone_pairing_findings": dict(sorted(blockers.items())),
             "source_generated_identifier_values_exposed": False,
