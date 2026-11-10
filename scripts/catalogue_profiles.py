@@ -6,7 +6,7 @@ Use the original reviewed Markdown, not a second manually retyped copy.
 """
 from __future__ import annotations
 
-from hashlib import sha1, sha256
+from hashlib import sha1
 import json
 from pathlib import Path
 import re
@@ -115,7 +115,6 @@ def _read_one(root: Path, file: Path, module: dict) -> tuple[str, dict]:
         "source_path": source,
         "source_git_blob_sha1": declaration["source_git_blob_sha1"],
         "format": "markdown",
-        "content_sha256": sha256((short + "\n" + long).encode("utf-8")).hexdigest(),
         "short_markdown": short,
         "long_markdown": long,
         "evidence_urls": evidence,
