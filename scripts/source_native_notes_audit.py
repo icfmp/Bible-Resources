@@ -11,10 +11,13 @@ from collections import Counter
 from lxml import etree
 import unicodedata
 
-from source_native_maintext_probe import (
-    _tree, MainTextParityError, MAX_VERSE, USFX_NOTE, USFX_HEAD,
-    USFX_LABELS, USFX_SPEAKER_P_STYLES,
-)
+# No dependency on the parent full-corpus CLI: the latter imports this
+# module, and import cycles would make both entrypoints unusable.
+MAX_VERSE = 2 * 1024 * 1024
+USFX_HEAD = frozenset({"s", "s1", "s2", "s3", "s4", "ms", "ms1",
+                       "ms2", "mt", "mt1", "mt2", "mr", "d", "cl", "r", "rem"})
+USFX_LABELS = frozenset({"vp", "va", "cp", "ca"})
+USFX_SPEAKER_P_STYLES = frozenset({"sp"})
 
 SOURCE_NOTES = frozenset({"f", "fe", "x", "ef", "ex", "note"})
 MAX_NOTES = 150_000
@@ -39,7 +42,18 @@ def collect_usfx_numbered_notes(xml: bytes, mapping: list[tuple[str, str]]) -> t
 
     Count notes outside numbered verses separately. No content escapes.
     """
-    root = _tree(xml, "usfx")
+    if not 0 < len(xml) <= 128 * 1024 * 1024:
+        raise NoteEvidenceError("Empty or oversized original source")
+    try:
+        parsed = etree.ElementTree(etree.fromstring(
+            xml, etree.XMLParser(resolve_entities=False, load_dtd=False,
+                                 no_network=True, recover=False, huge_tree=False)))
+    except (etree.XMLSyntaxError, ValueError) as exc:
+        raise NoteEvidenceError("Invalid original USFX") from exc
+    if (parsed.docinfo.doctype or parsed.docinfo.internalDTD or
+            parsed.docinfo.externalDTD or parsed.getroot().tag != "usfx"):
+        raise NoteEvidenceError("Unexpected source root or DTD")
+    root = parsed.getroot()
     pairs = dict(mapping)
     if not pairs or len(pairs) != len(mapping) or len(set(pairs.values())) != len(mapping):
         raise NoteEvidenceError("Ambiguous source book crosswalk")
