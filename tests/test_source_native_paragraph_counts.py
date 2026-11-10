@@ -101,5 +101,35 @@ class TypedParagraphBookTests(unittest.TestCase):
             "signed_difference"],1)
 
 
+
+    def test_prefatory_p_textful_empty_and_notes_are_distinguished_without_leaks(self):
+        from source_native_paragraph_counts import audit_usfx_book_prefaces
+        xml=(b'<usfx><book id="GEN"><p>PRIVATE INTRODUCTION</p><c id="1"/>'
+             b'<p><v id="1"/>VERSE</p></book>'
+             b'<book id="EXO"><p sfm="p"><f>PRIVATE NOTE</f></p>'
+             b'<c id="1"/><p><v id="1"/>VERSE</p></book></usfx>')
+        receipt=audit_usfx_book_prefaces(xml,MAPPING)
+        counts=receipt["prefatory_source_p_class_counts"]
+        self.assertEqual(counts["mapped_original_books"],2)
+        self.assertEqual(counts["prefatory_p_elements"],2)
+        self.assertEqual(counts["prefatory_p_with_any_descendant_text"],2)
+        self.assertEqual(counts["prefatory_p_with_non_annotation_text"],1)
+        self.assertEqual(counts["prefatory_p_without_non_annotation_text"],1)
+        self.assertEqual(counts["prefatory_p_with_attributes"],1)
+        self.assertFalse(receipt["compiled_book_intro_structure_verified"])
+        self.assertFalse(receipt["publication_approved"])
+        self.assertNotIn("PRIVATE",str(receipt))
+
+    def test_empty_prefatory_p_and_missing_book_are_visible(self):
+        from source_native_paragraph_counts import audit_usfx_book_prefaces
+        xml=(b'<usfx><book id="GEN"><p/><c id="1"/><v id="1"/>A</book>'
+             b'<book id="EXO"><c id="1"/><v id="1"/>B</book></usfx>')
+        r=audit_usfx_book_prefaces(xml,MAPPING)
+        c=r["prefatory_source_p_class_counts"]
+        self.assertEqual(c["prefatory_p_without_descendant_text"],1)
+        self.assertEqual(c["books_without_exactly_one_prefatory_p"],1)
+        with self.assertRaises(ParagraphAuditError):
+            audit_usfx_book_prefaces(xml,[("GEN","Gen"),("LEV","Lev")])
+
 if __name__=="__main__":
     unittest.main()
