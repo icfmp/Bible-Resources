@@ -49,6 +49,32 @@ python scripts/build.py --output dist --base-url https://icfmp.github.io/Bible-R
 
 The generated `dist/` contains a stable machine catalogue at `catalog/v1/catalog.json`, and a SWORD repository under `sword/`. To test actual SWORD-module behaviour, install `diatheke`, then run `python scripts/smoke.py --dist dist`. CI performs this before deploying when modules exist.
 
+## Integrate the catalogue in another application
+
+The public catalogue is a **static, versioned JSON feed** designed for any
+SWORD-compatible client; it does **not** require credentials or a custom API.
+
+```sh
+curl -fLsS https://icfmp.github.io/Bible-Resources/catalog/v1/catalog.json \
+  | python3 -m json.tool
+```
+
+For each approved `modules[]` entry, use `sword_id` to identify the
+SWORD module, `version` to identify its curated release, and
+`download.url`, `download.size_bytes` and `download.sha256` to
+download and **verify the exact ZIP before installation**.
+An optional `profiles.<locale>` object provides separately approved
+`short_markdown` and `long_markdown` descriptions, citations and its
+own `revision` independent of the SWORD module version.
+`schema_version: 1` is the current feed contract.
+
+**Developer documentation:** [Catalogue integration guide (v1)](docs/CATALOGUE_INTEGRATION.md)
+covers a JSON response example, all fields, example code, safe ZIP handling,
+standard SWORD repository endpoints, backwards compatibility and updates.
+[Update/identity semantics](docs/CATALOGUE_UPDATE_PROTOCOL.md) documents
+what a changed version or digest means. The app is responsible for its
+own UI, local installation, offline storage and rollback.
+
 ## Curated module update discovery
 
 The stable [public HTTPS catalogue](https://icfmp.github.io/Bible-Resources/catalog/v1/catalog.json) provides the current, **approved** Bible Resources release for each curated module, including its stable package identity, reviewed canonical edition lineage, exact SWORD module ID and version, download URL, package size and SHA-256. The generated ZIP contains a SWORD `Version` value that the publication validator requires to match the curated catalogue version. No private server or custom update protocol is needed. The public JSON is the discovery contract; an upstream publisher's newer source is not advertised as a curated update until its own edition has been approved and published.
@@ -79,6 +105,7 @@ For repository creation, push, Pages activation and branch rules, see [INSTALLAT
 
 ## Documentation
 
+- [Integrate the public JSON catalogue in a SWORD-compatible application](docs/CATALOGUE_INTEGRATION.md)
 - [Architecture & distribution](docs/ARCHITECTURE.md)
 - [SWORD source priority and duplicate-edition policy](docs/SOURCE_PRIORITY.md)
 - [Official versification and omitted verses](docs/VERSIFICATION_POLICY.md)
