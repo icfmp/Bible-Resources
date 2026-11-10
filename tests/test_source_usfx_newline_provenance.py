@@ -45,6 +45,13 @@ class OriginalXmlNewlineProvenanceTests(unittest.TestCase):
         self.assertEqual(c["unmarked_internal_newline_origin_text_within_inline_element"], 1)
         self.assertEqual(c["unmarked_internal_newline_origin_tail_after_inline_element"], 1)
         self.assertTrue(receipt["source_xml_fragment_newline_gap_coverage_verified"])
+        origin_samples = receipt[
+            "first_unmarked_internal_newline_xml_origin_references_only"]
+        self.assertEqual(len(origin_samples), 2)
+        self.assertEqual(
+            {sample["source_xml_fragment_origin"] for sample in origin_samples},
+            {"text_within_inline_element", "tail_after_inline_element"})
+        self.assertTrue(all(sample["reference"] == "Gen.1.1" for sample in origin_samples))
         self.assertFalse(receipt["source_native_original_whitespace_layout_verified"])
         self.assertTrue(receipt["source_xml_fragment_origin_does_not_prove_editorial_linebreak"])
         for secret in ("alpha", "beta", "gamma", "delta", "PRIVATE", "\n"):
@@ -125,6 +132,27 @@ class OriginalXmlNewlineProvenanceTests(unittest.TestCase):
                 MainTextStructuralWhitespaceTriage(
                     verses, boundaries, source_xml_newline_origins=corrupted)
         self.assertEqual(set(origins["Gen.1.1"]), newline_gaps_from_text(verses["Gen.1.1"]))
+
+    def test_origin_review_samples_are_capped_per_category_not_hidden_by_other_gaps(self):
+        body = b"".join(
+            (b'<p><v id="' + str(i).encode("ascii")
+             + b'"/>alpha\nbeta<ve/></p>')
+            for i in range(1, 10))
+        _xml, verses, boundaries, origins = source(body)
+        probe = MainTextStructuralWhitespaceTriage(
+            verses, boundaries, source_xml_newline_origins=origins)
+        for i in range(1, 10):
+            probe.observe(f"Gen.1.{i}", "alpha beta")
+        result = probe.finish()
+        counts = result["source_native_original_whitespace_gap_counts"]
+        self.assertEqual(counts[
+            "unmarked_internal_newline_origin_tail_after_numbering_milestone"], 9)
+        sample = result["first_unmarked_internal_newline_xml_origin_references_only"]
+        self.assertEqual(len(sample), 3)
+        self.assertEqual([x["reference"] for x in sample],
+                         ["Gen.1.1", "Gen.1.2", "Gen.1.3"])
+        for secret in ("alpha", "beta", "\n"):
+            self.assertNotIn(secret, str(sample))
 
     def test_no_synthetic_book_verse_separator_falsely_called_original_newline(self):
         body = (b'<p><v id="1"/>alpha<ve/></p>'
