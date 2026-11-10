@@ -713,6 +713,25 @@ def run_real_usfx_sword_text_probe(
             "source_native_layout_start_anchor_screen":
                 compare_start_anchors(source_layout, native_markup),
         }
+        def blocked_note_anchor_receipt(reason):
+            return {
+                "schema_version":1,
+                "status":"blocked_original_native_note_anchor_prerequisite",
+                "reason_category":reason,
+                "all_numbered_note_nonspace_anchor_positions_match":False,
+                "no_scripture_note_content_or_raw_xml_in_report":True,
+                "not_publication_or_editorial_approval":True,
+            }
+
+        if note_anchor_audit is None or note_anchor_blocker is not None:
+            note_anchor_receipt = blocked_note_anchor_receipt(
+                note_anchor_blocker or "missing_source_anchor_collector")
+        else:
+            try:
+                note_anchor_receipt = note_anchor_audit.finish()
+            except NoteAnchorError:
+                note_anchor_receipt = blocked_note_anchor_receipt(
+                    "incomplete_source_native_note_anchor_coverage")
         return {
             "schema_version": 1,
             "status": "real_usfx_to_stock_sword_maintext_diagnostic_not_publication",
@@ -736,17 +755,8 @@ def run_real_usfx_sword_text_probe(
             "source_book_scope": scope,
             "original_source_note_scope": source_note_scope,
             "private_numbered_source_native_note_body_diagnostic": note_audit.finish(),
-            "private_numbered_source_native_note_anchor_position_diagnostic": (
-                note_anchor_audit.finish()
-                if note_anchor_audit is not None and note_anchor_blocker is None
-                else {
-                    "schema_version":1,
-                    "status":"blocked_original_native_note_anchor_prerequisite",
-                    "reason_category":note_anchor_blocker,
-                    "all_numbered_note_nonspace_anchor_positions_match":False,
-                    "no_scripture_note_content_or_raw_xml_in_report":True,
-                    "not_publication_or_editorial_approval":True,
-                }),
+            "private_numbered_source_native_note_anchor_position_diagnostic":
+                note_anchor_receipt,
             "mapped_numbered_text_comparison": comparison,
             "source_only_verse_grouped_native_maintext_witness":
                 absorbed_group_witness,
