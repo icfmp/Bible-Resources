@@ -10,7 +10,7 @@
   "rights": {
     "status": "reviewed_for_research",
     "evidence_url": "https://editeurbpc.com/telechargements",
-    "note": "BPC identifies the 2024 JND v2.0 text as Public Domain. Publisher-edition notes are covered by its public-domain notice; no external Concordance/CrossWire Strong assignments are included in this eBible stock source selection. CrossWire FreJND 3.3 is a separately Strong-enriched alternative, not asserted as an identical copy. Original archives fingerprinted in metadata-only GitHub Action run 42808540898; final edition parity, note scope and release rights remain subject to later audits."
+    "note": "BPC identifies the 2024 JND v2.0 edition as Public Domain; source/notes still need audit. No external Strong data included. CrossWire FreJND is Strong-enriched, not proven identical to eBible. Hashes and stock conf observed in Actions run 42808540898; no release or derivative rights approval."
   },
   "source": {
     "format": "USFX",
