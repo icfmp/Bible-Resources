@@ -4,22 +4,22 @@
   "category": "bible",
   "title": "World English Bible, Protestant edition (research fixture)",
   "language": "en",
-  "edition": "eBible WEBP 2025, original pinned research artifacts",
+  "edition": "eBible WEBP 2025; research archives re-observed 2026-11-10 (not source-equivalence certified)",
   "provider": "ebible",
   "purpose": "research_only",
   "rights": {
     "status": "pending",
     "evidence_url": "https://ebible.org/Scriptures/details.php?id=engwebp",
-    "note": "Pinned read-only diagnostics only; no redistribution or editorial approval established by this manifest."
+    "note": "Read-only research only. Upstream bytes changed since 2026-11-09; previous SHA-256 receipts are preserved in docs/BIBLE_STAGE_AUTOMATION.md. Do not claim source/edition equivalence or redistribution rights."
   },
   "source": {
     "format": "USFX",
     "url": "https://ebible.org/Scriptures/engwebp_usfx.zip",
-    "sha256": "66f99b22a380d8ef8dbd9d401806fc02be3650e5fe3dbb0cec4d9693b53e1e44"
+    "sha256": "f678047c4177451b476c7f25e18ac3798d6722c25d474a56440b0ab8e2d7d84e"
   },
   "sword": {
     "url": "https://ebible.org/sword/zip/engweb2025peb.zip",
-    "sha256": "53d45377d1aa376f483aded415b6d122b7cbe6795baddc49dae6574e304b8810",
+    "sha256": "341fa8898cdbcdd28b743d3c28b663abb181644d3a5ec4420467fad487ba7ce8",
     "module_id": "engweb2025peb",
     "driver": "zText",
     "sample_references": [
