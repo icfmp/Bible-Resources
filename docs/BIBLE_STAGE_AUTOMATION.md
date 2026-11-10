@@ -39,14 +39,15 @@ It must satisfy `schemas/bible-intake.schema.json` and contain:
   is mandatory**: even after a technical report passes, this file does
   not grant redistribution or editorial permission.
 
-The `frajnd-2024` file begins as a **stage-one-only preliminary manifest**:
-its archive SHA-256 fields, SWORD ID and driver are deliberately `null`,
-not falsely pinned. It permits the stage-one `/bible-audit frajnd-2024 1`
-command, but stages 2–6 **must block** until the actual source and SWORD
-archives have been independently fingerprinted and their module identity
-reviewed in a committed manifest. eBible's currently linked source is USFX;
-the original publisher BPC separately provides 2024 OSIS XML for source
-cross-checking. The revised 2026 DarbyR must not be substituted.
+The `frajnd-2024` file **began** as a stage-one-only preliminary manifest
+with explicit `null` SHA-256 and uninspected SWORD identity. Its original
+USFX/SWORD hashes and actual `zText`/`Luther` stock identity were subsequently
+observed by [Action 42808540898](https://github.com/icfmp/Bible-Resources/actions/runs/42808540898),
+pinned in [PR #65](https://github.com/icfmp/Bible-Resources/pull/65) and independently reacquired in
+[stage-2 Action 42809483184](https://github.com/icfmp/Bible-Resources/actions/runs/42809483184).
+eBible's linked authorial source is USFX; original publisher BPC separately
+provides 2024 OSIS XML as an independent editorial cross-check. The revised
+2026 DarbyR is excluded.
 
 The existing `webp-research` file is an archived **research example**,
 not a second Bible approved for public release. It is pinned to the
