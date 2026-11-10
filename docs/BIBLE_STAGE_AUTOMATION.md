@@ -412,6 +412,33 @@ type overlaps (`x-p` versus `x-milestone`). The latter are
 explicit review findings, not automatic proof of corruption or faithful
 markup. The **seven-stage progress and stage 4c gate remain unchanged**.
 
+## Prefatory `p` and native book-intro scope (stage 4c)
+
+When every source book has one extra `p` beyond its paired native
+`div type="x-p"` count, first **inspect original source positioning**
+instead of inventing a one-off 66-book exception. The generic read-only
+source inventory distinguishes authorial `p` **before the first chapter**
+from in-chapter paragraph starts. For each original pre-chapter `p`,
+it reports whether authored non-whitespace text exists, whether the
+element has inline child markup, and whether the style is a known
+speaker identification (`sp`), ordinary paragraph (`p`), or other
+unrecognized authorial style. It never returns source words or values.
+
+The original stock-SWORD milestone inspector likewise counts actual
+**other/unknown-type `div` pairs per source book**, and records whether
+their opening is in a book intro, chapter intro or numbered verse.
+The original pre-chapter paragraph count is compared with those paired
+native structural counts *book by book* to identify a plausible
+alternative intro representation.
+
+**Even one prechapter `p` and one unknown native `div` in the same
+book does not establish they are the same authored editorial object.**
+Exact original introductory text/markup, corresponding SWORD intro
+content/position, unknown type meaning, note/heading and full reader
+layout must still be verified. Zero-value and unsupported source styles
+are explicit in reports, not silently discarded or altered. This audit
+does not rewrite, normalize or publish anything.
+
 ## Safety and publication separation
 
 - GitHub workflow uses `contents: read` for the audit job.
