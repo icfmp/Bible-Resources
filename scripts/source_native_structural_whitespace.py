@@ -203,11 +203,24 @@ class MainTextStructuralWhitespaceTriage:
                         # observations, otherwise rare original paragraph
                         # or poetic node.text cases may not be discoverable.
                         if len(self._newline_origin_samples[origin]) < MAX_SAMPLES_PER_CATEGORY:
+                            # A newline inside p/q node.text is NOT an
+                            # independently authored p/q opening or closing.
+                            # Give the reviewer exact numerical proximity
+                            # evidence, without revealing Scripture or claiming
+                            # that XML layout is editorially insignificant.
+                            authored_boundaries = self._positions[book]
+                            nearest = (min(abs(global_ordinal - boundary)
+                                           for boundary in authored_boundaries)
+                                       if authored_boundaries else None)
                             self._newline_origin_samples[origin].append({
                                 "reference":ref,
                                 "original_verse_nonspace_codepoint_gap":position,
                                 "original_book_nonspace_codepoint_gap":global_ordinal,
                                 "source_xml_fragment_origin":origin,
+                                "same_position_as_explicit_authorial_p_q_boundary":
+                                    global_ordinal in authored_boundaries,
+                                "nearest_explicit_authorial_p_q_boundary_distance_codepoints":
+                                    nearest,
                                 "editorial_linebreak_intent_unverified":True,
                             })
                     elif scope == "verse_end":

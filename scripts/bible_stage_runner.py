@@ -372,6 +372,37 @@ def _write_report(report_dir: Path, report: dict) -> None:
     lines.extend("- "+v for v in report["verified"])
     if not report["verified"]:
         lines.append("- Nothing proven in this stage")
+    # Expose a bounded reference/ordinal queue in the permanent issue
+    # checkpoint. This lets reviewers resume without downloading a large
+    # short-retention artifact; the data never include original verse text.
+    if report["stage"] == 4:
+        from stable_sword_refs import KEY
+        from source_usfx_newline_provenance import SOURCE_NEWLINE_ORIGIN_LABELS
+        rows = (report.get("evidence", {}).get("maintext", {})
+                .get("source_native_structural_whitespace_gap_triage", {})
+                .get("first_unmarked_internal_newline_xml_origin_references_only", []))
+        safe = []
+        for row in rows[:16]:
+            ref = row.get("reference")
+            origin = row.get("source_xml_fragment_origin")
+            gap = row.get("original_verse_nonspace_codepoint_gap")
+            distance = row.get(
+                "nearest_explicit_authorial_p_q_boundary_distance_codepoints")
+            if (isinstance(ref, str) and KEY.fullmatch(ref)
+                    and origin in SOURCE_NEWLINE_ORIGIN_LABELS
+                    and type(gap) is int and gap >= 0
+                    and type(distance) is int and distance >= 0
+                    and row.get("editorial_linebreak_intent_unverified") is True):
+                safe.append((ref, origin, gap, distance))
+        if safe:
+            lines.extend(["", "**Bounded original-newline review coordinates**",
+                          "Distances are Unicode non-whitespace codepoints to "
+                          "the nearest explicit source p/q start/end. "
+                          "These do NOT prove layout equivalence."])
+            for ref, origin, gap, distance in safe:
+                lines.append(
+                    f"- `{ref}` — `{origin}`, source gap {gap}, "
+                    f"nearest p/q boundary {distance} codepoints away")
     lines.extend(["","**Still missing / blocking**"])
     lines.extend("- "+v for v in report["missing"])
     if not report["missing"]:

@@ -238,6 +238,41 @@ class BibleIntakeTests(unittest.TestCase):
         with self.assertRaisesRegex(IntakeError,"replace"):
             _write_report(self.folder,report)
 
+    def test_stage_four_issue_summary_exposes_only_safe_bounded_newline_coordinates(self):
+        samples=[
+            {"reference":"Gen.1.1","source_xml_fragment_origin":
+             "text_within_paragraph_element",
+             "original_verse_nonspace_codepoint_gap":11,
+             "nearest_explicit_authorial_p_q_boundary_distance_codepoints":4,
+             "editorial_linebreak_intent_unverified":True},
+            {"reference":"PRIVATE SECRET","source_xml_fragment_origin":
+             "text_within_paragraph_element",
+             "original_verse_nonspace_codepoint_gap":11,
+             "nearest_explicit_authorial_p_q_boundary_distance_codepoints":4,
+             "editorial_linebreak_intent_unverified":True},
+            {"reference":"Gen.1.2","source_xml_fragment_origin":
+             "PRIVATE NOTE CONTENT",
+             "original_verse_nonspace_codepoint_gap":11,
+             "nearest_explicit_authorial_p_q_boundary_distance_codepoints":4,
+             "editorial_linebreak_intent_unverified":True}
+        ]
+        report={
+          "resource_id":"fixture","stage":4,"stage_name":STAGES[4],
+          "status":"PARTIAL","git_sha":"abc123","run_url":None,
+          "next_action":"Review semantics", "verified":[], "missing":["Review required"],
+          "evidence":{"maintext":{"source_native_structural_whitespace_gap_triage":{
+              "first_unmarked_internal_newline_xml_origin_references_only":samples
+          }}},
+        }
+        _write_report(self.folder,report)
+        summary=(self.folder/"stage-summary.md").read_text()
+        self.assertIn("Gen.1.1", summary)
+        self.assertIn("source gap 11", summary)
+        self.assertIn("boundary 4 codepoints away", summary)
+        self.assertIn("do NOT prove layout equivalence", summary)
+        self.assertNotIn("PRIVATE SECRET", summary)
+        self.assertNotIn("PRIVATE NOTE CONTENT", summary)
+
     def test_manifest_unknown_fields_and_reviewed_path_escape_rejected(self):
         newroot=self.folder/"repo"
         (newroot/"config/bible-intake").mkdir(parents=True)
