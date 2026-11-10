@@ -97,6 +97,20 @@ class NotesTests(unittest.TestCase):
             with self.subTest(raw=raw[:8]), self.assertRaises(NoteEvidenceError):
                 parse_native_numbered_notes(raw)
 
+    def test_substantive_note_mismatch_is_not_hidden_by_whitespace_findings(self):
+        authored = {
+            f"Alpha.1.{i}": [("f", "one  two")] for i in range(1, 60)
+        }
+        audit = NoteAudit(authored)
+        for i in range(1, 59):
+            audit.inspect(f"Alpha.1.{i}", b"<note>one two</note>")
+        audit.inspect("Alpha.1.59", b"<note>changed words</note>")
+        result = audit.finish()
+        self.assertEqual(result["first_findings_without_note_text"][0]["ref"], "Alpha.1.59")
+        self.assertEqual(result["first_findings_without_note_text"][0]["kind"],
+                         "ordered_note_bodies_differ")
+        self.assertNotIn("changed words", json.dumps(result))
+
     def test_duplicate_native_verse_is_rejected(self):
         audit = NoteAudit({})
         audit.inspect("Alpha.1.1", b'word')
