@@ -144,6 +144,11 @@ class MainTextStructuralWhitespaceTriage:
             self._counts[f"structure_{structure}"] += 1
             self._counts[f"change_{layout}"] += 1
             self._counts[f"scope_{scope}"] += 1
+            # The original source may serialize a newline at almost every
+            # verse end. Never merge these with *internal* unmarked poetic
+            # or paragraph line breaks; both remain editorial candidates.
+            self._counts[f"change_{layout}_at_{scope}"] += 1
+            self._counts[f"structure_{structure}_at_{scope}"] += 1
             if "q_open" in positions:
                 self._counts["changed_runs_touching_source_q_open"] += 1
             if "p_open" in positions:
@@ -154,6 +159,14 @@ class MainTextStructuralWhitespaceTriage:
                     self._counts["source_newline_absent_at_q_open_candidate"] += 1
                 elif not positions:
                     self._counts["source_newline_absent_without_p_q_marker_review"] += 1
+                    self._counts[
+                        f"source_newline_absent_without_p_q_marker_at_{scope}"] += 1
+                    if scope == "verse_internal":
+                        # Stronger review priority than a serialized
+                        # XML newline at the end of a numbered verse.
+                        self._counts["unmarked_internal_source_newline_review"] += 1
+                    elif scope == "verse_end":
+                        self._counts["unmarked_source_verse_end_newline_candidate"] += 1
             payload = json.dumps(
                 [ref,position,structure,layout,scope],
                 ensure_ascii=True,separators=(",",":")).encode()
@@ -181,6 +194,8 @@ class MainTextStructuralWhitespaceTriage:
         self._counts.setdefault("changed_whitespace_runs",0)
         self._counts.setdefault("source_newline_runs_absent_in_native_verse_text",0)
         self._counts.setdefault("source_newline_absent_without_p_q_marker_review",0)
+        self._counts.setdefault("unmarked_internal_source_newline_review",0)
+        self._counts.setdefault("unmarked_source_verse_end_newline_candidate",0)
         return {
             "schema_version":1,
             "status": ("whitespace_differences_classified_not_editorially_approved"
