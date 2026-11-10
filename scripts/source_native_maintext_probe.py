@@ -77,11 +77,13 @@ def authored_usfx_main_text(xml: bytes, mapping: list[tuple[str, str]]):
     observed: dict[str, list[str]] = {}
     skipped = Counter()
     visited = set()
+    visited_order = []
     for book in books:
         src = book.get("id")
         if (not src or not USFM_ID.fullmatch(src) or src in visited):
             raise MainTextParityError("Unsafe or repeated authorial source book ID")
         visited.add(src)
+        visited_order.append(src)
         if src not in pairs:
             continue
         dest = pairs[src]
@@ -123,7 +125,7 @@ def authored_usfx_main_text(xml: bytes, mapping: list[tuple[str, str]]):
                 append(child.tail)
 
         visit(book)
-    if list(visited) != metadata["original_books"]:
+    if visited_order != metadata["original_books"]:
         raise MainTextParityError("Authored book order changed during scan")
     mapped_keys = {
         f"{pairs[code]}.{chapter}.{verse}" for code, chapter, verse in authored_keys
@@ -392,7 +394,7 @@ def main() -> int:
         report = run_real_usfx_sword_text_probe(
             args.source_usfx_zip, args.original_sword_zip, args.crosswalk,
             args.native_index_inspector, args.native_raw_inspector)
-        write_new_metadata_report(args.report, Path("/non-existent-private-report-root"), report)
+        write_new_metadata_report(args.report, args.original_sword_zip, report)
     except (ValueError, OSError, UnicodeError) as exc:
         p.error(str(exc))
     rows = report["mapped_numbered_text_comparison"]
