@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "resource_id": "webp-research",
+  "category": "bible",
+  "title": "World English Bible, Protestant edition (research fixture)",
+  "language": "en",
+  "edition": "eBible WEBP 2025, original pinned research artifacts",
+  "provider": "ebible",
+  "purpose": "research_only",
+  "rights": {
+    "status": "pending",
+    "evidence_url": "https://ebible.org/Scriptures/details.php?id=engwebp",
+    "note": "Pinned read-only diagnostics only; no redistribution or editorial approval established by this manifest."
+  },
+  "source": {
+    "format": "USFX",
+    "url": "https://ebible.org/Scriptures/engwebp_usfx.zip",
+    "sha256": "66f99b22a380d8ef8dbd9d401806fc02be3650e5fe3dbb0cec4d9693b53e1e44"
+  },
+  "sword": {
+    "url": "https://ebible.org/sword/zip/engweb2025peb.zip",
+    "sha256": "53d45377d1aa376f483aded415b6d122b7cbe6795baddc49dae6574e304b8810",
+    "module_id": "engweb2025peb",
+    "driver": "zText",
+    "sample_references": [
+      "Gen 1:1",
+      "Ps 23:1",
+      "John 3:16"
+    ]
+  },
+  "crosswalk": "config/standard_usfm_osis_66.json"
+}
