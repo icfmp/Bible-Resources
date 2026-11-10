@@ -15,6 +15,8 @@ on:
       - tests/test_sword_native_raw_corpus_inventory.py
       - scripts/source_native_maintext_probe.py
       - tests/test_source_native_maintext_probe.py
+      - scripts/native_absorbed_verse_groups.py
+      - tests/test_native_absorbed_verse_groups.py
   workflow_dispatch:
 permissions:
   contents: read
@@ -208,6 +210,20 @@ jobs:
           # This pinned original is known to have source-only Romans verse IDs:
           # passing CI proves the diagnostic ran, NOT full edition parity.
           assert comparison["status"] == "blocked_full_mapped_numbered_maintext_parity"
+          groups = report["source_only_verse_grouped_native_maintext_witness"]
+          assert groups["source_only_reference_count"] == classes[
+              "source_verses_without_native_indexed_entry"]
+          assert not groups["source_versification_preserved_in_native_reader"]
+          assert not groups["whole_original_source_fidelity_verified"]
+          assert not groups["publication_approved"]
+          print("Source-only groups in original native entries (text-free):", [
+              (row["occupied_native_ref"], row["original_source_only_refs"],
+               row["status"],
+               row.get("complete_grouped_word_sequence_equal_diagnostic_only"),
+               row.get("complete_grouped_characters_equal_after_whitespace_folding"))
+              for row in groups.get("grouped_source_verses", [])
+          ])
+          print("Unresolved source-only refs:", groups.get("unresolved_source_verse_refs", []))
           print("Whole-corpus source/native indexed main text classifications:", classes)
           print("Numeric-only first mismatch examples:", [
               (row["native_ref"], row["classification"],
