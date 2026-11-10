@@ -1,6 +1,6 @@
 # Contributing to Bible Resources
 
-Open an issue before importing or substantially rewriting a module. For each new **Bible**, start with the [7-stage resource onboarding workflow](docs/BIBLE_7_STAGE_WORKFLOW.md) and [import issue template](.github/ISSUE_TEMPLATE/import.yml). Complete and record one audited checkpoint at a time; resume from the issue after any interruption, never from a partially remembered chat. The seven stages govern progress, not the maximum number of small, focused PRs. Contributions must preserve original source data and supply provenance and evidence of redistribution rights. Do **not** upload copyrighted texts based only on their presence in a publicly accessible SWORD mirror.
+Open an issue before importing or substantially rewriting a module. For each new **Bible**, start with the [7-stage resource onboarding workflow](docs/BIBLE_7_STAGE_WORKFLOW.md) and its [read-only GitHub Actions runner](docs/BIBLE_STAGE_AUTOMATION.md) and [import issue template](.github/ISSUE_TEMPLATE/import.yml). Complete and record one audited checkpoint at a time; resume from the issue after any interruption, never from a partially remembered chat. The seven stages govern progress, not the maximum number of small, focused PRs. Contributions must preserve original source data and supply provenance and evidence of redistribution rights. Do **not** upload copyrighted texts based only on their presence in a publicly accessible SWORD mirror.
 
 For a module submission, provide:
 

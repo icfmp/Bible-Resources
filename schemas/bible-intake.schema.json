@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Bible Resources pinned research intake (no publication approval)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "resource_id",
+    "category",
+    "title",
+    "language",
+    "edition",
+    "provider",
+    "purpose",
+    "rights",
+    "source",
+    "sword"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "resource_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,63}$"
+    },
+    "category": {
+      "const": "bible"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200
+    },
+    "language": {
+      "type": "string",
+      "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]+)*$"
+    },
+    "edition": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200
+    },
+    "provider": {
+      "enum": [
+        "ebible",
+        "crosswire",
+        "step",
+        "andbible",
+        "andbible-extra"
+      ]
+    },
+    "purpose": {
+      "const": "research_only"
+    },
+    "rights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "evidence_url"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "pending",
+            "reviewed_for_research"
+          ]
+        },
+        "evidence_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 400
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "url",
+        "sha256"
+      ],
+      "properties": {
+        "format": {
+          "enum": [
+            "USFX",
+            "USFM",
+            "OSIS"
+          ]
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "member": {
+          "type": "string",
+          "maxLength": 256
+        }
+      }
+    },
+    "sword": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "url",
+        "sha256",
+        "module_id",
+        "driver",
+        "sample_references"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "module_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]{1,39}$"
+        },
+        "driver": {
+          "enum": [
+            "RawText",
+            "zText"
+          ]
+        },
+        "versification": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9]{0,31}$"
+        },
+        "sample_references": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 12,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[1-4]?[A-Za-z][A-Za-z0-9 ]* [0-9]+(:[0-9]+)?$",
+            "maxLength": 60
+          }
+        }
+      }
+    },
+    "crosswalk": {
+      "type": "string",
+      "pattern": "^config/[a-z0-9_-]+\\.json$"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "source": {
+            "properties": {
+              "format": {
+                "const": "OSIS"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "source": {
+            "required": [
+              "member"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "source": {
+            "properties": {
+              "format": {
+                "const": "USFX"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "crosswalk"
+        ]
+      }
+    }
+  ]
+}

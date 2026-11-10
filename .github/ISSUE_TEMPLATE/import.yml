@@ -19,6 +19,14 @@ body:
       placeholder: "e.g. An identified publisher edition; source and version to verify"
     validations:
       required: true
+  - type: input
+    id: resource_id
+    attributes:
+      label: GitHub Actions research manifest ID (when created)
+      description: Filename stem in config/bible-intake/<id>.json; blank until a rights/source review has pinned original archives.
+      placeholder: "e.g. example-2026"
+    validations:
+      required: false
   - type: textarea
     id: source
     attributes:

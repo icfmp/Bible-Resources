@@ -48,6 +48,19 @@ run, unresolved issues and the **next specific action**. A blocked step
 is never silently skipped; completed work is saved on GitHub before
 moving on. Publication still requires separate rights/editorial approval.
 
+## Automated, resumable Bible source audits
+
+Bible Resources runs the seven fixed [onboarding checkpoints](docs/BIBLE_7_STAGE_WORKFLOW.md)
+on **independent GitHub Actions runs**. A SHA-pinned research manifest selects
+an exact original Bible source/official SWORD pair. Run just one stage at a
+time and use its metadata-only report to resume safely after interruptions;
+the original archives are never uploaded or published.
+
+**[How to run the staged GitHub Action](docs/BIBLE_STAGE_AUTOMATION.md)** —
+including the current supported source formats, real SWORD checks, the
+remaining blocked/partial fidelity gates and mandatory owner approval.
+The runner is *not* an automated permission to publish.
+
 ## Getting started
 
 Requires Python 3.11+ and `jsonschema` (`python -m pip install -r requirements.txt`).
