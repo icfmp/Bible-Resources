@@ -307,6 +307,37 @@ The step-4 stage stays **PARTIAL** until the whole stage gate is reviewed.
 Step 5 retains detailed caller/anchor/target and exact editorial structure
 comparison; a read-only diagnostic does not waive those requirements.
 
+## Stage-4c: actual compiled SWORD milestone-ID closure (not source layout parity)
+
+The read-only `scripts/native_milestone_pair_audit.py` joins the **already
+full-corpus, independent SWORD native reader**. In the original engine's
+ordered stream, it strictly parses all occupied numbered and verse-zero
+XML entries privately and checks matching `sID`/`eID` *identifier values*
+on structural `div`, `l`, `lg`, `milestone`, `p`, `q`, `lb`.
+
+- A count equality alone is insufficient: every close must find an active
+  opening of the same tag and ID, with duplicate active identifiers,
+  orphan closings, dangling openings, cross-book boundaries, conflicting
+  types and non-LIFO/crossed nesting recorded as distinct evidence.
+- Intro-to-numbered, numbered-to-numbered and intro-to-intro pair counts
+  are preserved. Raw identifiers, Scripture, note contents, unknown
+  attribute values and raw XML are **never present** in the saved receipt.
+  The report retains only counts, fingerprint, and bounded reference IDs.
+- Body content of `note` and `title` is **excluded**, as those have
+  separate annotation/editorial checks. Non-addressable TOP records are
+  explicitly flagged **unverified**, never silently discarded.
+- An actual compiled `sID`/`eID` proof verifies the internal integrity
+  of the *stock module*, **not** that the module has preserved the correct
+  USFX author's paragraph/poetry starts, source type hierarchy, every
+  line-break location, or notes/word positions. The next check must align
+  source and compiled semantic event **order/position** to make that
+  claim. Do not auto-normalize original whitespace or publish on
+  matching milestone counts alone.
+
+**Do not tick stage 4c or stage 4/7** until exact source-relative structure
+issues are reviewed. Stage 5 retains source-native note/caller/target and
+final typography checks. No change to published Bible modules or rights.
+
 ## Safety and publication separation
 
 - GitHub workflow uses `contents: read` for the audit job.
