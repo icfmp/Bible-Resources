@@ -1,0 +1,135 @@
+name: Observe original Bible archives (metadata only)
+
+on:
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      resource_id:
+        description: "Preliminary research manifest ID (no automatic pinning)"
+        type: string
+        required: true
+      issue_number:
+        description: "Optional open [Import] issue for permanent evidence"
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bible-observe-${{ github.event_name }}-${{ github.event.issue.number || inputs.resource_id }}
+  cancel-in-progress: false
+
+jobs:
+  observe:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.issue.pull_request == null && github.event.comment.author_association == 'OWNER' && startsWith(github.event.issue.title, '[Import]') && startsWith(github.event.comment.body, '/bible-observe ')) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install pinned Python dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Parse bounded owner request without shell interpolation
+        if: github.event_name == 'issue_comment'
+        env:
+          REQUEST: ${{ github.event.comment.body }}
+        run: |
+          python - <<'PY'
+          import os,sys
+          sys.path.insert(0,"scripts")
+          from bible_intake import parse_observe_comment
+          resource=parse_observe_comment(os.environ["REQUEST"])
+          with open(os.environ["GITHUB_ENV"],"a",encoding="utf8") as stream:
+              stream.write(f"RESOURCE_ID={resource}\n")
+          print("Source observation requested for:",resource)
+          PY
+      - name: Verify existing research tests and manifest before network access
+        env:
+          DISPATCH_RESOURCE_ID: ${{ inputs.resource_id }}
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p 'test_bible_stage_runner.py' -v
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            printf 'RESOURCE_ID=%s\n' "$DISPATCH_RESOURCE_ID" >> "$GITHUB_ENV"
+          fi
+      - name: Observe source and SWORD SHA-256 and .conf only (discard original archives)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p observation
+          python scripts/bible_intake.py --resource-id "$RESOURCE_ID" --observe-only > observation/observation.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path("observation/observation.json").read_text())
+          assert data["source_zip_not_retained"] and not data["published"]
+          assert not data["safe_to_acquire_without_approved_pins"]
+          for source in ("source","sword"):
+              r=data["archives"][source]
+              assert r["safe_original_zip_structure_verified"]
+              assert len(r["observed_sha256"]) == 64
+          s=data["archives"]["sword"]["sword_conf"]
+          print("OBSERVED resource:",data["resource_id"])
+          print("Source SHA-256:",data["archives"]["source"]["observed_sha256"])
+          print("SWORD SHA-256:",data["archives"]["sword"]["observed_sha256"])
+          print("SWORD metadata:",{k:s[k] for k in ("module_id","driver","versification","language","version")})
+          print("NOT certified: edition identity, rights for add-on data or source-to-SWORD fidelity")
+          PY
+      - name: Upload metadata-only discovery (no Scripture or original ZIPs)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bible-original-observation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: observation/observation.json
+          retention-days: 90
+          if-no-files-found: error
+
+  issue-evidence:
+    if: ${{ always() && needs.observe.result == 'success' && (github.event_name == 'issue_comment' || inputs.issue_number != '') }}
+    needs: observe
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: bible-original-observation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: observation
+      - name: Save a permanent human-review-required receipt to import issue
+        uses: actions/github-script@v7
+        env:
+          ISSUE_NUMBER: ${{ github.event_name == 'issue_comment' && github.event.issue.number || inputs.issue_number }}
+        with:
+          script: |
+            const fs = require('fs');
+            const issueNumber = process.env.ISSUE_NUMBER;
+            if (!/^[1-9][0-9]{0,8}$/.test(issueNumber)) {
+              core.setFailed('Invalid issue number');
+              return;
+            }
+            const issue = await github.rest.issues.get({...context.repo,issue_number:Number(issueNumber)});
+            if (issue.data.state !== 'open' || !issue.data.title.startsWith('[Import]')) {
+              core.setFailed('Destination must be an open [Import] resource issue');
+              return;
+            }
+            const data = JSON.parse(fs.readFileSync('observation/observation.json','utf8'));
+            const s=data.archives.source, z=data.archives.sword, c=z.sword_conf;
+            const safe = (v) => String(v ?? 'unknown').replace(/[\x60\r\n]/g,'');
+            const body = [
+              '### Original ZIP observation — review required, NOT approved/pinned',
+              'Resource: `'+safe(data.resource_id)+'`',
+              'Source original SHA-256: `'+safe(s.observed_sha256)+'` ('+s.observed_bytes+' bytes)',
+              'SWORD original SHA-256: `'+safe(z.observed_sha256)+'` ('+z.observed_bytes+' bytes)',
+              'SWORD: `'+safe(c.module_id)+'`, driver `'+safe(c.driver)+'`, v11n `'+safe(c.versification)+'`, lang `'+safe(c.language)+'`, version `'+safe(c.version)+'`',
+              'Original safe-ZIP structure: checked (source '+s.original_zip_member_count+' entries; SWORD '+z.original_zip_member_count+' entries).',
+              'These bytes were privately observed in this run and discarded. No text, notes or ZIP is uploaded.',
+              '**NOT verified:** edition equivalence, original authorial source-to-module parity, separate enrichment rights, current/past upstream revision identity or publication approval.',
+              'Next: review these exact inputs and provenance; commit the approved manifest SHA-256/actual .conf metadata, then run stage 2/7. Any later upstream mutation must fail closed.',
+              'Evidence: https://github.com/'+context.repo.owner+'/'+context.repo.repo+'/actions/runs/'+context.runId,
+            ].join('\n\n');
+            await github.rest.issues.createComment({...context.repo,issue_number:Number(issueNumber),body});
