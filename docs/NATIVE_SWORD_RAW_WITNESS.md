@@ -76,3 +76,29 @@ The SHA-pinned independent real-WEBP zText workflow now emits
 **metadata-only grouped evidence** as part of the source-to-native
 main-text audit; exact proof classification must be read from the
 run rather than presumed.
+
+
+### Confirmed SHA-pinned original-WEBP whole-group evidence — 2026-11-10
+
+The first real [grouped original USFX → stock zText run
+#42777659734](https://github.com/icfmp/Bible-Resources/actions/runs/42777659734)
+**passed** using the publisher-original SHA-pinned archives and the
+separately verified native full-corpus/exact-key readers.
+
+Generic discovery found one same-chapter group: native occupied
+`Rom.14.23`, plus **three separate original publisher refs**
+`Rom.14.24`, `Rom.14.25`, `Rom.14.26` absent from the indexed native
+registry. The compiled `Rom.14.23` entry contains the **entire**
+authorial concatenated main-verse text for 14.23–26 in the exact word
+order. More strongly, Unicode NFC and whitespace-folded **characters,
+including punctuation and letter case, match** the original complete
+verse group. Only whitespace differs within this restricted
+main-verse-character comparison.
+
+The proof does **not** make 14.24–26 independently addressable, verify
+where internal verse markers lie, prove original source-edition revision
+identity, or certify footnote callers, bodies and anchors, poetry,
+headings, Strong lexical attributes, 17 additional authorial source
+sections, rights or publication. A distinct reader UI must still
+handle absent native keys. The project has not repackaged or
+re-numbered this publisher's original module.
