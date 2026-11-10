@@ -205,6 +205,39 @@ normal PR touching this automation triggers the existing pinned WEBP
 research proof, without approving its original edition. No heavy
 research step should be run in a long-lived chat.
 
+## Full-corpus whitespace differences: diagnostic, not silent normalization
+
+For a source-native `USFX` to existing-stock-`zText` comparison, stage 4
+already independently checks all occupied native reference keys and compares
+the entire mapped text sequence. A complete match after whitespace folding
+**does not** establish exact textual whitespace or original paragraph/poetry
+layout equivalence. Source and stock module always remain unchanged.
+
+`scripts/maintext_whitespace_patterns.py` extends that same private pass
+with **aggregate, source-content-free evidence** for all verses classified
+as `whitespace_only`:
+
+- number of verses with leading/trailing versus internal changes;
+- newline and tab changes on each side, and Unicode spaces (including NBSP);
+- increasing/decreasing/same-length whitespace runs;
+- up to four **verse reference IDs** per category, never Scripture, note body,
+  raw strings or literal whitespace excerpts.
+
+The observation is derived from the separately pinned original and the
+independently read native entries in disposable runner storage. If a word or
+punctuation changes, the strict classifier **must not** treat it as
+whitespace-only. The report is included in the metadata-only stage-4 Action
+receipt. This enables a precise decision about whether boundary trimming is
+a stock compiler behavior or whether source-internal layout was altered.
+
+**Stage 4 stays `PARTIAL`** while any original whitespace/layout remains
+unverified, including when all words and punctuation match. Stage 5 must
+evaluate editorial paragraphs/poetry and note caller/anchor/target parity.
+Never automatically rewrite, strip or approve whitespace or invent verse
+mapping exceptions to obtain a green report. Any later acceptance needs
+the exact report link and source-scoped explanation recorded on the import
+issue.
+
 ## Safety and publication separation
 
 - GitHub workflow uses `contents: read` for the audit job.
