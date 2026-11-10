@@ -48,6 +48,27 @@ class StructuralWhitespaceTriageTests(unittest.TestCase):
         totals=result["source_native_original_whitespace_gap_counts"]
         self.assertEqual(totals["source_newline_absent_without_p_q_marker_review"],1)
         self.assertEqual(totals["structure_without_original_p_q_marker_at_that_character_boundary"],1)
+        self.assertEqual(totals["unmarked_internal_source_newline_review"],1)
+        self.assertEqual(totals["unmarked_source_verse_end_newline_candidate"],0)
+        self.assertEqual(totals[
+            "change_source_newline_not_present_in_compiled_verse_text_at_verse_internal"],1)
+
+    def test_unmarked_source_newline_at_verse_end_is_not_inferred_as_poetry_loss(self):
+        raw=(b'<p><v id="1"/>alpha beta\n<ve/>'
+             b'<v id="2"/>gamma<ve/></p>')
+        verses,boundaries=original(raw)
+        triage=MainTextStructuralWhitespaceTriage(verses,boundaries)
+        triage.observe("Gen.1.1","alpha beta")
+        triage.observe("Gen.1.2","gamma")
+        result=triage.finish()
+        c=result["source_native_original_whitespace_gap_counts"]
+        self.assertEqual(c["source_newline_absent_without_p_q_marker_review"],1)
+        self.assertEqual(c["unmarked_source_verse_end_newline_candidate"],1)
+        self.assertEqual(c["unmarked_internal_source_newline_review"],0)
+        self.assertEqual(c[
+            "change_source_newline_not_present_in_compiled_verse_text_at_verse_end"],1)
+        self.assertFalse(result["source_native_original_whitespace_layout_verified"])
+        self.assertNotIn("alpha",str(result))
 
     def test_poetry_close_linebreak_has_distinct_category(self):
         raw=b'<p><v id="1"/>alpha, <q>beta</q>\n gamma<ve/></p>'
