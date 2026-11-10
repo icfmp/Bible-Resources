@@ -58,6 +58,18 @@ int main(int argc, char** argv) {
                 // An occupied but unrecognizable native location is NOT discardable.
                 return 8;
             }
+            // hasEntry(&current) checks the supplied INDEX but does NOT
+            // position SWModule::key. getRawEntry() reads the MODULE'S
+            // current key. Without this call, every frame can contain the
+            // same text even though the enumerated references are distinct!
+            // Use the real VerseKey, never a re-parsed/localized text key.
+            if (module->setKey(current)) return 16;
+            const auto* positioned =
+                dynamic_cast<const sword::VerseKey*>(module->getKey());
+            if (!positioned ||
+                std::string(positioned->getOSISRef()) !=
+                    std::string(current.getOSISRef()) ||
+                !module->hasEntry(positioned)) return 17;
             const char* entry = module->getRawEntry();
             if (!entry) return 9;
             const std::string bytes(entry);
