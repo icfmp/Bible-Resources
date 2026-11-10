@@ -751,6 +751,54 @@ outside numbered verse strings, note caller/links, or reader appearance.
 Those remain explicit stage 4c / 5 / 6 editorial gates. No source
 or published SWORD module is ever modified.
 
+## Stage 4c — independent original USFX XML text/tail newline provenance
+
+`scripts/source_usfx_newline_provenance.py` independently reconstructs
+every numbered original USFX verse from its **actual XML text-node and
+child-tail fragments** (not a stock-SWORD approximation). It checks
+**exact verse-text equality** with the separately validated USFX reader,
+exact mapped book/verse coverage, and complete **original newline
+gap-to-fragment mapping** before releasing *private source coordinates*
+to the existing whitespace-run classifier. Parsing is strict, DTD/network
+disabled; note bodies, headings, source book-title text and generated
+verse-label content remain excluded exactly as in the original
+main-text reader.
+
+When the existing checker finds a source newline absent from compiled
+numbered text **inside an original verse with no p/q structural marker**,
+it classifies the source gap by a fixed, privacy-safe category:
+
+- A `node.text` fragment inside an original `p`, `q` or inline
+  element, versus a text fragment in an otherwise unreviewed element;
+- A `child.tail` fragment after a numbered-verse/chapter milestone,
+  original `p/q` element, an excluded note, a known inline element,
+  or an unreviewed source tag;
+- A **mixed text/tail origin** if more than one original XML fragment
+  contributed a newline to the *same* non-whitespace character gap.
+  Such mixed cases remain ambiguous and require review.
+
+The resulting metadata-only report carries counts by source fragment
+category, limited original book/verse reference IDs and integer
+character-gap coordinates, plus the prior immutable SHA-bound overall
+structural and whitespace evidence. **No original words, note bodies,
+unknown original tag names/attribute values, native generated IDs or
+raw whitespace strings leave private memory.** The synthetic fixtures
+check source-verse text tampering, missing/extra newline origins,
+source-note exclusion, XML fragments after inline markup, mixed
+origins and independent source/compiled character continuity.
+
+**Critical interpretive boundary:** Identifying a newline as
+`tail_after_numbering_milestone` or `text_within_paragraph_element`
+does **not** prove it was merely XML pretty-printing or, conversely,
+that it denotes intentional poetry layout. XML node provenance is
+evidence of **serialization origin**, *not authorial editorial intent*.
+The independently paired SWORD p/q/`l` milestones already document
+many genuine structural line breaks without literal `\\n`. Source
+whitespace outside numbered verses, source/publisher stanza-style
+decisions, native verse-zero introductions and actual reader layout
+remain explicit **REVIEW_REQUIRED** gates. Never auto-normalize source
+spaces/newlines to manufacture success.
+
 ## Safety and publication separation
 
 - GitHub workflow uses `contents: read` for the audit job.
