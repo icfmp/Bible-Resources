@@ -21,8 +21,14 @@ It must satisfy `schemas/bible-intake.schema.json` and contain:
 - Unique resource ID, real title, exact edition and source language.
 - Original provider and archive URLs from a hardcoded HTTPS host allowlist.
 - **Exact SHA-256 hashes** of the original authorial source ZIP and official
-  SWORD module ZIP; unknown hashes mean **do not run network acquisition
-  or publish**. Retrieve and independently review source identities first.
+  SWORD module ZIP are mandatory **before stages 2–6 download anything**.
+  During **stage 1 only**, `sha256: null` explicitly means **not yet pinned**;
+  this allows a safe metadata-only edition/rights checkpoint without inventing
+  fingerprints. `sword.module_id: null` and `sword.driver: null` similarly
+  mean **not yet inspected**. The stage-one runner performs **no network
+  acquisition**, and all later stages fail closed *before* opening an archive
+  if any of these identities are still unknown. Hashes must be independently
+  recorded and reviewed before continuing; stage 1 cannot approve publication.
 - `source.format`: `USFX`, `USFM`, or `OSIS`; for OSIS add the
   exact XML `source.member` in the ZIP. USFX needs a reviewed explicit
   book-name crosswalk. Neither unsupported markup nor ambiguous
@@ -32,6 +38,15 @@ It must satisfy `schemas/bible-intake.schema.json` and contain:
 - A rights-evidence URL and rights review status. **`research_only`
   is mandatory**: even after a technical report passes, this file does
   not grant redistribution or editorial permission.
+
+The `frajnd-2024` file begins as a **stage-one-only preliminary manifest**:
+its archive SHA-256 fields, SWORD ID and driver are deliberately `null`,
+not falsely pinned. It permits the stage-one `/bible-audit frajnd-2024 1`
+command, but stages 2–6 **must block** until the actual source and SWORD
+archives have been independently fingerprinted and their module identity
+reviewed in a committed manifest. eBible's currently linked source is USFX;
+the original publisher BPC separately provides 2024 OSIS XML for source
+cross-checking. The revised 2026 DarbyR must not be substituted.
 
 The existing `webp-research` file is an archived **research example**,
 not a second Bible approved for public release. It is pinned to the
@@ -113,6 +128,11 @@ mkdir -p /tmp/bible-report
 python scripts/bible_stage_runner.py \
   --resource-id webp-research --stage 1 --report-dir /tmp/bible-report
 ```
+
+For stage 1, no network fetch occurs. An unpinned manifest may pass
+structural validation, but the stage-one report lists all unresolved pins,
+edition identity and rights decisions as `REVIEW_REQUIRED`. **Never** mark
+the checkpoint done merely because its GitHub Action run is green.
 
 For stage 2 and above, network fetches always verify the pinned original
 archives in the temporary work directory. Stages 4–5 require stock
