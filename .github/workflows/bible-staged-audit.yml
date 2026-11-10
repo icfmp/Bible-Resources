@@ -77,6 +77,12 @@ jobs:
           set -euo pipefail
           python -m unittest discover -s tests -p 'test_bible_stage_runner.py' -v
           python -c 'import os, sys; sys.path.insert(0, "scripts"); from bible_intake import load_manifest; m=load_manifest(os.environ["RESOURCE_ID"]); print("Reviewed research manifest:", m["resource_id"], m["purpose"], m["source"]["format"])'
+      - name: Observe the current upstream WEBP bytes (SHA-256 only; never auto-repin)
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/bible_intake.py --resource-id webp-research --observe-only
       - name: Install stock SWORD binaries only if this stage needs them
         shell: bash
         run: |
