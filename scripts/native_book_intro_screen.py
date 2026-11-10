@@ -134,17 +134,20 @@ class NativeBookIntroScreen:
         text = _authored_words(root)
         divs = Counter()
         tags = Counter()
+        title_texts = []  # private, never output or uploaded
         for node in root.iterdescendants():
             if not isinstance(node.tag, str):
                 continue
             tag = etree.QName(node).localname
             if tag in {"div", "p", "l", "lg", "title"}:
                 tags[tag] += 1
+                if tag == "title":
+                    title_texts.append(_authored_words(node))
                 if tag == "div":
                     kind = node.get("type", "")
                     divs[kind if kind in {"book", "bookGroup", "x-p", "x-milestone", "paragraph"}
                          else "other_unreviewed_type"] += 1
-        self._entries[slot] = (text, divs, tags)
+        self._entries[slot] = (text, divs, tags, title_texts)
 
     def finish(self, private_prefaces, source_classification):
         count = Counter(self._counts)
@@ -163,13 +166,32 @@ class NativeBookIntroScreen:
                     record = self._entries.get((book, scope))
                     if record is None:
                         continue
-                    native, _divs, _tags = record
+                    native, _divs, _tags, _titles = record
                     if source in _fold_space(native):
                         located.append(scope)
                 if located:
                     count["preface_text_detected_in_book_or_first_chapter_intro"] += 1
                     count["text_detected_at_book_scope" if "book" in located
                           else "text_detected_at_first_chapter_scope_only"] += 1
+                    book_record = self._entries.get((book, "book"))
+                    title_values = (book_record[3] if book_record is not None else [])
+                    exact_titles = sum(1 for title in title_values
+                                       if _fold_space(title) == source)
+                    contained_titles = sum(1 for title in title_values
+                                           if source in _fold_space(title))
+                    if exact_titles == 1:
+                        count["preface_prose_exactly_equals_one_native_book_title"] += 1
+                    elif exact_titles > 1:
+                        count["preface_prose_duplicates_native_book_titles"] += 1
+                    elif contained_titles == 1:
+                        count["preface_prose_contained_in_one_native_book_title"] += 1
+                    elif contained_titles > 1:
+                        count["preface_prose_contained_in_multiple_native_titles"] += 1
+                    else:
+                        count["preface_prose_in_intro_but_not_in_any_native_book_title"] += 1
+                        if len(samples) < MAX_SAMPLE:
+                            samples.append({"book":book,
+                                            "classification":"intro_text_exists_but_not_in_native_title"})
                 else:
                     count["preface_text_not_contiguous_in_checked_native_intros"] += 1
                     if len(samples) < MAX_SAMPLE:
@@ -178,7 +200,7 @@ class NativeBookIntroScreen:
         for (_book, scope), item in self._entries.items():
             if item is None:
                 continue
-            _text, divs, tags = item
+            _text, divs, tags, _title_texts = item
             for typ,n in divs.items():
                 count[f"native_{scope}_div_type_{typ}"] += n
             for tag,n in tags.items():
@@ -195,6 +217,7 @@ class NativeBookIntroScreen:
             "source_preface_text_not_in_artifact":True,
             "native_intro_raw_markup_not_in_artifact":True,
             "matched_intro_prose_does_not_establish_original_layout":True,
+            "matched_native_title_text_does_not_prove_original_p_style_or_position":True,
             "source_native_prefatory_paragraph_position_parity_verified":False,
             "source_or_native_content_mutated":False,
             "editorial_or_publication_approved":False,
