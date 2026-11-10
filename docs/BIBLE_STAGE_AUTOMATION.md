@@ -637,6 +637,54 @@ original reference, a swapped structural kind, changed word positions
 and a conflicting original verse-key order. No Darby-specific
 counting rule, source change or compiler normalization is introduced.
 
+## Stage 4c — punctuation-sensitive original/stock structural boundaries
+
+`scripts/source_native_nonspace_boundaries.py` is the next generic
+stage-4c *machine diagnostic*, running immediately after independent
+source/native `p/q` **word-start and word-end** parity. Exact book
+text and event positions are reconstructed from the original USFX
+document and the separately decoded actual stock SWORD `x-p`/`l`
+milestones; neither source nor compiled Scriptures are uploaded.
+
+**Why:** A line may start after a comma in the original and before
+the same comma in the compiled record. Both positions have the
+same preceding *word* ordinal, so the previous check cannot see it.
+
+`_BookWords.resolve` now independently retains a private **book-wide
+non-whitespace Unicode codepoint** stream fingerprint and each
+p/q opening and closing's offset counted in that stream.
+Generated bookkeeping verse separators are whitespace and therefore
+excluded from this *specific* proof. The new audit:
+
+- Requires original/native words, p/q kind and event count, and word-start/
+  word-end positions to agree before reporting punctuation-level results.
+- Independently requires identical **full-book non-whitespace character
+  streams**, with case, Unicode codepoints and punctuation preserved
+  exactly (not lowercased, NFC-folded or edited); a genuine different
+  punctuation mark blocks the proof.
+- Checks **each opening and closing non-whitespace codepoint ordinal**
+  and returns aggregate differences plus no more than 24 canonical
+  reference/ordinal-only examples, and independently computed structural
+  event fingerprints. It never publishes Scripture characters, note
+  bodies, unknown XML values or generated `sID/eID` identifiers.
+- Includes adversarial fixtures for a moved poetic opening/closing
+  across a comma **with identical word ordinals**, changed punctuation,
+  only-whitespace changes, unsafe private hashes and changed word
+  positions. Original text/punctuation or SWORD binaries are never
+  modified or normalized to satisfy a test.
+- **Explicit limitation:** matching *non-whitespace codepoint ordinals*
+  is not preservation of **authored spaces, paragraph indentation,
+  consecutive newline counts, poetry stanza layout or exact original
+  character-byte offsets**. The original USFX and stock SWORD raw
+  records already differ in whitespace; synthetically inserted
+  verse separators cannot be mistaken for authored linebreaks.
+  Source-authored whitespace and reader presentation therefore remain
+  **PARTIAL / REVIEW_REQUIRED**, not auto-approved.
+
+This analysis is independent of any specific edition, Greek/Hebrew
+script, punctuation mark or predetermined event count. It is metadata-only
+research, not publisher identity/rights or publication permission.
+
 ## Safety and publication separation
 
 - GitHub workflow uses `contents: read` for the audit job.

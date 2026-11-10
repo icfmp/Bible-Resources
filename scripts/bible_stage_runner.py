@@ -193,6 +193,15 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
             missing.append("Some source/native paragraph/poetry record-scope shifts are nonadjacent or ambiguous despite matching word ordinals")
         else:
             missing.append("Source/native p/q record-scope classification could not run; prerequisite/source mapping unverified")
+        punctuation_screen = rows.get(
+            "source_native_nonwhitespace_codepoint_boundary_screen", {})
+        if punctuation_screen.get(
+            "all_p_q_source_native_nonwhitespace_codepoint_boundaries_match") is True:
+            verified.append("Original/compiled p/q OPEN and CLOSE punctuation-relative non-whitespace character positions match (NOT source whitespace/newline proof)")
+        elif punctuation_screen:
+            missing.append("Source-native punctuation-sensitive paragraph/poetry boundary positions differ or remain unverified")
+        else:
+            missing.append("No independent source-native punctuation-relative p/q boundary audit")
         body_order = rows.get("source_native_ordered_body_kind_screen", {})
         if body_order.get("status") == "blocked_original_authorial_source_scope_or_structure":
             missing.append("Source-native p/q ordered event check explicitly BLOCKED by original book/structure scope; do not infer matching order")

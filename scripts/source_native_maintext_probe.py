@@ -38,6 +38,9 @@ from source_native_word_boundaries import (
 from source_native_record_scope_triage import (
     ScopeTriageError, compare_body_record_scopes,
 )
+from source_native_nonspace_boundaries import (
+    NonspaceBoundaryError, compare_punctuation_sensitive_boundaries,
+)
 from stable_sword_refs import module_payload_digest
 from sword_native_raw_corpus_inventory import (
     inspect_native_raw_corpus, write_new_metadata_report,
@@ -580,6 +583,24 @@ def run_real_usfx_sword_text_probe(
                 "source_to_native_record_scope_equivalence_verified":False,
                 "no_scripture_or_native_identifier_values_in_report":True,
             }
+        if body_boundary.get("all_mapped_book_p_q_start_end_word_ordinals_match") is True:
+            try:
+                body_nonspace = compare_punctuation_sensitive_boundaries(
+                    source_boundaries, native_boundary_data)
+            except NonspaceBoundaryError:
+                body_nonspace = {
+                    "schema_version":1,
+                    "status":"blocked_original_native_punctuation_boundary_scope",
+                    "all_p_q_source_native_nonwhitespace_codepoint_boundaries_match":False,
+                    "no_original_text_notes_native_markup_or_sids_in_receipt":True,
+                }
+        else:
+            body_nonspace = {
+                "schema_version":1,
+                "status":"blocked_prerequisite_p_q_lexical_word_boundaries",
+                "all_p_q_source_native_nonwhitespace_codepoint_boundaries_match":False,
+                "no_original_text_notes_native_markup_or_sids_in_receipt":True,
+            }
         comparison = {
             "status": ("all_mapped_numbered_maintext_characters_match_index_only"
                        if exact else "blocked_full_mapped_numbered_maintext_parity"),
@@ -603,6 +624,7 @@ def run_real_usfx_sword_text_probe(
             "native_crossentry_milestone_pair_audit": native_pairs.finish(),
             "source_native_body_boundary_word_position_screen": body_boundary,
             "source_native_body_record_scope_triage": body_record_scope,
+            "source_native_nonwhitespace_codepoint_boundary_screen": body_nonspace,
             "source_native_ordered_body_kind_screen": (
                 source_body_order_block if source_body_order_block is not None
                 else compare_ordered_body_openings(

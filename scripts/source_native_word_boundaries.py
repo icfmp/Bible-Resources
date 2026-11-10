@@ -68,6 +68,21 @@ class _BookWords:
         if len(spans) > MAX_WORDS_PER_BOOK:
             raise BoundaryAuditError("Word stream exceeds per-book safety limit")
         ends = [end for _, end in spans]
+        # Character boundary evidence stronger than lexical word ordinal:
+        # exclude ONLY Unicode whitespace (including synthetic verse
+        # separators) so moved punctuation in the same interword gap is
+        # detectable. Preserve full authored case/punctuation exactly.
+        # Never return the underlying private non-whitespace character stream.
+        nonspace_prefix = [0]
+        count_nonspace = 0
+        nonspace_chars = []
+        for char in text:
+            if not char.isspace():
+                count_nonspace += 1
+                nonspace_chars.append(char)
+            nonspace_prefix.append(count_nonspace)
+        nonspace_digest = sha256(
+            "".join(nonspace_chars).encode("utf-8")).hexdigest()
         result = []
         for event in entries:
             def boundary(raw):
@@ -76,7 +91,9 @@ class _BookWords:
                 inside = bool(ordinal < len(spans)
                               and spans[ordinal][0] < pos < spans[ordinal][1])
                 return {"word_ordinal":ordinal, "inside_word":inside,
-                        "reference":raw["ref"], "record_scope":raw["scope"]}
+                        "reference":raw["ref"], "record_scope":raw["scope"],
+                        "nonwhitespace_codepoint_ordinal":nonspace_prefix[pos],
+                        "private_book_nonwhitespace_sha256":nonspace_digest}
             result.append({"kind":event["kind"],
                            "open":boundary(event["open"]),
                            "close":boundary(event["close"]) if event.get("close") else None})
