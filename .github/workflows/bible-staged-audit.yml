@@ -26,6 +26,9 @@ on:
       - "scripts/bible_intake.py"
       - "scripts/bible_stage_runner.py"
       - "scripts/source_usfx_structure.py"
+      - "scripts/usfx_schema_gate.py"
+      - "config/usfx-schema-policy.json"
+      - "tests/test_usfx_schema_gate.py"
       - "tests/test_source_usfx_structure.py"
       - "schemas/bible-intake.schema.json"
       - "config/bible-intake/**"
@@ -79,7 +82,26 @@ jobs:
           set -euo pipefail
           python -m unittest discover -s tests -p 'test_bible_stage_runner.py' -v
           python -m unittest discover -s tests -p 'test_source_usfx_structure.py' -v
+          python -m unittest discover -s tests -p 'test_usfx_schema_gate.py' -v
           python -c 'import os, sys; sys.path.insert(0, "scripts"); from bible_intake import load_manifest; m=load_manifest(os.environ["RESOURCE_ID"]); print("Reviewed research manifest:", m["resource_id"], m["purpose"], m["source"]["format"])'
+      - name: Observe official eBible USFX schema fingerprint (research only, no auto-approval)
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/usfx_schema_gate.py --observe-only > "${RUNNER_TEMP}/usfx-schema-observation.json"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          receipt=json.loads((Path(os.environ["RUNNER_TEMP"])/"usfx-schema-observation.json").read_text())
+          assert receipt["status"]=="observed_unreviewed_official_schema"
+          print("Official XSD URL:",receipt["publisher_url"])
+          print("Observed official XSD SHA-256:",receipt["official_xsd_sha256"])
+          print("Observed XSD bytes:",receipt["official_xsd_bytes"])
+          print("Offline compilation:",receipt["offline_compiled_without_external_dependencies"])
+          print("This fingerprint is NOT approved until reviewed/pinned on main.")
+          PY
       - name: Observe the current upstream WEBP bytes (SHA-256 only; never auto-repin)
         if: github.event_name == 'pull_request'
         shell: bash
