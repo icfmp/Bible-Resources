@@ -37,6 +37,17 @@ scripts/smoke.py                   actual SWORD runtime smoke test
 
 Only modules whose `quality.status` is **`approved`** are published, and only if redistribution rights have been affirmatively verified. Other entries remain source-side records and are excluded from distributable output.
 
+## Track each new Bible in seven resumable stages
+
+**One Bible = one tracking issue, seven visible checkpoints** (not a single
+enormous prompt or PR). Use the existing [resource import issue
+template](.github/ISSUE_TEMPLATE/import.yml) and the
+[seven-stage onboarding workflow](docs/BIBLE_7_STAGE_WORKFLOW.md).
+Each checkpoint records: progress `X/7`, last verified PR/commit and test
+run, unresolved issues and the **next specific action**. A blocked step
+is never silently skipped; completed work is saved on GitHub before
+moving on. Publication still requires separate rights/editorial approval.
+
 ## Getting started
 
 Requires Python 3.11+ and `jsonschema` (`python -m pip install -r requirements.txt`).
