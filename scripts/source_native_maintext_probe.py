@@ -27,7 +27,7 @@ from source_native_scope import read_crosswalk
 from maintext_whitespace_patterns import MainTextWhitespacePatterns
 from native_sword_markup_census import NativeMarkupCensus
 from native_milestone_pair_audit import NativeMilestonePairAudit
-from source_native_paragraph_counts import compare_authored_native_paragraphs
+from source_native_paragraph_counts import compare_authored_native_paragraphs, audit_usfx_book_prefaces
 from source_native_layout_anchors import source_usfx_layout_start_anchors, compare_start_anchors
 from stable_sword_refs import module_payload_digest
 from sword_native_raw_corpus_inventory import (
@@ -501,6 +501,7 @@ def run_real_usfx_sword_text_probe(
             "maintext_whitespace_patterns": whitespace_patterns.finish(),
             "native_raw_structural_markup_inventory": native_markup.finish(),
             "native_crossentry_milestone_pair_audit": native_pairs.finish(),
+            "source_prefatory_p_structure_classification": audit_usfx_book_prefaces(raw, mapping),
             "source_native_typed_paragraph_book_comparison":
                 compare_authored_native_paragraphs(
                     raw, mapping, native_pairs.native_x_p_pairs_by_book()),
