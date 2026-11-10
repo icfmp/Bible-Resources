@@ -276,6 +276,20 @@ source-relative paragraph and poetry proof:
   bounded source reference IDs. A neighboring native marker is **never**
   claimed to be the corresponding authored event without validating the
   exact type/word position/order and cross-verse semantics.
+- An original source structural start at a **chapter opening** has no
+  previous numbered verse within that chapter. The native SWORD inspector
+  therefore also privately parses actual **occupied book/chapter verse-zero
+  intro entries** exposed by the independent native reader. It records
+  only allowlisted intro div/line styles, bounded reference IDs, counts
+  and parse failures (never raw intro Scripture, headings, source titles
+  or unknown attribute values). It distinguishes native intro markers,
+  chapter openings without observed parseable intro markup, and genuinely
+  intra-chapter intervals missing both numbered neighbors.
+- An intro with malformed/unbalanced XML is **unverified**, not repaired
+  with a permissive parser. Intro co-occurrence is still not position-exact
+  source↔SWORD paragraph/poetry identity. Missing style information can
+  reflect open markers spanning multiple references; stage-5 structural
+  acceptance is not waived.
 - Source next-verse anchors are screened against the set of native verses
   containing `div` or `l`/`lg`/`lb`. A corresponding verse key is **not
   proof** of matching markup semantic meaning, source layout position or
