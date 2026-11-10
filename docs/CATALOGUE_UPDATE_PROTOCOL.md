@@ -19,8 +19,9 @@ The response is a static HTTPS JSON document, built from the approved resource m
 - **download.url** — HTTPS SWORD ZIP URL, currently the latest approved package for that SWORD ID.
 - **download.sha256** — SHA-256 of the **actual ZIP bytes** published at download.url (not the original provider's source ZIP nor the independently packaged GitHub release asset).
 - **download.size_bytes** — byte count of that exact published ZIP.
+- **profiles (optional)** — independently approved, localized resource descriptions keyed by locale (`fr`, `en`, etc.). Each profile has `revision` and `approved_at` separate from the module's `version`, `short_markdown`, `long_markdown`, `format=markdown`, source document Git-blob identity, `approval_url`, and `evidence_urls`. A module without an approved profile simply has no `profiles` key. Descriptive approval never follows automatically from the SWORD module's technical publication approval.
 
-A consumer only needs to read the one JSON document to learn the latest approved curated versions. The standard SWORD repository is available alongside it at https://icfmp.github.io/Bible-Resources/sword/ (mods.d, modules, mods.d.tar.gz and packages), generated from the same approved modules.
+A consumer only needs to read the one JSON document to learn the latest approved curated versions and, where present, both reader descriptions. Profile wording may be updated independently without changing the installed SWORD edition, binary SHA-256 or module version. Incompatible future catalogue changes will require a new schema version; the v1 extension is additive. The standard SWORD repository is available alongside it at https://icfmp.github.io/Bible-Resources/sword/ (mods.d, modules, mods.d.tar.gz and packages), generated from the same approved modules.
 
 ## Version and identity semantics
 
