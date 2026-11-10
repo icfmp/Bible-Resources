@@ -17,6 +17,7 @@ on:
       - tests/test_source_native_maintext_probe.py
       - scripts/source_native_notes_audit.py
       - tests/test_source_native_notes_audit.py
+      - docs/SOURCE_NATIVE_NOTES_AUDIT.md
       - scripts/native_absorbed_verse_groups.py
       - tests/test_native_absorbed_verse_groups.py
   workflow_dispatch:
