@@ -13,6 +13,8 @@ on:
       - scripts/sword_native_raw_corpus.cpp
       - scripts/sword_native_raw_corpus_inventory.py
       - tests/test_sword_native_raw_corpus_inventory.py
+      - scripts/source_native_maintext_probe.py
+      - tests/test_source_native_maintext_probe.py
   workflow_dispatch:
 permissions:
   contents: read
@@ -168,6 +170,42 @@ jobs:
                     row["diagnostic"],
                     "native", row["preceding_occupied_native_ref"])
           PY
+      - name: Compare complete original USFX numbered main text to actual stock zText characters
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The C++ native raw corpus emits Bible XML only to a private Python
+          # subprocess pipe. NEVER invoke it directly from a public CI shell.
+          python scripts/source_native_maintext_probe.py \
+            --source-usfx-zip "${RUNNER_TEMP}/original-engwebp-usfx.zip" \
+            --original-sword-zip "${RUNNER_TEMP}/original-engwebp-sword.zip" \
+            --native-index-inspector "${RUNNER_TEMP}/sword-native-index" \
+            --native-raw-inspector "${RUNNER_TEMP}/sword-native-raw-corpus" \
+            --crosswalk config/standard_usfm_osis_66.json \
+            --report "${RUNNER_TEMP}/second-bible-maintext-metadata-only.json"
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          report = json.loads((Path(os.environ["RUNNER_TEMP"]) /
+                               "second-bible-maintext-metadata-only.json").read_text())
+          scope = report["source_book_scope"]
+          comparison = report["mapped_numbered_text_comparison"]
+          classes = comparison["classifications"]
+          assert report["independent_native_whole_corpus_scan_completed"]
+          assert report["module_native_driver"] == "zText"
+          assert scope["unmapped_authored_book_count"] > 0
+          assert comparison["source_mapped_numbered_verse_count"] > 30000
+          assert classes["matching_indexed_keys_checked"] > 30000
+          assert classes["source_verses_without_native_indexed_entry"] >= 1
+          assert not report["publication_rights_and_human_editorial_approval"]
+          assert not report["note_callers_bodies_anchors_references_strong_and_layout_verified"]
+          assert not report["published"]
+          # This pinned original is known to have source-only Romans verse IDs:
+          # passing CI proves the diagnostic ran, NOT full edition parity.
+          assert comparison["status"] == "blocked_full_mapped_numbered_maintext_parity"
+          print("Whole-corpus source/native indexed main text classifications:", classes)
+          print("Additional source books remain unverified:", scope["unmapped_authored_book_count"])
+          PY
       - name: Upload metadata-only source/reader evidence (no Scripture content)
         uses: actions/upload-artifact@v4
         with:
@@ -175,4 +213,5 @@ jobs:
           path: |
             ${{ runner.temp }}/second-bible-metadata-only.json
             ${{ runner.temp }}/second-bible-native-raw-witness.json
+            ${{ runner.temp }}/second-bible-maintext-metadata-only.json
           retention-days: 30
