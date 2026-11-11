@@ -59,6 +59,47 @@ class SourceNoteLinkTriageTests(unittest.TestCase):
             report["bounded_note_host_findings"][1]["shape_hint"],
             "authorial_work_prefix_or_colon_requires_review")
 
+    def test_unsupported_separator_and_wrapper_are_only_research_hypotheses(self):
+        self.notes["Gen.1.1"] = [{"targets": (
+            "Gen.1.1; Exod.1.1", "(Gen.1.2)", "Gen.1.1,Exod.1.1"
+        )}]
+        report = self.check()
+        cases = [x["source_navigation_review_detail"]["analysis"]
+                 for x in report["bounded_note_host_findings"]]
+        self.assertEqual(cases, [
+            "punctuation_delimited_indexed_targets_candidate",
+            "bracket_wrapped_indexed_target_candidate",
+            "punctuation_delimited_indexed_targets_candidate",
+        ])
+        self.assertEqual(report["unresolved_original_target_attributes"], 3)
+        self.assertTrue(all(
+            x["source_navigation_review_detail"]["original_grammar_still_unsupported"]
+            for x in report["bounded_note_host_findings"]))
+        self.assertNotIn("Gen.1.1;", str(report))
+        self.assertNotIn("(Gen.1.2)", str(report))
+
+    def test_unindexed_verse_neighbor_diagnostic_does_not_invent_gap(self):
+        self.notes["Gen.1.1"] = [{"targets": ("Gen.1.3",)}]
+        report = self.check()
+        detail = report["bounded_note_host_findings"][0][
+            "source_navigation_review_detail"]
+        self.assertEqual(detail["analysis"], "simple_missing_publisher_verse_key")
+        self.assertTrue(detail["target_same_chapter_as_note"])
+        self.assertTrue(detail["preceding_verse_indexed"])
+        self.assertFalse(detail["following_verse_indexed"])
+        self.assertTrue(detail["chapter_exists_in_source"])
+        self.assertFalse(detail["missing_target_created"])
+        self.assertNotIn("Gen.1.3", str(report))
+
+    def test_original_nonascii_dash_is_review_only_not_a_rewrite(self):
+        self.notes["Gen.1.1"] = [{"targets": ("Gen.1.1–Gen.1.2",)}]
+        report = self.check()
+        detail = report["bounded_note_host_findings"][0][
+            "source_navigation_review_detail"]
+        self.assertEqual(detail["analysis"], "unicode_dash_reference_candidate")
+        self.assertTrue(detail["original_grammar_still_unsupported"])
+        self.assertNotIn("Gen.1.1–Gen.1.2", str(report))
+
     def test_source_only_reversed_range_does_not_claim_addressability(self):
         self.notes["Gen.1.1"]=[{"targets":("Exod.1.1-Gen.1.1",)}]
         report=self.check()

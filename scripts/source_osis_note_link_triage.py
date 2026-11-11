@@ -13,11 +13,12 @@ from collections import Counter
 from hashlib import sha256
 import json
 from pathlib import Path
+import re
 
 from publisher_osis_observation import read_pinned_publisher_osis
 from publisher_osis_usfx_parity import original_osis_verses_and_notes
 from source_native_osis_target_addressability import (
-    _classify_one, MAX_LINKS,
+    _classify_one, ENDPOINT, MAX_LINKS,
 )
 from stable_sword_refs import KEY
 
@@ -45,6 +46,98 @@ def _shape_hint(value: str, outcome: str) -> str:
     if "-" in value and any(x.isdigit() for x in value.split("-", 1)[1])             and "." not in value.split("-", 1)[1]:
         return "authorial_abbreviated_range_endpoint_requires_review"
     return "authorial_target_grammar_requires_review"
+
+
+def _navigation_review_detail(value: str, outcome: str,
+                              host: str, source_keys: set[str],
+                              rank: dict, chapters: dict, books: dict) -> dict:
+    """Return only bounded classifications, never the author's target text.
+
+    Interpret punctuation alternatives only as research hypotheses. OSIS
+    references are NOT corrected or resolved by this function.
+    """
+    if not isinstance(value, str) or len(value) > 1024:
+        return {"analysis": "unreviewed_nonstandard_value"}
+    if outcome == "target_with_unindexed_endpoint":
+        tokens = value.split()
+        if len(tokens) != 1:
+            return {"analysis": "multiple_components_need_editorial_review"}
+        match = ENDPOINT.fullmatch(tokens[0])
+        if not match or match.group(2) is None or match.group(3) is None:
+            return {"analysis": "unindexed_non_simple_reference"}
+        book, chapter, verse_text = match.groups()
+        verse = int(verse_text)
+        same_book = book == host.split(".")[0]
+        same_chapter = f"{book}.{chapter}" == host.rsplit(".", 1)[0]
+        before = f"{book}.{chapter}.{verse-1}" in source_keys if verse > 1 else False
+        after = f"{book}.{chapter}.{verse+1}" in source_keys
+        return {
+            "analysis": "simple_missing_publisher_verse_key",
+            "target_same_book_as_note": same_book,
+            "target_same_chapter_as_note": same_chapter,
+            "preceding_verse_indexed": before,
+            "following_verse_indexed": after,
+            "chapter_exists_in_source": f"{book}.{chapter}" in chapters,
+            "missing_target_created": False,
+        }
+
+    if outcome != "target_with_unsupported_grammar":
+        return {"analysis": "other_original_reference_limitation"}
+
+    # A source might encode multiple OSIS references using punctuation other
+    # than mandated whitespace. Only classify the shape: never normalize it
+    # for compilation, nor silently accept the proposed alternate grammar.
+    cleaned = value.strip()
+    has_separator = ";" in cleaned or "," in cleaned
+    if has_separator:
+        parts = [p for p in re.split(r"[;,\s]+", cleaned) if p]
+        if 1 < len(parts) <= 100 and all(
+            _classify_one(p, rank, chapters, books)[0] in INDEXABLE
+            for p in parts
+        ):
+            return {
+                "analysis": "punctuation_delimited_indexed_targets_candidate",
+                "candidate_component_count": len(parts),
+                "original_grammar_still_unsupported": True,
+            }
+    if cleaned and cleaned[0] in "([{":
+        matching = {"(": ")", "[": "]", "{": "}"}
+        if cleaned.endswith(matching[cleaned[0]]):
+            middle = cleaned[1:-1].strip()
+            if _classify_one(middle, rank, chapters, books)[0] in INDEXABLE:
+                return {
+                    "analysis": "bracket_wrapped_indexed_target_candidate",
+                    "original_grammar_still_unsupported": True,
+                }
+    if re.search(r"\.[1-9][0-9]*[a-zA-Z](?:\s|$)", cleaned):
+        return {
+            "analysis": "letter_suffixed_verse_reference_candidate",
+            "original_grammar_still_unsupported": True,
+        }
+    if any(c in cleaned for c in ("–", "—", "‑")):
+        return {
+            "analysis": "unicode_dash_reference_candidate",
+            "original_grammar_still_unsupported": True,
+        }
+    if "-" in cleaned:
+        return {
+            "analysis": "other_hyphenated_reference_requires_review",
+            "original_grammar_still_unsupported": True,
+        }
+    if any(c in cleaned for c in (",", ";")):
+        return {
+            "analysis": "punctuation_reference_requires_review",
+            "original_grammar_still_unsupported": True,
+        }
+    if any(not (c.isascii() and (c.isalnum() or c in ". \t\r\n")) for c in cleaned):
+        return {
+            "analysis": "nonstandard_character_reference_requires_review",
+            "original_grammar_still_unsupported": True,
+        }
+    return {
+        "analysis": "unknown_source_reference_grammar",
+        "original_grammar_still_unsupported": True,
+    }
 
 
 def triage_source_notes(notes: dict, source_keys: set[str],
@@ -116,6 +209,10 @@ def triage_source_notes(notes: dict, source_keys: set[str],
                         "shape_hint": _shape_hint(
                             raw_target if isinstance(raw_target, str) else "", outcome),
                         "literal_target_exposed": False,
+                        "source_navigation_review_detail":
+                            _navigation_review_detail(
+                                raw_target, outcome, host, source_keys,
+                                rank, chapters, books),
                     })
     unresolved = sum(value for k, value in counts.items()
                      if k.startswith("target_"))
