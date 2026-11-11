@@ -26,7 +26,10 @@ from publisher_osis_usfx_parity import (
 )
 from source_native_maintext_probe import native_raw_main_text
 from source_native_note_positions import native_note_anchor_positions
-from source_native_osis_structure_screen import authorial_structures, NativeStructuralCensus
+from source_native_osis_structure_screen import (
+    authorial_structures, NativeStructuralCensus, authorial_body_opening_sequences,
+)
+from source_native_ordered_body import compare_ordered_body_openings
 from source_osis_inventory import source_inventory
 from native_milestone_pair_audit import NativeMilestonePairAudit
 from sword_native_inventory import collect_native_inventory
@@ -218,7 +221,8 @@ def _native_notes(raw: bytes):
 
 def _candidate_result(index_binary: Path,raw_binary: Path,
                       candidate_dir: Path,module_id: str,system: str,
-                      source: dict,notes: dict,original_structures: dict):
+                      source: dict,notes: dict,original_structures: dict,
+                      authored_body: dict, authored_body_counts: dict):
     native_keys,_,inventory=collect_native_inventory(
         index_binary,candidate_dir,module_id)
     source_set=set(source)
@@ -312,6 +316,9 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
     if indexed_seen!=native_set:
         raise PublisherSWORDResearchError("Native index and raw corpus enumerations disagree")
     native_structure=milestones.finish()
+    ordered_body=compare_ordered_body_openings(
+        authored_body,milestones.private_ordered_body_openings(),
+        authored_body_counts)
 
     approved_candidate=False
     all_ok=(
@@ -326,7 +333,8 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
         not counts["note_explicit_target_sequence_different"] and
         not counts["note_nonspace_anchor_moved"] and
         not counts["numbered_verse_note_positions_unverified"] and
-        counts["note_pairs_compared"]==sum(map(len,notes.values()))
+        counts["note_pairs_compared"]==sum(map(len,notes.values())) and
+        ordered_body["same_order_and_kind_in_every_mapped_book"]
     )
     return {
         "candidate_status":("full_numbered_text_and_note_preflight_equal_not_approved"
@@ -338,6 +346,7 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
         "compiled_native_milestone_closure_metadata_only":native_structure,
         "authorial_osis_structural_census":original_structures,
         "native_compiled_structure_screen":native_layout.receipt(),
+        "original_to_compiled_body_opening_order":ordered_body,
         "compiled_native_driver":inventory["module_driver"],
         "source_to_compiled_counts":dict(sorted(counts.items())),
         "first_safe_reference_note_index_findings":[
@@ -423,6 +432,7 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
     source_keys,source_meta=source_inventory(original)
     verses,notes,source_check=original_osis_verses_and_notes(original)
     original_structures=authorial_structures(original)
+    authored_body,authored_body_counts=authorial_body_opening_sequences(original)
     if (set(verses)!=set(source_keys.splitlines())
             or source_check["publisher_numbered_verse_count"]!=
                source_meta["source_verse_count"]):
@@ -444,7 +454,7 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
                 compared=_candidate_result(
                     index_binary,raw_binary,work,
                     cfg["candidate_module_id"],system,verses,notes,
-                    original_structures)
+                    original_structures,authored_body,authored_body_counts)
                 compared["standard_osis_compiler"]=compilation
             except (PublisherSWORDResearchError,ValueError,OSError,
                     subprocess.TimeoutExpired) as exc:
