@@ -8,6 +8,7 @@ from lxml import etree
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from source_native_osis_structure_screen import (
     NativeStructuralCensus, OSISStructureScreenError, _markup_elements,
+    authorial_body_opening_sequences,
 )
 
 
@@ -43,6 +44,31 @@ class StructuralCensusTests(unittest.TestCase):
                          {"native_l_open_elements":1,"native_l_close_elements":1})
         with self.assertRaises(OSISStructureScreenError):
             census.observe(b'<div type="x-p"/>')
+
+    def test_authorial_osis_order_tracks_paragraph_and_poetry_not_notes(self):
+        source=(b'<osis xmlns="http://www.bibletechnologies.net/2003/OSIS/namespace">'
+                b'<osisText><div type="book" osisID="Gen"><chapter osisID="Gen.1">'
+                b'<p>alpha<note><l>PRIVATE</l></note></p>'
+                b'<verse osisID="Gen.1.1"/>'
+                b'<lg><l>beta</l></lg><p>gamma</p>'
+                b'</chapter></div></osisText></osis>')
+        original,counts=authorial_body_opening_sequences(source)
+        self.assertEqual(original,{"Gen":[("p","Gen"),("q","Gen.1.1"),
+                                           ("p","Gen.1.1")]})
+        self.assertEqual(counts["source_body_p_openings"],2)
+        self.assertEqual(counts["source_body_q_openings"],1)
+        self.assertNotIn("PRIVATE",str(counts))
+
+    def test_repeated_osis_book_and_invalid_key_fail(self):
+        prefix=b'<osis xmlns="http://www.bibletechnologies.net/2003/OSIS/namespace">'
+        duplicate=(prefix+b'<div type="book" osisID="Gen"/>'
+                   b'<div type="book" osisID="Gen"/></osis>')
+        with self.assertRaises(OSISStructureScreenError):
+            authorial_body_opening_sequences(duplicate)
+        unsafe=(prefix+b'<div type="book" osisID="unsafe secret"/>'
+                b'</osis>')
+        with self.assertRaises(OSISStructureScreenError):
+            authorial_body_opening_sequences(unsafe)
 
     def test_malformed_native_xml_fails_closed(self):
         with self.assertRaises(OSISStructureScreenError):

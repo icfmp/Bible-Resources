@@ -138,6 +138,17 @@ jobs:
               if(candidate.native_compiled_structure_screen) lines.push(
                 "Actual compiled native structural elements (census only):",
                 "```json",JSON.stringify(candidate.native_compiled_structure_screen,null,2),"```");
+              if(candidate.original_to_compiled_body_opening_order){
+                const o=candidate.original_to_compiled_body_opening_order;
+                lines.push("Original versus compiled paragraph/line opening order (NOT exact positioning):",
+                  "```json",JSON.stringify({
+                    same_order_and_kind_in_every_mapped_book:o.same_order_and_kind_in_every_mapped_book,
+                    source_native_body_opening_kind_counts:o.source_native_body_opening_kind_counts,
+                    first_mismatch_book_references_no_scripture:o.first_mismatch_book_references_no_scripture,
+                    source_native_exact_word_positions_or_boundary_spans_verified:
+                      o.source_native_exact_word_positions_or_boundary_spans_verified,
+                  },null,2),"```");
+              }
               if(candidate.source_to_compiled_counts){
                 lines.push("Checked counts (no Bible content):", "```json",
                   JSON.stringify(candidate.source_to_compiled_counts,null,2), "```");
