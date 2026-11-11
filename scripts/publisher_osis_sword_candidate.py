@@ -374,13 +374,18 @@ def safe_failure_code(exc: Exception) -> str:
     return "unclassified_private_failure"
 
 
+def select_candidate_versifications(cfg: dict, requested: str | None):
+    """Never invent or silently switch an unreviewed original source v11n."""
+    allowed=cfg["candidate_versifications"]
+    if requested is not None and requested not in allowed:
+        raise PublisherSWORDResearchError("Unreviewed requested candidate versification")
+    return list(allowed) if requested is None else [requested]
+
+
 def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
           raw_binary:Path, versification: str | None = None):
     cfg=config_for(resource_id)
-    if versification is not None and versification not in cfg["candidate_versifications"]:
-        raise PublisherSWORDResearchError("Unreviewed requested candidate versification")
-    selected=(cfg["candidate_versifications"] if versification is None
-              else [versification])
+    selected=select_candidate_versifications(cfg,versification)
     original=read_pinned_publisher_osis(resource_id)
     source_keys,source_meta=source_inventory(original)
     verses,notes,source_check=original_osis_verses_and_notes(original)
