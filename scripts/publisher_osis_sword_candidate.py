@@ -27,7 +27,7 @@ from publisher_osis_usfx_parity import (
 from source_native_maintext_probe import native_raw_main_text
 from source_native_note_positions import native_note_anchor_positions
 from source_osis_inventory import source_inventory
-from sword_native_inventory import collect_native_inventory
+from sword_native_inventory import collect_native_inventory, NativeIndexError
 from stable_sword_refs import KEY
 
 MODULE = re.compile(r"[A-Za-z][A-Za-z0-9_]{2,48}\Z")
@@ -377,6 +377,21 @@ def safe_failure_code(exc: Exception) -> str:
     return "unclassified_private_failure"
 
 
+def _safe_native_failure_details(exc):
+    """Only bounded validated numbers/references from trusted engine diagnostics."""
+    if not isinstance(exc, NativeIndexError):
+        return None
+    detail={}
+    msg=str(exc)
+    exit_match=re.search(r"^Stock-SWORD native inspector blocked \\(exit ([0-9]{1,3})\\)",msg)
+    if exit_match:
+        detail["native_inspector_exit_code"]=int(exit_match.group(1))
+    ref_match=re.search(r"Unrecognized native key: ([A-Za-z0-9.]+)",msg)
+    if ref_match and KEY.fullmatch(ref_match.group(1)):
+        detail["native_unrecognized_verse_reference"]=ref_match.group(1)
+    return detail or None
+
+
 def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
           raw_binary:Path):
     cfg=config_for(resource_id)
@@ -412,6 +427,7 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
                     "reason_category":type(exc).__name__,
                     "safe_failure_code":safe_failure_code(exc),
                     "safe_compiler_evidence":getattr(exc,"safe_compiler_evidence",None),
+                    "safe_native_failure_evidence":_safe_native_failure_details(exc),
                     "usable_for_publication":False,
                 }
             results.append(compared)
