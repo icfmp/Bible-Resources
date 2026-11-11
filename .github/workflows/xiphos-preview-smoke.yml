@@ -22,11 +22,12 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_reader_xiphos_headless_smoke.py' -v
   headless-preview:
     if: >-
-      github.event_name == 'issue_comment' &&
-      github.event.issue.pull_request == null &&
-      github.event.comment.author_association == 'OWNER' &&
-      startsWith(github.event.issue.title, '[Import]') &&
-      github.event.comment.body == '/bible-xiphos-smoke frajnd-2024'
+      ${{ github.event_name == 'pull_request' ||
+          (github.event_name == 'issue_comment' &&
+           github.event.issue.pull_request == null &&
+           github.event.comment.author_association == 'OWNER' &&
+           startsWith(github.event.issue.title, '[Import]') &&
+           github.event.comment.body == '/bible-xiphos-smoke frajnd-2024') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     permissions:
@@ -44,8 +45,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          sudo apt-get update -qq
-          sudo apt-get install -y xiphos xvfb dbus-x11 xdotool locales
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 \
+            install -y xiphos xvfb dbus-x11 xdotool locales imagemagick
           sudo sed -i 's/^# *fr_FR.UTF-8 UTF-8/fr_FR.UTF-8 UTF-8/' /etc/locale.gen
           sudo locale-gen fr_FR.UTF-8
           echo 'LANG=fr_FR.UTF-8' >> "$GITHUB_ENV"
@@ -80,6 +84,7 @@ jobs:
             --sha256 6f1ad63a4c0a51e052bc5aa29bed79704a0c014cf1e9bd74af66542839e48a7b \
             --seconds 12 \
             --screenshot "$RUNNER_TEMP/metadata/xiphos-window.png" \
+            --study-dir "$RUNNER_TEMP/metadata/study-samples" \
             --report "$RUNNER_TEMP/metadata/xiphos-headless.json"
       - name: Store bounded test-only window snapshot and numerical receipt
         uses: actions/upload-artifact@v4
@@ -88,9 +93,11 @@ jobs:
           path: |
             ${{ runner.temp }}/metadata/xiphos-headless.json
             ${{ runner.temp }}/metadata/xiphos-window.png
+            ${{ runner.temp }}/metadata/study-samples/*.png
           retention-days: 7
           if-no-files-found: error
       - name: Record result on original import issue
+        if: github.event_name == 'issue_comment'
         uses: actions/github-script@v7
         env:
           RECEIPT: ${{ runner.temp }}/metadata/xiphos-headless.json
