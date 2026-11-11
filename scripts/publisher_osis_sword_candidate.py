@@ -337,6 +337,36 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
     }
 
 
+def _safe_compiled_payload_presence(path: Path) -> dict:
+    """Metadata only: distinguish absent compiler output from unreadable SWORD keys.
+
+    Never serialize compiler-created filenames or bytes (both are untrusted).
+    Entries can be inspected privately only inside the already isolated root.
+    """
+    if path.is_symlink() or not path.is_dir():
+        raise PublisherSWORDResearchError("Candidate output directory is not trusted")
+    files=0
+    total=0
+    nonempty=0
+    for item in path.iterdir():
+        if item.is_symlink() or not item.is_file():
+            raise PublisherSWORDResearchError("Unexpected non-file candidate output")
+        files += 1
+        if files > 50:
+            raise PublisherSWORDResearchError("Too many candidate data files")
+        size=item.stat().st_size
+        if size > 256 * 1024 * 1024:
+            raise PublisherSWORDResearchError("Oversized candidate data file")
+        total += size
+        nonempty += size > 0
+    return {
+        "candidate_data_file_count":files,
+        "candidate_nonempty_data_file_count":nonempty,
+        "candidate_data_total_bytes":total,
+        "content_or_filenames_exposed":False,
+    }
+
+
 def safe_failure_code(exc: Exception) -> str:
     """Stable diagnostics only; never disclose exception strings from source/XML.
 
@@ -403,13 +433,17 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
             work.mkdir()
             payload,out=_create_candidate_layout(
                 work,cfg["candidate_module_id"],system)
+            compilation=None
+            compiled_presence=None
             try:
                 compilation=_compile_osis(
                     osis2mod,sourcefile,out,system,work/"osis2mod-private.log")
+                compiled_presence=_safe_compiled_payload_presence(out)
                 compared=_candidate_result(
                     index_binary,raw_binary,work,
                     cfg["candidate_module_id"],system,verses,notes)
                 compared["standard_osis_compiler"]=compilation
+                compared["compiled_payload_presence"]=compiled_presence
             except (PublisherSWORDResearchError,ValueError,OSError,
                     subprocess.TimeoutExpired) as exc:
                 compared={
@@ -417,6 +451,8 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
                     "candidate_versification":system,
                     "reason_category":type(exc).__name__,
                     "safe_failure_code":safe_failure_code(exc),
+                    "compiled_payload_presence":compiled_presence,
+                    "standard_osis_compiler":compilation,
                     "usable_for_publication":False,
                 }
             results.append(compared)
