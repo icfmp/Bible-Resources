@@ -93,7 +93,8 @@ def _visible_window(env):
     return False
 
 
-def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_seconds:int):
+def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_seconds:int,
+          screenshot:Path|None=None):
     if not isinstance(startup_seconds,int) or not 5<=startup_seconds<=25:
         raise XiphosSmokeError("Unbounded headless startup duration")
     with tempfile.TemporaryDirectory(prefix="isolated-xiphos-preview-") as temp:
@@ -125,6 +126,23 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                     raise XiphosSmokeError("Xiphos terminated before bounded startup gate")
                 time.sleep(0.5)
             window=_visible_window(env)
+            screenshot_sha=None
+            if screenshot is not None:
+                if (screenshot.is_symlink() or screenshot.exists()
+                        or not screenshot.parent.is_dir()
+                        or screenshot.suffix.lower()!=".png"):
+                    raise XiphosSmokeError("Refusing unsafe screenshot destination")
+                try:
+                    snap=subprocess.run(["import","-display",env["DISPLAY"],
+                                         "-window","root",str(screenshot)],
+                                        env=env,stdout=subprocess.DEVNULL,
+                                        stderr=subprocess.DEVNULL,timeout=15,
+                                        check=False)
+                except (OSError,subprocess.TimeoutExpired) as exc:
+                    raise XiphosSmokeError("X11 screenshot capture failed") from exc
+                if snap.returncode!=0 or screenshot.stat().st_size>6_000_000:
+                    raise XiphosSmokeError("Invalid bounded screenshot result")
+                screenshot_sha=sha256(screenshot.read_bytes()).hexdigest()
             return {
                 "status":"headless_xiphos_running_after_bounded_startup",
                 "reader":"xiphos",
@@ -132,6 +150,8 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                 "sha256_verified":True,
                 "isolated_standard_ztext_package":True,
                 "x11_window_detected_not_visually_inspected":window,
+                "test_only_screenshot_sha256":screenshot_sha,
+                "screenshot_external_review_required":screenshot is not None,
                 "actual_rendered_text_fidelity_verified":False,
                 "actual_note_click_navigation_verified":False,
                 "parallel_reading_verified":False,
@@ -153,12 +173,14 @@ def main():
     parser.add_argument("--versification",required=True)
     parser.add_argument("--seconds",type=int,default=12)
     parser.add_argument("--report",type=Path,required=True)
+    parser.add_argument("--screenshot",type=Path)
     args=parser.parse_args()
     if args.report.exists() or not args.report.parent.is_dir():
         parser.error("Refuse overwrite or missing report parent")
-    receipt=smoke(args.zip,args.module_id,args.sha256,args.versification,args.seconds)
+    receipt=smoke(args.zip,args.module_id,args.sha256,args.versification,args.seconds,
+                  screenshot=args.screenshot)
     args.report.write_text(json.dumps(receipt,sort_keys=True,indent=2)+"\n",encoding="utf-8")
-    print("Test-only headless Xiphos launch classified; no Scripture, GUI screenshot or release published")
+    print("Xiphos test-only capture classified; no screenshot pixels or Bible text logged")
 
 
 if __name__=="__main__":
