@@ -346,7 +346,7 @@ def safe_failure_code(exc: Exception) -> str:
     message = str(exc)
     # Numeric exit is diagnostic metadata from our native inspector, not
     # publisher text. Never echo the remainder of an exception message.
-    native_exit = re.match(r"Stock-SWORD native inspector blocked \\(exit ([0-9]{1,3})\\)", message)
+    native_exit = re.match(r"Stock-SWORD native inspector blocked \(exit ([0-9]{1,3})\)", message)
     if native_exit:
         value = int(native_exit.group(1))
         if 1 <= value <= 255:
