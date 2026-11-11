@@ -250,6 +250,26 @@ mapping exceptions to obtain a green report. Any later acceptance needs
 the exact report link and source-scoped explanation recorded on the import
 issue.
 
+## Material-loss gate before stock SWORD reuse
+
+The ordinary original-USFX vs real stock-SWORD whole-corpus stage-4 run now
+returns `stock_reuse_preflight`, an edition-independent decision from the
+existing private reader comparison. It highlights original note-count/body
+loss, missing literal caller labels, changed cross-reference note types or
+explicit machine target strings, and non-whitespace Scripture differences.
+
+A `BLOCKED` finding disqualifies **unchanged stock reuse** until investigated
+or replaced by an independently audited source-faithful module. A
+`REVIEW_REQUIRED` finding is *not* reuse approval: unknown note attribution,
+original whitespace, headings, poetry, verse-zero material, legal identity,
+reader navigation and owner signoff still have separate gates. Source text,
+note bodies and original target values never appear in the receipt.
+
+This first change reuses the already existing full private SWORD scan; it
+does **not yet** avoid that scan or implement hashed per-subcheck replay.
+Next work in #83 must add independently resumable inputs and a fast
+feature-presence pass, not new edition-specific whitespace probes.
+
 ## Stage-4 subchecks and provisional source/native structural anchors
 
 Step 4 is split **internally** into 4a (stock identity / complete reference
