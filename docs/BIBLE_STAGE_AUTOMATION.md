@@ -201,8 +201,10 @@ posting an owner-authored `/bible-audit <resource-id> <stage>` comment
 in the appropriate issue, but a later message is required for the
 assistant to return and interpret the completed action. The issue and
 run URLs preserve the exact checkpoint for the next conversation. A
-normal PR touching this automation triggers the existing pinned WEBP
-research proof, without approving its original edition. No heavy
+normal PR touching this automation uses the reviewed, pinned Darby 2024
+original USFX and stock SWORD research pair as a real regression fixture.
+The historically observed WEBP ZIP drift is retained separately; no upstream
+revision is silently repinned, and a green CI result cannot approve Darby. No heavy
 research step should be run in a long-lived chat.
 
 ## Full-corpus whitespace differences: diagnostic, not silent normalization
