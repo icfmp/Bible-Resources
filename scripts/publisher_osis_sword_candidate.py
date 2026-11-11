@@ -28,6 +28,7 @@ from source_native_maintext_probe import native_raw_main_text
 from source_native_note_positions import native_note_anchor_positions
 from source_osis_inventory import source_inventory
 from sword_native_inventory import collect_native_inventory
+from sword_native_inventory import NativeIndexError
 from stable_sword_refs import KEY
 
 MODULE = re.compile(r"[A-Za-z][A-Za-z0-9_]{2,48}\Z")
@@ -335,6 +336,36 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
     }
 
 
+def _safe_failure_reason(error: Exception) -> str:
+    """Allowlisted diagnostic class; never serialize exception content/Scripture."""
+    message = str(error)
+    if isinstance(error, NativeIndexError):
+        if message.startswith("Stock-SWORD native inspector blocked (exit "):
+            return "native_inspector_nonzero_exit"
+        if message == "Stock SWORD module contains no populated Bible verses":
+            return "native_no_populated_numbered_verses"
+        if message == "Missing or unsupported native module/engine header":
+            return "native_unrecognized_module_or_versification"
+        if message == "Native driver or v11n disagrees with pinned payload config":
+            return "native_versification_or_driver_disagrees_with_config"
+        if message == "Native populated key is not in installed registry":
+            return "native_verse_outside_versification_registry"
+        return "native_index_validation_failed"
+    if isinstance(error, PublisherSWORDResearchError):
+        if message.startswith("OSIS tool returned nonzero exit status "):
+            return "compiler_nonzero_exit"
+        if message == "Official OSIS compiler failed or timed out":
+            return "compiler_unavailable_or_timed_out"
+        if message == "OSIS tool emitted excessive diagnostics":
+            return "compiler_diagnostics_exceeded_limit"
+        return "candidate_reader_or_source_parse_failure"
+    if isinstance(error, subprocess.TimeoutExpired):
+        return "native_or_compiler_timeout"
+    if isinstance(error, OSError):
+        return "native_or_compiler_os_error"
+    return "candidate_validation_failed"
+
+
 def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
           raw_binary:Path):
     cfg=config_for(resource_id)
@@ -355,9 +386,11 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
             work.mkdir()
             payload,out=_create_candidate_layout(
                 work,cfg["candidate_module_id"],system)
+            phase="standard_osis2mod_compile"
             try:
                 compilation=_compile_osis(
                     osis2mod,sourcefile,out,system,work/"osis2mod-private.log")
+                phase="native_index_and_compiled_content_fidelity"
                 compared=_candidate_result(
                     index_binary,raw_binary,work,
                     cfg["candidate_module_id"],system,verses,notes)
@@ -367,7 +400,9 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
                 compared={
                     "candidate_status":"blocked_compilation_or_source_native_evidence",
                     "candidate_versification":system,
+                    "failed_phase":phase,
                     "reason_category":type(exc).__name__,
+                    "safe_failure_code":_safe_failure_reason(exc),
                     "usable_for_publication":False,
                 }
             results.append(compared)
