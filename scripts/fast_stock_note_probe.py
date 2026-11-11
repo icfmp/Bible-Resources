@@ -92,11 +92,8 @@ def probe_stock_note_callers(source_zip: Path, stock_zip: Path,
         notes, scope = collect_usfx_numbered_notes(
             raw, mapping, attributes_out=attrs)
         total = scope["mapped_source_numbered_note_count"]
-        if (scope["unmapped_source_book_count"]
-                or scope["notes_outside_numbered_verses"]):
-            # This limited screen may still report a definite loss in mapped
-            # numbered notes, but it cannot approve excluded notes.
-            pass
+        # This narrow sample never approves notes outside numbered verses,
+        # unindexed book introductions or unmapped source books.
         refs = _sample_references(attrs, max_samples)
     except (ValueError, OSError, UnicodeError, NoteEvidenceError):
         return _receipt("REVIEW_REQUIRED", "original_numbered_note_sampling_unverified")
@@ -135,12 +132,17 @@ def probe_stock_note_callers(source_zip: Path, stock_zip: Path,
                 probed += 1
                 source_notes = notes[ref]
                 source_attrs = attrs[ref]
+                # A different note count/body may arise from an edition
+                # mismatch, different source keys, or an OSIS serialization.
+                # Do not diagnose an original caller loss until the exact
+                # note bodies can be independently matched. Deep audit must
+                # resolve these cases, not auto-rebuild from a sample.
                 if len(compiled_notes) != len(source_notes):
-                    return _receipt("BLOCKED", "note_count_differs_on_exact_source_verse",
+                    return _receipt("REVIEW_REQUIRED", "sample_note_count_requires_full_audit",
                                     source_notes=total, probed=probed, ref=ref)
                 if any(_fold(old[1]) != _fold(new[1])
                        for old, new in zip(source_notes, compiled_notes)):
-                    return _receipt("BLOCKED", "note_body_differs_on_exact_source_verse",
+                    return _receipt("REVIEW_REQUIRED", "sample_note_body_requires_full_audit",
                                     source_notes=total, probed=probed, ref=ref)
                 for authored, native in zip(source_attrs, compiled_attributes):
                     caller = authored["caller"]
@@ -152,10 +154,12 @@ def probe_stock_note_callers(source_zip: Path, stock_zip: Path,
                     if caller != native["n"]:
                         return _receipt("BLOCKED", "literal_note_caller_changed",
                                         source_notes=total, probed=probed, ref=ref)
-                    source_crossref = authored["source_tag"] in {"x", "ex"}
-                    if source_crossref != (native["osis_type"] == "crossReference"):
-                        return _receipt("BLOCKED", "crossreference_note_kind_changed",
-                                        source_notes=total, probed=probed, ref=ref)
+                    source_tag = authored["source_tag"]
+                    if source_tag in {"x", "ex", "f", "fe", "ef"}:
+                        source_crossref = source_tag in {"x", "ex"}
+                        if source_crossref != (native["osis_type"] == "crossReference"):
+                            return _receipt("BLOCKED", "crossreference_note_kind_changed",
+                                            source_notes=total, probed=probed, ref=ref)
             return _receipt("REVIEW_REQUIRED", "sample_only_no_proven_stock_loss",
                             source_notes=total, probed=probed)
     except (ValueError, OSError, UnicodeError):
