@@ -254,7 +254,7 @@ class NativeMilestonePairAudit:
         return {
             "schema_version": 1,
             "status": ("compiled_milestones_have_unresolved_pairing_findings"
-                       if blockers or self._total["unaddressable_TOP_entries_unverified"]
+                       if blockers or self._total["unaddressable_TOP_milestone_events_unverified"]
                        else "compiled_milestone_pairs_verified_only"),
             "native_numbered_intro_scan_counts": dict(sorted(self._total.items())),
             "native_milestone_tag_counts": dict(sorted(self._per_tag.items())),
