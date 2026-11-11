@@ -187,12 +187,19 @@ def inspect_official_osis(xml):
     }
 
 
-def observe(resource_id, *, opener=None):
+def read_pinned_publisher_osis(resource_id, *, opener=None):
+    """Private bytes are returned only to another isolated source reviewer."""
     cfg = _source_config(resource_id)
     xml = _download(cfg["official_source_url"], opener=opener)
     if len(xml) != cfg["size_bytes"] or sha256(xml).hexdigest() != cfg["sha256"]:
         raise PublisherOSISObservationError(
             "Official publisher OSIS content no longer matches reviewed source pin")
+    return xml
+
+
+def observe(resource_id, *, opener=None):
+    cfg = _source_config(resource_id)
+    xml = read_pinned_publisher_osis(resource_id, opener=opener)
     report = inspect_official_osis(xml)
     report["source_sha256_pin_reverified"] = True
     report["resource_id"] = cfg["resource_id"]
