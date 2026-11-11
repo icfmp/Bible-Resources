@@ -370,10 +370,11 @@ def _sample_reader_passages(env, out: Path) -> list[dict]:
 
 
 def _capture_module_tree_probe(env: dict, study_dir: Path) -> dict:
-    """Show only the temporary Xiphos module tree for reader selection review.
+    """Probe a second Bible selection in the isolated Xiphos module tree.
 
-    A visible GTK tree item is not proof a translation was selected. Retain
-    two bounded screenshots for independent manual coordinates/semantics.
+    Four bounded screenshots expose the GTK tree, second-module opening and
+    a real passage-navigation attempt. Pixel content requires independent
+    review; an executed pointer command is never selection proof.
     """
     if (env.get("DISPLAY") != ":91" or not study_dir.is_dir()
             or study_dir.is_symlink()):
