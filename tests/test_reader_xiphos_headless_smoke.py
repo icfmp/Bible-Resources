@@ -60,7 +60,7 @@ class XiphosSmokeUnitTests(unittest.TestCase):
             def fake_run(args, **kwargs):
                 commands.append(args)
                 if args[:2] == ["xdotool", "search"]:
-                    return subprocess.CompletedProcess(args, 0, stdout=b"12345\\n")
+                    return subprocess.CompletedProcess(args, 0, stdout=b"12345")
                 if args[0] == "import":
                     Path(args[-1]).write_bytes(b"synthetic screenshot only")
                 return subprocess.CompletedProcess(args, 0)
