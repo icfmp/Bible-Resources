@@ -28,6 +28,7 @@ jobs:
     env:
       RESOURCE_ID: frajnd-2024
       CANDIDATE_V11N: ""
+      CANDIDATE_COMPILER_MODE: distro
       REPORT: /tmp/bible-source-rebuild-probe/candidate-report.json
     steps:
       - uses: actions/checkout@v4
@@ -54,13 +55,14 @@ jobs:
           python - <<'PY'
           import os, re
           match = re.fullmatch(
-              r"/bible-osis-candidate ([a-z0-9][a-z0-9-]{1,48})(?: ([A-Za-z][A-Za-z0-9]{1,31}))?",
+              r"/bible-osis-candidate ([a-z0-9][a-z0-9-]{1,48})(?: ([A-Za-z][A-Za-z0-9]{1,31}))?(?: (svn3918))?",
               os.environ["COMMAND"])
           if not match:
               raise SystemExit("Invalid research command")
           with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as out:
               out.write("RESOURCE_ID="+match.group(1)+"\n")
               out.write("CANDIDATE_V11N="+(match.group(2) or "")+"\n")
+              out.write("CANDIDATE_COMPILER_MODE="+(match.group(3) or "distro")+"\n")
           print("Authorized private compiler research:", match.group(1))
           PY
       - name: Install standard SWORD compiler and independent native inspectors
@@ -74,14 +76,39 @@ jobs:
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp -o /tmp/native-probe-binaries/native-index -lsword
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp -o /tmp/native-probe-binaries/native-raw -lsword
           command -v osis2mod
+      - name: Build exact upstream post-2025 SWORD osis2mod (experimental, isolated)
+        if: github.event_name == 'issue_comment' && contains(github.event.comment.body, ' svn3918')
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y subversion
+          mkdir -p /tmp/native-probe-binaries
+          # SVN revision is immutable: this does not fetch arbitrary trunk HEAD.
+          svn export --non-interactive --quiet -r 3918 \
+            https://crosswire.org/svn/sword/trunk/utilities/osis2mod.cpp \
+            /tmp/native-probe-binaries/osis2mod-svn3918.cpp
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            /tmp/native-probe-binaries/osis2mod-svn3918.cpp \
+            -o /tmp/native-probe-binaries/osis2mod-svn3918 -lsword
+          test -x /tmp/native-probe-binaries/osis2mod-svn3918
+          sha256sum /tmp/native-probe-binaries/osis2mod-svn3918.cpp
+          echo 'Pinned official SWORD r3918 osis2mod research executable built; no publisher source emitted.'
       - name: Compile selected ephemeral official-OSIS candidates and compare native entries
         if: github.event_name != 'pull_request'
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p /tmp/bible-source-rebuild-probe
+          compiler="$(command -v osis2mod)"
+          if [[ "$CANDIDATE_COMPILER_MODE" == "svn3918" ]]; then
+            compiler=/tmp/native-probe-binaries/osis2mod-svn3918
+            test -x "$compiler"
+          elif [[ "$CANDIDATE_COMPILER_MODE" != "distro" ]]; then
+            echo 'Unknown compiler mode' >&2
+            exit 1
+          fi
           args=(--resource-id "$RESOURCE_ID"
-                --osis2mod "$(command -v osis2mod)"
+                --osis2mod "$compiler"
                 --native-index /tmp/native-probe-binaries/native-index
                 --native-raw /tmp/native-probe-binaries/native-raw
                 --report "$REPORT")
@@ -108,6 +135,7 @@ jobs:
             const data=JSON.parse(fs.readFileSync(process.env.REPORT,'utf8'));
             const lines=[
               "### Official publisher OSIS → standard native SWORD research — NOT RELEASED",
+              `Compiler selection: \`${process.env.CANDIDATE_COMPILER_MODE || "distro"}\``,
               `Resource: \`${data.resource_id}\``,
               `Original SHA-256: \`${data.original_publisher_osis_sha256}\``,
               `Exact tool commit: \`${context.sha}\``,
