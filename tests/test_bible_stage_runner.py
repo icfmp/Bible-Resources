@@ -268,6 +268,26 @@ class BibleIntakeTests(unittest.TestCase):
         self.assertEqual(result["evidence"]["fast_stock_note_preflight"][
             "reason_code"],"literal_note_caller_missing")
 
+    def test_uncertain_fast_sample_never_skips_full_fidelity(self):
+        from bible_stage_runner import _run_fidelity
+        binary = self.folder/"native-binary"
+        binary.write_bytes(b"fixture")
+        with (patch("fast_stock_note_probe.probe_stock_note_callers",
+                    return_value={
+                        "status":"REVIEW_REQUIRED",
+                        "reason_code":"sample_only_no_proven_stock_loss",
+                        "fast_stock_reuse_disqualified":False,
+                    }) as sample,
+              patch("source_native_maintext_probe.run_real_usfx_sword_text_probe",
+                    side_effect=RuntimeError("full corpus reached")) as full):
+            with self.assertRaisesRegex(RuntimeError, "full corpus reached"):
+                _run_fidelity(self.cfg,{"source":self.folder/"source.zip",
+                                        "sword":self.folder/"stock.zip"},
+                              self.folder,index_binary=binary,raw_binary=binary,
+                              entry_binary=binary,schema=None)
+        sample.assert_called_once()
+        full.assert_called_once()
+
     def test_stage_five_keeps_fast_stock_loss_without_claiming_full_notes(self):
         from bible_stage_runner import _stage5_from_fidelity
         fast={
