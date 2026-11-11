@@ -93,6 +93,63 @@ def _visible_window(env):
     return False
 
 
+
+def _notice_click_from_geometry(geometry: dict[str, int]) -> tuple[int,int] | None:
+    """Locate the center-bottom button of a small transient notice window.
+
+    Avoid clicking the normal Bible-reading window or an unknown dialog.
+    Coordinates are computed for this fixed virtual-display harness only.
+    """
+    x,y,w,h=(geometry.get(k) for k in ("X","Y","WIDTH","HEIGHT"))
+    if not all(isinstance(v,int) for v in (x,y,w,h)):
+        return None
+    if x<0 or y<0 or w<220 or w>820 or h<80 or h>240:
+        return None
+    return x+w//2,y+h-18
+
+
+def _dismiss_transient_xiphos_notice(env):
+    """Best-effort modal dismissal. No click if small Xiphos window absent."""
+    try:
+        found=subprocess.run(["xdotool","search","--onlyvisible","--name",
+                              "^[Xx]iphos$"],env=env,stdout=subprocess.PIPE,
+                             stderr=subprocess.DEVNULL,timeout=4,check=False)
+    except (OSError,subprocess.TimeoutExpired):
+        return False
+    if found.returncode:
+        return False
+    for item in found.stdout.decode("ascii",errors="ignore").splitlines():
+        if not item.isdecimal():
+            continue
+        try:
+            dims=subprocess.run(["xdotool","getwindowgeometry","--shell",item],
+                                env=env,stdout=subprocess.PIPE,
+                                stderr=subprocess.DEVNULL,timeout=4,check=False)
+        except (OSError,subprocess.TimeoutExpired):
+            continue
+        if dims.returncode:
+            continue
+        values={}
+        for line in dims.stdout.decode("ascii",errors="ignore").splitlines():
+            if "=" not in line:
+                continue
+            key,value=line.split("=",1)
+            if key in {"X","Y","WIDTH","HEIGHT"} and value.isdecimal():
+                values[key]=int(value)
+        point=_notice_click_from_geometry(values)
+        if point is None:
+            continue
+        try:
+            clicked=subprocess.run(["xdotool","mousemove","--sync",
+                                    str(point[0]),str(point[1]),"click","1"],
+                                   env=env,stdout=subprocess.DEVNULL,
+                                   stderr=subprocess.DEVNULL,timeout=4,check=False)
+        except (OSError,subprocess.TimeoutExpired):
+            return False
+        return clicked.returncode==0
+    return False
+
+
 def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_seconds:int,
           screenshot:Path|None=None):
     if not isinstance(startup_seconds,int) or not 5<=startup_seconds<=25:
@@ -130,11 +187,7 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
             if screenshot is not None:
                 if not window:
                     raise XiphosSmokeError("Cannot review screenshot without visible Xiphos window")
-                # Dismiss possible first-run locale notice without editing application
-                # preferences or relying on window geometry.
-                subprocess.run(["xdotool","key","--clearmodifiers","Return"],
-                               env=env,stdout=subprocess.DEVNULL,
-                               stderr=subprocess.DEVNULL,timeout=4,check=False)
+                notice_dismissed=_dismiss_transient_xiphos_notice(env)
                 time.sleep(1.5)
                 if (screenshot.is_symlink() or screenshot.exists()
                         or not screenshot.parent.is_dir()
@@ -159,6 +212,8 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                 "isolated_standard_ztext_package":True,
                 "x11_window_detected_not_visually_inspected":window,
                 "test_only_screenshot_sha256":screenshot_sha,
+                "transient_small_notice_dismissal_attempt_succeeded":(
+                    notice_dismissed if screenshot is not None else False),
                 "screenshot_external_review_required":screenshot is not None,
                 "actual_rendered_text_fidelity_verified":False,
                 "actual_note_click_navigation_verified":False,
