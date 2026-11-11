@@ -76,23 +76,27 @@ jobs:
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp -o /tmp/native-probe-binaries/native-index -lsword
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp -o /tmp/native-probe-binaries/native-raw -lsword
           command -v osis2mod
-      - name: Build exact upstream post-2025 SWORD osis2mod (experimental, isolated)
+      - name: Build self-contained upstream r3918 SWORD + osis2mod (experimental)
         if: github.event_name == 'issue_comment' && contains(github.event.comment.body, ' svn3918')
         shell: bash
+        timeout-minutes: 12
         run: |
           set -euo pipefail
-          sudo apt-get install -y subversion
-          mkdir -p /tmp/native-probe-binaries
-          # SVN revision is immutable: this does not fetch arbitrary trunk HEAD.
+          sudo apt-get install -y subversion cmake ninja-build \
+            zlib1g-dev libbz2-dev liblzma-dev libicu-dev libcurl4-openssl-dev
+          # An exact immutable upstream source tree, not unpinned current trunk.
           svn export --non-interactive --quiet -r 3918 \
-            https://crosswire.org/svn/sword/trunk/utilities/osis2mod.cpp \
-            /tmp/native-probe-binaries/osis2mod-svn3918.cpp
-          g++ -std=c++17 -O2 -I/usr/include/sword \
-            /tmp/native-probe-binaries/osis2mod-svn3918.cpp \
-            -o /tmp/native-probe-binaries/osis2mod-svn3918 -lsword
-          test -x /tmp/native-probe-binaries/osis2mod-svn3918
-          sha256sum /tmp/native-probe-binaries/osis2mod-svn3918.cpp
-          echo 'Pinned official SWORD r3918 osis2mod research executable built; no publisher source emitted.'
+            https://crosswire.org/svn/sword/trunk /tmp/crosswire-sword-r3918
+          cmake -S /tmp/crosswire-sword-r3918 -B /tmp/crosswire-sword-r3918-build \
+            -G Ninja -DCMAKE_BUILD_TYPE=Release -DSWORD_BUILD_UTILS=YES \
+            -DSWORD_BUILD_TESTS=NO -DSWORD_BUILD_EXAMPLES=NO
+          cmake --build /tmp/crosswire-sword-r3918-build --target osis2mod --parallel 4
+          pinned="$(find /tmp/crosswire-sword-r3918-build -type f -name osis2mod -perm /111 -print -quit)"
+          test -n "$pinned"
+          test -x "$pinned"
+          echo "PINNED_COMPILER_PATH=$pinned" >> "$GITHUB_ENV"
+          sha256sum /tmp/crosswire-sword-r3918/utilities/osis2mod.cpp
+          echo 'Pinned official complete SWORD r3918 compiler built in isolation.'
       - name: Compile selected ephemeral official-OSIS candidates and compare native entries
         if: github.event_name != 'pull_request'
         shell: bash
@@ -101,7 +105,7 @@ jobs:
           mkdir -p /tmp/bible-source-rebuild-probe
           compiler="$(command -v osis2mod)"
           if [[ "$CANDIDATE_COMPILER_MODE" == "svn3918" ]]; then
-            compiler=/tmp/native-probe-binaries/osis2mod-svn3918
+            compiler="${PINNED_COMPILER_PATH:?Pinned compiler was not built}"
             test -x "$compiler"
           elif [[ "$CANDIDATE_COMPILER_MODE" != "distro" ]]; then
             echo 'Unknown compiler mode' >&2
