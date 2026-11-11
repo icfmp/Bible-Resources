@@ -27,6 +27,7 @@ from publisher_osis_usfx_parity import (
 from source_native_maintext_probe import native_raw_main_text
 from source_native_note_positions import native_note_anchor_positions
 from source_osis_inventory import source_inventory
+from native_milestone_pair_audit import NativeMilestonePairAudit
 from sword_native_inventory import collect_native_inventory
 from stable_sword_refs import KEY
 
@@ -236,8 +237,10 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
     counts["native_only_references"]=len(native_set-source_set)
 
     indexed_seen=set()
+    milestones=NativeMilestonePairAudit()
     for kind,ref,raw in _read_native_frames(raw_binary,module_id,
                                            candidate_dir/"payload"):
+        milestones.observe(kind,ref,raw)
         if kind!="K":
             counts["native_other_"+kind+"_entries"]+=1
             continue
@@ -305,6 +308,7 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
                 sample("note_explicit_target_sequence_different",ref,one_based_note=idx)
     if indexed_seen!=native_set:
         raise PublisherSWORDResearchError("Native index and raw corpus enumerations disagree")
+    native_structure=milestones.finish()
 
     approved_candidate=False
     all_ok=(
@@ -328,6 +332,7 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
         "candidate_module_id":module_id,
         "compiled_payload_sha256":inventory["module_payload_sha256"],
         "compiled_engine_version":inventory["reader_version"],
+        "compiled_native_milestone_closure_metadata_only":native_structure,
         "compiled_native_driver":inventory["module_driver"],
         "source_to_compiled_counts":dict(sorted(counts.items())),
         "first_safe_reference_note_index_findings":[
