@@ -78,7 +78,8 @@ permissions:
 
 concurrency:
   group: bible-audit-${{ github.event_name }}-${{ github.ref }}-${{ inputs.resource_id || 'webp-research' }}-${{ inputs.stage || 'research' }}
-  cancel-in-progress: false
+  # Issue-comment and manual research runs must never lose their checkpoints.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   single-stage:
