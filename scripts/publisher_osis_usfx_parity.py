@@ -67,6 +67,29 @@ def _fold(value: str) -> str:
     return " ".join(unicodedata.normalize("NFC",value).split())
 
 
+def _note_body_difference_shape(original: str, publisher: str) -> str:
+    """Describe where folded note strings differ; never declare editorial parity.
+
+    An extra prefix/suffix can be metadata, punctuation, or Scripture prose;
+    only independent original-element evidence can establish that. This
+    function emits categories only and never rewrites or approves either text.
+    """
+    a, b = _fold(original), _fold(publisher)
+    if a == b:
+        return "exact_after_unicode_and_whitespace_folding"
+    if not a or not b:
+        return "one_side_empty"
+    if a.endswith(b) or b.endswith(a):
+        return "prefix_only_candidate_unverified"
+    if a.startswith(b) or b.startswith(a):
+        return "suffix_only_candidate_unverified"
+    if a in b or b in a:
+        return "internal_containment_candidate_unverified"
+    if a.casefold() == b.casefold():
+        return "case_only_candidate_unverified"
+    return "different_or_unclassified"
+
+
 def _caller_class(value: str | None):
     if not value:
         return "missing"
@@ -272,11 +295,14 @@ def compare_original_sources(
         for idx,((oldtag,oldbody),oldatt,oldpoint,newnote) in enumerate(zip(
                 src,oldattrs,oldpoints,official),start=1):
             counts["source_note_pairs_checked"]+=1
-            if _fold(oldbody)==_fold(newnote["body"]):
+            note_shape = _note_body_difference_shape(oldbody,newnote["body"])
+            counts["note_body_shape_" + note_shape] += 1
+            if note_shape == "exact_after_unicode_and_whitespace_folding":
                 counts["note_body_words_punctuation_equal_after_space_folding"]+=1
             else:
                 counts["note_body_folded_different"]+=1
-                note_sample("note_body_folded_difference",ref,one_based_note=idx)
+                note_sample("note_body_folded_difference",ref,one_based_note=idx,
+                            difference_shape=note_shape)
             if oldatt["caller"] == newnote["caller"]:
                 counts["source_note_caller_labels_equal"]+=1
             else:
@@ -334,6 +360,7 @@ def compare_original_sources(
         "safe_for_automatic_source_switch_or_rebuild":False,
         "source_osis_and_usfx_bytes_never_uploaded":True,
         "publisher_original_note_caller_values_not_exposed":True,
+        "note_body_difference_shapes_are_diagnostic_not_equivalence":True,
         "not_publication_approval":True,
     }
     return results
