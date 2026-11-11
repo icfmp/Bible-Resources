@@ -118,6 +118,17 @@ jobs:
               if(candidate.standard_osis_compiler) lines.push(
                 "Compiler diagnostics (allowlisted counts only):", "\`\`\`json",
                 JSON.stringify(candidate.standard_osis_compiler,null,2), "\`\`\`");
+              if(candidate.compiled_native_milestone_closure_metadata_only){
+                const m=candidate.compiled_native_milestone_closure_metadata_only;
+                lines.push("Actual compiled structural milestone integrity (NOT source-layout parity):",
+                  "```json",JSON.stringify({
+                    status:m.status,
+                    paired_div_types_allowlisted:m.paired_div_types_allowlisted,
+                    native_milestone_tag_counts:m.native_milestone_tag_counts,
+                    native_milestone_pairing_findings:m.native_milestone_pairing_findings,
+                    remaining_unclosed_milestones_by_tag:m.remaining_unclosed_milestones_by_tag,
+                  },null,2),"```");
+              }
               if(candidate.source_to_compiled_counts){
                 lines.push("Checked counts (no Bible content):", "```json",
                   JSON.stringify(candidate.source_to_compiled_counts,null,2), "```");
