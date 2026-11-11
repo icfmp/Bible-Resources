@@ -252,6 +252,34 @@ mapping exceptions to obtain a green report. Any later acceptance needs
 the exact report link and source-scoped explanation recorded on the import
 issue.
 
+## Fast stock note preflight — reject before expensive whitespace work
+
+For authorial USFX plus a SHA-pinned stock `RawText`/`zText` module, the
+stage-4/5 runner now performs a **bounded original-to-actual-native note
+check first**. It inventories authored note-bearing verse references in
+private memory, selects at most 12 references with explicit literal note
+callers (preferring distinct books), and uses the existing standalone exact
+SWORD key inspector to obtain real original native OSIS fragments. It
+compares the matched note counts and whitespace-folded note bodies before
+checking source caller labels versus the native `note n` attribute. A
+proven missing/altered original caller (or other actual note mismatch)
+returns **BLOCKED for unmodified stock reuse** immediately; it does
+**not** run the heavyweight word/paragraph/poetry/whitespace proof on
+a candidate already demonstrated deficient.
+
+If the sample is inconclusive, has no literal original caller, or cannot be
+read independently, the result is **REVIEW_REQUIRED**, and the existing
+full-corpus audit still runs. A successful sample never means all notes
+or verses match. The output contains only allowlisted diagnostic categories,
+a validated source-reference ID and counts, not note text or original
+caller/target values. Exact original SHA pins, verified module identity,
+full text/index gates on the chosen replacement, editorial/rights approvals
+and actual reader acceptance remain mandatory.
+
+This is an *early rejection optimization*, not a full-corpus replacement or
+a new Bible-specific exception. OSIS or USFM source preflight extensions
+must be separately reviewed rather than silently treated as USFX.
+
 ## Material-loss gate before stock SWORD reuse
 
 The ordinary original-USFX vs real stock-SWORD whole-corpus stage-4 run now
