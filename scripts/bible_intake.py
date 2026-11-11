@@ -161,14 +161,16 @@ def acquire(manifest: dict, root: Path, *, source: bool, sword: bool, opener=Non
     return receipts, archives
 
 
-def parse_audit_comment(body: str) -> tuple[str, int]:
-    """Strict owner-only issue-comment command parser; never execute shell text."""
+def parse_audit_comment(body: str) -> tuple[str, int | str]:
+    """Strict owner-only one-stage or 4+5 bundle command; no shell text."""
     if not isinstance(body, str) or len(body) > 150 or "\n" in body or "\r" in body:
         raise IntakeError("Expected one bounded /bible-audit command")
-    match = re.fullmatch(r"/bible-audit ([a-z][a-z0-9-]{1,63}) ([1-7])", body.strip())
+    match = re.fullmatch(
+        r"/bible-audit ([a-z][a-z0-9-]{1,63}) ([1-7]|4-5)", body.strip())
     if not match:
-        raise IntakeError("Expected /bible-audit <resource-id> <stage 1-7>")
-    return match.group(1), int(match.group(2))
+        raise IntakeError("Expected /bible-audit <resource-id> <stage 1-7 or 4-5>")
+    stage = match.group(2)
+    return match.group(1), stage if stage == "4-5" else int(stage)
 
 
 def parse_observe_comment(body: str) -> str:
