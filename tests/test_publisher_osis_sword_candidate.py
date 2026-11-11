@@ -4,6 +4,8 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
+import subprocess
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from publisher_osis_sword_candidate import (
@@ -80,9 +82,38 @@ class PublisherSwordProbeTests(unittest.TestCase):
         self.assertEqual(safe_failure_code(PublisherSWORDResearchError(
             "Stock SWORD module contains no populated Bible verses")),
             "native_zero_populated_verses")
+        self.assertEqual(safe_failure_code(PublisherSWORDResearchError(
+            "Official OSIS compiler exceeded execution limit")),
+            "compiler_timeout")
+        self.assertEqual(safe_failure_code(PublisherSWORDResearchError(
+            "Official OSIS compiler could not launch")),
+            "compiler_launch_failure")
         self.assertEqual(safe_failure_code(ValueError(
             "PRIVATE PUBLISHER VERSE <unknown>")),
             "unclassified_private_failure")
+
+    def test_compiler_timeout_and_spawn_failure_are_distinct_and_private(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            tool=root/"compiler"
+            tool.write_text("#!/bin/sh\\nexit 0\\n")
+            authored=root/"source.osis.xml"
+            authored.write_text("<osis>PRIVATE SCRIPTURE</osis>")
+            out=root/"module"
+            out.mkdir()
+            with patch("publisher_osis_sword_candidate.subprocess.run",
+                       side_effect=subprocess.TimeoutExpired(
+                           ["PRIVATE SCRIPTURE"],210)):
+                with self.assertRaisesRegex(PublisherSWORDResearchError,
+                                            "exceeded execution limit") as caught:
+                    _compile_osis(tool,authored,out,"DarbyFr",root/"timeout-private.log")
+                self.assertNotIn("PRIVATE",str(caught.exception))
+            with patch("publisher_osis_sword_candidate.subprocess.run",
+                       side_effect=OSError("PRIVATE SRC PATH")):
+                with self.assertRaisesRegex(PublisherSWORDResearchError,
+                                            "could not launch") as caught:
+                    _compile_osis(tool,authored,out,"Luther",root/"launch-private.log")
+                self.assertNotIn("PRIVATE",str(caught.exception))
 
     def test_compiler_log_never_copies_scripture(self):
         with tempfile.TemporaryDirectory() as folder:
