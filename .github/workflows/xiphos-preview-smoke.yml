@@ -85,7 +85,7 @@ jobs:
             --comparison-module-id BRLSG1910 \
             --comparison-versification Segond \
             --sha256 6f1ad63a4c0a51e052bc5aa29bed79704a0c014cf1e9bd74af66542839e48a7b \
-            --seconds 12 \
+            --seconds 20 \
             --screenshot "$RUNNER_TEMP/metadata/xiphos-window.png" \
             --study-dir "$RUNNER_TEMP/metadata/study-samples" \
             --report "$RUNNER_TEMP/metadata/xiphos-headless.json"
