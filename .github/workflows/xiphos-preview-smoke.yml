@@ -1,0 +1,106 @@
+name: Test pinned SWORD preview in headless Xiphos (not visual signoff)
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/xiphos-preview-smoke.yml"
+      - "scripts/reader_xiphos_headless_smoke.py"
+      - "tests/test_reader_xiphos_headless_smoke.py"
+  issue_comment:
+    types: [created]
+permissions:
+  contents: read
+jobs:
+  synthetic-tests:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Test isolated Xiphos ZIP safety
+        run: python -m unittest discover -s tests -p 'test_reader_xiphos_headless_smoke.py' -v
+  headless-preview:
+    if: >-
+      github.event_name == 'issue_comment' &&
+      github.event.issue.pull_request == null &&
+      github.event.comment.author_association == 'OWNER' &&
+      startsWith(github.event.issue.title, '[Import]') &&
+      github.event.comment.body == '/bible-xiphos-smoke frajnd-2024'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    permissions:
+      contents: read
+      actions: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run synthetic safety tests
+        run: python -m unittest discover -s tests -p 'test_reader_xiphos_headless_smoke.py' -v
+      - name: Install distro Xiphos and virtual X11 dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y xiphos xvfb dbus-x11 xdotool
+          command -v xiphos
+          command -v Xvfb
+      - name: Retrieve exact previously audited TEST-ONLY module
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/preview-in" "$RUNNER_TEMP/metadata"
+          gh run download 43006720611 --repo "$GITHUB_REPOSITORY" \
+            --name JND2024Research-Luther-TEST-ONLY-43006720611 \
+            --dir "$RUNNER_TEMP/preview-in"
+          count="$(find "$RUNNER_TEMP/preview-in" -type f -name JND2024Research-Luther-TEST-ONLY.zip | wc -l)"
+          test "$count" = 1
+          candidate="$(find "$RUNNER_TEMP/preview-in" -type f -name JND2024Research-Luther-TEST-ONLY.zip -print -quit)"
+          printf '%s  %s\n' \
+            6f1ad63a4c0a51e052bc5aa29bed79704a0c014cf1e9bd74af66542839e48a7b \
+            "$candidate" | sha256sum --check
+          echo "PREVIEW_ZIP=$candidate" >> "$GITHUB_ENV"
+      - name: Launch real Xiphos in isolated X11 environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/reader_xiphos_headless_smoke.py \
+            --zip "$PREVIEW_ZIP" \
+            --module-id JND2024Research \
+            --versification Luther \
+            --sha256 6f1ad63a4c0a51e052bc5aa29bed79704a0c014cf1e9bd74af66542839e48a7b \
+            --seconds 12 \
+            --report "$RUNNER_TEMP/metadata/xiphos-headless.json"
+      - name: Store only numerical Xiphos startup receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: xiphos-headless-smoke-${{ github.run_id }}
+          path: ${{ runner.temp }}/metadata/xiphos-headless.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Record result on original import issue
+        uses: actions/github-script@v7
+        env:
+          RECEIPT: ${{ runner.temp }}/metadata/xiphos-headless.json
+        with:
+          script: |
+            const fs=require('fs');
+            const receipt=JSON.parse(fs.readFileSync(process.env.RECEIPT,'utf8'));
+            const body=[
+              "### Stage-6 real Xiphos isolated headless startup — NOT visual approval",
+              "Exact pinned preview: https://github.com/icfmp/Bible-Resources/actions/runs/43006720611",
+              "This run: https://github.com/"+context.repo.owner+"/"+context.repo.repo+"/actions/runs/"+context.runId,
+              "TEST-ONLY module SHA-256 verified; no publication or screenshots.",
+              "",
+              "```json",JSON.stringify(receipt,null,2),"```",
+              "",
+              "No note-click navigation, verse typography or parallel GUI comparison is certified by X11 startup."
+            ].join("\n");
+            await github.rest.issues.createComment({
+              ...context.repo,issue_number:context.issue.number,body
+            });
