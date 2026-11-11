@@ -78,6 +78,10 @@ class XiphosSmokeUnitTests(unittest.TestCase):
             self.assertEqual(len(list(folder.glob("*.png"))),len(READER_SAMPLES))
             self.assertIn(
                 ["xdotool","windowfocus","--sync","12345"],commands)
+            self.assertIn(
+                ["xdotool","windowsize","12345","1216","736"],commands)
+            self.assertIn(
+                ["xdotool","windowmove","12345","16","16"],commands)
             self.assertFalse(any("windowactivate" in command
                                  for command in commands))
             self.assertEqual(sum(command[:2] == ["xdotool","key"]
