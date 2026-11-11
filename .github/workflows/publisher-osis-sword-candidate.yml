@@ -7,6 +7,8 @@ on:
     paths:
       - ".github/workflows/publisher-osis-sword-candidate.yml"
       - "scripts/publisher_osis_sword_candidate.py"
+      - "scripts/source_native_osis_structure_screen.py"
+      - "tests/test_source_native_osis_structure_screen.py"
       - "tests/test_publisher_osis_sword_candidate.py"
       - "config/publisher-sword-research/**"
 
@@ -39,6 +41,7 @@ jobs:
           set -euo pipefail
           python -m unittest discover -s tests -p 'test_publisher_osis_sword_candidate.py' -v
           python -m unittest discover -s tests -p 'test_publisher_osis_usfx_parity.py' -v
+          python -m unittest discover -s tests -p 'test_source_native_osis_structure_screen.py' -v
       - name: Parse authenticated owner request
         if: github.event_name == 'issue_comment'
         shell: bash
@@ -129,6 +132,12 @@ jobs:
                     remaining_unclosed_milestones_by_tag:m.remaining_unclosed_milestones_by_tag,
                   },null,2),"```");
               }
+              if(candidate.authorial_osis_structural_census) lines.push(
+                "Official OSIS authorial structural elements (census only):",
+                "```json",JSON.stringify(candidate.authorial_osis_structural_census,null,2),"```");
+              if(candidate.native_compiled_structure_screen) lines.push(
+                "Actual compiled native structural elements (census only):",
+                "```json",JSON.stringify(candidate.native_compiled_structure_screen,null,2),"```");
               if(candidate.source_to_compiled_counts){
                 lines.push("Checked counts (no Bible content):", "```json",
                   JSON.stringify(candidate.source_to_compiled_counts,null,2), "```");
