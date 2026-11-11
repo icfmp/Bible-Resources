@@ -60,9 +60,10 @@ def preflight_stock_reuse(*, native_scan_complete: bool, main_text_preserved: bo
             losses[name] = n
     source_total = notes.get("source_numbered_note_count")
     native_total = notes.get("native_parseable_numbered_note_count")
-    if (type(source_total) is int and type(native_total) is int
-            and 0 <= source_total <= MAX_COUNT
-            and 0 <= native_total <= MAX_COUNT):
+    for count in (source_total, native_total):
+        if type(count) is int and not 0 <= count <= MAX_COUNT:
+            raise ValueError("Invalid source/native numbered note total")
+    if type(source_total) is int and type(native_total) is int:
         if source_total != native_total:
             losses["source_native_note_total_difference"] = abs(source_total-native_total)
         if source_total and (_count(attrs,"native_note_n_present") +
