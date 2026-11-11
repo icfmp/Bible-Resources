@@ -150,8 +150,60 @@ def _dismiss_transient_xiphos_notice(env):
     return False
 
 
+# Representative universal navigation examples; no authored verse data edits.
+READER_SAMPLES = (
+    ("genesis-prose", "Gen 1:1"),
+    ("psalm-poetry", "Ps 23:1"),
+    ("matthew-heading", "Matt 5:1"),
+    ("romans-annotation", "Rom 8:28"),
+)
+
+
+def _sample_reader_passages(env, out: Path) -> list[dict]:
+    """Xiphos Ctrl+L navigation with actual screenshots, not content approval."""
+    if out.exists() or out.is_symlink() or not out.parent.is_dir():
+        raise XiphosSmokeError("Unsafe sample screenshot output directory")
+    # No coordinates are needed to navigate: Ctrl+L is an official Xiphos
+    # keyboard shortcut. Note clicks are NOT attempted or certified here.
+    out.mkdir(mode=0o700)
+    snapshots = []
+    for slug, ref in READER_SAMPLES:
+        for command in (
+            ["xdotool", "key", "--clearmodifiers", "ctrl+l"],
+            ["xdotool", "type", "--clearmodifiers", "--delay", "35", ref],
+            ["xdotool", "key", "Return"],
+        ):
+            try:
+                completed = subprocess.run(
+                    command, env=env, stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL, timeout=10, check=False)
+            except (OSError, subprocess.TimeoutExpired) as exc:
+                raise XiphosSmokeError("Bounded X11 reader navigation unavailable") from exc
+            if completed.returncode:
+                raise XiphosSmokeError("X11 reader keyboard navigation failed")
+        time.sleep(2)
+        target = out / (slug + ".png")
+        try:
+            capture = subprocess.run(
+                ["import", "-display", env["DISPLAY"], "-window", "root",
+                 str(target)], env=env, stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL, timeout=15, check=False)
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            raise XiphosSmokeError("Bounded reader navigation screenshot failed") from exc
+        if (capture.returncode or not target.is_file()
+                or target.is_symlink() or target.stat().st_size > 6_000_000):
+            raise XiphosSmokeError("Unsafe or failed virtual reader screenshot")
+        snapshots.append({
+            "sample": slug,
+            "requested_reference": ref,
+            "screenshot_sha256": sha256(target.read_bytes()).hexdigest(),
+            "gui_navigation_outcome_requires_visual_inspection": True,
+        })
+    return snapshots
+
+
 def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_seconds:int,
-          screenshot:Path|None=None):
+          screenshot:Path|None=None, study_dir:Path|None=None):
     if not isinstance(startup_seconds,int) or not 5<=startup_seconds<=25:
         raise XiphosSmokeError("Unbounded headless startup duration")
     with tempfile.TemporaryDirectory(prefix="isolated-xiphos-preview-") as temp:
@@ -219,6 +271,7 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                 if snap.returncode!=0 or screenshot.stat().st_size>6_000_000:
                     raise XiphosSmokeError("Invalid bounded screenshot result")
                 screenshot_sha=sha256(screenshot.read_bytes()).hexdigest()
+            samples = _sample_reader_passages(env, study_dir) if study_dir else []
             return {
                 "status":"headless_xiphos_running_after_bounded_startup",
                 "reader":"xiphos",
@@ -227,6 +280,8 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                 "isolated_standard_ztext_package":True,
                 "x11_window_detected_not_visually_inspected":window,
                 "test_only_screenshot_sha256":screenshot_sha,
+                "real_reader_passage_samples":samples,
+                "keyboard_navigation_attempted": bool(samples),
                 "isolated_virtual_display_notice_click_fallback_attempted":(
                     fixed_viewport_fallback_attempted if screenshot is not None else False),
                 "transient_small_notice_dismissal_attempt_succeeded":(
@@ -254,11 +309,12 @@ def main():
     parser.add_argument("--seconds",type=int,default=12)
     parser.add_argument("--report",type=Path,required=True)
     parser.add_argument("--screenshot",type=Path)
+    parser.add_argument("--study-dir",type=Path)
     args=parser.parse_args()
     if args.report.exists() or not args.report.parent.is_dir():
         parser.error("Refuse overwrite or missing report parent")
     receipt=smoke(args.zip,args.module_id,args.sha256,args.versification,args.seconds,
-                  screenshot=args.screenshot)
+                  screenshot=args.screenshot, study_dir=args.study_dir)
     args.report.write_text(json.dumps(receipt,sort_keys=True,indent=2)+"\n",encoding="utf-8")
     print("Xiphos test-only capture classified; no screenshot pixels or Bible text logged")
 
