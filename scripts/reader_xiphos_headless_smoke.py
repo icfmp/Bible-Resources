@@ -429,6 +429,138 @@ def _capture_module_tree_probe(env: dict, study_dir: Path) -> dict:
     }
 
 
+def _capture_source_note_link_host(env: dict, study_dir: Path) -> dict:
+    """Capture a real reader specimen carrying one original reference in a note.
+
+    Xiphos uses a previewer for links embedded in notes. The screenshot is a
+    pre-interaction coordinate witness: it is NOT evidence that a reference
+    was clicked or navigated. Restore the previous study passage afterward.
+    """
+    if (env.get("DISPLAY") != ":91" or not study_dir.is_dir()
+            or study_dir.is_symlink()):
+        raise XiphosSmokeError("Unsafe source-note reference specimen")
+    target = study_dir / "source-note-link-host.png"
+    if target.exists() or target.is_symlink():
+        raise XiphosSmokeError("Refusing prior note-reference specimen")
+
+    def navigation(ref: str):
+        for command in (
+            ["xdotool", "key", "--clearmodifiers", "ctrl+l"],
+            ["xdotool", "type", "--clearmodifiers", "--delay", "35", ref],
+            ["xdotool", "key", "Return"],
+        ):
+            try:
+                outcome = subprocess.run(
+                    command, env=env, stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL, timeout=10, check=False)
+            except (OSError, subprocess.TimeoutExpired) as exc:
+                raise XiphosSmokeError("Bounded source-note navigation unavailable") from exc
+            if outcome.returncode:
+                raise XiphosSmokeError("Xiphos source-note navigation command failed")
+
+    # The source-audited note at Gen.2.4 carries a genuine OSIS
+    # <reference osisRef="Exod.6">; this case is an isolated GUI specimen,
+    # never a rewrite of either source or compiled SWORD data.
+    navigation("Gen 2:4")
+    time.sleep(2)
+    try:
+        shot = subprocess.run(
+            ["import", "-display", env["DISPLAY"], "-window", "root", str(target)],
+            env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            timeout=15, check=False)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise XiphosSmokeError("Note-reference host screenshot unavailable") from exc
+    if (shot.returncode or not target.is_file()
+            or not 0 < target.stat().st_size <= 6_000_000):
+        raise XiphosSmokeError("Unsafe note-reference host screenshot")
+
+    # Exact fixed Xvfb 1280x800, 1216x736 reading-window specimen from
+    # reviewed real screenshot #43091828367. Xiphos manual prescribes a
+    # middle-click on a note marker to anchor its preview for link access.
+    # Never run these pointer coordinates on an actual user desktop.
+    snapshots = {}
+    for label, commands in (
+        ("hover", (
+            ["xdotool", "mousemove", "--sync", "568", "295"],
+        )),
+        ("pinned", (
+            ["xdotool", "click", "2"],
+            ["xdotool", "mousemove", "--sync", "120", "550"],
+        )),
+    ):
+        for command in commands:
+            try:
+                acted = subprocess.run(
+                    command, env=env, stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL, timeout=5, check=False)
+            except (OSError, subprocess.TimeoutExpired) as exc:
+                raise XiphosSmokeError("Bounded original-note pointer action unavailable") from exc
+            if acted.returncode:
+                raise XiphosSmokeError("Original-note pointer interaction failed")
+        time.sleep(1.2)
+        screenshot = study_dir / ("source-note-link-" + label + ".png")
+        if screenshot.exists() or screenshot.is_symlink():
+            raise XiphosSmokeError("Refusing existing original-note interaction image")
+        try:
+            result = subprocess.run(
+                ["import", "-display", env["DISPLAY"], "-window", "root",
+                 str(screenshot)], env=env, stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL, timeout=15, check=False)
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            raise XiphosSmokeError("Original-note interaction capture unavailable") from exc
+        if (result.returncode or not screenshot.is_file()
+                or not 0 < screenshot.stat().st_size <= 6_000_000):
+            raise XiphosSmokeError("Unsafe original-note interaction image")
+        snapshots[label] = sha256(screenshot.read_bytes()).hexdigest()
+
+    # Independent real hover/pinned screenshots #43092365120 show the
+    # visible authored "Exode" reference in the pinned preview at approx.
+    # (174,545) on the same fixed test Xvfb geometry. Exercise a SINGLE
+    # genuine left click; never claim a successful target jump from xdotool.
+    for command in (
+        ["xdotool", "mousemove", "--sync", "174", "545"],
+        ["xdotool", "click", "1"],
+    ):
+        try:
+            action = subprocess.run(
+                command, env=env, stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL, timeout=5, check=False)
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            raise XiphosSmokeError("Original-note link click unavailable") from exc
+        if action.returncode:
+            raise XiphosSmokeError("Original-note link click command failed")
+    time.sleep(1.5)
+    clicked = study_dir / "source-note-link-after-click.png"
+    if clicked.exists() or clicked.is_symlink():
+        raise XiphosSmokeError("Refusing prior note-click evidence")
+    try:
+        result = subprocess.run(
+            ["import", "-display", env["DISPLAY"], "-window", "root",
+             str(clicked)], env=env, stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL, timeout=15, check=False)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise XiphosSmokeError("Source-note click capture unavailable") from exc
+    if (result.returncode or not clicked.is_file()
+            or not 0 < clicked.stat().st_size <= 6_000_000):
+        raise XiphosSmokeError("Unsafe source-note click screenshot")
+
+    navigation("Gen 1:1")
+    time.sleep(0.5)
+    return {
+        "source_note_host": "Gen.2.4",
+        "original_reference_target_in_source": "Exod.6",
+        "host_screenshot_sha256": sha256(target.read_bytes()).hexdigest(),
+        "note_hover_screenshot_sha256": snapshots["hover"],
+        "middle_click_pin_screenshot_sha256": snapshots["pinned"],
+        "post_link_click_screenshot_sha256": sha256(clicked.read_bytes()).hexdigest(),
+        "link_click_command_attempted": True,
+        "reference_marker_hover_verified": False,
+        "real_reference_link_click_verified": False,
+        "actual_reader_target_navigation_verified": False,
+        "requires_independent_visual_review": True,
+    }
+
+
 def _capture_parallel_toggle_sample(env:dict, study_dir:Path) -> dict:
     """Exercise Xiphos Alt-P and capture screenshot, never infer actual comparison."""
     if (not study_dir.is_dir() or study_dir.is_symlink()
@@ -548,6 +680,8 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
             samples = _sample_reader_passages(env, study_dir) if study_dir else []
             tree_probe = (_capture_module_tree_probe(env, study_dir)
                           if comparison and study_dir and samples else None)
+            link_host_probe = (_capture_source_note_link_host(env, study_dir)
+                               if comparison and study_dir and tree_probe else None)
             parallel_attempt = (_capture_parallel_toggle_sample(env, study_dir)
                                 if study_dir and samples else None)
             return {
@@ -562,6 +696,7 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                 "parallel_view_toggle_sample":parallel_attempt,
                 "independent_comparison_module":comparison,
                 "module_selection_probe":tree_probe,
+                "original_note_link_host_probe":link_host_probe,
                 "keyboard_navigation_attempted": bool(samples),
                 "isolated_virtual_display_notice_click_fallback_attempted":(
                     fixed_viewport_fallback_attempted if screenshot is not None else False),
