@@ -262,10 +262,12 @@ callers (preferring distinct books), and uses the existing standalone exact
 SWORD key inspector to obtain real original native OSIS fragments. It
 compares the matched note counts and whitespace-folded note bodies before
 checking source caller labels versus the native `note n` attribute. A
-proven missing/altered original caller (or other actual note mismatch)
-returns **BLOCKED for unmodified stock reuse** immediately; it does
-**not** run the heavyweight word/paragraph/poetry/whitespace proof on
-a candidate already demonstrated deficient.
+proven missing/altered original caller (or an unambiguous note type
+change) returns **BLOCKED for unmodified stock reuse** immediately;
+it does **not** run the heavyweight word/paragraph/poetry/whitespace
+proof on a candidate already demonstrated deficient. A note count/body
+difference, unlike a matched-body missing literal caller, is an
+**uncertain sample requiring full-corpus audit**, not a shortcut.
 
 If the sample is inconclusive, has no literal original caller, or cannot be
 read independently, the result is **REVIEW_REQUIRED**, and the existing
