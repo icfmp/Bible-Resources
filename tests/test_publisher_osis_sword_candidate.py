@@ -84,6 +84,29 @@ class PublisherSwordProbeTests(unittest.TestCase):
             "PRIVATE PUBLISHER VERSE <unknown>")),
             "unclassified_private_failure")
 
+    def test_failed_compiler_retains_only_safe_diagnostic_counts(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            tool=root/"compiler"
+            tool.write_text(
+                '#!/usr/bin/env python3\\n'
+                'import sys\\n'
+                'print("FATAL(V11N)[18,7]: PRIVATE BIBLICAL WORDS")\\n'
+                'sys.exit(2)\\n')
+            tool.chmod(0o755)
+            original=root/"official.xml"
+            original.write_text("<osis/>")
+            out=root/"module"
+            out.mkdir()
+            with self.assertRaises(PublisherSWORDResearchError) as caught:
+                _compile_osis(tool,original,out,"DarbyFr",root/"private.log")
+            report=caught.exception.safe_compiler_evidence
+            self.assertEqual(report["compiler_exit_code"],2)
+            self.assertEqual(report["diagnostic_categories"]["FATAL"],1)
+            self.assertEqual(report["first_diagnostic_locations_no_source_text"],[{
+                "type":"FATAL","source_line":18,"source_column":7}])
+            self.assertNotIn("PRIVATE",str(report))
+
     def test_compiler_log_never_copies_scripture(self):
         with tempfile.TemporaryDirectory() as folder:
             root=Path(folder)
