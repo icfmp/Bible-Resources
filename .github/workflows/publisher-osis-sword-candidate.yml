@@ -107,6 +107,7 @@ jobs:
               lines.push(`#### ${candidate.candidate_versification}: ${candidate.candidate_status}`);
               if(candidate.reason_category) lines.push(`Failure type: ${candidate.reason_category}`);
               if(candidate.safe_failure_code) lines.push(`Safe failure code: ${candidate.safe_failure_code}`);
+              if(candidate.safe_compiler_evidence) lines.push("Safe compiler evidence:", "```json", JSON.stringify(candidate.safe_compiler_evidence,null,2), "```");
               if(candidate.source_to_compiled_counts){
                 lines.push("Checked counts (no Bible content):", "```json",
                   JSON.stringify(candidate.source_to_compiled_counts,null,2), "```");
