@@ -6,6 +6,7 @@ import tempfile
 import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
+from native_milestone_pair_audit import NativeMilestonePairAudit
 from publisher_osis_sword_candidate import (
     PublisherSWORDResearchError, _create_candidate_layout, _native_notes,
     _read_native_frames, _compile_osis, config_for, safe_failure_code,
@@ -112,6 +113,20 @@ class PublisherSwordProbeTests(unittest.TestCase):
             self.assertEqual(report["nonempty_files"],1)
             self.assertEqual(report["total_bytes"],len(b"some_private_content"))
             self.assertNotIn("PRIVATE",str(report))
+
+    def test_compiled_paragraph_milestones_spanning_verses_are_paired(self):
+        # The real candidate's independent raw-reader scan must cover every
+        # numbered, intro and TOP frame; a matching tag *count* is not enough.
+        audit=NativeMilestonePairAudit()
+        audit.observe("K","Gen.1.1",
+                      b'<div type="x-p" sID="PRIVATE-A"/>first')
+        audit.observe("K","Gen.1.2",
+                      b'second<div eID="PRIVATE-A"/>')
+        result=audit.finish()
+        self.assertEqual(result["paired_div_types_allowlisted"]["x-p"],1)
+        self.assertEqual(result["native_numbered_intro_scan_counts"][
+            "paired_matching_sID_eID"],1)
+        self.assertNotIn("PRIVATE-A",str(result))
 
     def test_compiler_log_never_copies_scripture(self):
         with tempfile.TemporaryDirectory() as folder:
