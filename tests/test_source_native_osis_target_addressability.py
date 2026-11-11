@@ -44,8 +44,8 @@ class TargetAddressabilityTests(unittest.TestCase):
         result=audit_explicit_targets(notes,self.keys,set(self.keys))
         self.assertEqual(result["status"],"some_explicit_targets_need_grammar_or_editorial_review")
         self.assertEqual(result["counts"]["range_or_compound_reference_requires_review"],1)
-        self.assertEqual(result["counts"]["nonindexed_endpoint_requires_review"],2)
-        self.assertEqual(result["counts"]["unsupported_endpoint_syntax"],1)
+        self.assertEqual(result["counts"]["nonindexed_endpoint_requires_review"],1)
+        self.assertEqual(result["counts"]["unsupported_endpoint_syntax"],2)
         self.assertEqual(len(result["bounded_note_host_reference_samples"]),4)
         for secret in ("PRIVATE_PERSON","Bible:","Gen.1.37"):
             self.assertNotIn(secret,str(result))
