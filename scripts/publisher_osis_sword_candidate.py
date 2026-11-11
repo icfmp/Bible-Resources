@@ -27,7 +27,7 @@ from publisher_osis_usfx_parity import (
 from source_native_maintext_probe import native_raw_main_text
 from source_native_note_positions import native_note_anchor_positions
 from source_osis_inventory import source_inventory
-from sword_native_inventory import collect_native_inventory
+from sword_native_inventory import collect_native_inventory, NativeIndexError
 from stable_sword_refs import KEY
 
 MODULE = re.compile(r"[A-Za-z][A-Za-z0-9_]{2,48}\Z")
@@ -360,6 +360,42 @@ def compiler_output_metrics(output_dir: Path) -> dict:
     }
 
 
+def _safe_exact_native_spotchecks(binary: Path, candidate_root: Path,
+                                 module_id: str, source: dict) -> dict:
+    """Test independently addressed real SWORD keys after full index rejects.
+
+    All raw entry output stays private; public receipt contains only canonical
+    key IDs, numerical exit codes and exact character-parity booleans.
+    """
+    if binary.is_symlink() or not binary.is_file() or not source:
+        raise PublisherSWORDResearchError("No trusted exact-entry native inspector")
+    keys=list(source)
+    chosen=list(dict.fromkeys((keys[0],keys[len(keys)//2],keys[-1])))
+    if any(KEY.fullmatch(ref) is None for ref in chosen):
+        raise PublisherSWORDResearchError("Source exact-entry references are unsafe")
+    env=dict(os.environ,SWORD_PATH=str((candidate_root/"payload").resolve(strict=True)))
+    rows=[]
+    for ref in chosen:
+        try:
+            result=subprocess.run([str(binary.resolve(strict=True)),module_id,ref],
+                                  env=env,stdout=subprocess.PIPE,
+                                  stderr=subprocess.DEVNULL,timeout=30,check=False)
+        except (OSError,subprocess.TimeoutExpired) as exc:
+            raise PublisherSWORDResearchError("Exact native entry probe unavailable") from exc
+        if result.returncode < 0 or result.returncode > 255 or len(result.stdout)>MAX_ENTRY:
+            raise PublisherSWORDResearchError("Unsafe native exact-entry probe result")
+        row={"reference":ref,"native_probe_exit_code":result.returncode}
+        if result.returncode == 0:
+            try:
+                text,_ = native_raw_main_text(result.stdout)
+                row["nonspace_text_equal_to_publisher_osis"]=(_nonspace(text)==_nonspace(source[ref]))
+            except (ValueError,UnicodeError):
+                row["nonspace_text_equal_to_publisher_osis"]=False
+        rows.append(row)
+    return {"status":"exact_native_key_diagnostic_not_index_or_release_approval",
+            "probes":rows,"source_or_native_raw_bytes_never_exposed":True}
+
+
 def safe_failure_code(exc: Exception) -> str:
     """Stable diagnostics only; never disclose exception strings from source/XML.
 
@@ -406,7 +442,8 @@ def select_candidate_versifications(cfg: dict, requested: str | None):
 
 
 def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
-          raw_binary:Path, versification: str | None = None):
+          raw_binary:Path, entry_binary:Path | None = None,
+          versification: str | None = None):
     cfg=config_for(resource_id)
     selected=select_candidate_versifications(cfg,versification)
     original=read_pinned_publisher_osis(resource_id)
@@ -446,6 +483,13 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
                 if compilation is not None:
                     compared["standard_osis_compiler"] = compilation
                 compared["compiled_output_metadata"] = compiler_output_metrics(out)
+                if isinstance(exc,NativeIndexError) and entry_binary is not None:
+                    try:
+                        compared["private_native_exact_entry_spotchecks"] = (
+                            _safe_exact_native_spotchecks(entry_binary,work,
+                                                          cfg["candidate_module_id"],verses))
+                    except (PublisherSWORDResearchError,OSError,ValueError):
+                        compared["native_exact_spotchecks_status"] = "failed_closed_unverified"
             results.append(compared)
         if sha256(sourcefile.read_bytes()).hexdigest()!=sha256(original).hexdigest():
             raise PublisherSWORDResearchError("Original publisher XML mutated during compilation")
@@ -471,13 +515,15 @@ def main():
     p.add_argument("--osis2mod",type=Path,required=True)
     p.add_argument("--native-index",type=Path,required=True)
     p.add_argument("--native-raw",type=Path,required=True)
+    p.add_argument("--native-entry",type=Path,required=True)
     p.add_argument("--versification",default=None)
     p.add_argument("--report",type=Path,required=True)
     a=p.parse_args()
     if a.report.exists() or a.report.is_symlink() or not a.report.parent.is_dir():
         p.error("Use new metadata report in an existing directory")
     result=probe(a.resource_id,osis2mod=a.osis2mod,index_binary=a.native_index,
-                 raw_binary=a.native_raw,versification=a.versification)
+                 raw_binary=a.native_raw,entry_binary=a.native_entry,
+                 versification=a.versification)
     a.report.write_text(json.dumps(result,indent=2,sort_keys=True)+"\n",encoding="utf-8")
     print("Official OSIS to SWORD research executed for",a.resource_id)
     for row in result["candidate_research_results"]:
