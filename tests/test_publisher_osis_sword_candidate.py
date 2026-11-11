@@ -6,9 +6,10 @@ import tempfile
 import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
+from sword_native_inventory import NativeIndexError
 from publisher_osis_sword_candidate import (
     PublisherSWORDResearchError, _create_candidate_layout, _native_notes,
-    _read_native_frames, _compile_osis, config_for,
+    _read_native_frames, _compile_osis, config_for, _safe_failure_reason,
 )
 
 
@@ -73,6 +74,17 @@ class PublisherSwordProbeTests(unittest.TestCase):
             stub.chmod(0o755)
             with self.assertRaises(PublisherSWORDResearchError):
                 list(_read_native_frames(stub,"Fake",root))
+
+    def test_safe_diagnostic_never_leaks_exception_details(self):
+        self.assertEqual(_safe_failure_reason(
+            PublisherSWORDResearchError("OSIS tool returned nonzero exit status 3")),
+            "compiler_nonzero_exit")
+        self.assertEqual(_safe_failure_reason(NativeIndexError(
+            "Stock-SWORD native inspector blocked (exit 2); PRIVATE VERSE")),
+            "native_inspector_nonzero_exit")
+        self.assertEqual(_safe_failure_reason(NativeIndexError(
+            "PRIVATE SCRIPTURE WITH AN UNKNOWN CAUSE")),
+            "native_index_validation_failed")
 
     def test_compiler_log_never_copies_scripture(self):
         with tempfile.TemporaryDirectory() as folder:
