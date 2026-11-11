@@ -64,11 +64,11 @@ def _sample_references(source_attributes: dict, cap: int) -> list[str]:
             raise NoteEvidenceError("Unrecognized source-mapped note verse key")
         first_by_book.setdefault(ref.split(".", 1)[0], ref)
     choices = list(first_by_book.values())[:cap]
-    if len(choices) < cap:
-        choices.extend(ref for ref in eligible
-                       if ref not in choices
-                       for _ in (0,)
-                       if len(choices) < cap)
+    for ref in eligible:
+        if len(choices) == cap:
+            break
+        if ref not in choices:
+            choices.append(ref)
     return choices
 
 
