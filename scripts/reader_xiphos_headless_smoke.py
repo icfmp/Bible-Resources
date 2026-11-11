@@ -368,6 +368,60 @@ def _sample_reader_passages(env, out: Path) -> list[dict]:
     return snapshots
 
 
+
+def _capture_module_tree_probe(env: dict, study_dir: Path) -> dict:
+    """Show only the temporary Xiphos module tree for reader selection review.
+
+    A visible GTK tree item is not proof a translation was selected. Retain
+    two bounded screenshots for independent manual coordinates/semantics.
+    """
+    if (env.get("DISPLAY") != ":91" or not study_dir.is_dir()
+            or study_dir.is_symlink()):
+        raise XiphosSmokeError("Unsafe dual-module Xiphos tree probe")
+    pictures = []
+    commands = (
+        ["xdotool", "mousemove", "--sync", "100", "134", "click", "1"],
+        ["xdotool", "key", "Right"],
+        ["xdotool", "key", "Down"],
+        ["xdotool", "key", "Right"],
+    )
+    for i, command in enumerate(commands):
+        try:
+            result = subprocess.run(
+                command, env=env, stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL, timeout=5, check=False)
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            raise XiphosSmokeError("Bounded module-tree action unavailable") from exc
+        if result.returncode:
+            raise XiphosSmokeError("Module-tree interaction failed")
+        if i not in (1, 3):
+            continue
+        target = study_dir / ("module-tree-stage-" + str(i) + ".png")
+        if target.exists() or target.is_symlink():
+            raise XiphosSmokeError("Refusing to overwrite module-tree evidence")
+        time.sleep(0.5)
+        try:
+            captured = subprocess.run(
+                ["import", "-display", env["DISPLAY"], "-window", "root",
+                 str(target)], env=env, stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL, timeout=15, check=False)
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            raise XiphosSmokeError("Module-tree screenshot unavailable") from exc
+        if (captured.returncode or not target.is_file()
+                or not 0 < target.stat().st_size <= 6_000_000):
+            raise XiphosSmokeError("Unsafe module-tree screenshot")
+        pictures.append({
+            "step": i,
+            "screenshot_sha256": sha256(target.read_bytes()).hexdigest(),
+            "module_selection_verified": False,
+        })
+    return {
+        "inspection_only": True,
+        "snapshots": pictures,
+        "module_selection_verified": False,
+    }
+
+
 def _capture_parallel_toggle_sample(env:dict, study_dir:Path) -> dict:
     """Exercise Xiphos Alt-P and capture screenshot, never infer actual comparison."""
     if (not study_dir.is_dir() or study_dir.is_symlink()
@@ -485,6 +539,8 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                     raise XiphosSmokeError("Invalid bounded screenshot result")
                 screenshot_sha=sha256(screenshot.read_bytes()).hexdigest()
             samples = _sample_reader_passages(env, study_dir) if study_dir else []
+            tree_probe = (_capture_module_tree_probe(env, study_dir)
+                          if comparison and study_dir and samples else None)
             parallel_attempt = (_capture_parallel_toggle_sample(env, study_dir)
                                 if study_dir and samples else None)
             return {
@@ -498,6 +554,7 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                 "real_reader_passage_samples":samples,
                 "parallel_view_toggle_sample":parallel_attempt,
                 "independent_comparison_module":comparison,
+                "module_selection_probe":tree_probe,
                 "keyboard_navigation_attempted": bool(samples),
                 "isolated_virtual_display_notice_click_fallback_attempted":(
                     fixed_viewport_fallback_attempted if screenshot is not None else False),
