@@ -32,6 +32,28 @@ MAX_SAMPLE = 18
 MAX_NOTE_TEXT = 2 * 1024 * 1024
 EXCLUDED_MAIN = frozenset({"note", "title", "header"})
 
+# Report hard source-identity failures before prolific stylistic note deltas.
+# A global flat first-N sample can otherwise mask the *only* missing verse.
+FINDING_PRIORITY = (
+    "usfx_reference_absent_in_official_publisher",
+    "publisher_reference_absent_in_ebible_usfx",
+    "shared_scripture_nonspace_character_difference",
+    "shared_note_count_difference",
+    "source_note_anchor_position_difference",
+    "lost_explicit_usfx_machine_target",
+    "source_reference_target_difference",
+    "source_note_caller_label_difference",
+    "note_body_folded_difference",
+)
+
+
+def _bounded_priority_findings(findings: dict, limit: int = MAX_SAMPLE * 4):
+    """Bounded metadata-only reviewer samples, prioritizing critical identity gaps."""
+    order = {name: position for position, name in enumerate(FINDING_PRIORITY)}
+    return [row for kind in sorted(findings,
+                                   key=lambda name: (order.get(name, len(order)), name))
+            for row in findings[kind]][:limit]
+
 
 class PublisherSourceParityError(ValueError):
     """Untrusted, contradictory or unsafe original source evidence."""
@@ -304,9 +326,8 @@ def compare_original_sources(
                   else "material_publisher_osis_usfx_differences_require_review"),
         "original_source_comparison_counts":dict(sorted(counts.items())),
         "official_source_metadata":official_meta,
-        "bounded_reference_and_note_ordinal_findings_only":[
-            row for name in sorted(findings)
-            for row in findings[name]][:MAX_SAMPLE*4],
+        "bounded_reference_and_note_ordinal_findings_only":
+            _bounded_priority_findings(findings),
         "common_verse_nonspace_stream_comparison_sha256":digest.hexdigest(),
         "publisher_revision_same_as_usfx_verification":False,
         "publisher_original_layout_notes_targets_and_verse0_approved":False,
