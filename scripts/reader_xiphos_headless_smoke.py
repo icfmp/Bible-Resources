@@ -128,6 +128,14 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
             window=_visible_window(env)
             screenshot_sha=None
             if screenshot is not None:
+                if not window:
+                    raise XiphosSmokeError("Cannot review screenshot without visible Xiphos window")
+                # Dismiss possible first-run locale notice without editing application
+                # preferences or relying on window geometry.
+                subprocess.run(["xdotool","key","--clearmodifiers","Return"],
+                               env=env,stdout=subprocess.DEVNULL,
+                               stderr=subprocess.DEVNULL,timeout=4,check=False)
+                time.sleep(1.5)
                 if (screenshot.is_symlink() or screenshot.exists()
                         or not screenshot.parent.is_dir()
                         or screenshot.suffix.lower()!=".png"):

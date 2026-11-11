@@ -45,7 +45,11 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -qq
-          sudo apt-get install -y xiphos xvfb dbus-x11 xdotool
+          sudo apt-get install -y xiphos xvfb dbus-x11 xdotool locales
+          sudo sed -i 's/^# *fr_FR.UTF-8 UTF-8/fr_FR.UTF-8 UTF-8/' /etc/locale.gen
+          sudo locale-gen fr_FR.UTF-8
+          echo 'LANG=fr_FR.UTF-8' >> "$GITHUB_ENV"
+          echo 'LC_ALL=fr_FR.UTF-8' >> "$GITHUB_ENV"
           command -v xiphos
           command -v Xvfb
       - name: Retrieve exact previously audited TEST-ONLY module
