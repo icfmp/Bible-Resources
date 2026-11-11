@@ -280,7 +280,13 @@ class XiphosSmokeUnitTests(unittest.TestCase):
             self.assertIn(
                 ["xdotool", "type", "--clearmodifiers", "--delay", "35", "Gen 1:1"],
                 calls)
-            self.assertEqual(sum(c[0] == "import" for c in calls), 1)
+            self.assertEqual(sum(c[0] == "import" for c in calls), 3)
+            self.assertIn(["xdotool", "mousemove", "--sync", "568", "295"], calls)
+            self.assertIn(["xdotool", "click", "2"], calls)
+            self.assertTrue((study / "source-note-link-hover.png").is_file())
+            self.assertTrue((study / "source-note-link-pinned.png").is_file())
+            self.assertIn("middle_click_pin_screenshot_sha256", report)
+            self.assertFalse(report["reference_marker_hover_verified"])
 
     def test_source_note_reference_host_refuses_overwrite_and_unknown_display(self):
         with tempfile.TemporaryDirectory() as base:
