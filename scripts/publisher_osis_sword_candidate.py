@@ -125,8 +125,16 @@ def _compile_osis(tool: Path, outfile: Path, module_path: Path, system: str,
                                "source_line":int(match.group(1)),
                                "source_column":int(match.group(2))})
     if process.returncode!=0:
-        raise PublisherSWORDResearchError(
+        # Attach only the already allowlisted, text-free compiler receipt;
+        # the original diagnostics file is discarded with this research run.
+        failure=PublisherSWORDResearchError(
             f"OSIS tool returned nonzero exit status {process.returncode}")
+        failure.safe_compiler_evidence={
+            "compiler_exit_code":process.returncode,
+            "diagnostic_categories":dict(sorted(categories.items())),
+            "first_diagnostic_locations_no_source_text":first_safe,
+        }
+        raise failure
     return {"compiler_tool":"osis2mod","tool_sha256":sha256(tool.read_bytes()).hexdigest(),
             "returncode":process.returncode,
             "diagnostic_categories":dict(sorted(categories.items())),
@@ -397,6 +405,7 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
                     "candidate_versification":system,
                     "reason_category":type(exc).__name__,
                     "safe_failure_code":safe_failure_code(exc),
+                    "safe_compiler_evidence":getattr(exc,"safe_compiler_evidence",None),
                     "usable_for_publication":False,
                 }
             results.append(compared)
