@@ -7,7 +7,7 @@ on:
         description: "ID of reviewed config/bible-intake/<id>.json"
         type: string
         required: true
-        default: webp-research
+        default: frajnd-2024
       stage:
         description: "One of seven stages, or 4-5 in one shared machine-only scan"
         type: choice
