@@ -39,6 +39,14 @@ class StockReuseTests(unittest.TestCase):
         self.assertEqual(receipt["material_loss_categories"][
             "literal_source_caller_no_native_n"],2)
 
+    def test_missing_source_note_verse_is_material_loss(self):
+        receipt=check(note_classes={
+            "source_note_bearing_verses_without_native_slot": 1,
+        })
+        self.assertEqual(receipt["status"], "BLOCKED")
+        self.assertEqual(receipt["material_loss_categories"][
+            "source_note_bearing_verses_without_native_slot"], 1)
+
     def test_changed_caller_and_machine_targets_block_stock(self):
         receipt=check(attrs={"native_note_n_present":2,
                              "literal_caller_string_differs":1,
