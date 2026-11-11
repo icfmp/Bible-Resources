@@ -103,26 +103,36 @@ class NativeMilestonePairAudit:
         self._seen_refs.add((kind, ref))
         self._total[f"observed_{kind}_entries"] += 1
         if kind == "U":
-            # Anonymous TOP records are still privately parsed. A structural
-            # sID/eID there cannot be assigned a source-book anchor.
+            # Newer upstream osis2mod stores a bookGroup opening in an
+            # anonymous testament-introduction TOP record. Its generated
+            # private sID can be matched to the later native closing eID.
+            # Every other TOP event remains explicitly unverified.
             self._total["unaddressable_TOP_entries_unverified"] += 1
             try:
-                top = _strict_root(raw)
+                root = _strict_root(raw)
             except NativeMilestoneAuditError:
                 self._issue("unparseable_anonymous_TOP_fragment", ref)
                 return
             self._total["parseable_anonymous_TOP_entries"] += 1
-            self._total["unaddressable_TOP_milestone_events_unverified"] += sum(
-                1 for _ in _events(top))
-            return
-        book = ref.split(".", 1)[0]
-        try:
-            root = _strict_root(raw)
-        except NativeMilestoneAuditError:
-            self._issue("unparseable_native_fragment", ref)
-            return
-        self._total["parseable_numbered_or_intro_entries"] += 1
+            book = "__TOP__"
+        else:
+            book = ref.split(".", 1)[0]
+            try:
+                root = _strict_root(raw)
+            except NativeMilestoneAuditError:
+                self._issue("unparseable_native_fragment", ref)
+                return
+            self._total["parseable_numbered_or_intro_entries"] += 1
         for tag, sid, eid, open_type, subtype in _events(root):
+            if kind == "U":
+                if not (tag == "div" and (
+                        (sid is not None and eid is None and open_type == "bookGroup")
+                        or (eid is not None and sid is None
+                            and open_type in {"", "bookGroup"}))):
+                    self._total["unaddressable_TOP_milestone_events_unverified"] += 1
+                    self._issue("unsupported_anonymous_TOP_structural_event", ref)
+                    continue
+                self._total["verified_addressable_TOP_bookGroup_endpoint_events"] += 1
             self._sequence += 1
             if self._sequence > MAX_EVENTS:
                 raise NativeMilestoneAuditError("Too many structural events")
