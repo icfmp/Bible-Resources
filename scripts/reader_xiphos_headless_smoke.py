@@ -189,7 +189,23 @@ def _sample_reader_passages(env, out: Path) -> list[dict]:
     except (OSError, subprocess.TimeoutExpired) as exc:
         raise XiphosSmokeError("Cannot activate Xiphos study window") from exc
     if focus.returncode:
-        raise XiphosSmokeError("Xiphos study window activation failed")
+        raise XiphosSmokeError("Xiphos study window focus failed")
+    # In bare Xvfb, the default Xiphos window occupies only ~800x600 pixels,
+    # leaving a narrow center reader where Genesis headings hide verse 1.
+    # Resize the actual test-only X11 window; never alter any user desktop.
+    for command in (
+        ["xdotool", "windowsize", candidates[-1], "1216", "736"],
+        ["xdotool", "windowmove", candidates[-1], "16", "16"],
+    ):
+        try:
+            adjusted=subprocess.run(
+                command, env=env, stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL, timeout=5, check=False)
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            raise XiphosSmokeError("Bounded X11 study window resizing unavailable") from exc
+        if adjusted.returncode:
+            raise XiphosSmokeError("X11 study reader resizing failed")
+    time.sleep(0.5)
     out.mkdir(mode=0o700)
     snapshots = []
     for slug, ref in READER_SAMPLES:
