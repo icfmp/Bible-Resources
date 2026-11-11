@@ -5,7 +5,7 @@ import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from source_native_osis_boundary_positions import (
-    authorial_book_streams, NativeBookStreams,
+    authorial_book_streams, authorial_outside_book_titles, NativeBookStreams,
     compare_book_boundary_positions, BoundaryScreenError,
 )
 
@@ -29,7 +29,7 @@ def native(first=b'<div type="x-p" sID="p"/>',
 
 class OriginalNativeBoundaryPositionTests(unittest.TestCase):
     def test_source_and_native_boundary_positions_and_text_agree(self):
-        proof=compare_book_boundary_positions(authorial_book_streams(OSIS),native())
+        proof=compare_book_boundary_positions(authorial_book_streams(OSIS),native(),[])
         self.assertTrue(proof["all_book_body_nonspace_and_boundary_events_equal"])
         self.assertEqual(proof["counts"]["books_compared"],1)
         self.assertTrue(proof["all_title_text_and_nonspace_placement_equal"])
@@ -51,7 +51,7 @@ class OriginalNativeBoundaryPositionTests(unittest.TestCase):
                          b'<div type="x-p" eID="p"/>'
                          b'<lg sID="g"/><l sID="l"/>poetry'
                          b'<l eID="l"/><lg eID="g"/>')
-        proof=compare_book_boundary_positions(authorial_book_streams(OSIS),compiled)
+        proof=compare_book_boundary_positions(authorial_book_streams(OSIS),compiled,[])
         self.assertFalse(proof["all_title_text_and_nonspace_placement_equal"])
         self.assertFalse(proof["all_book_body_nonspace_and_boundary_events_equal"])
         self.assertEqual(proof["counts"]["books_with_identical_full_nonspace_body_stream"],1)
@@ -67,7 +67,7 @@ class OriginalNativeBoundaryPositionTests(unittest.TestCase):
                          b'<div type="x-p" eID="p"/>'
                          b'<lg sID="g"/><l sID="l"/>poetry'
                          b'<l eID="l"/><lg eID="g"/>')
-        proof=compare_book_boundary_positions(authorial_book_streams(OSIS),compiled)
+        proof=compare_book_boundary_positions(authorial_book_streams(OSIS),compiled,[])
         self.assertFalse(proof["all_title_text_and_nonspace_placement_equal"])
         self.assertNotIn("PRIVATE",str(proof))
 
@@ -76,14 +76,14 @@ class OriginalNativeBoundaryPositionTests(unittest.TestCase):
                                b'<lg sID="g"/><l sID="l"/> beta'
                                b'<div type="x-p" eID="p"/>poetry'
                                b'<l eID="l"/><lg eID="g"/>'))
-        proof=compare_book_boundary_positions(authorial_book_streams(OSIS),changed)
+        proof=compare_book_boundary_positions(authorial_book_streams(OSIS),changed,[])
         self.assertFalse(proof["all_book_body_nonspace_and_boundary_events_equal"])
         self.assertGreater(proof["counts"]["boundary_event_groups_unverified_or_different"],0)
         self.assertNotIn("PRIVATE",str(proof))
 
     def test_actual_changed_words_or_missing_prose_blocks_position_claim(self):
         broken=native(second=b'wrong text<div type="x-p" eID="p"/>')
-        result=compare_book_boundary_positions(authorial_book_streams(OSIS),broken)
+        result=compare_book_boundary_positions(authorial_book_streams(OSIS),broken,[])
         self.assertFalse(result["all_book_body_nonspace_and_boundary_events_equal"])
         self.assertEqual(result["counts"]["books_with_unmatched_full_body_stream"],1)
 
@@ -97,9 +97,42 @@ class OriginalNativeBoundaryPositionTests(unittest.TestCase):
     def test_compiled_extra_top_prose_not_silently_accepted(self):
         compiled=native()
         compiled.observe("U","TOP:1",b"PRIVATE EXTRA TEXT")
-        proof=compare_book_boundary_positions(authorial_book_streams(OSIS),compiled)
+        proof=compare_book_boundary_positions(authorial_book_streams(OSIS),compiled,[])
         self.assertFalse(proof["all_book_body_nonspace_and_boundary_events_equal"])
         self.assertGreater(proof["native_anonymous_top_nonspace_body_characters"],0)
+        self.assertNotIn("PRIVATE",str(proof))
+
+    def test_outside_book_testament_titles_match_TOP_provenance(self):
+        authored=OSIS.replace(
+            b'<div type="book" osisID="Gen">',
+            b'<div type="bookGroup"><title>PRIVATE TESTAMENT TITLE</title>'
+            b'<div type="book" osisID="Gen">'
+        ).replace(b'</div></osis>',b'</div></div></osis>')
+        compiled=native()
+        compiled.observe("U","TOP:1",b'<title>PRIVATE TESTAMENT TITLE</title>')
+        source_groups=authorial_outside_book_titles(authored)
+        self.assertEqual(len(source_groups),1)
+        proof=compare_book_boundary_positions(
+            authorial_book_streams(authored),compiled,source_groups)
+        self.assertTrue(proof["all_title_text_and_nonspace_placement_equal"])
+        self.assertEqual(proof["counts"]["outside_book_title_text_and_order_equal"],1)
+        self.assertEqual(proof["counts"]["source_outside_book_title_events"],1)
+        self.assertNotIn("PRIVATE",str(proof))
+
+    def test_changed_or_missing_TOP_title_blocks_full_editorial_title_parity(self):
+        authored=OSIS.replace(
+            b'<div type="book" osisID="Gen">',
+            b'<div type="bookGroup"><title>PRIVATE TESTAMENT TITLE</title>'
+            b'<div type="book" osisID="Gen">'
+        ).replace(b'</div></osis>',b'</div></div></osis>')
+        original_top=authorial_outside_book_titles(authored)
+        compiled=native()
+        compiled.observe("U","TOP:1",b'<title>PRIVATE CHANGED TITLE</title>')
+        proof=compare_book_boundary_positions(
+            authorial_book_streams(authored),compiled,original_top)
+        self.assertFalse(proof["all_title_text_and_nonspace_placement_equal"])
+        self.assertFalse(proof["all_book_body_nonspace_and_boundary_events_equal"])
+        self.assertEqual(proof["counts"]["outside_book_title_text_or_order_requires_review"],1)
         self.assertNotIn("PRIVATE",str(proof))
 
     def test_native_unbalanced_xml_fails_closed(self):
