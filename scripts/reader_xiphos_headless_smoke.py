@@ -224,6 +224,44 @@ def _sample_reader_passages(env, out: Path) -> list[dict]:
     return snapshots
 
 
+def _capture_parallel_toggle_sample(env:dict, study_dir:Path) -> dict:
+    """Exercise Xiphos Alt-P and capture screenshot, never infer actual comparison."""
+    if (not study_dir.is_dir() or study_dir.is_symlink()
+            or not study_dir.parent.is_dir()
+            or env.get("DISPLAY") != ":91"):
+        raise XiphosSmokeError("Unsafe parallel screenshot fixture")
+    target=study_dir/"parallel-toggle.png"
+    if target.exists() or target.is_symlink():
+        raise XiphosSmokeError("Refusing to overwrite parallel screenshot")
+    try:
+        toggled=subprocess.run(
+            ["xdotool","key","--clearmodifiers","alt+p"],
+            env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+            timeout=5,check=False)
+    except (OSError,subprocess.TimeoutExpired) as exc:
+        raise XiphosSmokeError("Parallel keyboard probe unavailable") from exc
+    if toggled.returncode:
+        raise XiphosSmokeError("Parallel keyboard probe failed")
+    time.sleep(1.5)
+    try:
+        snap=subprocess.run(
+            ["import","-display",env["DISPLAY"],"-window","root",str(target)],
+            env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+            timeout=15,check=False)
+    except (OSError,subprocess.TimeoutExpired) as exc:
+        raise XiphosSmokeError("Parallel screenshot capture unavailable") from exc
+    if (snap.returncode or not target.is_file() or target.is_symlink()
+            or not 0 < target.stat().st_size <= 6_000_000):
+        raise XiphosSmokeError("Unsafe parallel screenshot capture")
+    return {
+        "shortcut_invoked": "Alt+P",
+        "screenshot_sha256": sha256(target.read_bytes()).hexdigest(),
+        "actual_parallel_second_translation_visible_verified": False,
+        "gui_outcome_requires_visual_inspection": True,
+        "reader_originals_or_config_changed": False,
+    }
+
+
 def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_seconds:int,
           screenshot:Path|None=None, study_dir:Path|None=None):
     if not isinstance(startup_seconds,int) or not 5<=startup_seconds<=25:
@@ -294,6 +332,8 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                     raise XiphosSmokeError("Invalid bounded screenshot result")
                 screenshot_sha=sha256(screenshot.read_bytes()).hexdigest()
             samples = _sample_reader_passages(env, study_dir) if study_dir else []
+            parallel_attempt = (_capture_parallel_toggle_sample(env, study_dir)
+                                if study_dir and samples else None)
             return {
                 "status":"headless_xiphos_running_after_bounded_startup",
                 "reader":"xiphos",
@@ -303,6 +343,7 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                 "x11_window_detected_not_visually_inspected":window,
                 "test_only_screenshot_sha256":screenshot_sha,
                 "real_reader_passage_samples":samples,
+                "parallel_view_toggle_sample":parallel_attempt,
                 "keyboard_navigation_attempted": bool(samples),
                 "isolated_virtual_display_notice_click_fallback_attempted":(
                     fixed_viewport_fallback_attempted if screenshot is not None else False),
