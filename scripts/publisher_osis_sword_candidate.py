@@ -83,6 +83,8 @@ def _create_candidate_layout(folder: Path, module_id: str, system: str):
         f"[{module_id}]\n"
         f"DataPath=./modules/texts/ztext/{name}/\n"
         "ModDrv=zText\n"
+        "BlockType=BOOK\n"
+        "CompressType=ZIP\n"
         "Encoding=UTF-8\n"
         "Lang=fr\n"
         "SourceType=OSIS\n"

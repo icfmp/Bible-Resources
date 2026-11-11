@@ -40,6 +40,8 @@ class PublisherSwordProbeTests(unittest.TestCase):
                 root/"build","JND2024Research","Luther")
             conf=(payload/"mods.d/jnd2024research.conf").read_text()
             self.assertIn("ModDrv=zText",conf)
+            self.assertIn("BlockType=BOOK",conf)
+            self.assertIn("CompressType=ZIP",conf)
             self.assertIn("Versification=Luther",conf)
             self.assertIn("SourceType=OSIS",conf)
             self.assertTrue(out.is_dir())
