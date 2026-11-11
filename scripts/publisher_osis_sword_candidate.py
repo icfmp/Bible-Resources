@@ -337,6 +337,27 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
     }
 
 
+def compiler_output_metrics(output_dir: Path) -> dict:
+    """Only counts/byte sizes of the isolated standard compiler's artifacts.
+
+    Do not reveal any generated path, filename, original text, or note.
+    This is diagnostics, not proof that the index is readable.
+    """
+    if output_dir.is_symlink() or not output_dir.is_dir():
+        raise PublisherSWORDResearchError("Missing private compiler output directory")
+    entries = list(output_dir.rglob("*"))
+    if len(entries) > 1000 or any(item.is_symlink() for item in entries):
+        raise PublisherSWORDResearchError("Unsafe private compiler output tree")
+    files = [item for item in entries if item.is_file()]
+    sizes = [item.stat().st_size for item in files]
+    return {
+        "files": len(files),
+        "nonempty_files": sum(size > 0 for size in sizes),
+        "total_bytes": sum(sizes),
+        "not_reader_or_source_fidelity_approval": True,
+    }
+
+
 def safe_failure_code(exc: Exception) -> str:
     """Stable diagnostics only; never disclose exception strings from source/XML.
 
@@ -403,6 +424,7 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
             work.mkdir()
             payload,out=_create_candidate_layout(
                 work,cfg["candidate_module_id"],system)
+            compilation=None
             try:
                 compilation=_compile_osis(
                     osis2mod,sourcefile,out,system,work/"osis2mod-private.log")
@@ -419,6 +441,9 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
                     "safe_failure_code":safe_failure_code(exc),
                     "usable_for_publication":False,
                 }
+                if compilation is not None:
+                    compared["standard_osis_compiler"] = compilation
+                compared["compiled_output_metadata"] = compiler_output_metrics(out)
             results.append(compared)
         if sha256(sourcefile.read_bytes()).hexdigest()!=sha256(original).hexdigest():
             raise PublisherSWORDResearchError("Original publisher XML mutated during compilation")
