@@ -84,7 +84,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 35
     env:
-      RESOURCE_ID: ${{ github.event_name == 'pull_request' && 'webp-research' || inputs.resource_id || '' }}
+      RESOURCE_ID: ${{ github.event_name == 'pull_request' && 'frajnd-2024' || inputs.resource_id || '' }}
       STAGE: ${{ github.event_name == 'pull_request' && '4' || inputs.stage || '' }}
       REPORT_DIR: /tmp/bible-audit-report
       INSPECTOR_DIR: /tmp/sword-audit-bin
@@ -154,12 +154,12 @@ jobs:
           print("Offline compilation:",receipt["offline_compiled_without_external_dependencies"])
           print("This fingerprint is NOT approved until reviewed/pinned on main.")
           PY
-      - name: Observe the current upstream WEBP bytes (SHA-256 only; never auto-repin)
+      - name: Observe the current upstream Darby bytes (SHA-256 only; never auto-repin)
         if: github.event_name == 'pull_request'
         shell: bash
         run: |
           set -euo pipefail
-          python scripts/bible_intake.py --resource-id webp-research --observe-only
+          python scripts/bible_intake.py --resource-id frajnd-2024 --observe-only
       - name: Install stock SWORD binaries only if this stage needs them
         shell: bash
         run: |
