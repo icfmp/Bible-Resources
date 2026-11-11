@@ -339,7 +339,9 @@ def _capture_parallel_toggle_sample(env:dict, study_dir:Path) -> dict:
         "screenshot_sha256": sha256(target.read_bytes()).hexdigest(),
         "actual_parallel_second_translation_visible_verified": False,
         "gui_outcome_requires_visual_inspection": True,
-        "reader_originals_or_config_changed": False,
+        # Xiphos may update its own temporary HOME preferences; do not
+        # claim that GUI configuration is unchanged.
+        "original_pinned_preview_zip_modified": False,
     }
 
 
