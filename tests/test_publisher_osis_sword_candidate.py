@@ -9,7 +9,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from publisher_osis_sword_candidate import (
     PublisherSWORDResearchError, _create_candidate_layout, _native_notes,
     _read_native_frames, _compile_osis, config_for, safe_failure_code,
-    select_candidate_versifications,
+    select_candidate_versifications, _safe_compiled_payload_presence,
 )
 
 
@@ -31,6 +31,20 @@ class PublisherSwordProbeTests(unittest.TestCase):
         for invalid in ("KJV","../evil","","DarbyFr/evil"):
             with self.assertRaises(PublisherSWORDResearchError):
                 select_candidate_versifications(cfg,invalid)
+
+    def test_compiled_output_metadata_never_reveals_generated_filenames(self):
+        with tempfile.TemporaryDirectory() as folder:
+            out=Path(folder)
+            (out/"PRIVATE_VERSE_NAME").write_bytes(b"secret")
+            (out/"data").write_bytes(b"")
+            receipt=_safe_compiled_payload_presence(out)
+            self.assertEqual(receipt["candidate_data_file_count"],2)
+            self.assertEqual(receipt["candidate_nonempty_data_file_count"],1)
+            self.assertEqual(receipt["candidate_data_total_bytes"],6)
+            self.assertNotIn("PRIVATE",str(receipt))
+            (out/"not-a-file").mkdir()
+            with self.assertRaises(PublisherSWORDResearchError):
+                _safe_compiled_payload_presence(out)
 
     def test_layout_is_separate_nonpublishing_standard_sword(self):
         with tempfile.TemporaryDirectory() as folder:
