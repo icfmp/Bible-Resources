@@ -11,7 +11,7 @@ from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from reader_xiphos_headless_smoke import (
     extract_pinned_preview,XiphosSmokeError,_notice_click_from_geometry,
-    _sample_reader_passages, READER_SAMPLES,
+    _sample_reader_passages, _capture_parallel_toggle_sample, READER_SAMPLES,
 )
 
 
@@ -89,6 +89,46 @@ class XiphosSmokeUnitTests(unittest.TestCase):
                        side_effect=AssertionError("No X11 action allowed")):
                 with self.assertRaises(XiphosSmokeError):
                     _sample_reader_passages({"DISPLAY":":91"},folder)
+
+    def test_parallel_view_toggle_is_only_unreviewed_gui_evidence(self):
+        with tempfile.TemporaryDirectory() as base:
+            folder=Path(base)/"samples"
+            folder.mkdir()
+            calls=[]
+            def fake_run(args, **kwargs):
+                calls.append(args)
+                if args[0]=="import":
+                    Path(args[-1]).write_bytes(b"synthetic X11 screenshot")
+                return subprocess.CompletedProcess(args,0)
+            with (patch("reader_xiphos_headless_smoke.subprocess.run",
+                        side_effect=fake_run),
+                  patch("reader_xiphos_headless_smoke.time.sleep")):
+                result=_capture_parallel_toggle_sample({"DISPLAY":":91"},folder)
+            self.assertEqual(result["shortcut_invoked"],"Alt+P")
+            self.assertFalse(result["actual_parallel_second_translation_visible_verified"])
+            self.assertTrue(result["gui_outcome_requires_visual_inspection"])
+            self.assertEqual(calls[0][:4],
+                             ["xdotool","key","--clearmodifiers","alt+p"])
+            self.assertEqual(calls[1][:4],
+                             ["import","-display",":91","-window"])
+            self.assertTrue((folder/"parallel-toggle.png").is_file())
+
+    def test_parallel_probe_rejects_overwrite_or_untrusted_display_before_x11(self):
+        with tempfile.TemporaryDirectory() as base:
+            folder=Path(base)/"samples"
+            folder.mkdir()
+            (folder/"parallel-toggle.png").write_bytes(b"earlier verified proof")
+            with patch("reader_xiphos_headless_smoke.subprocess.run",
+                       side_effect=AssertionError("No X11 allowed")):
+                with self.assertRaises(XiphosSmokeError):
+                    _capture_parallel_toggle_sample({"DISPLAY":":91"},folder)
+            self.assertEqual((folder/"parallel-toggle.png").read_bytes(),
+                             b"earlier verified proof")
+            (folder/"parallel-toggle.png").unlink()
+            with patch("reader_xiphos_headless_smoke.subprocess.run",
+                       side_effect=AssertionError("No other display allowed")):
+                with self.assertRaises(XiphosSmokeError):
+                    _capture_parallel_toggle_sample({"DISPLAY":":0"},folder)
 
     def test_hash_and_scheme_mismatch_fail_closed(self):
         with tempfile.TemporaryDirectory() as folder:
