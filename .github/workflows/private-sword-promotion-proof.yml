@@ -1,0 +1,168 @@
+name: Test exact SWORD zText identity-only repackaging (research, not release)
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/private-sword-promotion-proof.yml"
+      - "scripts/promote_sword_preview.py"
+      - "tests/test_promote_sword_preview.py"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  pinned-ztext-repackaging:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run generic RawText and zText offline regressions
+        run: python -m unittest discover -s tests -p 'test_promote_sword_preview.py' -v
+      - name: Retrieve exact previously audited Darby TEST-ONLY research ZIP
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/ztext-private/input" "$RUNNER_TEMP/ztext-private/output"
+          gh run download 43006720611 --repo "$GITHUB_REPOSITORY" \
+            --name JND2024Research-Luther-TEST-ONLY-43006720611 \
+            --dir "$RUNNER_TEMP/ztext-private/input"
+          count="$(find "$RUNNER_TEMP/ztext-private/input" -type f \
+            -name 'JND2024Research-Luther-TEST-ONLY.zip' | wc -l)"
+          test "$count" = 1
+          source_zip="$(find "$RUNNER_TEMP/ztext-private/input" -type f \
+            -name 'JND2024Research-Luther-TEST-ONLY.zip' -print -quit)"
+          printf '%s  %s\n' \
+            6f1ad63a4c0a51e052bc5aa29bed79704a0c014cf1e9bd74af66542839e48a7b \
+            "$source_zip" | sha256sum --check
+          echo "SOURCE_ZIP=$source_zip" >> "$GITHUB_ENV"
+      - name: Write isolated candidate metadata — NOT APPROVED and NOT PUBLISHED
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/ztext-private/candidate.conf" <<'CONF'
+          [BRJND2024Candidate]
+          Description=Darby French Bible BPC 2024 rev 2.0 - INTERNAL TEST ONLY
+          About=Internal technical candidate for editorial review. Publisher original references and notes remain unchanged. Not approved or released by Bible Resources.
+          DataPath=./modules/texts/ztext/brjnd2024candidate/
+          ModDrv=zText
+          BlockType=BOOK
+          CompressType=ZIP
+          Encoding=UTF-8
+          Lang=fr
+          SourceType=OSIS
+          Versification=Luther
+          Version=0.0.0-private-candidate
+          DistributionLicense=Public Domain
+          TextSource=https://editeurbpc.com/telechargements/JND
+          GlobalOptionFilter=OSISFootnotes
+          GlobalOptionFilter=OSISXRefs
+          CONF
+          echo "REVIEW_CONF=$RUNNER_TEMP/ztext-private/candidate.conf" >> "$GITHUB_ENV"
+          echo "CANDIDATE_ZIP=$RUNNER_TEMP/ztext-private/output/BRJND2024Candidate-PRIVATE-ONLY.zip" >> "$GITHUB_ENV"
+      - name: Repackage only SWORD module identity and metadata — preserve all six data files
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/promote_sword_preview.py \
+            --source "$SOURCE_ZIP" \
+            --output "$CANDIDATE_ZIP" \
+            --expected-sha256 6f1ad63a4c0a51e052bc5aa29bed79704a0c014cf1e9bd74af66542839e48a7b \
+            --source-id JND2024Research \
+            --module-id BRJND2024Candidate \
+            --driver zText \
+            --versification Luther \
+            --config "$REVIEW_CONF" > "$RUNNER_TEMP/ztext-private/private-packaging.json"
+      - name: Verify exact source/candidate data SHA-256 and private safety receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          from zipfile import ZipFile
+          source=Path(os.environ["SOURCE_ZIP"])
+          candidate=Path(os.environ["CANDIDATE_ZIP"])
+          proof=json.loads(Path(os.environ["RUNNER_TEMP"]+"/ztext-private/private-packaging.json").read_text())
+          assert proof["status"] == "exact_sword_payload_promoted_with_reviewed_metadata"
+          assert proof["driver"] == "zText" and proof["versification"] == "Luther"
+          assert proof["data_byte_equal"] is True and proof["published"] is False
+          assert proof["source_zip_sha256"]=="6f1ad63a4c0a51e052bc5aa29bed79704a0c014cf1e9bd74af66542839e48a7b"
+          comparisons=[]
+          with ZipFile(source) as a, ZipFile(candidate) as b:
+              assert len(a.namelist())==len(b.namelist())==7
+              for testament in ("nt","ot"):
+                  for extension in ("bzs","bzv","bzz"):
+                      filename=f"{testament}.{extension}"
+                      left=a.read(f"modules/texts/ztext/jnd2024research/{filename}")
+                      right=b.read(f"modules/texts/ztext/brjnd2024candidate/{filename}")
+                      assert left==right
+                      comparisons.append(filename)
+              conf=b.read("mods.d/brjnd2024candidate.conf").decode("utf-8")
+              assert conf.startswith("[BRJND2024Candidate]\n")
+              assert "INTERNAL TEST ONLY" in conf and "Versification=Luther\n" in conf
+          report={
+              "status":"real_pinned_ztext_module_identity_only_preserved",
+              "source_sha256": proof["source_zip_sha256"],
+              "candidate_sha256": hashlib.sha256(candidate.read_bytes()).hexdigest(),
+              "candidate_bytes":candidate.stat().st_size,
+              "same_original_sword_data_files":sorted(comparisons),
+              "data_byte_identical":True,
+              "unapproved_and_unpublished":True,
+              "candidate_binary_uploaded":False,
+              "not_a_release":True,
+          }
+          target=Path(os.environ["RUNNER_TEMP"])/"ztext-private/metadata-receipt.json"
+          target.write_text(json.dumps(report,sort_keys=True,indent=2)+"\n")
+          print("Six original compressed SWORD data files copied bit-for-bit; no original or candidate Scripture printed")
+          PY
+      - name: Install independent standard SWORD reader
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y diatheke
+          command -v diatheke
+      - name: Reinstall only the private candidate and read five real passages through stock diatheke
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,subprocess
+          from pathlib import Path
+          from zipfile import ZipFile
+          root=Path(os.environ["RUNNER_TEMP"])/"ztext-private/installed"
+          root.mkdir()
+          with ZipFile(os.environ["CANDIDATE_ZIP"]) as z:
+              z.extractall(root)
+          env=dict(os.environ,SWORD_PATH=str(root))
+          passages=("Genesis 1:1","Psalms 23:1","Matthew 1:1","John 3:16","Revelation 22:21")
+          readbacks=[]
+          for reference in passages:
+              cmd=["diatheke","-b","BRJND2024Candidate","-f","plain","-m","1","-k",reference]
+              result=subprocess.run(cmd,env=env,stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE,timeout=30,check=False)
+              if result.returncode!=0 or len(result.stdout.strip())<30 or len(result.stdout)>500000:
+                  raise RuntimeError("Private stock SWORD readback failed for "+reference)
+              readbacks.append({"reference":reference,"status":"readable", "content_exposed":False})
+          path=Path(os.environ["RUNNER_TEMP"])/"ztext-private/metadata-receipt.json"
+          report=json.loads(path.read_text())
+          report["stock_diatheke_real_passages"]=readbacks
+          report["stock_reader_verified"]=True
+          path.write_text(json.dumps(report,sort_keys=True,indent=2)+"\n")
+          print("Five actual readbacks from isolated private candidate passed; no Bible prose printed")
+          PY
+      - name: Upload ONLY metadata evidence, never the unapproved binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-preserving-ztext-private-proof-${{ github.run_id }}
+          path: ${{ runner.temp }}/ztext-private/metadata-receipt.json
+          retention-days: 30
+          if-no-files-found: error
