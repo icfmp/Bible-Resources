@@ -384,6 +384,11 @@ def _capture_module_tree_probe(env: dict, study_dir: Path) -> dict:
         ["xdotool", "key", "Right"],
         ["xdotool", "mousemove", "--sync", "100", "202", "click", "1"],
         ["xdotool", "key", "Right"],
+        ["xdotool", "mousemove", "--sync", "120", "247"],
+        ["xdotool", "click", "--repeat", "2", "--delay", "160", "1"],
+        ["xdotool", "key", "--clearmodifiers", "ctrl+l"],
+        ["xdotool", "type", "--clearmodifiers", "--delay", "35", "Gen 1:1"],
+        ["xdotool", "key", "Return"],
     )
     for i, command in enumerate(commands):
         try:
@@ -394,7 +399,7 @@ def _capture_module_tree_probe(env: dict, study_dir: Path) -> dict:
             raise XiphosSmokeError("Bounded module-tree action unavailable") from exc
         if result.returncode:
             raise XiphosSmokeError("Module-tree interaction failed")
-        if i not in (1, 3):
+        if i not in (1, 3, 5, 8):
             continue
         target = study_dir / ("module-tree-stage-" + str(i) + ".png")
         if target.exists() or target.is_symlink():
@@ -418,6 +423,7 @@ def _capture_module_tree_probe(env: dict, study_dir: Path) -> dict:
     return {
         "inspection_only": True,
         "snapshots": pictures,
+        "attempted_second_tree_module_open_and_genesis_navigation": True,
         "module_selection_verified": False,
     }
 
