@@ -7,7 +7,7 @@ from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from publisher_osis_usfx_parity import (
     original_osis_verses_and_notes, compare_original_sources,
-    PublisherSourceParityError,
+    PublisherSourceParityError, _bounded_priority_findings,
 )
 
 ROOT="""<osis xmlns="http://www.bibletechnologies.net/2003/OSIS/namespace">
@@ -91,6 +91,36 @@ class OfficialSourceParityTests(unittest.TestCase):
         self.assertEqual(c["note_anchor_punctuation_ordinal_different"],1)
         self.assertEqual(c["shared_verse_nonspace_characters_equal"],2)
         self.assertNotIn("PRIVATE ORIGINAL NOTE",json.dumps(result))
+
+    def test_missing_verses_not_hidden_by_note_mismatch_sample_saturation(self):
+        # An edit-heavy edition can have hundreds of note differences, but
+        # the first bounded reviewer list must expose every sampled missing key.
+        findings = {
+            "note_body_folded_difference": [
+                {"reference": "Gen.1.1", "finding": "note_body_folded_difference"}
+                for _ in range(18)
+            ],
+            "source_note_caller_label_difference": [
+                {"reference": "Gen.1.1", "finding": "source_note_caller_label_difference"}
+                for _ in range(18)
+            ],
+            "source_reference_target_difference": [
+                {"reference": "Gen.1.1", "finding": "source_reference_target_difference"}
+                for _ in range(18)
+            ],
+            "source_note_anchor_position_difference": [
+                {"reference": "Gen.1.1", "finding": "source_note_anchor_position_difference"}
+                for _ in range(18)
+            ],
+            "usfx_reference_absent_in_official_publisher": [
+                {"reference": "Gen.1.2",
+                 "finding": "usfx_reference_absent_in_official_publisher"}
+            ],
+        }
+        rows = _bounded_priority_findings(findings)
+        self.assertEqual(len(rows), 72)
+        self.assertEqual(rows[0]["reference"], "Gen.1.2")
+        self.assertNotIn("PRIVATE", json.dumps(rows))
 
     def test_empty_or_overlapping_scope_blocks(self):
         xml=make_xml().replace(b'<verse eID="Gen.1.1"/>',b'')
