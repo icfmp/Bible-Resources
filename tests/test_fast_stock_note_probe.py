@@ -64,13 +64,15 @@ class QuickNotesTests(unittest.TestCase):
         self.assertEqual(result["reason_code"],"sample_only_no_proven_stock_loss")
         self.assertFalse(result["stock_reuse_or_publication_approved"])
 
-    def test_missing_note_body_blocks_stock(self):
+    def test_missing_note_requires_full_audit_not_invented_loss(self):
         result,_=self.run_probe(b'<div/>')
-        self.assertEqual(result["reason_code"],"note_count_differs_on_exact_source_verse")
+        self.assertEqual(result["status"],"REVIEW_REQUIRED")
+        self.assertEqual(result["reason_code"],"sample_note_count_requires_full_audit")
 
-    def test_changed_note_body_blocks_stock(self):
+    def test_note_body_encoding_difference_requires_full_audit(self):
         result,_=self.run_probe(b'<note n="a">different body</note>')
-        self.assertEqual(result["reason_code"],"note_body_differs_on_exact_source_verse")
+        self.assertEqual(result["status"],"REVIEW_REQUIRED")
+        self.assertEqual(result["reason_code"],"sample_note_body_requires_full_audit")
 
     def test_automatic_callers_are_not_mistaken_for_loss(self):
         result,reader=self.run_probe(caller="+")
