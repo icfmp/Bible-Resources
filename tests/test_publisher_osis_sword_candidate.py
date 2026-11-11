@@ -9,6 +9,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from publisher_osis_sword_candidate import (
     PublisherSWORDResearchError, _create_candidate_layout, _native_notes,
     _read_native_frames, _compile_osis, config_for, safe_failure_code,
+    compiler_output_metrics,
     select_candidate_versifications,
 )
 
@@ -99,6 +100,16 @@ class PublisherSwordProbeTests(unittest.TestCase):
         self.assertEqual(safe_failure_code(ValueError(
             "PRIVATE PUBLISHER VERSE <unknown>")),
             "unclassified_private_failure")
+
+    def test_private_compiler_output_receipt_never_includes_filenames(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path=Path(folder)
+            (path/"PRIVATE_SCRIPTURE.zdt").write_bytes(b"some_private_content")
+            report=compiler_output_metrics(path)
+            self.assertEqual(report["files"],1)
+            self.assertEqual(report["nonempty_files"],1)
+            self.assertEqual(report["total_bytes"],len(b"some_private_content"))
+            self.assertNotIn("PRIVATE",str(report))
 
     def test_compiler_log_never_copies_scripture(self):
         with tempfile.TemporaryDirectory() as folder:
