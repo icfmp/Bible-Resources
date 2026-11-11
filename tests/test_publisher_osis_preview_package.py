@@ -33,6 +33,40 @@ def fake_payload(path, extra=False):
     return base
 
 
+from publisher_osis_preview_readback import (
+    diatheke_readback_receipt, _readback_passed, PreviewReaderError,
+)
+
+class PreviewReadbackDiagnosticTests(unittest.TestCase):
+    def test_empty_and_nonzero_reader_status_are_safely_classified(self):
+        receipt=diatheke_readback_receipt(
+            1,b"",b"PRIVATE SWORD ERROR: filesystem details", "Genesis 1:1")
+        self.assertFalse(_readback_passed(receipt))
+        self.assertTrue(receipt["short_result"])
+        self.assertEqual(receipt["stderr_bytes"],
+                         len(b"PRIVATE SWORD ERROR: filesystem details"))
+        self.assertNotIn("PRIVATE",str(receipt))
+
+    def test_success_stays_possible_with_private_content_not_exposed(self):
+        receipt=diatheke_readback_receipt(
+            0,b"Genesis 1:1: PRIVATE SCRIPTURE WORDS AND MORE WORDS",b"",
+            "Genesis 1:1")
+        self.assertTrue(_readback_passed(receipt))
+        self.assertNotIn("PRIVATE",str(receipt))
+        self.assertEqual(receipt["exit_code"],0)
+
+    def test_module_not_found_is_not_a_successful_reader_passage(self):
+        receipt=diatheke_readback_receipt(
+            0,b"Module not found: JND2024Research, output ignored.",b"",
+            "Genesis 1:1")
+        self.assertFalse(_readback_passed(receipt))
+        self.assertTrue(receipt["known_module_not_found"])
+
+    def test_unreviewed_diagnostic_passage_is_rejected(self):
+        with self.assertRaises(PreviewReaderError):
+            diatheke_readback_receipt(0,b"PRIVATE",b"","NotARealPassage")
+
+
 class PreviewPackageTests(unittest.TestCase):
     def test_zip_is_exact_deterministic_and_reinstallable(self):
         with tempfile.TemporaryDirectory() as d:
