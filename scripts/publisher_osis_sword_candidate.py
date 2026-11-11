@@ -160,6 +160,13 @@ def _read_native_frames(reader: Path, module_id: str, payload: Path):
                     raise PublisherSWORDResearchError("Native frame count mismatch")
                 if p.stdout.read(1):
                     raise PublisherSWORDResearchError("Unexpected trailing native raw bytes")
+                try:
+                    if p.wait(timeout=15)!=0:
+                        raise PublisherSWORDResearchError(
+                            "Native raw reader returned nonzero after final frame")
+                except subprocess.TimeoutExpired as exc:
+                    raise PublisherSWORDResearchError(
+                        "Native raw reader failed to terminate") from exc
                 break
             if len(cells)!=3 or cells[0] not in {"K","I","U"}:
                 raise PublisherSWORDResearchError("Invalid native entry frame type")
@@ -179,9 +186,7 @@ def _read_native_frames(reader: Path, module_id: str, payload: Path):
         p.stdout.close()
         if p.poll() is None:
             p.kill()
-        code=p.wait(timeout=15)
-        if code!=0:
-            raise PublisherSWORDResearchError("Native raw reader failed")
+        p.wait(timeout=15)
 
 
 def _native_notes(raw: bytes):
@@ -306,6 +311,8 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
         not counts["numbered_verse_note_xml_invalid"] and
         not counts["note_original_caller_label_different"] and
         not counts["note_body_words_or_punctuation_differ"] and
+        not counts["note_original_type_different"] and
+        not counts["note_explicit_target_sequence_different"] and
         not counts["note_nonspace_anchor_moved"] and
         not counts["numbered_verse_note_positions_unverified"] and
         counts["note_pairs_compared"]==sum(map(len,notes.values()))
