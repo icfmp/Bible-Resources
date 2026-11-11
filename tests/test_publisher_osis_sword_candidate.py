@@ -8,7 +8,7 @@ import unittest
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from publisher_osis_sword_candidate import (
     PublisherSWORDResearchError, _create_candidate_layout, _native_notes,
-    _read_native_frames, _compile_osis, config_for,
+    _read_native_frames, _compile_osis, config_for, safe_failure_code,
 )
 
 
@@ -73,6 +73,16 @@ class PublisherSwordProbeTests(unittest.TestCase):
             stub.chmod(0o755)
             with self.assertRaises(PublisherSWORDResearchError):
                 list(_read_native_frames(stub,"Fake",root))
+
+    def test_safe_failure_codes_do_not_expose_private_exception_content(self):
+        self.assertEqual(safe_failure_code(PublisherSWORDResearchError(
+            "OSIS tool returned nonzero exit status 1")), "compiler_nonzero_exit")
+        self.assertEqual(safe_failure_code(PublisherSWORDResearchError(
+            "Stock SWORD module contains no populated Bible verses")),
+            "native_zero_populated_verses")
+        self.assertEqual(safe_failure_code(ValueError(
+            "PRIVATE PUBLISHER VERSE <unknown>")),
+            "unclassified_private_failure")
 
     def test_compiler_log_never_copies_scripture(self):
         with tempfile.TemporaryDirectory() as folder:
