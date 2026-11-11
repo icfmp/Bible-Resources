@@ -50,8 +50,7 @@ def preflight_stock_reuse(*, native_scan_complete: bool, main_text_preserved: bo
     if not main_text_preserved:
         losses["numbered_main_text_not_preserved"] = 1
     for name in MATERIAL_NOTE:
-        n = _count(notes if name == "source_note_bearing_verses_without_native_slot"
-                   else note_classes, name)
+        n = _count(note_classes, name)
         if n:
             losses[name] = n
     for name in MATERIAL_ATTRIBUTES:
