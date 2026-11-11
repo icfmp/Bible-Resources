@@ -188,6 +188,21 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                 if not window:
                     raise XiphosSmokeError("Cannot review screenshot without visible Xiphos window")
                 notice_dismissed=_dismiss_transient_xiphos_notice(env)
+                fixed_viewport_fallback_attempted=False
+                if not notice_dismissed and env.get("DISPLAY")==":91":
+                    # Fixed 1280x800 Xvfb test screen: first-start Xiphos
+                    # locale warning observed at (0,0)-(564,135). Click only
+                    # its broad bottom-center OK strip. This ephemeral test
+                    # session has a private HOME; never use on user desktop.
+                    fixed_viewport_fallback_attempted=True
+                    try:
+                        click=subprocess.run(
+                            ["xdotool","mousemove","--sync","282","116","click","1"],
+                            env=env,stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL,timeout=4,check=False)
+                        notice_dismissed=click.returncode==0
+                    except (OSError,subprocess.TimeoutExpired):
+                        notice_dismissed=False
                 time.sleep(1.5)
                 if (screenshot.is_symlink() or screenshot.exists()
                         or not screenshot.parent.is_dir()
@@ -212,6 +227,8 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                 "isolated_standard_ztext_package":True,
                 "x11_window_detected_not_visually_inspected":window,
                 "test_only_screenshot_sha256":screenshot_sha,
+                "isolated_virtual_display_notice_click_fallback_attempted":(
+                    fixed_viewport_fallback_attempted if screenshot is not None else False),
                 "transient_small_notice_dismissal_attempt_succeeded":(
                     notice_dismissed if screenshot is not None else False),
                 "screenshot_external_review_required":screenshot is not None,
