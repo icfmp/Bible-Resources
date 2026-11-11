@@ -10,7 +10,8 @@ from collections import Counter
 
 from lxml import etree
 
-from source_osis_inventory import _source_tree
+from source_osis_inventory import _source_tree, OSIS
+from stable_sword_refs import KEY
 
 STYLES = frozenset({"p", "l", "lg", "lb", "title"})
 
@@ -96,3 +97,47 @@ class NativeStructuralCensus:
             "source_native_structural_count_equality_not_inferred": True,
             "editorial_layout_and_visual_signoff_deferred_to_stage_5": True,
         }
+
+
+def authorial_body_opening_sequences(xml: bytes):
+    """Original per-book p/l opening kind order; private verse labels only.
+
+    Comparisons to native milestone order are not a word-position, end-boundary,
+    note, heading or reader-layout certificate.
+    """
+    root = _source_tree(xml)
+    books = [n for n in root.iter(OSIS+"div") if n.get("type") == "book"]
+    if not books or len(books) > 250:
+        raise OSISStructureScreenError("Missing or implausible authored book scope")
+    output = {}
+    counts = Counter()
+    for book in books:
+        ident=book.get("osisID")
+        if not ident or not ident.isascii() or not ident.isalnum() or len(ident)>40:
+            raise OSISStructureScreenError("Unsafe original book key")
+        if ident in output:
+            raise OSISStructureScreenError("Duplicate original book key")
+        if any(p.tag==OSIS+"div" and p.get("type")=="book"
+               for p in book.iterancestors()):
+            raise OSISStructureScreenError("Nested authored book")
+        last_ref=ident
+        events=[]
+        for n in book.iter():
+            if not isinstance(n.tag,str):
+                continue
+            if n.tag==OSIS+"verse" and n.get("osisID"):
+                ref=n.get("osisID")
+                if not KEY.fullmatch(ref) or not ref.startswith(ident+"."):
+                    raise OSISStructureScreenError("Invalid source location for structure")
+                last_ref=ref
+            if n.tag not in {OSIS+"p",OSIS+"l"}:
+                continue
+            if any(a.tag in {OSIS+"note",OSIS+"header",OSIS+"title"}
+                   for a in n.iterancestors() if a is not book):
+                counts["excluded_annotation_embedded_structure"]+=1
+                continue
+            kind="p" if n.tag==OSIS+"p" else "q"
+            events.append((kind,last_ref))
+            counts["source_body_"+kind+"_openings"]+=1
+        output[ident]=events
+    return output,dict(sorted(counts.items()))
