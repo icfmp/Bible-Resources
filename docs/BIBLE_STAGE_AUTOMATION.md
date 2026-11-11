@@ -270,6 +270,38 @@ does **not yet** avoid that scan or implement hashed per-subcheck replay.
 Next work in #83 must add independently resumable inputs and a fast
 feature-presence pass, not new edition-specific whitespace probes.
 
+## One-pass stages 4+5 machine audit (experimental nonpublishing)
+
+For a reviewed source manifest with the stock SWORD module SHA-256 already
+pinned, issue this authenticated comment on the open `[Import]` issue:
+
+```text
+/bible-audit frajnd-2024 4-5
+```
+
+Or choose `4-5` for the `stage` input of the existing GitHub Actions workflow.
+The command **does not create an eighth stage**. It acquires and independently
+SHA-verifies the same original source and stock SWORD ZIPs exactly once,
+executes the existing full source/native SWORD audit once and derives **two
+distinct technical receipts** (`stage_machine_receipts["4"]` and `["5"]`)
+inside one metadata-only `stage-report.json` plus one bounded
+`stage-summary.md`. Each receipt retains its own `DONE`, `PARTIAL`,
+`BLOCKED` or `REVIEW_REQUIRED` result. The combined report records the
+canonical manifest SHA-256, current tool commit, original archive
+fingerprints and whether an actual full native corpus scan completed.
+
+A material stock-module loss still blocks that candidate even if its
+Scripture prose matches. One-pass execution **does not** imply that
+independently rendered book titles, source-authorial white space, note link
+clicks, parallel GUI usage, rights or any publication gate are approved.
+Do not tick the stage-4 or stage-5 issue checkbox from this aggregate
+report alone. The original one-stage commands still work unchanged.
+
+This reduces repeated acquisitions and full scans **only when the operator
+chooses the bundle**. It does not yet implement cross-run receipt caching or
+revalidate a changed source/tool without rerunning the audit. Those remain
+explicitly tracked in #83.
+
 ## Stage-4 subchecks and provisional source/native structural anchors
 
 Step 4 is split **internally** into 4a (stock identity / complete reference
