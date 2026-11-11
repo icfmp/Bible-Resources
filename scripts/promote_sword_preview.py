@@ -97,16 +97,19 @@ def promote(source: Path, destination: Path, *, expected_source_sha256: str,
     new_dir = f"modules/texts/{layout}/{destination_id.lower()}/"
     expected = {f"mods.d/{source_id.lower()}.conf", *(old_dir + f for f in filenames)}
     with ZipFile(source) as archive:
-        if archive.testzip() is not None or len(archive.namelist()) != len(expected):
-            raise ValueError("Corrupt or unexpected SWORD ZIP")
-        if set(archive.namelist()) != expected:
-            raise ValueError("Unexpected SWORD input inventory")
+        # Inspect the bounded declared inventory before CRC/decompression so
+        # an oversized or duplicate member is never needlessly expanded.
+        members = archive.infolist()
+        if len(members) != len(expected) or {i.filename for i in members} != expected:
+            raise ValueError("Unexpected SWORD ZIP inventory")
         if any(i.is_dir() or ((i.external_attr >> 16) & 0o170000)
                not in (0, 0o100000) or i.file_size > MAX_ARCHIVE_MEMBER_BYTES
-               for i in archive.infolist()):
+               for i in members):
             raise ValueError("Unsafe ZIP member")
-        if sum(i.file_size for i in archive.infolist()) > MAX_TOTAL_DATA_BYTES:
+        if sum(i.file_size for i in members) > MAX_TOTAL_DATA_BYTES:
             raise ValueError("Oversized SWORD ZIP")
+        if archive.testzip() is not None:
+            raise ValueError("Corrupt SWORD ZIP")
         source_fields = _require_config_fields(
             archive.read(f"mods.d/{source_id.lower()}.conf"),
             module_id=source_id, path=old_dir, driver=driver,
