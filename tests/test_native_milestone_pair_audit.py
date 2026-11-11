@@ -90,6 +90,29 @@ class NativeMilestonePairTests(unittest.TestCase):
             "unaddressable_TOP_milestone_events_unverified"],1)
         self.assertNotEqual(result["status"],"compiled_milestone_pairs_verified_only")
 
+    def test_empty_parseable_anonymous_top_is_not_unresolved_milestone(self):
+        check=NativeMilestonePairAudit()
+        check.observe("U","TOP:1",b"<title>PRIVATE TITLE</title>")
+        check.observe("U","TOP:2",b"PRIVATE INTRODUCTION")
+        check.observe("I","Gen",b'<div type="book" sID="book"/>')
+        check.observe("K","Gen.1.1",b'<div type="book" eID="book"/>')
+        r=check.finish()
+        self.assertEqual(r["native_numbered_intro_scan_counts"][
+            "unaddressable_TOP_entries_unverified"],2)
+        self.assertEqual(r["native_numbered_intro_scan_counts"][
+            "unaddressable_TOP_milestone_events_unverified"],0)
+        self.assertEqual(r["native_milestone_pairing_findings"],{})
+        self.assertEqual(r["status"],"compiled_milestone_pairs_verified_only")
+        self.assertNotIn("PRIVATE",str(r))
+
+    def test_top_structural_event_still_blocks_milestone_pairing(self):
+        check=NativeMilestonePairAudit()
+        check.observe("U","TOP:1",b'<div sID="private-orphan"/>')
+        r=check.finish()
+        self.assertEqual(r["native_numbered_intro_scan_counts"][
+            "unaddressable_TOP_milestone_events_unverified"],1)
+        self.assertNotEqual(r["status"],"compiled_milestone_pairs_verified_only")
+
     def test_source_words_and_note_values_never_escape(self):
         check=NativeMilestonePairAudit()
         check.observe("K","Gen.1.1",b'<div sID="PRIVATE_IDENTIFIER"/>'
