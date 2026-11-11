@@ -76,6 +76,10 @@ class XiphosSmokeUnitTests(unittest.TestCase):
             self.assertTrue(all(entry["gui_navigation_outcome_requires_visual_inspection"]
                                 for entry in result))
             self.assertEqual(len(list(folder.glob("*.png"))),len(READER_SAMPLES))
+            self.assertIn(
+                ["xdotool","windowfocus","--sync","12345"],commands)
+            self.assertFalse(any("windowactivate" in command
+                                 for command in commands))
             self.assertEqual(sum(command[:2] == ["xdotool","key"]
                                  for command in commands),2*len(READER_SAMPLES))
             self.assertFalse(any("note" in " ".join(command).lower()
