@@ -54,6 +54,7 @@ jobs:
               raise SystemExit("Invalid research command")
           with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as out:
               out.write("RESOURCE_ID="+match.group(1)+"\n")
+              out.write("CANDIDATE_V11N="+(match.group(2) or "")+"\n")
           print("Authorized private compiler research:", match.group(1))
           PY
       - name: Install standard SWORD compiler and independent native inspectors
