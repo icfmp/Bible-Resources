@@ -297,6 +297,10 @@ def compare_original_sources(
                   and not counts["shared_verse_nonspace_characters_differ"]
                   and not counts["shared_verse_note_count_differs"]
                   and not counts["source_note_caller_labels_differ"]
+                  and not counts["note_body_folded_different"]
+                  and not counts["note_anchor_punctuation_ordinal_different"]
+                  and not counts["usfx_explicit_target_absent_in_publisher"]
+                  and not counts["both_explicit_target_sequences_differ"]
                   else "material_publisher_osis_usfx_differences_require_review"),
         "original_source_comparison_counts":dict(sorted(counts.items())),
         "official_source_metadata":official_meta,
