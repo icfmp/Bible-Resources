@@ -60,6 +60,7 @@ def test_preview(zip_path:Path, report_path:Path, native_index:Path,diatheke:Pat
     expected={conf}|{prefix+k for k in COMPRESSED_FILES}
     with tempfile.TemporaryDirectory(prefix="publisher-private-reader-preview-") as folder:
         root=Path(folder)
+        payload=root/"payload"
         with ZipFile(zip_path) as source_zip:
             members=source_zip.infolist()
             if (len(members)!=len(expected)
@@ -72,7 +73,7 @@ def test_preview(zip_path:Path, report_path:Path, native_index:Path,diatheke:Pat
                 blob=source_zip.read(item)
                 if sha256(blob).hexdigest()!=preview["member_sha256"].get(item.filename):
                     raise PreviewReaderError("Audited SWORD payload byte identity lost")
-                path=root/item.filename
+                path=payload/item.filename
                 path.parent.mkdir(parents=True,exist_ok=True)
                 path.write_bytes(blob)
         native_keys,_native_report,inventory=collect_native_inventory(native_index,root,module)
@@ -80,7 +81,7 @@ def test_preview(zip_path:Path, report_path:Path, native_index:Path,diatheke:Pat
         if (len(references)!=31166
                 or inventory.get("module_driver")!="zText"):
             raise PreviewReaderError("Isolated SWORD engine cannot read verified index")
-        env=dict(os.environ,SWORD_PATH=str(root))
+        env=dict(os.environ,SWORD_PATH=str(payload))
         for passage in TEST_PASSAGES:
             try:
                 cmd=[str(diatheke.resolve(strict=True)),"-b",module,
