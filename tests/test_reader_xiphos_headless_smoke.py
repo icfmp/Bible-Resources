@@ -5,10 +5,13 @@ from hashlib import sha256
 import tempfile
 import unittest
 from zipfile import ZipFile
+import subprocess
+from unittest.mock import patch
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from reader_xiphos_headless_smoke import (
     extract_pinned_preview,XiphosSmokeError,_notice_click_from_geometry,
+    _sample_reader_passages, READER_SAMPLES,
 )
 
 
@@ -49,6 +52,43 @@ class XiphosSmokeUnitTests(unittest.TestCase):
         self.assertIsNone(
             _notice_click_from_geometry({"X":5,"Y":5,"WIDTH":300,"HEIGHT":65}))
         self.assertIsNone(_notice_click_from_geometry({"X":3}))
+
+    def test_real_reader_sample_commands_remain_nonpublication_evidence(self):
+        with tempfile.TemporaryDirectory() as base:
+            folder=Path(base)/"samples"
+            commands=[]
+            def fake_run(args, **kwargs):
+                commands.append(args)
+                if args[:2] == ["xdotool", "search"]:
+                    return subprocess.CompletedProcess(args, 0, stdout=b"12345\\n")
+                if args[0] == "import":
+                    Path(args[-1]).write_bytes(b"synthetic screenshot only")
+                return subprocess.CompletedProcess(args, 0)
+            with (patch("reader_xiphos_headless_smoke.subprocess.run",
+                        side_effect=fake_run),
+                  patch("reader_xiphos_headless_smoke.time.sleep")):
+                result=_sample_reader_passages({"DISPLAY":":91"},folder)
+            self.assertEqual(len(result),len(READER_SAMPLES))
+            self.assertEqual([entry["sample"] for entry in result],
+                             [entry[0] for entry in READER_SAMPLES])
+            self.assertEqual([entry["requested_reference"] for entry in result],
+                             [entry[1] for entry in READER_SAMPLES])
+            self.assertTrue(all(entry["gui_navigation_outcome_requires_visual_inspection"]
+                                for entry in result))
+            self.assertEqual(len(list(folder.glob("*.png"))),len(READER_SAMPLES))
+            self.assertEqual(sum(command[:2] == ["xdotool","key"]
+                                 for command in commands),2*len(READER_SAMPLES))
+            self.assertFalse(any("note" in " ".join(command).lower()
+                                 for command in commands))
+
+    def test_real_reader_samples_do_not_overwrite_or_follow_symlinks(self):
+        with tempfile.TemporaryDirectory() as base:
+            folder=Path(base)/"samples"
+            folder.mkdir()
+            with patch("reader_xiphos_headless_smoke.subprocess.run",
+                       side_effect=AssertionError("No X11 action allowed")):
+                with self.assertRaises(XiphosSmokeError):
+                    _sample_reader_passages({"DISPLAY":":91"},folder)
 
     def test_hash_and_scheme_mismatch_fail_closed(self):
         with tempfile.TemporaryDirectory() as folder:
