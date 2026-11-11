@@ -13,7 +13,7 @@ from reader_xiphos_headless_smoke import (
     extract_pinned_preview,XiphosSmokeError,_notice_click_from_geometry,
     _sample_reader_passages, _capture_parallel_toggle_sample,
     _capture_note_hover_sample, GENESIS_1_2_NOTE_HOVER, READER_SAMPLES,
-    install_checked_out_rawtext_comparison,
+    install_checked_out_rawtext_comparison, _capture_module_tree_probe,
 )
 
 
@@ -216,6 +216,43 @@ class XiphosSmokeUnitTests(unittest.TestCase):
                 install_checked_out_rawtext_comparison(
                     source, isolated, "GenericSecond", "Segond")
             self.assertEqual(list(isolated.rglob("*")), [])
+
+
+    def test_module_tree_probe_records_only_unapproved_gui_screenshots(self):
+        with tempfile.TemporaryDirectory() as base:
+            study = Path(base) / "study"
+            study.mkdir()
+            commands = []
+            def fake_run(args, **kwargs):
+                commands.append(args)
+                if args[0] == "import":
+                    Path(args[-1]).write_bytes(b"synthetic tree screenshot")
+                return subprocess.CompletedProcess(args, 0)
+            with (patch("reader_xiphos_headless_smoke.subprocess.run",
+                        side_effect=fake_run),
+                  patch("reader_xiphos_headless_smoke.time.sleep")):
+                report = _capture_module_tree_probe({"DISPLAY": ":91"}, study)
+            self.assertEqual(len(report["snapshots"]), 2)
+            self.assertFalse(report["module_selection_verified"])
+            self.assertEqual(commands[0],
+                             ["xdotool", "mousemove", "--sync", "100", "134",
+                              "click", "1"])
+            self.assertEqual([x for x in commands if x[0] == "import"].__len__(), 2)
+            self.assertEqual(len(list(study.glob("module-tree-stage-*.png"))), 2)
+
+    def test_module_tree_probe_rejects_existing_or_untrusted_fixture(self):
+        with tempfile.TemporaryDirectory() as base:
+            study = Path(base) / "study"
+            study.mkdir()
+            with patch("reader_xiphos_headless_smoke.subprocess.run",
+                       side_effect=AssertionError("X11 should be rejected")):
+                with self.assertRaises(XiphosSmokeError):
+                    _capture_module_tree_probe({"DISPLAY": ":0"}, study)
+            (study / "module-tree-stage-1.png").write_bytes(b"prior evidence")
+            with patch("reader_xiphos_headless_smoke.subprocess.run",
+                       side_effect=lambda args, **kw: subprocess.CompletedProcess(args, 0)):
+                with self.assertRaises(XiphosSmokeError):
+                    _capture_module_tree_probe({"DISPLAY": ":91"}, study)
 
     def test_hash_and_scheme_mismatch_fail_closed(self):
         with tempfile.TemporaryDirectory() as folder:
