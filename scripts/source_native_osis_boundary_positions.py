@@ -36,6 +36,7 @@ class _Stream:
         self.hash = sha256()
         self.chars = 0
         self.events = defaultdict(list)
+        self.num_events = 0
 
     def append(self, string):
         if string:
@@ -50,7 +51,8 @@ class _Stream:
             raise BoundaryScreenError("Unknown structural event")
         key=name+"_"+endpoint
         self.events[key].append(self.chars)
-        if sum(map(len,self.events.values())) > MAX_EVENTS:
+        self.num_events += 1
+        if self.num_events > MAX_EVENTS:
             raise BoundaryScreenError("Too many private structural events")
 
     def digest(self):
