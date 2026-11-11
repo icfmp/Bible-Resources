@@ -132,11 +132,34 @@ def authorial_book_streams(xml: bytes):
     return result
 
 
+def authorial_outside_book_titles(xml: bytes):
+    """Title signatures outside book scopes (typically testament headings).
+
+    Their recorded authored order must equal the SWORD TOP title order. Title
+    contents are never included in the report; book headings remain separate.
+    """
+    root = _source_tree(xml)
+    result=[]
+    for node in root.iter(OSIS+"title"):
+        parents=list(node.iterancestors())
+        if any(p.tag in {OSIS+"header",OSIS+"note"} for p in parents):
+            continue
+        if any(p.tag==OSIS+"div" and p.get("type")=="book" for p in parents):
+            continue
+        prose="".join(node.itertext())
+        chars="".join(c for c in prose if not c.isspace())
+        if len(chars)>MAX_TEXT or len(result)>=MAX_EVENTS:
+            raise BoundaryScreenError("Excessive authored outside-book title")
+        result.append((sha256(chars.encode("utf-8")).hexdigest(),len(chars)))
+    return result
+
+
 class NativeBookStreams:
     """Process actual native K/I/U frames in the independent reader order."""
     def __init__(self):
         self.books={}
         self.top_nonspace=0
+        self.top_titles=[]  # original order, private content digests only
         self.frames=Counter()
 
     def observe(self,kind,ref,raw):
@@ -152,6 +175,7 @@ class NativeBookStreams:
             top=_Stream()
             _walk(root,top,"native")
             self.top_nonspace+=top.chars
+            self.top_titles.extend((digest,length) for _position,digest,length in top.titles)
             return
         book=ref.split(".",1)[0]
         if not BOOK.fullmatch(book):
@@ -160,7 +184,8 @@ class NativeBookStreams:
         _walk(root,stream,"native")
 
 
-def compare_book_boundary_positions(original: dict, compiled: NativeBookStreams):
+def compare_book_boundary_positions(original: dict, compiled: NativeBookStreams,
+                                    original_outside_titles=None):
     if not original or set(original)!=set(compiled.books):
         raise BoundaryScreenError("Full source/native book scope not verified")
     counts=Counter()
@@ -210,10 +235,24 @@ def compare_book_boundary_positions(original: dict, compiled: NativeBookStreams)
                                         "native_event_count":len(y),
                                         "source_nonspace_position":x[idx] if idx<len(x) else None,
                                         "native_nonspace_position":y[idx] if idx<len(y) else None})
+    outside_titles_proved=False
+    if original_outside_titles is not None:
+        counts["source_outside_book_title_events"]=len(original_outside_titles)
+        counts["native_TOP_title_events"]=len(compiled.top_titles)
+        outside_titles_proved=(original_outside_titles==compiled.top_titles)
+        if outside_titles_proved:
+            counts["outside_book_title_text_and_order_equal"]=len(original_outside_titles)
+        else:
+            counts["outside_book_title_text_or_order_requires_review"]+=1
+            if len(samples)<MAX_EXAMPLES:
+                samples.append({"kind":"outside_book_title_content_or_order_differs",
+                                "source_count":len(original_outside_titles),
+                                "compiled_count":len(compiled.top_titles)})
     verified=(counts["books_compared"]==len(original)
               and not counts["books_with_unmatched_full_body_stream"]
               and not counts["boundary_event_groups_unverified_or_different"]
               and not counts["books_with_title_position_or_text_differences"]
+              and outside_titles_proved
               and compiled.top_nonspace==0)
     return {
         "status":("source_native_body_boundary_nonspace_positions_equal"
@@ -227,6 +266,7 @@ def compare_book_boundary_positions(original: dict, compiled: NativeBookStreams)
         "all_title_text_and_nonspace_placement_equal": (
             not counts["books_with_title_position_or_text_differences"]
             and counts["source_title_events"]==counts["native_title_events"]
+            and outside_titles_proved
         ),
         "source_title_prose_and_verse_zero_semantics_verified":False,
         "independent_reader_visual_signoff":False,
