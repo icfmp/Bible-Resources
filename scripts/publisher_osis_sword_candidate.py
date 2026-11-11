@@ -103,9 +103,11 @@ def _compile_osis(tool: Path, outfile: Path, module_path: Path, system: str,
         try:
             cmd=[str(tool.resolve(strict=True)),str(module_path),
                  str(outfile),"-z","z","-b","4","-v",system]
-            process=subprocess.run(cmd,stdout=log,stderr=log,check=False,timeout=210)
-        except (OSError,subprocess.TimeoutExpired) as exc:
-            raise PublisherSWORDResearchError("Official OSIS compiler failed or timed out") from exc
+            process=subprocess.run(cmd,stdout=log,stderr=log,check=False,timeout=420)
+        except subprocess.TimeoutExpired as exc:
+            raise PublisherSWORDResearchError("Official OSIS compiler exceeded bounded timeout") from exc
+        except OSError as exc:
+            raise PublisherSWORDResearchError("Official OSIS compiler failed to launch") from exc
     if log_path.stat().st_size>MAX_LOG:
         raise PublisherSWORDResearchError("OSIS tool emitted excessive diagnostics")
     # Never print raw compiler stdout/stderr: even diagnostic messages can
@@ -342,8 +344,17 @@ def safe_failure_code(exc: Exception) -> str:
     are recognized. Unknown exceptions are intentionally opaque.
     """
     message = str(exc)
+    # Numeric exit is diagnostic metadata from our native inspector, not
+    # publisher text. Never echo the remainder of an exception message.
+    native_exit = re.match(r"Stock-SWORD native inspector blocked \(exit ([0-9]{1,3})\)", message)
+    if native_exit:
+        value = int(native_exit.group(1))
+        if 1 <= value <= 255:
+            return f"native_inspector_exit_{value}"
     known = (
         ("OSIS tool returned nonzero exit status ", "compiler_nonzero_exit"),
+        ("Official OSIS compiler exceeded bounded timeout", "compiler_bounded_timeout"),
+        ("Official OSIS compiler failed to launch", "compiler_launch_failed"),
         ("Official OSIS compiler failed or timed out", "compiler_launch_or_timeout"),
         ("OSIS tool emitted excessive diagnostics", "compiler_excessive_private_output"),
         ("Missing trusted compiler or original pinned OSIS", "compiler_or_source_missing"),

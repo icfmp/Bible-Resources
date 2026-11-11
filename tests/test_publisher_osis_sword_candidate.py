@@ -80,6 +80,12 @@ class PublisherSwordProbeTests(unittest.TestCase):
         self.assertEqual(safe_failure_code(PublisherSWORDResearchError(
             "Stock SWORD module contains no populated Bible verses")),
             "native_zero_populated_verses")
+        self.assertEqual(safe_failure_code(PublisherSWORDResearchError(
+            "Official OSIS compiler exceeded bounded timeout")),
+            "compiler_bounded_timeout")
+        self.assertEqual(safe_failure_code(ValueError(
+            "Stock-SWORD native inspector blocked (exit 7); PRIVATE VERSE")),
+            "native_inspector_exit_7")
         self.assertEqual(safe_failure_code(ValueError(
             "PRIVATE PUBLISHER VERSE <unknown>")),
             "unclassified_private_failure")
