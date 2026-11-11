@@ -151,9 +151,11 @@ def _dismiss_transient_xiphos_notice(env):
 
 
 def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_seconds:int,
-          screenshot:Path|None=None):
+          screenshot:Path|None=None,note_screenshot:Path|None=None):
     if not isinstance(startup_seconds,int) or not 5<=startup_seconds<=25:
         raise XiphosSmokeError("Unbounded headless startup duration")
+    if note_screenshot is not None and screenshot is None:
+        raise XiphosSmokeError("Cannot probe a note click without first screenshot")
     with tempfile.TemporaryDirectory(prefix="isolated-xiphos-preview-") as temp:
         base=Path(temp)
         payload_root=base/"payload"
@@ -184,6 +186,8 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                 time.sleep(0.5)
             window=_visible_window(env)
             screenshot_sha=None
+            note_screenshot_sha=None
+            note_click_attempted=False
             if screenshot is not None:
                 if not window:
                     raise XiphosSmokeError("Cannot review screenshot without visible Xiphos window")
@@ -219,6 +223,30 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                 if snap.returncode!=0 or screenshot.stat().st_size>6_000_000:
                     raise XiphosSmokeError("Invalid bounded screenshot result")
                 screenshot_sha=sha256(screenshot.read_bytes()).hexdigest()
+                if note_screenshot is not None:
+                    if (note_screenshot==screenshot or note_screenshot.exists()
+                            or note_screenshot.is_symlink()
+                            or note_screenshot.parent!=screenshot.parent
+                            or note_screenshot.suffix.lower()!=".png"):
+                        raise XiphosSmokeError("Refusing unsafe note screenshot path")
+                    # Fixed 1280x800 Xvfb viewport. The independent first
+                    # screenshot shows the default Rom 8:26 footnote caller
+                    # near x=415,y=190. Clicking is only a visual probe and
+                    # absolutely NOT a claim that navigation worked.
+                    clicked=subprocess.run(
+                        ["xdotool","mousemove","--sync","415","190","click","1"],
+                        env=env,stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,timeout=4,check=False)
+                    note_click_attempted=clicked.returncode==0
+                    time.sleep(1.5)
+                    shot=subprocess.run(
+                        ["import","-display",env["DISPLAY"],"-window","root",
+                         str(note_screenshot)],env=env,stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,timeout=15,check=False)
+                    if (shot.returncode!=0 or not note_screenshot.is_file()
+                            or note_screenshot.stat().st_size>6_000_000):
+                        raise XiphosSmokeError("Invalid note click visual receipt")
+                    note_screenshot_sha=sha256(note_screenshot.read_bytes()).hexdigest()
             return {
                 "status":"headless_xiphos_running_after_bounded_startup",
                 "reader":"xiphos",
@@ -227,6 +255,8 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                 "isolated_standard_ztext_package":True,
                 "x11_window_detected_not_visually_inspected":window,
                 "test_only_screenshot_sha256":screenshot_sha,
+                "test_only_note_click_screenshot_sha256":note_screenshot_sha,
+                "note_caller_click_attempted_no_success_inferred":note_click_attempted,
                 "isolated_virtual_display_notice_click_fallback_attempted":(
                     fixed_viewport_fallback_attempted if screenshot is not None else False),
                 "transient_small_notice_dismissal_attempt_succeeded":(
@@ -254,11 +284,12 @@ def main():
     parser.add_argument("--seconds",type=int,default=12)
     parser.add_argument("--report",type=Path,required=True)
     parser.add_argument("--screenshot",type=Path)
+    parser.add_argument("--note-screenshot",type=Path)
     args=parser.parse_args()
     if args.report.exists() or not args.report.parent.is_dir():
         parser.error("Refuse overwrite or missing report parent")
     receipt=smoke(args.zip,args.module_id,args.sha256,args.versification,args.seconds,
-                  screenshot=args.screenshot)
+                  screenshot=args.screenshot,note_screenshot=args.note_screenshot)
     args.report.write_text(json.dumps(receipt,sort_keys=True,indent=2)+"\n",encoding="utf-8")
     print("Xiphos test-only capture classified; no screenshot pixels or Bible text logged")
 
