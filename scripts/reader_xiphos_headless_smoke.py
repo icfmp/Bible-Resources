@@ -163,8 +163,30 @@ def _sample_reader_passages(env, out: Path) -> list[dict]:
     """Xiphos Ctrl+L navigation with actual screenshots, not content approval."""
     if out.exists() or out.is_symlink() or not out.parent.is_dir():
         raise XiphosSmokeError("Unsafe sample screenshot output directory")
-    # No coordinates are needed to navigate: Ctrl+L is an official Xiphos
-    # keyboard shortcut. Note clicks are NOT attempted or certified here.
+    # No screen coordinates: Ctrl+L is a documented Xiphos shortcut.
+    # Confirm that a visible normal Xiphos window is the keyboard recipient.
+    try:
+        found = subprocess.run(
+            ["xdotool", "search", "--onlyvisible", "--class", "[Xx]iphos"],
+            env=env, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+            timeout=5, check=False)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise XiphosSmokeError("Xiphos normal window not discoverable") from exc
+    if found.returncode:
+        raise XiphosSmokeError("Cannot focus real Xiphos reading window")
+    candidates = [item for item in found.stdout.decode(
+        "ascii", errors="ignore").splitlines() if item.isdecimal()]
+    if not candidates:
+        raise XiphosSmokeError("No valid Xiphos window ID for study sample")
+    try:
+        focus = subprocess.run(
+            ["xdotool", "windowactivate", "--sync", candidates[-1]],
+            env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            timeout=5, check=False)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise XiphosSmokeError("Cannot activate Xiphos study window") from exc
+    if focus.returncode:
+        raise XiphosSmokeError("Xiphos study window activation failed")
     out.mkdir(mode=0o700)
     snapshots = []
     for slug, ref in READER_SAMPLES:
