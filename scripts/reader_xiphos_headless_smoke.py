@@ -15,6 +15,7 @@ import os
 from pathlib import Path
 import re
 import signal
+import shutil
 import subprocess
 import tempfile
 import time
@@ -65,6 +66,68 @@ def extract_pinned_preview(archive: Path, root: Path, module: str,
             or f"Versification={versification}\n" not in conf):
         raise XiphosSmokeError("SWORD preview conf identity or versification mismatch")
     return root
+
+
+
+def install_checked_out_rawtext_comparison(
+    source: Path, root: Path, module: str, versification: str,
+) -> dict:
+    """Install a *separate*, checked-out standard RawText module for reader review.
+
+    Only five expected SWORD files are accepted. The existing reviewed module
+    is copied without changing bytes or source metadata; never download a
+    floating second edition or confuse two installed modules with visual
+    parallel-reading approval.
+    """
+    if (not MODULE.fullmatch(module) or not V11N.fullmatch(versification)
+            or source.is_symlink() or not source.is_dir()
+            or root.is_symlink() or not root.is_dir()):
+        raise XiphosSmokeError("Untrusted comparison source or module identity")
+    slug = module.lower()
+    conf_rel = f"mods.d/{slug}.conf"
+    data_rel = f"modules/texts/rawtext/{slug}"
+    expected = {conf_rel} | {
+        f"{data_rel}/{part}{ext}"
+        for part in PARTS for ext in ("", ".vss")
+    }
+    observed = set()
+    for entry in source.rglob("*"):
+        if entry.is_symlink() or (not entry.is_file() and not entry.is_dir()):
+            raise XiphosSmokeError("Unsafe comparison module member")
+        if entry.is_file():
+            observed.add(entry.relative_to(source).as_posix())
+    if observed != expected:
+        raise XiphosSmokeError("Unexpected comparison RawText file set")
+    conf_path = source / conf_rel
+    if conf_path.stat().st_size > 16_000:
+        raise XiphosSmokeError("Comparison module configuration too large")
+    conf = conf_path.read_text(encoding="utf-8")
+    if (not conf.startswith(f"[{module}]\\n")
+            or f"DataPath=./{data_rel}/\\n" not in conf
+            or "ModDrv=RawText\\n" not in conf
+            or f"Versification={versification}\\n" not in conf):
+        raise XiphosSmokeError("Comparison identity, driver or v11n mismatch")
+    # Check every file before copying anything to avoid an invalid partial
+    # comparison installation. Never overwrite the independently pinned Bible.
+    for rel in sorted(expected):
+        original = source / rel
+        target = root / rel
+        if (not original.is_file() or original.is_symlink()
+                or not 0 < original.stat().st_size <= 40_000_000
+                or target.exists() or target.is_symlink()):
+            raise XiphosSmokeError("Unsafe or colliding comparison SWORD file")
+    for rel in sorted(expected):
+        target = root / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source / rel, target)
+    return {
+        "module_id": module,
+        "driver": "RawText",
+        "versification": versification,
+        "file_count": len(expected),
+        "copied_from_existing_reviewed_checkout": True,
+        "gui_two_module_parallel_content_verified": False,
+    }
 
 
 def _stop_group(proc):
@@ -346,7 +409,9 @@ def _capture_parallel_toggle_sample(env:dict, study_dir:Path) -> dict:
 
 
 def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_seconds:int,
-          screenshot:Path|None=None, study_dir:Path|None=None):
+          screenshot:Path|None=None, study_dir:Path|None=None,
+          comparison_root:Path|None=None, comparison_module:str="",
+          comparison_versification:str=""):
     if not isinstance(startup_seconds,int) or not 5<=startup_seconds<=25:
         raise XiphosSmokeError("Unbounded headless startup duration")
     with tempfile.TemporaryDirectory(prefix="isolated-xiphos-preview-") as temp:
@@ -354,6 +419,11 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
         payload_root=base/"payload"
         payload_root.mkdir()
         payload=extract_pinned_preview(archive,payload_root,module,expected_sha,versification)
+        comparison = None
+        if comparison_root is not None:
+            comparison = install_checked_out_rawtext_comparison(
+                comparison_root, payload_root, comparison_module,
+                comparison_versification)
         # Separate HOME prevents global user preferences from influencing the trial.
         home=base/"home"
         home.mkdir()
@@ -427,6 +497,7 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                 "test_only_screenshot_sha256":screenshot_sha,
                 "real_reader_passage_samples":samples,
                 "parallel_view_toggle_sample":parallel_attempt,
+                "independent_comparison_module":comparison,
                 "keyboard_navigation_attempted": bool(samples),
                 "isolated_virtual_display_notice_click_fallback_attempted":(
                     fixed_viewport_fallback_attempted if screenshot is not None else False),
@@ -456,11 +527,17 @@ def main():
     parser.add_argument("--report",type=Path,required=True)
     parser.add_argument("--screenshot",type=Path)
     parser.add_argument("--study-dir",type=Path)
+    parser.add_argument("--comparison-root",type=Path)
+    parser.add_argument("--comparison-module-id",default="")
+    parser.add_argument("--comparison-versification",default="")
     args=parser.parse_args()
     if args.report.exists() or not args.report.parent.is_dir():
         parser.error("Refuse overwrite or missing report parent")
     receipt=smoke(args.zip,args.module_id,args.sha256,args.versification,args.seconds,
-                  screenshot=args.screenshot, study_dir=args.study_dir)
+                  screenshot=args.screenshot, study_dir=args.study_dir,
+                  comparison_root=args.comparison_root,
+                  comparison_module=args.comparison_module_id,
+                  comparison_versification=args.comparison_versification)
     args.report.write_text(json.dumps(receipt,sort_keys=True,indent=2)+"\n",encoding="utf-8")
     print("Xiphos test-only capture classified; no screenshot pixels or Bible text logged")
 
