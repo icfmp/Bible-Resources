@@ -180,7 +180,10 @@ def _sample_reader_passages(env, out: Path) -> list[dict]:
         raise XiphosSmokeError("No valid Xiphos window ID for study sample")
     try:
         focus = subprocess.run(
-            ["xdotool", "windowactivate", "--sync", candidates[-1]],
+            # No EWMH window manager runs inside this isolated Xvfb display.
+            # windowactivate requires _NET_ACTIVE_WINDOW; direct X11 focus
+            # works without mutating any user desktop or global preferences.
+            ["xdotool", "windowfocus", "--sync", candidates[-1]],
             env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
             timeout=5, check=False)
     except (OSError, subprocess.TimeoutExpired) as exc:
