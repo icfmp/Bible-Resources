@@ -15,6 +15,7 @@ import os
 from pathlib import Path
 import re
 import signal
+import shutil
 import subprocess
 import tempfile
 import time
@@ -65,6 +66,68 @@ def extract_pinned_preview(archive: Path, root: Path, module: str,
             or f"Versification={versification}\n" not in conf):
         raise XiphosSmokeError("SWORD preview conf identity or versification mismatch")
     return root
+
+
+
+def install_checked_out_rawtext_comparison(
+    source: Path, root: Path, module: str, versification: str,
+) -> dict:
+    """Install a *separate*, checked-out standard RawText module for reader review.
+
+    Only five expected SWORD files are accepted. The existing reviewed module
+    is copied without changing bytes or source metadata; never download a
+    floating second edition or confuse two installed modules with visual
+    parallel-reading approval.
+    """
+    if (not MODULE.fullmatch(module) or not V11N.fullmatch(versification)
+            or source.is_symlink() or not source.is_dir()
+            or root.is_symlink() or not root.is_dir()):
+        raise XiphosSmokeError("Untrusted comparison source or module identity")
+    slug = module.lower()
+    conf_rel = f"mods.d/{slug}.conf"
+    data_rel = f"modules/texts/rawtext/{slug}"
+    expected = {conf_rel} | {
+        f"{data_rel}/{part}{ext}"
+        for part in PARTS for ext in ("", ".vss")
+    }
+    observed = set()
+    for entry in source.rglob("*"):
+        if entry.is_symlink() or (not entry.is_file() and not entry.is_dir()):
+            raise XiphosSmokeError("Unsafe comparison module member")
+        if entry.is_file():
+            observed.add(entry.relative_to(source).as_posix())
+    if observed != expected:
+        raise XiphosSmokeError("Unexpected comparison RawText file set")
+    conf_path = source / conf_rel
+    if conf_path.stat().st_size > 16_000:
+        raise XiphosSmokeError("Comparison module configuration too large")
+    conf = conf_path.read_text(encoding="utf-8")
+    if (not conf.startswith(f"[{module}]\n")
+            or f"DataPath=./{data_rel}/\n" not in conf
+            or "ModDrv=RawText\n" not in conf
+            or f"Versification={versification}\n" not in conf):
+        raise XiphosSmokeError("Comparison identity, driver or v11n mismatch")
+    # Check every file before copying anything to avoid an invalid partial
+    # comparison installation. Never overwrite the independently pinned Bible.
+    for rel in sorted(expected):
+        original = source / rel
+        target = root / rel
+        if (not original.is_file() or original.is_symlink()
+                or not 0 < original.stat().st_size <= 40_000_000
+                or target.exists() or target.is_symlink()):
+            raise XiphosSmokeError("Unsafe or colliding comparison SWORD file")
+    for rel in sorted(expected):
+        target = root / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source / rel, target)
+    return {
+        "module_id": module,
+        "driver": "RawText",
+        "versification": versification,
+        "file_count": len(expected),
+        "copied_from_existing_reviewed_checkout": True,
+        "gui_two_module_parallel_content_verified": False,
+    }
 
 
 def _stop_group(proc):
@@ -305,6 +368,67 @@ def _sample_reader_passages(env, out: Path) -> list[dict]:
     return snapshots
 
 
+
+def _capture_module_tree_probe(env: dict, study_dir: Path) -> dict:
+    """Probe a second Bible selection in the isolated Xiphos module tree.
+
+    Four bounded screenshots expose the GTK tree, second-module opening and
+    a real passage-navigation attempt. Pixel content requires independent
+    review; an executed pointer command is never selection proof.
+    """
+    if (env.get("DISPLAY") != ":91" or not study_dir.is_dir()
+            or study_dir.is_symlink()):
+        raise XiphosSmokeError("Unsafe dual-module Xiphos tree probe")
+    pictures = []
+    commands = (
+        ["xdotool", "mousemove", "--sync", "100", "134", "click", "1"],
+        ["xdotool", "key", "Right"],
+        ["xdotool", "mousemove", "--sync", "100", "202", "click", "1"],
+        ["xdotool", "key", "Right"],
+        ["xdotool", "mousemove", "--sync", "120", "247"],
+        ["xdotool", "click", "--repeat", "2", "--delay", "160", "1"],
+        ["xdotool", "key", "--clearmodifiers", "ctrl+l"],
+        ["xdotool", "type", "--clearmodifiers", "--delay", "35", "Gen 1:1"],
+        ["xdotool", "key", "Return"],
+    )
+    for i, command in enumerate(commands):
+        try:
+            result = subprocess.run(
+                command, env=env, stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL, timeout=5, check=False)
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            raise XiphosSmokeError("Bounded module-tree action unavailable") from exc
+        if result.returncode:
+            raise XiphosSmokeError("Module-tree interaction failed")
+        if i not in (1, 3, 5, 8):
+            continue
+        target = study_dir / ("module-tree-stage-" + str(i) + ".png")
+        if target.exists() or target.is_symlink():
+            raise XiphosSmokeError("Refusing to overwrite module-tree evidence")
+        time.sleep(0.5)
+        try:
+            captured = subprocess.run(
+                ["import", "-display", env["DISPLAY"], "-window", "root",
+                 str(target)], env=env, stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL, timeout=15, check=False)
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            raise XiphosSmokeError("Module-tree screenshot unavailable") from exc
+        if (captured.returncode or not target.is_file()
+                or not 0 < target.stat().st_size <= 6_000_000):
+            raise XiphosSmokeError("Unsafe module-tree screenshot")
+        pictures.append({
+            "step": i,
+            "screenshot_sha256": sha256(target.read_bytes()).hexdigest(),
+            "module_selection_verified": False,
+        })
+    return {
+        "inspection_only": True,
+        "snapshots": pictures,
+        "attempted_second_tree_module_open_and_genesis_navigation": True,
+        "module_selection_verified": False,
+    }
+
+
 def _capture_parallel_toggle_sample(env:dict, study_dir:Path) -> dict:
     """Exercise Xiphos Alt-P and capture screenshot, never infer actual comparison."""
     if (not study_dir.is_dir() or study_dir.is_symlink()
@@ -346,7 +470,9 @@ def _capture_parallel_toggle_sample(env:dict, study_dir:Path) -> dict:
 
 
 def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_seconds:int,
-          screenshot:Path|None=None, study_dir:Path|None=None):
+          screenshot:Path|None=None, study_dir:Path|None=None,
+          comparison_root:Path|None=None, comparison_module:str="",
+          comparison_versification:str=""):
     if not isinstance(startup_seconds,int) or not 5<=startup_seconds<=25:
         raise XiphosSmokeError("Unbounded headless startup duration")
     with tempfile.TemporaryDirectory(prefix="isolated-xiphos-preview-") as temp:
@@ -354,6 +480,11 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
         payload_root=base/"payload"
         payload_root.mkdir()
         payload=extract_pinned_preview(archive,payload_root,module,expected_sha,versification)
+        comparison = None
+        if comparison_root is not None:
+            comparison = install_checked_out_rawtext_comparison(
+                comparison_root, payload_root, comparison_module,
+                comparison_versification)
         # Separate HOME prevents global user preferences from influencing the trial.
         home=base/"home"
         home.mkdir()
@@ -415,6 +546,8 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                     raise XiphosSmokeError("Invalid bounded screenshot result")
                 screenshot_sha=sha256(screenshot.read_bytes()).hexdigest()
             samples = _sample_reader_passages(env, study_dir) if study_dir else []
+            tree_probe = (_capture_module_tree_probe(env, study_dir)
+                          if comparison and study_dir and samples else None)
             parallel_attempt = (_capture_parallel_toggle_sample(env, study_dir)
                                 if study_dir and samples else None)
             return {
@@ -427,6 +560,8 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                 "test_only_screenshot_sha256":screenshot_sha,
                 "real_reader_passage_samples":samples,
                 "parallel_view_toggle_sample":parallel_attempt,
+                "independent_comparison_module":comparison,
+                "module_selection_probe":tree_probe,
                 "keyboard_navigation_attempted": bool(samples),
                 "isolated_virtual_display_notice_click_fallback_attempted":(
                     fixed_viewport_fallback_attempted if screenshot is not None else False),
@@ -456,11 +591,17 @@ def main():
     parser.add_argument("--report",type=Path,required=True)
     parser.add_argument("--screenshot",type=Path)
     parser.add_argument("--study-dir",type=Path)
+    parser.add_argument("--comparison-root",type=Path)
+    parser.add_argument("--comparison-module-id",default="")
+    parser.add_argument("--comparison-versification",default="")
     args=parser.parse_args()
     if args.report.exists() or not args.report.parent.is_dir():
         parser.error("Refuse overwrite or missing report parent")
     receipt=smoke(args.zip,args.module_id,args.sha256,args.versification,args.seconds,
-                  screenshot=args.screenshot, study_dir=args.study_dir)
+                  screenshot=args.screenshot, study_dir=args.study_dir,
+                  comparison_root=args.comparison_root,
+                  comparison_module=args.comparison_module_id,
+                  comparison_versification=args.comparison_versification)
     args.report.write_text(json.dumps(receipt,sort_keys=True,indent=2)+"\n",encoding="utf-8")
     print("Xiphos test-only capture classified; no screenshot pixels or Bible text logged")
 
