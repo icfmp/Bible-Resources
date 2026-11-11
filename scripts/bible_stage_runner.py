@@ -518,25 +518,30 @@ def main(argv=None) -> int:
                 # One underlying scan, but independent 4/7 and 5/7 receipts.
                 # A successful workflow is not an editorial signoff for either.
                 statuses = (stage4["status"], stage5["status"])
+                scan_completed = bool(stage4.get("evidence", {}).get(
+                    "actual_native_raw_manifest_sha256"))
                 result = _status(
                     "BLOCKED" if "BLOCKED" in statuses else "PARTIAL",
-                    verified=["One pinned source/native SWORD scan shared across two "
-                              "separate stage-4 and stage-5 technical receipts",
-                              "4/7 machine evidence: " + statuses[0],
+                    verified=(["One verified full native source/SWORD scan supports "
+                               "both stage-4 and stage-5 machine receipts"]
+                              if scan_completed else
+                              ["One stage-4 evaluation reused without a second "
+                               "stage-5 source fetch or scan"]) +
+                             ["4/7 machine evidence: " + statuses[0],
                               "5/7 machine evidence: " + statuses[1]],
                     missing=(["4/7: " + stage4["missing"][0]]
                              if stage4["missing"] else []) +
                             (["5/7: " + stage5["missing"][0]]
                              if stage5["missing"] else []) +
+                            ([] if scan_completed else
+                             ["Full native corpus scan not independently evidenced"]) +
                             ["Human editorial/rights/reader decisions are not automated"],
                     evidence={
                         "input_manifest_sha256": sha256(
                             json.dumps(manifest, sort_keys=True,
                                        separators=(",", ":")).encode("utf-8")).hexdigest(),
                         "shared_fidelity_invocations": 1,
-                        "full_native_corpus_scan_completed": (
-                            bool(stage4.get("evidence", {}).get(
-                                "actual_native_raw_manifest_sha256"))),
+                        "full_native_corpus_scan_completed": scan_completed,
                         "stage_machine_receipts": {"4": stage4, "5": stage5},
                         "not_publication_or_editorial_approval": True})
             else:
