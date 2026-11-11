@@ -113,6 +113,41 @@ class NativeMilestonePairTests(unittest.TestCase):
             "unaddressable_TOP_milestone_events_unverified"],1)
         self.assertNotEqual(r["status"],"compiled_milestone_pairs_verified_only")
 
+    def test_new_sword_testament_top_group_pairs_are_valid(self):
+        check=NativeMilestonePairAudit()
+        check.observe("U","TOP:1",b"<title>PRIVATE MODULE TITLE</title>")
+        check.observe("U","TOP:2",
+                      b'<title>PRIVATE OT TITLE</title>'
+                      b'<div type="bookGroup" sID="PRIVATE-OT"/>')
+        check.observe("I","Gen",b'<div type="book" sID="book-Gen"/>')
+        check.observe("K","Gen.1.1",b'<div type="book" eID="book-Gen"/>'
+                                     b'<div type="bookGroup" eID="PRIVATE-OT"/>')
+        check.observe("U","TOP:3",
+                      b'<title>PRIVATE NT TITLE</title>'
+                      b'<div type="bookGroup" sID="PRIVATE-NT"/>')
+        check.observe("I","Matt",b'<div type="book" sID="book-Matt"/>')
+        check.observe("K","Matt.1.1",b'<div type="book" eID="book-Matt"/>'
+                                      b'<div type="bookGroup" eID="PRIVATE-NT"/>')
+        receipt=check.finish()
+        self.assertEqual(receipt["status"],"compiled_milestone_pairs_verified_only")
+        self.assertEqual(receipt["paired_div_types_allowlisted"]["bookGroup"],2)
+        self.assertEqual(receipt["native_numbered_intro_scan_counts"][
+            "verified_addressable_TOP_bookGroup_endpoint_events"],2)
+        self.assertEqual(receipt["native_milestone_pairing_findings"],{})
+        self.assertEqual(receipt["remaining_unclosed_milestones_by_tag"],{})
+        self.assertNotIn("PRIVATE",str(receipt))
+
+    def test_unknown_TOP_milestone_still_fails_closed(self):
+        check=NativeMilestonePairAudit()
+        check.observe("U","TOP:1",b'<div type="x-p" sID="sensitive-id"/>')
+        receipt=check.finish()
+        self.assertEqual(receipt["status"],
+                         "compiled_milestones_have_unresolved_pairing_findings")
+        self.assertEqual(receipt["native_numbered_intro_scan_counts"][
+            "unaddressable_TOP_milestone_events_unverified"],1)
+        self.assertEqual(receipt["native_milestone_pairing_findings"],{})
+        self.assertNotIn("sensitive-id",str(receipt))
+
     def test_source_words_and_note_values_never_escape(self):
         check=NativeMilestonePairAudit()
         check.observe("K","Gen.1.1",b'<div sID="PRIVATE_IDENTIFIER"/>'
