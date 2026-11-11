@@ -34,10 +34,24 @@ def fake_payload(path, extra=False):
 
 
 from publisher_osis_preview_readback import (
-    diatheke_readback_receipt, _readback_passed, PreviewReaderError,
+    diatheke_readback_receipt, diatheke_single_verse_command,
+    _readback_passed, PreviewReaderError,
 )
 
 class PreviewReadbackDiagnosticTests(unittest.TestCase):
+    def test_diatheke_key_is_last_and_single_verse_explicit(self):
+        import sys
+        for passage in ("Genesis 1:1","Psalms 23:1","Revelation 22:21"):
+            argv=diatheke_single_verse_command(
+                Path(sys.executable),"JND2024Research",passage)
+            self.assertEqual(argv[-2:],["-k",passage])
+            self.assertEqual(argv[-4:-2],["-m","1"])
+            self.assertEqual(argv[3:5],["-f","plain"])
+            self.assertEqual(argv.count("-k"),1)
+        with self.assertRaises(PreviewReaderError):
+            diatheke_single_verse_command(Path(sys.executable),
+                                          "JND2024Research","Genesis")
+
     def test_empty_and_nonzero_reader_status_are_safely_classified(self):
         receipt=diatheke_readback_receipt(
             1,b"",b"PRIVATE SWORD ERROR: filesystem details", "Genesis 1:1")
