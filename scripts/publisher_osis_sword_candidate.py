@@ -374,9 +374,18 @@ def safe_failure_code(exc: Exception) -> str:
     return "unclassified_private_failure"
 
 
+def select_candidate_versifications(cfg: dict, requested: str | None):
+    """Never invent or silently switch an unreviewed original source v11n."""
+    allowed=cfg["candidate_versifications"]
+    if requested is not None and requested not in allowed:
+        raise PublisherSWORDResearchError("Unreviewed requested candidate versification")
+    return list(allowed) if requested is None else [requested]
+
+
 def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
-          raw_binary:Path):
+          raw_binary:Path, versification: str | None = None):
     cfg=config_for(resource_id)
+    selected=select_candidate_versifications(cfg,versification)
     original=read_pinned_publisher_osis(resource_id)
     source_keys,source_meta=source_inventory(original)
     verses,notes,source_check=original_osis_verses_and_notes(original)
@@ -389,7 +398,7 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
         tmp=Path(root)
         sourcefile=tmp/"source-authored-pinned.osis.xml"
         sourcefile.write_bytes(original)
-        for system in cfg["candidate_versifications"]:
+        for system in selected:
             work=tmp/("research-"+system)
             work.mkdir()
             payload,out=_create_candidate_layout(
@@ -435,12 +444,13 @@ def main():
     p.add_argument("--osis2mod",type=Path,required=True)
     p.add_argument("--native-index",type=Path,required=True)
     p.add_argument("--native-raw",type=Path,required=True)
+    p.add_argument("--versification",default=None)
     p.add_argument("--report",type=Path,required=True)
     a=p.parse_args()
     if a.report.exists() or a.report.is_symlink() or not a.report.parent.is_dir():
         p.error("Use new metadata report in an existing directory")
     result=probe(a.resource_id,osis2mod=a.osis2mod,index_binary=a.native_index,
-                 raw_binary=a.native_raw)
+                 raw_binary=a.native_raw,versification=a.versification)
     a.report.write_text(json.dumps(result,indent=2,sort_keys=True)+"\n",encoding="utf-8")
     print("Official OSIS to SWORD research executed for",a.resource_id)
     for row in result["candidate_research_results"]:

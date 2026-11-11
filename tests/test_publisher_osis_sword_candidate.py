@@ -9,6 +9,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from publisher_osis_sword_candidate import (
     PublisherSWORDResearchError, _create_candidate_layout, _native_notes,
     _read_native_frames, _compile_osis, config_for, safe_failure_code,
+    select_candidate_versifications,
 )
 
 
@@ -21,6 +22,15 @@ class PublisherSwordProbeTests(unittest.TestCase):
         for value in ("../evil","", "SECRET/private"):
             with self.assertRaises(PublisherSWORDResearchError):
                 config_for(value)
+
+    def test_explicit_one_scheme_limits_work_without_source_download(self):
+        cfg=config_for("frajnd-2024")
+        self.assertEqual(select_candidate_versifications(cfg,"Luther"),["Luther"])
+        self.assertEqual(select_candidate_versifications(cfg,"DarbyFr"),["DarbyFr"])
+        self.assertEqual(select_candidate_versifications(cfg,None),["DarbyFr","Luther"])
+        for invalid in ("KJV","../evil","","DarbyFr/evil"):
+            with self.assertRaises(PublisherSWORDResearchError):
+                select_candidate_versifications(cfg,invalid)
 
     def test_layout_is_separate_nonpublishing_standard_sword(self):
         with tempfile.TemporaryDirectory() as folder:

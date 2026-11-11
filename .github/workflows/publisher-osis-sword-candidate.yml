@@ -23,6 +23,7 @@ jobs:
       issues: write
     env:
       RESOURCE_ID: frajnd-2024
+      CANDIDATE_V11N: ""
       REPORT: /tmp/bible-source-rebuild-probe/candidate-report.json
     steps:
       - uses: actions/checkout@v4
@@ -47,7 +48,7 @@ jobs:
           python - <<'PY'
           import os, re
           match = re.fullmatch(
-              r"/bible-osis-candidate ([a-z0-9][a-z0-9-]{1,48})",
+              r"/bible-osis-candidate ([a-z0-9][a-z0-9-]{1,48})(?: ([A-Za-z][A-Za-z0-9]{1,31}))?",
               os.environ["COMMAND"])
           if not match:
               raise SystemExit("Invalid research command")
@@ -66,18 +67,21 @@ jobs:
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp -o /tmp/native-probe-binaries/native-index -lsword
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp -o /tmp/native-probe-binaries/native-raw -lsword
           command -v osis2mod
-      - name: Compile two ephemeral official-OSIS candidates and compare real native entries
+      - name: Compile selected ephemeral official-OSIS candidates and compare native entries
         if: github.event_name != 'pull_request'
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p /tmp/bible-source-rebuild-probe
-          python scripts/publisher_osis_sword_candidate.py \
-            --resource-id "$RESOURCE_ID" \
-            --osis2mod "$(command -v osis2mod)" \
-            --native-index /tmp/native-probe-binaries/native-index \
-            --native-raw /tmp/native-probe-binaries/native-raw \
-            --report "$REPORT"
+          args=(--resource-id "$RESOURCE_ID"
+                --osis2mod "$(command -v osis2mod)"
+                --native-index /tmp/native-probe-binaries/native-index
+                --native-raw /tmp/native-probe-binaries/native-raw
+                --report "$REPORT")
+          if [[ -n "${CANDIDATE_V11N:-}" ]]; then
+            args+=(--versification "$CANDIDATE_V11N")
+          fi
+          python scripts/publisher_osis_sword_candidate.py "${args[@]}"
       - name: Upload metadata-only evidence (never original OSIS or compiled SWORD)
         if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
