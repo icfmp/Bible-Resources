@@ -382,8 +382,8 @@ def _capture_module_tree_probe(env: dict, study_dir: Path) -> dict:
     commands = (
         ["xdotool", "mousemove", "--sync", "100", "134", "click", "1"],
         ["xdotool", "key", "Right"],
-        ["xdotool", "key", "Down"],
-        ["xdotool", "key", "Right"],
+        ["xdotool", "mousemove", "--sync", "20", "202", "click", "1"],
+        ["xdotool", "mousemove", "--sync", "1200", "740"],
     )
     for i, command in enumerate(commands):
         try:
