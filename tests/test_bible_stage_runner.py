@@ -243,6 +243,46 @@ class BibleIntakeTests(unittest.TestCase):
             },
         }
 
+    def test_fast_note_loss_rejects_stock_before_full_corpus_scan(self):
+        from bible_stage_runner import _run_fidelity
+        self.cfg["source"]["format"] = "USFX"
+        native = self.folder/"native-binary"
+        native.write_bytes(b"fixture")
+        with (patch("fast_stock_note_probe.probe_stock_note_callers",
+                    return_value={
+                        "status":"BLOCKED",
+                        "reason_code":"literal_note_caller_missing",
+                        "fast_stock_reuse_disqualified":True,
+                    }) as pre,
+              patch("source_native_maintext_probe.run_real_usfx_sword_text_probe",
+                    side_effect=AssertionError("Full corpus must be skipped")) as full):
+            result = _run_fidelity(
+                self.cfg,{"source":self.folder/"source.zip",
+                          "sword":self.folder/"stock.zip"},
+                self.folder,index_binary=native,raw_binary=native,
+                entry_binary=native,schema=None)
+        pre.assert_called_once()
+        full.assert_not_called()
+        self.assertEqual(result["status"],"BLOCKED")
+        self.assertFalse(result["evidence"]["whole_corpus_scan_performed"])
+        self.assertEqual(result["evidence"]["fast_stock_note_preflight"][
+            "reason_code"],"literal_note_caller_missing")
+
+    def test_stage_five_keeps_fast_stock_loss_without_claiming_full_notes(self):
+        from bible_stage_runner import _stage5_from_fidelity
+        fast={
+            "status":"BLOCKED",
+            "reason_code":"literal_note_caller_missing",
+            "fast_stock_reuse_disqualified":True,
+        }
+        stage4={
+            "status":"BLOCKED","evidence":{"fast_stock_note_preflight":fast}}
+        result=_stage5_from_fidelity(stage4, {})
+        self.assertEqual(result["status"],"BLOCKED")
+        self.assertFalse(result["evidence"]["whole_corpus_scan_performed"])
+        self.assertTrue(result["evidence"]["fast_stock_note_preflight"][
+            "fast_stock_reuse_disqualified"])
+
     def test_stage_four_five_bundle_invokes_one_fidelity_stage(self):
         original = self._fake_stage_four_receipt()
         with patch("bible_stage_runner.run_stage", return_value=original) as checked:
