@@ -533,7 +533,10 @@ def main(argv=None) -> int:
                         "input_manifest_sha256": sha256(
                             json.dumps(manifest, sort_keys=True,
                                        separators=(",", ":")).encode("utf-8")).hexdigest(),
-                        "source_native_full_corpus_scans_invoked": 1,
+                        "shared_fidelity_invocations": 1,
+                        "full_native_corpus_scan_completed": (
+                            bool(stage4.get("evidence", {}).get(
+                                "actual_native_raw_manifest_sha256"))),
                         "stage_machine_receipts": {"4": stage4, "5": stage5},
                         "not_publication_or_editorial_approval": True})
             else:
