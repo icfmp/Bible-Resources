@@ -108,6 +108,7 @@ class NativeMilestonePairAudit:
             # private sID can be matched to the later native closing eID.
             # Every other TOP event remains explicitly unverified.
             self._total["unaddressable_TOP_entries_unverified"] += 1
+            self._total["unaddressable_TOP_milestone_events_unverified"] += 0
             try:
                 root = _strict_root(raw)
             except NativeMilestoneAuditError:
