@@ -513,6 +513,37 @@ def _capture_source_note_link_host(env: dict, study_dir: Path) -> dict:
             raise XiphosSmokeError("Unsafe original-note interaction image")
         snapshots[label] = sha256(screenshot.read_bytes()).hexdigest()
 
+    # Independent real hover/pinned screenshots #43092365120 show the
+    # visible authored "Exode" reference in the pinned preview at approx.
+    # (174,545) on the same fixed test Xvfb geometry. Exercise a SINGLE
+    # genuine left click; never claim a successful target jump from xdotool.
+    for command in (
+        ["xdotool", "mousemove", "--sync", "174", "545"],
+        ["xdotool", "click", "1"],
+    ):
+        try:
+            action = subprocess.run(
+                command, env=env, stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL, timeout=5, check=False)
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            raise XiphosSmokeError("Original-note link click unavailable") from exc
+        if action.returncode:
+            raise XiphosSmokeError("Original-note link click command failed")
+    time.sleep(1.5)
+    clicked = study_dir / "source-note-link-after-click.png"
+    if clicked.exists() or clicked.is_symlink():
+        raise XiphosSmokeError("Refusing prior note-click evidence")
+    try:
+        result = subprocess.run(
+            ["import", "-display", env["DISPLAY"], "-window", "root",
+             str(clicked)], env=env, stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL, timeout=15, check=False)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise XiphosSmokeError("Source-note click capture unavailable") from exc
+    if (result.returncode or not clicked.is_file()
+            or not 0 < clicked.stat().st_size <= 6_000_000):
+        raise XiphosSmokeError("Unsafe source-note click screenshot")
+
     navigation("Gen 1:1")
     time.sleep(0.5)
     return {
@@ -521,6 +552,8 @@ def _capture_source_note_link_host(env: dict, study_dir: Path) -> dict:
         "host_screenshot_sha256": sha256(target.read_bytes()).hexdigest(),
         "note_hover_screenshot_sha256": snapshots["hover"],
         "middle_click_pin_screenshot_sha256": snapshots["pinned"],
+        "post_link_click_screenshot_sha256": sha256(clicked.read_bytes()).hexdigest(),
+        "link_click_command_attempted": True,
         "reference_marker_hover_verified": False,
         "real_reference_link_click_verified": False,
         "actual_reader_target_navigation_verified": False,
