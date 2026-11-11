@@ -335,6 +335,34 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
     }
 
 
+def safe_failure_code(exc: Exception) -> str:
+    """Stable diagnostics only; never disclose exception strings from source/XML.
+
+    Only messages emitted by this tool or the trusted native-index wrapper
+    are recognized. Unknown exceptions are intentionally opaque.
+    """
+    message = str(exc)
+    known = (
+        ("OSIS tool returned nonzero exit status ", "compiler_nonzero_exit"),
+        ("Official OSIS compiler failed or timed out", "compiler_launch_or_timeout"),
+        ("OSIS tool emitted excessive diagnostics", "compiler_excessive_private_output"),
+        ("Missing trusted compiler or original pinned OSIS", "compiler_or_source_missing"),
+        ("Stock-SWORD native inspector blocked", "native_inspector_nonzero_exit"),
+        ("Stock SWORD module contains no populated Bible verses", "native_zero_populated_verses"),
+        ("Missing or symlinked module directory", "native_module_directory_missing"),
+        ("Missing or symlinked SWORD configuration directory", "native_mods_directory_missing"),
+        ("Missing terminal complete-inventory counts", "native_trailer_missing"),
+        ("Missing, empty or implausibly large native inventory", "native_inventory_unavailable"),
+        ("Native driver or v11n disagrees", "native_driver_versification_disagreement"),
+        ("Native index and raw corpus enumerations disagree", "native_index_raw_mismatch"),
+        ("Invalid native raw XML note structure", "native_note_xml_invalid"),
+    )
+    for prefix,code in known:
+        if message.startswith(prefix):
+            return code
+    return "unclassified_private_failure"
+
+
 def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
           raw_binary:Path):
     cfg=config_for(resource_id)
@@ -368,6 +396,7 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
                     "candidate_status":"blocked_compilation_or_source_native_evidence",
                     "candidate_versification":system,
                     "reason_category":type(exc).__name__,
+                    "safe_failure_code":safe_failure_code(exc),
                     "usable_for_publication":False,
                 }
             results.append(compared)
