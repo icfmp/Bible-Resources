@@ -111,6 +111,8 @@ jobs:
               lines.push(`#### ${candidate.candidate_versification}: ${candidate.candidate_status}`);
               if(candidate.reason_category) lines.push(`Failure type: ${candidate.reason_category}`);
               if(candidate.safe_failure_code) lines.push(`Safe failure code: ${candidate.safe_failure_code}`);
+              if(candidate.compiled_payload_presence) lines.push("Compiled data presence (metadata only):", "```json", JSON.stringify(candidate.compiled_payload_presence,null,2), "```");
+              if(candidate.standard_osis_compiler) lines.push("Compiler metadata only:", "```json", JSON.stringify(candidate.standard_osis_compiler,null,2), "```");
               if(candidate.source_to_compiled_counts){
                 lines.push("Checked counts (no Bible content):", "```json",
                   JSON.stringify(candidate.source_to_compiled_counts,null,2), "```");
