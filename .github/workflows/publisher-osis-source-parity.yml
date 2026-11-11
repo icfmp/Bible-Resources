@@ -99,7 +99,23 @@ jobs:
               "publisher_has_links_not_encoded_in_usfx",
               "publisher_total_explicit_links",
             ];
-            const selected = Object.fromEntries(keys.map(k=>[k,c[k]||0]));
+            // New source-private note diagnostics are allowlisted by a strict
+            // categorical prefix and numeric counts, never by arbitrary keys.
+            // Every result remains unresolved until independently reviewed.
+            const safeNoteShapes = [
+              "exact_after_unicode_and_whitespace_folding",
+              "one_side_empty",
+              "prefix_only_candidate_unverified",
+              "suffix_only_candidate_unverified",
+              "internal_containment_candidate_unverified",
+              "case_only_candidate_unverified",
+              "different_or_unclassified",
+            ];
+            const selected = Object.fromEntries([
+              ...keys.map(k=>[k,c[k]||0]),
+              ...safeNoteShapes.map(shape=>[`note_body_shape_${shape}`,
+                c[`note_body_shape_${shape}`]||0]),
+            ]);
             const url = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
             const body = [
               "### Official publisher OSIS ↔ pinned eBible USFX — original source comparison (UNAPPROVED)",
