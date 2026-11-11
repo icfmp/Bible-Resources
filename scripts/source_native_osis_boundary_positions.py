@@ -37,6 +37,7 @@ class _Stream:
         self.chars = 0
         self.events = defaultdict(list)
         self.num_events = 0
+        self.titles = []  # private (nonspace position, title digest, character count)
 
     def append(self, string):
         if string:
@@ -65,6 +66,13 @@ def _local(node):
 
 def _walk(node,stream,mode):
     name=_local(node)
+    if name == "title":
+        prose="".join(node.itertext())
+        chars="".join(x for x in prose if not x.isspace())
+        if len(chars)>MAX_TEXT or len(stream.titles)>=MAX_EVENTS:
+            raise BoundaryScreenError("Oversized authored or native title")
+        stream.titles.append((stream.chars,sha256(chars.encode("utf-8")).hexdigest(),len(chars)))
+        return  # Title is editorial metadata, not part of the main-body stream.
     if name in SKIP:
         return  # Parent still processes node.tail, as authored.
     event = None
@@ -169,6 +177,20 @@ def compare_book_boundary_positions(original: dict, compiled: NativeBookStreams)
                 samples.append({"book":book,"kind":"body_nonspace_stream_differs",
                                 "source_nonspace_length":src.chars,
                                 "compiled_nonspace_length":nat.chars})
+        counts["source_title_events"]+=len(src.titles)
+        counts["native_title_events"]+=len(nat.titles)
+        if src.titles==nat.titles:
+            counts["title_prose_and_nonspace_positions_equal"]+=len(src.titles)
+        else:
+            counts["books_with_title_position_or_text_differences"]+=1
+            if len(samples)<MAX_EXAMPLES:
+                idx=next((i for i in range(min(len(src.titles),len(nat.titles)))
+                          if src.titles[i]!=nat.titles[i]),
+                         min(len(src.titles),len(nat.titles)))
+                samples.append({"book":book,"kind":"title_content_or_position_difference",
+                                "one_based_title":idx+1,
+                                "source_title_count":len(src.titles),
+                                "native_title_count":len(nat.titles)})
         for kind in KINDS:
             for endpoint in ENDPOINTS:
                 key=kind+"_"+endpoint
@@ -191,6 +213,7 @@ def compare_book_boundary_positions(original: dict, compiled: NativeBookStreams)
     verified=(counts["books_compared"]==len(original)
               and not counts["books_with_unmatched_full_body_stream"]
               and not counts["boundary_event_groups_unverified_or_different"]
+              and not counts["books_with_title_position_or_text_differences"]
               and compiled.top_nonspace==0)
     return {
         "status":("source_native_body_boundary_nonspace_positions_equal"
@@ -201,6 +224,10 @@ def compare_book_boundary_positions(original: dict, compiled: NativeBookStreams)
         "bounded_reference_only_findings":samples,
         "all_book_body_nonspace_and_boundary_events_equal":verified,
         "literal_whitespace_or_exact_typography_verified":False,
+        "all_title_text_and_nonspace_placement_equal": (
+            not counts["books_with_title_position_or_text_differences"]
+            and counts["source_title_events"]==counts["native_title_events"]
+        ),
         "source_title_prose_and_verse_zero_semantics_verified":False,
         "independent_reader_visual_signoff":False,
         "published":False,
