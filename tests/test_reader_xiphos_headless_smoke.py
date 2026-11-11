@@ -232,13 +232,13 @@ class XiphosSmokeUnitTests(unittest.TestCase):
                         side_effect=fake_run),
                   patch("reader_xiphos_headless_smoke.time.sleep")):
                 report = _capture_module_tree_probe({"DISPLAY": ":91"}, study)
-            self.assertEqual(len(report["snapshots"]), 2)
+            self.assertEqual(len(report["snapshots"]), 4)
             self.assertFalse(report["module_selection_verified"])
             self.assertEqual(commands[0],
                              ["xdotool", "mousemove", "--sync", "100", "134",
                               "click", "1"])
-            self.assertEqual([x for x in commands if x[0] == "import"].__len__(), 2)
-            self.assertEqual(len(list(study.glob("module-tree-stage-*.png"))), 2)
+            self.assertEqual(len([x for x in commands if x[0] == "import"]), 4)
+            self.assertEqual(len(list(study.glob("module-tree-stage-*.png"))), 4)
 
     def test_module_tree_probe_rejects_existing_or_untrusted_fixture(self):
         with tempfile.TemporaryDirectory() as base:
