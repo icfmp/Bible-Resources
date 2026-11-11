@@ -8,6 +8,8 @@ on:
       - ".github/workflows/publisher-osis-sword-candidate.yml"
       - "scripts/publisher_osis_sword_candidate.py"
       - "scripts/source_native_osis_structure_screen.py"
+      - "scripts/source_native_osis_boundary_positions.py"
+      - "tests/test_source_native_osis_boundary_positions.py"
       - "tests/test_source_native_osis_structure_screen.py"
       - "tests/test_publisher_osis_sword_candidate.py"
       - "config/publisher-sword-research/**"
@@ -42,6 +44,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_publisher_osis_sword_candidate.py' -v
           python -m unittest discover -s tests -p 'test_publisher_osis_usfx_parity.py' -v
           python -m unittest discover -s tests -p 'test_source_native_osis_structure_screen.py' -v
+          python -m unittest discover -s tests -p 'test_source_native_osis_boundary_positions.py' -v
       - name: Parse authenticated owner request
         if: github.event_name == 'issue_comment'
         shell: bash
@@ -147,6 +150,21 @@ jobs:
                     first_mismatch_book_references_no_scripture:o.first_mismatch_book_references_no_scripture,
                     source_native_exact_word_positions_or_boundary_spans_verified:
                       o.source_native_exact_word_positions_or_boundary_spans_verified,
+                  },null,2),"```");
+              }
+              if(candidate.source_native_body_boundary_positions){
+                const p=candidate.source_native_body_boundary_positions;
+                lines.push("Full-book source/native non-whitespace structural open-close positions (NOT typography):",
+                  "```json",JSON.stringify({
+                    status:p.status,
+                    all_book_body_nonspace_and_boundary_events_equal:
+                      p.all_book_body_nonspace_and_boundary_events_equal,
+                    counts:p.counts,
+                    native_anonymous_top_nonspace_body_characters:
+                      p.native_anonymous_top_nonspace_body_characters,
+                    bounded_reference_only_findings:p.bounded_reference_only_findings,
+                    literal_whitespace_or_exact_typography_verified:
+                      p.literal_whitespace_or_exact_typography_verified,
                   },null,2),"```");
               }
               if(candidate.source_to_compiled_counts){
