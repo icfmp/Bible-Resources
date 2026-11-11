@@ -252,6 +252,19 @@ mapping exceptions to obtain a green report. Any later acceptance needs
 the exact report link and source-scoped explanation recorded on the import
 issue.
 
+## CI economy: superseded PR runs
+
+On a pull request, GitHub Actions now cancels **only superseded runs
+of that same PR** when its head commit changes. This avoids repeated
+full-corpus research and SWORD package installation for outdated
+iterations. Owner-authorized issue-comment audits, manual `workflow_dispatch`
+research and `main` validation are **not cancelled**, so their
+permanent source-bound checkpoints are preserved.
+
+This improves CI queue/retry cost. It does not waive failed native SWORD
+validation, trust an external mirror, or silently accept a changed Bible
+source archive.
+
 ## Fast stock note preflight — reject before expensive whitespace work
 
 For authorial USFX plus a SHA-pinned stock `RawText`/`zText` module, the
