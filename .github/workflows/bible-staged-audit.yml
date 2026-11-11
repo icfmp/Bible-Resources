@@ -26,6 +26,8 @@ on:
       - "scripts/bible_intake.py"
       - "scripts/bible_stage_runner.py"
       - "scripts/stock_reuse_preflight.py"
+      - "scripts/fast_stock_note_probe.py"
+      - "tests/test_fast_stock_note_probe.py"
       - "tests/test_stock_reuse_preflight.py"
       - "scripts/maintext_fidelity_classification.py"
       - "scripts/maintext_whitespace_patterns.py"
@@ -132,6 +134,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_source_usfx_newline_provenance.py' -v
           python -m unittest discover -s tests -p 'test_source_native_notes_audit.py' -v
           python -m unittest discover -s tests -p 'test_stock_reuse_preflight.py' -v
+          python -m unittest discover -s tests -p 'test_fast_stock_note_probe.py' -v
           python -m unittest discover -s tests -p 'test_source_native_note_positions.py' -v
           python -m unittest discover -s tests -p 'test_native_book_intro_screen.py' -v
           python -m unittest discover -s tests -p 'test_source_native_layout_anchors.py' -v
