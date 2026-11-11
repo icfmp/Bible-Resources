@@ -11,7 +11,8 @@ from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from reader_xiphos_headless_smoke import (
     extract_pinned_preview,XiphosSmokeError,_notice_click_from_geometry,
-    _sample_reader_passages, _capture_parallel_toggle_sample, READER_SAMPLES,
+    _sample_reader_passages, _capture_parallel_toggle_sample,
+    _capture_note_hover_sample, GENESIS_1_2_NOTE_HOVER, READER_SAMPLES,
 )
 
 
@@ -75,7 +76,17 @@ class XiphosSmokeUnitTests(unittest.TestCase):
                              [entry[1] for entry in READER_SAMPLES])
             self.assertTrue(all(entry["gui_navigation_outcome_requires_visual_inspection"]
                                 for entry in result))
-            self.assertEqual(len(list(folder.glob("*.png"))),len(READER_SAMPLES))
+            # One additional Gen 1:2 note-hover frame is independent
+            # reader evidence; a screenshot is not an assertion of popup success.
+            self.assertEqual(len(list(folder.glob("*.png"))),
+                             len(READER_SAMPLES)+1)
+            note=result[0]["note_hover_sample"]
+            self.assertEqual(note["host_reference"],"Gen.1.2")
+            self.assertFalse(note["previewed_note_body_verified"])
+            self.assertFalse(note["actual_link_navigation_verified"])
+            x,y=GENESIS_1_2_NOTE_HOVER
+            self.assertIn(["xdotool","mousemove","--sync",str(x),str(y)],
+                          commands)
             self.assertIn(
                 ["xdotool","windowfocus","--sync","12345"],commands)
             self.assertIn(
@@ -97,6 +108,21 @@ class XiphosSmokeUnitTests(unittest.TestCase):
                        side_effect=AssertionError("No X11 action allowed")):
                 with self.assertRaises(XiphosSmokeError):
                     _sample_reader_passages({"DISPLAY":":91"},folder)
+
+    def test_note_hover_requires_isolated_xvfb_and_does_not_overwrite(self):
+        with tempfile.TemporaryDirectory() as base:
+            directory=Path(base)/"samples"
+            directory.mkdir()
+            note=directory/"genesis-note-hover.png"
+            note.write_bytes(b"previous source-linked evidence")
+            with patch("reader_xiphos_headless_smoke.subprocess.run",
+                       side_effect=AssertionError("Must not touch X11")):
+                with self.assertRaises(XiphosSmokeError):
+                    _capture_note_hover_sample({"DISPLAY":":91"}, directory)
+                self.assertEqual(note.read_bytes(),b"previous source-linked evidence")
+                note.unlink()
+                with self.assertRaises(XiphosSmokeError):
+                    _capture_note_hover_sample({"DISPLAY":":0"}, directory)
 
     def test_parallel_view_toggle_is_only_unreviewed_gui_evidence(self):
         with tempfile.TemporaryDirectory() as base:
