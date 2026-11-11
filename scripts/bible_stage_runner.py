@@ -514,9 +514,12 @@ def _write_report(report_dir: Path, report: dict) -> None:
                 .get("4", {}).get("evidence", {})
                 .get("fast_stock_note_preflight", {}))
     if fast and fast.get("fast_stock_reuse_disqualified"):
+        category = fast.get("reason_code", "")
+        if not isinstance(category, str) or SAFE_CODE.fullmatch(category) is None:
+            category = "untrusted_preflight_category"
         lines.extend(["", "**Fast original-note loss preflight (exact SWORD key)**",
                       "Confirmed stock reuse blocker: `" +
-                      fast["reason_code"] + "`",
+                      category + "`",
                       "The full corpus audit has NOT passed this gate."])
     if report["stage"] in (4, 5):
         preflight = report.get("evidence", {}).get("stock_reuse_preflight", {})
