@@ -14,6 +14,7 @@ from reader_xiphos_headless_smoke import (
     _sample_reader_passages, _capture_parallel_toggle_sample,
     _capture_note_hover_sample, GENESIS_1_2_NOTE_HOVER, READER_SAMPLES,
     install_checked_out_rawtext_comparison, _capture_module_tree_probe,
+    _capture_source_note_link_host,
 )
 
 
@@ -253,6 +254,47 @@ class XiphosSmokeUnitTests(unittest.TestCase):
                        side_effect=lambda args, **kw: subprocess.CompletedProcess(args, 0)):
                 with self.assertRaises(XiphosSmokeError):
                     _capture_module_tree_probe({"DISPLAY": ":91"}, study)
+
+    def test_source_note_reference_host_attempt_not_a_click_certificate(self):
+        with tempfile.TemporaryDirectory() as base:
+            study = Path(base) / "study"
+            study.mkdir()
+            calls = []
+            def fake_run(args, **kwargs):
+                calls.append(args)
+                if args[0] == "import":
+                    Path(args[-1]).write_bytes(b"synthetic source note reference pixels")
+                return subprocess.CompletedProcess(args, 0)
+            with (patch("reader_xiphos_headless_smoke.subprocess.run",
+                        side_effect=fake_run),
+                  patch("reader_xiphos_headless_smoke.time.sleep")):
+                report = _capture_source_note_link_host({"DISPLAY": ":91"}, study)
+            self.assertEqual(report["source_note_host"], "Gen.2.4")
+            self.assertEqual(report["original_reference_target_in_source"], "Exod.6")
+            self.assertFalse(report["real_reference_link_click_verified"])
+            self.assertFalse(report["actual_reader_target_navigation_verified"])
+            self.assertTrue((study / "source-note-link-host.png").is_file())
+            self.assertIn(
+                ["xdotool", "type", "--clearmodifiers", "--delay", "35", "Gen 2:4"],
+                calls)
+            self.assertIn(
+                ["xdotool", "type", "--clearmodifiers", "--delay", "35", "Gen 1:1"],
+                calls)
+            self.assertEqual(sum(c[0] == "import" for c in calls), 1)
+
+    def test_source_note_reference_host_refuses_overwrite_and_unknown_display(self):
+        with tempfile.TemporaryDirectory() as base:
+            study = Path(base) / "study"
+            study.mkdir()
+            with patch("reader_xiphos_headless_smoke.subprocess.run",
+                       side_effect=AssertionError("X11 not authorized")):
+                with self.assertRaises(XiphosSmokeError):
+                    _capture_source_note_link_host({"DISPLAY": ":0"}, study)
+                screenshot = study / "source-note-link-host.png"
+                screenshot.write_bytes(b"preserve older evidence")
+                with self.assertRaises(XiphosSmokeError):
+                    _capture_source_note_link_host({"DISPLAY": ":91"}, study)
+                self.assertEqual(screenshot.read_bytes(), b"preserve older evidence")
 
     def test_hash_and_scheme_mismatch_fail_closed(self):
         with tempfile.TemporaryDirectory() as folder:
