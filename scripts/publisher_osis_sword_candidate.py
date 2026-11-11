@@ -31,7 +31,8 @@ from source_native_osis_structure_screen import (
 )
 from source_native_ordered_body import compare_ordered_body_openings
 from source_native_osis_boundary_positions import (
-    authorial_book_streams,NativeBookStreams,compare_book_boundary_positions,
+    authorial_book_streams,authorial_outside_book_titles,
+    NativeBookStreams,compare_book_boundary_positions,
 )
 from source_osis_inventory import source_inventory
 from native_milestone_pair_audit import NativeMilestonePairAudit
@@ -226,7 +227,7 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
                       candidate_dir: Path,module_id: str,system: str,
                       source: dict,notes: dict,original_structures: dict,
                       authored_body: dict, authored_body_counts: dict,
-                      authored_boundaries: dict):
+                      authored_boundaries: dict,authored_outside_titles: list):
     native_keys,_,inventory=collect_native_inventory(
         index_binary,candidate_dir,module_id)
     source_set=set(source)
@@ -325,7 +326,8 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
     ordered_body=compare_ordered_body_openings(
         authored_body,milestones.private_ordered_body_openings(),
         authored_body_counts)
-    positions=compare_book_boundary_positions(authored_boundaries,native_boundaries)
+    positions=compare_book_boundary_positions(
+        authored_boundaries,native_boundaries,authored_outside_titles)
 
     approved_candidate=False
     all_ok=(
@@ -443,6 +445,7 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
     original_structures=authorial_structures(original)
     authored_body,authored_body_counts=authorial_body_opening_sequences(original)
     authored_boundaries=authorial_book_streams(original)
+    authored_outside_titles=authorial_outside_book_titles(original)
     if (set(verses)!=set(source_keys.splitlines())
             or source_check["publisher_numbered_verse_count"]!=
                source_meta["source_verse_count"]):
@@ -465,7 +468,7 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
                     index_binary,raw_binary,work,
                     cfg["candidate_module_id"],system,verses,notes,
                     original_structures,authored_body,authored_body_counts,
-                    authored_boundaries)
+                    authored_boundaries,authored_outside_titles)
                 compared["standard_osis_compiler"]=compilation
             except (PublisherSWORDResearchError,ValueError,OSError,
                     subprocess.TimeoutExpired) as exc:
