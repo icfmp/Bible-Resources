@@ -179,7 +179,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [[ "$STAGE" == "3" || "$STAGE" == "4" || "$STAGE" == "5" || "$STAGE" == "4-5" || "$STAGE" == "4-5" ]]; then
+          if [[ "$STAGE" == "3" || "$STAGE" == "4" || "$STAGE" == "5" || "$STAGE" == "4-5" ]]; then
             if [[ "$(python -c 'import os,sys; sys.path.insert(0,"scripts"); from bible_intake import load_manifest; print(load_manifest(os.environ["RESOURCE_ID"])["source"]["format"])')" == "OSIS" ]]; then
               python scripts/fetch_reviewed_schema.py --directory "${RUNNER_TEMP}/osis-xsd"
             fi
