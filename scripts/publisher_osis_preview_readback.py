@@ -27,6 +27,31 @@ TEST_PASSAGES=(
 class PreviewReaderError(ValueError):
     """Installed preview cannot be independently verified."""
 
+def diatheke_readback_receipt(returncode:int, output:bytes, stderr:bytes,
+                              passage:str) -> dict:
+    """Safe counts/categories only; raw verse and diagnostic bytes never escape."""
+    if passage not in TEST_PASSAGES or not isinstance(output,bytes) or not isinstance(stderr,bytes):
+        raise PreviewReaderError("Invalid stock SWORD diagnostic inputs")
+    rendered=output.decode("utf-8", errors="replace")
+    folded=rendered.casefold()
+    return {
+        "passage":passage,
+        "exit_code":returncode if isinstance(returncode,int) and -255<=returncode<=255 else None,
+        "stdout_bytes":len(output),
+        "stdout_nonwhitespace_codepoints":sum(not ch.isspace() for ch in rendered),
+        "stderr_bytes":len(stderr),
+        "known_module_not_found":("module not found" in folded or "not installed" in folded),
+        "short_result":len(rendered.strip())<30,
+        "oversize_result":len(rendered)>1_000_000,
+        "source_text_exposed":False,
+    }
+
+
+def _readback_passed(receipt:dict)->bool:
+    return (receipt["exit_code"]==0 and not receipt["short_result"]
+            and not receipt["oversize_result"]
+            and not receipt["known_module_not_found"])
+
 
 def test_preview(zip_path:Path, report_path:Path, native_index:Path,diatheke:Path):
     source=json.loads(report_path.read_text(encoding="utf-8"))
@@ -87,17 +112,17 @@ def test_preview(zip_path:Path, report_path:Path, native_index:Path,diatheke:Pat
                 cmd=[str(diatheke.resolve(strict=True)),"-b",module,
                      "-k",passage,"-f","plain"]
                 process=subprocess.run(cmd,env=env,stdout=subprocess.PIPE,
-                                       stderr=subprocess.DEVNULL,timeout=40,
+                                       stderr=subprocess.PIPE,timeout=40,
                                        check=False)
             except (OSError,subprocess.TimeoutExpired) as exc:
                 raise PreviewReaderError("Stock diatheke preview invocation failed") from exc
-            # A synthetic empty/error page is not successful reader coverage.
-            rendered=process.stdout.decode("utf-8",errors="replace")
-            if (process.returncode!=0 or len(rendered.strip())<30
-                    or len(rendered)>1_000_000
-                    or "module not found" in rendered.casefold()
-                    or "not installed" in rendered.casefold()):
-                raise PreviewReaderError("Stock diatheke did not render a representative passage")
+            # Emit safe numeric diagnostics, never private rendered Scripture.
+            receipt=diatheke_readback_receipt(
+                process.returncode,process.stdout,process.stderr,passage)
+            if not _readback_passed(receipt):
+                raise PreviewReaderError(
+                    "Stock diatheke representative passage failure: "
+                    +json.dumps(receipt,sort_keys=True,separators=(",",":")))
         return {
             "status":"test_zip_reinstalled_and_stock_sword_diatheke_readback_verified",
             "candidate_preview_sha256":digest,
