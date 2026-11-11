@@ -9,10 +9,10 @@ on:
         required: true
         default: webp-research
       stage:
-        description: "One of the seven fixed onboarding gates; one run per stage"
+        description: "One of seven stages, or 4-5 in one shared machine-only scan"
         type: choice
         required: true
-        options: ["1", "2", "3", "4", "5", "6", "7"]
+        options: ["1", "2", "3", "4", "5", "6", "7", "4-5"]
         default: "2"
       issue_number:
         description: "Optional [Import] GitHub issue number for permanent evidence comment"
@@ -164,11 +164,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [[ "$STAGE" == "4" || "$STAGE" == "5" || "$STAGE" == "6" ]]; then
+          if [[ "$STAGE" == "4" || "$STAGE" == "5" || "$STAGE" == "4-5" || "$STAGE" == "6" ]]; then
             sudo apt-get update
             sudo apt-get install -y diatheke
           fi
-          if [[ "$STAGE" == "4" || "$STAGE" == "5" ]]; then
+          if [[ "$STAGE" == "4" || "$STAGE" == "5" || "$STAGE" == "4-5" ]]; then
             sudo apt-get install -y libsword-dev
             mkdir -p "$INSPECTOR_DIR"
             g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp -o "$INSPECTOR_DIR/sword-native-index" -lsword
@@ -179,7 +179,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [[ "$STAGE" == "3" || "$STAGE" == "4" || "$STAGE" == "5" ]]; then
+          if [[ "$STAGE" == "3" || "$STAGE" == "4" || "$STAGE" == "5" || "$STAGE" == "4-5" || "$STAGE" == "4-5" ]]; then
             if [[ "$(python -c 'import os,sys; sys.path.insert(0,"scripts"); from bible_intake import load_manifest; print(load_manifest(os.environ["RESOURCE_ID"])["source"]["format"])')" == "OSIS" ]]; then
               python scripts/fetch_reviewed_schema.py --directory "${RUNNER_TEMP}/osis-xsd"
             fi
@@ -199,7 +199,7 @@ jobs:
           set -euo pipefail
           mkdir -p "$REPORT_DIR"
           args=(--resource-id "$RESOURCE_ID" --stage "$STAGE" --report-dir "$REPORT_DIR")
-          if [[ "$STAGE" == "4" || "$STAGE" == "5" ]]; then
+          if [[ "$STAGE" == "4" || "$STAGE" == "5" || "$STAGE" == "4-5" ]]; then
             args+=(--native-index-binary "$INSPECTOR_DIR/sword-native-index")
             args+=(--native-raw-binary "$INSPECTOR_DIR/sword-native-raw-corpus")
             args+=(--native-entry-binary "$INSPECTOR_DIR/sword-native-raw-entry")
