@@ -27,6 +27,18 @@ TEST_PASSAGES=(
 class PreviewReaderError(ValueError):
     """Installed preview cannot be independently verified."""
 
+def diatheke_single_verse_command(binary:Path,module:str,passage:str) -> list[str]:
+    """Diatheke's -k MUST be last: all trailing args become query tokens.
+
+    Limit to one verse to avoid mistakenly treating whole-book reads as
+    representative verse coverage.
+    """
+    if module!="JND2024Research" or passage not in TEST_PASSAGES:
+        raise PreviewReaderError("Unreviewed diatheke query")
+    return [str(binary.resolve(strict=True)),"-b",module,
+            "-f","plain","-m","1","-k",passage]
+
+
 def diatheke_readback_receipt(returncode:int, output:bytes, stderr:bytes,
                               passage:str) -> dict:
     """Safe counts/categories only; raw verse and diagnostic bytes never escape."""
@@ -109,8 +121,7 @@ def test_preview(zip_path:Path, report_path:Path, native_index:Path,diatheke:Pat
         env=dict(os.environ,SWORD_PATH=str(payload))
         for passage in TEST_PASSAGES:
             try:
-                cmd=[str(diatheke.resolve(strict=True)),"-b",module,
-                     "-k",passage,"-f","plain"]
+                cmd=diatheke_single_verse_command(diatheke,module,passage)
                 process=subprocess.run(cmd,env=env,stdout=subprocess.PIPE,
                                        stderr=subprocess.PIPE,timeout=40,
                                        check=False)
