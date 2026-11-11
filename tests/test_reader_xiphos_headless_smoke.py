@@ -8,7 +8,7 @@ from zipfile import ZipFile
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from reader_xiphos_headless_smoke import (
-    extract_pinned_preview,XiphosSmokeError,
+    extract_pinned_preview,XiphosSmokeError,_notice_click_from_geometry,
 )
 
 
@@ -39,6 +39,16 @@ class XiphosSmokeUnitTests(unittest.TestCase):
             self.assertEqual(actual,root)
             self.assertEqual(len([item for item in root.rglob("*") if item.is_file()]),7)
             self.assertNotIn("private-synthetic-bytes",str(actual))
+
+    def test_only_small_notice_window_gets_click_coordinates(self):
+        self.assertEqual(
+            _notice_click_from_geometry({"X":0,"Y":0,"WIDTH":564,"HEIGHT":135}),
+            (282,117))
+        self.assertIsNone(
+            _notice_click_from_geometry({"X":40,"Y":40,"WIDTH":800,"HEIGHT":600}))
+        self.assertIsNone(
+            _notice_click_from_geometry({"X":5,"Y":5,"WIDTH":300,"HEIGHT":65}))
+        self.assertIsNone(_notice_click_from_geometry({"X":3}))
 
     def test_hash_and_scheme_mismatch_fail_closed(self):
         with tempfile.TemporaryDirectory() as folder:
