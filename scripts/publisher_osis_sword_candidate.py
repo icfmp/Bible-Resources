@@ -30,6 +30,7 @@ from source_native_osis_structure_screen import (
     authorial_structures, NativeStructuralCensus, authorial_body_opening_sequences,
 )
 from source_native_ordered_body import compare_ordered_body_openings
+from source_native_osis_target_addressability import audit_explicit_targets
 from source_native_osis_boundary_positions import (
     authorial_book_streams,authorial_outside_book_titles,
     NativeBookStreams,compare_book_boundary_positions,
@@ -324,6 +325,7 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
     if indexed_seen!=native_set:
         raise PublisherSWORDResearchError("Native index and raw corpus enumerations disagree")
     native_structure=milestones.finish()
+    target_addressability=audit_explicit_targets(notes,source_set,native_set)
     ordered_body=compare_ordered_body_openings(
         authored_body,milestones.private_ordered_body_openings(),
         authored_body_counts)
@@ -361,6 +363,7 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
         "source_native_body_boundary_positions":positions,
         "compiled_native_driver":inventory["module_driver"],
         "source_to_compiled_counts":dict(sorted(counts.items())),
+        "explicit_note_target_index_addressability":target_addressability,
         "first_safe_reference_note_index_findings":[
             x for key in sorted(samples) for x in samples[key]][:MAX_SAMPLE*6],
         "explicit_p_q_and_layout_structure_fidelity_verified":False,

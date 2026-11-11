@@ -7,6 +7,8 @@ on:
     paths:
       - ".github/workflows/publisher-osis-sword-candidate.yml"
       - "scripts/publisher_osis_sword_candidate.py"
+      - "scripts/source_native_osis_target_addressability.py"
+      - "tests/test_source_native_osis_target_addressability.py"
       - "scripts/publisher_osis_preview_package.py"
       - "scripts/publisher_osis_preview_readback.py"
       - "tests/test_publisher_osis_preview_package.py"
@@ -52,6 +54,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_source_native_osis_structure_screen.py' -v
           python -m unittest discover -s tests -p 'test_source_native_osis_boundary_positions.py' -v
           python -m unittest discover -s tests -p 'test_publisher_osis_preview_package.py' -v
+          python -m unittest discover -s tests -p 'test_source_native_osis_target_addressability.py' -v
       - name: Parse authenticated owner request
         if: github.event_name == 'issue_comment'
         shell: bash
@@ -244,6 +247,11 @@ jobs:
                   "ZIP bytes: "+z.zip_bytes,
                   "All member files exact source/native tested bytes: "+z.all_module_files_byte_identical_to_audited_candidate,
                   "Preview approval status: NOT FOR RELEASE");
+              }
+              if(candidate.explicit_note_target_index_addressability) {
+                const a=candidate.explicit_note_target_index_addressability;
+                lines.push("Stage-5 original OSIS note target native-index addressability (NOT clicked navigation):",
+                  "```json",JSON.stringify(a,null,2),"```");
               }
               if(candidate.source_to_compiled_counts){
                 lines.push("Checked counts (no Bible content):", "```json",
