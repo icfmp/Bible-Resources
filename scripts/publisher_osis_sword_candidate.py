@@ -26,6 +26,7 @@ from publisher_osis_usfx_parity import (
 )
 from source_native_maintext_probe import native_raw_main_text
 from source_native_note_positions import native_note_anchor_positions
+from source_native_osis_structure_screen import authorial_structures, NativeStructuralCensus
 from source_osis_inventory import source_inventory
 from native_milestone_pair_audit import NativeMilestonePairAudit
 from sword_native_inventory import collect_native_inventory
@@ -217,7 +218,7 @@ def _native_notes(raw: bytes):
 
 def _candidate_result(index_binary: Path,raw_binary: Path,
                       candidate_dir: Path,module_id: str,system: str,
-                      source: dict,notes: dict):
+                      source: dict,notes: dict,original_structures: dict):
     native_keys,_,inventory=collect_native_inventory(
         index_binary,candidate_dir,module_id)
     source_set=set(source)
@@ -238,9 +239,11 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
 
     indexed_seen=set()
     milestones=NativeMilestonePairAudit()
+    native_layout=NativeStructuralCensus()
     for kind,ref,raw in _read_native_frames(raw_binary,module_id,
                                            candidate_dir/"payload"):
         milestones.observe(kind,ref,raw)
+        native_layout.observe(raw)
         if kind!="K":
             counts["native_other_"+kind+"_entries"]+=1
             continue
@@ -333,6 +336,8 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
         "compiled_payload_sha256":inventory["module_payload_sha256"],
         "compiled_engine_version":inventory["reader_version"],
         "compiled_native_milestone_closure_metadata_only":native_structure,
+        "authorial_osis_structural_census":original_structures,
+        "native_compiled_structure_screen":native_layout.receipt(),
         "compiled_native_driver":inventory["module_driver"],
         "source_to_compiled_counts":dict(sorted(counts.items())),
         "first_safe_reference_note_index_findings":[
@@ -417,6 +422,7 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
     original=read_pinned_publisher_osis(resource_id)
     source_keys,source_meta=source_inventory(original)
     verses,notes,source_check=original_osis_verses_and_notes(original)
+    original_structures=authorial_structures(original)
     if (set(verses)!=set(source_keys.splitlines())
             or source_check["publisher_numbered_verse_count"]!=
                source_meta["source_verse_count"]):
@@ -437,7 +443,8 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
                     osis2mod,sourcefile,out,system,work/"osis2mod-private.log")
                 compared=_candidate_result(
                     index_binary,raw_binary,work,
-                    cfg["candidate_module_id"],system,verses,notes)
+                    cfg["candidate_module_id"],system,verses,notes,
+                    original_structures)
                 compared["standard_osis_compiler"]=compilation
             except (PublisherSWORDResearchError,ValueError,OSError,
                     subprocess.TimeoutExpired) as exc:
