@@ -30,6 +30,9 @@ from source_native_osis_structure_screen import (
     authorial_structures, NativeStructuralCensus, authorial_body_opening_sequences,
 )
 from source_native_ordered_body import compare_ordered_body_openings
+from source_native_osis_boundary_positions import (
+    authorial_book_streams,NativeBookStreams,compare_book_boundary_positions,
+)
 from source_osis_inventory import source_inventory
 from native_milestone_pair_audit import NativeMilestonePairAudit
 from sword_native_inventory import collect_native_inventory
@@ -222,7 +225,8 @@ def _native_notes(raw: bytes):
 def _candidate_result(index_binary: Path,raw_binary: Path,
                       candidate_dir: Path,module_id: str,system: str,
                       source: dict,notes: dict,original_structures: dict,
-                      authored_body: dict, authored_body_counts: dict):
+                      authored_body: dict, authored_body_counts: dict,
+                      authored_boundaries: dict):
     native_keys,_,inventory=collect_native_inventory(
         index_binary,candidate_dir,module_id)
     source_set=set(source)
@@ -244,10 +248,12 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
     indexed_seen=set()
     milestones=NativeMilestonePairAudit()
     native_layout=NativeStructuralCensus()
+    native_boundaries=NativeBookStreams()
     for kind,ref,raw in _read_native_frames(raw_binary,module_id,
                                            candidate_dir/"payload"):
         milestones.observe(kind,ref,raw)
         native_layout.observe(raw)
+        native_boundaries.observe(kind,ref,raw)
         if kind!="K":
             counts["native_other_"+kind+"_entries"]+=1
             continue
@@ -319,6 +325,7 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
     ordered_body=compare_ordered_body_openings(
         authored_body,milestones.private_ordered_body_openings(),
         authored_body_counts)
+    positions=compare_book_boundary_positions(authored_boundaries,native_boundaries)
 
     approved_candidate=False
     all_ok=(
@@ -334,7 +341,8 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
         not counts["note_nonspace_anchor_moved"] and
         not counts["numbered_verse_note_positions_unverified"] and
         counts["note_pairs_compared"]==sum(map(len,notes.values())) and
-        ordered_body["same_order_and_kind_in_every_mapped_book"]
+        ordered_body["same_order_and_kind_in_every_mapped_book"] and
+        positions["all_book_body_nonspace_and_boundary_events_equal"]
     )
     return {
         "candidate_status":("full_numbered_text_and_note_preflight_equal_not_approved"
@@ -347,6 +355,7 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
         "authorial_osis_structural_census":original_structures,
         "native_compiled_structure_screen":native_layout.receipt(),
         "original_to_compiled_body_opening_order":ordered_body,
+        "source_native_body_boundary_positions":positions,
         "compiled_native_driver":inventory["module_driver"],
         "source_to_compiled_counts":dict(sorted(counts.items())),
         "first_safe_reference_note_index_findings":[
@@ -433,6 +442,7 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
     verses,notes,source_check=original_osis_verses_and_notes(original)
     original_structures=authorial_structures(original)
     authored_body,authored_body_counts=authorial_body_opening_sequences(original)
+    authored_boundaries=authorial_book_streams(original)
     if (set(verses)!=set(source_keys.splitlines())
             or source_check["publisher_numbered_verse_count"]!=
                source_meta["source_verse_count"]):
@@ -454,7 +464,8 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
                 compared=_candidate_result(
                     index_binary,raw_binary,work,
                     cfg["candidate_module_id"],system,verses,notes,
-                    original_structures,authored_body,authored_body_counts)
+                    original_structures,authored_body,authored_body_counts,
+                    authored_boundaries)
                 compared["standard_osis_compiler"]=compilation
             except (PublisherSWORDResearchError,ValueError,OSError,
                     subprocess.TimeoutExpired) as exc:
