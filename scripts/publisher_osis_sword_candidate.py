@@ -103,9 +103,13 @@ def _compile_osis(tool: Path, outfile: Path, module_path: Path, system: str,
         try:
             cmd=[str(tool.resolve(strict=True)),str(module_path),
                  str(outfile),"-z","z","-b","4","-v",system]
-            process=subprocess.run(cmd,stdout=log,stderr=log,check=False,timeout=210)
-        except (OSError,subprocess.TimeoutExpired) as exc:
-            raise PublisherSWORDResearchError("Official OSIS compiler failed or timed out") from exc
+            # Large publisher OSIS with thousands of linked notes may require
+            # longer than the old 210-second cap; still terminate boundedly.
+            process=subprocess.run(cmd,stdout=log,stderr=log,check=False,timeout=600)
+        except subprocess.TimeoutExpired as exc:
+            raise PublisherSWORDResearchError("Official OSIS compiler exceeded 600-second cap") from exc
+        except OSError as exc:
+            raise PublisherSWORDResearchError("Official OSIS compiler could not execute") from exc
     if log_path.stat().st_size>MAX_LOG:
         raise PublisherSWORDResearchError("OSIS tool emitted excessive diagnostics")
     # Never print raw compiler stdout/stderr: even diagnostic messages can
@@ -352,6 +356,8 @@ def safe_failure_code(exc: Exception) -> str:
     message = str(exc)
     known = (
         ("OSIS tool returned nonzero exit status ", "compiler_nonzero_exit"),
+        ("Official OSIS compiler exceeded 600-second cap", "compiler_bounded_timeout"),
+        ("Official OSIS compiler could not execute", "compiler_launch_failure"),
         ("Official OSIS compiler failed or timed out", "compiler_launch_or_timeout"),
         ("OSIS tool emitted excessive diagnostics", "compiler_excessive_private_output"),
         ("Missing trusted compiler or original pinned OSIS", "compiler_or_source_missing"),
