@@ -160,6 +160,7 @@ jobs:
                     all_book_body_nonspace_and_boundary_events_equal:
                       p.all_book_body_nonspace_and_boundary_events_equal,
                     counts:p.counts,
+                    all_title_text_and_nonspace_placement_equal:p.all_title_text_and_nonspace_placement_equal,
                     native_anonymous_top_nonspace_body_characters:
                       p.native_anonymous_top_nonspace_body_characters,
                     bounded_reference_only_findings:p.bounded_reference_only_findings,
