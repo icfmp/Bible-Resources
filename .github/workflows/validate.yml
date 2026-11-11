@@ -27,8 +27,13 @@ jobs:
         timeout-minutes: 8
         run: |
           python -m pip install -r requirements.txt
-          sudo apt-get update
-          sudo apt-get install -y diatheke libsword-dev
+          # External mirror outages must fail CI promptly, not consume the
+          # entire workflow timeout. No missing native test is waived.
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 \
+            install -y diatheke libsword-dev
       - run: python -m unittest discover -s tests -v
       - name: Independently scan the exact published SWORD module's native verse-index
         shell: bash
