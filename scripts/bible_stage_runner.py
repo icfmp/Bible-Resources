@@ -154,6 +154,29 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
         if raw_binary is None or entry_binary is None or not raw_binary.is_file() or not entry_binary.is_file():
             return _status("BLOCKED",verified=[],
                 missing=["Native raw corpus and exact-entry inspectors required for full-corpus diagnostics"])
+        # Fast, bounded source-derived note sample FIRST. A proven loss
+        # disqualifies unchanged stock reuse without paying for the lengthy
+        # punctuation/whitespace/poetry provenance analysis. An inconclusive
+        # sample NEVER waives the full source/native corpus requirements.
+        from fast_stock_note_probe import probe_stock_note_callers
+        fast_notes = probe_stock_note_callers(
+            archives["source"], archives["sword"],
+            ROOT / manifest["crosswalk"], entry_binary,
+            manifest["sword"]["module_id"])
+        if fast_notes["fast_stock_reuse_disqualified"]:
+            return _status("BLOCKED",
+                verified=["SHA-pinned authorial source sampled against independent "
+                          "exact native SWORD verse entry; material stock note "
+                          "difference observed"],
+                missing=["Unchanged stock SWORD candidate cannot be reused",
+                         "Full source/native Scripture and annotation audit NOT "
+                         "EXECUTED after early material-loss finding",
+                         "Select a reviewed source-faithful replacement; separately "
+                         "audit its full index, text and editorial structures",
+                         "No edition, rights or publication acceptance"],
+                evidence={"source_format":"USFX",
+                          "fast_stock_note_preflight":fast_notes,
+                          "whole_corpus_scan_performed":False})
         from source_native_maintext_probe import run_real_usfx_sword_text_probe
         receipt = run_real_usfx_sword_text_probe(
             archives["source"], archives["sword"], ROOT / manifest["crosswalk"],
@@ -257,6 +280,7 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
                       "maintext_scope_classification":witness,
                       "notes":notes,
                       "stock_reuse_preflight":stock_preflight,
+                      "fast_stock_note_preflight":fast_notes,
                       "note_anchor_positions":receipt[
                           "private_numbered_source_native_note_anchor_position_diagnostic"],
                       "source_scope":receipt["source_book_scope"],
@@ -291,6 +315,16 @@ def _stage5_from_fidelity(fidelity: dict, receipts: dict) -> dict:
     """
     evidence = fidelity.get("evidence", {})
     if "notes" not in evidence:
+        fast = evidence.get("fast_stock_note_preflight", {})
+        if fast.get("fast_stock_reuse_disqualified") is True:
+            return _status("BLOCKED",
+                verified=["Stock reuse already disqualified by exact native note sample"],
+                missing=["Full original/native note, anchor and structure audit "
+                         "not executed after early stock rejection",
+                         "Human editorial/rights/rebuild review remains mandatory"],
+                evidence={"original_archives": receipts,
+                          "fast_stock_note_preflight": fast,
+                          "whole_corpus_scan_performed": False})
         return _status("BLOCKED", verified=[],
             missing=["No source-native note/layout diagnostic for this format yet"],
             evidence={"original_archives": receipts})
@@ -472,6 +506,18 @@ def _write_report(report_dir: Path, report: dict) -> None:
                     f"- `{ref}` — `{origin}`, source gap {gap}, "
                     f"nearest p/q boundary {distance} codepoints away")
 
+    # Same safe metadata section in one-pass 4-5 or traditional 4/5 reports.
+    fast = report.get("evidence", {}).get("fast_stock_note_preflight", {})
+    if not fast and report["stage"] == "4-5":
+        fast = (report.get("evidence", {})
+                .get("stage_machine_receipts", {})
+                .get("4", {}).get("evidence", {})
+                .get("fast_stock_note_preflight", {}))
+    if fast and fast.get("fast_stock_reuse_disqualified"):
+        lines.extend(["", "**Fast original-note loss preflight (exact SWORD key)**",
+                      "Confirmed stock reuse blocker: `" +
+                      fast["reason_code"] + "`",
+                      "The full corpus audit has NOT passed this gate."])
     if report["stage"] in (4, 5):
         preflight = report.get("evidence", {}).get("stock_reuse_preflight", {})
         if preflight:
