@@ -159,6 +159,65 @@ READER_SAMPLES = (
 )
 
 
+# Verified Xvfb screenshot geometry from read-only stage-6 run #43072470491:
+# after focusing/resizing the 1216x736 window, an authored superscript
+# note caller is visible at Gen.1.2 near (503,520). This coordinate is ONLY
+# an ephemeral reader-UI interaction specimen, not a translation mapping.
+GENESIS_1_2_NOTE_HOVER = (503, 520)
+
+
+def _capture_note_hover_sample(env:dict, out:Path) -> dict:
+    """Move over one visibly identified note caller, capture possible preview.
+
+    Xiphos footnotes use mouse hover; this only observes pixels for manual
+    inspection and never pretends the hover actually resolved the note body.
+    """
+    if (env.get("DISPLAY") != ":91" or not out.is_dir()
+            or out.is_symlink()):
+        raise XiphosSmokeError("Unreviewed footnote hover display or directory")
+    target=out/"genesis-note-hover.png"
+    if target.exists() or target.is_symlink():
+        raise XiphosSmokeError("Refusing existing note-hover screenshot")
+    x,y=GENESIS_1_2_NOTE_HOVER
+    try:
+        moved=subprocess.run(
+            ["xdotool","mousemove","--sync",str(x),str(y)],
+            env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+            timeout=5,check=False)
+    except (OSError,subprocess.TimeoutExpired) as exc:
+        raise XiphosSmokeError("Bounded original-note hover unavailable") from exc
+    if moved.returncode:
+        raise XiphosSmokeError("Original note hover pointer movement failed")
+    time.sleep(1.5)
+    try:
+        captured=subprocess.run(
+            ["import","-display",env["DISPLAY"],"-window","root",str(target)],
+            env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+            timeout=15,check=False)
+    except (OSError,subprocess.TimeoutExpired) as exc:
+        raise XiphosSmokeError("Original note hover screenshot failed") from exc
+    if (captured.returncode or not target.is_file() or target.is_symlink()
+            or not 0 < target.stat().st_size <= 6_000_000):
+        raise XiphosSmokeError("Unsafe original-note hover screenshot")
+    # Return cursor to neutral screen area before navigating a new passage.
+    try:
+        subprocess.run(
+            ["xdotool","mousemove","1200","740"],
+            env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+            timeout=4,check=False)
+    except (OSError,subprocess.TimeoutExpired):
+        pass
+    return {
+        "host_reference": "Gen.1.2",
+        "interaction": "pointer_hover_over_visible_note_caller",
+        "screenshot_sha256": sha256(target.read_bytes()).hexdigest(),
+        "previewed_note_body_verified": False,
+        "actual_link_navigation_verified": False,
+        "visual_review_required": True,
+        "text_or_note_content_exported_to_metadata": False,
+    }
+
+
 def _sample_reader_passages(env, out: Path) -> list[dict]:
     """Xiphos Ctrl+L navigation with actual screenshots, not content approval."""
     if out.exists() or out.is_symlink() or not out.parent.is_dir():
@@ -234,12 +293,15 @@ def _sample_reader_passages(env, out: Path) -> list[dict]:
         if (capture.returncode or not target.is_file()
                 or target.is_symlink() or target.stat().st_size > 6_000_000):
             raise XiphosSmokeError("Unsafe or failed virtual reader screenshot")
-        snapshots.append({
+        snapshot={
             "sample": slug,
             "requested_reference": ref,
             "screenshot_sha256": sha256(target.read_bytes()).hexdigest(),
             "gui_navigation_outcome_requires_visual_inspection": True,
-        })
+        }
+        if slug == "genesis-prose":
+            snapshot["note_hover_sample"] = _capture_note_hover_sample(env, out)
+        snapshots.append(snapshot)
     return snapshots
 
 
