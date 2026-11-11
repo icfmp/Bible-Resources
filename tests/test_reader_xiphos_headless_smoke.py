@@ -280,7 +280,12 @@ class XiphosSmokeUnitTests(unittest.TestCase):
             self.assertIn(
                 ["xdotool", "type", "--clearmodifiers", "--delay", "35", "Gen 1:1"],
                 calls)
-            self.assertEqual(sum(c[0] == "import" for c in calls), 3)
+            self.assertEqual(sum(c[0] == "import" for c in calls), 4)
+            self.assertTrue(report["link_click_command_attempted"])
+            self.assertFalse(report["actual_reader_target_navigation_verified"])
+            self.assertIn(["xdotool", "mousemove", "--sync", "174", "545"], calls)
+            self.assertIn(["xdotool", "click", "1"], calls)
+            self.assertTrue((study / "source-note-link-after-click.png").is_file())
             self.assertIn(["xdotool", "mousemove", "--sync", "568", "295"], calls)
             self.assertIn(["xdotool", "click", "2"], calls)
             self.assertTrue((study / "source-note-link-hover.png").is_file())
