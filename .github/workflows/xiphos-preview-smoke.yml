@@ -75,13 +75,16 @@ jobs:
             --versification Luther \
             --sha256 6f1ad63a4c0a51e052bc5aa29bed79704a0c014cf1e9bd74af66542839e48a7b \
             --seconds 12 \
+            --screenshot "$RUNNER_TEMP/metadata/xiphos-window.png" \
             --report "$RUNNER_TEMP/metadata/xiphos-headless.json"
-      - name: Store only numerical Xiphos startup receipt
+      - name: Store bounded test-only window snapshot and numerical receipt
         uses: actions/upload-artifact@v4
         with:
           name: xiphos-headless-smoke-${{ github.run_id }}
-          path: ${{ runner.temp }}/metadata/xiphos-headless.json
-          retention-days: 90
+          path: |
+            ${{ runner.temp }}/metadata/xiphos-headless.json
+            ${{ runner.temp }}/metadata/xiphos-window.png
+          retention-days: 7
           if-no-files-found: error
       - name: Record result on original import issue
         uses: actions/github-script@v7
@@ -95,11 +98,11 @@ jobs:
               "### Stage-6 real Xiphos isolated headless startup — NOT visual approval",
               "Exact pinned preview: https://github.com/icfmp/Bible-Resources/actions/runs/43006720611",
               "This run: https://github.com/"+context.repo.owner+"/"+context.repo.repo+"/actions/runs/"+context.runId,
-              "TEST-ONLY module SHA-256 verified; no publication or screenshots.",
+              "TEST-ONLY module SHA-256 verified; no SWORD release. One short-lived screenshot may display public-domain source text and requires visual review.",
               "",
               "```json",JSON.stringify(receipt,null,2),"```",
               "",
-              "No note-click navigation, verse typography or parallel GUI comparison is certified by X11 startup."
+              "Screenshot for independent review is in the test-only Actions artifact. X11 startup alone certifies no note-click navigation, paragraph fidelity or parallel GUI comparison."
             ].join("\n");
             await github.rest.issues.createComment({
               ...context.repo,issue_number:context.issue.number,body
