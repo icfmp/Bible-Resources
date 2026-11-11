@@ -5,10 +5,14 @@ from hashlib import sha256
 import tempfile
 import unittest
 from zipfile import ZipFile
+import subprocess
+from unittest.mock import patch
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from reader_xiphos_headless_smoke import (
     extract_pinned_preview,XiphosSmokeError,_notice_click_from_geometry,
+    _sample_reader_passages, _capture_parallel_toggle_sample,
+    _capture_note_hover_sample, GENESIS_1_2_NOTE_HOVER, READER_SAMPLES,
 )
 
 
@@ -49,6 +53,120 @@ class XiphosSmokeUnitTests(unittest.TestCase):
         self.assertIsNone(
             _notice_click_from_geometry({"X":5,"Y":5,"WIDTH":300,"HEIGHT":65}))
         self.assertIsNone(_notice_click_from_geometry({"X":3}))
+
+    def test_real_reader_sample_commands_remain_nonpublication_evidence(self):
+        with tempfile.TemporaryDirectory() as base:
+            folder=Path(base)/"samples"
+            commands=[]
+            def fake_run(args, **kwargs):
+                commands.append(args)
+                if args[:2] == ["xdotool", "search"]:
+                    return subprocess.CompletedProcess(args, 0, stdout=b"12345")
+                if args[0] == "import":
+                    Path(args[-1]).write_bytes(b"synthetic screenshot only")
+                return subprocess.CompletedProcess(args, 0)
+            with (patch("reader_xiphos_headless_smoke.subprocess.run",
+                        side_effect=fake_run),
+                  patch("reader_xiphos_headless_smoke.time.sleep")):
+                result=_sample_reader_passages({"DISPLAY":":91"},folder)
+            self.assertEqual(len(result),len(READER_SAMPLES))
+            self.assertEqual([entry["sample"] for entry in result],
+                             [entry[0] for entry in READER_SAMPLES])
+            self.assertEqual([entry["requested_reference"] for entry in result],
+                             [entry[1] for entry in READER_SAMPLES])
+            self.assertTrue(all(entry["gui_navigation_outcome_requires_visual_inspection"]
+                                for entry in result))
+            # One additional Gen 1:2 note-hover frame is independent
+            # reader evidence; a screenshot is not an assertion of popup success.
+            self.assertEqual(len(list(folder.glob("*.png"))),
+                             len(READER_SAMPLES)+1)
+            note=result[0]["note_hover_sample"]
+            self.assertEqual(note["host_reference"],"Gen.1.2")
+            self.assertFalse(note["previewed_note_body_verified"])
+            self.assertFalse(note["actual_link_navigation_verified"])
+            x,y=GENESIS_1_2_NOTE_HOVER
+            self.assertIn(["xdotool","mousemove","--sync",str(x),str(y)],
+                          commands)
+            self.assertIn(
+                ["xdotool","windowfocus","--sync","12345"],commands)
+            self.assertIn(
+                ["xdotool","windowsize","12345","1216","736"],commands)
+            self.assertIn(
+                ["xdotool","windowmove","12345","16","16"],commands)
+            self.assertFalse(any("windowactivate" in command
+                                 for command in commands))
+            self.assertEqual(sum(command[:2] == ["xdotool","key"]
+                                 for command in commands),2*len(READER_SAMPLES))
+            # The *filename* of the test screenshot may mention 'note'.
+            # No authored note BODY, source prose or link target enters
+            # command arguments or public logs.
+            self.assertFalse(any("private-synthetic-bytes" in " ".join(command)
+                                 or "note body" in " ".join(command).lower()
+                                 for command in commands))
+
+    def test_real_reader_samples_do_not_overwrite_or_follow_symlinks(self):
+        with tempfile.TemporaryDirectory() as base:
+            folder=Path(base)/"samples"
+            folder.mkdir()
+            with patch("reader_xiphos_headless_smoke.subprocess.run",
+                       side_effect=AssertionError("No X11 action allowed")):
+                with self.assertRaises(XiphosSmokeError):
+                    _sample_reader_passages({"DISPLAY":":91"},folder)
+
+    def test_note_hover_requires_isolated_xvfb_and_does_not_overwrite(self):
+        with tempfile.TemporaryDirectory() as base:
+            directory=Path(base)/"samples"
+            directory.mkdir()
+            note=directory/"genesis-note-hover.png"
+            note.write_bytes(b"previous source-linked evidence")
+            with patch("reader_xiphos_headless_smoke.subprocess.run",
+                       side_effect=AssertionError("Must not touch X11")):
+                with self.assertRaises(XiphosSmokeError):
+                    _capture_note_hover_sample({"DISPLAY":":91"}, directory)
+                self.assertEqual(note.read_bytes(),b"previous source-linked evidence")
+                note.unlink()
+                with self.assertRaises(XiphosSmokeError):
+                    _capture_note_hover_sample({"DISPLAY":":0"}, directory)
+
+    def test_parallel_view_toggle_is_only_unreviewed_gui_evidence(self):
+        with tempfile.TemporaryDirectory() as base:
+            folder=Path(base)/"samples"
+            folder.mkdir()
+            calls=[]
+            def fake_run(args, **kwargs):
+                calls.append(args)
+                if args[0]=="import":
+                    Path(args[-1]).write_bytes(b"synthetic X11 screenshot")
+                return subprocess.CompletedProcess(args,0)
+            with (patch("reader_xiphos_headless_smoke.subprocess.run",
+                        side_effect=fake_run),
+                  patch("reader_xiphos_headless_smoke.time.sleep")):
+                result=_capture_parallel_toggle_sample({"DISPLAY":":91"},folder)
+            self.assertEqual(result["shortcut_invoked"],"Alt+P")
+            self.assertFalse(result["actual_parallel_second_translation_visible_verified"])
+            self.assertTrue(result["gui_outcome_requires_visual_inspection"])
+            self.assertEqual(calls[0][:4],
+                             ["xdotool","key","--clearmodifiers","alt+p"])
+            self.assertEqual(calls[1][:4],
+                             ["import","-display",":91","-window"])
+            self.assertTrue((folder/"parallel-toggle.png").is_file())
+
+    def test_parallel_probe_rejects_overwrite_or_untrusted_display_before_x11(self):
+        with tempfile.TemporaryDirectory() as base:
+            folder=Path(base)/"samples"
+            folder.mkdir()
+            (folder/"parallel-toggle.png").write_bytes(b"earlier verified proof")
+            with patch("reader_xiphos_headless_smoke.subprocess.run",
+                       side_effect=AssertionError("No X11 allowed")):
+                with self.assertRaises(XiphosSmokeError):
+                    _capture_parallel_toggle_sample({"DISPLAY":":91"},folder)
+            self.assertEqual((folder/"parallel-toggle.png").read_bytes(),
+                             b"earlier verified proof")
+            (folder/"parallel-toggle.png").unlink()
+            with patch("reader_xiphos_headless_smoke.subprocess.run",
+                       side_effect=AssertionError("No other display allowed")):
+                with self.assertRaises(XiphosSmokeError):
+                    _capture_parallel_toggle_sample({"DISPLAY":":0"},folder)
 
     def test_hash_and_scheme_mismatch_fail_closed(self):
         with tempfile.TemporaryDirectory() as folder:
