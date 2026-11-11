@@ -97,7 +97,11 @@ class XiphosSmokeUnitTests(unittest.TestCase):
                                  for command in commands))
             self.assertEqual(sum(command[:2] == ["xdotool","key"]
                                  for command in commands),2*len(READER_SAMPLES))
-            self.assertFalse(any("note" in " ".join(command).lower()
+            # The *filename* of the test screenshot may mention 'note'.
+            # No authored note BODY, source prose or link target enters
+            # command arguments or public logs.
+            self.assertFalse(any("private-synthetic-bytes" in " ".join(command)
+                                 or "note body" in " ".join(command).lower()
                                  for command in commands))
 
     def test_real_reader_samples_do_not_overwrite_or_follow_symlinks(self):
