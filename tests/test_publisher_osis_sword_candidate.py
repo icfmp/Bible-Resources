@@ -1,0 +1,98 @@
+"""Synthetic safety tests for disposable official OSIS SWORD research builds."""
+import os
+from pathlib import Path
+import sys
+import tempfile
+import unittest
+
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
+from publisher_osis_sword_candidate import (
+    PublisherSWORDResearchError, _create_candidate_layout, _native_notes,
+    _read_native_frames, _compile_osis, config_for,
+)
+
+
+class PublisherSwordProbeTests(unittest.TestCase):
+    def test_reviewed_candidate_does_not_assume_one_versification(self):
+        cfg=config_for("frajnd-2024")
+        self.assertEqual(cfg["purpose"],"research_only")
+        self.assertEqual(cfg["candidate_module_id"],"JND2024Research")
+        self.assertEqual(cfg["candidate_versifications"],["DarbyFr","Luther"])
+        for value in ("../evil","", "SECRET/private"):
+            with self.assertRaises(PublisherSWORDResearchError):
+                config_for(value)
+
+    def test_layout_is_separate_nonpublishing_standard_sword(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            payload,out=_create_candidate_layout(
+                root/"build","JND2024Research","Luther")
+            conf=(payload/"mods.d/jnd2024research.conf").read_text()
+            self.assertIn("ModDrv=zText",conf)
+            self.assertIn("Versification=Luther",conf)
+            self.assertIn("SourceType=OSIS",conf)
+            self.assertTrue(out.is_dir())
+            with self.assertRaises(PublisherSWORDResearchError):
+                _create_candidate_layout(root/"bad","../Private","Luther")
+
+    def test_raw_footnote_n_preserved_as_source_value_in_private_memory(self):
+        entries=_native_notes(
+            b'alpha<note n="a" type="x-footnote">PRIVATE NOTE '
+            b'<reference osisRef="Gen.1.2">other</reference></note> beta')
+        self.assertEqual(entries,[{
+            "caller":"a","type":"x-footnote","body":"PRIVATE NOTE other",
+            "targets":("Gen.1.2",),
+        }])
+
+    def test_complete_private_raw_stream_frames_and_no_logging(self):
+        with tempfile.TemporaryDirectory() as folder:
+            base=Path(folder)
+            script=base/"raw-research-stub"
+            raw=b'<note n="a">PRIVATE SECRET</note> ABC'
+            script.write_text(
+                '#!/usr/bin/env python3\n'
+                'import sys\n'
+                'out=sys.stdout.buffer\n'
+                f'r={raw!r}\n'
+                'out.write(b"K\\tGen.1.1\\t"+str(len(r)).encode()+b"\\n")\n'
+                'out.write(r)\n'
+                'out.write(b"S\\t1\\t1\\t0\\t0\\n")\n')
+            script.chmod(0o755)
+            rows=list(_read_native_frames(script,"Fake",base))
+            self.assertEqual(rows,[("K","Gen.1.1",raw)])
+            self.assertNotIn(b"PRIVATE SECRET",str(len(rows)).encode())
+
+    def test_truncated_or_untrusted_raw_reader_fails_closed(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            stub=root/"bad-reader"
+            stub.write_text(
+                '#!/usr/bin/env python3\n'
+                'import sys\n'
+                'sys.stdout.buffer.write(b"K\\tGen.1.1\\t8\\nshort")\n')
+            stub.chmod(0o755)
+            with self.assertRaises(PublisherSWORDResearchError):
+                list(_read_native_frames(stub,"Fake",root))
+
+    def test_compiler_log_never_copies_scripture(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            tool=root/"compiler"
+            tool.write_text(
+                '#!/usr/bin/env python3\n'
+                'print("WARNING(PARSE)[11,22]: PRIVATE SCRIPTURE")\n')
+            tool.chmod(0o755)
+            original=root/"authored.xml"
+            original.write_text("<osis/>")
+            out=root/"empty-output"
+            out.mkdir()
+            report=_compile_osis(tool,original,out,"Luther",root/"private.log")
+            self.assertEqual(report["returncode"],0)
+            self.assertEqual(report["diagnostic_categories"]["WARNING"],1)
+            self.assertEqual(report["first_diagnostic_locations_no_source_text"][0][
+                "source_line"],11)
+            self.assertNotIn("PRIVATE",str(report))
+
+
+if __name__=="__main__":
+    unittest.main()

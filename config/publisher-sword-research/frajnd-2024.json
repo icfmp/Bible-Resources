@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "resource_id": "frajnd-2024",
+  "purpose": "research_only",
+  "publisher_source_manifest": "config/publisher-osis/frajnd-2024.json",
+  "candidate_module_id": "JND2024Research",
+  "candidate_versifications": [
+    "DarbyFr",
+    "Luther"
+  ],
+  "compression": "zip",
+  "note": "Compare exact publisher BPC OSIS index and note anchors; no release or silently assigned missing verses."
+}
