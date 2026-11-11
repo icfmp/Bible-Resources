@@ -32,11 +32,43 @@ class OriginalNativeBoundaryPositionTests(unittest.TestCase):
         proof=compare_book_boundary_positions(authorial_book_streams(OSIS),native())
         self.assertTrue(proof["all_book_body_nonspace_and_boundary_events_equal"])
         self.assertEqual(proof["counts"]["books_compared"],1)
+        self.assertTrue(proof["all_title_text_and_nonspace_placement_equal"])
+        self.assertEqual(proof["counts"]["title_prose_and_nonspace_positions_equal"],1)
         self.assertEqual(proof["counts"]["source_p_open_events"],1)
         self.assertEqual(proof["counts"]["source_l_open_events"],1)
         self.assertEqual(proof["counts"]["source_lg_open_events"],1)
         self.assertEqual(proof["counts"]["boundary_event_positions_equal"],6)
         self.assertFalse(proof["literal_whitespace_or_exact_typography_verified"])
+        self.assertNotIn("PRIVATE",str(proof))
+
+    def test_original_and_native_title_text_difference_is_blocked(self):
+        compiled=NativeBookStreams()
+        compiled.observe("I","Gen",
+                         b'<title>PRIVATE WRONG TITLE</title>'
+                         b'<div type="x-p" sID="p"/>')
+        compiled.observe("K","Gen.1.1",
+                         b'alpha<note>PRIVATE NOTE</note> beta'
+                         b'<div type="x-p" eID="p"/>'
+                         b'<lg sID="g"/><l sID="l"/>poetry'
+                         b'<l eID="l"/><lg eID="g"/>')
+        proof=compare_book_boundary_positions(authorial_book_streams(OSIS),compiled)
+        self.assertFalse(proof["all_title_text_and_nonspace_placement_equal"])
+        self.assertFalse(proof["all_book_body_nonspace_and_boundary_events_equal"])
+        self.assertEqual(proof["counts"]["books_with_identical_full_nonspace_body_stream"],1)
+        self.assertEqual(proof["counts"]["books_with_title_position_or_text_differences"],1)
+        self.assertNotIn("PRIVATE",str(proof))
+
+    def test_moved_heading_to_middle_of_body_is_blocked(self):
+        compiled=NativeBookStreams()
+        compiled.observe("I","Gen",b'<div type="x-p" sID="p"/>')
+        compiled.observe("K","Gen.1.1",
+                         b'alpha<title>PRIVATE TITLE</title>'
+                         b'<note>PRIVATE NOTE</note> beta'
+                         b'<div type="x-p" eID="p"/>'
+                         b'<lg sID="g"/><l sID="l"/>poetry'
+                         b'<l eID="l"/><lg eID="g"/>')
+        proof=compare_book_boundary_positions(authorial_book_streams(OSIS),compiled)
+        self.assertFalse(proof["all_title_text_and_nonspace_placement_equal"])
         self.assertNotIn("PRIVATE",str(proof))
 
     def test_moved_line_start_does_not_pass_even_when_words_equal(self):
