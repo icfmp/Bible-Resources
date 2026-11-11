@@ -102,10 +102,10 @@ def install_checked_out_rawtext_comparison(
     if conf_path.stat().st_size > 16_000:
         raise XiphosSmokeError("Comparison module configuration too large")
     conf = conf_path.read_text(encoding="utf-8")
-    if (not conf.startswith(f"[{module}]\\n")
-            or f"DataPath=./{data_rel}/\\n" not in conf
-            or "ModDrv=RawText\\n" not in conf
-            or f"Versification={versification}\\n" not in conf):
+    if (not conf.startswith(f"[{module}]\n")
+            or f"DataPath=./{data_rel}/\n" not in conf
+            or "ModDrv=RawText\n" not in conf
+            or f"Versification={versification}\n" not in conf):
         raise XiphosSmokeError("Comparison identity, driver or v11n mismatch")
     # Check every file before copying anything to avoid an invalid partial
     # comparison installation. Never overwrite the independently pinned Bible.
