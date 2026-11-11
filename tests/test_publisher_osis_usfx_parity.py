@@ -8,6 +8,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from publisher_osis_usfx_parity import (
     original_osis_verses_and_notes, compare_original_sources,
     PublisherSourceParityError, _bounded_priority_findings,
+    _note_body_difference_shape,
 )
 
 ROOT="""<osis xmlns="http://www.bibletechnologies.net/2003/OSIS/namespace">
@@ -121,6 +122,38 @@ class OfficialSourceParityTests(unittest.TestCase):
         self.assertEqual(len(rows), 72)
         self.assertEqual(rows[0]["reference"], "Gen.1.2")
         self.assertNotIn("PRIVATE", json.dumps(rows))
+
+    def test_note_shape_categorization_never_approves_prose_changes(self):
+        self.assertEqual(_note_body_difference_shape(
+            "PRIVATE PREFACE: same prose", "same prose"),
+            "prefix_only_candidate_unverified")
+        self.assertEqual(_note_body_difference_shape(
+            "same prose", "same prose PRIVATE END"),
+            "suffix_only_candidate_unverified")
+        self.assertEqual(_note_body_difference_shape(
+            "x same prose z", "same prose"),
+            "internal_containment_candidate_unverified")
+        self.assertEqual(_note_body_difference_shape(
+            "same prose", "changed PRIVATE prose"),
+            "different_or_unclassified")
+        self.assertEqual(_note_body_difference_shape(
+            "identical  prose", "identical prose"),
+            "exact_after_unicode_and_whitespace_folding")
+        self.assertEqual(_note_body_difference_shape(
+            "same prose", "SAME PROSE"),
+            "case_only_candidate_unverified")
+
+    def test_differing_note_shapes_are_still_gate_blocking_and_text_private(self):
+        verses,notes,meta=original_osis_verses_and_notes(make_xml(
+            body="PRIVATE ORIGINAL NOTE PRIVATE SUFFIX"))
+        result=compare_original_sources(*input_data(),verses,notes,meta)
+        counts=result["original_source_comparison_counts"]
+        self.assertEqual(counts["note_body_folded_different"],1)
+        self.assertEqual(counts["note_body_shape_suffix_only_candidate_unverified"],1)
+        self.assertEqual(result["status"],
+                         "material_publisher_osis_usfx_differences_require_review")
+        self.assertTrue(result["note_body_difference_shapes_are_diagnostic_not_equivalence"])
+        self.assertNotIn("PRIVATE SUFFIX",json.dumps(result))
 
     def test_empty_or_overlapping_scope_blocks(self):
         xml=make_xml().replace(b'<verse eID="Gen.1.1"/>',b'')
