@@ -28,7 +28,6 @@ from source_native_maintext_probe import native_raw_main_text
 from source_native_note_positions import native_note_anchor_positions
 from source_osis_inventory import source_inventory
 from sword_native_inventory import collect_native_inventory
-from sword_native_inventory import NativeIndexError
 from stable_sword_refs import KEY
 
 MODULE = re.compile(r"[A-Za-z][A-Za-z0-9_]{2,48}\Z")
@@ -336,34 +335,32 @@ def _candidate_result(index_binary: Path,raw_binary: Path,
     }
 
 
-def _safe_failure_reason(error: Exception) -> str:
-    """Allowlisted diagnostic class; never serialize exception content/Scripture."""
-    message = str(error)
-    if isinstance(error, NativeIndexError):
-        if message.startswith("Stock-SWORD native inspector blocked (exit "):
-            return "native_inspector_nonzero_exit"
-        if message == "Stock SWORD module contains no populated Bible verses":
-            return "native_no_populated_numbered_verses"
-        if message == "Missing or unsupported native module/engine header":
-            return "native_unrecognized_module_or_versification"
-        if message == "Native driver or v11n disagrees with pinned payload config":
-            return "native_versification_or_driver_disagrees_with_config"
-        if message == "Native populated key is not in installed registry":
-            return "native_verse_outside_versification_registry"
-        return "native_index_validation_failed"
-    if isinstance(error, PublisherSWORDResearchError):
-        if message.startswith("OSIS tool returned nonzero exit status "):
-            return "compiler_nonzero_exit"
-        if message == "Official OSIS compiler failed or timed out":
-            return "compiler_unavailable_or_timed_out"
-        if message == "OSIS tool emitted excessive diagnostics":
-            return "compiler_diagnostics_exceeded_limit"
-        return "candidate_reader_or_source_parse_failure"
-    if isinstance(error, subprocess.TimeoutExpired):
-        return "native_or_compiler_timeout"
-    if isinstance(error, OSError):
-        return "native_or_compiler_os_error"
-    return "candidate_validation_failed"
+def safe_failure_code(exc: Exception) -> str:
+    """Stable diagnostics only; never disclose exception strings from source/XML.
+
+    Only messages emitted by this tool or the trusted native-index wrapper
+    are recognized. Unknown exceptions are intentionally opaque.
+    """
+    message = str(exc)
+    known = (
+        ("OSIS tool returned nonzero exit status ", "compiler_nonzero_exit"),
+        ("Official OSIS compiler failed or timed out", "compiler_launch_or_timeout"),
+        ("OSIS tool emitted excessive diagnostics", "compiler_excessive_private_output"),
+        ("Missing trusted compiler or original pinned OSIS", "compiler_or_source_missing"),
+        ("Stock-SWORD native inspector blocked", "native_inspector_nonzero_exit"),
+        ("Stock SWORD module contains no populated Bible verses", "native_zero_populated_verses"),
+        ("Missing or symlinked module directory", "native_module_directory_missing"),
+        ("Missing or symlinked SWORD configuration directory", "native_mods_directory_missing"),
+        ("Missing terminal complete-inventory counts", "native_trailer_missing"),
+        ("Missing, empty or implausibly large native inventory", "native_inventory_unavailable"),
+        ("Native driver or v11n disagrees", "native_driver_versification_disagreement"),
+        ("Native index and raw corpus enumerations disagree", "native_index_raw_mismatch"),
+        ("Invalid native raw XML note structure", "native_note_xml_invalid"),
+    )
+    for prefix,code in known:
+        if message.startswith(prefix):
+            return code
+    return "unclassified_private_failure"
 
 
 def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
@@ -402,7 +399,7 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
                     "candidate_versification":system,
                     "failed_phase":phase,
                     "reason_category":type(exc).__name__,
-                    "safe_failure_code":_safe_failure_reason(exc),
+                    "safe_failure_code":safe_failure_code(exc),
                     "usable_for_publication":False,
                 }
             results.append(compared)
