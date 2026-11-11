@@ -150,8 +150,203 @@ def _dismiss_transient_xiphos_notice(env):
     return False
 
 
+# Representative universal navigation examples; no authored verse data edits.
+READER_SAMPLES = (
+    ("genesis-prose", "Gen 1:1"),
+    ("psalm-poetry", "Ps 23:1"),
+    ("matthew-heading", "Matt 5:1"),
+    ("romans-annotation", "Rom 8:28"),
+)
+
+
+# Verified Xvfb screenshot geometry from read-only stage-6 run #43072470491:
+# after focusing/resizing the 1216x736 window, an authored superscript
+# note caller is visible at Gen.1.2 near (503,520). This coordinate is ONLY
+# an ephemeral reader-UI interaction specimen, not a translation mapping.
+GENESIS_1_2_NOTE_HOVER = (503, 520)
+
+
+def _capture_note_hover_sample(env:dict, out:Path) -> dict:
+    """Move over one visibly identified note caller, capture possible preview.
+
+    Xiphos footnotes use mouse hover; this only observes pixels for manual
+    inspection and never pretends the hover actually resolved the note body.
+    """
+    if (env.get("DISPLAY") != ":91" or not out.is_dir()
+            or out.is_symlink()):
+        raise XiphosSmokeError("Unreviewed footnote hover display or directory")
+    target=out/"genesis-note-hover.png"
+    if target.exists() or target.is_symlink():
+        raise XiphosSmokeError("Refusing existing note-hover screenshot")
+    x,y=GENESIS_1_2_NOTE_HOVER
+    try:
+        moved=subprocess.run(
+            ["xdotool","mousemove","--sync",str(x),str(y)],
+            env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+            timeout=5,check=False)
+    except (OSError,subprocess.TimeoutExpired) as exc:
+        raise XiphosSmokeError("Bounded original-note hover unavailable") from exc
+    if moved.returncode:
+        raise XiphosSmokeError("Original note hover pointer movement failed")
+    time.sleep(1.5)
+    try:
+        captured=subprocess.run(
+            ["import","-display",env["DISPLAY"],"-window","root",str(target)],
+            env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+            timeout=15,check=False)
+    except (OSError,subprocess.TimeoutExpired) as exc:
+        raise XiphosSmokeError("Original note hover screenshot failed") from exc
+    if (captured.returncode or not target.is_file() or target.is_symlink()
+            or not 0 < target.stat().st_size <= 6_000_000):
+        raise XiphosSmokeError("Unsafe original-note hover screenshot")
+    # Return cursor to neutral screen area before navigating a new passage.
+    try:
+        subprocess.run(
+            ["xdotool","mousemove","1200","740"],
+            env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+            timeout=4,check=False)
+    except (OSError,subprocess.TimeoutExpired):
+        pass
+    return {
+        "host_reference": "Gen.1.2",
+        "interaction": "pointer_hover_over_visible_note_caller",
+        "screenshot_sha256": sha256(target.read_bytes()).hexdigest(),
+        "previewed_note_body_verified": False,
+        "actual_link_navigation_verified": False,
+        "visual_review_required": True,
+        "text_or_note_content_exported_to_metadata": False,
+    }
+
+
+def _sample_reader_passages(env, out: Path) -> list[dict]:
+    """Xiphos Ctrl+L navigation with actual screenshots, not content approval."""
+    if out.exists() or out.is_symlink() or not out.parent.is_dir():
+        raise XiphosSmokeError("Unsafe sample screenshot output directory")
+    # No screen coordinates: Ctrl+L is a documented Xiphos shortcut.
+    # Confirm that a visible normal Xiphos window is the keyboard recipient.
+    try:
+        found = subprocess.run(
+            ["xdotool", "search", "--onlyvisible", "--class", "[Xx]iphos"],
+            env=env, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+            timeout=5, check=False)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise XiphosSmokeError("Xiphos normal window not discoverable") from exc
+    if found.returncode:
+        raise XiphosSmokeError("Cannot focus real Xiphos reading window")
+    candidates = [item for item in found.stdout.decode(
+        "ascii", errors="ignore").splitlines() if item.isdecimal()]
+    if not candidates:
+        raise XiphosSmokeError("No valid Xiphos window ID for study sample")
+    try:
+        focus = subprocess.run(
+            # No EWMH window manager runs inside this isolated Xvfb display.
+            # windowactivate requires _NET_ACTIVE_WINDOW; direct X11 focus
+            # works without mutating any user desktop or global preferences.
+            ["xdotool", "windowfocus", "--sync", candidates[-1]],
+            env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            timeout=5, check=False)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise XiphosSmokeError("Cannot activate Xiphos study window") from exc
+    if focus.returncode:
+        raise XiphosSmokeError("Xiphos study window focus failed")
+    # In bare Xvfb, the default Xiphos window occupies only ~800x600 pixels,
+    # leaving a narrow center reader where Genesis headings hide verse 1.
+    # Resize the actual test-only X11 window; never alter any user desktop.
+    for command in (
+        ["xdotool", "windowsize", candidates[-1], "1216", "736"],
+        ["xdotool", "windowmove", candidates[-1], "16", "16"],
+    ):
+        try:
+            adjusted=subprocess.run(
+                command, env=env, stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL, timeout=5, check=False)
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            raise XiphosSmokeError("Bounded X11 study window resizing unavailable") from exc
+        if adjusted.returncode:
+            raise XiphosSmokeError("X11 study reader resizing failed")
+    time.sleep(0.5)
+    out.mkdir(mode=0o700)
+    snapshots = []
+    for slug, ref in READER_SAMPLES:
+        for command in (
+            ["xdotool", "key", "--clearmodifiers", "ctrl+l"],
+            ["xdotool", "type", "--clearmodifiers", "--delay", "35", ref],
+            ["xdotool", "key", "Return"],
+        ):
+            try:
+                completed = subprocess.run(
+                    command, env=env, stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL, timeout=10, check=False)
+            except (OSError, subprocess.TimeoutExpired) as exc:
+                raise XiphosSmokeError("Bounded X11 reader navigation unavailable") from exc
+            if completed.returncode:
+                raise XiphosSmokeError("X11 reader keyboard navigation failed")
+        time.sleep(2)
+        target = out / (slug + ".png")
+        try:
+            capture = subprocess.run(
+                ["import", "-display", env["DISPLAY"], "-window", "root",
+                 str(target)], env=env, stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL, timeout=15, check=False)
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            raise XiphosSmokeError("Bounded reader navigation screenshot failed") from exc
+        if (capture.returncode or not target.is_file()
+                or target.is_symlink() or target.stat().st_size > 6_000_000):
+            raise XiphosSmokeError("Unsafe or failed virtual reader screenshot")
+        snapshot={
+            "sample": slug,
+            "requested_reference": ref,
+            "screenshot_sha256": sha256(target.read_bytes()).hexdigest(),
+            "gui_navigation_outcome_requires_visual_inspection": True,
+        }
+        if slug == "genesis-prose":
+            snapshot["note_hover_sample"] = _capture_note_hover_sample(env, out)
+        snapshots.append(snapshot)
+    return snapshots
+
+
+def _capture_parallel_toggle_sample(env:dict, study_dir:Path) -> dict:
+    """Exercise Xiphos Alt-P and capture screenshot, never infer actual comparison."""
+    if (not study_dir.is_dir() or study_dir.is_symlink()
+            or not study_dir.parent.is_dir()
+            or env.get("DISPLAY") != ":91"):
+        raise XiphosSmokeError("Unsafe parallel screenshot fixture")
+    target=study_dir/"parallel-toggle.png"
+    if target.exists() or target.is_symlink():
+        raise XiphosSmokeError("Refusing to overwrite parallel screenshot")
+    try:
+        toggled=subprocess.run(
+            ["xdotool","key","--clearmodifiers","alt+p"],
+            env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+            timeout=5,check=False)
+    except (OSError,subprocess.TimeoutExpired) as exc:
+        raise XiphosSmokeError("Parallel keyboard probe unavailable") from exc
+    if toggled.returncode:
+        raise XiphosSmokeError("Parallel keyboard probe failed")
+    time.sleep(1.5)
+    try:
+        snap=subprocess.run(
+            ["import","-display",env["DISPLAY"],"-window","root",str(target)],
+            env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
+            timeout=15,check=False)
+    except (OSError,subprocess.TimeoutExpired) as exc:
+        raise XiphosSmokeError("Parallel screenshot capture unavailable") from exc
+    if (snap.returncode or not target.is_file() or target.is_symlink()
+            or not 0 < target.stat().st_size <= 6_000_000):
+        raise XiphosSmokeError("Unsafe parallel screenshot capture")
+    return {
+        "shortcut_invoked": "Alt+P",
+        "screenshot_sha256": sha256(target.read_bytes()).hexdigest(),
+        "actual_parallel_second_translation_visible_verified": False,
+        "gui_outcome_requires_visual_inspection": True,
+        # Xiphos may update its own temporary HOME preferences; do not
+        # claim that GUI configuration is unchanged.
+        "original_pinned_preview_zip_modified": False,
+    }
+
+
 def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_seconds:int,
-          screenshot:Path|None=None):
+          screenshot:Path|None=None, study_dir:Path|None=None):
     if not isinstance(startup_seconds,int) or not 5<=startup_seconds<=25:
         raise XiphosSmokeError("Unbounded headless startup duration")
     with tempfile.TemporaryDirectory(prefix="isolated-xiphos-preview-") as temp:
@@ -219,6 +414,9 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                 if snap.returncode!=0 or screenshot.stat().st_size>6_000_000:
                     raise XiphosSmokeError("Invalid bounded screenshot result")
                 screenshot_sha=sha256(screenshot.read_bytes()).hexdigest()
+            samples = _sample_reader_passages(env, study_dir) if study_dir else []
+            parallel_attempt = (_capture_parallel_toggle_sample(env, study_dir)
+                                if study_dir and samples else None)
             return {
                 "status":"headless_xiphos_running_after_bounded_startup",
                 "reader":"xiphos",
@@ -227,6 +425,9 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                 "isolated_standard_ztext_package":True,
                 "x11_window_detected_not_visually_inspected":window,
                 "test_only_screenshot_sha256":screenshot_sha,
+                "real_reader_passage_samples":samples,
+                "parallel_view_toggle_sample":parallel_attempt,
+                "keyboard_navigation_attempted": bool(samples),
                 "isolated_virtual_display_notice_click_fallback_attempted":(
                     fixed_viewport_fallback_attempted if screenshot is not None else False),
                 "transient_small_notice_dismissal_attempt_succeeded":(
@@ -254,11 +455,12 @@ def main():
     parser.add_argument("--seconds",type=int,default=12)
     parser.add_argument("--report",type=Path,required=True)
     parser.add_argument("--screenshot",type=Path)
+    parser.add_argument("--study-dir",type=Path)
     args=parser.parse_args()
     if args.report.exists() or not args.report.parent.is_dir():
         parser.error("Refuse overwrite or missing report parent")
     receipt=smoke(args.zip,args.module_id,args.sha256,args.versification,args.seconds,
-                  screenshot=args.screenshot)
+                  screenshot=args.screenshot, study_dir=args.study_dir)
     args.report.write_text(json.dumps(receipt,sort_keys=True,indent=2)+"\n",encoding="utf-8")
     print("Xiphos test-only capture classified; no screenshot pixels or Bible text logged")
 
