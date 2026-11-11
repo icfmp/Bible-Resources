@@ -7,6 +7,9 @@ on:
     paths:
       - ".github/workflows/publisher-osis-sword-candidate.yml"
       - "scripts/publisher_osis_sword_candidate.py"
+      - "scripts/publisher_osis_preview_package.py"
+      - "scripts/publisher_osis_preview_readback.py"
+      - "tests/test_publisher_osis_preview_package.py"
       - "scripts/source_native_osis_structure_screen.py"
       - "scripts/source_native_osis_boundary_positions.py"
       - "tests/test_source_native_osis_boundary_positions.py"
@@ -29,6 +32,8 @@ jobs:
       RESOURCE_ID: frajnd-2024
       CANDIDATE_V11N: ""
       CANDIDATE_COMPILER_MODE: distro
+      CANDIDATE_PREVIEW: "false"
+      PREVIEW_DIR: /tmp/bible-source-rebuild-probe/reader-preview-only
       REPORT: /tmp/bible-source-rebuild-probe/candidate-report.json
     steps:
       - uses: actions/checkout@v4
@@ -46,6 +51,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_publisher_osis_usfx_parity.py' -v
           python -m unittest discover -s tests -p 'test_source_native_osis_structure_screen.py' -v
           python -m unittest discover -s tests -p 'test_source_native_osis_boundary_positions.py' -v
+          python -m unittest discover -s tests -p 'test_publisher_osis_preview_package.py' -v
       - name: Parse authenticated owner request
         if: github.event_name == 'issue_comment'
         shell: bash
@@ -55,14 +61,19 @@ jobs:
           python - <<'PY'
           import os, re
           match = re.fullmatch(
-              r"/bible-osis-candidate ([a-z0-9][a-z0-9-]{1,48})(?: ([A-Za-z][A-Za-z0-9]{1,31}))?(?: (svn3918))?",
+              r"/bible-osis-candidate ([a-z0-9][a-z0-9-]{1,48})(?: ([A-Za-z][A-Za-z0-9]{1,31}))?(?: (svn3918))?(?: (preview))?",
               os.environ["COMMAND"])
           if not match:
               raise SystemExit("Invalid research command")
+          if match.group(4) and (match.group(2)!="Luther"
+                                 or match.group(3)!="svn3918"
+                                 or match.group(1)!="frajnd-2024"):
+              raise SystemExit("Preview not approved for that source/compiler/versification")
           with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as out:
               out.write("RESOURCE_ID="+match.group(1)+"\n")
               out.write("CANDIDATE_V11N="+(match.group(2) or "")+"\n")
               out.write("CANDIDATE_COMPILER_MODE="+(match.group(3) or "distro")+"\n")
+              out.write("CANDIDATE_PREVIEW="+("true" if match.group(4) else "false")+"\n")
           print("Authorized private compiler research:", match.group(1))
           PY
       - name: Install standard SWORD compiler and independent native inspectors
@@ -119,7 +130,32 @@ jobs:
           if [[ -n "${CANDIDATE_V11N:-}" ]]; then
             args+=(--versification "$CANDIDATE_V11N")
           fi
+          if [[ "$CANDIDATE_PREVIEW" == "true" ]]; then
+            mkdir -p "$PREVIEW_DIR"
+            args+=(--preview-dir "$PREVIEW_DIR")
+          fi
           python scripts/publisher_osis_sword_candidate.py "${args[@]}"
+      - name: Independently reinstall and read temporary preview in stock SWORD
+        if: github.event_name == 'issue_comment' && endsWith(github.event.comment.body, ' preview')
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/publisher_osis_preview_readback.py \
+            --zip "$PREVIEW_DIR/JND2024Research-Luther-TEST-ONLY.zip" \
+            --source-report "$REPORT" \
+            --native-index /tmp/native-probe-binaries/native-index \
+            --diatheke "$(command -v diatheke)" \
+            --output /tmp/bible-source-rebuild-probe/reader-preview-check.json
+      - name: Upload tested preview to Actions artifact for owner reader trials only
+        if: github.event_name == 'issue_comment' && endsWith(github.event.comment.body, ' preview')
+        uses: actions/upload-artifact@v4
+        with:
+          name: JND2024Research-Luther-TEST-ONLY-${{ github.run_id }}
+          path: |
+            /tmp/bible-source-rebuild-probe/reader-preview-only/JND2024Research-Luther-TEST-ONLY.zip
+            /tmp/bible-source-rebuild-probe/reader-preview-check.json
+          retention-days: 14
+          if-no-files-found: error
       - name: Upload metadata-only evidence (never original OSIS or compiled SWORD)
         if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
@@ -133,6 +169,7 @@ jobs:
         uses: actions/github-script@v7
         env:
           REPORT: ${{ env.REPORT }}
+          PREVIEW_PROOF: /tmp/bible-source-rebuild-probe/reader-preview-check.json
         with:
           script: |
             const fs=require('fs');
@@ -200,6 +237,14 @@ jobs:
                       p.literal_whitespace_or_exact_typography_verified,
                   },null,2),"```");
               }
+              if(candidate.test_only_preview_archive) {
+                const z=candidate.test_only_preview_archive;
+                lines.push("Stage-6 **test-only** module archive (not published):",
+                  "ZIP SHA-256: `"+z.zip_sha256+"`",
+                  "ZIP bytes: "+z.zip_bytes,
+                  "All member files exact source/native tested bytes: "+z.all_module_files_byte_identical_to_audited_candidate,
+                  "Preview approval status: NOT FOR RELEASE");
+              }
               if(candidate.source_to_compiled_counts){
                 lines.push("Checked counts (no Bible content):", "```json",
                   JSON.stringify(candidate.source_to_compiled_counts,null,2), "```");
@@ -210,7 +255,16 @@ jobs:
                   "```");
               }
             }
-            lines.push("","**All research module binaries and publisher text discarded.**",
+            if(process.env.CANDIDATE_PREVIEW === "true") {
+              const test=JSON.parse(fs.readFileSync(process.env.PREVIEW_PROOF,"utf8"));
+              lines.push("Stage-6 isolated test ZIP reinstall and stock SWORD/diatheke:",
+                "```json",JSON.stringify(test,null,2),"```",
+                "TEST-ONLY Actions artifact: JND2024Research-Luther-TEST-ONLY-"+context.runId);
+            }
+            lines.push("","**Original OSIS source and compiler logs discarded.**"+
+              (process.env.CANDIDATE_PREVIEW === "true" ?
+                " One short-lived TEST-ONLY ZIP retained solely for stage-6 reader trials." :
+                " All ephemeral module binaries discarded."),
               "Not a rights/editorial sign-off, not complete structure/visual acceptance, not a release.");
             await github.rest.issues.createComment({
               ...context.repo, issue_number:context.issue.number,

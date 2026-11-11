@@ -37,6 +37,7 @@ from source_native_osis_boundary_positions import (
 from source_osis_inventory import source_inventory
 from native_milestone_pair_audit import NativeMilestonePairAudit
 from sword_native_inventory import collect_native_inventory
+from publisher_osis_preview_package import package_preview
 from stable_sword_refs import KEY
 
 MODULE = re.compile(r"[A-Za-z][A-Za-z0-9_]{2,48}\Z")
@@ -436,9 +437,17 @@ def select_candidate_versifications(cfg: dict, requested: str | None):
 
 
 def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
-          raw_binary:Path, versification: str | None = None):
+          raw_binary:Path, versification: str | None = None,
+          preview_dir:Path | None = None):
     cfg=config_for(resource_id)
     selected=select_candidate_versifications(cfg,versification)
+    if preview_dir is not None:
+        if (resource_id!="frajnd-2024" or selected!=["Luther"]
+                or preview_dir.is_symlink() or not preview_dir.is_dir()):
+            raise PublisherSWORDResearchError(
+                "Stage-6 preview requires one reviewed exact source and v11n")
+        if any(preview_dir.iterdir()):
+            raise PublisherSWORDResearchError("Preview output directory is not empty")
     original=read_pinned_publisher_osis(resource_id)
     source_keys,source_meta=source_inventory(original)
     verses,notes,source_check=original_osis_verses_and_notes(original)
@@ -470,6 +479,21 @@ def probe(resource_id: str, *, osis2mod:Path,index_binary:Path,
                     original_structures,authored_body,authored_body_counts,
                     authored_boundaries,authored_outside_titles)
                 compared["standard_osis_compiler"]=compilation
+                if preview_dir is not None:
+                    if (compared["candidate_status"] !=
+                        "full_numbered_text_and_note_preflight_equal_not_approved"
+                        or compared["compiled_native_milestone_closure_metadata_only"][
+                            "status"] != "compiled_milestone_pairs_verified_only"
+                        or not compared["source_native_body_boundary_positions"][
+                            "all_title_text_and_nonspace_placement_equal"]
+                        or not compared["source_native_body_boundary_positions"][
+                            "all_book_body_nonspace_and_boundary_events_equal"]):
+                        raise PublisherSWORDResearchError(
+                            "Real source/native evidence does not authorize preview")
+                    test_zip=preview_dir/(cfg["candidate_module_id"]
+                                          +"-Luther-TEST-ONLY.zip")
+                    compared["test_only_preview_archive"]=package_preview(
+                        payload,test_zip,cfg["candidate_module_id"],system)
             except (PublisherSWORDResearchError,ValueError,OSError,
                     subprocess.TimeoutExpired) as exc:
                 compared={
@@ -509,16 +533,23 @@ def main():
     p.add_argument("--native-raw",type=Path,required=True)
     p.add_argument("--versification",default=None)
     p.add_argument("--report",type=Path,required=True)
+    p.add_argument("--preview-dir",type=Path,default=None,
+                   help="Opt-in reviewed disposable SWORD test artifact (never release)")
     a=p.parse_args()
     if a.report.exists() or a.report.is_symlink() or not a.report.parent.is_dir():
         p.error("Use new metadata report in an existing directory")
     result=probe(a.resource_id,osis2mod=a.osis2mod,index_binary=a.native_index,
-                 raw_binary=a.native_raw,versification=a.versification)
+                 raw_binary=a.native_raw,versification=a.versification,
+                 preview_dir=a.preview_dir)
     a.report.write_text(json.dumps(result,indent=2,sort_keys=True)+"\n",encoding="utf-8")
     print("Official OSIS to SWORD research executed for",a.resource_id)
     for row in result["candidate_research_results"]:
         print(row["candidate_versification"],row["candidate_status"])
-    print("No source, compiled candidate, Scripture or note content persisted")
+    print("No original OSIS, compiler logs, or unapproved sources persisted")
+    if a.preview_dir is None:
+        print("All research module binaries discarded")
+    else:
+        print("Opt-in exact test-only SWORD artifact built; not public release")
     return 0
 
 
