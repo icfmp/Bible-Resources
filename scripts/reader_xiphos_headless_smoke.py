@@ -429,6 +429,64 @@ def _capture_module_tree_probe(env: dict, study_dir: Path) -> dict:
     }
 
 
+def _capture_source_note_link_host(env: dict, study_dir: Path) -> dict:
+    """Capture a real reader specimen carrying one original reference in a note.
+
+    Xiphos uses a previewer for links embedded in notes. The screenshot is a
+    pre-interaction coordinate witness: it is NOT evidence that a reference
+    was clicked or navigated. Restore the previous study passage afterward.
+    """
+    if (env.get("DISPLAY") != ":91" or not study_dir.is_dir()
+            or study_dir.is_symlink()):
+        raise XiphosSmokeError("Unsafe source-note reference specimen")
+    target = study_dir / "source-note-link-host.png"
+    if target.exists() or target.is_symlink():
+        raise XiphosSmokeError("Refusing prior note-reference specimen")
+
+    def navigation(ref: str):
+        for command in (
+            ["xdotool", "key", "--clearmodifiers", "ctrl+l"],
+            ["xdotool", "type", "--clearmodifiers", "--delay", "35", ref],
+            ["xdotool", "key", "Return"],
+        ):
+            try:
+                outcome = subprocess.run(
+                    command, env=env, stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL, timeout=10, check=False)
+            except (OSError, subprocess.TimeoutExpired) as exc:
+                raise XiphosSmokeError("Bounded source-note navigation unavailable") from exc
+            if outcome.returncode:
+                raise XiphosSmokeError("Xiphos source-note navigation command failed")
+
+    # The source-audited note at Gen.2.4 carries a genuine OSIS
+    # <reference osisRef="Exod.6">; this case is an isolated GUI specimen,
+    # never a rewrite of either source or compiled SWORD data.
+    navigation("Gen 2:4")
+    time.sleep(2)
+    try:
+        shot = subprocess.run(
+            ["import", "-display", env["DISPLAY"], "-window", "root", str(target)],
+            env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            timeout=15, check=False)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise XiphosSmokeError("Note-reference host screenshot unavailable") from exc
+    if (shot.returncode or not target.is_file()
+            or not 0 < target.stat().st_size <= 6_000_000):
+        raise XiphosSmokeError("Unsafe note-reference host screenshot")
+
+    navigation("Gen 1:1")
+    time.sleep(0.5)
+    return {
+        "source_note_host": "Gen.2.4",
+        "original_reference_target_in_source": "Exod.6",
+        "host_screenshot_sha256": sha256(target.read_bytes()).hexdigest(),
+        "reference_marker_hover_verified": False,
+        "real_reference_link_click_verified": False,
+        "actual_reader_target_navigation_verified": False,
+        "requires_independent_visual_review": True,
+    }
+
+
 def _capture_parallel_toggle_sample(env:dict, study_dir:Path) -> dict:
     """Exercise Xiphos Alt-P and capture screenshot, never infer actual comparison."""
     if (not study_dir.is_dir() or study_dir.is_symlink()
@@ -548,6 +606,8 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
             samples = _sample_reader_passages(env, study_dir) if study_dir else []
             tree_probe = (_capture_module_tree_probe(env, study_dir)
                           if comparison and study_dir and samples else None)
+            link_host_probe = (_capture_source_note_link_host(env, study_dir)
+                               if comparison and study_dir and tree_probe else None)
             parallel_attempt = (_capture_parallel_toggle_sample(env, study_dir)
                                 if study_dir and samples else None)
             return {
@@ -562,6 +622,7 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                 "parallel_view_toggle_sample":parallel_attempt,
                 "independent_comparison_module":comparison,
                 "module_selection_probe":tree_probe,
+                "original_note_link_host_probe":link_host_probe,
                 "keyboard_navigation_attempted": bool(samples),
                 "isolated_virtual_display_notice_click_fallback_attempted":(
                     fixed_viewport_fallback_attempted if screenshot is not None else False),
