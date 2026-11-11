@@ -178,6 +178,25 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
             "Mapped indexed main-text has unresolved non-whitespace word/punctuation or reference differences"])
         if witness["source_verses_with_whitespace_only_changes"]:
             missing.append("Original main-text whitespace differs; verse/poetry/paragraph layout preservation not yet verified")
+
+        # Stage 4d must not regard apparently identical Scripture as a
+        # reusable stock module when authorial note callers/targets were lost.
+        from stock_reuse_preflight import preflight_stock_reuse
+        stock_preflight = preflight_stock_reuse(
+            native_scan_complete=receipt["independent_native_whole_corpus_scan_completed"],
+            main_text_preserved=text_preserved,
+            notes=notes,
+            note_positions=receipt[
+                "private_numbered_source_native_note_anchor_position_diagnostic"],
+            original_note_scope=receipt["original_source_note_scope"])
+        if stock_preflight["proven_material_stock_loss"]:
+            missing.insert(0,
+                "Stock SWORD reuse BLOCKED by source/native material loss; "
+                "inspect preflight categories before researching whitespace")
+        else:
+            verified.append(
+                "Stock reuse material-loss screen found no demonstrated numbered "
+                "annotation loss; editorial reuse is NOT approved")
         boundary_screen = rows.get("source_native_body_boundary_word_position_screen", {})
         if boundary_screen.get("all_mapped_book_p_q_start_end_word_ordinals_match") is True:
             verified.append("Source/native body p/q OPEN and CLOSE word ordinals match per book (NOT whitespace/punctuation positions)")
@@ -226,7 +245,7 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
         missing += ["Exact publisher edition identity and original book/intro order not independently signed off",
                     "Original note callers, word anchors, resolved reference targets and verse-zero/poetry structure unverified",
                     "Rights/editorial publication approval remains separate"]
-        return _status("PARTIAL" if text_preserved else "BLOCKED",
+        return _status("BLOCKED" if stock_preflight["proven_material_stock_loss"] or not text_preserved else "PARTIAL",
             verified=verified, missing=missing,
             evidence={"source_format":"USFX","native_driver":receipt["module_native_driver"],
                       "native_versification":receipt["module_versification"],
@@ -237,6 +256,7 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
                       "maintext":rows,
                       "maintext_scope_classification":witness,
                       "notes":notes,
+                      "stock_reuse_preflight":stock_preflight,
                       "note_anchor_positions":receipt[
                           "private_numbered_source_native_note_anchor_position_diagnostic"],
                       "source_scope":receipt["source_book_scope"],
@@ -340,9 +360,16 @@ def run_stage(manifest: dict, stage: int, temp: Path, *, opener=None,
                         "All original numbered-note caller nonspace codepoint positions match actual stock SWORD")
                 else:
                     missing.insert(0, "Original/native numbered-note caller positional parity failed or unverified")
-                result = _status("PARTIAL",
+
+                stock_preflight = evidence.get("stock_reuse_preflight", {})
+                if stock_preflight.get("proven_material_stock_loss"):
+                    missing.insert(0, "Stock reuse BLOCKED: original numbered annotation data lost")
+                result = _status(
+                    "BLOCKED" if stock_preflight.get("proven_material_stock_loss")
+                    else "PARTIAL",
                     verified=verified, missing=missing,
                     evidence={"original_archives":receipts,
+                              "stock_reuse_preflight":stock_preflight,
                               "notes":evidence["notes"],
                               "note_anchor_positions":note_positions,
                               "source_scope":evidence["source_scope"]})
@@ -419,6 +446,19 @@ def _write_report(report_dir: Path, report: dict) -> None:
                 lines.append(
                     f"- `{ref}` — `{origin}`, source gap {gap}, "
                     f"nearest p/q boundary {distance} codepoints away")
+
+    if report["stage"] in (4, 5):
+        preflight = report.get("evidence", {}).get("stock_reuse_preflight", {})
+        if preflight:
+            lines.extend(["", "**Stock reuse material-loss preflight**",
+                          "Machine status: `" + preflight["status"] + "` "
+                          "(never reuse/editorial approval)"])
+            for code, count in sorted(
+                    preflight.get("material_loss_categories", {}).items()):
+                # Fixed tool-authored category tokens and numeric counts only:
+                # no source/reader strings or private XML leave the runner.
+                if SAFE_CODE.fullmatch(code) and type(count) is int:
+                    lines.append("- " + code + ": " + str(count))
     lines.extend(["","**Still missing / blocking**"])
     lines.extend("- "+v for v in report["missing"])
     if not report["missing"]:
