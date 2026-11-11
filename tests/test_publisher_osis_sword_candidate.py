@@ -6,9 +6,11 @@ import tempfile
 import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
+from sword_native_inventory import NativeIndexError
 from publisher_osis_sword_candidate import (
     PublisherSWORDResearchError, _create_candidate_layout, _native_notes,
     _read_native_frames, _compile_osis, config_for, safe_failure_code,
+    _safe_native_failure_details,
 )
 
 
@@ -106,6 +108,18 @@ class PublisherSwordProbeTests(unittest.TestCase):
             self.assertEqual(report["first_diagnostic_locations_no_source_text"],[{
                 "type":"FATAL","source_line":18,"source_column":7}])
             self.assertNotIn("PRIVATE",str(report))
+
+    def test_private_native_failure_details_allowlist(self):
+        evidence=_safe_native_failure_details(NativeIndexError(
+            "Stock-SWORD native inspector blocked (exit 3); "
+            "Unrecognized native key: Num.25.19"))
+        self.assertEqual(evidence,{
+            "native_inspector_exit_code":3,
+            "native_unrecognized_verse_reference":"Num.25.19"})
+        unknown=_safe_native_failure_details(NativeIndexError(
+            "Stock-SWORD native inspector blocked (exit 1); PRIVATE SCRIPTURE"))
+        self.assertEqual(unknown,{"native_inspector_exit_code":1})
+        self.assertNotIn("PRIVATE",str(unknown))
 
     def test_compiler_log_never_copies_scripture(self):
         with tempfile.TemporaryDirectory() as folder:
