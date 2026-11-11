@@ -106,8 +106,8 @@ jobs:
             for(const candidate of data.candidate_research_results){
               lines.push(`#### ${candidate.candidate_versification}: ${candidate.candidate_status}`);
               if(candidate.reason_category) lines.push(`Failure type: ${candidate.reason_category}`);
-              if(candidate.failed_phase) lines.push(`Failed phase: ${candidate.failed_phase}`);
               if(candidate.safe_failure_code) lines.push(`Safe failure code: ${candidate.safe_failure_code}`);
+              if(candidate.failed_phase) lines.push(`Failed phase: ${candidate.failed_phase}`);
               if(candidate.source_to_compiled_counts){
                 lines.push("Checked counts (no Bible content):", "```json",
                   JSON.stringify(candidate.source_to_compiled_counts,null,2), "```");
