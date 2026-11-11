@@ -169,11 +169,19 @@ jobs:
         run: |
           set -euo pipefail
           if [[ "$STAGE" == "4" || "$STAGE" == "5" || "$STAGE" == "4-5" || "$STAGE" == "6" ]]; then
-            sudo apt-get update
-            sudo apt-get install -y diatheke
+            # Fail visibly and promptly on broken Ubuntu mirrors; never skip
+            # source/native checks just because apt is unavailable.
+            timeout 90s sudo apt-get -o Acquire::Retries=0 \
+              -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update
+            packages=(diatheke)
+            if [[ "$STAGE" != "6" ]]; then
+              packages+=(libsword-dev)
+            fi
+            timeout 90s sudo apt-get -o Acquire::Retries=0 \
+              -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 \
+              install -y "${packages[@]}"
           fi
           if [[ "$STAGE" == "4" || "$STAGE" == "5" || "$STAGE" == "4-5" ]]; then
-            sudo apt-get install -y libsword-dev
             mkdir -p "$INSPECTOR_DIR"
             g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp -o "$INSPECTOR_DIR/sword-native-index" -lsword
             g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp -o "$INSPECTOR_DIR/sword-native-raw-corpus" -lsword
