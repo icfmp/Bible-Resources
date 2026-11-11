@@ -28,7 +28,7 @@ class OSISAddressabilityTests(unittest.TestCase):
         self.assertTrue(proof["all_original_explicit_targets_index_addressable"])
         self.assertEqual(proof["counts"]["explicit_target_attributes_checked"],7)
         self.assertEqual(proof["counts"]["target_component_indexed_ordered_full_range"],3)
-        self.assertEqual(proof["counts"]["addressable_endpoint_components"],10)
+        self.assertEqual(proof["counts"]["addressable_endpoint_components"],11)
         self.assertEqual(proof["counts"]["multi_reference_target_attributes"],1)
         self.assertFalse(proof["actual_reader_link_click_navigation_verified"])
 
