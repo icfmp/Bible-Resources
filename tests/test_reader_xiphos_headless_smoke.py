@@ -13,6 +13,7 @@ from reader_xiphos_headless_smoke import (
     extract_pinned_preview,XiphosSmokeError,_notice_click_from_geometry,
     _sample_reader_passages, _capture_parallel_toggle_sample,
     _capture_note_hover_sample, GENESIS_1_2_NOTE_HOVER, READER_SAMPLES,
+    install_checked_out_rawtext_comparison,
 )
 
 
@@ -167,6 +168,54 @@ class XiphosSmokeUnitTests(unittest.TestCase):
                        side_effect=AssertionError("No other display allowed")):
                 with self.assertRaises(XiphosSmokeError):
                     _capture_parallel_toggle_sample({"DISPLAY":":0"},folder)
+
+
+    def make_comparison_module(self, folder):
+        root = Path(folder) / "reviewed-comparison"
+        raw = root / "modules/texts/rawtext/genericsecond"
+        raw.mkdir(parents=True)
+        conf = root / "mods.d/genericsecond.conf"
+        conf.parent.mkdir(parents=True)
+        conf.write_text(
+            "[GenericSecond]\n"
+            "DataPath=./modules/texts/rawtext/genericsecond/\n"
+            "ModDrv=RawText\nVersification=Segond\n",
+            encoding="utf-8")
+        for part in ("ot", "nt"):
+            for ext in ("", ".vss"):
+                (raw / (part + ext)).write_bytes(b"synthetic distinct comparison")
+        return root
+
+    def test_checked_out_second_module_isolated_byte_preserving_copy(self):
+        with tempfile.TemporaryDirectory() as base:
+            source = self.make_comparison_module(base)
+            isolated = Path(base) / "isolated"
+            isolated.mkdir()
+            receipt = install_checked_out_rawtext_comparison(
+                source, isolated, "GenericSecond", "Segond")
+            self.assertEqual(receipt["file_count"], 5)
+            self.assertFalse(receipt["gui_two_module_parallel_content_verified"])
+            for original in source.rglob("*"):
+                if original.is_file():
+                    target = isolated / original.relative_to(source)
+                    self.assertEqual(target.read_bytes(), original.read_bytes())
+            self.assertFalse((source / "mods.d/genericsecond.conf").is_symlink())
+
+    def test_second_module_rejects_wrong_v11n_and_unexpected_files(self):
+        with tempfile.TemporaryDirectory() as base:
+            source = self.make_comparison_module(base)
+            isolated = Path(base) / "isolated"
+            isolated.mkdir()
+            with self.assertRaises(XiphosSmokeError):
+                install_checked_out_rawtext_comparison(
+                    source, isolated, "GenericSecond", "Luther")
+            self.assertEqual(list(isolated.rglob("*")), [])
+            extra = source / "modules/texts/rawtext/genericsecond/unreviewed"
+            extra.write_bytes(b"not a standard SWORD member")
+            with self.assertRaises(XiphosSmokeError):
+                install_checked_out_rawtext_comparison(
+                    source, isolated, "GenericSecond", "Segond")
+            self.assertEqual(list(isolated.rglob("*")), [])
 
     def test_hash_and_scheme_mismatch_fail_closed(self):
         with tempfile.TemporaryDirectory() as folder:
