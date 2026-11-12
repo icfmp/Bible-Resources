@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "category": "commentary",
+  "module_id": "MHCC",
+  "title": "Matthew Henry's Concise Commentary on the Whole Bible",
+  "language": "en",
+  "version": "2.0",
+  "provider": "crosswire",
+  "source_page_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=MHCC",
+  "sword_zip_url": "https://crosswire.org/ftpmirror/pub/sword/packages/rawzip/MHCC.zip",
+  "authorial_witness_url": "https://www.ccel.org/ccel/henry/mhcc/mhcc",
+  "reference_edition": "Moody Press, 28th printing, ISBN 0-8024-5190-X (CrossWire declaration; independently unverified)",
+  "archive_sha256": null,
+  "sample_references": [
+    "Gen 1:1",
+    "Ps 23:1",
+    "Matt 5:1",
+    "John 3:16",
+    "Rev 22:21"
+  ],
+  "rights": {
+    "status": "research_only",
+    "upstream_license_claim": "Public Domain--Copy Freely",
+    "evidence_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=MHCC",
+    "digital_corrections_and_derivatives_reviewed": false,
+    "owner_approved": false
+  },
+  "commentary_source": {
+    "format": "compiled_SWORD_only",
+    "authored_source_sha256": null,
+    "ccel_witness_edition_equivalence": "unverified"
+  }
+}
