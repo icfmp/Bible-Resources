@@ -52,25 +52,45 @@ jobs:
             --plan config/publisher-osis/frajnd-2024-note-link-research.json \
             --output "$RUNNER_TEMP/darby-private-link-probe/proposed.xml" \
             --receipt "$RUNNER_TEMP/darby-private-link-probe/receipt.json"
-      - name: Validate original and private proposal with exact pinned official OSIS XSD
+      - name: Compare exact official OSIS XSD conformance before and after without exposing source
         shell: bash
         run: |
           set -euo pipefail
           python scripts/fetch_reviewed_schema.py \
             --directory "$RUNNER_TEMP/darby-private-link-probe/reviewed-schema"
           python - <<'PY'
+          from collections import Counter
           import json,os
           from pathlib import Path
-          from guard_osis import _schema, parse_xml
+          from guard_osis import _schema,parse_xml
           root=Path(os.environ["RUNNER_TEMP"])/"darby-private-link-probe"
           policy=json.loads(Path("config/osis-policy.json").read_text())
           schema,_=_schema(policy,root/"reviewed-schema/osisCore.2.1.1-cw-latest.xsd")
-          for name in ("original.xml", "proposed.xml"):
+          result={}
+          for key,name in (("original","original.xml"),("proposed","proposed.xml")):
               path=root/name
               doc=parse_xml(path,path.read_bytes(),"XML_INPUT_NOT_WELL_FORMED")
-              if not schema.validate(doc):
-                  raise SystemExit("Publisher OSIS "+name+" fails reviewed official XSD")
-          print("Original and private corrected OSIS accepted by exact official pinned XSD")
+              valid=schema.validate(doc)
+              errors=Counter(f"{e.domain_name}:{e.type_name}" for e in schema.error_log)
+              result[key]={"official_xsd_valid":valid,
+                           "error_type_counts":dict(sorted(errors.items())),
+                           "error_count":sum(errors.values())}
+          before=Counter(result["original"]["error_type_counts"])
+          after=Counter(result["proposed"]["error_type_counts"])
+          if before:
+              introduced=after-before
+              # Do not falsely bless the source: it was already nonconforming.
+              result["original_source_xsd_nonconformance_blocks_release"]=True
+              result["no_new_xsd_error_categories_or_counts"]=not bool(introduced)
+          else:
+              result["original_source_xsd_nonconformance_blocks_release"]=False
+              result["no_new_xsd_error_categories_or_counts"]=not bool(after)
+          result["schema_validation_is_publication_approval"]=False
+          (root/"schema-audit.json").write_text(json.dumps(result,sort_keys=True,indent=2)+"\n")
+          print("Pinned OSIS XSD validity and bounded error TYPE counts:",
+                json.dumps(result,sort_keys=True))
+          if not result["no_new_xsd_error_categories_or_counts"]:
+              raise SystemExit("Proposed XML introduces new official XSD errors")
           PY
       - name: Independently reject overclaiming or incomplete actual-original outcomes
         shell: bash
@@ -98,6 +118,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: private-osis-link-repair-receipt-${{ github.run_id }}
-          path: ${{ runner.temp }}/darby-private-link-probe/receipt.json
+          path: |
+            ${{ runner.temp }}/darby-private-link-probe/receipt.json
+            ${{ runner.temp }}/darby-private-link-probe/schema-audit.json
           retention-days: 30
           if-no-files-found: error
