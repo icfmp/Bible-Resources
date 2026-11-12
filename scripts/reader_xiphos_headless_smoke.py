@@ -601,11 +601,79 @@ def _capture_parallel_toggle_sample(env:dict, study_dir:Path) -> dict:
     }
 
 
+
+def _capture_bounded_note_popup(env: dict, study_dir: Path, *,
+                                slug: str, reference: str,
+                                marker_x: int, marker_y: int) -> dict:
+    """Observe an evidenced footnote marker's hover and pinned preview.
+
+    The screenshot *pixels*, not the success of an xdotool command, must
+    establish whether the expected note and destination actually appeared.
+    This is restricted to the fixed private Xvfb display used by our tests.
+    """
+    if (env.get("DISPLAY") != ":91" or not study_dir.is_dir()
+            or study_dir.is_symlink()
+            or not re.fullmatch(r"[a-z][a-z0-9-]{2,65}", slug)
+            or not re.fullmatch(r"[A-Za-z0-9 ]{3,35}", reference)
+            or type(marker_x) is not int or type(marker_y) is not int
+            or not 215 <= marker_x <= 640 or not 115 <= marker_y <= 670):
+        raise XiphosSmokeError("Unreviewed bounded note popup interaction")
+    for cmd in (
+        ["xdotool", "key", "--clearmodifiers", "ctrl+l"],
+        ["xdotool", "type", "--clearmodifiers", "--delay", "35", reference],
+        ["xdotool", "key", "Return"],
+    ):
+        outcome = subprocess.run(cmd, env=env, stdout=subprocess.DEVNULL,
+                                 stderr=subprocess.DEVNULL, timeout=10,
+                                 check=False)
+        if outcome.returncode:
+            raise XiphosSmokeError("Cannot navigate to note popup host")
+    time.sleep(1.6)
+    shots = {}
+    for stage, commands in (
+        ("host", ()),
+        ("hover", (["xdotool", "mousemove", "--sync",
+                    str(marker_x), str(marker_y)],)),
+        ("pinned", (["xdotool", "click", "2"],
+                    ["xdotool", "mousemove", "--sync", "120", "550"])),
+    ):
+        for command in commands:
+            acted = subprocess.run(command, env=env, stdout=subprocess.DEVNULL,
+                                   stderr=subprocess.DEVNULL, timeout=6,
+                                   check=False)
+            if acted.returncode:
+                raise XiphosSmokeError("Xiphos note popup pointer command failed")
+        time.sleep(1.3)
+        target = study_dir / (slug + "-" + stage + ".png")
+        if target.exists() or target.is_symlink():
+            raise XiphosSmokeError("Refusing prior note popup image")
+        result = subprocess.run(
+            ["import", "-display", env["DISPLAY"], "-window", "root", str(target)],
+            env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            timeout=15, check=False)
+        if (result.returncode or not target.is_file() or target.is_symlink()
+                or not 0 < target.stat().st_size <= 6_000_000):
+            raise XiphosSmokeError("Xiphos note popup screenshot missing")
+        shots[stage] = sha256(target.read_bytes()).hexdigest()
+    return {
+        "sample": slug,
+        "requested_host_reference": reference,
+        "preobserved_marker_geometry_only": [marker_x, marker_y],
+        "host_hover_pinned_images_sha256": shots,
+        "hover_note_contents_visually_verified": False,
+        "pinned_popup_visually_verified": False,
+        "corrected_link_clicked": False,
+        "scripture_note_or_markup_exported_in_receipt": False,
+        "independent_pixel_review_required": True,
+    }
+
+
 def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_seconds:int,
           screenshot:Path|None=None, study_dir:Path|None=None,
           comparison_root:Path|None=None, comparison_module:str="",
           comparison_versification:str="", supplemental_samples=(),
-          capture_note_link_without_comparison:bool=False):
+          capture_note_link_without_comparison:bool=False,
+          note_popup_probes=()):
     if not isinstance(startup_seconds,int) or not 5<=startup_seconds<=25:
         raise XiphosSmokeError("Unbounded headless startup duration")
     with tempfile.TemporaryDirectory(prefix="isolated-xiphos-preview-") as temp:
@@ -691,6 +759,12 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                                if study_dir and samples and
                                ((comparison and tree_probe) or capture_note_link_without_comparison)
                                else None)
+            bounded_note_popups = (
+                [_capture_bounded_note_popup(
+                    env, study_dir, slug=slug, reference=ref,
+                    marker_x=x, marker_y=y)
+                 for slug, ref, x, y in note_popup_probes]
+                if study_dir and samples and note_popup_probes else [])
             parallel_attempt = (_capture_parallel_toggle_sample(env, study_dir)
                                 if study_dir and samples else None)
             return {
@@ -703,6 +777,7 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                 "test_only_screenshot_sha256":screenshot_sha,
                 "real_reader_passage_samples":samples,
                 "supplemental_source_case_screenshots":corrected_samples,
+                "source_specific_note_popup_evidence":bounded_note_popups,
                 "link_host_without_second_module_requested":bool(capture_note_link_without_comparison),
                 "parallel_view_toggle_sample":parallel_attempt,
                 "independent_comparison_module":comparison,
