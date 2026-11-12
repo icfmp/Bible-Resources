@@ -1,0 +1,56 @@
+name: Probe stable AndBible Android import UI (no Scripture)
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/andbible-android-import-preflight.yml"
+      - "scripts/probe_andbible_android_emulator.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  andbible-android-5-1:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Download official immutable stable AndBible 5.1.1117 APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/andbible-android-ui"
+          curl --fail --location --retry 2 --max-time 120 \
+            -o "$RUNNER_TEMP/andbible-android-ui/andbible-stable.apk" \
+            https://github.com/AndBible/and-bible/releases/download/production-1117/andbible-production-1117.apk
+          echo "1c9ed93391642c0de4529065a65e10eb44242d60722231b917b14c5919cdf796  $RUNNER_TEMP/andbible-android-ui/andbible-stable.apk" | sha256sum --check --status
+          mkdir -p "$RUNNER_TEMP/andbible-android-ui/evidence"
+      - name: Permit hardware acceleration where available
+        shell: bash
+        run: |
+          if test -c /dev/kvm; then sudo chmod 666 /dev/kvm; fi
+      - name: Observe first-run stable Android UI and local-file import affordance
+        uses: ReactiveCircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_4
+          cores: 2
+          ram-size: 2048M
+          heap-size: 512M
+          disable-animations: true
+          emulator-boot-timeout: 600
+          script: python scripts/probe_andbible_android_emulator.py --apk "$RUNNER_TEMP/andbible-android-ui/andbible-stable.apk" --evidence "$RUNNER_TEMP/andbible-android-ui/evidence"
+      - name: Upload only official app startup/import screenshots and sanitized control metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: andbible-5-1-android-import-ui-preflight-${{ github.run_id }}
+          path: ${{ runner.temp }}/andbible-android-ui/evidence/
+          retention-days: 7
+          if-no-files-found: error
