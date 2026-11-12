@@ -56,7 +56,7 @@ class AndBiblePrivateImportUiTest(unittest.TestCase):
             self.assertEqual(tap_allowlisted(controls,("DISMISS",)), "DISMISS")
             adb.assert_called_once()
 
-    def test_observed_pixel_launcher_anr_wait_is_sole_recovery_control(self):
+    def test_only_known_launcher_anr_exposes_close_app(self):
         xml=b"""<hierarchy>
           <node text="Pixel Launcher isn\'t responding" bounds="[40,500][800,600]"/>
           <node text="Close app" bounds="[70,880][760,970]"/>
@@ -65,10 +65,12 @@ class AndBiblePrivateImportUiTest(unittest.TestCase):
         </hierarchy>"""
         controls=safe_controls(xml)
         self.assertIn("WAIT", [control["label"] for control in controls])
-        self.assertNotIn("CLOSE APP", [control["label"] for control in controls])
+        self.assertIn("CLOSE APP", [control["label"] for control in controls])
+        unsafe=safe_controls(xml.replace(b"Pixel Launcher isn\'t responding", b"AndBible isn\'t responding"))
+        self.assertNotIn("CLOSE APP", [control["label"] for control in unsafe])
         with patch("probe_andbible_android_private_import.adb") as adb, \
              patch("probe_andbible_android_private_import.time.sleep"):
-            self.assertEqual(tap_allowlisted(controls,("WAIT",)), "WAIT")
+            self.assertEqual(tap_allowlisted(controls,("CLOSE APP",)), "CLOSE APP")
             adb.assert_called_once()
 
     def test_relaunch_only_restarts_official_app_without_reimport(self):
