@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]/"scripts"))
 from probe_andbible_android_private_import import (
     safe_controls, tap_allowlisted, relaunch_for_persistence,
     open_documented_reference_probe, probe_observed_note_marker,
+    probe_observed_corrected_colossians_link,
     AndroidDarbyImportError,
 )
 
@@ -116,6 +117,21 @@ class AndBiblePrivateImportUiTest(unittest.TestCase):
                   patch("probe_andbible_android_private_import.time.sleep")):
                 probe_observed_note_marker(path)
             adb.assert_called_once_with("shell","input","tap","823","1425",timeout=12)
+
+    def test_corrected_note_link_click_checks_same_exact_viewport(self):
+        from tempfile import TemporaryDirectory
+        import struct
+        with TemporaryDirectory() as tmp:
+            path=Path(tmp)/"popup.png"
+            header=bytes.fromhex("89504e470d0a1a0a")+bytes(8)
+            path.write_bytes(header+struct.pack(">II", 1080, 2280))
+            with (patch("probe_andbible_android_private_import.adb") as adb,
+                  patch("probe_andbible_android_private_import.time.sleep")):
+                probe_observed_corrected_colossians_link(path)
+            adb.assert_called_once_with("shell","input","tap","840","1800",timeout=12)
+            path.write_bytes(header+struct.pack(">II", 500, 1000))
+            with self.assertRaises(AndroidDarbyImportError):
+                probe_observed_corrected_colossians_link(path)
 
     def test_file_picker_identifies_only_explicit_private_candidate(self):
         xml=b"""<hierarchy>
