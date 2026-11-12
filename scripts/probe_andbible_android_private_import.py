@@ -28,7 +28,7 @@ SAFE_UI = frozenset({
     "JND2024REPAIRRESEARCH.ZIP", "ALLOW", "WHILE USING THE APP",
     "INSTALL", "IMPORT", "OK", "OPEN", "CONTINUE", "DONE", "CLOSE",
     "USE THIS FOLDER", "GRANT ACCESS", "SELECT", "NEXT", "PROCEED",
-    "DISMISS", "DISMISS UNTIL NEXT UPDATE", "WAIT",
+    "DISMISS", "DISMISS UNTIL NEXT UPDATE", "WAIT", "CLOSE APP",
 })
 
 
@@ -44,6 +44,13 @@ def safe_controls(xml: bytes) -> list[dict]:
         root=ET.fromstring(xml)
     except ET.ParseError:
         return []
+    # Only permit closing the *system launcher* when a matching exact
+    # OS-level ANR title is present in this same bounded UI hierarchy.
+    # Never expose a generic CLOSE APP button for AndBible itself.
+    launcher_anr=any(
+        node.attrib.get("text", "").strip().casefold() in {
+            "pixel launcher isn't responding", "quickstep isn't responding"
+        } for node in root.iter("node"))
     result=[]
     for node in root.iter("node"):
         bounds=node.attrib.get("bounds","")
@@ -58,7 +65,7 @@ def safe_controls(xml: bytes) -> list[dict]:
             label=value.upper()
             candidate_file=(value.startswith("JND2024Repai") and len(value)<=48
                             and re.fullmatch(r"JND2024Repai[A-Za-z0-9 ._…-]*",value) is not None)
-            if label in SAFE_UI or candidate_file:
+            if (label in SAFE_UI and (label != "CLOSE APP" or launcher_anr)) or candidate_file:
                 item={"label":("JND2024REPAIRRESEARCH.ZIP" if candidate_file else label),
                       "x":(x1+x2)//2,"y":(y1+y2)//2}
                 if item not in result:
@@ -84,6 +91,13 @@ def tap_allowlisted(controls, ordered_labels):
                 time.sleep(3)
                 return label
     return None
+
+
+def relaunch_for_persistence():
+    """Restart the known official app without touching module files or reimporting."""
+    adb("shell","am","force-stop",PACKAGE,timeout=20)
+    adb("shell","monkey","-p",PACKAGE,"1",timeout=35)
+    time.sleep(12)
 
 
 def attempt_private_android_import(*, payload: Path, apk: Path,
@@ -137,12 +151,16 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
     # ready AndBible first-run screen. Choose only its observed WAIT control;
     # never close a system process or blindly tap the obscured application.
     system_waits=0
-    while any(c["label"] == "WAIT" for c in controls) and system_waits < 3:
-        tap_allowlisted(controls,("WAIT",))
+    launcher_closed=False
+    while (any(c["label"] in {"WAIT", "CLOSE APP"} for c in controls)
+           and system_waits < 3):
+        action=tap_allowlisted(controls,("CLOSE APP", "WAIT"))
+        launcher_closed=launcher_closed or action == "CLOSE APP"
         system_waits+=1
         time.sleep(5)
         controls=android_controls()
     checkpoint("android_system_wait_recovery",attempts=system_waits,
+               exact_launcher_anr_closed=launcher_closed,
                startup_controls_recovered=any(c["label"] == "LOAD DOCUMENTS FROM FILES" for c in controls))
     first_labels=sorted({c["label"] for c in controls})
     checkpoint("official_initial_startup_ui",safe_control_labels=first_labels)
@@ -230,6 +248,28 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
         screenshots["08-after-optional-announcement"] = capture_png(
             evidence_dir/"08-after-optional-announcement.png")
 
+    # Independently probe persistence across a real app process restart.
+    # The module is NOT re-imported; this only records an observed reader
+    # screenshot for subsequent human review, never automatic acceptance.
+    relaunch_attempted=False
+    if selected:
+        relaunch_for_persistence()
+        relaunch_attempted=True
+        checkpoint("andbible_process_relaunch",attempted=True,
+                   persistent_module_identity_verified=False,
+                   rendered_notes_verified=False)
+        screenshots["09-after-process-relaunch"] = capture_png(
+            evidence_dir/"09-after-process-relaunch.png")
+        # The stable APK may show its known upgrade dialog again on restart.
+        # Dismiss the exact observed action only; do not infer app state from it.
+        relaunch_controls=android_controls()
+        relaunch_dismissed=tap_allowlisted(
+            relaunch_controls,("DISMISS", "DISMISS UNTIL NEXT UPDATE"))
+        checkpoint("relaunch_announcement",dismissed=relaunch_dismissed is not None,
+                   persistent_module_identity_verified=False)
+        screenshots["10-after-relaunch-dialog"] = capture_png(
+            evidence_dir/"10-after-relaunch-dialog.png")
+
     # A successful ADB press does not establish a loaded translation; retain
     # that as a separate visual and Java/Android document validation gate.
     result={
@@ -248,6 +288,8 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
         "file_picker_candidate_selected":selected,
         "import_confirmation_action_attempted":import_prompt,
         "post_import_announcement_dismissed":announcement_dismissed,
+        "andbible_process_relaunch_attempted":relaunch_attempted,
+        "andbible_persistent_module_identity_verified":False,
         "andbible_import_verified":imported_by_app,
         "andbible_rendered_text_and_notes_verified":False,
         "andbible_repaired_reference_gui_click_verified":False,

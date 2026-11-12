@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/"scripts"))
 from probe_andbible_android_private_import import (
-    safe_controls, tap_allowlisted, AndroidDarbyImportError,
+    safe_controls, tap_allowlisted, relaunch_for_persistence, AndroidDarbyImportError,
 )
 
 
@@ -56,7 +56,7 @@ class AndBiblePrivateImportUiTest(unittest.TestCase):
             self.assertEqual(tap_allowlisted(controls,("DISMISS",)), "DISMISS")
             adb.assert_called_once()
 
-    def test_observed_pixel_launcher_anr_wait_is_sole_recovery_control(self):
+    def test_only_known_launcher_anr_exposes_close_app(self):
         xml=b"""<hierarchy>
           <node text="Pixel Launcher isn\'t responding" bounds="[40,500][800,600]"/>
           <node text="Close app" bounds="[70,880][760,970]"/>
@@ -65,11 +65,24 @@ class AndBiblePrivateImportUiTest(unittest.TestCase):
         </hierarchy>"""
         controls=safe_controls(xml)
         self.assertIn("WAIT", [control["label"] for control in controls])
-        self.assertNotIn("CLOSE APP", [control["label"] for control in controls])
+        self.assertIn("CLOSE APP", [control["label"] for control in controls])
+        unsafe=safe_controls(xml.replace(b"Pixel Launcher isn\'t responding", b"AndBible isn\'t responding"))
+        self.assertNotIn("CLOSE APP", [control["label"] for control in unsafe])
         with patch("probe_andbible_android_private_import.adb") as adb, \
              patch("probe_andbible_android_private_import.time.sleep"):
-            self.assertEqual(tap_allowlisted(controls,("WAIT",)), "WAIT")
+            self.assertEqual(tap_allowlisted(controls,("CLOSE APP",)), "CLOSE APP")
             adb.assert_called_once()
+
+    def test_relaunch_only_restarts_official_app_without_reimport(self):
+        with (patch("probe_andbible_android_private_import.adb") as adb,
+              patch("probe_andbible_android_private_import.time.sleep") as sleep):
+            relaunch_for_persistence()
+        self.assertEqual(adb.call_count, 2)
+        self.assertEqual(adb.call_args_list[0].args[:4],
+                         ("shell", "am", "force-stop", "net.bible.android.activity"))
+        self.assertEqual(adb.call_args_list[1].args[:3],
+                         ("shell", "monkey", "-p"))
+        self.assertEqual(sleep.call_args.args, (12,))
 
     def test_file_picker_identifies_only_explicit_private_candidate(self):
         xml=b"""<hierarchy>
