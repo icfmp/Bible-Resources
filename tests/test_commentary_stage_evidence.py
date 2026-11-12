@@ -72,10 +72,10 @@ class CommentaryStageEvidenceTests(unittest.TestCase):
 
     def test_opaque_native_top_records_are_counted_not_conflated(self):
         source = (
-            b"M\\tTestCom\\tKJV\\t1.9.0\\tzCom\\n"
-            b"U\\tTOP:1\\nU\\tTOP:2\\n"
-            b"K\\tGen.1.1\\n"
-            b"S\\t31000\\t1\\t0\\t2\\n"
+            b"M\tTestCom\tKJV\t1.9.0\tzCom\n"
+            b"U\tTOP:1\nU\tTOP:2\n"
+            b"K\tGen.1.1\n"
+            b"S\t31000\t1\t0\t2\n"
         )
         result = parse_index(source, "TestCom")
         self.assertEqual(result["occupied_anonymous_top_slots"], 2)
