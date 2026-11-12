@@ -196,6 +196,8 @@ jobs:
           print('Both ZIP wrappers contain IDENTICAL independently audited seven SWORD member bytes.')
           print('Canonical public release SHA-256:',canonical_sha)
           PY
+          (cd "$RUNNER_TEMP/darby-stable/release" && sha256sum --check SHA256SUMS.txt)
+          python scripts/validate.py
       - name: Push final approved module to review branch, NEVER bypass protected main
         if: github.event_name != 'pull_request'
         shell: bash
