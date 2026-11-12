@@ -285,7 +285,7 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
             xiphos_receipt["independent_screenshot_pixels_reviewed"] = False
             xiphos_receipt["corrected_reference_clicks_visually_confirmed"] = False
             xiphos_receipt["omitted_verse_note_behavior_visually_confirmed"] = False
-        if sha(source_file.read_bytes()) != lexical_receipt["candidate_sha256"]:
+        if sha(source_file.read_bytes()) != plain_note_receipt["new_research_candidate_sha256"]:
             raise PrivateRepairedProbeError("Private source mutated during compiler invocation")
     return {
         "schema_version": 1,
@@ -294,6 +294,9 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
         "private_link_repaired_sha256": LINK_SHA,
         "private_canonical_xml_research_sha256": REPAIRED_SHA,
         "private_original_serialization_preserving_osis_sha256": lexical_receipt["candidate_sha256"],
+        "private_plain_omitted_reference_osis_sha256": plain_note_receipt["new_research_candidate_sha256"],
+        "plain_nonhyperlink_omission_label_count": plain_note_receipt["explicit_plain_label_count"],
+        "original_note_display_text_preserved_by_plain_overlay": plain_note_receipt["all_original_characters_preserved"],
         "original_unedited_osis_bytes_preserved": True,
         "reviewed_byte_patch_inventory": lexical_receipt["approved_byte_span_changes_only"],
         "official_crosswire_schema_sha256": schema_sha,
