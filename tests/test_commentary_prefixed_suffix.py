@@ -89,11 +89,11 @@ class CommentaryStockSuffixTests(unittest.TestCase):
         )
         source,_=_original_source_markers(original)
         result=compare_private_texts(source,{
-            "Gen.1.1":b"<title>Separate label.</title><hi>Original, words.</hi>",
+            "Gen.1.1":b"<title>Separate label.</title><hi>Original, words?</hi>",
             "Gen.1.2":b"<hi>Source words vary here.</hi>",
         })
         self.assertEqual(result["stock_original_body_suffix_exact_unicode_and_difference_classes"],
-                         {"exact_source_body_unicode_equals_stock_text_suffix":1})
+                         {"same_original_word_sequence_with_other_punctuation_or_markup_text_difference":1})
         self.assertEqual(result["unexplained_original_to_stock_word_boundary_count"],1)
         self.assertEqual(result["unexplained_original_to_stock_changed_segment_positions"],
                          {"middle_with_shared_edges":1})
