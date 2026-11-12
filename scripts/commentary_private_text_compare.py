@@ -24,6 +24,9 @@ from lxml import etree
 
 from commentary_intake import load_manifest
 from commentary_text_delta import punctuation_relationship, word_relationship, nonword_symbol_excess
+from commentary_stock_prefix_topology import (
+    source_word_prefix_topology, aligned_punctuation_gap_diagnostics,
+)
 from commentary_xml_witness import _parse_reference, WORK_REF, OSIS_LOC, xml_structure, MAX_XML
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
 from pilot_fetch import fetch
@@ -126,6 +129,14 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
     word_overlap_buckets=Counter()
     stock_containment_locations=Counter()
     stock_extra_prefix_token_bins=Counter()
+    stock_source_boundary_top_level_tags=Counter()
+    stock_prefix_full_sibling_top_level_tags=Counter()
+    stock_prefix_has_full_sibling_element=0
+    stock_prefix_owners_before_original_body=Counter()
+    punctuation_aligned_gap_classes=Counter()
+    punctuation_aligned_numeric_substitutions=Counter()
+    punctuation_entries_with_only_one_to_one_glyph_changes=0
+    punctuation_changed_gap_count=0
     stock_extra_suffix_token_bins=Counter()
     source_nonword_glyph_excess=Counter()
     stock_nonword_glyph_excess=Counter()
@@ -170,6 +181,14 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
                         extra_source,extra_stock=nonword_symbol_excess(a,b)
                         source_nonword_glyph_excess.update(extra_source)
                         stock_nonword_glyph_excess.update(extra_stock)
+                        aligned=aligned_punctuation_gap_diagnostics(a,b)
+                        punctuation_aligned_gap_classes.update(aligned["punctuation_gap_classes"])
+                        punctuation_aligned_numeric_substitutions.update(
+                            aligned["one_to_one_unicode_numeric_glyph_replacements"]
+                        )
+                        punctuation_changed_gap_count+=aligned["punctuation_gap_changes"]
+                        if aligned["all_nonword_glyph_differences_consistently_mapped"]:
+                            punctuation_entries_with_only_one_to_one_glyph_changes+=1
                     else:
                         if [t.casefold() for t in source_tokens]==[t.casefold() for t in stock_tokens]:
                             lexical_details["same_casefolded_word_tokens_different_case_or_punctuation"]+=1
@@ -182,6 +201,16 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
                         if category=="source_words_contiguous_inside_longer_stock":
                             position=diagnostic["original_words_contiguous_in_stock_location"]
                             stock_containment_locations[position]+=1
+                            topology=source_word_prefix_topology(item["original_text"], raw)
+                            stock_source_boundary_top_level_tags[
+                                topology["source_word_boundary_stock_top_level_owner"]]+=1
+                            previous=topology["top_level_element_types_wholly_before_original_source_words"]
+                            stock_prefix_full_sibling_top_level_tags.update(previous)
+                            if previous:
+                                stock_prefix_has_full_sibling_element+=1
+                            stock_prefix_owners_before_original_body.update(
+                                topology["prefix_text_top_level_owner_types"]
+                            )
                             for value,bins in (
                                 (diagnostic["additional_stock_word_tokens_before_source"],stock_extra_prefix_token_bins),
                                 (diagnostic["additional_stock_word_tokens_after_source"],stock_extra_suffix_token_bins),
@@ -239,6 +268,16 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
     if (sum(stock_extra_prefix_token_bins.values())!=sum(stock_containment_locations.values())
             or sum(stock_extra_suffix_token_bins.values())!=sum(stock_containment_locations.values())):
         raise PilotError("Extra stock word prefix/suffix bins do not account for the complete containment group")
+    if sum(stock_source_boundary_top_level_tags.values())!=sum(stock_containment_locations.values()):
+        raise PilotError("Private XML boundary topology does not account for every stock prefix case")
+    if stock_prefix_has_full_sibling_element>sum(stock_containment_locations.values()):
+        raise PilotError("Stock top-level sibling count exceeds prefix cases")
+    if punctuation_entries_with_only_one_to_one_glyph_changes>lexical_details[
+        "same_unicode_word_tokens_different_punctuation"
+    ]:
+        raise PilotError("Aligned punctuation entry count exceeds source divergence census")
+    if sum(punctuation_aligned_gap_classes.values())!=punctuation_changed_gap_count:
+        raise PilotError("Aligned punctuation gaps incomplete")
     if len(bounded_priority_examples)>40:
         raise PilotError("Private difference sample exceeds reviewed non-text bound")
     return {
@@ -254,6 +293,22 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
         "punctuation_nonword_glyph_excess_source_top_numeric_codepoints":dict(source_nonword_glyph_excess.most_common(16)),
         "punctuation_nonword_glyph_excess_stock_top_numeric_codepoints":dict(stock_nonword_glyph_excess.most_common(16)),
         "punctuation_codepoint_frequency_is_not_authorial_approval":True,
+        "punctuation_aligned_source_stock_gap_classes":dict(sorted(punctuation_aligned_gap_classes.items())),
+        "punctuation_aligned_one_to_one_numeric_unicode_replacements":
+            dict(punctuation_aligned_numeric_substitutions.most_common(20)),
+        "punctuation_aligned_total_changed_gaps":punctuation_changed_gap_count,
+        "punctuation_entries_with_exclusively_one_to_one_glyph_changes":
+            punctuation_entries_with_only_one_to_one_glyph_changes,
+        "punctuation_alignment_does_not_authorize_normalization":True,
+        "stock_prefixed_body_first_source_word_top_level_tag_counts":
+            dict(sorted(stock_source_boundary_top_level_tags.items())),
+        "stock_prefix_complete_top_level_elements_preceding_source_word_by_tag":
+            dict(sorted(stock_prefix_full_sibling_top_level_tags.items())),
+        "stock_prefix_cases_with_at_least_one_complete_prior_top_level_element":
+            stock_prefix_has_full_sibling_element,
+        "stock_prefix_text_owner_types_before_source_word":
+            dict(sorted(stock_prefix_owners_before_original_body.items())),
+        "original_source_word_contiguity_does_not_identify_or_approve_stock_added_material":True,
         "bounded_private_prioritized_hash_line_diagnostics":bounded_priority_examples,
         "all_detailed_difference_diagnostics_are_research_only":True,
         "lexical_disagreement_classification":dict(sorted(lexical_details.items())),
