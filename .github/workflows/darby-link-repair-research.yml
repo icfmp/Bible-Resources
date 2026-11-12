@@ -9,6 +9,9 @@ on:
       - "config/publisher-osis/frajnd-2024-note-link-research.json"
       - "scripts/source_osis_note_markup_shape.py"
       - "tests/test_source_osis_note_markup_shape.py"
+      - "tests/test_repair_osis_inline_markup.py"
+      - "scripts/repair_osis_inline_markup.py"
+      - "config/publisher-osis/frajnd-2024-inline-markup-research.json"
 
 permissions:
   contents: read
@@ -31,6 +34,8 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_repair_osis_note_links.py' -v
       - name: Test bounded note markup shape diagnostics
         run: python -m unittest discover -s tests -p 'test_source_osis_note_markup_shape.py' -v
+      - name: Test fail-closed inline markup corrections
+        run: python -m unittest discover -s tests -p 'test_repair_osis_inline_markup.py' -v
       - name: Reacquire exactly pinned original publisher XML into private temporary directory
         shell: bash
         run: |
@@ -63,6 +68,15 @@ jobs:
             --plan config/publisher-osis/frajnd-2024-note-link-research.json \
             --output "$RUNNER_TEMP/darby-private-link-probe/proposed.xml" \
             --receipt "$RUNNER_TEMP/darby-private-link-probe/receipt.json"
+      - name: Propose independent private inline OSIS markup fix on exact link-corrected source
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/repair_osis_inline_markup.py \
+            --source "$RUNNER_TEMP/darby-private-link-probe/proposed.xml" \
+            --plan config/publisher-osis/frajnd-2024-inline-markup-research.json \
+            --output "$RUNNER_TEMP/darby-private-link-probe/inline-corrected.xml" \
+            --report "$RUNNER_TEMP/darby-private-link-probe/inline-receipt.json"
       - name: Compare exact official OSIS XSD conformance before and after without exposing source
         shell: bash
         run: |
@@ -78,7 +92,7 @@ jobs:
           policy=json.loads(Path("config/osis-policy.json").read_text())
           schema,_=_schema(policy,root/"reviewed-schema/osisCore.2.1.1-cw-latest.xsd")
           result={}
-          for key,name in (("original","original.xml"),("proposed","proposed.xml")):
+          for key,name in (("original","original.xml"),("proposed","proposed.xml"),("inline_corrected","inline-corrected.xml")):
               path=root/name
               doc=parse_xml(path,path.read_bytes(),"XML_INPUT_NOT_WELL_FORMED")
               valid=schema.validate(doc)
@@ -127,6 +141,7 @@ jobs:
                                     e.message))),
                                 "structure":structural_context(int(e.line))}
                                for e in list(schema.error_log)[:12]]}
+          assert result["inline_corrected"]["official_xsd_valid"], "Private markup probe must satisfy pinned CrossWire XSD"
           before=Counter(result["original"]["error_type_counts"])
           after=Counter(result["proposed"]["error_type_counts"])
           if before:
@@ -174,5 +189,6 @@ jobs:
             ${{ runner.temp }}/darby-private-link-probe/receipt.json
             ${{ runner.temp }}/darby-private-link-probe/schema-audit.json
             ${{ runner.temp }}/darby-private-link-probe/markup-shape.json
+            ${{ runner.temp }}/darby-private-link-probe/inline-receipt.json
           retention-days: 30
           if-no-files-found: error
