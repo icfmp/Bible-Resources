@@ -164,7 +164,7 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
         "bounded_private_content_discrepancy_hash_samples":issues,
         "whitespace_only_status_is_not_exact_text_parity":True,
         "no_autocorrection_or_content_normalization_performed":True,
-        "all_original_commentary_text_verbatim_verified":counters["exact_unicode_text_match"]==tested,
+        "all_selected_verse_range_body_text_exact_matches":counters["exact_unicode_text_match"]==tested,
         "original_paragraphs_notes_and_quotations_verified":False,
         "full_authored_to_stock_parity_verified":False,
     }
