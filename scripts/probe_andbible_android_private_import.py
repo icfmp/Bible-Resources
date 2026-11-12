@@ -96,6 +96,7 @@ def tap_allowlisted(controls, ordered_labels):
 
 
 DOCUMENTED_REFERENCE_PROBES = ("Gen.2.4", "Rom.16.25")
+OMITTED_VERSE_NOTE_HOST_PROBES = ("Matt.23.13", "Acts.8.36", "Acts.15.33")
 
 
 def open_documented_reference_probe(reference: str) -> None:
@@ -104,7 +105,7 @@ def open_documented_reference_probe(reference: str) -> None:
     https://andbible.org/docs/bible_links/ documents /OSISREF with document,
     v11n. Intent invocation alone is NEVER proof of actual navigation.
     """
-    if reference not in DOCUMENTED_REFERENCE_PROBES:
+    if reference not in DOCUMENTED_REFERENCE_PROBES + OMITTED_VERSE_NOTE_HOST_PROBES:
         raise AndroidDarbyImportError("Unreviewed Android passage navigation")
     uri = ("https://read.andbible.org/" + reference + "?"
            + urlencode({"document": MODULE, "v11n": VERSIFICATION}))
@@ -348,6 +349,16 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
                    popup_link="Col.2.2-Col.2.3", actual_navigation_verified=False)
         screenshots["14-corrected-colossians-link-probe"] = capture_png(
             evidence_dir/"14-corrected-colossians-link-probe.png")
+        # Observe actual host verses for intentionally omitted textual-critical
+        # additions. Do not navigate to those absent numbered verses and never
+        # infer note popup fidelity from a reference intent alone.
+        for index, reference in enumerate(OMITTED_VERSE_NOTE_HOST_PROBES, start=15):
+            open_documented_reference_probe(reference)
+            checkpoint("android_omitted_verse_note_host_probe",
+                       host=reference, host_render_verified=False,
+                       omitted_note_popup_verified=False)
+            key=f"{index:02d}-omitted-verse-host"
+            screenshots[key] = capture_png(evidence_dir/(key+".png"))
 
     # A successful ADB press does not establish a loaded translation; retain
     # that as a separate visual and Java/Android document validation gate.
@@ -372,6 +383,7 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
         "andbible_documented_reference_navigation_verified":False,
         "andbible_romans_original_note_popup_verified":False,
         "andbible_colossians_note_link_gui_verified":False,
+        "andbible_three_omitted_verse_host_gui_verified":False,
         "andbible_persistent_module_identity_verified":False,
         "andbible_import_verified":imported_by_app,
         "andbible_rendered_text_and_notes_verified":False,
