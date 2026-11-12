@@ -37,6 +37,38 @@ from sword_native_raw_corpus_inventory import parse_native_raw_corpus
 MAX_DIAGNOSTICS=20
 
 
+def _original_thml_neighbor_candidates(marker) -> list[tuple[str,str]]:
+    """Private, bounded actual source metadata, not inferred SWORD headings.
+
+    Candidate matches to *compiled* metadata are only observations: a
+    chapter-title or marker-passage attribute is not automatically the title
+    of the following commentary body, and a nearby heading might belong to
+    an earlier source section. Never publish these original strings.
+    """
+    candidates=[]
+    for name, value in (
+        ("source_marker_passage_attribute", marker.get("passage", "")),
+    ):
+        if value:
+            candidates.append((name,value))
+    for ancestor in marker.iterancestors():
+        if not isinstance(ancestor.tag,str):
+            continue
+        local=ancestor.tag.rsplit("}",1)[-1]
+        if local in ("div1","div2") and ancestor.get("title"):
+            candidates.append(("source_"+local+"_title_attribute",ancestor.get("title")))
+    preceding=marker.getprevious()
+    if preceding is not None and isinstance(preceding.tag,str):
+        local=preceding.tag.rsplit("}",1)[-1]
+        if local in {"title","h1","h2","h3","h4","h5","h6"}:
+            original_heading="".join(preceding.itertext())
+            if original_heading.strip():
+                candidates.append(("source_immediate_previous_heading_element",original_heading))
+    if len(candidates)>8 or any(len(text)>2048 for _kind,text in candidates):
+        raise PilotError("Original neighboring source heading metadata exceeds review bounds")
+    return candidates
+
+
 def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dict]:
     # Must scan the entire actual original with network/entity resolution off.
     whole=xml_structure(xml_bytes)
@@ -83,7 +115,8 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
             "original_full_reference_sha256":sha256(full_ref_bytes).hexdigest(),
             "original_text":txt,
             "original_text_sha256":sha256(text_bytes).hexdigest(),
-            "original_characters":len(txt)
+            "original_characters":len(txt),
+            "private_original_neighbor_candidates":_original_thml_neighbor_candidates(node),
         })
     if sum(len(rows) for rows in sources.values()) != (
         counts["work_qualified_verse"]+counts["work_qualified_same_book_verse_range"]
