@@ -140,30 +140,11 @@ jobs:
           python -m unittest discover -s tests -p 'test_native_book_intro_screen.py' -v
           python -m unittest discover -s tests -p 'test_source_native_layout_anchors.py' -v
           python -c 'import os, sys; sys.path.insert(0, "scripts"); from bible_intake import load_manifest; m=load_manifest(os.environ["RESOURCE_ID"]); print("Reviewed research manifest:", m["resource_id"], m["purpose"], m["source"]["format"])'
-      - name: Observe official eBible USFX schema fingerprint (research only, no auto-approval)
-        if: github.event_name == 'pull_request'
-        continue-on-error: true
-        shell: bash
-        run: |
-          set -euo pipefail
-          python scripts/usfx_schema_gate.py --observe-only > "${RUNNER_TEMP}/usfx-schema-observation.json"
-          python - <<'PY'
-          import json,os
-          from pathlib import Path
-          receipt=json.loads((Path(os.environ["RUNNER_TEMP"])/"usfx-schema-observation.json").read_text())
-          assert receipt["status"]=="observed_unreviewed_official_schema"
-          print("Official XSD URL:",receipt["publisher_url"])
-          print("Observed official XSD SHA-256:",receipt["official_xsd_sha256"])
-          print("Observed XSD bytes:",receipt["official_xsd_bytes"])
-          print("Offline compilation:",receipt["offline_compiled_without_external_dependencies"])
-          print("This fingerprint is NOT approved until reviewed/pinned on main.")
-          PY
-      - name: Observe the current upstream Darby bytes (SHA-256 only; never auto-repin)
-        if: github.event_name == 'pull_request'
-        shell: bash
-        run: |
-          set -euo pipefail
-          python scripts/bible_intake.py --resource-id frajnd-2024 --observe-only
+      # Source and SWORD originals are acquired exactly once by the SHA-pinned
+      # stage runner. Do not observe/download the same upstream ZIPs a
+      # second time during a PR: a drift must fail the exact pin, never be
+      # silently adopted. Use bible-observe-originals.yml separately to
+      # investigate changed upstream editions before updating the manifest.
       - name: Install stock SWORD binaries only if this stage needs them
         shell: bash
         run: |
