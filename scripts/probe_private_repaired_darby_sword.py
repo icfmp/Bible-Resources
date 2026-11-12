@@ -229,7 +229,13 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
                     ("acts-omitted-reference", "Acts 8:36"),
                     ("psalm150-poetry", "Ps 150:2"),
                 ),
-                capture_note_link_without_comparison=True)
+                capture_note_link_without_comparison=True,
+                note_popup_probes=(
+                    # Review-only fixed coordinates from exact, visually
+                    # inspected 1280x800 snapshots in Action #43176350700.
+                    ("leviticus-original-note-2", "Lev 8:15", 446, 349),
+                    ("romans-original-note-1", "Rom 16:25", 429, 445),
+                ))
             xiphos_receipt["exact_candidate_zip_sha256"] = archive_metadata["zip_sha256"]
             xiphos_receipt["same_compiled_payload_as_native_audit"] = True
             xiphos_receipt["independent_screenshot_pixels_reviewed"] = False
