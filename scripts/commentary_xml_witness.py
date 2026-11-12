@@ -26,7 +26,7 @@ MAX_XML = 32 * 1024 * 1024
 MAX_TAG_TYPES = 128
 MAX_ELEMENTS = 600_000
 XML_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_.:-]{0,95}$")
-OSIS_PART = r"[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9][0-9]*\\.[1-9][0-9]*"
+OSIS_PART = r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*\.[1-9][0-9]*"
 OSIS_SINGLE = re.compile(r"^" + OSIS_PART + r"$")
 OSIS_RANGE = re.compile(r"^(" + OSIS_PART + r")-(" + OSIS_PART + r")$")
 
@@ -111,7 +111,7 @@ def xml_structure(data: bytes) -> dict:
             commentary_attribute_names.update(safe_name(k) for k in node.attrib)
             ref = node.get("osisRef", "")
             source_ref_digest.update(ref.encode("utf-8"))
-            source_ref_digest.update(b"\\0")
+            source_ref_digest.update(b"\0")
             category = _ref_category(ref)
             source_commentary_ref_classes[category] += 1
             if category in ("one_fully_qualified_verse", "same_book_verse_range"):
