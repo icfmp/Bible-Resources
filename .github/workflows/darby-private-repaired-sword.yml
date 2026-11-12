@@ -7,6 +7,8 @@ on:
       - "scripts/probe_private_repaired_darby_sword.py"
       - "scripts/repair_osis_note_links.py"
       - "scripts/repair_osis_inline_markup.py"
+      - "scripts/repair_osis_source_bytes.py"
+      - "tests/test_repair_osis_source_bytes.py"
       - "config/publisher-osis/frajnd-2024-note-link-research.json"
       - "config/publisher-osis/frajnd-2024-inline-markup-research.json"
 
@@ -33,6 +35,7 @@ jobs:
           set -euo pipefail
           python -m unittest discover -s tests -p 'test_repair_osis_note_links.py' -v
           python -m unittest discover -s tests -p 'test_repair_osis_inline_markup.py' -v
+          python -m unittest discover -s tests -p 'test_repair_osis_source_bytes.py' -v
           python -m unittest discover -s tests -p 'test_publisher_osis_sword_candidate.py' -v
       - name: Install standard SWORD readback and pinned r3918 compiler prerequisites
         shell: bash
