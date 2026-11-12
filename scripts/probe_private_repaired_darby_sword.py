@@ -223,7 +223,7 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
             if result.returncode != 0 or len(result.stdout.strip()) < 15 or len(result.stdout) > 200000:
                 raise PrivateRepairedProbeError("Private SWORD text readback failed")
             smoke.append({"reference": reference, "reader_status": "readable"})
-        jsword_receipt = (run_pinned_jsword(andbible_jsword_dir, payload, scratch)
+        jsword_receipt = (run_pinned_jsword(andbible_jsword_dir, payload, scratch, final_verses)
                           if andbible_jsword_dir is not None else None)
         xiphos_receipt = None
         if xiphos_review_dir is not None:
