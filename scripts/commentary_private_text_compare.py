@@ -23,6 +23,7 @@ import zipfile
 from lxml import etree
 
 from commentary_intake import load_manifest
+from commentary_text_delta import punctuation_relationship, word_relationship
 from commentary_xml_witness import _parse_reference, WORK_REF, OSIS_LOC, xml_structure, MAX_XML
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
 from pilot_fetch import fetch
@@ -120,6 +121,11 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
     counters=Counter()
     issues=[]
     lexical_details=Counter()
+    punctuation_change_subtypes=Counter()
+    word_relationship_subtypes=Counter()
+    word_overlap_buckets=Counter()
+    bounded_priority_examples=[]
+    priority_example_counts=Counter()
     per_book={}
     tested=0
     for start,items in source.items():
@@ -155,10 +161,29 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
                     stock_tokens=re.findall(r"\w+",b)
                     if source_tokens==stock_tokens:
                         lexical_details["same_unicode_word_tokens_different_punctuation"]+=1
-                    elif [t.casefold() for t in source_tokens]==[t.casefold() for t in stock_tokens]:
-                        lexical_details["same_casefolded_word_tokens_different_case_or_punctuation"]+=1
+                        punctuation_change_subtypes[punctuation_relationship(a,b)]+=1
                     else:
-                        lexical_details["different_unicode_word_token_sequence_or_selection"]+=1
+                        if [t.casefold() for t in source_tokens]==[t.casefold() for t in stock_tokens]:
+                            lexical_details["same_casefolded_word_tokens_different_case_or_punctuation"]+=1
+                        else:
+                            lexical_details["different_unicode_word_token_sequence_or_selection"]+=1
+                        diagnostic=word_relationship(a,b)
+                        category=diagnostic["relationship"]
+                        word_relationship_subtypes[category]+=1
+                        word_overlap_buckets[diagnostic["overlap_bucket"]]+=1
+                        if priority_example_counts[category]<4:
+                            priority_example_counts[category]+=1
+                            bounded_priority_examples.append({
+                                "source_line":item["original_source_line"],
+                                "original_reference_sha256":item["original_full_reference_sha256"],
+                                "original_unicode_characters":item["original_characters"],
+                                "stock_raw_sha256":sha256(raw).hexdigest(),
+                                "original_word_token_count":diagnostic["original_word_token_count"],
+                                "stock_word_token_count":diagnostic["stock_word_token_count"],
+                                "shared_word_token_occurrences":diagnostic["shared_word_token_multiset_occurrences"],
+                                "relationship":category,
+                                "word_overlap_bucket":diagnostic["overlap_bucket"],
+                            })
             counters[status]+=1
             book_counts[status]+=1
             if status!="exact_unicode_text_match" and len(issues)<MAX_DIAGNOSTICS:
@@ -177,8 +202,24 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
         raise PilotError("Original commentary text status totals are inconsistent")
     if sum(lexical_details.values())!=counters["lexical_text_or_punctuation_difference"]:
         raise PilotError("Detailed text discrepancy census does not reconcile with every source body")
+    if sum(punctuation_change_subtypes.values())!=lexical_details["same_unicode_word_tokens_different_punctuation"]:
+        raise PilotError("Punctuation discrepancy subtotals do not account for all matching word sequences")
+    if sum(word_relationship_subtypes.values())!=(
+        lexical_details["same_casefolded_word_tokens_different_case_or_punctuation"]
+        +lexical_details["different_unicode_word_token_sequence_or_selection"]
+    ):
+        raise PilotError("Unequal-word relationships have incomplete full-corpus accounting")
+    if sum(word_overlap_buckets.values())!=sum(word_relationship_subtypes.values()):
+        raise PilotError("Word overlap ratio categories have incomplete accounting")
+    if len(bounded_priority_examples)>40:
+        raise PilotError("Private difference sample exceeds reviewed non-text bound")
     return {
         "source_verse_or_range_bodies_compared":tested,
+        "same_words_different_punctuation_subtypes":dict(sorted(punctuation_change_subtypes.items())),
+        "different_word_sequence_relationship_subtypes":dict(sorted(word_relationship_subtypes.items())),
+        "different_word_sequence_overlap_buckets":dict(sorted(word_overlap_buckets.items())),
+        "bounded_private_prioritized_hash_line_diagnostics":bounded_priority_examples,
+        "all_detailed_difference_diagnostics_are_research_only":True,
         "lexical_disagreement_classification":dict(sorted(lexical_details.items())),
         "disagreement_categories_are_only_exploratory_not_text_parity":True,
         "per_source_marker_text_diagnostic_counts":dict(sorted(counters.items())),
