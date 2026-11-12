@@ -74,7 +74,10 @@ jobs:
               errors=Counter(f"{e.domain_name}:{e.type_name}" for e in schema.error_log)
               result[key]={"official_xsd_valid":valid,
                            "error_type_counts":dict(sorted(errors.items())),
-                           "error_count":sum(errors.values())}
+                           "error_count":sum(errors.values()),
+                           "bounded_error_coordinates_only":[
+                               {"line":int(e.line),"xsd_error_type":e.type_name}
+                               for e in list(schema.error_log)[:12]]}
           before=Counter(result["original"]["error_type_counts"])
           after=Counter(result["proposed"]["error_type_counts"])
           if before:
