@@ -105,6 +105,15 @@ class CommentaryIntakeTests(unittest.TestCase):
         self.assertNotIn("SECRET ORIGINAL COMMENTARY", report)
         self.assertNotIn("SECRET READER TEXT", report)
         self.assertFalse(result["full_original_to_module_parity"])
+        # A reader can echo a verse label without returning an actual
+        # commentary entry. Such results cannot establish full coverage.
+        reader.write_text("#!/usr/bin/env python3\\nprint('Gen 1:1: ')\\n")
+        with patch("commentary_intake.fetch", side_effect=local_fetch):
+            short = inspect_resource("example-commentary", "observe",
+                                     directory=self.manifests, reader=str(reader))
+        self.assertFalse(short["reader_samples_all_present"])
+        self.assertEqual(short["reader_samples_needing_mapping_review"],
+                         ["Gen 1:1", "Ps 23:1"])
 
     def test_changed_archive_blocks_stage_two_without_repinning(self):
         value = copy.deepcopy(self.manifest)
