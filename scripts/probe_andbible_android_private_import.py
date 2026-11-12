@@ -260,6 +260,15 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
                    rendered_notes_verified=False)
         screenshots["09-after-process-relaunch"] = capture_png(
             evidence_dir/"09-after-process-relaunch.png")
+        # The stable APK may show its known upgrade dialog again on restart.
+        # Dismiss the exact observed action only; do not infer app state from it.
+        relaunch_controls=android_controls()
+        relaunch_dismissed=tap_allowlisted(
+            relaunch_controls,("DISMISS", "DISMISS UNTIL NEXT UPDATE"))
+        checkpoint("relaunch_announcement",dismissed=relaunch_dismissed is not None,
+                   persistent_module_identity_verified=False)
+        screenshots["10-after-relaunch-dialog"] = capture_png(
+            evidence_dir/"10-after-relaunch-dialog.png")
 
     # A successful ADB press does not establish a loaded translation; retain
     # that as a separate visual and Java/Android document validation gate.
