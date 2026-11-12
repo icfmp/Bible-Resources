@@ -1,0 +1,83 @@
+name: Compare commentary original reference anchors to stock SWORD (read-only)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/commentary-anchor-parity.yml'
+      - 'scripts/commentary_anchor_parity.py'
+      - 'scripts/commentary_xml_witness.py'
+      - 'scripts/commentary_native_inventory.py'
+      - 'scripts/sword_native_commentary_index.cpp'
+      - 'tests/test_commentary_anchor_parity.py'
+      - 'config/commentary-intake/**'
+  workflow_dispatch:
+    inputs:
+      resource_id:
+        description: "Reviewed source-neutral commentary intake ID"
+        type: string
+        required: true
+        default: mhcc-crosswire
+      probe_osis_key:
+        description: "Optional one fully-qualified OSIS verse to examine (diagnostic only)"
+        type: string
+        required: false
+        default: John.3.16
+permissions:
+  contents: read
+concurrency:
+  group: commentary-anchor-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  original_to_native_anchors:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      RESOURCE_ID: ${{ github.event.inputs.resource_id || 'mhcc-crosswire' }}
+      PROBE: ${{ github.event.inputs.probe_osis_key || 'John.3.16' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install source XML and stock SWORD reader dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev
+      - name: Build native metadata-only commentary key scanner
+        shell: bash
+        run: |
+          set -euo pipefail
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_index.cpp \
+            -o "${RUNNER_TEMP}/commentary-native-index" -lsword
+      - name: Compare complete original reference anchors to exact stock occupied keys
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_anchor_parity.py \
+            --resource-id "$RESOURCE_ID" \
+            --native-inspector "${RUNNER_TEMP}/commentary-native-index" \
+            --probe-osis-key "$PROBE" \
+            --report "${RUNNER_TEMP}/commentary-anchor-receipt.json"
+      - name: Keep only metadata-only hash and key diagnostic receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: commentary-anchor-mapping-receipt
+          path: ${{ runner.temp }}/commentary-anchor-receipt.json
+          if-no-files-found: warn
+          retention-days: 90
+      - name: Prevent premature source-fidelity or publication assertions
+        if: always()
+        run: |
+          {
+            echo '## Commentary original-to-SWORD reference mapping'
+            echo 'Complete source work-qualified section reference *starts* compared to stock occupied native keys.'
+            echo 'Actual commentary text, notes, quote order, section end boundaries, edits, licensing and release are NOT approved.'
+            echo 'A missing exact key may be an address/range convention, not automatically lost authorial text.'
+            echo 'No source text, original XML or binary module is uploaded.'
+          } >> "$GITHUB_STEP_SUMMARY"
