@@ -132,6 +132,33 @@ class StructuralTopologyTest(unittest.TestCase):
             "record_or_verse_zero_scope_differences_for_review"],2)
         self.assertNotIn("SECRET SOURCE WORD",json.dumps(result))
 
+    def test_independent_usfx_and_real_sword_fragment_parsers_cross_verse(self):
+        from test_source_native_word_boundaries import original, compiled
+        source,_source_counts=original()
+        native,_native_counts=compiled()
+        result=compare_structural_event_topology(source,native)
+        self.assertTrue(
+            result["all_source_native_p_q_open_close_event_topology_match"])
+        # The real native x-p milestone opens in 'Gen.1' intro, while
+        # original USFX opens at the same lexical place in a different
+        # source-between-verses scope. Never infer literal record identity.
+        self.assertFalse(result["source_native_exact_record_scope_verified"])
+        self.assertEqual(
+            result["status"],
+            "source_native_structural_topology_positions_equal_scope_review")
+        self.assertNotIn("PRIVATE TITLE",str(result))
+        self.assertNotIn("alpha",str(result))
+        early=(b'alpha <l sID="line"/>beta<l eID="line"/>'
+               b'<div type="x-p" eID="p1"/> gamma '
+               b'<div type="x-p" sID="p2"/>')
+        shifted,_counts=compiled(first=early)
+        negative=compare_structural_event_topology(source,shifted)
+        self.assertEqual(negative["status"],
+                         "source_native_structural_topology_differs")
+        self.assertGreater(negative[
+            "source_native_event_count_and_topology_categories"][
+            "closing_word_or_codepoint_position_differences"],0)
+
     def test_unsafe_reference_scope_or_private_word_not_disclosed(self):
         source=input_books()
         source["Gen"][1][0]["close"]=anchor(3,"PRIVATE NOTE CONTENT")
