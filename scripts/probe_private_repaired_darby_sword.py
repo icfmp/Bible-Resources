@@ -233,8 +233,9 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
                 note_popup_probes=(
                     # Review-only fixed coordinates from exact, visually
                     # inspected 1280x800 snapshots in Action #43176350700.
-                    ("leviticus-original-note-2", "Lev 8:15", 446, 349),
-                    ("romans-original-note-1", "Rom 16:25", 429, 445),
+                    ("leviticus-original-note-2", "Lev 8:15", 433, 353, None),
+                    ("romans-original-note-1", "Rom 16:25", 429, 445,
+                     (160, 558)),
                 ))
             xiphos_receipt["exact_candidate_zip_sha256"] = archive_metadata["zip_sha256"]
             xiphos_receipt["same_compiled_payload_as_native_audit"] = True
