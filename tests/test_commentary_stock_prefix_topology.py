@@ -21,7 +21,7 @@ class CommentaryStockPrefixTopologyTests(unittest.TestCase):
     def test_stock_prefix_separate_top_level_heading_before_source_paragraph(self):
         raw=b"<h3>Unverified stock heading </h3><p>Original body with <i>markup</i>.</p>"
         result=source_word_prefix_topology("Original body with markup!",raw)
-        self.assertEqual(result["unapproved_stock_extra_word_prefix_count"],4)
+        self.assertEqual(result["unapproved_stock_extra_word_prefix_count"],3)
         self.assertEqual(result["source_word_boundary_stock_top_level_owner"],"p")
         self.assertEqual(result["top_level_element_types_wholly_before_original_source_words"],
                          {"h3":1})
