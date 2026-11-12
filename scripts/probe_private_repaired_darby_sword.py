@@ -101,7 +101,8 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
           xiphos_review_dir: Path | None = None,
           andbible_jsword_dir: Path | None = None,
           andbible_android_apk: Path | None = None,
-          andbible_android_evidence_dir: Path | None = None) -> dict:
+          andbible_android_evidence_dir: Path | None = None,
+          attested_preview_export: Path | None = None) -> dict:
     original = read_pinned_publisher_osis("frajnd-2024")
     if sha(original) != SOURCE_HASH:
         raise PrivateRepairedProbeError("Exact publisher original source drifted")
@@ -287,6 +288,18 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
             xiphos_receipt["omitted_verse_note_behavior_visually_confirmed"] = False
         if sha(source_file.read_bytes()) != plain_note_receipt["new_research_candidate_sha256"]:
             raise PrivateRepairedProbeError("Private source mutated during compiler invocation")
+        export_receipt = None
+        if attested_preview_export is not None:
+            # Explicitly requested only by the separately owner-authorized
+            # release builder. Never use this in the normal PR research jobs.
+            # The research-identity ZIP is NOT a published module.
+            export_receipt = package_preview(
+                payload, attested_preview_export, MODULE, V11N)
+            if (export_receipt["status"] !=
+                    "exact_audited_source_bytes_packaged_for_reader_testing_only"
+                    or export_receipt["module_file_count"] != 7
+                    or export_receipt["all_module_files_byte_identical_to_audited_candidate"] is not True):
+                raise PrivateRepairedProbeError("Export does not reproduce full validated candidate")
     return {
         "schema_version": 1,
         "status": "repaired_osis_to_native_sword_full_text_notes_research_passed",
@@ -319,6 +332,7 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
         "andbible_stable_android_gui_import_attempt": android_receipt,
         "xiphos_exact_candidate_gui_probe": xiphos_receipt,
         "published_or_editorially_approved": False,
+        "attested_private_preview_export": export_receipt,
     }
 
 
@@ -335,7 +349,13 @@ def main():
                    help="Pinned official AndBible stable APK for disposable Android emulator")
     p.add_argument("--andbible-android-evidence-dir", type=Path,
                    help="Fresh separate directory for screenshots and sanitized Android UI state")
+    p.add_argument("--attested-preview-export", type=Path,
+                   help="Explicit, temporary output for approved release workflow only; NEVER uploaded by research CI")
     args = p.parse_args()
+    if args.attested_preview_export is not None and (
+            args.attested_preview_export.exists() or args.attested_preview_export.is_symlink()
+            or not args.attested_preview_export.parent.is_dir()):
+        p.error("Private preview export requires a new file in an existing private folder")
     if args.report.is_symlink() or args.report.exists() or not args.report.parent.is_dir():
         p.error("Output must be a fresh metadata-only report")
     report = probe(
@@ -345,7 +365,8 @@ def main():
         xiphos_review_dir=args.xiphos_review_dir,
         andbible_jsword_dir=args.andbible_jsword_dir,
         andbible_android_apk=args.andbible_android_apk,
-        andbible_android_evidence_dir=args.andbible_android_evidence_dir)
+        andbible_android_evidence_dir=args.andbible_android_evidence_dir,
+        attested_preview_export=args.attested_preview_export)
     args.report.write_text(json.dumps(report, indent=2, sort_keys=True)+"\n",
                            encoding="utf-8")
     print("Exact private repaired source/native reader gate passed; no release made")

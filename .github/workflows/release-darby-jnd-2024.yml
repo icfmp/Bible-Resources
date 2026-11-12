@@ -1,0 +1,191 @@
+name: Verify and release source-attested Darby JND 2024 0.1.0
+
+# PRs only verify in temporary storage. The single reviewed authorization
+# manifest added to main triggers a separate immutable publication.
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/release-darby-jnd-2024.yml"
+      - "config/darby-release-authorization.json"
+      - "config/darby-0.1.0.conf"
+      - "modules/darby-jnd-2024/**"
+      - "scripts/materialize_attested_ztext_release.py"
+      - "scripts/probe_private_repaired_darby_sword.py"
+  push:
+    branches: [main]
+    paths: ["config/darby-release-authorization.json"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  source-attested-release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    # PRs cannot access the protected Pages deployment environment.
+    # Reserve github-pages for the owner-approved main-branch transaction.
+    environment: ${{ github.event_name == 'pull_request' && 'darby-release-preflight' || 'github-pages' }}
+    env:
+      PYTHONPATH: scripts
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Require exact editorial authorization, reject release overwrite
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          approval=json.load(open('config/darby-release-authorization.json'))
+          assert approval['status']=='owner_authorized_for_stable_release_after_all_final_gates'
+          assert approval['owner_decision']=='https://github.com/icfmp/Bible-Resources/issues/133#issuecomment-6826689084'
+          assert approval['release_tag']=='darby-jnd-2024-0.1.0'
+          assert approval['published'] is False
+          PY
+          if [[ "${{ github.event_name }}" != "pull_request" ]]; then
+            if gh release view darby-jnd-2024-0.1.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+              echo 'Immutable release exists: do not replace'
+              exit 1
+            fi
+          fi
+      - name: Install standard SWORD reader and pinned CrossWire compiler prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          timeout 180s sudo apt-get -o Acquire::Retries=1 update -qq
+          timeout 240s sudo apt-get -o Acquire::Retries=1 install -y \
+            libsword-dev libsword-utils diatheke subversion cmake ninja-build \
+            zlib1g-dev libbz2-dev liblzma-dev libicu-dev libcurl4-openssl-dev unzip
+          python -m unittest discover -s tests -v
+          python scripts/validate.py
+      - name: Compile exact official CrossWire SWORD r3918 osis2mod
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/darby-stable" "$RUNNER_TEMP/darby-stable/schema"
+          svn export --non-interactive --quiet -r 3918 \
+            https://crosswire.org/svn/sword/trunk "$RUNNER_TEMP/darby-stable/sword-r3918"
+          cmake -S "$RUNNER_TEMP/darby-stable/sword-r3918" \
+            -B "$RUNNER_TEMP/darby-stable/sword-r3918-build" -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release -DSWORD_BUILD_UTILS=YES \
+            -DSWORD_BUILD_TESTS=NO -DSWORD_BUILD_EXAMPLES=NO
+          cmake --build "$RUNNER_TEMP/darby-stable/sword-r3918-build" \
+            --target osis2mod --parallel 4
+          compiler="$(find "$RUNNER_TEMP/darby-stable/sword-r3918-build" \
+            -type f -name osis2mod -perm /111 -print -quit)"
+          test -n "$compiler"
+          test -x "$compiler"
+          echo "PINNED_COMPILER=$compiler" >> "$GITHUB_ENV"
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_index.cpp \
+            -o "$RUNNER_TEMP/darby-stable/native-index" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_raw_corpus.cpp \
+            -o "$RUNNER_TEMP/darby-stable/native-raw" -lsword
+          python scripts/fetch_reviewed_schema.py \
+            --directory "$RUNNER_TEMP/darby-stable/schema"
+      - name: Rebuild full official BPC source and audit all verses, structures and notes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/probe_private_repaired_darby_sword.py \
+            --osis2mod "$PINNED_COMPILER" \
+            --native-index "$RUNNER_TEMP/darby-stable/native-index" \
+            --native-raw "$RUNNER_TEMP/darby-stable/native-raw" \
+            --diatheke "$(command -v diatheke)" \
+            --schema "$RUNNER_TEMP/darby-stable/schema/osisCore.2.1.1-cw-latest.xsd" \
+            --link-plan config/publisher-osis/frajnd-2024-note-link-research.json \
+            --inline-plan config/publisher-osis/frajnd-2024-inline-markup-research.json \
+            --attested-preview-export "$RUNNER_TEMP/darby-stable/private-source-audited.zip" \
+            --report "$RUNNER_TEMP/darby-stable/source-native-report.json"
+      - name: Promote reviewed bytes, verify complete stable SWORD index and source provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/materialize_attested_ztext_release.py \
+            --root "$GITHUB_WORKSPACE" \
+            --preview-zip "$RUNNER_TEMP/darby-stable/private-source-audited.zip" \
+            --source-audit "$RUNNER_TEMP/darby-stable/source-native-report.json" \
+            --approval config/darby-release-authorization.json \
+            --stable-conf config/darby-0.1.0.conf \
+            --native-index "$RUNNER_TEMP/darby-stable/native-index" \
+            --release-dir "$RUNNER_TEMP/darby-stable/release"
+          (cd "$RUNNER_TEMP/darby-stable/release" && sha256sum --check SHA256SUMS.txt)
+          python scripts/validate.py
+      - name: Build official catalogue; independently read and verify both Bible modules
+        shell: bash
+        run: |
+          set -euo pipefail
+          mv catalog/v1/catalog.json "$RUNNER_TEMP/darby-stable/old-catalogue.json"
+          python scripts/build.py --output dist --base-url https://icfmp.github.io/Bible-Resources/
+          cp dist/catalog/v1/catalog.json catalog/v1/catalog.json
+          python scripts/build.py --output dist --base-url https://icfmp.github.io/Bible-Resources/
+          python scripts/smoke.py
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          modules=json.loads(Path('dist/catalog/v1/catalog.json').read_text())['modules']
+          matches=[x for x in modules if x['sword_id']=='BRJND2024' and x['version']=='0.1.0']
+          assert len(matches)==1
+          assert len([x for x in modules if x['sword_id']=='BRLSG1910'])==1
+          pkg=Path('dist/sword/packages/BRJND2024.zip')
+          assert pkg.is_file()
+          assert matches[0]['download']['sha256']==hashlib.sha256(pkg.read_bytes()).hexdigest()
+          assert matches[0]['versification']=='Luther'
+          PY
+      - name: PR acceptance proof without release, upload or publication
+        if: github.event_name == 'pull_request'
+        run: echo "Private final package and catalogue verified. PR did not publish."
+      - name: Commit only independently verified stable module and catalogue
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          test "$(git rev-parse origin/main)" = "$GITHUB_SHA"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add modules/darby-jnd-2024 catalog/v1/catalog.json
+          git diff --cached --quiet && { echo 'Refusing unchanged release'; exit 1; }
+          git commit -m 'Publish owner-approved JND 2024 0.1.0 and native SWORD audit'
+          git push origin HEAD:main
+      - name: Publish immutable release archive and checksum
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create darby-jnd-2024-0.1.0 \
+            "$RUNNER_TEMP/darby-stable/release/BRJND2024-0.1.0.zip" \
+            "$RUNNER_TEMP/darby-stable/release/SHA256SUMS.txt" \
+            "$RUNNER_TEMP/darby-stable/release/SOURCE_AUDIT.json" \
+            "$RUNNER_TEMP/darby-stable/release/RELEASE_PROVENANCE.json" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title 'Bible J. N. Darby — BPC 2024, Bible Resources 0.1.0' \
+            --notes-file docs/releases/DARBY-JND-2024-0.1.0.md
+          gh release view darby-jnd-2024-0.1.0 --repo "$GITHUB_REPOSITORY"
+      - uses: actions/configure-pages@v5
+        if: github.event_name != 'pull_request'
+      - uses: actions/upload-pages-artifact@v4
+        if: github.event_name != 'pull_request'
+        with:
+          path: dist
+      - uses: actions/deploy-pages@v4
+        if: github.event_name != 'pull_request'
