@@ -51,7 +51,7 @@ class AndBiblePrivateImportUiTest(unittest.TestCase):
         controls=safe_controls(xml)
         self.assertEqual([c["label"] for c in controls],
                          ["DISMISS","DISMISS UNTIL NEXT UPDATE"])
-        with patch("probe_andbible_android_private_import.adb") as adb, \\
+        with patch("probe_andbible_android_private_import.adb") as adb, \
              patch("probe_andbible_android_private_import.time.sleep"):
             self.assertEqual(tap_allowlisted(controls,("DISMISS",)), "DISMISS")
             adb.assert_called_once()
