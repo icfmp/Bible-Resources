@@ -86,6 +86,13 @@ def tap_allowlisted(controls, ordered_labels):
     return None
 
 
+def relaunch_for_persistence():
+    """Restart the known official app without touching module files or reimporting."""
+    adb("shell","am","force-stop",PACKAGE,timeout=20)
+    adb("shell","monkey","-p",PACKAGE,"1",timeout=35)
+    time.sleep(12)
+
+
 def attempt_private_android_import(*, payload: Path, apk: Path,
                                    evidence_dir: Path, scratch: Path) -> dict:
     if (not apk.is_file() or apk.is_symlink()
@@ -235,10 +242,8 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
     # screenshot for subsequent human review, never automatic acceptance.
     relaunch_attempted=False
     if selected:
-        adb("shell","am","force-stop",PACKAGE,timeout=20)
-        adb("shell","monkey","-p",PACKAGE,"1",timeout=35)
+        relaunch_for_persistence()
         relaunch_attempted=True
-        time.sleep(12)
         checkpoint("andbible_process_relaunch",attempted=True,
                    persistent_module_identity_verified=False,
                    rendered_notes_verified=False)
