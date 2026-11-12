@@ -1,0 +1,149 @@
+name: Research exact source-bound OSIS note-link repairs (no release)
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/darby-link-repair-research.yml"
+      - "scripts/repair_osis_note_links.py"
+      - "tests/test_repair_osis_note_links.py"
+      - "config/publisher-osis/frajnd-2024-note-link-research.json"
+
+permissions:
+  contents: read
+
+jobs:
+  private-link-probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: scripts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install independent XML and audit dependencies only
+        run: python -m pip install -r requirements.txt
+      - name: Run synthetic guard regressions without any publisher source
+        run: python -m unittest discover -s tests -p 'test_repair_osis_note_links.py' -v
+      - name: Reacquire exactly pinned original publisher XML into private temporary directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/darby-private-link-probe"
+          python - <<'PY'
+          from pathlib import Path
+          import os
+          from publisher_osis_observation import read_pinned_publisher_osis
+          source = read_pinned_publisher_osis("frajnd-2024")
+          path = Path(os.environ["RUNNER_TEMP"]) / "darby-private-link-probe/original.xml"
+          path.write_bytes(source)
+          print("Reacquired exact pinned publisher OSIS privately; Bible text not logged")
+          PY
+        env:
+          PYTHONPATH: scripts
+      - name: Apply strictly bounded unapproved technical link proposal to distinct private output
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/repair_osis_note_links.py \
+            --source "$RUNNER_TEMP/darby-private-link-probe/original.xml" \
+            --plan config/publisher-osis/frajnd-2024-note-link-research.json \
+            --output "$RUNNER_TEMP/darby-private-link-probe/proposed.xml" \
+            --receipt "$RUNNER_TEMP/darby-private-link-probe/receipt.json"
+      - name: Compare exact official OSIS XSD conformance before and after without exposing source
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/fetch_reviewed_schema.py \
+            --directory "$RUNNER_TEMP/darby-private-link-probe/reviewed-schema"
+          python - <<'PY'
+          from collections import Counter
+          import json,os
+          from pathlib import Path
+          from guard_osis import _schema,parse_xml
+          root=Path(os.environ["RUNNER_TEMP"])/"darby-private-link-probe"
+          policy=json.loads(Path("config/osis-policy.json").read_text())
+          schema,_=_schema(policy,root/"reviewed-schema/osisCore.2.1.1-cw-latest.xsd")
+          result={}
+          for key,name in (("original","original.xml"),("proposed","proposed.xml")):
+              path=root/name
+              doc=parse_xml(path,path.read_bytes(),"XML_INPUT_NOT_WELL_FORMED")
+              valid=schema.validate(doc)
+              errors=Counter(f"{e.domain_name}:{e.type_name}" for e in schema.error_log)
+              def structural_context(line):
+                  # Emit only element TAG names and original book identifier,
+                  # never attributes/words, note text, or original XML fragments.
+                  node = None
+                  for candidate in doc.getroot().iter():
+                      if isinstance(candidate.tag,str) and candidate.sourceline <= line:
+                          node=candidate
+                  if node is None:
+                      return {"element_tag":"unavailable"}
+                  from lxml import etree
+                  book=next((n.get("osisID") for n in node.iterancestors()
+                             if n.tag.endswith("}div") and n.get("type")=="book"),None)
+                  return {
+                      "nearest_element_tag":etree.QName(node).localname,
+                      "parent_element_tag":etree.QName(node.getparent()).localname if node.getparent() is not None else "root",
+                      "book_osis_id":book,
+                      "child_tag_names":[etree.QName(ch).localname for ch in list(node)[:8]
+                                         if isinstance(ch.tag,str)],
+                      "attribute_names":sorted(etree.QName(a).localname for a in node.attrib),
+                  }
+              result[key]={"official_xsd_valid":valid,
+                           "error_type_counts":dict(sorted(errors.items())),
+                           "error_count":sum(errors.values()),
+                           "bounded_error_coordinates_only":[
+                               {"line":int(e.line),"xsd_error_type":e.type_name,
+                                "structure":structural_context(int(e.line))}
+                               for e in list(schema.error_log)[:12]]}
+          before=Counter(result["original"]["error_type_counts"])
+          after=Counter(result["proposed"]["error_type_counts"])
+          if before:
+              introduced=after-before
+              # Do not falsely bless the source: it was already nonconforming.
+              result["original_source_xsd_nonconformance_blocks_release"]=True
+              result["no_new_xsd_error_categories_or_counts"]=not bool(introduced)
+          else:
+              result["original_source_xsd_nonconformance_blocks_release"]=False
+              result["no_new_xsd_error_categories_or_counts"]=not bool(after)
+          result["schema_validation_is_publication_approval"]=False
+          (root/"schema-audit.json").write_text(json.dumps(result,sort_keys=True,indent=2)+"\n")
+          print("Pinned OSIS XSD validity and bounded error TYPE counts:",
+                json.dumps(result,sort_keys=True))
+          if not result["no_new_xsd_error_categories_or_counts"]:
+              raise SystemExit("Proposed XML introduces new official XSD errors")
+          PY
+      - name: Independently reject overclaiming or incomplete actual-original outcomes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"darby-private-link-probe"
+          report=json.loads((root/"receipt.json").read_text())
+          assert report["change_count"]==11
+          assert sum(x["action"]=="replace_target" for x in report["bounded_changes"])==8
+          assert sum(x["action"]=="disable_absent_target" for x in report["bounded_changes"])==3
+          assert report["all_original_text_and_whitespace_characters_preserved"] is True
+          assert report["all_original_element_tags_and_other_attributes_preserved"] is True
+          assert report["all_verse_keys_and_note_ordinals_preserved"] is True
+          assert report["original_overwritten"] is False
+          assert report["scripture_or_note_text_uploaded"] is False
+          assert report["editorial_or_release_approved"] is False
+          assert report["real_reader_navigation_tested"] is False
+          assert report["original_sha256"]=="2204629e3efb3024dceb392780ef5e61f4296ea832c90e3dd2a5c3224179c1d3"
+          print("All eleven source-bound link operations checked; no approved/public output")
+          PY
+      - name: Upload ONLY metadata receipt; never original or modified Scripture
+        uses: actions/upload-artifact@v4
+        with:
+          name: private-osis-link-repair-receipt-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/darby-private-link-probe/receipt.json
+            ${{ runner.temp }}/darby-private-link-probe/schema-audit.json
+          retention-days: 30
+          if-no-files-found: error
