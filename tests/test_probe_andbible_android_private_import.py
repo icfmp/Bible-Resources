@@ -50,6 +50,20 @@ class AndBiblePrivateImportUiTest(unittest.TestCase):
         labels=[x["label"] for x in safe_controls(xml)]
         self.assertEqual(labels,["JND2024REPAIRRESEARCH.ZIP","DOWNLOADS"])
 
+    def test_actual_android_recent_file_card_shortened_title_is_candidate(self):
+        # Recorded Pixel 4 DocumentsUI screenshot after pressing PROCEED:
+        # JND2024Repai... at 1.96 MB is the sole private uploaded ZIP.
+        xml="""<hierarchy>
+          <node text="Recent" bounds="[200,40][600,150]"/>
+          <node text="JND2024Repai…" bounds="[58,390][400,852]"/>
+          <node text="an unrelated.zip" bounds="[58,855][400,1250]"/>
+        </hierarchy>""".encode("utf-8")
+        controls=safe_controls(xml)
+        self.assertEqual(len(controls),1)
+        self.assertEqual(controls[0]["label"],"JND2024REPAIRRESEARCH.ZIP")
+        self.assertEqual(controls[0]["x"],229)
+        self.assertEqual(controls[0]["y"],621)
+
     def test_out_of_screen_or_invalid_xml_is_rejected_or_ignored(self):
         self.assertEqual(safe_controls(b"<notxml"),[])
         self.assertEqual(safe_controls(b"""<hierarchy>
