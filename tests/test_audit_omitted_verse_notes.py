@@ -67,7 +67,8 @@ class OmittedVerseNotesTest(unittest.TestCase):
 
     def test_no_silent_source_reference_or_note_body_modification(self):
         original,corrected,plan=sample()
-        wrong=corrected.replace(b"verse 14",b"verse 15")
+        wrong=corrected.replace(b"Earlier edition verse ",b"Earlier edition annotation ")
+        self.assertNotEqual(wrong,corrected)
         with self.assertRaises(OmittedNoteAuditError):
             source_cases(original,wrong,plan)
         bad=corrected.replace(b"<reference>37</reference>",
