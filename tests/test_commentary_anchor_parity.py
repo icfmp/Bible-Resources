@@ -64,7 +64,7 @@ class CommentaryAnchorParityTests(unittest.TestCase):
 
     def test_stock_book_without_explicit_source_marker_is_an_advisory_finding(self):
         original = self.xml(b'<scripCom osisRef="Bible:Gen.1.1"/>')
-        stock = self.native(b"K\\tGen.1.1\\nK\\tJude.1.1\\n", numbered=2)
+        stock = self.native(b"K\tGen.1.1\nK\tJude.1.1\n", numbered=2)
         result = compare_anchors(original, stock, "TestCom")
         self.assertEqual(result["stock_books_without_explicit_source_scripCom_markers"], ["Jude"])
         self.assertTrue(result["lack_of_source_marker_is_not_proof_of_missing_book_text"])
