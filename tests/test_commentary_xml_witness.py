@@ -119,6 +119,28 @@ class CommentaryXMLSourceTests(unittest.TestCase):
         self.assertEqual(result['source_direct_chapters_by_annotation_book_code']['Gen'], 2)
         self.assertEqual(result['source_div1_with_multiple_reference_book_codes'], [])
         self.assertNotIn('All original content remains', json.dumps(result))
+    def test_adjacent_original_commentary_body_mapping_is_diagnostic_not_parity(self):
+        marker = (
+            b"<scripCom osisRef='Bible:Gen.1.1-Gen.1.3'/>"
+            b"<div><p>Original punctuation, unchanged!</p></div>"
+            b"<scripCom osisRef='Bible:Gen.1.4'/>"
+            b"<h3>Unreviewed body attachment</h3>"
+        )
+        source = self.sample().replace(b"<div2 title='Chapter'>",
+                                       b"<div2 title='Chapter'>" + marker)
+        report = xml_structure(source)
+        self.assertEqual(report["verse_or_range_scripCom_markers_followed_immediately_by_div"],1)
+        self.assertEqual(report["verse_or_range_scripCom_markers_without_immediate_div"],1)
+        self.assertEqual(report["verse_or_range_immediate_divs_with_nonempty_original_text"],1)
+        self.assertEqual(report["verse_or_range_immediate_div_paragraph_elements"],1)
+        self.assertIn("work_qualified_same_book_verse_range:div",
+                      report["source_marker_next_sibling_element_by_ref_class"])
+        self.assertTrue(report["immediate_div_source_text_is_not_confirmed_stock_sword_entry"])
+        self.assertNotIn("Original punctuation", json.dumps(report))
+        changed = xml_structure(source.replace(b"unchanged!",b"unchanged?"))
+        self.assertNotEqual(report["verse_or_range_immediate_div_ordered_unmodified_text_sha256"],
+                            changed["verse_or_range_immediate_div_ordered_unmodified_text_sha256"])
+
     def test_original_xml_with_dtd_is_never_marked_schema_validated(self):
         raw = self.sample().replace(b"<ThML>", b'<!DOCTYPE ThML [<!ENTITY original "text">]><ThML>')
         result = xml_structure(raw)
