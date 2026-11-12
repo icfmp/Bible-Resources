@@ -1,0 +1,92 @@
+name: Verify corrected private Darby in real SWORD (no release)
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/darby-private-repaired-sword.yml"
+      - "scripts/probe_private_repaired_darby_sword.py"
+      - "scripts/repair_osis_note_links.py"
+      - "scripts/repair_osis_inline_markup.py"
+      - "config/publisher-osis/frajnd-2024-note-link-research.json"
+      - "config/publisher-osis/frajnd-2024-inline-markup-research.json"
+
+permissions:
+  contents: read
+
+jobs:
+  private-native-reader:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 32
+    env:
+      PYTHONPATH: scripts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install bounded source audit dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run established source-only technical repair tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p 'test_repair_osis_note_links.py' -v
+          python -m unittest discover -s tests -p 'test_repair_osis_inline_markup.py' -v
+          python -m unittest discover -s tests -p 'test_publisher_osis_sword_candidate.py' -v
+      - name: Install standard SWORD readback and pinned r3918 compiler prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 150s sudo apt-get -o Acquire::Retries=1 update -qq
+          timeout 180s sudo apt-get -o Acquire::Retries=1 install -y \
+            libsword-dev libsword-utils diatheke subversion cmake ninja-build \
+            zlib1g-dev libbz2-dev liblzma-dev libicu-dev libcurl4-openssl-dev
+          mkdir -p "$RUNNER_TEMP/darby-private-native"
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp \
+            -o "$RUNNER_TEMP/darby-private-native/native-index" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp \
+            -o "$RUNNER_TEMP/darby-private-native/native-raw" -lsword
+      - name: Build full exact upstream CrossWire SWORD r3918 osis2mod
+        shell: bash
+        run: |
+          set -euo pipefail
+          svn export --non-interactive --quiet -r 3918 \
+            https://crosswire.org/svn/sword/trunk "$RUNNER_TEMP/darby-private-native/sword-r3918"
+          cmake -S "$RUNNER_TEMP/darby-private-native/sword-r3918" \
+            -B "$RUNNER_TEMP/darby-private-native/sword-r3918-build" \
+            -G Ninja -DCMAKE_BUILD_TYPE=Release -DSWORD_BUILD_UTILS=YES \
+            -DSWORD_BUILD_TESTS=NO -DSWORD_BUILD_EXAMPLES=NO
+          cmake --build "$RUNNER_TEMP/darby-private-native/sword-r3918-build" \
+            --target osis2mod --parallel 4
+          compiler="$(find "$RUNNER_TEMP/darby-private-native/sword-r3918-build" \
+            -type f -name osis2mod -perm /111 -print -quit)"
+          test -n "$compiler"
+          test -x "$compiler"
+          echo "PINNED_COMPILER=$compiler" >> "$GITHUB_ENV"
+      - name: Verify exact official CrossWire OSIS schema
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/fetch_reviewed_schema.py \
+            --directory "$RUNNER_TEMP/darby-private-native/schema"
+      - name: Recreate private source and run whole-corpus native SWORD fidelity gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/probe_private_repaired_darby_sword.py \
+            --osis2mod "$PINNED_COMPILER" \
+            --native-index "$RUNNER_TEMP/darby-private-native/native-index" \
+            --native-raw "$RUNNER_TEMP/darby-private-native/native-raw" \
+            --diatheke "$(command -v diatheke)" \
+            --schema "$RUNNER_TEMP/darby-private-native/schema/osisCore.2.1.1-cw-latest.xsd" \
+            --link-plan config/publisher-osis/frajnd-2024-note-link-research.json \
+            --inline-plan config/publisher-osis/frajnd-2024-inline-markup-research.json \
+            --report "$RUNNER_TEMP/darby-private-native/report.json"
+      - name: Upload metadata only (never source, Bible, or module)
+        uses: actions/upload-artifact@v4
+        with:
+          name: darby-repaired-native-metadata-${{ github.run_id }}
+          path: ${{ runner.temp }}/darby-private-native/report.json
+          retention-days: 30
+          if-no-files-found: error
