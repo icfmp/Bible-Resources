@@ -170,6 +170,10 @@ def compare_anchors(original_xml: bytes, native_output: bytes, module_id: str,
         "distinct_original_anchors": len(same_ref_count),
         "duplicate_exact_ref_appearances": sum(v-1 for v in same_ref_count.values()),
         "source_books_missing_from_stock": sorted(source_books - set(index_proof["occupied_slots_by_book"])),
+        "stock_books_without_explicit_source_scripCom_markers": sorted(
+            set(index_proof["occupied_slots_by_book"]) - source_books
+        ),
+        "lack_of_source_marker_is_not_proof_of_missing_book_text": True,
         "explicit_verse_probes": known_probes,
         "section_range_boundaries_verified": False,
         "authored_source_to_compiled_text_parity": text_body_checked,
