@@ -38,7 +38,12 @@ def sample():
     ]
     corrected=original
     for _host,target in mapping:
-        corrected=corrected.replace(b" osisRef='"+target.encode()+b"'",b"")
+        original_open=b"<reference osisRef='"+target.encode()+b"'>"
+        if original_open not in corrected:
+            raise AssertionError("Missing synthetic target")
+        corrected=corrected.replace(
+            original_open,b"<seg type='x-unlinked-reference'>",1)
+        corrected=corrected.replace(b"</reference>",b"</seg>",1)
     plan={"edits":[{"note_host":host,"note_index":1,
                    "old_target":target, "new_target":None,
                    "action":"disable_absent_target"}
@@ -71,11 +76,11 @@ class OmittedVerseNotesTest(unittest.TestCase):
         self.assertNotEqual(wrong,corrected)
         with self.assertRaises(OmittedNoteAuditError):
             source_cases(original,wrong,plan)
-        bad=corrected.replace(b"<reference>37</reference>",
+        bad=corrected.replace(b"<seg type='x-unlinked-reference'>37</seg>",
                               b"<reference osisRef='Acts.8.37'>37</reference>")
         with self.assertRaises(OmittedNoteAuditError):
             source_cases(original,bad,plan)
-        bad=corrected.replace(b">34</reference>",b">35</reference>")
+        bad=corrected.replace(b">34</seg>",b">35</seg>")
         with self.assertRaises(OmittedNoteAuditError):
             source_cases(original,bad,plan)
 
@@ -92,7 +97,9 @@ class OmittedVerseNotesTest(unittest.TestCase):
             native_cases(cases,corrected,native)
         native=native_frames(corrected)
         note=etree.fromstring(native["Matt.23.13"])
-        link=next(n for n in note.iter() if etree.QName(n).localname=="reference")
+        link=next(n for n in note.iter() if etree.QName(n).localname=="seg")
+        link.tag="{http://www.bibletechnologies.net/2003/OSIS/namespace}reference"
+        link.attrib.clear()
         link.set("osisRef","Matt.23.14")
         native["Matt.23.13"]=etree.tostring(note)
         with self.assertRaises(OmittedNoteAuditError):

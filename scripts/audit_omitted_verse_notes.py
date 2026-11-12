@@ -62,28 +62,34 @@ def source_cases(original: bytes, corrected: bytes, plan: dict):
             raise OmittedNoteAuditError("Duplicated or unreviewed missing-target operation")
         old = _one_host_note(orig_notes, edit)
         fixed = _one_host_note(fixed_notes, edit)
-        prior = _reference_children(old)
-        after = _reference_children(fixed)
-        if len(prior) != len(after) or len(prior) < 1:
-            raise OmittedNoteAuditError("Original reference markup changed count")
-        matches = [i for i,n in enumerate(prior)
-                   if n.get("osisRef") == old_target]
-        if len(matches) != 1:
-            raise OmittedNoteAuditError("Missing or ambiguous original broken target")
-        selected = after[matches[0]]
-        if (selected.get("osisRef") is not None
-                or any("href" in k.lower() or "target" in k.lower()
-                       for k in selected.attrib)):
-            raise OmittedNoteAuditError("Dead destination still active in source")
-        if (not _text(selected).strip()
-                or _text(selected) != _text(prior[matches[0]])
-                or _text(old) != _text(fixed)
+        # Removing only the osisRef left an underlined, apparently live link
+        # in actual AndBible 5.1. The reference wrapper must also become a
+        # plain OSIS segment, with *all* original printed text and note
+        # markers unchanged. Verify every other element and attribute.
+        prior = [n for n in old.iterdescendants() if isinstance(n.tag, str)]
+        after = [n for n in fixed.iterdescendants() if isinstance(n.tag, str)]
+        matches = [i for i, n in enumerate(prior)
+                   if n.tag == OSIS + "reference" and n.get("osisRef") == old_target]
+        if len(prior) != len(after) or len(matches) != 1:
+            raise OmittedNoteAuditError("Original note markup count or target changed")
+        selected_index = matches[0]
+        for i, (before_node, after_node) in enumerate(zip(prior, after)):
+            if (before_node.text, before_node.tail) != (
+                    after_node.text, after_node.tail):
+                raise OmittedNoteAuditError("Original note characters or tails changed")
+            if i == selected_index:
+                if (dict(before_node.attrib) != {"osisRef": old_target}
+                        or after_node.tag != OSIS + "seg"
+                        or dict(after_node.attrib) != {"type": "x-unlinked-reference"}
+                        or not _text(after_node).strip()):
+                    raise OmittedNoteAuditError("Absent target not rendered as plain text")
+            elif (before_node.tag != after_node.tag
+                  or dict(before_node.attrib) != dict(after_node.attrib)):
+                raise OmittedNoteAuditError("Unreviewed original note markup modification")
+        if (_text(old) != _text(fixed)
                 or old.get("n") != fixed.get("n")
                 or old.get("type") != fixed.get("type")):
-            raise OmittedNoteAuditError("Authored explanatory text or note caller changed")
-        if (len(_reference_children(old)) != len(_reference_children(fixed))
-                or sum(1 for n in after if n.get("osisRef") == old_target)):
-            raise OmittedNoteAuditError("Unreviewed link markup difference")
+            raise OmittedNoteAuditError("Original note text or caller changed")
         results[key] = {
             "host": host,
             "note_index": edit["note_index"],
@@ -92,6 +98,7 @@ def source_cases(original: bytes, corrected: bytes, plan: dict):
             "source_original_reference_display_text_equal": True,
             "source_broken_machine_target_removed": True,
             "displayed_reference_not_erased": True,
+            "plain_nonhyperlink_source_markup_verified": True,
         }
     return results
 
@@ -115,7 +122,7 @@ def native_cases(source_results: dict, corrected: bytes, native_raw_by_host: dic
             raise OmittedNoteAuditError("Compiled authorial explanatory note changed")
         if source_status["original_absent_verse_target"] in selected["targets"]:
             raise OmittedNoteAuditError("Compiled note still exposes absent target")
-        # Native SWORD may flatten an unlinked <reference> into plain text.
+        # Native SWORD must flatten the explicit plain <seg> into note prose.
         # The complete note body equality proves its printed words survive.
         output.append({
             "host": host,

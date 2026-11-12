@@ -19,6 +19,7 @@ from publisher_osis_observation import read_pinned_publisher_osis
 from repair_osis_note_links import propose as propose_links
 from repair_osis_inline_markup import propose as propose_inline
 from repair_osis_source_bytes import patch_exact_original
+from repair_osis_unlinked_reference_labels import render_absent_references_plain
 from audit_omitted_verse_notes import source_cases, native_cases
 from probe_andbible_jsword import run_pinned_jsword
 from probe_andbible_android_private_import import attempt_private_android_import
@@ -114,9 +115,17 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
         raise PrivateRepairedProbeError("Research inline source fingerprint disagrees")
     # osis2mod r3918 dropped four Psalm 150 poetry markers from an lxml-only
     # roundtrip (the original bytes passed). Preserve original serialization.
-    corrected, lexical_receipt = patch_exact_original(original, a, b)
+    corrected_raw, lexical_receipt = patch_exact_original(original, a, b)
     if not lexical_receipt["all_unedited_original_bytes_identical"]:
         raise PrivateRepairedProbeError("Unexpected lexical change in publisher bytes")
+    # A stripped osisRef still renders as an underlined link in AndBible if the
+    # authorial <reference> element remains. Preserve each printed character
+    # and remove only the misleading tag semantics in a separate reversible
+    # research overlay. Original BPC OSIS and the 11-link repair stay pinned.
+    corrected, plain_note_receipt = render_absent_references_plain(
+        original, corrected_raw, a)
+    if plain_note_receipt["explicit_plain_label_count"] != 3:
+        raise PrivateRepairedProbeError("Omitted-verse plain-label conversion incomplete")
     original_keys, original_index = source_inventory(original)
     corrected_keys, corrected_index = source_inventory(corrected)
     if original_keys != corrected_keys or corrected_index["source_verse_count"] != 31166:
@@ -276,7 +285,7 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
             xiphos_receipt["independent_screenshot_pixels_reviewed"] = False
             xiphos_receipt["corrected_reference_clicks_visually_confirmed"] = False
             xiphos_receipt["omitted_verse_note_behavior_visually_confirmed"] = False
-        if sha(source_file.read_bytes()) != lexical_receipt["candidate_sha256"]:
+        if sha(source_file.read_bytes()) != plain_note_receipt["new_research_candidate_sha256"]:
             raise PrivateRepairedProbeError("Private source mutated during compiler invocation")
     return {
         "schema_version": 1,
@@ -285,6 +294,9 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
         "private_link_repaired_sha256": LINK_SHA,
         "private_canonical_xml_research_sha256": REPAIRED_SHA,
         "private_original_serialization_preserving_osis_sha256": lexical_receipt["candidate_sha256"],
+        "private_plain_omitted_reference_osis_sha256": plain_note_receipt["new_research_candidate_sha256"],
+        "plain_nonhyperlink_omission_label_count": plain_note_receipt["explicit_plain_label_count"],
+        "original_note_display_text_preserved_by_plain_overlay": plain_note_receipt["all_original_characters_preserved"],
         "original_unedited_osis_bytes_preserved": True,
         "reviewed_byte_patch_inventory": lexical_receipt["approved_byte_span_changes_only"],
         "official_crosswire_schema_sha256": schema_sha,
