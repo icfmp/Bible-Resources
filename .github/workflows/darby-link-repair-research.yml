@@ -34,9 +34,9 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_repair_osis_note_links.py' -v
       - name: Test bounded note markup shape diagnostics
         run: python -m unittest discover -s tests -p 'test_source_osis_note_markup_shape.py' -v
-      - name: Reacquire exactly pinned original publisher XML into private temporary directory
       - name: Test fail-closed inline markup corrections
         run: python -m unittest discover -s tests -p 'test_repair_osis_inline_markup.py' -v
+      - name: Reacquire exactly pinned original publisher XML into private temporary directory
         shell: bash
         run: |
           set -euo pipefail
@@ -68,7 +68,6 @@ jobs:
             --plan config/publisher-osis/frajnd-2024-note-link-research.json \
             --output "$RUNNER_TEMP/darby-private-link-probe/proposed.xml" \
             --receipt "$RUNNER_TEMP/darby-private-link-probe/receipt.json"
-      - name: Compare exact official OSIS XSD conformance before and after without exposing source
       - name: Propose independent private inline OSIS markup fix on exact link-corrected source
         shell: bash
         run: |
@@ -78,6 +77,7 @@ jobs:
             --plan config/publisher-osis/frajnd-2024-inline-markup-research.json \
             --output "$RUNNER_TEMP/darby-private-link-probe/inline-corrected.xml" \
             --report "$RUNNER_TEMP/darby-private-link-probe/inline-receipt.json"
+      - name: Compare exact official OSIS XSD conformance before and after without exposing source
         shell: bash
         run: |
           set -euo pipefail
@@ -143,7 +143,6 @@ jobs:
                                for e in list(schema.error_log)[:12]]}
           assert result["inline_corrected"]["official_xsd_valid"], "Private markup probe must satisfy pinned CrossWire XSD"
           before=Counter(result["original"]["error_type_counts"])
-          before=Counter(result["original"]["error_type_counts"])
           after=Counter(result["proposed"]["error_type_counts"])
           if before:
               introduced=after-before
@@ -189,7 +188,6 @@ jobs:
           path: |
             ${{ runner.temp }}/darby-private-link-probe/receipt.json
             ${{ runner.temp }}/darby-private-link-probe/schema-audit.json
-            ${{ runner.temp }}/darby-private-link-probe/markup-shape.json
             ${{ runner.temp }}/darby-private-link-probe/markup-shape.json
             ${{ runner.temp }}/darby-private-link-probe/inline-receipt.json
           retention-days: 30
