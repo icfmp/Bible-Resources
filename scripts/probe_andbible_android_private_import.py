@@ -28,7 +28,7 @@ SAFE_UI = frozenset({
     "JND2024REPAIRRESEARCH.ZIP", "ALLOW", "WHILE USING THE APP",
     "INSTALL", "IMPORT", "OK", "OPEN", "CONTINUE", "DONE", "CLOSE",
     "USE THIS FOLDER", "GRANT ACCESS", "SELECT", "NEXT", "PROCEED",
-    "DISMISS", "DISMISS UNTIL NEXT UPDATE",
+    "DISMISS", "DISMISS UNTIL NEXT UPDATE", "WAIT",
 })
 
 
@@ -133,6 +133,17 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
     screenshots["01-startup"]=capture_png(evidence_dir/"01-andbible-startup.png")
 
     controls=android_controls()
+    # Android emulator sometimes surfaces a Pixel Launcher ANR above an otherwise
+    # ready AndBible first-run screen. Choose only its observed WAIT control;
+    # never close a system process or blindly tap the obscured application.
+    system_waits=0
+    while any(c["label"] == "WAIT" for c in controls) and system_waits < 3:
+        tap_allowlisted(controls,("WAIT",))
+        system_waits+=1
+        time.sleep(5)
+        controls=android_controls()
+    checkpoint("android_system_wait_recovery",attempts=system_waits,
+               startup_controls_recovered=any(c["label"] == "LOAD DOCUMENTS FROM FILES" for c in controls))
     first_labels=sorted({c["label"] for c in controls})
     checkpoint("official_initial_startup_ui",safe_control_labels=first_labels)
     chosen=tap_allowlisted(controls,("LOAD DOCUMENTS FROM FILES",
@@ -236,5 +247,9 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
     }
     (evidence_dir/"safe-report.json").write_text(
         json.dumps(result,sort_keys=True,indent=2)+"\n",encoding="utf-8")
-    print("Pinned AndBible Android candidate import UI attempted; no publication/visual claims")
+    if not (chosen and proceeded and selected):
+        raise AndroidDarbyImportError(
+            "Android UI import path incomplete: see safe-report.json and screenshots; "
+            "the workflow must not report a green import attempt")
+    print("Pinned AndBible Android private ZIP selected; GUI approval still pending")
     return result
