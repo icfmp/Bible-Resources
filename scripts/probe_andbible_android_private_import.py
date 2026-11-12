@@ -13,6 +13,7 @@ from pathlib import Path
 from urllib.parse import urlencode
 import re
 import subprocess
+import struct
 import time
 import xml.etree.ElementTree as ET
 
@@ -110,6 +111,24 @@ def open_documented_reference_probe(reference: str) -> None:
     adb("shell", "am", "start", "-a", "android.intent.action.VIEW",
         "-d", uri, "-p", PACKAGE, timeout=25, fail=False)
     time.sleep(7)
+
+
+def probe_observed_note_marker(screen: Path):
+    """Research-only click on a manually verified original note glyph.
+
+    The exact screenshot from Android run 43217039917, artifact 13944147727,
+    12-documented-reference-attempt.png (SHA-256
+    a191e1e7e5447701245c54fda902b4f01a1971342c16d88b22ea9ca443d5712e)
+    displays the Rom.16.25 note 'b' at (823,1425) on 1080x2280 AOSP Pixel 4.
+    This is a bounded *visual experiment*, not a generic coordinate rule,
+    note text verification, or permission to publish.
+    """
+    data=screen.read_bytes()
+    if (len(data) < 24 or data[:8] != b"\\x89PNG\\r\\n\\x1a\\n"
+            or struct.unpack(">II", data[16:24]) != (1080, 2280)):
+        raise AndroidDarbyImportError("Unexpected AndBible reader screenshot geometry")
+    adb("shell","input","tap","823","1425",timeout=12)
+    time.sleep(4)
 
 
 def relaunch_for_persistence():
@@ -297,6 +316,15 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
                        note_popup_verified=False)
             key=f"{index:02d}-documented-reference-attempt"
             screenshots[key] = capture_png(evidence_dir/(key+".png"))
+        # Only the last verified screen displays Rom 16:25, note caller b.
+        # Trigger precisely that manually witnessed marker geometry and
+        # independently inspect the resulting real UI; never auto-certify it.
+        probe_observed_note_marker(evidence_dir/"12-documented-reference-attempt.png")
+        checkpoint("romans_note_caller_visual_probe",
+                   probe="observed_Rom.16.25_original_b",
+                   note_popup_verified=False, repaired_link_click_verified=False)
+        screenshots["13-romans-note-marker-probe"] = capture_png(
+            evidence_dir/"13-romans-note-marker-probe.png")
 
     # A successful ADB press does not establish a loaded translation; retain
     # that as a separate visual and Java/Android document validation gate.
@@ -319,6 +347,7 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
         "andbible_process_relaunch_attempted":relaunch_attempted,
         "andbible_documented_reference_intent_attempted":relaunch_attempted,
         "andbible_documented_reference_navigation_verified":False,
+        "andbible_romans_original_note_popup_verified":False,
         "andbible_persistent_module_identity_verified":False,
         "andbible_import_verified":imported_by_app,
         "andbible_rendered_text_and_notes_verified":False,
