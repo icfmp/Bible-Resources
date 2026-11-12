@@ -23,8 +23,10 @@ MAX_EVENTS = 150_000
 MAX_WORDS = 250_000
 MAX_SAMPLES = 12
 BOOK = re.compile(r"^[1-4]?[A-Za-z][A-Za-z0-9]{0,14}$")
+# SWORD native intro identifiers may be Book or Book.Chapter;
+# numbered entries include Book.Chapter.Verse and source verse-zero records.
 REFERENCE = re.compile(
-    r"^[1-4]?[A-Za-z][A-Za-z0-9]{0,14}\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)$")
+    r"^[1-4]?[A-Za-z][A-Za-z0-9]{0,14}(?:\.0\.0|\.[1-9][0-9]*(?:\.(?:0|[1-9][0-9]*))?)?$")
 SCOPES = {"numbered", "source_between_verses", "native_intro"}
 STRUCTURE = {"p", "q"}
 
@@ -44,7 +46,8 @@ def _anchor(anchor: dict, book: str, word_count: int) -> tuple[int, int, str, st
             or type(anchor.get("inside_word")) is not bool
             or anchor["inside_word"]
             or not isinstance(ref, str) or not REFERENCE.fullmatch(ref)
-            or not ref.startswith(book + ".") or scope not in SCOPES):
+            or not (ref == book or ref.startswith(book + "."))
+            or scope not in SCOPES):
         raise StructureTopologyError("Invalid private structural anchor")
     return word, codepoint, ref, scope
 
