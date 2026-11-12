@@ -356,14 +356,6 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
                        note_popup_verified=False)
             key=f"{index:02d}-documented-reference-attempt"
             screenshots[key] = capture_png(evidence_dir/(key+".png"))
-            probe_observed_omitted_host_caller(evidence_dir/(key+".png"), reference)
-            checkpoint("android_omitted_verse_note_popup_visual_probe",
-                       host=reference, note_popup_verified=False,
-                       missing_verse_dead_link_verified=False)
-            screenshots[key+"-note"] = capture_png(
-                evidence_dir/(key+"-note.png"))
-            adb("shell","input","keyevent","KEYCODE_BACK",timeout=12)
-            time.sleep(2)
         # Only the last verified screen displays Rom 16:25, note caller b.
         # Trigger precisely that manually witnessed marker geometry and
         # independently inspect the resulting real UI; never auto-certify it.
@@ -389,6 +381,14 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
                        omitted_note_popup_verified=False)
             key=f"{index:02d}-omitted-verse-host"
             screenshots[key] = capture_png(evidence_dir/(key+".png"))
+            probe_observed_omitted_host_caller(evidence_dir/(key+".png"), reference)
+            checkpoint("android_omitted_verse_note_popup_visual_probe",
+                       host=reference, note_popup_verified=False,
+                       missing_verse_dead_link_verified=False)
+            screenshots[key+"-note"] = capture_png(
+                evidence_dir/(key+"-note.png"))
+            adb("shell","input","keyevent","KEYCODE_BACK",timeout=12)
+            time.sleep(2)
 
     # A successful ADB press does not establish a loaded translation; retain
     # that as a separate visual and Java/Android document validation gate.
