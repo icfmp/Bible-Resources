@@ -9,6 +9,7 @@ from __future__ import annotations
 from pathlib import Path
 import json
 import os
+import re
 import shutil
 import subprocess
 import xml.etree.ElementTree as ET
@@ -23,7 +24,8 @@ class AndBibleJSwordProbeError(ValueError):
     """Untrusted engine revision, missing native data or failing Java test."""
 
 
-def run_pinned_jsword(jsword: Path, payload: Path, scratch: Path) -> dict:
+def run_pinned_jsword(jsword: Path, payload: Path, scratch: Path,
+                      authored_osis_keys) -> dict:
     repo = jsword.resolve(strict=True)
     module_root = payload.resolve(strict=True)
     if (not repo.is_dir() or jsword.is_symlink() or
@@ -50,6 +52,14 @@ def run_pinned_jsword(jsword: Path, payload: Path, scratch: Path) -> dict:
         raise AndBibleJSwordProbeError("Refusing to overwrite upstream JSword test")
     shutil.copyfile(upstream_test, target)
 
+    keys = tuple(authored_osis_keys)
+    if (len(keys) != 31166 or len(set(keys)) != len(keys)
+            or any(not isinstance(k, str)
+                   or not re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9][0-9]*\\.[1-9][0-9]*", k)
+                   for k in keys)):
+        raise AndBibleJSwordProbeError("Authorial source-only key manifest is not validated")
+    key_file = scratch / "private-original-osis-keys.txt"
+    key_file.write_text("\\n".join(keys) + "\\n", encoding="ascii")
     private_home = scratch / "jsword-private-home"
     private_home.mkdir()
     gradle_home = scratch / "jsword-gradle-cache"
@@ -57,6 +67,7 @@ def run_pinned_jsword(jsword: Path, payload: Path, scratch: Path) -> dict:
     log = scratch / "jsword-gradle-private.log"
     env = dict(os.environ,
                DARBY_JSWORD_MODULE_ROOT=str(module_root),
+               DARBY_JSWORD_ORIGINAL_KEYS=str(key_file),
                DARBY_JSWORD_PRIVATE_HOME=str(private_home),
                GRADLE_USER_HOME=str(gradle_home),
                JAVA_TOOL_OPTIONS="-Duser.home=" + str(private_home),
@@ -89,6 +100,12 @@ def run_pinned_jsword(jsword: Path, payload: Path, scratch: Path) -> dict:
         skipped = int(report.attrib.get("skipped", "0"))
     except (ET.ParseError, ValueError, KeyError) as exc:
         raise AndBibleJSwordProbeError("Malformed AndBible JSword JUnit metadata") from exc
+    scope_diagnostics = {}
+    test_stdout = report.findtext("system-out", default="")
+    for label in ("CARDINALITY", "EXTRA_POPULATED", "EMPTY_NOMINAL_SLOTS"):
+        match = re.search(r"JSWORD_SCOPE_" + label + r"=(\\d{1,7})", test_stdout)
+        if match:
+            scope_diagnostics[label.lower()] = int(match.group(1))
     failed_names = [
         x.get("name", "unknown") for x in report.findall("testcase")
         if x.find("failure") is not None or x.find("error") is not None
@@ -99,7 +116,8 @@ def run_pinned_jsword(jsword: Path, payload: Path, scratch: Path) -> dict:
         print("AndBible JSword safe JUnit categories only:",
               json.dumps({"exit_success": process.returncode == 0,
                           "count": total, "failures": failures, "errors": errors,
-                          "skipped": skipped, "failed_test_names": failed_names[:5]},
+                          "skipped": skipped, "failed_test_names": failed_names[:5],
+                          "scope_counts_only": scope_diagnostics},
                          sort_keys=True))
         raise AndBibleJSwordProbeError("Independent stable AndBible JSword gate did not pass")
     return {
@@ -109,6 +127,8 @@ def run_pinned_jsword(jsword: Path, payload: Path, scratch: Path) -> dict:
         "java_test_count": total,
         "java_test_failures": failures,
         "java_test_skipped": skipped,
+        "all_31166_authored_keys_queried_via_jsword_contains": True,
+        "scope_semantics_diagnostics": scope_diagnostics,
         "actual_private_module_identity": MODULE,
         "actual_module_used_was_native_fidelity_audited": True,
         "android_gui_installed_or_tested": False,
