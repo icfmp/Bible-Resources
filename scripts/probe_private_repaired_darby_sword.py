@@ -18,6 +18,7 @@ import tempfile
 from publisher_osis_observation import read_pinned_publisher_osis
 from repair_osis_note_links import propose as propose_links
 from repair_osis_inline_markup import propose as propose_inline
+from repair_osis_source_bytes import patch_exact_original
 from publisher_osis_sword_candidate import (
     _candidate_result, _compile_osis, _create_candidate_layout, _read_native_frames,
 )
@@ -99,9 +100,14 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
     link, link_result = propose_links(original, a)
     if sha(link) != LINK_SHA or link_result["change_count"] != 11:
         raise PrivateRepairedProbeError("Research link source fingerprint disagrees")
-    corrected, inline_result = propose_inline(link, b)
-    if sha(corrected) != REPAIRED_SHA or inline_result["edit_count"] != 2:
+    canonical_full, inline_result = propose_inline(link, b)
+    if sha(canonical_full) != REPAIRED_SHA or inline_result["edit_count"] != 2:
         raise PrivateRepairedProbeError("Research inline source fingerprint disagrees")
+    # osis2mod r3918 dropped four Psalm 150 poetry markers from an lxml-only
+    # roundtrip (the original bytes passed). Preserve original serialization.
+    corrected, lexical_receipt = patch_exact_original(original, a, b)
+    if not lexical_receipt["all_unedited_original_bytes_identical"]:
+        raise PrivateRepairedProbeError("Unexpected lexical change in publisher bytes")
     original_keys, original_index = source_inventory(original)
     corrected_keys, corrected_index = source_inventory(corrected)
     if original_keys != corrected_keys or corrected_index["source_verse_count"] != 31166:
@@ -199,14 +205,17 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
             if result.returncode != 0 or len(result.stdout.strip()) < 15 or len(result.stdout) > 200000:
                 raise PrivateRepairedProbeError("Private SWORD text readback failed")
             smoke.append({"reference": reference, "reader_status": "readable"})
-        if sha(source_file.read_bytes()) != REPAIRED_SHA:
+        if sha(source_file.read_bytes()) != lexical_receipt["candidate_sha256"]:
             raise PrivateRepairedProbeError("Private source mutated during compiler invocation")
     return {
         "schema_version": 1,
         "status": "repaired_osis_to_native_sword_full_text_notes_research_passed",
         "publisher_original_sha256": SOURCE_HASH,
         "private_link_repaired_sha256": LINK_SHA,
-        "private_full_repaired_osis_sha256": REPAIRED_SHA,
+        "private_canonical_xml_research_sha256": REPAIRED_SHA,
+        "private_original_serialization_preserving_osis_sha256": lexical_receipt["candidate_sha256"],
+        "original_unedited_osis_bytes_preserved": True,
+        "reviewed_byte_patch_inventory": lexical_receipt["approved_byte_span_changes_only"],
         "official_crosswire_schema_sha256": schema_sha,
         "source_key_count": 31166,
         "source_note_count": 6340,
