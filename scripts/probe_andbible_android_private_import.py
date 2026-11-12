@@ -124,7 +124,7 @@ def probe_observed_note_marker(screen: Path):
     note text verification, or permission to publish.
     """
     data=screen.read_bytes()
-    if (len(data) < 24 or data[:8] != b"\\x89PNG\\r\\n\\x1a\\n"
+    if (len(data) < 24 or data[:8] != bytes.fromhex("89504e470d0a1a0a")
             or struct.unpack(">II", data[16:24]) != (1080, 2280)):
         raise AndroidDarbyImportError("Unexpected AndBible reader screenshot geometry")
     adb("shell","input","tap","823","1425",timeout=12)
