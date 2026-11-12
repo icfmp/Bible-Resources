@@ -67,7 +67,7 @@ class CommentaryStockPrefixTopologyTests(unittest.TestCase):
             b"<?xml version='1.0' encoding='UTF-8'?>"
             b"<ThML><div1><div2>"
             b"<scripCom osisRef='Bible:Gen.1.1'/><div><p>Original body!</p></div>"
-            b"<scripCom osisRef='Bible:Gen.1.2'/><div><p>Next – sentence.</p></div>"
+            b"<scripCom osisRef='Bible:Gen.1.2'/><div><p>Next \xe2\x80\x93 sentence.</p></div>"
             b"</div2></div1></ThML>"+b" " * 1100
         )
         units,_=_original_source_markers(source)
