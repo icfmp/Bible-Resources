@@ -14,6 +14,7 @@ from collections import Counter
 from hashlib import sha256
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import tempfile
@@ -118,6 +119,7 @@ def raw_as_strict_xml_text(raw: bytes) -> str | None:
 def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) -> dict:
     counters=Counter()
     issues=[]
+    lexical_details=Counter()
     per_book={}
     tested=0
     for start,items in source.items():
@@ -141,6 +143,22 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
                     status="interior_whitespace_difference_only"
                 else:
                     status="lexical_text_or_punctuation_difference"
+            if status=="lexical_text_or_punctuation_difference" and compiled is not None:
+                a=" ".join(item["original_text"].split())
+                b=" ".join(compiled.split())
+                if a and a in b:
+                    lexical_details["full_original_whitespace_collapsed_body_inside_stock"]+=1
+                elif b and b in a:
+                    lexical_details["full_stock_whitespace_collapsed_body_inside_original"]+=1
+                else:
+                    source_tokens=re.findall(r"\w+",a)
+                    stock_tokens=re.findall(r"\w+",b)
+                    if source_tokens==stock_tokens:
+                        lexical_details["same_unicode_word_tokens_different_punctuation"]+=1
+                    elif [t.casefold() for t in source_tokens]==[t.casefold() for t in stock_tokens]:
+                        lexical_details["same_casefolded_word_tokens_different_case_or_punctuation"]+=1
+                    else:
+                        lexical_details["different_unicode_word_token_sequence_or_selection"]+=1
             counters[status]+=1
             book_counts[status]+=1
             if status!="exact_unicode_text_match" and len(issues)<MAX_DIAGNOSTICS:
@@ -157,8 +175,12 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
         raise PilotError("Original commentary text comparison was incomplete")
     if sum(counters.values())!=tested:
         raise PilotError("Original commentary text status totals are inconsistent")
+    if sum(lexical_details.values())!=counters["lexical_text_or_punctuation_difference"]:
+        raise PilotError("Detailed text discrepancy census does not reconcile with every source body")
     return {
         "source_verse_or_range_bodies_compared":tested,
+        "lexical_disagreement_classification":dict(sorted(lexical_details.items())),
+        "disagreement_categories_are_only_exploratory_not_text_parity":True,
         "per_source_marker_text_diagnostic_counts":dict(sorted(counters.items())),
         "book_counts":{name:dict(sorted(counts.items())) for name,counts in sorted(per_book.items())},
         "bounded_private_content_discrepancy_hash_samples":issues,
