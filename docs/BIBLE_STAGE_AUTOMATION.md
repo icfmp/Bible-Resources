@@ -201,8 +201,10 @@ posting an owner-authored `/bible-audit <resource-id> <stage>` comment
 in the appropriate issue, but a later message is required for the
 assistant to return and interpret the completed action. The issue and
 run URLs preserve the exact checkpoint for the next conversation. A
-normal PR touching this automation triggers the existing pinned WEBP
-research proof, without approving its original edition. No heavy
+normal PR touching this automation uses the reviewed, pinned Darby 2024
+original USFX and stock SWORD research pair as a real regression fixture.
+The historically observed WEBP ZIP drift is retained separately; no upstream
+revision is silently repinned, and a green CI result cannot approve Darby. No heavy
 research step should be run in a long-lived chat.
 
 ## Full-corpus whitespace differences: diagnostic, not silent normalization
@@ -249,6 +251,101 @@ Never automatically rewrite, strip or approve whitespace or invent verse
 mapping exceptions to obtain a green report. Any later acceptance needs
 the exact report link and source-scoped explanation recorded on the import
 issue.
+
+## CI economy: superseded PR runs
+
+On a pull request, GitHub Actions now cancels **only superseded runs
+of that same PR** when its head commit changes. This avoids repeated
+full-corpus research and SWORD package installation for outdated
+iterations. Owner-authorized issue-comment audits, manual `workflow_dispatch`
+research and `main` validation are **not cancelled**, so their
+permanent source-bound checkpoints are preserved.
+
+This improves CI queue/retry cost. It does not waive failed native SWORD
+validation, trust an external mirror, or silently accept a changed Bible
+source archive.
+
+## Fast stock note preflight — reject before expensive whitespace work
+
+For authorial USFX plus a SHA-pinned stock `RawText`/`zText` module, the
+stage-4/5 runner now performs a **bounded original-to-actual-native note
+check first**. It inventories authored note-bearing verse references in
+private memory, selects at most 12 references with explicit literal note
+callers (preferring distinct books), and uses the existing standalone exact
+SWORD key inspector to obtain real original native OSIS fragments. It
+compares the matched note counts and whitespace-folded note bodies before
+checking source caller labels versus the native `note n` attribute. A
+proven missing/altered original caller (or an unambiguous note type
+change) returns **BLOCKED for unmodified stock reuse** immediately;
+it does **not** run the heavyweight word/paragraph/poetry/whitespace
+proof on a candidate already demonstrated deficient. A note count/body
+difference, unlike a matched-body missing literal caller, is an
+**uncertain sample requiring full-corpus audit**, not a shortcut.
+
+If the sample is inconclusive, has no literal original caller, or cannot be
+read independently, the result is **REVIEW_REQUIRED**, and the existing
+full-corpus audit still runs. A successful sample never means all notes
+or verses match. The output contains only allowlisted diagnostic categories,
+a validated source-reference ID and counts, not note text or original
+caller/target values. Exact original SHA pins, verified module identity,
+full text/index gates on the chosen replacement, editorial/rights approvals
+and actual reader acceptance remain mandatory.
+
+This is an *early rejection optimization*, not a full-corpus replacement or
+a new Bible-specific exception. OSIS or USFM source preflight extensions
+must be separately reviewed rather than silently treated as USFX.
+
+## Material-loss gate before stock SWORD reuse
+
+The ordinary original-USFX vs real stock-SWORD whole-corpus stage-4 run now
+returns `stock_reuse_preflight`, an edition-independent decision from the
+existing private reader comparison. It highlights original note-count/body
+loss, missing literal caller labels, changed cross-reference note types or
+explicit machine target strings, and non-whitespace Scripture differences.
+
+A `BLOCKED` finding disqualifies **unchanged stock reuse** until investigated
+or replaced by an independently audited source-faithful module. A
+`REVIEW_REQUIRED` finding is *not* reuse approval: unknown note attribution,
+original whitespace, headings, poetry, verse-zero material, legal identity,
+reader navigation and owner signoff still have separate gates. Source text,
+note bodies and original target values never appear in the receipt.
+
+This first change reuses the already existing full private SWORD scan; it
+does **not yet** avoid that scan or implement hashed per-subcheck replay.
+Next work in #83 must add independently resumable inputs and a fast
+feature-presence pass, not new edition-specific whitespace probes.
+
+## One-pass stages 4+5 machine audit (experimental nonpublishing)
+
+For a reviewed source manifest with the stock SWORD module SHA-256 already
+pinned, issue this authenticated comment on the open `[Import]` issue:
+
+```text
+/bible-audit frajnd-2024 4-5
+```
+
+Or choose `4-5` for the `stage` input of the existing GitHub Actions workflow.
+The command **does not create an eighth stage**. It acquires and independently
+SHA-verifies the same original source and stock SWORD ZIPs exactly once,
+executes the existing full source/native SWORD audit once and derives **two
+distinct technical receipts** (`stage_machine_receipts["4"]` and `["5"]`)
+inside one metadata-only `stage-report.json` plus one bounded
+`stage-summary.md`. Each receipt retains its own `DONE`, `PARTIAL`,
+`BLOCKED` or `REVIEW_REQUIRED` result. The combined report records the
+canonical manifest SHA-256, current tool commit, original archive
+fingerprints and whether an actual full native corpus scan completed.
+
+A material stock-module loss still blocks that candidate even if its
+Scripture prose matches. One-pass execution **does not** imply that
+independently rendered book titles, source-authorial white space, note link
+clicks, parallel GUI usage, rights or any publication gate are approved.
+Do not tick the stage-4 or stage-5 issue checkbox from this aggregate
+report alone. The original one-stage commands still work unchanged.
+
+This reduces repeated acquisitions and full scans **only when the operator
+chooses the bundle**. It does not yet implement cross-run receipt caching or
+revalidate a changed source/tool without rerunning the audit. Those remain
+explicitly tracked in #83.
 
 ## Stage-4 subchecks and provisional source/native structural anchors
 

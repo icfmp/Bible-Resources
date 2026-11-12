@@ -13,7 +13,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 from bible_intake import IntakeError, ProviderRedirects, acquire, fetch_pinned, load_manifest, _safe_url, parse_audit_comment, parse_observe_comment, observe_current_upstream
-from bible_stage_runner import run_stage, _write_report, STAGES
+from bible_stage_runner import run_stage, run_stage_four_and_five, _write_report, STAGES, main
 
 
 class _Response(io.BytesIO):
@@ -94,6 +94,8 @@ class BibleIntakeTests(unittest.TestCase):
     def test_authenticated_comment_command_parser_is_strict(self):
         self.assertEqual(parse_audit_comment("/bible-audit next-bible-1910 4"),
                          ("next-bible-1910",4))
+        self.assertEqual(parse_audit_comment("/bible-audit next-bible-1910 4-5"),
+                         ("next-bible-1910","4-5"))
         for command in ("/bible-audit ../outside 4",
                         "/bible-audit safe 8",
                         "/bible-audit safe 4; rm -rf /",
@@ -217,6 +219,148 @@ class BibleIntakeTests(unittest.TestCase):
             result=run_stage(self.cfg,4,self.folder)
         self.assertEqual(result["status"],"BLOCKED")
         self.assertIn("binary missing",result["missing"][0])
+
+    def _fake_stage_four_receipt(self, *, loss=False):
+        return {
+            "status": "BLOCKED" if loss else "PARTIAL",
+            "verified": ["Synthetic stage-4 private source/native proof"],
+            "missing": ["Review stock loss" if loss else "Review whitespace"],
+            "evidence": {
+                "original_archives": {
+                    "source": {"sha256": "a"*64},
+                    "sword": {"sha256": "b"*64},
+                },
+                "notes": {"status": "numbered-source-note-diagnostic"},
+                "note_anchor_positions": {
+                    "all_numbered_note_nonspace_anchor_positions_match": True,
+                },
+                "source_scope": {},
+                "stock_reuse_preflight": {
+                    "proven_material_stock_loss": loss,
+                    "material_loss_categories":
+                        {"literal_source_caller_no_native_n": 2} if loss else {},
+                },
+            },
+        }
+
+    def test_fast_note_loss_rejects_stock_before_full_corpus_scan(self):
+        from bible_stage_runner import _run_fidelity
+        self.cfg["source"]["format"] = "USFX"
+        native = self.folder/"native-binary"
+        native.write_bytes(b"fixture")
+        with (patch("fast_stock_note_probe.probe_stock_note_callers",
+                    return_value={
+                        "status":"BLOCKED",
+                        "reason_code":"literal_note_caller_missing",
+                        "fast_stock_reuse_disqualified":True,
+                    }) as pre,
+              patch("source_native_maintext_probe.run_real_usfx_sword_text_probe",
+                    side_effect=AssertionError("Full corpus must be skipped")) as full):
+            result = _run_fidelity(
+                self.cfg,{"source":self.folder/"source.zip",
+                          "sword":self.folder/"stock.zip"},
+                self.folder,index_binary=native,raw_binary=native,
+                entry_binary=native,schema=None)
+        pre.assert_called_once()
+        full.assert_not_called()
+        self.assertEqual(result["status"],"BLOCKED")
+        self.assertFalse(result["evidence"]["whole_corpus_scan_performed"])
+        self.assertEqual(result["evidence"]["fast_stock_note_preflight"][
+            "reason_code"],"literal_note_caller_missing")
+
+    def test_uncertain_fast_sample_never_skips_full_fidelity(self):
+        from bible_stage_runner import _run_fidelity
+        binary = self.folder/"native-binary"
+        binary.write_bytes(b"fixture")
+        with (patch("fast_stock_note_probe.probe_stock_note_callers",
+                    return_value={
+                        "status":"REVIEW_REQUIRED",
+                        "reason_code":"sample_only_no_proven_stock_loss",
+                        "fast_stock_reuse_disqualified":False,
+                    }) as sample,
+              patch("source_native_maintext_probe.run_real_usfx_sword_text_probe",
+                    side_effect=RuntimeError("full corpus reached")) as full):
+            with self.assertRaisesRegex(RuntimeError, "full corpus reached"):
+                _run_fidelity(self.cfg,{"source":self.folder/"source.zip",
+                                        "sword":self.folder/"stock.zip"},
+                              self.folder,index_binary=binary,raw_binary=binary,
+                              entry_binary=binary,schema=None)
+        sample.assert_called_once()
+        full.assert_called_once()
+
+    def test_stage_five_keeps_fast_stock_loss_without_claiming_full_notes(self):
+        from bible_stage_runner import _stage5_from_fidelity
+        fast={
+            "status":"BLOCKED",
+            "reason_code":"literal_note_caller_missing",
+            "fast_stock_reuse_disqualified":True,
+        }
+        stage4={
+            "status":"BLOCKED","evidence":{"fast_stock_note_preflight":fast}}
+        result=_stage5_from_fidelity(stage4, {})
+        self.assertEqual(result["status"],"BLOCKED")
+        self.assertFalse(result["evidence"]["whole_corpus_scan_performed"])
+        self.assertTrue(result["evidence"]["fast_stock_note_preflight"][
+            "fast_stock_reuse_disqualified"])
+
+    def test_stage_four_five_bundle_invokes_one_fidelity_stage(self):
+        original = self._fake_stage_four_receipt()
+        with patch("bible_stage_runner.run_stage", return_value=original) as checked:
+            four, five = run_stage_four_and_five(self.cfg, self.folder)
+        checked.assert_called_once()
+        self.assertEqual(checked.call_args.args[1], 4)
+        self.assertIs(four, original)
+        self.assertEqual(five["status"], "PARTIAL")
+        self.assertEqual(five["evidence"]["original_archives"],
+                         four["evidence"]["original_archives"])
+
+    def test_stage_four_five_bundle_retains_annotation_loss_blocker(self):
+        original = self._fake_stage_four_receipt(loss=True)
+        with patch("bible_stage_runner.run_stage", return_value=original):
+            four, five = run_stage_four_and_five(self.cfg, self.folder)
+        self.assertEqual(four["status"], "BLOCKED")
+        self.assertEqual(five["status"], "BLOCKED")
+        self.assertTrue(five["evidence"]["stock_reuse_preflight"][
+            "proven_material_stock_loss"])
+
+    def test_stage_four_five_bundle_does_not_infer_missing_notes(self):
+        original = self._fake_stage_four_receipt()
+        del original["evidence"]["notes"]
+        with patch("bible_stage_runner.run_stage", return_value=original):
+            four, five = run_stage_four_and_five(self.cfg, self.folder)
+        self.assertEqual(four["status"], "PARTIAL")
+        self.assertEqual(five["status"], "BLOCKED")
+
+    def test_combined_cli_writes_two_separate_machine_receipts(self):
+        original = self._fake_stage_four_receipt(loss=True)
+        five = {
+            "status": "BLOCKED", "verified": [],
+            "missing": ["Review omitted note callers"],
+            "evidence": {"stock_reuse_preflight":
+                         original["evidence"]["stock_reuse_preflight"]},
+        }
+        with patch("bible_stage_runner.run_stage_four_and_five",
+                   return_value=(original,five)) as combined:
+            exit_code=main(["--resource-id","webp-research","--stage","4-5",
+                            "--report-dir",str(self.folder)])
+        self.assertEqual(exit_code,0)  # Audit BLOCKED is a valid diagnostic
+        combined.assert_called_once()
+        report=json.loads((self.folder/"stage-report.json").read_text())
+        self.assertEqual(report["stage"],"4-5")
+        self.assertEqual(report["schema_version"],2)
+        self.assertEqual(report["status"],"BLOCKED")
+        self.assertFalse(report["gate_completed"])
+        self.assertFalse(report["reusable_for_pub_approval"])
+        self.assertEqual(report["evidence"]["shared_fidelity_invocations"],1)
+        self.assertFalse(report["evidence"]["full_native_corpus_scan_completed"])
+        self.assertEqual(set(report["evidence"]["stage_machine_receipts"]),{"4","5"})
+        self.assertIn("stage 4-5/7",(self.folder/"stage-summary.md").read_text())
+
+    def test_bundle_command_rejects_unreviewed_ranges_and_shell_content(self):
+        for value in ("/bible-audit safe 3-4", "/bible-audit safe 4-5; rm -rf /",
+                      "/bible-audit safe 4-5\\nPRIVATE"):
+            with self.subTest(value=value), self.assertRaises(IntakeError):
+                parse_audit_comment(value)
 
     def test_stage_seven_never_publishes_or_auto_approves(self):
         result=run_stage(self.cfg,7,self.folder)

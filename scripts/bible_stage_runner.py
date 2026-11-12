@@ -154,6 +154,29 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
         if raw_binary is None or entry_binary is None or not raw_binary.is_file() or not entry_binary.is_file():
             return _status("BLOCKED",verified=[],
                 missing=["Native raw corpus and exact-entry inspectors required for full-corpus diagnostics"])
+        # Fast, bounded source-derived note sample FIRST. A proven loss
+        # disqualifies unchanged stock reuse without paying for the lengthy
+        # punctuation/whitespace/poetry provenance analysis. An inconclusive
+        # sample NEVER waives the full source/native corpus requirements.
+        from fast_stock_note_probe import probe_stock_note_callers
+        fast_notes = probe_stock_note_callers(
+            archives["source"], archives["sword"],
+            ROOT / manifest["crosswalk"], entry_binary,
+            manifest["sword"]["module_id"])
+        if fast_notes["fast_stock_reuse_disqualified"]:
+            return _status("BLOCKED",
+                verified=["SHA-pinned authorial source sampled against independent "
+                          "exact native SWORD verse entry; material stock note "
+                          "difference observed"],
+                missing=["Unchanged stock SWORD candidate cannot be reused",
+                         "Full source/native Scripture and annotation audit NOT "
+                         "EXECUTED after early material-loss finding",
+                         "Select a reviewed source-faithful replacement; separately "
+                         "audit its full index, text and editorial structures",
+                         "No edition, rights or publication acceptance"],
+                evidence={"source_format":"USFX",
+                          "fast_stock_note_preflight":fast_notes,
+                          "whole_corpus_scan_performed":False})
         from source_native_maintext_probe import run_real_usfx_sword_text_probe
         receipt = run_real_usfx_sword_text_probe(
             archives["source"], archives["sword"], ROOT / manifest["crosswalk"],
@@ -178,6 +201,25 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
             "Mapped indexed main-text has unresolved non-whitespace word/punctuation or reference differences"])
         if witness["source_verses_with_whitespace_only_changes"]:
             missing.append("Original main-text whitespace differs; verse/poetry/paragraph layout preservation not yet verified")
+
+        # Stage 4d must not regard apparently identical Scripture as a
+        # reusable stock module when authorial note callers/targets were lost.
+        from stock_reuse_preflight import preflight_stock_reuse
+        stock_preflight = preflight_stock_reuse(
+            native_scan_complete=receipt["independent_native_whole_corpus_scan_completed"],
+            main_text_preserved=text_preserved,
+            notes=notes,
+            note_positions=receipt[
+                "private_numbered_source_native_note_anchor_position_diagnostic"],
+            original_note_scope=receipt["original_source_note_scope"])
+        if stock_preflight["proven_material_stock_loss"]:
+            missing.insert(0,
+                "Stock SWORD reuse BLOCKED by source/native material loss; "
+                "inspect preflight categories before researching whitespace")
+        else:
+            verified.append(
+                "Stock reuse material-loss screen found no demonstrated numbered "
+                "annotation loss; editorial reuse is NOT approved")
         boundary_screen = rows.get("source_native_body_boundary_word_position_screen", {})
         if boundary_screen.get("all_mapped_book_p_q_start_end_word_ordinals_match") is True:
             verified.append("Source/native body p/q OPEN and CLOSE word ordinals match per book (NOT whitespace/punctuation positions)")
@@ -226,7 +268,7 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
         missing += ["Exact publisher edition identity and original book/intro order not independently signed off",
                     "Original note callers, word anchors, resolved reference targets and verse-zero/poetry structure unverified",
                     "Rights/editorial publication approval remains separate"]
-        return _status("PARTIAL" if text_preserved else "BLOCKED",
+        return _status("BLOCKED" if stock_preflight["proven_material_stock_loss"] or not text_preserved else "PARTIAL",
             verified=verified, missing=missing,
             evidence={"source_format":"USFX","native_driver":receipt["module_native_driver"],
                       "native_versification":receipt["module_versification"],
@@ -237,6 +279,8 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
                       "maintext":rows,
                       "maintext_scope_classification":witness,
                       "notes":notes,
+                      "stock_reuse_preflight":stock_preflight,
+                      "fast_stock_note_preflight":fast_notes,
                       "note_anchor_positions":receipt[
                           "private_numbered_source_native_note_anchor_position_diagnostic"],
                       "source_scope":receipt["source_book_scope"],
@@ -260,6 +304,76 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
         missing=["Full OSIS main-text, notes and editorial structure to native binary parity",
                  "Source revision/canon identity and editorial approval"],
         evidence={"source_format":"OSIS","reference_index":diag})
+
+
+def _stage5_from_fidelity(fidelity: dict, receipts: dict) -> dict:
+    """Reuse one independent full-corpus receipt for stage-5 machine evidence.
+
+    This intentionally does not approve notes, links, typography or publication.
+    Stage 4 and stage 5 can share the same *immutable original/native scan*
+    without inventing a second independently observed source.
+    """
+    evidence = fidelity.get("evidence", {})
+    if "notes" not in evidence:
+        fast = evidence.get("fast_stock_note_preflight", {})
+        if fast.get("fast_stock_reuse_disqualified") is True:
+            return _status("BLOCKED",
+                verified=["Stock reuse already disqualified by exact native note sample"],
+                missing=["Full original/native note, anchor and structure audit "
+                         "not executed after early stock rejection",
+                         "Human editorial/rights/rebuild review remains mandatory"],
+                evidence={"original_archives": receipts,
+                          "fast_stock_note_preflight": fast,
+                          "whole_corpus_scan_performed": False})
+        return _status("BLOCKED", verified=[],
+            missing=["No source-native note/layout diagnostic for this format yet"],
+            evidence={"original_archives": receipts})
+    note_positions = evidence.get("note_anchor_positions", {})
+    position_match = (note_positions.get(
+        "all_numbered_note_nonspace_anchor_positions_match") is True)
+    verified = [
+        "Original/natively compiled numbered-verse note body and raw annotation comparisons executed"]
+    missing = [
+        "Exact caller labels, original reference targets and resolved navigation",
+        "Absorbed/non-numbered note ownership and note body typography",
+        "Full original paragraph, poetry, title, quotation and verse-zero structure",
+        "Strong values/ordinals if the original edition supplies them",
+        "Human editorial acceptance of all differences",
+    ]
+    if position_match:
+        verified.append(
+            "All original numbered-note caller nonspace codepoint positions match actual stock SWORD")
+    else:
+        missing.insert(0, "Original/native numbered-note caller positional parity failed or unverified")
+    stock_preflight = evidence.get("stock_reuse_preflight", {})
+    if stock_preflight.get("proven_material_stock_loss"):
+        missing.insert(0, "Stock reuse BLOCKED: original numbered annotation data lost")
+    return _status(
+        "BLOCKED" if stock_preflight.get("proven_material_stock_loss") else "PARTIAL",
+        verified=verified, missing=missing,
+        evidence={"original_archives": receipts,
+                  "stock_reuse_preflight": stock_preflight,
+                  "notes": evidence["notes"],
+                  "note_anchor_positions": note_positions,
+                  "source_scope": evidence.get("source_scope", {})})
+
+
+def run_stage_four_and_five(manifest: dict, temp: Path, *, opener=None,
+                            index_binary: Path | None = None,
+                            raw_binary: Path | None = None,
+                            entry_binary: Path | None = None,
+                            schema: Path | None = None) -> tuple[dict, dict]:
+    """Acquire SHA-pinned originals and scan real native SWORD exactly ONCE.
+
+    The two results are *separate machine receipts*, never editorial approvals.
+    The ordinary single-stage 4 and 5 entrypoints remain backward compatible.
+    """
+    stage4 = run_stage(manifest, 4, temp, opener=opener,
+                       index_binary=index_binary, raw_binary=raw_binary,
+                       entry_binary=entry_binary, schema=schema)
+    stage5 = _stage5_from_fidelity(
+        stage4, stage4.get("evidence", {}).get("original_archives", {}))
+    return stage4, stage5
 
 
 def run_stage(manifest: dict, stage: int, temp: Path, *, opener=None,
@@ -321,35 +435,7 @@ def run_stage(manifest: dict, stage: int, temp: Path, *, opener=None,
         result = _run_fidelity(manifest,archives,temp,index_binary=index_binary,
                                raw_binary=raw_binary,entry_binary=entry_binary,schema=schema)
         if stage == 5:
-            if "notes" in result["evidence"]:
-                evidence = result["evidence"]
-                note_positions = evidence.get("note_anchor_positions", {})
-                position_match = (note_positions.get(
-                    "all_numbered_note_nonspace_anchor_positions_match") is True)
-                verified = [
-                    "Original/natively compiled numbered-verse note body and raw annotation comparisons executed"]
-                missing = [
-                    "Exact caller labels, original reference targets and resolved navigation",
-                    "Absorbed/non-numbered note ownership and note body typography",
-                    "Full original paragraph, poetry, title, quotation and verse-zero structure",
-                    "Strong values/ordinals if the original edition supplies them",
-                    "Human editorial acceptance of all differences",
-                ]
-                if position_match:
-                    verified.append(
-                        "All original numbered-note caller nonspace codepoint positions match actual stock SWORD")
-                else:
-                    missing.insert(0, "Original/native numbered-note caller positional parity failed or unverified")
-                result = _status("PARTIAL",
-                    verified=verified, missing=missing,
-                    evidence={"original_archives":receipts,
-                              "notes":evidence["notes"],
-                              "note_anchor_positions":note_positions,
-                              "source_scope":evidence["source_scope"]})
-            else:
-                result = _status("BLOCKED",verified=[],
-                    missing=["No source-native note/layout diagnostic for this format yet"],
-                    evidence={"original_archives":receipts})
+            result = _stage5_from_fidelity(result, receipts)
     elif stage == 6:
         pilot = manifest["resource_id"]
         cfg={"pilots":{pilot:{"module_id":manifest["sword"]["module_id"],
@@ -419,6 +505,34 @@ def _write_report(report_dir: Path, report: dict) -> None:
                 lines.append(
                     f"- `{ref}` — `{origin}`, source gap {gap}, "
                     f"nearest p/q boundary {distance} codepoints away")
+
+    # Same safe metadata section in one-pass 4-5 or traditional 4/5 reports.
+    fast = report.get("evidence", {}).get("fast_stock_note_preflight", {})
+    if not fast and report["stage"] == "4-5":
+        fast = (report.get("evidence", {})
+                .get("stage_machine_receipts", {})
+                .get("4", {}).get("evidence", {})
+                .get("fast_stock_note_preflight", {}))
+    if fast and fast.get("fast_stock_reuse_disqualified"):
+        category = fast.get("reason_code", "")
+        if not isinstance(category, str) or SAFE_CODE.fullmatch(category) is None:
+            category = "untrusted_preflight_category"
+        lines.extend(["", "**Fast original-note loss preflight (exact SWORD key)**",
+                      "Confirmed stock reuse blocker: `" +
+                      category + "`",
+                      "The full corpus audit has NOT passed this gate."])
+    if report["stage"] in (4, 5):
+        preflight = report.get("evidence", {}).get("stock_reuse_preflight", {})
+        if preflight:
+            lines.extend(["", "**Stock reuse material-loss preflight**",
+                          "Machine status: `" + preflight["status"] + "` "
+                          "(never reuse/editorial approval)"])
+            for code, count in sorted(
+                    preflight.get("material_loss_categories", {}).items()):
+                # Fixed tool-authored category tokens and numeric counts only:
+                # no source/reader strings or private XML leave the runner.
+                if SAFE_CODE.fullmatch(code) and type(count) is int:
+                    lines.append("- " + code + ": " + str(count))
     lines.extend(["","**Still missing / blocking**"])
     lines.extend("- "+v for v in report["missing"])
     if not report["missing"]:
@@ -432,7 +546,9 @@ def _write_report(report_dir: Path, report: dict) -> None:
 def main(argv=None) -> int:
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--resource-id",required=True)
-    parser.add_argument("--stage",type=int,choices=sorted(STAGES),required=True)
+    parser.add_argument("--stage",choices=[*(str(x) for x in sorted(STAGES)), "4-5"],
+                        required=True,
+                        help="Single audit stage 1–7 or shared machine audit of stages 4-5")
     parser.add_argument("--report-dir",type=Path,required=True)
     parser.add_argument("--native-index-binary",type=Path)
     parser.add_argument("--native-raw-binary",type=Path)
@@ -443,9 +559,46 @@ def main(argv=None) -> int:
     try:
         manifest=load_manifest(args.resource_id)
         with tempfile.TemporaryDirectory(prefix="bible-research-stage-") as td:
-            result=run_stage(manifest,args.stage,Path(td),index_binary=args.native_index_binary,
-                             raw_binary=args.native_raw_binary,entry_binary=args.native_entry_binary,
-                             schema=args.osis_schema,usfx_schema=args.usfx_schema)
+            if args.stage == "4-5":
+                stage4, stage5 = run_stage_four_and_five(
+                    manifest, Path(td), index_binary=args.native_index_binary,
+                    raw_binary=args.native_raw_binary,
+                    entry_binary=args.native_entry_binary, schema=args.osis_schema)
+                # One underlying scan, but independent 4/7 and 5/7 receipts.
+                # A successful workflow is not an editorial signoff for either.
+                statuses = (stage4["status"], stage5["status"])
+                scan_completed = bool(stage4.get("evidence", {}).get(
+                    "actual_native_raw_manifest_sha256"))
+                result = _status(
+                    "BLOCKED" if "BLOCKED" in statuses else "PARTIAL",
+                    verified=(["One verified full native source/SWORD scan supports "
+                               "both stage-4 and stage-5 machine receipts"]
+                              if scan_completed else
+                              ["One stage-4 evaluation reused without a second "
+                               "stage-5 source fetch or scan"]) +
+                             ["4/7 machine evidence: " + statuses[0],
+                              "5/7 machine evidence: " + statuses[1]],
+                    missing=(["4/7: " + stage4["missing"][0]]
+                             if stage4["missing"] else []) +
+                            (["5/7: " + stage5["missing"][0]]
+                             if stage5["missing"] else []) +
+                            ([] if scan_completed else
+                             ["Full native corpus scan not independently evidenced"]) +
+                            ["Human editorial/rights/reader decisions are not automated"],
+                    evidence={
+                        "input_manifest_sha256": sha256(
+                            json.dumps(manifest, sort_keys=True,
+                                       separators=(",", ":")).encode("utf-8")).hexdigest(),
+                        "shared_fidelity_invocations": 1,
+                        "full_native_corpus_scan_completed": scan_completed,
+                        "stage_machine_receipts": {"4": stage4, "5": stage5},
+                        "not_publication_or_editorial_approval": True})
+            else:
+                result=run_stage(manifest,int(args.stage),Path(td),
+                                 index_binary=args.native_index_binary,
+                                 raw_binary=args.native_raw_binary,
+                                 entry_binary=args.native_entry_binary,
+                                 schema=args.osis_schema,usfx_schema=args.usfx_schema)
         failed=False
     except Exception as exc:
         # Third-party parser error strings may contain actual text.
@@ -455,17 +608,24 @@ def main(argv=None) -> int:
         result=_status("BLOCKED",verified=[],
             missing=["Run failed: " + reason], evidence={})
         failed=True
-    if result["status"] == "DONE" and args.stage < 7:
-        next_action = f"Review this evidence and proceed to stage {args.stage+1}/7 only when the full gate is documented"
+    if args.stage == "4-5":
+        next_action = ("Review distinct stage 4 and 5 machine receipts and resolve "
+                       "remaining editorial issues; neither stage is automatically DONE")
+    elif result["status"] == "DONE" and int(args.stage) < 7:
+        next_action = f"Review this evidence and proceed to stage {int(args.stage)+1}/7 only when the full gate is documented"
     else:
         next_action = f"Resolve the first missing gate, then repeat stage {args.stage}/7"
-    report={"schema_version":1,"resource_id":args.resource_id,"stage":args.stage,
-            "stage_name":STAGES[args.stage],
+    report={"schema_version":2 if args.stage == "4-5" else 1,
+            "resource_id":args.resource_id,
+            "stage":"4-5" if args.stage == "4-5" else int(args.stage),
+            "stage_name":("shared-source-native-4-5" if args.stage == "4-5"
+                          else STAGES[int(args.stage)]),
             "git_sha":os.environ.get("GITHUB_SHA","local"),
             "run_url":os.environ.get("GITHUB_SERVER_URL","")+"/"+
                 os.environ.get("GITHUB_REPOSITORY","")+"/actions/runs/"+
                 os.environ.get("GITHUB_RUN_ID","") if os.environ.get("GITHUB_RUN_ID") else None,
-            "status":result["status"],"gate_completed":result["status"]=="DONE",
+            "status":result["status"],"gate_completed":(
+                args.stage != "4-5" and result["status"]=="DONE"),
             "next_action":next_action,
             "verified":result["verified"],"missing":result["missing"],
             "evidence":result["evidence"],"reusable_for_pub_approval":False,

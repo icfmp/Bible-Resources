@@ -120,6 +120,18 @@ fix. Additional internal breakdowns should be introduced **only when a
 repeatable bottleneck is demonstrated**; do not inflate the seven-stage
 workflow itself.
 
+## One machine pass for 4+5 (opt-in; seven stages unchanged)
+
+The existing issue-driven read-only GitHub Action accepts
+`/bible-audit <resource-id> 4-5` to acquire each SHA-pinned original
+once, perform one actual source/native SWORD full-corpus audit, and
+produce **separate machine status receipts** for stages 4 and 5.
+This avoids repeating the same costly scan merely to extract numbered
+notes in a second Actions run. Machine receipts do not certify the
+human editorial/typographic checks, original vs rebuilt publisher edition
+identity, reader signoff or release; parent checkboxes remain gated
+separately. No original Bible source or private note content is uploaded.
+
 ## One progress tracker — no mystery number of steps
 
 Create **one GitHub issue per Bible** using the

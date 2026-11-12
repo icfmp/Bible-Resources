@@ -7,12 +7,12 @@ on:
         description: "ID of reviewed config/bible-intake/<id>.json"
         type: string
         required: true
-        default: webp-research
+        default: frajnd-2024
       stage:
-        description: "One of the seven fixed onboarding gates; one run per stage"
+        description: "One of seven stages, or 4-5 in one shared machine-only scan"
         type: choice
         required: true
-        options: ["1", "2", "3", "4", "5", "6", "7"]
+        options: ["1", "2", "3", "4", "5", "6", "7", "4-5"]
         default: "2"
       issue_number:
         description: "Optional [Import] GitHub issue number for permanent evidence comment"
@@ -25,6 +25,10 @@ on:
       - ".github/workflows/bible-staged-audit.yml"
       - "scripts/bible_intake.py"
       - "scripts/bible_stage_runner.py"
+      - "scripts/stock_reuse_preflight.py"
+      - "scripts/fast_stock_note_probe.py"
+      - "tests/test_fast_stock_note_probe.py"
+      - "tests/test_stock_reuse_preflight.py"
       - "scripts/maintext_fidelity_classification.py"
       - "scripts/maintext_whitespace_patterns.py"
       - "scripts/native_sword_markup_census.py"
@@ -74,7 +78,8 @@ permissions:
 
 concurrency:
   group: bible-audit-${{ github.event_name }}-${{ github.ref }}-${{ inputs.resource_id || 'webp-research' }}-${{ inputs.stage || 'research' }}
-  cancel-in-progress: false
+  # Issue-comment and manual research runs must never lose their checkpoints.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   single-stage:
@@ -82,7 +87,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 35
     env:
-      RESOURCE_ID: ${{ github.event_name == 'pull_request' && 'webp-research' || inputs.resource_id || '' }}
+      RESOURCE_ID: ${{ github.event_name == 'pull_request' && 'frajnd-2024' || inputs.resource_id || '' }}
       STAGE: ${{ github.event_name == 'pull_request' && '4' || inputs.stage || '' }}
       REPORT_DIR: /tmp/bible-audit-report
       INSPECTOR_DIR: /tmp/sword-audit-bin
@@ -129,6 +134,8 @@ jobs:
           python -m unittest discover -s tests -p 'test_source_native_structural_whitespace.py' -v
           python -m unittest discover -s tests -p 'test_source_usfx_newline_provenance.py' -v
           python -m unittest discover -s tests -p 'test_source_native_notes_audit.py' -v
+          python -m unittest discover -s tests -p 'test_stock_reuse_preflight.py' -v
+          python -m unittest discover -s tests -p 'test_fast_stock_note_probe.py' -v
           python -m unittest discover -s tests -p 'test_source_native_note_positions.py' -v
           python -m unittest discover -s tests -p 'test_native_book_intro_screen.py' -v
           python -m unittest discover -s tests -p 'test_source_native_layout_anchors.py' -v
@@ -151,22 +158,30 @@ jobs:
           print("Offline compilation:",receipt["offline_compiled_without_external_dependencies"])
           print("This fingerprint is NOT approved until reviewed/pinned on main.")
           PY
-      - name: Observe the current upstream WEBP bytes (SHA-256 only; never auto-repin)
+      - name: Observe the current upstream Darby bytes (SHA-256 only; never auto-repin)
         if: github.event_name == 'pull_request'
         shell: bash
         run: |
           set -euo pipefail
-          python scripts/bible_intake.py --resource-id webp-research --observe-only
+          python scripts/bible_intake.py --resource-id frajnd-2024 --observe-only
       - name: Install stock SWORD binaries only if this stage needs them
         shell: bash
         run: |
           set -euo pipefail
-          if [[ "$STAGE" == "4" || "$STAGE" == "5" || "$STAGE" == "6" ]]; then
-            sudo apt-get update
-            sudo apt-get install -y diatheke
+          if [[ "$STAGE" == "4" || "$STAGE" == "5" || "$STAGE" == "4-5" || "$STAGE" == "6" ]]; then
+            # Fail visibly and promptly on broken Ubuntu mirrors; never skip
+            # source/native checks just because apt is unavailable.
+            timeout 90s sudo apt-get -o Acquire::Retries=0 \
+              -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update
+            packages=(diatheke)
+            if [[ "$STAGE" != "6" ]]; then
+              packages+=(libsword-dev)
+            fi
+            timeout 90s sudo apt-get -o Acquire::Retries=0 \
+              -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 \
+              install -y "${packages[@]}"
           fi
-          if [[ "$STAGE" == "4" || "$STAGE" == "5" ]]; then
-            sudo apt-get install -y libsword-dev
+          if [[ "$STAGE" == "4" || "$STAGE" == "5" || "$STAGE" == "4-5" ]]; then
             mkdir -p "$INSPECTOR_DIR"
             g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp -o "$INSPECTOR_DIR/sword-native-index" -lsword
             g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp -o "$INSPECTOR_DIR/sword-native-raw-corpus" -lsword
@@ -176,7 +191,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [[ "$STAGE" == "3" || "$STAGE" == "4" || "$STAGE" == "5" ]]; then
+          if [[ "$STAGE" == "3" || "$STAGE" == "4" || "$STAGE" == "5" || "$STAGE" == "4-5" ]]; then
             if [[ "$(python -c 'import os,sys; sys.path.insert(0,"scripts"); from bible_intake import load_manifest; print(load_manifest(os.environ["RESOURCE_ID"])["source"]["format"])')" == "OSIS" ]]; then
               python scripts/fetch_reviewed_schema.py --directory "${RUNNER_TEMP}/osis-xsd"
             fi
@@ -196,7 +211,7 @@ jobs:
           set -euo pipefail
           mkdir -p "$REPORT_DIR"
           args=(--resource-id "$RESOURCE_ID" --stage "$STAGE" --report-dir "$REPORT_DIR")
-          if [[ "$STAGE" == "4" || "$STAGE" == "5" ]]; then
+          if [[ "$STAGE" == "4" || "$STAGE" == "5" || "$STAGE" == "4-5" ]]; then
             args+=(--native-index-binary "$INSPECTOR_DIR/sword-native-index")
             args+=(--native-raw-binary "$INSPECTOR_DIR/sword-native-raw-corpus")
             args+=(--native-entry-binary "$INSPECTOR_DIR/sword-native-raw-entry")
