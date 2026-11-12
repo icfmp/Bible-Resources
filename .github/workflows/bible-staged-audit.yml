@@ -88,7 +88,7 @@ jobs:
     timeout-minutes: 35
     env:
       RESOURCE_ID: ${{ github.event_name == 'pull_request' && 'frajnd-2024' || inputs.resource_id || '' }}
-      STAGE: ${{ github.event_name == 'pull_request' && '4' || inputs.stage || '' }}
+      STAGE: ${{ github.event_name == 'pull_request' && '4-5' || inputs.stage || '' }}
       REPORT_DIR: /tmp/bible-audit-report
       INSPECTOR_DIR: /tmp/sword-audit-bin
     steps:
