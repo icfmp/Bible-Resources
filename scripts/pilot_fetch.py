@@ -19,6 +19,7 @@ ALLOWED_HOSTS = {
     # Provider-level policy for independent commentary intake manifests.
     # This avoids embedding each new commentary ID in the downloader.
     "crosswire": {"crosswire.org", "www.crosswire.org", "ftp.crosswire.org"},
+    "ccel": {"ccel.org", "www.ccel.org"},
 }
 MAX_REDIRECTS = 5
 
