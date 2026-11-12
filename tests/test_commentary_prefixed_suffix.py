@@ -45,7 +45,7 @@ class CommentaryStockSuffixTests(unittest.TestCase):
     def test_only_source_leading_whitespace_is_distinguished_from_exact(self):
         result=stock_prefixed_source_body_concordance(
             "\n  Original words.",
-            b"<title>Heading</title><hi>Original words.</hi>",
+            b"<title>Heading.</title><hi>Original words.</hi>",
         )
         self.assertEqual(result["original_source_body_to_stock_suffix_class"],
                          "only_source_leading_whitespace_before_first_word")
@@ -89,7 +89,7 @@ class CommentaryStockSuffixTests(unittest.TestCase):
         )
         source,_=_original_source_markers(original)
         result=compare_private_texts(source,{
-            "Gen.1.1":b"<title>Separate label</title><hi>Original, words.</hi>",
+            "Gen.1.1":b"<title>Separate label.</title><hi>Original, words.</hi>",
             "Gen.1.2":b"<hi>Source words vary here.</hi>",
         })
         self.assertEqual(result["stock_original_body_suffix_exact_unicode_and_difference_classes"],
@@ -97,7 +97,7 @@ class CommentaryStockSuffixTests(unittest.TestCase):
         self.assertEqual(result["unexplained_original_to_stock_word_boundary_count"],1)
         self.assertEqual(result["unexplained_original_to_stock_changed_segment_positions"],
                          {"middle_with_shared_edges":1})
-        self.assertFalse(result["stock_body_suffix_comparison_does_not_approve_omitted_prefix_or_layout"] is False)
+        self.assertTrue(result["stock_body_suffix_comparison_does_not_approve_omitted_prefix_or_layout"])
         self.assertFalse(result["full_authored_to_stock_parity_verified"])
         self.assertNotIn("Source words",json.dumps(result))
         self.assertNotIn("Separate label",json.dumps(result))
