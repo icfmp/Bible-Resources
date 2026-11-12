@@ -48,6 +48,18 @@ run, unresolved issues and the **next specific action**. A blocked step
 is never silently skipped; completed work is saved on GitHub before
 moving on. Publication still requires separate rights/editorial approval.
 
+## Seven-stage commentary onboarding (research-only)
+
+Commentaries have a **separate seven-stage evidence process**, based on the
+Bible workflow but preserving commentary entry/range semantics, quotations,
+original editorial divisions and licence distinctions. See the
+[commentary onboarding guide](docs/COMMENTARY_7_STAGE_WORKFLOW.md) and the
+[initial MHCC issue #177](https://github.com/icfmp/Bible-Resources/issues/177).
+The read-only [commentary intake Action](.github/workflows/commentary-intake.yml)
+observes the exact original CrossWire SWORD ZIP and produces metadata-only
+fingerprints. This does **not** constitute textual, editorial or legal approval,
+and nothing is published automatically.
+
 ## Automated, resumable Bible source audits
 
 Bible Resources runs the seven fixed [onboarding checkpoints](docs/BIBLE_7_STAGE_WORKFLOW.md)
