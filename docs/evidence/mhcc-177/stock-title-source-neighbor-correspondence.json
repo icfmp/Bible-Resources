@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "status": "STOCK_PREFIX_SOURCE_NEIGHBOR_TITLE_WITNESS_OBSERVED_NOT_EDITION_PARITY",
+  "issue": "https://github.com/icfmp/Bible-Resources/issues/177",
+  "pinned": {
+    "original_ccel_thml_sha256": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+    "original_stock_crosswire_archive_sha256": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+    "complete_native_stock_raw_content_sha256": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
+  },
+  "source_heading_and_original_stock_metadata_correspondence": {
+    "source_units_with_earlier_unapproved_stock_markup": 799,
+    "stock_units_with_any_exact_real_source_neighbor_metadata_text": 799,
+    "stock_units_with_any_same_word_token_not_exact_neighbor_metadata_text": 0,
+    "original_real_context_candidates_seen": {
+      "source_div1_title_attribute": 799,
+      "source_div2_title_attribute": 798,
+      "source_immediate_previous_heading_element": 4,
+      "source_marker_passage_attribute": 799
+    },
+    "confirmed_stock_title_to_source_candidate_comparisons": {
+      "exact_unicode:title:source_div1_title_attribute": 47,
+      "exact_unicode:title:source_div2_title_attribute": 798,
+      "only_outer_whitespace:title:source_immediate_previous_heading_element": 4
+    },
+    "matched_source_candidate_counts_are_overlapping_not_799_distinct_titles": true,
+    "source_passage_attribute_text_did_not_exactly_match_entire_earlier_stock_title_table_reference_element": true,
+    "source_neighborhood_match_does_not_prove_stock_content_authorial_or_license": true,
+    "stock_prefix_earlier_whole_top_level_elements": {
+      "title": 1593,
+      "table": 2366,
+      "reference": 6
+    },
+    "stock_prefix_table_content_still_without_authenticated_authorial_parity": true,
+    "stock_original_body_trailing_verse_text_word_order_not_strict_unicode_fidelity": true
+  },
+  "independent_actions": {
+    "latest_exact_head_private_real_comparison": "https://github.com/icfmp/Bible-Resources/actions/runs/43322656373",
+    "latest_exact_head_validation": "https://github.com/icfmp/Bible-Resources/actions/runs/43322656337",
+    "metadata_only_artifact": "https://github.com/icfmp/Bible-Resources/actions/runs/43322656373/artifacts/13990702831"
+  },
+  "remaining_required_reviews": {
+    "all_156_unexplained_different_word_body_cases": true,
+    "all_799_body_suffix_punctuation_gaps_true_differences": true,
+    "stock_table_reference_and_quote_markup_complete_source_equivalence_unverified": true,
+    "all_228_original_chapter_anchors_unverified": true,
+    "original_post_Revelation_unmarked_division_unverified": true,
+    "Jude_original_annotation_mismatch_unverified": true,
+    "whole_editable_digital_edition_identity_and_rights_unapproved": true,
+    "independent_GUI_readers_not_tested": true,
+    "published": false
+  },
+  "original_wording_or_binary_modified": false,
+  "original_text_or_attribute_values_committed": false
+}
