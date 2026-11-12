@@ -5,6 +5,8 @@ on:
       - '.github/workflows/commentary-private-text-compare.yml'
       - 'scripts/commentary_private_text_compare.py'
       - 'tests/test_commentary_private_text_compare.py'
+      - 'scripts/commentary_text_delta.py'
+      - 'tests/test_commentary_text_delta.py'
       - 'scripts/commentary_native_raw_inventory.py'
       - 'scripts/sword_native_commentary_raw_corpus.cpp'
       - 'scripts/commentary_xml_witness.py'
