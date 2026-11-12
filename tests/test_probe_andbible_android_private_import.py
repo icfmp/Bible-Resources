@@ -100,6 +100,16 @@ class AndBiblePrivateImportUiTest(unittest.TestCase):
         with self.assertRaises(AndroidDarbyImportError):
             open_documented_reference_probe("Acts.8.37")
 
+    def test_omitted_verse_host_links_allow_no_phantom_verses(self):
+        with (patch("probe_andbible_android_private_import.adb") as adb,
+              patch("probe_andbible_android_private_import.time.sleep")):
+            for host in ("Matt.23.13", "Acts.8.36", "Acts.15.33"):
+                open_documented_reference_probe(host)
+        self.assertEqual(adb.call_count, 3)
+        for ref in ("Matt.23.14", "Acts.8.37", "Acts.15.34"):
+            with self.assertRaises(AndroidDarbyImportError):
+                open_documented_reference_probe(ref)
+
     def test_note_probe_requires_exact_verified_android_png_geometry(self):
         from tempfile import TemporaryDirectory
         with TemporaryDirectory() as tmp:
