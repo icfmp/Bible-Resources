@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "issue": "https://github.com/icfmp/Bible-Resources/issues/177",
+  "audit_status": "FULL_STOCK_NATIVE_RAW_READBACK_PASSED_NOT_AUTHORIAL_TEXT_PARITY",
+  "original_stock_sword": {
+    "zip_sha256": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+    "conf_sha256": "2762a04757ec3ee14bcf5d442fedcd47d2b938d573de4e9100a31aa073bc5863",
+    "module_id": "MHCC",
+    "driver": "zCom",
+    "native_versification": "KJV",
+    "stock_sword_engine": "1.9.0"
+  },
+  "completed_content_inventory": {
+    "all_native_occupied_slots_read": 29975,
+    "occupied_numbered_verse_slots": 28718,
+    "occupied_introduction_slots": 1255,
+    "occupied_opaque_top_slots": 2,
+    "total_unfiltered_raw_bytes_recovered": 45863399,
+    "zero_length_native_raw_entries": 0,
+    "whitespace_only_native_raw_entries": 0,
+    "duplicate_raw_digest_extra_occurrences": 24672,
+    "all_actual_native_occupied_keys_independently_crosschecked": true,
+    "native_index_ordered_sha256": "fd8f02258e08d1ed4934dbbd7229d533234c1050bbcaab4cc7c9ef38abe7fb09",
+    "actual_full_native_raw_corpus_ordered_sha256": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6",
+    "jude_native_occupied_entries": 27,
+    "jude_nonempty_raw_entries": 27,
+    "jude_raw_bytes": 66641
+  },
+  "proof": {
+    "real_stock_audit_action": "https://github.com/icfmp/Bible-Resources/actions/runs/43279768346",
+    "independent_offline_validate": "https://github.com/icfmp/Bible-Resources/actions/runs/43279767713",
+    "metadata_only_artifact": "https://github.com/icfmp/Bible-Resources/actions/runs/43279768346/artifacts/13971972949"
+  },
+  "interpretation": {
+    "native_slots_are_not_unique_authored_comments": true,
+    "repeated_hashes_can_reflect_range_propagation": true,
+    "all_compiled_contents_readable": true,
+    "original_source_to_stock_text_and_punctuation_parity": false,
+    "original_source_to_stock_quotations_notes_and_structure_parity": false,
+    "source_no_marker_division_identified": false,
+    "source_same_digital_edition_confirmed": false,
+    "rights_approved": false,
+    "editorial_approved": false,
+    "gui_xiphos_and_andbible_tested": false,
+    "published": false
+  },
+  "third_party_text_or_module_committed": false,
+  "source_original_modified": false
+}
