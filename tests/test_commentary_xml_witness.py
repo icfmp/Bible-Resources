@@ -71,6 +71,54 @@ class CommentaryXMLSourceTests(unittest.TestCase):
         self.assertEqual(result["candidate_commentary_reference_classes"]["cross_book_range_requires_order_review"], 1)
         self.assertFalse(result["authored_ranges_verified"])
 
+    def test_chapter_bearing_division_without_scripcom_is_not_discarded(self):
+        source = self.sample().replace(
+            b"</div1><!-- original comment -->",
+            b"</div1><div1 title='Jude'>"
+            b"<div2 title='Chapter'><p>Unmarked source still contains genuine authorial prose.</p></div2>"
+            b"</div1><!-- original comment -->"
+        )
+        result = xml_structure(source)
+        self.assertEqual(result['source_div1_with_direct_chapters'], 2)
+        self.assertEqual(result['source_direct_chapters_inside_div1'], 2)
+        self.assertEqual(len(result['source_chapter_bearing_div1_without_scripCom']), 2)
+        self.assertGreater(result['source_chapter_bearing_div1_without_scripCom'][1]['original_text_unicode_characters'], 10)
+        self.assertEqual(result['source_chapter_bearing_div1_without_scripCom'][1]['nonempty_paragraph_elements'], 1)
+        self.assertNotIn('Unmarked source still contains', json.dumps(result))
+        self.assertNotIn('Jude', json.dumps(result))
+        self.assertTrue(result['source_division_text_stream_sha_is_not_original_file_byte_hash'])
+    def test_unmarked_division_neighbors_are_evidence_not_inferred_identity(self):
+        source = (
+            b'<?xml version="1.0" encoding="UTF-8"?>'
+            b'<ThML><div1><div2><scripCom osisRef="Bible:Gen.1.1"/></div2></div1>'
+            b'<div1 title="Unknown"><div2><p>Original unmarked authorial text.</p></div2></div1>'
+            b'<div1><div2><scripCom osisRef="Bible:Exod.1.1"/></div2></div1></ThML>'
+            + b' ' * 1100
+        )
+        report = xml_structure(source)
+        self.assertEqual(len(report['source_chapter_bearing_div1_without_scripCom']), 1)
+        unmarked = report['source_chapter_bearing_div1_without_scripCom'][0]
+        self.assertEqual(unmarked['source_div1_ordinal'], 2)
+        self.assertEqual(unmarked['nearest_prior_annotated_division_book_codes'], ['Gen'])
+        self.assertEqual(unmarked['nearest_next_annotated_division_book_codes'], ['Exod'])
+        self.assertFalse(unmarked['identity_from_neighbor_codes_established'])
+        self.assertNotIn('Original unmarked authorial text', json.dumps(report))
+
+    def test_split_book_divisions_are_counted_not_silently_collapsed(self):
+        source = self.sample().replace(
+            b"<div2 title='Chapter'>",
+            b"<div2 title='Chapter'><scripCom osisRef='Bible:Gen.1.1'/>"
+        ).replace(
+            b"</div1><!-- original comment -->",
+            b"</div1><div1 title='Another division'>"
+            b"<div2 title='Chapter'><scripCom osisRef='Bible:Gen.2.1'/>"
+            b"<p>All original content remains.</p></div2></div1><!-- original comment -->"
+        )
+        result = xml_structure(source)
+        self.assertEqual(result['source_div1_count_by_unmodified_annotation_book_code']['Gen'], 2)
+        self.assertEqual(result['source_direct_chapters_by_annotation_book_code']['Gen'], 2)
+        self.assertEqual(result['source_div1_with_multiple_reference_book_codes'], [])
+        self.assertNotIn('All original content remains', json.dumps(result))
     def test_original_xml_with_dtd_is_never_marked_schema_validated(self):
         raw = self.sample().replace(b"<ThML>", b'<!DOCTYPE ThML [<!ENTITY original "text">]><ThML>')
         result = xml_structure(raw)
