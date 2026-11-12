@@ -1,0 +1,77 @@
+name: Reconcile commentary source anchors with SWORD slots (research only)
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/commentary-anchor-reconciliation.yml'
+      - 'scripts/commentary_anchor_reconciliation.py'
+      - 'scripts/commentary_native_inventory.py'
+      - 'tests/test_commentary_anchor_reconciliation.py'
+  workflow_dispatch:
+    inputs:
+      resource_id:
+        description: 'Previously pinned commentary intake ID'
+        required: true
+        default: mhcc-crosswire
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: commentary-anchor-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  original_anchor_reconciliation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    env:
+      RESOURCE_ID: ${{ github.event.inputs.resource_id || 'mhcc-crosswire' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install reviewed Python dependencies and release libSWORD
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev
+      - name: Compile generic native commentary reference inspector
+        shell: bash
+        run: |
+          set -euo pipefail
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_index.cpp \
+            -o "${RUNNER_TEMP}/sword-commentary-index" -lsword
+      - name: Compare complete source anchor spans to native occupied slots
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_anchor_reconciliation.py \
+            --resource-id "$RESOURCE_ID" \
+            --native-inspector "${RUNNER_TEMP}/sword-commentary-index" \
+            --report "${RUNNER_TEMP}/commentary-anchor-reconciliation.json"
+      - name: Retain metadata-only research receipt, never source files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: commentary-anchor-reconciliation-receipt
+          path: ${{ runner.temp }}/commentary-anchor-reconciliation.json
+          if-no-files-found: warn
+          retention-days: 90
+      - name: Separate reference-location evidence from fidelity approval
+        if: always()
+        run: |
+          {
+            echo '## Original source anchor versus native occupied-slot study'
+            echo 'Original XML and compiled stock SWORD bytes never leave runner temporary storage.'
+            echo 'A candidate occupied key within an original source range is NOT proof of identical text, same authorial annotation, or accurate paragraph/notes.'
+            echo 'Unmatched and ambiguous references require editorial review, not automatic relabelling.'
+            echo 'Rights, editorial signoff, real independent GUI readers and release remain blocked.'
+          } >> "$GITHUB_STEP_SUMMARY"
