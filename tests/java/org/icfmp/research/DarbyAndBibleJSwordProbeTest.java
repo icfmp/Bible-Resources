@@ -2,6 +2,10 @@ package org.icfmp.research;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,6 +17,10 @@ import org.crosswire.jsword.book.Books;
 import org.crosswire.jsword.book.OSISUtil;
 import org.crosswire.jsword.book.sword.SwordBookPath;
 import org.crosswire.jsword.passage.Key;
+import org.crosswire.jsword.passage.Verse;
+import org.crosswire.jsword.versification.BibleBook;
+import org.crosswire.jsword.versification.Versification;
+import org.crosswire.jsword.versification.system.Versifications;
 import org.jdom2.Element;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -157,10 +165,49 @@ public final class DarbyAndBibleJSwordProbeTest {
     }
 
     @Test
-    public void exposesExactlySourceIndexedVersesWithoutInventingMissingOnes() throws Exception {
-        // JSword's calculated scope comes from the module index, NOT the
-        // nominated counts in the external original-source audit.
-        int count = bible.getScope().getCardinality();
-        assertEquals("JSword sees a different number of genuine source entries", 31166, count);
+    public void checksEveryAuthoredVerseThroughRealJswordIndexWithoutPhantomTexts() throws Exception {
+        // JSword's scope may contain nominal versification slots and intros.
+        // Those are not necessarily populated Bible verse entries. Compare
+        // the actual .contains() result against the exact reviewed source keys
+        // rather than assuming scope.getCardinality() equals source text count.
+        String manifest = System.getenv("DARBY_JSWORD_ORIGINAL_KEYS");
+        assertNotNull("Exact original index manifest is required", manifest);
+        List<String> keys = Files.readAllLines(Paths.get(manifest), StandardCharsets.US_ASCII);
+        assertEquals("Unverified authored verse reference manifest", 31166, keys.size());
+        Versification luther = Versifications.instance().getVersification("Luther");
+        assertNotNull("AndBible JSword does not support real Luther versification", luther);
+        Set<String> expected = new HashSet<>();
+        int missing = 0;
+        for (String osis : keys) {
+            assertTrue("Invalid authorial OSIS reference shape",
+                       osis.matches("[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9][0-9]*\\.[1-9][0-9]*"));
+            assertTrue("Duplicated source verse ID in JSword manifest", expected.add(osis));
+            String[] parts = osis.split("\\.");
+            BibleBook book = BibleBook.fromExactOSIS(parts[0]);
+            assertNotNull("Unknown authorial OSIS book to AndBible JSword", book);
+            Verse verse = new Verse(luther, book,
+                    Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+            assertEquals("JSword changed a source OSIS verse address", osis, verse.getOsisRef());
+            if (!bible.contains(verse)) missing++;
+        }
+        assertEquals("JSword cannot address authored source verses", 0, missing);
+        int nominalScope = bible.getScope().getCardinality();
+        int extraPopulated = 0;
+        int unpopulatedScopeSlots = 0;
+        for (Key candidate : bible.getScope()) {
+            if (!(candidate instanceof Verse)) continue;
+            Verse v = (Verse) candidate;
+            if (v.getChapter() <= 0 || v.getVerse() <= 0) continue;
+            if (!expected.contains(v.getOsisRef())) {
+                if (bible.contains(v)) extraPopulated++;
+                else unpopulatedScopeSlots++;
+            }
+        }
+        System.out.println("JSWORD_SCOPE_CARDINALITY=" + nominalScope);
+        System.out.println("JSWORD_SCOPE_EXTRA_POPULATED=" + extraPopulated);
+        System.out.println("JSWORD_SCOPE_EMPTY_NOMINAL_SLOTS=" + unpopulatedScopeSlots);
+        assertEquals("JSword reports numbered Bible entries absent from the authorial source",
+                     0, extraPopulated);
     }
+
 }
