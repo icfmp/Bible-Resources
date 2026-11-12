@@ -194,6 +194,7 @@ def xml_structure(data: bytes) -> dict:
     source_annotation_book_chapters = Counter()
     source_multi_book_divisions = []
     book_body_ordered_sha = sha256()
+    division_original_marker_book_codes = []
     for division in root.iter():
         if not isinstance(division.tag, str) or safe_name(division.tag) != "div1":
             continue
@@ -215,6 +216,7 @@ def xml_structure(data: bytes) -> dict:
             _, code = _parse_reference(original_marker.get("osisRef", ""))
             if code:
                 original_book_codes.add(code)
+        division_original_marker_book_codes.append(tuple(sorted(original_book_codes)))
         if len(original_book_codes) == 1:
             original_book_code = next(iter(original_book_codes))
             source_annotation_book_divisions[original_book_code] += 1
@@ -246,6 +248,18 @@ def xml_structure(data: bytes) -> dict:
                 ),
                 "source_words_or_heading_text_not_disclosed": True,
             })
+    # Original source order is evidence, not proof of canonical book identity.
+    # Preserve neighboring *annotated* book codes for unmarked divisions;
+    # never assign their text to a book by inference.
+    for item in no_marker_division_receipts:
+        idx = item["source_div1_ordinal"] - 1
+        before = next((codes for codes in reversed(division_original_marker_book_codes[:idx])
+                       if codes), ())
+        after = next((codes for codes in division_original_marker_book_codes[idx + 1:]
+                      if codes), ())
+        item["nearest_prior_annotated_division_book_codes"] = list(before)
+        item["nearest_next_annotated_division_book_codes"] = list(after)
+        item["identity_from_neighbor_codes_established"] = False
     # XML could be ThML with DTD/unknown entities; always flag instead of
     # silently interpreting its sections as authoritative SWORD mappings.
     return {
