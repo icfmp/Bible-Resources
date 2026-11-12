@@ -26,6 +26,7 @@ from commentary_intake import load_manifest
 from commentary_text_delta import punctuation_relationship, word_relationship, nonword_symbol_excess
 from commentary_stock_prefix_topology import (
     source_word_prefix_topology, aligned_punctuation_gap_diagnostics,
+    stock_prefixed_source_body_concordance, unexplained_word_boundary_census,
 )
 from commentary_xml_witness import _parse_reference, WORK_REF, OSIS_LOC, xml_structure, MAX_XML
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
@@ -133,6 +134,15 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
     stock_prefix_full_sibling_top_level_tags=Counter()
     stock_prefix_has_full_sibling_element=0
     stock_prefix_owners_before_original_body=Counter()
+    stock_original_body_suffix_concordance=Counter()
+    stock_original_body_suffix_glyph_classes=Counter()
+    stock_original_body_suffix_glyph_replacements=Counter()
+    stock_original_body_suffix_changed_gaps=0
+    divergent_word_boundary_suffix_bins=Counter()
+    divergent_word_boundary_placement=Counter()
+    divergent_original_middle_word_bins=Counter()
+    divergent_stock_middle_word_bins=Counter()
+    divergent_word_boundary_scanned=0
     punctuation_aligned_gap_classes=Counter()
     punctuation_aligned_numeric_substitutions=Counter()
     punctuation_entries_with_only_one_to_one_glyph_changes=0
@@ -211,6 +221,23 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
                             stock_prefix_owners_before_original_body.update(
                                 topology["prefix_text_top_level_owner_types"]
                             )
+                            suffix_result=stock_prefixed_source_body_concordance(item["original_text"],raw)
+                            if suffix_result["stock_extra_prefix_word_tokens"]!=diagnostic[
+                                "additional_stock_word_tokens_before_source"
+                            ]:
+                                raise PilotError("Original stock suffix does not match independent token-prefix audit")
+                            stock_original_body_suffix_concordance[
+                                suffix_result["original_source_body_to_stock_suffix_class"]
+                            ]+=1
+                            stock_original_body_suffix_glyph_classes.update(
+                                suffix_result["aligned_suffix_gap_class_counts"]
+                            )
+                            stock_original_body_suffix_glyph_replacements.update(
+                                suffix_result["aligned_suffix_one_to_one_numeric_glyph_substitutions"]
+                            )
+                            stock_original_body_suffix_changed_gaps+=suffix_result[
+                                "aligned_suffix_changed_nonword_gaps"
+                            ]
                             for value,bins in (
                                 (diagnostic["additional_stock_word_tokens_before_source"],stock_extra_prefix_token_bins),
                                 (diagnostic["additional_stock_word_tokens_after_source"],stock_extra_suffix_token_bins),
@@ -221,6 +248,29 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
                                 elif value<=29: b="10_to_29"
                                 else: b="30_or_more"
                                 bins[b]+=1
+                        if category=="different_word_order_or_selection_requires_review":
+                            unresolved=unexplained_word_boundary_census(item["original_text"],compiled)
+                            divergent_word_boundary_scanned+=1
+                            divergent_word_boundary_suffix_bins[unresolved[
+                                "common_suffix_fraction_bucket"]]+=1
+                            if unresolved["changed_only_at_start_of_word_sequence"]:
+                                divergent_word_boundary_placement["only_start"]+=1
+                            elif unresolved["changed_only_at_end_of_word_sequence"]:
+                                divergent_word_boundary_placement["only_end"]+=1
+                            elif unresolved["changed_in_middle_with_both_matching_boundaries"]:
+                                divergent_word_boundary_placement["middle_with_shared_edges"]+=1
+                            else:
+                                divergent_word_boundary_placement["complex_or_disjoint_boundaries"]+=1
+                            for value,bins in (
+                                (unresolved["source_middle_different_word_tokens"],divergent_original_middle_word_bins),
+                                (unresolved["stock_middle_different_word_tokens"],divergent_stock_middle_word_bins),
+                            ):
+                                if value==0: label="none"
+                                elif value==1: label="one_word"
+                                elif value<=5: label="two_to_five_words"
+                                elif value<=20: label="six_to_twenty_words"
+                                else: label="over_twenty_words"
+                                bins[label]+=1
                         if priority_example_counts[category]<4:
                             priority_example_counts[category]+=1
                             bounded_priority_examples.append({
@@ -278,6 +328,19 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
         raise PilotError("Aligned punctuation entry count exceeds source divergence census")
     if sum(punctuation_aligned_gap_classes.values())!=punctuation_changed_gap_count:
         raise PilotError("Aligned punctuation gaps incomplete")
+    if sum(stock_original_body_suffix_concordance.values())!=sum(stock_containment_locations.values()):
+        raise PilotError("Unmodified original source body suffix comparison omitted stock-prefixed entries")
+    if sum(stock_original_body_suffix_glyph_classes.values())!=stock_original_body_suffix_changed_gaps:
+        raise PilotError("Punctuation changes inside stock suffix do not reconcile")
+    if divergent_word_boundary_scanned!=word_relationship_subtypes[
+        "different_word_order_or_selection_requires_review"
+    ]:
+        raise PilotError("Unexplained lexical source-to-stock cases not fully enumerated")
+    if (sum(divergent_word_boundary_suffix_bins.values())!=divergent_word_boundary_scanned
+            or sum(divergent_word_boundary_placement.values())!=divergent_word_boundary_scanned
+            or sum(divergent_original_middle_word_bins.values())!=divergent_word_boundary_scanned
+            or sum(divergent_stock_middle_word_bins.values())!=divergent_word_boundary_scanned):
+        raise PilotError("Unexplained source-versus-stock word-boundary totals diverged")
     if len(bounded_priority_examples)>40:
         raise PilotError("Private difference sample exceeds reviewed non-text bound")
     return {
@@ -309,6 +372,25 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
         "stock_prefix_text_owner_types_before_source_word":
             dict(sorted(stock_prefix_owners_before_original_body.items())),
         "original_source_word_contiguity_does_not_identify_or_approve_stock_added_material":True,
+        "stock_original_body_suffix_exact_unicode_and_difference_classes":
+            dict(sorted(stock_original_body_suffix_concordance.items())),
+        "stock_original_body_suffix_punctuation_gap_classes":
+            dict(sorted(stock_original_body_suffix_glyph_classes.items())),
+        "stock_original_body_suffix_one_to_one_numeric_glyph_changes":
+            dict(stock_original_body_suffix_glyph_replacements.most_common(16)),
+        "stock_original_body_suffix_total_changed_punctuation_gaps":
+            stock_original_body_suffix_changed_gaps,
+        "stock_body_suffix_comparison_does_not_approve_omitted_prefix_or_layout":True,
+        "unexplained_original_to_stock_word_boundary_count":divergent_word_boundary_scanned,
+        "unexplained_original_to_stock_common_suffix_fraction_buckets":
+            dict(sorted(divergent_word_boundary_suffix_bins.items())),
+        "unexplained_original_to_stock_changed_segment_positions":
+            dict(sorted(divergent_word_boundary_placement.items())),
+        "unexplained_source_changed_middle_word_token_count_buckets":
+            dict(sorted(divergent_original_middle_word_bins.items())),
+        "unexplained_stock_changed_middle_word_token_count_buckets":
+            dict(sorted(divergent_stock_middle_word_bins.items())),
+        "unexplained_word_boundary_counts_do_not_prove_compiled_loss":True,
         "bounded_private_prioritized_hash_line_diagnostics":bounded_priority_examples,
         "all_detailed_difference_diagnostics_are_research_only":True,
         "lexical_disagreement_classification":dict(sorted(lexical_details.items())),
