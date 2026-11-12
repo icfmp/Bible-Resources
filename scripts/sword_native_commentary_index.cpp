@@ -46,8 +46,7 @@ int main(int argc, char** argv) {
         if (module->hasEntry(&key)) {
             std::string ref = key.getOSISRef();
             if (ref.empty() && key.getChapter() == 0 && key.getVerse() == 0) {
-                std::cout << "U\tTOP" << '\n';
-                ++topCount;
+                std::cout << "U\tTOP:" << (++topCount) << '\n';
             } else if (key.getChapter() == 0 || key.getVerse() == 0) {
                 if (!std::regex_match(ref, introduction)) return 8;
                 std::cout << "I\t" << ref << '\n';
