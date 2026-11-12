@@ -37,13 +37,13 @@ class CommentaryXMLSourceTests(unittest.TestCase):
         source = self.sample().replace(
             b"<div2 title='Chapter'>",
             b"<div2 title='Chapter'>"
-            b"<scripCom osisRef='Gen.1.1-Gen.1.5' passage='Gen 1:1-5' type='section'/>"
-            b"<scripCom osisRef='Gen.1.6' passage='Gen 1:6' type='section'/>"
-            b"<scripCom osisRef='Gen.1.6' passage='Gen 1:6' type='section'/>"
+            b"<scripCom osisRef='Bible:Gen.1.1-Gen.1.5' passage='Gen 1:1-5' type='section'/>"
+            b"<scripCom osisRef='Bible:Gen.1.6' passage='Gen 1:6' type='section'/>"
+            b"<scripCom osisRef='Bible:Gen.1.6' passage='Gen 1:6' type='section'/>"
         )
         result = xml_structure(source)
-        self.assertEqual(result['candidate_commentary_reference_classes']['same_book_verse_range'], 1)
-        self.assertEqual(result['candidate_commentary_reference_classes']['one_fully_qualified_verse'], 2)
+        self.assertEqual(result['candidate_commentary_reference_classes']['work_qualified_same_book_verse_range'], 1)
+        self.assertEqual(result['candidate_commentary_reference_classes']['work_qualified_verse'], 2)
         self.assertEqual(result['candidate_commentary_distinct_reference_count'], 2)
         self.assertEqual(result['candidate_commentary_duplicate_identical_reference_count'], 1)
         self.assertEqual(result['candidate_commentary_attribute_name_counts']['osisRef'], 3)
@@ -56,9 +56,21 @@ class CommentaryXMLSourceTests(unittest.TestCase):
             b"<div2 title='Chapter'><scripCom osisRef='Gen 1:1-3'/>"
         )
         result = xml_structure(source)
-        self.assertEqual(result['candidate_commentary_reference_classes']['other_unreviewed_reference_grammar'], 1)
+        self.assertEqual(result['candidate_commentary_reference_classes']['unreviewed_missing_or_unqualified_work_ref'], 1)
         self.assertFalse(result['authored_ranges_verified'])
         self.assertTrue(all('Gen' not in shape for shape in result['candidate_commentary_reference_shapes']))
+    def test_thml_work_qualified_chapters_and_cross_book_ranges_do_not_rewrite(self):
+        source = self.sample().replace(
+            b"<div2 title='Chapter'>",
+            b"<div2 title='Chapter'>"
+            b"<scripCom osisRef='Bible:Gen.1'/>"
+            b"<scripCom osisRef='Bible:Gen.1.1-Exod.1.1'/>"
+        )
+        result = xml_structure(source)
+        self.assertEqual(result["candidate_commentary_reference_classes"]["work_qualified_chapter"], 1)
+        self.assertEqual(result["candidate_commentary_reference_classes"]["cross_book_range_requires_order_review"], 1)
+        self.assertFalse(result["authored_ranges_verified"])
+
     def test_original_xml_with_dtd_is_never_marked_schema_validated(self):
         raw = self.sample().replace(b"<ThML>", b'<!DOCTYPE ThML [<!ENTITY original "text">]><ThML>')
         result = xml_structure(raw)
