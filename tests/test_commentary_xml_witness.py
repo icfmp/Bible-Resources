@@ -33,6 +33,31 @@ class CommentaryXMLSourceTests(unittest.TestCase):
         self.assertFalse(result["source_format_validated"])
         self.assertNotIn("Sample original words", json.dumps(result))
 
+    def test_commentary_section_reference_classes_are_read_only_and_order_sensitive(self):
+        source = self.sample().replace(
+            b"<div2 title='Chapter'>",
+            b"<div2 title='Chapter'>"
+            b"<scripCom osisRef='Gen.1.1-Gen.1.5' passage='Gen 1:1-5' type='section'/>"
+            b"<scripCom osisRef='Gen.1.6' passage='Gen 1:6' type='section'/>"
+            b"<scripCom osisRef='Gen.1.6' passage='Gen 1:6' type='section'/>"
+        )
+        result = xml_structure(source)
+        self.assertEqual(result['candidate_commentary_reference_classes']['same_book_verse_range'], 1)
+        self.assertEqual(result['candidate_commentary_reference_classes']['one_fully_qualified_verse'], 2)
+        self.assertEqual(result['candidate_commentary_distinct_reference_count'], 2)
+        self.assertEqual(result['candidate_commentary_duplicate_identical_reference_count'], 1)
+        self.assertEqual(result['candidate_commentary_attribute_name_counts']['osisRef'], 3)
+        self.assertFalse(result['candidate_sections_are_verified_annotations'])
+        self.assertNotIn('Gen 1:1-5', json.dumps(result))
+
+    def test_unreviewed_reference_grammar_remains_visible_as_count_not_guessed(self):
+        source = self.sample().replace(
+            b"<div2 title='Chapter'>",
+            b"<div2 title='Chapter'><scripCom osisRef='Gen 1:1-3'/>"
+        )
+        result = xml_structure(source)
+        self.assertEqual(result['candidate_commentary_reference_classes']['other_unreviewed_reference_grammar'], 1)
+        self.assertFalse(result['authored_ranges_verified'])
     def test_original_xml_with_dtd_is_never_marked_schema_validated(self):
         raw = self.sample().replace(b"<ThML>", b'<!DOCTYPE ThML [<!ENTITY original "text">]><ThML>')
         result = xml_structure(raw)
