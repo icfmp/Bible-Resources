@@ -14,7 +14,7 @@ from reader_xiphos_headless_smoke import (
     _sample_reader_passages, _capture_parallel_toggle_sample,
     _capture_note_hover_sample, GENESIS_1_2_NOTE_HOVER, READER_SAMPLES,
     install_checked_out_rawtext_comparison, _capture_module_tree_probe,
-    _capture_source_note_link_host,
+    _capture_source_note_link_host, _capture_bounded_note_popup,
 )
 
 
@@ -306,6 +306,36 @@ class XiphosSmokeUnitTests(unittest.TestCase):
                 with self.assertRaises(XiphosSmokeError):
                     _capture_source_note_link_host({"DISPLAY": ":91"}, study)
                 self.assertEqual(screenshot.read_bytes(), b"preserve older evidence")
+
+    def test_bounded_note_popups_allow_real_colon_references_and_refuse_unsafe_input(self):
+        with tempfile.TemporaryDirectory() as base:
+            out=Path(base)
+            commands=[]
+            def fake_run(cmd, **kwargs):
+                commands.append(cmd)
+                if cmd[0] == "import":
+                    Path(cmd[-1]).write_bytes(b"synthetic note UI pixels")
+                return subprocess.CompletedProcess(cmd,0)
+            with (patch("reader_xiphos_headless_smoke.subprocess.run",side_effect=fake_run),
+                  patch("reader_xiphos_headless_smoke.time.sleep")):
+                result=_capture_bounded_note_popup(
+                    {"DISPLAY":":91"},out,slug="leviticus-note-2",
+                    reference="Lev 8:15",marker_x=446,marker_y=349)
+                self.assertEqual(result["requested_host_reference"],"Lev 8:15")
+                self.assertTrue(result["independent_pixel_review_required"])
+                self.assertFalse(result["corrected_link_clicked"])
+                self.assertEqual(len(result["host_hover_pinned_images_sha256"]),3)
+                self.assertIn(["xdotool","click","2"],commands)
+                self.assertTrue((out/"leviticus-note-2-pinned.png").is_file())
+                for bad in ("Lev%8:15","../8:15","Lev 8:15!"):
+                    with self.subTest(reference=bad),self.assertRaises(XiphosSmokeError):
+                        _capture_bounded_note_popup({"DISPLAY":":91"},out,
+                            slug="unsafe-test",reference=bad,
+                            marker_x=446,marker_y=349)
+                with self.assertRaises(XiphosSmokeError):
+                    _capture_bounded_note_popup({"DISPLAY":":0"},out,
+                        slug="unsafe-display",reference="Lev 8:15",
+                        marker_x=446,marker_y=349)
 
     def test_hash_and_scheme_mismatch_fail_closed(self):
         with tempfile.TemporaryDirectory() as folder:
