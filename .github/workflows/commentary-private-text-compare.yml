@@ -1,0 +1,83 @@
+name: Compare exact original commentary text to stock SWORD privately
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/commentary-private-text-compare.yml'
+      - 'scripts/commentary_private_text_compare.py'
+      - 'tests/test_commentary_private_text_compare.py'
+      - 'scripts/commentary_native_raw_inventory.py'
+      - 'scripts/sword_native_commentary_raw_corpus.cpp'
+      - 'scripts/commentary_xml_witness.py'
+      - 'config/commentary-intake/**'
+  workflow_dispatch:
+    inputs:
+      resource_id:
+        description: "Independently pinned commentary source and SWORD originals"
+        required: true
+        type: string
+        default: mhcc-crosswire
+
+permissions:
+  contents: read
+
+concurrency:
+  group: commentary-lexical-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  private_source_to_stock_text:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      RESOURCE_ID: ${{ github.event.inputs.resource_id || 'mhcc-crosswire' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install reviewed XML and stable SWORD dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev
+      - name: Compile independent stock key inspector and PRIVATE raw SWORD reader
+        shell: bash
+        run: |
+          set -euo pipefail
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_index.cpp \
+            -o "${RUNNER_TEMP}/commentary-native-index" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "${RUNNER_TEMP}/commentary-private-raw" -lsword
+      - name: Compare every original verse/range body with stock entry without content output
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_private_text_compare.py \
+            --resource-id "$RESOURCE_ID" \
+            --native-index-binary "${RUNNER_TEMP}/commentary-native-index" \
+            --native-raw-binary "${RUNNER_TEMP}/commentary-private-raw" \
+            --report "${RUNNER_TEMP}/commentary-source-stock-lexical.json"
+      - name: Preserve only non-text source and stock diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: commentary-private-text-compare-receipt
+          path: ${{ runner.temp }}/commentary-source-stock-lexical.json
+          if-no-files-found: warn
+          retention-days: 90
+      - name: Explain exact source and source parity gates
+        if: always()
+        run: |
+          {
+            echo '## Original commentary/source-to-SWORD lexical comparison'
+            echo 'All authored text and stock raw XML were privately processed and never logged or uploaded.'
+            echo 'Exact Unicode matches are distinct from whitespace-only heuristics and actual lexical differences.'
+            echo 'Failure to parse a stock raw XML fragment blocks that entry rather than normalizing it.'
+            echo 'Original chapter material, unmarked source divisions, quotations, notes, structure, rights and GUI readers remain unapproved.'
+          } >> "$GITHUB_STEP_SUMMARY"
