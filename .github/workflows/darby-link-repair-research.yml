@@ -75,7 +75,7 @@ jobs:
       - name: Upload ONLY metadata receipt; never original or modified Scripture
         uses: actions/upload-artifact@v4
         with:
-          name: private-osis-link-repair-receipt-\${{ github.run_id }}
-          path: \${{ runner.temp }}/darby-private-link-probe/receipt.json
+          name: private-osis-link-repair-receipt-${{ github.run_id }}
+          path: ${{ runner.temp }}/darby-private-link-probe/receipt.json
           retention-days: 30
           if-no-files-found: error
