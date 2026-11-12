@@ -9,7 +9,8 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/"scripts"))
 from probe_andbible_android_private_import import (
     safe_controls, tap_allowlisted, relaunch_for_persistence,
-    open_documented_reference_probe, AndroidDarbyImportError,
+    open_documented_reference_probe, probe_observed_note_marker,
+    AndroidDarbyImportError,
 )
 
 
@@ -97,6 +98,24 @@ class AndBiblePrivateImportUiTest(unittest.TestCase):
         self.assertEqual(args[7:9], ("-p", "net.bible.android.activity"))
         with self.assertRaises(AndroidDarbyImportError):
             open_documented_reference_probe("Acts.8.37")
+
+    def test_note_probe_requires_exact_verified_android_png_geometry(self):
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory() as tmp:
+            path=Path(tmp)/"screen.png"
+            path.write_bytes(b"not-a-png")
+            with self.assertRaises(AndroidDarbyImportError):
+                probe_observed_note_marker(path)
+            import struct
+            header=b"\\x89PNG\\r\\n\\x1a\\n"+b"\\x00"*8
+            path.write_bytes(header+struct.pack(">II", 832, 1792))
+            with self.assertRaises(AndroidDarbyImportError):
+                probe_observed_note_marker(path)
+            path.write_bytes(header+struct.pack(">II", 1080, 2280))
+            with (patch("probe_andbible_android_private_import.adb") as adb,
+                  patch("probe_andbible_android_private_import.time.sleep")):
+                probe_observed_note_marker(path)
+            adb.assert_called_once_with("shell","input","tap","823","1425",timeout=12)
 
     def test_file_picker_identifies_only_explicit_private_candidate(self):
         xml=b"""<hierarchy>
