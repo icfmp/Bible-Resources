@@ -87,6 +87,21 @@ class CommentaryXMLSourceTests(unittest.TestCase):
         self.assertNotIn('Unmarked source still contains', json.dumps(result))
         self.assertNotIn('Jude', json.dumps(result))
         self.assertTrue(result['source_division_text_stream_sha_is_not_original_file_byte_hash'])
+    def test_split_book_divisions_are_counted_not_silently_collapsed(self):
+        source = self.sample().replace(
+            b"<div2 title='Chapter'>",
+            b"<div2 title='Chapter'><scripCom osisRef='Bible:Gen.1.1'/>"
+        ).replace(
+            b"</div1><!-- original comment -->",
+            b"</div1><div1 title='Another division'>"
+            b"<div2 title='Chapter'><scripCom osisRef='Bible:Gen.2.1'/>"
+            b"<p>All original content remains.</p></div2></div1><!-- original comment -->"
+        )
+        result = xml_structure(source)
+        self.assertEqual(result['source_div1_count_by_unmodified_annotation_book_code']['Gen'], 2)
+        self.assertEqual(result['source_direct_chapters_by_annotation_book_code']['Gen'], 2)
+        self.assertEqual(result['source_div1_with_multiple_reference_book_codes'], [])
+        self.assertNotIn('All original content remains', json.dumps(result))
     def test_original_xml_with_dtd_is_never_marked_schema_validated(self):
         raw = self.sample().replace(b"<ThML>", b'<!DOCTYPE ThML [<!ENTITY original "text">]><ThML>')
         result = xml_structure(raw)
