@@ -26,13 +26,15 @@ MAX_XML = 32 * 1024 * 1024
 MAX_TAG_TYPES = 128
 MAX_ELEMENTS = 600_000
 XML_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_.:-]{0,95}$")
-OSIS_PART = r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*\.[1-9][0-9]*"
-OSIS_SINGLE = re.compile(r"^" + OSIS_PART + r"$")
-OSIS_RANGE = re.compile(r"^(" + OSIS_PART + r")-(" + OSIS_PART + r")$")
+OSIS_BOOK = r"[1-4]?[A-Za-z][A-Za-z0-9]*"
+OSIS_LOC = re.compile(
+    r"^(" + OSIS_BOOK + r")\.([1-9][0-9]*)(?:\.([1-9][0-9]*))?$"
+)
+WORK_REF = re.compile(r"^([A-Za-z][A-Za-z0-9_-]{0,39}):(.+)$")
+
 
 def _safe_reference_shape(value: str) -> str:
-    # This is deliberately not a reference or a commentary excerpt.
-    # Only character classes and punctuation survive the fingerprint.
+    """Show only the grammar shape, never an original source attribute."""
     if len(value) > 400:
         return "UNREVIEWED_LONG_REFERENCE"
     shape = "".join("A" if c.isalpha() else "9" if c.isdigit() else c
@@ -42,16 +44,43 @@ def _safe_reference_shape(value: str) -> str:
     return shape[:100]
 
 
+def _parse_reference(value: str) -> tuple[str, str | None]:
+    """Observe ThML work-qualified annotations without rewriting source refs.
+
+    A work prefix is *legitimate original ThML*; our SWORD OSIS commentary
+    normalizer has a different policy. Never silently strip a source prefix.
+    Only classify fully qualified chapter/verse endpoints in memory.
+    """
+    match = WORK_REF.fullmatch(value)
+    if not match:
+        return "unreviewed_missing_or_unqualified_work_ref", None
+    work, body = match.groups()
+    if len(body) > 256:
+        return "unreviewed_long_work_ref", None
+    parts = body.split("-")
+    if len(parts) not in (1, 2):
+        return "unreviewed_range_syntax", None
+    endpoints = [OSIS_LOC.fullmatch(part) for part in parts]
+    if not all(endpoints):
+        return "unreviewed_location_syntax", None
+    first = endpoints[0]
+    book, chapter, verse = first.groups()
+    if len(parts) == 1:
+        return ("work_qualified_chapter" if verse is None
+                else "work_qualified_verse"), book
+    second = endpoints[1]
+    book2, chapter2, verse2 = second.groups()
+    if verse is None or verse2 is None:
+        return "unreviewed_range_without_complete_verses", None
+    if book != book2:
+        return "cross_book_range_requires_order_review", None
+    if (int(chapter), int(verse)) > (int(chapter2), int(verse2)):
+        return "reversed_range_requires_editorial_review", None
+    return "work_qualified_same_book_verse_range", book
+
+
 def _ref_category(value: str) -> str:
-    if not value:
-        return "missing"
-    if OSIS_SINGLE.fullmatch(value):
-        return "one_fully_qualified_verse"
-    match = OSIS_RANGE.fullmatch(value)
-    if match:
-        return ("same_book_verse_range" if match[1].split(".")[0] == match[2].split(".")[0]
-                else "cross_book_range_requires_review")
-    return "other_unreviewed_reference_grammar"
+    return _parse_reference(value)[0]
 
 
 def safe_name(tag: str) -> str:
@@ -125,11 +154,11 @@ def xml_structure(data: bytes) -> dict:
             ref = node.get("osisRef", "")
             source_ref_digest.update(ref.encode("utf-8"))
             source_ref_digest.update(b"\0")
-            category = _ref_category(ref)
+            category, book = _parse_reference(ref)
             source_commentary_ref_classes[category] += 1
             source_commentary_ref_shapes[_safe_reference_shape(ref)] += 1
-            if category in ("one_fully_qualified_verse", "same_book_verse_range"):
-                source_commentary_books[ref.split(".")[0]] += 1
+            if book:
+                source_commentary_books[book] += 1
             if ref in observed_ref_keys:
                 duplicate_ref_count += 1
             observed_ref_keys.add(ref)
