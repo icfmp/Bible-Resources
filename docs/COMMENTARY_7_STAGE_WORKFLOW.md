@@ -2,10 +2,10 @@
 
 **Scope:** commentaries (CrossWire SWORD RawCom/zCom or authorial OSIS/other
 reviewed source), **not** Bible verse imports. Track each edition in one
-\`[Import]\` issue. This specializes the evidence gates in
+`[Import]` issue. This specializes the evidence gates in
 [Bible's seven-stage workflow](BIBLE_7_STAGE_WORKFLOW.md), while reusing
 the existing ZIP preflight, bounded SWORD reader probes, generic OSIS guard,
-strict \`guard_commentary.py\`, upstream/license policy and catalogue gates.
+strict `guard_commentary.py`, upstream/license policy and catalogue gates.
 
 ## Stages and durable evidence
 
@@ -20,7 +20,7 @@ strict \`guard_commentary.py\`, upstream/license policy and catalogue gates.
 | **7/7. Approve & publish** | Separate legal, editorial and technical approval, stable package SHA, licence/source profile, verified GitHub release, standard SWORD and JSON catalogue endpoints | All approval and publication states independently verified |
 
 The existing strict OSIS validator applies **only when the actual original is
-OSIS**. A compiled binary labelled \`SourceType=OSIS\` is *not itself*
+OSIS**. A compiled binary labelled `SourceType=OSIS` is *not itself*
 its original authorial OSIS source. CCEL XML/ThML is an independent witness,
 not interchangeable with an unverified Moody Press transcription. Never
 reconstruct invented authorial source line numbers from a SWORD entry.
@@ -43,31 +43,31 @@ reconstruct invented authorial source line numbers from a SWORD entry.
 ## Reusable read-only observation (implemented)
 
 Each candidate has a **separate reviewed manifest**
-\`config/commentary-intake/<resource-id>.json\`; the initial file is
-\`mhcc-crosswire.json\`. The Python intake has **no MHCC-specific content
+`config/commentary-intake/<resource-id>.json`; the initial file is
+`mhcc-crosswire.json`. The Python intake has **no MHCC-specific content
 logic**. It uses the existing HTTPS CrossWire provider allowlist, bounded
-downloader, safe ZIP inspector, read-only \`diatheke\` scanner and content-free
+downloader, safe ZIP inspector, read-only `diatheke` scanner and content-free
 sample SHA reports. No original bytes or the retrieved commentary text are
 committed, copied to reports, or uploaded as workflow artifacts.
 
 Run [Observe commentary intake (read-only)](
 ../.github/workflows/commentary-intake.yml) through Actions, or locally:
 
-\`\`\`sh
+```sh
 python scripts/commentary_intake.py --resource-id mhcc-crosswire \
   --stage 1 --report /tmp/mhcc-identity.json
 python scripts/commentary_intake.py --resource-id mhcc-crosswire \
   --stage observe --report /tmp/mhcc-observation.json
-\`\`\`
+```
 
 - **Stage 1** uses no network and records that identity/rights need review.
-- **\`observe\`** acquires the **current** CrossWire ZIP into disposable
+- **`observe`** acquires the **current** CrossWire ZIP into disposable
   storage, verifies .conf module ID/version/language/license claim and ZIP
   safety, tests bounded diatheke entry retrieval, and writes only
   size, SHA-256, binary metadata and key-scoped hashes. It does **not**
   mean that 1/7, 2/7 or any subsequent stage has been accepted.
 - After independent review, place the observed ZIP SHA-256 in that
-  manifest and run **\`--stage 2\`** to enforce the exact pin on every
+  manifest and run **`--stage 2`** to enforce the exact pin on every
   redownload. A changed original **blocks** rather than repinning itself.
   Stage 2 still cannot be considered fully complete until the authorial
   witness is independently identified, compared and pinned.
