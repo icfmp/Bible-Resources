@@ -11,6 +11,8 @@ from probe_andbible_android_private_import import (
     safe_controls, tap_allowlisted, relaunch_for_persistence,
     open_documented_reference_probe, probe_observed_note_marker,
     probe_observed_corrected_colossians_link,
+    probe_observed_omitted_host_caller,
+    probe_observed_omitted_note_printed_link,
     AndroidDarbyImportError,
 )
 
@@ -99,6 +101,48 @@ class AndBiblePrivateImportUiTest(unittest.TestCase):
         self.assertEqual(args[7:9], ("-p", "net.bible.android.activity"))
         with self.assertRaises(AndroidDarbyImportError):
             open_documented_reference_probe("Acts.8.37")
+
+    def test_omitted_verse_host_links_allow_no_phantom_verses(self):
+        with (patch("probe_andbible_android_private_import.adb") as adb,
+              patch("probe_andbible_android_private_import.time.sleep")):
+            for host in ("Matt.23.13", "Acts.8.36", "Acts.15.33"):
+                open_documented_reference_probe(host)
+        self.assertEqual(adb.call_count, 3)
+        for ref in ("Matt.23.14", "Acts.8.37", "Acts.15.34"):
+            with self.assertRaises(AndroidDarbyImportError):
+                open_documented_reference_probe(ref)
+
+    def test_all_three_authorial_omitted_note_marker_samples_are_bounded(self):
+        from tempfile import TemporaryDirectory
+        import struct
+        with TemporaryDirectory() as tmp:
+            path=Path(tmp)/"host.png"
+            path.write_bytes(bytes.fromhex("89504e470d0a1a0a")
+                             +bytes(8)+struct.pack(">II",1080,2280))
+            with (patch("probe_andbible_android_private_import.adb") as adb,
+                  patch("probe_andbible_android_private_import.time.sleep")):
+                for host in ("Matt.23.13", "Acts.8.36", "Acts.15.33"):
+                    probe_observed_omitted_host_caller(path,host)
+            self.assertEqual([c.args[3:] for c in adb.call_args_list],
+                             [("225","1217"),("1017","1080"),("240","1151")])
+            with self.assertRaises(AndroidDarbyImportError):
+                probe_observed_omitted_host_caller(path,"Acts.8.37")
+
+    def test_research_only_missing_verse_label_taps_are_constrained(self):
+        from tempfile import TemporaryDirectory
+        import struct
+        with TemporaryDirectory() as tmp:
+            path=Path(tmp)/"note.png"
+            path.write_bytes(bytes.fromhex("89504e470d0a1a0a")
+                             +bytes(8)+struct.pack(">II",1080,2280))
+            with (patch("probe_andbible_android_private_import.adb") as adb,
+                  patch("probe_andbible_android_private_import.time.sleep")):
+                for host in ("Matt.23.13","Acts.8.36","Acts.15.33"):
+                    probe_observed_omitted_note_printed_link(path,host)
+            self.assertEqual([c.args[3:] for c in adb.call_args_list],
+                             [("685","1185"),("685","1292"),("685","1400")])
+            with self.assertRaises(AndroidDarbyImportError):
+                probe_observed_omitted_note_printed_link(path,"Acts.8.37")
 
     def test_note_probe_requires_exact_verified_android_png_geometry(self):
         from tempfile import TemporaryDirectory

@@ -96,6 +96,7 @@ def tap_allowlisted(controls, ordered_labels):
 
 
 DOCUMENTED_REFERENCE_PROBES = ("Gen.2.4", "Rom.16.25")
+OMITTED_VERSE_NOTE_HOST_PROBES = ("Matt.23.13", "Acts.8.36", "Acts.15.33")
 
 
 def open_documented_reference_probe(reference: str) -> None:
@@ -104,7 +105,7 @@ def open_documented_reference_probe(reference: str) -> None:
     https://andbible.org/docs/bible_links/ documents /OSISREF with document,
     v11n. Intent invocation alone is NEVER proof of actual navigation.
     """
-    if reference not in DOCUMENTED_REFERENCE_PROBES:
+    if reference not in DOCUMENTED_REFERENCE_PROBES + OMITTED_VERSE_NOTE_HOST_PROBES:
         raise AndroidDarbyImportError("Unreviewed Android passage navigation")
     uri = ("https://read.andbible.org/" + reference + "?"
            + urlencode({"document": MODULE, "v11n": VERSIFICATION}))
@@ -146,6 +147,51 @@ def probe_observed_corrected_colossians_link(screen: Path):
         raise AndroidDarbyImportError("Unexpected note popup screenshot geometry")
     adb("shell","input","tap","840","1800",timeout=12)
     time.sleep(5)
+
+
+# Actual independent run 43220850024 screenshot samples, 1080x2280,
+# with authorial note markers on the *host* verses, not omitted additions.
+OMITTED_HOST_CALLER_SAMPLES = {
+    "Matt.23.13": (225, 1217),  # original purple a, screenshot 15
+    "Acts.8.36": (1017, 1080),  # original purple i, screenshot 16
+    "Acts.15.33": (240, 1151),  # original purple e, screenshot 17
+}
+
+
+def probe_observed_omitted_host_caller(screen: Path, host: str) -> None:
+    """Tap ONLY an independently observed test screenshot note caller."""
+    if host not in OMITTED_HOST_CALLER_SAMPLES:
+        raise AndroidDarbyImportError("Unknown omitted-verse note host")
+    data=screen.read_bytes()
+    if (len(data) < 24 or data[:8] != bytes.fromhex("89504e470d0a1a0a")
+            or struct.unpack(">II", data[16:24]) != (1080, 2280)):
+        raise AndroidDarbyImportError("Unexpected omitted-note reader geometry")
+    x,y=OMITTED_HOST_CALLER_SAMPLES[host]
+    adb("shell","input","tap",str(x),str(y),timeout=12)
+    time.sleep(3)
+
+
+# Real run 43223191886: underlined missing-verse labels remain blue after
+# removal of machine osisRef targets. Determine their *actual* tap behavior.
+# Exact 1080x2280 AOSP screenshots 15/16/17, independently reviewed.
+OMITTED_NOTE_PRINTED_LINK_SAMPLES = {
+    "Matt.23.13": (685, 1185),
+    "Acts.8.36": (685, 1292),
+    "Acts.15.33": (685, 1400),
+}
+
+
+def probe_observed_omitted_note_printed_link(screen: Path, host: str) -> None:
+    """Research-only probe of blue omitted-verse reference, never a proof."""
+    if host not in OMITTED_NOTE_PRINTED_LINK_SAMPLES:
+        raise AndroidDarbyImportError("Unreviewed textual-critical note host")
+    data=screen.read_bytes()
+    if (len(data) < 24 or data[:8] != bytes.fromhex("89504e470d0a1a0a")
+            or struct.unpack(">II", data[16:24]) != (1080, 2280)):
+        raise AndroidDarbyImportError("Unexpected textual-critical popup geometry")
+    x,y=OMITTED_NOTE_PRINTED_LINK_SAMPLES[host]
+    adb("shell","input","tap",str(x),str(y),timeout=12)
+    time.sleep(4)
 
 
 def relaunch_for_persistence():
@@ -348,6 +394,31 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
                    popup_link="Col.2.2-Col.2.3", actual_navigation_verified=False)
         screenshots["14-corrected-colossians-link-probe"] = capture_png(
             evidence_dir/"14-corrected-colossians-link-probe.png")
+        # Observe actual host verses for intentionally omitted textual-critical
+        # additions. Do not navigate to those absent numbered verses and never
+        # infer note popup fidelity from a reference intent alone.
+        for index, reference in enumerate(OMITTED_VERSE_NOTE_HOST_PROBES, start=15):
+            open_documented_reference_probe(reference)
+            checkpoint("android_omitted_verse_note_host_probe",
+                       host=reference, host_render_verified=False,
+                       omitted_note_popup_verified=False)
+            key=f"{index:02d}-omitted-verse-host"
+            screenshots[key] = capture_png(evidence_dir/(key+".png"))
+            probe_observed_omitted_host_caller(evidence_dir/(key+".png"), reference)
+            checkpoint("android_omitted_verse_note_popup_visual_probe",
+                       host=reference, note_popup_verified=False,
+                       missing_verse_dead_link_verified=False)
+            screenshots[key+"-note"] = capture_png(
+                evidence_dir/(key+"-note.png"))
+            probe_observed_omitted_note_printed_link(
+                evidence_dir/(key+"-note.png"), reference)
+            checkpoint("android_missing_verse_printed_link_tap",
+                       host=reference, navigation_result_verified=False,
+                       phantom_verse_absence_gui_verified=False)
+            screenshots[key+"-reference-tap"] = capture_png(
+                evidence_dir/(key+"-reference-tap.png"))
+            adb("shell","input","keyevent","KEYCODE_BACK",timeout=12)
+            time.sleep(2)
 
     # A successful ADB press does not establish a loaded translation; retain
     # that as a separate visual and Java/Android document validation gate.
@@ -372,6 +443,9 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
         "andbible_documented_reference_navigation_verified":False,
         "andbible_romans_original_note_popup_verified":False,
         "andbible_colossians_note_link_gui_verified":False,
+        "andbible_three_omitted_verse_host_gui_verified":False,
+        "andbible_three_omitted_verse_note_popup_gui_verified":False,
+        "andbible_missing_verse_click_behavior_verified":False,
         "andbible_persistent_module_identity_verified":False,
         "andbible_import_verified":imported_by_app,
         "andbible_rendered_text_and_notes_verified":False,
