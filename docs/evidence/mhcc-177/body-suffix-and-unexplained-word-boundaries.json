@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "issue_url": "https://github.com/icfmp/Bible-Resources/issues/177",
+  "status": "SOURCE_BODY_SUFFIX_AND_UNEXPLAINED_WORD_BOUNDARY_DIAGNOSTICS_ONLY",
+  "original_inputs": {
+    "ccel_xml_sha256": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+    "crosswire_stock_zip_sha256": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+    "stock_native_corpus_ordered_sha256": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
+  },
+  "stock_prefix_source_body_word_alignment": {
+    "original_body_source_word_sequence_is_stock_entry_suffix": 799,
+    "strict_original_unicode_body_suffix_equality": 0,
+    "same_word_sequence_but_punctuation_or_nonword_difference": 799,
+    "total_changed_punctuation_gaps_within_799_body_suffixes": 916,
+    "whole_extra_stock_xml_prefix_and_all_original_content_remain_untouched": true,
+    "prefix_titles_and_tables_legitimacy_not_established": true
+  },
+  "unresolved_word_selection_boundaries": {
+    "total_unresolved_source_vs_compiled_body_cases": 156,
+    "different_middle_with_common_start_and_end": 107,
+    "different_at_start_only": 43,
+    "different_at_end_only": 2,
+    "different_with_disjoint_or_complex_boundaries": 4,
+    "source_changed_segment_word_token_bins": {
+      "one_word": 97,
+      "six_to_twenty_words": 3,
+      "over_twenty_words": 56
+    },
+    "stock_changed_segment_word_token_bins": {
+      "one_word": 97,
+      "six_to_twenty_words": 2,
+      "over_twenty_words": 57
+    },
+    "common_suffix_overlap_buckets": {
+      "none": 13,
+      "under_25_percent": 41,
+      "from_25_to_49_percent": 45,
+      "from_50_to_74_percent": 34,
+      "from_75_to_99_percent": 23
+    }
+  },
+  "actual_ci_runs": {
+    "validate": "https://github.com/icfmp/Bible-Resources/actions/runs/43321009218",
+    "real_source_original_to_stock_audit": "https://github.com/icfmp/Bible-Resources/actions/runs/43321009309",
+    "metadata_only_artifact": "https://github.com/icfmp/Bible-Resources/actions/runs/43321009309/artifacts/13990881187"
+  },
+  "unapproved_gates": {
+    "comparison_does_not_approve_text_loss_or_edition_equivalence": true,
+    "source_chapter_markers_and_unmarked_post_revelation_division_unverified": true,
+    "original_Jude_mapping_unverified": true,
+    "punctuation_and_markup_structural_editorial_parity_unverified": true,
+    "source_to_stock_notes_references_and_quotations_unverified": true,
+    "digital_edition_and_redistribution_rights_unapproved": true,
+    "Xiphos_AndBible_reader_checks_pending": true,
+    "publication_approved": false
+  },
+  "original_text_committed": false,
+  "original_source_or_stock_modified": false
+}
