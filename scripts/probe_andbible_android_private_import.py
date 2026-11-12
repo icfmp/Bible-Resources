@@ -149,6 +149,28 @@ def probe_observed_corrected_colossians_link(screen: Path):
     time.sleep(5)
 
 
+# Actual independent run 43220850024 screenshot samples, 1080x2280,
+# with authorial note markers on the *host* verses, not omitted additions.
+OMITTED_HOST_CALLER_SAMPLES = {
+    "Matt.23.13": (225, 1217),  # original purple a, screenshot 15
+    "Acts.8.36": (1017, 1080),  # original purple i, screenshot 16
+    "Acts.15.33": (240, 1151),  # original purple e, screenshot 17
+}
+
+
+def probe_observed_omitted_host_caller(screen: Path, host: str) -> None:
+    """Tap ONLY an independently observed test screenshot note caller."""
+    if host not in OMITTED_HOST_CALLER_SAMPLES:
+        raise AndroidDarbyImportError("Unknown omitted-verse note host")
+    data=screen.read_bytes()
+    if (len(data) < 24 or data[:8] != bytes.fromhex("89504e470d0a1a0a")
+            or struct.unpack(">II", data[16:24]) != (1080, 2280)):
+        raise AndroidDarbyImportError("Unexpected omitted-note reader geometry")
+    x,y=OMITTED_HOST_CALLER_SAMPLES[host]
+    adb("shell","input","tap",str(x),str(y),timeout=12)
+    time.sleep(3)
+
+
 def relaunch_for_persistence():
     """Restart the known official app without touching module files or reimporting."""
     adb("shell","am","force-stop",PACKAGE,timeout=20)
@@ -334,6 +356,14 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
                        note_popup_verified=False)
             key=f"{index:02d}-documented-reference-attempt"
             screenshots[key] = capture_png(evidence_dir/(key+".png"))
+            probe_observed_omitted_host_caller(evidence_dir/(key+".png"), reference)
+            checkpoint("android_omitted_verse_note_popup_visual_probe",
+                       host=reference, note_popup_verified=False,
+                       missing_verse_dead_link_verified=False)
+            screenshots[key+"-note"] = capture_png(
+                evidence_dir/(key+"-note.png"))
+            adb("shell","input","keyevent","KEYCODE_BACK",timeout=12)
+            time.sleep(2)
         # Only the last verified screen displays Rom 16:25, note caller b.
         # Trigger precisely that manually witnessed marker geometry and
         # independently inspect the resulting real UI; never auto-certify it.
@@ -384,6 +414,7 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
         "andbible_romans_original_note_popup_verified":False,
         "andbible_colossians_note_link_gui_verified":False,
         "andbible_three_omitted_verse_host_gui_verified":False,
+        "andbible_three_omitted_verse_note_popup_gui_verified":False,
         "andbible_persistent_module_identity_verified":False,
         "andbible_import_verified":imported_by_app,
         "andbible_rendered_text_and_notes_verified":False,
