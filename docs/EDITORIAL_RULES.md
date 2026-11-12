@@ -4,6 +4,51 @@ Preserve the exact original as immutable input with hash and attribution. Distin
 
 Warnings: all-caps paragraphs, oversized bold blocks, corrupted numbering, duplicated headings, broken tags, inappropriate fonts/colors, and embedded scripture blocks. Human review decides on ambiguous transformations. Changes must be documented and reversible; provide before/after examples. Do not rewrite theology or the translation during technical cleaning.
 
+## Principle: preserve authored content; repair demonstrable technical defects
+
+**The owner requires both faithful content and technically correct resources.**
+Source-fidelity checks are a baseline, **not** a reason to ship known
+non-functional or misdirected links. Conversely, technical repair is **not
+permission to rewrite** Scripture, punctuation, notes, theological meaning,
+textual-critical choices, authored verse numbers, or genuine editorial
+structure.
+
+Keep three separate objects in the evidence trail:
+
+1. **Immutable publisher original:** exact edition, byte SHA-256, provenance
+   and all original attributes retained for verification and rollback.
+2. **Reviewed technical repair plan:** reference/host and exact old/new
+   *machine-readable metadata or rendering behavior*, reason, independent
+   evidence, affected source checksum, expected invariants, tests and a
+   reversible rollback; an unconfirmed interpretation is not an approved fix.
+3. **Reader-ready candidate:** technical repairs applied deterministically;
+   verify it against both the pinned source **and** the approved delta.
+   Unchanged visible note and Bible text must still pass a full-corpus
+   fidelity check; independently test the repaired behavior in a real reader.
+
+**Examples:**
+- A note's *printed* “Exodus 30:10” is correct but the underlying OSIS
+  `osisRef` points to a nonexistent Leviticus 30:10: correct the navigational
+  attribute **only after verifying the intended target**, not the note text.
+- A syntactically valid OSIS target can still point to the wrong book.
+  Check semantics in addition to index addressability.
+- A footnote discussing a verse intentionally absent from the publisher's
+  textual edition is legitimate content. Retain its explanation and omission;
+  never manufacture the verse. An unavailable destination must not masquerade
+  as a working link: use an evidenced non-deceptive rendering or navigation
+  decision that preserves the authorial annotation.
+- Source/native whitespace differences are **diagnostic**, not automatically
+  defects requiring byte-identical formatting. Repair demonstrated semantic
+  line-break, paragraph, poetry, title or note-call losses and broken
+  presentation; do not rewrite harmless XML serialization whitespace.
+
+For any technical repair, record the old and new attribute/rendering and
+exact tests so that it can be reverted. When publisher intent is ambiguous,
+investigate and request upstream clarification instead of silently guessing.
+A candidate with unresolved demonstrated material defects stays **blocked**;
+a warning does not substitute for a known necessary repair. Editorial and
+publication approval remain separate gates.
+
 ## Strict structure handling
 
 Editorial cleanup must never override valid intentional Scripture formatting, including OSIS stanzas (`lg`), poetic lines and their levels (`l`), quotations (`q`), headings, translation additions, the divine name, original emphasis, notes and verse milestones. Unlike advisory typography findings, structural failures are **blocking** and report the source file and line. Never infer whether an unusual case is a mistake: follow [the reviewed OSIS normalization contract](NORMALIZATION_POLICY.md) and add an explicit tested rule before retrying.
