@@ -255,6 +255,7 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
                     # Hover/pin screenshots require independent visual review.
                     ("matthew-omitted-verse-note", "Matt 23:13", 301, 317, None),
                     ("acts8-omitted-verse-note", "Acts 8:36", 620, 390, None),
+                    ("acts15-omitted-verse-note", "Acts 15:33", 302, 244, None),
                 ))
             xiphos_receipt["exact_candidate_zip_sha256"] = archive_metadata["zip_sha256"]
             xiphos_receipt["same_compiled_payload_as_native_audit"] = True
