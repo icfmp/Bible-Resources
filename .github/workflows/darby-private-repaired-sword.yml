@@ -5,6 +5,7 @@ on:
     paths:
       - ".github/workflows/darby-private-repaired-sword.yml"
       - "scripts/probe_private_repaired_darby_sword.py"
+      - "scripts/reader_xiphos_headless_smoke.py"
       - "scripts/repair_osis_note_links.py"
       - "scripts/repair_osis_inline_markup.py"
       - "scripts/repair_osis_source_bytes.py"
@@ -67,6 +68,17 @@ jobs:
           test -n "$compiler"
           test -x "$compiler"
           echo "PINNED_COMPILER=$compiler" >> "$GITHUB_ENV"
+      - name: Install isolated Xiphos X11 GUI review dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 180s sudo apt-get -o Acquire::Retries=1 install -y \
+            xiphos xvfb dbus-x11 xdotool locales imagemagick
+          sudo sed -i 's/^# *fr_FR.UTF-8 UTF-8/fr_FR.UTF-8 UTF-8/' /etc/locale.gen
+          sudo locale-gen fr_FR.UTF-8
+          echo 'LANG=fr_FR.UTF-8' >> "$GITHUB_ENV"
+          echo 'LC_ALL=fr_FR.UTF-8' >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/darby-private-native/xiphos-review"
       - name: Verify exact official CrossWire OSIS schema
         shell: bash
         run: |
@@ -85,11 +97,19 @@ jobs:
             --schema "$RUNNER_TEMP/darby-private-native/schema/osisCore.2.1.1-cw-latest.xsd" \
             --link-plan config/publisher-osis/frajnd-2024-note-link-research.json \
             --inline-plan config/publisher-osis/frajnd-2024-inline-markup-research.json \
-            --report "$RUNNER_TEMP/darby-private-native/report.json"
+            --report "$RUNNER_TEMP/darby-private-native/report.json" \
+            --xiphos-review-dir "$RUNNER_TEMP/darby-private-native/xiphos-review"
       - name: Upload metadata only (never source, Bible, or module)
         uses: actions/upload-artifact@v4
         with:
           name: darby-repaired-native-metadata-${{ github.run_id }}
           path: ${{ runner.temp }}/darby-private-native/report.json
           retention-days: 30
+          if-no-files-found: error
+      - name: Upload review-only Xiphos screenshots from the exact corrected module
+        uses: actions/upload-artifact@v4
+        with:
+          name: darby-corrected-xiphos-visual-evidence-${{ github.run_id }}
+          path: ${{ runner.temp }}/darby-private-native/xiphos-review/**/*.png
+          retention-days: 7
           if-no-files-found: error

@@ -31,6 +31,8 @@ from source_native_osis_boundary_positions import (
     authorial_book_streams, authorial_outside_book_titles,
 )
 from guard_osis import _schema, parse_xml
+from publisher_osis_preview_package import package_preview
+from reader_xiphos_headless_smoke import smoke as xiphos_smoke
 from source_osis_inventory import _source_tree
 from source_native_ordered_body import compare_ordered_body_openings
 from native_milestone_pair_audit import NativeMilestonePairAudit
@@ -91,7 +93,8 @@ def _diagnose_temporary_body_order(tool: Path, reader: Path, scratch: Path,
 
 
 def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
-          diatheke: Path, schema: Path, link_plan: Path, inline_plan: Path) -> dict:
+          diatheke: Path, schema: Path, link_plan: Path, inline_plan: Path,
+          xiphos_review_dir: Path | None = None) -> dict:
     original = read_pinned_publisher_osis("frajnd-2024")
     if sha(original) != SOURCE_HASH:
         raise PrivateRepairedProbeError("Exact publisher original source drifted")
@@ -205,6 +208,33 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
             if result.returncode != 0 or len(result.stdout.strip()) < 15 or len(result.stdout) > 200000:
                 raise PrivateRepairedProbeError("Private SWORD text readback failed")
             smoke.append({"reference": reference, "reader_status": "readable"})
+        xiphos_receipt = None
+        if xiphos_review_dir is not None:
+            if (xiphos_review_dir.is_symlink() or not xiphos_review_dir.is_dir()
+                    or any(xiphos_review_dir.iterdir())):
+                raise PrivateRepairedProbeError("Xiphos evidence directory must be empty and private")
+            archive = scratch / "corrected-research-only.zip"
+            archive_metadata = package_preview(payload, archive, MODULE, V11N)
+            # This exact ephemeral package carries the checksum of the full
+            # corpus-validated private module. Never upload ZIP or SWORD data.
+            xiphos_receipt = xiphos_smoke(
+                archive, MODULE, archive_metadata["zip_sha256"], V11N, 12,
+                screenshot=xiphos_review_dir / "xiphos-startup.png",
+                study_dir=xiphos_review_dir / "study-samples",
+                supplemental_samples=(
+                    ("ezekiel-measurement-note", "Ezek 4:11"),
+                    ("leviticus-repaired-reference", "Lev 8:15"),
+                    ("romans-repaired-reference", "Rom 16:25"),
+                    ("matthew-omitted-reference", "Matt 23:13"),
+                    ("acts-omitted-reference", "Acts 8:36"),
+                    ("psalm150-poetry", "Ps 150:2"),
+                ),
+                capture_note_link_without_comparison=True)
+            xiphos_receipt["exact_candidate_zip_sha256"] = archive_metadata["zip_sha256"]
+            xiphos_receipt["same_compiled_payload_as_native_audit"] = True
+            xiphos_receipt["independent_screenshot_pixels_reviewed"] = False
+            xiphos_receipt["corrected_reference_clicks_visually_confirmed"] = False
+            xiphos_receipt["omitted_verse_note_behavior_visually_confirmed"] = False
         if sha(source_file.read_bytes()) != lexical_receipt["candidate_sha256"]:
             raise PrivateRepairedProbeError("Private source mutated during compiler invocation")
     return {
@@ -231,6 +261,7 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
         "candidate_binary_sha256_not_public_release": metrics["compiled_payload_sha256"],
         "original_or_compiled_binary_uploaded": False,
         "xiphos_gui_links_tested": False,
+        "xiphos_exact_candidate_gui_probe": xiphos_receipt,
         "published_or_editorially_approved": False,
     }
 
@@ -240,13 +271,16 @@ def main():
     for name in ("osis2mod", "native-index", "native-raw", "diatheke", "schema",
                  "link-plan", "inline-plan", "report"):
         p.add_argument("--" + name, required=True, type=Path)
+    p.add_argument("--xiphos-review-dir", type=Path,
+                   help="Optional empty directory for real isolated Xiphos screenshots; no SWORD artifact upload")
     args = p.parse_args()
     if args.report.is_symlink() or args.report.exists() or not args.report.parent.is_dir():
         p.error("Output must be a fresh metadata-only report")
     report = probe(
         osis2mod=args.osis2mod, native_index=args.native_index,
         native_raw=args.native_raw, diatheke=args.diatheke, schema=args.schema,
-        link_plan=args.link_plan, inline_plan=args.inline_plan)
+        link_plan=args.link_plan, inline_plan=args.inline_plan,
+        xiphos_review_dir=args.xiphos_review_dir)
     args.report.write_text(json.dumps(report, indent=2, sort_keys=True)+"\n",
                            encoding="utf-8")
     print("Exact private repaired source/native reader gate passed; no release made")
