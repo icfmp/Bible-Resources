@@ -62,6 +62,14 @@ class CommentaryAnchorParityTests(unittest.TestCase):
         self.assertEqual(r["duplicate_exact_ref_appearances"], 1)
         self.assertEqual(r["matched_exact_start_by_class"]["work_qualified_verse"], 2)
 
+    def test_stock_book_without_explicit_source_marker_is_an_advisory_finding(self):
+        original = self.xml(b'<scripCom osisRef="Bible:Gen.1.1"/>')
+        stock = self.native(b"K\\tGen.1.1\\nK\\tJude.1.1\\n", numbered=2)
+        result = compare_anchors(original, stock, "TestCom")
+        self.assertEqual(result["stock_books_without_explicit_source_scripCom_markers"], ["Jude"])
+        self.assertTrue(result["lack_of_source_marker_is_not_proof_of_missing_book_text"])
+        self.assertFalse(result["authored_source_to_compiled_text_parity"])
+
     def test_unknown_original_reference_is_not_guessed(self):
         xml = self.xml(b'<scripCom osisRef="Unclear 1:2"/>')
         r = compare_anchors(xml, self.native(b"K\tGen.1.1\n", numbered=1), "TestCom")
