@@ -112,7 +112,7 @@ jobs:
                            "bounded_error_coordinates_only":[
                                {"line":int(e.line),"xsd_error_type":e.type_name,
                                 "schema_osis_element_names":sorted(set(__import__("re").findall(
-                                    r"\\{http://www\\.bibletechnologies\\.net/2003/OSIS/namespace\\}([A-Za-z0-9_-]+)",
+                                    r"\{http://www\.bibletechnologies\.net/2003/OSIS/namespace\}([A-Za-z0-9_-]+)",
                                     e.message))),
                                 "structure":structural_context(int(e.line))}
                                for e in list(schema.error_log)[:12]]}
