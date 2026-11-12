@@ -16,6 +16,9 @@ from pilot_preflight import ROOT, PilotError, MAX_ZIP_BYTES
 ALLOWED_HOSTS = {
     "lsg": {"ebible.org", "www.ebible.org"},
     "mhc": {"crosswire.org", "www.crosswire.org", "ftp.crosswire.org"},
+    # Provider-level policy for independent commentary intake manifests.
+    # This avoids embedding each new commentary ID in the downloader.
+    "crosswire": {"crosswire.org", "www.crosswire.org", "ftp.crosswire.org"},
 }
 MAX_REDIRECTS = 5
 
