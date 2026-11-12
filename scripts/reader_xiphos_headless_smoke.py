@@ -614,7 +614,7 @@ def _capture_bounded_note_popup(env: dict, study_dir: Path, *,
     if (env.get("DISPLAY") != ":91" or not study_dir.is_dir()
             or study_dir.is_symlink()
             or not re.fullmatch(r"[a-z][a-z0-9-]{2,65}", slug)
-            or not re.fullmatch(r"[A-Za-z0-9 ]{3,35}", reference)
+            or not re.fullmatch(r"[A-Za-z0-9 :]{3,35}", reference)
             or type(marker_x) is not int or type(marker_y) is not int
             or not 215 <= marker_x <= 640 or not 115 <= marker_y <= 670):
         raise XiphosSmokeError("Unreviewed bounded note popup interaction")
