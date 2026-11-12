@@ -19,6 +19,7 @@ from publisher_osis_observation import read_pinned_publisher_osis
 from repair_osis_note_links import propose as propose_links
 from repair_osis_inline_markup import propose as propose_inline
 from repair_osis_source_bytes import patch_exact_original
+from audit_omitted_verse_notes import source_cases, native_cases
 from publisher_osis_sword_candidate import (
     _candidate_result, _compile_osis, _create_candidate_layout, _read_native_frames,
 )
@@ -123,6 +124,9 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
         raise PrivateRepairedProbeError("Original Scripture or note content/anchors were changed")
     if original_index["source_verse_count"] != corrected_index["source_verse_count"]:
         raise PrivateRepairedProbeError("Verse count changed")
+    # Independently verify notes that discuss deliberately omitted verses:
+    # their explanatory prose remains, but a dead machine target must not.
+    omitted_source_checks = source_cases(original, corrected, a)
     policy = json.loads((Path(__file__).resolve().parents[1] / "config/osis-policy.json").read_text(encoding="utf-8"))
     validator, schema_sha = _schema(policy, schema)
     with tempfile.TemporaryDirectory(prefix="private-darby-repaired-sword-") as root:
@@ -194,6 +198,15 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
             print("RESEARCH-ONLY source serialization and attribute isolation:",
                   json.dumps(diagnoses, sort_keys=True))
             raise PrivateRepairedProbeError("Corrected candidate full native fidelity gate did not pass")
+        omitted_hosts = {host for host, _ordinal in omitted_source_checks}
+        omitted_raw = {
+            ref: raw
+            for kind, ref, raw in _read_native_frames(native_raw, MODULE, payload)
+            if kind == "K" and ref in omitted_hosts
+        }
+        omitted_native_checks = native_cases(omitted_source_checks, corrected, omitted_raw)
+        if omitted_native_checks["missing_verse_note_count"] != len(omitted_source_checks):
+            raise PrivateRepairedProbeError("Missing-verse note audit incomplete")
         env = dict(os.environ, SWORD_PATH=str(payload.resolve()))
         passages = (
             "Genesis 1:1", "Psalms 23:1", "Matthew 1:1",
@@ -227,6 +240,7 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
                     ("romans-repaired-reference", "Rom 16:25"),
                     ("matthew-omitted-reference", "Matt 23:13"),
                     ("acts-omitted-reference", "Acts 8:36"),
+                    ("acts15-omitted-reference", "Acts 15:33"),
                     ("psalm150-poetry", "Ps 150:2"),
                 ),
                 capture_note_link_without_comparison=True,
@@ -236,6 +250,11 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
                     ("leviticus-original-note-2", "Lev 8:15", 433, 353, None),
                     ("romans-original-note-1", "Rom 16:25", 429, 445,
                      (160, 558)),
+                    # Fixed real Xvfb source-caller coordinates taken from
+                    # exact corrected-module screenshots #43176350700.
+                    # Hover/pin screenshots require independent visual review.
+                    ("matthew-omitted-verse-note", "Matt 23:13", 301, 317, None),
+                    ("acts8-omitted-verse-note", "Acts 8:36", 620, 390, None),
                 ))
             xiphos_receipt["exact_candidate_zip_sha256"] = archive_metadata["zip_sha256"]
             xiphos_receipt["same_compiled_payload_as_native_audit"] = True
@@ -256,6 +275,7 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
         "official_crosswire_schema_sha256": schema_sha,
         "source_key_count": 31166,
         "source_note_count": 6340,
+        "omitted_verse_notes_source_and_native": omitted_native_checks,
         "machine_note_targets_replaced": 8,
         "nonexistent_source_verse_link_targets_disabled": 3,
         "invalid_inline_osis_elements_replaced": 2,
