@@ -60,6 +60,11 @@ def xml_structure(data: bytes) -> dict:
     text_nodes = 0
     nonempty_text_nodes = 0
     direct_children = Counter()
+    commentary_parent_paths = Counter()
+    commentary_children = Counter()
+    commentary_attribute_names = Counter()
+    commentary_with_nonempty_direct_text = 0
+    chapter_child_tags = Counter()
     entities = 0
     comments = 0
     max_depth = 0
@@ -79,6 +84,19 @@ def xml_structure(data: bytes) -> dict:
             raise PilotError("Unsupported source XML construct")
         tag = safe_name(node.tag)
         tags[tag] += 1
+        if tag == "scripCom":
+            ancestors = list(node.iterancestors())
+            parent_path = "/".join(safe_name(x.tag) for x in reversed(ancestors[:5])
+                                   if isinstance(x.tag, str))
+            commentary_parent_paths[parent_path] += 1
+            commentary_attribute_names.update(safe_name(k) for k in node.attrib)
+            commentary_children.update(safe_name(x.tag) for x in node
+                                       if isinstance(x.tag, str))
+            if node.text and node.text.strip():
+                commentary_with_nonempty_direct_text += 1
+        if tag == "div2":
+            chapter_child_tags.update(safe_name(x.tag) for x in node
+                                      if isinstance(x.tag, str))
         for name in node.attrib:
             attrs[safe_name(name)] += 1
         for value in (node.text, node.tail):
@@ -104,6 +122,12 @@ def xml_structure(data: bytes) -> dict:
         "element_counts": dict(sorted(tags.items())),
         "attribute_name_counts": dict(sorted(attrs.items())),
         "direct_root_child_counts": dict(sorted(direct_children.items())),
+        "candidate_commentary_parent_path_counts": dict(sorted(commentary_parent_paths.items())),
+        "candidate_commentary_direct_child_tags": dict(sorted(commentary_children.items())),
+        "candidate_commentary_attribute_name_counts": dict(sorted(commentary_attribute_names.items())),
+        "candidate_commentary_nonempty_direct_text_count": commentary_with_nonempty_direct_text,
+        "chapter_direct_child_tag_counts": dict(sorted(chapter_child_tags.items())),
+        "candidate_sections_are_verified_annotations": False,
         "text_node_count": text_nodes,
         "nonempty_text_node_count": nonempty_text_nodes,
         "unresolved_entity_node_count": entities,
