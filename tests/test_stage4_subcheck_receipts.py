@@ -63,6 +63,9 @@ def full_result():
             "all_p_q_source_native_nonwhitespace_codepoint_boundaries_match": True},
         "source_native_ordered_body_kind_screen": {
             "same_order_and_kind_in_every_mapped_book": True},
+        "source_native_p_q_event_topology_diagnostic": {
+            "status":"source_native_structural_topology_positions_equal_not_layout_certificate",
+            "all_source_native_p_q_open_close_event_topology_match":True},
     }
     evidence["stock_reuse_preflight"] = {"proven_material_stock_loss": False}
     return result
@@ -119,6 +122,20 @@ class StageFourSubchecksTests(unittest.TestCase):
                 self.assertIn(
                     "source_native_p_q_boundary_or_kind_difference",
                     receipt["subchecks"]["4c"]["unverified_machine_codes"])
+
+    def test_proven_same_count_structural_displacement_blocks_4c(self):
+        result=full_result()
+        # Word/punctuation and kind-order flags can remain green in a stale
+        # or incomplete previous audit; a new semantic event displacement
+        # must independently block structure receipt 4c.
+        result["evidence"]["maintext"][
+            "source_native_p_q_event_topology_diagnostic"]={
+                "status":"source_native_structural_topology_differs",
+                "all_source_native_p_q_open_close_event_topology_match":False}
+        receipt=create(result)
+        self.assertEqual(receipt["subchecks"]["4c"]["status"],"BLOCKED")
+        self.assertIn("source_native_p_q_boundary_or_kind_difference",
+                      receipt["subchecks"]["4c"]["unverified_machine_codes"])
 
     def test_incomplete_source_acquisition_cannot_be_reused(self):
         result = full_result()
