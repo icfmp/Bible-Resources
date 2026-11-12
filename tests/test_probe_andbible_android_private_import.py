@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/"scripts"))
 from probe_andbible_android_private_import import (
-    safe_controls, tap_allowlisted, AndroidDarbyImportError,
+    safe_controls, tap_allowlisted, relaunch_for_persistence, AndroidDarbyImportError,
 )
 
 
@@ -70,6 +70,17 @@ class AndBiblePrivateImportUiTest(unittest.TestCase):
              patch("probe_andbible_android_private_import.time.sleep"):
             self.assertEqual(tap_allowlisted(controls,("WAIT",)), "WAIT")
             adb.assert_called_once()
+
+    def test_relaunch_only_restarts_official_app_without_reimport(self):
+        with patch("probe_andbible_android_private_import.adb") as adb, \\
+             patch("probe_andbible_android_private_import.time.sleep") as sleep:
+            relaunch_for_persistence()
+        self.assertEqual(adb.call_count, 2)
+        self.assertEqual(adb.call_args_list[0].args[:4],
+                         ("shell", "am", "force-stop", "net.bible.android.activity"))
+        self.assertEqual(adb.call_args_list[1].args[:3],
+                         ("shell", "monkey", "-p"))
+        self.assertEqual(sleep.call_args.args, (12,))
 
     def test_file_picker_identifies_only_explicit_private_candidate(self):
         xml=b"""<hierarchy>
