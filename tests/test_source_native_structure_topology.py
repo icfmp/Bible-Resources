@@ -111,7 +111,7 @@ class StructuralTopologyTest(unittest.TestCase):
 
     def test_equal_coordinate_same_kind_opening_not_automatically_certified(self):
         source=input_books()
-        source["Gen"][1][2]["open"]=copy.deepcopy(
+        source["Gen"][1][1]["open"]=copy.deepcopy(
             source["Gen"][1][0]["open"])
         result=compare_structural_event_topology(source,copy.deepcopy(source))
         self.assertEqual(result["status"],
@@ -122,7 +122,7 @@ class StructuralTopologyTest(unittest.TestCase):
         source=input_books()
         native=copy.deepcopy(source)
         native["Gen"][1][0]["close"]=anchor(3,"Gen.1.3")
-        native["Gen"][1][2]["open"]=anchor(3,"Gen.1.2","native_intro")
+        native["Gen"][1][2]["open"]=anchor(3,"Gen.0.0","native_intro")
         result=compare_structural_event_topology(source,native)
         self.assertTrue(result["all_source_native_p_q_open_close_event_topology_match"])
         self.assertFalse(result["source_native_exact_record_scope_verified"])
