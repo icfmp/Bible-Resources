@@ -9,9 +9,9 @@
   "provider": "crosswire",
   "source_page_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=MHCC",
   "sword_zip_url": "https://crosswire.org/ftpmirror/pub/sword/packages/rawzip/MHCC.zip",
-  "authorial_witness_url": "https://www.ccel.org/ccel/henry/mhcc/mhcc",
+  "authorial_witness_url": "https://ccel.org/ccel/h/henry/mhcc/cache/mhcc.txt",
   "reference_edition": "Moody Press, 28th printing, ISBN 0-8024-5190-X (CrossWire declaration; independently unverified)",
-  "archive_sha256": null,
+  "archive_sha256": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
   "sample_references": [
     "Gen 1:1",
     "Ps 23:1",
@@ -27,8 +27,11 @@
     "owner_approved": false
   },
   "commentary_source": {
-    "format": "compiled_SWORD_only",
+    "format": "compiled_SWORD_SourceType_OSIS_without_original_osis",
     "authored_source_sha256": null,
-    "ccel_witness_edition_equivalence": "unverified"
-  }
+    "ccel_witness_edition_equivalence": "unverified",
+    "sword_conf_text_source": "https://ccel.org/ccel/h/henry/mhcc/cache/mhcc.txt",
+    "ccel_witness_redistribution_rights": "needs_independent_review"
+  },
+  "authorial_witness_info_url": "https://www.ccel.org/ccel/henry/mhcc/mhcc"
 }
