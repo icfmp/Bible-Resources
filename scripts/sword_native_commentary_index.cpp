@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
     std::cout << "M\t" << moduleId << '\t' << v11n
               << '\t' << ver << '\t' << driver << '\n';
     const std::regex numbered("[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9][0-9]*\\.[1-9][0-9]*");
-    const std::regex introduction("[1-4]?[A-Za-z][A-Za-z0-9]*(\\.0\\.0|\\.[1-9][0-9]*\\.0)?");
+    const std::regex introduction("[1-4]?[A-Za-z][A-Za-z0-9]*(\\.0\\.0|\\.[1-9][0-9]*(\\.0)?)?");
     unsigned long visited = 0, numberedCount = 0, introCount = 0, topCount = 0;
     while (!key.popError()) {
         if (++visited > 300000) return 7;
