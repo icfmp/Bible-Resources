@@ -72,9 +72,11 @@ python scripts/commentary_intake.py --resource-id mhcc-crosswire \
   Stage 2 still cannot be considered fully complete until the authorial
   witness is independently identified, compared and pinned.
 
-The workflow runs the **observation only** for changes to this intake on a
-PR; explicit manual dispatch permits stage 1/observe/2 for an arbitrary
-reviewed manifest. The PR workflow may fail on actual upstream drift, package
+The PR workflow selects **observe** when the archive SHA is still unpinned
+and **stage 2** after the reviewed original ZIP SHA has been pinned; the
+manual Action also accepts `auto`. The original is re-downloaded and hash-
+checked, not silently reused from a previous CI runner. The workflow permits
+stage 1/observe/2/auto for an arbitrary reviewed manifest. The PR workflow may fail on actual upstream drift, package
 format or reader setup. Its green result is diagnostic **not a publication
 gate**. Link the Actions run and permanent key facts in the resource issue,
 without excerpting any source content into a log.
@@ -94,9 +96,30 @@ without excerpting any source content into a log.
   resource. In particular do not substitute CCEL's complete MHC or use
   the MHC 2.2 metadata for the concise module.
 
-**Outstanding:** exact live ZIP/.conf fingerprint, independent source
-correspondence, full mapping and text/structure parity, rights for digital
-changes, Xiphos/AndBible tests, reviewer sign-off and publication. The
+**Actual read-only observation (Action #43265980336, 2026-11-12):**
+- CrossWire ZIP: 1,773,038 bytes; SHA-256
+  `5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d`,
+  now pinned in the research manifest. Reacquisition against this pin is
+  required, and does not by itself validate edition equivalence.
+- Actual `mods.d/mhcc.conf`: `MHCC` / version 2.0 / `zCom` /
+  `KJV` / `Lang=en` / `SourceType=OSIS`, declaring
+  `DistributionLicense=Public Domain`. Conf SHA-256:
+  `2762a04757ec3ee14bcf5d442fedcd47d2b938d573de4e9100a31aa073bc5863`.
+- The actual `.conf` specifically credits
+  `https://ccel.org/ccel/h/henry/mhcc/cache/mhcc.txt` as `TextSource`.
+  Its identity, rights and full correspondence to the compiled SWORD data
+  still need independent verification. CCEL's own
+  [rights policy](https://www.ccel.org/about/copyright.html) warns that
+  its editions may contain protected editorial material and says to ask
+  permission for republication/commercial reuse.
+- Bounded `diatheke` probes succeeded for several passages, but the
+  19-byte response for John 3:16 is not credible evidence of a complete
+  commentary entry; the generic intake flags such short readbacks for
+  commentary entry/range mapping review. No missing-author-text claim.
+
+**Outstanding:** independent source correspondence, full entry/range mapping
+and text/structure parity, rights for digitization/corrections,
+Xiphos/AndBible tests, reviewer sign-off and publication. The
 initial research does **not** authorize a SWORD copy on the public Pages
 repository.
 
