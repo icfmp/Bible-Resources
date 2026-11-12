@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "purpose": "research_only_not_approved",
+  "resource_id": "frajnd-2024",
+  "source_sha256": "2204629e3efb3024dceb392780ef5e61f4296ea832c90e3dd2a5c3224179c1d3",
+  "edits": [
+    {
+      "note_host": "Lev.8.15",
+      "note_index": 2,
+      "old_target": "Lev.30.10",
+      "new_target": "Exod.30.10",
+      "action": "replace_target",
+      "reason": "Note's abbreviated label follows Exodus 29:36, while Leviticus has no chapter 30",
+      "evidence_url": "https://github.com/icfmp/Bible-Resources/blob/main/docs/evidence/frajnd-2024-stage5-editorial-review.md"
+    },
+    {
+      "note_host": "2Sam.7.27",
+      "note_index": 1,
+      "old_target": "Ruth.20.2",
+      "new_target": "1Sam.20.2",
+      "action": "replace_target",
+      "reason": "Original Ruth chapter 20 is impossible; nearby context names first Samuel",
+      "evidence_url": "https://github.com/icfmp/Bible-Resources/blob/main/docs/evidence/frajnd-2024-stage5-editorial-review.md"
+    },
+    {
+      "note_host": "Matt.23.13",
+      "note_index": 1,
+      "old_target": "Matt.23.14",
+      "new_target": null,
+      "action": "disable_absent_target",
+      "reason": "Textual-critical note discusses verse 14 omitted from this source edition",
+      "evidence_url": "https://github.com/icfmp/Bible-Resources/blob/main/docs/evidence/frajnd-2024-stage5-editorial-review.md"
+    },
+    {
+      "note_host": "Acts.3.1",
+      "note_index": 1,
+      "old_target": ".3",
+      "new_target": "Acts.3",
+      "action": "replace_target",
+      "reason": "Relative chapter-three label requires a complete navigable current-book target",
+      "evidence_url": "https://github.com/icfmp/Bible-Resources/blob/main/docs/evidence/frajnd-2024-stage5-editorial-review.md"
+    },
+    {
+      "note_host": "Acts.8.36",
+      "note_index": 1,
+      "old_target": "Acts.8.37",
+      "new_target": null,
+      "action": "disable_absent_target",
+      "reason": "Textual-critical note discusses verse 37 intentionally absent in original source",
+      "evidence_url": "https://github.com/icfmp/Bible-Resources/blob/main/docs/evidence/frajnd-2024-stage5-editorial-review.md"
+    },
+    {
+      "note_host": "Acts.15.33",
+      "note_index": 1,
+      "old_target": "Acts.15.34",
+      "new_target": null,
+      "action": "disable_absent_target",
+      "reason": "Textual-critical note discusses verse 34 intentionally absent in original source",
+      "evidence_url": "https://github.com/icfmp/Bible-Resources/blob/main/docs/evidence/frajnd-2024-stage5-editorial-review.md"
+    },
+    {
+      "note_host": "Rom.5.12",
+      "note_index": 1,
+      "old_target": "Rom.1.à.8",
+      "new_target": "Rom.1-Rom.8",
+      "action": "replace_target",
+      "reason": "Printed chapter range one through eight uses a nonstandard French connective",
+      "evidence_url": "https://github.com/icfmp/Bible-Resources/blob/main/docs/evidence/frajnd-2024-stage5-editorial-review.md"
+    },
+    {
+      "note_host": "Rom.5.13",
+      "note_index": 1,
+      "old_target": "Rom.5.13.à.17",
+      "new_target": "Rom.5.13-Rom.5.17",
+      "action": "replace_target",
+      "reason": "Printed verse range thirteen through seventeen uses nonstandard target grammar",
+      "evidence_url": "https://github.com/icfmp/Bible-Resources/blob/main/docs/evidence/frajnd-2024-stage5-editorial-review.md"
+    },
+    {
+      "note_host": "Rom.8.9",
+      "note_index": 1,
+      "old_target": "Rom.8.1.à.11",
+      "new_target": "Rom.8.1-Rom.8.11",
+      "action": "replace_target",
+      "reason": "Printed verse range one through eleven uses nonstandard target grammar",
+      "evidence_url": "https://github.com/icfmp/Bible-Resources/blob/main/docs/evidence/frajnd-2024-stage5-editorial-review.md"
+    },
+    {
+      "note_host": "Rom.16.25",
+      "note_index": 1,
+      "old_target": "1Cor.5.32",
+      "new_target": "Eph.5.32",
+      "action": "replace_target",
+      "reason": "Original first Corinthians chapter five has no verse 32; nearby prose names Ephesians",
+      "evidence_url": "https://github.com/icfmp/Bible-Resources/blob/main/docs/evidence/frajnd-2024-stage5-editorial-review.md"
+    },
+    {
+      "note_host": "Rom.16.25",
+      "note_index": 1,
+      "old_target": "1Cor.2.2-1Cor.2.3",
+      "new_target": "Col.2.2-Col.2.3",
+      "action": "replace_target",
+      "reason": "Indexed but semantically wrong-book target; nearby text names Colossians",
+      "evidence_url": "https://github.com/icfmp/Bible-Resources/blob/main/docs/evidence/frajnd-2024-stage5-editorial-review.md"
+    }
+  ]
+}
