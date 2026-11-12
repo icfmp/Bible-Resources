@@ -23,7 +23,7 @@ import zipfile
 from lxml import etree
 
 from commentary_intake import load_manifest
-from commentary_text_delta import punctuation_relationship, word_relationship
+from commentary_text_delta import punctuation_relationship, word_relationship, nonword_symbol_excess
 from commentary_xml_witness import _parse_reference, WORK_REF, OSIS_LOC, xml_structure, MAX_XML
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
 from pilot_fetch import fetch
@@ -124,6 +124,11 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
     punctuation_change_subtypes=Counter()
     word_relationship_subtypes=Counter()
     word_overlap_buckets=Counter()
+    stock_containment_locations=Counter()
+    stock_extra_prefix_token_bins=Counter()
+    stock_extra_suffix_token_bins=Counter()
+    source_nonword_glyph_excess=Counter()
+    stock_nonword_glyph_excess=Counter()
     bounded_priority_examples=[]
     priority_example_counts=Counter()
     per_book={}
@@ -162,6 +167,9 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
                     if source_tokens==stock_tokens:
                         lexical_details["same_unicode_word_tokens_different_punctuation"]+=1
                         punctuation_change_subtypes[punctuation_relationship(a,b)]+=1
+                        extra_source,extra_stock=nonword_symbol_excess(a,b)
+                        source_nonword_glyph_excess.update(extra_source)
+                        stock_nonword_glyph_excess.update(extra_stock)
                     else:
                         if [t.casefold() for t in source_tokens]==[t.casefold() for t in stock_tokens]:
                             lexical_details["same_casefolded_word_tokens_different_case_or_punctuation"]+=1
@@ -171,6 +179,19 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
                         category=diagnostic["relationship"]
                         word_relationship_subtypes[category]+=1
                         word_overlap_buckets[diagnostic["overlap_bucket"]]+=1
+                        if category=="source_words_contiguous_inside_longer_stock":
+                            position=diagnostic["original_words_contiguous_in_stock_location"]
+                            stock_containment_locations[position]+=1
+                            for value,bins in (
+                                (diagnostic["additional_stock_word_tokens_before_source"],stock_extra_prefix_token_bins),
+                                (diagnostic["additional_stock_word_tokens_after_source"],stock_extra_suffix_token_bins),
+                            ):
+                                if value==0: b="0"
+                                elif value<=4: b="1_to_4"
+                                elif value<=9: b="5_to_9"
+                                elif value<=29: b="10_to_29"
+                                else: b="30_or_more"
+                                bins[b]+=1
                         if priority_example_counts[category]<4:
                             priority_example_counts[category]+=1
                             bounded_priority_examples.append({
@@ -211,6 +232,13 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
         raise PilotError("Unequal-word relationships have incomplete full-corpus accounting")
     if sum(word_overlap_buckets.values())!=sum(word_relationship_subtypes.values()):
         raise PilotError("Word overlap ratio categories have incomplete accounting")
+    if sum(stock_containment_locations.values())!=word_relationship_subtypes[
+        "source_words_contiguous_inside_longer_stock"
+    ]:
+        raise PilotError("Full original-in-stock containment location census is incomplete")
+    if (sum(stock_extra_prefix_token_bins.values())!=sum(stock_containment_locations.values())
+            or sum(stock_extra_suffix_token_bins.values())!=sum(stock_containment_locations.values())):
+        raise PilotError("Extra stock word prefix/suffix bins do not account for the complete containment group")
     if len(bounded_priority_examples)>40:
         raise PilotError("Private difference sample exceeds reviewed non-text bound")
     return {
@@ -218,6 +246,14 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
         "same_words_different_punctuation_subtypes":dict(sorted(punctuation_change_subtypes.items())),
         "different_word_sequence_relationship_subtypes":dict(sorted(word_relationship_subtypes.items())),
         "different_word_sequence_overlap_buckets":dict(sorted(word_overlap_buckets.items())),
+        "stock_containment_additional_word_position_counts":dict(sorted(stock_containment_locations.items())),
+        "stock_containment_extra_stock_prefix_word_token_bins":dict(sorted(stock_extra_prefix_token_bins.items())),
+        "stock_containment_extra_stock_suffix_word_token_bins":dict(sorted(stock_extra_suffix_token_bins.items())),
+        "punctuation_nonword_glyph_excess_source_total":sum(source_nonword_glyph_excess.values()),
+        "punctuation_nonword_glyph_excess_stock_total":sum(stock_nonword_glyph_excess.values()),
+        "punctuation_nonword_glyph_excess_source_top_numeric_codepoints":dict(source_nonword_glyph_excess.most_common(16)),
+        "punctuation_nonword_glyph_excess_stock_top_numeric_codepoints":dict(stock_nonword_glyph_excess.most_common(16)),
+        "punctuation_codepoint_frequency_is_not_authorial_approval":True,
         "bounded_private_prioritized_hash_line_diagnostics":bounded_priority_examples,
         "all_detailed_difference_diagnostics_are_research_only":True,
         "lexical_disagreement_classification":dict(sorted(lexical_details.items())),

@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "issue": "https://github.com/icfmp/Bible-Resources/issues/177",
+  "status": "COMPLETE_PRIVATE_SOURCE_VERSUS_COMPILED_EXTRA_WORD_AND_PUNCTUATION_STATISTICS_NOT_PARITY",
+  "evidence_pins": {
+    "original_ccel_thml_sha256": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+    "official_crosswire_sword_zip_sha256": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+    "stock_full_native_raw_sha256": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
+  },
+  "private_comparison": {
+    "source_verse_and_range_bodies_compared": 3364,
+    "all_original_word_sequences_present_at_end_of_stock_entry_count": 799,
+    "all_799_stock_has_only_extra_prefix_word_tokens": true,
+    "stock_added_suffix_word_cases": 0,
+    "stock_extra_prefix_word_token_count_buckets": {
+      "1_to_4": 4,
+      "5_to_9": 3,
+      "10_to_29": 357,
+      "30_or_more": 435
+    },
+    "still_unexplained_word_order_or_selection": 156,
+    "stock_word_tokens_appear_in_order_inside_longer_original": 1,
+    "punctuation_cases_with_same_word_tokens_but_different_symbols": 1949,
+    "source_glyph_excess_numeric_unicode_counts": {
+      "U+002C": 96,
+      "U+2013": 1877,
+      "U+2014": 1,
+      "U+2018": 8,
+      "U+2019": 11,
+      "U+201C": 146,
+      "U+201D": 147
+    },
+    "stock_glyph_excess_numeric_unicode_counts": {
+      "U+0022": 293,
+      "U+0027": 11,
+      "U+002D": 1975
+    },
+    "all_glyph_numeric_occurrences_across_1949_cases": {
+      "source_extra_total": 2286,
+      "stock_extra_total": 2279
+    }
+  },
+  "interpretation": {
+    "systematic_prefix_source_to_stock_transformation_indicated_not_proven_authorial": true,
+    "unicode_quotation_mark_and_hyphen_transformations_indicated_not_editorially_approved": true,
+    "punctuation_changed_even_where_original_word_tokens_match": true,
+    "source_and_compiled_may_use_different_digital_editions": true,
+    "original_extra_prefix_content_origin_still_unverified": true,
+    "approved_exact_source_to_compiled_words_and_punctuation_parity": false,
+    "approved_source_note_citation_quotation_heading_paragraph_parity": false,
+    "original_chapter_heading_and_unmarked_source_body_still_unreviewed": true,
+    "edition_and_rights_review_pending": true,
+    "true_GUI_Xiphos_AndBible_tests_pending": true,
+    "original_wording_rewritten": false,
+    "published": false
+  },
+  "actions": {
+    "exact_initial_source_stock_diagnostic": "https://github.com/icfmp/Bible-Resources/actions/runs/43285908730",
+    "exact_initial_Validate": "https://github.com/icfmp/Bible-Resources/actions/runs/43285911776",
+    "private_metadata_artifact": "https://github.com/icfmp/Bible-Resources/actions/runs/43285908730/artifacts/13974198995"
+  },
+  "contains_original_source_commentary_text": false
+}
