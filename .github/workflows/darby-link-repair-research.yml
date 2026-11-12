@@ -50,6 +50,26 @@ jobs:
             --plan config/publisher-osis/frajnd-2024-note-link-research.json \
             --output "$RUNNER_TEMP/darby-private-link-probe/proposed.xml" \
             --receipt "$RUNNER_TEMP/darby-private-link-probe/receipt.json"
+      - name: Validate original and private proposal with exact pinned official OSIS XSD
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/fetch_reviewed_schema.py \
+            --directory "$RUNNER_TEMP/darby-private-link-probe/reviewed-schema"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          from guard_osis import _schema, parse_xml
+          root=Path(os.environ["RUNNER_TEMP"])/"darby-private-link-probe"
+          policy=json.loads(Path("config/osis-policy.json").read_text())
+          schema,_=_schema(policy,root/"reviewed-schema/osisCore.2.1.1-cw-latest.xsd")
+          for name in ("original.xml", "proposed.xml"):
+              path=root/name
+              doc=parse_xml(path,path.read_bytes(),"XML_INPUT_NOT_WELL_FORMED")
+              if not schema.validate(doc):
+                  raise SystemExit("Publisher OSIS "+name+" fails reviewed official XSD")
+          print("Original and private corrected OSIS accepted by exact official pinned XSD")
+          PY
       - name: Independently reject overclaiming or incomplete actual-original outcomes
         shell: bash
         run: |
