@@ -226,6 +226,55 @@ another editor's review. A local `local-unpinned` receipt is never reusable.
 The receipt digest is an integrity check for a **trusted GitHub Actions
 artifact**, not a cryptographic signature proving the publisher's identity.
 
+### Replay one previously verified machine receipt without re-downloading original Bibles
+
+With the original audited run still available on GitHub Actions, choose
+**Audit one Bible onboarding stage (read-only)** → **Run workflow** on the
+*same exact main commit* that produced the prior metadata artifact:
+
+- `resource_id`: the same reviewed manifest ID as the original run
+- `stage`: `4a`, `4b`, `4c` or `4d`
+- `reuse_run_id`: exact numeric run ID containing the previously generated
+  `bible-stage-<run_id>-1` artifact with `stage4-subchecks.json`
+- Optional `issue_number`: an **open** `[Import]` issue for a durable
+  checkpoint, **never** an automatic approval
+
+Or post (as repository owner only) on a new or ongoing **open**
+`[Import]` issue:
+
+```text
+/bible-audit <resource-id> 4c <prior-run-id>
+```
+
+The Action downloads **only the previous text-free evidence artifact** using
+the repository's own scoped GitHub Actions token. Before considering it for
+reuse, the separate deterministic verifier requires exactly identical
+publisher-source ZIP SHA-256, compiled-original SWORD ZIP SHA-256, canonical
+manifest digest, source-acquisition proof, **same 40-digit Git tool commit**,
+trusted GitHub run URL and exact prerequisite receipt hashes. A changed
+original, module, manifest, code revision or dependency invalidates replay;
+it fails `BLOCKED` rather than silently falling back to unverified output.
+A failed/missing artifact is an error. Only the **first run attempt's**
+metadata artifact is currently supported; rerun a fresh full Action when that
+artifact is no longer accessible. Trusted artifact timestamps and Github's
+retention period are not promises that an old upstream source is unchanged.
+
+A successful replay reports `machine_receipt_reused_only=true` and
+`new_native_scan_completed=false`, and explicitly retains the former
+machine `BLOCKED`, `PARTIAL`, `DONE` or `REVIEW_REQUIRED` **without
+calling `acquire()`, recompiling SWORD, downloading private original ZIPs
+or rerunning expensive corpus checks**. It creates a new limited evidence
+report and issue checkpoint linking to the original source run.
+
+**Safety and limits:** This is *reusing historical exact-input machine
+findings*, not a claim of new real reader inspection. It is not an
+independent 4a/4b/4c/4d fresh scanner and never grants permission to reuse
+a defective stock module, alter a biblical word, dismiss a discrepancy,
+close the editor's checkbox, or publish. To check a different source,
+SWORD module or new tool commit, launch a fresh stage 4 / combined 4-5
+audit instead. Do not point `reuse_run_id` at arbitrary third-party
+artifacts; the verifier accepts only source/tool-bound reports.
+
 **Current boundary:** These are separately *reviewable* machine questions
 derived from the existing one-pass stage-4 evidence, not yet four
 independently executable scanners. Selective 4a/4b/4c/4d dispatch and
