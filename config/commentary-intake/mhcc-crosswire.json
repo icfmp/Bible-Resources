@@ -28,10 +28,12 @@
   },
   "commentary_source": {
     "format": "compiled_SWORD_SourceType_OSIS_without_original_osis",
-    "authored_source_sha256": null,
+    "authored_source_sha256": "7af7f0feef2a8522263d48825a170125f4c421d14250212d83db6aef6d4f5269",
     "ccel_witness_edition_equivalence": "unverified",
     "sword_conf_text_source": "https://ccel.org/ccel/h/henry/mhcc/cache/mhcc.txt",
-    "ccel_witness_redistribution_rights": "needs_independent_review"
+    "ccel_witness_redistribution_rights": "needs_independent_review",
+    "observed_size_bytes": 5661067,
+    "observation_action": "https://github.com/icfmp/Bible-Resources/actions/runs/43269575913"
   },
   "authorial_witness_info_url": "https://www.ccel.org/ccel/henry/mhcc/mhcc"
 }
