@@ -84,7 +84,7 @@ class CommentaryIntakeTests(unittest.TestCase):
             z.writestr("modules/comments/zcom/example/ot.bzz",
                        b"SECRET ORIGINAL COMMENTARY NEVER PUBLISH")
         reader = self.root / "fake-diatheke"
-        reader.write_text("#!/usr/bin/env python3\nprint('<p>SECRET READER TEXT</p>')\n")
+        reader.write_text("#!/usr/bin/env python3\nprint('<p>SECRET READER TEXT ' + 'long substantive passage ' * 5 + '</p>')\n")
         reader.chmod(0o700)
 
         def local_fetch(url, destination, provider):
@@ -100,6 +100,7 @@ class CommentaryIntakeTests(unittest.TestCase):
         self.assertEqual(result["status"], "observed_not_approved")
         self.assertEqual(result["sword_conf"]["distribution_license"], "Public Domain")
         self.assertTrue(result["reader_samples_all_present"])
+        self.assertEqual(result["reader_samples_needing_mapping_review"], [])
         self.assertFalse(result["archive_pin_matches"])
         self.assertNotIn("SECRET ORIGINAL COMMENTARY", report)
         self.assertNotIn("SECRET READER TEXT", report)
