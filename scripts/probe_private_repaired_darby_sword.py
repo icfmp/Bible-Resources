@@ -21,6 +21,7 @@ from repair_osis_inline_markup import propose as propose_inline
 from repair_osis_source_bytes import patch_exact_original
 from audit_omitted_verse_notes import source_cases, native_cases
 from probe_andbible_jsword import run_pinned_jsword
+from probe_andbible_android_private_import import attempt_private_android_import
 from publisher_osis_sword_candidate import (
     _candidate_result, _compile_osis, _create_candidate_layout, _read_native_frames,
 )
@@ -97,7 +98,9 @@ def _diagnose_temporary_body_order(tool: Path, reader: Path, scratch: Path,
 def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
           diatheke: Path, schema: Path, link_plan: Path, inline_plan: Path,
           xiphos_review_dir: Path | None = None,
-          andbible_jsword_dir: Path | None = None) -> dict:
+          andbible_jsword_dir: Path | None = None,
+          andbible_android_apk: Path | None = None,
+          andbible_android_evidence_dir: Path | None = None) -> dict:
     original = read_pinned_publisher_osis("frajnd-2024")
     if sha(original) != SOURCE_HASH:
         raise PrivateRepairedProbeError("Exact publisher original source drifted")
@@ -225,6 +228,13 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
             smoke.append({"reference": reference, "reader_status": "readable"})
         jsword_receipt = (run_pinned_jsword(andbible_jsword_dir, payload, scratch, final_verses)
                           if andbible_jsword_dir is not None else None)
+        android_receipt = None
+        if andbible_android_apk is not None:
+            if andbible_android_evidence_dir is None:
+                raise PrivateRepairedProbeError("Android GUI evidence directory required")
+            android_receipt = attempt_private_android_import(
+                payload=payload, apk=andbible_android_apk,
+                evidence_dir=andbible_android_evidence_dir, scratch=scratch)
         xiphos_receipt = None
         if xiphos_review_dir is not None:
             if (xiphos_review_dir.is_symlink() or not xiphos_review_dir.is_dir()
@@ -294,6 +304,7 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
         "original_or_compiled_binary_uploaded": False,
         "xiphos_gui_links_tested": False,
         "andbible_stable_jsword_engine_probe": jsword_receipt,
+        "andbible_stable_android_gui_import_attempt": android_receipt,
         "xiphos_exact_candidate_gui_probe": xiphos_receipt,
         "published_or_editorially_approved": False,
     }
@@ -308,6 +319,10 @@ def main():
                    help="Optional empty directory for real isolated Xiphos screenshots; no SWORD artifact upload")
     p.add_argument("--andbible-jsword-dir", type=Path,
                    help="Exact pinned AndBible 5.1 JSword checkout for private Java engine test")
+    p.add_argument("--andbible-android-apk", type=Path,
+                   help="Pinned official AndBible stable APK for disposable Android emulator")
+    p.add_argument("--andbible-android-evidence-dir", type=Path,
+                   help="Fresh separate directory for screenshots and sanitized Android UI state")
     args = p.parse_args()
     if args.report.is_symlink() or args.report.exists() or not args.report.parent.is_dir():
         p.error("Output must be a fresh metadata-only report")
@@ -316,7 +331,9 @@ def main():
         native_raw=args.native_raw, diatheke=args.diatheke, schema=args.schema,
         link_plan=args.link_plan, inline_plan=args.inline_plan,
         xiphos_review_dir=args.xiphos_review_dir,
-        andbible_jsword_dir=args.andbible_jsword_dir)
+        andbible_jsword_dir=args.andbible_jsword_dir,
+        andbible_android_apk=args.andbible_android_apk,
+        andbible_android_evidence_dir=args.andbible_android_evidence_dir)
     args.report.write_text(json.dumps(report, indent=2, sort_keys=True)+"\n",
                            encoding="utf-8")
     print("Exact private repaired source/native reader gate passed; no release made")
