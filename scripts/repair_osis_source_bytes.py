@@ -180,12 +180,15 @@ def patch_exact_original(original: bytes, link_plan: dict, inline_plan: dict):
     categories = {}
     for _start, _end, _new, kind in patches:
         categories[kind] = categories.get(kind, 0) + 1
-    if categories != {
-        "inline_start": 2, "inline_end": 2,
-        "target_replace": 8, "absent_target_remove": 3,
-    }:
-        # This is a *research-only* composition of the two explicit plans,
-        # not a generic hard-coded translation-specific compiler rule.
+    expected = {
+        "inline_start": inline_plan["expected_count"],
+        "inline_end": inline_plan["expected_count"],
+        "target_replace": sum(e["action"] == "replace_target"
+                              for e in link_plan["edits"]),
+        "absent_target_remove": sum(e["action"] == "disable_absent_target"
+                                    for e in link_plan["edits"]),
+    }
+    if categories != {key: count for key, count in expected.items() if count}:
         raise LexicalPatchError("Unexpected edition plan operation inventory")
     return final, {
         "schema_version": 1,
