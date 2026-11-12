@@ -55,11 +55,11 @@ def run_pinned_jsword(jsword: Path, payload: Path, scratch: Path,
     keys = tuple(authored_osis_keys)
     if (len(keys) != 31166 or len(set(keys)) != len(keys)
             or any(not isinstance(k, str)
-                   or not re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9][0-9]*\\.[1-9][0-9]*", k)
+                   or not re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*\.[1-9][0-9]*", k)
                    for k in keys)):
         raise AndBibleJSwordProbeError("Authorial source-only key manifest is not validated")
     key_file = scratch / "private-original-osis-keys.txt"
-    key_file.write_text("\\n".join(keys) + "\\n", encoding="ascii")
+    key_file.write_text("\n".join(keys) + "\n", encoding="ascii")
     private_home = scratch / "jsword-private-home"
     private_home.mkdir()
     gradle_home = scratch / "jsword-gradle-cache"
@@ -103,7 +103,7 @@ def run_pinned_jsword(jsword: Path, payload: Path, scratch: Path,
     scope_diagnostics = {}
     test_stdout = report.findtext("system-out", default="")
     for label in ("CARDINALITY", "EXTRA_POPULATED", "EMPTY_NOMINAL_SLOTS"):
-        match = re.search(r"JSWORD_SCOPE_" + label + r"=(\\d{1,7})", test_stdout)
+        match = re.search(r"JSWORD_SCOPE_" + label + r"=(\d{1,7})", test_stdout)
         if match:
             scope_diagnostics[label.lower()] = int(match.group(1))
     failed_names = [
