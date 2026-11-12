@@ -58,6 +58,7 @@ class CommentaryXMLSourceTests(unittest.TestCase):
         result = xml_structure(source)
         self.assertEqual(result['candidate_commentary_reference_classes']['other_unreviewed_reference_grammar'], 1)
         self.assertFalse(result['authored_ranges_verified'])
+        self.assertTrue(all('Gen' not in shape for shape in result['candidate_commentary_reference_shapes']))
     def test_original_xml_with_dtd_is_never_marked_schema_validated(self):
         raw = self.sample().replace(b"<ThML>", b'<!DOCTYPE ThML [<!ENTITY original "text">]><ThML>')
         result = xml_structure(raw)
