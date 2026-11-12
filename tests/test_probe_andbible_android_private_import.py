@@ -28,6 +28,19 @@ class AndBiblePrivateImportUiTest(unittest.TestCase):
         self.assertTrue(any(c["label"]=="EASY START" for c in values))
         self.assertFalse(any("Bible Study" in c["label"] for c in values))
 
+    def test_actual_andbible_file_import_confirmation_is_restricted(self):
+        dialog=b"""<hierarchy>
+          <node text="PROCEED" bounds="[625,1140][785,1240]"/>
+          <node text="CANCEL" bounds="[80,1140][280,1240]"/>
+          <node text="Load Documents From Files" bounds="[100,500][700,570]"/>
+        </hierarchy>"""
+        controls=safe_controls(dialog)
+        self.assertIn("PROCEED",[c["label"] for c in controls])
+        with patch("probe_andbible_android_private_import.adb") as adb, \
+             patch("probe_andbible_android_private_import.time.sleep"):
+            self.assertEqual(tap_allowlisted(controls,("PROCEED",)),"PROCEED")
+            adb.assert_called_once()
+
     def test_file_picker_identifies_only_explicit_private_candidate(self):
         xml=b"""<hierarchy>
           <node text="JND2024RepairResearch.zip" bounds="[80,620][1000,740]"/>
