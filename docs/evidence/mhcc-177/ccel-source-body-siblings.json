@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "issue": "https://github.com/icfmp/Bible-Resources/issues/177",
+  "stage": "3_source_body_map_and_stage_4b_source_side_preflight",
+  "status": "ALL_EXPLICIT_SOURCE_VERSE_AND_RANGE_MARKERS_HAVE_ADJACENT_DIV_NOT_STOCK_CONTENT_PARITY",
+  "source_xml": {
+    "sha256": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+    "url": "https://www.ccel.org/ccel/h/henry/mhcc.xml"
+  },
+  "observed": {
+    "source_scripCom_total": 3592,
+    "source_work_qualified_chapter": 228,
+    "chapter_marker_immediate_next_h2": 220,
+    "chapter_marker_immediate_next_p": 8,
+    "source_work_qualified_range": 2902,
+    "source_work_qualified_verse": 462,
+    "verse_or_range_markers_followed_by_div": 3364,
+    "verse_or_range_markers_without_adjacent_div": 0,
+    "verse_or_range_adjacent_div_with_nonempty_original_text": 3364,
+    "verse_or_range_adjacent_div_p_elements": 3364,
+    "source_text_characters_in_adjacent_divs": 3094861,
+    "source_markers_with_nonempty_intervening_tail_text": 0,
+    "source_body_stream_sha256": "36632fdc8963f211c448c648bcabfa1e18ffccf7135b6ebe056acd17c5001347"
+  },
+  "technical_evidence": {
+    "real_ccel_audit_action": "https://github.com/icfmp/Bible-Resources/actions/runs/43280939908",
+    "artifact": "https://github.com/icfmp/Bible-Resources/actions/runs/43280939908/artifacts/13972322657"
+  },
+  "unreleased_gates": {
+    "original_section_identity_proven_beyond_direct_sibling": false,
+    "source_plaintext_to_stock_compiled_text_equality": false,
+    "source_paragraphs_headings_notes_and_quotations_compared_to_stock": false,
+    "original_non_scripCom_divisions_fully_mapped": false,
+    "CCEL_digital_edition_redistribution_approved": false,
+    "independent_xiphos_and_andbible_gui_tested": false,
+    "published": false
+  },
+  "source_content_committed": false,
+  "original_source_modified": false
+}
