@@ -41,6 +41,21 @@ class AndBiblePrivateImportUiTest(unittest.TestCase):
             self.assertEqual(tap_allowlisted(controls,("PROCEED",)),"PROCEED")
             adb.assert_called_once()
 
+    def test_observed_upgrade_announcement_has_only_explicit_dismissal_controls(self):
+        xml=b"""<hierarchy>
+            <node text="Application has been upgraded!" bounds="[60,375][775,650]"/>
+            <node text="DISMISS" bounds="[90,1280][290,1350]"/>
+            <node text="DISMISS UNTIL NEXT UPDATE" bounds="[290,1280][770,1350]"/>
+            <node text="Please see the video" bounds="[90,960][720,1060]"/>
+        </hierarchy>"""
+        controls=safe_controls(xml)
+        self.assertEqual([c["label"] for c in controls],
+                         ["DISMISS","DISMISS UNTIL NEXT UPDATE"])
+        with patch("probe_andbible_android_private_import.adb") as adb, \\
+             patch("probe_andbible_android_private_import.time.sleep"):
+            self.assertEqual(tap_allowlisted(controls,("DISMISS",)), "DISMISS")
+            adb.assert_called_once()
+
     def test_file_picker_identifies_only_explicit_private_candidate(self):
         xml=b"""<hierarchy>
           <node text="JND2024RepairResearch.zip" bounds="[80,620][1000,740]"/>
