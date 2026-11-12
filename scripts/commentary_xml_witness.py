@@ -190,6 +190,9 @@ def xml_structure(data: bytes) -> dict:
     chapter_bearing_chapters = 0
     chapter_bearing_markers = 0
     no_marker_division_receipts = []
+    source_annotation_book_divisions = Counter()
+    source_annotation_book_chapters = Counter()
+    source_multi_book_divisions = []
     book_body_ordered_sha = sha256()
     for division in root.iter():
         if not isinstance(division.tag, str) or safe_name(division.tag) != "div1":
@@ -200,10 +203,29 @@ def xml_structure(data: bytes) -> dict:
             continue
         chapter_bearing_divisions += 1
         chapter_bearing_chapters += len(chapters)
-        markers = sum(1 for candidate in division.iter()
-                      if isinstance(candidate.tag, str)
-                      and safe_name(candidate.tag) == "scripCom")
+        original_markers = [
+            candidate for candidate in division.iter()
+            if isinstance(candidate.tag, str)
+            and safe_name(candidate.tag) == "scripCom"
+        ]
+        markers = len(original_markers)
         chapter_bearing_markers += markers
+        original_book_codes = set()
+        for original_marker in original_markers:
+            _, code = _parse_reference(original_marker.get("osisRef", ""))
+            if code:
+                original_book_codes.add(code)
+        if len(original_book_codes) == 1:
+            original_book_code = next(iter(original_book_codes))
+            source_annotation_book_divisions[original_book_code] += 1
+            source_annotation_book_chapters[original_book_code] += len(chapters)
+        elif len(original_book_codes) > 1:
+            source_multi_book_divisions.append({
+                "source_div1_ordinal": chapter_bearing_divisions,
+                "observed_original_reference_book_codes": sorted(original_book_codes),
+                "chapter_count": len(chapters),
+                "source_content_or_books_not_reassigned": True,
+            })
         original_text_stream = "".join(division.itertext())
         text_digest = sha256(original_text_stream.encode("utf-8")).hexdigest()
         book_body_ordered_sha.update(
@@ -249,6 +271,9 @@ def xml_structure(data: bytes) -> dict:
         "source_div1_with_direct_chapters": chapter_bearing_divisions,
         "source_direct_chapters_inside_div1": chapter_bearing_chapters,
         "source_scripCom_inside_chapter_bearing_div1": chapter_bearing_markers,
+        "source_div1_count_by_unmodified_annotation_book_code": dict(sorted(source_annotation_book_divisions.items())),
+        "source_direct_chapters_by_annotation_book_code": dict(sorted(source_annotation_book_chapters.items())),
+        "source_div1_with_multiple_reference_book_codes": source_multi_book_divisions,
         "source_chapter_bearing_div1_ordered_text_stream_sha256": book_body_ordered_sha.hexdigest(),
         "source_chapter_bearing_div1_without_scripCom": no_marker_division_receipts,
         "source_division_text_stream_sha_is_not_original_file_byte_hash": True,
