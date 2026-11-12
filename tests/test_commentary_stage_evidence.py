@@ -70,6 +70,19 @@ class CommentaryStageEvidenceTests(unittest.TestCase):
                 with self.assertRaises(PilotError):
                     parse_index(bad, "TestCom")
 
+    def test_opaque_native_top_records_are_counted_not_conflated(self):
+        source = (
+            b"M\\tTestCom\\tKJV\\t1.9.0\\tzCom\\n"
+            b"U\\tTOP:1\\nU\\tTOP:2\\n"
+            b"K\\tGen.1.1\\n"
+            b"S\\t31000\\t1\\t0\\t2\\n"
+        )
+        result = parse_index(source, "TestCom")
+        self.assertEqual(result["occupied_anonymous_top_slots"], 2)
+        self.assertEqual(result["occupied_numbered_slots"], 1)
+        with self.assertRaisesRegex(PilotError, "Duplicate"):
+            parse_index(source.replace(b"TOP:2", b"TOP:1"), "TestCom")
+
     def test_native_inventory_deterministic_and_sensitive_to_order(self):
         a = parse_index(self.SAMPLE, "TestCom")
         b = parse_index(self.SAMPLE, "TestCom")
