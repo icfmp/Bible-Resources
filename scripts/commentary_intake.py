@@ -22,7 +22,7 @@ import zipfile
 
 from audit_real_pilot import scan_sword_entries
 from check_updates import ID_PATTERN
-from pilot_fetch import ALLOWED_HOSTS, fetch, validate_url
+from pilot_fetch import fetch, validate_url
 from pilot_preflight import ROOT, PilotError, inspect_archive
 
 ID = re.compile(r"^[a-z][a-z0-9-]{1,63}$")
@@ -81,6 +81,8 @@ def load_manifest(resource_id: str, directory: Path | None = None) -> dict:
 def inspect_resource(resource_id: str, stage: str, *, directory: Path | None = None,
                      reader: str | None = None) -> dict:
     manifest = load_manifest(resource_id, directory=directory)
+    if stage == "auto":
+        stage = "2" if manifest["archive_sha256"] is not None else "observe"
     report = {
         "schema_version": 1,
         "resource_id": resource_id,
@@ -137,6 +139,13 @@ def inspect_resource(resource_id: str, stage: str, *, directory: Path | None = N
             raise PilotError("Actual diatheke reader required for commentary observation")
         sample = scan_sword_entries(resource_id, archive, config=scanner_config,
                                     diatheke=reader_exe)
+        # A 19-byte `John 3:16` response can be just a reference echo.
+        # This is an advisory signal, not proof the author omitted material:
+        # the commentary may be indexed by an enclosing passage range.
+        for probe in sample["samples"]:
+            probe["short_response_needs_entry_mapping_review"] = probe["bytes"] < 64
+        confirmed = all(probe["successful"] and not probe["short_response_needs_entry_mapping_review"]
+                        for probe in sample["samples"])
         report.update({
             "status": "observed_not_approved" if stage == "observe"
                       else "pinned_sword_observed_source_comparison_pending",
@@ -148,7 +157,11 @@ def inspect_resource(resource_id: str, stage: str, *, directory: Path | None = N
             "archive_member_count": metadata["member_count"],
             "unpacked_bytes": metadata["total_unpacked_bytes"],
             "reader_samples": sample["samples"],
-            "reader_samples_all_present": sample["has_all_sample_keys"],
+            "reader_samples_all_present": confirmed,
+            "reader_samples_needing_mapping_review": [
+                probe["reference"] for probe in sample["samples"]
+                if probe["short_response_needs_entry_mapping_review"]
+            ],
             "source_to_sword_comparison_performed": False,
         })
     return report
@@ -157,7 +170,7 @@ def inspect_resource(resource_id: str, stage: str, *, directory: Path | None = N
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--resource-id", required=True)
-    parser.add_argument("--stage", choices=("1", "observe", "2"), required=True)
+    parser.add_argument("--stage", choices=("1", "observe", "2", "auto"), required=True)
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args(argv)
     try:
