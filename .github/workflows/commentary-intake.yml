@@ -22,6 +22,9 @@ on:
         options: ['1', 'observe', '2', 'auto']
 permissions:
   contents: read
+concurrency:
+  group: commentary-intake-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   intake:
     runs-on: ubuntu-latest
