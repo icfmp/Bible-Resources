@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "issue_url": "https://github.com/icfmp/Bible-Resources/issues/177",
+  "source_witness": {
+    "provider": "CCEL",
+    "format": "ThML/XML",
+    "url": "https://www.ccel.org/ccel/h/henry/mhcc.xml",
+    "sha256": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+    "bytes": 7952268,
+    "verified_against_pin": true,
+    "charset": "XML parsed with entity expansion/network disabled",
+    "has_doctype": true,
+    "unresolved_entities": 0,
+    "observed_action": "https://github.com/icfmp/Bible-Resources/actions/runs/43274198744"
+  },
+  "structural_observation": {
+    "div1_count": 68,
+    "div2_count": 1189,
+    "scripCom_count": 3592,
+    "paragraph_count": 12513,
+    "scripture_reference_element_count": 8417,
+    "book_count_from_reviewed_work_qualified_reference_syntax": 66,
+    "reference_forms": {
+      "work_qualified_chapter": 228,
+      "work_qualified_verse": 462,
+      "work_qualified_same_book_verse_range": 2902
+    },
+    "distinct_original_osisref_values": 3583,
+    "repeat_occurrences_with_identical_osisref": 9,
+    "source_work_prefixes_removed_from_original": false,
+    "source_reference_ordered_sha256": "bedef08447a1ad597d3dfa41c5d6f0f8bb257f3fc8935d54acd3a78be4697745",
+    "commentary_marker_is_empty": true,
+    "markers_located_under_div2": 3590,
+    "markers_located_under_div1": 2
+  },
+  "open_gates": {
+    "original_thml_schema_validation": false,
+    "original_text_to_compiled_sword_equivalence": false,
+    "stock_sword_anchor_correspondence": false,
+    "complete_entry_text_punctuation_structural_fidelity": false,
+    "exact_thml_plaintext_same_edition_proven": false,
+    "CCEL_redistribution_or_derivative_rights_approved": false,
+    "visual_reader_matrix_tested": false,
+    "publication_authorized": false
+  },
+  "source_text_committed": false,
+  "published": false
+}
