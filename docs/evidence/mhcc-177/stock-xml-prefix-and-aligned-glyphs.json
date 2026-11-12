@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "issue": "https://github.com/icfmp/Bible-Resources/issues/177",
+  "status": "COMPLETE_ORIGINAL_TO_STOCK_XML_PREFIX_AND_PUNCTUATION_BOUNDARY_DIAGNOSTICS_NOT_PARITY",
+  "immutable_inputs": {
+    "original_ccel_thml_sha256": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+    "crosswire_original_sword_zip_sha256": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+    "native_stock_raw_corpus_sha256": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
+  },
+  "original_source_verse_or_range_units_checked": 3364,
+  "compiled_stock_extra_prefix_cases": {
+    "all_799_original_word_token_sequences_at_end_of_stock_entries": 799,
+    "all_799_have_complete_top_level_XML_siblings_before_original_text": true,
+    "original_body_first_token_contained_in_top_level_tag": {
+      "hi": 799
+    },
+    "prior_stock_top_level_element_counts_across_799": {
+      "title": 1593,
+      "table": 2366,
+      "reference": 6
+    },
+    "prefix_text_top_level_owner_types_across_799": {
+      "title": 799,
+      "table": 740,
+      "reference": 3,
+      "_ROOT_TAIL": 148
+    },
+    "the_extra_stock_titles_and_tables_are_not_proven_legitimate_authorial_content": true,
+    "no_stock_entry_or_source_section_modified": true
+  },
+  "punctuation_aligned_gaps": {
+    "original_source_stock_units_with_equal_word_token_sequence_but_punctuation_different": 1949,
+    "total_changed_word_interstitial_gaps": 2283,
+    "one_to_one_numeric_unicode_glyph_substitutions": 2038,
+    "changed_gaps_with_complex_or_multiple_punctuation": 242,
+    "source_single_glyph_removed_in_stock": 3,
+    "original_entries_with_exclusively_one_to_one_glyph_changes": 1842,
+    "original_glyph_to_stock_glyph_numeric_substitutions": {
+      "U+2013>U+002D": 1877,
+      "U+002C>U+002D": 96,
+      "U+201C>U+0022": 50,
+      "U+201D>U+0022": 12,
+      "U+2019>U+0027": 3
+    },
+    "original_symbols_and_punctuation_remain_authorial_material": true,
+    "no_codepoint_conversion_approved": true
+  },
+  "real_actions": {
+    "exact_implementation_private_audit": "https://github.com/icfmp/Bible-Resources/actions/runs/43304428012",
+    "exact_implementation_validate": "https://github.com/icfmp/Bible-Resources/actions/runs/43304428208",
+    "metadata_only_artifact": "https://github.com/icfmp/Bible-Resources/actions/runs/43304428012/artifacts/13982368904"
+  },
+  "outstanding": {
+    "original_source_and_stock_may_be_different_digital_editions": true,
+    "stock_prefix_authorial_attribution_and_content_equivalence_unverified": true,
+    "source_chapter_markers_and_unanchored_source_division_unverified": true,
+    "other_156_lexical_selection_anomalies_and_one_stock_subsequence_case_unreviewed": true,
+    "complete_source_structure_notes_quotes_and_citations_unverified": true,
+    "redistribution_and_derivative_rights_unapproved": true,
+    "Xiphos_and_AndBible_GUI_tests_not_done": true,
+    "editorial_signoff": false,
+    "published": false
+  },
+  "original_authorial_text_or_stock_bytes_committed": false
+}
