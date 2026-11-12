@@ -30,6 +30,18 @@ OSIS_PART = r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*\.[1-9][0-9]*"
 OSIS_SINGLE = re.compile(r"^" + OSIS_PART + r"$")
 OSIS_RANGE = re.compile(r"^(" + OSIS_PART + r")-(" + OSIS_PART + r")$")
 
+def _safe_reference_shape(value: str) -> str:
+    # This is deliberately not a reference or a commentary excerpt.
+    # Only character classes and punctuation survive the fingerprint.
+    if len(value) > 400:
+        return "UNREVIEWED_LONG_REFERENCE"
+    shape = "".join("A" if c.isalpha() else "9" if c.isdigit() else c
+                    for c in value)
+    shape = re.sub(r"A+", "A", shape)
+    shape = re.sub(r"9+", "9", shape)
+    return shape[:100]
+
+
 def _ref_category(value: str) -> str:
     if not value:
         return "missing"
@@ -78,6 +90,7 @@ def xml_structure(data: bytes) -> dict:
     commentary_children = Counter()
     commentary_attribute_names = Counter()
     source_commentary_ref_classes = Counter()
+    source_commentary_ref_shapes = Counter()
     source_commentary_books = Counter()
     source_ref_digest = sha256()
     duplicate_ref_count = 0
@@ -114,6 +127,7 @@ def xml_structure(data: bytes) -> dict:
             source_ref_digest.update(b"\0")
             category = _ref_category(ref)
             source_commentary_ref_classes[category] += 1
+            source_commentary_ref_shapes[_safe_reference_shape(ref)] += 1
             if category in ("one_fully_qualified_verse", "same_book_verse_range"):
                 source_commentary_books[ref.split(".")[0]] += 1
             if ref in observed_ref_keys:
@@ -155,6 +169,7 @@ def xml_structure(data: bytes) -> dict:
         "candidate_commentary_direct_child_tags": dict(sorted(commentary_children.items())),
         "candidate_commentary_attribute_name_counts": dict(sorted(commentary_attribute_names.items())),
         "candidate_commentary_reference_classes": dict(sorted(source_commentary_ref_classes.items())),
+        "candidate_commentary_reference_shapes": dict(source_commentary_ref_shapes.most_common(15)),
         "candidate_commentary_reference_books": dict(sorted(source_commentary_books.items())),
         "candidate_commentary_reference_ordered_sha256": source_ref_digest.hexdigest(),
         "candidate_commentary_duplicate_identical_reference_count": duplicate_ref_count,
