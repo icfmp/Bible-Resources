@@ -10,6 +10,7 @@ from __future__ import annotations
 from hashlib import sha256
 import json
 from pathlib import Path
+from urllib.parse import urlencode
 import re
 import subprocess
 import time
@@ -91,6 +92,24 @@ def tap_allowlisted(controls, ordered_labels):
                 time.sleep(3)
                 return label
     return None
+
+
+DOCUMENTED_REFERENCE_PROBES = ("Gen.2.4", "Rom.16.25")
+
+
+def open_documented_reference_probe(reference: str) -> None:
+    """Attempt only a pre-reviewed AndBible OSIS deep link in the pinned app.
+
+    https://andbible.org/docs/bible_links/ documents /OSISREF with document,
+    v11n. Intent invocation alone is NEVER proof of actual navigation.
+    """
+    if reference not in DOCUMENTED_REFERENCE_PROBES:
+        raise AndroidDarbyImportError("Unreviewed Android passage navigation")
+    uri = ("https://read.andbible.org/" + reference + "?"
+           + urlencode({"document": MODULE, "v11n": VERSIFICATION}))
+    adb("shell", "am", "start", "-a", "android.intent.action.VIEW",
+        "-d", uri, "-p", PACKAGE, timeout=25, fail=False)
+    time.sleep(7)
 
 
 def relaunch_for_persistence():
@@ -269,6 +288,15 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
                    persistent_module_identity_verified=False)
         screenshots["10-after-relaunch-dialog"] = capture_png(
             evidence_dir/"10-after-relaunch-dialog.png")
+        # Native app-only URI handling is a RESEARCH probe. No forced URL
+        # browser fallback or speculative passage/footnote tapping.
+        for index, reference in enumerate(DOCUMENTED_REFERENCE_PROBES, start=11):
+            open_documented_reference_probe(reference)
+            checkpoint("android_documented_deep_link_attempt",
+                       reference=reference, actual_target_verified=False,
+                       note_popup_verified=False)
+            key=f"{index:02d}-documented-reference-attempt"
+            screenshots[key] = capture_png(evidence_dir/(key+".png"))
 
     # A successful ADB press does not establish a loaded translation; retain
     # that as a separate visual and Java/Android document validation gate.
@@ -289,6 +317,8 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
         "import_confirmation_action_attempted":import_prompt,
         "post_import_announcement_dismissed":announcement_dismissed,
         "andbible_process_relaunch_attempted":relaunch_attempted,
+        "andbible_documented_reference_intent_attempted":relaunch_attempted,
+        "andbible_documented_reference_navigation_verified":False,
         "andbible_persistent_module_identity_verified":False,
         "andbible_import_verified":imported_by_app,
         "andbible_rendered_text_and_notes_verified":False,

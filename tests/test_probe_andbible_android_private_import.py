@@ -8,7 +8,8 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/"scripts"))
 from probe_andbible_android_private_import import (
-    safe_controls, tap_allowlisted, relaunch_for_persistence, AndroidDarbyImportError,
+    safe_controls, tap_allowlisted, relaunch_for_persistence,
+    open_documented_reference_probe, AndroidDarbyImportError,
 )
 
 
@@ -83,6 +84,19 @@ class AndBiblePrivateImportUiTest(unittest.TestCase):
         self.assertEqual(adb.call_args_list[1].args[:3],
                          ("shell", "monkey", "-p"))
         self.assertEqual(sleep.call_args.args, (12,))
+
+    def test_official_osis_deep_link_is_module_and_versification_bound(self):
+        with (patch("probe_andbible_android_private_import.adb") as adb,
+              patch("probe_andbible_android_private_import.time.sleep")):
+            open_documented_reference_probe("Rom.16.25")
+        args=adb.call_args.args
+        self.assertEqual(args[:6],
+                         ("shell", "am", "start", "-a", "android.intent.action.VIEW", "-d"))
+        self.assertEqual(args[6],
+                         "https://read.andbible.org/Rom.16.25?document=JND2024RepairResearch&v11n=Luther")
+        self.assertEqual(args[7:9], ("-p", "net.bible.android.activity"))
+        with self.assertRaises(AndroidDarbyImportError):
+            open_documented_reference_probe("Acts.8.37")
 
     def test_file_picker_identifies_only_explicit_private_candidate(self):
         xml=b"""<hierarchy>
