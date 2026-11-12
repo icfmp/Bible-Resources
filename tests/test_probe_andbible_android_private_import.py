@@ -107,7 +107,7 @@ class AndBiblePrivateImportUiTest(unittest.TestCase):
             with self.assertRaises(AndroidDarbyImportError):
                 probe_observed_note_marker(path)
             import struct
-            header=b"\\x89PNG\\r\\n\\x1a\\n"+b"\\x00"*8
+            header=bytes.fromhex("89504e470d0a1a0a")+b"\\x00"*8
             path.write_bytes(header+struct.pack(">II", 832, 1792))
             with self.assertRaises(AndroidDarbyImportError):
                 probe_observed_note_marker(path)
