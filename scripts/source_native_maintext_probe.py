@@ -43,6 +43,9 @@ from source_native_record_scope_triage import (
 from source_native_nonspace_boundaries import (
     NonspaceBoundaryError, compare_punctuation_sensitive_boundaries,
 )
+from source_native_structure_topology import (
+    StructureTopologyError, compare_structural_event_topology,
+)
 from source_native_structural_whitespace import (
     MainTextStructuralWhitespaceTriage, StructuralWhitespaceError,
 )
@@ -583,6 +586,7 @@ def run_real_usfx_sword_text_probe(
         exact = bool(source_text and len(native_keys) == len(source_text)
                      and not missing and counts["exact_semantic_characters"] == len(source_text)
                      and not counts["native_verse_without_same_indexed_source_key"])
+        native_boundary_data = None
         if source_boundary_blocker is not None:
             body_boundary = {
                 "schema_version":1, "status":source_boundary_blocker,
@@ -607,6 +611,33 @@ def run_real_usfx_sword_text_probe(
                     "status":"source_native_boundary_comparison_unverified",
                     "all_mapped_book_p_q_start_end_word_ordinals_match":False,
                     "no_source_text_note_content_or_native_ids_exposed":True,
+                }
+        # Independently compare ALL original and actually compiled p/q
+        # semantic opening and closing coordinates, event pair order and
+        # crossing topology. Word streams are private; the receipt contains
+        # only bounded book/reference identifiers, counts and SHA digests.
+        # An ambiguous shared source/native anchor is not editorial proof.
+        if source_boundaries is None or native_boundary_data is None:
+            body_topology = {
+                "schema_version":1,
+                "status":"blocked_source_native_structural_topology_prerequisite",
+                "all_source_native_p_q_open_close_event_topology_match":False,
+                "source_original_style_and_linebreak_fidelity_verified":False,
+                "editorial_or_publication_approved":False,
+                "no_scripture_note_body_raw_ids_or_native_xml_exposed":True,
+            }
+        else:
+            try:
+                body_topology = compare_structural_event_topology(
+                    source_boundaries, native_boundary_data)
+            except StructureTopologyError:
+                body_topology = {
+                    "schema_version":1,
+                    "status":"blocked_unparseable_source_native_structural_topology",
+                    "all_source_native_p_q_open_close_event_topology_match":False,
+                    "source_original_style_and_linebreak_fidelity_verified":False,
+                    "editorial_or_publication_approved":False,
+                    "no_scripture_note_body_raw_ids_or_native_xml_exposed":True,
                 }
         # A word-position-equal structure can be serialized in a prior
         # USFX verse but a following native SWORD verse/intro. Classify the
@@ -695,6 +726,7 @@ def run_real_usfx_sword_text_probe(
             "source_native_body_boundary_word_position_screen": body_boundary,
             "source_native_body_record_scope_triage": body_record_scope,
             "source_native_nonwhitespace_codepoint_boundary_screen": body_nonspace,
+            "source_native_p_q_event_topology_diagnostic": body_topology,
             "source_native_structural_whitespace_gap_triage": body_whitespace_gaps,
             "source_xml_newline_provenance_status":
                 source_xml_newline_provenance_status,
