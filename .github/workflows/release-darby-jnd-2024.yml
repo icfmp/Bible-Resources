@@ -13,26 +13,26 @@ on:
       - "scripts/probe_private_repaired_darby_sword.py"
   push:
     branches: [main]
-    paths: ["config/darby-release-authorization.json"]
+    paths:
+      - "config/darby-release-authorization.json"
+      - ".github/workflows/release-darby-jnd-2024.yml"
   workflow_dispatch:
 
 permissions:
   contents: write
   actions: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: github-pages
+  group: darby-source-attested-release-build
   cancel-in-progress: false
 
 jobs:
   source-attested-release:
     runs-on: ubuntu-24.04
     timeout-minutes: 35
-    # PRs cannot access the protected Pages deployment environment.
-    # Reserve github-pages for the owner-approved main-branch transaction.
-    environment: ${{ github.event_name == 'pull_request' && 'darby-release-preflight' || 'github-pages' }}
+    # No Pages write/production environment in this build. The reviewed
+    # final binary is committed through a NEW PR and verified independently.
+    environment: darby-release-preflight
     env:
       PYTHONPATH: scripts
     steps:
@@ -152,40 +152,40 @@ jobs:
       - name: PR acceptance proof without release, upload or publication
         if: github.event_name == 'pull_request'
         run: echo "Private final package and catalogue verified. PR did not publish."
-      - name: Commit only independently verified stable module and catalogue
+      - name: Check exact final Pages package equals audited GitHub release ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          from hashlib import sha256
+          import json
+          provenance=json.loads(Path('modules/darby-jnd-2024/RELEASE_PROVENANCE.json').read_text())
+          pkg=Path('dist/sword/packages/BRJND2024.zip')
+          actual=sha256(pkg.read_bytes()).hexdigest()
+          assert actual==provenance['release_zip_sha256'], (
+            'Promoted stable release package differs from deterministic Pages package')
+          assert provenance['six_ztext_payload_files_byte_identical_to_full_native_audit']
+          print('Final stable ZIP and Pages ZIP identical, SHA-256:',actual)
+          PY
+      - name: Push final approved module to review branch, NEVER bypass protected main
         if: github.event_name != 'pull_request'
         shell: bash
         run: |
           set -euo pipefail
           git fetch origin main
           test "$(git rev-parse origin/main)" = "$GITHUB_SHA"
+          branch="publish/darby-jnd-2024-0.1.0"
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+            echo "Existing review branch must not be overwritten: $branch"
+            exit 1
+          fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -c "$branch"
           git add modules/darby-jnd-2024 catalog/v1/catalog.json
           git diff --cached --quiet && { echo 'Refusing unchanged release'; exit 1; }
-          git commit -m 'Publish owner-approved JND 2024 0.1.0 and native SWORD audit'
-          git push origin HEAD:main
-      - name: Publish immutable release archive and checksum
-        if: github.event_name != 'pull_request'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          gh release create darby-jnd-2024-0.1.0 \
-            "$RUNNER_TEMP/darby-stable/release/BRJND2024-0.1.0.zip" \
-            "$RUNNER_TEMP/darby-stable/release/SHA256SUMS.txt" \
-            "$RUNNER_TEMP/darby-stable/release/SOURCE_AUDIT.json" \
-            "$RUNNER_TEMP/darby-stable/release/RELEASE_PROVENANCE.json" \
-            --repo "$GITHUB_REPOSITORY" \
-            --title 'Bible J. N. Darby — BPC 2024, Bible Resources 0.1.0' \
-            --notes-file docs/releases/DARBY-JND-2024-0.1.0.md
-          gh release view darby-jnd-2024-0.1.0 --repo "$GITHUB_REPOSITORY"
-      - uses: actions/configure-pages@v5
-        if: github.event_name != 'pull_request'
-      - uses: actions/upload-pages-artifact@v4
-        if: github.event_name != 'pull_request'
-        with:
-          path: dist
-      - uses: actions/deploy-pages@v4
-        if: github.event_name != 'pull_request'
+          git commit -m 'Stage attested JND 2024 SWORD 0.1.0 for protected PR review'
+          git push origin "HEAD:refs/heads/$branch"
+          echo "Exact SHA-pinned BPC edition staged on separate PR branch: $branch"
+          echo "No GitHub release or Pages deployment performed by this workflow"
