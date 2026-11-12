@@ -45,6 +45,25 @@ be checked until the **whole gate** is independently evidenced.
 | **6/7** | **Test the actual reader package** | Exact candidate ZIP checksum; install/readback with stock SWORD/diatheke plus another independent reader where available; representative passages, independent/parallel readings and recorded limitations | Executed tests linked; unavailable GUI/client checks remain **NOT TESTED**, never a fabricated success. Blocking reader defects prevent release |
 | **7/7** | **Approve, publish, and verify** | Owner editorial/rights sign-off, final provenance and known-limitations record, immutable release and source/payload checksums, official catalogue snapshot and successful Pages publication, external endpoint check when available | No public claims before actual approval and publication; distinguish successful workflow, GitHub release, external HTTP availability and app adoption |
 
+### Stage 5 source-link decision: syntax is not semantics
+
+A non-empty or index-addressable original `osisRef` is **not evidence of an
+editorially correct destination**. Compare a bounded sample of displayed
+reference labels and note context against target attributes, including
+already-indexed targets, not only missing-key or unsupported-syntax flags.
+Keep distinct outcomes for (a) omitted numbered verses discussed in a
+text-critical note, (b) nonstandard relative/range grammar, (c) likely
+wrong-book targets even if their destinations exist, and (d) actual compiled
+reference-attribute loss. Preserve the exact source values; any repair needs
+upstream confirmation or a separately approved, reversible transformation.
+
+Before stage-5 acceptance, record both **machine-complete source/native
+fidelity** and **owner editorial acceptance** as separate decisions. A
+diagnostic triage, draft publisher report, or sample GUI click cannot
+approve a distribution or automatically waive known non-navigable source links.
+See the [BPC Darby stage-5 case study](evidence/frajnd-2024-stage5-editorial-review.md)
+and its [unsubmitted upstream report](evidence/frajnd-2024-upstream-link-report-draft.md).
+
 For an already satisfactory **official SWORD module**, stage 3's conversion
 and stage 4's rebuilding can be **N/A** if justified by a verifiable
 original-source/official binary audit. The **index, content, notes and reader
