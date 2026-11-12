@@ -61,10 +61,10 @@ def parse_index(output: bytes, module_id: str) -> dict:
         kind, key = cells
         if (kind == "K" and not KEY.fullmatch(key)
                 or kind == "I" and not INTRO.fullmatch(key)
-                or kind == "U" and key != "TOP"):
+                or kind == "U" and not re.fullmatch(r"TOP:[1-9][0-9]*", key)):
             raise PilotError("Invalid commentary slot reference")
         if (kind, key) in seen:
-            raise PilotError("Duplicate native commentary slot key")
+            raise PilotError(f"Duplicate native commentary slot key: {kind} {key}")
         seen.add((kind, key))
         counts[kind] += 1
         if kind != "U":
@@ -74,7 +74,7 @@ def parse_index(output: bytes, module_id: str) -> dict:
         ordered.update(line.encode("ascii") + b"\n")
     if (counts["K"], counts["I"], counts["U"]) != (num, intr, anonymous):
         raise PilotError("Native commentary slot totals differ from completion trailer")
-    if not (1 <= num <= visited <= 300000) or not (1 <= len(by_book) <= 100) or anonymous > 1:
+    if not (1 <= num <= visited <= 300000) or not (1 <= len(by_book) <= 100) or anonymous > 10000:
         raise PilotError("Implausible native commentary occupancy or canon")
     # This is an occupied-key hash only. Shared physical zCom blocks and
     # overlapping annotation ranges cannot be inferred from hasEntry().
