@@ -18,8 +18,8 @@ on:
         description: "1 = metadata-only; observe = unpinned fingerprint; 2 = SHA-pinned readback"
         required: true
         type: choice
-        default: observe
-        options: ['1', 'observe', '2']
+        default: auto
+        options: ['1', 'observe', '2', 'auto']
 permissions:
   contents: read
 jobs:
@@ -28,7 +28,7 @@ jobs:
     timeout-minutes: 15
     env:
       RESOURCE_ID: ${{ github.event.inputs.resource_id || 'mhcc-crosswire' }}
-      STAGE: ${{ github.event.inputs.stage || 'observe' }}
+      STAGE: ${{ github.event.inputs.stage || 'auto' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
