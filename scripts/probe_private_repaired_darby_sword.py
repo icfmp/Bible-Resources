@@ -125,7 +125,10 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
             }
             print("RESEARCH-ONLY safe native mismatch categories:",
                   json.dumps({"aggregate_problem_counts": problems,
-                              "structural_flags": flags}, sort_keys=True))
+                              "structural_flags": flags,
+                              "body_opening_kind_counts": body.get("source_native_body_opening_kind_counts"),
+                              "first_body_mismatch_host_references_only":
+                                  body.get("first_mismatch_book_references_no_scripture", [])[:4]}, sort_keys=True))
             raise PrivateRepairedProbeError("Corrected candidate full native fidelity gate did not pass")
         env = dict(os.environ, SWORD_PATH=str(payload.resolve()))
         passages = (
