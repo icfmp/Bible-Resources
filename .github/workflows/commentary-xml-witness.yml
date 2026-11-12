@@ -1,0 +1,62 @@
+name: Observe commentary XML structure (read-only)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/commentary-xml-witness.yml'
+      - 'scripts/commentary_xml_witness.py'
+      - 'tests/test_commentary_xml_witness.py'
+      - 'config/commentary-intake/**'
+      - 'scripts/pilot_fetch.py'
+  workflow_dispatch:
+    inputs:
+      resource_id:
+        description: "Reviewed commentary intake manifest ID"
+        required: true
+        type: string
+        default: mhcc-crosswire
+
+permissions:
+  contents: read
+
+concurrency:
+  group: commentary-xml-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  source_xml_inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    env:
+      RESOURCE_ID: ${{ github.event.inputs.resource_id || 'mhcc-crosswire' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install project-pinned XML parser
+        run: python -m pip install -r requirements.txt
+      - name: Independently observe official XML source into disposable runner storage
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_xml_witness.py \
+            --resource-id "$RESOURCE_ID" \
+            --report "${RUNNER_TEMP}/commentary-xml-structure.json"
+      - name: Keep only metadata without authorial text
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: commentary-xml-structure-receipt
+          path: ${{ runner.temp }}/commentary-xml-structure.json
+          if-no-files-found: warn
+          retention-days: 90
+      - name: Distinguish structure discovery from legal or textual acceptance
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo '## Independent CCEL XML witness'
+            echo 'All CCEL source bytes are temporary. The uploaded receipt contains structural names/counts and SHA only.'
+            echo 'No DTD/entity resolution, OSIS/ThML schema validation or original text redistribution is authorized.'
+            echo 'An XML layout inventory does not establish identity with the CCEL plaintext or CrossWire module.'
+          } >> "$GITHUB_STEP_SUMMARY"
