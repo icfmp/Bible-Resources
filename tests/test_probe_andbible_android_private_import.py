@@ -59,10 +59,12 @@ class AndBiblePrivateImportUiTest(unittest.TestCase):
           <node text="an unrelated.zip" bounds="[58,855][400,1250]"/>
         </hierarchy>""".encode("utf-8")
         controls=safe_controls(xml)
-        self.assertEqual(len(controls),1)
-        self.assertEqual(controls[0]["label"],"JND2024REPAIRRESEARCH.ZIP")
-        self.assertEqual(controls[0]["x"],229)
-        self.assertEqual(controls[0]["y"],621)
+        candidates=[item for item in controls
+                    if item["label"]=="JND2024REPAIRRESEARCH.ZIP"]
+        self.assertEqual(len(candidates),1)
+        self.assertEqual(candidates[0]["x"],229)
+        self.assertEqual(candidates[0]["y"],621)
+        self.assertTrue(any(c["label"]=="RECENT" for c in controls))
 
     def test_out_of_screen_or_invalid_xml_is_rejected_or_ignored(self):
         self.assertEqual(safe_controls(b"<notxml"),[])
