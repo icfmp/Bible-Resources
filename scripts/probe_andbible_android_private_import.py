@@ -177,7 +177,9 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
             if item:
                 selected=True
                 checkpoint("private_candidate_file_selected",selected=True)
-                time.sleep(5)
+                # Real SWORD import can briefly saturate the emulator; allow
+                # the UI to settle before requesting a full framebuffer.
+                time.sleep(16)
             elif not visited_downloads:
                 folder=tap_allowlisted(controls,("DOWNLOADS","DOWNLOAD"))
                 if folder:
@@ -195,8 +197,17 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
             else:
                 break
         try:
-            screenshots[f"{4+step:02d}-import-state"] = capture_png(
-                evidence_dir/f"{4+step:02d}-import-state.png")
+            for capture_attempt in range(2):
+                try:
+                    screenshots[f"{4+step:02d}-import-state"] = capture_png(
+                        evidence_dir/f"{4+step:02d}-import-state.png")
+                    break
+                except AndroidPreflightError:
+                    if capture_attempt:
+                        raise
+                    checkpoint("android_post_selection_capture_retry", index=step,
+                               error_type="bounded_adb_screencap_failure")
+                    time.sleep(12)
         except AndroidPreflightError:
             checkpoint("android_emulator_lost_during_import_attempt",
                        after_exact_file_selected=selected,
