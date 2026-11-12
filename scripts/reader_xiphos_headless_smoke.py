@@ -604,7 +604,8 @@ def _capture_parallel_toggle_sample(env:dict, study_dir:Path) -> dict:
 
 def _capture_bounded_note_popup(env: dict, study_dir: Path, *,
                                 slug: str, reference: str,
-                                marker_x: int, marker_y: int) -> dict:
+                                marker_x: int, marker_y: int,
+                                link_click: tuple[int, int] | None = None) -> dict:
     """Observe an evidenced footnote marker's hover and pinned preview.
 
     The screenshot *pixels*, not the success of an xdotool command, must
@@ -655,6 +656,34 @@ def _capture_bounded_note_popup(env: dict, study_dir: Path, *,
                 or not 0 < target.stat().st_size <= 6_000_000):
             raise XiphosSmokeError("Xiphos note popup screenshot missing")
         shots[stage] = sha256(target.read_bytes()).hexdigest()
+    click_snapshot = None
+    if link_click is not None:
+        if (not isinstance(link_click, tuple) or len(link_click) != 2
+                or any(type(p) is not int for p in link_click)
+                or not 16 <= link_click[0] <= 210
+                or not 485 <= link_click[1] <= 690):
+            raise XiphosSmokeError("Unreviewed note-preview link-click geometry")
+        for command in (
+            ["xdotool", "mousemove", "--sync", str(link_click[0]), str(link_click[1])],
+            ["xdotool", "click", "1"],
+        ):
+            outcome = subprocess.run(command, env=env, stdout=subprocess.DEVNULL,
+                                     stderr=subprocess.DEVNULL, timeout=6,
+                                     check=False)
+            if outcome.returncode:
+                raise XiphosSmokeError("Note-preview link click command failed")
+        time.sleep(1.5)
+        target = study_dir / (slug + "-post-link-click.png")
+        if target.exists() or target.is_symlink():
+            raise XiphosSmokeError("Refusing prior note-preview link screenshot")
+        result = subprocess.run(
+            ["import", "-display", env["DISPLAY"], "-window", "root", str(target)],
+            env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            timeout=15, check=False)
+        if (result.returncode or not target.is_file() or target.is_symlink()
+                or not 0 < target.stat().st_size <= 6_000_000):
+            raise XiphosSmokeError("Note-preview click screenshot missing")
+        click_snapshot = sha256(target.read_bytes()).hexdigest()
     return {
         "sample": slug,
         "requested_host_reference": reference,
@@ -662,7 +691,9 @@ def _capture_bounded_note_popup(env: dict, study_dir: Path, *,
         "host_hover_pinned_images_sha256": shots,
         "hover_note_contents_visually_verified": False,
         "pinned_popup_visually_verified": False,
-        "corrected_link_clicked": False,
+        "corrected_link_click_attempted": link_click is not None,
+        "post_link_click_screenshot_sha256": click_snapshot,
+        "corrected_link_target_navigation_visually_verified": False,
         "scripture_note_or_markup_exported_in_receipt": False,
         "independent_pixel_review_required": True,
     }
@@ -762,8 +793,8 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
             bounded_note_popups = (
                 [_capture_bounded_note_popup(
                     env, study_dir, slug=slug, reference=ref,
-                    marker_x=x, marker_y=y)
-                 for slug, ref, x, y in note_popup_probes]
+                    marker_x=x, marker_y=y, link_click=clicked)
+                 for slug, ref, x, y, clicked in note_popup_probes]
                 if study_dir and samples and note_popup_probes else [])
             parallel_attempt = (_capture_parallel_toggle_sample(env, study_dir)
                                 if study_dir and samples else None)
