@@ -16,7 +16,7 @@ import time
 import xml.etree.ElementTree as ET
 
 from publisher_osis_preview_package import package_preview
-from probe_andbible_android_emulator import APK_SHA256, PACKAGE, adb, capture_png
+from probe_andbible_android_emulator import APK_SHA256, PACKAGE, adb, capture_png, AndroidPreflightError
 
 MODULE = "JND2024RepairResearch"
 VERSIFICATION = "Luther"
@@ -55,8 +55,11 @@ def safe_controls(xml: bytes) -> list[dict]:
         for key in ("text","content-desc"):
             value=node.attrib.get(key,"").strip()
             label=value.upper()
-            if label in SAFE_UI:
-                item={"label":label,"x":(x1+x2)//2,"y":(y1+y2)//2}
+            candidate_file=(value.startswith("JND2024Repai") and len(value)<=48
+                            and re.fullmatch(r"JND2024Repai[A-Za-z0-9 ._\\u2026-]*",value) is not None)
+            if label in SAFE_UI or candidate_file:
+                item={"label":("JND2024REPAIRRESEARCH.ZIP" if candidate_file else label),
+                      "x":(x1+x2)//2,"y":(y1+y2)//2}
                 if item not in result:
                     result.append(item)
     return result[:50]
@@ -114,19 +117,33 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
 
     adb("shell","monkey","-p",PACKAGE,"1",timeout=35)
     time.sleep(14)
+    trace=[]
+    def checkpoint(phase, **fields):
+        item={"phase":phase,**fields}
+        trace.append(item)
+        (evidence_dir/"progress.json").write_text(
+            json.dumps({"schema_version":1,
+                        "status":"research_only_android_ui_attempt_no_approval",
+                        "trace":trace,
+                        "android_gui_import_confirmed":False},
+                       indent=2,sort_keys=True)+"\\n",encoding="utf-8")
+    checkpoint("private_zip_pushed_and_official_apk_started")
     screenshots={}
     screenshots["01-startup"]=capture_png(evidence_dir/"01-andbible-startup.png")
 
     controls=android_controls()
     first_labels=sorted({c["label"] for c in controls})
+    checkpoint("official_initial_startup_ui",safe_control_labels=first_labels)
     chosen=tap_allowlisted(controls,("LOAD DOCUMENTS FROM FILES",
                                      "LOAD DOCUMENT FROM FILES"))
     proceeded=False
+    checkpoint("andbible_load_document_button",found=chosen is not None)
     if chosen is not None:
         screenshots["02-import-instructions"]=capture_png(
             evidence_dir/"02-import-instructions.png")
         instructions=android_controls()
         proceeded=tap_allowlisted(instructions,("PROCEED",)) is not None
+        checkpoint("andbible_import_proceed_dialog",pressed=proceeded)
         if proceeded:
             time.sleep(2)
             screenshots["03-android-file-picker"]=capture_png(
@@ -140,10 +157,14 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
         controls=android_controls()
         labels=sorted({c["label"] for c in controls})
         history.append(labels)
+        checkpoint("android_picker_state",index=step,allowed_labels=labels)
         if not selected:
+            checkpoint("try_exact_private_candidate_file",
+                       candidate_visible="JND2024REPAIRRESEARCH.ZIP" in labels)
             item=tap_allowlisted(controls,("JND2024REPAIRRESEARCH.ZIP",))
             if item:
                 selected=True
+                checkpoint("private_candidate_file_selected",selected=True)
                 time.sleep(5)
             elif not visited_downloads:
                 folder=tap_allowlisted(controls,("DOWNLOADS","DOWNLOAD"))
@@ -161,8 +182,14 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
                 time.sleep(4)
             else:
                 break
-        screenshots[f"{4+step:02d}-import-state"] = capture_png(
-            evidence_dir/f"{4+step:02d}-import-state.png")
+        try:
+            screenshots[f"{4+step:02d}-import-state"] = capture_png(
+                evidence_dir/f"{4+step:02d}-import-state.png")
+        except AndroidPreflightError:
+            checkpoint("android_emulator_lost_during_import_attempt",
+                       after_exact_file_selected=selected,
+                       candidate_installation_not_verified=True)
+            raise
 
     # A successful ADB press does not establish a loaded translation; retain
     # that as a separate visual and Java/Android document validation gate.
