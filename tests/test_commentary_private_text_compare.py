@@ -42,6 +42,26 @@ class CommentaryOriginalStockTextTests(unittest.TestCase):
         self.assertNotIn("Exact private text",json.dumps(out))
         self.assertNotIn("Original next paragraph",json.dumps(out))
 
+    def test_diagnostic_word_sequence_and_added_stock_markup_are_not_false_parity(self):
+        original,_=_original_source_markers(self.source())
+        punctuation=compare_private_texts(original,{
+            "Gen.1.1":b"<p>Exact private text punctuation!</p>",
+            "Gen.1.4":b"<p>Original next paragraph.</p>",
+        })
+        self.assertEqual(
+            punctuation["lexical_disagreement_classification"][
+                "same_unicode_word_tokens_different_punctuation"],1)
+        self.assertFalse(punctuation["full_authored_to_stock_parity_verified"])
+        with_heading=compare_private_texts(original,{
+            "Gen.1.1":b"<h3>Added heading. </h3><p>Exact private text, punctuation!</p>",
+            "Gen.1.4":b"<p>Original next paragraph.</p>",
+        })
+        self.assertEqual(
+            with_heading["lexical_disagreement_classification"][
+                "full_original_whitespace_collapsed_body_inside_stock"],1)
+        self.assertTrue(with_heading["disagreement_categories_are_only_exploratory_not_text_parity"])
+        self.assertFalse(with_heading["full_authored_to_stock_parity_verified"])
+
     def test_whitespace_only_differences_are_not_exact_fidelity(self):
         units,_=_original_source_markers(self.source())
         out=compare_private_texts(units,{
