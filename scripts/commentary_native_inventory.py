@@ -31,7 +31,7 @@ SYSTEM = re.compile(r"^[A-Za-z][A-Za-z0-9]{0,31}$")
 DRIVERS = {"RawCom", "RawCom4", "zCom", "zCom4"}
 
 
-def parse_index(output: bytes, module_id: str) -> dict:
+def parse_index(output: bytes, module_id: str, *, include_rows: bool = False) -> dict:
     if len(output) > MAX_OUTPUT:
         raise PilotError("Native commentary index output exceeded reviewed bound")
     try:
@@ -70,7 +70,7 @@ def parse_index(output: bytes, module_id: str) -> dict:
         if kind != "U":
             book = key.split(".")[0]
             by_book[book] += 1
-        keys.append(key)
+        keys.append((kind, key))
         ordered.update(line.encode("ascii") + b"\n")
     if (counts["K"], counts["I"], counts["U"]) != (num, intr, anonymous):
         raise PilotError("Native commentary slot totals differ from completion trailer")
@@ -78,7 +78,7 @@ def parse_index(output: bytes, module_id: str) -> dict:
         raise PilotError("Implausible native commentary occupancy or canon")
     # This is an occupied-key hash only. Shared physical zCom blocks and
     # overlapping annotation ranges cannot be inferred from hasEntry().
-    return {
+    result = {
         "status": "occupied_slot_inventory_not_entry_parity",
         "module_id": meta[1], "native_versification": meta[2],
         "libsword_version": meta[3], "driver": meta[4],
@@ -95,9 +95,15 @@ def parse_index(output: bytes, module_id: str) -> dict:
         "complete_commentary_entry_count_verified": False,
         "no_commentary_text_exported": True,
     }
+    if include_rows:
+        # Keys remain PRIVATE in callers: never serialize these into a
+        # public receipt unless their precise disclosure is intentional.
+        result["native_occupied_rows_for_in_memory_reconciliation"] = keys
+    return result
 
 
-def inventory(resource_id: str, *, inspector: Path, directory: Path | None = None) -> dict:
+def inventory(resource_id: str, *, inspector: Path, directory: Path | None = None,
+              include_rows: bool = False) -> dict:
     manifest = load_manifest(resource_id, directory)
     expected = manifest.get("archive_sha256")
     if not expected:
@@ -137,7 +143,7 @@ def inventory(resource_id: str, *, inspector: Path, directory: Path | None = Non
             raise PilotError("Native commentary inspector exceeded 50-second safety limit") from exc
         if run.returncode:
             raise PilotError(f"Native commentary inspector failed with nonzero exit code {run.returncode}")
-        report = parse_index(run.stdout, manifest["module_id"])
+        report = parse_index(run.stdout, manifest["module_id"], include_rows=include_rows)
         if report["native_versification"] != (conf["versification"] or "KJV"):
             raise PilotError("Stock engine versification differs from effective declared SWORD module registry")
         if report["driver"] != conf["driver"]:
