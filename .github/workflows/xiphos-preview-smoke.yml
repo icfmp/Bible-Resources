@@ -97,6 +97,7 @@ jobs:
             ${{ runner.temp }}/metadata/xiphos-headless.json
             ${{ runner.temp }}/metadata/xiphos-window.png
             ${{ runner.temp }}/metadata/study-samples/*.png
+            ${{ runner.temp }}/metadata/study-samples/post-module-selection/*.png
           retention-days: 7
           if-no-files-found: error
       - name: Record result on original import issue
