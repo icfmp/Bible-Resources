@@ -1,0 +1,75 @@
+name: Observe commentary intake (read-only)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/commentary-intake.yml'
+      - 'scripts/commentary_intake.py'
+      - 'scripts/pilot_fetch.py'
+      - 'config/commentary-intake/**'
+      - 'tests/test_commentary_intake.py'
+  workflow_dispatch:
+    inputs:
+      resource_id:
+        description: "Reviewed config/commentary-intake/<id>.json manifest"
+        required: true
+        type: string
+        default: mhcc-crosswire
+      stage:
+        description: "1 = metadata-only; observe = unpinned fingerprint; 2 = SHA-pinned readback"
+        required: true
+        type: choice
+        default: auto
+        options: ['1', 'observe', '2', 'auto']
+permissions:
+  contents: read
+concurrency:
+  group: commentary-intake-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  intake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      RESOURCE_ID: ${{ github.event.inputs.resource_id || 'mhcc-crosswire' }}
+      STAGE: ${{ github.event.inputs.stage || 'auto' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install real SWORD reader for bounded, content-free output hashes
+        if: env.STAGE != '1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y diatheke
+      - name: Observe original commentary in disposable workspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_intake.py \
+            --resource-id "$RESOURCE_ID" \
+            --stage "$STAGE" \
+            --report "${RUNNER_TEMP}/commentary-intake-report.json"
+      - name: Keep only metadata-only receipt, never the original module
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: commentary-intake-receipt
+          path: ${{ runner.temp }}/commentary-intake-report.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Explain strict research scope
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo '## Commentary intake'
+            echo 'Original archives and returned commentary text are **never uploaded**.'
+            echo 'Read-only ZIP fingerprint and SWORD probes are evidence, not original/source parity.'
+            echo 'A successful Action does **not** approve rights, repairs or release.'
+            echo 'Store the validated fingerprint and next review decision in the import issue.'
+          } >> "$GITHUB_STEP_SUMMARY"
