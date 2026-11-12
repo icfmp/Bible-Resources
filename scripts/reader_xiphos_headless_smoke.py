@@ -617,7 +617,12 @@ def _capture_bounded_note_popup(env: dict, study_dir: Path, *,
             or not re.fullmatch(r"[a-z][a-z0-9-]{2,65}", slug)
             or not re.fullmatch(r"[A-Za-z0-9 :]{3,35}", reference)
             or type(marker_x) is not int or type(marker_y) is not int
-            or not 215 <= marker_x <= 640 or not 115 <= marker_y <= 670):
+            or not 215 <= marker_x <= 640 or not 115 <= marker_y <= 670
+            or (link_click is not None and (
+                not isinstance(link_click, tuple) or len(link_click) != 2
+                or any(type(p) is not int for p in link_click)
+                or not 16 <= link_click[0] <= 210
+                or not 485 <= link_click[1] <= 690))):
         raise XiphosSmokeError("Unreviewed bounded note popup interaction")
     for cmd in (
         ["xdotool", "key", "--clearmodifiers", "ctrl+l"],
@@ -658,11 +663,6 @@ def _capture_bounded_note_popup(env: dict, study_dir: Path, *,
         shots[stage] = sha256(target.read_bytes()).hexdigest()
     click_snapshot = None
     if link_click is not None:
-        if (not isinstance(link_click, tuple) or len(link_click) != 2
-                or any(type(p) is not int for p in link_click)
-                or not 16 <= link_click[0] <= 210
-                or not 485 <= link_click[1] <= 690):
-            raise XiphosSmokeError("Unreviewed note-preview link-click geometry")
         for command in (
             ["xdotool", "mousemove", "--sync", str(link_click[0]), str(link_click[1])],
             ["xdotool", "click", "1"],
