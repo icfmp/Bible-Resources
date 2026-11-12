@@ -1,0 +1,330 @@
+{
+  "andbible_stable_android_gui_import_attempt": null,
+  "andbible_stable_jsword_engine_probe": null,
+  "attested_private_preview_export": {
+    "all_module_files_byte_identical_to_audited_candidate": true,
+    "editorial_review_completed": false,
+    "independent_reader_tested": false,
+    "member_sha256": {
+      "mods.d/jnd2024repairresearch.conf": "59162504efdc0a217029488c8b62c851c3b64d3c70329daad86a2d622bd1dd0f",
+      "modules/texts/ztext/jnd2024repairresearch/nt.bzs": "ee0b18d9eb7398a52d6d2d96a1249f48755531dc98a892a88dd37b4510b4bac6",
+      "modules/texts/ztext/jnd2024repairresearch/nt.bzv": "4e6c77f1708e12c862edc2d927323adbdca60e006e297329f488e453e7735498",
+      "modules/texts/ztext/jnd2024repairresearch/nt.bzz": "66cfe1539b2b997264d19ce4cbb6b27ab861487824e918dc0ec0d57cf9e13243",
+      "modules/texts/ztext/jnd2024repairresearch/ot.bzs": "ccf84dfb4099c19f1206b44eb130fe9bfe78d02ac08e9fb81b38a948c4bbe908",
+      "modules/texts/ztext/jnd2024repairresearch/ot.bzv": "4db272cac1b0b1e809e5276a6220318c5d07d077d023b528cb4ad1e7eb98c2aa",
+      "modules/texts/ztext/jnd2024repairresearch/ot.bzz": "96f73ca16c6086f6aabdaa9e1c79cb3a649e1df813de29faba45432abeb4da0e"
+    },
+    "module_file_count": 7,
+    "module_id": "JND2024RepairResearch",
+    "preview_only": true,
+    "published": false,
+    "release_approved": false,
+    "status": "exact_audited_source_bytes_packaged_for_reader_testing_only",
+    "versification": "Luther",
+    "zip_bytes": 1958302,
+    "zip_sha256": "281f18311a5f0709406c5bc5ec436a7fe37a7f0b5f7b086c2bd1f5141ff7ec11"
+  },
+  "candidate_binary_sha256_not_public_release": "5283a57bfbb0f80855f8206e2f6df9a51b013b3ca36313ee83c79524abb88a59",
+  "compiler_diagnostic_category_counts": {
+    "INFO": 1,
+    "unclassified": 2
+  },
+  "invalid_inline_osis_elements_replaced": 2,
+  "machine_note_targets_replaced": 8,
+  "native_result": {
+    "authorial_osis_structural_census": {
+      "source_l_elements": 3895,
+      "source_lg_elements": 708,
+      "source_p_elements": 5197,
+      "source_title_elements": 1257
+    },
+    "candidate_module_id": "JND2024RepairResearch",
+    "candidate_status": "full_numbered_text_and_note_preflight_equal_not_approved",
+    "candidate_versification": "Luther",
+    "compiled_engine_version": "1.9.0",
+    "compiled_native_driver": "zText",
+    "compiled_native_milestone_closure_metadata_only": {
+      "cross_book_pair_reference_samples_no_ids": [
+        {
+          "end_ref": "Mal.3.24",
+          "opening_type_allowlisted": "bookGroup",
+          "start_ref": "TOP:2",
+          "structural_tag": "div"
+        },
+        {
+          "end_ref": "Rev.22.21",
+          "opening_type_allowlisted": "bookGroup",
+          "start_ref": "TOP:3",
+          "structural_tag": "div"
+        }
+      ],
+      "different_tag_interleavings_are_diagnostic_not_nesting_defects": true,
+      "first_issue_reference_ids_no_scripture": {},
+      "native_milestone_pair_categories": {
+        "different_tag_interleaving_diagnostic": 3673,
+        "globally_non_lifo_milestone_pairs": 7789,
+        "intro_to_intro_pairs": 1,
+        "intro_to_numbered_verse_pairs": 1425,
+        "numbered_to_numbered_verse_pairs": 16229,
+        "other_record_kind_pair": 2,
+        "pair_spans_multiple_books_review_scope": 2,
+        "pairs_spanning_multiple_entries": 5229,
+        "pairs_with_both_ends_in_one_entry": 12428,
+        "same_tag_different_type_interleaving_review": 4116
+      },
+      "native_milestone_pairing_findings": {},
+      "native_milestone_tag_counts": {
+        "div:close": 13054,
+        "div:open": 13054,
+        "div:paired": 13054,
+        "l:close": 3895,
+        "l:open": 3895,
+        "l:paired": 3895,
+        "lg:close": 708,
+        "lg:open": 708,
+        "lg:paired": 708
+      },
+      "native_numbered_intro_scan_counts": {
+        "close_events": 17657,
+        "observed_I_entries": 1255,
+        "observed_K_entries": 31166,
+        "observed_U_entries": 3,
+        "open_events": 17657,
+        "paired_matching_sID_eID": 17657,
+        "parseable_anonymous_TOP_entries": 3,
+        "parseable_numbered_or_intro_entries": 32421,
+        "unaddressable_TOP_entries_unverified": 3,
+        "unaddressable_TOP_milestone_events_unverified": 0,
+        "verified_addressable_TOP_bookGroup_endpoint_events": 2
+      },
+      "ordered_native_event_reference_fingerprint_sha256": "8f7ed0dfc18637fe35cc1dafb12c8b2232a4071dfd08dd273b1f579d755397ee",
+      "paired_div_types_allowlisted": {
+        "book": 66,
+        "bookGroup": 2,
+        "x-milestone": 7789,
+        "x-p": 5197
+      },
+      "remaining_unclosed_milestones_by_tag": {},
+      "schema_version": 1,
+      "source_editorial_or_publication_approved": false,
+      "source_generated_identifier_values_exposed": false,
+      "source_relative_word_position_coverage_verified": false,
+      "source_to_compiled_same_type_event_order_verified": false,
+      "status": "compiled_milestone_pairs_verified_only",
+      "verse_zero_and_numbered_milestones_inspected": true
+    },
+    "compiled_payload_sha256": "5283a57bfbb0f80855f8206e2f6df9a51b013b3ca36313ee83c79524abb88a59",
+    "explicit_note_target_index_addressability": {
+      "actual_reader_link_click_navigation_verified": false,
+      "all_original_explicit_targets_index_addressable": true,
+      "bounded_note_host_reference_samples": [],
+      "counts": {
+        "addressable_endpoint_components": 1160,
+        "all_target_components_index_addressable": 1041,
+        "explicit_target_attributes_checked": 1041,
+        "notes_checked": 6340,
+        "range_components_checked": 119,
+        "target_component_indexed_chapter": 8,
+        "target_component_indexed_ordered_full_range": 119,
+        "target_component_indexed_verse": 914
+      },
+      "original_target_literals_or_note_text_exposed": false,
+      "publication_approved": false,
+      "source_and_native_verse_indices_equal": true,
+      "status": "all_explicit_targets_index_addressable_including_full_ranges"
+    },
+    "explicit_p_q_and_layout_structure_fidelity_verified": false,
+    "first_safe_reference_note_index_findings": [],
+    "native_compiled_structure_screen": {
+      "actual_compiled_raw_entries_scanned": 32424,
+      "editorial_layout_and_visual_signoff_deferred_to_stage_5": true,
+      "original_to_native_editorial_structure_counts": {
+        "native_l_close_elements": 3895,
+        "native_l_open_elements": 3895,
+        "native_lg_close_elements": 708,
+        "native_lg_open_elements": 708,
+        "native_paragraph_close_elements": 5197,
+        "native_paragraph_open_elements": 5197,
+        "native_title_container_elements": 1257
+      },
+      "semantic_source_native_event_position_or_scope_verified": false,
+      "source_native_structural_count_equality_not_inferred": true
+    },
+    "original_to_compiled_body_opening_order": {
+      "explicit_prechapter_book_title_styles_separately_accounted_for": true,
+      "first_mismatch_book_references_no_scripture": [],
+      "native_event_kind_order_sha256": "f943caa861decb73c631d664956c1c2fe91ec955e6af5115f9a9b8dbd01b3c57",
+      "no_scripture_or_native_milestone_identifiers_in_report": true,
+      "original_to_native_book_title_match_not_verified_by_this_screen": true,
+      "originals_rewritten_or_published": false,
+      "same_order_and_kind_in_every_mapped_book": true,
+      "schema_version": 1,
+      "source_event_kind_order_sha256": "f943caa861decb73c631d664956c1c2fe91ec955e6af5115f9a9b8dbd01b3c57",
+      "source_native_body_opening_kind_counts": {
+        "authorial_body_start_events": 9092,
+        "books_checked": 66,
+        "books_with_body_opening_count_difference": 0,
+        "books_with_body_opening_kind_difference": 0,
+        "books_with_equal_count_but_reordered_kinds": 0,
+        "books_with_exact_body_opening_kind_order": 66,
+        "native_body_start_events": 9092,
+        "native_paragraph_starts": 5197,
+        "native_poetry_line_starts": 3895,
+        "source_body_p_openings": 5197,
+        "source_body_q_openings": 3895
+      },
+      "source_native_exact_word_positions_or_boundary_spans_verified": false,
+      "source_native_whitespace_or_full_editorial_layout_verified": false
+    },
+    "publisher_original_note_target_navigation_verified": false,
+    "source_native_body_boundary_positions": {
+      "all_book_body_nonspace_and_boundary_events_equal": true,
+      "all_title_text_and_nonspace_placement_equal": true,
+      "bounded_reference_only_findings": [],
+      "counts": {
+        "books_compared": 66,
+        "books_with_identical_full_nonspace_body_stream": 66,
+        "boundary_event_positions_equal": 19600,
+        "native_TOP_title_events": 2,
+        "native_l_close_events": 3895,
+        "native_l_open_events": 3895,
+        "native_lg_close_events": 708,
+        "native_lg_open_events": 708,
+        "native_p_close_events": 5197,
+        "native_p_open_events": 5197,
+        "native_title_events": 1255,
+        "outside_book_title_text_and_order_equal": 2,
+        "source_l_close_events": 3895,
+        "source_l_open_events": 3895,
+        "source_lg_close_events": 708,
+        "source_lg_open_events": 708,
+        "source_outside_book_title_events": 2,
+        "source_p_close_events": 5197,
+        "source_p_open_events": 5197,
+        "source_title_events": 1255,
+        "title_prose_and_nonspace_positions_equal": 1255
+      },
+      "independent_reader_visual_signoff": false,
+      "literal_whitespace_or_exact_typography_verified": false,
+      "native_anonymous_top_nonspace_body_characters": 0,
+      "native_frame_counts": {
+        "I": 1255,
+        "K": 31166,
+        "U": 3
+      },
+      "published": false,
+      "source_title_prose_and_verse_zero_semantics_verified": false,
+      "status": "source_native_body_boundary_nonspace_positions_equal"
+    },
+    "source_to_compiled_counts": {
+      "native_only_references": 0,
+      "native_other_I_entries": 1255,
+      "native_other_U_entries": 3,
+      "note_body_equal_after_whitespace_folding": 6340,
+      "note_explicit_target_sequence_equal": 6340,
+      "note_nonspace_anchor_equal": 6340,
+      "note_original_caller_label_equal": 6340,
+      "note_original_type_equal": 6340,
+      "note_pairs_compared": 6340,
+      "numbered_verse_nonspace_main_text_equal": 31166,
+      "numbered_verse_note_count_matches": 31166,
+      "official_source_verse_count": 31166,
+      "populated_native_verse_count": 31166,
+      "source_only_references": 0
+    },
+    "usable_for_publication": false,
+    "visual_reader_or_parallel_reader_verified": false
+  },
+  "nonexistent_source_verse_link_targets_disabled": 3,
+  "official_crosswire_schema_sha256": "bee01a2e957e9128a60328639761922b7aa701edad5efa5c8e885f762ff1baa2",
+  "official_osis_xsd_conforming": true,
+  "omitted_verse_notes_source_and_native": {
+    "actual_reader_visual_state_verified": false,
+    "all_original_note_text_preserved": true,
+    "cases": [
+      {
+        "GUI_dead_link_behavior_verified": false,
+        "authored_note_caller_and_display_text_preserved": true,
+        "host": "Matt.23.13",
+        "missing_scripture_verse_was_not_fabricated": true,
+        "missing_target_not_present_in_compiled_navigation_attributes": true,
+        "note_index": 1
+      },
+      {
+        "GUI_dead_link_behavior_verified": false,
+        "authored_note_caller_and_display_text_preserved": true,
+        "host": "Acts.8.36",
+        "missing_scripture_verse_was_not_fabricated": true,
+        "missing_target_not_present_in_compiled_navigation_attributes": true,
+        "note_index": 1
+      },
+      {
+        "GUI_dead_link_behavior_verified": false,
+        "authored_note_caller_and_display_text_preserved": true,
+        "host": "Acts.15.33",
+        "missing_scripture_verse_was_not_fabricated": true,
+        "missing_target_not_present_in_compiled_navigation_attributes": true,
+        "note_index": 1
+      }
+    ],
+    "editorially_approved": false,
+    "missing_verse_note_count": 3,
+    "no_omitted_verses_fabricated": true,
+    "published": false,
+    "status": "source_and_native_omitted_verse_note_metadata_verified"
+  },
+  "original_note_display_text_preserved_by_plain_overlay": true,
+  "original_notes_unchanged_except_approved_navigation_targets": true,
+  "original_or_compiled_binary_uploaded": false,
+  "original_unedited_osis_bytes_preserved": true,
+  "original_verse_words_and_punctuation_equal": true,
+  "plain_nonhyperlink_omission_label_count": 3,
+  "private_canonical_xml_research_sha256": "89b67a1007547b113c0049a2df8912b66716a406d19237f036d5dad71f7771c8",
+  "private_link_repaired_sha256": "23b6225cf4f827f6f84e321ed60fedb55ec42c3bc2b5cf58747942bd32f6ad8d",
+  "private_original_serialization_preserving_osis_sha256": "90a7a67db2c43cced53c1c34e4578c20470f3a247e16f07cb45145eae8d326c5",
+  "private_plain_omitted_reference_osis_sha256": "1f0d439b20b763e3548a05bb766d9f59447918f973ea92f8695d7578e096178a",
+  "published_or_editorially_approved": false,
+  "publisher_original_sha256": "2204629e3efb3024dceb392780ef5e61f4296ea832c90e3dd2a5c3224179c1d3",
+  "real_sword_readbacks": [
+    {
+      "reader_status": "readable",
+      "reference": "Genesis 1:1"
+    },
+    {
+      "reader_status": "readable",
+      "reference": "Psalms 23:1"
+    },
+    {
+      "reader_status": "readable",
+      "reference": "Matthew 1:1"
+    },
+    {
+      "reader_status": "readable",
+      "reference": "John 3:16"
+    },
+    {
+      "reader_status": "readable",
+      "reference": "Ezekiel 4:11"
+    },
+    {
+      "reader_status": "readable",
+      "reference": "Romans 16:25"
+    },
+    {
+      "reader_status": "readable",
+      "reference": "Revelation 22:21"
+    }
+  ],
+  "reviewed_byte_patch_inventory": {
+    "absent_target_remove": 3,
+    "inline_end": 2,
+    "inline_start": 2,
+    "target_replace": 8
+  },
+  "schema_version": 1,
+  "source_key_count": 31166,
+  "source_note_count": 6340,
+  "status": "repaired_osis_to_native_sword_full_text_notes_research_passed",
+  "xiphos_exact_candidate_gui_probe": null,
+  "xiphos_gui_links_tested": false
+}

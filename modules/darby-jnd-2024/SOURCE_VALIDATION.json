@@ -1,0 +1,10 @@
+{
+  "no_transformation_performed": true,
+  "note": "Pinned XSD validation of separately reviewed corrected OSIS; original BPC source unchanged.",
+  "policy_sha256": "15f875c19b94fc84ae123afad312164ca8631a302c2e03d980b934adf221a34f",
+  "provenance_audit_sha256": "3ae44db7e82a65453690de9ff414aa4d2f8b39bc424ac66c7354071b7f9baba5",
+  "schema_sha256": "bee01a2e957e9128a60328639761922b7aa701edad5efa5c8e885f762ff1baa2",
+  "source_kind": "bible",
+  "source_sha256": "1f0d439b20b763e3548a05bb766d9f59447918f973ea92f8695d7578e096178a",
+  "status": "validated"
+}

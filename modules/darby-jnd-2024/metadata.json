@@ -1,42 +1,42 @@
 {
-  "schema_version": 1,
-  "id": "darby-jnd-2024",
   "canonical_edition_id": "bpc-jnd-2024-revision-2.0",
-  "sword_id": "BRJND2024",
-  "title": {
-    "fr": "Bible J. N. Darby — BPC 2024",
-    "en": "J. N. Darby Bible — BPC 2024"
-  },
   "category": "bible",
-  "language": "fr",
-  "version": "0.1.0",
-  "origin": {
-    "publisher": "Bibles et Publications Chrétiennes (BPC)",
-    "url": "https://editeurbpc.com/telechargements/JND",
-    "source_revision": "2024-09-04 rev. 2.0; official OSIS SHA-256 2204629e3efb3024dceb392780ef5e61f4296ea832c90e3dd2a5c3224179c1d3"
-  },
-  "rights": {
-    "license": "Public Domain",
-    "evidence_url": "https://editeurbpc.com/telechargements",
-    "redistribution_allowed": true,
-    "derivatives_allowed": true,
-    "reviewed_by": "Bible Resources project owner, editorial approval 2026-11-12"
-  },
-  "quality": {
-    "status": "in_review",
-    "edition": "reader_optimized",
-    "reviewed_by": "Bible Resources project owner, scoped decision 2026-11-12",
-    "smoke_key": "John 3:16"
-  },
-  "versification": "Luther",
+  "id": "darby-jnd-2024",
   "index_audit": {
     "mode": "stock_reader_keys"
   },
+  "language": "fr",
+  "origin": {
+    "publisher": "Bibles et Publications Chrétiennes (BPC)",
+    "source_revision": "2024-09-04 rev. 2.0; official OSIS SHA-256 2204629e3efb3024dceb392780ef5e61f4296ea832c90e3dd2a5c3224179c1d3",
+    "url": "https://editeurbpc.com/telechargements/JND"
+  },
+  "quality": {
+    "edition": "reader_optimized",
+    "reviewed_by": "Bible Resources project owner, scoped decision 2026-11-12",
+    "smoke_key": "John 3:16",
+    "status": "approved"
+  },
+  "rights": {
+    "derivatives_allowed": true,
+    "evidence_url": "https://editeurbpc.com/telechargements",
+    "license": "Public Domain",
+    "redistribution_allowed": true,
+    "reviewed_by": "Bible Resources project owner, editorial approval 2026-11-12"
+  },
+  "schema_version": 1,
+  "sword_id": "BRJND2024",
+  "title": {
+    "en": "J. N. Darby Bible — BPC 2024",
+    "fr": "Bible J. N. Darby — BPC 2024"
+  },
   "upstreams": [
     {
-      "provider": "ebible",
+      "last_integrated_version": "2025-05-02",
       "module_id": "frajnd2024eb",
-      "last_integrated_version": "2025-05-02"
+      "provider": "ebible"
     }
-  ]
+  ],
+  "versification": "Luther",
+  "version": "0.1.0"
 }
