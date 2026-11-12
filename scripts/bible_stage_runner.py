@@ -564,20 +564,58 @@ def _write_report(report_dir: Path, report: dict) -> None:
 def main(argv=None) -> int:
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--resource-id",required=True)
-    parser.add_argument("--stage",choices=[*(str(x) for x in sorted(STAGES)), "4-5"],
+    parser.add_argument("--stage",choices=[*(str(x) for x in sorted(STAGES)), "4-5",
+                                          "4a", "4b", "4c", "4d"],
                         required=True,
-                        help="Single audit stage 1–7 or shared machine audit of stages 4-5")
+                        help="Single 1-7, shared 4-5, or trusted exact-source machine receipt replay 4a-4d")
     parser.add_argument("--report-dir",type=Path,required=True)
+    parser.add_argument("--prior-receipts",type=Path,
+                        help="Verified metadata-only artifact from exact preceding GitHub Actions run (for 4a-4d only)")
     parser.add_argument("--native-index-binary",type=Path)
     parser.add_argument("--native-raw-binary",type=Path)
     parser.add_argument("--native-entry-binary",type=Path)
     parser.add_argument("--osis-schema",type=Path)
     parser.add_argument("--usfx-schema",type=Path)
     args=parser.parse_args(argv)
+    if (args.stage in ("4a", "4b", "4c", "4d")) != (
+            args.prior_receipts is not None):
+        parser.error("4a-4d require prior receipts; all other stages prohibit them")
     try:
         manifest=load_manifest(args.resource_id)
         with tempfile.TemporaryDirectory(prefix="bible-research-stage-") as td:
-            if args.stage == "4-5":
+            if args.stage in ("4a", "4b", "4c", "4d"):
+                from stage4_subcheck_receipts import verify_receipts_for_reuse
+                prior = args.prior_receipts
+                if (not prior.is_file() or prior.is_symlink()
+                        or prior.stat().st_size > 256 * 1024
+                        or prior.stat().st_size == 0):
+                    raise IntakeError("Untrusted or oversized machine receipt artifact")
+                raw = prior.read_bytes()
+                previous = json.loads(raw)
+                row = verify_receipts_for_reuse(
+                    previous, manifest,
+                    commit_sha=os.environ.get("GITHUB_SHA", "local-unpinned"),
+                    subcheck=args.stage)
+                result = _status(
+                    row["status"],
+                    verified=["Replayed exact previous machine " + args.stage +
+                              " receipt from a prior authenticated GitHub Actions artifact",
+                              "No original source archive acquisition or native reader work performed"],
+                    missing=["This is prior machine evidence, not a new source/native check",
+                             "No human editorial, rights, conversion or reader signoff implied"] +
+                            list(row["unverified_machine_codes"]),
+                    evidence={
+                        "reused_machine_receipt": row,
+                        "previous_evidence_action_run": previous["run_url"],
+                        "input_source_archive_sha256":
+                            previous["input_source_archive_sha256"],
+                        "input_sword_archive_sha256":
+                            previous["input_sword_archive_sha256"],
+                        "audit_tool_commit": previous["audit_tool_commit"],
+                        "new_native_scan_completed": False,
+                        "no_source_download_or_publication": True,
+                    })
+            elif args.stage == "4-5":
                 stage4, stage5 = run_stage_four_and_five(
                     manifest, Path(td), index_binary=args.native_index_binary,
                     raw_binary=args.native_raw_binary,
@@ -640,24 +678,32 @@ def main(argv=None) -> int:
                    "GITHUB_RUN_ID") else None
         result["evidence"]["stage4_subcheck_receipts"] = create_subcheck_receipts(
             manifest, origin, commit_sha=commit, run_url=url)
-    if args.stage == "4-5":
+    if args.stage in ("4a", "4b", "4c", "4d"):
+        next_action = ("Reuse only the validated prior machine evidence; perform any "
+                       "unproven or changed source/native checks and human review separately")
+    elif args.stage == "4-5":
         next_action = ("Review distinct stage 4 and 5 machine receipts and resolve "
                        "remaining editorial issues; neither stage is automatically DONE")
     elif result["status"] == "DONE" and int(args.stage) < 7:
         next_action = f"Review this evidence and proceed to stage {int(args.stage)+1}/7 only when the full gate is documented"
     else:
         next_action = f"Resolve the first missing gate, then repeat stage {args.stage}/7"
-    report={"schema_version":2 if args.stage == "4-5" else 1,
+    report={"schema_version":3 if args.stage in ("4a","4b","4c","4d")
+            else 2 if args.stage == "4-5" else 1,
             "resource_id":args.resource_id,
-            "stage":"4-5" if args.stage == "4-5" else int(args.stage),
+            "stage":args.stage if args.stage in ("4-5","4a","4b","4c","4d")
+                    else int(args.stage),
             "stage_name":("shared-source-native-4-5" if args.stage == "4-5"
+                          else "replayed-source-native-machine-"+args.stage
+                          if args.stage in ("4a","4b","4c","4d")
                           else STAGES[int(args.stage)]),
             "git_sha":os.environ.get("GITHUB_SHA","local"),
             "run_url":os.environ.get("GITHUB_SERVER_URL","")+"/"+
                 os.environ.get("GITHUB_REPOSITORY","")+"/actions/runs/"+
                 os.environ.get("GITHUB_RUN_ID","") if os.environ.get("GITHUB_RUN_ID") else None,
             "status":result["status"],"gate_completed":(
-                args.stage != "4-5" and result["status"]=="DONE"),
+                args.stage not in ("4-5","4a","4b","4c","4d")
+                and result["status"]=="DONE"),
             "next_action":next_action,
             "verified":result["verified"],"missing":result["missing"],
             "evidence":result["evidence"],"reusable_for_pub_approval":False,
