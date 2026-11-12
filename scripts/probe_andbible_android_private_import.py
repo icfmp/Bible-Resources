@@ -27,7 +27,7 @@ SAFE_UI = frozenset({
     "RECENT", "DOWNLOADS", "DOWNLOAD", "BROWSE FILES", "BROWSE",
     "JND2024REPAIRRESEARCH.ZIP", "ALLOW", "WHILE USING THE APP",
     "INSTALL", "IMPORT", "OK", "OPEN", "CONTINUE", "DONE", "CLOSE",
-    "USE THIS FOLDER", "GRANT ACCESS", "SELECT", "NEXT",
+    "USE THIS FOLDER", "GRANT ACCESS", "SELECT", "NEXT", "PROCEED",
 })
 
 
@@ -121,15 +121,22 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
     first_labels=sorted({c["label"] for c in controls})
     chosen=tap_allowlisted(controls,("LOAD DOCUMENTS FROM FILES",
                                      "LOAD DOCUMENT FROM FILES"))
+    proceeded=False
     if chosen is not None:
-        screenshots["02-import-picker"]=capture_png(
-            evidence_dir/"02-file-picker.png")
+        screenshots["02-import-instructions"]=capture_png(
+            evidence_dir/"02-import-instructions.png")
+        instructions=android_controls()
+        proceeded=tap_allowlisted(instructions,("PROCEED",)) is not None
+        if proceeded:
+            time.sleep(2)
+            screenshots["03-android-file-picker"]=capture_png(
+                evidence_dir/"03-android-file-picker.png")
     history=[]
     selected=False
     import_prompt=False
     imported_by_app=False
     visited_downloads=False
-    for step in range(4) if chosen else range(0):
+    for step in range(4) if proceeded else range(0):
         controls=android_controls()
         labels=sorted({c["label"] for c in controls})
         history.append(labels)
@@ -154,8 +161,8 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
                 time.sleep(4)
             else:
                 break
-        screenshots[f"{3+step:02d}-import-state"] = capture_png(
-            evidence_dir/f"{3+step:02d}-import-state.png")
+        screenshots[f"{4+step:02d}-import-state"] = capture_png(
+            evidence_dir/f"{4+step:02d}-import-state.png")
 
     # A successful ADB press does not establish a loaded translation; retain
     # that as a separate visual and Java/Android document validation gate.
@@ -171,6 +178,7 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
         "original_sword_xml_and_zip_uploaded":False,
         "first_screen_allowlisted_labels":first_labels,
         "import_button_found_and_pressed":chosen is not None,
+        "import_instructions_proceeded": proceeded,
         "file_picker_candidate_selected":selected,
         "import_confirmation_action_attempted":import_prompt,
         "andbible_import_verified":imported_by_app,
