@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "issue": "https://github.com/icfmp/Bible-Resources/issues/177",
+  "status": "DIAGNOSTIC_SOURCE_ANCHOR_MAPPING_ONLY",
+  "crosswire_original": {
+    "module_id": "MHCC",
+    "version": "2.0",
+    "driver": "zCom",
+    "versification": "KJV",
+    "zip_sha256": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+    "native_ordered_occupied_key_sha256": "fd8f02258e08d1ed4934dbbd7229d533234c1050bbcaab4cc7c9ef38abe7fb09",
+    "occupied_numbered_slots": 28718,
+    "occupied_intro_slots": 1255
+  },
+  "original_ccel_thml": {
+    "url": "https://www.ccel.org/ccel/h/henry/mhcc.xml",
+    "sha256": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+    "scripCom_count": 3592,
+    "books_with_qualified_annotations": 65,
+    "range_annotations": 2902,
+    "single_verse_annotations": 462,
+    "chapter_annotations": 228,
+    "duplicate_exact_reference_occurrences": 9,
+    "ordered_unmodified_reference_sha256": "bedef08447a1ad597d3dfa41c5d6f0f8bb257f3fc8935d54acd3a78be4697745"
+  },
+  "original_to_native_diagnostic": {
+    "exact_source_start_occupied": {
+      "chapter": 228,
+      "verse": 462,
+      "same_book_range": 2902
+    },
+    "range_last_slot_occupied": 2902,
+    "source_start_without_native_occupancy": 0,
+    "source_books_missing_from_stock": [],
+    "native_books_without_original_scripCom_marker": [
+      "Jude"
+    ],
+    "john_3_16": {
+      "native_exact_slot_occupied": false,
+      "original_annotated_verse_ranges_covering_key": 0,
+      "annotation_absence_does_not_prove_missing_commentary_words": true
+    }
+  },
+  "evidence": {
+    "exact_head_action": "https://github.com/icfmp/Bible-Resources/actions/runs/43275774261",
+    "exact_head_validation": "https://github.com/icfmp/Bible-Resources/actions/runs/43275774135",
+    "metadata_only_artifact": "https://github.com/icfmp/Bible-Resources/actions/runs/43275774261/artifacts/13970352022"
+  },
+  "gates": {
+    "authorial_source_edition_identity": "REVIEW_REQUIRED",
+    "source_reference_anchors": "DIAGNOSTIC_ALL_START_AND_RANGE_ENDPOINT_KEYS_PRESENT",
+    "original_sections_body_content_comparison": "NOT_PERFORMED",
+    "full_source_to_stock_text_and_markup_parity": "NOT_PERFORMED",
+    "Jude_source_div1_content_classification": "NOT_PERFORMED",
+    "CCEL_rights_and_redistribution": "NOT_APPROVED",
+    "graphical_second_readers": "NOT_TESTED",
+    "publication": "BLOCKED"
+  },
+  "publisher_text_disclosed": false,
+  "original_content_modified": false,
+  "published": false
+}
