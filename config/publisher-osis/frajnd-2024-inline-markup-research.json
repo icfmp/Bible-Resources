@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "purpose": "private_research_not_approved",
+  "publisher_original_sha256": "2204629e3efb3024dceb392780ef5e61f4296ea832c90e3dd2a5c3224179c1d3",
+  "private_input_sha256": "23b6225cf4f827f6f84e321ed60fedb55ec42c3bc2b5cf58747942bd32f6ad8d",
+  "resource_id": "frajnd-2024",
+  "note_host": "Ezek.4.11",
+  "note_index": 1,
+  "old_local_tag": "m",
+  "new_local_tag": "seg",
+  "new_type": "x-measure",
+  "expected_count": 2,
+  "old_direct_text_sha256": [
+    "7fcce82c8e5925c7dafdd56688bb1e33ead31dc4227152aaf9ab648d0a9625c0",
+    "db12df880e2273bbd32e02cd9a9f77f709461df6e2e62207c615b847c4c4717a"
+  ],
+  "old_tail_sha256": [
+    "38ca8561a85ea35071f2d993619c75ac8e581fbef63021d57d30528bf1e0030e",
+    "ba5ec51d07a4ac0e951608704431d59a02b21a4e951acc10505a8dc407c501ee"
+  ],
+  "evidence_url": "https://github.com/icfmp/Bible-Resources/issues/152",
+  "reason": "Source-only, two unknown inline OSIS m elements in a measurement footnote; test retaining their exact text while encoding a custom segment in standard OSIS."
+}
