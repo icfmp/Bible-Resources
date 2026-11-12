@@ -230,6 +230,21 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
         screenshots["08-after-optional-announcement"] = capture_png(
             evidence_dir/"08-after-optional-announcement.png")
 
+    # Independently probe persistence across a real app process restart.
+    # The module is NOT re-imported; this only records an observed reader
+    # screenshot for subsequent human review, never automatic acceptance.
+    relaunch_attempted=False
+    if selected:
+        adb("shell","am","force-stop",PACKAGE,timeout=20)
+        adb("shell","monkey","-p",PACKAGE,"1",timeout=35)
+        relaunch_attempted=True
+        time.sleep(12)
+        checkpoint("andbible_process_relaunch",attempted=True,
+                   persistent_module_identity_verified=False,
+                   rendered_notes_verified=False)
+        screenshots["09-after-process-relaunch"] = capture_png(
+            evidence_dir/"09-after-process-relaunch.png")
+
     # A successful ADB press does not establish a loaded translation; retain
     # that as a separate visual and Java/Android document validation gate.
     result={
@@ -248,6 +263,8 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
         "file_picker_candidate_selected":selected,
         "import_confirmation_action_attempted":import_prompt,
         "post_import_announcement_dismissed":announcement_dismissed,
+        "andbible_process_relaunch_attempted":relaunch_attempted,
+        "andbible_persistent_module_identity_verified":False,
         "andbible_import_verified":imported_by_app,
         "andbible_rendered_text_and_notes_verified":False,
         "andbible_repaired_reference_gui_click_verified":False,
