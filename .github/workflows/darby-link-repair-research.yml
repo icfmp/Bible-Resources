@@ -84,10 +84,24 @@ jobs:
                   from lxml import etree
                   book=next((n.get("osisID") for n in node.iterancestors()
                              if n.tag.endswith("}div") and n.get("type")=="book"),None)
+                  parent=node.getparent()
+                  source_note=node if etree.QName(node).localname=="note" else next(
+                      (a for a in node.iterancestors() if etree.QName(a).localname=="note"),None)
+                  owner=None
+                  if source_note is not None:
+                      from repair_osis_note_links import _source_note_nodes
+                      scope=_source_note_nodes(doc.getroot())
+                      owner=next(({"host":host,"note_number":number}
+                                  for host,notes in scope.items()
+                                  for number,candidate in enumerate(notes,1)
+                                  if candidate.sourceline==source_note.sourceline),None)
                   return {
                       "nearest_element_tag":etree.QName(node).localname,
-                      "parent_element_tag":etree.QName(node.getparent()).localname if node.getparent() is not None else "root",
+                      "parent_element_tag":etree.QName(parent).localname if parent is not None else "root",
                       "book_osis_id":book,
+                      "note_host_coordinate":owner,
+                      "parent_child_tag_order":[etree.QName(ch).localname for ch in list(parent or node)[:12]
+                                                if isinstance(ch.tag,str)],
                       "child_tag_names":[etree.QName(ch).localname for ch in list(node)[:8]
                                          if isinstance(ch.tag,str)],
                       "attribute_names":sorted(etree.QName(a).localname for a in node.attrib),
@@ -97,6 +111,9 @@ jobs:
                            "error_count":sum(errors.values()),
                            "bounded_error_coordinates_only":[
                                {"line":int(e.line),"xsd_error_type":e.type_name,
+                                "schema_osis_element_names":sorted(set(__import__("re").findall(
+                                    r"\\{http://www\\.bibletechnologies\\.net/2003/OSIS/namespace\\}([A-Za-z0-9_-]+)",
+                                    e.message))),
                                 "structure":structural_context(int(e.line))}
                                for e in list(schema.error_log)[:12]]}
           before=Counter(result["original"]["error_type_counts"])
