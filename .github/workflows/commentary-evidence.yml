@@ -1,0 +1,115 @@
+name: Commentary source and native index (research only)
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/commentary-evidence.yml'
+      - 'scripts/commentary_native_inventory.py'
+      - 'scripts/sword_native_commentary_index.cpp'
+      - 'scripts/commentary_witness.py'
+      - 'scripts/pilot_fetch.py'
+      - 'config/commentary-intake/**'
+      - 'tests/test_commentary_stage_evidence.py'
+  workflow_dispatch:
+    inputs:
+      resource_id:
+        description: "Reviewed source-neutral commentary intake ID"
+        required: true
+        type: string
+        default: mhcc-crosswire
+
+permissions:
+  contents: read
+
+concurrency:
+  group: commentary-evidence-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  independent_source_witness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      RESOURCE_ID: ${{ github.event.inputs.resource_id || 'mhcc-crosswire' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Observe original independent CCEL source only (no raw text stored)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_witness.py \
+            --resource-id "$RESOURCE_ID" \
+            --report "${RUNNER_TEMP}/commentary-witness.json"
+      - name: Upload metadata only; never upload source text
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: commentary-source-witness-receipt
+          path: ${{ runner.temp }}/commentary-witness.json
+          if-no-files-found: warn
+          retention-days: 90
+      - name: Mark evidence boundaries
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo '## Independent original source observation'
+            echo 'Only SHA, byte count, newline statistics and status leave runner temp.'
+            echo 'No source XML/ThML/authorial edition mapping was inferred.'
+            echo 'No redistribution, rights approval or complete text fidelity is claimed.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  stock_commentary_occupied_index:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    env:
+      RESOURCE_ID: ${{ github.event.inputs.resource_id || 'mhcc-crosswire' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install stable libSWORD development library
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev
+      - name: Build trusted native metadata-only commentary inspector
+        shell: bash
+        run: |
+          set -euo pipefail
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_index.cpp \
+            -o "${RUNNER_TEMP}/sword-commentary-index" -lsword
+      - name: Audit full stock native occupied-slot index, not authorial entries
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_native_inventory.py \
+            --resource-id "$RESOURCE_ID" \
+            --native-inspector "${RUNNER_TEMP}/sword-commentary-index" \
+            --report "${RUNNER_TEMP}/commentary-native-index.json"
+      - name: Upload metadata only; no third-party module or commentary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: commentary-native-index-receipt
+          path: ${{ runner.temp }}/commentary-native-index.json
+          if-no-files-found: warn
+          retention-days: 90
+      - name: Mark evidence boundaries
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo '## SWORD commentary occupied-key index'
+            echo 'SHA-pinned stock SWORD original, isolated, no raw text leaked.'
+            echo 'Native occupied VerseKey slots are NOT original commentary entry boundaries.'
+            echo 'The source-text match, technical remediation and release remain blocked.'
+          } >> "$GITHUB_STEP_SUMMARY"
