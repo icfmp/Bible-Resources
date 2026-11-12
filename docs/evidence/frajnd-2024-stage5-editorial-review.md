@@ -60,6 +60,27 @@ and [#143](https://github.com/icfmp/Bible-Resources/pull/143),
 All authorial targets remain source-to-native-identical; **no compiler-induced
 loss of the referenced attributes was found**.
 
+### Independent Xiphos screenshot identity correction (2026-11-12)
+
+The real two-module [run #43086458383](https://github.com/icfmp/Bible-Resources/actions/runs/43086458383)
+has **two different sampling phases**. Direct independent visual inspection
+of its original `psalm-poetry.png` (SHA-256
+`70ac0dd7e860a1ce420aa27b49b603ec0a23cff3df12608cd1e264e8333b28b2`),
+`matthew-heading.png` (SHA-256
+`65e149f51495f94021879c9daf5ba3cf5637cd739179bce14fd35571da4ed6ea`)
+and `romans-annotation.png` (SHA-256
+`eb9154fe1cef448bd55c919877f5525b26d85633cccf0d8c7ad429298e42b4ab`)
+shows an explicit **`BRLSG1910` title bar in all three**: they
+depict the **Segond comparison module**, auto-selected by Xiphos on initial
+startup, **not Darby typography**. Do not certify Darby's Psalms poetry,
+Matthew headings or Romans callout layout from these three images.
+
+The *later* `module-tree-stage-8.png` and genuine Darby
+`Gen.2.4` note-link screenshot are separate independently reviewed
+evidence and remain valid for their much narrower claims. A corrected
+post-Darby-selection Psalm/Matthew/Romans screenshot series is still needed.
+The prior real-source native structure-position audit is unaffected.
+
 ## Ten original OSIS target limitations — manual editorial proposals only
 
 Reference labels in the source are frequently relative to preceding prose.
