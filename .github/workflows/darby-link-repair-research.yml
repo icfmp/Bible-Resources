@@ -72,11 +72,32 @@ jobs:
               doc=parse_xml(path,path.read_bytes(),"XML_INPUT_NOT_WELL_FORMED")
               valid=schema.validate(doc)
               errors=Counter(f"{e.domain_name}:{e.type_name}" for e in schema.error_log)
+              def structural_context(line):
+                  # Emit only element TAG names and original book identifier,
+                  # never attributes/words, note text, or original XML fragments.
+                  node = None
+                  for candidate in doc.getroot().iter():
+                      if isinstance(candidate.tag,str) and candidate.sourceline <= line:
+                          node=candidate
+                  if node is None:
+                      return {"element_tag":"unavailable"}
+                  from lxml import etree
+                  book=next((n.get("osisID") for n in node.iterancestors()
+                             if n.tag.endswith("}div") and n.get("type")=="book"),None)
+                  return {
+                      "nearest_element_tag":etree.QName(node).localname,
+                      "parent_element_tag":etree.QName(node.getparent()).localname if node.getparent() is not None else "root",
+                      "book_osis_id":book,
+                      "child_tag_names":[etree.QName(ch).localname for ch in list(node)[:8]
+                                         if isinstance(ch.tag,str)],
+                      "attribute_names":sorted(etree.QName(a).localname for a in node.attrib),
+                  }
               result[key]={"official_xsd_valid":valid,
                            "error_type_counts":dict(sorted(errors.items())),
                            "error_count":sum(errors.values()),
                            "bounded_error_coordinates_only":[
-                               {"line":int(e.line),"xsd_error_type":e.type_name}
+                               {"line":int(e.line),"xsd_error_type":e.type_name,
+                                "structure":structural_context(int(e.line))}
                                for e in list(schema.error_log)[:12]]}
           before=Counter(result["original"]["error_type_counts"])
           after=Counter(result["proposed"]["error_type_counts"])
