@@ -71,6 +71,22 @@ class CommentaryXMLSourceTests(unittest.TestCase):
         self.assertEqual(result["candidate_commentary_reference_classes"]["cross_book_range_requires_order_review"], 1)
         self.assertFalse(result["authored_ranges_verified"])
 
+    def test_chapter_bearing_division_without_scripcom_is_not_discarded(self):
+        source = self.sample().replace(
+            b"</div1><!-- original comment -->",
+            b"</div1><div1 title='Jude'>"
+            b"<div2 title='Chapter'><p>Unmarked source still contains genuine authorial prose.</p></div2>"
+            b"</div1><!-- original comment -->"
+        )
+        result = xml_structure(source)
+        self.assertEqual(result['source_div1_with_direct_chapters'], 2)
+        self.assertEqual(result['source_direct_chapters_inside_div1'], 2)
+        self.assertEqual(len(result['source_chapter_bearing_div1_without_scripCom']), 2)
+        self.assertGreater(result['source_chapter_bearing_div1_without_scripCom'][1]['original_text_unicode_characters'], 10)
+        self.assertEqual(result['source_chapter_bearing_div1_without_scripCom'][1]['nonempty_paragraph_elements'], 1)
+        self.assertNotIn('Unmarked source still contains', json.dumps(result))
+        self.assertNotIn('Jude', json.dumps(result))
+        self.assertTrue(result['source_division_text_stream_sha_is_not_original_file_byte_hash'])
     def test_original_xml_with_dtd_is_never_marked_schema_validated(self):
         raw = self.sample().replace(b"<ThML>", b'<!DOCTYPE ThML [<!ENTITY original "text">]><ThML>')
         result = xml_structure(raw)
