@@ -77,9 +77,35 @@ Matthew headings or Romans callout layout from these three images.
 
 The *later* `module-tree-stage-8.png` and genuine Darby
 `Gen.2.4` note-link screenshot are separate independently reviewed
-evidence and remain valid for their much narrower claims. A corrected
-post-Darby-selection Psalm/Matthew/Romans screenshot series is still needed.
-The prior real-source native structure-position audit is unaffected.
+evidence and remain valid for their much narrower claims.
+
+**Correction implemented and independently reviewed:** [merged PR
+#147](https://github.com/icfmp/Bible-Resources/pull/147) at
+`72adbf6c4b375232809861393aeba69dd9520b64` captures the same reader
+passages **after** the requested Bible is selected in the Xiphos module
+tree, preserving both earlier and later samples distinctly. Exact-head
+[Validate #43151365047](https://github.com/icfmp/Bible-Resources/actions/runs/43151365047)
+and real isolated [Xiphos GUI #43151365056](https://github.com/icfmp/Bible-Resources/actions/runs/43151365056)
+both succeeded. Artifact `xiphos-headless-smoke-43151365056`, ID
+`13913572849` (short retention), contains new
+`study-samples/post-module-selection/*.png` files. Each independently
+inspected screenshot SHA-256 matches the metadata receipt:
+
+| Post-selection specimen | Exact screenshot SHA-256 | Actual visual witness |
+|---|---|---|
+| `psalm-poetry.png` | `b98210ca9e62b675d68b9328a814c8e1e6c19f2f567531b6e90d2ab67a9c50d9` | Xiphos title shows **`JND2024Research: Psalms 23:1`** with selected Darby in the module tree, heading *Psaume 23*, French prose and visible line/paragraph breaks |
+| `matthew-heading.png` | `255c283fa09428870b7b19f9a8e42f6925f6be98e33649d230cd9ea3818a558d` | **`JND2024Research: Matthew 5:1`** selected, chapter heading, French Beatitudes and inline verse numbers with note calls |
+| `romans-annotation.png` | `2d93cd7068200e8abd9fa97029a7a063a3ff3b906019c7a72d280dc133b38889` | **`JND2024Research: Romans 8:28`** selected, French Scripture, verse numbers, note superscripts and paragraph separation near verse 31 |
+
+A fourth `genesis-prose.png` file has SHA-256
+`c640d087c40e251d371a846f86b92f5102edf623c3ec95e86b57d76057a3d87a`
+and matches the receipt, but was **not** separately visually assessed in
+this checkpoint. The three listed actual Darby screenshots establish
+**representative readability and structure in one Xiphos reader session**.
+They do **not** establish typographic identity to printed BPC, every
+poetry/heading/callout case, all reference destinations or Bible-app
+compatibility. Exact original whitespace remains unproved. The prior
+whole-source native structure-position audit is unaffected.
 
 ## Ten original OSIS target limitations — manual editorial proposals only
 
