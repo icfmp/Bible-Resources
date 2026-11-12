@@ -105,7 +105,27 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
             authorial_outside_book_titles(corrected),
         )
         if metrics["candidate_status"] != "full_numbered_text_and_note_preflight_equal_not_approved":
-            # No source or note data goes into public Actions logs.
+            # Emit aggregate category counts and boolean structural outcomes only:
+            # no Scripture, note body, raw XML, native binary, or original target text.
+            counts = metrics["source_to_compiled_counts"]
+            problems = {
+                key: value for key, value in counts.items()
+                if value and any(marker in key for marker in (
+                    "different", "differs", "moved", "unverified",
+                    "source_only", "native_only", "invalid",
+                ))
+            }
+            body = metrics["original_to_compiled_body_opening_order"]
+            positions = metrics["source_native_body_boundary_positions"]
+            flags = {
+                "ordered_body_same": body.get("same_order_and_kind_in_every_mapped_book"),
+                "body_boundaries_same": positions.get("all_book_body_nonspace_and_boundary_events_equal"),
+                "total_notes_compared": counts.get("note_pairs_compared"),
+                "indexed_keys": counts.get("official_source_verse_count"),
+            }
+            print("RESEARCH-ONLY safe native mismatch categories:",
+                  json.dumps({"aggregate_problem_counts": problems,
+                              "structural_flags": flags}, sort_keys=True))
             raise PrivateRepairedProbeError("Corrected candidate full native fidelity gate did not pass")
         env = dict(os.environ, SWORD_PATH=str(payload.resolve()))
         passages = (
