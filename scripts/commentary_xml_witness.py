@@ -183,6 +183,47 @@ def xml_structure(data: bytes) -> dict:
         stack.extend((child, depth + 1) for child in reversed(children))
     if len(tags) > MAX_TAG_TYPES or not tags:
         raise PilotError("Too many distinct original XML element types")
+    # A chapter-bearing division is a structural source unit, not an
+    # inferred original SWORD entry. Check source text presence independently
+    # of the annotation markers, especially chapters with no scripCom.
+    chapter_bearing_divisions = 0
+    chapter_bearing_chapters = 0
+    chapter_bearing_markers = 0
+    no_marker_division_receipts = []
+    book_body_ordered_sha = sha256()
+    for division in root.iter():
+        if not isinstance(division.tag, str) or safe_name(division.tag) != "div1":
+            continue
+        chapters = [child for child in division
+                    if isinstance(child.tag, str) and safe_name(child.tag) == "div2"]
+        if not chapters:
+            continue
+        chapter_bearing_divisions += 1
+        chapter_bearing_chapters += len(chapters)
+        markers = sum(1 for candidate in division.iter()
+                      if isinstance(candidate.tag, str)
+                      and safe_name(candidate.tag) == "scripCom")
+        chapter_bearing_markers += markers
+        original_text_stream = "".join(division.itertext())
+        text_digest = sha256(original_text_stream.encode("utf-8")).hexdigest()
+        book_body_ordered_sha.update(
+            f"{chapter_bearing_divisions}:{len(chapters)}:{markers}:{text_digest}\n".encode("ascii")
+        )
+        if not markers:
+            title = division.get("title", "")
+            no_marker_division_receipts.append({
+                "source_div1_ordinal": chapter_bearing_divisions,
+                "source_div1_title_sha256": sha256(title.encode("utf-8")).hexdigest(),
+                "chapter_count": len(chapters),
+                "original_text_unicode_characters": len(original_text_stream),
+                "original_text_stream_sha256": text_digest,
+                "nonempty_paragraph_elements": sum(
+                    1 for node in division.iter()
+                    if isinstance(node.tag, str) and safe_name(node.tag) == "p"
+                    and "".join(node.itertext()).strip()
+                ),
+                "source_words_or_heading_text_not_disclosed": True,
+            })
     # XML could be ThML with DTD/unknown entities; always flag instead of
     # silently interpreting its sections as authoritative SWORD mappings.
     return {
@@ -205,6 +246,12 @@ def xml_structure(data: bytes) -> dict:
         "candidate_commentary_distinct_reference_count": len(observed_ref_keys),
         "candidate_commentary_nonempty_direct_text_count": commentary_with_nonempty_direct_text,
         "chapter_direct_child_tag_counts": dict(sorted(chapter_child_tags.items())),
+        "source_div1_with_direct_chapters": chapter_bearing_divisions,
+        "source_direct_chapters_inside_div1": chapter_bearing_chapters,
+        "source_scripCom_inside_chapter_bearing_div1": chapter_bearing_markers,
+        "source_chapter_bearing_div1_ordered_text_stream_sha256": book_body_ordered_sha.hexdigest(),
+        "source_chapter_bearing_div1_without_scripCom": no_marker_division_receipts,
+        "source_division_text_stream_sha_is_not_original_file_byte_hash": True,
         "candidate_sections_are_verified_annotations": False,
         "text_node_count": text_nodes,
         "nonempty_text_node_count": nonempty_text_nodes,
