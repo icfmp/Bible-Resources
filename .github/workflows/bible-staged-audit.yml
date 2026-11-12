@@ -43,6 +43,8 @@ on:
       - "scripts/source_native_paragraph_counts.py"
       - "scripts/source_native_ordered_body.py"
       - "scripts/source_native_word_boundaries.py"
+      - "scripts/source_native_structure_topology.py"
+      - "tests/test_source_native_structure_topology.py"
       - "scripts/source_native_record_scope_triage.py"
       - "scripts/source_native_nonspace_boundaries.py"
       - "scripts/source_native_structural_whitespace.py"
@@ -142,6 +144,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_source_native_paragraph_counts.py' -v
           python -m unittest discover -s tests -p 'test_source_native_ordered_body.py' -v
           python -m unittest discover -s tests -p 'test_source_native_word_boundaries.py' -v
+          python -m unittest discover -s tests -p 'test_source_native_structure_topology.py' -v
           python -m unittest discover -s tests -p 'test_source_native_record_scope_triage.py' -v
           python -m unittest discover -s tests -p 'test_source_native_nonspace_boundaries.py' -v
           python -m unittest discover -s tests -p 'test_source_native_structural_whitespace.py' -v

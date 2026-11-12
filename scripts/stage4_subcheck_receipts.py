@@ -107,7 +107,8 @@ def _scope(evidence: dict) -> dict[str, tuple[str, tuple[str, ...], tuple[str, .
     word = rows.get("source_native_body_boundary_word_position_screen", {})
     punctuation = rows.get("source_native_nonwhitespace_codepoint_boundary_screen", {})
     order = rows.get("source_native_ordered_body_kind_screen", {})
-    for value in (word, punctuation, order):
+    topology = rows.get("source_native_p_q_event_topology_diagnostic", {})
+    for value in (word, punctuation, order, topology):
         if not isinstance(value, dict):
             raise Stage4ReceiptError("Invalid structural evidence")
     if early_loss:
@@ -129,7 +130,8 @@ def _scope(evidence: dict) -> dict[str, tuple[str, tuple[str, ...], tuple[str, .
         "all_p_q_source_native_nonwhitespace_codepoint_boundaries_match") is True
     order_ok = order.get("same_order_and_kind_in_every_mapped_book") is True
     structure_difference = (
-        word.get("all_mapped_book_p_q_start_end_word_ordinals_match") is False
+        topology.get("status") == "source_native_structural_topology_differs"
+        or word.get("all_mapped_book_p_q_start_end_word_ordinals_match") is False
         or punctuation.get(
             "all_p_q_source_native_nonwhitespace_codepoint_boundaries_match") is False
         or order.get("same_order_and_kind_in_every_mapped_book") is False
@@ -150,8 +152,12 @@ def _scope(evidence: dict) -> dict[str, tuple[str, tuple[str, ...], tuple[str, .
         b = ("BLOCKED", (), ("full_main_text_scan_not_executed",))
     if structure_difference:
         c = ("BLOCKED", (), ("source_native_p_q_boundary_or_kind_difference",))
-    elif full and word_ok and punctuation_ok and order_ok:
-        c = ("PARTIAL", ("p_q_open_close_word_and_codepoint_boundaries_match",), (
+    elif (full and word_ok and punctuation_ok and order_ok
+          and topology.get("all_source_native_p_q_open_close_event_topology_match") is True):
+        c = ("PARTIAL", (
+            "p_q_open_close_word_and_codepoint_boundaries_match",
+            "p_q_open_close_pairing_and_topology_machine_positions_match",
+        ), (
             "whitespace_verse_zero_and_non_p_q_styles_unverified",
             "source_native_representation_equivalence_not_editorially_approved"))
     else:

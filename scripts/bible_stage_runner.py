@@ -244,6 +244,30 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
             missing.append("Source-native punctuation-sensitive paragraph/poetry boundary positions differ or remain unverified")
         else:
             missing.append("No independent source-native punctuation-relative p/q boundary audit")
+        topology = rows.get("source_native_p_q_event_topology_diagnostic", {})
+        topology_proven_difference = (
+            topology.get("status") == "source_native_structural_topology_differs")
+        if topology_proven_difference:
+            missing.append(
+                "Source/native p/q OPEN/CLOSE ordering, pairing, nesting or "
+                "word/punctuation-relative positions demonstrably differ")
+        elif topology.get(
+                "all_source_native_p_q_open_close_event_topology_match") is True:
+            verified.append(
+                "Source/native p/q opening AND closing semantic event positions, "
+                "order and nesting matched independent compiled SWORD evidence")
+            if not topology.get("source_native_exact_record_scope_verified"):
+                missing.append(
+                    "Identical word/character boundaries may use different "
+                    "verse-zero/cross-verse record scopes; editorial review required")
+            if not topology.get("same_boundary_event_order_unambiguous"):
+                missing.append(
+                    "Same-location structural events cannot be individually paired "
+                    "without independent source/native style or ID evidence")
+        else:
+            missing.append(
+                "Independent original/native p/q opening-closing event topology "
+                "not fully proven (including verse-zero and same-boundary cases)")
         whitespace_gaps = rows.get("source_native_structural_whitespace_gap_triage", {})
         if whitespace_gaps.get("status") == "whitespace_differences_classified_not_editorially_approved":
             verified.append("Source/native main-text whitespace differences classified by original p/q boundaries and source newline presence (not editorial layout approval)")
@@ -268,7 +292,9 @@ def _run_fidelity(manifest: dict, archives: dict, work: Path, *,
         missing += ["Exact publisher edition identity and original book/intro order not independently signed off",
                     "Original note callers, word anchors, resolved reference targets and verse-zero/poetry structure unverified",
                     "Rights/editorial publication approval remains separate"]
-        return _status("BLOCKED" if stock_preflight["proven_material_stock_loss"] or not text_preserved else "PARTIAL",
+        return _status("BLOCKED" if (stock_preflight["proven_material_stock_loss"]
+                                 or not text_preserved or topology_proven_difference)
+                       else "PARTIAL",
             verified=verified, missing=missing,
             evidence={"source_format":"USFX","native_driver":receipt["module_native_driver"],
                       "native_versification":receipt["module_versification"],
