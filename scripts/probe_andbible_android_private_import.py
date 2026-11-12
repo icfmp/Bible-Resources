@@ -28,6 +28,7 @@ SAFE_UI = frozenset({
     "JND2024REPAIRRESEARCH.ZIP", "ALLOW", "WHILE USING THE APP",
     "INSTALL", "IMPORT", "OK", "OPEN", "CONTINUE", "DONE", "CLOSE",
     "USE THIS FOLDER", "GRANT ACCESS", "SELECT", "NEXT", "PROCEED",
+    "DISMISS", "DISMISS UNTIL NEXT UPDATE",
 })
 
 
@@ -191,6 +192,22 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
                        candidate_installation_not_verified=True)
             raise
 
+    # The real exact-APK screenshot after selecting the ZIP (run 43195135975)
+    # showed French John 3 under the research edition title, obscured by the
+    # AndBible 5.1 post-install update dialog. Dismiss only this observed
+    # optional announcement, and preserve unreviewed visual evidence.
+    announcement_dismissed=False
+    if selected:
+        overlay_controls=android_controls()
+        chosen_dismiss=tap_allowlisted(
+            overlay_controls,("DISMISS", "DISMISS UNTIL NEXT UPDATE"))
+        announcement_dismissed=chosen_dismiss is not None
+        checkpoint("post_import_announcement",
+                   dismiss_control_found=announcement_dismissed,
+                   andbible_import_still_requires_independent_review=True)
+        screenshots["08-after-optional-announcement"] = capture_png(
+            evidence_dir/"08-after-optional-announcement.png")
+
     # A successful ADB press does not establish a loaded translation; retain
     # that as a separate visual and Java/Android document validation gate.
     result={
@@ -208,6 +225,7 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
         "import_instructions_proceeded": proceeded,
         "file_picker_candidate_selected":selected,
         "import_confirmation_action_attempted":import_prompt,
+        "post_import_announcement_dismissed":announcement_dismissed,
         "andbible_import_verified":imported_by_app,
         "andbible_rendered_text_and_notes_verified":False,
         "andbible_repaired_reference_gui_click_verified":False,
