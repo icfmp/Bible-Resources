@@ -127,6 +127,78 @@ def source_word_prefix_topology(source_text: str, original_stock_raw: bytes) -> 
     }
 
 
+def stock_prefix_context_correspondence(
+    source_text: str, stock_raw: bytes, candidate_source_strings: list[tuple[str,str]]
+) -> dict:
+    """Compare actual earlier stock title/table/reference text to source neighbors.
+
+    Only an exact Unicode string match, whitespace-only match, or identical
+    Unicode word-token sequence is observed. None identifies the stock prefix
+    as authorial, licensable, or accurate; source context may belong to a
+    surrounding book/chapter and not to the particular annotated body.
+    """
+    if len(candidate_source_strings)>8 or any(
+        not isinstance(kind,str) or not isinstance(value,str) or len(value)>2048
+        for kind,value in candidate_source_strings
+    ):
+        raise ValueError("Unreviewed original neighboring context candidate")
+    allowed_types={
+        "source_marker_passage_attribute",
+        "source_div2_title_attribute",
+        "source_div1_title_attribute",
+        "source_immediate_previous_heading_element",
+    }
+    if any(kind not in allowed_types for kind,_value in candidate_source_strings):
+        raise ValueError("Unknown original source neighbor candidate type")
+    root = _parse_original_stock_fragment(stock_raw)
+    compiled="".join(root.itertext())
+    original_words=WORD.findall(source_text)
+    stock_matches=list(WORD.finditer(compiled))
+    stock_words=[m.group(0) for m in stock_matches]
+    start=_contiguous_offset(original_words,stock_words)
+    if start is None or start<=0 or start+len(original_words)!=len(stock_words):
+        raise ValueError("Stock entry is not a source-word-aligned prefixed body")
+    source_word_start_char=stock_matches[start].start()
+    matches=Counter()
+    preceding_counts=Counter()
+    candidate_types=Counter(kind for kind,value in candidate_source_strings if value.strip())
+    any_exact=False
+    any_word_only=False
+    cursor=len(root.text or "")
+    for child in root:
+        if isinstance(child.tag,str):
+            label=safe_name(child.tag)
+            raw_text="".join(child.itertext())
+            end=cursor+len(raw_text)
+            if end<=source_word_start_char and raw_text.strip():
+                if label in {"title","table","reference"}:
+                    preceding_counts[label]+=1
+                    for kind,original in candidate_source_strings:
+                        if not original.strip():
+                            continue
+                        if raw_text==original:
+                            matches[f"exact_unicode:{label}:{kind}"]+=1
+                            any_exact=True
+                        elif raw_text.strip()==original.strip():
+                            matches[f"only_outer_whitespace:{label}:{kind}"]+=1
+                        elif WORD.findall(raw_text)==WORD.findall(original):
+                            matches[f"same_unicode_word_tokens_not_exact:{label}:{kind}"]+=1
+                            any_word_only=True
+            cursor=end
+        cursor+=len(child.tail or "")
+    if cursor!=len(compiled):
+        raise ValueError("Stock source-title context byte traversal does not cover complete original text")
+    return {
+        "authenticated_source_neighbor_candidate_type_counts":dict(sorted(candidate_types.items())),
+        "preceding_stock_metadata_element_count_by_tag":dict(sorted(preceding_counts.items())),
+        "source_neighbor_to_stock_element_correspondence_classes":dict(sorted(matches.items())),
+        "any_exact_source_neighbor_text_in_stock_metadata":any_exact,
+        "any_only_word_token_source_neighbor_in_stock_metadata":any_word_only,
+        "actual_source_candidate_is_not_approved_compiled_heading":True,
+        "source_or_stock_text_or_attribute_values_disclosed":False,
+    }
+
+
 def stock_prefixed_source_body_concordance(source_text: str, original_stock_raw: bytes) -> dict:
     """Compare the author's source body to the real stock suffix *without changing bytes*.
 
