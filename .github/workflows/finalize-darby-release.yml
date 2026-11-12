@@ -1,0 +1,152 @@
+name: Finalize approved Darby SWORD release and deploy catalogue
+
+# This runs ONLY after the source-attested binary+catalogue have entered
+# protected main through a separately validated pull request.
+on:
+  push:
+    branches: [main]
+    paths: ["modules/darby-jnd-2024/RELEASE_PROVENANCE.json"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  publish-attested:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: github-pages
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Validate signed-off module and original source fidelity attestations
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          timeout 180s sudo apt-get -o Acquire::Retries=1 update -qq
+          timeout 180s sudo apt-get -o Acquire::Retries=1 install -y diatheke
+          python -m unittest discover -s tests -v
+          python scripts/validate.py
+          python scripts/build.py --output dist \
+            --base-url https://icfmp.github.io/Bible-Resources/
+          python scripts/smoke.py
+          python - <<'PY'
+          from pathlib import Path
+          from hashlib import sha256
+          import json
+          root=Path('modules/darby-jnd-2024')
+          manifest=json.loads((root/'RELEASE_PROVENANCE.json').read_text())
+          approval=json.loads(Path('config/darby-release-authorization.json').read_text())
+          metadata=json.loads((root/'metadata.json').read_text())
+          audit=(root/'SOURCE_AUDIT.json').read_bytes()
+          src=json.loads((root/'SOURCE_VALIDATION.json').read_text())
+          catalogue=json.loads(Path('dist/catalog/v1/catalog.json').read_text())
+          pkg=Path('dist/sword/packages/BRJND2024.zip')
+          assert manifest['status']=='source_and_native_attested_release_candidate'
+          assert manifest['release_tag']=='darby-jnd-2024-0.1.0'
+          assert manifest['published'] is False
+          assert manifest['six_ztext_payload_files_byte_identical_to_full_native_audit']
+          assert manifest['original_publisher_osis_sha256']==approval['original_publisher_osis_sha256']
+          assert manifest['corrected_candidate_osis_sha256']==approval['final_private_corrected_osis_sha256']
+          assert sha256(audit).hexdigest()==manifest['full_native_audit_sha256']
+          assert sha256(pkg.read_bytes()).hexdigest()==manifest['release_zip_sha256']
+          assert src['source_sha256']==manifest['corrected_candidate_osis_sha256']
+          assert metadata['quality']['status']=='approved'
+          assert metadata['sword_id']=='BRJND2024' and metadata['version']=='0.1.0'
+          assert metadata['versification']=='Luther'
+          modules=catalogue['modules']
+          assert len(modules)==2
+          assert len([m for m in modules if m['sword_id']=='BRLSG1910' and m['version']=='0.1.0'])==1
+          darby=[m for m in modules if m['sword_id']=='BRJND2024' and m['version']=='0.1.0']
+          assert len(darby)==1
+          assert darby[0]['download']['sha256']==manifest['release_zip_sha256']
+          from zipfile import ZipFile
+          with ZipFile(pkg) as archive:
+              assert archive.testzip() is None
+              assert set(archive.namelist())==set(manifest['complete_release_member_sha256'])
+              assert all(sha256(archive.read(n)).hexdigest()==v
+                         for n,v in manifest['complete_release_member_sha256'].items())
+          print('Exactly two validated SWORD Bibles; fully signed Darby 2024 payload matches published catalogue')
+          PY
+      - name: Stage immutable release ZIP and independent checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/darby-release"
+          cp dist/sword/packages/BRJND2024.zip "$RUNNER_TEMP/darby-release/BRJND2024-0.1.0.zip"
+          (cd "$RUNNER_TEMP/darby-release" && sha256sum BRJND2024-0.1.0.zip > SHA256SUMS.txt && sha256sum --check SHA256SUMS.txt)
+      - name: Create immutable GitHub Release or verify existing asset; never overwrite
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag=darby-jnd-2024-0.1.0
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            mkdir -p "$RUNNER_TEMP/existing"
+            gh release download "$tag" --repo "$GITHUB_REPOSITORY" \
+              --pattern BRJND2024-0.1.0.zip --dir "$RUNNER_TEMP/existing"
+            cmp "$RUNNER_TEMP/existing/BRJND2024-0.1.0.zip" \
+                "$RUNNER_TEMP/darby-release/BRJND2024-0.1.0.zip"
+            echo "Existing immutable GitHub release matches source-attested module exactly."
+          else
+            gh release create "$tag" \
+              "$RUNNER_TEMP/darby-release/BRJND2024-0.1.0.zip" \
+              "$RUNNER_TEMP/darby-release/SHA256SUMS.txt" \
+              "modules/darby-jnd-2024/SOURCE_AUDIT.json" \
+              "modules/darby-jnd-2024/RELEASE_PROVENANCE.json" \
+              --repo "$GITHUB_REPOSITORY" \
+              --title 'Bible J. N. Darby — BPC 2024, Bible Resources 0.1.0' \
+              --notes-file docs/releases/DARBY-JND-2024-0.1.0.md
+          fi
+          gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+      - uses: actions/deploy-pages@v4
+      - name: Independently verify live HTTPS catalogue, package and metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from urllib.request import Request, urlopen
+          from hashlib import sha256
+          from pathlib import Path
+          import json,time
+          base='https://icfmp.github.io/Bible-Resources/'
+          expected=sha256(Path('dist/sword/packages/BRJND2024.zip').read_bytes()).hexdigest()
+          for i in range(12):
+              try:
+                  req=Request(base+'catalog/v1/catalog.json?recheck='+str(i),
+                              headers={'Cache-Control':'no-cache'})
+                  with urlopen(req,timeout=20) as response:
+                      assert response.status==200
+                      live=json.load(response)
+                  modules=live['modules']
+                  found=[m for m in modules if m['sword_id']=='BRJND2024']
+                  assert len(found)==1 and found[0]['download']['sha256']==expected
+                  assert any(m['sword_id']=='BRLSG1910' for m in modules)
+                  with urlopen(Request(base+'sword/packages/BRJND2024.zip',
+                                       method='HEAD'),timeout=20) as response:
+                      assert response.status==200
+                  with urlopen(Request(base+'sword/mods.d/brjnd2024.conf',
+                                       method='HEAD'),timeout=20) as response:
+                      assert response.status==200
+                  print('LIVE verified: exact Darby and LSG catalogue, SWORD ZIP and conf endpoints')
+                  break
+              except Exception as exc:
+                  if i==11:
+                      raise RuntimeError('Published Pages endpoints failed independent verification') from exc
+                  time.sleep(10)
+          PY
