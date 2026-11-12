@@ -26,6 +26,20 @@ MAX_XML = 32 * 1024 * 1024
 MAX_TAG_TYPES = 128
 MAX_ELEMENTS = 600_000
 XML_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_.:-]{0,95}$")
+OSIS_PART = r"[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9][0-9]*\\.[1-9][0-9]*"
+OSIS_SINGLE = re.compile(r"^" + OSIS_PART + r"$")
+OSIS_RANGE = re.compile(r"^(" + OSIS_PART + r")-(" + OSIS_PART + r")$")
+
+def _ref_category(value: str) -> str:
+    if not value:
+        return "missing"
+    if OSIS_SINGLE.fullmatch(value):
+        return "one_fully_qualified_verse"
+    match = OSIS_RANGE.fullmatch(value)
+    if match:
+        return ("same_book_verse_range" if match[1].split(".")[0] == match[2].split(".")[0]
+                else "cross_book_range_requires_review")
+    return "other_unreviewed_reference_grammar"
 
 
 def safe_name(tag: str) -> str:
@@ -63,6 +77,11 @@ def xml_structure(data: bytes) -> dict:
     commentary_parent_paths = Counter()
     commentary_children = Counter()
     commentary_attribute_names = Counter()
+    source_commentary_ref_classes = Counter()
+    source_commentary_books = Counter()
+    source_ref_digest = sha256()
+    duplicate_ref_count = 0
+    observed_ref_keys = set()
     commentary_with_nonempty_direct_text = 0
     chapter_child_tags = Counter()
     entities = 0
@@ -90,6 +109,16 @@ def xml_structure(data: bytes) -> dict:
                                    if isinstance(x.tag, str))
             commentary_parent_paths[parent_path] += 1
             commentary_attribute_names.update(safe_name(k) for k in node.attrib)
+            ref = node.get("osisRef", "")
+            source_ref_digest.update(ref.encode("utf-8"))
+            source_ref_digest.update(b"\\0")
+            category = _ref_category(ref)
+            source_commentary_ref_classes[category] += 1
+            if category in ("one_fully_qualified_verse", "same_book_verse_range"):
+                source_commentary_books[ref.split(".")[0]] += 1
+            if ref in observed_ref_keys:
+                duplicate_ref_count += 1
+            observed_ref_keys.add(ref)
             commentary_children.update(safe_name(x.tag) for x in node
                                        if isinstance(x.tag, str))
             if node.text and node.text.strip():
@@ -125,6 +154,11 @@ def xml_structure(data: bytes) -> dict:
         "candidate_commentary_parent_path_counts": dict(sorted(commentary_parent_paths.items())),
         "candidate_commentary_direct_child_tags": dict(sorted(commentary_children.items())),
         "candidate_commentary_attribute_name_counts": dict(sorted(commentary_attribute_names.items())),
+        "candidate_commentary_reference_classes": dict(sorted(source_commentary_ref_classes.items())),
+        "candidate_commentary_reference_books": dict(sorted(source_commentary_books.items())),
+        "candidate_commentary_reference_ordered_sha256": source_ref_digest.hexdigest(),
+        "candidate_commentary_duplicate_identical_reference_count": duplicate_ref_count,
+        "candidate_commentary_distinct_reference_count": len(observed_ref_keys),
         "candidate_commentary_nonempty_direct_text_count": commentary_with_nonempty_direct_text,
         "chapter_direct_child_tag_counts": dict(sorted(chapter_child_tags.items())),
         "candidate_sections_are_verified_annotations": False,
