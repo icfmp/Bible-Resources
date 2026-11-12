@@ -131,6 +131,23 @@ def probe_observed_note_marker(screen: Path):
     time.sleep(4)
 
 
+def probe_observed_corrected_colossians_link(screen: Path):
+    """Research-only tap on source-repaired Col.2.2–3 hyperlink in real note.
+
+    Actual run 43218512341 screenshot 13-romans-note-marker-probe.png
+    SHA-256 7b8954b9d865dfaa4eee3b9ae58f70c2c722469696fd7b8c5de464e77604a688
+    shows the blue '2.2-3' link at (840,1800), 1080x2280 Pixel 4.
+    Actual navigation requires independent pixel examination; never infer
+    successful corrected target selection from an ADB tap.
+    """
+    data=screen.read_bytes()
+    if (len(data) < 24 or data[:8] != bytes.fromhex("89504e470d0a1a0a")
+            or struct.unpack(">II", data[16:24]) != (1080, 2280)):
+        raise AndroidDarbyImportError("Unexpected note popup screenshot geometry")
+    adb("shell","input","tap","840","1800",timeout=12)
+    time.sleep(5)
+
+
 def relaunch_for_persistence():
     """Restart the known official app without touching module files or reimporting."""
     adb("shell","am","force-stop",PACKAGE,timeout=20)
@@ -325,6 +342,12 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
                    note_popup_verified=False, repaired_link_click_verified=False)
         screenshots["13-romans-note-marker-probe"] = capture_png(
             evidence_dir/"13-romans-note-marker-probe.png")
+        probe_observed_corrected_colossians_link(
+            evidence_dir/"13-romans-note-marker-probe.png")
+        checkpoint("romans_corrected_colossians_link_visual_probe",
+                   popup_link="Col.2.2-Col.2.3", actual_navigation_verified=False)
+        screenshots["14-corrected-colossians-link-probe"] = capture_png(
+            evidence_dir/"14-corrected-colossians-link-probe.png")
 
     # A successful ADB press does not establish a loaded translation; retain
     # that as a separate visual and Java/Android document validation gate.
@@ -348,6 +371,7 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
         "andbible_documented_reference_intent_attempted":relaunch_attempted,
         "andbible_documented_reference_navigation_verified":False,
         "andbible_romans_original_note_popup_verified":False,
+        "andbible_colossians_note_link_gui_verified":False,
         "andbible_persistent_module_identity_verified":False,
         "andbible_import_verified":imported_by_app,
         "andbible_rendered_text_and_notes_verified":False,
