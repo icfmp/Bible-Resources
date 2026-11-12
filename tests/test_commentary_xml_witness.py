@@ -87,6 +87,23 @@ class CommentaryXMLSourceTests(unittest.TestCase):
         self.assertNotIn('Unmarked source still contains', json.dumps(result))
         self.assertNotIn('Jude', json.dumps(result))
         self.assertTrue(result['source_division_text_stream_sha_is_not_original_file_byte_hash'])
+    def test_unmarked_division_neighbors_are_evidence_not_inferred_identity(self):
+        source = (
+            b'<?xml version="1.0" encoding="UTF-8"?>'
+            b'<ThML><div1><div2><scripCom osisRef="Bible:Gen.1.1"/></div2></div1>'
+            b'<div1 title="Unknown"><div2><p>Original unmarked authorial text.</p></div2></div1>'
+            b'<div1><div2><scripCom osisRef="Bible:Exod.1.1"/></div2></div1></ThML>'
+            + b' ' * 1100
+        )
+        report = xml_structure(source)
+        self.assertEqual(len(report['source_chapter_bearing_div1_without_scripCom']), 1)
+        unmarked = report['source_chapter_bearing_div1_without_scripCom'][0]
+        self.assertEqual(unmarked['source_div1_ordinal'], 2)
+        self.assertEqual(unmarked['nearest_prior_annotated_division_book_codes'], ['Gen'])
+        self.assertEqual(unmarked['nearest_next_annotated_division_book_codes'], ['Exod'])
+        self.assertFalse(unmarked['identity_from_neighbor_codes_established'])
+        self.assertNotIn('Original unmarked authorial text', json.dumps(report))
+
     def test_split_book_divisions_are_counted_not_silently_collapsed(self):
         source = self.sample().replace(
             b"<div2 title='Chapter'>",
