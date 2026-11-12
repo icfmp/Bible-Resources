@@ -30,7 +30,9 @@ jobs:
   source-attested-release:
     runs-on: ubuntu-24.04
     timeout-minutes: 35
-    environment: github-pages
+    # PRs cannot access the protected Pages deployment environment.
+    # Reserve github-pages for the owner-approved main-branch transaction.
+    environment: ${{ github.event_name == 'pull_request' && 'darby-release-preflight' || 'github-pages' }}
     env:
       PYTHONPATH: scripts
     steps:
