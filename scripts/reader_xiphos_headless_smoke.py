@@ -680,6 +680,8 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
             samples = _sample_reader_passages(env, study_dir) if study_dir else []
             tree_probe = (_capture_module_tree_probe(env, study_dir)
                           if comparison and study_dir and samples else None)
+            post_samples = (_sample_reader_passages(env, study_dir / "post-module-selection")
+                            if comparison and study_dir and tree_probe else [])
             link_host_probe = (_capture_source_note_link_host(env, study_dir)
                                if comparison and study_dir and tree_probe else None)
             parallel_attempt = (_capture_parallel_toggle_sample(env, study_dir)
@@ -696,6 +698,8 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                 "parallel_view_toggle_sample":parallel_attempt,
                 "independent_comparison_module":comparison,
                 "module_selection_probe":tree_probe,
+                "post_selection_reader_passage_samples":post_samples,
+                "post_selection_module_identity_requires_visual_review":True,
                 "original_note_link_host_probe":link_host_probe,
                 "keyboard_navigation_attempted": bool(samples),
                 "isolated_virtual_display_notice_click_fallback_attempted":(
