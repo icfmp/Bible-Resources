@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "status": "COMPLETE_VERSE_AND_RANGE_TEXT_DIAGNOSTIC_RESEARCH_ONLY_NOT_PARITY",
+  "issue": "https://github.com/icfmp/Bible-Resources/issues/177",
+  "original_ccel": {
+    "format": "ThML/XML",
+    "sha256": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+    "original_verse_and_range_body_count": 3364,
+    "distinct_native_start_anchors": 3363,
+    "ordered_unmodified_original_body_text_sha256": "36632fdc8963f211c448c648bcabfa1e18ffccf7135b6ebe056acd17c5001347",
+    "chapter_source_markers_not_in_this_subcheck": 228,
+    "unmarked_source_divisions_not_in_this_subcheck": true
+  },
+  "original_crosswire": {
+    "module_id": "MHCC",
+    "version": "2.0",
+    "driver": "zCom",
+    "archive_sha256": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+    "conf_sha256": "2762a04757ec3ee14bcf5d442fedcd47d2b938d573de4e9100a31aa073bc5863",
+    "full_native_raw_corpus_sha256": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6",
+    "independently_crosschecked_native_index_sha256": "fd8f02258e08d1ed4934dbbd7229d533234c1050bbcaab4cc7c9ef38abe7fb09"
+  },
+  "results": {
+    "original_verse_or_range_bodies_compared": 3364,
+    "exact_unicode_text_matches": 0,
+    "whitespace_only_differences": 433,
+    "same_unicode_word_token_sequence_with_different_punctuation": 1949,
+    "source_whitespace_collapsed_body_contained_in_stock": 26,
+    "different_unicode_word_token_sequence_or_source_selection": 956,
+    "source_anchors_without_native_raw_slot": 0,
+    "invalid_native_raw_xml_fragments": 0,
+    "no_text_modified": true
+  },
+  "interpretation": {
+    "unexplained_editorial_variants_and_real_content_differences_may_exist": true,
+    "punctuation_changes_are_not_automatically_acceptable": true,
+    "compare_compiled_vs_source_text_as_different_digital_editions_until_proven": true,
+    "unicode_word_token_differences_require_private_review": true,
+    "punctuation_and_whitespace_diagnostics_are_not_lexical_text_parity": true,
+    "original_chapter_text_and_unmarked_division_are_unverified": true,
+    "footnotes_quotations_paragraph_order_links_not_verified": true,
+    "public_redistribution_and_rights_not_approved": true,
+    "editorial_and_reader_review_not_approved": true,
+    "published": false
+  },
+  "evidence": {
+    "real_private_comparison_action": "https://github.com/icfmp/Bible-Resources/actions/runs/43282691897",
+    "exact_head_validate_action": "https://github.com/icfmp/Bible-Resources/actions/runs/43282691619",
+    "metadata_only_detail_artifact": "https://github.com/icfmp/Bible-Resources/actions/runs/43282691897/artifacts/13972229548"
+  },
+  "third_party_original_text_in_repo": false
+}
