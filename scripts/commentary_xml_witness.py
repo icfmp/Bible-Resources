@@ -125,6 +125,15 @@ def xml_structure(data: bytes) -> dict:
     duplicate_ref_count = 0
     observed_ref_keys = set()
     commentary_with_nonempty_direct_text = 0
+    next_sibling_element_types_by_reference_class = Counter()
+    source_marker_nonempty_tail_count = 0
+    verse_or_range_markers_with_immediate_div = 0
+    verse_or_range_markers_without_immediate_div = 0
+    immediate_divs_with_nonempty_text = 0
+    immediate_div_unicode_characters = 0
+    immediate_div_paragraph_elements = 0
+    immediate_div_ordered_unmodified_text_sha = sha256()
+    next_div_marker_examples = []
     chapter_child_tags = Counter()
     entities = 0
     comments = 0
@@ -155,6 +164,35 @@ def xml_structure(data: bytes) -> dict:
             source_ref_digest.update(ref.encode("utf-8"))
             source_ref_digest.update(b"\0")
             category, book = _parse_reference(ref)
+            next_sibling = node.getnext()
+            next_type = (
+                safe_name(next_sibling.tag)
+                if next_sibling is not None and isinstance(next_sibling.tag, str)
+                else "_END_OR_NON_ELEMENT"
+            )
+            next_sibling_element_types_by_reference_class[(category, next_type)] += 1
+            if node.tail and node.tail.strip():
+                source_marker_nonempty_tail_count += 1
+            if category in ("work_qualified_verse", "work_qualified_same_book_verse_range"):
+                if next_type == "div":
+                    verse_or_range_markers_with_immediate_div += 1
+                    exact_text_stream = "".join(next_sibling.itertext())
+                    raw_text_bytes = exact_text_stream.encode("utf-8")
+                    immediate_div_ordered_unmodified_text_sha.update(
+                        len(ref.encode("utf-8")).to_bytes(4,"big") + ref.encode("utf-8")
+                        + len(raw_text_bytes).to_bytes(8,"big")
+                        + bytes.fromhex(sha256(raw_text_bytes).hexdigest())
+                    )
+                    immediate_div_unicode_characters += len(exact_text_stream)
+                    if exact_text_stream.strip():
+                        immediate_divs_with_nonempty_text += 1
+                    immediate_div_paragraph_elements += sum(
+                        safe_name(child.tag) == "p"
+                        for child in next_sibling.iter()
+                        if isinstance(child.tag, str)
+                    )
+                else:
+                    verse_or_range_markers_without_immediate_div += 1
             source_commentary_ref_classes[category] += 1
             source_commentary_ref_shapes[_safe_reference_shape(ref)] += 1
             if book:
@@ -280,6 +318,19 @@ def xml_structure(data: bytes) -> dict:
         "candidate_commentary_reference_ordered_sha256": source_ref_digest.hexdigest(),
         "candidate_commentary_duplicate_identical_reference_count": duplicate_ref_count,
         "candidate_commentary_distinct_reference_count": len(observed_ref_keys),
+        "source_marker_next_sibling_element_by_ref_class": {
+            f"{class_name}:{node_type}": count
+            for (class_name,node_type),count
+            in sorted(next_sibling_element_types_by_reference_class.items())
+        },
+        "original_scripCom_markers_with_nonempty_intervening_tail_text": source_marker_nonempty_tail_count,
+        "verse_or_range_scripCom_markers_followed_immediately_by_div": verse_or_range_markers_with_immediate_div,
+        "verse_or_range_scripCom_markers_without_immediate_div": verse_or_range_markers_without_immediate_div,
+        "verse_or_range_immediate_divs_with_nonempty_original_text": immediate_divs_with_nonempty_text,
+        "verse_or_range_immediate_div_unicode_text_characters": immediate_div_unicode_characters,
+        "verse_or_range_immediate_div_paragraph_elements": immediate_div_paragraph_elements,
+        "verse_or_range_immediate_div_ordered_unmodified_text_sha256": immediate_div_ordered_unmodified_text_sha.hexdigest(),
+        "immediate_div_source_text_is_not_confirmed_stock_sword_entry": True,
         "candidate_commentary_nonempty_direct_text_count": commentary_with_nonempty_direct_text,
         "chapter_direct_child_tag_counts": dict(sorted(chapter_child_tags.items())),
         "source_div1_with_direct_chapters": chapter_bearing_divisions,
