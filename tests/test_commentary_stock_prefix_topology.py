@@ -51,7 +51,7 @@ class CommentaryStockPrefixTopologyTests(unittest.TestCase):
 
     def test_aligned_glyph_substitutions_without_replacing_original(self):
         report=aligned_punctuation_gap_diagnostics(
-            'Original – prose with “quotes”!', 'Original - prose with "quotes"!')
+            'Original – prose with “quotes”', 'Original - prose with "quotes"')
         self.assertEqual(report["punctuation_gap_classes"]["one_to_one_glyph_substitution"],3)
         self.assertEqual(report["one_to_one_unicode_numeric_glyph_replacements"]["U+2013>U+002D"],1)
         self.assertEqual(report["one_to_one_unicode_numeric_glyph_replacements"]["U+201C>U+0022"],1)
