@@ -72,8 +72,8 @@ class AndBiblePrivateImportUiTest(unittest.TestCase):
             adb.assert_called_once()
 
     def test_relaunch_only_restarts_official_app_without_reimport(self):
-        with patch("probe_andbible_android_private_import.adb") as adb, \\
-             patch("probe_andbible_android_private_import.time.sleep") as sleep:
+        with (patch("probe_andbible_android_private_import.adb") as adb,
+              patch("probe_andbible_android_private_import.time.sleep") as sleep):
             relaunch_for_persistence()
         self.assertEqual(adb.call_count, 2)
         self.assertEqual(adb.call_args_list[0].args[:4],
