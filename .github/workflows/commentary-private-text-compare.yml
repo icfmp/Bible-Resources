@@ -9,6 +9,7 @@ on:
       - 'tests/test_commentary_text_delta.py'
       - 'scripts/commentary_stock_prefix_topology.py'
       - 'tests/test_commentary_stock_prefix_topology.py'
+      - 'tests/test_commentary_prefixed_suffix.py'
       - 'scripts/commentary_native_raw_inventory.py'
       - 'scripts/sword_native_commentary_raw_corpus.cpp'
       - 'scripts/commentary_xml_witness.py'
