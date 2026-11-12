@@ -188,6 +188,50 @@ See [Darby 2024 postmortem](DARBY_2024_IMPORT_POSTMORTEM.md) for measured
 preflight and full-source timing, where the stage 4/5 optimization helped, and
 what is deliberately still pending in generic fidelity work #28/#83.
 
+## Stage 4c — semantic paragraph/poetry opening and closing topology
+
+The full original USFX → independent SWORD corpus pass now invokes
+`source_native_structure_topology.py` **after** the original and compiled
+private structural readers have independently produced canonical book-relative
+word/punctuation-sensitive start and end anchors. It checks, for each
+book and p/q structural kind:
+
+- Original/native **opening and closing counts**, paired and unclosed events,
+  duplicated/tied opening positions, source/native event order, overlapping or
+  crossing open/close boundaries and missing book scopes.
+- Every paired original and compiled paragraph/poetry event's **open and close
+  lexical-word and nonwhitespace Unicode-character ordinals**, not merely
+  source/native event totals or p/q kind order. A close moved three words,
+  an opening shifted one word, a duplicate or missing close, or a same-kind
+  event swap is a **machine structural difference** and now blocks stage 4,
+  independently of identical Scripture word counts.
+- Record and verse-zero ownership are **reported separately**. Real SWORD
+  native intro identifiers can be `Book`, `Book.Chapter` or a verse-zero
+  reference; a source USFX element can begin between verses. Matching lexical
+  coordinates with different source/native record ownership is **PARTIAL /
+  REVIEW REQUIRED**, never silently retagged or certified as equivalent.
+- When two events open at exactly the same original lexical coordinate,
+  raw XML/SWORD source-derived styles and IDs may be needed to disambiguate
+  identity. The machine flags this instead of claiming a one-to-one semantic
+  pairing it cannot prove. Source poetry style, linebreak whitespace, verse
+  boundary typography, published-reader layout and editorial intent remain
+  **unverified** separately.
+
+The new receipt contains safe machine counts, at most 12 book/reference/ordinal
+finding examples and separate SHA digests of **structural event coordinates**
+only. It never includes original Scripture or note bodies, private sIDs/eIDs,
+untrusted markup or a whole XML file. The original archives and published
+SWORD modules remain immutable.
+
+Synthetic and actual independently parsed USFX/native fragment regressions
+cover moved `</p>` or `eID`, delayed `q` openings, duplicate/missing
+closures, same-kind swaps with unchanged counts, crossings, ambiguous identical
+locations and real cross-verse source/native representation scope. This
+**strengthens**, but does not finish, the complete T1 requirement of issue #83:
+styles, independent cross-verse semantic alignment and verse-zero authorial
+meaning still need source-supported review. A green Action is not an
+editorial certificate.
+
 ## Source-bound machine receipts for subchecks 4a–4d
 
 Every completed `stage=4` or shared `stage=4-5` machine invocation
