@@ -8,7 +8,7 @@ import unittest
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
-from commentary_text_delta import punctuation_relationship, word_relationship
+from commentary_text_delta import punctuation_relationship, word_relationship, nonword_symbol_excess
 from commentary_private_text_compare import _original_source_markers,compare_private_texts
 
 
@@ -48,6 +48,31 @@ class CommentaryTextDeltaTests(unittest.TestCase):
                 self.assertNotIn("ancient",json.dumps(result))
         with self.assertRaises(ValueError):
             word_relationship("same words","same words")
+
+    def test_original_contiguous_in_stock_is_located_without_emitting_extra_words(self):
+        original="Private phrase maintained"
+        cases=[
+            ("Heading Private phrase maintained","extra_stock_words_only_before_original_body",1,0),
+            ("Private phrase maintained heading","extra_stock_words_only_after_original_body",0,1),
+            ("Title Private phrase maintained ending","extra_stock_words_before_and_after_original_body",1,1),
+        ]
+        for stock,category,prefix,suffix in cases:
+            with self.subTest(category=category):
+                report=word_relationship(original,stock)
+                self.assertEqual(report["relationship"],"source_words_contiguous_inside_longer_stock")
+                self.assertEqual(report["original_words_contiguous_in_stock_location"],category)
+                self.assertEqual(report["additional_stock_word_tokens_before_source"],prefix)
+                self.assertEqual(report["additional_stock_word_tokens_after_source"],suffix)
+                self.assertNotIn("heading",json.dumps(report).lower())
+                self.assertNotIn("Private",json.dumps(report))
+
+    def test_original_nonword_glyph_codepoints_are_numeric_ids_not_source_glyphs(self):
+        source,stock=nonword_symbol_excess("Private–words.","Private-words.")
+        self.assertEqual(source["U+2013"],1)
+        self.assertEqual(stock["U+002D"],1)
+        self.assertEqual(sum(source.values()),1)
+        self.assertEqual(sum(stock.values()),1)
+        self.assertNotIn("Private",json.dumps({"source":source,"stock":stock}))
 
     def test_integration_covers_exactly_every_source_disagreement(self):
         source_xml=(
