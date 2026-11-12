@@ -19,7 +19,7 @@ from publisher_osis_observation import read_pinned_publisher_osis
 from repair_osis_note_links import propose as propose_links
 from repair_osis_inline_markup import propose as propose_inline
 from publisher_osis_sword_candidate import (
-    _candidate_result, _compile_osis, _create_candidate_layout,
+    _candidate_result, _compile_osis, _create_candidate_layout, _read_native_frames,
 )
 from publisher_osis_usfx_parity import original_osis_verses_and_notes
 from source_osis_inventory import source_inventory
@@ -30,6 +30,10 @@ from source_native_osis_boundary_positions import (
     authorial_book_streams, authorial_outside_book_titles,
 )
 from guard_osis import _schema, parse_xml
+from source_osis_inventory import _source_tree
+from source_native_ordered_body import compare_ordered_body_openings
+from native_milestone_pair_audit import NativeMilestonePairAudit
+from lxml import etree
 
 SOURCE_HASH = "2204629e3efb3024dceb392780ef5e61f4296ea832c90e3dd2a5c3224179c1d3"
 LINK_SHA = "23b6225cf4f827f6f84e321ed60fedb55ec42c3bc2b5cf58747942bd32f6ad8d"
@@ -56,6 +60,33 @@ def _source_notes_equal_except_targets(before, after) -> bool:
             for old, new in zip(before[key], after[key])
         ) for key in before
     )
+
+
+def _diagnose_temporary_body_order(tool: Path, reader: Path, scratch: Path,
+                                   source: bytes, label: str) -> dict:
+    """Inspect a wholly separate transient research compilation by structural kinds only."""
+    work = scratch / ("debug-" + label)
+    work.mkdir()
+    _payload, output = _create_candidate_layout(work, MODULE + "Debug" + label, V11N)
+    source_file = scratch / ("debug-" + label + ".xml")
+    source_file.write_bytes(source)
+    _compile_osis(tool, source_file, output, V11N,
+                  scratch / ("debug-" + label + ".compiler-private.log"))
+    milestones = NativeMilestonePairAudit()
+    for kind, ref, raw in _read_native_frames(reader, MODULE + "Debug" + label,
+                                              work / "payload"):
+        milestones.observe(kind, ref, raw)
+    milestones.finish()
+    expected, expected_counts = authorial_body_opening_sequences(source)
+    result = compare_ordered_body_openings(
+        expected, milestones.private_ordered_body_openings(), expected_counts)
+    return {
+        "variant": label,
+        "body_order_equal": result["same_order_and_kind_in_every_mapped_book"],
+        "kinds_only": result["source_native_body_opening_kind_counts"],
+        "first_differences_only": result["first_mismatch_book_references_no_scripture"][:2],
+        "no_scripture_notes_or_binary_exposed": True,
+    }
 
 
 def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
@@ -129,6 +160,30 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
                               "body_opening_kind_counts": body.get("source_native_body_opening_kind_counts"),
                               "first_body_mismatch_host_references_only":
                                   body.get("first_mismatch_book_references_no_scripture", [])[:4]}, sort_keys=True))
+            # Compilers sometimes treat serially identical XML differently.
+            # Isolate serialization from LINK and INLINE changes; never
+            # normalize away a reported missing original poetry marker.
+            from source_osis_inventory import _source_tree
+            reserialized_original = etree.tostring(
+                _source_tree(original), encoding="UTF-8", xml_declaration=True)
+            if "".join(_source_tree(original).itertext()) != "".join(
+                    _source_tree(reserialized_original).itertext()):
+                raise PrivateRepairedProbeError("Original-only XML serialization changed text")
+            scenarios = [
+                ("Original", original),
+                ("Reserialized", reserialized_original),
+                ("LinksOnly", link),
+            ]
+            diagnoses = []
+            for label, data in scenarios:
+                try:
+                    diagnoses.append(_diagnose_temporary_body_order(
+                        osis2mod, native_raw, scratch, data, label))
+                except Exception as exc:
+                    diagnoses.append({"variant": label, "status": "private_diagnostic_failed",
+                                     "exception_type": type(exc).__name__})
+            print("RESEARCH-ONLY source serialization and attribute isolation:",
+                  json.dumps(diagnoses, sort_keys=True))
             raise PrivateRepairedProbeError("Corrected candidate full native fidelity gate did not pass")
         env = dict(os.environ, SWORD_PATH=str(payload.resolve()))
         passages = (
