@@ -171,6 +171,29 @@ def probe_observed_omitted_host_caller(screen: Path, host: str) -> None:
     time.sleep(3)
 
 
+# Real run 43223191886: underlined missing-verse labels remain blue after
+# removal of machine osisRef targets. Determine their *actual* tap behavior.
+# Exact 1080x2280 AOSP screenshots 15/16/17, independently reviewed.
+OMITTED_NOTE_PRINTED_LINK_SAMPLES = {
+    "Matt.23.13": (685, 1185),
+    "Acts.8.36": (685, 1292),
+    "Acts.15.33": (685, 1400),
+}
+
+
+def probe_observed_omitted_note_printed_link(screen: Path, host: str) -> None:
+    """Research-only probe of blue omitted-verse reference, never a proof."""
+    if host not in OMITTED_NOTE_PRINTED_LINK_SAMPLES:
+        raise AndroidDarbyImportError("Unreviewed textual-critical note host")
+    data=screen.read_bytes()
+    if (len(data) < 24 or data[:8] != bytes.fromhex("89504e470d0a1a0a")
+            or struct.unpack(">II", data[16:24]) != (1080, 2280)):
+        raise AndroidDarbyImportError("Unexpected textual-critical popup geometry")
+    x,y=OMITTED_NOTE_PRINTED_LINK_SAMPLES[host]
+    adb("shell","input","tap",str(x),str(y),timeout=12)
+    time.sleep(4)
+
+
 def relaunch_for_persistence():
     """Restart the known official app without touching module files or reimporting."""
     adb("shell","am","force-stop",PACKAGE,timeout=20)
@@ -387,6 +410,13 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
                        missing_verse_dead_link_verified=False)
             screenshots[key+"-note"] = capture_png(
                 evidence_dir/(key+"-note.png"))
+            probe_observed_omitted_note_printed_link(
+                evidence_dir/(key+"-note.png"), reference)
+            checkpoint("android_missing_verse_printed_link_tap",
+                       host=reference, navigation_result_verified=False,
+                       phantom_verse_absence_gui_verified=False)
+            screenshots[key+"-reference-tap"] = capture_png(
+                evidence_dir/(key+"-reference-tap.png"))
             adb("shell","input","keyevent","KEYCODE_BACK",timeout=12)
             time.sleep(2)
 
@@ -415,6 +445,7 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
         "andbible_colossians_note_link_gui_verified":False,
         "andbible_three_omitted_verse_host_gui_verified":False,
         "andbible_three_omitted_verse_note_popup_gui_verified":False,
+        "andbible_missing_verse_click_behavior_verified":False,
         "andbible_persistent_module_identity_verified":False,
         "andbible_import_verified":imported_by_app,
         "andbible_rendered_text_and_notes_verified":False,
