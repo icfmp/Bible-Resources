@@ -46,10 +46,7 @@ jobs:
           heap-size: 512M
           disable-animations: true
           emulator-boot-timeout: 600
-          script: |
-            python scripts/probe_andbible_android_emulator.py \
-              --apk "$RUNNER_TEMP/andbible-android-ui/andbible-stable.apk" \
-              --evidence "$RUNNER_TEMP/andbible-android-ui/evidence"
+          script: python scripts/probe_andbible_android_emulator.py --apk "$RUNNER_TEMP/andbible-android-ui/andbible-stable.apk" --evidence "$RUNNER_TEMP/andbible-android-ui/evidence"
       - name: Upload only official app startup/import screenshots and sanitized control metadata
         uses: actions/upload-artifact@v4
         with:
