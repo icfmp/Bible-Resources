@@ -127,6 +127,107 @@ def source_word_prefix_topology(source_text: str, original_stock_raw: bytes) -> 
     }
 
 
+def stock_prefixed_source_body_concordance(source_text: str, original_stock_raw: bytes) -> dict:
+    """Compare the author's source body to the real stock suffix *without changing bytes*.
+
+    This is a second diagnostic view of a stock entry whose original source
+    WORD tokens exactly occupy the *ending* stock word sequence. The entire
+    original stock entry remains retained; nothing is stripped/recompiled.
+    Exact lexical suffix equality does NOT approve extra stock prefix content.
+    """
+    root = _parse_original_stock_fragment(original_stock_raw)
+    stock_text = "".join(root.itertext())
+    original_words = WORD.findall(source_text)
+    stock_word_matches = list(WORD.finditer(stock_text))
+    stock_words = [match.group(0) for match in stock_word_matches]
+    if not original_words or len(original_words) >= len(stock_words):
+        raise ValueError("No additional stock words before source original")
+    offset = _contiguous_offset(original_words, stock_words)
+    if offset is None or not offset or offset + len(original_words) != len(stock_words):
+        raise ValueError("Original does not occupy complete stock ending word sequence")
+    stock_suffix = stock_text[stock_word_matches[offset].start():]
+    if WORD.findall(stock_suffix) != original_words:
+        raise ValueError("Stock source-word suffix no longer aligns exactly")
+    if source_text == stock_suffix:
+        match_class = "exact_source_body_unicode_equals_stock_text_suffix"
+    elif source_text.lstrip() == stock_suffix:
+        match_class = "only_source_leading_whitespace_before_first_word"
+    elif source_text.strip() == stock_suffix.strip():
+        match_class = "only_edge_whitespace_differences"
+    elif " ".join(source_text.split()) == " ".join(stock_suffix.split()):
+        match_class = "only_interior_whitespace_differences"
+    else:
+        match_class = "same_original_word_sequence_with_other_punctuation_or_markup_text_difference"
+    punctuation = aligned_punctuation_gap_diagnostics(source_text, stock_suffix)
+    return {
+        "stock_extra_prefix_word_tokens": offset,
+        "suffix_original_word_tokens_consistent": len(original_words),
+        "original_source_body_to_stock_suffix_class": match_class,
+        "aligned_suffix_changed_nonword_gaps": punctuation["punctuation_gap_changes"],
+        "aligned_suffix_gap_class_counts": punctuation["punctuation_gap_classes"],
+        "aligned_suffix_one_to_one_numeric_glyph_substitutions":
+            punctuation["one_to_one_unicode_numeric_glyph_replacements"],
+        "source_leading_nonspace_punctuation_before_first_word": bool(
+            source_text and any(not char.isspace() for char in source_text[:WORD.search(source_text).start()])
+        ),
+        "stock_raw_full_prefix_retained": True,
+        "stock_prefix_proven_authorial_or_legal": False,
+        "complete_authorial_text_and_structure_parity_proven": False,
+        "original_text_or_markup_disclosed": False,
+    }
+
+
+def unexplained_word_boundary_census(source_text: str, stock_text: str) -> dict:
+    """Numeric differences in two diverging Unicode word sequences.
+
+    Measures shared boundaries to distinguish isolated substitutions from
+    different section selection; **does not** infer text corruption or choose
+    an edition. In particular, an unusually long common suffix is a clue,
+    not evidence of legitimate stock additions.
+    """
+    left, right = WORD.findall(source_text), WORD.findall(stock_text)
+    if not left or not right or left == right:
+        raise ValueError("Expected two nonempty distinct word sequences")
+    limit = min(len(left), len(right))
+    prefix = 0
+    while prefix < limit and left[prefix] == right[prefix]:
+        prefix += 1
+    suffix = 0
+    while (suffix < limit - prefix
+           and left[len(left) - suffix - 1] == right[len(right) - suffix - 1]):
+        suffix += 1
+    original_middle = len(left) - prefix - suffix
+    stock_middle = len(right) - prefix - suffix
+    if original_middle == 0 and stock_middle == 0:
+        raise ValueError("No explanatory changed-word segment detected")
+    # Count common suffix proportion of *shorter* sequence, with no source data.
+    pct = suffix * 100 // limit
+    if pct == 0:
+        bucket = "no_exact_common_word_suffix"
+    elif pct < 25:
+        bucket = "common_suffix_under_25_percent"
+    elif pct < 50:
+        bucket = "common_suffix_25_to_49_percent"
+    elif pct < 75:
+        bucket = "common_suffix_50_to_74_percent"
+    elif pct < 100:
+        bucket = "common_suffix_75_to_99_percent"
+    else:
+        bucket = "whole_shorter_sequence_matches_at_end_but_not_start"
+    return {
+        "common_start_word_tokens": prefix,
+        "common_end_word_tokens": suffix,
+        "source_middle_different_word_tokens": original_middle,
+        "stock_middle_different_word_tokens": stock_middle,
+        "common_suffix_fraction_bucket": bucket,
+        "changed_only_at_start_of_word_sequence": prefix == 0 and suffix > 0,
+        "changed_only_at_end_of_word_sequence": prefix > 0 and suffix == 0,
+        "changed_in_middle_with_both_matching_boundaries": prefix > 0 and suffix > 0,
+        "original_body_words_or_stock_words_disclosed": False,
+        "source_loss_or_editorial_equivalence_proven": False,
+    }
+
+
 def aligned_punctuation_gap_diagnostics(source_text: str, stock_text: str) -> dict:
     """Compare nonword symbols *between corresponding identical word tokens*.
 
