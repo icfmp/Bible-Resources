@@ -54,8 +54,21 @@ already-indexed targets, not only missing-key or unsupported-syntax flags.
 Keep distinct outcomes for (a) omitted numbered verses discussed in a
 text-critical note, (b) nonstandard relative/range grammar, (c) likely
 wrong-book targets even if their destinations exist, and (d) actual compiled
-reference-attribute loss. Preserve the exact source values; any repair needs
-upstream confirmation or a separately approved, reversible transformation.
+reference-attribute loss. **Preserve the exact publisher source as immutable
+provenance, but fix demonstrably incorrect machine-readable links and broken
+rendering in the candidate rather than release knowingly broken functionality.**
+The fix must be independently supported, exact-source-SHA-bound, applied
+through a reviewed reversible operation, and tested against both original
+content invariants and actual navigation. Ambiguous mappings remain blocked
+pending more evidence; don't auto-apply conjectural cross-book fixes.
+
+Never invent intentionally omitted authorial verses just to make a note's
+reference target addressable. Preserve the printed explanatory note; handle
+its non-existent target without misleading the reader. Whitespace differences
+alone are not blocking when meaning and editorial structure are preserved;
+a demonstrated lost paragraph/poetry/heading boundary or unreadable rendering
+**is** blocking. See [editorial rules](EDITORIAL_RULES.md) for the general
+content-versus-technical-repair contract.
 
 Before stage-5 acceptance, record both **machine-complete source/native
 fidelity** and **owner editorial acceptance** as separate decisions. A
