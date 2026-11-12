@@ -165,6 +165,29 @@ stage 6 requires `diatheke`. An original OSIS stage 3/4 requires the
 official, pinned schema automatically fetched by its existing approved
 helper. Source and original SWORD binary never appear in the artifact.
 
+## Avoid redundant upstream re-downloads in the same stage-4 job
+
+A reviewed manifest already identifies the source archive and original SWORD
+archive using **exact SHA-256 fingerprints**. The stage runner's
+`bible_intake.acquire()` obtains each once into disposable runner storage,
+checks the pinned hash and safe archive layout, and passes the verified local
+paths to the relevant native audit. A changed upstream ZIP **blocks** that
+exact-source audit; it is never automatically re-pinned or called equivalent.
+
+The PR audit job therefore **does not** call the separate upstream archive
+`--observe-only` command before `acquire()`: doing so downloaded identical
+ZIPs twice and added unverified mutable-upstream work to every stage-4 PR.
+Nor does it independently re-observe the already SHA-pinned official USFX XSD
+in every unrelated code PR. For **new or changed** editions, use the existing
+independent [observe-originals Action](../.github/workflows/bible-observe-originals.yml)
+and reviewed OSIS/USFX schema procedures **before** updating immutable
+manifest pins. This change skips duplicate observation, **not source hash
+validation**, standards requirements, native readback or human review.
+
+See [Darby 2024 postmortem](DARBY_2024_IMPORT_POSTMORTEM.md) for measured
+preflight and full-source timing, where the stage 4/5 optimization helped, and
+what is deliberately still pending in generic fidelity work #28/#83.
+
 ## Automation coverage — honest limits
 
 | Stage | Currently automated and recorded | Remains outside automated approval |
