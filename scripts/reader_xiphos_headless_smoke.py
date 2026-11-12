@@ -281,7 +281,7 @@ def _capture_note_hover_sample(env:dict, out:Path) -> dict:
     }
 
 
-def _sample_reader_passages(env, out: Path) -> list[dict]:
+def _sample_reader_passages(env, out: Path, samples=READER_SAMPLES) -> list[dict]:
     """Xiphos Ctrl+L navigation with actual screenshots, not content approval."""
     if out.exists() or out.is_symlink() or not out.parent.is_dir():
         raise XiphosSmokeError("Unsafe sample screenshot output directory")
@@ -330,7 +330,7 @@ def _sample_reader_passages(env, out: Path) -> list[dict]:
     time.sleep(0.5)
     out.mkdir(mode=0o700)
     snapshots = []
-    for slug, ref in READER_SAMPLES:
+    for slug, ref in samples:
         for command in (
             ["xdotool", "key", "--clearmodifiers", "ctrl+l"],
             ["xdotool", "type", "--clearmodifiers", "--delay", "35", ref],
@@ -604,7 +604,8 @@ def _capture_parallel_toggle_sample(env:dict, study_dir:Path) -> dict:
 def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_seconds:int,
           screenshot:Path|None=None, study_dir:Path|None=None,
           comparison_root:Path|None=None, comparison_module:str="",
-          comparison_versification:str=""):
+          comparison_versification:str="", supplemental_samples=(),
+          capture_note_link_without_comparison:bool=False):
     if not isinstance(startup_seconds,int) or not 5<=startup_seconds<=25:
         raise XiphosSmokeError("Unbounded headless startup duration")
     with tempfile.TemporaryDirectory(prefix="isolated-xiphos-preview-") as temp:
@@ -678,12 +679,18 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                     raise XiphosSmokeError("Invalid bounded screenshot result")
                 screenshot_sha=sha256(screenshot.read_bytes()).hexdigest()
             samples = _sample_reader_passages(env, study_dir) if study_dir else []
+            corrected_samples = (
+                _sample_reader_passages(env, study_dir / "corrected-source-cases",
+                                        supplemental_samples)
+                if study_dir and samples and supplemental_samples else [])
             tree_probe = (_capture_module_tree_probe(env, study_dir)
                           if comparison and study_dir and samples else None)
             post_samples = (_sample_reader_passages(env, study_dir / "post-module-selection")
                             if comparison and study_dir and tree_probe else [])
             link_host_probe = (_capture_source_note_link_host(env, study_dir)
-                               if comparison and study_dir and tree_probe else None)
+                               if study_dir and samples and
+                               ((comparison and tree_probe) or capture_note_link_without_comparison)
+                               else None)
             parallel_attempt = (_capture_parallel_toggle_sample(env, study_dir)
                                 if study_dir and samples else None)
             return {
@@ -695,6 +702,8 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                 "x11_window_detected_not_visually_inspected":window,
                 "test_only_screenshot_sha256":screenshot_sha,
                 "real_reader_passage_samples":samples,
+                "supplemental_source_case_screenshots":corrected_samples,
+                "link_host_without_second_module_requested":bool(capture_note_link_without_comparison),
                 "parallel_view_toggle_sample":parallel_attempt,
                 "independent_comparison_module":comparison,
                 "module_selection_probe":tree_probe,
