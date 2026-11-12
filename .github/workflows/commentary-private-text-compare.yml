@@ -68,6 +68,43 @@ jobs:
             --native-index-binary "${RUNNER_TEMP}/commentary-native-index" \
             --native-raw-binary "${RUNNER_TEMP}/commentary-private-raw" \
             --report "${RUNNER_TEMP}/commentary-source-stock-lexical.json"
+      - name: Summarize reviewed text-free source/body audit counters
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          report = json.loads((Path(os.environ["RUNNER_TEMP"]) /
+                               "commentary-source-stock-lexical.json").read_text())
+          if report.get("status") != "full_source_verse_and_range_body_to_stock_raw_text_diagnostics_not_release_approval":
+              raise SystemExit("Source-to-stock text receipt is incomplete")
+          metrics = report.get("text_diagnostic", {})
+          selected = (
+              "stock_original_body_suffix_exact_unicode_and_difference_classes",
+              "stock_original_body_suffix_total_changed_punctuation_gaps",
+              "unexplained_original_to_stock_word_boundary_count",
+              "unexplained_original_to_stock_common_suffix_fraction_buckets",
+              "unexplained_original_to_stock_changed_segment_positions",
+              "unexplained_source_changed_middle_word_token_count_buckets",
+              "unexplained_stock_changed_middle_word_token_count_buckets",
+          )
+          safe = {}
+          for key in selected:
+              value = metrics[key]
+              if isinstance(value, dict):
+                  if not all(re.fullmatch(r"[a-z][a-z0-9_]{0,127}", label)
+                             and type(count) is int and count >= 0
+                             for label, count in value.items()):
+                      raise SystemExit("Unapproved diagnostic value in bounded public summary")
+              elif type(value) is not int or value < 0:
+                  raise SystemExit("Unapproved numeric diagnostic in bounded public summary")
+              safe[key] = value
+          print("Non-text original-to-stock suffix diagnostics: " + json.dumps(safe, sort_keys=True))
+          PY
       - name: Preserve only non-text source and stock diagnostics
         if: always()
         uses: actions/upload-artifact@v4
