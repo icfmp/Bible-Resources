@@ -320,10 +320,14 @@ class XiphosSmokeUnitTests(unittest.TestCase):
                   patch("reader_xiphos_headless_smoke.time.sleep")):
                 result=_capture_bounded_note_popup(
                     {"DISPLAY":":91"},out,slug="leviticus-note-2",
-                    reference="Lev 8:15",marker_x=446,marker_y=349)
+                    reference="Lev 8:15",marker_x=446,marker_y=349,
+                    link_click=(160,558))
                 self.assertEqual(result["requested_host_reference"],"Lev 8:15")
                 self.assertTrue(result["independent_pixel_review_required"])
-                self.assertFalse(result["corrected_link_clicked"])
+                self.assertTrue(result["corrected_link_click_attempted"])
+                self.assertFalse(result["corrected_link_target_navigation_visually_verified"])
+                self.assertIsNotNone(result["post_link_click_screenshot_sha256"])
+                self.assertIn(["xdotool","click","1"],commands)
                 self.assertEqual(len(result["host_hover_pinned_images_sha256"]),3)
                 self.assertIn(["xdotool","click","2"],commands)
                 self.assertTrue((out/"leviticus-note-2-pinned.png").is_file())
@@ -336,6 +340,10 @@ class XiphosSmokeUnitTests(unittest.TestCase):
                     _capture_bounded_note_popup({"DISPLAY":":0"},out,
                         slug="unsafe-display",reference="Lev 8:15",
                         marker_x=446,marker_y=349)
+                with self.assertRaises(XiphosSmokeError):
+                    _capture_bounded_note_popup({"DISPLAY":":91"},out,
+                        slug="unsafe-click",reference="Lev 8:15",
+                        marker_x=446,marker_y=349,link_click=(500,558))
 
     def test_hash_and_scheme_mismatch_fail_closed(self):
         with tempfile.TemporaryDirectory() as folder:
