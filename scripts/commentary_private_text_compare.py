@@ -27,6 +27,7 @@ from commentary_text_delta import punctuation_relationship, word_relationship, n
 from commentary_stock_prefix_topology import (
     source_word_prefix_topology, aligned_punctuation_gap_diagnostics,
     stock_prefixed_source_body_concordance, unexplained_word_boundary_census,
+    stock_prefix_context_correspondence,
 )
 from commentary_xml_witness import _parse_reference, WORK_REF, OSIS_LOC, xml_structure, MAX_XML
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
@@ -168,6 +169,12 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
     stock_prefix_has_full_sibling_element=0
     stock_prefix_owners_before_original_body=Counter()
     stock_original_body_suffix_concordance=Counter()
+    stock_heading_source_candidate_types=Counter()
+    stock_heading_source_match_classes=Counter()
+    stock_heading_context_earlier_tag_counts=Counter()
+    stock_heading_source_any_exact_match_entries=0
+    stock_heading_source_any_word_only_match_entries=0
+    stock_heading_source_covered_entries=0
     stock_original_body_suffix_glyph_classes=Counter()
     stock_original_body_suffix_glyph_replacements=Counter()
     stock_original_body_suffix_changed_gaps=0
@@ -271,6 +278,23 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
                             stock_original_body_suffix_changed_gaps+=suffix_result[
                                 "aligned_suffix_changed_nonword_gaps"
                             ]
+                            source_context=stock_prefix_context_correspondence(
+                                item["original_text"],raw,item["private_original_neighbor_candidates"]
+                            )
+                            stock_heading_source_covered_entries+=1
+                            stock_heading_source_candidate_types.update(
+                                source_context["authenticated_source_neighbor_candidate_type_counts"]
+                            )
+                            stock_heading_source_match_classes.update(
+                                source_context["source_neighbor_to_stock_element_correspondence_classes"]
+                            )
+                            stock_heading_context_earlier_tag_counts.update(
+                                source_context["preceding_stock_metadata_element_count_by_tag"]
+                            )
+                            if source_context["any_exact_source_neighbor_text_in_stock_metadata"]:
+                                stock_heading_source_any_exact_match_entries+=1
+                            if source_context["any_only_word_token_source_neighbor_in_stock_metadata"]:
+                                stock_heading_source_any_word_only_match_entries+=1
                             for value,bins in (
                                 (diagnostic["additional_stock_word_tokens_before_source"],stock_extra_prefix_token_bins),
                                 (diagnostic["additional_stock_word_tokens_after_source"],stock_extra_suffix_token_bins),
@@ -361,6 +385,17 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
         raise PilotError("Aligned punctuation entry count exceeds source divergence census")
     if sum(punctuation_aligned_gap_classes.values())!=punctuation_changed_gap_count:
         raise PilotError("Aligned punctuation gaps incomplete")
+    if stock_heading_source_covered_entries!=sum(stock_containment_locations.values()):
+        raise PilotError("Stock metadata/source neighboring context census is incomplete")
+    if stock_heading_context_earlier_tag_counts!=Counter({
+        kind:number
+        for kind,number in stock_prefix_full_sibling_top_level_tags.items()
+        if kind in {"title","table","reference"}
+    }):
+        raise PilotError("Stock prefix metadata element counts disagree with independent XML topology")
+    if (stock_heading_source_any_exact_match_entries>stock_heading_source_covered_entries
+            or stock_heading_source_any_word_only_match_entries>stock_heading_source_covered_entries):
+        raise PilotError("Source neighbor/title textual match observations exceed stock entries")
     if sum(stock_original_body_suffix_concordance.values())!=sum(stock_containment_locations.values()):
         raise PilotError("Unmodified original source body suffix comparison omitted stock-prefixed entries")
     if sum(stock_original_body_suffix_glyph_classes.values())!=stock_original_body_suffix_changed_gaps:
@@ -414,6 +449,17 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
         "stock_original_body_suffix_total_changed_punctuation_gaps":
             stock_original_body_suffix_changed_gaps,
         "stock_body_suffix_comparison_does_not_approve_omitted_prefix_or_layout":True,
+        "source_neighbor_compared_to_stock_prefix_entry_count":stock_heading_source_covered_entries,
+        "source_neighbor_candidate_type_counts":dict(sorted(stock_heading_source_candidate_types.items())),
+        "stock_prefix_matched_authentic_source_neighbor_context_classes":
+            dict(sorted(stock_heading_source_match_classes.items())),
+        "source_neighbor_exact_context_match_stock_entry_count":
+            stock_heading_source_any_exact_match_entries,
+        "source_neighbor_same_word_tokens_not_exact_context_match_stock_entry_count":
+            stock_heading_source_any_word_only_match_entries,
+        "stock_metadata_top_level_tag_counts_crosschecked_against_existing_prefix_inventory":
+            dict(sorted(stock_heading_context_earlier_tag_counts.items())),
+        "source_neighbor_textual_match_does_not_confirm_authorial_edition_or_license":True,
         "unexplained_original_to_stock_word_boundary_count":divergent_word_boundary_scanned,
         "unexplained_original_to_stock_common_suffix_fraction_buckets":
             dict(sorted(divergent_word_boundary_suffix_bins.items())),
