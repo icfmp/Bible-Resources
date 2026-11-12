@@ -12,8 +12,12 @@ on:
         description: "One of seven stages, or 4-5 in one shared machine-only scan"
         type: choice
         required: true
-        options: ["1", "2", "3", "4", "5", "6", "7", "4-5"]
+        options: ["1", "2", "3", "4", "5", "6", "7", "4-5", "4a", "4b", "4c", "4d"]
         default: "2"
+      reuse_run_id:
+        description: "Prior audited run ID for 4a-4d; no run ID for normal scans"
+        type: string
+        required: false
       issue_number:
         description: "Optional [Import] GitHub issue number for permanent evidence comment"
         type: string
@@ -77,6 +81,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: bible-audit-${{ github.event_name }}-${{ github.ref }}-${{ inputs.resource_id || 'webp-research' }}-${{ inputs.stage || 'research' }}
@@ -91,6 +96,7 @@ jobs:
     env:
       RESOURCE_ID: ${{ github.event_name == 'pull_request' && 'frajnd-2024' || inputs.resource_id || '' }}
       STAGE: ${{ github.event_name == 'pull_request' && '4-5' || inputs.stage || '' }}
+      REUSE_RUN_ID: ${{ inputs.reuse_run_id || '' }}
       REPORT_DIR: /tmp/bible-audit-report
       INSPECTOR_DIR: /tmp/sword-audit-bin
     steps:
@@ -111,10 +117,12 @@ jobs:
           python - <<'PY'
           import os,sys
           sys.path.insert(0,"scripts")
-          from bible_intake import parse_audit_comment
-          rid,stage=parse_audit_comment(os.environ["COMMAND"])
+          from bible_intake import parse_audit_command
+          rid,stage,prior_run=parse_audit_command(os.environ["COMMAND"])
           with open(os.environ["GITHUB_ENV"],"a",encoding="utf-8") as stream:
               stream.write(f"RESOURCE_ID={rid}\nSTAGE={stage}\n")
+              if prior_run is not None:
+                  stream.write(f"REUSE_RUN_ID={prior_run}\n")
           print("Authorized owner research command:", rid, "stage", stage)
           PY
       - name: Validate manifest and run regression tests (offline)
@@ -148,6 +156,28 @@ jobs:
       # second time during a PR: a drift must fail the exact pin, never be
       # silently adopted. Use bible-observe-originals.yml separately to
       # investigate changed upstream editions before updating the manifest.
+      - name: Verify exact previous run identifier before reading old evidence
+        if: ${{ contains(fromJSON('["4a","4b","4c","4d"]'), env.STAGE) }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,re
+          run=os.environ.get("REUSE_RUN_ID","")
+          if not re.fullmatch(r"[1-9][0-9]{0,15}",run):
+              raise SystemExit("A bounded prior GitHub Actions run ID is required")
+          if run==os.environ.get("GITHUB_RUN_ID",""):
+              raise SystemExit("A workflow cannot read its own not-yet-produced artifact")
+          print("Prior metadata-only Actions run:",run)
+          PY
+      - name: Fetch only prior stage-4 metadata artifact, no publisher original
+        if: ${{ contains(fromJSON('["4a","4b","4c","4d"]'), env.STAGE) }}
+        uses: actions/download-artifact@v4
+        with:
+          name: bible-stage-${{ env.REUSE_RUN_ID }}-1
+          path: /tmp/bible-prior-machine
+          run-id: ${{ env.REUSE_RUN_ID }}
+          github-token: ${{ github.token }}
       - name: Install stock SWORD binaries only if this stage needs them
         shell: bash
         run: |
@@ -195,6 +225,9 @@ jobs:
           set -euo pipefail
           mkdir -p "$REPORT_DIR"
           args=(--resource-id "$RESOURCE_ID" --stage "$STAGE" --report-dir "$REPORT_DIR")
+          if [[ "$STAGE" =~ ^4[a-d]$ ]]; then
+            args+=(--prior-receipts /tmp/bible-prior-machine/stage4-subchecks.json)
+          fi
           if [[ "$STAGE" == "4" || "$STAGE" == "5" || "$STAGE" == "4-5" ]]; then
             args+=(--native-index-binary "$INSPECTOR_DIR/sword-native-index")
             args+=(--native-raw-binary "$INSPECTOR_DIR/sword-native-raw-corpus")
