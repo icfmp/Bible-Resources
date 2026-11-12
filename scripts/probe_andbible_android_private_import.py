@@ -56,7 +56,7 @@ def safe_controls(xml: bytes) -> list[dict]:
             value=node.attrib.get(key,"").strip()
             label=value.upper()
             candidate_file=(value.startswith("JND2024Repai") and len(value)<=48
-                            and re.fullmatch(r"JND2024Repai[A-Za-z0-9 ._\\u2026-]*",value) is not None)
+                            and re.fullmatch(r"JND2024Repai[A-Za-z0-9 ._…-]*",value) is not None)
             if label in SAFE_UI or candidate_file:
                 item={"label":("JND2024REPAIRRESEARCH.ZIP" if candidate_file else label),
                       "x":(x1+x2)//2,"y":(y1+y2)//2}
@@ -126,7 +126,7 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
                         "status":"research_only_android_ui_attempt_no_approval",
                         "trace":trace,
                         "android_gui_import_confirmed":False},
-                       indent=2,sort_keys=True)+"\\n",encoding="utf-8")
+                       indent=2,sort_keys=True)+"\n",encoding="utf-8")
     checkpoint("private_zip_pushed_and_official_apk_started")
     screenshots={}
     screenshots["01-startup"]=capture_png(evidence_dir/"01-andbible-startup.png")
