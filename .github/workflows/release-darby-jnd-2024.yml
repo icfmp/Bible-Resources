@@ -27,7 +27,47 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  detect-already-attested-module:
+    runs-on: ubuntu-24.04
+    outputs:
+      already_attested: ${{ steps.check.outputs.already_attested }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Distinguish initial private build from already audited final-module PR
+        id: check
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,re
+          folder=Path('modules/darby-jnd-2024')
+          payload=folder/'payload'
+          proof=folder/'RELEASE_PROVENANCE.json'
+          if payload.exists() != proof.exists():
+              raise SystemExit('Incomplete final module: cannot skip source-audited builder')
+          if not payload.exists():
+              print('already_attested=false', file=open(os.environ['GITHUB_OUTPUT'],'a'))
+          else:
+              manifest=json.loads(proof.read_text())
+              metadata=json.loads((folder/'metadata.json').read_text())
+              files=sorted(p.relative_to(payload).as_posix()
+                           for p in payload.rglob('*') if p.is_file())
+              expected=['mods.d/brjnd2024.conf']+sorted(
+                  'modules/texts/ztext/brjnd2024/'+book+'.'+ext
+                  for book in ('nt','ot') for ext in ('bzs','bzv','bzz'))
+              if (manifest.get('status')!='source_and_native_attested_release_candidate'
+                      or manifest.get('release_tag')!='darby-jnd-2024-0.1.0'
+                      or not re.fullmatch('[a-f0-9]{64}',manifest.get('release_zip_sha256',''))
+                      or metadata['quality']['status']!='approved'
+                      or sorted(files)!=sorted(expected)):
+                  raise SystemExit('Existing final module lacks reviewed complete SWORD evidence')
+              print('already_attested=true',file=open(os.environ['GITHUB_OUTPUT'],'a'))
+              print('Fully staged final resource exists; leave it to the required Validate check and separate finalizer')
+          PY
   source-attested-release:
+    needs: detect-already-attested-module
+    if: needs.detect-already-attested-module.outputs.already_attested != 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     # No Pages write/production environment in this build. The reviewed
