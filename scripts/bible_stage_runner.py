@@ -533,6 +533,17 @@ def _write_report(report_dir: Path, report: dict) -> None:
                 # no source/reader strings or private XML leave the runner.
                 if SAFE_CODE.fullmatch(code) and type(count) is int:
                     lines.append("- " + code + ": " + str(count))
+    subchecks = (report.get("evidence", {})
+                 .get("stage4_subcheck_receipts", {}))
+    if isinstance(subchecks, dict) and isinstance(
+            subchecks.get("subchecks"), dict):
+        lines.extend(["", "**Stage-4 machine subchecks (not editorial DONE)**"])
+        for name in ("4a", "4b", "4c", "4d"):
+            row = subchecks["subchecks"].get(name, {})
+            if row.get("status") in ("DONE", "PARTIAL", "BLOCKED",
+                                     "REVIEW_REQUIRED"):
+                lines.append("- " + name + ": `" + row["status"] +
+                             "` — exact source/tool-bound receipt in artifact")
     lines.extend(["","**Still missing / blocking**"])
     lines.extend("- "+v for v in report["missing"])
     if not report["missing"]:
@@ -541,6 +552,13 @@ def _write_report(report_dir: Path, report: dict) -> None:
                   "No Scripture text, notes or original archives are uploaded.",
                   "**This report is not publication or editorial approval.**"])
     summary.write_text("\n".join(lines)+"\n",encoding="utf-8")
+    if isinstance(subchecks, dict) and "subchecks" in subchecks:
+        target = report_dir / "stage4-subchecks.json"
+        if target.exists() or target.is_symlink():
+            raise IntakeError("Refusing to replace prior machine subcheck receipt")
+        target.write_text(json.dumps(subchecks,sort_keys=True,indent=2) + "\n",
+                          encoding="utf-8")
+
 
 
 def main(argv=None) -> int:
@@ -608,6 +626,20 @@ def main(argv=None) -> int:
         result=_status("BLOCKED",verified=[],
             missing=["Run failed: " + reason], evidence={})
         failed=True
+    if args.stage in ("4", "4-5") and not failed:
+        # Four separately reviewable, exact-input/tool-bound machine receipts
+        # from the evidence already collected. This does not re-scan a source,
+        # manufacture absent proofs, or certify that each audit was separately
+        # executed. A conclusive early loss leaves all unexecuted checks BLOCKED.
+        from stage4_subcheck_receipts import create_subcheck_receipts
+        origin = stage4 if args.stage == "4-5" else result
+        commit = os.environ.get("GITHUB_SHA", "local-unpinned")
+        url = (os.environ.get("GITHUB_SERVER_URL", "") + "/" +
+               os.environ.get("GITHUB_REPOSITORY", "") + "/actions/runs/" +
+               os.environ.get("GITHUB_RUN_ID", "")) if os.environ.get(
+                   "GITHUB_RUN_ID") else None
+        result["evidence"]["stage4_subcheck_receipts"] = create_subcheck_receipts(
+            manifest, origin, commit_sha=commit, run_url=url)
     if args.stage == "4-5":
         next_action = ("Review distinct stage 4 and 5 machine receipts and resolve "
                        "remaining editorial issues; neither stage is automatically DONE")

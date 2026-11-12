@@ -25,6 +25,8 @@ on:
       - ".github/workflows/bible-staged-audit.yml"
       - "scripts/bible_intake.py"
       - "scripts/bible_stage_runner.py"
+      - "scripts/stage4_subcheck_receipts.py"
+      - "tests/test_stage4_subcheck_receipts.py"
       - "scripts/stock_reuse_preflight.py"
       - "scripts/fast_stock_note_probe.py"
       - "tests/test_fast_stock_note_probe.py"
@@ -120,6 +122,7 @@ jobs:
         run: |
           set -euo pipefail
           python -m unittest discover -s tests -p 'test_bible_stage_runner.py' -v
+          python -m unittest discover -s tests -p 'test_stage4_subcheck_receipts.py' -v
           python -m unittest discover -s tests -p 'test_source_usfx_structure.py' -v
           python -m unittest discover -s tests -p 'test_usfx_schema_gate.py' -v
           python -m unittest discover -s tests -p 'test_maintext_fidelity_classification.py' -v
@@ -220,6 +223,7 @@ jobs:
           name: bible-stage-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             /tmp/bible-audit-report/stage-report.json
+            /tmp/bible-audit-report/stage4-subchecks.json
             /tmp/bible-audit-report/stage-summary.md
           retention-days: 90
           if-no-files-found: warn

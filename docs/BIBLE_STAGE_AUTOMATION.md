@@ -188,6 +188,52 @@ See [Darby 2024 postmortem](DARBY_2024_IMPORT_POSTMORTEM.md) for measured
 preflight and full-source timing, where the stage 4/5 optimization helped, and
 what is deliberately still pending in generic fidelity work #28/#83.
 
+## Source-bound machine receipts for subchecks 4a–4d
+
+Every completed `stage=4` or shared `stage=4-5` machine invocation
+also writes a **separate versioned `stage4-subchecks.json` artifact**.
+The independent metadata questions are:
+
+- **4a — native index:** exact occupied original-versus-SWORD source keys
+  when an actual index audit is available; otherwise `PARTIAL` or `BLOCKED`.
+- **4b — full numbered main text:** independently read native words,
+  case and punctuation; source whitespace and any unverified original/native
+  key alignment remain explicit. `DONE` is never inferred from a fast sample.
+- **4c — structure:** authorial versus native paragraph/poetry start and end
+  word, punctuation, event-kind and order screens; source whitespace,
+  cross-verse/verse-zero mapping and non-p/q styles remain unapproved.
+- **4d — stock reuse:** proven missing literal caller/type/annotation data
+  **blocks** unchanged stock reuse; a clean fast sample remains
+  `REVIEW_REQUIRED` and cannot approve reuse.
+
+Each receipt includes a schema version, exact original source/SWORD ZIP
+SHA-256, canonical manifest digest, Git **tool commit**, Action run URL,
+machine status, bounded fixed finding codes, allowlisted integer counts
+and canonical book/chapter/verse reference samples only. It also carries
+explicit dependency hashes (4b requires 4a, 4c requires 4b, 4d depends
+on 4a/4b/4c), while noting which full-corpus scans truly ran. The
+`stage-report.json` still holds the regular stage evidence; the separate
+receipt is a **metadata-only review/index document**, never Scripture or
+note content.
+
+`verify_receipts_for_reuse(...)` rejects mismatched source/module SHA,
+canonical manifest, Git commit, missing/untrusted Action URL, stale
+dependency hashes, rewritten machine status, missing source acquisition,
+unrecognized fields, unsafe references and accidental private prose.
+It returns the original **machine-only** status (including `BLOCKED`);
+it cannot grant permission to publish, accept source changes or skip
+another editor's review. A local `local-unpinned` receipt is never reusable.
+The receipt digest is an integrity check for a **trusted GitHub Actions
+artifact**, not a cryptographic signature proving the publisher's identity.
+
+**Current boundary:** These are separately *reviewable* machine questions
+derived from the existing one-pass stage-4 evidence, not yet four
+independently executable scanners. Selective 4a/4b/4c/4d dispatch and
+cross-run reuse without re-running the same reader check require a
+separately validated orchestration change under [#83](https://github.com/icfmp/Bible-Resources/issues/83).
+A green Action and a machine `DONE` in one narrow subcheck cannot close
+any seven-stage editorial gate.
+
 ## Automation coverage — honest limits
 
 | Stage | Currently automated and recorded | Remains outside automated approval |
