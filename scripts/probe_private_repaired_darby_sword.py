@@ -20,6 +20,7 @@ from repair_osis_note_links import propose as propose_links
 from repair_osis_inline_markup import propose as propose_inline
 from repair_osis_source_bytes import patch_exact_original
 from audit_omitted_verse_notes import source_cases, native_cases
+from probe_andbible_jsword import run_pinned_jsword
 from publisher_osis_sword_candidate import (
     _candidate_result, _compile_osis, _create_candidate_layout, _read_native_frames,
 )
@@ -95,7 +96,8 @@ def _diagnose_temporary_body_order(tool: Path, reader: Path, scratch: Path,
 
 def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
           diatheke: Path, schema: Path, link_plan: Path, inline_plan: Path,
-          xiphos_review_dir: Path | None = None) -> dict:
+          xiphos_review_dir: Path | None = None,
+          andbible_jsword_dir: Path | None = None) -> dict:
     original = read_pinned_publisher_osis("frajnd-2024")
     if sha(original) != SOURCE_HASH:
         raise PrivateRepairedProbeError("Exact publisher original source drifted")
@@ -221,6 +223,8 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
             if result.returncode != 0 or len(result.stdout.strip()) < 15 or len(result.stdout) > 200000:
                 raise PrivateRepairedProbeError("Private SWORD text readback failed")
             smoke.append({"reference": reference, "reader_status": "readable"})
+        jsword_receipt = (run_pinned_jsword(andbible_jsword_dir, payload, scratch, final_verses)
+                          if andbible_jsword_dir is not None else None)
         xiphos_receipt = None
         if xiphos_review_dir is not None:
             if (xiphos_review_dir.is_symlink() or not xiphos_review_dir.is_dir()
@@ -289,6 +293,7 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
         "candidate_binary_sha256_not_public_release": metrics["compiled_payload_sha256"],
         "original_or_compiled_binary_uploaded": False,
         "xiphos_gui_links_tested": False,
+        "andbible_stable_jsword_engine_probe": jsword_receipt,
         "xiphos_exact_candidate_gui_probe": xiphos_receipt,
         "published_or_editorially_approved": False,
     }
@@ -301,6 +306,8 @@ def main():
         p.add_argument("--" + name, required=True, type=Path)
     p.add_argument("--xiphos-review-dir", type=Path,
                    help="Optional empty directory for real isolated Xiphos screenshots; no SWORD artifact upload")
+    p.add_argument("--andbible-jsword-dir", type=Path,
+                   help="Exact pinned AndBible 5.1 JSword checkout for private Java engine test")
     args = p.parse_args()
     if args.report.is_symlink() or args.report.exists() or not args.report.parent.is_dir():
         p.error("Output must be a fresh metadata-only report")
@@ -308,7 +315,8 @@ def main():
         osis2mod=args.osis2mod, native_index=args.native_index,
         native_raw=args.native_raw, diatheke=args.diatheke, schema=args.schema,
         link_plan=args.link_plan, inline_plan=args.inline_plan,
-        xiphos_review_dir=args.xiphos_review_dir)
+        xiphos_review_dir=args.xiphos_review_dir,
+        andbible_jsword_dir=args.andbible_jsword_dir)
     args.report.write_text(json.dumps(report, indent=2, sort_keys=True)+"\n",
                            encoding="utf-8")
     print("Exact private repaired source/native reader gate passed; no release made")

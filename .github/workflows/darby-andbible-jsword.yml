@@ -1,0 +1,115 @@
+name: Verify corrected Darby with AndBible stable JSword (no release)
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/darby-andbible-jsword.yml"
+      - "scripts/probe_andbible_jsword.py"
+      - "scripts/probe_private_repaired_darby_sword.py"
+      - "tests/java/org/icfmp/research/DarbyAndBibleJSwordProbeTest.java"
+      - "scripts/repair_osis_source_bytes.py"
+      - "config/publisher-osis/frajnd-2024-note-link-research.json"
+      - "config/publisher-osis/frajnd-2024-inline-markup-research.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  private-andbible-jsword:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: scripts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "11"
+      - name: Install private audit dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Check actual source note edits before touching Java engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p 'test_repair_osis_source_bytes.py' -v
+          python -m unittest discover -s tests -p 'test_audit_omitted_verse_notes.py' -v
+      - name: Acquire exact JSword source used by stable AndBible 5.1.1117
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/darby-private-jsword"
+          git clone --quiet --filter=blob:none --no-checkout \
+            https://github.com/AndBible/jsword.git \
+            "$RUNNER_TEMP/darby-private-jsword/andbible-jsword"
+          git -C "$RUNNER_TEMP/darby-private-jsword/andbible-jsword" \
+            fetch --quiet --depth=1 origin \
+            6ebd10a005fa7761e611c048ececea1430e22546
+          git -C "$RUNNER_TEMP/darby-private-jsword/andbible-jsword" \
+            checkout --quiet --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/darby-private-jsword/andbible-jsword" rev-parse HEAD)" = \
+            "6ebd10a005fa7761e611c048ececea1430e22546"
+          test -f "$RUNNER_TEMP/darby-private-jsword/andbible-jsword/build.gradle.kts"
+          echo "Confirmed exact JSword submodule of AndBible production-1117"
+      - name: Install independent native SWORD readback and compiler prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 150s sudo apt-get -o Acquire::Retries=1 update -qq
+          timeout 180s sudo apt-get -o Acquire::Retries=1 install -y \
+            libsword-dev libsword-utils diatheke subversion cmake ninja-build \
+            zlib1g-dev libbz2-dev liblzma-dev libicu-dev libcurl4-openssl-dev
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp \
+            -o "$RUNNER_TEMP/darby-private-jsword/native-index" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_corpus.cpp \
+            -o "$RUNNER_TEMP/darby-private-jsword/native-raw" -lsword
+      - name: Build pinned CrossWire SWORD r3918 compiler
+        shell: bash
+        run: |
+          set -euo pipefail
+          svn export --non-interactive --quiet -r 3918 \
+            https://crosswire.org/svn/sword/trunk \
+            "$RUNNER_TEMP/darby-private-jsword/sword-r3918"
+          cmake -S "$RUNNER_TEMP/darby-private-jsword/sword-r3918" \
+            -B "$RUNNER_TEMP/darby-private-jsword/sword-r3918-build" \
+            -G Ninja -DCMAKE_BUILD_TYPE=Release -DSWORD_BUILD_UTILS=YES \
+            -DSWORD_BUILD_TESTS=NO -DSWORD_BUILD_EXAMPLES=NO
+          cmake --build "$RUNNER_TEMP/darby-private-jsword/sword-r3918-build" \
+            --target osis2mod --parallel 4
+          compiler="$(find "$RUNNER_TEMP/darby-private-jsword/sword-r3918-build" \
+            -type f -name osis2mod -perm /111 -print -quit)"
+          test -n "$compiler"
+          test -x "$compiler"
+          echo "PINNED_COMPILER=$compiler" >> "$GITHUB_ENV"
+      - name: Verify the same official SHA-pinned OSIS XSD as original audited edition
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/fetch_reviewed_schema.py \
+            --directory "$RUNNER_TEMP/darby-private-jsword/schema"
+      - name: Independently decode exact fully audited repaired module in AndBible JSword
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/probe_private_repaired_darby_sword.py \
+            --osis2mod "$PINNED_COMPILER" \
+            --native-index "$RUNNER_TEMP/darby-private-jsword/native-index" \
+            --native-raw "$RUNNER_TEMP/darby-private-jsword/native-raw" \
+            --diatheke "$(command -v diatheke)" \
+            --schema "$RUNNER_TEMP/darby-private-jsword/schema/osisCore.2.1.1-cw-latest.xsd" \
+            --link-plan config/publisher-osis/frajnd-2024-note-link-research.json \
+            --inline-plan config/publisher-osis/frajnd-2024-inline-markup-research.json \
+            --andbible-jsword-dir "$RUNNER_TEMP/darby-private-jsword/andbible-jsword" \
+            --report "$RUNNER_TEMP/darby-private-jsword/report.json"
+      - name: Upload ONLY safe metadata, never edited source or any Bible module
+        uses: actions/upload-artifact@v4
+        with:
+          name: darby-andbible-jsword-private-metadata-${{ github.run_id }}
+          path: ${{ runner.temp }}/darby-private-jsword/report.json
+          retention-days: 30
+          if-no-files-found: error
