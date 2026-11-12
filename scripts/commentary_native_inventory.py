@@ -25,7 +25,7 @@ from pilot_preflight import PilotError, inspect_archive
 
 MAX_OUTPUT = 12 * 1024 * 1024
 KEY = re.compile(r"^[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*\.[1-9][0-9]*$")
-INTRO = re.compile(r"^[1-4]?[A-Za-z][A-Za-z0-9]*(?:\.0\.0|\.[1-9][0-9]*\.0)?$")
+INTRO = re.compile(r"^[1-4]?[A-Za-z][A-Za-z0-9]*(?:\.0\.0|\.[1-9][0-9]*(?:\.0)?)?$")
 VERSION = re.compile(r"^[0-9]+\.[0-9]+\.[0-9]+$")
 SYSTEM = re.compile(r"^[A-Za-z][A-Za-z0-9]{0,31}$")
 DRIVERS = {"RawCom", "RawCom4", "zCom", "zCom4"}
