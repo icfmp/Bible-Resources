@@ -1,0 +1,25 @@
+{
+  "complete_release_member_sha256": {
+    "mods.d/brjnd2024.conf": "f52f62c1750f4a5576ba3578f25a3961617d927fd5db60b619d247b5ac0f3db1",
+    "modules/texts/ztext/brjnd2024/nt.bzs": "ee0b18d9eb7398a52d6d2d96a1249f48755531dc98a892a88dd37b4510b4bac6",
+    "modules/texts/ztext/brjnd2024/nt.bzv": "4e6c77f1708e12c862edc2d927323adbdca60e006e297329f488e453e7735498",
+    "modules/texts/ztext/brjnd2024/nt.bzz": "66cfe1539b2b997264d19ce4cbb6b27ab861487824e918dc0ec0d57cf9e13243",
+    "modules/texts/ztext/brjnd2024/ot.bzs": "ccf84dfb4099c19f1206b44eb130fe9bfe78d02ac08e9fb81b38a948c4bbe908",
+    "modules/texts/ztext/brjnd2024/ot.bzv": "4db272cac1b0b1e809e5276a6220318c5d07d077d023b528cb4ad1e7eb98c2aa",
+    "modules/texts/ztext/brjnd2024/ot.bzz": "96f73ca16c6086f6aabdaa9e1c79cb3a649e1df813de29faba45432abeb4da0e"
+  },
+  "corrected_candidate_osis_sha256": "1f0d439b20b763e3548a05bb766d9f59447918f973ea92f8695d7578e096178a",
+  "full_native_audit_sha256": "3ae44db7e82a65453690de9ff414aa4d2f8b39bc424ac66c7354071b7f9baba5",
+  "identity_only_promotion_zip_sha256": "41e33e93d0b440c8f7fa6493b280287cba93b0cdeb56243156ea57c3af074d7c",
+  "original_publisher_osis_sha256": "2204629e3efb3024dceb392780ef5e61f4296ea832c90e3dd2a5c3224179c1d3",
+  "promoted_and_public_zip_member_bytes_identical": true,
+  "public_zip_format": "canonical_Bible_Resources_catalogue_build",
+  "published": false,
+  "release_tag": "darby-jnd-2024-0.1.0",
+  "release_zip_bytes": 1958165,
+  "release_zip_sha256": "5910669e5eeb85d2ba06a4602918ce71d6773f36d64502bbdf7f96fff0585f15",
+  "review_approval_sha256": "bb17f780678394cd152ab70ae46ab36a130ad5d2085db16220a9e81940b301bf",
+  "six_ztext_payload_files_byte_identical_to_full_native_audit": true,
+  "source_research_preview_sha256": "281f18311a5f0709406c5bc5ec436a7fe37a7f0b5f7b086c2bd1f5141ff7ec11",
+  "status": "source_and_native_attested_release_candidate"
+}
