@@ -10,6 +10,8 @@ on:
       - "scripts/repair_osis_inline_markup.py"
       - "scripts/repair_osis_source_bytes.py"
       - "tests/test_repair_osis_source_bytes.py"
+      - "scripts/audit_omitted_verse_notes.py"
+      - "tests/test_audit_omitted_verse_notes.py"
       - "config/publisher-osis/frajnd-2024-note-link-research.json"
       - "config/publisher-osis/frajnd-2024-inline-markup-research.json"
 
@@ -37,6 +39,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_repair_osis_note_links.py' -v
           python -m unittest discover -s tests -p 'test_repair_osis_inline_markup.py' -v
           python -m unittest discover -s tests -p 'test_repair_osis_source_bytes.py' -v
+          python -m unittest discover -s tests -p 'test_audit_omitted_verse_notes.py' -v
           python -m unittest discover -s tests -p 'test_publisher_osis_sword_candidate.py' -v
       - name: Install standard SWORD readback and pinned r3918 compiler prerequisites
         shell: bash
