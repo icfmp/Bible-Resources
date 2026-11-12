@@ -56,6 +56,21 @@ class AndBiblePrivateImportUiTest(unittest.TestCase):
             self.assertEqual(tap_allowlisted(controls,("DISMISS",)), "DISMISS")
             adb.assert_called_once()
 
+    def test_observed_pixel_launcher_anr_wait_is_sole_recovery_control(self):
+        xml=b"""<hierarchy>
+          <node text="Pixel Launcher isn\'t responding" bounds="[40,500][800,600]"/>
+          <node text="Close app" bounds="[70,880][760,970]"/>
+          <node text="Wait" bounds="[70,980][760,1070]"/>
+          <node text="LOAD DOCUMENTS FROM FILES" bounds="[30,1350][790,1450]"/>
+        </hierarchy>"""
+        controls=safe_controls(xml)
+        self.assertIn("WAIT", [control["label"] for control in controls])
+        self.assertNotIn("CLOSE APP", [control["label"] for control in controls])
+        with patch("probe_andbible_android_private_import.adb") as adb, \
+             patch("probe_andbible_android_private_import.time.sleep"):
+            self.assertEqual(tap_allowlisted(controls,("WAIT",)), "WAIT")
+            adb.assert_called_once()
+
     def test_file_picker_identifies_only_explicit_private_candidate(self):
         xml=b"""<hierarchy>
           <node text="JND2024RepairResearch.zip" bounds="[80,620][1000,740]"/>
