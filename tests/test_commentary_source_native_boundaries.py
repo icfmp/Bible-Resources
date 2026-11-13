@@ -141,6 +141,29 @@ class SourceVersusNativeRunBoundaryTests(unittest.TestCase):
         self.assertEqual(result["selected_native_raw_run_structure_classes"][
             "occupied_native_raw_run_differs_from_occupied_original_range_span"],1)
 
+    def test_original_declared_range_can_continue_into_different_compiled_raw_within_same_chapter(self):
+        source=original_fixture()
+        selected=b"<div>Original selected stock</div>"
+        other=b"<div>Another compilation unit</div>"
+        ledger=NativeRawRunBoundaryInventory()
+        for key,payload in (
+            ("Gen.1.1",selected),
+            ("Gen.1.2",selected),
+            ("Gen.1.3",other),
+            ("Gen.1.4",other),
+        ):
+            ledger.observe("K",key,payload)
+        result=ledger.report(source,[review_case(source,raw=selected)])
+        c=result["original_source_marker_native_run_sha256_and_metadata_only_cases"][0]
+        self.assertTrue(c["original_declared_range_end_K_occupied"])
+        self.assertFalse(c["original_declared_end_K_key_inside_selected_raw_run"])
+        self.assertEqual(c["original_explicit_verse_range_declared_numeric_verse_count"],3)
+        self.assertEqual(c["original_declared_range_native_occupied_K_key_count"],3)
+        self.assertEqual(c["original_declared_range_native_K_same_raw_as_selected_count"],2)
+        self.assertEqual(c["original_declared_range_native_K_other_raw_count"],1)
+        self.assertFalse(c["native_raw_run_occupied_K_keys_equal_occupied_K_keys_within_declared_original_range"])
+        self.assertTrue(c["native_raw_run_K_key_numbers_are_truly_consecutive_within_one_chapter"])
+
     def test_original_source_hash_identity_and_compiled_selected_raw_digest_fail_closed(self):
         source=original_fixture()
         ledger=NativeRawRunBoundaryInventory()
