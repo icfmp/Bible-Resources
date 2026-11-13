@@ -1,0 +1,138 @@
+name: Verify original MHCC with reviewed LSG in real Xiphos reader (private)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/commentary-xiphos-dual-reader.yml'
+      - 'scripts/commentary_xiphos_dual_reader.py'
+      - 'tests/test_commentary_xiphos_dual_reader.py'
+      - 'modules/lsg-1910/payload/**'
+      - 'config/catalogue-import-lsg-0.1.0.json'
+      - 'config/commentary-intake/**'
+  workflow_dispatch:
+    inputs:
+      resource_id:
+        description: Exact reviewed CrossWire commentary research manifest
+        required: true
+        type: string
+        default: mhcc-crosswire
+
+permissions:
+  contents: read
+concurrency:
+  group: commentary-dual-xiphos-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  original-commentary-plus-reviewed-bible:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    env:
+      RESOURCE_ID: ${{ github.event.inputs.resource_id || 'mhcc-crosswire' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned research dependencies and run synthetic safety tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          python -m unittest discover -s tests -p 'test_commentary_xiphos_dual_reader.py' -v
+      - name: Install real Xiphos and isolated X11 clipboard helpers
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          timeout 180s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y \
+            xiphos xvfb xdotool xclip dbus-x11 diatheke
+          command -v xiphos
+          command -v diatheke
+          command -v xclip
+      - name: Install exact published LSG and exact original MHCC privately; inspect reader
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_xiphos_dual_reader.py \
+            --resource-id "$RESOURCE_ID" \
+            --seconds 12 \
+            --report "$RUNNER_TEMP/commentary-xiphos-dual-reader.json"
+      - name: Gate actual dual-module installation and independent real GUI passage evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          data=json.loads((Path(os.environ["RUNNER_TEMP"])/"commentary-xiphos-dual-reader.json").read_text())
+          manifest=json.loads((Path("config/commentary-intake")/(os.environ["RESOURCE_ID"]+".json")).read_text())
+          assert data["schema_version"]==1
+          assert data["status"]=="pinned_original_MHCC_plus_attested_Bible_real_Xiphos_reader_probe"
+          assert data["resource_id"]==manifest["resource_id"]
+          assert data["original_module_id"]=="MHCC"
+          assert data["exact_original_commentary_zip_sha256"]==manifest["archive_sha256"]
+          assert data["exact_original_commentary_conf_sha256"]==manifest["stock_conf_sha256"]
+          bible=data["installed_reviewed_bible"]
+          assert bible["module_id"]=="BRLSG1910"
+          assert bible["version"]=="lsg-0.1.0"
+          assert bible["versification"]=="Segond"
+          assert bible["all_five_published_bible_files_sha256_attested"] is True
+          assert data["both_real_sword_modules_have_nonempty_diatheke_readback"] is True
+          assert 2<=data["sample_count"]<=3
+          assert len(data["actual_substantive_sample_references"])==data["sample_count"]
+          assert all(isinstance(x,str) and re.fullmatch(
+              r"[1-4]?[A-Za-z][A-Za-z ]{0,35} [1-9][0-9]{0,2}:[1-9][0-9]{0,2}",x
+          ) for x in data["actual_substantive_sample_references"])
+          assert isinstance(data["original_sparse_commentary_slots_skipped"],list)
+          assert data["unoccupied_stock_verses_silently_reintroduced"] is False
+          assert data["real_xiphos_executable_started_and_visible"] is True
+          assert data["original_source_SWORD_PATH_isolated"] is True
+          assert data["real_main_reader_window_found"] is True
+          assert data["actual_passage_commands_accepted"] is True
+          samples=data["commentary_clipboard_match_by_passage"]
+          # JSON metadata has sorted keys: order is not original source order.
+          assert len(samples)==data["sample_count"]
+          assert set(samples)==set(data["actual_substantive_sample_references"])
+          assert all(type(value) is bool for value in samples.values())
+          counts=data["copied_gui_clipboard_byte_count_by_passage"]
+          assert set(counts)==set(samples)
+          assert all(type(n) is int and 0<=n<=256000 for n in counts.values())
+          focus=data["bounded_right_commentary_pane_focus_attempts_by_passage"]
+          assert set(focus)==set(samples)
+          assert all(type(value) is int and 0<=value<=2 for value in focus.values())
+          failures=data["bounded_xiphos_ui_failed_action_by_passage"]
+          assert isinstance(failures,dict) and set(failures)<=set(samples)
+          assert all(isinstance(x,str) and len(x)<=45 for x in failures.values())
+          assert data["independent_gui_commentary_excerpt_match_count"]==sum(samples.values())
+          # Do not approve partial GUI text evidence as complete sample pass.
+          assert data["independent_gui_commentary_excerpt_match_count"]==data["sample_count"], (
+              "Not all independently selected substantive original MHCC entries "
+              "were actually retrieved from the Xiphos GUI commentary pane."
+          )
+          assert data["entire_original_commentary_content_and_links_gui_verified"] is False
+          assert data["owner_rights_editorial_approval"] is False
+          assert data["published"] is False
+          assert data["commentary_or_bible_text_uploaded"] is False
+          assert data["screenshots_uploaded"] is False
+          print("Private real Xiphos GUI commentary excerpt matched original; entire corpus/UI remain unapproved")
+          PY
+      - name: Preserve bounded metadata only; never upload original commentary, Bible or screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: original-mhcc-plus-lsg-xiphos-metadata-${{ github.run_id }}
+          path: ${{ runner.temp }}/commentary-xiphos-dual-reader.json
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Declare reader acceptance scope
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo 'Real Ubuntu-packaged Xiphos loaded in disposable Xvfb with both CrossWire original MHCC and our SHA-attested published BRLSG1910.'
+            echo 'Actual Xiphos Ctrl+L and Alt+C shortcuts attempt synced commentary; transient clipboard is compared only to authentic private diatheke text.'
+            echo 'This is NOT approval of all 29,975 entries, headings, hyperlinks or full passage/navigation/typography fidelity.'
+            echo 'No original words, screenshots or SWORD archives are published. Owner legal/editorial and release gates remain open.'
+          } >> "$GITHUB_STEP_SUMMARY"
