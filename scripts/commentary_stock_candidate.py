@@ -47,7 +47,13 @@ def private_relabel_config(original: bytes, old_id: str, candidate_id: str) -> b
     except UnicodeError:
         raise PilotError("Original stock SWORD .conf is not verified UTF-8") from None
     lines=original.splitlines(keepends=True)
-    if not lines or lines[0].rstrip(b"\r\n") != f"[{old_id}]".encode("ascii"):
+    headers=[i for i,line in enumerate(lines)
+             if line.rstrip(b"\r\n").startswith(b"[")
+             and line.rstrip(b"\r\n").endswith(b"]")]
+    if (len(headers)!=1 or
+            lines[headers[0]].rstrip(b"\r\n") != f"[{old_id}]".encode("ascii") or
+            any(line.strip() and not line.lstrip().startswith((b"#",b";"))
+                for line in lines[:headers[0]])):
         raise PilotError("Actual original stock SWORD .conf section differs")
     source_path=f"DataPath=./modules/comments/zcom/{old_id.lower()}/".encode("ascii")
     destination_path=f"DataPath=./modules/comments/zcom/{candidate_id.lower()}/".encode("ascii")
@@ -55,8 +61,11 @@ def private_relabel_config(original: bytes, old_id: str, candidate_id: str) -> b
     if len(matches)!=1:
         raise PilotError("Actual original compressed commentary DataPath must occur exactly once")
     edited=list(lines)
-    edited[0]=edited[0].replace(f"[{old_id}]".encode("ascii"),
-                               f"[{candidate_id}]".encode("ascii"),1)
+    section_index=headers[0]
+    edited[section_index]=edited[section_index].replace(
+        f"[{old_id}]".encode("ascii"),
+        f"[{candidate_id}]".encode("ascii"),1
+    )
     index=matches[0]
     edited[index]=edited[index].replace(source_path,destination_path,1)
     rebuilt=b"".join(edited)
