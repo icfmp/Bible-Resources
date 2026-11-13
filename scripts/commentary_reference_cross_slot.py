@@ -194,6 +194,8 @@ class ReferenceCrossSlotTopology:
             raise PilotError("Cross-slot original source word differences do not reconcile")
         source_categories = Counter()
         compiled_categories = Counter()
+        original_target_x_label_location = defaultdict(Counter)
+        unmatched_target_scope_x_label_location = defaultdict(Counter)
         marker_census = Counter()
         no_stock_cases = []
         priority_cases = []
@@ -213,25 +215,48 @@ class ReferenceCrossSlotTopology:
             exact_matches += exact
             literal_qualifier_matches += qualifier
             selected_values = Counter(selected_stock_targets)
+            source_match_statuses = original_link_target_match_statuses(orig, selected_stock_targets)
+            if (source_match_statuses.count("raw_target_exact_match") != exact or
+                    source_match_statuses.count("literal_Bible_work_prefix_only_match") != qualifier or
+                    source_match_statuses.count("unpaired_original_target") != sum(remain_source.values())):
+                raise PilotError("Independent per-original-link target matching disagrees with multiset audit")
             source_values = Counter(
                 link["private_original_osisRef_target"] for link in orig
             )
             this_source = Counter()
             this_stock = Counter()
-            for target, occurrences in remain_source.items():
+
+            def source_unpaired_scope(target: str) -> str:
                 if target in selected_values or (
                     target.startswith("Bible:") and target[len("Bible:"):] in selected_values
                 ):
-                    category = "same_entry_reference_target_multiplicity_shortfall"
-                elif target.startswith("Bible:") and len(target) > len("Bible:"):
-                    category = self._stock_target_scope(
+                    return "same_entry_reference_target_multiplicity_shortfall"
+                if target.startswith("Bible:") and len(target) > len("Bible:"):
+                    return self._stock_target_scope(
                         book, chapter, start, target[len("Bible:"):],
                         self.stock_positions.get((book, target[len("Bible:"):]), set())
                     )
-                elif not target:
-                    category = "original_source_target_is_empty"
-                else:
-                    category = "original_target_not_literal_Bible_work_qualified_unreviewed"
+                if not target:
+                    return "original_source_target_is_empty"
+                return "original_target_not_literal_Bible_work_qualified_unreviewed"
+
+            # Check each genuine source link label against the exact selected raw
+            # stock entry, not a synthetic title or guessed authorial verse range.
+            for link, status in zip(orig, source_match_statuses):
+                label_classes = link_label_location([link], raw)[
+                    "original_scripRef_to_stock_text_location_classes"
+                ]
+                if sum(label_classes.values()) != 1 or len(label_classes) != 1:
+                    raise PilotError("An original source scripture label has ambiguous location")
+                label_class = next(iter(label_classes))
+                original_target_x_label_location[status][label_class] += 1
+                if status == "unpaired_original_target":
+                    unmatched_target_scope_x_label_location[
+                        source_unpaired_scope(link["private_original_osisRef_target"])
+                    ][label_class] += 1
+
+            for target, occurrences in remain_source.items():
+                category = source_unpaired_scope(target)
                 source_categories[category] += occurrences
                 this_source[category] += occurrences
             for target, occurrences in remain_stock.items():
