@@ -115,6 +115,17 @@ def analyze_source(source: bytes, references: list[str]) -> tuple[dict, dict]:
                       if not verse.get("eID")), None)
         if first:
             first_para_refs.add(first)
+    paragraph_ws_patterns = Counter()
+    paragraph_ws_examples = {}
+    for ref in sorted(first_para_refs):
+        if ref not in strings:
+            continue
+        s = shape(strings[ref])
+        key = ("lf_" + str(s["leading_lf"]) +
+               "_space_" + str(s["leading_ascii_spaces"]) +
+               "_nbsp_" + str(s["leading_nbsp"]))
+        paragraph_ws_patterns[key] += 1
+        paragraph_ws_examples.setdefault(key, ref)
     occurrences = Counter()
     marker_refs = []
     triple_refs = []
@@ -145,6 +156,8 @@ def analyze_source(source: bytes, references: list[str]) -> tuple[dict, dict]:
                 suspicious_nonfirst.append(ref)
     summary = {
         "original_verse_count": len(strings),
+        "original_paragraph_start_whitespace_patterns": dict(sorted(paragraph_ws_patterns.items())),
+        "original_paragraph_start_whitespace_example_refs": dict(sorted(paragraph_ws_examples.items())),
         "original_note_count": metadata["publisher_numbered_note_count"],
         "whole_source_leading_marker_counts": dict(sorted(occurrences.items())),
         "semantic_candidate_categories_not_editorial_certification": dict(sorted(semantic_groups.items())),
@@ -217,6 +230,7 @@ def main(argv=None):
                      references=args.ref)
     args.report.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print("Checked pinned source and exact native SWORD paragraph samples.")
+    print("Original paragraph whitespace patterns:", json.dumps(result["original_source_marker_summary"]["original_paragraph_start_whitespace_patterns"], sort_keys=True))
     print("Source leading marker counts:", json.dumps(result["original_source_marker_summary"]["whole_source_leading_marker_counts"], sort_keys=True))
     print("Candidate marker meanings:", json.dumps(result["original_source_marker_summary"]["semantic_candidate_categories_not_editorial_certification"], sort_keys=True))
     print("Unresolved marker references:", result["original_source_marker_summary"]["bounded_unresolved_marker_references"])
