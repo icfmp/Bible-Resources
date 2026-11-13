@@ -155,6 +155,30 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
         with self.assertRaisesRegex(PilotError, "outside reviewed"):
             _commentary_pane_focus_points({"DISPLAY": ":91"}, "101")
 
+    def test_repeated_verse_focus_does_not_wait_for_pointer_motion_at_same_point(self):
+        from commentary_xiphos_dual_reader import attempt_real_xiphos_passage_copy
+        probes = {
+            "Gen 1:1": {"commentary": b"source", "bible": b"bible"},
+            "Ps 23:1": {"commentary": b"source", "bible": b"bible"},
+        }
+        with patch("commentary_xiphos_dual_reader._main_xiphos_window", return_value="101"), \
+             patch("commentary_xiphos_dual_reader._commentary_pane_focus_points",
+                   return_value=((1000, 390),)), \
+             patch("commentary_xiphos_dual_reader._seed_x11_clipboard"), \
+             patch("commentary_xiphos_dual_reader._long_commentary_excerpt_is_on_gui_clipboard",
+                   return_value=True), \
+             patch("commentary_xiphos_dual_reader.time.sleep"), \
+             patch("commentary_xiphos_dual_reader._x11", return_value=b"copied") as x11:
+            result = attempt_real_xiphos_passage_copy(
+                {"DISPLAY": ":91", "GDK_BACKEND": "x11"}, probes,
+            )
+        self.assertTrue(result["actual_passage_commands_accepted"])
+        self.assertEqual(result["independent_gui_commentary_excerpt_match_count"], 2)
+        pointer = [c.args[0] for c in x11.call_args_list
+                   if c.args[0][:2] == ["xdotool", "mousemove"]]
+        self.assertEqual(len(pointer), 2)
+        self.assertTrue(all("--sync" not in command for command in pointer))
+
     def test_no_user_display_or_wayland_gui_capture(self):
         with self.assertRaisesRegex(PilotError, "Unsafe virtual"):
             attempt_real_xiphos_passage_copy(
