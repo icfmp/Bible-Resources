@@ -55,7 +55,7 @@ jobs:
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
           timeout 180s sudo apt-get -o Acquire::Retries=0 \
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y \
-            libsword-dev diatheke xiphos xvfb xdotool xclip dbus-x11
+            libsword-dev diatheke xiphos xvfb xdotool xclip dbus-x11 \
             python3-pyatspi at-spi2-core
           command -v diatheke
           command -v xiphos
