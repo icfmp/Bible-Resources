@@ -56,7 +56,7 @@ class TestDivisionMarkerRemediation(unittest.TestCase):
         self.assertTrue(first["Gen.1.4"].lstrip().startswith("*"))
         self.assertFalse(first["Gen.1.6"].lstrip().startswith("*"))
         tags = list(_source_tree(corrected).iter(OSIS + "milestone"))
-        self.assertEqual([n.get("marker") for n in tags], ["*", "**", "***", "*", "*"])
+        self.assertEqual([n.get("marker") for n in tags], ["*", "**", "*", "*", "***"])
 
     def test_exact_source_sha_is_mandatory(self):
         with self.assertRaises(DivisionRepairError):
