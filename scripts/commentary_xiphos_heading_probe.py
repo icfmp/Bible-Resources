@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
-"""PRIVATE real-Xiphos commentary book/chapter-introduction context-menu probe.
+"""PRIVATE real-Xiphos chapter-introduction rendering and context-menu probe.
 
 Use original, full-native-corpus SHA-pinned SWORD intro entries and actual X11
-menu/clipboard interaction. The result is metadata only. An unsuccessful menu
-attempt is INCONCLUSIVE, never evidence of missing upstream commentary text.
+chapter-pane/clipboard interaction. Independently test normal chapter display
+BEFORE attempting the context menu: Xiphos's GTKChapDisp::RenderOneChapter
+calls introMaterial() for 0-key entries when its headings option is enabled.
+The result is metadata only. Unsuccessful UI observations are INCONCLUSIVE,
+never evidence of missing upstream commentary text.
 """
 from __future__ import annotations
 
@@ -231,6 +234,28 @@ def _intro_in_gui_clipboard(intro: bytes, copied: bytes, verse_text: bytes) -> b
     return False
 
 
+def _normal_chapter_intro_in_real_gui(
+    env: dict, points, original: bytes, ordinary: bytes,
+) -> bool:
+    """Read actual *normal* commentary pane with two independently located focus points.
+
+    No key/menu action or copied words are accepted as evidence by themselves:
+    compare a distinctive source-pinned 10-word intro sequence against actual
+    ephemeral GUI clipboard, independently excluding original first-verse prose.
+    """
+    for px, py in points:
+        _x11(["xdotool", "mousemove", str(px), str(py), "click", "1"], env)
+        time.sleep(.2)
+        _seed_x11_clipboard(env)
+        _x11(["xdotool", "key", "--clearmodifiers", "ctrl+a"], env)
+        _x11(["xdotool", "key", "--clearmodifiers", "ctrl+c"], env)
+        time.sleep(.5)
+        copied = _x11(["xclip", "-selection", "clipboard", "-o"], env)
+        if _intro_in_gui_clipboard(original, copied, ordinary):
+            return True
+    return False
+
+
 def probe_real_xiphos_commentary_heading_menu(
     env: dict, private_intro_raw: dict[str, bytes], *,
     ordinary_first_verse: bytes,
@@ -252,6 +277,7 @@ def probe_real_xiphos_commentary_heading_menu(
         return {"heading_context_real_main_reader_window_found": False,
                 "book_and_chapter_menu_observations": {},
                 "heading_GUI_presentation_verified": False,
+                "original_intro_in_normal_chapter_GUI_verified": False,
                 "intro_data_or_clipboard_exported": False,
                 "no_heading_missing_from_source_inferred": True}
     try:
@@ -260,6 +286,7 @@ def probe_real_xiphos_commentary_heading_menu(
         points = ()
     for kind, up in (("chapter", 1), ("book", 2)):
         status = "not_attempted"
+        normal_status = "not_attempted"
         sample = private_intro_raw.get(kind)
         if isinstance(sample, dict):
             original = sample.get("raw")
@@ -278,8 +305,10 @@ def probe_real_xiphos_commentary_heading_menu(
             ordinary = ordinary_first_verse
         if original is None:
             status = "no_authenticated_original_intro_key_for_this_scope"
+            normal_status = "no_authenticated_original_intro_key_for_this_scope"
         elif not points:
             status = "commentary_pane_geometry_unavailable"
+            normal_status = "commentary_pane_geometry_unavailable"
         else:
             try:
                 _x11(["xdotool", "windowfocus", "--sync", window], env)
@@ -291,6 +320,15 @@ def probe_real_xiphos_commentary_heading_menu(
                 ):
                     _x11(cmd, env)
                 time.sleep(1)
+                # Check actual normal chapter rendering first. Upstream Xiphos
+                # can include native introMaterial() without any popup action.
+                # Do not attribute an already-visible intro to a menu click.
+                normal_status = (
+                    "original_intro_prose_copied_from_normal_chapter_GUI"
+                    if _normal_chapter_intro_in_real_gui(
+                        env, points, original, ordinary,
+                    ) else "normal_chapter_GUI_intro_not_proven"
+                )
                 x,y = points[0]
                 _x11(["xdotool", "mousemove", str(x), str(y), "click", "3"], env)
                 time.sleep(.3)
@@ -309,13 +347,21 @@ def probe_real_xiphos_commentary_heading_menu(
                           else "menu_action_attempted_but_intro_not_proven_in_clipboard")
             except PilotError:
                 status = "real_GUI_menu_or_clipboard_action_unavailable"
+                if normal_status == "not_attempted":
+                    normal_status = "real_GUI_normal_chapter_clipboard_unavailable"
         stats[kind] = {"original_intro_sha256_attested": original is not None,
+                       "normal_chapter_GUI_observation_class": normal_status,
                        "GUI_menu_observation_class": status}
     return {
         "heading_context_real_main_reader_window_found": True,
         "book_and_chapter_menu_observations": stats,
         "heading_GUI_presentation_verified": all(
             x["GUI_menu_observation_class"] == "original_intro_prose_copied_from_real_GUI"
+            for x in stats.values()
+        ),
+        "original_intro_in_normal_chapter_GUI_verified": any(
+            x["normal_chapter_GUI_observation_class"]
+            == "original_intro_prose_copied_from_normal_chapter_GUI"
             for x in stats.values()
         ),
         "intro_data_or_clipboard_exported": False,
