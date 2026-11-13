@@ -74,15 +74,26 @@ def _real_original_targets(
                 diagnostics["short_original_reference_label_count"] += 1
             continue
         escaped_target = raw.casefold()
-        if not any(
-            seen_label == label
-            and re.search(r"(?<![a-z0-9])" + re.escape(escaped_target) +
-                          r"(?![a-z0-9])", unquote(unescape(href)).casefold())
-            and unquote(unescape(href)).casefold().startswith(("sword:", "bible:"))
+        matching = [
+            unquote(unescape(href)).casefold()
             for seen_label, href in scan.anchor_destinations
-        ):
+            if seen_label == label and re.search(
+                r"(?<![a-z0-9])" + re.escape(escaped_target) + r"(?![a-z0-9])",
+                unquote(unescape(href)).casefold(),
+            )
+        ]
+        if diagnostics is not None:
+            diagnostics["exact_authorial_label_and_href_target_joins"] += len(matching)
+        # Xiphos's own main_url_handler supports sword/bible URI and
+        # passagestudy.jsp / xiphos.url. Do not click an arbitrary external URL.
+        if not any(uri.startswith((
+            "sword://", "bible://", "passagestudy.jsp", "xiphos.url",
+        )) for uri in matching):
             if diagnostics is not None:
                 diagnostics["single_source_target_not_joined_to_GUI_count"] += 1
+                diagnostics["source_target_href_scheme_not_approved_count"] += (
+                    1 if matching else 0
+                )
             continue
         if reference not in targets:
             targets.append(reference)
@@ -218,6 +229,8 @@ def probe_real_original_osisref_click(
         "same_chapter_original_reference_count": 0,
         "short_original_reference_label_count": 0,
         "single_source_target_not_joined_to_GUI_count": 0,
+        "exact_authorial_label_and_href_target_joins": 0,
+        "source_target_href_scheme_not_approved_count": 0,
         "independent_exact_target_bible_readbacks": 0,
         "x11_pointer_shape_observed": False,
         "hover_candidate_actual_mouse_clicks": 0,
