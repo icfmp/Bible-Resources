@@ -105,7 +105,23 @@ jobs:
           assert (not toolbar["exact_original_commentary_menu_item_tapped"]
                   or (toolbar["actual_commentary_toolbar_resource_found"]
                       and toolbar["exact_original_commentary_popup_item_found"]))
-          # A screenshot hash change is not an independent authorial-text proof.
+          reader_context=data["android_reader_context_by_phase"]
+          assert set(reader_context)=={"after_app_restart","after_commentary_toolbar_attempt"}
+          allowed_ids={"bibleButton","commentaryButton","workspaceButton","optionsMenu",
+                       "strongsButton","searchButton","speakButton"}
+          for context in reader_context.values():
+              assert set(context)=={
+                  "known_reader_toolbar_resource_ids_visible",
+                  "main_bible_reader_activity_resumed",
+                  "another_andbible_activity_resumed",
+                  "ui_hierarchy_has_any_elements",
+                  "actual_commentary_rendering_verified"
+              }
+              assert isinstance(context["known_reader_toolbar_resource_ids_visible"],list)
+              assert set(context["known_reader_toolbar_resource_ids_visible"])<=allowed_ids
+              assert all(type(v) is bool for k,v in context.items() if k!="known_reader_toolbar_resource_ids_visible")
+              assert context["actual_commentary_rendering_verified"] is False
+          # No reader-toolbar absence is a claim of missing or damaged MHCC text.
           assert type(data["android_documented_intent_request_accepted"]) is bool
           assert type(data["android_screen_changed_after_reference_attempt"]) is bool
           assert type(data["android_exact_file_row_still_visible_after_selection"]) is bool
@@ -144,6 +160,7 @@ jobs:
           {
             echo 'Real official Android stable APK and original SHA-pinned CrossWire SWORD ZIP used inside disposable emulator.'
             echo 'Exact commentaryButton resource-id and MHCC (en) menu selection are probed; MHC (en) is a distinct full-edition module.'
+            echo 'Exact resumed Activity and allowlisted reader toolbar resource names are recorded to distinguish an actual Bible reader from first-run/import context.'
             echo 'Android document switching is distinct from compiled text/links rendering; full visual fidelity is not automatically certified.'
             echo 'Real file-picker selection and deep-link attempts alone do not prove successful persistent import.'
             echo 'No screenshots, original commentary words, source archive or Android emulator image are published.'
