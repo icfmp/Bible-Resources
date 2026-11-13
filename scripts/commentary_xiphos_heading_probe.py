@@ -27,8 +27,8 @@ _SHA = re.compile(r"[a-f0-9]{64}\Z")
 _BOOK = "Gen"
 _CHAPTER = "Gen.1"
 _REF = "Gen 1:1"
-_I_BOOK = re.compile(r"([1-4]?[A-Za-z][A-Za-z0-9]*)(?:\\.0\\.0)?\\Z")
-_I_CHAPTER = re.compile(r"([1-4]?[A-Za-z][A-Za-z0-9]*)\\.([1-9][0-9]*)(?:\\.0)?\\Z")
+_I_BOOK = re.compile(r"([1-4]?[A-Za-z][A-Za-z0-9]*)(?:\.0\.0)?\Z")
+_I_CHAPTER = re.compile(r"([1-4]?[A-Za-z][A-Za-z0-9]*)\.([1-9][0-9]*)(?:\.0)?\Z")
 
 
 def pinned_source_intro_witness(
