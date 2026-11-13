@@ -92,6 +92,20 @@ jobs:
           }
           assert data["android_file_picker_exact_original_zip_selected"] is True
           assert data["android_sample_reference_deeplink_attempted"] is True
+          toolbar=data["android_commentary_toolbar_selection"]
+          assert set(toolbar)=={
+              "actual_commentary_toolbar_resource_found",
+              "exact_original_commentary_popup_item_found",
+              "exact_original_commentary_menu_item_tapped",
+              "reader_source_identity_witness_after_selection",
+              "reader_screen_changed_after_selection",
+              "possible_auto_switch_without_menu"
+          }
+          assert all(type(value) is bool for value in toolbar.values())
+          assert (not toolbar["exact_original_commentary_menu_item_tapped"]
+                  or (toolbar["actual_commentary_toolbar_resource_found"]
+                      and toolbar["exact_original_commentary_popup_item_found"]))
+          # A screenshot hash change is not an independent authorial-text proof.
           assert type(data["android_documented_intent_request_accepted"]) is bool
           assert type(data["android_screen_changed_after_reference_attempt"]) is bool
           assert type(data["android_exact_file_row_still_visible_after_selection"]) is bool
@@ -129,7 +143,9 @@ jobs:
         run: |
           {
             echo 'Real official Android stable APK and original SHA-pinned CrossWire SWORD ZIP used inside disposable emulator.'
-            echo 'Real file-picker selection and documented deep link attempts do not themselves prove successful module import, persistent selection or rendered commentary text.'
+            echo 'Exact commentaryButton resource-id and MHCC (en) menu selection are probed; MHC (en) is a distinct full-edition module.'
+            echo 'Android document switching is distinct from compiled text/links rendering; full visual fidelity is not automatically certified.'
+            echo 'Real file-picker selection and deep-link attempts alone do not prove successful persistent import.'
             echo 'No screenshots, original commentary words, source archive or Android emulator image are published.'
             echo 'Independent authorial content/links/GUI inspection, rights, editorial acceptance and release remain open.'
           } >> "$GITHUB_STEP_SUMMARY"
