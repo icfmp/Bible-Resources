@@ -56,7 +56,13 @@ class TestDivisionMarkerRemediation(unittest.TestCase):
         self.assertTrue(first["Gen.1.4"].lstrip().startswith("*"))
         self.assertFalse(first["Gen.1.6"].lstrip().startswith("*"))
         tags = list(_source_tree(corrected).iter(OSIS + "milestone"))
-        self.assertEqual([n.get("marker") for n in tags], ["*", "**", "*", "*", "***"])
+        self.assertEqual([n.get("subType") for n in tags], [
+            "x-original-ascii-star-1", "x-original-ascii-star-2",
+            "x-original-ascii-star-1", "x-original-ascii-star-1",
+            "x-original-ascii-star-3",
+        ])
+        self.assertTrue(all(n.get("marker") is None for n in tags))
+        self.assertEqual(sum(int(n.get("subType").rsplit("-",1)[1]) for n in tags), 8)
 
     def test_exact_source_sha_is_mandatory(self):
         with self.assertRaises(DivisionRepairError):
