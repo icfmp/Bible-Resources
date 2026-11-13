@@ -198,6 +198,65 @@ def _screenshot_sha256() -> str:
     return sha256(data).hexdigest()
 
 
+# Only these exact resource identifiers from AndBible production-1117
+# main_bible_view.xml may be disclosed as diagnostic flags.
+KNOWN_READER_VIEW_IDS = frozenset({
+    "bibleButton", "commentaryButton", "workspaceButton",
+    "optionsMenu", "strongsButton", "searchButton", "speakButton",
+})
+
+
+def _classify_main_reader_context(xml: bytes, activity_dump: bytes) -> dict:
+    """Diagnose UI context without exporting any source prose or UI strings.
+
+    An Android test can have imported a SWORD ZIP yet still be on a welcome,
+    permission, document download or chooser screen. In that case a missing
+    commentary toolbar is not evidence of incompatible commentary content.
+    """
+    if (not isinstance(xml, bytes) or not isinstance(activity_dump, bytes)
+            or len(xml) > 3_000_000 or len(activity_dump) > 4_000_000):
+        raise PilotError("Unbounded Android layout/activity diagnostic")
+    ids = set()
+    try:
+        tree = ET.fromstring(xml) if xml else None
+    except ET.ParseError:
+        tree = None
+    if tree is not None:
+        for node in tree.iter("node"):
+            rid = node.attrib.get("resource-id", "")
+            prefix = PACKAGE + ":id/"
+            if rid.startswith(prefix):
+                name = rid[len(prefix):]
+                if name in KNOWN_READER_VIEW_IDS:
+                    ids.add(name)
+    resumed_lines = [
+        ln for ln in activity_dump.splitlines()
+        if any(name in ln for name in (
+            b"topResumedActivity", b"mResumedActivity", b"mTopResumedActivity",
+        ))
+    ]
+    reader = any(b"MainBibleActivity" in ln and PACKAGE.encode() in ln
+                 for ln in resumed_lines)
+    other_andbible = any(PACKAGE.encode() in ln for ln in resumed_lines)
+    return {
+        "known_reader_toolbar_resource_ids_visible": sorted(ids),
+        "main_bible_reader_activity_resumed": reader,
+        "another_andbible_activity_resumed": other_andbible and not reader,
+        "ui_hierarchy_has_any_elements": tree is not None,
+        "actual_commentary_rendering_verified": False,
+    }
+
+
+def _reader_context_witness() -> dict:
+    adb("shell", "uiautomator", "dump", "/sdcard/commentary-context-ui.xml",
+        timeout=40, fail=False)
+    xml = adb("exec-out", "cat", "/sdcard/commentary-context-ui.xml",
+              timeout=20, fail=False)
+    activity = adb("shell", "dumpsys", "activity", "activities",
+                   timeout=30, fail=False)
+    return _classify_main_reader_context(xml, activity)
+
+
 def _app_focus_witness() -> list[str]:
     """Record exact Android focus/lifecycle signal classes, never screen text.
 
@@ -348,9 +407,11 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
         after_restart = _screen(module_id, title)
         identity_after_restart = after_restart["reader_module_metadata_detected"]
         focus_after_restart = _app_focus_witness()
+        reader_context_after_restart = _reader_context_witness()
         # Follow the user-observed commentary books icon in the real reader
         # toolbar; this tests selection instead of guessing a deep link.
         toolbar_probe = _attempt_commentary_toolbar_selection(module_id, title)
+        reader_context_after_toolbar = _reader_context_witness()
         # Real platform request result is checked, but not equated to a
         # rendered page. A rejected Intent must remain explicitly unverified.
         intent_accepted = _dispatch_documented_reference(manifest)
@@ -390,6 +451,10 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
             "android_application_foreground_after_deeplink": bool(focus_after_link),
             "android_sample_reference_deeplink_attempted": True,
             "android_commentary_toolbar_selection": toolbar_probe,
+            "android_reader_context_by_phase": {
+                "after_app_restart": reader_context_after_restart,
+                "after_commentary_toolbar_attempt": reader_context_after_toolbar,
+            },
             "android_documented_intent_request_accepted": intent_accepted,
             "android_screen_changed_after_reference_attempt": (
                 snapshots["post_reference_dispatch"] != snapshots["after_import_attempt"]
