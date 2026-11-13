@@ -19,7 +19,7 @@ from publisher_osis_usfx_parity import original_osis_verses_and_notes, _nonspace
 from repair_osis_source_bytes import _end_of_tag
 from source_osis_inventory import _source_tree, OSIS, source_inventory
 
-PREFIX = re.compile(r"(?P<spaces>[ \t\r\n]*)(?P<mark>\*\*|\*)(?!\*)")
+PREFIX = re.compile(r"(?P<spaces>\s*)(?P<mark>\*\*|\*)(?!\*)")
 MAX_BYTES = 128 * 1024 * 1024
 KINDS = {"paragraph": "x-subject-division", "poetry": "x-stanza-division"}
 
@@ -56,12 +56,25 @@ def _candidates(original: bytes):
         if verse.get("eID") or not ref:
             continue
         match = PREFIX.match(verse.tail or "")
+        mode = "verse_tail"
+        hi_node = None
+        outer_spaces = ""
+        if match is None:
+            next_node = verse.getnext()
+            if (next_node is not None and next_node.tag == OSIS + "hi"
+                    and not (verse.tail or "").strip()):
+                match = PREFIX.match(next_node.text or "")
+                if match:
+                    mode = "following_hi"
+                    hi_node = next_node
+                    outer_spaces = verse.tail or ""
         if not match:
             continue
         if ref in candidates:
             raise DivisionRepairError("Repeated authored verse marker")
         sign = match.group("mark")
-        rest = (verse.tail or "")[match.end():]
+        segment = (hi_node.text or "") if hi_node is not None else (verse.tail or "")
+        rest = segment[match.end():]
         if sign == "*" and (rest.startswith("[") or rest.startswith("Dieu") or
                              rest.startswith("Seigneur")):
             skipped["protected_textual_symbol"] += 1
@@ -73,7 +86,8 @@ def _candidates(original: bytes):
         else:
             unresolved.append(ref)
             continue
-        candidates[ref] = (verse, kind, sign, match.group("spaces"))
+        candidates[ref] = (verse, kind, sign, match.group("spaces"),
+                           mode, hi_node, outer_spaces)
     if unresolved:
         raise DivisionRepairError(
             "Original source has leading marks without approved p/l semantics: " +
@@ -90,8 +104,13 @@ def patch_divisions(source: bytes, *, expected_sha256: str):
     original_verses, original_notes, _ = original_osis_verses_and_notes(source)
     root, candidates, skipped = _candidates(source)
     nodes = [n for n in root.iter() if isinstance(n.tag, str)]
-    selected = {n: (ref, kind, mark, spaces)
-                for ref, (n, kind, mark, spaces) in candidates.items()}
+    selected = {n: (ref, kind, mark, spaces, mode, hi, outer)
+                for ref, (n, kind, mark, spaces, mode, hi, outer) in candidates.items()}
+    selected_hi = {hi: (ref, mark, spaces)
+                   for ref, (_, _, mark, spaces, mode, hi, _) in candidates.items()
+                   if mode == "following_hi"}
+    if len(selected_hi) != sum(c[4] == "following_hi" for c in candidates.values()):
+        raise DivisionRepairError("Overlapping original wrapper markup")
     parser = expat.ParserCreate(namespace_separator="}")
     started = [0]
     patches = []
@@ -103,19 +122,25 @@ def patch_divisions(source: bytes, *, expected_sha256: str):
         if index >= len(nodes) or nodes[index].tag != "{" + name:
             raise DivisionRepairError("Original byte and XML element order differ")
         node = nodes[index]
-        if node not in selected:
-            return
-        ref, kind, mark, spaces = selected[node]
-        end = _end_of_tag(source, pos)
-        if source[end-2:end] != b"/>":
-            raise DivisionRepairError("Expected unclosed verse start milestone")
-        old = (spaces + mark).encode("utf-8")
-        if source[end:end+len(old)] != old:
-            raise DivisionRepairError("Unexpected original marker byte placement")
-        # Every marker survives exactly as an OSIS editorial attribute.
-        replacement = ('<milestone type="' + KINDS[kind] +
-                       '" marker="' + mark + '"/>').encode("ascii")
-        patches.append((end, end+len(old), replacement, ref, kind, mark))
+        if node in selected:
+            ref, kind, mark, spaces, mode, hi, outer = selected[node]
+            end = _end_of_tag(source, pos)
+            if source[end-2:end] != b"/>":
+                raise DivisionRepairError("Expected unclosed verse start milestone")
+            old = (spaces + mark if mode == "verse_tail" else outer).encode("utf-8")
+            if source[end:end+len(old)] != old:
+                raise DivisionRepairError("Unexpected original marker byte placement")
+            # Preserve original sign as an OSIS attribute, not inline prose.
+            replacement = ('<milestone type="' + KINDS[kind] +
+                           '" marker="' + mark + '"/>').encode("ascii")
+            patches.append((end, end+len(old), replacement))
+        if node in selected_hi:
+            ref, mark, spaces = selected_hi[node]
+            end = _end_of_tag(source, pos)
+            old = (spaces + mark).encode("utf-8")
+            if source[end:end+len(old)] != old:
+                raise DivisionRepairError("Unexpected wrapped symbol byte placement")
+            patches.append((end, end+len(old), b""))
 
     def deny(*_args):
         raise DivisionRepairError("DTD or external entities are forbidden")
@@ -126,14 +151,14 @@ def patch_divisions(source: bytes, *, expected_sha256: str):
     parser.ExternalEntityRefHandler = deny
     parser.SetParamEntityParsing(expat.XML_PARAM_ENTITY_PARSING_NEVER)
     parser.Parse(source, True)
-    if started[0] != len(nodes) or len(patches) != len(candidates):
+    if started[0] != len(nodes) or len(patches) != len(candidates) + len(selected_hi):
         raise DivisionRepairError("Incomplete approved marker coverage")
     patches.sort()
     if any(a[1] > b[0] for a, b in zip(patches, patches[1:])):
         raise DivisionRepairError("Overlapping source changes")
     result = bytearray()
     last = 0
-    for start, end, replacement, *_ in patches:
+    for start, end, replacement in patches:
         result.extend(source[last:start])
         result.extend(replacement)
         last = end
@@ -142,7 +167,7 @@ def patch_divisions(source: bytes, *, expected_sha256: str):
     new_root = _source_tree(corrected)
     markers = [(n.get("type"), n.get("marker")) for n in new_root.iter(OSIS + "milestone")
                if n.get("type") in set(KINDS.values())]
-    expected = [(KINDS[kind], mark) for *_, kind, mark in patches]
+    expected = [(KINDS[kind], mark) for _, kind, mark, *_ in candidates.values()]
     if sorted(markers) != sorted(expected):
         raise DivisionRepairError("Original editorial marker metadata not preserved")
     corrected_keys, _ = source_inventory(corrected)
@@ -152,7 +177,7 @@ def patch_divisions(source: bytes, *, expected_sha256: str):
     if original_verses.keys() != transformed_verses.keys() or \
             original_notes.keys() != transformed_notes.keys():
         raise DivisionRepairError("Source verses or note hosts changed")
-    edits_by_ref = {ref: mark for _, _, _, ref, _, mark in patches}
+    edits_by_ref = {ref: mark for ref, (_, _, mark, *_) in candidates.items()}
     for ref, authored in original_verses.items():
         transformed = transformed_verses[ref]
         if ref in edits_by_ref:
@@ -171,7 +196,7 @@ def patch_divisions(source: bytes, *, expected_sha256: str):
             expected_shift = len(edits_by_ref.get(ref, ""))
             if a["point"] - b["point"] != expected_shift:
                 raise DivisionRepairError("Unexplained note anchor position shift")
-    counts = Counter(kind for _, _, _, _, kind, _ in patches)
+    counts = Counter(kind for _, kind, *_ in candidates.values())
     unresolved_markers = []
     for ref, value in original_verses.items():
         m = PREFIX.match(value)
