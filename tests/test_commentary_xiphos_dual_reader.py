@@ -115,6 +115,16 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
         self.assertFalse(receipt["actual_passage_commands_accepted"])
         self.assertEqual(receipt["independent_gui_commentary_excerpt_match_count"], 0)
 
+    def test_sparse_original_source_slots_are_not_filled_with_invented_verses(self):
+        from commentary_xiphos_dual_reader import _candidate_passages
+        manifest={"sample_references":["Gen 1:1","John 3:16","Ps 23:1"]}
+        self.assertEqual(
+            _candidate_passages(manifest),
+            ("Gen 1:1","John 3:16","John 3:1","Ps 23:1"),
+        )
+        with self.assertRaisesRegex(PilotError,"Malformed"):
+            _candidate_passages({"sample_references":["Gen 0:0"]})
+
     def test_no_user_display_or_wayland_gui_capture(self):
         with self.assertRaisesRegex(PilotError, "Unsafe virtual"):
             attempt_real_xiphos_passage_copy(
