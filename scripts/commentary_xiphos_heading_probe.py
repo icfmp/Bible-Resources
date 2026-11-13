@@ -196,7 +196,7 @@ def _words(text: str) -> list[str]:
 
 
 def _intro_in_gui_clipboard(intro: bytes, copied: bytes, verse_text: bytes) -> bool:
-    """At least 4 consecutive authenticated intro words absent from verse prose."""
+    """Prove 10 consecutive authentic words (all words for shorter headings)."""
     if not isinstance(intro, bytes) or not isinstance(copied, bytes):
         raise PilotError("Unbounded source intro/GUI clipboard witness")
     if max(len(intro), len(copied), len(verse_text)) > 2_000_000:
@@ -211,14 +211,22 @@ def _intro_in_gui_clipboard(intro: bytes, copied: bytes, verse_text: bytes) -> b
     source = _words("".join(parsed.itertext()))
     displayed = _words(copied.decode("utf-8", errors="replace"))
     verse = _words(verse_text.decode("utf-8", errors="replace"))
-    if len(source) < 4 or len(displayed) < 4:
+    # A four-word phrase is too weak for long, repeated biblical exposition.
+    # Require ten consecutive original words, as promised by the acceptance
+    # gate. For a genuinely shorter heading, require its *entire* 4–9-word text.
+    if len(source) < 4:
         return False
-    for n in range(len(source) - 3):
-        phrase = source[n:n+4]
-        # Selection must be explanatory intro prose and must not be merely
-        # the unchanged currently displayed first verse commentary.
-        if (any(displayed[k:k+4] == phrase for k in range(len(displayed)-3))
-                and not any(verse[k:k+4] == phrase for k in range(max(0,len(verse)-3)))):
+    span = min(10, len(source))
+    if len(displayed) < span:
+        return False
+    for n in range(len(source) - span + 1):
+        phrase = source[n:n+span]
+        # The phrase must be independently visible in the real commentary
+        # pane, not merely be an unchanged excerpt of the ordinary verse.
+        if (any(displayed[k:k+span] == phrase
+                for k in range(len(displayed) - span + 1))
+                and not any(verse[k:k+span] == phrase
+                            for k in range(len(verse) - span + 1))):
             return True
     return False
 

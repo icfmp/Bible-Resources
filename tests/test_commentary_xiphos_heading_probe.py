@@ -33,6 +33,28 @@ class SourceNativeIntroContextMenuTests(unittest.TestCase):
         self.assertFalse(_intro_in_gui_clipboard(intro, b"Unrelated GUI text", b"unrelated verse"))
         self.assertFalse(_intro_in_gui_clipboard(intro, gui, gui))
 
+    def test_long_original_intro_needs_ten_consecutive_words(self):
+        source_words = ["originalintro%02d" % n for n in range(20)]
+        source = ("<p>" + " ".join(source_words) + "</p>").encode()
+        # Nine authentic words are not sufficient for a long source.
+        self.assertFalse(_intro_in_gui_clipboard(
+            source, (" ".join(source_words[:9])).encode(), b"Different verse text",
+        ))
+        # A word gap also breaks the required ten-word source sequence.
+        self.assertFalse(_intro_in_gui_clipboard(
+            source,
+            (" ".join(source_words[:9] + ["unrelated"] + source_words[10:19])).encode(),
+            b"Different verse text",
+        ))
+        self.assertTrue(_intro_in_gui_clipboard(
+            source, (" ".join(source_words[:10])).encode(), b"Different verse text",
+        ))
+        # A shared original verse phrase cannot prove an introduction.
+        self.assertFalse(_intro_in_gui_clipboard(
+            source, (" ".join(source_words[:10])).encode(),
+            (" ".join(source_words)).encode(),
+        ))
+
     def test_short_original_heading_can_be_verified_without_guessing_words(self):
         original=b"<title>Remarkable title of Genesis commentary</title>"
         self.assertTrue(_intro_in_gui_clipboard(
