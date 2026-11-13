@@ -23,6 +23,8 @@ on:
       - 'scripts/commentary_prose_cross_slot.py'
       - 'scripts/commentary_source_native_boundaries.py'
       - 'scripts/commentary_shared_raw_source_units.py'
+      - 'scripts/commentary_original_div1_book_consistency.py'
+      - 'tests/test_commentary_original_div1_book_consistency.py'
       - 'tests/test_commentary_shared_raw_source_units.py'
       - 'tests/test_commentary_source_native_boundaries.py'
       - 'tests/test_commentary_prose_cross_slot.py'
@@ -1235,6 +1237,221 @@ jobs:
                         "actual_original_div1_ancestry_group_classes":observed_div1_group_shapes,
                         "original_source_line_and_hash_only_groups":groups,
                     },sort_keys=True))
+          orig_div1=report["source_original_div1_osisRef_book_consistency_census"]
+          allowed_div1_fields={
+              "original_source_div1_document_total",
+              "original_div1_with_at_least_one_verse_range_source_marker_count",
+              "original_verse_range_source_units_considered",
+              "distinct_original_osisRef_book_code_count",
+              "original_osisRef_book_tokens_used_in_more_than_one_div1_count",
+              "original_scripCom_start_key_reused_across_different_div1_count",
+              "original_div1_distinct_declared_osisRef_book_token_count_distribution",
+              "original_osisRef_book_tokens_original_div1_occurrence_count_distribution",
+              "original_source_div1_heading_origin_counts",
+              "bounded_cross_div1_same_original_osisRef_start_key_sha256_cases",
+              "cross_div1_source_start_collision_examples_truncated",
+              "focused_shared_raw_source_group_original_bookcode_and_div1_heading_evidence",
+              "focused_original_source_units_reconciled",
+              "original_div1_title_metadata_only_not_certified_canonical_book_name",
+              "same_osisRef_book_code_across_original_div1_not_automatically_a_source_error",
+              "source_annotation_reference_work_and_div1_book_identity_not_normalized",
+              "no_original_book_names_heading_words_reference_values_or_native_keys_output",
+              "original_source_or_stock_bytes_modified",
+          }
+          if (not isinstance(orig_div1,dict) or set(orig_div1)!=allowed_div1_fields or
+                  not all(type(orig_div1[k]) is int and orig_div1[k]>=0 for k in (
+                      "original_source_div1_document_total",
+                      "original_div1_with_at_least_one_verse_range_source_marker_count",
+                      "original_verse_range_source_units_considered",
+                      "distinct_original_osisRef_book_code_count",
+                      "original_osisRef_book_tokens_used_in_more_than_one_div1_count",
+                      "original_scripCom_start_key_reused_across_different_div1_count",
+                      "focused_original_source_units_reconciled"
+                  )) or
+                  orig_div1["original_source_div1_document_total"] <
+                      orig_div1["original_div1_with_at_least_one_verse_range_source_marker_count"] or
+                  orig_div1["original_verse_range_source_units_considered"] !=
+                      report["source_original_verse_and_range_body_evidence"][
+                          "original_verse_or_range_body_count"] or
+                  orig_div1["original_osisRef_book_tokens_used_in_more_than_one_div1_count"] >
+                      orig_div1["distinct_original_osisRef_book_code_count"] or
+                  not all(orig_div1[k] is True for k in (
+                      "original_div1_title_metadata_only_not_certified_canonical_book_name",
+                      "same_osisRef_book_code_across_original_div1_not_automatically_a_source_error",
+                      "source_annotation_reference_work_and_div1_book_identity_not_normalized",
+                      "no_original_book_names_heading_words_reference_values_or_native_keys_output"
+                  )) or
+                  orig_div1["original_source_or_stock_bytes_modified"] is not False):
+              raise SystemExit("Original ThML div1 source/OSIS ancestry census incomplete")
+          original_distinct_book_hist=orig_div1[
+              "original_osisRef_book_tokens_original_div1_occurrence_count_distribution"
+          ]
+          original_div1_book_hist=orig_div1[
+              "original_div1_distinct_declared_osisRef_book_token_count_distribution"
+          ]
+          allowed_heading_origins={
+              "title_attribute","immediate_original_h1_or_title_child","absent"
+          }
+          def counts_with_int_or_digit_keys(v, digit_key=False):
+              return isinstance(v,dict) and all(
+                  (isinstance(k,str) and k.isdecimal() if digit_key else
+                   type(k) is int or isinstance(k,str) and k.isdecimal())
+                  and type(n) is int and n>=0 for k,n in v.items()
+              )
+          if (not counts_with_int_or_digit_keys(original_distinct_book_hist,True) or
+                  not counts_with_int_or_digit_keys(original_div1_book_hist,True) or
+                  sum(original_distinct_book_hist.values()) !=
+                      orig_div1["distinct_original_osisRef_book_code_count"] or
+                  sum(original_div1_book_hist.values()) !=
+                      orig_div1["original_div1_with_at_least_one_verse_range_source_marker_count"] or
+                  not isinstance(orig_div1["original_source_div1_heading_origin_counts"],dict) or
+                  not all(k in allowed_heading_origins and type(n) is int and n>=0
+                          for k,n in orig_div1["original_source_div1_heading_origin_counts"].items()) or
+                  sum(orig_div1["original_source_div1_heading_origin_counts"].values()) !=
+                      orig_div1["original_div1_with_at_least_one_verse_range_source_marker_count"]):
+              raise SystemExit("Original div1 book-code/heading shape totals differ")
+          collision_cases=orig_div1["bounded_cross_div1_same_original_osisRef_start_key_sha256_cases"]
+          collision_fields={
+              "original_osisRef_start_key_sha256","original_osisRef_book_code_sha256",
+              "distinct_original_div1_document_ordinals",
+              "original_source_line_and_full_ref_body_SHA256",
+              "source_reused_start_in_different_div1_is_not_evidence_of_same_authored_book",
+          }
+          collision_member_fields={
+              "original_source_line","original_full_reference_sha256",
+              "original_body_sha256","original_div1_document_ordinal",
+          }
+          if (not isinstance(collision_cases,list) or len(collision_cases)>20 or
+                  len(collision_cases)>orig_div1["original_scripCom_start_key_reused_across_different_div1_count"] or
+                  orig_div1["cross_div1_source_start_collision_examples_truncated"] is not (
+                      len(collision_cases) <
+                      orig_div1["original_scripCom_start_key_reused_across_different_div1_count"]
+                  )):
+              raise SystemExit("Original repeated source OSIS start-key cases exceed bound")
+          for case in collision_cases:
+              if (set(case)!=collision_fields or
+                  case["source_reused_start_in_different_div1_is_not_evidence_of_same_authored_book"] is not True or
+                  not all(isinstance(case[k],str) and re.fullmatch(r"[a-f0-9]{64}",case[k])
+                          for k in ("original_osisRef_start_key_sha256",
+                                    "original_osisRef_book_code_sha256")) or
+                  not isinstance(case["distinct_original_div1_document_ordinals"],list) or
+                  not 2<=len(case["distinct_original_div1_document_ordinals"])<=
+                      orig_div1["original_source_div1_document_total"] or
+                  case["distinct_original_div1_document_ordinals"]!=
+                      sorted(set(case["distinct_original_div1_document_ordinals"])) or
+                  not isinstance(case["original_source_line_and_full_ref_body_SHA256"],list) or
+                  not 2<=len(case["original_source_line_and_full_ref_body_SHA256"])<=20):
+                  raise SystemExit("Unreviewed original cross-div1 start-key report values")
+              for member in case["original_source_line_and_full_ref_body_SHA256"]:
+                  if (set(member)!=collision_member_fields or
+                      not all(isinstance(member[k],str) and re.fullmatch(r"[a-f0-9]{64}",member[k])
+                              for k in ("original_full_reference_sha256","original_body_sha256")) or
+                      type(member["original_source_line"]) is not int or
+                      member["original_source_line"]<1 or
+                      type(member["original_div1_document_ordinal"]) is not int or
+                      member["original_div1_document_ordinal"] not in
+                          case["distinct_original_div1_document_ordinals"]):
+                      raise SystemExit("Original collision source body identity not source-bound")
+          focused=orig_div1[
+              "focused_shared_raw_source_group_original_bookcode_and_div1_heading_evidence"
+          ]
+          focus_fields={
+              "native_shared_compiled_raw_SHA256","original_source_unit_count",
+              "distinct_original_div1_count","original_div1_document_ordinals",
+              "distinct_original_declared_book_token_count",
+              "distinct_nonempty_original_div1_heading_SHA256_count",
+              "all_original_source_units_claim_same_osisRef_book_code",
+              "same_claimed_book_code_occurs_in_multiple_original_div1_sections",
+              "original_source_div1_heading_hashes_distinct_when_present",
+              "actual_original_units_grouped_only_by_compiled_reference_not_original_div1",
+              "source_members_line_sha256_and_div1_heading_metadata",
+          }
+          focus_unit_fields={
+              "original_source_line","original_full_reference_sha256",
+              "original_body_sha256","original_reference_start_key_sha256",
+              "original_scripCom_declared_book_token_sha256",
+              "original_div1_document_ordinal",
+              "original_div1_title_or_direct_heading_origin",
+              "original_div1_title_or_direct_heading_sha256",
+              "original_div1_original_attribute_names",
+              "original_div1_distinct_declared_osisRef_book_tokens",
+              "original_div1_scripCom_units_claiming_this_book_token",
+              "same_book_code_reused_in_multiple_original_div1_sections",
+              "source_context_is_not_authored_stock_verse_section_approval",
+          }
+          if (not isinstance(focused,list) or len(focused)!=shared[
+                  "multi_original_source_start_same_native_raw_run_groups"] or
+                  sum(group["original_source_unit_count"] for group in focused) !=
+                  orig_div1["focused_original_source_units_reconciled"] or
+                  orig_div1["focused_original_source_units_reconciled"] !=
+                      shared["full_authentic_original_source_units_in_those_runs"]):
+              raise SystemExit("Original shared-raw groups diverged from original div1 ancestry")
+          for group in focused:
+              members=group["source_members_line_sha256_and_div1_heading_metadata"]
+              if (set(group)!=focus_fields or
+                      not isinstance(group["native_shared_compiled_raw_SHA256"],str) or
+                      not re.fullmatch(r"[a-f0-9]{64}",group["native_shared_compiled_raw_SHA256"]) or
+                      not isinstance(members,list) or
+                      not 2<=len(members)<=16 or
+                      group["original_source_unit_count"]!=len(members) or
+                      group["distinct_original_div1_count"]!=len(
+                          group["original_div1_document_ordinals"]) or
+                      group["original_div1_document_ordinals"]!=sorted(set(
+                          group["original_div1_document_ordinals"])) or
+                      group["distinct_original_declared_book_token_count"]<1 or
+                      group["distinct_nonempty_original_div1_heading_SHA256_count"] >
+                          group["distinct_original_div1_count"] or
+                      group["all_original_source_units_claim_same_osisRef_book_code"] is not (
+                          group["distinct_original_declared_book_token_count"]==1) or
+                      group["same_claimed_book_code_occurs_in_multiple_original_div1_sections"] is not (
+                          group["distinct_original_div1_count"]>1 and
+                          group["distinct_original_declared_book_token_count"]==1
+                      ) or
+                      not isinstance(group["original_source_div1_heading_hashes_distinct_when_present"],bool) or
+                      group["actual_original_units_grouped_only_by_compiled_reference_not_original_div1"] is not True):
+                  raise SystemExit("Unreviewed original source division/book claim in shared raw")
+              for member in members:
+                  if (set(member)!=focus_unit_fields or
+                      not all(isinstance(member[k],str) and re.fullmatch(r"[a-f0-9]{64}",member[k])
+                              for k in ("original_full_reference_sha256","original_body_sha256",
+                                        "original_reference_start_key_sha256",
+                                        "original_scripCom_declared_book_token_sha256")) or
+                      member["original_div1_document_ordinal"] not in
+                          group["original_div1_document_ordinals"] or
+                      member["original_div1_title_or_direct_heading_origin"] not in
+                          allowed_heading_origins or
+                      (member["original_div1_title_or_direct_heading_sha256"] is not None and
+                       (not isinstance(member["original_div1_title_or_direct_heading_sha256"],str) or
+                        not re.fullmatch(r"[a-f0-9]{64}",
+                                         member["original_div1_title_or_direct_heading_sha256"]))) or
+                      not isinstance(member["original_div1_original_attribute_names"],list) or
+                      not all(re.fullmatch(r"[A-Za-z][A-Za-z0-9_.:-]{0,95}",name)
+                              for name in member["original_div1_original_attribute_names"]) or
+                      member["source_context_is_not_authored_stock_verse_section_approval"] is not True or
+                      not isinstance(member["same_book_code_reused_in_multiple_original_div1_sections"],bool) or
+                      not all(type(member[k]) is int and member[k]>0 for k in (
+                          "original_source_line","original_div1_document_ordinal",
+                          "original_div1_distinct_declared_osisRef_book_tokens",
+                          "original_div1_scripCom_units_claiming_this_book_token"
+                      ))):
+                      raise SystemExit("Original div1 source metadata leaked unreviewed values")
+          print("Original CCEL div1 vs its own scripCom book/start claims (not edition parity): "+
+                json.dumps({
+                    "actual_xml_div1_total":orig_div1["original_source_div1_document_total"],
+                    "div1_with_original_verse_annotations":
+                        orig_div1["original_div1_with_at_least_one_verse_range_source_marker_count"],
+                    "distinct_original_declared_book_tokens":
+                        orig_div1["distinct_original_osisRef_book_code_count"],
+                    "book_tokens_reused_in_different_original_div1":
+                        orig_div1["original_osisRef_book_tokens_used_in_more_than_one_div1_count"],
+                    "original_start_keys_reused_across_div1":
+                        orig_div1["original_scripCom_start_key_reused_across_different_div1_count"],
+                    "title_origins":orig_div1["original_source_div1_heading_origin_counts"],
+                    "focused_source_division_bookcode_evidence":focused,
+                    "cross_div1_source_linehash_examples":collision_cases,
+                    "original_cross_div1_start_examples_truncated":
+                        orig_div1["cross_div1_source_start_collision_examples_truncated"],
+                },sort_keys=True))
           print("Original bounded source prose alignment and stock raw repetition (not authored range proof): " +
                 json.dumps({
                     "alignment_classes":alignment_counts,

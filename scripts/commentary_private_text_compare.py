@@ -31,6 +31,7 @@ from commentary_reference_cross_slot import ReferenceCrossSlotTopology
 from commentary_prose_cross_slot import OriginalProseAlternativeNativeSlotProbe
 from commentary_source_native_boundaries import original_marker_boundary, NativeRawRunBoundaryInventory
 from commentary_shared_raw_source_units import inspect_shared_original_units_in_native_runs
+from commentary_original_div1_book_consistency import private_original_div1_book_code_consistency
 from commentary_intake import load_manifest
 from commentary_text_delta import punctuation_relationship, word_relationship, nonword_symbol_excess
 from commentary_unresolved_lexical_triage import (
@@ -122,6 +123,22 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
         if source_div1 is None:
             raise PilotError("Original scripture annotation has no verifiable enclosing ThML div1")
         source_div1_ordinal=original_div1_order[source_div1]
+        original_div1_title=source_div1.get("title")
+        heading_origin="title_attribute" if original_div1_title is not None else "absent"
+        if original_div1_title is None:
+            for heading in source_div1:
+                if (isinstance(heading.tag,str) and
+                        heading.tag.rsplit("}",1)[-1] in {"h1","title"}):
+                    original_div1_title="".join(heading.itertext())
+                    heading_origin="immediate_original_h1_or_title_child"
+                    break
+        if original_div1_title is not None and len(original_div1_title)>4096:
+            raise PilotError("Original div1 heading exceeds private source-review bound")
+        original_div1_heading_sha=(
+            sha256(original_div1_title.encode("utf-8")).hexdigest()
+            if original_div1_title is not None and original_div1_title.strip()
+            else None
+        )
         source_endpoints=match.group(2).split("-",1)
         start=source_endpoints[0]
         original_declared_end=source_endpoints[-1]
@@ -148,6 +165,11 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
             "private_original_declared_range_end_key":original_declared_end,
             "private_original_enclosing_div1_document_ordinal":source_div1_ordinal,
             "private_original_total_div1_in_document":len(original_div1_nodes),
+            "private_original_div1_heading_origin":heading_origin,
+            "private_original_div1_heading_sha256":original_div1_heading_sha,
+            "private_original_div1_attribute_name_types":sorted(
+                k.rsplit("}",1)[-1] for k in source_div1.attrib
+            ),
             "original_text":txt,
             "original_text_sha256":sha256(text_bytes).hexdigest(),
             "original_characters":len(txt),
@@ -711,6 +733,9 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
                 "full_authentic_original_source_units_in_those_runs":0,
                 "no_large_original_prose_cases_to_inspect":True,
             }
+        original_div1_book_consistency=private_original_div1_book_code_consistency(
+            source,complete_shared_run_sources
+        )
         chapter_analysis=compare_chapter_neighbors(
             chapter_neighbors,chapter_intros,raw_as_strict_xml_text
         )
@@ -741,6 +766,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         "source_large_nonlink_prose_native_alternative_locations":alternative_prose,
         "source_large_prose_marker_to_native_raw_run_boundary_diagnostics":boundary_case_report,
         "source_complete_original_units_within_shared_stock_raw_K_runs":complete_shared_run_sources,
+        "source_original_div1_osisRef_book_consistency_census":original_div1_book_consistency,
         "source_original_chapter_neighbor_evidence":chapter_proof,
         "source_chapter_neighbor_to_stock_intro_diagnostics":chapter_analysis,
         "source_chapter_neighbor_to_same_chapter_numbered_location":chapter_numbered_location,
