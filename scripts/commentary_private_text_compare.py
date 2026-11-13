@@ -27,6 +27,7 @@ from commentary_chapter_neighbors import (original_chapter_neighbors, compare_ch
 from commentary_chapter_cross_slot import ChapterNeighborSameBookAlternativeProbe
 from commentary_chapter_paragraph_overlap import OriginalChapterParagraphSpanProbe
 from commentary_chapter_p_boundaries import ChapterParagraphBoundaryProbe
+from commentary_reference_cross_slot import ReferenceCrossSlotTopology
 from commentary_intake import load_manifest
 from commentary_text_delta import punctuation_relationship, word_relationship, nonword_symbol_excess
 from commentary_unresolved_lexical_triage import (
@@ -181,7 +182,8 @@ def raw_as_strict_xml_text(raw: bytes) -> str | None:
         return None
 
 
-def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) -> dict:
+def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes],
+                          *, on_unresolved_word_case=None) -> dict:
     counters=Counter()
     issues=[]
     lexical_details=Counter()
@@ -334,6 +336,8 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
                                 bins[b]+=1
                         if category=="different_word_order_or_selection_requires_review":
                             unresolved_lexical_census.observe(item,compiled,raw,book)
+                            if on_unresolved_word_case is not None:
+                                on_unresolved_word_case(start,item,raw)
                             unresolved=unexplained_word_boundary_census(item["original_text"],compiled)
                             divergent_word_boundary_scanned+=1
                             divergent_word_boundary_suffix_bins[unresolved[
@@ -569,6 +573,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         alternate_probe=ChapterNeighborSameBookAlternativeProbe(chapter_neighbors)
         source_p_overlap_probe=OriginalChapterParagraphSpanProbe(chapter_neighbors)
         source_p_boundary_probe=ChapterParagraphBoundaryProbe(chapter_neighbors)
+        reference_cross_slot=ReferenceCrossSlotTopology(source)
         try:
             process=subprocess.Popen(["timeout","360s",str(raw_binary),manifest["module_id"]],
                                      stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,env=env)
@@ -582,6 +587,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
                 alternate_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
                 source_p_overlap_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
                 source_p_boundary_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
+                reference_cross_slot.observe_stock(kind,ref,raw)
                 if kind=="I" and (ref in chapter_neighbors or
                                    (ref.endswith(".0") and ref[:-2] in chapter_neighbors)):
                     chapter_intros[ref]=raw
@@ -596,7 +602,10 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
                 process.wait()
             raise
         crosscheck=private_crosscheck(ix.stdout,manifest["module_id"],rows,raw_summary)
-        analysis=compare_private_texts(source,matches)
+        analysis=compare_private_texts(source,matches,
+            on_unresolved_word_case=reference_cross_slot.observe_unresolved)
+        reference_cross_slot_report=reference_cross_slot.report(
+            analysis['unresolved_source_stock_lexical_selection_triage'])
         chapter_analysis=compare_chapter_neighbors(
             chapter_neighbors,chapter_intros,raw_as_strict_xml_text
         )
@@ -622,6 +631,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         "native_full_corpus_rechecked":True,
         "source_original_verse_and_range_body_evidence":source_proof,
         "text_diagnostic":analysis,
+        "source_unpaired_reference_cross_native_slots":reference_cross_slot_report,
         "source_original_chapter_neighbor_evidence":chapter_proof,
         "source_chapter_neighbor_to_stock_intro_diagnostics":chapter_analysis,
         "source_chapter_neighbor_to_same_chapter_numbered_location":chapter_numbered_location,
