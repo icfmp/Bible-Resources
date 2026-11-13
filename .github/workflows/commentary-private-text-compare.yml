@@ -375,6 +375,13 @@ jobs:
                       sum(missing["source_label_location_classes_in_unmarked_stock_text"].values())
                           != missing["original_scripRef_count"]):
                   raise SystemExit("Unreviewed original no-stock-reference case data")
+          # Only 10 already schema-verified original line/full-text-hash
+          # identifiers. Never disclose text, OSIS references or individual
+          # displayed scripture-link labels or target attribute values.
+          print("Original unresolved bodies WITHOUT stock reference markup, line/hash only: " +
+                json.dumps(lexical[
+                    "all_missing_stock_reference_entry_source_line_hash_only_cases"],
+                    sort_keys=True))
           print("Original 156-case word selection and source/stock markup triage (not parity): " +
                 json.dumps({
                     "unresolved": unresolved,
@@ -398,6 +405,14 @@ jobs:
                         lexical["original_scripRef_total_across_unresolved_entries"],
                     "stock_reference_total":
                         lexical["stock_reference_total_across_unresolved_entries"],
+                    "source_nonempty_reference_targets":
+                        lexical["original_nonempty_scripRef_osisRef_target_count"],
+                    "stock_reference_with_osisRef_attributes":
+                        lexical["stock_reference_elements_with_osisRef_attribute_count"],
+                    "exact_raw_target_matches_by_multiset":
+                        lexical["raw_exact_osisRef_target_multiset_match_count"],
+                    "literal_Bible_work_qualifier_only_target_matches_by_multiset":
+                        lexical["literal_Bible_work_qualifier_only_osisRef_target_multiset_match_count"],
                     "target_correspondence":
                         lexical["original_vs_stock_target_correspondence_classes"],
                     "source_label_location_in_stock":
