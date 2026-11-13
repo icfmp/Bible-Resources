@@ -11,7 +11,7 @@ sys.path.insert(0,str(ROOT/"scripts"))
 
 from commentary_unresolved_lexical_triage import (
     source_stock_unresolved_words, stock_raw_element_counts,
-    UnresolvedLexicalSelectionCensus,
+    marked_word_token_indices, UnresolvedLexicalSelectionCensus,
 )
 from commentary_private_text_compare import _original_source_markers, compare_private_texts
 from pilot_preflight import PilotError
@@ -79,6 +79,18 @@ class UnresolvedLexicalSourceMarkupTests(unittest.TestCase):
         with self.assertRaises(PilotError):
             stock_raw_element_counts(b"<p>invalid</title>")
 
+    def test_inline_source_link_marked_word_indices_do_not_include_tails(self):
+        from lxml import etree
+        root=etree.fromstring(
+            b'<p>A <scripRef osisRef="Bible:Gen.1.1">scripture'
+            b'<hi> citation</hi></scripRef> then end</p>'
+        )
+        text="".join(root.itertext())
+        self.assertEqual(
+            marked_word_token_indices(root,"scripRef",text),[1,2])
+        with self.assertRaises(PilotError):
+            marked_word_token_indices(root,"scripRef","unrelated text")
+
     def test_integrated_verse_marker_count_and_markup_census(self):
         original_xml=(
             b'<?xml version="1.0"?><ThML><ThML.body><div1><div2>'
@@ -101,6 +113,14 @@ class UnresolvedLexicalSourceMarkupTests(unittest.TestCase):
                          {"source_has_scripRef":1,"source_no_scripRef":1})
         self.assertEqual(triage["stock_reference_presence"],
                          {"stock_has_reference":1,"stock_no_reference":1})
+        self.assertEqual(triage["one_to_one_middle_word_changes_inside_source_and_stock_references"],{
+            "source_outside_scripRef_stock_outside_reference":1,
+            "source_within_scripRef_stock_within_reference":1,
+        })
+        self.assertEqual(triage["source_scripRef_and_stock_reference_changed_word_overlap"],{
+            "source_link_overlap_stock_ref_overlap":1,
+            "source_no_link_overlap_stock_no_ref_overlap":1,
+        })
         self.assertEqual(
             sum(triage["differing_middle_shape_classes"].values()),2)
         self.assertEqual(len(triage["bounded_highest_changed_word_count_line_hash_only_cases"]),2)
