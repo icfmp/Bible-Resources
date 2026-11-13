@@ -104,9 +104,11 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
         match=WORK_REF.fullmatch(original_ref)
         if not match:
             raise PilotError("Previously reviewed original annotation is no longer qualified")
-        start=match.group(2).split("-",1)[0]
-        if not OSIS_LOC.fullmatch(start):
-            raise PilotError("Original chapter/verse start anchor is unreviewed")
+        source_endpoints=match.group(2).split("-",1)
+        start=source_endpoints[0]
+        original_declared_end=source_endpoints[-1]
+        if not OSIS_LOC.fullmatch(start) or not OSIS_LOC.fullmatch(original_declared_end):
+            raise PilotError("Original chapter/verse start or end anchor is unreviewed")
         sibling=node.getnext()
         if sibling is None or not isinstance(sibling.tag,str) or sibling.tag.rsplit("}",1)[-1]!="div":
             raise PilotError("Original verse/range annotation has no exact adjacent div body")
@@ -125,6 +127,7 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
         sources.setdefault(start,[]).append({
             "original_source_line":node.sourceline,
             "original_full_reference_sha256":sha256(full_ref_bytes).hexdigest(),
+            "private_original_declared_range_end_key":original_declared_end,
             "original_text":txt,
             "original_text_sha256":sha256(text_bytes).hexdigest(),
             "original_characters":len(txt),
