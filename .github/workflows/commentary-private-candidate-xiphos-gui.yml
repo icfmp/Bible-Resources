@@ -113,6 +113,22 @@ jobs:
           assert proof["published"] is False
           receipt=proof["independent_private_candidate_gui_receipt"]
           _gate_real_candidate_gui(receipt)
+          intro=receipt["pinned_original_source_intro_keys_and_word_counts"]
+          assert intro["source_full_native_raw_corpus_sha256_reconfirmed"] is True
+          assert intro["source_native_I_entries_scanned"] == proof["intro_I_keys"]
+          assert intro["source_native_I_entries_with_authored_word_tokens"] >= 0
+          assert intro["source_native_I_entries_without_word_tokens"] >= 0
+          assert intro["source_native_I_entries_unparseable_strict_XML"] >= 0
+          assert (intro["source_native_I_entries_scanned"] ==
+                  intro["source_native_I_entries_with_authored_word_tokens"] +
+                  intro["source_native_I_entries_without_word_tokens"] +
+                  intro["source_native_I_entries_unparseable_strict_XML"])
+          assert intro["source_native_I_raw_byte_count"] > 0
+          assert intro["no_original_intro_or_full_words_exported"] is True
+          assert intro["unparseable_or_nonverifiable_intro_is_not_missing_commentary"] is True
+          print("Original pinned full native I-key inventory (no title text): " +
+                json.dumps({k:v for k,v in intro.items() if k not in {
+                    "selected_Gen_native_I_word_token_counts"}}, sort_keys=True))
           heading=receipt["real_Xiphos_commentary_book_chapter_heading_context_menu"]
           assert heading["intro_data_or_clipboard_exported"] is False
           assert heading["no_heading_missing_from_source_inferred"] is True
