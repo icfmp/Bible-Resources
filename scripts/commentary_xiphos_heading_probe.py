@@ -69,6 +69,7 @@ def pinned_source_intro_witness(
             if proc.stdout is not None:
                 proc.stdout.close()
     result = {}
+    sampled_original_intro_word_counts = {}
     for key, raw in found.items():
         if not 1 <= len(raw) <= 2_000_000:
             continue
@@ -85,8 +86,13 @@ def pinned_source_intro_witness(
         if any(isinstance(x, etree._Entity) for x in parsed.iter()):
             continue
         words = _words("".join(parsed.itertext()))
-        if len(words) >= 10:
+        sampled_original_intro_word_counts[key] = len(words)
+        if len(words) >= 4:
             result["book" if key in {_BOOK, _BOOK+".0.0"} else "chapter"] = raw
+    # Metadata only: identifies whether a GUI heading was testable without
+    # exposing original source headings, citations or authorial words.
+    print("Pinned native Genesis book/chapter intros, word-count-only: " +
+          str(dict(sorted(sampled_original_intro_word_counts.items()))))
     return result
 
 
@@ -97,7 +103,7 @@ def _words(text: str) -> list[str]:
 
 
 def _intro_in_gui_clipboard(intro: bytes, copied: bytes, verse_text: bytes) -> bool:
-    """A real 10+ consecutive ORIGINAL intro word run absent from verse prose."""
+    """At least 4 consecutive authenticated intro words absent from verse prose."""
     if not isinstance(intro, bytes) or not isinstance(copied, bytes):
         raise PilotError("Unbounded source intro/GUI clipboard witness")
     if max(len(intro), len(copied), len(verse_text)) > 2_000_000:
@@ -112,14 +118,14 @@ def _intro_in_gui_clipboard(intro: bytes, copied: bytes, verse_text: bytes) -> b
     source = _words("".join(parsed.itertext()))
     displayed = _words(copied.decode("utf-8", errors="replace"))
     verse = _words(verse_text.decode("utf-8", errors="replace"))
-    if len(source) < 10 or len(displayed) < 10:
+    if len(source) < 4 or len(displayed) < 4:
         return False
-    for n in range(len(source) - 9):
-        phrase = source[n:n+10]
+    for n in range(len(source) - 3):
+        phrase = source[n:n+4]
         # Selection must be explanatory intro prose and must not be merely
         # the unchanged currently displayed first verse commentary.
-        if (any(displayed[k:k+10] == phrase for k in range(len(displayed)-9))
-                and not any(verse[k:k+10] == phrase for k in range(max(0,len(verse)-9)))):
+        if (any(displayed[k:k+4] == phrase for k in range(len(displayed)-3))
+                and not any(verse[k:k+4] == phrase for k in range(max(0,len(verse)-3)))):
             return True
     return False
 
