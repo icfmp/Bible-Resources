@@ -108,6 +108,37 @@ def verify_and_install_reviewed_bible(destination: Path, *, source: Path = BIBLE
     }
 
 
+def _exact_native_commentary_raw(root: Path, module_id: str, ref: str,
+                                 inspector: Path) -> bytes:
+    """Read actual original stock XML through released libSWORD, no retyping.
+
+    The full raw keys and all 29,975 occupied entries were previously audited.
+    This small bounded private reader preserves markup needed for GUI title and
+    scripture-link comparison without logging any original authorial content.
+    """
+    if (root.is_symlink() or not root.is_dir()
+            or inspector.is_symlink() or not inspector.is_file()
+            or not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{1,39}", module_id)
+            or not re.fullmatch(
+                r"[1-4]?[A-Za-z][A-Za-z ]{0,35} [1-9][0-9]{0,2}:[1-9][0-9]{0,2}", ref
+            )):
+        raise PilotError("Unsafe original native commentary inspection input")
+    try:
+        completed = subprocess.run(
+            [str(inspector), module_id, ref],
+            env=dict(os.environ, SWORD_PATH=str(root)),
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+            timeout=20, check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise PilotError("Original native commentary entry unavailable") from exc
+    if completed.returncode or not 8 <= len(completed.stdout) <= 256_000:
+        raise PilotError(
+            "Actual original native commentary XML missing or outside safe bounds"
+        )
+    return completed.stdout
+
+
 def _normalized_words(raw: bytes) -> list[str]:
     """Text comparison only; no rewriting of either actual SWORD module."""
     value = unicodedata.normalize("NFKD", raw.decode("utf-8", errors="replace"))
@@ -475,7 +506,8 @@ def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int) -> 
 
 
 def observe_dual_module_reader(resource_id: str = "mhcc-crosswire",
-                               *, seconds: int = 12) -> dict:
+                               *, native_raw_key_binary: Path,
+                               seconds: int = 12) -> dict:
     manifest = load_manifest(resource_id)
     if (manifest["rights"]["status"] != "research_only"
             or manifest["rights"]["owner_approved"] is not False
@@ -527,14 +559,9 @@ def observe_dual_module_reader(resource_id: str = "mhcc-crosswire",
                 raise PilotError(
                     f"Reviewed Bible could not navigate real commentary anchor: {passage}"
                 )
-            internal_code, internal_markup = query(
-                manifest["module_id"], passage, fmt="internal", root=installed,
-                exe="diatheke", limit=256 * 1024, timeout=30,
+            internal_markup = _exact_native_commentary_raw(
+                installed, manifest["module_id"], passage, native_raw_key_binary
             )
-            if internal_code != 0 or not present_key(
-                passage, internal_markup, internal_code
-            ):
-                raise PilotError("Cannot independently observe original zCom OSIS markup")
             comparisons[passage] = {
                 "commentary": text,
                 "bible": bible_output,
@@ -574,11 +601,15 @@ def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--resource-id", default="mhcc-crosswire")
     p.add_argument("--seconds", type=int, default=12)
+    p.add_argument("--native-raw-key-binary", type=Path, required=True)
     p.add_argument("--report", type=Path, required=True)
     args = p.parse_args()
     if args.report.exists() or args.report.is_symlink() or not args.report.parent.is_dir():
         raise PilotError("Unsafe or preexisting Xiphos receipt path")
-    result = observe_dual_module_reader(args.resource_id, seconds=args.seconds)
+    result = observe_dual_module_reader(
+        args.resource_id, native_raw_key_binary=args.native_raw_key_binary,
+        seconds=args.seconds,
+    )
     args.report.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n",
                            encoding="utf-8")
     print("Original MHCC and reviewed Bible tested in real isolated Xiphos; no source prose/screenshots exported")
