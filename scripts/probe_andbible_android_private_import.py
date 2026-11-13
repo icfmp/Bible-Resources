@@ -96,6 +96,7 @@ def tap_allowlisted(controls, ordered_labels):
 
 
 DOCUMENTED_REFERENCE_PROBES = ("Gen.2.4", "Rom.16.25")
+PARAGRAPH_LAYOUT_REFERENCE_PROBES = ("Gen.6.9", "Gen.6.13", "Gen.7.17", "Ps.3.1", "Job.3.1")
 OMITTED_VERSE_NOTE_HOST_PROBES = ("Matt.23.13", "Acts.8.36", "Acts.15.33")
 
 
@@ -105,7 +106,7 @@ def open_documented_reference_probe(reference: str) -> None:
     https://andbible.org/docs/bible_links/ documents /OSISREF with document,
     v11n. Intent invocation alone is NEVER proof of actual navigation.
     """
-    if reference not in DOCUMENTED_REFERENCE_PROBES + OMITTED_VERSE_NOTE_HOST_PROBES:
+    if reference not in DOCUMENTED_REFERENCE_PROBES + OMITTED_VERSE_NOTE_HOST_PROBES + PARAGRAPH_LAYOUT_REFERENCE_PROBES:
         raise AndroidDarbyImportError("Unreviewed Android passage navigation")
     uri = ("https://read.andbible.org/" + reference + "?"
            + urlencode({"document": MODULE, "v11n": VERSIFICATION}))
@@ -419,6 +420,17 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
                 evidence_dir/(key+"-reference-tap.png"))
             adb("shell","input","keyevent","KEYCODE_BACK",timeout=12)
             time.sleep(2)
+        # Post-import paragraph check uses only documented reference intents.
+        # Capture the *actual repaired module* without trusting the intent to
+        # establish navigation or visual correctness. Images require review.
+        for idx, reference in enumerate(PARAGRAPH_LAYOUT_REFERENCE_PROBES, start=18):
+            open_documented_reference_probe(reference)
+            key=f"{idx:02d}-repaired-paragraph-{reference.replace('.', '-')}"
+            screenshots[key] = capture_png(evidence_dir/(key+".png"))
+            checkpoint("andbible_repaired_paragraph_visual_probe",
+                       reference=reference, actual_module_and_reference_verified=False,
+                       visible_editorial_stars_absent_verified=False,
+                       leading_whitespace_accepted=False)
 
     # A successful ADB press does not establish a loaded translation; retain
     # that as a separate visual and Java/Android document validation gate.
@@ -444,6 +456,7 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
         "andbible_romans_original_note_popup_verified":False,
         "andbible_colossians_note_link_gui_verified":False,
         "andbible_three_omitted_verse_host_gui_verified":False,
+        "andbible_repaired_paragraph_gui_verified": False,
         "andbible_three_omitted_verse_note_popup_gui_verified":False,
         "andbible_missing_verse_click_behavior_verified":False,
         "andbible_persistent_module_identity_verified":False,
