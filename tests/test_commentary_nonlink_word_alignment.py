@@ -26,7 +26,7 @@ class OriginalPlainWordsAlignmentTests(unittest.TestCase):
         self.assertEqual(result["common_end_word_tokens"],2)
         self.assertEqual(result["exact_unicode_ordered_alignment_class"],
                          "all_source_plain_words_in_stock_order_with_extra_stock_words")
-        self.assertNotIn("original",json.dumps(result))
+        self.assertNotIn("\"before\"",json.dumps(result))
 
     def test_word_reordering_is_not_an_exact_source_preserving_subsequence(self):
         result=plain_word_alignment(["one","two","three"],["one","three","two"])
