@@ -46,6 +46,12 @@ def safe_controls(xml: bytes, module_id: str, title: str) -> dict:
     except ET.ParseError:
         return {"controls": [], "reader_module_metadata_detected": False}
     file_label = module_id.upper() + ".ZIP"
+    # AndBible stable's MainBibleActivity uses commentaryButton with
+    # resource-id '<package>:id/commentaryButton' (main_bible_view.xml).
+    # Its popup item text is "<book abbreviation> (language)" (menuForDocs).
+    # Exact MHCC (en), never MHC (en), identifies the concise edition.
+    commentary_toolbar_resource = PACKAGE + ":id/commentaryButton"
+    exact_commentary_popup = module_id.upper() + " (EN)"
     # Never dismiss an arbitrary application. On hosted AOSP emulators only,
     # the known launcher ANR may be closed using an explicitly seen control.
     launcher_anr = any(
@@ -57,12 +63,18 @@ def safe_controls(xml: bytes, module_id: str, title: str) -> dict:
     module_label_in_tree = False
     for node in tree.iter("node"):
         candidates = (node.attrib.get("text", ""), node.attrib.get("content-desc", ""))
-        for value in candidates:
+        for key, value in zip(("text", "content-desc"), candidates):
             # Source metadata identity only, not user-authored or rendered prose.
             if value.strip().casefold() in (module_id.casefold(), title.casefold()):
                 module_label_in_tree = True
             label = value.strip().upper()
-            if label not in SAFE and label != file_label:
+            has_commentary_toolbar_id = (
+                key == "content-desc" and
+                node.attrib.get("resource-id") == commentary_toolbar_resource
+            )
+            exact_popup_entry = (label == exact_commentary_popup)
+            if (label not in SAFE and label != file_label
+                    and not has_commentary_toolbar_id and not exact_popup_entry):
                 continue
             if label == "CLOSE APP" and not launcher_anr:
                 continue
@@ -72,7 +84,10 @@ def safe_controls(xml: bytes, module_id: str, title: str) -> dict:
             x1, y1, x2, y2 = map(int, match.groups())
             if not (0 <= x1 < x2 <= 1600 and 0 <= y1 < y2 <= 2400):
                 continue
-            item = {"action": "EXACT_MODULE_ZIP" if label == file_label else label,
+            action = ("OPEN_COMMENTARY_MENU" if has_commentary_toolbar_id
+                      else "EXACT_COMMENTARY_MENU_MODULE" if exact_popup_entry
+                      else "EXACT_MODULE_ZIP" if label == file_label else label)
+            item = {"action": action,
                     "x": (x1+x2)//2, "y": (y1+y2)//2}
             if item not in results:
                 results.append(item)
@@ -89,7 +104,9 @@ def _screen(module_id: str, title: str) -> dict:
 
 def _tap(controls: list[dict], choices: tuple[str, ...]) -> str | None:
     for choice in choices:
-        if choice not in SAFE and choice != "EXACT_MODULE_ZIP":
+        if choice not in SAFE and choice not in {
+            "EXACT_MODULE_ZIP", "OPEN_COMMENTARY_MENU", "EXACT_COMMENTARY_MENU_MODULE"
+        }:
             raise PilotError("Unreviewed Android command")
         for item in controls:
             if item["action"] == choice:
@@ -130,6 +147,48 @@ def _start_bounded_android_import(module_id: str, title: str) -> dict:
             recovery.append(fallback)
         time.sleep(5)
     raise PilotError("Stable AndBible import UI not established after bounded recovery")
+
+
+def _attempt_commentary_toolbar_selection(module_id: str, title: str) -> dict:
+    """Use the reader toolbar's actual resource-id to select EXACT MHCC (en).
+
+    A different edition labeled MHC (en) MUST NOT satisfy the selection.
+    AndBible menuForDocs can auto-switch with two documents instead of
+    showing a menu; a switch alone remains unverified without visible
+    source-module identity. No hard-coded tap coordinates or source prose.
+    """
+    if not MODULE.fullmatch(module_id):
+        raise PilotError("Unreviewed commentary toolbar identity")
+    before = _screen(module_id, title)
+    opened = _tap(before["controls"], ("OPEN_COMMENTARY_MENU",))
+    if not opened:
+        return {
+            "actual_commentary_toolbar_resource_found": False,
+            "exact_original_commentary_popup_item_found": False,
+            "exact_original_commentary_menu_item_tapped": False,
+            "reader_source_identity_witness_after_selection": False,
+            "reader_screen_changed_after_selection": False,
+            "possible_auto_switch_without_menu": False,
+        }
+    before_sha = _screenshot_sha256()
+    opened_screen = _screen(module_id, title)
+    items = opened_screen["controls"]
+    exact_found = any(x["action"] == "EXACT_COMMENTARY_MENU_MODULE" for x in items)
+    clicked = _tap(items, ("EXACT_COMMENTARY_MENU_MODULE",)) if exact_found else None
+    after = _screen(module_id, title)
+    after_sha = _screenshot_sha256()
+    return {
+        "actual_commentary_toolbar_resource_found": True,
+        "exact_original_commentary_popup_item_found": exact_found,
+        "exact_original_commentary_menu_item_tapped": clicked is not None,
+        "reader_source_identity_witness_after_selection": (
+            after["reader_module_metadata_detected"]
+        ),
+        "reader_screen_changed_after_selection": before_sha != after_sha,
+        "possible_auto_switch_without_menu": (
+            not exact_found and after["reader_module_metadata_detected"]
+        ),
+    }
 
 
 def _screenshot_sha256() -> str:
@@ -289,6 +348,9 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
         after_restart = _screen(module_id, title)
         identity_after_restart = after_restart["reader_module_metadata_detected"]
         focus_after_restart = _app_focus_witness()
+        # Follow the user-observed commentary books icon in the real reader
+        # toolbar; this tests selection instead of guessing a deep link.
+        toolbar_probe = _attempt_commentary_toolbar_selection(module_id, title)
         # Real platform request result is checked, but not equated to a
         # rendered page. A rejected Intent must remain explicitly unverified.
         intent_accepted = _dispatch_documented_reference(manifest)
@@ -327,6 +389,7 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
             },
             "android_application_foreground_after_deeplink": bool(focus_after_link),
             "android_sample_reference_deeplink_attempted": True,
+            "android_commentary_toolbar_selection": toolbar_probe,
             "android_documented_intent_request_accepted": intent_accepted,
             "android_screen_changed_after_reference_attempt": (
                 snapshots["post_reference_dispatch"] != snapshots["after_import_attempt"]
