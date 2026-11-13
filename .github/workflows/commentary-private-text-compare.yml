@@ -18,6 +18,8 @@ on:
       - 'scripts/commentary_text_delta.py'
       - 'tests/test_commentary_text_delta.py'
       - 'scripts/commentary_unresolved_lexical_triage.py'
+      - 'scripts/commentary_reference_cross_slot.py'
+      - 'tests/test_commentary_reference_cross_slot.py'
       - 'tests/test_commentary_unresolved_lexical_triage.py'
       - 'scripts/commentary_stock_prefix_topology.py'
       - 'tests/test_commentary_stock_prefix_topology.py'
@@ -226,7 +228,104 @@ jobs:
               safe_cases.append(case)
           print("Original chapter-neighbor bounded line/hash-only remaining cases: " +
                 json.dumps(safe_cases, sort_keys=True))
+          cross = report["source_unpaired_reference_cross_native_slots"]
           lexical = metrics["unresolved_source_stock_lexical_selection_triage"]
+          allowed_source = {
+              "same_entry_reference_target_multiplicity_shortfall",
+              "target_witnessed_in_other_numbered_key_same_chapter",
+              "target_witnessed_in_same_chapter_intro_key",
+              "target_witnessed_elsewhere_in_same_book",
+              "target_not_witnessed_in_other_same_book_stock_reference_markup",
+              "original_source_target_is_empty",
+              "original_target_not_literal_Bible_work_qualified_unreviewed",
+          }
+          allowed_compiled = {
+              "same_entry_original_target_multiplicity_shortfall",
+              "target_witnessed_in_other_original_source_unit_same_chapter",
+              "target_witnessed_in_other_original_source_chapter_same_book",
+              "stock_target_not_in_any_original_verse_range_link_same_book",
+          }
+          source_classes = cross["source_unpaired_target_occurrence_location_classes"]
+          stock_classes = cross["stock_unpaired_target_occurrence_source_classes"]
+          missing_cases = cross["bounded_all_no_stock_reference_case_line_fullhash_topology"]
+          high_cases = cross["bounded_highest_unpaired_source_target_line_fullhash_topology"]
+          allowed_receipt_fields = {
+              "original_source_line","original_full_reference_sha256",
+              "original_body_sha256","compiled_stock_raw_sha256",
+              "unpaired_original_reference_targets","unpaired_stock_reference_targets",
+              "unpaired_original_target_scope_counts",
+              "unpaired_compiled_target_source_scope_counts",
+              "same_book_numbered_native_keys_with_identical_selected_raw",
+              "same_book_intro_native_keys_with_identical_selected_raw",
+              "native_payload_repetition_is_not_source_range_or_commentary_parity",
+          }
+          def checked_counts(values, names):
+              return isinstance(values,dict) and all(
+                  key in names and type(n) is int and n >= 0
+                  for key,n in values.items()
+              )
+          if (cross["source_markers_with_lexically_unresolved_reference_issues"] !=
+                    metrics["unexplained_original_to_stock_word_boundary_count"] or
+                  cross["original_scripRef_target_occurrences"] !=
+                    lexical["original_scripRef_total_across_unresolved_entries"] or
+                  cross["stock_reference_target_occurrences"] !=
+                    lexical["stock_reference_total_across_unresolved_entries"] or
+                  cross["source_and_stock_raw_exact_target_matches"] !=
+                    lexical["raw_exact_osisRef_target_multiset_match_count"] or
+                  cross["source_and_stock_literal_Bible_work_prefix_only_matches"] !=
+                    lexical["literal_Bible_work_qualifier_only_osisRef_target_multiset_match_count"] or
+                  not checked_counts(source_classes, allowed_source) or
+                  not checked_counts(stock_classes, allowed_compiled) or
+                  sum(source_classes.values()) !=
+                    cross["original_scripRef_target_occurrences"] -
+                    cross["source_and_stock_raw_exact_target_matches"] -
+                    cross["source_and_stock_literal_Bible_work_prefix_only_matches"] or
+                  sum(stock_classes.values()) !=
+                    cross["stock_reference_target_occurrences"] -
+                    cross["source_and_stock_raw_exact_target_matches"] -
+                    cross["source_and_stock_literal_Bible_work_prefix_only_matches"] or
+                  sum(cross["original_source_markers_with_or_without_stock_reference_markup"].values()) !=
+                    cross["source_markers_with_lexically_unresolved_reference_issues"] or
+                  len(missing_cases) != lexical["stock_reference_presence"].get("stock_no_reference",0) or
+                  len(missing_cases) > 20 or len(high_cases) > 20 or
+                  cross["reviewed_metadata_line_hash_only_case_cap"] != 20):
+              raise SystemExit("Original cross-slot scripture-reference evidence did not reconcile")
+          for case in missing_cases + high_cases:
+              if (set(case) != allowed_receipt_fields or
+                      type(case["original_source_line"]) is not int or
+                      case["original_source_line"] < 1 or
+                      not all(isinstance(case[name],str) and re.fullmatch(r"[a-f0-9]{64}",case[name])
+                              for name in ("original_full_reference_sha256","original_body_sha256",
+                                           "compiled_stock_raw_sha256")) or
+                      not all(type(case[name]) is int and case[name] >= 0
+                              for name in ("unpaired_original_reference_targets",
+                                           "unpaired_stock_reference_targets",
+                                           "same_book_numbered_native_keys_with_identical_selected_raw",
+                                           "same_book_intro_native_keys_with_identical_selected_raw")) or
+                      case["native_payload_repetition_is_not_source_range_or_commentary_parity"] is not True or
+                      not checked_counts(case["unpaired_original_target_scope_counts"],allowed_source) or
+                      not checked_counts(case["unpaired_compiled_target_source_scope_counts"],allowed_compiled) or
+                      sum(case["unpaired_original_target_scope_counts"].values()) !=
+                          case["unpaired_original_reference_targets"] or
+                      sum(case["unpaired_compiled_target_source_scope_counts"].values()) !=
+                          case["unpaired_stock_reference_targets"]):
+                  raise SystemExit("Original reference cross-slot report has unsafe or incomplete case")
+          print("Original chapter/book alternative reference location counts (NOT source parity): " +
+                json.dumps({
+                    "original_unpaired":source_classes,
+                    "stock_unpaired":stock_classes,
+                    "unresolved_original_markers":
+                        cross["source_markers_with_lexically_unresolved_reference_issues"],
+                    "stock_native_keys_scanned":
+                        cross["complete_native_K_and_I_keys_inspected_for_target_witnesses"],
+                    "stock_reference_bearing_native_keys":
+                        cross["native_keys_with_at_least_one_reference_element"],
+                    "reference_xml_errors":cross["reference_markup_strict_xml_parse_failures"],
+                    "no_reference_original_markers":len(missing_cases),
+                    "highest_unpaired_linehash_cases":len(high_cases),
+                },sort_keys=True))
+          print("Bounded original no-stock-reference payload propagation line/hash cases: " +
+                json.dumps(missing_cases,sort_keys=True))
           unresolved = metrics["unexplained_original_to_stock_word_boundary_count"]
           if (lexical["source_vs_stock_unresolved_word_selection_cases"] != unresolved or
                   sum(lexical["differing_middle_shape_classes"].values()) != unresolved or
