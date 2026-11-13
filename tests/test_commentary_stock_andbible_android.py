@@ -156,5 +156,92 @@ class CommentaryAndroidStockTests(unittest.TestCase):
         self.assertEqual(screen.call_count, 6)
 
 
+    def test_real_toolbar_resource_id_and_exact_original_commentary_popup_only(self):
+        # AndBible main_bible_view.xml -> commentaryButton; menuForDocs uses
+        # "<abbreviation> (language)". Full MHC is NOT concise MHCC.
+        xml = b'''<hierarchy>
+          <node class="android.widget.ImageButton"
+                resource-id="net.bible.android.activity:id/commentaryButton"
+                content-desc="Commentary" bounds="[850,180][955,295]"/>
+          <node class="android.widget.TextView"
+                text="MHC (en)" bounds="[520,430][980,550]"/>
+          <node class="android.widget.TextView"
+                text="MHCC (en)" bounds="[520,560][980,680]"/>
+        </hierarchy>'''
+        out = safe_controls(xml, "MHCC", TITLE)
+        self.assertEqual(
+            [item["action"] for item in out["controls"]],
+            ["OPEN_COMMENTARY_MENU", "EXACT_COMMENTARY_MENU_MODULE"],
+        )
+        self.assertFalse(out["reader_module_metadata_detected"])
+        no_concise = safe_controls(xml.replace(b"MHCC (en)", b"MHC (en)"), "MHCC", TITLE)
+        self.assertEqual(
+            [item["action"] for item in no_concise["controls"]],
+            ["OPEN_COMMENTARY_MENU"],
+        )
+
+    def test_spoofed_commentary_text_without_exact_toolbar_id_is_not_tappable(self):
+        wrong_id = b'''<hierarchy>
+          <node text="Commentary" content-desc="Commentary"
+                resource-id="net.bible.android.activity:id/workspaceButton"
+                bounds="[850,180][955,295]"/>
+        </hierarchy>'''
+        out = safe_controls(wrong_id, "MHCC", TITLE)
+        self.assertNotIn("OPEN_COMMENTARY_MENU",
+                         [item["action"] for item in out["controls"]])
+
+    @patch("commentary_stock_andbible_android._screenshot_sha256", side_effect=["a"*64, "b"*64])
+    @patch("commentary_stock_andbible_android._tap")
+    @patch("commentary_stock_andbible_android._screen")
+    def test_exact_concise_menu_selection_and_identity_are_separate(self, screen, tap, _sha):
+        from commentary_stock_andbible_android import _attempt_commentary_toolbar_selection
+        screen.side_effect = [
+            {"controls":[{"action":"OPEN_COMMENTARY_MENU","x":900,"y":240}],
+             "reader_module_metadata_detected":False},
+            {"controls":[{"action":"EXACT_COMMENTARY_MENU_MODULE","x":820,"y":580}],
+             "reader_module_metadata_detected":False},
+            {"controls":[],"reader_module_metadata_detected":True},
+        ]
+        tap.side_effect = ["OPEN_COMMENTARY_MENU", "EXACT_COMMENTARY_MENU_MODULE"]
+        out = _attempt_commentary_toolbar_selection("MHCC", TITLE)
+        self.assertTrue(out["actual_commentary_toolbar_resource_found"])
+        self.assertTrue(out["exact_original_commentary_popup_item_found"])
+        self.assertTrue(out["exact_original_commentary_menu_item_tapped"])
+        self.assertTrue(out["reader_source_identity_witness_after_selection"])
+        self.assertTrue(out["reader_screen_changed_after_selection"])
+        self.assertFalse(out["possible_auto_switch_without_menu"])
+
+    @patch("commentary_stock_andbible_android._screenshot_sha256", side_effect=["a"*64, "a"*64])
+    @patch("commentary_stock_andbible_android._tap")
+    @patch("commentary_stock_andbible_android._screen")
+    def test_only_full_MHC_popup_never_counts_as_MHCC_selection(self, screen, tap, _sha):
+        from commentary_stock_andbible_android import _attempt_commentary_toolbar_selection
+        screen.side_effect = [
+            {"controls":[{"action":"OPEN_COMMENTARY_MENU","x":900,"y":240}],
+             "reader_module_metadata_detected":False},
+            {"controls":[],"reader_module_metadata_detected":False},
+            {"controls":[],"reader_module_metadata_detected":False},
+        ]
+        tap.return_value = "OPEN_COMMENTARY_MENU"
+        out = _attempt_commentary_toolbar_selection("MHCC", TITLE)
+        self.assertTrue(out["actual_commentary_toolbar_resource_found"])
+        self.assertFalse(out["exact_original_commentary_popup_item_found"])
+        self.assertFalse(out["exact_original_commentary_menu_item_tapped"])
+        self.assertFalse(out["reader_source_identity_witness_after_selection"])
+        self.assertFalse(out["reader_screen_changed_after_selection"])
+        self.assertEqual(tap.call_count, 1)
+
+    @patch("commentary_stock_andbible_android._tap")
+    @patch("commentary_stock_andbible_android._screen")
+    def test_missing_toolbar_never_claims_source_selection(self, screen, tap):
+        from commentary_stock_andbible_android import _attempt_commentary_toolbar_selection
+        screen.return_value = {"controls":[],"reader_module_metadata_detected":False}
+        tap.return_value = None
+        out = _attempt_commentary_toolbar_selection("MHCC", TITLE)
+        self.assertFalse(out["actual_commentary_toolbar_resource_found"])
+        self.assertFalse(out["exact_original_commentary_menu_item_tapped"])
+        self.assertFalse(out["reader_source_identity_witness_after_selection"])
+
+
 if __name__ == "__main__":
     unittest.main()
