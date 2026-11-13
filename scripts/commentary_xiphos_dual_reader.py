@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 from html import unescape
 from html.parser import HTMLParser
+from urllib.parse import unquote
 from hashlib import sha256
 import json
 import os
@@ -266,6 +267,10 @@ def _long_commentary_excerpt_is_on_gui_clipboard(
 _TITLE_TAG = re.compile(r"<title(?:\s+[^>]*)?>(.*?)</title\s*>", re.I | re.S)
 _REFERENCE_TAG = re.compile(r"<reference(?:\s+[^>]*)?>", re.I | re.S)
 _REFERENCE_WITH_LABEL = re.compile(r"<reference(?:\s+[^>]*)?>(.*?)</reference\s*>", re.I | re.S)
+_REFERENCE_WITH_ATTRIBUTES = re.compile(
+    r"<reference\b([^>]*)>(.*?)</reference\s*>", re.I | re.S
+)
+_OSIS_REF_ATTRIBUTE = re.compile(r"\bosisRef\s*=\s*([\"'])(.*?)\1", re.I | re.S)
 
 
 class _BoundedMarkupScanner(HTMLParser):
@@ -274,22 +279,28 @@ class _BoundedMarkupScanner(HTMLParser):
         self.link_count = 0
         self.text_chunks = []
         self.anchor_labels = []
+        self.anchor_destinations = []
         self._current_anchor = None
+        self._current_href = None
 
     def handle_starttag(self, tag, attrs):
-        if tag.casefold() == "a" and any(
-            key.casefold() == "href" and isinstance(value, str) and value.strip()
-            for key, value in attrs
-        ):
-            self.link_count += 1
-            self._current_anchor = []
+        if tag.casefold() == "a":
+            href = next((
+                value for key, value in attrs
+                if key.casefold() == "href" and isinstance(value, str) and value.strip()
+            ), None)
+            if href is not None:
+                self.link_count += 1
+                self._current_anchor = []
+                self._current_href = href
 
     def handle_endtag(self, tag):
         if tag.casefold() == "a" and self._current_anchor is not None:
-            self.anchor_labels.append(
-                " ".join("".join(self._current_anchor).split())
-            )
+            label = " ".join("".join(self._current_anchor).split())
+            self.anchor_labels.append(label)
+            self.anchor_destinations.append((label, self._current_href))
             self._current_anchor = None
+            self._current_href = None
 
     def handle_data(self, data):
         self.text_chunks.append(data)
@@ -318,12 +329,14 @@ def _markup_display_witness(internal: bytes, rendered_plain: bytes,
     exact_titles = sum(1 for value in extracted_titles if value in visible)
     rich_link_count = 0
     actual_anchor_labels = set()
+    actual_anchor_destinations = []
     actual_html_text = ""
     if rendered_html:
         parser = _BoundedMarkupScanner()
         parser.feed(rendered_html.decode("utf-8", errors="replace"))
         rich_link_count = min(parser.link_count, 5000)
         actual_anchor_labels = set(parser.anchor_labels)
+        actual_anchor_destinations = parser.anchor_destinations
         actual_html_text = " ".join("".join(parser.text_chunks).split())
     source_reference_labels = []
     for value in _REFERENCE_WITH_LABEL.findall(original)[:256]:
@@ -338,6 +351,29 @@ def _markup_display_witness(internal: bytes, rendered_plain: bytes,
     matched_anchor_labels = sum(
         1 for label in source_reference_labels if label in actual_anchor_labels
     )
+    exact_source_target_hrefs = 0
+    for attrs, raw_label in _REFERENCE_WITH_ATTRIBUTES.findall(original)[:256]:
+        osis = _OSIS_REF_ATTRIBUTE.search(attrs)
+        if not osis:
+            continue
+        raw_target = unescape(osis.group(2)).strip()
+        if raw_target.startswith("Bible:"):
+            raw_target = raw_target[len("Bible:"):]
+        if not 3 <= len(raw_target) <= 160:
+            continue
+        parser = _BoundedMarkupScanner()
+        parser.feed(unescape(raw_label))
+        label = " ".join("".join(parser.text_chunks).split())
+        if len(label) < 5:
+            continue
+        for rendered_label, href in actual_anchor_destinations:
+            uri = unquote(unescape(href)).casefold()
+            if (rendered_label == label and re.search(
+                r"(?<![a-z0-9])" + re.escape(raw_target.casefold()) + r"(?![a-z0-9])",
+                uri,
+            )):
+                exact_source_target_hrefs += 1
+                break
     return {
         "original_internal_title_elements_found": len(extracted_titles),
         "exact_original_titles_in_copied_gui_text": exact_titles,
@@ -350,6 +386,8 @@ def _markup_display_witness(internal: bytes, rendered_plain: bytes,
         "original_stock_nontrivial_reference_labels_found": len(source_reference_labels),
         "source_reference_labels_observed_as_real_gui_HTML_anchors":
             matched_anchor_labels,
+        "exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations":
+            exact_source_target_hrefs,
         "real_gui_rich_html_selection_available": bool(rendered_html),
         "real_gui_rich_html_anchor_elements_found": rich_link_count,
         "xiphos_link_click_target_and_navigation_verified": False,
