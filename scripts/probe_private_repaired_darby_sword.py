@@ -20,6 +20,7 @@ from repair_osis_note_links import propose as propose_links
 from repair_osis_inline_markup import propose as propose_inline
 from repair_osis_source_bytes import patch_exact_original
 from repair_osis_division_markers import patch_divisions
+from repair_osis_paragraph_indentation import trim_publisher_paragraph_indentation
 from repair_osis_unlinked_reference_labels import render_absent_references_plain
 from audit_omitted_verse_notes import source_cases, native_cases
 from probe_andbible_jsword import run_pinned_jsword
@@ -128,12 +129,17 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
     corrected, plain_note_receipt = render_absent_references_plain(
         original, corrected_raw, a)
     division_receipt = None
+    paragraph_whitespace_receipt = None
     if division_overlay:
         corrected, division_receipt = patch_divisions(
             corrected, expected_sha256=sha(corrected))
         if not division_receipt["all_leading_editorial_signs_transferred"]:
             raise PrivateRepairedProbeError(
                 "Remaining authorial inline division symbols require independent review")
+        corrected, paragraph_whitespace_receipt = trim_publisher_paragraph_indentation(
+            corrected, expected_sha256=sha(corrected))
+        if not paragraph_whitespace_receipt["all_source_nonspace_characters_preserved"]:
+            raise PrivateRepairedProbeError("Paragraph indentation repair changed authorial words")
     compiled_source_sha256 = sha(corrected)
     if plain_note_receipt["explicit_plain_label_count"] != 3:
         raise PrivateRepairedProbeError("Omitted-verse plain-label conversion incomplete")
@@ -352,6 +358,7 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
         "private_plain_omitted_reference_osis_sha256": plain_note_receipt["new_research_candidate_sha256"],
         "private_compiled_osis_sha256": compiled_source_sha256,
         "research_division_overlay_receipt": division_receipt,
+        "research_paragraph_whitespace_overlay_receipt": paragraph_whitespace_receipt,
         "research_division_private_native_rendering_shapes": division_reader_shapes,
         "plain_nonhyperlink_omission_label_count": plain_note_receipt["explicit_plain_label_count"],
         "original_note_display_text_preserved_by_plain_overlay": plain_note_receipt["all_original_characters_preserved"],
