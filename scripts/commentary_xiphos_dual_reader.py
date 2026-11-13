@@ -277,7 +277,10 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
             for px, py in right_side_points:
                 stage = "focus_right_hand_commentary_pane"
                 _x11(
-                    ["xdotool", "mousemove", "--sync", str(px), str(py), "click", "1"],
+                    # Do not use --sync here: the same coordinate can be
+                    # revisited on another verse, and xdotool's wait-for-motion
+                    # may then time out because no new pointer movement occurs.
+                    ["xdotool", "mousemove", str(px), str(py), "click", "1"],
                     env,
                 )
                 focus_attempts[ref] += 1
