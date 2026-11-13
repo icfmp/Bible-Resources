@@ -184,6 +184,40 @@ jobs:
                                 alternative["native_same_book_other_slot_reads_by_kind"],
                             "classification": classifications,
                             }, sort_keys=True))
+          # Approved, bounded machine identifiers only. Never log original headings,
+          # original osisRef strings, stock XML, editorial text, or snippets.
+          cases = alternative["bounded_originally_unlocated_line_hash_only_cases"]
+          if len(cases) != min(original_gap, alternative["per_marker_detail_cap"]):
+              raise SystemExit("Source-line/hash-only case inventory was incomplete")
+          safe_cases = []
+          for case in cases:
+              keys = {
+                  "source_line", "original_reference_sha256", "original_neighbor_text_sha256",
+                  "original_neighbor_tag", "original_unicode_characters",
+                  "original_unicode_word_token_count", "alternative_stock_location_class",
+                  "matching_native_key_sha256",
+              }
+              if set(case) != keys:
+                  raise SystemExit("Unreviewed diagnostic field may disclose source")
+              if (type(case["source_line"]) is not int or case["source_line"] < 1 or
+                      type(case["original_unicode_characters"]) is not int or
+                      case["original_unicode_characters"] <= 0 or
+                      type(case["original_unicode_word_token_count"]) is not int or
+                      case["original_unicode_word_token_count"] <= 0 or
+                      case["original_neighbor_tag"] not in {"h2", "p"} or
+                      case["alternative_stock_location_class"] not in allowed):
+                  raise SystemExit("Invalid original source audit metadata")
+              if not all(re.fullmatch(r"[0-9a-f]{64}", case[k])
+                         for k in ("original_reference_sha256", "original_neighbor_text_sha256")):
+                  raise SystemExit("Invalid original source audit hash")
+              match_hash = case["matching_native_key_sha256"]
+              if match_hash is not None and (
+                      not isinstance(match_hash, str) or
+                      not re.fullmatch(r"[0-9a-f]{64}", match_hash)):
+                  raise SystemExit("Invalid stock key identifier hash")
+              safe_cases.append(case)
+          print("Original chapter-neighbor bounded line/hash-only remaining cases: " +
+                json.dumps(safe_cases, sort_keys=True))
           PY
       - name: Preserve only non-text source and stock diagnostics
         if: always()
