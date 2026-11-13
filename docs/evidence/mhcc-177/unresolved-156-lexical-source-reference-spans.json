@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "issue": "https://github.com/icfmp/Bible-Resources/issues/177",
+  "status": "ALL_ORIGINAL_156_VERSERANGE_UNRESOLVED_LEXICAL_VARIANTS_CLASSIFIED_AS_MARKUP_PROXIMITY_NOT_TEXT_PARITY",
+  "pinned": {
+    "original_ccel_thml_sha256": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+    "original_crosswire_stock_zip_sha256": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+    "stock_full_raw_ordered_sha256": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
+  },
+  "full_original_verse_range_selection_diagnostics": {
+    "unresolved_source_to_compiled_word_selection_cases": 156,
+    "source_versus_stock_differing_middle_shape": {
+      "middle_partial_shared_word_occurrences": 59,
+      "one_to_one_middle_word_substitution": 97
+    },
+    "middle_alignment_classes": {
+      "multiple_distinct_edit_blocks": 59,
+      "single_edit_block": 97
+    },
+    "source_changed_middle_word_count_buckets": {
+      "1": 97,
+      "21_to_100": 21,
+      "6_to_20": 3,
+      "over_100": 35
+    },
+    "stock_changed_middle_word_count_buckets": {
+      "1": 97,
+      "21_to_100": 13,
+      "6_to_20": 2,
+      "over_100": 44
+    },
+    "one_word_difference_subtypes": {
+      "different_case_sensitive_unicode_word": 97,
+      "not_one_to_one": 59
+    },
+    "original_scripRef_presence": {
+      "source_has_scripRef": 156
+    },
+    "stock_reference_presence": {
+      "stock_has_reference": 146,
+      "stock_no_reference": 10
+    },
+    "source_link_x_stock_reference_presence": {
+      "source_link_no_stock_reference": 10,
+      "source_link_stock_reference": 146
+    },
+    "source_scripRef_changed_word_proximity": {
+      "all_source_changed_words_in_scripRef": 98,
+      "some_source_changed_words_in_scripRef": 58
+    },
+    "stock_reference_changed_word_proximity": {
+      "all_stock_changed_words_in_reference": 96,
+      "no_stock_changed_words_in_reference": 10,
+      "some_stock_changed_words_in_reference": 50
+    },
+    "source_and_stock_changed_word_link_overlap": {
+      "source_link_overlap_stock_no_ref_overlap": 10,
+      "source_link_overlap_stock_ref_overlap": 146
+    },
+    "one_to_one_word_difference_inside_source_stock_reference_spans": {
+      "source_within_scripRef_stock_outside_reference": 2,
+      "source_within_scripRef_stock_within_reference": 95
+    },
+    "compiled_stock_title_or_table_presence": {
+      "stock_contains_title_or_table": 47,
+      "stock_no_title_or_table": 109
+    },
+    "bounded_source_line_and_sha256_priority_case_count": 20,
+    "source_changing_words_in_a_reference_is_not_equivalent_to_source_reference_target_parity": true,
+    "stock_reference_absence_in_one_native_entry_does_not_prove_original_authorial_reference_deleted": true,
+    "markup_proximity_does_not_authorize_any_word_or_punctuation_replacement": true
+  },
+  "workflow_confirmation": {
+    "full_real_SHA_pinned_original_to_stock_comparison": "https://github.com/icfmp/Bible-Resources/actions/runs/43412940818",
+    "exact_head_validate": "https://github.com/icfmp/Bible-Resources/actions/runs/43412940814",
+    "implementation_head_sha": "2e29e1f5c7258ae8c78c2d4515f076893d608710",
+    "private_full_metadata_only_run_artifact": "https://github.com/icfmp/Bible-Resources/actions/runs/43412940818/artifacts/14030576725",
+    "private_diagnostic_retention_days": 90
+  },
+  "outstanding": {
+    "identify_10_source_verse_range_entries_with_no_stock_reference_element": true,
+    "verify_all_source_scripRef_to_stock_reference_osisRef_targets_and_label_order_without_assuming_digital_edition_identity": true,
+    "evaluate_59_multi_block_lexical_and_markup_differences_without_silent_editing": true,
+    "verify_unmarked_after_Revelation_source_division_and_Jude": true,
+    "verify_original_markup_structure_paragraphs_notes_tables_quotations_references": true,
+    "verify_digital_copyright_and_redistribution_rights": true,
+    "independent_Xiphos_AndBible_GUI_reader_signoff": true,
+    "release": false
+  },
+  "fully_approved_7_stage_workflow_steps": 0,
+  "source_original_or_stock_raw_modified": false,
+  "third_party_original_words_or_stock_XML_or_binaries_committed": false
+}
