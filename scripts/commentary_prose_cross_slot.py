@@ -199,6 +199,10 @@ class OriginalProseAlternativeNativeSlotProbe:
             return
         self.replay_relevant_native_keys += 1
         digest = sha256(raw).hexdigest()
+        for case_index, unit in enumerate(self.units):
+            if (unit["book"] == book and key != unit["start"] and
+                    digest == unit["selected_stock_raw_sha256"]):
+                self.identical_selected_stock_raw_key_counts[case_index] += 1
         cache_key = (book,digest)
         scores = self.raw_seen.get(cache_key)
         stock_words = None
@@ -221,8 +225,9 @@ class OriginalProseAlternativeNativeSlotProbe:
                 if scores[case_index] < MIN_ANCHOR_RUN:
                     raise PilotError("Source substring anchor and run scanner disagree")
             self.raw_seen[cache_key] = (scores, len(stock_words))
+            cached_len = len(stock_words)
         else:
-            scores, _ = scores
+            scores, cached_len = scores
         for case_index, best_run in scores.items():
             unit=self.units[case_index]
             scope=self._scope(unit,kind,key)
@@ -231,13 +236,12 @@ class OriginalProseAlternativeNativeSlotProbe:
             # A different verse key with the exact same *raw content* is a
             # repeated native payload, not a new independent textual witness.
             if digest == unit["selected_stock_raw_sha256"]:
-                self.identical_selected_stock_raw_key_counts[case_index] += 1
                 continue
             self.candidate_with_original_six_word_anchor[case_index] += 1
             pool=self.top_scopes[case_index][scope]
             if any(x["stock_raw_sha256"]==digest for x in pool):
                 continue
-            candidate_rank=(best_run, -abs(len(stock_words or ())-unit["source_word_count"]))
+            candidate_rank=(best_run, -abs(cached_len-unit["source_word_count"]))
             if len(pool) == MAX_TOP_RAW_PAYLOADS_PER_SCOPE:
                 minimum=min(pool,key=lambda x:x["sort_rank"])
                 if candidate_rank <= minimum["sort_rank"]:
