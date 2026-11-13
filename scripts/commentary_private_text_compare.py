@@ -664,7 +664,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         # Preserve BOTH original values: never join different book texts and
         # call their word differences a CrossWire compiled-content defect.
         source_identity_lexical_gate=classify_lexical_source_identity(
-            source,lexical["bounded_plain_word_nontrivial_differences_line_and_hash_cases"]
+            source,lexical.get("bounded_plain_word_nontrivial_differences_line_and_hash_cases",[])
         )
         reference_cross_slot_report=reference_cross_slot.report(lexical)
         pending_plain_relations={
