@@ -66,7 +66,32 @@ class OriginalScriptureReferenceLabelTests(unittest.TestCase):
         self.assertEqual(
             out["original_scripRef_osisRef_targets_exact_value_multiset_matches_in_stock"],0)
         self.assertFalse(out["source_and_selected_stock_reference_targets_exact_ordered_match"])
+        self.assertEqual(
+            out["original_scripRef_osisRef_work_qualifier_only_matches_in_stock"],1)
+        self.assertTrue(out["work_qualifier_only_matching_does_not_authorize_target_normalization"])
         self.assertNotIn("Bible:Gen.1.1",json.dumps(out))
+
+    def test_unknown_work_qualifier_is_not_silently_removed(self):
+        out=link_label_location(
+            [{"text":"Genesis 1:1", "attribute_name_types":["osisRef"],
+              "private_original_osisRef_target":"OtherBible:Gen.1.1"}],
+            b'<reference osisRef="Gen.1.1">Genesis 1:1</reference>'
+        )
+        self.assertEqual(
+            out["original_scripRef_osisRef_work_qualifier_only_matches_in_stock"],0)
+
+    def test_compiled_reference_does_not_match_twice_for_distinct_source_targets(self):
+        out=link_label_location(
+            [{"text":"first", "attribute_name_types":["osisRef"],
+              "private_original_osisRef_target":"Gen.1.1"},
+             {"text":"second", "attribute_name_types":["osisRef"],
+              "private_original_osisRef_target":"Bible:Gen.1.1"}],
+            b'<reference osisRef="Gen.1.1">first</reference>'
+        )
+        self.assertEqual(
+            out["original_scripRef_osisRef_targets_exact_value_multiset_matches_in_stock"],1)
+        self.assertEqual(
+            out["original_scripRef_osisRef_work_qualifier_only_matches_in_stock"],0)
 
     def test_same_reference_values_in_different_order_not_approved_as_ordered(self):
         out=link_label_location(
