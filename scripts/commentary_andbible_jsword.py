@@ -26,6 +26,10 @@ from zipfile import ZipFile
 from commentary_intake import load_manifest
 from commentary_native_raw_inventory import _safe_stock_install
 from commentary_stock_candidate import _native_content
+from commentary_xiphos_dual_reader import (
+    _exact_native_commentary_raw, _original_stock_reference_bearing_samples,
+)
+from commentary_reference_cross_slot import actual_stock_osisref_targets
 from pilot_fetch import fetch
 from pilot_preflight import PilotError, inspect_archive
 from pilot_subprocess import present_key, query
@@ -51,7 +55,7 @@ def _junit_result(path: Path, *, exit_code: int) -> dict:
         counts["skipped"] = int(result.attrib.get("skipped", "0"))
     except (ET.ParseError, ValueError, KeyError, OverflowError):
         raise PilotError("Unreviewed JSword JUnit result metadata") from None
-    if (exit_code != 0 or counts != {"tests": 3, "errors": 0, "failures": 0, "skipped": 0}):
+    if (exit_code != 0 or counts != {"tests": 4, "errors": 0, "failures": 0, "skipped": 0}):
         raise PilotError("AndBible JSword original-commentary engine checks failed")
     return counts
 
@@ -76,8 +80,46 @@ def _live_samples(manifest: dict, installed: Path, *, reader: str) -> tuple[list
     return selected, digests
 
 
+def _original_native_link_witnesses(
+    installed: Path, module_id: str, full_raw_binary: Path,
+    single_key_binary: Path, *, expected_raw_sha256: str,
+) -> tuple[list[str], int]:
+    """Capture original target *hashes*, never original reference text, for JSword.
+
+    Choose two authorial, strict-XML source keys with real references from
+    the exact independently SHA-pinned stock corpus, not arbitrary test data.
+    """
+    if (single_key_binary.is_symlink() or not single_key_binary.is_file()
+            or full_raw_binary.is_symlink() or not full_raw_binary.is_file()
+            or not SHA.fullmatch(expected_raw_sha256)):
+        raise PilotError("No independently compiled original reference inspector")
+    inventory = _original_stock_reference_bearing_samples(
+        installed, module_id, full_raw_binary,
+        expected_corpus_sha256=expected_raw_sha256, max_samples=2,
+    )
+    keys = inventory["real_reference_bearing_original_native_samples"]
+    if len(keys) != 2:
+        raise PilotError("No two independently located original stock reference entries")
+    witness = []
+    target_count = 0
+    for ref in keys:
+        original = _exact_native_commentary_raw(
+            installed, module_id, ref, single_key_binary
+        )
+        targets = actual_stock_osisref_targets(original)
+        if not 1 <= len(targets) <= 256 or any(
+                not 1 <= len(target.encode("utf-8")) <= 512 for target in targets
+        ):
+            raise PilotError("Original stock OSIS reference targets absent or unsafe")
+        hashes = sorted(sha256(value.encode("utf-8")).hexdigest() for value in targets)
+        witness.append(ref + "|" + ",".join(hashes))
+        target_count += len(targets)
+    return witness, target_count
+
+
 def _run_pinned_jsword(
     jsword: Path, installed: Path, scratch: Path, module_id: str, probes: list[str],
+    link_witnesses: list[str],
 ) -> dict:
     """Use exactly the earlier approved AndBible 5.1.1117 JSword source commit."""
     if (jsword.is_symlink() or not jsword.is_dir()
@@ -87,7 +129,12 @@ def _run_pinned_jsword(
             or not (jsword / "build.gradle.kts").is_file()
             or not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{1,39}", module_id)
             or any(";" in p or "\n" in p for p in probes)
-            or not 2 <= len(probes) <= 20):
+            or not 2 <= len(probes) <= 20
+            or not 2 <= len(link_witnesses) <= 6
+            or any(not re.fullmatch(
+                r"[1-4]?[A-Za-z][A-Za-z0-9 ]{1,35} [1-9][0-9]{0,2}:[1-9][0-9]{0,2}\|[a-f0-9]{64}(?:,[a-f0-9]{64}){0,255}",
+                item,
+            ) for item in link_witnesses)):
         raise PilotError("Unsafe original module / independent JSword test context")
     checked = subprocess.run(
         ["git", "-C", str(jsword), "rev-parse", "HEAD"],
@@ -112,6 +159,7 @@ def _run_pinned_jsword(
         COMMENTARY_JSWORD_MODULE_ROOT=str(installed),
         COMMENTARY_JSWORD_MODULE_ID=module_id,
         COMMENTARY_JSWORD_SAMPLES=";".join(probes),
+        COMMENTARY_JSWORD_REFERENCE_SHA256_WITNESSES=";".join(link_witnesses),
         SWORD_PATH=str(installed),
         HOME=str(home),
         GRADLE_USER_HOME=str(gradle),
@@ -147,7 +195,8 @@ def _run_pinned_jsword(
 
 
 def audit_pinned_commentary(resource_id: str, *, jsword: Path,
-                           native_raw_binary: Path, reader: str = "diatheke") -> dict:
+                           native_raw_binary: Path, native_raw_key_binary: Path,
+                           reader: str = "diatheke") -> dict:
     manifest = load_manifest(resource_id)
     if (manifest["rights"]["status"] != "research_only"
             or manifest["rights"]["owner_approved"] is not False
@@ -187,8 +236,12 @@ def audit_pinned_commentary(resource_id: str, *, jsword: Path,
                 or native["count"] < 2):
             raise PilotError("Full original native raw commentary corpus is not identical")
         refs, digests = _live_samples(manifest, installed, reader=reader)
+        original_link_witnesses, original_link_count = _original_native_link_witnesses(
+            installed, manifest["module_id"], native_raw_binary,
+            native_raw_key_binary, expected_raw_sha256=manifest["native_raw_corpus_sha256"],
+        )
         java = _run_pinned_jsword(jsword, installed, work,
-                                  manifest["module_id"], refs)
+                                  manifest["module_id"], refs, original_link_witnesses)
         return {
             "schema_version": 1,
             "status": "pinned_original_zCom_andbible_stable_jsword_engine_samples_pass",
@@ -203,6 +256,11 @@ def audit_pinned_commentary(resource_id: str, *, jsword: Path,
             "native_opaque_top_keys": native["U"],
             "real_diatheke_substantial_samples": len(refs),
             "real_diatheke_original_output_sha256": digests,
+            "original_link_bearing_native_entries_tested_in_JSword":
+                len(original_link_witnesses),
+            "original_source_osisRef_target_count_verified_in_JSword":
+                original_link_count,
+            "original_osisRef_values_or_original_link_labels_exported": False,
             **java,
             "original_sword_module_mutated": False,
             "andbible_android_app_installed_or_gui_tested": False,
@@ -217,6 +275,7 @@ def main(argv=None) -> int:
     parser.add_argument("--resource-id", required=True)
     parser.add_argument("--jsword", type=Path, required=True)
     parser.add_argument("--native-raw-binary", type=Path, required=True)
+    parser.add_argument("--native-raw-key-binary", type=Path, required=True)
     parser.add_argument("--reader", default="diatheke")
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args(argv)
@@ -224,7 +283,8 @@ def main(argv=None) -> int:
         raise PilotError("Refusing unsafe or existing JSword result path")
     receipt = audit_pinned_commentary(
         args.resource_id, jsword=args.jsword,
-        native_raw_binary=args.native_raw_binary, reader=args.reader,
+        native_raw_binary=args.native_raw_binary,
+        native_raw_key_binary=args.native_raw_key_binary, reader=args.reader,
     )
     args.report.write_text(json.dumps(receipt, sort_keys=True, indent=2) + "\n", encoding="utf-8")
     print("Exact original SWORD zCom independently decoded with stable AndBible JSword (metadata only; not Android GUI)")
