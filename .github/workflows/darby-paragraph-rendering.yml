@@ -1,0 +1,63 @@
+name: Inspect released Darby paragraph rendering (metadata only)
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/darby-paragraph-rendering.yml"
+      - "scripts/inspect_paragraph_rendering.py"
+      - "tests/test_inspect_paragraph_rendering.py"
+      - "modules/darby-jnd-2024/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-source-native-rendering:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      PYTHONPATH: scripts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install parser and pinned-module native reader
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_entry.cpp \
+            -o "$RUNNER_TEMP/native-darby-entry" -lsword
+      - name: Test generic source/compiled marker shape logic
+        run: python -m unittest discover -s tests -p test_inspect_paragraph_rendering.py -v
+      - name: Reacquire exact publisher source and compare published BRJND2024
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/inspect_paragraph_rendering.py \
+            --resource-id frajnd-2024 \
+            --module-id BRJND2024 \
+            --module-path modules/darby-jnd-2024/payload \
+            --native-reader "$RUNNER_TEMP/native-darby-entry" \
+            --ref Gen.6.8 \
+            --ref Gen.6.9 \
+            --ref Gen.6.13 \
+            --ref Gen.7.17 \
+            --ref Gen.10.1 \
+            --ref Gen.11.10 \
+            --ref Gen.14.18 \
+            --report darby-paragraph-shapes.json
+      - name: Upload safe shape-only evidence (no Scripture/module/source)
+        uses: actions/upload-artifact@v4
+        with:
+          name: darby-paragraph-shapes
+          path: darby-paragraph-shapes.json
+          retention-days: 30
+          if-no-files-found: error
