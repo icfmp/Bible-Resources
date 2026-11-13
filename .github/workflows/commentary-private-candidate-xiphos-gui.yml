@@ -1,0 +1,142 @@
+name: Review exact private zCom MHCC candidate in real Xiphos (no release)
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/commentary-private-candidate-xiphos-gui.yml'
+      - 'scripts/commentary_private_candidate_xiphos_gui.py'
+      - 'scripts/commentary_stock_candidate.py'
+      - 'scripts/commentary_xiphos_dual_reader.py'
+      - 'scripts/sword_commentary_raw_key.cpp'
+      - 'scripts/sword_native_commentary_raw_corpus.cpp'
+      - 'tests/test_commentary_private_candidate_xiphos_gui.py'
+      - 'modules/lsg-1910/payload/**'
+      - 'config/catalogue-import-lsg-0.1.0.json'
+      - 'config/commentary-intake/**'
+  workflow_dispatch:
+    inputs:
+      resource_id:
+        description: Original, byte-attested commentary research manifest
+        type: string
+        required: true
+        default: mhcc-crosswire
+
+permissions:
+  contents: read
+concurrency:
+  group: private-candidate-xiphos-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  private-candidate-and-bible-in-xiphos:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    env:
+      RESOURCE_ID: ${{ github.event.inputs.resource_id || 'mhcc-crosswire' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Python requirements and test strict review boundaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          python -m unittest discover -s tests -p 'test_commentary_private_candidate_xiphos_gui.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_stock_candidate.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_xiphos_dual_reader.py' -v
+      - name: Install real libSWORD, diatheke, Xiphos and isolated GUI tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          timeout 180s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y \
+            libsword-dev diatheke xiphos xvfb xdotool xclip dbus-x11
+          command -v diatheke
+          command -v xiphos
+      - name: Build independent full native corpus and exact original key readback tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "$RUNNER_TEMP/private-native-stock-corpus" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_commentary_raw_key.cpp \
+            -o "$RUNNER_TEMP/private-native-stock-key" -lsword
+      - name: Prove full byte-preserving candidate then read five original passages in actual Xiphos
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_private_candidate_xiphos_gui.py \
+            --resource-id "$RESOURCE_ID" \
+            --native-full-corpus-binary "$RUNNER_TEMP/private-native-stock-corpus" \
+            --native-single-key-binary "$RUNNER_TEMP/private-native-stock-key" \
+            --seconds 12 \
+            --report "$RUNNER_TEMP/private-candidate-xiphos-metadata.json"
+      - name: Enforce candidate, original corpus, full private GUI and no-publication gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          from sys import path
+          path.insert(0,"scripts")
+          from commentary_private_candidate_xiphos_gui import _gate_real_candidate_gui
+          proof=json.loads((Path(os.environ["RUNNER_TEMP"])/"private-candidate-xiphos-metadata.json").read_text())
+          manifest=json.loads((Path("config/commentary-intake")/(os.environ["RESOURCE_ID"]+".json")).read_text())
+          assert proof["schema_version"]==1
+          assert proof["resource_id"]==manifest["resource_id"]=="mhcc-crosswire"
+          assert proof["upstream_sword_original_archive_sha256"]==manifest["archive_sha256"]
+          assert proof["upstream_sword_original_conf_sha256"]==manifest["stock_conf_sha256"]
+          assert proof["upstream_sword_original_module_id"]=="MHCC"
+          assert proof["private_candidate_module_id"]=="BRMHCCReview"
+          assert proof["full_native_unfiltered_raw_corpus_sha256"]==manifest["native_raw_corpus_sha256"]
+          assert proof["total_native_keys"]==29975
+          assert (proof["numbered_commentary_K_keys"],proof["intro_I_keys"],proof["opaque_TOP_keys"])==(28718,1255,2)
+          assert proof["complete_stock_and_candidate_native_raw_corpus_sha256_equal"] is True
+          assert proof["all_occupied_native_K_I_TOP_keys_and_order_identical"] is True
+          assert proof["all_original_SWORD_compressed_files_byte_preserved"] is True
+          assert proof["original_metadata_only_module_identity_and_data_path_changed"] is True
+          assert proof["private_candidate_archive_destroyed_without_upload"] is True
+          assert proof["no_unredacted_authorial_text_or_real_reference_names_in_report"] is True
+          assert proof["CCEL_source_to_CrossWire_digital_edition_equivalence_proven"] is False
+          assert proof["digital_transcription_rights_separately_approved"] is False
+          assert proof["editorial_acceptance"] is False
+          assert proof["published"] is False
+          receipt=proof["independent_private_candidate_gui_receipt"]
+          _gate_real_candidate_gui(receipt)
+          assert receipt["status"]=="byte_exact_private_candidate_real_Xiphos_GUI_observation"
+          assert receipt["authentic_original_reference_bearing_keys_count"]>=2
+          assert receipt["original_words_links_screenshots_or_SWORD_archives_uploaded"] is False
+          assert len(receipt["actual_substantive_sample_references"])==5
+          assert all(type(v) is bool and v for v in receipt["commentary_clipboard_match_by_passage"].values())
+          assert len(receipt["real_markup_rendering_observation_by_passage"])==5
+          assert all(row["xiphos_link_click_target_and_navigation_verified"] is False
+                     for row in receipt["real_markup_rendering_observation_by_passage"].values())
+          assert len(json.dumps(proof))<40000
+          print("Private BRMHCCReview + approved LSG: exact original/candidate 29975-entry parity, five real GUI readbacks and two original href targets; NO public release")
+          PY
+      - name: Upload only bounded private verification metadata, never a module or screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: commentary-private-candidate-xiphos-proof-${{ github.run_id }}
+          path: ${{ runner.temp }}/private-candidate-xiphos-metadata.json
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Record strict scope of this disposable reader
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo 'Actual stock MHCC and temporary BRMHCCReview have identical 29,975 occupied native entries and byte-identical compressed payload.'
+            echo 'Our published LSG Bible was SHA-attested and installed next to BRMHCCReview for real Xiphos commentary-pane GUI tests.'
+            echo 'Five real original commentary prose selections and two genuine original OSIS link destinations are strictly required to pass.'
+            echo 'No source prose, SWORD original/candidate ZIP, screenshots or UI HTML are uploaded.'
+            echo 'This does NOT approve all headings, actual mouse click navigation, copyright/edition equivalence, editorial acceptance or publication.'
+          } >> "$GITHUB_STEP_SUMMARY"
