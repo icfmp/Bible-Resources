@@ -91,6 +91,18 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
             recover=False,huge_tree=False,remove_blank_text=False))
     except (ValueError,etree.XMLSyntaxError):
         raise PilotError("Invalid complete original XML; cannot form commentary units") from None
+    # Map actual document-order top-level ThML commentary divisions, not
+    # a guessed OSIS book or a marker's biblical reference value. A marker
+    # sharing a verse anchor with another marker in a DIFFERENT original div1
+    # must not be treated as the same authorial section.
+    original_div1_nodes=[
+        n for n in root.iter()
+        if isinstance(n.tag,str) and n.tag.rsplit("}",1)[-1]=="div1"
+    ]
+    original_div1_order={n:i+1 for i,n in enumerate(original_div1_nodes)}
+    if (len(original_div1_order)!=len(original_div1_nodes)
+            or len(original_div1_nodes)!=whole["element_counts"].get("div1",0)):
+        raise PilotError("Original document-order ThML div1 inventory differs from whole XML scan")
     sources={}
     counts=Counter()
     original_map_digest=sha256()
@@ -105,6 +117,11 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
         match=WORK_REF.fullmatch(original_ref)
         if not match:
             raise PilotError("Previously reviewed original annotation is no longer qualified")
+        source_div1=next((ancestor for ancestor in node.iterancestors()
+                          if ancestor in original_div1_order),None)
+        if source_div1 is None:
+            raise PilotError("Original scripture annotation has no verifiable enclosing ThML div1")
+        source_div1_ordinal=original_div1_order[source_div1]
         source_endpoints=match.group(2).split("-",1)
         start=source_endpoints[0]
         original_declared_end=source_endpoints[-1]
@@ -129,6 +146,8 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
             "original_source_line":node.sourceline,
             "original_full_reference_sha256":sha256(full_ref_bytes).hexdigest(),
             "private_original_declared_range_end_key":original_declared_end,
+            "private_original_enclosing_div1_document_ordinal":source_div1_ordinal,
+            "private_original_total_div1_in_document":len(original_div1_nodes),
             "original_text":txt,
             "original_text_sha256":sha256(text_bytes).hexdigest(),
             "original_characters":len(txt),
