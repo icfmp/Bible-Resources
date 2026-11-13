@@ -11,27 +11,27 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from commentary_andbible_jsword import _junit_result, _live_samples
+from commentary_andbible_jsword import _junit_result, _live_samples, _original_native_link_witnesses
 from pilot_preflight import PilotError
 
 
 class CommentaryAndBibleJSwordTests(unittest.TestCase):
-    def test_accepts_only_three_complete_java_engine_tests(self):
+    def test_accepts_only_four_complete_java_engine_tests(self):
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp) / "TEST.xml"
-            p.write_text('<testsuite tests="3" errors="0" failures="0" skipped="0"/>',
+            p.write_text('<testsuite tests="4" errors="0" failures="0" skipped="0"/>',
                          encoding="utf-8")
             self.assertEqual(
                 _junit_result(p, exit_code=0),
-                {"tests": 3, "errors": 0, "failures": 0, "skipped": 0},
+                {"tests": 4, "errors": 0, "failures": 0, "skipped": 0},
             )
             for content, code in [
-                ('<testsuite tests="3" errors="0" failures="1" skipped="0"/>', 0),
+                ('<testsuite tests="4" errors="0" failures="1" skipped="0"/>', 0),
                 ('<testsuite tests="2" errors="0" failures="0" skipped="0"/>', 0),
-                ('<testsuite tests="3" errors="0" failures="0" skipped="1"/>', 0),
-                ('<testsuite tests="3" errors="0" failures="0" skipped="0"/>', 1),
+                ('<testsuite tests="4" errors="0" failures="0" skipped="1"/>', 0),
+                ('<testsuite tests="4" errors="0" failures="0" skipped="0"/>', 1),
                 ('<testsuite tests="three" errors="0" failures="0"/>', 0),
-                ('<testsuite tests="3" errors="0" failures="0"/>', 1),
+                ('<testsuite tests="4" errors="0" failures="0"/>', 1),
                 ('<anything tests="3" errors="0" failures="0"/>', 0),
             ]:
                 p.write_text(content, encoding="utf-8")
@@ -46,6 +46,39 @@ class CommentaryAndBibleJSwordTests(unittest.TestCase):
             p.write_text("x" * 501_000, encoding="utf-8")
             with self.assertRaises(PilotError):
                 _junit_result(p, exit_code=0)
+
+    @patch("commentary_andbible_jsword._exact_native_commentary_raw")
+    @patch("commentary_andbible_jsword._original_stock_reference_bearing_samples")
+    def test_authentic_source_ref_witnesses_keep_exact_duplicate_targets(
+        self, inventory, reader,
+    ):
+        from hashlib import sha256
+        with tempfile.TemporaryDirectory() as tmp:
+            full = Path(tmp) / "full"
+            key = Path(tmp) / "key"
+            full.write_text("compiled native scanner")
+            key.write_text("compiled native single key")
+            inventory.return_value = {
+                "real_reference_bearing_original_native_samples": [
+                    "Gen 1:3", "Exod 2:1",
+                ]
+            }
+            reader.side_effect = [
+                b'<reference osisRef="Ps.23.1">Original link</reference>'
+                b'<reference osisRef="Ps.23.1">Repeated reference</reference>',
+                b'<reference osisRef="Matt.5.3">Another link</reference>',
+            ]
+            witnesses, count = _original_native_link_witnesses(
+                Path(tmp), "MHCC", full, key,
+                expected_raw_sha256="a" * 64,
+            )
+        first = sha256(b"Ps.23.1").hexdigest()
+        second = sha256(b"Matt.5.3").hexdigest()
+        self.assertEqual(witnesses, [
+            "Gen 1:3|" + first + "," + first,
+            "Exod 2:1|" + second,
+        ])
+        self.assertEqual(count, 3)
 
     @patch("commentary_andbible_jsword.present_key", return_value=True)
     @patch("commentary_andbible_jsword.query")
