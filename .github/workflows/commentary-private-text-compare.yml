@@ -7,6 +7,8 @@ on:
       - 'scripts/commentary_chapter_neighbors.py'
       - 'scripts/commentary_chapter_cross_slot.py'
       - 'scripts/commentary_chapter_paragraph_overlap.py'
+      - 'scripts/commentary_chapter_p_boundaries.py'
+      - 'tests/test_commentary_chapter_p_boundaries.py'
       - 'tests/test_commentary_chapter_paragraph_overlap.py'
       - 'tests/test_commentary_chapter_cross_slot.py'
       - 'tests/test_commentary_chapter_neighbors.py'
@@ -254,6 +256,51 @@ jobs:
                             "strict_xml_failures": paragraph["strict_raw_xml_parse_failures_by_kind"],
                             "source_p_census": paragraph["all_original_p_word_span_fidelity_classes"],
                             "unlocated_p_line_hash_span_metrics": p_cases}, sort_keys=True))
+          boundary = report["source_chapter_p_boundaries_in_stock"]
+          boundary_cases = boundary["source_paragraph_word_run_boundary_cases"]
+          if (boundary["original_chapter_adjacent_p_total"] != all_p or
+                  boundary["previously_unlocated_p_examined"] != len(expected_p) or
+                  len(boundary_cases) != len(expected_p) or len(boundary_cases) > 12):
+              raise SystemExit("Original p paragraph boundary cases not reconciled")
+          expected_fields = {
+              "source_line", "source_reference_sha256", "original_paragraph_sha256",
+              "original_word_tokens", "best_same_chapter_contiguous_word_run",
+              "original_tokens_before_shared_run", "original_tokens_after_shared_run",
+              "selected_stock_run_start_token_offset", "stock_key_slots_tied_for_best_word_run",
+              "matching_native_key_sha256", "repeated_identical_word_run_windows_in_selected_stock_key",
+              "original_word_token_multiset_occurrences_in_selected_stock_key",
+              "source_paragraph_direct_child_element_counts", "original_next_sibling_tag",
+              "original_parent_element_tag",
+          }
+          for case in boundary_cases:
+              identity = (case["source_reference_sha256"], case["original_paragraph_sha256"])
+              if set(case) != expected_fields or identity not in expected_id or not all(
+                  isinstance(case[name], str) and re.fullmatch(r"[0-9a-f]{64}",case[name])
+                  for name in ("source_reference_sha256", "original_paragraph_sha256",
+                               "matching_native_key_sha256")
+              ):
+                  raise SystemExit("Unreviewed original chapter p boundary value")
+              if (not all(type(case[name]) is int and case[name] >= 0 for name in (
+                      "source_line", "original_word_tokens", "best_same_chapter_contiguous_word_run",
+                      "original_tokens_before_shared_run", "original_tokens_after_shared_run",
+                      "selected_stock_run_start_token_offset", "stock_key_slots_tied_for_best_word_run",
+                      "repeated_identical_word_run_windows_in_selected_stock_key",
+                      "original_word_token_multiset_occurrences_in_selected_stock_key"))
+                  or case["best_same_chapter_contiguous_word_run"] <= 0
+                  or case["original_tokens_before_shared_run"] +
+                     case["best_same_chapter_contiguous_word_run"] +
+                     case["original_tokens_after_shared_run"] != case["original_word_tokens"]):
+                  raise SystemExit("Invalid original-to-stock word-run offset accounting")
+              if (not re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]{0,60}|_none",
+                                   case["original_next_sibling_tag"]) or
+                  not re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]{0,60}|_none",
+                                   case["original_parent_element_tag"]) or
+                  not all(re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]{0,60}",name)
+                              and type(number) is int and number >= 0
+                              for name,number in case["source_paragraph_direct_child_element_counts"].items())):
+                  raise SystemExit("Source XML tag metadata exceeds safe bounds")
+          print("Original source p word boundaries and stock anchor counts (not editorial parity): " +
+                json.dumps(boundary_cases, sort_keys=True))
           PY
       - name: Preserve only non-text source and stock diagnostics
         if: always()
