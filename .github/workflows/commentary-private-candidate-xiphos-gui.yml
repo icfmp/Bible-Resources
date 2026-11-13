@@ -121,6 +121,7 @@ jobs:
           assert click["original_words_or_private_screenshots_exported"] is False
           assert type(click["source_reference_targets_verified_in_real_GUI"]) is bool
           assert type(click["genuine_original_osisref_click_navigated_to_expected_bible"]) is bool
+          assert type(click["original_reference_link_sidebar_preview_verified"]) is bool
           assert type(click["x11_pointer_shape_observed"]) is bool
           assert 0 <= click["hover_candidate_actual_mouse_clicks"] <= 12
           assert 0 <= click["independent_exact_target_bible_readbacks"] <= 72
@@ -131,11 +132,18 @@ jobs:
               "X11_pointer_shape_unavailable",
               "genuine_source_href_attested_mouse_link_not_yet_confirmed",
               "original_source_attested_link_real_click_Bible_target_verified",
+              "original_source_attested_link_real_click_sidebar_preview_verified",
               "real_GUI_pointer_or_bible_readback_unavailable",
           }
           assert click["genuine_original_osisref_click_navigated_to_expected_bible"] == (
               click["status"] == "original_source_attested_link_real_click_Bible_target_verified"
           )
+          assert click["original_reference_link_sidebar_preview_verified"] == (
+              click["status"] == "original_source_attested_link_real_click_sidebar_preview_verified"
+          )
+          assert set(click["authentic_GUI_internal_href_route_counts"]) == {
+              "sword", "bible", "passagestudy", "xiphosurl"
+          }
           print("Xiphos real mouse link/canonical target Bible-pane evidence (metadata only): " +
                 json.dumps(click, sort_keys=True))
           intro=receipt["pinned_original_source_intro_keys_and_word_counts"]
