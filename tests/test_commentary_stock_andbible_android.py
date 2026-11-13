@@ -30,6 +30,71 @@ class CommentaryAndroidStockTests(unittest.TestCase):
                          ["EXACT_MODULE_ZIP", "DOWNLOADS"])
         self.assertFalse(result["reader_module_metadata_detected"])
 
+    def test_only_reviewed_baseline_bible_zip_is_selectable(self):
+        xml = b'''<hierarchy>
+          <node text="BRLSG1910.zip" bounds="[100,250][650,350]"/>
+          <node text="SomeOtherBible.zip" bounds="[100,350][650,450]"/>
+          <node text="MHCC.zip" bounds="[100,450][650,550]"/>
+        </hierarchy>'''
+        actions = [row["action"] for row in safe_controls(xml, "MHCC", TITLE)["controls"]]
+        self.assertEqual(actions, ["EXACT_REVIEWED_BIBLE_ZIP", "EXACT_MODULE_ZIP"])
+
+    @patch("commentary_stock_andbible_android.time.sleep")
+    @patch("commentary_stock_andbible_android._tap")
+    @patch("commentary_stock_andbible_android._screen")
+    def test_reviewed_baseline_file_picker_selects_only_actual_basename(
+        self, screen, tap, _sleep,
+    ):
+        from commentary_stock_andbible_android import _select_exact_download_zip
+        screen.return_value = {"controls": [
+            {"action": "EXACT_REVIEWED_BIBLE_ZIP", "x": 321, "y": 432}
+        ]}
+        tap.return_value = "EXACT_REVIEWED_BIBLE_ZIP"
+        selected, history = _select_exact_download_zip(
+            "MHCC", TITLE, wanted="EXACT_REVIEWED_BIBLE_ZIP"
+        )
+        self.assertTrue(selected)
+        self.assertEqual(history[0]["safe_action_names"], ["EXACT_REVIEWED_BIBLE_ZIP"])
+        self.assertEqual(tap.call_args.args[1], ("EXACT_REVIEWED_BIBLE_ZIP",))
+        with self.assertRaisesRegex(PilotError, "Unreviewed"):
+            _select_exact_download_zip(
+                "MHCC", TITLE, wanted="ARBITRARY_UNVERIFIED_BIBLE"
+            )
+
+    @patch("commentary_stock_andbible_android.verify_and_install_reviewed_bible")
+    def test_temporary_bible_zip_preserves_all_five_attested_files(self, verifier):
+        from tempfile import TemporaryDirectory
+        from zipfile import ZipFile
+        from commentary_stock_andbible_android import (
+            _create_attested_reviewed_bible_zip, BIBLE_MODULE,
+        )
+        members = (
+            "mods.d/brlsg1910.conf",
+            "modules/texts/rawtext/brlsg1910/ot",
+            "modules/texts/rawtext/brlsg1910/ot.vss",
+            "modules/texts/rawtext/brlsg1910/nt",
+            "modules/texts/rawtext/brlsg1910/nt.vss",
+        )
+        def fill(destination):
+            for n, name in enumerate(members):
+                p = destination / name
+                p.parent.mkdir(parents=True, exist_ok=True)
+                p.write_bytes(("original approved member %d" % n).encode())
+            return {
+                "module_id": BIBLE_MODULE,
+                "all_five_published_bible_files_sha256_attested": True,
+            }
+        verifier.side_effect = fill
+        with TemporaryDirectory() as tmp:
+            archive = _create_attested_reviewed_bible_zip(Path(tmp))
+            with ZipFile(archive, "r") as z:
+                self.assertEqual(set(z.namelist()), set(members))
+                for n, name in enumerate(members):
+                    self.assertEqual(
+                        z.read(name), ("original approved member %d" % n).encode()
+                    )
+        self.assertEqual(verifier.call_count, 1)
+
     def test_metadata_identity_not_file_picker_filename_is_reader_witness(self):
         xml = (b'<hierarchy><node text="MHCC" bounds="[50,100][600,200]"/>'
                b'<node text="MHCC.zip" bounds="[50,200][600,300]"/></hierarchy>')
