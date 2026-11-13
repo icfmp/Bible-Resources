@@ -87,6 +87,7 @@ def original_chapter_neighbors(xml_bytes: bytes) -> tuple[dict, dict]:
         private_link_labels = [
             {
                 "text": "".join(candidate.itertext()),
+                "private_original_osisRef_target": candidate.get("osisRef", ""),
                 "attribute_name_types": sorted(
                     name.rsplit("}", 1)[-1] for name in candidate.attrib
                 ),
