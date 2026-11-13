@@ -7,6 +7,8 @@ on:
       - 'scripts/commentary_private_candidate_xiphos_gui.py'
       - 'scripts/commentary_stock_candidate.py'
       - 'scripts/commentary_xiphos_dual_reader.py'
+      - 'scripts/commentary_xiphos_heading_probe.py'
+      - 'tests/test_commentary_xiphos_heading_probe.py'
       - 'scripts/sword_commentary_raw_key.cpp'
       - 'scripts/sword_native_commentary_raw_corpus.cpp'
       - 'tests/test_commentary_private_candidate_xiphos_gui.py'
@@ -44,6 +46,7 @@ jobs:
           set -euo pipefail
           python -m pip install -r requirements.txt
           python -m unittest discover -s tests -p 'test_commentary_private_candidate_xiphos_gui.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_xiphos_heading_probe.py' -v
           python -m unittest discover -s tests -p 'test_commentary_stock_candidate.py' -v
           python -m unittest discover -s tests -p 'test_commentary_xiphos_dual_reader.py' -v
       - name: Install real libSWORD, diatheke, Xiphos and isolated GUI tools
@@ -110,6 +113,41 @@ jobs:
           assert proof["published"] is False
           receipt=proof["independent_private_candidate_gui_receipt"]
           _gate_real_candidate_gui(receipt)
+          intro=receipt["pinned_original_source_intro_keys_and_word_counts"]
+          assert intro["source_full_native_raw_corpus_sha256_reconfirmed"] is True
+          assert intro["source_native_I_entries_scanned"] == proof["intro_I_keys"]
+          assert intro["source_native_I_entries_with_authored_word_tokens"] >= 0
+          assert intro["source_native_I_entries_without_word_tokens"] >= 0
+          assert intro["source_native_I_entries_unparseable_strict_XML"] >= 0
+          assert (intro["source_native_I_entries_scanned"] ==
+                  intro["source_native_I_entries_with_authored_word_tokens"] +
+                  intro["source_native_I_entries_without_word_tokens"] +
+                  intro["source_native_I_entries_unparseable_strict_XML"])
+          assert intro["source_native_I_raw_byte_count"] > 0
+          assert intro["no_original_intro_or_full_words_exported"] is True
+          assert intro["unparseable_or_nonverifiable_intro_is_not_missing_commentary"] is True
+          print("Original pinned full native I-key inventory (no title text): " +
+                json.dumps({k:v for k,v in intro.items() if k not in {
+                    "selected_Gen_native_I_word_token_counts"}}, sort_keys=True))
+          heading=receipt["real_Xiphos_commentary_book_chapter_heading_context_menu"]
+          assert heading["intro_data_or_clipboard_exported"] is False
+          assert heading["no_heading_missing_from_source_inferred"] is True
+          assert type(heading["heading_GUI_presentation_verified"]) is bool
+          assert set(heading["book_and_chapter_menu_observations"]) == {"book", "chapter"}
+          allowed = {
+              "not_attempted", "no_authenticated_original_intro_key_for_this_scope",
+              "commentary_pane_geometry_unavailable",
+              "original_intro_prose_copied_from_real_GUI",
+              "menu_action_attempted_but_intro_not_proven_in_clipboard",
+              "real_GUI_menu_or_clipboard_action_unavailable",
+          }
+          assert all(
+              r["GUI_menu_observation_class"] in allowed
+              and type(r["original_intro_sha256_attested"]) is bool
+              for r in heading["book_and_chapter_menu_observations"].values()
+          )
+          print("Xiphos book/chapter heading UI (pass only on copied original intro): " +
+                json.dumps(heading["book_and_chapter_menu_observations"], sort_keys=True))
           assert receipt["status"]=="byte_exact_private_candidate_real_Xiphos_GUI_observation"
           assert receipt["authentic_original_reference_bearing_keys_count"]>=2
           assert receipt["original_words_links_screenshots_or_SWORD_archives_uploaded"] is False
