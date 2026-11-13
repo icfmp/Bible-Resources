@@ -41,6 +41,13 @@ def case(item: dict) -> dict:
 
 
 class SourceLexicalIdentityGuardTests(unittest.TestCase):
+    def test_empty_future_edition_has_no_false_lexical_anomalies(self):
+        result = classify_lexical_source_identity({}, [])
+        self.assertEqual(result["original_source_compiled_lexical_attention_cases_checked"],0)
+        self.assertEqual(result["original_div1_book_identity_gate_classes"],{})
+        self.assertTrue(result["no_unresolved_nonlink_lexical_cases_to_classify"])
+        self.assertFalse(result["published"])
+
     def test_cross_book_original_title_claim_is_quarantined_without_rewriting(self):
         disputed = original(66, "Jude")
         matched = original(8, "Judges")
