@@ -41,7 +41,30 @@ BIBLE_ATTESTATION = ROOT / "config/catalogue-import-lsg-0.1.0.json"
 BIBLE_MODULE = "BRLSG1910"
 BIBLE_V11N = "Segond"
 # Actual authored comments are never copied into the version-controlled repository.
-PASSAGES = ("Gen 1:1", "John 3:16", "Ps 23:1")
+MAX_SUBSTANTIVE_SAMPLES = 3
+
+
+def _candidate_passages(manifest: dict) -> tuple[str, ...]:
+    """Probe only reviewed real source refs and their own chapter starts.
+
+    A zCom commentary is legitimately sparse: an occupied chapter/range
+    anchor need not occur at each Bible verse. Do not generate absent entries
+    or label a silent stock slot as damaged. The full corpus is independently
+    inventoried elsewhere.
+    """
+    refs = manifest["sample_references"]
+    result = []
+    for ref in refs:
+        if not isinstance(ref, str):
+            raise PilotError("Unreviewed source reference")
+        match = re.fullmatch(r"([1-4]?[A-Za-z][A-Za-z ]{0,35}) ([1-9][0-9]{0,2}):([1-9][0-9]{0,2})", ref)
+        if not match:
+            raise PilotError("Malformed original commentary sample reference")
+        book, chapter, verse = match.groups()
+        for candidate in (ref, f"{book} {chapter}:1"):
+            if candidate not in result:
+                result.append(candidate)
+    return tuple(result)
 SHA = re.compile(r"[0-9a-f]{64}\Z")
 
 
@@ -298,26 +321,37 @@ def observe_dual_module_reader(resource_id: str = "mhcc-crosswire",
         _safe_stock_install(archive, inspection["members"], installed)
         bible = verify_and_install_reviewed_bible(installed)
         comparisons = {}
-        for passage in PASSAGES:
-            pair = {}
-            for slot, module in (("commentary", manifest["module_id"]),
-                                 ("bible", BIBLE_MODULE)):
-                code, output = query(
-                    module, passage, fmt="plain", root=installed,
-                    exe="diatheke", limit=256 * 1024, timeout=30,
+        sparse_original_commentary_slots = []
+        for passage in _candidate_passages(manifest):
+            # Order deliberately starts with the original zCom source: do
+            # NOT treat an unoccupied commentary verse as a corruption.
+            code, text = query(
+                manifest["module_id"], passage, fmt="plain", root=installed,
+                exe="diatheke", limit=256 * 1024, timeout=30,
+            )
+            if code != 0 or not present_key(passage, text, code) or len(text) <= 64:
+                sparse_original_commentary_slots.append(passage)
+                continue
+            bible_code, bible_output = query(
+                BIBLE_MODULE, passage, fmt="plain", root=installed,
+                exe="diatheke", limit=256 * 1024, timeout=30,
+            )
+            if (bible_code != 0 or not present_key(passage, bible_output, bible_code)
+                    or len(bible_output) <= 16):
+                raise PilotError(
+                    f"Reviewed Bible could not navigate real commentary anchor: {passage}"
                 )
-                key_found = present_key(passage, output, code)
-                threshold = 64 if slot == "commentary" else 16
-                if code != 0 or not key_found or len(output) <= threshold:
-                    # Metadata-only diagnostic: no Bible/commentary words or
-                    # source fragments leave the private runner.
-                    raise PilotError(
-                        f"Actual installed {slot} entry unreadable at {passage}: "
-                        f"exit_success={code == 0}; key_found={key_found}; "
-                        f"output_bytes={len(output)}; threshold={threshold}"
-                    )
-                pair[slot] = output
-            comparisons[passage] = pair
+            comparisons[passage] = {
+                "commentary": text,
+                "bible": bible_output,
+            }
+            if len(comparisons) == MAX_SUBSTANTIVE_SAMPLES:
+                break
+        if len(comparisons) < 2:
+            raise PilotError(
+                "Fewer than two independently occupied original commentary keys "
+                "also navigable in the reviewed Bible"
+            )
         observed = _run_real_gui(installed, comparisons, seconds=seconds)
         return {
             "schema_version": 1,
@@ -329,6 +363,9 @@ def observe_dual_module_reader(resource_id: str = "mhcc-crosswire",
             "installed_reviewed_bible": bible,
             "both_real_sword_modules_have_nonempty_diatheke_readback": True,
             "sample_count": len(comparisons),
+            "actual_substantive_sample_references": list(comparisons),
+            "original_sparse_commentary_slots_skipped": sparse_original_commentary_slots,
+            "unoccupied_stock_verses_silently_reintroduced": False,
             **observed,
             "entire_original_commentary_content_and_links_gui_verified": False,
             "owner_rights_editorial_approval": False,
