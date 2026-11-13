@@ -24,7 +24,7 @@ SOURCE = b"""<?xml version='1.0' encoding='utf-8'?>
       *[Uncertain wording]<verse eID='Gen.1.4'/></p>
 <p><verse osisID='Gen.1.5' sID='Gen.1.5'/>
       *Dieu is a lexical marker<verse eID='Gen.1.5'/></p>
-<lg><l><verse osisID='Gen.1.6' sID='Gen.1.6'/>\n      <hi type='italic'>*Wrapped poetic division</hi><verse eID='Gen.1.6'/></l></lg>\n</chapter></div></osisText></osis>
+<lg><l><verse osisID='Gen.1.6' sID='Gen.1.6'/>\n      <hi type='italic'>*Wrapped poetic division</hi><verse eID='Gen.1.6'/></l></lg>\n<p><verse osisID='Gen.1.7' sID='Gen.1.7'/>\n      ***Level three break<verse eID='Gen.1.7'/></p>\n</chapter></div></osisText></osis>
 """
 
 
