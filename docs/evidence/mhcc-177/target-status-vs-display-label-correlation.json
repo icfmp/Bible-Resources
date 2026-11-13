@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "issue": "https://github.com/icfmp/Bible-Resources/issues/177",
+  "status": "SOURCE_VS_COMPILATION_450_SCRIPTURE_LABEL_TARGET_PER_OCCURRENCE_PRIVATE_CORRELATION_NOT_EDITORIAL_PARITY",
+  "source_original_SHA256": {
+    "ccel_thml": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+    "crosswire_native_original_zip": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+    "full_native_stock_raw_ordered": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
+  },
+  "actual_source_link_to_stock_entry_correlations": {
+    "original_scripRef_occurrences_across_156_verse_range_discrepancies": 450,
+    "selected_stock_reference_element_occurrences": 272,
+    "original_target_occurrences_matching_after_only_literal_Bible_work_qualifier_comparison": 255,
+    "original_target_occurrences_unmatched_in_same_compiled_entry": 195,
+    "original_source_target_correspondence_x_display_label_location": {
+      "literal_Bible_work_prefix_only_match": {
+        "literal_label_in_stock_text_outside_confirmed_reference_element": 4,
+        "literal_label_inside_stock_reference_element": 90,
+        "original_label_text_not_located_in_selected_stock_entry": 154,
+        "word_tokens_in_stock_reference_element_different_punctuation": 7
+      },
+      "unpaired_original_target": {
+        "literal_label_in_stock_text_outside_confirmed_reference_element": 14,
+        "literal_label_inside_stock_reference_element": 16,
+        "original_label_text_not_located_in_selected_stock_entry": 17,
+        "word_tokens_in_stock_text_different_punctuation_or_markup": 148
+      }
+    },
+    "unmatched_original_target_same_book_stock_location_scope_x_selected_entry_label_location": {
+      "target_not_witnessed_in_other_same_book_stock_reference_markup": {
+        "literal_label_in_stock_text_outside_confirmed_reference_element": 14,
+        "literal_label_inside_stock_reference_element": 14,
+        "original_label_text_not_located_in_selected_stock_entry": 17,
+        "word_tokens_in_stock_text_different_punctuation_or_markup": 147
+      },
+      "target_witnessed_elsewhere_in_same_book": {
+        "literal_label_inside_stock_reference_element": 2
+      },
+      "target_witnessed_in_other_numbered_key_same_chapter": {
+        "word_tokens_in_stock_text_different_punctuation_or_markup": 1
+      }
+    },
+    "original_unmatched_target_label_occurrences_with_literal_or_contiguous_word_location": 178,
+    "unmatched_source_labels_not_detected_in_selected_stock_entry_exact_or_contiguous_words": 17,
+    "selected_entry_label_location_does_not_prove_citation_target_accuracy": true,
+    "contiguous_word_tokens_do_not_prove_original_punctuation_or_link_markup_retained": true,
+    "stock_entry_reference_element_presence_or_absence_does_not_prove_full_authorial_section_mapping": true
+  },
+  "verification": {
+    "final_tested_pr_head_before_permanent_report": "a82c505d6fadd820550adb44479ba6155dd9f1f3",
+    "actual_full_SHA_pinned_original_source_to_stock_Actions_run": "https://github.com/icfmp/Bible-Resources/actions/runs/43420999352",
+    "exact_head_Validate_run": "https://github.com/icfmp/Bible-Resources/actions/runs/43420999342"
+  },
+  "followup_gates": {
+    "review_17_source_label_occurrences_not_located_in_selected_stock_entry": true,
+    "compare_all_original_reference_target_attribute_ranges_and_placement": true,
+    "resolve_59_original_multi_block_lexical_edits": true,
+    "original_source_Jude_unmarked_division_and_post_Revelation_div1": true,
+    "source_to_stock_ordered_notes_quotes_tables_paragraphs_and_all_references": true,
+    "specific_original_digital_edition_and_redistribution_authorization": true,
+    "independent_Xiphos_and_AndBible_GUI_signoff": true,
+    "release": false
+  },
+  "full_seven_stage_approval_gates_completed": 0,
+  "original_authorial_source_text_or_sword_compiled_bytes_modified": false,
+  "original_words_label_text_reference_values_or_raw_stock_xml_published": false
+}
