@@ -69,8 +69,11 @@ jobs:
           from pathlib import Path
           report=json.loads((Path(os.environ["RUNNER_TEMP"])/"commentary-stock-xiphos-private-proof.json").read_text())
           assert report["status"]=="original_pinned_zCom_xiphos_real_window_private_smoke_pass"
-          assert report["resource_id"]=="mhcc-crosswire"
-          assert report["original_module_id"]=="MHCC"
+          manifest=json.loads((Path("config/commentary-intake")/(os.environ["RESOURCE_ID"]+".json")).read_text())
+          assert report["resource_id"]==manifest["resource_id"]
+          assert report["original_module_id"]==manifest["module_id"]
+          assert report["original_upstream_archive_sha256"]==manifest["archive_sha256"]
+          assert report["original_upstream_conf_sha256"]==manifest["stock_conf_sha256"]
           assert report["original_sword_driver"]=="zCom"
           assert re.fullmatch(r"[0-9a-f]{64}",report["original_upstream_archive_sha256"])
           assert re.fullmatch(r"[0-9a-f]{64}",report["original_upstream_conf_sha256"])
