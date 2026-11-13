@@ -9,7 +9,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from commentary_chapter_neighbors import original_chapter_neighbors, compare_chapter_neighbors
+from commentary_chapter_neighbors import original_chapter_neighbors, compare_chapter_neighbors, ChapterNeighborNumberedProbe
 from commentary_private_text_compare import raw_as_strict_xml_text
 from pilot_preflight import PilotError
 
@@ -68,6 +68,51 @@ class ChapterSiblingWitnessTests(unittest.TestCase):
                 b"<scripCom osisRef='Bible:Gen.1'/>Unmapped content"))
         with self.assertRaisesRegex(PilotError, "unreviewed next sibling"):
             original_chapter_neighbors(fixture(b"<div>Unreviewed body</div>"))
+
+
+    def test_original_sibling_found_in_numbered_stock_of_same_chapter(self):
+        source, _ = original_chapter_neighbors(fixture())
+        probe = ChapterNeighborNumberedProbe(source)
+        probe.observe("K", "Gen.1.1",
+                      b"<p>Companion words. Chapter commentary. Other words.</p>",
+                      raw_as_strict_xml_text)
+        result = probe.report()
+        self.assertEqual(
+            result["source_sibling_location_in_original_stock_same_chapter_numbered_slots"],
+            {"original_sibling_exact_unicode_contained_in_same_chapter_numbered_slot": 1})
+        self.assertFalse(result["full_source_to_stock_chapter_section_parity_verified"])
+        self.assertNotIn("Chapter commentary.", json.dumps(result))
+
+    def test_word_match_without_punctuation_is_not_exact(self):
+        source, _ = original_chapter_neighbors(fixture())
+        probe = ChapterNeighborNumberedProbe(source)
+        probe.observe("K", "Gen.1.1", b"<p>Chapter commentary?</p>",
+                      raw_as_strict_xml_text)
+        self.assertEqual(
+            probe.report()["source_sibling_location_in_original_stock_same_chapter_numbered_slots"],
+            {"original_sibling_word_tokens_contiguous_in_same_chapter_numbered_slot": 1})
+
+    def test_other_book_does_not_supply_fake_chapter_match(self):
+        source, _ = original_chapter_neighbors(fixture())
+        probe = ChapterNeighborNumberedProbe(source)
+        probe.observe("K", "Exod.1.1", b"<p>Chapter commentary.</p>",
+                      raw_as_strict_xml_text)
+        probe.observe("K", "Gen.1.1", b"<p>Different words altogether.</p>",
+                      raw_as_strict_xml_text)
+        self.assertEqual(
+            probe.report()["source_sibling_location_in_original_stock_same_chapter_numbered_slots"],
+            {"original_sibling_not_found_in_same_chapter_numbered_slots": 1})
+
+    def test_unparseable_same_chapter_entry_does_not_claim_missing_source(self):
+        source, _ = original_chapter_neighbors(fixture())
+        probe = ChapterNeighborNumberedProbe(source)
+        probe.observe("K", "Gen.1.1", b"<p>unclosed</title>",
+                      raw_as_strict_xml_text)
+        result = probe.report()
+        self.assertEqual(result["strict_xml_unparseable_stock_numbered_slots"], 1)
+        self.assertEqual(
+            result["source_sibling_location_in_original_stock_same_chapter_numbered_slots"],
+            {"no_strictly_parsed_same_chapter_numbered_slot": 1})
 
 
 if __name__ == "__main__":

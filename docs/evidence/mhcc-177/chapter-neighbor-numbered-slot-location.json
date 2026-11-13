@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "issue": "https://github.com/icfmp/Bible-Resources/issues/177",
+  "status": "SOURCE_CHAPTER_NEIGHBORS_LOCALIZED_IN_SAME_CHAPTER_NUMBERED_SWORD_ENTRIES_NOT_CHAPTER_PARITY",
+  "pinned": {
+    "original_ccel_thml_sha256": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+    "original_stock_crosswire_archive_sha256": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+    "native_stock_ordered_raw_sha256": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
+  },
+  "original_source": {
+    "explicit_chapter_markers": 228,
+    "immediate_sibling_tags": {
+      "h2": 220,
+      "p": 8
+    },
+    "source_sibling_not_entire_chapter_section": true
+  },
+  "native_same_chapter_probe": {
+    "original_siblings_evaluated": 228,
+    "occupied_numbered_stock_slots_scanned": 4618,
+    "strict_xml_parse_failures": 0,
+    "exact_unicode_source_sibling_contained_at_one_or_more_same_chapter_numbered_slots": 223,
+    "source_word_tokens_contiguous_without_exact_unicode_match_at_same_chapter_numbered_slots": 1,
+    "no_source_sibling_text_match_found_within_same_chapter_numbered_slots": 4,
+    "source_sibling_not_found_in_stock_intro_directly": 228,
+    "word_contiguity_does_not_prove_punctuation_or_layout_identity": true,
+    "repeated_native_keys_may_represent_range_propagation": true,
+    "found_location_not_verified_authored_source_section_mapping": true,
+    "unmatched_four_are_not_proven_missing_from_every_stock_entry": true
+  },
+  "implementation_evidence": {
+    "real_full_originals_action": "https://github.com/icfmp/Bible-Resources/actions/runs/43402644182",
+    "validate_action": "https://github.com/icfmp/Bible-Resources/actions/runs/43402644322",
+    "implementation_head": "f605b6a2bd44cf3ed70d81b1b6cd17e94f62fb43"
+  },
+  "pending": {
+    "investigate_four_unlocated_chapter_siblings_without_invented_mapping": true,
+    "source_unmarked_division_and_jude_identity_and_content": true,
+    "original_156_unexplained_lexical_differences": true,
+    "complete_chapter_intro_and_body_scope_and_ordered_markup_parity": true,
+    "rights_for_specific_digital_files_approval": true,
+    "independent_gui_xiphos_and_andbible_tests": true,
+    "publication": false
+  },
+  "source_words_or_stock_xml_committed": false,
+  "originals_modified": false,
+  "legal_editorial_technical_release_approved": false
+}

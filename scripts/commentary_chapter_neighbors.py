@@ -129,3 +129,84 @@ def compare_chapter_neighbors(source: dict, stocked_intros: dict,
         "chapter_source_neighbor_matching_does_not_prove_intro_content_or_layout_parity": True,
         "no_original_text_or_raw_stock_xml_in_report": True,
     }
+
+
+class ChapterNeighborNumberedProbe:
+    """Bounded read-only search at independently observed SAME-CHAPTER K keys.
+
+    Finds possible text location only. A K slot can repeat another range entry,
+    and neither containment nor word order establishes authorial provenance.
+    """
+
+    def __init__(self, source: dict):
+        self.units_by_chapter = {}
+        self.marker_units = []
+        for chapter, items in source.items():
+            units = []
+            for item in items:
+                original = item["text"]
+                words = re.findall(r"\w+", original)
+                state = {"text": original, "words": words, "exact": False,
+                         "words_found": False, "stock_numbered_keys": 0}
+                units.append(state)
+                self.marker_units.append(state)
+            self.units_by_chapter[chapter] = units
+        self.chapter_numbered_keys = Counter()
+        self.strict_xml_parse_failures = 0
+        self.numbered_entries_scanned = 0
+
+    def observe(self, kind: str, key: str, raw: bytes, decode_raw) -> None:
+        if kind != "K":
+            return
+        chapter_key = key.rsplit(".", 1)[0]
+        items = self.units_by_chapter.get(chapter_key)
+        if not items:
+            return
+        self.numbered_entries_scanned += 1
+        self.chapter_numbered_keys[chapter_key] += 1
+        native_text = decode_raw(raw)
+        if native_text is None:
+            self.strict_xml_parse_failures += 1
+            return
+        native_words = None
+        for item in items:
+            item["stock_numbered_keys"] += 1
+            if item["text"] in native_text:
+                item["exact"] = True
+                item["words_found"] = True
+                continue
+            if item["words"] and not item["words_found"]:
+                if native_words is None:
+                    native_words = re.findall(r"\w+", native_text)
+                if _contiguous_offset(item["words"], native_words) is not None:
+                    item["words_found"] = True
+
+    def report(self) -> dict:
+        if not self.marker_units or self.numbered_entries_scanned == 0:
+            raise PilotError("Chapter numbered-slot witness lacks source or stock coverage")
+        outcome = Counter()
+        for item in self.marker_units:
+            if item["exact"]:
+                outcome["original_sibling_exact_unicode_contained_in_same_chapter_numbered_slot"] += 1
+            elif item["words_found"]:
+                outcome["original_sibling_word_tokens_contiguous_in_same_chapter_numbered_slot"] += 1
+            elif item["stock_numbered_keys"]:
+                outcome["original_sibling_not_found_in_same_chapter_numbered_slots"] += 1
+            else:
+                outcome["no_strictly_parsed_same_chapter_numbered_slot"] += 1
+        if sum(outcome.values()) != len(self.marker_units):
+            raise PilotError("Same-chapter stock text location audit lost original chapter markers")
+        return {
+            "original_chapter_source_markers_evaluated": len(self.marker_units),
+            "same_chapter_numbered_stock_slots_scanned": self.numbered_entries_scanned,
+            "explicit_chapter_keys_with_any_numbered_stock_slot":
+                len(self.chapter_numbered_keys),
+            "strict_xml_unparseable_stock_numbered_slots": self.strict_xml_parse_failures,
+            "source_sibling_location_in_original_stock_same_chapter_numbered_slots":
+                dict(sorted(outcome.items())),
+            "word_contiguity_is_not_unicode_punctuation_or_markup_parity": True,
+            "numbered_slots_may_repeat_same_range_comment": True,
+            "no_original_text_or_sword_entry_bytes_reported": True,
+            "no_chapter_or_book_attribution_invented": True,
+            "full_source_to_stock_chapter_section_parity_verified": False,
+        }
