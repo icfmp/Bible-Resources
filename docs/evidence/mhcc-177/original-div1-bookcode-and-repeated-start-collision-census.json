@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "issue": "https://github.com/icfmp/Bible-Resources/issues/177",
+  "status": "ONE_ORIGINAL_THML_OSIS_BOOK_CODE_AND_EXACT_ANNOTATION_START_REUSED_ACROSS_TWO_DIFFERENT_TITLE_DIV1S_NOT_RESOLVED_CANONICAL_BOOK_IDENTITY",
+  "pinned_witness_SHA256": {
+    "source_ccel_thml_xml": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+    "original_crosswire_sword_zip": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+    "original_compiled_native_raw_corpus_ordered": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
+  },
+  "original_thml_source_inventory": {
+    "total_original_div1_in_unchanged_XML": 68,
+    "div1_with_any_original_verse_or_range_scripCom": 57,
+    "source_annotated_original_div1_heading_provenance_counts": {
+      "title_attribute": 57
+    },
+    "distinct_original_scripCom_declared_book_tokens": 56,
+    "different_div1s_reusing_one_declared_book_token_count": 1,
+    "original_scripCom_exact_start_keys_reused_across_different_div1_count": 1,
+    "original_start_reuse_is_the_single_8_66_div1_pair": true,
+    "original_source_xml_line_12430_and_55844_claim_the_same_exact_scripCom_start_key": true,
+    "their_actual_original_div1_headings_are_present_but_different": true,
+    "original_source_div1_title_is_not_equivalent_to_a_validated_OSIS_book_identity": true,
+    "annotation_bookcode_collision_is_not_automatic_proof_of_whose_text_is_correct": true,
+    "original_verse_range_source_unit_count_from_full_source": 3364
+  },
+  "full_3364_source_div1_osisref_bookcode_numeric_evidence": {
+    "original_start_key_collision_examples_truncated": false,
+    "original_source_book_collision_line_sha256_and_div1_title_sha256_only": [
+      {
+        "distinct_original_div1_document_ordinals": [
+          8,
+          66
+        ],
+        "original_osisRef_book_code_sha256": "85915277c54638a00271f1f92798ce6379e402c19c6df8787045d3e36f862ba0",
+        "original_osisRef_start_key_sha256": "7aa5e72cebb106a4e693b03210ca07c8a33c0ebe0deb33645177dd66106e9eeb",
+        "original_source_line_and_full_ref_body_SHA256": [
+          {
+            "original_body_sha256": "75a2d806c0b7a18c21a5b257748e7db2f3bb330b2946637707a3c76f7b3c8a62",
+            "original_div1_document_ordinal": 8,
+            "original_full_reference_sha256": "d6f7840155f1ed89cbc1d5be312febca3b999f8db8c8c93024ba0838210dc3bc",
+            "original_source_line": 12430
+          },
+          {
+            "original_body_sha256": "5ef525b574f9c049bd39bad7bafcaa99cb9ae9120e8647208c0261e25e801630",
+            "original_div1_document_ordinal": 66,
+            "original_full_reference_sha256": "fe9620db993881f30ab981307b22f201c3aeb36dca52b83eee08874ac0d273e8",
+            "original_source_line": 55844
+          }
+        ],
+        "source_reused_start_in_different_div1_is_not_evidence_of_same_authored_book": true
+      }
+    ],
+    "original_focused_four_units_div1_heading_and_book_token_SHA256_relationships": [
+      {
+        "actual_original_units_grouped_only_by_compiled_reference_not_original_div1": true,
+        "all_original_source_units_claim_same_osisRef_book_code": true,
+        "distinct_nonempty_original_div1_heading_SHA256_count": 2,
+        "distinct_original_declared_book_token_count": 1,
+        "distinct_original_div1_count": 2,
+        "native_shared_compiled_raw_SHA256": "82a58bed69c125a9c167069bfe84c1b68355cc8a4a5897efa9fa835e284ac991",
+        "original_div1_document_ordinals": [
+          8,
+          66
+        ],
+        "original_source_div1_heading_hashes_distinct_when_present": true,
+        "original_source_unit_count": 4,
+        "same_claimed_book_code_occurs_in_multiple_original_div1_sections": true,
+        "source_members_line_sha256_and_div1_heading_metadata": [
+          {
+            "original_body_sha256": "75a2d806c0b7a18c21a5b257748e7db2f3bb330b2946637707a3c76f7b3c8a62",
+            "original_div1_distinct_declared_osisRef_book_tokens": 1,
+            "original_div1_document_ordinal": 8,
+            "original_div1_original_attribute_names": [
+              "id",
+              "n",
+              "next",
+              "prev",
+              "progress",
+              "shorttitle",
+              "title"
+            ],
+            "original_div1_scripCom_units_claiming_this_book_token": 62,
+            "original_div1_title_or_direct_heading_origin": "title_attribute",
+            "original_div1_title_or_direct_heading_sha256": "8001539b87b43b79a9add7bf13f10f48f6d73f2cfbc89c06d3f4ba48ac87d147",
+            "original_full_reference_sha256": "d6f7840155f1ed89cbc1d5be312febca3b999f8db8c8c93024ba0838210dc3bc",
+            "original_reference_start_key_sha256": "7aa5e72cebb106a4e693b03210ca07c8a33c0ebe0deb33645177dd66106e9eeb",
+            "original_scripCom_declared_book_token_sha256": "85915277c54638a00271f1f92798ce6379e402c19c6df8787045d3e36f862ba0",
+            "original_source_line": 12430,
+            "same_book_code_reused_in_multiple_original_div1_sections": true,
+            "source_context_is_not_authored_stock_verse_section_approval": true
+          },
+          {
+            "original_body_sha256": "5ef525b574f9c049bd39bad7bafcaa99cb9ae9120e8647208c0261e25e801630",
+            "original_div1_distinct_declared_osisRef_book_tokens": 1,
+            "original_div1_document_ordinal": 66,
+            "original_div1_original_attribute_names": [
+              "id",
+              "n",
+              "next",
+              "prev",
+              "progress",
+              "shorttitle",
+              "title"
+            ],
+            "original_div1_scripCom_units_claiming_this_book_token": 5,
+            "original_div1_title_or_direct_heading_origin": "title_attribute",
+            "original_div1_title_or_direct_heading_sha256": "7c07671726a7ed322ea12d52e312bb5f6250d7f253c61c6129fd675834f81ebc",
+            "original_full_reference_sha256": "fe9620db993881f30ab981307b22f201c3aeb36dca52b83eee08874ac0d273e8",
+            "original_reference_start_key_sha256": "7aa5e72cebb106a4e693b03210ca07c8a33c0ebe0deb33645177dd66106e9eeb",
+            "original_scripCom_declared_book_token_sha256": "85915277c54638a00271f1f92798ce6379e402c19c6df8787045d3e36f862ba0",
+            "original_source_line": 55844,
+            "same_book_code_reused_in_multiple_original_div1_sections": true,
+            "source_context_is_not_authored_stock_verse_section_approval": true
+          },
+          {
+            "original_body_sha256": "67c4f17497220a6ba04a712e1c8cb635ddc347c4189f5fdfacf98bd200009149",
+            "original_div1_distinct_declared_osisRef_book_tokens": 1,
+            "original_div1_document_ordinal": 66,
+            "original_div1_original_attribute_names": [
+              "id",
+              "n",
+              "next",
+              "prev",
+              "progress",
+              "shorttitle",
+              "title"
+            ],
+            "original_div1_scripCom_units_claiming_this_book_token": 5,
+            "original_div1_title_or_direct_heading_origin": "title_attribute",
+            "original_div1_title_or_direct_heading_sha256": "7c07671726a7ed322ea12d52e312bb5f6250d7f253c61c6129fd675834f81ebc",
+            "original_full_reference_sha256": "6128ddc7772acf6374490a0c456f693e43b8ed79ff5d881b1ef76740bf11d7d1",
+            "original_reference_start_key_sha256": "d3c7581cd487f549332e4c4db908aa4e8777b6ec1c200f67a3a07b7a77d8807c",
+            "original_scripCom_declared_book_token_sha256": "85915277c54638a00271f1f92798ce6379e402c19c6df8787045d3e36f862ba0",
+            "original_source_line": 55852,
+            "same_book_code_reused_in_multiple_original_div1_sections": true,
+            "source_context_is_not_authored_stock_verse_section_approval": true
+          },
+          {
+            "original_body_sha256": "8554c360b4ad1d3046c6abf1d117c28865922d51e4563768c7395ad4dbe2926a",
+            "original_div1_distinct_declared_osisRef_book_tokens": 1,
+            "original_div1_document_ordinal": 66,
+            "original_div1_original_attribute_names": [
+              "id",
+              "n",
+              "next",
+              "prev",
+              "progress",
+              "shorttitle",
+              "title"
+            ],
+            "original_div1_scripCom_units_claiming_this_book_token": 5,
+            "original_div1_title_or_direct_heading_origin": "title_attribute",
+            "original_div1_title_or_direct_heading_sha256": "7c07671726a7ed322ea12d52e312bb5f6250d7f253c61c6129fd675834f81ebc",
+            "original_full_reference_sha256": "11233f1eefefc1b026c1bf95b408bbe15f61fcacf7aa7b2b806bdb49d94f246e",
+            "original_reference_start_key_sha256": "d3d19850381d5f6af382b4e970d2e6cbf822efeef973450a5103b62403a2baef",
+            "original_scripCom_declared_book_token_sha256": "85915277c54638a00271f1f92798ce6379e402c19c6df8787045d3e36f862ba0",
+            "original_source_line": 55858,
+            "same_book_code_reused_in_multiple_original_div1_sections": true,
+            "source_context_is_not_authored_stock_verse_section_approval": true
+          }
+        ]
+      }
+    ]
+  },
+  "reproducibility": {
+    "actual_full_SHA_pinned_CCEL_to_original_CrossWire_stock_action": "https://github.com/icfmp/Bible-Resources/actions/runs/43453187826",
+    "exact_tested_pr_head_Validate": "https://github.com/icfmp/Bible-Resources/actions/runs/43453187884",
+    "no_title_text_bible_osisRef_original_notes_or_compiled_xml_committed": true
+  },
+  "next_unapproved_gate": {
+    "identify_canonical_original_div1_heading_book_vs_source_scripCom_osisRef_code_for_div1_66": true,
+    "review_all_five_div1_66_annotations_without_inventing_book_or_chapter": true,
+    "decide_source_authority_vs_compiled_stock_only_after_exact_edition_context": true,
+    "verify_Jude_unmarked_postRevelation_other_structures": true,
+    "independent_Xiphos_AndBible_reader_review": true,
+    "publication": false
+  },
+  "mhcc_7_step_fully_accepted_count": 0,
+  "source_original_osisRef_values_and_authorial_text_modified": false
+}
