@@ -584,7 +584,7 @@ jobs:
               "book_intro",
           }
           native_scope_outcomes={
-              "no_nonidentical_stock_payload_with_six_contiguous_source_words",
+              "no_nonidentical_stock_payload_with_four_contiguous_source_words",
               "all_reviewed_candidate_alignments_exceeded_budget",
               "all_original_plain_words_present_in_selected_other_stock_entry",
               "other_stock_entry_improves_original_ordered_word_match",
@@ -605,7 +605,10 @@ jobs:
               cross_cases=cross_prose["all_original_large_plain_word_case_line_fullhash_scope_witnesses"]
               cross_aggregate=cross_prose["cross_slot_scope_outcome_counts"]
               if (cross_prose["original_source_large_plain_word_cases"] != len(large_cases) or
-                      cross_prose["original_six_word_anchor_length"] != 6 or
+                      cross_prose["minimum_fallback_word_anchor_length"] != 4 or
+                      cross_prose["strong_original_word_anchor_length"] != 6 or
+                      cross_prose["weak_four_or_five_word_anchor_does_not_prove_same_original_authorial_section"] is not True or
+                      cross_prose["strong_six_word_anchor_was_separately_counted"] is not True or
                       cross_prose["sampled_top_distinct_raw_payloads_per_case_scope"] != 4 or
                       type(cross_prose["all_native_raw_entries_replayed"]) is not int or
                       type(cross_prose["native_replay_entries_in_relevant_source_books"]) is not int or
@@ -628,9 +631,11 @@ jobs:
                   "original_body_sha256","selected_stock_raw_sha256",
                   "original_plain_word_count",
                   "selected_stock_ordered_shared_plain_word_count",
+                  "unique_original_four_word_anchors_examined",
                   "unique_original_six_word_anchors_examined",
                   "same_raw_selected_payload_other_native_key_repetitions",
                   "native_slots_with_any_six_word_anchor_in_distinct_payload",
+                  "native_slots_with_four_or_five_word_anchor_in_distinct_payload",
                   "overall_scope_conclusion","by_native_scope",
                   "original_source_ref_or_passage_not_derived_from_stock_key",
               }
@@ -640,6 +645,7 @@ jobs:
                   "original_plain_words_not_matched_in_order",
                   "stock_plain_words_not_matched_in_order",
                   "longest_exact_contiguous_source_word_run",
+                  "original_contiguous_anchor_strength_class",
                   "source_plain_word_count","compiled_plain_word_count",
                   "stock_native_key_is_only_a_textual_location_witness",
               }
@@ -663,9 +669,11 @@ jobs:
                           or not all(type(entry[name]) is int and entry[name] >= 0 for name in (
                               "original_source_line","original_plain_word_count",
                               "selected_stock_ordered_shared_plain_word_count",
+                              "unique_original_four_word_anchors_examined",
                               "unique_original_six_word_anchors_examined",
                               "same_raw_selected_payload_other_native_key_repetitions",
-                              "native_slots_with_any_six_word_anchor_in_distinct_payload"
+                              "native_slots_with_any_six_word_anchor_in_distinct_payload",
+                              "native_slots_with_four_or_five_word_anchor_in_distinct_payload"
                           ))):
                       raise SystemExit("Original source case cross-slot identity or scoped output invalid")
                   visited.add(identity)
@@ -676,7 +684,7 @@ jobs:
                           or not 0 <= witness["sampled_distinct_alternative_raw_payloads"] <= 4):
                           raise SystemExit("Unreviewed cross-slot scope evidence")
                       label=witness["scope_outcome"]
-                      if label=="no_nonidentical_stock_payload_with_six_contiguous_source_words":
+                      if label=="no_nonidentical_stock_payload_with_four_contiguous_source_words":
                           if set(witness) != {
                               "sampled_distinct_alternative_raw_payloads","scope_outcome"
                           } or witness["sampled_distinct_alternative_raw_payloads"] != 0:
@@ -721,7 +729,15 @@ jobs:
                                   best["compiled_plain_word_count"] !=
                                       best["shared_original_plain_words_in_order"] +
                                       best["stock_plain_words_not_matched_in_order"] or
-                                  best["longest_exact_contiguous_source_word_run"] < 6 or
+                                  best["longest_exact_contiguous_source_word_run"] < 4 or
+                                  best["original_contiguous_anchor_strength_class"] not in {
+                                      "at_least_six_original_words_contiguous_in_stock",
+                                      "only_four_or_five_original_words_contiguous_in_stock",
+                                  } or
+                                  (best["longest_exact_contiguous_source_word_run"]>=6) != (
+                                      best["original_contiguous_anchor_strength_class"]==
+                                          "at_least_six_original_words_contiguous_in_stock"
+                                  ) or
                                   best["longest_exact_contiguous_source_word_run"] >
                                       best["shared_original_plain_words_in_order"]):
                                   raise SystemExit("Unreviewed stock wording or implausible alignment leaked")
