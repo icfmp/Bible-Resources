@@ -80,7 +80,7 @@ class OriginalLinkRealClickTests(unittest.TestCase):
     ):
         def respond(command, env):
             if command[:3] == ["xdotool", "getwindowgeometry", "--shell"]:
-                return b"X=0\\nY=0\\nWIDTH=1000\\nHEIGHT=700\\n"
+                return b"X=0\nY=0\nWIDTH=1000\nHEIGHT=700\n"
             if command[:3] == ["xclip", "-selection", "clipboard"]:
                 return b"Actual private GUI sidebar selection"
             return b""
