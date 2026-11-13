@@ -97,6 +97,9 @@ jobs:
           counts=data["copied_gui_clipboard_byte_count_by_passage"]
           assert set(counts)==set(samples)
           assert all(type(n) is int and 0<=n<=256000 for n in counts.values())
+          focus=data["bounded_right_commentary_pane_focus_attempts_by_passage"]
+          assert set(focus)==set(samples)
+          assert all(type(value) is int and 0<=value<=2 for value in focus.values())
           failures=data["bounded_xiphos_ui_failed_action_by_passage"]
           assert isinstance(failures,dict) and set(failures)<=set(samples)
           assert all(isinstance(x,str) and len(x)<=45 for x in failures.values())
