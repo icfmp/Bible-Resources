@@ -95,6 +95,18 @@ def _real_original_targets(
                     1 if matching else 0
                 )
             continue
+        if diagnostics is not None:
+            route = next(
+                (("sword" if uri.startswith("sword://") else
+                  "bible" if uri.startswith("bible://") else
+                  "passagestudy" if uri.startswith("passagestudy.jsp") else
+                  "xiphosurl")
+                 for uri in matching if uri.startswith((
+                     "sword://", "bible://", "passagestudy.jsp", "xiphos.url"
+                 ))),
+                "unknown",
+            )
+            diagnostics["authentic_GUI_internal_href_route_counts"][route] += 1
         if reference not in targets:
             targets.append(reference)
         if len(targets) >= _MAX_LINKS:
@@ -194,6 +206,36 @@ def _real_bible_clipboard(env: dict, window: str) -> bytes:
     return _x11(["xclip", "-selection", "clipboard", "-o"], env)
 
 
+def _real_sidebar_preview_clipboards(env: dict, window: str) -> list[bytes]:
+    """Copy only the real *left sidebar preview* after a candidate link click.
+
+    Xiphos upstream showRef routes to main_display_verse_list_in_sidebar and
+    renders the selected verse in sidebar.html_viewer_widget by default.
+    No guessed expected verse or synthetic UI text is inserted.
+    """
+    geo = _x11(["xdotool", "getwindowgeometry", "--shell", window], env)
+    values = dict(re.findall(rb"^(X|Y|WIDTH|HEIGHT)=(-?\d+)$", geo, re.M))
+    if set(values) != {b"X", b"Y", b"WIDTH", b"HEIGHT"}:
+        raise PilotError("No verified Xiphos sidebar preview geometry")
+    x, y, w, h = (int(values[k]) for k in
+                   (b"X", b"Y", b"WIDTH", b"HEIGHT"))
+    if x < 0 or y < 0 or not 700 <= w <= 1280 or not 500 <= h <= 800:
+        raise PilotError("Invalid virtual Xiphos sidebar bounds")
+    copies = []
+    for xp, yp in ((15, 67), (15, 81), (22, 72)):
+        try:
+            _x11(["xdotool", "mousemove", str(x+w*xp//100),
+                  str(y+h*yp//100), "click", "1"], env)
+            _seed_x11_clipboard(env)
+            _x11(["xdotool", "key", "--clearmodifiers", "ctrl+a"], env)
+            _x11(["xdotool", "key", "--clearmodifiers", "ctrl+c"], env)
+            time.sleep(.25)
+            copies.append(_x11(["xclip", "-selection", "clipboard", "-o"], env))
+        except PilotError:
+            copies.append(b"")
+    return copies
+
+
 def _show_source(env: dict, window: str, ref: str):
     if not _REF.fullmatch(ref):
         raise PilotError("Unreviewed real reader source passage")
@@ -222,6 +264,9 @@ def probe_real_original_osisref_click(
         "scope": "real_isolated_xiphos_mouse_on_original_source_link",
         "source_reference_targets_verified_in_real_GUI": False,
         "real_GUI_rich_selection_available_count": 0,
+        "authentic_GUI_internal_href_route_counts": {
+            "sword": 0, "bible": 0, "passagestudy": 0, "xiphosurl": 0,
+        },
         "real_GUI_rich_anchor_count": 0,
         "original_source_reference_elements_count": 0,
         "single_OSIS_original_reference_count": 0,
@@ -235,6 +280,7 @@ def probe_real_original_osisref_click(
         "x11_pointer_shape_observed": False,
         "hover_candidate_actual_mouse_clicks": 0,
         "genuine_original_osisref_click_navigated_to_expected_bible": False,
+        "original_reference_link_sidebar_preview_verified": False,
         "status": "inconclusive_no_eligible_authentic_GUI_link",
         "original_words_or_private_screenshots_exported": False,
     }
@@ -292,9 +338,14 @@ def probe_real_original_osisref_click(
                 continue
             base["independent_exact_target_bible_readbacks"] += len(original_target_bibles)
             before = _real_bible_clipboard(env, window)
+            before_sidebar = _real_sidebar_preview_clipboards(env, window)
             candidates = {
                 ref: data for ref, data in original_target_bibles.items()
-                if _has_target_phrase(data, data, before)
+                if (_has_target_phrase(data, data, before)
+                    and not any(
+                        _has_target_phrase(data, side, b"")
+                        for side in before_sidebar
+                    ))
             }
             if not candidates:
                 continue
@@ -305,8 +356,10 @@ def probe_real_original_osisref_click(
             # Deliberately bounded to the already verified right commentary
             # area. Never click toolbar, menus, a desktop or external browser.
             coords = [(x0 + dx, y0 + dy)
-                      for dy in (-205, -160, -115, -70, -25, 20, 65, 110, 155)
-                      for dx in (-185, -135, -85, -35, 15, 65)]
+                      for dy in (-225, -190, -155, -120, -85, -50, -15,
+                                 20, 55, 90, 125, 160, 195, 230)
+                      for dx in (-450, -410, -370, -330, -290, -250,
+                                 -210, -170, -130, -90, -50, -10, 30, 70)]
             for xx, yy in coords:
                 if not 0 < xx < 1280 or not 0 < yy < 800:
                     continue
@@ -325,6 +378,18 @@ def probe_real_original_osisref_click(
                        for data in candidates.values()):
                     base["genuine_original_osisref_click_navigated_to_expected_bible"] = True
                     base["status"] = "original_source_attested_link_real_click_Bible_target_verified"
+                    return base
+                # CrossWire/Xiphos showRef uses the sidebar results + preview,
+                # *not* main Bible navigation. Compare actual sidebar prose
+                # against the independently queried original Bible destination.
+                side_copies = _real_sidebar_preview_clipboards(env, window)
+                if any(
+                    _has_target_phrase(data, side, previous)
+                    for data in candidates.values()
+                    for side, previous in zip(side_copies, before_sidebar)
+                ):
+                    base["original_reference_link_sidebar_preview_verified"] = True
+                    base["status"] = "original_source_attested_link_real_click_sidebar_preview_verified"
                     return base
                 if base["hover_candidate_actual_mouse_clicks"] >= 12:
                     return base
