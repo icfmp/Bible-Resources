@@ -155,6 +155,26 @@ def _x11(args: list[str], env: dict, *, input_bytes: bytes | None = None,
     return proc.stdout
 
 
+def _seed_x11_clipboard(env: dict) -> None:
+    """Set an unmistakably unrelated private sentinel before each GUI copy.
+
+    Xclip's background selection owner must not inherit a captured stdout
+    pipe from subprocess.run, which can otherwise block until its lifetime
+    ends. An empty input also need not yield a valid X11 selection.
+    """
+    try:
+        outcome = subprocess.run(
+            ["xclip", "-selection", "clipboard", "-i"],
+            input=b"XIPHOS_PRIVATE_CLIPBOARD_SENTINEL_NOT_SOURCE_TEXT",
+            env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            timeout=8, check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise PilotError("Cannot reset private Xiphos GUI clipboard") from exc
+    if outcome.returncode != 0:
+        raise PilotError("Refusing stale original commentary X11 selection")
+
+
 def _main_xiphos_window(env: dict) -> str | None:
     for query_command in (
         ["xdotool", "search", "--onlyvisible", "--class", "[Xx]iphos"],
@@ -197,9 +217,13 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
                 "bounded_xiphos_ui_failed_action_by_passage": {
                     key: "main_window_not_found" for key in comparisons
                 },
+                "copied_gui_clipboard_byte_count_by_passage": {
+                    key: 0 for key in comparisons
+                },
                 "independent_gui_commentary_excerpt_match_count": 0}
     result = {}
     failures = {}
+    copied_sizes = {}
     accepted = True
     for ref, originals in comparisons.items():
         stage = "focus_main_window"
@@ -216,7 +240,7 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
             time.sleep(2)
             # Clear the old X11 selection to avoid stale-passage false PASS.
             stage = "clear_prior_clipboard"
-            _x11(["xclip", "-selection", "clipboard", "-i"], env, input_bytes=b"")
+            _seed_x11_clipboard(env)
             stage = "select_commentary_text"
             _x11(["xdotool", "key", "--clearmodifiers", "ctrl+a"], env)
             stage = "copy_commentary_text"
@@ -224,18 +248,21 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
             time.sleep(1)
             stage = "read_commentary_clipboard"
             selected = _x11(["xclip", "-selection", "clipboard", "-o"], env)
+            copied_sizes[ref] = len(selected)
             result[ref] = _long_commentary_excerpt_is_on_gui_clipboard(
                 originals["commentary"], originals["bible"], selected
             )
         except PilotError:
             accepted = False
             failures[ref] = stage
+            copied_sizes[ref] = 0
             result[ref] = False
     return {
         "real_main_reader_window_found": True,
         "actual_passage_commands_accepted": accepted,
         "commentary_clipboard_match_by_passage": result,
         "bounded_xiphos_ui_failed_action_by_passage": failures,
+        "copied_gui_clipboard_byte_count_by_passage": copied_sizes,
         "independent_gui_commentary_excerpt_match_count": sum(result.values()),
     }
 
