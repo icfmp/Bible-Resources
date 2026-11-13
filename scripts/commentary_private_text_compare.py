@@ -28,6 +28,7 @@ from commentary_chapter_cross_slot import ChapterNeighborSameBookAlternativeProb
 from commentary_chapter_paragraph_overlap import OriginalChapterParagraphSpanProbe
 from commentary_chapter_p_boundaries import ChapterParagraphBoundaryProbe
 from commentary_reference_cross_slot import ReferenceCrossSlotTopology
+from commentary_prose_cross_slot import OriginalProseAlternativeNativeSlotProbe
 from commentary_intake import load_manifest
 from commentary_text_delta import punctuation_relationship, word_relationship, nonword_symbol_excess
 from commentary_unresolved_lexical_triage import (
@@ -619,6 +620,53 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
             lexical["bounded_plain_word_nontrivial_differences_line_and_hash_cases"],
             total_nonlink_review_cases=plain_review_total,
         )
+        large_plain_cases=[
+            case for case in lexical["bounded_plain_word_nontrivial_differences_line_and_hash_cases"]
+            if (case["exact_plain_word_alignment"][
+                    "original_plain_words_not_matched_in_exact_order"] is not None
+                and case["exact_plain_word_alignment"][
+                    "original_plain_words_not_matched_in_exact_order"] > 10)
+        ]
+        if not large_plain_cases:
+            alternative_prose={
+                "original_source_large_plain_word_cases":0,
+                "no_large_original_plain_word_cases_to_scan":True,
+            }
+        else:
+            alternative_probe=OriginalProseAlternativeNativeSlotProbe(
+                source,large_plain_cases
+            )
+            replay_rows=[]
+            replay_process=None
+            try:
+                replay_process=subprocess.Popen(
+                    ["timeout","360s",str(raw_binary),manifest["module_id"]],
+                    stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,env=env
+                )
+                if replay_process.stdout is None:
+                    raise PilotError("Second exact native stock reader cannot stream")
+                def collect_original_prose_alternatives(kind,ref,raw):
+                    replay_rows.append((kind,ref))
+                    alternative_probe.observe(kind,ref,raw)
+                replay_summary,_,_,_=parse_native_raw_corpus(
+                    replay_process.stdout,on_entry=collect_original_prose_alternatives
+                )
+                replay_process.stdout.close()
+                replay_status=replay_process.wait(timeout=15)
+                if replay_status != 0:
+                    raise PilotError("Second original native raw reader did not complete")
+                if replay_summary != raw_summary or replay_rows != rows:
+                    raise PilotError(
+                        "Original stock native replay content or occupied K/I key order changed"
+                    )
+            except BaseException:
+                if replay_process is not None and replay_process.poll() is None:
+                    replay_process.kill()
+                    replay_process.wait()
+                raise
+            alternative_prose=alternative_probe.report()
+            if alternative_prose["all_native_raw_entries_replayed"] != len(rows):
+                raise PilotError("Original second native prose scan omitted occupied keys")
         chapter_analysis=compare_chapter_neighbors(
             chapter_neighbors,chapter_intros,raw_as_strict_xml_text
         )
@@ -646,6 +694,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         "text_diagnostic":analysis,
         "source_unpaired_reference_cross_native_slots":reference_cross_slot_report,
         "source_nonlink_prose_review_stock_raw_duplicate_topology":plain_payload_topology,
+        "source_large_nonlink_prose_native_alternative_locations":alternative_prose,
         "source_original_chapter_neighbor_evidence":chapter_proof,
         "source_chapter_neighbor_to_stock_intro_diagnostics":chapter_analysis,
         "source_chapter_neighbor_to_same_chapter_numbered_location":chapter_numbered_location,
