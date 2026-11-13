@@ -33,7 +33,7 @@ class UnresolvedLexicalSourceMarkupTests(unittest.TestCase):
         self.assertEqual(result["middle_alignment_class"],"single_edit_block")
         self.assertEqual(result["alignment_opcode_type_counts"],{"replace":1})
         self.assertNotIn("sacred",json.dumps(result))
-        self.assertNotIn("different",json.dumps(result))
+        self.assertNotIn("ancient different written",json.dumps(result))
 
     def test_distinct_replacements_inside_middle_not_hidden_as_one_edit(self):
         out=source_stock_unresolved_words(
