@@ -133,10 +133,13 @@ def patch_divisions(source: bytes, *, expected_sha256: str):
             old = (spaces + mark if mode == "verse_tail" else outer).encode("utf-8")
             if source[end:end+len(old)] != old:
                 raise DivisionRepairError("Unexpected original marker byte placement")
-            # Preserve original sign as an OSIS attribute, not inline prose.
+            # The OSIS 'marker' attribute is DISPLAYED as a glyph in JSword/
+            # AndBible, so it cannot hold the literal authored '*' here.
+            # Preserve it losslessly as a non-displayed, typed source annotation.
             value = MAJOR_KIND if kind == "paragraph" and len(mark) == 3 else KINDS[kind]
+            subtype = "x-original-ascii-star-" + str(len(mark))
             replacement = ('<milestone type="' + value +
-                           '" marker="' + mark + '"/>').encode("ascii")
+                           '" subType="' + subtype + '"/>').encode("ascii")
             patches.append((end, end+len(old), replacement))
         if node in selected_hi:
             ref, mark, spaces = selected_hi[node]
@@ -169,8 +172,19 @@ def patch_divisions(source: bytes, *, expected_sha256: str):
     result.extend(source[last:])
     corrected = bytes(result)
     new_root = _source_tree(corrected)
-    markers = [(n.get("type"), n.get("marker")) for n in new_root.iter(OSIS + "milestone")
-               if n.get("type") in set(KINDS.values()) | {MAJOR_KIND}]
+    expected_types = set(KINDS.values()) | {MAJOR_KIND}
+    milestones = [n for n in new_root.iter(OSIS + "milestone")
+                  if n.get("type") in expected_types]
+    if any(n.get("marker") is not None for n in milestones):
+        raise DivisionRepairError("Displayable OSIS marker leaked into research candidate")
+    markers = [
+        (n.get("type"), "*" * int(n.get("subType").removeprefix("x-original-ascii-star-")))
+        for n in milestones if n.get("subType") in {
+            "x-original-ascii-star-1", "x-original-ascii-star-2",
+            "x-original-ascii-star-3"}
+    ]
+    if len(markers) != len(milestones):
+        raise DivisionRepairError("Editorial section sign subtype is not reversibly encoded")
     expected = [(MAJOR_KIND if kind == "paragraph" and len(mark) == 3 else KINDS[kind], mark)
                 for _, kind, mark, *_ in candidates.values()]
     if sorted(markers) != sorted(expected):
@@ -226,6 +240,7 @@ def patch_divisions(source: bytes, *, expected_sha256: str):
         "candidate_sha256": sha256(corrected).hexdigest(),
         "converted_markers_by_kind": dict(sorted(counts.items())),
         "source_literal_marker_metadata_equal": True,
+        "source_editorial_stars_preserved_as_non_displayable_subtype": True,
         "all_leading_editorial_signs_transferred": not unresolved_markers,
         "unconverted_leading_marker_count": len(unresolved_markers),
         "bounded_unconverted_leading_marker_refs": unresolved_markers[:40],
