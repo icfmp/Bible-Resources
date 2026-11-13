@@ -92,7 +92,9 @@ jobs:
           assert data["real_main_reader_window_found"] is True
           assert data["actual_passage_commands_accepted"] is True
           samples=data["commentary_clipboard_match_by_passage"]
-          assert list(samples)==data["actual_substantive_sample_references"]
+          # JSON metadata has sorted keys: order is not original source order.
+          assert len(samples)==data["sample_count"]
+          assert set(samples)==set(data["actual_substantive_sample_references"])
           assert all(type(value) is bool for value in samples.values())
           counts=data["copied_gui_clipboard_byte_count_by_passage"]
           assert set(counts)==set(samples)
@@ -104,10 +106,10 @@ jobs:
           assert isinstance(failures,dict) and set(failures)<=set(samples)
           assert all(isinstance(x,str) and len(x)<=45 for x in failures.values())
           assert data["independent_gui_commentary_excerpt_match_count"]==sum(samples.values())
-          # A zero match is NOT proof of a working commentary pane.
-          assert data["independent_gui_commentary_excerpt_match_count"]>=1, (
-              "Xiphos launched with the exact Bible + MHCC, but no original MHCC "
-              "passage excerpt could be independently read via the real GUI."
+          # Do not approve partial GUI text evidence as complete sample pass.
+          assert data["independent_gui_commentary_excerpt_match_count"]==data["sample_count"], (
+              "Not all independently selected substantive original MHCC entries "
+              "were actually retrieved from the Xiphos GUI commentary pane."
           )
           assert data["entire_original_commentary_content_and_links_gui_verified"] is False
           assert data["owner_rights_editorial_approval"] is False
