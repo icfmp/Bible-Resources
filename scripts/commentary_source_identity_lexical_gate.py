@@ -41,8 +41,22 @@ def classify_lexical_source_identity(source: dict, cases: list[dict]) -> dict:
     only makes comparison meaningful, never proves print/edition equivalence.
     """
     if (not isinstance(source, dict) or not isinstance(cases, list)
-            or not 1 <= len(cases) <= 256):
+            or len(cases) > 256):
         raise PilotError("Unreviewed original commentary lexical identity inputs")
+    if not cases:
+        return {
+            "schema_version": 1,
+            "original_source_compiled_lexical_attention_cases_checked": 0,
+            "original_div1_book_identity_gate_classes": {},
+            "source_identity_gated_original_line_hash_cases": [],
+            "no_unresolved_nonlink_lexical_cases_to_classify": True,
+            "source_book_heading_alias_is_not_authorial_book_reassignment": True,
+            "cross_book_join_is_not_evidence_of_missing_stock_prose": True,
+            "same_book_comparison_is_not_proof_of_digital_edition_parity": True,
+            "original_source_stock_binary_and_scripture_references_unmodified": True,
+            "editorial_decisions_approved": False,
+            "published": False,
+        }
     aliases, registry = read_existing_66_book_english_aliases()
     identities = {}
     for start, units in source.items():
