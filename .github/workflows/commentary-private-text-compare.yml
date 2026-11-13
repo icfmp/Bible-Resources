@@ -393,6 +393,17 @@ jobs:
           plain_counts = lexical["original_prose_outside_link_word_relation_counts"]
           plain_x_shape = lexical["original_prose_outside_link_relations_by_original_lexical_difference"]
           plain_cases = lexical["bounded_plain_word_nontrivial_differences_line_and_hash_cases"]
+          plain_by_stock_ref = lexical["original_prose_outside_link_relations_by_compiled_reference_markup"]
+          if (not isinstance(plain_by_stock_ref,dict) or
+                  not all(scope in {"stock_has_reference","stock_no_reference"} and
+                          isinstance(relations,dict) and
+                          all(key in allowed_plain_relations and type(number) is int and number >= 0
+                              for key,number in relations.items())
+                          for scope,relations in plain_by_stock_ref.items()) or
+                  sum(sum(rel.values()) for rel in plain_by_stock_ref.values()) != unresolved or
+                  any(sum(relations.values()) != lexical["stock_reference_presence"].get(scope,0)
+                      for scope,relations in plain_by_stock_ref.items())):
+              raise SystemExit("Source outside-link/stock-reference cross-tab diverged")
           allowed_plain_case_fields = {
               "original_source_line","original_full_reference_sha256",
               "original_body_sha256","stock_raw_sha256",
@@ -433,7 +444,10 @@ jobs:
           print("Original 156-case words OUTSIDE source/stock scripture link labels (not exegesis parity): " +
                 json.dumps({"relations":plain_counts,
                             "by_original_lexical_shape":plain_x_shape,
+                            "by_stock_reference_markup":plain_by_stock_ref,
                             "nontrivial_linehash_cases":len(plain_cases)},sort_keys=True))
+          print("Original outside-link prose discrepancies, source line/full hash only: " +
+                json.dumps(plain_cases,sort_keys=True))
           if (lexical["source_vs_stock_unresolved_word_selection_cases"] != unresolved or
                   sum(lexical["differing_middle_shape_classes"].values()) != unresolved or
                   sum(lexical["one_word_case_character_classes"].values()) != unresolved or
