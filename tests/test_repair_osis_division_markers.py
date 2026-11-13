@@ -24,6 +24,7 @@ SOURCE = b"""<?xml version='1.0' encoding='utf-8'?>
       *[Uncertain wording]<verse eID='Gen.1.4'/></p>
 <p><verse osisID='Gen.1.5' sID='Gen.1.5'/>
       *Dieu is a lexical marker<verse eID='Gen.1.5'/></p>
+<p><verse osisID='Gen.1.7' sID='Gen.1.7'/>\n      ***Major division<verse eID='Gen.1.7'/></p>
 <lg><l><verse osisID='Gen.1.6' sID='Gen.1.6'/>\n      <hi type='italic'>*Wrapped poetic division</hi><verse eID='Gen.1.6'/></l></lg>\n</chapter></div></osisText></osis>
 """
 
@@ -36,13 +37,14 @@ class TestDivisionMarkerRemediation(unittest.TestCase):
     def test_reencode_sections_and_stanzas_keep_lexical_symbols(self):
         corrected, receipt = repair()
         self.assertEqual(receipt["converted_markers_by_kind"], {
-            "paragraph": 2, "poetry": 2,
+            "paragraph": 2, "paragraph_level_3": 1, "poetry": 2,
         })
         self.assertEqual(receipt["protected_unchanged_marker_counts"], {
             "protected_textual_symbol": 2,
         })
         self.assertEqual(corrected.count(b'<milestone type="x-subject-division"'), 2)
         self.assertEqual(corrected.count(b'<milestone type="x-stanza-division"'), 2)
+        self.assertEqual(corrected.count(b'<milestone type="x-major-subject-division"'), 1)
         self.assertIn(b"*[Uncertain wording]", corrected)
         self.assertIn(b"*Dieu is a lexical marker", corrected)
         self.assertTrue(receipt["all_original_notes_and_machine_targets_preserved"])
@@ -55,7 +57,7 @@ class TestDivisionMarkerRemediation(unittest.TestCase):
         self.assertTrue(first["Gen.1.4"].lstrip().startswith("*"))
         self.assertFalse(first["Gen.1.6"].lstrip().startswith("*"))
         tags = list(_source_tree(corrected).iter(OSIS + "milestone"))
-        self.assertEqual([n.get("marker") for n in tags], ["*", "**", "*", "*"])
+        self.assertEqual([n.get("marker") for n in tags], ["*", "**", "***", "*", "*"])
 
     def test_exact_source_sha_is_mandatory(self):
         with self.assertRaises(DivisionRepairError):
@@ -73,7 +75,7 @@ class TestDivisionMarkerRemediation(unittest.TestCase):
         changed = SOURCE.replace(b"    *A subject break", b"    A *subject break")
         corrected, receipt = repair(changed)
         self.assertEqual(receipt["converted_markers_by_kind"], {
-            "paragraph": 1, "poetry": 2,
+            "paragraph": 1, "paragraph_level_3": 1, "poetry": 2,
         })
         self.assertIn(b"A *subject break", corrected)
 
