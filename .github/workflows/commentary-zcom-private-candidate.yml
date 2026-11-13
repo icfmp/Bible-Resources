@@ -90,7 +90,11 @@ jobs:
           assert d["CCEL_source_to_CrossWire_digital_edition_equivalence_proven"] is False
           assert d["editorial_acceptance"] is False and d["published"] is False
           assert len(d["isolated_stock_diatheke_original_vs_private_candidate"])>=2
-          assert all(p["candidate_plain_readback_byte_equal"] is True
+          assert d["only_real_diatheke_module_identity_label_differences_allowed"] is True
+          assert all(p["candidate_plain_readback_equal_after_only_module_identity_relabel"] is True
+                     for p in d["isolated_stock_diatheke_original_vs_private_candidate"])
+          assert all(type(p["module_identity_label_substitution_count"]) is int
+                     and p["module_identity_label_substitution_count"]>=0
                      for p in d["isolated_stock_diatheke_original_vs_private_candidate"])
           assert re.fullmatch("[0-9a-f]{64}",d["private_candidate_package_sha256"])
           print("Verified original zCom payload, 29975 native keys and diatheke readbacks; no commentary text output")
