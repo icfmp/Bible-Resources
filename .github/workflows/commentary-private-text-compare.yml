@@ -309,6 +309,8 @@ jobs:
                     "selected_stock_reference_elements_with_osisRef_attribute",
                     "original_scripRef_with_nonempty_osisRef_target_count",
                     "original_scripRef_osisRef_targets_exact_value_multiset_matches_in_stock",
+                    "original_scripRef_osisRef_work_qualifier_only_matches_in_stock",
+                    "work_qualifier_only_matching_does_not_authorize_target_normalization",
                     "source_and_selected_stock_reference_targets_exact_ordered_match",
                     "nonmatching_target_values_are_not_auto_normalized_or_rewritten",
                     "matched_label_does_not_validate_reference_target_or_edition",
@@ -318,7 +320,8 @@ jobs:
                     "original_scripRef_label_count","selected_stock_reference_element_count",
                     "selected_stock_reference_elements_with_osisRef_attribute",
                     "original_scripRef_with_nonempty_osisRef_target_count",
-                    "original_scripRef_osisRef_targets_exact_value_multiset_matches_in_stock")) or
+                    "original_scripRef_osisRef_targets_exact_value_multiset_matches_in_stock",
+                    "original_scripRef_osisRef_work_qualifier_only_matches_in_stock")) or
                   sum(links["original_scripRef_to_stock_text_location_classes"].values()) !=
                     links["original_scripRef_label_count"] or
                   not all(name in allowed_link_classes and type(n) is int and n >= 0
@@ -333,6 +336,11 @@ jobs:
                   links["original_scripRef_osisRef_targets_exact_value_multiset_matches_in_stock"] >
                     min(links["original_scripRef_with_nonempty_osisRef_target_count"],
                         links["selected_stock_reference_elements_with_osisRef_attribute"]) or
+                  links["original_scripRef_osisRef_targets_exact_value_multiset_matches_in_stock"] +
+                    links["original_scripRef_osisRef_work_qualifier_only_matches_in_stock"] >
+                    min(links["original_scripRef_with_nonempty_osisRef_target_count"],
+                        links["selected_stock_reference_elements_with_osisRef_attribute"]) or
+                  links["work_qualifier_only_matching_does_not_authorize_target_normalization"] is not True or
                   type(links["source_and_selected_stock_reference_targets_exact_ordered_match"]) is not bool or
                   links["nonmatching_target_values_are_not_auto_normalized_or_rewritten"] is not True or
                   links["matched_label_does_not_validate_reference_target_or_edition"] is not True or
