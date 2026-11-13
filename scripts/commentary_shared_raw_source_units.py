@@ -122,6 +122,7 @@ def inspect_shared_original_units_in_native_runs(
     newly_identified=0
     per_group_source_alignment=Counter()
     source_scope_counts=Counter()
+    original_div1_group_shapes=Counter()
     for (book,left,right,raw_sha),original_cases in sorted(
         multi,key=lambda g:(g[0][0],g[0][1],g[0][2])
     ):
@@ -158,6 +159,7 @@ def inspect_shared_original_units_in_native_runs(
         compiled_unmarked_words_count=len(compiled_words)
         source_member_receipts=[]
         all_source_words=[]
+        actual_source_div1_ordinals=[]
         run_source_coverage=Counter()
         for line,start,unit in source_starts:
             if (unit["original_source_line"]!=line or
@@ -185,6 +187,12 @@ def inspect_shared_original_units_in_native_runs(
             ]
             if not source_in_range or start not in {key for key,_hash in source_in_range}:
                 raise PilotError("Original source range has no authentic numbered K start")
+            ordinal=unit.get("private_original_enclosing_div1_document_ordinal")
+            total_div1=unit.get("private_original_total_div1_in_document")
+            if (type(ordinal) is not int or type(total_div1) is not int
+                    or not 1<=ordinal<=total_div1<=500):
+                raise PilotError("Original source div1 XML document ancestry is unverified")
+            actual_source_div1_ordinals.append(ordinal)
             plain=_real_source_plain_words(unit)
             all_source_words.extend(plain)
             aligned=plain_word_alignment(plain,compiled_words)
@@ -205,6 +213,8 @@ def inspect_shared_original_units_in_native_runs(
                 "original_source_line":line,
                 "original_full_reference_sha256":unit["original_full_reference_sha256"],
                 "original_source_body_sha256":unit["original_text_sha256"],
+                "original_enclosing_div1_ordinal_in_original_XML_document":ordinal,
+                "total_div1_ancestors_enumerated_in_original_XML_document":total_div1,
                 "original_source_start_key_sha256":_sha(start),
                 "original_source_end_key_sha256":_sha(
                     unit["private_original_declared_range_end_key"]
@@ -246,6 +256,15 @@ def inspect_shared_original_units_in_native_runs(
         covered=sum(n>0 for n in run_source_coverage.values())
         overlap=sum(n>1 for n in run_source_coverage.values())
         combined_alignment=plain_word_alignment(all_source_words,compiled_words)
+        div1_ordinal_set=set(actual_source_div1_ordinals)
+        if len({m["total_div1_ancestors_enumerated_in_original_XML_document"]
+                for m in source_member_receipts})!=1:
+            raise PilotError("Original source units disagree about one actual div1 inventory")
+        division_class=(
+            "multiple_distinct_original_div1_documents_in_same_stock_raw_run"
+            if len(div1_ordinal_set)>1
+            else "all_original_source_units_from_one_original_div1"
+        )
         group={
             "native_shared_raw_SHA256":raw_sha,
             "native_shared_first_numbered_K_key_SHA256":_sha(run[0][0]),
@@ -253,6 +272,12 @@ def inspect_shared_original_units_in_native_runs(
             "native_occupied_numbered_K_keys_in_shared_raw_run":len(run),
             "distinct_original_scripCom_source_units_starting_in_shared_run":
                 len(source_member_receipts),
+            "distinct_original_div1_document_divisions_in_shared_stock_raw_run":
+                len(div1_ordinal_set),
+            "original_div1_document_ordinals_represented_in_shared_stock_raw_run":
+                sorted(div1_ordinal_set),
+            "original_div1_structure_class":division_class,
+            "sharing_a_native_K_key_does_not_prove_same_original_div1_book_or_section":True,
             "previously_known_serious_original_prose_cases_in_this_run":len(original_cases),
             "additional_authentic_original_source_units_identified":
                 len(source_member_receipts)-len(original_cases),
@@ -268,9 +293,11 @@ def inspect_shared_original_units_in_native_runs(
             "combined_original_source_plain_words_in_original_XML_unit_order_vs_one_stock_raw":
                 combined_alignment,
             "repeated_compiled_native_payload_is_not_original_source_section_parity":True,
+            "concatenated_source_text_from_different_original_div1_is_not_authorial_text":True,
             "original_source_prose_or_range_edited":False,
         }
         source_units_total+=len(source_member_receipts)
+        original_div1_group_shapes[division_class]+=1
         results.append(group)
     return {
         "multi_original_source_start_same_native_raw_run_groups":len(results),
@@ -279,6 +306,7 @@ def inspect_shared_original_units_in_native_runs(
         "source_unit_plain_word_alignments_to_shared_native_raw_closed_categories":
             dict(sorted(per_group_source_alignment.items())),
         "source_marker_scope_evidence_class_counts":dict(sorted(source_scope_counts.items())),
+        "source_div1_ancestry_structure_class_counts":dict(sorted(original_div1_group_shapes.items())),
         "bounded_shared_native_raw_run_source_unit_line_sha256_and_alignment_reports":
             results,
         "no_inferred_missing_original_source_marker_or_fabricated_verse_range":True,
