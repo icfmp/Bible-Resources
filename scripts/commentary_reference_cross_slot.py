@@ -187,13 +187,16 @@ class ReferenceCrossSlotTopology:
             return "target_witnessed_elsewhere_in_same_book"
         return "target_not_witnessed_in_other_same_book_stock_reference_markup"
 
-    def report_nonlink_plain_word_stock_payloads(self, review_cases: list[dict]) -> dict:
+    def report_nonlink_plain_word_stock_payloads(self, review_cases: list[dict],
+                                                *, total_nonlink_review_cases: int) -> dict:
         """Measure exact raw payload propagation at bounded original prose anomalies.
 
         A bitwise repeated stock payload is NOT a source-authorized verse range.
         No native key, authorial word or reference attribute leaves this report.
         """
-        if not isinstance(review_cases, list) or len(review_cases) > MAX_PRIVATE_RECEIPTS:
+        if (not isinstance(review_cases, list) or len(review_cases) > MAX_PRIVATE_RECEIPTS
+                or type(total_nonlink_review_cases) is not int
+                or total_nonlink_review_cases < len(review_cases)):
             raise PilotError("Original plain-word review list exceeds text-free report bound")
         available = {}
         for start, item, raw in self.private_unresolved:
@@ -242,7 +245,9 @@ class ReferenceCrossSlotTopology:
         if len(examined) != sum(duplicate_counts.values()):
             raise PilotError("Original source plain-word stock repeat census incomplete")
         return {
+            "total_original_plain_word_cases_requiring_review":total_nonlink_review_cases,
             "bounded_original_plain_word_review_cases_examined":len(examined),
+            "bounded_review_cases_truncated":len(examined) < total_nonlink_review_cases,
             "source_plain_word_stock_payload_repetition_classes":
                 dict(sorted(duplicate_counts.items())),
             "bounded_plain_word_cases_line_fullhash_and_repeated_native_slot_counts":
