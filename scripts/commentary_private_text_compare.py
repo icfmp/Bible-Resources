@@ -31,6 +31,7 @@ from commentary_reference_cross_slot import ReferenceCrossSlotTopology
 from commentary_prose_cross_slot import OriginalProseAlternativeNativeSlotProbe
 from commentary_source_native_boundaries import original_marker_boundary, NativeRawRunBoundaryInventory
 from commentary_shared_raw_source_units import inspect_shared_original_units_in_native_runs
+from commentary_original_div1_book_consistency import private_original_div1_book_code_consistency
 from commentary_intake import load_manifest
 from commentary_text_delta import punctuation_relationship, word_relationship, nonword_symbol_excess
 from commentary_unresolved_lexical_triage import (
@@ -732,6 +733,9 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
                 "full_authentic_original_source_units_in_those_runs":0,
                 "no_large_original_prose_cases_to_inspect":True,
             }
+        original_div1_book_consistency=private_original_div1_book_code_consistency(
+            source,complete_shared_run_sources
+        )
         chapter_analysis=compare_chapter_neighbors(
             chapter_neighbors,chapter_intros,raw_as_strict_xml_text
         )
@@ -762,6 +766,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         "source_large_nonlink_prose_native_alternative_locations":alternative_prose,
         "source_large_prose_marker_to_native_raw_run_boundary_diagnostics":boundary_case_report,
         "source_complete_original_units_within_shared_stock_raw_K_runs":complete_shared_run_sources,
+        "source_original_div1_osisRef_book_consistency_census":original_div1_book_consistency,
         "source_original_chapter_neighbor_evidence":chapter_proof,
         "source_chapter_neighbor_to_stock_intro_diagnostics":chapter_analysis,
         "source_chapter_neighbor_to_same_chapter_numbered_location":chapter_numbered_location,
