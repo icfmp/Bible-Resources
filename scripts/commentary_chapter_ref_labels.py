@@ -122,6 +122,13 @@ def link_label_location(source_links: list[dict], raw: bytes) -> dict:
             and all(source_targets)
             and source_targets == stock_targets
         ),
+        "source_and_stock_targets_only_literal_bible_work_qualifier_ordered_match": (
+            bool(source_targets)
+            and len(source_targets) == len(stock_targets)
+            and all(target.startswith("Bible:") and len(target) > len("Bible:")
+                    for target in source_targets)
+            and [target[len("Bible:"):] for target in source_targets] == stock_targets
+        ),
         "nonmatching_target_values_are_not_auto_normalized_or_rewritten": True,
         "matched_label_does_not_validate_reference_target_or_edition": True,
         "original_words_and_stock_XML_never_reported": True,
