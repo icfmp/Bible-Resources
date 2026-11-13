@@ -29,6 +29,7 @@ from commentary_chapter_paragraph_overlap import OriginalChapterParagraphSpanPro
 from commentary_chapter_p_boundaries import ChapterParagraphBoundaryProbe
 from commentary_intake import load_manifest
 from commentary_text_delta import punctuation_relationship, word_relationship, nonword_symbol_excess
+from commentary_unresolved_lexical_triage import UnresolvedLexicalSelectionCensus
 from commentary_stock_prefix_topology import (
     source_word_prefix_topology, aligned_punctuation_gap_diagnostics,
     stock_prefixed_source_body_concordance, unexplained_word_boundary_census,
@@ -123,6 +124,10 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
             "original_text_sha256":sha256(text_bytes).hexdigest(),
             "original_characters":len(txt),
             "private_original_neighbor_candidates":_original_thml_neighbor_candidates(node),
+            "private_original_body_tag_counts": dict(sorted(Counter(
+                x.tag.rsplit("}",1)[-1] for x in sibling.iter()
+                if x is not sibling and isinstance(x.tag,str)
+            ).items())),
         })
     if sum(len(rows) for rows in sources.values()) != (
         counts["work_qualified_verse"]+counts["work_qualified_same_book_verse_range"]
@@ -188,6 +193,7 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
     divergent_original_middle_word_bins=Counter()
     divergent_stock_middle_word_bins=Counter()
     divergent_word_boundary_scanned=0
+    unresolved_lexical_census=UnresolvedLexicalSelectionCensus()
     punctuation_aligned_gap_classes=Counter()
     punctuation_aligned_numeric_substitutions=Counter()
     punctuation_entries_with_only_one_to_one_glyph_changes=0
@@ -311,6 +317,7 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
                                 else: b="30_or_more"
                                 bins[b]+=1
                         if category=="different_word_order_or_selection_requires_review":
+                            unresolved_lexical_census.observe(item,compiled,raw,book)
                             unresolved=unexplained_word_boundary_census(item["original_text"],compiled)
                             divergent_word_boundary_scanned+=1
                             divergent_word_boundary_suffix_bins[unresolved[
@@ -407,7 +414,7 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
         raise PilotError("Punctuation changes inside stock suffix do not reconcile")
     if divergent_word_boundary_scanned!=word_relationship_subtypes[
         "different_word_order_or_selection_requires_review"
-    ]:
+    ] or unresolved_lexical_census.total!=divergent_word_boundary_scanned:
         raise PilotError("Unexplained lexical source-to-stock cases not fully enumerated")
     if (sum(divergent_word_boundary_suffix_bins.values())!=divergent_word_boundary_scanned
             or sum(divergent_word_boundary_placement.values())!=divergent_word_boundary_scanned
@@ -466,6 +473,11 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes]) 
             dict(sorted(stock_heading_context_earlier_tag_counts.items())),
         "source_neighbor_textual_match_does_not_confirm_authorial_edition_or_license":True,
         "unexplained_original_to_stock_word_boundary_count":divergent_word_boundary_scanned,
+        "unresolved_source_stock_lexical_selection_triage":(
+            unresolved_lexical_census.report() if unresolved_lexical_census.total
+            else {"source_vs_stock_unresolved_word_selection_cases":0,
+                  "no_unresolved_lexical_cases_to_triage":True}
+        ),
         "unexplained_original_to_stock_common_suffix_fraction_buckets":
             dict(sorted(divergent_word_boundary_suffix_bins.items())),
         "unexplained_original_to_stock_changed_segment_positions":
