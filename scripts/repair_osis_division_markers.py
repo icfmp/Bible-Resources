@@ -199,6 +199,12 @@ def patch_divisions(source: bytes, *, expected_sha256: str):
     counts = Counter(kind for _, kind, *_ in candidates.values())
     unresolved_markers = []
     for ref, value in original_verses.items():
+        # Triple/longer original marks are editorially distinct and must not
+        # disappear from the review queue merely because this overlay handles
+        # only one- and two-star divisions.
+        if value.lstrip().startswith("***"):
+            unresolved_markers.append(ref)
+            continue
         m = PREFIX.match(value)
         if not m or ref in edits_by_ref:
             continue
