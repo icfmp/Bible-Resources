@@ -86,6 +86,9 @@ jobs:
           assert data["reviewed_bible_module_id"]=="BRLSG1910"
           assert data["reviewed_bible_all_five_published_files_attested"] is True
           assert data["reviewed_bible_zip_selected_in_actual_file_picker"] is True
+          assert data["android_proceed_dialog_tapped"] is True
+          assert data["original_commentary_installzip_proceed_tapped"] is True
+          assert type(data["first_download_enabled_okay_button_tapped"]) is bool
           assert 1<=data["android_startup_commentary_snapshots_checked"]<=6
           assert type(data["android_startup_snapshots_checked"]) is int
           assert 1<=data["android_startup_snapshots_checked"]<=6
