@@ -89,7 +89,7 @@ jobs:
           assert data["android_proceed_dialog_tapped"] is True
           assert data["original_commentary_installzip_proceed_tapped"] is True
           assert type(data["first_download_enabled_okay_button_tapped"]) is bool
-          assert 1<=data["android_startup_commentary_snapshots_checked"]<=6
+          assert data["official_exported_installzip_activity_started"] is True
           assert type(data["android_startup_snapshots_checked"]) is int
           assert 1<=data["android_startup_snapshots_checked"]<=6
           assert isinstance(data["android_bounded_startup_recovery_actions"],list)
@@ -172,6 +172,7 @@ jobs:
           {
             echo 'Real official Android stable APK and original SHA-pinned CrossWire SWORD ZIP used inside disposable emulator.'
             echo 'Independently SHA-attested five-file reviewed BRLSG1910 Bible is ZIP-packaged byte-for-byte, selected first via Android file picker to satisfy AndBible FirstDownload Bible requirement.'
+            echo 'After Bible installation the original MHCC uses the exact exported official AndBible InstallZip Activity, a real Proceed dialog and OS file picker; no internal app database or UI widget is forged.'
             echo 'Exact commentaryButton resource-id and MHCC (en) menu selection are probed; MHC (en) is a distinct full-edition module.'
             echo 'Exact resumed Activity and allowlisted reader toolbar resource names are recorded to distinguish an actual Bible reader from first-run/import context.'
             echo 'Android document switching is distinct from compiled text/links rendering; full visual fidelity is not automatically certified.'
