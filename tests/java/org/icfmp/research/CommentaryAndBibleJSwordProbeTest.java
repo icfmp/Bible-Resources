@@ -3,6 +3,13 @@ package org.icfmp.research;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Locale;
+import java.security.MessageDigest;
+import java.nio.charset.StandardCharsets;
+
+import org.jdom2.Content;
 
 import org.crosswire.jsword.book.Book;
 import org.crosswire.jsword.book.BookData;
@@ -86,6 +93,71 @@ public final class CommentaryAndBibleJSwordProbeTest {
             read++;
         }
         assertEquals(sampledReferences.size(), read);
+    }
+
+    private static String sha256Utf8(String value) throws Exception {
+        byte[] digest = MessageDigest.getInstance("SHA-256").digest(
+            value.getBytes(StandardCharsets.UTF_8)
+        );
+        StringBuilder hex = new StringBuilder(digest.length * 2);
+        for (byte b : digest) {
+            hex.append(String.format(Locale.ROOT, "%02x", b & 0xff));
+        }
+        return hex.toString();
+    }
+
+    @Test
+    public void preservesExactOriginalSourceOSISReferenceTargets() throws Exception {
+        // The original target hashes are privately read from native,
+        // SHA-pinned CrossWire SWORD raw keys before the Java test begins.
+        // Neither their words nor hrefs are embedded in this test source.
+        String original = System.getenv("COMMENTARY_JSWORD_REFERENCE_SHA256_WITNESSES");
+        assertNotNull("Original native source-reference witnesses required", original);
+        String[] specimens = original.split(";", -1);
+        assertTrue("Two to six authentic original link-bearing keys required",
+                   specimens.length >= 2 && specimens.length <= 6);
+        for (String specimen : specimens) {
+            String[] pair = specimen.split("\\|", -1);
+            assertEquals("Source/target witness must contain exactly two parts", 2, pair.length);
+            assertTrue("Source reference must be original SWORD key",
+                       pair[0].matches("[1-4]?[A-Za-z][A-Za-z0-9 ]{1,35} [1-9][0-9]{0,2}:[1-9][0-9]{0,2}"));
+            String[] targetHashes = pair[1].split(",", -1);
+            assertTrue("At least one authentic original link expected",
+                       targetHashes.length >= 1 && targetHashes.length <= 256);
+            List<String> expected = new ArrayList<>(Arrays.asList(targetHashes));
+            for (String hash : expected) {
+                assertTrue("Invalid original native reference fingerprint",
+                           hash.matches("[a-f0-9]{64}"));
+            }
+            Collections.sort(expected);
+            Key key = commentary.getKey(pair[0]);
+            assertNotNull("Original source linked key not found in JSword", key);
+            assertTrue("Original linked commentary entry not occupied", commentary.contains(key));
+            Element root = new BookData(commentary, key).getOsisFragment();
+            assertNotNull("JSword returned no actual OSIS fragment for reference key", root);
+            List<String> observed = new ArrayList<>();
+            if ("reference".equals(root.getName())) {
+                String target = root.getAttributeValue("osisRef");
+                if (target != null) {
+                    observed.add(sha256Utf8(target));
+                }
+            }
+            for (Content child : root.getDescendants()) {
+                if (child instanceof Element) {
+                    Element entry = (Element) child;
+                    if ("reference".equals(entry.getName())) {
+                        String target = entry.getAttributeValue("osisRef");
+                        if (target != null) {
+                            observed.add(sha256Utf8(target));
+                        }
+                    }
+                }
+            }
+            Collections.sort(observed);
+            // This is stronger than merely seeing a reference label: require
+            // exact native source osisRef targets, with duplicate multiplicity.
+            assertEquals("JSword lost or changed an original OSIS target", expected, observed);
+        }
     }
 
     @Test
