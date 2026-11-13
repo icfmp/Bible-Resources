@@ -133,6 +133,22 @@ jobs:
                     "stock_intro_alignment_classes":
                         chapter["source_chapter_sibling_to_occupied_native_intro_classes"],
                 }, sort_keys=True))
+          location = report["source_chapter_neighbor_to_same_chapter_numbered_location"]
+          if location["original_chapter_source_markers_evaluated"] != proof["explicit_chapter_source_marker_count"]:
+              raise SystemExit("Same-chapter native numbered scan omitted original source markers")
+          outcome = location["source_sibling_location_in_original_stock_same_chapter_numbered_slots"]
+          if (not all(re.fullmatch(r"[a-z][a-z0-9_]{0,127}", name)
+                      and type(value) is int and value >= 0
+                      for name, value in outcome.items())
+                  or sum(outcome.values()) != proof["explicit_chapter_source_marker_count"]):
+              raise SystemExit("Same-chapter witness categories did not reconcile")
+          print("Source chapter siblings in SAME-chapter numbered stock entries (NOT authorial parity): " +
+                json.dumps({
+                    "markers": location["original_chapter_source_markers_evaluated"],
+                    "stock_numbered_slots_scanned": location["same_chapter_numbered_stock_slots_scanned"],
+                    "strict_xml_parse_failures": location["strict_xml_unparseable_stock_numbered_slots"],
+                    "location_classes": outcome,
+                }, sort_keys=True))
           PY
       - name: Preserve only non-text source and stock diagnostics
         if: always()
