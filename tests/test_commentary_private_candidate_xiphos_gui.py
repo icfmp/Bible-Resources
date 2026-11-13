@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from commentary_private_candidate_xiphos_gui import (
-    PRIVATE_ID, _gate_real_candidate_gui, private_candidate_xiphos_review,
+    PRIVATE_ID, PROPOSED_STABLE_ID, _gate_real_candidate_gui, private_candidate_xiphos_review,
 )
 from pilot_preflight import PilotError
 
@@ -50,6 +50,16 @@ class PrivateCandidateRealXiphosTests(unittest.TestCase):
     def test_five_actual_selected_private_commentary_texts_and_two_real_source_hrefs(self):
         _gate_real_candidate_gui(receipt())
 
+    def test_proposed_stable_identity_same_real_gui_evidence_with_no_release(self):
+        stable = receipt()
+        stable["selected_private_commentary_module_id"] = PROPOSED_STABLE_ID
+        _gate_real_candidate_gui(stable, expected_candidate_id=PROPOSED_STABLE_ID)
+        with self.assertRaisesRegex(PilotError, "expected private module"):
+            _gate_real_candidate_gui(stable)
+        with self.assertRaisesRegex(PilotError, "expected private module"):
+            _gate_real_candidate_gui(stable, expected_candidate_id="UnreviewedNewName")
+        self.assertFalse(stable["published"])
+
     def test_source_and_private_commentary_must_not_be_confused(self):
         bad = receipt()
         bad["selected_private_commentary_module_id"] = "MHCC"
@@ -88,6 +98,15 @@ class PrivateCandidateRealXiphosTests(unittest.TestCase):
         with self.assertRaisesRegex(PilotError, "Unreviewed"):
             private_candidate_xiphos_review(
                 "mhcc-crosswire",
+                native_full_corpus_binary=Path("/private/nonexistent/full-native"),
+                native_single_key_binary=Path("/private/nonexistent/single-key"),
+            )
+
+    def test_reject_unapproved_public_id_and_no_existing_binary(self):
+        with self.assertRaisesRegex(PilotError, "Unreviewed"):
+            private_candidate_xiphos_review(
+                "mhcc-crosswire",
+                candidate_id="MHCC",
                 native_full_corpus_binary=Path("/private/nonexistent/full-native"),
                 native_single_key_binary=Path("/private/nonexistent/single-key"),
             )
