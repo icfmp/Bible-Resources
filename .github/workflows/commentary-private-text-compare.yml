@@ -24,6 +24,8 @@ on:
       - 'scripts/commentary_source_native_boundaries.py'
       - 'scripts/commentary_shared_raw_source_units.py'
       - 'scripts/commentary_original_div1_book_consistency.py'
+      - 'scripts/commentary_unmarked_division_coverage.py'
+      - 'tests/test_commentary_unmarked_division_coverage.py'
       - 'tests/test_commentary_original_div1_book_consistency.py'
       - 'tests/test_commentary_shared_raw_source_units.py'
       - 'tests/test_commentary_source_native_boundaries.py'
@@ -1237,6 +1239,107 @@ jobs:
                         "actual_original_div1_ancestry_group_classes":observed_div1_group_shapes,
                         "original_source_line_and_hash_only_groups":groups,
                     },sort_keys=True))
+          unmarked=report["source_complete_original_div1_without_markers_coverage"]
+          safe_unmarked_fields={
+              "source_all_div1_total","source_div1_with_direct_chapters",
+              "source_total_direct_chapters","source_div1_with_any_scripCom",
+              "source_div1_without_any_scripCom","source_all_scripCom_count",
+              "source_verse_or_range_scripCom_count",
+              "source_unmarked_div1_with_direct_chapters",
+              "source_unmarked_div1_without_direct_chapters",
+              "original_no_scripCom_div1_exact_content_hash_and_tag_name_only_cases",
+              "source_unmarked_division_has_no_inferred_biblical_book_or_verse_reference",
+              "source_div1_title_hash_does_not_establish_canonical_book_identity",
+              "source_original_content_unchanged",
+              "all_original_source_words_title_text_and_osisRef_values_private",
+          }
+          safe_unmarked_case_fields={
+              "original_div1_document_ordinal","original_div1_title_sha256",
+              "original_div1_has_title_attribute",
+              "original_div1_direct_chapter_div2_count","original_div1_scripCom_count",
+              "original_div1_text_unicode_character_count",
+              "original_div1_full_text_sha256",
+              "original_div1_paragraph_nonempty_element_count",
+              "original_div1_chapter_text_nonempty_count",
+              "original_div1_scripRef_element_count",
+              "original_div1_note_element_count",
+              "original_div1_heading_element_count",
+              "original_div1_table_element_count",
+              "original_direct_chapter_child_tag_counts",
+              "original_div1_descendant_tag_counts",
+              "original_div1_content_not_assigned_a_scripture_reference",
+          }
+          unmarked_cases=unmarked["original_no_scripCom_div1_exact_content_hash_and_tag_name_only_cases"]
+          if (set(unmarked)!=safe_unmarked_fields or
+                  not all(type(unmarked[k]) is int and unmarked[k]>=0 for k in (
+                      "source_all_div1_total","source_div1_with_direct_chapters",
+                      "source_total_direct_chapters","source_div1_with_any_scripCom",
+                      "source_div1_without_any_scripCom","source_all_scripCom_count",
+                      "source_verse_or_range_scripCom_count",
+                      "source_unmarked_div1_with_direct_chapters",
+                      "source_unmarked_div1_without_direct_chapters")) or
+                  unmarked["source_all_div1_total"] !=
+                      unmarked["source_div1_with_any_scripCom"]+
+                      unmarked["source_div1_without_any_scripCom"] or
+                  unmarked["source_all_div1_total"] != report[
+                      "source_original_div1_osisRef_book_consistency_census"][
+                      "original_source_div1_document_total"] or
+                  unmarked["source_verse_or_range_scripCom_count"] != report[
+                      "source_original_div1_osisRef_book_consistency_census"][
+                      "original_verse_range_source_units_considered"] or
+                  unmarked["source_div1_without_any_scripCom"] != len(unmarked_cases) or
+                  unmarked["source_unmarked_div1_with_direct_chapters"]+
+                      unmarked["source_unmarked_div1_without_direct_chapters"] !=
+                      len(unmarked_cases) or
+                  unmarked["source_unmarked_division_has_no_inferred_biblical_book_or_verse_reference"] is not True or
+                  unmarked["source_div1_title_hash_does_not_establish_canonical_book_identity"] is not True or
+                  unmarked["source_original_content_unchanged"] is not True or
+                  unmarked["all_original_source_words_title_text_and_osisRef_values_private"] is not True):
+              raise SystemExit("Full original unmarked division inventory incomplete")
+          observed_unmarked_div1_ordinals=set()
+          for record in unmarked_cases:
+              if (set(record)!=safe_unmarked_case_fields or
+                      type(record["original_div1_document_ordinal"]) is not int or
+                      record["original_div1_document_ordinal"]<1 or
+                      record["original_div1_document_ordinal"]>unmarked["source_all_div1_total"] or
+                      record["original_div1_document_ordinal"] in observed_unmarked_div1_ordinals or
+                      not all(isinstance(record[k],str) and re.fullmatch(r"[a-f0-9]{64}",record[k])
+                              for k in ("original_div1_title_sha256",
+                                        "original_div1_full_text_sha256")) or
+                      record["original_div1_scripCom_count"]!=0 or
+                      record["original_div1_has_title_attribute"] not in (True,False) or
+                      record["original_div1_content_not_assigned_a_scripture_reference"] is not True or
+                      not all(type(record[k]) is int and record[k]>=0 for k in (
+                          "original_div1_direct_chapter_div2_count",
+                          "original_div1_text_unicode_character_count",
+                          "original_div1_paragraph_nonempty_element_count",
+                          "original_div1_chapter_text_nonempty_count",
+                          "original_div1_scripRef_element_count",
+                          "original_div1_note_element_count",
+                          "original_div1_heading_element_count",
+                          "original_div1_table_element_count")) or
+                      not all(isinstance(rows,dict) and
+                              all(isinstance(name,str) and
+                                  re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]{0,63}",name)
+                                  and type(n) is int and n>=0 for name,n in rows.items())
+                              for rows in (
+                                  record["original_direct_chapter_child_tag_counts"],
+                                  record["original_div1_descendant_tag_counts"]))):
+                  raise SystemExit("Unsafe original no-marker division metadata output")
+              observed_unmarked_div1_ordinals.add(record["original_div1_document_ordinal"])
+          print("Original all-div1 marked/unmarked divisions and authorial structure only: "+
+                json.dumps({
+                    "total":unmarked["source_all_div1_total"],
+                    "without_any_scripCom":unmarked["source_div1_without_any_scripCom"],
+                    "unmarked_with_direct_chapters":
+                        unmarked["source_unmarked_div1_with_direct_chapters"],
+                    "unmarked_without_direct_chapters":
+                        unmarked["source_unmarked_div1_without_direct_chapters"],
+                    "source_line_free_original_div1_ordinals":
+                        sorted(observed_unmarked_div1_ordinals),
+                },sort_keys=True))
+          print("Original no-marker division SHA-only structural receipts: "+
+                json.dumps(unmarked_cases,sort_keys=True))
           orig_div1=report["source_original_div1_osisRef_book_consistency_census"]
           allowed_div1_fields={
               "original_source_div1_document_total",
