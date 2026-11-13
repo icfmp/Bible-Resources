@@ -24,8 +24,10 @@ on:
       - 'scripts/commentary_source_native_boundaries.py'
       - 'scripts/commentary_shared_raw_source_units.py'
       - 'scripts/commentary_original_div1_book_consistency.py'
-      - 'scripts/commentary_unmarked_division_coverage.py'
-      - 'tests/test_commentary_unmarked_division_coverage.py'
+      - 'scripts/commentary_source_english_osis_alias.py'
+      - 'tests/test_commentary_source_english_osis_alias.py'
+      - 'config/standard_usfm_osis_66.json'
+      - 'config/diatheke-usfm-book-aliases.json'
       - 'tests/test_commentary_original_div1_book_consistency.py'
       - 'tests/test_commentary_shared_raw_source_units.py'
       - 'tests/test_commentary_source_native_boundaries.py'
@@ -1239,107 +1241,6 @@ jobs:
                         "actual_original_div1_ancestry_group_classes":observed_div1_group_shapes,
                         "original_source_line_and_hash_only_groups":groups,
                     },sort_keys=True))
-          unmarked=report["source_complete_original_div1_without_markers_coverage"]
-          safe_unmarked_fields={
-              "source_all_div1_total","source_div1_with_direct_chapters",
-              "source_total_direct_chapters","source_div1_with_any_scripCom",
-              "source_div1_without_any_scripCom","source_all_scripCom_count",
-              "source_verse_or_range_scripCom_count",
-              "source_unmarked_div1_with_direct_chapters",
-              "source_unmarked_div1_without_direct_chapters",
-              "original_no_scripCom_div1_exact_content_hash_and_tag_name_only_cases",
-              "source_unmarked_division_has_no_inferred_biblical_book_or_verse_reference",
-              "source_div1_title_hash_does_not_establish_canonical_book_identity",
-              "source_original_content_unchanged",
-              "all_original_source_words_title_text_and_osisRef_values_private",
-          }
-          safe_unmarked_case_fields={
-              "original_div1_document_ordinal","original_div1_title_sha256",
-              "original_div1_has_title_attribute",
-              "original_div1_direct_chapter_div2_count","original_div1_scripCom_count",
-              "original_div1_text_unicode_character_count",
-              "original_div1_full_text_sha256",
-              "original_div1_paragraph_nonempty_element_count",
-              "original_div1_chapter_text_nonempty_count",
-              "original_div1_scripRef_element_count",
-              "original_div1_note_element_count",
-              "original_div1_heading_element_count",
-              "original_div1_table_element_count",
-              "original_direct_chapter_child_tag_counts",
-              "original_div1_descendant_tag_counts",
-              "original_div1_content_not_assigned_a_scripture_reference",
-          }
-          unmarked_cases=unmarked["original_no_scripCom_div1_exact_content_hash_and_tag_name_only_cases"]
-          if (set(unmarked)!=safe_unmarked_fields or
-                  not all(type(unmarked[k]) is int and unmarked[k]>=0 for k in (
-                      "source_all_div1_total","source_div1_with_direct_chapters",
-                      "source_total_direct_chapters","source_div1_with_any_scripCom",
-                      "source_div1_without_any_scripCom","source_all_scripCom_count",
-                      "source_verse_or_range_scripCom_count",
-                      "source_unmarked_div1_with_direct_chapters",
-                      "source_unmarked_div1_without_direct_chapters")) or
-                  unmarked["source_all_div1_total"] !=
-                      unmarked["source_div1_with_any_scripCom"]+
-                      unmarked["source_div1_without_any_scripCom"] or
-                  unmarked["source_all_div1_total"] != report[
-                      "source_original_div1_osisRef_book_consistency_census"][
-                      "original_source_div1_document_total"] or
-                  unmarked["source_verse_or_range_scripCom_count"] != report[
-                      "source_original_div1_osisRef_book_consistency_census"][
-                      "original_verse_range_source_units_considered"] or
-                  unmarked["source_div1_without_any_scripCom"] != len(unmarked_cases) or
-                  unmarked["source_unmarked_div1_with_direct_chapters"]+
-                      unmarked["source_unmarked_div1_without_direct_chapters"] !=
-                      len(unmarked_cases) or
-                  unmarked["source_unmarked_division_has_no_inferred_biblical_book_or_verse_reference"] is not True or
-                  unmarked["source_div1_title_hash_does_not_establish_canonical_book_identity"] is not True or
-                  unmarked["source_original_content_unchanged"] is not True or
-                  unmarked["all_original_source_words_title_text_and_osisRef_values_private"] is not True):
-              raise SystemExit("Full original unmarked division inventory incomplete")
-          observed_unmarked_div1_ordinals=set()
-          for record in unmarked_cases:
-              if (set(record)!=safe_unmarked_case_fields or
-                      type(record["original_div1_document_ordinal"]) is not int or
-                      record["original_div1_document_ordinal"]<1 or
-                      record["original_div1_document_ordinal"]>unmarked["source_all_div1_total"] or
-                      record["original_div1_document_ordinal"] in observed_unmarked_div1_ordinals or
-                      not all(isinstance(record[k],str) and re.fullmatch(r"[a-f0-9]{64}",record[k])
-                              for k in ("original_div1_title_sha256",
-                                        "original_div1_full_text_sha256")) or
-                      record["original_div1_scripCom_count"]!=0 or
-                      record["original_div1_has_title_attribute"] not in (True,False) or
-                      record["original_div1_content_not_assigned_a_scripture_reference"] is not True or
-                      not all(type(record[k]) is int and record[k]>=0 for k in (
-                          "original_div1_direct_chapter_div2_count",
-                          "original_div1_text_unicode_character_count",
-                          "original_div1_paragraph_nonempty_element_count",
-                          "original_div1_chapter_text_nonempty_count",
-                          "original_div1_scripRef_element_count",
-                          "original_div1_note_element_count",
-                          "original_div1_heading_element_count",
-                          "original_div1_table_element_count")) or
-                      not all(isinstance(rows,dict) and
-                              all(isinstance(name,str) and
-                                  re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]{0,63}",name)
-                                  and type(n) is int and n>=0 for name,n in rows.items())
-                              for rows in (
-                                  record["original_direct_chapter_child_tag_counts"],
-                                  record["original_div1_descendant_tag_counts"]))):
-                  raise SystemExit("Unsafe original no-marker division metadata output")
-              observed_unmarked_div1_ordinals.add(record["original_div1_document_ordinal"])
-          print("Original all-div1 marked/unmarked divisions and authorial structure only: "+
-                json.dumps({
-                    "total":unmarked["source_all_div1_total"],
-                    "without_any_scripCom":unmarked["source_div1_without_any_scripCom"],
-                    "unmarked_with_direct_chapters":
-                        unmarked["source_unmarked_div1_with_direct_chapters"],
-                    "unmarked_without_direct_chapters":
-                        unmarked["source_unmarked_div1_without_direct_chapters"],
-                    "source_line_free_original_div1_ordinals":
-                        sorted(observed_unmarked_div1_ordinals),
-                },sort_keys=True))
-          print("Original no-marker division SHA-only structural receipts: "+
-                json.dumps(unmarked_cases,sort_keys=True))
           orig_div1=report["source_original_div1_osisRef_book_consistency_census"]
           allowed_div1_fields={
               "original_source_div1_document_total",
@@ -1554,6 +1455,148 @@ jobs:
                     "cross_div1_source_linehash_examples":collision_cases,
                     "original_cross_div1_start_examples_truncated":
                         orig_div1["cross_div1_source_start_collision_examples_truncated"],
+                },sort_keys=True))
+          aliases=report["source_original_div1_english_alias_vs_osisRef_book_claim_evidence"]
+          aliases_schema={
+              "canonical_usfm_osis_66_config_sha256",
+              "canonical_english_diatheke_alias_config_sha256",
+              "comparison_uses_exact_existing_66_book_registry_without_edits",
+              "source_div1_with_exactly_one_declared_book_code_title_compared",
+              "source_div1_total_with_any_annotations",
+              "source_original_div1_title_vs_canonical_english_alias_classes",
+              "original_verse_range_source_unit_counts_by_title_alias_class",
+              "canonical_english_alias_heading_conflicts_found",
+              "bounded_original_div1_english_title_alias_conflicts_line_sha256_cases",
+              "english_alias_title_conflicts_truncated",
+              "focused_shared_stock_raw_original_source_book_title_alias_checks",
+              "book_codes_or_original_source_titles_exposed",
+              "canonical_alias_is_not_proof_of_source_editorial_book_identity",
+              "no_original_source_osisRef_or_title_value_modified",
+          }
+          allowed_title_alias_classes={
+              "original_title_exact_english_alias_matches_claimed_book_code",
+              "original_title_contains_english_alias_matching_claimed_book_code",
+              "original_title_exact_english_alias_points_to_different_book_code",
+              "original_title_contains_english_alias_for_different_book_code",
+              "original_title_no_canonical_english_alias_found_unreviewed",
+              "original_title_matches_multiple_canonical_aliases_unreviewed",
+              "original_div1_title_missing_unreviewed",
+              "original_scripCom_book_code_not_in_known_66_osis_crosswalk",
+              "multiple_declared_book_codes_one_source_div1_unreviewed",
+          }
+          aliases_counts=aliases["source_original_div1_title_vs_canonical_english_alias_classes"]
+          aliases_suspects=aliases["bounded_original_div1_english_title_alias_conflicts_line_sha256_cases"]
+          title_review_fields={
+              "original_div1_document_ordinal","original_div1_title_SHA256",
+              "claimed_original_osis_book_code_SHA256",
+              "unique_canonical_english_aliases_matched",
+              "unambiguous_english_title_candidate_osis_SHA256",
+              "original_div1_alias_vs_scripCom_book_code_class",
+              "original_scripCom_source_unit_count",
+              "original_div1_source_line_min","original_div1_source_line_max",
+              "source_title_candidate_does_not_authorize_reference_rewrite",
+          }
+          alias_member_fields={
+              "original_source_line","original_full_reference_sha256",
+              "original_body_sha256","original_div1_document_ordinal",
+              "original_div1_title_SHA256",
+              "original_scripCom_osis_book_code_SHA256",
+              "unambiguous_canonical_english_title_candidate_osis_SHA256",
+              "english_title_alias_vs_actual_original_osis_claim_class",
+              "canonical_alias_only_a_read_only_source_title_witness",
+          }
+          if (not isinstance(aliases,dict) or set(aliases)!=aliases_schema or
+                  not all(isinstance(aliases[k],str) and re.fullmatch(r"[a-f0-9]{64}",aliases[k])
+                          for k in ("canonical_usfm_osis_66_config_sha256",
+                                    "canonical_english_diatheke_alias_config_sha256")) or
+                  not isinstance(aliases_counts,dict) or
+                  not all(key in allowed_title_alias_classes and type(n) is int and n>=0
+                          for key,n in aliases_counts.items()) or
+                  sum(aliases_counts.values())!=aliases["source_div1_total_with_any_annotations"] or
+                  aliases["source_div1_total_with_any_annotations"] !=
+                      orig_div1["original_div1_with_at_least_one_verse_range_source_marker_count"] or
+                  not isinstance(aliases["original_verse_range_source_unit_counts_by_title_alias_class"],dict) or
+                  not all(k in allowed_title_alias_classes and type(n) is int and n>=0
+                          for k,n in aliases["original_verse_range_source_unit_counts_by_title_alias_class"].items()) or
+                  sum(aliases["original_verse_range_source_unit_counts_by_title_alias_class"].values()) >
+                      orig_div1["original_verse_range_source_units_considered"] or
+                  aliases["comparison_uses_exact_existing_66_book_registry_without_edits"] is not True or
+                  aliases["book_codes_or_original_source_titles_exposed"] is not False or
+                  aliases["canonical_alias_is_not_proof_of_source_editorial_book_identity"] is not True or
+                  aliases["no_original_source_osisRef_or_title_value_modified"] is not True or
+                  not isinstance(aliases_suspects,list) or len(aliases_suspects)>20 or
+                  aliases["canonical_english_alias_heading_conflicts_found"]<
+                      len(aliases_suspects) or
+                  aliases["english_alias_title_conflicts_truncated"] is not (
+                      aliases["canonical_english_alias_heading_conflicts_found"]>
+                      len(aliases_suspects)
+                  )):
+              raise SystemExit("Original div1 English/OSIS alias review disagrees with pinned source")
+          for case in aliases_suspects:
+              if (set(case)!=title_review_fields or
+                      case["original_div1_alias_vs_scripCom_book_code_class"] not in {
+                          "original_title_exact_english_alias_points_to_different_book_code",
+                          "original_title_contains_english_alias_for_different_book_code"
+                      } or
+                      not all(type(case[k]) is int and case[k]>=1 for k in (
+                          "original_div1_document_ordinal",
+                          "unique_canonical_english_aliases_matched",
+                          "original_scripCom_source_unit_count",
+                          "original_div1_source_line_min","original_div1_source_line_max"
+                      )) or case["original_div1_source_line_min"]>
+                          case["original_div1_source_line_max"] or
+                      not all(isinstance(case[k],str) and re.fullmatch(r"[a-f0-9]{64}",case[k])
+                              for k in ("original_div1_title_SHA256",
+                                        "claimed_original_osis_book_code_SHA256",
+                                        "unambiguous_english_title_candidate_osis_SHA256")) or
+                      case["source_title_candidate_does_not_authorize_reference_rewrite"] is not True):
+                  raise SystemExit("Source title candidate mismatch case contains unreviewed values")
+          focused_alias=aliases["focused_shared_stock_raw_original_source_book_title_alias_checks"]
+          if (not isinstance(focused_alias,list) or len(focused_alias)!=shared[
+                  "multi_original_source_start_same_native_raw_run_groups"]):
+              raise SystemExit("Source title/osis focus groups omitted")
+          for group in focused_alias:
+              if (set(group)!={
+                  "native_shared_stock_raw_sha256","original_source_units_checked",
+                  "source_line_original_full_hash_and_title_alias_class_members"
+              } or not isinstance(group["native_shared_stock_raw_sha256"],str) or
+                  not re.fullmatch(r"[a-f0-9]{64}",group["native_shared_stock_raw_sha256"]) or
+                  not isinstance(group["source_line_original_full_hash_and_title_alias_class_members"],list) or
+                  group["original_source_units_checked"]!=len(
+                      group["source_line_original_full_hash_and_title_alias_class_members"])):
+                  raise SystemExit("Original group-title source metadata shape failed")
+              for member in group["source_line_original_full_hash_and_title_alias_class_members"]:
+                  if (set(member)!=alias_member_fields or
+                      member["english_title_alias_vs_actual_original_osis_claim_class"] not in
+                          allowed_title_alias_classes or
+                      member["canonical_alias_only_a_read_only_source_title_witness"] is not True or
+                      type(member["original_source_line"]) is not int or
+                      member["original_source_line"]<1 or
+                      type(member["original_div1_document_ordinal"]) is not int or
+                      member["original_div1_document_ordinal"]<1 or
+                      not all(isinstance(member[k],str) and re.fullmatch(r"[a-f0-9]{64}",member[k])
+                              for k in (
+                                  "original_full_reference_sha256","original_body_sha256",
+                                  "original_scripCom_osis_book_code_SHA256"
+                              )) or
+                      any(member[k] is not None and (
+                          not isinstance(member[k],str) or
+                          not re.fullmatch(r"[a-f0-9]{64}",member[k])
+                      ) for k in (
+                          "original_div1_title_SHA256",
+                          "unambiguous_canonical_english_title_candidate_osis_SHA256"
+                      ))):
+                      raise SystemExit("Original source title/OSIS witness contains unreviewed string")
+          print("Original div1 English title candidates vs literal original OSIS scripCom book claims (NOT auto repair): "+
+                json.dumps({
+                    "source_div1_reviewed":
+                        aliases["source_div1_total_with_any_annotations"],
+                    "source_div1_classes":aliases_counts,
+                    "possible_original_title_alias_book_claim_conflicts":
+                        aliases["canonical_english_alias_heading_conflicts_found"],
+                    "bounded_actual_original_title_conflict_evidence":aliases_suspects,
+                    "focused_source_group_original_title_english_alias_classes":
+                        focused_alias,
                 },sort_keys=True))
           print("Original bounded source prose alignment and stock raw repetition (not authored range proof): " +
                 json.dumps({
