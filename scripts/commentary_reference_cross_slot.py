@@ -187,6 +187,73 @@ class ReferenceCrossSlotTopology:
             return "target_witnessed_elsewhere_in_same_book"
         return "target_not_witnessed_in_other_same_book_stock_reference_markup"
 
+    def report_nonlink_plain_word_stock_payloads(self, review_cases: list[dict]) -> dict:
+        """Measure exact raw payload propagation at bounded original prose anomalies.
+
+        A bitwise repeated stock payload is NOT a source-authorized verse range.
+        No native key, authorial word or reference attribute leaves this report.
+        """
+        if not isinstance(review_cases, list) or len(review_cases) > MAX_PRIVATE_RECEIPTS:
+            raise PilotError("Original plain-word review list exceeds text-free report bound")
+        available = {}
+        for start, item, raw in self.private_unresolved:
+            identity = (
+                item["original_source_line"],
+                item["original_full_reference_sha256"],
+                item["original_text_sha256"],
+                sha256(raw).hexdigest(),
+            )
+            if identity in available:
+                raise PilotError("Ambiguous original source-unit identity for stock topology")
+            book = start.split(".", 1)[0]
+            available[identity] = book
+        examined = []
+        duplicate_counts = Counter()
+        for record in review_cases:
+            identity = (
+                record["original_source_line"],
+                record["original_full_reference_sha256"],
+                record["original_body_sha256"],
+                record["stock_raw_sha256"],
+            )
+            book = available.get(identity)
+            if book is None:
+                raise PilotError("Unverified plain-word case omitted from native stock stream")
+            slots = self.identical_raw_counts_by_book.get(
+                (book, record["stock_raw_sha256"])
+            )
+            if slots is None or sum(slots.values()) == 0:
+                raise PilotError("No original native stock key has this exact raw payload")
+            numbered, intro = slots["K"], slots["I"]
+            if numbered + intro == 1:
+                category = "unique_native_stock_raw_payload_within_same_book"
+            else:
+                category = "identical_stock_raw_payload_in_multiple_native_keys_same_book"
+            duplicate_counts[category] += 1
+            examined.append({
+                "original_source_line":record["original_source_line"],
+                "original_full_reference_sha256":record["original_full_reference_sha256"],
+                "original_body_sha256":record["original_body_sha256"],
+                "stock_raw_sha256":record["stock_raw_sha256"],
+                "same_book_numbered_native_keys_with_identical_raw_payload":numbered,
+                "same_book_intro_native_keys_with_identical_raw_payload":intro,
+                "exact_stock_raw_payload_repetition_class":category,
+            })
+        if len(examined) != sum(duplicate_counts.values()):
+            raise PilotError("Original source plain-word stock repeat census incomplete")
+        return {
+            "bounded_original_plain_word_review_cases_examined":len(examined),
+            "source_plain_word_stock_payload_repetition_classes":
+                dict(sorted(duplicate_counts.items())),
+            "bounded_plain_word_cases_line_fullhash_and_repeated_native_slot_counts":
+                sorted(examined,key=lambda r:(
+                    r["original_source_line"],r["original_full_reference_sha256"]
+                )),
+            "identical_raw_stock_payload_is_not_original_source_annotation_range":True,
+            "no_native_reference_key_or_unredacted_authorial_text_in_report":True,
+            "source_prose_or_citation_edit_authorized":False,
+        }
+
     def report(self, expected: dict) -> dict:
         if len(self.private_unresolved) != expected[
             "source_vs_stock_unresolved_word_selection_cases"
