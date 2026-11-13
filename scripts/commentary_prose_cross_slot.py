@@ -28,7 +28,8 @@ MAX_DISTINCT_RAW_PAYLOADS = 45_000
 MAX_NATIVE_XML_BYTES = 2 * 1024 * 1024
 MAX_STOCK_WORDS = 50_000
 MAX_SOURCE_WORDS = 4_000
-MIN_ANCHOR_RUN = 6
+MIN_ANCHOR_RUN = 4
+STRONG_ANCHOR_RUN = 6
 MAX_TOP_RAW_PAYLOADS_PER_SCOPE = 4
 VALID_SCOPES = (
     "other_numbered_key_same_chapter",
@@ -107,6 +108,7 @@ class OriginalProseAlternativeNativeSlotProbe:
         self.top_scopes = defaultdict(lambda: {scope: [] for scope in VALID_SCOPES})
         self.identical_selected_stock_raw_key_counts = Counter()
         self.candidate_with_original_six_word_anchor = Counter()
+        self.candidate_with_original_four_or_five_word_anchor = Counter()
         for index, case in enumerate(review_cases):
             if not all(isinstance(case.get(k), str) and SHA_RE.fullmatch(case[k])
                        for k in (
@@ -153,6 +155,10 @@ class OriginalProseAlternativeNativeSlotProbe:
             }
             for anchor in anchor_set:
                 self.anchor_to_units_by_book[book][anchor].add(index)
+            strong_anchor_set = {
+                tuple(plain_words[k:k+STRONG_ANCHOR_RUN])
+                for k in range(len(plain_words)-STRONG_ANCHOR_RUN+1)
+            }
             unit = {
                 "line":line,
                 "source_reference_sha256":case["original_full_reference_sha256"],
@@ -164,6 +170,7 @@ class OriginalProseAlternativeNativeSlotProbe:
                 "source_words":plain_words,"source_word_positions":positions,
                 "source_word_count":len(plain_words),
                 "unique_anchor_count":len(anchor_set),
+                "unique_strong_anchor_count":len(strong_anchor_set),
             }
             if not isinstance(unit["original_selected_stock_lcs_word_count"],int):
                 raise PilotError("Original selected-stock LCS witness is not complete")
@@ -237,7 +244,10 @@ class OriginalProseAlternativeNativeSlotProbe:
             # repeated native payload, not a new independent textual witness.
             if digest == unit["selected_stock_raw_sha256"]:
                 continue
-            self.candidate_with_original_six_word_anchor[case_index] += 1
+            if best_run >= STRONG_ANCHOR_RUN:
+                self.candidate_with_original_six_word_anchor[case_index] += 1
+            else:
+                self.candidate_with_original_four_or_five_word_anchor[case_index] += 1
             pool=self.top_scopes[case_index][scope]
             if any(x["stock_raw_sha256"]==digest for x in pool):
                 continue
@@ -254,6 +264,11 @@ class OriginalProseAlternativeNativeSlotProbe:
                 "stock_raw_sha256":digest,
                 "same_native_chapter_as_original":scope=="other_numbered_key_same_chapter",
                 "original_words_contiguous_best_run":best_run,
+                "anchor_strength_class":(
+                    "at_least_six_original_words_contiguous_in_stock"
+                    if best_run >= STRONG_ANCHOR_RUN
+                    else "only_four_or_five_original_words_contiguous_in_stock"
+                ),
                 "stock_plain_word_count":len(stock_words),
                 "sort_rank":(best_run,-abs(len(stock_words)-unit["source_word_count"])),
                 "private_stock_words":stock_words,
@@ -271,7 +286,7 @@ class OriginalProseAlternativeNativeSlotProbe:
                 if not pool:
                     scope_receipts[scope] = {
                         "sampled_distinct_alternative_raw_payloads":0,
-                        "scope_outcome":"no_nonidentical_stock_payload_with_six_contiguous_source_words",
+                        "scope_outcome":"no_nonidentical_stock_payload_with_four_contiguous_source_words",
                     }
                     continue
                 best=None
@@ -297,6 +312,8 @@ class OriginalProseAlternativeNativeSlotProbe:
                             "stock_plain_words_not_matched_in_exact_order"],
                         "longest_exact_contiguous_source_word_run":candidate[
                             "original_words_contiguous_best_run"],
+                        "original_contiguous_anchor_strength_class":candidate[
+                            "anchor_strength_class"],
                         "source_plain_word_count":unit["source_word_count"],
                         "compiled_plain_word_count":candidate["stock_plain_word_count"],
                         "stock_native_key_is_only_a_textual_location_witness":True,
@@ -353,10 +370,13 @@ class OriginalProseAlternativeNativeSlotProbe:
                 "original_plain_word_count":unit["source_word_count"],
                 "selected_stock_ordered_shared_plain_word_count":
                     unit["original_selected_stock_lcs_word_count"],
-                "unique_original_six_word_anchors_examined":unit["unique_anchor_count"],
+                "unique_original_four_word_anchors_examined":unit["unique_anchor_count"],
+                "unique_original_six_word_anchors_examined":unit["unique_strong_anchor_count"],
                 "same_raw_selected_payload_other_native_key_repetitions":self.identical_selected_stock_raw_key_counts[case_index],
                 "native_slots_with_any_six_word_anchor_in_distinct_payload":
                     self.candidate_with_original_six_word_anchor[case_index],
+                "native_slots_with_four_or_five_word_anchor_in_distinct_payload":
+                    self.candidate_with_original_four_or_five_word_anchor[case_index],
                 "overall_scope_conclusion":overall,
                 "by_native_scope":scope_receipts,
                 "original_source_ref_or_passage_not_derived_from_stock_key":True,
@@ -367,7 +387,8 @@ class OriginalProseAlternativeNativeSlotProbe:
             raise PilotError("Actual native raw replay did not inspect source-relevant books")
         return {
             "original_source_large_plain_word_cases":len(self.units),
-            "original_six_word_anchor_length":MIN_ANCHOR_RUN,
+            "minimum_fallback_word_anchor_length":MIN_ANCHOR_RUN,
+            "strong_original_word_anchor_length":STRONG_ANCHOR_RUN,
             "sampled_top_distinct_raw_payloads_per_case_scope":MAX_TOP_RAW_PAYLOADS_PER_SCOPE,
             "all_native_raw_entries_replayed":self.replay_native_keys,
             "native_replay_entries_in_relevant_source_books":self.replay_relevant_native_keys,
@@ -375,6 +396,8 @@ class OriginalProseAlternativeNativeSlotProbe:
             "cross_slot_scope_outcome_counts":dict(sorted(aggregate.items())),
             "all_original_large_plain_word_case_line_fullhash_scope_witnesses":
                 sorted(cases,key=lambda x:(x["original_source_line"],x["original_full_reference_sha256"])),
+            "weak_four_or_five_word_anchor_does_not_prove_same_original_authorial_section":True,
+            "strong_six_word_anchor_was_separately_counted":True,
             "nonidentical_native_payload_match_is_not_an_original_source_range_or_edition_proof":True,
             "no_original_words_native_key_strings_scripture_targets_or_raw_XML_exposed":True,
             "source_annotation_and_original_stock_module_unchanged":True,
