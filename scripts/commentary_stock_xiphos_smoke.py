@@ -148,7 +148,7 @@ def observe_stock_xiphos(resource_id: str, *, seconds: int = 12) -> dict:
             "original_module_id": manifest["module_id"],
             "original_sword_driver": "zCom",
             "diatheke_original_readback_sha256": samples,
-            "original_stock_diathake_samples_available": True,
+            "original_stock_diatheke_samples_available": True,
             **result,
             "edition_equivalence_to_other_digital_witness": "unverified",
             "editorial_approved": False,
