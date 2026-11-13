@@ -360,8 +360,23 @@ def probe_real_original_osisref_click(
                                  20, 55, 90, 125, 160, 195, 230)
                       for dx in (-450, -410, -370, -330, -290, -250,
                                  -210, -170, -130, -90, -50, -10, 30, 70)]
+            geometry = _x11(
+                ["xdotool", "getwindowgeometry", "--shell", window], env
+            )
+            dims = dict(re.findall(
+                rb"^(X|Y|WIDTH|HEIGHT)=(-?\d+)$", geometry, re.M
+            ))
+            if set(dims) != {b"X", b"Y", b"WIDTH", b"HEIGHT"}:
+                raise PilotError("Unverified reader content pane bounds")
+            gx, gy, gw, gh = (int(dims[k]) for k in
+                             (b"X", b"Y", b"WIDTH", b"HEIGHT"))
+            # No click outside the actual right-side COMMENTARY content area:
+            # exclude the sidebar, Bible, headerbar and bottom controls.
+            min_x, max_x = gx + gw * 60 // 100, gx + gw * 97 // 100
+            min_y, max_y = gy + gh * 20 // 100, gy + gh * 85 // 100
             for xx, yy in coords:
-                if not 0 < xx < 1280 or not 0 < yy < 800:
+                if not (min_x <= xx <= max_x and min_y <= yy <= max_y
+                        and 0 < xx < 1280 and 0 < yy < 800):
                     continue
                 _x11(["xdotool", "mousemove", str(xx), str(yy)], env)
                 time.sleep(.045)
