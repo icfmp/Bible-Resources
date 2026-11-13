@@ -106,6 +106,28 @@ jobs:
           assert isinstance(failures,dict) and set(failures)<=set(samples)
           assert all(isinstance(x,str) and len(x)<=45 for x in failures.values())
           assert data["independent_gui_commentary_excerpt_match_count"]==sum(samples.values())
+          markup=data["real_markup_rendering_observation_by_passage"]
+          assert set(markup)==set(samples)
+          for row in markup.values():
+              assert set(row)=={
+                  "original_internal_title_elements_found",
+                  "exact_original_titles_in_copied_gui_text",
+                  "original_internal_reference_elements_found",
+                  "real_gui_rich_html_selection_available",
+                  "real_gui_rich_html_anchor_elements_found",
+                  "xiphos_link_click_target_and_navigation_verified"
+              }
+              assert all(type(row[k]) is int and 0<=row[k]<=5000 for k in (
+                  "original_internal_title_elements_found",
+                  "exact_original_titles_in_copied_gui_text",
+                  "original_internal_reference_elements_found",
+                  "real_gui_rich_html_anchor_elements_found"
+              ))
+              assert row["exact_original_titles_in_copied_gui_text"]<=row["original_internal_title_elements_found"]
+              assert type(row["real_gui_rich_html_selection_available"]) is bool
+              assert row["xiphos_link_click_target_and_navigation_verified"] is False
+          # Rich HTML availability and actual title matches are observations,
+          # not invented GUI evidence or proof that links are clickable.
           # Do not approve partial GUI text evidence as complete sample pass.
           assert data["independent_gui_commentary_excerpt_match_count"]==data["sample_count"], (
               "Not all independently selected substantive original MHCC entries "
@@ -134,5 +156,7 @@ jobs:
             echo 'Real Ubuntu-packaged Xiphos loaded in disposable Xvfb with both CrossWire original MHCC and our SHA-attested published BRLSG1910.'
             echo 'Actual Xiphos Ctrl+L and Alt+C shortcuts attempt synced commentary; transient clipboard is compared only to authentic private diatheke text.'
             echo 'This is NOT approval of all 29,975 entries, headings, hyperlinks or full passage/navigation/typography fidelity.'
+            echo 'Only metadata counts are retained for original OSIS title/reference elements versus real clipboard-visible titles and optional rich HTML anchors.'
+            echo 'Textual link presence in rich X11 clipboard does not certify clicking or correct reference navigation.'
             echo 'No original words, screenshots or SWORD archives are published. Owner legal/editorial and release gates remain open.'
           } >> "$GITHUB_STEP_SUMMARY"
