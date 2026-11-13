@@ -19,6 +19,7 @@ from publisher_osis_observation import read_pinned_publisher_osis
 from repair_osis_note_links import propose as propose_links
 from repair_osis_inline_markup import propose as propose_inline
 from repair_osis_source_bytes import patch_exact_original
+from repair_osis_division_markers import patch_divisions
 from repair_osis_unlinked_reference_labels import render_absent_references_plain
 from audit_omitted_verse_notes import source_cases, native_cases
 from probe_andbible_jsword import run_pinned_jsword
@@ -102,7 +103,8 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
           andbible_jsword_dir: Path | None = None,
           andbible_android_apk: Path | None = None,
           andbible_android_evidence_dir: Path | None = None,
-          attested_preview_export: Path | None = None) -> dict:
+          attested_preview_export: Path | None = None,
+          division_overlay: bool = False) -> dict:
     original = read_pinned_publisher_osis("frajnd-2024")
     if sha(original) != SOURCE_HASH:
         raise PrivateRepairedProbeError("Exact publisher original source drifted")
@@ -125,6 +127,14 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
     # research overlay. Original BPC OSIS and the 11-link repair stay pinned.
     corrected, plain_note_receipt = render_absent_references_plain(
         original, corrected_raw, a)
+    division_receipt = None
+    if division_overlay:
+        corrected, division_receipt = patch_divisions(
+            corrected, expected_sha256=sha(corrected))
+        if not division_receipt["all_leading_editorial_signs_transferred"]:
+            raise PrivateRepairedProbeError(
+                "Remaining authorial inline division symbols require independent review")
+    compiled_source_sha256 = sha(corrected)
     if plain_note_receipt["explicit_plain_label_count"] != 3:
         raise PrivateRepairedProbeError("Omitted-verse plain-label conversion incomplete")
     original_keys, original_index = source_inventory(original)
@@ -133,10 +143,23 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
         raise PrivateRepairedProbeError("Authored Scripture index changed")
     source_verses, source_notes, _original_meta = original_osis_verses_and_notes(original)
     final_verses, final_notes, _final_meta = original_osis_verses_and_notes(corrected)
-    if (source_verses != final_verses or
-            not _source_notes_equal_except_targets(source_notes, final_notes) or
-            sum(map(len, final_notes.values())) != 6340):
-        raise PrivateRepairedProbeError("Original Scripture or note content/anchors were changed")
+    if division_overlay:
+        same_note_labels_and_bodies = all(
+            len(source_notes[ref]) == len(final_notes[ref])
+            and all(
+                {k: v for k, v in before.items() if k not in ("targets", "point")} ==
+                {k: v for k, v in after.items() if k not in ("targets", "point")}
+                for before, after in zip(source_notes[ref], final_notes[ref])
+            )
+            for ref in source_notes
+        )
+        original_text_verified = division_receipt["verse_prose_modifications_outside_recorded_symbols"] == 0
+    else:
+        same_note_labels_and_bodies = _source_notes_equal_except_targets(source_notes, final_notes)
+        original_text_verified = source_verses == final_verses
+    if (not original_text_verified or not same_note_labels_and_bodies
+            or sum(map(len, final_notes.values())) != 6340):
+        raise PrivateRepairedProbeError("Original Scripture/notes changed outside reviewed overlays")
     if original_index["source_verse_count"] != corrected_index["source_verse_count"]:
         raise PrivateRepairedProbeError("Verse count changed")
     # Independently verify notes that discuss deliberately omitted verses:
@@ -286,7 +309,7 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
             xiphos_receipt["independent_screenshot_pixels_reviewed"] = False
             xiphos_receipt["corrected_reference_clicks_visually_confirmed"] = False
             xiphos_receipt["omitted_verse_note_behavior_visually_confirmed"] = False
-        if sha(source_file.read_bytes()) != plain_note_receipt["new_research_candidate_sha256"]:
+        if sha(source_file.read_bytes()) != compiled_source_sha256:
             raise PrivateRepairedProbeError("Private source mutated during compiler invocation")
         export_receipt = None
         if attested_preview_export is not None:
@@ -308,6 +331,8 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
         "private_canonical_xml_research_sha256": REPAIRED_SHA,
         "private_original_serialization_preserving_osis_sha256": lexical_receipt["candidate_sha256"],
         "private_plain_omitted_reference_osis_sha256": plain_note_receipt["new_research_candidate_sha256"],
+        "private_compiled_osis_sha256": compiled_source_sha256,
+        "research_division_overlay_receipt": division_receipt,
         "plain_nonhyperlink_omission_label_count": plain_note_receipt["explicit_plain_label_count"],
         "original_note_display_text_preserved_by_plain_overlay": plain_note_receipt["all_original_characters_preserved"],
         "original_unedited_osis_bytes_preserved": True,
@@ -320,7 +345,9 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
         "nonexistent_source_verse_link_targets_disabled": 3,
         "invalid_inline_osis_elements_replaced": 2,
         "original_notes_unchanged_except_approved_navigation_targets": True,
-        "original_verse_words_and_punctuation_equal": True,
+        "original_verse_words_and_punctuation_equal": not division_overlay,
+        "original_words_and_punctuation_except_explicit_moved_editorial_stars_equal":
+            bool(division_overlay and division_receipt["all_leading_editorial_signs_transferred"]),
         "official_osis_xsd_conforming": True,
         "native_result": metrics,
         "real_sword_readbacks": smoke,
@@ -351,6 +378,8 @@ def main():
                    help="Fresh separate directory for screenshots and sanitized Android UI state")
     p.add_argument("--attested-preview-export", type=Path,
                    help="Explicit, temporary output for approved release workflow only; NEVER uploaded by research CI")
+    p.add_argument("--division-overlay", action="store_true",
+                   help="Private research-only source-bound editorial section/stanza marker layout overlay")
     args = p.parse_args()
     if args.attested_preview_export is not None and (
             args.attested_preview_export.exists() or args.attested_preview_export.is_symlink()
@@ -366,7 +395,8 @@ def main():
         andbible_jsword_dir=args.andbible_jsword_dir,
         andbible_android_apk=args.andbible_android_apk,
         andbible_android_evidence_dir=args.andbible_android_evidence_dir,
-        attested_preview_export=args.attested_preview_export)
+        attested_preview_export=args.attested_preview_export,
+        division_overlay=args.division_overlay)
     args.report.write_text(json.dumps(report, indent=2, sort_keys=True)+"\n",
                            encoding="utf-8")
     print("Exact private repaired source/native reader gate passed; no release made")
