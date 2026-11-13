@@ -97,14 +97,48 @@ def _screenshot_sha256() -> str:
     return sha256(data).hexdigest()
 
 
+def _app_focus_witness() -> list[str]:
+    """Record exact Android focus/lifecycle signal classes, never screen text.
+
+    Android 35 may expose top activity through ActivityManager rather than
+    WindowManager. Seeing the installed package somewhere in dumpsys is NOT
+    evidence it is the current/resumed activity.
+    """
+    found = set()
+    names = {
+        b"mCurrentFocus": "focused_window",
+        b"mFocusedApp": "focused_app_window",
+        b"mResumedActivity": "resumed_activity",
+        b"topResumedActivity": "top_resumed_activity",
+        b"mTopResumedActivity": "top_resumed_activity",
+    }
+    for category, command in (("window", "windows"), ("activity", "activities")):
+        output = adb("shell", "dumpsys", category, command, timeout=25, fail=False)
+        if len(output) > 4_000_000:
+            raise PilotError("Unbounded Android lifecycle metadata")
+        for line in output.splitlines():
+            if PACKAGE.encode("ascii") not in line:
+                continue
+            for prefix, label in names.items():
+                if prefix in line:
+                    found.add(label)
+    return sorted(found)
+
+
 def _app_foreground() -> bool:
-    # Process/lifecycle confirmation only. It does not prove commentary text.
-    state = adb("shell", "dumpsys", "window", "windows", timeout=25, fail=False)
-    if len(state) > 4_000_000:
-        raise PilotError("Unbounded Android window manager metadata")
-    return any(PACKAGE.encode("ascii") in line
-               for line in state.splitlines()
-               if b"mCurrentFocus" in line or b"mFocusedApp" in line)
+    return bool(_app_focus_witness())
+
+
+def _dispatch_documented_reference(manifest: dict) -> bool:
+    """Only a recognized ActivityManager acceptance, not actual navigation."""
+    response = adb(
+        "shell", "am", "start", "-a", "android.intent.action.VIEW",
+        "-d", _reference_uri(manifest), "-p", PACKAGE, timeout=30, fail=False
+    )
+    # adb(fail=False) returns empty bytes on command error. We must NOT
+    # report a successful dispatch merely because it was invoked.
+    return (b"Starting: Intent" in response or
+            b"Warning: Activity not started" in response) and b"Error:" not in response
 
 
 def _reference_uri(manifest: dict) -> str:
@@ -196,6 +230,11 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
         if not selected:
             raise PilotError("Exact original stock ZIP was not selectable by Android file picker")
         snapshots["post_selection"] = _screenshot_sha256()
+        selected_screen = _screen(module_id, title)
+        exact_file_still_visible = any(
+            item["action"] == "EXACT_MODULE_ZIP" for item in selected_screen["controls"]
+        )
+        focus_after_selection = _app_focus_witness()
         action_after = []
         for _step in range(3):
             snap = _screen(module_id, title)
@@ -205,7 +244,8 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
             action_after.append(next_action)
             time.sleep(6)
         snap = _screen(module_id, title)
-        identity_seen = snap["reader_module_metadata_detected"]
+        identity_after_first_import = snap["reader_module_metadata_detected"]
+        focus_after_import = _app_focus_witness()
         _tap(snap["controls"], ("DISMISS", "DISMISS UNTIL NEXT UPDATE"))
         time.sleep(2)
         snapshots["after_import_attempt"] = _screenshot_sha256()
@@ -213,13 +253,15 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
         adb("shell", "monkey", "-p", PACKAGE, "1", timeout=40)
         time.sleep(12)
         after_restart = _screen(module_id, title)
-        identity_seen = identity_seen or after_restart["reader_module_metadata_detected"]
-        # A documented deep-link dispatch is only an attempted navigation.
-        adb("shell", "am", "start", "-a", "android.intent.action.VIEW",
-            "-d", _reference_uri(manifest), "-p", PACKAGE, timeout=30, fail=False)
+        identity_after_restart = after_restart["reader_module_metadata_detected"]
+        focus_after_restart = _app_focus_witness()
+        # Real platform request result is checked, but not equated to a
+        # rendered page. A rejected Intent must remain explicitly unverified.
+        intent_accepted = _dispatch_documented_reference(manifest)
         time.sleep(7)
         after_link = _screen(module_id, title)
-        identity_seen = identity_seen or after_link["reader_module_metadata_detected"]
+        identity_after_link = after_link["reader_module_metadata_detected"]
+        focus_after_link = _app_focus_witness()
         snapshots["post_reference_dispatch"] = _screenshot_sha256()
         return {
             "schema_version": 1,
@@ -234,9 +276,27 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
             "android_file_picker_exact_original_zip_selected": selected,
             "android_proceed_dialog_tapped": proceeded,
             "android_safe_import_confirmation_buttons_tapped": action_after,
-            "original_module_metadata_detected_in_ui_after_import": identity_seen,
-            "android_application_foreground_after_deeplink": _app_foreground(),
-            "android_sample_reference_deeplink_dispatched": True,
+            "original_module_metadata_detected_in_ui_after_import": (
+                identity_after_first_import or identity_after_restart or identity_after_link
+            ),
+            "original_module_identity_witness_by_phase": {
+                "after_import": identity_after_first_import,
+                "after_app_restart": identity_after_restart,
+                "after_reference_intent": identity_after_link,
+            },
+            "android_exact_file_row_still_visible_after_selection": exact_file_still_visible,
+            "android_focus_witness_by_phase": {
+                "after_file_selection": focus_after_selection,
+                "after_import_attempt": focus_after_import,
+                "after_app_restart": focus_after_restart,
+                "after_reference_intent": focus_after_link,
+            },
+            "android_application_foreground_after_deeplink": bool(focus_after_link),
+            "android_sample_reference_deeplink_attempted": True,
+            "android_documented_intent_request_accepted": intent_accepted,
+            "android_screen_changed_after_reference_attempt": (
+                snapshots["post_reference_dispatch"] != snapshots["after_import_attempt"]
+            ),
             "bounded_first_screen_available_actions": initial_buttons,
             "bounded_file_picker_actions": history,
             "real_screen_sha256_only": snapshots,
