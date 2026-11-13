@@ -16,6 +16,7 @@ from commentary_chapter_paragraph_overlap import (
     SOURCE_WORD_RE, longest_common_contiguous_word_run,
 )
 from pilot_preflight import PilotError
+from commentary_chapter_ref_labels import link_label_location
 
 MAX_SAFE_SOURCE_P = 1000
 MAX_REVIEW_CASES = 12
@@ -72,6 +73,8 @@ class ChapterParagraphBoundaryProbe:
                     "neighbor_tag_counts": item["source_sibling_direct_child_tag_counts"],
                     "neighbor_next_tag": item["source_sibling_next_tag"],
                     "neighbor_parent_tag": item["source_sibling_parent_tag"],
+                    "private_original_scripRef_labels": item["private_source_scripRef_labels"],
+                    "selected_scripRef_label_result": None,
                     "best": 0, "best_keys": 0, "best_key_sha256": None,
                     "source_anchor_start": None, "stock_anchor_start": None,
                     "stock_anchor_occurrences_at_selected_key": 0,
@@ -112,6 +115,9 @@ class ChapterParagraphBoundaryProbe:
             unit["best"] = n
             unit["best_keys"] = 1
             unit["best_key_sha256"] = sha256(key.encode("ascii")).hexdigest()
+            unit["selected_scripRef_label_result"] = link_label_location(
+                unit["private_original_scripRef_labels"], raw
+            )
             start, stock_start, occurrences = anchor_window(original_words, stock_words, n)
             unit["source_anchor_start"] = start
             unit["stock_anchor_start"] = stock_start
@@ -169,6 +175,8 @@ class ChapterParagraphBoundaryProbe:
                     unit["neighbor_tag_counts"],
                 "original_next_sibling_tag": unit["neighbor_next_tag"],
                 "original_parent_element_tag": unit["neighbor_parent_tag"],
+                "selected_stock_scripRef_label_diagnostics":
+                    unit["selected_scripRef_label_result"],
             })
         if len(receipt) != len(cases):
             raise PilotError("Original unresolved chapter p paragraph boundary report incomplete")
