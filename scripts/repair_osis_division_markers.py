@@ -1,0 +1,256 @@
+#!/usr/bin/env python3
+"""Reversibly encode verified leading editorial divisions as OSIS milestones.
+
+Research-only. Never strip all '*' or whitespace globally: only replace
+literal section/stanza marks at a verified authored p/l opening. Preserves
+the precise original sign as a 'marker' attribute, so it is no longer
+inline Scripture prose. Reject unknown cases instead of guessing.
+"""
+from __future__ import annotations
+
+from collections import Counter
+from hashlib import sha256
+import re
+from xml.parsers import expat
+
+from lxml import etree
+
+from publisher_osis_usfx_parity import original_osis_verses_and_notes, _nonspace
+from repair_osis_source_bytes import _end_of_tag
+from source_osis_inventory import _source_tree, OSIS, source_inventory
+
+PREFIX = re.compile(r"(?P<spaces>\s*)(?P<mark>\*{1,3})(?!\*)")
+MAX_BYTES = 128 * 1024 * 1024
+KINDS = {"paragraph": "x-subject-division", "poetry": "x-stanza-division"}
+MAJOR_KIND = "x-major-subject-division"
+
+
+class DivisionRepairError(ValueError):
+    pass
+
+
+def _first_authored_verse(element):
+    for verse in element.iter(OSIS + "verse"):
+        if not verse.get("eID"):
+            return verse.get("sID") or verse.get("osisID")
+    return None
+
+
+def _candidates(original: bytes):
+    root = _source_tree(original)
+    paragraph_first = set()
+    poetry_first = set()
+    for node in root.iter():
+        if node.tag == OSIS + "p":
+            ref = _first_authored_verse(node)
+            if ref:
+                paragraph_first.add(ref)
+        elif node.tag in {OSIS + "l", OSIS + "lg"}:
+            ref = _first_authored_verse(node)
+            if ref:
+                poetry_first.add(ref)
+    candidates = {}
+    skipped = Counter()
+    unresolved = []
+    for verse in root.iter(OSIS + "verse"):
+        ref = verse.get("sID") or verse.get("osisID")
+        if verse.get("eID") or not ref:
+            continue
+        match = PREFIX.match(verse.tail or "")
+        mode = "verse_tail"
+        hi_node = None
+        outer_spaces = ""
+        if match is None:
+            next_node = verse.getnext()
+            if (next_node is not None and next_node.tag == OSIS + "hi"
+                    and not (verse.tail or "").strip()):
+                match = PREFIX.match(next_node.text or "")
+                if match:
+                    mode = "following_hi"
+                    hi_node = next_node
+                    outer_spaces = verse.tail or ""
+        if not match:
+            continue
+        if ref in candidates:
+            raise DivisionRepairError("Repeated authored verse marker")
+        sign = match.group("mark")
+        segment = (hi_node.text or "") if hi_node is not None else (verse.tail or "")
+        rest = segment[match.end():]
+        if sign == "*" and (rest.startswith("[") or rest.startswith("Dieu") or
+                             rest.startswith("Seigneur")):
+            skipped["protected_textual_symbol"] += 1
+            continue
+        if ref in paragraph_first:
+            kind = "paragraph"
+        elif ref in poetry_first:
+            kind = "poetry"
+        else:
+            unresolved.append(ref)
+            continue
+        if len(sign) == 3 and kind != "paragraph":
+            raise DivisionRepairError("Triple-star significance outside paragraph not verified")
+        candidates[ref] = (verse, kind, sign, match.group("spaces"),
+                           mode, hi_node, outer_spaces)
+    if unresolved:
+        raise DivisionRepairError(
+            "Original source has leading marks without approved p/l semantics: " +
+            ", ".join(unresolved[:8]))
+    return root, candidates, skipped
+
+
+def patch_divisions(source: bytes, *, expected_sha256: str):
+    if (not isinstance(source, bytes) or not 128 <= len(source) <= MAX_BYTES or
+            not re.fullmatch(r"[a-f0-9]{64}", expected_sha256) or
+            sha256(source).hexdigest() != expected_sha256):
+        raise DivisionRepairError("Source SHA mismatch or invalid input")
+    original_keys, _ = source_inventory(source)
+    original_verses, original_notes, _ = original_osis_verses_and_notes(source)
+    root, candidates, skipped = _candidates(source)
+    nodes = [n for n in root.iter() if isinstance(n.tag, str)]
+    selected = {n: (ref, kind, mark, spaces, mode, hi, outer)
+                for ref, (n, kind, mark, spaces, mode, hi, outer) in candidates.items()}
+    selected_hi = {hi: (ref, mark, spaces)
+                   for ref, (_, _, mark, spaces, mode, hi, _) in candidates.items()
+                   if mode == "following_hi"}
+    if len(selected_hi) != sum(c[4] == "following_hi" for c in candidates.values()):
+        raise DivisionRepairError("Overlapping original wrapper markup")
+    parser = expat.ParserCreate(namespace_separator="}")
+    started = [0]
+    patches = []
+
+    def begin(name, _attributes):
+        pos = parser.CurrentByteIndex
+        index = started[0]
+        started[0] += 1
+        if index >= len(nodes) or nodes[index].tag != "{" + name:
+            raise DivisionRepairError("Original byte and XML element order differ")
+        node = nodes[index]
+        if node in selected:
+            ref, kind, mark, spaces, mode, hi, outer = selected[node]
+            end = _end_of_tag(source, pos)
+            if source[end-2:end] != b"/>":
+                raise DivisionRepairError("Expected unclosed verse start milestone")
+            old = (spaces + mark if mode == "verse_tail" else outer).encode("utf-8")
+            if source[end:end+len(old)] != old:
+                raise DivisionRepairError("Unexpected original marker byte placement")
+            # The OSIS 'marker' attribute is DISPLAYED as a glyph in JSword/
+            # AndBible, so it cannot hold the literal authored '*' here.
+            # Preserve it losslessly as a non-displayed, typed source annotation.
+            value = MAJOR_KIND if kind == "paragraph" and len(mark) == 3 else KINDS[kind]
+            subtype = "x-original-ascii-star-" + str(len(mark))
+            replacement = ('<milestone type="' + value +
+                           '" subType="' + subtype + '"/>').encode("ascii")
+            patches.append((end, end+len(old), replacement))
+        if node in selected_hi:
+            ref, mark, spaces = selected_hi[node]
+            end = _end_of_tag(source, pos)
+            old = (spaces + mark).encode("utf-8")
+            if source[end:end+len(old)] != old:
+                raise DivisionRepairError("Unexpected wrapped symbol byte placement")
+            patches.append((end, end+len(old), b""))
+
+    def deny(*_args):
+        raise DivisionRepairError("DTD or external entities are forbidden")
+
+    parser.StartElementHandler = begin
+    parser.StartDoctypeDeclHandler = deny
+    parser.EntityDeclHandler = deny
+    parser.ExternalEntityRefHandler = deny
+    parser.SetParamEntityParsing(expat.XML_PARAM_ENTITY_PARSING_NEVER)
+    parser.Parse(source, True)
+    if started[0] != len(nodes) or len(patches) != len(candidates) + len(selected_hi):
+        raise DivisionRepairError("Incomplete approved marker coverage")
+    patches.sort()
+    if any(a[1] > b[0] for a, b in zip(patches, patches[1:])):
+        raise DivisionRepairError("Overlapping source changes")
+    result = bytearray()
+    last = 0
+    for start, end, replacement in patches:
+        result.extend(source[last:start])
+        result.extend(replacement)
+        last = end
+    result.extend(source[last:])
+    corrected = bytes(result)
+    new_root = _source_tree(corrected)
+    expected_types = set(KINDS.values()) | {MAJOR_KIND}
+    milestones = [n for n in new_root.iter(OSIS + "milestone")
+                  if n.get("type") in expected_types]
+    if any(n.get("marker") is not None for n in milestones):
+        raise DivisionRepairError("Displayable OSIS marker leaked into research candidate")
+    markers = [
+        (n.get("type"), "*" * int(n.get("subType").removeprefix("x-original-ascii-star-")))
+        for n in milestones if n.get("subType") in {
+            "x-original-ascii-star-1", "x-original-ascii-star-2",
+            "x-original-ascii-star-3"}
+    ]
+    if len(markers) != len(milestones):
+        raise DivisionRepairError("Editorial section sign subtype is not reversibly encoded")
+    expected = [(MAJOR_KIND if kind == "paragraph" and len(mark) == 3 else KINDS[kind], mark)
+                for _, kind, mark, *_ in candidates.values()]
+    if sorted(markers) != sorted(expected):
+        raise DivisionRepairError("Original editorial marker metadata not preserved")
+    corrected_keys, _ = source_inventory(corrected)
+    if corrected_keys != original_keys:
+        raise DivisionRepairError("Original numbered verse identifiers changed")
+    transformed_verses, transformed_notes, _ = original_osis_verses_and_notes(corrected)
+    if original_verses.keys() != transformed_verses.keys() or \
+            original_notes.keys() != transformed_notes.keys():
+        raise DivisionRepairError("Source verses or note hosts changed")
+    edits_by_ref = {ref: mark for ref, (_, _, mark, *_) in candidates.items()}
+    for ref, authored in original_verses.items():
+        transformed = transformed_verses[ref]
+        if ref in edits_by_ref:
+            if _nonspace(authored) != edits_by_ref[ref] + _nonspace(transformed):
+                raise DivisionRepairError("Verse content changed beyond recorded division")
+        elif authored != transformed:
+            raise DivisionRepairError("Unreviewed authored verse content changed")
+        before, after = original_notes[ref], transformed_notes[ref]
+        if len(before) != len(after):
+            raise DivisionRepairError("Lost authored note")
+        for a, b in zip(before, after):
+            if {k: v for k, v in a.items() if k != "point"} != \
+                    {k: v for k, v in b.items() if k != "point"}:
+                raise DivisionRepairError("Note body, caller, type or target changed")
+            # Note lexical offsets move by the exact marker length (1/2 chars).
+            expected_shift = len(edits_by_ref.get(ref, ""))
+            if a["point"] - b["point"] != expected_shift:
+                raise DivisionRepairError("Unexplained note anchor position shift")
+    counts = Counter((kind+"_level_3" if kind == "paragraph" and len(mark) == 3 else kind)
+                     for _, kind, mark, *_ in candidates.values())
+    unresolved_markers = []
+    for ref, value in original_verses.items():
+        # Longer original marks have not been reviewed and must not disappear
+        # from the editorial review queue.
+        if value.lstrip().startswith("****"):
+            unresolved_markers.append(ref)
+            continue
+        m = PREFIX.match(value)
+        if not m or ref in edits_by_ref:
+            continue
+        remainder = value[m.end():]
+        if m.group("mark") == "*" and (
+                remainder.startswith("[") or remainder.startswith("Dieu")
+                or remainder.startswith("Seigneur")):
+            continue
+        unresolved_markers.append(ref)
+    return corrected, {
+        "schema_version": 1,
+        "status": "research_only_byte_patched_editorial_divisions_not_published",
+        "source_sha256": expected_sha256,
+        "candidate_sha256": sha256(corrected).hexdigest(),
+        "converted_markers_by_kind": dict(sorted(counts.items())),
+        "source_literal_marker_metadata_equal": True,
+        "source_editorial_stars_preserved_as_non_displayable_subtype": True,
+        "all_leading_editorial_signs_transferred": not unresolved_markers,
+        "unconverted_leading_marker_count": len(unresolved_markers),
+        "bounded_unconverted_leading_marker_refs": unresolved_markers[:40],
+        "protected_unchanged_marker_counts": dict(sorted(skipped.items())),
+        "unapproved_source_reference_changes": 0,
+        "verse_prose_modifications_outside_recorded_symbols": 0,
+        "all_original_notes_and_machine_targets_preserved": True,
+        "note_anchor_shifts_exactly_accounted_for": True,
+        "source_binary_overwritten": False,
+        "native_sword_readback_verified": False,
+        "reader_visual_accepted": False,
+        "release_authorized": False,
+    }
