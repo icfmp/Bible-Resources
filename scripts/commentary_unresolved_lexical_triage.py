@@ -17,6 +17,7 @@ from lxml import etree
 
 from commentary_stock_prefix_topology import unexplained_word_boundary_census
 from commentary_chapter_ref_labels import link_label_location
+from commentary_nonlink_words import compare_words_outside_links
 from pilot_preflight import PilotError
 
 WORD = re.compile(r"\w+", flags=re.UNICODE)
@@ -203,6 +204,11 @@ class UnresolvedLexicalSelectionCensus:
         self.raw_exact_target_multiset_matches_total = 0
         self.literal_work_qualifier_only_target_matches_total = 0
         self.no_stock_reference_cases = []
+        self.nonlink_word_relationships = Counter()
+        self.nonlink_word_relationships_by_original_lexical_shape = {}
+        self.original_plain_word_bins = Counter()
+        self.stock_plain_word_bins = Counter()
+        self.nonlink_attention_cases = []
         self.edit_ops = Counter()
         self.stock_link_and_source_link = Counter()
         self.original_middle_bins = Counter()
@@ -254,6 +260,32 @@ class UnresolvedLexicalSelectionCensus:
         stock_link_indices = marked_word_token_indices(stock_root,"reference",compiled)
         source_words = WORD.findall(original)
         stock_words = WORD.findall(compiled)
+        plain_witness = compare_words_outside_links(
+            source_words, stock_words, original_link_indices, stock_link_indices
+        )
+        nonlink_category = plain_witness["outside_link_word_relation"]
+        self.nonlink_word_relationships[nonlink_category] += 1
+        self.nonlink_word_relationships_by_original_lexical_shape.setdefault(
+            delta["lexical_middle_shape"],Counter()
+        )[nonlink_category] += 1
+        self.original_plain_word_bins[self._bucket(plain_witness["original_plain_word_tokens"])] += 1
+        self.stock_plain_word_bins[self._bucket(plain_witness["stock_plain_word_tokens"])] += 1
+        if nonlink_category in {
+            "plain_word_order_or_selection_requires_editorial_review",
+            "same_plain_word_multiset_but_different_order",
+            "source_plain_words_only_after_removing_stock_scripture_labels",
+        }:
+            self.nonlink_attention_cases.append({
+                "original_source_line":source["original_source_line"],
+                "original_full_reference_sha256":source["original_full_reference_sha256"],
+                "original_body_sha256":source["original_text_sha256"],
+                "stock_raw_sha256":sha256(raw).hexdigest(),
+                "original_plain_word_tokens":plain_witness["original_plain_word_tokens"],
+                "stock_plain_word_tokens":plain_witness["stock_plain_word_tokens"],
+                "shared_plain_word_multiset_occurrences":
+                    plain_witness["shared_plain_word_multiset_occurrences"],
+                "outside_link_word_relation":nonlink_category,
+            })
         orig_head = delta["common_start_word_tokens"]
         orig_tail = len(source_words) - delta["common_end_word_tokens"]
         stock_head = orig_head
@@ -420,10 +452,21 @@ class UnresolvedLexicalSelectionCensus:
             self.stock_link_and_source_link,
             self.original_to_compiled_reference_target_classes,
             self.source_stock_reference_element_count_relationships,
-            self.original_middle_bins, self.stock_middle_bins, self.changed_middle_overlap
+            self.original_middle_bins, self.stock_middle_bins, self.changed_middle_overlap,
+            self.nonlink_word_relationships, self.original_plain_word_bins,
+            self.stock_plain_word_bins
         ):
             if sum(category.values()) != self.total:
                 raise PilotError("Original source/stock mismatch diagnostic accounting incomplete")
+        if (sum(sum(v.values()) for v in self.nonlink_word_relationships_by_original_lexical_shape.values())
+                != self.total or
+                sum(self.nonlink_word_relationships_by_original_lexical_shape.get(
+                    "one_to_one_middle_word_substitution",Counter()).values()) !=
+                    self.category["one_to_one_middle_word_substitution"] or
+                sum(self.nonlink_word_relationships_by_original_lexical_shape.get(
+                    "middle_partial_shared_word_occurrences",Counter()).values()) !=
+                    self.category["middle_partial_shared_word_occurrences"]):
+            raise PilotError("Original nonlink word relation census does not reconcile")
         if (sum(self.original_reference_label_location_classes.values()) !=
                 self.original_reference_total or
                 self.source_nonempty_targets_total > self.original_reference_total or
@@ -454,6 +497,23 @@ class UnresolvedLexicalSelectionCensus:
             "bounded_alignment_opcode_types": dict(sorted(self.edit_ops.items())),
             "source_scripRef_presence": dict(sorted(self.source_link_marked.items())),
             "stock_reference_presence": dict(sorted(self.stock_link_marked.items())),
+            "original_prose_outside_link_word_relation_counts":
+                dict(sorted(self.nonlink_word_relationships.items())),
+            "original_prose_outside_link_relations_by_original_lexical_difference":{
+                kind:dict(sorted(classes.items()))
+                for kind,classes in sorted(self.nonlink_word_relationships_by_original_lexical_shape.items())
+            },
+            "original_plain_word_token_count_bins":dict(sorted(self.original_plain_word_bins.items())),
+            "stock_plain_word_token_count_bins":dict(sorted(self.stock_plain_word_bins.items())),
+            "bounded_plain_word_nontrivial_differences_line_and_hash_cases":sorted(
+                self.nonlink_attention_cases,
+                key=lambda item:(
+                    item["shared_plain_word_multiset_occurrences"],
+                    -max(item["original_plain_word_tokens"],item["stock_plain_word_tokens"]),
+                    item["original_source_line"],
+                )
+            )[:MAX_PRIVATE_CASES],
+            "plain_word_extraction_does_not_prove_original_paragraph_or_punctuation_parity":True,
             "source_scripRef_x_stock_reference_presence": dict(sorted(self.stock_link_and_source_link.items())),
             "stock_title_or_table_presence": dict(sorted(self.stock_title_or_table_marked.items())),
             "original_scripRef_total_across_unresolved_entries":self.original_reference_total,
