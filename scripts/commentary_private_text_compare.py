@@ -122,6 +122,22 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
         if source_div1 is None:
             raise PilotError("Original scripture annotation has no verifiable enclosing ThML div1")
         source_div1_ordinal=original_div1_order[source_div1]
+        original_div1_title=source_div1.get("title")
+        heading_origin="title_attribute" if original_div1_title is not None else "absent"
+        if original_div1_title is None:
+            for heading in source_div1:
+                if (isinstance(heading.tag,str) and
+                        heading.tag.rsplit("}",1)[-1] in {"h1","title"}):
+                    original_div1_title="".join(heading.itertext())
+                    heading_origin="immediate_original_h1_or_title_child"
+                    break
+        if original_div1_title is not None and len(original_div1_title)>4096:
+            raise PilotError("Original div1 heading exceeds private source-review bound")
+        original_div1_heading_sha=(
+            sha256(original_div1_title.encode("utf-8")).hexdigest()
+            if original_div1_title is not None and original_div1_title.strip()
+            else None
+        )
         source_endpoints=match.group(2).split("-",1)
         start=source_endpoints[0]
         original_declared_end=source_endpoints[-1]
@@ -148,6 +164,11 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
             "private_original_declared_range_end_key":original_declared_end,
             "private_original_enclosing_div1_document_ordinal":source_div1_ordinal,
             "private_original_total_div1_in_document":len(original_div1_nodes),
+            "private_original_div1_heading_origin":heading_origin,
+            "private_original_div1_heading_sha256":original_div1_heading_sha,
+            "private_original_div1_attribute_name_types":sorted(
+                k.rsplit("}",1)[-1] for k in source_div1.attrib
+            ),
             "original_text":txt,
             "original_text_sha256":sha256(text_bytes).hexdigest(),
             "original_characters":len(txt),
