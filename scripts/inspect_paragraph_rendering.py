@@ -23,7 +23,7 @@ from stable_sword_refs import KEY
 
 MAX_REFERENCES = 24
 MAX_NATIVE = 2 * 1024 * 1024
-MARKERS = ("**", "*", "#", "\u2020")
+MARKERS = ("****", "***", "**", "*", "#", "\u2020")
 
 
 class ParagraphRenderingProbeError(ValueError):
@@ -117,6 +117,7 @@ def analyze_source(source: bytes, references: list[str]) -> tuple[dict, dict]:
             first_para_refs.add(first)
     occurrences = Counter()
     marker_refs = []
+    triple_refs = []
     semantic_groups = Counter()
     suspicious_nonfirst = []
     for ref, value in strings.items():
@@ -125,10 +126,14 @@ def analyze_source(source: bytes, references: list[str]) -> tuple[dict, dict]:
         if not marker:
             continue
         occurrences[marker] += 1
+        if marker.startswith("***") and len(triple_refs) < 24:
+            triple_refs.append(ref)
         if len(marker_refs) < 24:
             marker_refs.append(ref)
         beginning = value.lstrip()
-        if beginning.startswith("*Dieu") or beginning.startswith("*Seigneur"):
+        if marker.startswith("***"):
+            semantic_groups["unclassified_three_or_more_stars"] += 1
+        elif beginning.startswith("*Dieu") or beginning.startswith("*Seigneur"):
             semantic_groups["protected_divine_name_candidate"] += 1
         elif beginning.startswith("*["):
             semantic_groups["protected_textual_uncertainty_candidate"] += 1
@@ -144,6 +149,7 @@ def analyze_source(source: bytes, references: list[str]) -> tuple[dict, dict]:
         "whole_source_leading_marker_counts": dict(sorted(occurrences.items())),
         "semantic_candidate_categories_not_editorial_certification": dict(sorted(semantic_groups.items())),
         "bounded_leading_marker_references": marker_refs,
+        "bounded_three_or_more_star_references": triple_refs,
         "bounded_unresolved_marker_references": suspicious_nonfirst,
     }
     return {ref: strings[ref] for ref in references}, summary
@@ -213,6 +219,7 @@ def main(argv=None):
     print("Source leading marker counts:", json.dumps(result["original_source_marker_summary"]["whole_source_leading_marker_counts"], sort_keys=True))
     print("Candidate marker meanings:", json.dumps(result["original_source_marker_summary"]["semantic_candidate_categories_not_editorial_certification"], sort_keys=True))
     print("Unresolved marker references:", result["original_source_marker_summary"]["bounded_unresolved_marker_references"])
+    print("Three-or-more star references:", result["original_source_marker_summary"]["bounded_three_or_more_star_references"])
     for ref, row in result["verse_samples"].items():
         print(ref, "source", json.dumps(row["original"], sort_keys=True),
               "native", json.dumps(row["compiled"], sort_keys=True),
