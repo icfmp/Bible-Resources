@@ -604,8 +604,21 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         crosscheck=private_crosscheck(ix.stdout,manifest["module_id"],rows,raw_summary)
         analysis=compare_private_texts(source,matches,
             on_unresolved_word_case=reference_cross_slot.observe_unresolved)
-        reference_cross_slot_report=reference_cross_slot.report(
-            analysis['unresolved_source_stock_lexical_selection_triage'])
+        lexical=analysis['unresolved_source_stock_lexical_selection_triage']
+        reference_cross_slot_report=reference_cross_slot.report(lexical)
+        pending_plain_relations={
+            "plain_word_order_or_selection_requires_editorial_review",
+            "same_plain_word_multiset_but_different_order",
+            "source_plain_words_only_after_removing_stock_scripture_labels",
+        }
+        plain_review_total=sum(
+            lexical["original_prose_outside_link_word_relation_counts"].get(k,0)
+            for k in pending_plain_relations
+        )
+        plain_payload_topology=reference_cross_slot.report_nonlink_plain_word_stock_payloads(
+            lexical["bounded_plain_word_nontrivial_differences_line_and_hash_cases"],
+            total_nonlink_review_cases=plain_review_total,
+        )
         chapter_analysis=compare_chapter_neighbors(
             chapter_neighbors,chapter_intros,raw_as_strict_xml_text
         )
@@ -632,6 +645,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         "source_original_verse_and_range_body_evidence":source_proof,
         "text_diagnostic":analysis,
         "source_unpaired_reference_cross_native_slots":reference_cross_slot_report,
+        "source_nonlink_prose_review_stock_raw_duplicate_topology":plain_payload_topology,
         "source_original_chapter_neighbor_evidence":chapter_proof,
         "source_chapter_neighbor_to_stock_intro_diagnostics":chapter_analysis,
         "source_chapter_neighbor_to_same_chapter_numbered_location":chapter_numbered_location,
