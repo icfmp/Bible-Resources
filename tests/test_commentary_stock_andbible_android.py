@@ -243,5 +243,44 @@ class CommentaryAndroidStockTests(unittest.TestCase):
         self.assertFalse(out["reader_source_identity_witness_after_selection"])
 
 
+    def test_main_reader_resource_ids_are_checked_without_exporting_unknown_ui_text(self):
+        from commentary_stock_andbible_android import _classify_main_reader_context
+        xml = b'''<hierarchy>
+            <node resource-id="net.bible.android.activity:id/bibleButton"
+                  text="Private Bible passage" bounds="[10,200][90,300]"/>
+            <node resource-id="net.bible.android.activity:id/optionsMenu"
+                  content-desc="More options" bounds="[950,200][1040,300]"/>
+            <node resource-id="net.bible.android.activity:id/otherUnknown"
+                  text="Private user note" bounds="[10,300][900,390]"/>
+        </hierarchy>'''
+        output = _classify_main_reader_context(
+            xml,
+            b"topResumedActivity=ActivityRecord{12 net.bible.android.activity/net.bible.android.view.activity.page.MainBibleActivity}\n",
+        )
+        self.assertEqual(output["known_reader_toolbar_resource_ids_visible"],
+                         ["bibleButton", "optionsMenu"])
+        self.assertTrue(output["main_bible_reader_activity_resumed"])
+        self.assertFalse(output["another_andbible_activity_resumed"])
+        self.assertNotIn("Private user note", str(output))
+        self.assertFalse(output["actual_commentary_rendering_verified"])
+
+    def test_missing_reader_window_is_not_a_mhcc_data_failure(self):
+        from commentary_stock_andbible_android import _classify_main_reader_context
+        state = _classify_main_reader_context(
+            b"<hierarchy/>",
+            b"topResumedActivity=ActivityRecord{42 net.bible.android.activity/net.bible.android.view.activity.download.DocumentDownloadActivity}\n",
+        )
+        self.assertFalse(state["main_bible_reader_activity_resumed"])
+        self.assertTrue(state["another_andbible_activity_resumed"])
+        self.assertEqual(state["known_reader_toolbar_resource_ids_visible"], [])
+
+    def test_context_diagnostics_reject_unbounded_inputs(self):
+        from commentary_stock_andbible_android import _classify_main_reader_context
+        with self.assertRaisesRegex(PilotError, "Unbounded"):
+            _classify_main_reader_context(b"x"*3_000_001, b"")
+        with self.assertRaisesRegex(PilotError, "Unbounded"):
+            _classify_main_reader_context(b"", b"x"*4_000_001)
+
+
 if __name__ == "__main__":
     unittest.main()
