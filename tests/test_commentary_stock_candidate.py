@@ -6,7 +6,7 @@ import sys
 import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
-from commentary_stock_candidate import private_relabel_config
+from commentary_stock_candidate import private_relabel_config, _reader_identity_only_equivalence
 from pilot_preflight import PilotError
 
 
@@ -78,6 +78,32 @@ class PrivateCommentaryCandidateTests(unittest.TestCase):
                 b"DataPath=./modules/comments/zcom/mhcc/\nCipherKey=secret\n")
         with self.assertRaises(PilotError):
             private_relabel_config(source,"MHCC","BRMHCCReview")
+
+    def test_real_reader_module_identity_may_differ_without_body_rewrite(self):
+        original=b"Genesis 1:1: Commentary body verbatim. (MHCC)"
+        candidate=b"Genesis 1:1: Commentary body verbatim. (BRMHCCReview)"
+        result=_reader_identity_only_equivalence(
+            original,candidate,old_id="MHCC",candidate_id="BRMHCCReview"
+        )
+        self.assertEqual(result["original_module_label_replacements"],1)
+        self.assertFalse(result["readback_byte_equal_before_identity_relabel"])
+        self.assertTrue(result["same_plain_rendered_output_or_identity_only"])
+
+    def test_reader_cannot_hide_even_one_changed_authorial_word(self):
+        source=b"Matthew 1:1: Original commentary. (MHCC)"
+        changed=b"Matthew 1:1: Altered commentary. (BRMHCCReview)"
+        with self.assertRaises(PilotError):
+            _reader_identity_only_equivalence(
+                source,changed,old_id="MHCC",candidate_id="BRMHCCReview"
+            )
+
+    def test_reader_unchanged_literal_bytes_are_accepted(self):
+        x=b"Unchanged module output"
+        d=_reader_identity_only_equivalence(
+            x,x,old_id="MHCC",candidate_id="BRMHCCReview"
+        )
+        self.assertEqual(d["original_module_label_replacements"],0)
+        self.assertTrue(d["readback_byte_equal_before_identity_relabel"])
 
     def test_no_same_id_invalid_id_or_unverified_header(self):
         valid=(b"[MHCC]\n"
