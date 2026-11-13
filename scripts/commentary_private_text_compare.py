@@ -29,7 +29,9 @@ from commentary_chapter_paragraph_overlap import OriginalChapterParagraphSpanPro
 from commentary_chapter_p_boundaries import ChapterParagraphBoundaryProbe
 from commentary_intake import load_manifest
 from commentary_text_delta import punctuation_relationship, word_relationship, nonword_symbol_excess
-from commentary_unresolved_lexical_triage import UnresolvedLexicalSelectionCensus
+from commentary_unresolved_lexical_triage import (
+    UnresolvedLexicalSelectionCensus, marked_word_token_indices,
+)
 from commentary_stock_prefix_topology import (
     source_word_prefix_topology, aligned_punctuation_gap_diagnostics,
     stock_prefixed_source_body_concordance, unexplained_word_boundary_census,
@@ -128,6 +130,9 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
                 x.tag.rsplit("}",1)[-1] for x in sibling.iter()
                 if x is not sibling and isinstance(x.tag,str)
             ).items())),
+            "private_original_scripRef_word_indices": marked_word_token_indices(
+                sibling, "scripRef", txt
+            ),
         })
     if sum(len(rows) for rows in sources.values()) != (
         counts["work_qualified_verse"]+counts["work_qualified_same_book_verse_range"]
