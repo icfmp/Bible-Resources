@@ -34,8 +34,9 @@ def local_tag(node) -> str:
 def original_marker_boundary(marker, div, reference: str, start: str) -> dict:
     """Source XML siblings only; does not infer missing verse or marker."""
     if (local_tag(marker)!="scripCom" or local_tag(div)!="div"
-            or marker.getnext() is not div or marker.getparent() is not div.getparent()):
-        raise PilotError("Original ThML body is not the immediate marker sibling")
+            or marker.getnext() is not div or marker.getparent() is not div.getparent()
+            or marker.get("osisRef","") != reference):
+        raise PilotError("Original ThML marker/reference/body witnesses do not agree")
     kind,book=_parse_reference(reference)
     if kind not in {"work_qualified_verse","work_qualified_same_book_verse_range"}:
         raise PilotError("Unreviewed original source verse/range marker kind")
