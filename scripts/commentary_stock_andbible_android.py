@@ -78,8 +78,14 @@ def safe_controls(xml: bytes, module_id: str, title: str) -> dict:
                 node.attrib.get("resource-id") == commentary_toolbar_resource
             )
             exact_popup_entry = (label == exact_commentary_popup)
+            first_download_finish = (
+                node.attrib.get("resource-id") == PACKAGE + ":id/okayButton"
+                and node.attrib.get("enabled") == "true"
+                and node.attrib.get("clickable") == "true"
+            )
             if (label not in SAFE and label not in (file_label, baseline_label)
-                    and not has_commentary_toolbar_id and not exact_popup_entry):
+                    and not has_commentary_toolbar_id and not exact_popup_entry
+                    and not first_download_finish):
                 continue
             if label == "CLOSE APP" and not launcher_anr:
                 continue
@@ -89,7 +95,8 @@ def safe_controls(xml: bytes, module_id: str, title: str) -> dict:
             x1, y1, x2, y2 = map(int, match.groups())
             if not (0 <= x1 < x2 <= 1600 and 0 <= y1 < y2 <= 2400):
                 continue
-            action = ("OPEN_COMMENTARY_MENU" if has_commentary_toolbar_id
+            action = ("FINISH_FIRST_DOWNLOAD" if first_download_finish
+                      else "OPEN_COMMENTARY_MENU" if has_commentary_toolbar_id
                       else "EXACT_COMMENTARY_MENU_MODULE" if exact_popup_entry
                       else "EXACT_MODULE_ZIP" if label == file_label
                       else "EXACT_REVIEWED_BIBLE_ZIP" if label == baseline_label
@@ -113,6 +120,7 @@ def _tap(controls: list[dict], choices: tuple[str, ...]) -> str | None:
     for choice in choices:
         if choice not in SAFE and choice not in {
             "EXACT_MODULE_ZIP", "EXACT_REVIEWED_BIBLE_ZIP",
+            "FINISH_FIRST_DOWNLOAD",
             "OPEN_COMMENTARY_MENU", "EXACT_COMMENTARY_MENU_MODULE"
         }:
             raise PilotError("Unreviewed Android command")
@@ -443,9 +451,13 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
         history = []
         startup = _start_bounded_android_import(module_id, title)
         initial_buttons = startup["initial_buttons"]
-        # Official AndBible FirstDownload requires an actual Bible before its
-        # Proceed/OK button can enter the reader. A commentary alone cannot
-        # satisfy that independent requirement.
+        # InstallZip.getFileFromUserAndInstall() opens a separate, real
+        # "Proceed" confirmation *before* ACTION_OPEN_DOCUMENT. This is not
+        # the FirstDownload Okay button, which requires an installed Bible.
+        dialog = _screen(module_id, title)
+        proceeded = _tap(dialog["controls"], ("PROCEED",)) is not None
+        if not proceeded:
+            raise PilotError("Exact official InstallZip file-picker Proceed was not observed")
         bible_selected, baseline_history = _select_exact_download_zip(
             module_id, title, wanted="EXACT_REVIEWED_BIBLE_ZIP",
         )
@@ -458,18 +470,27 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
                 "allowlisted actual action classes: " + ",".join(observed)
             )
         baseline_before_proceed = _reader_context_witness()
-        baseline_screen = _screen(module_id, title)
-        proceeded = _tap(
-            baseline_screen["controls"], ("PROCEED", "CONTINUE", "DONE"),
-        ) is not None
-        baseline_after_proceed = _reader_context_witness()
-        # Do not infer source import from merely selecting a file.
+        # Stay in the first-download flow to import the original MHCC next.
+        # The registered Bible must subsequently enable FirstDownload's
+        # *different* actual okayButton before entering MainBibleActivity.
         startup_commentary = _start_bounded_android_import(module_id, title)
+        dialog = _screen(module_id, title)
+        commentary_dialog_proceeded = _tap(dialog["controls"], ("PROCEED",)) is not None
+        if not commentary_dialog_proceeded:
+            raise PilotError("Second original commentary InstallZip Proceed not observed")
         selected, history = _select_exact_download_zip(
             module_id, title, wanted="EXACT_MODULE_ZIP",
         )
         if not selected:
             raise PilotError("Exact original stock ZIP was not selectable by Android file picker")
+        # This is the first-download completion *after* both ZIPs, not an
+        # arbitrary "OK" dialog. Refuse to tap a disabled or spoofed control.
+        post_both = _screen(module_id, title)
+        first_download_completed = _tap(
+            post_both["controls"], ("FINISH_FIRST_DOWNLOAD",)
+        ) is not None
+        time.sleep(3)
+        baseline_after_proceed = _reader_context_witness()
         snapshots["post_selection"] = _screenshot_sha256()
         selected_screen = _screen(module_id, title)
         exact_file_still_visible = any(
@@ -522,6 +543,8 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
             "reviewed_bible_module_id": BIBLE_MODULE,
             "reviewed_bible_all_five_published_files_attested": True,
             "reviewed_bible_zip_selected_in_actual_file_picker": bible_selected,
+            "original_commentary_installzip_proceed_tapped": commentary_dialog_proceeded,
+            "first_download_enabled_okay_button_tapped": first_download_completed,
             "android_reviewed_bible_baseline_reader_before_proceed": baseline_before_proceed,
             "android_reviewed_bible_baseline_reader_after_proceed": baseline_after_proceed,
             "android_baseline_bible_picker_actions": baseline_history,
