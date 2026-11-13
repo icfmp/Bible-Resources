@@ -1,0 +1,111 @@
+name: Private original zCom commentary Xiphos GTK startup (not publication)
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/commentary-zcom-xiphos-private-smoke.yml'
+      - 'scripts/commentary_stock_xiphos_smoke.py'
+      - 'tests/test_commentary_stock_xiphos_smoke.py'
+      - 'scripts/reader_xiphos_headless_smoke.py'
+      - 'config/commentary-intake/**'
+  workflow_dispatch:
+    inputs:
+      resource_id:
+        description: Reviewed SHA-pinned original CrossWire zCom commentary
+        required: true
+        type: string
+        default: mhcc-crosswire
+
+permissions:
+  contents: read
+concurrency:
+  group: commentary-xiphos-private-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  private-original-commentary-xiphos:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    env:
+      RESOURCE_ID: ${{ github.event.inputs.resource_id || 'mhcc-crosswire' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install reviewed Python dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+      - name: Test bounded GUI observation, isolation and false-positive prevention
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p 'test_commentary_stock_xiphos_smoke.py' -v
+      - name: Install independent actual Xiphos and virtual X11 frontend
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          timeout 180s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y \
+            xiphos xvfb xdotool dbus-x11 diatheke
+      - name: Reacquire exact official original zCom and start isolated real Xiphos
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_stock_xiphos_smoke.py \
+            --resource-id "$RESOURCE_ID" \
+            --seconds 12 \
+            --report "$RUNNER_TEMP/commentary-stock-xiphos-private-proof.json"
+      - name: Enforce narrow frontend gate and preserve legal/editorial blockers
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          report=json.loads((Path(os.environ["RUNNER_TEMP"])/"commentary-stock-xiphos-private-proof.json").read_text())
+          assert report["status"]=="original_pinned_zCom_xiphos_real_window_private_smoke_pass"
+          manifest=json.loads((Path("config/commentary-intake")/(os.environ["RESOURCE_ID"]+".json")).read_text())
+          assert report["resource_id"]==manifest["resource_id"]
+          assert report["original_module_id"]==manifest["module_id"]
+          assert report["original_upstream_archive_sha256"]==manifest["archive_sha256"]
+          assert report["original_upstream_conf_sha256"]==manifest["stock_conf_sha256"]
+          assert report["original_sword_driver"]=="zCom"
+          assert re.fullmatch(r"[0-9a-f]{64}",report["original_upstream_archive_sha256"])
+          assert re.fullmatch(r"[0-9a-f]{64}",report["original_upstream_conf_sha256"])
+          assert report["real_xiphos_process_survived_bounded_startup"] is True
+          assert report["real_xiphos_X11_window_found"] is True
+          assert report["isolated_original_SWORD_PATH"] is True
+          assert report["original_stock_diatheke_samples_available"] is True
+          assert report["independent_commentary_text_actually_rendered_and_read"] is False
+          assert report["independent_Xiphos_reference_navigation_verified"] is False
+          assert report["AndBible_Android_GUI_tested"] is False
+          assert report["screenshot_or_original_commentary_text_uploaded"] is False
+          assert report["editorial_approved"] is False
+          assert report["rights_approved"] is False
+          assert report["published"] is False
+          assert len(report["diatheke_original_readback_sha256"])>=2
+          assert all(re.fullmatch(r"[a-f0-9]{64}",x) for x in report["diatheke_original_readback_sha256"])
+          print("Real private Xiphos startup observed; no passage-visual, AndBible or publication claim")
+          PY
+      - name: Preserve bounded metadata only, never commentary words/screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: commentary-stock-xiphos-metadata-${{ github.run_id }}
+          path: ${{ runner.temp }}/commentary-stock-xiphos-private-proof.json
+          retention-days: 30
+          if-no-files-found: error
+      - name: Declare independent-reader scope
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo 'This workflow verifies one independently installed exact CrossWire zCom original in an isolated real Xiphos GTK/Xvfb process.'
+            echo 'X11 window presence and independent diatheke samples DO NOT prove that commentary text or links rendered correctly in Xiphos.'
+            echo 'Manual actual passage/navigation review, AndBible Android GUI, edition/rights and editorial approvals remain pending.'
+            echo 'No screenshot or commentary payload is published or uploaded.'
+          } >> "$GITHUB_STEP_SUMMARY"
