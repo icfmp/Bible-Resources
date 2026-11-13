@@ -88,6 +88,17 @@ class SourceVersusNativeRunBoundaryTests(unittest.TestCase):
         self.assertEqual(record["native_K_run_other_identical_raw_keys_outside_selected_run"],2)
         self.assertEqual(record["native_K_run_key_count_in_same_selected_chapter"],3)
         self.assertFalse(record["native_K_run_has_keys_in_another_chapter_same_book"])
+        self.assertEqual(record["original_explicit_verse_range_declared_numeric_verse_count"],3)
+        self.assertEqual(record["original_declared_range_native_occupied_K_key_count"],3)
+        self.assertEqual(record["original_declared_range_native_K_same_raw_as_selected_count"],3)
+        self.assertEqual(record["original_declared_range_native_K_other_raw_count"],0)
+        self.assertTrue(record["native_raw_run_first_K_key_equals_original_range_start"])
+        self.assertTrue(record["native_raw_run_last_K_key_equals_original_range_end"])
+        self.assertTrue(record[
+            "native_raw_run_occupied_K_keys_equal_occupied_K_keys_within_declared_original_range"])
+        self.assertTrue(record["native_raw_run_K_key_numbers_are_truly_consecutive_within_one_chapter"])
+        self.assertEqual(record[
+            "actual_source_annotations_starting_at_K_keys_inside_same_native_raw_run"],1)
         self.assertEqual(len(record["native_run_last_key_sha256"]),64)
         self.assertNotIn("Gen.1.3",json.dumps(record))
         self.assertNotIn("Raw shared",json.dumps(record))
@@ -103,7 +114,32 @@ class SourceVersusNativeRunBoundaryTests(unittest.TestCase):
         unit=report["original_source_marker_native_run_sha256_and_metadata_only_cases"][0]
         self.assertTrue(unit["native_K_run_has_keys_in_another_chapter_same_book"])
         self.assertEqual(unit["native_K_run_key_count_in_same_selected_chapter"],2)
+        self.assertFalse(unit["original_declared_range_end_K_occupied"])
+        self.assertFalse(unit["original_declared_end_K_key_inside_selected_raw_run"])
+        self.assertFalse(unit["native_raw_run_last_K_key_equals_original_range_end"])
+        self.assertFalse(unit["native_raw_run_occupied_K_keys_equal_occupied_K_keys_within_declared_original_range"])
+        self.assertFalse(unit["native_raw_run_K_key_numbers_are_truly_consecutive_within_one_chapter"])
         self.assertTrue(report["native_K_run_is_only_consecutive_occupied_keys_not_numeric_verses"])
+
+    def test_native_occupied_run_can_overshoot_original_range_and_merge_two_source_markers(self):
+        source=original_fixture()
+        raw=b"<div>Shared compiled range</div>"
+        ledger=NativeRawRunBoundaryInventory()
+        for key in ("Gen.1.1","Gen.1.2","Gen.1.3","Gen.1.4"):
+            ledger.observe("K",key,raw)
+        result=ledger.report(source,[review_case(source,raw=raw)])
+        case=result["original_source_marker_native_run_sha256_and_metadata_only_cases"][0]
+        self.assertEqual(case["native_raw_run_K_keys_after_original_range_end"],1)
+        self.assertEqual(case[
+            "actual_source_annotations_starting_at_K_keys_inside_same_native_raw_run"],2)
+        self.assertTrue(case["native_raw_run_first_K_key_equals_original_range_start"])
+        self.assertFalse(case["native_raw_run_last_K_key_equals_original_range_end"])
+        self.assertTrue(case["original_declared_range_end_K_occupied"])
+        self.assertTrue(case["original_declared_end_K_key_inside_selected_raw_run"])
+        self.assertFalse(case[
+            "native_raw_run_occupied_K_keys_equal_occupied_K_keys_within_declared_original_range"])
+        self.assertEqual(result["selected_native_raw_run_structure_classes"][
+            "occupied_native_raw_run_differs_from_occupied_original_range_span"],1)
 
     def test_original_source_hash_identity_and_compiled_selected_raw_digest_fail_closed(self):
         source=original_fixture()
