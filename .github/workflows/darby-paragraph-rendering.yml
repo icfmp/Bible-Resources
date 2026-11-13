@@ -69,7 +69,7 @@ jobs:
           corrected,report=patch_divisions(original,expected_sha256=sha256(original).hexdigest())
           if not report['converted_markers_by_kind'] or not report['all_original_notes_and_machine_targets_preserved']:
               raise SystemExit('No independently validated technical division marker overlay')
-          Path('darby-division-overlay-shapes.json').write_text(json.dumps(report,sort_keys=True,indent=2)+'\\n')
+          Path('darby-division-overlay-shapes.json').write_text(json.dumps(report,sort_keys=True,indent=2))
           print('Research-only reviewed source marker conversion categories:',report['converted_markers_by_kind'])
           print('Protected literal marks remain:',report['protected_unchanged_marker_counts'])
           print('No original or corrected OSIS source is uploaded; no compiled SWORD published')
