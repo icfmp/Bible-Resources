@@ -673,8 +673,10 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
             alternative_prose=alternative_probe.report()
             if alternative_prose["all_native_raw_entries_replayed"] != len(rows):
                 raise PilotError("Original second native prose scan omitted occupied keys")
-        boundary_case_report=native_run_boundaries.report(source,large_plain_cases)
-            if large_plain_cases else {
+        if large_plain_cases:
+            boundary_case_report=native_run_boundaries.report(source,large_plain_cases)
+        else:
+            boundary_case_report={
                 "source_marker_case_count":0,
                 "no_original_large_prose_cases_to_check":True,
             }
