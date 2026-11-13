@@ -356,6 +356,57 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
                     folder, "MHCC", binary, expected_corpus_sha256="a"*64
                 )
 
+    def test_xiphos_heading_menu_requires_private_shared_dbus_not_a_click_guess(self):
+        from commentary_xiphos_dual_reader import _attempt_actual_context_heading_menu
+        record = _attempt_actual_context_heading_menu(
+            {"DISPLAY": ":91", "GDK_BACKEND": "x11"},
+            {"Gen 1:1": {"commentary": b"stock", "bible": b"bible"}},
+        )
+        self.assertFalse(record["real_xiphos_commentary_chapter_heading_menu_activated"])
+        self.assertFalse(record["actual_commentary_pane_content_changed_after_heading_action"])
+        self.assertFalse(record["chapter_heading_text_matches_original_native_intro"])
+
+    @patch("commentary_xiphos_dual_reader.subprocess.run")
+    @patch("commentary_xiphos_dual_reader._seed_x11_clipboard")
+    @patch("commentary_xiphos_dual_reader._long_commentary_excerpt_is_on_gui_clipboard",
+           return_value=True)
+    @patch("commentary_xiphos_dual_reader._commentary_pane_focus_points",
+           return_value=((1000, 390),))
+    @patch("commentary_xiphos_dual_reader._main_xiphos_window",
+           return_value="101")
+    @patch("commentary_xiphos_dual_reader.time.sleep")
+    @patch("commentary_xiphos_dual_reader._x11")
+    def test_real_a11y_activated_heading_menu_is_observed_without_claiming_title_parity(
+        self, x11, sleep, window, points, matched, clipboard_seed, subprocess_run,
+    ):
+        from commentary_xiphos_dual_reader import _attempt_actual_context_heading_menu
+        def read_x11(command, environment, **kwargs):
+            if command[:3] == ["xclip", "-selection", "clipboard"]:
+                read_x11.copies += 1
+                return (b"Real long original commentary" if read_x11.copies == 1
+                        else b"Different header from actual Xiphos")
+            return b""
+        read_x11.copies = 0
+        x11.side_effect = read_x11
+        subprocess_run.return_value.returncode = 0
+        subprocess_run.return_value.stdout = b"ACTIVATED\n"
+        result = _attempt_actual_context_heading_menu(
+            {
+                "DISPLAY": ":91", "GDK_BACKEND": "x11",
+                "DBUS_SESSION_BUS_ADDRESS": "unix:path=/tmp/private-test",
+                "BIBLE_PRIVATE_GUI_A11Y": "1",
+                "SWORD_PATH": "/private/original",
+            },
+            {"Gen 1:1": {"commentary": b"long", "bible": b"bible"}},
+        )
+        self.assertTrue(result["real_xiphos_commentary_chapter_heading_menu_activated"])
+        self.assertTrue(result["actual_commentary_pane_content_changed_after_heading_action"])
+        self.assertFalse(result["chapter_heading_text_matches_original_native_intro"])
+        self.assertFalse(result["all_in_verse_original_title_elements_rendered_as_visual_headings"])
+        self.assertFalse(result["reader_gui_heading_css_typography_approved"])
+        self.assertEqual(subprocess_run.call_args.args[0][-1], "chapter")
+        self.assertEqual(read_x11.copies, 2)
+
     def test_no_user_display_or_wayland_gui_capture(self):
         with self.assertRaisesRegex(PilotError, "Unsafe virtual"):
             attempt_real_xiphos_passage_copy(
