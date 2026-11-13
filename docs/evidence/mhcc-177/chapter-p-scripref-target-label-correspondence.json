@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "issue": "https://github.com/icfmp/Bible-Resources/issues/177",
+  "status": "SOURCE_SCRIPREF_DISPLAY_LABELS_DIFFER_TARGETS_EQUIVALENT_ONLY_WITH_LITERAL_WORK_QUALIFIER_OMISSION_NOT_EDITORIAL_PARITY",
+  "source_originals_sha256": {
+    "ccel_thml": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+    "crosswire_stock_zip": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+    "full_stock_raw": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
+  },
+  "source_p_reference_markup_metadata": [
+    {
+      "source_line": 34439,
+      "original_source_reference_sha256": "99875638192a1640f10e8b085932ac9171249d2857ee4ffa420d6cfc2fd45e39",
+      "original_p_text_sha256": "5c71bb382bf2480fbfbf02995346a02512833ee249172ea7030a5af81fc86273",
+      "source_direct_scripRef_elements": 2,
+      "selected_native_key_sha256": "bb994b2bcd4b5b500e4608c950c1e00a8b676721ba317b54f77b420d45b5fb2c",
+      "label_target_diagnostics": {
+        "matched_label_does_not_validate_reference_target_or_edition": true,
+        "nonmatching_target_values_are_not_auto_normalized_or_rewritten": true,
+        "original_scripRef_attribute_name_occurrences": {
+          "id": 2,
+          "osisRef": 2,
+          "parsed": 2,
+          "passage": 2
+        },
+        "original_scripRef_label_count": 2,
+        "original_scripRef_osisRef_targets_exact_value_multiset_matches_in_stock": 0,
+        "original_scripRef_osisRef_work_qualifier_only_matches_in_stock": 2,
+        "original_scripRef_to_stock_text_location_classes": {
+          "original_label_text_not_located_in_selected_stock_entry": 2
+        },
+        "original_scripRef_with_nonempty_osisRef_target_count": 2,
+        "original_words_and_stock_XML_never_reported": true,
+        "selected_stock_reference_element_count": 2,
+        "selected_stock_reference_elements_with_osisRef_attribute": 2,
+        "source_and_selected_stock_reference_targets_exact_ordered_match": false,
+        "source_and_stock_targets_only_literal_bible_work_qualifier_ordered_match": true,
+        "work_qualifier_only_matching_does_not_authorize_target_normalization": true
+      }
+    },
+    {
+      "source_line": 35054,
+      "original_source_reference_sha256": "f5a0881ef41fb84303e4ea1f2932026d4139091d19c73b3f8a5c0b6102cc672e",
+      "original_p_text_sha256": "25aef8b6aa0bfc15ccd5b3406ea9b9a3baaedb4295d9aa208820117c2082af2c",
+      "source_direct_scripRef_elements": 2,
+      "selected_native_key_sha256": "f767670547db5d5061f370a2581f54aa083d61cf48cc2b3a4385478700df7cf7",
+      "label_target_diagnostics": {
+        "matched_label_does_not_validate_reference_target_or_edition": true,
+        "nonmatching_target_values_are_not_auto_normalized_or_rewritten": true,
+        "original_scripRef_attribute_name_occurrences": {
+          "id": 2,
+          "osisRef": 2,
+          "parsed": 2,
+          "passage": 2
+        },
+        "original_scripRef_label_count": 2,
+        "original_scripRef_osisRef_targets_exact_value_multiset_matches_in_stock": 0,
+        "original_scripRef_osisRef_work_qualifier_only_matches_in_stock": 2,
+        "original_scripRef_to_stock_text_location_classes": {
+          "original_label_text_not_located_in_selected_stock_entry": 2
+        },
+        "original_scripRef_with_nonempty_osisRef_target_count": 2,
+        "original_words_and_stock_XML_never_reported": true,
+        "selected_stock_reference_element_count": 2,
+        "selected_stock_reference_elements_with_osisRef_attribute": 2,
+        "source_and_selected_stock_reference_targets_exact_ordered_match": false,
+        "source_and_stock_targets_only_literal_bible_work_qualifier_ordered_match": true,
+        "work_qualifier_only_matching_does_not_authorize_target_normalization": true
+      }
+    },
+    {
+      "source_line": 35608,
+      "original_source_reference_sha256": "53df2cd02435f0e9352da3bca39da5da29dd4c88b2c875a5da9b8c3cd1f44fab",
+      "original_p_text_sha256": "27d3383b3b29c69c8598e10fe1d881c327ec35b7080e5f8e5fd5eb8d469d591f",
+      "source_direct_scripRef_elements": 3,
+      "selected_native_key_sha256": "89efa58642fa89fb1b9e69c9fda5657b7649b00f1b1658dc7d659d8fd7e4c360",
+      "label_target_diagnostics": {
+        "matched_label_does_not_validate_reference_target_or_edition": true,
+        "nonmatching_target_values_are_not_auto_normalized_or_rewritten": true,
+        "original_scripRef_attribute_name_occurrences": {
+          "id": 3,
+          "osisRef": 3,
+          "parsed": 3,
+          "passage": 3
+        },
+        "original_scripRef_label_count": 3,
+        "original_scripRef_osisRef_targets_exact_value_multiset_matches_in_stock": 0,
+        "original_scripRef_osisRef_work_qualifier_only_matches_in_stock": 3,
+        "original_scripRef_to_stock_text_location_classes": {
+          "original_label_text_not_located_in_selected_stock_entry": 3
+        },
+        "original_scripRef_with_nonempty_osisRef_target_count": 3,
+        "original_words_and_stock_XML_never_reported": true,
+        "selected_stock_reference_element_count": 3,
+        "selected_stock_reference_elements_with_osisRef_attribute": 3,
+        "source_and_selected_stock_reference_targets_exact_ordered_match": false,
+        "source_and_stock_targets_only_literal_bible_work_qualifier_ordered_match": true,
+        "work_qualifier_only_matching_does_not_authorize_target_normalization": true
+      }
+    }
+  ],
+  "summary": {
+    "original_scripRef_total": 7,
+    "selected_stock_reference_element_total": 7,
+    "original_link_display_labels_exact_in_selected_stock": 0,
+    "original_and_stock_targets_exact_raw_value_match": 0,
+    "targets_equal_in_original_order_when_comparing_only_explicit_literal_Bible_work_prefix": 7,
+    "the_original_scripRef_and_compiled_reference_attribute_values_are_unmodified": true,
+    "original_link_label_textual_difference_remains_unexplained": true,
+    "ordered_target_value_correspondence_does_not_prove_all_original_chapter_section_text_or_markup_fidelity": true
+  },
+  "real_workflows": {
+    "pinned_private_originals_audit": "https://github.com/icfmp/Bible-Resources/actions/runs/43409648053",
+    "exact_pr_head_validate": "https://github.com/icfmp/Bible-Resources/actions/runs/43409647999",
+    "tested_head": "ff346fae425e17962a9bc7ccfc5f44bfba14c823"
+  },
+  "outstanding": {
+    "compare_original_display_label_lexical_content_vs_stock_generated_reference_display": true,
+    "validate_original_p_complete_words_punctuation_and_order": true,
+    "remaining_156_original_source_stock_word_disagreements": true,
+    "unmarked_source_division_and_Jude": true,
+    "original_quote_note_paragraph_table_reference_fidelity": true,
+    "original_digital_edition_and_derivative_redistribution_rights": true,
+    "independent_xiphos_andbible_GUI": true,
+    "publication": false
+  },
+  "seven_stage_acceptance_full_checks_completed": 0,
+  "original_text_modified": false,
+  "stock_module_modified": false,
+  "third_party_original_text_or_binary_published": false
+}

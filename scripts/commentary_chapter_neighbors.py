@@ -77,8 +77,26 @@ def original_chapter_neighbors(xml_bytes: bytes) -> tuple[dict, dict]:
         parent_tag = (parent_node.tag.rsplit("}", 1)[-1]
                       if parent_node is not None and isinstance(parent_node.tag, str)
                       else "_none")
+        original_link_nodes = [
+            candidate for candidate in sibling.iter()
+            if candidate is not sibling and isinstance(candidate.tag, str)
+            and candidate.tag.rsplit("}", 1)[-1] == "scripRef"
+        ]
+        if len(original_link_nodes) > 250:
+            raise PilotError("Unreviewed original source paragraph has too many scripRef tags")
+        private_link_labels = [
+            {
+                "text": "".join(candidate.itertext()),
+                "private_original_osisRef_target": candidate.get("osisRef", ""),
+                "attribute_name_types": sorted(
+                    name.rsplit("}", 1)[-1] for name in candidate.attrib
+                ),
+            }
+            for candidate in original_link_nodes
+        ]
         observed.setdefault(key, []).append({
             "tag": tag, "text": body,
+            "private_source_scripRef_labels": private_link_labels,
             "source_line": node.sourceline,
             "source_reference_sha256": sha256(ref_bytes).hexdigest(),
             "source_sibling_sha256": sha256(original_bytes).hexdigest(),
