@@ -68,8 +68,22 @@ class OriginalScriptureReferenceLabelTests(unittest.TestCase):
         self.assertFalse(out["source_and_selected_stock_reference_targets_exact_ordered_match"])
         self.assertEqual(
             out["original_scripRef_osisRef_work_qualifier_only_matches_in_stock"],1)
+        self.assertTrue(out["source_and_stock_targets_only_literal_bible_work_qualifier_ordered_match"])
         self.assertTrue(out["work_qualifier_only_matching_does_not_authorize_target_normalization"])
         self.assertNotIn("Bible:Gen.1.1",json.dumps(out))
+
+    def test_work_qualifier_only_same_targets_reordered_is_not_approved_ordered(self):
+        out=link_label_location(
+            [{"text":"first", "attribute_name_types":["osisRef"],
+              "private_original_osisRef_target":"Bible:A"},
+             {"text":"second", "attribute_name_types":["osisRef"],
+              "private_original_osisRef_target":"Bible:B"}],
+            b'<reference osisRef="B">second</reference><reference osisRef="A">first</reference>'
+        )
+        self.assertEqual(
+            out["original_scripRef_osisRef_work_qualifier_only_matches_in_stock"],2)
+        self.assertFalse(
+            out["source_and_stock_targets_only_literal_bible_work_qualifier_ordered_match"])
 
     def test_unknown_work_qualifier_is_not_silently_removed(self):
         out=link_label_location(
