@@ -33,6 +33,7 @@ from commentary_source_native_boundaries import original_marker_boundary, Native
 from commentary_shared_raw_source_units import inspect_shared_original_units_in_native_runs
 from commentary_original_div1_book_consistency import private_original_div1_book_code_consistency
 from commentary_source_english_osis_alias import original_div1_english_alias_vs_declared_osis
+from commentary_source_identity_lexical_gate import classify_lexical_source_identity
 from commentary_intake import load_manifest
 from commentary_text_delta import punctuation_relationship, word_relationship, nonword_symbol_excess
 from commentary_unresolved_lexical_triage import (
@@ -659,6 +660,12 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         analysis=compare_private_texts(source,matches,
             on_unresolved_word_case=reference_cross_slot.observe_unresolved)
         lexical=analysis['unresolved_source_stock_lexical_selection_triage']
+        # A ThML div1 can claim a different OSIS book than its own title.
+        # Preserve BOTH original values: never join different book texts and
+        # call their word differences a CrossWire compiled-content defect.
+        source_identity_lexical_gate=classify_lexical_source_identity(
+            source,lexical.get("bounded_plain_word_nontrivial_differences_line_and_hash_cases",[])
+        )
         reference_cross_slot_report=reference_cross_slot.report(lexical)
         pending_plain_relations={
             "plain_word_order_or_selection_requires_editorial_review",
@@ -773,6 +780,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         "source_complete_original_units_within_shared_stock_raw_K_runs":complete_shared_run_sources,
         "source_original_div1_osisRef_book_consistency_census":original_div1_book_consistency,
         "source_original_div1_english_alias_vs_osisRef_book_claim_evidence":original_div1_english_aliases,
+        "source_div1_book_identity_safety_gate_for_nonlink_lexical_differences":source_identity_lexical_gate,
         "source_original_chapter_neighbor_evidence":chapter_proof,
         "source_chapter_neighbor_to_stock_intro_diagnostics":chapter_analysis,
         "source_chapter_neighbor_to_same_chapter_numbered_location":chapter_numbered_location,

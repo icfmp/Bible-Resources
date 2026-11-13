@@ -18,6 +18,8 @@ on:
       - 'scripts/commentary_text_delta.py'
       - 'tests/test_commentary_text_delta.py'
       - 'scripts/commentary_unresolved_lexical_triage.py'
+      - 'scripts/commentary_source_identity_lexical_gate.py'
+      - 'tests/test_commentary_source_identity_lexical_gate.py'
       - 'scripts/commentary_nonlink_words.py'
       - 'scripts/commentary_nonlink_word_alignment.py'
       - 'scripts/commentary_prose_cross_slot.py'
@@ -76,6 +78,7 @@ jobs:
         run: |
           set -euo pipefail
           python -m pip install -r requirements.txt
+          python -m unittest discover -s tests -p 'test_commentary_source_identity_lexical_gate.py' -v
           timeout 90s sudo apt-get -o Acquire::Retries=0 \
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update
           timeout 90s sudo apt-get -o Acquire::Retries=0 \
@@ -114,6 +117,37 @@ jobs:
           if report.get("status") != "full_source_verse_and_range_body_to_stock_raw_text_diagnostics_not_release_approval":
               raise SystemExit("Source-to-stock text receipt is incomplete")
           metrics = report.get("text_diagnostic", {})
+          identity = report["source_div1_book_identity_safety_gate_for_nonlink_lexical_differences"]
+          lexical = metrics["unresolved_source_stock_lexical_selection_triage"]
+          attention = lexical.get("bounded_plain_word_nontrivial_differences_line_and_hash_cases", [])
+          counts = identity["original_div1_book_identity_gate_classes"]
+          rows = identity["source_identity_gated_original_line_hash_cases"]
+          assert identity["schema_version"] == 1
+          assert identity["original_source_compiled_lexical_attention_cases_checked"] == len(attention)
+          assert len(rows) == len(attention) and sum(counts.values()) == len(attention)
+          assert identity["source_book_heading_alias_is_not_authorial_book_reassignment"] is True
+          assert identity["cross_book_join_is_not_evidence_of_missing_stock_prose"] is True
+          assert identity["same_book_comparison_is_not_proof_of_digital_edition_parity"] is True
+          assert identity["original_source_stock_binary_and_scripture_references_unmodified"] is True
+          assert identity["editorial_decisions_approved"] is False
+          assert identity["published"] is False
+          allowed = {
+              "quarantine_original_book_title_vs_osis_marker_conflict",
+              "meaningful_separate_editions_lexical_review_still_required",
+              "ambiguous_original_source_book_identity_manual_review"
+          }
+          assert set(counts) <= allowed and all(type(v) is int and v>=0 for v in counts.values())
+          for row in rows:
+              assert row["source_div1_vs_stock_book_comparison_gate"] in allowed
+              assert type(row["original_source_line"]) is int
+              assert all(re.fullmatch(r"[a-f0-9]{64}",row[k]) for k in (
+                  "original_full_reference_sha256", "original_body_sha256",
+                  "stock_raw_sha256", "original_div1_heading_sha256"
+              ))
+              assert row["original_source_marker_or_heading_edited"] is False
+              assert row["source_canonical_alias_is_diagnostic_not_a_reference_correction"] is True
+          print("Original div1 heading vs scripCom key source-identity quarantine (NOT textual correction): " +
+                json.dumps(counts, sort_keys=True))
           selected = (
               "stock_original_body_suffix_exact_unicode_and_difference_classes",
               "stock_original_body_suffix_total_changed_punctuation_gaps",
