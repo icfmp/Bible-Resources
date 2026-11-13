@@ -80,6 +80,35 @@ def private_relabel_config(original: bytes, old_id: str, candidate_id: str) -> b
     return rebuilt
 
 
+def _reader_identity_only_equivalence(
+    source:bytes, candidate:bytes, *, old_id:str, candidate_id:str
+) -> dict:
+    """Permit only actual module-identity differences, not a text rewrite.
+
+    Stronger independent condition: the full unfiltered native raw SWORD
+    corpus was already proven bit-for-bit equal for both module IDs.
+    """
+    if source==candidate:
+        return {
+            "same_plain_rendered_output_or_identity_only":True,
+            "original_module_label_replacements":0,
+            "readback_byte_equal_before_identity_relabel":True,
+        }
+    if not MODULE.fullmatch(old_id) or not MODULE.fullmatch(candidate_id):
+        raise PilotError("Reader identity check has an unreviewed module name")
+    label=candidate_id.encode("ascii")
+    replacement=old_id.encode("ascii")
+    number=candidate.count(label)
+    if (number<1 or number>128 or
+            candidate.replace(label,replacement)!=source):
+        raise PilotError("Reader commentary changed beyond exact SWORD module identity label")
+    return {
+        "same_plain_rendered_output_or_identity_only":True,
+        "original_module_label_replacements":number,
+        "readback_byte_equal_before_identity_relabel":False,
+    }
+
+
 def _native_content(root:Path,module_id:str,native_raw_binary:Path) -> dict:
     process=None
     env=dict(os.environ,SWORD_PATH=str(root))
@@ -190,29 +219,23 @@ def make_private_candidate(
                                       root=candidate_install,exe=reader,
                                       limit=256*1024,timeout=30)
             if (stock_code!=0 or test_code!=0 or
-                    stock_text!=test_text or
-                    not present_key(passage,stock_text,stock_code)):
-                # Names, references and actual commentary prose remain private;
-                # only lengths and the result of exact literal ID substitution
-                # are safe here. Never silently strip arbitrary words.
-                label_only=(test_text.replace(
-                    candidate_id.encode("ascii"),old_id.encode("ascii")
-                )==stock_text)
-                raise PilotError(
-                    "Independent diatheke output differs: "
-                    f"exit_equal={stock_code==test_code}; "
-                    f"source_len={len(stock_text)}; candidate_len={len(test_text)}; "
-                    f"source_id_occurrences={stock_text.count(old_id.encode('ascii'))}; "
-                    f"candidate_id_occurrences={test_text.count(candidate_id.encode('ascii'))}; "
-                    f"exact_module_ID_only_substitution_equal={label_only}; "
-                    f"both_present={present_key(passage,stock_text,stock_code) and present_key(passage,test_text,test_code)}"
-                )
+                    not present_key(passage,stock_text,stock_code) or
+                    not present_key(passage,test_text,test_code)):
+                raise PilotError("Independent diatheke original or private candidate readback failed")
+            render=_reader_identity_only_equivalence(
+                stock_text,test_text,old_id=old_id,candidate_id=candidate_id
+            )
             if len(stock_text)>64:
                 substantial+=1
             probes.append({
                 "source_query_SHA256":sha256(passage.encode()).hexdigest(),
                 "native_reader_output_sha256":sha256(stock_text).hexdigest(),
-                "candidate_plain_readback_byte_equal":True,
+                "candidate_plain_readback_equal_after_only_module_identity_relabel":
+                    render["same_plain_rendered_output_or_identity_only"],
+                "module_identity_label_substitution_count":
+                    render["original_module_label_replacements"],
+                "raw_diatheke_output_was_byte_identical_before_relabel":
+                    render["readback_byte_equal_before_identity_relabel"],
                 "response_has_substantial_content":len(stock_text)>64,
             })
         if substantial<1:
@@ -235,6 +258,7 @@ def make_private_candidate(
             "full_native_unfiltered_raw_corpus_sha256":stock["raw_sha256"],
             "complete_stock_and_candidate_native_raw_corpus_sha256_equal":True,
             "all_occupied_native_K_I_TOP_keys_and_order_identical":True,
+            "only_real_diatheke_module_identity_label_differences_allowed":True,
             "numbered_commentary_K_keys":stock["K"],
             "intro_I_keys":stock["I"],
             "opaque_TOP_keys":stock["U"],
