@@ -113,6 +113,45 @@ def source_stock_unresolved_words(original: str, compiled: str) -> dict:
     }
 
 
+def marked_word_token_indices(element, marker_tag: str, expected_text: str) -> list[int]:
+    """Map original and compiled inline-link labels to real *word token offsets*.
+
+    Uses the original XML's own text/tail stream; never guesses labels from
+    reference strings or substring search. No word token or label is returned.
+    """
+    if marker_tag not in {"scripRef", "reference"}:
+        raise PilotError("Unreviewed inline source/stock tag requested")
+    fragments = []
+    spans = []
+    cursor = 0
+
+    def emit(value: str | None):
+        nonlocal cursor
+        if value:
+            fragments.append(value)
+            cursor += len(value)
+
+    def walk(node):
+        emit(node.text)
+        for child in node:
+            if isinstance(child.tag, str):
+                start = cursor
+                walk(child)
+                end = cursor
+                if child.tag.rsplit("}", 1)[-1] == marker_tag:
+                    spans.append((start, end))
+            emit(child.tail)
+
+    walk(element)
+    if "".join(fragments) != expected_text:
+        raise PilotError("Original XML inline reference text offsets cannot be authenticated")
+    found = []
+    for n, word in enumerate(WORD.finditer(expected_text)):
+        if any(start < word.end() and word.start() < end for start, end in spans):
+            found.append(n)
+    return found
+
+
 def stock_raw_element_counts(raw: bytes) -> dict:
     """Counts actual XML names, strictly; never exposes content/attributes."""
     if len(raw) > 2 * 1024 * 1024 or b"\x00" in raw:
@@ -148,6 +187,10 @@ class UnresolvedLexicalSelectionCensus:
         self.source_link_marked = Counter()
         self.stock_link_marked = Counter()
         self.stock_title_or_table_marked = Counter()
+        self.original_changed_link_token_presence = Counter()
+        self.stock_changed_link_token_presence = Counter()
+        self.original_and_stock_changed_link_token_overlap = Counter()
+        self.one_word_link_overlap = Counter()
         self.edit_ops = Counter()
         self.stock_link_and_source_link = Counter()
         self.original_middle_bins = Counter()
@@ -182,6 +225,37 @@ class UnresolvedLexicalSelectionCensus:
             raise PilotError("Original source body markup not independently inventoried")
         stock_tags = stock_raw_element_counts(raw)
         orig_links = original_tags.get("scripRef", 0)
+        original_link_indices = source.get("private_original_scripRef_word_indices")
+        if (not isinstance(original_link_indices, list)
+                or any(type(k) is not int or k < 0 for k in original_link_indices)):
+            raise PilotError("Original source link-word offset witness absent")
+        try:
+            stock_root = etree.fromstring(
+                b"<stock>" + raw + b"</stock>",
+                parser=etree.XMLParser(
+                    resolve_entities=False, no_network=True, load_dtd=False,
+                    recover=False, huge_tree=False, remove_blank_text=False,
+                ),
+            )
+        except (ValueError, etree.XMLSyntaxError):
+            raise PilotError("Stock reference inline markup cannot be mapped") from None
+        stock_link_indices = marked_word_token_indices(stock_root,"reference",compiled)
+        source_words = WORD.findall(original)
+        stock_words = WORD.findall(compiled)
+        orig_head = delta["common_start_word_tokens"]
+        orig_tail = len(source_words) - delta["common_end_word_tokens"]
+        stock_head = orig_head
+        stock_tail = len(stock_words) - delta["common_end_word_tokens"]
+        source_changed_link = sum(
+            orig_head <= idx < orig_tail for idx in original_link_indices
+        )
+        stock_changed_link = sum(
+            stock_head <= idx < stock_tail for idx in stock_link_indices
+        )
+        source_changed = delta["source_changed_middle_words"]
+        stock_changed = delta["stock_changed_middle_words"]
+        if source_changed_link > source_changed or stock_changed_link > stock_changed:
+            raise PilotError("Reference label words exceed known differing middle span")
         stock_links = stock_tags.get("reference", 0)
         if any(type(n) is not int or n < 0 for n in original_tags.values()):
             raise PilotError("Invalid original source tag count")
@@ -198,6 +272,27 @@ class UnresolvedLexicalSelectionCensus:
         self.stock_title_or_table_marked[
             "stock_contains_title_or_table" if stock_tags.get("title", 0) or stock_tags.get("table", 0)
             else "stock_no_title_or_table"] += 1
+        source_context = ("all_source_changed_words_in_scripRef"
+                          if source_changed > 0 and source_changed_link == source_changed
+                          else ("some_source_changed_words_in_scripRef"
+                                if source_changed_link else "no_source_changed_words_in_scripRef"))
+        stock_context = ("all_stock_changed_words_in_reference"
+                         if stock_changed > 0 and stock_changed_link == stock_changed
+                         else ("some_stock_changed_words_in_reference"
+                               if stock_changed_link else "no_stock_changed_words_in_reference"))
+        self.original_changed_link_token_presence[source_context] += 1
+        self.stock_changed_link_token_presence[stock_context] += 1
+        self.original_and_stock_changed_link_token_overlap[
+            ("source_link_overlap" if source_changed_link else "source_no_link_overlap")
+            + "_"
+            + ("stock_ref_overlap" if stock_changed_link else "stock_no_ref_overlap")
+        ] += 1
+        if source_changed == stock_changed == 1:
+            self.one_word_link_overlap[
+                ("source_within_scripRef" if source_changed_link else "source_outside_scripRef")
+                + "_"
+                + ("stock_within_reference" if stock_changed_link else "stock_outside_reference")
+            ] += 1
         self.stock_link_and_source_link[
             ("source_link" if orig_links else "no_source_link")
             + "_"
@@ -213,6 +308,8 @@ class UnresolvedLexicalSelectionCensus:
             "stock_raw_sha256": sha256(raw).hexdigest(),
             "source_markup_scripRef_count": orig_links,
             "stock_markup_reference_count": stock_links,
+            "changed_source_middle_words_in_scripRef": source_changed_link,
+            "changed_stock_middle_words_in_reference": stock_changed_link,
             "stock_markup_title_count": stock_tags.get("title", 0),
             "stock_markup_table_count": stock_tags.get("table", 0),
             "source_middle_word_count": delta["source_changed_middle_words"],
@@ -233,6 +330,8 @@ class UnresolvedLexicalSelectionCensus:
         for category in (
             self.category, self.one_word, self.alignments, self.source_link_marked,
             self.stock_link_marked, self.stock_title_or_table_marked,
+            self.original_changed_link_token_presence, self.stock_changed_link_token_presence,
+            self.original_and_stock_changed_link_token_overlap,
             self.stock_link_and_source_link, self.original_middle_bins,
             self.stock_middle_bins, self.changed_middle_overlap
         ):
@@ -260,6 +359,14 @@ class UnresolvedLexicalSelectionCensus:
             "stock_reference_presence": dict(sorted(self.stock_link_marked.items())),
             "source_scripRef_x_stock_reference_presence": dict(sorted(self.stock_link_and_source_link.items())),
             "stock_title_or_table_presence": dict(sorted(self.stock_title_or_table_marked.items())),
+            "original_changed_word_tokens_in_source_scripRef": dict(
+                sorted(self.original_changed_link_token_presence.items())),
+            "stock_changed_word_tokens_in_stock_reference": dict(
+                sorted(self.stock_changed_link_token_presence.items())),
+            "source_scripRef_and_stock_reference_changed_word_overlap": dict(
+                sorted(self.original_and_stock_changed_link_token_overlap.items())),
+            "one_to_one_middle_word_changes_inside_source_and_stock_references": dict(
+                sorted(self.one_word_link_overlap.items())),
             "per_book_source_marker_lexical_middle_shapes": {
                 book: dict(sorted(counts.items())) for book, counts in sorted(self.by_book.items())
             },
