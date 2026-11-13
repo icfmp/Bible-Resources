@@ -22,7 +22,8 @@ import zipfile
 
 from lxml import etree
 
-from commentary_chapter_neighbors import original_chapter_neighbors, compare_chapter_neighbors
+from commentary_chapter_neighbors import (original_chapter_neighbors, compare_chapter_neighbors,
+                                          ChapterNeighborNumberedProbe)
 from commentary_intake import load_manifest
 from commentary_text_delta import punctuation_relationship, word_relationship, nonword_symbol_excess
 from commentary_stock_prefix_topology import (
@@ -533,6 +534,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         rows=[]
         matches={}
         chapter_intros={}
+        numbered_probe=ChapterNeighborNumberedProbe(chapter_neighbors)
         try:
             process=subprocess.Popen(["timeout","360s",str(raw_binary),manifest["module_id"]],
                                      stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,env=env)
@@ -542,6 +544,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
                 rows.append((kind,ref))
                 if kind=="K" and ref in source:
                     matches[ref]=raw
+                numbered_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
                 if kind=="I" and (ref in chapter_neighbors or
                                    (ref.endswith(".0") and ref[:-2] in chapter_neighbors)):
                     chapter_intros[ref]=raw
@@ -560,6 +563,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         chapter_analysis=compare_chapter_neighbors(
             chapter_neighbors,chapter_intros,raw_as_strict_xml_text
         )
+        chapter_numbered_location=numbered_probe.report()
         if chapter_analysis["original_chapter_source_siblings_compared"]!=chapter_proof[
             "explicit_chapter_source_marker_count"
         ]:
@@ -578,6 +582,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         "text_diagnostic":analysis,
         "source_original_chapter_neighbor_evidence":chapter_proof,
         "source_chapter_neighbor_to_stock_intro_diagnostics":chapter_analysis,
+        "source_chapter_neighbor_to_same_chapter_numbered_location":chapter_numbered_location,
         "original_source_divisions_without_markers_compared":False,
         "chapter_intro_and_body_lexical_parity_compared":False,
         "original_exact_edition_proven":False,
