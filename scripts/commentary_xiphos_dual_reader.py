@@ -200,6 +200,31 @@ def _main_xiphos_window(env: dict) -> str | None:
     return None
 
 
+def _commentary_pane_focus_points(env: dict, window: str) -> tuple[tuple[int,int], ...]:
+    """Only the commentary side of a *real, validated* Xiphos main window.
+
+    Source: Xiphos manual's commentary pane is on the right; its actual main
+    window is checked above. Coordinates are proportional to the window
+    geometry on our private 1280x800 Xvfb, never used on a user's desktop.
+    A click is an observation attempt, NOT proof that text was rendered.
+    """
+    geometry = _x11(
+        ["xdotool", "getwindowgeometry", "--shell", window], env,
+    ).decode("ascii", errors="ignore")
+    dims = dict(re.findall(r"^(X|Y|WIDTH|HEIGHT)=(-?\d+)$", geometry, re.M))
+    if set(dims) != {"X", "Y", "WIDTH", "HEIGHT"}:
+        raise PilotError("Unknown Xiphos main-reader geometry")
+    x, y, width, height = [int(dims[k]) for k in ("X", "Y", "WIDTH", "HEIGHT")]
+    if (x < 0 or y < 0 or width < 700 or width > 1280
+            or height < 500 or height > 800 or x + width > 1280
+            or y + height > 800):
+        raise PilotError("Xiphos commentary pane outside reviewed X11 screen")
+    return (
+        (x + width * 85 // 100, y + height * 38 // 100),
+        (x + width * 83 // 100, y + height * 57 // 100),
+    )
+
+
 def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) -> dict:
     """Actual GUI passage changes in Bible + commentary pane (Alt+C).
 
@@ -220,11 +245,19 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
                 "copied_gui_clipboard_byte_count_by_passage": {
                     key: 0 for key in comparisons
                 },
+                "bounded_right_commentary_pane_focus_attempts_by_passage": {
+                    key: 0 for key in comparisons
+                },
                 "independent_gui_commentary_excerpt_match_count": 0}
     result = {}
     failures = {}
     copied_sizes = {}
+    focus_attempts = {}
     accepted = True
+    try:
+        right_side_points = _commentary_pane_focus_points(env, window)
+    except PilotError:
+        right_side_points = ()
     for ref, originals in comparisons.items():
         stage = "focus_main_window"
         try:
@@ -238,24 +271,39 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
                 stage = action
                 _x11(command, env)
             time.sleep(2)
-            # Clear the old X11 selection to avoid stale-passage false PASS.
-            stage = "clear_prior_clipboard"
-            _seed_x11_clipboard(env)
-            stage = "select_commentary_text"
-            _x11(["xdotool", "key", "--clearmodifiers", "ctrl+a"], env)
-            stage = "copy_commentary_text"
-            _x11(["xdotool", "key", "--clearmodifiers", "ctrl+c"], env)
-            time.sleep(1)
-            stage = "read_commentary_clipboard"
-            selected = _x11(["xclip", "-selection", "clipboard", "-o"], env)
-            copied_sizes[ref] = len(selected)
-            result[ref] = _long_commentary_excerpt_is_on_gui_clipboard(
-                originals["commentary"], originals["bible"], selected
-            )
+            focus_attempts[ref] = 0
+            result[ref] = False
+            copied_sizes[ref] = 0
+            for px, py in right_side_points:
+                stage = "focus_right_hand_commentary_pane"
+                _x11(
+                    ["xdotool", "mousemove", "--sync", str(px), str(py), "click", "1"],
+                    env,
+                )
+                focus_attempts[ref] += 1
+                time.sleep(0.7)
+                # Seed a non-authorial sentinel. If the GUI doesn't replace
+                # it, it cannot accidentally match original commentary.
+                stage = "clear_prior_clipboard"
+                _seed_x11_clipboard(env)
+                stage = "select_commentary_text"
+                _x11(["xdotool", "key", "--clearmodifiers", "ctrl+a"], env)
+                stage = "copy_commentary_text"
+                _x11(["xdotool", "key", "--clearmodifiers", "ctrl+c"], env)
+                time.sleep(1)
+                stage = "read_commentary_clipboard"
+                selected = _x11(["xclip", "-selection", "clipboard", "-o"], env)
+                copied_sizes[ref] = len(selected)
+                result[ref] = _long_commentary_excerpt_is_on_gui_clipboard(
+                    originals["commentary"], originals["bible"], selected
+                )
+                if result[ref]:
+                    break
         except PilotError:
             accepted = False
             failures[ref] = stage
             copied_sizes[ref] = 0
+            focus_attempts.setdefault(ref, 0)
             result[ref] = False
     return {
         "real_main_reader_window_found": True,
@@ -263,6 +311,7 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
         "commentary_clipboard_match_by_passage": result,
         "bounded_xiphos_ui_failed_action_by_passage": failures,
         "copied_gui_clipboard_byte_count_by_passage": copied_sizes,
+        "bounded_right_commentary_pane_focus_attempts_by_passage": focus_attempts,
         "independent_gui_commentary_excerpt_match_count": sum(result.values()),
     }
 
