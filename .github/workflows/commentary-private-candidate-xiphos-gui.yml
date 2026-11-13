@@ -8,6 +8,8 @@ on:
       - 'scripts/commentary_stock_candidate.py'
       - 'scripts/commentary_xiphos_dual_reader.py'
       - 'scripts/commentary_xiphos_heading_probe.py'
+      - 'scripts/commentary_xiphos_link_click.py'
+      - 'tests/test_commentary_xiphos_link_click.py'
       - 'tests/test_commentary_xiphos_heading_probe.py'
       - 'scripts/sword_commentary_raw_key.cpp'
       - 'scripts/sword_native_commentary_raw_corpus.cpp'
@@ -47,6 +49,7 @@ jobs:
           python -m pip install -r requirements.txt
           python -m unittest discover -s tests -p 'test_commentary_private_candidate_xiphos_gui.py' -v
           python -m unittest discover -s tests -p 'test_commentary_xiphos_heading_probe.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_xiphos_link_click.py' -v
           python -m unittest discover -s tests -p 'test_commentary_stock_candidate.py' -v
           python -m unittest discover -s tests -p 'test_commentary_xiphos_dual_reader.py' -v
       - name: Install real libSWORD, diatheke, Xiphos and isolated GUI tools
@@ -113,6 +116,28 @@ jobs:
           assert proof["published"] is False
           receipt=proof["independent_private_candidate_gui_receipt"]
           _gate_real_candidate_gui(receipt)
+          click=receipt["real_Xiphos_commentary_original_osisref_mouse_click"]
+          assert click["scope"]=="real_isolated_xiphos_mouse_on_original_source_link"
+          assert click["original_words_or_private_screenshots_exported"] is False
+          assert type(click["source_reference_targets_verified_in_real_GUI"]) is bool
+          assert type(click["genuine_original_osisref_click_navigated_to_expected_bible"]) is bool
+          assert type(click["x11_pointer_shape_observed"]) is bool
+          assert 0 <= click["hover_candidate_actual_mouse_clicks"] <= 12
+          assert 0 <= click["independent_exact_target_bible_readbacks"] <= 72
+          assert click["status"] in {
+              "inconclusive_no_eligible_authentic_GUI_link",
+              "real_xiphos_main_window_unavailable",
+              "commentary_pane_geometry_unavailable",
+              "X11_pointer_shape_unavailable",
+              "genuine_source_href_attested_mouse_link_not_yet_confirmed",
+              "original_source_attested_link_real_click_Bible_target_verified",
+              "real_GUI_pointer_or_bible_readback_unavailable",
+          }
+          assert click["genuine_original_osisref_click_navigated_to_expected_bible"] == (
+              click["status"] == "original_source_attested_link_real_click_Bible_target_verified"
+          )
+          print("Xiphos real mouse link/canonical target Bible-pane evidence (metadata only): " +
+                json.dumps(click, sort_keys=True))
           intro=receipt["pinned_original_source_intro_keys_and_word_counts"]
           assert intro["source_full_native_raw_corpus_sha256_reconfirmed"] is True
           assert intro["source_native_I_entries_scanned"] == proof["intro_I_keys"]
