@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "issue": "https://github.com/icfmp/Bible-Resources/issues/177",
+  "status": "EXPLICIT_SOURCE_CHAPTER_ADJACENT_SIBLINGS_HAVE_NO_DIRECT_STOCK_INTRO_TEXT_ALIGNMENT_NOT_CHAPTER_PARITY",
+  "pinned": {
+    "original_ccel_thml_sha256": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+    "original_stock_crosswire_archive_sha256": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+    "native_stock_ordered_raw_sha256": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
+  },
+  "original_source_marker_scan": {
+    "explicit_chapter_marker_count": 228,
+    "source_immediate_sibling_types": {
+      "h2": 220,
+      "p": 8
+    },
+    "source_sibling_is_entire_chapter_body": false,
+    "chapter_marker_keys_or_text_not_rewritten": true
+  },
+  "source_neighbor_to_original_native_intro": {
+    "source_markers_compared": 228,
+    "native_intro_entry_available_and_xml_parsed": 228,
+    "direct_unicode_match": 0,
+    "outer_whitespace_only_difference": 0,
+    "original_exact_substring_of_stock_intro": 0,
+    "same_unicode_word_tokens_other_punctuation": 0,
+    "source_words_contiguous_inside_larger_stock_intro": 0,
+    "different_text_or_selection_requires_review": 228,
+    "result_does_not_prove_missing_authored_chapter_text": true,
+    "native_intro_mapping_semantics_not_approved": true
+  },
+  "technical_evidence": {
+    "full_pinned_real_comparison": "https://github.com/icfmp/Bible-Resources/actions/runs/43401427853",
+    "exact_implementation_head_validate": "https://github.com/icfmp/Bible-Resources/actions/runs/43401427896",
+    "non_text_report_artifact": "https://github.com/icfmp/Bible-Resources/actions/runs/43401427853/artifacts/14025396322",
+    "implementation_head": "494e8c80aafb6c481492dacc321806a4c232f390"
+  },
+  "required_next_checks": {
+    "determine_source_chapter_sibling_role_vs_native_intro_semantics": true,
+    "audit_real_chapter_body_location_and_section_structure": true,
+    "investigate_unmarked_post_revelation_source_division_and_jude": true,
+    "classify_156_original_stock_word_sequence_disagreements": true,
+    "compare_quotes_notes_paragraphs_references_and_compiled_tables": true,
+    "independently_approve_digital_edition_redistribution_and_derivative_rights": true,
+    "independent_xiphos_and_andbible_gui_tests": true,
+    "published": false
+  },
+  "source_or_stock_text_committed": false,
+  "original_text_or_sword_module_modified": false,
+  "editorial_approved": false,
+  "legal_approved": false,
+  "release_approved": false
+}
