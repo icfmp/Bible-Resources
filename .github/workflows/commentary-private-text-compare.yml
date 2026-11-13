@@ -8,6 +8,8 @@ on:
       - 'scripts/commentary_chapter_cross_slot.py'
       - 'scripts/commentary_chapter_paragraph_overlap.py'
       - 'scripts/commentary_chapter_p_boundaries.py'
+      - 'scripts/commentary_chapter_ref_labels.py'
+      - 'tests/test_commentary_chapter_ref_labels.py'
       - 'tests/test_commentary_chapter_p_boundaries.py'
       - 'tests/test_commentary_chapter_paragraph_overlap.py'
       - 'tests/test_commentary_chapter_cross_slot.py'
@@ -270,7 +272,7 @@ jobs:
               "matching_native_key_sha256", "repeated_identical_word_run_windows_in_selected_stock_key",
               "original_word_token_multiset_occurrences_in_selected_stock_key",
               "source_paragraph_direct_child_element_counts", "original_next_sibling_tag",
-              "original_parent_element_tag",
+              "original_parent_element_tag", "selected_stock_scripRef_label_diagnostics",
           }
           for case in boundary_cases:
               identity = (case["source_reference_sha256"], case["original_paragraph_sha256"])
@@ -291,6 +293,36 @@ jobs:
                      case["best_same_chapter_contiguous_word_run"] +
                      case["original_tokens_after_shared_run"] != case["original_word_tokens"]):
                   raise SystemExit("Invalid original-to-stock word-run offset accounting")
+              links = case["selected_stock_scripRef_label_diagnostics"]
+              allowed_link_classes = {
+                  "empty_original_label_unreviewed",
+                  "literal_label_inside_stock_reference_element",
+                  "literal_label_in_stock_text_outside_confirmed_reference_element",
+                  "word_tokens_in_stock_reference_element_different_punctuation",
+                  "word_tokens_in_stock_text_different_punctuation_or_markup",
+                  "original_label_text_not_located_in_selected_stock_entry",
+              }
+              if (not isinstance(links,dict) or set(links) != {
+                    "original_scripRef_label_count", "original_scripRef_attribute_name_occurrences",
+                    "original_scripRef_to_stock_text_location_classes",
+                    "selected_stock_reference_element_count",
+                    "selected_stock_reference_elements_with_osisRef_attribute",
+                    "matched_label_does_not_validate_reference_target_or_edition",
+                    "original_words_and_stock_XML_never_reported"
+                  } or
+                  not all(type(links[k]) is int and links[k] >= 0 for k in (
+                    "original_scripRef_label_count","selected_stock_reference_element_count",
+                    "selected_stock_reference_elements_with_osisRef_attribute")) or
+                  sum(links["original_scripRef_to_stock_text_location_classes"].values()) !=
+                    links["original_scripRef_label_count"] or
+                  not all(name in allowed_link_classes and type(n) is int and n >= 0
+                          for name,n in links["original_scripRef_to_stock_text_location_classes"].items()) or
+                  not all(re.fullmatch(r"[A-Za-z][A-Za-z0-9_.-]{0,127}",name)
+                          and type(n) is int and n >= 0
+                          for name,n in links["original_scripRef_attribute_name_occurrences"].items()) or
+                  links["selected_stock_reference_elements_with_osisRef_attribute"] >
+                    links["selected_stock_reference_element_count"]):
+                  raise SystemExit("Unreviewed original scripRef/source-stock label value")
               if (not re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]{0,60}|_none",
                                    case["original_next_sibling_tag"]) or
                   not re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]{0,60}|_none",
