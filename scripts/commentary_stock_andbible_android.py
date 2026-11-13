@@ -425,6 +425,14 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
         reviewed_bible_zip = _create_attested_reviewed_bible_zip(root)
         adb("push", str(reviewed_bible_zip),
             "/sdcard/Download/" + BIBLE_MODULE + ".zip", timeout=110)
+        # The original MHCC file-picker probe explicitly informs MediaStore.
+        # The second ZIP needs its *own* scan; otherwise Android DocumentsUI
+        # may not expose the approved Bible despite a successful adb push.
+        adb("shell", "am", "broadcast", "-a",
+            "android.intent.action.MEDIA_SCANNER_SCAN_FILE",
+            "-d", "file:///sdcard/Download/" + BIBLE_MODULE + ".zip",
+            timeout=20, fail=False)
+        time.sleep(3)
         adb("shell", "am", "broadcast", "-a",
             "android.intent.action.MEDIA_SCANNER_SCAN_FILE",
             "-d", "file://" + device_path, timeout=20, fail=False)
@@ -442,7 +450,13 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
             module_id, title, wanted="EXACT_REVIEWED_BIBLE_ZIP",
         )
         if not bible_selected:
-            raise PilotError("Reviewed baseline Bible ZIP was not selectable")
+            observed = sorted({
+                name for step in baseline_history for name in step["safe_action_names"]
+            })
+            raise PilotError(
+                "Reviewed baseline Bible ZIP was not selectable in Android file picker; "
+                "allowlisted actual action classes: " + ",".join(observed)
+            )
         baseline_before_proceed = _reader_context_witness()
         baseline_screen = _screen(module_id, title)
         proceeded = _tap(
