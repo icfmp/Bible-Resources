@@ -28,7 +28,9 @@ _REF = re.compile(r"[1-4]?[A-Za-z][A-Za-z0-9]* [1-9][0-9]{0,2}:[1-9][0-9]{0,2}\Z
 _MAX_LINKS = 24
 
 
-def _real_original_targets(original: bytes, rich: bytes, source_ref: str) -> list[str]:
+def _real_original_targets(
+    original: bytes, rich: bytes, source_ref: str, *, diagnostics: dict | None = None,
+) -> list[str]:
     """Join exact original OSIS targets + authorial labels to actual GUI hrefs."""
     if (not isinstance(original, bytes) or not isinstance(rich, bytes)
             or len(original) > 256_000 or len(rich) > 256_000
@@ -38,9 +40,13 @@ def _real_original_targets(original: bytes, rich: bytes, source_ref: str) -> lis
     scan.feed(rich.decode("utf-8", errors="replace"))
     source_chapter = source_ref.split(":", 1)[0]
     targets = []
-    for attrs, body in _REFERENCE_WITH_ATTRIBUTES.findall(
+    source_refs = _REFERENCE_WITH_ATTRIBUTES.findall(
         original.decode("utf-8", errors="replace")
-    )[:256]:
+    )[:256]
+    if diagnostics is not None:
+        diagnostics["real_GUI_rich_anchor_count"] += len(scan.anchor_destinations)
+        diagnostics["original_source_reference_elements_count"] += len(source_refs)
+    for attrs, body in source_refs:
         attr = _OSIS_REF_ATTRIBUTE.search(attrs)
         if attr is None:
             continue
@@ -49,15 +55,23 @@ def _real_original_targets(original: bytes, rich: bytes, source_ref: str) -> lis
             raw = raw[len("Bible:"):]
         match = _OSIS.fullmatch(raw)
         if not match:
+            if diagnostics is not None:
+                diagnostics["non_single_OSIS_original_reference_count"] += 1
             continue  # no guessed range/multitarget-to-verse mapping
+        if diagnostics is not None:
+            diagnostics["single_OSIS_original_reference_count"] += 1
         book, chapter, verse = match.groups()
         reference = f"{book} {chapter}:{verse}"
         if f"{book} {chapter}" == source_chapter:
+            if diagnostics is not None:
+                diagnostics["same_chapter_original_reference_count"] += 1
             continue  # target could already be in current full chapter
         label_parser = _BoundedMarkupScanner()
         label_parser.feed(unescape(body))
         label = " ".join("".join(label_parser.text_chunks).split())
         if len(label) < 5:
+            if diagnostics is not None:
+                diagnostics["short_original_reference_label_count"] += 1
             continue
         escaped_target = raw.casefold()
         if not any(
@@ -67,6 +81,8 @@ def _real_original_targets(original: bytes, rich: bytes, source_ref: str) -> lis
             and unquote(unescape(href)).casefold().startswith(("sword:", "bible:"))
             for seen_label, href in scan.anchor_destinations
         ):
+            if diagnostics is not None:
+                diagnostics["single_source_target_not_joined_to_GUI_count"] += 1
             continue
         if reference not in targets:
             targets.append(reference)
@@ -194,6 +210,14 @@ def probe_real_original_osisref_click(
     base = {
         "scope": "real_isolated_xiphos_mouse_on_original_source_link",
         "source_reference_targets_verified_in_real_GUI": False,
+        "real_GUI_rich_selection_available_count": 0,
+        "real_GUI_rich_anchor_count": 0,
+        "original_source_reference_elements_count": 0,
+        "single_OSIS_original_reference_count": 0,
+        "non_single_OSIS_original_reference_count": 0,
+        "same_chapter_original_reference_count": 0,
+        "short_original_reference_label_count": 0,
+        "single_source_target_not_joined_to_GUI_count": 0,
         "independent_exact_target_bible_readbacks": 0,
         "x11_pointer_shape_observed": False,
         "hover_candidate_actual_mouse_clicks": 0,
@@ -237,8 +261,10 @@ def probe_real_original_osisref_click(
             rich = _optional_real_rich_xiphos_selection(env)
             if not rich:
                 continue
+            base["real_GUI_rich_selection_available_count"] += 1
             targets = _real_original_targets(
-                source["commentary_internal"], rich, source_ref
+                source["commentary_internal"], rich, source_ref,
+                diagnostics=base,
             )
             if not targets:
                 continue
