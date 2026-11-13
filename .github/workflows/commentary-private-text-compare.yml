@@ -21,6 +21,8 @@ on:
       - 'scripts/commentary_source_identity_lexical_gate.py'
       - 'tests/test_commentary_source_identity_lexical_gate.py'
       - 'scripts/commentary_original_bookcode_repair.py'
+      - 'scripts/commentary_bookcode_repair_receipt_guard.py'
+      - 'tests/test_commentary_bookcode_repair_receipt_guard.py'
       - 'tests/test_commentary_original_bookcode_repair.py'
       - 'scripts/commentary_near_prose_unicode_review.py'
       - 'tests/test_commentary_near_prose_unicode_review.py'
@@ -84,6 +86,7 @@ jobs:
           python -m pip install -r requirements.txt
           python -m unittest discover -s tests -p 'test_commentary_source_identity_lexical_gate.py' -v
           python -m unittest discover -s tests -p 'test_commentary_original_bookcode_repair.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_bookcode_repair_receipt_guard.py' -v
           python -m unittest discover -s tests -p 'test_commentary_near_prose_unicode_review.py' -v
           timeout 90s sudo apt-get -o Acquire::Retries=0 \
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update
@@ -154,44 +157,13 @@ jobs:
               assert row["source_canonical_alias_is_diagnostic_not_a_reference_correction"] is True
           print("Original div1 heading vs scripCom key source-identity quarantine (NOT textual correction): " +
                 json.dumps(counts, sort_keys=True))
-          repairs = report["original_source_book_marker_private_repair_proposal_stock_review"]
-          assert repairs["schema_version"] == 1
-          assert repairs["status"] == "private_exact_scripCom_book_token_repair_proposal_not_approved"
-          assert repairs["original_source_sha256"] == report["source_original_sha256"]
-          assert re.fullmatch(r"[a-f0-9]{64}", repairs["private_corrected_source_sha256"])
-          assert repairs["private_corrected_source_sha256"] != repairs["original_source_sha256"]
-          assert repairs["reviewed_private_original_bookcode_replacements"] == 5
-          assert repairs["corrected_book_source_marker_count_compared"] == 5
-          assert repairs["all_original_scripCom_elements_preserved"] >= 5
-          assert repairs["actual_original_stock_full_native_corpus_sha256"] == report["stock_full_raw_content_sha256"]
-          assert repairs["only_unique_original_exact_english_div1_title_conflicts_proposed"] is True
-          assert repairs["original_source_byte_for_byte_restorable"] is True
-          assert repairs["every_original_other_XML_text_title_note_reference_and_structure_unmodified"] is True
-          assert repairs["original_crosswire_sword_data_or_versification_changed"] is False
-          assert repairs["source_book_repair_is_not_crosswire_text_or_verse_repair"] is True
-          assert repairs["original_XML_or_stock_SWORD_mutated"] is False
-          assert repairs["independent_authorial_edition_identity_established"] is False
-          assert repairs["source_owner_or_editor_approved"] is False
-          assert repairs["public_release_authorized"] is False
-          repair_rows = repairs["original_scripCom_replacement_operations_without_authorial_text"]
-          assert len(repair_rows) == 5
-          assert all(type(row["source_line"]) is int and row["source_line"]>0 and
-                     all(re.fullmatch(r"[a-f0-9]{64}",row[k]) for k in (
-                          "original_source_osisRef_sha256", "proposed_private_osisRef_sha256"
-                     )) and row["only_inferred_book_code_changed_in_scripCom"] is True
-                     for row in repair_rows)
-          mapping = repairs["original_repaired_book_source_text_match_classes"]
-          assert set(mapping) <= {
-              "proposed_book_key_not_occupied_in_original_stock",
-              "original_stock_correct_book_alignment_exceeds_safe_budget",
-              "all_source_prose_words_found_in_order_at_correct_book_stock_key",
-              "some_source_prose_words_still_differ_at_correct_book_stock_key",
-          }
-          assert sum(mapping.values()) == 5
-          assert len(repairs["original_repaired_book_line_SHA_only_stock_comparison_cases"]) == 5
-          print("Real private byte-exact source book-marker repair proposals and original stock book-anchor readbacks: " +
-                json.dumps(mapping, sort_keys=True))
-          unicode_review = report["original_source_same_book_unicode_lexical_witness_review"]
+          import sys
+          sys.path.insert(0, str(Path("scripts").resolve()))
+          from commentary_bookcode_repair_receipt_guard import validate_private_bookcode_repair_receipt
+          guarded_repairs = validate_private_bookcode_repair_receipt(report)
+          print("Private source-bound book-marker proposal (not an approved edit): " +
+                json.dumps(guarded_repairs, sort_keys=True))
+                    unicode_review = report["original_source_same_book_unicode_lexical_witness_review"]
           assert unicode_review["schema_version"] == 1
           assert unicode_review["authentic_same_book_original_digital_edition_cases_evaluated"] == counts.get(
               "meaningful_separate_editions_lexical_review_still_required", 0
