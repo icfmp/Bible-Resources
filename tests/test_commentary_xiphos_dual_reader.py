@@ -1,0 +1,126 @@
+"""Synthetic controls for an attested Bible + exact original Xiphos commentary."""
+from __future__ import annotations
+
+from hashlib import sha256
+import json
+from pathlib import Path
+import sys
+import tempfile
+import unittest
+from unittest.mock import patch
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+
+from commentary_xiphos_dual_reader import (
+    _long_commentary_excerpt_is_on_gui_clipboard,
+    _normalized_words,
+    _main_xiphos_window,
+    attempt_real_xiphos_passage_copy,
+    verify_and_install_reviewed_bible,
+)
+from pilot_preflight import PilotError
+
+
+class ExactDualModuleXiphosReaderTests(unittest.TestCase):
+    def test_long_distinct_original_commentary_in_real_clipboard(self):
+        text = ("Original commentary source. " +
+                " ".join("exegeticalword%03d" % n for n in range(100)))
+        self.assertTrue(
+            _long_commentary_excerpt_is_on_gui_clipboard(
+                text.encode(), b"Some other original Bible verse.",
+                ("Copy from Bible reader\n" + text[10:]).encode(),
+            )
+        )
+
+    def test_bible_verse_or_short_module_label_is_not_commentary_proof(self):
+        text = " ".join("word%03d" % n for n in range(130))
+        scripture = text.encode()
+        self.assertFalse(_long_commentary_excerpt_is_on_gui_clipboard(
+            scripture, scripture, scripture
+        ))
+        self.assertFalse(_long_commentary_excerpt_is_on_gui_clipboard(
+            scripture, b"Unrelated source", b"MHCC Genesis 1:1"
+        ))
+        self.assertFalse(_long_commentary_excerpt_is_on_gui_clipboard(
+            scripture, b"Unrelated source", b""
+        ))
+
+    def test_readback_word_normalization_is_comparison_only(self):
+        self.assertEqual(
+            _normalized_words("Ésaïe 1:1 — coöpération".encode()),
+            ["esaie", "1", "1", "cooperation"],
+        )
+
+    @patch("commentary_xiphos_dual_reader.install_checked_out_rawtext_comparison")
+    def test_attested_exact_five_bible_files_are_not_rewritten(self, install):
+        names = [
+            "mods.d/brlsg1910.conf",
+            "modules/texts/rawtext/brlsg1910/ot",
+            "modules/texts/rawtext/brlsg1910/ot.vss",
+            "modules/texts/rawtext/brlsg1910/nt",
+            "modules/texts/rawtext/brlsg1910/nt.vss",
+        ]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "baseline"
+            dest = root / "installed"
+            source.mkdir()
+            dest.mkdir()
+            expected = {}
+            for n in names:
+                file = source / n
+                file.parent.mkdir(parents=True, exist_ok=True)
+                original = (b"authorially checked data " + n.encode()) * 2
+                file.write_bytes(original)
+                expected[n] = sha256(original).hexdigest()
+            receipt = root / "attestation.json"
+            receipt.write_text(
+                json.dumps({"module_id": "BRLSG1910",
+                            "release_tag": "lsg-0.1.0",
+                            "files": expected})
+            )
+            install.return_value = {
+                "file_count": 5,
+                "module_id": "BRLSG1910",
+            }
+            out = verify_and_install_reviewed_bible(
+                dest, source=source, attestation=receipt
+            )
+            self.assertTrue(out["all_five_published_bible_files_sha256_attested"])
+            self.assertEqual(out["module_id"], "BRLSG1910")
+            install.assert_called_once()
+            # An accidental source Bible mutation fails closed.
+            (source / "modules/texts/rawtext/brlsg1910/nt").write_bytes(b"changed")
+            with self.assertRaisesRegex(PilotError, "changed"):
+                verify_and_install_reviewed_bible(
+                    dest, source=source, attestation=receipt
+                )
+
+    @patch("commentary_xiphos_dual_reader._x11")
+    def test_visible_full_xiphos_window_required_not_tiny_notice(self, command):
+        command.side_effect = [
+            b"101\n102\n",
+            b"WIDTH=300\nHEIGHT=120\n",
+            b"WIDTH=1100\nHEIGHT=760\n",
+        ]
+        self.assertEqual(_main_xiphos_window({"DISPLAY": ":91"}), "102")
+
+    @patch("commentary_xiphos_dual_reader._main_xiphos_window", return_value=None)
+    def test_missing_real_main_window_does_not_claim_visual_content(self, _window):
+        samples = {"Gen 1:1": {"commentary": b"real", "bible": b"real"}}
+        receipt = attempt_real_xiphos_passage_copy(
+            {"DISPLAY": ":91", "GDK_BACKEND": "x11"}, samples
+        )
+        self.assertFalse(receipt["real_main_reader_window_found"])
+        self.assertFalse(receipt["actual_passage_commands_accepted"])
+        self.assertEqual(receipt["independent_gui_commentary_excerpt_match_count"], 0)
+
+    def test_no_user_display_or_wayland_gui_capture(self):
+        with self.assertRaisesRegex(PilotError, "Unsafe virtual"):
+            attempt_real_xiphos_passage_copy(
+                {"DISPLAY": ":0", "GDK_BACKEND": "x11"}, {}
+            )
+
+
+if __name__ == "__main__":
+    unittest.main()
