@@ -1,0 +1,99 @@
+name: Inspect released Darby paragraph rendering (metadata only)
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/darby-paragraph-rendering.yml"
+      - "scripts/inspect_paragraph_rendering.py"
+      - "tests/test_inspect_paragraph_rendering.py"
+      - "scripts/repair_osis_division_markers.py"
+      - "tests/test_repair_osis_division_markers.py"
+      - "scripts/repair_osis_paragraph_indentation.py"
+      - "tests/test_repair_osis_paragraph_indentation.py"
+      - "modules/darby-jnd-2024/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-source-native-rendering:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      PYTHONPATH: scripts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install parser and pinned-module native reader
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_raw_entry.cpp \
+            -o "$RUNNER_TEMP/native-darby-entry" -lsword
+      - name: Test generic source/compiled marker shape logic
+        run: python -m unittest discover -s tests -p test_inspect_paragraph_rendering.py -v
+      - name: Reacquire exact publisher source and compare published BRJND2024
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/inspect_paragraph_rendering.py \
+            --resource-id frajnd-2024 \
+            --module-id BRJND2024 \
+            --module-path modules/darby-jnd-2024/payload \
+            --native-reader "$RUNNER_TEMP/native-darby-entry" \
+            --ref Gen.6.8 \
+            --ref Gen.6.9 \
+            --ref Gen.6.13 \
+            --ref Gen.7.17 \
+            --ref Gen.10.1 \
+            --ref Gen.11.10 \
+            --ref Gen.14.18 \
+            --ref Ps.3.1 \
+            --ref Ps.73.21 \
+            --report darby-paragraph-shapes.json
+      - name: Prove reversible OSIS marker metadata overlay privately on the complete pinned source
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p test_repair_osis_division_markers.py -v
+          python -m unittest discover -s tests -p test_repair_osis_paragraph_indentation.py -v
+          python - <<'PY'
+          import json
+          from hashlib import sha256
+          from pathlib import Path
+          from publisher_osis_observation import read_pinned_publisher_osis
+          from repair_osis_division_markers import patch_divisions
+          from repair_osis_paragraph_indentation import trim_publisher_paragraph_indentation
+          original=read_pinned_publisher_osis('frajnd-2024')
+          corrected,report=patch_divisions(original,expected_sha256=sha256(original).hexdigest())
+          if not report['converted_markers_by_kind'] or not report['all_original_notes_and_machine_targets_preserved']:
+              raise SystemExit('No independently validated technical division marker overlay')
+          indented,spaces_receipt=trim_publisher_paragraph_indentation(corrected,expected_sha256=sha256(corrected).hexdigest())
+          assert spaces_receipt['all_source_nonspace_characters_preserved']
+          assert spaces_receipt['all_source_note_values_and_positions_preserved']
+          report['paragraph_whitespace_repair'] = spaces_receipt
+          Path('darby-division-overlay-shapes.json').write_text(json.dumps(report,sort_keys=True,indent=2))
+          print('Research-only reviewed source marker conversion categories:',report['converted_markers_by_kind'])
+          print('Protected literal marks remain:',report['protected_unchanged_marker_counts'])
+          print('Unconverted leading references:',report['bounded_unconverted_leading_marker_refs'])
+          print('Exact original XML paragraph indent candidates:', spaces_receipt['counts'])
+          print('No original or corrected OSIS source is uploaded; no compiled SWORD published')
+          PY
+      - name: Upload safe shape-only evidence (no Scripture/module/source)
+        uses: actions/upload-artifact@v4
+        with:
+          name: darby-paragraph-shapes
+          path: |
+            darby-paragraph-shapes.json
+            darby-division-overlay-shapes.json
+          retention-days: 30
+          if-no-files-found: error

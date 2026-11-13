@@ -103,7 +103,7 @@ jobs:
             --diatheke "$(command -v diatheke)" \
             --schema "$RUNNER_TEMP/darby-private-jsword/schema/osisCore.2.1.1-cw-latest.xsd" \
             --link-plan config/publisher-osis/frajnd-2024-note-link-research.json \
-            --inline-plan config/publisher-osis/frajnd-2024-inline-markup-research.json \
+            --inline-plan config/publisher-osis/frajnd-2024-inline-markup-research.json --division-overlay \
             --andbible-jsword-dir "$RUNNER_TEMP/darby-private-jsword/andbible-jsword" \
             --report "$RUNNER_TEMP/darby-private-jsword/report.json"
       - name: Upload ONLY safe metadata, never edited source or any Bible module

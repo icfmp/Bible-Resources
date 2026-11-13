@@ -10,6 +10,12 @@ on:
       - "scripts/repair_osis_inline_markup.py"
       - "scripts/repair_osis_source_bytes.py"
       - "tests/test_repair_osis_source_bytes.py"
+      - "scripts/repair_osis_division_markers.py"
+      - "tests/test_repair_osis_division_markers.py"
+      - "scripts/repair_osis_paragraph_indentation.py"
+      - "tests/test_repair_osis_paragraph_indentation.py"
+      - "scripts/source_native_division_markers.py"
+      - "tests/test_source_native_division_markers.py"
       - "scripts/audit_omitted_verse_notes.py"
       - "tests/test_audit_omitted_verse_notes.py"
       - "config/publisher-osis/frajnd-2024-note-link-research.json"
@@ -39,6 +45,9 @@ jobs:
           python -m unittest discover -s tests -p 'test_repair_osis_note_links.py' -v
           python -m unittest discover -s tests -p 'test_repair_osis_inline_markup.py' -v
           python -m unittest discover -s tests -p 'test_repair_osis_source_bytes.py' -v
+          python -m unittest discover -s tests -p 'test_repair_osis_division_markers.py' -v
+          python -m unittest discover -s tests -p 'test_repair_osis_paragraph_indentation.py' -v
+          python -m unittest discover -s tests -p 'test_source_native_division_markers.py' -v
           python -m unittest discover -s tests -p 'test_audit_omitted_verse_notes.py' -v
           python -m unittest discover -s tests -p 'test_publisher_osis_sword_candidate.py' -v
       - name: Install standard SWORD readback and pinned r3918 compiler prerequisites
@@ -100,6 +109,7 @@ jobs:
             --schema "$RUNNER_TEMP/darby-private-native/schema/osisCore.2.1.1-cw-latest.xsd" \
             --link-plan config/publisher-osis/frajnd-2024-note-link-research.json \
             --inline-plan config/publisher-osis/frajnd-2024-inline-markup-research.json \
+            --division-overlay \
             --report "$RUNNER_TEMP/darby-private-native/report.json" \
             --xiphos-review-dir "$RUNNER_TEMP/darby-private-native/xiphos-review"
       - name: Upload metadata only (never source, Bible, or module)
