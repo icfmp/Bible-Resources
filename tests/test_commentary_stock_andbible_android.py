@@ -95,6 +95,28 @@ class CommentaryAndroidStockTests(unittest.TestCase):
                     )
         self.assertEqual(verifier.call_count, 1)
 
+    def test_first_download_completion_requires_exact_enabled_clickable_button(self):
+        exact = b'''<hierarchy>
+          <node resource-id="net.bible.android.activity:id/okayButton"
+                text="OK" enabled="true" clickable="true"
+                bounds="[300,850][700,950]"/>
+          <node resource-id="net.bible.android.activity:id/otherButton"
+                text="OK" enabled="true" clickable="true"
+                bounds="[300,550][700,650]"/>
+        </hierarchy>'''
+        result = safe_controls(exact, "MHCC", TITLE)
+        self.assertIn("FINISH_FIRST_DOWNLOAD", [
+            x["action"] for x in result["controls"]
+        ])
+        for changed in (
+            exact.replace(b'enabled="true"', b'enabled="false"', 1),
+            exact.replace(b'clickable="true"', b'clickable="false"', 1),
+            exact.replace(b':id/okayButton', b':id/otherButton', 1),
+        ):
+            self.assertNotIn("FINISH_FIRST_DOWNLOAD", [
+                x["action"] for x in safe_controls(changed, "MHCC", TITLE)["controls"]
+            ])
+
     def test_metadata_identity_not_file_picker_filename_is_reader_witness(self):
         xml = (b'<hierarchy><node text="MHCC" bounds="[50,100][600,200]"/>'
                b'<node text="MHCC.zip" bounds="[50,200][600,300]"/></hierarchy>')
