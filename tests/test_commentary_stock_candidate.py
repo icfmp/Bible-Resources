@@ -36,6 +36,22 @@ class PrivateCommentaryCandidateTests(unittest.TestCase):
         self.assertTrue(changed.endswith(b"DistributionLicense=Public Domain\n"))
         self.assertEqual(changed.count(b"Original scholarly commentary"),1)
 
+    def test_actual_upstream_conf_header_comments_are_preserved(self):
+        original=(
+            b"# Original upstream source notice\n"
+            b"; Maintainer comment\n\n"
+            b"[MHCC]\n"
+            b"DataPath=./modules/comments/zcom/mhcc/\n"
+            b"ModDrv=zCom\nVersification=KJV\n"
+        )
+        result=private_relabel_config(original,"MHCC","BRMHCCReview")
+        self.assertTrue(result.startswith(
+            b"# Original upstream source notice\n; Maintainer comment\n\n[BRMHCCReview]\n"))
+        self.assertIn(
+            b"DataPath=./modules/comments/zcom/brmhccreview/\n",result)
+        self.assertIn(b"ModDrv=zCom\nVersification=KJV\n",result)
+        self.assertNotIn(b"[MHCC]",result)
+
     def test_crlf_source_conf_preserved_for_unmodified_metadata_lines(self):
         original=(
             b"[MHCC]\r\nDataPath=./modules/comments/zcom/mhcc/\r\n"
