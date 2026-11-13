@@ -222,6 +222,8 @@ def private_original_div1_book_code_consistency(
             dict(sorted(source_book_histogram.items())),
         "original_source_div1_heading_origin_counts":dict(sorted(title_origin_counts.items())),
         "bounded_cross_div1_same_original_osisRef_start_key_sha256_cases":candidates,
+        "cross_div1_source_start_collision_examples_truncated":
+            len(repeated_starts)>len(candidates),
         "focused_shared_raw_source_group_original_bookcode_and_div1_heading_evidence":focused,
         "focused_original_source_units_reconciled":focused_unit_count,
         "original_div1_title_metadata_only_not_certified_canonical_book_name":True,
