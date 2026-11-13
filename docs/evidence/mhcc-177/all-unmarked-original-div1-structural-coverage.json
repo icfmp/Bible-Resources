@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "issue": "https://github.com/icfmp/Bible-Resources/issues/177",
+  "status": "ALL_68_CCEl_ORIGINAL_DIV1_SOURCE_SECTIONS_AUDITED_FOR_COMPLETE_MARKERLESS_CONTENT_NOT_EDITORIAL_ASSIGNMENT",
+  "original_input_sha256": {
+    "exact_CCEl_ThML_xml": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+    "original_crosswire_SWORD_zip": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+    "complete_native_SWORD_raw_ordered": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
+  },
+  "observed": {
+    "total_original_div1": 68,
+    "original_div1_with_any_source_scripCom": 66,
+    "original_div1_without_any_scripCom": 2,
+    "original_div1_without_marker_but_with_direct_chapters": 1,
+    "original_div1_without_marker_and_without_direct_chapters": 1,
+    "original_unmarked_div1_ordinals": [
+      1,
+      68
+    ],
+    "original_div1_number_68_has_two_original_direct_div2": true,
+    "original_div1_number_68_exact_authorial_character_count": 125133,
+    "original_div1_number_68_nonempty_paragraph_count": 262,
+    "not_one_original_div1_or_paragraph_assigned_a_guessed_Bible_book_or_verse": true,
+    "source_first_div1_original_text_not_discarded": true,
+    "source_last_div1_original_content_not_discarded": true,
+    "source_division_title_or_chapter_structure_does_not_prove_osisRef_book_identity": true
+  },
+  "complete_genuine_original_unmarked_div1_line_free_title_full_content_SHA256_and_structural_tag_names_only": [
+    {
+      "original_direct_chapter_child_tag_counts": {},
+      "original_div1_chapter_text_nonempty_count": 0,
+      "original_div1_content_not_assigned_a_scripture_reference": true,
+      "original_div1_descendant_tag_counts": {
+        "h1": 3,
+        "p": 2
+      },
+      "original_div1_direct_chapter_div2_count": 0,
+      "original_div1_document_ordinal": 1,
+      "original_div1_full_text_sha256": "653b8a796fa3962c4fcb0736270ab6afa1d51c3ec8bd5f12c81a75434a754fad",
+      "original_div1_has_title_attribute": true,
+      "original_div1_heading_element_count": 3,
+      "original_div1_note_element_count": 0,
+      "original_div1_paragraph_nonempty_element_count": 2,
+      "original_div1_scripCom_count": 0,
+      "original_div1_scripRef_element_count": 0,
+      "original_div1_table_element_count": 0,
+      "original_div1_text_unicode_character_count": 129,
+      "original_div1_title_sha256": "7f0d4007fecb7e8bb41188dbc659b768e4feeba1357d5fa45c69254d0d3ccdf3"
+    },
+    {
+      "original_direct_chapter_child_tag_counts": {
+        "div": 2,
+        "h2": 2,
+        "insertIndex": 2
+      },
+      "original_div1_chapter_text_nonempty_count": 2,
+      "original_div1_content_not_assigned_a_scripture_reference": true,
+      "original_div1_descendant_tag_counts": {
+        "a": 12011,
+        "div": 2,
+        "div2": 2,
+        "h1": 1,
+        "h2": 2,
+        "insertIndex": 2,
+        "p": 262
+      },
+      "original_div1_direct_chapter_div2_count": 2,
+      "original_div1_document_ordinal": 68,
+      "original_div1_full_text_sha256": "39034558cd77ca20e03ba9b8af9b7fa58ea3487ce5f82ff772f57185913698de",
+      "original_div1_has_title_attribute": true,
+      "original_div1_heading_element_count": 3,
+      "original_div1_note_element_count": 0,
+      "original_div1_paragraph_nonempty_element_count": 262,
+      "original_div1_scripCom_count": 0,
+      "original_div1_scripRef_element_count": 0,
+      "original_div1_table_element_count": 0,
+      "original_div1_text_unicode_character_count": 125133,
+      "original_div1_title_sha256": "90b901a30c3f089e10d82e1b842bbdc736a36b536a19d207b36a8e7be1904dcb"
+    }
+  ],
+  "real_source_workflows": {
+    "first_verified_original_CCEl_vs_CrossWire_pinned_private_audit": "https://github.com/icfmp/Bible-Resources/actions/runs/43454780318",
+    "exact_pre_receipt_HEAD_Validate": "https://github.com/icfmp/Bible-Resources/actions/runs/43454780350",
+    "independently_reconciled_to_existing_original_XML_structure_inventory": true,
+    "no_source_words_title_osisRef_values_or_compiled_stock_raw_logged_or_committed": true
+  },
+  "editorial_gates": {
+    "verify_last_original_div1_editorial_identity_without_inferred_Bible_reference": true,
+    "verify_first_original_div1_intro_handling": true,
+    "original_source_Jude_book_code_collision_in_two_differently_titled_div1": true,
+    "source_original_chapter_intro_and_all_paragraph_notes_quotations_tables_crossrefs": true,
+    "specific_original_edition_digital_provenance": true,
+    "independent_Xiphos_AndBible_GUI_review": true,
+    "MHCC_release": false
+  },
+  "MHCC_seven_stage_full_approval_count": 0,
+  "authorial_source_and_stock_bytes_changed": false
+}
