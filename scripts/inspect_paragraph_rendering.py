@@ -83,6 +83,14 @@ def source_structure(source: bytes, refs: set[str]) -> dict:
         ]
         result[ref] = {
             "authorial_container_chain": [x["tag"] for x in reversed(parent_chain)],
+            "start_element_is_milestone": bool(node.get("sID")),
+            "start_element_has_direct_text_marker": bool(re.match(r"^[ \\t\\r\\n]*\\*", node.text or "")),
+            "start_element_tail_has_marker": bool(re.match(r"^[ \\t\\r\\n]*\\*", node.tail or "")),
+            "first_following_sibling_tag": (
+                node.getnext().tag.rsplit("}", 1)[-1]
+                if node.getnext() is not None and isinstance(node.getnext().tag, str)
+                else None
+            ),
             "preceding_sibling_tag": (
                 node.getprevious().tag.rsplit("}", 1)[-1]
                 if node.getprevious() is not None and isinstance(node.getprevious().tag, str)
@@ -208,7 +216,8 @@ def main(argv=None):
     for ref, row in result["verse_samples"].items():
         print(ref, "source", json.dumps(row["original"], sort_keys=True),
               "native", json.dumps(row["compiled"], sort_keys=True),
-              "same_nonspace", row["same_nonspace_characters"])
+              "same_nonspace", row["same_nonspace_characters"],
+              "source_markup", row["original_paragraph_markup"])
     return 0
 
 
