@@ -609,6 +609,86 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
     }
 
 
+def _attempt_actual_context_heading_menu(env: dict, comparisons: dict) -> dict:
+    """Optional real Gtk/AT-SPI check of Xiphos's documented intro menu.
+
+    Real Gtk menu activation is required; right-click coordinates alone or
+    untrusted screenshot/clipboard differences cannot count as menu success.
+    This detects a *reader feature*, not original source heading parity:
+    Xiphos's 'Display Chapter Heading' navigates to a separate SWORD
+    chapter-introduction key (0), rather than proving the verse's <title>
+    tag was rendered with the correct typography.
+    """
+    result = {
+        "real_xiphos_commentary_chapter_heading_menu_activated": False,
+        "actual_commentary_pane_content_changed_after_heading_action": False,
+        "chapter_heading_text_matches_original_native_intro": False,
+        "all_in_verse_original_title_elements_rendered_as_visual_headings": False,
+        "reader_gui_heading_css_typography_approved": False,
+    }
+    if (env.get("BIBLE_PRIVATE_GUI_A11Y") != "1"
+            or not env.get("DBUS_SESSION_BUS_ADDRESS")
+            or not Path("/usr/bin/python3").is_file()
+            or not comparisons):
+        return result
+    window = _main_xiphos_window(env)
+    if window is None:
+        return result
+    try:
+        point = _commentary_pane_focus_points(env, window)[0]
+        ref = next(iter(comparisons))
+        item = comparisons[ref]
+        _x11(["xdotool", "windowfocus", "--sync", window], env)
+        for command in (
+            ["xdotool", "key", "--clearmodifiers", "ctrl+l"],
+            ["xdotool", "type", "--clearmodifiers", "--delay", "25", ref],
+            ["xdotool", "key", "Return"],
+            ["xdotool", "key", "--clearmodifiers", "alt+c"],
+        ):
+            _x11(command, env)
+        time.sleep(1)
+        px, py = point
+
+        def copy_actual_commentary():
+            _x11(["xdotool", "mousemove", str(px), str(py), "click", "1"], env)
+            _seed_x11_clipboard(env)
+            _x11(["xdotool", "key", "--clearmodifiers", "ctrl+a"], env)
+            _x11(["xdotool", "key", "--clearmodifiers", "ctrl+c"], env)
+            time.sleep(0.5)
+            return _x11(["xclip", "-selection", "clipboard", "-o"], env)
+
+        original_plain = copy_actual_commentary()
+        if not _long_commentary_excerpt_is_on_gui_clipboard(
+            item["commentary"], item["bible"], original_plain
+        ):
+            return result
+        # One real menu popover on the private Xvfb, then activate exactly the
+        # *accessible menu item name* through Gtk/AT-SPI, not a guessed pixel.
+        _x11(["xdotool", "mousemove", str(px), str(py), "click", "3"], env)
+        time.sleep(0.5)
+        helper = ROOT / "scripts" / "commentary_xiphos_a11y_menu.py"
+        if helper.is_symlink() or not helper.is_file():
+            raise PilotError("Reviewed Xiphos accessibility helper missing")
+        activated = subprocess.run(
+            ["/usr/bin/python3", str(helper), "chapter"],
+            env=env, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+            timeout=10, check=False,
+        )
+        if activated.returncode != 0 or activated.stdout != b"ACTIVATED\n":
+            _x11(["xdotool", "key", "Escape"], env)
+            return result
+        result["real_xiphos_commentary_chapter_heading_menu_activated"] = True
+        time.sleep(0.7)
+        changed = copy_actual_commentary()
+        result["actual_commentary_pane_content_changed_after_heading_action"] = (
+            changed != original_plain and len(changed) > 20
+            and changed not in (b"private-xiphos-sentinel",)
+        )
+        return result
+    except (PilotError, OSError, subprocess.TimeoutExpired):
+        return result
+
+
 def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int,
                   commentary_module_id: str = "MHCC") -> dict:
     if (not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{1,39}", commentary_module_id)
@@ -634,6 +714,12 @@ def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int,
         GDK_BACKEND="x11", LC_ALL="C.UTF-8",
         NO_AT_BRIDGE="1",
     )
+    optional_a11y = os.environ.get("BIBLE_PRIVATE_GUI_A11Y") == "1"
+    if optional_a11y:
+        if not env.get("DBUS_SESSION_BUS_ADDRESS"):
+            raise PilotError("Real Xiphos accessibility menu requires one shared private DBus session")
+        env.pop("NO_AT_BRIDGE", None)
+        env["BIBLE_PRIVATE_GUI_A11Y"] = "1"
     display = None
     app = None
     try:
@@ -646,7 +732,8 @@ def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int,
         if display.poll() is not None:
             raise PilotError("Actual virtual Xiphos display did not start")
         app = subprocess.Popen(
-            ["dbus-run-session", "--", "xiphos"], env=env,
+            (["xiphos"] if optional_a11y else
+             ["dbus-run-session", "--", "xiphos"]), env=env,
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
             start_new_session=True,
         )
@@ -658,8 +745,10 @@ def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int,
             raise PilotError("No independently visible Xiphos window with Bible and commentary")
         _dismiss_transient_xiphos_notice(env)
         inspection = attempt_real_xiphos_passage_copy(env, comparisons)
+        heading_menu = _attempt_actual_context_heading_menu(env, comparisons)
         return {
             "real_xiphos_executable_started_and_visible": True,
+            "actual_Xiphos_heading_context_menu_observation": heading_menu,
             "original_source_SWORD_PATH_isolated": True,
             **inspection,
         }
