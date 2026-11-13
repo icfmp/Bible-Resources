@@ -42,8 +42,38 @@ def pinned_source_intro_witness(
             or not _SHA.fullmatch(expected_raw_corpus_sha256)):
         raise PilotError("Unreviewed original commentary intro source or scanner")
     found: dict[str, bytes] = {}
+    intro_keys = 0
+    intro_textual_keys = 0
+    intro_without_words = 0
+    intro_invalid_xml = 0
+    intro_raw_byte_total = 0
+
     def observe(kind: str, key: str, raw: bytes):
-        if kind == "I" and key in {_BOOK, _BOOK+".0.0", _CHAPTER, _CHAPTER+".0"}:
+        nonlocal intro_keys, intro_textual_keys, intro_without_words
+        nonlocal intro_invalid_xml, intro_raw_byte_total
+        if kind != "I":
+            return
+        intro_keys += 1
+        intro_raw_byte_total += len(raw)
+        try:
+            parsed = etree.fromstring(
+                b"<source>" + raw + b"</source>",
+                parser=etree.XMLParser(
+                    resolve_entities=False, no_network=True, load_dtd=False,
+                    recover=False, huge_tree=False, remove_blank_text=False,
+                ),
+            )
+            if any(isinstance(x, etree._Entity) for x in parsed.iter()):
+                raise ValueError("unreviewed source XML entity")
+        except (ValueError, etree.XMLSyntaxError):
+            intro_invalid_xml += 1
+            return
+        words = _words("".join(parsed.itertext()))
+        if words:
+            intro_textual_keys += 1
+        else:
+            intro_without_words += 1
+        if key in {_BOOK, _BOOK+".0.0", _CHAPTER, _CHAPTER+".0"}:
             found[key] = raw
     proc = None
     try:
@@ -89,10 +119,28 @@ def pinned_source_intro_witness(
         sampled_original_intro_word_counts[key] = len(words)
         if len(words) >= 4:
             result["book" if key in {_BOOK, _BOOK+".0.0"} else "chapter"] = raw
-    # Metadata only: identifies whether a GUI heading was testable without
-    # exposing original source headings, citations or authorial words.
-    print("Pinned native Genesis book/chapter intros, word-count-only: " +
-          str(dict(sorted(sampled_original_intro_word_counts.items()))))
+    # Counts only: an occupied intro with no words is not missing SWORD
+    # content, and a GUI cannot be required to copy prose not present upstream.
+    summary = {
+        "source_full_native_raw_corpus_sha256_reconfirmed": True,
+        "source_native_I_entries_scanned": intro_keys,
+        "source_native_I_entries_with_authored_word_tokens": intro_textual_keys,
+        "source_native_I_entries_without_word_tokens": intro_without_words,
+        "source_native_I_entries_unparseable_strict_XML": intro_invalid_xml,
+        "source_native_I_raw_byte_count": intro_raw_byte_total,
+        "selected_Gen_native_I_word_token_counts":
+            dict(sorted(sampled_original_intro_word_counts.items())),
+        "no_original_intro_or_full_words_exported": True,
+        "unparseable_or_nonverifiable_intro_is_not_missing_commentary": True,
+    }
+    if (intro_keys <= 0 or
+            intro_keys != intro_textual_keys+intro_without_words+intro_invalid_xml):
+        raise PilotError("Original SWORD I-key inventory is internally inconsistent")
+    print("Exact pinned source I-key intros, count-only: " +
+          str({k: v for k, v in summary.items()
+               if k not in {"no_original_intro_or_full_words_exported",
+                            "unparseable_or_nonverifiable_intro_is_not_missing_commentary"}}))
+    result["_source_intro_inventory"] = summary
     return result
 
 
