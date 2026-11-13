@@ -83,6 +83,13 @@ jobs:
           assert data["andbible_apk_sha256"]=="1c9ed93391642c0de4529065a65e10eb44242d60722231b917b14c5919cdf796"
           assert data["official_android_application_installed"] is True
           assert data["official_android_app_file_import_action_tapped"] is True
+          assert type(data["android_startup_snapshots_checked"]) is int
+          assert 1<=data["android_startup_snapshots_checked"]<=6
+          assert isinstance(data["android_bounded_startup_recovery_actions"],list)
+          assert len(data["android_bounded_startup_recovery_actions"])<=6
+          assert set(data["android_bounded_startup_recovery_actions"])<={
+              "WAIT","CLOSE APP","DISMISS","DISMISS UNTIL NEXT UPDATE","ADVANCED"
+          }
           assert data["android_file_picker_exact_original_zip_selected"] is True
           assert data["android_sample_reference_deeplink_attempted"] is True
           assert type(data["android_documented_intent_request_accepted"]) is bool
