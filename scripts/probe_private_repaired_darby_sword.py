@@ -237,12 +237,31 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
                   json.dumps(diagnoses, sort_keys=True))
             raise PrivateRepairedProbeError("Corrected candidate full native fidelity gate did not pass")
         omitted_hosts = {host for host, _ordinal in omitted_source_checks}
-        omitted_raw = {
-            ref: raw
-            for kind, ref, raw in _read_native_frames(native_raw, MODULE, payload)
-            if kind == "K" and ref in omitted_hosts
-        }
+        render_refs = {"Gen.6.9", "Gen.6.13", "Gen.7.17", "Ps.3.1", "Job.3.1"}
+        omitted_raw = {}
+        render_raw = {}
+        for kind, ref, raw in _read_native_frames(native_raw, MODULE, payload):
+            if kind != "K":
+                continue
+            if ref in omitted_hosts:
+                omitted_raw[ref] = raw
+            if division_overlay and ref in render_refs:
+                render_raw[ref] = raw
         omitted_native_checks = native_cases(omitted_source_checks, corrected, omitted_raw)
+        division_reader_shapes = None
+        if division_overlay:
+            from inspect_paragraph_rendering import diff, native_xml_prefix_shape
+            from source_native_maintext_probe import native_raw_main_text
+            if set(render_raw) != render_refs:
+                raise PrivateRepairedProbeError("Private SWORD lacks verified original paragraph samples")
+            division_reader_shapes = {}
+            for ref in sorted(render_refs):
+                compiled_text, _excluded = native_raw_main_text(render_raw[ref])
+                row = diff(final_verses[ref], compiled_text)
+                if not row["same_nonspace_characters"]:
+                    raise PrivateRepairedProbeError("Edited source/native paragraph reading changed nonspace content")
+                row["native_xml_prefix_shape"] = native_xml_prefix_shape(render_raw[ref])
+                division_reader_shapes[ref] = row
         if omitted_native_checks["missing_verse_note_count"] != len(omitted_source_checks):
             raise PrivateRepairedProbeError("Missing-verse note audit incomplete")
         env = dict(os.environ, SWORD_PATH=str(payload.resolve()))
@@ -333,6 +352,7 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
         "private_plain_omitted_reference_osis_sha256": plain_note_receipt["new_research_candidate_sha256"],
         "private_compiled_osis_sha256": compiled_source_sha256,
         "research_division_overlay_receipt": division_receipt,
+        "research_division_private_native_rendering_shapes": division_reader_shapes,
         "plain_nonhyperlink_omission_label_count": plain_note_receipt["explicit_plain_label_count"],
         "original_note_display_text_preserved_by_plain_overlay": plain_note_receipt["all_original_characters_preserved"],
         "original_unedited_osis_bytes_preserved": True,
