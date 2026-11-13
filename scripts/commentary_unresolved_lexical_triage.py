@@ -205,6 +205,7 @@ class UnresolvedLexicalSelectionCensus:
         self.literal_work_qualifier_only_target_matches_total = 0
         self.no_stock_reference_cases = []
         self.nonlink_word_relationships = Counter()
+        self.nonlink_relation_by_stock_reference_markup = {}
         self.nonlink_word_relationships_by_original_lexical_shape = {}
         self.original_plain_word_bins = Counter()
         self.stock_plain_word_bins = Counter()
@@ -301,6 +302,9 @@ class UnresolvedLexicalSelectionCensus:
         if source_changed_link > source_changed or stock_changed_link > stock_changed:
             raise PilotError("Reference label words exceed known differing middle span")
         stock_links = stock_tags.get("reference", 0)
+        self.nonlink_relation_by_stock_reference_markup.setdefault(
+            "stock_has_reference" if stock_links else "stock_no_reference",Counter()
+        )[nonlink_category] += 1
         original_ref_links = source.get("private_original_scripRef_links")
         if not isinstance(original_ref_links, list) or len(original_ref_links) != orig_links:
             raise PilotError("Original scripRef source labels and target inventory inconsistent")
@@ -458,7 +462,15 @@ class UnresolvedLexicalSelectionCensus:
         ):
             if sum(category.values()) != self.total:
                 raise PilotError("Original source/stock mismatch diagnostic accounting incomplete")
-        if (sum(sum(v.values()) for v in self.nonlink_word_relationships_by_original_lexical_shape.values())
+        if (sum(sum(v.values()) for v in self.nonlink_relation_by_stock_reference_markup.values())
+                != self.total or
+                sum(self.nonlink_relation_by_stock_reference_markup.get(
+                    "stock_has_reference",Counter()).values()) !=
+                    self.stock_link_marked["stock_has_reference"] or
+                sum(self.nonlink_relation_by_stock_reference_markup.get(
+                    "stock_no_reference",Counter()).values()) !=
+                    self.stock_link_marked["stock_no_reference"] or
+                sum(sum(v.values()) for v in self.nonlink_word_relationships_by_original_lexical_shape.values())
                 != self.total or
                 sum(self.nonlink_word_relationships_by_original_lexical_shape.get(
                     "one_to_one_middle_word_substitution",Counter()).values()) !=
@@ -502,6 +514,10 @@ class UnresolvedLexicalSelectionCensus:
             "original_prose_outside_link_relations_by_original_lexical_difference":{
                 kind:dict(sorted(classes.items()))
                 for kind,classes in sorted(self.nonlink_word_relationships_by_original_lexical_shape.items())
+            },
+            "original_prose_outside_link_relations_by_compiled_reference_markup":{
+                scope:dict(sorted(values.items()))
+                for scope,values in sorted(self.nonlink_relation_by_stock_reference_markup.items())
             },
             "original_plain_word_token_count_bins":dict(sorted(self.original_plain_word_bins.items())),
             "stock_plain_word_token_count_bins":dict(sorted(self.stock_plain_word_bins.items())),
