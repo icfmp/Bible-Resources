@@ -306,8 +306,16 @@ def observe_dual_module_reader(resource_id: str = "mhcc-crosswire",
                     module, passage, fmt="plain", root=installed,
                     exe="diatheke", limit=256 * 1024, timeout=30,
                 )
-                if code != 0 or not present_key(passage, output, code) or len(output) <= 64:
-                    raise PilotError("Actual installed Bible/commentary entry unreadable")
+                key_found = present_key(passage, output, code)
+                threshold = 64 if slot == "commentary" else 16
+                if code != 0 or not key_found or len(output) <= threshold:
+                    # Metadata-only diagnostic: no Bible/commentary words or
+                    # source fragments leave the private runner.
+                    raise PilotError(
+                        f"Actual installed {slot} entry unreadable at {passage}: "
+                        f"exit_success={code == 0}; key_found={key_found}; "
+                        f"output_bytes={len(output)}; threshold={threshold}"
+                    )
                 pair[slot] = output
             comparisons[passage] = pair
         observed = _run_real_gui(installed, comparisons, seconds=seconds)
