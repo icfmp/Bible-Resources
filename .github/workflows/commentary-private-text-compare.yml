@@ -4,6 +4,8 @@ on:
     paths:
       - '.github/workflows/commentary-private-text-compare.yml'
       - 'scripts/commentary_private_text_compare.py'
+      - 'scripts/commentary_chapter_neighbors.py'
+      - 'tests/test_commentary_chapter_neighbors.py'
       - 'tests/test_commentary_private_text_compare.py'
       - 'scripts/commentary_text_delta.py'
       - 'tests/test_commentary_text_delta.py'
@@ -111,6 +113,26 @@ jobs:
                   raise SystemExit("Unapproved numeric diagnostic in bounded public summary")
               safe[key] = value
           print("Non-text original-to-stock suffix diagnostics: " + json.dumps(safe, sort_keys=True))
+          chapter = report["source_chapter_neighbor_to_stock_intro_diagnostics"]
+          proof = report["source_original_chapter_neighbor_evidence"]
+          if (proof["explicit_chapter_source_marker_count"] !=
+                  chapter["original_chapter_source_siblings_compared"]):
+              raise SystemExit("Chapter-adjacent source audit was not complete")
+          for obj in (
+                  proof["original_chapter_adjacent_sibling_tag_counts"],
+                  chapter["source_chapter_sibling_tags"],
+                  chapter["source_chapter_sibling_to_occupied_native_intro_classes"]):
+              if not all(re.fullmatch(r"[a-z][a-z0-9_]{0,127}", label)
+                         and type(count) is int and count >= 0
+                         for label, count in obj.items()):
+                  raise SystemExit("Unreviewed chapter witness summary field")
+          print("Source-adjacent chapter witness (NOT chapter parity): " +
+                json.dumps({
+                    "source_markers": proof["explicit_chapter_source_marker_count"],
+                    "original_sibling_tags": chapter["source_chapter_sibling_tags"],
+                    "stock_intro_alignment_classes":
+                        chapter["source_chapter_sibling_to_occupied_native_intro_classes"],
+                }, sort_keys=True))
           PY
       - name: Preserve only non-text source and stock diagnostics
         if: always()
@@ -128,5 +150,5 @@ jobs:
             echo 'All authored text and stock raw XML were privately processed and never logged or uploaded.'
             echo 'Exact Unicode matches are distinct from whitespace-only heuristics and actual lexical differences.'
             echo 'Failure to parse a stock raw XML fragment blocks that entry rather than normalizing it.'
-            echo 'Original chapter material, unmarked source divisions, quotations, notes, structure, rights and GUI readers remain unapproved.'
+            echo 'Only the immediate source sibling of each original chapter marker was compared to an occupied stock intro key; this is NOT full chapter body parity. Unmarked divisions, quotations, notes, structure, rights and GUI readers remain unapproved.'
           } >> "$GITHUB_STEP_SUMMARY"
