@@ -124,7 +124,7 @@ def propose_private_source_bookcode_repair(
             raise PilotError("Original reference has no enclosing authorial book division")
         claimed = REF_START.match(original_ref)
         if claimed is not None:
-            divisions[id(div)].append((i, div, claimed.group(1)))
+            divisions[div].append((i, div, claimed.group(1)))
         marker_rows.append((node, tag, attrs[0], original_ref))
 
     planned = {}
@@ -197,20 +197,20 @@ def propose_private_source_bookcode_repair(
         raise PilotError("Original source cannot be restored byte-for-byte")
 
     candidate_root = _parse(candidate)
-    candidate_nodes = [
-        n for n in candidate_root.iter()
-        if isinstance(n.tag, str) and n.tag.rsplit("}", 1)[-1] == "scripCom"
-    ]
-    if len(candidate_nodes) != len(marker_nodes):
-        raise PilotError("Proposed source marker change altered source element count")
-    edited_marker_indices = set(planned)
-    for index, (before, after) in enumerate(zip(original_root.iter(), candidate_root.iter())):
+    before_nodes = list(original_root.iter())
+    after_nodes = list(candidate_root.iter())
+    if len(before_nodes) != len(after_nodes):
+        raise PilotError("Private source repair changed complete XML element inventory")
+    marker_index_by_node = {node: i for i, node in enumerate(marker_nodes)}
+    if len(marker_index_by_node) != len(marker_nodes):
+        raise PilotError("Duplicate original source marker node identity")
+    for before, after in zip(before_nodes, after_nodes):
         if before.tag != after.tag or before.text != after.text or before.tail != after.tail:
             raise PilotError("Private source repair changed authorial XML text or structure")
         left = dict(before.attrib)
         right = dict(after.attrib)
-        if before in marker_nodes and marker_nodes.index(before) in edited_marker_indices:
-            marker_index = marker_nodes.index(before)
+        marker_index = marker_index_by_node.get(before)
+        if marker_index in planned:
             if right.pop("osisRef", None) != planned[marker_index]:
                 raise PilotError("Proposed scripCom OSIS target differs from reviewed patch")
             left.pop("osisRef", None)
