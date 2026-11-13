@@ -309,6 +309,29 @@ class ReferenceCrossSlotTopology:
               or sum(marker_census.values()) != len(self.private_unresolved)
               or len(no_stock_cases) != expected["stock_reference_presence"].get("stock_no_reference", 0)):
             raise PilotError("Cross-entry lexical reference census disagrees with original full stock audit")
+        target_status_census = Counter({
+            status: sum(labels.values())
+            for status, labels in original_target_x_label_location.items()
+        })
+        flattened_label_census = Counter()
+        for labels in original_target_x_label_location.values():
+            flattened_label_census.update(labels)
+        source_scope_census = {
+            scope: sum(labels.values())
+            for scope, labels in unmatched_target_scope_x_label_location.items()
+        }
+        if (sum(target_status_census.values()) != total_original_links or
+                target_status_census.get("raw_target_exact_match", 0) != exact_matches or
+                target_status_census.get("literal_Bible_work_prefix_only_match", 0) !=
+                    literal_qualifier_matches or
+                target_status_census.get("unpaired_original_target", 0) !=
+                    sum(source_categories.values()) or
+                source_scope_census != dict(source_categories) or
+                flattened_label_census != Counter(
+                    expected["original_scripRef_display_label_location_in_stock_text_classes"]
+                )):
+            raise PilotError("Per-link label/target census differs from independent full original audit")
+
         # Keep no-reference cases complete, and only the 20 largest unresolved
         # source target counts otherwise. Never emit any target or verse name.
         if len(no_stock_cases) > MAX_PRIVATE_RECEIPTS:
@@ -329,6 +352,14 @@ class ReferenceCrossSlotTopology:
             "source_and_stock_raw_exact_target_matches":exact_matches,
             "source_and_stock_literal_Bible_work_prefix_only_matches":literal_qualifier_matches,
             "source_unpaired_target_occurrence_location_classes":dict(sorted(source_categories.items())),
+            "original_target_match_status_x_selected_stock_label_location":{
+                status:dict(sorted(classes.items()))
+                for status, classes in sorted(original_target_x_label_location.items())
+            },
+            "unpaired_original_target_scope_x_selected_stock_label_location":{
+                scope:dict(sorted(classes.items()))
+                for scope, classes in sorted(unmatched_target_scope_x_label_location.items())
+            },
             "stock_unpaired_target_occurrence_source_classes":dict(sorted(compiled_categories.items())),
             "original_source_markers_with_or_without_stock_reference_markup":dict(sorted(marker_census.items())),
             "complete_native_K_and_I_keys_inspected_for_target_witnesses":self.native_keys_scanned,
