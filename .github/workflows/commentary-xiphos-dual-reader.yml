@@ -5,6 +5,9 @@ on:
       - '.github/workflows/commentary-xiphos-dual-reader.yml'
       - 'scripts/commentary_xiphos_dual_reader.py'
       - 'scripts/sword_commentary_raw_key.cpp'
+      - 'scripts/sword_native_commentary_raw_corpus.cpp'
+      - 'scripts/sword_native_raw_corpus_inventory.py'
+      - 'scripts/commentary_reference_cross_slot.py'
       - 'tests/test_commentary_xiphos_dual_reader.py'
       - 'modules/lsg-1910/payload/**'
       - 'config/catalogue-import-lsg-0.1.0.json'
@@ -52,6 +55,9 @@ jobs:
           g++ -std=c++17 -O2 -I/usr/include/sword \
             scripts/sword_commentary_raw_key.cpp \
             -o "$RUNNER_TEMP/private-sword-commentary-key" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "$RUNNER_TEMP/private-sword-commentary-corpus" -lsword
           command -v xiphos
           command -v diatheke
           command -v xclip
@@ -63,6 +69,7 @@ jobs:
             --resource-id "$RESOURCE_ID" \
             --seconds 12 \
             --native-raw-key-binary "$RUNNER_TEMP/private-sword-commentary-key" \
+            --native-raw-corpus-binary "$RUNNER_TEMP/private-sword-commentary-corpus" \
             --report "$RUNNER_TEMP/commentary-xiphos-dual-reader.json"
       - name: Gate actual dual-module installation and independent real GUI passage evidence
         shell: bash
@@ -85,6 +92,18 @@ jobs:
           assert bible["versification"]=="Segond"
           assert bible["all_five_published_bible_files_sha256_attested"] is True
           assert data["both_real_sword_modules_have_nonempty_diatheke_readback"] is True
+          original_refs=data["authentic_original_reference_bearing_inventory"]
+          assert original_refs["complete_native_original_stock_entries_checked"]==29975
+          assert original_refs["full_pinned_raw_corpus_sha256_reconfirmed"] is True
+          assert type(original_refs["original_occupied_numbered_keys_with_reference_markup"]) is int
+          assert 0<=original_refs["original_occupied_numbered_keys_with_reference_markup"]<=29975
+          assert type(original_refs["original_stock_reference_strict_xml_parse_failures"]) is int
+          assert 0<=original_refs["original_stock_reference_strict_xml_parse_failures"]<=29975
+          assert len(original_refs["real_reference_bearing_original_native_samples"])<=3
+          assert all(re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z ]{0,35} [1-9][0-9]{0,2}:[1-9][0-9]{0,2}",x)
+                     for x in original_refs["real_reference_bearing_original_native_samples"])
+          assert original_refs["actual_link_click_and_target_verified_in_xiphos"] is False
+          assert original_refs["original_authorial_reference_targets_exported"] is False
           assert 2<=data["sample_count"]<=3
           assert len(data["actual_substantive_sample_references"])==data["sample_count"]
           assert all(isinstance(x,str) and re.fullmatch(
@@ -162,6 +181,7 @@ jobs:
             echo 'Actual Xiphos Ctrl+L and Alt+C shortcuts attempt synced commentary; transient clipboard is compared only to authentic private diatheke text.'
             echo 'This is NOT approval of all 29,975 entries, headings, hyperlinks or full passage/navigation/typography fidelity.'
             echo 'Only metadata counts are retained for original OSIS title/reference elements versus real clipboard-visible titles and optional rich HTML anchors.'
+            echo 'Original-reference-bearing native slots are discovered from the full pinned SWORD raw corpus, not guessed from arbitrary verses.'
             echo 'Textual link presence in rich X11 clipboard does not certify clicking or correct reference navigation.'
             echo 'No original words, screenshots or SWORD archives are published. Owner legal/editorial and release gates remain open.'
           } >> "$GITHUB_STEP_SUMMARY"
