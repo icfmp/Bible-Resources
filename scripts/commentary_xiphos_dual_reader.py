@@ -13,6 +13,8 @@ This is a narrow cross-reader test, not a release or editorial decision.
 from __future__ import annotations
 
 import argparse
+from html import unescape
+from html.parser import HTMLParser
 from hashlib import sha256
 import json
 import os
@@ -139,6 +141,83 @@ def _long_commentary_excerpt_is_on_gui_clipboard(
     return False
 
 
+
+# Read-only diagnostic of original stock OSIS markup and actual Xiphos clipboard.
+# No source heading, authorial phrase, reference label or target leaves CI.
+_TITLE_TAG = re.compile(r"<title(?:\s+[^>]*)?>(.*?)</title\s*>", re.I | re.S)
+_REFERENCE_TAG = re.compile(r"<reference(?:\s+[^>]*)?>", re.I | re.S)
+
+
+class _BoundedMarkupScanner(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.link_count = 0
+        self.text_chunks = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag.casefold() == "a" and any(
+            key.casefold() == "href" and isinstance(value, str) and value.strip()
+            for key, value in attrs
+        ):
+            self.link_count += 1
+
+    def handle_data(self, data):
+        self.text_chunks.append(data)
+
+
+def _markup_display_witness(internal: bytes, rendered_plain: bytes,
+                            rendered_html: bytes | None) -> dict:
+    """Compare exact source headings to copied GUI text and count real links."""
+    if (not isinstance(internal, bytes) or len(internal) > 256_000
+            or not isinstance(rendered_plain, bytes) or len(rendered_plain) > 256_000
+            or (rendered_html is not None and
+                (not isinstance(rendered_html, bytes) or len(rendered_html) > 256_000))):
+        raise PilotError("Unbounded private Xiphos markup witness")
+    original = internal.decode("utf-8", errors="replace")
+    copied = rendered_plain.decode("utf-8", errors="replace")
+    extracted_titles = []
+    for value in _TITLE_TAG.findall(original)[:32]:
+        parser = _BoundedMarkupScanner()
+        parser.feed(unescape(value))
+        title = " ".join("".join(parser.text_chunks).split())
+        if len(title) >= 8:
+            extracted_titles.append(title)
+    visible = " ".join(copied.split())
+    exact_titles = sum(1 for value in extracted_titles if value in visible)
+    rich_link_count = 0
+    if rendered_html:
+        parser = _BoundedMarkupScanner()
+        parser.feed(rendered_html.decode("utf-8", errors="replace"))
+        rich_link_count = min(parser.link_count, 5000)
+    return {
+        "original_internal_title_elements_found": len(extracted_titles),
+        "exact_original_titles_in_copied_gui_text": exact_titles,
+        "original_internal_reference_elements_found": min(
+            len(_REFERENCE_TAG.findall(original)), 5000
+        ),
+        "real_gui_rich_html_selection_available": bool(rendered_html),
+        "real_gui_rich_html_anchor_elements_found": rich_link_count,
+        "xiphos_link_click_target_and_navigation_verified": False,
+    }
+
+
+def _optional_real_rich_xiphos_selection(env: dict) -> bytes | None:
+    """Read HTML offered by the real clipboard, never synthesize markup."""
+    try:
+        targets = _x11(
+            ["xclip", "-selection", "clipboard", "-t", "TARGETS", "-o"],
+            env, timeout=6,
+        )
+        if "text/html" not in targets.decode("ascii", errors="ignore").splitlines():
+            return None
+        return _x11(
+            ["xclip", "-selection", "clipboard", "-t", "text/html", "-o"],
+            env, timeout=7,
+        )
+    except PilotError:
+        return None
+
+
 def _x11(args: list[str], env: dict, *, input_bytes: bytes | None = None,
          timeout: int = 12) -> bytes:
     try:
@@ -248,11 +327,17 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
                 "bounded_right_commentary_pane_focus_attempts_by_passage": {
                     key: 0 for key in comparisons
                 },
+                "real_markup_rendering_observation_by_passage": {
+                    key: _markup_display_witness(
+                        item.get("commentary_internal", b""), b"", None
+                    ) for key, item in comparisons.items()
+                },
                 "independent_gui_commentary_excerpt_match_count": 0}
     result = {}
     failures = {}
     copied_sizes = {}
     focus_attempts = {}
+    markup_by_passage = {}
     accepted = True
     try:
         right_side_points = _commentary_pane_focus_points(env, window)
@@ -274,6 +359,9 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
             focus_attempts[ref] = 0
             result[ref] = False
             copied_sizes[ref] = 0
+            markup_by_passage[ref] = _markup_display_witness(
+                originals.get("commentary_internal", b""), b"", None
+            )
             for px, py in right_side_points:
                 stage = "focus_right_hand_commentary_pane"
                 _x11(
@@ -300,6 +388,10 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
                 result[ref] = _long_commentary_excerpt_is_on_gui_clipboard(
                     originals["commentary"], originals["bible"], selected
                 )
+                markup_by_passage[ref] = _markup_display_witness(
+                    originals.get("commentary_internal", b""),
+                    selected, _optional_real_rich_xiphos_selection(env),
+                )
                 if result[ref]:
                     break
         except PilotError:
@@ -307,6 +399,9 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
             failures[ref] = stage
             copied_sizes[ref] = 0
             focus_attempts.setdefault(ref, 0)
+            markup_by_passage.setdefault(ref, _markup_display_witness(
+                originals.get("commentary_internal", b""), b"", None
+            ))
             result[ref] = False
     return {
         "real_main_reader_window_found": True,
@@ -315,6 +410,7 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
         "bounded_xiphos_ui_failed_action_by_passage": failures,
         "copied_gui_clipboard_byte_count_by_passage": copied_sizes,
         "bounded_right_commentary_pane_focus_attempts_by_passage": focus_attempts,
+        "real_markup_rendering_observation_by_passage": markup_by_passage,
         "independent_gui_commentary_excerpt_match_count": sum(result.values()),
     }
 
@@ -431,9 +527,18 @@ def observe_dual_module_reader(resource_id: str = "mhcc-crosswire",
                 raise PilotError(
                     f"Reviewed Bible could not navigate real commentary anchor: {passage}"
                 )
+            internal_code, internal_markup = query(
+                manifest["module_id"], passage, fmt="internal", root=installed,
+                exe="diatheke", limit=256 * 1024, timeout=30,
+            )
+            if internal_code != 0 or not present_key(
+                passage, internal_markup, internal_code
+            ):
+                raise PilotError("Cannot independently observe original zCom OSIS markup")
             comparisons[passage] = {
                 "commentary": text,
                 "bible": bible_output,
+                "commentary_internal": internal_markup,
             }
             if len(comparisons) == MAX_SUBSTANTIVE_SAMPLES:
                 break
