@@ -77,7 +77,7 @@ jobs:
           assert report["real_xiphos_process_survived_bounded_startup"] is True
           assert report["real_xiphos_X11_window_found"] is True
           assert report["isolated_original_SWORD_PATH"] is True
-          assert report["original_stock_diathake_samples_available"] is True
+          assert report["original_stock_diatheke_samples_available"] is True
           assert report["independent_commentary_text_actually_rendered_and_read"] is False
           assert report["independent_Xiphos_reference_navigation_verified"] is False
           assert report["AndBible_Android_GUI_tested"] is False
