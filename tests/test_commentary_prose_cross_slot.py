@@ -96,6 +96,26 @@ class OriginalLargeProseAlternativeSlotTests(unittest.TestCase):
         self.assertEqual(by["same_chapter_intro"]["scope_outcome"],
                          "other_stock_entry_improves_original_ordered_word_match")
 
+    def test_four_word_fallback_remains_weak_and_does_not_count_as_six_word_witness(self):
+        source,cases,selected,_=fixture()
+        probe=OriginalProseAlternativeNativeSlotProbe(source,cases)
+        probe.observe("K","Gen.1.1",selected)
+        probe.observe("K","Gen.1.4",b"<p>w0 w1 w2 w3 unrelated longer rest</p>")
+        result=probe.report()
+        unit=result["all_original_large_plain_word_case_line_fullhash_scope_witnesses"][0]
+        scope=unit["by_native_scope"]["other_numbered_key_same_chapter"]
+        self.assertEqual(scope["scope_outcome"],
+                         "other_stock_entry_improves_original_ordered_word_match")
+        self.assertEqual(scope["best_candidate"][
+            "original_contiguous_anchor_strength_class"],
+            "only_four_or_five_original_words_contiguous_in_stock")
+        self.assertEqual(scope["best_candidate"][
+            "longest_exact_contiguous_source_word_run"],4)
+        self.assertEqual(unit["native_slots_with_any_six_word_anchor_in_distinct_payload"],0)
+        self.assertEqual(unit["native_slots_with_four_or_five_word_anchor_in_distinct_payload"],1)
+        self.assertTrue(result[
+            "weak_four_or_five_word_anchor_does_not_prove_same_original_authorial_section"])
+
     def test_six_word_anchor_negative_does_not_claim_original_prose_missing(self):
         source,cases,selected,_=fixture()
         probe=OriginalProseAlternativeNativeSlotProbe(source,cases)
@@ -106,7 +126,7 @@ class OriginalLargeProseAlternativeSlotTests(unittest.TestCase):
         self.assertEqual(item["overall_scope_conclusion"],
             "no_better_ordered_source_plain_word_witness_in_sampled_native_slots")
         self.assertEqual(item["by_native_scope"]["other_numbered_key_same_chapter"]["scope_outcome"],
-                         "no_nonidentical_stock_payload_with_six_contiguous_source_words")
+                         "no_nonidentical_stock_payload_with_four_contiguous_source_words")
         self.assertTrue(r[
             "nonidentical_native_payload_match_is_not_an_original_source_range_or_edition_proof"])
 
