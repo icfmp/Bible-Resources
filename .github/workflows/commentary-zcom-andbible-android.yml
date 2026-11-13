@@ -84,7 +84,20 @@ jobs:
           assert data["official_android_application_installed"] is True
           assert data["official_android_app_file_import_action_tapped"] is True
           assert data["android_file_picker_exact_original_zip_selected"] is True
-          assert data["android_sample_reference_deeplink_dispatched"] is True
+          assert data["android_sample_reference_deeplink_attempted"] is True
+          assert type(data["android_documented_intent_request_accepted"]) is bool
+          assert type(data["android_screen_changed_after_reference_attempt"]) is bool
+          assert type(data["android_exact_file_row_still_visible_after_selection"]) is bool
+          phases=data["android_focus_witness_by_phase"]
+          assert set(phases)=={"after_file_selection","after_import_attempt","after_app_restart","after_reference_intent"}
+          allowed={"focused_window","focused_app_window","resumed_activity","top_resumed_activity"}
+          assert all(isinstance(names,list) and len(names)<=4 and set(names)<=allowed
+                     for names in phases.values())
+          assert data["android_application_foreground_after_deeplink"] is bool(phases["after_reference_intent"])
+          identity=data["original_module_identity_witness_by_phase"]
+          assert set(identity)=={"after_import","after_app_restart","after_reference_intent"}
+          assert all(type(v) is bool for v in identity.values())
+          assert data["original_module_metadata_detected_in_ui_after_import"] is any(identity.values())
           assert data["original_text_and_reference_target_display_verified"] is False
           assert data["module_persistence_in_application_database_verified"] is False
           assert data["Android_commentary_links_verified"] is False
