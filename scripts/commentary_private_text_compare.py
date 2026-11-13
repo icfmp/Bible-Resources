@@ -22,6 +22,7 @@ import zipfile
 
 from lxml import etree
 
+from commentary_chapter_neighbors import original_chapter_neighbors, compare_chapter_neighbors
 from commentary_intake import load_manifest
 from commentary_text_delta import punctuation_relationship, word_relationship, nonword_symbol_excess
 from commentary_stock_prefix_topology import (
@@ -507,7 +508,11 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
             raise PilotError("Original CCEL text or CrossWire ZIP changed; abort text comparison")
         if obs_xml["bytes"]>MAX_XML:
             raise PilotError("Pinned XML exceeds original-source maximum")
-        source,source_proof=_original_source_markers(xml_file.read_bytes())
+        original_xml=xml_file.read_bytes()
+        source,source_proof=_original_source_markers(original_xml)
+        chapter_neighbors,chapter_proof=original_chapter_neighbors(original_xml)
+        if chapter_proof["explicit_chapter_source_marker_count"]!=source_proof["chapter_source_markers_not_compared"]:
+            raise PilotError("Original chapter marker count differs from full independent source audit")
         stock_meta=inspect_archive(stock_file,source_kind="sword",
                                    expected_module_id=manifest["module_id"],
                                    expected_category="commentary")
@@ -527,6 +532,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         process=None
         rows=[]
         matches={}
+        chapter_intros={}
         try:
             process=subprocess.Popen(["timeout","360s",str(raw_binary),manifest["module_id"]],
                                      stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,env=env)
@@ -536,6 +542,9 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
                 rows.append((kind,ref))
                 if kind=="K" and ref in source:
                     matches[ref]=raw
+                if kind=="I" and (ref in chapter_neighbors or
+                                   (ref.endswith(".0") and ref[:-2] in chapter_neighbors)):
+                    chapter_intros[ref]=raw
             raw_summary,_,_,_=parse_native_raw_corpus(process.stdout,on_entry=collect)
             process.stdout.close()
             status=process.wait(timeout=15)
@@ -548,6 +557,13 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
             raise
         crosscheck=private_crosscheck(ix.stdout,manifest["module_id"],rows,raw_summary)
         analysis=compare_private_texts(source,matches)
+        chapter_analysis=compare_chapter_neighbors(
+            chapter_neighbors,chapter_intros,raw_as_strict_xml_text
+        )
+        if chapter_analysis["original_chapter_source_siblings_compared"]!=chapter_proof[
+            "explicit_chapter_source_marker_count"
+        ]:
+            raise PilotError("Chapter neighbor readback omitted original markers")
     return {
         "schema_version":1,
         "resource_id":resource_id,
@@ -560,6 +576,8 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         "native_full_corpus_rechecked":True,
         "source_original_verse_and_range_body_evidence":source_proof,
         "text_diagnostic":analysis,
+        "source_original_chapter_neighbor_evidence":chapter_proof,
+        "source_chapter_neighbor_to_stock_intro_diagnostics":chapter_analysis,
         "original_source_divisions_without_markers_compared":False,
         "chapter_intro_and_body_lexical_parity_compared":False,
         "original_exact_edition_proven":False,
