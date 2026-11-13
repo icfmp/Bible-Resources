@@ -145,8 +145,11 @@ def make_private_candidate(
     *,native_raw_binary:Path,reader:str="diatheke",
     candidate_id:str="BRMHCCReview",
     directory:Path|None=None,
+    on_verified_private_candidate=None,
 ) -> dict:
     manifest=load_manifest(resource_id,directory=directory)
+    if on_verified_private_candidate is not None and not callable(on_verified_private_candidate):
+        raise PilotError("Unreviewed candidate GUI verification callback")
     old_id=manifest["module_id"]
     if manifest["rights"]["status"]!="research_only" or manifest["rights"]["owner_approved"] is not False:
         raise PilotError("Unexpected original commentary rights workflow state")
@@ -240,6 +243,18 @@ def make_private_candidate(
             })
         if substantial<1:
             raise PilotError("Original commentary test samples did not contain any substantial reader output")
+        private_gui=None
+        if on_verified_private_candidate is not None:
+            # Execute the real reader in the SAME temporary directory only
+            # after all 29,975 original and relabelled entries have been proven
+            # identical. No test-only ZIP outlives this context.
+            private_gui=on_verified_private_candidate(
+                original_install, candidate_install, manifest
+            )
+            if not isinstance(private_gui,dict):
+                raise PilotError("Private candidate reader returned no structured evidence")
+            if sha256(private_zip.read_bytes()).hexdigest()!=promotion["release_zip_sha256"]:
+                raise PilotError("Private candidate ZIP changed during independent reader review")
         # The scope of this report is binary preservation, not CCEL digital-edition parity.
         return {
             "schema_version":1,
@@ -268,6 +283,7 @@ def make_private_candidate(
             "substantial_plain_readback_sample_count":substantial,
             "no_unredacted_authorial_text_or_real_reference_names_in_report":True,
             "private_candidate_archive_destroyed_without_upload":True,
+            "independent_private_candidate_gui_receipt":private_gui,
             "independent_Xiphos_AndBible_visual_validation_passed":False,
             "CCEL_source_to_CrossWire_digital_edition_equivalence_proven":False,
             "digital_transcription_rights_separately_approved":False,

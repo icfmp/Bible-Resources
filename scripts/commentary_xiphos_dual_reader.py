@@ -29,6 +29,7 @@ import unicodedata
 from zipfile import ZipFile
 
 from commentary_intake import load_manifest
+from commentary_stock_candidate import _reader_identity_only_equivalence
 from commentary_reference_cross_slot import actual_stock_osisref_targets
 from sword_native_raw_corpus_inventory import parse_native_raw_corpus, RawCorpusError
 from commentary_native_raw_inventory import _safe_stock_install
@@ -608,9 +609,11 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
     }
 
 
-def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int) -> dict:
-    if (not 6 <= seconds <= 25 or root.is_symlink() or not root.is_dir()
-            or not (root / "mods.d/mhcc.conf").is_file()
+def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int,
+                  commentary_module_id: str = "MHCC") -> dict:
+    if (not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{1,39}", commentary_module_id)
+            or not 6 <= seconds <= 25 or root.is_symlink() or not root.is_dir()
+            or not (root / "mods.d" / (commentary_module_id.lower()+".conf")).is_file()
             or not (root / "mods.d/brlsg1910.conf").is_file()):
         raise PilotError("Xiphos requires pinned Bible plus original commentary")
     for program in ("Xvfb", "dbus-run-session", "xiphos", "xdotool", "xclip"):
@@ -667,6 +670,91 @@ def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int) -> 
             _stop_group(display)
 
 
+def prepare_original_and_candidate_gui_samples(
+    manifest: dict, *, original_root: Path, reader_root: Path,
+    selected_module_id: str, source_reference_cases: dict,
+    native_raw_key_binary: Path,
+) -> tuple[dict, list[str], list[str], list[str]]:
+    """Use the same five original key specimens for upstream or relabelled stock.
+
+    The original and selected compiled module text is independently compared
+    for every candidate key. A different empty verse is never silently added.
+    The actual raw OSIS title/link markup ALWAYS comes from original CrossWire,
+    not a synthesized title or editable clone.
+    """
+    original_id = manifest["module_id"]
+    if (not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{1,39}", selected_module_id)
+            or not original_root.is_dir() or not reader_root.is_dir()):
+        raise PilotError("Unsafe commentary module comparison roots")
+
+    def read_pair(passage: str):
+        old_code, stock = query(
+            original_id, passage, fmt="plain", root=original_root,
+            exe="diatheke", limit=256 * 1024, timeout=30,
+        )
+        new_code, selected = query(
+            selected_module_id, passage, fmt="plain", root=reader_root,
+            exe="diatheke", limit=256 * 1024, timeout=30,
+        )
+        if (old_code != 0 or new_code != 0
+                or not present_key(passage, stock, old_code)
+                or not present_key(passage, selected, new_code)
+                or len(stock) <= 64 or len(selected) <= 64):
+            return None
+        if original_id != selected_module_id:
+            _reader_identity_only_equivalence(
+                stock, selected,
+                old_id=original_id, candidate_id=selected_module_id,
+            )
+        elif stock != selected:
+            raise PilotError(
+                "Original reader output differs from actual selected stock bytes"
+            )
+        code, bible = query(
+            BIBLE_MODULE, passage, fmt="plain", root=reader_root,
+            exe="diatheke", limit=256 * 1024, timeout=30,
+        )
+        if code != 0 or not present_key(passage, bible, code) or len(bible) <= 16:
+            raise PilotError(
+                "Reviewed Bible could not navigate actual occupied commentary key"
+            )
+        return {
+            "commentary": selected,
+            "bible": bible,
+            "commentary_internal": _exact_native_commentary_raw(
+                original_root, original_id, passage, native_raw_key_binary
+            ),
+        }
+
+    comparisons = {}
+    sparse_original_commentary_slots = []
+    for ref in _candidate_passages(manifest):
+        item = read_pair(ref)
+        if item is None:
+            sparse_original_commentary_slots.append(ref)
+            continue
+        comparisons[ref] = item
+        if len(comparisons) == MAX_SUBSTANTIVE_SAMPLES:
+            break
+    if len(comparisons) != MAX_SUBSTANTIVE_SAMPLES:
+        raise PilotError("Not enough distinct nonempty original source commentary anchors")
+    baseline = list(comparisons)
+    link_samples = []
+    for ref in source_reference_cases["real_reference_bearing_original_native_samples"]:
+        if ref in comparisons:
+            continue
+        item = read_pair(ref)
+        if item is None:
+            continue
+        comparisons[ref] = item
+        link_samples.append(ref)
+        if len(link_samples) == 2:
+            break
+    if len(link_samples) != 2:
+        raise PilotError("Not enough actual original scripture-link-bearing keys")
+    return comparisons, baseline, link_samples, sparse_original_commentary_slots
+
+
 def observe_dual_module_reader(resource_id: str = "mhcc-crosswire",
                                *, native_raw_key_binary: Path,
                                native_raw_corpus_binary: Path,
@@ -705,68 +793,14 @@ def observe_dual_module_reader(resource_id: str = "mhcc-crosswire",
             installed, manifest["module_id"], native_raw_corpus_binary,
             expected_corpus_sha256=manifest["native_raw_corpus_sha256"],
         )
-        comparisons = {}
-        sparse_original_commentary_slots = []
-        for passage in _candidate_passages(manifest):
-            # Order deliberately starts with the original zCom source: do
-            # NOT treat an unoccupied commentary verse as a corruption.
-            code, text = query(
-                manifest["module_id"], passage, fmt="plain", root=installed,
-                exe="diatheke", limit=256 * 1024, timeout=30,
+        comparisons, baseline, link_samples, sparse_original_commentary_slots = (
+            prepare_original_and_candidate_gui_samples(
+                manifest, original_root=installed, reader_root=installed,
+                selected_module_id=manifest["module_id"],
+                source_reference_cases=source_reference_cases,
+                native_raw_key_binary=native_raw_key_binary,
             )
-            if code != 0 or not present_key(passage, text, code) or len(text) <= 64:
-                sparse_original_commentary_slots.append(passage)
-                continue
-            bible_code, bible_output = query(
-                BIBLE_MODULE, passage, fmt="plain", root=installed,
-                exe="diatheke", limit=256 * 1024, timeout=30,
-            )
-            if (bible_code != 0 or not present_key(passage, bible_output, bible_code)
-                    or len(bible_output) <= 16):
-                raise PilotError(
-                    f"Reviewed Bible could not navigate real commentary anchor: {passage}"
-                )
-            internal_markup = _exact_native_commentary_raw(
-                installed, manifest["module_id"], passage, native_raw_key_binary
-            )
-            comparisons[passage] = {
-                "commentary": text,
-                "bible": bible_output,
-                "commentary_internal": internal_markup,
-            }
-            if len(comparisons) == MAX_SUBSTANTIVE_SAMPLES:
-                break
-        if len(comparisons) < 2:
-            raise PilotError(
-                "Fewer than two independently occupied original commentary keys "
-                "also navigable in the reviewed Bible"
-            )
-        baseline = list(comparisons)
-        link_samples = []
-        for passage in source_reference_cases["real_reference_bearing_original_native_samples"]:
-            if passage in comparisons:
-                continue
-            code, original = query(
-                manifest["module_id"], passage, fmt="plain", root=installed,
-                exe="diatheke", limit=256 * 1024, timeout=30,
-            )
-            if code != 0 or not present_key(passage, original, code) or len(original) <= 64:
-                continue
-            bible_code, text = query(
-                BIBLE_MODULE, passage, fmt="plain", root=installed,
-                exe="diatheke", limit=256 * 1024, timeout=30,
-            )
-            if bible_code != 0 or not present_key(passage, text, bible_code) or len(text) <= 16:
-                continue
-            comparisons[passage] = {
-                "commentary": original, "bible": text,
-                "commentary_internal": _exact_native_commentary_raw(
-                    installed, manifest["module_id"], passage, native_raw_key_binary
-                ),
-            }
-            link_samples.append(passage)
-            if len(link_samples) >= 2:
-                break
+        )
         observed = _run_real_gui(installed, comparisons, seconds=seconds)
         return {
             "schema_version": 1,
