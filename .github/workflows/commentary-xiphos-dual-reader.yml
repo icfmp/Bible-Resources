@@ -108,7 +108,9 @@ jobs:
           baseline=data["original_baseline_commentary_text_gui_probe_references"]
           linkprobes=data["genuine_original_reference_bearing_gui_probe_references"]
           assert baseline==["Gen 1:1","Ps 23:1","Matt 5:1"]
-          assert 0<=len(linkprobes)<=2
+          assert len(linkprobes)==2, (
+              "Need at least two distinct true reference-bearing occupied original MHCC keys"
+          )
           assert len(set(linkprobes))==len(linkprobes)
           assert set(linkprobes)<=set(original_refs["real_reference_bearing_original_native_samples"])
           assert not set(linkprobes)&set(baseline)
@@ -138,7 +140,7 @@ jobs:
           assert isinstance(failures,dict) and set(failures)<=set(samples)
           assert all(isinstance(x,str) and len(x)<=45 for x in failures.values())
           assert not set(failures)&set(baseline)
-          assert all(samples[ref] is True for ref in baseline)
+          assert all(samples[ref] is True for ref in baseline+linkprobes)
           assert data["independent_gui_commentary_excerpt_match_count"]==sum(samples.values())
           markup=data["real_markup_rendering_observation_by_passage"]
           assert set(markup)==set(samples)
@@ -171,8 +173,16 @@ jobs:
               assert row["exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations"]<=row["source_reference_labels_observed_as_real_gui_HTML_anchors"]
               assert type(row["real_gui_rich_html_selection_available"]) is bool
               assert row["xiphos_link_click_target_and_navigation_verified"] is False
-          # Rich HTML availability and actual title matches are observations,
-          # not invented GUI evidence or proof that links are clickable.
+          # Genuine source links must retain their *exact* original OSIS
+          # destinations in the actual WebKit/GTK HTML clipboard.
+          for ref in linkprobes:
+              row=markup[ref]
+              assert row["original_internal_reference_elements_found"]>=1
+              assert row["source_reference_labels_observed_as_real_gui_HTML_anchors"]>=1
+              assert row["exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations"]>=1
+              assert row["xiphos_link_click_target_and_navigation_verified"] is False
+          # The href and source label are proven, but actual clicking and
+          # heading placement/typography remain independent acceptance gates.
           # All three original baseline text examples remain hard proof.
           # Additional true source-reference-bearing controls are observed
           # independently; a missing UI link must NOT be represented as PASS.
