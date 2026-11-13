@@ -7,8 +7,6 @@ attempt is INCONCLUSIVE, never evidence of missing upstream commentary text.
 """
 from __future__ import annotations
 
-from collections import Counter
-from hashlib import sha256
 import os
 from pathlib import Path
 import re
@@ -29,6 +27,8 @@ _SHA = re.compile(r"[a-f0-9]{64}\Z")
 _BOOK = "Gen"
 _CHAPTER = "Gen.1"
 _REF = "Gen 1:1"
+_I_BOOK = re.compile(r"([1-4]?[A-Za-z][A-Za-z0-9]*)(?:\\.0\\.0)?\\Z")
+_I_CHAPTER = re.compile(r"([1-4]?[A-Za-z][A-Za-z0-9]*)\\.([1-9][0-9]*)(?:\\.0)?\\Z")
 
 
 def pinned_source_intro_witness(
@@ -42,6 +42,8 @@ def pinned_source_intro_witness(
             or not _SHA.fullmatch(expected_raw_corpus_sha256)):
         raise PilotError("Unreviewed original commentary intro source or scanner")
     found: dict[str, bytes] = {}
+    textual_candidates = []
+    first_verse_entries: dict[str, bytes] = {}
     intro_keys = 0
     intro_textual_keys = 0
     intro_without_words = 0
@@ -51,6 +53,10 @@ def pinned_source_intro_witness(
     def observe(kind: str, key: str, raw: bytes):
         nonlocal intro_keys, intro_textual_keys, intro_without_words
         nonlocal intro_invalid_xml, intro_raw_byte_total
+        if kind == "K":
+            if key.endswith(".1") and len(raw) <= 256_000:
+                first_verse_entries[key] = raw
+            return
         if kind != "I":
             return
         intro_keys += 1
@@ -75,6 +81,16 @@ def pinned_source_intro_witness(
             intro_without_words += 1
         if key in {_BOOK, _BOOK+".0.0", _CHAPTER, _CHAPTER+".0"}:
             found[key] = raw
+        if len(words) >= 4:
+            book = _I_BOOK.fullmatch(key)
+            chapter = _I_CHAPTER.fullmatch(key)
+            if book:
+                textual_candidates.append(("book", key, book.group(1), 1, raw, len(words)))
+            elif chapter:
+                textual_candidates.append((
+                    "chapter", key, chapter.group(1), int(chapter.group(2)),
+                    raw, len(words),
+                ))
     proc = None
     try:
         proc = subprocess.Popen(
@@ -117,8 +133,33 @@ def pinned_source_intro_witness(
             continue
         words = _words("".join(parsed.itertext()))
         sampled_original_intro_word_counts[key] = len(words)
-        if len(words) >= 4:
-            result["book" if key in {_BOOK, _BOOK+".0.0"} else "chapter"] = raw
+    # Select real SOURCE keys with enough prose, never fabricate an intro or
+    # substitute another passage. A first-verse native entry is required so
+    # ordinary commentary cannot be mistaken for an activated heading.
+    result = {}
+    source_selected_keys = {}
+    for kind in ("book", "chapter"):
+        candidates = sorted(
+            (r for r in textual_candidates if r[0] == kind),
+            key=lambda r: (-r[5], r[1]),
+        )
+        for _kind, original_i_key, book, chapter, raw, word_count in candidates:
+            first = book + "." + str(chapter) + ".1"
+            ordinary = first_verse_entries.get(first)
+            if ordinary is None:
+                continue
+            result[kind] = {
+                "raw": raw,
+                "reference": book + " " + str(chapter) + ":1",
+                "ordinary_first_verse": ordinary,
+                "original_intro_native_key": original_i_key,
+            }
+            source_selected_keys[kind] = {
+                "native_original_intro_key": original_i_key,
+                "original_word_token_count": word_count,
+                "actual_original_numbered_first_verse_key": first,
+            }
+            break
     # Counts only: an occupied intro with no words is not missing SWORD
     # content, and a GUI cannot be required to copy prose not present upstream.
     summary = {
@@ -130,6 +171,10 @@ def pinned_source_intro_witness(
         "source_native_I_raw_byte_count": intro_raw_byte_total,
         "selected_Gen_native_I_word_token_counts":
             dict(sorted(sampled_original_intro_word_counts.items())),
+        "original_source_I_keys_with_authored_words_only": sorted(
+            (row[1] for row in textual_candidates)
+        ),
+        "chosen_native_source_intro_samples_for_real_GUI": source_selected_keys,
         "no_original_intro_or_full_words_exported": True,
         "unparseable_or_nonverifiable_intro_is_not_missing_commentary": True,
     }
@@ -207,7 +252,22 @@ def probe_real_xiphos_commentary_heading_menu(
         points = ()
     for kind, up in (("chapter", 1), ("book", 2)):
         status = "not_attempted"
-        original = private_intro_raw.get(kind)
+        sample = private_intro_raw.get(kind)
+        if isinstance(sample, dict):
+            original = sample.get("raw")
+            reference = sample.get("reference")
+            ordinary = sample.get("ordinary_first_verse")
+            if (not isinstance(original, bytes)
+                    or not isinstance(ordinary, bytes)
+                    or not isinstance(reference, str)
+                    or not re.fullmatch(
+                        r"[1-4]?[A-Za-z][A-Za-z0-9]* [1-9][0-9]*:1",
+                        reference)):
+                raise PilotError("Unreviewed source-attested Xiphos intro GUI sample")
+        else:
+            original = sample
+            reference = _REF
+            ordinary = ordinary_first_verse
         if original is None:
             status = "no_authenticated_original_intro_key_for_this_scope"
         elif not points:
@@ -217,7 +277,7 @@ def probe_real_xiphos_commentary_heading_menu(
                 _x11(["xdotool", "windowfocus", "--sync", window], env)
                 for cmd in (
                     ["xdotool", "key", "--clearmodifiers", "ctrl+l"],
-                    ["xdotool", "type", "--clearmodifiers", "--delay", "25", _REF],
+                    ["xdotool", "type", "--clearmodifiers", "--delay", "25", reference],
                     ["xdotool", "key", "Return"],
                     ["xdotool", "key", "--clearmodifiers", "alt+c"],
                 ):
@@ -237,7 +297,7 @@ def probe_real_xiphos_commentary_heading_menu(
                 time.sleep(.6)
                 copied = _x11(["xclip", "-selection", "clipboard", "-o"], env)
                 status = ("original_intro_prose_copied_from_real_GUI"
-                          if _intro_in_gui_clipboard(original, copied, ordinary_first_verse)
+                          if _intro_in_gui_clipboard(original, copied, ordinary)
                           else "menu_action_attempted_but_intro_not_proven_in_clipboard")
             except PilotError:
                 status = "real_GUI_menu_or_clipboard_action_unavailable"
