@@ -703,6 +703,32 @@ def observe_dual_module_reader(resource_id: str = "mhcc-crosswire",
                 "Fewer than two independently occupied original commentary keys "
                 "also navigable in the reviewed Bible"
             )
+        baseline = list(comparisons)
+        link_samples = []
+        for passage in source_reference_cases["real_reference_bearing_original_native_samples"]:
+            if passage in comparisons:
+                continue
+            code, original = query(
+                manifest["module_id"], passage, fmt="plain", root=installed,
+                exe="diatheke", limit=256 * 1024, timeout=30,
+            )
+            if code != 0 or not present_key(passage, original, code) or len(original) <= 64:
+                continue
+            bible_code, text = query(
+                BIBLE_MODULE, passage, fmt="plain", root=installed,
+                exe="diatheke", limit=256 * 1024, timeout=30,
+            )
+            if bible_code != 0 or not present_key(passage, text, bible_code) or len(text) <= 16:
+                continue
+            comparisons[passage] = {
+                "commentary": original, "bible": text,
+                "commentary_internal": _exact_native_commentary_raw(
+                    installed, manifest["module_id"], passage, native_raw_key_binary
+                ),
+            }
+            link_samples.append(passage)
+            if len(link_samples) >= 2:
+                break
         observed = _run_real_gui(installed, comparisons, seconds=seconds)
         return {
             "schema_version": 1,
@@ -715,6 +741,8 @@ def observe_dual_module_reader(resource_id: str = "mhcc-crosswire",
             "authentic_original_reference_bearing_inventory": source_reference_cases,
             "both_real_sword_modules_have_nonempty_diatheke_readback": True,
             "sample_count": len(comparisons),
+            "original_baseline_commentary_text_gui_probe_references": baseline,
+            "genuine_original_reference_bearing_gui_probe_references": link_samples,
             "actual_substantive_sample_references": list(comparisons),
             "original_sparse_commentary_slots_skipped": sparse_original_commentary_slots,
             "unoccupied_stock_verses_silently_reintroduced": False,
