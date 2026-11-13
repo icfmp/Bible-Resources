@@ -192,6 +192,10 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
         self.assertEqual(report["original_internal_title_elements_found"], 1)
         self.assertEqual(report["exact_original_titles_in_copied_gui_text"], 1)
         self.assertEqual(report["original_internal_reference_elements_found"], 1)
+        self.assertEqual(report["original_stock_nontrivial_reference_labels_found"], 1)
+        self.assertEqual(report["source_reference_labels_observed_as_real_gui_HTML_anchors"], 1)
+        self.assertEqual(report["exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations"], 1)
+        self.assertEqual(report["exact_original_titles_in_copied_gui_rich_html"], 1)
         self.assertEqual(report["real_gui_rich_html_anchor_elements_found"], 1)
         self.assertFalse(report["xiphos_link_click_target_and_navigation_verified"])
         self.assertNotIn("The first creation", str(report))
@@ -206,6 +210,32 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
         self.assertEqual(report["original_internal_reference_elements_found"], 1)
         self.assertFalse(report["real_gui_rich_html_selection_available"])
         self.assertEqual(report["real_gui_rich_html_anchor_elements_found"], 0)
+        self.assertEqual(report["source_reference_labels_observed_as_real_gui_HTML_anchors"], 0)
+
+    def test_unrelated_webkit_anchor_does_not_certify_original_sword_reference(self):
+        from commentary_xiphos_dual_reader import _markup_display_witness
+        original=b'<reference osisRef="Gen.2.1">a real original reference label</reference>'
+        clipboard=b'<a href="about:blank">unrelated menu link</a>'
+        result=_markup_display_witness(original,b"unrelated menu link",clipboard)
+        self.assertEqual(result["original_stock_nontrivial_reference_labels_found"],1)
+        self.assertEqual(result["real_gui_rich_html_anchor_elements_found"],1)
+        self.assertEqual(result["source_reference_labels_observed_as_real_gui_HTML_anchors"],0)
+        self.assertEqual(result["exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations"],0)
+        self.assertFalse(result["xiphos_link_click_target_and_navigation_verified"])
+
+    def test_lookalike_reference_target_does_not_match_different_original_osisref(self):
+        from commentary_xiphos_dual_reader import _markup_display_witness
+        original=b'<reference osisRef="Gen.2.1">genuine Scripture source label</reference>'
+        webkit=b'<a href="sword://Bible/Gen.2.10">genuine Scripture source label</a>'
+        result=_markup_display_witness(original,b"genuine Scripture source label",webkit)
+        self.assertEqual(result["source_reference_labels_observed_as_real_gui_HTML_anchors"],1)
+        self.assertEqual(result["exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations"],0)
+        good=_markup_display_witness(
+            original,b"genuine Scripture source label",
+            b'<a href="sword://Bible/Gen.2.1">genuine Scripture source label</a>'
+        )
+        self.assertEqual(good["exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations"],1)
+        self.assertFalse(good["xiphos_link_click_target_and_navigation_verified"])
 
     def test_bounded_private_gui_markup_input_and_source_limits(self):
         from commentary_xiphos_dual_reader import _markup_display_witness
@@ -255,6 +285,76 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
                 _exact_native_commentary_raw(installed, "MHCC", "Gen 1:1", tool)
             with self.assertRaisesRegex(PilotError, "Unsafe"):
                 _exact_native_commentary_raw(installed, "MHCC", "Gen 0:0", tool)
+
+    @patch("commentary_xiphos_dual_reader.parse_native_raw_corpus")
+    @patch("commentary_xiphos_dual_reader.subprocess.Popen")
+    def test_private_full_stock_reference_discovery_preserves_corpus_identity(
+        self, popen, scan,
+    ):
+        from commentary_xiphos_dual_reader import _original_stock_reference_bearing_samples
+        from unittest.mock import MagicMock
+        from io import BytesIO
+        expected = "a" * 64
+        stream = MagicMock()
+        stream.stdout = BytesIO()
+        stream.wait.return_value = 0
+        stream.poll.return_value = 0
+        popen.return_value = stream
+
+        def scan_source(_stdout, *, on_entry):
+            on_entry(
+                "K", "Gen.1.1",
+                b'<title>Some original heading</title><reference osisRef="Gen.2.1">true source</reference>'
+            )
+            on_entry("K", "Ps.23.1",
+                     b'<reference osisRef="Ps.23.1">another true reference</reference>')
+            on_entry("K", "Matt.5.1", b"<title>No original link</title>")
+            return ({
+                "all_native_raw_entries_ordered_sha256": expected,
+                "all_actual_raw_entries_scanned": 29975,
+            }, [], [], [])
+
+        scan.side_effect = scan_source
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            binary = folder / "sword-inspector"
+            binary.write_bytes(b"binary")
+            result = _original_stock_reference_bearing_samples(
+                folder, "MHCC", binary, expected_corpus_sha256=expected
+            )
+        self.assertEqual(result["real_reference_bearing_original_native_samples"],
+                         ["Gen 1:1", "Ps 23:1"])
+        self.assertEqual(result["original_occupied_numbered_keys_with_reference_markup"], 2)
+        self.assertEqual(result["complete_native_original_stock_entries_checked"], 29975)
+        self.assertTrue(result["full_pinned_raw_corpus_sha256_reconfirmed"])
+        self.assertFalse(result["actual_link_click_and_target_verified_in_xiphos"])
+        self.assertFalse(result["original_authorial_reference_targets_exported"])
+
+    @patch("commentary_xiphos_dual_reader.parse_native_raw_corpus")
+    @patch("commentary_xiphos_dual_reader.subprocess.Popen")
+    def test_full_stock_digest_drift_fails_before_authorizing_source_link_samples(
+        self, popen, scan,
+    ):
+        from commentary_xiphos_dual_reader import _original_stock_reference_bearing_samples
+        from unittest.mock import MagicMock
+        from io import BytesIO
+        proc = MagicMock()
+        proc.stdout = BytesIO()
+        proc.wait.return_value = 0
+        proc.poll.return_value = 0
+        popen.return_value = proc
+        scan.return_value = ({
+            "all_native_raw_entries_ordered_sha256": "b"*64,
+            "all_actual_raw_entries_scanned": 29975,
+        }, [], [], [])
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            binary = folder / "real-inspector"
+            binary.write_bytes(b"placeholder")
+            with self.assertRaisesRegex(PilotError, "diverged"):
+                _original_stock_reference_bearing_samples(
+                    folder, "MHCC", binary, expected_corpus_sha256="a"*64
+                )
 
     def test_no_user_display_or_wayland_gui_capture(self):
         with self.assertRaisesRegex(PilotError, "Unsafe virtual"):

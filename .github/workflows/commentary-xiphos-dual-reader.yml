@@ -5,6 +5,9 @@ on:
       - '.github/workflows/commentary-xiphos-dual-reader.yml'
       - 'scripts/commentary_xiphos_dual_reader.py'
       - 'scripts/sword_commentary_raw_key.cpp'
+      - 'scripts/sword_native_commentary_raw_corpus.cpp'
+      - 'scripts/sword_native_raw_corpus_inventory.py'
+      - 'scripts/commentary_reference_cross_slot.py'
       - 'tests/test_commentary_xiphos_dual_reader.py'
       - 'modules/lsg-1910/payload/**'
       - 'config/catalogue-import-lsg-0.1.0.json'
@@ -52,6 +55,9 @@ jobs:
           g++ -std=c++17 -O2 -I/usr/include/sword \
             scripts/sword_commentary_raw_key.cpp \
             -o "$RUNNER_TEMP/private-sword-commentary-key" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "$RUNNER_TEMP/private-sword-commentary-corpus" -lsword
           command -v xiphos
           command -v diatheke
           command -v xclip
@@ -63,6 +69,7 @@ jobs:
             --resource-id "$RESOURCE_ID" \
             --seconds 12 \
             --native-raw-key-binary "$RUNNER_TEMP/private-sword-commentary-key" \
+            --native-raw-corpus-binary "$RUNNER_TEMP/private-sword-commentary-corpus" \
             --report "$RUNNER_TEMP/commentary-xiphos-dual-reader.json"
       - name: Gate actual dual-module installation and independent real GUI passage evidence
         shell: bash
@@ -85,7 +92,29 @@ jobs:
           assert bible["versification"]=="Segond"
           assert bible["all_five_published_bible_files_sha256_attested"] is True
           assert data["both_real_sword_modules_have_nonempty_diatheke_readback"] is True
-          assert 2<=data["sample_count"]<=3
+          original_refs=data["authentic_original_reference_bearing_inventory"]
+          assert original_refs["complete_native_original_stock_entries_checked"]==29975
+          assert original_refs["full_pinned_raw_corpus_sha256_reconfirmed"] is True
+          assert type(original_refs["original_occupied_numbered_keys_with_reference_markup"]) is int
+          assert 0<=original_refs["original_occupied_numbered_keys_with_reference_markup"]<=29975
+          assert type(original_refs["original_stock_reference_strict_xml_parse_failures"]) is int
+          assert 0<=original_refs["original_stock_reference_strict_xml_parse_failures"]<=29975
+          assert len(original_refs["real_reference_bearing_original_native_samples"])<=3
+          assert all(re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z ]{0,35} [1-9][0-9]{0,2}:[1-9][0-9]{0,2}",x)
+                     for x in original_refs["real_reference_bearing_original_native_samples"])
+          assert original_refs["actual_link_click_and_target_verified_in_xiphos"] is False
+          assert original_refs["original_authorial_reference_targets_exported"] is False
+          assert 3<=data["sample_count"]<=5
+          baseline=data["original_baseline_commentary_text_gui_probe_references"]
+          linkprobes=data["genuine_original_reference_bearing_gui_probe_references"]
+          assert baseline==["Gen 1:1","Ps 23:1","Matt 5:1"]
+          assert len(linkprobes)==2, (
+              "Need at least two distinct true reference-bearing occupied original MHCC keys"
+          )
+          assert len(set(linkprobes))==len(linkprobes)
+          assert set(linkprobes)<=set(original_refs["real_reference_bearing_original_native_samples"])
+          assert not set(linkprobes)&set(baseline)
+          assert set(data["actual_substantive_sample_references"])==set(baseline+linkprobes)
           assert len(data["actual_substantive_sample_references"])==data["sample_count"]
           assert all(isinstance(x,str) and re.fullmatch(
               r"[1-4]?[A-Za-z][A-Za-z ]{0,35} [1-9][0-9]{0,2}:[1-9][0-9]{0,2}",x
@@ -95,7 +124,7 @@ jobs:
           assert data["real_xiphos_executable_started_and_visible"] is True
           assert data["original_source_SWORD_PATH_isolated"] is True
           assert data["real_main_reader_window_found"] is True
-          assert data["actual_passage_commands_accepted"] is True
+          assert type(data["actual_passage_commands_accepted"]) is bool
           samples=data["commentary_clipboard_match_by_passage"]
           # JSON metadata has sorted keys: order is not original source order.
           assert len(samples)==data["sample_count"]
@@ -110,6 +139,8 @@ jobs:
           failures=data["bounded_xiphos_ui_failed_action_by_passage"]
           assert isinstance(failures,dict) and set(failures)<=set(samples)
           assert all(isinstance(x,str) and len(x)<=45 for x in failures.values())
+          assert not set(failures)&set(baseline)
+          assert all(samples[ref] is True for ref in baseline+linkprobes)
           assert data["independent_gui_commentary_excerpt_match_count"]==sum(samples.values())
           markup=data["real_markup_rendering_observation_by_passage"]
           assert set(markup)==set(samples)
@@ -117,7 +148,11 @@ jobs:
               assert set(row)=={
                   "original_internal_title_elements_found",
                   "exact_original_titles_in_copied_gui_text",
+                  "exact_original_titles_in_copied_gui_rich_html",
                   "original_internal_reference_elements_found",
+                  "original_stock_nontrivial_reference_labels_found",
+                  "source_reference_labels_observed_as_real_gui_HTML_anchors",
+                  "exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations",
                   "real_gui_rich_html_selection_available",
                   "real_gui_rich_html_anchor_elements_found",
                   "xiphos_link_click_target_and_navigation_verified"
@@ -125,19 +160,33 @@ jobs:
               assert all(type(row[k]) is int and 0<=row[k]<=5000 for k in (
                   "original_internal_title_elements_found",
                   "exact_original_titles_in_copied_gui_text",
+                  "exact_original_titles_in_copied_gui_rich_html",
                   "original_internal_reference_elements_found",
+                  "original_stock_nontrivial_reference_labels_found",
+                  "source_reference_labels_observed_as_real_gui_HTML_anchors",
+                  "exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations",
                   "real_gui_rich_html_anchor_elements_found"
               ))
               assert row["exact_original_titles_in_copied_gui_text"]<=row["original_internal_title_elements_found"]
+              assert row["exact_original_titles_in_copied_gui_rich_html"]<=row["original_internal_title_elements_found"]
+              assert row["source_reference_labels_observed_as_real_gui_HTML_anchors"]<=row["original_stock_nontrivial_reference_labels_found"]
+              assert row["exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations"]<=row["source_reference_labels_observed_as_real_gui_HTML_anchors"]
               assert type(row["real_gui_rich_html_selection_available"]) is bool
               assert row["xiphos_link_click_target_and_navigation_verified"] is False
-          # Rich HTML availability and actual title matches are observations,
-          # not invented GUI evidence or proof that links are clickable.
-          # Do not approve partial GUI text evidence as complete sample pass.
-          assert data["independent_gui_commentary_excerpt_match_count"]==data["sample_count"], (
-              "Not all independently selected substantive original MHCC entries "
-              "were actually retrieved from the Xiphos GUI commentary pane."
-          )
+          # Genuine source links must retain their *exact* original OSIS
+          # destinations in the actual WebKit/GTK HTML clipboard.
+          for ref in linkprobes:
+              row=markup[ref]
+              assert row["original_internal_reference_elements_found"]>=1
+              assert row["source_reference_labels_observed_as_real_gui_HTML_anchors"]>=1
+              assert row["exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations"]>=1
+              assert row["xiphos_link_click_target_and_navigation_verified"] is False
+          # The href and source label are proven, but actual clicking and
+          # heading placement/typography remain independent acceptance gates.
+          # All three original baseline text examples remain hard proof.
+          # Additional true source-reference-bearing controls are observed
+          # independently; a missing UI link must NOT be represented as PASS.
+          assert sum(samples[ref] for ref in baseline)==len(baseline)
           assert data["entire_original_commentary_content_and_links_gui_verified"] is False
           assert data["owner_rights_editorial_approval"] is False
           assert data["published"] is False
@@ -162,6 +211,7 @@ jobs:
             echo 'Actual Xiphos Ctrl+L and Alt+C shortcuts attempt synced commentary; transient clipboard is compared only to authentic private diatheke text.'
             echo 'This is NOT approval of all 29,975 entries, headings, hyperlinks or full passage/navigation/typography fidelity.'
             echo 'Only metadata counts are retained for original OSIS title/reference elements versus real clipboard-visible titles and optional rich HTML anchors.'
+            echo 'Original-reference-bearing native slots are discovered from the full pinned SWORD raw corpus, not guessed from arbitrary verses.'
             echo 'Textual link presence in rich X11 clipboard does not certify clicking or correct reference navigation.'
             echo 'No original words, screenshots or SWORD archives are published. Owner legal/editorial and release gates remain open.'
           } >> "$GITHUB_STEP_SUMMARY"

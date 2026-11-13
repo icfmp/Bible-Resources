@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 from html import unescape
 from html.parser import HTMLParser
+from urllib.parse import unquote
 from hashlib import sha256
 import json
 import os
@@ -28,6 +29,8 @@ import unicodedata
 from zipfile import ZipFile
 
 from commentary_intake import load_manifest
+from commentary_reference_cross_slot import actual_stock_osisref_targets
+from sword_native_raw_corpus_inventory import parse_native_raw_corpus, RawCorpusError
 from commentary_native_raw_inventory import _safe_stock_install
 from pilot_fetch import fetch
 from pilot_preflight import PilotError, inspect_archive
@@ -139,6 +142,92 @@ def _exact_native_commentary_raw(root: Path, module_id: str, ref: str,
     return completed.stdout
 
 
+def _original_stock_reference_bearing_samples(
+    root: Path, module_id: str, native_scanner: Path,
+    *, expected_corpus_sha256: str, max_samples: int = 3,
+) -> dict:
+    """Reuse the existing FULL native SWORD scanner for real reference cases.
+
+    This examines every occupied stock entry, chooses at most one actual
+    strict-XML scripture-link-bearing key per source book, and verifies the
+    entire native corpus digest again. No original XML/body/link target
+    is ever returned to the CI receipt.
+    """
+    if (root.is_symlink() or not root.is_dir()
+            or native_scanner.is_symlink() or not native_scanner.is_file()
+            or not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{1,39}", module_id)
+            or not SHA.fullmatch(expected_corpus_sha256)
+            or type(max_samples) is not int or not 1 <= max_samples <= 6):
+        raise PilotError("Unreviewed source reference scan context")
+    chosen = []
+    observed_books = set()
+    reference_bearing = 0
+    strict_source_reference_parse_failures = 0
+
+    def original_entry(kind: str, key: str, raw: bytes):
+        nonlocal reference_bearing, strict_source_reference_parse_failures
+        if kind != "K" or b"<reference" not in raw:
+            return
+        reference_bearing += 1
+        try:
+            original_targets = actual_stock_osisref_targets(raw)
+        except PilotError:
+            strict_source_reference_parse_failures += 1
+            return
+        if not original_targets or len(chosen) >= max_samples:
+            return
+        parts = key.split(".")
+        if len(parts) != 3:
+            return
+        book, chapter, verse = parts
+        if book in observed_books:
+            return
+        ref = f"{book} {chapter}:{verse}"
+        if not re.fullmatch(
+            r"[1-4]?[A-Za-z][A-Za-z ]{0,35} [1-9][0-9]{0,2}:[1-9][0-9]{0,2}", ref
+        ):
+            return
+        observed_books.add(book)
+        chosen.append(ref)
+
+    environment = dict(os.environ, SWORD_PATH=str(root))
+    process = None
+    try:
+        process = subprocess.Popen(
+            ["timeout", "300s", str(native_scanner), module_id],
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env=environment,
+        )
+        if process.stdout is None:
+            raise PilotError("Original native corpus stream unavailable")
+        inventory, _, _, _ = parse_native_raw_corpus(
+            process.stdout, on_entry=original_entry
+        )
+        process.stdout.close()
+        status = process.wait(timeout=15)
+        if (status != 0 or
+                inventory["all_native_raw_entries_ordered_sha256"] != expected_corpus_sha256):
+            raise PilotError("Original corpus inventory or full native SHA-256 diverged")
+    except (OSError, subprocess.TimeoutExpired, RawCorpusError) as exc:
+        raise PilotError("Private original source link inventory failed") from exc
+    finally:
+        if process is not None:
+            if process.poll() is None:
+                process.kill()
+                process.wait()
+            if process.stdout is not None:
+                process.stdout.close()
+    return {
+        "complete_native_original_stock_entries_checked": inventory["all_actual_raw_entries_scanned"],
+        "full_pinned_raw_corpus_sha256_reconfirmed": True,
+        "original_occupied_numbered_keys_with_reference_markup": reference_bearing,
+        "original_stock_reference_strict_xml_parse_failures":
+            strict_source_reference_parse_failures,
+        "real_reference_bearing_original_native_samples": chosen,
+        "actual_link_click_and_target_verified_in_xiphos": False,
+        "original_authorial_reference_targets_exported": False,
+    }
+
+
 def _normalized_words(raw: bytes) -> list[str]:
     """Text comparison only; no rewriting of either actual SWORD module."""
     value = unicodedata.normalize("NFKD", raw.decode("utf-8", errors="replace"))
@@ -177,6 +266,11 @@ def _long_commentary_excerpt_is_on_gui_clipboard(
 # No source heading, authorial phrase, reference label or target leaves CI.
 _TITLE_TAG = re.compile(r"<title(?:\s+[^>]*)?>(.*?)</title\s*>", re.I | re.S)
 _REFERENCE_TAG = re.compile(r"<reference(?:\s+[^>]*)?>", re.I | re.S)
+_REFERENCE_WITH_LABEL = re.compile(r"<reference(?:\s+[^>]*)?>(.*?)</reference\s*>", re.I | re.S)
+_REFERENCE_WITH_ATTRIBUTES = re.compile(
+    r"<reference\b([^>]*)>(.*?)</reference\s*>", re.I | re.S
+)
+_OSIS_REF_ATTRIBUTE = re.compile(r"\bosisRef\s*=\s*([\"'])(.*?)\1", re.I | re.S)
 
 
 class _BoundedMarkupScanner(HTMLParser):
@@ -184,16 +278,34 @@ class _BoundedMarkupScanner(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.link_count = 0
         self.text_chunks = []
+        self.anchor_labels = []
+        self.anchor_destinations = []
+        self._current_anchor = None
+        self._current_href = None
 
     def handle_starttag(self, tag, attrs):
-        if tag.casefold() == "a" and any(
-            key.casefold() == "href" and isinstance(value, str) and value.strip()
-            for key, value in attrs
-        ):
-            self.link_count += 1
+        if tag.casefold() == "a":
+            href = next((
+                value for key, value in attrs
+                if key.casefold() == "href" and isinstance(value, str) and value.strip()
+            ), None)
+            if href is not None:
+                self.link_count += 1
+                self._current_anchor = []
+                self._current_href = href
+
+    def handle_endtag(self, tag):
+        if tag.casefold() == "a" and self._current_anchor is not None:
+            label = " ".join("".join(self._current_anchor).split())
+            self.anchor_labels.append(label)
+            self.anchor_destinations.append((label, self._current_href))
+            self._current_anchor = None
+            self._current_href = None
 
     def handle_data(self, data):
         self.text_chunks.append(data)
+        if self._current_anchor is not None:
+            self._current_anchor.append(data)
 
 
 def _markup_display_witness(internal: bytes, rendered_plain: bytes,
@@ -216,16 +328,66 @@ def _markup_display_witness(internal: bytes, rendered_plain: bytes,
     visible = " ".join(copied.split())
     exact_titles = sum(1 for value in extracted_titles if value in visible)
     rich_link_count = 0
+    actual_anchor_labels = set()
+    actual_anchor_destinations = []
+    actual_html_text = ""
     if rendered_html:
         parser = _BoundedMarkupScanner()
         parser.feed(rendered_html.decode("utf-8", errors="replace"))
         rich_link_count = min(parser.link_count, 5000)
+        actual_anchor_labels = set(parser.anchor_labels)
+        actual_anchor_destinations = parser.anchor_destinations
+        actual_html_text = " ".join("".join(parser.text_chunks).split())
+    source_reference_labels = []
+    for value in _REFERENCE_WITH_LABEL.findall(original)[:256]:
+        parser = _BoundedMarkupScanner()
+        parser.feed(unescape(value))
+        label = " ".join("".join(parser.text_chunks).split())
+        if len(label) >= 5:
+            source_reference_labels.append(label)
+    # A semantic match only proves the *original hyperlink label* was copied
+    # as an actual HTML anchor; its OSIS target and click navigation are not
+    # independently verified by the clipboard.
+    matched_anchor_labels = sum(
+        1 for label in source_reference_labels if label in actual_anchor_labels
+    )
+    exact_source_target_hrefs = 0
+    for attrs, raw_label in _REFERENCE_WITH_ATTRIBUTES.findall(original)[:256]:
+        osis = _OSIS_REF_ATTRIBUTE.search(attrs)
+        if not osis:
+            continue
+        raw_target = unescape(osis.group(2)).strip()
+        if raw_target.startswith("Bible:"):
+            raw_target = raw_target[len("Bible:"):]
+        if not 3 <= len(raw_target) <= 160:
+            continue
+        parser = _BoundedMarkupScanner()
+        parser.feed(unescape(raw_label))
+        label = " ".join("".join(parser.text_chunks).split())
+        if len(label) < 5:
+            continue
+        for rendered_label, href in actual_anchor_destinations:
+            uri = unquote(unescape(href)).casefold()
+            if (rendered_label == label and re.search(
+                r"(?<![a-z0-9])" + re.escape(raw_target.casefold()) + r"(?![a-z0-9])",
+                uri,
+            )):
+                exact_source_target_hrefs += 1
+                break
     return {
         "original_internal_title_elements_found": len(extracted_titles),
         "exact_original_titles_in_copied_gui_text": exact_titles,
+        "exact_original_titles_in_copied_gui_rich_html": sum(
+            1 for value in extracted_titles if value in actual_html_text
+        ),
         "original_internal_reference_elements_found": min(
             len(_REFERENCE_TAG.findall(original)), 5000
         ),
+        "original_stock_nontrivial_reference_labels_found": len(source_reference_labels),
+        "source_reference_labels_observed_as_real_gui_HTML_anchors":
+            matched_anchor_labels,
+        "exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations":
+            exact_source_target_hrefs,
         "real_gui_rich_html_selection_available": bool(rendered_html),
         "real_gui_rich_html_anchor_elements_found": rich_link_count,
         "xiphos_link_click_target_and_navigation_verified": False,
@@ -507,6 +669,7 @@ def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int) -> 
 
 def observe_dual_module_reader(resource_id: str = "mhcc-crosswire",
                                *, native_raw_key_binary: Path,
+                               native_raw_corpus_binary: Path,
                                seconds: int = 12) -> dict:
     manifest = load_manifest(resource_id)
     if (manifest["rights"]["status"] != "research_only"
@@ -538,6 +701,10 @@ def observe_dual_module_reader(resource_id: str = "mhcc-crosswire",
         installed = temp / "sword-library"
         _safe_stock_install(archive, inspection["members"], installed)
         bible = verify_and_install_reviewed_bible(installed)
+        source_reference_cases = _original_stock_reference_bearing_samples(
+            installed, manifest["module_id"], native_raw_corpus_binary,
+            expected_corpus_sha256=manifest["native_raw_corpus_sha256"],
+        )
         comparisons = {}
         sparse_original_commentary_slots = []
         for passage in _candidate_passages(manifest):
@@ -574,6 +741,32 @@ def observe_dual_module_reader(resource_id: str = "mhcc-crosswire",
                 "Fewer than two independently occupied original commentary keys "
                 "also navigable in the reviewed Bible"
             )
+        baseline = list(comparisons)
+        link_samples = []
+        for passage in source_reference_cases["real_reference_bearing_original_native_samples"]:
+            if passage in comparisons:
+                continue
+            code, original = query(
+                manifest["module_id"], passage, fmt="plain", root=installed,
+                exe="diatheke", limit=256 * 1024, timeout=30,
+            )
+            if code != 0 or not present_key(passage, original, code) or len(original) <= 64:
+                continue
+            bible_code, text = query(
+                BIBLE_MODULE, passage, fmt="plain", root=installed,
+                exe="diatheke", limit=256 * 1024, timeout=30,
+            )
+            if bible_code != 0 or not present_key(passage, text, bible_code) or len(text) <= 16:
+                continue
+            comparisons[passage] = {
+                "commentary": original, "bible": text,
+                "commentary_internal": _exact_native_commentary_raw(
+                    installed, manifest["module_id"], passage, native_raw_key_binary
+                ),
+            }
+            link_samples.append(passage)
+            if len(link_samples) >= 2:
+                break
         observed = _run_real_gui(installed, comparisons, seconds=seconds)
         return {
             "schema_version": 1,
@@ -583,8 +776,11 @@ def observe_dual_module_reader(resource_id: str = "mhcc-crosswire",
             "exact_original_commentary_conf_sha256": sha256(metadata).hexdigest(),
             "original_module_id": manifest["module_id"],
             "installed_reviewed_bible": bible,
+            "authentic_original_reference_bearing_inventory": source_reference_cases,
             "both_real_sword_modules_have_nonempty_diatheke_readback": True,
             "sample_count": len(comparisons),
+            "original_baseline_commentary_text_gui_probe_references": baseline,
+            "genuine_original_reference_bearing_gui_probe_references": link_samples,
             "actual_substantive_sample_references": list(comparisons),
             "original_sparse_commentary_slots_skipped": sparse_original_commentary_slots,
             "unoccupied_stock_verses_silently_reintroduced": False,
@@ -602,12 +798,15 @@ def main() -> int:
     p.add_argument("--resource-id", default="mhcc-crosswire")
     p.add_argument("--seconds", type=int, default=12)
     p.add_argument("--native-raw-key-binary", type=Path, required=True)
+    p.add_argument("--native-raw-corpus-binary", type=Path, required=True)
     p.add_argument("--report", type=Path, required=True)
     args = p.parse_args()
     if args.report.exists() or args.report.is_symlink() or not args.report.parent.is_dir():
         raise PilotError("Unsafe or preexisting Xiphos receipt path")
     result = observe_dual_module_reader(
-        args.resource_id, native_raw_key_binary=args.native_raw_key_binary,
+        args.resource_id,
+        native_raw_key_binary=args.native_raw_key_binary,
+        native_raw_corpus_binary=args.native_raw_corpus_binary,
         seconds=args.seconds,
     )
     args.report.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n",
