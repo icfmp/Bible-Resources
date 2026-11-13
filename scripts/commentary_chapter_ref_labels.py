@@ -86,8 +86,19 @@ def link_label_location(source_links: list[dict], raw: bytes) -> dict:
         raise PilotError("Original source scripture-reference label count incomplete")
     nonempty_source_targets = Counter(t for t in source_targets if t)
     nonempty_stock_targets = Counter(t for t in stock_targets if t)
-    exact_target_occurrences = sum(
-        (nonempty_source_targets & nonempty_stock_targets).values()
+    exact_shared = nonempty_source_targets & nonempty_stock_targets
+    exact_target_occurrences = sum(exact_shared.values())
+    remaining_source = nonempty_source_targets - exact_shared
+    remaining_stock = nonempty_stock_targets - exact_shared
+    # An explicitly work-qualified original target may differ only by
+    # CrossWire's target display grammar. Do NOT rewrite either value.
+    # This diagnostic requires literal Bible: and literal remaining target.
+    source_without_literal_bible_work_prefix = Counter()
+    for target, count in remaining_source.items():
+        if target.startswith("Bible:") and len(target) > len("Bible:"):
+            source_without_literal_bible_work_prefix[target[len("Bible:"):]] += count
+    work_qualifier_only_occurrences = sum(
+        (source_without_literal_bible_work_prefix & remaining_stock).values()
     )
     return {
         "original_scripRef_label_count": len(source_links),
@@ -102,6 +113,9 @@ def link_label_location(source_links: list[dict], raw: bytes) -> dict:
         ),
         "original_scripRef_osisRef_targets_exact_value_multiset_matches_in_stock":
             exact_target_occurrences,
+        "original_scripRef_osisRef_work_qualifier_only_matches_in_stock":
+            work_qualifier_only_occurrences,
+        "work_qualifier_only_matching_does_not_authorize_target_normalization": True,
         "source_and_selected_stock_reference_targets_exact_ordered_match": (
             bool(source_targets)
             and len(source_targets) == len(stock_targets)
