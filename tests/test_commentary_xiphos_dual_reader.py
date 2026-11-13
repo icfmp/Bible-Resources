@@ -143,17 +143,17 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
     @patch("commentary_xiphos_dual_reader._x11")
     def test_commentary_focus_targets_bound_to_real_private_main_window(self, command):
         from commentary_xiphos_dual_reader import _commentary_pane_focus_points
-        command.return_value=b"X=40\\nY=20\\nWIDTH=1200\\nHEIGHT=740\\n".replace(b"\\n",b"\n")
-        points=_commentary_pane_focus_points({"DISPLAY":":91"}, "101")
-        self.assertEqual(len(points),2)
-        for x,y in points:
-            self.assertGreater(x,700)
-            self.assertLess(x,1280)
-            self.assertGreater(y,200)
-            self.assertLess(y,800)
-        command.return_value=b"X=0\nY=0\nWIDTH=200\nHEIGHT=100\n"
-        with self.assertRaisesRegex(PilotError,"outside reviewed"):
-            _commentary_pane_focus_points({"DISPLAY":":91"}, "101")
+        command.return_value = b"X=40\nY=20\nWIDTH=1200\nHEIGHT=740\n"
+        points = _commentary_pane_focus_points({"DISPLAY": ":91"}, "101")
+        self.assertEqual(len(points), 2)
+        for x, y in points:
+            self.assertGreater(x, 700)
+            self.assertLess(x, 1280)
+            self.assertGreater(y, 200)
+            self.assertLess(y, 800)
+        command.return_value = b"X=0\nY=0\nWIDTH=200\nHEIGHT=100\n"
+        with self.assertRaisesRegex(PilotError, "outside reviewed"):
+            _commentary_pane_focus_points({"DISPLAY": ":91"}, "101")
 
     def test_no_user_display_or_wayland_gui_capture(self):
         with self.assertRaisesRegex(PilotError, "Unsafe virtual"):
