@@ -104,6 +104,7 @@ class PrivateCandidateRealXiphosTests(unittest.TestCase):
             with patch("commentary_private_candidate_xiphos_gui.make_private_candidate") as candidate, \
                  patch("commentary_private_candidate_xiphos_gui.verify_and_install_reviewed_bible") as bible, \
                  patch("commentary_private_candidate_xiphos_gui._original_stock_reference_bearing_samples") as refs, \
+                 patch("commentary_private_candidate_xiphos_gui.pinned_source_intro_witness", return_value={}) as intros, \
                  patch("commentary_private_candidate_xiphos_gui.prepare_original_and_candidate_gui_samples") as samples, \
                  patch("commentary_private_candidate_xiphos_gui._run_real_gui") as gui:
                 bible.return_value = expected["installed_reviewed_bible"]
@@ -150,6 +151,7 @@ class PrivateCandidateRealXiphosTests(unittest.TestCase):
                 )
                 self.assertEqual(outcome["independent_private_candidate_gui_receipt"]["selected_private_commentary_module_id"], PRIVATE_ID)
                 self.assertEqual(gui.call_args.kwargs["commentary_module_id"], PRIVATE_ID)
+                self.assertTrue(callable(gui.call_args.kwargs["on_gui_ready"]))
 
 
 if __name__ == "__main__":
