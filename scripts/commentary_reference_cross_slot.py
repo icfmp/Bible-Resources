@@ -14,6 +14,7 @@ import re
 from lxml import etree
 
 from pilot_preflight import PilotError
+from commentary_chapter_ref_labels import link_label_location
 
 MAX_NATIVE_STOCK_KEYS = 45000
 MAX_XML_BYTES = 2 * 1024 * 1024
@@ -66,6 +67,30 @@ def _private_target_counts(links: list[dict], stock_targets: list[str]):
                 if orig_remaining[source_target] == 0:
                     del orig_remaining[source_target]
     return orig_remaining, stock_remaining, sum(exact.values()), sum(work.values())
+
+
+def original_link_target_match_statuses(links: list[dict], stock_targets: list[str]) -> list[str]:
+    """Pair original occurrence targets exact first, then literal Bible: only.
+
+    The statuses are diagnostic labels, never source or stock modifications.
+    """
+    available = Counter(stock_targets)
+    statuses = ["unpaired_original_target"] * len(links)
+    for i, link in enumerate(links):
+        target = link["private_original_osisRef_target"]
+        if available[target] > 0:
+            statuses[i] = "raw_target_exact_match"
+            available[target] -= 1
+    for i, link in enumerate(links):
+        if statuses[i] != "unpaired_original_target":
+            continue
+        target = link["private_original_osisRef_target"]
+        if target.startswith("Bible:") and len(target) > len("Bible:"):
+            unqualified = target[len("Bible:"):]
+            if available[unqualified] > 0:
+                statuses[i] = "literal_Bible_work_prefix_only_match"
+                available[unqualified] -= 1
+    return statuses
 
 
 class ReferenceCrossSlotTopology:
