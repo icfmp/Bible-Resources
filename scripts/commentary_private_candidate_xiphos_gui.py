@@ -26,6 +26,7 @@ from commentary_xiphos_heading_probe import (
     pinned_source_intro_witness,
     probe_real_xiphos_commentary_heading_menu,
 )
+from commentary_xiphos_link_click import probe_real_original_osisref_click
 from pilot_preflight import PilotError
 
 PRIVATE_ID = "BRMHCCReview"
@@ -104,6 +105,11 @@ def private_candidate_xiphos_review(
             candidate_root, comparisons, seconds=seconds,
             commentary_module_id=PRIVATE_ID,
             on_gui_ready=lambda env: {
+                "real_Xiphos_commentary_original_osisref_mouse_click":
+                probe_real_original_osisref_click(
+                    env, comparisons, links,
+                    installed_sword_root=candidate_root,
+                ),
                 "real_Xiphos_commentary_book_chapter_heading_context_menu":
                 probe_real_xiphos_commentary_heading_menu(
                     env, authentic_intros,
