@@ -72,6 +72,7 @@ jobs:
           Path('darby-division-overlay-shapes.json').write_text(json.dumps(report,sort_keys=True,indent=2))
           print('Research-only reviewed source marker conversion categories:',report['converted_markers_by_kind'])
           print('Protected literal marks remain:',report['protected_unchanged_marker_counts'])
+          print('Unconverted leading references:',report['bounded_unconverted_leading_marker_refs'])
           print('No original or corrected OSIS source is uploaded; no compiled SWORD published')
           PY
       - name: Upload safe shape-only evidence (no Scripture/module/source)
