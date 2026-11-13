@@ -150,6 +150,7 @@ jobs:
                   "original_internal_reference_elements_found",
                   "original_stock_nontrivial_reference_labels_found",
                   "source_reference_labels_observed_as_real_gui_HTML_anchors",
+                  "exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations",
                   "real_gui_rich_html_selection_available",
                   "real_gui_rich_html_anchor_elements_found",
                   "xiphos_link_click_target_and_navigation_verified"
@@ -161,11 +162,13 @@ jobs:
                   "original_internal_reference_elements_found",
                   "original_stock_nontrivial_reference_labels_found",
                   "source_reference_labels_observed_as_real_gui_HTML_anchors",
+                  "exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations",
                   "real_gui_rich_html_anchor_elements_found"
               ))
               assert row["exact_original_titles_in_copied_gui_text"]<=row["original_internal_title_elements_found"]
               assert row["exact_original_titles_in_copied_gui_rich_html"]<=row["original_internal_title_elements_found"]
               assert row["source_reference_labels_observed_as_real_gui_HTML_anchors"]<=row["original_stock_nontrivial_reference_labels_found"]
+              assert row["exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations"]<=row["source_reference_labels_observed_as_real_gui_HTML_anchors"]
               assert type(row["real_gui_rich_html_selection_available"]) is bool
               assert row["xiphos_link_click_target_and_navigation_verified"] is False
           # Rich HTML availability and actual title matches are observations,
