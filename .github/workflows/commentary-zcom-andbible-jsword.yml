@@ -70,6 +70,9 @@ jobs:
           g++ -std=c++17 -O2 -I/usr/include/sword \
             scripts/sword_native_commentary_raw_corpus.cpp \
             -o "$RUNNER_TEMP/commentary-andbible-raw-reader" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_commentary_raw_key.cpp \
+            -o "$RUNNER_TEMP/commentary-andbible-raw-key-reader" -lsword
       - name: Verify full exact original zCom and independent AndBible JSword decoding
         shell: bash
         run: |
@@ -78,6 +81,7 @@ jobs:
             --resource-id "$RESOURCE_ID" \
             --jsword "$RUNNER_TEMP/andbible-pinned-jsword" \
             --native-raw-binary "$RUNNER_TEMP/commentary-andbible-raw-reader" \
+            --native-raw-key-binary "$RUNNER_TEMP/commentary-andbible-raw-key-reader" \
             --reader "$(command -v diatheke)" \
             --report "$RUNNER_TEMP/commentary-andbible-jsword-private-proof.json"
       - name: Accept only authenticated original Java engine scope (not Android UI)
@@ -100,14 +104,17 @@ jobs:
           assert len(result["real_diatheke_original_output_sha256"])==result["real_diatheke_substantial_samples"]
           assert all(re.fullmatch(r"[a-f0-9]{64}",x) for x in result["real_diatheke_original_output_sha256"])
           assert result["pinned_AndBible_JSword_commit"]=="6ebd10a005fa7761e611c048ececea1430e22546"
-          assert (result["jsword_test_count"],result["jsword_errors"],result["jsword_failures"],result["jsword_skipped"])==(3,0,0,0)
+          assert (result["jsword_test_count"],result["jsword_errors"],result["jsword_failures"],result["jsword_skipped"])==(4,0,0,0)
+          assert result["original_link_bearing_native_entries_tested_in_JSword"]==2
+          assert 2<=result["original_source_osisRef_target_count_verified_in_JSword"]<=512
+          assert result["original_osisRef_values_or_original_link_labels_exported"] is False
           assert result["test_log_or_original_prose_uploaded"] is False
           assert result["original_sword_module_mutated"] is False
           assert result["andbible_android_app_installed_or_gui_tested"] is False
           assert result["xiphos_commentary_content_gui_verified"] is False
           assert result["rights_and_editorial_owner_approved"] is False
           assert result["published"] is False
-          print("Original zCom loaded/read in AndBible-stable JSword; Android GUI/rights/release not approved")
+          print("Original zCom and SHA-attested OSIS references independently decoded by stable JSword; Android GUI/rights/release not approved")
           PY
       - name: Upload private metadata only; never source text, module or build log
         uses: actions/upload-artifact@v4
