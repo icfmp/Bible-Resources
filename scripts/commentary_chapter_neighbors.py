@@ -65,11 +65,26 @@ def original_chapter_neighbors(xml_bytes: bytes) -> tuple[dict, dict]:
         ref_bytes = original_ref.encode("utf-8")
         ordered.update(len(ref_bytes).to_bytes(4, "big") + ref_bytes)
         ordered.update(tag.encode("ascii") + b"\0" + sha256(original_bytes).digest())
+        original_direct_child_tags = Counter(
+            child.tag.rsplit("}", 1)[-1] for child in sibling
+            if isinstance(child.tag, str)
+        )
+        next_node = sibling.getnext()
+        next_tag = (next_node.tag.rsplit("}", 1)[-1]
+                    if next_node is not None and isinstance(next_node.tag, str)
+                    else "_none")
+        parent_node = sibling.getparent()
+        parent_tag = (parent_node.tag.rsplit("}", 1)[-1]
+                      if parent_node is not None and isinstance(parent_node.tag, str)
+                      else "_none")
         observed.setdefault(key, []).append({
             "tag": tag, "text": body,
             "source_line": node.sourceline,
             "source_reference_sha256": sha256(ref_bytes).hexdigest(),
             "source_sibling_sha256": sha256(original_bytes).hexdigest(),
+            "source_sibling_direct_child_tag_counts": dict(sorted(original_direct_child_tags.items())),
+            "source_sibling_next_tag": next_tag,
+            "source_sibling_parent_tag": parent_tag,
         })
         tag_counts[tag] += 1
     return observed, {
