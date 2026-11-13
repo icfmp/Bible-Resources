@@ -194,37 +194,48 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
                 "commentary_clipboard_match_by_passage": {
                     key: False for key in comparisons
                 },
+                "bounded_xiphos_ui_failed_action_by_passage": {
+                    key: "main_window_not_found" for key in comparisons
+                },
                 "independent_gui_commentary_excerpt_match_count": 0}
     result = {}
+    failures = {}
     accepted = True
     for ref, originals in comparisons.items():
+        stage = "focus_main_window"
         try:
             _x11(["xdotool", "windowfocus", "--sync", window], env)
-            for command in (
-                ["xdotool", "key", "--clearmodifiers", "ctrl+l"],
-                ["xdotool", "type", "--clearmodifiers", "--delay", "25", ref],
-                ["xdotool", "key", "Return"],
-                ["xdotool", "key", "--clearmodifiers", "alt+c"],
+            for action, command in (
+                ("select_reference", ["xdotool", "key", "--clearmodifiers", "ctrl+l"]),
+                ("enter_reference", ["xdotool", "type", "--clearmodifiers", "--delay", "25", ref]),
+                ("open_reference", ["xdotool", "key", "Return"]),
+                ("raise_commentary_pane", ["xdotool", "key", "--clearmodifiers", "alt+c"]),
             ):
+                stage = action
                 _x11(command, env)
             time.sleep(2)
-            # Replace prior clipboard content before copying to ensure that
-            # stale text from an earlier chapter cannot produce a false PASS.
+            # Clear the old X11 selection to avoid stale-passage false PASS.
+            stage = "clear_prior_clipboard"
             _x11(["xclip", "-selection", "clipboard", "-i"], env, input_bytes=b"")
+            stage = "select_commentary_text"
             _x11(["xdotool", "key", "--clearmodifiers", "ctrl+a"], env)
+            stage = "copy_commentary_text"
             _x11(["xdotool", "key", "--clearmodifiers", "ctrl+c"], env)
             time.sleep(1)
+            stage = "read_commentary_clipboard"
             selected = _x11(["xclip", "-selection", "clipboard", "-o"], env)
             result[ref] = _long_commentary_excerpt_is_on_gui_clipboard(
                 originals["commentary"], originals["bible"], selected
             )
         except PilotError:
             accepted = False
+            failures[ref] = stage
             result[ref] = False
     return {
         "real_main_reader_window_found": True,
         "actual_passage_commands_accepted": accepted,
         "commentary_clipboard_match_by_passage": result,
+        "bounded_xiphos_ui_failed_action_by_passage": failures,
         "independent_gui_commentary_excerpt_match_count": sum(result.values()),
     }
 
