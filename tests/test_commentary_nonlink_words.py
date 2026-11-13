@@ -85,6 +85,10 @@ class CommentaryOriginalOutsideLinkWordsTests(unittest.TestCase):
             "plain_word_order_or_selection_requires_editorial_review":1,
         })
         self.assertEqual(len(d["bounded_plain_word_nontrivial_differences_line_and_hash_cases"]),1)
+        self.assertEqual(d["original_prose_outside_link_relations_by_compiled_reference_markup"],{
+            "stock_has_reference":{"same_ordered_case_sensitive_unicode_plain_words":1},
+            "stock_no_reference":{"plain_word_order_or_selection_requires_editorial_review":1},
+        })
         self.assertNotIn("changed label",json.dumps(d))
         self.assertNotIn("Original different",json.dumps(d))
 
