@@ -30,6 +30,7 @@ from commentary_chapter_p_boundaries import ChapterParagraphBoundaryProbe
 from commentary_reference_cross_slot import ReferenceCrossSlotTopology
 from commentary_prose_cross_slot import OriginalProseAlternativeNativeSlotProbe
 from commentary_source_native_boundaries import original_marker_boundary, NativeRawRunBoundaryInventory
+from commentary_shared_raw_source_units import inspect_shared_original_units_in_native_runs
 from commentary_intake import load_manifest
 from commentary_text_delta import punctuation_relationship, word_relationship, nonword_symbol_excess
 from commentary_unresolved_lexical_triage import (
@@ -90,6 +91,18 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
             recover=False,huge_tree=False,remove_blank_text=False))
     except (ValueError,etree.XMLSyntaxError):
         raise PilotError("Invalid complete original XML; cannot form commentary units") from None
+    # Map actual document-order top-level ThML commentary divisions, not
+    # a guessed OSIS book or a marker's biblical reference value. A marker
+    # sharing a verse anchor with another marker in a DIFFERENT original div1
+    # must not be treated as the same authorial section.
+    original_div1_nodes=[
+        n for n in root.iter()
+        if isinstance(n.tag,str) and n.tag.rsplit("}",1)[-1]=="div1"
+    ]
+    original_div1_order={n:i+1 for i,n in enumerate(original_div1_nodes)}
+    if (len(original_div1_order)!=len(original_div1_nodes)
+            or len(original_div1_nodes)!=whole["element_counts"].get("div1",0)):
+        raise PilotError("Original document-order ThML div1 inventory differs from whole XML scan")
     sources={}
     counts=Counter()
     original_map_digest=sha256()
@@ -104,6 +117,11 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
         match=WORK_REF.fullmatch(original_ref)
         if not match:
             raise PilotError("Previously reviewed original annotation is no longer qualified")
+        source_div1=next((ancestor for ancestor in node.iterancestors()
+                          if ancestor in original_div1_order),None)
+        if source_div1 is None:
+            raise PilotError("Original scripture annotation has no verifiable enclosing ThML div1")
+        source_div1_ordinal=original_div1_order[source_div1]
         source_endpoints=match.group(2).split("-",1)
         start=source_endpoints[0]
         original_declared_end=source_endpoints[-1]
@@ -128,6 +146,8 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
             "original_source_line":node.sourceline,
             "original_full_reference_sha256":sha256(full_ref_bytes).hexdigest(),
             "private_original_declared_range_end_key":original_declared_end,
+            "private_original_enclosing_div1_document_ordinal":source_div1_ordinal,
+            "private_original_total_div1_in_document":len(original_div1_nodes),
             "original_text":txt,
             "original_text_sha256":sha256(text_bytes).hexdigest(),
             "original_characters":len(txt),
@@ -678,10 +698,18 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
                 raise PilotError("Original second native prose scan omitted occupied keys")
         if large_plain_cases:
             boundary_case_report=native_run_boundaries.report(source,large_plain_cases)
+            complete_shared_run_sources=inspect_shared_original_units_in_native_runs(
+                source,native_run_boundaries,matches,large_plain_cases
+            )
         else:
             boundary_case_report={
                 "source_marker_case_count":0,
                 "no_original_large_prose_cases_to_check":True,
+            }
+            complete_shared_run_sources={
+                "multi_original_source_start_same_native_raw_run_groups":0,
+                "full_authentic_original_source_units_in_those_runs":0,
+                "no_large_original_prose_cases_to_inspect":True,
             }
         chapter_analysis=compare_chapter_neighbors(
             chapter_neighbors,chapter_intros,raw_as_strict_xml_text
@@ -712,6 +740,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         "source_nonlink_prose_review_stock_raw_duplicate_topology":plain_payload_topology,
         "source_large_nonlink_prose_native_alternative_locations":alternative_prose,
         "source_large_prose_marker_to_native_raw_run_boundary_diagnostics":boundary_case_report,
+        "source_complete_original_units_within_shared_stock_raw_K_runs":complete_shared_run_sources,
         "source_original_chapter_neighbor_evidence":chapter_proof,
         "source_chapter_neighbor_to_stock_intro_diagnostics":chapter_analysis,
         "source_chapter_neighbor_to_same_chapter_numbered_location":chapter_numbered_location,
