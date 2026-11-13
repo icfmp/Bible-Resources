@@ -1,0 +1,128 @@
+name: Verify exact original commentary zCom in AndBible stable JSword (not Android GUI)
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/commentary-zcom-andbible-jsword.yml'
+      - 'scripts/commentary_andbible_jsword.py'
+      - 'tests/test_commentary_andbible_jsword.py'
+      - 'tests/java/org/icfmp/research/CommentaryAndBibleJSwordProbeTest.java'
+      - 'config/commentary-intake/**'
+      - 'scripts/commentary_stock_candidate.py'
+  workflow_dispatch:
+    inputs:
+      resource_id:
+        description: SHA-pinned stock zCom commentary research manifest
+        required: true
+        type: string
+        default: mhcc-crosswire
+
+permissions:
+  contents: read
+
+concurrency:
+  group: commentary-andbible-jsword-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  original-commentary-andbible-jsword:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 28
+    env:
+      RESOURCE_ID: ${{ github.event.inputs.resource_id || 'mhcc-crosswire' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+      - name: Install Python dependencies and test fail-closed evidence parsing
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          python -m unittest discover -s tests -p 'test_commentary_andbible_jsword.py' -v
+      - name: Acquire exact pinned JSword source used by stable AndBible
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --quiet --filter=blob:none --no-checkout \
+            https://github.com/AndBible/jsword.git \
+            "$RUNNER_TEMP/andbible-pinned-jsword"
+          git -C "$RUNNER_TEMP/andbible-pinned-jsword" fetch --quiet --depth=1 origin \
+            6ebd10a005fa7761e611c048ececea1430e22546
+          git -C "$RUNNER_TEMP/andbible-pinned-jsword" checkout --quiet --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/andbible-pinned-jsword" rev-parse HEAD)" = \
+            6ebd10a005fa7761e611c048ececea1430e22546
+          test -f "$RUNNER_TEMP/andbible-pinned-jsword/build.gradle.kts"
+      - name: Install independent native SWORD scanner and real diatheke
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          timeout 150s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y \
+            libsword-dev diatheke
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "$RUNNER_TEMP/commentary-andbible-raw-reader" -lsword
+      - name: Verify full exact original zCom and independent AndBible JSword decoding
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_andbible_jsword.py \
+            --resource-id "$RESOURCE_ID" \
+            --jsword "$RUNNER_TEMP/andbible-pinned-jsword" \
+            --native-raw-binary "$RUNNER_TEMP/commentary-andbible-raw-reader" \
+            --reader "$(command -v diatheke)" \
+            --report "$RUNNER_TEMP/commentary-andbible-jsword-private-proof.json"
+      - name: Accept only authenticated original Java engine scope (not Android UI)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,re
+          from pathlib import Path
+          result=json.loads((Path(os.environ["RUNNER_TEMP"])/"commentary-andbible-jsword-private-proof.json").read_text())
+          manifest=json.loads((Path("config/commentary-intake")/(os.environ["RESOURCE_ID"]+".json")).read_text())
+          assert result["status"]=="pinned_original_zCom_andbible_stable_jsword_engine_samples_pass"
+          assert result["resource_id"]==manifest["resource_id"]
+          assert result["module_id"]==manifest["module_id"]
+          assert result["original_archive_sha256"]==manifest["archive_sha256"]
+          assert result["original_conf_sha256"]==manifest["stock_conf_sha256"]
+          assert result["all_original_native_raw_sha256"]==manifest["native_raw_corpus_sha256"]
+          assert result["all_native_keys_independently_read"]==result["native_numbered_keys"]+result["native_intro_keys"]+result["native_opaque_top_keys"]
+          assert 2<=result["real_diatheke_substantial_samples"]<=20
+          assert len(result["real_diatheke_original_output_sha256"])==result["real_diatheke_substantial_samples"]
+          assert all(re.fullmatch(r"[a-f0-9]{64}",x) for x in result["real_diatheke_original_output_sha256"])
+          assert result["pinned_AndBible_JSword_commit"]=="6ebd10a005fa7761e611c048ececea1430e22546"
+          assert (result["jsword_test_count"],result["jsword_errors"],result["jsword_failures"],result["jsword_skipped"])==(3,0,0,0)
+          assert result["test_log_or_original_prose_uploaded"] is False
+          assert result["original_sword_module_mutated"] is False
+          assert result["andbible_android_app_installed_or_gui_tested"] is False
+          assert result["xiphos_commentary_content_gui_verified"] is False
+          assert result["rights_and_editorial_owner_approved"] is False
+          assert result["published"] is False
+          print("Original zCom loaded/read in AndBible-stable JSword; Android GUI/rights/release not approved")
+          PY
+      - name: Upload private metadata only; never source text, module or build log
+        uses: actions/upload-artifact@v4
+        with:
+          name: commentary-andbible-jsword-metadata-${{ github.run_id }}
+          path: ${{ runner.temp }}/commentary-andbible-jsword-private-proof.json
+          retention-days: 30
+          if-no-files-found: error
+      - name: Explicit stage-6 scope
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo 'Engine-only test uses the exact JSword commit from stable AndBible production-1117.'
+            echo 'It independently checks real CrossWire zCom commentary entries using the Java decoder.'
+            echo 'It does not install AndBible Android, check Android UI, or verify actual UI rendered text/navigation.'
+            echo 'No source content or binary SWORD module was uploaded or published.'
+          } >> "$GITHUB_STEP_SUMMARY"
