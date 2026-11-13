@@ -40,6 +40,53 @@ reconstruct invented authorial source line numbers from a SWORD entry.
 
 **Do not check 4/7 until all four slices have defensible evidence.**
 
+### Exact-upstream reuse versus source-derived reconstruction
+
+Use one of two **explicit, noninterchangeable** paths for commentary
+content. The choice is independent of which editions are in the public
+domain; the rights and frontend gates below apply in either case.
+
+1. **Unmodified upstream SWORD witness (preferred when suitable):** pin the
+   exact original ZIP, \`.conf\`, version, driver, versification and provider
+   metadata. For a private candidate with a *new module identity*, require
+   independent byte-for-byte equality of **every original compressed payload
+   file** and independently re-read **every occupied native commentary key**
+   (including introductions and opaque TOP entries). Verify key order,
+   unfiltered raw corpus SHA-256 and actual independent reader output. Only
+   module identity and corresponding \`DataPath\` may change, under a
+   deterministic, reviewed, fully logged metadata-only transformation.
+   Retaining **all original data bytes** proves that this candidate did
+   **not itself** lose or rewrite source text, punctuation, markup,
+   references, quotations or titles relative to **that precise compiled
+   upstream witness**. It does **not** prove that upstream transcribed the
+   historical print edition without error or that a different digital
+   transcription is textually equivalent. Classify actual upstream
+   deficiencies separately; do not silently "fix" an upstream witness.
+2. **New or corrected build from a reviewed authorial source:** retain the
+   actual exact-edition source and audit full original-to-compiled text,
+   punctuation, section placement, note/ref targets, ranges and ordered
+   markup. Every transformation must be deterministic, justified,
+   reversible, editorially authorized and reported. A public-domain
+   historical author does not turn two divergent third-party **digital**
+   transcriptions into identical editions.
+
+The current **MHCC CrossWire 2.0** technical route follows **(1)**, with
+the original binary payload unchanged. The separately pinned **CCEL ThML**
+has its own original-reference anomalies and cannot be silently promoted
+to the definitive source of CrossWire's compiled entries. Keep its read-only
+diagnostics as independent witness evidence, not as an invented forced
+text-parity gate for byte-exact CrossWire reuse.
+
+**These are technical and provenance distinctions, not publication
+shortcuts.** The upstream distribution-rights claim, scope of digital
+editorial additions, owner editorial acceptance, real Xiphos content and
+reference navigation, real AndBible/JSword reader checks and final module
+release/catalogue approval remain separately required. A headless Xiphos
+process/window smoke is **not** a content-rendering or Android acceptance
+test. Never mark those steps complete merely because both SWORD binaries
+produce the same raw keys.
+
+
 ## Reusable read-only observation (implemented)
 
 Each candidate has a **separate reviewed manifest**
