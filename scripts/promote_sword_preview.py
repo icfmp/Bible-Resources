@@ -22,6 +22,11 @@ DRIVER_LAYOUT = {
         for book in ("nt", "ot")
         for extension in ("bzs", "bzv", "bzz")
     )),
+    "zCom": ("zcom", tuple(
+        f"{book}.{extension}"
+        for book in ("nt", "ot")
+        for extension in ("bzs", "bzv", "bzz")
+    )),
 }
 MAX_ARCHIVE_MEMBER_BYTES = 40_000_000
 MAX_TOTAL_DATA_BYTES = 240_000_000
@@ -60,7 +65,7 @@ def _require_config_fields(raw: bytes, *, module_id: str, path: str,
         raise ValueError("Module driver, path, charset or versification differs")
     if seen.get("CipherKey") is not None:
         raise ValueError("Encrypted SWORD module cannot be promoted")
-    if driver == "zText":
+    if driver in ("zText", "zCom"):
         if (seen.get("BlockType") not in {"BOOK", "CHAPTER", "VERSE"}
                 or seen.get("CompressType") not in {"ZIP", "LZSS", "BZIP2", "XZ"}):
             raise ValueError("Unknown compressed SWORD block type")
@@ -93,8 +98,9 @@ def promote(source: Path, destination: Path, *, expected_source_sha256: str,
     original = source.read_bytes()
     if digest(original) != expected_source_sha256:
         raise ValueError("SWORD source ZIP SHA-256 changed")
-    old_dir = f"modules/texts/{layout}/{source_id.lower()}/"
-    new_dir = f"modules/texts/{layout}/{destination_id.lower()}/"
+    category_dir = "comments" if driver == "zCom" else "texts"
+    old_dir = f"modules/{category_dir}/{layout}/{source_id.lower()}/"
+    new_dir = f"modules/{category_dir}/{layout}/{destination_id.lower()}/"
     expected = {f"mods.d/{source_id.lower()}.conf", *(old_dir + f for f in filenames)}
     with ZipFile(source) as archive:
         # Inspect the bounded declared inventory before CRC/decompression so
@@ -119,7 +125,7 @@ def promote(source: Path, destination: Path, *, expected_source_sha256: str,
     destination_fields = _require_config_fields(
         revised, module_id=destination_id, path=new_dir,
         driver=driver, versification=versification, final=True)
-    if driver == "zText" and any(
+    if driver in ("zText", "zCom") and any(
             source_fields[k] != destination_fields[k]
             for k in ("BlockType", "CompressType")):
         raise ValueError("Compressed SWORD algorithm or block size changed")
