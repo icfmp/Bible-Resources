@@ -53,6 +53,8 @@ jobs:
             --ref Gen.10.1 \
             --ref Gen.11.10 \
             --ref Gen.14.18 \
+            --ref Ps.3.1 \
+            --ref Ps.73.21 \
             --report darby-paragraph-shapes.json
       - name: Prove reversible OSIS marker metadata overlay privately on the complete pinned source
         shell: bash
