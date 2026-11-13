@@ -85,6 +85,22 @@ class CanonicalEnglishTitleWitnessTests(unittest.TestCase):
         self.assertNotIn("Bible:Judg",output)
         self.assertFalse(report["book_codes_or_original_source_titles_exposed"])
 
+    def test_jude_and_judges_remain_distinct_original_source_title_witnesses(self):
+        aliases,_=read_existing_66_book_english_aliases()
+        # Exact original titles are evidence; they do not amend any scripCom.
+        self.assertEqual(
+            _classify("Jude","Judg",aliases),
+            ("original_title_exact_english_alias_points_to_different_book_code","Jude",1),
+        )
+        self.assertEqual(
+            _classify("Judges","Judg",aliases),
+            ("original_title_exact_english_alias_matches_claimed_book_code","Judg",1),
+        )
+        self.assertEqual(
+            _classify("Jude","Jude",aliases),
+            ("original_title_exact_english_alias_matches_claimed_book_code","Jude",1),
+        )
+
     def test_ambiguous_english_book_heading_is_not_silently_approved(self):
         alias,_=read_existing_66_book_english_aliases()
         category,code,amount=_classify("First Letter: 1 John","1John",alias)
