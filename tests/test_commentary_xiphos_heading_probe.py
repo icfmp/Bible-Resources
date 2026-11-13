@@ -9,6 +9,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from commentary_xiphos_heading_probe import (
     _I_BOOK, _I_CHAPTER, _intro_in_gui_clipboard,
+    _normal_chapter_intro_in_real_gui,
     probe_real_xiphos_commentary_heading_menu,
 )
 from pilot_preflight import PilotError
@@ -77,6 +78,7 @@ class SourceNativeIntroContextMenuTests(unittest.TestCase):
             r=probe_real_xiphos_commentary_heading_menu(
                 {"DISPLAY":":91","GDK_BACKEND":"x11"}, {}, ordinary_first_verse=b"commentary")
         self.assertFalse(r["heading_GUI_presentation_verified"])
+        self.assertFalse(r["original_intro_in_normal_chapter_GUI_verified"])
         self.assertTrue(r["no_heading_missing_from_source_inferred"])
         self.assertEqual(set(r["book_and_chapter_menu_observations"]),{"book","chapter"})
 
@@ -87,6 +89,47 @@ class SourceNativeIntroContextMenuTests(unittest.TestCase):
                 ordinary_first_verse=b"commentary")
         self.assertFalse(r["heading_context_real_main_reader_window_found"])
         self.assertFalse(r["heading_GUI_presentation_verified"])
+        self.assertFalse(r["original_intro_in_normal_chapter_GUI_verified"])
+
+    @patch("commentary_xiphos_heading_probe.time.sleep")
+    @patch("commentary_xiphos_heading_probe._seed_x11_clipboard")
+    @patch("commentary_xiphos_heading_probe._x11")
+    def test_normal_chapter_display_checks_second_real_pane_point(
+        self, x11, _seed, _sleep,
+    ):
+        words = ["authenticatedintro%02d" % n for n in range(18)]
+        intro = ("<p>" + " ".join(words) + "</p>").encode()
+        reads = iter((b"Unrelated first pane text", (" ".join(words)).encode()))
+        def action(command, env):
+            if command[:3] == ["xclip", "-selection", "clipboard"]:
+                return next(reads)
+            return b""
+        x11.side_effect = action
+        self.assertTrue(_normal_chapter_intro_in_real_gui(
+            {"DISPLAY": ":91"}, ((900, 310), (900, 480)),
+            intro, b"Ordinary first verse commentary",
+        ))
+        self.assertEqual(sum(
+            call.args[0][:3] == ["xclip", "-selection", "clipboard"]
+            for call in x11.call_args_list
+        ), 2)
+
+    @patch("commentary_xiphos_heading_probe.time.sleep")
+    @patch("commentary_xiphos_heading_probe._seed_x11_clipboard")
+    @patch("commentary_xiphos_heading_probe._x11")
+    def test_normal_chapter_cannot_pass_with_unmodified_verse(
+        self, x11, _seed, _sleep,
+    ):
+        words = ["authenticatedintro%02d" % n for n in range(18)]
+        intro = ("<p>" + " ".join(words) + "</p>").encode()
+        verse = (" ".join(words)).encode()
+        x11.side_effect = lambda command, env: (
+            verse if command[:3] == ["xclip", "-selection", "clipboard"]
+            else b""
+        )
+        self.assertFalse(_normal_chapter_intro_in_real_gui(
+            {"DISPLAY": ":91"}, ((900, 310),), intro, verse,
+        ))
 
     @patch("commentary_xiphos_heading_probe._intro_in_gui_clipboard",return_value=True)
     @patch("commentary_xiphos_heading_probe.time.sleep")
@@ -101,6 +144,7 @@ class SourceNativeIntroContextMenuTests(unittest.TestCase):
         out=probe_real_xiphos_commentary_heading_menu(
             {"DISPLAY":":91","GDK_BACKEND":"x11"},intro,ordinary_first_verse=b"verse")
         self.assertTrue(out["heading_GUI_presentation_verified"])
+        self.assertTrue(out["original_intro_in_normal_chapter_GUI_verified"])
         self.assertFalse(out["intro_data_or_clipboard_exported"])
 
 
