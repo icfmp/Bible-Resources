@@ -150,6 +150,7 @@ def analyze_source(source: bytes, references: list[str]) -> tuple[dict, dict]:
         "semantic_candidate_categories_not_editorial_certification": dict(sorted(semantic_groups.items())),
         "bounded_leading_marker_references": marker_refs,
         "bounded_three_or_more_star_references": triple_refs,
+        "three_or_more_star_markup": source_structure(source, set(triple_refs)) if triple_refs else {},
         "bounded_unresolved_marker_references": suspicious_nonfirst,
     }
     return {ref: strings[ref] for ref in references}, summary
@@ -220,6 +221,7 @@ def main(argv=None):
     print("Candidate marker meanings:", json.dumps(result["original_source_marker_summary"]["semantic_candidate_categories_not_editorial_certification"], sort_keys=True))
     print("Unresolved marker references:", result["original_source_marker_summary"]["bounded_unresolved_marker_references"])
     print("Three-or-more star references:", result["original_source_marker_summary"]["bounded_three_or_more_star_references"])
+    print("Three-or-more star source structure:", json.dumps(result["original_source_marker_summary"]["three_or_more_star_markup"],sort_keys=True))
     for ref, row in result["verse_samples"].items():
         print(ref, "source", json.dumps(row["original"], sort_keys=True),
               "native", json.dumps(row["compiled"], sort_keys=True),
