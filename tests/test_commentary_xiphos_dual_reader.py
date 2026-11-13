@@ -192,6 +192,9 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
         self.assertEqual(report["original_internal_title_elements_found"], 1)
         self.assertEqual(report["exact_original_titles_in_copied_gui_text"], 1)
         self.assertEqual(report["original_internal_reference_elements_found"], 1)
+        self.assertEqual(report["original_stock_nontrivial_reference_labels_found"], 1)
+        self.assertEqual(report["source_reference_labels_observed_as_real_gui_HTML_anchors"], 1)
+        self.assertEqual(report["exact_original_titles_in_copied_gui_rich_html"], 1)
         self.assertEqual(report["real_gui_rich_html_anchor_elements_found"], 1)
         self.assertFalse(report["xiphos_link_click_target_and_navigation_verified"])
         self.assertNotIn("The first creation", str(report))
@@ -206,6 +209,17 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
         self.assertEqual(report["original_internal_reference_elements_found"], 1)
         self.assertFalse(report["real_gui_rich_html_selection_available"])
         self.assertEqual(report["real_gui_rich_html_anchor_elements_found"], 0)
+        self.assertEqual(report["source_reference_labels_observed_as_real_gui_HTML_anchors"], 0)
+
+    def test_unrelated_webkit_anchor_does_not_certify_original_sword_reference(self):
+        from commentary_xiphos_dual_reader import _markup_display_witness
+        original=b'<reference osisRef="Gen.2.1">a real original reference label</reference>'
+        clipboard=b'<a href="about:blank">unrelated menu link</a>'
+        result=_markup_display_witness(original,b"unrelated menu link",clipboard)
+        self.assertEqual(result["original_stock_nontrivial_reference_labels_found"],1)
+        self.assertEqual(result["real_gui_rich_html_anchor_elements_found"],1)
+        self.assertEqual(result["source_reference_labels_observed_as_real_gui_HTML_anchors"],0)
+        self.assertFalse(result["xiphos_link_click_target_and_navigation_verified"])
 
     def test_bounded_private_gui_markup_input_and_source_limits(self):
         from commentary_xiphos_dual_reader import _markup_display_witness
