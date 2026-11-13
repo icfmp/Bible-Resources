@@ -1,0 +1,359 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "issue_url": "https://github.com/icfmp/Bible-Resources/issues/177",
+  "status": "SEVEN_SOURCE_SCRIPCOM_IMMEDIATE_DIV_MARKER_BOUNDARIES_VS_STOCK_OCCUPIED_NATIVE_K_RAW_RUNS_AUTHENTICATED_NOT_EDITORIALLY_PAIRED",
+  "pinned_original_inputs": {
+    "ccel_thml_xml_sha256": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+    "crosswire_stock_zip_sha256": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+    "complete_ordered_native_raw_corpus_sha256": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
+  },
+  "scope": {
+    "original_source_verse_range_prose_anomalies": 7,
+    "actual_complete_compiled_numbered_K_entries": 28718,
+    "actual_complete_compiled_intro_I_entries": 1255,
+    "original_immediately_following_sibling_classes": {
+      "_none": 3,
+      "scripCom": 4
+    },
+    "native_identical_raw_consecutive_occupied_K_run_classes": {
+      "multiple_occupied_K_keys_share_adjacent_raw": 7
+    },
+    "all_seven_source_markers_explicit_same_book_verse_ranges": true,
+    "all_seven_source_ranges_end_in_same_chapter": true,
+    "all_seven_native_selected_compiled_raw_groups_repeated_adjacent_occupied_K_keys": true,
+    "source_markers_at_lines_55844_55852_55858_are_distinct_original_scripCom_annotations": true,
+    "three_distinct_original_body_hashes_share_exactly_same_native_raw_payload_in_same_eight_occupied_K_run": true,
+    "repeated_native_payload_cannot_by_itself_establish_three_original_authorial_ranges": true,
+    "consecutive_occupied_native_K_keys_may_not_be_numerically_consecutive_bible_verses": true,
+    "no_original_prose_or_compiled_text_punctuation_reference_or_markup_mutated": true
+  },
+  "original_seven_source_line_fullhash_and_ThML_marker_native_raw_boundary_metadata": [
+    {
+      "native_K_consecutive_occupied_key_run_length": 13,
+      "native_K_consecutiveness_means_enumerated_occupied_keys_not_numeric_verse_continuity": true,
+      "native_K_occurrences_with_same_raw_in_source_book": 13,
+      "native_K_run_consecutive_occupied_keys_after_selected": 5,
+      "native_K_run_consecutive_occupied_keys_before_selected": 7,
+      "native_K_run_has_keys_in_another_chapter_same_book": false,
+      "native_K_run_key_count_in_same_selected_chapter": 13,
+      "native_K_run_other_identical_raw_keys_outside_selected_run": 0,
+      "native_K_separate_identical_raw_runs_in_same_book": 1,
+      "native_key_immediately_after_raw_run_sha256": "66eaa215cf6097b8c53a5477a6c7a23dfb7a1d57f2e2c43f4c327628fb4f441d",
+      "native_key_immediately_before_raw_run_sha256": "6f8626c741a149501280522bc0f56c2037b461cfddc290bad773be0bd41cff45",
+      "native_raw_immediately_after_raw_run_sha256": "c112ad7ad6f1bb50e56f2d44eafa40317a84722e3a1f6f83a5629a9a190c052d",
+      "native_raw_immediately_before_raw_run_sha256": "78cfb6c355ef373760b39bdf79fffa339ca599cd936c87f08b9203d6f1223472",
+      "native_raw_repetition_does_not_authorize_original_authorial_range": true,
+      "native_run_first_key_sha256": "5bf22299c1636a144b7744081161a4f6a37352a2af8c89db3e3ffb4804c3339f",
+      "native_run_last_key_sha256": "c51db05910bea4fa953bd23ec22d49b4cb630b76048d50dedd67d56bcb20c27a",
+      "original_body_sha256": "342e29d2730b8b3c0a2a584c3bcbcb1afd5e2f6a4c32af25df92a71e42d52b1c",
+      "original_full_reference_sha256": "be69d1d8f75a38cb5bfddb46ec60f9b5023964d9369afbd1619f3806bde41909",
+      "original_source_marker_boundary": {
+        "immediately_following_marker_same_book": false,
+        "immediately_following_marker_same_chapter": false,
+        "immediately_following_original_marker_reference_kind": "not_followed_by_scripCom_sibling",
+        "immediately_following_sibling_after_source_body_tag": "_none",
+        "original_annotation_reference_kind": "work_qualified_same_book_verse_range",
+        "original_range_ends_in_same_chapter": true,
+        "preceding_sibling_tag_before_source_marker": "div",
+        "preceding_sibling_was_div_preceded_by_scripCom": true,
+        "source_body_direct_child_tag_counts": {
+          "h3": 1,
+          "p": 1
+        },
+        "source_marker_parent_tag": "div2",
+        "source_original_marker_and_body_unmodified": true
+      },
+      "selected_native_raw_sha256": "c3edca4cfb9da2137b7f9f5a16714bde42d9498fa6ed167e15adb5f79ab6610a",
+      "source_line": 15219
+    },
+    {
+      "native_K_consecutive_occupied_key_run_length": 11,
+      "native_K_consecutiveness_means_enumerated_occupied_keys_not_numeric_verse_continuity": true,
+      "native_K_occurrences_with_same_raw_in_source_book": 11,
+      "native_K_run_consecutive_occupied_keys_after_selected": 4,
+      "native_K_run_consecutive_occupied_keys_before_selected": 6,
+      "native_K_run_has_keys_in_another_chapter_same_book": false,
+      "native_K_run_key_count_in_same_selected_chapter": 11,
+      "native_K_run_other_identical_raw_keys_outside_selected_run": 0,
+      "native_K_separate_identical_raw_runs_in_same_book": 1,
+      "native_key_immediately_after_raw_run_sha256": "ba5aa8b49b031a20a1e05bd1ca4aac102ecb7d2d3ac8a161f10ecbdec190720f",
+      "native_key_immediately_before_raw_run_sha256": "4fb91b8be11e7e88ec7099b697803e884b6748178be059e12c0ecb034ef9d050",
+      "native_raw_immediately_after_raw_run_sha256": "846f3e8b0fd155fbccc212f186acfb7adf37f9bd38ac4d8a8ebbbcb29e741473",
+      "native_raw_immediately_before_raw_run_sha256": "13153432cba8bca11446a7108bcc6909e5a581a6339cb13cadad1daff4060ffd",
+      "native_raw_repetition_does_not_authorize_original_authorial_range": true,
+      "native_run_first_key_sha256": "216821fa6cd70950c12f9dc2e982a331f64d32eeb4cb37f2d1a2b7786a7a70ab",
+      "native_run_last_key_sha256": "4af4b21a161d5fdee24106f05e0b7102798ebc3fc4beb7911c594339b05b02cc",
+      "original_body_sha256": "9a2c7898a2b53bdbc55d0468ef2c1115ab9bbe4a4cce3fd853b6bb028ee36a74",
+      "original_full_reference_sha256": "1bf50eabf40e4396fe2edca76cd910483461f6c3ef60bbe17e0e823f5a404870",
+      "original_source_marker_boundary": {
+        "immediately_following_marker_same_book": false,
+        "immediately_following_marker_same_chapter": false,
+        "immediately_following_original_marker_reference_kind": "not_followed_by_scripCom_sibling",
+        "immediately_following_sibling_after_source_body_tag": "_none",
+        "original_annotation_reference_kind": "work_qualified_same_book_verse_range",
+        "original_range_ends_in_same_chapter": true,
+        "preceding_sibling_tag_before_source_marker": "div",
+        "preceding_sibling_was_div_preceded_by_scripCom": true,
+        "source_body_direct_child_tag_counts": {
+          "h3": 1,
+          "p": 1
+        },
+        "source_marker_parent_tag": "div2",
+        "source_original_marker_and_body_unmodified": true
+      },
+      "selected_native_raw_sha256": "eb60645030a80e2021039b17751e397cce5aa2ce5f9fa61fb956519d0ae5430f",
+      "source_line": 28749
+    },
+    {
+      "native_K_consecutive_occupied_key_run_length": 8,
+      "native_K_consecutiveness_means_enumerated_occupied_keys_not_numeric_verse_continuity": true,
+      "native_K_occurrences_with_same_raw_in_source_book": 8,
+      "native_K_run_consecutive_occupied_keys_after_selected": 7,
+      "native_K_run_consecutive_occupied_keys_before_selected": 0,
+      "native_K_run_has_keys_in_another_chapter_same_book": false,
+      "native_K_run_key_count_in_same_selected_chapter": 8,
+      "native_K_run_other_identical_raw_keys_outside_selected_run": 0,
+      "native_K_separate_identical_raw_runs_in_same_book": 1,
+      "native_key_immediately_after_raw_run_sha256": "7a6fa542607c29b32d66a03e81c5738fdb34628391ff74f91a617e72db0f428c",
+      "native_key_immediately_before_raw_run_sha256": null,
+      "native_raw_immediately_after_raw_run_sha256": "24ad18d45b63ca2c3bc696186178f95456d117c80997342da229229bd2a5a5f9",
+      "native_raw_immediately_before_raw_run_sha256": null,
+      "native_raw_repetition_does_not_authorize_original_authorial_range": true,
+      "native_run_first_key_sha256": "7aa5e72cebb106a4e693b03210ca07c8a33c0ebe0deb33645177dd66106e9eeb",
+      "native_run_last_key_sha256": "d3d19850381d5f6af382b4e970d2e6cbf822efeef973450a5103b62403a2baef",
+      "original_body_sha256": "5ef525b574f9c049bd39bad7bafcaa99cb9ae9120e8647208c0261e25e801630",
+      "original_full_reference_sha256": "fe9620db993881f30ab981307b22f201c3aeb36dca52b83eee08874ac0d273e8",
+      "original_source_marker_boundary": {
+        "immediately_following_marker_same_book": true,
+        "immediately_following_marker_same_chapter": true,
+        "immediately_following_original_marker_reference_kind": "work_qualified_same_book_verse_range",
+        "immediately_following_sibling_after_source_body_tag": "scripCom",
+        "original_annotation_reference_kind": "work_qualified_same_book_verse_range",
+        "original_range_ends_in_same_chapter": true,
+        "preceding_sibling_tag_before_source_marker": "p",
+        "preceding_sibling_was_div_preceded_by_scripCom": false,
+        "source_body_direct_child_tag_counts": {
+          "h3": 1,
+          "p": 1
+        },
+        "source_marker_parent_tag": "div2",
+        "source_original_marker_and_body_unmodified": true
+      },
+      "selected_native_raw_sha256": "82a58bed69c125a9c167069bfe84c1b68355cc8a4a5897efa9fa835e284ac991",
+      "source_line": 55844
+    },
+    {
+      "native_K_consecutive_occupied_key_run_length": 8,
+      "native_K_consecutiveness_means_enumerated_occupied_keys_not_numeric_verse_continuity": true,
+      "native_K_occurrences_with_same_raw_in_source_book": 8,
+      "native_K_run_consecutive_occupied_keys_after_selected": 3,
+      "native_K_run_consecutive_occupied_keys_before_selected": 4,
+      "native_K_run_has_keys_in_another_chapter_same_book": false,
+      "native_K_run_key_count_in_same_selected_chapter": 8,
+      "native_K_run_other_identical_raw_keys_outside_selected_run": 0,
+      "native_K_separate_identical_raw_runs_in_same_book": 1,
+      "native_key_immediately_after_raw_run_sha256": "7a6fa542607c29b32d66a03e81c5738fdb34628391ff74f91a617e72db0f428c",
+      "native_key_immediately_before_raw_run_sha256": null,
+      "native_raw_immediately_after_raw_run_sha256": "24ad18d45b63ca2c3bc696186178f95456d117c80997342da229229bd2a5a5f9",
+      "native_raw_immediately_before_raw_run_sha256": null,
+      "native_raw_repetition_does_not_authorize_original_authorial_range": true,
+      "native_run_first_key_sha256": "7aa5e72cebb106a4e693b03210ca07c8a33c0ebe0deb33645177dd66106e9eeb",
+      "native_run_last_key_sha256": "d3d19850381d5f6af382b4e970d2e6cbf822efeef973450a5103b62403a2baef",
+      "original_body_sha256": "67c4f17497220a6ba04a712e1c8cb635ddc347c4189f5fdfacf98bd200009149",
+      "original_full_reference_sha256": "6128ddc7772acf6374490a0c456f693e43b8ed79ff5d881b1ef76740bf11d7d1",
+      "original_source_marker_boundary": {
+        "immediately_following_marker_same_book": true,
+        "immediately_following_marker_same_chapter": true,
+        "immediately_following_original_marker_reference_kind": "work_qualified_same_book_verse_range",
+        "immediately_following_sibling_after_source_body_tag": "scripCom",
+        "original_annotation_reference_kind": "work_qualified_same_book_verse_range",
+        "original_range_ends_in_same_chapter": true,
+        "preceding_sibling_tag_before_source_marker": "div",
+        "preceding_sibling_was_div_preceded_by_scripCom": true,
+        "source_body_direct_child_tag_counts": {
+          "h3": 1,
+          "p": 1
+        },
+        "source_marker_parent_tag": "div2",
+        "source_original_marker_and_body_unmodified": true
+      },
+      "selected_native_raw_sha256": "82a58bed69c125a9c167069bfe84c1b68355cc8a4a5897efa9fa835e284ac991",
+      "source_line": 55852
+    },
+    {
+      "native_K_consecutive_occupied_key_run_length": 8,
+      "native_K_consecutiveness_means_enumerated_occupied_keys_not_numeric_verse_continuity": true,
+      "native_K_occurrences_with_same_raw_in_source_book": 8,
+      "native_K_run_consecutive_occupied_keys_after_selected": 0,
+      "native_K_run_consecutive_occupied_keys_before_selected": 7,
+      "native_K_run_has_keys_in_another_chapter_same_book": false,
+      "native_K_run_key_count_in_same_selected_chapter": 8,
+      "native_K_run_other_identical_raw_keys_outside_selected_run": 0,
+      "native_K_separate_identical_raw_runs_in_same_book": 1,
+      "native_key_immediately_after_raw_run_sha256": "7a6fa542607c29b32d66a03e81c5738fdb34628391ff74f91a617e72db0f428c",
+      "native_key_immediately_before_raw_run_sha256": null,
+      "native_raw_immediately_after_raw_run_sha256": "24ad18d45b63ca2c3bc696186178f95456d117c80997342da229229bd2a5a5f9",
+      "native_raw_immediately_before_raw_run_sha256": null,
+      "native_raw_repetition_does_not_authorize_original_authorial_range": true,
+      "native_run_first_key_sha256": "7aa5e72cebb106a4e693b03210ca07c8a33c0ebe0deb33645177dd66106e9eeb",
+      "native_run_last_key_sha256": "d3d19850381d5f6af382b4e970d2e6cbf822efeef973450a5103b62403a2baef",
+      "original_body_sha256": "8554c360b4ad1d3046c6abf1d117c28865922d51e4563768c7395ad4dbe2926a",
+      "original_full_reference_sha256": "11233f1eefefc1b026c1bf95b408bbe15f61fcacf7aa7b2b806bdb49d94f246e",
+      "original_source_marker_boundary": {
+        "immediately_following_marker_same_book": true,
+        "immediately_following_marker_same_chapter": true,
+        "immediately_following_original_marker_reference_kind": "work_qualified_same_book_verse_range",
+        "immediately_following_sibling_after_source_body_tag": "scripCom",
+        "original_annotation_reference_kind": "work_qualified_same_book_verse_range",
+        "original_range_ends_in_same_chapter": true,
+        "preceding_sibling_tag_before_source_marker": "div",
+        "preceding_sibling_was_div_preceded_by_scripCom": true,
+        "source_body_direct_child_tag_counts": {
+          "h3": 1,
+          "p": 1
+        },
+        "source_marker_parent_tag": "div2",
+        "source_original_marker_and_body_unmodified": true
+      },
+      "selected_native_raw_sha256": "82a58bed69c125a9c167069bfe84c1b68355cc8a4a5897efa9fa835e284ac991",
+      "source_line": 55858
+    },
+    {
+      "native_K_consecutive_occupied_key_run_length": 12,
+      "native_K_consecutiveness_means_enumerated_occupied_keys_not_numeric_verse_continuity": true,
+      "native_K_occurrences_with_same_raw_in_source_book": 12,
+      "native_K_run_consecutive_occupied_keys_after_selected": 3,
+      "native_K_run_consecutive_occupied_keys_before_selected": 8,
+      "native_K_run_has_keys_in_another_chapter_same_book": false,
+      "native_K_run_key_count_in_same_selected_chapter": 12,
+      "native_K_run_other_identical_raw_keys_outside_selected_run": 0,
+      "native_K_separate_identical_raw_runs_in_same_book": 1,
+      "native_key_immediately_after_raw_run_sha256": "189deca268988c1caa87c507ccdc3e281ff92db61fe88d02f5f7b2c904294270",
+      "native_key_immediately_before_raw_run_sha256": "d3d19850381d5f6af382b4e970d2e6cbf822efeef973450a5103b62403a2baef",
+      "native_raw_immediately_after_raw_run_sha256": "882002a5c4cb337fc5ac19ce95ef071ab66ff0e138a7070b118e85985fb4926d",
+      "native_raw_immediately_before_raw_run_sha256": "82a58bed69c125a9c167069bfe84c1b68355cc8a4a5897efa9fa835e284ac991",
+      "native_raw_repetition_does_not_authorize_original_authorial_range": true,
+      "native_run_first_key_sha256": "7a6fa542607c29b32d66a03e81c5738fdb34628391ff74f91a617e72db0f428c",
+      "native_run_last_key_sha256": "74c134907aa6e7160719e2bf2ae9550dd9c44c9d5660aff67614bcb4a3077abd",
+      "original_body_sha256": "04a0bb60d42bfa51102ab232eccda58b41f63caaa6906234225bcf59b6eecf6b",
+      "original_full_reference_sha256": "5168acc1b7943312f5742ceb472b5c69b55613d6e0c6cf5f2e95a55a178ffb7b",
+      "original_source_marker_boundary": {
+        "immediately_following_marker_same_book": true,
+        "immediately_following_marker_same_chapter": true,
+        "immediately_following_original_marker_reference_kind": "work_qualified_same_book_verse_range",
+        "immediately_following_sibling_after_source_body_tag": "scripCom",
+        "original_annotation_reference_kind": "work_qualified_same_book_verse_range",
+        "original_range_ends_in_same_chapter": true,
+        "preceding_sibling_tag_before_source_marker": "div",
+        "preceding_sibling_was_div_preceded_by_scripCom": true,
+        "source_body_direct_child_tag_counts": {
+          "h3": 1,
+          "p": 1
+        },
+        "source_marker_parent_tag": "div2",
+        "source_original_marker_and_body_unmodified": true
+      },
+      "selected_native_raw_sha256": "24ad18d45b63ca2c3bc696186178f95456d117c80997342da229229bd2a5a5f9",
+      "source_line": 55868
+    },
+    {
+      "native_K_consecutive_occupied_key_run_length": 16,
+      "native_K_consecutiveness_means_enumerated_occupied_keys_not_numeric_verse_continuity": true,
+      "native_K_occurrences_with_same_raw_in_source_book": 16,
+      "native_K_run_consecutive_occupied_keys_after_selected": 12,
+      "native_K_run_consecutive_occupied_keys_before_selected": 3,
+      "native_K_run_has_keys_in_another_chapter_same_book": false,
+      "native_K_run_key_count_in_same_selected_chapter": 16,
+      "native_K_run_other_identical_raw_keys_outside_selected_run": 0,
+      "native_K_separate_identical_raw_runs_in_same_book": 1,
+      "native_key_immediately_after_raw_run_sha256": "5f38ceacd699c6228f1ef0eaec4fe732988ceb21f329e4a649d678e85a910388",
+      "native_key_immediately_before_raw_run_sha256": "74c134907aa6e7160719e2bf2ae9550dd9c44c9d5660aff67614bcb4a3077abd",
+      "native_raw_immediately_after_raw_run_sha256": "19fbaa8a2c0af899da64c4922c7b70047a3cb680abb31f5ff2219758c748ed52",
+      "native_raw_immediately_before_raw_run_sha256": "24ad18d45b63ca2c3bc696186178f95456d117c80997342da229229bd2a5a5f9",
+      "native_raw_repetition_does_not_authorize_original_authorial_range": true,
+      "native_run_first_key_sha256": "189deca268988c1caa87c507ccdc3e281ff92db61fe88d02f5f7b2c904294270",
+      "native_run_last_key_sha256": "63d76db11c668e33be6756f75b777f2d83f8fc236049f14c7565e8353d156185",
+      "original_body_sha256": "2d24487f1adbad3ddc7f6181b13d27a11ab2007ed4edeb69405ad519b48d5d88",
+      "original_full_reference_sha256": "23ca0a52b876519d3d966b0866f47a687ba7696560075cf004415a5f6ddb669f",
+      "original_source_marker_boundary": {
+        "immediately_following_marker_same_book": false,
+        "immediately_following_marker_same_chapter": false,
+        "immediately_following_original_marker_reference_kind": "not_followed_by_scripCom_sibling",
+        "immediately_following_sibling_after_source_body_tag": "_none",
+        "original_annotation_reference_kind": "work_qualified_same_book_verse_range",
+        "original_range_ends_in_same_chapter": true,
+        "preceding_sibling_tag_before_source_marker": "div",
+        "preceding_sibling_was_div_preceded_by_scripCom": true,
+        "source_body_direct_child_tag_counts": {
+          "h3": 1,
+          "p": 1
+        },
+        "source_marker_parent_tag": "div2",
+        "source_original_marker_and_body_unmodified": true
+      },
+      "selected_native_raw_sha256": "882002a5c4cb337fc5ac19ce95ef071ab66ff0e138a7070b118e85985fb4926d",
+      "source_line": 55875
+    }
+  ],
+  "same_original_stock_raw_SHA256_groups_across_seven_anomalies": [
+    {
+      "same_native_raw_sha256": "c3edca4cfb9da2137b7f9f5a16714bde42d9498fa6ed167e15adb5f79ab6610a",
+      "original_source_lines": [
+        15219
+      ],
+      "distinct_original_source_body_hashes": 1,
+      "shared_native_occupied_K_run_length": 13
+    },
+    {
+      "same_native_raw_sha256": "eb60645030a80e2021039b17751e397cce5aa2ce5f9fa61fb956519d0ae5430f",
+      "original_source_lines": [
+        28749
+      ],
+      "distinct_original_source_body_hashes": 1,
+      "shared_native_occupied_K_run_length": 11
+    },
+    {
+      "same_native_raw_sha256": "82a58bed69c125a9c167069bfe84c1b68355cc8a4a5897efa9fa835e284ac991",
+      "original_source_lines": [
+        55844,
+        55852,
+        55858
+      ],
+      "distinct_original_source_body_hashes": 3,
+      "shared_native_occupied_K_run_length": 8
+    },
+    {
+      "same_native_raw_sha256": "24ad18d45b63ca2c3bc696186178f95456d117c80997342da229229bd2a5a5f9",
+      "original_source_lines": [
+        55868
+      ],
+      "distinct_original_source_body_hashes": 1,
+      "shared_native_occupied_K_run_length": 12
+    },
+    {
+      "same_native_raw_sha256": "882002a5c4cb337fc5ac19ce95ef071ab66ff0e138a7070b118e85985fb4926d",
+      "original_source_lines": [
+        55875
+      ],
+      "distinct_original_source_body_hashes": 1,
+      "shared_native_occupied_K_run_length": 16
+    }
+  ],
+  "real_source_validation": {
+    "actual_complete_ccel_original_vs_crosswire_stock_private_action": "https://github.com/icfmp/Bible-Resources/actions/runs/43440618084",
+    "exact_original_sources_preserved": true,
+    "exact_validate_on_pre_receipt_head": "https://github.com/icfmp/Bible-Resources/actions/runs/43440617935",
+    "original_source_lines_sha256_and_raw_digest_cross_checked_against_prior_merged_204": true
+  },
+  "editorial_gate": {
+    "source_and_stock_range_authorities_not_assumed_equivalent": true,
+    "original_source_Jude_and_post_Revelation_unmarked_division_still_unresolved": true,
+    "original_chapter_intro_notes_quotes_paragraphs_tables_and_crossrefs_unapproved": true,
+    "historical_Matthew_Henry_work_in_public_domain": true,
+    "specific_digital_editions_provenance_requires_review": true,
+    "independent_Xiphos_AndBible_reading_not_approved": true,
+    "mhcc_release": false
+  },
+  "seven_stage_full_approval_count": 0
+}

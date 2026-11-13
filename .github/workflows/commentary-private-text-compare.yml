@@ -21,6 +21,8 @@ on:
       - 'scripts/commentary_nonlink_words.py'
       - 'scripts/commentary_nonlink_word_alignment.py'
       - 'scripts/commentary_prose_cross_slot.py'
+      - 'scripts/commentary_source_native_boundaries.py'
+      - 'tests/test_commentary_source_native_boundaries.py'
       - 'tests/test_commentary_prose_cross_slot.py'
       - 'tests/test_commentary_nonlink_word_alignment.py'
       - 'tests/test_commentary_nonlink_words.py'
@@ -766,6 +768,158 @@ jobs:
               "no_large_original_plain_word_cases_to_scan":True,
           }:
               raise SystemExit("Unexpected cross-slot scan with no original source cases")
+          boundaries=report["source_large_prose_marker_to_native_raw_run_boundary_diagnostics"]
+          if large_cases:
+              bounded=boundaries[
+                  "original_source_marker_native_run_sha256_and_metadata_only_cases"
+              ]
+              fields={
+                  "source_line","original_full_reference_sha256","original_body_sha256",
+                  "selected_native_raw_sha256","original_source_marker_boundary",
+                  "native_K_occurrences_with_same_raw_in_source_book",
+                  "native_K_consecutive_occupied_key_run_length",
+                  "native_K_run_consecutive_occupied_keys_before_selected",
+                  "native_K_run_consecutive_occupied_keys_after_selected",
+                  "native_K_run_key_count_in_same_selected_chapter",
+                  "native_K_run_has_keys_in_another_chapter_same_book",
+                  "native_K_run_other_identical_raw_keys_outside_selected_run",
+                  "native_K_separate_identical_raw_runs_in_same_book",
+                  "native_run_first_key_sha256","native_run_last_key_sha256",
+                  "native_key_immediately_before_raw_run_sha256",
+                  "native_raw_immediately_before_raw_run_sha256",
+                  "native_key_immediately_after_raw_run_sha256",
+                  "native_raw_immediately_after_raw_run_sha256",
+                  "native_K_consecutiveness_means_enumerated_occupied_keys_not_numeric_verse_continuity",
+                  "native_raw_repetition_does_not_authorize_original_authorial_range",
+              }
+              source_fields={
+                  "original_annotation_reference_kind",
+                  "original_range_ends_in_same_chapter",
+                  "source_marker_parent_tag",
+                  "source_body_direct_child_tag_counts",
+                  "preceding_sibling_tag_before_source_marker",
+                  "preceding_sibling_was_div_preceded_by_scripCom",
+                  "immediately_following_sibling_after_source_body_tag",
+                  "immediately_following_original_marker_reference_kind",
+                  "immediately_following_marker_same_book",
+                  "immediately_following_marker_same_chapter",
+                  "source_original_marker_and_body_unmodified",
+              }
+              expected_boundaries={
+                  (z["original_source_line"],z["original_full_reference_sha256"],
+                   z["original_body_sha256"],z["stock_raw_sha256"])
+                  for z in large_cases
+              }
+              observed_boundaries=set()
+              allowed_ref_shapes={
+                  "work_qualified_verse","work_qualified_same_book_verse_range",
+                  "work_qualified_chapter","not_followed_by_scripCom_sibling",
+              }
+              if (boundaries["source_marker_case_count"] != len(large_cases) or
+                      len(bounded) != len(large_cases) or
+                      boundaries["actual_native_K_occupied_keys_in_full_corpus"] < len(bounded) or
+                      boundaries["native_K_run_is_only_consecutive_occupied_keys_not_numeric_verses"] is not True or
+                      boundaries["original_ThML_scripCom_marker_and_stock_SWORD_verse_key_are_not_equivalent_structural_authorities"] is not True or
+                      boundaries["original_content_markup_and_edition_parity_verified"] is not False or
+                      sum(boundaries["original_marker_following_source_sibling_tag_classes"].values())
+                          != len(bounded) or
+                      sum(boundaries["selected_native_raw_run_structure_classes"].get(k,0)
+                          for k in ("single_occupied_K_raw_run",
+                                    "multiple_occupied_K_keys_share_adjacent_raw"))
+                          != len(bounded)):
+                  raise SystemExit("Original marker/native run boundaries omitted original cases")
+              for entry in bounded:
+                  ident=(entry["source_line"],entry["original_full_reference_sha256"],
+                         entry["original_body_sha256"],entry["selected_native_raw_sha256"])
+                  structure=entry["original_source_marker_boundary"]
+                  if (set(entry)!=fields or ident not in expected_boundaries
+                          or ident in observed_boundaries or
+                          not isinstance(structure,dict) or set(structure)!=source_fields or
+                          structure["original_annotation_reference_kind"] not in {
+                              "work_qualified_verse","work_qualified_same_book_verse_range"
+                          } or
+                          structure["immediately_following_original_marker_reference_kind"]
+                              not in allowed_ref_shapes or
+                          not all(isinstance(structure[k],bool) for k in (
+                              "original_range_ends_in_same_chapter",
+                              "preceding_sibling_was_div_preceded_by_scripCom",
+                              "immediately_following_marker_same_book",
+                              "immediately_following_marker_same_chapter",
+                          )) or
+                          structure["source_original_marker_and_body_unmodified"] is not True or
+                          not all(isinstance(structure[k],str)
+                                  and re.fullmatch(r"[a-zA-Z][a-zA-Z0-9_-]{0,63}|_none",
+                                                   structure[k])
+                                  for k in ("source_marker_parent_tag",
+                                            "preceding_sibling_tag_before_source_marker",
+                                            "immediately_following_sibling_after_source_body_tag")) or
+                          not all(isinstance(k,str)
+                                  and re.fullmatch(r"[a-zA-Z][a-zA-Z0-9_-]{0,63}",k)
+                                  and type(v) is int and v>=0
+                                  for k,v in structure[
+                                      "source_body_direct_child_tag_counts"].items())
+                          or not all(type(entry[k]) is int and entry[k]>=0
+                                  for k in (
+                                      "source_line","native_K_occurrences_with_same_raw_in_source_book",
+                                      "native_K_consecutive_occupied_key_run_length",
+                                      "native_K_run_consecutive_occupied_keys_before_selected",
+                                      "native_K_run_consecutive_occupied_keys_after_selected",
+                                      "native_K_run_key_count_in_same_selected_chapter",
+                                      "native_K_run_other_identical_raw_keys_outside_selected_run",
+                                      "native_K_separate_identical_raw_runs_in_same_book",
+                                  )) or
+                          entry["native_K_run_has_keys_in_another_chapter_same_book"] is not
+                              (entry["native_K_run_key_count_in_same_selected_chapter"] !=
+                               entry["native_K_consecutive_occupied_key_run_length"]) or
+                          entry["native_K_consecutiveness_means_enumerated_occupied_keys_not_numeric_verse_continuity"] is not True or
+                          entry["native_raw_repetition_does_not_authorize_original_authorial_range"] is not True or
+                          entry["native_K_consecutive_occupied_key_run_length"] !=
+                            entry["native_K_run_consecutive_occupied_keys_before_selected"]+
+                            entry["native_K_run_consecutive_occupied_keys_after_selected"]+1 or
+                          entry["native_K_occurrences_with_same_raw_in_source_book"] !=
+                            entry["native_K_consecutive_occupied_key_run_length"]+
+                            entry["native_K_run_other_identical_raw_keys_outside_selected_run"]):
+                      raise SystemExit("Original exact source marker/native run evidence invalid")
+                  for k in (
+                      "original_full_reference_sha256","original_body_sha256",
+                      "selected_native_raw_sha256",
+                      "native_run_first_key_sha256","native_run_last_key_sha256"
+                  ):
+                      if not re.fullmatch(r"[a-f0-9]{64}",entry[k]):
+                          raise SystemExit("Unreviewed original source/native SHA in run boundary")
+                  for k in (
+                      "native_key_immediately_before_raw_run_sha256",
+                      "native_raw_immediately_before_raw_run_sha256",
+                      "native_key_immediately_after_raw_run_sha256",
+                      "native_raw_immediately_after_raw_run_sha256"
+                  ):
+                      if entry[k] is not None and (
+                          not isinstance(entry[k],str) or
+                          not re.fullmatch(r"[a-f0-9]{64}",entry[k])
+                      ):
+                          raise SystemExit("Unreviewed source/native adjacent raw SHA in boundary")
+                  observed_boundaries.add(ident)
+              if observed_boundaries != expected_boundaries:
+                  raise SystemExit("Original seven source marker boundary identities not fully verified")
+              print("Original scripCom marker siblings and native raw K-run boundary classes (NOT section parity): " +
+                    json.dumps({
+                        "source_units":len(bounded),
+                        "original_next_tag_classes":
+                            boundaries["original_marker_following_source_sibling_tag_classes"],
+                        "native_run_classes":
+                            boundaries["selected_native_raw_run_structure_classes"],
+                        "total_native_numbered_occupied_keys":
+                            boundaries["actual_native_K_occupied_keys_in_full_corpus"],
+                        "total_native_intro_keys":
+                            boundaries["actual_native_I_intro_keys_in_full_corpus"],
+                    },sort_keys=True))
+              print("Original seven source marker and native raw K-run line/hash boundary cases: " +
+                    json.dumps(bounded,sort_keys=True))
+          elif boundaries != {
+              "source_marker_case_count":0,
+              "no_original_large_prose_cases_to_check":True,
+          }:
+              raise SystemExit("Source native run boundary report unexpectedly claims cases")
           print("Original bounded source prose alignment and stock raw repetition (not authored range proof): " +
                 json.dumps({
                     "alignment_classes":alignment_counts,

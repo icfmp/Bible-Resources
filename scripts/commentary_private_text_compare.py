@@ -29,6 +29,7 @@ from commentary_chapter_paragraph_overlap import OriginalChapterParagraphSpanPro
 from commentary_chapter_p_boundaries import ChapterParagraphBoundaryProbe
 from commentary_reference_cross_slot import ReferenceCrossSlotTopology
 from commentary_prose_cross_slot import OriginalProseAlternativeNativeSlotProbe
+from commentary_source_native_boundaries import original_marker_boundary, NativeRawRunBoundaryInventory
 from commentary_intake import load_manifest
 from commentary_text_delta import punctuation_relationship, word_relationship, nonword_symbol_excess
 from commentary_unresolved_lexical_triage import (
@@ -128,6 +129,9 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
             "original_text_sha256":sha256(text_bytes).hexdigest(),
             "original_characters":len(txt),
             "private_original_neighbor_candidates":_original_thml_neighbor_candidates(node),
+            "private_source_marker_boundary":original_marker_boundary(
+                node,sibling,original_ref,start
+            ),
             "private_original_body_tag_counts": dict(sorted(Counter(
                 x.tag.rsplit("}",1)[-1] for x in sibling.iter()
                 if x is not sibling and isinstance(x.tag,str)
@@ -575,6 +579,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         source_p_overlap_probe=OriginalChapterParagraphSpanProbe(chapter_neighbors)
         source_p_boundary_probe=ChapterParagraphBoundaryProbe(chapter_neighbors)
         reference_cross_slot=ReferenceCrossSlotTopology(source)
+        native_run_boundaries=NativeRawRunBoundaryInventory()
         try:
             process=subprocess.Popen(["timeout","360s",str(raw_binary),manifest["module_id"]],
                                      stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,env=env)
@@ -589,6 +594,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
                 source_p_overlap_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
                 source_p_boundary_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
                 reference_cross_slot.observe_stock(kind,ref,raw)
+                native_run_boundaries.observe(kind,ref,raw)
                 if kind=="I" and (ref in chapter_neighbors or
                                    (ref.endswith(".0") and ref[:-2] in chapter_neighbors)):
                     chapter_intros[ref]=raw
@@ -667,6 +673,13 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
             alternative_prose=alternative_probe.report()
             if alternative_prose["all_native_raw_entries_replayed"] != len(rows):
                 raise PilotError("Original second native prose scan omitted occupied keys")
+        if large_plain_cases:
+            boundary_case_report=native_run_boundaries.report(source,large_plain_cases)
+        else:
+            boundary_case_report={
+                "source_marker_case_count":0,
+                "no_original_large_prose_cases_to_check":True,
+            }
         chapter_analysis=compare_chapter_neighbors(
             chapter_neighbors,chapter_intros,raw_as_strict_xml_text
         )
@@ -695,6 +708,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         "source_unpaired_reference_cross_native_slots":reference_cross_slot_report,
         "source_nonlink_prose_review_stock_raw_duplicate_topology":plain_payload_topology,
         "source_large_nonlink_prose_native_alternative_locations":alternative_prose,
+        "source_large_prose_marker_to_native_raw_run_boundary_diagnostics":boundary_case_report,
         "source_original_chapter_neighbor_evidence":chapter_proof,
         "source_chapter_neighbor_to_stock_intro_diagnostics":chapter_analysis,
         "source_chapter_neighbor_to_same_chapter_numbered_location":chapter_numbered_location,
