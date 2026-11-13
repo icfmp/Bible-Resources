@@ -192,7 +192,21 @@ def make_private_candidate(
             if (stock_code!=0 or test_code!=0 or
                     stock_text!=test_text or
                     not present_key(passage,stock_text,stock_code)):
-                raise PilotError("Independent diatheke readback differs after identity-only candidate packaging")
+                # Names, references and actual commentary prose remain private;
+                # only lengths and the result of exact literal ID substitution
+                # are safe here. Never silently strip arbitrary words.
+                label_only=(test_text.replace(
+                    candidate_id.encode("ascii"),old_id.encode("ascii")
+                )==stock_text)
+                raise PilotError(
+                    "Independent diatheke output differs: "
+                    f"exit_equal={stock_code==test_code}; "
+                    f"source_len={len(stock_text)}; candidate_len={len(test_text)}; "
+                    f"source_id_occurrences={stock_text.count(old_id.encode('ascii'))}; "
+                    f"candidate_id_occurrences={test_text.count(candidate_id.encode('ascii'))}; "
+                    f"exact_module_ID_only_substitution_equal={label_only}; "
+                    f"both_present={present_key(passage,stock_text,stock_code) and present_key(passage,test_text,test_code)}"
+                )
             if len(stock_text)>64:
                 substantial+=1
             probes.append({
