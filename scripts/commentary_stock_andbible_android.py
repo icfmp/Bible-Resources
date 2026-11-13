@@ -329,6 +329,25 @@ def _reference_uri(manifest: dict) -> str:
             urlencode({"document": manifest["module_id"], "v11n": "KJV"}))
 
 
+def _launch_official_exported_zip_installer() -> bool:
+    """Open the exact official stable AndBible manifest-exported InstallZip Activity.
+
+    After Bible registration the initial Load Documents shortcut is no longer
+    available. This opens the official app Activity via Android ActivityManager,
+    then uses its real Proceed dialog + ACTION_OPEN_DOCUMENT system picker.
+    No application database edits, unpublished APK, or inferred UI state.
+    """
+    component = PACKAGE + "/net.bible.android.view.activity.installzip.InstallZip"
+    response = adb("shell", "am", "start", "-n", component,
+                   timeout=30, fail=False)
+    if (b"Error:" in response or
+            not (b"Starting: Intent" in response or
+                 b"Warning: Activity not started" in response)):
+        raise PilotError("Official exported AndBible InstallZip Activity unavailable")
+    time.sleep(2)
+    return True
+
+
 def _create_attested_reviewed_bible_zip(directory: Path) -> Path:
     """Package only the five unchanged, independently attested published Bible files.
 
@@ -470,14 +489,19 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
                 "allowlisted actual action classes: " + ",".join(observed)
             )
         baseline_before_proceed = _reader_context_witness()
-        # Stay in the first-download flow to import the original MHCC next.
-        # The registered Bible must subsequently enable FirstDownload's
-        # *different* actual okayButton before entering MainBibleActivity.
-        startup_commentary = _start_bounded_android_import(module_id, title)
-        dialog = _screen(module_id, title)
-        commentary_dialog_proceeded = _tap(dialog["controls"], ("PROCEED",)) is not None
+        # Official production-1117 AndroidManifest.xml explicitly exports
+        # the separate InstallZip Activity. Once a Bible has been registered,
+        # the first-run Load Documents shortcut is no longer reachable.
+        commentary_installer_started = _launch_official_exported_zip_installer()
+        commentary_dialog_proceeded = False
+        for _attempt in range(6):
+            dialog = _screen(module_id, title)
+            if _tap(dialog["controls"], ("PROCEED",)) is not None:
+                commentary_dialog_proceeded = True
+                break
+            time.sleep(2)
         if not commentary_dialog_proceeded:
-            raise PilotError("Second original commentary InstallZip Proceed not observed")
+            raise PilotError("Official exported commentary InstallZip Proceed not observed")
         selected, history = _select_exact_download_zip(
             module_id, title, wanted="EXACT_MODULE_ZIP",
         )
@@ -544,11 +568,11 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
             "reviewed_bible_all_five_published_files_attested": True,
             "reviewed_bible_zip_selected_in_actual_file_picker": bible_selected,
             "original_commentary_installzip_proceed_tapped": commentary_dialog_proceeded,
+            "official_exported_installzip_activity_started": commentary_installer_started,
             "first_download_enabled_okay_button_tapped": first_download_completed,
             "android_reviewed_bible_baseline_reader_before_proceed": baseline_before_proceed,
             "android_reviewed_bible_baseline_reader_after_proceed": baseline_after_proceed,
             "android_baseline_bible_picker_actions": baseline_history,
-            "android_startup_commentary_snapshots_checked": startup_commentary["startup_snapshots_checked"],
             "android_file_picker_exact_original_zip_selected": selected,
             "android_proceed_dialog_tapped": proceeded,
             "android_safe_import_confirmation_buttons_tapped": action_after,
