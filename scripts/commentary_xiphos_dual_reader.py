@@ -701,13 +701,15 @@ def prepare_original_and_candidate_gui_samples(
                 or not present_key(passage, selected, new_code)
                 or len(stock) <= 64 or len(selected) <= 64):
             return None
-        _reader_identity_only_equivalence(
-            stock, selected, old_id=original_id, candidate_id=selected_module_id
-        ) if original_id != selected_module_id else (
-            None if stock == selected else
-            (_ for _ in ()).throw(PilotError(
+        if original_id != selected_module_id:
+            _reader_identity_only_equivalence(
+                stock, selected,
+                old_id=original_id, candidate_id=selected_module_id,
+            )
+        elif stock != selected:
+            raise PilotError(
                 "Original reader output differs from actual selected stock bytes"
-            ))
+            )
         code, bible = query(
             BIBLE_MODULE, passage, fmt="plain", root=reader_root,
             exe="diatheke", limit=256 * 1024, timeout=30,
