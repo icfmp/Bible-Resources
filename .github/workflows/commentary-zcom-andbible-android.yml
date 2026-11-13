@@ -1,0 +1,115 @@
+name: Attempt exact original zCom in official AndBible Android emulator (research only)
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/commentary-zcom-andbible-android.yml'
+      - 'scripts/commentary_stock_andbible_android.py'
+      - 'tests/test_commentary_stock_andbible_android.py'
+      - 'config/commentary-intake/**'
+  workflow_dispatch:
+    inputs:
+      resource_id:
+        description: Reviewed original CrossWire zCom commentary
+        required: true
+        type: string
+        default: mhcc-crosswire
+
+permissions:
+  contents: read
+concurrency:
+  group: commentary-stock-android-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  official-stable-andbible-zcom-original:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      RESOURCE_ID: ${{ github.event.inputs.resource_id || 'mhcc-crosswire' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Python dependencies and verify safe Android controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          python -m unittest discover -s tests -p 'test_commentary_stock_andbible_android.py' -v
+      - name: Obtain exact official stable AndBible APK; no other APK accepted
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/commentary-private-android"
+          curl --fail --location --retry 2 --max-time 120 \
+            -o "$RUNNER_TEMP/commentary-private-android/andbible-production-1117.apk" \
+            https://github.com/AndBible/and-bible/releases/download/production-1117/andbible-production-1117.apk
+          echo "1c9ed93391642c0de4529065a65e10eb44242d60722231b917b14c5919cdf796  $RUNNER_TEMP/commentary-private-android/andbible-production-1117.apk" \
+            | sha256sum --check --status
+      - name: Permit ephemeral hardware acceleration if present
+        shell: bash
+        run: |
+          if test -c /dev/kvm; then sudo chmod 666 /dev/kvm; fi
+      - name: Test actual exact CrossWire stock ZIP via pinned stable Android app and file picker
+        uses: ReactiveCircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: 35
+          target: default
+          arch: x86_64
+          profile: pixel_4
+          cores: 4
+          ram-size: 4096M
+          heap-size: 512M
+          disable-animations: true
+          emulator-boot-timeout: 600
+          script: python scripts/commentary_stock_andbible_android.py --resource-id "$RESOURCE_ID" --apk "$RUNNER_TEMP/commentary-private-android/andbible-production-1117.apk" --report "$RUNNER_TEMP/commentary-private-android/android-stock-import-proof.json"
+      - name: Enforce exact pinned stock and honest Android observation limitations
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          p=Path(os.environ["RUNNER_TEMP"])/"commentary-private-android/android-stock-import-proof.json"
+          data=json.loads(p.read_text())
+          manifest=json.loads((Path("config/commentary-intake")/(os.environ["RESOURCE_ID"]+".json")).read_text())
+          assert data["status"]=="pinned_original_zCom_stable_Android_ui_import_observation"
+          assert data["resource_id"]==manifest["resource_id"]
+          assert data["sword_module_id"]==manifest["module_id"]
+          assert data["crosswire_original_zip_sha256"]==manifest["archive_sha256"]
+          assert data["crosswire_original_conf_sha256"]==manifest["stock_conf_sha256"]
+          assert data["andbible_apk_sha256"]=="1c9ed93391642c0de4529065a65e10eb44242d60722231b917b14c5919cdf796"
+          assert data["official_android_application_installed"] is True
+          assert data["official_android_app_file_import_action_tapped"] is True
+          assert data["android_file_picker_exact_original_zip_selected"] is True
+          assert data["android_sample_reference_deeplink_dispatched"] is True
+          assert data["original_text_and_reference_target_display_verified"] is False
+          assert data["module_persistence_in_application_database_verified"] is False
+          assert data["Android_commentary_links_verified"] is False
+          assert data["Screenshots_or_commented_text_or_module_uploaded"] is False
+          assert data["legal_editorial_release_approved"] is False
+          assert data["published"] is False
+          assert len(data["real_screen_sha256_only"])>=3
+          assert all(re.fullmatch(r"[a-f0-9]{64}",val) for val in data["real_screen_sha256_only"].values())
+          print("Android: exact original ZIP chosen in official stable app; actual rendered text and navigation not certified")
+          PY
+      - name: Preserve only bounded original identity and UI action metadata
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: commentary-stock-android-metadata-${{ github.run_id }}
+          path: ${{ runner.temp }}/commentary-private-android/android-stock-import-proof.json
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Declare exact scope and outstanding independent checks
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo 'Real official Android stable APK and original SHA-pinned CrossWire SWORD ZIP used inside disposable emulator.'
+            echo 'Real file-picker selection and documented deep link attempts do not themselves prove successful module import, persistent selection or rendered commentary text.'
+            echo 'No screenshots, original commentary words, source archive or Android emulator image are published.'
+            echo 'Independent authorial content/links/GUI inspection, rights, editorial acceptance and release remain open.'
+          } >> "$GITHUB_STEP_SUMMARY"
