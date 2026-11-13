@@ -31,7 +31,7 @@ SAFE = frozenset({
     "DOWNLOADS", "DOWNLOAD", "PROCEED", "BROWSE FILES", "BROWSE",
     "IMPORT", "INSTALL", "OK", "OPEN", "CONTINUE", "DONE",
     "DISMISS", "DISMISS UNTIL NEXT UPDATE", "ALLOW",
-    "WHILE USING THE APP", "USE THIS FOLDER",
+    "WHILE USING THE APP", "USE THIS FOLDER", "WAIT", "CLOSE APP",
 })
 
 
@@ -46,6 +46,13 @@ def safe_controls(xml: bytes, module_id: str, title: str) -> dict:
     except ET.ParseError:
         return {"controls": [], "reader_module_metadata_detected": False}
     file_label = module_id.upper() + ".ZIP"
+    # Never dismiss an arbitrary application. On hosted AOSP emulators only,
+    # the known launcher ANR may be closed using an explicitly seen control.
+    launcher_anr = any(
+        node.attrib.get("text", "").strip().casefold() in {
+            "pixel launcher isn't responding", "quickstep isn't responding"
+        } for node in tree.iter("node")
+    )
     results = []
     module_label_in_tree = False
     for node in tree.iter("node"):
@@ -56,6 +63,8 @@ def safe_controls(xml: bytes, module_id: str, title: str) -> dict:
                 module_label_in_tree = True
             label = value.strip().upper()
             if label not in SAFE and label != file_label:
+                continue
+            if label == "CLOSE APP" and not launcher_anr:
                 continue
             match = BOUNDS.fullmatch(node.attrib.get("bounds", ""))
             if not match:
@@ -88,6 +97,39 @@ def _tap(controls: list[dict], choices: tuple[str, ...]) -> str | None:
                 time.sleep(3)
                 return choice
     return None
+
+
+def _start_bounded_android_import(module_id: str, title: str) -> dict:
+    """Recover transient launcher/upgrade overlays; never tap unknown buttons.
+
+    The same official pinned app can cold-start to a still-loading screen or
+    show AOSP Pixel Launcher ANR. An absent button after one snapshot is not
+    proof the import UI is unavailable; bounded retries must still fail closed.
+    """
+    initial = []
+    recovery = []
+    for index in range(6):
+        observed = _screen(module_id, title)
+        names = sorted({c["action"] for c in observed["controls"]})
+        if index == 0:
+            initial = names
+        chosen = _tap(observed["controls"], (
+            "LOAD DOCUMENTS FROM FILES", "LOAD DOCUMENT FROM FILES"
+        ))
+        if chosen is not None:
+            return {
+                "initial_buttons": initial,
+                "recovery_actions": recovery,
+                "import_button": chosen,
+                "startup_snapshots_checked": index + 1,
+            }
+        fallback = _tap(observed["controls"], (
+            "CLOSE APP", "WAIT", "DISMISS", "DISMISS UNTIL NEXT UPDATE", "ADVANCED"
+        ))
+        if fallback is not None:
+            recovery.append(fallback)
+        time.sleep(5)
+    raise PilotError("Stable AndBible import UI not established after bounded recovery")
 
 
 def _screenshot_sha256() -> str:
@@ -202,17 +244,9 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
         adb("shell", "monkey", "-p", PACKAGE, "1", timeout=40)
         time.sleep(14)
         snapshots = {"startup": _screenshot_sha256()}
-        snap = _screen(module_id, title)
         history = []
-        initial_buttons = sorted({c["action"] for c in snap["controls"]})
-        if "LOAD DOCUMENTS FROM FILES" not in initial_buttons and "LOAD DOCUMENT FROM FILES" not in initial_buttons:
-            advanced = _tap(snap["controls"], ("ADVANCED",))
-            if advanced:
-                snap = _screen(module_id, title)
-        load = _tap(snap["controls"], ("LOAD DOCUMENTS FROM FILES",
-                                      "LOAD DOCUMENT FROM FILES"))
-        if load is None:
-            raise PilotError("Stable AndBible did not expose its actual file-import action")
+        startup = _start_bounded_android_import(module_id, title)
+        initial_buttons = startup["initial_buttons"]
         snap = _screen(module_id, title)
         proceeded = _tap(snap["controls"], ("PROCEED",)) is not None
         selected = False
@@ -298,6 +332,8 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
                 snapshots["post_reference_dispatch"] != snapshots["after_import_attempt"]
             ),
             "bounded_first_screen_available_actions": initial_buttons,
+            "android_bounded_startup_recovery_actions": startup["recovery_actions"],
+            "android_startup_snapshots_checked": startup["startup_snapshots_checked"],
             "bounded_file_picker_actions": history,
             "real_screen_sha256_only": snapshots,
             "original_text_and_reference_target_display_verified": False,
