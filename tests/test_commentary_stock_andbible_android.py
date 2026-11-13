@@ -84,5 +84,37 @@ class CommentaryAndroidStockTests(unittest.TestCase):
         self.assertFalse(_app_foreground())
 
 
+    @patch("commentary_stock_andbible_android.adb")
+    def test_only_active_or_resumed_original_app_counts_as_foreground(self, adb):
+        from commentary_stock_andbible_android import _app_focus_witness
+        adb.side_effect = [
+            b"mCurrentFocus=Window{11 com.android.documentsui/.Files}\n",
+            b"Recent activities include net.bible.android.activity but nothing resumed\n",
+        ]
+        self.assertEqual(_app_focus_witness(), [])
+        adb.side_effect = [
+            b"mCurrentFocus=Window{42 net.bible.android.activity/MainActivity}\n",
+            b"",
+        ]
+        self.assertEqual(_app_focus_witness(), ["focused_window"])
+        adb.side_effect = [
+            b"",
+            b"topResumedActivity=ActivityRecord{12 net.bible.android.activity/.MainActivity}\n",
+        ]
+        self.assertEqual(_app_focus_witness(), ["top_resumed_activity"])
+
+    @patch("commentary_stock_andbible_android.adb")
+    def test_reference_intent_must_have_actual_activity_manager_acceptance(self, adb):
+        from commentary_stock_andbible_android import _dispatch_documented_reference
+        manifest = {"module_id": "MHCC", "sample_references": ["Gen 1:1"]}
+        adb.return_value = b""
+        self.assertFalse(_dispatch_documented_reference(manifest))
+        adb.return_value = b"Error: Activity not found"
+        self.assertFalse(_dispatch_documented_reference(manifest))
+        adb.return_value = b"Starting: Intent { act=android.intent.action.VIEW }"
+        self.assertTrue(_dispatch_documented_reference(manifest))
+        self.assertIn("read.andbible.org/Gen.1.1", adb.call_args.args[6])
+
+
 if __name__ == "__main__":
     unittest.main()
