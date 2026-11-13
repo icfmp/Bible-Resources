@@ -43,7 +43,7 @@ class SourceDiv1BookMarkerRepairTests(unittest.TestCase):
             b'    <div><p>Another original passage <scripRef osisRef="Bible:Gen.1.1">Genesis</scripRef>.</p></div>\n'
             b'  </div1>\n'
             b'  <div1 title="Genesis"><scripCom osisRef="Bible:Gen.1.1"/>\n'
-            b'    <div>Unchanged authorial text.</div></div>\n'
+            b'    <div>Unchanged authorial text.</div></div1>\n'
             b'</ThML>\n'
         )
         proposed, receipt = review(raw)
