@@ -17,6 +17,8 @@ on:
       - 'tests/test_commentary_private_text_compare.py'
       - 'scripts/commentary_text_delta.py'
       - 'tests/test_commentary_text_delta.py'
+      - 'scripts/commentary_unresolved_lexical_triage.py'
+      - 'tests/test_commentary_unresolved_lexical_triage.py'
       - 'scripts/commentary_stock_prefix_topology.py'
       - 'tests/test_commentary_stock_prefix_topology.py'
       - 'tests/test_commentary_prefixed_suffix.py'
@@ -224,6 +226,76 @@ jobs:
               safe_cases.append(case)
           print("Original chapter-neighbor bounded line/hash-only remaining cases: " +
                 json.dumps(safe_cases, sort_keys=True))
+          lexical = metrics["unresolved_source_stock_lexical_selection_triage"]
+          unresolved = metrics["unexplained_original_to_stock_word_boundary_count"]
+          if (lexical["source_vs_stock_unresolved_word_selection_cases"] != unresolved or
+                  sum(lexical["differing_middle_shape_classes"].values()) != unresolved or
+                  sum(lexical["one_word_case_character_classes"].values()) != unresolved or
+                  sum(lexical["middle_exact_alignment_classes"].values()) != unresolved or
+                  sum(lexical["source_scripRef_presence"].values()) != unresolved or
+                  sum(lexical["stock_reference_presence"].values()) != unresolved or
+                  sum(lexical["source_scripRef_x_stock_reference_presence"].values()) != unresolved or
+                  sum(lexical["stock_title_or_table_presence"].values()) != unresolved or
+                  sum(lexical["original_middle_word_count_buckets"].values()) != unresolved or
+                  sum(lexical["stock_middle_word_count_buckets"].values()) != unresolved or
+                  sum(lexical["shared_middle_word_multiset_occurrence_buckets"].values()) != unresolved or
+                  sum(sum(x.values()) for x in lexical[
+                      "per_book_source_marker_lexical_middle_shapes"].values()) != unresolved):
+              raise SystemExit("Full private unresolved original lexical census did not reconcile")
+          cases = lexical["bounded_highest_changed_word_count_line_hash_only_cases"]
+          expected_case_fields = {
+              "source_line", "original_reference_sha256", "original_body_sha256",
+              "stock_raw_sha256", "source_markup_scripRef_count", "stock_markup_reference_count",
+              "stock_markup_title_count", "stock_markup_table_count",
+              "source_middle_word_count", "stock_middle_word_count",
+              "shared_changed_middle_words", "same_prefix_words", "same_suffix_words",
+              "lexical_shape", "middle_alignment", "alignment_edit_opcode_count",
+          }
+          allowed_shapes = {
+              "only_stock_middle_words_added", "only_source_middle_words_removed",
+              "one_to_one_middle_word_substitution",
+              "middle_same_word_multiset_different_order",
+              "middle_word_multisets_disjoint", "middle_partial_shared_word_occurrences",
+          }
+          allowed_alignments = {
+              "single_edit_block", "multiple_distinct_edit_blocks",
+              "alignment_skipped_under_explicit_safe_cell_limit",
+          }
+          if len(cases) != min(unresolved, lexical["priority_receipt_limit"]) or len(cases) > 20:
+              raise SystemExit("Bounded unresolved original source/stock case list incomplete")
+          for case in cases:
+              if (set(case) != expected_case_fields or
+                      case["lexical_shape"] not in allowed_shapes or
+                      case["middle_alignment"] not in allowed_alignments or
+                      not all(type(case[key]) is int and case[key] >= 0 for key in (
+                          "source_line","source_markup_scripRef_count",
+                          "stock_markup_reference_count", "stock_markup_title_count",
+                          "stock_markup_table_count", "source_middle_word_count",
+                          "stock_middle_word_count", "shared_changed_middle_words",
+                          "same_prefix_words", "same_suffix_words",
+                          "alignment_edit_opcode_count")) or
+                      not all(isinstance(case[key],str) and re.fullmatch(r"[0-9a-f]{64}",case[key])
+                              for key in ("original_reference_sha256","original_body_sha256",
+                                          "stock_raw_sha256")) or
+                      case["source_line"] < 1 or
+                      case["shared_changed_middle_words"] > min(
+                          case["source_middle_word_count"],case["stock_middle_word_count"])):
+                  raise SystemExit("Unreviewed raw or source text exposed in lexical case data")
+          print("Original 156-case word selection and source/stock markup triage (not parity): " +
+                json.dumps({
+                    "unresolved": unresolved,
+                    "middle_shapes": lexical["differing_middle_shape_classes"],
+                    "single_word_subtypes":lexical["one_word_case_character_classes"],
+                    "alignment_classes":lexical["middle_exact_alignment_classes"],
+                    "source_link_presence":lexical["source_scripRef_presence"],
+                    "stock_ref_presence":lexical["stock_reference_presence"],
+                    "cross_source_stock_link_presence":
+                        lexical["source_scripRef_x_stock_reference_presence"],
+                    "compiled_titles_tables":lexical["stock_title_or_table_presence"],
+                    "source_middle_bins":lexical["original_middle_word_count_buckets"],
+                    "compiled_middle_bins":lexical["stock_middle_word_count_buckets"],
+                    "bounded_source_line_hash_cases":len(cases),
+                },sort_keys=True))
           paragraph = report["source_chapter_p_source_to_stock_word_contiguity"]
           all_p = paragraph["original_explicit_chapter_marker_adjacent_p_count"]
           if (type(all_p) is not int or all_p < 1 or
