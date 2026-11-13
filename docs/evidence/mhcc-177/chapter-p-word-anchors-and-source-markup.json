@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "issue": "https://github.com/icfmp/Bible-Resources/issues/177",
+  "status": "SOURCE_CHAPTER_PARAGRAPH_WORD_ANCHOR_POSITIONS_AND_CHILD_TAGS_OBSERVED_NOT_AUTHORIAL_PARITY",
+  "original_sha256": {
+    "ccel_thml": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+    "stock_crosswire_zip": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+    "full_stock_raw_ordered": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
+  },
+  "source_chapter_p_comparison": {
+    "original_adjacent_p_total": 8,
+    "previously_unlocated_original_p_count": 3,
+    "unresolved_cases_source_line_hash_and_numeric_only": [
+      {
+        "best_same_chapter_contiguous_word_run": 18,
+        "matching_native_key_sha256": "bb994b2bcd4b5b500e4608c950c1e00a8b676721ba317b54f77b420d45b5fb2c",
+        "original_next_sibling_tag": "p",
+        "original_paragraph_sha256": "5c71bb382bf2480fbfbf02995346a02512833ee249172ea7030a5af81fc86273",
+        "original_parent_element_tag": "div2",
+        "original_tokens_after_shared_run": 4,
+        "original_tokens_before_shared_run": 8,
+        "original_word_token_multiset_occurrences_in_selected_stock_key": 28,
+        "original_word_tokens": 30,
+        "repeated_identical_word_run_windows_in_selected_stock_key": 1,
+        "selected_stock_run_start_token_offset": 168,
+        "source_line": 34439,
+        "source_paragraph_direct_child_element_counts": {
+          "scripRef": 2
+        },
+        "source_reference_sha256": "99875638192a1640f10e8b085932ac9171249d2857ee4ffa420d6cfc2fd45e39",
+        "stock_key_slots_tied_for_best_word_run": 10
+      },
+      {
+        "best_same_chapter_contiguous_word_run": 16,
+        "matching_native_key_sha256": "f767670547db5d5061f370a2581f54aa083d61cf48cc2b3a4385478700df7cf7",
+        "original_next_sibling_tag": "p",
+        "original_paragraph_sha256": "25aef8b6aa0bfc15ccd5b3406ea9b9a3baaedb4295d9aa208820117c2082af2c",
+        "original_parent_element_tag": "div2",
+        "original_tokens_after_shared_run": 4,
+        "original_tokens_before_shared_run": 12,
+        "original_word_token_multiset_occurrences_in_selected_stock_key": 30,
+        "original_word_tokens": 32,
+        "repeated_identical_word_run_windows_in_selected_stock_key": 1,
+        "selected_stock_run_start_token_offset": 77,
+        "source_line": 35054,
+        "source_paragraph_direct_child_element_counts": {
+          "scripRef": 2
+        },
+        "source_reference_sha256": "f5a0881ef41fb84303e4ea1f2932026d4139091d19c73b3f8a5c0b6102cc672e",
+        "stock_key_slots_tied_for_best_word_run": 11
+      },
+      {
+        "best_same_chapter_contiguous_word_run": 11,
+        "matching_native_key_sha256": "89efa58642fa89fb1b9e69c9fda5657b7649b00f1b1658dc7d659d8fd7e4c360",
+        "original_next_sibling_tag": "p",
+        "original_paragraph_sha256": "27d3383b3b29c69c8598e10fe1d881c327ec35b7080e5f8e5fd5eb8d469d591f",
+        "original_parent_element_tag": "div2",
+        "original_tokens_after_shared_run": 12,
+        "original_tokens_before_shared_run": 8,
+        "original_word_token_multiset_occurrences_in_selected_stock_key": 28,
+        "original_word_tokens": 31,
+        "repeated_identical_word_run_windows_in_selected_stock_key": 1,
+        "selected_stock_run_start_token_offset": 201,
+        "source_line": 35608,
+        "source_paragraph_direct_child_element_counts": {
+          "scripRef": 3
+        },
+        "source_reference_sha256": "53df2cd02435f0e9352da3bca39da5da29dd4c88b2c875a5da9b8c3cd1f44fab",
+        "stock_key_slots_tied_for_best_word_run": 7
+      }
+    ],
+    "source_p_scripture_reference_children_counts_are_not_approved_source_to_stock_ref_parity": true,
+    "lexical_multiset_overlap_does_not_prove_original_order_or_section_identity": true,
+    "word_anchor_starts_do_not_authorize_reassignment_of_chapter_verses": true,
+    "repeated_stock_native_key_hashes_may_represent_range_propagation": true
+  },
+  "verification": {
+    "actual_sha_pinned_stock_compare": "https://github.com/icfmp/Bible-Resources/actions/runs/43407585155",
+    "exact_head_tests": "https://github.com/icfmp/Bible-Resources/actions/runs/43407585187",
+    "implementation_head": "c19783193c86cf26ce0c82519bca1d86e4bbd863"
+  },
+  "next_checks": {
+    "compare_source_scripRef_spans_against_actual_stock_reference_content_and_markup": true,
+    "review_156_original_source_vs_compiled_word_selections": true,
+    "unmarked_source_division_and_Jude": true,
+    "complete_source_notes_paragraphs_tables_quotes_and_references": true,
+    "rights_and_GUI_readers_and_publication": false
+  },
+  "acceptance_approved_stages": 0,
+  "original_source_text_or_stock_binary_modified": false,
+  "original_text_or_binary_published": false
+}
