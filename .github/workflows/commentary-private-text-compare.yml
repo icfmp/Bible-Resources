@@ -241,6 +241,24 @@ jobs:
                   sum(lexical["source_scripRef_and_stock_reference_changed_word_overlap"].values()) != unresolved or
                   sum(lexical["one_to_one_middle_word_changes_inside_source_and_stock_references"].values())
                     != lexical["differing_middle_shape_classes"].get("one_to_one_middle_word_substitution", 0) or
+                  sum(lexical["original_vs_stock_target_correspondence_classes"].values()) != unresolved or
+                  sum(lexical["original_scripRef_vs_stock_reference_tag_count_relationships"].values())
+                    != unresolved or
+                  sum(lexical["original_scripRef_display_label_location_in_stock_text_classes"].values())
+                    != lexical["original_scripRef_total_across_unresolved_entries"] or
+                  sum(x["original_scripRef_count"] for x in lexical[
+                      "all_missing_stock_reference_entry_source_line_hash_only_cases"])
+                    > lexical["original_scripRef_total_across_unresolved_entries"] or
+                  len(lexical["all_missing_stock_reference_entry_source_line_hash_only_cases"])
+                    != lexical["stock_reference_presence"].get("stock_no_reference", 0) or
+                  lexical["raw_exact_osisRef_target_multiset_match_count"] +
+                    lexical["literal_Bible_work_qualifier_only_osisRef_target_multiset_match_count"]
+                    > min(lexical["original_nonempty_scripRef_osisRef_target_count"],
+                          lexical["stock_reference_elements_with_osisRef_attribute_count"]) or
+                  lexical["original_nonempty_scripRef_osisRef_target_count"]
+                    > lexical["original_scripRef_total_across_unresolved_entries"] or
+                  lexical["stock_reference_elements_with_osisRef_attribute_count"]
+                    > lexical["stock_reference_total_across_unresolved_entries"] or
                   sum(lexical["original_middle_word_count_buckets"].values()) != unresolved or
                   sum(lexical["stock_middle_word_count_buckets"].values()) != unresolved or
                   sum(lexical["shared_middle_word_multiset_occurrence_buckets"].values()) != unresolved or
@@ -251,6 +269,11 @@ jobs:
           expected_case_fields = {
               "source_line", "original_reference_sha256", "original_body_sha256",
               "stock_raw_sha256", "source_markup_scripRef_count", "stock_markup_reference_count",
+              "original_to_stock_reference_target_relationship",
+              "original_source_scripRef_target_nonempty_count",
+              "stock_reference_osisRef_present_count",
+              "source_stock_reference_raw_target_exact_multiset_matches",
+              "source_stock_reference_literal_work_qualifier_only_target_matches",
               "changed_source_middle_words_in_scripRef",
               "changed_stock_middle_words_in_reference",
               "stock_markup_title_count", "stock_markup_table_count",
@@ -268,15 +291,31 @@ jobs:
               "single_edit_block", "multiple_distinct_edit_blocks",
               "alignment_skipped_under_explicit_safe_cell_limit",
           }
+          allowed_targets = {
+              "no_stock_reference_markup",
+              "all_osisRef_values_identical_in_order",
+              "all_osisRef_values_ordered_sole_literal_Bible_work_qualifier_difference",
+              "all_targets_multiset_correspond_but_order_or_mixed_format_unverified",
+              "some_targets_correspond_but_not_all",
+              "no_exact_or_literal_qualifier_only_target_correspondence",
+          }
+          if not all(k in allowed_targets and type(v) is int and v >= 0
+                     for k,v in lexical["original_vs_stock_target_correspondence_classes"].items()):
+              raise SystemExit("Unreviewed scripture target class")
           if len(cases) != min(unresolved, lexical["priority_receipt_limit"]) or len(cases) > 20:
               raise SystemExit("Bounded unresolved original source/stock case list incomplete")
           for case in cases:
               if (set(case) != expected_case_fields or
                       case["lexical_shape"] not in allowed_shapes or
                       case["middle_alignment"] not in allowed_alignments or
+                      case["original_to_stock_reference_target_relationship"] not in allowed_targets or
                       not all(type(case[key]) is int and case[key] >= 0 for key in (
                           "source_line","source_markup_scripRef_count",
                           "stock_markup_reference_count",
+                          "original_source_scripRef_target_nonempty_count",
+                          "stock_reference_osisRef_present_count",
+                          "source_stock_reference_raw_target_exact_multiset_matches",
+                          "source_stock_reference_literal_work_qualifier_only_target_matches",
                           "changed_source_middle_words_in_scripRef",
                           "changed_stock_middle_words_in_reference",
                           "stock_markup_title_count",
@@ -293,8 +332,49 @@ jobs:
                       case["changed_source_middle_words_in_scripRef"] >
                           case["source_middle_word_count"] or
                       case["changed_stock_middle_words_in_reference"] >
-                          case["stock_middle_word_count"]):
+                          case["stock_middle_word_count"] or
+                      case["original_source_scripRef_target_nonempty_count"] >
+                          case["source_markup_scripRef_count"] or
+                      case["stock_reference_osisRef_present_count"] >
+                          case["stock_markup_reference_count"] or
+                      case["source_stock_reference_raw_target_exact_multiset_matches"] +
+                      case["source_stock_reference_literal_work_qualifier_only_target_matches"] >
+                          min(case["original_source_scripRef_target_nonempty_count"],
+                              case["stock_reference_osisRef_present_count"])):
                   raise SystemExit("Unreviewed raw or source text exposed in lexical case data")
+          allowed_missing_fields = {
+              "source_line","original_reference_sha256","original_body_sha256",
+              "stock_raw_sha256","original_scripRef_count",
+              "original_scripRef_target_nonempty_count",
+              "source_label_location_classes_in_unmarked_stock_text",
+              "no_original_stock_reference_or_text_assigned_as_equivalent",
+          }
+          allowed_labels = {
+              "empty_original_label_unreviewed",
+              "literal_label_inside_stock_reference_element",
+              "literal_label_in_stock_text_outside_confirmed_reference_element",
+              "word_tokens_in_stock_reference_element_different_punctuation",
+              "word_tokens_in_stock_text_different_punctuation_or_markup",
+              "original_label_text_not_located_in_selected_stock_entry",
+          }
+          for missing in lexical["all_missing_stock_reference_entry_source_line_hash_only_cases"]:
+              if (set(missing) != allowed_missing_fields or
+                      missing["no_original_stock_reference_or_text_assigned_as_equivalent"] is not True or
+                      not all(type(missing[name]) is int and missing[name] >= 0
+                              for name in ("source_line","original_scripRef_count",
+                                           "original_scripRef_target_nonempty_count")) or
+                      missing["source_line"] < 1 or
+                      missing["original_scripRef_target_nonempty_count"] >
+                          missing["original_scripRef_count"] or
+                      not all(re.fullmatch(r"[0-9a-f]{64}",missing[name])
+                              for name in ("original_reference_sha256","original_body_sha256",
+                                           "stock_raw_sha256")) or
+                      not all(name in allowed_labels and type(n) is int and n >= 0
+                              for name,n in missing[
+                                  "source_label_location_classes_in_unmarked_stock_text"].items()) or
+                      sum(missing["source_label_location_classes_in_unmarked_stock_text"].values())
+                          != missing["original_scripRef_count"]):
+                  raise SystemExit("Unreviewed original no-stock-reference case data")
           print("Original 156-case word selection and source/stock markup triage (not parity): " +
                 json.dumps({
                     "unresolved": unresolved,
@@ -314,6 +394,18 @@ jobs:
                         lexical["source_scripRef_and_stock_reference_changed_word_overlap"],
                     "one_word_changes_at_reference_spans":
                         lexical["one_to_one_middle_word_changes_inside_source_and_stock_references"],
+                    "original_scripRef_total":
+                        lexical["original_scripRef_total_across_unresolved_entries"],
+                    "stock_reference_total":
+                        lexical["stock_reference_total_across_unresolved_entries"],
+                    "target_correspondence":
+                        lexical["original_vs_stock_target_correspondence_classes"],
+                    "source_label_location_in_stock":
+                        lexical["original_scripRef_display_label_location_in_stock_text_classes"],
+                    "reference_element_count_relationships":
+                        lexical["original_scripRef_vs_stock_reference_tag_count_relationships"],
+                    "missing_stock_reference_cases":
+                        len(lexical["all_missing_stock_reference_entry_source_line_hash_only_cases"]),
                     "source_middle_bins":lexical["original_middle_word_count_buckets"],
                     "compiled_middle_bins":lexical["stock_middle_word_count_buckets"],
                     "bounded_source_line_hash_cases":len(cases),
