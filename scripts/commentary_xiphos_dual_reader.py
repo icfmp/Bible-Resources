@@ -265,6 +265,7 @@ def _long_commentary_excerpt_is_on_gui_clipboard(
 # No source heading, authorial phrase, reference label or target leaves CI.
 _TITLE_TAG = re.compile(r"<title(?:\s+[^>]*)?>(.*?)</title\s*>", re.I | re.S)
 _REFERENCE_TAG = re.compile(r"<reference(?:\s+[^>]*)?>", re.I | re.S)
+_REFERENCE_WITH_LABEL = re.compile(r"<reference(?:\s+[^>]*)?>(.*?)</reference\s*>", re.I | re.S)
 
 
 class _BoundedMarkupScanner(HTMLParser):
@@ -272,6 +273,8 @@ class _BoundedMarkupScanner(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.link_count = 0
         self.text_chunks = []
+        self.anchor_labels = []
+        self._current_anchor = None
 
     def handle_starttag(self, tag, attrs):
         if tag.casefold() == "a" and any(
@@ -279,9 +282,19 @@ class _BoundedMarkupScanner(HTMLParser):
             for key, value in attrs
         ):
             self.link_count += 1
+            self._current_anchor = []
+
+    def handle_endtag(self, tag):
+        if tag.casefold() == "a" and self._current_anchor is not None:
+            self.anchor_labels.append(
+                " ".join("".join(self._current_anchor).split())
+            )
+            self._current_anchor = None
 
     def handle_data(self, data):
         self.text_chunks.append(data)
+        if self._current_anchor is not None:
+            self._current_anchor.append(data)
 
 
 def _markup_display_witness(internal: bytes, rendered_plain: bytes,
@@ -304,16 +317,39 @@ def _markup_display_witness(internal: bytes, rendered_plain: bytes,
     visible = " ".join(copied.split())
     exact_titles = sum(1 for value in extracted_titles if value in visible)
     rich_link_count = 0
+    actual_anchor_labels = set()
+    actual_html_text = ""
     if rendered_html:
         parser = _BoundedMarkupScanner()
         parser.feed(rendered_html.decode("utf-8", errors="replace"))
         rich_link_count = min(parser.link_count, 5000)
+        actual_anchor_labels = set(parser.anchor_labels)
+        actual_html_text = " ".join("".join(parser.text_chunks).split())
+    source_reference_labels = []
+    for value in _REFERENCE_WITH_LABEL.findall(original)[:256]:
+        parser = _BoundedMarkupScanner()
+        parser.feed(unescape(value))
+        label = " ".join("".join(parser.text_chunks).split())
+        if len(label) >= 5:
+            source_reference_labels.append(label)
+    # A semantic match only proves the *original hyperlink label* was copied
+    # as an actual HTML anchor; its OSIS target and click navigation are not
+    # independently verified by the clipboard.
+    matched_anchor_labels = sum(
+        1 for label in source_reference_labels if label in actual_anchor_labels
+    )
     return {
         "original_internal_title_elements_found": len(extracted_titles),
         "exact_original_titles_in_copied_gui_text": exact_titles,
+        "exact_original_titles_in_copied_gui_rich_html": sum(
+            1 for value in extracted_titles if value in actual_html_text
+        ),
         "original_internal_reference_elements_found": min(
             len(_REFERENCE_TAG.findall(original)), 5000
         ),
+        "original_stock_nontrivial_reference_labels_found": len(source_reference_labels),
+        "source_reference_labels_observed_as_real_gui_HTML_anchors":
+            matched_anchor_labels,
         "real_gui_rich_html_selection_available": bool(rendered_html),
         "real_gui_rich_html_anchor_elements_found": rich_link_count,
         "xiphos_link_click_target_and_navigation_verified": False,
