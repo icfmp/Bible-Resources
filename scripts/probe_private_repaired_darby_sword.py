@@ -20,6 +20,7 @@ from repair_osis_note_links import propose as propose_links
 from repair_osis_inline_markup import propose as propose_inline
 from repair_osis_source_bytes import patch_exact_original
 from repair_osis_division_markers import patch_divisions
+from source_native_division_markers import NativeDivisionAudit
 from repair_osis_paragraph_indentation import trim_publisher_paragraph_indentation
 from repair_osis_unlinked_reference_labels import render_absent_references_plain
 from audit_omitted_verse_notes import source_cases, native_cases
@@ -246,7 +247,10 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
         render_refs = {"Gen.6.9", "Gen.6.13", "Gen.7.17", "Ps.3.1", "Job.3.1"}
         omitted_raw = {}
         render_raw = {}
+        division_full_native_check = NativeDivisionAudit(corrected) if division_overlay else None
         for kind, ref, raw in _read_native_frames(native_raw, MODULE, payload):
+            if division_full_native_check is not None:
+                division_full_native_check.observe(kind, ref, raw)
             if kind != "K":
                 continue
             if ref in omitted_hosts:
@@ -254,6 +258,7 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
             if division_overlay and ref in render_refs:
                 render_raw[ref] = raw
         omitted_native_checks = native_cases(omitted_source_checks, corrected, omitted_raw)
+        full_division_native_result = (division_full_native_check.finish() if division_full_native_check is not None else None)
         division_reader_shapes = None
         if division_overlay:
             from inspect_paragraph_rendering import diff, native_xml_prefix_shape
@@ -365,6 +370,7 @@ def probe(*, osis2mod: Path, native_index: Path, native_raw: Path,
         "research_division_overlay_receipt": division_receipt,
         "research_paragraph_whitespace_overlay_receipt": paragraph_whitespace_receipt,
         "research_division_private_native_rendering_shapes": division_reader_shapes,
+        "research_full_source_native_editorial_division_metadata": full_division_native_result,
         "plain_nonhyperlink_omission_label_count": plain_note_receipt["explicit_plain_label_count"],
         "original_note_display_text_preserved_by_plain_overlay": plain_note_receipt["all_original_characters_preserved"],
         "original_unedited_osis_bytes_preserved": True,
