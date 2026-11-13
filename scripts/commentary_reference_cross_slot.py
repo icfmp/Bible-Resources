@@ -14,6 +14,7 @@ import re
 from lxml import etree
 
 from pilot_preflight import PilotError
+from commentary_chapter_ref_labels import link_label_location
 
 MAX_NATIVE_STOCK_KEYS = 45000
 MAX_XML_BYTES = 2 * 1024 * 1024
@@ -66,6 +67,30 @@ def _private_target_counts(links: list[dict], stock_targets: list[str]):
                 if orig_remaining[source_target] == 0:
                     del orig_remaining[source_target]
     return orig_remaining, stock_remaining, sum(exact.values()), sum(work.values())
+
+
+def original_link_target_match_statuses(links: list[dict], stock_targets: list[str]) -> list[str]:
+    """Pair original occurrence targets exact first, then literal Bible: only.
+
+    The statuses are diagnostic labels, never source or stock modifications.
+    """
+    available = Counter(stock_targets)
+    statuses = ["unpaired_original_target"] * len(links)
+    for i, link in enumerate(links):
+        target = link["private_original_osisRef_target"]
+        if available[target] > 0:
+            statuses[i] = "raw_target_exact_match"
+            available[target] -= 1
+    for i, link in enumerate(links):
+        if statuses[i] != "unpaired_original_target":
+            continue
+        target = link["private_original_osisRef_target"]
+        if target.startswith("Bible:") and len(target) > len("Bible:"):
+            unqualified = target[len("Bible:"):]
+            if available[unqualified] > 0:
+                statuses[i] = "literal_Bible_work_prefix_only_match"
+                available[unqualified] -= 1
+    return statuses
 
 
 class ReferenceCrossSlotTopology:
@@ -169,6 +194,8 @@ class ReferenceCrossSlotTopology:
             raise PilotError("Cross-slot original source word differences do not reconcile")
         source_categories = Counter()
         compiled_categories = Counter()
+        original_target_x_label_location = defaultdict(Counter)
+        unmatched_target_scope_x_label_location = defaultdict(Counter)
         marker_census = Counter()
         no_stock_cases = []
         priority_cases = []
@@ -188,25 +215,48 @@ class ReferenceCrossSlotTopology:
             exact_matches += exact
             literal_qualifier_matches += qualifier
             selected_values = Counter(selected_stock_targets)
+            source_match_statuses = original_link_target_match_statuses(orig, selected_stock_targets)
+            if (source_match_statuses.count("raw_target_exact_match") != exact or
+                    source_match_statuses.count("literal_Bible_work_prefix_only_match") != qualifier or
+                    source_match_statuses.count("unpaired_original_target") != sum(remain_source.values())):
+                raise PilotError("Independent per-original-link target matching disagrees with multiset audit")
             source_values = Counter(
                 link["private_original_osisRef_target"] for link in orig
             )
             this_source = Counter()
             this_stock = Counter()
-            for target, occurrences in remain_source.items():
+
+            def source_unpaired_scope(target: str) -> str:
                 if target in selected_values or (
                     target.startswith("Bible:") and target[len("Bible:"):] in selected_values
                 ):
-                    category = "same_entry_reference_target_multiplicity_shortfall"
-                elif target.startswith("Bible:") and len(target) > len("Bible:"):
-                    category = self._stock_target_scope(
+                    return "same_entry_reference_target_multiplicity_shortfall"
+                if target.startswith("Bible:") and len(target) > len("Bible:"):
+                    return self._stock_target_scope(
                         book, chapter, start, target[len("Bible:"):],
                         self.stock_positions.get((book, target[len("Bible:"):]), set())
                     )
-                elif not target:
-                    category = "original_source_target_is_empty"
-                else:
-                    category = "original_target_not_literal_Bible_work_qualified_unreviewed"
+                if not target:
+                    return "original_source_target_is_empty"
+                return "original_target_not_literal_Bible_work_qualified_unreviewed"
+
+            # Check each genuine source link label against the exact selected raw
+            # stock entry, not a synthetic title or guessed authorial verse range.
+            for link, status in zip(orig, source_match_statuses):
+                label_classes = link_label_location([link], raw)[
+                    "original_scripRef_to_stock_text_location_classes"
+                ]
+                if sum(label_classes.values()) != 1 or len(label_classes) != 1:
+                    raise PilotError("An original source scripture label has ambiguous location")
+                label_class = next(iter(label_classes))
+                original_target_x_label_location[status][label_class] += 1
+                if status == "unpaired_original_target":
+                    unmatched_target_scope_x_label_location[
+                        source_unpaired_scope(link["private_original_osisRef_target"])
+                    ][label_class] += 1
+
+            for target, occurrences in remain_source.items():
+                category = source_unpaired_scope(target)
                 source_categories[category] += occurrences
                 this_source[category] += occurrences
             for target, occurrences in remain_stock.items():
@@ -259,6 +309,29 @@ class ReferenceCrossSlotTopology:
               or sum(marker_census.values()) != len(self.private_unresolved)
               or len(no_stock_cases) != expected["stock_reference_presence"].get("stock_no_reference", 0)):
             raise PilotError("Cross-entry lexical reference census disagrees with original full stock audit")
+        target_status_census = Counter({
+            status: sum(labels.values())
+            for status, labels in original_target_x_label_location.items()
+        })
+        flattened_label_census = Counter()
+        for labels in original_target_x_label_location.values():
+            flattened_label_census.update(labels)
+        source_scope_census = {
+            scope: sum(labels.values())
+            for scope, labels in unmatched_target_scope_x_label_location.items()
+        }
+        if (sum(target_status_census.values()) != total_original_links or
+                target_status_census.get("raw_target_exact_match", 0) != exact_matches or
+                target_status_census.get("literal_Bible_work_prefix_only_match", 0) !=
+                    literal_qualifier_matches or
+                target_status_census.get("unpaired_original_target", 0) !=
+                    sum(source_categories.values()) or
+                source_scope_census != dict(source_categories) or
+                flattened_label_census != Counter(
+                    expected["original_scripRef_display_label_location_in_stock_text_classes"]
+                )):
+            raise PilotError("Per-link label/target census differs from independent full original audit")
+
         # Keep no-reference cases complete, and only the 20 largest unresolved
         # source target counts otherwise. Never emit any target or verse name.
         if len(no_stock_cases) > MAX_PRIVATE_RECEIPTS:
@@ -279,6 +352,14 @@ class ReferenceCrossSlotTopology:
             "source_and_stock_raw_exact_target_matches":exact_matches,
             "source_and_stock_literal_Bible_work_prefix_only_matches":literal_qualifier_matches,
             "source_unpaired_target_occurrence_location_classes":dict(sorted(source_categories.items())),
+            "original_target_match_status_x_selected_stock_label_location":{
+                status:dict(sorted(classes.items()))
+                for status, classes in sorted(original_target_x_label_location.items())
+            },
+            "unpaired_original_target_scope_x_selected_stock_label_location":{
+                scope:dict(sorted(classes.items()))
+                for scope, classes in sorted(unmatched_target_scope_x_label_location.items())
+            },
             "stock_unpaired_target_occurrence_source_classes":dict(sorted(compiled_categories.items())),
             "original_source_markers_with_or_without_stock_reference_markup":dict(sorted(marker_census.items())),
             "complete_native_K_and_I_keys_inspected_for_target_witnesses":self.native_keys_scanned,

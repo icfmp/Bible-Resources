@@ -12,7 +12,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from commentary_reference_cross_slot import (
     ReferenceCrossSlotTopology, actual_stock_osisref_targets,
-    _private_target_counts,
+    _private_target_counts, original_link_target_match_statuses,
 )
 from commentary_private_text_compare import _original_source_markers, compare_private_texts
 from pilot_preflight import PilotError
@@ -31,7 +31,8 @@ def unit(line: int, *targets):
     }
 
 
-def expected(markers: int, source: int, stock: int, matched: int, without_ref: int):
+def expected(markers: int, source: int, stock: int, matched: int, without_ref: int,
+             *, label_classes=None):
     return {
         "source_vs_stock_unresolved_word_selection_cases":markers,
         "original_scripRef_total_across_unresolved_entries":source,
@@ -40,10 +41,54 @@ def expected(markers: int, source: int, stock: int, matched: int, without_ref: i
         "literal_Bible_work_qualifier_only_osisRef_target_multiset_match_count":matched,
         "stock_reference_presence":{"stock_no_reference":without_ref,
                                      "stock_has_reference":markers-without_ref},
+        "original_scripRef_display_label_location_in_stock_text_classes":(
+            label_classes if label_classes is not None else
+            {"original_label_text_not_located_in_selected_stock_entry":source}
+        ),
     }
 
 
 class OriginalReferenceCrossSlotTests(unittest.TestCase):
+    def test_individual_source_target_occurrence_matching_prefers_exact_before_qualifier(self):
+        labels=[
+            {"private_original_osisRef_target":"Bible:Gen.1.3"},
+            {"private_original_osisRef_target":"Bible:Gen.1.3"},
+        ]
+        self.assertEqual(original_link_target_match_statuses(labels,["Gen.1.3"]),[
+            "literal_Bible_work_prefix_only_match","unpaired_original_target"
+        ])
+        labels=[
+            {"private_original_osisRef_target":"Bible:Gen.1.3"},
+            {"private_original_osisRef_target":"Gen.1.3"},
+        ]
+        self.assertEqual(original_link_target_match_statuses(labels,["Gen.1.3"]),[
+            "unpaired_original_target","raw_target_exact_match"
+        ])
+
+    def test_unmatched_target_can_preserve_original_plain_label_outside_reference_tag(self):
+        original={"Gen.1.1":[unit(15,"Bible:Gen.1.3")]}
+        stock=b"<p>prefix private dummy label suffix</p>"
+        probe=ReferenceCrossSlotTopology(original)
+        probe.observe_stock("K","Gen.1.1",stock)
+        probe.observe_unresolved("Gen.1.1",original["Gen.1.1"][0],stock)
+        observed=probe.report(expected(
+            1,1,0,0,1,
+            label_classes={"literal_label_in_stock_text_outside_confirmed_reference_element":1}
+        ))
+        self.assertEqual(observed[
+            "original_target_match_status_x_selected_stock_label_location"],{
+                "unpaired_original_target":{
+                    "literal_label_in_stock_text_outside_confirmed_reference_element":1
+                }
+            })
+        self.assertEqual(observed[
+            "unpaired_original_target_scope_x_selected_stock_label_location"],{
+                "target_not_witnessed_in_other_same_book_stock_reference_markup":{
+                    "literal_label_in_stock_text_outside_confirmed_reference_element":1
+                }
+            })
+        self.assertNotIn("private dummy label",json.dumps(observed))
+
     def test_limited_target_multiplicity_accounting_does_not_duplicate_one_stock_link(self):
         remaining_source, remaining_stock, exact, prefix = _private_target_counts([
             {"private_original_osisRef_target":"Bible:Gen.1.3"},
