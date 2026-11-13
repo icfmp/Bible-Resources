@@ -40,5 +40,7 @@
     "xml_observed_bytes": 7952268,
     "xml_observation_action": "https://github.com/icfmp/Bible-Resources/actions/runs/43272728270"
   },
-  "authorial_witness_info_url": "https://www.ccel.org/ccel/henry/mhcc/mhcc"
+  "authorial_witness_info_url": "https://www.ccel.org/ccel/henry/mhcc/mhcc",
+  "stock_conf_sha256": "2762a04757ec3ee14bcf5d442fedcd47d2b938d573de4e9100a31aa073bc5863",
+  "native_raw_corpus_sha256": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
 }

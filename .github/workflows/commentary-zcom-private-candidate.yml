@@ -1,0 +1,117 @@
+name: Build private zCom commentary technical candidate (not release)
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/commentary-zcom-private-candidate.yml'
+      - 'scripts/commentary_stock_candidate.py'
+      - 'scripts/promote_sword_preview.py'
+      - 'tests/test_commentary_stock_candidate.py'
+      - 'tests/test_promote_sword_preview.py'
+      - 'config/commentary-intake/**'
+  workflow_dispatch:
+    inputs:
+      resource_id:
+        description: SHA-pinned CrossWire zCom commentary manifest
+        required: true
+        type: string
+        default: mhcc-crosswire
+
+permissions:
+  contents: read
+concurrency:
+  group: private-zcom-candidate-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  full-private-zcom-candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    env:
+      RESOURCE_ID: ${{ github.event.inputs.resource_id || 'mhcc-crosswire' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test synthetic byte-preserving zCom packaging and strict config changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p 'test_promote_sword_preview.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_stock_candidate.py' -v
+      - name: Install independent real SWORD library and diatheke
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          timeout 120s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev diatheke
+      - name: Build independent actual full native commentary raw reader
+        shell: bash
+        run: |
+          set -euo pipefail
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "$RUNNER_TEMP/commentary-private-native-raw" -lsword
+      - name: Build temporary exact compressed commentary clone and verify every occupied native key
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_stock_candidate.py \
+            --resource-id "$RESOURCE_ID" \
+            --candidate-id BRMHCCReview \
+            --native-raw-binary "$RUNNER_TEMP/commentary-private-native-raw" \
+            --reader diatheke \
+            --report "$RUNNER_TEMP/commentary-private-candidate-proof.json"
+      - name: Independently enforce full 29975-entry stock/candidate identity and no release
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,re
+          from pathlib import Path
+          p=Path(os.environ["RUNNER_TEMP"])/"commentary-private-candidate-proof.json"
+          d=json.loads(p.read_text())
+          assert d["status"]=="exact_original_zCom_payload_private_candidate_full_native_roundtrip_verified"
+          assert d["private_candidate_module_id"]=="BRMHCCReview"
+          assert d["upstream_sword_original_module_id"]=="MHCC"
+          assert d["all_original_SWORD_compressed_files_byte_preserved"] is True
+          assert d["original_metadata_only_module_identity_and_data_path_changed"] is True
+          assert d["complete_stock_and_candidate_native_raw_corpus_sha256_equal"] is True
+          assert d["all_occupied_native_K_I_TOP_keys_and_order_identical"] is True
+          assert d["full_native_unfiltered_raw_corpus_sha256"]=="8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
+          assert (d["numbered_commentary_K_keys"],d["intro_I_keys"],d["opaque_TOP_keys"])==(28718,1255,2)
+          assert d["total_native_keys"]==29975
+          assert d["private_candidate_archive_destroyed_without_upload"] is True
+          assert d["independent_Xiphos_AndBible_visual_validation_passed"] is False
+          assert d["CCEL_source_to_CrossWire_digital_edition_equivalence_proven"] is False
+          assert d["editorial_acceptance"] is False and d["published"] is False
+          assert len(d["isolated_stock_diatheke_original_vs_private_candidate"])>=2
+          assert d["only_real_diatheke_module_identity_label_differences_allowed"] is True
+          assert all(p["candidate_plain_readback_equal_after_only_module_identity_relabel"] is True
+                     for p in d["isolated_stock_diatheke_original_vs_private_candidate"])
+          assert all(type(p["module_identity_label_substitution_count"]) is int
+                     and p["module_identity_label_substitution_count"]>=0
+                     for p in d["isolated_stock_diatheke_original_vs_private_candidate"])
+          assert re.fullmatch("[0-9a-f]{64}",d["private_candidate_package_sha256"])
+          print("Verified original zCom payload, 29975 native keys and diatheke readbacks; no commentary text output")
+          PY
+      - name: Upload only source/content hashes and counts, NEVER the candidate module
+        uses: actions/upload-artifact@v4
+        with:
+          name: commentary-zcom-private-proof-${{ github.run_id }}
+          path: ${{ runner.temp }}/commentary-private-candidate-proof.json
+          retention-days: 30
+          if-no-files-found: error
+      - name: Explicit separation from rights, editorial and publication gates
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo 'Original CrossWire zCom compressed payload reused byte-for-byte.'
+            echo 'Temporary candidate ZIP is never uploaded or published.'
+            echo 'CCEL edition identity, full editorial acceptance, Xiphos/AndBible GUI and rights remain unapproved.'
+          } >> "$GITHUB_STEP_SUMMARY"

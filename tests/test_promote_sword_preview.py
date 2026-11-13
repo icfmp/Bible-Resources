@@ -134,6 +134,74 @@ class SwordPromotionTests(unittest.TestCase):
             self.assertFalse(self.out.exists())
             self.conf.write_text(correct)
 
+    def configure_zcom_fixture(self):
+        """Compressed commentary has six genuine SWORD zCom data files."""
+        self.src.unlink()
+        with ZipFile(self.src,"w",compression=ZIP_DEFLATED) as z:
+            z.writestr(
+                "mods.d/verifiedpreview.conf",
+                "[VerifiedPreview]\n"
+                "DataPath=./modules/comments/zcom/verifiedpreview/\n"
+                "ModDrv=zCom\nBlockType=BOOK\nCompressType=ZIP\n"
+                "Versification=KJV\nEncoding=UTF-8\nVersion=2.0\n"
+                "DistributionLicense=Public Domain\n"
+            )
+            for part in ("nt","ot"):
+                for ext in ("bzs","bzv","bzz"):
+                    z.writestr(
+                        f"modules/comments/zcom/verifiedpreview/{part}.{ext}",
+                        f"{part}-{ext}-commentary-fixture".encode()
+                    )
+        self.sha=hashlib.sha256(self.src.read_bytes()).hexdigest()
+        self.conf.write_text(
+            "[PublishedModule]\n"
+            "DataPath=./modules/comments/zcom/publishedmodule/\n"
+            "ModDrv=zCom\nBlockType=BOOK\nCompressType=ZIP\n"
+            "Versification=KJV\nEncoding=UTF-8\nVersion=2.0\n"
+            "DistributionLicense=Public Domain\n",
+            encoding="utf-8"
+        )
+
+    def test_zcom_stock_commentary_six_payloads_preserved_exactly(self):
+        self.configure_zcom_fixture()
+        source=self.src.read_bytes()
+        proof=self.promote(driver="zCom",versification="KJV")
+        self.assertEqual(proof["driver"],"zCom")
+        self.assertEqual(proof["versification"],"KJV")
+        self.assertTrue(proof["data_byte_equal"])
+        self.assertFalse(proof["published"])
+        with ZipFile(self.src) as original,ZipFile(self.out) as candidate:
+            self.assertEqual(len(candidate.namelist()),7)
+            for part in ("nt","ot"):
+                for ext in ("bzs","bzv","bzz"):
+                    old=f"modules/comments/zcom/verifiedpreview/{part}.{ext}"
+                    new=f"modules/comments/zcom/publishedmodule/{part}.{ext}"
+                    self.assertEqual(original.read(old),candidate.read(new))
+        self.assertEqual(source,self.src.read_bytes())
+        digest=proof["release_zip_sha256"]
+        self.out.unlink()
+        self.assertEqual(
+            digest,self.promote(driver="zCom",versification="KJV")["release_zip_sha256"]
+        )
+
+    def test_zcom_rejects_wrong_block_type_versification_and_unsafe_members(self):
+        self.configure_zcom_fixture()
+        for good,bad in (("BlockType=BOOK","BlockType=VERSE"),
+                         ("CompressType=ZIP","CompressType=LZSS"),
+                         ("Versification=KJV","Versification=Segond")):
+            safe=self.conf.read_text()
+            self.conf.write_text(safe.replace(good,bad))
+            with self.assertRaises(ValueError):
+                self.promote(driver="zCom",versification="KJV")
+            self.assertFalse(self.out.exists())
+            self.conf.write_text(safe)
+        with ZipFile(self.src,"a") as z:
+            z.writestr("modules/comments/zcom/verifiedpreview/fake.bzz",b"unexpected")
+        self.sha=hashlib.sha256(self.src.read_bytes()).hexdigest()
+        with self.assertRaises(ValueError):
+            self.promote(driver="zCom",versification="KJV")
+        self.assertFalse(self.out.exists())
+
     def test_ztext_rejects_wrong_member_set_and_duplicate_critical_conf(self):
         self.configure_ztext_fixture()
         with ZipFile(self.src, "a") as z:
