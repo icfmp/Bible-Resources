@@ -718,7 +718,10 @@ def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int,
     if optional_a11y:
         if not env.get("DBUS_SESSION_BUS_ADDRESS"):
             raise PilotError("Real Xiphos accessibility menu requires one shared private DBus session")
-        env.pop("NO_AT_BRIDGE", None)
+        # First confirm that shared-session startup itself works. This
+        # conservative mode keeps the tested reader's GTK bridge disabled;
+        # any unavailable heading action must report NOT VERIFIED.
+        env["NO_AT_BRIDGE"] = "1"
         env["BIBLE_PRIVATE_GUI_A11Y"] = "1"
     display = None
     app = None
