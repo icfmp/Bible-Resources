@@ -610,7 +610,8 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
 
 
 def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int,
-                  commentary_module_id: str = "MHCC") -> dict:
+                  commentary_module_id: str = "MHCC",
+                  on_gui_ready=None) -> dict:
     if (not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{1,39}", commentary_module_id)
             or not 6 <= seconds <= 25 or root.is_symlink() or not root.is_dir()
             or not (root / "mods.d" / (commentary_module_id.lower()+".conf")).is_file()
@@ -658,10 +659,14 @@ def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int,
             raise PilotError("No independently visible Xiphos window with Bible and commentary")
         _dismiss_transient_xiphos_notice(env)
         inspection = attempt_real_xiphos_passage_copy(env, comparisons)
+        after = on_gui_ready(env) if on_gui_ready is not None else {}
+        if not isinstance(after, dict):
+            raise PilotError("Invalid private real-Xiphos post-readback observation")
         return {
             "real_xiphos_executable_started_and_visible": True,
             "original_source_SWORD_PATH_isolated": True,
             **inspection,
+            **after,
         }
     finally:
         if app is not None:
