@@ -20,6 +20,8 @@ on:
       - 'scripts/commentary_unresolved_lexical_triage.py'
       - 'scripts/commentary_source_identity_lexical_gate.py'
       - 'tests/test_commentary_source_identity_lexical_gate.py'
+      - 'scripts/commentary_near_prose_unicode_review.py'
+      - 'tests/test_commentary_near_prose_unicode_review.py'
       - 'scripts/commentary_nonlink_words.py'
       - 'scripts/commentary_nonlink_word_alignment.py'
       - 'scripts/commentary_prose_cross_slot.py'
@@ -79,6 +81,7 @@ jobs:
           set -euo pipefail
           python -m pip install -r requirements.txt
           python -m unittest discover -s tests -p 'test_commentary_source_identity_lexical_gate.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_near_prose_unicode_review.py' -v
           timeout 90s sudo apt-get -o Acquire::Retries=0 \
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update
           timeout 90s sudo apt-get -o Acquire::Retries=0 \
@@ -148,6 +151,38 @@ jobs:
               assert row["source_canonical_alias_is_diagnostic_not_a_reference_correction"] is True
           print("Original div1 heading vs scripCom key source-identity quarantine (NOT textual correction): " +
                 json.dumps(counts, sort_keys=True))
+          unicode_review = report["original_source_same_book_unicode_lexical_witness_review"]
+          assert unicode_review["schema_version"] == 1
+          assert unicode_review["authentic_same_book_original_digital_edition_cases_evaluated"] == counts.get(
+              "meaningful_separate_editions_lexical_review_still_required", 0
+          )
+          assert sum(unicode_review["source_nonlink_unicode_witness_classes"].values()) == unicode_review[
+              "authentic_same_book_original_digital_edition_cases_evaluated"
+          ]
+          assert len(unicode_review["bounded_source_line_hash_only_unicode_review_cases"]) == unicode_review[
+              "authentic_same_book_original_digital_edition_cases_evaluated"
+          ]
+          assert unicode_review["source_book_conflicts_quarantined_elsewhere_not_claimed_as_missing_text"] is True
+          assert unicode_review["no_original_authorial_text_words_replacements_or_bible_references_emitted"] is True
+          assert unicode_review["unicode_compatibility_is_not_authored_edition_fidelity_approval"] is True
+          assert unicode_review["original_stock_content_or_source_text_modified"] is False
+          assert unicode_review["editorial_approved"] is False and unicode_review["published"] is False
+          for case in unicode_review["bounded_source_line_hash_only_unicode_review_cases"]:
+              assert type(case["original_source_line"]) is int
+              assert all(re.fullmatch(r"[a-f0-9]{64}",case[name]) for name in (
+                  "original_full_reference_sha256","original_body_sha256","stock_raw_sha256"
+              ))
+              assert case["original_nonlink_unicode_witness_class"] in {
+                  "more_than_two_original_nonlink_word_order_gaps_review_manually",
+                  "unicode_near_match_alignment_safely_skipped_under_budget",
+                  "original_plain_word_order_compatible_after_unicode_casefold",
+                  "original_plain_word_order_compatible_after_nfkc_casefold",
+                  "original_plain_word_order_still_differs_after_casefold_and_nfkc",
+              }
+              assert case["original_source_and_stock_bytes_unchanged"] is True
+              assert case["casefold_compatible_order_does_not_certify_exact_wording_or_markup"] is True
+          print("Original same-book Unicode nonlink-word review (NOT correction): " +
+                json.dumps(unicode_review["source_nonlink_unicode_witness_classes"], sort_keys=True))
           selected = (
               "stock_original_body_suffix_exact_unicode_and_difference_classes",
               "stock_original_body_suffix_total_changed_punctuation_gaps",
