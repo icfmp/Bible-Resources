@@ -22,7 +22,7 @@ class SourceNativeIntroContextMenuTests(unittest.TestCase):
         for key in ("Gen.1", "Ps.23", "Rev.22", "1Cor.3.0"):
             self.assertIsNotNone(_I_CHAPTER.fullmatch(key))
             self.assertIsNone(_I_BOOK.fullmatch(key))
-        for key in ("Gen.1.1", "GenZ1", "Gen.0", "Gen.1.2"):
+        for key in ("Gen.1.1", "Gen..1", "Gen.0", "Gen.1.2"):
             self.assertIsNone(_I_BOOK.fullmatch(key))
             self.assertIsNone(_I_CHAPTER.fullmatch(key))
 
