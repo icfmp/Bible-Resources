@@ -8,12 +8,24 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from commentary_xiphos_heading_probe import (
-    _intro_in_gui_clipboard, probe_real_xiphos_commentary_heading_menu,
+    _I_BOOK, _I_CHAPTER, _intro_in_gui_clipboard,
+    probe_real_xiphos_commentary_heading_menu,
 )
 from pilot_preflight import PilotError
 
 
 class SourceNativeIntroContextMenuTests(unittest.TestCase):
+    def test_actual_native_OSIS_intro_grammars_are_distinct(self):
+        for key in ("Gen", "Gen.0.0", "Ps", "Jude"):
+            self.assertIsNotNone(_I_BOOK.fullmatch(key))
+            self.assertIsNone(_I_CHAPTER.fullmatch(key))
+        for key in ("Gen.1", "Ps.23", "Rev.22", "1Cor.3.0"):
+            self.assertIsNotNone(_I_CHAPTER.fullmatch(key))
+            self.assertIsNone(_I_BOOK.fullmatch(key))
+        for key in ("Gen.1.1", "GenZ1", "Gen.0", "Gen.1.2"):
+            self.assertIsNone(_I_BOOK.fullmatch(key))
+            self.assertIsNone(_I_CHAPTER.fullmatch(key))
+
     def test_actual_original_intro_prose_can_be_proven_without_copying_source_verse(self):
         intro = b"<p>" + b" ".join(("introductionword%02d" % x).encode() for x in range(20)) + b"</p>"
         gui = b"GUI header" + intro[3:-4] + b" trailing text"
