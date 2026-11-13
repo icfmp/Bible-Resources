@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "issue": "https://github.com/icfmp/Bible-Resources/issues/177",
+  "status": "ONE_CONFIRMED_ORIGINAL_CCEl_DIV1_TITLE_ENGLISH_ALIAS_VS_SCRIPCOM_OSIS_BOOK_CODE_CONFLICT_JUDE_VS_JUDG_READ_ONLY",
+  "original_pinned_sha256": {
+    "ccel_mhcc_xml": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+    "crosswire_stock_SWORD_zip": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+    "all_original_native_stock_ordered_raw": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
+  },
+  "original_source_standard_66_book_title_alias_evidence": {
+    "original_div1_with_any_verse_range_markers_reviewed": 57,
+    "original_div1_original_english_title_vs_source_osis_reference_claim_classes": {
+      "original_title_exact_english_alias_matches_claimed_book_code": 53,
+      "original_title_exact_english_alias_points_to_different_book_code": 1,
+      "original_title_matches_multiple_canonical_aliases_unreviewed": 3
+    },
+    "original_div1_titles_with_unambiguous_different_canonical_book_code": 1,
+    "original_div1_ordinal_with_unique_conflict": 66,
+    "source_exact_original_div1_title_matches_canonical_english_alias": "Jude",
+    "original_div1_66_title_alias_candidate_osis_code_SHA256": "7c07671726a7ed322ea12d52e312bb5f6250d7f253c61c6129fd675834f81ebc",
+    "original_div1_66_actual_scripCom_declared_osis_book_code_SHA256": "85915277c54638a00271f1f92798ce6379e402c19c6df8787045d3e36f862ba0",
+    "standard_canonical_alias_candidate_title_book_code": "Jude",
+    "standard_actual_original_source_scripCom_book_code": "Judg",
+    "source_div1_66_verse_range_original_annotations_using_conflicted_book_code": 5,
+    "source_div1_8_english_title_alias_matches_claimed_book_code": true,
+    "other_original_div1_with_unambiguous_english_alias_mismatch": 0,
+    "three_original_source_div1_titles_ambiguous_under_conservative_alias_check_are_not_automatically_approved": true,
+    "canonical_english_alias_table_does_not_authorize_mutating_source_osisRef": true,
+    "source_book_name_title_or_authorial_commentary_text_not_derived_from_stock": true
+  },
+  "bounded_source_div1_title_and_source_book_code_SHA256_only_cases": [
+    {
+      "claimed_original_osis_book_code_SHA256": "85915277c54638a00271f1f92798ce6379e402c19c6df8787045d3e36f862ba0",
+      "original_div1_alias_vs_scripCom_book_code_class": "original_title_exact_english_alias_points_to_different_book_code",
+      "original_div1_document_ordinal": 66,
+      "original_div1_source_line_max": 55875,
+      "original_div1_source_line_min": 55844,
+      "original_div1_title_SHA256": "7c07671726a7ed322ea12d52e312bb5f6250d7f253c61c6129fd675834f81ebc",
+      "original_scripCom_source_unit_count": 5,
+      "source_title_candidate_does_not_authorize_reference_rewrite": true,
+      "unambiguous_english_title_candidate_osis_SHA256": "7c07671726a7ed322ea12d52e312bb5f6250d7f253c61c6129fd675834f81ebc",
+      "unique_canonical_english_aliases_matched": 1
+    }
+  ],
+  "shared_native_raw_K_run_4_authentic_original_source_marker_title_osis_alias_witnesses": [
+    {
+      "native_shared_stock_raw_sha256": "82a58bed69c125a9c167069bfe84c1b68355cc8a4a5897efa9fa835e284ac991",
+      "original_source_units_checked": 4,
+      "source_line_original_full_hash_and_title_alias_class_members": [
+        {
+          "canonical_alias_only_a_read_only_source_title_witness": true,
+          "english_title_alias_vs_actual_original_osis_claim_class": "original_title_exact_english_alias_matches_claimed_book_code",
+          "original_body_sha256": "75a2d806c0b7a18c21a5b257748e7db2f3bb330b2946637707a3c76f7b3c8a62",
+          "original_div1_document_ordinal": 8,
+          "original_div1_title_SHA256": "8001539b87b43b79a9add7bf13f10f48f6d73f2cfbc89c06d3f4ba48ac87d147",
+          "original_full_reference_sha256": "d6f7840155f1ed89cbc1d5be312febca3b999f8db8c8c93024ba0838210dc3bc",
+          "original_scripCom_osis_book_code_SHA256": "85915277c54638a00271f1f92798ce6379e402c19c6df8787045d3e36f862ba0",
+          "original_source_line": 12430,
+          "unambiguous_canonical_english_title_candidate_osis_SHA256": "85915277c54638a00271f1f92798ce6379e402c19c6df8787045d3e36f862ba0"
+        },
+        {
+          "canonical_alias_only_a_read_only_source_title_witness": true,
+          "english_title_alias_vs_actual_original_osis_claim_class": "original_title_exact_english_alias_points_to_different_book_code",
+          "original_body_sha256": "5ef525b574f9c049bd39bad7bafcaa99cb9ae9120e8647208c0261e25e801630",
+          "original_div1_document_ordinal": 66,
+          "original_div1_title_SHA256": "7c07671726a7ed322ea12d52e312bb5f6250d7f253c61c6129fd675834f81ebc",
+          "original_full_reference_sha256": "fe9620db993881f30ab981307b22f201c3aeb36dca52b83eee08874ac0d273e8",
+          "original_scripCom_osis_book_code_SHA256": "85915277c54638a00271f1f92798ce6379e402c19c6df8787045d3e36f862ba0",
+          "original_source_line": 55844,
+          "unambiguous_canonical_english_title_candidate_osis_SHA256": "7c07671726a7ed322ea12d52e312bb5f6250d7f253c61c6129fd675834f81ebc"
+        },
+        {
+          "canonical_alias_only_a_read_only_source_title_witness": true,
+          "english_title_alias_vs_actual_original_osis_claim_class": "original_title_exact_english_alias_points_to_different_book_code",
+          "original_body_sha256": "67c4f17497220a6ba04a712e1c8cb635ddc347c4189f5fdfacf98bd200009149",
+          "original_div1_document_ordinal": 66,
+          "original_div1_title_SHA256": "7c07671726a7ed322ea12d52e312bb5f6250d7f253c61c6129fd675834f81ebc",
+          "original_full_reference_sha256": "6128ddc7772acf6374490a0c456f693e43b8ed79ff5d881b1ef76740bf11d7d1",
+          "original_scripCom_osis_book_code_SHA256": "85915277c54638a00271f1f92798ce6379e402c19c6df8787045d3e36f862ba0",
+          "original_source_line": 55852,
+          "unambiguous_canonical_english_title_candidate_osis_SHA256": "7c07671726a7ed322ea12d52e312bb5f6250d7f253c61c6129fd675834f81ebc"
+        },
+        {
+          "canonical_alias_only_a_read_only_source_title_witness": true,
+          "english_title_alias_vs_actual_original_osis_claim_class": "original_title_exact_english_alias_points_to_different_book_code",
+          "original_body_sha256": "8554c360b4ad1d3046c6abf1d117c28865922d51e4563768c7395ad4dbe2926a",
+          "original_div1_document_ordinal": 66,
+          "original_div1_title_SHA256": "7c07671726a7ed322ea12d52e312bb5f6250d7f253c61c6129fd675834f81ebc",
+          "original_full_reference_sha256": "11233f1eefefc1b026c1bf95b408bbe15f61fcacf7aa7b2b806bdb49d94f246e",
+          "original_scripCom_osis_book_code_SHA256": "85915277c54638a00271f1f92798ce6379e402c19c6df8787045d3e36f862ba0",
+          "original_source_line": 55858,
+          "unambiguous_canonical_english_title_candidate_osis_SHA256": "7c07671726a7ed322ea12d52e312bb5f6250d7f253c61c6129fd675834f81ebc"
+        }
+      ]
+    }
+  ],
+  "source_legacy_error_diagnosis": {
+    "original_div1_8_and_66_same_scripCom_book_code_but_different_actual_english_book_title": true,
+    "source_div1_66_book_code_is_inconsistent_with_exact_english_original_title": true,
+    "prior_stock_Judges_comment_selected_by_late_Jude_source_bookcode_is_a_false_source_to_stock_join": true,
+    "all_five_original_Jude_div1_marker_source_reference_values_must_be_independently_reviewed": true,
+    "no_original_reference_corrected_yet": true
+  },
+  "workflow_reproducibility": {
+    "original_full_source_to_stock_private_audit": "https://github.com/icfmp/Bible-Resources/actions/runs/43455321763",
+    "exact_validated_code_head_before_receipt": "245b1d0c7cc9b5dbf4037de34aa9a00f58822cb3",
+    "existing_canonical_registry": "config/standard_usfm_osis_66.json",
+    "existing_english_alias_registry": "config/diatheke-usfm-book-aliases.json",
+    "no_original_source_headings_or_unredacted_verse_refs_logged": true
+  },
+  "next_gates": {
+    "confirm_five_source_Jude_original_range_endpoints_and_true_authorial_commentary_units": true,
+    "document_reversible_proposed_annotation_correction_with_explicit_editorial_approval": true,
+    "check_all_unmarked_source_Jude_postRevelation_division_notes_quotes_and_paragraphs": true,
+    "recompute_authentic_source_vs_stock_lexical_census_excluding_cross_book_false_positive_joins": true,
+    "verify_independent_Xiphos_AndBible_readers": true,
+    "release_MHCC": false
+  },
+  "seven_step_fully_accepted_count": 0,
+  "original_source_text_punctuation_osisRef_metadata_edited": false
+}
