@@ -84,8 +84,8 @@ def source_structure(source: bytes, refs: set[str]) -> dict:
         result[ref] = {
             "authorial_container_chain": [x["tag"] for x in reversed(parent_chain)],
             "start_element_is_milestone": bool(node.get("sID")),
-            "start_element_has_direct_text_marker": bool(re.match(r"^[ \\t\\r\\n]*\\*", node.text or "")),
-            "start_element_tail_has_marker": bool(re.match(r"^[ \\t\\r\\n]*\\*", node.tail or "")),
+            "start_element_has_direct_text_marker": bool((node.text or "").lstrip().startswith("*")),
+            "start_element_tail_has_marker": bool((node.tail or "").lstrip().startswith("*")),
             "first_following_sibling_tag": (
                 node.getnext().tag.rsplit("}", 1)[-1]
                 if node.getnext() is not None and isinstance(node.getnext().tag, str)
