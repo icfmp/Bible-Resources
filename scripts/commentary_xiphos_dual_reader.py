@@ -28,6 +28,8 @@ import unicodedata
 from zipfile import ZipFile
 
 from commentary_intake import load_manifest
+from commentary_reference_cross_slot import actual_stock_osisref_targets
+from sword_native_raw_corpus_inventory import parse_native_raw_corpus, RawCorpusError
 from commentary_native_raw_inventory import _safe_stock_install
 from pilot_fetch import fetch
 from pilot_preflight import PilotError, inspect_archive
@@ -137,6 +139,92 @@ def _exact_native_commentary_raw(root: Path, module_id: str, ref: str,
             "Actual original native commentary XML missing or outside safe bounds"
         )
     return completed.stdout
+
+
+def _original_stock_reference_bearing_samples(
+    root: Path, module_id: str, native_scanner: Path,
+    *, expected_corpus_sha256: str, max_samples: int = 3,
+) -> dict:
+    """Reuse the existing FULL native SWORD scanner for real reference cases.
+
+    This examines every occupied stock entry, chooses at most one actual
+    strict-XML scripture-link-bearing key per source book, and verifies the
+    entire native corpus digest again. No original XML/body/link target
+    is ever returned to the CI receipt.
+    """
+    if (root.is_symlink() or not root.is_dir()
+            or native_scanner.is_symlink() or not native_scanner.is_file()
+            or not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{1,39}", module_id)
+            or not SHA.fullmatch(expected_corpus_sha256)
+            or type(max_samples) is not int or not 1 <= max_samples <= 6):
+        raise PilotError("Unreviewed source reference scan context")
+    chosen = []
+    observed_books = set()
+    reference_bearing = 0
+    strict_source_reference_parse_failures = 0
+
+    def original_entry(kind: str, key: str, raw: bytes):
+        nonlocal reference_bearing, strict_source_reference_parse_failures
+        if kind != "K" or b"<reference" not in raw:
+            return
+        reference_bearing += 1
+        try:
+            original_targets = actual_stock_osisref_targets(raw)
+        except PilotError:
+            strict_source_reference_parse_failures += 1
+            return
+        if not original_targets or len(chosen) >= max_samples:
+            return
+        parts = key.split(".")
+        if len(parts) != 3:
+            return
+        book, chapter, verse = parts
+        if book in observed_books:
+            return
+        ref = f"{book} {chapter}:{verse}"
+        if not re.fullmatch(
+            r"[1-4]?[A-Za-z][A-Za-z ]{0,35} [1-9][0-9]{0,2}:[1-9][0-9]{0,2}", ref
+        ):
+            return
+        observed_books.add(book)
+        chosen.append(ref)
+
+    environment = dict(os.environ, SWORD_PATH=str(root))
+    process = None
+    try:
+        process = subprocess.Popen(
+            ["timeout", "300s", str(native_scanner), module_id],
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env=environment,
+        )
+        if process.stdout is None:
+            raise PilotError("Original native corpus stream unavailable")
+        inventory, _, _, _ = parse_native_raw_corpus(
+            process.stdout, on_entry=original_entry
+        )
+        process.stdout.close()
+        status = process.wait(timeout=15)
+        if (status != 0 or
+                inventory["all_native_raw_entries_ordered_sha256"] != expected_corpus_sha256):
+            raise PilotError("Original corpus inventory or full native SHA-256 diverged")
+    except (OSError, subprocess.TimeoutExpired, RawCorpusError) as exc:
+        raise PilotError("Private original source link inventory failed") from exc
+    finally:
+        if process is not None:
+            if process.poll() is None:
+                process.kill()
+                process.wait()
+            if process.stdout is not None:
+                process.stdout.close()
+    return {
+        "complete_native_original_stock_entries_checked": inventory["all_actual_raw_entries_scanned"],
+        "full_pinned_raw_corpus_sha256_reconfirmed": True,
+        "original_occupied_numbered_keys_with_reference_markup": reference_bearing,
+        "original_stock_reference_strict_xml_parse_failures":
+            strict_source_reference_parse_failures,
+        "real_reference_bearing_original_native_samples": chosen,
+        "actual_link_click_and_target_verified_in_xiphos": False,
+        "original_authorial_reference_targets_exported": False,
+    }
 
 
 def _normalized_words(raw: bytes) -> list[str]:
@@ -507,6 +595,7 @@ def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int) -> 
 
 def observe_dual_module_reader(resource_id: str = "mhcc-crosswire",
                                *, native_raw_key_binary: Path,
+                               native_raw_corpus_binary: Path,
                                seconds: int = 12) -> dict:
     manifest = load_manifest(resource_id)
     if (manifest["rights"]["status"] != "research_only"
@@ -538,6 +627,10 @@ def observe_dual_module_reader(resource_id: str = "mhcc-crosswire",
         installed = temp / "sword-library"
         _safe_stock_install(archive, inspection["members"], installed)
         bible = verify_and_install_reviewed_bible(installed)
+        source_reference_cases = _original_stock_reference_bearing_samples(
+            installed, manifest["module_id"], native_raw_corpus_binary,
+            expected_corpus_sha256=manifest["native_raw_corpus_sha256"],
+        )
         comparisons = {}
         sparse_original_commentary_slots = []
         for passage in _candidate_passages(manifest):
@@ -583,6 +676,7 @@ def observe_dual_module_reader(resource_id: str = "mhcc-crosswire",
             "exact_original_commentary_conf_sha256": sha256(metadata).hexdigest(),
             "original_module_id": manifest["module_id"],
             "installed_reviewed_bible": bible,
+            "authentic_original_reference_bearing_inventory": source_reference_cases,
             "both_real_sword_modules_have_nonempty_diatheke_readback": True,
             "sample_count": len(comparisons),
             "actual_substantive_sample_references": list(comparisons),
@@ -602,12 +696,15 @@ def main() -> int:
     p.add_argument("--resource-id", default="mhcc-crosswire")
     p.add_argument("--seconds", type=int, default=12)
     p.add_argument("--native-raw-key-binary", type=Path, required=True)
+    p.add_argument("--native-raw-corpus-binary", type=Path, required=True)
     p.add_argument("--report", type=Path, required=True)
     args = p.parse_args()
     if args.report.exists() or args.report.is_symlink() or not args.report.parent.is_dir():
         raise PilotError("Unsafe or preexisting Xiphos receipt path")
     result = observe_dual_module_reader(
-        args.resource_id, native_raw_key_binary=args.native_raw_key_binary,
+        args.resource_id,
+        native_raw_key_binary=args.native_raw_key_binary,
+        native_raw_corpus_binary=args.native_raw_corpus_binary,
         seconds=args.seconds,
     )
     args.report.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n",
