@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "issue": "https://github.com/icfmp/Bible-Resources/issues/177",
+  "status": "SOURCE_CHAPTER_ADJACENT_SIBLING_SAME_BOOK_OTHER_NATIVE_SLOT_TRIAGE_NOT_SOURCE_PARITY",
+  "source_and_stock_originals_sha256": {
+    "ccel_thml_xml": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+    "crosswire_stock_sword_zip": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+    "full_unfiltered_stock_native_corpus_ordered": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
+  },
+  "previous_checkpoint": {
+    "source_explicit_chapter_markers": 228,
+    "same_chapter_native_numbered_exact_unicode_containment": 223,
+    "same_chapter_native_numbered_contiguous_unicode_word_only": 1,
+    "unlocated_within_same_chapter": 4
+  },
+  "new_scope_limited_diagnostics": {
+    "same_book_other_chapter_numbered_and_intro_slots_examined": {
+      "I": 229,
+      "K": 4619
+    },
+    "classifications": {
+      "not_found_in_other_same_book_stock_slots": 3,
+      "other_chapter_numbered_exact_unicode_containment": 1,
+      "previously_found_exact_in_same_chapter_numbered_slot": 223,
+      "previously_found_words_in_same_chapter_numbered_slot": 1
+    },
+    "four_prior_unlocated_original_sibling_line_and_hash_cases": [
+      {
+        "alternative_stock_location_class": "other_chapter_numbered_exact_unicode_containment",
+        "matching_native_key_sha256": "8570e15463e15441127699338a9048b84b5b3a29237900648282c1f3688ad446",
+        "original_neighbor_tag": "h2",
+        "original_neighbor_text_sha256": "81da0b1ce6a9f8bee1244ee75a077941a501c3c7f81baac43c30b04fe8764ee4",
+        "original_reference_sha256": "ff33d458fd44598fdbba51f922e30c615ffb8a0809f6333b7ede5fed6c0dd75c",
+        "original_unicode_characters": 10,
+        "original_unicode_word_token_count": 2,
+        "source_line": 34073
+      },
+      {
+        "alternative_stock_location_class": "not_found_in_other_same_book_stock_slots",
+        "matching_native_key_sha256": null,
+        "original_neighbor_tag": "p",
+        "original_neighbor_text_sha256": "5c71bb382bf2480fbfbf02995346a02512833ee249172ea7030a5af81fc86273",
+        "original_reference_sha256": "99875638192a1640f10e8b085932ac9171249d2857ee4ffa420d6cfc2fd45e39",
+        "original_unicode_characters": 152,
+        "original_unicode_word_token_count": 30,
+        "source_line": 34439
+      },
+      {
+        "alternative_stock_location_class": "not_found_in_other_same_book_stock_slots",
+        "matching_native_key_sha256": null,
+        "original_neighbor_tag": "p",
+        "original_neighbor_text_sha256": "25aef8b6aa0bfc15ccd5b3406ea9b9a3baaedb4295d9aa208820117c2082af2c",
+        "original_reference_sha256": "f5a0881ef41fb84303e4ea1f2932026d4139091d19c73b3f8a5c0b6102cc672e",
+        "original_unicode_characters": 183,
+        "original_unicode_word_token_count": 32,
+        "source_line": 35054
+      },
+      {
+        "alternative_stock_location_class": "not_found_in_other_same_book_stock_slots",
+        "matching_native_key_sha256": null,
+        "original_neighbor_tag": "p",
+        "original_neighbor_text_sha256": "27d3383b3b29c69c8598e10fe1d881c327ec35b7080e5f8e5fd5eb8d469d591f",
+        "original_reference_sha256": "53df2cd02435f0e9352da3bca39da5da29dd4c88b2c875a5da9b8c3cd1f44fab",
+        "original_unicode_characters": 154,
+        "original_unicode_word_token_count": 31,
+        "source_line": 35608
+      }
+    ],
+    "three_without_detected_same_book_stock_location_are_source_p_paragraphs": true,
+    "no_original_text_or_original_reference_strings_disclosed": true,
+    "one_other_chapter_same_book_match_is_not_authorial_range_mapping": true,
+    "negative_case_is_not_proof_of_loss_from_all_stock_content": true,
+    "published_cases_are_bounded_to_12": true
+  },
+  "reproducibility": {
+    "exact_pr_head": "f24384673584614f822ef886c466f00c291119b3",
+    "real_sha_pinned_comparison_action": "https://github.com/icfmp/Bible-Resources/actions/runs/43404428841",
+    "validate_action": "https://github.com/icfmp/Bible-Resources/actions/runs/43404429547",
+    "private_action_receipt_note": "The original report artifact holds a full metadata-only receipt for 90 days; this permanent file contains only reconcilable numeric/line/hash metadata."
+  },
+  "blocking_next": {
+    "review_original_p_sibling_roles_and_following_original_source_chapter_structure": true,
+    "determine_whether_three_p_contents_are_relocated_or_differently_digitized": true,
+    "verify_156_lexical_source_vs_stock_discrepancies": true,
+    "complete_chapter_text_and_markup_parity": true,
+    "audit_unmarked_post_Revelation_division_and_Jude": true,
+    "approve_edition_and_digital_rights_separately": true,
+    "run_independent_Xiphos_AndBible_GUI_tests": true,
+    "publication": false
+  },
+  "full_seven_stage_checkpoints_approved": 0,
+  "original_authorial_text_or_stock_binary_modified": false,
+  "any_original_words_or_module_published": false
+}

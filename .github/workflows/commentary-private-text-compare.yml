@@ -5,6 +5,8 @@ on:
       - '.github/workflows/commentary-private-text-compare.yml'
       - 'scripts/commentary_private_text_compare.py'
       - 'scripts/commentary_chapter_neighbors.py'
+      - 'scripts/commentary_chapter_cross_slot.py'
+      - 'tests/test_commentary_chapter_cross_slot.py'
       - 'tests/test_commentary_chapter_neighbors.py'
       - 'tests/test_commentary_private_text_compare.py'
       - 'scripts/commentary_text_delta.py'
@@ -149,6 +151,73 @@ jobs:
                     "strict_xml_parse_failures": location["strict_xml_unparseable_stock_numbered_slots"],
                     "location_classes": outcome,
                 }, sort_keys=True))
+          alternative = report["source_chapter_neighbor_to_same_book_alternative_slots"]
+          classifications = alternative["source_sibling_locations_in_alternative_same_book_slots"]
+          original_gap = (outcome.get("original_sibling_not_found_in_same_chapter_numbered_slots", 0)
+                          + outcome.get("no_strictly_parsed_same_chapter_numbered_slot", 0))
+          allowed = {
+              "previously_found_exact_in_same_chapter_numbered_slot",
+              "previously_found_words_in_same_chapter_numbered_slot",
+              "same_chapter_intro_exact_unicode_containment",
+              "same_chapter_intro_contiguous_unicode_word_tokens_only",
+              "other_chapter_numbered_exact_unicode_containment",
+              "other_chapter_numbered_contiguous_unicode_word_tokens_only",
+              "other_chapter_intro_exact_unicode_containment",
+              "other_chapter_intro_contiguous_unicode_word_tokens_only",
+              "book_intro_exact_unicode_containment",
+              "book_intro_contiguous_unicode_word_tokens_only",
+              "not_found_in_other_same_book_stock_slots",
+          }
+          if (alternative["original_source_chapter_siblings_evaluated"] !=
+                  proof["explicit_chapter_source_marker_count"] or
+                  alternative["previously_not_found_in_same_chapter_numbered_slots"] != original_gap or
+                  not all(k in allowed and type(v) is int and v >= 0
+                          for k, v in classifications.items()) or
+                  sum(classifications.values()) != proof["explicit_chapter_source_marker_count"] or
+                  len(alternative["bounded_originally_unlocated_line_hash_only_cases"]) >
+                      alternative["per_marker_detail_cap"]):
+              raise SystemExit("MHCC alternate stock location probe did not reconcile")
+          print("Original chapter-neighbor alternative stock location counts (not text parity): " +
+                json.dumps({"source_chapter_markers": proof["explicit_chapter_source_marker_count"],
+                            "same_chapter_unlocated": original_gap,
+                            "stock_slots_scanned_by_kind":
+                                alternative["native_same_book_other_slot_reads_by_kind"],
+                            "classification": classifications,
+                            }, sort_keys=True))
+          # Approved, bounded machine identifiers only. Never log original headings,
+          # original osisRef strings, stock XML, editorial text, or snippets.
+          cases = alternative["bounded_originally_unlocated_line_hash_only_cases"]
+          if len(cases) != min(original_gap, alternative["per_marker_detail_cap"]):
+              raise SystemExit("Source-line/hash-only case inventory was incomplete")
+          safe_cases = []
+          for case in cases:
+              keys = {
+                  "source_line", "original_reference_sha256", "original_neighbor_text_sha256",
+                  "original_neighbor_tag", "original_unicode_characters",
+                  "original_unicode_word_token_count", "alternative_stock_location_class",
+                  "matching_native_key_sha256",
+              }
+              if set(case) != keys:
+                  raise SystemExit("Unreviewed diagnostic field may disclose source")
+              if (type(case["source_line"]) is not int or case["source_line"] < 1 or
+                      type(case["original_unicode_characters"]) is not int or
+                      case["original_unicode_characters"] <= 0 or
+                      type(case["original_unicode_word_token_count"]) is not int or
+                      case["original_unicode_word_token_count"] <= 0 or
+                      case["original_neighbor_tag"] not in {"h2", "p"} or
+                      case["alternative_stock_location_class"] not in allowed):
+                  raise SystemExit("Invalid original source audit metadata")
+              if not all(re.fullmatch(r"[0-9a-f]{64}", case[k])
+                         for k in ("original_reference_sha256", "original_neighbor_text_sha256")):
+                  raise SystemExit("Invalid original source audit hash")
+              match_hash = case["matching_native_key_sha256"]
+              if match_hash is not None and (
+                      not isinstance(match_hash, str) or
+                      not re.fullmatch(r"[0-9a-f]{64}", match_hash)):
+                  raise SystemExit("Invalid stock key identifier hash")
+              safe_cases.append(case)
+          print("Original chapter-neighbor bounded line/hash-only remaining cases: " +
+                json.dumps(safe_cases, sort_keys=True))
           PY
       - name: Preserve only non-text source and stock diagnostics
         if: always()
@@ -166,5 +235,5 @@ jobs:
             echo 'All authored text and stock raw XML were privately processed and never logged or uploaded.'
             echo 'Exact Unicode matches are distinct from whitespace-only heuristics and actual lexical differences.'
             echo 'Failure to parse a stock raw XML fragment blocks that entry rather than normalizing it.'
-            echo 'Only the immediate source sibling of each original chapter marker was compared to an occupied stock intro key; this is NOT full chapter body parity. Unmarked divisions, quotations, notes, structure, rights and GUI readers remain unapproved.'
+            echo 'The source chapter-marker immediate sibling was located against same-chapter numbered keys and alternatively searched in other native same-book K/I slots; this is NOT full authorial chapter or edition parity. Unmarked divisions, quotations, notes, structure, rights and GUI readers remain unapproved.'
           } >> "$GITHUB_STEP_SUMMARY"
