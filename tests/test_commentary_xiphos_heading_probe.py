@@ -21,6 +21,17 @@ class SourceNativeIntroContextMenuTests(unittest.TestCase):
         self.assertFalse(_intro_in_gui_clipboard(intro, b"Unrelated GUI text", b"unrelated verse"))
         self.assertFalse(_intro_in_gui_clipboard(intro, gui, gui))
 
+    def test_short_original_heading_can_be_verified_without_guessing_words(self):
+        original=b"<title>Remarkable title of Genesis commentary</title>"
+        self.assertTrue(_intro_in_gui_clipboard(
+            original,b"GUI Remarkable title of Genesis commentary",
+            b"Unrelated first verse exposition",
+        ))
+        self.assertFalse(_intro_in_gui_clipboard(
+            original,b"GUI Remarkable title of Genesis commentary",
+            b"Remarkable title of Genesis commentary",
+        ))
+
     def test_invalid_private_reader_context_fails_closed(self):
         with self.assertRaisesRegex(PilotError,"Unreviewed"):
             probe_real_xiphos_commentary_heading_menu(
