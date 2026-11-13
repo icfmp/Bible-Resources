@@ -236,6 +236,11 @@ jobs:
                   sum(lexical["stock_reference_presence"].values()) != unresolved or
                   sum(lexical["source_scripRef_x_stock_reference_presence"].values()) != unresolved or
                   sum(lexical["stock_title_or_table_presence"].values()) != unresolved or
+                  sum(lexical["original_changed_word_tokens_in_source_scripRef"].values()) != unresolved or
+                  sum(lexical["stock_changed_word_tokens_in_stock_reference"].values()) != unresolved or
+                  sum(lexical["source_scripRef_and_stock_reference_changed_word_overlap"].values()) != unresolved or
+                  sum(lexical["one_to_one_middle_word_changes_inside_source_and_stock_references"].values())
+                    != lexical["differing_middle_shape_classes"].get("one_to_one_middle_word_substitution", 0) or
                   sum(lexical["original_middle_word_count_buckets"].values()) != unresolved or
                   sum(lexical["stock_middle_word_count_buckets"].values()) != unresolved or
                   sum(lexical["shared_middle_word_multiset_occurrence_buckets"].values()) != unresolved or
@@ -246,6 +251,8 @@ jobs:
           expected_case_fields = {
               "source_line", "original_reference_sha256", "original_body_sha256",
               "stock_raw_sha256", "source_markup_scripRef_count", "stock_markup_reference_count",
+              "changed_source_middle_words_in_scripRef",
+              "changed_stock_middle_words_in_reference",
               "stock_markup_title_count", "stock_markup_table_count",
               "source_middle_word_count", "stock_middle_word_count",
               "shared_changed_middle_words", "same_prefix_words", "same_suffix_words",
@@ -269,7 +276,10 @@ jobs:
                       case["middle_alignment"] not in allowed_alignments or
                       not all(type(case[key]) is int and case[key] >= 0 for key in (
                           "source_line","source_markup_scripRef_count",
-                          "stock_markup_reference_count", "stock_markup_title_count",
+                          "stock_markup_reference_count",
+                          "changed_source_middle_words_in_scripRef",
+                          "changed_stock_middle_words_in_reference",
+                          "stock_markup_title_count",
                           "stock_markup_table_count", "source_middle_word_count",
                           "stock_middle_word_count", "shared_changed_middle_words",
                           "same_prefix_words", "same_suffix_words",
@@ -279,7 +289,11 @@ jobs:
                                           "stock_raw_sha256")) or
                       case["source_line"] < 1 or
                       case["shared_changed_middle_words"] > min(
-                          case["source_middle_word_count"],case["stock_middle_word_count"])):
+                          case["source_middle_word_count"],case["stock_middle_word_count"]) or
+                      case["changed_source_middle_words_in_scripRef"] >
+                          case["source_middle_word_count"] or
+                      case["changed_stock_middle_words_in_reference"] >
+                          case["stock_middle_word_count"]):
                   raise SystemExit("Unreviewed raw or source text exposed in lexical case data")
           print("Original 156-case word selection and source/stock markup triage (not parity): " +
                 json.dumps({
@@ -292,6 +306,14 @@ jobs:
                     "cross_source_stock_link_presence":
                         lexical["source_scripRef_x_stock_reference_presence"],
                     "compiled_titles_tables":lexical["stock_title_or_table_presence"],
+                    "source_changed_reference_word_spans":
+                        lexical["original_changed_word_tokens_in_source_scripRef"],
+                    "stock_changed_reference_word_spans":
+                        lexical["stock_changed_word_tokens_in_stock_reference"],
+                    "changed_reference_word_overlap":
+                        lexical["source_scripRef_and_stock_reference_changed_word_overlap"],
+                    "one_word_changes_at_reference_spans":
+                        lexical["one_to_one_middle_word_changes_inside_source_and_stock_references"],
                     "source_middle_bins":lexical["original_middle_word_count_buckets"],
                     "compiled_middle_bins":lexical["stock_middle_word_count_buckets"],
                     "bounded_source_line_hash_cases":len(cases),
