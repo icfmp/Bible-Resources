@@ -150,9 +150,10 @@ def inspect_shared_original_units_in_native_runs(
         }
         if not original_cases.issubset(true_member_identities):
             raise PilotError("Source original known anomalies not contained in shared stock raw run")
-        selected_stock=matches.get(run[0][0])
+        witness_start=source_starts[0][1]
+        selected_stock=matches.get(witness_start)
         if selected_stock is None or sha256(selected_stock).hexdigest()!=raw_sha:
-            raise PilotError("Stock native first raw run key is not source-anchored in inventory")
+            raise PilotError("Stock shared raw has no source-start-anchored native witness")
         compiled_words=strict_native_stock_plain_words(selected_stock)
         compiled_unmarked_words_count=len(compiled_words)
         source_member_receipts=[]
