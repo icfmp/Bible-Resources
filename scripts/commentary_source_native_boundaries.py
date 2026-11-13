@@ -14,7 +14,7 @@ from collections import Counter, defaultdict
 from hashlib import sha256
 import re
 
-from commentary_xml_witness import _parse_reference, WORK_REF
+from commentary_xml_witness import _parse_reference, WORK_REF, OSIS_LOC
 from pilot_preflight import PilotError
 
 MAX_RAW_K_KEYS=50_000
@@ -175,6 +175,52 @@ class NativeRawRunBoundaryInventory:
                 chapter==start.rsplit(".",1)[0]
                 for (_key,chapter,_dig) in keys[left:right+1]
             )
+            # Compare the *actual ThML-declared* source range endpoints
+            # against the full native raw run, without inferring that
+            # independently occupied SWORD keys establish source versification.
+            explicit_end=original.get("private_original_declared_range_end_key")
+            if (not isinstance(explicit_end,str) or
+                    not OSIS_LOC.fullmatch(explicit_end) or
+                    not OSIS_LOC.fullmatch(start)):
+                raise PilotError("Unreviewed source original verse-range endpoint")
+            start_c, source_first_verse=start.rsplit(".",1)
+            end_c, source_last_verse=explicit_end.rsplit(".",1)
+            if (start_c!=end_c or
+                    not 0 < int(source_first_verse) <= int(source_last_verse) or
+                    int(source_last_verse)-int(source_first_verse)+1 > 500):
+                raise PilotError("Original source range endpoints exceed reviewed one-chapter scope")
+            start_verse=int(source_first_verse)
+            last_verse=int(source_last_verse)
+            # Actual numbered K occupation, never a reconstructed verse grid.
+            native_declared_span=[
+                (key,chapter,digest)
+                for key,chapter,digest in keys
+                if chapter==start_c and start_verse<=int(key.rsplit(".",1)[-1])<=last_verse
+            ]
+            if not native_declared_span:
+                raise PilotError("Original source selected start not found in genuine numbered span")
+            native_span_keys={key for key,_chapter,_digest in native_declared_span}
+            run_keys={key for key,_chapter,_digest in keys[left:right+1]}
+            raw_in_span=sum(digest==pinned_raw for _key,_chapter,digest in native_declared_span)
+            native_run_before_source_start=sum(
+                chapter==start_c and int(key.rsplit(".",1)[-1])<start_verse
+                for key,chapter,_digest in keys[left:right+1]
+            )
+            native_run_after_source_end=sum(
+                chapter==start_c and int(key.rsplit(".",1)[-1])>last_verse
+                for key,chapter,_digest in keys[left:right+1]
+            )
+            original_marker_starts_on_run=sum(
+                len(source_units)
+                for original_start,source_units in source.items()
+                if original_start in run_keys
+            )
+            true_numeric_native_K_continuity=all(
+                first_chapter==second_chapter and
+                int(second_key.rsplit(".",1)[-1])==int(first_key.rsplit(".",1)[-1])+1
+                for (first_key,first_chapter,_),(second_key,second_chapter,_)
+                in zip(keys[left:right],keys[left+1:right+1])
+            )
             native={
                 "source_line":ident[0],
                 "original_full_reference_sha256":ident[1],
@@ -190,6 +236,32 @@ class NativeRawRunBoundaryInventory:
                     same_chapter_count!=run_size,
                 "native_K_run_other_identical_raw_keys_outside_selected_run":other_raw_slots,
                 "native_K_separate_identical_raw_runs_in_same_book":separate_runs,
+                "original_source_declared_end_key_sha256":
+                    sha256(explicit_end.encode("utf-8")).hexdigest(),
+                "original_explicit_verse_range_declared_numeric_verse_count":
+                    last_verse-start_verse+1,
+                "original_declared_range_native_occupied_K_key_count":len(native_declared_span),
+                "original_declared_range_native_K_same_raw_as_selected_count":raw_in_span,
+                "original_declared_range_native_K_other_raw_count":
+                    len(native_declared_span)-raw_in_span,
+                "original_declared_range_start_K_occupied":start in native_span_keys,
+                "original_declared_range_end_K_occupied":explicit_end in native_span_keys,
+                "original_declared_end_K_key_inside_selected_raw_run":
+                    explicit_end in run_keys,
+                "native_raw_run_first_K_key_equals_original_range_start":
+                    keys[left][0]==start,
+                "native_raw_run_last_K_key_equals_original_range_end":
+                    keys[right][0]==explicit_end,
+                "native_raw_run_occupied_K_keys_equal_occupied_K_keys_within_declared_original_range":
+                    run_keys==native_span_keys,
+                "native_raw_run_K_keys_before_original_range_start":
+                    native_run_before_source_start,
+                "native_raw_run_K_keys_after_original_range_end":
+                    native_run_after_source_end,
+                "actual_source_annotations_starting_at_K_keys_inside_same_native_raw_run":
+                    original_marker_starts_on_run,
+                "native_raw_run_K_key_numbers_are_truly_consecutive_within_one_chapter":
+                    true_numeric_native_K_continuity,
                 "native_run_first_key_sha256":sha256(keys[left][0].encode()).hexdigest(),
                 "native_run_last_key_sha256":sha256(keys[right][0].encode()).hexdigest(),
                 "native_key_immediately_before_raw_run_sha256":
@@ -210,11 +282,23 @@ class NativeRawRunBoundaryInventory:
                 run_counts["selected_raw_run_crosses_chapter_boundary"]+=1
             if other_raw_slots:
                 run_counts["identical_raw_occurs_in_separate_K_runs"]+=1
+            if native["native_raw_run_occupied_K_keys_equal_occupied_K_keys_within_declared_original_range"]:
+                run_counts["occupied_native_raw_run_equals_occupied_original_range_span"]+=1
+            else:
+                run_counts["occupied_native_raw_run_differs_from_occupied_original_range_span"]+=1
+            if native["native_raw_run_K_key_numbers_are_truly_consecutive_within_one_chapter"]:
+                run_counts["native_occupied_K_run_is_also_numeric_verse_continuous"]+=1
+            else:
+                run_counts["native_occupied_K_run_has_numeric_verse_gap_or_chapter_change"]+=1
             response.append(native)
         if (len(response)!=len(case_receipts) or
                 sum(source_counts.values())!=len(response) or
                 run_counts["single_occupied_K_raw_run"]+
-                run_counts["multiple_occupied_K_keys_share_adjacent_raw"]!=len(response)):
+                run_counts["multiple_occupied_K_keys_share_adjacent_raw"]!=len(response) or
+                run_counts["occupied_native_raw_run_equals_occupied_original_range_span"]+
+                run_counts["occupied_native_raw_run_differs_from_occupied_original_range_span"]!=len(response) or
+                run_counts["native_occupied_K_run_is_also_numeric_verse_continuous"]+
+                run_counts["native_occupied_K_run_has_numeric_verse_gap_or_chapter_change"]!=len(response)):
             raise PilotError("Native and original source boundaries not fully reconciled")
         return {
             "source_marker_case_count":len(response),
@@ -224,6 +308,7 @@ class NativeRawRunBoundaryInventory:
             "selected_native_raw_run_structure_classes":dict(sorted(run_counts.items())),
             "original_source_marker_native_run_sha256_and_metadata_only_cases":
                 sorted(response,key=lambda z:(z["source_line"],z["original_full_reference_sha256"])),
+            "comparison_to_original_declared_range_uses_only_genuine_occupied_K_keys":True,
             "native_K_run_is_only_consecutive_occupied_keys_not_numeric_verses":True,
             "original_ThML_scripCom_marker_and_stock_SWORD_verse_key_are_not_equivalent_structural_authorities":True,
             "original_content_markup_and_edition_parity_verified":False,
