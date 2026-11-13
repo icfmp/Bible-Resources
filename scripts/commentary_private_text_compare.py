@@ -34,6 +34,7 @@ from commentary_shared_raw_source_units import inspect_shared_original_units_in_
 from commentary_original_div1_book_consistency import private_original_div1_book_code_consistency
 from commentary_source_english_osis_alias import original_div1_english_alias_vs_declared_osis
 from commentary_source_identity_lexical_gate import classify_lexical_source_identity
+from commentary_near_prose_unicode_review import classify_same_book_unicode_variants
 from commentary_intake import load_manifest
 from commentary_text_delta import punctuation_relationship, word_relationship, nonword_symbol_excess
 from commentary_unresolved_lexical_triage import (
@@ -666,6 +667,10 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         source_identity_lexical_gate=classify_lexical_source_identity(
             source,lexical.get("bounded_plain_word_nontrivial_differences_line_and_hash_cases",[])
         )
+        source_same_book_unicode_prose_review=classify_same_book_unicode_variants(
+            source,matches,source_identity_lexical_gate,
+            stock_text_parser=raw_as_strict_xml_text,
+        )
         reference_cross_slot_report=reference_cross_slot.report(lexical)
         pending_plain_relations={
             "plain_word_order_or_selection_requires_editorial_review",
@@ -781,6 +786,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         "source_original_div1_osisRef_book_consistency_census":original_div1_book_consistency,
         "source_original_div1_english_alias_vs_osisRef_book_claim_evidence":original_div1_english_aliases,
         "source_div1_book_identity_safety_gate_for_nonlink_lexical_differences":source_identity_lexical_gate,
+        "original_source_same_book_unicode_lexical_witness_review":source_same_book_unicode_prose_review,
         "source_original_chapter_neighbor_evidence":chapter_proof,
         "source_chapter_neighbor_to_stock_intro_diagnostics":chapter_analysis,
         "source_chapter_neighbor_to_same_chapter_numbered_location":chapter_numbered_location,
