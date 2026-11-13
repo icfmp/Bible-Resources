@@ -86,6 +86,44 @@ process/window smoke is **not** a content-rendering or Android acceptance
 test. Never mark those steps complete merely because both SWORD binaries
 produce the same raw keys.
 
+### Xiphos original scripture-reference link acceptance
+
+Do not conflate **original source reference data**, **real GUI hyperlink
+destinations**, and **actual clicked navigation**:
+
+- Read original `osisRef` values and original labels from the exact SHA-pinned
+  native SWORD module. A real Xiphos rich-HTML selection can independently
+  prove that a label and its correct target survived rendering; this does not
+  prove that a user successfully clicked the displayed hyperlink.
+- Check the **specific route type** against Xiphos's own handlers. In
+  [`src/main/url.cc`](https://github.com/crosswire/xiphos/blob/master/src/main/url.cc),
+  an internal `passagestudy.jsp?action=showRef&type=scripRef` click goes through
+  `show_ref()` and `main_display_verse_list_in_sidebar()`. The selected
+  verse appears in the **sidebar results/preview**, as implemented in
+  [`src/main/sidebar.cc`](https://github.com/crosswire/xiphos/blob/master/src/main/sidebar.cc)
+  and [`src/gtk/sidebar.c`](https://github.com/crosswire/xiphos/blob/master/src/gtk/sidebar.c).
+  A `sword://` navigation follows a **different** main-reader path. Never
+  require a `showRef` link to change the main Bible pane to declare it valid.
+- Record **actual click PASS** only when a bounded, independent UI test proves
+  that the clicked *original link* produced the *original expected Bible target*
+  in the pane appropriate to its observed Xiphos route, using independently
+  retrieved Bible text. A pointer shape, a changed clipboard, a URI substring,
+  source/GUI href equality or an upstream code path alone is **not** a click PASS.
+- A virtual GUI that cannot identify the authentic clickable link location
+  reports **INCONCLUSIVE / NOT TESTED**, not missing source content, a reader
+  defect, or a release approval. Avoid merging permanent automated probes
+  that cannot generate a positive acceptance witness. A real desktop/manual
+  reader check can fill this narrow gap, with the route and observed target
+  recorded separately from the source/compiled parity verdict.
+
+The bounded [MHCC #237 experiment](https://github.com/icfmp/Bible-Resources/pull/237)
+verified an exact original reference-to-real-GUI-href join and Xiphos's
+`passagestudy.jsp` route, but did **not** establish real clicked navigation;
+its always-inconclusive GUI automation was deliberately **closed unmerged**.
+See [MHCC issue #177](https://github.com/icfmp/Bible-Resources/issues/177)
+for exact source SHA evidence and CI receipts. No authorial text or references
+were changed.
+
 
 ## Reusable read-only observation (implemented)
 
