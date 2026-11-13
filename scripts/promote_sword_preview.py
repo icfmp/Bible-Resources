@@ -40,8 +40,11 @@ def _require_config_fields(raw: bytes, *, module_id: str, path: str,
         raise ValueError("SWORD module metadata too large")
     text = raw.decode("utf-8")
     lines = text.splitlines()
-    if not lines or lines[0] != f"[{module_id}]" or any(
-            line.startswith("[") and line.endswith("]") for line in lines[1:]):
+    headers = [(i,line) for i,line in enumerate(lines)
+               if line.startswith("[") and line.endswith("]")]
+    if (len(headers)!=1 or headers[0][1]!=f"[{module_id}]" or
+            any(line.strip() and not line.lstrip().startswith(("#",";"))
+                for line in lines[:headers[0][0]])):
         raise ValueError("Unverified SWORD metadata section identity")
     sensitive = ("DataPath", "ModDrv", "Versification", "Encoding",
                  "BlockType", "CompressType", "Version",
