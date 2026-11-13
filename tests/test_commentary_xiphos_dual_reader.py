@@ -194,6 +194,7 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
         self.assertEqual(report["original_internal_reference_elements_found"], 1)
         self.assertEqual(report["original_stock_nontrivial_reference_labels_found"], 1)
         self.assertEqual(report["source_reference_labels_observed_as_real_gui_HTML_anchors"], 1)
+        self.assertEqual(report["exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations"], 1)
         self.assertEqual(report["exact_original_titles_in_copied_gui_rich_html"], 1)
         self.assertEqual(report["real_gui_rich_html_anchor_elements_found"], 1)
         self.assertFalse(report["xiphos_link_click_target_and_navigation_verified"])
@@ -219,7 +220,22 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
         self.assertEqual(result["original_stock_nontrivial_reference_labels_found"],1)
         self.assertEqual(result["real_gui_rich_html_anchor_elements_found"],1)
         self.assertEqual(result["source_reference_labels_observed_as_real_gui_HTML_anchors"],0)
+        self.assertEqual(result["exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations"],0)
         self.assertFalse(result["xiphos_link_click_target_and_navigation_verified"])
+
+    def test_lookalike_reference_target_does_not_match_different_original_osisref(self):
+        from commentary_xiphos_dual_reader import _markup_display_witness
+        original=b'<reference osisRef="Gen.2.1">genuine Scripture source label</reference>'
+        webkit=b'<a href="sword://Bible/Gen.2.10">genuine Scripture source label</a>'
+        result=_markup_display_witness(original,b"genuine Scripture source label",webkit)
+        self.assertEqual(result["source_reference_labels_observed_as_real_gui_HTML_anchors"],1)
+        self.assertEqual(result["exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations"],0)
+        good=_markup_display_witness(
+            original,b"genuine Scripture source label",
+            b'<a href="sword://Bible/Gen.2.1">genuine Scripture source label</a>'
+        )
+        self.assertEqual(good["exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations"],1)
+        self.assertFalse(good["xiphos_link_click_target_and_navigation_verified"])
 
     def test_bounded_private_gui_markup_input_and_source_limits(self):
         from commentary_xiphos_dual_reader import _markup_display_witness
