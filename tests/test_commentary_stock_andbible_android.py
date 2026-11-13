@@ -117,6 +117,30 @@ class CommentaryAndroidStockTests(unittest.TestCase):
                 x["action"] for x in safe_controls(changed, "MHCC", TITLE)["controls"]
             ])
 
+    @patch("commentary_stock_andbible_android.time.sleep")
+    @patch("commentary_stock_andbible_android.adb")
+    def test_only_official_manifest_exported_installer_activity_can_be_launched(
+        self, adb, _sleep,
+    ):
+        from commentary_stock_andbible_android import (
+            _launch_official_exported_zip_installer,
+        )
+        adb.return_value = b"Starting: Intent { cmp=net.bible.android.activity/.InstallZip }"
+        self.assertTrue(_launch_official_exported_zip_installer())
+        self.assertEqual(
+            adb.call_args.args[:6],
+            (
+                "shell", "am", "start", "-n",
+                "net.bible.android.activity/net.bible.android.view.activity.installzip.InstallZip",
+            )[:6],
+        )
+        adb.return_value = b"Error: Activity class does not exist"
+        with self.assertRaisesRegex(PilotError, "unavailable"):
+            _launch_official_exported_zip_installer()
+        adb.return_value = b""
+        with self.assertRaises(PilotError):
+            _launch_official_exported_zip_installer()
+
     def test_metadata_identity_not_file_picker_filename_is_reader_witness(self):
         xml = (b'<hierarchy><node text="MHCC" bounds="[50,100][600,200]"/>'
                b'<node text="MHCC.zip" bounds="[50,200][600,300]"/></hierarchy>')
