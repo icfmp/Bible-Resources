@@ -101,7 +101,7 @@ class OriginalDiv1OsisBookClaimTests(unittest.TestCase):
         source,shared=synthetic_original()
         group=shared["bounded_shared_native_raw_run_source_unit_line_sha256_and_alignment_reports"][0]
         group["original_source_unit_starts_inside_same_native_raw_run_in_CCEl_XML_order"][0][
-            "original_body_sha256"]="0"*64
+            "original_source_body_sha256"]="0"*64
         with self.assertRaises(PilotError):
             private_original_div1_book_code_consistency(source,shared)
 
