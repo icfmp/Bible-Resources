@@ -22,6 +22,10 @@ from commentary_xiphos_dual_reader import (
     prepare_original_and_candidate_gui_samples,
     verify_and_install_reviewed_bible,
 )
+from commentary_xiphos_heading_probe import (
+    pinned_source_intro_witness,
+    probe_real_xiphos_commentary_heading_menu,
+)
 from pilot_preflight import PilotError
 
 PRIVATE_ID = "BRMHCCReview"
@@ -92,9 +96,20 @@ def private_candidate_xiphos_review(
             source_reference_cases=cases,
             native_raw_key_binary=native_single_key_binary,
         )
+        authentic_intros = pinned_source_intro_witness(
+            original_root, manifest["module_id"], native_full_corpus_binary,
+            expected_raw_corpus_sha256=manifest["native_raw_corpus_sha256"],
+        )
         real_gui = _run_real_gui(
             candidate_root, comparisons, seconds=seconds,
             commentary_module_id=PRIVATE_ID,
+            on_gui_ready=lambda env: {
+                "real_Xiphos_commentary_book_chapter_heading_context_menu":
+                probe_real_xiphos_commentary_heading_menu(
+                    env, authentic_intros,
+                    ordinary_first_verse=comparisons["Gen 1:1"]["commentary"],
+                ),
+            },
         )
         result = {
             "status": "byte_exact_private_candidate_real_Xiphos_GUI_observation",
