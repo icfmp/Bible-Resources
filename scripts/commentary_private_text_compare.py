@@ -34,6 +34,10 @@ from commentary_shared_raw_source_units import inspect_shared_original_units_in_
 from commentary_original_div1_book_consistency import private_original_div1_book_code_consistency
 from commentary_source_english_osis_alias import original_div1_english_alias_vs_declared_osis
 from commentary_source_identity_lexical_gate import classify_lexical_source_identity
+from commentary_original_bookcode_repair import propose_private_source_bookcode_repair
+from commentary_prose_cross_slot import strict_native_stock_plain_words
+from commentary_nonlink_word_alignment import plain_word_alignment
+from commentary_unresolved_lexical_triage import WORD
 from commentary_near_prose_unicode_review import classify_same_book_unicode_variants
 from commentary_intake import load_manifest
 from commentary_text_delta import punctuation_relationship, word_relationship, nonword_symbol_excess
@@ -600,6 +604,47 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
             raise PilotError("Pinned XML exceeds original-source maximum")
         original_xml=xml_file.read_bytes()
         source,source_proof=_original_source_markers(original_xml)
+        # A changed in-memory copy is NOT a source/stock repair. It resolves
+        # contradictory book markers only when the exact authorial div1 title
+        # independently identifies a different known book, with a byte-exact
+        # reversible proposal and full original body identity checks.
+        suggested_xml,source_marker_repair=propose_private_source_bookcode_repair(
+            original_xml,expected_source_sha256=original_sha
+        )
+        suggested_source,suggested_source_proof=_original_source_markers(suggested_xml)
+        def by_line_and_hash(items):
+            result={}
+            for key,units in items.items():
+                for unit in units:
+                    ident=(unit["original_source_line"],unit["original_text_sha256"])
+                    if ident in result:
+                        raise PilotError("Nonunique original source passage identity during repair")
+                    result[ident]=(key,unit)
+            return result
+        original_by_line=by_line_and_hash(source)
+        proposed_by_line=by_line_and_hash(suggested_source)
+        if (set(original_by_line)!=set(proposed_by_line)
+                or source_proof["original_verse_or_range_body_count"]!=suggested_source_proof[
+                    "original_verse_or_range_body_count"
+                ]):
+            raise PilotError("Proposed book-marker correction changed source authorial bodies")
+        moved_source_units=[]
+        for ident,(original_start,before) in original_by_line.items():
+            proposed_start,after=proposed_by_line[ident]
+            if (before["original_text"]!=after["original_text"]
+                    or before["private_original_scripRef_links"]!=after[
+                        "private_original_scripRef_links"
+                    ] or before["private_original_div1_heading_sha256"]!=after[
+                        "private_original_div1_heading_sha256"
+                    ]):
+                raise PilotError("Private source repair unexpectedly changed authorial annotation or heading")
+            if original_start!=proposed_start:
+                moved_source_units.append((ident,original_start,proposed_start,after))
+        if len(moved_source_units)!=source_marker_repair[
+            "reviewed_private_original_bookcode_replacements"
+        ]:
+            raise PilotError("Not all proposed original scripCom book tokens changed anchor books")
+        proposed_native_keys={value[2] for value in moved_source_units}
         chapter_neighbors,chapter_proof=original_chapter_neighbors(original_xml)
         if chapter_proof["explicit_chapter_source_marker_count"]!=source_proof["chapter_source_markers_not_compared"]:
             raise PilotError("Original chapter marker count differs from full independent source audit")
@@ -622,6 +667,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         process=None
         rows=[]
         matches={}
+        proposed_original_book_anchor_native_matches={}
         chapter_intros={}
         numbered_probe=ChapterNeighborNumberedProbe(chapter_neighbors)
         alternate_probe=ChapterNeighborSameBookAlternativeProbe(chapter_neighbors)
@@ -636,8 +682,11 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
                 raise PilotError("Cannot capture stock raw XML privately")
             def collect(kind,ref,raw):
                 rows.append((kind,ref))
-                if kind=="K" and ref in source:
-                    matches[ref]=raw
+                if kind=="K":
+                    if ref in source:
+                        matches[ref]=raw
+                    if ref in proposed_native_keys:
+                        proposed_original_book_anchor_native_matches[ref]=raw
                 numbered_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
                 alternate_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
                 source_p_overlap_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
@@ -658,6 +707,58 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
                 process.wait()
             raise
         crosscheck=private_crosscheck(ix.stdout,manifest["module_id"],rows,raw_summary)
+        # Inspect the REAL compiled stock under the *proposed* book identity,
+        # without ever overwriting the original XML, CrossWire files, or
+        # inferred verse ranges. A source-title book correction is an editorial
+        # proposal, and matching text is only supporting independent evidence.
+        repaired_book_source_word_outcomes=Counter()
+        repaired_book_original_line_hash_receipts=[]
+        for (line,original_body_sha),old_start,new_start,item in moved_source_units:
+            raw=proposed_original_book_anchor_native_matches.get(new_start)
+            if raw is None:
+                outcome="proposed_book_key_not_occupied_in_original_stock"
+                original_missing=None
+            else:
+                source_words=WORD.findall(item["original_text"])
+                linked=set(item["private_original_scripRef_word_indices"])
+                if (not source_words or any(type(i) is not int or i<0 or
+                        i>=len(source_words) for i in linked)):
+                    raise PilotError("Private original source corrected-book plain words missing")
+                unlinked=[w for i,w in enumerate(source_words) if i not in linked]
+                stock_words=strict_native_stock_plain_words(raw)
+                aligned=plain_word_alignment(unlinked,stock_words)
+                original_missing=aligned["original_plain_words_not_matched_in_exact_order"]
+                if original_missing is None:
+                    outcome="original_stock_correct_book_alignment_exceeds_safe_budget"
+                elif original_missing==0:
+                    outcome="all_source_prose_words_found_in_order_at_correct_book_stock_key"
+                else:
+                    outcome="some_source_prose_words_still_differ_at_correct_book_stock_key"
+            repaired_book_source_word_outcomes[outcome]+=1
+            repaired_book_original_line_hash_receipts.append({
+                "original_source_line":line,
+                "original_authorial_body_sha256":original_body_sha,
+                "original_wrong_book_start_sha256":sha256(old_start.encode()).hexdigest(),
+                "proposed_book_start_sha256":sha256(new_start.encode()).hexdigest(),
+                "source_plain_words_not_aligned_at_proposed_book_key":original_missing,
+                "private_original_repaired_book_text_witness_class":outcome,
+                "not_authorized_to_reassign_crosswire_original_reference":True,
+            })
+        if sum(repaired_book_source_word_outcomes.values()) != len(moved_source_units):
+            raise PilotError("Private book-marker source repair stock comparisons incomplete")
+        original_source_book_marker_private_repair_stock_review={
+            **source_marker_repair,
+            "actual_original_stock_full_native_corpus_sha256":
+                raw_summary["all_native_raw_entries_ordered_sha256"],
+            "corrected_book_source_marker_count_compared":len(moved_source_units),
+            "original_repaired_book_source_text_match_classes":
+                dict(sorted(repaired_book_source_word_outcomes.items())),
+            "original_repaired_book_line_SHA_only_stock_comparison_cases":
+                repaired_book_original_line_hash_receipts,
+            "source_book_repair_is_not_crosswire_text_or_verse_repair":True,
+            "original_XML_or_stock_SWORD_mutated":False,
+            "independent_authorial_edition_identity_established":False,
+        }
         analysis=compare_private_texts(source,matches,
             on_unresolved_word_case=reference_cross_slot.observe_unresolved)
         lexical=analysis['unresolved_source_stock_lexical_selection_triage']
@@ -786,6 +887,8 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         "source_original_div1_osisRef_book_consistency_census":original_div1_book_consistency,
         "source_original_div1_english_alias_vs_osisRef_book_claim_evidence":original_div1_english_aliases,
         "source_div1_book_identity_safety_gate_for_nonlink_lexical_differences":source_identity_lexical_gate,
+        "original_source_book_marker_private_repair_proposal_stock_review":
+            original_source_book_marker_private_repair_stock_review,
         "original_source_same_book_unicode_lexical_witness_review":source_same_book_unicode_prose_review,
         "source_original_chapter_neighbor_evidence":chapter_proof,
         "source_chapter_neighbor_to_stock_intro_diagnostics":chapter_analysis,
