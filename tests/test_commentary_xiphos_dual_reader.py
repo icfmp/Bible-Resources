@@ -125,6 +125,21 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
         with self.assertRaisesRegex(PilotError,"Malformed"):
             _candidate_passages({"sample_references":["Gen 0:0"]})
 
+    @patch("commentary_xiphos_dual_reader.subprocess.run")
+    def test_private_clipboard_seed_uses_nonempty_sentinel_without_captured_stdout(self, run):
+        import subprocess
+        from commentary_xiphos_dual_reader import _seed_x11_clipboard
+        run.return_value.returncode=0
+        _seed_x11_clipboard({"DISPLAY":":91"})
+        self.assertEqual(run.call_args.args[0], [
+            "xclip","-selection","clipboard","-i"
+        ])
+        self.assertIn(b"PRIVATE_CLIPBOARD_SENTINEL",run.call_args.kwargs["input"])
+        self.assertEqual(run.call_args.kwargs["stdout"],subprocess.DEVNULL)
+        run.return_value.returncode=1
+        with self.assertRaisesRegex(PilotError,"stale"):
+            _seed_x11_clipboard({"DISPLAY":":91"})
+
     def test_no_user_display_or_wayland_gui_capture(self):
         with self.assertRaisesRegex(PilotError, "Unsafe virtual"):
             attempt_real_xiphos_passage_copy(
