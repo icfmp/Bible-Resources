@@ -59,6 +59,30 @@ class UnresolvedLexicalSourceMarkupTests(unittest.TestCase):
         self.assertEqual(result["lexical_middle_shape"],"middle_same_word_multiset_different_order")
         self.assertTrue(result["unresolved_selection_does_not_prove_content_loss_or_edition_equivalence"])
 
+    def test_original_reference_without_compiled_markup_retains_line_hash_only(self):
+        original_xml=(
+            b'<?xml version="1.0"?><ThML><ThML.body><div1><div2>'
+            b'<scripCom osisRef="Bible:Gen.1.1"/>'
+            b'<div><p>Opening <scripRef osisRef="Bible:Gen.2.1">'
+            b'link source</scripRef> closing words.</p></div>'
+            b'</div2></div1></ThML.body></ThML>' + b" "*1100
+        )
+        source,_=_original_source_markers(original_xml)
+        report=compare_private_texts(source,{
+            "Gen.1.1":b'<p>Opening link revised closing words.</p>',
+        })
+        triage=report["unresolved_source_stock_lexical_selection_triage"]
+        self.assertEqual(triage["source_vs_stock_unresolved_word_selection_cases"],1)
+        self.assertEqual(triage["original_vs_stock_target_correspondence_classes"],
+                         {"no_stock_reference_markup":1})
+        self.assertEqual(triage["stock_reference_total_across_unresolved_entries"],0)
+        missing=triage["all_missing_stock_reference_entry_source_line_hash_only_cases"]
+        self.assertEqual(len(missing),1)
+        self.assertEqual(missing[0]["original_scripRef_count"],1)
+        self.assertEqual(len(missing[0]["original_reference_sha256"]),64)
+        self.assertNotIn("link source",json.dumps(triage))
+        self.assertNotIn("Gen.2.1",json.dumps(triage))
+
     def test_oversized_alignment_skips_without_approving_parity(self):
         a=" ".join(["original"]*1100)
         b=" ".join(["changed"]*1100)
@@ -113,6 +137,18 @@ class UnresolvedLexicalSourceMarkupTests(unittest.TestCase):
                          {"source_has_scripRef":1,"source_no_scripRef":1})
         self.assertEqual(triage["stock_reference_presence"],
                          {"stock_has_reference":1,"stock_no_reference":1})
+        self.assertEqual(
+            triage["original_vs_stock_target_correspondence_classes"],{
+                "all_osisRef_values_ordered_sole_literal_Bible_work_qualifier_difference":1,
+                "no_stock_reference_markup":1,
+            })
+        self.assertEqual(triage["original_scripRef_total_across_unresolved_entries"],1)
+        self.assertEqual(triage["stock_reference_total_across_unresolved_entries"],1)
+        self.assertEqual(
+            triage["literal_Bible_work_qualifier_only_osisRef_target_multiset_match_count"],1)
+        self.assertEqual(
+            triage["raw_exact_osisRef_target_multiset_match_count"],0)
+        self.assertEqual(len(triage["all_missing_stock_reference_entry_source_line_hash_only_cases"]),1)
         self.assertEqual(triage["one_to_one_middle_word_changes_inside_source_and_stock_references"],{
             "source_outside_scripRef_stock_outside_reference":1,
             "source_within_scripRef_stock_within_reference":1,

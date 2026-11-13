@@ -133,6 +133,17 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
             "private_original_scripRef_word_indices": marked_word_token_indices(
                 sibling, "scripRef", txt
             ),
+            "private_original_scripRef_links": [
+                {
+                    "text": "".join(ref.itertext()),
+                    "private_original_osisRef_target": ref.get("osisRef", ""),
+                    "attribute_name_types": sorted(
+                        key.rsplit("}",1)[-1] for key in ref.attrib
+                    ),
+                }
+                for ref in sibling.iter()
+                if isinstance(ref.tag,str) and ref.tag.rsplit("}",1)[-1] == "scripRef"
+            ],
         })
     if sum(len(rows) for rows in sources.values()) != (
         counts["work_qualified_verse"]+counts["work_qualified_same_book_verse_range"]

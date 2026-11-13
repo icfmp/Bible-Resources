@@ -16,6 +16,7 @@ import unicodedata
 from lxml import etree
 
 from commentary_stock_prefix_topology import unexplained_word_boundary_census
+from commentary_chapter_ref_labels import link_label_location
 from pilot_preflight import PilotError
 
 WORD = re.compile(r"\w+", flags=re.UNICODE)
@@ -191,6 +192,17 @@ class UnresolvedLexicalSelectionCensus:
         self.stock_changed_link_token_presence = Counter()
         self.original_and_stock_changed_link_token_overlap = Counter()
         self.one_word_link_overlap = Counter()
+        self.original_to_compiled_reference_target_classes = Counter()
+        self.original_reference_label_location_classes = Counter()
+        self.source_scripRef_attribute_name_occurrences = Counter()
+        self.source_stock_reference_element_count_relationships = Counter()
+        self.original_reference_total = 0
+        self.stock_reference_total = 0
+        self.source_nonempty_targets_total = 0
+        self.stock_nonempty_targets_total = 0
+        self.raw_exact_target_multiset_matches_total = 0
+        self.literal_work_qualifier_only_target_matches_total = 0
+        self.no_stock_reference_cases = []
         self.edit_ops = Counter()
         self.stock_link_and_source_link = Counter()
         self.original_middle_bins = Counter()
@@ -257,9 +269,58 @@ class UnresolvedLexicalSelectionCensus:
         if source_changed_link > source_changed or stock_changed_link > stock_changed:
             raise PilotError("Reference label words exceed known differing middle span")
         stock_links = stock_tags.get("reference", 0)
+        original_ref_links = source.get("private_original_scripRef_links")
+        if not isinstance(original_ref_links, list) or len(original_ref_links) != orig_links:
+            raise PilotError("Original scripRef source labels and target inventory inconsistent")
+        ref_witness = link_label_location(original_ref_links, raw)
+        if (ref_witness["original_scripRef_label_count"] != orig_links or
+                ref_witness["selected_stock_reference_element_count"] != stock_links):
+            raise PilotError("Original-source and stock-reference independent tag counts diverge")
+        exact_targets = ref_witness[
+            "original_scripRef_osisRef_targets_exact_value_multiset_matches_in_stock"
+        ]
+        qualifier_targets = ref_witness[
+            "original_scripRef_osisRef_work_qualifier_only_matches_in_stock"
+        ]
+        if stock_links == 0:
+            ref_class = "no_stock_reference_markup"
+        elif ref_witness["source_and_selected_stock_reference_targets_exact_ordered_match"]:
+            ref_class = "all_osisRef_values_identical_in_order"
+        elif ref_witness["source_and_stock_targets_only_literal_bible_work_qualifier_ordered_match"]:
+            ref_class = "all_osisRef_values_ordered_sole_literal_Bible_work_qualifier_difference"
+        elif (orig_links == stock_links and
+              exact_targets + qualifier_targets == orig_links):
+            ref_class = "all_targets_multiset_correspond_but_order_or_mixed_format_unverified"
+        elif exact_targets + qualifier_targets > 0:
+            ref_class = "some_targets_correspond_but_not_all"
+        else:
+            ref_class = "no_exact_or_literal_qualifier_only_target_correspondence"
         if any(type(n) is not int or n < 0 for n in original_tags.values()):
             raise PilotError("Invalid original source tag count")
         self.total += 1
+        self.original_to_compiled_reference_target_classes[ref_class] += 1
+        self.original_reference_label_location_classes.update(ref_witness[
+            "original_scripRef_to_stock_text_location_classes"
+        ])
+        self.source_scripRef_attribute_name_occurrences.update(ref_witness[
+            "original_scripRef_attribute_name_occurrences"
+        ])
+        self.original_reference_total += orig_links
+        self.stock_reference_total += stock_links
+        self.source_nonempty_targets_total += ref_witness[
+            "original_scripRef_with_nonempty_osisRef_target_count"
+        ]
+        self.stock_nonempty_targets_total += ref_witness[
+            "selected_stock_reference_elements_with_osisRef_attribute"
+        ]
+        self.raw_exact_target_multiset_matches_total += exact_targets
+        self.literal_work_qualifier_only_target_matches_total += qualifier_targets
+        self.source_stock_reference_element_count_relationships[
+            "same_reference_tag_count" if orig_links == stock_links
+            else ("more_original_scripRef_than_stock_reference"
+                  if orig_links > stock_links
+                  else "more_stock_reference_than_original_scripRef")
+        ] += 1
         self.category[delta["lexical_middle_shape"]] += 1
         self.one_word[delta["one_word_difference_subtype"]] += 1
         self.alignments[delta["middle_alignment_class"]] += 1
@@ -308,6 +369,15 @@ class UnresolvedLexicalSelectionCensus:
             "stock_raw_sha256": sha256(raw).hexdigest(),
             "source_markup_scripRef_count": orig_links,
             "stock_markup_reference_count": stock_links,
+            "original_to_stock_reference_target_relationship": ref_class,
+            "original_source_scripRef_target_nonempty_count": ref_witness[
+                "original_scripRef_with_nonempty_osisRef_target_count"
+            ],
+            "stock_reference_osisRef_present_count": ref_witness[
+                "selected_stock_reference_elements_with_osisRef_attribute"
+            ],
+            "source_stock_reference_raw_target_exact_multiset_matches": exact_targets,
+            "source_stock_reference_literal_work_qualifier_only_target_matches": qualifier_targets,
             "changed_source_middle_words_in_scripRef": source_changed_link,
             "changed_stock_middle_words_in_reference": stock_changed_link,
             "stock_markup_title_count": stock_tags.get("title", 0),
@@ -322,6 +392,21 @@ class UnresolvedLexicalSelectionCensus:
             "alignment_edit_opcode_count": delta["alignment_edit_opcode_count"],
         }
         self.candidates.append(selected)
+        if not stock_links:
+            self.no_stock_reference_cases.append({
+                "source_line":source["original_source_line"],
+                "original_reference_sha256":source["original_full_reference_sha256"],
+                "original_body_sha256":source["original_text_sha256"],
+                "stock_raw_sha256":sha256(raw).hexdigest(),
+                "original_scripRef_count":orig_links,
+                "original_scripRef_target_nonempty_count":ref_witness[
+                    "original_scripRef_with_nonempty_osisRef_target_count"
+                ],
+                "source_label_location_classes_in_unmarked_stock_text":dict(sorted(
+                    ref_witness["original_scripRef_to_stock_text_location_classes"].items()
+                )),
+                "no_original_stock_reference_or_text_assigned_as_equivalent":True,
+            })
         return delta
 
     def report(self) -> dict:
@@ -332,11 +417,23 @@ class UnresolvedLexicalSelectionCensus:
             self.stock_link_marked, self.stock_title_or_table_marked,
             self.original_changed_link_token_presence, self.stock_changed_link_token_presence,
             self.original_and_stock_changed_link_token_overlap,
-            self.stock_link_and_source_link, self.original_middle_bins,
-            self.stock_middle_bins, self.changed_middle_overlap
+            self.stock_link_and_source_link,
+            self.original_to_compiled_reference_target_classes,
+            self.source_stock_reference_element_count_relationships,
+            self.original_middle_bins, self.stock_middle_bins, self.changed_middle_overlap
         ):
             if sum(category.values()) != self.total:
                 raise PilotError("Original source/stock mismatch diagnostic accounting incomplete")
+        if (sum(self.original_reference_label_location_classes.values()) !=
+                self.original_reference_total or
+                self.source_nonempty_targets_total > self.original_reference_total or
+                self.stock_nonempty_targets_total > self.stock_reference_total or
+                self.raw_exact_target_multiset_matches_total +
+                self.literal_work_qualifier_only_target_matches_total >
+                min(self.source_nonempty_targets_total, self.stock_nonempty_targets_total)):
+            raise PilotError("Original scripture-target and label totals not fully reconciled")
+        if len(self.no_stock_reference_cases) != self.stock_link_marked["stock_no_reference"]:
+            raise PilotError("Missing compiled reference cases lack source-bound identities")
         # Rank most difficult cases first (not only easy 1:1 substitutions).
         priority = sorted(
             self.candidates,
@@ -359,6 +456,26 @@ class UnresolvedLexicalSelectionCensus:
             "stock_reference_presence": dict(sorted(self.stock_link_marked.items())),
             "source_scripRef_x_stock_reference_presence": dict(sorted(self.stock_link_and_source_link.items())),
             "stock_title_or_table_presence": dict(sorted(self.stock_title_or_table_marked.items())),
+            "original_scripRef_total_across_unresolved_entries":self.original_reference_total,
+            "stock_reference_total_across_unresolved_entries":self.stock_reference_total,
+            "original_nonempty_scripRef_osisRef_target_count":self.source_nonempty_targets_total,
+            "stock_reference_elements_with_osisRef_attribute_count":self.stock_nonempty_targets_total,
+            "raw_exact_osisRef_target_multiset_match_count":self.raw_exact_target_multiset_matches_total,
+            "literal_Bible_work_qualifier_only_osisRef_target_multiset_match_count":
+                self.literal_work_qualifier_only_target_matches_total,
+            "original_scripRef_vs_stock_reference_tag_count_relationships":
+                dict(sorted(self.source_stock_reference_element_count_relationships.items())),
+            "original_vs_stock_target_correspondence_classes":
+                dict(sorted(self.original_to_compiled_reference_target_classes.items())),
+            "original_scripRef_display_label_location_in_stock_text_classes":
+                dict(sorted(self.original_reference_label_location_classes.items())),
+            "original_scripRef_attribute_name_occurrences":
+                dict(sorted(self.source_scripRef_attribute_name_occurrences.items())),
+            "all_missing_stock_reference_entry_source_line_hash_only_cases":sorted(
+                self.no_stock_reference_cases,key=lambda c:(
+                    c["source_line"],c["original_reference_sha256"]
+                )
+            ),
             "original_changed_word_tokens_in_source_scripRef": dict(
                 sorted(self.original_changed_link_token_presence.items())),
             "stock_changed_word_tokens_in_stock_reference": dict(
