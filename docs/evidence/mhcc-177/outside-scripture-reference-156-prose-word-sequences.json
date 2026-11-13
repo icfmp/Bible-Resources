@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "issue": "https://github.com/icfmp/Bible-Resources/issues/177",
+  "status": "ALL_ORIGINAL_156_VERSE_RANGE_OUTSIDE_SCRIPREF_VS_STOCK_OUTSIDE_REFERENCE_WORD_TOKENS_COMPARED_NOT_EDITORIAL_PARITY",
+  "original_pinned_sha256": {
+    "ccel_thml_xml": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+    "original_crosswire_sword_zip": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+    "stock_native_all_raw_ordered": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
+  },
+  "observed": {
+    "previously_unresolved_full_body_original_word_selection_cases": 156,
+    "source_plain_word_sequence_vs_stock_outside_link_word_sequence_counts": {
+      "original_plain_words_in_order_with_extra_unmarked_stock_words": 146,
+      "plain_word_order_or_selection_requires_editorial_review": 10
+    },
+    "source_plain_word_relation_by_original_full_body_lexical_change_shape": {
+      "middle_partial_shared_word_occurrences": {
+        "original_plain_words_in_order_with_extra_unmarked_stock_words": 51,
+        "plain_word_order_or_selection_requires_editorial_review": 8
+      },
+      "one_to_one_middle_word_substitution": {
+        "original_plain_words_in_order_with_extra_unmarked_stock_words": 95,
+        "plain_word_order_or_selection_requires_editorial_review": 2
+      }
+    },
+    "source_plain_word_relation_by_actual_stock_reference_markup_presence": {
+      "stock_has_reference": {
+        "original_plain_words_in_order_with_extra_unmarked_stock_words": 142,
+        "plain_word_order_or_selection_requires_editorial_review": 4
+      },
+      "stock_no_reference": {
+        "original_plain_words_in_order_with_extra_unmarked_stock_words": 4,
+        "plain_word_order_or_selection_requires_editorial_review": 6
+      }
+    },
+    "original_sources_with_unresolved_outside_link_word_order_or_selection": 10,
+    "bounded_original_source_line_and_SHA256_only_review_cases": [
+      {
+        "original_body_sha256": "04a0bb60d42bfa51102ab232eccda58b41f63caaa6906234225bcf59b6eecf6b",
+        "original_full_reference_sha256": "5168acc1b7943312f5742ceb472b5c69b55613d6e0c6cf5f2e95a55a178ffb7b",
+        "original_plain_word_tokens": 257,
+        "original_source_line": 55868,
+        "outside_link_word_relation": "plain_word_order_or_selection_requires_editorial_review",
+        "shared_plain_word_multiset_occurrences": 18,
+        "stock_plain_word_tokens": 73,
+        "stock_raw_sha256": "24ad18d45b63ca2c3bc696186178f95456d117c80997342da229229bd2a5a5f9"
+      },
+      {
+        "original_body_sha256": "342e29d2730b8b3c0a2a584c3bcbcb1afd5e2f6a4c32af25df92a71e42d52b1c",
+        "original_full_reference_sha256": "be69d1d8f75a38cb5bfddb46ec60f9b5023964d9369afbd1619f3806bde41909",
+        "original_plain_word_tokens": 76,
+        "original_source_line": 15219,
+        "outside_link_word_relation": "plain_word_order_or_selection_requires_editorial_review",
+        "shared_plain_word_multiset_occurrences": 28,
+        "stock_plain_word_tokens": 273,
+        "stock_raw_sha256": "c3edca4cfb9da2137b7f9f5a16714bde42d9498fa6ed167e15adb5f79ab6610a"
+      },
+      {
+        "original_body_sha256": "9a2c7898a2b53bdbc55d0468ef2c1115ab9bbe4a4cce3fd853b6bb028ee36a74",
+        "original_full_reference_sha256": "1bf50eabf40e4396fe2edca76cd910483461f6c3ef60bbe17e0e823f5a404870",
+        "original_plain_word_tokens": 202,
+        "original_source_line": 28749,
+        "outside_link_word_relation": "plain_word_order_or_selection_requires_editorial_review",
+        "shared_plain_word_multiset_occurrences": 63,
+        "stock_plain_word_tokens": 161,
+        "stock_raw_sha256": "eb60645030a80e2021039b17751e397cce5aa2ce5f9fa61fb956519d0ae5430f"
+      },
+      {
+        "original_body_sha256": "2d24487f1adbad3ddc7f6181b13d27a11ab2007ed4edeb69405ad519b48d5d88",
+        "original_full_reference_sha256": "23ca0a52b876519d3d966b0866f47a687ba7696560075cf004415a5f6ddb669f",
+        "original_plain_word_tokens": 227,
+        "original_source_line": 55875,
+        "outside_link_word_relation": "plain_word_order_or_selection_requires_editorial_review",
+        "shared_plain_word_multiset_occurrences": 73,
+        "stock_plain_word_tokens": 231,
+        "stock_raw_sha256": "882002a5c4cb337fc5ac19ce95ef071ab66ff0e138a7070b118e85985fb4926d"
+      },
+      {
+        "original_body_sha256": "67c4f17497220a6ba04a712e1c8cb635ddc347c4189f5fdfacf98bd200009149",
+        "original_full_reference_sha256": "6128ddc7772acf6374490a0c456f693e43b8ed79ff5d881b1ef76740bf11d7d1",
+        "original_plain_word_tokens": 223,
+        "original_source_line": 55852,
+        "outside_link_word_relation": "plain_word_order_or_selection_requires_editorial_review",
+        "shared_plain_word_multiset_occurrences": 103,
+        "stock_plain_word_tokens": 353,
+        "stock_raw_sha256": "82a58bed69c125a9c167069bfe84c1b68355cc8a4a5897efa9fa835e284ac991"
+      },
+      {
+        "original_body_sha256": "18f8ea264110559e3636374841faaadb90f6e2dd10ec7992f1eb7755e9f5f503",
+        "original_full_reference_sha256": "f89d68adfb6100dc78c08eb43c55369c5e7e0afa6925952b81c2b8c4f8a72e36",
+        "original_plain_word_tokens": 105,
+        "original_source_line": 9727,
+        "outside_link_word_relation": "plain_word_order_or_selection_requires_editorial_review",
+        "shared_plain_word_multiset_occurrences": 104,
+        "stock_plain_word_tokens": 106,
+        "stock_raw_sha256": "55bcc31d31d958d8c860fc1b17f63078a165b4c20722c1e578e90d0e40290a21"
+      },
+      {
+        "original_body_sha256": "5ef525b574f9c049bd39bad7bafcaa99cb9ae9120e8647208c0261e25e801630",
+        "original_full_reference_sha256": "fe9620db993881f30ab981307b22f201c3aeb36dca52b83eee08874ac0d273e8",
+        "original_plain_word_tokens": 393,
+        "original_source_line": 55844,
+        "outside_link_word_relation": "plain_word_order_or_selection_requires_editorial_review",
+        "shared_plain_word_multiset_occurrences": 145,
+        "stock_plain_word_tokens": 353,
+        "stock_raw_sha256": "82a58bed69c125a9c167069bfe84c1b68355cc8a4a5897efa9fa835e284ac991"
+      },
+      {
+        "original_body_sha256": "8554c360b4ad1d3046c6abf1d117c28865922d51e4563768c7395ad4dbe2926a",
+        "original_full_reference_sha256": "11233f1eefefc1b026c1bf95b408bbe15f61fcacf7aa7b2b806bdb49d94f246e",
+        "original_plain_word_tokens": 531,
+        "original_source_line": 55858,
+        "outside_link_word_relation": "plain_word_order_or_selection_requires_editorial_review",
+        "shared_plain_word_multiset_occurrences": 153,
+        "stock_plain_word_tokens": 353,
+        "stock_raw_sha256": "82a58bed69c125a9c167069bfe84c1b68355cc8a4a5897efa9fa835e284ac991"
+      },
+      {
+        "original_body_sha256": "2f38e2d2b6cda28c73e18362873fdcd6f9a2b7ec7797beac9351868f61ec8718",
+        "original_full_reference_sha256": "6bf709b28979cc2f3dddbfdbbf10af91f2cf618c2447f5137c36dfc2578224b1",
+        "original_plain_word_tokens": 390,
+        "original_source_line": 441,
+        "outside_link_word_relation": "plain_word_order_or_selection_requires_editorial_review",
+        "shared_plain_word_multiset_occurrences": 389,
+        "stock_plain_word_tokens": 391,
+        "stock_raw_sha256": "bdd48715c0ee40b4fec2aaf489e4d03dde27d134354cce93528d14563d1eae4e"
+      },
+      {
+        "original_body_sha256": "4c845ebc8602a2f672ab64d50d9b753a71b018443d177a40dd50770b1d2f120e",
+        "original_full_reference_sha256": "5dd8668651f1576751490305c7faac288b19fead450c9d19cc326f9fe4fe37d0",
+        "original_plain_word_tokens": 881,
+        "original_source_line": 4291,
+        "outside_link_word_relation": "plain_word_order_or_selection_requires_editorial_review",
+        "shared_plain_word_multiset_occurrences": 879,
+        "stock_plain_word_tokens": 940,
+        "stock_raw_sha256": "9ed1bd927c09e128d686243525d570c279bffc567eb695ca80dac1b30e97c23d"
+      }
+    ],
+    "stock_plain_words_can_include_authorial_source_scripture_labels_when_compiled_markup_is_missing": true,
+    "source_word_order_preserved_as_subsequence_does_not_prove_punctuation_full_text_or_edition_parity": true,
+    "unmatched_plain_word_relation_does_not_prove_authorial_commentary_loss": true
+  },
+  "workflow_evidence": {
+    "actual_full_SHA_pinned_CCEL_original_vs_stock_SWORD": "https://github.com/icfmp/Bible-Resources/actions/runs/43422697811",
+    "exact_head_Validate": "https://github.com/icfmp/Bible-Resources/actions/runs/43422697821",
+    "source_implementation_head_before_permanent_report": "c0ff2ec17a731fc541730d761f4900007e96430a"
+  },
+  "remaining_gates": {
+    "editorial_review_10_outside_link_word_order_or_selection_cases": true,
+    "verify_all_original_scripRef_targets_and_display_labels": true,
+    "resolve_all_source_original_chapter_metadata_and_unmarked_Jude_post_Revelation_division": true,
+    "verify_full_original_paragraph_note_table_quote_heading_markup_parity": true,
+    "verify_source_CCEl_CrossWire_digital_edition_equivalence": true,
+    "verify_redistribution_rights": true,
+    "independent_Xiphos_AndBible_GUI_tests": true,
+    "module_publication_approved": false
+  },
+  "fully_approved_seven_stage_steps": 0,
+  "original_authorial_text_XML_or_stock_SWORD_module_modified": false,
+  "original_source_words_reference_strings_or_stock_raw_xml_published": false
+}
