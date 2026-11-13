@@ -312,6 +312,7 @@ jobs:
                     "original_scripRef_osisRef_work_qualifier_only_matches_in_stock",
                     "work_qualifier_only_matching_does_not_authorize_target_normalization",
                     "source_and_selected_stock_reference_targets_exact_ordered_match",
+                    "source_and_stock_targets_only_literal_bible_work_qualifier_ordered_match",
                     "nonmatching_target_values_are_not_auto_normalized_or_rewritten",
                     "matched_label_does_not_validate_reference_target_or_edition",
                     "original_words_and_stock_XML_never_reported"
@@ -342,6 +343,7 @@ jobs:
                         links["selected_stock_reference_elements_with_osisRef_attribute"]) or
                   links["work_qualifier_only_matching_does_not_authorize_target_normalization"] is not True or
                   type(links["source_and_selected_stock_reference_targets_exact_ordered_match"]) is not bool or
+                  type(links["source_and_stock_targets_only_literal_bible_work_qualifier_ordered_match"]) is not bool or
                   links["nonmatching_target_values_are_not_auto_normalized_or_rewritten"] is not True or
                   links["matched_label_does_not_validate_reference_target_or_edition"] is not True or
                   links["original_words_and_stock_XML_never_reported"] is not True):
