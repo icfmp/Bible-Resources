@@ -99,19 +99,44 @@ def analyze_source(source: bytes, references: list[str]) -> tuple[dict, dict]:
     wanted = set(references)
     if not wanted <= strings.keys():
         raise ParagraphRenderingProbeError("Requested source reference absent")
+    root = _source_tree(source)
+    first_para_refs = set()
+    for paragraph in root.iter(OSIS + "p"):
+        first = next((verse.get("sID") or verse.get("osisID")
+                      for verse in paragraph.iter(OSIS + "verse")
+                      if not verse.get("eID")), None)
+        if first:
+            first_para_refs.add(first)
     occurrences = Counter()
     marker_refs = []
+    semantic_groups = Counter()
+    suspicious_nonfirst = []
     for ref, value in strings.items():
         s = shape(value)
-        if s["starts_with_editorial_symbol_candidate"]:
-            occurrences[s["starts_with_editorial_symbol_candidate"]] += 1
-            if len(marker_refs) < 24:
-                marker_refs.append(ref)
+        marker = s["starts_with_editorial_symbol_candidate"]
+        if not marker:
+            continue
+        occurrences[marker] += 1
+        if len(marker_refs) < 24:
+            marker_refs.append(ref)
+        beginning = value.lstrip()
+        if beginning.startswith("*Dieu") or beginning.startswith("*Seigneur"):
+            semantic_groups["protected_divine_name_candidate"] += 1
+        elif beginning.startswith("*["):
+            semantic_groups["protected_textual_uncertainty_candidate"] += 1
+        elif ref in first_para_refs:
+            semantic_groups["subject_division_at_paragraph_start_candidate"] += 1
+        else:
+            semantic_groups["not_at_authored_paragraph_start_unresolved"] += 1
+            if len(suspicious_nonfirst) < 24:
+                suspicious_nonfirst.append(ref)
     summary = {
         "original_verse_count": len(strings),
         "original_note_count": metadata["publisher_numbered_note_count"],
         "whole_source_leading_marker_counts": dict(sorted(occurrences.items())),
+        "semantic_candidate_categories_not_editorial_certification": dict(sorted(semantic_groups.items())),
         "bounded_leading_marker_references": marker_refs,
+        "bounded_unresolved_marker_references": suspicious_nonfirst,
     }
     return {ref: strings[ref] for ref in references}, summary
 
@@ -178,6 +203,8 @@ def main(argv=None):
     args.report.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print("Checked pinned source and exact native SWORD paragraph samples.")
     print("Source leading marker counts:", json.dumps(result["original_source_marker_summary"]["whole_source_leading_marker_counts"], sort_keys=True))
+    print("Candidate marker meanings:", json.dumps(result["original_source_marker_summary"]["semantic_candidate_categories_not_editorial_certification"], sort_keys=True))
+    print("Unresolved marker references:", result["original_source_marker_summary"]["bounded_unresolved_marker_references"])
     for ref, row in result["verse_samples"].items():
         print(ref, "source", json.dumps(row["original"], sort_keys=True),
               "native", json.dumps(row["compiled"], sort_keys=True),
