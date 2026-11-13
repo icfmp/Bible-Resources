@@ -608,9 +608,11 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
     }
 
 
-def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int) -> dict:
-    if (not 6 <= seconds <= 25 or root.is_symlink() or not root.is_dir()
-            or not (root / "mods.d/mhcc.conf").is_file()
+def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int,
+                  commentary_module_id: str = "MHCC") -> dict:
+    if (not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{1,39}", commentary_module_id)
+            or not 6 <= seconds <= 25 or root.is_symlink() or not root.is_dir()
+            or not (root / "mods.d" / (commentary_module_id.lower()+".conf")).is_file()
             or not (root / "mods.d/brlsg1910.conf").is_file()):
         raise PilotError("Xiphos requires pinned Bible plus original commentary")
     for program in ("Xvfb", "dbus-run-session", "xiphos", "xdotool", "xclip"):
