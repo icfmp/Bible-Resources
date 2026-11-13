@@ -19,9 +19,10 @@ from publisher_osis_usfx_parity import original_osis_verses_and_notes, _nonspace
 from repair_osis_source_bytes import _end_of_tag
 from source_osis_inventory import _source_tree, OSIS, source_inventory
 
-PREFIX = re.compile(r"(?P<spaces>\s*)(?P<mark>\*\*|\*)(?!\*)")
+PREFIX = re.compile(r"(?P<spaces>\s*)(?P<mark>\*{1,3})(?!\*)")
 MAX_BYTES = 128 * 1024 * 1024
 KINDS = {"paragraph": "x-subject-division", "poetry": "x-stanza-division"}
+MAJOR_KIND = "x-major-subject-division"
 
 
 class DivisionRepairError(ValueError):
@@ -86,6 +87,8 @@ def _candidates(original: bytes):
         else:
             unresolved.append(ref)
             continue
+        if len(sign) == 3 and kind != "paragraph":
+            raise DivisionRepairError("Triple-star significance outside paragraph not verified")
         candidates[ref] = (verse, kind, sign, match.group("spaces"),
                            mode, hi_node, outer_spaces)
     if unresolved:
@@ -131,7 +134,8 @@ def patch_divisions(source: bytes, *, expected_sha256: str):
             if source[end:end+len(old)] != old:
                 raise DivisionRepairError("Unexpected original marker byte placement")
             # Preserve original sign as an OSIS attribute, not inline prose.
-            replacement = ('<milestone type="' + KINDS[kind] +
+            value = MAJOR_KIND if kind == "paragraph" and len(mark) == 3 else KINDS[kind]
+            replacement = ('<milestone type="' + value +
                            '" marker="' + mark + '"/>').encode("ascii")
             patches.append((end, end+len(old), replacement))
         if node in selected_hi:
@@ -166,8 +170,9 @@ def patch_divisions(source: bytes, *, expected_sha256: str):
     corrected = bytes(result)
     new_root = _source_tree(corrected)
     markers = [(n.get("type"), n.get("marker")) for n in new_root.iter(OSIS + "milestone")
-               if n.get("type") in set(KINDS.values())]
-    expected = [(KINDS[kind], mark) for _, kind, mark, *_ in candidates.values()]
+               if n.get("type") in set(KINDS.values()) | {MAJOR_KIND}]
+    expected = [(MAJOR_KIND if kind == "paragraph" and len(mark) == 3 else KINDS[kind], mark)
+                for _, kind, mark, *_ in candidates.values()]
     if sorted(markers) != sorted(expected):
         raise DivisionRepairError("Original editorial marker metadata not preserved")
     corrected_keys, _ = source_inventory(corrected)
@@ -196,13 +201,13 @@ def patch_divisions(source: bytes, *, expected_sha256: str):
             expected_shift = len(edits_by_ref.get(ref, ""))
             if a["point"] - b["point"] != expected_shift:
                 raise DivisionRepairError("Unexplained note anchor position shift")
-    counts = Counter(kind for _, kind, *_ in candidates.values())
+    counts = Counter((kind+"_level_3" if kind == "paragraph" and len(mark) == 3 else kind)
+                     for _, kind, mark, *_ in candidates.values())
     unresolved_markers = []
     for ref, value in original_verses.items():
-        # Triple/longer original marks are editorially distinct and must not
-        # disappear from the review queue merely because this overlay handles
-        # only one- and two-star divisions.
-        if value.lstrip().startswith("***"):
+        # Longer original marks have not been reviewed and must not disappear
+        # from the editorial review queue.
+        if value.lstrip().startswith("****"):
             unresolved_markers.append(ref)
             continue
         m = PREFIX.match(value)
