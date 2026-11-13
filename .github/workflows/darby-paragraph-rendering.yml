@@ -6,6 +6,8 @@ on:
       - ".github/workflows/darby-paragraph-rendering.yml"
       - "scripts/inspect_paragraph_rendering.py"
       - "tests/test_inspect_paragraph_rendering.py"
+      - "scripts/repair_osis_division_markers.py"
+      - "tests/test_repair_osis_division_markers.py"
       - "modules/darby-jnd-2024/**"
   workflow_dispatch:
 
