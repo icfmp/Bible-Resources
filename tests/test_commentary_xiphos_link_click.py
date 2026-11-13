@@ -23,6 +23,12 @@ class OriginalLinkRealClickTests(unittest.TestCase):
         self.assertEqual(
             _real_original_targets(source, rich, "Ps 23:4"), []
         )
+        # Xiphos upstream also routes passagestudy.jsp internally.
+        internal = (b'<a href="passagestudy.jsp?action=showRef&amp;'
+                    b'passage=Ps.23.1">Psalms twenty three</a>')
+        self.assertEqual(
+            _real_original_targets(source, internal, "Gen 1:1"), ["Ps 23:1"]
+        )
         self.assertEqual(
             _real_original_targets(
                 source, b'<a href="sword:///Ps.23.2">Psalms twenty three</a>',
