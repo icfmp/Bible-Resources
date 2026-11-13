@@ -47,13 +47,13 @@ content. The choice is independent of which editions are in the public
 domain; the rights and frontend gates below apply in either case.
 
 1. **Unmodified upstream SWORD witness (preferred when suitable):** pin the
-   exact original ZIP, \`.conf\`, version, driver, versification and provider
+   exact original ZIP, `.conf`, version, driver, versification and provider
    metadata. For a private candidate with a *new module identity*, require
    independent byte-for-byte equality of **every original compressed payload
    file** and independently re-read **every occupied native commentary key**
    (including introductions and opaque TOP entries). Verify key order,
    unfiltered raw corpus SHA-256 and actual independent reader output. Only
-   module identity and corresponding \`DataPath\` may change, under a
+   module identity and corresponding `DataPath` may change, under a
    deterministic, reviewed, fully logged metadata-only transformation.
    Retaining **all original data bytes** proves that this candidate did
    **not itself** lose or rewrite source text, punctuation, markup,
