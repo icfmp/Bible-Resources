@@ -18,7 +18,7 @@ from commentary_source_native_boundaries import NativeRawRunBoundaryInventory
 from pilot_preflight import PilotError
 
 
-def fixtures():
+def fixtures(*, split_original_div1=False):
     xml=(
         b'<?xml version="1.0"?><ThML><ThML.body><div1><div2>'
         b'<scripCom osisRef="Bible:Gen.1.1-Gen.1.2"/>'
@@ -30,6 +30,11 @@ def fixtures():
         b'<div><p>Third original scripture comment with distinct words.</p></div>'
         b'</div2></div1></ThML.body></ThML>'+b" "*1100
     )
+    if split_original_div1:
+        xml=xml.replace(
+            b'<scripCom osisRef="Bible:Gen.1.3-Gen.1.4"/>',
+            b'</div2></div1><div1><div2><scripCom osisRef="Bible:Gen.1.3-Gen.1.4"/>'
+        )
     original,_proof=_original_source_markers(xml)
     compiled=(b'<p>Compiled different original source text, '
               b'<reference osisRef="Gen.2.2">Reference label</reference> '
@@ -62,6 +67,9 @@ class CompleteOriginalUnitsPerNativeRawRunTests(unittest.TestCase):
         self.assertEqual(report["previously_unreviewed_original_source_units_now_identified"],1)
         group=report["bounded_shared_native_raw_run_source_unit_line_sha256_and_alignment_reports"][0]
         self.assertEqual(group["native_occupied_numbered_K_keys_in_shared_raw_run"],6)
+        self.assertEqual(group["original_div1_structure_class"],
+                         "all_original_source_units_from_one_original_div1")
+        self.assertEqual(group["original_div1_document_ordinals_represented_in_shared_stock_raw_run"],[1])
         self.assertEqual(group["previously_known_serious_original_prose_cases_in_this_run"],2)
         self.assertEqual(group["additional_authentic_original_source_units_identified"],1)
         self.assertEqual(group["native_raw_run_K_keys_covered_by_at_least_one_actual_original_source_range"],6)
@@ -87,6 +95,29 @@ class CompleteOriginalUnitsPerNativeRawRunTests(unittest.TestCase):
         self.assertNotIn("Gen.1.1",json.dumps(report))
         self.assertNotIn("Gen.1.3",json.dumps(report))
         self.assertNotIn("Gen.1.5",json.dumps(report))
+
+    def test_same_stock_raw_can_join_original_sources_from_distinct_div1_sections(self):
+        original,ledger,matches,serious,_=fixtures(split_original_div1=True)
+        result=inspect_shared_original_units_in_native_runs(
+            original,ledger,matches,serious
+        )
+        group=result["bounded_shared_native_raw_run_source_unit_line_sha256_and_alignment_reports"][0]
+        self.assertEqual(group["original_div1_structure_class"],
+                         "multiple_distinct_original_div1_documents_in_same_stock_raw_run")
+        self.assertEqual(group["distinct_original_div1_document_divisions_in_shared_stock_raw_run"],2)
+        self.assertEqual(group["original_div1_document_ordinals_represented_in_shared_stock_raw_run"],[1,2])
+        self.assertEqual([x["original_enclosing_div1_ordinal_in_original_XML_document"]
+                          for x in group["original_source_unit_starts_inside_same_native_raw_run_in_CCEl_XML_order"]],
+                         [1,2,2])
+        self.assertEqual(
+            result["source_div1_ancestry_structure_class_counts"],{
+                "multiple_distinct_original_div1_documents_in_same_stock_raw_run":1
+            }
+        )
+        self.assertTrue(group[
+            "sharing_a_native_K_key_does_not_prove_same_original_div1_book_or_section"])
+        self.assertTrue(group[
+            "concatenated_source_text_from_different_original_div1_is_not_authorial_text"])
 
     def test_one_source_case_only_does_not_make_multi_source_group(self):
         original,ledger,matches,serious,_=fixtures()
