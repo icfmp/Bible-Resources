@@ -245,6 +245,21 @@ jobs:
               "target_witnessed_in_other_original_source_chapter_same_book",
               "stock_target_not_in_any_original_verse_range_link_same_book",
           }
+          allowed_target_statuses = {
+              "raw_target_exact_match",
+              "literal_Bible_work_prefix_only_match",
+              "unpaired_original_target",
+          }
+          allowed_link_label_classes = {
+              "empty_original_label_unreviewed",
+              "literal_label_inside_stock_reference_element",
+              "literal_label_in_stock_text_outside_confirmed_reference_element",
+              "word_tokens_in_stock_reference_element_different_punctuation",
+              "word_tokens_in_stock_text_different_punctuation_or_markup",
+              "original_label_text_not_located_in_selected_stock_entry",
+          }
+          target_label_matrix = cross["original_target_match_status_x_selected_stock_label_location"]
+          scope_label_matrix = cross["unpaired_original_target_scope_x_selected_stock_label_location"]
           source_classes = cross["source_unpaired_target_occurrence_location_classes"]
           stock_classes = cross["stock_unpaired_target_occurrence_source_classes"]
           missing_cases = cross["bounded_all_no_stock_reference_case_line_fullhash_topology"]
@@ -264,6 +279,36 @@ jobs:
                   key in names and type(n) is int and n >= 0
                   for key,n in values.items()
               )
+          if (not isinstance(target_label_matrix,dict) or
+                  not isinstance(scope_label_matrix,dict) or
+                  not all(status in allowed_target_statuses and
+                          checked_counts(labels, allowed_link_label_classes)
+                          for status,labels in target_label_matrix.items()) or
+                  not all(scope in allowed_source and
+                          checked_counts(labels, allowed_link_label_classes)
+                          for scope,labels in scope_label_matrix.items())):
+              raise SystemExit("Unreviewed per-link original scripture target/label class")
+          target_label_counts = {
+              status:sum(labels.values()) for status,labels in target_label_matrix.items()
+          }
+          scope_label_counts = {
+              scope:sum(labels.values()) for scope,labels in scope_label_matrix.items()
+          }
+          independent_label_count = {}
+          for labels in target_label_matrix.values():
+              for label,n in labels.items():
+                  independent_label_count[label] = independent_label_count.get(label,0)+n
+          if (target_label_counts.get("raw_target_exact_match",0) !=
+                  cross["source_and_stock_raw_exact_target_matches"] or
+                  target_label_counts.get("literal_Bible_work_prefix_only_match",0) !=
+                  cross["source_and_stock_literal_Bible_work_prefix_only_matches"] or
+                  target_label_counts.get("unpaired_original_target",0) !=
+                  sum(source_classes.values()) or
+                  sum(target_label_counts.values()) != cross["original_scripRef_target_occurrences"] or
+                  scope_label_counts != source_classes or
+                  independent_label_count !=
+                  lexical["original_scripRef_display_label_location_in_stock_text_classes"]):
+              raise SystemExit("Individual original link target/label census diverged")
           if (cross["source_markers_with_lexically_unresolved_reference_issues"] !=
                     metrics["unexplained_original_to_stock_word_boundary_count"] or
                   cross["original_scripRef_target_occurrences"] !=
@@ -314,6 +359,8 @@ jobs:
                 json.dumps({
                     "original_unpaired":source_classes,
                     "stock_unpaired":stock_classes,
+                    "source_target_match_x_label_location":target_label_matrix,
+                    "unpaired_source_target_scope_x_label_location":scope_label_matrix,
                     "unresolved_original_markers":
                         cross["source_markers_with_lexically_unresolved_reference_issues"],
                     "stock_native_keys_scanned":
