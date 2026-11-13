@@ -167,6 +167,7 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
             "private_original_total_div1_in_document":len(original_div1_nodes),
             "private_original_div1_heading_origin":heading_origin,
             "private_original_div1_heading_sha256":original_div1_heading_sha,
+            "private_original_div1_heading_text":original_div1_title or "",
             "private_original_div1_attribute_name_types":sorted(
                 k.rsplit("}",1)[-1] for k in source_div1.attrib
             ),
