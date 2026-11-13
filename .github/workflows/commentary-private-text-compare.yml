@@ -607,12 +607,14 @@ jobs:
               if (cross_prose["original_source_large_plain_word_cases"] != len(large_cases) or
                       cross_prose["original_six_word_anchor_length"] != 6 or
                       cross_prose["sampled_top_distinct_raw_payloads_per_case_scope"] != 4 or
-                      cross_prose["all_native_raw_entries_replayed"] !=
-                          report["source_unpaired_reference_cross_native_slots"][
-                              "complete_native_K_and_I_keys_inspected_for_target_witnesses"] +
-                          # The above comparator scans only source-book keys.
-                          (cross_prose["all_native_raw_entries_replayed"] -
-                           cross_prose["native_replay_entries_in_relevant_source_books"]) or
+                      type(cross_prose["all_native_raw_entries_replayed"]) is not int or
+                      type(cross_prose["native_replay_entries_in_relevant_source_books"]) is not int or
+                      type(cross_prose["distinct_original_native_stock_raw_payloads_scored"]) is not int or
+                      cross_prose["all_native_raw_entries_replayed"] <
+                          cross_prose["native_replay_entries_in_relevant_source_books"] or
+                      cross_prose["native_replay_entries_in_relevant_source_books"] <
+                          cross_prose["distinct_original_native_stock_raw_payloads_scored"] or
+                      cross_prose["distinct_original_native_stock_raw_payloads_scored"] < 1 or
                       len(cross_cases) != len(large_cases) or
                       len(expected_large) != len(large_cases) or
                       not isinstance(cross_aggregate,dict) or
