@@ -65,7 +65,12 @@ def original_chapter_neighbors(xml_bytes: bytes) -> tuple[dict, dict]:
         ref_bytes = original_ref.encode("utf-8")
         ordered.update(len(ref_bytes).to_bytes(4, "big") + ref_bytes)
         ordered.update(tag.encode("ascii") + b"\0" + sha256(original_bytes).digest())
-        observed.setdefault(key, []).append({"tag": tag, "text": body})
+        observed.setdefault(key, []).append({
+            "tag": tag, "text": body,
+            "source_line": node.sourceline,
+            "source_reference_sha256": sha256(ref_bytes).hexdigest(),
+            "source_sibling_sha256": sha256(original_bytes).hexdigest(),
+        })
         tag_counts[tag] += 1
     return observed, {
         "explicit_chapter_source_marker_count": count,
