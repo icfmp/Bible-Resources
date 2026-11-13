@@ -229,6 +229,33 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
             b"<a href='x'>link</a>",
         )
 
+    @patch("commentary_xiphos_dual_reader.subprocess.run")
+    def test_native_sword_inspection_uses_exact_key_and_never_logs_source(self, run):
+        from commentary_xiphos_dual_reader import _exact_native_commentary_raw
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            installed = root / "installed"
+            installed.mkdir()
+            tool = root / "native-key"
+            tool.write_bytes(b"placeholder native binary")
+            source = b"<title>Faithful original chapter heading</title>"
+            run.return_value.returncode = 0
+            run.return_value.stdout = source
+            self.assertEqual(_exact_native_commentary_raw(
+                installed, "MHCC", "Gen 1:1", tool,
+            ), source)
+            self.assertEqual(run.call_args.args[0], [
+                str(tool), "MHCC", "Gen 1:1"
+            ])
+            self.assertEqual(run.call_args.kwargs["env"]["SWORD_PATH"], str(installed))
+            import subprocess
+            self.assertEqual(run.call_args.kwargs["stderr"], subprocess.DEVNULL)
+            run.return_value.returncode = 9
+            with self.assertRaisesRegex(PilotError, "missing"):
+                _exact_native_commentary_raw(installed, "MHCC", "Gen 1:1", tool)
+            with self.assertRaisesRegex(PilotError, "Unsafe"):
+                _exact_native_commentary_raw(installed, "MHCC", "Gen 0:0", tool)
+
     def test_no_user_display_or_wayland_gui_capture(self):
         with self.assertRaisesRegex(PilotError, "Unsafe virtual"):
             attempt_real_xiphos_passage_copy(
