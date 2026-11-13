@@ -7,6 +7,7 @@ on:
       - 'scripts/commentary_private_candidate_xiphos_gui.py'
       - 'scripts/commentary_stock_candidate.py'
       - 'scripts/commentary_xiphos_dual_reader.py'
+      - 'scripts/commentary_xiphos_a11y_menu.py'
       - 'scripts/sword_commentary_raw_key.cpp'
       - 'scripts/sword_native_commentary_raw_corpus.cpp'
       - 'tests/test_commentary_private_candidate_xiphos_gui.py'
@@ -55,6 +56,7 @@ jobs:
           timeout 180s sudo apt-get -o Acquire::Retries=0 \
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y \
             libsword-dev diatheke xiphos xvfb xdotool xclip dbus-x11
+            python3-pyatspi at-spi2-core
           command -v diatheke
           command -v xiphos
       - name: Build independent full native corpus and exact original key readback tools
@@ -71,7 +73,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python scripts/commentary_private_candidate_xiphos_gui.py \
+          BIBLE_PRIVATE_GUI_A11Y=1 dbus-run-session -- \
+            python scripts/commentary_private_candidate_xiphos_gui.py \
             --resource-id "$RESOURCE_ID" \
             --native-full-corpus-binary "$RUNNER_TEMP/private-native-stock-corpus" \
             --native-single-key-binary "$RUNNER_TEMP/private-native-stock-key" \
@@ -110,6 +113,20 @@ jobs:
           assert proof["published"] is False
           receipt=proof["independent_private_candidate_gui_receipt"]
           _gate_real_candidate_gui(receipt)
+          heading=receipt["actual_Xiphos_heading_context_menu_observation"]
+          assert set(heading)=={
+              "real_xiphos_commentary_chapter_heading_menu_activated",
+              "actual_commentary_pane_content_changed_after_heading_action",
+              "chapter_heading_text_matches_original_native_intro",
+              "all_in_verse_original_title_elements_rendered_as_visual_headings",
+              "reader_gui_heading_css_typography_approved"
+          }
+          assert all(type(value) is bool for value in heading.values())
+          # An accessible GTK action is a useful observation but NOT proof of
+          # faithful chapter heading, CSS, or in-verse <title> appearance.
+          assert heading["chapter_heading_text_matches_original_native_intro"] is False
+          assert heading["all_in_verse_original_title_elements_rendered_as_visual_headings"] is False
+          assert heading["reader_gui_heading_css_typography_approved"] is False
           assert receipt["status"]=="byte_exact_private_candidate_real_Xiphos_GUI_observation"
           assert receipt["authentic_original_reference_bearing_keys_count"]>=2
           assert receipt["original_words_links_screenshots_or_SWORD_archives_uploaded"] is False
@@ -138,5 +155,6 @@ jobs:
             echo 'Our published LSG Bible was SHA-attested and installed next to BRMHCCReview for real Xiphos commentary-pane GUI tests.'
             echo 'Five real original commentary prose selections and two genuine original OSIS link destinations are strictly required to pass.'
             echo 'No source prose, SWORD original/candidate ZIP, screenshots or UI HTML are uploaded.'
+            echo 'Reader appendix: real GTK/AT-SPI activation of documented Xiphos chapter-heading context menu is diagnostic only.'
             echo 'This does NOT approve all headings, actual mouse click navigation, copyright/edition equivalence, editorial acceptance or publication.'
           } >> "$GITHUB_STEP_SUMMARY"
