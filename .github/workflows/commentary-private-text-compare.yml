@@ -19,6 +19,8 @@ on:
       - 'tests/test_commentary_text_delta.py'
       - 'scripts/commentary_unresolved_lexical_triage.py'
       - 'scripts/commentary_nonlink_words.py'
+      - 'scripts/commentary_nonlink_word_alignment.py'
+      - 'tests/test_commentary_nonlink_word_alignment.py'
       - 'tests/test_commentary_nonlink_words.py'
       - 'scripts/commentary_reference_cross_slot.py'
       - 'tests/test_commentary_reference_cross_slot.py'
@@ -409,6 +411,11 @@ jobs:
               "original_body_sha256","stock_raw_sha256",
               "original_plain_word_tokens","stock_plain_word_tokens",
               "shared_plain_word_multiset_occurrences","outside_link_word_relation",
+              "exact_plain_word_alignment",
+              "original_source_p_element_count","original_source_note_element_count",
+              "original_source_scripRef_element_count","stock_p_element_count",
+              "stock_note_element_count","stock_reference_element_count",
+              "stock_title_element_count","stock_table_element_count",
           }
           if (not isinstance(plain_counts,dict) or
                   not all(k in allowed_plain_relations and type(v) is int and v >= 0
@@ -437,10 +444,142 @@ jobs:
                       case["original_source_line"] < 1 or
                       case["shared_plain_word_multiset_occurrences"] >
                           min(case["original_plain_word_tokens"],case["stock_plain_word_tokens"]) or
+                      not all(type(case[k]) is int and case[k] >= 0 for k in (
+                          "original_source_p_element_count","original_source_note_element_count",
+                          "original_source_scripRef_element_count","stock_p_element_count",
+                          "stock_note_element_count","stock_reference_element_count",
+                          "stock_title_element_count","stock_table_element_count")) or
                       not all(isinstance(case[k],str) and re.fullmatch(r"[a-f0-9]{64}",case[k])
                               for k in ("original_full_reference_sha256","original_body_sha256",
                                         "stock_raw_sha256"))):
                   raise SystemExit("Unreviewed source nonlink words leaked into report")
+          allowed_alignments={
+              "alignment_skipped_exceeds_reviewed_word_or_cell_bound",
+              "plain_words_exactly_identical_in_original_order",
+              "all_source_plain_words_in_stock_order_with_extra_stock_words",
+              "all_stock_plain_words_in_source_order_with_extra_source_words",
+              "one_or_two_original_plain_words_not_found_in_exact_order",
+              "three_to_ten_original_plain_words_not_found_in_exact_order",
+              "more_than_ten_original_plain_words_not_found_in_exact_order",
+          }
+          alignment_fields={
+              "exact_unicode_ordered_alignment_class",
+              "original_plain_word_tokens","stock_plain_word_tokens",
+              "original_plain_words_not_matched_in_exact_order",
+              "stock_plain_words_not_matched_in_exact_order",
+              "exact_unicode_longest_common_subsequence_word_count",
+              "exact_unicode_longest_contiguous_shared_word_run_count",
+              "common_start_word_tokens","common_end_word_tokens",
+              "alignment_budget_cells",
+              "longest_common_subsequence_is_not_textual_or_edition_parity",
+              "original_words_never_exposed",
+          }
+          alignment_counts={}
+          for case in plain_cases:
+              a=case["exact_plain_word_alignment"]
+              if (not isinstance(a,dict) or set(a) != alignment_fields or
+                      a["exact_unicode_ordered_alignment_class"] not in allowed_alignments or
+                      a["longest_common_subsequence_is_not_textual_or_edition_parity"] is not True or
+                      a["original_words_never_exposed"] is not True or
+                      a["alignment_budget_cells"] != 2000000 or
+                      a["original_plain_word_tokens"] != case["original_plain_word_tokens"] or
+                      a["stock_plain_word_tokens"] != case["stock_plain_word_tokens"]):
+                  raise SystemExit("Source original plain-word alignment schema invalid")
+              alignment_counts[a["exact_unicode_ordered_alignment_class"]]=(
+                  alignment_counts.get(a["exact_unicode_ordered_alignment_class"],0)+1
+              )
+              numeric_fields=(
+                  "original_plain_words_not_matched_in_exact_order",
+                  "stock_plain_words_not_matched_in_exact_order",
+                  "exact_unicode_longest_common_subsequence_word_count",
+                  "exact_unicode_longest_contiguous_shared_word_run_count",
+                  "common_start_word_tokens","common_end_word_tokens",
+              )
+              if a["exact_unicode_ordered_alignment_class"] == (
+                  "alignment_skipped_exceeds_reviewed_word_or_cell_bound"
+              ):
+                  if any(a[name] is not None for name in numeric_fields):
+                      raise SystemExit("Skipped original alignment asserted success")
+              else:
+                  if (not all(type(a[name]) is int and a[name]>=0
+                              for name in numeric_fields) or
+                          a["exact_unicode_longest_common_subsequence_word_count"] +
+                            a["original_plain_words_not_matched_in_exact_order"] !=
+                            a["original_plain_word_tokens"] or
+                          a["exact_unicode_longest_common_subsequence_word_count"] +
+                            a["stock_plain_words_not_matched_in_exact_order"] !=
+                            a["stock_plain_word_tokens"] or
+                          a["exact_unicode_longest_contiguous_shared_word_run_count"] >
+                            a["exact_unicode_longest_common_subsequence_word_count"] or
+                          a["common_start_word_tokens"]+a["common_end_word_tokens"] >
+                            min(a["original_plain_word_tokens"],a["stock_plain_word_tokens"])):
+                      raise SystemExit("Original prose alignment numerical accounting invalid")
+          if (alignment_counts != lexical["bounded_plain_word_alignment_classes"] or
+                  sum(lexical["bounded_plain_word_alignment_unmatched_source_count_buckets"].values())
+                    != len(plain_cases)):
+              raise SystemExit("Independent original prose alignment census incomplete")
+          stock_repeats=report["source_nonlink_prose_review_stock_raw_duplicate_topology"]
+          repeat_cases=stock_repeats[
+              "bounded_plain_word_cases_line_fullhash_and_repeated_native_slot_counts"
+          ]
+          repeat_fields={
+              "original_source_line","original_full_reference_sha256",
+              "original_body_sha256","stock_raw_sha256",
+              "same_book_numbered_native_keys_with_identical_raw_payload",
+              "same_book_intro_native_keys_with_identical_raw_payload",
+              "exact_stock_raw_payload_repetition_class",
+          }
+          repetition_classes={
+              "unique_native_stock_raw_payload_within_same_book",
+              "identical_stock_raw_payload_in_multiple_native_keys_same_book",
+          }
+          original_pending=sum(
+              plain_counts.get(category,0) for category in (
+                  "plain_word_order_or_selection_requires_editorial_review",
+                  "same_plain_word_multiset_but_different_order",
+                  "source_plain_words_only_after_removing_stock_scripture_labels"
+              )
+          )
+          if (stock_repeats["total_original_plain_word_cases_requiring_review"] != original_pending or
+                  stock_repeats["bounded_original_plain_word_review_cases_examined"] != len(plain_cases) or
+                  stock_repeats["bounded_review_cases_truncated"] is not (len(plain_cases)<original_pending) or
+                  len(repeat_cases) != len(plain_cases) or
+                  sum(stock_repeats["source_plain_word_stock_payload_repetition_classes"].values())
+                    != len(plain_cases) or
+                  not all(k in repetition_classes and type(n) is int and n>=0
+                          for k,n in stock_repeats[
+                              "source_plain_word_stock_payload_repetition_classes"].items())):
+              raise SystemExit("Original plain-word native stock raw repetition census incomplete")
+          expected_id={
+              (z["original_source_line"],z["original_full_reference_sha256"],
+               z["original_body_sha256"],z["stock_raw_sha256"])
+              for z in plain_cases
+          }
+          for z in repeat_cases:
+              if (set(z) != repeat_fields or
+                      (z["original_source_line"],z["original_full_reference_sha256"],
+                       z["original_body_sha256"],z["stock_raw_sha256"]) not in expected_id or
+                      z["exact_stock_raw_payload_repetition_class"] not in repetition_classes or
+                      not all(type(z[k]) is int and z[k]>=0 for k in (
+                          "same_book_numbered_native_keys_with_identical_raw_payload",
+                          "same_book_intro_native_keys_with_identical_raw_payload")) or
+                      z["same_book_numbered_native_keys_with_identical_raw_payload"] +
+                        z["same_book_intro_native_keys_with_identical_raw_payload"] < 1):
+                  raise SystemExit("Unreviewed original raw duplicate context in prose report")
+          print("Original bounded source prose alignment and stock raw repetition (not authored range proof): " +
+                json.dumps({
+                    "alignment_classes":alignment_counts,
+                    "unmatched_original_plain_word_buckets":
+                        lexical["bounded_plain_word_alignment_unmatched_source_count_buckets"],
+                    "native_duplicate_payload_classes":
+                        stock_repeats["source_plain_word_stock_payload_repetition_classes"],
+                    "bounded_original_plain_word_cases":len(repeat_cases),
+                    "unreviewed_original_plain_word_cases":original_pending,
+                },sort_keys=True))
+          print("Original nonlink prose unresolved aligned cases, source line and SHA-256 metadata only: " +
+                json.dumps(plain_cases,sort_keys=True))
+          print("Original nonlink prose native duplicate payload topology, line/hash only: " +
+                json.dumps(repeat_cases,sort_keys=True))
           print("Original 156-case words OUTSIDE source/stock scripture link labels (not exegesis parity): " +
                 json.dumps({"relations":plain_counts,
                             "by_original_lexical_shape":plain_x_shape,

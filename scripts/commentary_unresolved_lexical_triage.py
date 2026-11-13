@@ -18,6 +18,7 @@ from lxml import etree
 from commentary_stock_prefix_topology import unexplained_word_boundary_census
 from commentary_chapter_ref_labels import link_label_location
 from commentary_nonlink_words import compare_words_outside_links
+from commentary_nonlink_word_alignment import plain_word_alignment
 from pilot_preflight import PilotError
 
 WORD = re.compile(r"\w+", flags=re.UNICODE)
@@ -210,6 +211,8 @@ class UnresolvedLexicalSelectionCensus:
         self.original_plain_word_bins = Counter()
         self.stock_plain_word_bins = Counter()
         self.nonlink_attention_cases = []
+        self.nonlink_alignment_classes = Counter()
+        self.nonlink_alignment_unmatched_source_bins = Counter()
         self.edit_ops = Counter()
         self.stock_link_and_source_link = Counter()
         self.original_middle_bins = Counter()
@@ -276,6 +279,24 @@ class UnresolvedLexicalSelectionCensus:
             "same_plain_word_multiset_but_different_order",
             "source_plain_words_only_after_removing_stock_scripture_labels",
         }:
+            plain_original = [w for i,w in enumerate(source_words)
+                              if i not in set(original_link_indices)]
+            plain_compiled = [w for i,w in enumerate(stock_words)
+                              if i not in set(stock_link_indices)]
+            alignment = plain_word_alignment(plain_original, plain_compiled)
+            if (alignment["original_plain_word_tokens"] !=
+                plain_witness["original_plain_word_tokens"] or
+                alignment["stock_plain_word_tokens"] !=
+                plain_witness["stock_plain_word_tokens"]):
+                raise PilotError("Original source/stock alignment did not preserve verified plain word counts")
+            alignment_type = alignment["exact_unicode_ordered_alignment_class"]
+            self.nonlink_alignment_classes[alignment_type] += 1
+            if alignment["original_plain_words_not_matched_in_exact_order"] is None:
+                self.nonlink_alignment_unmatched_source_bins["unreviewed_large_alignment"] += 1
+            else:
+                self.nonlink_alignment_unmatched_source_bins[
+                    self._bucket(alignment["original_plain_words_not_matched_in_exact_order"])
+                ] += 1
             self.nonlink_attention_cases.append({
                 "original_source_line":source["original_source_line"],
                 "original_full_reference_sha256":source["original_full_reference_sha256"],
@@ -286,6 +307,18 @@ class UnresolvedLexicalSelectionCensus:
                 "shared_plain_word_multiset_occurrences":
                     plain_witness["shared_plain_word_multiset_occurrences"],
                 "outside_link_word_relation":nonlink_category,
+                "exact_plain_word_alignment":alignment,
+                "original_source_p_element_count":
+                    original_tags.get("p",0),
+                "original_source_note_element_count":
+                    original_tags.get("note",0),
+                "original_source_scripRef_element_count":
+                    original_tags.get("scripRef",0),
+                "stock_p_element_count":stock_tags.get("p",0),
+                "stock_note_element_count":stock_tags.get("note",0),
+                "stock_reference_element_count":stock_tags.get("reference",0),
+                "stock_title_element_count":stock_tags.get("title",0),
+                "stock_table_element_count":stock_tags.get("table",0),
             })
         orig_head = delta["common_start_word_tokens"]
         orig_tail = len(source_words) - delta["common_end_word_tokens"]
@@ -489,6 +522,10 @@ class UnresolvedLexicalSelectionCensus:
             raise PilotError("Original scripture-target and label totals not fully reconciled")
         if len(self.no_stock_reference_cases) != self.stock_link_marked["stock_no_reference"]:
             raise PilotError("Missing compiled reference cases lack source-bound identities")
+        if (sum(self.nonlink_alignment_classes.values()) != len(self.nonlink_attention_cases)
+                or sum(self.nonlink_alignment_unmatched_source_bins.values())
+                    != len(self.nonlink_attention_cases)):
+            raise PilotError("Original plain-word alignment census incomplete")
         # Rank most difficult cases first (not only easy 1:1 substitutions).
         priority = sorted(
             self.candidates,
@@ -521,6 +558,9 @@ class UnresolvedLexicalSelectionCensus:
             },
             "original_plain_word_token_count_bins":dict(sorted(self.original_plain_word_bins.items())),
             "stock_plain_word_token_count_bins":dict(sorted(self.stock_plain_word_bins.items())),
+            "bounded_plain_word_alignment_classes":dict(sorted(self.nonlink_alignment_classes.items())),
+            "bounded_plain_word_alignment_unmatched_source_count_buckets":
+                dict(sorted(self.nonlink_alignment_unmatched_source_bins.items())),
             "bounded_plain_word_nontrivial_differences_line_and_hash_cases":sorted(
                 self.nonlink_attention_cases,
                 key=lambda item:(

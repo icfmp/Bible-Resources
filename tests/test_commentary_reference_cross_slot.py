@@ -177,6 +177,39 @@ class OriginalReferenceCrossSlotTests(unittest.TestCase):
         self.assertEqual(result["source_and_stock_literal_Bible_work_prefix_only_matches"],1)
         self.assertFalse(result["authorial_original_to_stock_text_markup_or_edition_parity_verified"])
 
+    def test_private_plain_word_anomaly_stock_duplicate_proof_uses_original_hash(self):
+        original={"Gen.1.1":[unit(15,"Bible:Gen.1.3")]}
+        stock=b"<p>Repeated original content within this compiled native range.</p>"
+        probe=ReferenceCrossSlotTopology(original)
+        probe.observe_stock("K","Gen.1.1",stock)
+        probe.observe_stock("K","Gen.1.2",stock)
+        probe.observe_unresolved("Gen.1.1",original["Gen.1.1"][0],stock)
+        case={
+            "original_source_line":15,
+            "original_full_reference_sha256":original["Gen.1.1"][0][
+                "original_full_reference_sha256"],
+            "original_body_sha256":original["Gen.1.1"][0]["original_text_sha256"],
+            "stock_raw_sha256":sha256(stock).hexdigest(),
+        }
+        topology=probe.report_nonlink_plain_word_stock_payloads(
+            [case],total_nonlink_review_cases=1
+        )
+        self.assertEqual(topology["total_original_plain_word_cases_requiring_review"],1)
+        self.assertFalse(topology["bounded_review_cases_truncated"])
+        self.assertEqual(topology["source_plain_word_stock_payload_repetition_classes"],{
+            "identical_stock_raw_payload_in_multiple_native_keys_same_book":1
+        })
+        witness=topology[
+            "bounded_plain_word_cases_line_fullhash_and_repeated_native_slot_counts"][0]
+        self.assertEqual(witness[
+            "same_book_numbered_native_keys_with_identical_raw_payload"],2)
+        self.assertNotIn("Repeated original",json.dumps(topology))
+        with self.assertRaises(PilotError):
+            probe.report_nonlink_plain_word_stock_payloads(
+                [dict(case,original_body_sha256="0"*64)],
+                total_nonlink_review_cases=1
+            )
+
     def test_invalid_native_reference_xml_rejected_and_not_silently_considered_citation(self):
         with self.assertRaises(PilotError):
             actual_stock_osisref_targets(b'<reference osisRef="Gen.1.1"></incorrect>')
