@@ -48,6 +48,8 @@ def link_label_location(source_links: list[dict], raw: bytes) -> dict:
     reference_texts = ["".join(child.itertext()) for child in references]
     label_categories = Counter()
     attribute_types = Counter()
+    source_targets = []
+    stock_targets = [child.get("osisRef", "") for child in references]
     for source_link in source_links:
         label = source_link.get("text")
         attr_names = source_link.get("attribute_name_types")
@@ -57,6 +59,11 @@ def link_label_location(source_links: list[dict], raw: bytes) -> dict:
             isinstance(name, str) and XML_NAME.fullmatch(name) for name in attr_names
         ):
             raise PilotError("Unreviewed original scripRef attribute names")
+        original_target = source_link.get("private_original_osisRef_target", "")
+        if (not isinstance(original_target, str)
+                or len(original_target) > 2048):
+            raise PilotError("Unreviewed private original scripRef target value")
+        source_targets.append(original_target)
         attribute_types.update(attr_names)
         words = re.findall(r"\w+", label)
         if not label.strip():
@@ -77,6 +84,11 @@ def link_label_location(source_links: list[dict], raw: bytes) -> dict:
         label_categories[status] += 1
     if sum(label_categories.values()) != len(source_links):
         raise PilotError("Original source scripture-reference label count incomplete")
+    nonempty_source_targets = Counter(t for t in source_targets if t)
+    nonempty_stock_targets = Counter(t for t in stock_targets if t)
+    exact_target_occurrences = sum(
+        (nonempty_source_targets & nonempty_stock_targets).values()
+    )
     return {
         "original_scripRef_label_count": len(source_links),
         "original_scripRef_attribute_name_occurrences": dict(sorted(attribute_types.items())),
@@ -85,6 +97,18 @@ def link_label_location(source_links: list[dict], raw: bytes) -> dict:
         "selected_stock_reference_elements_with_osisRef_attribute": sum(
             "osisRef" in child.attrib for child in references
         ),
+        "original_scripRef_with_nonempty_osisRef_target_count": sum(
+            bool(t) for t in source_targets
+        ),
+        "original_scripRef_osisRef_targets_exact_value_multiset_matches_in_stock":
+            exact_target_occurrences,
+        "source_and_selected_stock_reference_targets_exact_ordered_match": (
+            bool(source_targets)
+            and len(source_targets) == len(stock_targets)
+            and all(source_targets)
+            and source_targets == stock_targets
+        ),
+        "nonmatching_target_values_are_not_auto_normalized_or_rewritten": True,
         "matched_label_does_not_validate_reference_target_or_edition": True,
         "original_words_and_stock_XML_never_reported": True,
     }
