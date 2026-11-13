@@ -8,6 +8,8 @@ on:
       - "tests/test_inspect_paragraph_rendering.py"
       - "scripts/repair_osis_division_markers.py"
       - "tests/test_repair_osis_division_markers.py"
+      - "scripts/repair_osis_paragraph_indentation.py"
+      - "tests/test_repair_osis_paragraph_indentation.py"
       - "modules/darby-jnd-2024/**"
   workflow_dispatch:
 
@@ -63,20 +65,27 @@ jobs:
         run: |
           set -euo pipefail
           python -m unittest discover -s tests -p test_repair_osis_division_markers.py -v
+          python -m unittest discover -s tests -p test_repair_osis_paragraph_indentation.py -v
           python - <<'PY'
           import json
           from hashlib import sha256
           from pathlib import Path
           from publisher_osis_observation import read_pinned_publisher_osis
           from repair_osis_division_markers import patch_divisions
+          from repair_osis_paragraph_indentation import trim_publisher_paragraph_indentation
           original=read_pinned_publisher_osis('frajnd-2024')
           corrected,report=patch_divisions(original,expected_sha256=sha256(original).hexdigest())
           if not report['converted_markers_by_kind'] or not report['all_original_notes_and_machine_targets_preserved']:
               raise SystemExit('No independently validated technical division marker overlay')
+          indented,spaces_receipt=trim_publisher_paragraph_indentation(corrected,expected_sha256=sha256(corrected).hexdigest())
+          assert spaces_receipt['all_source_nonspace_characters_preserved']
+          assert spaces_receipt['all_source_note_values_and_positions_preserved']
+          report['paragraph_whitespace_repair'] = spaces_receipt
           Path('darby-division-overlay-shapes.json').write_text(json.dumps(report,sort_keys=True,indent=2))
           print('Research-only reviewed source marker conversion categories:',report['converted_markers_by_kind'])
           print('Protected literal marks remain:',report['protected_unchanged_marker_counts'])
           print('Unconverted leading references:',report['bounded_unconverted_leading_marker_refs'])
+          print('Exact original XML paragraph indent candidates:', spaces_receipt['counts'])
           print('No original or corrected OSIS source is uploaded; no compiled SWORD published')
           PY
       - name: Upload safe shape-only evidence (no Scripture/module/source)
