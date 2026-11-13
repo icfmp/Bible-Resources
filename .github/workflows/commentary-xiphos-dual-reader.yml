@@ -80,13 +80,19 @@ jobs:
           assert bible["versification"]=="Segond"
           assert bible["all_five_published_bible_files_sha256_attested"] is True
           assert data["both_real_sword_modules_have_nonempty_diatheke_readback"] is True
-          assert data["sample_count"]==3
+          assert 2<=data["sample_count"]<=3
+          assert len(data["actual_substantive_sample_references"])==data["sample_count"]
+          assert all(isinstance(x,str) and re.fullmatch(
+              r"[1-4]?[A-Za-z][A-Za-z ]{0,35} [1-9][0-9]{0,2}:[1-9][0-9]{0,2}",x
+          ) for x in data["actual_substantive_sample_references"])
+          assert isinstance(data["original_sparse_commentary_slots_skipped"],list)
+          assert data["unoccupied_stock_verses_silently_reintroduced"] is False
           assert data["real_xiphos_executable_started_and_visible"] is True
           assert data["original_source_SWORD_PATH_isolated"] is True
           assert data["real_main_reader_window_found"] is True
           assert data["actual_passage_commands_accepted"] is True
           samples=data["commentary_clipboard_match_by_passage"]
-          assert set(samples)=={"Gen 1:1","John 3:16","Ps 23:1"}
+          assert list(samples)==data["actual_substantive_sample_references"]
           assert all(type(value) is bool for value in samples.values())
           assert data["independent_gui_commentary_excerpt_match_count"]==sum(samples.values())
           # A zero match is NOT proof of a working commentary pane.
