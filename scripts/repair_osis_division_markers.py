@@ -172,6 +172,17 @@ def patch_divisions(source: bytes, *, expected_sha256: str):
             if a["point"] - b["point"] != expected_shift:
                 raise DivisionRepairError("Unexplained note anchor position shift")
     counts = Counter(kind for _, _, _, _, kind, _ in patches)
+    unresolved_markers = []
+    for ref, value in original_verses.items():
+        m = PREFIX.match(value)
+        if not m or ref in edits_by_ref:
+            continue
+        remainder = value[m.end():]
+        if m.group("mark") == "*" and (
+                remainder.startswith("[") or remainder.startswith("Dieu")
+                or remainder.startswith("Seigneur")):
+            continue
+        unresolved_markers.append(ref)
     return corrected, {
         "schema_version": 1,
         "status": "research_only_byte_patched_editorial_divisions_not_published",
@@ -179,6 +190,9 @@ def patch_divisions(source: bytes, *, expected_sha256: str):
         "candidate_sha256": sha256(corrected).hexdigest(),
         "converted_markers_by_kind": dict(sorted(counts.items())),
         "source_literal_marker_metadata_equal": True,
+        "all_leading_editorial_signs_transferred": not unresolved_markers,
+        "unconverted_leading_marker_count": len(unresolved_markers),
+        "bounded_unconverted_leading_marker_refs": unresolved_markers[:40],
         "protected_unchanged_marker_counts": dict(sorted(skipped.items())),
         "unapproved_source_reference_changes": 0,
         "verse_prose_modifications_outside_recorded_symbols": 0,
