@@ -163,7 +163,7 @@ jobs:
           guarded_repairs = validate_private_bookcode_repair_receipt(report)
           print("Private source-bound book-marker proposal (not an approved edit): " +
                 json.dumps(guarded_repairs, sort_keys=True))
-                    unicode_review = report["original_source_same_book_unicode_lexical_witness_review"]
+          unicode_review = report["original_source_same_book_unicode_lexical_witness_review"]
           assert unicode_review["schema_version"] == 1
           assert unicode_review["authentic_same_book_original_digital_edition_cases_evaluated"] == counts.get(
               "meaningful_separate_editions_lexical_review_still_required", 0
