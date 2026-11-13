@@ -15,6 +15,7 @@ from pathlib import Path
 import re
 import subprocess
 
+from lxml import etree
 from publisher_osis_observation import read_pinned_publisher_osis
 from publisher_osis_usfx_parity import original_osis_verses_and_notes, _nonspace
 from source_native_maintext_probe import native_raw_main_text
@@ -50,6 +51,40 @@ def shape(value: str) -> dict:
         "nonspace_codepoint_count": len(_nonspace(value)),
         "trailing_whitespace_codepoints": len(value) - len(value.rstrip()),
     }
+
+
+def native_xml_prefix_shape(raw: bytes) -> list[dict]:
+    """Private strict XML token shape: no Scripture or authorial attr values."""
+    parser = etree.XMLParser(resolve_entities=False, load_dtd=False,
+                             no_network=True, recover=False, huge_tree=False)
+    try:
+        root = etree.fromstring(b"<private_root>" + raw + b"</private_root>", parser)
+    except (etree.XMLSyntaxError, ValueError) as exc:
+        raise ParagraphRenderingProbeError("Malformed compiled SWORD fragment") from exc
+    allowed = {"div", "verse", "p", "l", "lg", "milestone", "hi", "seg", "note", "reference"}
+    output = []
+    for node in list(root.iter())[:12]:
+        if not isinstance(node.tag, str):
+            continue
+        local = etree.QName(node).localname
+        direct, tail = node.text or "", node.tail or ""
+        s1, s2 = shape(direct), shape(tail)
+        output.append({
+            "tag": local if local in allowed else "other",
+            "known_type": node.get("type") if node.get("type") in {
+                "x-p", "x-subject-division", "x-major-subject-division",
+                "x-stanza-division", "italic", "bold"} else None,
+            "has_sid": bool(node.get("sID")),
+            "has_eid": bool(node.get("eID")),
+            "has_marker_attribute": node.get("marker") is not None,
+            "direct_leading_space": s1["leading_ascii_spaces"],
+            "direct_leading_lf": s1["leading_lf"],
+            "direct_nonspace_length": s1["nonspace_codepoint_count"],
+            "tail_leading_space": s2["leading_ascii_spaces"],
+            "tail_leading_lf": s2["leading_lf"],
+            "tail_nonspace_length": s2["nonspace_codepoint_count"],
+        })
+    return output
 
 
 def diff(source: str, native: str) -> dict:
@@ -197,6 +232,7 @@ def inspect(*, resource_id: str, module_id: str, module_path: Path,
         row = diff(selected[ref], compiled)
         row["original_paragraph_markup"] = structure[ref]
         row["native_raw_byte_sha256"] = sha256(process.stdout).hexdigest()
+        row["native_xml_prefix_shape"] = native_xml_prefix_shape(process.stdout)
         row["native_note_and_title_element_counts"] = excluded
         rows[ref] = row
     return {
@@ -240,7 +276,8 @@ def main(argv=None):
         print(ref, "source", json.dumps(row["original"], sort_keys=True),
               "native", json.dumps(row["compiled"], sort_keys=True),
               "same_nonspace", row["same_nonspace_characters"],
-              "source_markup", row["original_paragraph_markup"])
+              "source_markup", row["original_paragraph_markup"],
+              "native_xml_prefix_shape", row["native_xml_prefix_shape"])
     return 0
 
 
