@@ -4,6 +4,7 @@ on:
     paths:
       - '.github/workflows/commentary-xiphos-dual-reader.yml'
       - 'scripts/commentary_xiphos_dual_reader.py'
+      - 'scripts/sword_commentary_raw_key.cpp'
       - 'tests/test_commentary_xiphos_dual_reader.py'
       - 'modules/lsg-1910/payload/**'
       - 'config/catalogue-import-lsg-0.1.0.json'
@@ -47,7 +48,10 @@ jobs:
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
           timeout 180s sudo apt-get -o Acquire::Retries=0 \
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y \
-            xiphos xvfb xdotool xclip dbus-x11 diatheke
+            xiphos xvfb xdotool xclip dbus-x11 diatheke libsword-dev
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_commentary_raw_key.cpp \
+            -o "$RUNNER_TEMP/private-sword-commentary-key" -lsword
           command -v xiphos
           command -v diatheke
           command -v xclip
@@ -58,6 +62,7 @@ jobs:
           python scripts/commentary_xiphos_dual_reader.py \
             --resource-id "$RESOURCE_ID" \
             --seconds 12 \
+            --native-raw-key-binary "$RUNNER_TEMP/private-sword-commentary-key" \
             --report "$RUNNER_TEMP/commentary-xiphos-dual-reader.json"
       - name: Gate actual dual-module installation and independent real GUI passage evidence
         shell: bash
