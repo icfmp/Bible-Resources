@@ -6,6 +6,8 @@ on:
       - 'scripts/commentary_private_text_compare.py'
       - 'scripts/commentary_chapter_neighbors.py'
       - 'scripts/commentary_chapter_cross_slot.py'
+      - 'scripts/commentary_chapter_paragraph_overlap.py'
+      - 'tests/test_commentary_chapter_paragraph_overlap.py'
       - 'tests/test_commentary_chapter_cross_slot.py'
       - 'tests/test_commentary_chapter_neighbors.py'
       - 'tests/test_commentary_private_text_compare.py'
@@ -218,6 +220,40 @@ jobs:
               safe_cases.append(case)
           print("Original chapter-neighbor bounded line/hash-only remaining cases: " +
                 json.dumps(safe_cases, sort_keys=True))
+          paragraph = report["source_chapter_p_source_to_stock_word_contiguity"]
+          all_p = paragraph["original_explicit_chapter_marker_adjacent_p_count"]
+          if (type(all_p) is not int or all_p < 1 or
+                  all_p != proof["original_chapter_adjacent_sibling_tag_counts"].get("p", 0)):
+              raise SystemExit("Source chapter p paragraph full census not reconciled")
+          p_cases = paragraph["unlocated_original_p_line_hash_only_best_contiguous_word_spans"]
+          expected_p = [c for c in safe_cases
+                        if c["original_neighbor_tag"] == "p" and
+                        c["alternative_stock_location_class"] == "not_found_in_other_same_book_stock_slots"]
+          if len(p_cases) != len(expected_p) or len(p_cases) > 12:
+              raise SystemExit("Unlocated p paragraph cases do not match original source lines")
+          expected_id = {(c["original_reference_sha256"], c["original_neighbor_text_sha256"])
+                         for c in expected_p}
+          allowed_scopes = {"same_chapter_numbered", "other_chapter_numbered",
+                            "same_chapter_intro", "other_intro"}
+          for case in p_cases:
+              ident = (case["original_reference_sha256"], case["original_neighbor_text_sha256"])
+              if (ident not in expected_id or
+                      type(case["source_line"]) is not int or case["source_line"] < 1 or
+                      set(case["largest_identical_case_word_span_by_slot_scope"]) != allowed_scopes or
+                      set(case["largest_casefolded_word_span_by_slot_scope"]) != allowed_scopes):
+                  raise SystemExit("Unreviewed original paragraph overlap identity or scope")
+              for key in allowed_scopes:
+                  exact = case["largest_identical_case_word_span_by_slot_scope"][key]
+                  folded = case["largest_casefolded_word_span_by_slot_scope"][key]
+                  if not (type(exact) is int and type(folded) is int and
+                          0 <= exact <= folded <= case["original_word_token_count"]):
+                      raise SystemExit("Inconsistent original paragraph word-span evidence")
+          print("Original chapter p paragraphs, bounded word-span metrics (NOT original-content parity): " +
+                json.dumps({"source_p_total": all_p,
+                            "stock_scans_by_kind": paragraph["stock_original_same_book_K_and_I_slots_read_by_kind"],
+                            "strict_xml_failures": paragraph["strict_raw_xml_parse_failures_by_kind"],
+                            "source_p_census": paragraph["all_original_p_word_span_fidelity_classes"],
+                            "unlocated_p_line_hash_span_metrics": p_cases}, sort_keys=True))
           PY
       - name: Preserve only non-text source and stock diagnostics
         if: always()
