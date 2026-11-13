@@ -121,6 +121,8 @@ def private_candidate_xiphos_review(
             "authentic_original_reference_bearing_keys_count": cases[
                 "original_occupied_numbered_keys_with_reference_markup"
             ],
+            "pinned_original_source_intro_keys_and_word_counts":
+                authentic_intros.get("_source_intro_inventory", {}),
             "actual_baseline_commentary_samples": baseline,
             "actual_source_link_samples": links,
             "actual_substantive_sample_references": list(comparisons),
