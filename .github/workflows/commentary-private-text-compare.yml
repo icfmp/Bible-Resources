@@ -975,6 +975,10 @@ jobs:
               "native_shared_last_numbered_K_key_SHA256",
               "native_occupied_numbered_K_keys_in_shared_raw_run",
               "distinct_original_scripCom_source_units_starting_in_shared_run",
+              "distinct_original_div1_document_divisions_in_shared_stock_raw_run",
+              "original_div1_document_ordinals_represented_in_shared_stock_raw_run",
+              "original_div1_structure_class",
+              "sharing_a_native_K_key_does_not_prove_same_original_div1_book_or_section",
               "previously_known_serious_original_prose_cases_in_this_run",
               "additional_authentic_original_source_units_identified",
               "original_source_unit_starts_inside_same_native_raw_run_in_CCEl_XML_order",
@@ -984,11 +988,15 @@ jobs:
               "combined_original_source_plain_word_token_count",
               "combined_original_source_plain_words_in_original_XML_unit_order_vs_one_stock_raw",
               "repeated_compiled_native_payload_is_not_original_source_section_parity",
+              "concatenated_source_text_from_different_original_div1_is_not_authorial_text",
               "original_source_prose_or_range_edited",
           }
           shared_unit_fields={
               "original_source_line","original_full_reference_sha256",
-              "original_source_body_sha256","original_source_start_key_sha256",
+              "original_source_body_sha256",
+              "original_enclosing_div1_ordinal_in_original_XML_document",
+              "total_div1_ancestors_enumerated_in_original_XML_document",
+              "original_source_start_key_sha256",
               "original_source_end_key_sha256","original_source_marker_reference_kind",
               "original_source_direct_body_tag_counts",
               "original_source_numeric_verse_span",
@@ -1052,6 +1060,7 @@ jobs:
                   "previously_unreviewed_original_source_units_now_identified",
                   "source_unit_plain_word_alignments_to_shared_native_raw_closed_categories",
                   "source_marker_scope_evidence_class_counts",
+                  "source_div1_ancestry_structure_class_counts",
                   "bounded_shared_native_raw_run_source_unit_line_sha256_and_alignment_reports",
                   "no_inferred_missing_original_source_marker_or_fabricated_verse_range",
                   "source_word_overlap_does_not_authorize_original_section_to_compiled_raw_mapping",
@@ -1074,6 +1083,7 @@ jobs:
                   for entry in large_cases
               }
               observed_original_counts={}
+              observed_div1_group_shapes={}
               reviewed=0
               newly=0
               for group in groups:
@@ -1087,6 +1097,27 @@ jobs:
                   ):
                       raise SystemExit("Unreviewed shared original stock raw group identity")
                   units=group["original_source_unit_starts_inside_same_native_raw_run_in_CCEl_XML_order"]
+                  div1_classes={
+                      "all_original_source_units_from_one_original_div1",
+                      "multiple_distinct_original_div1_documents_in_same_stock_raw_run",
+                  }
+                  div1_ordinals=group["original_div1_document_ordinals_represented_in_shared_stock_raw_run"]
+                  if (not isinstance(div1_ordinals,list) or
+                          not 1<=len(div1_ordinals)<=16 or
+                          any(type(v) is not int or not 1<=v<=500 for v in div1_ordinals) or
+                          div1_ordinals!=sorted(set(div1_ordinals)) or
+                          len(div1_ordinals)!=group["distinct_original_div1_document_divisions_in_shared_stock_raw_run"] or
+                          group["original_div1_structure_class"] not in div1_classes or
+                          (len(div1_ordinals)>1) is not (
+                              group["original_div1_structure_class"]==
+                              "multiple_distinct_original_div1_documents_in_same_stock_raw_run"
+                          ) or
+                          group["sharing_a_native_K_key_does_not_prove_same_original_div1_book_or_section"] is not True or
+                          group["concatenated_source_text_from_different_original_div1_is_not_authorial_text"] is not True):
+                      raise SystemExit("Source original division ancestry must be real and separately classified")
+                  observed_div1_group_shapes[group["original_div1_structure_class"]]=(
+                      observed_div1_group_shapes.get(group["original_div1_structure_class"],0)+1
+                  )
                   if (not isinstance(units,list) or not 2<=len(units)<=16 or
                           not all(type(group[key]) is int and group[key]>=0 for key in (
                               "native_occupied_numbered_K_keys_in_shared_raw_run",
@@ -1130,6 +1161,8 @@ jobs:
                           entry["source_range_and_native_raw_bytes_not_reassigned_or_modified"] is not True or
                           not all(type(entry[k]) is int and entry[k]>=0 for k in (
                               "original_source_numeric_verse_span",
+                              "original_enclosing_div1_ordinal_in_original_XML_document",
+                              "total_div1_ancestors_enumerated_in_original_XML_document",
                               "original_source_genuine_native_occupied_K_in_declared_span",
                               "source_declared_range_native_K_same_raw_as_group",
                               "source_declared_range_native_K_other_raw",
@@ -1138,6 +1171,9 @@ jobs:
                               "original_source_plain_word_token_count",
                               "compiled_shared_raw_plain_word_token_count",
                           )) or
+                          entry["original_enclosing_div1_ordinal_in_original_XML_document"] not in div1_ordinals or
+                          not 1<=entry["original_enclosing_div1_ordinal_in_original_XML_document"]<=
+                              entry["total_div1_ancestors_enumerated_in_original_XML_document"]<=500 or
                           entry["original_source_numeric_verse_span"]<1 or
                           entry["original_source_genuine_native_occupied_K_in_declared_span"] >
                             entry["original_source_numeric_verse_span"] or
@@ -1187,13 +1223,16 @@ jobs:
                   newly!=shared["source_marker_scope_evidence_class_counts"].get(
                       "newly_discovered_source_unit_in_shared_stock_run",0) or
                   observed_original_counts!=
-                      shared["source_unit_plain_word_alignments_to_shared_native_raw_closed_categories"]):
+                      shared["source_unit_plain_word_alignments_to_shared_native_raw_closed_categories"] or
+                  observed_div1_group_shapes!=
+                      shared["source_div1_ancestry_structure_class_counts"]):
                   raise SystemExit("All original source marker and plain-word group totals diverged")
               print("Original source units sharing actual native raw K-runs (no authorial mapping assumed): " +
                     json.dumps({
                         "native_groups":len(groups),
                         "source_units_in_shared_raw_runs":len(identity_seen),
                         "original_units_outside_previous_major_prose_disagreements":newly,
+                        "actual_original_div1_ancestry_group_classes":observed_div1_group_shapes,
                         "original_source_line_and_hash_only_groups":groups,
                     },sort_keys=True))
           print("Original bounded source prose alignment and stock raw repetition (not authored range proof): " +
