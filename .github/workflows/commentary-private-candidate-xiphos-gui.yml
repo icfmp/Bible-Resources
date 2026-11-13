@@ -133,7 +133,24 @@ jobs:
           assert heading["intro_data_or_clipboard_exported"] is False
           assert heading["no_heading_missing_from_source_inferred"] is True
           assert type(heading["heading_GUI_presentation_verified"]) is bool
+          assert type(heading["original_intro_in_normal_chapter_GUI_verified"]) is bool
           assert set(heading["book_and_chapter_menu_observations"]) == {"book", "chapter"}
+          allowed_normal = {
+              "not_attempted", "no_authenticated_original_intro_key_for_this_scope",
+              "commentary_pane_geometry_unavailable",
+              "original_intro_prose_copied_from_normal_chapter_GUI",
+              "normal_chapter_GUI_intro_not_proven",
+              "real_GUI_normal_chapter_clipboard_unavailable",
+          }
+          assert all(
+              row["normal_chapter_GUI_observation_class"] in allowed_normal
+              for row in heading["book_and_chapter_menu_observations"].values()
+          )
+          assert heading["original_intro_in_normal_chapter_GUI_verified"] == any(
+              row["normal_chapter_GUI_observation_class"]
+              == "original_intro_prose_copied_from_normal_chapter_GUI"
+              for row in heading["book_and_chapter_menu_observations"].values()
+          )
           allowed = {
               "not_attempted", "no_authenticated_original_intro_key_for_this_scope",
               "commentary_pane_geometry_unavailable",
@@ -146,8 +163,10 @@ jobs:
               and type(r["original_intro_sha256_attested"]) is bool
               for r in heading["book_and_chapter_menu_observations"].values()
           )
-          print("Xiphos book/chapter heading UI (pass only on copied original intro): " +
+          print("Xiphos original book/chapter intro: normal chapter rendering independently checked before context menu: " +
                 json.dumps(heading["book_and_chapter_menu_observations"], sort_keys=True))
+          print("Real normal chapter intro source words positively copied: " +
+                str(heading["original_intro_in_normal_chapter_GUI_verified"]))
           assert receipt["status"]=="byte_exact_private_candidate_real_Xiphos_GUI_observation"
           assert receipt["authentic_original_reference_bearing_keys_count"]>=2
           assert receipt["original_words_links_screenshots_or_SWORD_archives_uploaded"] is False
