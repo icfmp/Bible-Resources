@@ -25,6 +25,7 @@ from lxml import etree
 from commentary_chapter_neighbors import (original_chapter_neighbors, compare_chapter_neighbors,
                                           ChapterNeighborNumberedProbe)
 from commentary_chapter_cross_slot import ChapterNeighborSameBookAlternativeProbe
+from commentary_chapter_paragraph_overlap import OriginalChapterParagraphSpanProbe
 from commentary_intake import load_manifest
 from commentary_text_delta import punctuation_relationship, word_relationship, nonword_symbol_excess
 from commentary_stock_prefix_topology import (
@@ -537,6 +538,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         chapter_intros={}
         numbered_probe=ChapterNeighborNumberedProbe(chapter_neighbors)
         alternate_probe=ChapterNeighborSameBookAlternativeProbe(chapter_neighbors)
+        source_p_overlap_probe=OriginalChapterParagraphSpanProbe(chapter_neighbors)
         try:
             process=subprocess.Popen(["timeout","360s",str(raw_binary),manifest["module_id"]],
                                      stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,env=env)
@@ -548,6 +550,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
                     matches[ref]=raw
                 numbered_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
                 alternate_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
+                source_p_overlap_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
                 if kind=="I" and (ref in chapter_neighbors or
                                    (ref.endswith(".0") and ref[:-2] in chapter_neighbors)):
                     chapter_intros[ref]=raw
@@ -568,6 +571,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         )
         chapter_numbered_location=numbered_probe.report()
         chapter_other_slot_location=alternate_probe.report(numbered_probe)
+        original_p_word_overlap=source_p_overlap_probe.report(chapter_other_slot_location)
         if chapter_analysis["original_chapter_source_siblings_compared"]!=chapter_proof[
             "explicit_chapter_source_marker_count"
         ]:
@@ -588,6 +592,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         "source_chapter_neighbor_to_stock_intro_diagnostics":chapter_analysis,
         "source_chapter_neighbor_to_same_chapter_numbered_location":chapter_numbered_location,
         "source_chapter_neighbor_to_same_book_alternative_slots":chapter_other_slot_location,
+        "source_chapter_p_source_to_stock_word_contiguity":original_p_word_overlap,
         "original_source_divisions_without_markers_compared":False,
         "chapter_intro_and_body_lexical_parity_compared":False,
         "original_exact_edition_proven":False,
