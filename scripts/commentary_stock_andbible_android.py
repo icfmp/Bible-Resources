@@ -22,6 +22,7 @@ from commentary_xiphos_dual_reader import BIBLE_MODULE, verify_and_install_revie
 from commentary_native_raw_inventory import _safe_stock_install
 from commentary_android_text_witness import (
     original_prose_in_real_android_webview,
+    full_native_original_prose_in_real_android_webview,
     read_only_actually_occupied_original_entries,
 )
 
@@ -499,6 +500,7 @@ def _select_exact_download_zip(
 
 def run_android_original(
     resource_id: str, *, apk: Path, native_raw_key_binary: Path,
+    native_full_raw_binary: Path,
 ) -> dict:
     manifest = load_manifest(resource_id)
     module_id = manifest["module_id"]
@@ -509,6 +511,8 @@ def run_android_original(
             or apk.is_symlink() or not apk.is_file()
             or native_raw_key_binary.is_symlink()
             or not native_raw_key_binary.is_file()
+            or native_full_raw_binary.is_symlink()
+            or not native_full_raw_binary.is_file()
             or sha256(apk.read_bytes()).hexdigest() != APK_SHA256):
         raise PilotError("Original commentary / exact official AndBible APK not verified")
     for key in ("archive_sha256", "stock_conf_sha256"):
@@ -676,6 +680,10 @@ def run_android_original(
             prose_witness = original_prose_in_real_android_webview(
                 original_prose_samples, actual_ui,
             )
+            full_prose_witness = full_native_original_prose_in_real_android_webview(
+                original_native_root, module_id, native_full_raw_binary,
+                manifest["native_raw_corpus_sha256"], actual_ui,
+            )
         else:
             prose_witness = {
                 "scope": "exact_original_native_zCom_prose_vs_actual_AndBible_WebView_accessibility",
@@ -686,6 +694,18 @@ def run_android_original(
                 "actual_original_prose_excerpt_in_Android_WebView_verified": False,
                 "status": "inconclusive_exact_MHCC_reader_selection_unavailable",
                 "original_prose_UI_text_XML_screenshots_or_ZIP_exported": False,
+            }
+            full_prose_witness = {
+                "scope": "all_occupied_original_native_zCom_keys_vs_real_Android_WebView_prose",
+                "original_full_native_corpus_sha256_attested": False,
+                "actual_original_native_occupied_keys_scanned": 0,
+                "original_native_entries_with_substantial_exposition": 0,
+                "real_AndBible_WebViews_observed": 0,
+                "real_AndBible_WebView_text_sequences_examined": 0,
+                "source_occupied_entries_with_16_consecutive_words_visible": 0,
+                "actual_original_authorial_prose_in_real_Android_WebView_verified": False,
+                "status": "inconclusive_exact_MHCC_reader_selection_unavailable",
+                "source_words_android_UI_XML_screenshots_or_ZIP_exported": False,
             }
         # Real platform request result is checked, but not equated to a
         # rendered page. A rejected Intent must remain explicitly unverified.
@@ -736,6 +756,7 @@ def run_android_original(
             "android_sample_reference_deeplink_attempted": True,
             "android_commentary_toolbar_selection": toolbar_probe,
             "android_exact_original_authorial_prose_webview_witness": prose_witness,
+            "android_full_original_authorial_prose_webview_witness": full_prose_witness,
             "original_sample_references_not_verifiably_native_occupied_count":
                 not_occupied_samples,
             "official_stable_update_notice_action": stable_notice_action,
@@ -767,12 +788,15 @@ def main(argv=None) -> int:
     p.add_argument("--resource-id", required=True)
     p.add_argument("--apk", type=Path, required=True)
     p.add_argument("--native-raw-key-binary", type=Path, required=True)
+    p.add_argument("--native-full-raw-binary", type=Path, required=True)
     p.add_argument("--report", type=Path, required=True)
     args = p.parse_args(argv)
     if args.report.exists() or args.report.is_symlink() or not args.report.parent.is_dir():
         raise PilotError("Refusing unsafe or existing Android report destination")
     result = run_android_original(
-        args.resource_id, apk=args.apk, native_raw_key_binary=args.native_raw_key_binary,
+        args.resource_id, apk=args.apk,
+        native_raw_key_binary=args.native_raw_key_binary,
+        native_full_raw_binary=args.native_full_raw_binary,
     )
     args.report.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n",
                            encoding="utf-8")
