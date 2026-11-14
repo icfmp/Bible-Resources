@@ -202,3 +202,59 @@ all 29,975 original native occupied K/I/U entries.
 **No complete replacement module has yet been generated.** This is an
 inspection and standard compiler feasibility gate, not publication or an
 approved editoral change.
+
+
+## Complete 29,975-entry standard SWORD rebuild — source-constrained research gate (2026-11-14)
+
+[Exact-head isolated original-stock audit #43644376840](https://github.com/icfmp/Bible-Resources/actions/runs/43644376840)
+**SUCCESS**, original full-module implementation head
+`4d15e918cdecab6dbb322275918c580fc662ef6a`.
+
+The existing original source-native reader streamed every original, SHA-pinned
+CrossWire MHCC 2.0 raw native record. A **temporary, separately identified**
+zCom source candidate was compiled with the standard `osis2mod` importer
+from the **unchanged original I and K fragments**, arranged in their
+verified KJV book/chapter and occupied-verse order. The two opaque original
+TOP fragments were **not inserted or synthesized by custom index patching**;
+the standard compiler generated them, and the independently run native reader
+checked their exact original bytes and indexed order.
+
+| Native entry class | Exact original | Candidate readback | Missing | Additional | Content/markup gates |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Numbered K | **28,718** | **28,718** | **0** | **0** | **28,718/28,718** |
+| Book/chapter I | **1,255** | **1,255** | **0** | **0** | **1,255/1,255** |
+| Opaque TOP U | **2** | **2** | **0** | **0** | **exact original bytes 2/2** |
+| **Total indexed** | **29,975** | **29,975** | **0** | **0** | **all source-constrained checks passed** |
+
+Every I/K entry retained: exactly the original **ordered Unicode word sequence**,
+the same **visible Unicode text except for whitespace normalization**
+(including punctuation), original ordered non-`div` element names and
+literal attributes, all original `div` attribute-value multisets, and
+all original ordered citation `reference` attribute values (including
+`osisRef`). Every original I/K native key was present and no extra I/K
+key appeared. The source fragments were incorporated **verbatim** in the
+private OSIS generation step, with no word, heading or navigation correction.
+
+**Precisely what this proves:** the released standard SWORD importer can
+reconstruct all original indexed locations of this commentary with the
+specified **source-semantic readback invariants** and original TOP bytes.
+This is now a full-corpus **technical transport** result, no longer just a
+chapter sample.
+
+**Precisely what it does not prove:** original raw XML *byte equality*
+(the compiler adds `div` wrappers and normalizes whitespace); absolute
+reader-layout/paragraph presentation equivalence; historical print-edition
+identity; independent editorial section boundaries or the correctness of
+CrossWire's 17/24 omitted keys, 118 single-key chapter scopes, two
+intro-text-only chapters, CCEL citation-target differences, and 1 Chr 7
+digital-witness wording difference. These remain **separate editorial and
+reader acceptance gates**. The tested candidate did not attempt any
+section repair, add unverified aliases, alter original stock, or publish.
+
+**Next:** use the demonstrated complete-source transport as the strictly
+isolated baseline for reviewed non-overwriting section-link adjustments;
+read back every original K/I/U record plus any approved new aliases,
+verify that no newly linked verse overwrites a distinct commentary section,
+then check one real reader for section deduplication and actual references.
+Do not merge or release before full editorial decisions and explicit owner
+approval. Modern-English #270/#272 remains paused.
