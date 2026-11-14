@@ -65,18 +65,29 @@ def heading_extent(raw: bytes) -> tuple[tuple[int, ...], str] | None:
     if not numbers or min(numbers) == 0 or max(numbers) > 176:
         return None
     punctuation = {ch for ch in literal if ch in ",-–"}
-    if len(punctuation) > 1:
-        return None
     if not punctuation:
         return ((numbers[0],), "single")
-    if punctuation <= {"-"} or punctuation <= {"–"}:
+    if "," not in punctuation and punctuation <= {"-", "–"}:
         if len(numbers) != 2 or numbers[0] >= numbers[1]:
             return None
         return (tuple(range(numbers[0], numbers[1] + 1)), "dash")
     if "," in punctuation:
-        if numbers != sorted(set(numbers)):
+        expanded = []
+        has_range = False
+        for item in literal.split(","):
+            item = item.strip()
+            match = re.fullmatch(r"(\d{1,3})(?:\s*[-–]\s*(\d{1,3}))?", item)
+            if match is None:
+                return None
+            start = int(match.group(1))
+            end = int(match.group(2) or start)
+            if start > end:
+                return None
+            has_range |= match.group(2) is not None
+            expanded.extend(range(start, end + 1))
+        if expanded != sorted(set(expanded)):
             return None
-        return (tuple(numbers), "comma")
+        return (tuple(expanded), "discontinuous" if has_range else "comma")
     return None
 
 
