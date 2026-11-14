@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "module_id": "mhcc-crosswire",
+  "sword_id": "BRMHCC",
+  "module_version": "0.1.0",
+  "locale": "en",
+  "revision": "2026-11-14.1",
+  "approved_at": "2026-11-14",
+  "approved_by": "Bible Resources project owner",
+  "approval_url": "https://github.com/icfmp/Bible-Resources/pull/264",
+  "source_path": "docs/profiles/en-matthew-henry-concise-crosswire-2-0.md",
+  "source_git_blob_sha1": "5d2ceaddc926d873487899ee45445a5bc24553bf",
+  "sections": {
+    "short": "## Short description",
+    "long": "## Long description",
+    "end": "## Source and licensing record"
+  },
+  "evidence_urls": {
+    "original_module": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=MHCC",
+    "independent_module_attribution": "https://www.stepbible.org/version.jsp?version=MHCC",
+    "source_rights_review": "https://github.com/icfmp/Bible-Resources/blob/main/docs/evidence/mhcc-177/crosswire-exact-stock-rights-review.md",
+    "editorial_tracking": "https://github.com/icfmp/Bible-Resources/issues/177",
+    "reader_qa_accepted": "https://github.com/icfmp/Bible-Resources/issues/257"
+  }
+}
