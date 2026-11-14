@@ -264,11 +264,18 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
 
     counts = Counter(relation(s) for s in sections)
     reference_counts = Counter()
+    independent_evidence_matrix = Counter()
     for s in sections:
         last = s["start"].rsplit(".", 1)[0] + "." + str(s["declared_end"])
+        has_scripref = last in independent_reference_ranges.get(s["start"], set())
+        has_scripcom = relation(s) == "SAME_DECLARED_RANGE_IN_INDEPENDENT_EDITION"
         reference_counts[
-            "EXACT_INDEPENDENT_SCRIPREF_RANGE" if last in independent_reference_ranges.get(s["start"], set())
+            "EXACT_INDEPENDENT_SCRIPREF_RANGE" if has_scripref
             else "NO_EXACT_INDEPENDENT_SCRIPREF_RANGE"
+        ] += 1
+        independent_evidence_matrix[
+            ("scripCom" if has_scripcom else "no_scripCom") + "_and_" +
+            ("scripRef" if has_scripref else "no_scripRef")
         ] += 1
     return {
         "status": "PINNED_DIFFERENT_DIGITAL_EDITION_SCOPE_COMPARISON",
@@ -278,6 +285,7 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
         "stock_start_sections_compared": len(sections),
         "source_range_agreement_counts": dict(sorted(counts.items())),
         "independent_scripref_range_agreement_counts": dict(sorted(reference_counts.items())),
+        "independent_reference_evidence_matrix": dict(sorted(independent_evidence_matrix.items())),
         "independent_scripref_is_not_section_anchor": True,
         "anomaly_source_range_corroboration": [
             {"start": a["start"], "declared_end": a["declared_end"],
