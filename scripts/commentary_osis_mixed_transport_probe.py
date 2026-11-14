@@ -273,3 +273,256 @@ def probe_original_mixed_transport(chapter: str, book_intro: bytes,
         "entire_original_native_corpus_preserved":False,
         "published":False,
     }
+
+
+def build_complete_original_transport(
+        original_intros: dict[str, bytes],
+        original_numbered: dict[str, list[tuple[str, bytes]]],
+        *, work_id: str) -> tuple[bytes, dict]:
+    """Build *unmodified* original I/K XML into a private whole-module OSIS.
+
+    This deliberately does NOT expand missing section links, guess scopes,
+    change word forms, or claim the two native TOP records were reproduced.
+    Every original raw body is included as-is; same-byte contiguous K slots
+    are represented by one standard annotateRef range.
+    """
+    chapter_pattern = re.compile(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9]\d*")
+    book_pattern = re.compile(r"[1-4]?[A-Za-z][A-Za-z0-9]*")
+    if (not WORK.fullmatch(work_id) or not isinstance(original_intros, dict)
+            or not isinstance(original_numbered, dict)
+            or not 2 <= len(original_intros) <= 10000):
+        raise ValueError("Invalid original complete I/K corpus")
+    books = {}
+    chapters = {}
+    for ref, raw in original_intros.items():
+        if not isinstance(ref, str) or not isinstance(raw, bytes):
+            raise ValueError("Invalid original introduction frame")
+        _source_visible_text(raw)
+        if book_pattern.fullmatch(ref):
+            books[ref] = raw
+        elif chapter_pattern.fullmatch(ref):
+            chapters[ref] = raw
+        else:
+            raise ValueError("Unexpected original introduction key")
+    if not books or not chapters or len(books) > 100 or len(chapters) > 3000:
+        raise ValueError("Unbounded or incomplete original book/chapter inventory")
+    if any(chapter.split(".", 1)[0] not in books for chapter in chapters):
+        raise ValueError("Original chapter intro without original book intro")
+    if any(chapter not in chapters for chapter in original_numbered):
+        raise ValueError("Numbered commentary without original chapter intro")
+    if not any(original_numbered.values()):
+        raise ValueError("Original complete source has no numbered commentary")
+    parts = [
+        b'<?xml version="1.0" encoding="UTF-8"?>',
+        f'<osis xmlns="{OSIS_NS}"><osisText osisIDWork="{work_id}" osisRefWork="Commentary" xml:lang="en" canonical="true">'.encode(),
+        (f'<header><work osisWork="{work_id}"><title>Private full original I/K transport</title>'
+         f'<identifier type="OSIS">{work_id}</identifier><refSystem>Bible.KJV</refSystem>'
+         '</work></header><div type="bookGroup">').encode(),
+    ]
+    original_K_count = 0
+    original_group_count = 0
+    for book, original_book_intro in books.items():
+        parts.extend((f'<div type="book" osisID="{book}">'.encode(),
+                      original_book_intro))
+        book_chapters = [
+            (chapter, original_chapter_intro)
+            for chapter, original_chapter_intro in chapters.items()
+            if chapter.split(".", 1)[0] == book
+        ]
+        book_chapters.sort(key=lambda x: int(x[0].rsplit(".", 1)[1]))
+        for chapter, original_chapter_intro in book_chapters:
+            parts.extend((f'<div type="chapter" osisID="{chapter}">'.encode(),
+                          original_chapter_intro))
+            groups = []
+            last_verse = 0
+            seen_verses = set()
+            for ref, raw in original_numbered.get(chapter, ()):
+                if not isinstance(ref, str) or KEY.fullmatch(ref) is None:
+                    raise ValueError("Invalid original numbered verse identity")
+                if ref.rsplit(".", 1)[0] != chapter or not isinstance(raw, bytes):
+                    raise ValueError("Original verse is outside its chapter")
+                verse = int(ref.rsplit(".", 1)[1])
+                if verse <= last_verse or verse in seen_verses:
+                    raise ValueError("Nonmonotonic or duplicate native verse")
+                _source_visible_text(raw)
+                digest = sha256(raw).digest()
+                if groups and groups[-1]["digest"] == digest and groups[-1]["end"] + 1 == verse:
+                    groups[-1]["end"] = verse
+                else:
+                    groups.append({"start": verse, "end": verse, "digest": digest, "raw": raw})
+                last_verse = verse
+                seen_verses.add(verse)
+                original_K_count += 1
+            for group in groups:
+                start = f"{chapter}.{group['start']}"
+                end = f"{chapter}.{group['end']}"
+                target = start if start == end else f"{start}-{end}"
+                parts.extend((
+                    f'<div type="section" annotateType="commentary" annotateRef="{target}">'.encode(),
+                    group["raw"], b"</div>"
+                ))
+            original_group_count += len(groups)
+            parts.append(b"</div>")
+        parts.append(b"</div>")
+    parts.extend((b"</div>", b"</osisText>", b"</osis>"))
+    xml = b"".join(parts)
+    if len(xml) > 512 * 1024 * 1024:
+        raise ValueError("Original full OSIS XML exceeds safety bound")
+    try:
+        etree.fromstring(xml, parser=_strict_parser())
+    except (ValueError, etree.XMLSyntaxError):
+        raise ValueError("Unmodified whole-original OSIS is not strict XML") from None
+    return xml, {
+        "status": "COMPLETE_ORIGINAL_I_K_WRAPPED_FOR_PRIVATE_REBUILD_NOT_APPROVAL",
+        "source_book_intro_count": len(books),
+        "source_chapter_intro_count": len(chapters),
+        "source_numbered_key_count": original_K_count,
+        "source_numbered_group_count": original_group_count,
+        "original_I_K_raw_markup_not_rewritten": True,
+        "original_TOP_positions_not_yet_reconstructed": True,
+        "original_source_published": False,
+    }
+
+
+def probe_complete_original_transport(
+        original_intros: dict[str, bytes],
+        original_numbered: dict[str, list[tuple[str, bytes]]],
+        original_TOP: list[bytes], *,
+        scratch: Path, native_raw_binary: Path,
+        osis2mod_binary: str = "osis2mod") -> dict:
+    """Attempt full private SWORD readback and compare EVERY original native key.
+
+    This is diagnostic and cannot authorize a release. TOP is separately
+    reconciled and never silently omitted merely because it contains no words.
+    """
+    if (not scratch.is_dir() or scratch.is_symlink()
+            or not native_raw_binary.is_file() or native_raw_binary.is_symlink()
+            or len(original_TOP) > 10 or not all(isinstance(x, bytes) for x in original_TOP)):
+        raise ValueError("Untrusted complete original transport test input")
+    module_id = "BRFullProbe"
+    xml, source = build_complete_original_transport(
+        original_intros, original_numbered, work_id=module_id
+    )
+    root = scratch / "complete-original-private-candidate"
+    if root.exists() or root.is_symlink():
+        raise ValueError("Refuse to overwrite private complete source candidate")
+    data = root / "modules" / "comments" / "zcom" / module_id
+    conf = root / "mods.d" / (module_id + ".conf")
+    data.mkdir(parents=True)
+    conf.parent.mkdir()
+    (root / "source-original-private.osis.xml").write_bytes(xml)
+    try:
+        run = subprocess.run([
+            str(osis2mod_binary), str(data),
+            str(root / "source-original-private.osis.xml"),
+            "-z", "z", "-b", "3", "-v", "KJV"
+        ], cwd=root, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+           timeout=360, check=False)
+    except (OSError, subprocess.TimeoutExpired):
+        return {**source, "status": "COMPLETE_ORIGINAL_COMPILER_UNAVAILABLE",
+                "readback_completed": False, "published": False}
+    if run.returncode:
+        return {**source, "status": "COMPLETE_ORIGINAL_COMPILER_REJECTED",
+                "readback_completed": False, "published": False}
+    conf.write_text(
+        f"[{module_id}]\nDataPath=./modules/comments/zcom/{module_id}\n"
+        "ModDrv=zCom\nCompressType=ZIP\nBlockType=CHAPTER\n"
+        "SourceType=OSIS\nVersification=KJV\nLang=en\n"
+        "Description=Private whole-original text transport only\n",
+        encoding="utf-8"
+    )
+    try:
+        scan = subprocess.run(
+            [str(native_raw_binary), module_id],
+            cwd=root, env=dict(os.environ, SWORD_PATH=str(root)),
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+            timeout=300, check=False
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return {**source, "status": "COMPLETE_ORIGINAL_NATIVE_READBACK_UNAVAILABLE",
+                "readback_completed": False, "published": False}
+    if scan.returncode or len(scan.stdout) > 512 * 1024 * 1024:
+        return {**source, "status": "COMPLETE_ORIGINAL_NATIVE_READBACK_FAILED",
+                "readback_completed": False, "published": False}
+    rebuilt = {"I": {}, "K": {}, "U": []}
+    def collect(kind, key, raw):
+        if kind == "U":
+            rebuilt["U"].append(raw)
+        else:
+            rebuilt[kind][key] = raw
+    parse_native_raw_corpus(BytesIO(scan.stdout), on_entry=collect)
+    original_K = {
+        key: raw
+        for chapter in original_numbered.values()
+        for key, raw in chapter
+    }
+    original_I = original_intros
+    absent_I = sorted(set(original_I) - set(rebuilt["I"]))
+    absent_K = sorted(set(original_K) - set(rebuilt["K"]))
+    extra_I = sorted(set(rebuilt["I"]) - set(original_I))
+    extra_K = sorted(set(rebuilt["K"]) - set(original_K))
+    cache = {}
+    summaries = {}
+    names = (
+        ("source_keys_present", None),
+        ("source_words_preserved_in_exact_order", "word_sequence_relation"),
+        ("source_whitespace_normalized_visible_text_identical", "normalized_whitespace_visible_unicode_equal"),
+        ("original_nondiv_element_order_and_attributes_preserved", "non_div_element_order_and_exact_attribute_values_preserved"),
+        ("original_div_attribute_multiset_preserved", "original_div_elements_exact_attribute_multiset_preserved"),
+        ("original_reference_attribute_values_preserved", "reference_attribute_values_in_original_document_order_preserved"),
+    )
+    for kind, originals in (("I", original_I), ("K", original_K)):
+        counts = dict.fromkeys((name for name, _ in names), 0)
+        for key, raw in originals.items():
+            compiled = rebuilt[kind].get(key)
+            if compiled is None:
+                continue
+            counts["source_keys_present"] += 1
+            identity = (sha256(raw).digest(), sha256(compiled).digest())
+            delta = cache.get(identity)
+            if delta is None:
+                delta = classify_native_osis_roundtrip_delta(raw, compiled)
+                cache[identity] = delta
+            for name, field in names[1:]:
+                passed = (
+                    delta[field] == "EXACT_ORIGINAL_WORD_SEQUENCE"
+                    if field == "word_sequence_relation" else delta[field] is True
+                )
+                counts[name] += int(passed)
+        summaries[kind] = counts
+    def complete(kind, original):
+        return all(summaries[kind][name] == len(original) for name, _ in names)
+    indexed_checks = (
+        not any((absent_I, absent_K, extra_I, extra_K))
+        and complete("I", original_I) and complete("K", original_K)
+    )
+    top_exact = (
+        len(original_TOP) == len(rebuilt["U"])
+        and all(a == b for a, b in zip(original_TOP, rebuilt["U"]))
+    )
+    return {
+        **source,
+        "status": "COMPLETE_ORIGINAL_PRIVATE_I_K_U_COMPILED_READBACK_NOT_APPROVAL",
+        "readback_completed": True,
+        "source_intro_I_coverage": summaries["I"],
+        "source_numbered_K_coverage": summaries["K"],
+        "missing_I_count": len(absent_I),
+        "missing_K_count": len(absent_K),
+        "extra_I_count": len(extra_I),
+        "extra_K_count": len(extra_K),
+        "missing_I_first_ten": absent_I[:10],
+        "missing_K_first_ten": absent_K[:10],
+        "extra_I_first_ten": extra_I[:10],
+        "extra_K_first_ten": extra_K[:10],
+        "source_TOP_count": len(original_TOP),
+        "compiled_TOP_count": len(rebuilt["U"]),
+        "all_original_TOP_positions_exact_raw_bytes": top_exact,
+        "original_indexed_I_K_text_markup_reference_checks_passed": indexed_checks,
+        "full_original_K_I_U_native_entry_parity_proven":
+            indexed_checks and top_exact,
+        "original_raw_entry_bytes_all_identical": False,
+        "historical_print_edition_parity_proven": False,
+        "reader_layout_parity_proven": False,
+        "corrections_or_publication_authorized": False,
+        "published": False,
+    }
