@@ -171,7 +171,7 @@ class SafeLexicalEvidenceTests(unittest.TestCase):
     def test_original_source_suffix_has_a_distinct_stock_title_prefix(self):
         result = independent_lexical_overlap(
             "The whole chapter commentary.",
-            b"<title>Chapter 1</title><p>The whole chapter commentary.</p>",
+            b"<title>Chapter 1</title>\n<p>The whole chapter commentary.</p>",
         )
         self.assertEqual(result["ordered_word_alignment"][
             "exact_unicode_ordered_alignment_class"
