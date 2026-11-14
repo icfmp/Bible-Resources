@@ -243,6 +243,13 @@ def _classify_main_reader_context(xml: bytes, activity_dump: bytes) -> dict:
     roots = set()
     packages = {"andbible": 0, "system_ui": 0, "documents_ui": 0, "other": 0}
     webviews = 0
+    ui_classes = {
+        "TextView": 0, "Button": 0, "ImageButton": 0,
+        "EditText": 0, "CheckBox": 0, "Switch": 0,
+        "FrameLayout": 0, "LinearLayout": 0,
+        "ScrollView": 0, "WebView": 0, "ComposeView": 0, "other": 0,
+    }
+    enabled_clickable = 0
     try:
         tree = ET.fromstring(xml) if xml else None
     except ET.ParseError:
@@ -262,8 +269,14 @@ def _classify_main_reader_context(xml: bytes, activity_dump: bytes) -> dict:
                 packages["documents_ui"] += 1
             else:
                 packages["other"] += 1
-            if node.attrib.get("class", "").endswith("WebView"):
+            class_name = node.attrib.get("class", "").rsplit(".", 1)[-1]
+            class_group = class_name if class_name in ui_classes else "other"
+            ui_classes[class_group] += 1
+            if class_name == "WebView":
                 webviews += 1
+            if (node.attrib.get("clickable") == "true"
+                    and node.attrib.get("enabled") == "true"):
+                enabled_clickable += 1
             rid = node.attrib.get("resource-id", "")
             prefix = PACKAGE + ":id/"
             if rid.startswith(prefix):
@@ -287,6 +300,8 @@ def _classify_main_reader_context(xml: bytes, activity_dump: bytes) -> dict:
         "ui_hierarchy_node_count": node_count,
         "ui_hierarchy_package_class_counts": packages,
         "ui_hierarchy_webview_count": webviews,
+        "ui_hierarchy_framework_class_counts": ui_classes,
+        "ui_hierarchy_enabled_clickable_node_count": enabled_clickable,
         "ui_hierarchy_text_or_unknown_ids_exported": False,
         "main_bible_reader_activity_resumed": reader,
         "another_andbible_activity_resumed": other_andbible and not reader,
