@@ -1,10 +1,15 @@
 """Synthetic regressions for source-neutral commentary section-scope triage."""
 import sys
 from pathlib import Path
+from hashlib import sha256
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from commentary_section_scope_audit import heading_extent, classify
+from commentary_section_scope_audit import (
+    heading_extent, classify, compare_independent_thml_witness
+)
 
 
 class HeadingTests(unittest.TestCase):
@@ -72,6 +77,54 @@ class ClassificationTests(unittest.TestCase):
             "Song.1.3": {"sha256": "a", "heading": ((2, 3, 4), "dash")},
         })
         self.assertEqual(outcome["anomalies"][0]["missing_slots"], ["Song.1.4"])
+
+
+
+class IndependentWitnessTests(unittest.TestCase):
+    def test_citation_range_is_not_commentary_section_anchor(self):
+        xml = (
+            b"<root>"
+            b'<scripRef osisRef="Bible:Song.1.7-Song.1.8"/>'
+            b'<scripCom osisRef="Bible:Song.1.9-Song.1.17"/>'
+            b"</root>"
+        )
+        digest = sha256(xml).hexdigest()
+        manifest = {"commentary_source": {
+            "xml_witness_url": "https://www.ccel.org/fake.xml",
+            "xml_witness_sha256": digest
+        }}
+        sections = [
+            {"start": "Song.1.7", "declared_end": 8, "heading_kind": "comma"},
+            {"start": "Song.1.9", "declared_end": 17, "heading_kind": "dash"}
+        ]
+        anomalies = [{"start": "Song.1.7", "declared_end": 8}]
+
+        def private_fixture_fetch(url, dest, provider):
+            self.assertEqual(provider, "ccel")
+            dest.write_bytes(xml)
+            return {"sha256": digest, "bytes": len(xml)}
+
+        with TemporaryDirectory() as td:
+            with patch("commentary_section_scope_audit.fetch", private_fixture_fetch):
+                outcome = compare_independent_thml_witness(
+                    manifest, sections, anomalies, Path(td)
+                )
+        self.assertEqual(
+            outcome["source_range_agreement_counts"], {
+                "NO_MATCHING_INDEPENDENT_START": 1,
+                "SAME_DECLARED_RANGE_IN_INDEPENDENT_EDITION": 1
+            }
+        )
+        self.assertEqual(
+            outcome["independent_scripref_range_agreement_counts"], {
+                "EXACT_INDEPENDENT_SCRIPREF_RANGE": 1,
+                "NO_EXACT_INDEPENDENT_SCRIPREF_RANGE": 1
+            }
+        )
+        case = outcome["anomaly_source_range_corroboration"][0]
+        self.assertEqual(case["relation"], "NO_MATCHING_INDEPENDENT_START")
+        self.assertTrue(case["same_end_in_independent_scripref"])
+        self.assertFalse(outcome["ccel_edition_equivalence_to_stock_proven"])
 
 
 if __name__ == "__main__":
