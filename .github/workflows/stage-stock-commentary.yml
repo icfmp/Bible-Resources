@@ -1,0 +1,134 @@
+name: Stage attested compiled SWORD commentary on release branch only
+
+on:
+  push:
+    branches:
+      - 'release/**'
+    paths:
+      - '.github/workflows/stage-stock-commentary.yml'
+      - 'scripts/stage_verified_stock_commentary.py'
+      - 'scripts/compiled_stock_commentary_proof.py'
+      - 'modules/*/metadata.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: staged-stock-commentary-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  source-pinned-stock-staging:
+    # Never touch main, released tags, external PR forks or existing payload.
+    if: github.repository == 'icfmp/Bible-Resources' && startsWith(github.ref, 'refs/heads/release/')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install reviewed verifier dependencies and genuine libSWORD
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          timeout 180s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y \
+            libsword-dev diatheke g++
+      - name: Build independent raw-native original SWORD identity reader
+        run: |
+          set -euo pipefail
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "$RUNNER_TEMP/source-native-raw" -lsword
+      - name: Download SHA-pinned stock, compare every original native key and stage
+        env:
+          NATIVE_BIN: ${{ runner.temp }}/source-native-raw
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, sys
+          from pathlib import Path
+          sys.path.insert(0, "scripts")
+          from stage_verified_stock_commentary import stage
+          root=Path.cwd()
+          staged=[]
+          for d in sorted((root/"modules").iterdir()):
+              file=d/"metadata.json"
+              if not file.is_file() or (d/"payload").exists():
+                  continue
+              meta=json.loads(file.read_text(encoding="utf-8"))
+              if (meta.get("category")=="commentary" and
+                  meta.get("quality", {}).get("status")=="approved" and
+                  meta.get("index_audit", {}).get("mode")=="stock_reader_keys"):
+                  if d.name!=meta["id"]:
+                      raise ValueError("Reviewed stock module folder and ID differ")
+                  proof=stage(meta["id"],module_dir=d,
+                              native_raw_binary=Path(os.environ["NATIVE_BIN"]))
+                  staged.append((meta["id"],proof["native_key_count"]))
+          if not staged:
+              raise ValueError("No approved unstaged compiled commentary on release branch")
+          print("Source-attested compiled stock commentaries staged (count-only): "+str(staged))
+          PY
+      - name: Refresh exact deterministic catalogue snapshot after full staging
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import shutil, sys
+          sys.path.insert(0, "scripts")
+          from build import build
+          root=Path.cwd()
+          snapshot=root/"catalog/v1/catalog.json"
+          if not snapshot.is_file():
+              raise ValueError("Expected existing official catalogue snapshot missing")
+          snapshot.unlink()  # only on disposable checked-out release branch
+          built=build(root=root,output=root/"dist",
+                      base_url="https://icfmp.github.io/Bible-Resources/")
+          if not any(m["id"]=="mhcc-crosswire" for m in built):
+              raise ValueError("Expected current reviewed source omitted from catalogue")
+          shutil.copyfile(root/"dist/catalog/v1/catalog.json",snapshot)
+          print("Exact deterministic catalogue snapshot updated after source validation")
+          PY
+      - name: Validate complete staged repository, deterministic build and actual reader
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -v
+          python scripts/validate.py
+          python scripts/build.py --output dist \
+            --base-url https://icfmp.github.io/Bible-Resources/
+          python scripts/smoke.py
+          git diff --check
+      - name: Commit reviewed derived compiled files and catalogue to PR branch only
+        env:
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          case "$BRANCH" in release/*) ;; *) exit 1 ;; esac
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add catalog/v1/catalog.json
+          for p in modules/*/SOURCE_VALIDATION.json; do
+            test -f "$p"
+            if ! git ls-files --error-unmatch "$p" >/dev/null 2>&1; then
+              d="${p%/SOURCE_VALIDATION.json}"
+              git add "$p" "$d/payload"
+            fi
+          done
+          if git diff --cached --quiet; then
+            echo "No staged release changes to commit"; exit 1
+          fi
+          git diff --cached --name-only
+          git commit -m "chore(release): materialize hash-attested compiled SWORD stock and catalogue"
+          git push origin "HEAD:refs/heads/$BRANCH"
+      - name: State release boundaries
+        if: always()
+        run: |
+          echo "Release-branch staging only; GitHub Pages publishes main after successful merge." >> "$GITHUB_STEP_SUMMARY"
+          echo "Never publish original CCEL text, unverified source, or private checkout data." >> "$GITHUB_STEP_SUMMARY"
