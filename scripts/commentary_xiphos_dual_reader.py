@@ -449,6 +449,9 @@ def _seed_x11_clipboard(env: dict) -> None:
 
 
 def _main_xiphos_window(env: dict) -> str | None:
+    # Only window geometry/count metadata are safe in diagnostics; never
+    # report titles, clipboard, HTML, source passage or window body text.
+    visible_shapes = []
     for query_command in (
         ["xdotool", "search", "--onlyvisible", "--class", "[Xx]iphos"],
         ["xdotool", "search", "--onlyvisible", "--name", "[Xx]iphos"],
@@ -468,8 +471,13 @@ def _main_xiphos_window(env: dict) -> str | None:
             except PilotError:
                 continue
             dims = dict(re.findall(r"^(WIDTH|HEIGHT)=(\d+)$", geometry, re.M))
-            if int(dims.get("WIDTH", "0")) >= 500 and int(dims.get("HEIGHT", "0")) >= 350:
+            width, height = int(dims.get("WIDTH", "0")), int(dims.get("HEIGHT", "0"))
+            if 0 < width <= 1280 and 0 < height <= 800 and len(visible_shapes) < 12:
+                visible_shapes.append((width, height))
+            if width >= 500 and height >= 350:
                 return line
+    print("Xiphos reader main window unavailable (only visible window sizes, pixels): "
+          + json.dumps(visible_shapes[:12]), flush=True)
     return None
 
 
