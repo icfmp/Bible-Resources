@@ -108,9 +108,9 @@ jobs:
           CLONE="${RUNNER_TEMP}/synthetic-commentary-alias"
           cp -a "$ROOT" "$CLONE"
           DATA="$CLONE/modules/comments/zcom/LinkProof"
-          find "$DATA" -maxdepth 1 -type f -printf 'Synthetic compressed module filename: %f\\n'
-          compgen -G "$DATA/*.bzz" > /dev/null
-          (cd "$DATA" && sha256sum ./*.bzz) > "$CLONE/compressed-payloads.before.sha256"
+          # zCom uses .czz for compressed authorial bytes; .czv is its verse index.
+          compgen -G "$DATA/*.czz" > /dev/null
+          (cd "$DATA" && sha256sum ./*.czz) > "$CLONE/compressed-payloads.before.sha256"
           g++ -std=c++17 -O2 -I/usr/include/sword \
             tests/fixtures/synthetic_zcom_link_entry.cpp \
             -o "${RUNNER_TEMP}/synthetic-native-link-entry" -lsword
