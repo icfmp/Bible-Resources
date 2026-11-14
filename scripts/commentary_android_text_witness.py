@@ -9,7 +9,10 @@ source excerpts, or private ZIP may leave the temporary CI workspace.
 from __future__ import annotations
 
 from collections.abc import Mapping
+import os
+from pathlib import Path
 import re
+import subprocess
 import xml.etree.ElementTree as ET
 
 from lxml import etree
@@ -21,6 +24,57 @@ from probe_andbible_android_emulator import PACKAGE
 REF = re.compile(r"[1-4]?[A-Za-z][A-Za-z ]{0,35} [1-9][0-9]{0,2}:[1-9][0-9]{0,2}\Z")
 WINDOW = 16
 MAX_XML = 3_000_000
+
+
+def read_only_actually_occupied_original_entries(
+    source_root: Path, module_id: str, references: list[str],
+    native_reader: Path,
+) -> tuple[dict[str, bytes], int]:
+    """Select only real occupied source keys; refuse all other native failures.
+
+    The source module may index a commentary *range* at one physical verse
+    key; querying other verse numbers must not invent or copy an entry.
+    Our compiled native reader reserves exit code 9 for a nonmatching or
+    unoccupied exact VerseKey. It verifies canonical key equality itself.
+    """
+    if (source_root.is_symlink() or not source_root.is_dir()
+            or native_reader.is_symlink() or not native_reader.is_file()
+            or not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{1,39}", module_id)
+            or not isinstance(references, list)
+            or not 2 <= len(references) <= 12
+            or len(set(references)) != len(references)
+            or any(not isinstance(ref, str) or not REF.fullmatch(ref)
+                   for ref in references)):
+        raise PilotError("Unsafe original occupied MHCC source inspection")
+    present = {}
+    not_verified_occupied = 0
+    for reference in references:
+        try:
+            run = subprocess.run(
+                [str(native_reader), module_id, reference],
+                env=dict(os.environ, SWORD_PATH=str(source_root)),
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                timeout=20,
+                check=False,
+            )
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            raise PilotError("Original native SWORD sample inspection unavailable") from exc
+        if run.returncode == 9:
+            not_verified_occupied += 1
+            continue
+        if run.returncode != 0:
+            raise PilotError(
+                "Original native SWORD inspector failed for a reason other than an "
+                "unoccupied key (status %d)" % run.returncode
+            )
+        if not 8 <= len(run.stdout) <= 256_000:
+            raise PilotError("Unbounded original native occupied SWORD body")
+        present[reference] = run.stdout
+    if not present:
+        raise PilotError("No actually occupied original source sample key proved")
+    return present, not_verified_occupied
 
 
 def _actual_original_authorial_words(native_xml: bytes) -> list[str]:
