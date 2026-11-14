@@ -6,6 +6,7 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from commentary_navigation_link_plan import (
     propose_commentary_links, UnsafeCommentaryLinkPlan,
+    parse_native_commentary_verse_registry,
 )
 
 A = "a" * 64
@@ -117,6 +118,49 @@ class PlanTests(unittest.TestCase):
                 occupied={"Song.1.7": A},
                 valid_verse_keys={"Song.1.7", "Song.1.8"},
                 reviewed_sections=[section])
+
+
+
+class NativeRegistryTests(unittest.TestCase):
+    def test_exact_chapter_bounds_can_feed_generic_link_plan(self):
+        payload = (
+            b"M\tMHCC\tKJV\t1.9.0\tzCom\n"
+            b"R\tGen.36\t43\n"
+            b"R\tSong.1\t17\n"
+            b"S\t2\t60\n"
+        )
+        registry = parse_native_commentary_verse_registry(payload, "MHCC")
+        self.assertEqual(registry["chapter_count"], 2)
+        self.assertEqual(registry["chapter_maximums"]["Gen.36"], 43)
+        self.assertNotIn("Gen.36.44", registry["verse_keys"])
+        result = propose_commentary_links(
+            occupied={"Gen.36.1": A},
+            valid_verse_keys=registry["verse_keys"],
+            reviewed_sections=[source("Gen.36.1", [span("Gen.36", 1, 43)])]
+        )
+        self.assertEqual(result["added_alias_count"], 42)
+
+    def test_rejects_forged_registry_totals_or_duplicate_chapters(self):
+        for raw in (
+            b"M\tMHCC\tKJV\t1.9.0\tzCom\nR\tGen.36\t43\nS\t1\t44\n",
+            b"M\tMHCC\tKJV\t1.9.0\tzCom\nR\tGen.36\t43\nR\tGen.36\t43\nS\t2\t86\n",
+            b"M\tMHCC\tKJV\t1.9.0\tzCom\nR\tGen.36\t43\nS\t1\t43\n", # valid
+        ):
+            if raw.endswith(b"S\t1\t43\n") and raw.count(b"R\t") == 1:
+                parsed = parse_native_commentary_verse_registry(raw, "MHCC")
+                self.assertEqual(parsed["canonical_verse_count"], 43)
+            else:
+                with self.assertRaises(UnsafeCommentaryLinkPlan):
+                    parse_native_commentary_verse_registry(raw, "MHCC")
+
+    def test_mismatched_module_and_out_of_range_verses_blocked(self):
+        for raw in (
+            b"M\tMHC\tKJV\t1.9.0\tzCom\nR\tGen.36\t43\nS\t1\t43\n",
+            b"M\tMHCC\tKJV\t1.9.0\tzCom\nR\tGen.36\t1001\nS\t1\t1001\n",
+            b"M\tMHCC\tKJV\t1.9.0\tzCom\nR\tGen.36\t0\nS\t1\t0\n",
+        ):
+            with self.assertRaises(UnsafeCommentaryLinkPlan):
+                parse_native_commentary_verse_registry(raw, "MHCC")
 
 
 if __name__ == "__main__":
