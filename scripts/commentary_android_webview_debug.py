@@ -95,8 +95,10 @@ def read_private_official_andbible_dom_text() -> tuple[list[str], dict]:
         return [], result
     socket = "webview_devtools_remote_" + pids.decode("ascii")
     sockets = adb("shell", "cat", "/proc/net/unix", timeout=20, fail=False)
-    if not any(("@"+socket).encode("ascii") in line
-               for line in sockets.splitlines()):
+    if not any(
+        line.split() and line.split()[-1] == ("@" + socket).encode("ascii")
+        for line in sockets.splitlines()
+    ):
         return [], result
     result["actual_app_debug_socket_found"] = True
     port_text = adb(
