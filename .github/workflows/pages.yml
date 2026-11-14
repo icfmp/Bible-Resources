@@ -34,3 +34,11 @@ jobs:
         with:
           path: dist
       - uses: actions/deploy-pages@v4
+      - name: Verify live public HTTPS catalogue and all actual ZIP checksums
+        run: |
+          set -euo pipefail
+          python scripts/verify_public_catalogue.py \
+            --snapshot catalog/v1/catalog.json \
+            --base-url https://icfmp.github.io/Bible-Resources/ \
+            --attempts 8 --pause-seconds 8 \
+            --run-id "${{ github.run_id }}"
