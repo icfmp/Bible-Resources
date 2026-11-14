@@ -37,7 +37,7 @@ Think of the honor given to Abraham: he received God's promises. Anyone who has 
 
 Everyone who receives the Lord Jesus shares that honor.
 
-So let us enter our spiritual struggles trusting in his word and strength. Let us give his grace the credit for our victories, and seek his blessing wherever we go.
+So let us enter our spiritual struggles trusting in his word and strength. Let us give his grace the credit for our victories, and long for him to meet and bless us wherever we go.
 
 ## The enduring priesthood and better covenant of Christ (verses 11–25)
 
@@ -45,13 +45,13 @@ The Levitical priesthood could not bring perfection. Neither could the law on wh
 
 Another Priest has come, and with him a new dispensation through which true believers may be made perfect. The change is clear.
 
-The Levitical priests were weak and mortal. They could not save even their own lives, much less the souls of those who came to them.
+The law that established the Levitical priesthood showed how frail its priests were. They were mortal and could not save even their own lives, much less the souls of those who came to them.
 
 Christ is different. He holds his priesthood by the power of endless life within himself.
 
 He has that life not only to remain alive himself. Through his sacrifice and intercession, he also gives spiritual and eternal life to all who rely on him.
 
-Jesus is the Surety of a better covenant. Here, this covenant is not being contrasted with the covenant of works, under which every transgressor stands condemned.
+Jesus is the Surety of a better covenant. Here, this covenant is not being contrasted with the covenant of works, under which every transgressor is held under a curse.
 
 The contrast is with the covenant made with Israel at Sinai and the legal order under which the church had lived for so long.
 
@@ -61,7 +61,7 @@ Under Aaron there were many priests, and high priests succeeded one another. In 
 
 That is the believer's safety and happiness: our everlasting High Priest can save to the uttermost, at every time and in every circumstance.
 
-Surely our greater privileges should lead us to seek a spiritual life and holiness greater than that of Old Testament believers.
+Surely we should seek a spiritual life and holiness that surpass those of Old Testament believers as greatly as our privileges surpass theirs.
 
 ## The holiness of our High Priest and our hope in him (verses 26–28)
 
