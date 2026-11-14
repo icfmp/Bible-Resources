@@ -35,6 +35,7 @@ from commentary_stock_prefix_topology import (
     source_word_prefix_topology, stock_prefixed_source_body_concordance,
     single_word_stock_markup_diagnostic, stock_prefix_context_correspondence,
 )
+from commentary_chapter_ref_labels import link_label_location
 from commentary_xml_witness import _parse_reference, WORK_REF
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
 from pilot_fetch import ALLOWED_HOSTS, fetch
@@ -576,6 +577,7 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
     source_chapters = {}
     private_book_prefix_text = {}
     private_book_prefix_neighbors = {}
+    private_book_prefix_ref_links = {}
     explicit_source_chapters = {}
     ambiguous_source_heading_chapters = set()
     book_classes = Counter()
@@ -647,6 +649,16 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
             for node in element.iter()
             if isinstance(node.tag, str) and node.tag.rsplit("}", 1)[-1] == "p"
         )
+        private_book_prefix_ref_links[code] = [
+            {
+                "text": "".join(node.itertext()),
+                "attribute_name_types": list(node.attrib),
+                "private_original_osisRef_target": node.get("osisRef", ""),
+            }
+            for element in source_prefix_nodes for node in element.iter()
+            if isinstance(node.tag, str)
+            and node.tag.rsplit("}", 1)[-1] == "scripRef"
+        ]
         private_book_prefix_neighbors[code] = [
             ("source_div1_title_attribute", div1.get("title", "")),
             *(
@@ -729,6 +741,16 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
                 "source_div2_original_text_retained": True,
                 "source_div2_ordinal": chapter_number,
                 "_private_source_visible_text": "".join(div2.itertext()),
+                "_private_original_scripref_links": [
+                    {
+                        "text": "".join(node.itertext()),
+                        "attribute_name_types": list(node.attrib),
+                        "private_original_osisRef_target": node.get("osisRef", ""),
+                    }
+                    for node in div2.iter()
+                    if isinstance(node.tag, str)
+                    and node.tag.rsplit("}", 1)[-1] == "scripRef"
+                ],
                 "_private_source_neighbor_candidates": [
                     ("source_div2_title_attribute", div2.get("title", "")),
                     ("source_div1_title_attribute", div1.get("title", "")),
@@ -803,6 +825,7 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
             classification = "SOURCE_DIV2_UNDIVIDED_CHAPTER_BODY_CANDIDATE"
         classes[classification] += 1
         lexical = None
+        reference_targets = None
         if stock_unknown_raw and row["native_key"] in stock_unknown_raw:
             # For a source div2, compare that chapter's actual private source
             # unit; for a missing first div2, compare the prefix *as a probe*
@@ -827,8 +850,19 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
                     source_text, stock_unknown_raw[row["native_key"]],
                     source_neighbor_candidates=neighboring
                 )
+                source_links = (
+                    source["_private_original_scripref_links"] if source is not None
+                    else private_book_prefix_ref_links.get(chapter.split(".", 1)[0], [])
+                )
+                # The existing strict original-reference/stock-reference
+                # comparator verifies literal source target pairing without
+                # treating label resemblance as destination identity.
+                reference_targets = link_label_location(
+                    source_links, stock_unknown_raw[row["native_key"]]
+                )
         cases.append({
             "independent_lexical_comparison": lexical,
+            "independent_reference_target_comparison": reference_targets,
             "native_start": row["native_key"],
             "source_div2_structure_class": classification,
             "source_chapter_alignment_method": alignment_method,
