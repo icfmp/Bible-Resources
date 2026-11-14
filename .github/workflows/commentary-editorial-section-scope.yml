@@ -609,6 +609,32 @@ jobs:
                         "stock_plain_words_not_matched_in_exact_order") if overlap else None)
           print("Full source div2 chapter-scope classification:",
                 json.dumps(div2.get("candidate_classes",{}),sort_keys=True))
+          chapter_review=r["single_key_chapter_navigation_source_review_not_approved"]
+          assert chapter_review["status"]=="COMPLETE_SINGLE_KEY_CHAPTER_SCOPE_TRIAGE_NOT_APPROVAL"
+          assert chapter_review["original_single_key_chapter_candidates"]==118
+          assert chapter_review["any_new_aliases_created"] is False
+          assert chapter_review["source_prose_or_index_mutated"] is False
+          assert chapter_review["publication_authorized"] is False
+          print("Conservative original first-verse-only chapter triage:",
+                json.dumps(chapter_review["classes"],sort_keys=True),
+                "possible additional aliases ONLY after source and reader approval",
+                chapter_review["potential_total_new_chapter_aliases_if_every_scope_approved"],
+                "chapters with independently differing citation-target annotations",
+                chapter_review["source_reference_differences_needing_separate_review"],
+                "native original I introductions with visible text",
+                chapter_review["chapter_intro_prose_needing_independent_ownership_review"],
+                "native intro ownership not checked",
+                chapter_review["chapter_intro_owner_unchecked_count"])
+          for chapter_case in chapter_review["case_rows"]:
+              if chapter_case["classification"]!="INDEPENDENT_UNDIVIDED_CHAPTER_SCOPE_STRONGLY_CORROBORATED":
+                  print("Chapter navigation source review exception:",
+                        chapter_case["master_key"],chapter_case["classification"],
+                        "original master sha256",chapter_case["original_master_raw_sha256"],
+                        "original source unmatched words",
+                        chapter_case["independent_original_unmatched_words"],
+                        "native intro contains separate prose",
+                        chapter_case["original_native_chapter_intro_contains_visible_prose"])
+
           print("Independent source vs unchanged stock chapter-word diagnostic:",
                 json.dumps(div2.get("independent_stock_vs_source_lexical_diagnostic_classes",{}),sort_keys=True))
           print("Independent source vs unchanged stock ordered-word alignment:",
