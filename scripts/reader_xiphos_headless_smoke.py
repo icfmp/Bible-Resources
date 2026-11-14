@@ -284,7 +284,7 @@ def _capture_note_hover_sample(env:dict, out:Path) -> dict:
 def _navigation_commands(reference: str, mode: str) -> tuple[list[str], ...]:
     """Two ordinary Xiphos navigation methods, tested in isolated 1280x800 Xvfb.
 
-    Reference-entry mode uses the already visually attested navigation field
+    Reference-entry mode uses the visually observed Xiphos navigation field
     in the Xiphos header (center near x=754,y=120) after moving the window to
     (16,16) and resizing to 1216x736. This is not a global desktop action.
     """
@@ -296,7 +296,7 @@ def _navigation_commands(reference: str, mode: str) -> tuple[list[str], ...]:
         )
     if mode == "reference-entry":
         return (
-            ["xdotool", "mousemove", "--sync", "752", "121", "click", "1"],
+            ["xdotool", "mousemove", "752", "121", "click", "1"],
             ["xdotool", "key", "--clearmodifiers", "ctrl+a"],
             ["xdotool", "type", "--clearmodifiers", "--delay", "35", reference],
             ["xdotool", "key", "Return"],
