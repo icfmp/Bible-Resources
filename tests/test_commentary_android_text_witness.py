@@ -2,6 +2,7 @@
 from __future__ import annotations
 from pathlib import Path
 import sys
+import io
 import tempfile
 import subprocess
 import unittest
@@ -15,6 +16,7 @@ from commentary_android_text_witness import (
     _actual_android_webview_word_sequences,
     original_prose_in_real_android_webview,
     read_only_actually_occupied_original_entries,
+    full_native_original_prose_in_real_android_webview,
 )
 from pilot_preflight import PilotError
 from probe_andbible_android_emulator import PACKAGE
@@ -149,6 +151,68 @@ class AndroidOriginalProseWitnessTests(unittest.TestCase):
             with self.assertRaisesRegex(PilotError, "No actually occupied"):
                 read_only_actually_occupied_original_entries(
                     root, "MHCC", ["Gen 1:1", "John 3:16"], inspector,
+                )
+
+    @patch("commentary_android_text_witness.parse_native_raw_corpus")
+    @patch("commentary_android_text_witness.subprocess.Popen")
+    def test_full_authenticated_native_scan_can_match_unexpected_occupied_key(
+        self, popen, parser,
+    ):
+        from unittest.mock import Mock
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            executable = root / "native-corpus-reader"
+            executable.write_bytes(b"private compiled C++ scanner")
+            proc = Mock()
+            proc.stdout = io.BytesIO()
+            proc.wait.return_value = 0
+            proc.poll.return_value = 0
+            popen.return_value = proc
+            def stream(scan, *, on_entry):
+                on_entry("K", "Gen.1.1", b"<p>Short verse without sustained exposition</p>")
+                on_entry("K", "Obad.1.1", original(70))
+                on_entry("I", "Gen.1", original(70))
+                return ({
+                    "all_native_raw_entries_ordered_sha256": "a" * 64,
+                    "all_actual_raw_entries_scanned": 3,
+                }, [], [], [])
+            parser.side_effect = stream
+            prose = " ".join(
+                "authenticatedauthorialword%03d" % i for i in range(22, 40)
+            )
+            result = full_native_original_prose_in_real_android_webview(
+                root, "MHCC", executable, "a" * 64, real_webview(prose),
+            )
+        self.assertTrue(result["original_full_native_corpus_sha256_attested"])
+        self.assertEqual(result["actual_original_native_occupied_keys_scanned"], 3)
+        self.assertEqual(result["source_occupied_entries_with_16_consecutive_words_visible"], 1)
+        self.assertTrue(result["actual_original_authorial_prose_in_real_Android_WebView_verified"])
+        self.assertFalse(result["source_words_android_UI_XML_screenshots_or_ZIP_exported"])
+        self.assertNotIn("Obad", str(result))
+        self.assertNotIn("authenticatedauthorialword", str(result))
+        self.assertEqual(popen.call_count, 1)
+
+    @patch("commentary_android_text_witness.parse_native_raw_corpus")
+    @patch("commentary_android_text_witness.subprocess.Popen")
+    def test_full_corpus_digest_mismatch_never_passes_prose(self, popen, parser):
+        from unittest.mock import Mock
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            scanner = root / "native-reader"
+            scanner.write_bytes(b"private compiled C++ scanner")
+            proc = Mock()
+            proc.stdout = io.BytesIO()
+            proc.wait.return_value = 0
+            proc.poll.return_value = 0
+            popen.return_value = proc
+            parser.return_value = ({
+                "all_native_raw_entries_ordered_sha256": "b" * 64,
+                "all_actual_raw_entries_scanned": 29975,
+            }, [], [], [])
+            with self.assertRaisesRegex(PilotError, "digest"):
+                full_native_original_prose_in_real_android_webview(
+                    root, "MHCC", scanner, "a" * 64,
+                    real_webview("genuine Android user interface prose"),
                 )
 
     def test_untrusted_module_and_oversized_ui_fail_closed(self):
