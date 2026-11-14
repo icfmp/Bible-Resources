@@ -28,7 +28,9 @@ from commentary_osis_rebuild_preflight import (
     NativeOSISRebuildPreflight, compare_opaque_top_with_standard_compiler_fixture,
 )
 from commentary_osis_transport_probe import isolated_osis2mod_original_sample_roundtrip
-from commentary_osis_mixed_transport_probe import probe_original_mixed_transport
+from commentary_osis_mixed_transport_probe import (
+    probe_original_mixed_transport, probe_complete_original_transport
+)
 from commentary_osis_intro_transport_probe import probe_original_intro_transport
 from commentary_intro_chapter_text_review import (
     review_original_intro_against_numbered_chapter,
@@ -1304,7 +1306,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
           *, transport_sample_chapters: tuple[str, ...] = (),
           synthetic_intro_native_stream: Path | None = None,
           intro_sample_chapters: tuple[str, ...] = (),
-          mixed_sample_chapters: tuple[str, ...] = ()) -> dict:
+          mixed_sample_chapters: tuple[str, ...] = (),
+          full_transport: bool = False) -> dict:
     """Use exact SHA-pinned official stock, existing independently proved readers."""
     manifest = load_manifest(resource_id)
     if (len(mixed_sample_chapters) > 3
@@ -1379,6 +1382,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
         original_mixed_sample_set = set(mixed_sample_chapters)
         private_mixed_I = {}
         private_mixed_K = defaultdict(list)
+        private_full_I = {}
+        private_full_K = defaultdict(list)
         osis_rebuild_preflight = NativeOSISRebuildPreflight()
         original_opaque_top_records = []
         private_intro_text_raw_by_chapter = {}
@@ -1399,6 +1404,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 if kind == "U":
                     original_opaque_top_records.append(raw)
                 if kind == "I":
+                    if full_transport:
+                        private_full_I[ref] = raw
                     if (ref in original_mixed_sample_set
                             or ref in {ch.rsplit(".",1)[0] for ch in original_mixed_sample_set}):
                         private_mixed_I[ref] = raw
@@ -1413,6 +1420,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 chapter = ref.rsplit(".", 1)[0]
                 if chapter in original_mixed_sample_set:
                     private_mixed_K[chapter].append((ref, raw))
+                if full_transport:
+                    private_full_K[chapter].append((ref, raw))
                 if chapter in private_intro_text_raw_by_chapter:
                     digest = sha256(raw).hexdigest()
                     private_numbered_bodies_for_intro_chapter[chapter].setdefault(
@@ -1497,6 +1506,14 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 private_mixed_K[chapter],
                 scratch=scratch, native_raw_binary=raw_binary
             ))
+        full_probe = None
+        if full_transport:
+            full_dir = directory / "whole-original-private-transport"
+            full_dir.mkdir()
+            full_probe = probe_complete_original_transport(
+                private_full_I, private_full_K, original_opaque_top_records,
+                scratch=full_dir, native_raw_binary=raw_binary
+            )
         sample_probe = None
         if original_sample_chapter_set:
             observed_sample_chapters = {
@@ -1584,6 +1601,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 intro_transport_probes,
             "private_original_mixed_intro_and_numbered_osis2mod_roundtrips":
                 mixed_probes,
+            "private_complete_original_I_K_U_osis2mod_roundtrip":
+                full_probe,
             "native_rows_with_unrecognized_heading_or_xml": unparsed,
             **result,
             "explicit_heading_native_link_candidate_preflight": index_preflight,
@@ -1606,6 +1625,8 @@ def main(argv=None) -> int:
                         help="Original I-only chapter tests in private isolated zCom candidates")
     parser.add_argument("--temporary-original-mixed-chapters", nargs="*", default=[],
                         help="Strict private mixed original book I, chapter I and K native OSIS roundtrips")
+    parser.add_argument("--temporary-original-full-transport", action="store_true",
+                        help="Attempt isolated whole-original I/K OSIS compile and independent TOP reconciliation")
     parser.add_argument("--synthetic-intro-native-stream", type=Path,
                         help="Optional invented standalone OSIS compilation raw stream, compare TOP bytes only")
     parser.add_argument("--native-index-binary", type=Path, required=True)
@@ -1618,7 +1639,8 @@ def main(argv=None) -> int:
             transport_sample_chapters=tuple(args.temporary_numbered_sample_chapters),
             synthetic_intro_native_stream=args.synthetic_intro_native_stream,
             intro_sample_chapters=tuple(args.temporary_original_intro_sample_chapters),
-            mixed_sample_chapters=tuple(args.temporary_original_mixed_chapters)
+            mixed_sample_chapters=tuple(args.temporary_original_mixed_chapters),
+            full_transport=args.temporary_original_full_transport
         )
         code = 0
     except (OSError, RuntimeError, ValueError, zipfile.BadZipFile, RawCorpusError) as exc:
