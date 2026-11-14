@@ -54,3 +54,36 @@ Being identical to CrossWire MHCC 2.0 is a **provenance guarantee**, not an inst
 The independent diagnosis remains in PR #275. Prepare a generic read-only **link-plan validator** as the next step. After section-level editorial evidence and rights are checked, build an isolated SWORD candidate from reviewed standard commentary OSIS, run complete source-to-module parity and link readback, then test that chapter reading deduplicates commentary. Prefer an upstream CrossWire report where an actual upstream source/converter bug is confirmed.
 
 **Approval boundary:** project owner has authorized pursuing reader-first indexing even if it differs from CrossWire's design. This **does not** imply permission to change the published BRMHCC 0.1.0, release a revised module, or restart paused modern-English edition #270/#272.
+
+
+## Native index mutation feasibility — verified 2026-11-14
+
+The standard `osis2mod` route is experimentally supported: a synthetic,
+invented-content OSIS commentary compiled as `zCom` was read back by an
+independent stock libSWORD reader, proving that contiguous and disjoint
+`annotateRef` sections work and do not absorb another section in the gap.
+Evidence: [synthetic OSIS run #43622505845](https://github.com/icfmp/Bible-Resources/actions/runs/43622505845).
+
+The simpler **in-place compiled-index link** idea has a concrete limitation:
+the released libSWORD 1.9 zCom loaded through `SWMgr` is **read-only**.
+On an entirely invented synthetic module copy, the supported `isWritable()`
+check returned false, so public `linkEntry` could not be used safely.
+An explicit capability-gated test confirmed the original synthetic module's
+11 occupied native entries and all its compressed `.czz` records were
+unchanged. Evidence: [capability test #43623537818](https://github.com/icfmp/Bible-Resources/actions/runs/43623537818).
+Do **not** change raw `.czv/.czs` index bytes outside a documented SWORD
+writer or attempt a bypass of the read-only guard.
+
+Therefore the next candidate must use an **officially supported writer or
+a newly compiled, separately identified, reviewed OSIS source**, followed
+by strict full original/proposed content, markup, introductions, notes,
+references and native-verse readback parity. Replacing the original
+CrossWire compressed corpus with unverified CCEL text is not allowed.
+A new compiled module with same words is not by itself proof of equal
+authorial edition or preserved original markup.
+
+This is a technical route decision, **not** editorial approval or permission
+to publish. The 17/24 explicit section-index anomalies and 118 whole-chapter
+reader-navigation proposals still require their own reviewed scopes,
+unchanged original provenance, deduplicated reader UX and separate release
+approval.
