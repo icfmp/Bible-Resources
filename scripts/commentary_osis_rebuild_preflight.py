@@ -37,6 +37,8 @@ class NativeOSISRebuildPreflight:
         self.xml_attributes = Counter()
         self.digest_to_keys = defaultdict(list)
         self.opaque_digests = set()
+        self.opaque_length_counts = Counter()
+        self.native_intro_key_classes = Counter()
 
     @staticmethod
     def _safe_parser():
@@ -61,7 +63,21 @@ class NativeOSISRebuildPreflight:
             raise ValueError("Binary numbered or intro payload cannot be XML-wrapped")
         # A rejected frame must not advance any source inventory counter.
         self.count[kind] += 1
+        if kind == "I":
+            if ref.endswith(".0.0"):
+                self.native_intro_key_classes["book_intro_key"] += 1
+            elif ref.endswith(".0"):
+                self.native_intro_key_classes["chapter_intro_key"] += 1
+            else:
+                self.native_intro_key_classes["other_intro_key"] += 1
         if kind == "U":
+            self.opaque_length_counts[len(raw)] += 1
+            if not raw:
+                self.shape["opaque_top_empty_raw_entry"] += 1
+            elif not raw.strip():
+                self.shape["opaque_top_whitespace_only_raw_entry"] += 1
+            else:
+                self.shape["opaque_top_nonempty_raw_entry"] += 1
             self.opaque_digests.add(sha256(raw).hexdigest())
             self.blockers["opaque_top_record_requires_distinct_preservation_plan"] += 1
             return
@@ -164,6 +180,12 @@ class NativeOSISRebuildPreflight:
             "same_raw_payload_across_book_group_count": multi_book,
             "same_raw_payload_shared_by_intro_and_numbered_keys_count": k_i_shared,
             "opaque_top_distinct_digest_count": len(self.opaque_digests),
+            "opaque_top_original_raw_length_counts": {
+                str(size): count for size, count
+                in sorted(self.opaque_length_counts.items())
+            },
+            "intro_original_native_key_class_counts":
+                dict(sorted(self.native_intro_key_classes.items())),
             "original_markup_shape_counts": dict(sorted(self.shape.items())),
             "blocking_or_unresolved_structure_counts": dict(sorted(self.blockers.items())),
             "original_element_counts_by_name": dict(sorted(self.tags.items())),
