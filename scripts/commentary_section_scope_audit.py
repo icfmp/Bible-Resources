@@ -24,6 +24,9 @@ import zipfile
 from lxml import etree
 
 from commentary_intake import load_manifest
+from commentary_navigation_link_plan import (
+    parse_native_commentary_verse_registry, UnsafeCommentaryLinkPlan
+)
 from commentary_xml_witness import _parse_reference, WORK_REF
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
 from pilot_fetch import ALLOWED_HOSTS, fetch
@@ -642,6 +645,27 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         )
         if independent.returncode or len(independent.stdout) > 12 * 1024 * 1024:
             raise PilotError("Independent stock SWORD index read failed")
+        registry_run = subprocess.run(
+            [str(index_binary), manifest["module_id"], "--chapter-registry"],
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+            env=env, timeout=75, check=False
+        )
+        if registry_run.returncode or len(registry_run.stdout) > 256 * 1024:
+            raise PilotError("Independent native versification chapter registry unavailable")
+        try:
+            registry = parse_native_commentary_verse_registry(
+                registry_run.stdout, manifest["module_id"]
+            )
+        except UnsafeCommentaryLinkPlan:
+            raise PilotError("Native versification registry invalid") from None
+        original_header = independent.stdout.splitlines()[0].split(b"\t")
+        if (len(original_header) != 5
+                or original_header[0] != b"M"
+                or original_header[1].decode("ascii") != manifest["module_id"]
+                or original_header[2].decode("ascii") != registry["versification"]
+                or original_header[3].decode("ascii") != registry["engine_version"]
+                or original_header[4].decode("ascii") != registry["driver"]):
+            raise PilotError("Independent native index and registry module identity differ")
         rows = []
         records = {}
         unparsed = 0
@@ -686,6 +710,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         actual_raw = summary["all_native_raw_entries_ordered_sha256"]
         if not expected_raw or expected_raw != actual_raw:
             raise PilotError("Original full native corpus hash drift")
+        if set(records) - registry["verse_keys"]:
+            raise PilotError("Stock native occupied key escaped independent versification registry")
         result = classify(records)
         unknown = audit_unrecognized_slots(records)
         if unknown["total"] != result["counts"]["no_recognized_heading"]:
@@ -693,11 +719,39 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         witness = compare_independent_thml_witness(
             manifest, result["start_anchored_section_map"],
             result["anomalies"], directory, unknown["case_rows"])
+        # A native single-key chapter plus an independently corroborated
+        # source division still needs explicit editorial signoff. These are
+        # chapter-limit *measurements*, not link insertion instructions.
+        chapter_sizing = []
+        for row in witness["independent_whole_chapter_review"]["case_rows"]:
+            chapter = row["candidate_chapter"]
+            maximum = registry["chapter_maximums"].get(chapter)
+            if maximum is None or maximum < 1:
+                raise PilotError("Source chapter candidate absent from actual SWORD versification")
+            chapter_sizing.append({
+                "chapter": chapter,
+                "native_verse_max": maximum,
+                "potential_new_navigation_keys_not_editorially_approved": maximum - 1,
+                "independent_source_class": row["witness_class"],
+            })
         return {
             "schema_version": 1,
             "status": "COMPLETE_NATIVE_SCAN_EDITORIAL_TRIAGE_NOT_APPROVAL",
             "resource_id": resource_id, "original_zip_sha256": downloaded["sha256"],
             "original_native_raw_sha256": actual_raw,
+            "native_versification_registry": {
+                "name": registry["versification"],
+                "libSWORD_version": registry["engine_version"],
+                "canonical_chapters": registry["chapter_count"],
+                "canonical_verse_keys": registry["canonical_verse_count"],
+                "original_occupied_numbered_keys_within_registry": True,
+                "candidate_single_key_chapter_sizing": chapter_sizing,
+                "candidate_new_navigation_keys_if_all_chapters_approved": sum(
+                    row["potential_new_navigation_keys_not_editorially_approved"]
+                    for row in chapter_sizing
+                ),
+                "navigation_changes_approved": False,
+            },
             "native_numbered_rows": len(keys),
             "native_intro_rows": len(intros), "native_top_rows": len(top),
             "native_full_key_crosscheck": proof["exact_all_occupied_stock_keys_read_and_crosschecked"],
