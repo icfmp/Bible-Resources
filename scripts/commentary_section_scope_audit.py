@@ -28,6 +28,7 @@ from commentary_osis_rebuild_preflight import (
     NativeOSISRebuildPreflight, compare_opaque_top_with_standard_compiler_fixture,
 )
 from commentary_osis_transport_probe import isolated_osis2mod_original_sample_roundtrip
+from commentary_osis_intro_transport_probe import probe_original_intro_transport
 from commentary_intro_chapter_text_review import (
     review_original_intro_against_numbered_chapter,
     independent_thml_chapter_intro_witness,
@@ -1300,9 +1301,15 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
 
 def audit(resource_id: str, index_binary: Path, raw_binary: Path,
           *, transport_sample_chapters: tuple[str, ...] = (),
-          synthetic_intro_native_stream: Path | None = None) -> dict:
+          synthetic_intro_native_stream: Path | None = None,
+          intro_sample_chapters: tuple[str, ...] = ()) -> dict:
     """Use exact SHA-pinned official stock, existing independently proved readers."""
     manifest = load_manifest(resource_id)
+    if (len(intro_sample_chapters) > 4
+            or len(set(intro_sample_chapters)) != len(intro_sample_chapters)
+            or any(re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9]\d*", ref) is None
+                   for ref in intro_sample_chapters)):
+        raise PilotError("Unreviewed or excessive original introduction transport chapters")
     if (len(transport_sample_chapters) > 6
             or len(set(transport_sample_chapters)) != len(transport_sample_chapters)
             or any(re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9]\d*",
@@ -1449,6 +1456,19 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             raise PilotError("Original full native corpus hash drift")
         if set(records) - registry["verse_keys"]:
             raise PilotError("Stock native occupied key escaped independent versification registry")
+        intro_transport_probes = []
+        for i, chapter in enumerate(intro_sample_chapters):
+            original_intro_raw = private_intro_text_raw_by_chapter.get(chapter)
+            if original_intro_raw is None:
+                raise PilotError("Original text-bearing I entry is absent from chapter intro")
+            subdir = directory / f"sample-original-intro-{i}"
+            subdir.mkdir()
+            intro_transport_probes.append(
+                probe_original_intro_transport(
+                    chapter, original_intro_raw,
+                    scratch=subdir, native_raw_binary=raw_binary
+                )
+            )
         sample_probe = None
         if original_sample_chapter_set:
             observed_sample_chapters = {
@@ -1532,6 +1552,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             "synthetic_compiler_opaque_top_original_exact_byte_comparison":
                 synthetic_opaque_top_comparison,
             "private_numbered_only_osis2mod_sample_roundtrip": sample_probe,
+            "private_original_intro_only_osis2mod_sample_roundtrips":
+                intro_transport_probes,
             "native_rows_with_unrecognized_heading_or_xml": unparsed,
             **result,
             "explicit_heading_native_link_candidate_preflight": index_preflight,
@@ -1550,6 +1572,8 @@ def main(argv=None) -> int:
     parser.add_argument("--resource-id", required=True)
     parser.add_argument("--temporary-numbered-sample-chapters", nargs="*", default=[],
                         help="Read-only selected original chapters, temporary private OSIS conversion")
+    parser.add_argument("--temporary-original-intro-sample-chapters", nargs="*", default=[],
+                        help="Original I-only chapter tests in private isolated zCom candidates")
     parser.add_argument("--synthetic-intro-native-stream", type=Path,
                         help="Optional invented standalone OSIS compilation raw stream, compare TOP bytes only")
     parser.add_argument("--native-index-binary", type=Path, required=True)
@@ -1560,7 +1584,8 @@ def main(argv=None) -> int:
         result = audit(
             args.resource_id, args.native_index_binary, args.native_raw_binary,
             transport_sample_chapters=tuple(args.temporary_numbered_sample_chapters),
-            synthetic_intro_native_stream=args.synthetic_intro_native_stream
+            synthetic_intro_native_stream=args.synthetic_intro_native_stream,
+            intro_sample_chapters=tuple(args.temporary_original_intro_sample_chapters)
         )
         code = 0
     except (OSError, RuntimeError, ValueError, zipfile.BadZipFile, RawCorpusError) as exc:
