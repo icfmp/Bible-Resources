@@ -6,6 +6,7 @@ on:
       - ".github/workflows/darby-private-repaired-sword.yml"
       - "scripts/probe_private_repaired_darby_sword.py"
       - "scripts/reader_xiphos_headless_smoke.py"
+      - "tests/test_reader_xiphos_reference_navigation.py"
       - "scripts/repair_osis_note_links.py"
       - "scripts/repair_osis_inline_markup.py"
       - "scripts/repair_osis_source_bytes.py"
@@ -15,6 +16,10 @@ on:
       - "config/darby-0.1.1.conf"
       - "scripts/prepare_darby_011_private_release_candidate.py"
       - "tests/test_prepare_darby_011_private_release_candidate.py"
+      - "scripts/probe_darby_011_final_android.py"
+      - "tests/test_probe_darby_011_final_android.py"
+      - "scripts/probe_andbible_android_private_import.py"
+      - "scripts/reader_xiphos_headless_smoke.py"
       - "scripts/repair_osis_paragraph_indentation.py"
       - "tests/test_repair_osis_paragraph_indentation.py"
       - "scripts/source_native_division_markers.py"
@@ -30,7 +35,7 @@ permissions:
 jobs:
   private-native-reader:
     runs-on: ubuntu-24.04
-    timeout-minutes: 32
+    timeout-minutes: 45
     env:
       PYTHONPATH: scripts
     steps:
@@ -39,8 +44,22 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
       - name: Install bounded source audit dependencies
-        run: python -m pip install -r requirements.txt
+        run: |
+          python -m pip install -r requirements.txt
+          python -m unittest discover -s tests -p test_probe_darby_011_final_android.py -v
+          python -m unittest discover -s tests -p test_reader_xiphos_reference_navigation.py -v
+      - name: Download and checksum-lock official stable AndBible 5.1.1117 APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/darby-private-native/android-final-review"                    "$RUNNER_TEMP/darby-private-native/xiphos-final-review"
+          curl --fail --location --retry 2 --max-time 120             -o "$RUNNER_TEMP/darby-private-native/andbible-production-1117.apk"             https://github.com/AndBible/and-bible/releases/download/production-1117/andbible-production-1117.apk
+          echo "1c9ed93391642c0de4529065a65e10eb44242d60722231b917b14c5919cdf796  $RUNNER_TEMP/darby-private-native/andbible-production-1117.apk" | sha256sum --check --status
       - name: Run established source-only technical repair tests
         shell: bash
         run: |
@@ -61,7 +80,11 @@ jobs:
           timeout 150s sudo apt-get -o Acquire::Retries=1 update -qq
           timeout 180s sudo apt-get -o Acquire::Retries=1 install -y \
             libsword-dev libsword-utils diatheke subversion cmake ninja-build \
-            zlib1g-dev libbz2-dev liblzma-dev libicu-dev libcurl4-openssl-dev
+            zlib1g-dev libbz2-dev liblzma-dev libicu-dev libcurl4-openssl-dev             xiphos xvfb dbus-x11 xdotool locales imagemagick
+          sudo sed -i 's/^# *fr_FR.UTF-8 UTF-8/fr_FR.UTF-8 UTF-8/' /etc/locale.gen
+          sudo locale-gen fr_FR.UTF-8
+          echo 'LANG=fr_FR.UTF-8' >> "$GITHUB_ENV"
+          echo 'LC_ALL=fr_FR.UTF-8' >> "$GITHUB_ENV"
           mkdir -p "$RUNNER_TEMP/darby-private-native"
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_index.cpp \
             -o "$RUNNER_TEMP/darby-private-native/native-index" -lsword
@@ -118,6 +141,75 @@ jobs:
             --private-output-dir "$RUNNER_TEMP/darby-private-native/final-011-candidate"
           grep -Fx 'Version=0.1.0' modules/darby-jnd-2024/payload/mods.d/brjnd2024.conf
           echo "Existing 0.1.0 remains untouched; candidate ZIP is private."
+      - name: Capture actual final-ID 0.1.1 ZIP in isolated Xiphos (no publication)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          from reader_xiphos_headless_smoke import smoke
+          os.environ["LANG"]="en_US.UTF-8"
+          os.environ["LC_ALL"]="en_US.UTF-8"
+          base=Path(os.environ["RUNNER_TEMP"])/"darby-private-native"
+          final=base/"final-011-candidate"
+          report=json.loads((final/"metadata-only-report.json").read_text())
+          archive=final/"BRJND2024-0.1.1.zip"
+          out=base/"xiphos-final-review"
+          result=smoke(
+              archive, "BRJND2024", report["private_final_candidate_sword_zip_sha256"],
+              "Luther", 12, screenshot=out/"xiphos-startup.png",
+              study_dir=out/"study-samples",
+              navigation_mode="reference-entry",
+              supplemental_samples=(
+                  ("final-genesis-6-9", "Gen 6:9"),
+                  ("final-genesis-6-13", "Gen 6:13"),
+                  ("final-genesis-7-17", "Gen 7:17"),
+                  ("final-psalm-3-1", "Ps 3:1"),
+                  ("final-job-3-1", "Job 3:1"),
+              ),
+          )
+          if (result["status"]!="headless_xiphos_running_after_bounded_startup"
+                  or not result["sha256_verified"]
+                  or not result["isolated_standard_ztext_package"]
+                  or len(result["supplemental_source_case_screenshots"]) != 5
+                  or len(set(s["screenshot_sha256"] for s in result["supplemental_source_case_screenshots"])) != 5):
+              raise SystemExit("Actual final-ID Xiphos capture gate incomplete")
+          result["tested_exact_private_final_zip_sha256"]=report["private_final_candidate_sword_zip_sha256"]
+          result["tested_internal_sword_module_id"]="BRJND2024"
+          result["tested_version"]="0.1.1"
+          result["independent_screenshot_pixels_reviewed"]=False
+          result["published"]=False
+          (out/"safe-report.json").write_text(json.dumps(result,sort_keys=True,indent=2)+"\n")
+          print("Xiphos captured on exact finalized 0.1.1 private ZIP; visual review remains required")
+          PY
+      - name: Allow disposable Android emulator hardware acceleration
+        shell: bash
+        run: |
+          if test -c /dev/kvm; then sudo chmod 666 /dev/kvm; fi
+      - name: Import exact final BRJND2024 0.1.1 ZIP in official stable AndBible emulator
+        uses: ReactiveCircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: 35
+          target: default
+          arch: x86_64
+          profile: pixel_4
+          cores: 4
+          ram-size: 4096M
+          heap-size: 512M
+          disable-animations: true
+          emulator-boot-timeout: 600
+          script: python scripts/probe_darby_011_final_android.py --final-zip "$RUNNER_TEMP/darby-private-native/final-011-candidate/BRJND2024-0.1.1.zip" --metadata "$RUNNER_TEMP/darby-private-native/final-011-candidate/metadata-only-report.json" --apk "$RUNNER_TEMP/darby-private-native/andbible-production-1117.apk" --evidence-dir "$RUNNER_TEMP/darby-private-native/android-final-review" --report "$RUNNER_TEMP/darby-private-native/android-final-review/safe-report.json"
+      - name: Upload research-only Xiphos and Android reader screenshots (never SWORD ZIP)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: darby-011-exact-final-reader-captures-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/darby-private-native/xiphos-final-review/
+            ${{ runner.temp }}/darby-private-native/android-final-review/
+          retention-days: 7
+          if-no-files-found: warn
       - name: Upload only metadata and checksums, never module or Bible text
         uses: actions/upload-artifact@v4
         with:
