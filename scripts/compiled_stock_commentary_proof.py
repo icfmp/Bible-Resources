@@ -52,6 +52,12 @@ def compiled_stock_commentary_errors(module_dir: Path, root: Path,
     if not isinstance(manifest, dict):
         return [f"{module_dir.name}: [STOCK_SOURCE_IDENTITY_INVALID] Manifest not an object"]
     issues = []
+    upstreams = metadata.get("upstreams")
+    if (not isinstance(upstreams, list) or len(upstreams) != 1
+            or not isinstance(upstreams[0], dict)):
+        return [f"{module_dir.name}: [STOCK_SOURCE_PROOF_INVALID] "
+                "One reviewed original SWORD upstream is required"]
+    upstream = upstreams[0]
     def check(condition: bool, label: str):
         if not condition:
             issues.append(f"{module_dir.name}: [STOCK_SOURCE_PROOF_INVALID] {label}")
@@ -77,7 +83,7 @@ def compiled_stock_commentary_errors(module_dir: Path, root: Path,
     for name, val in expected.items():
         check(proof.get(name) == val, name)
     check(manifest.get("category") == "commentary", "original category")
-    check(manifest.get("provider") == metadata.get("upstreams", [{}])[0].get("provider"),
+    check(manifest.get("provider") == upstream.get("provider"),
           "original provider")
     check(manifest.get("source_page_url") == metadata["origin"]["url"],
           "origin URL does not match original evidence")
@@ -86,15 +92,16 @@ def compiled_stock_commentary_errors(module_dir: Path, root: Path,
     check(metadata["rights"]["license"] == "Public Domain", "original licence modified")
     check(conf.get("DistributionLicense") == "Public Domain", "SWORD licence changed")
     check(conf.get("ModDrv") == "zCom", "driver must remain original zCom")
+    check(conf.get("SourceType") == "OSIS", "original compiled source-type metadata")
     check(conf.get("Versification") == "KJV", "original versification changed")
-    check(metadata.get("upstreams", [{}])[0].get("module_id")
+    check(upstream.get("module_id")
           == manifest.get("module_id"), "upstream SWORD identity")
-    check(metadata.get("upstreams", [{}])[0].get("last_integrated_version")
+    check(upstream.get("last_integrated_version")
           == manifest.get("version"), "upstream version")
-    check(metadata.get("upstreams", [{}])[0].get("last_integrated_conf_sha256")
+    check(upstream.get("last_integrated_conf_sha256")
           == manifest.get("stock_conf_sha256"), "upstream conf hash")
-    check(proof.get("native_key_count", 0) > 0
-          and type(proof.get("native_key_count")) is int, "native key count")
+    check(type(proof.get("native_key_count")) is int
+          and proof["native_key_count"] > 0, "native key count")
     for name in ("upstream_archive_sha256", "upstream_conf_sha256",
                  "native_raw_corpus_sha256", "curated_conf_sha256"):
         check(isinstance(proof.get(name), str)
