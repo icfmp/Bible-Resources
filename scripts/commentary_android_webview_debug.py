@@ -48,9 +48,12 @@ def _read_only_debugger_body(url: str, port: int) -> str:
     # Only the pinned CI runner's Android job installs this small client.
     # Unit tests of safety and transcript parsing need no third-party socket.
     import websocket
-    connection = websocket.create_connection(
-        url, timeout=8, origin="http://localhost",
-    )
+    try:
+        connection = websocket.create_connection(
+            url, timeout=8, origin="http://localhost",
+        )
+    except (websocket.WebSocketException, OSError, TimeoutError) as exc:
+        raise PilotError("Private Android WebView debugger connection unreadable") from exc
     try:
         connection.settimeout(8)
         connection.send(json.dumps({
@@ -72,6 +75,9 @@ def _read_only_debugger_body(url: str, port: int) -> str:
             value = message.get("result", {}).get("result", {}).get("value")
             return value if isinstance(value, str) and len(value) <= MAX_CDP_BODY else ""
         return ""
+    except (websocket.WebSocketException, OSError, TimeoutError,
+            json.JSONDecodeError) as exc:
+        raise PilotError("Private Android WebView debugger response unavailable") from exc
     finally:
         connection.close()
 
