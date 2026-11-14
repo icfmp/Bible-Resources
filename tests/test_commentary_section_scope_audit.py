@@ -373,10 +373,10 @@ class SourceDivisionChapterTests(unittest.TestCase):
             result["independent_source_div2_text_bearing_native_intro_reviews"][0]["classification"],
             "INDEPENDENT_DIGITAL_EDITION_CHAPTER_LOCATION_CORROBORATED"
         )
-        self.assertFalse(
+        self.assertTrue(
             result["independent_source_div2_text_bearing_native_intro_reviews"][0][
                 "is_not_source_edition_or_authorial_chapter_approval"
-            ] is False
+            ]
         )
 
     def test_conflicting_intro_book_identity_never_corroborates_ordinal_only(self):
