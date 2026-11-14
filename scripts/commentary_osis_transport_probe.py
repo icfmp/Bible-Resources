@@ -151,7 +151,10 @@ def build_numbered_transport_sample(entries: list[tuple[str, bytes]],
         "contiguous_identical_raw_body_groups": len(groups),
         "groups_with_multiple_original_native_verse_keys":
             sum(group["native_key_count"] > 1 for group in groups),
-        "source_original_raw_bytes_included_verbatim": total_bytes,
+        "source_original_raw_bytes_in_reviewed_input": total_bytes,
+        "source_original_raw_bytes_included_verbatim_in_osis": sum(
+            len(group["raw"]) for group in groups
+        ),
         "temporary_osis_bytes": len(xml),
         "source_unmodified_unicode_visible_text_in_syntax_approved_osis": True,
         "original_introductions_preserved_in_candidate": False,
