@@ -11,7 +11,8 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 from commentary_native_raw_inventory import (
-    private_crosscheck, NativeCommentaryMarkupCensus, MAX_RAW_MARKUP_BYTES
+    private_crosscheck, NativeCommentaryMarkupCensus, MAX_RAW_MARKUP_BYTES,
+    original_osisref_form,
 )
 from pilot_preflight import PilotError
 from sword_native_raw_corpus_inventory import parse_native_raw_corpus,RawCorpusError
@@ -155,6 +156,74 @@ class OriginalCommentaryMarkupCensusTests(unittest.TestCase):
         ):
             with self.assertRaisesRegex(PilotError, "Unreviewed"):
                 census.observe(invalid_kind, invalid_key, invalid_content)
+
+
+
+class OriginalCommentaryLinkFormTests(unittest.TestCase):
+    def test_common_original_target_forms_are_observations_not_verse_validation(self):
+        samples = {
+            "Gen.1.1": "single_osis_verse",
+            "1John.3.16": "single_osis_verse",
+            "Bible:Ps.119.176": "single_osis_verse",
+            "Exod.3.1-Exod.3.5": "verse_range_like",
+            "Bible:Exod.3.1-5": "verse_range_like",
+            "Matt": "book_or_chapter_like",
+            "Matt.5": "book_or_chapter_like",
+            "Luke.2.1,3": "compound_target",
+            "Bible:Luke.2.1 Luke.2.2": "compound_target",
+            "KJV:Luke.3.3": "other_unclassified",
+            "Gen.1.1!note": "other_unclassified",
+            "Gen.1.0": "other_unclassified",
+        }
+        for target, category in samples.items():
+            with self.subTest(category=category):
+                self.assertEqual(original_osisref_form(target), category)
+        with self.assertRaisesRegex(PilotError, "absent"):
+            original_osisref_form("")
+
+    def test_complete_reference_label_title_inventory_has_no_source_leak(self):
+        audit = NativeCommentaryMarkupCensus()
+        audit.observe("K", "Gen.1.1", (
+            b"<title>Private authored chapter title</title>"
+            b"<title> </title>"
+            b'<reference osisRef="Bible:Gen.2.1">Original citation prose</reference>'
+            b'<reference osisRef="Ps.3.1-Ps.3.5"><hi>Next</hi> original label</reference>'
+            b'<reference osisRef="1John.2"> </reference>'
+            b'<reference osisRef="Some:unknownTarget">Unexpected reference</reference>'
+            b'<reference osisRef="Gen.1.1,Gen.1.2">Compound</reference>'
+            b'<reference osisRef="Gen.2.2"/>'
+            b'<reference>Missing source target</reference>'
+        ))
+        report = audit.report(1)
+        self.assertEqual(report["reference_elements_with_osisref_attribute"], 6)
+        self.assertEqual(report["reference_elements_without_osisref_attribute"], 1)
+        self.assertEqual(report["original_reference_elements_with_literal_Bible_work_prefix"], 1)
+        self.assertEqual(report["original_reference_labels_with_visible_text"], 5)
+        self.assertEqual(report["original_reference_labels_without_visible_text"], 2)
+        self.assertEqual(report["original_title_elements_with_visible_text"], 1)
+        self.assertEqual(report["original_title_elements_without_visible_text"], 1)
+        self.assertEqual(report["original_osisref_form_count_by_fixed_category"], {
+            "single_osis_verse": 2, "verse_range_like": 1,
+            "book_or_chapter_like": 1, "compound_target": 1,
+            "other_unclassified": 1,
+        })
+        self.assertTrue(report["no_osisref_value_normalization_or_verse_existence_claim"])
+        serialized=json.dumps(report)
+        for original in ("Gen.2.1", "Some:unknownTarget", "Original citation",
+                         "Private authored", "Missing source", "Some:", "Gen.1.1"):
+            self.assertNotIn(original, serialized)
+
+    def test_unknown_osis_reference_attribute_is_classified_without_correction(self):
+        census = NativeCommentaryMarkupCensus()
+        census.observe("K", "Rev.22.1",
+                       b'<reference osisRef="A deliberately odd source target">'
+                       b'Original words in the source</reference>')
+        summary = census.report(1)
+        self.assertEqual(summary["original_osisref_form_count_by_fixed_category"]
+                         ["compound_target"], 1)
+        self.assertTrue(summary["no_original_source_bytes_rewritten"])
+        self.assertNotIn("deliberately", str(summary))
+
 
 
 if __name__=="__main__":
