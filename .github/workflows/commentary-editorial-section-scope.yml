@@ -8,8 +8,10 @@ on:
       - 'scripts/commentary_osis_rebuild_preflight.py'
       - 'scripts/commentary_intro_chapter_text_review.py'
       - 'scripts/commentary_osis_intro_transport_probe.py'
+      - 'scripts/commentary_osis_mixed_transport_probe.py'
       - 'scripts/commentary_osis_transport_probe.py'
       - 'tests/test_commentary_osis_intro_transport_probe.py'
+      - 'tests/test_commentary_osis_mixed_transport_probe.py'
       - 'tests/test_commentary_intro_chapter_text_review.py'
       - 'tests/test_commentary_section_scope_audit.py'
       - 'tests/test_commentary_osis_transport_probe.py'
@@ -51,6 +53,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_commentary_intro_chapter_text_review.py' -v
           python -m unittest discover -s tests -p 'test_commentary_osis_transport_probe.py' -v
           python -m unittest discover -s tests -p 'test_commentary_osis_intro_transport_probe.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_osis_mixed_transport_probe.py' -v
       - name: Install stable upstream native SWORD library
         run: |
           set -euo pipefail
@@ -228,6 +231,7 @@ jobs:
             --report "${RUNNER_TEMP}/editorial-scope.json" \
             --temporary-numbered-sample-chapters Gen.36 Matt.13 Song.1 \
             --temporary-original-intro-sample-chapters Lev.19 Ps.108 \
+            --temporary-original-mixed-chapters 2John.1 \
             --synthetic-intro-native-stream "${RUNNER_TEMP}/synthetic-introductions/native.raw"
       - name: Summarize scope and known regression probes without original text
         run: |
@@ -319,6 +323,17 @@ jobs:
                 json.dumps(transport["intro_original_native_key_class_counts"],sort_keys=True))
           print("Original book/chapter introduction top-level XML element names:",
                 json.dumps(transport["intro_original_top_level_element_counts"],sort_keys=True))
+          for sample in r["private_original_mixed_intro_and_numbered_osis2mod_roundtrips"]:
+              print("Private original mixed I+K transport",sample["chapter"],
+                    "status",sample["status"],"completed",sample.get("readback_completed",False),
+                    "original I",json.dumps(sample.get("source_original_intro_I_coverage",{}),sort_keys=True),
+                    "original K",json.dumps(sample.get("source_original_K_coverage",{}),sort_keys=True),
+                    "missing original I",json.dumps(sample.get("original_I_keys_missing_from_compiled",[])),
+                    "missing original K",json.dumps(sample.get("original_K_keys_missing_from_compiled",[])),
+                    "unexpected K",json.dumps(sample.get("unexpected_compiled_K_keys",[])))
+              assert sample["published"] is False
+              if not sample.get("readback_completed",False):
+                  raise AssertionError("Private original mixed source OSIS transport failed")
           for sample in r["private_original_intro_only_osis2mod_sample_roundtrips"]:
               print("Isolated actual original I transport proof",sample["original_native_intro_key"],
                     "modes",json.dumps(sample["test_only_modes"],sort_keys=True),
