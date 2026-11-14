@@ -314,7 +314,7 @@ def independent_chapter_scope_evidence(document, unrecognized_cases: list[dict])
         if kind != "work_qualified_chapter":
             continue
         m = WORK_REF.fullmatch(original_ref)
-        if m is None or not re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9]\\d*", m.group(2)):
+        if m is None or not re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9]\d*", m.group(2)):
             continue
         chapter = m.group(2)
         source_marker_counts["complete_chapter_marker_occurrences"] += 1
@@ -363,8 +363,8 @@ def independent_chapter_scope_evidence(document, unrecognized_cases: list[dict])
     grouped_by_book = defaultdict(Counter)
     candidates = [
         row for row in (unrecognized_cases or [])
-        if row["first_verse_in_chapter"]
-        and row["number_of_occupied_native_slots_in_chapter"] == 1
+        if row.get("first_verse_in_chapter", False)
+        and row.get("number_of_occupied_native_slots_in_chapter") == 1
     ]
     seen = set()
     for row in candidates:
