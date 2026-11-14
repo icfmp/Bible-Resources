@@ -163,3 +163,127 @@ def build_numbered_transport_sample(entries: list[tuple[str, bytes]],
         "authorial_scope_approved": False,
         "no_publication": True,
     }
+
+
+def isolated_osis2mod_original_sample_roundtrip(
+    entries: list[tuple[str, bytes]], *, scratch, native_raw_binary,
+    osis2mod_binary="osis2mod", work_id="BRTransportProbe"
+) -> dict:
+    """Compile ONLY temporary K samples and privately compare native readbacks.
+
+    The original module is never opened as a writable target. Original I/TOP
+    and original metadata are omitted by definition, so even an exact K sample
+    match is not an authorial, publication or complete edition parity proof.
+    """
+    from io import BytesIO
+    import os
+    from pathlib import Path
+    import subprocess
+    from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+
+    scratch = Path(scratch)
+    reader = Path(native_raw_binary)
+    if (not scratch.is_dir() or scratch.is_symlink()
+            or not reader.is_file() or reader.is_symlink()):
+        raise ValueError("Unverified isolated sample directory or native inspector")
+    raw_osis, original_report = build_numbered_transport_sample(
+        entries, work_id=work_id
+    )
+    root = scratch / "temporary-numbered-transport"
+    if root.exists() or root.is_symlink():
+        raise ValueError("Temporary OSIS transport proof destination already exists")
+    conf = root / "mods.d" / (work_id + ".conf")
+    destination = root / "modules" / "comments" / "zcom" / work_id
+    destination.mkdir(parents=True)
+    conf.parent.mkdir()
+    input_file = root / "input-private.osis.xml"
+    input_file.write_bytes(raw_osis)
+    if input_file.stat().st_size != len(raw_osis):
+        raise ValueError("Private OSIS source was not written completely")
+    args = [
+        str(osis2mod_binary), str(destination), str(input_file),
+        "-z", "z", "-b", "3", "-v", "KJV"
+    ]
+    try:
+        compiled = subprocess.run(
+            args, cwd=root, stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL, check=False, timeout=150
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return {
+            **original_report,
+            "status": "TEMPORARY_NUMBERED_SAMPLE_COMPILER_UNAVAILABLE_OR_TIMEOUT",
+            "compiled_native_readback_completed": False,
+            "all_original_intros_and_top_preserved": False,
+            "publication_authorized": False,
+        }
+    if compiled.returncode != 0:
+        return {
+            **original_report,
+            "status": "TEMPORARY_NUMBERED_SAMPLE_COMPILER_RETURNED_ERROR",
+            "compiled_native_readback_completed": False,
+            "all_original_intros_and_top_preserved": False,
+            "publication_authorized": False,
+        }
+    conf.write_text(
+        f"[{work_id}]\n"
+        f"DataPath=./modules/comments/zcom/{work_id}\n"
+        "ModDrv=zCom\nCompressType=ZIP\nBlockType=CHAPTER\n"
+        "SourceType=OSIS\nVersification=KJV\nLang=en\n"
+        "Description=Private original-native transport diagnostic only\n",
+        encoding="utf-8"
+    )
+    env = dict(os.environ, SWORD_PATH=str(root))
+    try:
+        native = subprocess.run(
+            [str(reader), work_id], cwd=root, env=env,
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+            check=False, timeout=90
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        native = None
+    if native is None or native.returncode or len(native.stdout) > MAX_BYTES:
+        return {
+            **original_report,
+            "status": "TEMPORARY_NUMBERED_SAMPLE_NATIVE_READBACK_FAILED",
+            "compiled_native_readback_completed": False,
+            "all_original_intros_and_top_preserved": False,
+            "publication_authorized": False,
+        }
+    rebuilt = {}
+    def receive(kind, key, raw):
+        if kind == "K":
+            rebuilt[key] = raw
+    parsed, _, intros, top = parse_native_raw_corpus(
+        BytesIO(native.stdout), on_entry=receive
+    )
+    original = dict(entries)
+    if len(original) != len(entries):
+        raise ValueError("Duplicate original numbered input reference")
+    matched = original.keys() & rebuilt.keys()
+    exact_bytes = sum(original[key] == rebuilt[key] for key in matched)
+    exact_visible = 0
+    unparseable_candidate = 0
+    for key in matched:
+        try:
+            exact_visible += _source_visible_text(original[key]) == _source_visible_text(rebuilt[key])
+        except ValueError:
+            unparseable_candidate += 1
+    return {
+        **original_report,
+        "status": "TEMPORARY_NUMBERED_NATIVE_TRANSPORT_READBACK_COMPLETED",
+        "compiled_native_readback_completed": True,
+        "original_numbered_keys_in_compiled_sample": len(matched),
+        "original_numbered_keys_missing_from_compiled_sample": len(original) - len(matched),
+        "additional_numbered_keys_in_compiled_sample": len(rebuilt.keys() - original.keys()),
+        "original_raw_xml_exact_byte_matches": exact_bytes,
+        "original_raw_xml_visible_unicode_text_matches": exact_visible,
+        "compiled_entries_unparseable_as_original_fragments": unparseable_candidate,
+        "compiled_numbered_entry_count": parsed["actual_occupied_numbered_entry_count"],
+        "compiled_introduction_entry_count_not_parity_approved": len(intros),
+        "compiled_opaque_top_entry_count_not_parity_approved": len(top),
+        "original_module_content_or_metadata_modified": False,
+        "all_original_intros_and_top_preserved": False,
+        "source_to_original_digital_edition_fidelity_proven": False,
+        "publication_authorized": False,
+    }
