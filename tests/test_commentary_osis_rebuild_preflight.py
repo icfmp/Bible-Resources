@@ -42,6 +42,10 @@ class NativeOSISRebuildPreflightTests(unittest.TestCase):
         self.assertEqual(report["intro_original_native_key_class_counts"], {
             "book_intro_key": 1, "chapter_intro_key": 1
         })
+        self.assertEqual(report["intro_original_top_level_element_counts"], {"p": 2})
+        self.assertEqual(report["intro_original_unwrapped_leading_text_presence"], {
+            "intro_has_no_unwrapped_leading_text": 2
+        })
         self.assertEqual(report["opaque_top_original_raw_length_counts"], {
             str(len(b"Invented control data")): 1,
             str(len(b"Invented other control data")): 1
@@ -80,6 +84,7 @@ class NativeOSISRebuildPreflightTests(unittest.TestCase):
         r = c.report(expected_count=1)
         self.assertEqual(r["original_markup_shape_counts"]["opaque_top_valid_xml_fragment"], 1)
         self.assertEqual(r["original_markup_shape_counts"]["opaque_top_visible_nonblank_text"], 1)
+        self.assertEqual(r["opaque_top_original_xml_element_names"], {"title": 1})
         self.assertFalse(r["canonical_original_introductions_and_TOP_reconstructed"])
 
     def test_repeated_raw_keys_not_inferred_as_authorial_verse_range(self):
