@@ -2,7 +2,10 @@
 from __future__ import annotations
 from pathlib import Path
 import sys
+import tempfile
+import subprocess
 import unittest
+from unittest.mock import patch
 import xml.etree.ElementTree as ET
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
@@ -11,6 +14,7 @@ from commentary_android_text_witness import (
     _actual_original_authorial_words,
     _actual_android_webview_word_sequences,
     original_prose_in_real_android_webview,
+    read_only_actually_occupied_original_entries,
 )
 from pilot_preflight import PilotError
 from probe_andbible_android_emulator import PACKAGE
@@ -109,6 +113,43 @@ class AndroidOriginalProseWitnessTests(unittest.TestCase):
             {"Gen 1:1": original()}, real_webview(a, b),
         )
         self.assertTrue(result["actual_original_prose_excerpt_in_Android_WebView_verified"])
+
+    @patch("commentary_android_text_witness.subprocess.run")
+    def test_nonoccupied_original_native_key_is_not_fabricated(self, run):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            inspector = root / "native-reader"
+            inspector.write_bytes(b"private compiled tool")
+            raw = original()
+            run.side_effect = [
+                subprocess.CompletedProcess([], 0, stdout=raw),
+                subprocess.CompletedProcess([], 9, stdout=b""),
+                subprocess.CompletedProcess([], 0, stdout=raw),
+            ]
+            samples, absent = read_only_actually_occupied_original_entries(
+                root, "MHCC", ["Gen 1:1", "John 3:16", "Rev 22:21"], inspector,
+            )
+            self.assertEqual(set(samples), {"Gen 1:1", "Rev 22:21"})
+            self.assertEqual(absent, 1)
+            self.assertEqual(samples["Gen 1:1"], raw)
+            self.assertEqual(run.call_count, 3)
+
+    @patch("commentary_android_text_witness.subprocess.run")
+    def test_non_sparse_native_source_failure_never_becomes_absence(self, run):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            inspector = root / "native-reader"
+            inspector.write_bytes(b"private compiled tool")
+            run.return_value = subprocess.CompletedProcess([], 7, stdout=b"")
+            with self.assertRaisesRegex(PilotError, "reason other than"):
+                read_only_actually_occupied_original_entries(
+                    root, "MHCC", ["Gen 1:1", "John 3:16"], inspector,
+                )
+            run.return_value = subprocess.CompletedProcess([], 9, stdout=b"")
+            with self.assertRaisesRegex(PilotError, "No actually occupied"):
+                read_only_actually_occupied_original_entries(
+                    root, "MHCC", ["Gen 1:1", "John 3:16"], inspector,
+                )
 
     def test_untrusted_module_and_oversized_ui_fail_closed(self):
         with self.assertRaises(PilotError):
