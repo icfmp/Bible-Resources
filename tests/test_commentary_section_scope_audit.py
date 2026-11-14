@@ -354,6 +354,46 @@ class SourceDivisionChapterTests(unittest.TestCase):
         self.assertFalse(result["derived_authorial_section_scope_proven"])
         self.assertEqual(result["case_rows"][0]["source_h2_numeric_chapters"], [1])
 
+    def test_intro_only_text_uses_validated_book_and_chapter_div2_mapping(self):
+        document = etree.fromstring(
+            b'<root><div1 title="Genesis"><div2><h2>Chapter 1</h2> '
+            b'<p>Invented original chapter explanation.</p>'
+            b'</div2></div1></root>'
+        )
+        result = independent_div2_chapter_body_evidence(
+            document, {"chapter_maximums": {"Gen.1": 31}}, [],
+            original_visible_chapter_intro_raw={
+                "Gen.1": (
+                    b'<chapter osisID="Gen.1"/>'
+                    b'Invented original chapter explanation.'
+                )
+            }
+        )
+        self.assertEqual(
+            result["independent_source_div2_text_bearing_native_intro_reviews"][0]["classification"],
+            "INDEPENDENT_DIGITAL_EDITION_CHAPTER_LOCATION_CORROBORATED"
+        )
+        self.assertFalse(
+            result["independent_source_div2_text_bearing_native_intro_reviews"][0][
+                "is_not_source_edition_or_authorial_chapter_approval"
+            ] is False
+        )
+
+    def test_conflicting_intro_book_identity_never_corroborates_ordinal_only(self):
+        source = etree.fromstring(
+            b'<root><div1 title="Exodus"><div2>'
+            b'<p>Invented chapter exposition.</p></div2></div1></root>'
+        )
+        result = independent_div2_chapter_body_evidence(
+            source, {"chapter_maximums": {"Gen.1": 31}}, [],
+            original_visible_chapter_intro_raw={
+                "Gen.1": b'<chapter osisID="Gen.1"/>Invented chapter exposition.'
+            }
+        )
+        classification = result[
+            "independent_source_div2_text_bearing_native_intro_reviews"][0]["classification"]
+        self.assertEqual(classification, "SOURCE_BOOK_IDENTITY_UNVERIFIED")
+
     def test_source_citation_target_compared_independently_of_label(self):
         source = etree.fromstring(
             b'<root><div1 title="Genesis"><div2><h2>Chapter 1</h2>'
