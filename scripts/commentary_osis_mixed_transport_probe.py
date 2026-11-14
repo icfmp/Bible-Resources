@@ -459,13 +459,114 @@ def build_complete_original_transport(
     }
 
 
+
+def _probe_private_alias_real_xiphos(root: Path, module_id: str, aliases: dict,
+                                    compiled_K: dict[str, bytes]) -> dict:
+    """Bounded real-reader experiment; never claim window == rendered passage.
+
+    Reuses the already existing independently verified Bible + Xiphos helper.
+    Only metadata/booleans are returned, never commentary words or screenshots.
+    """
+    from collections import defaultdict
+    from commentary_xiphos_dual_reader import (
+        verify_and_install_reviewed_bible, _run_real_gui, BIBLE_MODULE
+    )
+    from pilot_subprocess import query, present_key
+    from difflib import SequenceMatcher
+
+    if not aliases or not root.is_dir() or root.is_symlink():
+        raise ValueError("Real-reader preview requires a private alias candidate")
+    by_master = defaultdict(list)
+    for target, claim in aliases.items():
+        by_master[claim["link_to"]].append(target)
+    # Reuse a scope-neutral selection: one large multi-verse group and two
+    # other books. No MHCC-specific hardcoded verse used to pass a test.
+    largest = sorted(by_master, key=lambda k: (-len(by_master[k]), k))[0]
+    selected = [sorted(by_master[largest])[0]]
+    seen_books = {selected[0].split(".", 1)[0]}
+    for target in sorted(aliases):
+        book = target.split(".", 1)[0]
+        if book not in seen_books:
+            selected.append(target)
+            seen_books.add(book)
+        if len(selected) == 3:
+            break
+    bible = verify_and_install_reviewed_bible(root)
+    if bible["module_id"] != BIBLE_MODULE:
+        raise ValueError("Private reader Bible verification failed")
+    comparisons = {}
+    shared_runs = {}
+    for key in selected:
+        book, chapter, verse = key.split(".")
+        passage = f"{book} {chapter}:{verse}"
+        master_key = aliases[key]["link_to"]
+        mbook, mchapter, mverse = master_key.split(".")
+        master_passage = f"{mbook} {mchapter}:{mverse}"
+        first_code, alias_plain = query(
+            module_id, passage, fmt="plain", root=root, timeout=25,
+            limit=256*1024,
+        )
+        master_code, master_plain = query(
+            module_id, master_passage, fmt="plain", root=root, timeout=25,
+            limit=256*1024,
+        )
+        bible_code, bible_plain = query(
+            BIBLE_MODULE, passage, fmt="plain", root=root, timeout=25,
+            limit=256*1024,
+        )
+        if (not present_key(passage,alias_plain,first_code)
+                or not present_key(master_passage,master_plain,master_code)
+                or not present_key(passage,bible_plain,bible_code)):
+            raise ValueError("Real independent reader failed to navigate proposed alias")
+        master_words = re.findall(r"\w+",master_plain.decode("utf-8").casefold())
+        alias_words = re.findall(r"\w+",alias_plain.decode("utf-8").casefold())
+        if (not 30 <= len(alias_words) <= 30000
+                or not 30 <= len(master_words) <= 30000):
+            raise ValueError("Independent alias output is empty or oversized")
+        # 25 source words in a row rules out incidental shared scripture
+        # references and formatting-only "success".
+        longest = SequenceMatcher(
+            None, master_words, alias_words, autojunk=False
+        ).find_longest_match().size
+        if longest < 25:
+            raise ValueError("Independent reader alias/master prose does not match")
+        shared_runs[passage] = longest
+        comparisons[passage] = {
+            "commentary": alias_plain,
+            "bible": bible_plain,
+            "commentary_internal": compiled_K[key],
+        }
+    gui = _run_real_gui(
+        root, comparisons, seconds=6, commentary_module_id=module_id
+    )
+    return {
+        "status": "PRIVATE_XIPHOS_REAL_GUI_EXPERIMENT_NOT_PRESENTATION_APPROVAL",
+        "sample_count": len(comparisons),
+        "sample_keys": sorted(comparisons),
+        "diatheke_alias_master_shared_run_minimum": min(shared_runs.values()),
+        "real_xiphos_executable_started_and_visible":
+            gui["real_xiphos_executable_started_and_visible"],
+        "actual_passage_commands_accepted":
+            gui["actual_passage_commands_accepted"],
+        "commentary_clipboard_match_by_passage":
+            gui["commentary_clipboard_match_by_passage"],
+        "independent_gui_commentary_excerpt_match_count":
+            gui["independent_gui_commentary_excerpt_match_count"],
+        "whole_chapter_commentary_deduplication_proven": False,
+        "entire_edition_reader_presentation_approved": False,
+        "source_prose_or_screenshot_uploaded": False,
+        "published": False,
+    }
+
+
 def probe_complete_original_transport(
         original_intros: dict[str, bytes],
         original_numbered: dict[str, list[tuple[str, bytes]]],
         original_TOP: list[bytes], *,
         scratch: Path, native_raw_binary: Path,
         osis2mod_binary: str = "osis2mod",
-        provisional_index_aliases: dict[str, dict] | None = None) -> dict:
+        provisional_index_aliases: dict[str, dict] | None = None,
+        test_preview_in_xiphos: bool = False) -> dict:
     """Attempt full private SWORD readback and compare EVERY original native key.
 
     This is diagnostic and cannot authorize a release. TOP is separately
@@ -588,8 +689,16 @@ def probe_complete_original_transport(
         len(original_TOP) == len(rebuilt["U"])
         and all(a == b for a, b in zip(original_TOP, rebuilt["U"]))
     )
+    gui = None
+    if test_preview_in_xiphos:
+        if not aliases or not (indexed_checks and alias_identical and top_exact):
+            raise ValueError("Refuse Xiphos on an unreconciled private preview")
+        gui = _probe_private_alias_real_xiphos(
+            root, module_id, aliases, rebuilt["K"]
+        )
     return {
         **source,
+        "private_real_xiphos_alias_navigation_probe": gui,
         "status": "COMPLETE_ORIGINAL_PRIVATE_I_K_U_COMPILED_READBACK_NOT_APPROVAL",
         "readback_completed": True,
         "source_intro_I_coverage": summaries["I"],
