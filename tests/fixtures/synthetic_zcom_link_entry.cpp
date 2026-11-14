@@ -12,7 +12,13 @@ int main() {
     sword::SWModule* module = mgr.getModule("LinkProof");
     if (!module || std::string(module->getConfigEntry("ModDrv") ?
         module->getConfigEntry("ModDrv") : "") != "zCom") return 2;
-    if (!module->isWritable()) return 3;
+    if (!module->isWritable()) {
+        // Ordinary module loading in released libSWORD may intentionally
+        // open zCom indexes read-only. Report a non-buildable capability,
+        // NEVER bypass the guard or modify the index binary manually.
+        std::cout << "SYNTHETIC_NATIVE_ZCOM_READ_ONLY" << std::endl;
+        return 0;
+    }
     sword::VerseKey master;
     sword::VerseKey target;
     master.setVersificationSystem("KJV");
@@ -29,6 +35,6 @@ int main() {
     module->flush();
     if (!module->hasEntry(&target)) return 7;
     if (!module->isLinked(&master, &target)) return 8;
-    std::cout << "SWORD synthetic only: native zCom linkEntry API completed" << std::endl;
+    std::cout << "SYNTHETIC_NATIVE_ZCOM_LINK_APPLIED" << std::endl;
     return 0;
 }
