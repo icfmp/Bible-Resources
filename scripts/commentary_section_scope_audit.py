@@ -1712,6 +1712,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 test_preview_in_xiphos=preview_real_xiphos,
                 original_stock_sword_root=installed,
                 original_stock_module_id=manifest["module_id"],
+                native_index_binary=index_binary,
             )
             provisional_preview["source_scope_editorially_approved"] = False
             provisional_preview["preflight_candidate_section_count"] = (
