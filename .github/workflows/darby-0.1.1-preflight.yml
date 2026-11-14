@@ -6,6 +6,7 @@ on:
       - ".github/workflows/darby-private-repaired-sword.yml"
       - "scripts/probe_private_repaired_darby_sword.py"
       - "scripts/reader_xiphos_headless_smoke.py"
+      - "tests/test_reader_xiphos_reference_navigation.py"
       - "scripts/repair_osis_note_links.py"
       - "scripts/repair_osis_inline_markup.py"
       - "scripts/repair_osis_source_bytes.py"
@@ -51,6 +52,7 @@ jobs:
         run: |
           python -m pip install -r requirements.txt
           python -m unittest discover -s tests -p test_probe_darby_011_final_android.py -v
+          python -m unittest discover -s tests -p test_reader_xiphos_reference_navigation.py -v
       - name: Download and checksum-lock official stable AndBible 5.1.1117 APK
         shell: bash
         run: |
@@ -147,6 +149,8 @@ jobs:
           import json, os
           from pathlib import Path
           from reader_xiphos_headless_smoke import smoke
+          os.environ["LANG"]="en_US.UTF-8"
+          os.environ["LC_ALL"]="en_US.UTF-8"
           base=Path(os.environ["RUNNER_TEMP"])/"darby-private-native"
           final=base/"final-011-candidate"
           report=json.loads((final/"metadata-only-report.json").read_text())
@@ -156,6 +160,7 @@ jobs:
               archive, "BRJND2024", report["private_final_candidate_sword_zip_sha256"],
               "Luther", 12, screenshot=out/"xiphos-startup.png",
               study_dir=out/"study-samples",
+              navigation_mode="reference-entry",
               supplemental_samples=(
                   ("final-genesis-6-9", "Gen 6:9"),
                   ("final-genesis-6-13", "Gen 6:13"),
@@ -167,7 +172,8 @@ jobs:
           if (result["status"]!="headless_xiphos_running_after_bounded_startup"
                   or not result["sha256_verified"]
                   or not result["isolated_standard_ztext_package"]
-                  or len(result["supplemental_source_case_screenshots"]) != 5):
+                  or len(result["supplemental_source_case_screenshots"]) != 5
+                  or len(set(s["screenshot_sha256"] for s in result["supplemental_source_case_screenshots"])) != 5):
               raise SystemExit("Actual final-ID Xiphos capture gate incomplete")
           result["tested_exact_private_final_zip_sha256"]=report["private_final_candidate_sword_zip_sha256"]
           result["tested_internal_sword_module_id"]="BRJND2024"
