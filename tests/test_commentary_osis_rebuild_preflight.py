@@ -65,6 +65,23 @@ class NativeOSISRebuildPreflightTests(unittest.TestCase):
             "opaque_top_record_requires_distinct_preservation_plan"], 1)
         self.assertFalse(report["canonical_original_introductions_and_TOP_reconstructed"])
 
+    def test_normalized_intro_key_shapes(self):
+        c = NativeOSISRebuildPreflight()
+        c.observe("I", "Gen", b"<p>Book intro</p>")
+        c.observe("I", "Gen.1", b"<p>Chapter intro</p>")
+        report = c.report(expected_count=2)
+        self.assertEqual(report["intro_original_native_key_class_counts"], {
+            "book_intro_key": 1, "chapter_intro_key": 1
+        })
+
+    def test_nonempty_opaque_top_xml_metadata_does_not_certify_preservation(self):
+        c = NativeOSISRebuildPreflight()
+        c.observe("U", "TOP:1", b"<title>Private invented section</title>")
+        r = c.report(expected_count=1)
+        self.assertEqual(r["original_markup_shape_counts"]["opaque_top_valid_xml_fragment"], 1)
+        self.assertEqual(r["original_markup_shape_counts"]["opaque_top_visible_nonblank_text"], 1)
+        self.assertFalse(r["canonical_original_introductions_and_TOP_reconstructed"])
+
     def test_repeated_raw_keys_not_inferred_as_authorial_verse_range(self):
         c = NativeOSISRebuildPreflight()
         for key in ("Gen.1.7", "Gen.1.8", "Gen.2.1"):
