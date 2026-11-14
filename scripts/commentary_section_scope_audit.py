@@ -28,7 +28,10 @@ from commentary_osis_rebuild_preflight import (
     NativeOSISRebuildPreflight, compare_opaque_top_with_standard_compiler_fixture,
 )
 from commentary_osis_transport_probe import isolated_osis2mod_original_sample_roundtrip
-from commentary_intro_chapter_text_review import review_original_intro_against_numbered_chapter
+from commentary_intro_chapter_text_review import (
+    review_original_intro_against_numbered_chapter,
+    independent_thml_chapter_intro_witness,
+)
 from commentary_navigation_link_plan import (
     parse_native_commentary_verse_registry, UnsafeCommentaryLinkPlan,
     triage_missing_native_section_links,
@@ -527,7 +530,8 @@ def independent_chapter_scope_evidence(document, unrecognized_cases: list[dict])
 
 def independent_div2_chapter_body_evidence(document, native_registry: dict,
                                           unrecognized_cases: list[dict],
-                                          stock_unknown_raw: dict[str, bytes] | None = None) -> dict:
+                                          stock_unknown_raw: dict[str, bytes] | None = None,
+                                     original_chapter_intro_raw: dict[str, bytes] | None = None) -> dict:
     """Collate chapter wrappers in canonical order, verifying book identities.
 
     Source order alone is never authority: each div1 must be the expected book
@@ -1182,6 +1186,9 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
             "classification": "CROSS_EDITION_METADATA_ONLY_NOT_A_CORRECTION",
         })
 
+    source_intro_chapter_comparison = independent_thml_chapter_intro_witness(
+        document, original_chapter_intro_raw or {}
+    )
     chapter_scopes = independent_chapter_scope_evidence(document, unrecognized_cases or [])
     div2_scopes = (
         independent_div2_chapter_body_evidence(
@@ -1195,6 +1202,7 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
         "status": "PINNED_DIFFERENT_DIGITAL_EDITION_SCOPE_COMPARISON",
         "independent_whole_chapter_review": chapter_scopes,
         "independent_div2_chapter_body_review": div2_scopes,
+        "independent_chapter_intro_text_witness": source_intro_chapter_comparison,
         "witness_sha256": expected,
         "source_marker_rows_observed": observed,
         "unrecognized_source_annotation_classes": dict(
@@ -1418,7 +1426,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
         witness = compare_independent_thml_witness(
             manifest, result["start_anchored_section_map"],
             result["anomalies"], directory, unknown["case_rows"],
-            registry, private_unrecognized_raw)
+            registry, private_unrecognized_raw,
+            original_chapter_intro_raw=private_intro_text_raw_by_chapter)
         # A native single-key chapter plus an independently corroborated
         # source division still needs explicit editorial signoff. These are
         # chapter-limit *measurements*, not link insertion instructions.
