@@ -201,3 +201,43 @@ For **2 John 1** the original source includes a book-intro I key, a chapter-intr
 The original source fragments were included verbatim in a private temporary OSIS document. Its separately identified zCom candidate has **not** been proposed for release and no source content was committed to GitHub. Compiler-added wrapper `div` elements and whitespace still mean raw original-entry byte equality cannot be asserted.
 
 This closes the narrowly defined **single real chapter mixed I+K compiler feasibility gate**, not the whole commentary’s editorial validation. Next: select representative book/chapter transitions and intro-topology cases; attempt full 66-book K/I/U reconstruction on an isolated runner, compare all actual original native occupied keys and real commentary XML semantics, and keep the 17 explicitly documented native missing-index cases/118 chapter-scope candidates subject to independent editorial review. Modern English remains paused and BRMHCC 0.1.0 unchanged.
+
+
+## Three-case mixed I/K readback with fail-closed content gates (2026-11-14)
+
+Exact experimental code head `807cef754f0b9eaf63f9a0734b8465f63c08254e`,
+[original pinned corpus CI #43643793204](https://github.com/icfmp/Bible-Resources/actions/runs/43643793204)
+**SUCCESS**. Unlike the earlier single-chapter experiment, this runner
+now fails if *any* numbered or introduction original key disappears,
+an extra I/K key appears, or any selected original's six independent
+content/markup/reference preservation checks does not match the exact
+expected entry count. Synthetic negative regressions cover each property
+and all missing/extra I/K directions.
+
+The same actual CrossWire 2.0 stock, independently inspected through the
+private native SWORD reader, passed these separate mixed book-I, chapter-I
+and numbered-K compilation/readback cases:
+
+| Original chapter | Preserved I entries | Preserved K entries | Missing/extra I/K | Six preservation checks |
+| --- | ---: | ---: | ---: | --- |
+| `2John.1` | 2/2 | 13/13 | 0 | all 15 entries passed |
+| `2Chr.1` | 2/2 | 1/1 | 0 | all 3 entries passed |
+| `Matt.13` | 2/2 | 50/50 | 0 | all 52 entries passed |
+| **Total** | **6/6** | **64/64** | **0** | **70/70** |
+
+The six checks are original ordered Unicode word sequence, visible text
+after **whitespace-only** normalization, non-`div` element order and
+literal attributes, original `div` attribute multiset, ordered
+`reference` attribute values, and exact original indexed I/K location
+coverage. The last comparison also rejects *extra* compiled keys. Original
+compiled raw XML byte equality is **not** asserted: the standard importer
+adds `div` wrappers. Nor has output been checked in a reader.
+
+**Open next gate:** construct and independently read back an isolated,
+whole-original 66-book / 1,189-chapter candidate and reconcile
+**all 29,975 original K/I/U records, including the two distinct TOP
+locations**. Do not infer a full-source fidelity certificate from 70 samples,
+adopt different CCEL wording, silently fill the 17/24 missing index
+slots or 118 chapter-first candidates, merge, publish, or resume
+modern-English translation #270/#272. Published BRMHCC 0.1.0 remains
+byte-for-byte unchanged.
