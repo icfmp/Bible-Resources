@@ -17,6 +17,8 @@ import subprocess
 import tempfile
 from zipfile import ZipFile
 
+from catalogue_release_coverage import coverage
+
 ROOT = Path(__file__).resolve().parents[1]
 SHA = re.compile(r"[a-f0-9]{64}\Z")
 COMMIT_SHA = re.compile(r"[a-f0-9]{40}\Z")
@@ -180,6 +182,39 @@ def publish_one(approved: dict, *, repository: str, target_sha: str) -> None:
               f"ZIP SHA-256 {plan['package_sha256']}")
 
 
+
+def verify_historical_release(record: dict, *, repository: str) -> None:
+    """Check an immutable pre-unification release without changing its assets.
+
+    Its Pages and versioned ZIP digests may differ only if the explicit,
+    source-reviewed legacy inventory records that historical discrepancy.
+    This is release-existence/integrity proof, not authorial parity proof.
+    """
+    tag=record["tag"]
+    found=gh("release","view",tag,"--repo",repository,
+             "--json","isDraft,assets",check=False)
+    if found.returncode != 0:
+        raise ReleaseError(f"Approved catalogue has no GitHub Release for {tag}")
+    try:
+        description=json.loads(found.stdout)
+    except ValueError as exc:
+        raise ReleaseError("GitHub Release returned invalid metadata") from exc
+    if description.get("isDraft") is not False:
+        raise ReleaseError("Historical GitHub Release is not public")
+    asset_names={item.get("name") for item in description.get("assets",[])}
+    if record["asset_name"] not in asset_names:
+        raise ReleaseError("Historical GitHub Release missing its reviewed versioned ZIP")
+    with tempfile.TemporaryDirectory(prefix="verify-historical-sword-release-") as workspace:
+        gh("release","download",tag,"--repo",repository,
+           "--pattern",record["asset_name"],"--dir",workspace)
+        file=Path(workspace)/record["asset_name"]
+        if (not file.is_file() or
+                file.stat().st_size!=record["release_size_bytes"] or
+                sha256(file.read_bytes()).hexdigest()!=record["release_sha256"]):
+            raise ReleaseError(f"Existing historical GitHub Release bytes differ: {tag}")
+    print(f"Verified existing published GitHub Release {tag}: "
+          "actual versioned asset SHA-256 and size match frozen evidence")
+
 def main() -> int:
     import argparse
     parser=argparse.ArgumentParser(description=__doc__)
@@ -192,15 +227,23 @@ def main() -> int:
     if (not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+",args.repository)
             or not COMMIT_SHA.fullmatch(args.target_sha)):
         raise ReleaseError("Unsafe destination or unreviewed release commit")
-    plans = sorted((args.root/"config/release-plans").glob("*.json"))
-    if not plans:
-        raise ReleaseError("No authorized public GitHub Release plan exists")
-    verified=[approved_release(args.root,plan,args.built) for plan in plans]
-    for item in verified:
-        if args.verify_only:
+    # Fail closed BEFORE any release creation on a missing catalogue mapping,
+    # malformed legacy exception, or uncatalogued/newly approved module.
+    scope=coverage(args.root,built=args.built)
+    verified=[approved_release(args.root,path,args.built)
+              for path,_ in scope["planned"]]
+    if args.verify_only:
+        for item in verified:
             print(f"Verified authorized release plan {item['plan']['tag']} "
-                  "(no public write)")
-        else:
+                  "(PR validation; no public write)")
+        print(f"Verified {len(scope['legacy'])} immutable historical binding(s) "
+              "(PR validation; no network or public write)")
+    else:
+        # Strict order: all existing releases first; planned ones next.
+        # Any failure prevents the calling workflow from deploying Pages.
+        for item in scope["legacy"]:
+            verify_historical_release(item,repository=args.repository)
+        for item in verified:
             publish_one(item,repository=args.repository,target_sha=args.target_sha)
     return 0
 
