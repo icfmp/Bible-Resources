@@ -632,13 +632,18 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
         chapter = row["native_key"].rsplit(".", 1)[0]
         source = source_chapters.get(chapter)
         alignment_method = "SOURCE_NATIVE_DIV2_ORDINAL_AND_BOOK"
-        if (source is not None and
-                source["book_identity_class"] == "SOURCE_CHAPTER_COUNT_DIFFERS_FROM_NATIVE_REGISTRY"):
+        if chapter in explicit_source_chapters or chapter in ambiguous_source_heading_chapters:
             source = (
                 explicit_source_chapters.get(chapter)
                 if chapter not in ambiguous_source_heading_chapters else None
             )
             alignment_method = "EXPLICIT_NUMERIC_SOURCE_CHAPTER_HEADING"
+        elif (source is not None and
+              source["book_identity_class"] == "SOURCE_CHAPTER_COUNT_DIFFERS_FROM_NATIVE_REGISTRY"):
+            # The unverified div2 ordinal must never stand in for a chapter
+            # omitted from this digital witness's division sequence.
+            source = None
+            alignment_method = "NO_SAFE_EXPLICIT_SOURCE_CHAPTER_MAPPING"
         if source is None:
             classification = "NO_SAFE_SOURCE_DIV2_FOR_NATIVE_CHAPTER"
         elif source["book_identity_class"] not in {
