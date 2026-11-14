@@ -117,7 +117,15 @@ def probe_original_intro_transport(chapter: str, original_intro_raw: bytes,
             results.append({"mode": mode, "status": "NATIVE_READBACK_UNAVAILABLE"})
             continue
         if reader.returncode or len(reader.stdout) > 15 * 1024 * 1024:
-            results.append({"mode": mode, "status": "NATIVE_READBACK_FAILED"})
+            results.append({
+                "mode": mode,
+                "status": "NATIVE_READBACK_FAILED",
+                "native_readback_exit_code": reader.returncode,
+                "private_module_output_suffixes": sorted({
+                    item.suffix for item in dst.iterdir() if item.is_file()
+                }),
+                "private_compiled_body_readability_not_proven": True,
+            })
             continue
         intro, K, top = {}, [], []
         def observe(kind, key, raw):
