@@ -20,7 +20,10 @@ from zipfile import ZipFile, ZIP_DEFLATED
 
 from commentary_xiphos_dual_reader import (
     BIBLE_MODULE, verify_and_install_reviewed_bible,
+    _exact_native_commentary_raw,
 )
+from commentary_native_raw_inventory import _safe_stock_install
+from commentary_android_text_witness import original_prose_in_real_android_webview
 
 from commentary_intake import load_manifest
 from pilot_fetch import fetch
@@ -494,7 +497,9 @@ def _select_exact_download_zip(
     return False, history
 
 
-def run_android_original(resource_id: str, *, apk: Path) -> dict:
+def run_android_original(
+    resource_id: str, *, apk: Path, native_raw_key_binary: Path,
+) -> dict:
     manifest = load_manifest(resource_id)
     module_id = manifest["module_id"]
     title = manifest["title"]
@@ -502,6 +507,8 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
             or manifest["rights"]["status"] != "research_only"
             or manifest["rights"]["owner_approved"] is not False
             or apk.is_symlink() or not apk.is_file()
+            or native_raw_key_binary.is_symlink()
+            or not native_raw_key_binary.is_file()
             or sha256(apk.read_bytes()).hexdigest() != APK_SHA256):
         raise PilotError("Original commentary / exact official AndBible APK not verified")
     for key in ("archive_sha256", "stock_conf_sha256"):
@@ -528,6 +535,22 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
         confhash = sha256(metadata).hexdigest()
         if confhash != manifest["stock_conf_sha256"]:
             raise PilotError("Original SWORD commentary metadata changed")
+        # Unchanged native source, not a hand-written paragraph or derived
+        # approximation. Use a separate compiled libsword single-key reader.
+        # Keep all raw original body bytes in the disposable CI workspace.
+        original_native_root = root / "native-original"
+        _safe_stock_install(archive, inspected["members"], original_native_root)
+        references = manifest["sample_references"]
+        if (not isinstance(references, list)
+                or not 2 <= len(references) <= 12
+                or len(set(references)) != len(references)):
+            raise PilotError("Unsafe original Android authorial sample list")
+        original_prose_samples = {
+            reference: _exact_native_commentary_raw(
+                original_native_root, module_id, reference, native_raw_key_binary,
+            )
+            for reference in references
+        }
 
         adb("wait-for-device", timeout=80)
         adb("install", "-r", str(apk), timeout=130)
@@ -637,6 +660,34 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
         # toolbar; this tests selection instead of guessing a deep link.
         toolbar_probe = _attempt_commentary_toolbar_selection(module_id, title)
         reader_context_after_toolbar = _reader_context_witness(module_id, title)
+        # Sample real WebView authorial text AFTER the exact MHCC (en)
+        # selection and BEFORE unrelated reference-intent navigation.
+        # Never export the accessibility XML or source prose itself.
+        if (toolbar_probe["exact_original_commentary_menu_item_tapped"]
+                and toolbar_probe["reader_source_identity_witness_after_selection"]
+                and reader_context_after_toolbar["main_bible_reader_activity_resumed"]
+                and reader_context_after_toolbar["ui_hierarchy_webview_count"] > 0):
+            adb("shell", "uiautomator", "dump",
+                "/sdcard/commentary-original-text-private.xml",
+                timeout=40, fail=False)
+            actual_ui = adb(
+                "exec-out", "cat", "/sdcard/commentary-original-text-private.xml",
+                timeout=20, fail=False,
+            )
+            prose_witness = original_prose_in_real_android_webview(
+                original_prose_samples, actual_ui,
+            )
+        else:
+            prose_witness = {
+                "scope": "exact_original_native_zCom_prose_vs_actual_AndBible_WebView_accessibility",
+                "original_native_occupied_sample_keys_inspected": len(original_prose_samples),
+                "real_AndBible_WebViews_observed": 0,
+                "real_AndBible_WebView_text_sequences_examined": 0,
+                "original_prose_sample_entries_with_16_consecutive_words_visible": 0,
+                "actual_original_prose_excerpt_in_Android_WebView_verified": False,
+                "status": "inconclusive_exact_MHCC_reader_selection_unavailable",
+                "original_prose_UI_text_XML_screenshots_or_ZIP_exported": False,
+            }
         # Real platform request result is checked, but not equated to a
         # rendered page. A rejected Intent must remain explicitly unverified.
         intent_accepted = _dispatch_documented_reference(manifest)
@@ -685,6 +736,7 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
             "android_application_foreground_after_deeplink": bool(focus_after_link),
             "android_sample_reference_deeplink_attempted": True,
             "android_commentary_toolbar_selection": toolbar_probe,
+            "android_exact_original_authorial_prose_webview_witness": prose_witness,
             "official_stable_update_notice_action": stable_notice_action,
             "android_reader_context_by_phase": {
                 "after_app_restart": reader_context_after_restart,
@@ -713,11 +765,14 @@ def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--resource-id", required=True)
     p.add_argument("--apk", type=Path, required=True)
+    p.add_argument("--native-raw-key-binary", type=Path, required=True)
     p.add_argument("--report", type=Path, required=True)
     args = p.parse_args(argv)
     if args.report.exists() or args.report.is_symlink() or not args.report.parent.is_dir():
         raise PilotError("Refusing unsafe or existing Android report destination")
-    result = run_android_original(args.resource_id, apk=args.apk)
+    result = run_android_original(
+        args.resource_id, apk=args.apk, native_raw_key_binary=args.native_raw_key_binary,
+    )
     args.report.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n",
                            encoding="utf-8")
     print("Official stable Android app was tested with original pinned zCom; only safe UI metadata retained")
