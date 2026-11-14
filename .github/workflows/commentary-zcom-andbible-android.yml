@@ -196,7 +196,8 @@ jobs:
           assert set(debug)=={
               "scope","actual_app_debug_socket_found",
               "actual_Android_debug_page_targets_discovered",
-              "actual_Android_debug_DOM_pages_read","status",
+              "actual_Android_debug_DOM_pages_read",
+              "local_CDP_outcome_class_counts","status",
               "Android_DOM_page_URL_words_XML_screenshot_or_cookies_exported"
           }
           assert debug["scope"]=="official_AndBible_pinned_release_read_only_loopback_WebView_CDP"
@@ -205,6 +206,21 @@ jobs:
           assert type(debug["actual_Android_debug_DOM_pages_read"]) is int
           assert 0<=debug["actual_Android_debug_page_targets_discovered"]<=8
           assert 0<=debug["actual_Android_debug_DOM_pages_read"]<=debug["actual_Android_debug_page_targets_discovered"]
+          cdperrors=debug["local_CDP_outcome_class_counts"]
+          assert set(cdperrors)=={
+              "body_read","body_empty",
+              "local_CDP_connection_or_handshake_unavailable",
+              "CDP_Runtime_evaluation_rejected",
+              "CDP_Runtime_result_shape_unavailable",
+              "CDP_Runtime_non_string_body",
+              "CDP_Runtime_body_above_safe_bound",
+              "CDP_Runtime_response_not_received",
+              "CDP_Runtime_transport_or_JSON_unavailable",
+              "other_unreadable_local_CDP"
+          }
+          assert all(type(v) is int and 0<=v<=8 for v in cdperrors.values())
+          assert sum(cdperrors.values())<=debug["actual_Android_debug_page_targets_discovered"]
+          assert cdperrors["body_read"]==debug["actual_Android_debug_DOM_pages_read"]
           assert debug["status"] in {
               "inconclusive_original_app_WebView_debug_unavailable",
               "inconclusive_Android_debug_socket_no_readable_DOM",
