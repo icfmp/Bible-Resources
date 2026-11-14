@@ -104,6 +104,13 @@ jobs:
                 json.dumps(witness.get("independent_scripref_range_agreement_counts",{}),sort_keys=True))
           print("Independent source evidence matrix:",
                 json.dumps(witness.get("independent_reference_evidence_matrix",{}),sort_keys=True))
+          print("Unrecognized source section classes:",
+                json.dumps(witness.get("unrecognized_source_annotation_classes",{}),sort_keys=True))
+          for row in witness.get("unrecognized_distinct_payload_source_rows",[]):
+              print("Unlabelled source section",row["native_start"],
+                    "section-endpoints",",".join(row["source_section_endpoints"]),
+                    "source-explicit-multiverse",row["source_explicit_multiverse_annotation"],
+                    "native-chapter-one-slot",row["only_one_native_occupied_verse_in_chapter"])
           for row in witness.get("no_exact_independent_reference_evidence_sections",[]):
               print("Needs editorial witness review",row["start"],row["declared_end"],row["heading_kind"])
           for case in witness.get("anomaly_source_range_corroboration",[]):
