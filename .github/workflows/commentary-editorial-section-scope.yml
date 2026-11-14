@@ -45,7 +45,7 @@ jobs:
           timeout 90s sudo apt-get -o Acquire::Retries=0 \
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update
           timeout 90s sudo apt-get -o Acquire::Retries=0 \
-            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev libsword-utils
       - name: Compile independent stock index and private raw-entry readers
         run: |
           set -euo pipefail
@@ -55,6 +55,52 @@ jobs:
           g++ -std=c++17 -O2 -I/usr/include/sword \
             scripts/sword_native_commentary_raw_corpus.cpp \
             -o "${RUNNER_TEMP}/stock-raw" -lsword
+      - name: Prove standards-based continuous and disjoint commentary links on synthetic OSIS
+        run: |
+          set -euo pipefail
+          command -v osis2mod
+          ROOT="${RUNNER_TEMP}/synthetic-commentary"
+          mkdir -p "$ROOT/mods.d" "$ROOT/modules/comments/zcom/LinkProof"
+          timeout 45s osis2mod "$ROOT/modules/comments/zcom/LinkProof" \
+            tests/fixtures/synthetic-linked-commentary.osis.xml \
+            -z z -b 3 -v KJV > "$ROOT/osis2mod.log" 2>&1
+          if grep -Eq 'FATAL\\(|ERROR\\(' "$ROOT/osis2mod.log"; then
+            echo "Synthetic OSIS importer reported an error"
+            exit 1
+          fi
+          cat > "$ROOT/mods.d/LinkProof.conf" <<'CONF'
+          [LinkProof]
+          DataPath=./modules/comments/zcom/LinkProof
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          SourceType=OSIS
+          Versification=KJV
+          Lang=en
+          Description=Synthetic audit fixture only
+          CONF
+          SWORD_PATH="$ROOT" timeout 60s "${RUNNER_TEMP}/stock-raw" LinkProof > "$ROOT/native.raw"
+          PYTHONPATH=scripts python - "$ROOT/native.raw" <<'PY'
+          import sys
+          from pathlib import Path
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          raw = {}
+          def entry(kind, key, payload):
+              if kind == "K":
+                  raw[key] = payload
+          with Path(sys.argv[1]).open("rb") as f:
+              _, keys, _, _ = parse_native_raw_corpus(f, on_entry=entry)
+          expected = {f"Gen.1.{v}" for v in (1, 2, 3, 4, 5, 7, 8)}
+          assert expected <= set(keys), "Missing a real linked synthetic commentary verse"
+          assert "Gen.1.6" not in keys, "Disjoint range incorrectly linked its gap"
+          assert raw["Gen.1.1"] == raw["Gen.1.2"], "Connected range lost its linked body"
+          assert len({raw[f"Gen.1.{v}"] for v in (4, 5, 7, 8)}) == 1, (
+              "Disjoint annotation does not read back a single original commentary"
+          )
+          assert raw["Gen.1.3"] != raw["Gen.1.4"], "Independent commentary was overwritten"
+          print("Synthetic SWORD linked-commentary readback PASSED:",
+                len(expected), "occupied target verses; independent gap preserved")
+          PY
       - name: Audit all original stock section headings against native occupied slots
         run: |
           set -euo pipefail
