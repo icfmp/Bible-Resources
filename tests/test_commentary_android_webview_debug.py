@@ -58,6 +58,44 @@ class OfficialAndBibleWebViewDebugTests(unittest.TestCase):
         self.assertNotIn("set", sent["params"]["expression"])
         fake.close.assert_called_once()
 
+    def test_403_loopback_origin_rejection_uses_only_safe_no_origin_fallback(self):
+        from pilot_preflight import PilotError
+        class HandshakeRejected(Exception):
+            status_code = 403
+        module = Mock()
+        module.WebSocketBadStatusException = HandshakeRejected
+        module.WebSocketException = Exception
+        connection = Mock()
+        connection.recv.return_value = json.dumps({
+            "id": 1, "result": {"result": {
+                "type": "string", "value": "Private verified native prose"
+            }}
+        })
+        module.create_connection.side_effect = [HandshakeRejected(), connection]
+        with patch.dict(sys.modules, {"websocket": module}):
+            text = _read_only_debugger_body(
+                "ws://127.0.0.1:52655/devtools/page/abc", 52655,
+            )
+        self.assertEqual(text, "Private verified native prose")
+        self.assertEqual(module.create_connection.call_count, 2)
+        first, last = module.create_connection.call_args_list
+        self.assertEqual(
+            first.kwargs["origin"], "http://127.0.0.1:52655",
+        )
+        self.assertTrue(last.kwargs["suppress_origin"])
+        self.assertEqual(
+            first.args[0], last.args[0],
+        )
+        self.assertNotIn("Private verified native prose", repr(last))
+        connection.close.assert_called_once()
+
+        module.create_connection.side_effect = [HandshakeRejected(), HandshakeRejected()]
+        with patch.dict(sys.modules, {"websocket": module}):
+            with self.assertRaisesRegex(PilotError, "local_CDP_handshake_HTTP_403"):
+                _read_only_debugger_body(
+                    "ws://127.0.0.1:52655/devtools/page/abc", 52655,
+                )
+
     @patch("commentary_android_webview_debug._read_only_debugger_body")
     @patch("commentary_android_webview_debug.build_opener")
     @patch("commentary_android_webview_debug.adb")
