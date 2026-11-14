@@ -14,7 +14,9 @@
 int main(int argc, char** argv) {
     const bool registryMode =
         argc == 3 && std::string(argv[2]) == "--chapter-registry";
-    if (argc != 2 && !registryMode) return 2;
+    const bool linkedMode =
+        argc == 5 && std::string(argv[2]) == "--is-linked";
+    if (argc != 2 && !registryMode && !linkedMode) return 2;
     const std::string moduleId(argv[1]);
     if (!std::regex_match(moduleId, std::regex("[A-Za-z][A-Za-z0-9_]{0,79}")))
         return 2;
@@ -27,6 +29,30 @@ int main(int argc, char** argv) {
     const std::string driver = drv ? drv : "";
     if (driver != "RawCom" && driver != "RawCom4"
             && driver != "zCom" && driver != "zCom4") return 5;
+    if (linkedMode) {
+        const std::regex keyPattern(
+            "[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9][0-9]*\\.[1-9][0-9]*");
+        const std::string first(argv[3]), second(argv[4]);
+        if (!std::regex_match(first, keyPattern)
+                || !std::regex_match(second, keyPattern)) return 20;
+        sword::VerseKey k1, k2;
+        k1.setVersificationSystem(original->getVersificationSystem());
+        k2.setVersificationSystem(original->getVersificationSystem());
+        k1.setIntros(true);
+        k2.setIntros(true);
+        k1.setAutoNormalize(false);
+        k2.setAutoNormalize(false);
+        k1.setText(first.c_str());
+        k2.setText(second.c_str());
+        if (k1.popError() || k2.popError()
+                || k1.getOSISRef() != first || k2.getOSISRef() != second)
+            return 21;
+        if (!module->hasEntry(&k1) || !module->hasEntry(&k2)) return 22;
+        std::cout << "L\\t" << first << '\\t' << second << '\\t'
+                  << (module->isLinked(&k1, &k2) ? "1" : "0")
+                  << '\\n';
+        return std::cout.good() ? 0 : 23;
+    }
     const char* v11nPtr = original->getVersificationSystem();
     const std::string v11n = v11nPtr ? v11nPtr : "";
     const std::string ver = sword::SWVersion::currentVersion.getText();
