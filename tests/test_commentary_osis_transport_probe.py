@@ -98,6 +98,28 @@ class OriginalRawNumberedTransportTests(unittest.TestCase):
                          "COMPILED_WORDS_A_SUBSEQUENCE_OF_ORIGINAL")
         self.assertFalse(got["source_prose_and_markup_parity_approved"])
 
+    def test_added_div_wrapper_can_preserve_original_element_attributes(self):
+        source = (b'<div type="commentary"><reference osisRef="Gen.1.2">'
+                  b'Invented citation</reference></div>')
+        compiled = (b'<div type="technical"><div type="commentary">'
+                    b'<reference osisRef="Gen.1.2">Invented citation</reference>'
+                    b'</div></div>')
+        result=classify_native_osis_roundtrip_delta(source,compiled)
+        self.assertTrue(result["only_div_element_count_added_not_other_element_names"])
+        self.assertTrue(result["non_div_element_order_and_exact_attribute_values_preserved"])
+        self.assertTrue(result["original_div_elements_exact_attribute_multiset_preserved"])
+        self.assertTrue(result["reference_attribute_values_in_original_document_order_preserved"])
+        self.assertFalse(result["all_original_markup_element_names_and_counts_preserved"])
+
+    def test_same_visible_citation_words_with_changed_link_target_is_detected(self):
+        source=b'<p><reference osisRef="Gen.1.2">An invented phrase</reference></p>'
+        compiled=b'<div type="technical"><p><reference osisRef="Gen.1.3">An invented phrase</reference></p></div>'
+        result=classify_native_osis_roundtrip_delta(source,compiled)
+        self.assertTrue(result["normalized_whitespace_visible_unicode_equal"])
+        self.assertFalse(result["reference_attribute_values_in_original_document_order_preserved"])
+        self.assertFalse(result["non_div_element_order_and_exact_attribute_values_preserved"])
+        self.assertTrue(result["only_div_element_count_added_not_other_element_names"])
+
     def test_invalid_work_id_cannot_inject_xml_attributes(self):
         with self.assertRaises(ValueError):
             build_numbered_transport_sample(
