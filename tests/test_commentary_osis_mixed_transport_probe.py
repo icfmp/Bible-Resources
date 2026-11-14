@@ -8,6 +8,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from commentary_osis_mixed_transport_probe import (
     build_mixed_original_transport, build_complete_original_transport,
     validate_private_index_alias_preview, _native_same_chapter_ranges,
+    classify_chapter_reader_repetition, probe_private_chapter_reader_repetition,
     mixed_transport_checks_pass, _COVERAGE_FIELDS
 )
 
@@ -188,6 +189,65 @@ class MixedOriginalTransportTests(unittest.TestCase):
         ]),"Gen.1.1-Gen.1.2 Gen.1.5 Gen.1.7")
         with self.assertRaises(ValueError):
             _native_same_chapter_ranges(["Gen.1.1","Gen.2.2"])
+
+
+
+class ReaderRepetitionTests(unittest.TestCase):
+    def test_complete_chapter_one_copy_vs_two_copies(self):
+        master=(" ".join(f"inventedword{n}" for n in range(1,125))).encode()
+        chapter_single=b"Chapter beginning " + master + b" Chapter ending."
+        chapter_double=b"Chapter beginning " + master + b" " + master + b" Chapter ending."
+        single=classify_chapter_reader_repetition(master, chapter_single)
+        twice=classify_chapter_reader_repetition(master,chapter_double)
+        self.assertEqual(single["classification"],"EXACT_COMMENTARY_EXCERPT_APPEARS_ONCE")
+        self.assertEqual(single["reliable_count"],1)
+        self.assertEqual(twice["classification"],"REPEATED_EXACT_COMMENTARY_EXCERPT")
+        self.assertEqual(twice["reliable_count"],2)
+
+    def test_partial_chapter_or_too_short_master_is_inconclusive(self):
+        master=(" ".join(f"word{n}" for n in range(1,125))).encode()
+        missing=b"Unrelated independent commentary omitted from this screen."
+        self.assertIsNone(
+            classify_chapter_reader_repetition(master,missing)["reliable_count"]
+        )
+        short=b"one two three four"
+        self.assertEqual(
+            classify_chapter_reader_repetition(short,master)["classification"],
+            "INSUFFICIENT_UNIQUE_ORIGINAL_PROSE"
+        )
+        with self.assertRaises(ValueError):
+            classify_chapter_reader_repetition(master,master,width=7)
+
+    def test_real_reader_difference_is_reported_not_approved(self):
+        from unittest.mock import patch
+        from tempfile import TemporaryDirectory
+        master=(" ".join(f"synthetic{n}" for n in range(1,125))).encode()
+        cases={
+            ("MHCC","Gen 1:1"):master,
+            ("BRIndexProbe","Gen 1:1"):master,
+            ("MHCC","Gen 1"):b"Beginning " +master + b" End",
+            ("BRIndexProbe","Gen 1"):b"Beginning " +master + b" " +master+b" End",
+        }
+        def mocked_query(module,reference,**kwargs):
+            return 0,cases[(module,reference)]
+        with TemporaryDirectory() as tmp, patch(
+            "pilot_subprocess.query",side_effect=mocked_query
+        ):
+            p=Path(tmp)
+            original=p/"original";original.mkdir()
+            rebuilt=p/"candidate";rebuilt.mkdir()
+            observed=probe_private_chapter_reader_repetition(
+                original,rebuilt,"MHCC","BRIndexProbe",{
+                    "Gen.1.2":{"link_to":"Gen.1.1","source_raw_sha256":"a"*64},
+                    "Gen.1.3":{"link_to":"Gen.1.1","source_raw_sha256":"a"*64},
+                }
+            )
+        self.assertEqual(observed["chapters_with_proven_increased_repeat_count"],1)
+        self.assertFalse(observed["publication_authorized"])
+        self.assertFalse(observed["chapter_deduplication_in_Xiphos_or_Bible_verified"])
+        self.assertEqual(
+            observed["cases"][0]["status"],"NEW_ALIAS_CHAPTER_REPETITION_INCREASE"
+        )
 
 
 if __name__=="__main__":
