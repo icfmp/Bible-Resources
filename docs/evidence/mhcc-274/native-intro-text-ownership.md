@@ -81,3 +81,53 @@ original book/chapter introduction still displays the original prose.
 
 No original source, installed source, released BRMHCC or published asset
 was altered.
+
+
+## Independent CCEL book/chapter-correlated evidence
+
+[Complete native + source witness test #43634072027](https://github.com/icfmp/Bible-Resources/actions/runs/43634072027)
+**PASS**, with all 47 section tests, 18 navigation tests, 16 structural
+transport tests, 6 intro text-location tests and 10 numbered OSIS tests.
+
+Neither source chapter contains a directly usable *chapter-wide*
+`scripCom` marker. The source therefore cannot be assigned merely by
+looking for `scripCom osisRef="Bible:Lev.19"`. The *existing* strict
+source `div1` book title and native book/code verification, full source
+chapter division count and source `div2` chapter mapping were reused
+instead — not an arbitrary ordinal or scripture citation fallback.
+
+| Original I key | Verified source book/chapter location | Source verse-section markers | Word alignment in differently published CCEL witness |
+| --- | --- | ---: | --- |
+| `Lev.19` | source book title **and** book markers match; chapter ordinal safe | 0 | **same complete ordered Unicode word sequence** |
+| `Ps.108` | source book title **and** book markers match; chapter ordinal safe | 0 | **at least 95% lexical overlap**; one or two source words not matched in the strict ordered comparison |
+
+Both texts are genuinely present at an original native chapter-introduction
+key but **have no K-keyed commentary entries at all** in their chapter.
+The original native KJV verse registry verifies **37** verse references in
+Leviticus 19 and **13** in Psalm 108. If independent editorial review
+establishes that each original passage represents the whole-chapter
+commentary, these are **50 potential new reader navigation targets**, not
+50 distinct commentary expositions, no proof of a source verse loss, and no
+permission to remove or duplicate original introduction text.
+
+Source witness for the five shorter single-chapter books remains mixed:
+2 John, 3 John and Jude source book identity is ambiguous or conflicts with
+known original metadata, and Obadiah and Philemon source chapter words are
+not close to the original I text, even though their source book/chapter
+locations can be independently recognized. These are **not** approved
+chapter-wide aliases: retain the original I texts and all independent
+K section bodies.
+
+## Implementation research boundary
+
+A real I-only standard `osis2mod` compilation was attempted separately
+for `Lev.19` and `Ps.108`. The original full-corpus native inspector
+initially rejected both **by its own requirement for at least one numbered
+K entry**; this diagnostic failure is not evidence the original introduction
+is unparseable. A separate explicit, strictly opt-in *intro-only* native
+reader and parser mode is being tested while retaining all production
+full-corpus no-empty-K checks by default.
+
+No original I/TOP content was edited. No publishable replacement module
+has been produced. The true source edition and full original layout still
+require human editorial verification before an index expansion.
