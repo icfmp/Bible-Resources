@@ -211,7 +211,7 @@ class SafeLexicalEvidenceTests(unittest.TestCase):
     def test_source_neighbor_correspondence_is_text_free_not_approval(self):
         result = independent_lexical_overlap(
             "The original explanation.",
-            b"<title>Prior chapter heading</title><p>The original explanation.</p>",
+            b"<title>Prior chapter heading</title>\n<p>The original explanation.</p>",
             source_neighbor_candidates=[
                 ("source_immediate_previous_heading_element", "Prior chapter heading")
             ],
@@ -229,7 +229,7 @@ class SafeLexicalEvidenceTests(unittest.TestCase):
     def test_unmatched_source_neighbor_is_not_accepted_as_approval(self):
         result = independent_lexical_overlap(
             "The original explanation.",
-            b"<title>Different original heading</title><p>The original explanation.</p>",
+            b"<title>Different original heading</title>\n<p>The original explanation.</p>",
             source_neighbor_candidates=[
                 ("source_div1_title_attribute", "Another title")
             ],
