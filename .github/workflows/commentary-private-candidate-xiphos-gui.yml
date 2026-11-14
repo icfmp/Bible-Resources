@@ -197,3 +197,86 @@ jobs:
             echo 'No source prose, SWORD original/candidate ZIP, screenshots or UI HTML are uploaded.'
             echo 'This does NOT approve all headings, actual mouse click navigation, copyright/edition equivalence, editorial acceptance or publication.'
           } >> "$GITHUB_STEP_SUMMARY"
+
+  # Modern independent reader lane. Ubuntu 24.04's packaged Xiphos 4.2.1
+  # predates the March 2026 upstream commentary-introduction fix (#1091).
+  # Fedora 45 ships reviewed upstream Xiphos 4.5.0 without source builds.
+  # This runs the SAME private stock/candidate/text checks, not a new probe.
+  private-candidate-in-current-xiphos:
+    runs-on: ubuntu-24.04
+    container:
+      image: fedora:45
+    timeout-minutes: 30
+    env:
+      RESOURCE_ID: ${{ github.event.inputs.resource_id || 'mhcc-crosswire' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install distribution Xiphos 4.5 and native SWORD test dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 420s dnf -y --setopt=install_weak_deps=False install \
+            xiphos sword-devel sword-utils gcc-c++ python3 python3-lxml \
+            python3-jsonschema xorg-x11-server-Xvfb xdotool xclip \
+            dbus-daemon shadow-utils util-linux
+          for name in Xvfb xiphos diatheke xdotool xclip dbus-run-session g++ runuser; do
+            command -v "$name"
+          done
+          actual="$(rpm -q --qf '%{VERSION}' xiphos)"
+          test "$actual" = '4.5.0' || {
+            echo "This separate lane requires the reviewed Fedora 45 Xiphos 4.5.0"; exit 1;
+          }
+          python3 -c 'from lxml import etree; import jsonschema'
+          useradd --create-home --shell /bin/bash mhccci
+          install -d -m 0700 -o mhccci -g mhccci /tmp/mhcc-current-xiphos
+      - name: Compile same independent unfiltered original SWORD readers
+        shell: bash
+        run: |
+          set -euo pipefail
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_raw_corpus.cpp \
+            -o /tmp/mhcc-current-xiphos/native-full -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_commentary_raw_key.cpp \
+            -o /tmp/mhcc-current-xiphos/native-key -lsword
+      - name: Check unchanged source and actual five-prose/two-href Xiphos 4.5 GUI
+        shell: bash
+        run: |
+          set -euo pipefail
+          runuser -u mhccci -- python3 \
+            scripts/commentary_private_candidate_xiphos_gui.py \
+            --resource-id "$RESOURCE_ID" \
+            --native-full-corpus-binary /tmp/mhcc-current-xiphos/native-full \
+            --native-single-key-binary /tmp/mhcc-current-xiphos/native-key \
+            --seconds 12 \
+            --report /tmp/mhcc-current-xiphos/receipt.json
+      - name: Verify modern-reader positive evidence but not untested navigation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d = json.loads(Path("/tmp/mhcc-current-xiphos/receipt.json").read_text())
+          proof = d["independent_private_candidate_gui_receipt"]
+          assert d["total_native_keys"] == 29975
+          assert d["all_original_SWORD_compressed_files_byte_preserved"] is True
+          assert d["complete_stock_and_candidate_native_raw_corpus_sha256_equal"] is True
+          assert proof["independent_gui_commentary_excerpt_match_count"] == 5
+          assert proof["original_source_corpus_hash_reconfirmed"] is True
+          assert proof["published"] is False and d["published"] is False
+          assert proof["xiphos_reference_mouse_click_navigation_verified"] is False
+          intro = proof["real_Xiphos_commentary_book_chapter_heading_context_menu"]
+          print("Current Xiphos 4.5.0 genuine prose samples: 5; "
+                "source hyperlink destinations: 2; normal chapter intro positive: "
+                + str(intro["original_intro_in_normal_chapter_GUI_verified"])
+                + "; no link click or release approval implied")
+          PY
+      - name: Retain metadata only for modern Xiphos comparison
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: commentary-private-xiphos-fedora45-metadata-${{ github.run_id }}
+          path: /tmp/mhcc-current-xiphos/receipt.json
+          retention-days: 14
+          if-no-files-found: warn
