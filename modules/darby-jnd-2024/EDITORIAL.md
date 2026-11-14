@@ -24,3 +24,7 @@
 - Any future publisher correction/revision is a **new source identity** to audit; upstream BPC error report remains a draft and no publisher reply has been claimed.
 
 The stable release must use distinct SWORD module ID `BRJND2024`, `zText`, `Luther`, and version `0.1.0`, with the exact source-fidelity report, independent native indexed-key audit, schema report, final SWORD binary hashes, a real catalogue snapshot and successful Pages endpoint verification.
+
+## Maintenance update 0.1.1 — 2026-11-14
+
+Owner release authorization: https://github.com/icfmp/Bible-Resources/issues/241#issuecomment-6875143143. Original BPC OSIS untouched. All 31,166 verses and 6,340 notes preserved. All 521 original subject/stanza division stars now represented in reversible, nondisplayed OSIS metadata; one textual-critical star stays inline. 4,690 machine XML indentation spans removed without changing textual words or poetic formatting. Source/native and Xiphos/AndBible QA is in docs/evidence/darby-2024-0.1.1-final-reader-qa.md. The original tagged 0.1.0 GitHub release remains immutable and available for rollback.

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "status": "owner_authorized_for_stable_0_1_1_after_exact_source_and_reader_checks",
+  "module_id": "BRJND2024",
+  "version": "0.1.1",
+  "release_tag": "darby-jnd-2024-0.1.1",
+  "source_osis_sha256": "2204629e3efb3024dceb392780ef5e61f4296ea832c90e3dd2a5c3224179c1d3",
+  "compiler_input_osis_sha256": "35eb23c62eefdcda9a94d6a493df0bf32d5af1bc6ccc2132e495091d7771406d",
+  "private_final_zip_sha256": "631f97956ba1b83def91fdba84f83ff9dcb0486a4097e5102a9b3a937f0abba6",
+  "prior_immutable_release_zip_sha256": "5910669e5eeb85d2ba06a4602918ce71d6773f36d64502bbdf7f96fff0585f15",
+  "owner_approval_url": "https://github.com/icfmp/Bible-Resources/issues/241#issuecomment-6875143143",
+  "preserve_previous_release_assets": true,
+  "published": false
+}

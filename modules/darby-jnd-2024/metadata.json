@@ -13,7 +13,7 @@
   },
   "quality": {
     "edition": "reader_optimized",
-    "reviewed_by": "Bible Resources project owner, scoped decision 2026-11-12",
+    "reviewed_by": "Bible Resources project owner, release #241 (2026-11-14)",
     "smoke_key": "John 3:16",
     "status": "approved"
   },
@@ -38,5 +38,5 @@
     }
   ],
   "versification": "Luther",
-  "version": "0.1.0"
+  "version": "0.1.1"
 }
