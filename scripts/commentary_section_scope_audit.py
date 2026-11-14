@@ -265,6 +265,7 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
     counts = Counter(relation(s) for s in sections)
     reference_counts = Counter()
     independent_evidence_matrix = Counter()
+    no_independent_range_evidence = []
     for s in sections:
         last = s["start"].rsplit(".", 1)[0] + "." + str(s["declared_end"])
         has_scripref = last in independent_reference_ranges.get(s["start"], set())
@@ -277,6 +278,8 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
             ("scripCom" if has_scripcom else "no_scripCom") + "_and_" +
             ("scripRef" if has_scripref else "no_scripRef")
         ] += 1
+        if not has_scripcom and not has_scripref:
+            no_independent_range_evidence.append(s)
     return {
         "status": "PINNED_DIFFERENT_DIGITAL_EDITION_SCOPE_COMPARISON",
         "witness_sha256": expected,
@@ -286,6 +289,7 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
         "source_range_agreement_counts": dict(sorted(counts.items())),
         "independent_scripref_range_agreement_counts": dict(sorted(reference_counts.items())),
         "independent_reference_evidence_matrix": dict(sorted(independent_evidence_matrix.items())),
+        "no_exact_independent_reference_evidence_sections": no_independent_range_evidence,
         "independent_scripref_is_not_section_anchor": True,
         "anomaly_source_range_corroboration": [
             {"start": a["start"], "declared_end": a["declared_end"],
