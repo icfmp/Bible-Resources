@@ -20,7 +20,7 @@ from zipfile import ZipFile
 ROOT = Path(__file__).resolve().parents[1]
 SHA = re.compile(r"[a-f0-9]{64}\Z")
 COMMIT_SHA = re.compile(r"[a-f0-9]{40}\Z")
-TAG = re.compile(r"[a-z][a-z0-9-]{2,80}\Z")
+TAG = re.compile(r"[a-z][a-z0-9-]{1,64}-(?:[0-9]+\.){2}[0-9]+\Z")
 SAFE_NAME = re.compile(r"[A-Za-z][A-Za-z0-9_-]{1,63}-(?:[0-9]+\.){2}[0-9]+\.zip\Z")
 HEX_VERSION = re.compile(r"[0-9]+\.[0-9]+\.[0-9]+\Z")
 ALLOWED_FIELDS = {
@@ -69,7 +69,7 @@ def approved_release(root: Path, plan_file: Path, built: Path) -> dict:
             or type(plan["package_size_bytes"]) is not int
             or not 0 < plan["package_size_bytes"] <= 100 * 1024 * 1024):
         raise ReleaseError("Release ID, archive fingerprint or version invalid")
-    if plan["tag"] != f"{plan['module_id'].replace('-crosswire','')}-{plan['version']}" and not plan["tag"].endswith("-" + plan["version"]):
+    if not plan["tag"].endswith("-" + plan["version"]):
         raise ReleaseError("Release tag and curated version differ")
     if (not isinstance(plan["title"], str) or not plan["title"].strip()
             or len(plan["title"]) > 140):
