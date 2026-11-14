@@ -85,3 +85,27 @@ These are **reference-scope signals only**, and the same CCEL XML is a different
 5. Propose upstream CrossWire/CCEL corrections with evidence, and seek explicit owner approval before any publication. Never silently overwrite original BRMHCC 0.1.0 or resume the paused modern-English edition #270.
 
 **Every published original and independent witness remains unchanged.**
+
+
+## Second pass — unlabelled chapters and discontinuous ranges (2026-11-14)
+
+**This section supersedes the 3,927-section / 140-unknown / 16-index-case preliminary
+figures above; earlier results remain as dated reproducible checkpoints.**
+
+Exact original SHA-pinned stock scan and independent CCEL comparison
+[Actions #43609634615](https://github.com/icfmp/Bible-Resources/actions/runs/43609634615)
+**PASS**; 19 synthetic tests **PASS**.
+
+- **3,928** distinct start-anchored section headings identified (previously 3,927).
+- **3,443** continuous dash groups, **468** single-verse groups, **16** comma groups and **one discontinuous multi-range group**.
+- **17** original native index coverage failures across explicitly declared section headings, corresponding to **24 missing numbered SWORD slots**: the previously documented 16 two-verse groups plus the eight verse continuation slots in **Matthew 13:36–43**.
+- Matthew 13:24–30 **and 36–43** form one authorial exposition of the parable of the tares. The *same stock payload* is occupied in Matt 13:24–30, whereas **all eight keys 13:36–43 are unoccupied**. Different publisher-independent displays agree on the unusual discontiguous scope: [Biblia](https://biblia.com/books/mhenryc/Mt13.1-23), [Christianity.com](https://www.christianity.com/bible/commentary/matthew-henry-concise/matthew/13), and [a preserved alternative transcription](https://sacred-texts.com/bib/cmt/mhcc/mat013.htm). These witnesses establish a source-reading hypothesis, not identical edition provenance.
+- **133** native numbered rows lack a recognized *simple* number heading after recognizing Matthew's discontiguous reference: 131 with nonnumeric XML title and 2 with unparsed mention of the word “Verse”. They are **119 distinct raw source payloads**.
+- **119** of the 133 unrecognized rows occur at a chapter's **first verse**; the remaining **14** are Amos 1:2–15 repeating exactly the same raw text as Amos 1:1.
+- **118** of the 119 chapter-first rows are the **only occupied native SWORD verse-key in their entire chapter**. The single exception is Amos 1, whose identical whole-chapter raw text is available at 15 individual native keys. This is a **chapter-level coverage design / editorial scope question**, not proof of lost words.
+- In the independent *different-edition* CCEL ThML, **none of the 119 distinct unrecognized original stock payloads** corresponds to a strictly parseable explicit multi-verse `scripCom` annotation beginning at the same native key. The parser found one such annotated multi-verse group for Matt 13:24–30 only; its second range 36–43 is not in a continuous simple `scripCom` endpoint.
+- The strict *independent* agreement matrix for 3,928 starts is now 3,237 `scripCom`+`scripRef`, 119 `scripCom` only, 566 `scripRef` only and **6 neither**. The additional “neither” is Matthew 13's **noncontiguous** section; five previously known Jude/Judges source-bookcode conflicts remain distinct. These six are **not automatically source errors**.
+
+**Interpretive boundary:** A chapter with exactly one original stock SWORD verse slot can intentionally be represented by a single chapter-level comment anchored to verse 1. It may be inconvenient for verse-based reading, but one cannot silently duplicate that comment to all verses and call it a *textual correction*. The corresponding original chapter body, author's scope and source editorial conventions must be verified before considering a navigational enrichment.
+
+**Remaining gates:** (1) inspect chapter divisions with no `scripCom` unit and determine whether every “chapter-level” comment genuinely covers the whole chapter; (2) classify the two Psalms with a non-heading verse mention without changing prose; (3) verify original source-to-compiled text fidelity, references, headings, intros and 17 confirmed indexing cases; (4) prepare a generic, reversible index patch proposal separately with explicit editorial review and owner authorization. **No source bytes or published assets changed.**
