@@ -1397,6 +1397,15 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             )
             for chapter, raw in sorted(private_intro_text_raw_by_chapter.items())
         ]
+        for row in source_intro_chapter_text_reviews:
+            limit = registry["chapter_maximums"].get(row["original_native_intro_key"])
+            if not isinstance(limit, int) or limit < 1:
+                raise PilotError("Original intro chapter is outside native versification registry")
+            row["registered_native_chapter_verse_limit"] = limit
+            row["navigation_keys_not_originally_occupied_if_intro_is_approved_as_whole_chapter"] = (
+                limit if row["numbered_keys_present_in_original_chapter"] == 0 else None
+            )
+            row["whole_chapter_authorial_scope_is_not_yet_approved"] = True
         result = classify(records)
         index_preflight = triage_missing_native_section_links(
             occupied={key: entry["sha256"] for key, entry in records.items()},
