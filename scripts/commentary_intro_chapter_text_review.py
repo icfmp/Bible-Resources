@@ -114,3 +114,90 @@ def review_original_intro_against_numbered_chapter(
         "original_full_chapter_commentary_coverage_proven": False,
         "source_or_candidate_published": False,
     }
+
+
+def independent_thml_chapter_intro_witness(
+        document, original_intro_raw_by_chapter: dict[str, bytes]) -> dict:
+    """Cross-check chapter-annotated independent ThML against native I text.
+
+    Only a *chapter-level* scripCom annotation in a unique div2 is eligible.
+    Cross-edition word agreement does not prove original print identity or
+    authorize moving original native I text into numbered K slots.
+    """
+    from commentary_nonlink_word_alignment import plain_word_alignment
+
+    if not isinstance(original_intro_raw_by_chapter, dict):
+        raise ValueError("Unreviewed native introduction source registry")
+    targets = set(original_intro_raw_by_chapter)
+    if (len(targets) > 200 or any(
+            re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9]\d*", key) is None
+            for key in targets)):
+        raise ValueError("Invalid or oversized native intro source registry")
+    source_markers = {chapter: [] for chapter in targets}
+    for node in document.iter():
+        if not isinstance(node.tag, str) or node.tag.rsplit("}", 1)[-1] != "scripCom":
+            continue
+        attr = node.get("osisRef", "")
+        if not attr.startswith("Bible:"):
+            continue
+        chapter = attr[len("Bible:"):]
+        if chapter not in targets:
+            continue
+        parent = node.getparent()
+        while parent is not None and (
+            not isinstance(parent.tag, str)
+            or parent.tag.rsplit("}", 1)[-1] != "div2"
+        ):
+            parent = parent.getparent()
+        if parent is not None and parent not in source_markers[chapter]:
+            source_markers[chapter].append(parent)
+    cases = []
+    for chapter in sorted(targets):
+        paragraphs = source_markers[chapter]
+        base = {
+            "native_original_intro_chapter": chapter,
+            "independent_explicit_chapter_annotation_div2_count": len(paragraphs),
+            "source_and_original_same_digital_edition_proven": False,
+            "original_introduction_text_or_anchor_changed": False,
+        }
+        if len(paragraphs) != 1:
+            base.update({
+                "status": "NO_UNIQUE_PINNED_THML_CHAPTER_ANNOTATION",
+                "original_original_source_scope_approved": False,
+            })
+            cases.append(base)
+            continue
+        witness_text = _visible(paragraphs[0])
+        original_text = _visible(_original(original_intro_raw_by_chapter[chapter]))
+        source_tokens = [token.casefold() for token in WORD.findall(witness_text)]
+        original_tokens = [token.casefold() for token in WORD.findall(original_text)]
+        if not original_tokens or not source_tokens:
+            base.update({
+                "status": "EMPTY_SOURCE_OR_NATIVE_INTRO_WORDS",
+                "original_original_source_scope_approved": False,
+            })
+        else:
+            ordered = plain_word_alignment(source_tokens, original_tokens)
+            base.update({
+                "status": "INDEPENDENT_THML_CHAPTER_MARKER_LEXICAL_WITNESS_NOT_APPROVAL",
+                "independent_source_div2_word_count": len(source_tokens),
+                "original_native_intro_word_count": len(original_tokens),
+                "source_vs_original_intro_ordered_word_class":
+                    ordered["exact_unicode_ordered_alignment_class"],
+                "source_words_not_located_in_original_intro":
+                    ordered["original_plain_words_not_matched_in_exact_order"],
+                "native_intro_words_not_located_in_source_div2":
+                    ordered["stock_plain_words_not_matched_in_exact_order"],
+                "native_intro_full_word_sequence_is_in_source_div2":
+                    ordered["stock_plain_words_not_matched_in_exact_order"] == 0,
+                "source_words_in_full_original_intro_order":
+                    ordered["original_plain_words_not_matched_in_exact_order"] == 0,
+                "original_original_source_scope_approved": False,
+            })
+        cases.append(base)
+    return {
+        "status": "INDEPENDENT_THML_CHAPTER_INTRO_ALIGNMENT_NOT_EDITORIAL_APPROVAL",
+        "case_rows": cases,
+        "source_or_original_text_values_logged": False,
+        "chapter_scope_and_verse_navigation_approved": False,
+    }
