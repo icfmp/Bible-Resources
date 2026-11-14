@@ -232,6 +232,7 @@ jobs:
             --temporary-numbered-sample-chapters Gen.36 Matt.13 Song.1 \
             --temporary-original-intro-sample-chapters Lev.19 Ps.108 \
             --temporary-original-mixed-chapters 2John.1 2Chr.1 Matt.13 \
+            --temporary-original-full-transport \
             --synthetic-intro-native-stream "${RUNNER_TEMP}/synthetic-introductions/native.raw"
       - name: Summarize scope and known regression probes without original text
         run: |
@@ -338,6 +339,36 @@ jobs:
                   raise AssertionError("Private original mixed source transport lost or changed I/K content, keys, attributes or reference targets")
               if sample["original_I_keys_missing_from_compiled"] or sample["original_K_keys_missing_from_compiled"] or sample["unexpected_compiled_I_keys"] or sample["unexpected_compiled_K_keys"]:
                   raise AssertionError("Private original mixed module has nonidentical indexed I/K locations")
+          full=r["private_complete_original_I_K_U_osis2mod_roundtrip"]
+          assert full is not None and full["published"] is False
+          print("Private complete-original I/K/U compiler result:",full["status"],
+                "completed",full.get("readback_completed",False),
+                "original books",full["source_book_intro_count"],
+                "chapters",full["source_chapter_intro_count"],
+                "numbered native source keys",full["source_numbered_key_count"])
+          if not full.get("readback_completed",False):
+              raise AssertionError("Whole-original isolated OSIS compile/native readback failed")
+          assert full["source_book_intro_count"]==66
+          assert full["source_chapter_intro_count"]==1189
+          assert full["source_numbered_key_count"]==28718
+          print("Whole original intro comparisons:",json.dumps(full["source_intro_I_coverage"],sort_keys=True))
+          print("Whole original numbered comparisons:",json.dumps(full["source_numbered_K_coverage"],sort_keys=True))
+          print("Missing/extra original I/K:",
+                full["missing_I_count"],full["missing_K_count"],
+                full["extra_I_count"],full["extra_K_count"])
+          print("Original versus recompiled TOP raw positions:",
+                full["source_TOP_count"],full["compiled_TOP_count"],
+                "exact original indexed TOP bytes",
+                full["all_original_TOP_positions_exact_raw_bytes"])
+          print("Full-original indexed source I/K semantic checks:",
+                full["original_indexed_I_K_text_markup_reference_checks_passed"])
+          print("All original I/K/U positions and checked semantics reconciled:",
+                full["full_original_K_I_U_native_entry_parity_proven"])
+          assert full["corrections_or_publication_authorized"] is False
+          assert full["historical_print_edition_parity_proven"] is False
+          assert full["reader_layout_parity_proven"] is False
+          if not full["original_indexed_I_K_text_markup_reference_checks_passed"]:
+              raise AssertionError("Full original I/K technical roundtrip differs; see metadata-only artifact")
           for sample in r["private_original_intro_only_osis2mod_sample_roundtrips"]:
               print("Isolated actual original I transport proof",sample["original_native_intro_key"],
                     "modes",json.dumps(sample["test_only_modes"],sort_keys=True),
