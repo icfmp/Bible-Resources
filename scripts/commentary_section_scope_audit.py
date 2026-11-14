@@ -24,6 +24,7 @@ import zipfile
 from lxml import etree
 
 from commentary_intake import load_manifest
+from commentary_osis_rebuild_preflight import NativeOSISRebuildPreflight
 from commentary_navigation_link_plan import (
     parse_native_commentary_verse_registry, UnsafeCommentaryLinkPlan,
     triage_missing_native_section_links,
@@ -1277,6 +1278,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         rows = []
         records = {}
         private_unrecognized_raw = {}
+        osis_rebuild_preflight = NativeOSISRebuildPreflight()
         unparsed = 0
         process = None
         try:
@@ -1289,6 +1291,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
             def on_entry(kind: str, ref: str, raw: bytes) -> None:
                 nonlocal unparsed
                 rows.append((kind, ref))
+                osis_rebuild_preflight.observe(kind, ref, raw)
                 if kind != "K":
                     return
                 heading = heading_extent(raw)
@@ -1315,6 +1318,9 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
             raise
         proof = private_crosscheck(
             independent.stdout, manifest["module_id"], rows, summary
+        )
+        original_osis_rebuild_feasibility = osis_rebuild_preflight.report(
+            expected_count=summary["all_actual_raw_entries_scanned"]
         )
         expected_raw = manifest.get("native_raw_corpus_sha256")
         actual_raw = summary["all_native_raw_entries_ordered_sha256"]
@@ -1371,6 +1377,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
             "native_numbered_rows": len(keys),
             "native_intro_rows": len(intros), "native_top_rows": len(top),
             "native_full_key_crosscheck": proof["exact_all_occupied_stock_keys_read_and_crosschecked"],
+            "original_osis_rebuild_structure_preflight": original_osis_rebuild_feasibility,
             "native_rows_with_unrecognized_heading_or_xml": unparsed,
             **result,
             "explicit_heading_native_link_candidate_preflight": index_preflight,
