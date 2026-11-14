@@ -61,6 +61,12 @@ jobs:
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update
           timeout 90s sudo apt-get -o Acquire::Retries=0 \
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev libsword-utils
+      - name: Install one independent Xiphos reader for the bounded private alias preview
+        run: |
+          set -euo pipefail
+          timeout 180s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y \
+            xiphos xvfb xdotool xclip dbus-x11 diatheke
       - name: Compile independent stock index and private raw-entry readers
         run: |
           set -euo pipefail
@@ -234,6 +240,7 @@ jobs:
             --temporary-original-mixed-chapters 2John.1 2Chr.1 Matt.13 \
             --temporary-original-full-transport \
             --temporary-provisional-range-index-preview \
+            --temporary-preview-real-xiphos \
             --synthetic-intro-native-stream "${RUNNER_TEMP}/synthetic-introductions/native.raw"
       - name: Summarize scope and known regression probes without original text
         run: |
@@ -385,6 +392,28 @@ jobs:
                 preview["all_proposed_new_aliases_same_compiled_raw_as_original_master"],
                 "original TOP unchanged",preview["all_original_TOP_positions_exact_raw_bytes"])
           assert preview["preflight_candidate_section_count"]==17
+          xiphos=preview["private_real_xiphos_alias_navigation_probe"]
+          assert xiphos is not None
+          print("Independent real Xiphos/private LSG preview:",
+                xiphos["status"],
+                "sample keys",xiphos["sample_keys"],
+                "diatheke 25-consecutive-word master/alias matches",
+                xiphos["diatheke_alias_master_shared_run_minimum"],
+                "GTK window visible",
+                xiphos["real_xiphos_executable_started_and_visible"],
+                "real selected commentary clipboard matches",
+                xiphos["independent_gui_commentary_excerpt_match_count"],
+                "all real passage commands accepted",
+                xiphos["actual_passage_commands_accepted"],
+                "whole chapter deduplication PROVEN",
+                xiphos["whole_chapter_commentary_deduplication_proven"])
+          assert xiphos["source_prose_or_screenshot_uploaded"] is False
+          assert xiphos["published"] is False
+          assert xiphos["sample_count"]>=2
+          assert xiphos["diatheke_alias_master_shared_run_minimum"]>=25
+          assert xiphos["real_xiphos_executable_started_and_visible"] is True
+          assert xiphos["entire_edition_reader_presentation_approved"] is False
+
           assert preview["planned_extra_index_keys"]==24
           if not preview.get("readback_completed",False):
               raise AssertionError("Provisional range preview compiler/native reader failed")
