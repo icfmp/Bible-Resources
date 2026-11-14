@@ -123,6 +123,8 @@ jobs:
           div2=witness["independent_div2_chapter_body_review"]
           print("Full source div2 chapter-scope classification:",
                 json.dumps(div2.get("candidate_classes",{}),sort_keys=True))
+          print("Independent source vs unchanged stock chapter-word diagnostic:",
+                json.dumps(div2.get("independent_stock_vs_source_lexical_diagnostic_classes",{}),sort_keys=True))
           print("Source book title/marker alignment:",
                 json.dumps(div2.get("book_alignment_evidence_classes",{}),sort_keys=True))
           for bookrow in div2.get("book_alignment_evidence_rows",[]):
@@ -135,6 +137,11 @@ jobs:
                     "nonempty-paragraphs",divcase["source_nonempty_paragraph_count"],
                     "source-annotation-chapters",divcase["source_annotated_chapters"],
                     "source-h2-numeric-chapters",divcase["source_h2_numeric_chapters"])
+              lexical=divcase.get("independent_lexical_comparison")
+              if lexical and (divcase["native_start"]=="2Chr.1.1"
+                              or lexical.get("overlap_class") not in ("HIGH_95_PLUS", "HIGH_80_PLUS")):
+                  print("Needs lexical scope review",divcase["native_start"],
+                        json.dumps(lexical,sort_keys=True))
           chapter=witness["independent_whole_chapter_review"]
           print("Independently witnessed one-key chapter scope candidates:",
                 json.dumps(chapter["source_scope_candidate_classes"],sort_keys=True))
