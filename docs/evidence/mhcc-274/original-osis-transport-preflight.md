@@ -162,3 +162,43 @@ access proposals; 25 CCEL `scripRef` annotation gaps; font/paragraph
 rendering in a real independent reader. All remain separate acceptance
 gates. The complete original MHCC compressed module and published BRMHCC
 0.1.0 remain unchanged, as do #270/#272.
+
+
+## Fourth gate — complete original book/chapter intro and opaque TOP structural provenance
+
+[Exact-original complete native audit #43631093133](https://github.com/icfmp/Bible-Resources/actions/runs/43631093133)
+**SUCCESS** and 45 editorial, 18 link-plan, 13 native reconstruction-structure
+and 10 compiled sample tests passed on the exact original SHA-pinned corpus.
+
+The intros and TOP must be treated as **independent first-class indexed
+SWORD records**, not discarded or guessed from the 28,718 K entry texts.
+
+Original intro records:
+- **66 book intro keys**, **1,189 chapter intro keys**.
+- Their top-level parsed XML children, preserving all original element
+  names (counts across 1,255 source entries): **1,191 `chapter`**,
+  **1,957 `div`**, **198 `milestone`**, **7 `title`**.
+- **None** has unwrapped leading visible text before its first XML child.
+- All are included in the 5,302 original distinct safely parsable K/I XML
+  bodies; no published source content was rewritten.
+
+Original TOP records:
+- **2 indexed opaque TOP** entries, each with **83 exact original bytes**,
+  the same raw SHA-256, and exactly **one `milestone` XML element**.
+- Each original `milestone` has the original attribute-name set
+  `n`, `subType`, `type`; no visible Unicode words.
+- Their original byte-level and XML attribute-value identity remains
+  an explicit full-rebuild readback gate. A lack of prose does not make
+  an indexed structural milestone disposable.
+
+**Technical implication:** a naive K-only `osis2mod` reconstruction is
+inadequate even if the 67 sampled K entry words and attributes survive.
+The full edition requires a source-faithful way to restore book/chapter
+introduction locations and the two structural TOP positions, while not
+duplicating the existing intro markup within a newly generated OSIS
+book/chapter wrapper. It also requires roundtrip testing against
+all 29,975 original native occupied K/I/U entries.
+
+**No complete replacement module has yet been generated.** This is an
+inspection and standard compiler feasibility gate, not publication or an
+approved editoral change.
