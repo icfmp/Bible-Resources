@@ -460,6 +460,146 @@ def build_complete_original_transport(
 
 
 
+
+def _word_tokens_for_reader_comparison(rendered: bytes) -> list[str]:
+    """Decode only private bounded UTF-8 reader output, never log its words."""
+    if not isinstance(rendered, bytes) or not 1 <= len(rendered) <= 4*1024*1024:
+        raise ValueError("Unbounded reader content in chapter-duplication probe")
+    try:
+        value = rendered.decode("utf-8")
+    except UnicodeError:
+        raise ValueError("Independent reader output is not UTF-8") from None
+    return re.findall(r"\w+", value.casefold())
+
+
+def classify_chapter_reader_repetition(master: bytes, chapter: bytes,
+                                       *, width: int = 20) -> dict:
+    """Count repeated *source prose*, not repeated verse numbers/headings.
+
+    For a definitive result, independently sampled unique source windows
+    must all occur the same positive number of times in a chapter rendering.
+    Otherwise the result is explicitly inconclusive. The exact words never
+    leave this bounded in-memory diagnostic.
+    """
+    if type(width) is not int or not 12 <= width <= 40:
+        raise ValueError("Unreviewed exact-prose window size")
+    words = _word_tokens_for_reader_comparison(master)
+    in_chapter = _word_tokens_for_reader_comparison(chapter)
+    if len(words) < width * 3 or len(in_chapter) > 700_000:
+        return {"classification": "INSUFFICIENT_UNIQUE_ORIGINAL_PROSE",
+                "reliable_count": None, "unique_master_windows_used": 0}
+    offsets = sorted({
+        width, max(width, len(words)//3),
+        max(width, len(words)*2//3),
+        max(width, len(words)-2*width)
+    })
+    counts = []
+    for offset in offsets:
+        needle = words[offset:offset+width]
+        if len(needle) < width:
+            continue
+        def occurrences(haystack):
+            return sum(haystack[i:i+width] == needle
+                       for i in range(len(haystack)-width+1))
+        if occurrences(words) != 1:
+            continue
+        counts.append(occurrences(in_chapter))
+    if len(counts) < 2 or any(c != counts[0] for c in counts) or counts[0] == 0:
+        return {"classification": "INCONCLUSIVE_CHAPTER_CONTENT_OR_WINDOW_COUNTS",
+                "reliable_count": None, "unique_master_windows_used": len(counts)}
+    return {
+        "classification": (
+            "EXACT_COMMENTARY_EXCERPT_APPEARS_ONCE"
+            if counts[0] == 1 else "REPEATED_EXACT_COMMENTARY_EXCERPT"
+        ),
+        "reliable_count": counts[0],
+        "unique_master_windows_used": len(counts),
+    }
+
+
+def probe_private_chapter_reader_repetition(
+        original_root: Path, candidate_root: Path,
+        original_module_id: str, candidate_module_id: str,
+        proposed_aliases: dict[str, dict], *, max_chapters: int = 4) -> dict:
+    """Compare original and proposed chapter-wide CLI render duplication.
+
+    A native alias is correct as an index entry without proving whole-chapter
+    deduplication in the application. Report increases as blockers, never
+    erase a truthful source association merely to silence duplicate prose.
+    """
+    from collections import Counter
+    from pilot_subprocess import query, present_key
+    if (not original_root.is_dir() or original_root.is_symlink()
+            or not candidate_root.is_dir() or candidate_root.is_symlink()
+            or not proposed_aliases or not 1 <= max_chapters <= 6):
+        raise ValueError("Untrusted private original/candidate chapter probe")
+    chapters = {}
+    for target, claim in proposed_aliases.items():
+        chapter = target.rsplit(".", 1)[0]
+        section = claim["link_to"]
+        chapters.setdefault(chapter, Counter())[section] += 1
+    ranked = sorted(
+        chapters, key=lambda c: (-sum(chapters[c].values()), c)
+    )[:max_chapters]
+    cases = []
+    for chapter in ranked:
+        master = sorted(chapters[chapter],
+                        key=lambda x: (-chapters[chapter][x], x))[0]
+        book, number = chapter.rsplit(".", 1)
+        _, _, verse = master.split(".")
+        passage = f"{book} {number}:{verse}"
+        chapter_query = f"{book} {number}"
+        old_m, old_master = query(original_module_id, passage, fmt="plain",
+                                  root=original_root, timeout=35, limit=512*1024)
+        new_m, new_master = query(candidate_module_id, passage, fmt="plain",
+                                  root=candidate_root, timeout=35, limit=512*1024)
+        old_c, old_chapter = query(original_module_id, chapter_query,
+                                    fmt="plain",root=original_root,timeout=35,limit=4*1024*1024)
+        new_c, new_chapter = query(candidate_module_id, chapter_query,
+                                    fmt="plain",root=candidate_root,timeout=35,limit=4*1024*1024)
+        if not all((
+            present_key(passage, old_master, old_m),
+            present_key(passage, new_master, new_m),
+            present_key(chapter_query, old_chapter, old_c),
+            present_key(chapter_query, new_chapter, new_c),
+        )):
+            cases.append({
+                "chapter":chapter, "master":master,
+                "status":"ONE_OR_MORE_REAL_READER_QUERIES_UNAVAILABLE",
+                "original_repetition": None, "proposed_repetition": None
+            })
+            continue
+        old = classify_chapter_reader_repetition(old_master,old_chapter)
+        new = classify_chapter_reader_repetition(new_master,new_chapter)
+        old_count, new_count = old["reliable_count"],new["reliable_count"]
+        delta = (
+            "INCONCLUSIVE_NATIVE_CHAPTER_TEXT_PRESENTATION"
+            if old_count is None or new_count is None else
+            "NEW_ALIAS_CHAPTER_REPETITION_INCREASE"
+            if new_count > old_count else
+            "NO_INCREASE_IN_CLI_CHAPTER_REPETITION"
+        )
+        cases.append({
+            "chapter":chapter,"master":master,
+            "proposed_additional_aliases_for_master":chapters[chapter][master],
+            "status":delta,
+            "original_repetition":old,
+            "proposed_repetition":new,
+            "both_original_and_candidate_queried_in_actual_diatheke":True,
+        })
+    return {
+        "status":"GENERIC_NATIVE_COMMENTARY_CLI_CHAPTER_REPEAT_COMPARISON_NOT_GUI_APPROVAL",
+        "case_count":len(cases),
+        "cases":cases,
+        "chapters_with_proven_increased_repeat_count":sum(
+            c["status"]=="NEW_ALIAS_CHAPTER_REPETITION_INCREASE" for c in cases
+        ),
+        "chapter_deduplication_in_Xiphos_or_Bible_verified":False,
+        "no_source_text_logged_or_published":True,
+        "publication_authorized":False,
+    }
+
+
 def _probe_private_alias_real_xiphos(root: Path, module_id: str, aliases: dict,
                                     compiled_K: dict[str, bytes]) -> dict:
     """Bounded real-reader experiment; never claim window == rendered passage.
@@ -571,7 +711,9 @@ def probe_complete_original_transport(
         scratch: Path, native_raw_binary: Path,
         osis2mod_binary: str = "osis2mod",
         provisional_index_aliases: dict[str, dict] | None = None,
-        test_preview_in_xiphos: bool = False) -> dict:
+        test_preview_in_xiphos: bool = False,
+        original_stock_sword_root: Path | None = None,
+        original_stock_module_id: str = "MHCC") -> dict:
     """Attempt full private SWORD readback and compare EVERY original native key.
 
     This is diagnostic and cannot authorize a release. TOP is separately
@@ -694,6 +836,14 @@ def probe_complete_original_transport(
         len(original_TOP) == len(rebuilt["U"])
         and all(a == b for a, b in zip(original_TOP, rebuilt["U"]))
     )
+    chapter_repeat = None
+    if aliases and original_stock_sword_root is not None:
+        if not (indexed_checks and alias_identical and top_exact):
+            raise ValueError("Refuse chapter comparison for unreconciled alias source")
+        chapter_repeat = probe_private_chapter_reader_repetition(
+            original_stock_sword_root, root,
+            original_stock_module_id, module_id, aliases
+        )
     gui = None
     if test_preview_in_xiphos:
         if not aliases or not (indexed_checks and alias_identical and top_exact):
@@ -704,6 +854,7 @@ def probe_complete_original_transport(
     return {
         **source,
         "private_real_xiphos_alias_navigation_probe": gui,
+        "private_original_vs_alias_cli_chapter_repetition_probe": chapter_repeat,
         "status": "COMPLETE_ORIGINAL_PRIVATE_I_K_U_COMPILED_READBACK_NOT_APPROVAL",
         "readback_completed": True,
         "source_intro_I_coverage": summaries["I"],
