@@ -278,6 +278,43 @@ class SourceDivisionChapterTests(unittest.TestCase):
         self.assertEqual(report["candidate_classes"],
                          {"SOURCE_DIV2_UNDIVIDED_CHAPTER_BODY_CANDIDATE": 1})
 
+    def test_source_skipped_first_chapter_uses_its_own_explicit_heading(self):
+        document = etree.fromstring(
+            b'<root><div1 title="Genesis">'
+            b'<div2><scripCom osisRef="Bible:Gen.2"/>'
+            b'<h2>Chapter 2</h2><p>Undivided notes for chapter 2</p></div2>'
+            b'</div1></root>'
+        )
+        native = {"chapter_maximums": {"Gen.1":31, "Gen.2":25}}
+        cases = [
+            {"native_key": f"Gen.{chapter}.1", "first_verse_in_chapter": True,
+             "number_of_occupied_native_slots_in_chapter": 1,
+             "raw_payload_sha256": "a" * 64}
+            for chapter in (1, 2)
+        ]
+        result = independent_div2_chapter_body_evidence(document, native, cases)
+        by_key = {r["native_start"]: r for r in result["case_rows"]}
+        self.assertEqual(by_key["Gen.1.1"]["source_div2_structure_class"],
+                         "NO_SAFE_SOURCE_DIV2_FOR_NATIVE_CHAPTER")
+        self.assertEqual(by_key["Gen.2.1"]["source_div2_structure_class"],
+                         "SOURCE_DIV2_UNDIVIDED_EXPLICIT_HEADING_CANDIDATE")
+        self.assertEqual(by_key["Gen.2.1"]["source_div2_original_ordinal"], 1)
+
+    def test_chapter_heading_conflicting_with_source_scripcom_is_not_reassigned(self):
+        document = etree.fromstring(
+            b'<root><div1 title="Genesis">'
+            b'<div2><scripCom osisRef="Bible:Gen.1"/>'
+            b'<h2>Chapter 2</h2><p>Contradictory source metadata</p></div2>'
+            b'</div1></root>'
+        )
+        native = {"chapter_maximums": {"Gen.1":31, "Gen.2":25}}
+        cases = [{"native_key": "Gen.2.1", "first_verse_in_chapter": True,
+                  "number_of_occupied_native_slots_in_chapter": 1,
+                  "raw_payload_sha256": "a" * 64}]
+        result = independent_div2_chapter_body_evidence(document, native, cases)
+        self.assertEqual(result["candidate_classes"],
+                         {"NO_SAFE_SOURCE_DIV2_FOR_NATIVE_CHAPTER": 1})
+
     def test_partial_source_book_coverage_is_not_accepted(self):
         document = etree.fromstring(
             b'<root><div1 title="Genesis"><div2><p>Text</p></div2></div1></root>'
