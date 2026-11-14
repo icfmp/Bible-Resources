@@ -22,35 +22,59 @@ issue: "https://github.com/icfmp/Bible-Resources/issues/270"
 
 ## Elimelech and his sons die in Moab (verses 1–5)
 
-Elimelech was not wrong to provide for his family, but his decision to move to Moab could not be justified. That move ended in the loss of his family. It is foolish to try to escape a cross that lies in our path when we ought to take it up. A change of place seldom puts things right.
+Elimelech was right to care for his family. But he could not justify moving to Moab. The move ended in the loss of his family.
 
-Those who expose young people to bad company and remove them from public worship and religious ordinances may believe that the young people themselves have firm principles and are armed against temptation. But they cannot know how things will end. We are not told that the women whom Elimelech's sons married had converted to the Jewish faith.
+We are foolish when we run from a cross we ought to bear. Moving elsewhere seldom puts things right.
 
-Earthly trials and enjoyments alike last only a short time. Death continually takes people of every age and circumstance, spoiling all our outward comforts. We cannot place too high a value on blessings that will last forever.
+People may expose young people to bad company and take them away from public worship and religious ordinances. They may believe those young people have firm convictions and can resist temptation. But they cannot know how things will end.
+
+Elimelech's sons married women in Moab. We are not told whether those women had embraced the Jewish faith.
+
+Earthly troubles and pleasures do not last long. Death comes to people of every age and condition, taking away the comforts of this life.
+
+That is why we cannot value everlasting blessings too highly.
 
 ## Naomi returns home (verses 6–14)
 
-After the death of her two sons, Naomi began to consider returning home. When death enters a family, it should lead us to put right what is wrong there. Earth is made bitter to us so that heaven may become dear to us.
+After losing both her sons, Naomi began to think of returning home. When death enters a family, it should lead us to put right what is wrong.
 
-Naomi appears to have been a woman of faith and devotion. She sent her daughters-in-law away with prayer. It is fitting for friends who must part to do so in prayer and love.
+Earth can become bitter to us so that heaven grows dearer.
 
-Was Naomi right to discourage her daughters-in-law from going with her? She might have saved them from the idolatry of Moab and brought them to the faith and worship of the God of Israel. Without doubt she desired this, but she did not want them to go merely for her sake. Those who profess religion only to please their friends or to enjoy their company make poor converts.
+Naomi seems to have been a woman of faith and devotion. She parted from her daughters-in-law with prayer. When friends must say goodbye, they should do so with love and prayer.
 
-If they accompanied her, Naomi wanted them to make a deliberate choice. They needed first to sit down and count the cost, as everyone should when professing faith. Many desire “rest in the house of a husband,” some earthly security or satisfaction, more than the rest to which Christ invites our souls. When tested, such people will turn away from Christ, perhaps with sorrow.
+But was Naomi right to discourage them from coming with her? She could have led them away from Moab's idols and toward the worship of Israel's God.
+
+Surely she wanted that. Yet she did not want them to follow her simply out of affection for her. Those who embrace religion only to please friends, or to remain in their company, make poor converts.
+
+Naomi wanted them to make a deliberate choice. They needed to count the cost, as everyone should when professing faith.
+
+Many long for the “rest” of marriage—earthly comfort and security—more than the rest Christ offers the soul. When tested, such people turn away from him, perhaps with sorrow.
 
 ## Orpah remains; Ruth goes with Naomi (verses 15–18)
 
-Consider Ruth's resolve and her deep affection for Naomi. Orpah was reluctant to leave her, yet she did not love her enough to leave Moab for her sake. In the same way, many value Christ and feel affection for him, yet fall short of salvation through him because they will not give up other things for his sake. They love him and still leave him: they do not love him enough, for they love other things more. Ruth shows God's grace leading a soul to choose the better portion.
+Look at Ruth's resolve and her love for Naomi. Orpah found it hard to leave, but she did not love Naomi enough to leave Moab for her sake.
 
-Naomi could ask no more than Ruth's solemn declaration. Notice the power of firm resolve: it silences temptation. Those who follow a religious path without a steadfast mind are like a door left half open, inviting a thief. Resolution shuts and bolts the door, resists the devil, and forces him to flee.
+Something similar happens with Christ. Many admire him and feel affection for him, yet will not give up other things to follow him. They love him, but still leave him. They do not love him enough, because they love other things more.
+
+Ruth's choice shows what God's grace can do: it leads a soul to choose the better portion.
+
+Naomi could ask for no stronger pledge. A firm decision has power to silence temptation.
+
+Those who set out on the path of faith without a settled mind are like someone leaving a door half open to a thief. Firm resolve closes and bolts the door. It resists the devil and drives him away.
 
 ## Naomi and Ruth arrive in Bethlehem (verses 19–22)
 
-Naomi and Ruth arrived in Bethlehem. Affliction can bring great and unexpected changes in a short time. May God, by his grace, prepare us for all such changes, especially the greatest change of all.
+Naomi and Ruth arrived in Bethlehem. Affliction can change our lives greatly, and very quickly.
 
-Naomi means “pleasant” or “lovable”; Mara means “bitter” or “bitterness.” Naomi was now filled with sorrow. She had returned home empty: poor, widowed, and without children. Yet believers possess a fullness of which they can never be emptied—a good portion that will never be taken away from them.
+May God, by his grace, prepare us for every such change—especially the greatest change of all.
 
-Affliction is a bitter cup, but Naomi acknowledged that her suffering came from God. It is fitting for our hearts to be humbled under God's humbling providence. It is not affliction itself, but affliction rightly endured, that does us good.
+Naomi means “pleasant” or “lovable.” Mara means “bitter” or “bitterness.” Naomi was now full of sorrow. She had come home empty: poor, widowed, and without children.
+
+Yet believers possess a fullness that can never be taken from them. Their good portion will remain.
+
+Affliction is a bitter cup, and Naomi acknowledged that her suffering came from God. It is right for our hearts to be humbled under his humbling providence.
+
+Suffering alone does not do us good. What matters is how we bear it.
 
 ---
 
