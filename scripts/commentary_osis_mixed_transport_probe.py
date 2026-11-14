@@ -592,7 +592,7 @@ def probe_complete_original_transport(
     if root.exists() or root.is_symlink():
         raise ValueError("Refuse to overwrite private complete source candidate")
     data = root / "modules" / "comments" / "zcom" / module_id
-    conf = root / "mods.d" / (module_id + ".conf")
+    conf = root / "mods.d" / (module_id.lower() + ".conf")
     data.mkdir(parents=True)
     conf.parent.mkdir()
     (root / "source-original-private.osis.xml").write_bytes(xml)
