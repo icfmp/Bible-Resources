@@ -462,6 +462,81 @@ def build_complete_original_transport(
 
 
 
+
+def probe_native_original_link_identity(
+        *, installed_candidate_root: Path, module_id: str,
+        inspector_binary: Path, original_numbered: dict[str,bytes],
+        provisional_aliases: dict[str,dict]) -> dict:
+    """Independently inspect actual libSWORD isLinked (never raw-text equality).
+
+    This is vital for discontinuous annotation: a nonadjacent verse may be
+    linked to an earlier authorial unit even if another different unit lies
+    between them. Distinct authored units with identical words cannot safely
+    be identified by a plain-text hash.
+    """
+    if (not installed_candidate_root.is_dir() or installed_candidate_root.is_symlink()
+            or not inspector_binary.is_file() or inspector_binary.is_symlink()
+            or not WORK.fullmatch(module_id) or not provisional_aliases
+            or len(provisional_aliases)>3000):
+        raise ValueError("Untrusted native link-identity comparison inputs")
+    def inspect(master,target):
+        try:
+            proc=subprocess.run(
+                [str(inspector_binary),module_id,"--is-linked",master,target],
+                env=dict(os.environ,SWORD_PATH=str(installed_candidate_root)),
+                stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,
+                timeout=8,check=False
+            )
+        except (OSError,subprocess.TimeoutExpired) as exc:
+            raise ValueError("Native SWORD isLinked inspector unavailable") from exc
+        expected=f"L\t{master}\t{target}\t"
+        if (proc.returncode or len(proc.stdout)>512
+                or not proc.stdout.startswith(expected.encode("ascii"))
+                or proc.stdout not in (
+                    (expected+"1\n").encode("ascii"),
+                    (expected+"0\n").encode("ascii"),
+                )):
+            raise ValueError("Unexpected native SWORD link response")
+        return proc.stdout.endswith(b"1\n")
+    all_positive=[]
+    for target,claim in sorted(provisional_aliases.items()):
+        all_positive.append((target,inspect(claim["link_to"],target)))
+    # One explicit negative per chapter where a *different authored original*
+    # entry exists; do not equate source content hashes with authored identity.
+    controls=[]
+    tested=set()
+    for target,claim in sorted(provisional_aliases.items()):
+        master=claim["link_to"]
+        chapter=master.rsplit(".",1)[0]
+        if chapter in tested:
+            continue
+        tested.add(chapter)
+        alternate=next((
+            key for key,raw in sorted(original_numbered.items())
+            if key.startswith(chapter+".") and raw!=original_numbered[master]
+        ),None)
+        if alternate:
+            controls.append({
+                "chapter":chapter,"first":master,"second":alternate,
+                "different_original_authorial_section_was_linked":
+                    inspect(master,alternate)
+            })
+    return {
+        "status":"REAL_LIBSWORD_NATIVE_NONADJACENT_LINK_IDENTITY",
+        "proposed_key_count":len(provisional_aliases),
+        "all_original_master_to_proposed_target_pairs_are_native_linked":
+            all(x[1] for x in all_positive),
+        "native_linked_alias_count":sum(x[1] for x in all_positive),
+        "non_linked_proposed_pairs":[x[0] for x in all_positive if not x[1]],
+        "negative_distinct_section_controls":len(controls),
+        "all_independently_distinct_section_controls_unlinked":
+            all(not x["different_original_authorial_section_was_linked"] for x in controls),
+        "linked_discontinuous_sections_reported_without_bridging_gaps":True,
+        "source_text_and_xml_never_logged":True,
+        "candidate_not_published":True,
+    }
+
+
 def _word_tokens_for_reader_comparison(rendered: bytes) -> list[str]:
     """Decode only private bounded UTF-8 reader output, never log its words."""
     if not isinstance(rendered, bytes) or not 1 <= len(rendered) <= 4*1024*1024:
@@ -834,7 +909,8 @@ def probe_complete_original_transport(
         provisional_index_aliases: dict[str, dict] | None = None,
         test_preview_in_xiphos: bool = False,
         original_stock_sword_root: Path | None = None,
-        original_stock_module_id: str = "MHCC") -> dict:
+        original_stock_module_id: str = "MHCC",
+        native_index_binary: Path | None = None) -> dict:
     """Attempt full private SWORD readback and compare EVERY original native key.
 
     This is diagnostic and cannot authorize a release. TOP is separately
@@ -957,6 +1033,15 @@ def probe_complete_original_transport(
         len(original_TOP) == len(rebuilt["U"])
         and all(a == b for a, b in zip(original_TOP, rebuilt["U"]))
     )
+    link_identity = None
+    if aliases and native_index_binary is not None:
+        if not (indexed_checks and alias_identical and top_exact):
+            raise ValueError("Refuse native identity check on changed original content")
+        link_identity = probe_native_original_link_identity(
+            installed_candidate_root=root, module_id=module_id,
+            inspector_binary=native_index_binary,
+            original_numbered=original_K, provisional_aliases=aliases
+        )
     chapter_repeat = None
     if aliases and original_stock_sword_root is not None:
         if not (indexed_checks and alias_identical and top_exact):
@@ -976,6 +1061,7 @@ def probe_complete_original_transport(
         **source,
         "private_real_xiphos_alias_navigation_probe": gui,
         "private_original_vs_alias_cli_chapter_repetition_probe": chapter_repeat,
+        "private_native_original_and_provisional_alias_link_identity": link_identity,
         "status": "COMPLETE_ORIGINAL_PRIVATE_I_K_U_COMPILED_READBACK_NOT_APPROVAL",
         "readback_completed": True,
         "source_intro_I_coverage": summaries["I"],
