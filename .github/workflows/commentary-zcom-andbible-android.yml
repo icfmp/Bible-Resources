@@ -210,6 +210,8 @@ jobs:
           assert set(cdperrors)=={
               "body_read","body_empty",
               "local_CDP_connection_or_handshake_unavailable",
+              "local_CDP_handshake_HTTP_403",
+              "local_CDP_handshake_other_HTTP_status",
               "CDP_Runtime_evaluation_rejected",
               "CDP_Runtime_result_shape_unavailable",
               "CDP_Runtime_non_string_body",
