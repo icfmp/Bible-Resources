@@ -530,7 +530,8 @@ def independent_chapter_scope_evidence(document, unrecognized_cases: list[dict])
 
 def independent_div2_chapter_body_evidence(document, native_registry: dict,
                                           unrecognized_cases: list[dict],
-                                          stock_unknown_raw: dict[str, bytes] | None = None) -> dict:
+                                          stock_unknown_raw: dict[str, bytes] | None = None,
+                                          original_visible_chapter_intro_raw: dict[str, bytes] | None = None) -> dict:
     """Collate chapter wrappers in canonical order, verifying book identities.
 
     Source order alone is never authority: each div1 must be the expected book
@@ -986,8 +987,68 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
         for row in cases if row["independent_lexical_comparison"] is not None
         and "ordered_word_alignment" in row["independent_lexical_comparison"]
     )
+    # Reuse the *same* already verified book-title/chapter-ordinal
+    # source mapping for original native I text, rather than guessing a
+    # section scope from another edition's stray verse citation.
+    introduction_witnesses = []
+    for intro_chapter, raw in sorted((original_visible_chapter_intro_raw or {}).items()):
+        source = source_chapters.get(intro_chapter)
+        alignment = "SOURCE_NATIVE_DIV2_ORDINAL_AND_BOOK"
+        if (intro_chapter in explicit_source_chapters
+                or intro_chapter in ambiguous_source_heading_chapters):
+            source = (
+                explicit_source_chapters.get(intro_chapter)
+                if intro_chapter not in ambiguous_source_heading_chapters else None
+            )
+            alignment = "EXPLICIT_NUMERIC_SOURCE_CHAPTER_HEADING"
+        if (source is not None
+                and source["book_identity_class"] ==
+                   "SOURCE_CHAPTER_COUNT_DIFFERS_FROM_NATIVE_REGISTRY"
+                and alignment != "EXPLICIT_NUMERIC_SOURCE_CHAPTER_HEADING"):
+            source = None
+        if source is None:
+            classification = "NO_SAFE_WITNESS_DIV2_CHAPTER_MAPPING"
+        elif source["book_identity_class"] not in {
+                "SOURCE_BOOK_TITLE_AND_MARKERS_MATCH",
+                "SOURCE_BOOK_TITLE_MATCH",
+                "SOURCE_BOOK_MARKERS_MATCH",
+                "SOURCE_CHAPTER_COUNT_DIFFERS_FROM_NATIVE_REGISTRY",
+        }:
+            classification = "SOURCE_BOOK_IDENTITY_UNVERIFIED"
+        elif (source["source_h2_explicit_numeric_chapters"]
+              and int(intro_chapter.rsplit(".", 1)[1])
+              not in source["source_h2_explicit_numeric_chapters"]):
+            classification = "SOURCE_CHAPTER_HEADING_DISAGREES_WITH_NATIVE_KEY"
+        else:
+            classification = "INDEPENDENT_DIGITAL_EDITION_CHAPTER_LOCATION_CORROBORATED"
+        lex = (
+            independent_lexical_overlap(source["_private_source_visible_text"], raw)
+            if classification ==
+               "INDEPENDENT_DIGITAL_EDITION_CHAPTER_LOCATION_CORROBORATED"
+            else None
+        )
+        introduction_witnesses.append({
+            "original_native_intro_chapter": intro_chapter,
+            "classification": classification,
+            "source_book_alignment_class": (
+                source["book_identity_class"] if source is not None else None
+            ),
+            "source_chapter_alignment_method": alignment,
+            "source_numbered_comment_section_markers": (
+                source["source_numbered_section_marker_count"]
+                if source is not None else None
+            ),
+            "source_chapter_comment_section_markers": (
+                source["source_chapter_marker_count"]
+                if source is not None else None
+            ),
+            "original_intro_vs_witness_word_overlap": lex,
+            "is_not_source_edition_or_authorial_chapter_approval": True,
+        })
     return {
         "status": "SOURCE_DIV2_STRUCTURE_COLLATED_NO_REINDEX_AUTHORIZATION",
+        "independent_source_div2_text_bearing_native_intro_reviews":
+            introduction_witnesses,
         "independent_stock_vs_source_reference_target_classes":
             dict(sorted(reference_classes.items())),
         "independent_stock_vs_source_reference_target_totals":
@@ -1192,7 +1253,8 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
     chapter_scopes = independent_chapter_scope_evidence(document, unrecognized_cases or [])
     div2_scopes = (
         independent_div2_chapter_body_evidence(
-            document, native_registry, unrecognized_cases or [], stock_unknown_raw
+            document, native_registry, unrecognized_cases or [], stock_unknown_raw,
+            original_chapter_intro_raw
         ) if native_registry is not None else {
             "status": "NO_NATIVE_REGISTRY_PROVIDED",
             "case_rows": [], "derived_authorial_section_scope_proven": False
