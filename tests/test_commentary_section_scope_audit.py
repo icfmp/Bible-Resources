@@ -37,7 +37,18 @@ class HeadingTests(unittest.TestCase):
 
     def test_reversed_and_ambiguous_range_not_guessed(self):
         self.assertIsNone(heading_extent(b"Verses 7-2 Text"))
-        self.assertIsNone(heading_extent(b"Verses 2,4-7 Text"))
+        self.assertIsNone(heading_extent(b"Verses 8,4-7 Text"))
+        self.assertIsNone(heading_extent(b"Verses 2-5,4-7 Text"))
+
+    def test_discontinuous_nonoverlapping_ranges_are_not_lost(self):
+        self.assertEqual(
+            heading_extent(b"<title>Verses 24-30, 36-43</title><p>Discussion</p>"),
+            (tuple(range(24, 31)) + tuple(range(36, 44)), "discontinuous")
+        )
+        self.assertEqual(
+            heading_extent(b"<title>Verses 2,4-7</title>"),
+            ((2,4,5,6,7), "discontinuous")
+        )
 
     def test_xml_malformed_or_entities_rejected(self):
         self.assertIsNone(heading_extent(b"<p>Verse 2 <b>unclosed</p>"))
@@ -71,6 +82,23 @@ class ClassificationTests(unittest.TestCase):
         }
         outcome = classify(records)
         self.assertEqual(outcome["counts"]["distinct_payload_within_declared_section"], 1)
+
+    def test_discontinuous_commentary_reports_missing_second_block(self):
+        entries = {
+            f"Matt.13.{verse}": {
+                "sha256": "a", "heading": (
+                    tuple(range(24, 31)) + tuple(range(36, 44)),
+                    "discontinuous"
+                )
+            }
+            for verse in range(24, 31)
+        }
+        report = classify(entries)
+        self.assertEqual(report["counts"]["start_sections_discontinuous"], 1)
+        self.assertEqual(
+            report["anomalies"][0]["missing_slots"],
+            [f"Matt.13.{verse}" for verse in range(36,44)]
+        )
 
     def test_missing_members_of_dash_section(self):
         outcome = classify({
