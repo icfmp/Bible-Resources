@@ -197,3 +197,113 @@ jobs:
             echo 'No source prose, SWORD original/candidate ZIP, screenshots or UI HTML are uploaded.'
             echo 'This does NOT approve all headings, actual mouse click navigation, copyright/edition equivalence, editorial acceptance or publication.'
           } >> "$GITHUB_STEP_SUMMARY"
+
+
+  # Current Xiphos is compiled from its pinned, official release commit on
+  # a full GitHub-hosted Ubuntu VM, not inside a Fedora Docker namespace.
+  # No new commentary harness/script is introduced. The private SWORD module
+  # is never uploaded, shipped, or incorporated into public catalogue data.
+  native-current-xiphos45-private:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      RESOURCE_ID: ${{ github.event.inputs.resource_id || 'mhcc-crosswire' }}
+      XIPHOS_UPSTREAM_COMMIT: 2a7a830794aea9ad2667d02f27f1f53e901f7390
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install official Xiphos build dependencies on real Ubuntu VM
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          timeout 270s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y \
+            cmake g++ make git pkg-config appstream intltool itstool \
+            desktop-file-utils gsettings-desktop-schemas-dev \
+            libbiblesync-dev libenchant-2-dev libgail-3-dev \
+            libgtk-3-dev libwebkit2gtk-4.1-dev libxml2-dev \
+            libminizip-dev libgsf-1-dev libsqlite3-dev libsword-dev \
+            uuid-dev yelp-tools xvfb xdotool xclip dbus-x11 diatheke
+      - name: Build exact official Xiphos 4.5 release on VM host (not in container)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/upstream-xiphos"
+          git -C "$RUNNER_TEMP/upstream-xiphos" init -q
+          git -C "$RUNNER_TEMP/upstream-xiphos" remote add origin \
+            https://github.com/crosswire/xiphos.git
+          timeout 180s git -C "$RUNNER_TEMP/upstream-xiphos" \
+            -c protocol.version=2 fetch --depth 1 origin "$XIPHOS_UPSTREAM_COMMIT"
+          git -C "$RUNNER_TEMP/upstream-xiphos" checkout --quiet --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/upstream-xiphos" rev-parse HEAD)" = \
+            "$XIPHOS_UPSTREAM_COMMIT"
+          timeout 180s cmake -S "$RUNNER_TEMP/upstream-xiphos" \
+            -B "$RUNNER_TEMP/xiphos-45-build" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/usr/local \
+            -DGTKTVEDITOR=ON -DHELP=OFF -DEPUB=OFF
+          timeout 420s cmake --build "$RUNNER_TEMP/xiphos-45-build" --parallel 4
+          sudo cmake --install "$RUNNER_TEMP/xiphos-45-build"
+          test -x /usr/local/bin/xiphos
+          test "$(command -v xiphos)" = /usr/local/bin/xiphos
+          echo "Pinned official Xiphos 4.5 release host build: $XIPHOS_UPSTREAM_COMMIT"
+      - name: Compile independent original native SWORD content validators
+        shell: bash
+        run: |
+          set -euo pipefail
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "$RUNNER_TEMP/private-native-stock-corpus" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_commentary_raw_key.cpp \
+            -o "$RUNNER_TEMP/private-native-stock-key" -lsword
+      - name: Verify original CrossWire MHCC in actual current Xiphos 4.5 reader
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_private_candidate_xiphos_gui.py \
+            --resource-id "$RESOURCE_ID" \
+            --native-full-corpus-binary "$RUNNER_TEMP/private-native-stock-corpus" \
+            --native-single-key-binary "$RUNNER_TEMP/private-native-stock-key" \
+            --seconds 16 \
+            --report "$RUNNER_TEMP/private-current-xiphos-45-proof.json"
+      - name: Enforce original 29,975-key stock preservation and real GUI evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          from sys import path
+          path.insert(0, "scripts")
+          from commentary_private_candidate_xiphos_gui import _gate_real_candidate_gui
+          p = Path(os.environ["RUNNER_TEMP"])/"private-current-xiphos-45-proof.json"
+          receipt = json.loads(p.read_text())
+          assert receipt["resource_id"] == "mhcc-crosswire"
+          assert receipt["upstream_sword_original_module_id"] == "MHCC"
+          assert receipt["private_candidate_module_id"] == "BRMHCCReview"
+          assert receipt["total_native_keys"] == 29975
+          assert receipt["full_native_unfiltered_raw_corpus_sha256"] == \
+              "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
+          assert receipt["all_original_SWORD_compressed_files_byte_preserved"] is True
+          assert receipt["complete_stock_and_candidate_native_raw_corpus_sha256_equal"] is True
+          assert receipt["private_candidate_archive_destroyed_without_upload"] is True
+          assert receipt["published"] is False and receipt["editorial_acceptance"] is False
+          gui = receipt["independent_private_candidate_gui_receipt"]
+          _gate_real_candidate_gui(gui)
+          print("Pinned Xiphos 4.5 full host VM: 5/5 real authorial prose, "
+                "2/2 exact source hrefs; original archive intact, no release")
+          PY
+      - name: Retain hashes/metadata only; NEVER Xiphos screen or SWORD ZIP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: commentary-private-xiphos45-host-proof-${{ github.run_id }}
+          path: ${{ runner.temp }}/private-current-xiphos-45-proof.json
+          retention-days: 14
+          if-no-files-found: warn
