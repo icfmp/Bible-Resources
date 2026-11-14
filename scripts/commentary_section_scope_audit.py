@@ -15,6 +15,7 @@ from hashlib import sha256
 import json
 import os
 from pathlib import Path
+from urllib.parse import urlsplit
 import re
 import subprocess
 import tempfile
@@ -25,7 +26,7 @@ from lxml import etree
 from commentary_intake import load_manifest
 from commentary_xml_witness import _parse_reference, WORK_REF
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
-from pilot_fetch import fetch
+from pilot_fetch import ALLOWED_HOSTS, fetch
 from pilot_preflight import PilotError, inspect_archive
 from sword_native_raw_corpus_inventory import RawCorpusError, parse_native_raw_corpus
 
@@ -172,10 +173,17 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
     expected = config.get("xml_witness_sha256")
     if not url or not re.fullmatch(r"[0-9a-f]{64}", expected or ""):
         return {"status": "NO_PINNED_THML_WITNESS", "proven_stock_faults": 0}
-    if not url.startswith(("https://www.ccel.org/", "https://ccel.org/")) or not url.endswith(".xml"):
-        raise PilotError("Unreviewed independent ThML witness URL")
+    parts = urlsplit(url)
+    approved_providers = sorted(
+        provider for provider, hosts in ALLOWED_HOSTS.items()
+        if parts.hostname in hosts
+    )
+    if (parts.scheme != "https" or not url.endswith(".xml")
+            or not approved_providers or parts.username or parts.password
+            or parts.port not in (None, 443) or parts.fragment):
+        raise PilotError("Independent ThML witness URL is not in the approved source registry")
     witness_path = temp / "independent-witness.xml"
-    receipt = fetch(url, witness_path, "ccel")
+    receipt = fetch(url, witness_path, approved_providers[0])
     if receipt["sha256"] != expected or receipt["bytes"] > 32 * 1024 * 1024:
         raise PilotError("Independent ThML witness hash or bound mismatch")
     parser = etree.XMLParser(
