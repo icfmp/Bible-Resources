@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "tag": "mhcc-0.1.0",
+  "module_id": "mhcc-crosswire",
+  "sword_id": "BRMHCC",
+  "version": "0.1.0",
+  "title": "Matthew Henry Concise Commentary — Bible Resources 0.1.0",
+  "zip_name": "BRMHCC-0.1.0.zip",
+  "package_sha256": "0faf4376b6b97093ecb94f306886c24d3030ab1f5e194472ad908dd73921f9c0",
+  "package_size_bytes": 1772960,
+  "notes_path": "docs/releases/MHCC-0.1.0.md",
+  "evidence_path": "modules/mhcc-crosswire/SOURCE_VALIDATION.json",
+  "editorial_path": "modules/mhcc-crosswire/EDITORIAL.md",
+  "authorization": {
+    "reviewed_by": "Bible Resources project owner",
+    "decision": "Publish the already-approved exact-stock CrossWire Public Domain BRMHCC 0.1.0 SWORD module as a GitHub Release corresponding to its verified public Pages package",
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/issues/177",
+    "source_rights": "Public Domain — Copy Freely (CrossWire MHCC 2.0); no project relicensing"
+  }
+}
