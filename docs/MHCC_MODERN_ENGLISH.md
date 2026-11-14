@@ -22,6 +22,22 @@ Modernize obsolete English vocabulary, opaque idioms and cumbersome syntax only 
 
 Preserve whether Henry makes a claim, inference, tentative judgment, exhortation or warning. Never upgrade uncertainty to certainty, add doctrinal qualifications of our own, collapse an argument into a summary or rewrite theology to align with modern preferences.
 
+### Calibrated reading rhythm — owner feedback, 2026-11-14
+
+The initial three drafts were **too dense and too close to older English sentence rhythm**, even where vocabulary had changed. The target is now **more fluid, less compact contemporary English** while preserving the full authorial thought:
+
+- Shorten unnecessarily long sentences, but retain the actual logical relationship (qualification, contrast, cause, warning, exhortation). Do not recast every sentence into abrupt fragments.
+- Use shorter **meaningful** paragraphs, usually one developed thought per paragraph, with visible separation. This is a **reading preference**, not a word-limit validator or permission to delete substantive material.
+- Preserve meaningful rhetorical questions and exhortations, and leave significant conclusions room to stand on their own where the source supports the emphasis.
+- Keep clear, precise theological terms when their nuance matters (e.g. justification, atonement, Surety, covenant), without adding unexplained contemporary paraphrases that change the author's meaning.
+- Preserve the author's imagery and recognizable pastoral voice. Replace heavy or tangled sentence construction, not the meaning or the doctrine.
+- Keep **source units distinct**. Added blank lines and editorial paragraph divisions are draft presentation only until they have been mapped to real OSIS/SWORD paragraph and range semantics; the finished module must render these as actual paragraphs, not raw whitespace dependent on one reader.
+- Avoid gratuitous headings between every short paragraph. Headings should reflect real argument divisions, with any new editorial headings identified as such.
+- Before approving a shortened paragraph, compare **every claim and nuance** to the exact source and ensure no example, limitation or deliberate repetition was dropped simply to make the text lighter.
+
+All three pilot **DRAFTS** were revised for this rhythm; their new readability is a **style calibration only**, not an independent source fidelity PASS. The exact BRMHCC/OSIS semantic audit and SWORD round-trip still remain pending.
+
+
 The treatment of biblical material requires separate evidence for:
 
 - Direct quotations (preserve their role and distinguish them from the commentator's own prose; do **not** silently replace by a modern translation).
