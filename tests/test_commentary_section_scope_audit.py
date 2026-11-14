@@ -220,6 +220,7 @@ class SourceDivisionChapterTests(unittest.TestCase):
             "SOURCE_DIV2_UNDIVIDED_CHAPTER_BODY_CANDIDATE": 1
         })
         self.assertFalse(result["derived_authorial_section_scope_proven"])
+        self.assertEqual(result["case_rows"][0]["source_h2_numeric_chapters"], [1])
 
     def test_same_book_chapter_intro_with_numbered_comments_is_not_whole_chapter(self):
         document = etree.fromstring(
@@ -239,6 +240,7 @@ class SourceDivisionChapterTests(unittest.TestCase):
         self.assertEqual(result["candidate_classes"], {
             "SOURCE_DIV2_HAS_INDEPENDENT_VERSE_SECTIONS": 1
         })
+        self.assertEqual(result["case_rows"][0]["source_annotated_chapters"], ["Gen.1"])
 
     def test_conflicting_source_book_title_never_approves_a_reindex(self):
         document = etree.fromstring(
