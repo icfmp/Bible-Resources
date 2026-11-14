@@ -200,6 +200,39 @@ def classify_native_osis_roundtrip_delta(original_raw: bytes, compiled_raw: byte
         return result
     original_tags = element_counts(original_raw)
     compiled_tags = element_counts(compiled_raw)
+
+    def element_signatures(raw):
+        root = etree.fromstring(b"<fragment>" + raw + b"</fragment>",
+                              parser=_strict_parser())
+        ordinary = []
+        divs = Counter()
+        references = []
+        for el in root.iter():
+            if el is root or not isinstance(el.tag, str):
+                continue
+            local = el.tag.rsplit("}", 1)[-1]
+            attrs = tuple(sorted(el.attrib.items()))
+            if local == "div":
+                divs[attrs] += 1
+            else:
+                ordinary.append((local, attrs))
+            if local == "reference":
+                references.append(tuple(sorted(el.attrib.items())))
+        return ordinary, divs, references
+
+    source_attrs, source_div_attrs, source_references = element_signatures(original_raw)
+    compiled_attrs, compiled_div_attrs, compiled_references = element_signatures(compiled_raw)
+    original_divs_preserved = all(
+        compiled_div_attrs[attrs] >= count
+        for attrs, count in source_div_attrs.items()
+    )
+    only_added_div_wrappers_by_local_name = (
+        all(compiled_tags[name] == count
+            for name, count in original_tags.items() if name != "div")
+        and all(name == "div" or name in original_tags
+                for name in compiled_tags)
+        and compiled_tags["div"] >= original_tags["div"]
+    )
     return {
         "source_original_unfiltered_raw_bytes": len(original_raw),
         "compiled_candidate_unfiltered_raw_bytes": len(compiled_raw),
@@ -216,6 +249,14 @@ def classify_native_osis_roundtrip_delta(original_raw: bytes, compiled_raw: byte
         ),
         "original_markup_element_counts": dict(sorted(original_tags.items())),
         "compiled_markup_element_counts": dict(sorted(compiled_tags.items())),
+        "non_div_element_order_and_exact_attribute_values_preserved":
+            source_attrs == compiled_attrs,
+        "original_div_elements_exact_attribute_multiset_preserved":
+            original_divs_preserved,
+        "reference_attribute_values_in_original_document_order_preserved":
+            source_references == compiled_references,
+        "only_div_element_count_added_not_other_element_names":
+            only_added_div_wrappers_by_local_name,
         "original_xml_bytes_modified": original_raw != compiled_raw,
         "source_prose_and_markup_parity_approved": False,
     }
@@ -323,6 +364,10 @@ def isolated_osis2mod_original_sample_roundtrip(
     delta_classes = Counter()
     normalized_text_equal = 0
     tags_equal = 0
+    exact_nondiv_attributes = 0
+    original_div_attributes_preserved = 0
+    original_reference_attributes_preserved = 0
+    only_extra_div_tags = 0
     original_total_element_names = Counter()
     compiled_total_element_names = Counter()
     changed_element_name_entry_counts = Counter()
@@ -334,6 +379,18 @@ def isolated_osis2mod_original_sample_roundtrip(
             delta_classes[comparison["word_sequence_relation"]] += 1
             normalized_text_equal += comparison["normalized_whitespace_visible_unicode_equal"]
             tags_equal += comparison["all_original_markup_element_names_and_counts_preserved"]
+            exact_nondiv_attributes += comparison[
+                "non_div_element_order_and_exact_attribute_values_preserved"
+            ]
+            original_div_attributes_preserved += comparison[
+                "original_div_elements_exact_attribute_multiset_preserved"
+            ]
+            original_reference_attributes_preserved += comparison[
+                "reference_attribute_values_in_original_document_order_preserved"
+            ]
+            only_extra_div_tags += comparison[
+                "only_div_element_count_added_not_other_element_names"
+            ]
             source_elements = Counter(comparison["original_markup_element_counts"])
             converted_elements = Counter(comparison["compiled_markup_element_counts"])
             original_total_element_names.update(source_elements)
@@ -368,6 +425,14 @@ def isolated_osis2mod_original_sample_roundtrip(
         "original_vs_compiled_whitespace_normalized_visible_text_exact_matches":
             normalized_text_equal,
         "original_vs_compiled_element_name_count_exact_matches": tags_equal,
+        "original_non_div_element_order_and_attribute_value_exact_matches":
+            exact_nondiv_attributes,
+        "original_div_element_attribute_multiset_preserved_entry_count":
+            original_div_attributes_preserved,
+        "original_reference_attribute_value_exact_order_matches":
+            original_reference_attributes_preserved,
+        "only_additional_div_tags_other_markup_names_unchanged":
+            only_extra_div_tags,
         "original_native_element_name_total_counts_in_sample":
             dict(sorted(original_total_element_names.items())),
         "compiled_native_element_name_total_counts_in_sample":
