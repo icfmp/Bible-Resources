@@ -188,6 +188,136 @@ def triage_missing_native_section_links(*, occupied: dict[str, str],
     }
 
 
+
+def triage_single_key_chapter_navigation(
+        *, occupied: dict[str, str],
+        chapter_verse_maximums: dict[str, int],
+        independent_chapter_cases: list[dict],
+        original_chapter_intro_has_visible_prose: dict[str, bool] | None = None
+        ) -> dict:
+    """Classify chapter-first index anchors without implying text loss.
+
+    This deliberately emits *no aliases*: one original K at verse 1 plus
+    an undivided corroborating chapter exposition justifies a source review,
+    not automatic chapter-wide expansion. Protect any original I text as
+    separate independently authored chapter-introduction material.
+    """
+    if (not isinstance(occupied, dict) or not occupied
+            or not isinstance(chapter_verse_maximums, dict)
+            or not chapter_verse_maximums
+            or not isinstance(independent_chapter_cases, list)
+            or len(independent_chapter_cases) > 250
+            or not isinstance(original_chapter_intro_has_visible_prose, (dict, type(None)))):
+        raise UnsafeCommentaryLinkPlan("Invalid source chapter candidate inventory")
+    if any(KEY.fullmatch(k) is None or SHA256.fullmatch(v) is None
+           for k, v in occupied.items()):
+        raise UnsafeCommentaryLinkPlan("Unverified native source K keys")
+    if any(CHAPTER.fullmatch(k) is None or type(v) is not int
+           or not 1 <= v <= 1000 for k,v in chapter_verse_maximums.items()):
+        raise UnsafeCommentaryLinkPlan("Unverified native chapter maximums")
+    intros = original_chapter_intro_has_visible_prose or {}
+    if (any(CHAPTER.fullmatch(k) is None or type(v) is not bool
+            for k,v in intros.items())):
+        raise UnsafeCommentaryLinkPlan("Unverified original native I chapter diagnostics")
+    by_chapter = defaultdict(list)
+    for key in occupied:
+        by_chapter[key.rsplit(".",1)[0]].append(key)
+    seen = set()
+    classes = defaultdict(int)
+    total_potential_new = 0
+    cases = []
+    for case in independent_chapter_cases:
+        if not isinstance(case, dict):
+            raise UnsafeCommentaryLinkPlan("Unstructured source chapter case")
+        master = case.get("native_start")
+        if (not isinstance(master, str) or KEY.fullmatch(master) is None
+                or master in seen or master not in occupied):
+            raise UnsafeCommentaryLinkPlan("Nonunique or missing original chapter master")
+        seen.add(master)
+        chapter = master.rsplit(".",1)[0]
+        limit = chapter_verse_maximums.get(chapter)
+        if (not isinstance(limit,int) or limit < 1
+                or master != chapter+".1"
+                or by_chapter[chapter] != [master]):
+            raise UnsafeCommentaryLinkPlan("Chapter-first candidate has an existing separate section")
+        lexical = case.get("independent_lexical_comparison")
+        structure = case.get("source_div2_structure_class")
+        if not isinstance(structure, str):
+            raise UnsafeCommentaryLinkPlan("Missing chapter-source structure classification")
+        references = case.get("independent_reference_target_comparison")
+        link_disagreement = (
+            references is not None and
+            references.get("original_scripRef_with_nonempty_osisRef_target_count",0)
+            > (references.get(
+                "original_scripRef_osisRef_targets_exact_value_multiset_matches_in_stock",0)
+               + references.get(
+                "original_scripRef_osisRef_work_qualifier_only_matches_in_stock",0))
+        )
+        source_missing = structure not in {
+            "SOURCE_DIV2_UNDIVIDED_CHAPTER_BODY_CANDIDATE",
+            "SOURCE_DIV2_UNDIVIDED_EXPLICIT_HEADING_CANDIDATE"
+        }
+        lexical_alignment = (
+            lexical.get("ordered_word_alignment",{})
+            if isinstance(lexical,dict) else {}
+        )
+        original_unmatched = lexical_alignment.get(
+            "original_plain_words_not_matched_in_exact_order")
+        stock_unmatched = lexical_alignment.get(
+            "stock_plain_words_not_matched_in_exact_order")
+        high_similarity = (
+            isinstance(lexical,dict)
+            and lexical.get("overlap_class") == "HIGH_95_PLUS"
+            and type(original_unmatched) is int
+            and original_unmatched <= 2
+        )
+        intro_prose = intros.get(chapter)
+        if source_missing:
+            classification = "NO_SAFE_INDEPENDENT_UNDIVIDED_CHAPTER_SCOPE"
+        elif not high_similarity:
+            classification = "INDEPENDENT_SOURCE_AND_NATIVE_TEXT_NEED_WORD_REVIEW"
+        elif intro_prose:
+            classification = "ADDITIONAL_NATIVE_CHAPTER_INTRO_PROSE_NEEDS_OWNERSHIP_REVIEW"
+        else:
+            classification = "INDEPENDENT_UNDIVIDED_CHAPTER_SCOPE_STRONGLY_CORROBORATED"
+        classes[classification] += 1
+        total_potential_new += limit-1
+        cases.append({
+            "master_key":master,
+            "original_master_raw_sha256":occupied[master],
+            "classification":classification,
+            "native_chapter_verse_count":limit,
+            "original_numbered_K_count":1,
+            "potential_additional_links_if_explicitly_editorially_approved":limit-1,
+            "independent_structure_class":structure,
+            "independent_original_unmatched_words":original_unmatched,
+            "independent_stock_unmatched_words":stock_unmatched,
+            "independent_source_reference_target_disagreement_requires_review":
+                bool(link_disagreement),
+            "original_native_chapter_intro_contains_visible_prose":intro_prose,
+            "independent_chapter_scope_expansion_editorially_approved":False,
+        })
+    return {
+        "status":"COMPLETE_SINGLE_KEY_CHAPTER_SCOPE_TRIAGE_NOT_APPROVAL",
+        "original_single_key_chapter_candidates":len(cases),
+        "classes":dict(sorted(classes.items())),
+        "potential_total_new_chapter_aliases_if_every_scope_approved":total_potential_new,
+        "source_reference_differences_needing_separate_review":sum(
+            row["independent_source_reference_target_disagreement_requires_review"]
+            for row in cases
+        ),
+        "chapter_intro_prose_needing_independent_ownership_review":sum(
+            row["original_native_chapter_intro_contains_visible_prose"] is True
+            for row in cases
+        ),
+        "case_rows":cases,
+        "any_new_aliases_created":False,
+        "source_prose_or_index_mutated":False,
+        "all_scopes_explicitly_unapproved":True,
+        "publication_authorized":False,
+    }
+
+
 def parse_native_commentary_verse_registry(raw: bytes, expected_module: str) -> dict:
     """Parse read-only released-libSWORD chapter bounds, never manuscript data.
 
