@@ -184,3 +184,47 @@ chapter* is rendered as multiple verse keys. The complete native and
 deduplication is still a separate concern and must not be asserted as
 passed. Neither the published `BRMHCC` package nor the original CrossWire
 text was edited. Source scope/edition approval and publication remain held.
+
+
+## Important reader regression: chapter-wide `diatheke` repeats real linked entries (2026-11-15)
+
+The native **24/24 new indexed-key parity result is valid**, but **must not
+be mistaken for satisfactory entire-chapter display**. [Private original
+versus preview CLI chapter comparison #43653681714](https://github.com/icfmp/Bible-Resources/actions/runs/43653681714)
+**SUCCESS** on the real CrossWire MHCC and the temporary `BRIndexProbe`
+candidate. Four independent, exact 20-word original commentary windows per
+master section were counted in a full-chapter `diatheke -f plain` rendering
+of *both* original and proposed modules. Every source window was unique in
+its original entry. No source words left the ephemeral runner.
+
+| Real chapter | Original exact original-section excerpt occurrences | With provisional verse aliases |
+| --- | ---: | ---: |
+| Matthew 13 | 7 | **15** |
+| Isaiah 58 | 1 | **2** |
+| Jeremiah 4 | 1 | **2** |
+| Ecclesiastes 4 | 1 | **2** |
+
+This is **not original text duplication in the zCom source**: native linked
+keys share one identical original authorial payload. It is a **reader
+presentation** effect of iterating verse keys without grouping linked
+entries. It already affects **existing CrossWire range-linked commentary**,
+as shown by the baseline seven occurrences in Matthew 13.
+
+**Editorial/architecture consequence:**
+- Do not silently remove correct passage aliases solely to make an
+  unsophisticated full-chapter renderer print each unit once.
+- Do not automatically add thousands of whole-chapter links among the 118
+  first-verse-only cases. Their origin and purpose must first be individually
+  classified; a full-chapter reader could show dozens of repeated copies.
+- Build chapter/selection display from **independent authored sections**
+  with shared native link identity and contiguous/discontinuous passage
+  scopes, not by naïvely rendering every occupied verse key as a new
+  commentary section. A correct presentation must keep separate
+  independently authored adjacent sections distinct.
+- Do not equate `diatheke` output with Xiphos GUI, Bible's renderer, or
+  any other reader. A bounded real GUI check is required before asserting
+  which clients are affected.
+
+The proof establishes a reproducible concrete **UI regression risk**,
+not a failure of content preservation or new authorial index scope.
+The separate source release and editorial hold continues.
