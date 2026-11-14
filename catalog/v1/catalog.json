@@ -60,6 +60,45 @@
       },
       "versification": "Segond",
       "version": "0.1.0"
+    },
+    {
+      "canonical_edition_id": "matthew-henry-concise-crosswire-2.0",
+      "category": "commentary",
+      "download": {
+        "sha256": "0faf4376b6b97093ecb94f306886c24d3030ab1f5e194472ad908dd73921f9c0",
+        "size_bytes": 1772960,
+        "url": "https://icfmp.github.io/Bible-Resources/sword/packages/BRMHCC.zip"
+      },
+      "edition": "faithful",
+      "id": "mhcc-crosswire",
+      "language": "en",
+      "profiles": {
+        "en": {
+          "approval_url": "https://github.com/icfmp/Bible-Resources/pull/264",
+          "approved_at": "2026-11-14",
+          "approved_by": "Bible Resources project owner",
+          "evidence_urls": {
+            "editorial_tracking": "https://github.com/icfmp/Bible-Resources/issues/177",
+            "independent_module_attribution": "https://www.stepbible.org/version.jsp?version=MHCC",
+            "original_module": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=MHCC",
+            "reader_qa_accepted": "https://github.com/icfmp/Bible-Resources/issues/257",
+            "source_rights_review": "https://github.com/icfmp/Bible-Resources/blob/main/docs/evidence/mhcc-177/crosswire-exact-stock-rights-review.md"
+          },
+          "format": "markdown",
+          "long_markdown": "### About this work\n\n*Matthew Henry's Concise Commentary on the Whole Bible* presents a\nshorter form of the commentary associated with Matthew Henry, an English\nNonconformist pastor and writer. It introduces and explains Bible\npassages from a historic Protestant Christian perspective.\n\nThis is the **Concise Commentary (MHCC)**, not Henry's much longer\n*Complete Commentary (MHC)*. It is a study companion and does not replace\na Bible translation.\n\n### What is in this digital edition?\n\nThe published edition is curated from the exact **CrossWire MHCC 2.0**\ncompiled SWORD module, dated **2021-02-14**. Its original compressed\ncommentary data, headings, introductions, notes and Scripture-reference\nmarkup are retained without editorial rewording. Bible Resources changes\nonly the installation module identity, matching data path and curated\nrelease version.\n\nCrossWire attributes its electronic source to the **Moody Press\n28th printing**, ISBN **0-8024-5190-X**, and describes corrections\nmade to an earlier electronic copy. This attribution does **not**\nestablish that the digital source is a perfect facsimile of any\nparticular printed edition.\n\nThe independently available CCEL digital transcription is not\nidentified as textually equivalent to CrossWire's compiled module.\nBible Resources does not combine or silently harmonize those\ndifferent digital witnesses.\n\n### Use and technical details\n\n- **Language:** English.\n- **Category:** Bible commentary, covering the Protestant 66-book canon.\n- **Format:** standard SWORD `zCom`, using the `KJV` verse index.\n- **Original provider:** CrossWire, module `MHCC`, release 2.0.\n- **Curated module:** Bible Resources `BRMHCC`, version 0.1.0.\n- **Copyright / redistribution:** CrossWire declares this exact\n  digital module **Public Domain — Copy Freely**.\n\nThe full original module has been examined by complete source-byte and\nnative-entry checks; selected passages were also successfully displayed\nin Xiphos 4.2.1. This does not certify the layout or link-click behavior\nof every third-party reader.\n\n### Provenance and licence\n\nThe complete source and distribution declaration are available on the\n[official CrossWire MHCC page](\nhttps://crosswire.org/sword/modules/ModInfo.jsp?modName=MHCC).\nSee the [Bible Resources source-rights dossier](\nhttps://github.com/icfmp/Bible-Resources/blob/main/docs/evidence/mhcc-177/crosswire-exact-stock-rights-review.md)\nfor the specific CrossWire module, original hashes and editorial\nlimitations. CrossWire's public-domain declaration remains the source\ntext's legal description; Bible Resources does not claim to newly apply\na CC0 licence to CrossWire's compiled material.",
+          "revision": "2026-11-14.1",
+          "short_markdown": "**Matthew Henry's Concise Commentary on the Whole Bible**\n\nAn English-language concise commentary drawing on the biblical exposition\nassociated with Matthew Henry (1662–1714). It accompanies all 66 books of\nthe Protestant Bible, offering historical Christian interpretation for\npersonal reading and study.\n\nThis resource preserves the original CrossWire MHCC 2.0 SWORD commentary,\nwith no changes to its authorial text or Scripture references.",
+          "source_git_blob_sha1": "5d2ceaddc926d873487899ee45445a5bc24553bf",
+          "source_path": "docs/profiles/en-matthew-henry-concise-crosswire-2-0.md"
+        }
+      },
+      "sword_id": "BRMHCC",
+      "title": {
+        "en": "Matthew Henry's Concise Commentary on the Whole Bible",
+        "fr": "Commentaire concis de Matthew Henry sur toute la Bible"
+      },
+      "versification": "KJV",
+      "version": "0.1.0"
     }
   ],
   "repository": "Bible Resources",
