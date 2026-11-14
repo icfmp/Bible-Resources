@@ -1,10 +1,14 @@
 {
-  "final_corrected_osis_sha256": "1f0d439b20b763e3548a05bb766d9f59447918f973ea92f8695d7578e096178a",
+  "final_corrected_osis_sha256": "35eb23c62eefdcda9a94d6a493df0bf32d5af1bc6ccc2132e495091d7771406d",
   "invalid_inline_measurement_tags": 2,
-  "original_all_authorial_characters_unchanged": true,
+  "original_all_authorial_characters_unchanged": false,
+  "original_division_marks_preserved_reversibly_as_metadata": 521,
   "original_missing_numbered_verses_uninvented": true,
+  "original_textcritical_star_preserved_inline": 1,
+  "prose_and_punctuation_unchanged_except_nondisplay_division_signs": true,
   "publisher_original_osis_sha256": "2204629e3efb3024dceb392780ef5e61f4296ea832c90e3dd2a5c3224179c1d3",
   "reviewed_reference_destinations": 8,
-  "source_attested_audit_sha256": "3ae44db7e82a65453690de9ff414aa4d2f8b39bc424ac66c7354071b7f9baba5",
+  "source_attested_audit_sha256": "99a16d3891f5748dc2a691833480558edc94f5aa22e7f1938a1c10938f16e11d",
+  "source_formatting_indent_spans_removed": 4690,
   "textcritical_plain_reference_wrappers": 3
 }

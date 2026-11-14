@@ -1,0 +1,195 @@
+name: Finalize authorized immutable Darby 2024 0.1.1 release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "modules/darby-jnd-2024/RELEASE_PROVENANCE.json"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+concurrency:
+  group: darby-011-final-publication
+  cancel-in-progress: false
+
+jobs:
+  publish-011:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    environment: github-pages
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Verify complete approved version and original-vs-new provenance
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          timeout 180s sudo apt-get -o Acquire::Retries=1 update -qq
+          timeout 180s sudo apt-get -o Acquire::Retries=1 install -y diatheke
+          python -m unittest discover -s tests -v
+          python scripts/validate.py
+          python scripts/build.py --output dist \
+            --base-url https://icfmp.github.io/Bible-Resources/
+          python scripts/smoke.py
+          python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          from hashlib import sha256
+          import json
+          root=Path('modules/darby-jnd-2024')
+          auth=json.loads(Path('config/darby-0.1.1-release-authorization.json').read_text())
+          release=json.loads((root/'RELEASE_PROVENANCE.json').read_text())
+          manifest=json.loads((root/'metadata.json').read_text())
+          proof=json.loads((root/'SOURCE_VALIDATION.json').read_text())
+          catalogue=json.loads(Path('dist/catalog/v1/catalog.json').read_text())
+          committed=json.loads(Path('catalog/v1/catalog.json').read_text())
+          assert auth['status']=='owner_authorized_for_stable_0_1_1_after_exact_source_and_reader_checks'
+          assert auth['owner_approval_url']=='https://github.com/icfmp/Bible-Resources/issues/241#issuecomment-6875143143'
+          assert auth['private_final_zip_sha256']=='631f97956ba1b83def91fdba84f83ff9dcb0486a4097e5102a9b3a937f0abba6'
+          assert auth['preserve_previous_release_assets'] and not auth['published']
+          assert release['status']=='source_and_native_attested_release_candidate'
+          assert release['release_tag']=='darby-jnd-2024-0.1.1' and not release['published']
+          assert release['final_private_zip_sha256']==auth['private_final_zip_sha256']
+          assert release['owner_publication_authorization_url']==auth['owner_approval_url']
+          assert release['prior_immutable_release_zip_sha256']==auth['prior_immutable_release_zip_sha256']
+          assert release['original_publisher_osis_sha256']==auth['source_osis_sha256']
+          assert release['corrected_candidate_osis_sha256']==auth['compiler_input_osis_sha256']
+          assert proof['source_sha256']==auth['compiler_input_osis_sha256']
+          assert manifest['version']=='0.1.1' and manifest['sword_id']=='BRJND2024'
+          assert manifest['versification']=='Luther' and manifest['quality']['status']=='approved'
+          assert release['full_source_verse_count']==31166
+          assert release['full_source_note_count']==6340
+          assert release['original_editorial_division_metadata_count']==521
+          assert release['six_ztext_payload_files_byte_identical_to_full_native_audit']
+          assert catalogue==committed
+          entries=[m for m in catalogue['modules'] if m['sword_id']=='BRJND2024']
+          assert len(entries)==1 and entries[0]['version']=='0.1.1'
+          assert len([m for m in catalogue['modules'] if m['sword_id']=='BRLSG1910' and m['version']=='0.1.0'])==1
+          pkg=Path('dist/sword/packages/BRJND2024.zip')
+          digest=lambda raw:sha256(raw).hexdigest()
+          assert digest(pkg.read_bytes())==release['release_zip_sha256']==entries[0]['download']['sha256']
+          assert pkg.stat().st_size==release['release_zip_bytes']==entries[0]['download']['size_bytes']
+          assert digest((root/'SOURCE_AUDIT.json').read_bytes())==release['full_native_audit_sha256']
+          with ZipFile(pkg) as z:
+              assert z.testzip() is None
+              assert len(z.namelist())==7
+              assert set(z.namelist())==set(release['complete_release_member_sha256'])
+              for name,expected in release['complete_release_member_sha256'].items():
+                  assert digest(z.read(name))==expected
+          print('Approved exact 0.1.1 only: source/native, canonical ZIP, catalogue and complete member hashes')
+          PY
+          gh api "repos/$GITHUB_REPOSITORY/issues/comments/6875143143" \
+            --jq '.user.login + "\n" + .body' > "$RUNNER_TEMP/darby-011-owner-approval.txt"
+          grep -Fx 'icfmp' "$RUNNER_TEMP/darby-011-owner-approval.txt"
+          grep -F 'Owner authorization' "$RUNNER_TEMP/darby-011-owner-approval.txt"
+          grep -F '0.1.1' "$RUNNER_TEMP/darby-011-owner-approval.txt"
+      - name: Verify old immutable 0.1.0 public ZIP before any new release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/darby-011-old"
+          gh release download darby-jnd-2024-0.1.0 \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern BRJND2024-0.1.0.zip \
+            --dir "$RUNNER_TEMP/darby-011-old"
+          echo "5910669e5eeb85d2ba06a4602918ce71d6773f36d64502bbdf7f96fff0585f15  $RUNNER_TEMP/darby-011-old/BRJND2024-0.1.0.zip" | sha256sum -c
+      - name: Create a NEW immutable 0.1.1 release or verify its exact previous bytes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag=darby-jnd-2024-0.1.1
+          mkdir -p "$RUNNER_TEMP/darby-011-new"
+          cp dist/sword/packages/BRJND2024.zip \
+            "$RUNNER_TEMP/darby-011-new/BRJND2024-0.1.1.zip"
+          (cd "$RUNNER_TEMP/darby-011-new" \
+            && sha256sum BRJND2024-0.1.1.zip > SHA256SUMS.txt \
+            && sha256sum --check SHA256SUMS.txt)
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            mkdir -p "$RUNNER_TEMP/darby-011-existing"
+            gh release download "$tag" --repo "$GITHUB_REPOSITORY" \
+              --pattern BRJND2024-0.1.1.zip \
+              --dir "$RUNNER_TEMP/darby-011-existing"
+            cmp "$RUNNER_TEMP/darby-011-new/BRJND2024-0.1.1.zip" \
+                "$RUNNER_TEMP/darby-011-existing/BRJND2024-0.1.1.zip"
+            echo "Previously existing immutable 0.1.1 asset exactly identical"
+          else
+            gh release create "$tag" \
+              "$RUNNER_TEMP/darby-011-new/BRJND2024-0.1.1.zip" \
+              "$RUNNER_TEMP/darby-011-new/SHA256SUMS.txt" \
+              modules/darby-jnd-2024/SOURCE_AUDIT.json \
+              modules/darby-jnd-2024/RELEASE_PROVENANCE.json \
+              --repo "$GITHUB_REPOSITORY" \
+              --title 'Bible J. N. Darby — BPC 2024, Bible Resources 0.1.1' \
+              --notes-file docs/releases/DARBY-JND-2024-0.1.1.md
+          fi
+          mkdir -p "$RUNNER_TEMP/darby-011-independent"
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" \
+            --pattern BRJND2024-0.1.1.zip \
+            --dir "$RUNNER_TEMP/darby-011-independent"
+          cmp "$RUNNER_TEMP/darby-011-independent/BRJND2024-0.1.1.zip" \
+              "$RUNNER_TEMP/darby-011-new/BRJND2024-0.1.1.zip"
+          gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null
+      - name: Check independently deployed public Pages catalogue AND downloaded SWORD ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from urllib.request import Request,urlopen
+          from hashlib import sha256
+          from pathlib import Path
+          import json,time
+          base='https://icfmp.github.io/Bible-Resources/'
+          expected=sha256(Path('dist/sword/packages/BRJND2024.zip').read_bytes()).hexdigest()
+          last=None
+          for attempt in range(20):
+              try:
+                  headers={'Cache-Control':'no-cache','User-Agent':'BibleResourcesReleaseVerifier/0.1.1'}
+                  req=Request(base+'catalog/v1/catalog.json?verify011='+str(attempt),headers=headers)
+                  with urlopen(req,timeout=22) as resp:
+                      assert resp.status==200
+                      catalog=json.load(resp)
+                  modules=catalog['modules']
+                  darby=[m for m in modules if m['sword_id']=='BRJND2024']
+                  assert len(darby)==1 and darby[0]['version']=='0.1.1'
+                  assert len([m for m in modules if m['sword_id']=='BRLSG1910' and m['version']=='0.1.0'])==1
+                  assert darby[0]['download']['sha256']==expected
+                  req=Request(base+'sword/packages/BRJND2024.zip?verify011='+str(attempt),headers=headers)
+                  with urlopen(req,timeout=30) as resp:
+                      assert resp.status==200
+                      live=resp.read(10_000_000)
+                  assert sha256(live).hexdigest()==expected
+                  assert len(live)==darby[0]['download']['size_bytes']
+                  print('Independently fetched public HTTPS Pages catalogue and complete ZIP match approved 0.1.1 SHA-256:',expected)
+                  break
+              except Exception as exc:
+                  last=exc
+                  if attempt==19:
+                      raise SystemExit('New public Pages catalogue or downloaded module is not correct: '+str(last))
+                  time.sleep(20)
+          PY
+      - name: Check 0.1.0 remains byte-identical and record verified publication
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/darby-011-old-check"
+          gh release download darby-jnd-2024-0.1.0 \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern BRJND2024-0.1.0.zip \
+            --dir "$RUNNER_TEMP/darby-011-old-check"
+          echo "5910669e5eeb85d2ba06a4602918ce71d6773f36d64502bbdf7f96fff0585f15  $RUNNER_TEMP/darby-011-old-check/BRJND2024-0.1.0.zip" | sha256sum -c
+          checksum="$(sha256sum dist/sword/packages/BRJND2024.zip | awk '{print $1}')"
+          gh issue comment 241 --repo "$GITHUB_REPOSITORY" \
+            --body "Published and independently verified Darby 0.1.1: https://github.com/$GITHUB_REPOSITORY/releases/tag/darby-jnd-2024-0.1.1 . Public Pages catalogue and the actual downloaded BRJND2024.zip SHA-256: \`$checksum\`. Same exact audited 31,166 populated verses, 6,340 notes, 521 reversible division markers; official reader screenshots in docs/evidence. The 0.1.0 immutable release ZIP was independently downloaded again and its original checksum verified unchanged. Post-publication checks PASS in this Action run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID."

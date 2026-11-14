@@ -18,7 +18,29 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  check-historical-release:
+    runs-on: ubuntu-24.04
+    outputs:
+      for_010: ${{ steps.v.outputs.for_010 }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Route versioned finalization to the matching workflow
+        id: v
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          source=Path('modules/darby-jnd-2024/RELEASE_PROVENANCE.json')
+          p=json.loads(source.read_text())
+          old=p.get('release_tag')=='darby-jnd-2024-0.1.0'
+          with open(os.environ['GITHUB_OUTPUT'],'a') as h:
+              print('for_010='+('true' if old else 'false'),file=h)
+          print('Historical 0.1.0 finalizer applies:',old)
+          PY
   publish-attested:
+    needs: check-historical-release
+    if: needs.check-historical-release.outputs.for_010 == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     environment: github-pages

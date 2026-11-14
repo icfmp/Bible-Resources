@@ -4,8 +4,8 @@
       "canonical_edition_id": "bpc-jnd-2024-revision-2.0",
       "category": "bible",
       "download": {
-        "sha256": "5910669e5eeb85d2ba06a4602918ce71d6773f36d64502bbdf7f96fff0585f15",
-        "size_bytes": 1958165,
+        "sha256": "2b48c3c9a8897e58805a7cb3be731bb895363e51bc854df502ce7e7a45f0c2c4",
+        "size_bytes": 1960800,
         "url": "https://icfmp.github.io/Bible-Resources/sword/packages/BRJND2024.zip"
       },
       "edition": "reader_optimized",
@@ -17,7 +17,7 @@
         "fr": "Bible J. N. Darby — BPC 2024"
       },
       "versification": "Luther",
-      "version": "0.1.0"
+      "version": "0.1.1"
     },
     {
       "canonical_edition_id": "louis-segond-1910-ebible",
