@@ -33,6 +33,7 @@ from commentary_source_english_osis_alias import (
 from commentary_nonlink_word_alignment import plain_word_alignment
 from commentary_stock_prefix_topology import (
     source_word_prefix_topology, stock_prefixed_source_body_concordance,
+    single_word_stock_markup_diagnostic,
 )
 from commentary_xml_witness import _parse_reference, WORK_REF
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
@@ -98,6 +99,13 @@ def independent_lexical_overlap(source_text: str, stock_raw: bytes) -> dict:
                 "status": "NOT_A_STRICT_CASE_SENSITIVE_STOCK_PREFIX",
                 "extra_stock_words_are_not_approved": True,
             }
+    single_word = None
+    if (ordered["original_plain_words_not_matched_in_exact_order"] == 1
+            and ordered["stock_plain_words_not_matched_in_exact_order"] == 1
+            and len(original) == len(compiled)):
+        # Existing cross-edition counts identify a small number of isolated
+        # mismatches. Locate their stock XML owner without logging any words.
+        single_word = single_word_stock_markup_diagnostic(source_text, stock_raw)
     return {
         "status": "INDEPENDENT_DIGITAL_EDITION_DIAGNOSTIC_ONLY",
         "source_word_count": len(original),
@@ -109,6 +117,7 @@ def independent_lexical_overlap(source_text: str, stock_raw: bytes) -> dict:
         "exact_ordered_word_equality": original == compiled,
         "ordered_word_alignment": ordered,
         "stock_extra_prefix_xml_topology": prefix,
+        "isolated_one_word_xml_location": single_word,
         "stock_source_suffix_punctuation_topology": suffix,
         "source_text_equal": source_text == stock_text,
         "historical_or_editorial_equivalence_proven": False,
