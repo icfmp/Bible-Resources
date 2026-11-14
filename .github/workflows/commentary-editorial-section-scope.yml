@@ -429,6 +429,16 @@ jobs:
           assert xiphos["sample_count"]>=2
           assert xiphos["diatheke_alias_master_shared_run_minimum"]>=25
           assert xiphos["real_xiphos_executable_started_and_visible"] is True
+          print("Bounded real Xiphos whole-chapter section/de-dup witness:",
+                json.dumps(xiphos["whole_chapter_Xiphos_GTK_proof"],sort_keys=True))
+          assert xiphos["whole_chapter_Xiphos_GTK_proof"][
+              "source_prose_or_screenshot_uploaded"] is False or (
+                xiphos["whole_chapter_Xiphos_GTK_proof"]["status"] in (
+                    "NO_INDEPENDENT_SECTION_WITNESS_IN_CHAPTER",
+                    "INDEPENDENT_SECTION_READBACK_UNAVAILABLE"
+                )
+            )
+
           assert xiphos["entire_edition_reader_presentation_approved"] is False
 
           assert preview["planned_extra_index_keys"]==24
