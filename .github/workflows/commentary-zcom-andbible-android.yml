@@ -83,6 +83,13 @@ jobs:
           assert data["andbible_apk_sha256"]=="1c9ed93391642c0de4529065a65e10eb44242d60722231b917b14c5919cdf796"
           assert data["official_android_application_installed"] is True
           assert data["official_android_app_file_import_action_tapped"] is True
+          assert data["reviewed_bible_module_id"]=="BRLSG1910"
+          assert data["reviewed_bible_all_five_published_files_attested"] is True
+          assert data["reviewed_bible_zip_selected_in_actual_file_picker"] is True
+          assert data["android_proceed_dialog_tapped"] is True
+          assert data["original_commentary_installzip_proceed_tapped"] is True
+          assert type(data["first_download_enabled_okay_button_tapped"]) is bool
+          assert data["official_exported_installzip_activity_started"] is True
           assert type(data["android_startup_snapshots_checked"]) is int
           assert 1<=data["android_startup_snapshots_checked"]<=6
           assert isinstance(data["android_bounded_startup_recovery_actions"],list)
@@ -91,6 +98,8 @@ jobs:
               "WAIT","CLOSE APP","DISMISS","DISMISS UNTIL NEXT UPDATE","ADVANCED"
           }
           assert data["android_file_picker_exact_original_zip_selected"] is True
+          assert 1<=len(data["android_baseline_bible_picker_actions"])<=7
+          assert all(isinstance(x["safe_action_names"],list) for x in data["android_baseline_bible_picker_actions"])
           assert data["android_sample_reference_deeplink_attempted"] is True
           toolbar=data["android_commentary_toolbar_selection"]
           assert set(toolbar)=={
@@ -109,7 +118,10 @@ jobs:
           assert set(reader_context)=={"after_app_restart","after_commentary_toolbar_attempt"}
           allowed_ids={"bibleButton","commentaryButton","workspaceButton","optionsMenu",
                        "strongsButton","searchButton","speakButton"}
-          for context in reader_context.values():
+          for context in list(reader_context.values())+[
+              data["android_reviewed_bible_baseline_reader_before_proceed"],
+              data["android_reviewed_bible_baseline_reader_after_proceed"],
+          ]:
               assert set(context)=={
                   "known_reader_toolbar_resource_ids_visible",
                   "main_bible_reader_activity_resumed",
@@ -143,7 +155,7 @@ jobs:
           assert data["published"] is False
           assert len(data["real_screen_sha256_only"])>=3
           assert all(re.fullmatch(r"[a-f0-9]{64}",val) for val in data["real_screen_sha256_only"].values())
-          print("Android: exact original ZIP chosen in official stable app; actual rendered text and navigation not certified")
+          print("Android: reviewed complete Bible loaded first and exact stock MHCC ZIP chosen; actual Android reader/content and navigation independently recorded, not assumed")
           PY
       - name: Preserve only bounded original identity and UI action metadata
         if: always()
@@ -159,6 +171,8 @@ jobs:
         run: |
           {
             echo 'Real official Android stable APK and original SHA-pinned CrossWire SWORD ZIP used inside disposable emulator.'
+            echo 'Independently SHA-attested five-file reviewed BRLSG1910 Bible is ZIP-packaged byte-for-byte, selected first via Android file picker to satisfy AndBible FirstDownload Bible requirement.'
+            echo 'After Bible installation the original MHCC uses the exact exported official AndBible InstallZip Activity, a real Proceed dialog and OS file picker; no internal app database or UI widget is forged.'
             echo 'Exact commentaryButton resource-id and MHCC (en) menu selection are probed; MHC (en) is a distinct full-edition module.'
             echo 'Exact resumed Activity and allowlisted reader toolbar resource names are recorded to distinguish an actual Bible reader from first-run/import context.'
             echo 'Android document switching is distinct from compiled text/links rendering; full visual fidelity is not automatically certified.'

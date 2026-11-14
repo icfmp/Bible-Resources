@@ -16,7 +16,11 @@ import re
 import time
 from urllib.parse import urlencode
 import xml.etree.ElementTree as ET
-from zipfile import ZipFile
+from zipfile import ZipFile, ZIP_DEFLATED
+
+from commentary_xiphos_dual_reader import (
+    BIBLE_MODULE, verify_and_install_reviewed_bible,
+)
 
 from commentary_intake import load_manifest
 from pilot_fetch import fetch
@@ -46,6 +50,7 @@ def safe_controls(xml: bytes, module_id: str, title: str) -> dict:
     except ET.ParseError:
         return {"controls": [], "reader_module_metadata_detected": False}
     file_label = module_id.upper() + ".ZIP"
+    baseline_label = BIBLE_MODULE.upper() + ".ZIP"
     # AndBible stable's MainBibleActivity uses commentaryButton with
     # resource-id '<package>:id/commentaryButton' (main_bible_view.xml).
     # Its popup item text is "<book abbreviation> (language)" (menuForDocs).
@@ -73,8 +78,14 @@ def safe_controls(xml: bytes, module_id: str, title: str) -> dict:
                 node.attrib.get("resource-id") == commentary_toolbar_resource
             )
             exact_popup_entry = (label == exact_commentary_popup)
-            if (label not in SAFE and label != file_label
-                    and not has_commentary_toolbar_id and not exact_popup_entry):
+            first_download_finish = (
+                node.attrib.get("resource-id") == PACKAGE + ":id/okayButton"
+                and node.attrib.get("enabled") == "true"
+                and node.attrib.get("clickable") == "true"
+            )
+            if (label not in SAFE and label not in (file_label, baseline_label)
+                    and not has_commentary_toolbar_id and not exact_popup_entry
+                    and not first_download_finish):
                 continue
             if label == "CLOSE APP" and not launcher_anr:
                 continue
@@ -84,9 +95,12 @@ def safe_controls(xml: bytes, module_id: str, title: str) -> dict:
             x1, y1, x2, y2 = map(int, match.groups())
             if not (0 <= x1 < x2 <= 1600 and 0 <= y1 < y2 <= 2400):
                 continue
-            action = ("OPEN_COMMENTARY_MENU" if has_commentary_toolbar_id
+            action = ("FINISH_FIRST_DOWNLOAD" if first_download_finish
+                      else "OPEN_COMMENTARY_MENU" if has_commentary_toolbar_id
                       else "EXACT_COMMENTARY_MENU_MODULE" if exact_popup_entry
-                      else "EXACT_MODULE_ZIP" if label == file_label else label)
+                      else "EXACT_MODULE_ZIP" if label == file_label
+                      else "EXACT_REVIEWED_BIBLE_ZIP" if label == baseline_label
+                      else label)
             item = {"action": action,
                     "x": (x1+x2)//2, "y": (y1+y2)//2}
             if item not in results:
@@ -105,7 +119,9 @@ def _screen(module_id: str, title: str) -> dict:
 def _tap(controls: list[dict], choices: tuple[str, ...]) -> str | None:
     for choice in choices:
         if choice not in SAFE and choice not in {
-            "EXACT_MODULE_ZIP", "OPEN_COMMENTARY_MENU", "EXACT_COMMENTARY_MENU_MODULE"
+            "EXACT_MODULE_ZIP", "EXACT_REVIEWED_BIBLE_ZIP",
+            "FINISH_FIRST_DOWNLOAD",
+            "OPEN_COMMENTARY_MENU", "EXACT_COMMENTARY_MENU_MODULE"
         }:
             raise PilotError("Unreviewed Android command")
         for item in controls:
@@ -313,6 +329,84 @@ def _reference_uri(manifest: dict) -> str:
             urlencode({"document": manifest["module_id"], "v11n": "KJV"}))
 
 
+def _launch_official_exported_zip_installer() -> bool:
+    """Open the exact official stable AndBible manifest-exported InstallZip Activity.
+
+    After Bible registration the initial Load Documents shortcut is no longer
+    available. This opens the official app Activity via Android ActivityManager,
+    then uses its real Proceed dialog + ACTION_OPEN_DOCUMENT system picker.
+    No application database edits, unpublished APK, or inferred UI state.
+    """
+    component = PACKAGE + "/net.bible.android.view.activity.installzip.InstallZip"
+    response = adb("shell", "am", "start", "-n", component,
+                   timeout=30, fail=False)
+    if (b"Error:" in response or
+            not (b"Starting: Intent" in response or
+                 b"Warning: Activity not started" in response)):
+        raise PilotError("Official exported AndBible InstallZip Activity unavailable")
+    time.sleep(2)
+    return True
+
+
+def _create_attested_reviewed_bible_zip(directory: Path) -> Path:
+    """Package only the five unchanged, independently attested published Bible files.
+
+    No recompilation, relabeling, scripture rewriting or global SWORD install.
+    The exact previously approved BRLSG1910 file hashes are checked before
+    packaging and again after opening the disposable archive.
+    """
+    if directory.is_symlink() or not directory.is_dir():
+        raise PilotError("Unsafe private reviewed Bible packaging directory")
+    installed = directory / "attested-bible"
+    installed.mkdir()
+    witness = verify_and_install_reviewed_bible(installed)
+    if (witness["module_id"] != BIBLE_MODULE or
+            witness["all_five_published_bible_files_sha256_attested"] is not True):
+        raise PilotError("No approved baseline Bible source attestation")
+    members = (
+        "mods.d/brlsg1910.conf",
+        "modules/texts/rawtext/brlsg1910/ot",
+        "modules/texts/rawtext/brlsg1910/ot.vss",
+        "modules/texts/rawtext/brlsg1910/nt",
+        "modules/texts/rawtext/brlsg1910/nt.vss",
+    )
+    output = directory / (BIBLE_MODULE + ".zip")
+    with ZipFile(output, "x", compression=ZIP_DEFLATED) as target:
+        for relative in members:
+            candidate = installed / relative
+            if candidate.is_symlink() or not candidate.is_file():
+                raise PilotError("Missing exact attested Bible SWORD member")
+            target.write(candidate, arcname=relative)
+    with ZipFile(output, "r") as review:
+        if set(review.namelist()) != set(members):
+            raise PilotError("Baseline Bible ZIP member list changed")
+        for relative in members:
+            if review.read(relative) != (installed / relative).read_bytes():
+                raise PilotError("Baseline Bible ZIP changed approved payload bytes")
+    return output
+
+
+def _select_exact_download_zip(
+    module_id: str, title: str, *, wanted: str, max_steps: int = 7,
+) -> tuple[bool, list[dict]]:
+    """Use only an actually observed exact-basename Android file-picker row."""
+    if wanted not in {"EXACT_REVIEWED_BIBLE_ZIP", "EXACT_MODULE_ZIP"}:
+        raise PilotError("Unreviewed Android file picker module choice")
+    history = []
+    for step in range(max_steps):
+        snap = _screen(module_id, title)
+        actions = sorted({c["action"] for c in snap["controls"]})
+        history.append({"step": step, "safe_action_names": actions})
+        if _tap(snap["controls"], (wanted,)) is not None:
+            time.sleep(16)
+            return True, history
+        if not _tap(
+            snap["controls"], ("DOWNLOADS", "DOWNLOAD", "BROWSE", "BROWSE FILES")
+        ):
+            break
+    return False, history
+
+
 def run_android_original(resource_id: str, *, apk: Path) -> dict:
     manifest = load_manifest(resource_id)
     module_id = manifest["module_id"]
@@ -355,6 +449,17 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
             raise PilotError("Official AndBible stable app missing after actual install")
         device_path = "/sdcard/Download/" + module_id + ".zip"
         adb("push", str(archive), device_path, timeout=110)
+        reviewed_bible_zip = _create_attested_reviewed_bible_zip(root)
+        adb("push", str(reviewed_bible_zip),
+            "/sdcard/Download/" + BIBLE_MODULE + ".zip", timeout=110)
+        # The original MHCC file-picker probe explicitly informs MediaStore.
+        # The second ZIP needs its *own* scan; otherwise Android DocumentsUI
+        # may not expose the approved Bible despite a successful adb push.
+        adb("shell", "am", "broadcast", "-a",
+            "android.intent.action.MEDIA_SCANNER_SCAN_FILE",
+            "-d", "file:///sdcard/Download/" + BIBLE_MODULE + ".zip",
+            timeout=20, fail=False)
+        time.sleep(3)
         adb("shell", "am", "broadcast", "-a",
             "android.intent.action.MEDIA_SCANNER_SCAN_FILE",
             "-d", "file://" + device_path, timeout=20, fail=False)
@@ -365,22 +470,51 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
         history = []
         startup = _start_bounded_android_import(module_id, title)
         initial_buttons = startup["initial_buttons"]
-        snap = _screen(module_id, title)
-        proceeded = _tap(snap["controls"], ("PROCEED",)) is not None
-        selected = False
-        for step in range(7):
-            snap = _screen(module_id, title)
-            actions = sorted({c["action"] for c in snap["controls"]})
-            history.append({"step": step, "safe_action_names": actions})
-            chosen = _tap(snap["controls"], ("EXACT_MODULE_ZIP",))
-            if chosen:
-                selected = True
-                time.sleep(16)
+        # InstallZip.getFileFromUserAndInstall() opens a separate, real
+        # "Proceed" confirmation *before* ACTION_OPEN_DOCUMENT. This is not
+        # the FirstDownload Okay button, which requires an installed Bible.
+        dialog = _screen(module_id, title)
+        proceeded = _tap(dialog["controls"], ("PROCEED",)) is not None
+        if not proceeded:
+            raise PilotError("Exact official InstallZip file-picker Proceed was not observed")
+        bible_selected, baseline_history = _select_exact_download_zip(
+            module_id, title, wanted="EXACT_REVIEWED_BIBLE_ZIP",
+        )
+        if not bible_selected:
+            observed = sorted({
+                name for step in baseline_history for name in step["safe_action_names"]
+            })
+            raise PilotError(
+                "Reviewed baseline Bible ZIP was not selectable in Android file picker; "
+                "allowlisted actual action classes: " + ",".join(observed)
+            )
+        baseline_before_proceed = _reader_context_witness()
+        # Official production-1117 AndroidManifest.xml explicitly exports
+        # the separate InstallZip Activity. Once a Bible has been registered,
+        # the first-run Load Documents shortcut is no longer reachable.
+        commentary_installer_started = _launch_official_exported_zip_installer()
+        commentary_dialog_proceeded = False
+        for _attempt in range(6):
+            dialog = _screen(module_id, title)
+            if _tap(dialog["controls"], ("PROCEED",)) is not None:
+                commentary_dialog_proceeded = True
                 break
-            if not _tap(snap["controls"], ("DOWNLOADS", "DOWNLOAD", "BROWSE", "BROWSE FILES")):
-                break
+            time.sleep(2)
+        if not commentary_dialog_proceeded:
+            raise PilotError("Official exported commentary InstallZip Proceed not observed")
+        selected, history = _select_exact_download_zip(
+            module_id, title, wanted="EXACT_MODULE_ZIP",
+        )
         if not selected:
             raise PilotError("Exact original stock ZIP was not selectable by Android file picker")
+        # This is the first-download completion *after* both ZIPs, not an
+        # arbitrary "OK" dialog. Refuse to tap a disabled or spoofed control.
+        post_both = _screen(module_id, title)
+        first_download_completed = _tap(
+            post_both["controls"], ("FINISH_FIRST_DOWNLOAD",)
+        ) is not None
+        time.sleep(3)
+        baseline_after_proceed = _reader_context_witness()
         snapshots["post_selection"] = _screenshot_sha256()
         selected_screen = _screen(module_id, title)
         exact_file_still_visible = any(
@@ -430,6 +564,15 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
             "crosswire_original_conf_sha256": confhash,
             "official_android_application_installed": True,
             "official_android_app_file_import_action_tapped": True,
+            "reviewed_bible_module_id": BIBLE_MODULE,
+            "reviewed_bible_all_five_published_files_attested": True,
+            "reviewed_bible_zip_selected_in_actual_file_picker": bible_selected,
+            "original_commentary_installzip_proceed_tapped": commentary_dialog_proceeded,
+            "official_exported_installzip_activity_started": commentary_installer_started,
+            "first_download_enabled_okay_button_tapped": first_download_completed,
+            "android_reviewed_bible_baseline_reader_before_proceed": baseline_before_proceed,
+            "android_reviewed_bible_baseline_reader_after_proceed": baseline_after_proceed,
+            "android_baseline_bible_picker_actions": baseline_history,
             "android_file_picker_exact_original_zip_selected": selected,
             "android_proceed_dialog_tapped": proceeded,
             "android_safe_import_confirmation_buttons_tapped": action_after,

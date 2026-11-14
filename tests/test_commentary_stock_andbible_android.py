@@ -30,6 +30,117 @@ class CommentaryAndroidStockTests(unittest.TestCase):
                          ["EXACT_MODULE_ZIP", "DOWNLOADS"])
         self.assertFalse(result["reader_module_metadata_detected"])
 
+    def test_only_reviewed_baseline_bible_zip_is_selectable(self):
+        xml = b'''<hierarchy>
+          <node text="BRLSG1910.zip" bounds="[100,250][650,350]"/>
+          <node text="SomeOtherBible.zip" bounds="[100,350][650,450]"/>
+          <node text="MHCC.zip" bounds="[100,450][650,550]"/>
+        </hierarchy>'''
+        actions = [row["action"] for row in safe_controls(xml, "MHCC", TITLE)["controls"]]
+        self.assertEqual(actions, ["EXACT_REVIEWED_BIBLE_ZIP", "EXACT_MODULE_ZIP"])
+
+    @patch("commentary_stock_andbible_android.time.sleep")
+    @patch("commentary_stock_andbible_android._tap")
+    @patch("commentary_stock_andbible_android._screen")
+    def test_reviewed_baseline_file_picker_selects_only_actual_basename(
+        self, screen, tap, _sleep,
+    ):
+        from commentary_stock_andbible_android import _select_exact_download_zip
+        screen.return_value = {"controls": [
+            {"action": "EXACT_REVIEWED_BIBLE_ZIP", "x": 321, "y": 432}
+        ]}
+        tap.return_value = "EXACT_REVIEWED_BIBLE_ZIP"
+        selected, history = _select_exact_download_zip(
+            "MHCC", TITLE, wanted="EXACT_REVIEWED_BIBLE_ZIP"
+        )
+        self.assertTrue(selected)
+        self.assertEqual(history[0]["safe_action_names"], ["EXACT_REVIEWED_BIBLE_ZIP"])
+        self.assertEqual(tap.call_args.args[1], ("EXACT_REVIEWED_BIBLE_ZIP",))
+        with self.assertRaisesRegex(PilotError, "Unreviewed"):
+            _select_exact_download_zip(
+                "MHCC", TITLE, wanted="ARBITRARY_UNVERIFIED_BIBLE"
+            )
+
+    @patch("commentary_stock_andbible_android.verify_and_install_reviewed_bible")
+    def test_temporary_bible_zip_preserves_all_five_attested_files(self, verifier):
+        from tempfile import TemporaryDirectory
+        from zipfile import ZipFile
+        from commentary_stock_andbible_android import (
+            _create_attested_reviewed_bible_zip, BIBLE_MODULE,
+        )
+        members = (
+            "mods.d/brlsg1910.conf",
+            "modules/texts/rawtext/brlsg1910/ot",
+            "modules/texts/rawtext/brlsg1910/ot.vss",
+            "modules/texts/rawtext/brlsg1910/nt",
+            "modules/texts/rawtext/brlsg1910/nt.vss",
+        )
+        def fill(destination):
+            for n, name in enumerate(members):
+                p = destination / name
+                p.parent.mkdir(parents=True, exist_ok=True)
+                p.write_bytes(("original approved member %d" % n).encode())
+            return {
+                "module_id": BIBLE_MODULE,
+                "all_five_published_bible_files_sha256_attested": True,
+            }
+        verifier.side_effect = fill
+        with TemporaryDirectory() as tmp:
+            archive = _create_attested_reviewed_bible_zip(Path(tmp))
+            with ZipFile(archive, "r") as z:
+                self.assertEqual(set(z.namelist()), set(members))
+                for n, name in enumerate(members):
+                    self.assertEqual(
+                        z.read(name), ("original approved member %d" % n).encode()
+                    )
+        self.assertEqual(verifier.call_count, 1)
+
+    def test_first_download_completion_requires_exact_enabled_clickable_button(self):
+        exact = b'''<hierarchy>
+          <node resource-id="net.bible.android.activity:id/okayButton"
+                text="OK" enabled="true" clickable="true"
+                bounds="[300,850][700,950]"/>
+          <node resource-id="net.bible.android.activity:id/otherButton"
+                text="OK" enabled="true" clickable="true"
+                bounds="[300,550][700,650]"/>
+        </hierarchy>'''
+        result = safe_controls(exact, "MHCC", TITLE)
+        self.assertIn("FINISH_FIRST_DOWNLOAD", [
+            x["action"] for x in result["controls"]
+        ])
+        for changed in (
+            exact.replace(b'enabled="true"', b'enabled="false"', 1),
+            exact.replace(b'clickable="true"', b'clickable="false"', 1),
+            exact.replace(b':id/okayButton', b':id/otherButton', 1),
+        ):
+            self.assertNotIn("FINISH_FIRST_DOWNLOAD", [
+                x["action"] for x in safe_controls(changed, "MHCC", TITLE)["controls"]
+            ])
+
+    @patch("commentary_stock_andbible_android.time.sleep")
+    @patch("commentary_stock_andbible_android.adb")
+    def test_only_official_manifest_exported_installer_activity_can_be_launched(
+        self, adb, _sleep,
+    ):
+        from commentary_stock_andbible_android import (
+            _launch_official_exported_zip_installer,
+        )
+        adb.return_value = b"Starting: Intent { cmp=net.bible.android.activity/.InstallZip }"
+        self.assertTrue(_launch_official_exported_zip_installer())
+        self.assertEqual(
+            adb.call_args.args[:6],
+            (
+                "shell", "am", "start", "-n",
+                "net.bible.android.activity/net.bible.android.view.activity.installzip.InstallZip",
+            )[:6],
+        )
+        adb.return_value = b"Error: Activity class does not exist"
+        with self.assertRaisesRegex(PilotError, "unavailable"):
+            _launch_official_exported_zip_installer()
+        adb.return_value = b""
+        with self.assertRaises(PilotError):
+            _launch_official_exported_zip_installer()
+
     def test_metadata_identity_not_file_picker_filename_is_reader_witness(self):
         xml = (b'<hierarchy><node text="MHCC" bounds="[50,100][600,200]"/>'
                b'<node text="MHCC.zip" bounds="[50,200][600,300]"/></hierarchy>')
