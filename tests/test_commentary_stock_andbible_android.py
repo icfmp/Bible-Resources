@@ -447,6 +447,70 @@ class CommentaryAndroidStockTests(unittest.TestCase):
         self.assertFalse(result["actual_commentary_rendering_verified"])
         self.assertFalse(result["ui_hierarchy_text_or_unknown_ids_exported"])
 
+    @patch("commentary_stock_andbible_android._tap")
+    @patch("commentary_stock_andbible_android._screen")
+    def test_exact_official_stable_notice_can_be_dismissed_once(self, screen, tap):
+        from commentary_stock_andbible_android import (
+            _classify_main_reader_context, _dismiss_verified_official_stable_notice,
+        )
+        xml = b'''<hierarchy>
+          <node package="net.bible.android.activity"
+                class="android.widget.FrameLayout"/>
+          <node package="net.bible.android.activity"
+                class="android.widget.LinearLayout"/>
+          <node package="net.bible.android.activity"
+                class="android.widget.ScrollView"/>
+          <node package="net.bible.android.activity"
+                class="android.widget.TextView"/>
+          <node package="net.bible.android.activity"
+                class="android.widget.FrameLayout"/>
+          <node package="net.bible.android.activity"
+                class="android.widget.LinearLayout"/>
+          <node package="net.bible.android.activity"
+                class="android.widget.FrameLayout"/>
+          <node package="net.bible.android.activity"
+                class="android.widget.LinearLayout"/>
+          <node package="net.bible.android.activity"
+                class="android.widget.FrameLayout"/>
+          <node package="net.bible.android.activity"
+                class="android.widget.LinearLayout"/>
+          <node package="net.bible.android.activity"
+                class="android.widget.Button" enabled="true" clickable="true"
+                text="Dismiss" bounds="[200,600][480,720]"/>
+          <node package="net.bible.android.activity"
+                class="android.widget.Button" enabled="true" clickable="true"
+                text="Dismiss until next update" bounds="[490,600][970,720]"/>
+        </hierarchy>'''
+        ctx = _classify_main_reader_context(
+            xml,
+            b"topResumedActivity=ActivityRecord{12 net.bible.android.activity/MainBibleActivity}",
+            "MHCC", TITLE,
+        )
+        screen.return_value = {"controls": [
+            {"action": "DISMISS", "x": 350, "y": 660},
+            {"action": "DISMISS UNTIL NEXT UPDATE", "x": 730, "y": 660},
+        ]}
+        tap.return_value = "DISMISS UNTIL NEXT UPDATE"
+        self.assertEqual(
+            _dismiss_verified_official_stable_notice("MHCC", TITLE, ctx),
+            "official_stable_update_notice_dismissed_until_update",
+        )
+        self.assertEqual(tap.call_args.args[1], ("DISMISS UNTIL NEXT UPDATE",))
+        screen.return_value = {"controls": [
+            {"action": "DISMISS", "x": 350, "y": 660},
+        ]}
+        self.assertEqual(
+            _dismiss_verified_official_stable_notice("MHCC", TITLE, ctx),
+            "notice_changed_before_safe_click",
+        )
+        previous = tap.call_count
+        blocked = {**ctx, "known_reader_root_resource_ids_visible": ["mainBibleView"]}
+        self.assertEqual(
+            _dismiss_verified_official_stable_notice("MHCC", TITLE, blocked),
+            "not_exact_verified_official_stable_notice",
+        )
+        self.assertEqual(tap.call_count, previous)
+
     def test_missing_reader_window_is_not_a_mhcc_data_failure(self):
         from commentary_stock_andbible_android import _classify_main_reader_context
         state = _classify_main_reader_context(
