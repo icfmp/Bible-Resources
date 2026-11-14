@@ -31,6 +31,9 @@ from commentary_source_english_osis_alias import (
     read_existing_66_book_english_aliases, _canon_name
 )
 from commentary_nonlink_word_alignment import plain_word_alignment
+from commentary_stock_prefix_topology import (
+    source_word_prefix_topology, stock_prefixed_source_body_concordance,
+)
 from commentary_xml_witness import _parse_reference, WORK_REF
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
 from pilot_fetch import ALLOWED_HOSTS, fetch
@@ -82,6 +85,19 @@ def independent_lexical_overlap(source_text: str, stock_raw: bytes) -> dict:
         "HIGH_80_PLUS" if least >= 80 else
         "MODERATE_50_PLUS" if least >= 50 else "LOW_OVERLAP"
     )
+    prefix = None
+    suffix = None
+    if (ordered["original_plain_words_not_matched_in_exact_order"] == 0
+            and ordered["stock_plain_words_not_matched_in_exact_order"] > 0
+            and ordered["common_end_word_tokens"] == len(original)):
+        try:
+            prefix = source_word_prefix_topology(source_text, stock_raw)
+            suffix = stock_prefixed_source_body_concordance(source_text, stock_raw)
+        except (ValueError, PilotError):
+            prefix = {
+                "status": "NOT_A_STRICT_CASE_SENSITIVE_STOCK_PREFIX",
+                "extra_stock_words_are_not_approved": True,
+            }
     return {
         "status": "INDEPENDENT_DIGITAL_EDITION_DIAGNOSTIC_ONLY",
         "source_word_count": len(original),
@@ -92,6 +108,8 @@ def independent_lexical_overlap(source_text: str, stock_raw: bytes) -> dict:
         "overlap_class": classification,
         "exact_ordered_word_equality": original == compiled,
         "ordered_word_alignment": ordered,
+        "stock_extra_prefix_xml_topology": prefix,
+        "stock_source_suffix_punctuation_topology": suffix,
         "source_text_equal": source_text == stock_text,
         "historical_or_editorial_equivalence_proven": False,
         "authorial_prose_modified": False,
