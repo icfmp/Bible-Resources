@@ -215,9 +215,10 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
             or not scratch.is_dir() or scratch.is_symlink()
             or not ((module_id == MODULE and "private-darby-repaired-sword-" in str(payload.resolve()))
                     or (module_id == FINAL_RESEARCH_MODULE
-                        and "darby-v011" in payload.resolve().parts
+                        and ({"darby-v011", "darby-private-native"} & set(payload.resolve().parts))
                         and payload.name == "payload"
-                        and payload.parent.name == "final-module"))):
+                        and payload.parent.name == "final-module"
+                        and payload.parent.parent.name in {"final-011-candidate", "private-final"}))):
         raise AndroidDarbyImportError("Unpinned APK or unsafe private experiment paths")
 
     if module_id not in {MODULE, FINAL_RESEARCH_MODULE}:
