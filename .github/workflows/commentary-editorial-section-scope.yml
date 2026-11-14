@@ -149,6 +149,9 @@ jobs:
           print("Source citation labels where CrossWire selected stock has no clickable links:",
                 json.dumps(div2.get("source_reference_labels_when_stock_has_no_link_markup",{}),
                            sort_keys=True))
+          print("Changed word position in independent original source markup:",
+                json.dumps(div2.get("isolated_one_word_original_source_markup_location_classes",{}),
+                           sort_keys=True))
           for row in div2.get("independent_stock_vs_source_reference_target_exception_rows",[]):
               print("Review unmatched chapter citation annotation",row["native_start"],
                     "source-unpaired",row["source_target_occurrences_not_paired"],
