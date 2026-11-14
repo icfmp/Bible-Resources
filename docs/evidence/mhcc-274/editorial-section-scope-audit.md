@@ -248,3 +248,93 @@ introduction semantics, including 2 Chr 1 and Neh 1; then prepare an
 disjoint spans (e.g. Matt 13), and test deduplicated rendering in a real
 reader. The exact original CrossWire module and published BRMHCC 0.1.0
 remain unchanged, and modern English #270/#272 is paused.
+
+
+## Sixth pass — reference preservation and safe unbuilt link-preflight (2026-11-14)
+
+The independently pinned CCEL ThML source and the complete SHA-pinned original
+CrossWire MHCC zCom were compared **for every one of the 118 single-key
+chapters**, using the existing strict source `scripRef` versus compiled
+`reference osisRef` comparator. The comparison checks exact raw targets first,
+then **only** the *literal* optional `Bible:` work prefix; it never invents
+canonical destinations from displayed labels.
+
+Reproduction:
+- [Whole 118-case reference target census — SUCCESS](https://github.com/icfmp/Bible-Resources/actions/runs/43621130646)
+- [Original source labels versus unlinked compiled text — SUCCESS](https://github.com/icfmp/Bible-Resources/actions/runs/43621365477)
+- [Complete canonical original-native key preflight — SUCCESS](https://github.com/icfmp/Bible-Resources/actions/runs/43621652881)
+
+### Exact source-vs-stock target inventory
+
+| Cross-edition reference markup class | One-key chapter entries |
+| --- | ---: |
+| Neither original nor stock has annotated scripture reference targets | **79** |
+| Every reference target matches exactly or by literal `Bible:` work prefix | **19** |
+| Source has at least one target, selected stock entry has no `reference` tags | **16** |
+| Source has more target occurrences than matching target occurrences in stock | **4** |
+| Stock has unpaired source-absent target occurrence | **0** |
+| **Total** | **118** |
+
+- Original CCEL source `scripRef` target occurrences: **58**.
+- Original CrossWire stock `reference` target occurrences: **33**.
+- Paired original/stock target occurrences after exact / literal `Bible:` prefix matching: **33**.
+- **25 CCEL-annotated citation target occurrences are not linked** in those
+  selected original stock entries, across **20** single-key chapters.
+  This is a *cross-edition annotation fidelity difference*, NOT proof of
+  authorial word loss or 25 independently approved corrections.
+- In **16** of those chapters, stock has **zero link-markup targets** where
+  original CCEL has **20** source citation labels. Of those 20 labels,
+  **16** still occur literally in stock plain text, **2** occur as word
+  sequences with different punctuation/markup, and **2** cannot be located in
+  the selected stock entry at all.
+- The other **four** partial-reference chapters are **2 Sam 22, 1 Chr 17,
+  Psalm 16 and Psalm 53** (5 source unpaired targets).
+- Three one-word stock XML `reference` label variants require special
+  care: **Gen 38** and **Job 25** retain both independently source-matched
+  `osisRef` targets (2/2) and differ only in displayed label spelling;
+  **1 Chr 17** retains only 2 of 4 original CCEL reference target
+  occurrences in the selected stock body. An original target presence check
+  **does not validate that it points to the intended verse in a reader**.
+
+The existing global lexical/reference audit in issue #177 previously revealed
+unpaired `scripRef`/stock `reference` annotation differences in **other**
+selected commentary sections. This 118-chapter census is a complementary
+bounded audit of chapter-wide units, **not** the complete corpus-wide
+cross-edition source/target fidelity certificate.
+
+### Canonical missing section preflight
+
+A new **reusable, read-only** `triage_missing_native_section_links` in
+`scripts/commentary_navigation_link_plan.py` takes the independently
+read original native occupied-key-to-raw-digest map, actual released libSWORD
+KJV registry and the full parsed heading-gap list. It checks original master
+digest presence, canonical target key bounds, *actual* target vacancy,
+cross-section double claims and original payload collisions.
+
+The complete exact-stock source run reports **17 candidate sections,
+24 unoccupied canonical verse keys, zero collisions with already occupied
+different original commentary sections**. The disjoint Matt 13 section
+remains 24–30 **and** 36–43, leaving the genuinely different 31–35
+commentary alone. **No original raw content, linked key, verse number,
+index file or release was edited**, and the output carries
+`editorial_approval=false` and `release_authorized=false`. It is **not
+yet a build-ready proposal** and cannot be passed through the guarded
+`propose_commentary_links` without individual scope review.
+
+### Next editorial decisions (not automatic corrections)
+
+1. Locate the four apparent prose one-character differences inside the
+   original independent XML `scripRef` label offsets, **not just** the
+   compiled stock `reference` element offsets. A flattened source citation
+   can look like ordinary compiled prose; it must not be misclassified as an
+   authorial prose rewrite.
+2. Review the two source labels not found in selected compiled entry,
+   plus the five partial-section citation annotations, against their
+   own source passage divisions and another independently identified
+   edition before any markup reconstruction.
+3. Check original verse/passage ranges, chapter-level unit scope, all
+   notes/paragraphs/intro relationships and the exact source edition
+   rights. Produce a **separate, reversible candidate** only after these
+   gates; confirm all original keys/raw payloads and one real reader's
+   behavior. Owner approval remains required for publication, and paused
+   modern-English #270/#272 must not restart prematurely.
