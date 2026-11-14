@@ -99,7 +99,7 @@ jobs:
           heap-size: 512M
           disable-animations: true
           emulator-boot-timeout: 600
-          script: python scripts/probe_private_repaired_darby_sword.py --osis2mod "$PINNED_COMPILER" --native-index "$RUNNER_TEMP/darby-private-android/native-index" --native-raw "$RUNNER_TEMP/darby-private-android/native-raw" --diatheke "$(command -v diatheke)" --schema "$RUNNER_TEMP/darby-private-android/schema/osisCore.2.1.1-cw-latest.xsd" --link-plan config/publisher-osis/frajnd-2024-note-link-research.json --inline-plan config/publisher-osis/frajnd-2024-inline-markup-research.json --andbible-android-apk "$RUNNER_TEMP/darby-private-android/andbible-production-1117.apk" --andbible-android-evidence-dir "$RUNNER_TEMP/darby-private-android/evidence" --report "$RUNNER_TEMP/darby-private-android/report.json"
+          script: python scripts/probe_private_repaired_darby_sword.py --osis2mod "$PINNED_COMPILER" --native-index "$RUNNER_TEMP/darby-private-android/native-index" --native-raw "$RUNNER_TEMP/darby-private-android/native-raw" --diatheke "$(command -v diatheke)" --schema "$RUNNER_TEMP/darby-private-android/schema/osisCore.2.1.1-cw-latest.xsd" --link-plan config/publisher-osis/frajnd-2024-note-link-research.json --inline-plan config/publisher-osis/frajnd-2024-inline-markup-research.json --division-overlay --andbible-android-apk "$RUNNER_TEMP/darby-private-android/andbible-production-1117.apk" --andbible-android-evidence-dir "$RUNNER_TEMP/darby-private-android/evidence" --report "$RUNNER_TEMP/darby-private-android/report.json"
       - name: Upload screenshot and bounded metadata only; never candidate Bible payload
         if: always()
         uses: actions/upload-artifact@v4
