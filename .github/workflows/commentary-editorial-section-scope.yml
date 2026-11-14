@@ -120,6 +120,16 @@ jobs:
                 json.dumps(witness.get("independent_reference_evidence_matrix",{}),sort_keys=True))
           print("Unrecognized source section classes:",
                 json.dumps(witness.get("unrecognized_source_annotation_classes",{}),sort_keys=True))
+          div2=witness["independent_div2_chapter_body_review"]
+          print("Full source div2 chapter-scope classification:",
+                json.dumps(div2.get("candidate_classes",{}),sort_keys=True))
+          print("Source book title/marker alignment:",
+                json.dumps(div2.get("book_alignment_evidence_classes",{}),sort_keys=True))
+          for divcase in div2.get("case_rows",[]):
+              print("Source div2 chapter",divcase["native_start"],
+                    divcase["source_div2_structure_class"],
+                    "verse-annotation-count",divcase["source_numbered_marker_count"],
+                    "nonempty-paragraphs",divcase["source_nonempty_paragraph_count"])
           chapter=witness["independent_whole_chapter_review"]
           print("Independently witnessed one-key chapter scope candidates:",
                 json.dumps(chapter["source_scope_candidate_classes"],sort_keys=True))
