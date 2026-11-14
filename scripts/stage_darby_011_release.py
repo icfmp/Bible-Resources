@@ -223,6 +223,34 @@ def stage(root,archive,metadata_path,audit_path,dist):
     })
     _,errors=validate(root)
     require(not errors,"Final 0.1.1 validation failed: "+"; ".join(errors[:10]))
+    release_note=root/"docs/releases/DARBY-JND-2024-0.1.1.md"
+    require(not release_note.exists() and not release_note.is_symlink(),"Refusing old release-note overwrite")
+    release_note.write_text(
+        "# J. N. Darby Bible — BPC 2024 rev. 2.0 / Bible Resources 0.1.1\n\n"
+        "Maintenance release: 521 authorial subject/stanza separators are now "
+        "reversibly preserved as nondisplayed OSIS metadata, while the genuine "
+        "text-critical star remains visible. 4,690 XML indentation artifacts "
+        "were removed. All 31,166 Scripture verse keys and 6,340 original "
+        "notes were source/native audited, including targets, caller labels, "
+        "paragraphs, poetry and verse omissions. Actual stable AndBible and "
+        "Xiphos samples at Gen 6:9, 6:13, 7:17, Ps 3:1, Job 3:1 were reviewed.\n\n"
+        "## Exact release identity\n\n"
+        "- SWORD ID: `BRJND2024`; version: `0.1.1`; driver: `zText`; versification: `Luther`.\n"
+        "- BPC source OSIS SHA-256: `"+ORIGINAL+"`.\n"
+        "- Reviewed compiler-input OSIS SHA-256: `"+CORRECTED+"`.\n"
+        "- Reader-tested private exact final-ID ZIP SHA-256: `"+NEW+"`.\n"
+        "- Canonical public ZIP SHA-256: `"+canonical_hash+"`.\n"
+        "- Owner authorization: "+APPROVAL+".\n"
+        "- [Final reader evidence](../evidence/darby-2024-0.1.1-final-reader-qa.md).\n\n"
+        "## Update and rollback\n\n"
+        "Install `BRJND2024-0.1.1.zip` from the versioned GitHub Release or "
+        "use the Bible Resources SWORD catalogue. Clients differ in how they "
+        "recognize updates. For rollback, the previously released immutable "
+        "[Darby 0.1.0 archive](https://github.com/icfmp/Bible-Resources/releases/tag/darby-jnd-2024-0.1.0) "
+        "remains available. No publisher-original bytes were rewritten.\n\n"
+        "Public-domain J. N. Darby text, BPC 2024 rev 2.0; independently curated "
+        "technical distribution, not a BPC official SWORD release.\n",
+        encoding="utf-8")
     return {"status":"0_1_1_staged_for_protected_review_not_published",
             "private_zip_sha256":NEW,"canonical_release_zip_sha256":canonical_hash,
             "canonical_release_zip_bytes":built_zip.stat().st_size}
