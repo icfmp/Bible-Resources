@@ -208,6 +208,36 @@ class SafeLexicalEvidenceTests(unittest.TestCase):
         self.assertEqual(r["status"], "UNPARSEABLE_ORIGINAL_RAW")
         self.assertFalse(r["source_text_equal"])
 
+    def test_source_neighbor_correspondence_is_text_free_not_approval(self):
+        result = independent_lexical_overlap(
+            "The original explanation.",
+            b"<title>Prior chapter heading</title><p>The original explanation.</p>",
+            source_neighbor_candidates=[
+                ("source_immediate_previous_heading_element", "Prior chapter heading")
+            ],
+        )
+        witness = result["stock_prefix_independent_source_neighbor_correspondence"]
+        self.assertTrue(witness["any_exact_source_neighbor_text_in_stock_metadata"])
+        self.assertEqual(
+            witness["source_neighbor_to_stock_element_correspondence_classes"],
+            {"exact_unicode:title:source_immediate_previous_heading_element": 1}
+        )
+        self.assertTrue(witness["actual_source_candidate_is_not_approved_compiled_heading"])
+        self.assertFalse(witness["source_or_stock_text_or_attribute_values_disclosed"])
+        self.assertNotIn("Prior chapter heading", str(witness))
+
+    def test_unmatched_source_neighbor_is_not_accepted_as_approval(self):
+        result = independent_lexical_overlap(
+            "The original explanation.",
+            b"<title>Different original heading</title><p>The original explanation.</p>",
+            source_neighbor_candidates=[
+                ("source_div1_title_attribute", "Another title")
+            ],
+        )
+        witness = result["stock_prefix_independent_source_neighbor_correspondence"]
+        self.assertFalse(witness["any_exact_source_neighbor_text_in_stock_metadata"])
+        self.assertTrue(witness["actual_source_candidate_is_not_approved_compiled_heading"])
+
     def test_isolated_mismatched_stock_word_located_in_paragraph_without_export(self):
         r = independent_lexical_overlap(
             "The promised comfort lasts.",
