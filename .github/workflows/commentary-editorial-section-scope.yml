@@ -1,0 +1,344 @@
+name: Audit original commentary editorial section scopes
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/commentary-editorial-section-scope.yml'
+      - 'scripts/commentary_section_scope_audit.py'
+      - 'scripts/commentary_osis_rebuild_preflight.py'
+      - 'tests/test_commentary_section_scope_audit.py'
+      - 'tests/test_commentary_osis_rebuild_preflight.py'
+      - 'scripts/commentary_navigation_link_plan.py'
+      - 'tests/test_commentary_navigation_link_plan.py'
+      - 'scripts/sword_native_commentary_index.cpp'
+      - 'scripts/sword_native_commentary_raw_corpus.cpp'
+      - 'config/commentary-intake/**'
+  workflow_dispatch:
+    inputs:
+      resource_id:
+        description: "Pinned original commentary manifest ID"
+        required: true
+        default: mhcc-crosswire
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      RESOURCE_ID: ${{ github.event.inputs.resource_id || 'mhcc-crosswire' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test read-only generic section-scope classifier
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          python -m unittest discover -s tests -p 'test_commentary_section_scope_audit.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_navigation_link_plan.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_osis_rebuild_preflight.py' -v
+      - name: Install stable upstream native SWORD library
+        run: |
+          set -euo pipefail
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev libsword-utils
+      - name: Compile independent stock index and private raw-entry readers
+        run: |
+          set -euo pipefail
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_index.cpp \
+            -o "${RUNNER_TEMP}/stock-index" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "${RUNNER_TEMP}/stock-raw" -lsword
+      - name: Prove standards-based continuous and disjoint commentary links on synthetic OSIS
+        run: |
+          set -euo pipefail
+          command -v osis2mod
+          ROOT="${RUNNER_TEMP}/synthetic-commentary"
+          mkdir -p "$ROOT/mods.d" "$ROOT/modules/comments/zcom/LinkProof"
+          timeout 45s osis2mod "$ROOT/modules/comments/zcom/LinkProof" \
+            tests/fixtures/synthetic-linked-commentary.osis.xml \
+            -z z -b 3 -v KJV > "$ROOT/osis2mod.log" 2>&1
+          if grep -Eq 'FATAL\\(|ERROR\\(' "$ROOT/osis2mod.log"; then
+            echo "Synthetic OSIS importer reported an error"
+            exit 1
+          fi
+          cat > "$ROOT/mods.d/LinkProof.conf" <<'CONF'
+          [LinkProof]
+          DataPath=./modules/comments/zcom/LinkProof
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          SourceType=OSIS
+          Versification=KJV
+          Lang=en
+          Description=Synthetic audit fixture only
+          CONF
+          SWORD_PATH="$ROOT" timeout 60s "${RUNNER_TEMP}/stock-raw" LinkProof > "$ROOT/native.raw"
+          PYTHONPATH=scripts python - "$ROOT/native.raw" <<'PY'
+          import sys
+          from pathlib import Path
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          raw = {}
+          def entry(kind, key, payload):
+              if kind == "K":
+                  raw[key] = payload
+          with Path(sys.argv[1]).open("rb") as f:
+              _, keys, _, _ = parse_native_raw_corpus(f, on_entry=entry)
+          expected = {f"Gen.1.{v}" for v in (1, 2, 3, 4, 5, 7, 8)}
+          assert expected <= set(keys), "Missing a real linked synthetic commentary verse"
+          assert "Gen.1.6" not in keys, "Disjoint range incorrectly linked its gap"
+          assert raw["Gen.1.1"] == raw["Gen.1.2"], "Connected range lost its linked body"
+          assert len({raw[f"Gen.1.{v}"] for v in (4, 5, 7, 8)}) == 1, (
+              "Disjoint annotation does not read back a single original commentary"
+          )
+          assert raw["Gen.1.3"] != raw["Gen.1.4"], "Independent commentary was overwritten"
+          print("Synthetic SWORD linked-commentary readback PASSED:",
+                len(expected), "occupied target verses; independent gap preserved")
+          PY
+      - name: Prove isolated native zCom alias links preserve all existing raw entries
+        run: |
+          set -euo pipefail
+          ROOT="${RUNNER_TEMP}/synthetic-commentary"
+          CLONE="${RUNNER_TEMP}/synthetic-commentary-alias"
+          cp -a "$ROOT" "$CLONE"
+          DATA="$CLONE/modules/comments/zcom/LinkProof"
+          # zCom uses .czz for compressed authorial bytes; .czv is its verse index.
+          compgen -G "$DATA/*.czz" > /dev/null
+          (cd "$DATA" && sha256sum ./*.czz) > "$CLONE/compressed-payloads.before.sha256"
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            tests/fixtures/synthetic_zcom_link_entry.cpp \
+            -o "${RUNNER_TEMP}/synthetic-native-link-entry" -lsword
+          MODE=$(SWORD_PATH="$CLONE" timeout 45s "${RUNNER_TEMP}/synthetic-native-link-entry")
+          echo "Synthetic zCom native linking capability: $MODE"
+          (cd "$DATA" && sha256sum -c "$CLONE/compressed-payloads.before.sha256")
+          SWORD_PATH="$CLONE" timeout 60s "${RUNNER_TEMP}/stock-raw" LinkProof > "$CLONE/native.after.raw"
+          PYTHONPATH=scripts python - "$ROOT/native.raw" "$CLONE/native.after.raw" "$MODE" <<'PY'
+          import sys
+          from pathlib import Path
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          def read(path):
+              exact={}
+              def entry(kind,key,raw):
+                  exact[(kind,key)]=raw
+              with Path(path).open("rb") as f:
+                  _,keys,intros,top=parse_native_raw_corpus(f,on_entry=entry)
+              return exact,keys,intros,top
+          before, old_keys, old_intro, old_top=read(sys.argv[1])
+          after, new_keys, new_intro, new_top=read(sys.argv[2])
+          assert old_intro==new_intro and old_top==new_top
+          assert all(after[key]==body for key,body in before.items()), (
+              "A previously occupied original synthetic module entry was altered"
+          )
+          assert "Gen.1.6" not in new_keys
+          mode=sys.argv[3]
+          if mode=="SYNTHETIC_NATIVE_ZCOM_READ_ONLY":
+              assert after==before, "The read-only zCom load unexpectedly changed an index entry"
+              print("Synthetic zCom native link support: READ_ONLY; "
+                    "all",len(before),"original entries and compressed bodies unchanged")
+          elif mode=="SYNTHETIC_NATIVE_ZCOM_LINK_APPLIED":
+              assert set(after)==set(before)|{("K","Gen.1.10")}
+              assert after[("K","Gen.1.10")]==before[("K","Gen.1.9")]
+              print("Synthetic zCom linkEntry: applied one new alias, "
+                    "all",len(before),"original entries and compressed bodies unchanged")
+          else:
+              raise AssertionError("Unknown native module link capability result")
+          PY
+      - name: Audit all original stock section headings against native occupied slots
+        run: |
+          set -euo pipefail
+          python scripts/commentary_section_scope_audit.py \
+            --resource-id "$RESOURCE_ID" \
+            --native-index-binary "${RUNNER_TEMP}/stock-index" \
+            --native-raw-binary "${RUNNER_TEMP}/stock-raw" \
+            --report "${RUNNER_TEMP}/editorial-scope.json"
+      - name: Summarize scope and known regression probes without original text
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          r=json.loads((Path(os.environ["RUNNER_TEMP"])/"editorial-scope.json").read_text())
+          assert r["status"]=="COMPLETE_NATIVE_SCAN_EDITORIAL_TRIAGE_NOT_APPROVAL"
+          assert r["native_full_key_crosscheck"] is True
+          assert r["original_text_logged_or_published"] is False
+          assert r["original_sword_changed"] is False
+          print("Native slots:",r["native_numbered_rows"],"intros:",r["native_intro_rows"])
+          transport=r["original_osis_rebuild_structure_preflight"]
+          assert transport["status"]=="COMPLETE_NATIVE_OSIS_WRAPPER_PREFLIGHT_NOT_A_REBUILD"
+          assert transport["raw_entries_observed"]==(
+              r["native_numbered_rows"]+r["native_intro_rows"]+r["native_top_rows"])
+          assert transport["compiled_osis_to_stock_byte_parity_proven"] is False
+          assert transport["original_content_or_module_changed"] is False
+          assert transport["publication_authorized"] is False
+          print("Real original XML-to-OSIS-wrapper feasibility observed entries:",
+                transport["raw_entries_observed"],
+                "original-kind-counts",json.dumps(transport["raw_record_kinds"],sort_keys=True),
+                "distinct bodies",transport["unique_nonopaque_payload_sha256_count"])
+          print("OSIS wrapper original element/text structure observations:",
+                json.dumps(transport["original_markup_shape_counts"],sort_keys=True))
+          print("OSIS wrapper blockers / unhandled source structure:",
+                json.dumps(transport["blocking_or_unresolved_structure_counts"],sort_keys=True))
+          print("OSIS source local element names:",
+                json.dumps(transport["original_element_counts_by_name"],sort_keys=True))
+          print("Opaque TOP requiring explicit preservation:",
+                transport["opaque_top_distinct_digest_count"])
+          print("Repeated raw groups crossing chapters/books / intro and numbered:",
+                transport["same_raw_payload_across_chapter_group_count"],
+                transport["same_raw_payload_across_book_group_count"],
+                transport["same_raw_payload_shared_by_intro_and_numbered_keys_count"])
+          registry=r["native_versification_registry"]
+          print("Native versification registry", registry["name"],
+                "chapters",registry["canonical_chapters"],
+                "verse keys",registry["canonical_verse_keys"],
+                "stock keys all within actual registry",
+                registry["original_occupied_numbered_keys_within_registry"])
+          print("Potential newly navigable one-key-chapter slots, NOT APPROVED:",
+                registry["candidate_new_navigation_keys_if_all_chapters_approved"])
+          for one in registry["candidate_single_key_chapter_sizing"]:
+              print("Chapter-size",one["chapter"],one["native_verse_max"],
+                    one["independent_source_class"])
+          print("Section scope triage categories:",json.dumps(r["counts"],sort_keys=True))
+          preflight=r["explicit_heading_native_link_candidate_preflight"]
+          assert preflight["status"]=="PRELIMINARY_NATIVE_INDEX_GAPS_REVIEW_REQUIRED"
+          assert preflight["source_prose_modified"] is False
+          assert preflight["compiled_binary_modified"] is False
+          assert preflight["editorial_approval"] is False
+          assert preflight["release_authorized"] is False
+          print("Original registry-checked section gap preflight:",
+                "sections",preflight["candidate_section_count"],
+                "unoccupied native keys",preflight["candidate_additional_native_target_keys"],
+                "blocked original payload collisions",
+                len(preflight["blocked_sections_with_different_existing_original_payload"]))
+          for section in preflight["candidate_sections"]:
+              print("Candidate unapproved native section",section["original_master_key"],
+                    "unoccupied targets",",".join(section["unoccupied_native_target_keys"]))
+
+          unknown=r["unrecognized_native_slot_review"]
+          assert unknown["total"]==r["counts"]["no_recognized_heading"]
+          assert unknown["all_output_is_original_text_free_metadata"] is True
+          print("Unrecognized slot classes:",json.dumps(unknown["reason_counts"],sort_keys=True))
+          print("Unrecognized distinct raw payloads:",unknown["distinct_native_raw_payload_hashes"])
+          print("Unrecognized slots sharing payload with recognized heading:",
+                unknown["shares_content_with_recognized_heading"])
+          print("Unrecognized first-verse native rows:",unknown["first_verse_entries"])
+          print("Chapter-first unknowns with only one occupied native slot:",
+                unknown["single_occupied_slot_chapters_among_unknown"])
+          for row in unknown["case_rows"]:
+              print("Unrecognized slot",row["native_key"],row["category"],
+                    "same-payload-count",row["same_raw_payload_slot_count"],
+                    "first-in-chapter",row["first_verse_in_chapter"],
+                    "recognized-payload",row["same_payload_with_recognized_heading"])
+          for key in ("Song.1.7","Jer.4.1","Jer.4.3"):
+              probe=r["probes"].get(key)
+              print("Probe",key,json.dumps(
+                  {k:v for k,v in (probe or {}).items() if k!="raw_payload_sha256"},
+                  sort_keys=True))
+          for row in r["anomalies"]:
+              print("Candidate range",row["start"],"through",row["declared_end"],
+                    row["category"],"missing",",".join(row["missing_slots"]))
+          witness=r["independent_thml_witness"]
+          print("Independent ThML status:",witness["status"])
+          print("Independent ThML section agreement:",
+                json.dumps(witness.get("source_range_agreement_counts",{}),sort_keys=True))
+          print("Independent ThML scripRef citation-only agreement:",
+                json.dumps(witness.get("independent_scripref_range_agreement_counts",{}),sort_keys=True))
+          print("Independent source evidence matrix:",
+                json.dumps(witness.get("independent_reference_evidence_matrix",{}),sort_keys=True))
+          print("Unrecognized source section classes:",
+                json.dumps(witness.get("unrecognized_source_annotation_classes",{}),sort_keys=True))
+          div2=witness["independent_div2_chapter_body_review"]
+          print("Full source div2 chapter-scope classification:",
+                json.dumps(div2.get("candidate_classes",{}),sort_keys=True))
+          print("Independent source vs unchanged stock chapter-word diagnostic:",
+                json.dumps(div2.get("independent_stock_vs_source_lexical_diagnostic_classes",{}),sort_keys=True))
+          print("Independent source vs unchanged stock ordered-word alignment:",
+                json.dumps(div2.get("independent_stock_vs_source_ordered_word_diagnostic_classes",{}),sort_keys=True))
+          print("Chapter-level original source vs stock link-target classes:",
+                json.dumps(div2.get("independent_stock_vs_source_reference_target_classes",{}),sort_keys=True))
+          print("Chapter-level original source vs stock link-target totals:",
+                json.dumps(div2.get("independent_stock_vs_source_reference_target_totals",{}),sort_keys=True))
+          print("Source citation labels where CrossWire selected stock has no clickable links:",
+                json.dumps(div2.get("source_reference_labels_when_stock_has_no_link_markup",{}),
+                           sort_keys=True))
+          print("Changed word position in independent original source markup:",
+                json.dumps(div2.get("isolated_one_word_original_source_markup_location_classes",{}),
+                           sort_keys=True))
+          for row in div2.get("independent_stock_vs_source_reference_target_exception_rows",[]):
+              print("Review unmatched chapter citation annotation",row["native_start"],
+                    "source-unpaired",row["source_target_occurrences_not_paired"],
+                    "stock-unpaired",row["stock_target_occurrences_not_paired"],
+                    "classification",row["classification"],
+                    "source-label-locations",
+                    json.dumps(row["source_link_label_location_classes"],sort_keys=True))
+          print("Source book title/marker alignment:",
+                json.dumps(div2.get("book_alignment_evidence_classes",{}),sort_keys=True))
+          for bookrow in div2.get("book_alignment_evidence_rows",[]):
+              if bookrow["identity_class"]!="SOURCE_BOOK_TITLE_AND_MARKERS_MATCH":
+                  print("Book mapping review",json.dumps(bookrow,sort_keys=True))
+          for divcase in div2.get("case_rows",[]):
+              print("Source div2 chapter",divcase["native_start"],
+                    divcase["source_div2_structure_class"],
+                    "verse-annotation-count",divcase["source_numbered_marker_count"],
+                    "nonempty-paragraphs",divcase["source_nonempty_paragraph_count"],
+                    "source-annotation-chapters",divcase["source_annotated_chapters"],
+                    "source-h2-numeric-chapters",divcase["source_h2_numeric_chapters"])
+              lexical=divcase.get("independent_lexical_comparison")
+              if lexical and (
+                  divcase["native_start"]=="2Chr.1.1"
+                  or lexical.get("overlap_class") != "HIGH_95_PLUS"
+                  or lexical["ordered_word_alignment"]["exact_unicode_ordered_alignment_class"]
+                     not in (
+                         "plain_words_exactly_identical_in_original_order",
+                         "all_source_plain_words_in_stock_order_with_extra_stock_words",
+                         "all_stock_plain_words_in_source_order_with_extra_source_words"
+                     )
+              ):
+                  print("Needs lexical scope review",divcase["native_start"],
+                        json.dumps(lexical,sort_keys=True))
+              if lexical and (
+                  lexical.get("isolated_one_word_xml_location") is not None
+                  or divcase["native_start"] in ("2Chr.1.1","Neh.1.1")
+              ):
+                  refcheck=divcase.get("independent_reference_target_comparison")
+                  if refcheck is None:
+                      raise AssertionError("Source/stock citation target review absent")
+                  print("Private citation target review",divcase["native_start"],
+                        json.dumps(refcheck,sort_keys=True))
+          chapter=witness["independent_whole_chapter_review"]
+          print("Independently witnessed one-key chapter scope candidates:",
+                json.dumps(chapter["source_scope_candidate_classes"],sort_keys=True))
+          print("Complete source chapter annotations:",
+                json.dumps(chapter["independent_source_chapter_marker_inventory"],sort_keys=True))
+          for case in chapter["case_rows"]:
+              print("Chapter-scope witness",case["candidate_chapter"],case["witness_class"],
+                    "markers",case["matching_source_chapter_markers"],
+                    "source-section-count",case["witness_verse_marker_count"])
+          for row in witness.get("unrecognized_distinct_payload_source_rows",[]):
+              print("Unlabelled source section",row["native_start"],
+                    "section-endpoints",",".join(row["source_section_endpoints"]),
+                    "source-explicit-multiverse",row["source_explicit_multiverse_annotation"],
+                    "native-chapter-one-slot",row["only_one_native_occupied_verse_in_chapter"])
+          for row in witness.get("no_exact_independent_reference_evidence_sections",[]):
+              print("Needs editorial witness review",row["start"],row["declared_end"],row["heading_kind"])
+          for case in witness.get("anomaly_source_range_corroboration",[]):
+              print("Candidate witness",case["start"],case["declared_end"],case["relation"])
+          for start,refs in witness.get("unparsed_source_reference_candidates_near_anomalies",{}).items():
+              print("Unparsed source anchor",start,json.dumps(refs,sort_keys=True))
+          for start,attrs in witness.get("source_attributes_near_anomalies",{}).items():
+              print("Source attribute anchor",start,json.dumps(attrs,sort_keys=True))
+          PY
+      - name: Preserve metadata-only complete candidate report for independent review
+        uses: actions/upload-artifact@v4
+        with:
+          name: original-commentary-section-scope
+          path: ${{ runner.temp }}/editorial-scope.json
+          retention-days: 14
