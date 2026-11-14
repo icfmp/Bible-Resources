@@ -127,6 +127,15 @@ jobs:
                 json.dumps(div2.get("independent_stock_vs_source_lexical_diagnostic_classes",{}),sort_keys=True))
           print("Independent source vs unchanged stock ordered-word alignment:",
                 json.dumps(div2.get("independent_stock_vs_source_ordered_word_diagnostic_classes",{}),sort_keys=True))
+          print("Chapter-level original source vs stock link-target classes:",
+                json.dumps(div2.get("independent_stock_vs_source_reference_target_classes",{}),sort_keys=True))
+          print("Chapter-level original source vs stock link-target totals:",
+                json.dumps(div2.get("independent_stock_vs_source_reference_target_totals",{}),sort_keys=True))
+          for row in div2.get("independent_stock_vs_source_reference_target_exception_rows",[]):
+              print("Review unmatched chapter citation annotation",row["native_start"],
+                    "source-unpaired",row["source_target_occurrences_not_paired"],
+                    "stock-unpaired",row["stock_target_occurrences_not_paired"],
+                    "classification",row["classification"])
           print("Source book title/marker alignment:",
                 json.dumps(div2.get("book_alignment_evidence_classes",{}),sort_keys=True))
           for bookrow in div2.get("book_alignment_evidence_rows",[]):
