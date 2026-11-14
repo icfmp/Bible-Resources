@@ -229,7 +229,10 @@ KNOWN_READER_ROOT_IDS = frozenset({
 })
 
 
-def _classify_main_reader_context(xml: bytes, activity_dump: bytes) -> dict:
+def _classify_main_reader_context(
+    xml: bytes, activity_dump: bytes, module_id: str | None = None,
+    title: str | None = None,
+) -> dict:
     """Diagnose UI context without exporting any source prose or UI strings.
 
     An Android test can have imported a SWORD ZIP yet still be on a welcome,
@@ -294,6 +297,13 @@ def _classify_main_reader_context(xml: bytes, activity_dump: bytes) -> dict:
     reader = any(b"MainBibleActivity" in ln and PACKAGE.encode() in ln
                  for ln in resumed_lines)
     other_andbible = any(PACKAGE.encode() in ln for ln in resumed_lines)
+    # Only project-reviewed action classes, never captured text or unknown
+    # application labels, are allowed out of the disposable Android emulator.
+    actions = []
+    if module_id is not None and title is not None:
+        actions = sorted({
+            control["action"] for control in safe_controls(xml, module_id, title)["controls"]
+        })
     return {
         "known_reader_toolbar_resource_ids_visible": sorted(ids),
         "known_reader_root_resource_ids_visible": sorted(roots),
@@ -302,6 +312,7 @@ def _classify_main_reader_context(xml: bytes, activity_dump: bytes) -> dict:
         "ui_hierarchy_webview_count": webviews,
         "ui_hierarchy_framework_class_counts": ui_classes,
         "ui_hierarchy_enabled_clickable_node_count": enabled_clickable,
+        "known_allowlisted_ui_actions_visible": actions,
         "ui_hierarchy_text_or_unknown_ids_exported": False,
         "main_bible_reader_activity_resumed": reader,
         "another_andbible_activity_resumed": other_andbible and not reader,
@@ -310,14 +321,14 @@ def _classify_main_reader_context(xml: bytes, activity_dump: bytes) -> dict:
     }
 
 
-def _reader_context_witness() -> dict:
+def _reader_context_witness(module_id: str, title: str) -> dict:
     adb("shell", "uiautomator", "dump", "/sdcard/commentary-context-ui.xml",
         timeout=40, fail=False)
     xml = adb("exec-out", "cat", "/sdcard/commentary-context-ui.xml",
               timeout=20, fail=False)
     activity = adb("shell", "dumpsys", "activity", "activities",
                    timeout=30, fail=False)
-    return _classify_main_reader_context(xml, activity)
+    return _classify_main_reader_context(xml, activity, module_id, title)
 
 
 def _app_focus_witness() -> list[str]:
@@ -535,7 +546,7 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
                 "Reviewed baseline Bible ZIP was not selectable in Android file picker; "
                 "allowlisted actual action classes: " + ",".join(observed)
             )
-        baseline_before_proceed = _reader_context_witness()
+        baseline_before_proceed = _reader_context_witness(module_id, title)
         # Official production-1117 AndroidManifest.xml explicitly exports
         # the separate InstallZip Activity. Once a Bible has been registered,
         # the first-run Load Documents shortcut is no longer reachable.
@@ -561,7 +572,7 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
             post_both["controls"], ("FINISH_FIRST_DOWNLOAD",)
         ) is not None
         time.sleep(3)
-        baseline_after_proceed = _reader_context_witness()
+        baseline_after_proceed = _reader_context_witness(module_id, title)
         snapshots["post_selection"] = _screenshot_sha256()
         selected_screen = _screen(module_id, title)
         exact_file_still_visible = any(
@@ -588,11 +599,11 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
         after_restart = _screen(module_id, title)
         identity_after_restart = after_restart["reader_module_metadata_detected"]
         focus_after_restart = _app_focus_witness()
-        reader_context_after_restart = _reader_context_witness()
+        reader_context_after_restart = _reader_context_witness(module_id, title)
         # Follow the user-observed commentary books icon in the real reader
         # toolbar; this tests selection instead of guessing a deep link.
         toolbar_probe = _attempt_commentary_toolbar_selection(module_id, title)
-        reader_context_after_toolbar = _reader_context_witness()
+        reader_context_after_toolbar = _reader_context_witness(module_id, title)
         # Real platform request result is checked, but not equated to a
         # rendered page. A rejected Intent must remain explicitly unverified.
         intent_accepted = _dispatch_documented_reference(manifest)
