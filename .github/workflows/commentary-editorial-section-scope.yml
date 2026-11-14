@@ -443,7 +443,15 @@ jobs:
                     "source chapter markers",row["source_chapter_comment_section_markers"],
                     "lexical overlap",overlap.get("overlap_class") if overlap else None,
                     "ordered words",overlap.get("ordered_word_alignment",{}).get(
-                        "exact_unicode_ordered_alignment_class") if overlap else None)
+                        "exact_unicode_ordered_alignment_class") if overlap else None,
+                    "source-word-count",overlap.get("source_word_count") if overlap else None,
+                    "original-intro-word-count",overlap.get("stock_word_count") if overlap else None,
+                    "source-words-not-in-original-intro",
+                    overlap.get("ordered_word_alignment",{}).get(
+                        "original_plain_words_not_matched_in_exact_order") if overlap else None,
+                    "original-intro-words-not-in-source",
+                    overlap.get("ordered_word_alignment",{}).get(
+                        "stock_plain_words_not_matched_in_exact_order") if overlap else None)
           print("Full source div2 chapter-scope classification:",
                 json.dumps(div2.get("candidate_classes",{}),sort_keys=True))
           print("Independent source vs unchanged stock chapter-word diagnostic:",
