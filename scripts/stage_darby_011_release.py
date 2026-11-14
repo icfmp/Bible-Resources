@@ -4,10 +4,11 @@ from __future__ import annotations
 
 import argparse
 from hashlib import sha256
+from io import BytesIO
 import json
 from pathlib import Path
 import shutil
-from zipfile import ZipFile
+from zipfile import ZipFile, ZipInfo, ZIP_DEFLATED
 
 from build import build
 from stable_sword_refs import module_payload_digest
@@ -184,6 +185,26 @@ def stage(root,archive,metadata_path,audit_path,dist):
     write(module/"SOURCE_AUDIT.json",audit)
     modules,errors=validate(root)
     require(not errors,"Staged provenance validation failed: "+"; ".join(errors[:10]))
+    # The official builder intentionally refuses stale committed catalogues.
+    # Precompute the exact canonical seven-member ZIP format used by build.py;
+    # update ONLY the already-listed Darby entry before invoking that builder.
+    # The builder independently recomputes every entry and rejects any drift.
+    zip_buffer=BytesIO()
+    with ZipFile(zip_buffer,"w",compression=ZIP_DEFLATED,compresslevel=9) as z:
+        for name,raw in sorted(payload.items()):
+            info=ZipInfo(name,(1980,1,1,0,0,0))
+            info.compress_type=ZIP_DEFLATED
+            info.external_attr=0o100644<<16
+            z.writestr(info,raw)
+    canonical_bytes=zip_buffer.getvalue()
+    pinned_catalog=read(root/"catalog/v1/catalog.json")
+    old_entries=[x for x in pinned_catalog["modules"] if x["sword_id"]=="BRJND2024"]
+    require(len(old_entries)==1 and old_entries[0]["version"]=="0.1.0",
+            "Current catalogue does not have exactly one 0.1.0 Darby entry")
+    old_entries[0]["version"]="0.1.1"
+    old_entries[0]["download"]["sha256"]=hash_bytes(canonical_bytes)
+    old_entries[0]["download"]["size_bytes"]=len(canonical_bytes)
+    write(root/"catalog/v1/catalog.json",pinned_catalog)
     require(not dist.exists() and not dist.is_symlink() and dist.parent.is_dir(),
             "Unsafe canonical build output directory")
     build(root=root,output=dist,base_url="https://icfmp.github.io/Bible-Resources/")
