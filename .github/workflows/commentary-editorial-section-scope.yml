@@ -101,6 +101,45 @@ jobs:
           print("Synthetic SWORD linked-commentary readback PASSED:",
                 len(expected), "occupied target verses; independent gap preserved")
           PY
+      - name: Prove isolated native zCom alias links preserve all existing raw entries
+        run: |
+          set -euo pipefail
+          ROOT="${RUNNER_TEMP}/synthetic-commentary"
+          CLONE="${RUNNER_TEMP}/synthetic-commentary-alias"
+          cp -a "$ROOT" "$CLONE"
+          DATA="$CLONE/modules/comments/zcom/LinkProof"
+          compgen -G "$DATA/*.bzz" > /dev/null
+          (cd "$DATA" && sha256sum ./*.bzz) > "$CLONE/compressed-payloads.before.sha256"
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            tests/fixtures/synthetic_zcom_link_entry.cpp \
+            -o "${RUNNER_TEMP}/synthetic-native-link-entry" -lsword
+          SWORD_PATH="$CLONE" timeout 45s "${RUNNER_TEMP}/synthetic-native-link-entry"
+          (cd "$DATA" && sha256sum -c "$CLONE/compressed-payloads.before.sha256")
+          SWORD_PATH="$CLONE" timeout 60s "${RUNNER_TEMP}/stock-raw" LinkProof > "$CLONE/native.after.raw"
+          PYTHONPATH=scripts python - "$ROOT/native.raw" "$CLONE/native.after.raw" <<'PY'
+          import sys
+          from pathlib import Path
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          def read(path):
+              exact={}
+              def entry(kind,key,raw):
+                  exact[(kind,key)]=raw
+              with Path(path).open("rb") as f:
+                  _,keys,intros,top=parse_native_raw_corpus(f,on_entry=entry)
+              return exact,keys,intros,top
+          before, old_keys, old_intro, old_top=read(sys.argv[1])
+          after, new_keys, new_intro, new_top=read(sys.argv[2])
+          assert old_intro==new_intro and old_top==new_top
+          assert set(after)==set(before)|{("K","Gen.1.10")}
+          assert all(after[key]==body for key,body in before.items()), (
+              "A previously occupied original synthetic module entry was altered"
+          )
+          assert after[("K","Gen.1.10")]==before[("K","Gen.1.9")]
+          assert "Gen.1.6" not in new_keys
+          print("Synthetic copy native index-only linkEntry PASSED:",
+                "all",len(before),"preexisting native entry bytes preserved;",
+                "one independent alias added; compressed bodies unchanged")
+          PY
       - name: Audit all original stock section headings against native occupied slots
         run: |
           set -euo pipefail
