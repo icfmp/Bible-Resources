@@ -30,6 +30,7 @@ from commentary_navigation_link_plan import (
 from commentary_source_english_osis_alias import (
     read_existing_66_book_english_aliases, _canon_name
 )
+from commentary_nonlink_word_alignment import plain_word_alignment
 from commentary_xml_witness import _parse_reference, WORK_REF
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
 from pilot_fetch import ALLOWED_HOSTS, fetch
@@ -69,6 +70,9 @@ def independent_lexical_overlap(source_text: str, stock_raw: bytes) -> dict:
     compiled = re.findall(r"\w+", stock_text.casefold())
     if not original or not compiled or len(original) > 100000 or len(compiled) > 100000:
         return {"status": "EMPTY_OR_OVERSIZE_LEXICAL_UNITS", "source_text_equal": False}
+    # Reuse the independently reviewed bounded LCS helper. Multiset
+    # overlap by itself would hide reordering/omission of original prose.
+    ordered = plain_word_alignment(original, compiled)
     common = sum((Counter(original) & Counter(compiled)).values())
     source_pct = round(common * 100 / len(original))
     stock_pct = round(common * 100 / len(compiled))
@@ -87,6 +91,7 @@ def independent_lexical_overlap(source_text: str, stock_raw: bytes) -> dict:
         "stock_word_overlap_percent": stock_pct,
         "overlap_class": classification,
         "exact_ordered_word_equality": original == compiled,
+        "ordered_word_alignment": ordered,
         "source_text_equal": source_text == stock_text,
         "historical_or_editorial_equivalence_proven": False,
         "authorial_prose_modified": False,
@@ -768,10 +773,19 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
         row["independent_lexical_comparison"].get("overlap_class", "UNREVIEWED")
         for row in cases if row["independent_lexical_comparison"] is not None
     )
+    ordered_word_classes = Counter(
+        row["independent_lexical_comparison"]["ordered_word_alignment"][
+            "exact_unicode_ordered_alignment_class"
+        ]
+        for row in cases if row["independent_lexical_comparison"] is not None
+        and "ordered_word_alignment" in row["independent_lexical_comparison"]
+    )
     return {
         "status": "SOURCE_DIV2_STRUCTURE_COLLATED_NO_REINDEX_AUTHORIZATION",
         "independent_stock_vs_source_lexical_diagnostic_classes":
             dict(sorted(word_classes.items())),
+        "independent_stock_vs_source_ordered_word_diagnostic_classes":
+            dict(sorted(ordered_word_classes.items())),
         "source_book_divisions": len(chapters_div1),
         "unattributed_noncanonical_div1_with_div2_excluded": excluded_unattributed_div1,
         "native_book_count": len(canonical_books),
