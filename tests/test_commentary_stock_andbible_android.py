@@ -411,6 +411,42 @@ class CommentaryAndroidStockTests(unittest.TestCase):
         self.assertEqual(overlay["known_reader_toolbar_resource_ids_visible"], [])
         self.assertEqual(overlay["known_reader_root_resource_ids_visible"], [])
 
+    def test_modal_with_allowlisted_action_is_separate_from_actual_reader(self):
+        from commentary_stock_andbible_android import _classify_main_reader_context
+        xml = b'''<hierarchy>
+          <node package="net.bible.android.activity"
+                class="android.widget.FrameLayout" bounds="[0,0][1080,1920]"/>
+          <node package="net.bible.android.activity"
+                class="android.widget.TextView" text="Sensitive unseen prompt"
+                bounds="[25,100][950,400]"/>
+          <node package="net.bible.android.activity"
+                class="android.widget.Button" text="CONTINUE"
+                enabled="true" clickable="true"
+                bounds="[200,900][900,1030]"/>
+          <node package="net.bible.android.activity"
+                class="android.widget.Button" text="Private account password"
+                enabled="true" clickable="true"
+                bounds="[200,1035][900,1170]"/>
+        </hierarchy>'''
+        result = _classify_main_reader_context(
+            xml,
+            b"topResumedActivity=ActivityRecord{12 net.bible.android.activity/MainBibleActivity}",
+            "MHCC", TITLE,
+        )
+        self.assertTrue(result["main_bible_reader_activity_resumed"])
+        self.assertEqual(result["ui_hierarchy_node_count"], 4)
+        self.assertEqual(result["ui_hierarchy_framework_class_counts"]["Button"], 2)
+        self.assertEqual(result["ui_hierarchy_framework_class_counts"]["TextView"], 1)
+        self.assertEqual(result["ui_hierarchy_framework_class_counts"]["FrameLayout"], 1)
+        self.assertEqual(result["ui_hierarchy_enabled_clickable_node_count"], 2)
+        self.assertEqual(result["known_allowlisted_ui_actions_visible"], ["CONTINUE"])
+        self.assertEqual(result["known_reader_toolbar_resource_ids_visible"], [])
+        self.assertEqual(result["known_reader_root_resource_ids_visible"], [])
+        self.assertNotIn("Sensitive", str(result))
+        self.assertNotIn("password", str(result))
+        self.assertFalse(result["actual_commentary_rendering_verified"])
+        self.assertFalse(result["ui_hierarchy_text_or_unknown_ids_exported"])
+
     def test_missing_reader_window_is_not_a_mhcc_data_failure(self):
         from commentary_stock_andbible_android import _classify_main_reader_context
         state = _classify_main_reader_context(
