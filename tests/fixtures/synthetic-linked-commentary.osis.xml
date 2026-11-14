@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Completely invented, test-only commentary. No biblical or MHCC source prose. -->
+<osis xmlns="http://www.bibletechnologies.net/2003/OSIS/namespace">
+  <osisText osisIDWork="LinkProof" osisRefWork="Commentary" xml:lang="en" canonical="true">
+    <header>
+      <work osisWork="LinkProof">
+        <title>Synthetic linked-commentary regression fixture</title>
+        <identifier type="OSIS">LinkProof</identifier>
+        <refSystem>Bible.KJV</refSystem>
+      </work>
+    </header>
+    <div type="bookGroup">
+      <div type="book" osisID="Gen">
+        <div type="chapter" osisID="Gen.1">
+          <div type="section" annotateType="commentary" annotateRef="Gen.1.1-Gen.1.2">
+            <p>Original synthetic first-section prose.</p>
+          </div>
+          <div type="section" annotateType="commentary" annotateRef="Gen.1.3">
+            <p>Original synthetic independent middle-section prose.</p>
+          </div>
+          <div type="section" annotateType="commentary" annotateRef="Gen.1.4-Gen.1.5 Gen.1.7-Gen.1.8">
+            <p>Original synthetic discontinuous-section prose.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </osisText>
+</osis>
