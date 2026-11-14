@@ -39,6 +39,13 @@ class NativeOSISRebuildPreflightTests(unittest.TestCase):
         c.observe("I", "Gen.1.0", b"<p>Invented chapter intro</p>")
         report = c.report(expected_count=4)
         self.assertEqual(report["raw_record_kinds"], {"I": 2, "U": 2})
+        self.assertEqual(report["intro_original_native_key_class_counts"], {
+            "book_intro_key": 1, "chapter_intro_key": 1
+        })
+        self.assertEqual(report["opaque_top_original_raw_length_counts"], {
+            str(len(b"Invented control data")): 1,
+            str(len(b"Invented other control data")): 1
+        })
         self.assertEqual(
             report["blocking_or_unresolved_structure_counts"][
                 "opaque_top_record_requires_distinct_preservation_plan"], 2
@@ -52,6 +59,8 @@ class NativeOSISRebuildPreflightTests(unittest.TestCase):
         report = c.report(expected_count=2)
         self.assertEqual(report["raw_record_kinds"], {"K": 1, "U": 1})
         self.assertEqual(report["opaque_top_distinct_digest_count"], 1)
+        self.assertEqual(report["original_markup_shape_counts"][
+            "opaque_top_nonempty_raw_entry"], 1)
         self.assertEqual(report["blocking_or_unresolved_structure_counts"][
             "opaque_top_record_requires_distinct_preservation_plan"], 1)
         self.assertFalse(report["canonical_original_introductions_and_TOP_reconstructed"])
