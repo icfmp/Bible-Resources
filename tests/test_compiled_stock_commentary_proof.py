@@ -93,7 +93,8 @@ class StockCommentaryReleaseTests(unittest.TestCase):
             "gui_other_reader_compatibility_claimed":False,
         }
         (directory/"SOURCE_VALIDATION.json").write_text(json.dumps(proof))
-        conf_options={"DistributionLicense":"Public Domain","ModDrv":"zCom","Versification":"KJV"}
+        conf_options={"DistributionLicense":"Public Domain","ModDrv":"zCom",
+                      "Versification":"KJV","SourceType":"OSIS"}
         return directory, m, conf_options, proof, original, data, conf
 
     def test_compiled_original_acceptance_checks_every_byte(self):
