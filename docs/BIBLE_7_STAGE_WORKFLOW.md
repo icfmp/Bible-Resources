@@ -45,6 +45,32 @@ be checked until the **whole gate** is independently evidenced.
 | **6/7** | **Test the actual reader package** | Exact candidate ZIP checksum; install/readback with stock SWORD/diatheke plus another independent reader where available; representative passages, independent/parallel readings and recorded limitations | Executed tests linked; unavailable GUI/client checks remain **NOT TESTED**, never a fabricated success. Blocking reader defects prevent release |
 | **7/7** | **Approve, publish, and verify** | Owner editorial/rights sign-off, final provenance and known-limitations record, immutable release and source/payload checksums, official catalogue snapshot and successful Pages publication, external endpoint check when available | No public claims before actual approval and publication; distinguish successful workflow, GitHub release, external HTTP availability and app adoption |
 
+### Mandatory paragraph-rendering preflight for each Bible
+
+**Cross-reference for stages 3, 4c, 5 and 6:** [reusable OSIS paragraph
+rendering QA](OSIS_PARAGRAPH_RENDERING_QA.md). The Darby 2024 0.1.0
+post-release repair demonstrated two independent risks: authorial
+`*`/`**`/`***` division symbols leaked into ordinary displayed verse
+text, and XML pretty-print indentation leaked into native SWORD leading
+spaces. A clean native verse-key and nonspace Scripture audit **does not**
+prove that a module is legibly rendered.
+
+Before approving a rebuilt module, inspect **all source-leading marker
+categories** and source paragraph/poetry indentation; classify genuine
+textual signs separately; compare their actual native SWORD shape; and
+check representative real reader images from the **exact final package**
+at the correct visible references. Encoding a symbol into OSIS
+`milestone@marker` is not a universal fix: in JSword/AndBible this can
+render the glyph again. Preserve original editorial intent reversibly,
+or leave ambiguous cases blocked. Never globally strip symbols/whitespace.
+
+Source-based generic diagnostics and narrowly reviewed overlay helpers
+exist, but their operation is **not automatically authorized for an
+unrelated edition**. Full corpus fidelity, independent GUI review, exact
+artifact identity and publication are separately evidenced gates. Record
+this preflight as a stage-4c/5/6 checkpoint in the resource issue; do not
+invent an eighth top-level stage.
+
 ### Stage 5 source-link decision: syntax is not semantics
 
 A non-empty or index-addressable original `osisRef` is **not evidence of an
