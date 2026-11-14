@@ -338,3 +338,45 @@ yet a build-ready proposal** and cannot be passed through the guarded
    gates; confirm all original keys/raw payloads and one real reader's
    behavior. Owner approval remains required for publication, and paused
    modern-English #270/#272 must not restart prematurely.
+
+
+## Seventh pass — resolve the original XML owner of all seven one-word variants (2026-11-14)
+
+The source XML versus native word-offset check is now independently tested
+against actual **original CCEL `scripRef` markup offsets**, rather than
+classifying words solely from their *compiled stock* XML location.
+[Full original SWORD/ThML audit #43621876487](https://github.com/icfmp/Bible-Resources/actions/runs/43621876487)
+**PASS** on exact native module and SHA-pinned independent source. The 118-case
+review identifies:
+
+| Chapter | Original CCEL changed-word owner | Compiled CrossWire changed-word owner |
+| --- | --- | --- |
+| Gen 38 | `scripRef` citation label | `reference` |
+| 2 Sam 22 | `scripRef` citation label | unlinked root-level text |
+| 1 Chr 7 | **outside any** `scripRef` label | unlinked root-level text |
+| 1 Chr 17 | `scripRef` citation label | `reference` |
+| Job 25 | `scripRef` citation label | `reference` |
+| Ps 70 | `scripRef` citation label | unlinked root-level text |
+| Jer 45 | `scripRef` citation label | unlinked root-level text |
+
+**Consequences:** Six of the seven one-character text differences are
+**source scripture-citation label variations**. Three are displayed in
+compiled linked references, and three are flattened into unlinked compiled
+text. Only **1 Chr 7** is a different word in the **commentary prose outside
+a source `scripRef`**. It is a *digital-witness variant*; no print-edition
+authority has yet resolved which form is authorial. Neither original word
+was exposed outside the restricted comparison. No source spelling or
+punctuation has been edited.
+
+The source `scripRef` is a citation element, not proof that it should be
+a chapter annotation anchor. Correct future treatment requires preserving
+the original link's intended OSIS target *and* the author's visible wording
+where independently verified, rather than arbitrarily adding a hyperlink
+around a similar string.
+
+**Current decisions:** retain all 118 original source/commentary bodies
+unchanged; keep 17/24 range-index **preflight** separate from proposed
+chapter-wide access; review 25 source-vs-stock missing link target
+occurrences before reconstructing markup. Source-to-stock content
+integrity is not yet accepted globally. The modern-English translation
+remains paused.
