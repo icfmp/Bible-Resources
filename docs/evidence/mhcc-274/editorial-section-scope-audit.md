@@ -380,3 +380,27 @@ chapter-wide access; review 25 source-vs-stock missing link target
 occurrences before reconstructing markup. Source-to-stock content
 integrity is not yet accepted globally. The modern-English translation
 remains paused.
+
+
+## Eighth pass — standards-based native link strategy, synthetic evidence and driver limits (2026-11-14)
+
+This implementation checkpoint is deliberately **not a MHCC reindexing or new edition**. The only compiled binaries created for these experiments are synthetic, source-original text authored solely for tests, installed in isolated temporary runner directories.
+
+**Standard OSIS commentary linked-section proof:** `tests/fixtures/synthetic-linked-commentary.osis.xml` has three different independently worded comments: a contiguous range, an independent intervening section, and a discontinuous range with an intentionally vacant key in the middle. In [CI #43622505845](https://github.com/icfmp/Bible-Resources/actions/runs/43622505845), the released `osis2mod` zCom importer created the module and our independently compiled original native SWORD raw reader verified:
+- All seven expected occupied synthetic verses read back their full original comment text.
+- All linked members of the same source section returned byte-identical raw payloads.
+- The intervening independently authored section did not get overwritten.
+- The deliberately unannotated gap stayed empty.
+
+Therefore **standards-based OSIS continuous and discontinuous commentary annotation is independently viable** with the installed released SWORD engine; this neither certifies the original MHCC's content parity nor guarantees that all viewers deduplicate linked entries.
+
+**Direct modification of an existing compiled module is not assumed possible.**
+A second isolated proof attempted calling the public `zCom::linkEntry` method on a copied synthetic module whose compressed authorial `.czz` data files were independently SHA-256 recorded before modification. The stock released-libSWORD module loaded via `SWMgr` reports `isWritable()==false`. This is consistent with the actual SWORD 1.9 zCom constructor passing `-1` for zVerse file mode, which is mapped to `FileMgr::RDONLY`. See:
+- https://www.crosswire.org/sword/apiref/zcom_8cpp_source.html
+- https://www.crosswire.org/sword/apiref/zverse_8cpp_source.html
+
+A **fail-closed capability** regression therefore records `SYNTHETIC_NATIVE_ZCOM_READ_ONLY`: the synthetic copied original raw entries must remain identical and no link is inserted. The test must **not** modify compressed records or patch .czv index bytes outside the supported SWORD API. A writable-mode constructor or alternative official importer must be demonstrated with lossless readback before an index-only path is proposed.
+
+**Implementation direction:** prefer a **new, separately identified standard OSIS-derived SWORD edition**, but only after the precise original source content, topology, XML metadata, rights and passage scopes are sufficiently verified to guarantee no authorial words/notes/links lost or rewritten. Existing original MHCC 2.0 and BRMHCC 0.1.0 always remain immutable witnesses. Existing cross-edition differences of 25 source reference target occurrences and the one actual 1 Chr 7 prose variant are unresolved; do not mechanically choose CCEL text as a replacement original.
+
+**Release gates:** independently verified full source+stock text and structure parity, exact compiler/readback of 29,975 original occupied keys including intros and TOP, deterministic reversible mapping receipts, collision-free 17 explicitly justified section gaps, separate reviewed chapter-wide navigation scopes, correct citation destinations, one authentic independent reader, deduplicated presentation, approved rights and explicit publication authorization. Failing any gate leaves the new module unpublished and the modern-English translation paused.
