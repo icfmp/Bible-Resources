@@ -228,3 +228,46 @@ as shown by the baseline seven occurrences in Matthew 13.
 The proof establishes a reproducible concrete **UI regression risk**,
 not a failure of content preservation or new authorial index scope.
 The separate source release and editorial hold continues.
+
+
+## The native identity test settles the disjoint-section representation (2026-11-15)
+
+[Authentic original-stock private CI #43654527757](https://github.com/icfmp/Bible-Resources/actions/runs/43654527757)
+**SUCCESS** using the installed released libSWORD module itself — the
+generic read-only `sword_native_commentary_index --is-linked A B`
+checks **native `SWModule::isLinked`**, rather than copied text or
+equal content hashes.
+
+- **24/24** newly proposed verse index keys have actual SWORD linked
+  identity with their pre-existing authorial source master.
+- **15/15** available same-chapter, independent original-source section
+  controls correctly return **not linked**.
+- In particular the new **Matthew 13:36–43** keys are genuinely linked
+  to the 24–30 commentary without equating the distinct 31–35
+  commentary. This means we can use SWORD's existing persistent
+  linkage identity to represent **one disjoint authorial commentary
+  section**.
+- The previous complete **28,718 K + 1,255 I + 2 TOP** original
+  source-relative parity and 24 extra native indexed-key checks still
+  pass. No original payload was changed, no release was created.
+- Independent `diatheke` shows that linked-key identity **does not
+  automatically deduplicate output** when iterating every verse;
+  whole-chapter `diatheke` increases repeated prose as described above.
+- A separate real Xiphos whole-chapter GUI clipboard test remains
+  **INCONCLUSIVE**: it did not establish that both independent chapter
+  units were present in the same copied selection, so it cannot prove
+  Xiphos deduplication. Selected-verse Xiphos navigation did pass 3/3.
+
+The Bible application at present groups only **adjacent** source-linked
+entries via `reader.module.isLinked(previous,key)`; it therefore
+cannot yet represent the two disjoint parts of one source section while
+preserving an intervening independent section. A separate,
+cross-repository [Bible issue #267](https://github.com/icfmp/Bible/issues/267)
+tracks source-neutral nonadjacent linked identity, correct disjoint
+scope labelling, one original entry displayed once, real-reader testing
+and preserving intro/adjacent semantics.
+
+**Publication stays blocked pending actual whole-chapter display and
+editorial/release gates.** Do not replace native linked
+identity with literal text-deduplication: two independently authored
+sections can have identical wording, and should remain separate.
