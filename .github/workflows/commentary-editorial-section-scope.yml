@@ -109,6 +109,15 @@ jobs:
                 json.dumps(witness.get("independent_reference_evidence_matrix",{}),sort_keys=True))
           print("Unrecognized source section classes:",
                 json.dumps(witness.get("unrecognized_source_annotation_classes",{}),sort_keys=True))
+          chapter=witness["independent_whole_chapter_review"]
+          print("Independently witnessed one-key chapter scope candidates:",
+                json.dumps(chapter["source_scope_candidate_classes"],sort_keys=True))
+          print("Complete source chapter annotations:",
+                json.dumps(chapter["independent_source_chapter_marker_inventory"],sort_keys=True))
+          for case in chapter["case_rows"]:
+              print("Chapter-scope witness",case["candidate_chapter"],case["witness_class"],
+                    "markers",case["matching_source_chapter_markers"],
+                    "source-section-count",case["witness_verse_marker_count"])
           for row in witness.get("unrecognized_distinct_payload_source_rows",[]):
               print("Unlabelled source section",row["native_start"],
                     "section-endpoints",",".join(row["source_section_endpoints"]),
