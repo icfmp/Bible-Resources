@@ -24,7 +24,7 @@ class IntroTransportTests(unittest.TestCase):
 
     def test_intro_only_native_stream_is_rejected_by_default_but_allowed_for_probe(self):
         raw=b"<p>Synthetic intro</p>"
-        framed=b"I\\tGen.1\\t"+str(len(raw)).encode()+b"\\n"+raw+b"S\\t1\\t0\\t1\\t0\\n"
+        framed=b"I\tGen.1\t"+str(len(raw)).encode()+b"\n"+raw+b"S\t1\t0\t1\t0\n"
         with self.assertRaises(RawCorpusError):
             parse_native_raw_corpus(BytesIO(framed))
         result,K,I,U=parse_native_raw_corpus(
