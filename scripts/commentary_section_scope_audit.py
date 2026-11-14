@@ -1438,11 +1438,14 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
           intro_sample_chapters: tuple[str, ...] = (),
           mixed_sample_chapters: tuple[str, ...] = (),
           full_transport: bool = False,
-          provisional_range_preview: bool = False) -> dict:
+          provisional_range_preview: bool = False,
+          preview_real_xiphos: bool = False) -> dict:
     """Use exact SHA-pinned official stock, existing independently proved readers."""
     manifest = load_manifest(resource_id)
     if provisional_range_preview and not full_transport:
         raise PilotError("Provisional range preview requires original complete transport")
+    if preview_real_xiphos and not provisional_range_preview:
+        raise PilotError("Real-reader preview requires source-constrained index preview")
     if (len(mixed_sample_chapters) > 3
             or len(set(mixed_sample_chapters)) != len(mixed_sample_chapters)
             or any(re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9]\d*", ref) is None
@@ -1703,6 +1706,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 private_full_I, private_full_K, original_opaque_top_records,
                 scratch=preview_dir, native_raw_binary=raw_binary,
                 provisional_index_aliases=preliminary_aliases,
+                test_preview_in_xiphos=preview_real_xiphos,
             )
             provisional_preview["source_scope_editorially_approved"] = False
             provisional_preview["preflight_candidate_section_count"] = (
@@ -1793,6 +1797,8 @@ def main(argv=None) -> int:
                         help="Attempt isolated whole-original I/K OSIS compile and independent TOP reconciliation")
     parser.add_argument("--temporary-provisional-range-index-preview", action="store_true",
                         help="Experimentally compile heading-derived missing links; editorial approval explicitly absent")
+    parser.add_argument("--temporary-preview-real-xiphos", action="store_true",
+                        help="One bounded authentic Xiphos test of provisional alias samples, not edition approval")
     parser.add_argument("--synthetic-intro-native-stream", type=Path,
                         help="Optional invented standalone OSIS compilation raw stream, compare TOP bytes only")
     parser.add_argument("--native-index-binary", type=Path, required=True)
@@ -1807,7 +1813,8 @@ def main(argv=None) -> int:
             intro_sample_chapters=tuple(args.temporary_original_intro_sample_chapters),
             mixed_sample_chapters=tuple(args.temporary_original_mixed_chapters),
             full_transport=args.temporary_original_full_transport,
-            provisional_range_preview=args.temporary_provisional_range_index_preview
+            provisional_range_preview=args.temporary_provisional_range_index_preview,
+            preview_real_xiphos=args.temporary_preview_real_xiphos
         )
         code = 0
     except (OSError, RuntimeError, ValueError, zipfile.BadZipFile, RawCorpusError) as exc:
