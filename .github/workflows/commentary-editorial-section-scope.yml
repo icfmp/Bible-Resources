@@ -6,7 +6,9 @@ on:
       - '.github/workflows/commentary-editorial-section-scope.yml'
       - 'scripts/commentary_section_scope_audit.py'
       - 'scripts/commentary_osis_rebuild_preflight.py'
+      - 'scripts/commentary_intro_chapter_text_review.py'
       - 'scripts/commentary_osis_transport_probe.py'
+      - 'tests/test_commentary_intro_chapter_text_review.py'
       - 'tests/test_commentary_section_scope_audit.py'
       - 'tests/test_commentary_osis_transport_probe.py'
       - 'tests/test_commentary_osis_rebuild_preflight.py'
@@ -44,6 +46,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_commentary_section_scope_audit.py' -v
           python -m unittest discover -s tests -p 'test_commentary_navigation_link_plan.py' -v
           python -m unittest discover -s tests -p 'test_commentary_osis_rebuild_preflight.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_intro_chapter_text_review.py' -v
           python -m unittest discover -s tests -p 'test_commentary_osis_transport_probe.py' -v
       - name: Install stable upstream native SWORD library
         run: |
@@ -334,6 +337,15 @@ jobs:
                     "native-scope",case["native_intro_scope"],
                     "top-level-tags",",".join(case["top_level_element_names"]),
                     "text-owner-tags",json.dumps(case["text_owning_element_name_counts"],sort_keys=True))
+          for row in r["original_intro_visible_text_slot_concordance"]:
+              print("Original chapter intro text coverage",row["original_native_intro_key"],
+                    "intro words",row["original_intro_unicode_word_count"],
+                    "original distinct K entries",row["distinct_numbered_raw_bodies_in_original_chapter"],
+                    "intro repeated whole",row["full_original_intro_visible_text_in_a_numbered_body"],
+                    "unrepeated text spans",row["runs_not_exactly_repeated_in_numbered_body"],
+                    "unrepeated words",row["words_in_original_intro_runs_not_exactly_matched"],
+                    "text owner classes",json.dumps(row["unmatched_intro_text_owning_element_classes"],
+                                                    sort_keys=True))
           print("Original introduction top-level leading text classes:",
                 json.dumps(transport["intro_original_unwrapped_leading_text_presence"],sort_keys=True))
           print("Original opaque TOP element/attribute names:",
