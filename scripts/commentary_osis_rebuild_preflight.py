@@ -300,3 +300,36 @@ class NativeOSISRebuildPreflight:
             "original_content_or_module_changed": False,
             "publication_authorized": False,
         }
+
+
+def compare_opaque_top_with_standard_compiler_fixture(
+        original_raw_top: list[bytes], synthetic_raw_top: list[bytes]) -> dict:
+    """Compare exact unfiltered U payloads without publishing their values.
+
+    A match supports compiler-generated *shape* provenance only. It cannot
+    establish the number/placement of original TOP records in a new module,
+    and never substitutes for complete source-to-rebuild readback.
+    """
+    if (not isinstance(original_raw_top, list)
+            or not isinstance(synthetic_raw_top, list)
+            or not original_raw_top or not synthetic_raw_top
+            or len(original_raw_top) > 16 or len(synthetic_raw_top) > 16
+            or any(not isinstance(x, bytes) or len(x) > MAX_RAW
+                   for x in original_raw_top + synthetic_raw_top)):
+        raise ValueError("Unverified or excessive original/synthetic TOP streams")
+    originals = [sha256(x).hexdigest() for x in original_raw_top]
+    synthetic = {sha256(x).hexdigest() for x in synthetic_raw_top}
+    return {
+        "status": "COMPILER_GENERATED_TOP_POSSIBLE_MATCH_NOT_FULL_PRESERVATION",
+        "original_top_entry_count": len(originals),
+        "synthetic_top_entry_count": len(synthetic_raw_top),
+        "original_top_entry_bytes_equal_any_synthetic": sum(
+            digest in synthetic for digest in originals
+        ),
+        "all_original_top_byte_payloads_seen_in_synthetic": all(
+            digest in synthetic for digest in originals
+        ),
+        "source_original_top_locations_and_count_reconstructed": False,
+        "original_top_raw_values_disclosed": False,
+        "source_or_candidate_published": False,
+    }
