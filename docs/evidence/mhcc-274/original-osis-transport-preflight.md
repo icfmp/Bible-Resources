@@ -107,3 +107,58 @@ commentary sections. This is a generic regression, not an MHCC exception.
 
 Modern-English MHCC #270 and #272 remain paused pending real editorial
 source validation. No source authorial bytes or published module were edited.
+
+
+## Third gate — source-word, markup and citation-attribute preservation in actual temporary sample
+
+The sample's discrepancies were refined on complete exact-head
+[CI #43630794830](https://github.com/icfmp/Bible-Resources/actions/runs/43630794830)
+**SUCCESS** with 45 generic editorial tests, 18 link-plan tests,
+13 original-structure transport tests and 10 numbered OSIS transport tests.
+On exact code/docs head
+`8c7fc6432a8c20df5609abce0856a06004781bd0`, the other five project
+quality actions also report **SUCCESS**:
+[Validate #43630794837](https://github.com/icfmp/Bible-Resources/actions/runs/43630794837),
+[original stock text #43630794812](https://github.com/icfmp/Bible-Resources/actions/runs/43630794812),
+[full raw census #43630794829](https://github.com/icfmp/Bible-Resources/actions/runs/43630794829),
+[reference targets #43630794873](https://github.com/icfmp/Bible-Resources/actions/runs/43630794873)
+and [original source/native index #43630794930](https://github.com/icfmp/Bible-Resources/actions/runs/43630794930).
+
+The **67 original native K keys all survive with no extra K keys**;
+raw XML bytes and exact literal whitespace differ, but the **same original
+Unicode words in the same sequence** and **the identical original Unicode
+text after only whitespace normalization** appear in every rebuilt key.
+The extra markup is isolated:
+
+| Observed XML element | Original occurrences in the 67 sampled entries | After `osis2mod` |
+| --- | ---: | ---: |
+| `div` | **917** | **1,089** |
+| `cell` | 138 | 138 |
+| `chapter` | 16 | 16 |
+| `hi` | 66 | 66 |
+| `reference` | **58** | **58** |
+| `row` | 69 | 69 |
+| `table` | 69 | 69 |
+| `title` | 49 | 49 |
+
+**In all 67 entries**, the original non-`div` element order **and all
+literal attribute values** match; every original `div` has its original
+attribute-value multiset represented in the compiled entry; and the entire
+original ordered sequence of `reference` attribute values (including actual
+`osisRef` destinations) is **unchanged**. The converter added **172**
+`div` wrapper elements but **did not drop/rename/alter another original
+element name or attribute** in this sample.
+
+This is much stronger evidence that the compiler's difference is **structural
+wrapping / whitespace**, rather than altered source words, hyperlink targets
+or missing notes. However this sample has no proof of the full source
+paragraph semantics in all 5,302 distinct bodies; added wrappers may affect
+reader layout and de-duplication even when every word and attribute survives.
+
+**Explicitly not proven:** complete 29,975-key parity; 1,255 I introduction
+entry provenance; two opaque 83-byte TOP fragment locations; source
+to print-edition parity; 17 index repair scopes; 118 whole-chapter
+access proposals; 25 CCEL `scripRef` annotation gaps; font/paragraph
+rendering in a real independent reader. All remain separate acceptance
+gates. The complete original MHCC compressed module and published BRMHCC
+0.1.0 remain unchanged, as do #270/#272.
