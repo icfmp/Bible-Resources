@@ -778,7 +778,8 @@ def _probe_private_alias_real_xiphos(root: Path, module_id: str, aliases: dict,
         if other_original_section is None:
             return {"whole_chapter_Xiphos_GTK_proof":{
                 "status":"NO_INDEPENDENT_SECTION_WITNESS_IN_CHAPTER",
-                "two_original_distinct_section_bodies_visible":False
+                "two_original_distinct_section_bodies_visible":False,
+                "source_prose_or_screenshot_uploaded":False
             }}
         b,c,v=other_original_section.split(".")
         code,other_plain=query(module_id,f"{b} {c}:{v}",fmt="plain",
@@ -786,7 +787,8 @@ def _probe_private_alias_real_xiphos(root: Path, module_id: str, aliases: dict,
         if not present_key(f"{b} {c}:{v}",other_plain,code):
             return {"whole_chapter_Xiphos_GTK_proof":{
                 "status":"INDEPENDENT_SECTION_READBACK_UNAVAILABLE",
-                "two_original_distinct_section_bodies_visible":False
+                "two_original_distinct_section_bodies_visible":False,
+                "source_prose_or_screenshot_uploaded":False
             }}
         bm,cm,vm=largest.split(".")
         main_code,main_plain=query(module_id,f"{bm} {cm}:{vm}",fmt="plain",
