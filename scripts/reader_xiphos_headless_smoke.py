@@ -281,8 +281,32 @@ def _capture_note_hover_sample(env:dict, out:Path) -> dict:
     }
 
 
-def _sample_reader_passages(env, out: Path, samples=READER_SAMPLES) -> list[dict]:
-    """Xiphos Ctrl+L navigation with actual screenshots, not content approval."""
+def _navigation_commands(reference: str, mode: str) -> tuple[list[str], ...]:
+    """Two ordinary Xiphos navigation methods, tested in isolated 1280x800 Xvfb.
+
+    Reference-entry mode uses the already visually attested navigation field
+    in the Xiphos header (center near x=754,y=120) after moving the window to
+    (16,16) and resizing to 1216x736. This is not a global desktop action.
+    """
+    if mode == "shortcut":
+        return (
+            ["xdotool", "key", "--clearmodifiers", "ctrl+l"],
+            ["xdotool", "type", "--clearmodifiers", "--delay", "35", reference],
+            ["xdotool", "key", "Return"],
+        )
+    if mode == "reference-entry":
+        return (
+            ["xdotool", "mousemove", "--sync", "752", "121", "click", "1"],
+            ["xdotool", "key", "--clearmodifiers", "ctrl+a"],
+            ["xdotool", "type", "--clearmodifiers", "--delay", "35", reference],
+            ["xdotool", "key", "Return"],
+        )
+    raise XiphosSmokeError("Unsupported test-only Xiphos navigation method")
+
+
+def _sample_reader_passages(env, out: Path, samples=READER_SAMPLES,
+                            navigation_mode: str="shortcut") -> list[dict]:
+    """Navigate with the reviewed Xiphos reference field or Ctrl+L, then capture."""
     if out.exists() or out.is_symlink() or not out.parent.is_dir():
         raise XiphosSmokeError("Unsafe sample screenshot output directory")
     # No screen coordinates: Ctrl+L is a documented Xiphos shortcut.
@@ -331,11 +355,7 @@ def _sample_reader_passages(env, out: Path, samples=READER_SAMPLES) -> list[dict
     out.mkdir(mode=0o700)
     snapshots = []
     for slug, ref in samples:
-        for command in (
-            ["xdotool", "key", "--clearmodifiers", "ctrl+l"],
-            ["xdotool", "type", "--clearmodifiers", "--delay", "35", ref],
-            ["xdotool", "key", "Return"],
-        ):
+        for command in _navigation_commands(ref, navigation_mode):
             try:
                 completed = subprocess.run(
                     command, env=env, stdout=subprocess.DEVNULL,
@@ -704,7 +724,7 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
           comparison_root:Path|None=None, comparison_module:str="",
           comparison_versification:str="", supplemental_samples=(),
           capture_note_link_without_comparison:bool=False,
-          note_popup_probes=()):
+          note_popup_probes=(), navigation_mode: str="shortcut"):
     if not isinstance(startup_seconds,int) or not 5<=startup_seconds<=25:
         raise XiphosSmokeError("Unbounded headless startup duration")
     with tempfile.TemporaryDirectory(prefix="isolated-xiphos-preview-") as temp:
@@ -777,10 +797,12 @@ def smoke(archive:Path,module:str,expected_sha:str,versification:str,startup_sec
                 if snap.returncode!=0 or screenshot.stat().st_size>6_000_000:
                     raise XiphosSmokeError("Invalid bounded screenshot result")
                 screenshot_sha=sha256(screenshot.read_bytes()).hexdigest()
-            samples = _sample_reader_passages(env, study_dir) if study_dir else []
+            samples = _sample_reader_passages(
+                env, study_dir, navigation_mode=navigation_mode) if study_dir else []
             corrected_samples = (
                 _sample_reader_passages(env, study_dir / "corrected-source-cases",
-                                        supplemental_samples)
+                                        supplemental_samples,
+                                        navigation_mode=navigation_mode)
                 if study_dir and samples and supplemental_samples else [])
             tree_probe = (_capture_module_tree_probe(env, study_dir)
                           if comparison and study_dir and samples else None)
