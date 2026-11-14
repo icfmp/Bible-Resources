@@ -248,7 +248,7 @@ jobs:
             --resource-id "$RESOURCE_ID" \
             --native-full-corpus-binary /tmp/mhcc-current-xiphos/native-full \
             --native-single-key-binary /tmp/mhcc-current-xiphos/native-key \
-            --seconds 12 \
+            --seconds 22 \
             --report /tmp/mhcc-current-xiphos/receipt.json
       - name: Verify modern-reader positive evidence but not untested navigation
         shell: bash
