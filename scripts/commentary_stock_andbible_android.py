@@ -707,6 +707,17 @@ def run_android_original(
                 "actual_app_debug_socket_found": False,
                 "actual_Android_debug_page_targets_discovered": 0,
                 "actual_Android_debug_DOM_pages_read": 0,
+                "local_CDP_outcome_class_counts": {
+                    "body_read": 0, "body_empty": 0,
+                    "local_CDP_connection_or_handshake_unavailable": 0,
+                    "CDP_Runtime_evaluation_rejected": 0,
+                    "CDP_Runtime_result_shape_unavailable": 0,
+                    "CDP_Runtime_non_string_body": 0,
+                    "CDP_Runtime_body_above_safe_bound": 0,
+                    "CDP_Runtime_response_not_received": 0,
+                    "CDP_Runtime_transport_or_JSON_unavailable": 0,
+                    "other_unreadable_local_CDP": 0,
+                },
                 "status": "inconclusive_exact_MHCC_reader_selection_unavailable",
                 "Android_DOM_page_URL_words_XML_screenshot_or_cookies_exported": False,
             }
