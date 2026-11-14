@@ -6,6 +6,8 @@ on:
       - '.github/workflows/commentary-editorial-section-scope.yml'
       - 'scripts/commentary_section_scope_audit.py'
       - 'tests/test_commentary_section_scope_audit.py'
+      - 'scripts/commentary_navigation_link_plan.py'
+      - 'tests/test_commentary_navigation_link_plan.py'
       - 'scripts/sword_native_commentary_index.cpp'
       - 'scripts/sword_native_commentary_raw_corpus.cpp'
       - 'config/commentary-intake/**'
@@ -36,6 +38,7 @@ jobs:
           set -euo pipefail
           python -m pip install -r requirements.txt
           python -m unittest discover -s tests -p 'test_commentary_section_scope_audit.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_navigation_link_plan.py' -v
       - name: Install stable upstream native SWORD library
         run: |
           set -euo pipefail
