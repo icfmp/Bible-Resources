@@ -194,6 +194,44 @@ class AndroidOriginalProseWitnessTests(unittest.TestCase):
 
     @patch("commentary_android_text_witness.parse_native_raw_corpus")
     @patch("commentary_android_text_witness.subprocess.Popen")
+    def test_full_corpus_can_prove_read_only_real_dom_even_when_a11y_is_empty(
+        self, popen, parser,
+    ):
+        from unittest.mock import Mock
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            scanner = root / "native-reader"
+            scanner.write_bytes(b"private compiled C++ scanner")
+            proc = Mock()
+            proc.stdout = io.BytesIO()
+            proc.wait.return_value = 0
+            proc.poll.return_value = 0
+            popen.return_value = proc
+            def stream(_pipe, *, on_entry):
+                on_entry("K", "John.1.1", original(70))
+                return ({
+                    "all_native_raw_entries_ordered_sha256": "a" * 64,
+                    "all_actual_raw_entries_scanned": 1,
+                }, [], [], [])
+            parser.side_effect = stream
+            dom_text = " ".join(
+                "authenticatedauthorialword%03d" % n for n in range(20, 42)
+            )
+            result = full_native_original_prose_in_real_android_webview(
+                root, "MHCC", scanner, "a" * 64,
+                real_webview("Text returned by Android accessibility has no authorial content"),
+                real_read_only_dom_texts=[dom_text],
+            )
+        self.assertTrue(result["actual_original_authorial_prose_in_real_Android_WebView_verified"])
+        self.assertTrue(result["actual_original_prose_in_read_only_Android_debug_DOM_verified"])
+        self.assertEqual(result["source_occupied_entries_with_16_words_in_debug_DOM"], 1)
+        self.assertEqual(result["status"],
+                         "source_pinned_original_prose_visible_in_real_Android_debug_DOM")
+        self.assertNotIn(dom_text, str(result))
+        self.assertFalse(result["source_words_android_UI_XML_screenshots_or_ZIP_exported"])
+
+    @patch("commentary_android_text_witness.parse_native_raw_corpus")
+    @patch("commentary_android_text_witness.subprocess.Popen")
     def test_full_corpus_digest_mismatch_never_passes_prose(self, popen, parser):
         from unittest.mock import Mock
         with tempfile.TemporaryDirectory() as temp:
