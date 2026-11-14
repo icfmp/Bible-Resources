@@ -81,6 +81,12 @@ jobs:
           for row in r["anomalies"]:
               print("Candidate range",row["start"],"through",row["declared_end"],
                     row["category"],"missing",",".join(row["missing_slots"]))
+          witness=r["independent_thml_witness"]
+          print("Independent ThML status:",witness["status"])
+          print("Independent ThML section agreement:",
+                json.dumps(witness.get("source_range_agreement_counts",{}),sort_keys=True))
+          for case in witness.get("anomaly_source_range_corroboration",[]):
+              print("Candidate witness",case["start"],case["declared_end"],case["relation"])
           PY
       - name: Preserve metadata-only complete candidate report for independent review
         uses: actions/upload-artifact@v4
