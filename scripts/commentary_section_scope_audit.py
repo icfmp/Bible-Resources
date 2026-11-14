@@ -37,6 +37,7 @@ from commentary_stock_prefix_topology import (
     single_word_stock_markup_diagnostic, stock_prefix_context_correspondence,
 )
 from commentary_chapter_ref_labels import link_label_location
+from commentary_unresolved_lexical_triage import marked_word_token_indices
 from commentary_xml_witness import _parse_reference, WORK_REF
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
 from pilot_fetch import ALLOWED_HOSTS, fetch
@@ -742,6 +743,7 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
                 "source_div2_original_text_retained": True,
                 "source_div2_ordinal": chapter_number,
                 "_private_source_visible_text": "".join(div2.itertext()),
+                "_private_source_xml_div2_element": div2,
                 "_private_original_scripref_links": [
                     {
                         "text": "".join(node.itertext()),
@@ -861,6 +863,23 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
                 reference_targets = link_label_location(
                     source_links, stock_unknown_raw[row["native_key"]]
                 )
+                one_word = lexical.get("isolated_one_word_xml_location")
+                if one_word is not None:
+                    if source is None:
+                        source_position = "NO_SAFE_INDEPENDENT_SOURCE_UNIT"
+                    else:
+                        source_link_word_positions = set(marked_word_token_indices(
+                            source["_private_source_xml_div2_element"], "scripRef",
+                            source_text
+                        ))
+                        source_position = (
+                            "SOURCE_SCRIPREF_LINK_LABEL"
+                            if one_word["original_word_index_from_zero"]
+                            in source_link_word_positions
+                            else "SOURCE_COMMENTARY_TEXT_OUTSIDE_SCRIPREF"
+                        )
+                    one_word["original_source_word_markup_location"] = source_position
+                    one_word["source_link_annotation_is_not_authorial_prose_parity"] = True
         cases.append({
             "independent_lexical_comparison": lexical,
             "independent_reference_target_comparison": reference_targets,
@@ -940,6 +959,14 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
                     refs["original_scripRef_to_stock_text_location_classes"],
                 "source_to_stock_reference_markup_parity_proven": False,
             })
+    single_word_source_markup = Counter(
+        row["independent_lexical_comparison"]["isolated_one_word_xml_location"].get(
+            "original_source_word_markup_location", "NOT_LOCATED"
+        )
+        for row in cases
+        if row["independent_lexical_comparison"] is not None
+        and row["independent_lexical_comparison"].get("isolated_one_word_xml_location")
+    )
     word_classes = Counter(
         row["independent_lexical_comparison"].get("overlap_class", "UNREVIEWED")
         for row in cases if row["independent_lexical_comparison"] is not None
@@ -962,6 +989,8 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
         "source_reference_labels_when_stock_has_no_link_markup":
             dict(sorted(missing_stock_link_label_locations.items())),
         "source_reference_label_location_is_not_a_target_or_text_parity_check": True,
+        "isolated_one_word_original_source_markup_location_classes":
+            dict(sorted(single_word_source_markup.items())),
         "source_reference_target_completeness_not_proven": True,
         "independent_stock_vs_source_lexical_diagnostic_classes":
             dict(sorted(word_classes.items())),
