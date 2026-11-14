@@ -218,9 +218,21 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
     # Source XML can encode a passage in a non-scripCom attribute or as
     # editorial prose. Record only short location attributes for diagnosis.
     nearby_attributes = defaultdict(list)
+    independent_reference_ranges = defaultdict(set)
     for node in document.iter():
         if not isinstance(node.tag, str):
             continue
+        if node.tag.rsplit("}", 1)[-1] == "scripRef":
+            ref = node.get("osisRef", "")
+            kind, _ = _parse_reference(ref)
+            if kind in ("work_qualified_verse", "work_qualified_same_book_verse_range"):
+                parsed = WORK_REF.fullmatch(ref)
+                if parsed is not None:
+                    body = parsed.group(2)
+                    first, last = body.split("-", 1) if "-" in body else (body, body)
+                    if KEY.fullmatch(first) and KEY.fullmatch(last):
+                        if first.split(".")[:2] == last.split(".")[:2]:
+                            independent_reference_ranges[first].add(last)
         for attr, value in node.attrib.items():
             if len(value) > 256:
                 continue
@@ -243,6 +255,13 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
         return "DIFFERENT_RANGE_IN_INDEPENDENT_EDITION"
 
     counts = Counter(relation(s) for s in sections)
+    reference_counts = Counter()
+    for s in sections:
+        last = s["start"].rsplit(".", 1)[0] + "." + str(s["declared_end"])
+        reference_counts[
+            "EXACT_INDEPENDENT_SCRIPREF_RANGE" if last in independent_reference_ranges.get(s["start"], set())
+            else "NO_EXACT_INDEPENDENT_SCRIPREF_RANGE"
+        ] += 1
     return {
         "status": "PINNED_DIFFERENT_DIGITAL_EDITION_SCOPE_COMPARISON",
         "witness_sha256": expected,
@@ -250,9 +269,15 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
         "source_distinct_starts": len(markers),
         "stock_start_sections_compared": len(sections),
         "source_range_agreement_counts": dict(sorted(counts.items())),
+        "independent_scripref_range_agreement_counts": dict(sorted(reference_counts.items())),
+        "independent_scripref_is_not_section_anchor": True,
         "anomaly_source_range_corroboration": [
             {"start": a["start"], "declared_end": a["declared_end"],
-             "relation": relation(a)} for a in anomalies
+             "relation": relation(a),
+             "same_end_in_independent_scripref": (
+                 a["start"].rsplit(".", 1)[0] + "." + str(a["declared_end"])
+                 in independent_reference_ranges.get(a["start"], set())
+             )} for a in anomalies
         ],
         "unparsed_source_reference_candidates_near_anomalies": {
             start: values for start, values in sorted(unresolved_near_candidates.items())
