@@ -18,12 +18,12 @@ from urllib.parse import urlencode
 import xml.etree.ElementTree as ET
 from zipfile import ZipFile, ZIP_DEFLATED
 
-from commentary_xiphos_dual_reader import (
-    BIBLE_MODULE, verify_and_install_reviewed_bible,
-    _exact_native_commentary_raw,
-)
+from commentary_xiphos_dual_reader import BIBLE_MODULE, verify_and_install_reviewed_bible
 from commentary_native_raw_inventory import _safe_stock_install
-from commentary_android_text_witness import original_prose_in_real_android_webview
+from commentary_android_text_witness import (
+    original_prose_in_real_android_webview,
+    read_only_actually_occupied_original_entries,
+)
 
 from commentary_intake import load_manifest
 from pilot_fetch import fetch
@@ -545,12 +545,11 @@ def run_android_original(
                 or not 2 <= len(references) <= 12
                 or len(set(references)) != len(references)):
             raise PilotError("Unsafe original Android authorial sample list")
-        original_prose_samples = {
-            reference: _exact_native_commentary_raw(
-                original_native_root, module_id, reference, native_raw_key_binary,
+        original_prose_samples, not_occupied_samples = (
+            read_only_actually_occupied_original_entries(
+                original_native_root, module_id, references, native_raw_key_binary,
             )
-            for reference in references
-        }
+        )
 
         adb("wait-for-device", timeout=80)
         adb("install", "-r", str(apk), timeout=130)
@@ -737,6 +736,8 @@ def run_android_original(
             "android_sample_reference_deeplink_attempted": True,
             "android_commentary_toolbar_selection": toolbar_probe,
             "android_exact_original_authorial_prose_webview_witness": prose_witness,
+            "original_sample_references_not_verifiably_native_occupied_count":
+                not_occupied_samples,
             "official_stable_update_notice_action": stable_notice_action,
             "android_reader_context_by_phase": {
                 "after_app_restart": reader_context_after_restart,
