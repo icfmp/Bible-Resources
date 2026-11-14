@@ -220,6 +220,13 @@ KNOWN_READER_VIEW_IDS = frozenset({
     "bibleButton", "commentaryButton", "workspaceButton",
     "optionsMenu", "strongsButton", "searchButton", "speakButton",
 })
+# Exact nontext UI structure in official pinned production-1117
+# app/src/main/res/layout/main_bible_view.xml. Do not output other resource
+# IDs or node text/labels; use them only as scoped real-reader witnesses.
+KNOWN_READER_ROOT_IDS = frozenset({
+    "drawerLayout", "mainLayout", "toolbarLayout",
+    "toolbarButtonLayout", "mainBibleView",
+})
 
 
 def _classify_main_reader_context(xml: bytes, activity_dump: bytes) -> dict:
@@ -233,18 +240,38 @@ def _classify_main_reader_context(xml: bytes, activity_dump: bytes) -> dict:
             or len(xml) > 3_000_000 or len(activity_dump) > 4_000_000):
         raise PilotError("Unbounded Android layout/activity diagnostic")
     ids = set()
+    roots = set()
+    packages = {"andbible": 0, "system_ui": 0, "documents_ui": 0, "other": 0}
+    webviews = 0
     try:
         tree = ET.fromstring(xml) if xml else None
     except ET.ParseError:
         tree = None
+    node_count = 0
     if tree is not None:
         for node in tree.iter("node"):
+            node_count += 1
+            if node_count > 20_000:
+                raise PilotError("Android hierarchy has too many actual nodes")
+            package = node.attrib.get("package", "")
+            if package == PACKAGE:
+                packages["andbible"] += 1
+            elif package == "com.android.systemui":
+                packages["system_ui"] += 1
+            elif package in ("com.google.android.documentsui", "com.android.documentsui"):
+                packages["documents_ui"] += 1
+            else:
+                packages["other"] += 1
+            if node.attrib.get("class", "").endswith("WebView"):
+                webviews += 1
             rid = node.attrib.get("resource-id", "")
             prefix = PACKAGE + ":id/"
             if rid.startswith(prefix):
                 name = rid[len(prefix):]
                 if name in KNOWN_READER_VIEW_IDS:
                     ids.add(name)
+                if name in KNOWN_READER_ROOT_IDS:
+                    roots.add(name)
     resumed_lines = [
         ln for ln in activity_dump.splitlines()
         if any(name in ln for name in (
@@ -256,6 +283,11 @@ def _classify_main_reader_context(xml: bytes, activity_dump: bytes) -> dict:
     other_andbible = any(PACKAGE.encode() in ln for ln in resumed_lines)
     return {
         "known_reader_toolbar_resource_ids_visible": sorted(ids),
+        "known_reader_root_resource_ids_visible": sorted(roots),
+        "ui_hierarchy_node_count": node_count,
+        "ui_hierarchy_package_class_counts": packages,
+        "ui_hierarchy_webview_count": webviews,
+        "ui_hierarchy_text_or_unknown_ids_exported": False,
         "main_bible_reader_activity_resumed": reader,
         "another_andbible_activity_resumed": other_andbible and not reader,
         "ui_hierarchy_has_any_elements": tree is not None,

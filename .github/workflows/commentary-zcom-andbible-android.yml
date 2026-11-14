@@ -118,12 +118,19 @@ jobs:
           assert set(reader_context)=={"after_app_restart","after_commentary_toolbar_attempt"}
           allowed_ids={"bibleButton","commentaryButton","workspaceButton","optionsMenu",
                        "strongsButton","searchButton","speakButton"}
+          allowed_roots={"drawerLayout","mainLayout","toolbarLayout",
+                         "toolbarButtonLayout","mainBibleView"}
           for context in list(reader_context.values())+[
               data["android_reviewed_bible_baseline_reader_before_proceed"],
               data["android_reviewed_bible_baseline_reader_after_proceed"],
           ]:
               assert set(context)=={
                   "known_reader_toolbar_resource_ids_visible",
+                  "known_reader_root_resource_ids_visible",
+                  "ui_hierarchy_node_count",
+                  "ui_hierarchy_package_class_counts",
+                  "ui_hierarchy_webview_count",
+                  "ui_hierarchy_text_or_unknown_ids_exported",
                   "main_bible_reader_activity_resumed",
                   "another_andbible_activity_resumed",
                   "ui_hierarchy_has_any_elements",
@@ -131,7 +138,22 @@ jobs:
               }
               assert isinstance(context["known_reader_toolbar_resource_ids_visible"],list)
               assert set(context["known_reader_toolbar_resource_ids_visible"])<=allowed_ids
-              assert all(type(v) is bool for k,v in context.items() if k!="known_reader_toolbar_resource_ids_visible")
+              assert isinstance(context["known_reader_root_resource_ids_visible"],list)
+              assert set(context["known_reader_root_resource_ids_visible"])<=allowed_roots
+              assert type(context["ui_hierarchy_node_count"]) is int
+              assert 0<=context["ui_hierarchy_node_count"]<=20000
+              assert type(context["ui_hierarchy_webview_count"]) is int
+              assert 0<=context["ui_hierarchy_webview_count"]<=context["ui_hierarchy_node_count"]
+              packages=context["ui_hierarchy_package_class_counts"]
+              assert set(packages)=={"andbible","system_ui","documents_ui","other"}
+              assert all(type(n) is int and 0<=n<=20000 for n in packages.values())
+              assert sum(packages.values())==context["ui_hierarchy_node_count"]
+              assert context["ui_hierarchy_text_or_unknown_ids_exported"] is False
+              for key in ("main_bible_reader_activity_resumed",
+                          "another_andbible_activity_resumed",
+                          "ui_hierarchy_has_any_elements",
+                          "actual_commentary_rendering_verified"):
+                  assert type(context[key]) is bool
               assert context["actual_commentary_rendering_verified"] is False
           # No reader-toolbar absence is a claim of missing or damaged MHCC text.
           assert type(data["android_documented_intent_request_accepted"]) is bool
@@ -156,6 +178,8 @@ jobs:
           assert len(data["real_screen_sha256_only"])>=3
           assert all(re.fullmatch(r"[a-f0-9]{64}",val) for val in data["real_screen_sha256_only"].values())
           print("Android: reviewed complete Bible loaded first and exact stock MHCC ZIP chosen; actual Android reader/content and navigation independently recorded, not assumed")
+          print("Android actual resumed reader accessibility structure (no content, IDs beyond allowlist, or screenshots): "+
+                json.dumps(reader_context,sort_keys=True))
           PY
       - name: Preserve only bounded original identity and UI action metadata
         if: always()
