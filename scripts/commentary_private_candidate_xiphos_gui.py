@@ -69,6 +69,58 @@ def _gate_real_candidate_gui(receipt: dict) -> None:
         raise PilotError("Private candidate reader exceeded its approval scope")
 
 
+
+def _bounded_gui_diagnostic(source: dict) -> dict:
+    """Summarize real GUI outcomes *before* the strict gate, without source.
+
+    A failed GUI test must not discard the only useful classification or
+    expose any author's prose, reference label, href, HTML, or clipboard.
+    """
+    allowed_stages = {
+        "focus_main_window", "select_reference", "enter_reference",
+        "open_reference", "raise_commentary_pane",
+        "focus_right_hand_commentary_pane", "clear_prior_clipboard",
+        "select_commentary_text", "copy_commentary_text",
+        "read_commentary_clipboard",
+    }
+    failures = source.get("bounded_xiphos_ui_failed_action_by_passage") or {}
+    stages = {}
+    for value in failures.values():
+        name = value if value in allowed_stages else "unclassified"
+        stages[name] = stages.get(name, 0) + 1
+    measured = source.get("copied_gui_clipboard_byte_count_by_passage") or {}
+    lengths = [
+        min(max(0, size), 256_000) if type(size) is int else 0
+        for size in measured.values()
+    ]
+    markup = source.get("real_markup_rendering_observation_by_passage") or {}
+    intro = source.get("real_Xiphos_commentary_book_chapter_heading_context_menu") or {}
+    return {
+        "main_reader_window_found": source.get("real_main_reader_window_found") is True,
+        "passage_commands_accepted": source.get("actual_passage_commands_accepted") is True,
+        "actual_copied_source_exposition_matches": source.get(
+            "independent_gui_commentary_excerpt_match_count", 0
+        ),
+        "number_of_passage_clipboard_lengths": len(lengths),
+        "copied_clipboard_byte_length_summary": {
+            "min": min(lengths) if lengths else 0,
+            "max": max(lengths) if lengths else 0,
+        },
+        "failed_action_stages_by_fixed_category": {
+            name: stages[name] for name in sorted(stages)
+        },
+        "source_reference_label_and_href_matches_in_rendered_GUI": sum(
+            item.get("exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations", 0)
+            for item in markup.values() if isinstance(item, dict)
+        ),
+        "original_intro_observed_in_normal_chapter_GUI": intro.get(
+            "original_intro_in_normal_chapter_GUI_verified"
+        ) is True,
+        "original_words_attributes_links_screenshots_or_windows_exported": False,
+    }
+
+
+
 def private_candidate_xiphos_review(
     resource_id: str, *, native_full_corpus_binary: Path,
     native_single_key_binary: Path, seconds: int = 12,
@@ -133,6 +185,12 @@ def private_candidate_xiphos_review(
             "published": False,
             "original_words_links_screenshots_or_SWORD_archives_uploaded": False,
         }
+        # Log bounded, fixed-category diagnostics even when the actual GUI
+        # fails strict authorial prose or href gates on a newer reader.
+        # Never log the complete receipt (which may grow new internal fields).
+        print("Real Xiphos reader diagnostic (metadata only): " +
+              json.dumps(_bounded_gui_diagnostic(result), sort_keys=True),
+              flush=True)
         _gate_real_candidate_gui(result)
         return result
 
