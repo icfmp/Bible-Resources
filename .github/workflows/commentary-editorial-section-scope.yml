@@ -507,7 +507,16 @@ jobs:
                     candidate["independent_leading_reference_with_substantial_following_prose"],
                     "substantive original stock paragraph alignment",
                     candidate["independent_leading_reference_and_matching_original_stock_exposition"],
-                    "authorially reviewed",candidate["scope_authorially_reviewed"])
+                    "authorially reviewed",candidate["scope_authorially_reviewed"],
+                    "source citation parent/lead shapes",
+                    json.dumps([
+                        {"parent":q["source_markup_parent"],
+                         "inside_paragraph":q["source_reference_inside_paragraph"],
+                         "leads_paragraph":q["source_scripRef_is_leading_paragraph_element"],
+                         "substantial_following_prose":q["reference_has_substantial_following_prose"],
+                         "matching_prose":q["source_and_stock_share_at_least_twenty_contiguous_words"]}
+                        for q in candidate["independent_reference_observations"]
+                    ],sort_keys=True))
 
           print("Independent ThML status:",witness["status"])
           print("Independent ThML section agreement:",
