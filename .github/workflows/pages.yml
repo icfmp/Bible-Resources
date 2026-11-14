@@ -1,10 +1,10 @@
-name: Publish catalogue
+name: Publish approved GitHub Releases and Pages catalogue
 on:
   push:
     branches: [main]
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 concurrency:
@@ -12,6 +12,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   publish:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: github-pages
     steps:
@@ -29,6 +30,18 @@ jobs:
       - run: python scripts/validate.py
       - run: python scripts/build.py --output dist --base-url https://icfmp.github.io/Bible-Resources/
       - run: python scripts/smoke.py
+      - name: Require an authorized GitHub Release for every catalogue resource
+        run: |
+          set -euo pipefail
+          python scripts/catalogue_release_coverage.py --built dist
+      - name: Create or verify ALL GitHub Releases before exposing Pages catalogue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python scripts/publish_reviewed_release.py \
+            --built dist --repository "$GITHUB_REPOSITORY" \
+            --target-sha "${{ github.sha }}"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
