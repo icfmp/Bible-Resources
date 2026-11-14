@@ -49,8 +49,8 @@ class OriginalIntroTextLocationTests(unittest.TestCase):
 
     def test_independent_annotation_locates_intro_without_edit_permission(self):
         doc=etree.fromstring(
-            b'<root><div2><h2>Chapter 19</h2>'
-            b'<scripCom osisRef="Bible:Lev.19"/>'
+            b'<root><div2><h2>Chapter 19</h2> '
+            b'<scripCom osisRef="Bible:Lev.19"/> '
             b'<p>Invented explanation for the whole chapter.</p>'
             b'</div2></root>'
         )
