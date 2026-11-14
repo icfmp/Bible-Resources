@@ -255,6 +255,27 @@ class SourceDivisionChapterTests(unittest.TestCase):
             "SOURCE_BOOK_OR_CHAPTER_ALIGNMENT_NEEDS_REVIEW": 1
         })
 
+    def test_unmarked_noncanonical_source_appendix_is_not_assigned_a_bible_book(self):
+        document = etree.fromstring(
+            b'<root>'
+            b'<div1 title="Genesis"><div2><p>Genesis one</p></div2></div1>'
+            b'<div1 title="Exodus"><div2><p>Exodus one</p></div2></div1>'
+            b'<div1 title="Original index"><div2><p>Alphabetical appendix</p></div2>'
+            b'<div2><p>Another index page</p></div2></div1>'
+            b'</root>'
+        )
+        registry = {"chapter_maximums": {"Gen.1":31, "Exod.1":22}}
+        cases = [
+            {"native_key": "Gen.1.1", "first_verse_in_chapter": True,
+             "number_of_occupied_native_slots_in_chapter": 1,
+             "raw_payload_sha256": "a" * 64},
+        ]
+        report = independent_div2_chapter_body_evidence(document, registry, cases)
+        self.assertEqual(report["unattributed_noncanonical_div1_with_div2_excluded"], 1)
+        self.assertEqual(report["source_book_divisions"], 2)
+        self.assertEqual(report["candidate_classes"],
+                         {"SOURCE_DIV2_UNDIVIDED_CHAPTER_BODY_CANDIDATE": 1})
+
     def test_partial_source_book_coverage_is_not_accepted(self):
         document = etree.fromstring(
             b'<root><div1 title="Genesis"><div2><p>Text</p></div2></div1></root>'
