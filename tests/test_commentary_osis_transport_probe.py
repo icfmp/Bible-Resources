@@ -5,7 +5,9 @@ import unittest
 from lxml import etree
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from commentary_osis_transport_probe import build_numbered_transport_sample
+from commentary_osis_transport_probe import (
+    build_numbered_transport_sample, classify_native_osis_roundtrip_delta
+)
 
 
 class OriginalRawNumberedTransportTests(unittest.TestCase):
@@ -66,6 +68,35 @@ class OriginalRawNumberedTransportTests(unittest.TestCase):
         ):
             with self.assertRaises(ValueError):
                 build_numbered_transport_sample(entries,work_id="ProbeModule")
+
+    def test_metadata_only_detects_whitespace_changes_without_text_loss(self):
+        got=classify_native_osis_roundtrip_delta(
+            b"<p>Invented  body text.</p>",
+            b"<p>Invented body text.</p>"
+        )
+        self.assertEqual(got["word_sequence_relation"], "EXACT_ORIGINAL_WORD_SEQUENCE")
+        self.assertTrue(got["normalized_whitespace_visible_unicode_equal"])
+        self.assertTrue(got["all_original_markup_element_names_and_counts_preserved"])
+        self.assertNotIn("Invented", str(got))
+
+    def test_added_compiled_heading_is_not_accepted_as_same_authorial_prose(self):
+        got=classify_native_osis_roundtrip_delta(
+            b"<p>Synthetic prose</p>",
+            b"<title>Additional heading</title><p>Synthetic prose</p>"
+        )
+        self.assertEqual(got["word_sequence_relation"],
+                         "ALL_ORIGINAL_WORDS_IN_ORDER_WITH_ADDITIONAL_COMPILED_WORDS")
+        self.assertFalse(got["normalized_whitespace_visible_unicode_equal"])
+        self.assertFalse(got["all_original_markup_element_names_and_counts_preserved"])
+
+    def test_dropped_synthetic_word_is_detected(self):
+        got=classify_native_osis_roundtrip_delta(
+            b"<p>Synthetic prose remains</p>",
+            b"<p>Synthetic remains</p>"
+        )
+        self.assertEqual(got["word_sequence_relation"],
+                         "COMPILED_WORDS_A_SUBSEQUENCE_OF_ORIGINAL")
+        self.assertFalse(got["source_prose_and_markup_parity_approved"])
 
     def test_invalid_work_id_cannot_inject_xml_attributes(self):
         with self.assertRaises(ValueError):
