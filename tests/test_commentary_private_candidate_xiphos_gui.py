@@ -9,6 +9,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from commentary_private_candidate_xiphos_gui import (
     PRIVATE_ID, _gate_real_candidate_gui, private_candidate_xiphos_review,
+    _bounded_gui_diagnostic,
 )
 from pilot_preflight import PilotError
 
@@ -49,6 +50,47 @@ def receipt():
 class PrivateCandidateRealXiphosTests(unittest.TestCase):
     def test_five_actual_selected_private_commentary_texts_and_two_real_source_hrefs(self):
         _gate_real_candidate_gui(receipt())
+
+    def test_failed_real_gui_classification_reports_metadata_only(self):
+        raw = receipt()
+        raw["independent_gui_commentary_excerpt_match_count"] = 0
+        raw["real_main_reader_window_found"] = True
+        raw["actual_passage_commands_accepted"] = True
+        raw["copied_gui_clipboard_byte_count_by_passage"] = {
+            "secret source text Gen 1:1": 100,
+            "secret source text Phlm 1:1": 120,
+        }
+        raw["bounded_xiphos_ui_failed_action_by_passage"] = {
+            "source key Gen.1.1": "focus_right_hand_commentary_pane",
+            "source key Exod.2.1": "AUTHORIAL PROSE PRIVATE",
+        }
+        raw["real_markup_rendering_observation_by_passage"] = {
+            "secret key": {
+                "exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations": 1,
+                "private original title": "Do not print this field",
+            },
+        }
+        raw["real_Xiphos_commentary_book_chapter_heading_context_menu"] = {
+            "original_intro_in_normal_chapter_GUI_verified": False,
+            "secret editorial material": "Do not print this field",
+        }
+        observed = _bounded_gui_diagnostic(raw)
+        self.assertTrue(observed["main_reader_window_found"])
+        self.assertTrue(observed["passage_commands_accepted"])
+        self.assertEqual(observed["actual_copied_source_exposition_matches"], 0)
+        self.assertEqual(observed["source_reference_label_and_href_matches_in_rendered_GUI"], 1)
+        self.assertEqual(
+            observed["failed_action_stages_by_fixed_category"],
+            {"focus_right_hand_commentary_pane": 1, "unclassified": 1},
+        )
+        import json
+        diagnostic = json.dumps(observed, sort_keys=True)
+        for forbidden in ("Gen 1:1", "Phlm 1:1", "Exod", "AUTHORIAL",
+                          "Do not print", "source key", "secret"):
+            self.assertNotIn(forbidden, diagnostic)
+        self.assertFalse(observed[
+            "original_words_attributes_links_screenshots_or_windows_exported"
+        ])
 
     def test_source_and_private_commentary_must_not_be_confused(self):
         bad = receipt()
