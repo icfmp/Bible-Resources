@@ -106,3 +106,62 @@ def propose_commentary_links(*, occupied: dict[str, str],
         "original_source_modified": False,
         "candidate_built_or_reader_tested": False,
     }
+
+
+def parse_native_commentary_verse_registry(raw: bytes, expected_module: str) -> dict:
+    """Parse read-only released-libSWORD chapter bounds, never manuscript data.
+
+    Expected framing from sword_native_commentary_index --chapter-registry:
+    M<TAB>module<TAB>v11n<TAB>engine<TAB>driver
+    R<TAB>book.chapter<TAB>native_verse_max
+    S<TAB>chapter_count<TAB>total_verse_count
+    """
+    if (not isinstance(raw, bytes) or len(raw) > 256 * 1024
+            or b"\x00" in raw):
+        raise UnsafeCommentaryLinkPlan("Oversize or invalid native registry stream")
+    try:
+        lines = raw.decode("ascii").splitlines()
+    except UnicodeError as exc:
+        raise UnsafeCommentaryLinkPlan("Non-ASCII native registry") from exc
+    if len(lines) < 3:
+        raise UnsafeCommentaryLinkPlan("Missing native registry framing")
+    header = lines[0].split("\t")
+    if (len(header) != 5 or header[0] != "M"
+            or header[1] != expected_module
+            or not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,79}", expected_module)
+            or not re.fullmatch(r"[A-Za-z][A-Za-z0-9]{0,31}", header[2])
+            or not re.fullmatch(r"\d+\.\d+\.\d+", header[3])
+            or header[4] not in {"RawCom", "RawCom4", "zCom", "zCom4"}):
+        raise UnsafeCommentaryLinkPlan("Unknown native registry module/version/driver")
+    chapters = {}
+    verse_keys = set()
+    for line in lines[1:-1]:
+        parts = line.split("\t")
+        if (len(parts) != 3 or parts[0] != "R"
+                or CHAPTER.fullmatch(parts[1]) is None
+                or not re.fullmatch(r"[1-9]\d{0,3}", parts[2])):
+            raise UnsafeCommentaryLinkPlan("Unreviewed native chapter registry row")
+        chapter = parts[1]
+        limit = int(parts[2])
+        if limit > 1000 or chapter in chapters or len(chapters) >= 2500:
+            raise UnsafeCommentaryLinkPlan("Duplicated/unsupported native chapter bounds")
+        chapters[chapter] = limit
+        verse_keys.update(f"{chapter}.{verse}" for verse in range(1, limit + 1))
+        if len(verse_keys) > 300000:
+            raise UnsafeCommentaryLinkPlan("Oversize native verse registry")
+    footer = lines[-1].split("\t")
+    if (len(footer) != 3 or footer[0] != "S"
+            or not all(re.fullmatch(r"[1-9]\d{0,8}", x) for x in footer[1:])
+            or int(footer[1]) != len(chapters)
+            or int(footer[2]) != len(verse_keys)):
+        raise UnsafeCommentaryLinkPlan("Incomplete native chapter/verse registry")
+    if not chapters:
+        raise UnsafeCommentaryLinkPlan("Empty native chapter registry")
+    return {
+        "module_id": expected_module, "versification": header[2],
+        "engine_version": header[3], "driver": header[4],
+        "chapter_maximums": chapters,
+        "verse_keys": verse_keys,
+        "chapter_count": len(chapters), "canonical_verse_count": len(verse_keys),
+        "registry_is_original_sword_engine_not_source_text": True
+    }
