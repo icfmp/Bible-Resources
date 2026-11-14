@@ -21,13 +21,14 @@ from publisher_osis_preview_package import package_preview
 from probe_andbible_android_emulator import APK_SHA256, PACKAGE, adb, capture_png, AndroidPreflightError
 
 MODULE = "JND2024RepairResearch"
+FINAL_RESEARCH_MODULE = "BRJND2024"
 VERSIFICATION = "Luther"
 DEVICE_ZIP = "/sdcard/Download/JND2024RepairResearch.zip"
 SAFE_UI = frozenset({
     "LOAD DOCUMENTS FROM FILES", "LOAD DOCUMENT FROM FILES",
     "DOWNLOAD DOCUMENTS", "EASY START", "ADVANCED",
     "RECENT", "DOWNLOADS", "DOWNLOAD", "BROWSE FILES", "BROWSE",
-    "JND2024REPAIRRESEARCH.ZIP", "ALLOW", "WHILE USING THE APP",
+    "JND2024REPAIRRESEARCH.ZIP", "BRJND2024.ZIP", "ALLOW", "WHILE USING THE APP",
     "INSTALL", "IMPORT", "OK", "OPEN", "CONTINUE", "DONE", "CLOSE",
     "USE THIS FOLDER", "GRANT ACCESS", "SELECT", "NEXT", "PROCEED",
     "DISMISS", "DISMISS UNTIL NEXT UPDATE", "WAIT", "CLOSE APP",
@@ -100,16 +101,18 @@ PARAGRAPH_LAYOUT_REFERENCE_PROBES = ("Gen.6.9", "Gen.6.13", "Gen.7.17", "Ps.3.1"
 OMITTED_VERSE_NOTE_HOST_PROBES = ("Matt.23.13", "Acts.8.36", "Acts.15.33")
 
 
-def open_documented_reference_probe(reference: str) -> None:
+def open_documented_reference_probe(reference: str, *, module_id: str = MODULE) -> None:
     """Attempt only a pre-reviewed AndBible OSIS deep link in the pinned app.
 
     https://andbible.org/docs/bible_links/ documents /OSISREF with document,
     v11n. Intent invocation alone is NEVER proof of actual navigation.
     """
+    if module_id not in {MODULE, FINAL_RESEARCH_MODULE}:
+        raise AndroidDarbyImportError("Unreviewed SWORD module identity")
     if reference not in DOCUMENTED_REFERENCE_PROBES + OMITTED_VERSE_NOTE_HOST_PROBES + PARAGRAPH_LAYOUT_REFERENCE_PROBES:
         raise AndroidDarbyImportError("Unreviewed Android passage navigation")
     uri = ("https://read.andbible.org/" + reference + "?"
-           + urlencode({"document": MODULE, "v11n": VERSIFICATION}))
+           + urlencode({"document": module_id, "v11n": VERSIFICATION}))
     adb("shell", "am", "start", "-a", "android.intent.action.VIEW",
         "-d", uri, "-p", PACKAGE, timeout=25, fail=False)
     time.sleep(7)
@@ -203,17 +206,26 @@ def relaunch_for_persistence():
 
 
 def attempt_private_android_import(*, payload: Path, apk: Path,
-                                   evidence_dir: Path, scratch: Path) -> dict:
+                                   evidence_dir: Path, scratch: Path,
+                                   module_id: str = MODULE) -> dict:
     if (not apk.is_file() or apk.is_symlink()
             or sha256(apk.read_bytes()).hexdigest() != APK_SHA256
             or evidence_dir.is_symlink() or not evidence_dir.is_dir()
             or any(evidence_dir.iterdir())
             or not scratch.is_dir() or scratch.is_symlink()
-            or not "private-darby-repaired-sword-" in str(payload.resolve())):
+            or not ((module_id == MODULE and "private-darby-repaired-sword-" in str(payload.resolve()))
+                    or (module_id == FINAL_RESEARCH_MODULE
+                        and "darby-v011" in payload.resolve().parts
+                        and payload.name == "payload"
+                        and payload.parent.name == "final-module"))):
         raise AndroidDarbyImportError("Unpinned APK or unsafe private experiment paths")
 
+    if module_id not in {MODULE, FINAL_RESEARCH_MODULE}:
+        raise AndroidDarbyImportError("Unexpected private final module identity")
     local_archive=scratch/"private-corrected-for-andbible-only.zip"
-    receipt=package_preview(payload,local_archive,MODULE,VERSIFICATION)
+    receipt=package_preview(payload,local_archive,module_id,VERSIFICATION)
+    device_zip = DEVICE_ZIP if module_id == MODULE else "/sdcard/Download/BRJND2024.zip"
+    target_label = (module_id + ".zip").upper()
     if (not receipt["all_module_files_byte_identical_to_audited_candidate"]
             or receipt["preview_only"] is not True
             or receipt["release_approved"] is not False):
@@ -227,10 +239,10 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
 
     # ADB push keeps the private module inside this disposable emulator; no
     # public cloud artifact or ordinary Android filesystem is written.
-    adb("push",str(local_archive),DEVICE_ZIP,timeout=100)
+    adb("push",str(local_archive),device_zip,timeout=100)
     adb("shell","am","broadcast","-a",
         "android.intent.action.MEDIA_SCANNER_SCAN_FILE",
-        "-d","file://"+DEVICE_ZIP,timeout=18,fail=False)
+        "-d","file://"+device_zip,timeout=18,fail=False)
 
     adb("shell","monkey","-p",PACKAGE,"1",timeout=35)
     time.sleep(14)
@@ -292,8 +304,8 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
         checkpoint("android_picker_state",index=step,allowed_labels=labels)
         if not selected:
             checkpoint("try_exact_private_candidate_file",
-                       candidate_visible="JND2024REPAIRRESEARCH.ZIP" in labels)
-            item=tap_allowlisted(controls,("JND2024REPAIRRESEARCH.ZIP",))
+                       candidate_visible=target_label in labels)
+            item=tap_allowlisted(controls,(target_label,))
             if item:
                 selected=True
                 checkpoint("private_candidate_file_selected",selected=True)
@@ -374,7 +386,7 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
         # Native app-only URI handling is a RESEARCH probe. No forced URL
         # browser fallback or speculative passage/footnote tapping.
         for index, reference in enumerate(DOCUMENTED_REFERENCE_PROBES, start=11):
-            open_documented_reference_probe(reference)
+            open_documented_reference_probe(reference, module_id=module_id)
             checkpoint("android_documented_deep_link_attempt",
                        reference=reference, actual_target_verified=False,
                        note_popup_verified=False)
@@ -399,7 +411,7 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
         # additions. Do not navigate to those absent numbered verses and never
         # infer note popup fidelity from a reference intent alone.
         for index, reference in enumerate(OMITTED_VERSE_NOTE_HOST_PROBES, start=15):
-            open_documented_reference_probe(reference)
+            open_documented_reference_probe(reference, module_id=module_id)
             checkpoint("android_omitted_verse_note_host_probe",
                        host=reference, host_render_verified=False,
                        omitted_note_popup_verified=False)
@@ -424,7 +436,7 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
         # Capture the *actual repaired module* without trusting the intent to
         # establish navigation or visual correctness. Images require review.
         for idx, reference in enumerate(PARAGRAPH_LAYOUT_REFERENCE_PROBES, start=18):
-            open_documented_reference_probe(reference)
+            open_documented_reference_probe(reference, module_id=module_id)
             key=f"{idx:02d}-repaired-paragraph-{reference.replace('.', '-')}"
             screenshots[key] = capture_png(evidence_dir/(key+".png"))
             checkpoint("andbible_repaired_paragraph_visual_probe",
@@ -439,7 +451,7 @@ def attempt_private_android_import(*, payload: Path, apk: Path,
         "status":"stable_andbible_android_private_zip_import_attempt_research_only",
         "andbible_release":"production-1117",
         "andbible_apk_sha256":APK_SHA256,
-        "sword_module_id":MODULE,
+        "sword_module_id":module_id,
         "sword_versification":VERSIFICATION,
         "private_candidate_zip_sha256":receipt["zip_sha256"],
         "all_zip_files_identical_to_full_native_audit":True,
