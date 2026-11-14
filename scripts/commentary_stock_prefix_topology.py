@@ -359,8 +359,10 @@ def single_word_stock_markup_diagnostic(source_text: str, stock_raw: bytes) -> d
         raise ValueError("Original source text required")
     root = _parse_original_stock_fragment(stock_raw)
     compiled = "".join(root.itertext())
-    source = list(WORD.finditer(source_text.casefold()))
-    stock = list(WORD.finditer(compiled.casefold()))
+    # Use ORIGINAL character offsets for XML ownership. casefold() can
+    # expand a Unicode character and must never shift these offsets.
+    source = list(WORD.finditer(source_text))
+    stock = list(WORD.finditer(compiled))
     if not source or len(source) != len(stock) or len(source) > 4000:
         return {
             "status": "NOT_AN_ISOLATED_ONE_WORD_SUBSTITUTION",
@@ -368,7 +370,7 @@ def single_word_stock_markup_diagnostic(source_text: str, stock_raw: bytes) -> d
         }
     differences = [
         i for i, (a, b) in enumerate(zip(source, stock))
-        if a.group(0) != b.group(0)
+        if a.group(0).casefold() != b.group(0).casefold()
     ]
     if len(differences) != 1:
         return {
@@ -376,7 +378,7 @@ def single_word_stock_markup_diagnostic(source_text: str, stock_raw: bytes) -> d
             "edition_parity_approved": False,
         }
     position = differences[0]
-    a, b = source[position].group(0), stock[position].group(0)
+    a, b = source[position].group(0).casefold(), stock[position].group(0).casefold()
     owner = None
     start, end = stock[position].span()
     cursor = 0
