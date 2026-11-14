@@ -188,6 +188,8 @@ jobs:
           '
           git diff --cached --quiet && { echo "No reviewed release files staged"; exit 1; }
           git commit -m "Stage owner-authorized Darby 2024 0.1.1, source proofs and catalogue"
+          git fetch origin release/darby-2024-0.1.1-stage
+          git rebase FETCH_HEAD
           git push origin HEAD:refs/heads/release/darby-2024-0.1.1-stage
           echo "Staged release content pushed to topic branch ONLY. No GitHub Release or Pages deployment."
       - name: Retain text-free release staging checksum receipt
