@@ -19,41 +19,63 @@ issue: "https://github.com/icfmp/Bible-Resources/issues/270"
 
 ## Melchizedek as a type of Christ (verses 1–3)
 
-Melchizedek met Abraham as he returned from rescuing Lot. His name, “King of Righteousness,” was no doubt well suited to his character and marked him as a type of the Messiah and his kingdom. The name of his city meant “Peace.” As king of peace, he foreshadowed Christ, the Prince of Peace and the great Reconciler of God and humanity.
+Melchizedek met Abraham after Abraham rescued Lot. His name means “King of Righteousness.” It was surely suited to his character and marked him as a type of the Messiah and his kingdom.
 
-Nothing is recorded about the beginning or end of Melchizedek's life. In this way, as a type, he resembled the Son of God, who exists from everlasting to everlasting and has neither predecessor nor successor in his priesthood.
+His city's name meant “Peace.” As king of peace, Melchizedek foreshadowed Christ: the Prince of Peace and the great Reconciler of God and humanity.
 
-Every part of Scripture honors this great King of Righteousness and Peace, our glorious High Priest and Savior. The more closely we examine Scripture, the more convinced we become that the testimony of Jesus is the spirit of prophecy.
+Scripture tells us nothing about the beginning or end of Melchizedek's life. In this way, he serves as a type of the Son of God.
+
+Christ himself is eternal. He has no predecessor or successor in his priesthood.
+
+Every part of Scripture honors this great King of Righteousness and Peace, our glorious High Priest and Savior. The closer we look at Scripture, the more we see that the testimony of Jesus is the spirit of prophecy.
 
 ## Christ's priesthood is greater than the Levitical priesthood (verses 4–10)
 
-The High Priest who was to come, whom Melchizedek foreshadowed, must be far greater than the Levitical priests. Consider Abraham's great dignity and blessing: he had received the promises. Truly rich and happy is the person who has God's promises for this life and for the life to come. Everyone who receives the Lord Jesus shares this honor.
+The High Priest whom Melchizedek foreshadowed is far greater than the Levitical priests.
 
-Let us therefore go into our spiritual struggles trusting in his word and strength, giving his grace the credit for our victories, and longing for him to meet and bless us in all our ways.
+Think of the honor given to Abraham: he received God's promises. Anyone who has those promises for this life and the life to come is truly rich and blessed.
+
+Everyone who receives the Lord Jesus shares that honor.
+
+So let us enter our spiritual struggles trusting in his word and strength. Let us give his grace the credit for our victories, and seek his blessing wherever we go.
 
 ## The enduring priesthood and better covenant of Christ (verses 11–25)
 
-The priesthood and law through which perfection could not be attained have been set aside. A Priest has arisen, and a new dispensation has been established through which true believers may be made perfect. That such a change has taken place is clear.
+The Levitical priesthood could not bring perfection. Neither could the law on which it rested. Both have therefore been set aside.
 
-The law that established the Levitical priesthood showed that its priests were frail and mortal. They could not save their own lives, much less the souls of those who came to them.
+Another Priest has come, and with him a new dispensation through which true believers may be made perfect. The change is clear.
 
-But the High Priest whom we confess holds his office by the power of endless life within himself. He has this life not only to remain alive himself but also to give spiritual and eternal life to all who rely on his sacrifice and intercession.
+The Levitical priests were weak and mortal. They could not save even their own lives, much less the souls of those who came to them.
 
-The better covenant, for which Jesus is the Surety, is not being contrasted here with the covenant of works, under which every transgressor stands condemned. Rather, it is distinguished from the covenant made with Israel at Sinai and the legal dispensation under which the church had lived for so long.
+Christ is different. He holds his priesthood by the power of endless life within himself.
 
-This better covenant has brought the church and every believer into clearer light, fuller liberty, and greater privileges. In Aaron's order there were many priests, with high priests succeeding one another. In Christ's priesthood there is only one High Priest, always the same.
+He has that life not only to remain alive himself. Through his sacrifice and intercession, he also gives spiritual and eternal life to all who rely on him.
 
-Here lies the believer's safety and happiness: this everlasting High Priest is able to save to the uttermost, at every time and in every circumstance.
+Jesus is the Surety of a better covenant. Here, this covenant is not being contrasted with the covenant of works, under which every transgressor stands condemned.
 
-Surely, then, we should seek a spiritual life and holiness surpassing those of Old Testament believers as greatly as our privileges surpass theirs.
+The contrast is with the covenant made with Israel at Sinai and the legal order under which the church had lived for so long.
+
+Through this better covenant, the church and every believer receive clearer light, greater liberty and richer privileges.
+
+Under Aaron there were many priests, and high priests succeeded one another. In Christ's priesthood there is only one High Priest. He remains the same forever.
+
+That is the believer's safety and happiness: our everlasting High Priest can save to the uttermost, at every time and in every circumstance.
+
+Surely our greater privileges should lead us to seek a spiritual life and holiness greater than that of Old Testament believers.
 
 ## The holiness of our High Priest and our hope in him (verses 26–28)
 
-Notice how Christ's personal holiness is described. He is free from every habit or principle of sin; there is not the slightest disposition toward sin in his nature. No sin dwells in him—not even the smallest sinful inclination, such as is found even in the best Christians.
+Think of Christ's holiness. There is no sinful habit or principle in him. Not even the slightest inclination to sin can be found in his nature.
 
-He is harmless and free from every actual transgression. He did no violence, and no deceit was found in his mouth. He is undefiled. We ourselves find it difficult to remain pure without sharing in the guilt of other people's sins.
+Even the best Christians know such inclinations. Christ has none.
 
-Yet none who come to God in the name of his beloved Son need be afraid. Let them be assured that he will deliver them in times of trial and suffering, in prosperity, at the hour of death, and on the day of judgment.
+He is harmless and free from every actual sin. He committed no violence, and no deceit was found in his mouth. He is undefiled.
+
+We ourselves struggle to remain pure without sharing in the guilt of other people's sins.
+
+Yet no one who comes to God in the name of his beloved Son needs to be afraid.
+
+Let them be assured: he will deliver them in times of trial and suffering, in prosperity, at the hour of death and on the day of judgment.
 
 ---
 
