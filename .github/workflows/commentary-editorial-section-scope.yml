@@ -7,7 +7,9 @@ on:
       - 'scripts/commentary_section_scope_audit.py'
       - 'scripts/commentary_osis_rebuild_preflight.py'
       - 'scripts/commentary_intro_chapter_text_review.py'
+      - 'scripts/commentary_osis_intro_transport_probe.py'
       - 'scripts/commentary_osis_transport_probe.py'
+      - 'tests/test_commentary_osis_intro_transport_probe.py'
       - 'tests/test_commentary_intro_chapter_text_review.py'
       - 'tests/test_commentary_section_scope_audit.py'
       - 'tests/test_commentary_osis_transport_probe.py'
@@ -48,6 +50,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_commentary_osis_rebuild_preflight.py' -v
           python -m unittest discover -s tests -p 'test_commentary_intro_chapter_text_review.py' -v
           python -m unittest discover -s tests -p 'test_commentary_osis_transport_probe.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_osis_intro_transport_probe.py' -v
       - name: Install stable upstream native SWORD library
         run: |
           set -euo pipefail
@@ -224,6 +227,7 @@ jobs:
             --native-raw-binary "${RUNNER_TEMP}/stock-raw" \
             --report "${RUNNER_TEMP}/editorial-scope.json" \
             --temporary-numbered-sample-chapters Gen.36 Matt.13 Song.1 \
+            --temporary-original-intro-sample-chapters Lev.19 Ps.108 \
             --synthetic-intro-native-stream "${RUNNER_TEMP}/synthetic-introductions/native.raw"
       - name: Summarize scope and known regression probes without original text
         run: |
@@ -315,6 +319,11 @@ jobs:
                 json.dumps(transport["intro_original_native_key_class_counts"],sort_keys=True))
           print("Original book/chapter introduction top-level XML element names:",
                 json.dumps(transport["intro_original_top_level_element_counts"],sort_keys=True))
+          for sample in r["private_original_intro_only_osis2mod_sample_roundtrips"]:
+              print("Isolated actual original I transport proof",sample["original_native_intro_key"],
+                    "modes",json.dumps(sample["test_only_modes"],sort_keys=True),
+                    "original module unchanged",sample["original_module_unchanged"],
+                    "not a full source parity proof",not sample["original_K_I_U_full_parity_proven"])
           print("Original intro full element names and attribute names:",
                 json.dumps(transport["intro_original_full_element_name_counts"],sort_keys=True),
                 json.dumps(transport["intro_original_full_attribute_name_counts"],sort_keys=True))
