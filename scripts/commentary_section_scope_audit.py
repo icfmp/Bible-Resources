@@ -27,7 +27,9 @@ from commentary_intake import load_manifest
 from commentary_osis_rebuild_preflight import (
     NativeOSISRebuildPreflight, compare_opaque_top_with_standard_compiler_fixture,
 )
-from commentary_osis_transport_probe import isolated_osis2mod_original_sample_roundtrip
+from commentary_osis_transport_probe import (
+    isolated_osis2mod_original_sample_roundtrip, _source_visible_text,
+)
 from commentary_osis_mixed_transport_probe import (
     probe_original_mixed_transport, probe_complete_original_transport
 )
@@ -39,6 +41,7 @@ from commentary_intro_chapter_text_review import (
 from commentary_navigation_link_plan import (
     parse_native_commentary_verse_registry, UnsafeCommentaryLinkPlan,
     triage_missing_native_section_links,
+    triage_single_key_chapter_navigation,
 )
 from commentary_source_english_osis_alias import (
     read_existing_66_book_english_aliases, _canon_name
@@ -1723,6 +1726,23 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             registry, private_unrecognized_raw,
             original_chapter_intro_raw=private_intro_text_raw_by_chapter,
             original_range_stock_raw=private_range_heading_raw)
+        chapter_source_cases = witness["independent_div2_chapter_body_review"]["case_rows"]
+        chapter_intros = (
+            {
+                case["native_start"].rsplit(".",1)[0]:
+                bool(_source_visible_text(
+                    private_full_I[case["native_start"].rsplit(".",1)[0]]
+                ).strip())
+                for case in chapter_source_cases
+                if case["native_start"].rsplit(".",1)[0] in private_full_I
+            } if full_transport else None
+        )
+        chapter_navigation_review = triage_single_key_chapter_navigation(
+            occupied={key: value["sha256"] for key,value in records.items()},
+            chapter_verse_maximums=registry["chapter_maximums"],
+            independent_chapter_cases=chapter_source_cases,
+            original_chapter_intro_has_visible_prose=chapter_intros,
+        )
         # A native single-key chapter plus an independently corroborated
         # source division still needs explicit editorial signoff. These are
         # chapter-limit *measurements*, not link insertion instructions.
@@ -1776,6 +1796,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             "native_rows_with_unrecognized_heading_or_xml": unparsed,
             **result,
             "explicit_heading_native_link_candidate_preflight": index_preflight,
+            "single_key_chapter_navigation_source_review_not_approved":
+                chapter_navigation_review,
             "unrecognized_native_slot_review": unknown,
             "independent_thml_witness": witness,
             "section_heading_matching_is_heuristic": True,
