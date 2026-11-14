@@ -1118,19 +1118,28 @@ def inspect_independent_leading_range_citations(document, anomalies: list[dict],
         first, last = body.split("-", 1) if "-" in body else (body, body)
         if wanted.get(first) != last:
             continue
-        parent = node.getparent()
-        parent_type = (parent.tag.rsplit("}", 1)[-1]
-                       if parent is not None and isinstance(parent.tag, str)
-                       else "_NONE")
-        leading_in_paragraph = (
-            parent_type == "p"
-            and not (parent.text or "").strip()
-            and len(list(parent)) >= 1 and parent[0] is node
+        direct_parent = node.getparent()
+        direct_parent_type = (
+            direct_parent.tag.rsplit("}", 1)[-1]
+            if direct_parent is not None and isinstance(direct_parent.tag, str)
+            else "_NONE"
         )
-        # Source might use a section reference in an outline, or a citation
-        # before the actual passage prose. These are not interchangeable.
-        # Never use target alone as an annotation or authorial boundary.
-        tail_words = re.findall(r"\w+", (node.tail or "").casefold())
+        # CCEL ThML often nests the citation inside formatting markup.
+        # A direct p-only rule would wrongly reject a genuine lead reference.
+        paragraph = direct_parent
+        while paragraph is not None and (
+                not isinstance(paragraph.tag, str)
+                or paragraph.tag.rsplit("}", 1)[-1] != "p"):
+            paragraph = paragraph.getparent()
+        reference_words = "".join(node.itertext(with_tail=False)).strip()
+        source_text = "".join(paragraph.itertext()) if paragraph is not None else ""
+        visible = source_text.lstrip()
+        leading_in_paragraph = (
+            bool(reference_words) and bool(paragraph is not None)
+            and visible.startswith(reference_words)
+        )
+        after_ref = visible[len(reference_words):] if leading_in_paragraph else ""
+        tail_words = re.findall(r"\w+", after_ref.casefold())
         original_root = etree.fromstring(
             b"<entry>" + original_stock_raw[first] + b"</entry>",
             parser=etree.XMLParser(resolve_entities=False, no_network=True,
@@ -1141,11 +1150,9 @@ def inspect_independent_leading_range_citations(document, anomalies: list[dict],
             r"\w+", "".join(original_root.itertext()).casefold()
         )
         source_words = re.findall(
-            r"\w+", "".join(parent.itertext()).casefold()
-        ) if parent_type == "p" else []
+            r"\w+", source_text.casefold()
+        ) if paragraph is not None else []
         aligned = plain_word_alignment(source_words, stock_words) if source_words else None
-        # The long matching-run threshold intentionally requires real shared
-        # exposition, not just two matching scripture reference numerals.
         passage_body_correspondence = (
             leading_in_paragraph and len(tail_words) >= 20
             and aligned is not None
@@ -1162,7 +1169,8 @@ def inspect_independent_leading_range_citations(document, anomalies: list[dict],
             "aligned_consecutive_word_count":
                 (aligned["exact_unicode_longest_contiguous_shared_word_run_count"]
                  if aligned else None),
-            "source_markup_parent": parent_type,
+            "source_markup_parent": direct_parent_type,
+            "source_reference_inside_paragraph": paragraph is not None,
             "scripRef_is_not_scripCom": True,
         })
     cases = []
