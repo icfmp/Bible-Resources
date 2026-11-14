@@ -87,6 +87,21 @@ jobs:
               print("Chapter-size",one["chapter"],one["native_verse_max"],
                     one["independent_source_class"])
           print("Section scope triage categories:",json.dumps(r["counts"],sort_keys=True))
+          preflight=r["explicit_heading_native_link_candidate_preflight"]
+          assert preflight["status"]=="PRELIMINARY_NATIVE_INDEX_GAPS_REVIEW_REQUIRED"
+          assert preflight["source_prose_modified"] is False
+          assert preflight["compiled_binary_modified"] is False
+          assert preflight["editorial_approval"] is False
+          assert preflight["release_authorized"] is False
+          print("Original registry-checked section gap preflight:",
+                "sections",preflight["candidate_section_count"],
+                "unoccupied native keys",preflight["candidate_additional_native_target_keys"],
+                "blocked original payload collisions",
+                len(preflight["blocked_sections_with_different_existing_original_payload"]))
+          for section in preflight["candidate_sections"]:
+              print("Candidate unapproved native section",section["original_master_key"],
+                    "unoccupied targets",",".join(section["unoccupied_native_target_keys"]))
+
           unknown=r["unrecognized_native_slot_review"]
           assert unknown["total"]==r["counts"]["no_recognized_heading"]
           assert unknown["all_output_is_original_text_free_metadata"] is True
