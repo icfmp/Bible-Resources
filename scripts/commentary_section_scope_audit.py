@@ -286,7 +286,8 @@ def classify(records: dict[str, dict]) -> dict:
 
 
 def compare_independent_thml_witness(manifest: dict, sections: list[dict],
-                                     anomalies: list[dict], temp: Path) -> dict:
+                                     anomalies: list[dict], temp: Path,
+                                     unrecognized_cases: list[dict] | None = None) -> dict:
     """Compare all start/end section locations with a separately pinned ThML.
 
     Different digital editions are never automatically assumed identical;
@@ -404,10 +405,59 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
         ] += 1
         if not has_scripcom and not has_scripref:
             no_independent_range_evidence.append(s)
+    # These rows have no machine-recognized verse-range heading in stock.
+    # Inspect their independent *source annotation anchors* without deriving
+    # any new stock index or treating verse citations as section extents.
+    unrecognized_source_rows = []
+    unrecognized_source_classes = Counter()
+    processed_digests = set()
+    for row in (unrecognized_cases or []):
+        digest = row["raw_payload_sha256"]
+        if digest in processed_digests:
+            continue
+        processed_digests.add(digest)
+        ref = row["native_key"]
+        native = KEY.fullmatch(ref)
+        if native is None:
+            raise PilotError("Noncanonical unknown numbered SWORD slot in source review")
+        same_book_chapter = lambda s: (
+            KEY.fullmatch(s) is not None
+            and s.split(".")[:2] == ref.split(".")[:2]
+        )
+        com_ends = sorted(
+            (end for end in markers.get(ref, set()) if same_book_chapter(end)),
+            key=lambda end: int(end.split(".")[-1])
+        )
+        citation_ends = sorted(
+            (end for end in independent_reference_ranges.get(ref, set())
+             if same_book_chapter(end)),
+            key=lambda end: int(end.split(".")[-1])
+        )
+        source_multi = any(int(end.split(".")[-1]) > int(native.group(3))
+                           for end in com_ends)
+        cls = (
+            "SOURCE_EXPLICIT_MULTI_VERSE_SECTION" if source_multi
+            else "SOURCE_SINGLE_START_OR_NO_EXPLICIT_MULTI_VERSE_SECTION"
+        )
+        unrecognized_source_classes[cls] += 1
+        unrecognized_source_rows.append({
+            "native_start": ref,
+            "source_section_endpoints": com_ends,
+            "source_citation_endpoints_not_sections": citation_ends,
+            "source_explicit_multiverse_annotation": source_multi,
+            "only_one_native_occupied_verse_in_chapter":
+                row["number_of_occupied_native_slots_in_chapter"] == 1,
+            "classification": "CROSS_EDITION_METADATA_ONLY_NOT_A_CORRECTION",
+        })
+
     return {
         "status": "PINNED_DIFFERENT_DIGITAL_EDITION_SCOPE_COMPARISON",
         "witness_sha256": expected,
         "source_marker_rows_observed": observed,
+        "unrecognized_source_annotation_classes": dict(
+            sorted(unrecognized_source_classes.items())
+        ),
+        "unrecognized_distinct_payload_source_rows": unrecognized_source_rows,
         "source_distinct_starts": len(markers),
         "stock_start_sections_compared": len(sections),
         "source_range_agreement_counts": dict(sorted(counts.items())),
@@ -515,7 +565,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
             raise PilotError("Unrecognized heading count diverged from complete native inventory")
         witness = compare_independent_thml_witness(
             manifest, result["start_anchored_section_map"],
-            result["anomalies"], directory)
+            result["anomalies"], directory, unknown["case_rows"])
         return {
             "schema_version": 1,
             "status": "COMPLETE_NATIVE_SCAN_EDITORIAL_TRIAGE_NOT_APPROVAL",
