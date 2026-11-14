@@ -323,6 +323,9 @@ def isolated_osis2mod_original_sample_roundtrip(
     delta_classes = Counter()
     normalized_text_equal = 0
     tags_equal = 0
+    original_total_element_names = Counter()
+    compiled_total_element_names = Counter()
+    changed_element_name_entry_counts = Counter()
     delta_cases = []
     for key in sorted(matched):
         try:
@@ -331,6 +334,14 @@ def isolated_osis2mod_original_sample_roundtrip(
             delta_classes[comparison["word_sequence_relation"]] += 1
             normalized_text_equal += comparison["normalized_whitespace_visible_unicode_equal"]
             tags_equal += comparison["all_original_markup_element_names_and_counts_preserved"]
+            source_elements = Counter(comparison["original_markup_element_counts"])
+            converted_elements = Counter(comparison["compiled_markup_element_counts"])
+            original_total_element_names.update(source_elements)
+            compiled_total_element_names.update(converted_elements)
+            changed_element_name_entry_counts.update(
+                name for name in source_elements.keys() | converted_elements.keys()
+                if source_elements[name] != converted_elements[name]
+            )
             delta_cases.append({
                 "original_native_key": key,
                 "word_sequence_relation": comparison["word_sequence_relation"],
@@ -357,6 +368,12 @@ def isolated_osis2mod_original_sample_roundtrip(
         "original_vs_compiled_whitespace_normalized_visible_text_exact_matches":
             normalized_text_equal,
         "original_vs_compiled_element_name_count_exact_matches": tags_equal,
+        "original_native_element_name_total_counts_in_sample":
+            dict(sorted(original_total_element_names.items())),
+        "compiled_native_element_name_total_counts_in_sample":
+            dict(sorted(compiled_total_element_names.items())),
+        "source_to_compiled_element_name_count_changed_entry_counts":
+            dict(sorted(changed_element_name_entry_counts.items())),
         "per_original_key_text_free_delta_classes": delta_cases,
         "compiled_numbered_entry_count": parsed["actual_occupied_numbered_entry_count"],
         "compiled_introduction_entry_count_not_parity_approved": len(intros),
