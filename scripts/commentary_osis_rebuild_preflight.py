@@ -64,9 +64,12 @@ class NativeOSISRebuildPreflight:
         # A rejected frame must not advance any source inventory counter.
         self.count[kind] += 1
         if kind == "I":
-            if ref.endswith(".0.0"):
+            # libSWORD getOSISRef commonly normalizes `book.0.0` to
+            # `book` and `book.chapter.0` to `book.chapter`.
+            # Both canonical representations must be recognized.
+            if "." not in ref or ref.endswith(".0.0"):
                 self.native_intro_key_classes["book_intro_key"] += 1
-            elif ref.endswith(".0"):
+            elif re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9]\\d*(?:\\.0)?", ref):
                 self.native_intro_key_classes["chapter_intro_key"] += 1
             else:
                 self.native_intro_key_classes["other_intro_key"] += 1
@@ -79,6 +82,30 @@ class NativeOSISRebuildPreflight:
             else:
                 self.shape["opaque_top_nonempty_raw_entry"] += 1
             self.opaque_digests.add(sha256(raw).hexdigest())
+            # TOP is not a Bible verse or chapter intro; inspect only its
+            # XML/text *shape*, without attributing or discarding content.
+            if raw.strip():
+                try:
+                    parsed = etree.fromstring(
+                        b"<opaque>" + raw + b"</opaque>", self._safe_parser()
+                    )
+                    if any(isinstance(n, etree._Entity) for n in parsed.iter()):
+                        self.shape["opaque_top_unresolved_xml_entity"] += 1
+                    else:
+                        self.shape["opaque_top_valid_xml_fragment"] += 1
+                        self.shape["opaque_top_visible_nonblank_text"] += bool(
+                            "".join(parsed.itertext()).strip()
+                        )
+                        self.shape["opaque_top_visible_word_token_count"] += len(
+                            re.findall(r"\\w+", "".join(parsed.itertext()))
+                        )
+                        for element in parsed.iter():
+                            if element is parsed:
+                                continue
+                            if isinstance(element.tag, str):
+                                self.shape["opaque_top_xml_element_count"] += 1
+                except (etree.XMLSyntaxError, ValueError):
+                    self.shape["opaque_top_not_strict_xml_fragment"] += 1
             self.blockers["opaque_top_record_requires_distinct_preservation_plan"] += 1
             return
         digest = sha256(raw).hexdigest()
