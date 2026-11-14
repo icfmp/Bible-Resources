@@ -131,6 +131,9 @@ jobs:
                 json.dumps(div2.get("independent_stock_vs_source_reference_target_classes",{}),sort_keys=True))
           print("Chapter-level original source vs stock link-target totals:",
                 json.dumps(div2.get("independent_stock_vs_source_reference_target_totals",{}),sort_keys=True))
+          print("Source citation labels where CrossWire selected stock has no clickable links:",
+                json.dumps(div2.get("source_reference_labels_when_stock_has_no_link_markup",{}),
+                           sort_keys=True))
           for row in div2.get("independent_stock_vs_source_reference_target_exception_rows",[]):
               print("Review unmatched chapter citation annotation",row["native_start"],
                     "source-unpaired",row["source_target_occurrences_not_paired"],
