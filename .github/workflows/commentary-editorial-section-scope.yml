@@ -252,6 +252,13 @@ jobs:
           assert pilot["publication_authorized"] is False
           print("Introduction original native key classes:",
                 json.dumps(transport["intro_original_native_key_class_counts"],sort_keys=True))
+          print("Original book/chapter introduction top-level XML element names:",
+                json.dumps(transport["intro_original_top_level_element_counts"],sort_keys=True))
+          print("Original introduction top-level leading text classes:",
+                json.dumps(transport["intro_original_unwrapped_leading_text_presence"],sort_keys=True))
+          print("Original opaque TOP element/attribute names:",
+                json.dumps(transport["opaque_top_original_xml_element_names"],sort_keys=True),
+                json.dumps(transport["opaque_top_original_xml_attribute_names"],sort_keys=True))
           print("Repeated raw groups crossing chapters/books / intro and numbered:",
                 transport["same_raw_payload_across_chapter_group_count"],
                 transport["same_raw_payload_across_book_group_count"],
