@@ -354,6 +354,56 @@ class SourceDivisionChapterTests(unittest.TestCase):
         self.assertFalse(result["derived_authorial_section_scope_proven"])
         self.assertEqual(result["case_rows"][0]["source_h2_numeric_chapters"], [1])
 
+    def test_source_citation_target_compared_independently_of_label(self):
+        source = etree.fromstring(
+            b'<root><div1 title="Genesis"><div2><h2>Chapter 1</h2>'
+            b'<p>Study <scripRef osisRef="Bible:Exod.2.4">Exodus two</scripRef>.</p>'
+            b'</div2></div1></root>'
+        )
+        registry = {"chapter_maximums": {"Gen.1":31}}
+        rows = [{"native_key": "Gen.1.1", "first_verse_in_chapter": True,
+                 "number_of_occupied_native_slots_in_chapter": 1,
+                 "raw_payload_sha256": "a"*64}]
+        stock = {"Gen.1.1": (
+            b'<title>Chapter 1</title><p>Study '
+            b'<reference osisRef="Exod.2.4">Exodus two</reference>.</p>'
+        )}
+        report = independent_div2_chapter_body_evidence(source, registry, rows, stock)
+        result = report["case_rows"][0]["independent_reference_target_comparison"]
+        self.assertEqual(result["original_scripRef_label_count"], 1)
+        self.assertEqual(result["selected_stock_reference_element_count"], 1)
+        self.assertEqual(
+            result["original_scripRef_osisRef_work_qualifier_only_matches_in_stock"], 1
+        )
+        self.assertEqual(
+            result["original_scripRef_to_stock_text_location_classes"],
+            {"literal_label_inside_stock_reference_element": 1}
+        )
+        self.assertFalse(result["source_and_selected_stock_reference_targets_exact_ordered_match"])
+        self.assertTrue(result["nonmatching_target_values_are_not_auto_normalized_or_rewritten"])
+        self.assertNotIn("Exodus two", json.dumps(result))
+
+    def test_same_citation_label_with_wrong_destination_is_not_approved(self):
+        source = etree.fromstring(
+            b'<root><div1 title="Genesis"><div2><h2>Chapter 1</h2>'
+            b'<p>Study <scripRef osisRef="Bible:Exod.2.4">Exodus two</scripRef>.</p>'
+            b'</div2></div1></root>'
+        )
+        registry = {"chapter_maximums": {"Gen.1":31}}
+        rows = [{"native_key": "Gen.1.1", "first_verse_in_chapter": True,
+                 "number_of_occupied_native_slots_in_chapter": 1,
+                 "raw_payload_sha256": "a"*64}]
+        stock = {"Gen.1.1": (
+            b'<p>Study <reference osisRef="Gen.9.9">Exodus two</reference>.</p>'
+        )}
+        report = independent_div2_chapter_body_evidence(source, registry, rows, stock)
+        result = report["case_rows"][0]["independent_reference_target_comparison"]
+        self.assertEqual(result["original_scripRef_osisRef_work_qualifier_only_matches_in_stock"], 0)
+        self.assertEqual(result["original_scripRef_osisRef_targets_exact_value_multiset_matches_in_stock"], 0)
+        self.assertEqual(result["original_scripRef_to_stock_text_location_classes"],
+                         {"literal_label_inside_stock_reference_element": 1})
+        self.assertTrue(result["matched_label_does_not_validate_reference_target_or_edition"])
+
     def test_same_book_chapter_intro_with_numbered_comments_is_not_whole_chapter(self):
         document = etree.fromstring(
             b'<root><div1 title="Genesis"><div2><h2>Chapter 1</h2>'
