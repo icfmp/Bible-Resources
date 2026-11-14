@@ -7,9 +7,11 @@ from unittest.mock import patch
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+from lxml import etree
 from commentary_section_scope_audit import (
     heading_extent, classify, compare_independent_thml_witness,
     describe_unrecognized_heading, audit_unrecognized_slots,
+    independent_chapter_scope_evidence,
 )
 
 
@@ -146,6 +148,54 @@ class UnknownHeadingTests(unittest.TestCase):
         self.assertEqual(result["case_rows"][0]["highest_occupied_native_verse_in_chapter"], 3)
         self.assertFalse(result["unrecognized_means_missing_text_proven"])
         self.assertTrue(result["all_output_is_original_text_free_metadata"])
+
+
+class ChapterScopeEvidenceTests(unittest.TestCase):
+    def test_chapter_only_div2_is_candidate_not_editorial_approval(self):
+        source = etree.fromstring(
+            b'<root><div2>'
+            b'<scripCom osisRef="Bible:Gen.36"/>'
+            b'<h2>Chapter summary</h2><p>Whole chapter notes</p>'
+            b'</div2></root>'
+        )
+        candidates = [{
+            "native_key": "Gen.36.1", "first_verse_in_chapter": True,
+            "number_of_occupied_native_slots_in_chapter": 1
+        }]
+        result = independent_chapter_scope_evidence(source, candidates)
+        self.assertEqual(result["source_scope_candidate_classes"],
+                         {"INDEPENDENT_UNDIVIDED_CHAPTER_SCOPE_CANDIDATE": 1})
+        self.assertFalse(result["per_verse_navigation_approved"])
+
+    def test_chapter_intro_does_not_override_independent_verse_sections(self):
+        source = etree.fromstring(
+            b'<root><div2>'
+            b'<scripCom osisRef="Bible:Gen.36"/>'
+            b'<h2>Chapter summary</h2>'
+            b'<scripCom osisRef="Bible:Gen.36.1-Gen.36.5"/>'
+            b'<div><p>A specific original section</p></div>'
+            b'</div2></root>'
+        )
+        candidate = [{
+            "native_key": "Gen.36.1", "first_verse_in_chapter": True,
+            "number_of_occupied_native_slots_in_chapter": 1
+        }]
+        result = independent_chapter_scope_evidence(source, candidate)
+        self.assertEqual(result["source_scope_candidate_classes"],
+            {"CHAPTER_ANNOTATION_WITH_SECTIONS_OR_UNREVIEWED_SHAPE": 1})
+
+    def test_missing_source_chapter_annotation_fails_to_classify_scope(self):
+        source = etree.fromstring(
+            b'<root><div2><p>Some original prose</p></div2></root>'
+        )
+        candidate = [{
+            "native_key": "Gen.36.1", "first_verse_in_chapter": True,
+            "number_of_occupied_native_slots_in_chapter": 1
+        }]
+        result = independent_chapter_scope_evidence(source, candidate)
+        self.assertEqual(result["source_scope_candidate_classes"],
+                         {"NO_MATCHING_CHAPTER_ANNOTATION_IN_OTHER_EDITION": 1})
+        self.assertFalse(result["per_verse_navigation_approved"])
 
 
 class IndependentWitnessTests(unittest.TestCase):
