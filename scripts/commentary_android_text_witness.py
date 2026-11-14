@@ -183,7 +183,7 @@ def full_native_original_prose_in_real_android_webview(
     matching_dom_entries = 0
     substantial_entries = 0
     def examine(kind: str, key: str, raw: bytes) -> None:
-        nonlocal matching_entries, substantial_entries
+        nonlocal matching_entries, matching_dom_entries, substantial_entries
         if kind != "K":
             return
         words = _actual_original_authorial_words(raw) if len(raw) >= 8 else []
