@@ -56,6 +56,14 @@ jobs:
               expected=['mods.d/brjnd2024.conf']+sorted(
                   'modules/texts/ztext/brjnd2024/'+book+'.'+ext
                   for book in ('nt','ot') for ext in ('bzs','bzv','bzz'))
+              # The 0.1.1 maintenance release has its own authorized
+              # staging/finalizer. Do not run the historical 0.1.0 builder.
+              if (manifest.get('status')=='source_and_native_attested_release_candidate'
+                      and manifest.get('release_tag')=='darby-jnd-2024-0.1.1'
+                      and metadata.get('version')=='0.1.1'):
+                  print('already_attested=true',file=open(os.environ['GITHUB_OUTPUT'],'a'))
+                  print('Verified current 0.1.1 metadata route; historical 0.1.0 builder skipped')
+                  raise SystemExit(0)
               if (manifest.get('status')!='source_and_native_attested_release_candidate'
                       or manifest.get('release_tag')!='darby-jnd-2024-0.1.0'
                       or not re.fullmatch('[a-f0-9]{64}',manifest.get('release_zip_sha256',''))
