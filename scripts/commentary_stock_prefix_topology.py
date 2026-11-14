@@ -342,3 +342,95 @@ def aligned_punctuation_gap_diagnostics(source_text: str, stock_text: str) -> di
         "original_punctuation_modified": False,
         "text_or_punctuation_excerpts_exported": False,
     }
+
+
+def single_word_stock_markup_diagnostic(source_text: str, stock_raw: bytes) -> dict:
+    """Classify one casefolded Unicode-word substitution in real stock XML.
+
+    Generic, private, text-free metadata: the unmatched word, its
+    surrounding commentary, exact original bytes, and any replacement
+    candidate are NEVER emitted. One digital transcription cannot determine
+    which spelling, heading or paragraph the author intended.
+    """
+    import difflib
+    import unicodedata
+
+    if not isinstance(source_text, str):
+        raise ValueError("Original source text required")
+    root = _parse_original_stock_fragment(stock_raw)
+    compiled = "".join(root.itertext())
+    source = list(WORD.finditer(source_text.casefold()))
+    stock = list(WORD.finditer(compiled.casefold()))
+    if not source or len(source) != len(stock) or len(source) > 4000:
+        return {
+            "status": "NOT_AN_ISOLATED_ONE_WORD_SUBSTITUTION",
+            "edition_parity_approved": False,
+        }
+    differences = [
+        i for i, (a, b) in enumerate(zip(source, stock))
+        if a.group(0) != b.group(0)
+    ]
+    if len(differences) != 1:
+        return {
+            "status": "NOT_AN_ISOLATED_ONE_WORD_SUBSTITUTION",
+            "edition_parity_approved": False,
+        }
+    position = differences[0]
+    a, b = source[position].group(0), stock[position].group(0)
+    owner = None
+    start, end = stock[position].span()
+    cursor = 0
+    seen_owners = set()
+    segments = list(_top_level_segments(root))
+    if "".join(chunk for chunk, _ in segments) != compiled:
+        raise ValueError("Original compiled XML text offsets diverge from original native fragment")
+    for chunk, label in segments:
+        last = cursor + len(chunk)
+        if cursor < end and start < last:
+            seen_owners.add(label)
+        cursor = last
+    if cursor != len(compiled) or not seen_owners:
+        raise ValueError("Cannot locate changed word within original stock XML")
+    owner = next(iter(seen_owners)) if len(seen_owners) == 1 else "MULTIPLE_MARKUP_SEGMENTS"
+
+    if a.isdecimal() and b.isdecimal():
+        edit_kind = "DIFFERENT_NUMERIC_WORD"
+    elif unicodedata.normalize("NFKC", a) == unicodedata.normalize("NFKC", b):
+        edit_kind = "UNICODE_COMPATIBILITY_EQUIVALENT"
+    elif "".join(
+        ch for ch in unicodedata.normalize("NFD", a)
+        if unicodedata.category(ch) != "Mn"
+    ) == "".join(
+        ch for ch in unicodedata.normalize("NFD", b)
+        if unicodedata.category(ch) != "Mn"
+    ):
+        edit_kind = "DIACRITIC_ONLY"
+    else:
+        changes = [op for op in difflib.SequenceMatcher(
+            a=a, b=b, autojunk=False
+        ).get_opcodes() if op[0] != "equal"]
+        if len(changes) == 1:
+            op, i1, i2, j1, j2 = changes[0]
+            if op == "replace" and i2 - i1 == j2 - j1 == 1:
+                edit_kind = "ONE_CHARACTER_SUBSTITUTION"
+            elif op == "delete" and i2 - i1 == 1:
+                edit_kind = "ONE_CHARACTER_DELETION_IN_STOCK"
+            elif op == "insert" and j2 - j1 == 1:
+                edit_kind = "ONE_CHARACTER_INSERTION_IN_STOCK"
+            else:
+                edit_kind = "MULTICHARACTER_REPLACEMENT"
+        else:
+            edit_kind = "MULTIPLE_CHARACTER_EDIT_BLOCKS"
+
+    return {
+        "status": "ISOLATED_ONE_WORD_DIFFERENCE_NOT_EDITORIAL_VERDICT",
+        "original_word_index_from_zero": position,
+        "original_word_tokens_in_source_and_stock": len(source),
+        "stock_owning_top_level_xml_element": owner,
+        "difference_is_inside_xml_title": owner == "title",
+        "difference_is_inside_xml_reference": owner == "reference",
+        "one_word_edit_class": edit_kind,
+        "original_or_stock_words_disclosed": False,
+        "edition_parity_approved": False,
+        "source_or_stock_modified": False,
+    }
