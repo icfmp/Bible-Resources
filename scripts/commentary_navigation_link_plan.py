@@ -108,6 +108,86 @@ def propose_commentary_links(*, occupied: dict[str, str],
     }
 
 
+def triage_missing_native_section_links(*, occupied: dict[str, str],
+                                        valid_verse_keys: set[str],
+                                        source_heading_anomalies: list[dict]) -> dict:
+    """Safely inventory original indexed-section gaps before editorial approval.
+
+    A source heading parsed from the compiled module is not equivalent to a
+    reviewed authorial section scope. This produces **no** build-ready link
+    plan: unlike propose_commentary_links, every candidate is pending
+    independent source review and subsequent explicit editorial acceptance.
+    """
+    if (not occupied or not valid_verse_keys
+            or not isinstance(source_heading_anomalies, list)
+            or len(source_heading_anomalies) > 10000):
+        raise UnsafeCommentaryLinkPlan("Empty or unbounded original index-gap audit")
+    if any(KEY.fullmatch(key) is None or SHA256.fullmatch(digest) is None
+           for key, digest in occupied.items()):
+        raise UnsafeCommentaryLinkPlan("Original native index keys/digests are unverified")
+    if any(KEY.fullmatch(key) is None for key in valid_verse_keys):
+        raise UnsafeCommentaryLinkPlan("Original native versification is unverified")
+    candidates = []
+    claimed = set()
+    blocked = []
+    for row in source_heading_anomalies:
+        if not isinstance(row, dict):
+            raise UnsafeCommentaryLinkPlan("Unstructured native section anomaly")
+        master = row.get("start")
+        missing = row.get("missing_slots")
+        other_payload = row.get("different_payload_slots")
+        if (not isinstance(master, str) or KEY.fullmatch(master) is None
+                or master not in occupied or master not in valid_verse_keys
+                or not isinstance(missing, list) or not isinstance(other_payload, list)
+                or not all(isinstance(k, str) and KEY.fullmatch(k) for k in missing+other_payload)):
+            raise UnsafeCommentaryLinkPlan("Index gap does not authenticate a native master/target")
+        if not missing and not other_payload:
+            raise UnsafeCommentaryLinkPlan("Claimed anomaly has no missing or different original native target")
+        if len(set(missing)) != len(missing):
+            raise UnsafeCommentaryLinkPlan("A purported original gap appears more than once")
+        if any(k in claimed for k in missing):
+            raise UnsafeCommentaryLinkPlan("A missing target belongs to multiple candidate sections")
+        for key in missing:
+            if key in occupied or key not in valid_verse_keys:
+                raise UnsafeCommentaryLinkPlan("Original missing slot is occupied or outside native versification")
+        claimed.update(missing)
+        if other_payload:
+            blocked.append({
+                "original_master_key": master,
+                "status": "BLOCKED_DIFFERENT_EXISTING_COMMENTARY",
+                "occupied_different_original_keys": sorted(set(other_payload)),
+                "no_content_or_index_mutated": True,
+            })
+            continue
+        candidates.append({
+            "original_master_key": master,
+            "original_master_raw_sha256": occupied[master],
+            "unoccupied_native_target_keys": sorted(
+                missing,
+                key=lambda ref: (
+                    ref.rsplit(".", 1)[0], int(ref.rsplit(".", 1)[1])
+                )
+            ),
+            "origin": "PARSED_COMPILED_NATIVE_HEADING_NOT_AUTHORIAL_APPROVAL",
+            "source_scope_editorially_reviewed": False,
+            "standards_based_sword_links_built": False,
+        })
+    return {
+        "status": "PRELIMINARY_NATIVE_INDEX_GAPS_REVIEW_REQUIRED",
+        "candidate_section_count": len(candidates),
+        "candidate_additional_native_target_keys": sum(
+            len(row["unoccupied_native_target_keys"]) for row in candidates
+        ),
+        "blocked_sections_with_different_existing_original_payload": blocked,
+        "candidate_sections": sorted(candidates, key=lambda x: x["original_master_key"]),
+        "original_occupied_keys_preserved": len(occupied),
+        "source_prose_modified": False,
+        "compiled_binary_modified": False,
+        "editorial_approval": False,
+        "release_authorized": False,
+    }
+
+
 def parse_native_commentary_verse_registry(raw: bytes, expected_module: str) -> dict:
     """Parse read-only released-libSWORD chapter bounds, never manuscript data.
 
