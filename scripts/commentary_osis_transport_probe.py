@@ -14,6 +14,7 @@ original native entries and the independently determined editorial scopes.
 from __future__ import annotations
 
 from hashlib import sha256
+from collections import Counter
 import re
 from lxml import etree
 
@@ -167,6 +168,59 @@ def build_numbered_transport_sample(entries: list[tuple[str, bytes]],
     }
 
 
+def classify_native_osis_roundtrip_delta(original_raw: bytes, compiled_raw: bytes) -> dict:
+    """Bounded metadata-only classification of an osis2mod transport delta."""
+    from collections import Counter
+    from commentary_nonlink_word_alignment import plain_word_alignment
+
+    original_text = _source_visible_text(original_raw)
+    compiled_text = _source_visible_text(compiled_raw)
+    source_words = re.findall(r"\w+", original_text.casefold())
+    compiled_words = re.findall(r"\w+", compiled_text.casefold())
+    if len(source_words) > 200000 or len(compiled_words) > 200000:
+        raise ValueError("Oversize compiled commentary word comparison")
+    if source_words == compiled_words:
+        category = "EXACT_ORIGINAL_WORD_SEQUENCE"
+    else:
+        aligned = plain_word_alignment(source_words, compiled_words)
+        if aligned["original_plain_words_not_matched_in_exact_order"] == 0:
+            category = "ALL_ORIGINAL_WORDS_IN_ORDER_WITH_ADDITIONAL_COMPILED_WORDS"
+        elif aligned["stock_plain_words_not_matched_in_exact_order"] == 0:
+            category = "COMPILED_WORDS_A_SUBSEQUENCE_OF_ORIGINAL"
+        else:
+            category = "MISSING_OR_REORDERED_OR_CHANGED_WORDS"
+    def element_counts(raw):
+        root = etree.fromstring(b"<fragment>" + raw + b"</fragment>",
+                              parser=_strict_parser())
+        result = Counter()
+        for node in root.iter():
+            if node is root or not isinstance(node.tag, str):
+                continue
+            result[node.tag.rsplit("}", 1)[-1]] += 1
+        return result
+    original_tags = element_counts(original_raw)
+    compiled_tags = element_counts(compiled_raw)
+    return {
+        "source_original_unfiltered_raw_bytes": len(original_raw),
+        "compiled_candidate_unfiltered_raw_bytes": len(compiled_raw),
+        "source_original_visible_text_characters": len(original_text),
+        "compiled_visible_text_characters": len(compiled_text),
+        "source_original_unicode_word_tokens": len(source_words),
+        "compiled_unicode_word_tokens": len(compiled_words),
+        "word_sequence_relation": category,
+        "normalized_whitespace_visible_unicode_equal": (
+            " ".join(original_text.split()) == " ".join(compiled_text.split())
+        ),
+        "all_original_markup_element_names_and_counts_preserved": (
+            original_tags == compiled_tags
+        ),
+        "original_markup_element_counts": dict(sorted(original_tags.items())),
+        "compiled_markup_element_counts": dict(sorted(compiled_tags.items())),
+        "original_xml_bytes_modified": original_raw != compiled_raw,
+        "source_prose_and_markup_parity_approved": False,
+    }
+
+
 def isolated_osis2mod_original_sample_roundtrip(
     entries: list[tuple[str, bytes]], *, scratch, native_raw_binary,
     osis2mod_binary="osis2mod", work_id="BRTransportProbe"
@@ -266,9 +320,27 @@ def isolated_osis2mod_original_sample_roundtrip(
     exact_bytes = sum(original[key] == rebuilt[key] for key in matched)
     exact_visible = 0
     unparseable_candidate = 0
-    for key in matched:
+    delta_classes = Counter()
+    normalized_text_equal = 0
+    tags_equal = 0
+    delta_cases = []
+    for key in sorted(matched):
         try:
             exact_visible += _source_visible_text(original[key]) == _source_visible_text(rebuilt[key])
+            comparison = classify_native_osis_roundtrip_delta(original[key], rebuilt[key])
+            delta_classes[comparison["word_sequence_relation"]] += 1
+            normalized_text_equal += comparison["normalized_whitespace_visible_unicode_equal"]
+            tags_equal += comparison["all_original_markup_element_names_and_counts_preserved"]
+            delta_cases.append({
+                "original_native_key": key,
+                "word_sequence_relation": comparison["word_sequence_relation"],
+                "source_word_count": comparison["source_original_unicode_word_tokens"],
+                "compiled_word_count": comparison["compiled_unicode_word_tokens"],
+                "source_markup_elements": comparison["original_markup_element_counts"],
+                "compiled_markup_elements": comparison["compiled_markup_element_counts"],
+                "normalized_whitespace_text_identical":
+                    comparison["normalized_whitespace_visible_unicode_equal"],
+            })
         except ValueError:
             unparseable_candidate += 1
     return {
@@ -281,6 +353,11 @@ def isolated_osis2mod_original_sample_roundtrip(
         "original_raw_xml_exact_byte_matches": exact_bytes,
         "original_raw_xml_visible_unicode_text_matches": exact_visible,
         "compiled_entries_unparseable_as_original_fragments": unparseable_candidate,
+        "original_vs_compiled_word_sequence_classes": dict(sorted(delta_classes.items())),
+        "original_vs_compiled_whitespace_normalized_visible_text_exact_matches":
+            normalized_text_equal,
+        "original_vs_compiled_element_name_count_exact_matches": tags_equal,
+        "per_original_key_text_free_delta_classes": delta_cases,
         "compiled_numbered_entry_count": parsed["actual_occupied_numbered_entry_count"],
         "compiled_introduction_entry_count_not_parity_approved": len(intros),
         "compiled_opaque_top_entry_count_not_parity_approved": len(top),
