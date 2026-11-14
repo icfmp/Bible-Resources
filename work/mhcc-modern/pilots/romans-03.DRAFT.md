@@ -19,37 +19,79 @@ issue: "https://github.com/icfmp/Bible-Resources/issues/270"
 
 ## Objections answered (verses 1–8)
 
-The law could not save people while they remained in sin or deliver them from it, but it gave the Jews advantages in obtaining salvation. Their appointed ordinances, instruction in the knowledge and worship of the true God, and the many favors shown to Abraham's descendants were all means of grace. No doubt they helped bring many to conversion. Above all, the Scriptures were entrusted to them. To possess God's word and his ordinances is a people's greatest blessing.
+The law could not save people while they remained in sin, or free them from it. Yet it gave the Jews real advantages in seeking salvation.
 
-Yet God's promises are made only to believers. The unbelief of some—even of many who profess faith—cannot cancel his faithfulness. He will fulfill his promises to his people and bring his threatened judgment upon unbelievers. The fact that God will judge the world ought to silence every doubt and accusation concerning his justice. The wickedness and stubborn unbelief of the Jews showed humanity's need for the righteousness of God received by faith, as well as God's justice in punishing sin.
+They had religious ordinances, knowledge of the true God and his worship, and many blessings given to Abraham's descendants. All these were means of grace. No doubt they helped bring many people to conversion.
 
-“Let us do evil so that good may come” is more often found in sinners' hearts than on their lips; few openly defend their sinful ways in those terms. The believer knows that obedience is his responsibility, while outcomes belong to God. He must not commit even one sin or tell even one lie in the hope—or even with the assurance—that God might thereby glorify himself. Anyone who speaks and acts this way is justly condemned.
+Above all, the Scriptures were entrusted to them. To possess God's word and his ordinances is a people's greatest blessing.
+
+Yet God's promises are made to believers. The unbelief of some—even of many who profess faith—cannot cancel his faithfulness.
+
+God will keep his promises to his people. He will also carry out his warnings against unbelief. The fact that he will judge the world should silence accusations against his justice.
+
+The Jews' wickedness and stubborn unbelief showed both our need for God's righteousness through faith and God's justice in punishing sin.
+
+“Let us do evil so that good may come.” This thought lives in sinners' hearts more often than they admit it aloud. Few openly defend wrongdoing in those terms.
+
+But believers know that obedience is their responsibility, while the outcome belongs to God.
+
+We must not commit even one sin or tell even one lie in the hope that God will be glorified by it—not even if we are sure that he will. Those who speak and act this way deserve condemnation.
 
 ## All humanity is under sin (verses 9–18)
 
-Once again, all humanity is shown to bear the guilt of sin as a burden and to live under sin's rule and dominion, enslaved to do evil. Several Old Testament passages make this clear. They describe the corrupt and depraved condition of all people until grace restrains or transforms them.
+All people stand under the guilt of sin. Sin also rules over them, enslaving them to do evil.
 
-However great our privileges may be, these passages also describe multitudes who call themselves Christians. Their principles and conduct show that there is no fear of God before their eyes. And where there is no fear of God, no good can be expected.
+Several Old Testament passages describe this corruption. They show what people are like until God's grace restrains or transforms them.
+
+These words also describe many who call themselves Christians, whatever privileges they may have. Their beliefs and conduct reveal that they have no fear of God.
+
+And where there is no fear of God, no good can be expected.
 
 ## No justification by works of the law (verses 19–20)
 
-Seeking justification through works of the law is useless. Everyone must plead guilty. To be *guilty before God* is a dreadful thing, for no one can be justified by a law that condemns him for breaking it. The corruption of our nature forever rules out justification by our own works.
+Trying to be justified by works of the law is useless. Everyone must plead guilty.
+
+To stand guilty before God is a dreadful thing. The law we have broken cannot declare us righteous.
+
+Our corrupt nature rules out any hope of justification through our own works.
 
 ## God's righteousness through faith in Christ (verses 21–26)
 
-Must guilty people remain under God's wrath? Is the wound forever incurable? No. Blessed be God, another way has been opened to us. It is the righteousness of God: a righteousness that he ordains, provides, and accepts. It is received through faith in Jesus Christ, whose name signifies an anointed Savior.
+Must guilty people remain under God's wrath? Is their wound beyond healing?
 
-Justifying faith looks to Christ as Savior in all three of his anointed offices: Prophet, Priest, and King. It trusts him, receives him, and holds fast to him. In all these respects Jews and Gentiles are equally welcome to God through Christ. There is no distinction. His righteousness comes upon everyone who believes. It is not merely offered to them but placed upon them like a crown or a robe. This is free grace, sheer mercy; nothing in us deserves such favor.
+No. Blessed be God, another way has opened to us.
 
-This righteousness comes to us freely, but Christ purchased it and paid its price. Faith looks especially to Christ's blood, by which atonement was made. In all this God declares his righteousness. That nothing less than Christ's blood could satisfy for sin makes plain how much God hates it. Nor would it be consistent with his justice to demand the debt again after the Surety has paid it and God has accepted that payment in full satisfaction.
+God provides the righteousness we need. He ordains it, supplies it and accepts it. We receive it through faith in Jesus Christ, whose name signifies an anointed Savior.
+
+Justifying faith looks to Christ as Savior in all three of his anointed offices: Prophet, Priest and King. It trusts him, receives him and holds fast to him.
+
+Jews and Gentiles are equally welcome to God through Christ. There is no distinction.
+
+Christ's righteousness is not merely offered to those who believe. It is placed upon them, like a crown or a robe.
+
+This is free grace, pure mercy. Nothing in us deserves such favor.
+
+The righteousness is given freely, but Christ paid its price. Faith looks especially to his blood, through which atonement was made.
+
+Here God reveals his righteousness. Nothing less than Christ's blood could satisfy for sin. That shows how deeply God hates it.
+
+Once the Surety has paid the debt, and God has accepted that payment in full, justice cannot demand that the debt be paid a second time.
 
 ## Faith excludes boasting but does not set aside the law (verses 27–31)
 
-God intends the great work of justifying and saving sinners, from beginning to end, to leave no room for boasting. If we were saved by our own works, boasting would not be excluded. But justification by faith excludes it forever.
+God's work in justifying and saving sinners leaves no room for boasting, from beginning to end.
 
-Yet believers are not left without law. Faith itself is a law, an active grace wherever it is genuine. In justification, faith is not regarded as an act of obedience or as a good work. Rather, it forms the relationship between Christ and the sinner, making it fitting for the believer to be pardoned and justified for the Savior's sake. The unbeliever, who is not united or related to Christ in this way, remains under condemnation.
+If we were saved by our own works, boasting would remain possible. Justification by faith shuts it out completely.
 
-The law is still useful: it convicts us concerning the past and directs us concerning the future. Although we cannot be saved by it as a covenant, we acknowledge and submit to it as a rule in the hand of the Mediator.
+Yet believers are not left without law. Faith itself is a law and an active grace wherever it is genuine.
+
+When it comes to justification, faith is not counted as an act of obedience or as a good work. Instead, it establishes a relationship between Christ and the sinner.
+
+Because of that relationship, the believer is pardoned and justified for the Savior's sake. Without it, the unbeliever remains under condemnation.
+
+The law still has its place. It convicts us concerning the past and guides us for the future.
+
+We cannot be saved by the law as a covenant. Yet we acknowledge it as our rule under the Mediator.
 
 ---
 
