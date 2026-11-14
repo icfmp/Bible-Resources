@@ -135,8 +135,16 @@ def audit_unrecognized_slots(records: dict[str, dict]) -> dict:
     """Classify each row once and detect duplicates without guessing ranges."""
     from collections import defaultdict
     hash_refs = defaultdict(list)
+    chapter_refs = defaultdict(list)
     for ref, row in records.items():
         hash_refs[row["sha256"]].append(ref)
+        match = KEY.fullmatch(ref)
+        if match is not None:
+            chapter_refs[(match.group(1), int(match.group(2)))].append(
+                (int(match.group(3)), ref)
+            )
+    for chapter in chapter_refs.values():
+        chapter.sort()
     categories = Counter()
     books = defaultdict(Counter)
     rows = []
@@ -147,6 +155,11 @@ def audit_unrecognized_slots(records: dict[str, dict]) -> dict:
         if profile is None:
             raise PilotError("Original unrecognized stock payload was not profiled")
         linked_refs = hash_refs[item["sha256"]]
+        key = KEY.fullmatch(ref)
+        if key is None:
+            raise PilotError("Unrecognized slot is not a canonical numbered VerseKey")
+        chapter = chapter_refs[(key.group(1), int(key.group(2)))]
+        chapter_digests = {records[k]["sha256"] for _, k in chapter}
         shared_with_recognized = [
             key for key in linked_refs
             if records[key].get("heading") is not None
@@ -158,7 +171,11 @@ def audit_unrecognized_slots(records: dict[str, dict]) -> dict:
             "same_raw_payload_slot_count": len(linked_refs),
             "same_payload_with_recognized_heading": bool(shared_with_recognized),
             "same_payload_with_unrecognized_heading": len(linked_refs) > 1,
-            "first_verse_in_chapter": bool(ref.endswith(".1")),
+            "first_verse_in_chapter": int(key.group(3)) == 1,
+            "number_of_occupied_native_slots_in_chapter": len(chapter),
+            "number_of_distinct_native_payloads_in_chapter": len(chapter_digests),
+            "highest_occupied_native_verse_in_chapter": chapter[-1][0],
+            "source_chapter_verse_count_verified": False,
             "xml_title_present": profile["has_title"],
             "visible_nonempty": profile.get("visible_nonempty", False),
         }
@@ -173,6 +190,12 @@ def audit_unrecognized_slots(records: dict[str, dict]) -> dict:
         },
         "shares_content_with_recognized_heading": sum(
             row["same_payload_with_recognized_heading"] for row in rows
+        ),
+        "first_verse_entries": sum(row["first_verse_in_chapter"] for row in rows),
+        "single_occupied_slot_chapters_among_unknown": sum(
+            row["first_verse_in_chapter"]
+            and row["number_of_occupied_native_slots_in_chapter"] == 1
+            for row in rows
         ),
         "distinct_native_raw_payload_hashes": len({row["raw_payload_sha256"] for row in rows}),
         "case_rows": rows,
