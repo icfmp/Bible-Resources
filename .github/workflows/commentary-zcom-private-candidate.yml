@@ -45,6 +45,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # Stock candidate imports the existing lxml-based strict ZIP
+          # verifier. Install pinned project requirements before tests.
+          python -m pip install -r requirements.txt
           python -m unittest discover -s tests -p 'test_promote_sword_preview.py' -v
           python -m unittest discover -s tests -p 'test_commentary_stock_candidate.py' -v
       - name: Install independent real SWORD library and diatheke
