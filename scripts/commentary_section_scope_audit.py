@@ -24,7 +24,9 @@ import zipfile
 from lxml import etree
 
 from commentary_intake import load_manifest
-from commentary_osis_rebuild_preflight import NativeOSISRebuildPreflight
+from commentary_osis_rebuild_preflight import (
+    NativeOSISRebuildPreflight, compare_opaque_top_with_standard_compiler_fixture,
+)
 from commentary_osis_transport_probe import isolated_osis2mod_original_sample_roundtrip
 from commentary_navigation_link_plan import (
     parse_native_commentary_verse_registry, UnsafeCommentaryLinkPlan,
@@ -1226,7 +1228,8 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
 
 
 def audit(resource_id: str, index_binary: Path, raw_binary: Path,
-          *, transport_sample_chapters: tuple[str, ...] = ()) -> dict:
+          *, transport_sample_chapters: tuple[str, ...] = (),
+          synthetic_intro_native_stream: Path | None = None) -> dict:
     """Use exact SHA-pinned official stock, existing independently proved readers."""
     manifest = load_manifest(resource_id)
     if (len(transport_sample_chapters) > 6
@@ -1289,6 +1292,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
         temporary_original_sample_raw = []
         original_sample_chapter_set = set(transport_sample_chapters)
         osis_rebuild_preflight = NativeOSISRebuildPreflight()
+        original_opaque_top_records = []
         unparsed = 0
         process = None
         try:
@@ -1302,6 +1306,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 nonlocal unparsed
                 rows.append((kind, ref))
                 osis_rebuild_preflight.observe(kind, ref, raw)
+                if kind == "U":
+                    original_opaque_top_records.append(raw)
                 if kind != "K":
                     return
                 if ref.rsplit(".", 1)[0] in original_sample_chapter_set:
@@ -1334,6 +1340,23 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
         original_osis_rebuild_feasibility = osis_rebuild_preflight.report(
             expected_count=summary["all_actual_raw_entries_scanned"]
         )
+        synthetic_opaque_top_comparison = None
+        if synthetic_intro_native_stream is not None:
+            if (not synthetic_intro_native_stream.is_file()
+                    or synthetic_intro_native_stream.is_symlink()
+                    or synthetic_intro_native_stream.stat().st_size > 16 * 1024 * 1024):
+                raise PilotError("Unverified private synthetic introduction raw stream")
+            synthetic_opaque = []
+            def collect_synthetic(kind, key, raw):
+                if kind == "U":
+                    synthetic_opaque.append(raw)
+            with synthetic_intro_native_stream.open("rb") as stream:
+                parse_native_raw_corpus(stream, on_entry=collect_synthetic)
+            synthetic_opaque_top_comparison = (
+                compare_opaque_top_with_standard_compiler_fixture(
+                    original_opaque_top_records, synthetic_opaque
+                )
+            )
         expected_raw = manifest.get("native_raw_corpus_sha256")
         actual_raw = summary["all_native_raw_entries_ordered_sha256"]
         if not expected_raw or expected_raw != actual_raw:
@@ -1401,6 +1424,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             "native_intro_rows": len(intros), "native_top_rows": len(top),
             "native_full_key_crosscheck": proof["exact_all_occupied_stock_keys_read_and_crosschecked"],
             "original_osis_rebuild_structure_preflight": original_osis_rebuild_feasibility,
+            "synthetic_compiler_opaque_top_original_exact_byte_comparison":
+                synthetic_opaque_top_comparison,
             "private_numbered_only_osis2mod_sample_roundtrip": sample_probe,
             "native_rows_with_unrecognized_heading_or_xml": unparsed,
             **result,
@@ -1420,6 +1445,8 @@ def main(argv=None) -> int:
     parser.add_argument("--resource-id", required=True)
     parser.add_argument("--temporary-numbered-sample-chapters", nargs="*", default=[],
                         help="Read-only selected original chapters, temporary private OSIS conversion")
+    parser.add_argument("--synthetic-intro-native-stream", type=Path,
+                        help="Optional invented standalone OSIS compilation raw stream, compare TOP bytes only")
     parser.add_argument("--native-index-binary", type=Path, required=True)
     parser.add_argument("--native-raw-binary", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
@@ -1427,7 +1454,8 @@ def main(argv=None) -> int:
     try:
         result = audit(
             args.resource_id, args.native_index_binary, args.native_raw_binary,
-            transport_sample_chapters=tuple(args.temporary_numbered_sample_chapters)
+            transport_sample_chapters=tuple(args.temporary_numbered_sample_chapters),
+            synthetic_intro_native_stream=args.synthetic_intro_native_stream
         )
         code = 0
     except (OSError, RuntimeError, ValueError, zipfile.BadZipFile, RawCorpusError) as exc:
