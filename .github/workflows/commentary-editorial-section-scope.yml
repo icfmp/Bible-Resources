@@ -5,7 +5,9 @@ on:
     paths:
       - '.github/workflows/commentary-editorial-section-scope.yml'
       - 'scripts/commentary_section_scope_audit.py'
+      - 'scripts/commentary_osis_rebuild_preflight.py'
       - 'tests/test_commentary_section_scope_audit.py'
+      - 'tests/test_commentary_osis_rebuild_preflight.py'
       - 'scripts/commentary_navigation_link_plan.py'
       - 'tests/test_commentary_navigation_link_plan.py'
       - 'scripts/sword_native_commentary_index.cpp'
@@ -39,6 +41,7 @@ jobs:
           python -m pip install -r requirements.txt
           python -m unittest discover -s tests -p 'test_commentary_section_scope_audit.py' -v
           python -m unittest discover -s tests -p 'test_commentary_navigation_link_plan.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_osis_rebuild_preflight.py' -v
       - name: Install stable upstream native SWORD library
         run: |
           set -euo pipefail
@@ -169,6 +172,29 @@ jobs:
           assert r["original_text_logged_or_published"] is False
           assert r["original_sword_changed"] is False
           print("Native slots:",r["native_numbered_rows"],"intros:",r["native_intro_rows"])
+          transport=r["original_osis_rebuild_structure_preflight"]
+          assert transport["status"]=="COMPLETE_NATIVE_OSIS_WRAPPER_PREFLIGHT_NOT_A_REBUILD"
+          assert transport["raw_entries_observed"]==(
+              r["native_numbered_rows"]+r["native_intro_rows"]+r["native_top_rows"])
+          assert transport["compiled_osis_to_stock_byte_parity_proven"] is False
+          assert transport["original_content_or_module_changed"] is False
+          assert transport["publication_authorized"] is False
+          print("Real original XML-to-OSIS-wrapper feasibility observed entries:",
+                transport["raw_entries_observed"],
+                "original-kind-counts",json.dumps(transport["raw_record_kinds"],sort_keys=True),
+                "distinct bodies",transport["unique_nonopaque_payload_sha256_count"])
+          print("OSIS wrapper original element/text structure observations:",
+                json.dumps(transport["original_markup_shape_counts"],sort_keys=True))
+          print("OSIS wrapper blockers / unhandled source structure:",
+                json.dumps(transport["blocking_or_unresolved_structure_counts"],sort_keys=True))
+          print("OSIS source local element names:",
+                json.dumps(transport["original_element_counts_by_name"],sort_keys=True))
+          print("Opaque TOP requiring explicit preservation:",
+                transport["opaque_top_distinct_digest_count"])
+          print("Repeated raw groups crossing chapters/books / intro and numbered:",
+                transport["same_raw_payload_across_chapter_group_count"],
+                transport["same_raw_payload_across_book_group_count"],
+                transport["same_raw_payload_shared_by_intro_and_numbered_keys_count"])
           registry=r["native_versification_registry"]
           print("Native versification registry", registry["name"],
                 "chapters",registry["canonical_chapters"],
