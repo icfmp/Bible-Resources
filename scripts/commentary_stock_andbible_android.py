@@ -165,6 +165,35 @@ def _start_bounded_android_import(module_id: str, title: str) -> dict:
     raise PilotError("Stable AndBible import UI not established after bounded recovery")
 
 
+def _dismiss_verified_official_stable_notice(
+    module_id: str, title: str, context: dict,
+) -> str:
+    """Dismiss only the real pinned AndBible stable update notice, if seen.
+
+    MainBibleActivity.showStableNotice() in production-1117 explicitly
+    supplies *both* Dismiss and Dismiss until next update buttons. Require
+    their real pairing, actual AndBible package and exactly two active
+    clickable app-modal Buttons before using the persistent safe option.
+    A resumed activity alone cannot approve any dismissal or reader test.
+    """
+    if not (context["main_bible_reader_activity_resumed"]
+            and not context["known_reader_root_resource_ids_visible"]
+            and context["ui_hierarchy_webview_count"] == 0
+            and context["ui_hierarchy_package_class_counts"]["andbible"] >= 10
+            and context["ui_hierarchy_framework_class_counts"]["Button"] == 2
+            and context["ui_hierarchy_enabled_clickable_node_count"] == 2
+            and set(context["known_allowlisted_ui_actions_visible"]) ==
+            {"DISMISS", "DISMISS UNTIL NEXT UPDATE"}):
+        return "not_exact_verified_official_stable_notice"
+    snap = _screen(module_id, title)
+    choices = {x["action"] for x in snap["controls"]}
+    if not {"DISMISS", "DISMISS UNTIL NEXT UPDATE"} <= choices:
+        return "notice_changed_before_safe_click"
+    if _tap(snap["controls"], ("DISMISS UNTIL NEXT UPDATE",)) is None:
+        return "notice_safe_action_unavailable"
+    return "official_stable_update_notice_dismissed_until_update"
+
+
 def _attempt_commentary_toolbar_selection(module_id: str, title: str) -> dict:
     """Use the reader toolbar's actual resource-id to select EXACT MHCC (en).
 
@@ -600,6 +629,10 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
         identity_after_restart = after_restart["reader_module_metadata_detected"]
         focus_after_restart = _app_focus_witness()
         reader_context_after_restart = _reader_context_witness(module_id, title)
+        stable_notice_action = _dismiss_verified_official_stable_notice(
+            module_id, title, reader_context_after_restart,
+        )
+        reader_context_after_notice = _reader_context_witness(module_id, title)
         # Follow the user-observed commentary books icon in the real reader
         # toolbar; this tests selection instead of guessing a deep link.
         toolbar_probe = _attempt_commentary_toolbar_selection(module_id, title)
@@ -652,8 +685,10 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
             "android_application_foreground_after_deeplink": bool(focus_after_link),
             "android_sample_reference_deeplink_attempted": True,
             "android_commentary_toolbar_selection": toolbar_probe,
+            "official_stable_update_notice_action": stable_notice_action,
             "android_reader_context_by_phase": {
                 "after_app_restart": reader_context_after_restart,
+                "after_verified_notice_action": reader_context_after_notice,
                 "after_commentary_toolbar_attempt": reader_context_after_toolbar,
             },
             "android_documented_intent_request_accepted": intent_accepted,
