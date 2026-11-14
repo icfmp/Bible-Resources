@@ -473,6 +473,8 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
             "case_rows": [], "scope_authorized": False
         }
     source_chapters = {}
+    explicit_source_chapters = {}
+    ambiguous_source_heading_chapters = set()
     book_classes = Counter()
     book_evidence_rows = []
     for (div1, chapters), code in zip(chapters_div1, canonical_books):
@@ -573,7 +575,19 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
                     "".join(div2.itertext()).encode("utf-8")
                 ).hexdigest(),
                 "source_div2_original_text_retained": True,
+                "source_div2_ordinal": chapter_number,
             }
+            if (identity == "SOURCE_CHAPTER_COUNT_DIFFERS_FROM_NATIVE_REGISTRY"
+                    and candidates == {code} and annotated_books == {code}
+                    and len(heading_chapter_numbers) == 1):
+                declared = next(iter(heading_chapter_numbers))
+                target = f"{code}.{declared}"
+                if (target in chapter_maximums
+                        and marker_chapter_references <= {target}):
+                    if target in explicit_source_chapters:
+                        ambiguous_source_heading_chapters.add(target)
+                    else:
+                        explicit_source_chapters[target] = source_chapters[chapter]
     cases = []
     classes = Counter()
     candidates = [
@@ -584,24 +598,46 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
     for row in candidates:
         chapter = row["native_key"].rsplit(".", 1)[0]
         source = source_chapters.get(chapter)
+        alignment_method = "SOURCE_NATIVE_DIV2_ORDINAL_AND_BOOK"
+        if (source is not None and
+                source["book_identity_class"] == "SOURCE_CHAPTER_COUNT_DIFFERS_FROM_NATIVE_REGISTRY"):
+            source = (
+                explicit_source_chapters.get(chapter)
+                if chapter not in ambiguous_source_heading_chapters else None
+            )
+            alignment_method = "EXPLICIT_NUMERIC_SOURCE_CHAPTER_HEADING"
         if source is None:
-            classification = "NO_CORRESPONDING_SOURCE_DIV2"
+            classification = "NO_SAFE_SOURCE_DIV2_FOR_NATIVE_CHAPTER"
         elif source["book_identity_class"] not in {
             "SOURCE_BOOK_TITLE_AND_MARKERS_MATCH",
             "SOURCE_BOOK_TITLE_MATCH",
-            "SOURCE_BOOK_MARKERS_MATCH"
+            "SOURCE_BOOK_MARKERS_MATCH",
+            "SOURCE_CHAPTER_COUNT_DIFFERS_FROM_NATIVE_REGISTRY"
         }:
             classification = "SOURCE_BOOK_OR_CHAPTER_ALIGNMENT_NEEDS_REVIEW"
+        elif source["book_identity_class"] == "SOURCE_CHAPTER_COUNT_DIFFERS_FROM_NATIVE_REGISTRY" and (
+            alignment_method != "EXPLICIT_NUMERIC_SOURCE_CHAPTER_HEADING"
+        ):
+            classification = "SOURCE_CHAPTER_COUNT_UNREVIEWED"
+        elif source["source_h2_explicit_numeric_chapters"] and (
+            int(chapter.rsplit(".", 1)[1])
+            not in source["source_h2_explicit_numeric_chapters"]
+        ):
+            classification = "SOURCE_HEADING_CHAPTER_CONFLICT"
         elif source["source_numbered_section_marker_count"] > 0:
             classification = "SOURCE_DIV2_HAS_INDEPENDENT_VERSE_SECTIONS"
         elif source["source_nonempty_paragraph_count"] == 0:
             classification = "SOURCE_DIV2_NO_NONEMPTY_COMMENTARY_PARAGRAPHS"
+        elif alignment_method == "EXPLICIT_NUMERIC_SOURCE_CHAPTER_HEADING":
+            classification = "SOURCE_DIV2_UNDIVIDED_EXPLICIT_HEADING_CANDIDATE"
         else:
             classification = "SOURCE_DIV2_UNDIVIDED_CHAPTER_BODY_CANDIDATE"
         classes[classification] += 1
         cases.append({
             "native_start": row["native_key"],
             "source_div2_structure_class": classification,
+            "source_chapter_alignment_method": alignment_method,
+            "source_div2_original_ordinal": source["source_div2_ordinal"] if source else None,
             "source_chapter_marker_count": source["source_chapter_marker_count"] if source else 0,
             "source_numbered_marker_count": source["source_numbered_section_marker_count"] if source else 0,
             "source_nonempty_paragraph_count": source["source_nonempty_paragraph_count"] if source else 0,
@@ -619,6 +655,7 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
         "native_book_count": len(canonical_books),
         "book_alignment_evidence_classes": dict(sorted(book_classes.items())),
         "book_alignment_evidence_rows": book_evidence_rows,
+        "ambiguous_original_numeric_chapter_headings": sorted(ambiguous_source_heading_chapters),
         "reviewed_registry_evidence": alias_registry_meta,
         "candidate_classes": dict(sorted(classes.items())),
         "case_rows": cases,
