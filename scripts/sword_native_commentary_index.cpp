@@ -58,8 +58,8 @@ int main(int argc, char** argv) {
                 if (chapterRef != lastRegistryChapter) {
                     const int verseMax = key.getVerseMax();
                     if (verseMax < 1 || verseMax > 1000) return 13;
-                    std::cout << "R\\t" << chapterRef << '\\t'
-                              << verseMax << '\\n';
+                    std::cout << "R\t" << chapterRef << '\t'
+                              << verseMax << '\n';
                     lastRegistryChapter = chapterRef;
                     ++registryChapterCount;
                     registryVerseCount += static_cast<unsigned long>(verseMax);
@@ -86,8 +86,8 @@ int main(int argc, char** argv) {
     }
     if (registryMode) {
         if (registryChapterCount == 0 || registryVerseCount == 0) return 14;
-        std::cout << "S\\t" << registryChapterCount << '\\t'
-                  << registryVerseCount << '\\n';
+        std::cout << "S\t" << registryChapterCount << '\t'
+                  << registryVerseCount << '\n';
         return std::cout.good() ? 0 : 15;
     }
     if (numberedCount == 0) return 10;
