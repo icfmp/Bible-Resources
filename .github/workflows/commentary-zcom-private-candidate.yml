@@ -25,10 +25,17 @@ concurrency:
 
 jobs:
   full-private-zcom-candidate:
+    # Both a diagnostic-only ID and the proposed eventual public ID are
+    # tested; neither may be shipped or uploaded from this workflow.
+    strategy:
+      fail-fast: false
+      matrix:
+        candidate_id: [BRMHCCReview, BRMHCC]
     runs-on: ubuntu-24.04
     timeout-minutes: 18
     env:
       RESOURCE_ID: ${{ github.event.inputs.resource_id || 'mhcc-crosswire' }}
+      CANDIDATE_ID: ${{ matrix.candidate_id }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -38,6 +45,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # Stock candidate imports the existing lxml-based strict ZIP
+          # verifier. Install pinned project requirements before tests.
+          python -m pip install -r requirements.txt
           python -m unittest discover -s tests -p 'test_promote_sword_preview.py' -v
           python -m unittest discover -s tests -p 'test_commentary_stock_candidate.py' -v
       - name: Install independent real SWORD library and diatheke
@@ -62,7 +72,7 @@ jobs:
           set -euo pipefail
           python scripts/commentary_stock_candidate.py \
             --resource-id "$RESOURCE_ID" \
-            --candidate-id BRMHCCReview \
+            --candidate-id "$CANDIDATE_ID" \
             --native-raw-binary "$RUNNER_TEMP/commentary-private-native-raw" \
             --reader diatheke \
             --report "$RUNNER_TEMP/commentary-private-candidate-proof.json"
@@ -76,8 +86,12 @@ jobs:
           p=Path(os.environ["RUNNER_TEMP"])/"commentary-private-candidate-proof.json"
           d=json.loads(p.read_text())
           assert d["status"]=="exact_original_zCom_payload_private_candidate_full_native_roundtrip_verified"
-          assert d["private_candidate_module_id"]=="BRMHCCReview"
+          assert d["private_candidate_module_id"]==os.environ["CANDIDATE_ID"]
           assert d["upstream_sword_original_module_id"]=="MHCC"
+          assert d["private_candidate_module_id"] != d["upstream_sword_original_module_id"]
+          # Intended future release label only; still private and blocked.
+          if d["private_candidate_module_id"] == "BRMHCC":
+              assert d["private_candidate_package_bytes"] > 100000
           assert d["all_original_SWORD_compressed_files_byte_preserved"] is True
           assert d["original_metadata_only_module_identity_and_data_path_changed"] is True
           assert d["complete_stock_and_candidate_native_raw_corpus_sha256_equal"] is True
@@ -102,7 +116,7 @@ jobs:
       - name: Upload only source/content hashes and counts, NEVER the candidate module
         uses: actions/upload-artifact@v4
         with:
-          name: commentary-zcom-private-proof-${{ github.run_id }}
+          name: commentary-zcom-private-proof-${{ matrix.candidate_id }}-${{ github.run_id }}
           path: ${{ runner.temp }}/commentary-private-candidate-proof.json
           retention-days: 30
           if-no-files-found: error
@@ -112,6 +126,7 @@ jobs:
         run: |
           {
             echo 'Original CrossWire zCom compressed payload reused byte-for-byte.'
+            echo "Strictly private candidate ID: $CANDIDATE_ID"
             echo 'Temporary candidate ZIP is never uploaded or published.'
             echo 'CCEL edition identity, full editorial acceptance, Xiphos/AndBible GUI and rights remain unapproved.'
           } >> "$GITHUB_STEP_SUMMARY"
