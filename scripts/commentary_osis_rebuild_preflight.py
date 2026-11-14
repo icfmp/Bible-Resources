@@ -42,6 +42,7 @@ class NativeOSISRebuildPreflight:
         self.intro_top_level_element_names = Counter()
         self.intro_top_level_nonwhitespace_text = Counter()
         self.intro_visible_word_count_bands = Counter()
+        self.intro_visible_cases = []
         self.intro_full_element_name_counts = Counter()
         self.intro_full_attribute_name_counts = Counter()
         self.opaque_top_xml_element_names = Counter()
@@ -165,6 +166,31 @@ class NativeOSISRebuildPreflight:
                     "eleven_to_hundred_words" if words <= 100 else
                     "more_than_hundred_words")
             self.intro_visible_word_count_bands[band] += 1
+            if words:
+                # This is a source-location queue, not a transcript.
+                # A chapter intro with text may contain an author's
+                # preface, a heading, or original structural captions.
+                visible_text_owners = Counter()
+                for element in source.iter():
+                    if element is source or not isinstance(element.tag, str):
+                        continue
+                    if (element.text or "").strip():
+                        visible_text_owners[self._local(element.tag)] += 1
+                    if (element.tail or "").strip():
+                        visible_text_owners["after_" + self._local(element.tag)] += 1
+                self.intro_visible_cases.append({
+                    "original_native_intro_key": ref,
+                    "native_intro_scope":
+                        "book" if "." not in ref or ref.endswith(".0.0")
+                        else "chapter",
+                    "visible_words_count": words,
+                    "top_level_element_names": [
+                        self._local(element.tag) for element in source
+                    ],
+                    "text_owning_element_name_counts":
+                        dict(sorted(visible_text_owners.items())),
+                    "source_visible_text_is_not_auto_classified_as_prose": True,
+                })
             for element in source.iter():
                 if element is source or not isinstance(element.tag, str):
                     continue
@@ -252,6 +278,8 @@ class NativeOSISRebuildPreflight:
                 dict(sorted(self.intro_top_level_nonwhitespace_text.items())),
             "intro_original_visible_word_count_bands":
                 dict(sorted(self.intro_visible_word_count_bands.items())),
+            "intro_visible_text_case_review_queue":
+                sorted(self.intro_visible_cases, key=lambda row: row["original_native_intro_key"]),
             "intro_original_full_element_name_counts":
                 dict(sorted(self.intro_full_element_name_counts.items())),
             "intro_original_full_attribute_name_counts":
