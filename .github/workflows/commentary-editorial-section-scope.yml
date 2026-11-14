@@ -220,7 +220,8 @@ jobs:
             --native-index-binary "${RUNNER_TEMP}/stock-index" \
             --native-raw-binary "${RUNNER_TEMP}/stock-raw" \
             --report "${RUNNER_TEMP}/editorial-scope.json" \
-            --temporary-numbered-sample-chapters Gen.36 Matt.13 Song.1
+            --temporary-numbered-sample-chapters Gen.36 Matt.13 Song.1 \
+            --synthetic-intro-native-stream "${RUNNER_TEMP}/synthetic-introductions/native.raw"
       - name: Summarize scope and known regression probes without original text
         run: |
           set -euo pipefail
@@ -316,6 +317,17 @@ jobs:
                 json.dumps(transport["intro_original_full_attribute_name_counts"],sort_keys=True))
           print("Original intro visible-word-band classes:",
                 json.dumps(transport["intro_original_visible_word_count_bands"],sort_keys=True))
+          opaque_compare=r["synthetic_compiler_opaque_top_original_exact_byte_comparison"]
+          assert opaque_compare is not None
+          assert opaque_compare["original_top_entry_count"]==r["native_top_rows"]
+          assert opaque_compare["original_top_raw_values_disclosed"] is False
+          print("Original opaque TOP compared by exact bytes to independent synthetic osis2mod:",
+                "original U",opaque_compare["original_top_entry_count"],
+                "synthetic U",opaque_compare["synthetic_top_entry_count"],
+                "identical raw TOP",opaque_compare[
+                    "original_top_entry_bytes_equal_any_synthetic"],
+                "all originals matched",opaque_compare[
+                    "all_original_top_byte_payloads_seen_in_synthetic"])
           for case in transport["intro_visible_text_case_review_queue"]:
               print("Intro containing original visible text",case["original_native_intro_key"],
                     "word-count",case["visible_words_count"],
