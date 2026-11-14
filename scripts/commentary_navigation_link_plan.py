@@ -276,6 +276,8 @@ def triage_single_key_chapter_navigation(
             classification = "NO_SAFE_INDEPENDENT_UNDIVIDED_CHAPTER_SCOPE"
         elif not high_similarity:
             classification = "INDEPENDENT_SOURCE_AND_NATIVE_TEXT_NEED_WORD_REVIEW"
+        elif intro_prose is None:
+            classification = "ORIGINAL_NATIVE_CHAPTER_INTRO_NOT_CHECKED"
         elif intro_prose:
             classification = "ADDITIONAL_NATIVE_CHAPTER_INTRO_PROSE_NEEDS_OWNERSHIP_REVIEW"
         else:
@@ -304,6 +306,10 @@ def triage_single_key_chapter_navigation(
         "potential_total_new_chapter_aliases_if_every_scope_approved":total_potential_new,
         "source_reference_differences_needing_separate_review":sum(
             row["independent_source_reference_target_disagreement_requires_review"]
+            for row in cases
+        ),
+        "chapter_intro_owner_unchecked_count":sum(
+            row["original_native_chapter_intro_contains_visible_prose"] is None
             for row in cases
         ),
         "chapter_intro_prose_needing_independent_ownership_review":sum(
