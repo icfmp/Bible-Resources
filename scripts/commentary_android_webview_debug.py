@@ -50,10 +50,10 @@ def _read_only_debugger_body(url: str, port: int) -> str:
     import websocket
     try:
         connection = websocket.create_connection(
-            url, timeout=8, origin="http://localhost",
+            url, timeout=8, http_no_proxy=["localhost", "127.0.0.1"],
         )
     except (websocket.WebSocketException, OSError, TimeoutError) as exc:
-        raise PilotError("Private Android WebView debugger connection unreadable") from exc
+        raise PilotError("local_CDP_connection_or_handshake_unavailable") from exc
     try:
         connection.settimeout(8)
         connection.send(json.dumps({
@@ -72,12 +72,21 @@ def _read_only_debugger_body(url: str, port: int) -> str:
             message = json.loads(payload)
             if not isinstance(message, dict) or message.get("id") != 1:
                 continue
-            value = message.get("result", {}).get("result", {}).get("value")
-            return value if isinstance(value, str) and len(value) <= MAX_CDP_BODY else ""
-        return ""
+            if "error" in message:
+                raise PilotError("CDP_Runtime_evaluation_rejected")
+            result = message.get("result", {}).get("result", {})
+            if not isinstance(result, dict):
+                raise PilotError("CDP_Runtime_result_shape_unavailable")
+            value = result.get("value")
+            if not isinstance(value, str):
+                raise PilotError("CDP_Runtime_non_string_body")
+            if len(value) > MAX_CDP_BODY:
+                raise PilotError("CDP_Runtime_body_above_safe_bound")
+            return value
+        raise PilotError("CDP_Runtime_response_not_received")
     except (websocket.WebSocketException, OSError, TimeoutError,
             json.JSONDecodeError) as exc:
-        raise PilotError("Private Android WebView debugger response unavailable") from exc
+        raise PilotError("CDP_Runtime_transport_or_JSON_unavailable") from exc
     finally:
         connection.close()
 
@@ -93,6 +102,18 @@ def read_private_official_andbible_dom_text() -> tuple[list[str], dict]:
         "actual_app_debug_socket_found": False,
         "actual_Android_debug_page_targets_discovered": 0,
         "actual_Android_debug_DOM_pages_read": 0,
+        "local_CDP_outcome_class_counts": {
+            "body_read": 0,
+            "body_empty": 0,
+            "local_CDP_connection_or_handshake_unavailable": 0,
+            "CDP_Runtime_evaluation_rejected": 0,
+            "CDP_Runtime_result_shape_unavailable": 0,
+            "CDP_Runtime_non_string_body": 0,
+            "CDP_Runtime_body_above_safe_bound": 0,
+            "CDP_Runtime_response_not_received": 0,
+            "CDP_Runtime_transport_or_JSON_unavailable": 0,
+            "other_unreadable_local_CDP": 0,
+        },
         "status": "inconclusive_original_app_WebView_debug_unavailable",
         "Android_DOM_page_URL_words_XML_screenshot_or_cookies_exported": False,
     }
@@ -141,10 +162,17 @@ def read_private_official_andbible_dom_text() -> tuple[list[str], dict]:
                 body = _read_only_debugger_body(
                     page["webSocketDebuggerUrl"], port,
                 )
-            except (ValueError, OSError, TimeoutError, ImportError, PilotError):
+            except (ValueError, OSError, TimeoutError, ImportError, PilotError) as exc:
+                kind = str(exc) if isinstance(exc, PilotError) else ""
+                if kind not in result["local_CDP_outcome_class_counts"]:
+                    kind = "other_unreadable_local_CDP"
+                result["local_CDP_outcome_class_counts"][kind] += 1
                 continue
             if body.strip():
                 texts.append(body)
+                result["local_CDP_outcome_class_counts"]["body_read"] += 1
+            else:
+                result["local_CDP_outcome_class_counts"]["body_empty"] += 1
         result["actual_Android_debug_DOM_pages_read"] = len(texts)
         result["status"] = (
             "official_Android_reader_DOM_text_read_privately"
