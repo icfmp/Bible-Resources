@@ -223,6 +223,15 @@ jobs:
                 pilot["original_vs_compiled_whitespace_normalized_visible_text_exact_matches"])
           print("Original native XML element-name counts exactly retained:",
                 pilot["original_vs_compiled_element_name_count_exact_matches"])
+          print("Original native sample total XML element names:",
+                json.dumps(pilot["original_native_element_name_total_counts_in_sample"],
+                           sort_keys=True))
+          print("Recompiled native sample total XML element names:",
+                json.dumps(pilot["compiled_native_element_name_total_counts_in_sample"],
+                           sort_keys=True))
+          print("Entry-level original-vs-recompiled XML element name count divergences:",
+                json.dumps(pilot["source_to_compiled_element_name_count_changed_entry_counts"],
+                           sort_keys=True))
           for row in pilot["per_original_key_text_free_delta_classes"]:
               if row["word_sequence_relation"]!="EXACT_ORIGINAL_WORD_SEQUENCE":
                   print("Pilot changed words or word order",row["original_native_key"],
