@@ -125,6 +125,8 @@ jobs:
                 json.dumps(div2.get("candidate_classes",{}),sort_keys=True))
           print("Independent source vs unchanged stock chapter-word diagnostic:",
                 json.dumps(div2.get("independent_stock_vs_source_lexical_diagnostic_classes",{}),sort_keys=True))
+          print("Independent source vs unchanged stock ordered-word alignment:",
+                json.dumps(div2.get("independent_stock_vs_source_ordered_word_diagnostic_classes",{}),sort_keys=True))
           print("Source book title/marker alignment:",
                 json.dumps(div2.get("book_alignment_evidence_classes",{}),sort_keys=True))
           for bookrow in div2.get("book_alignment_evidence_rows",[]):
@@ -138,8 +140,16 @@ jobs:
                     "source-annotation-chapters",divcase["source_annotated_chapters"],
                     "source-h2-numeric-chapters",divcase["source_h2_numeric_chapters"])
               lexical=divcase.get("independent_lexical_comparison")
-              if lexical and (divcase["native_start"]=="2Chr.1.1"
-                              or lexical.get("overlap_class") not in ("HIGH_95_PLUS", "HIGH_80_PLUS")):
+              if lexical and (
+                  divcase["native_start"]=="2Chr.1.1"
+                  or lexical.get("overlap_class") != "HIGH_95_PLUS"
+                  or lexical["ordered_word_alignment"]["exact_unicode_ordered_alignment_class"]
+                     not in (
+                         "plain_words_exactly_identical_in_original_order",
+                         "all_source_plain_words_in_stock_order_with_extra_stock_words",
+                         "all_stock_plain_words_in_source_order_with_extra_source_words"
+                     )
+              ):
                   print("Needs lexical scope review",divcase["native_start"],
                         json.dumps(lexical,sort_keys=True))
           chapter=witness["independent_whole_chapter_review"]
