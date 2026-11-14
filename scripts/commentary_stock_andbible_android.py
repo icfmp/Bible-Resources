@@ -25,6 +25,7 @@ from commentary_android_text_witness import (
     full_native_original_prose_in_real_android_webview,
     read_only_actually_occupied_original_entries,
 )
+from commentary_android_webview_debug import read_private_official_andbible_dom_text
 
 from commentary_intake import load_manifest
 from pilot_fetch import fetch
@@ -680,9 +681,15 @@ def run_android_original(
             prose_witness = original_prose_in_real_android_webview(
                 original_prose_samples, actual_ui,
             )
+            # The pinned release BibleView.kt unconditionally enables
+            # WebView debugging. The Android accessibility snapshot may omit
+            # HTML text; read only document.body.innerText via the official
+            # app's local ADB-forwarded WebView debug socket (no DOM edits).
+            dom_texts, dom_probe = read_private_official_andbible_dom_text()
             full_prose_witness = full_native_original_prose_in_real_android_webview(
                 original_native_root, module_id, native_full_raw_binary,
                 manifest["native_raw_corpus_sha256"], actual_ui,
+                real_read_only_dom_texts=dom_texts,
             )
         else:
             prose_witness = {
@@ -695,6 +702,14 @@ def run_android_original(
                 "status": "inconclusive_exact_MHCC_reader_selection_unavailable",
                 "original_prose_UI_text_XML_screenshots_or_ZIP_exported": False,
             }
+            dom_probe = {
+                "scope": "official_AndBible_pinned_release_read_only_loopback_WebView_CDP",
+                "actual_app_debug_socket_found": False,
+                "actual_Android_debug_page_targets_discovered": 0,
+                "actual_Android_debug_DOM_pages_read": 0,
+                "status": "inconclusive_exact_MHCC_reader_selection_unavailable",
+                "Android_DOM_page_URL_words_XML_screenshot_or_cookies_exported": False,
+            }
             full_prose_witness = {
                 "scope": "all_occupied_original_native_zCom_keys_vs_real_Android_WebView_prose",
                 "original_full_native_corpus_sha256_attested": False,
@@ -702,8 +717,11 @@ def run_android_original(
                 "original_native_entries_with_substantial_exposition": 0,
                 "real_AndBible_WebViews_observed": 0,
                 "real_AndBible_WebView_text_sequences_examined": 0,
+                "real_Android_read_only_debug_DOM_pages_examined": 0,
                 "source_occupied_entries_with_16_consecutive_words_visible": 0,
+                "source_occupied_entries_with_16_words_in_debug_DOM": 0,
                 "actual_original_authorial_prose_in_real_Android_WebView_verified": False,
+                "actual_original_prose_in_read_only_Android_debug_DOM_verified": False,
                 "status": "inconclusive_exact_MHCC_reader_selection_unavailable",
                 "source_words_android_UI_XML_screenshots_or_ZIP_exported": False,
             }
@@ -757,6 +775,7 @@ def run_android_original(
             "android_commentary_toolbar_selection": toolbar_probe,
             "android_exact_original_authorial_prose_webview_witness": prose_witness,
             "android_full_original_authorial_prose_webview_witness": full_prose_witness,
+            "android_private_read_only_official_webview_debug_probe": dom_probe,
             "original_sample_references_not_verifiably_native_occupied_count":
                 not_occupied_samples,
             "official_stable_update_notice_action": stable_notice_action,
