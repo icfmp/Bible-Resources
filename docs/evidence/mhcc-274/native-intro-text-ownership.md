@@ -131,3 +131,47 @@ full-corpus no-empty-K checks by default.
 No original I/TOP content was edited. No publishable replacement module
 has been produced. The true source edition and full original layout still
 require human editorial verification before an index expansion.
+
+
+## Exact original I-only OSIS roundtrip achieved
+
+[Full original stock/native diagnostic #43634817753](https://github.com/icfmp/Bible-Resources/actions/runs/43634817753)
+**SUCCESS** (47 editorial, 18 link plan, 16 structural, 6 native
+intro-text, 10 numbered transport and explicit I-only transport tests).
+The first two independently compiled tests had been rejected **by the
+diagnostic reader**, not the compiler: both the C++ native scanner and
+Python frame parser required a numbered K entry. A narrowly scoped
+`--allow-intro-only` reader argument and `allow_intro_only=True` parser
+argument now permit genuine I-only private test modules; production
+full-corpus calls retain the strict default **K required**.
+
+For **both Lev 19 and Psalm 108**, and for **both** original-source
+embedding strategies (`chapter_wrapper` and `book_direct`),
+the standard `osis2mod` produced an independently accessible native
+chapter-introduction I key:
+
+| Native introduction test | Lev 19 | Psalm 108 |
+| --- | --- | --- |
+| Original chapter I key present | `Lev.19` | `Ps.108` |
+| Original source words preserved, same exact Unicode word sequence | **698/698** | **136/136** |
+| Original visible text identical after whitespace-only normalization | **Yes** | **Yes** |
+| Original non-`div` element order and all literal attribute values | **Yes** | **Yes** |
+| Original `div` attribute multiset retained | **Yes** | **Yes** |
+| Original ordered `reference` `osisRef` attribute values retained | **Yes** | **Yes** |
+| Only additional `div` markup introduced | **Yes** | **Yes** |
+| Unexpected numbered K keys | **0** | **0** |
+| Additional automatic book I key | `Lev` | `Ps` |
+| Automatically generated synthetic U/TOP keys | 1 | 1 |
+
+These findings prove a reusable original-source **I-entry transport**
+mechanism **for the two tested real introduction texts**; no loss of words,
+reference destinations or attributes was detected. They do **not** prove
+the whole book/chapter layout, the two original TOP positions, the other
+1,253 introductions or full-corpus K/I/U parity.
+
+**Next**: compile mixed original I+K entries together (not separately), then
+attempt a complete isolated compilation. Compare exact original 29,975
+key locations and semantically relevant XML/notes/reference attributes
+without hiding compiler wrapper differences, plus reader display behavior.
+Source-endorsed verse navigation changes are separate from technical parity.
+No original or published module has changed.
