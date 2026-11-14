@@ -530,8 +530,7 @@ def independent_chapter_scope_evidence(document, unrecognized_cases: list[dict])
 
 def independent_div2_chapter_body_evidence(document, native_registry: dict,
                                           unrecognized_cases: list[dict],
-                                          stock_unknown_raw: dict[str, bytes] | None = None,
-                                     original_chapter_intro_raw: dict[str, bytes] | None = None) -> dict:
+                                          stock_unknown_raw: dict[str, bytes] | None = None) -> dict:
     """Collate chapter wrappers in canonical order, verifying book identities.
 
     Source order alone is never authority: each div1 must be the expected book
@@ -1023,7 +1022,8 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
                                      anomalies: list[dict], temp: Path,
                                      unrecognized_cases: list[dict] | None = None,
                                      native_registry: dict | None = None,
-                                     stock_unknown_raw: dict[str, bytes] | None = None) -> dict:
+                                     stock_unknown_raw: dict[str, bytes] | None = None,
+                                     original_chapter_intro_raw: dict[str, bytes] | None = None) -> dict:
     """Compare all start/end section locations with a separately pinned ThML.
 
     Different digital editions are never automatically assumed identical;
