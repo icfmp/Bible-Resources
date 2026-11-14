@@ -3,6 +3,9 @@ name: Verify private final BRJND2024 0.1.1 ZIP in stable Android GUI (NO publica
 on:
   pull_request:
     paths:
+      - ".github/workflows/darby-0.1.1-final-android.yml"
+      - "scripts/probe_andbible_android_private_import.py"
+      - "tests/test_probe_andbible_android_private_import.py"
       - ".github/workflows/darby-private-repaired-sword.yml"
       - "scripts/probe_private_repaired_darby_sword.py"
       - "scripts/reader_xiphos_headless_smoke.py"
@@ -50,6 +53,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_repair_osis_source_bytes.py' -v
           python -m unittest discover -s tests -p 'test_repair_osis_division_markers.py' -v
           python -m unittest discover -s tests -p 'test_prepare_darby_011_private_release_candidate.py' -v
+          python -m unittest discover -s tests -p 'test_probe_andbible_android_private_import.py' -v
           python -m unittest discover -s tests -p 'test_probe_andbible_android_private_import.py' -v
           python -m unittest discover -s tests -p 'test_repair_osis_paragraph_indentation.py' -v
           python -m unittest discover -s tests -p 'test_source_native_division_markers.py' -v
