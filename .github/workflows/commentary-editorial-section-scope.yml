@@ -232,6 +232,14 @@ jobs:
           print("Entry-level original-vs-recompiled XML element name count divergences:",
                 json.dumps(pilot["source_to_compiled_element_name_count_changed_entry_counts"],
                            sort_keys=True))
+          print("Original non-div element order and exact attribute values retained:",
+                pilot["original_non_div_element_order_and_attribute_value_exact_matches"])
+          print("All original div attributes retained despite compiler-generated wrappers:",
+                pilot["original_div_element_attribute_multiset_preserved_entry_count"])
+          print("All original reference element actual attribute values retained:",
+                pilot["original_reference_attribute_value_exact_order_matches"])
+          print("Only additional div tags; all other original element counts retained:",
+                pilot["only_additional_div_tags_other_markup_names_unchanged"])
           for row in pilot["per_original_key_text_free_delta_classes"]:
               if row["word_sequence_relation"]!="EXACT_ORIGINAL_WORD_SEQUENCE":
                   print("Pilot changed words or word order",row["original_native_key"],
