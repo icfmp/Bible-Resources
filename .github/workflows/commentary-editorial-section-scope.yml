@@ -392,6 +392,23 @@ jobs:
                 preview["all_proposed_new_aliases_same_compiled_raw_as_original_master"],
                 "original TOP unchanged",preview["all_original_TOP_positions_exact_raw_bytes"])
           assert preview["preflight_candidate_section_count"]==17
+          repeats=preview["private_original_vs_alias_cli_chapter_repetition_probe"]
+          assert repeats["status"]=="GENERIC_NATIVE_COMMENTARY_CLI_CHAPTER_REPEAT_COMPARISON_NOT_GUI_APPROVAL"
+          assert repeats["case_count"]>=1
+          assert repeats["publication_authorized"] is False
+          assert repeats["no_source_text_logged_or_published"] is True
+          print("Original versus candidate chapter-wide CLI repetition:",
+                "cases",repeats["case_count"],
+                "chapters with increased repeated source prose",
+                repeats["chapters_with_proven_increased_repeat_count"],
+                "independent GUI deduplication verified",
+                repeats["chapter_deduplication_in_Xiphos_or_Bible_verified"])
+          for case in repeats["cases"]:
+              print("Chapter CLI linked commentary repetition sample:",
+                    case["chapter"],case["status"],
+                    "original",case["original_repetition"],
+                    "candidate",case["proposed_repetition"])
+
           xiphos=preview["private_real_xiphos_alias_navigation_probe"]
           assert xiphos is not None
           print("Independent real Xiphos/private LSG preview:",
