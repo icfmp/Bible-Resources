@@ -35,8 +35,9 @@ class OfficialAndBibleWebViewDebugTests(unittest.TestCase):
             self.assertFalse(_exact_local_page_debugger_url(candidate, 52655))
 
     def test_cdp_only_evaluates_read_only_document_body_text(self):
-        with patch.dict(sys.modules, {"websocket": Mock()}) as mocked:
-            fake = mocked["websocket"].create_connection.return_value
+        websocket_module = Mock()
+        with patch.dict(sys.modules, {"websocket": websocket_module}):
+            fake = websocket_module.create_connection.return_value
             fake.recv.return_value = json.dumps({
                 "id": 1,
                 "result": {"result": {"type": "string", "value": "Private genuine text"}},
@@ -48,7 +49,7 @@ class OfficialAndBibleWebViewDebugTests(unittest.TestCase):
         sent = json.loads(fake.send.call_args.args[0])
         self.assertEqual(sent["method"], "Runtime.evaluate")
         self.assertEqual(
-            mocked["websocket"].create_connection.call_args.kwargs["http_no_proxy"],
+            websocket_module.create_connection.call_args.kwargs["http_no_proxy"],
             ["localhost", "127.0.0.1"],
         )
         self.assertEqual(sent["params"]["expression"],
