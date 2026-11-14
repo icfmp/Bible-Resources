@@ -883,6 +883,7 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
     reference_classes = Counter()
     reference_totals = Counter()
     reference_exception_rows = []
+    missing_stock_link_label_locations = Counter()
     for row in cases:
         refs = row.get("independent_reference_target_comparison")
         if refs is None:
@@ -918,6 +919,14 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
         else:
             classification = "BOTH_EDITIONS_HAVE_UNPAIRED_LINK_TARGETS"
         reference_classes[classification] += 1
+        if classification == "SOURCE_LINK_MARKUP_NOT_PRESENT_IN_SELECTED_STOCK":
+            # Every source citation in this precise class is target-unpaired:
+            # its displayed label may remain visible as ordinary stock prose,
+            # or be absent from the selected stock text. Never infer the
+            # underlying destination from label resemblance alone.
+            missing_stock_link_label_locations.update(
+                refs["original_scripRef_to_stock_text_location_classes"]
+            )
         if unpaired_source or unpaired_stock:
             reference_exception_rows.append({
                 "native_start": row["native_start"],
@@ -926,10 +935,12 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
                 "selected_stock_reference_element_count":
                     refs["selected_stock_reference_element_count"],
                 "classification": classification,
+                "source_link_label_location_classes":
+                    refs["original_scripRef_to_stock_text_location_classes"],
                 "source_to_stock_reference_markup_parity_proven": False,
             })
     word_classes = Counter(
-        row["independent_lexical_comparison"].get("overlap_class", "UNREVIEW")
+        row["independent_lexical_comparison"].get("overlap_class", "UNREVIEWED")
         for row in cases if row["independent_lexical_comparison"] is not None
     )
     ordered_word_classes = Counter(
@@ -947,6 +958,9 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
             dict(sorted(reference_totals.items())),
         "independent_stock_vs_source_reference_target_exception_rows":
             reference_exception_rows,
+        "source_reference_labels_when_stock_has_no_link_markup":
+            dict(sorted(missing_stock_link_label_locations.items())),
+        "source_reference_label_location_is_not_a_target_or_text_parity_check": True,
         "source_reference_target_completeness_not_proven": True,
         "independent_stock_vs_source_lexical_diagnostic_classes":
             dict(sorted(word_classes.items())),
