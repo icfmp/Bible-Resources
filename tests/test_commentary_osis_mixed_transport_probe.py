@@ -6,7 +6,8 @@ from lxml import etree
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from commentary_osis_mixed_transport_probe import (
-    build_mixed_original_transport, mixed_transport_checks_pass, _COVERAGE_FIELDS
+    build_mixed_original_transport, build_complete_original_transport,
+    mixed_transport_checks_pass, _COVERAGE_FIELDS
 )
 
 
@@ -79,6 +80,59 @@ class MixedOriginalTransportTests(unittest.TestCase):
         self.assertFalse(mixed_transport_checks_pass(
             **{**base, "numbered_coverage":
                {**coverage(13), "source_keys_present":True}}))
+
+
+    def test_complete_original_transport_groups_only_adjacent_identical_K(self):
+        first=b'<div type="section"><title>Invented A</title>Text A.</div>'
+        later=b'<div type="section"><title>Invented B</title>Text B.</div>'
+        intro={
+            "Gen":b"<div type='book'/>",
+            "Gen.1":b"<chapter osisID='Gen.1'/>",
+            "Gen.2":b"<chapter osisID='Gen.2'/><title>Invented intro only</title>",
+            "Exod":b"<div type='book'/>",
+            "Exod.1":b"<chapter osisID='Exod.1'/>",
+        }
+        numbered={
+            "Gen.1":[("Gen.1.1",first),("Gen.1.2",first),
+                     ("Gen.1.4",first),("Gen.1.5",later)],
+            "Exod.1":[("Exod.1.1",later)]
+        }
+        xml, info=build_complete_original_transport(
+            intro,numbered,work_id="FullTest"
+        )
+        self.assertEqual(info["source_book_intro_count"],2)
+        self.assertEqual(info["source_chapter_intro_count"],3)
+        self.assertEqual(info["source_numbered_key_count"],5)
+        self.assertEqual(info["source_numbered_group_count"],4)
+        self.assertTrue(info["original_I_K_raw_markup_not_rewritten"])
+        root=etree.fromstring(xml)
+        targets=root.xpath(
+            "//*[local-name()='div' and @annotateType='commentary']/@annotateRef"
+        )
+        self.assertEqual(targets,[
+            "Gen.1.1-Gen.1.2","Gen.1.4","Gen.1.5","Exod.1.1"
+        ])
+        self.assertEqual(len(root.xpath(
+            "//*[local-name()='div' and @type='chapter' and @osisID='Gen.2']"
+        )),1)
+        self.assertNotIn(b'annotateRef="Gen.2.',xml)
+
+    def test_complete_transport_refuses_orphan_and_untrusted_entries(self):
+        good={"Gen":b"<div/>","Gen.1":b"<chapter/>"}
+        for intros, numbered in (
+            ({"Gen.1":b"<chapter/>","Exod":b"<div/>"},
+             {"Gen.1":[("Gen.1.1",b"<div/>")]}),
+            (good,{"Exod.1":[("Exod.1.1",b"<div/>")]}),
+            (good,{"Gen.1":[("Gen.2.1",b"<div/>")]}),
+            (good,{"Gen.1":[("Gen.1.2",b"<div/>"),
+                            ("Gen.1.1",b"<div/>")]}),
+            (good,{"Gen.1":[("Gen.1.1",b"<div>\x00</div>")]}),
+        ):
+            with self.subTest(intros=list(intros),numbered=list(numbered)):
+                with self.assertRaises(ValueError):
+                    build_complete_original_transport(
+                        intros,numbered,work_id="FullTest"
+                    )
 
 
 if __name__=="__main__":
