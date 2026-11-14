@@ -12,6 +12,7 @@ from collections import Counter, defaultdict
 from hashlib import sha256
 import json
 import os
+import re
 from pathlib import Path, PurePosixPath
 import shutil
 import subprocess
@@ -38,6 +39,46 @@ MARKUP_TAGS = ("p", "div", "title", "table", "row", "cell", "reference",
                "milestone", "seg", "verse", "chapter")
 MAX_RAW_MARKUP_BYTES = 2 * 1024 * 1024
 
+# Observational *forms*, not a full OSIS reference validator or verse-key
+# existence test. Keep literal source attributes private and untouched.
+_OSIS_BOOK = r"[1-4]?[A-Za-z][A-Za-z0-9]*"
+_OSIS_CHAPTER = rf"{_OSIS_BOOK}\.[1-9][0-9]{{0,2}}"
+_OSIS_VERSE = rf"{_OSIS_CHAPTER}\.[1-9][0-9]{{0,2}}"
+_REFERENCE_FORMS = (
+    "single_osis_verse",
+    "verse_range_like",
+    "book_or_chapter_like",
+    "compound_target",
+    "other_unclassified",
+)
+
+
+def original_osisref_form(value: str) -> str:
+    """Classify the *original* target shape without normalizing or guessing.
+
+    A recognized shape is NOT a valid existence-checked verse. Unrecognized
+    forms could be valid OSIS extensions or authorial markup; never call them
+    errors or rewrite them merely because the classifier lacks grammar.
+    """
+    if not isinstance(value, str) or not value:
+        raise PilotError("Original source reference target is absent")
+    candidate = value[len("Bible:"):] if value.startswith("Bible:") else value
+    if re.fullmatch(_OSIS_VERSE, candidate):
+        return "single_osis_verse"
+    if "-" in candidate:
+        parts = candidate.split("-", 1)
+        if (len(parts) == 2 and re.fullmatch(_OSIS_VERSE, parts[0])
+                and (re.fullmatch(_OSIS_VERSE, parts[1])
+                     or re.fullmatch(r"[1-9][0-9]{0,2}", parts[1]))):
+            return "verse_range_like"
+    if re.fullmatch(_OSIS_BOOK, candidate) or re.fullmatch(_OSIS_CHAPTER, candidate):
+        return "book_or_chapter_like"
+    if any(ch in candidate for ch in (",", " ", ";", "\\t")):
+        return "compound_target"
+    return "other_unclassified"
+
+
+
 
 class NativeCommentaryMarkupCensus:
     """Inventory source-native markup on the complete original SWORD stream.
@@ -63,6 +104,12 @@ class NativeCommentaryMarkupCensus:
         self.entries_with_notes = 0
         self.refs_with_osisref = 0
         self.refs_without_osisref = 0
+        self.reference_forms = Counter()
+        self.literal_bible_work_qualified = 0
+        self.reference_label_with_visible_text = 0
+        self.reference_label_without_visible_text = 0
+        self.title_with_visible_text = 0
+        self.title_without_visible_text = 0
         self.elements = Counter()
 
     def observe(self, kind: str, key: str, raw: bytes) -> None:
@@ -102,11 +149,25 @@ class NativeCommentaryMarkupCensus:
             local_name = node.tag.rsplit("}", 1)[-1]
             category = local_name if local_name in MARKUP_TAGS else "other"
             observed[category] += 1
+            if local_name == "title":
+                if "".join(node.itertext()).strip():
+                    self.title_with_visible_text += 1
+                else:
+                    self.title_without_visible_text += 1
             if local_name == "reference":
-                if node.get("osisRef"):
+                # Count only *literal* original OSIS attributes, never link
+                # destinations inferred from a nearby key or display label.
+                original_target = node.get("osisRef")
+                if original_target:
                     self.refs_with_osisref += 1
+                    self.reference_forms[original_osisref_form(original_target)] += 1
+                    self.literal_bible_work_qualified += original_target.startswith("Bible:")
                 else:
                     self.refs_without_osisref += 1
+                if "".join(node.itertext()).strip():
+                    self.reference_label_with_visible_text += 1
+                else:
+                    self.reference_label_without_visible_text += 1
         self.elements.update(observed)
         self.entries_with_titles += bool(observed["title"])
         self.entries_with_paragraphs += bool(observed["p"])
@@ -122,7 +183,13 @@ class NativeCommentaryMarkupCensus:
                     self.opaque_top_entries + self.empty_nonopaque_entries
                     + self.valid_nonopaque_entries + self.invalid_nonopaque_entries
                     + self.excessive_nonopaque_entries
-                )):
+                )
+                or sum(self.reference_forms.values()) != self.refs_with_osisref
+                or self.reference_label_with_visible_text
+                   + self.reference_label_without_visible_text
+                   != self.elements["reference"]
+                or self.title_with_visible_text + self.title_without_visible_text
+                   != self.elements["title"]):
             raise PilotError("Unreconciled complete original commentary XML observations")
         return {
             "all_original_native_entries_accounted_for": True,
@@ -139,6 +206,20 @@ class NativeCommentaryMarkupCensus:
             "entries_with_note_markup": self.entries_with_notes,
             "reference_elements_with_osisref_attribute": self.refs_with_osisref,
             "reference_elements_without_osisref_attribute": self.refs_without_osisref,
+            "original_osisref_form_count_by_fixed_category": {
+                name: self.reference_forms[name] for name in _REFERENCE_FORMS
+            },
+            "original_reference_elements_with_literal_Bible_work_prefix":
+                self.literal_bible_work_qualified,
+            "original_reference_labels_with_visible_text":
+                self.reference_label_with_visible_text,
+            "original_reference_labels_without_visible_text":
+                self.reference_label_without_visible_text,
+            "original_title_elements_with_visible_text":
+                self.title_with_visible_text,
+            "original_title_elements_without_visible_text":
+                self.title_without_visible_text,
+            "no_osisref_value_normalization_or_verse_existence_claim": True,
             "original_element_counts_by_fixed_category": {
                 name: self.elements[name] for name in (*MARKUP_TAGS, "other")
             },
