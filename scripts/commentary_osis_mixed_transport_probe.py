@@ -103,6 +103,46 @@ def build_mixed_original_transport(chapter: str, book_intro: bytes,
     }
 
 
+
+_COVERAGE_FIELDS = (
+    "source_keys_present",
+    "source_words_preserved_in_exact_order",
+    "source_whitespace_normalized_visible_text_identical",
+    "original_nondiv_element_order_and_attributes_preserved",
+    "original_div_attribute_multiset_preserved",
+    "original_reference_attribute_values_preserved",
+)
+
+
+def mixed_transport_checks_pass(*, expected_intro_keys: int,
+                                expected_numbered_keys: int,
+                                intro_coverage: dict,
+                                numbered_coverage: dict,
+                                missing_intro_keys: list[str],
+                                missing_numbered_keys: list[str],
+                                extra_intro_keys: list[str],
+                                extra_numbered_keys: list[str]) -> bool:
+    """Fail closed when even one original I/K text, attribute or key check fails.
+
+    This proves selected-entry transport only, NOT original raw-byte identity,
+    complete edition fidelity, user-facing layout, or TOP-position parity.
+    """
+    if (type(expected_intro_keys) is not int or expected_intro_keys != 2
+            or type(expected_numbered_keys) is not int
+            or expected_numbered_keys < 1
+            or missing_intro_keys or missing_numbered_keys
+            or extra_intro_keys or extra_numbered_keys):
+        return False
+    return all(
+        type(coverage.get(field)) is int and coverage[field] == expected
+        for coverage, expected in (
+            (intro_coverage, expected_intro_keys),
+            (numbered_coverage, expected_numbered_keys),
+        )
+        for field in _COVERAGE_FIELDS
+    )
+
+
 def probe_original_mixed_transport(chapter: str, book_intro: bytes,
                                    chapter_intro: bytes,
                                    numbered: list[tuple[str, bytes]], *,
@@ -199,18 +239,33 @@ def probe_original_mixed_transport(chapter: str, book_intro: bytes,
                 case["reference_attribute_values_in_original_document_order_preserved"]
                 for case in compared.values()),
         }
+    intro_coverage = summarize(compared_I)
+    numbered_coverage = summarize(compared_K)
+    missing_I = sorted(set(originals_I) - set(rebuilt_I))
+    missing_K = sorted(set(originals_K) - set(rebuilt_K))
+    extra_I = sorted(set(rebuilt_I) - set(originals_I))
+    extra_K = sorted(set(rebuilt_K) - set(originals_K))
+    checks_passed = mixed_transport_checks_pass(
+        expected_intro_keys=len(originals_I),
+        expected_numbered_keys=len(originals_K),
+        intro_coverage=intro_coverage,
+        numbered_coverage=numbered_coverage,
+        missing_intro_keys=missing_I,
+        missing_numbered_keys=missing_K,
+        extra_intro_keys=extra_I,
+        extra_numbered_keys=extra_K,
+    )
     return {
         **source,
         "status":"TEMPORARY_MIXED_ORIGINAL_I_K_REBUILT_NOT_EDITION_PARITY",
         "readback_completed":True,
-        "source_original_intro_I_coverage":summarize(compared_I),
-        "source_original_K_coverage":summarize(compared_K),
-        "original_I_keys_missing_from_compiled":sorted(
-            set(originals_I)-set(rebuilt_I)),
-        "original_K_keys_missing_from_compiled":sorted(
-            set(originals_K)-set(rebuilt_K)),
-        "unexpected_compiled_K_keys":sorted(
-            set(rebuilt_K)-set(originals_K)),
+        "source_original_intro_I_coverage":intro_coverage,
+        "source_original_K_coverage":numbered_coverage,
+        "original_I_keys_missing_from_compiled":missing_I,
+        "original_K_keys_missing_from_compiled":missing_K,
+        "unexpected_compiled_I_keys":extra_I,
+        "unexpected_compiled_K_keys":extra_K,
+        "selected_original_I_K_text_markup_reference_checks_passed":checks_passed,
         "compiled_I_key_count":len(rebuilt_I),
         "compiled_K_key_count":len(rebuilt_K),
         "compiled_TOP_key_count":len(rebuilt_U),
