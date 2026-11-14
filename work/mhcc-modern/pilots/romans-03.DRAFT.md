@@ -21,13 +21,13 @@ issue: "https://github.com/icfmp/Bible-Resources/issues/270"
 
 The law could not save people while they remained in sin, or free them from it. Yet it gave the Jews real advantages in seeking salvation.
 
-They had religious ordinances, knowledge of the true God and his worship, and many blessings given to Abraham's descendants. All these were means of grace. No doubt they helped bring many people to conversion.
+They had regular religious ordinances, instruction in the knowledge and worship of the true God, and many blessings given to Abraham's descendants. All these were means of grace. No doubt they helped bring many people to conversion.
 
 Above all, the Scriptures were entrusted to them. To possess God's word and his ordinances is a people's greatest blessing.
 
-Yet God's promises are made to believers. The unbelief of some—even of many who profess faith—cannot cancel his faithfulness.
+Yet God's promises are made only to believers. The unbelief of some—even of many who profess faith—cannot cancel his faithfulness.
 
-God will keep his promises to his people. He will also carry out his warnings against unbelief. The fact that he will judge the world should silence accusations against his justice.
+God will keep his promises to his people. He will also bring his threatened judgment upon unbelievers. The fact that he will judge the world should silence both doubts about his justice and accusations against it.
 
 The Jews' wickedness and stubborn unbelief showed both our need for God's righteousness through faith and God's justice in punishing sin.
 
@@ -39,7 +39,7 @@ We must not commit even one sin or tell even one lie in the hope that God will b
 
 ## All humanity is under sin (verses 9–18)
 
-All people stand under the guilt of sin. Sin also rules over them, enslaving them to do evil.
+All people bear the burden of sin's guilt. Sin also rules over them, enslaving them to do evil.
 
 Several Old Testament passages describe this corruption. They show what people are like until God's grace restrains or transforms them.
 
@@ -87,11 +87,11 @@ Yet believers are not left without law. Faith itself is a law and an active grac
 
 When it comes to justification, faith is not counted as an act of obedience or as a good work. Instead, it establishes a relationship between Christ and the sinner.
 
-Because of that relationship, the believer is pardoned and justified for the Savior's sake. Without it, the unbeliever remains under condemnation.
+Because of that relationship, the believer is pardoned and justified for the Savior's sake. The unbeliever, who is not united to Christ in this way, remains under condemnation.
 
 The law still has its place. It convicts us concerning the past and guides us for the future.
 
-We cannot be saved by the law as a covenant. Yet we acknowledge it as our rule under the Mediator.
+We cannot be saved by the law as a covenant. Yet we acknowledge and submit to it as a rule in the Mediator's hand.
 
 ---
 
