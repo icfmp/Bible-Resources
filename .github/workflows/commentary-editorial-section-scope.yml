@@ -78,6 +78,9 @@ jobs:
               print("Probe",key,json.dumps(
                   {k:v for k,v in (probe or {}).items() if k!="raw_payload_sha256"},
                   sort_keys=True))
+          for row in r["anomalies"]:
+              print("Candidate range",row["start"],"through",row["declared_end"],
+                    row["category"],"missing",",".join(row["missing_slots"]))
           PY
       - name: Preserve metadata-only complete candidate report for independent review
         uses: actions/upload-artifact@v4
