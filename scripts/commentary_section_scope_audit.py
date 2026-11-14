@@ -509,6 +509,35 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
         if len(chapters) != len(native_by_book[code]):
             identity = "SOURCE_CHAPTER_COUNT_DIFFERS_FROM_NATIVE_REGISTRY"
         book_classes[identity] += 1
+        source_prefix_nodes = []
+        for direct_child in div1:
+            if isinstance(direct_child.tag, str) and direct_child.tag.rsplit("}", 1)[-1] == "div2":
+                break
+            source_prefix_nodes.append(direct_child)
+        prefix_tag_counts = Counter(
+            node.tag.rsplit("}", 1)[-1]
+            for node in source_prefix_nodes if isinstance(node.tag, str)
+        )
+        prefix_chapter_markers = []
+        prefix_heading_numbers = set()
+        prefix_nonempty_paragraphs = 0
+        for prefix_node in source_prefix_nodes:
+            for element in prefix_node.iter():
+                if not isinstance(element.tag, str):
+                    continue
+                kind = element.tag.rsplit("}", 1)[-1]
+                if kind == "scripCom":
+                    ref = element.get("osisRef", "")
+                    typ, _ = _parse_reference(ref)
+                    matched = WORK_REF.fullmatch(ref)
+                    if typ == "work_qualified_chapter" and matched:
+                        prefix_chapter_markers.append(matched.group(2))
+                if kind in ("h2", "title"):
+                    heading = "".join(element.itertext())
+                    for number in re.findall(r"\bchapter\s+([1-9]\d*)\b", heading, re.I):
+                        prefix_heading_numbers.add(int(number))
+                if kind == "p":
+                    prefix_nonempty_paragraphs += bool("".join(element.itertext()).strip())
         book_evidence_rows.append({
             "native_book": code,
             "title_alias_candidate_books": sorted(candidates),
@@ -516,6 +545,10 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
             "source_direct_div2_count": len(chapters),
             "native_registry_chapter_count": len(native_by_book[code]),
             "identity_class": identity,
+            "source_direct_nodes_before_first_div2": dict(sorted(prefix_tag_counts.items())),
+            "source_prefix_chapter_scripCom_refs": sorted(set(prefix_chapter_markers)),
+            "source_prefix_numeric_h2_chapters": sorted(prefix_heading_numbers),
+            "source_prefix_nonempty_paragraphs": prefix_nonempty_paragraphs,
         })
         for chapter_number, div2 in enumerate(chapters, start=1):
             chapter = f"{code}.{chapter_number}"
