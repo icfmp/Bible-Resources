@@ -12,7 +12,9 @@
 #include <string>
 
 int main(int argc, char** argv) {
-    if (argc != 2) return 2;
+    const bool registryMode =
+        argc == 3 && std::string(argv[2]) == "--chapter-registry";
+    if (argc != 2 && !registryMode) return 2;
     const std::string moduleId(argv[1]);
     if (!std::regex_match(moduleId, std::regex("[A-Za-z][A-Za-z0-9_]{0,79}")))
         return 2;
@@ -41,8 +43,31 @@ int main(int argc, char** argv) {
     const std::regex numbered("[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9][0-9]*\\.[1-9][0-9]*");
     const std::regex introduction("[1-4]?[A-Za-z][A-Za-z0-9]*(\\.0\\.0|\\.[1-9][0-9]*(\\.0)?)?");
     unsigned long visited = 0, numberedCount = 0, introCount = 0, topCount = 0;
+    unsigned long registryChapterCount = 0, registryVerseCount = 0;
+    std::string lastRegistryChapter;
     while (!key.popError()) {
         if (++visited > 300000) return 7;
+        if (registryMode) {
+            if (key.getChapter() > 0 && key.getVerse() > 0) {
+                const std::string ref = key.getOSISRef();
+                const auto lastDot = ref.rfind('.');
+                if (lastDot == std::string::npos) return 11;
+                const std::string chapterRef = ref.substr(0, lastDot);
+                if (!std::regex_match(chapterRef, std::regex(
+                    "[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9][0-9]*"))) return 12;
+                if (chapterRef != lastRegistryChapter) {
+                    const int verseMax = key.getVerseMax();
+                    if (verseMax < 1 || verseMax > 1000) return 13;
+                    std::cout << "R\\t" << chapterRef << '\\t'
+                              << verseMax << '\\n';
+                    lastRegistryChapter = chapterRef;
+                    ++registryChapterCount;
+                    registryVerseCount += static_cast<unsigned long>(verseMax);
+                }
+            }
+            key++;
+            continue;
+        }
         if (module->hasEntry(&key)) {
             std::string ref = key.getOSISRef();
             if (ref.empty() && key.getChapter() == 0 && key.getVerse() == 0) {
@@ -58,6 +83,12 @@ int main(int argc, char** argv) {
             }
         }
         key++;
+    }
+    if (registryMode) {
+        if (registryChapterCount == 0 || registryVerseCount == 0) return 14;
+        std::cout << "S\\t" << registryChapterCount << '\\t'
+                  << registryVerseCount << '\\n';
+        return std::cout.good() ? 0 : 15;
     }
     if (numberedCount == 0) return 10;
     std::cout << "S\t" << visited << '\t' << numberedCount
