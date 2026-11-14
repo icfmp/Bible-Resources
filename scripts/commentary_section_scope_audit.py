@@ -28,6 +28,7 @@ from commentary_osis_rebuild_preflight import (
     NativeOSISRebuildPreflight, compare_opaque_top_with_standard_compiler_fixture,
 )
 from commentary_osis_transport_probe import isolated_osis2mod_original_sample_roundtrip
+from commentary_osis_mixed_transport_probe import probe_original_mixed_transport
 from commentary_osis_intro_transport_probe import probe_original_intro_transport
 from commentary_intro_chapter_text_review import (
     review_original_intro_against_numbered_chapter,
@@ -1302,9 +1303,15 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
 def audit(resource_id: str, index_binary: Path, raw_binary: Path,
           *, transport_sample_chapters: tuple[str, ...] = (),
           synthetic_intro_native_stream: Path | None = None,
-          intro_sample_chapters: tuple[str, ...] = ()) -> dict:
+          intro_sample_chapters: tuple[str, ...] = (),
+          mixed_sample_chapters: tuple[str, ...] = ()) -> dict:
     """Use exact SHA-pinned official stock, existing independently proved readers."""
     manifest = load_manifest(resource_id)
+    if (len(mixed_sample_chapters) > 3
+            or len(set(mixed_sample_chapters)) != len(mixed_sample_chapters)
+            or any(re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9]\d*", ref) is None
+                   for ref in mixed_sample_chapters)):
+        raise PilotError("Unreviewed or excessive original mixed I+K sample chapters")
     if (len(intro_sample_chapters) > 4
             or len(set(intro_sample_chapters)) != len(intro_sample_chapters)
             or any(re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9]\d*", ref) is None
@@ -1369,6 +1376,9 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
         private_unrecognized_raw = {}
         temporary_original_sample_raw = []
         original_sample_chapter_set = set(transport_sample_chapters)
+        original_mixed_sample_set = set(mixed_sample_chapters)
+        private_mixed_I = {}
+        private_mixed_K = defaultdict(list)
         osis_rebuild_preflight = NativeOSISRebuildPreflight()
         original_opaque_top_records = []
         private_intro_text_raw_by_chapter = {}
@@ -1389,6 +1399,9 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 if kind == "U":
                     original_opaque_top_records.append(raw)
                 if kind == "I":
+                    if (ref in original_mixed_sample_set
+                            or ref in {ch.rsplit(".",1)[0] for ch in original_mixed_sample_set}):
+                        private_mixed_I[ref] = raw
                     if (osis_rebuild_preflight.intro_visible_cases
                             and osis_rebuild_preflight.intro_visible_cases[-1][
                                 "original_native_intro_key"] == ref
@@ -1398,6 +1411,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 if kind != "K":
                     return
                 chapter = ref.rsplit(".", 1)[0]
+                if chapter in original_mixed_sample_set:
+                    private_mixed_K[chapter].append((ref, raw))
                 if chapter in private_intro_text_raw_by_chapter:
                     digest = sha256(raw).hexdigest()
                     private_numbered_bodies_for_intro_chapter[chapter].setdefault(
@@ -1469,6 +1484,19 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                     scratch=subdir, native_raw_binary=raw_binary
                 )
             )
+        mixed_probes = []
+        for i, chapter in enumerate(mixed_sample_chapters):
+            book = chapter.rsplit(".", 1)[0]
+            if (book not in private_mixed_I or chapter not in private_mixed_I
+                    or not private_mixed_K[chapter]):
+                raise PilotError("Mixed original chapter lacks verified book I, chapter I or occupied K")
+            scratch = directory / f"sample-mixed-original-{i}"
+            scratch.mkdir()
+            mixed_probes.append(probe_original_mixed_transport(
+                chapter, private_mixed_I[book], private_mixed_I[chapter],
+                private_mixed_K[chapter],
+                scratch=scratch, native_raw_binary=raw_binary
+            ))
         sample_probe = None
         if original_sample_chapter_set:
             observed_sample_chapters = {
@@ -1554,6 +1582,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             "private_numbered_only_osis2mod_sample_roundtrip": sample_probe,
             "private_original_intro_only_osis2mod_sample_roundtrips":
                 intro_transport_probes,
+            "private_original_mixed_intro_and_numbered_osis2mod_roundtrips":
+                mixed_probes,
             "native_rows_with_unrecognized_heading_or_xml": unparsed,
             **result,
             "explicit_heading_native_link_candidate_preflight": index_preflight,
@@ -1574,6 +1604,8 @@ def main(argv=None) -> int:
                         help="Read-only selected original chapters, temporary private OSIS conversion")
     parser.add_argument("--temporary-original-intro-sample-chapters", nargs="*", default=[],
                         help="Original I-only chapter tests in private isolated zCom candidates")
+    parser.add_argument("--temporary-original-mixed-chapters", nargs="*", default=[],
+                        help="Strict private mixed original book I, chapter I and K native OSIS roundtrips")
     parser.add_argument("--synthetic-intro-native-stream", type=Path,
                         help="Optional invented standalone OSIS compilation raw stream, compare TOP bytes only")
     parser.add_argument("--native-index-binary", type=Path, required=True)
@@ -1585,7 +1617,8 @@ def main(argv=None) -> int:
             args.resource_id, args.native_index_binary, args.native_raw_binary,
             transport_sample_chapters=tuple(args.temporary_numbered_sample_chapters),
             synthetic_intro_native_stream=args.synthetic_intro_native_stream,
-            intro_sample_chapters=tuple(args.temporary_original_intro_sample_chapters)
+            intro_sample_chapters=tuple(args.temporary_original_intro_sample_chapters),
+            mixed_sample_chapters=tuple(args.temporary_original_mixed_chapters)
         )
         code = 0
     except (OSError, RuntimeError, ValueError, zipfile.BadZipFile, RawCorpusError) as exc:
