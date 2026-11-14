@@ -126,4 +126,13 @@ jobs:
           PY
       - run: python scripts/validate.py
       - run: python scripts/build.py --output dist
+      - name: Check every catalogue resource has reviewed GitHub Release coverage
+        run: python scripts/catalogue_release_coverage.py --built dist
+      - name: Validate each current source-pinned versioned release plan (read-only)
+        env:
+          GITHUB_SHA_REF: ${{ github.sha }}
+        run: |
+          python scripts/publish_reviewed_release.py \
+            --built dist --repository "$GITHUB_REPOSITORY" \
+            --target-sha "$GITHUB_SHA_REF" --verify-only
       - run: python scripts/smoke.py

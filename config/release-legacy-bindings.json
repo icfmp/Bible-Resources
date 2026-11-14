@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "purpose": "Historical releases preceding unified publication. This closed, owner-reviewed list does not authorize adding new exemptions.",
+  "reviewed_by": "Bible Resources project owner — unified-publication remediation 2026-11-14",
+  "entries": [
+    {
+      "module_id": "darby-jnd-2024",
+      "sword_id": "BRJND2024",
+      "version": "0.1.1",
+      "tag": "darby-jnd-2024-0.1.1",
+      "asset_name": "BRJND2024-0.1.1.zip",
+      "release_sha256": "2b48c3c9a8897e58805a7cb3be731bb895363e51bc854df502ce7e7a45f0c2c4",
+      "release_size_bytes": 1960800,
+      "catalogue_sha256": "2b48c3c9a8897e58805a7cb3be731bb895363e51bc854df502ce7e7a45f0c2c4",
+      "catalogue_size_bytes": 1960800,
+      "legacy_package_differs": false,
+      "evidence_url": "https://github.com/icfmp/Bible-Resources/releases/tag/darby-jnd-2024-0.1.1",
+      "notes": "Previously published immutable Darby 0.1.1 release; verified source and catalogued version are identical."
+    },
+    {
+      "module_id": "lsg-1910",
+      "sword_id": "BRLSG1910",
+      "version": "0.1.0",
+      "tag": "lsg-0.1.0",
+      "asset_name": "BRLSG1910-0.1.0.zip",
+      "release_sha256": "af2f80ea84f40a6bf62993c9e65c2e2061e1ec20b34b0772a4eb775dd47723c1",
+      "release_size_bytes": 3881106,
+      "catalogue_sha256": "f3f74a1016f708e10263b5628e606a73b727c0e80fbb7e131d195c4b11d86c51",
+      "catalogue_size_bytes": 4042088,
+      "legacy_package_differs": true,
+      "evidence_url": "https://github.com/icfmp/Bible-Resources/releases/tag/lsg-0.1.0",
+      "notes": "Historical LSG 0.1.0 versioned release and deterministic current Pages SWORD archive have different byte-level ZIP package representations. Preserve both immutable existing publications; this exception is NOT proof that content/edition identity is identical. A separately audited, owner-authorized update is required to reconcile if necessary. Never silently replace either ZIP."
+    }
+  ]
+}
