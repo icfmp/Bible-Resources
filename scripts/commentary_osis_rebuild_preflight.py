@@ -22,7 +22,7 @@ MAX_RAW = 2 * 1024 * 1024
 MAX_ENTRIES = 300000
 OSIS_NS = b"http://www.bibletechnologies.net/2003/OSIS/namespace"
 K = re.compile(r"^[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9]\d*\.[1-9]\d*$")
-I = re.compile(r"^[1-4]?[A-Za-z][A-Za-z0-9]*(?:\.(?:0|[1-9]\d*)(?:\.0)?)?$")
+I = re.compile(r"^[1-4]?[A-Za-z][A-Za-z0-9]*(?:\.0\.0|\.[1-9]\d*(?:\.0)?)?$")
 U = re.compile(r"^TOP:[1-9]\d*$")
 
 
