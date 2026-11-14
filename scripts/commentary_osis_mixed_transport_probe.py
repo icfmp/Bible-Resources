@@ -340,10 +340,12 @@ def build_complete_original_transport(
         ) -> tuple[bytes, dict]:
     """Build *unmodified* original I/K XML into a private whole-module OSIS.
 
-    This deliberately does NOT expand missing section links, guess scopes,
-    change word forms, or claim the two native TOP records were reproduced.
-    Every original raw body is included as-is; same-byte contiguous K slots
-    are represented by one standard annotateRef range.
+    By default this does not add index targets. Optional, explicitly
+    PROVISIONAL alias records may alter only standard annotateRef coverage
+    after every master/raw digest and target vacancy is checked; this is
+    never a source-scope or publication approval. Original words and XML
+    fragments are unchanged. The original two TOP positions are separately
+    recompiled/read back by the caller, not manually synthesized.
     """
     chapter_pattern = re.compile(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9]\d*")
     book_pattern = re.compile(r"[1-4]?[A-Za-z][A-Za-z0-9]*")
