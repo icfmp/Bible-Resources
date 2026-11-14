@@ -7,6 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from commentary_navigation_link_plan import (
     propose_commentary_links, UnsafeCommentaryLinkPlan,
     parse_native_commentary_verse_registry, triage_missing_native_section_links,
+    triage_single_key_chapter_navigation,
 )
 
 A = "a" * 64
@@ -119,6 +120,87 @@ class PlanTests(unittest.TestCase):
                 valid_verse_keys={"Song.1.7", "Song.1.8"},
                 reviewed_sections=[section])
 
+
+
+
+class WholeChapterSourceTriageTests(unittest.TestCase):
+    def case(self, key, *, scope="SOURCE_DIV2_UNDIVIDED_CHAPTER_BODY_CANDIDATE",
+             overlap="HIGH_95_PLUS", unmatched=0, target_count=0,
+             target_paired=0):
+        return {
+            "native_start":key,
+            "source_div2_structure_class":scope,
+            "independent_lexical_comparison":{
+                "overlap_class":overlap,
+                "ordered_word_alignment":{
+                    "original_plain_words_not_matched_in_exact_order":unmatched,
+                    "stock_plain_words_not_matched_in_exact_order":0,
+                }
+            },
+            "independent_reference_target_comparison":{
+                "original_scripRef_with_nonempty_osisRef_target_count":target_count,
+                "original_scripRef_osisRef_targets_exact_value_multiset_matches_in_stock":
+                    target_paired,
+                "original_scripRef_osisRef_work_qualifier_only_matches_in_stock":0
+            }
+        }
+
+    def test_strong_chapter_witness_is_review_candidate_without_new_aliases(self):
+        observed=triage_single_key_chapter_navigation(
+            occupied={"Gen.36.1":A},
+            chapter_verse_maximums={"Gen.36":43},
+            independent_chapter_cases=[self.case("Gen.36.1")],
+            original_chapter_intro_has_visible_prose={"Gen.36":False},
+        )
+        self.assertEqual(observed["original_single_key_chapter_candidates"],1)
+        self.assertEqual(observed["potential_total_new_chapter_aliases_if_every_scope_approved"],42)
+        self.assertEqual(observed["classes"],{
+            "INDEPENDENT_UNDIVIDED_CHAPTER_SCOPE_STRONGLY_CORROBORATED":1
+        })
+        self.assertFalse(observed["any_new_aliases_created"])
+        self.assertFalse(observed["publication_authorized"])
+
+    def test_source_mapping_word_drift_and_native_intro_prose_have_distinct_blocks(self):
+        cases=[
+            self.case("Gen.1.1",scope="NO_SAFE_SOURCE_DIV2_FOR_NATIVE_CHAPTER"),
+            self.case("Exod.1.1",overlap="HIGH_80_PLUS"),
+            self.case("Lev.1.1"),
+            self.case("Num.1.1",target_count=2,target_paired=1),
+        ]
+        observed=triage_single_key_chapter_navigation(
+            occupied={r["native_start"]:A for r in cases},
+            chapter_verse_maximums={r["native_start"].rsplit(".",1)[0]:20
+                                    for r in cases},
+            independent_chapter_cases=cases,
+            original_chapter_intro_has_visible_prose={"Lev.1":True}
+        )
+        self.assertEqual(observed["classes"],{
+            "NO_SAFE_INDEPENDENT_UNDIVIDED_CHAPTER_SCOPE":1,
+            "INDEPENDENT_SOURCE_AND_NATIVE_TEXT_NEED_WORD_REVIEW":1,
+            "ADDITIONAL_NATIVE_CHAPTER_INTRO_PROSE_NEEDS_OWNERSHIP_REVIEW":1,
+            "INDEPENDENT_UNDIVIDED_CHAPTER_SCOPE_STRONGLY_CORROBORATED":1,
+        })
+        self.assertEqual(observed["source_reference_differences_needing_separate_review"],1)
+        self.assertEqual(observed["chapter_intro_prose_needing_independent_ownership_review"],1)
+        self.assertFalse(observed["any_new_aliases_created"])
+
+    def test_existing_different_section_and_ambiguous_original_is_refused(self):
+        with self.assertRaises(UnsafeCommentaryLinkPlan):
+            triage_single_key_chapter_navigation(
+                occupied={"Gen.1.1":A, "Gen.1.3":B},
+                chapter_verse_maximums={"Gen.1":31},
+                independent_chapter_cases=[self.case("Gen.1.1")])
+        with self.assertRaises(UnsafeCommentaryLinkPlan):
+            triage_single_key_chapter_navigation(
+                occupied={"Gen.1.1":A},
+                chapter_verse_maximums={"Gen.1":31},
+                independent_chapter_cases=[self.case("Gen.1.3")])
+        with self.assertRaises(UnsafeCommentaryLinkPlan):
+            triage_single_key_chapter_navigation(
+                occupied={"Gen.1.1":A},
+                chapter_verse_maximums={"Gen.1":31},
+                independent_chapter_cases=[self.case("Gen.1.1"),
+                                           self.case("Gen.1.1")])
 
 
 class MissingNativeSectionPreflightTests(unittest.TestCase):
