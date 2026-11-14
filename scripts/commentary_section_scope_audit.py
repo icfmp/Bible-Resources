@@ -296,6 +296,120 @@ def classify(records: dict[str, dict]) -> dict:
 
 
 
+
+def independent_chapter_scope_evidence(document, unrecognized_cases: list[dict]) -> dict:
+    """Classify genuine chapter-level source anchors in their div2 context.
+
+    A chapter scripCom annotation is NOT by itself proof of an undivided
+    chapter comment. The same div2 may contain other verse/range sections;
+    report that separately, and never infer absent verse keys or copy prose.
+    """
+    source_by_chapter = defaultdict(list)
+    source_marker_counts = Counter()
+    for node in document.iter():
+        if not isinstance(node.tag, str) or node.tag.rsplit("}", 1)[-1] != "scripCom":
+            continue
+        original_ref = node.get("osisRef", "")
+        kind, _ = _parse_reference(original_ref)
+        if kind != "work_qualified_chapter":
+            continue
+        m = WORK_REF.fullmatch(original_ref)
+        if m is None or not re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9]\\d*", m.group(2)):
+            continue
+        chapter = m.group(2)
+        source_marker_counts["complete_chapter_marker_occurrences"] += 1
+        parent = node.getparent()
+        while parent is not None and (
+            not isinstance(parent.tag, str) or
+            parent.tag.rsplit("}", 1)[-1] != "div2"
+        ):
+            parent = parent.getparent()
+        if parent is None:
+            source_by_chapter[chapter].append({
+                "shape": "CHAPTER_MARKER_OUTSIDE_DIV2",
+                "verse_markers": -1,
+                "paragraphs": 0,
+                "nonempty_div2": False,
+                "after_marker_tag": "_NOT_IN_CHAPTER"
+            })
+            continue
+        verse_markers = sum(
+            isinstance(child.tag, str)
+            and child.tag.rsplit("}", 1)[-1] == "scripCom"
+            and _parse_reference(child.get("osisRef", ""))[0] in (
+                "work_qualified_verse",
+                "work_qualified_same_book_verse_range"
+            )
+            for child in parent.iter()
+        )
+        paragraph_nodes = [
+            child for child in parent.iter()
+            if isinstance(child.tag, str) and child.tag.rsplit("}", 1)[-1] == "p"
+        ]
+        next_sibling = node.getnext()
+        next_tag = (next_sibling.tag.rsplit("}", 1)[-1]
+                    if next_sibling is not None and isinstance(next_sibling.tag, str)
+                    else "_END")
+        source_by_chapter[chapter].append({
+            "shape": ("CHAPTER_MARKER_WITH_SEPARATE_VERSE_SECTIONS"
+                      if verse_markers else "CHAPTER_MARKER_WITHOUT_VERSE_SECTIONS"),
+            "verse_markers": verse_markers,
+            "paragraphs": len(paragraph_nodes),
+            "nonempty_div2": bool("".join(parent.itertext()).strip()),
+            "after_marker_tag": next_tag,
+        })
+    rows = []
+    classes = Counter()
+    grouped_by_book = defaultdict(Counter)
+    candidates = [
+        row for row in (unrecognized_cases or [])
+        if row["first_verse_in_chapter"]
+        and row["number_of_occupied_native_slots_in_chapter"] == 1
+    ]
+    seen = set()
+    for row in candidates:
+        ref = row["native_key"]
+        if ref in seen:
+            raise PilotError("Duplicate candidate whole-chapter native key")
+        seen.add(ref)
+        chapter = ref.rsplit(".", 1)[0]
+        annotations = source_by_chapter.get(chapter, [])
+        if not annotations:
+            cls = "NO_MATCHING_CHAPTER_ANNOTATION_IN_OTHER_EDITION"
+        elif len(annotations) != 1:
+            cls = "MULTIPLE_CHAPTER_ANNOTATIONS_REQUIRE_EDITORIAL_REVIEW"
+        elif annotations[0]["shape"] == "CHAPTER_MARKER_WITHOUT_VERSE_SECTIONS" and (
+            annotations[0]["paragraphs"] > 0 and annotations[0]["nonempty_div2"]
+        ):
+            cls = "INDEPENDENT_UNDIVIDED_CHAPTER_SCOPE_CANDIDATE"
+        else:
+            cls = "CHAPTER_ANNOTATION_WITH_SECTIONS_OR_UNREVIEWED_SHAPE"
+        classes[cls] += 1
+        grouped_by_book[chapter.split(".", 1)[0]][cls] += 1
+        rows.append({
+            "native_start": ref,
+            "candidate_chapter": chapter,
+            "witness_class": cls,
+            "matching_source_chapter_markers": len(annotations),
+            "witness_marker_shapes": [i["shape"] for i in annotations],
+            "witness_verse_marker_count": sum(max(i["verse_markers"], 0) for i in annotations),
+            "witness_nonempty_paragraphs": sum(i["paragraphs"] for i in annotations),
+            "source_reference_strings_rewritten": False,
+            "authorial_chapter_scope_approved": False,
+        })
+    return {
+        "stock_single_occupied_slot_chapter_candidates": len(candidates),
+        "independent_source_chapter_marker_inventory": dict(sorted(source_marker_counts.items())),
+        "source_scope_candidate_classes": dict(sorted(classes.items())),
+        "source_scope_candidates_by_book": {
+            book: dict(sorted(counts.items())) for book, counts in sorted(grouped_by_book.items())
+        },
+        "case_rows": rows,
+        "source_digital_edition_equivalence_unverified": True,
+        "per_verse_navigation_approved": False
+    }
+
+
 def compare_independent_thml_witness(manifest: dict, sections: list[dict],
                                      anomalies: list[dict], temp: Path,
                                      unrecognized_cases: list[dict] | None = None) -> dict:
@@ -461,8 +575,10 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
             "classification": "CROSS_EDITION_METADATA_ONLY_NOT_A_CORRECTION",
         })
 
+    chapter_scopes = independent_chapter_scope_evidence(document, unrecognized_cases or [])
     return {
         "status": "PINNED_DIFFERENT_DIGITAL_EDITION_SCOPE_COMPARISON",
+        "independent_whole_chapter_review": chapter_scopes,
         "witness_sha256": expected,
         "source_marker_rows_observed": observed,
         "unrecognized_source_annotation_classes": dict(
