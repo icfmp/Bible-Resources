@@ -600,6 +600,91 @@ def probe_private_chapter_reader_repetition(
     }
 
 
+
+
+def _observe_real_xiphos_full_chapter_excerpt(
+        env: dict, chapter: str, master_plain: bytes,
+        independent_section_plain: bytes) -> dict:
+    """One conservative actual-GTK whole-chapter attempt, no screenshots.
+
+    Requires both a repeated-link section and an independent chapter section
+    to be copied from the *same visible GUI selection* before calling a
+    single occurrence a meaningful chapter-level dedup observation.
+    """
+    import time
+    from commentary_xiphos_dual_reader import (
+        _x11, _main_xiphos_window, _commentary_pane_focus_points,
+        _seed_x11_clipboard
+    )
+    try:
+        window = _main_xiphos_window(env)
+        if window is None or not re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9]\d*",chapter):
+            raise ValueError("Xiphos whole chapter identity/window not verifiable")
+        book, chapter_number = chapter.rsplit(".",1)
+        reference=f"{book} {chapter_number}"
+        _x11(["xdotool","windowfocus","--sync",window],env)
+        for command in (
+            ["xdotool","key","--clearmodifiers","ctrl+l"],
+            ["xdotool","type","--clearmodifiers","--delay","25",reference],
+            ["xdotool","key","Return"],
+            ["xdotool","key","--clearmodifiers","alt+c"]
+        ):
+            _x11(command,env)
+        time.sleep(1.5)
+        results=[]
+        for x,y in _commentary_pane_focus_points(env,window):
+            _x11(["xdotool","mousemove",str(x),str(y),"click","1"],env)
+            time.sleep(0.6)
+            _seed_x11_clipboard(env)
+            _x11(["xdotool","key","--clearmodifiers","ctrl+a"],env)
+            _x11(["xdotool","key","--clearmodifiers","ctrl+c"],env)
+            time.sleep(0.8)
+            selection=_x11(["xclip","-selection","clipboard","-o"],env)
+            if b"XIPHOS_PRIVATE_CLIPBOARD_SENTINEL_NOT_SOURCE_TEXT" in selection:
+                continue
+            main=classify_chapter_reader_repetition(master_plain,selection)
+            other=classify_chapter_reader_repetition(independent_section_plain,selection)
+            results.append({
+                "main":main,"independent_section":other,
+                "same_real_GTK_clipboard_from_commentary_pane":True,
+            })
+        for observation in results:
+            count=observation["main"]["reliable_count"]
+            separate=observation["independent_section"]["reliable_count"]
+            if count is not None and separate is not None:
+                return {
+                    "status": (
+                        "XIPHOS_CHAPTER_MULTIPLE_SECTIONS_SEEN_ONCE_EACH"
+                        if count == separate == 1 else
+                        "XIPHOS_CHAPTER_REPEATED_PROSE_DETECTED"
+                        if count > 1 or separate > 1
+                        else "INCONCLUSIVE_REAL_GUI_CHAPTER_COPY"
+                    ),
+                    "linked_section_observed_occurrences":count,
+                    "independent_commentary_section_observed_occurrences":separate,
+                    "two_original_distinct_section_bodies_visible":True,
+                    "source_prose_or_screenshot_uploaded":False,
+                }
+        return {
+            "status":"INCONCLUSIVE_REAL_GUI_CHAPTER_COPY_NOT_WHOLE_CHAPTER",
+            "linked_section_observed_occurrences":None,
+            "independent_commentary_section_observed_occurrences":None,
+            "two_original_distinct_section_bodies_visible":False,
+            "source_prose_or_screenshot_uploaded":False,
+        }
+    except (ValueError,Exception) as error:
+        # Only exception *class* is logged, never UI/OS error strings
+        # that might embed private authorial text.
+        return {
+            "status":"REAL_GUI_CHAPTER_COPY_UNAVAILABLE",
+            "exception_kind":type(error).__name__,
+            "linked_section_observed_occurrences":None,
+            "independent_commentary_section_observed_occurrences":None,
+            "two_original_distinct_section_bodies_visible":False,
+            "source_prose_or_screenshot_uploaded":False,
+        }
+
+
 def _probe_private_alias_real_xiphos(root: Path, module_id: str, aliases: dict,
                                     compiled_K: dict[str, bytes]) -> dict:
     """Bounded real-reader experiment; never claim window == rendered passage.
@@ -681,8 +766,39 @@ def _probe_private_alias_real_xiphos(root: Path, module_id: str, aliases: dict,
             "bible": bible_plain,
             "commentary_internal": compiled_K[key],
         }
+    chapter = largest.rsplit(".",1)[0]
+    other_original_section = next((
+        key for key,raw in compiled_K.items()
+        if key.startswith(chapter+".")
+        and raw != compiled_K[largest]
+        and key not in aliases
+    ),None)
+    def chapter_readback(env):
+        if other_original_section is None:
+            return {"whole_chapter_Xiphos_GTK_proof":{
+                "status":"NO_INDEPENDENT_SECTION_WITNESS_IN_CHAPTER",
+                "two_original_distinct_section_bodies_visible":False
+            }}
+        b,c,v=other_original_section.split(".")
+        code,other_plain=query(module_id,f"{b} {c}:{v}",fmt="plain",
+                               root=root,timeout=25,limit=256*1024)
+        if not present_key(f"{b} {c}:{v}",other_plain,code):
+            return {"whole_chapter_Xiphos_GTK_proof":{
+                "status":"INDEPENDENT_SECTION_READBACK_UNAVAILABLE",
+                "two_original_distinct_section_bodies_visible":False
+            }}
+        bm,cm,vm=largest.split(".")
+        main_code,main_plain=query(module_id,f"{bm} {cm}:{vm}",fmt="plain",
+                                   root=root,timeout=25,limit=256*1024)
+        if not present_key(f"{bm} {cm}:{vm}",main_plain,main_code):
+            raise ValueError("Master original commentary reader unavailable")
+        return {"whole_chapter_Xiphos_GTK_proof":
+            _observe_real_xiphos_full_chapter_excerpt(
+                env,chapter,main_plain,other_plain
+            )}
     gui = _run_real_gui(
-        root, comparisons, seconds=6, commentary_module_id=module_id
+        root, comparisons, seconds=6, commentary_module_id=module_id,
+        on_gui_ready=chapter_readback
     )
     return {
         "status": "PRIVATE_XIPHOS_REAL_GUI_EXPERIMENT_NOT_PRESENTATION_APPROVAL",
@@ -697,6 +813,8 @@ def _probe_private_alias_real_xiphos(root: Path, module_id: str, aliases: dict,
             gui["commentary_clipboard_match_by_passage"],
         "independent_gui_commentary_excerpt_match_count":
             gui["independent_gui_commentary_excerpt_match_count"],
+        "whole_chapter_Xiphos_GTK_proof":
+            gui["whole_chapter_Xiphos_GTK_proof"],
         "whole_chapter_commentary_deduplication_proven": False,
         "entire_edition_reader_presentation_approved": False,
         "source_prose_or_screenshot_uploaded": False,
