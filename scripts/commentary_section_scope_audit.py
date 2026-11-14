@@ -187,12 +187,21 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
         raise PilotError("Pinned independent ThML is not safely parseable") from None
     markers = defaultdict(set)
     observed = 0
+    unresolved_near_candidates = defaultdict(list)
+    suspect_starts = {row["start"] for row in anomalies}
     for node in document.iter():
         if not isinstance(node.tag, str) or node.tag.rsplit("}", 1)[-1] != "scripCom":
             continue
         original_ref = node.get("osisRef", "")
         kind, _ = _parse_reference(original_ref)
         if kind not in ("work_qualified_verse", "work_qualified_same_book_verse_range"):
+            for start in suspect_starts:
+                if re.search(re.escape(start) + r"(?![0-9])", original_ref):
+                    if len(original_ref) <= 256:
+                        unresolved_near_candidates[start].append({
+                            "source_reference_attribute": original_ref,
+                            "strict_parser_class": kind
+                        })
             continue
         match = WORK_REF.fullmatch(original_ref)
         if match is None:
@@ -228,6 +237,9 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
             {"start": a["start"], "declared_end": a["declared_end"],
              "relation": relation(a)} for a in anomalies
         ],
+        "unparsed_source_reference_candidates_near_anomalies": {
+            start: values for start, values in sorted(unresolved_near_candidates.items())
+        },
         "ccel_edition_equivalence_to_stock_proven": False,
         "editorial_correctness_proven": False,
         "text_or_reference_edited": False
