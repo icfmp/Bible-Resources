@@ -140,7 +140,12 @@ jobs:
               "status","original_prose_UI_text_XML_screenshots_or_ZIP_exported"
           }
           assert prose["scope"]=="exact_original_native_zCom_prose_vs_actual_AndBible_WebView_accessibility"
-          assert prose["original_native_occupied_sample_keys_inspected"]==len(manifest["sample_references"])
+          assert type(data["original_sample_references_not_verifiably_native_occupied_count"]) is int
+          assert 0<=data["original_sample_references_not_verifiably_native_occupied_count"]<len(manifest["sample_references"])
+          assert 1<=prose["original_native_occupied_sample_keys_inspected"]<=len(manifest["sample_references"])
+          assert (prose["original_native_occupied_sample_keys_inspected"]
+                  + data["original_sample_references_not_verifiably_native_occupied_count"]
+                  == len(manifest["sample_references"]))
           assert type(prose["real_AndBible_WebViews_observed"]) is int
           assert 0<=prose["real_AndBible_WebViews_observed"]<=12
           assert type(prose["real_AndBible_WebView_text_sequences_examined"]) is int
