@@ -121,6 +121,42 @@ class UnknownHeadingTests(unittest.TestCase):
 
 
 class IndependentWitnessTests(unittest.TestCase):
+    def test_unlabelled_stock_entry_can_have_explicit_independent_section(self):
+        xml = (
+            b"<root>"
+            b'<scripCom osisRef="Bible:Gen.36.1-Gen.36.43"/>'
+            b'<scripRef osisRef="Bible:Gen.36.1-Gen.36.43"/>'
+            b"</root>"
+        )
+        digest = sha256(xml).hexdigest()
+        manifest = {"commentary_source": {
+            "xml_witness_url": "https://www.ccel.org/fake.xml",
+            "xml_witness_sha256": digest,
+        }}
+        unknown = [{
+            "native_key": "Gen.36.1",
+            "raw_payload_sha256": "fake-unique-payload",
+            "number_of_occupied_native_slots_in_chapter": 1,
+        }]
+        def fixture(url, dest, provider):
+            dest.write_bytes(xml)
+            return {"sha256": digest, "bytes": len(xml)}
+        with TemporaryDirectory() as td, patch(
+            "commentary_section_scope_audit.fetch", fixture
+        ):
+            got = compare_independent_thml_witness(
+                manifest, [], [], Path(td), unknown
+            )
+        self.assertEqual(
+            got["unrecognized_source_annotation_classes"],
+            {"SOURCE_EXPLICIT_MULTI_VERSE_SECTION": 1}
+        )
+        self.assertEqual(
+            got["unrecognized_distinct_payload_source_rows"][0]["source_section_endpoints"],
+            ["Gen.36.43"]
+        )
+        self.assertFalse(got["editorial_correctness_proven"])
+
     def test_citation_range_is_not_commentary_section_anchor(self):
         xml = (
             b"<root>"
