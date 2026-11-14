@@ -24,7 +24,7 @@ issue: "https://github.com/icfmp/Bible-Resources/issues/270"
 
 Elimelech was not wrong to provide for his family, but his decision to move to Moab could not be justified. That move ended in the loss of his family. It is foolish to try to escape a cross that lies in our path when we ought to take it up. A change of place seldom puts things right.
 
-Those who expose young people to bad company and take them away from public worship and religious ordinances may believe that they are well grounded in faith and armed against temptation. But they cannot know how things will end. We are not told that the women whom Elimelech's sons married had converted to the Jewish faith.
+Those who expose young people to bad company and remove them from public worship and religious ordinances may believe that the young people themselves have firm principles and are armed against temptation. But they cannot know how things will end. We are not told that the women whom Elimelech's sons married had converted to the Jewish faith.
 
 Earthly trials and enjoyments alike last only a short time. Death continually takes people of every age and circumstance, spoiling all our outward comforts. We cannot place too high a value on blessings that will last forever.
 
