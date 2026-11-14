@@ -89,6 +89,20 @@ class AndBiblePrivateImportUiTest(unittest.TestCase):
                          ("shell", "monkey", "-p"))
         self.assertEqual(sleep.call_args.args, (12,))
 
+    def test_final_stable_id_is_strictly_allowed_for_private_0_1_1_visual_proof(self):
+        xml=b'<hierarchy><node text="BRJND2024.zip" bounds="[50,500][300,600]"/></hierarchy>'
+        controls=safe_controls(xml)
+        self.assertEqual(controls[0]["label"],"BRJND2024.ZIP")
+        with (patch("probe_andbible_android_private_import.adb") as adb,
+              patch("probe_andbible_android_private_import.time.sleep")):
+            open_documented_reference_probe("Gen.6.9",module_id="BRJND2024")
+        self.assertEqual(
+            adb.call_args.args[6],
+            "https://read.andbible.org/Gen.6.9?document=BRJND2024&v11n=Luther",
+        )
+        with self.assertRaises(AndroidDarbyImportError):
+            open_documented_reference_probe("Gen.6.9",module_id="UnknownBible")
+
     def test_official_osis_deep_link_is_module_and_versification_bound(self):
         with (patch("probe_andbible_android_private_import.adb") as adb,
               patch("probe_andbible_android_private_import.time.sleep")):
