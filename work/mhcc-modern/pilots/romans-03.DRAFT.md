@@ -37,7 +37,7 @@ Seeking justification through works of the law is useless. Everyone must plead g
 
 ## God's righteousness through faith in Christ (verses 21–26)
 
-Must guilty people remain under God's wrath? Is the wound forever incurable? No. Blessed be God, another way has been opened to us. It is the righteousness of God: a righteousness that he ordains, provides, and accepts. It is received through faith whose object is Jesus Christ, the anointed Savior.
+Must guilty people remain under God's wrath? Is the wound forever incurable? No. Blessed be God, another way has been opened to us. It is the righteousness of God: a righteousness that he ordains, provides, and accepts. It is received through faith in Jesus Christ, whose name signifies an anointed Savior.
 
 Justifying faith looks to Christ as Savior in all three of his anointed offices: Prophet, Priest, and King. It trusts him, receives him, and holds fast to him. In all these respects Jews and Gentiles are equally welcome to God through Christ. There is no distinction. His righteousness comes upon everyone who believes. It is not merely offered to them but placed upon them like a crown or a robe. This is free grace, sheer mercy; nothing in us deserves such favor.
 
@@ -47,7 +47,7 @@ This righteousness comes to us freely, but Christ purchased it and paid its pric
 
 God intends the great work of justifying and saving sinners, from beginning to end, to leave no room for boasting. If we were saved by our own works, boasting would not be excluded. But justification by faith excludes it forever.
 
-Yet believers are not left without law. Faith itself is a governing principle and an active grace wherever it is genuine. In justification, faith is not regarded as an act of obedience or as a good work. Rather, it forms the relationship between Christ and the sinner, making it fitting for the believer to be pardoned and justified for the Savior's sake. The unbeliever, who is not united or related to Christ in this way, remains under condemnation.
+Yet believers are not left without law. Faith itself is a law, an active grace wherever it is genuine. In justification, faith is not regarded as an act of obedience or as a good work. Rather, it forms the relationship between Christ and the sinner, making it fitting for the believer to be pardoned and justified for the Savior's sake. The unbeliever, who is not united or related to Christ in this way, remains under condemnation.
 
 The law is still useful: it convicts us concerning the past and directs us concerning the future. Although we cannot be saved by it as a covenant, we acknowledge and submit to it as a rule in the hand of the Mediator.
 
