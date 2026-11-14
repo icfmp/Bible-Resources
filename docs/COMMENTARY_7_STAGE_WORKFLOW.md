@@ -164,6 +164,34 @@ This full-original XML census does not establish historical print-edition
 parity, exact book/chapter typography, clicked-link navigation, licence
 rights, or publication approval.
 
+
+### Original scripture links: literal source forms and visible labels
+
+The same generic source-native census now classifies **each original**
+`reference/@osisRef` attribute (without stripping the literal source value)
+as a simple OSIS verse, verse-range-like, book/chapter-like, compound or
+unclassified form. It separately counts original reference labels and title
+elements that contain authored visible text, and literal `Bible:` work
+prefixes, without exporting **any** original target, title, link text or key.
+
+For the SHA-pinned original CrossWire **MHCC 2.0**, the actual all-entry
+[PR #260 native audit](https://github.com/icfmp/Bible-Resources/pull/260)
+found **5,891** simple single-verse-like references, **4,666**
+verse-range-like references and **0** in the other three shape categories.
+All **10,557** native reference labels and **15,985** title elements
+contain source text. Neither an empty label nor unclassified target shape
+was observed. The exact 29,975 occupied native keys and original full-corpus
+digest were re-verified in the same source-pinned run.
+
+These are **shape and presence observations**, not independent confirmation
+that every endpoint exists in the correct KJV versification, that every
+range's endpoints are ordered, that a commentary label matches its declared
+reference, or that Xiphos performs the correct UI navigation. The original
+compiled bytes and reference attributes remain untouched. A future
+independent target-resolution check must preserve original multi-verse
+range semantics; it must never replace a range with an invented endpoint.
+
+
 ## Reusable read-only observation (implemented)
 
 Each candidate has a **separate reviewed manifest**
