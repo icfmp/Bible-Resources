@@ -28,6 +28,7 @@ from commentary_osis_rebuild_preflight import (
     NativeOSISRebuildPreflight, compare_opaque_top_with_standard_compiler_fixture,
 )
 from commentary_osis_transport_probe import isolated_osis2mod_original_sample_roundtrip
+from commentary_intro_chapter_text_review import review_original_intro_against_numbered_chapter
 from commentary_navigation_link_plan import (
     parse_native_commentary_verse_registry, UnsafeCommentaryLinkPlan,
     triage_missing_native_section_links,
@@ -1293,6 +1294,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
         original_sample_chapter_set = set(transport_sample_chapters)
         osis_rebuild_preflight = NativeOSISRebuildPreflight()
         original_opaque_top_records = []
+        private_intro_text_raw_by_chapter = {}
+        private_numbered_bodies_for_intro_chapter = defaultdict(dict)
         unparsed = 0
         process = None
         try:
@@ -1308,8 +1311,21 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 osis_rebuild_preflight.observe(kind, ref, raw)
                 if kind == "U":
                     original_opaque_top_records.append(raw)
+                if kind == "I":
+                    if (osis_rebuild_preflight.intro_visible_cases
+                            and osis_rebuild_preflight.intro_visible_cases[-1][
+                                "original_native_intro_key"] == ref
+                            and "." in ref):
+                        private_intro_text_raw_by_chapter[ref] = raw
+                    return
                 if kind != "K":
                     return
+                chapter = ref.rsplit(".", 1)[0]
+                if chapter in private_intro_text_raw_by_chapter:
+                    digest = sha256(raw).hexdigest()
+                    private_numbered_bodies_for_intro_chapter[chapter].setdefault(
+                        digest, (ref, raw)
+                    )
                 if ref.rsplit(".", 1)[0] in original_sample_chapter_set:
                     temporary_original_sample_raw.append((ref, raw))
                 heading = heading_extent(raw)
@@ -1374,6 +1390,13 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 temporary_original_sample_raw, scratch=directory,
                 native_raw_binary=raw_binary,
             )
+        source_intro_chapter_text_reviews = [
+            review_original_intro_against_numbered_chapter(
+                chapter, raw,
+                list(private_numbered_bodies_for_intro_chapter[chapter].values())
+            )
+            for chapter, raw in sorted(private_intro_text_raw_by_chapter.items())
+        ]
         result = classify(records)
         index_preflight = triage_missing_native_section_links(
             occupied={key: entry["sha256"] for key, entry in records.items()},
@@ -1424,6 +1447,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             "native_intro_rows": len(intros), "native_top_rows": len(top),
             "native_full_key_crosscheck": proof["exact_all_occupied_stock_keys_read_and_crosschecked"],
             "original_osis_rebuild_structure_preflight": original_osis_rebuild_feasibility,
+            "original_intro_visible_text_slot_concordance":
+                source_intro_chapter_text_reviews,
             "synthetic_compiler_opaque_top_original_exact_byte_comparison":
                 synthetic_opaque_top_comparison,
             "private_numbered_only_osis2mod_sample_roundtrip": sample_probe,
