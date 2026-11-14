@@ -490,6 +490,25 @@ jobs:
               print("Candidate range",row["start"],"through",row["declared_end"],
                     row["category"],"missing",",".join(row["missing_slots"]))
           witness=r["independent_thml_witness"]
+          lead=witness["independent_leading_range_citations"]
+          assert lead["status"]=="INDEPENDENT_DIGITAL_SECTION_LEAD_TO_STOCK_PROSE_TRIAGE_NOT_APPROVAL"
+          assert lead["case_count"]==17
+          assert lead["publication_authorized"] is False
+          print("Independent real source citation leads: exact range cases",
+                lead["cases_with_independent_exact_range_citation"],
+                "lead with corresponding stock exposition",
+                lead["cases_with_source_lead_prose_and_matching_stock_exposition"])
+          for candidate in lead["case_rows"]:
+              print("Source leading-section citation check:",
+                    candidate["original_section_start"],
+                    "exact original CCEL citations",
+                    candidate["independent_exact_range_citation_count"],
+                    "leading paragraph with substantial prose",
+                    candidate["independent_leading_reference_with_substantial_following_prose"],
+                    "substantive original stock paragraph alignment",
+                    candidate["independent_leading_reference_and_matching_original_stock_exposition"],
+                    "authorially reviewed",candidate["scope_authorially_reviewed"])
+
           print("Independent ThML status:",witness["status"])
           print("Independent ThML section agreement:",
                 json.dumps(witness.get("source_range_agreement_counts",{}),sort_keys=True))
