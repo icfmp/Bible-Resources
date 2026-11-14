@@ -208,6 +208,50 @@ class SafeLexicalEvidenceTests(unittest.TestCase):
         self.assertEqual(r["status"], "UNPARSEABLE_ORIGINAL_RAW")
         self.assertFalse(r["source_text_equal"])
 
+    def test_isolated_mismatched_stock_word_located_in_paragraph_without_export(self):
+        r = independent_lexical_overlap(
+            "The promised comfort lasts.",
+            b"<p>The promised courage lasts.</p>",
+        )
+        word = r["isolated_one_word_xml_location"]
+        self.assertEqual(word["status"],
+                         "ISOLATED_ONE_WORD_DIFFERENCE_NOT_EDITORIAL_VERDICT")
+        self.assertEqual(word["original_word_index_from_zero"], 2)
+        self.assertEqual(word["stock_owning_top_level_xml_element"], "p")
+        self.assertFalse(word["difference_is_inside_xml_reference"])
+        self.assertFalse(word["original_or_stock_words_disclosed"])
+        self.assertNotIn("comfort", str(word))
+        self.assertNotIn("courage", str(word))
+
+    def test_stock_title_word_is_not_mistaken_for_authorial_prose(self):
+        r = independent_lexical_overlap(
+            "Chapter 2 explains redemption.",
+            b"<title>Chapter 3</title><p> explains redemption.</p>"
+        )
+        word = r["isolated_one_word_xml_location"]
+        self.assertEqual(word["stock_owning_top_level_xml_element"], "title")
+        self.assertTrue(word["difference_is_inside_xml_title"])
+        self.assertEqual(word["one_word_edit_class"],
+                         "DIFFERENT_NUMERIC_WORD")
+
+    def test_single_character_edit_and_unicode_casefold_offsets(self):
+        r = independent_lexical_overlap(
+            "Straße truth end.",
+            "<p>Straße truths end.</p>".encode("utf-8")
+        )
+        word = r["isolated_one_word_xml_location"]
+        self.assertEqual(word["original_word_index_from_zero"], 1)
+        self.assertEqual(word["one_word_edit_class"],
+                         "ONE_CHARACTER_INSERTION_IN_STOCK")
+        self.assertEqual(word["stock_owning_top_level_xml_element"], "p")
+
+    def test_multiple_word_variants_do_not_claim_isolated_word(self):
+        r = independent_lexical_overlap(
+            "faith hope charity",
+            b"<p>strength mercy kindness</p>"
+        )
+        self.assertIsNone(r["isolated_one_word_xml_location"])
+
 class ChapterScopeEvidenceTests(unittest.TestCase):
     def test_chapter_only_div2_is_candidate_not_editorial_approval(self):
         source = etree.fromstring(
