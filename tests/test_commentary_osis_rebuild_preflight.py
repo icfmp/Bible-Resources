@@ -87,6 +87,24 @@ class NativeOSISRebuildPreflightTests(unittest.TestCase):
         self.assertEqual(r["opaque_top_original_xml_element_names"], {"title": 1})
         self.assertFalse(r["canonical_original_introductions_and_TOP_reconstructed"])
 
+    def test_intro_structural_fragment_distinguished_from_prose(self):
+        c = NativeOSISRebuildPreflight()
+        c.observe(
+            "I", "Gen.1",
+            b'<chapter osisID="Gen.1" sID="somechapter"/>'
+            b'<div type="section"><milestone type="line"/></div>'
+        )
+        c.observe("I", "Gen.2", b'<div><p>Invented chapter overview.</p></div>')
+        result = c.report(expected_count=2)
+        self.assertEqual(
+            result["intro_original_visible_word_count_bands"],
+            {"zero_words": 1, "one_to_ten_words": 1}
+        )
+        self.assertEqual(result["intro_original_full_element_name_counts"],
+                         {"chapter": 1, "div": 2, "milestone": 1, "p": 1})
+        self.assertEqual(result["intro_original_full_attribute_name_counts"],
+                         {"osisID": 1, "sID": 1, "type": 2})
+
     def test_repeated_raw_keys_not_inferred_as_authorial_verse_range(self):
         c = NativeOSISRebuildPreflight()
         for key in ("Gen.1.7", "Gen.1.8", "Gen.2.1"):
