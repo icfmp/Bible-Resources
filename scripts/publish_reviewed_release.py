@@ -19,6 +19,7 @@ from zipfile import ZipFile
 
 ROOT = Path(__file__).resolve().parents[1]
 SHA = re.compile(r"[a-f0-9]{64}\Z")
+COMMIT_SHA = re.compile(r"[a-f0-9]{40}\Z")
 TAG = re.compile(r"[a-z][a-z0-9-]{2,80}\Z")
 SAFE_NAME = re.compile(r"[A-Za-z][A-Za-z0-9_-]{1,63}-(?:[0-9]+\.){2}[0-9]+\.zip\Z")
 HEX_VERSION = re.compile(r"[0-9]+\.[0-9]+\.[0-9]+\Z")
@@ -189,7 +190,7 @@ def main() -> int:
     parser.add_argument("--verify-only",action="store_true")
     args=parser.parse_args()
     if (not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+",args.repository)
-            or not SHA.fullmatch(args.target_sha)):
+            or not COMMIT_SHA.fullmatch(args.target_sha)):
         raise ReleaseError("Unsafe destination or unreviewed release commit")
     plans = sorted((args.root/"config/release-plans").glob("*.json"))
     if not plans:
