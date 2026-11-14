@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import sys
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, MagicMock, patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
 from commentary_android_webview_debug import (
@@ -62,7 +62,7 @@ class OfficialAndBibleWebViewDebugTests(unittest.TestCase):
         def device(*args, **kwargs):
             if args[:3] == ("shell", "pidof", "net.bible.android.activity"):
                 return b"12345\n"
-            if args[:4] == ("shell", "cat", "/proc/net/unix"):
+            if args[:3] == ("shell", "cat", "/proc/net/unix"):
                 return b"one socket: @webview_devtools_remote_12345\n"
             if args[:3] == ("forward", "tcp:0", "localabstract:webview_devtools_remote_12345"):
                 return b"52655\n"
@@ -77,8 +77,9 @@ class OfficialAndBibleWebViewDebugTests(unittest.TestCase):
             {"type": "page",
              "webSocketDebuggerUrl": "ws://external.invalid:52655/devtools/page/def"},
         ]).encode()
-        build_opener.return_value.open.return_value.__enter__ = Mock(return_value=resource)
-        build_opener.return_value.open.return_value.__exit__ = Mock(return_value=False)
+        response = MagicMock()
+        response.__enter__.return_value = resource
+        build_opener.return_value.open.return_value = response
         debugger.return_value = "Private authentic commentary text"
         texts, meta = read_private_official_andbible_dom_text()
         self.assertEqual(texts, ["Private authentic commentary text"])
