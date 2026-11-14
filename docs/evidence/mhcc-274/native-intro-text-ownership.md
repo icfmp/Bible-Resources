@@ -175,3 +175,29 @@ key locations and semantically relevant XML/notes/reference attributes
 without hiding compiler wrapper differences, plus reader display behavior.
 Source-endorsed verse navigation changes are separate from technical parity.
 No original or published module has changed.
+
+
+## Mixed original book-I + chapter-I + K transport: authentic chapter verified
+
+[Exact original-source mixed transport audit #43637657763](https://github.com/icfmp/Bible-Resources/actions/runs/43637657763) **SUCCESS**, using a disposable module compiled by standard `osis2mod`, then independently read back through the released libSWORD native raw scanner. The SHA-pinned CrossWire MHCC stock remained completely untouched.
+
+For **2 John 1** the original source includes a book-intro I key, a chapter-intro I key and **13 occupied numbered K keys** (four distinct K commentary bodies; do not confuse original indexed addresses with authorial sections). The **mixed** OSIS construction preserved all of them **in the same candidate compilation**, rather than merely exercising separate I-only and K-only builds.
+
+| Verification | Exact real compiled candidate result |
+| --- | ---: |
+| Original I keys found | 2 / 2 |
+| Original occupied K keys found | 13 / 13 |
+| Missing original I or K keys | 0 |
+| Unexpected K keys | 0 |
+| Original ordered Unicode words, I and K | 15 / 15 |
+| Original visible text, after whitespace-only normalization | 15 / 15 |
+| Original non-`div` elements, order, and literal attributes | 15 / 15 |
+| Original `div` attribute multiset | 15 / 15 |
+| Original ordered `reference` attribute values | 15 / 15 |
+| Whole-source historical/print-edition parity proven | **No** |
+| All 29,975 original K/I/U entries reconciled | **No** |
+| Published / modified original source | **No** |
+
+The original source fragments were included verbatim in a private temporary OSIS document. Its separately identified zCom candidate has **not** been proposed for release and no source content was committed to GitHub. Compiler-added wrapper `div` elements and whitespace still mean raw original-entry byte equality cannot be asserted.
+
+This closes the narrowly defined **single real chapter mixed I+K compiler feasibility gate**, not the whole commentary’s editorial validation. Next: select representative book/chapter transitions and intro-topology cases; attempt full 66-book K/I/U reconstruction on an isolated runner, compare all actual original native occupied keys and real commentary XML semantics, and keep the 17 explicitly documented native missing-index cases/118 chapter-scope candidates subject to independent editorial review. Modern English remains paused and BRMHCC 0.1.0 unchanged.
