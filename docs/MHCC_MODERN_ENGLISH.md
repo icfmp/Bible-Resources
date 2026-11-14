@@ -37,6 +37,15 @@ The initial three drafts were **too dense and too close to older English sentenc
 
 All three pilot **DRAFTS** were revised for this rhythm; their new readability is a **style calibration only**, not an independent source fidelity PASS. The exact BRMHCC/OSIS semantic audit and SWORD round-trip still remain pending.
 
+### Pilot semantic comparison — source meaning vs fluent English (2026-11-14)
+
+The owner confirmed the **second, more fluid and airy style** as the target; no alternative-style testing is needed. Before extending the examples, three full pilot texts (Ruth 1, Romans 3 and Hebrews 7) were checked **section by section against STEP Bible's display of the original CrossWire MHCC** (13 original exposition units). CCEL's separate digitization was used as a non-authoritative comparison witness for Ruth and Romans. Source-meaning drift was found and corrected in 17 bounded draft text edits (Ruth 7, Romans 6, Hebrews 4), with committed-file coverage/phrase checks. The owner-requested *pilot* review and corrections are recorded in [the complete source-meaning comparison dossier](../work/mhcc-modern/pilots/SEMANTIC_COLLATION_2026-11-14.md).
+
+**Generalize the lessons, not these unvalidated chapter artifacts:** keep the same reading rhythm, but guard particularly against dropped salvation statements, exclusive qualifiers, judgment or curse, doctrinal union with Christ, qualified certainty, source metaphors and the force of pastoral exhortations. A short, pleasant sentence is unacceptable if it weakens a statement. Keep source-meaning checks distinct from prose style checks.
+
+**Production remains paused.** The pilot collation was made against the *rendered* CrossWire text; it is **not an independent second-reviewer sign-off**, not the pinned compiled `BRMHCC` binary/OSIS verification, and not full text-and-range source acceptance. Editorial repair of original `BRMHCC` is handled separately under [#274](https://github.com/icfmp/Bible-Resources/issues/274). No canonical chapter has been certified or released; **0/1,189 validated**.
+
+
 
 The treatment of biblical material requires separate evidence for:
 
