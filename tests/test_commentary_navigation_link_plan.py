@@ -6,7 +6,7 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from commentary_navigation_link_plan import (
     propose_commentary_links, UnsafeCommentaryLinkPlan,
-    parse_native_commentary_verse_registry,
+    parse_native_commentary_verse_registry, triage_missing_native_section_links,
 )
 
 A = "a" * 64
@@ -120,6 +120,65 @@ class PlanTests(unittest.TestCase):
                 reviewed_sections=[section])
 
 
+
+class MissingNativeSectionPreflightTests(unittest.TestCase):
+    def test_missing_second_verse_is_candidate_not_edit_approval(self):
+        result = triage_missing_native_section_links(
+            occupied={"Song.1.7": A},
+            valid_verse_keys={"Song.1.7", "Song.1.8"},
+            source_heading_anomalies=[{
+                "start": "Song.1.7", "missing_slots": ["Song.1.8"],
+                "different_payload_slots": []
+            }],
+        )
+        self.assertEqual(result["candidate_section_count"], 1)
+        self.assertEqual(result["candidate_additional_native_target_keys"], 1)
+        self.assertEqual(result["candidate_sections"][0]["original_master_raw_sha256"], A)
+        self.assertEqual(result["candidate_sections"][0]["unoccupied_native_target_keys"], ["Song.1.8"])
+        self.assertFalse(result["candidate_sections"][0]["source_scope_editorially_reviewed"])
+        self.assertFalse(result["compiled_binary_modified"])
+        self.assertFalse(result["release_authorized"])
+
+    def test_discontinuous_section_has_only_actual_missing_second_block(self):
+        occupied = {f"Matt.13.{n}": A for n in range(24, 31)}
+        occupied.update({f"Matt.13.{n}": B for n in range(31, 36)})
+        result = triage_missing_native_section_links(
+            occupied=occupied,
+            valid_verse_keys={f"Matt.13.{n}" for n in range(24,44)},
+            source_heading_anomalies=[{
+                "start": "Matt.13.24",
+                "missing_slots": [f"Matt.13.{n}" for n in range(36,44)],
+                "different_payload_slots": []
+            }]
+        )
+        self.assertEqual(result["candidate_additional_native_target_keys"], 8)
+        self.assertNotIn("Matt.13.31",result["candidate_sections"][0]["unoccupied_native_target_keys"])
+
+    def test_collision_with_other_original_body_stays_blocked(self):
+        result = triage_missing_native_section_links(
+            occupied={"Matt.13.24": A, "Matt.13.31": B},
+            valid_verse_keys={"Matt.13.24", "Matt.13.31", "Matt.13.36"},
+            source_heading_anomalies=[{
+                "start": "Matt.13.24", "missing_slots": ["Matt.13.36"],
+                "different_payload_slots": ["Matt.13.31"]
+            }]
+        )
+        self.assertEqual(result["candidate_section_count"],0)
+        self.assertEqual(len(result["blocked_sections_with_different_existing_original_payload"]),1)
+
+    def test_never_accept_an_occupied_or_noncannonical_missing_target(self):
+        for valid, occupied in (
+            ({"Song.1.7", "Song.1.8"}, {"Song.1.7": A, "Song.1.8": B}),
+            ({"Song.1.7"}, {"Song.1.7": A}),
+        ):
+            with self.assertRaises(UnsafeCommentaryLinkPlan):
+                triage_missing_native_section_links(
+                    occupied=occupied, valid_verse_keys=valid,
+                    source_heading_anomalies=[{
+                        "start": "Song.1.7", "missing_slots": ["Song.1.8"],
+                        "different_payload_slots": []
+                    }]
+                )
 
 class NativeRegistryTests(unittest.TestCase):
     def test_exact_chapter_bounds_can_feed_generic_link_plan(self):
