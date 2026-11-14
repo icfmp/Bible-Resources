@@ -216,6 +216,21 @@ jobs:
                 "visible Unicode identical",pilot["original_raw_xml_visible_unicode_text_matches"],
                 "unparseable compiled fragments",
                 pilot["compiled_entries_unparseable_as_original_fragments"])
+          print("Original versus recompilation same-order word classes:",
+                json.dumps(pilot["original_vs_compiled_word_sequence_classes"],
+                           sort_keys=True))
+          print("Original visible text equality ignoring only whitespace:",
+                pilot["original_vs_compiled_whitespace_normalized_visible_text_exact_matches"])
+          print("Original native XML element-name counts exactly retained:",
+                pilot["original_vs_compiled_element_name_count_exact_matches"])
+          for row in pilot["per_original_key_text_free_delta_classes"]:
+              if row["word_sequence_relation"]!="EXACT_ORIGINAL_WORD_SEQUENCE":
+                  print("Pilot changed words or word order",row["original_native_key"],
+                        row["word_sequence_relation"],
+                        "original words",row["source_word_count"],
+                        "compiled words",row["compiled_word_count"],
+                        "original tags",json.dumps(row["source_markup_elements"],sort_keys=True),
+                        "compiled tags",json.dumps(row["compiled_markup_elements"],sort_keys=True))
           assert pilot["original_module_content_or_metadata_modified"] is False
           assert pilot["publication_authorized"] is False
           print("Introduction original native key classes:",
