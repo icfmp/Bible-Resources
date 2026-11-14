@@ -9,6 +9,7 @@ on:
       - 'scripts/commentary_android_text_witness.py'
       - 'scripts/commentary_android_webview_debug.py'
       - 'tests/test_commentary_android_text_witness.py'
+      - 'tests/test_commentary_android_webview_debug.py'
       - 'scripts/sword_commentary_raw_key.cpp'
       - 'scripts/sword_native_commentary_raw_corpus.cpp'
       - 'scripts/sword_native_raw_corpus_inventory.py'
@@ -46,6 +47,7 @@ jobs:
           python -m pip install websocket-client==1.8.0
           python -m unittest discover -s tests -p 'test_commentary_stock_andbible_android.py' -v
           python -m unittest discover -s tests -p 'test_commentary_android_text_witness.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_android_webview_debug.py' -v
       - name: Obtain exact official stable AndBible APK; no other APK accepted
         shell: bash
         run: |
