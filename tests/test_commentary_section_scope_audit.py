@@ -112,6 +112,10 @@ class UnknownHeadingTests(unittest.TestCase):
         self.assertEqual(result["total"], 2)
         self.assertEqual(result["reason_counts"]["NON_NUMERIC_XML_TITLE"], 2)
         self.assertEqual(result["distinct_native_raw_payload_hashes"], 1)
+        self.assertEqual(result["first_verse_entries"], 1)
+        self.assertEqual(result["single_occupied_slot_chapters_among_unknown"], 0)
+        self.assertEqual(result["case_rows"][0]["number_of_occupied_native_slots_in_chapter"], 3)
+        self.assertEqual(result["case_rows"][0]["highest_occupied_native_verse_in_chapter"], 3)
         self.assertFalse(result["unrecognized_means_missing_text_proven"])
         self.assertTrue(result["all_output_is_original_text_free_metadata"])
 
