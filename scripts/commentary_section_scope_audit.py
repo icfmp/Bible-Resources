@@ -1083,12 +1083,130 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
     }
 
 
+
+def inspect_independent_leading_range_citations(document, anomalies: list[dict],
+                                                original_stock_raw: dict[str, bytes]) -> dict:
+    """Read-only, source-neutral attribution of claimed ranges to source prose.
+
+    A scripRef in a chapter outline is a citation, NOT a commentary-section
+    anchor. Compare source scripRef placement and the exact original stock
+    passage's plain-word overlap; disclose only counts and closed-set classes.
+    This never grants independent editorial approval or modifies the source.
+    """
+    wanted = {}
+    for row in anomalies:
+        key = row["start"]
+        end = row["declared_end"]
+        if (KEY.fullmatch(key) is None or not isinstance(end, int)
+                or end < int(key.rsplit(".", 1)[1])
+                or key not in original_stock_raw):
+            raise PilotError("Unverified source range candidate in independent review")
+        wanted[key] = key.rsplit(".", 1)[0] + "." + str(end)
+    if len(wanted) > 100:
+        raise PilotError("Excessive independent citation range candidates")
+    entries = defaultdict(list)
+    for node in document.iter():
+        if (not isinstance(node.tag, str)
+                or node.tag.rsplit("}", 1)[-1] != "scripRef"):
+            continue
+        ref = node.get("osisRef", "")
+        parsed = WORK_REF.fullmatch(ref)
+        if parsed is None or _parse_reference(ref)[0] not in (
+                "work_qualified_verse", "work_qualified_same_book_verse_range"):
+            continue
+        body = parsed.group(2)
+        first, last = body.split("-", 1) if "-" in body else (body, body)
+        if wanted.get(first) != last:
+            continue
+        parent = node.getparent()
+        parent_type = (parent.tag.rsplit("}", 1)[-1]
+                       if parent is not None and isinstance(parent.tag, str)
+                       else "_NONE")
+        leading_in_paragraph = (
+            parent_type == "p"
+            and not (parent.text or "").strip()
+            and len(list(parent)) >= 1 and parent[0] is node
+        )
+        # Source might use a section reference in an outline, or a citation
+        # before the actual passage prose. These are not interchangeable.
+        # Never use target alone as an annotation or authorial boundary.
+        tail_words = re.findall(r"\w+", (node.tail or "").casefold())
+        original_root = etree.fromstring(
+            b"<entry>" + original_stock_raw[first] + b"</entry>",
+            parser=etree.XMLParser(resolve_entities=False, no_network=True,
+                                   load_dtd=False, recover=False,
+                                   huge_tree=False, remove_blank_text=False)
+        )
+        stock_words = re.findall(
+            r"\w+", "".join(original_root.itertext()).casefold()
+        )
+        source_words = re.findall(
+            r"\w+", "".join(parent.itertext()).casefold()
+        ) if parent_type == "p" else []
+        aligned = plain_word_alignment(source_words, stock_words) if source_words else None
+        # The long matching-run threshold intentionally requires real shared
+        # exposition, not just two matching scripture reference numerals.
+        passage_body_correspondence = (
+            leading_in_paragraph and len(tail_words) >= 20
+            and aligned is not None
+            and aligned["exact_unicode_longest_contiguous_shared_word_run_count"] is not None
+            and aligned["exact_unicode_longest_contiguous_shared_word_run_count"] >= 20
+        )
+        entries[first].append({
+            "source_scripRef_is_leading_paragraph_element": leading_in_paragraph,
+            "reference_has_substantial_following_prose": len(tail_words) >= 20,
+            "source_and_stock_share_at_least_twenty_contiguous_words":
+                passage_body_correspondence,
+            "source_paragraph_word_count": len(source_words),
+            "source_following_direct_tail_word_count": len(tail_words),
+            "aligned_consecutive_word_count":
+                (aligned["exact_unicode_longest_contiguous_shared_word_run_count"]
+                 if aligned else None),
+            "source_markup_parent": parent_type,
+            "scripRef_is_not_scripCom": True,
+        })
+    cases = []
+    for start, end in wanted.items():
+        observations = entries.get(start, [])
+        cases.append({
+            "original_section_start": start,
+            "stock_declared_end": end,
+            "independent_exact_range_citation_count": len(observations),
+            "independent_leading_reference_with_substantial_following_prose":
+                sum(o["source_scripRef_is_leading_paragraph_element"]
+                    and o["reference_has_substantial_following_prose"]
+                    for o in observations),
+            "independent_leading_reference_and_matching_original_stock_exposition":
+                sum(o["source_and_stock_share_at_least_twenty_contiguous_words"]
+                    for o in observations),
+            "independent_reference_observations": observations[:6],
+            "scope_authorially_reviewed": False,
+            "claim_is_only_corroborating_digital_witness": True,
+        })
+    return {
+        "status": "INDEPENDENT_DIGITAL_SECTION_LEAD_TO_STOCK_PROSE_TRIAGE_NOT_APPROVAL",
+        "case_count": len(cases),
+        "cases_with_independent_exact_range_citation": sum(
+            row["independent_exact_range_citation_count"] > 0 for row in cases
+        ),
+        "cases_with_source_lead_prose_and_matching_stock_exposition": sum(
+            row["independent_leading_reference_and_matching_original_stock_exposition"] > 0
+            for row in cases
+        ),
+        "case_rows": cases,
+        "original_or_independent_source_text_logged": False,
+        "original_source_changed": False,
+        "publication_authorized": False,
+    }
+
+
 def compare_independent_thml_witness(manifest: dict, sections: list[dict],
                                      anomalies: list[dict], temp: Path,
                                      unrecognized_cases: list[dict] | None = None,
                                      native_registry: dict | None = None,
                                      stock_unknown_raw: dict[str, bytes] | None = None,
-                                     original_chapter_intro_raw: dict[str, bytes] | None = None) -> dict:
+                                     original_chapter_intro_raw: dict[str, bytes] | None = None,
+                                     original_range_stock_raw: dict[str, bytes] | None = None) -> dict:
     """Compare all start/end section locations with a separately pinned ThML.
 
     Different digital editions are never automatically assumed identical;
@@ -1264,7 +1382,11 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
             "case_rows": [], "derived_authorial_section_scope_proven": False
         }
     )
+    independent_lead_citations = inspect_independent_leading_range_citations(
+        document, anomalies, original_range_stock_raw or {}
+    ) if original_range_stock_raw is not None else None
     return {
+        "independent_leading_range_citations": independent_lead_citations,
         "status": "PINNED_DIFFERENT_DIGITAL_EDITION_SCOPE_COMPARISON",
         "independent_whole_chapter_review": chapter_scopes,
         "independent_div2_chapter_body_review": div2_scopes,
@@ -1380,6 +1502,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
         rows = []
         records = {}
         private_unrecognized_raw = {}
+        private_range_heading_raw = {}
         temporary_original_sample_raw = []
         original_sample_chapter_set = set(transport_sample_chapters)
         original_mixed_sample_set = set(mixed_sample_chapters)
@@ -1433,6 +1556,10 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 if ref.rsplit(".", 1)[0] in original_sample_chapter_set:
                     temporary_original_sample_raw.append((ref, raw))
                 heading = heading_extent(raw)
+                if (heading is not None
+                        and heading[1] in ("comma", "discontinuous")
+                        and heading[0][0] == int(ref.rsplit(".",1)[1])):
+                    private_range_heading_raw[ref] = raw
                 if heading is None and raw.strip():
                     unparsed += 1
                     private_unrecognized_raw[ref] = raw
@@ -1580,7 +1707,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             manifest, result["start_anchored_section_map"],
             result["anomalies"], directory, unknown["case_rows"],
             registry, private_unrecognized_raw,
-            original_chapter_intro_raw=private_intro_text_raw_by_chapter)
+            original_chapter_intro_raw=private_intro_text_raw_by_chapter,
+            original_range_stock_raw=private_range_heading_raw)
         # A native single-key chapter plus an independently corroborated
         # source division still needs explicit editorial signoff. These are
         # chapter-limit *measurements*, not link insertion instructions.
