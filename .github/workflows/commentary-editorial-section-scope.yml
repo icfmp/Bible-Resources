@@ -1,0 +1,87 @@
+name: Audit original commentary editorial section scopes
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/commentary-editorial-section-scope.yml'
+      - 'scripts/commentary_section_scope_audit.py'
+      - 'tests/test_commentary_section_scope_audit.py'
+      - 'scripts/sword_native_commentary_index.cpp'
+      - 'scripts/sword_native_commentary_raw_corpus.cpp'
+      - 'config/commentary-intake/**'
+  workflow_dispatch:
+    inputs:
+      resource_id:
+        description: "Pinned original commentary manifest ID"
+        required: true
+        default: mhcc-crosswire
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      RESOURCE_ID: ${{ github.event.inputs.resource_id || 'mhcc-crosswire' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test read-only generic section-scope classifier
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          python -m unittest discover -s tests -p 'test_commentary_section_scope_audit.py' -v
+      - name: Install stable upstream native SWORD library
+        run: |
+          set -euo pipefail
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev
+      - name: Compile independent stock index and private raw-entry readers
+        run: |
+          set -euo pipefail
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_index.cpp \
+            -o "${RUNNER_TEMP}/stock-index" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "${RUNNER_TEMP}/stock-raw" -lsword
+      - name: Audit all original stock section headings against native occupied slots
+        run: |
+          set -euo pipefail
+          python scripts/commentary_section_scope_audit.py \
+            --resource-id "$RESOURCE_ID" \
+            --native-index-binary "${RUNNER_TEMP}/stock-index" \
+            --native-raw-binary "${RUNNER_TEMP}/stock-raw" \
+            --report "${RUNNER_TEMP}/editorial-scope.json"
+      - name: Summarize scope and known regression probes without original text
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          r=json.loads((Path(os.environ["RUNNER_TEMP"])/"editorial-scope.json").read_text())
+          assert r["status"]=="COMPLETE_NATIVE_SCAN_EDITORIAL_TRIAGE_NOT_APPROVAL"
+          assert r["native_full_key_crosscheck"] is True
+          assert r["original_text_logged_or_published"] is False
+          assert r["original_sword_changed"] is False
+          print("Native slots:",r["native_numbered_rows"],"intros:",r["native_intro_rows"])
+          print("Section scope triage categories:",json.dumps(r["counts"],sort_keys=True))
+          for key in ("Song.1.7","Jer.4.1","Jer.4.3"):
+              probe=r["probes"].get(key)
+              print("Probe",key,json.dumps(
+                  {k:v for k,v in (probe or {}).items() if k!="raw_payload_sha256"},
+                  sort_keys=True))
+          PY
+      - name: Preserve metadata-only complete candidate report for independent review
+        uses: actions/upload-artifact@v4
+        with:
+          name: original-commentary-section-scope
+          path: ${{ runner.temp }}/editorial-scope.json
+          retention-days: 14
