@@ -8,7 +8,8 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from commentary_section_scope_audit import (
-    heading_extent, classify, compare_independent_thml_witness
+    heading_extent, classify, compare_independent_thml_witness,
+    describe_unrecognized_heading, audit_unrecognized_slots,
 )
 
 
@@ -78,6 +79,41 @@ class ClassificationTests(unittest.TestCase):
         })
         self.assertEqual(outcome["anomalies"][0]["missing_slots"], ["Song.1.4"])
 
+
+
+class UnknownHeadingTests(unittest.TestCase):
+    def test_no_verse_title_is_not_mistaken_for_lost_content(self):
+        p = describe_unrecognized_heading(b"<title>Introduction</title><p>Context</p>")
+        self.assertEqual(p["reason"], "NON_NUMERIC_XML_TITLE")
+        self.assertTrue(p["visible_nonempty"])
+
+    def test_empty_and_invalid_xml_have_different_classes(self):
+        self.assertEqual(describe_unrecognized_heading(b" ")["reason"], "EMPTY_RAW_PAYLOAD")
+        self.assertEqual(describe_unrecognized_heading(b"<p>broken</b>")["reason"],
+                         "INVALID_XML_FRAGMENT")
+
+    def test_no_title_and_nonempty_prose(self):
+        p = describe_unrecognized_heading(b"<p>Context without numbered title</p>")
+        self.assertEqual(p["reason"], "UNLABELLED_VISIBLE_PROSE")
+
+    def test_unparsed_heading_not_automatically_corrected(self):
+        p = describe_unrecognized_heading(b"<title>Verses two to five</title>")
+        self.assertEqual(p["reason"], "UNPARSED_VERSE_LABEL")
+
+    def test_raw_payload_groups_are_tracked_without_prose(self):
+        unknown = describe_unrecognized_heading(b"<title>Introduction</title>")
+        rows = {
+            "Gen.1.1": {"sha256": "a", "heading": None, "unrecognized_profile": unknown},
+            "Gen.1.2": {"sha256": "a", "heading": None, "unrecognized_profile": unknown},
+            "Gen.1.3": {"sha256": "b", "heading": ((3, 4), "dash"),
+                        "unrecognized_profile": None},
+        }
+        result = audit_unrecognized_slots(rows)
+        self.assertEqual(result["total"], 2)
+        self.assertEqual(result["reason_counts"]["NON_NUMERIC_XML_TITLE"], 2)
+        self.assertEqual(result["distinct_native_raw_payload_hashes"], 1)
+        self.assertFalse(result["unrecognized_means_missing_text_proven"])
+        self.assertTrue(result["all_output_is_original_text_free_metadata"])
 
 
 class IndependentWitnessTests(unittest.TestCase):
