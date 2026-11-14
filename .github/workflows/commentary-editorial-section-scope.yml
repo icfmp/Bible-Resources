@@ -114,10 +114,11 @@ jobs:
           g++ -std=c++17 -O2 -I/usr/include/sword \
             tests/fixtures/synthetic_zcom_link_entry.cpp \
             -o "${RUNNER_TEMP}/synthetic-native-link-entry" -lsword
-          SWORD_PATH="$CLONE" timeout 45s "${RUNNER_TEMP}/synthetic-native-link-entry"
+          MODE=$(SWORD_PATH="$CLONE" timeout 45s "${RUNNER_TEMP}/synthetic-native-link-entry")
+          echo "Synthetic zCom native linking capability: $MODE"
           (cd "$DATA" && sha256sum -c "$CLONE/compressed-payloads.before.sha256")
           SWORD_PATH="$CLONE" timeout 60s "${RUNNER_TEMP}/stock-raw" LinkProof > "$CLONE/native.after.raw"
-          PYTHONPATH=scripts python - "$ROOT/native.raw" "$CLONE/native.after.raw" <<'PY'
+          PYTHONPATH=scripts python - "$ROOT/native.raw" "$CLONE/native.after.raw" "$MODE" <<'PY'
           import sys
           from pathlib import Path
           from sword_native_raw_corpus_inventory import parse_native_raw_corpus
@@ -131,15 +132,22 @@ jobs:
           before, old_keys, old_intro, old_top=read(sys.argv[1])
           after, new_keys, new_intro, new_top=read(sys.argv[2])
           assert old_intro==new_intro and old_top==new_top
-          assert set(after)==set(before)|{("K","Gen.1.10")}
           assert all(after[key]==body for key,body in before.items()), (
               "A previously occupied original synthetic module entry was altered"
           )
-          assert after[("K","Gen.1.10")]==before[("K","Gen.1.9")]
           assert "Gen.1.6" not in new_keys
-          print("Synthetic copy native index-only linkEntry PASSED:",
-                "all",len(before),"preexisting native entry bytes preserved;",
-                "one independent alias added; compressed bodies unchanged")
+          mode=sys.argv[3]
+          if mode=="SYNTHETIC_NATIVE_ZCOM_READ_ONLY":
+              assert after==before, "The read-only zCom load unexpectedly changed an index entry"
+              print("Synthetic zCom native link support: READ_ONLY; "
+                    "all",len(before),"original entries and compressed bodies unchanged")
+          elif mode=="SYNTHETIC_NATIVE_ZCOM_LINK_APPLIED":
+              assert set(after)==set(before)|{("K","Gen.1.10")}
+              assert after[("K","Gen.1.10")]==before[("K","Gen.1.9")]
+              print("Synthetic zCom linkEntry: applied one new alias, "
+                    "all",len(before),"original entries and compressed bodies unchanged")
+          else:
+              raise AssertionError("Unknown native module link capability result")
           PY
       - name: Audit all original stock section headings against native occupied slots
         run: |
