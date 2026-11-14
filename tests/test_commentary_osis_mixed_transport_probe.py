@@ -7,6 +7,7 @@ from lxml import etree
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from commentary_osis_mixed_transport_probe import (
     build_mixed_original_transport, build_complete_original_transport,
+    validate_private_index_alias_preview, _native_same_chapter_ranges,
     mixed_transport_checks_pass, _COVERAGE_FIELDS
 )
 
@@ -133,6 +134,60 @@ class MixedOriginalTransportTests(unittest.TestCase):
                     build_complete_original_transport(
                         intros,numbered,work_id="FullTest"
                     )
+
+
+    def test_provisional_alias_inherits_single_authorial_section_without_gap_fill(self):
+        first=b'<div type="section"><title>Original invented joint section</title></div>'
+        separate=b'<div type="section"><title>Original invented middle section</title></div>'
+        intros={"Gen":b"<div/>","Gen.1":b"<chapter/>"}
+        numbered={"Gen.1":[
+            ("Gen.1.1",first),("Gen.1.2",first),
+            ("Gen.1.3",separate),("Gen.1.4",separate)
+        ]}
+        aliases={
+            "Gen.1.5":{"link_to":"Gen.1.1","source_raw_sha256":__import__("hashlib").sha256(first).hexdigest()},
+            "Gen.1.7":{"link_to":"Gen.1.1","source_raw_sha256":__import__("hashlib").sha256(first).hexdigest()},
+            "Gen.1.8":{"link_to":"Gen.1.1","source_raw_sha256":__import__("hashlib").sha256(first).hexdigest()},
+        }
+        xml,info=build_complete_original_transport(
+            intros,numbered,work_id="PreviewTest",
+            provisional_index_aliases=aliases
+        )
+        root=etree.fromstring(xml)
+        entries=root.xpath(
+            "//*[local-name()='div' and @annotateType='commentary']"
+        )
+        self.assertEqual(len(entries),2)
+        self.assertEqual(entries[0].attrib["annotateRef"],
+                         "Gen.1.1-Gen.1.2 Gen.1.5 Gen.1.7-Gen.1.8")
+        self.assertEqual(entries[1].attrib["annotateRef"],"Gen.1.3-Gen.1.4")
+        self.assertEqual(info["provisional_index_alias_count"],3)
+        self.assertTrue(info["provisional_index_aliases_not_editorially_approved"])
+        self.assertEqual(xml.count(first),1)
+        self.assertEqual(xml.count(separate),1)
+
+    def test_index_link_preview_blocks_wrong_hash_cross_chapter_and_overwrite(self):
+        from hashlib import sha256
+        original=b"<div><title>Unchanged synthetic original</title></div>"
+        occupied={"Gen.1":[("Gen.1.1",original)]}
+        good={"link_to":"Gen.1.1","source_raw_sha256":sha256(original).hexdigest()}
+        for aliases in (
+            {"Gen.1.1":good},
+            {"Gen.2.2":good},
+            {"Exod.1.2":good},
+            {"Gen.1.2":{"link_to":"Gen.1.99","source_raw_sha256":good["source_raw_sha256"]}},
+            {"Gen.1.2":{**good,"source_raw_sha256":"0"*64}},
+            {"Gen.1.2":{**good,"link_to":"Exod.1.1"}},
+            {"Gen.1.0":good},
+        ):
+            with self.subTest(aliases=aliases):
+                with self.assertRaises(ValueError):
+                    validate_private_index_alias_preview(occupied,aliases)
+        self.assertEqual(_native_same_chapter_ranges([
+            "Gen.1.1","Gen.1.2","Gen.1.5","Gen.1.7"
+        ]),"Gen.1.1-Gen.1.2 Gen.1.5 Gen.1.7")
+        with self.assertRaises(ValueError):
+            _native_same_chapter_ranges(["Gen.1.1","Gen.2.2"])
 
 
 if __name__=="__main__":
