@@ -275,10 +275,69 @@ def probe_original_mixed_transport(chapter: str, book_intro: bytes,
     }
 
 
+
+
+def validate_private_index_alias_preview(
+        original_numbered: dict[str, list[tuple[str, bytes]]],
+        proposed_aliases: dict[str, dict]) -> dict[str, list[str]]:
+    """Accept only vacant same-chapter aliases to exact unchanged source K keys.
+
+    These are *unapproved* experimental index targets; the caller must not
+    present a compilation as an editorial correction or publish it.
+    """
+    if (not isinstance(proposed_aliases, dict)
+            or len(proposed_aliases) > 3000):
+        raise ValueError("Unbounded proposed index-only aliases")
+    occupied = {
+        key: raw
+        for chapter in original_numbered.values()
+        for key, raw in chapter
+    }
+    out = {}
+    for target, claim in proposed_aliases.items():
+        if (not isinstance(target, str) or KEY.fullmatch(target) is None
+                or target in occupied or not isinstance(claim, dict)):
+            raise ValueError("Untrusted or occupied proposed index target")
+        master = claim.get("link_to")
+        digest = claim.get("source_raw_sha256")
+        if (not isinstance(master, str) or KEY.fullmatch(master) is None
+                or master not in occupied or not isinstance(digest, str)
+                or digest != sha256(occupied[master]).hexdigest()
+                or master.rsplit(".", 1)[0] != target.rsplit(".", 1)[0]
+                or int(target.rsplit(".", 1)[1]) > 1000):
+            raise ValueError("Alias master absent, changed, or outside native chapter")
+        out.setdefault(master, []).append(target)
+    return out
+
+
+def _native_same_chapter_ranges(keys: list[str]) -> str:
+    """Produce standard, unambiguous OSIS segments without bridging gaps."""
+    if not keys or len(keys) != len(set(keys)):
+        raise ValueError("Empty or overlapping native section keys")
+    chapter = keys[0].rsplit(".", 1)[0]
+    if any(key.rsplit(".", 1)[0] != chapter for key in keys):
+        raise ValueError("Commentary section alias crosses a chapter")
+    numbers = sorted(int(key.rsplit(".", 1)[1]) for key in keys)
+    runs = []
+    start = end = numbers[0]
+    for number in numbers[1:]:
+        if number == end + 1:
+            end = number
+        else:
+            runs.append((start, end))
+            start = end = number
+    runs.append((start, end))
+    return " ".join(
+        f"{chapter}.{a}" if a == z else f"{chapter}.{a}-{chapter}.{z}"
+        for a, z in runs
+    )
+
 def build_complete_original_transport(
         original_intros: dict[str, bytes],
         original_numbered: dict[str, list[tuple[str, bytes]]],
-        *, work_id: str) -> tuple[bytes, dict]:
+        *, work_id: str,
+        provisional_index_aliases: dict[str, dict] | None = None
+        ) -> tuple[bytes, dict]:
     """Build *unmodified* original I/K XML into a private whole-module OSIS.
 
     This deliberately does NOT expand missing section links, guess scopes,
@@ -319,6 +378,10 @@ def build_complete_original_transport(
          f'<identifier type="OSIS">{work_id}</identifier><refSystem>Bible.KJV</refSystem>'
          '</work></header><div type="bookGroup">').encode(),
     ]
+    source_alias_claims = provisional_index_aliases or {}
+    alias_by_master = validate_private_index_alias_preview(
+        original_numbered, source_alias_claims
+    )
     original_K_count = 0
     original_group_count = 0
     for book, original_book_intro in books.items():
@@ -348,15 +411,23 @@ def build_complete_original_transport(
                 digest = sha256(raw).digest()
                 if groups and groups[-1]["digest"] == digest and groups[-1]["end"] + 1 == verse:
                     groups[-1]["end"] = verse
+                    groups[-1]["original_keys"].append(ref)
                 else:
-                    groups.append({"start": verse, "end": verse, "digest": digest, "raw": raw})
+                    groups.append({"start": verse, "end": verse, "digest": digest,
+                                   "raw": raw, "original_keys": [ref]})
                 last_verse = verse
                 seen_verses.add(verse)
                 original_K_count += 1
             for group in groups:
                 start = f"{chapter}.{group['start']}"
                 end = f"{chapter}.{group['end']}"
-                target = start if start == end else f"{start}-{end}"
+                extras = [
+                    alias for original_key in group["original_keys"]
+                    for alias in alias_by_master.get(original_key, ())
+                ]
+                target = _native_same_chapter_ranges(
+                    group["original_keys"] + extras
+                )
                 parts.extend((
                     f'<div type="section" annotateType="commentary" annotateRef="{target}">'.encode(),
                     group["raw"], b"</div>"
@@ -378,6 +449,8 @@ def build_complete_original_transport(
         "source_chapter_intro_count": len(chapters),
         "source_numbered_key_count": original_K_count,
         "source_numbered_group_count": original_group_count,
+        "provisional_index_alias_count": len(source_alias_claims),
+        "provisional_index_aliases_not_editorially_approved": True,
         "original_I_K_raw_markup_not_rewritten": True,
         "original_TOP_positions_not_yet_reconstructed": True,
         "original_source_published": False,
@@ -389,7 +462,8 @@ def probe_complete_original_transport(
         original_numbered: dict[str, list[tuple[str, bytes]]],
         original_TOP: list[bytes], *,
         scratch: Path, native_raw_binary: Path,
-        osis2mod_binary: str = "osis2mod") -> dict:
+        osis2mod_binary: str = "osis2mod",
+        provisional_index_aliases: dict[str, dict] | None = None) -> dict:
     """Attempt full private SWORD readback and compare EVERY original native key.
 
     This is diagnostic and cannot authorize a release. TOP is separately
@@ -399,9 +473,12 @@ def probe_complete_original_transport(
             or not native_raw_binary.is_file() or native_raw_binary.is_symlink()
             or len(original_TOP) > 10 or not all(isinstance(x, bytes) for x in original_TOP)):
         raise ValueError("Untrusted complete original transport test input")
-    module_id = "BRFullProbe"
+    aliases = provisional_index_aliases or {}
+    validate_private_index_alias_preview(original_numbered, aliases)
+    module_id = "BRIndexProbe" if aliases else "BRFullProbe"
     xml, source = build_complete_original_transport(
-        original_intros, original_numbered, work_id=module_id
+        original_intros, original_numbered, work_id=module_id,
+        provisional_index_aliases=aliases
     )
     root = scratch / "complete-original-private-candidate"
     if root.exists() or root.is_symlink():
@@ -493,8 +570,17 @@ def probe_complete_original_transport(
     def complete(kind, original):
         return all(summaries[kind][name] == len(original) for name, _ in names)
     indexed_checks = (
-        not any((absent_I, absent_K, extra_I, extra_K))
+        not any((absent_I, absent_K, extra_I))
+        and set(extra_K) == set(aliases)
         and complete("I", original_I) and complete("K", original_K)
+    )
+    alias_identical = (
+        set(extra_K) == set(aliases)
+        and all(
+            rebuilt["K"].get(target) is not None
+            and rebuilt["K"].get(target) == rebuilt["K"].get(claim["link_to"])
+            for target, claim in aliases.items()
+        )
     )
     top_exact = (
         len(original_TOP) == len(rebuilt["U"])
@@ -514,12 +600,15 @@ def probe_complete_original_transport(
         "missing_K_first_ten": absent_K[:10],
         "extra_I_first_ten": extra_I[:10],
         "extra_K_first_ten": extra_K[:10],
+        "planned_extra_index_keys": len(aliases),
+        "all_proposed_new_aliases_same_compiled_raw_as_original_master": alias_identical,
+        "proposed_aliases_have_no_independent_editorial_approval": True,
         "source_TOP_count": len(original_TOP),
         "compiled_TOP_count": len(rebuilt["U"]),
         "all_original_TOP_positions_exact_raw_bytes": top_exact,
         "original_indexed_I_K_text_markup_reference_checks_passed": indexed_checks,
         "full_original_K_I_U_native_entry_parity_proven":
-            indexed_checks and top_exact,
+            indexed_checks and top_exact and alias_identical,
         "original_raw_entry_bytes_all_identical": False,
         "historical_print_edition_parity_proven": False,
         "reader_layout_parity_proven": False,
