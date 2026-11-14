@@ -300,6 +300,23 @@ class SourceDivisionChapterTests(unittest.TestCase):
                          "SOURCE_DIV2_UNDIVIDED_EXPLICIT_HEADING_CANDIDATE")
         self.assertEqual(by_key["Gen.2.1"]["source_div2_original_ordinal"], 1)
 
+    def test_original_chapter_one_before_first_div2_is_documented_not_guessed(self):
+        document = etree.fromstring(
+            b'<root><div1 title="Genesis">'
+            b'<h1>Genesis</h1><scripCom osisRef="Bible:Gen.1"/>'
+            b'<h2>Chapter 1</h2><p>Unwrapped first chapter notes</p>'
+            b'<div2><h2>Chapter 2</h2><p>Second chapter notes</p></div2>'
+            b'</div1></root>'
+        )
+        native = {"chapter_maximums": {"Gen.1":31, "Gen.2":25}}
+        result = independent_div2_chapter_body_evidence(document, native, [])
+        book = result["book_alignment_evidence_rows"][0]
+        self.assertEqual(book["source_prefix_chapter_scripCom_refs"], ["Gen.1"])
+        self.assertEqual(book["source_prefix_numeric_h2_chapters"], [1])
+        self.assertEqual(book["source_prefix_nonempty_paragraphs"], 1)
+        self.assertEqual(book["native_registry_chapter_count"], 2)
+        self.assertEqual(book["source_direct_div2_count"], 1)
+
     def test_chapter_heading_conflicting_with_source_scripcom_is_not_reassigned(self):
         document = etree.fromstring(
             b'<root><div1 title="Genesis">'
