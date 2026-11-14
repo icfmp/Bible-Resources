@@ -5,7 +5,9 @@ import unittest
 from lxml import etree
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
-from commentary_osis_mixed_transport_probe import build_mixed_original_transport
+from commentary_osis_mixed_transport_probe import (
+    build_mixed_original_transport, mixed_transport_checks_pass, _COVERAGE_FIELDS
+)
 
 
 class MixedOriginalTransportTests(unittest.TestCase):
@@ -43,6 +45,40 @@ class MixedOriginalTransportTests(unittest.TestCase):
                     "Gen.36",b"<div/>",b"<chapter/>",rows,
                     work_id="MixedTest"
                 )
+
+
+    def test_real_readback_gate_checks_every_I_and_K_property(self):
+        def coverage(n):
+            return {field:n for field in _COVERAGE_FIELDS}
+        base = dict(
+            expected_intro_keys=2, expected_numbered_keys=13,
+            intro_coverage=coverage(2), numbered_coverage=coverage(13),
+            missing_intro_keys=[], missing_numbered_keys=[],
+            extra_intro_keys=[], extra_numbered_keys=[]
+        )
+        self.assertTrue(mixed_transport_checks_pass(**base))
+        for field in _COVERAGE_FIELDS:
+            broken_intro = dict(coverage(2))
+            broken_intro[field] = 1
+            self.assertFalse(mixed_transport_checks_pass(
+                **{**base, "intro_coverage":broken_intro}))
+            broken_numbered = dict(coverage(13))
+            broken_numbered[field] = 12
+            self.assertFalse(mixed_transport_checks_pass(
+                **{**base, "numbered_coverage":broken_numbered}))
+        for field, value in (
+            ("missing_intro_keys", ["2John"]),
+            ("missing_numbered_keys", ["2John.1.3"]),
+            ("extra_intro_keys", ["Jude"]),
+            ("extra_numbered_keys", ["2John.1.14"]),
+            ("expected_numbered_keys", 0),
+            ("expected_intro_keys", 3)
+        ):
+            self.assertFalse(mixed_transport_checks_pass(
+                **{**base, field:value}))
+        self.assertFalse(mixed_transport_checks_pass(
+            **{**base, "numbered_coverage":
+               {**coverage(13), "source_keys_present":True}}))
 
 
 if __name__=="__main__":
