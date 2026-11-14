@@ -432,6 +432,18 @@ jobs:
                     "original intro words absent from source",
                     case.get("native_intro_words_not_located_in_source_div2"))
           div2=witness["independent_div2_chapter_body_review"]
+          for row in div2["independent_source_div2_text_bearing_native_intro_reviews"]:
+              overlap=row["original_intro_vs_witness_word_overlap"]
+              print("Safe book/chapter-mapped independent intro witness",
+                    row["original_native_intro_chapter"],
+                    "classification",row["classification"],
+                    "book mapping",row["source_book_alignment_class"],
+                    "chapter mapping",row["source_chapter_alignment_method"],
+                    "source numbered sections",row["source_numbered_comment_section_markers"],
+                    "source chapter markers",row["source_chapter_comment_section_markers"],
+                    "lexical overlap",overlap.get("overlap_class") if overlap else None,
+                    "ordered words",overlap.get("ordered_word_alignment",{}).get(
+                        "exact_unicode_ordered_alignment_class") if overlap else None)
           print("Full source div2 chapter-scope classification:",
                 json.dumps(div2.get("candidate_classes",{}),sort_keys=True))
           print("Independent source vs unchanged stock chapter-word diagnostic:",
