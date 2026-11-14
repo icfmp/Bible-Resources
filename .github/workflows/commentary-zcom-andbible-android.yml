@@ -115,7 +115,26 @@ jobs:
                   or (toolbar["actual_commentary_toolbar_resource_found"]
                       and toolbar["exact_original_commentary_popup_item_found"]))
           reader_context=data["android_reader_context_by_phase"]
-          assert set(reader_context)=={"after_app_restart","after_commentary_toolbar_attempt"}
+          assert set(reader_context)=={
+              "after_app_restart", "after_verified_notice_action",
+              "after_commentary_toolbar_attempt"
+          }
+          assert data["official_stable_update_notice_action"] in {
+              "not_exact_verified_official_stable_notice",
+              "notice_changed_before_safe_click",
+              "notice_safe_action_unavailable",
+              "official_stable_update_notice_dismissed_until_update"
+          }
+          if data["official_stable_update_notice_action"]=="official_stable_update_notice_dismissed_until_update":
+              before_notice=reader_context["after_app_restart"]
+              assert set(before_notice["known_allowlisted_ui_actions_visible"])=={
+                  "DISMISS","DISMISS UNTIL NEXT UPDATE"
+              }
+              assert before_notice["ui_hierarchy_framework_class_counts"]["Button"]==2
+              assert before_notice["ui_hierarchy_enabled_clickable_node_count"]==2
+              assert before_notice["main_bible_reader_activity_resumed"] is True
+              assert before_notice["ui_hierarchy_webview_count"]==0
+              assert before_notice["known_reader_root_resource_ids_visible"]==[]
           allowed_ids={"bibleButton","commentaryButton","workspaceButton","optionsMenu",
                        "strongsButton","searchButton","speakButton"}
           allowed_roots={"drawerLayout","mainLayout","toolbarLayout",
@@ -130,6 +149,9 @@ jobs:
                   "ui_hierarchy_node_count",
                   "ui_hierarchy_package_class_counts",
                   "ui_hierarchy_webview_count",
+                  "ui_hierarchy_framework_class_counts",
+                  "ui_hierarchy_enabled_clickable_node_count",
+                  "known_allowlisted_ui_actions_visible",
                   "ui_hierarchy_text_or_unknown_ids_exported",
                   "main_bible_reader_activity_resumed",
                   "another_andbible_activity_resumed",
@@ -144,6 +166,26 @@ jobs:
               assert 0<=context["ui_hierarchy_node_count"]<=20000
               assert type(context["ui_hierarchy_webview_count"]) is int
               assert 0<=context["ui_hierarchy_webview_count"]<=context["ui_hierarchy_node_count"]
+              classes=context["ui_hierarchy_framework_class_counts"]
+              assert set(classes)=={
+                  "TextView","Button","ImageButton","EditText","CheckBox","Switch",
+                  "FrameLayout","LinearLayout","ScrollView","WebView","ComposeView","other"
+              }
+              assert all(type(n) is int and 0<=n<=20000 for n in classes.values())
+              assert sum(classes.values())==context["ui_hierarchy_node_count"]
+              assert type(context["ui_hierarchy_enabled_clickable_node_count"]) is int
+              assert 0<=context["ui_hierarchy_enabled_clickable_node_count"]<=context["ui_hierarchy_node_count"]
+              allowed_actions={
+                  "LOAD DOCUMENTS FROM FILES","LOAD DOCUMENT FROM FILES",
+                  "ADVANCED","DOWNLOADS","DOWNLOAD","PROCEED","BROWSE FILES","BROWSE",
+                  "IMPORT","INSTALL","OK","OPEN","CONTINUE","DONE","DISMISS",
+                  "DISMISS UNTIL NEXT UPDATE","ALLOW","WHILE USING THE APP",
+                  "USE THIS FOLDER","WAIT","CLOSE APP","EXACT_MODULE_ZIP",
+                  "EXACT_REVIEWED_BIBLE_ZIP","FINISH_FIRST_DOWNLOAD",
+                  "OPEN_COMMENTARY_MENU","EXACT_COMMENTARY_MENU_MODULE"
+              }
+              assert isinstance(context["known_allowlisted_ui_actions_visible"],list)
+              assert set(context["known_allowlisted_ui_actions_visible"])<=allowed_actions
               packages=context["ui_hierarchy_package_class_counts"]
               assert set(packages)=={"andbible","system_ui","documents_ui","other"}
               assert all(type(n) is int and 0<=n<=20000 for n in packages.values())
@@ -178,6 +220,7 @@ jobs:
           assert len(data["real_screen_sha256_only"])>=3
           assert all(re.fullmatch(r"[a-f0-9]{64}",val) for val in data["real_screen_sha256_only"].values())
           print("Android: reviewed complete Bible loaded first and exact stock MHCC ZIP chosen; actual Android reader/content and navigation independently recorded, not assumed")
+          print("Android official stable notice safe action: "+data["official_stable_update_notice_action"])
           print("Android actual resumed reader accessibility structure (no content, IDs beyond allowlist, or screenshots): "+
                 json.dumps(reader_context,sort_keys=True))
           PY

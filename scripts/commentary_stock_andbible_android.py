@@ -165,6 +165,35 @@ def _start_bounded_android_import(module_id: str, title: str) -> dict:
     raise PilotError("Stable AndBible import UI not established after bounded recovery")
 
 
+def _dismiss_verified_official_stable_notice(
+    module_id: str, title: str, context: dict,
+) -> str:
+    """Dismiss only the real pinned AndBible stable update notice, if seen.
+
+    MainBibleActivity.showStableNotice() in production-1117 explicitly
+    supplies *both* Dismiss and Dismiss until next update buttons. Require
+    their real pairing, actual AndBible package and exactly two active
+    clickable app-modal Buttons before using the persistent safe option.
+    A resumed activity alone cannot approve any dismissal or reader test.
+    """
+    if not (context["main_bible_reader_activity_resumed"]
+            and not context["known_reader_root_resource_ids_visible"]
+            and context["ui_hierarchy_webview_count"] == 0
+            and context["ui_hierarchy_package_class_counts"]["andbible"] >= 10
+            and context["ui_hierarchy_framework_class_counts"]["Button"] == 2
+            and context["ui_hierarchy_enabled_clickable_node_count"] == 2
+            and set(context["known_allowlisted_ui_actions_visible"]) ==
+            {"DISMISS", "DISMISS UNTIL NEXT UPDATE"}):
+        return "not_exact_verified_official_stable_notice"
+    snap = _screen(module_id, title)
+    choices = {x["action"] for x in snap["controls"]}
+    if not {"DISMISS", "DISMISS UNTIL NEXT UPDATE"} <= choices:
+        return "notice_changed_before_safe_click"
+    if _tap(snap["controls"], ("DISMISS UNTIL NEXT UPDATE",)) is None:
+        return "notice_safe_action_unavailable"
+    return "official_stable_update_notice_dismissed_until_update"
+
+
 def _attempt_commentary_toolbar_selection(module_id: str, title: str) -> dict:
     """Use the reader toolbar's actual resource-id to select EXACT MHCC (en).
 
@@ -229,7 +258,10 @@ KNOWN_READER_ROOT_IDS = frozenset({
 })
 
 
-def _classify_main_reader_context(xml: bytes, activity_dump: bytes) -> dict:
+def _classify_main_reader_context(
+    xml: bytes, activity_dump: bytes, module_id: str | None = None,
+    title: str | None = None,
+) -> dict:
     """Diagnose UI context without exporting any source prose or UI strings.
 
     An Android test can have imported a SWORD ZIP yet still be on a welcome,
@@ -243,6 +275,13 @@ def _classify_main_reader_context(xml: bytes, activity_dump: bytes) -> dict:
     roots = set()
     packages = {"andbible": 0, "system_ui": 0, "documents_ui": 0, "other": 0}
     webviews = 0
+    ui_classes = {
+        "TextView": 0, "Button": 0, "ImageButton": 0,
+        "EditText": 0, "CheckBox": 0, "Switch": 0,
+        "FrameLayout": 0, "LinearLayout": 0,
+        "ScrollView": 0, "WebView": 0, "ComposeView": 0, "other": 0,
+    }
+    enabled_clickable = 0
     try:
         tree = ET.fromstring(xml) if xml else None
     except ET.ParseError:
@@ -262,8 +301,14 @@ def _classify_main_reader_context(xml: bytes, activity_dump: bytes) -> dict:
                 packages["documents_ui"] += 1
             else:
                 packages["other"] += 1
-            if node.attrib.get("class", "").endswith("WebView"):
+            class_name = node.attrib.get("class", "").rsplit(".", 1)[-1]
+            class_group = class_name if class_name in ui_classes else "other"
+            ui_classes[class_group] += 1
+            if class_name == "WebView":
                 webviews += 1
+            if (node.attrib.get("clickable") == "true"
+                    and node.attrib.get("enabled") == "true"):
+                enabled_clickable += 1
             rid = node.attrib.get("resource-id", "")
             prefix = PACKAGE + ":id/"
             if rid.startswith(prefix):
@@ -281,12 +326,22 @@ def _classify_main_reader_context(xml: bytes, activity_dump: bytes) -> dict:
     reader = any(b"MainBibleActivity" in ln and PACKAGE.encode() in ln
                  for ln in resumed_lines)
     other_andbible = any(PACKAGE.encode() in ln for ln in resumed_lines)
+    # Only project-reviewed action classes, never captured text or unknown
+    # application labels, are allowed out of the disposable Android emulator.
+    actions = []
+    if module_id is not None and title is not None:
+        actions = sorted({
+            control["action"] for control in safe_controls(xml, module_id, title)["controls"]
+        })
     return {
         "known_reader_toolbar_resource_ids_visible": sorted(ids),
         "known_reader_root_resource_ids_visible": sorted(roots),
         "ui_hierarchy_node_count": node_count,
         "ui_hierarchy_package_class_counts": packages,
         "ui_hierarchy_webview_count": webviews,
+        "ui_hierarchy_framework_class_counts": ui_classes,
+        "ui_hierarchy_enabled_clickable_node_count": enabled_clickable,
+        "known_allowlisted_ui_actions_visible": actions,
         "ui_hierarchy_text_or_unknown_ids_exported": False,
         "main_bible_reader_activity_resumed": reader,
         "another_andbible_activity_resumed": other_andbible and not reader,
@@ -295,14 +350,14 @@ def _classify_main_reader_context(xml: bytes, activity_dump: bytes) -> dict:
     }
 
 
-def _reader_context_witness() -> dict:
+def _reader_context_witness(module_id: str, title: str) -> dict:
     adb("shell", "uiautomator", "dump", "/sdcard/commentary-context-ui.xml",
         timeout=40, fail=False)
     xml = adb("exec-out", "cat", "/sdcard/commentary-context-ui.xml",
               timeout=20, fail=False)
     activity = adb("shell", "dumpsys", "activity", "activities",
                    timeout=30, fail=False)
-    return _classify_main_reader_context(xml, activity)
+    return _classify_main_reader_context(xml, activity, module_id, title)
 
 
 def _app_focus_witness() -> list[str]:
@@ -520,7 +575,7 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
                 "Reviewed baseline Bible ZIP was not selectable in Android file picker; "
                 "allowlisted actual action classes: " + ",".join(observed)
             )
-        baseline_before_proceed = _reader_context_witness()
+        baseline_before_proceed = _reader_context_witness(module_id, title)
         # Official production-1117 AndroidManifest.xml explicitly exports
         # the separate InstallZip Activity. Once a Bible has been registered,
         # the first-run Load Documents shortcut is no longer reachable.
@@ -546,7 +601,7 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
             post_both["controls"], ("FINISH_FIRST_DOWNLOAD",)
         ) is not None
         time.sleep(3)
-        baseline_after_proceed = _reader_context_witness()
+        baseline_after_proceed = _reader_context_witness(module_id, title)
         snapshots["post_selection"] = _screenshot_sha256()
         selected_screen = _screen(module_id, title)
         exact_file_still_visible = any(
@@ -573,11 +628,15 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
         after_restart = _screen(module_id, title)
         identity_after_restart = after_restart["reader_module_metadata_detected"]
         focus_after_restart = _app_focus_witness()
-        reader_context_after_restart = _reader_context_witness()
+        reader_context_after_restart = _reader_context_witness(module_id, title)
+        stable_notice_action = _dismiss_verified_official_stable_notice(
+            module_id, title, reader_context_after_restart,
+        )
+        reader_context_after_notice = _reader_context_witness(module_id, title)
         # Follow the user-observed commentary books icon in the real reader
         # toolbar; this tests selection instead of guessing a deep link.
         toolbar_probe = _attempt_commentary_toolbar_selection(module_id, title)
-        reader_context_after_toolbar = _reader_context_witness()
+        reader_context_after_toolbar = _reader_context_witness(module_id, title)
         # Real platform request result is checked, but not equated to a
         # rendered page. A rejected Intent must remain explicitly unverified.
         intent_accepted = _dispatch_documented_reference(manifest)
@@ -626,8 +685,10 @@ def run_android_original(resource_id: str, *, apk: Path) -> dict:
             "android_application_foreground_after_deeplink": bool(focus_after_link),
             "android_sample_reference_deeplink_attempted": True,
             "android_commentary_toolbar_selection": toolbar_probe,
+            "official_stable_update_notice_action": stable_notice_action,
             "android_reader_context_by_phase": {
                 "after_app_restart": reader_context_after_restart,
+                "after_verified_notice_action": reader_context_after_notice,
                 "after_commentary_toolbar_attempt": reader_context_after_toolbar,
             },
             "android_documented_intent_request_accepted": intent_accepted,
