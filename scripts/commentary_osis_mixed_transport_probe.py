@@ -20,6 +20,7 @@ import re
 import subprocess
 
 from lxml import etree
+from pilot_preflight import PilotError
 
 from commentary_osis_transport_probe import (
     KEY, WORK, OSIS_NS, _strict_parser, _source_visible_text,
@@ -672,7 +673,7 @@ def _observe_real_xiphos_full_chapter_excerpt(
             "two_original_distinct_section_bodies_visible":False,
             "source_prose_or_screenshot_uploaded":False,
         }
-    except (ValueError,Exception) as error:
+    except (PilotError, ValueError, UnicodeError) as error:
         # Only exception *class* is logged, never UI/OS error strings
         # that might embed private authorial text.
         return {
