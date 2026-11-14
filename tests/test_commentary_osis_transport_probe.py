@@ -82,7 +82,7 @@ class OriginalRawNumberedTransportTests(unittest.TestCase):
     def test_added_compiled_heading_is_not_accepted_as_same_authorial_prose(self):
         got=classify_native_osis_roundtrip_delta(
             b"<p>Synthetic prose</p>",
-            b"<title>Additional heading</title><p>Synthetic prose</p>"
+            b"<title>Additional heading</title> <p>Synthetic prose</p>"
         )
         self.assertEqual(got["word_sequence_relation"],
                          "ALL_ORIGINAL_WORDS_IN_ORDER_WITH_ADDITIONAL_COMPILED_WORDS")
