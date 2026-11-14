@@ -191,6 +191,10 @@ jobs:
                 json.dumps(transport["original_element_counts_by_name"],sort_keys=True))
           print("Opaque TOP requiring explicit preservation:",
                 transport["opaque_top_distinct_digest_count"])
+          print("Opaque TOP exact native raw byte length census:",
+                json.dumps(transport["opaque_top_original_raw_length_counts"],sort_keys=True))
+          print("Introduction original native key classes:",
+                json.dumps(transport["intro_original_native_key_class_counts"],sort_keys=True))
           print("Repeated raw groups crossing chapters/books / intro and numbered:",
                 transport["same_raw_payload_across_chapter_group_count"],
                 transport["same_raw_payload_across_book_group_count"],
