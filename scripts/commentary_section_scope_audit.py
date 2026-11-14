@@ -28,7 +28,7 @@ from pilot_fetch import fetch
 from pilot_preflight import PilotError, inspect_archive
 from sword_native_raw_corpus_inventory import RawCorpusError, parse_native_raw_corpus
 
-HEADING = re.compile(r"\b(Verses?)\s+(\d{1,3}(?:\s*[-–,]\s*\d{1,3}){0,8})\b")
+HEADING = re.compile(r"\b(Verses?)\s+(\d{1,3}(?:\s*[-–,]\s*\d{1,3}){0,8})(?!\d)")
 KEY = re.compile(r"^([1-4]?[A-Za-z][A-Za-z0-9]*)\.([1-9]\d*)\.([1-9]\d*)$")
 PROBES = ("Song.1.7", "Jer.4.1", "Jer.4.3")
 
