@@ -23,6 +23,7 @@ import zipfile
 from lxml import etree
 
 from commentary_intake import load_manifest
+from commentary_xml_witness import _parse_reference, WORK_REF
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
 from pilot_fetch import fetch
 from pilot_preflight import PilotError, inspect_archive
@@ -88,6 +89,7 @@ def classify(records: dict[str, dict]) -> dict:
     by_book = defaultdict(Counter)
     anomalies = []
     probes = {}
+    sections = []
     for ref, entry in records.items():
         match = KEY.fullmatch(ref)
         if match is None:
@@ -106,6 +108,8 @@ def classify(records: dict[str, dict]) -> dict:
             counts["non_start_verse_rows"] += 1
             by_book[book]["non_start_verse_rows"] += 1
             continue
+        sections.append({"start": ref, "declared_end": span[-1],
+                         "heading_kind": style})
         counts["start_anchored_sections"] += 1
         counts["start_sections_" + style] += 1
         by_book[book]["start_anchored_sections"] += 1
@@ -150,7 +154,83 @@ def classify(records: dict[str, dict]) -> dict:
     return {
         "counts": dict(sorted(counts.items())),
         "by_book": {k: dict(sorted(v.items())) for k, v in sorted(by_book.items())},
-        "anomalies": anomalies, "probes": probes
+        "anomalies": anomalies, "probes": probes,
+        "start_anchored_section_map": sections
+    }
+
+
+
+def compare_independent_thml_witness(manifest: dict, sections: list[dict],
+                                     anomalies: list[dict], temp: Path) -> dict:
+    """Compare all start/end section locations with a separately pinned ThML.
+
+    Different digital editions are never automatically assumed identical;
+    this is corroborating metadata, not an instruction to rewrite stock.
+    """
+    config = manifest.get("commentary_source", {})
+    url = config.get("xml_witness_url")
+    expected = config.get("xml_witness_sha256")
+    if not url or not re.fullmatch(r"[0-9a-f]{64}", expected or ""):
+        return {"status": "NO_PINNED_THML_WITNESS", "proven_stock_faults": 0}
+    if not url.startswith(("https://www.ccel.org/", "https://ccel.org/")) or not url.endswith(".xml"):
+        raise PilotError("Unreviewed independent ThML witness URL")
+    witness_path = temp / "independent-witness.xml"
+    receipt = fetch(url, witness_path, "ccel")
+    if receipt["sha256"] != expected or receipt["bytes"] > 32 * 1024 * 1024:
+        raise PilotError("Independent ThML witness hash or bound mismatch")
+    parser = etree.XMLParser(
+        resolve_entities=False, no_network=True, load_dtd=False,
+        recover=False, huge_tree=False, remove_blank_text=False)
+    try:
+        document = etree.parse(str(witness_path), parser)
+    except (etree.XMLSyntaxError, ValueError):
+        raise PilotError("Pinned independent ThML is not safely parseable") from None
+    markers = defaultdict(set)
+    observed = 0
+    for node in document.iter():
+        if not isinstance(node.tag, str) or node.tag.rsplit("}", 1)[-1] != "scripCom":
+            continue
+        original_ref = node.get("osisRef", "")
+        kind, _ = _parse_reference(original_ref)
+        if kind not in ("work_qualified_verse", "work_qualified_same_book_verse_range"):
+            continue
+        match = WORK_REF.fullmatch(original_ref)
+        if match is None:
+            continue
+        body = match.group(2)
+        first, last = body.split("-", 1) if "-" in body else (body, body)
+        if not KEY.fullmatch(first) or not KEY.fullmatch(last):
+            continue
+        if first.split(".")[:2] != last.split(".")[:2]:
+            continue
+        markers[first].add(last)
+        observed += 1
+
+    def relation(section: dict) -> str:
+        first = section["start"]
+        last = first.rsplit(".", 1)[0] + "." + str(section["declared_end"])
+        endpoints = markers.get(first)
+        if not endpoints:
+            return "NO_MATCHING_INDEPENDENT_START"
+        if last in endpoints:
+            return "SAME_DECLARED_RANGE_IN_INDEPENDENT_EDITION"
+        return "DIFFERENT_RANGE_IN_INDEPENDENT_EDITION"
+
+    counts = Counter(relation(s) for s in sections)
+    return {
+        "status": "PINNED_DIFFERENT_DIGITAL_EDITION_SCOPE_COMPARISON",
+        "witness_sha256": expected,
+        "source_marker_rows_observed": observed,
+        "source_distinct_starts": len(markers),
+        "stock_start_sections_compared": len(sections),
+        "source_range_agreement_counts": dict(sorted(counts.items())),
+        "anomaly_source_range_corroboration": [
+            {"start": a["start"], "declared_end": a["declared_end"],
+             "relation": relation(a)} for a in anomalies
+        ],
+        "ccel_edition_equivalence_to_stock_proven": False,
+        "editorial_correctness_proven": False,
+        "text_or_reference_edited": False
     }
 
 
@@ -224,6 +304,9 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         if not expected_raw or expected_raw != actual_raw:
             raise PilotError("Original full native corpus hash drift")
         result = classify(records)
+        witness = compare_independent_thml_witness(
+            manifest, result["start_anchored_section_map"],
+            result["anomalies"], directory)
         return {
             "schema_version": 1,
             "status": "COMPLETE_NATIVE_SCAN_EDITORIAL_TRIAGE_NOT_APPROVAL",
@@ -234,8 +317,9 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
             "native_full_key_crosscheck": proof["exact_all_occupied_stock_keys_read_and_crosschecked"],
             "native_rows_with_unrecognized_heading_or_xml": unparsed,
             **result,
+            "independent_thml_witness": witness,
             "section_heading_matching_is_heuristic": True,
-            "independent_edition_range_comparison_completed": False,
+            "independent_edition_range_comparison_completed": witness["status"].startswith("PINNED"),
             "source_prose_or_bible_text_missing_proven": False,
             "original_text_logged_or_published": False,
             "original_sword_changed": False
