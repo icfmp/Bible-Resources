@@ -390,6 +390,36 @@ class SourceDivisionChapterTests(unittest.TestCase):
             ], 0
         )
 
+    def test_source_link_downgraded_to_plain_text_does_not_mean_missing_prose(self):
+        xml = etree.fromstring(
+            b'<root><div1 title="Genesis"><div2><h2>Chapter 1</h2>'
+            b'<p>Consult <scripRef osisRef="Bible:Ps.2.3">the other psalm</scripRef>.</p>'
+            b'</div2></div1></root>'
+        )
+        registry = {"chapter_maximums": {"Gen.1":31}}
+        rows = [{"native_key": "Gen.1.1", "first_verse_in_chapter": True,
+                 "number_of_occupied_native_slots_in_chapter": 1,
+                 "raw_payload_sha256": "a"*64}]
+        stock = {"Gen.1.1": b"<p>Consult the other psalm.</p>"}
+        report = independent_div2_chapter_body_evidence(xml, registry, rows, stock)
+        self.assertEqual(
+            report["independent_stock_vs_source_reference_target_classes"],
+            {"SOURCE_LINK_MARKUP_NOT_PRESENT_IN_SELECTED_STOCK": 1}
+        )
+        self.assertEqual(
+            report["source_reference_labels_when_stock_has_no_link_markup"],
+            {"literal_label_in_stock_text_outside_confirmed_reference_element": 1}
+        )
+        self.assertEqual(
+            report["independent_stock_vs_source_reference_target_totals"][
+                "source_target_occurrences_not_paired_in_selected_stock"
+            ], 1
+        )
+        self.assertTrue(
+            report["source_reference_label_location_is_not_a_target_or_text_parity_check"]
+        )
+        self.assertNotIn("the other psalm", json.dumps(report))
+
     def test_same_citation_label_with_wrong_destination_is_not_approved(self):
         source = etree.fromstring(
             b'<root><div1 title="Genesis"><div2><h2>Chapter 1</h2>'
