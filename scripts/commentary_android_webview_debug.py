@@ -48,12 +48,34 @@ def _read_only_debugger_body(url: str, port: int) -> str:
     # Only the pinned CI runner's Android job installs this small client.
     # Unit tests of safety and transcript parsing need no third-party socket.
     import websocket
-    try:
-        connection = websocket.create_connection(
-            url, timeout=8, http_no_proxy=["localhost", "127.0.0.1"],
-        )
-    except (websocket.WebSocketException, OSError, TimeoutError) as exc:
-        raise PilotError("local_CDP_connection_or_handshake_unavailable") from exc
+    connection = None
+    failure_class = "local_CDP_connection_or_handshake_unavailable"
+    # A Chromium WebView may require an Origin matching the ADB-forwarded
+    # loopback Host, or may accept only an omitted Origin. Both strategies
+    # stay on the *same already verified local app-owned debug socket*;
+    # no remote host, JavaScript mutation, UI injection or browser setting.
+    for origin_policy in (
+        {"origin": "http://127.0.0.1:%d" % port},
+        {"suppress_origin": True},
+    ):
+        try:
+            connection = websocket.create_connection(
+                url, timeout=8,
+                http_no_proxy=["localhost", "127.0.0.1"],
+                **origin_policy,
+            )
+            break
+        except websocket.WebSocketBadStatusException as exc:
+            status = getattr(exc, "status_code", None)
+            failure_class = (
+                "local_CDP_handshake_HTTP_403"
+                if status == 403 else
+                "local_CDP_handshake_other_HTTP_status"
+            )
+        except (websocket.WebSocketException, OSError, TimeoutError):
+            failure_class = "local_CDP_connection_or_handshake_unavailable"
+    if connection is None:
+        raise PilotError(failure_class)
     try:
         connection.settimeout(8)
         connection.send(json.dumps({
@@ -106,6 +128,8 @@ def read_private_official_andbible_dom_text() -> tuple[list[str], dict]:
             "body_read": 0,
             "body_empty": 0,
             "local_CDP_connection_or_handshake_unavailable": 0,
+            "local_CDP_handshake_HTTP_403": 0,
+            "local_CDP_handshake_other_HTTP_status": 0,
             "CDP_Runtime_evaluation_rejected": 0,
             "CDP_Runtime_result_shape_unavailable": 0,
             "CDP_Runtime_non_string_body": 0,
