@@ -8,6 +8,8 @@ on:
       - '.github/workflows/stage-stock-commentary.yml'
       - 'scripts/stage_verified_stock_commentary.py'
       - 'scripts/compiled_stock_commentary_proof.py'
+      - 'scripts/smoke.py'
+      - 'tests/test_smoke.py'
       - 'modules/*/metadata.json'
   workflow_dispatch:
 
