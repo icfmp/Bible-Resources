@@ -27,6 +27,9 @@ from commentary_intake import load_manifest
 from commentary_navigation_link_plan import (
     parse_native_commentary_verse_registry, UnsafeCommentaryLinkPlan
 )
+from commentary_source_english_osis_alias import (
+    read_existing_66_book_english_aliases, _canon_name
+)
 from commentary_xml_witness import _parse_reference, WORK_REF
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
 from pilot_fetch import ALLOWED_HOSTS, fetch
@@ -413,9 +416,168 @@ def independent_chapter_scope_evidence(document, unrecognized_cases: list[dict])
     }
 
 
+
+def independent_div2_chapter_body_evidence(document, native_registry: dict,
+                                          unrecognized_cases: list[dict]) -> dict:
+    """Collate chapter wrappers in canonical order, verifying book identities.
+
+    Source order alone is never authority: each div1 must be the expected book
+    with independently checked chapter count, a non-conflicting source book
+    title and/or explicit source section annotations. Unmarked div2 paragraphs
+    are evidence for a *chapter-unit candidate*, not automatically approval
+    to assign its whole body to each verse in the stock digital edition.
+    """
+    chapter_maximums = native_registry["chapter_maximums"]
+    native_by_book = defaultdict(list)
+    for chapter_key in chapter_maximums:
+        book, chapter_str = chapter_key.rsplit(".", 1)
+        native_by_book[book].append(int(chapter_str))
+    if any(chapters != list(range(1, len(chapters) + 1))
+           for chapters in native_by_book.values()):
+        raise PilotError("Actual native registry has discontinuous chapter enumeration")
+    canonical_books = list(native_by_book)
+    chapters_div1 = []
+    for node in document.iter():
+        if not isinstance(node.tag, str) or node.tag.rsplit("}", 1)[-1] != "div1":
+            continue
+        chapters = [x for x in node if
+                    isinstance(x.tag, str) and x.tag.rsplit("}", 1)[-1] == "div2"]
+        if chapters:
+            chapters_div1.append((node, chapters))
+    if len(chapters_div1) != len(canonical_books):
+        return {
+            "status": "SOURCE_BOOK_LAYOUT_NOT_EXACT_NATIVE_BOOK_COUNT",
+            "native_book_count": len(canonical_books),
+            "source_book_divisions": len(chapters_div1),
+            "case_rows": [], "scope_authorized": False
+        }
+    aliases, alias_registry_meta = read_existing_66_book_english_aliases()
+    if not set(canonical_books).issubset(aliases):
+        return {
+            "status": "SOURCE_BOOK_ALIASES_NOT_REVIEWED_FOR_NATIVE_MODULE",
+            "case_rows": [], "scope_authorized": False
+        }
+    source_chapters = {}
+    book_classes = Counter()
+    for (div1, chapters), code in zip(chapters_div1, canonical_books):
+        title = _canon_name(div1.get("title", ""))
+        candidates = set()
+        for book, alias in aliases.items():
+            needle = _canon_name(alias)
+            if re.search(r"(?<!\w)" + re.escape(needle) + r"(?!\w)", title):
+                candidates.add(book)
+        annotated_books = set()
+        for marker in div1.iter():
+            if not isinstance(marker.tag, str) or marker.tag.rsplit("}", 1)[-1] != "scripCom":
+                continue
+            kind, book = _parse_reference(marker.get("osisRef", ""))
+            if book and kind in (
+                "work_qualified_chapter", "work_qualified_verse",
+                "work_qualified_same_book_verse_range"
+            ):
+                annotated_books.add(book)
+        if len(candidates) > 1 or (candidates and code not in candidates):
+            identity = "SOURCE_BOOK_TITLE_CONFLICT_OR_AMBIGUOUS"
+        elif annotated_books and annotated_books != {code}:
+            identity = "SOURCE_BOOK_ANNOTATION_CONFLICT"
+        elif code in candidates and code in annotated_books:
+            identity = "SOURCE_BOOK_TITLE_AND_MARKERS_MATCH"
+        elif code in candidates:
+            identity = "SOURCE_BOOK_TITLE_MATCH"
+        elif annotated_books == {code}:
+            identity = "SOURCE_BOOK_MARKERS_MATCH"
+        else:
+            identity = "SOURCE_BOOK_IDENTITY_ORDINAL_ONLY_UNREVIEWED"
+        if len(chapters) != len(native_by_book[code]):
+            identity = "SOURCE_CHAPTER_COUNT_DIFFERS_FROM_NATIVE_REGISTRY"
+        book_classes[identity] += 1
+        for chapter_number, div2 in enumerate(chapters, start=1):
+            chapter = f"{code}.{chapter_number}"
+            markers = [
+                marker for marker in div2.iter()
+                if isinstance(marker.tag, str)
+                and marker.tag.rsplit("}", 1)[-1] == "scripCom"
+            ]
+            numbered = [
+                marker for marker in markers
+                if _parse_reference(marker.get("osisRef", ""))[0] in (
+                    "work_qualified_verse", "work_qualified_same_book_verse_range"
+                )
+            ]
+            chapter_markers = [
+                marker for marker in markers
+                if _parse_reference(marker.get("osisRef", ""))[0]
+                == "work_qualified_chapter"
+            ]
+            nonempty_paragraphs = sum(
+                bool("".join(node.itertext()).strip())
+                for node in div2.iter()
+                if isinstance(node.tag, str) and node.tag.rsplit("}", 1)[-1] == "p"
+            )
+            source_chapters[chapter] = {
+                "book_identity_class": identity,
+                "source_marker_count": len(markers),
+                "source_numbered_section_marker_count": len(numbered),
+                "source_chapter_marker_count": len(chapter_markers),
+                "source_nonempty_paragraph_count": nonempty_paragraphs,
+                "source_div2_text_sha256": sha256(
+                    "".join(div2.itertext()).encode("utf-8")
+                ).hexdigest(),
+                "source_div2_original_text_retained": True,
+            }
+    cases = []
+    classes = Counter()
+    candidates = [
+        row for row in unrecognized_cases
+        if row.get("first_verse_in_chapter", False)
+        and row.get("number_of_occupied_native_slots_in_chapter") == 1
+    ]
+    for row in candidates:
+        chapter = row["native_key"].rsplit(".", 1)[0]
+        source = source_chapters.get(chapter)
+        if source is None:
+            classification = "NO_CORRESPONDING_SOURCE_DIV2"
+        elif source["book_identity_class"] not in {
+            "SOURCE_BOOK_TITLE_AND_MARKERS_MATCH",
+            "SOURCE_BOOK_TITLE_MATCH",
+            "SOURCE_BOOK_MARKERS_MATCH"
+        }:
+            classification = "SOURCE_BOOK_OR_CHAPTER_ALIGNMENT_NEEDS_REVIEW"
+        elif source["source_numbered_section_marker_count"] > 0:
+            classification = "SOURCE_DIV2_HAS_INDEPENDENT_VERSE_SECTIONS"
+        elif source["source_nonempty_paragraph_count"] == 0:
+            classification = "SOURCE_DIV2_NO_NONEMPTY_COMMENTARY_PARAGRAPHS"
+        else:
+            classification = "SOURCE_DIV2_UNDIVIDED_CHAPTER_BODY_CANDIDATE"
+        classes[classification] += 1
+        cases.append({
+            "native_start": row["native_key"],
+            "source_div2_structure_class": classification,
+            "source_chapter_marker_count": source["source_chapter_marker_count"] if source else 0,
+            "source_numbered_marker_count": source["source_numbered_section_marker_count"] if source else 0,
+            "source_nonempty_paragraph_count": source["source_nonempty_paragraph_count"] if source else 0,
+            "source_div2_text_sha256": source["source_div2_text_sha256"] if source else None,
+            "stock_raw_sha256": row["raw_payload_sha256"],
+            "source_text_to_stock_text_identity_proven": False,
+            "approved_for_native_index_expansion": False,
+        })
+    return {
+        "status": "SOURCE_DIV2_STRUCTURE_COLLATED_NO_REINDEX_AUTHORIZATION",
+        "source_book_divisions": len(chapters_div1),
+        "native_book_count": len(canonical_books),
+        "book_alignment_evidence_classes": dict(sorted(book_classes.items())),
+        "reviewed_registry_evidence": alias_registry_meta,
+        "candidate_classes": dict(sorted(classes.items())),
+        "case_rows": cases,
+        "derived_authorial_section_scope_proven": False,
+        "original_xml_or_stock_modified": False
+    }
+
+
 def compare_independent_thml_witness(manifest: dict, sections: list[dict],
                                      anomalies: list[dict], temp: Path,
-                                     unrecognized_cases: list[dict] | None = None) -> dict:
+                                     unrecognized_cases: list[dict] | None = None,
+                                     native_registry: dict | None = None) -> dict:
     """Compare all start/end section locations with a separately pinned ThML.
 
     Different digital editions are never automatically assumed identical;
@@ -579,9 +741,18 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
         })
 
     chapter_scopes = independent_chapter_scope_evidence(document, unrecognized_cases or [])
+    div2_scopes = (
+        independent_div2_chapter_body_evidence(
+            document, native_registry, unrecognized_cases or []
+        ) if native_registry is not None else {
+            "status": "NO_NATIVE_REGISTRY_PROVIDED",
+            "case_rows": [], "derived_authorial_section_scope_proven": False
+        }
+    )
     return {
         "status": "PINNED_DIFFERENT_DIGITAL_EDITION_SCOPE_COMPARISON",
         "independent_whole_chapter_review": chapter_scopes,
+        "independent_div2_chapter_body_review": div2_scopes,
         "witness_sha256": expected,
         "source_marker_rows_observed": observed,
         "unrecognized_source_annotation_classes": dict(
@@ -718,7 +889,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
             raise PilotError("Unrecognized heading count diverged from complete native inventory")
         witness = compare_independent_thml_witness(
             manifest, result["start_anchored_section_map"],
-            result["anomalies"], directory, unknown["case_rows"])
+            result["anomalies"], directory, unknown["case_rows"], registry)
         # A native single-key chapter plus an independently corroborated
         # source division still needs explicit editorial signoff. These are
         # chapter-limit *measurements*, not link insertion instructions.
