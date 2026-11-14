@@ -766,6 +766,28 @@ class IndependentLeadingRangeTests(unittest.TestCase):
         self.assertFalse(row["scope_authorially_reviewed"])
         self.assertFalse(review["publication_authorized"])
 
+    def test_nested_source_scripture_reference_can_be_a_prose_lead(self):
+        words = ("An invented commentary compares the author's stated "
+                 "intent with the actual examples through patience and "
+                 "careful examination of each paragraph before deciding "
+                 "whether a particular passage properly belongs to a "
+                 "joint exposition of several verses in Scripture.")
+        xml = (
+            '<root><p><b><scripRef osisRef="Bible:Song.1.7-Song.1.8">'
+            '7,8</scripRef></b> ' + words + '</p></root>'
+        )
+        row = inspect_independent_leading_range_citations(
+            etree.fromstring(xml.encode()),
+            [{"start":"Song.1.7","declared_end":8}],
+            {"Song.1.7":("<title>Verse 7 ,8</title><p>"+words+"</p>").encode()}
+        )["case_rows"][0]
+        self.assertEqual(
+            row["independent_leading_reference_and_matching_original_stock_exposition"],1
+        )
+        self.assertEqual(
+            row["independent_reference_observations"][0]["source_markup_parent"],"b"
+        )
+
     def test_outline_or_in_prose_reference_is_not_authorial_section(self):
         xml = etree.fromstring(
             b'<root><p>Outline <scripRef osisRef="Bible:Song.1.7-Song.1.8">'
