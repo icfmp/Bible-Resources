@@ -85,6 +85,8 @@ jobs:
           print("Independent ThML status:",witness["status"])
           print("Independent ThML section agreement:",
                 json.dumps(witness.get("source_range_agreement_counts",{}),sort_keys=True))
+          print("Independent ThML scripRef citation-only agreement:",
+                json.dumps(witness.get("independent_scripref_range_agreement_counts",{}),sort_keys=True))
           for case in witness.get("anomaly_source_range_corroboration",[]):
               print("Candidate witness",case["start"],case["declared_end"],case["relation"])
           for start,refs in witness.get("unparsed_source_reference_candidates_near_anomalies",{}).items():
