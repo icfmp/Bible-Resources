@@ -130,6 +130,9 @@ jobs:
                   "ui_hierarchy_node_count",
                   "ui_hierarchy_package_class_counts",
                   "ui_hierarchy_webview_count",
+                  "ui_hierarchy_framework_class_counts",
+                  "ui_hierarchy_enabled_clickable_node_count",
+                  "known_allowlisted_ui_actions_visible",
                   "ui_hierarchy_text_or_unknown_ids_exported",
                   "main_bible_reader_activity_resumed",
                   "another_andbible_activity_resumed",
@@ -144,6 +147,26 @@ jobs:
               assert 0<=context["ui_hierarchy_node_count"]<=20000
               assert type(context["ui_hierarchy_webview_count"]) is int
               assert 0<=context["ui_hierarchy_webview_count"]<=context["ui_hierarchy_node_count"]
+              classes=context["ui_hierarchy_framework_class_counts"]
+              assert set(classes)=={
+                  "TextView","Button","ImageButton","EditText","CheckBox","Switch",
+                  "FrameLayout","LinearLayout","ScrollView","WebView","ComposeView","other"
+              }
+              assert all(type(n) is int and 0<=n<=20000 for n in classes.values())
+              assert sum(classes.values())==context["ui_hierarchy_node_count"]
+              assert type(context["ui_hierarchy_enabled_clickable_node_count"]) is int
+              assert 0<=context["ui_hierarchy_enabled_clickable_node_count"]<=context["ui_hierarchy_node_count"]
+              allowed_actions={
+                  "LOAD DOCUMENTS FROM FILES","LOAD DOCUMENT FROM FILES",
+                  "ADVANCED","DOWNLOADS","DOWNLOAD","PROCEED","BROWSE FILES","BROWSE",
+                  "IMPORT","INSTALL","OK","OPEN","CONTINUE","DONE","DISMISS",
+                  "DISMISS UNTIL NEXT UPDATE","ALLOW","WHILE USING THE APP",
+                  "USE THIS FOLDER","WAIT","CLOSE APP","EXACT_MODULE_ZIP",
+                  "EXACT_REVIEWED_BIBLE_ZIP","FINISH_FIRST_DOWNLOAD",
+                  "OPEN_COMMENTARY_MENU","EXACT_COMMENTARY_MENU_MODULE"
+              }
+              assert isinstance(context["known_allowlisted_ui_actions_visible"],list)
+              assert set(context["known_allowlisted_ui_actions_visible"])<=allowed_actions
               packages=context["ui_hierarchy_package_class_counts"]
               assert set(packages)=={"andbible","system_ui","documents_ui","other"}
               assert all(type(n) is int and 0<=n<=20000 for n in packages.values())
