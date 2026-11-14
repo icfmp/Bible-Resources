@@ -47,6 +47,10 @@ class OfficialAndBibleWebViewDebugTests(unittest.TestCase):
         self.assertEqual(got, "Private genuine text")
         sent = json.loads(fake.send.call_args.args[0])
         self.assertEqual(sent["method"], "Runtime.evaluate")
+        self.assertEqual(
+            mocked["websocket"].create_connection.call_args.kwargs["http_no_proxy"],
+            ["localhost", "127.0.0.1"],
+        )
         self.assertEqual(sent["params"]["expression"],
                          'document.body ? document.body.innerText : ""')
         self.assertTrue(sent["params"]["returnByValue"])
@@ -86,6 +90,8 @@ class OfficialAndBibleWebViewDebugTests(unittest.TestCase):
         self.assertEqual(meta["actual_Android_debug_page_targets_discovered"], 1)
         self.assertEqual(meta["actual_Android_debug_DOM_pages_read"], 1)
         self.assertEqual(meta["status"], "official_Android_reader_DOM_text_read_privately")
+        self.assertEqual(meta["local_CDP_outcome_class_counts"]["body_read"], 1)
+        self.assertEqual(sum(meta["local_CDP_outcome_class_counts"].values()), 1)
         self.assertNotIn("Private authentic", str(meta))
         self.assertFalse(meta["Android_DOM_page_URL_words_XML_screenshot_or_cookies_exported"])
         self.assertTrue(any(
