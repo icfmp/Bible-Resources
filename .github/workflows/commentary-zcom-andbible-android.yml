@@ -6,6 +6,13 @@ on:
       - '.github/workflows/commentary-zcom-andbible-android.yml'
       - 'scripts/commentary_stock_andbible_android.py'
       - 'tests/test_commentary_stock_andbible_android.py'
+      - 'scripts/commentary_android_text_witness.py'
+      - 'scripts/commentary_android_webview_debug.py'
+      - 'tests/test_commentary_android_text_witness.py'
+      - 'tests/test_commentary_android_webview_debug.py'
+      - 'scripts/sword_commentary_raw_key.cpp'
+      - 'scripts/sword_native_commentary_raw_corpus.cpp'
+      - 'scripts/sword_native_raw_corpus_inventory.py'
       - 'config/commentary-intake/**'
   workflow_dispatch:
     inputs:
@@ -37,7 +44,10 @@ jobs:
         run: |
           set -euo pipefail
           python -m pip install -r requirements.txt
+          python -m pip install websocket-client==1.8.0
           python -m unittest discover -s tests -p 'test_commentary_stock_andbible_android.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_android_text_witness.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_android_webview_debug.py' -v
       - name: Obtain exact official stable AndBible APK; no other APK accepted
         shell: bash
         run: |
@@ -48,6 +58,22 @@ jobs:
             https://github.com/AndBible/and-bible/releases/download/production-1117/andbible-production-1117.apk
           echo "1c9ed93391642c0de4529065a65e10eb44242d60722231b917b14c5919cdf796  $RUNNER_TEMP/commentary-private-android/andbible-production-1117.apk" \
             | sha256sum --check --status
+      - name: Build source-only original native SWORD single-entry reader
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          timeout 150s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_commentary_raw_key.cpp \
+            -o "$RUNNER_TEMP/commentary-private-android/stock-raw-key" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "$RUNNER_TEMP/commentary-private-android/stock-full-native" -lsword
+          test -x "$RUNNER_TEMP/commentary-private-android/stock-raw-key"
+          test -x "$RUNNER_TEMP/commentary-private-android/stock-full-native"
       - name: Permit ephemeral hardware acceleration if present
         shell: bash
         run: |
@@ -64,7 +90,7 @@ jobs:
           heap-size: 512M
           disable-animations: true
           emulator-boot-timeout: 600
-          script: python scripts/commentary_stock_andbible_android.py --resource-id "$RESOURCE_ID" --apk "$RUNNER_TEMP/commentary-private-android/andbible-production-1117.apk" --report "$RUNNER_TEMP/commentary-private-android/android-stock-import-proof.json"
+          script: python scripts/commentary_stock_andbible_android.py --resource-id "$RESOURCE_ID" --apk "$RUNNER_TEMP/commentary-private-android/andbible-production-1117.apk" --native-raw-key-binary "$RUNNER_TEMP/commentary-private-android/stock-raw-key" --native-full-raw-binary "$RUNNER_TEMP/commentary-private-android/stock-full-native" --report "$RUNNER_TEMP/commentary-private-android/android-stock-import-proof.json"
       - name: Enforce exact pinned stock and honest Android observation limitations
         shell: bash
         run: |
@@ -114,6 +140,136 @@ jobs:
           assert (not toolbar["exact_original_commentary_menu_item_tapped"]
                   or (toolbar["actual_commentary_toolbar_resource_found"]
                       and toolbar["exact_original_commentary_popup_item_found"]))
+          prose=data["android_exact_original_authorial_prose_webview_witness"]
+          assert set(prose)=={
+              "scope","original_native_occupied_sample_keys_inspected",
+              "real_AndBible_WebViews_observed",
+              "real_AndBible_WebView_text_sequences_examined",
+              "original_prose_sample_entries_with_16_consecutive_words_visible",
+              "actual_original_prose_excerpt_in_Android_WebView_verified",
+              "status","original_prose_UI_text_XML_screenshots_or_ZIP_exported"
+          }
+          assert prose["scope"]=="exact_original_native_zCom_prose_vs_actual_AndBible_WebView_accessibility"
+          assert type(data["original_sample_references_not_verifiably_native_occupied_count"]) is int
+          assert 0<=data["original_sample_references_not_verifiably_native_occupied_count"]<len(manifest["sample_references"])
+          assert 1<=prose["original_native_occupied_sample_keys_inspected"]<=len(manifest["sample_references"])
+          assert (prose["original_native_occupied_sample_keys_inspected"]
+                  + data["original_sample_references_not_verifiably_native_occupied_count"]
+                  == len(manifest["sample_references"]))
+          assert type(prose["real_AndBible_WebViews_observed"]) is int
+          assert 0<=prose["real_AndBible_WebViews_observed"]<=12
+          assert type(prose["real_AndBible_WebView_text_sequences_examined"]) is int
+          assert 0<=prose["real_AndBible_WebView_text_sequences_examined"]<=3000
+          assert type(prose["original_prose_sample_entries_with_16_consecutive_words_visible"]) is int
+          assert 0<=prose["original_prose_sample_entries_with_16_consecutive_words_visible"]<=len(manifest["sample_references"])
+          assert type(prose["actual_original_prose_excerpt_in_Android_WebView_verified"]) is bool
+          assert prose["original_prose_UI_text_XML_screenshots_or_ZIP_exported"] is False
+          assert prose["status"] in {
+              "source_pinned_original_exposition_visible_in_real_Android_WebView",
+              "inconclusive_no_source_prose_witness_in_accessibility",
+              "inconclusive_exact_MHCC_reader_selection_unavailable"
+          }
+          assert prose["actual_original_prose_excerpt_in_Android_WebView_verified"] == (
+              prose["status"]=="source_pinned_original_exposition_visible_in_real_Android_WebView"
+          )
+          if prose["actual_original_prose_excerpt_in_Android_WebView_verified"]:
+              assert prose["original_prose_sample_entries_with_16_consecutive_words_visible"]>=1
+              assert prose["real_AndBible_WebViews_observed"]>=1
+              assert toolbar["exact_original_commentary_menu_item_tapped"] is True
+              assert toolbar["reader_source_identity_witness_after_selection"] is True
+          full=data["android_full_original_authorial_prose_webview_witness"]
+          assert set(full)=={
+              "scope","original_full_native_corpus_sha256_attested",
+              "actual_original_native_occupied_keys_scanned",
+              "original_native_entries_with_substantial_exposition",
+              "real_AndBible_WebViews_observed",
+              "real_AndBible_WebView_text_sequences_examined",
+              "real_Android_read_only_debug_DOM_pages_examined",
+              "source_occupied_entries_with_16_consecutive_words_visible",
+              "source_occupied_entries_with_16_words_in_debug_DOM",
+              "actual_original_authorial_prose_in_real_Android_WebView_verified",
+              "actual_original_prose_in_read_only_Android_debug_DOM_verified",
+              "status","source_words_android_UI_XML_screenshots_or_ZIP_exported"
+          }
+          assert full["scope"]=="all_occupied_original_native_zCom_keys_vs_real_Android_WebView_prose"
+          debug=data["android_private_read_only_official_webview_debug_probe"]
+          assert set(debug)=={
+              "scope","actual_app_debug_socket_found",
+              "actual_Android_debug_page_targets_discovered",
+              "actual_Android_debug_DOM_pages_read",
+              "local_CDP_outcome_class_counts","status",
+              "Android_DOM_page_URL_words_XML_screenshot_or_cookies_exported"
+          }
+          assert debug["scope"]=="official_AndBible_pinned_release_read_only_loopback_WebView_CDP"
+          assert type(debug["actual_app_debug_socket_found"]) is bool
+          assert type(debug["actual_Android_debug_page_targets_discovered"]) is int
+          assert type(debug["actual_Android_debug_DOM_pages_read"]) is int
+          assert 0<=debug["actual_Android_debug_page_targets_discovered"]<=8
+          assert 0<=debug["actual_Android_debug_DOM_pages_read"]<=debug["actual_Android_debug_page_targets_discovered"]
+          cdperrors=debug["local_CDP_outcome_class_counts"]
+          assert set(cdperrors)=={
+              "body_read","body_empty",
+              "local_CDP_connection_or_handshake_unavailable",
+              "local_CDP_handshake_HTTP_403",
+              "local_CDP_handshake_other_HTTP_status",
+              "CDP_Runtime_evaluation_rejected",
+              "CDP_Runtime_result_shape_unavailable",
+              "CDP_Runtime_non_string_body",
+              "CDP_Runtime_body_above_safe_bound",
+              "CDP_Runtime_response_not_received",
+              "CDP_Runtime_transport_or_JSON_unavailable",
+              "other_unreadable_local_CDP"
+          }
+          assert all(type(v) is int and 0<=v<=8 for v in cdperrors.values())
+          assert sum(cdperrors.values())<=debug["actual_Android_debug_page_targets_discovered"]
+          assert cdperrors["body_read"]==debug["actual_Android_debug_DOM_pages_read"]
+          assert debug["status"] in {
+              "inconclusive_original_app_WebView_debug_unavailable",
+              "inconclusive_Android_debug_socket_no_readable_DOM",
+              "official_Android_reader_DOM_text_read_privately",
+              "inconclusive_exact_MHCC_reader_selection_unavailable"
+          }
+          assert debug["Android_DOM_page_URL_words_XML_screenshot_or_cookies_exported"] is False
+          assert full["real_Android_read_only_debug_DOM_pages_examined"]==debug["actual_Android_debug_DOM_pages_read"]
+          assert type(full["original_full_native_corpus_sha256_attested"]) is bool
+          assert type(full["actual_original_native_occupied_keys_scanned"]) is int
+          assert type(full["original_native_entries_with_substantial_exposition"]) is int
+          assert type(full["real_AndBible_WebViews_observed"]) is int
+          assert type(full["real_AndBible_WebView_text_sequences_examined"]) is int
+          assert type(full["real_Android_read_only_debug_DOM_pages_examined"]) is int
+          assert 0<=full["real_Android_read_only_debug_DOM_pages_examined"]<=8
+          assert type(full["source_occupied_entries_with_16_consecutive_words_visible"]) is int
+          assert type(full["source_occupied_entries_with_16_words_in_debug_DOM"]) is int
+          assert type(full["actual_original_authorial_prose_in_real_Android_WebView_verified"]) is bool
+          assert type(full["actual_original_prose_in_read_only_Android_debug_DOM_verified"]) is bool
+          assert full["source_words_android_UI_XML_screenshots_or_ZIP_exported"] is False
+          assert full["status"] in {
+              "source_pinned_full_corpus_original_prose_visible_in_real_Android_WebView",
+              "source_pinned_original_prose_visible_in_real_Android_debug_DOM",
+              "inconclusive_no_full_original_prose_witness_in_accessibility_or_debug_DOM",
+              "inconclusive_exact_MHCC_reader_selection_unavailable"
+          }
+          assert full["actual_original_authorial_prose_in_real_Android_WebView_verified"]==(
+              full["status"] in {
+                  "source_pinned_full_corpus_original_prose_visible_in_real_Android_WebView",
+                  "source_pinned_original_prose_visible_in_real_Android_debug_DOM"
+              }
+          )
+          assert full["actual_original_prose_in_read_only_Android_debug_DOM_verified"]==(
+              full["status"]=="source_pinned_original_prose_visible_in_real_Android_debug_DOM"
+          )
+          assert 0<=full["source_occupied_entries_with_16_words_in_debug_DOM"]<=full["source_occupied_entries_with_16_consecutive_words_visible"]
+          if full["original_full_native_corpus_sha256_attested"]:
+              assert full["actual_original_native_occupied_keys_scanned"]==29975
+              assert 1<=full["original_native_entries_with_substantial_exposition"]<=29975
+              assert 0<=full["source_occupied_entries_with_16_consecutive_words_visible"]<=full["original_native_entries_with_substantial_exposition"]
+              assert 1<=full["real_AndBible_WebViews_observed"]<=12
+              assert toolbar["exact_original_commentary_menu_item_tapped"] is True
+          else:
+              assert full["status"]=="inconclusive_exact_MHCC_reader_selection_unavailable"
+          if full["actual_original_authorial_prose_in_real_Android_WebView_verified"]:
+              assert full["source_occupied_entries_with_16_consecutive_words_visible"]>=1
+              assert toolbar["reader_source_identity_witness_after_selection"] is True
           reader_context=data["android_reader_context_by_phase"]
           assert set(reader_context)=={
               "after_app_restart", "after_verified_notice_action",
@@ -221,6 +377,12 @@ jobs:
           assert all(re.fullmatch(r"[a-f0-9]{64}",val) for val in data["real_screen_sha256_only"].values())
           print("Android: reviewed complete Bible loaded first and exact stock MHCC ZIP chosen; actual Android reader/content and navigation independently recorded, not assumed")
           print("Android official stable notice safe action: "+data["official_stable_update_notice_action"])
+          print("Actual source-pinned MHCC 16-word Android WebView prose witness (metadata only): "+
+                json.dumps(prose,sort_keys=True))
+          print("Android official local read-only WebView debug probe (metadata only): "+
+                json.dumps(debug,sort_keys=True))
+          print("All original 29,975 native MHCC entries vs real Android WebView (metadata only): "+
+                json.dumps(full,sort_keys=True))
           print("Android actual resumed reader accessibility structure (no content, IDs beyond allowlist, or screenshots): "+
                 json.dumps(reader_context,sort_keys=True))
           PY
