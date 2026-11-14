@@ -122,7 +122,7 @@ class OriginalCommentaryMarkupCensusTests(unittest.TestCase):
         self.assertEqual(report["unparseable_numbered_or_intro_entries"], 2)
         self.assertEqual(report["strict_xml_parseable_numbered_or_intro_entries"], 1)
         self.assertEqual(report["reference_elements_without_osisref_attribute"], 1)
-        self.assertFalse(report["no_original_source_bytes_rewritten"] is False)
+        self.assertTrue(report["no_original_source_bytes_rewritten"])
         self.assertNotIn("Original label", str(report))
 
     def test_opaque_and_noncanonical_tags_cannot_be_exposed_in_receipt(self):
@@ -137,7 +137,7 @@ class OriginalCommentaryMarkupCensusTests(unittest.TestCase):
 
     def test_binary_and_oversized_payloads_are_not_accepted_as_parsed(self):
         census = NativeCommentaryMarkupCensus()
-        census.observe("K", "Gen.1.1", b"<p>broken\\x00data</p>".replace(b"\\x00", b"\x00"))
+        census.observe("K", "Gen.1.1", b"<p>broken\x00data</p>")
         census.observe("K", "Gen.1.2", b"a" * (MAX_RAW_MARKUP_BYTES + 1))
         report = census.report(2)
         self.assertEqual(report["oversized_or_binary_numbered_or_intro_entries"], 2)
@@ -155,8 +155,6 @@ class OriginalCommentaryMarkupCensusTests(unittest.TestCase):
         ):
             with self.assertRaisesRegex(PilotError, "Unreviewed"):
                 census.observe(invalid_kind, invalid_key, invalid_content)
-
-
 
 
 if __name__=="__main__":
