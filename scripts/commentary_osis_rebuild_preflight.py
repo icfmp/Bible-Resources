@@ -57,13 +57,14 @@ class NativeOSISRebuildPreflight:
         expected = {"K": K, "I": I, "U": U}[kind]
         if expected.fullmatch(ref) is None or sum(self.count.values()) >= MAX_ENTRIES:
             raise ValueError("Invalid original key or excessive number of records")
+        if kind != "U" and b"\x00" in raw:
+            raise ValueError("Binary numbered or intro payload cannot be XML-wrapped")
+        # A rejected frame must not advance any source inventory counter.
         self.count[kind] += 1
         if kind == "U":
             self.opaque_digests.add(sha256(raw).hexdigest())
             self.blockers["opaque_top_record_requires_distinct_preservation_plan"] += 1
             return
-        if b"\x00" in raw:
-            raise ValueError("Binary numbered or intro payload cannot be XML-wrapped")
         digest = sha256(raw).hexdigest()
         self.digest_to_keys[digest].append((kind, ref))
         if not raw.strip():
