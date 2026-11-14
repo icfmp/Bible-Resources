@@ -39,6 +39,10 @@ class NativeOSISRebuildPreflight:
         self.opaque_digests = set()
         self.opaque_length_counts = Counter()
         self.native_intro_key_classes = Counter()
+        self.intro_top_level_element_names = Counter()
+        self.intro_top_level_nonwhitespace_text = Counter()
+        self.opaque_top_xml_element_names = Counter()
+        self.opaque_top_xml_attribute_names = Counter()
 
     @staticmethod
     def _safe_parser():
@@ -104,6 +108,10 @@ class NativeOSISRebuildPreflight:
                                 continue
                             if isinstance(element.tag, str):
                                 self.shape["opaque_top_xml_element_count"] += 1
+                                self.opaque_top_xml_element_names[self._local(element.tag)] += 1
+                                self.opaque_top_xml_attribute_names.update(
+                                    self._local(name) for name in element.attrib
+                                )
                 except (etree.XMLSyntaxError, ValueError):
                     self.shape["opaque_top_not_strict_xml_fragment"] += 1
             self.blockers["opaque_top_record_requires_distinct_preservation_plan"] += 1
@@ -139,6 +147,15 @@ class NativeOSISRebuildPreflight:
             return
 
         self.shape["strict_osis_wrapper_xml_parseable_distinct_bodies"] += 1
+        if kind == "I":
+            self.intro_top_level_element_names.update(
+                self._local(child.tag) for child in source
+            )
+            self.intro_top_level_nonwhitespace_text[
+                "intro_has_unwrapped_leading_text"
+                if (source.text or "").strip()
+                else "intro_has_no_unwrapped_leading_text"
+            ] += 1
         # Verbatim Unicode visible-text comparison, including all whitespace,
         # without any casefold, punctuation normalization or other edits.
         if "".join(source.itertext()) != "".join(wrapped.itertext()):
@@ -213,6 +230,14 @@ class NativeOSISRebuildPreflight:
             },
             "intro_original_native_key_class_counts":
                 dict(sorted(self.native_intro_key_classes.items())),
+            "intro_original_top_level_element_counts":
+                dict(sorted(self.intro_top_level_element_names.items())),
+            "intro_original_unwrapped_leading_text_presence":
+                dict(sorted(self.intro_top_level_nonwhitespace_text.items())),
+            "opaque_top_original_xml_element_names":
+                dict(sorted(self.opaque_top_xml_element_names.items())),
+            "opaque_top_original_xml_attribute_names":
+                dict(sorted(self.opaque_top_xml_attribute_names.items())),
             "original_markup_shape_counts": dict(sorted(self.shape.items())),
             "blocking_or_unresolved_structure_counts": dict(sorted(self.blockers.items())),
             "original_element_counts_by_name": dict(sorted(self.tags.items())),
