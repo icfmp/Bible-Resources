@@ -80,6 +80,9 @@ jobs:
           print("Unrecognized distinct raw payloads:",unknown["distinct_native_raw_payload_hashes"])
           print("Unrecognized slots sharing payload with recognized heading:",
                 unknown["shares_content_with_recognized_heading"])
+          print("Unrecognized first-verse native rows:",unknown["first_verse_entries"])
+          print("Chapter-first unknowns with only one occupied native slot:",
+                unknown["single_occupied_slot_chapters_among_unknown"])
           for row in unknown["case_rows"]:
               print("Unrecognized slot",row["native_key"],row["category"],
                     "same-payload-count",row["same_raw_payload_slot_count"],
