@@ -390,6 +390,33 @@ class SourceDivisionChapterTests(unittest.TestCase):
             ], 0
         )
 
+    def test_changed_word_inside_original_scripture_label_is_not_assumed_prose(self):
+        source = etree.fromstring(
+            b'<root><div1 title="Genesis"><div2><h2>Chapter 1</h2>\n'
+            b'<p>See <scripRef osisRef="Bible:Exod.2.4">God</scripRef> now.</p>'
+            b'</div2></div1></root>'
+        )
+        rows = [{"native_key": "Gen.1.1", "first_verse_in_chapter": True,
+                 "number_of_occupied_native_slots_in_chapter": 1,
+                 "raw_payload_sha256": "a"*64}]
+        stock = {"Gen.1.1": (
+            b'<title>Chapter 1</title>\n'
+            b'<p>See <reference osisRef="Exod.2.4">Go</reference> now.</p>'
+        )}
+        report = independent_div2_chapter_body_evidence(
+            source, {"chapter_maximums":{"Gen.1":31}}, rows, stock
+        )
+        case = report["case_rows"][0]["independent_lexical_comparison"]
+        one = case["isolated_one_word_xml_location"]
+        self.assertEqual(one["original_source_word_markup_location"],
+                         "SOURCE_SCRIPREF_LINK_LABEL")
+        self.assertEqual(one["stock_owning_top_level_xml_element"], "p")
+        self.assertEqual(
+            report["isolated_one_word_original_source_markup_location_classes"],
+            {"SOURCE_SCRIPREF_LINK_LABEL":1}
+        )
+        self.assertNotIn("God", json.dumps(one))
+
     def test_source_link_downgraded_to_plain_text_does_not_mean_missing_prose(self):
         xml = etree.fromstring(
             b'<root><div1 title="Genesis"><div2><h2>Chapter 1</h2>'
