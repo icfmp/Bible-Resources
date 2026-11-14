@@ -5,10 +5,12 @@ on:
     branches: [main]
     paths:
       - "modules/darby-jnd-2024/RELEASE_PROVENANCE.json"
+      - ".github/workflows/finalize-darby-0.1.1.yml"
   workflow_dispatch:
 
 permissions:
   contents: write
+  issues: write
 concurrency:
   group: darby-011-final-publication
   cancel-in-progress: false
