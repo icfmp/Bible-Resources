@@ -135,3 +135,36 @@ This checkpoint supersedes earlier *scope-coverage* limitations but does **not**
 The new reusable checks are in `scripts/commentary_section_scope_audit.py` (full original privately parsed ThML versus native stock and reference fingerprints), `scripts/sword_native_commentary_index.cpp --chapter-registry` (actual released SWORD verse limits), and `scripts/commentary_navigation_link_plan.py` (read-only reviewed-scope alias proposal).
 
 **Acceptance gates before any corrected SWORD candidate:** (1) finish the 22-case 2 Chronicles evidence-based section identity (source chapter headings, original `scripCom` references, position); (2) verify exact source-to-stock words and section identity for the whole-chapter group; (3) distinguish authored chapter scope from merely a source-book heading; (4) run fully audited, reversible OSIS link construction with no content or occupied-key overwrite, deduplicated chapter presentation and one real reader test. Any new release still requires rights and owner approval. Modern-English #270/#272 remains paused.
+
+
+## Fourth pass — 117 / 118 source chapter identity and private ordered-word diagnostic (2026-11-14)
+
+**This is the latest measured checkpoint; earlier 96/22 counts are historical.**
+
+At last successful head `5365829188580819ce6f7cc9e4774eeb76700a41`, the independent released native SWORD MHCC module, pinned CCEL ThML, native KJV registry, and source divisions were compared in [full Actions #43617953997](https://github.com/icfmp/Bible-Resources/actions/runs/43617953997) **PASS** (34 targeted tests and complete original inventory). The independent **Validate** suite on the same head is separately tracked and should be checked before any merge.
+
+### Chapter-level structural identity
+
+The original **2 Chronicles** ThML `div1` contains 35 direct chapter `div2` blocks versus 36 KJV chapters. The first `div2` is headed **Chapter 2**. Its original `h2` numeric chapter labels and independent `scripCom` references resolve the off-by-one; the original `div1` book-level *prefix* has two nonempty paragraphs before any `div2`. A similar first-div2 omission occurs in 2 Kings (24 `div2` vs 25 canonical chapters). There is **no directly attributable chapter-one `scripCom` or unambiguous H2 in the 2Chr prefix**. Treat its chapter-one text correspondence as original-source editorial evidence, not a right to silently reassign source markup.
+
+Of the 118 genuine single-key native chapters, **117** have independently coherent source `div2` chapter-body structures: 96 match by complete canonical book/chapter order and 21 match explicit source H2 chapter numbers (2 Chronicles); **1 source `div2` is unassigned: 2Chr.1**.
+
+### Private lexical checks across all 118 unique chapter-body comments
+
+For each single-key native chapter, the exact pinned independent CCEL chapter text (or source `div1` prefix for 2Chr 1) was compared against the exact unchanged compiled CrossWire raw XML. The initial word multiset and independent **existing, bounded** `plain_word_alignment` LCS helper are both diagnostic; **no original prose, markup, citations or verse text was logged or committed**.
+
+- **117** have reciprocal word-multiset overlap at least 95%; **1**, **Neh 1**, falls in the 80–94% class due to original CrossWire raw text including extra words.
+- **109 / 118** have exactly identical ordered casefolded Unicode word sequences across source and stock.
+- **2 / 118** contain every original CCEL word **in the same order** plus extra CrossWire stock words:
+  - **2Chr 1**: CCEL `div1` unwrapped two-paragraph prefix has 129 words, all 129 in identical order within the 131-word native stock body. The **2 extra stock words precede** the 129 exact shared words. This is strong evidence that CrossWire 2Chr.1 preserves that source prefix as a commentary, but source scope / exact-edition typography remains unproven.
+  - **Neh 1**: CCEL `div2` has 239 words, all 239 appear in exact order inside 268 native stock words (**29 stock-extra words at the start**). This could reflect an upstream-added title/intro, not automatically content corruption; investigate its markup positions before classification.
+- **7 / 118** have a one-word gap on each side of their ordered sequence comparison (one CCEL word and one stock word unmatched). **Gen 38; 2Sam 22; 1Chr 7; 1Chr 17; Job 25; Ps 70; Jer 45.** No lost passage proven; review exact original/source variant and word-token boundary before any edit.
+- **No chapters** fall in the “more than ten original words missing in ordered alignment” class. All 118 were within the reviewed alignment budget.
+
+This is **not** a historical Matthew Henry text-parity certificate: headings and source edition differ, punctuation/typography/notes/links/paragraphs have not been matched at full-document precision, and comparisons rely on confirmed scope for the digital original rather than an identical print facsimile.
+
+### Navigation and publication gates
+
+The reader-first indexing policy still holds: when a section is *actually established* as whole chapter, make it discoverable from all canonical chapter verses by **linked references to one unchanged comment**, displayed **once**, never copied as distinct authored comments. A reviewable candidate can be designed against the real 31,102-key KJV registry, with an upper bound of **2,285** possible new navigation keys for these 118 chapters. **None has been added.** The 17 explicit original indexing omissions across 24 missing native keys remain separate from this optional chapter-level navigation upgrade.
+
+**Next:** investigate the seven one-word discrepancies and Neh 1 extra prefix against original XML/stock markup; determine whether 2Chr 1 prefix is genuinely the first chapter exposition rather than a book introduction; verify exact source paragraph and intro fidelity and cross-reference targets before proposing reviewed changes. Keep CrossWire original + BRMHCC 0.1.0 untouched, PR #275 draft, modern-English MHCC #270/#272 paused and any publication blocked until explicit decision.
