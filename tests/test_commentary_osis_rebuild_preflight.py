@@ -45,6 +45,17 @@ class NativeOSISRebuildPreflightTests(unittest.TestCase):
         )
         self.assertFalse(report["canonical_original_introductions_and_TOP_reconstructed"])
 
+    def test_opaque_top_binary_is_preserved_as_opaque_not_misparsed(self):
+        c = NativeOSISRebuildPreflight()
+        c.observe("U", "TOP:1", b"Invented binary control bytes\\x00")
+        c.observe("K", "Gen.1.1", b"<p>Invented</p>")
+        report = c.report(expected_count=2)
+        self.assertEqual(report["raw_record_kinds"], {"K": 1, "U": 1})
+        self.assertEqual(report["opaque_top_distinct_digest_count"], 1)
+        self.assertEqual(report["blocking_or_unresolved_structure_counts"][
+            "opaque_top_record_requires_distinct_preservation_plan"], 1)
+        self.assertFalse(report["canonical_original_introductions_and_TOP_reconstructed"])
+
     def test_repeated_raw_keys_not_inferred_as_authorial_verse_range(self):
         c = NativeOSISRebuildPreflight()
         for key in ("Gen.1.7", "Gen.1.8", "Gen.2.1"):
