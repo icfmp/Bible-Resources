@@ -1,0 +1,72 @@
+name: Publish source-approved SWORD GitHub Releases
+
+on:
+  pull_request:
+    paths:
+      - "config/release-plans/**"
+      - "scripts/publish_reviewed_release.py"
+      - ".github/workflows/publish-reviewed-sword-releases.yml"
+  push:
+    branches: [main]
+    paths:
+      - "config/release-plans/**"
+      - "scripts/publish_reviewed_release.py"
+      - ".github/workflows/publish-reviewed-sword-releases.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: approved-sword-github-releases
+  cancel-in-progress: false
+
+jobs:
+  publish-reviewed-releases:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install existing validation requirements and real SWORD reader
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          timeout 180s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y diatheke
+      - name: Reproduce official catalogue and approved SWORD bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/validate.py
+          python scripts/build.py --output dist \
+            --base-url https://icfmp.github.io/Bible-Resources/
+          python scripts/smoke.py
+      - name: Validate release authorization and exact assets (PR, read-only)
+        if: github.event_name == 'pull_request'
+        shell: bash
+        env:
+          GITHUB_SHA_REF: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          python scripts/publish_reviewed_release.py \
+            --built dist --repository "$GITHUB_REPOSITORY" \
+            --target-sha "$GITHUB_SHA_REF" --verify-only
+      - name: Create or verify immutable GitHub Releases (main only)
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_SHA_REF: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          python scripts/publish_reviewed_release.py \
+            --built dist --repository "$GITHUB_REPOSITORY" \
+            --target-sha "$GITHUB_SHA_REF"
