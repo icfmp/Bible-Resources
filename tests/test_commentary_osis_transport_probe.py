@@ -1,0 +1,79 @@
+"""Invented-only original K raw -> temporary OSIS transport tests."""
+from pathlib import Path
+import sys
+import unittest
+from lxml import etree
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+from commentary_osis_transport_probe import build_numbered_transport_sample
+
+
+class OriginalRawNumberedTransportTests(unittest.TestCase):
+    def test_noncontiguous_identical_payloads_do_not_link_across_gap(self):
+        one = b"<title>Invented section</title>\n<p>First original body.</p>"
+        middle = b"<p>Different original body.</p>"
+        later = b"<p>Another original body.</p>"
+        records = [
+            ("Gen.1.1", one), ("Gen.1.2", one), ("Gen.1.3", middle),
+            ("Gen.1.4", later), ("Gen.1.5", later),
+            ("Gen.1.7", later), ("Gen.1.8", later),
+        ]
+        xml, report = build_numbered_transport_sample(
+            records, work_id="TransportProbe"
+        )
+        self.assertEqual(report["input_numbered_native_keys"], 7)
+        self.assertEqual(report["contiguous_identical_raw_body_groups"], 4)
+        self.assertEqual(report["groups_with_multiple_original_native_verse_keys"], 3)
+        self.assertTrue(report["source_unmodified_unicode_visible_text_in_syntax_approved_osis"])
+        self.assertFalse(report["original_introductions_preserved_in_candidate"])
+        self.assertFalse(report["compiler_roundtrip_parity_proven"])
+        self.assertNotIn("Gen.1.6", xml.decode())
+        root=etree.fromstring(xml)
+        annotations=root.xpath("//*[local-name()='div' and @annotateType='commentary']")
+        self.assertEqual([a.get("annotateRef") for a in annotations], [
+            "Gen.1.1-Gen.1.2", "Gen.1.3",
+            "Gen.1.4-Gen.1.5", "Gen.1.7-Gen.1.8"
+        ])
+        self.assertIn(one, xml)
+        self.assertIn(middle, xml)
+        self.assertIn(later, xml)
+
+    def test_multiple_books_chapters_preserve_original_order(self):
+        entries=[
+            ("Gen.36.1", b"<p>Text for Gen 36</p>"),
+            ("Exod.1.1", b"<p>Text for Exod 1</p>"),
+        ]
+        xml,report=build_numbered_transport_sample(entries,work_id="ProofWork")
+        self.assertEqual(report["input_numbered_native_keys"],2)
+        self.assertIn(b'osisID="Gen"',xml)
+        self.assertIn(b'osisID="Exod"',xml)
+
+    def test_rejects_duplicate_noncanonical_or_invalid_xml(self):
+        for entries in (
+            [("Gen.1.1", b"<p>x</p>"), ("Gen.1.1", b"<p>x</p>")],
+            [("Gen.1.2", b"<p>x</p>"), ("Gen.1.1", b"<p>y</p>")],
+            [("Gen.1.0", b"<p>x</p>")],
+            [("Gen.1.1", b"<p>unclosed")],
+            [("Gen.1.1", b"bad\x00bytes")],
+        ):
+            with self.assertRaises(ValueError):
+                build_numbered_transport_sample(entries,work_id="ProbeModule")
+
+    def test_intro_and_opaque_top_not_passed_off_as_verse_entries(self):
+        for entries in (
+            [("Gen.0.0", b"<p>Book intro</p>")],
+            [("TOP:1", b"<div/>")],
+        ):
+            with self.assertRaises(ValueError):
+                build_numbered_transport_sample(entries,work_id="ProbeModule")
+
+    def test_invalid_work_id_cannot_inject_xml_attributes(self):
+        with self.assertRaises(ValueError):
+            build_numbered_transport_sample(
+                [("Gen.1.1", b"<p>x</p>")],
+                work_id='Invalid" module'
+            )
+
+
+if __name__=="__main__":
+    unittest.main()
