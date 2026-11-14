@@ -375,6 +375,42 @@ class CommentaryAndroidStockTests(unittest.TestCase):
         self.assertNotIn("Private user note", str(output))
         self.assertFalse(output["actual_commentary_rendering_verified"])
 
+    def test_actual_reader_layout_root_and_overlay_are_diagnostic_only(self):
+        from commentary_stock_andbible_android import _classify_main_reader_context
+        layout = b'''<hierarchy>
+            <node package="net.bible.android.activity" class="android.widget.FrameLayout"
+                  resource-id="net.bible.android.activity:id/drawerLayout"/>
+            <node package="net.bible.android.activity" class="android.webkit.WebView"
+                  resource-id="net.bible.android.activity:id/mainBibleView"
+                  text="Private authorial biblical content"/>
+            <node package="com.android.systemui" class="android.widget.FrameLayout"
+                  text="Unrelated system UI text"/>
+        </hierarchy>'''
+        out = _classify_main_reader_context(
+            layout,
+            b"topResumedActivity=ActivityRecord{12 net.bible.android.activity/MainBibleActivity}",
+        )
+        self.assertTrue(out["main_bible_reader_activity_resumed"])
+        self.assertEqual(out["known_reader_root_resource_ids_visible"],
+                         ["drawerLayout", "mainBibleView"])
+        self.assertEqual(out["ui_hierarchy_webview_count"], 1)
+        self.assertEqual(out["ui_hierarchy_package_class_counts"],
+                         {"andbible": 2, "system_ui": 1, "documents_ui": 0, "other": 0})
+        self.assertEqual(out["ui_hierarchy_node_count"], 3)
+        self.assertFalse(out["actual_commentary_rendering_verified"])
+        self.assertFalse(out["ui_hierarchy_text_or_unknown_ids_exported"])
+        self.assertNotIn("Private authorial", str(out))
+        self.assertNotIn("Unrelated system UI", str(out))
+        overlay = _classify_main_reader_context(
+            b'''<hierarchy><node package="com.android.systemui"
+                  class="android.widget.FrameLayout" text="Overlay"/></hierarchy>''',
+            b"topResumedActivity=ActivityRecord{12 net.bible.android.activity/MainBibleActivity}",
+        )
+        self.assertTrue(overlay["main_bible_reader_activity_resumed"])
+        self.assertEqual(overlay["ui_hierarchy_package_class_counts"]["andbible"], 0)
+        self.assertEqual(overlay["known_reader_toolbar_resource_ids_visible"], [])
+        self.assertEqual(overlay["known_reader_root_resource_ids_visible"], [])
+
     def test_missing_reader_window_is_not_a_mhcc_data_failure(self):
         from commentary_stock_andbible_android import _classify_main_reader_context
         state = _classify_main_reader_context(
