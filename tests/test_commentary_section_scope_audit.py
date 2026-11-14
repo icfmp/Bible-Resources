@@ -168,6 +168,21 @@ class SafeLexicalEvidenceTests(unittest.TestCase):
         self.assertFalse(r["historical_or_editorial_equivalence_proven"])
         self.assertNotIn("Wisdom", str(r))
 
+    def test_original_source_suffix_has_a_distinct_stock_title_prefix(self):
+        result = independent_lexical_overlap(
+            "The whole chapter commentary.",
+            b"<title>Chapter 1</title><p>The whole chapter commentary.</p>",
+        )
+        self.assertEqual(result["ordered_word_alignment"][
+            "exact_unicode_ordered_alignment_class"
+        ], "all_source_plain_words_in_stock_order_with_extra_stock_words")
+        prefix = result["stock_extra_prefix_xml_topology"]
+        self.assertTrue(prefix["full_original_source_word_sequence_inside_stock"])
+        self.assertEqual(prefix["unapproved_stock_extra_word_prefix_count"], 2)
+        self.assertEqual(prefix["top_level_element_types_wholly_before_original_source_words"], {"title": 1})
+        self.assertFalse(prefix["additional_stock_words_approved_as_heading"])
+        self.assertFalse(result["historical_or_editorial_equivalence_proven"])
+
     def test_unrelated_original_words_fail_the_overlapping_diagnostic(self):
         r = independent_lexical_overlap(
             "Alpha beta gamma delta epsilon zeta",
