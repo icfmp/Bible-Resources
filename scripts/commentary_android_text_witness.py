@@ -147,6 +147,7 @@ def _actual_android_webview_word_sequences(ui_xml: bytes) -> tuple[list[list[str
 def full_native_original_prose_in_real_android_webview(
     source_root: Path, module_id: str, native_scanner: Path,
     expected_corpus_sha256: str, actual_ui_xml: bytes,
+    *, real_read_only_dom_texts: list[str] | None = None,
 ) -> dict:
     """One full, exact SHA-verified original scan; no passage-reference guess.
 
@@ -160,13 +161,26 @@ def full_native_original_prose_in_real_android_webview(
             or not re.fullmatch(r"[a-f0-9]{64}", expected_corpus_sha256)):
         raise PilotError("Unapproved full original stock SWORD scan context")
     sequences, webviews = _actual_android_webview_word_sequences(actual_ui_xml)
+    doms = real_read_only_dom_texts if real_read_only_dom_texts is not None else []
+    if (not isinstance(doms, list) or len(doms) > 8
+            or any(not isinstance(body, str)
+                   or len(body.encode("utf-8")) > 256_000 for body in doms)):
+        raise PilotError("Untrusted or unbounded private WebView CDP body")
     visible = set()
     for words in sequences:
         for pos in range(len(words) - WINDOW + 1):
             phrase = tuple(words[pos:pos + WINDOW])
             if len(" ".join(phrase)) >= 85:
                 visible.add(phrase)
+    dom_visible = set()
+    for body in doms:
+        words = _normalized_words(body.encode("utf-8"))
+        for pos in range(len(words) - WINDOW + 1):
+            phrase = tuple(words[pos:pos + WINDOW])
+            if len(" ".join(phrase)) >= 85:
+                dom_visible.add(phrase)
     matching_entries = 0
+    matching_dom_entries = 0
     substantial_entries = 0
     def examine(kind: str, key: str, raw: bytes) -> None:
         nonlocal matching_entries, substantial_entries
@@ -176,11 +190,20 @@ def full_native_original_prose_in_real_android_webview(
         if len(words) < 32:
             return
         substantial_entries += 1
+        accessible = False
+        cdp = False
         for pos in range(12, min(len(words) - WINDOW + 1, 350)):
             phrase = tuple(words[pos:pos + WINDOW])
             if phrase in visible:
-                matching_entries += 1
+                accessible = True
+            if phrase in dom_visible:
+                cdp = True
+            if accessible and cdp:
                 break
+        if accessible or cdp:
+            matching_entries += 1
+        if cdp:
+            matching_dom_entries += 1
 
     process = None
     try:
@@ -212,7 +235,8 @@ def full_native_original_prose_in_real_android_webview(
     scanned = inventory["all_actual_raw_entries_scanned"]
     if not 1 <= substantial_entries <= scanned or matching_entries > substantial_entries:
         raise PilotError("Unbounded original substantial commentary sample count")
-    verified = matching_entries > 0 and webviews > 0
+    verified = matching_entries > 0 and (webviews > 0 or len(doms) > 0)
+    dom_verified = matching_dom_entries > 0 and len(doms) > 0
     return {
         "scope": "all_occupied_original_native_zCom_keys_vs_real_Android_WebView_prose",
         "original_full_native_corpus_sha256_attested": True,
@@ -220,11 +244,17 @@ def full_native_original_prose_in_real_android_webview(
         "original_native_entries_with_substantial_exposition": substantial_entries,
         "real_AndBible_WebViews_observed": webviews,
         "real_AndBible_WebView_text_sequences_examined": len(sequences),
+        "real_Android_read_only_debug_DOM_pages_examined": len(doms),
         "source_occupied_entries_with_16_consecutive_words_visible": matching_entries,
+        "source_occupied_entries_with_16_words_in_debug_DOM": matching_dom_entries,
         "actual_original_authorial_prose_in_real_Android_WebView_verified": verified,
+        "actual_original_prose_in_read_only_Android_debug_DOM_verified": dom_verified,
         "status": (
+            "source_pinned_original_prose_visible_in_real_Android_debug_DOM"
+            if dom_verified else
             "source_pinned_full_corpus_original_prose_visible_in_real_Android_WebView"
-            if verified else "inconclusive_no_full_original_prose_witness_in_accessibility"
+            if verified else
+            "inconclusive_no_full_original_prose_witness_in_accessibility_or_debug_DOM"
         ),
         "source_words_android_UI_XML_screenshots_or_ZIP_exported": False,
     }
