@@ -1,6 +1,6 @@
 {
   "diff_format": "text-free source-attested semantic operation inventory",
-  "diff_sha256": "4091f9b2fd2399a8dcb6376e8f49e94afbe960878268e1538693e688a1ab4b99",
+  "diff_sha256": "a08724b84d20f71a43fe1c89ca1f4b47ce966826bdc26622550c7055b27ab369",
   "edition": "reader_optimized",
   "full_text_exactly_preserved": true,
   "inline_semantic_tags_preserved": true,
@@ -17,13 +17,21 @@
     {
       "count": 2,
       "kind": "replace_invalid_measurement_inline_tag"
+    },
+    {
+      "count": 521,
+      "kind": "preserve_original_subject_division_signs_as_nondisplay_metadata"
+    },
+    {
+      "count": 4690,
+      "kind": "remove_verified_xml_formatting_indentation_spans"
     }
   ],
   "original_source_unchanged": true,
-  "output_sha256": "1f0d439b20b763e3548a05bb766d9f59447918f973ea92f8695d7578e096178a",
-  "plan_sha256": "e998882607a0042cb271a4911ef023abee3623131a9911f17368a9a759c42132",
-  "provenance_audit_sha256": "3ae44db7e82a65453690de9ff414aa4d2f8b39bc424ac66c7354071b7f9baba5",
-  "review_asserted_by_plan": "Bible Resources project owner 2026-11-12 (issue #133)",
+  "output_sha256": "35eb23c62eefdcda9a94d6a493df0bf32d5af1bc6ccc2132e495091d7771406d",
+  "plan_sha256": "cba2a34b4b00429e87d932e3b318870bd7a91bf4003d22401dabde3fc1f2603a",
+  "provenance_audit_sha256": "99a16d3891f5748dc2a691833480558edc94f5aa22e7f1938a1c10938f16e11d",
+  "review_asserted_by_plan": "Bible Resources project owner, issue #241 (2026-11-14)",
   "schema_sha256": "bee01a2e957e9128a60328639761922b7aa701edad5efa5c8e885f762ff1baa2",
   "source_sha256": "2204629e3efb3024dceb392780ef5e61f4296ea832c90e3dd2a5c3224179c1d3",
   "status": "structural_edit_verified_not_published"

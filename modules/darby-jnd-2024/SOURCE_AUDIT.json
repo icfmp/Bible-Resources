@@ -7,12 +7,12 @@
     "independent_reader_tested": false,
     "member_sha256": {
       "mods.d/jnd2024repairresearch.conf": "59162504efdc0a217029488c8b62c851c3b64d3c70329daad86a2d622bd1dd0f",
-      "modules/texts/ztext/jnd2024repairresearch/nt.bzs": "ee0b18d9eb7398a52d6d2d96a1249f48755531dc98a892a88dd37b4510b4bac6",
-      "modules/texts/ztext/jnd2024repairresearch/nt.bzv": "4e6c77f1708e12c862edc2d927323adbdca60e006e297329f488e453e7735498",
-      "modules/texts/ztext/jnd2024repairresearch/nt.bzz": "66cfe1539b2b997264d19ce4cbb6b27ab861487824e918dc0ec0d57cf9e13243",
-      "modules/texts/ztext/jnd2024repairresearch/ot.bzs": "ccf84dfb4099c19f1206b44eb130fe9bfe78d02ac08e9fb81b38a948c4bbe908",
-      "modules/texts/ztext/jnd2024repairresearch/ot.bzv": "4db272cac1b0b1e809e5276a6220318c5d07d077d023b528cb4ad1e7eb98c2aa",
-      "modules/texts/ztext/jnd2024repairresearch/ot.bzz": "96f73ca16c6086f6aabdaa9e1c79cb3a649e1df813de29faba45432abeb4da0e"
+      "modules/texts/ztext/jnd2024repairresearch/nt.bzs": "640a405f27dab6313ccca94b962b98057363f8967d01e4d98b982329eeb1f14c",
+      "modules/texts/ztext/jnd2024repairresearch/nt.bzv": "4e52999400ad2410a32a91f2e7fe3ea7a7c138b02f3c805870271d203279e17d",
+      "modules/texts/ztext/jnd2024repairresearch/nt.bzz": "6965613636374f2b4dfe07f6a17895c4060062c0605f3939edac3e987057c67b",
+      "modules/texts/ztext/jnd2024repairresearch/ot.bzs": "14f1b4697d81c9f0b5f9a6c5a4ee41cc36ebb334c253a1c646baff432dd7500d",
+      "modules/texts/ztext/jnd2024repairresearch/ot.bzv": "8e722b8eb1be520a28d4f882a0781680d8637383da26ed39f69a4d5a3995bd00",
+      "modules/texts/ztext/jnd2024repairresearch/ot.bzz": "0423cd0aef6a21d7d395782e1c49e4945da2e812e7394f326a2bbc40a0a812e8"
     },
     "module_file_count": 7,
     "module_id": "JND2024RepairResearch",
@@ -21,10 +21,10 @@
     "release_approved": false,
     "status": "exact_audited_source_bytes_packaged_for_reader_testing_only",
     "versification": "Luther",
-    "zip_bytes": 1958302,
-    "zip_sha256": "281f18311a5f0709406c5bc5ec436a7fe37a7f0b5f7b086c2bd1f5141ff7ec11"
+    "zip_bytes": 1960821,
+    "zip_sha256": "d5a6c5adc0ad49a2b026c3c6e22a7aa2e2d51e30b7f577eefa2926dec4eb6594"
   },
-  "candidate_binary_sha256_not_public_release": "5283a57bfbb0f80855f8206e2f6df9a51b013b3ca36313ee83c79524abb88a59",
+  "candidate_binary_sha256_not_public_release": "1d9eac592c6ef99a92493d73dd4718e3a353b1fb478f961c6c09605be6e2524c",
   "compiler_diagnostic_category_counts": {
     "INFO": 1,
     "unclassified": 2
@@ -113,7 +113,7 @@
       "status": "compiled_milestone_pairs_verified_only",
       "verse_zero_and_numbered_milestones_inspected": true
     },
-    "compiled_payload_sha256": "5283a57bfbb0f80855f8206e2f6df9a51b013b3ca36313ee83c79524abb88a59",
+    "compiled_payload_sha256": "1d9eac592c6ef99a92493d73dd4718e3a353b1fb478f961c6c09605be6e2524c",
     "explicit_note_target_index_addressability": {
       "actual_reader_link_click_navigation_verified": false,
       "all_original_explicit_targets_index_addressable": true,
@@ -277,9 +277,11 @@
   "original_notes_unchanged_except_approved_navigation_targets": true,
   "original_or_compiled_binary_uploaded": false,
   "original_unedited_osis_bytes_preserved": true,
-  "original_verse_words_and_punctuation_equal": true,
+  "original_verse_words_and_punctuation_equal": false,
+  "original_words_and_punctuation_except_explicit_moved_editorial_stars_equal": true,
   "plain_nonhyperlink_omission_label_count": 3,
   "private_canonical_xml_research_sha256": "89b67a1007547b113c0049a2df8912b66716a406d19237f036d5dad71f7771c8",
+  "private_compiled_osis_sha256": "35eb23c62eefdcda9a94d6a493df0bf32d5af1bc6ccc2132e495091d7771406d",
   "private_link_repaired_sha256": "23b6225cf4f827f6f84e321ed60fedb55ec42c3bc2b5cf58747942bd32f6ad8d",
   "private_original_serialization_preserving_osis_sha256": "90a7a67db2c43cced53c1c34e4578c20470f3a247e16f07cb45145eae8d326c5",
   "private_plain_omitted_reference_osis_sha256": "1f0d439b20b763e3548a05bb766d9f59447918f973ea92f8695d7578e096178a",
@@ -315,6 +317,479 @@
       "reference": "Revelation 22:21"
     }
   ],
+  "research_division_overlay_receipt": {
+    "all_leading_editorial_signs_transferred": true,
+    "all_original_notes_and_machine_targets_preserved": true,
+    "bounded_unconverted_leading_marker_refs": [],
+    "candidate_sha256": "ea9870b7a6283d06e10ae6644cd85fe1206b1f46ce864fd3e9aaea2e3e222bf5",
+    "converted_markers_by_kind": {
+      "paragraph": 477,
+      "paragraph_level_3": 13,
+      "poetry": 31
+    },
+    "native_sword_readback_verified": false,
+    "note_anchor_shifts_exactly_accounted_for": true,
+    "protected_unchanged_marker_counts": {
+      "protected_textual_symbol": 1
+    },
+    "reader_visual_accepted": false,
+    "release_authorized": false,
+    "schema_version": 1,
+    "source_binary_overwritten": false,
+    "source_editorial_stars_preserved_as_non_displayable_subtype": true,
+    "source_literal_marker_metadata_equal": true,
+    "source_sha256": "1f0d439b20b763e3548a05bb766d9f59447918f973ea92f8695d7578e096178a",
+    "status": "research_only_byte_patched_editorial_divisions_not_published",
+    "unapproved_source_reference_changes": 0,
+    "unconverted_leading_marker_count": 0,
+    "verse_prose_modifications_outside_recorded_symbols": 0
+  },
+  "research_division_private_native_rendering_shapes": {
+    "Gen.6.13": {
+      "compiled": {
+        "leading_ascii_spaces": 1,
+        "leading_cr": 0,
+        "leading_lf": 0,
+        "leading_narrow_nbsp": 0,
+        "leading_nbsp": 0,
+        "leading_whitespace_codepoints": 1,
+        "nonspace_codepoint_count": 127,
+        "space_immediately_after_symbol": false,
+        "starts_with_editorial_symbol_candidate": null,
+        "trailing_whitespace_codepoints": 0
+      },
+      "native_xml_prefix_shape": [
+        {
+          "direct_leading_lf": 0,
+          "direct_leading_space": 0,
+          "direct_nonspace_length": 0,
+          "has_eid": false,
+          "has_marker_attribute": false,
+          "has_sid": false,
+          "known_type": null,
+          "tag": "other",
+          "tail_leading_lf": 0,
+          "tail_leading_space": 0,
+          "tail_nonspace_length": 0
+        },
+        {
+          "direct_leading_lf": 0,
+          "direct_leading_space": 0,
+          "direct_nonspace_length": 0,
+          "has_eid": false,
+          "has_marker_attribute": false,
+          "has_sid": true,
+          "known_type": null,
+          "tag": "div",
+          "tail_leading_lf": 0,
+          "tail_leading_space": 0,
+          "tail_nonspace_length": 0
+        },
+        {
+          "direct_leading_lf": 0,
+          "direct_leading_space": 0,
+          "direct_nonspace_length": 0,
+          "has_eid": false,
+          "has_marker_attribute": false,
+          "has_sid": true,
+          "known_type": "x-p",
+          "tag": "div",
+          "tail_leading_lf": 0,
+          "tail_leading_space": 1,
+          "tail_nonspace_length": 0
+        },
+        {
+          "direct_leading_lf": 0,
+          "direct_leading_space": 0,
+          "direct_nonspace_length": 0,
+          "has_eid": true,
+          "has_marker_attribute": false,
+          "has_sid": false,
+          "known_type": null,
+          "tag": "div",
+          "tail_leading_lf": 0,
+          "tail_leading_space": 0,
+          "tail_nonspace_length": 127
+        }
+      ],
+      "original": {
+        "leading_ascii_spaces": 0,
+        "leading_cr": 0,
+        "leading_lf": 0,
+        "leading_narrow_nbsp": 0,
+        "leading_nbsp": 0,
+        "leading_whitespace_codepoints": 0,
+        "nonspace_codepoint_count": 127,
+        "space_immediately_after_symbol": false,
+        "starts_with_editorial_symbol_candidate": null,
+        "trailing_whitespace_codepoints": 13
+      },
+      "same_exact_verse_characters": false,
+      "same_leading_symbol": true,
+      "same_leading_whitespace": false,
+      "same_nonspace_characters": true
+    },
+    "Gen.6.9": {
+      "compiled": {
+        "leading_ascii_spaces": 1,
+        "leading_cr": 0,
+        "leading_lf": 0,
+        "leading_narrow_nbsp": 0,
+        "leading_nbsp": 0,
+        "leading_whitespace_codepoints": 1,
+        "nonspace_codepoint_count": 104,
+        "space_immediately_after_symbol": false,
+        "starts_with_editorial_symbol_candidate": null,
+        "trailing_whitespace_codepoints": 0
+      },
+      "native_xml_prefix_shape": [
+        {
+          "direct_leading_lf": 0,
+          "direct_leading_space": 0,
+          "direct_nonspace_length": 0,
+          "has_eid": false,
+          "has_marker_attribute": false,
+          "has_sid": false,
+          "known_type": null,
+          "tag": "other",
+          "tail_leading_lf": 0,
+          "tail_leading_space": 0,
+          "tail_nonspace_length": 0
+        },
+        {
+          "direct_leading_lf": 0,
+          "direct_leading_space": 0,
+          "direct_nonspace_length": 0,
+          "has_eid": false,
+          "has_marker_attribute": false,
+          "has_sid": true,
+          "known_type": null,
+          "tag": "div",
+          "tail_leading_lf": 0,
+          "tail_leading_space": 0,
+          "tail_nonspace_length": 0
+        },
+        {
+          "direct_leading_lf": 0,
+          "direct_leading_space": 0,
+          "direct_nonspace_length": 0,
+          "has_eid": false,
+          "has_marker_attribute": false,
+          "has_sid": true,
+          "known_type": "x-p",
+          "tag": "div",
+          "tail_leading_lf": 0,
+          "tail_leading_space": 1,
+          "tail_nonspace_length": 0
+        },
+        {
+          "direct_leading_lf": 0,
+          "direct_leading_space": 0,
+          "direct_nonspace_length": 0,
+          "has_eid": true,
+          "has_marker_attribute": false,
+          "has_sid": false,
+          "known_type": null,
+          "tag": "div",
+          "tail_leading_lf": 0,
+          "tail_leading_space": 0,
+          "tail_nonspace_length": 0
+        },
+        {
+          "direct_leading_lf": 0,
+          "direct_leading_space": 0,
+          "direct_nonspace_length": 0,
+          "has_eid": false,
+          "has_marker_attribute": false,
+          "has_sid": false,
+          "known_type": "x-subject-division",
+          "tag": "milestone",
+          "tail_leading_lf": 0,
+          "tail_leading_space": 0,
+          "tail_nonspace_length": 104
+        }
+      ],
+      "original": {
+        "leading_ascii_spaces": 0,
+        "leading_cr": 0,
+        "leading_lf": 0,
+        "leading_narrow_nbsp": 0,
+        "leading_nbsp": 0,
+        "leading_whitespace_codepoints": 0,
+        "nonspace_codepoint_count": 104,
+        "space_immediately_after_symbol": false,
+        "starts_with_editorial_symbol_candidate": null,
+        "trailing_whitespace_codepoints": 13
+      },
+      "same_exact_verse_characters": false,
+      "same_leading_symbol": true,
+      "same_leading_whitespace": false,
+      "same_nonspace_characters": true
+    },
+    "Gen.7.17": {
+      "compiled": {
+        "leading_ascii_spaces": 1,
+        "leading_cr": 0,
+        "leading_lf": 0,
+        "leading_narrow_nbsp": 0,
+        "leading_nbsp": 0,
+        "leading_whitespace_codepoints": 1,
+        "nonspace_codepoint_count": 102,
+        "space_immediately_after_symbol": false,
+        "starts_with_editorial_symbol_candidate": null,
+        "trailing_whitespace_codepoints": 0
+      },
+      "native_xml_prefix_shape": [
+        {
+          "direct_leading_lf": 0,
+          "direct_leading_space": 0,
+          "direct_nonspace_length": 0,
+          "has_eid": false,
+          "has_marker_attribute": false,
+          "has_sid": false,
+          "known_type": null,
+          "tag": "other",
+          "tail_leading_lf": 0,
+          "tail_leading_space": 0,
+          "tail_nonspace_length": 0
+        },
+        {
+          "direct_leading_lf": 0,
+          "direct_leading_space": 0,
+          "direct_nonspace_length": 0,
+          "has_eid": false,
+          "has_marker_attribute": false,
+          "has_sid": true,
+          "known_type": null,
+          "tag": "div",
+          "tail_leading_lf": 0,
+          "tail_leading_space": 0,
+          "tail_nonspace_length": 0
+        },
+        {
+          "direct_leading_lf": 0,
+          "direct_leading_space": 0,
+          "direct_nonspace_length": 0,
+          "has_eid": false,
+          "has_marker_attribute": false,
+          "has_sid": true,
+          "known_type": "x-p",
+          "tag": "div",
+          "tail_leading_lf": 0,
+          "tail_leading_space": 1,
+          "tail_nonspace_length": 0
+        },
+        {
+          "direct_leading_lf": 0,
+          "direct_leading_space": 0,
+          "direct_nonspace_length": 0,
+          "has_eid": true,
+          "has_marker_attribute": false,
+          "has_sid": false,
+          "known_type": null,
+          "tag": "div",
+          "tail_leading_lf": 0,
+          "tail_leading_space": 0,
+          "tail_nonspace_length": 102
+        }
+      ],
+      "original": {
+        "leading_ascii_spaces": 0,
+        "leading_cr": 0,
+        "leading_lf": 0,
+        "leading_narrow_nbsp": 0,
+        "leading_nbsp": 0,
+        "leading_whitespace_codepoints": 0,
+        "nonspace_codepoint_count": 102,
+        "space_immediately_after_symbol": false,
+        "starts_with_editorial_symbol_candidate": null,
+        "trailing_whitespace_codepoints": 13
+      },
+      "same_exact_verse_characters": false,
+      "same_leading_symbol": true,
+      "same_leading_whitespace": false,
+      "same_nonspace_characters": true
+    },
+    "Job.3.1": {
+      "compiled": {
+        "leading_ascii_spaces": 0,
+        "leading_cr": 0,
+        "leading_lf": 0,
+        "leading_narrow_nbsp": 0,
+        "leading_nbsp": 0,
+        "leading_whitespace_codepoints": 0,
+        "nonspace_codepoint_count": 43,
+        "space_immediately_after_symbol": false,
+        "starts_with_editorial_symbol_candidate": null,
+        "trailing_whitespace_codepoints": 0
+      },
+      "native_xml_prefix_shape": [
+        {
+          "direct_leading_lf": 0,
+          "direct_leading_space": 0,
+          "direct_nonspace_length": 0,
+          "has_eid": false,
+          "has_marker_attribute": false,
+          "has_sid": false,
+          "known_type": null,
+          "tag": "other",
+          "tail_leading_lf": 0,
+          "tail_leading_space": 0,
+          "tail_nonspace_length": 0
+        },
+        {
+          "direct_leading_lf": 0,
+          "direct_leading_space": 0,
+          "direct_nonspace_length": 0,
+          "has_eid": false,
+          "has_marker_attribute": false,
+          "has_sid": false,
+          "known_type": "x-major-subject-division",
+          "tag": "milestone",
+          "tail_leading_lf": 0,
+          "tail_leading_space": 0,
+          "tail_nonspace_length": 43
+        }
+      ],
+      "original": {
+        "leading_ascii_spaces": 0,
+        "leading_cr": 0,
+        "leading_lf": 0,
+        "leading_narrow_nbsp": 0,
+        "leading_nbsp": 0,
+        "leading_whitespace_codepoints": 0,
+        "nonspace_codepoint_count": 43,
+        "space_immediately_after_symbol": false,
+        "starts_with_editorial_symbol_candidate": null,
+        "trailing_whitespace_codepoints": 13
+      },
+      "same_exact_verse_characters": false,
+      "same_leading_symbol": true,
+      "same_leading_whitespace": true,
+      "same_nonspace_characters": true
+    },
+    "Ps.3.1": {
+      "compiled": {
+        "leading_ascii_spaces": 0,
+        "leading_cr": 0,
+        "leading_lf": 0,
+        "leading_narrow_nbsp": 0,
+        "leading_nbsp": 0,
+        "leading_whitespace_codepoints": 0,
+        "nonspace_codepoint_count": 57,
+        "space_immediately_after_symbol": false,
+        "starts_with_editorial_symbol_candidate": null,
+        "trailing_whitespace_codepoints": 0
+      },
+      "native_xml_prefix_shape": [
+        {
+          "direct_leading_lf": 0,
+          "direct_leading_space": 0,
+          "direct_nonspace_length": 0,
+          "has_eid": false,
+          "has_marker_attribute": false,
+          "has_sid": false,
+          "known_type": null,
+          "tag": "other",
+          "tail_leading_lf": 0,
+          "tail_leading_space": 0,
+          "tail_nonspace_length": 0
+        },
+        {
+          "direct_leading_lf": 0,
+          "direct_leading_space": 0,
+          "direct_nonspace_length": 0,
+          "has_eid": false,
+          "has_marker_attribute": false,
+          "has_sid": false,
+          "known_type": "x-stanza-division",
+          "tag": "milestone",
+          "tail_leading_lf": 0,
+          "tail_leading_space": 0,
+          "tail_nonspace_length": 0
+        },
+        {
+          "direct_leading_lf": 0,
+          "direct_leading_space": 0,
+          "direct_nonspace_length": 57,
+          "has_eid": false,
+          "has_marker_attribute": false,
+          "has_sid": false,
+          "known_type": "italic",
+          "tag": "hi",
+          "tail_leading_lf": 0,
+          "tail_leading_space": 0,
+          "tail_nonspace_length": 0
+        }
+      ],
+      "original": {
+        "leading_ascii_spaces": 0,
+        "leading_cr": 0,
+        "leading_lf": 0,
+        "leading_narrow_nbsp": 0,
+        "leading_nbsp": 0,
+        "leading_whitespace_codepoints": 0,
+        "nonspace_codepoint_count": 57,
+        "space_immediately_after_symbol": false,
+        "starts_with_editorial_symbol_candidate": null,
+        "trailing_whitespace_codepoints": 15
+      },
+      "same_exact_verse_characters": false,
+      "same_leading_symbol": true,
+      "same_leading_whitespace": true,
+      "same_nonspace_characters": true
+    }
+  },
+  "research_full_source_native_editorial_division_metadata": {
+    "actual_reader_visual_acceptance": false,
+    "all_displayable_marker_attributes_absent": true,
+    "by_non_display_subtype": {
+      "x-original-ascii-star-1": 498,
+      "x-original-ascii-star-2": 10,
+      "x-original-ascii-star-3": 13
+    },
+    "by_type": {
+      "x-major-subject-division": 13,
+      "x-stanza-division": 31,
+      "x-subject-division": 477
+    },
+    "native_frame_types_read": {
+      "I": 1255,
+      "K": 31166,
+      "U": 3
+    },
+    "native_host_verse_count": 521,
+    "native_marker_count": 521,
+    "ordered_marker_host_fingerprint_sha256": "9f9b1deff8ff2035b04747345690f8d60da5e756e7df42136817d40c43b90ee9",
+    "release_approval": false,
+    "schema_version": 1,
+    "source_and_native_all_marker_types_levels_and_host_verses_equal": true,
+    "source_host_verse_count": 521,
+    "source_marker_count": 521,
+    "source_or_module_modified": false,
+    "status": "exact_source_and_native_non_display_editorial_markers_equal"
+  },
+  "research_paragraph_whitespace_overlay_receipt": {
+    "all_source_nonspace_characters_preserved": true,
+    "all_source_note_values_and_positions_preserved": true,
+    "authorial_typography_signoff": false,
+    "counts": {
+      "formatting_newlines_removed": 4690,
+      "formatting_spaces_removed": 56288,
+      "paragraph_start_indent_width_12": 4684,
+      "paragraph_start_indent_width_13": 4,
+      "paragraph_start_indent_width_14": 2,
+      "paragraphs_with_exact_xml_indent": 4690,
+      "paragraphs_without_exact_xml_indent_candidate": 491
+    },
+    "native_reader_indentation_reduction_proved": false,
+    "new_sha256": "35eb23c62eefdcda9a94d6a493df0bf32d5af1bc6ccc2132e495091d7771406d",
+    "original_sha256": "ea9870b7a6283d06e10ae6644cd85fe1206b1f46ce864fd3e9aaea2e3e222bf5",
+    "original_xml_bytes_untouched": true,
+    "release_approved": false,
+    "schema_version": 1,
+    "status": "private_reversible_source_xml_formatting_whitespace_only"
+  },
   "reviewed_byte_patch_inventory": {
     "absent_target_remove": 3,
     "inline_end": 2,
