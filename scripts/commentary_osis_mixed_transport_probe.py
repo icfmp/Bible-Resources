@@ -472,7 +472,6 @@ def _probe_private_alias_real_xiphos(root: Path, module_id: str, aliases: dict,
         verify_and_install_reviewed_bible, _run_real_gui, BIBLE_MODULE
     )
     from pilot_subprocess import query, present_key
-    from difflib import SequenceMatcher
 
     if not aliases or not root.is_dir() or root.is_symlink():
         raise ValueError("Real-reader preview requires a private alias candidate")
@@ -525,12 +524,18 @@ def _probe_private_alias_real_xiphos(root: Path, module_id: str, aliases: dict,
             raise ValueError("Independent alias output is empty or oversized")
         # 25 source words in a row rules out incidental shared scripture
         # references and formatting-only "success".
-        longest = SequenceMatcher(
-            None, master_words, alias_words, autojunk=False
-        ).find_longest_match().size
-        if longest < 25:
+        window = 25
+        master_windows = {
+            tuple(master_words[i:i+window])
+            for i in range(len(master_words) - window + 1)
+        }
+        has_shared_source = any(
+            tuple(alias_words[i:i+window]) in master_windows
+            for i in range(len(alias_words) - window + 1)
+        )
+        if not has_shared_source:
             raise ValueError("Independent reader alias/master prose does not match")
-        shared_runs[passage] = longest
+        shared_runs[passage] = window
         comparisons[passage] = {
             "commentary": alias_plain,
             "bible": bible_plain,
