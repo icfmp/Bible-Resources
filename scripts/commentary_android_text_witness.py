@@ -15,6 +15,8 @@ import re
 import subprocess
 import xml.etree.ElementTree as ET
 
+from sword_native_raw_corpus_inventory import parse_native_raw_corpus, RawCorpusError
+
 from lxml import etree
 
 from commentary_xiphos_dual_reader import _normalized_words
@@ -140,6 +142,92 @@ def _actual_android_webview_word_sequences(ui_xml: bytes) -> tuple[list[list[str
     if len(sequences) > 3000:
         raise PilotError("Unbounded Android descendant text nodes")
     return sequences, webviews
+
+
+def full_native_original_prose_in_real_android_webview(
+    source_root: Path, module_id: str, native_scanner: Path,
+    expected_corpus_sha256: str, actual_ui_xml: bytes,
+) -> dict:
+    """One full, exact SHA-verified original scan; no passage-reference guess.
+
+    Rather than infer that the Android reader currently displays one of five
+    arbitrarily sampled references, compare real WebView descendant prose
+    against every genuine *occupied* native numbered source key.
+    """
+    if (source_root.is_symlink() or not source_root.is_dir()
+            or native_scanner.is_symlink() or not native_scanner.is_file()
+            or not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{1,39}", module_id)
+            or not re.fullmatch(r"[a-f0-9]{64}", expected_corpus_sha256)):
+        raise PilotError("Unapproved full original stock SWORD scan context")
+    sequences, webviews = _actual_android_webview_word_sequences(actual_ui_xml)
+    visible = set()
+    for words in sequences:
+        for pos in range(len(words) - WINDOW + 1):
+            phrase = tuple(words[pos:pos + WINDOW])
+            if len(" ".join(phrase)) >= 85:
+                visible.add(phrase)
+    matching_entries = 0
+    substantial_entries = 0
+    def examine(kind: str, key: str, raw: bytes) -> None:
+        nonlocal matching_entries, substantial_entries
+        if kind != "K":
+            return
+        words = _actual_original_authorial_words(raw) if len(raw) >= 8 else []
+        if len(words) < 32:
+            return
+        substantial_entries += 1
+        for pos in range(12, min(len(words) - WINDOW + 1, 350)):
+            phrase = tuple(words[pos:pos + WINDOW])
+            if phrase in visible:
+                matching_entries += 1
+                break
+
+    process = None
+    try:
+        process = subprocess.Popen(
+            ["timeout", "300s", str(native_scanner), module_id],
+            env=dict(os.environ, SWORD_PATH=str(source_root)),
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+        )
+        if process.stdout is None:
+            raise PilotError("Native original stream stdout unavailable")
+        inventory, _, _, _ = parse_native_raw_corpus(
+            process.stdout, on_entry=examine,
+        )
+        process.stdout.close()
+        result_code = process.wait(timeout=20)
+        if (result_code != 0 or inventory["all_native_raw_entries_ordered_sha256"]
+                != expected_corpus_sha256):
+            raise PilotError("Original full-native corpus digest or scanner changed")
+    except (OSError, subprocess.TimeoutExpired, RawCorpusError) as exc:
+        raise PilotError("Independent original full-native commentary scan unavailable") from exc
+    finally:
+        if process is not None:
+            if process.poll() is None:
+                process.kill()
+                process.wait()
+            if process.stdout is not None:
+                process.stdout.close()
+    scanned = inventory["all_actual_raw_entries_scanned"]
+    if not 1 <= substantial_entries <= scanned or matching_entries > substantial_entries:
+        raise PilotError("Unbounded original substantial commentary sample count")
+    verified = matching_entries > 0 and webviews > 0
+    return {
+        "scope": "all_occupied_original_native_zCom_keys_vs_real_Android_WebView_prose",
+        "original_full_native_corpus_sha256_attested": True,
+        "actual_original_native_occupied_keys_scanned": scanned,
+        "original_native_entries_with_substantial_exposition": substantial_entries,
+        "real_AndBible_WebViews_observed": webviews,
+        "real_AndBible_WebView_text_sequences_examined": len(sequences),
+        "source_occupied_entries_with_16_consecutive_words_visible": matching_entries,
+        "actual_original_authorial_prose_in_real_Android_WebView_verified": verified,
+        "status": (
+            "source_pinned_full_corpus_original_prose_visible_in_real_Android_WebView"
+            if verified else "inconclusive_no_full_original_prose_witness_in_accessibility"
+        ),
+        "source_words_android_UI_XML_screenshots_or_ZIP_exported": False,
+    }
 
 
 def original_prose_in_real_android_webview(
