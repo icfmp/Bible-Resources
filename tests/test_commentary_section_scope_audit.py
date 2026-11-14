@@ -1,0 +1,78 @@
+"""Synthetic regressions for source-neutral commentary section-scope triage."""
+import sys
+from pathlib import Path
+import unittest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+from commentary_section_scope_audit import heading_extent, classify
+
+
+class HeadingTests(unittest.TestCase):
+    def test_comma_section_with_space_outside_heading(self):
+        self.assertEqual(
+            heading_extent(b"<title>Verse 7</title> ,8 Observe carefully."),
+            ((7, 8), "comma")
+        )
+
+    def test_dash_and_plural_heading(self):
+        self.assertEqual(
+            heading_extent(b"<title>Verses 2-6</title><p>Some prose.</p>"),
+            ((2, 3, 4, 5, 6), "dash")
+        )
+
+    def test_multiple_explicit_comma_verses(self):
+        self.assertEqual(heading_extent(b"Verses 1,2,3 Comment"),
+                         ((1, 2, 3), "comma"))
+
+    def test_single_verse_and_no_heading(self):
+        self.assertEqual(heading_extent(b"<title>Verse 4</title>"),
+                         ((4,), "single"))
+        self.assertIsNone(heading_extent(b"<p>A sermon concerning the book.</p>"))
+
+    def test_reversed_and_ambiguous_range_not_guessed(self):
+        self.assertIsNone(heading_extent(b"Verses 7-2 Text"))
+        self.assertIsNone(heading_extent(b"Verses 2,4-7 Text"))
+
+    def test_xml_malformed_or_entities_rejected(self):
+        self.assertIsNone(heading_extent(b"<p>Verse 2 <b>unclosed</p>"))
+        self.assertIsNone(heading_extent(b"<p>&madeup; Verse 1</p>"))
+
+
+class ClassificationTests(unittest.TestCase):
+    def test_same_native_raw_for_whole_declared_section(self):
+        records = {
+            "Song.1.7": {"sha256": "a", "heading": ((7, 8), "comma")},
+            "Song.1.8": {"sha256": "a", "heading": ((7, 8), "comma")},
+        }
+        outcome = classify(records)
+        self.assertEqual(outcome["counts"]["start_anchored_sections"], 1)
+        self.assertEqual(outcome["counts"]["all_declared_slots_same_raw_payload"], 1)
+        self.assertEqual(outcome["anomalies"], [])
+        self.assertEqual(outcome["probes"]["Song.1.7"]["same_payload_slots"], ["Song.1.8"])
+
+    def test_missing_verse_for_comma_span_stays_suspected(self):
+        records = {"Jer.4.1": {"sha256": "a", "heading": ((1, 2), "comma")}}
+        outcome = classify(records)
+        self.assertEqual(outcome["counts"]["missing_slots_within_declared_section"], 1)
+        self.assertEqual(outcome["anomalies"][0]["missing_slots"], ["Jer.4.2"])
+        self.assertEqual(outcome["anomalies"][0]["classification"],
+                         "SUSPECTED_NOT_EDITORIALLY_CONFIRMED")
+
+    def test_distinct_payload_in_declared_range(self):
+        records = {
+            "Jer.4.3": {"sha256": "a", "heading": ((3, 4), "comma")},
+            "Jer.4.4": {"sha256": "b", "heading": ((3, 4), "comma")},
+        }
+        outcome = classify(records)
+        self.assertEqual(outcome["counts"]["distinct_payload_within_declared_section"], 1)
+
+    def test_missing_members_of_dash_section(self):
+        outcome = classify({
+            "Song.1.2": {"sha256": "a", "heading": ((2, 3, 4), "dash")},
+            "Song.1.3": {"sha256": "a", "heading": ((2, 3, 4), "dash")},
+        })
+        self.assertEqual(outcome["anomalies"][0]["missing_slots"], ["Song.1.4"])
+
+
+if __name__ == "__main__":
+    unittest.main()
