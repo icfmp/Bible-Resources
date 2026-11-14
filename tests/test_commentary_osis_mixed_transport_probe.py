@@ -36,7 +36,7 @@ class MixedOriginalTransportTests(unittest.TestCase):
             [("Gen.35.1",b"<p>Other chapter</p>")],
             [("Gen.36.2",b"<p>later</p>"),
              ("Gen.36.1",b"<p>earlier</p>")],
-            [("Gen.36.1",b"<p>binary\\x00</p>")]
+            [("Gen.36.1",b"<p>binary\x00</p>")]
         ):
             with self.assertRaises(ValueError):
                 build_mixed_original_transport(
