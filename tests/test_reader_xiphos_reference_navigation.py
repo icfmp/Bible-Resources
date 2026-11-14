@@ -18,7 +18,7 @@ class TestXiphosReferenceNavigation(unittest.TestCase):
     def test_explicit_reference_field_targets_only_test_display(self):
         commands=_navigation_commands("Gen 7:17", "reference-entry")
         self.assertEqual(commands[0], [
-            "xdotool","mousemove","--sync","752","121","click","1"])
+            "xdotool","mousemove","752","121","click","1"])
         self.assertEqual(commands[1][-1], "ctrl+a")
         self.assertEqual(commands[2][-1], "Gen 7:17")
         self.assertEqual(commands[-1][-1], "Return")
