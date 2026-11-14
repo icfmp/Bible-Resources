@@ -25,7 +25,8 @@ from lxml import etree
 
 from commentary_intake import load_manifest
 from commentary_navigation_link_plan import (
-    parse_native_commentary_verse_registry, UnsafeCommentaryLinkPlan
+    parse_native_commentary_verse_registry, UnsafeCommentaryLinkPlan,
+    triage_missing_native_section_links,
 )
 from commentary_source_english_osis_alias import (
     read_existing_66_book_english_aliases, _canon_name
@@ -1293,6 +1294,11 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         if set(records) - registry["verse_keys"]:
             raise PilotError("Stock native occupied key escaped independent versification registry")
         result = classify(records)
+        index_preflight = triage_missing_native_section_links(
+            occupied={key: entry["sha256"] for key, entry in records.items()},
+            valid_verse_keys=registry["verse_keys"],
+            source_heading_anomalies=result["anomalies"],
+        )
         unknown = audit_unrecognized_slots(records)
         if unknown["total"] != result["counts"]["no_recognized_heading"]:
             raise PilotError("Unrecognized heading count diverged from complete native inventory")
@@ -1338,6 +1344,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
             "native_full_key_crosscheck": proof["exact_all_occupied_stock_keys_read_and_crosschecked"],
             "native_rows_with_unrecognized_heading_or_xml": unparsed,
             **result,
+            "explicit_heading_native_link_candidate_preflight": index_preflight,
             "unrecognized_native_slot_review": unknown,
             "independent_thml_witness": witness,
             "section_heading_matching_is_heuristic": True,
