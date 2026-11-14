@@ -877,8 +877,59 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
             "source_text_to_stock_text_identity_proven": False,
             "approved_for_native_index_expansion": False,
         })
+    # Compare inline scripture-link *targets* separately from displayed
+    # words: an exact spelling match must never substitute for real OSIS
+    # destination preservation. These are different pinned digital editions.
+    reference_classes = Counter()
+    reference_totals = Counter()
+    reference_exception_rows = []
+    for row in cases:
+        refs = row.get("independent_reference_target_comparison")
+        if refs is None:
+            reference_classes["NOT_COMPARABLE"] += 1
+            continue
+        orig = refs["original_scripRef_with_nonempty_osisRef_target_count"]
+        stock = refs["selected_stock_reference_elements_with_osisRef_attribute"]
+        paired = (
+            refs["original_scripRef_osisRef_targets_exact_value_multiset_matches_in_stock"]
+            + refs["original_scripRef_osisRef_work_qualifier_only_matches_in_stock"]
+        )
+        if paired > min(orig, stock):
+            raise PilotError("Original/stock reference target pairing exceeds actual markup")
+        unpaired_source = orig - paired
+        unpaired_stock = stock - paired
+        reference_totals["original_source_nonempty_target_occurrences"] += orig
+        reference_totals["stock_nonempty_target_occurrences"] += stock
+        reference_totals["paired_target_occurrences_exact_or_literal_work_prefix"] += paired
+        reference_totals["source_target_occurrences_not_paired_in_selected_stock"] += unpaired_source
+        reference_totals["stock_target_occurrences_not_paired_in_selected_source"] += unpaired_stock
+        if orig == stock == 0:
+            classification = "BOTH_HAVE_NO_LINK_MARKUP"
+        elif orig and not stock:
+            classification = "SOURCE_LINK_MARKUP_NOT_PRESENT_IN_SELECTED_STOCK"
+        elif not orig and stock:
+            classification = "STOCK_ONLY_LINK_MARKUP"
+        elif orig == stock == paired:
+            classification = "ALL_LINK_TARGETS_MATCH_EXACT_OR_LITERAL_WORK_PREFIX"
+        elif unpaired_source and not unpaired_stock:
+            classification = "SOURCE_HAS_EXTRA_UNPAIRED_LINK_TARGETS"
+        elif unpaired_stock and not unpaired_source:
+            classification = "STOCK_HAS_EXTRA_UNPAIRED_LINK_TARGETS"
+        else:
+            classification = "BOTH_EDITIONS_HAVE_UNPAIRED_LINK_TARGETS"
+        reference_classes[classification] += 1
+        if unpaired_source or unpaired_stock:
+            reference_exception_rows.append({
+                "native_start": row["native_start"],
+                "source_target_occurrences_not_paired": unpaired_source,
+                "stock_target_occurrences_not_paired": unpaired_stock,
+                "selected_stock_reference_element_count":
+                    refs["selected_stock_reference_element_count"],
+                "classification": classification,
+                "source_to_stock_reference_markup_parity_proven": False,
+            })
     word_classes = Counter(
-        row["independent_lexical_comparison"].get("overlap_class", "UNREVIEWED")
+        row["independent_lexical_comparison"].get("overlap_class", "UNREVIEW")
         for row in cases if row["independent_lexical_comparison"] is not None
     )
     ordered_word_classes = Counter(
@@ -890,6 +941,13 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
     )
     return {
         "status": "SOURCE_DIV2_STRUCTURE_COLLATED_NO_REINDEX_AUTHORIZATION",
+        "independent_stock_vs_source_reference_target_classes":
+            dict(sorted(reference_classes.items())),
+        "independent_stock_vs_source_reference_target_totals":
+            dict(sorted(reference_totals.items())),
+        "independent_stock_vs_source_reference_target_exception_rows":
+            reference_exception_rows,
+        "source_reference_target_completeness_not_proven": True,
         "independent_stock_vs_source_lexical_diagnostic_classes":
             dict(sorted(word_classes.items())),
         "independent_stock_vs_source_ordered_word_diagnostic_classes":
