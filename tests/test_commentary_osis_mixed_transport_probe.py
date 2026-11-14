@@ -9,6 +9,7 @@ from commentary_osis_mixed_transport_probe import (
     build_mixed_original_transport, build_complete_original_transport,
     validate_private_index_alias_preview, _native_same_chapter_ranges,
     classify_chapter_reader_repetition, probe_private_chapter_reader_repetition,
+    probe_native_original_link_identity,
     mixed_transport_checks_pass, _COVERAGE_FIELDS
 )
 
@@ -248,6 +249,63 @@ class ReaderRepetitionTests(unittest.TestCase):
         self.assertEqual(
             observed["cases"][0]["status"],"NEW_ALIAS_CHAPTER_REPETITION_INCREASE"
         )
+
+
+
+class NativeLinkedIdentityTests(unittest.TestCase):
+    def test_native_pairs_distinguish_nonadjacent_link_from_middle_section(self):
+        from tempfile import TemporaryDirectory
+        from unittest.mock import patch
+        import subprocess
+        with TemporaryDirectory() as td:
+            root=Path(td)
+            binary=root/"index-inspector";binary.write_bytes(b"not an executable")
+            original={
+                "Gen.1.1":b"<p>A source section</p>",
+                "Gen.1.3":b"<p>An independent middle section</p>",
+            }
+            aliases={
+                "Gen.1.2":{"link_to":"Gen.1.1"},
+                "Gen.1.5":{"link_to":"Gen.1.1"},
+            }
+            observed=[]
+            def mock_run(args,**kwargs):
+                first,second=args[-2:]
+                link=first=="Gen.1.1" and second in ("Gen.1.2","Gen.1.5")
+                observed.append((first,second))
+                return subprocess.CompletedProcess(args,0,
+                    f"L\t{first}\t{second}\t{int(link)}\n".encode())
+            with patch("commentary_osis_mixed_transport_probe.subprocess.run",
+                       side_effect=mock_run):
+                result=probe_native_original_link_identity(
+                    installed_candidate_root=root,module_id="ProbeTest",
+                    inspector_binary=binary,original_numbered=original,
+                    provisional_aliases=aliases
+                )
+            self.assertEqual(len(observed),3)
+            self.assertEqual(result["native_linked_alias_count"],2)
+            self.assertTrue(result["all_independently_distinct_section_controls_unlinked"])
+            self.assertEqual(result["negative_distinct_section_controls"],1)
+            self.assertTrue(result["source_text_and_xml_never_logged"])
+
+    def test_native_link_identity_fails_if_alias_is_only_text_copy(self):
+        from tempfile import TemporaryDirectory
+        from unittest.mock import patch
+        import subprocess
+        with TemporaryDirectory() as td:
+            root=Path(td);binary=root/"index-inspector";binary.write_bytes(b"fixture")
+            with patch("commentary_osis_mixed_transport_probe.subprocess.run",
+                       return_value=subprocess.CompletedProcess(
+                         ["probe"],0,b"L\tGen.1.1\tGen.1.5\t0\n"
+                       )):
+                actual=probe_native_original_link_identity(
+                    installed_candidate_root=root,module_id="ProbeTest",
+                    inspector_binary=binary,
+                    original_numbered={"Gen.1.1":b"<p>Original</p>"},
+                    provisional_aliases={"Gen.1.5":{"link_to":"Gen.1.1"}}
+                )
+        self.assertEqual(actual["non_linked_proposed_pairs"],["Gen.1.5"])
+        self.assertFalse(actual["all_original_master_to_proposed_target_pairs_are_native_linked"])
 
 
 if __name__=="__main__":
