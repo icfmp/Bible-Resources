@@ -48,9 +48,9 @@ int main(int argc, char** argv) {
                 || k1.getOSISRef() != first || k2.getOSISRef() != second)
             return 21;
         if (!module->hasEntry(&k1) || !module->hasEntry(&k2)) return 22;
-        std::cout << "L\\t" << first << '\\t' << second << '\\t'
+        std::cout << "L\t" << first << '\t' << second << '\t'
                   << (module->isLinked(&k1, &k2) ? "1" : "0")
-                  << '\\n';
+                  << '\n';
         return std::cout.good() ? 0 : 23;
     }
     const char* v11nPtr = original->getVersificationSystem();
