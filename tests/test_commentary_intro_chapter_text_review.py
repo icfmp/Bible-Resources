@@ -5,7 +5,11 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
-from commentary_intro_chapter_text_review import review_original_intro_against_numbered_chapter
+from commentary_intro_chapter_text_review import (
+    review_original_intro_against_numbered_chapter,
+    independent_thml_chapter_intro_witness,
+)
+from lxml import etree
 
 
 class OriginalIntroTextLocationTests(unittest.TestCase):
@@ -42,6 +46,36 @@ class OriginalIntroTextLocationTests(unittest.TestCase):
         )
         self.assertEqual(report["numbered_keys_present_in_original_chapter"], 0)
         self.assertEqual(report["runs_not_exactly_repeated_in_numbered_body"], 1)
+
+    def test_independent_annotation_locates_intro_without_edit_permission(self):
+        doc=etree.fromstring(
+            b'<root><div2><h2>Chapter 19</h2>'
+            b'<scripCom osisRef="Bible:Lev.19"/>'
+            b'<p>Invented explanation for the whole chapter.</p>'
+            b'</div2></root>'
+        )
+        witness=independent_thml_chapter_intro_witness(
+            doc, {"Lev.19":
+                b'<chapter osisID="Lev.19"/>'
+                b'<div type="original"/>Invented explanation for the whole chapter.'
+            }
+        )
+        row=witness["case_rows"][0]
+        self.assertEqual(row["independent_explicit_chapter_annotation_div2_count"],1)
+        self.assertTrue(row["native_intro_full_word_sequence_is_in_source_div2"])
+        self.assertFalse(row["original_original_source_scope_approved"])
+        self.assertFalse(witness["chapter_scope_and_verse_navigation_approved"])
+
+    def test_unannotated_source_is_not_a_verified_chapter_witness(self):
+        doc=etree.fromstring(
+            b'<root><div2><h2>Chapter 19</h2><p>Invented explanation.</p></div2></root>'
+        )
+        witness=independent_thml_chapter_intro_witness(
+            doc, {"Lev.19": b'<div/>Invented explanation.'}
+        )
+        self.assertEqual(witness["case_rows"][0]["status"],
+                         "NO_UNIQUE_PINNED_THML_CHAPTER_ANNOTATION")
+        self.assertFalse(witness["case_rows"][0]["original_original_source_scope_approved"])
 
     def test_reject_wrong_chapter_or_nonnumeric_intro(self):
         for name, slot in (
