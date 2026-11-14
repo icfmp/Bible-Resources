@@ -1231,7 +1231,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
     manifest = load_manifest(resource_id)
     if (len(transport_sample_chapters) > 6
             or len(set(transport_sample_chapters)) != len(transport_sample_chapters)
-            or any(re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9]\\d*",
+            or any(re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9]\d*",
                                 chapter) is None
                    for chapter in transport_sample_chapters)):
         raise PilotError("Unreviewed or excessive original chapter transport samples")
