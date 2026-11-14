@@ -18,6 +18,8 @@ import subprocess
 import tempfile
 import zipfile
 
+from lxml import etree
+
 from commentary_intake import load_manifest
 from commentary_native_inventory import parse_index
 from pilot_fetch import fetch
@@ -26,6 +28,125 @@ from sword_native_raw_corpus_inventory import RawCorpusError, parse_native_raw_c
 
 MAX_KEY_REPORT = 20
 MAX_TOTAL_SECONDS = 360
+
+
+
+# These tags are observations of unchanged stock XML, not a canonical content
+# schema. Unknown element names are counted without exposing source strings.
+MARKUP_TAGS = ("p", "div", "title", "table", "row", "cell", "reference",
+               "note", "hi", "q", "quote", "list", "item", "lb", "br",
+               "milestone", "seg", "verse", "chapter")
+MAX_RAW_MARKUP_BYTES = 2 * 1024 * 1024
+
+
+class NativeCommentaryMarkupCensus:
+    """Inventory source-native markup on the complete original SWORD stream.
+
+    Every populated K/I payload is parsed as a strict XML fragment in a
+    synthetic root. Unknown or malformed XML is *classified*, never repaired.
+    Opaque TOP metadata is not presumed to be XML. Reports contain only
+    fixed category names, aggregate counts and boolean scope flags, never
+    raw text, original attributes, literal reference targets or key names.
+    """
+
+    def __init__(self) -> None:
+        self.entries_observed = 0
+        self.opaque_top_entries = 0
+        self.empty_nonopaque_entries = 0
+        self.valid_nonopaque_entries = 0
+        self.invalid_nonopaque_entries = 0
+        self.excessive_nonopaque_entries = 0
+        self.entries_with_titles = 0
+        self.entries_with_paragraphs = 0
+        self.entries_with_tables = 0
+        self.entries_with_references = 0
+        self.entries_with_notes = 0
+        self.refs_with_osisref = 0
+        self.refs_without_osisref = 0
+        self.elements = Counter()
+
+    def observe(self, kind: str, key: str, raw: bytes) -> None:
+        """Read one original record only; keep neither keys nor source words."""
+        if kind not in ("K", "I", "U") or not isinstance(key, str) or not isinstance(raw, bytes):
+            raise PilotError("Unreviewed native commentary markup frame")
+        self.entries_observed += 1
+        if kind == "U":
+            self.opaque_top_entries += 1
+            return
+        if not raw.strip():
+            self.empty_nonopaque_entries += 1
+            return
+        if len(raw) > MAX_RAW_MARKUP_BYTES or b"\x00" in raw:
+            self.excessive_nonopaque_entries += 1
+            return
+        try:
+            root = etree.fromstring(
+                b"<stock>" + raw + b"</stock>",
+                parser=etree.XMLParser(
+                    resolve_entities=False, no_network=True,
+                    load_dtd=False, recover=False, huge_tree=False,
+                    remove_blank_text=False,
+                ),
+            )
+            if any(isinstance(node, etree._Entity) for node in root.iter()):
+                self.invalid_nonopaque_entries += 1
+                return
+        except (ValueError, etree.XMLSyntaxError):
+            self.invalid_nonopaque_entries += 1
+            return
+        self.valid_nonopaque_entries += 1
+        observed = Counter()
+        for node in root.iter():
+            if node is root or not isinstance(node.tag, str):
+                continue
+            local_name = node.tag.rsplit("}", 1)[-1]
+            category = local_name if local_name in MARKUP_TAGS else "other"
+            observed[category] += 1
+            if local_name == "reference":
+                if node.get("osisRef"):
+                    self.refs_with_osisref += 1
+                else:
+                    self.refs_without_osisref += 1
+        self.elements.update(observed)
+        self.entries_with_titles += bool(observed["title"])
+        self.entries_with_paragraphs += bool(observed["p"])
+        self.entries_with_tables += bool(observed["table"])
+        self.entries_with_references += bool(observed["reference"])
+        self.entries_with_notes += bool(observed["note"])
+
+    def report(self, expected_entries: int) -> dict:
+        """Reconcile every source frame without making text/GUI claims."""
+        if (type(expected_entries) is not int or expected_entries < 0
+                or self.entries_observed != expected_entries
+                or self.entries_observed != (
+                    self.opaque_top_entries + self.empty_nonopaque_entries
+                    + self.valid_nonopaque_entries + self.invalid_nonopaque_entries
+                    + self.excessive_nonopaque_entries
+                )):
+            raise PilotError("Unreconciled complete original commentary XML observations")
+        return {
+            "all_original_native_entries_accounted_for": True,
+            "raw_entries_observed": self.entries_observed,
+            "opaque_top_entries_not_assumed_to_be_xml": self.opaque_top_entries,
+            "empty_numbered_or_intro_entries": self.empty_nonopaque_entries,
+            "strict_xml_parseable_numbered_or_intro_entries": self.valid_nonopaque_entries,
+            "unparseable_numbered_or_intro_entries": self.invalid_nonopaque_entries,
+            "oversized_or_binary_numbered_or_intro_entries": self.excessive_nonopaque_entries,
+            "entries_with_title_markup": self.entries_with_titles,
+            "entries_with_paragraph_markup": self.entries_with_paragraphs,
+            "entries_with_table_markup": self.entries_with_tables,
+            "entries_with_reference_markup": self.entries_with_references,
+            "entries_with_note_markup": self.entries_with_notes,
+            "reference_elements_with_osisref_attribute": self.refs_with_osisref,
+            "reference_elements_without_osisref_attribute": self.refs_without_osisref,
+            "original_element_counts_by_fixed_category": {
+                name: self.elements[name] for name in (*MARKUP_TAGS, "other")
+            },
+            "no_original_words_keys_or_reference_values_reported": True,
+            "no_original_source_bytes_rewritten": True,
+            "source_to_other_digital_edition_parity_proven": False,
+            "real_reader_layout_or_click_navigation_proven": False,
+        }
 
 
 def _safe_stock_install(zip_path: Path, records: list[dict], root: Path) -> None:
@@ -106,6 +227,7 @@ def inspect_raw_content(resource_id: str, *, index_binary: Path, raw_binary: Pat
         zero_length_count=0
         whitespace_only_count=0
         per_book=defaultdict(lambda: {"entries":0,"raw_bytes":0,"nonempty_raw_entries":0})
+        markup = NativeCommentaryMarkupCensus()
         try:
             process=subprocess.Popen(command,stdout=subprocess.PIPE,
                                      stderr=subprocess.DEVNULL,env=env)
@@ -114,6 +236,7 @@ def inspect_raw_content(resource_id: str, *, index_binary: Path, raw_binary: Pat
             def examine(kind: str, ref: str, content: bytes) -> None:
                 nonlocal zero_length_count, whitespace_only_count
                 ordered_rows.append((kind,ref))
+                markup.observe(kind,ref,content)
                 raw_sha_count[sha256(content).hexdigest()]+=1
                 if not content:
                     zero_length_count+=1
@@ -158,6 +281,7 @@ def inspect_raw_content(resource_id: str, *, index_binary: Path, raw_binary: Pat
                 key:per_book[key] for key in sorted(per_book)
             },
             "native_correspondence":proof,
+            "original_stock_markup_census": markup.report(raw["all_actual_raw_entries_scanned"]),
             "source_scripCom_references_compared":False,
             "source_text_punctuation_semantics_compared":False,
             "source_and_stock_paragraph_order_compared":False,

@@ -125,6 +125,45 @@ for exact source SHA evidence and CI receipts. No authorial text or references
 were changed.
 
 
+## Generic native-stock markup census (no source edits)
+
+For a pinned existing SWORD commentary, the [full native raw audit](
+../.github/workflows/commentary-native-raw-corpus.yml) now also inventories
+markup **inside the same complete, independently enumerated raw-entry stream**.
+It does not introduce a commentary-specific importer or create a derivative.
+
+The metadata-only receipt contains `original_stock_markup_census` with:
+- Strict XML-fragment parse results for each populated numbered commentary
+  and introduction record, separately from opaque TOP entries, empty payloads
+  and oversized/binary or unparseable originals.
+- Fixed-category counts of native original `title`, `div`, `p`, `table`,
+  `row`, `cell`, `reference`, `note` and other structural elements,
+  plus how many entries carry titles, paragraph tags, tables, links and notes.
+- Counts of native `reference` elements **with** and **without** an actual
+  `osisRef` attribute. Neither the attribute values nor any authorial words,
+  unknown tag names, commentary keys or source fragments enter the receipt.
+- A total-entry reconciliation against the complete independent source
+  native index and raw-content hash. Any malformed XML remains classified,
+  **never auto-repaired, reinterpreted, or silently accepted as faithful**.
+
+For original CrossWire **MHCC 2.0**, the actual pinned stock scan on
+[PR #258](https://github.com/icfmp/Bible-Resources/pull/258) observed
+29,973 strictly parseable original K/I entries and two opaque TOP records,
+with zero malformed/binary K/I payloads; 15,985 `title` elements, 10,557
+`reference` elements (all with `osisRef`), 20,001 `table` elements
+and 272,362 `div` elements. It observed **zero literal `p` elements**.
+This is **native markup evidence, not paragraph loss**: original SWORD
+markup can represent sections and prose with `div` and tables, and the
+reader's rendering is an independent, client-specific acceptance question.
+Do not synthesize `p` tags, rewrite the original, or infer exact layout
+equivalence to the separate CCEL transcription. See [MHCC #177](
+https://github.com/icfmp/Bible-Resources/issues/177) and
+[reader QA #257](https://github.com/icfmp/Bible-Resources/issues/257).
+
+This full-original XML census does not establish historical print-edition
+parity, exact book/chapter typography, clicked-link navigation, licence
+rights, or publication approval.
+
 ## Reusable read-only observation (implemented)
 
 Each candidate has a **separate reviewed manifest**

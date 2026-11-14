@@ -10,7 +10,9 @@ import unittest
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
-from commentary_native_raw_inventory import private_crosscheck
+from commentary_native_raw_inventory import (
+    private_crosscheck, NativeCommentaryMarkupCensus, MAX_RAW_MARKUP_BYTES
+)
 from pilot_preflight import PilotError
 from sword_native_raw_corpus_inventory import parse_native_raw_corpus,RawCorpusError
 
@@ -77,6 +79,82 @@ class CommentaryRawInventoryTests(unittest.TestCase):
                                "TestCom",
                                [("I","Gen"),("K","Gen.1.1"),("K","Gen.1.3"),("U","TOP:1")],
                                parsed)
+
+
+
+class OriginalCommentaryMarkupCensusTests(unittest.TestCase):
+    def test_all_source_frames_reconciled_and_fixed_structure_counts_only(self):
+        census = NativeCommentaryMarkupCensus()
+        census.observe("K", "Gen.1.3", (
+            b"<title>Secret original heading</title>"
+            b"<p>Private original paragraph "
+            b'<reference osisRef="Gen.2.1">secret target label</reference></p>'
+            b'<table><row><cell>Private textual table</cell></row></table>'
+            b"<note>Private editorial note</note>"
+        ))
+        census.observe("I", "Gen", b"  ")
+        census.observe("U", "TOP:1", b"opaque unparsed top-level source")
+        report = census.report(3)
+        self.assertTrue(report["all_original_native_entries_accounted_for"])
+        self.assertEqual(report["strict_xml_parseable_numbered_or_intro_entries"], 1)
+        self.assertEqual(report["empty_numbered_or_intro_entries"], 1)
+        self.assertEqual(report["opaque_top_entries_not_assumed_to_be_xml"], 1)
+        self.assertEqual(report["entries_with_title_markup"], 1)
+        self.assertEqual(report["entries_with_paragraph_markup"], 1)
+        self.assertEqual(report["entries_with_reference_markup"], 1)
+        self.assertEqual(report["entries_with_table_markup"], 1)
+        self.assertEqual(report["entries_with_note_markup"], 1)
+        self.assertEqual(report["reference_elements_with_osisref_attribute"], 1)
+        self.assertEqual(report["original_element_counts_by_fixed_category"]["row"], 1)
+        self.assertEqual(report["original_element_counts_by_fixed_category"]["cell"], 1)
+        output = json.dumps(report)
+        for forbidden in ("Secret original", "Private", "Gen.2.1", "Gen.1.3", "TOP:1"):
+            self.assertNotIn(forbidden, output)
+        self.assertFalse(report["source_to_other_digital_edition_parity_proven"])
+        self.assertFalse(report["real_reader_layout_or_click_navigation_proven"])
+
+    def test_invalid_source_xml_is_classified_not_silently_fixed(self):
+        census = NativeCommentaryMarkupCensus()
+        census.observe("K", "Gen.1.1", b"<p>Unclosed original markup")
+        census.observe("I", "Gen.1", b"<note>&unknownEntity;</note>")
+        census.observe("K", "Gen.1.2", b"<reference>Original label</reference>")
+        report = census.report(3)
+        self.assertEqual(report["unparseable_numbered_or_intro_entries"], 2)
+        self.assertEqual(report["strict_xml_parseable_numbered_or_intro_entries"], 1)
+        self.assertEqual(report["reference_elements_without_osisref_attribute"], 1)
+        self.assertTrue(report["no_original_source_bytes_rewritten"])
+        self.assertNotIn("Original label", str(report))
+
+    def test_opaque_and_noncanonical_tags_cannot_be_exposed_in_receipt(self):
+        census = NativeCommentaryMarkupCensus()
+        census.observe("U", "TOP:1", b"<notactuallyxml>opaque")
+        census.observe("K", "Gen.1.1", b"<privateSourceName>Actual words</privateSourceName>")
+        report = census.report(2)
+        self.assertEqual(report["original_element_counts_by_fixed_category"]["other"], 1)
+        self.assertEqual(report["strict_xml_parseable_numbered_or_intro_entries"], 1)
+        self.assertNotIn("privateSourceName", str(report))
+        self.assertNotIn("notactuallyxml", str(report))
+
+    def test_binary_and_oversized_payloads_are_not_accepted_as_parsed(self):
+        census = NativeCommentaryMarkupCensus()
+        census.observe("K", "Gen.1.1", b"<p>broken\x00data</p>")
+        census.observe("K", "Gen.1.2", b"a" * (MAX_RAW_MARKUP_BYTES + 1))
+        report = census.report(2)
+        self.assertEqual(report["oversized_or_binary_numbered_or_intro_entries"], 2)
+        self.assertEqual(report["strict_xml_parseable_numbered_or_intro_entries"], 0)
+
+    def test_incomplete_or_malformed_frame_accounting_fails_closed(self):
+        census = NativeCommentaryMarkupCensus()
+        census.observe("I", "Gen", b"")
+        with self.assertRaisesRegex(PilotError, "Unreconciled"):
+            census.report(2)
+        for invalid_kind, invalid_key, invalid_content in (
+            ("X", "Gen.1", b""),
+            ("K", None, b""),
+            ("K", "Gen.1.1", "untrusted unicode"),
+        ):
+            with self.assertRaisesRegex(PilotError, "Unreviewed"):
+                census.observe(invalid_kind, invalid_key, invalid_content)
 
 
 if __name__=="__main__":

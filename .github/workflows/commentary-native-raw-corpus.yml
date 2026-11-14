@@ -62,6 +62,47 @@ jobs:
             --native-index-binary "${RUNNER_TEMP}/commentary-native-index" \
             --native-raw-binary "${RUNNER_TEMP}/commentary-private-raw" \
             --report "${RUNNER_TEMP}/commentary-raw-receipt.json"
+      - name: Enforce complete source-native XML observation and content privacy
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          report = json.loads(
+              (Path(os.environ["RUNNER_TEMP"])/"commentary-raw-receipt.json").read_text()
+          )
+          source = json.loads(
+              (Path("config/commentary-intake")/(os.environ["RESOURCE_ID"]+".json")).read_text()
+          )
+          assert report["stock_sword_original_sha256"] == source["archive_sha256"]
+          if source.get("native_raw_corpus_sha256"):
+              assert report["native_raw_corpus_ordered_sha256"] == source["native_raw_corpus_sha256"]
+          census = report["original_stock_markup_census"]
+          assert census["all_original_native_entries_accounted_for"] is True
+          assert census["raw_entries_observed"] == report["raw_entry_count"]
+          assert census["opaque_top_entries_not_assumed_to_be_xml"] == report["raw_opaque_top_slots"]
+          assert (census["strict_xml_parseable_numbered_or_intro_entries"]
+                  + census["empty_numbered_or_intro_entries"]
+                  + census["unparseable_numbered_or_intro_entries"]
+                  + census["oversized_or_binary_numbered_or_intro_entries"]
+                  == report["raw_numbered_slots"] + report["raw_introduction_slots"])
+          assert (census["reference_elements_with_osisref_attribute"]
+                  + census["reference_elements_without_osisref_attribute"]
+                  == census["original_element_counts_by_fixed_category"]["reference"])
+          assert census["no_original_words_keys_or_reference_values_reported"] is True
+          assert census["no_original_source_bytes_rewritten"] is True
+          assert census["source_to_other_digital_edition_parity_proven"] is False
+          assert census["real_reader_layout_or_click_navigation_proven"] is False
+          assert report["original_bytes_changed"] is False and report["published"] is False
+          print("Original-stock markup: {} strictly parsed; {} unresolved XML; "
+                "{} title elements, {} references; no source edits or release".format(
+                    census["strict_xml_parseable_numbered_or_intro_entries"],
+                    census["unparseable_numbered_or_intro_entries"],
+                    census["original_element_counts_by_fixed_category"]["title"],
+                    census["original_element_counts_by_fixed_category"]["reference"],
+                ))
+          PY
       - name: Retain only text-free metadata, hashes, totals and pending approvals
         if: always()
         uses: actions/upload-artifact@v4
