@@ -13,7 +13,7 @@ from commentary_section_scope_audit import (
     heading_extent, classify, compare_independent_thml_witness,
     describe_unrecognized_heading, audit_unrecognized_slots,
     independent_chapter_scope_evidence, independent_div2_chapter_body_evidence,
-    independent_lexical_overlap,
+    independent_lexical_overlap, inspect_independent_leading_range_citations,
 )
 
 
@@ -729,6 +729,62 @@ class IndependentWitnessTests(unittest.TestCase):
         self.assertEqual(case["relation"], "NO_MATCHING_INDEPENDENT_START")
         self.assertTrue(case["same_end_in_independent_scripref"])
         self.assertFalse(outcome["ccel_edition_equivalence_to_stock_proven"])
+
+
+
+class IndependentLeadingRangeTests(unittest.TestCase):
+    def test_section_lead_with_shared_original_exposition_not_outline_only(self):
+        prose = ("A deliberately invented long commentary paragraph explains "
+                 "the parable's narrative through repeated lessons concerning "
+                 "patience humility kindness mercy truth and careful reading "
+                 "of the author's argument instead of inventing a new text "
+                 "or adding any unsupported assertions about the original source.")
+        xml = (
+            '<root><div2>'
+            '<p>Outline of this invented lesson '
+            '<scripRef osisRef="Bible:Song.1.7-Song.1.8">7,8</scripRef>.</p>'
+            '<p><scripRef osisRef="Bible:Song.1.7-Song.1.8">7,8</scripRef> '
+            + prose + '</p>'
+            '</div2></root>'
+        )
+        original = ('<title>Verse 7 ,8</title><p>' + prose + '</p>').encode()
+        review = inspect_independent_leading_range_citations(
+            etree.fromstring(xml.encode()), [
+                {"start": "Song.1.7", "declared_end": 8}
+            ], {"Song.1.7": original}
+        )
+        self.assertEqual(review["case_count"], 1)
+        self.assertEqual(review["cases_with_independent_exact_range_citation"], 1)
+        self.assertEqual(
+            review["cases_with_source_lead_prose_and_matching_stock_exposition"], 1
+        )
+        row = review["case_rows"][0]
+        self.assertEqual(row["independent_exact_range_citation_count"], 2)
+        self.assertEqual(
+            row["independent_leading_reference_and_matching_original_stock_exposition"], 1
+        )
+        self.assertFalse(row["scope_authorially_reviewed"])
+        self.assertFalse(review["publication_authorized"])
+
+    def test_outline_or_in_prose_reference_is_not_authorial_section(self):
+        xml = etree.fromstring(
+            b'<root><p>Outline <scripRef osisRef="Bible:Song.1.7-Song.1.8">'
+            b'7,8</scripRef> End.</p>'
+            b'<p>A discussion cites <scripRef osisRef="Bible:Song.1.7-Song.1.8">'
+            b'7,8</scripRef> without a section start.</p></root>'
+        )
+        review = inspect_independent_leading_range_citations(
+            xml, [{"start":"Song.1.7", "declared_end":8}],
+            {"Song.1.7":b"<p>Verse 7 ,8 Our fictional explanation.</p>"}
+        )
+        self.assertEqual(
+            review["case_rows"][0][
+                "independent_leading_reference_and_matching_original_stock_exposition"
+            ], 0
+        )
+        self.assertEqual(
+            review["cases_with_source_lead_prose_and_matching_stock_exposition"], 0
+        )
 
 
 if __name__ == "__main__":
