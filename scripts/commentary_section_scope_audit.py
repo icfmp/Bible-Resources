@@ -436,25 +436,40 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
            for chapters in native_by_book.values()):
         raise PilotError("Actual native registry has discontinuous chapter enumeration")
     canonical_books = list(native_by_book)
+    aliases, alias_registry_meta = read_existing_66_book_english_aliases()
+    if not set(canonical_books).issubset(aliases):
+        return {
+            "status": "SOURCE_BOOK_ALIASES_NOT_REVIEWED_FOR_NATIVE_MODULE",
+            "case_rows": [], "scope_authorized": False
+        }
     chapters_div1 = []
+    excluded_unattributed_div1 = 0
     for node in document.iter():
         if not isinstance(node.tag, str) or node.tag.rsplit("}", 1)[-1] != "div1":
             continue
         chapters = [x for x in node if
                     isinstance(x.tag, str) and x.tag.rsplit("}", 1)[-1] == "div2"]
-        if chapters:
-            chapters_div1.append((node, chapters))
+        if not chapters:
+            continue
+        title = _canon_name(node.get("title", ""))
+        title_names = [
+            code for code, alias in aliases.items()
+            if re.search(r"(?<!\w)" + re.escape(_canon_name(alias)) + r"(?!\w)", title)
+        ]
+        has_scripcom = any(
+            isinstance(child.tag, str)
+            and child.tag.rsplit("}", 1)[-1] == "scripCom"
+            for child in node.iter()
+        )
+        if not title_names and not has_scripcom:
+            excluded_unattributed_div1 += 1
+            continue
+        chapters_div1.append((node, chapters))
     if len(chapters_div1) != len(canonical_books):
         return {
             "status": "SOURCE_BOOK_LAYOUT_NOT_EXACT_NATIVE_BOOK_COUNT",
             "native_book_count": len(canonical_books),
             "source_book_divisions": len(chapters_div1),
-            "case_rows": [], "scope_authorized": False
-        }
-    aliases, alias_registry_meta = read_existing_66_book_english_aliases()
-    if not set(canonical_books).issubset(aliases):
-        return {
-            "status": "SOURCE_BOOK_ALIASES_NOT_REVIEWED_FOR_NATIVE_MODULE",
             "case_rows": [], "scope_authorized": False
         }
     source_chapters = {}
@@ -564,6 +579,7 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
     return {
         "status": "SOURCE_DIV2_STRUCTURE_COLLATED_NO_REINDEX_AUTHORIZATION",
         "source_book_divisions": len(chapters_div1),
+        "unattributed_noncanonical_div1_with_div2_excluded": excluded_unattributed_div1,
         "native_book_count": len(canonical_books),
         "book_alignment_evidence_classes": dict(sorted(book_classes.items())),
         "reviewed_registry_evidence": alias_registry_meta,
