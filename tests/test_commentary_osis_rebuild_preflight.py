@@ -8,7 +8,9 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
-from commentary_osis_rebuild_preflight import NativeOSISRebuildPreflight
+from commentary_osis_rebuild_preflight import (
+    NativeOSISRebuildPreflight, compare_opaque_top_with_standard_compiler_fixture,
+)
 
 
 class NativeOSISRebuildPreflightTests(unittest.TestCase):
@@ -168,6 +170,25 @@ class NativeOSISRebuildPreflightTests(unittest.TestCase):
         r = c.report(expected_count=1)
         self.assertEqual(r["blocking_or_unresolved_structure_counts"][
             "inline_document_declaration_requires_special_handling"], 1)
+
+    def test_compiler_generated_top_byte_comparison_is_only_provenance_hint(self):
+        raw=b'<milestone n="top" type="x"/>'
+        proof=compare_opaque_top_with_standard_compiler_fixture(
+            [raw, raw], [raw]
+        )
+        self.assertEqual(proof["original_top_entry_count"], 2)
+        self.assertEqual(proof["synthetic_top_entry_count"], 1)
+        self.assertEqual(proof["original_top_entry_bytes_equal_any_synthetic"], 2)
+        self.assertTrue(proof["all_original_top_byte_payloads_seen_in_synthetic"])
+        self.assertFalse(proof["source_original_top_locations_and_count_reconstructed"])
+        self.assertFalse(proof["source_or_candidate_published"])
+
+    def test_different_top_marker_is_not_claimed_to_match(self):
+        proof=compare_opaque_top_with_standard_compiler_fixture(
+            [b'<milestone n="one"/>'],[b'<milestone n="two"/>']
+        )
+        self.assertEqual(proof["original_top_entry_bytes_equal_any_synthetic"], 0)
+        self.assertFalse(proof["all_original_top_byte_payloads_seen_in_synthetic"])
 
     def test_count_mismatch_blocks_completion(self):
         c = NativeOSISRebuildPreflight()
