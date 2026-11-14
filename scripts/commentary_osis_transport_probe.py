@@ -127,7 +127,9 @@ def build_numbered_transport_sample(entries: list[tuple[str, bytes]],
     if current_book is not None:
         parts.append(b"</div>")
     parts.extend([b"</div>", b"</osisText>", b"</osis>"])
-    xml = b"\n".join(parts)
+    # Do not insert formatting newlines into original commentary XML.
+    # Even one artificial separator would change the authorial whitespace.
+    xml = b"".join(parts)
     if len(xml) > MAX_BYTES + MAX_FRAGMENTS * 320:
         raise ValueError("Private transport document exceeds safe length")
 
