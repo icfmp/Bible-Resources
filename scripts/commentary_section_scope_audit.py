@@ -474,6 +474,7 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
         }
     source_chapters = {}
     book_classes = Counter()
+    book_evidence_rows = []
     for (div1, chapters), code in zip(chapters_div1, canonical_books):
         title = _canon_name(div1.get("title", ""))
         candidates = set()
@@ -506,6 +507,14 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
         if len(chapters) != len(native_by_book[code]):
             identity = "SOURCE_CHAPTER_COUNT_DIFFERS_FROM_NATIVE_REGISTRY"
         book_classes[identity] += 1
+        book_evidence_rows.append({
+            "native_book": code,
+            "title_alias_candidate_books": sorted(candidates),
+            "explicit_source_annotation_books": sorted(annotated_books),
+            "source_direct_div2_count": len(chapters),
+            "native_registry_chapter_count": len(native_by_book[code]),
+            "identity_class": identity,
+        })
         for chapter_number, div2 in enumerate(chapters, start=1):
             chapter = f"{code}.{chapter_number}"
             markers = [
@@ -524,6 +533,29 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
                 if _parse_reference(marker.get("osisRef", ""))[0]
                 == "work_qualified_chapter"
             ]
+            marker_chapter_references = set()
+            for marker in markers:
+                kind, _ = _parse_reference(marker.get("osisRef", ""))
+                if kind not in (
+                    "work_qualified_chapter", "work_qualified_verse",
+                    "work_qualified_same_book_verse_range"
+                ):
+                    continue
+                match = WORK_REF.fullmatch(marker.get("osisRef", ""))
+                if match:
+                    for part in match.group(2).split("-"):
+                        parts = part.split(".")
+                        if len(parts) >= 2 and parts[1].isdigit():
+                            marker_chapter_references.add(parts[0] + "." + parts[1])
+            # Title text is inspected privately for *numerical* chapter
+            # indicators only; it is not emitted in the report.
+            heading_chapter_numbers = set()
+            for head in div2:
+                if not isinstance(head.tag, str) or head.tag.rsplit("}", 1)[-1] not in ("h2", "title"):
+                    continue
+                text = "".join(head.itertext())
+                for number in re.findall(r"\bchapter\s+([1-9]\d*)\b", text, re.I):
+                    heading_chapter_numbers.add(int(number))
             nonempty_paragraphs = sum(
                 bool("".join(node.itertext()).strip())
                 for node in div2.iter()
@@ -535,6 +567,8 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
                 "source_numbered_section_marker_count": len(numbered),
                 "source_chapter_marker_count": len(chapter_markers),
                 "source_nonempty_paragraph_count": nonempty_paragraphs,
+                "source_annotated_chapter_references": sorted(marker_chapter_references),
+                "source_h2_explicit_numeric_chapters": sorted(heading_chapter_numbers),
                 "source_div2_text_sha256": sha256(
                     "".join(div2.itertext()).encode("utf-8")
                 ).hexdigest(),
@@ -572,6 +606,8 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
             "source_numbered_marker_count": source["source_numbered_section_marker_count"] if source else 0,
             "source_nonempty_paragraph_count": source["source_nonempty_paragraph_count"] if source else 0,
             "source_div2_text_sha256": source["source_div2_text_sha256"] if source else None,
+            "source_annotated_chapters": source["source_annotated_chapter_references"] if source else [],
+            "source_h2_numeric_chapters": source["source_h2_explicit_numeric_chapters"] if source else [],
             "stock_raw_sha256": row["raw_payload_sha256"],
             "source_text_to_stock_text_identity_proven": False,
             "approved_for_native_index_expansion": False,
@@ -582,6 +618,7 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
         "unattributed_noncanonical_div1_with_div2_excluded": excluded_unattributed_div1,
         "native_book_count": len(canonical_books),
         "book_alignment_evidence_classes": dict(sorted(book_classes.items())),
+        "book_alignment_evidence_rows": book_evidence_rows,
         "reviewed_registry_evidence": alias_registry_meta,
         "candidate_classes": dict(sorted(classes.items())),
         "case_rows": cases,
