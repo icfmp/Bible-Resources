@@ -33,7 +33,7 @@ from commentary_source_english_osis_alias import (
 from commentary_nonlink_word_alignment import plain_word_alignment
 from commentary_stock_prefix_topology import (
     source_word_prefix_topology, stock_prefixed_source_body_concordance,
-    single_word_stock_markup_diagnostic,
+    single_word_stock_markup_diagnostic, stock_prefix_context_correspondence,
 )
 from commentary_xml_witness import _parse_reference, WORK_REF
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
@@ -46,7 +46,8 @@ KEY = re.compile(r"^([1-4]?[A-Za-z][A-Za-z0-9]*)\.([1-9]\d*)\.([1-9]\d*)$")
 PROBES = ("Song.1.7", "Jer.4.1", "Jer.4.3")
 
 
-def independent_lexical_overlap(source_text: str, stock_raw: bytes) -> dict:
+def independent_lexical_overlap(source_text: str, stock_raw: bytes,
+                                source_neighbor_candidates: list[tuple[str, str]] | None = None) -> dict:
     """Compare word-multiset overlap in memory, emitting NO original words.
 
     This is diagnostic cross-edition evidence, not exact text parity:
@@ -99,6 +100,18 @@ def independent_lexical_overlap(source_text: str, stock_raw: bytes) -> dict:
                 "status": "NOT_A_STRICT_CASE_SENSITIVE_STOCK_PREFIX",
                 "extra_stock_words_are_not_approved": True,
             }
+    neighbor_concordance = None
+    if (prefix is not None and prefix.get("full_original_source_word_sequence_inside_stock")
+            and source_neighbor_candidates is not None):
+        try:
+            neighbor_concordance = stock_prefix_context_correspondence(
+                source_text, stock_raw, source_neighbor_candidates
+            )
+        except (ValueError, PilotError):
+            neighbor_concordance = {
+                "status": "SOURCE_CONTEXT_NOT_SAFE_FOR_CORRESPONDENCE",
+                "original_text_or_xml_disclosed": False,
+            }
     single_word = None
     if (ordered["original_plain_words_not_matched_in_exact_order"] == 1
             and ordered["stock_plain_words_not_matched_in_exact_order"] == 1
@@ -117,6 +130,7 @@ def independent_lexical_overlap(source_text: str, stock_raw: bytes) -> dict:
         "exact_ordered_word_equality": original == compiled,
         "ordered_word_alignment": ordered,
         "stock_extra_prefix_xml_topology": prefix,
+        "stock_prefix_independent_source_neighbor_correspondence": neighbor_concordance,
         "isolated_one_word_xml_location": single_word,
         "stock_source_suffix_punctuation_topology": suffix,
         "source_text_equal": source_text == stock_text,
@@ -561,6 +575,7 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
         }
     source_chapters = {}
     private_book_prefix_text = {}
+    private_book_prefix_neighbors = {}
     explicit_source_chapters = {}
     ambiguous_source_heading_chapters = set()
     book_classes = Counter()
@@ -632,6 +647,16 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
             for node in element.iter()
             if isinstance(node.tag, str) and node.tag.rsplit("}", 1)[-1] == "p"
         )
+        private_book_prefix_neighbors[code] = [
+            ("source_div1_title_attribute", div1.get("title", "")),
+            *(
+                ("source_immediate_previous_heading_element",
+                 "".join(element.itertext()))
+                for element in source_prefix_nodes
+                if isinstance(element.tag, str)
+                and element.tag.rsplit("}", 1)[-1] in {"h1", "h2", "title"}
+            ),
+        ][:8]
         book_evidence_rows.append({
             "native_book": code,
             "title_alias_candidate_books": sorted(candidates),
@@ -704,6 +729,17 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
                 "source_div2_original_text_retained": True,
                 "source_div2_ordinal": chapter_number,
                 "_private_source_visible_text": "".join(div2.itertext()),
+                "_private_source_neighbor_candidates": [
+                    ("source_div2_title_attribute", div2.get("title", "")),
+                    ("source_div1_title_attribute", div1.get("title", "")),
+                    *(
+                        ("source_immediate_previous_heading_element",
+                         "".join(head.itertext()))
+                        for head in div2
+                        if isinstance(head.tag, str)
+                        and head.tag.rsplit("}", 1)[-1] in {"h2", "h1", "title"}
+                    ),
+                ][:8],
             }
             if (identity == "SOURCE_CHAPTER_COUNT_DIFFERS_FROM_NATIVE_REGISTRY"
                     and candidates == {code} and annotated_books == {code}
@@ -777,8 +813,19 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
                 if chapter.endswith(".1") else None
             )
             if source_text is not None:
+                neighboring = (
+                    source["_private_source_neighbor_candidates"] if source is not None
+                    else private_book_prefix_neighbors.get(chapter.split(".", 1)[0], [])
+                )
+                # Keep all private source strings bounded before passing them to
+                # a metadata-only XML source-context comparison.
+                neighboring = [
+                    (name, value) for name, value in neighboring
+                    if isinstance(value, str) and len(value) <= 2048
+                ]
                 lexical = independent_lexical_overlap(
-                    source_text, stock_unknown_raw[row["native_key"]]
+                    source_text, stock_unknown_raw[row["native_key"]],
+                    source_neighbor_candidates=neighboring
                 )
         cases.append({
             "independent_lexical_comparison": lexical,
