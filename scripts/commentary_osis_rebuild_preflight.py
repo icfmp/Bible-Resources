@@ -41,6 +41,9 @@ class NativeOSISRebuildPreflight:
         self.native_intro_key_classes = Counter()
         self.intro_top_level_element_names = Counter()
         self.intro_top_level_nonwhitespace_text = Counter()
+        self.intro_visible_word_count_bands = Counter()
+        self.intro_full_element_name_counts = Counter()
+        self.intro_full_attribute_name_counts = Counter()
         self.opaque_top_xml_element_names = Counter()
         self.opaque_top_xml_attribute_names = Counter()
 
@@ -156,6 +159,19 @@ class NativeOSISRebuildPreflight:
                 if (source.text or "").strip()
                 else "intro_has_no_unwrapped_leading_text"
             ] += 1
+            words = len(re.findall(r"\w+", "".join(source.itertext())))
+            band = ("zero_words" if words == 0 else
+                    "one_to_ten_words" if words <= 10 else
+                    "eleven_to_hundred_words" if words <= 100 else
+                    "more_than_hundred_words")
+            self.intro_visible_word_count_bands[band] += 1
+            for element in source.iter():
+                if element is source or not isinstance(element.tag, str):
+                    continue
+                self.intro_full_element_name_counts[self._local(element.tag)] += 1
+                self.intro_full_attribute_name_counts.update(
+                    self._local(name) for name in element.attrib
+                )
         # Verbatim Unicode visible-text comparison, including all whitespace,
         # without any casefold, punctuation normalization or other edits.
         if "".join(source.itertext()) != "".join(wrapped.itertext()):
@@ -234,6 +250,12 @@ class NativeOSISRebuildPreflight:
                 dict(sorted(self.intro_top_level_element_names.items())),
             "intro_original_unwrapped_leading_text_presence":
                 dict(sorted(self.intro_top_level_nonwhitespace_text.items())),
+            "intro_original_visible_word_count_bands":
+                dict(sorted(self.intro_visible_word_count_bands.items())),
+            "intro_original_full_element_name_counts":
+                dict(sorted(self.intro_full_element_name_counts.items())),
+            "intro_original_full_attribute_name_counts":
+                dict(sorted(self.intro_full_attribute_name_counts.items())),
             "opaque_top_original_xml_element_names":
                 dict(sorted(self.opaque_top_xml_element_names.items())),
             "opaque_top_original_xml_attribute_names":
