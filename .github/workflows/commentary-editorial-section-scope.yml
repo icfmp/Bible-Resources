@@ -89,6 +89,8 @@ jobs:
               print("Candidate witness",case["start"],case["declared_end"],case["relation"])
           for start,refs in witness.get("unparsed_source_reference_candidates_near_anomalies",{}).items():
               print("Unparsed source anchor",start,json.dumps(refs,sort_keys=True))
+          for start,attrs in witness.get("source_attributes_near_anomalies",{}).items():
+              print("Source attribute anchor",start,json.dumps(attrs,sort_keys=True))
           PY
       - name: Preserve metadata-only complete candidate report for independent review
         uses: actions/upload-artifact@v4
