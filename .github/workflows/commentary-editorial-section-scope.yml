@@ -152,6 +152,15 @@ jobs:
               ):
                   print("Needs lexical scope review",divcase["native_start"],
                         json.dumps(lexical,sort_keys=True))
+              if lexical and (
+                  lexical.get("isolated_one_word_xml_location") is not None
+                  or divcase["native_start"] in ("2Chr.1.1","Neh.1.1")
+              ):
+                  refcheck=divcase.get("independent_reference_target_comparison")
+                  if refcheck is None:
+                      raise AssertionError("Source/stock citation target review absent")
+                  print("Private citation target review",divcase["native_start"],
+                        json.dumps(refcheck,sort_keys=True))
           chapter=witness["independent_whole_chapter_review"]
           print("Independently witnessed one-key chapter scope candidates:",
                 json.dumps(chapter["source_scope_candidate_classes"],sort_keys=True))
