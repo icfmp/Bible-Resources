@@ -392,6 +392,23 @@ jobs:
                 preview["all_proposed_new_aliases_same_compiled_raw_as_original_master"],
                 "original TOP unchanged",preview["all_original_TOP_positions_exact_raw_bytes"])
           assert preview["preflight_candidate_section_count"]==17
+          native_links=preview["private_native_original_and_provisional_alias_link_identity"]
+          assert native_links["status"]=="REAL_LIBSWORD_NATIVE_NONADJACENT_LINK_IDENTITY"
+          print("Real released libSWORD native linked records:",
+                "all new aliases match original native linked identity",
+                native_links["all_original_master_to_proposed_target_pairs_are_native_linked"],
+                "count",native_links["native_linked_alias_count"],
+                "different-source-section negative controls",
+                native_links["negative_distinct_section_controls"],
+                "negative controls truly unlinked",
+                native_links["all_independently_distinct_section_controls_unlinked"])
+          assert native_links["proposed_key_count"]==24
+          assert native_links["native_linked_alias_count"]==24
+          assert native_links["all_original_master_to_proposed_target_pairs_are_native_linked"] is True
+          assert native_links["negative_distinct_section_controls"]>=1
+          assert native_links["all_independently_distinct_section_controls_unlinked"] is True
+          assert native_links["source_text_and_xml_never_logged"] is True
+
           repeats=preview["private_original_vs_alias_cli_chapter_repetition_probe"]
           assert repeats["status"]=="GENERIC_NATIVE_COMMENTARY_CLI_CHAPTER_REPEAT_COMPARISON_NOT_GUI_APPROVAL"
           assert repeats["case_count"]>=1
