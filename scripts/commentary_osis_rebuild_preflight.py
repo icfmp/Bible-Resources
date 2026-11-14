@@ -69,7 +69,7 @@ class NativeOSISRebuildPreflight:
             # Both canonical representations must be recognized.
             if "." not in ref or ref.endswith(".0.0"):
                 self.native_intro_key_classes["book_intro_key"] += 1
-            elif re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9]\\d*(?:\\.0)?", ref):
+            elif re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9]\d*(?:\.0)?", ref):
                 self.native_intro_key_classes["chapter_intro_key"] += 1
             else:
                 self.native_intro_key_classes["other_intro_key"] += 1
@@ -97,7 +97,7 @@ class NativeOSISRebuildPreflight:
                             "".join(parsed.itertext()).strip()
                         )
                         self.shape["opaque_top_visible_word_token_count"] += len(
-                            re.findall(r"\\w+", "".join(parsed.itertext()))
+                            re.findall(r"\w+", "".join(parsed.itertext()))
                         )
                         for element in parsed.iter():
                             if element is parsed:
