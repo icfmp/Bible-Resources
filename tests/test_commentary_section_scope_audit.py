@@ -382,6 +382,13 @@ class SourceDivisionChapterTests(unittest.TestCase):
         self.assertFalse(result["source_and_selected_stock_reference_targets_exact_ordered_match"])
         self.assertTrue(result["nonmatching_target_values_are_not_auto_normalized_or_rewritten"])
         self.assertNotIn("Exodus two", json.dumps(result))
+        self.assertEqual(report["independent_stock_vs_source_reference_target_classes"],
+                         {"ALL_LINK_TARGETS_MATCH_EXACT_OR_LITERAL_WORK_PREFIX": 1})
+        self.assertEqual(
+            report["independent_stock_vs_source_reference_target_totals"][
+                "source_target_occurrences_not_paired_in_selected_stock"
+            ], 0
+        )
 
     def test_same_citation_label_with_wrong_destination_is_not_approved(self):
         source = etree.fromstring(
@@ -403,6 +410,16 @@ class SourceDivisionChapterTests(unittest.TestCase):
         self.assertEqual(result["original_scripRef_to_stock_text_location_classes"],
                          {"literal_label_inside_stock_reference_element": 1})
         self.assertTrue(result["matched_label_does_not_validate_reference_target_or_edition"])
+        self.assertEqual(
+            report["independent_stock_vs_source_reference_target_classes"],
+            {"BOTH_EDITIONS_HAVE_UNPAIRED_LINK_TARGETS": 1}
+        )
+        self.assertEqual(
+            report["independent_stock_vs_source_reference_target_exception_rows"][0][
+                "source_target_occurrences_not_paired"
+            ], 1
+        )
+        self.assertTrue(report["source_reference_target_completeness_not_proven"])
 
     def test_same_book_chapter_intro_with_numbered_comments_is_not_whole_chapter(self):
         document = etree.fromstring(
