@@ -1,5 +1,6 @@
 """Synthetic regressions for source-neutral commentary section-scope triage."""
 import sys
+import json
 from pathlib import Path
 from hashlib import sha256
 from tempfile import TemporaryDirectory
@@ -12,6 +13,7 @@ from commentary_section_scope_audit import (
     heading_extent, classify, compare_independent_thml_witness,
     describe_unrecognized_heading, audit_unrecognized_slots,
     independent_chapter_scope_evidence, independent_div2_chapter_body_evidence,
+    independent_lexical_overlap,
 )
 
 
@@ -149,6 +151,32 @@ class UnknownHeadingTests(unittest.TestCase):
         self.assertFalse(result["unrecognized_means_missing_text_proven"])
         self.assertTrue(result["all_output_is_original_text_free_metadata"])
 
+
+
+class SafeLexicalEvidenceTests(unittest.TestCase):
+    def test_identical_original_word_sequence_is_high_overlap_without_rewrite(self):
+        r = independent_lexical_overlap(
+            "Wisdom directs those who listen carefully.",
+            b"<p>Wisdom directs those who listen carefully.</p>",
+        )
+        self.assertEqual(r["overlap_class"], "HIGH_95_PLUS")
+        self.assertTrue(r["exact_ordered_word_equality"])
+        self.assertFalse(r["historical_or_editorial_equivalence_proven"])
+        self.assertNotIn("Wisdom", str(r))
+
+    def test_unrelated_original_words_fail_the_overlapping_diagnostic(self):
+        r = independent_lexical_overlap(
+            "Alpha beta gamma delta epsilon zeta",
+            b"<p>One two three four five six seven</p>",
+        )
+        self.assertEqual(r["overlap_class"], "LOW_OVERLAP")
+
+    def test_xml_failure_does_not_claim_a_match(self):
+        r = independent_lexical_overlap(
+            "Some original prose", b"<p>Unclosed original text"
+        )
+        self.assertEqual(r["status"], "UNPARSEABLE_ORIGINAL_RAW")
+        self.assertFalse(r["source_text_equal"])
 
 class ChapterScopeEvidenceTests(unittest.TestCase):
     def test_chapter_only_div2_is_candidate_not_editorial_approval(self):
@@ -316,6 +344,17 @@ class SourceDivisionChapterTests(unittest.TestCase):
         self.assertEqual(book["source_prefix_nonempty_paragraphs"], 1)
         self.assertEqual(book["native_registry_chapter_count"], 2)
         self.assertEqual(book["source_direct_div2_count"], 1)
+        stock = {"Gen.1.1": b"<p>Unwrapped first chapter notes</p>"}
+        compared = independent_div2_chapter_body_evidence(
+            document, native, [
+                {"native_key": "Gen.1.1", "first_verse_in_chapter": True,
+                 "number_of_occupied_native_slots_in_chapter": 1,
+                 "raw_payload_sha256": "a" * 64}
+            ], stock,
+        )
+        metrics = compared["case_rows"][0]["independent_lexical_comparison"]
+        self.assertEqual(metrics["overlap_class"], "HIGH_95_PLUS")
+        self.assertNotIn("Unwrapped", json.dumps(compared))
 
     def test_chapter_heading_conflicting_with_source_scripcom_is_not_reassigned(self):
         document = etree.fromstring(
