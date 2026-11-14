@@ -90,6 +90,22 @@ jobs:
           assert (census["reference_elements_with_osisref_attribute"]
                   + census["reference_elements_without_osisref_attribute"]
                   == census["original_element_counts_by_fixed_category"]["reference"])
+          forms = census["original_osisref_form_count_by_fixed_category"]
+          assert set(forms) == {
+              "single_osis_verse", "verse_range_like", "book_or_chapter_like",
+              "compound_target", "other_unclassified",
+          }
+          assert all(type(value) is int and value >= 0 for value in forms.values())
+          assert sum(forms.values()) == census["reference_elements_with_osisref_attribute"]
+          assert (census["original_reference_labels_with_visible_text"]
+                  + census["original_reference_labels_without_visible_text"]
+                  == census["original_element_counts_by_fixed_category"]["reference"])
+          assert (census["original_title_elements_with_visible_text"]
+                  + census["original_title_elements_without_visible_text"]
+                  == census["original_element_counts_by_fixed_category"]["title"])
+          assert (0 <= census["original_reference_elements_with_literal_Bible_work_prefix"]
+                  <= census["reference_elements_with_osisref_attribute"])
+          assert census["no_osisref_value_normalization_or_verse_existence_claim"] is True
           assert census["no_original_words_keys_or_reference_values_reported"] is True
           assert census["no_original_source_bytes_rewritten"] is True
           assert census["source_to_other_digital_edition_parity_proven"] is False
@@ -102,6 +118,14 @@ jobs:
                     census["original_element_counts_by_fixed_category"]["title"],
                     census["original_element_counts_by_fixed_category"]["reference"],
                 ))
+          print("Original OSIS reference form tally (metadata only): "
+                + json.dumps(forms, sort_keys=True))
+          print("Original reference labels with/without visible text: "
+                + str(census["original_reference_labels_with_visible_text"])
+                + "/" + str(census["original_reference_labels_without_visible_text"]))
+          print("Original titles with/without visible text: "
+                + str(census["original_title_elements_with_visible_text"])
+                + "/" + str(census["original_title_elements_without_visible_text"]))
           PY
       - name: Retain only text-free metadata, hashes, totals and pending approvals
         if: always()
