@@ -6,7 +6,9 @@ on:
       - '.github/workflows/commentary-editorial-section-scope.yml'
       - 'scripts/commentary_section_scope_audit.py'
       - 'scripts/commentary_osis_rebuild_preflight.py'
+      - 'scripts/commentary_osis_transport_probe.py'
       - 'tests/test_commentary_section_scope_audit.py'
+      - 'tests/test_commentary_osis_transport_probe.py'
       - 'tests/test_commentary_osis_rebuild_preflight.py'
       - 'scripts/commentary_navigation_link_plan.py'
       - 'tests/test_commentary_navigation_link_plan.py'
@@ -42,6 +44,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_commentary_section_scope_audit.py' -v
           python -m unittest discover -s tests -p 'test_commentary_navigation_link_plan.py' -v
           python -m unittest discover -s tests -p 'test_commentary_osis_rebuild_preflight.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_osis_transport_probe.py' -v
       - name: Install stable upstream native SWORD library
         run: |
           set -euo pipefail
@@ -159,7 +162,8 @@ jobs:
             --resource-id "$RESOURCE_ID" \
             --native-index-binary "${RUNNER_TEMP}/stock-index" \
             --native-raw-binary "${RUNNER_TEMP}/stock-raw" \
-            --report "${RUNNER_TEMP}/editorial-scope.json"
+            --report "${RUNNER_TEMP}/editorial-scope.json" \
+            --temporary-numbered-sample-chapters Gen.36 Matt.13 Song.1
       - name: Summarize scope and known regression probes without original text
         run: |
           set -euo pipefail
@@ -193,6 +197,27 @@ jobs:
                 transport["opaque_top_distinct_digest_count"])
           print("Opaque TOP exact native raw byte length census:",
                 json.dumps(transport["opaque_top_original_raw_length_counts"],sort_keys=True))
+          pilot=r["private_numbered_only_osis2mod_sample_roundtrip"]
+          assert pilot is not None
+          assert pilot["no_publication"] is True
+          assert pilot["original_introductions_preserved_in_candidate"] is False
+          assert pilot["original_top_preserved_in_candidate"] is False
+          print("Private original numbered-only osis2mod source transport:",
+                pilot["status"],
+                "source K",pilot["input_numbered_native_keys"],
+                "source identical-body groups",pilot["contiguous_identical_raw_body_groups"])
+          if not pilot.get("compiled_native_readback_completed"):
+              raise AssertionError("Isolated original native numbered OSIS compiler/readback unavailable")
+          print("Private original numbered-only compiled sample readback:",
+                "original K matched",pilot["original_numbered_keys_in_compiled_sample"],
+                "source K missing",pilot["original_numbered_keys_missing_from_compiled_sample"],
+                "extra K",pilot["additional_numbered_keys_in_compiled_sample"],
+                "original raw bytes identical",pilot["original_raw_xml_exact_byte_matches"],
+                "visible Unicode identical",pilot["original_raw_xml_visible_unicode_text_matches"],
+                "unparseable compiled fragments",
+                pilot["compiled_entries_unparseable_as_original_fragments"])
+          assert pilot["original_module_content_or_metadata_modified"] is False
+          assert pilot["publication_authorized"] is False
           print("Introduction original native key classes:",
                 json.dumps(transport["intro_original_native_key_class_counts"],sort_keys=True))
           print("Repeated raw groups crossing chapters/books / intro and numbered:",
