@@ -166,7 +166,7 @@ For repository creation, push, Pages activation and branch rules, see [INSTALLAT
 
 ## Licenses
 
-Code, tooling and documentation: **GPL-3.0-or-later** (see `COPYING`). **Modules and their source texts are licensed independently**, as recorded in their metadata; this repository's code license does not relicense their contents.
+Code, tooling and existing documentation: **GPL-3.0-or-later** (see `COPYING`). **Modules and their source texts retain their own upstream rights**, as recorded in module metadata; the repository code licence does not relicense their contents. For newly created, separately owned *non-code* contributions, the owner's preferred public-domain dedication is **CC0 1.0** where the project has the necessary rights and contributor consent. This is not a blanket CC0 grant for third-party resources or the existing GPL repository. See [Rights and provenance](docs/RIGHTS.md).
 
 ## Source and compatibility references
 
