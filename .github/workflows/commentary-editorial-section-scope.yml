@@ -233,6 +233,7 @@ jobs:
             --temporary-original-intro-sample-chapters Lev.19 Ps.108 \
             --temporary-original-mixed-chapters 2John.1 2Chr.1 Matt.13 \
             --temporary-original-full-transport \
+            --temporary-provisional-range-index-preview \
             --synthetic-intro-native-stream "${RUNNER_TEMP}/synthetic-introductions/native.raw"
       - name: Summarize scope and known regression probes without original text
         run: |
@@ -369,6 +370,27 @@ jobs:
           assert full["reader_layout_parity_proven"] is False
           if not full["original_indexed_I_K_text_markup_reference_checks_passed"]:
               raise AssertionError("Full original I/K technical roundtrip differs; see metadata-only artifact")
+          preview=r["private_provisional_range_index_preview_not_approved"]
+          assert preview is not None and preview["published"] is False
+          assert preview["corrections_or_publication_authorized"] is False
+          assert preview["source_scope_editorially_approved"] is False
+          print("Provisional missing-section index preview (NOT editorially approved):",
+                preview["status"],"compiled",preview.get("readback_completed",False),
+                "original entries",preview["source_numbered_key_count"],
+                "proposed new aliases",preview["planned_extra_index_keys"],
+                "missing/extra originals I/K",
+                preview["missing_I_count"],preview["missing_K_count"],preview["extra_I_count"],
+                "extra index targets",preview["extra_K_count"],
+                "alias raw payloads identical to original compiled master",
+                preview["all_proposed_new_aliases_same_compiled_raw_as_original_master"],
+                "original TOP unchanged",preview["all_original_TOP_positions_exact_raw_bytes"])
+          assert preview["preflight_candidate_section_count"]==17
+          assert preview["planned_extra_index_keys"]==24
+          if not preview.get("readback_completed",False):
+              raise AssertionError("Provisional range preview compiler/native reader failed")
+          if not (preview["all_proposed_new_aliases_same_compiled_raw_as_original_master"]
+                  and preview["full_original_K_I_U_native_entry_parity_proven"]):
+              raise AssertionError("Provisional index preview changed original content or lost aliases")
           for sample in r["private_original_intro_only_osis2mod_sample_roundtrips"]:
               print("Isolated actual original I transport proof",sample["original_native_intro_key"],
                     "modes",json.dumps(sample["test_only_modes"],sort_keys=True),
