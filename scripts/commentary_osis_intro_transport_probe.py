@@ -108,7 +108,7 @@ def probe_original_intro_transport(chapter: str, original_intro_raw: bytes,
         )
         try:
             reader = subprocess.run(
-                [str(native_raw_binary), work_id],
+                [str(native_raw_binary), work_id, "--allow-intro-only"],
                 env=dict(os.environ, SWORD_PATH=str(root)),
                 cwd=root, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
                 timeout=70, check=False
@@ -135,7 +135,9 @@ def probe_original_intro_transport(chapter: str, original_intro_raw: bytes,
                 K.append(key)
             elif kind == "U":
                 top.append(key)
-        parse_native_raw_corpus(BytesIO(reader.stdout), on_entry=observe)
+        parse_native_raw_corpus(
+            BytesIO(reader.stdout), on_entry=observe, allow_intro_only=True
+        )
         case = {
             "mode": mode,
             "status": "TEMPORARY_NATIVE_I_READBACK_NOT_PROVEN_EDITION_PARITY",
