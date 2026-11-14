@@ -87,3 +87,62 @@ to publish. The 17/24 explicit section-index anomalies and 118 whole-chapter
 reader-navigation proposals still require their own reviewed scopes,
 unchanged original provenance, deduplicated reader UX and separate release
 approval.
+
+
+## Private whole-corpus 24-target index preview — validated technical behavior (2026-11-14)
+
+The direct `SWMgr` / public `zCom::linkEntry` approach remains blocked
+by the released module's read-only driver. Binary `.czv` index patching would
+bypass the supported API and risks a hidden source/index mismatch. Therefore
+**prefer one standard, source-constrained `osis2mod` rebuild only when
+an actual new corrected SWORD module is justified**. Do not present this as
+changing the historical CrossWire stock in place.
+
+The generic `build_complete_original_transport` now optionally consumes
+**strictly bounded, provisional same-chapter aliases**. Each new key must
+be vacant in the exact original K map and name an existing original master
+with matching SHA-256; grouping merges adjacent references but NEVER joins
+across an independent original section or a discontinuous gap. The *single*
+original source raw body is included once in the OSIS section with multiple
+standard `annotateRef` ranges. Bad hashes, cross-chapter aliases and
+occupied target attempts fail closed in synthetic regressions.
+
+[Exact pinned original private audit #43645508238](https://github.com/icfmp/Bible-Resources/actions/runs/43645508238)
+**SUCCESS**. This experimental preview has **17 original heading-derived
+candidate sections / 24 unoccupied canonical proposed keys**. Actual
+`osis2mod` + independent native libSWORD readback established:
+
+| Verification | Original unchanged | Provisional preview |
+| --- | ---: | ---: |
+| Original K slots retained | 28,718 | **28,718/28,718** |
+| Original I slots retained | 1,255 | **1,255/1,255** |
+| Original TOP slots, exact raw payload | 2 | **2/2** |
+| New native K aliases | 0 | **24**, exactly the proposed keys |
+| Original K/I missing or overwritten | 0 | **0** |
+| Additional unexpected K/I | 0 | **0** |
+| New alias native raw content equal to its compiled original master | n/a | **24/24** |
+
+Every original K/I entry also passes the existing complete
+word-order, whitespace-normalized original visible punctuation/text,
+non-`div` element/attribute, original `div` attribute and ordered
+`reference` target invariants. Compiler-added `div` wrappers mean this is
+**not exact original XML byte equality** or a reader-layout certificate.
+
+**Critical editorial boundary:** these particular 17 scopes come from a
+*heading-based original source diagnostic*, not 17 signed-off authorial
+section decisions. The source-independent CCEL `scripRef` witness
+corroborates citation ranges but does not itself establish `scripCom`
+commentary anchors. Therefore the preview is deliberately labelled
+`source_scope_editorially_approved=false`, not published, and **must not**
+be used as an approved corrected release recipe yet. The separate 118
+chapter-first candidates, Lev 19/Ps 108 intro-only bodies, cross-witness
+annotation differences and one wording variant are untouched.
+
+**Next decision gates:** individually review the 17 boundaries and 24
+targets from the actual authorial commentary, original chapter outlines
+and independent editions; verify truthful contiguous/discontinuous
+section headings; exercise the preview in Xiphos on actual affected
+passages, including deduplication and independent intermediate
+commentary. Only then propose a separately versioned corrected module
+for owner publication approval. BRMHCC 0.1.0 remains byte-immutable,
+and modern-English #270/#272 stays paused.
