@@ -215,6 +215,23 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
         markers[first].add(last)
         observed += 1
 
+    # Source XML can encode a passage in a non-scripCom attribute or as
+    # editorial prose. Record only short location attributes for diagnosis.
+    nearby_attributes = defaultdict(list)
+    for node in document.iter():
+        if not isinstance(node.tag, str):
+            continue
+        for attr, value in node.attrib.items():
+            if len(value) > 256:
+                continue
+            for start in suspect_starts:
+                if re.search(re.escape(start) + r"(?![0-9])", value):
+                    if len(nearby_attributes[start]) < 8:
+                        nearby_attributes[start].append({
+                            "xml_tag": node.tag.rsplit("}", 1)[-1],
+                            "attribute_name": attr.rsplit("}", 1)[-1],
+                            "attribute_value": value
+                        })
     def relation(section: dict) -> str:
         first = section["start"]
         last = first.rsplit(".", 1)[0] + "." + str(section["declared_end"])
@@ -239,6 +256,9 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
         ],
         "unparsed_source_reference_candidates_near_anomalies": {
             start: values for start, values in sorted(unresolved_near_candidates.items())
+        },
+        "source_attributes_near_anomalies": {
+            start: values for start, values in sorted(nearby_attributes.items())
         },
         "ccel_edition_equivalence_to_stock_proven": False,
         "editorial_correctness_proven": False,
