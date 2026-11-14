@@ -80,6 +80,107 @@ def heading_extent(raw: bytes) -> tuple[tuple[int, ...], str] | None:
     return None
 
 
+
+def describe_unrecognized_heading(raw: bytes) -> dict:
+    """Classify an unexplained *native occupied slot*, never infer lost prose.
+
+    Use only fixed classes, XML element names and counts. Do not emit any
+    authorial words, original XML, scripture text or free-form snippets.
+    """
+    if not raw.strip():
+        return {"reason": "EMPTY_RAW_PAYLOAD", "has_title": False}
+    if len(raw) > 2 * 1024 * 1024 or b"\x00" in raw:
+        return {"reason": "UNSAFE_OR_OVERSIZE_RAW", "has_title": False}
+    try:
+        root = etree.fromstring(
+            b"<entry>" + raw + b"</entry>",
+            parser=etree.XMLParser(
+                resolve_entities=False, no_network=True, load_dtd=False,
+                recover=False, huge_tree=False, remove_blank_text=False
+            )
+        )
+        if any(isinstance(el, etree._Entity) for el in root.iter()):
+            return {"reason": "UNRESOLVED_XML_ENTITY", "has_title": False}
+    except (ValueError, etree.XMLSyntaxError):
+        return {"reason": "INVALID_XML_FRAGMENT", "has_title": False}
+    visible = "".join(root.itertext())
+    titles = [
+        n for n in root.iter()
+        if isinstance(n.tag, str)
+        and n.tag.rsplit("}", 1)[-1] in {"title", "h1", "h2", "h3", "h4", "h5", "h6"}
+    ]
+    if not visible.strip():
+        reason = "NO_VISIBLE_PROSE"
+    elif HEADING.search(visible[:3000]):
+        # The heading is legible but rejected for an invalid/ambiguous span.
+        reason = "UNSUPPORTED_NUMBERED_SPAN"
+    elif HEADING.search(visible[3000:]):
+        reason = "NUMBERED_HEADING_AFTER_SCAN_LIMIT"
+    elif re.search(r"\bVerses?\b", visible, re.IGNORECASE):
+        reason = "UNPARSED_VERSE_LABEL"
+    elif titles:
+        reason = "NON_NUMERIC_XML_TITLE"
+    else:
+        reason = "UNLABELLED_VISIBLE_PROSE"
+    return {
+        "reason": reason,
+        "has_title": bool(titles),
+        "title_node_count": len(titles),
+        "visible_nonempty": bool(visible.strip()),
+        "raw_bytes": len(raw),
+    }
+
+
+def audit_unrecognized_slots(records: dict[str, dict]) -> dict:
+    """Classify each row once and detect duplicates without guessing ranges."""
+    from collections import defaultdict
+    hash_refs = defaultdict(list)
+    for ref, row in records.items():
+        hash_refs[row["sha256"]].append(ref)
+    categories = Counter()
+    books = defaultdict(Counter)
+    rows = []
+    for ref, item in records.items():
+        if item.get("heading") is not None:
+            continue
+        profile = item.get("unrecognized_profile")
+        if profile is None:
+            raise PilotError("Original unrecognized stock payload was not profiled")
+        linked_refs = hash_refs[item["sha256"]]
+        shared_with_recognized = [
+            key for key in linked_refs
+            if records[key].get("heading") is not None
+        ]
+        result = {
+            "native_key": ref,
+            "category": profile["reason"],
+            "raw_payload_sha256": item["sha256"],
+            "same_raw_payload_slot_count": len(linked_refs),
+            "same_payload_with_recognized_heading": bool(shared_with_recognized),
+            "same_payload_with_unrecognized_heading": len(linked_refs) > 1,
+            "first_verse_in_chapter": bool(ref.endswith(".1")),
+            "xml_title_present": profile["has_title"],
+            "visible_nonempty": profile.get("visible_nonempty", False),
+        }
+        rows.append(result)
+        categories[profile["reason"]] += 1
+        books[ref.split(".", 1)[0]][profile["reason"]] += 1
+    return {
+        "total": len(rows),
+        "reason_counts": dict(sorted(categories.items())),
+        "reason_counts_by_book": {
+            book: dict(sorted(classes.items())) for book, classes in sorted(books.items())
+        },
+        "shares_content_with_recognized_heading": sum(
+            row["same_payload_with_recognized_heading"] for row in rows
+        ),
+        "distinct_native_raw_payload_hashes": len({row["raw_payload_sha256"] for row in rows}),
+        "case_rows": rows,
+        "unrecognized_means_missing_text_proven": False,
+        "all_output_is_original_text_free_metadata": True,
+    }
+
+
 def classify(records: dict[str, dict]) -> dict:
     """Compare declared start-anchored headings with real occupied key payloads.
 
@@ -360,8 +461,13 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
                 heading = heading_extent(raw)
                 if heading is None and raw.strip():
                     unparsed += 1
-                records[ref] = {"sha256": sha256(raw).hexdigest(),
-                                "heading": heading}
+                records[ref] = {
+                    "sha256": sha256(raw).hexdigest(),
+                    "heading": heading,
+                    "unrecognized_profile": (
+                        describe_unrecognized_heading(raw) if heading is None else None
+                    ),
+                }
             summary, keys, intros, top = parse_native_raw_corpus(
                 process.stdout, on_entry=on_entry
             )
@@ -381,6 +487,9 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         if not expected_raw or expected_raw != actual_raw:
             raise PilotError("Original full native corpus hash drift")
         result = classify(records)
+        unknown = audit_unrecognized_slots(records)
+        if unknown["total"] != result["counts"]["no_recognized_heading"]:
+            raise PilotError("Unrecognized heading count diverged from complete native inventory")
         witness = compare_independent_thml_witness(
             manifest, result["start_anchored_section_map"],
             result["anomalies"], directory)
@@ -394,6 +503,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
             "native_full_key_crosscheck": proof["exact_all_occupied_stock_keys_read_and_crosschecked"],
             "native_rows_with_unrecognized_heading_or_xml": unparsed,
             **result,
+            "unrecognized_native_slot_review": unknown,
             "independent_thml_witness": witness,
             "section_heading_matching_is_heuristic": True,
             "independent_edition_range_comparison_completed": witness["status"].startswith("PINNED"),
