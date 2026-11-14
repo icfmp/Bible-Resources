@@ -172,7 +172,10 @@ class WholeChapterSourceTriageTests(unittest.TestCase):
             chapter_verse_maximums={r["native_start"].rsplit(".",1)[0]:20
                                     for r in cases},
             independent_chapter_cases=cases,
-            original_chapter_intro_has_visible_prose={"Lev.1":True}
+            original_chapter_intro_has_visible_prose={
+                "Gen.1":False, "Exod.1":False,
+                "Lev.1":True, "Num.1":False
+            }
         )
         self.assertEqual(observed["classes"],{
             "NO_SAFE_INDEPENDENT_UNDIVIDED_CHAPTER_SCOPE":1,
