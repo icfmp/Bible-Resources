@@ -107,6 +107,63 @@ jobs:
           print("Synthetic SWORD linked-commentary readback PASSED:",
                 len(expected), "occupied target verses; independent gap preserved")
           PY
+      - name: Probe original SWORD book and chapter introduction index mapping using invented OSIS
+        run: |
+          set -euo pipefail
+          ROOT="${RUNNER_TEMP}/synthetic-introductions"
+          mkdir -p "$ROOT/mods.d" "$ROOT/modules/comments/zcom/IntroProof"
+          timeout 45s osis2mod "$ROOT/modules/comments/zcom/IntroProof" \
+            tests/fixtures/synthetic-commentary-introductions.osis.xml \
+            -z z -b 3 -v KJV > "$ROOT/osis2mod.log" 2>&1
+          cat > "$ROOT/mods.d/IntroProof.conf" <<'CONF'
+          [IntroProof]
+          DataPath=./modules/comments/zcom/IntroProof
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          SourceType=OSIS
+          Versification=KJV
+          Lang=en
+          Description=Invented original-source introduction index diagnostic only
+          CONF
+          SWORD_PATH="$ROOT" timeout 60s "${RUNNER_TEMP}/stock-raw" IntroProof > "$ROOT/native.raw"
+          PYTHONPATH=scripts python - "$ROOT/native.raw" <<'PY'
+          from collections import Counter
+          import sys
+          from pathlib import Path
+          from lxml import etree
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          intro={}
+          top={}
+          K={}
+          def collect(kind, ref, raw):
+              if kind=="I":
+                  intro[ref]=raw
+              elif kind=="U":
+                  top[ref]=raw
+              else:
+                  K[ref]=raw
+          with Path(sys.argv[1]).open("rb") as stream:
+              report, numbered, intros, opaque=parse_native_raw_corpus(stream,on_entry=collect)
+          print("Invented book+chapter intro OSIS native keys",
+                "K",len(numbered),"I",len(intros),"U",len(opaque),
+                "I-refs",",".join(intros),"U-refs",",".join(opaque))
+          for ref,raw in intro.items():
+              root=etree.fromstring(b"<r>"+raw+b"</r>")
+              print("Invented SWORD intro slot",ref,
+                    "raw-bytes",len(raw),
+                    "nonblank-text",bool("".join(root.itertext()).strip()),
+                    "child-tags",','.join(x.tag.rsplit('}',1)[-1] for x in root))
+          for ref,raw in top.items():
+              root=etree.fromstring(b"<r>"+raw+b"</r>")
+              print("Invented SWORD opaque top slot",ref,
+                    "raw-bytes",len(raw),
+                    "nonblank-text",bool("".join(root.itertext()).strip()),
+                    "child-tags",','.join(x.tag.rsplit('}',1)[-1] for x in root))
+          assert {"Gen.1.1","Gen.1.2","Gen.2.1"} <= set(K)
+          assert "Gen.1.3" not in K
+          print("Invented introduction mapping exploration complete; no original module modified.")
+          PY
       - name: Prove isolated native zCom alias links preserve all existing raw entries
         run: |
           set -euo pipefail
