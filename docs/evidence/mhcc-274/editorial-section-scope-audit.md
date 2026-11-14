@@ -168,3 +168,83 @@ This is **not** a historical Matthew Henry text-parity certificate: headings and
 The reader-first indexing policy still holds: when a section is *actually established* as whole chapter, make it discoverable from all canonical chapter verses by **linked references to one unchanged comment**, displayed **once**, never copied as distinct authored comments. A reviewable candidate can be designed against the real 31,102-key KJV registry, with an upper bound of **2,285** possible new navigation keys for these 118 chapters. **None has been added.** The 17 explicit original indexing omissions across 24 missing native keys remain separate from this optional chapter-level navigation upgrade.
 
 **Next:** investigate the seven one-word discrepancies and Neh 1 extra prefix against original XML/stock markup; determine whether 2Chr 1 prefix is genuinely the first chapter exposition rather than a book introduction; verify exact source paragraph and intro fidelity and cross-reference targets before proposing reviewed changes. Keep CrossWire original + BRMHCC 0.1.0 untouched, PR #275 draft, modern-English MHCC #270/#272 paused and any publication blocked until explicit decision.
+
+
+## Fifth pass — the nine exceptional chapter-body witnesses, original markup positions (2026-11-14)
+
+The full original MHCC stock plus separately SHA-pinned CCEL XML has been
+re-scanned on head `bdc7ce7ff3e5b03d0bd892c402465af37ad06883`.
+[Editorial scope Action #43619310392](https://github.com/icfmp/Bible-Resources/actions/runs/43619310392)
+**PASS** (41 generic editorial tests + 14 read-only link-plan tests), as were
+[Validate #43619310411](https://github.com/icfmp/Bible-Resources/actions/runs/43619310411),
+[reference targets #43619310358](https://github.com/icfmp/Bible-Resources/actions/runs/43619310358),
+[original text #43619310352](https://github.com/icfmp/Bible-Resources/actions/runs/43619310352),
+[raw stream #43619310375](https://github.com/icfmp/Bible-Resources/actions/runs/43619310375)
+and [source/native research #43619310378](https://github.com/icfmp/Bible-Resources/actions/runs/43619310378).
+
+### Seven isolated one-word source differences
+
+The seven one-word CCEL/CrossWire differences are each a **one-character**
+insertion/deletion at the *same word position*. The actual unchanged
+CrossWire XML owner was checked with original native text offsets, including
+a regression for expanding Unicode casefolds.
+
+| Chapter | Original stock XML owner | Digital-witness edit shape |
+| --- | --- | --- |
+| Gen 38 | `reference` | one character deleted in stock |
+| 2 Sam 22 | root-level tail text | one character inserted in stock |
+| 1 Chr 7 | root-level tail text | one character deleted in stock |
+| 1 Chr 17 | `reference` | one character deleted in stock |
+| Job 25 | `reference` | one character inserted in stock |
+| Ps 70 | root-level tail text | one character inserted in stock |
+| Jer 45 | root-level tail text | one character deleted in stock |
+
+**Not** seven missing commentary passages; **not** proof that one spelling
+or cited reference label should replace the other. The original differing
+words and XML never left private CI; the four prose cases still require
+exact editorial source review before any change. The three
+`reference`-element variations require **independent destination and label
+checks**, not an automatic word-normalization rule.
+
+### Two stock-only title/prefix additions
+
+- **2 Chr 1** — all 129 source-prefix words occur in the same order as the
+  ending 129 words of the 131-word native entry. The two extra leading words
+  are a complete original stock `title` element whose text matches **exactly**
+  both the original CCEL `div1 title` attribute and the original preceding
+  book H1. This strongly identifies the addition as sourced book-title
+  metadata, *not* 2 missing authorial words. The CCEL ThML source body is
+  unwrapped in its `div1`, before Chapter 2's first `div2`. However the
+  CCEL **web presentation** and a separate digital presentation attribute
+  that specific Solomon-themed body to **2 Chronicles chapter 1**:
+  [CCEL concise 2 Chronicles page](https://ccel.org/ccel/henry/mhcc/mhcc.xv.html);
+  [Christianity.com chapter 1](https://www.christianity.com/bible/commentary/matthew-henry-concise/2-chronicles/1).
+  This supplies further strong editorial **chapter-scope corroboration** for
+  the previously unassigned source `div1` prefix. It is still not a matching
+  print-edition facsimile and not yet an approved compiled link delta.
+- **Neh 1** — all 239 original source `div2` words occur in the same order
+  as the final 239 words of the 268-word original stock entry. The 29 extra
+  leading words include a separate original stock `title` element whose
+  text matches **exactly** the source CCEL `div1 title` attribute.
+  Original source-body word boundary lies *within another stock title*;
+  provenance/typography of all extra leading words remains to be reviewed.
+  The 239-word authorial body was not demonstrated lost.
+
+Both stock/source suffixes have one punctuation/nonword gap difference by
+the existing text-free comparator. This requires fidelity review but cannot
+be called an error without checking the exact digital edition conventions.
+
+### Cautions and next gate
+
+This diagnostic is **non-destructive** and source-neutral. It never exports
+the original differing word values, modifies source text or assumes
+that a `scripRef` citation is the anchor of a commentary section.
+
+**Next:** review all seven one-character differences with a trustworthy
+identified edition; test the three navigational citation destinations;
+independently verify the chapter-first heading and original source
+introduction semantics, including 2 Chr 1 and Neh 1; then prepare an
+*explicitly reviewed* candidate full-verse linked-index map, correct separate
+disjoint spans (e.g. Matt 13), and test deduplicated rendering in a real
+reader. The exact original CrossWire module and published BRMHCC 0.1.0
+remain unchanged, and modern English #270/#272 is paused.
