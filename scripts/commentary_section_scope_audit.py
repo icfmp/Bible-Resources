@@ -1307,9 +1307,12 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
           synthetic_intro_native_stream: Path | None = None,
           intro_sample_chapters: tuple[str, ...] = (),
           mixed_sample_chapters: tuple[str, ...] = (),
-          full_transport: bool = False) -> dict:
+          full_transport: bool = False,
+          provisional_range_preview: bool = False) -> dict:
     """Use exact SHA-pinned official stock, existing independently proved readers."""
     manifest = load_manifest(resource_id)
+    if provisional_range_preview and not full_transport:
+        raise PilotError("Provisional range preview requires original complete transport")
     if (len(mixed_sample_chapters) > 3
             or len(set(mixed_sample_chapters)) != len(mixed_sample_chapters)
             or any(re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9]\d*", ref) is None
@@ -1547,6 +1550,29 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             valid_verse_keys=registry["verse_keys"],
             source_heading_anomalies=result["anomalies"],
         )
+        provisional_preview = None
+        if provisional_range_preview:
+            preliminary_aliases = {
+                target: {
+                    "link_to": row["original_master_key"],
+                    "source_raw_sha256": row["original_master_raw_sha256"],
+                }
+                for row in index_preflight["candidate_sections"]
+                for target in row["unoccupied_native_target_keys"]
+            }
+            # Technical-only candidate. Heading-derived scope is UNREVIEWED.
+            # No correction, approval, release or production source change.
+            preview_dir = directory / "range-index-preview-not-approved"
+            preview_dir.mkdir()
+            provisional_preview = probe_complete_original_transport(
+                private_full_I, private_full_K, original_opaque_top_records,
+                scratch=preview_dir, native_raw_binary=raw_binary,
+                provisional_index_aliases=preliminary_aliases,
+            )
+            provisional_preview["source_scope_editorially_approved"] = False
+            provisional_preview["preflight_candidate_section_count"] = (
+                index_preflight["candidate_section_count"]
+            )
         unknown = audit_unrecognized_slots(records)
         if unknown["total"] != result["counts"]["no_recognized_heading"]:
             raise PilotError("Unrecognized heading count diverged from complete native inventory")
@@ -1603,6 +1629,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 mixed_probes,
             "private_complete_original_I_K_U_osis2mod_roundtrip":
                 full_probe,
+            "private_provisional_range_index_preview_not_approved":
+                provisional_preview,
             "native_rows_with_unrecognized_heading_or_xml": unparsed,
             **result,
             "explicit_heading_native_link_candidate_preflight": index_preflight,
@@ -1627,6 +1655,8 @@ def main(argv=None) -> int:
                         help="Strict private mixed original book I, chapter I and K native OSIS roundtrips")
     parser.add_argument("--temporary-original-full-transport", action="store_true",
                         help="Attempt isolated whole-original I/K OSIS compile and independent TOP reconciliation")
+    parser.add_argument("--temporary-provisional-range-index-preview", action="store_true",
+                        help="Experimentally compile heading-derived missing links; editorial approval explicitly absent")
     parser.add_argument("--synthetic-intro-native-stream", type=Path,
                         help="Optional invented standalone OSIS compilation raw stream, compare TOP bytes only")
     parser.add_argument("--native-index-binary", type=Path, required=True)
@@ -1640,7 +1670,8 @@ def main(argv=None) -> int:
             synthetic_intro_native_stream=args.synthetic_intro_native_stream,
             intro_sample_chapters=tuple(args.temporary_original_intro_sample_chapters),
             mixed_sample_chapters=tuple(args.temporary_original_mixed_chapters),
-            full_transport=args.temporary_original_full_transport
+            full_transport=args.temporary_original_full_transport,
+            provisional_range_preview=args.temporary_provisional_range_index_preview
         )
         code = 0
     except (OSError, RuntimeError, ValueError, zipfile.BadZipFile, RawCorpusError) as exc:
