@@ -161,6 +161,10 @@ class SafeLexicalEvidenceTests(unittest.TestCase):
         )
         self.assertEqual(r["overlap_class"], "HIGH_95_PLUS")
         self.assertTrue(r["exact_ordered_word_equality"])
+        self.assertEqual(
+            r["ordered_word_alignment"]["exact_unicode_ordered_alignment_class"],
+            "plain_words_exactly_identical_in_original_order"
+        )
         self.assertFalse(r["historical_or_editorial_equivalence_proven"])
         self.assertNotIn("Wisdom", str(r))
 
@@ -170,6 +174,17 @@ class SafeLexicalEvidenceTests(unittest.TestCase):
             b"<p>One two three four five six seven</p>",
         )
         self.assertEqual(r["overlap_class"], "LOW_OVERLAP")
+
+    def test_multiset_cannot_hide_word_order_changes(self):
+        r = independent_lexical_overlap(
+            "faith hope charity truth",
+            b"<p>truth charity hope faith</p>",
+        )
+        self.assertEqual(r["overlap_class"], "HIGH_95_PLUS")
+        self.assertNotEqual(
+            r["ordered_word_alignment"]["exact_unicode_ordered_alignment_class"],
+            "plain_words_exactly_identical_in_original_order"
+        )
 
     def test_xml_failure_does_not_claim_a_match(self):
         r = independent_lexical_overlap(
