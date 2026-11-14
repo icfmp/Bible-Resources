@@ -1,0 +1,33 @@
+{
+  "all_native_original_keys_byte_identical": true,
+  "all_original_compressed_files_byte_identical": true,
+  "compressed_members_sha256_by_filename": {
+    "nt.bzs": "a5d66fb4ea0110ef65d1a64c6dbc7eb8adf07ef660a60334cd6450c08d6c886c",
+    "nt.bzv": "93d9de386728b0e5204145c7485ddd08b76186f2caff1782ecfbc714ff39951a",
+    "nt.bzz": "7da3aa7f4d32045e7272c5077c1a9f5e5a0c7ac220b0aa82f946d06b7eaa81a5",
+    "ot.bzs": "c01f5db909ef824a86cff8f990d07c7cd1dc90dae8f19a11c00b4e453eda6487",
+    "ot.bzv": "6f3525da8a883304d3781ca671931e4de01cc848ff759596a6ab0e245fa56525",
+    "ot.bzz": "ddf95b44d31cb888852a428e529a6ebbced30a9e174b179762c4553907f44a11"
+  },
+  "curated_conf_sha256": "f7388227095f5d0e3f8084bacd28eb71e33bf8b309401279342143ca70f66c29",
+  "curated_module_id": "BRMHCC",
+  "curated_version": "0.1.0",
+  "gui_other_reader_compatibility_claimed": false,
+  "historical_print_or_ccel_parity_claimed": false,
+  "native_key_count": 29975,
+  "native_raw_corpus_sha256": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6",
+  "no_original_source_text_edited": true,
+  "only_source_metadata_relabelled": [
+    "section_id",
+    "DataPath",
+    "Version"
+  ],
+  "schema_version": 1,
+  "source_intake_manifest": "config/commentary-intake/mhcc-crosswire.json",
+  "source_kind": "compiled_sword_stock",
+  "status": "validated",
+  "upstream_archive_sha256": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+  "upstream_conf_sha256": "2762a04757ec3ee14bcf5d442fedcd47d2b938d573de4e9100a31aa073bc5863",
+  "upstream_module_id": "MHCC",
+  "upstream_version": "2.0"
+}

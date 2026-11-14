@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "id": "mhcc-crosswire",
+  "canonical_edition_id": "matthew-henry-concise-crosswire-2.0",
+  "sword_id": "BRMHCC",
+  "title": {
+    "en": "Matthew Henry's Concise Commentary on the Whole Bible",
+    "fr": "Commentaire concis de Matthew Henry sur toute la Bible"
+  },
+  "category": "commentary",
+  "language": "en",
+  "version": "0.1.0",
+  "versification": "KJV",
+  "origin": {
+    "publisher": "CrossWire / SWORD Project",
+    "url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=MHCC",
+    "source_revision": "MHCC 2.0 (2021-02-14), archived original ZIP SHA-256 5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d"
+  },
+  "rights": {
+    "license": "Public Domain",
+    "evidence_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=MHCC",
+    "redistribution_allowed": true,
+    "derivatives_allowed": true,
+    "reviewed_by": "Bible Resources project owner — 2026-11-14 direction to proceed with exact CrossWire PD stock, not separately licensed CCEL content"
+  },
+  "quality": {
+    "status": "approved",
+    "edition": "faithful",
+    "smoke_key": "Gen 1:1",
+    "reviewed_by": "Bible Resources project owner — 2026-11-14 exact-source release instruction; Xiphos 4.2.1 reader smoke evidence accepted"
+  },
+  "upstreams": [
+    {
+      "provider": "crosswire",
+      "module_id": "MHCC",
+      "last_integrated_version": "2.0",
+      "last_integrated_conf_sha256": "2762a04757ec3ee14bcf5d442fedcd47d2b938d573de4e9100a31aa073bc5863"
+    }
+  ],
+  "index_audit": {
+    "mode": "stock_reader_keys"
+  }
+}
