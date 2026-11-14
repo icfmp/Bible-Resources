@@ -41,6 +41,60 @@ KEY = re.compile(r"^([1-4]?[A-Za-z][A-Za-z0-9]*)\.([1-9]\d*)\.([1-9]\d*)$")
 PROBES = ("Song.1.7", "Jer.4.1", "Jer.4.3")
 
 
+def independent_lexical_overlap(source_text: str, stock_raw: bytes) -> dict:
+    """Compare word-multiset overlap in memory, emitting NO original words.
+
+    This is diagnostic cross-edition evidence, not exact text parity:
+    punctuation, sequence, markup, source edition and omitted prose must be
+    audited independently before authorising a derivative.
+    """
+    if (not isinstance(source_text, str) or not isinstance(stock_raw, bytes)
+            or len(source_text) > 2 * 1024 * 1024
+            or len(stock_raw) > 2 * 1024 * 1024 or b"\x00" in stock_raw):
+        return {"status": "UNREVIEWED_OR_OVERSIZE", "source_text_equal": False}
+    try:
+        fragment = etree.fromstring(
+            b"<entry>" + stock_raw + b"</entry>",
+            parser=etree.XMLParser(
+                resolve_entities=False, no_network=True, load_dtd=False,
+                recover=False, huge_tree=False, remove_blank_text=False
+            )
+        )
+        if any(isinstance(n, etree._Entity) for n in fragment.iter()):
+            return {"status": "UNRESOLVED_XML_ENTITY", "source_text_equal": False}
+        stock_text = "".join(fragment.itertext())
+    except (ValueError, etree.XMLSyntaxError):
+        return {"status": "UNPARSEABLE_ORIGINAL_RAW", "source_text_equal": False}
+    original = re.findall(r"\w+", source_text.casefold())
+    compiled = re.findall(r"\w+", stock_text.casefold())
+    if not original or not compiled or len(original) > 100000 or len(compiled) > 100000:
+        return {"status": "EMPTY_OR_OVERSIZE_LEXICAL_UNITS", "source_text_equal": False}
+    common = sum((Counter(original) & Counter(compiled)).values())
+    source_pct = round(common * 100 / len(original))
+    stock_pct = round(common * 100 / len(compiled))
+    least = min(source_pct, stock_pct)
+    classification = (
+        "HIGH_95_PLUS" if least >= 95 else
+        "HIGH_80_PLUS" if least >= 80 else
+        "MODERATE_50_PLUS" if least >= 50 else "LOW_OVERLAP"
+    )
+    return {
+        "status": "INDEPENDENT_DIGITAL_EDITION_DIAGNOSTIC_ONLY",
+        "source_word_count": len(original),
+        "stock_word_count": len(compiled),
+        "matched_word_multiset_count": common,
+        "source_word_overlap_percent": source_pct,
+        "stock_word_overlap_percent": stock_pct,
+        "overlap_class": classification,
+        "exact_ordered_word_equality": original == compiled,
+        "source_text_equal": source_text == stock_text,
+        "historical_or_editorial_equivalence_proven": False,
+        "authorial_prose_modified": False,
+    }
+
+
+
+
 def heading_extent(raw: bytes) -> tuple[tuple[int, ...], str] | None:
     """Return a tentative single-chapter extent, without editing original text.
 
@@ -418,7 +472,8 @@ def independent_chapter_scope_evidence(document, unrecognized_cases: list[dict])
 
 
 def independent_div2_chapter_body_evidence(document, native_registry: dict,
-                                          unrecognized_cases: list[dict]) -> dict:
+                                          unrecognized_cases: list[dict],
+                                          stock_unknown_raw: dict[str, bytes] | None = None) -> dict:
     """Collate chapter wrappers in canonical order, verifying book identities.
 
     Source order alone is never authority: each div1 must be the expected book
@@ -473,6 +528,7 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
             "case_rows": [], "scope_authorized": False
         }
     source_chapters = {}
+    private_book_prefix_text = {}
     explicit_source_chapters = {}
     ambiguous_source_heading_chapters = set()
     book_classes = Counter()
@@ -538,6 +594,12 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
                         prefix_heading_numbers.add(int(number))
                 if kind == "p":
                     prefix_nonempty_paragraphs += bool("".join(element.itertext()).strip())
+        private_book_prefix_text[code] = " ".join(
+            "".join(node.itertext())
+            for element in source_prefix_nodes
+            for node in element.iter()
+            if isinstance(node.tag, str) and node.tag.rsplit("}", 1)[-1] == "p"
+        )
         book_evidence_rows.append({
             "native_book": code,
             "title_alias_candidate_books": sorted(candidates),
@@ -609,6 +671,7 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
                 ).hexdigest(),
                 "source_div2_original_text_retained": True,
                 "source_div2_ordinal": chapter_number,
+                "_private_source_visible_text": "".join(div2.itertext()),
             }
             if (identity == "SOURCE_CHAPTER_COUNT_DIFFERS_FROM_NATIVE_REGISTRY"
                     and candidates == {code} and annotated_books == {code}
@@ -671,7 +734,22 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
         else:
             classification = "SOURCE_DIV2_UNDIVIDED_CHAPTER_BODY_CANDIDATE"
         classes[classification] += 1
+        lexical = None
+        if stock_unknown_raw and row["native_key"] in stock_unknown_raw:
+            # For a source div2, compare that chapter's actual private source
+            # unit; for a missing first div2, compare the prefix *as a probe*
+            # and never silently call it the authored first chapter.
+            source_text = (
+                source["_private_source_visible_text"] if source is not None
+                else private_book_prefix_text.get(chapter.split(".", 1)[0])
+                if chapter.endswith(".1") else None
+            )
+            if source_text is not None:
+                lexical = independent_lexical_overlap(
+                    source_text, stock_unknown_raw[row["native_key"]]
+                )
         cases.append({
+            "independent_lexical_comparison": lexical,
             "native_start": row["native_key"],
             "source_div2_structure_class": classification,
             "source_chapter_alignment_method": alignment_method,
@@ -686,8 +764,14 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
             "source_text_to_stock_text_identity_proven": False,
             "approved_for_native_index_expansion": False,
         })
+    word_classes = Counter(
+        row["independent_lexical_comparison"].get("overlap_class", "UNREVIEWED")
+        for row in cases if row["independent_lexical_comparison"] is not None
+    )
     return {
         "status": "SOURCE_DIV2_STRUCTURE_COLLATED_NO_REINDEX_AUTHORIZATION",
+        "independent_stock_vs_source_lexical_diagnostic_classes":
+            dict(sorted(word_classes.items())),
         "source_book_divisions": len(chapters_div1),
         "unattributed_noncanonical_div1_with_div2_excluded": excluded_unattributed_div1,
         "native_book_count": len(canonical_books),
@@ -705,7 +789,8 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
 def compare_independent_thml_witness(manifest: dict, sections: list[dict],
                                      anomalies: list[dict], temp: Path,
                                      unrecognized_cases: list[dict] | None = None,
-                                     native_registry: dict | None = None) -> dict:
+                                     native_registry: dict | None = None,
+                                     stock_unknown_raw: dict[str, bytes] | None = None) -> dict:
     """Compare all start/end section locations with a separately pinned ThML.
 
     Different digital editions are never automatically assumed identical;
@@ -871,7 +956,7 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
     chapter_scopes = independent_chapter_scope_evidence(document, unrecognized_cases or [])
     div2_scopes = (
         independent_div2_chapter_body_evidence(
-            document, native_registry, unrecognized_cases or []
+            document, native_registry, unrecognized_cases or [], stock_unknown_raw
         ) if native_registry is not None else {
             "status": "NO_NATIVE_REGISTRY_PROVIDED",
             "case_rows": [], "derived_authorial_section_scope_proven": False
@@ -967,6 +1052,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
             raise PilotError("Independent native index and registry module identity differ")
         rows = []
         records = {}
+        private_unrecognized_raw = {}
         unparsed = 0
         process = None
         try:
@@ -984,6 +1070,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
                 heading = heading_extent(raw)
                 if heading is None and raw.strip():
                     unparsed += 1
+                    private_unrecognized_raw[ref] = raw
                 records[ref] = {
                     "sha256": sha256(raw).hexdigest(),
                     "heading": heading,
@@ -1017,7 +1104,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
             raise PilotError("Unrecognized heading count diverged from complete native inventory")
         witness = compare_independent_thml_witness(
             manifest, result["start_anchored_section_map"],
-            result["anomalies"], directory, unknown["case_rows"], registry)
+            result["anomalies"], directory, unknown["case_rows"],
+            registry, private_unrecognized_raw)
         # A native single-key chapter plus an independently corroborated
         # source division still needs explicit editorial signoff. These are
         # chapter-limit *measurements*, not link insertion instructions.
