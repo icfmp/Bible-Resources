@@ -11,7 +11,7 @@ from lxml import etree
 from commentary_section_scope_audit import (
     heading_extent, classify, compare_independent_thml_witness,
     describe_unrecognized_heading, audit_unrecognized_slots,
-    independent_chapter_scope_evidence,
+    independent_chapter_scope_evidence, independent_div2_chapter_body_evidence,
 )
 
 
@@ -196,6 +196,72 @@ class ChapterScopeEvidenceTests(unittest.TestCase):
         self.assertEqual(result["source_scope_candidate_classes"],
                          {"NO_MATCHING_CHAPTER_ANNOTATION_IN_OTHER_EDITION": 1})
         self.assertFalse(result["per_verse_navigation_approved"])
+
+
+
+class SourceDivisionChapterTests(unittest.TestCase):
+    def test_undivided_source_chapter_with_title_and_order_witness(self):
+        document = etree.fromstring(
+            b'<root><div1 title="Genesis"><div2><h2>Chapter 1</h2>'
+            b'<p>Independent chapter exposition</p></div2></div1>'
+            b'<div1 title="Exodus"><div2><h2>Chapter 1</h2>'
+            b'<p>Another exposition</p></div2></div1></root>'
+        )
+        registry = {"chapter_maximums": {"Gen.1":31, "Exod.1":22}}
+        cases = [{
+            "native_key": "Gen.1.1", "first_verse_in_chapter": True,
+            "number_of_occupied_native_slots_in_chapter": 1,
+            "raw_payload_sha256": "a" * 64,
+        }]
+        result = independent_div2_chapter_body_evidence(
+            document, registry, cases
+        )
+        self.assertEqual(result["candidate_classes"], {
+            "SOURCE_DIV2_UNDIVIDED_CHAPTER_BODY_CANDIDATE": 1
+        })
+        self.assertFalse(result["derived_authorial_section_scope_proven"])
+
+    def test_same_book_chapter_intro_with_numbered_comments_is_not_whole_chapter(self):
+        document = etree.fromstring(
+            b'<root><div1 title="Genesis"><div2><h2>Chapter 1</h2>'
+            b'<scripCom osisRef="Bible:Gen.1.1-Gen.1.5"/>'
+            b'<div><p>First commentary section</p></div></div2></div1></root>'
+        )
+        registry = {"chapter_maximums": {"Gen.1":31}}
+        cases = [{
+            "native_key": "Gen.1.1", "first_verse_in_chapter": True,
+            "number_of_occupied_native_slots_in_chapter": 1,
+            "raw_payload_sha256": "a" * 64,
+        }]
+        result = independent_div2_chapter_body_evidence(
+            document, registry, cases
+        )
+        self.assertEqual(result["candidate_classes"], {
+            "SOURCE_DIV2_HAS_INDEPENDENT_VERSE_SECTIONS": 1
+        })
+
+    def test_conflicting_source_book_title_never_approves_a_reindex(self):
+        document = etree.fromstring(
+            b'<root><div1 title="Exodus"><div2><p>Text</p></div2></div1></root>'
+        )
+        registry = {"chapter_maximums": {"Gen.1":31}}
+        cases = [{
+            "native_key": "Gen.1.1", "first_verse_in_chapter": True,
+            "number_of_occupied_native_slots_in_chapter": 1,
+            "raw_payload_sha256": "a" * 64,
+        }]
+        result = independent_div2_chapter_body_evidence(document, registry, cases)
+        self.assertEqual(result["candidate_classes"], {
+            "SOURCE_BOOK_OR_CHAPTER_ALIGNMENT_NEEDS_REVIEW": 1
+        })
+
+    def test_partial_source_book_coverage_is_not_accepted(self):
+        document = etree.fromstring(
+            b'<root><div1 title="Genesis"><div2><p>Text</p></div2></div1></root>'
+        )
+        registry = {"chapter_maximums": {"Gen.1":31, "Exod.1":22}}
+        result = independent_div2_chapter_body_evidence(document, registry, [])
+        self.assertEqual(result["status"], "SOURCE_BOOK_LAYOUT_NOT_EXACT_NATIVE_BOOK_COUNT")
 
 
 class IndependentWitnessTests(unittest.TestCase):
