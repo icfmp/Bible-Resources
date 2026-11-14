@@ -146,3 +146,41 @@ passages, including deduplication and independent intermediate
 commentary. Only then propose a separately versioned corrected module
 for owner publication approval. BRMHCC 0.1.0 remains byte-immutable,
 and modern-English #270/#272 stays paused.
+
+
+## Authentic independent Xiphos preview — targeted passage navigation verified (2026-11-15)
+
+[Exact pinned-original private CI #43652204356](https://github.com/icfmp/Bible-Resources/actions/runs/43652204356)
+**SUCCESS**, including synthetic negative tests, the complete 29,975 original
+K/I/TOP corpus comparison, and 24/24 exact provisional additional SWORD
+verse-index aliases. The same runner installed a SHA-attested real published
+`BRLSG1910` Bible alongside the **temporary** corrected `BRIndexProbe`
+zCom, started the **actual independent Xiphos GTK program** in an isolated
+X11 session, selected proposed alias verses, and compared text copied from
+the actual commentary pane against the independent `diatheke` readback.
+
+| Actual proposed alias selected | `diatheke` alias/master shares ≥25 consecutive original words | Xiphos GTK passage accepted and actual commentary copied |
+| --- | --- | --- |
+| `Eccl.4.8` | Yes | **Yes** |
+| `Isa.21.12` | Yes | **Yes** |
+| `Matt.13.36` | Yes | **Yes** |
+| **Total** | **3/3** | **3/3** |
+
+Selection is source-neutral in the script: it chooses the largest original
+multi-verse alias group and representative aliases from other books; these
+are the resulting original MHCC cases, not hardcoded exceptions.
+
+This is **genuine reader use**, not merely a visible Xiphos window. The
+original commentary and biblical text are never uploaded to reports;
+screenshot pixels never leave the temporary X11 runner. The linked
+commentary content remains one original authorial raw section, not copied
+into 24 authored expositions.
+
+**Boundary:** this proves actual selected-verse retrieval on three real
+target keys, **not** full 24/24 visual passage QA, perfect paragraph layout,
+correct cross-reference click-through, or deduplication when a *whole
+chapter* is rendered as multiple verse keys. The complete native and
+`diatheke` indexed-payload gates cover all 24; whole-chapter reader
+deduplication is still a separate concern and must not be asserted as
+passed. Neither the published `BRMHCC` package nor the original CrossWire
+text was edited. Source scope/edition approval and publication remain held.
