@@ -25,6 +25,7 @@ from lxml import etree
 
 from commentary_intake import load_manifest
 from commentary_osis_rebuild_preflight import NativeOSISRebuildPreflight
+from commentary_osis_transport_probe import isolated_osis2mod_original_sample_roundtrip
 from commentary_navigation_link_plan import (
     parse_native_commentary_verse_registry, UnsafeCommentaryLinkPlan,
     triage_missing_native_section_links,
@@ -1224,9 +1225,16 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
     }
 
 
-def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
+def audit(resource_id: str, index_binary: Path, raw_binary: Path,
+          *, transport_sample_chapters: tuple[str, ...] = ()) -> dict:
     """Use exact SHA-pinned official stock, existing independently proved readers."""
     manifest = load_manifest(resource_id)
+    if (len(transport_sample_chapters) > 6
+            or len(set(transport_sample_chapters)) != len(transport_sample_chapters)
+            or any(re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9]\\d*",
+                                chapter) is None
+                   for chapter in transport_sample_chapters)):
+        raise PilotError("Unreviewed or excessive original chapter transport samples")
     for p in (index_binary, raw_binary):
         if not p.is_file() or p.is_symlink():
             raise PilotError("Trusted native SWORD inspector binary unavailable")
@@ -1278,6 +1286,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         rows = []
         records = {}
         private_unrecognized_raw = {}
+        temporary_original_sample_raw = []
+        original_sample_chapter_set = set(transport_sample_chapters)
         osis_rebuild_preflight = NativeOSISRebuildPreflight()
         unparsed = 0
         process = None
@@ -1294,6 +1304,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
                 osis_rebuild_preflight.observe(kind, ref, raw)
                 if kind != "K":
                     return
+                if ref.rsplit(".", 1)[0] in original_sample_chapter_set:
+                    temporary_original_sample_raw.append((ref, raw))
                 heading = heading_extent(raw)
                 if heading is None and raw.strip():
                     unparsed += 1
@@ -1328,6 +1340,17 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
             raise PilotError("Original full native corpus hash drift")
         if set(records) - registry["verse_keys"]:
             raise PilotError("Stock native occupied key escaped independent versification registry")
+        sample_probe = None
+        if original_sample_chapter_set:
+            observed_sample_chapters = {
+                ref.rsplit(".", 1)[0] for ref, _ in temporary_original_sample_raw
+            }
+            if observed_sample_chapters != original_sample_chapter_set:
+                raise PilotError("Some requested real original commentary sample chapters have no native keys")
+            sample_probe = isolated_osis2mod_original_sample_roundtrip(
+                temporary_original_sample_raw, scratch=directory,
+                native_raw_binary=raw_binary,
+            )
         result = classify(records)
         index_preflight = triage_missing_native_section_links(
             occupied={key: entry["sha256"] for key, entry in records.items()},
@@ -1378,6 +1401,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
             "native_intro_rows": len(intros), "native_top_rows": len(top),
             "native_full_key_crosscheck": proof["exact_all_occupied_stock_keys_read_and_crosschecked"],
             "original_osis_rebuild_structure_preflight": original_osis_rebuild_feasibility,
+            "private_numbered_only_osis2mod_sample_roundtrip": sample_probe,
             "native_rows_with_unrecognized_heading_or_xml": unparsed,
             **result,
             "explicit_heading_native_link_candidate_preflight": index_preflight,
@@ -1394,12 +1418,17 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--resource-id", required=True)
+    parser.add_argument("--temporary-numbered-sample-chapters", nargs="*", default=[],
+                        help="Read-only selected original chapters, temporary private OSIS conversion")
     parser.add_argument("--native-index-binary", type=Path, required=True)
     parser.add_argument("--native-raw-binary", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args(argv)
     try:
-        result = audit(args.resource_id, args.native_index_binary, args.native_raw_binary)
+        result = audit(
+            args.resource_id, args.native_index_binary, args.native_raw_binary,
+            transport_sample_chapters=tuple(args.temporary_numbered_sample_chapters)
+        )
         code = 0
     except (OSError, RuntimeError, ValueError, zipfile.BadZipFile, RawCorpusError) as exc:
         result = {
