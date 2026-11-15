@@ -18,6 +18,7 @@ from pathlib import Path
 import os
 import re
 import subprocess
+import zipfile
 
 from lxml import etree
 from pilot_preflight import PilotError
@@ -897,6 +898,152 @@ def _probe_private_alias_real_xiphos(root: Path, module_id: str, aliases: dict,
         "entire_edition_reader_presentation_approved": False,
         "source_prose_or_screenshot_uploaded": False,
         "published": False,
+    }
+
+
+
+def privately_stage_versioned_zcom_zip(
+        *, compiler_root: Path, compiled_module_id: str,
+        package_module_id: str, previous_version: str, proposed_version: str,
+        published_conf_template: bytes, scratch: Path,
+        native_raw_binary: Path) -> dict:
+    """Privately package an official-compiler zCom under its curated identity.
+
+    Reuses the *compiled native bytes* without patching them. ZIP is created
+    inside an auto-removed research directory, installed independently and
+    re-read with released libSWORD. Never uploads, releases or edits the
+    published module. This staging is intentionally not a distribution gate.
+    """
+    allowed_id=re.compile(r"[A-Za-z][A-Za-z0-9_]{0,79}")
+    version=re.compile(r"[0-9]+\.[0-9]+\.[0-9]+")
+    if (not allowed_id.fullmatch(compiled_module_id)
+            or not allowed_id.fullmatch(package_module_id)
+            or compiled_module_id==package_module_id
+            or not version.fullmatch(previous_version)
+            or not version.fullmatch(proposed_version)
+            or proposed_version==previous_version
+            or not isinstance(published_conf_template,bytes)
+            or len(published_conf_template)>128*1024
+            or b"\0" in published_conf_template
+            or not scratch.is_dir() or scratch.is_symlink()
+            or not native_raw_binary.is_file()
+            or native_raw_binary.is_symlink()):
+        raise ValueError("Unsafe original commentary private package identity")
+    source=compiler_root/"modules"/"comments"/"zcom"/compiled_module_id
+    if not source.is_dir() or source.is_symlink():
+        raise ValueError("Standard compiler zCom data unavailable")
+    files=sorted(source.iterdir(),key=lambda p:p.name)
+    if (not 2<=len(files)<=32 or any(
+            not p.is_file() or p.is_symlink()
+            or not re.fullmatch(r"[A-Za-z0-9_.-]{1,80}",p.name)
+            or p.stat().st_size>30*1024*1024 for p in files)):
+        raise ValueError("Unreviewed compiler zCom output")
+    try: conf=published_conf_template.decode("utf-8")
+    except UnicodeError:
+        raise ValueError("Unreviewed published SWORD metadata encoding") from None
+    if (conf.count(f"[{package_module_id}]")!=1
+            or conf.count(f"Version={previous_version}")!=1
+            or conf.count("ModDrv=zCom")!=1
+            or conf.count("SourceType=OSIS")!=1
+            or conf.count("Versification=KJV")!=1
+            or len(re.findall(r"^BlockType=(?:BOOK|CHAPTER)$",conf,re.M))!=1):
+        raise ValueError("Published reference configuration is not the approved source")
+    data_path=re.findall(r"^DataPath=(.*)$",conf,re.M)
+    target_path=f"./modules/comments/zcom/{package_module_id.lower()}/"
+    if len(data_path)!=1 or data_path[0]!=target_path:
+        raise ValueError("Published source configuration has an unexpected native path")
+    # -b 3 is the standard compiler's CHAPTER block type. Reusing
+    # the published BOOK header would misdescribe the *new* compiled bytes.
+    conf=conf.replace(f"Version={previous_version}",f"Version={proposed_version}")
+    conf=re.sub(r"^BlockType=(?:BOOK|CHAPTER)$","BlockType=CHAPTER",conf,
+                count=1,flags=re.M)
+    total_size=sum(p.stat().st_size for p in files)
+    if re.search(r"^InstallSize=\d+$",conf,re.M):
+        conf=re.sub(r"^InstallSize=\d+$",f"InstallSize={total_size}",
+                    conf,count=1,flags=re.M)
+    else:
+        conf+=f"\nInstallSize={total_size}\n"
+    if f"History_{proposed_version}=" in conf:
+        raise ValueError("Proposed version already exists in published source history")
+    conf+=(
+        f"\nHistory_{proposed_version}=Index-only section navigation corrections; "
+        "original commentary words and source references retained\n"
+    )
+    if conf.count(f"Version={proposed_version}")!=1:
+        raise ValueError("Staging metadata version collision")
+    members={f"mods.d/{package_module_id.lower()}.conf":conf.encode("utf-8")}
+    members.update({
+        f"modules/comments/zcom/{package_module_id.lower()}/{p.name}":
+        p.read_bytes()
+        for p in files
+    })
+    if sum(map(len,members.values()))>64*1024*1024:
+        raise ValueError("Oversize unpublished SWORD package content")
+    package=scratch/f"{package_module_id}-{proposed_version}.zip"
+    installed=scratch/"isolated-package-install"
+    if package.exists() or installed.exists():
+        raise ValueError("Refuse to overwrite earlier private SWORD staging")
+    def fixed_zip_item(name):
+        info=zipfile.ZipInfo(name,(1980,1,1,0,0,0))
+        info.compress_type=zipfile.ZIP_STORED
+        info.create_system=3
+        info.external_attr=0o100644<<16
+        return info
+    with zipfile.ZipFile(package,"w") as archive:
+        for name,payload in sorted(members.items()):
+            archive.writestr(fixed_zip_item(name),payload)
+    installed.mkdir()
+    with zipfile.ZipFile(package) as archive:
+        if sorted(archive.namelist())!=sorted(members):
+            raise ValueError("Private package entry inventory differs from source")
+        for info in archive.infolist():
+            if (info.filename not in members or
+                    archive.read(info)!=members[info.filename]):
+                raise ValueError("Private SWORD package cannot be reproduced")
+            dest=installed/info.filename
+            dest.parent.mkdir(parents=True,exist_ok=True)
+            dest.write_bytes(archive.read(info))
+    inventories={}
+    for id_,root in (
+            (compiled_module_id,compiler_root),
+            (package_module_id,installed)):
+        run=subprocess.run(
+            [str(native_raw_binary),id_],
+            env=dict(os.environ,SWORD_PATH=str(root)),
+            stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,
+            timeout=240,check=False
+        )
+        if run.returncode or len(run.stdout)>512*1024*1024:
+            raise ValueError("Native installed commentary package readback failed")
+        observed={"I":{},"K":{},"U":[]}
+        def collect(kind,key,raw):
+            if kind=="U":observed["U"].append(sha256(raw).digest())
+            else: observed[kind][key]=sha256(raw).digest()
+        parse_native_raw_corpus(BytesIO(run.stdout),on_entry=collect)
+        inventories[id_]=observed
+    before=inventories[compiled_module_id]
+    after=inventories[package_module_id]
+    if (before!=after or not before["K"]
+            or not before["I"] or not before["U"]):
+        raise ValueError("Private curated-identity installation changed native source records")
+    return {
+        "status":"PRIVATE_VERSIONED_SWORD_ZCOM_ZIP_ISOLATED_INSTALL_PARITY_NOT_PUBLICATION",
+        "curated_module_id":package_module_id,
+        "proposed_version":proposed_version,
+        "source_compiled_module_identity_changed_only_in_package":True,
+        "native_compiled_files_copied_without_recompression_or_byte_edits":True,
+        "compiled_file_count":len(files),
+        "staged_package_zip_sha256":sha256(package.read_bytes()).hexdigest(),
+        "staged_package_size_bytes":package.stat().st_size,
+        "original_native_I_count":len(before["I"]),
+        "original_and_alias_native_K_count":len(before["K"]),
+        "original_opaque_TOP_count":len(before["U"]),
+        "installed_package_I_K_U_raw_bytes_equal_to_private_compiled_source":True,
+        "source_annotations_and_words_modified":False,
+        "source_sword_zip_or_0_1_0_package_overwritten":False,
+        "package_saved_as_public_artifact":False,
+        "release_authorized":False,
+        "published":False,
     }
 
 
