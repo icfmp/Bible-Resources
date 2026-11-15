@@ -2083,6 +2083,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                     native_raw_binary=raw_binary,
                     native_index_binary=index_binary,
                     history_note=proposed_errata["private_revised_candidate_history_note"],
+                    source_provider=curated["origin"]["publisher"],
                 )
                 if (private_corrected["source_linked_original_verse_keys_changed"]
                         != correction["expected_original_linked_native_K_count"]
