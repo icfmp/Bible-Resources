@@ -644,7 +644,7 @@ class SourceDivisionChapterTests(unittest.TestCase):
         rows=[{"native_key":"Gen.1.1","first_verse_in_chapter":True,
                "number_of_occupied_native_slots_in_chapter":1,
                "raw_payload_sha256":"a"*64}]
-        original=("<title>Genesis</title><p>"+first+"</p>").encode()
+        original=("<title>Genesis</title> <p>"+first+"</p>").encode()
         got=independent_div2_chapter_body_evidence(
             etree.fromstring(body.encode()),registry,rows,{"Gen.1.1":original})
         row=got["case_rows"][0]
