@@ -25,6 +25,8 @@ TITLE_NUMBERS = re.compile(
     r"^\s*Verses?\s+(\d{1,3}(?:\s*[-–,]\s*\d{1,3}){0,8})(?!\d)",
     flags=re.IGNORECASE,
 )
+PROSE_NUMBERED_LABEL = re.compile(r"\bVerses?\s+\d{1,3}", flags=re.IGNORECASE)
+LEADING_PROSE_WINDOW = 350
 MAX_RAW = 2 * 1024 * 1024
 MAX_CASES_PER_CLASS = 80
 MAX_UNIQUE_BODIES = 40000
@@ -99,21 +101,43 @@ class NativeCommentaryEditorialTopology:
             if any(isinstance(x, etree._Entity) for x in root.iter()):
                 raise ValueError("Unresolved XML entity in original commentary body")
             titles = []
+            structural_leading = []
             for child in root.iter():
                 if (isinstance(child.tag, str)
                         and child.tag.rsplit("}", 1)[-1] in
                         {"title", "h1", "h2", "h3", "h4", "h5", "h6"}):
                     titles.append(_heading_span("".join(child.itertext())))
+                # Direct text/tail is inspected once at its actual DOM
+                # boundary. Parent itertext() would duplicate nested labels.
+                for fragment in (child.text, child.tail):
+                    if fragment and (span := _heading_span(fragment.lstrip())):
+                        structural_leading.append(span)
             spans = tuple(x for x in titles if x is not None)
+            text_prefix = "".join(root.itertext())[:3000]
+            earliest = PROSE_NUMBERED_LABEL.search(text_prefix)
+            first_visible = (
+                _heading_span(text_prefix[earliest.start():])
+                if earliest else None
+            )
+            # Lack of a <title>Verse ...</title> does not imply lack of a
+            # heading: stock SWORD OSIS commonly carries it as inline prose.
             profile = {
                 "numeric_xml_title_spans": spans,
                 "all_xml_title_count": len(titles),
                 "has_conflicting_numeric_title_scopes": len(set(spans)) > 1,
+                "structurally_leading_numbered_spans": tuple(structural_leading),
+                "first_visible_numbered_span": first_visible,
+                "first_visible_numbered_offset": earliest.start() if earliest else None,
             }
             self.bodies[digest] = profile
             self.unique_titles["distinct_bodies_with_numbered_xml_title"] += bool(spans)
             self.unique_titles["distinct_bodies_without_numbered_xml_title"] += not bool(spans)
             self.unique_titles["distinct_bodies_with_multiple_numbered_titles"] += len(spans) > 1
+            self.unique_titles["distinct_bodies_with_structural_leading_verse_label"] += bool(structural_leading)
+            self.unique_titles["distinct_bodies_with_verse_label_in_first_3000_visible_chars"] += first_visible is not None
+            self.unique_titles["distinct_bodies_with_verse_label_in_first_350_visible_chars"] += (
+                first_visible is not None and earliest.start() <= LEADING_PROSE_WINDOW
+            )
         self.occupied[chapter][digest].append(verse)
 
     def report(self, chapter_maximums: dict[str, int]) -> dict:
@@ -135,6 +159,9 @@ class NativeCommentaryEditorialTopology:
                 per_digest_chapters[digest].append(chapter)
                 profile = self.bodies[digest]
                 titles = profile["numeric_xml_title_spans"]
+                starts = profile["structurally_leading_numbered_spans"]
+                visible = profile["first_visible_numbered_span"]
+                offset = profile["first_visible_numbered_offset"]
                 first = positions[0]
                 # One original raw body can be deliberately linked to two
                 # non-contiguous passage spans. Never auto-fill their gap.
@@ -165,6 +192,43 @@ class NativeCommentaryEditorialTopology:
                     candidates["numbered_title_outside_native_chapter_verse_limit"].append({
                         "first_native_key": f"{chapter}.{first}",
                         "chapter_verse_limit": limit,
+                    })
+                # These separate observations work when title markup carries
+                # no numeric labels. They are source-structure questions,
+                # never permissions to edit the original or add aliases.
+                if len(set(starts)) > 1:
+                    counts["different_structural_leading_verse_labels_in_same_body"] += 1
+                    candidates["different_structural_leading_verse_labels_in_same_body"].append({
+                        "first_native_key": f"{chapter}.{first}",
+                        "different_label_count": len(set(starts)),
+                    })
+                if starts and starts[0][0] != first:
+                    counts["first_structural_verse_label_vs_native_first_disagree"] += 1
+                    candidates["first_structural_verse_label_vs_native_first_disagree"].append({
+                        "first_native_key": f"{chapter}.{first}",
+                        "first_structural_label_starts_at": starts[0][0],
+                    })
+                if (visible is not None and offset is not None
+                        and offset <= LEADING_PROSE_WINDOW
+                        and visible[0] != first):
+                    counts["early_visible_verse_label_vs_native_first_disagree"] += 1
+                    candidates["early_visible_verse_label_vs_native_first_disagree"].append({
+                        "first_native_key": f"{chapter}.{first}",
+                        "first_visible_label_starts_at": visible[0],
+                        "label_start_character_offset": offset,
+                    })
+                if visible is not None and max(visible) > limit:
+                    counts["first_visible_verse_span_outside_native_chapter_limit"] += 1
+                    candidates["first_visible_verse_span_outside_native_chapter_limit"].append({
+                        "first_native_key": f"{chapter}.{first}",
+                        "chapter_verse_limit": limit,
+                    })
+                if starts and visible is not None and starts[0] != visible:
+                    counts["first_structural_vs_first_prose_label_disagree"] += 1
+                    candidates["first_structural_vs_first_prose_label_disagree"].append({
+                        "first_native_key": f"{chapter}.{first}",
+                        "first_structural_start": starts[0][0],
+                        "first_visible_start": visible[0],
                     })
         if seen != self.numbered_count:
             raise ValueError("Incomplete original native K key topology")
