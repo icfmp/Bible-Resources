@@ -380,6 +380,23 @@ jobs:
           assert full["reader_layout_parity_proven"] is False
           if not full["original_indexed_I_K_text_markup_reference_checks_passed"]:
               raise AssertionError("Full original I/K technical roundtrip differs; see metadata-only artifact")
+          reviewed=r["source_corroborated_reviewed_section_alias_plan_not_release_approved"]
+          assert reviewed is not None
+          assert reviewed["status"]=="SOURCE_SCOPE_CORROBORATED_CANDIDATE_NOT_RELEASE_AUTHORIZED"
+          assert reviewed["added_alias_count"]==24
+          assert reviewed["independent_source_evidence_classes"]=={
+              "EXACT_ORIGINAL_HEADING_AND_INDEPENDENT_LEADING_COMMENTARY_CITATION":16,
+              "EXACT_DISCONTIGUOUS_ORIGINAL_HEADING_AND_INDEPENDENT_DIGITAL_PRESENTATIONS":1,
+          }
+          assert reviewed["release_authorized"] is False
+          assert reviewed["original_keys_overwritten"] is False
+          assert reviewed["original_ccel_annotation_values_copied"] is False
+          assert reviewed["unmarked_first_verse_chapter_aliases_added"] is False
+          print("Reviewed metadata-only original index-correction scope:",
+                reviewed["status"],"classes",
+                json.dumps(reviewed["independent_source_evidence_classes"],sort_keys=True),
+                "source-preserving SWORD aliases",reviewed["added_alias_count"],
+                "publication authorized",reviewed["release_authorized"])
           preview=r["private_provisional_range_index_preview_not_approved"]
           assert preview is not None and preview["published"] is False
           assert preview["corrections_or_publication_authorized"] is False
