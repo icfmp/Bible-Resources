@@ -424,6 +424,20 @@ jobs:
           assert staging["package_saved_as_public_artifact"] is False
           assert staging["published"] is False
           assert staging["release_authorized"] is False
+          staged_gui=staging["private_versioned_curated_module_real_xiphos_selected_verse_probe"]
+          assert staged_gui is not None
+          assert staged_gui["sample_count"]==3
+          assert staged_gui["independent_gui_commentary_excerpt_match_count"]==3
+          assert staged_gui["real_xiphos_executable_started_and_visible"] is True
+          assert staged_gui["actual_passage_commands_accepted"] is True
+          assert staged_gui["source_prose_or_screenshot_uploaded"] is False
+          assert staged_gui["published"] is False
+          print("Real versioned BRMHCC 0.1.1 installed ZIP Xiphos navigation:",
+                "sample",staged_gui["sample_count"],
+                "real GUI matches",staged_gui["independent_gui_commentary_excerpt_match_count"],
+                "commands accepted",staged_gui["actual_passage_commands_accepted"],
+                "full chapter deduplication proven",staged_gui["whole_chapter_commentary_deduplication_proven"])
+
           print("Private curated module ZIP isolated install:",
                 staging["status"],"module",staging["curated_module_id"],
                 "version",staging["proposed_version"],
