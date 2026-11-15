@@ -31,7 +31,8 @@ from commentary_osis_transport_probe import (
     isolated_osis2mod_original_sample_roundtrip, _source_visible_text,
 )
 from commentary_osis_mixed_transport_probe import (
-    probe_original_mixed_transport, probe_complete_original_transport
+    probe_original_mixed_transport, probe_complete_original_transport,
+    privately_stage_versioned_zcom_zip,
 )
 from commentary_osis_intro_transport_probe import probe_original_intro_transport
 from commentary_intro_chapter_text_review import (
@@ -1860,6 +1861,39 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 original_stock_module_id=manifest["module_id"],
                 native_index_binary=index_binary,
             )
+            if not provisional_preview.get(
+                    "full_original_K_I_U_native_entry_parity_proven"):
+                raise PilotError("Cannot stage unverified source-preserving SWORD preview")
+            meta_file=(Path(__file__).resolve().parents[1] /
+                       "modules" / resource_id / "metadata.json")
+            if not meta_file.is_file() or meta_file.is_symlink():
+                raise PilotError("Curated versioned commentary metadata not found")
+            if meta_file.stat().st_size>128*1024:
+                raise PilotError("Oversize curated commentary source metadata")
+            curated=json.loads(meta_file.read_text(encoding="utf-8"))
+            if (curated.get("id")!=resource_id
+                    or not isinstance(curated.get("sword_id"),str)
+                    or not isinstance(curated.get("version"),str)
+                    or curated.get("origin",{}).get("publisher")
+                       !="CrossWire / SWORD Project"
+                    or not isinstance(decisions.get("proposed_next_version"),str)
+                    or decisions.get("package_staging_only") is not True):
+                raise PilotError("Unreviewed original curated commentary version identity")
+            original_conf=(meta_file.parent / "payload" / "mods.d" /
+                           (curated["sword_id"].lower()+".conf"))
+            if not original_conf.is_file() or original_conf.is_symlink():
+                raise PilotError("Original curated module configuration is missing")
+            package_staging=privately_stage_versioned_zcom_zip(
+                compiler_root=preview_dir/"complete-original-private-candidate",
+                compiled_module_id="BRIndexProbe",
+                package_module_id=curated["sword_id"],
+                previous_version=curated["version"],
+                proposed_version=decisions["proposed_next_version"],
+                published_conf_template=original_conf.read_bytes(),
+                scratch=preview_dir,
+                native_raw_binary=raw_binary,
+            )
+            provisional_preview["private_versioned_package_install_not_released"]=package_staging
             provisional_preview["source_scope_corroborated_in_draft_only"] = True
             provisional_preview["source_scope_editorially_approved"] = False
             provisional_preview["preflight_candidate_section_count"] = (
