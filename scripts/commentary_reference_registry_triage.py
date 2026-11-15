@@ -220,10 +220,6 @@ class OriginalCommentaryReferenceRegistryTriage:
                     source_com_single_start_counts[first] > 0 and
                     source_ref_counts[(first, expected_native_end)] > 0
                 )
-                source_corresponding_count = (
-                    1 if (full_source_matches_native or source_start_matches_native)
-                    else 0
-                )
                 witness_bad = source_ref_counts[endpoints]
                 label_match = any(
                     label.strip().casefold() == original_label.strip().casefold()
@@ -232,6 +228,25 @@ class OriginalCommentaryReferenceRegistryTriage:
                 numeric_label_match = any(
                     _literal_reference_label_reversed(label, first, last)
                     for label in source_ref_labels[endpoints]
+                )
+                # A digital witness may have only scripRef links, with no
+                # scripCom authorial-range marker. This weaker concordance
+                # still requires (a) the very same malformed digital citation
+                # and numeric label, (b) another *valid* source range with
+                # identical start, and (c) the independently indexed native
+                # numbered section agreeing on its end. It only suggests a
+                # candidate: scripRef is NOT an authorial section anchor.
+                citation_and_native_concordance = (
+                    native_scope_exists
+                    and witness_bad > 0 and numeric_label_match
+                    and _literal_reference_label_reversed(original_label, first, last)
+                    and expected_native_end is not None
+                    and source_ref_counts[(first, expected_native_end)] > 0
+                )
+                source_corresponding_count = (
+                    1 if (full_source_matches_native
+                          or source_start_matches_native
+                          or citation_and_native_concordance) else 0
                 )
                 result = {
                     "original_native_entry": key,
@@ -256,6 +271,16 @@ class OriginalCommentaryReferenceRegistryTriage:
                         native_scope[-1] if native_scope_exists else None,
                     "independent_source_and_native_heading_matching_candidate_count":
                         source_corresponding_count,
+                    "candidate_evidence_class": (
+                        "INDEPENDENT_SCRIPCOM_FULL_RANGE_AND_ORIGINAL_NATIVE_HEADING"
+                        if full_source_matches_native else
+                        "INDEPENDENT_SCRIPCOM_START_AND_SCRIPREF_RANGE_WITH_NATIVE_HEADING"
+                        if source_start_matches_native else
+                        "TWO_INDEPENDENT_SCRIPREF_CITATIONS_AND_NATIVE_HEADING_NOT_SECTION_PROOF"
+                        if citation_and_native_concordance else
+                        "UNRESOLVED_SOURCE_NATIVE_CORROBORATION"
+                    ),
+                    "source_scripref_is_not_a_proven_authorial_section_anchor": True,
                     "candidate_end_verse_if_both_witnesses_agree":
                         native_scope[-1] if source_corresponding_count else None,
                     "original_source_target_or_label_exported": False,
