@@ -44,6 +44,39 @@ class ReversibleOriginalCommentaryReferencePreviewTests(unittest.TestCase):
         self.assertIn(b"Genesis 1:3 \xe2\x80\x93 5", patched)
         self.assertTrue(proof["reverse_restores_exact_original_raw_bytes"])
 
+    def test_comment_and_cdata_reference_lookalikes_are_never_edited(self):
+        fake = (
+            b'<reference osisRef="Gen.1.3-Gen.1.1">'
+            b'Gen 1:3-1</reference>'
+        )
+        only_lookalikes = [
+            b'<p><![CDATA[' + fake + b']]></p>',
+            b'<p><!--' + fake + b'--></p>',
+            b'<p><![CDATA[' + fake + b']]></p><!--' + fake + b'-->',
+            b'<reference xosisRef="Gen.1.3-Gen.1.1">Gen 1:3-1</reference>',
+        ]
+        for original in only_lookalikes:
+            with self.subTest(original=original[:40]):
+                with self.assertRaises(ValueError):
+                    preview_exact_reversible_commentary_reference_erratum(
+                        original, first_verse="Gen.1.3",
+                        original_end_verse="Gen.1.1", proposed_end_verse="Gen.1.5"
+                    )
+        actual = b'<reference osisRef="Gen.1.3-Gen.1.1">Gen 1:3-1</reference>'
+        prefix = b'<p><!--' + fake + b'--><![CDATA[' + fake + b']]></p>'
+        original = prefix + actual + b'<p>other source text</p>'
+        proposed, receipt = preview_exact_reversible_commentary_reference_erratum(
+            original, first_verse="Gen.1.3",
+            original_end_verse="Gen.1.1", proposed_end_verse="Gen.1.5"
+        )
+        expected = (
+            prefix + b'<reference osisRef="Gen.1.3-Gen.1.5">'
+            b'Gen 1:3-5</reference><p>other source text</p>'
+        )
+        self.assertEqual(proposed, expected)
+        self.assertTrue(receipt["reverse_restores_exact_original_raw_bytes"])
+        self.assertEqual(proposed.count(fake), 2)
+
     def test_any_ambiguous_source_candidate_fails_closed(self):
         base = (
             b'<reference osisRef="Gen.1.3-Gen.1.1">'
