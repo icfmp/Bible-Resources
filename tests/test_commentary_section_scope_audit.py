@@ -624,6 +624,49 @@ class SourceDivisionChapterTests(unittest.TestCase):
         self.assertEqual(metrics["overlap_class"], "HIGH_95_PLUS")
         self.assertNotIn("Unwrapped", json.dumps(compared))
 
+    def test_unwrapped_book_prefix_is_eligible_only_with_explicit_sequential_chapters(self):
+        first=("This entirely invented opening exposition gives faithful "
+               "introductory commentary about chapter one and discusses "
+               "several examples of patient, careful inquiry without "
+               "suggesting that chapter two begins here. "
+               "It consists of a complete original paragraph that clearly "
+               "belongs before the independently labelled second chapter.")
+        body=(
+            '<root><div1 title="Genesis">'
+            '<h1>Genesis</h1><p>'+first+'</p>'
+            '<div2><h2>Chapter 2</h2><scripCom osisRef="Bible:Gen.2"/>'
+            '<p>Second chapter deliberately separate</p></div2>'
+            '<div2><h2>Chapter 3</h2><scripCom osisRef="Bible:Gen.3"/>'
+            '<p>Third chapter deliberately separate</p></div2>'
+            '</div1></root>'
+        )
+        registry={"chapter_maximums":{"Gen.1":31,"Gen.2":25,"Gen.3":24}}
+        rows=[{"native_key":"Gen.1.1","first_verse_in_chapter":True,
+               "number_of_occupied_native_slots_in_chapter":1,
+               "raw_payload_sha256":"a"*64}]
+        original=("<title>Genesis</title><p>"+first+"</p>").encode()
+        got=independent_div2_chapter_body_evidence(
+            etree.fromstring(body.encode()),registry,rows,{"Gen.1.1":original})
+        row=got["case_rows"][0]
+        self.assertEqual(row["source_div2_structure_class"],
+                         "SOURCE_BOOK_PREFIX_FIRST_CHAPTER_UNDIVIDED_CANDIDATE")
+        evidence=row["source_book_prefix_first_chapter_structural_witness"]
+        self.assertTrue(evidence[
+            "all_source_book_identity_and_chapter_order_guards_pass"])
+        self.assertTrue(evidence[
+            "source_book_prefix_prose_is_complete_in_original_K"])
+        self.assertFalse(evidence[
+            "source_book_prefix_first_chapter_attribution_approved"])
+        self.assertNotIn(first,json.dumps(got))
+
+        # A conflicting next chapter must never be relabelled from order alone.
+        contradictory=body.replace("Chapter 2","Chapter 3")
+        fail=independent_div2_chapter_body_evidence(
+            etree.fromstring(contradictory.encode()),registry,rows,
+            {"Gen.1.1":original})
+        self.assertEqual(fail["case_rows"][0]["source_div2_structure_class"],
+                         "NO_SAFE_SOURCE_DIV2_FOR_NATIVE_CHAPTER")
+
     def test_chapter_heading_conflicting_with_source_scripcom_is_not_reassigned(self):
         document = etree.fromstring(
             b'<root><div1 title="Genesis">'
