@@ -153,6 +153,7 @@ class OriginalCommentaryReferenceRegistryTriage:
             raise ValueError("Original native section labels unavailable")
         source_ref_counts = Counter()
         source_com_counts = Counter()
+        source_com_single_start_counts = Counter()
         source_ref_labels = defaultdict(list)
         root = document.getroot() if isinstance(document, etree._ElementTree) else document
         for element in root.iter():
@@ -162,6 +163,9 @@ class OriginalCommentaryReferenceRegistryTriage:
             if tag not in ("scripRef", "scripCom"):
                 continue
             value = element.get("osisRef", "")
+            stripped = value[len("Bible:"):] if value.startswith("Bible:") else value
+            if tag == "scripCom" and SINGLE_VERSE.fullmatch(stripped):
+                source_com_single_start_counts[stripped] += 1
             endpoints = _unambiguous_verse_range_endpoints(value)
             if endpoints is None:
                 continue
@@ -197,16 +201,36 @@ class OriginalCommentaryReferenceRegistryTriage:
                                 >= int(first.rsplit(".", 1)[1])):
                         intended.append((source_last, count))
                 native_scope = native_section_spans.get(first)
-                source_corresponding = [
-                    (candidate, count) for candidate, count in intended
-                    if native_scope is not None
-                    and len(native_scope) >= 2
-                    and native_scope[0] == int(first.rsplit(".", 1)[1])
-                    and native_scope[-1] == int(candidate.rsplit(".", 1)[1])
-                ]
+                native_scope_exists = (
+                    native_scope is not None and len(native_scope) >= 2
+                    and native_scope[0] == int(first.rsplit(".", 1)[1]))
+                expected_native_end = (
+                    chapter + "." + str(native_scope[-1])
+                    if native_scope_exists else None
+                )
+                # A source scripCom can mark just a start verse rather than
+                # a whole authored range. Require a separate matching source
+                # scripRef to corroborate its end in that representation.
+                full_source_matches_native = (
+                    expected_native_end is not None and
+                    source_com_counts[(first, expected_native_end)] > 0
+                )
+                source_start_matches_native = (
+                    expected_native_end is not None and
+                    source_com_single_start_counts[first] > 0 and
+                    source_ref_counts[(first, expected_native_end)] > 0
+                )
+                source_corresponding_count = (
+                    1 if (full_source_matches_native or source_start_matches_native)
+                    else 0
+                )
                 witness_bad = source_ref_counts[endpoints]
                 label_match = any(
                     label.strip().casefold() == original_label.strip().casefold()
+                    for label in source_ref_labels[endpoints]
+                )
+                numeric_label_match = any(
+                    _literal_reference_label_reversed(label, first, last)
                     for label in source_ref_labels[endpoints]
                 )
                 result = {
@@ -217,13 +241,23 @@ class OriginalCommentaryReferenceRegistryTriage:
                         _literal_reference_label_reversed(original_label, first, last),
                     "independent_source_same_bad_range_scripref_count": witness_bad,
                     "independent_source_same_display_label_literal_match": label_match,
-                    "independent_source_valid_matching_start_scripcom_count":
+                    "independent_source_same_reversed_numeric_label_present":
+                        numeric_label_match,
+                    "independent_source_full_range_scripcom_same_start_count":
                         sum(count for _, count in intended),
+                    "independent_source_single_verse_scripcom_same_start_count":
+                        source_com_single_start_counts[first],
+                    "independent_source_valid_range_scripref_matching_native_count":
+                        source_ref_counts[(first, expected_native_end)]
+                        if expected_native_end is not None else 0,
+                    "original_native_numbered_heading_at_range_start_exists":
+                        native_scope_exists,
+                    "original_native_numbered_heading_last_verse":
+                        native_scope[-1] if native_scope_exists else None,
                     "independent_source_and_native_heading_matching_candidate_count":
-                        len(source_corresponding),
+                        source_corresponding_count,
                     "candidate_end_verse_if_both_witnesses_agree":
-                        int(source_corresponding[0][0].rsplit(".", 1)[1])
-                        if len(source_corresponding) == 1 else None,
+                        native_scope[-1] if source_corresponding_count else None,
                     "original_source_target_or_label_exported": False,
                     "source_text_edited": False,
                     "editorial_approval": False,
