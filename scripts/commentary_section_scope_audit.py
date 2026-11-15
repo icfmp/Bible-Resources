@@ -57,6 +57,7 @@ from commentary_stock_prefix_topology import (
 from commentary_chapter_ref_labels import link_label_location
 from commentary_editorial_topology import NativeCommentaryEditorialTopology
 from commentary_reference_registry_triage import OriginalCommentaryReferenceRegistryTriage
+from commentary_literal_erratum_preflight import preview_exact_reversible_commentary_reference_erratum
 from commentary_unresolved_lexical_triage import marked_word_token_indices
 from commentary_xml_witness import _parse_reference, WORK_REF
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
@@ -1866,6 +1867,95 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 if row["heading"] is not None
                 and row["heading"][0][0] == int(key.rsplit(".", 1)[1])
             })
+        # Review a proposed literal source erratum ONLY as a private in-memory
+        # exact-byte reversible preview. The separately staged 0.1.1 package
+        # below still uses all ORIGINAL stock entries, never these bytes.
+        unapproved_literal_erratum_preflight = None
+        errata_path = (Path(__file__).resolve().parents[1] /
+                       "config" / "commentary-intake" /
+                       f"{resource_id}-proposed-literal-errata.json")
+        if errata_path.is_file() and full_transport:
+            if errata_path.is_symlink() or errata_path.stat().st_size > 128 * 1024:
+                raise PilotError("Untrusted original commentary erratum review plan")
+            proposed_errata = json.loads(errata_path.read_text(encoding="utf-8"))
+            if (proposed_errata.get("schema_version") != 1
+                    or proposed_errata.get("resource_id") != resource_id
+                    or proposed_errata.get("source_module_id") != manifest["module_id"]
+                    or proposed_errata.get("source_archive_sha256") != downloaded["sha256"]
+                    or proposed_errata.get("independent_digital_witness_sha256")
+                       != witness["witness_sha256"]
+                    or proposed_errata.get("status")
+                       != "PRIVATE_BYTE_REVERSIBLE_PROPOSAL_NOT_EDITORIALLY_APPROVED"
+                    or proposed_errata.get("release_authorized") is not False
+                    or proposed_errata.get("source_text_changes_authorized") is not False
+                    or proposed_errata.get("original_source_published_or_overwritten") is not False):
+                raise PilotError("Source erratum review was not explicitly unapproved/pinned")
+            proposals = proposed_errata.get("proposed_single_reference_changes")
+            if not isinstance(proposals, list) or not 1 <= len(proposals) <= 16:
+                raise PilotError("Unreviewed number of original commentary errata")
+            source_cases = witness["independent_original_reversed_reference_witness"][
+                "case_rows"]
+            receipts = []
+            used_original_keys = set()
+            for row in proposals:
+                key = row.get("original_native_entry")
+                first = row.get("first_verse")
+                old_end = row.get("original_end_verse")
+                new_end = row.get("proposed_end_verse")
+                if (not isinstance(key, str) or key in used_original_keys
+                        or not isinstance(row.get("external_review_url"), str)
+                        or not row["external_review_url"].startswith(
+                            "https://github.com/icfmp/Bible-Resources/issues/")
+                        or row.get("editorial_decision")
+                           != "REQUIRES_OWNER_SOURCE_TEXT_CORRECTION_APPROVAL"
+                        or row.get("corroboration_class")
+                           != "SAME_MALFORMED_CCEL_SCRIPREF_PLUS_VALID_CCEL_SCRIPREF_AND_ORIGINAL_NATIVE_SECTION_HEADING"):
+                    raise PilotError("Original commentary source erratum plan is not source-reviewed")
+                used_original_keys.add(key)
+                support = [
+                    case for case in source_cases
+                    if case["original_native_entry"] == key
+                    and case["candidate_end_verse_if_both_witnesses_agree"]
+                        == int(new_end.rsplit(".", 1)[1])
+                    and case["original_link_display_text_contains_reversed_numeric_span"]
+                    and case["independent_source_same_reversed_numeric_label_present"]
+                    and case["independent_source_same_bad_range_scripref_count"] >= 1
+                    and case["independent_source_valid_range_scripref_matching_native_count"] >= 1
+                    and case["original_native_numbered_heading_at_range_start_exists"]
+                    and not case["editorial_approval"]
+                ]
+                if len(support) != 1:
+                    raise PilotError("Source erratum proposed endpoint not independently corroborated")
+                chapter = key.rsplit(".", 1)[0]
+                original_raw = dict(private_full_K[chapter]).get(key)
+                if original_raw is None or sha256(original_raw).hexdigest() != records[key]["sha256"]:
+                    raise PilotError("Exact original native erratum record missing")
+                _, receipt = preview_exact_reversible_commentary_reference_erratum(
+                    original_raw, first_verse=first,
+                    original_end_verse=old_end,
+                    proposed_end_verse=new_end)
+                if (not receipt["reverse_restores_exact_original_raw_bytes"]
+                        or receipt["editorial_change_authorized"]
+                        or receipt["release_authorized"]):
+                    raise PilotError("Source erratum candidate does not preserve original bytes")
+                receipts.append({
+                    "original_native_entry": key,
+                    "proposed_endpoint_corrobated_by_source_and_native": True,
+                    "source_witness_is_citation_not_authorial_scope": True,
+                    "native_existing_aliases_sharing_original_raw":
+                        sum(entry["sha256"] == records[key]["sha256"]
+                            for entry in records.values()),
+                    **receipt,
+                })
+            unapproved_literal_erratum_preflight = {
+                "status": "PRIVATE_ORIGINAL_SOURCE_ERRATUM_PREVIEW_NOT_APPROVED_OR_COMPILED",
+                "case_count": len(receipts),
+                "case_rows": receipts,
+                "all_original_K_I_TOP_entries_untouched": True,
+                "public_or_private_staged_zcom_package_content_unchanged": True,
+                "text_or_reference_values_exported": False,
+                "publication_authorized": False,
+            }
         review_path = (Path(__file__).resolve().parents[1] /
                        "config" / "commentary-intake" /
                        f"{resource_id}-reviewed-links.json")
@@ -2021,6 +2111,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             "unrecognized_native_slot_review": unknown,
             "independent_original_native_editorial_topology_triage": topology_review,
             "independent_original_native_reference_registry_triage": original_reference_review,
+            "private_unapproved_original_literal_erratum_byte_preflight":
+                unapproved_literal_erratum_preflight,
             "independent_thml_witness": witness,
             "section_heading_matching_is_heuristic": True,
             "independent_edition_range_comparison_completed": witness["status"].startswith("PINNED"),
