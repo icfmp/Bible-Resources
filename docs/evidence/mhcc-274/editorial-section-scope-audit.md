@@ -598,3 +598,28 @@ These are **distinct-body** annotation occurrences, **not** the much higher tota
 - The existing 25 CCEL-vs-CrossWire annotation target divergences and 118 single-verse-index chapter bodies remain classified as **separate editorial/reader questions**, not auto-corrections.
 
 **Result:** the complete final structure/reference registry screening uncovered **one additional probable inherited digital source erratum**, not a new general failure of the 17-section index repair. The original BRMHCC 0.1.0 and sources, private 0.1.1 source content, Bible application and public catalogue remain unchanged. Draft PR #275 and release issue #276 remain approval-gated. Do not resume modern-English derivation until the source/editorial disposition is explicitly settled.
+
+
+## Exact-source Ezekiel 3 erratum: independently corroborated, byte-reversible PRIVATE preview (2026-11-15)
+
+[Full source-pinned private audit CI #43713005607](https://github.com/icfmp/Bible-Resources/actions/runs/43713005607) **SUCCESS**; the generic reversed-reference and exact-byte-literal-edit synthetic tests also pass. The preflight is explicitly marked *research only* in [the separately pinned, unapproved proposal](../../../../config/commentary-intake/mhcc-crosswire-proposed-literal-errata.json) and in [erratum issue #277](https://github.com/icfmp/Bible-Resources/issues/277).
+
+### Three independent observations, with careful editorial boundaries
+
+1. Original CrossWire MHCC 2.0 `Ezek.3.1` contains the **only reversed original `reference/@osisRef`** among 1,204 distinct-body original K/I reference annotations. Its **visible link label** has the same reversed numeric span, with unchanged surrounding source wording.
+2. The separate SHA-pinned CCEL ThML contains **one `scripRef` with the same erroneous range and numeric label** and **one distinct, valid `scripRef` for `Ezek.3.12–21`**. The actual [CCEL chapter-3 public edition](https://ccel.org/ccel/henry/mhcc.xxvii.iii.html) visibly introduces the subsequent exposition with that valid range. The source XML does **not** carry an independently matching `scripCom` section anchor for this passage, so this proof is **citation concordance, not a claim of source authorial-section-marker equality**.
+3. Original CrossWire's separately indexed `Ezek.3.12` section heading explicitly runs through **verse 21**, and the real SWORD KJV canonical registry verifies the passage. The candidate `12–21` is thus strongly supported by the original module and the separate CCEL digital witness; historical printed Moody Press edition identity is **not independently certified**.
+
+### Exact-byte trial on the unchanged original native body
+
+The generic `scripts/commentary_literal_erratum_preflight.py` requires one uniquely matching original XML `reference` element with a direct visible numeric label; it rejects ambiguity or nested/unsupported structure. It changes **only** the malformed range endpoint in that element's existing `osisRef` and in its displayed numeric label **in a private, temporary byte string**. It reparses strict XML and runs the inverse exact-byte operation.
+
+- **Original raw entry SHA-256:** `c69f6b1580c2ea555083f78bfa05c92f82150a1afcca0c0672b8e69333ac99ae`.
+- **Proposed private edited entry SHA-256:** `d307cf2e00790bde22a0e9e89be4ae02c47d6e7b1b3baa734e29ccc546ad8d7a`.
+- **Original native occupied verse addresses sharing this one authorial raw body:** **11**. This is **one** original editorial text fragment, **not eleven independent rewrites**. A future corrected build must verify every original linked address.
+- **Full reversal restores the exact original entry bytes:** **TRUE**.
+- **All other original text, XML markup, original source citation/annotation values, punctuation and attributes:** byte-unchanged by this private single-entry preview.
+- **Published `BRMHCC 0.1.0`, every original source file, the private pre-existing index-only `0.1.1` ZIP and its SHA-256 `233c0fdec19ca5d7aa2394fb05be18953c508b8495094fca77d0d47b610c7c5a`:** **unchanged**.
+- **Corrected source compiled into SWORD, editorially approved, released or inserted in a catalogue:** **NO**.
+
+**Next gated step:** the project owner must decide whether to correct the original malformed displayed reference/target or deliberately retain it with a documented source erratum. If approved, a *new* source-changing candidate must use the preserved original + a separately logged/reversible correction plan, rerun **all** unrelated K/I/TOP source/OSIS/native parity checks (with a narrowly approved delta at the source block and all 11 linked entries), check reader rendering, prepare new release metadata/checksum and obtain separate publication authorization. The current index-only 0.1.1 acceptance and SHA are **not** acceptance of a source-changing SWORD package.
