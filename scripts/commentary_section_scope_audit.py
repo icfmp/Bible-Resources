@@ -1326,7 +1326,9 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
                                      native_registry: dict | None = None,
                                      stock_unknown_raw: dict[str, bytes] | None = None,
                                      original_chapter_intro_raw: dict[str, bytes] | None = None,
-                                     original_range_stock_raw: dict[str, bytes] | None = None) -> dict:
+                                     original_range_stock_raw: dict[str, bytes] | None = None,
+                                     original_reference_triage: OriginalCommentaryReferenceRegistryTriage | None = None,
+                                     original_native_section_spans: dict[str, tuple[int, ...]] | None = None) -> dict:
     """Compare all start/end section locations with a separately pinned ThML.
 
     Different digital editions are never automatically assumed identical;
@@ -1505,7 +1507,14 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
     independent_lead_citations = inspect_independent_leading_range_citations(
         document, anomalies, original_range_stock_raw or {}
     ) if original_range_stock_raw is not None else None
+    reversed_reference_witness = (
+        original_reference_triage.triangulate_reversed_ranges_against_independent_witness(
+            document, canonical_verses=native_registry["verse_keys"],
+            native_section_spans=original_native_section_spans or {})
+        if original_reference_triage is not None and native_registry is not None else None
+    )
     return {
+        "independent_original_reversed_reference_witness": reversed_reference_witness,
         "independent_leading_range_citations": independent_lead_citations,
         "status": "PINNED_DIFFERENT_DIGITAL_EDITION_SCOPE_COMPARISON",
         "independent_whole_chapter_review": chapter_scopes,
@@ -1849,7 +1858,14 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             result["anomalies"], directory, unknown["case_rows"],
             registry, private_unrecognized_raw,
             original_chapter_intro_raw=private_intro_text_raw_by_chapter,
-            original_range_stock_raw=private_range_heading_raw)
+            original_range_stock_raw=private_range_heading_raw,
+            original_reference_triage=original_reference_triage,
+            original_native_section_spans={
+                key: row["heading"][0]
+                for key, row in records.items()
+                if row["heading"] is not None
+                and row["heading"][0][0] == int(key.rsplit(".", 1)[1])
+            })
         review_path = (Path(__file__).resolve().parents[1] /
                        "config" / "commentary-intake" /
                        f"{resource_id}-reviewed-links.json")
