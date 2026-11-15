@@ -18,6 +18,8 @@ on:
       - 'tests/test_commentary_osis_rebuild_preflight.py'
       - 'scripts/commentary_navigation_link_plan.py'
       - 'tests/test_commentary_navigation_link_plan.py'
+      - 'scripts/commentary_chapter_ref_labels.py'
+      - 'tests/test_commentary_chapter_ref_labels.py'
       - 'scripts/sword_native_commentary_index.cpp'
       - 'scripts/sword_native_commentary_raw_corpus.cpp'
       - 'config/commentary-intake/**'
@@ -49,6 +51,7 @@ jobs:
           python -m pip install -r requirements.txt
           python -m unittest discover -s tests -p 'test_commentary_section_scope_audit.py' -v
           python -m unittest discover -s tests -p 'test_commentary_navigation_link_plan.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_chapter_ref_labels.py' -v
           python -m unittest discover -s tests -p 'test_commentary_osis_rebuild_preflight.py' -v
           python -m unittest discover -s tests -p 'test_commentary_intro_chapter_text_review.py' -v
           python -m unittest discover -s tests -p 'test_commentary_osis_transport_probe.py' -v
@@ -676,6 +679,20 @@ jobs:
                 json.dumps(div2.get("independent_stock_vs_source_reference_target_classes",{}),sort_keys=True))
           print("Chapter-level original source vs stock link-target totals:",
                 json.dumps(div2.get("independent_stock_vs_source_reference_target_totals",{}),sort_keys=True))
+          unpaired=div2["independent_stock_vs_source_reference_target_totals"][
+              "source_target_occurrences_not_paired_in_selected_stock"
+          ]
+          source_labels=div2["unpaired_original_source_reference_target_label_location_classes"]
+          literal_unique=div2["unpaired_unique_literal_reference_label_candidate_count"]
+          print("Unpaired only source citation destination label in original stock:",
+                json.dumps(source_labels,sort_keys=True),
+                "unique exact plain-label locations",literal_unique,
+                "ALL editorially unapproved",div2[
+                    "all_cross_edition_unpaired_source_targets_require_review"])
+          assert unpaired==25
+          assert sum(source_labels.values())==25
+          assert 0<=literal_unique<=25
+          assert div2["all_cross_edition_unpaired_source_targets_require_review"] is True
           print("Source citation labels where CrossWire selected stock has no clickable links:",
                 json.dumps(div2.get("source_reference_labels_when_stock_has_no_link_markup",{}),
                            sort_keys=True))
@@ -688,7 +705,11 @@ jobs:
                     "stock-unpaired",row["stock_target_occurrences_not_paired"],
                     "classification",row["classification"],
                     "source-label-locations",
-                    json.dumps(row["source_link_label_location_classes"],sort_keys=True))
+                    json.dumps(row["source_link_label_location_classes"],sort_keys=True),
+                    "unpaired targets' label locations",
+                    json.dumps(row["unpaired_source_link_label_location_classes"],sort_keys=True),
+                    "unique exact unlinked label",
+                    row["unique_literal_unlinked_original_source_label_candidates"])
           print("Source book title/marker alignment:",
                 json.dumps(div2.get("book_alignment_evidence_classes",{}),sort_keys=True))
           for bookrow in div2.get("book_alignment_evidence_rows",[]):
