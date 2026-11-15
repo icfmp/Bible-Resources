@@ -2075,7 +2075,13 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             provisional_preview["preflight_candidate_section_count"] = (
                 index_preflight["candidate_section_count"]
             )
-            provisional_preview["source_prose_or_annotation_edited"] = False
+            # The index-only *control* must not be confused with the
+            # separately recompiled private source-corrected candidate.
+            provisional_preview["index_only_control_source_content_edited"] = False
+            provisional_preview["private_source_corrected_candidate_compiled"] = (
+                "private_source_edited_versioned_candidate_not_released"
+                in provisional_preview
+            )
             provisional_preview["release_authorized"] = False
         chapter_source_cases = witness["independent_div2_chapter_body_review"]["case_rows"]
         chapter_intros = (
