@@ -120,6 +120,52 @@ class OriginalRawNumberedTransportTests(unittest.TestCase):
         self.assertFalse(result["non_div_element_order_and_exact_attribute_values_preserved"])
         self.assertTrue(result["only_div_element_count_added_not_other_element_names"])
 
+    def test_same_words_and_reference_attributes_cannot_change_clickable_text_scope(self):
+        original = (
+            b'<p><reference osisRef="Gen.1.1">Gen 1:1</reference>'
+            b' and Gen 1:2</p>'
+        )
+        moved = (
+            b'<p><reference osisRef="Gen.1.1">'
+            b'Gen 1:1 and Gen 1:2</reference></p>'
+        )
+        delta = classify_native_osis_roundtrip_delta(original, moved)
+        self.assertEqual(delta["word_sequence_relation"], "EXACT_ORIGINAL_WORD_SEQUENCE")
+        self.assertTrue(delta["normalized_whitespace_visible_unicode_equal"])
+        self.assertTrue(delta["non_div_element_order_and_exact_attribute_values_preserved"])
+        self.assertTrue(delta["reference_attribute_values_in_original_document_order_preserved"])
+        self.assertFalse(delta["original_nondiv_text_and_tail_ownership_preserved"])
+        self.assertNotIn("Gen 1:2", str(delta))
+
+        punctuation_original = (
+            b'<p><reference osisRef="Gen.1.1">Gen 1:1</reference>, next</p>'
+        )
+        punctuation_moved = (
+            b'<p><reference osisRef="Gen.1.1">Gen 1:1,</reference> next</p>'
+        )
+        punctuation = classify_native_osis_roundtrip_delta(
+            punctuation_original, punctuation_moved
+        )
+        self.assertTrue(punctuation["normalized_whitespace_visible_unicode_equal"])
+        self.assertFalse(punctuation["original_nondiv_text_and_tail_ownership_preserved"])
+
+    def test_compiler_div_wrappers_do_not_change_semantic_text_ownership(self):
+        original = (
+            b'<div type="original"><p>Hello '
+            b'<reference osisRef="Gen.1.1">Gen 1:1</reference>'
+            b' and other words.</p></div>'
+        )
+        compiled = (
+            b'<div type="technical"><div type="original"><div type="technical">'
+            b'<p>Hello <reference osisRef="Gen.1.1">Gen 1:1</reference>'
+            b' and other words.</p></div></div></div>'
+        )
+        result = classify_native_osis_roundtrip_delta(original, compiled)
+        self.assertTrue(result["original_nondiv_text_and_tail_ownership_preserved"])
+        self.assertTrue(result["non_div_element_order_and_exact_attribute_values_preserved"])
+        self.assertTrue(result["original_div_elements_exact_attribute_multiset_preserved"])
+        self.assertTrue(result["normalized_whitespace_visible_unicode_equal"])
+
     def test_invalid_work_id_cannot_inject_xml_attributes(self):
         with self.assertRaises(ValueError):
             build_numbered_transport_sample(
