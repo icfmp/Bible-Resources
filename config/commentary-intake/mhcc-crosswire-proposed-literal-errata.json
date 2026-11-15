@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "source_module_id": "MHCC",
+  "source_archive_sha256": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+  "independent_digital_witness_sha256": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+  "status": "PRIVATE_BYTE_REVERSIBLE_PROPOSAL_NOT_EDITORIALLY_APPROVED",
+  "release_authorized": false,
+  "source_text_changes_authorized": false,
+  "original_source_published_or_overwritten": false,
+  "proposed_single_reference_changes": [
+    {
+      "original_native_entry": "Ezek.3.1",
+      "first_verse": "Ezek.3.12",
+      "original_end_verse": "Ezek.3.2",
+      "proposed_end_verse": "Ezek.3.21",
+      "external_review_url": "https://github.com/icfmp/Bible-Resources/issues/277",
+      "corroboration_class": "SAME_MALFORMED_CCEL_SCRIPREF_PLUS_VALID_CCEL_SCRIPREF_AND_ORIGINAL_NATIVE_SECTION_HEADING",
+      "editorial_decision": "REQUIRES_OWNER_SOURCE_TEXT_CORRECTION_APPROVAL"
+    }
+  ]
+}
