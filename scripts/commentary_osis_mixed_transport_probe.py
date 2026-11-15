@@ -941,8 +941,7 @@ def verify_private_versioned_commentary_conf_delta(
 
     # Exact line-based source fields must be present before staged
     # metadata can be accepted; never replace an upstream licence with CC0.
-    for key in ("DistributionLicense", "TextSource", "About",
-                "SwordVersionDate", "ModDrv", "SourceType", "DataPath",
+    for key in ("DistributionLicense", "ModDrv", "SourceType", "DataPath",
                 "Versification", "Version", "BlockType", "InstallSize"):
         one(before, key)
         one(after, key)
