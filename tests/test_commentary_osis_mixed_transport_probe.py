@@ -30,7 +30,7 @@ class PrivateCommentaryMetadataDeltaTests(unittest.TestCase):
             "About=Source printing assertion, not curator verified\n"
             "SwordVersionDate=2020-02-03\n"
             "GlobalOptionFilter=OSISHeadings\n"
-        ).replace("\\\n", "\n").encode("utf-8")
+        ).encode("utf-8")
         staged = (
             source.decode("utf-8")
             .replace("BlockType=BOOK", "BlockType=CHAPTER")
@@ -62,7 +62,7 @@ class PrivateCommentaryMetadataDeltaTests(unittest.TestCase):
             staged.replace(b"InstallSize=540", b"InstallSize=541"),
             staged.replace(b"History_0.1.1=", b"History_0.1.0="),
             staged.replace(b"Version=0.1.1", b"Version=0.1.0"),
-            staged + b"Unapproved=extra\n".replace(b"\\\n", b"\n"),
+            staged + b"Unapproved=extra\n",
         ):
             with self.subTest(tampered_suffix=tampered[-72:]):
                 with self.assertRaises(ValueError):
@@ -82,7 +82,7 @@ class PrivateCommentaryMetadataDeltaTests(unittest.TestCase):
             b"ModDrv=zCom\nSourceType=OSIS\nVersification=KJV\n"
             b"BlockType=BOOK\nVersion=0.1.0\nInstallSize=5\n"
             b"DistributionLicense=Public Domain\n"
-        ).replace(b"\\\n", b"\n")
+        )
         staged = (
             source.decode("utf-8")
             .replace("BlockType=BOOK", "BlockType=CHAPTER")
