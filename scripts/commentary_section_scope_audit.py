@@ -596,6 +596,7 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
     private_book_prefix_text = {}
     private_book_prefix_neighbors = {}
     private_book_prefix_ref_links = {}
+    private_book_prefix_structure = {}
     explicit_source_chapters = {}
     ambiguous_source_heading_chapters = set()
     book_classes = Counter()
@@ -687,6 +688,58 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
                 and element.tag.rsplit("}", 1)[-1] in {"h1", "h2", "title"}
             ),
         ][:8]
+        # Extra caution: several CCEL ThML editions put the first
+        # chapter prose directly under the BOOK div1, before the first div2.
+        # Only a complete one-chapter deficit + explicit nonconflicting
+        # chapter numbering from chapter 2 onward can support that scope.
+        # This remains an *independent digital witness*, not a publication
+        # or text normalization permit.
+        first_expected_chapter = 2
+        numbered_source_div2_evidence = 0
+        source_div2_heading_conflicts = 0
+        source_first_div2_declares_chapter_two = False
+        for offset, child in enumerate(chapters, start=first_expected_chapter):
+            declared_numbers = set()
+            for heading in child:
+                if (isinstance(heading.tag, str)
+                        and heading.tag.rsplit("}", 1)[-1] in ("h2", "title")):
+                    declared_numbers.update(int(n) for n in re.findall(
+                        r"\bchapter\s+([1-9]\d*)\b",
+                        "".join(heading.itertext()), re.I
+                    ))
+            if declared_numbers:
+                numbered_source_div2_evidence += 1
+                if declared_numbers != {offset}:
+                    source_div2_heading_conflicts += 1
+            if offset == first_expected_chapter:
+                source_first_div2_declares_chapter_two = (
+                    declared_numbers == {first_expected_chapter}
+                )
+        first_prefix_compatible = (
+            len(chapters) == len(native_by_book[code]) - 1
+            and candidates == {code} and annotated_books == {code}
+            and len(native_by_book[code]) >= 3
+            and prefix_nonempty_paragraphs >= 1
+            and source_first_div2_declares_chapter_two
+            and numbered_source_div2_evidence >= 2
+            and source_div2_heading_conflicts == 0
+            and set(prefix_chapter_markers) <= {f"{code}.1"}
+            and set(prefix_heading_numbers) <= {1}
+        )
+        private_book_prefix_structure[code] = {
+            "missing_exactly_one_div2_with_book_prefix_prose":
+                len(chapters) == len(native_by_book[code]) - 1
+                and prefix_nonempty_paragraphs > 0,
+            "first_div2_explicitly_declares_second_chapter":
+                source_first_div2_declares_chapter_two,
+            "nonconflicting_later_numeric_chapter_headings":
+                numbered_source_div2_evidence,
+            "conflicting_later_numeric_chapter_headings":
+                source_div2_heading_conflicts,
+            "all_source_book_identity_and_chapter_order_guards_pass":
+                first_prefix_compatible,
+            "original_book_prefix_text_not_reassigned": True,
+        }
         book_evidence_rows.append({
             "native_book": code,
             "title_alias_candidate_books": sorted(candidates),
@@ -842,7 +895,6 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
             classification = "SOURCE_DIV2_UNDIVIDED_EXPLICIT_HEADING_CANDIDATE"
         else:
             classification = "SOURCE_DIV2_UNDIVIDED_CHAPTER_BODY_CANDIDATE"
-        classes[classification] += 1
         lexical = None
         reference_targets = None
         if stock_unknown_raw and row["native_key"] in stock_unknown_raw:
@@ -896,11 +948,44 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
                         )
                     one_word["original_source_word_markup_location"] = source_position
                     one_word["source_link_annotation_is_not_authorial_prose_parity"] = True
+        prefix_proof = None
+        if source is None and chapter.endswith(".1"):
+            candidate_proof = private_book_prefix_structure.get(
+                chapter.rsplit(".", 1)[0], {}
+            )
+            source_alignment = (
+                lexical.get("ordered_word_alignment",{})
+                if isinstance(lexical, dict) else {}
+            )
+            full_original_prose_retained = (
+                source_alignment.get(
+                    "original_plain_words_not_matched_in_exact_order"
+                ) == 0
+                and source_alignment.get(
+                    "exact_unicode_longest_common_subsequence_word_count"
+                ) == source_alignment.get("original_plain_word_tokens")
+                and isinstance(lexical,dict)
+                and lexical.get("overlap_class") == "HIGH_95_PLUS"
+            )
+            prefix_proof = {
+                **candidate_proof,
+                "source_book_prefix_prose_is_complete_in_original_K":
+                    full_original_prose_retained,
+                "source_book_prefix_first_chapter_attribution_approved":False,
+            }
+            if (candidate_proof.get(
+                    "all_source_book_identity_and_chapter_order_guards_pass")
+                    and full_original_prose_retained):
+                classification = (
+                    "SOURCE_BOOK_PREFIX_FIRST_CHAPTER_UNDIVIDED_CANDIDATE"
+                )
+        classes[classification] += 1
         cases.append({
             "independent_lexical_comparison": lexical,
             "independent_reference_target_comparison": reference_targets,
             "native_start": row["native_key"],
             "source_div2_structure_class": classification,
+            "source_book_prefix_first_chapter_structural_witness": prefix_proof,
             "source_chapter_alignment_method": alignment_method,
             "source_div2_original_ordinal": source["source_div2_ordinal"] if source else None,
             "source_chapter_marker_count": source["source_chapter_marker_count"] if source else 0,
