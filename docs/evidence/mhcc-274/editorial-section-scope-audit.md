@@ -440,3 +440,49 @@ Results for all **16 comma-separated original sections**:
 - The source checker prevents treating one unmarked section as a second authored comment, refuses separate existing K sections, and checks native canonical chapter maxima before counting possible new links.
 
 **Decision:** preserve current stock first-verse-only navigation and keep original BRMHCC 0.1.0 immutable while the app's true linked-section grouping and full-chapter presentation are investigated. Do **not** add 2,285 aliases just because a digital source has one undivided chapter commentary. For the limited 24-link original-heading repairs, the independent `diatheke` chapter test has already confirmed increased repeated output from native linked records; see [reader-oriented-indexing decision](reader-oriented-indexing-decision.md). The actual Xiphos chapter clipboard test in the same CI run was **INCONCLUSIVE**; the GUI copy did not independently establish two distinct source sections visible in one chapter selection, so no Xiphos dedupulation claim was made.
+
+
+## Exact source-structure resolution of the remaining two atypical chapters (2026-11-15)
+
+[Full pinned-source CI #43656744054](https://github.com/icfmp/Bible-Resources/actions/runs/43656744054)
+**SUCCESS**, including all new negative synthetic tests, all original
+29,975 I/K/TOP occupancy and word/markup/reference preservation checks,
+and the separately compiled 24-key linked-index preview.
+
+The source-neutral chapter reviewer now distinguishes three **structural
+provenance classes**, with **zero source/index changes**:
+
+| Original single-key chapter classes | Count | Independent evidence |
+| --- | ---: | --- |
+| Undivided, strongly corroborated independent CCEL `div2` chapter commentary | **116** | Exact canonical chapter identity, original-word order and no independent native I prose |
+| **Source first-chapter prose preserved in book `div1` prefix**, outside `div2` | **1 — 2Chr.1.1** | CCEL original contains **35** direct `div2` elements for the native **36** chapters. Its **first `div2` explicitly says chapter 2**; **21** independently numeric div2 headings follow the correct 2…36 ordinal sequence, with **zero conflicting chapter numbers**. The book-level prefix contains **two real nonempty paragraphs**, and all **129** source prose words appear in original CrossWire stock in exact sequence, with a separate **two-word** original `title` heading. No native I chapter prose is lost. |
+| **Full source prose preserved with an additional original stock book heading** | **1 — Neh.1.1** | The whole **239-word CCEL chapter exposition** is present in CrossWire order. CrossWire retains **29 additional leading heading words** in its original XML `title`; an exact independent CCEL book-level `div1` title attribute matches that original title. Punctuation/markup across editions remains distinct and is not silently normalized. |
+| **Total** | **118** | No absent authorial chapter text demonstrated in these cases |
+
+Public independent digital display corroboration:
+- [CCEL, 2 Chronicles' introductory/book text](https://ccel.org/ccel/henry/mhcc/mhcc.xv.html) displays the chapter-1 Solomon exposition **under the book heading** rather than a standalone `Chapter 1` wrapper.
+- [CCEL, Nehemiah chapter 1](https://ccel.org/ccel/henry/mhcc/mhcc.xvii.i.html) independently displays the complete exposition under chapter one.
+
+**Boundary of these results:** The structural provenance question is
+explained, **not** authorial print-edition equivalence. These are
+differently encoded digital copies. The exact original CrossWire XML,
+punctuation and title are left intact. A book-prefix `div1` node is
+*not* silently rewritten into a `div2`, and a CCEL book title is
+*not* deleted from a CrossWire chapter. This cannot license automatic
+full-chapter key expansion (still **2,285** possible keys across all 118)
+while the reader's section identity and chapter-level deduplication
+remain under review ([Bible #267](https://github.com/icfmp/Bible/issues/267)).
+
+All 118 original native chapter `I` entries were checked separately
+and none has additional visible independent commentary prose; **Lev 19**
+and **Ps 108** remain distinct **I-only** chapter-source cases outside
+this 118-case census. The 25 cross-edition scripture-reference
+annotation mismatches on 20 one-key chapters remain a **separate
+unapproved editorial track**, not a reason to rewrite original authorial
+text or retrofit CCEL hyperlinks into CrossWire without validation.
+
+**Current gate:** One cohesive technical 24-alias candidate, available
+as a temporary isolated CI proof only. No BRMHCC 0.1.1 release, no
+main-branch merge, no automatic restoration of missing links, no
+resumption of English modernization #270/#272 until editorial and real
+reader presentation approval.
