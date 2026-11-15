@@ -16,7 +16,12 @@
       "proposed_end_verse": "Ezek.3.21",
       "external_review_url": "https://github.com/icfmp/Bible-Resources/issues/277",
       "corroboration_class": "SAME_MALFORMED_CCEL_SCRIPREF_PLUS_VALID_CCEL_SCRIPREF_AND_ORIGINAL_NATIVE_SECTION_HEADING",
-      "editorial_decision": "REQUIRES_OWNER_SOURCE_TEXT_CORRECTION_APPROVAL"
+      "editorial_decision": "PRIVATE_COMPILATION_AND_TESTS_APPROVED_PUBLICATION_REQUIRES_SEPARATE_SIGNOFF",
+      "original_raw_sha256": "c69f6b1580c2ea555083f78bfa05c92f82150a1afcca0c0672b8e69333ac99ae",
+      "expected_original_linked_native_K_count": 11
     }
-  ]
+  ],
+  "private_revised_candidate_build_authorized": true,
+  "private_revised_candidate_build_authorization_note": "Owner said 'Continue' after the explicit request to approve the targeted Ezekiel 3 source correction; authorization is limited to a new private edited candidate and integrity/reader tests, NOT a public release, merge, or catalogue change.",
+  "private_revised_candidate_history_note": "Reviewed index navigation links and one documented source citation correction"
 }
