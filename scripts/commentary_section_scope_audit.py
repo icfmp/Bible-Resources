@@ -55,6 +55,7 @@ from commentary_stock_prefix_topology import (
     single_word_stock_markup_diagnostic, stock_prefix_context_correspondence,
 )
 from commentary_chapter_ref_labels import link_label_location
+from commentary_editorial_topology import NativeCommentaryEditorialTopology
 from commentary_unresolved_lexical_triage import marked_word_token_indices
 from commentary_xml_witness import _parse_reference, WORK_REF
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
@@ -1632,6 +1633,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
         private_full_I = {}
         private_full_K = defaultdict(list)
         osis_rebuild_preflight = NativeOSISRebuildPreflight()
+        editorial_topology = NativeCommentaryEditorialTopology()
         original_opaque_top_records = []
         private_intro_text_raw_by_chapter = {}
         private_numbered_bodies_for_intro_chapter = defaultdict(dict)
@@ -1648,6 +1650,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 nonlocal unparsed
                 rows.append((kind, ref))
                 osis_rebuild_preflight.observe(kind, ref, raw)
+                editorial_topology.observe(kind, ref, raw)
                 if kind == "U":
                     original_opaque_top_records.append(raw)
                 if kind == "I":
@@ -1731,6 +1734,13 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             raise PilotError("Original full native corpus hash drift")
         if set(records) - registry["verse_keys"]:
             raise PilotError("Stock native occupied key escaped independent versification registry")
+        topology_review = editorial_topology.report(registry["chapter_maximums"])
+        if (topology_review["original_native_K_rows_seen"] != len(keys)
+                or topology_review["original_native_I_rows_seen"] != len(intros)
+                or topology_review["original_native_TOP_rows_seen"] != len(top)
+                or not topology_review["all_original_native_K_rows_examined"]
+                or topology_review["release_authorized"]):
+            raise PilotError("Original editorial topology census does not match native source")
         intro_transport_probes = []
         for i, chapter in enumerate(intro_sample_chapters):
             original_intro_raw = private_intro_text_raw_by_chapter.get(chapter)
@@ -1980,6 +1990,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             "single_key_chapter_navigation_source_review_not_approved":
                 chapter_navigation_review,
             "unrecognized_native_slot_review": unknown,
+            "independent_original_native_editorial_topology_triage": topology_review,
             "independent_thml_witness": witness,
             "section_heading_matching_is_heuristic": True,
             "independent_edition_range_comparison_completed": witness["status"].startswith("PINNED"),
