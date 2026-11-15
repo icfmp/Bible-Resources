@@ -56,6 +56,7 @@ from commentary_stock_prefix_topology import (
 )
 from commentary_chapter_ref_labels import link_label_location
 from commentary_editorial_topology import NativeCommentaryEditorialTopology
+from commentary_reference_registry_triage import OriginalCommentaryReferenceRegistryTriage
 from commentary_unresolved_lexical_triage import marked_word_token_indices
 from commentary_xml_witness import _parse_reference, WORK_REF
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
@@ -1634,6 +1635,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
         private_full_K = defaultdict(list)
         osis_rebuild_preflight = NativeOSISRebuildPreflight()
         editorial_topology = NativeCommentaryEditorialTopology()
+        original_reference_triage = OriginalCommentaryReferenceRegistryTriage()
         original_opaque_top_records = []
         private_intro_text_raw_by_chapter = {}
         private_numbered_bodies_for_intro_chapter = defaultdict(dict)
@@ -1651,6 +1653,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 rows.append((kind, ref))
                 osis_rebuild_preflight.observe(kind, ref, raw)
                 editorial_topology.observe(kind, ref, raw)
+                original_reference_triage.observe(kind, ref, raw)
                 if kind == "U":
                     original_opaque_top_records.append(raw)
                 if kind == "I":
@@ -1735,6 +1738,16 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
         if set(records) - registry["verse_keys"]:
             raise PilotError("Stock native occupied key escaped independent versification registry")
         topology_review = editorial_topology.report(registry["chapter_maximums"])
+        original_reference_review = original_reference_triage.report(
+            canonical_verses=registry["verse_keys"],
+            canonical_chapters=registry["chapter_maximums"],
+        )
+        if (original_reference_review["original_native_K_seen"] != len(keys)
+                or original_reference_review["original_native_I_seen"] != len(intros)
+                or original_reference_review["original_native_TOP_seen"] != len(top)
+                or original_reference_review["publication_authorized"]
+                or original_reference_review["original_reference_targets_or_prose_exported"]):
+            raise PilotError("Original source reference registry census incomplete")
         if (topology_review["original_native_K_rows_seen"] != len(keys)
                 or topology_review["original_native_I_rows_seen"] != len(intros)
                 or topology_review["original_native_TOP_rows_seen"] != len(top)
@@ -1991,6 +2004,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 chapter_navigation_review,
             "unrecognized_native_slot_review": unknown,
             "independent_original_native_editorial_topology_triage": topology_review,
+            "independent_original_native_reference_registry_triage": original_reference_review,
             "independent_thml_witness": witness,
             "section_heading_matching_is_heuristic": True,
             "independent_edition_range_comparison_completed": witness["status"].startswith("PINNED"),
