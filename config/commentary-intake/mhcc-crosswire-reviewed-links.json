@@ -1,0 +1,293 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhcc-crosswire",
+  "source_module_id": "MHCC",
+  "source_archive_sha256": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+  "independent_digital_witness_sha256": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+  "scope": "ONLY_EXPLICIT_ORIGINAL_AUTHORED_RANGE_INDEX_OMISSIONS",
+  "meaning": "Source-constrained non-destructive navigation proposal, not altered authorial commentary, annotations or publication authorization.",
+  "reviewed_source_scopes": [
+    {
+      "master_key": "Eccl.4.7",
+      "segments": [
+        {
+          "chapter": "Eccl.4",
+          "from": 7,
+          "through": 8
+        }
+      ],
+      "evidence_class": "EXACT_ORIGINAL_HEADING_AND_INDEPENDENT_LEADING_COMMENTARY_CITATION",
+      "evidence_ids": [
+        "stock-heading:sha256:5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+        "ccel-leading-20-word-prose:sha256:4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6"
+      ],
+      "review_decision": "PROPOSE_SOURCE_PRESERVING_NAVIGATION_LINKS"
+    },
+    {
+      "master_key": "Eccl.9.11",
+      "segments": [
+        {
+          "chapter": "Eccl.9",
+          "from": 11,
+          "through": 12
+        }
+      ],
+      "evidence_class": "EXACT_ORIGINAL_HEADING_AND_INDEPENDENT_LEADING_COMMENTARY_CITATION",
+      "evidence_ids": [
+        "stock-heading:sha256:5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+        "ccel-leading-20-word-prose:sha256:4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6"
+      ],
+      "review_decision": "PROPOSE_SOURCE_PRESERVING_NAVIGATION_LINKS"
+    },
+    {
+      "master_key": "Isa.21.11",
+      "segments": [
+        {
+          "chapter": "Isa.21",
+          "from": 11,
+          "through": 12
+        }
+      ],
+      "evidence_class": "EXACT_ORIGINAL_HEADING_AND_INDEPENDENT_LEADING_COMMENTARY_CITATION",
+      "evidence_ids": [
+        "stock-heading:sha256:5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+        "ccel-leading-20-word-prose:sha256:4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6"
+      ],
+      "review_decision": "PROPOSE_SOURCE_PRESERVING_NAVIGATION_LINKS"
+    },
+    {
+      "master_key": "Isa.26.20",
+      "segments": [
+        {
+          "chapter": "Isa.26",
+          "from": 20,
+          "through": 21
+        }
+      ],
+      "evidence_class": "EXACT_ORIGINAL_HEADING_AND_INDEPENDENT_LEADING_COMMENTARY_CITATION",
+      "evidence_ids": [
+        "stock-heading:sha256:5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+        "ccel-leading-20-word-prose:sha256:4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6"
+      ],
+      "review_decision": "PROPOSE_SOURCE_PRESERVING_NAVIGATION_LINKS"
+    },
+    {
+      "master_key": "Isa.50.10",
+      "segments": [
+        {
+          "chapter": "Isa.50",
+          "from": 10,
+          "through": 11
+        }
+      ],
+      "evidence_class": "EXACT_ORIGINAL_HEADING_AND_INDEPENDENT_LEADING_COMMENTARY_CITATION",
+      "evidence_ids": [
+        "stock-heading:sha256:5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+        "ccel-leading-20-word-prose:sha256:4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6"
+      ],
+      "review_decision": "PROPOSE_SOURCE_PRESERVING_NAVIGATION_LINKS"
+    },
+    {
+      "master_key": "Isa.56.1",
+      "segments": [
+        {
+          "chapter": "Isa.56",
+          "from": 1,
+          "through": 2
+        }
+      ],
+      "evidence_class": "EXACT_ORIGINAL_HEADING_AND_INDEPENDENT_LEADING_COMMENTARY_CITATION",
+      "evidence_ids": [
+        "stock-heading:sha256:5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+        "ccel-leading-20-word-prose:sha256:4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6"
+      ],
+      "review_decision": "PROPOSE_SOURCE_PRESERVING_NAVIGATION_LINKS"
+    },
+    {
+      "master_key": "Isa.57.1",
+      "segments": [
+        {
+          "chapter": "Isa.57",
+          "from": 1,
+          "through": 2
+        }
+      ],
+      "evidence_class": "EXACT_ORIGINAL_HEADING_AND_INDEPENDENT_LEADING_COMMENTARY_CITATION",
+      "evidence_ids": [
+        "stock-heading:sha256:5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+        "ccel-leading-20-word-prose:sha256:4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6"
+      ],
+      "review_decision": "PROPOSE_SOURCE_PRESERVING_NAVIGATION_LINKS"
+    },
+    {
+      "master_key": "Isa.58.1",
+      "segments": [
+        {
+          "chapter": "Isa.58",
+          "from": 1,
+          "through": 2
+        }
+      ],
+      "evidence_class": "EXACT_ORIGINAL_HEADING_AND_INDEPENDENT_LEADING_COMMENTARY_CITATION",
+      "evidence_ids": [
+        "stock-heading:sha256:5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+        "ccel-leading-20-word-prose:sha256:4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6"
+      ],
+      "review_decision": "PROPOSE_SOURCE_PRESERVING_NAVIGATION_LINKS"
+    },
+    {
+      "master_key": "Isa.58.13",
+      "segments": [
+        {
+          "chapter": "Isa.58",
+          "from": 13,
+          "through": 14
+        }
+      ],
+      "evidence_class": "EXACT_ORIGINAL_HEADING_AND_INDEPENDENT_LEADING_COMMENTARY_CITATION",
+      "evidence_ids": [
+        "stock-heading:sha256:5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+        "ccel-leading-20-word-prose:sha256:4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6"
+      ],
+      "review_decision": "PROPOSE_SOURCE_PRESERVING_NAVIGATION_LINKS"
+    },
+    {
+      "master_key": "Isa.61.10",
+      "segments": [
+        {
+          "chapter": "Isa.61",
+          "from": 10,
+          "through": 11
+        }
+      ],
+      "evidence_class": "EXACT_ORIGINAL_HEADING_AND_INDEPENDENT_LEADING_COMMENTARY_CITATION",
+      "evidence_ids": [
+        "stock-heading:sha256:5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+        "ccel-leading-20-word-prose:sha256:4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6"
+      ],
+      "review_decision": "PROPOSE_SOURCE_PRESERVING_NAVIGATION_LINKS"
+    },
+    {
+      "master_key": "Jer.4.1",
+      "segments": [
+        {
+          "chapter": "Jer.4",
+          "from": 1,
+          "through": 2
+        }
+      ],
+      "evidence_class": "EXACT_ORIGINAL_HEADING_AND_INDEPENDENT_LEADING_COMMENTARY_CITATION",
+      "evidence_ids": [
+        "stock-heading:sha256:5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+        "ccel-leading-20-word-prose:sha256:4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6"
+      ],
+      "review_decision": "PROPOSE_SOURCE_PRESERVING_NAVIGATION_LINKS"
+    },
+    {
+      "master_key": "Jer.4.3",
+      "segments": [
+        {
+          "chapter": "Jer.4",
+          "from": 3,
+          "through": 4
+        }
+      ],
+      "evidence_class": "EXACT_ORIGINAL_HEADING_AND_INDEPENDENT_LEADING_COMMENTARY_CITATION",
+      "evidence_ids": [
+        "stock-heading:sha256:5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+        "ccel-leading-20-word-prose:sha256:4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6"
+      ],
+      "review_decision": "PROPOSE_SOURCE_PRESERVING_NAVIGATION_LINKS"
+    },
+    {
+      "master_key": "Lam.4.21",
+      "segments": [
+        {
+          "chapter": "Lam.4",
+          "from": 21,
+          "through": 22
+        }
+      ],
+      "evidence_class": "EXACT_ORIGINAL_HEADING_AND_INDEPENDENT_LEADING_COMMENTARY_CITATION",
+      "evidence_ids": [
+        "stock-heading:sha256:5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+        "ccel-leading-20-word-prose:sha256:4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6"
+      ],
+      "review_decision": "PROPOSE_SOURCE_PRESERVING_NAVIGATION_LINKS"
+    },
+    {
+      "master_key": "Matt.13.24",
+      "segments": [
+        {
+          "chapter": "Matt.13",
+          "from": 24,
+          "through": 30
+        },
+        {
+          "chapter": "Matt.13",
+          "from": 36,
+          "through": 43
+        }
+      ],
+      "evidence_class": "EXACT_DISCONTIGUOUS_ORIGINAL_HEADING_AND_INDEPENDENT_DIGITAL_PRESENTATIONS",
+      "evidence_ids": [
+        "stock-heading:sha256:5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+        "biblia-mhenryc-Mt13.1-23",
+        "egwwritings-mhcc-book14168.7598"
+      ],
+      "review_decision": "PROPOSE_SOURCE_PRESERVING_NAVIGATION_LINKS"
+    },
+    {
+      "master_key": "Song.1.7",
+      "segments": [
+        {
+          "chapter": "Song.1",
+          "from": 7,
+          "through": 8
+        }
+      ],
+      "evidence_class": "EXACT_ORIGINAL_HEADING_AND_INDEPENDENT_LEADING_COMMENTARY_CITATION",
+      "evidence_ids": [
+        "stock-heading:sha256:5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+        "ccel-leading-20-word-prose:sha256:4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6"
+      ],
+      "review_decision": "PROPOSE_SOURCE_PRESERVING_NAVIGATION_LINKS"
+    },
+    {
+      "master_key": "Song.6.2",
+      "segments": [
+        {
+          "chapter": "Song.6",
+          "from": 2,
+          "through": 3
+        }
+      ],
+      "evidence_class": "EXACT_ORIGINAL_HEADING_AND_INDEPENDENT_LEADING_COMMENTARY_CITATION",
+      "evidence_ids": [
+        "stock-heading:sha256:5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+        "ccel-leading-20-word-prose:sha256:4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6"
+      ],
+      "review_decision": "PROPOSE_SOURCE_PRESERVING_NAVIGATION_LINKS"
+    },
+    {
+      "master_key": "Song.8.13",
+      "segments": [
+        {
+          "chapter": "Song.8",
+          "from": 13,
+          "through": 14
+        }
+      ],
+      "evidence_class": "EXACT_ORIGINAL_HEADING_AND_INDEPENDENT_LEADING_COMMENTARY_CITATION",
+      "evidence_ids": [
+        "stock-heading:sha256:5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+        "ccel-leading-20-word-prose:sha256:4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6"
+      ],
+      "review_decision": "PROPOSE_SOURCE_PRESERVING_NAVIGATION_LINKS"
+    }
+  ],
+  "source_text_changes_authorized": false,
+  "cross_edition_annotation_changes_authorized": false,
+  "chapter_expansion_changes_authorized": false,
+  "release_authorized": false
+}
