@@ -1,6 +1,7 @@
 """Invented-only original SWORD reference target / registry tests."""
 import sys
 import unittest
+from lxml import etree
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
@@ -75,6 +76,69 @@ class NativeCommentaryReferenceRegistryTests(unittest.TestCase):
         self.assertFalse(report["publication_authorized"])
         self.assertNotIn("Gen.1.9", str(report))
         self.assertNotIn("Invented incorrect", str(report))
+
+    def test_reversed_original_source_range_requires_independent_and_native_agreement(self):
+        """Do not infer proposed labels from CCEL alone."""
+        scan = OriginalCommentaryReferenceRegistryTriage()
+        original = (
+            b"<div>Invented original summary "
+            b'<reference osisRef="Gen.1.3-Gen.1.1">'
+            b"Gen 1:3-1</reference>.</div>"
+        )
+        scan.observe("K", "Gen.1.1", original)
+        witness = etree.fromstring(
+            b"<ThML><div2>"
+            b'<scripRef osisRef="Bible:Gen.1.3-Gen.1.1">Gen 1:3-1</scripRef>'
+            b'<scripCom osisRef="Bible:Gen.1.3-Gen.1.5">Invented section</scripCom>'
+            b"</div2></ThML>"
+        )
+        good = scan.triangulate_reversed_ranges_against_independent_witness(
+            witness, canonical_verses={f"Gen.1.{n}" for n in range(1, 6)},
+            native_section_spans={"Gen.1.3": (3, 4, 5)},
+        )
+        self.assertEqual(good["source_original_distinct_body_reversed_reference_count"], 1)
+        case = good["case_rows"][0]
+        self.assertEqual(case["original_native_entry"], "Gen.1.1")
+        self.assertTrue(case["original_link_display_text_contains_reversed_numeric_span"])
+        self.assertTrue(case["independent_source_same_display_label_literal_match"])
+        self.assertEqual(case["independent_source_same_bad_range_scripref_count"], 1)
+        self.assertEqual(case["independent_source_valid_matching_start_scripcom_count"], 1)
+        self.assertEqual(case["independent_source_and_native_heading_matching_candidate_count"], 1)
+        self.assertEqual(case["candidate_end_verse_if_both_witnesses_agree"], 5)
+        self.assertFalse(good["correction_authorized"])
+        self.assertFalse(good["source_text_xml_or_original_reference_target_exported"])
+        self.assertNotIn("Invented", str(good))
+
+        # A different native passage, absent source section, or a source
+        # with an invalid candidate endpoint can never approve a repair.
+        no_native = scan.triangulate_reversed_ranges_against_independent_witness(
+            witness, canonical_verses={f"Gen.1.{n}" for n in range(1, 6)},
+            native_section_spans={"Gen.1.3": (3, 4)},
+        )
+        self.assertIsNone(
+            no_native["case_rows"][0]["candidate_end_verse_if_both_witnesses_agree"])
+        missing_source = etree.fromstring(
+            b'<ThML><scripRef osisRef="Bible:Gen.1.3-Gen.1.1">'
+            b"Gen 1:3-1</scripRef></ThML>"
+        )
+        no_source = scan.triangulate_reversed_ranges_against_independent_witness(
+            missing_source, canonical_verses={f"Gen.1.{n}" for n in range(1, 6)},
+            native_section_spans={"Gen.1.3": (3, 4, 5)},
+        )
+        self.assertIsNone(
+            no_source["case_rows"][0]["candidate_end_verse_if_both_witnesses_agree"])
+
+    def test_reversed_range_witness_rejects_invalid_inputs(self):
+        scan = OriginalCommentaryReferenceRegistryTriage()
+        scan.observe("K", "Gen.1.1", b'<reference osisRef="Gen.1.3-Gen.1.1">3-1</reference>')
+        with self.assertRaises(ValueError):
+            scan.triangulate_reversed_ranges_against_independent_witness(
+                "not an XML witness", canonical_verses={"Gen.1.3"}, native_section_spans={}
+            )
+        with self.assertRaises(ValueError):
+            scan.triangulate_reversed_ranges_against_independent_witness(
+                etree.Element("ThML"), canonical_verses=set(), native_section_spans={}
+            )
 
     def test_invalid_source_and_missing_registry_fail_closed(self):
         scan = OriginalCommentaryReferenceRegistryTriage()
