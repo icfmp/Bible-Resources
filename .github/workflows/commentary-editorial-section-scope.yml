@@ -5,6 +5,8 @@ on:
     paths:
       - '.github/workflows/commentary-editorial-section-scope.yml'
       - 'scripts/commentary_section_scope_audit.py'
+      - 'scripts/commentary_editorial_topology.py'
+      - 'tests/test_commentary_editorial_topology.py'
       - 'scripts/commentary_osis_rebuild_preflight.py'
       - 'scripts/commentary_intro_chapter_text_review.py'
       - 'scripts/commentary_osis_intro_transport_probe.py'
@@ -50,6 +52,7 @@ jobs:
           set -euo pipefail
           python -m pip install -r requirements.txt
           python -m unittest discover -s tests -p 'test_commentary_section_scope_audit.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_editorial_topology.py' -v
           python -m unittest discover -s tests -p 'test_commentary_navigation_link_plan.py' -v
           python -m unittest discover -s tests -p 'test_commentary_chapter_ref_labels.py' -v
           python -m unittest discover -s tests -p 'test_commentary_osis_rebuild_preflight.py' -v
@@ -623,6 +626,25 @@ jobs:
               print("Candidate unapproved native section",section["original_master_key"],
                     "unoccupied targets",",".join(section["unoccupied_native_target_keys"]))
 
+          topology=r["independent_original_native_editorial_topology_triage"]
+          assert topology["status"]=="COMPLETE_ORIGINAL_NATIVE_EDITORIAL_TOPOLOGY_TRIAGE_NOT_APPROVAL"
+          assert topology["all_original_native_K_rows_examined"] is True
+          assert topology["original_native_K_rows_seen"]==r["native_numbered_rows"]
+          assert topology["original_native_I_rows_seen"]==r["native_intro_rows"]
+          assert topology["original_native_TOP_rows_seen"]==r["native_top_rows"]
+          assert topology["candidate_is_not_an_editorial_defect_verdict"] is True
+          assert topology["original_words_or_xml_in_report"] is False
+          assert topology["release_authorized"] is False
+          print("Independent whole-original editorial title and reuse topology:",
+                "distinct K bodies",topology["distinct_original_K_raw_bodies"],
+                "numeric title classes",
+                json.dumps(topology["unique_original_body_numeric_title_classes"],sort_keys=True))
+          print("Independent whole-original editorial topology candidate counts:",
+                json.dumps(topology["candidate_counts"],sort_keys=True))
+          for category, cases in topology["candidate_samples"].items():
+              print("Original editorial topology review cases",category,
+                    json.dumps(cases,sort_keys=True),
+                    "additional unlisted",topology["sample_overflow_counts"][category])
           unknown=r["unrecognized_native_slot_review"]
           assert unknown["total"]==r["counts"]["no_recognized_heading"]
           assert unknown["all_output_is_original_text_free_metadata"] is True
