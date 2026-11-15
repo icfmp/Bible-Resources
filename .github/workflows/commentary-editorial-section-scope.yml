@@ -12,6 +12,8 @@ on:
       - 'scripts/commentary_literal_erratum_preflight.py'
       - 'scripts/commentary_source_erratum_compiled_probe.py'
       - 'tests/test_commentary_source_erratum_compiled_probe.py'
+      - 'scripts/commentary_public_metadata_preflight.py'
+      - 'tests/test_commentary_public_metadata_preflight.py'
       - 'tests/test_commentary_literal_erratum_preflight.py'
       - 'scripts/commentary_osis_rebuild_preflight.py'
       - 'scripts/commentary_intro_chapter_text_review.py'
@@ -62,6 +64,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_commentary_reference_registry_triage.py' -v
           python -m unittest discover -s tests -p 'test_commentary_literal_erratum_preflight.py' -v
           python -m unittest discover -s tests -p 'test_commentary_source_erratum_compiled_probe.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_public_metadata_preflight.py' -v
           python -m unittest discover -s tests -p 'test_commentary_navigation_link_plan.py' -v
           python -m unittest discover -s tests -p 'test_commentary_chapter_ref_labels.py' -v
           python -m unittest discover -s tests -p 'test_commentary_osis_rebuild_preflight.py' -v
