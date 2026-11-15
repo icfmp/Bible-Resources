@@ -1860,7 +1860,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 original_stock_module_id=manifest["module_id"],
                 native_index_binary=index_binary,
             )
-            provisional_preview["source_scope_corrobated_in_draft_only"] = True
+            provisional_preview["source_scope_corroborated_in_draft_only"] = True
             provisional_preview["source_scope_editorially_approved"] = False
             provisional_preview["preflight_candidate_section_count"] = (
                 index_preflight["candidate_section_count"]
@@ -1934,7 +1934,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 full_probe,
             "private_provisional_range_index_preview_not_approved":
                 provisional_preview,
-            "source_corrobated_reviewed_section_alias_plan_not_release_approved":
+            "source_corroborated_reviewed_section_alias_plan_not_release_approved":
                 reviewed_scope_plan,
             "native_rows_with_unrecognized_heading_or_xml": unparsed,
             **result,
