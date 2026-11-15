@@ -7,6 +7,8 @@ on:
       - 'scripts/commentary_section_scope_audit.py'
       - 'scripts/commentary_editorial_topology.py'
       - 'tests/test_commentary_editorial_topology.py'
+      - 'scripts/commentary_reference_registry_triage.py'
+      - 'tests/test_commentary_reference_registry_triage.py'
       - 'scripts/commentary_osis_rebuild_preflight.py'
       - 'scripts/commentary_intro_chapter_text_review.py'
       - 'scripts/commentary_osis_intro_transport_probe.py'
@@ -53,6 +55,7 @@ jobs:
           python -m pip install -r requirements.txt
           python -m unittest discover -s tests -p 'test_commentary_section_scope_audit.py' -v
           python -m unittest discover -s tests -p 'test_commentary_editorial_topology.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_reference_registry_triage.py' -v
           python -m unittest discover -s tests -p 'test_commentary_navigation_link_plan.py' -v
           python -m unittest discover -s tests -p 'test_commentary_chapter_ref_labels.py' -v
           python -m unittest discover -s tests -p 'test_commentary_osis_rebuild_preflight.py' -v
@@ -645,6 +648,25 @@ jobs:
               print("Original editorial topology review cases",category,
                     json.dumps(cases,sort_keys=True),
                     "additional unlisted",topology["sample_overflow_counts"][category])
+          references=r["independent_original_native_reference_registry_triage"]
+          assert references["status"]=="FULL_ORIGINAL_NATIVE_REFERENCE_REGISTRY_TRIAGE_NOT_EDITORIAL_CORRECTION"
+          assert references["original_native_K_seen"]==r["native_numbered_rows"]
+          assert references["original_native_I_seen"]==r["native_intro_rows"]
+          assert references["original_native_TOP_seen"]==r["native_top_rows"]
+          assert references["original_reference_targets_or_prose_exported"] is False
+          assert references["original_reference_targets_or_prose_changed"] is False
+          assert references["complex_target_not_classified_as_error"] is True
+          assert references["publication_authorized"] is False
+          print("Full original native reference target registry classes:",
+                references["distinct_body_reference_elements_classified"],
+                json.dumps(references["reference_target_classes"],sort_keys=True))
+          print("Original canonical-registry manual reference review counts:",
+                json.dumps(references["manual_review_candidate_counts"],sort_keys=True))
+          for category, rows in references["manual_review_samples"].items():
+              print("Reference registry candidate category",category,
+                    "first 20 locations",json.dumps(rows[:20],sort_keys=True),
+                    "additional reviewed privately",
+                    references["manual_review_unlisted_counts"][category]+max(0,len(rows)-20))
           unknown=r["unrecognized_native_slot_review"]
           assert unknown["total"]==r["counts"]["no_recognized_heading"]
           assert unknown["all_output_is_original_text_free_metadata"] is True
