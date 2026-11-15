@@ -43,6 +43,7 @@ from commentary_navigation_link_plan import (
     triage_missing_native_section_links,
     triage_single_key_chapter_navigation,
     verify_original_native_adjacent_section_boundaries,
+    corroborate_reviewed_commentary_link_plan,
 )
 from commentary_source_english_osis_alias import (
     read_existing_66_book_english_aliases, _canon_name
@@ -1813,33 +1814,9 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             valid_verse_keys=registry["verse_keys"],
             source_heading_anomalies=result["anomalies"],
         )
+        # Source corroboration must precede any proposed production-like build.
         provisional_preview = None
-        if provisional_range_preview:
-            preliminary_aliases = {
-                target: {
-                    "link_to": row["original_master_key"],
-                    "source_raw_sha256": row["original_master_raw_sha256"],
-                }
-                for row in index_preflight["candidate_sections"]
-                for target in row["unoccupied_native_target_keys"]
-            }
-            # Technical-only candidate. Heading-derived scope is UNREVIEWED.
-            # No correction, approval, release or production source change.
-            preview_dir = directory / "range-index-preview-not-approved"
-            preview_dir.mkdir()
-            provisional_preview = probe_complete_original_transport(
-                private_full_I, private_full_K, original_opaque_top_records,
-                scratch=preview_dir, native_raw_binary=raw_binary,
-                provisional_index_aliases=preliminary_aliases,
-                test_preview_in_xiphos=preview_real_xiphos,
-                original_stock_sword_root=installed,
-                original_stock_module_id=manifest["module_id"],
-                native_index_binary=index_binary,
-            )
-            provisional_preview["source_scope_editorially_approved"] = False
-            provisional_preview["preflight_candidate_section_count"] = (
-                index_preflight["candidate_section_count"]
-            )
+        reviewed_scope_plan = None
         unknown = audit_unrecognized_slots(records)
         if unknown["total"] != result["counts"]["no_recognized_heading"]:
             raise PilotError("Unrecognized heading count diverged from complete native inventory")
@@ -1849,6 +1826,47 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             registry, private_unrecognized_raw,
             original_chapter_intro_raw=private_intro_text_raw_by_chapter,
             original_range_stock_raw=private_range_heading_raw)
+        review_path = (Path(__file__).resolve().parents[1] /
+                       "config" / "commentary-intake" /
+                       f"{resource_id}-reviewed-links.json")
+        if review_path.is_file():
+            if review_path.is_symlink() or review_path.stat().st_size > 128*1024:
+                raise PilotError("Unbounded or unsafe original source-scope decision file")
+            decisions = json.loads(review_path.read_text(encoding="utf-8"))
+            reviewed_scope_plan = corroborate_reviewed_commentary_link_plan(
+                review=decisions, resource_id=resource_id,
+                original_archive_sha256=downloaded["sha256"],
+                witness_sha256=witness["witness_sha256"],
+                occupied={key:row["sha256"] for key,row in records.items()},
+                valid_verse_keys=registry["verse_keys"],
+                original_candidate_preflight=index_preflight,
+                independent_leading_range_citations=
+                    witness["independent_leading_range_citations"]
+            )
+        if provisional_range_preview:
+            if reviewed_scope_plan is None:
+                raise PilotError(
+                    "Private index preview requires independently corroborated"
+                    " editorial section-scope decision data")
+            preview_dir = directory / "range-index-reviewed-private-not-release"
+            preview_dir.mkdir()
+            provisional_preview = probe_complete_original_transport(
+                private_full_I, private_full_K, original_opaque_top_records,
+                scratch=preview_dir, native_raw_binary=raw_binary,
+                provisional_index_aliases=reviewed_scope_plan[
+                    "new_native_aliases"],
+                test_preview_in_xiphos=preview_real_xiphos,
+                original_stock_sword_root=installed,
+                original_stock_module_id=manifest["module_id"],
+                native_index_binary=index_binary,
+            )
+            provisional_preview["source_scope_corrobated_in_draft_only"] = True
+            provisional_preview["source_scope_editorially_approved"] = False
+            provisional_preview["preflight_candidate_section_count"] = (
+                index_preflight["candidate_section_count"]
+            )
+            provisional_preview["source_prose_or_annotation_edited"] = False
+            provisional_preview["release_authorized"] = False
         chapter_source_cases = witness["independent_div2_chapter_body_review"]["case_rows"]
         chapter_intros = (
             {
@@ -1916,6 +1934,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 full_probe,
             "private_provisional_range_index_preview_not_approved":
                 provisional_preview,
+            "source_corrobated_reviewed_section_alias_plan_not_release_approved":
+                reviewed_scope_plan,
             "native_rows_with_unrecognized_heading_or_xml": unparsed,
             **result,
             "explicit_heading_native_link_candidate_preflight": index_preflight,
