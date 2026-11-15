@@ -2032,8 +2032,21 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             if proposed_errata.get("private_revised_candidate_build_authorized") is True:
                 if (proposed_errata.get("source_text_changes_for_public_release_authorized") is not False
                         or proposed_errata.get("release_authorized") is not False
-                        or proposed_errata.get("private_revised_candidate_build_authorization_note")
-                           != "Owner said 'Continue' after the explicit request to approve the targeted Ezekiel 3 source correction; authorization is limited to a new private edited candidate and integrity/reader tests, NOT a public release, merge, or catalogue change."
+                        or not isinstance(proposed_errata.get("private_revised_candidate_build_authorization"),dict)
+                        or proposed_errata["private_revised_candidate_build_authorization"].get("scope")
+                           != "private_compile_and_validate_only"
+                        or proposed_errata["private_revised_candidate_build_authorization"].get("source")
+                           != "project_owner_instruction"
+                        or not isinstance(proposed_errata["private_revised_candidate_build_authorization"].get("decision_text"),str)
+                        or not 2 <= len(proposed_errata["private_revised_candidate_build_authorization"]["decision_text"]) <= 200
+                        or not isinstance(proposed_errata["private_revised_candidate_build_authorization"].get("recorded_date"),str)
+                        or not re.fullmatch(r"\d{4}-\d{2}-\d{2}",
+                            proposed_errata["private_revised_candidate_build_authorization"]["recorded_date"])
+                        or proposed_errata["private_revised_candidate_build_authorization"].get("review_issue_url")
+                           != proposals[0]["external_review_url"]
+                        or any(proposed_errata["private_revised_candidate_build_authorization"].get(name) is not False
+                               for name in ("merge_authorized", "public_release_authorized",
+                                            "catalogue_update_authorized"))
                         or not isinstance(proposed_errata.get("private_revised_candidate_history_note"),str)
                         or len(proposals)!=1 or len(receipts)!=1
                         or receipts[0]["native_existing_aliases_sharing_original_raw"]
