@@ -189,6 +189,137 @@ def triage_missing_native_section_links(*, occupied: dict[str, str],
 
 
 
+
+def corroborate_reviewed_commentary_link_plan(
+        *, review: dict, resource_id: str, original_archive_sha256: str,
+        witness_sha256: str, occupied: dict[str,str],
+        valid_verse_keys: set[str], original_candidate_preflight: dict,
+        independent_leading_range_citations: dict) -> dict:
+    """Cross-check a separately recorded section decision against real sources.
+
+    The review data fixes *scope only*. The SHA-pinned original SWORD stock
+    supplies current raw-body digests and actual vacant native verse keys.
+    Independent source checks establish evidence strength; neither an original
+    display heading nor another digital edition authorizes rewriting commentary,
+    extending unmarked chapters, copying annotations, or publishing a module.
+    """
+    if (not isinstance(review,dict) or review.get("schema_version")!=1
+            or review.get("resource_id")!=resource_id
+            or review.get("source_archive_sha256")!=original_archive_sha256
+            or review.get("independent_digital_witness_sha256")!=witness_sha256
+            or not SHA256.fullmatch(original_archive_sha256)
+            or not SHA256.fullmatch(witness_sha256)
+            or review.get("scope")!="ONLY_EXPLICIT_ORIGINAL_AUTHORED_RANGE_INDEX_OMISSIONS"
+            or any(review.get(k) is not False for k in (
+                "source_text_changes_authorized",
+                "cross_edition_annotation_changes_authorized",
+                "chapter_expansion_changes_authorized", "release_authorized"))):
+        raise UnsafeCommentaryLinkPlan("Unpinned or out-of-scope editorial link review")
+    sections=review.get("reviewed_source_scopes")
+    preflight=original_candidate_preflight.get("candidate_sections")
+    leads=independent_leading_range_citations.get("case_rows")
+    if (not isinstance(sections,list) or not 0<len(sections)<=500
+            or not isinstance(preflight,list) or not isinstance(leads,list)
+            or len(sections)!=len(preflight) or len(leads)!=len(preflight)):
+        raise UnsafeCommentaryLinkPlan("Incomplete original section review census")
+    original={r.get("original_master_key"):r for r in preflight}
+    independent={r.get("original_section_start"):r for r in leads}
+    if (len(original)!=len(preflight) or len(independent)!=len(leads)
+            or set(original)!=set(independent)):
+        raise UnsafeCommentaryLinkPlan("Original native and independent source inventory conflict")
+    chosen=[]
+    review_classes=defaultdict(int)
+    for row in sections:
+        if not isinstance(row,dict):
+            raise UnsafeCommentaryLinkPlan("Unstructured source section decision")
+        master=row.get("master_key")
+        evidence_class=row.get("evidence_class")
+        evidence_ids=row.get("evidence_ids")
+        if (master not in original or master not in independent
+                or master not in occupied
+                or row.get("review_decision")!="PROPOSE_SOURCE_PRESERVING_NAVIGATION_LINKS"
+                or not isinstance(evidence_ids,list) or len(evidence_ids)<2
+                or len(set(evidence_ids))!=len(evidence_ids)
+                or any(not isinstance(x,str) or not x.strip() or len(x)>256
+                       for x in evidence_ids)):
+            raise UnsafeCommentaryLinkPlan("Missing independent, bounded review evidence")
+        lead=independent[master]
+        sections_segments=row.get("segments")
+        if not isinstance(sections_segments,list) or not sections_segments:
+            raise UnsafeCommentaryLinkPlan("Missing explicit authorial passage segments")
+        if evidence_class=="EXACT_ORIGINAL_HEADING_AND_INDEPENDENT_LEADING_COMMENTARY_CITATION":
+            if (len(sections_segments)!=1
+                    or lead.get("independent_exact_range_citation_count",0)<1
+                    or lead.get(
+                        "independent_leading_reference_and_matching_original_stock_exposition",
+                        0)<1
+                    or not any(witness_sha256 in x for x in evidence_ids)):
+                raise UnsafeCommentaryLinkPlan("Original range lacks matching independent exposition")
+        elif evidence_class=="EXACT_DISCONTIGUOUS_ORIGINAL_HEADING_AND_INDEPENDENT_DIGITAL_PRESENTATIONS":
+            # Secondary digital presentations were reviewed and recorded
+            # separately, not silently elevated to exact CCEL/print equivalence.
+            if (len(sections_segments)<2 or len(evidence_ids)<3
+                    or lead.get("independent_exact_range_citation_count")!=0):
+                raise UnsafeCommentaryLinkPlan("Discontinuous scope requires explicit independent editorial evidence")
+        else:
+            raise UnsafeCommentaryLinkPlan("Unknown editorial section evidence type")
+        candidate=original[master]
+        chapter=master.rsplit(".",1)[0]
+        targets=set()
+        for segment in sections_segments:
+            if (not isinstance(segment,dict)
+                    or segment.get("chapter")!=chapter
+                    or type(segment.get("from")) is not int
+                    or type(segment.get("through")) is not int
+                    or segment["from"]<1
+                    or segment["through"]<segment["from"]
+                    or segment["through"]>1000):
+                raise UnsafeCommentaryLinkPlan("Different chapter or unreviewed section extent")
+            targets.update(
+                f'{chapter}.{i}' for i in range(segment["from"],segment["through"]+1)
+            )
+        if (master not in targets or
+                sorted(targets-occupied.keys())!=
+                sorted(candidate.get("unoccupied_native_target_keys",[]))):
+            raise UnsafeCommentaryLinkPlan("Reviewed segments do not match exact original index omissions")
+        if (candidate.get("original_master_raw_sha256")!=occupied[master]
+                or candidate.get("source_scope_editorially_reviewed") is not False):
+            raise UnsafeCommentaryLinkPlan("Original preflight changed or was prematurely approved")
+        chosen.append({
+            "master_key":master,
+            "raw_sha256":occupied[master],
+            "segments":sections_segments,
+            "source_scope_reviewed":True,
+            "evidence_ids":evidence_ids,
+        })
+        review_classes[evidence_class]+=1
+    if len({r["master_key"] for r in chosen})!=len(preflight):
+        raise UnsafeCommentaryLinkPlan("Original section excluded, duplicated or replaced")
+    proposed=propose_commentary_links(
+        occupied=occupied,valid_verse_keys=valid_verse_keys,
+        reviewed_sections=chosen
+    )
+    if proposed["added_alias_count"] != sum(
+            len(row["unoccupied_native_target_keys"]) for row in preflight):
+        raise UnsafeCommentaryLinkPlan("Approved review and original index gap counts differ")
+    if (set(proposed["new_native_aliases"])!=
+            {target for row in preflight
+             for target in row["unoccupied_native_target_keys"]}):
+        raise UnsafeCommentaryLinkPlan("Reviewed plan adds unsupported or omits original gap")
+    return {
+        **proposed,
+        "status":"SOURCE_SCOPE_CORROBORATED_CANDIDATE_NOT_RELEASE_AUTHORIZED",
+        "independent_source_evidence_classes":dict(sorted(review_classes.items())),
+        "original_source_archive_sha256":original_archive_sha256,
+        "independent_digital_witness_sha256":witness_sha256,
+        "one_reviewed_authorial_body_per_master":True,
+        "all_source_omission_candidate_scopes_correspond_to_reviewed_source":True,
+        "original_ccel_annotation_values_copied":False,
+        "unmarked_first_verse_chapter_aliases_added":False,
+        "release_authorized":False,
+    }
+
+
 def triage_single_key_chapter_navigation(
         *, occupied: dict[str, str],
         chapter_verse_maximums: dict[str, int],
