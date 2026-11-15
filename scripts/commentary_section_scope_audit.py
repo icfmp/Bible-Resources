@@ -1940,7 +1940,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                     raise PilotError("Source erratum candidate does not preserve original bytes")
                 receipts.append({
                     "original_native_entry": key,
-                    "proposed_endpoint_corrobated_by_source_and_native": True,
+                    "proposed_endpoint_corroborated_by_source_and_native": True,
                     "source_witness_is_citation_not_authorial_scope": True,
                     "native_existing_aliases_sharing_original_raw":
                         sum(entry["sha256"] == records[key]["sha256"]
