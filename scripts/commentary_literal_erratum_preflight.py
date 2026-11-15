@@ -27,7 +27,7 @@ REFERENCE_ELEMENT = re.compile(
     flags=re.DOTALL
 )
 REF_ATTRIBUTE = re.compile(
-    rb"(?<!\S)osisRef=(?P<quote>['\\"])(?P<value>[^'\\"<>]{1,2048})(?P=quote)"
+    rb"(?<!\S)osisRef=(?P<quote>['\"])(?P<value>[^'\"<>]{1,2048})(?P=quote)"
 )
 
 
