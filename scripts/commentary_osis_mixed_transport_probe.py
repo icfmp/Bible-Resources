@@ -902,10 +902,26 @@ def _probe_private_alias_real_xiphos(root: Path, module_id: str, aliases: dict,
 
 
 
+DEFAULT_PRIVATE_COMMENTARY_HISTORY = (
+    "Index-only section navigation corrections; "
+    "original commentary words and source references retained"
+)
+
+
+def _private_commentary_history_note(note: str) -> str:
+    """One safe version-history text value, never arbitrary source XML."""
+    if (not isinstance(note, str) or not 12 <= len(note) <= 200
+            or re.fullmatch(r"[A-Za-z0-9 ;:,.()/-]+", note) is None):
+        raise ValueError("Unsafe proposed SWORD history metadata")
+    return note
+
+
 def verify_private_versioned_commentary_conf_delta(
         published_conf_template: bytes, staged_conf: bytes, *,
         previous_version: str, proposed_version: str,
-        installed_native_data_size: int) -> dict:
+        installed_native_data_size: int,
+        history_note: str = DEFAULT_PRIVATE_COMMENTARY_HISTORY,
+        source_reference_change_verified: bool = False) -> dict:
     """Fail closed if a private SWORD update changes unreviewed metadata.
 
     Native .conf lineage is checked *byte for byte*, apart from Version,
@@ -914,6 +930,9 @@ def verify_private_versioned_commentary_conf_delta(
     a curator's independent endorsement of print-edition accuracy.
     This is a staging guard, never editorial or release approval.
     """
+    _private_commentary_history_note(history_note)
+    if not isinstance(source_reference_change_verified, bool):
+        raise ValueError("Unsafe source-change audit status")
     if (not isinstance(published_conf_template, bytes)
             or not isinstance(staged_conf, bytes)
             or not 0 < len(published_conf_template) <= 128*1024
@@ -954,10 +973,7 @@ def verify_private_versioned_commentary_conf_delta(
         raise ValueError("Incorrect versioned commentary packaging metadata")
     if re.search(rf"^History_{re.escape(proposed_version)}=", before, re.M):
         raise ValueError("Release history already exists in original commentary")
-    history = (
-        f"\nHistory_{proposed_version}=Index-only section navigation corrections; "
-        "original commentary words and source references retained\n"
-    )
+    history = f"\nHistory_{proposed_version}={history_note}\n"
     if not after.endswith(history):
         raise ValueError("Unreviewed new commentary release history")
     restored = after[:-len(history)]
@@ -982,6 +998,7 @@ def verify_private_versioned_commentary_conf_delta(
         "original_distribution_license_textsource_about_and_date_unchanged": True,
         "installed_native_bytes_used_for_install_size": True,
         "original_about_print_claim_is_inherited_not_independently_certified": True,
+        "private_source_reference_change_verified": source_reference_change_verified,
         "public_release_or_new_revision_date_authorized": False,
     }
 
@@ -992,7 +1009,9 @@ def privately_stage_versioned_zcom_zip(
         published_conf_template: bytes, scratch: Path,
         native_raw_binary: Path,
         provisional_index_aliases: dict[str,dict] | None = None,
-        test_with_real_xiphos: bool = False) -> dict:
+        test_with_real_xiphos: bool = False,
+        history_note: str = DEFAULT_PRIVATE_COMMENTARY_HISTORY,
+        source_reference_change_verified: bool = False) -> dict:
     """Privately package an official-compiler zCom under its curated identity.
 
     Reuses the *compiled native bytes* without patching them. ZIP is created
@@ -1002,6 +1021,11 @@ def privately_stage_versioned_zcom_zip(
     """
     allowed_id=re.compile(r"[A-Za-z][A-Za-z0-9_]{0,79}")
     version=re.compile(r"[0-9]+\.[0-9]+\.[0-9]+")
+    _private_commentary_history_note(history_note)
+    if not isinstance(source_reference_change_verified, bool):
+        raise ValueError("Unsafe source change status")
+    if source_reference_change_verified and history_note == DEFAULT_PRIVATE_COMMENTARY_HISTORY:
+        raise ValueError("Source-changing SWORD ZIP cannot claim unchanged annotations")
     if test_with_real_xiphos and not provisional_index_aliases:
         raise ValueError("Xiphos needs independently source-reviewed alias links")
     if (not allowed_id.fullmatch(compiled_module_id)
@@ -1053,16 +1077,15 @@ def privately_stage_versioned_zcom_zip(
         conf+=f"\nInstallSize={total_size}\n"
     if f"History_{proposed_version}=" in conf:
         raise ValueError("Proposed version already exists in published source history")
-    conf+=(
-        f"\nHistory_{proposed_version}=Index-only section navigation corrections; "
-        "original commentary words and source references retained\n"
-    )
+    conf+=f"\nHistory_{proposed_version}={history_note}\n"
     if conf.count(f"Version={proposed_version}")!=1:
         raise ValueError("Staging metadata version collision")
     metadata_guard = verify_private_versioned_commentary_conf_delta(
         published_conf_template, conf.encode("utf-8"),
         previous_version=previous_version, proposed_version=proposed_version,
-        installed_native_data_size=total_size)
+        installed_native_data_size=total_size,
+        history_note=history_note,
+        source_reference_change_verified=source_reference_change_verified)
     members={f"mods.d/{package_module_id.lower()}.conf":conf.encode("utf-8")}
     members.update({
         f"modules/comments/zcom/{package_module_id.lower()}/{p.name}":
@@ -1148,7 +1171,7 @@ def privately_stage_versioned_zcom_zip(
         "original_and_alias_native_K_count":len(before["K"]),
         "original_opaque_TOP_count":len(before["U"]),
         "installed_package_I_K_U_raw_bytes_equal_to_private_compiled_source":True,
-        "source_annotations_and_words_modified":False,
+        "source_annotations_and_words_modified":source_reference_change_verified,
         "source_sword_zip_or_0_1_0_package_overwritten":False,
         "package_saved_as_public_artifact":False,
         "release_authorized":False,
