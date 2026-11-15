@@ -237,7 +237,7 @@ def classify_native_osis_roundtrip_delta(original_raw: bytes, compiled_raw: byte
 
         def add(value, owner):
             if value:
-                sequence.extend((owner, token) for token in re.findall(r"\\S+", value))
+                sequence.extend((owner, token) for token in re.findall(r"\S+", value))
 
         def walk(node, parent_owner):
             nonlocal next_owner
