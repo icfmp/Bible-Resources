@@ -481,6 +481,14 @@ jobs:
           assert revised["package_isolated_install_exact_compiled_parity"] is True
           assert revised["package_zip_sha256"]!=staging["staged_package_zip_sha256"]
           assert revised["corrected_metadata_guard"]["private_source_reference_change_verified"] is True
+          proposed_metadata=revised["private_package_real_conf_public_metadata_dry_run"]
+          assert proposed_metadata["status"]=="PROVISIONAL_PUBLIC_SWORD_COMMENTARY_METADATA_TWO_FIELDS_ONLY_NOT_APPROVED"
+          assert proposed_metadata["exact_changed_fields"]==["About","SwordVersionDate"]
+          assert proposed_metadata["original_upstream_about_verbatim_preserved_with_explicit_attribution"] is True
+          assert proposed_metadata["all_other_fields_comments_license_textsource_and_history_exact"] is True
+          assert proposed_metadata["test_date_only_no_actual_release_day_selected"] is True
+          assert proposed_metadata["publication_authorized"] is False
+          assert proposed_metadata["public_asset_generated"] is False
           assert revised["corrected_metadata_guard"]["original_distribution_license_textsource_about_and_date_unchanged"] is True
           xiphos_revised=revised["real_xiphos_three_passage_proof"]
           assert xiphos_revised["actual_xiphos_gui_displayed"] is True
