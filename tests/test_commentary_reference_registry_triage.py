@@ -171,7 +171,7 @@ class NativeCommentaryReferenceRegistryTests(unittest.TestCase):
             b'<ThML><div2><scripRef osisRef="Bible:Gen.1.3-Gen.1.1">'
             b"Gen 1:3-1</scripRef>"
             b'<p><scripRef osisRef="Bible:Gen.1.3-Gen.1.5">'
-            b"Gen 1:3-5</scripRef> Invented following passage</p></div2></ThML>'
+            b"Gen 1:3-5</scripRef> Invented following passage</p></div2></ThML>"
         )
         verses = {f"Gen.1.{v}" for v in range(1, 6)}
         native = {"Gen.1.3": (3, 4, 5)}
