@@ -1005,6 +1005,8 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
     reference_totals = Counter()
     reference_exception_rows = []
     missing_stock_link_label_locations = Counter()
+    unmatched_source_target_label_locations = Counter()
+    unpaired_literal_unique_anchor_candidates = 0
     for row in cases:
         refs = row.get("independent_reference_target_comparison")
         if refs is None:
@@ -1020,6 +1022,14 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
             raise PilotError("Original/stock reference target pairing exceeds actual markup")
         unpaired_source = orig - paired
         unpaired_stock = stock - paired
+        if refs["unpaired_original_source_target_occurrences"] != unpaired_source:
+            raise PilotError("Independent original source target remainder misclassified")
+        unmatched_source_target_label_locations.update(
+            refs["unpaired_original_source_target_label_location_classes"]
+        )
+        unpaired_literal_unique_anchor_candidates += refs[
+            "unpaired_unique_literal_unlinked_citation_label_candidate_count"
+        ]
         reference_totals["original_source_nonempty_target_occurrences"] += orig
         reference_totals["stock_nonempty_target_occurrences"] += stock
         reference_totals["paired_target_occurrences_exact_or_literal_work_prefix"] += paired
@@ -1058,6 +1068,10 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
                 "classification": classification,
                 "source_link_label_location_classes":
                     refs["original_scripRef_to_stock_text_location_classes"],
+                "unpaired_source_link_label_location_classes":
+                    refs["unpaired_original_source_target_label_location_classes"],
+                "unique_literal_unlinked_original_source_label_candidates":
+                    refs["unpaired_unique_literal_unlinked_citation_label_candidate_count"],
                 "source_to_stock_reference_markup_parity_proven": False,
             })
     single_word_source_markup = Counter(
@@ -1149,6 +1163,11 @@ def independent_div2_chapter_body_evidence(document, native_registry: dict,
             reference_exception_rows,
         "source_reference_labels_when_stock_has_no_link_markup":
             dict(sorted(missing_stock_link_label_locations.items())),
+        "unpaired_original_source_reference_target_label_location_classes":
+            dict(sorted(unmatched_source_target_label_locations.items())),
+        "unpaired_unique_literal_reference_label_candidate_count":
+            unpaired_literal_unique_anchor_candidates,
+        "all_cross_edition_unpaired_source_targets_require_review":True,
         "source_reference_label_location_is_not_a_target_or_text_parity_check": True,
         "isolated_one_word_original_source_markup_location_classes":
             dict(sorted(single_word_source_markup.items())),
