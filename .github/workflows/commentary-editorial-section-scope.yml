@@ -455,6 +455,42 @@ jobs:
                 "commands accepted",staged_gui["actual_passage_commands_accepted"],
                 "full chapter deduplication proven",staged_gui["whole_chapter_commentary_deduplication_proven"])
 
+          revised=preview["private_source_edited_versioned_candidate_not_released"]
+          assert revised["status"]=="PRIVATE_SOURCE_EDITED_SWORD_ZCOM_CANDIDATE_FULL_PARITY_NOT_PUBLICATION"
+          assert revised["source_linked_original_verse_keys_changed"]==11
+          assert revised["only_original_linked_source_group_changed"] is True
+          assert len(revised["exact_original_K_keys_changed"])==11
+          assert revised["all_other_original_and_alias_K_bytes_identical_to_index_only_compilation"] is True
+          assert revised["all_original_I_and_TOP_bytes_identical_to_index_only_compilation"] is True
+          assert revised["all_original_compiled_native_adjacent_links_identical"] is True
+          assert revised["complete_corrected_source_semantic_and_xml_parity_passed"] is True
+          assert revised["corrected_reference_native_target_present_once"] is True
+          assert revised["reverse_restores_exact_original_raw"] is True
+          assert revised["original_numbered_key_count"]==28718
+          assert revised["revised_numbered_key_count"]==28742
+          assert revised["original_intro_key_count"]==1255
+          assert revised["original_TOP_slot_count"]==2
+          assert revised["package_isolated_install_exact_compiled_parity"] is True
+          assert revised["package_zip_sha256"]!=staging["staged_package_zip_sha256"]
+          assert revised["corrected_metadata_guard"]["private_source_reference_change_verified"] is True
+          assert revised["corrected_metadata_guard"]["original_distribution_license_textsource_about_and_date_unchanged"] is True
+          xiphos_revised=revised["real_xiphos_three_passage_proof"]
+          assert xiphos_revised["actual_xiphos_gui_displayed"] is True
+          assert xiphos_revised["independent_real_reader_sample_count"]==3
+          assert xiphos_revised["independent_real_reader_clipboard_matches"]==3
+          assert xiphos_revised["source_text_or_screenshot_logged"] is False
+          assert revised["original_and_public_module_unchanged"] is True
+          assert revised["corrected_package_uploaded_or_distributed"] is False
+          assert revised["source_words_or_xml_logged"] is False
+          assert revised["owner_publication_authorized"] is False
+          print("Corrected MHCC exact source delta and isolated actual Xiphos 3/3:",
+                "original K slots changed",revised["source_linked_original_verse_keys_changed"],
+                "all other original K/I/TOP exactly preserved",
+                revised["all_other_original_and_alias_K_bytes_identical_to_index_only_compilation"],
+                "all original native links identical",
+                revised["all_original_compiled_native_adjacent_links_identical"],
+                "private revised ZIP checksum",revised["package_zip_sha256"],
+                "public",revised["corrected_package_uploaded_or_distributed"])
           print("Private curated module ZIP isolated install:",
                 staging["status"],"module",staging["curated_module_id"],
                 "version",staging["proposed_version"],
