@@ -255,6 +255,7 @@ def probe_private_compiled_source_erratum(
         if (delta["word_sequence_relation"] != "EXACT_ORIGINAL_WORD_SEQUENCE"
                 or delta["normalized_whitespace_visible_unicode_equal"] is not True
                 or delta["non_div_element_order_and_exact_attribute_values_preserved"] is not True
+                or delta["original_nondiv_text_and_tail_ownership_preserved"] is not True
                 or delta["reference_attribute_values_in_original_document_order_preserved"] is not True):
             raise ValueError("Corrected original linked entry lost modified-source XML/text")
     if _original_citation_endpoints(revised_compiled["K"][original_master_key],
