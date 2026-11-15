@@ -691,6 +691,18 @@ jobs:
               print("Candidate range",row["start"],"through",row["declared_end"],
                     row["category"],"missing",",".join(row["missing_slots"]))
           witness=r["independent_thml_witness"]
+          inverted=witness["independent_original_reversed_reference_witness"]
+          assert inverted["status"]=="SOURCE_NATIVE_AND_INDEPENDENT_DIGITAL_REVERSED_REFERENCE_REVIEW_ONLY"
+          assert inverted["source_original_distinct_body_reversed_reference_count"]==(
+              references["manual_review_candidate_counts"].get(
+                  "REVERSED_SAME_CHAPTER_VERSE_RANGE",0))
+          assert inverted["source_text_xml_or_original_reference_target_exported"] is False
+          assert inverted["original_edition_changed"] is False
+          assert inverted["correction_authorized"] is False
+          assert inverted["release_authorized"] is False
+          print("Original reversed citations versus independent source and native headings:",
+                inverted["source_original_distinct_body_reversed_reference_count"],
+                json.dumps(inverted["case_rows"],sort_keys=True))
           lead=witness["independent_leading_range_citations"]
           assert lead["status"]=="INDEPENDENT_DIGITAL_SECTION_LEAD_TO_STOCK_PROSE_TRIAGE_NOT_APPROVAL"
           assert lead["case_count"]==17
