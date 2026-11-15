@@ -86,7 +86,7 @@ class CommentaryFinalDateAndSourceAttributionTests(unittest.TestCase):
             original, **self.args)
         self.assertIn(b"dated source edition with uncertain authorship", candidate)
         self.assertNotIn(b"source printing claim", candidate)
-        self.assertEqual(candidate.count(b"About="), 2) # old label inside a notice, plus one actual field
+        self.assertEqual(candidate.count(b"About="), 1) # only one actual SWORD field; the quoted value stays intact
 
 
 if __name__ == "__main__":
