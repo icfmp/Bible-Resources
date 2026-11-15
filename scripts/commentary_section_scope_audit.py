@@ -42,6 +42,7 @@ from commentary_navigation_link_plan import (
     parse_native_commentary_verse_registry, UnsafeCommentaryLinkPlan,
     triage_missing_native_section_links,
     triage_single_key_chapter_navigation,
+    verify_original_native_adjacent_section_boundaries,
 )
 from commentary_source_english_osis_alias import (
     read_existing_66_book_english_aliases, _canon_name
@@ -1789,6 +1790,23 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 limit if row["numbered_keys_present_in_original_chapter"] == 0 else None
             )
             row["whole_chapter_authorial_scope_is_not_yet_approved"] = True
+        # Check original SWORD's ACTUAL native link identity for every
+        # adjacent occupied K pair. Raw XML equality is not independently
+        # sufficient evidence that two authors' entries are one section.
+        adjacency_run = subprocess.run(
+            [str(index_binary), manifest["module_id"], "--adjacent-links"],
+            env=env, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+            timeout=150, check=False
+        )
+        if adjacency_run.returncode or len(adjacency_run.stdout) > 12*1024*1024:
+            raise PilotError("Original complete native section-link identity unavailable")
+        native_section_boundaries = verify_original_native_adjacent_section_boundaries(
+            adjacency_run.stdout,
+            expected_module=manifest["module_id"],
+            original_occupied_sha256={
+                ref: row["sha256"] for ref,row in records.items()
+            }
+        )
         result = classify(records)
         index_preflight = triage_missing_native_section_links(
             occupied={key: entry["sha256"] for key, entry in records.items()},
@@ -1901,6 +1919,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             "native_rows_with_unrecognized_heading_or_xml": unparsed,
             **result,
             "explicit_heading_native_link_candidate_preflight": index_preflight,
+            "complete_original_native_linked_section_boundary_review":
+                native_section_boundaries,
             "single_key_chapter_navigation_source_review_not_approved":
                 chapter_navigation_review,
             "unrecognized_native_slot_review": unknown,
