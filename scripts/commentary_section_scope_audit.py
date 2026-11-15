@@ -1892,6 +1892,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 published_conf_template=original_conf.read_bytes(),
                 scratch=preview_dir,
                 native_raw_binary=raw_binary,
+                provisional_index_aliases=reviewed_scope_plan["new_native_aliases"],
+                test_with_real_xiphos=preview_real_xiphos,
             )
             provisional_preview["private_versioned_package_install_not_released"]=package_staging
             provisional_preview["source_scope_corroborated_in_draft_only"] = True
