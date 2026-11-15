@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from hashlib import sha256
 import re
+from xml.parsers import expat
 
 from lxml import etree
 
@@ -26,7 +27,7 @@ REFERENCE_ELEMENT = re.compile(
     flags=re.DOTALL
 )
 REF_ATTRIBUTE = re.compile(
-    rb"\bosisRef=(?P<quote>['\"])(?P<value>[^'\"<>]{1,2048})(?P=quote)"
+    rb"(?<!\S)osisRef=(?P<quote>['\\"])(?P<value>[^'\\"<>]{1,2048})(?P=quote)"
 )
 
 
@@ -48,6 +49,44 @@ def _strict_original_fragment(raw: bytes) -> None:
         raise ValueError("Unsafe unresolved entity in source commentary XML")
 
 
+
+def _parsed_reference_spans(raw: bytes) -> list[tuple[int, int, str]]:
+    """Bind editable byte offsets to *actual* XML reference parser events.
+
+    The expat offsets point into the original UTF-8 source. A regex alone can
+    mistake comment or CDATA bytes for real elements. Parsing first also
+    rules out reference-like attributes on unrelated tags. The wrapper and
+    offsets are never written to the source.
+    """
+    prefix = b"<entry>"
+    parser = expat.ParserCreate("UTF-8")
+    stack = []
+    references = []
+
+    def start(name, attrs):
+        stack.append((name, parser.CurrentByteIndex - len(prefix), attrs))
+
+    def end(name):
+        if not stack:
+            raise ValueError("Unbalanced original commentary reference nodes")
+        opened, start_byte, attrs = stack.pop()
+        if opened != name:
+            raise ValueError("Unexpected original commentary nesting")
+        if name == "reference" and "osisRef" in attrs:
+            references.append((start_byte, parser.CurrentByteIndex - len(prefix),
+                               attrs["osisRef"]))
+
+    parser.StartElementHandler = start
+    parser.EndElementHandler = end
+    try:
+        parser.Parse(prefix + raw + b"</entry>", True)
+    except expat.ExpatError:
+        raise ValueError("Original commentary cannot be parsed for exact XML spans") from None
+    if stack or len(references) > 10000:
+        raise ValueError("Unbounded or unbalanced commentary reference parsing")
+    return references
+
+
 def _apply_exact_original_link_change(
         raw: bytes, *, first_verse: str,
         original_end_verse: str, proposed_end_verse: str) -> bytes:
@@ -67,17 +106,26 @@ def _apply_exact_original_link_change(
         rb"(?<!\d)" + re.escape(first_n) + rb"\s*(?:-|\xe2\x80\x93)\s*"
         + rb"(?P<end>" + re.escape(old_n) + rb")(?!\d)"
     )
-    for element in REFERENCE_ELEMENT.finditer(raw):
-        attr = REF_ATTRIBUTE.search(element.group("attrs"))
-        if attr is None:
+    for start_byte, close_byte, parsed_target in _parsed_reference_spans(raw):
+        if _unambiguous_verse_range_endpoints(parsed_target) != (
+                first_verse, original_end_verse):
             continue
+        # Both boundaries belong to an actual parsed element. Any XML comment,
+        # CDATA or nested-markup lookalike lacks these exact parser offsets.
+        element = REFERENCE_ELEMENT.match(raw, start_byte)
+        if (element is None or element.end("label") != close_byte
+                or not raw[close_byte:].startswith(b"</reference>")):
+            raise ValueError("Original reference does not have a direct-text XML label")
+        attributes = element.group("attrs")
+        attr = REF_ATTRIBUTE.search(attributes)
+        if attr is None:
+            raise ValueError("Parsed original reference has no exact osisRef attribute")
         try:
             existing = attr.group("value").decode("utf-8")
         except UnicodeDecodeError:
             raise ValueError("Invalid original encoded scripture target") from None
-        if _unambiguous_verse_range_endpoints(existing) != (
-                first_verse, original_end_verse):
-            continue
+        if existing != parsed_target:
+            raise ValueError("Lexical source reference does not match parsed XML attribute")
         label = element.group("label")
         numeric = list(label_form.finditer(label))
         if len(numeric) != 1:
@@ -92,11 +140,11 @@ def _apply_exact_original_link_change(
         else:
             raise ValueError("Original range endpoint has unsupported grammar")
         matches.append((
-            element.start("attrs") + attr.start("value"),
-            element.start("attrs") + attr.end("value"),
+            start_byte + element.start("attrs") + attr.start("value"),
+            start_byte + element.start("attrs") + attr.end("value"),
             next_target.encode("utf-8"),
-            element.start("label") + numeric[0].start("end"),
-            element.start("label") + numeric[0].end("end"),
+            start_byte + element.start("label") + numeric[0].start("end"),
+            start_byte + element.start("label") + numeric[0].end("end"),
             new_n,
         ))
     if len(matches) != 1:
