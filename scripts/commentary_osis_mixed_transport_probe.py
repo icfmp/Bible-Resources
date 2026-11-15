@@ -984,7 +984,9 @@ def privately_stage_versioned_zcom_zip(
     if sum(map(len,members.values()))>64*1024*1024:
         raise ValueError("Oversize unpublished SWORD package content")
     package=scratch/f"{package_module_id}-{proposed_version}.zip"
-    installed=scratch/"isolated-package-install"
+    # Distinct HOME parent: two real GTK/Xiphos probes in the same audit
+    # must never reuse each other's isolated GUI state.
+    installed=scratch/"curated-package-stage"/"isolated-package-install"
     if package.exists() or installed.exists():
         raise ValueError("Refuse to overwrite earlier private SWORD staging")
     def fixed_zip_item(name):
@@ -996,6 +998,7 @@ def privately_stage_versioned_zcom_zip(
     with zipfile.ZipFile(package,"w") as archive:
         for name,payload in sorted(members.items()):
             archive.writestr(fixed_zip_item(name),payload)
+    installed.parent.mkdir()
     installed.mkdir()
     with zipfile.ZipFile(package) as archive:
         if sorted(archive.namelist())!=sorted(members):
