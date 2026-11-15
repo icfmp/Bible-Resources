@@ -54,6 +54,29 @@ class OriginalNativeEditorialTopologyTests(unittest.TestCase):
         self.assertFalse(receipt["release_authorized"])
         self.assertNotIn("Invented passage", str(receipt))
 
+    def test_section_heading_in_prose_not_title_markup(self):
+        scan = NativeCommentaryEditorialTopology()
+        scan.observe(
+            "K", "Gen.1.3",
+            b"<div type='x-p'>Verses 9-10. Invented prose-only heading.</div>",
+        )
+        scan.observe(
+            "K", "Gen.1.4",
+            b"<div>Verses 4-5. Invented first section.</div>"
+            b"<div>Verses 8-9. Invented second section.</div>",
+        )
+        result = scan.report({"Gen.1": 5})
+        classes = result["unique_original_body_numeric_title_classes"]
+        self.assertEqual(classes["distinct_bodies_with_numbered_xml_title"], 0)
+        self.assertEqual(
+            classes["distinct_bodies_with_verse_label_in_first_350_visible_chars"], 2)
+        counts = result["candidate_counts"]
+        self.assertEqual(counts["early_visible_verse_label_vs_native_first_disagree"], 1)
+        self.assertEqual(counts["first_structural_verse_label_vs_native_first_disagree"], 1)
+        self.assertEqual(counts["different_structural_leading_verse_labels_in_same_body"], 1)
+        self.assertEqual(counts["first_visible_verse_span_outside_native_chapter_limit"], 1)
+        self.assertNotIn("Invented prose", str(result))
+
     def test_missing_or_invalid_registry_rejected(self):
         scan = NativeCommentaryEditorialTopology()
         scan.observe("K", "Gen.1.1", b"<title>Verse 1</title>Invented content")
