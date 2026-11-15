@@ -113,6 +113,7 @@ _COVERAGE_FIELDS = (
     "original_nondiv_element_order_and_attributes_preserved",
     "original_div_attribute_multiset_preserved",
     "original_reference_attribute_values_preserved",
+    "original_nondiv_text_and_tail_ownership_preserved",
 )
 
 
@@ -239,6 +240,9 @@ def probe_original_mixed_transport(chapter: str, book_intro: bytes,
                 for case in compared.values()),
             "original_reference_attribute_values_preserved":sum(
                 case["reference_attribute_values_in_original_document_order_preserved"]
+                for case in compared.values()),
+            "original_nondiv_text_and_tail_ownership_preserved":sum(
+                case["original_nondiv_text_and_tail_ownership_preserved"]
                 for case in compared.values()),
         }
     intro_coverage = summarize(compared_I)
@@ -1273,6 +1277,7 @@ def probe_complete_original_transport(
         ("original_nondiv_element_order_and_attributes_preserved", "non_div_element_order_and_exact_attribute_values_preserved"),
         ("original_div_attribute_multiset_preserved", "original_div_elements_exact_attribute_multiset_preserved"),
         ("original_reference_attribute_values_preserved", "reference_attribute_values_in_original_document_order_preserved"),
+        ("original_nondiv_text_and_tail_ownership_preserved", "original_nondiv_text_and_tail_ownership_preserved"),
     )
     for kind, originals in (("I", original_I), ("K", original_K)):
         counts = dict.fromkeys((name for name, _ in names), 0)
