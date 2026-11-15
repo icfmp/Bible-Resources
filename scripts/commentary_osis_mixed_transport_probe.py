@@ -902,6 +902,91 @@ def _probe_private_alias_real_xiphos(root: Path, module_id: str, aliases: dict,
 
 
 
+def verify_private_versioned_commentary_conf_delta(
+        published_conf_template: bytes, staged_conf: bytes, *,
+        previous_version: str, proposed_version: str,
+        installed_native_data_size: int) -> dict:
+    """Fail closed if a private SWORD update changes unreviewed metadata.
+
+    Native .conf lineage is checked *byte for byte*, apart from Version,
+    compression block type, measured InstallSize and the appended history.
+    Inherited source attribution/About/license remain source claims, not
+    a curator's independent endorsement of print-edition accuracy.
+    This is a staging guard, never editorial or release approval.
+    """
+    if (not isinstance(published_conf_template, bytes)
+            or not isinstance(staged_conf, bytes)
+            or not 0 < len(published_conf_template) <= 128*1024
+            or not 0 < len(staged_conf) <= 128*1024
+            or b"\x00" in published_conf_template or b"\x00" in staged_conf
+            or not isinstance(installed_native_data_size, int)
+            or isinstance(installed_native_data_size, bool)
+            or not 0 < installed_native_data_size <= 64*1024*1024
+            or not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", previous_version)
+            or not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", proposed_version)
+            or previous_version == proposed_version):
+        raise ValueError("Unsafe SWORD commentary metadata comparison")
+    try:
+        before = published_conf_template.decode("utf-8")
+        after = staged_conf.decode("utf-8")
+    except UnicodeError:
+        raise ValueError("Unreviewed SWORD commentary metadata encoding") from None
+
+    def one(conf: str, name: str) -> str:
+        values = re.findall(
+            rf"^{re.escape(name)}=([^\r\n]*)$", conf, flags=re.M)
+        if len(values) != 1 or not values[0].strip():
+            raise ValueError("Missing or ambiguous SWORD commentary metadata")
+        return values[0]
+
+    # Exact line-based source fields must be present before staged
+    # metadata can be accepted; never replace an upstream licence with CC0.
+    for key in ("DistributionLicense", "TextSource", "About",
+                "SwordVersionDate", "ModDrv", "SourceType", "DataPath",
+                "Versification", "Version", "BlockType", "InstallSize"):
+        one(before, key)
+        one(after, key)
+    if (one(before, "Version") != previous_version
+            or one(after, "Version") != proposed_version
+            or one(before, "BlockType") not in ("BOOK", "CHAPTER")
+            or one(after, "BlockType") != "CHAPTER"
+            or not one(before, "InstallSize").isdigit()
+            or one(after, "InstallSize") != str(installed_native_data_size)):
+        raise ValueError("Incorrect versioned commentary packaging metadata")
+    if re.search(rf"^History_{re.escape(proposed_version)}=", before, re.M):
+        raise ValueError("Release history already exists in original commentary")
+    history = (
+        f"\nHistory_{proposed_version}=Index-only section navigation corrections; "
+        "original commentary words and source references retained\n"
+    )
+    if not after.endswith(history):
+        raise ValueError("Unreviewed new commentary release history")
+    restored = after[:-len(history)]
+    replacements = (
+        ("Version", one(before, "Version")),
+        ("BlockType", one(before, "BlockType")),
+        ("InstallSize", one(before, "InstallSize")),
+    )
+    for key, old_value in replacements:
+        restored, n = re.subn(
+            rf"^{re.escape(key)}=[^\r\n]*$",
+            lambda _: f"{key}={old_value}", restored,
+            count=1, flags=re.M)
+        if n != 1:
+            raise ValueError("Expected original SWORD metadata key missing")
+    if restored != before:
+        raise ValueError("Unreviewed metadata or upstream provenance altered")
+    return {
+        "private_metadata_exact_reviewed_delta_only": True,
+        "only_changed_original_fields": ["BlockType", "InstallSize", "Version"],
+        "only_added_metadata_field": f"History_{proposed_version}",
+        "original_distribution_license_textsource_about_and_date_unchanged": True,
+        "installed_native_bytes_used_for_install_size": True,
+        "original_about_print_claim_is_inherited_not_independently_certified": True,
+        "public_release_or_new_revision_date_authorized": False,
+    }
+
+
 def privately_stage_versioned_zcom_zip(
         *, compiler_root: Path, compiled_module_id: str,
         package_module_id: str, previous_version: str, proposed_version: str,
@@ -975,6 +1060,10 @@ def privately_stage_versioned_zcom_zip(
     )
     if conf.count(f"Version={proposed_version}")!=1:
         raise ValueError("Staging metadata version collision")
+    metadata_guard = verify_private_versioned_commentary_conf_delta(
+        published_conf_template, conf.encode("utf-8"),
+        previous_version=previous_version, proposed_version=proposed_version,
+        installed_native_data_size=total_size)
     members={f"mods.d/{package_module_id.lower()}.conf":conf.encode("utf-8")}
     members.update({
         f"modules/comments/zcom/{package_module_id.lower()}/{p.name}":
@@ -1053,6 +1142,7 @@ def privately_stage_versioned_zcom_zip(
         "source_compiled_module_identity_changed_only_in_package":True,
         "native_compiled_files_copied_without_recompression_or_byte_edits":True,
         "compiled_file_count":len(files),
+        "private_conf_metadata_exact_delta_receipt": metadata_guard,
         "staged_package_zip_sha256":sha256(package.read_bytes()).hexdigest(),
         "staged_package_size_bytes":package.stat().st_size,
         "original_native_I_count":len(before["I"]),
