@@ -258,3 +258,50 @@ verify that no newly linked verse overwrites a distinct commentary section,
 then check one real reader for section deduplication and actual references.
 Do not merge or release before full editorial decisions and explicit owner
 approval. Modern-English #270/#272 remains paused.
+
+
+## Whole-original source SECTION identity verified beyond raw payload equality (2026-11-15)
+
+[Native SWORD exact-source CI #43657705190](https://github.com/icfmp/Bible-Resources/actions/runs/43657705190)
+**SUCCESS**. The source-neutral read-only native SWORD inspector now
+enumerates **every pair of consecutively numbered, occupied K positions in
+each chapter** and asks the actual libSWORD module whether
+`SWModule::isLinked(previous, current)`. The separate independently
+pinned original raw-entry inventory provides the unfiltered source
+body SHA-256 at both positions.
+
+| Independent measurement | Original stock result |
+| --- | ---: |
+| All consecutively numbered occupied K pairs | **27,516** |
+| Actual native `isLinked` pairs | **24,671** |
+| Actual independent, unlinked adjacent original sections | **2,845** |
+| **Same raw XML but native sections are NOT linked** | **0** |
+| **Different raw XML but native SWORD says linked** | **0** |
+| Incomplete, duplicated or invalid pair frames | **0** |
+| Exactly reconciled to source inventory | **27,516 / 27,516** |
+
+**Why this matters:** an earlier private OSIS builder grouped
+*contiguous, raw-identical* original K fragments for efficient
+`annotateRef` ranges. Identical words or identical XML do not, in
+general, prove a shared source section. The new **independent real
+SWORD identity census** proves that for this exact original MHCC
+2.0 SHA-pinned corpus, grouping by consecutive same-raw K entries
+does **not merge independently authored original native sections**.
+Negative synthetic cases (identical raw but unlinked) are checked and
+cause the full-corpus gate to reject that grouping assumption.
+
+This check is **generic and fail-closed**: another source commentary
+with identical-but-natively-independent sections will NOT be approved
+for reconstruction merely because the text-level transport succeeds.
+The current corpus passed because **every contiguous raw equality
+matched the original libSWORD link identity**, not because the test
+assumed raw equality proved authorship.
+
+Nonadjacent new aliases remain covered by a distinct native test:
+[24/24 newly linked source master identities + 15/15 independently
+separate controls #43654527757](https://github.com/icfmp/Bible-Resources/actions/runs/43654527757).
+These two independent tests jointly verify both the original
+contiguous sections and the temporary proposed disjoint links.
+Neither validates whole-chapter reader deduplication or historical
+print-edition identity. BRMHCC 0.1.0 and original CCEL/CrossWire source
+remain immutable, and no corrected module is approved for publication.
