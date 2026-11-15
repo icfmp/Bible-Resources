@@ -14,6 +14,7 @@ source replacement, not an upstream import and not a release mechanism.
 from __future__ import annotations
 
 from hashlib import sha256
+from datetime import date, timedelta
 from io import BytesIO
 from pathlib import Path
 import os
@@ -23,6 +24,9 @@ from lxml import etree
 
 from commentary_literal_erratum_preflight import (
     preview_exact_reversible_commentary_reference_erratum,
+)
+from commentary_public_metadata_preflight import (
+    prepare_provisional_public_commentary_conf, _exact_conf_value,
 )
 from commentary_reference_registry_triage import (
     SINGLE_VERSE, _unambiguous_verse_range_endpoints,
@@ -173,7 +177,7 @@ def probe_private_compiled_source_erratum(
         original_curated_conf: bytes,
         scratch: Path, native_raw_binary: Path,
         native_index_binary: Path,
-        history_note: str,
+        history_note: str, source_provider: str,
         test_with_real_xiphos: bool = True) -> dict:
     """Build and test a second wholly private corrected compiled SWORD ZIP."""
     if (not test_with_real_xiphos or not scratch.is_dir()
@@ -182,7 +186,8 @@ def probe_private_compiled_source_erratum(
             or not isinstance(original_TOP, list)
             or any(not isinstance(x, bytes) for x in original_TOP)
             or not original_index_only_compiled_root.is_dir()
-            or not original_curated_conf):
+            or not original_curated_conf
+            or not isinstance(source_provider, str) or not source_provider.strip()):
         raise ValueError("Missing source-verified candidate/review baseline")
     chapter = original_master_key.rsplit(".", 1)[0]
     native_original_chapter = original_numbered.get(chapter, [])
@@ -291,6 +296,32 @@ def probe_private_compiled_source_erratum(
     )
     if actual_install != revised_compiled:
         raise ValueError("New curated SWORD ZIP lost complete corrected native source parity")
+    # A generic *public-metadata proposal* must also work against the
+    # real privately compiled ZIP, not merely synthetic .conf test fixtures.
+    # Use the day immediately after the actual original source date solely
+    # as a reproducible dummy input; NEVER treat it as a release calendar day.
+    installed_conf = (
+        install_root / "mods.d" / (curated_module_id.lower() + ".conf")
+    ).read_bytes()
+    source_date = _exact_conf_value(
+        installed_conf.decode("utf-8"), "SwordVersionDate")
+    dummy_day = (date.fromisoformat(source_date) + timedelta(days=1)).isoformat()
+    _, metadata_proposal = prepare_provisional_public_commentary_conf(
+        installed_conf,
+        expected_module_id=curated_module_id,
+        expected_module_version=curated_proposed_version,
+        source_provider=source_provider,
+        original_sword_version_date=source_date,
+        proposed_public_revision_day=dummy_day,
+        revision_summary=history_note,
+    )
+    if (metadata_proposal["publication_authorized"] is not False
+            or metadata_proposal["public_asset_generated"] is not False
+            or metadata_proposal["exact_changed_fields"]
+               != ["About", "SwordVersionDate"]
+            or metadata_proposal["all_other_fields_comments_license_textsource_and_history_exact"]
+               is not True):
+        raise ValueError("Actual private ZIP .conf cannot yield a safe metadata draft")
     # Select a neutral original distinct section and an actually proposed
     # navigation alias as controls. This is not a test hardcoded to Ezekiel.
     review_control_key = first_verse
@@ -321,6 +352,10 @@ def probe_private_compiled_source_erratum(
         "package_zip_sha256": staged["staged_package_zip_sha256"],
         "package_isolated_install_exact_compiled_parity": True,
         "corrected_metadata_guard": staged["private_conf_metadata_exact_delta_receipt"],
+        "private_package_real_conf_public_metadata_dry_run": {
+            **metadata_proposal,
+            "test_date_only_no_actual_release_day_selected": True,
+        },
         "real_xiphos_three_passage_proof": xiphos,
         "original_and_public_module_unchanged": True,
         "corrected_package_uploaded_or_distributed": False,
