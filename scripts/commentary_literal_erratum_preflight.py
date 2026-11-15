@@ -140,11 +140,11 @@ def _apply_exact_original_link_change(
         else:
             raise ValueError("Original range endpoint has unsupported grammar")
         matches.append((
-            start_byte + element.start("attrs") + attr.start("value"),
-            start_byte + element.start("attrs") + attr.end("value"),
+            element.start("attrs") + attr.start("value"),
+            element.start("attrs") + attr.end("value"),
             next_target.encode("utf-8"),
-            start_byte + element.start("label") + numeric[0].start("end"),
-            start_byte + element.start("label") + numeric[0].end("end"),
+            element.start("label") + numeric[0].start("end"),
+            element.start("label") + numeric[0].end("end"),
             new_n,
         ))
     if len(matches) != 1:
