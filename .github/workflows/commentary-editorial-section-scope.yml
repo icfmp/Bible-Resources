@@ -395,6 +395,27 @@ jobs:
                 preview["all_proposed_new_aliases_same_compiled_raw_as_original_master"],
                 "original TOP unchanged",preview["all_original_TOP_positions_exact_raw_bytes"])
           assert preview["preflight_candidate_section_count"]==17
+          native_boundaries=r["complete_original_native_linked_section_boundary_review"]
+          assert native_boundaries["status"]=="COMPLETE_ORIGINAL_NATIVE_LINKED_SECTION_BOUNDARY_AUDIT"
+          assert native_boundaries["all_original_adjacent_native_section_identities_proven"] is True
+          print("All original native linked section boundaries:",
+                "adjacent original K pairs",
+                native_boundaries["original_adjacent_occupied_K_pair_count"],
+                "SWORD actual linked",native_boundaries["original_native_linked_pair_count"],
+                "independently separate",native_boundaries["original_native_separate_adjacent_pair_count"],
+                "same raw but originally UNLINKED",
+                native_boundaries["same_original_raw_payload_but_independently_unlinked_pair_count"],
+                "distinct raw but originally LINKED",
+                native_boundaries["distinct_original_raw_payload_but_native_linked_pair_count"],
+                "grouping faithful to native section identity",
+                native_boundaries["raw_payload_based_osis_grouping_is_native_identity_faithful"])
+          print("Native section identity disagreements (up to first ten each):",
+                native_boundaries["same_original_raw_unlinked_first_ten"],
+                native_boundaries["distinct_original_raw_linked_first_ten"])
+          assert native_boundaries["raw_payload_based_osis_grouping_is_native_identity_faithful"], (
+              "Hash-equal original entries are NOT necessarily the same authorial SWORD section"
+          )
+
           native_links=preview["private_native_original_and_provisional_alias_link_identity"]
           assert native_links["status"]=="REAL_LIBSWORD_NATIVE_NONADJACENT_LINK_IDENTITY"
           print("Real released libSWORD native linked records:",
