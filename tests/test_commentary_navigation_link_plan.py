@@ -187,6 +187,73 @@ class WholeChapterSourceTriageTests(unittest.TestCase):
         self.assertEqual(observed["chapter_intro_prose_needing_independent_ownership_review"],1)
         self.assertFalse(observed["any_new_aliases_created"])
 
+    def test_structural_first_chapter_prefix_kept_distinct_from_explicit_div2(self):
+        sample=self.case(
+            "Gen.1.1",
+            scope="SOURCE_BOOK_PREFIX_FIRST_CHAPTER_UNDIVIDED_CANDIDATE"
+        )
+        sample["source_book_prefix_first_chapter_structural_witness"]={
+            "all_source_book_identity_and_chapter_order_guards_pass":True,
+            "source_book_prefix_prose_is_complete_in_original_K":True,
+            "source_book_prefix_first_chapter_attribution_approved":False,
+        }
+        given=dict(occupied={"Gen.1.1":A},
+                   chapter_verse_maximums={"Gen.1":31},
+                   independent_chapter_cases=[sample],
+                   original_chapter_intro_has_visible_prose={"Gen.1":False})
+        result=triage_single_key_chapter_navigation(**given)
+        self.assertEqual(result["classes"],{
+            "SOURCE_FIRST_CHAPTER_PROSE_PRESERVED_OUTSIDE_DIV2":1
+        })
+        self.assertFalse(result["publication_authorized"])
+        sample["source_book_prefix_first_chapter_structural_witness"][
+            "all_source_book_identity_and_chapter_order_guards_pass"]=False
+        bad=triage_single_key_chapter_navigation(**given)
+        self.assertEqual(bad["classes"],{
+            "SOURCE_BOOK_PREFIX_STRUCTURAL_EVIDENCE_UNVERIFIED":1
+        })
+
+    def test_extra_original_book_heading_is_preserved_not_auto_removed(self):
+        case=self.case("Neh.1.1",overlap="HIGH_80_PLUS")
+        case["independent_lexical_comparison"]={
+            "overlap_class":"HIGH_80_PLUS",
+            "ordered_word_alignment":{
+                "original_plain_words_not_matched_in_exact_order":0,
+                "stock_plain_words_not_matched_in_exact_order":29,
+            },
+            "stock_extra_prefix_xml_topology":{
+                "prefix_text_top_level_owner_types":["title","_ROOT_TAIL"],
+                "full_original_source_word_sequence_inside_stock":True,
+            },
+            "stock_prefix_independent_source_neighbor_correspondence":{
+                "source_neighbor_to_stock_element_correspondence_classes":{
+                    "exact_unicode:title:source_div1_title_attribute":1
+                }
+            }
+        }
+        result=triage_single_key_chapter_navigation(
+            occupied={"Neh.1.1":A},
+            chapter_verse_maximums={"Neh.1":11},
+            independent_chapter_cases=[case],
+            original_chapter_intro_has_visible_prose={"Neh.1":False})
+        self.assertEqual(result["classes"],{
+            "SOURCE_PROSE_PRESERVED_WITH_EXTRA_STOCK_BOOK_HEADING":1
+        })
+        self.assertTrue(result["case_rows"][0][
+            "complete_independent_source_prose_with_original_stock_heading"])
+        self.assertFalse(result["any_new_aliases_created"])
+        case["independent_lexical_comparison"][
+            "stock_prefix_independent_source_neighbor_correspondence"
+        ]={}
+        fail=triage_single_key_chapter_navigation(
+            occupied={"Neh.1.1":A},
+            chapter_verse_maximums={"Neh.1":11},
+            independent_chapter_cases=[case],
+            original_chapter_intro_has_visible_prose={"Neh.1":False})
+        self.assertEqual(fail["classes"],{
+            "INDEPENDENT_SOURCE_AND_NATIVE_TEXT_NEED_WORD_REVIEW":1
+        })
+
     def test_existing_different_section_and_ambiguous_original_is_refused(self):
         with self.assertRaises(UnsafeCommentaryLinkPlan):
             triage_single_key_chapter_navigation(
