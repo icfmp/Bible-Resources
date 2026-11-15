@@ -255,7 +255,8 @@ def triage_single_key_chapter_navigation(
         )
         source_missing = structure not in {
             "SOURCE_DIV2_UNDIVIDED_CHAPTER_BODY_CANDIDATE",
-            "SOURCE_DIV2_UNDIVIDED_EXPLICIT_HEADING_CANDIDATE"
+            "SOURCE_DIV2_UNDIVIDED_EXPLICIT_HEADING_CANDIDATE",
+            "SOURCE_BOOK_PREFIX_FIRST_CHAPTER_UNDIVIDED_CANDIDATE",
         }
         lexical_alignment = (
             lexical.get("ordered_word_alignment",{})
@@ -272,14 +273,54 @@ def triage_single_key_chapter_navigation(
             and original_unmatched <= 2
         )
         intro_prose = intros.get(chapter)
+        source_prefix = case.get(
+            "source_book_prefix_first_chapter_structural_witness"
+        )
+        cross_edition_title = (
+            lexical.get("stock_prefix_independent_source_neighbor_correspondence")
+            if isinstance(lexical,dict) else None
+        )
+        topo = (
+            lexical.get("stock_extra_prefix_xml_topology")
+            if isinstance(lexical,dict) else None
+        )
+        original_book_heading_is_separate = (
+            isinstance(cross_edition_title,dict)
+            and isinstance(topo,dict)
+            and "title" in topo.get("prefix_text_top_level_owner_types",[])
+            and cross_edition_title.get(
+                "source_neighbor_to_stock_element_correspondence_classes",{}
+            ).get("exact_unicode:title:source_div1_title_attribute",0) >= 1
+        )
+        prose_source_fully_present_with_heading = (
+            isinstance(lexical,dict)
+            and lexical.get("overlap_class") in ("HIGH_80_PLUS","HIGH_95_PLUS")
+            and original_unmatched == 0
+            and type(stock_unmatched) is int and stock_unmatched > 0
+            and isinstance(topo,dict)
+            and topo.get("full_original_source_word_sequence_inside_stock") is True
+            and original_book_heading_is_separate
+        )
         if source_missing:
             classification = "NO_SAFE_INDEPENDENT_UNDIVIDED_CHAPTER_SCOPE"
-        elif not high_similarity:
+        elif (structure=="SOURCE_BOOK_PREFIX_FIRST_CHAPTER_UNDIVIDED_CANDIDATE"
+              and not (
+                  isinstance(source_prefix,dict)
+                  and source_prefix.get(
+                    "all_source_book_identity_and_chapter_order_guards_pass") is True
+                  and source_prefix.get(
+                    "source_book_prefix_prose_is_complete_in_original_K") is True)):
+            classification = "SOURCE_BOOK_PREFIX_STRUCTURAL_EVIDENCE_UNVERIFIED"
+        elif not high_similarity and not prose_source_fully_present_with_heading:
             classification = "INDEPENDENT_SOURCE_AND_NATIVE_TEXT_NEED_WORD_REVIEW"
         elif intro_prose is None:
             classification = "ORIGINAL_NATIVE_CHAPTER_INTRO_NOT_CHECKED"
         elif intro_prose:
             classification = "ADDITIONAL_NATIVE_CHAPTER_INTRO_PROSE_NEEDS_OWNERSHIP_REVIEW"
+        elif structure == "SOURCE_BOOK_PREFIX_FIRST_CHAPTER_UNDIVIDED_CANDIDATE":
+            classification = "SOURCE_FIRST_CHAPTER_PROSE_PRESERVED_OUTSIDE_DIV2"
+        elif prose_source_fully_present_with_heading:
+            classification = "SOURCE_PROSE_PRESERVED_WITH_EXTRA_STOCK_BOOK_HEADING"
         else:
             classification = "INDEPENDENT_UNDIVIDED_CHAPTER_SCOPE_STRONGLY_CORROBORATED"
         classes[classification] += 1
@@ -292,6 +333,12 @@ def triage_single_key_chapter_navigation(
             "original_numbered_K_count":1,
             "potential_additional_links_if_explicitly_editorially_approved":limit-1,
             "independent_structure_class":structure,
+            "source_book_prefix_structural_evidence":
+                source_prefix if isinstance(source_prefix,dict) else None,
+            "source_corresponding_original_stock_prefixed_book_title":
+                original_book_heading_is_separate,
+            "complete_independent_source_prose_with_original_stock_heading":
+                prose_source_fully_present_with_heading,
             "independent_original_unmatched_words":original_unmatched,
             "independent_stock_unmatched_words":stock_unmatched,
             "independent_source_reference_target_disagreement_requires_review":
