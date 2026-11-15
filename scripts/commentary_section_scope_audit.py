@@ -58,6 +58,7 @@ from commentary_chapter_ref_labels import link_label_location
 from commentary_editorial_topology import NativeCommentaryEditorialTopology
 from commentary_reference_registry_triage import OriginalCommentaryReferenceRegistryTriage
 from commentary_literal_erratum_preflight import preview_exact_reversible_commentary_reference_erratum
+from commentary_source_erratum_compiled_probe import probe_private_compiled_source_erratum
 from commentary_unresolved_lexical_triage import marked_word_token_indices
 from commentary_xml_witness import _parse_reference, WORK_REF
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
@@ -1907,7 +1908,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                         or not row["external_review_url"].startswith(
                             "https://github.com/icfmp/Bible-Resources/issues/")
                         or row.get("editorial_decision")
-                           != "REQUIRES_OWNER_SOURCE_TEXT_CORRECTION_APPROVAL"
+                           != "PRIVATE_COMPILATION_AND_TESTS_APPROVED_PUBLICATION_REQUIRES_SEPARATE_SIGNOFF"
                         or row.get("corroboration_class")
                            != "SAME_MALFORMED_CCEL_SCRIPREF_PLUS_VALID_CCEL_SCRIPREF_AND_ORIGINAL_NATIVE_SECTION_HEADING"):
                     raise PilotError("Original commentary source erratum plan is not source-reviewed")
@@ -1928,8 +1929,9 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                     raise PilotError("Source erratum proposed endpoint not independently corroborated")
                 chapter = key.rsplit(".", 1)[0]
                 original_raw = dict(private_full_K[chapter]).get(key)
-                if original_raw is None or sha256(original_raw).hexdigest() != records[key]["sha256"]:
-                    raise PilotError("Exact original native erratum record missing")
+                if (original_raw is None or sha256(original_raw).hexdigest() != records[key]["sha256"]
+                        or row.get("original_raw_sha256") != records[key]["sha256"]):
+                    raise PilotError("Exact pinned original native erratum record missing")
                 _, receipt = preview_exact_reversible_commentary_reference_erratum(
                     original_raw, first_verse=first,
                     original_end_verse=old_end,
@@ -1938,13 +1940,15 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                         or receipt["editorial_change_authorized"]
                         or receipt["release_authorized"]):
                     raise PilotError("Source erratum candidate does not preserve original bytes")
+                linked_count=sum(entry["sha256"] == records[key]["sha256"]
+                                 for entry in records.values())
+                if linked_count != row.get("expected_original_linked_native_K_count"):
+                    raise PilotError("Original linked source erratum group changed unexpectedly")
                 receipts.append({
                     "original_native_entry": key,
                     "proposed_endpoint_corroborated_by_source_and_native": True,
                     "source_witness_is_citation_not_authorial_scope": True,
-                    "native_existing_aliases_sharing_original_raw":
-                        sum(entry["sha256"] == records[key]["sha256"]
-                            for entry in records.values()),
+                    "native_existing_aliases_sharing_original_raw": linked_count,
                     **receipt,
                 })
             unapproved_literal_erratum_preflight = {
@@ -2025,6 +2029,47 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 test_with_real_xiphos=preview_real_xiphos,
             )
             provisional_preview["private_versioned_package_install_not_released"]=package_staging
+            if proposed_errata.get("private_revised_candidate_build_authorized") is True:
+                if (proposed_errata.get("source_text_changes_authorized") is not False
+                        or proposed_errata.get("release_authorized") is not False
+                        or proposed_errata.get("private_revised_candidate_build_authorization_note")
+                           != "Owner said 'Continue' after the explicit request to approve the targeted Ezekiel 3 source correction; authorization is limited to a new private edited candidate and integrity/reader tests, NOT a public release, merge, or catalogue change."
+                        or not isinstance(proposed_errata.get("private_revised_candidate_history_note"),str)
+                        or len(proposals)!=1 or len(receipts)!=1
+                        or receipts[0]["native_existing_aliases_sharing_original_raw"]
+                           != proposals[0]["expected_original_linked_native_K_count"]):
+                    raise PilotError("Owner did not separately authorize a bounded private text-change build")
+                correction=proposals[0]
+                revised_dir=directory/"single-source-erratum-revised-private"
+                revised_dir.mkdir()
+                private_corrected=probe_private_compiled_source_erratum(
+                    original_intros=private_full_I,
+                    original_numbered=private_full_K,
+                    original_TOP=original_opaque_top_records,
+                    original_master_key=correction["original_native_entry"],
+                    first_verse=correction["first_verse"],
+                    original_end_verse=correction["original_end_verse"],
+                    proposed_end_verse=correction["proposed_end_verse"],
+                    original_index_only_compiled_root=(
+                        preview_dir/"complete-original-private-candidate"),
+                    reviewed_aliases=reviewed_scope_plan["new_native_aliases"],
+                    curated_module_id=curated["sword_id"],
+                    curated_previous_version=curated["version"],
+                    curated_proposed_version=decisions["proposed_next_version"],
+                    original_curated_conf=original_conf.read_bytes(),
+                    scratch=revised_dir,
+                    native_raw_binary=raw_binary,
+                    native_index_binary=index_binary,
+                    history_note=proposed_errata["private_revised_candidate_history_note"],
+                )
+                if (private_corrected["source_linked_original_verse_keys_changed"]
+                        != correction["expected_original_linked_native_K_count"]
+                        or private_corrected["original_raw_source_checksum"]
+                           != correction["original_raw_sha256"]
+                        or private_corrected["corrected_package_uploaded_or_distributed"]
+                        or private_corrected["owner_publication_authorized"]):
+                    raise PilotError("Source-corrected private package violated reviewed source boundaries")
+                provisional_preview["private_source_edited_versioned_candidate_not_released"]=private_corrected
             provisional_preview["source_scope_corroborated_in_draft_only"] = True
             provisional_preview["source_scope_editorially_approved"] = False
             provisional_preview["preflight_candidate_section_count"] = (
