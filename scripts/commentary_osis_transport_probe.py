@@ -220,6 +220,41 @@ def classify_native_osis_roundtrip_delta(original_raw: bytes, compiled_raw: byte
                 references.append(tuple(sorted(el.attrib.items())))
         return ordinary, divs, references
 
+    def non_div_text_ownership(raw):
+        """Token and punctuation ownership by original non-technical XML nodes.
+
+        The standard SWORD compiler may insert structural div wrappers. Skip
+        *only* divs when identifying the owning semantic element, but retain
+        every non-whitespace text token in document order with its owner ID.
+        In particular, moving prose from a reference.tail into reference.text
+        now changes ownership even when the flattened text and link target do
+        not change. Neither word positions nor source content are logged.
+        """
+        root = etree.fromstring(b"<fragment>" + raw + b"</fragment>",
+                              parser=_strict_parser())
+        sequence = []
+        next_owner = 0
+
+        def add(value, owner):
+            if value:
+                sequence.extend((owner, token) for token in re.findall(r"\\S+", value))
+
+        def walk(node, parent_owner):
+            nonlocal next_owner
+            local = node.tag.rsplit("}", 1)[-1]
+            owner = parent_owner
+            if node is not root and local != "div":
+                next_owner += 1
+                owner = next_owner
+            add(node.text, owner)
+            for child in node:
+                if isinstance(child.tag, str):
+                    walk(child, owner)
+                add(child.tail, owner)
+
+        walk(root, 0)
+        return sequence
+
     source_attrs, source_div_attrs, source_references = element_signatures(original_raw)
     compiled_attrs, compiled_div_attrs, compiled_references = element_signatures(compiled_raw)
     original_divs_preserved = all(
@@ -255,6 +290,8 @@ def classify_native_osis_roundtrip_delta(original_raw: bytes, compiled_raw: byte
             original_divs_preserved,
         "reference_attribute_values_in_original_document_order_preserved":
             source_references == compiled_references,
+        "original_nondiv_text_and_tail_ownership_preserved":
+            non_div_text_ownership(original_raw) == non_div_text_ownership(compiled_raw),
         "only_div_element_count_added_not_other_element_names":
             only_added_div_wrappers_by_local_name,
         "original_xml_bytes_modified": original_raw != compiled_raw,
