@@ -18,11 +18,11 @@ import re
 
 from lxml import etree
 
-VERSE_KEY = re.compile(r"^([1-4]?[A-Za-z][A-Za-z0-9]*)\\.([1-9]\\d*)\\.([1-9]\\d*)$")
+VERSE_KEY = re.compile(r"^([1-4]?[A-Za-z][A-Za-z0-9]*)\.([1-9]\d*)\.([1-9]\d*)$")
 # Numeric XML title starts are stronger *location* evidence than citations
 # found anywhere in the full visible prose. Still not authorial scope approval.
 TITLE_NUMBERS = re.compile(
-    r"^\\s*Verses?\\s+(\\d{1,3}(?:\\s*[-–,]\\s*\\d{1,3}){0,8})(?!\\d)",
+    r"^\s*Verses?\s+(\d{1,3}(?:\s*[-–,]\s*\d{1,3}){0,8})(?!\d)",
     flags=re.IGNORECASE,
 )
 MAX_RAW = 2 * 1024 * 1024
@@ -38,7 +38,7 @@ def _heading_span(value: str) -> tuple[int, ...] | None:
     literal = match.group(1)
     parts = []
     for portion in literal.split(","):
-        m = re.fullmatch(r"\\s*(\\d{1,3})(?:\\s*[-–]\\s*(\\d{1,3}))?\\s*", portion)
+        m = re.fullmatch(r"\s*(\d{1,3})(?:\s*[-–]\s*(\d{1,3}))?\s*", portion)
         if m is None:
             return None
         start = int(m.group(1))
@@ -61,7 +61,6 @@ class NativeCommentaryEditorialTopology:
     def __init__(self):
         self.bodies = {}
         self.occupied = defaultdict(lambda: defaultdict(list))
-        self.nonopaque_count = 0
         self.numbered_count = 0
         self.original_I_count = 0
         self.original_U_count = 0
@@ -76,7 +75,7 @@ class NativeCommentaryEditorialTopology:
             return
         m = VERSE_KEY.fullmatch(key) if isinstance(key, str) else None
         if (kind != "K" or m is None or not isinstance(raw, bytes)
-                or len(raw) > MAX_RAW or b"\\x00" in raw
+                or len(raw) > MAX_RAW or b"\x00" in raw
                 or self.numbered_count >= MAX_OCCUPIED_K):
             raise ValueError("Untrusted native commentary topology input")
         self.numbered_count += 1
