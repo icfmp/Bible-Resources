@@ -639,6 +639,12 @@ jobs:
           chapter_review=r["single_key_chapter_navigation_source_review_not_approved"]
           assert chapter_review["status"]=="COMPLETE_SINGLE_KEY_CHAPTER_SCOPE_TRIAGE_NOT_APPROVAL"
           assert chapter_review["original_single_key_chapter_candidates"]==118
+          assert chapter_review["classes"]=={
+              "INDEPENDENT_UNDIVIDED_CHAPTER_SCOPE_STRONGLY_CORROBORATED":116,
+              "SOURCE_FIRST_CHAPTER_PROSE_PRESERVED_OUTSIDE_DIV2":1,
+              "SOURCE_PROSE_PRESERVED_WITH_EXTRA_STOCK_BOOK_HEADING":1,
+          }
+          assert chapter_review["chapter_intro_owner_unchecked_count"]==0
           assert chapter_review["any_new_aliases_created"] is False
           assert chapter_review["source_prose_or_index_mutated"] is False
           assert chapter_review["publication_authorized"] is False
