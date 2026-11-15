@@ -128,6 +128,40 @@ class NativeCommentaryReferenceRegistryTests(unittest.TestCase):
         self.assertIsNone(
             no_source["case_rows"][0]["candidate_end_verse_if_both_witnesses_agree"])
 
+    def test_single_verse_source_section_anchor_needs_independent_valid_range(self):
+        scan = OriginalCommentaryReferenceRegistryTriage()
+        scan.observe(
+            "K", "Gen.1.1",
+            b'<reference osisRef="Gen.1.3-Gen.1.1">Gen 1:3-1</reference>'
+        )
+        native = {"Gen.1.3": (3, 4, 5)}
+        verses = {f"Gen.1.{v}" for v in range(1, 6)}
+        source = etree.fromstring(
+            b'<ThML><scripRef osisRef="Bible:Gen.1.3-Gen.1.1">'
+            b"Gen 1:3-1</scripRef>"
+            b'<scripCom osisRef="Bible:Gen.1.3">Invented source start</scripCom>'
+            b'<scripRef osisRef="Bible:Gen.1.3-Gen.1.5">'
+            b"Gen 1:3-5</scripRef></ThML>"
+        )
+        receipt = scan.triangulate_reversed_ranges_against_independent_witness(
+            source, canonical_verses=verses, native_section_spans=native)
+        candidate = receipt["case_rows"][0]
+        self.assertEqual(candidate["candidate_end_verse_if_both_witnesses_agree"], 5)
+        self.assertEqual(
+            candidate["independent_source_single_verse_scripcom_same_start_count"], 1)
+        self.assertEqual(
+            candidate["independent_source_valid_range_scripref_matching_native_count"], 1)
+        self.assertTrue(candidate["independent_source_same_reversed_numeric_label_present"])
+        self.assertFalse(candidate["editorial_approval"])
+        missing_valid_range = etree.fromstring(
+            b'<ThML><scripCom osisRef="Bible:Gen.1.3">'
+            b"Invented source start only</scripCom></ThML>"
+        )
+        blocked = scan.triangulate_reversed_ranges_against_independent_witness(
+            missing_valid_range, canonical_verses=verses, native_section_spans=native)
+        self.assertIsNone(
+            blocked["case_rows"][0]["candidate_end_verse_if_both_witnesses_agree"])
+
     def test_reversed_range_witness_rejects_invalid_inputs(self):
         scan = OriginalCommentaryReferenceRegistryTriage()
         scan.observe("K", "Gen.1.1", b'<reference osisRef="Gen.1.3-Gen.1.1">3-1</reference>')
