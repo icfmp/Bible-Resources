@@ -906,7 +906,9 @@ def privately_stage_versioned_zcom_zip(
         *, compiler_root: Path, compiled_module_id: str,
         package_module_id: str, previous_version: str, proposed_version: str,
         published_conf_template: bytes, scratch: Path,
-        native_raw_binary: Path) -> dict:
+        native_raw_binary: Path,
+        provisional_index_aliases: dict[str,dict] | None = None,
+        test_with_real_xiphos: bool = False) -> dict:
     """Privately package an official-compiler zCom under its curated identity.
 
     Reuses the *compiled native bytes* without patching them. ZIP is created
@@ -916,6 +918,8 @@ def privately_stage_versioned_zcom_zip(
     """
     allowed_id=re.compile(r"[A-Za-z][A-Za-z0-9_]{0,79}")
     version=re.compile(r"[0-9]+\.[0-9]+\.[0-9]+")
+    if test_with_real_xiphos and not provisional_index_aliases:
+        raise ValueError("Xiphos needs independently source-reviewed alias links")
     if (not allowed_id.fullmatch(compiled_module_id)
             or not allowed_id.fullmatch(package_module_id)
             or compiled_module_id==package_module_id
@@ -1004,6 +1008,7 @@ def privately_stage_versioned_zcom_zip(
             dest.parent.mkdir(parents=True,exist_ok=True)
             dest.write_bytes(archive.read(info))
     inventories={}
+    installed_reader_K={}
     for id_,root in (
             (compiled_module_id,compiler_root),
             (package_module_id,installed)):
@@ -1018,7 +1023,11 @@ def privately_stage_versioned_zcom_zip(
         observed={"I":{},"K":{},"U":[]}
         def collect(kind,key,raw):
             if kind=="U":observed["U"].append(sha256(raw).digest())
-            else: observed[kind][key]=sha256(raw).digest()
+            else:
+                observed[kind][key]=sha256(raw).digest()
+                if (id_==package_module_id and kind=="K"
+                        and test_with_real_xiphos):
+                    installed_reader_K[key]=raw
         parse_native_raw_corpus(BytesIO(run.stdout),on_entry=collect)
         inventories[id_]=observed
     before=inventories[compiled_module_id]
@@ -1026,7 +1035,15 @@ def privately_stage_versioned_zcom_zip(
     if (before!=after or not before["K"]
             or not before["I"] or not before["U"]):
         raise ValueError("Private curated-identity installation changed native source records")
+    curated_reader_probe = (
+        _probe_private_alias_real_xiphos(
+            installed,package_module_id,
+            provisional_index_aliases,installed_reader_K
+        ) if test_with_real_xiphos else None
+    )
     return {
+        "private_versioned_curated_module_real_xiphos_selected_verse_probe":
+            curated_reader_probe,
         "status":"PRIVATE_VERSIONED_SWORD_ZCOM_ZIP_ISOLATED_INSTALL_PARITY_NOT_PUBLICATION",
         "curated_module_id":package_module_id,
         "proposed_version":proposed_version,
