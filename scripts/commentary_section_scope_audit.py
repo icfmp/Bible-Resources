@@ -1886,9 +1886,9 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                     or proposed_errata.get("independent_digital_witness_sha256")
                        != witness["witness_sha256"]
                     or proposed_errata.get("status")
-                       != "PRIVATE_BYTE_REVERSIBLE_PROPOSAL_NOT_EDITORIALLY_APPROVED"
+                       != "PRIVATE_EDIT_COMPILATION_APPROVED_PUBLIC_RELEASE_NOT_AUTHORIZED"
                     or proposed_errata.get("release_authorized") is not False
-                    or proposed_errata.get("source_text_changes_authorized") is not False
+                    or proposed_errata.get("source_text_changes_for_public_release_authorized") is not False
                     or proposed_errata.get("original_source_published_or_overwritten") is not False):
                 raise PilotError("Source erratum review was not explicitly unapproved/pinned")
             proposals = proposed_errata.get("proposed_single_reference_changes")
@@ -2030,7 +2030,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             )
             provisional_preview["private_versioned_package_install_not_released"]=package_staging
             if proposed_errata.get("private_revised_candidate_build_authorized") is True:
-                if (proposed_errata.get("source_text_changes_authorized") is not False
+                if (proposed_errata.get("source_text_changes_for_public_release_authorized") is not False
                         or proposed_errata.get("release_authorized") is not False
                         or proposed_errata.get("private_revised_candidate_build_authorization_note")
                            != "Owner said 'Continue' after the explicit request to approve the targeted Ezekiel 3 source correction; authorization is limited to a new private edited candidate and integrity/reader tests, NOT a public release, merge, or catalogue change."
