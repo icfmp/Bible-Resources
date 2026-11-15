@@ -20,24 +20,24 @@ from commentary_osis_mixed_transport_probe import (
 class PrivateCommentaryMetadataDeltaTests(unittest.TestCase):
     def test_exact_private_edition_delta_preserves_all_upstream_claims(self):
         source = (
-            "[Curated]\\nDescription=Invented test commentary\\n"
-            "DataPath=./modules/comments/zcom/curated/\\n"
-            "ModDrv=zCom\\nSourceType=OSIS\\nVersification=KJV\\n"
-            "BlockType=BOOK\\nCompressType=ZIP\\n"
-            "Version=0.1.0\\nInstallSize=120\\n"
-            "DistributionLicense=Public Domain\\n"
-            "TextSource=https://example.invalid/source\\n"
-            "About=Source printing assertion, not curator verified\\n"
-            "SwordVersionDate=2020-02-03\\n"
-            "GlobalOptionFilter=OSISHeadings\\n"
-        ).replace("\\\\n", "\\n").encode("utf-8")
+            "[Curated]\nDescription=Invented test commentary\n"
+            "DataPath=./modules/comments/zcom/curated/\n"
+            "ModDrv=zCom\nSourceType=OSIS\nVersification=KJV\n"
+            "BlockType=BOOK\nCompressType=ZIP\n"
+            "Version=0.1.0\nInstallSize=120\n"
+            "DistributionLicense=Public Domain\n"
+            "TextSource=https://example.invalid/source\n"
+            "About=Source printing assertion, not curator verified\n"
+            "SwordVersionDate=2020-02-03\n"
+            "GlobalOptionFilter=OSISHeadings\n"
+        ).replace("\\\n", "\n").encode("utf-8")
         staged = (
             source.decode("utf-8")
             .replace("BlockType=BOOK", "BlockType=CHAPTER")
             .replace("Version=0.1.0", "Version=0.1.1")
             .replace("InstallSize=120", "InstallSize=540")
-            + "\\nHistory_0.1.1=Index-only section navigation corrections; "
-              "original commentary words and source references retained\\n"
+            + "\nHistory_0.1.1=Index-only section navigation corrections; "
+              "original commentary words and source references retained\n"
         ).encode("utf-8")
         args = dict(
             previous_version="0.1.0", proposed_version="0.1.1",
@@ -62,7 +62,7 @@ class PrivateCommentaryMetadataDeltaTests(unittest.TestCase):
             staged.replace(b"InstallSize=540", b"InstallSize=541"),
             staged.replace(b"History_0.1.1=", b"History_0.1.0="),
             staged.replace(b"Version=0.1.1", b"Version=0.1.0"),
-            staged + b"Unapproved=extra\\n".replace(b"\\\\n", b"\\n"),
+            staged + b"Unapproved=extra\n".replace(b"\\\n", b"\n"),
         ):
             with self.subTest(tampered_suffix=tampered[-72:]):
                 with self.assertRaises(ValueError):
@@ -73,23 +73,23 @@ class PrivateCommentaryMetadataDeltaTests(unittest.TestCase):
                 source, staged, **{**args, "installed_native_data_size":541})
         with self.assertRaises(ValueError):
             verify_private_versioned_commentary_conf_delta(
-                source.replace(b"DistributionLicense=Public Domain\\n", b""),
+                source.replace(b"DistributionLicense=Public Domain\n", b""),
                 staged, **args)
 
     def test_optional_upstream_metadata_is_not_invented(self):
         source = (
-            b"[Curated]\\nDataPath=./modules/comments/zcom/curated/\\n"
-            b"ModDrv=zCom\\nSourceType=OSIS\\nVersification=KJV\\n"
-            b"BlockType=BOOK\\nVersion=0.1.0\\nInstallSize=5\\n"
-            b"DistributionLicense=Public Domain\\n"
-        ).replace(b"\\\\n", b"\\n")
+            b"[Curated]\nDataPath=./modules/comments/zcom/curated/\n"
+            b"ModDrv=zCom\nSourceType=OSIS\nVersification=KJV\n"
+            b"BlockType=BOOK\nVersion=0.1.0\nInstallSize=5\n"
+            b"DistributionLicense=Public Domain\n"
+        ).replace(b"\\\n", b"\n")
         staged = (
             source.decode("utf-8")
             .replace("BlockType=BOOK", "BlockType=CHAPTER")
             .replace("Version=0.1.0", "Version=0.1.1")
             .replace("InstallSize=5", "InstallSize=10")
-            + "\\nHistory_0.1.1=Index-only section navigation corrections; "
-              "original commentary words and source references retained\\n"
+            + "\nHistory_0.1.1=Index-only section navigation corrections; "
+              "original commentary words and source references retained\n"
         ).encode("utf-8")
         self.assertTrue(verify_private_versioned_commentary_conf_delta(
             source, staged, previous_version="0.1.0",
