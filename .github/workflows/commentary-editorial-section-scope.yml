@@ -412,6 +412,27 @@ jobs:
                 preview["all_proposed_new_aliases_same_compiled_raw_as_original_master"],
                 "original TOP unchanged",preview["all_original_TOP_positions_exact_raw_bytes"])
           assert preview["preflight_candidate_section_count"]==17
+          staging=preview["private_versioned_package_install_not_released"]
+          assert staging["status"]=="PRIVATE_VERSIONED_SWORD_ZCOM_ZIP_ISOLATED_INSTALL_PARITY_NOT_PUBLICATION"
+          assert staging["curated_module_id"]=="BRMHCC"
+          assert staging["proposed_version"]=="0.1.1"
+          assert staging["original_native_I_count"]==1255
+          assert staging["original_and_alias_native_K_count"]==28742
+          assert staging["original_opaque_TOP_count"]==2
+          assert staging["installed_package_I_K_U_raw_bytes_equal_to_private_compiled_source"] is True
+          assert staging["native_compiled_files_copied_without_recompression_or_byte_edits"] is True
+          assert staging["package_saved_as_public_artifact"] is False
+          assert staging["published"] is False
+          assert staging["release_authorized"] is False
+          print("Private curated module ZIP isolated install:",
+                staging["status"],"module",staging["curated_module_id"],
+                "version",staging["proposed_version"],
+                "exact native I/K/TOP installed",staging["original_native_I_count"],
+                staging["original_and_alias_native_K_count"],
+                staging["original_opaque_TOP_count"],
+                "private package checksum",staging["staged_package_zip_sha256"],
+                "downloadable artifact",staging["package_saved_as_public_artifact"])
+
           native_boundaries=r["complete_original_native_linked_section_boundary_review"]
           assert native_boundaries["status"]=="COMPLETE_ORIGINAL_NATIVE_LINKED_SECTION_BOUNDARY_AUDIT"
           assert native_boundaries["all_original_adjacent_native_section_identities_proven"] is True
