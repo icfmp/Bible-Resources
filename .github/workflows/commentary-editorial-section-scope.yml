@@ -416,6 +416,8 @@ jobs:
           assert preview is not None and preview["published"] is False
           assert preview["corrections_or_publication_authorized"] is False
           assert preview["source_scope_editorially_approved"] is False
+          assert preview["index_only_control_source_content_edited"] is False
+          assert preview["private_source_corrected_candidate_compiled"] is True
           print("Provisional missing-section index preview (NOT editorially approved):",
                 preview["status"],"compiled",preview.get("readback_completed",False),
                 "original entries",preview["source_numbered_key_count"],
