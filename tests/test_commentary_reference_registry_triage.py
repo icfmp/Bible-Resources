@@ -102,7 +102,7 @@ class NativeCommentaryReferenceRegistryTests(unittest.TestCase):
         self.assertTrue(case["original_link_display_text_contains_reversed_numeric_span"])
         self.assertTrue(case["independent_source_same_display_label_literal_match"])
         self.assertEqual(case["independent_source_same_bad_range_scripref_count"], 1)
-        self.assertEqual(case["independent_source_valid_matching_start_scripcom_count"], 1)
+        self.assertEqual(case["independent_source_full_range_scripcom_same_start_count"], 1)
         self.assertEqual(case["independent_source_and_native_heading_matching_candidate_count"], 1)
         self.assertEqual(case["candidate_end_verse_if_both_witnesses_agree"], 5)
         self.assertFalse(good["correction_authorized"])
