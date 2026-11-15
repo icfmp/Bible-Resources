@@ -8,6 +8,7 @@ from commentary_navigation_link_plan import (
     propose_commentary_links, UnsafeCommentaryLinkPlan,
     parse_native_commentary_verse_registry, triage_missing_native_section_links,
     triage_single_key_chapter_navigation,
+    verify_original_native_adjacent_section_boundaries,
 )
 
 A = "a" * 64
@@ -271,6 +272,63 @@ class WholeChapterSourceTriageTests(unittest.TestCase):
                 chapter_verse_maximums={"Gen.1":31},
                 independent_chapter_cases=[self.case("Gen.1.1"),
                                            self.case("Gen.1.1")])
+
+
+
+class CompleteOriginalNativeLinkedBoundaryTests(unittest.TestCase):
+    def run_audit(self, occupied, pairs):
+        linked=sum(last for first,second,last in pairs)
+        line=["M\tMHCC\tKJV\t1.9.0\tzCom"]
+        line.extend(f"L\t{a}\t{b}\t{n}" for a,b,n in pairs)
+        line.append(f"S\t{len(pairs)}\t{linked}\t{len(pairs)-linked}")
+        return verify_original_native_adjacent_section_boundaries(
+            ("\n".join(line)+"\n").encode(),
+            expected_module="MHCC",original_occupied_sha256=occupied
+        )
+
+    def test_exactly_equal_adjacent_entries_are_not_assumed_native_linked(self):
+        got=self.run_audit({
+            "Gen.1.1":A, "Gen.1.2":A, "Gen.1.3":A,
+            "Gen.1.4":B,"Gen.1.5":B
+        },[
+            ("Gen.1.1","Gen.1.2",1),
+            ("Gen.1.2","Gen.1.3",0),
+            ("Gen.1.3","Gen.1.4",0),
+            ("Gen.1.4","Gen.1.5",1),
+        ])
+        self.assertEqual(got["original_native_linked_pair_count"],2)
+        self.assertEqual(
+            got["same_original_raw_payload_but_independently_unlinked_pair_count"],1
+        )
+        self.assertEqual(
+            got["same_original_raw_unlinked_first_ten"],[["Gen.1.2","Gen.1.3"]]
+        )
+        self.assertFalse(got["raw_payload_based_osis_grouping_is_native_identity_faithful"])
+
+    def test_native_identity_and_raw_footprints_compatible(self):
+        got=self.run_audit({
+            "Gen.1.1":A,"Gen.1.2":A,"Gen.1.3":B,
+            "Gen.1.5":B,
+        },[
+            ("Gen.1.1","Gen.1.2",1),
+            ("Gen.1.2","Gen.1.3",0),
+        ])
+        self.assertEqual(got["original_adjacent_occupied_K_pair_count"],2)
+        self.assertTrue(got["all_original_adjacent_native_section_identities_proven"])
+        self.assertTrue(got["raw_payload_based_osis_grouping_is_native_identity_faithful"])
+        self.assertTrue(got["original_source_text_copied_or_mutated"] is False)
+
+    def test_missing_or_duplicate_native_identity_position_is_blocked(self):
+        for rows in (
+            [("Gen.1.1","Gen.1.2",1)],
+            [("Gen.1.1","Gen.1.2",1),("Gen.1.1","Gen.1.2",0)],
+            [("Gen.1.1","Gen.1.3",1),("Gen.1.2","Gen.1.3",0)],
+        ):
+            with self.subTest(rows=rows),self.assertRaises(UnsafeCommentaryLinkPlan):
+                self.run_audit({
+                    "Gen.1.1":A,"Gen.1.2":A,"Gen.1.3":B
+                },rows)
+
 
 
 class MissingNativeSectionPreflightTests(unittest.TestCase):
