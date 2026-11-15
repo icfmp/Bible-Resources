@@ -16,7 +16,10 @@ int main(int argc, char** argv) {
         argc == 3 && std::string(argv[2]) == "--chapter-registry";
     const bool linkedMode =
         argc == 5 && std::string(argv[2]) == "--is-linked";
-    if (argc != 2 && !registryMode && !linkedMode) return 2;
+    const bool adjacentLinkedMode =
+        argc == 3 && std::string(argv[2]) == "--adjacent-links";
+    if (argc != 2 && !registryMode && !linkedMode && !adjacentLinkedMode)
+        return 2;
     const std::string moduleId(argv[1]);
     if (!std::regex_match(moduleId, std::regex("[A-Za-z][A-Za-z0-9_]{0,79}")))
         return 2;
@@ -71,8 +74,44 @@ int main(int argc, char** argv) {
     unsigned long visited = 0, numberedCount = 0, introCount = 0, topCount = 0;
     unsigned long registryChapterCount = 0, registryVerseCount = 0;
     std::string lastRegistryChapter;
+    unsigned long adjacencyPairs = 0, adjacencyLinked = 0;
+    bool havePreviousNumbered = false;
+    sword::VerseKey previousNumbered;
+    previousNumbered.setVersificationSystem(v11n.c_str());
+    previousNumbered.setIntros(true);
+    previousNumbered.setAutoNormalize(false);
+    std::string previousChapter, previousReference;
+    int previousVerse = 0;
     while (!key.popError()) {
         if (++visited > 300000) return 7;
+        if (adjacentLinkedMode) {
+            if (key.getChapter() > 0 && key.getVerse() > 0
+                    && module->hasEntry(&key)) {
+                const std::string ref = key.getOSISRef();
+                const auto split = ref.rfind('.');
+                if (split == std::string::npos
+                        || !std::regex_match(ref, numbered)) return 24;
+                const std::string chapter = ref.substr(0, split);
+                const int verse = key.getVerse();
+                if (havePreviousNumbered && chapter == previousChapter
+                        && verse == previousVerse + 1) {
+                    const bool nativeLinked = module->isLinked(
+                        &previousNumbered, &key);
+                    std::cout << "L\t" << previousReference
+                              << '\t' << ref << '\t'
+                              << (nativeLinked ? "1" : "0") << '\n';
+                    ++adjacencyPairs;
+                    if (nativeLinked) ++adjacencyLinked;
+                }
+                previousNumbered = key;
+                previousChapter = chapter;
+                previousReference = ref;
+                previousVerse = verse;
+                havePreviousNumbered = true;
+            }
+            key++;
+            continue;
+        }
         if (registryMode) {
             if (key.getChapter() > 0 && key.getVerse() > 0) {
                 const std::string ref = key.getOSISRef();
@@ -109,6 +148,13 @@ int main(int argc, char** argv) {
             }
         }
         key++;
+    }
+    if (adjacentLinkedMode) {
+        if (!adjacencyPairs || adjacencyLinked > adjacencyPairs) return 25;
+        std::cout << "S\t" << adjacencyPairs << '\t'
+                  << adjacencyLinked << '\t'
+                  << (adjacencyPairs-adjacencyLinked) << '\n';
+        return std::cout.good() ? 0 : 26;
     }
     if (registryMode) {
         if (registryChapterCount == 0 || registryVerseCount == 0) return 14;
