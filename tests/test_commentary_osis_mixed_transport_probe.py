@@ -76,6 +76,54 @@ class PrivateCommentaryMetadataDeltaTests(unittest.TestCase):
                 source.replace(b"DistributionLicense=Public Domain\n", b""),
                 staged, **args)
 
+    def test_private_source_corrected_history_is_explicit_not_index_only(self):
+        source = (
+            b"[Curated]\nDataPath=./modules/comments/zcom/curated/\n"
+            b"ModDrv=zCom\nSourceType=OSIS\nVersification=KJV\n"
+            b"BlockType=BOOK\nVersion=0.1.0\nInstallSize=15\n"
+            b"DistributionLicense=Public Domain\nTextSource=https://source.invalid/\n"
+            b"About=Invented source printing declaration, not independently verified\n"
+            b"SwordVersionDate=2020-02-03\n"
+        )
+        note = "Reviewed index navigation links and one documented source citation correction"
+        staged = (
+            source.decode("utf-8")
+            .replace("BlockType=BOOK", "BlockType=CHAPTER")
+            .replace("Version=0.1.0", "Version=0.1.1")
+            .replace("InstallSize=15", "InstallSize=16")
+            + "\nHistory_0.1.1=" + note + "\n"
+        ).encode("utf-8")
+        kwargs = dict(
+            previous_version="0.1.0", proposed_version="0.1.1",
+            installed_native_data_size=16, history_note=note,
+            source_reference_change_verified=True,
+        )
+        receipt = verify_private_versioned_commentary_conf_delta(
+            source, staged, **kwargs)
+        self.assertTrue(receipt["private_metadata_exact_reviewed_delta_only"])
+        self.assertTrue(receipt["private_source_reference_change_verified"])
+        self.assertTrue(
+            receipt["original_distribution_license_textsource_about_and_date_unchanged"])
+        self.assertFalse(receipt["public_release_or_new_revision_date_authorized"])
+        for corrupted in (
+            staged.replace(b"Public Domain", b"CC0"),
+            staged.replace(b"Date=2020-02-03", b"Date=2026-11-15"),
+            staged.replace(note.encode("utf-8"), b"Index-only section navigation corrections"),
+            staged + b"\nIllegalExtra=extra\n",
+        ):
+            with self.subTest(corrupted=corrupted[-60:]):
+                with self.assertRaises(ValueError):
+                    verify_private_versioned_commentary_conf_delta(
+                        source, corrupted, **kwargs)
+        with self.assertRaises(ValueError):
+            verify_private_versioned_commentary_conf_delta(
+                source, staged, **{**kwargs, "history_note": "Line break\nforged"}
+            )
+        with self.assertRaises(ValueError):
+            verify_private_versioned_commentary_conf_delta(
+                source, staged, **{**kwargs, "source_reference_change_verified": None}
+            )
+
     def test_optional_upstream_metadata_is_not_invented(self):
         source = (
             b"[Curated]\nDataPath=./modules/comments/zcom/curated/\n"
