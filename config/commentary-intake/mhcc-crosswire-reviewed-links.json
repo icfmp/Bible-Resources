@@ -289,5 +289,7 @@
   "source_text_changes_authorized": false,
   "cross_edition_annotation_changes_authorized": false,
   "chapter_expansion_changes_authorized": false,
-  "release_authorized": false
+  "release_authorized": false,
+  "proposed_next_version": "0.1.1",
+  "package_staging_only": true
 }
