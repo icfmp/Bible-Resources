@@ -33,7 +33,8 @@ def _iso_day(value: str) -> date:
 
 def prepare_provisional_public_commentary_conf(
         private_conf: bytes, *, expected_module_id: str,
-        expected_module_version: str, original_sword_version_date: str,
+        expected_module_version: str, source_provider: str,
+        original_sword_version_date: str,
         proposed_public_revision_day: str, revision_summary: str) -> tuple[bytes, dict]:
     """Build two reviewed field deltas only; original source About is retained.
 
@@ -47,6 +48,9 @@ def prepare_provisional_public_commentary_conf(
             or not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,79}", expected_module_id)
             or not isinstance(expected_module_version, str)
             or not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", expected_module_version)
+            or not isinstance(source_provider, str)
+            or not 2 <= len(source_provider) <= 120
+            or not re.fullmatch(r"[A-Za-z0-9 .&()/:-]+", source_provider)
             or not isinstance(revision_summary, str)
             or not 16 <= len(revision_summary) <= 220
             or not re.fullmatch(r"[A-Za-z0-9 ,.;:()/-]+", revision_summary)):
@@ -74,9 +78,9 @@ def prepare_provisional_public_commentary_conf(
         f"Bible Resources edited module {expected_module_id} "
         f"version {expected_module_version}. {revision_summary}. "
         "The historical printed-edition equivalence claim in the original "
-        "CrossWire description below is inherited upstream and has NOT been "
+        f"{source_provider} description below is inherited upstream and has NOT been "
         "independently verified by Bible Resources."
-        r"\par\parOriginal upstream CrossWire About (verbatim):\par"
+        rf"\par\parOriginal upstream {source_provider} About (verbatim):\par"
     )
     revised_about = notice + old_about
     # Only changes SwordVersionDate and About; preserve every other line,
@@ -106,7 +110,6 @@ def prepare_provisional_public_commentary_conf(
     if (staged.count(f"SwordVersionDate={proposed_public_revision_day}\n") != 1
             or staged.count(f"About={revised_about}\n") != 1
             or not _exact_conf_value(staged, "History_" + expected_module_version)
-            or not _exact_conf_value(staged, "TextSource")
             or _exact_conf_value(staged, "DistributionLicense")
                != _exact_conf_value(original, "DistributionLicense")):
         raise ValueError("Original source/license or verified history lost in public proposal")
@@ -117,7 +120,7 @@ def prepare_provisional_public_commentary_conf(
         "original_private_conf_sha256": sha256(private_conf).hexdigest(),
         "proposed_public_conf_sha256": sha256(proposed).hexdigest(),
         "original_upstream_about_verbatim_preserved_with_explicit_attribution": True,
-        "original_crosswire_source_date_retained_in_private_original_provenance": True,
+        "original_source_date_retained_in_private_original_provenance": True,
         "new_revision_date_not_inherited_from_upstream": True,
         "all_other_fields_comments_license_textsource_and_history_exact": True,
         "proposed_day_must_match_actual_approved_release_day": True,
