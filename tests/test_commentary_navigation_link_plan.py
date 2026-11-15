@@ -9,6 +9,7 @@ from commentary_navigation_link_plan import (
     parse_native_commentary_verse_registry, triage_missing_native_section_links,
     triage_single_key_chapter_navigation,
     verify_original_native_adjacent_section_boundaries,
+    corroborate_reviewed_commentary_link_plan,
 )
 
 A = "a" * 64
@@ -23,6 +24,95 @@ def source(master, segments, digest=A, reviewed=True):
 
 def span(chapter, first, last):
     return {"chapter": chapter, "from": first, "through": last}
+
+
+class IndependentlyCorroboratedPlanTests(unittest.TestCase):
+    ORIGINAL="1"*64
+    WITNESS="2"*64
+
+    def make(self):
+        sections=[
+            dict(master_key="Song.1.7",segments=[span("Song.1",7,8)],
+                 review_decision="PROPOSE_SOURCE_PRESERVING_NAVIGATION_LINKS",
+                 evidence_class="EXACT_ORIGINAL_HEADING_AND_INDEPENDENT_LEADING_COMMENTARY_CITATION",
+                 evidence_ids=["original-crosswire-heading",self.WITNESS]),
+            dict(master_key="Matt.13.24",
+                 segments=[span("Matt.13",24,30),span("Matt.13",36,43)],
+                 review_decision="PROPOSE_SOURCE_PRESERVING_NAVIGATION_LINKS",
+                 evidence_class="EXACT_DISCONTIGUOUS_ORIGINAL_HEADING_AND_INDEPENDENT_DIGITAL_PRESENTATIONS",
+                 evidence_ids=["source-original-disjoint","independent-web-view-A","independent-web-view-B"])
+        ]
+        original={"Song.1.7":A,
+                  **{f"Matt.13.{v}":B for v in range(24,31)},
+                  **{f"Matt.13.{v}":A for v in range(31,36)}}
+        preflight={"candidate_sections":[
+            {"original_master_key":"Song.1.7",
+             "original_master_raw_sha256":A,
+             "unoccupied_native_target_keys":["Song.1.8"],
+             "source_scope_editorially_reviewed":False},
+            {"original_master_key":"Matt.13.24",
+             "original_master_raw_sha256":B,
+             "unoccupied_native_target_keys":[f"Matt.13.{v}" for v in range(36,44)],
+             "source_scope_editorially_reviewed":False}
+        ]}
+        independent={"case_rows":[
+            {"original_section_start":"Song.1.7",
+             "independent_exact_range_citation_count":1,
+             "independent_leading_reference_and_matching_original_stock_exposition":1},
+            {"original_section_start":"Matt.13.24",
+             "independent_exact_range_citation_count":0,
+             "independent_leading_reference_and_matching_original_stock_exposition":0},
+        ]}
+        review={"schema_version":1,"resource_id":"example",
+                "source_archive_sha256":self.ORIGINAL,
+                "independent_digital_witness_sha256":self.WITNESS,
+                "scope":"ONLY_EXPLICIT_ORIGINAL_AUTHORED_RANGE_INDEX_OMISSIONS",
+                "source_text_changes_authorized":False,
+                "cross_edition_annotation_changes_authorized":False,
+                "chapter_expansion_changes_authorized":False,
+                "release_authorized":False,
+                "reviewed_source_scopes":sections}
+        return dict(review=review,resource_id="example",
+                    original_archive_sha256=self.ORIGINAL,
+                    witness_sha256=self.WITNESS,occupied=original,
+                    valid_verse_keys={"Song.1.7","Song.1.8"}|
+                    {f"Matt.13.{v}" for v in range(24,44)},
+                    original_candidate_preflight=preflight,
+                    independent_leading_range_citations=independent)
+
+    def test_independent_review_and_original_sha_pin_produce_exact_non_overlapping_aliases(self):
+        args=self.make()
+        out=corroborate_reviewed_commentary_link_plan(**args)
+        self.assertEqual(out["added_alias_count"],9)
+        self.assertEqual(out["independent_source_evidence_classes"],{
+            "EXACT_DISCONTIGUOUS_ORIGINAL_HEADING_AND_INDEPENDENT_DIGITAL_PRESENTATIONS":1,
+            "EXACT_ORIGINAL_HEADING_AND_INDEPENDENT_LEADING_COMMENTARY_CITATION":1})
+        self.assertFalse(out["release_authorized"])
+        self.assertTrue(out["one_reviewed_authorial_body_per_master"])
+        self.assertEqual(out["new_native_aliases"]["Matt.13.36"]["link_to"],"Matt.13.24")
+        self.assertNotIn("Matt.13.31",out["new_native_aliases"])
+
+    def test_missing_original_or_independent_scope_evidence_fails_closed(self):
+        import copy
+        cases=[
+            lambda x:x["review"]["reviewed_source_scopes"].pop(),
+            lambda x:x["review"]["reviewed_source_scopes"][0]["segments"][0].update(through=12),
+            lambda x:x["review"]["reviewed_source_scopes"][0]["evidence_ids"].clear(),
+            lambda x:x["review"]["reviewed_source_scopes"][1]["segments"].pop(),
+            lambda x:x["independent_leading_range_citations"]["case_rows"][0].update(
+                independent_leading_reference_and_matching_original_stock_exposition=0),
+            lambda x:x["review"].update(cross_edition_annotation_changes_authorized=True),
+            lambda x:x["review"].update(release_authorized=True),
+            lambda x:x["review"].update(source_archive_sha256="f"*64),
+            lambda x:x["original_candidate_preflight"]["candidate_sections"][1][
+                "unoccupied_native_target_keys"].append("Matt.13.31"),
+        ]
+        for change in cases:
+            given=copy.deepcopy(self.make())
+            change(given)
+            with self.subTest(change=change),self.assertRaises(UnsafeCommentaryLinkPlan):
+                corroborate_reviewed_commentary_link_plan(**given)
+
 
 
 class PlanTests(unittest.TestCase):
