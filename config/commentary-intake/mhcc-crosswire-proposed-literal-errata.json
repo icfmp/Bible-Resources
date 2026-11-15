@@ -4,9 +4,8 @@
   "source_module_id": "MHCC",
   "source_archive_sha256": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
   "independent_digital_witness_sha256": "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
-  "status": "PRIVATE_BYTE_REVERSIBLE_PROPOSAL_NOT_EDITORIALLY_APPROVED",
+  "status": "PRIVATE_EDIT_COMPILATION_APPROVED_PUBLIC_RELEASE_NOT_AUTHORIZED",
   "release_authorized": false,
-  "source_text_changes_authorized": false,
   "original_source_published_or_overwritten": false,
   "proposed_single_reference_changes": [
     {
@@ -23,5 +22,6 @@
   ],
   "private_revised_candidate_build_authorized": true,
   "private_revised_candidate_build_authorization_note": "Owner said 'Continue' after the explicit request to approve the targeted Ezekiel 3 source correction; authorization is limited to a new private edited candidate and integrity/reader tests, NOT a public release, merge, or catalogue change.",
-  "private_revised_candidate_history_note": "Reviewed index navigation links and one documented source citation correction"
+  "private_revised_candidate_history_note": "Reviewed index navigation links and one documented source citation correction",
+  "source_text_changes_for_public_release_authorized": false
 }
