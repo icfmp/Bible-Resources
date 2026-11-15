@@ -558,3 +558,43 @@ discrepancies are not part of the provisional **24 verse-index alias**
 candidate and **not a blocker solved by reindexing**. Owner/editorial
 approval and independent release rights are still needed before any
 annotation mutation.
+
+
+## Final cross-cutting pass — original title topology and complete original-reference destination registry (2026-11-15)
+
+**Evidence:** [source-pinned full audit and invented-only negative tests, CI #43705786140](https://github.com/icfmp/Bible-Resources/actions/runs/43705786140) **SUCCESS** on draft PR #275. The other **13** MHCC/shared workflows on this head also passed; the independent WEBP upstream-source checksum drift remains unrelated. All input sources remain unchanged; this is a metadata-only, read-only audit, **not** an approval to correct the original.
+
+### A. Actual original XML text topology, not merely XML title tags
+
+- All **28,718 original native K**, **1,255 I**, and **2 TOP** source records were observed and independently reconciled with the pinned complete original source and native versification. The K keys represent **4,047 distinct original raw bodies**, because native aliases intentionally share a body.
+- **3,928** distinct K bodies have a leading source-authored numeric section label in the combined visible prose and in the structural XML text/tail nodes; **3,828** of those labels start within the first 350 visible characters.
+- **Zero** numeric verse labels occur inside XML `title` tags. The very first title-only attempt [#43704960841](https://github.com/icfmp/Bible-Resources/actions/runs/43704960841) showed no candidates **because it looked in the wrong XML location**. It is not an editorial clean bill. The separate structural/prose comparison was added, tested on invented prose-only headings and rerun against the exact original.
+- The resulting **17** structural-fragment-versus-joined-prose span mismatches all start at the original **same first verse** and match **exactly the 17 already-reviewed native-section-index cases** (including the disjoint Matt 13 correction). They are not new missing commentary entries or a newly discovered independent list of errors. The raw XML and source-authored visible heading have not been changed.
+- **Zero** newly discovered different-first-verse conflicts, contradictory multiple explicit numbered XML titles, visible opening section ranges beyond the native chapter verse maximum, unrelated chapter duplication of an exact source body, or originally disconnected same-raw within-chapter repetitions. The remaining 119 unique bodies without this form of numeric label cannot be called absent text on this basis; the source-only/chapter-intro analyses above address them separately.
+- Neither a heading-shape parser nor a shared raw-body hash proves authentic authorial scope or print-edition identity. Any proposed correction continues to require a separately pinned witness and reversible review.
+
+### B. All original K/I reference destinations cross-checked against exact native KJV versification
+
+A new **generic** `scripts/commentary_reference_registry_triage.py` parser reuses the independently pinned original SWORD raw stream, strictly parses original K/I XML, deduplicates repeated raw bodies and classifies unambiguous literal `reference/@osisRef` forms. Complex/extended forms are *not* falsely treated as wrong. Nothing is silently reinterpreted or rewritten.
+
+Among **1,204 original reference elements across distinct K/I bodies**:
+
+| Independent canonical-registry verdict | Count |
+| --- | ---: |
+| Exact single-verse destinations present in native KJV registry | 691 |
+| Exact verse-range endpoints present in native KJV registry | 512 |
+| **Reversed same-chapter source range** | **1** |
+| Other simple missing/out-of-range, empty or unclassified targets | **0** |
+| **Total** | **1,204** |
+
+These are **distinct-body** annotation occurrences, **not** the much higher total counted by a per-occupied-K-alias XML-census; two aliases with identical original raw XML do not become two separate authorial citation additions. In-range links still require semantic review for whether they point to the *right* passage; the registry only proves existence and endpoint order, not theological correctness.
+
+### C. One newly evidenced *source* anomaly — Ezekiel 3 chapter overview
+
+- The unique reversed range occurs in the untouched original CrossWire native **`Ezek.3.1`** K body, part of the Ezekiel 3 chapter synopsis.
+- [CCEL's separate digital chapter-3 page](https://ccel.org/ccel/henry/mhcc.xxvii.iii.html) repeats the malformed chapter-summary reference **`Ezek. 3:12-2`** after the watchman synopsis, but independently labels the immediately following actual commentary section **`Ezek. 3:12-21`**. This is strong evidence of a **probable missing terminal `1` in a transmitted digital citation**. CCEL and CrossWire may share digital ancestry; their agreement is **not** proof that a specified Moody Press printing contains or lacks the typo.
+- This is **not** the previously known 17-section missing-native-key defect, not a missing Bible verse and not an app reader display failure.
+- **Open, separately trackable editorial decision:** [erratum issue #277](https://github.com/icfmp/Bible-Resources/issues/277). An approved source-changing fix would need to review **both visible chapter-summary wording and literal link target**, preserve the exact original, log a reversible narrowly scoped diff, rerun whole-corpus preservation and regenerate package hash. **Do not silently slip it into the 24-key index-only 0.1.1 plan**. Retaining a faithful reproduction with a visible erratum is also a legitimate explicitly reviewed disposition.
+- The existing 25 CCEL-vs-CrossWire annotation target divergences and 118 single-verse-index chapter bodies remain classified as **separate editorial/reader questions**, not auto-corrections.
+
+**Result:** the complete final structure/reference registry screening uncovered **one additional probable inherited digital source erratum**, not a new general failure of the 17-section index repair. The original BRMHCC 0.1.0 and sources, private 0.1.1 source content, Bible application and public catalogue remain unchanged. Draft PR #275 and release issue #276 remain approval-gated. Do not resume modern-English derivation until the source/editorial disposition is explicitly settled.
