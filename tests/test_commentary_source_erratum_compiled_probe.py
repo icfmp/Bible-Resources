@@ -38,6 +38,26 @@ class SourceErratumCorrectedNativeLinkTests(unittest.TestCase):
                                          expected_end="Gen.1.5"), 2
         )
 
+    def test_similar_prefix_and_same_end_on_different_start_are_not_matches(self):
+        first = "Gen.1.3"
+        end = "Gen.1.5"
+        misleading = (
+            b'<reference osisRef="Bible:Gen.1.30-Gen.1.5">wrong first</reference>'
+            b'<reference osisRef="Bible:Gen.1.4-Gen.1.5">same end</reference>'
+            b'<reference osisRef="Gen.1.3-Gen.2.5">same numeral</reference>'
+            b'<reference osisRef="Bible:Gen.1.3,Gen.1.5">complex target</reference>'
+        )
+        self.assertEqual(
+            _original_citation_endpoints(misleading, first=first,
+                                         expected_end=end), 0)
+        self.assertEqual(
+            _original_citation_endpoints(
+                misleading + b'<reference osisRef="Bible:Gen.1.3-5">valid</reference>',
+                first=first, expected_end=end), 1)
+        with self.assertRaises(ValueError):
+            _original_citation_endpoints(
+                misleading, first="Gen.1", expected_end=end)
+
     def test_bad_xml_and_nonmatching_target_cannot_be_accepted(self):
         with self.assertRaises(ValueError):
             _original_citation_endpoints(
