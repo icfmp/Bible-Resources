@@ -12,8 +12,89 @@ from commentary_osis_mixed_transport_probe import (
     classify_chapter_reader_repetition, probe_private_chapter_reader_repetition,
     probe_native_original_link_identity,
     mixed_transport_checks_pass, _COVERAGE_FIELDS,
-    privately_stage_versioned_zcom_zip
+    privately_stage_versioned_zcom_zip,
+    verify_private_versioned_commentary_conf_delta
 )
+
+
+class PrivateCommentaryMetadataDeltaTests(unittest.TestCase):
+    def test_exact_private_edition_delta_preserves_all_upstream_claims(self):
+        source = (
+            "[Curated]\\nDescription=Invented test commentary\\n"
+            "DataPath=./modules/comments/zcom/curated/\\n"
+            "ModDrv=zCom\\nSourceType=OSIS\\nVersification=KJV\\n"
+            "BlockType=BOOK\\nCompressType=ZIP\\n"
+            "Version=0.1.0\\nInstallSize=120\\n"
+            "DistributionLicense=Public Domain\\n"
+            "TextSource=https://example.invalid/source\\n"
+            "About=Source printing assertion, not curator verified\\n"
+            "SwordVersionDate=2020-02-03\\n"
+            "GlobalOptionFilter=OSISHeadings\\n"
+        ).replace("\\\\n", "\\n").encode("utf-8")
+        staged = (
+            source.decode("utf-8")
+            .replace("BlockType=BOOK", "BlockType=CHAPTER")
+            .replace("Version=0.1.0", "Version=0.1.1")
+            .replace("InstallSize=120", "InstallSize=540")
+            + "\\nHistory_0.1.1=Index-only section navigation corrections; "
+              "original commentary words and source references retained\\n"
+        ).encode("utf-8")
+        args = dict(
+            previous_version="0.1.0", proposed_version="0.1.1",
+            installed_native_data_size=540
+        )
+        receipt = verify_private_versioned_commentary_conf_delta(
+            source, staged, **args)
+        self.assertTrue(receipt["private_metadata_exact_reviewed_delta_only"])
+        self.assertTrue(
+            receipt["original_distribution_license_textsource_about_and_date_unchanged"])
+        self.assertFalse(receipt["public_release_or_new_revision_date_authorized"])
+        for tampered in (
+            staged.replace(b"Public Domain", b"CC0"),
+            staged.replace(b"TextSource=https://example.invalid/source",
+                           b"TextSource=https://example.invalid/other"),
+            staged.replace(b"SwordVersionDate=2020-02-03",
+                           b"SwordVersionDate=2026-11-15"),
+            staged.replace(b"About=Source printing assertion",
+                           b"About=Certified printed-edition match"),
+            staged.replace(b"GlobalOptionFilter=OSISHeadings",
+                           b"GlobalOptionFilter=OSISLemma"),
+            staged.replace(b"InstallSize=540", b"InstallSize=541"),
+            staged.replace(b"History_0.1.1=", b"History_0.1.0="),
+            staged.replace(b"Version=0.1.1", b"Version=0.1.0"),
+            staged + b"Unapproved=extra\\n".replace(b"\\\\n", b"\\n"),
+        ):
+            with self.subTest(tampered_suffix=tampered[-72:]):
+                with self.assertRaises(ValueError):
+                    verify_private_versioned_commentary_conf_delta(
+                        source, tampered, **args)
+        with self.assertRaises(ValueError):
+            verify_private_versioned_commentary_conf_delta(
+                source, staged, **{**args, "installed_native_data_size":541})
+        with self.assertRaises(ValueError):
+            verify_private_versioned_commentary_conf_delta(
+                source.replace(b"DistributionLicense=Public Domain\\n", b""),
+                staged, **args)
+
+    def test_optional_upstream_metadata_is_not_invented(self):
+        source = (
+            b"[Curated]\\nDataPath=./modules/comments/zcom/curated/\\n"
+            b"ModDrv=zCom\\nSourceType=OSIS\\nVersification=KJV\\n"
+            b"BlockType=BOOK\\nVersion=0.1.0\\nInstallSize=5\\n"
+            b"DistributionLicense=Public Domain\\n"
+        ).replace(b"\\\\n", b"\\n")
+        staged = (
+            source.decode("utf-8")
+            .replace("BlockType=BOOK", "BlockType=CHAPTER")
+            .replace("Version=0.1.0", "Version=0.1.1")
+            .replace("InstallSize=5", "InstallSize=10")
+            + "\\nHistory_0.1.1=Index-only section navigation corrections; "
+              "original commentary words and source references retained\\n"
+        ).encode("utf-8")
+        self.assertTrue(verify_private_versioned_commentary_conf_delta(
+            source, staged, previous_version="0.1.0",
+            proposed_version="0.1.1", installed_native_data_size=10
+        )["private_metadata_exact_reviewed_delta_only"])
 
 
 class PrivateVersionedCommentaryZipTests(unittest.TestCase):
