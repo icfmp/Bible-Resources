@@ -2007,8 +2007,17 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             if (curated.get("id")!=resource_id
                     or not isinstance(curated.get("sword_id"),str)
                     or not isinstance(curated.get("version"),str)
-                    or curated.get("origin",{}).get("publisher")
-                       !="CrossWire / SWORD Project"
+                    or not isinstance(curated.get("origin"), dict)
+                    or not isinstance(curated["origin"].get("publisher"), str)
+                    or not curated["origin"]["publisher"].strip()
+                    or curated["origin"].get("url") != manifest["source_page_url"]
+                    or downloaded["sha256"] not in
+                       str(curated["origin"].get("source_revision", ""))
+                    or not isinstance(curated.get("upstreams"), list)
+                    or not any(isinstance(item, dict)
+                               and item.get("module_id") == manifest["module_id"]
+                               and item.get("last_integrated_version") == manifest["version"]
+                               for item in curated["upstreams"])
                     or not isinstance(decisions.get("proposed_next_version"),str)
                     or decisions.get("package_staging_only") is not True):
                 raise PilotError("Unreviewed original curated commentary version identity")
