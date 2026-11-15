@@ -421,6 +421,14 @@ jobs:
           assert staging["original_opaque_TOP_count"]==2
           assert staging["installed_package_I_K_U_raw_bytes_equal_to_private_compiled_source"] is True
           assert staging["native_compiled_files_copied_without_recompression_or_byte_edits"] is True
+          metadata=staging["private_conf_metadata_exact_delta_receipt"]
+          assert metadata["private_metadata_exact_reviewed_delta_only"] is True
+          assert metadata["only_changed_original_fields"]==["BlockType","InstallSize","Version"]
+          assert metadata["only_added_metadata_field"]=="History_0.1.1"
+          assert metadata["original_distribution_license_textsource_about_and_date_unchanged"] is True
+          assert metadata["installed_native_bytes_used_for_install_size"] is True
+          assert metadata["original_about_print_claim_is_inherited_not_independently_certified"] is True
+          assert metadata["public_release_or_new_revision_date_authorized"] is False
           assert staging["package_saved_as_public_artifact"] is False
           assert staging["published"] is False
           assert staging["release_authorized"] is False
