@@ -371,6 +371,96 @@ def triage_single_key_chapter_navigation(
     }
 
 
+
+def verify_original_native_adjacent_section_boundaries(
+        raw: bytes, *, expected_module: str,
+        original_occupied_sha256: dict[str,str]) -> dict:
+    """Compare ALL adjacent native entry identities with raw-body grouping.
+
+    The OSIS reconstruction may group equal adjacent K payloads only when
+    original native SWORD also says those exact positions were linked. Equal
+    authorial wording is never alone permission to collapse distinct sections.
+    This is a complete coverage check, not a sample or content adaptation.
+    """
+    if (not isinstance(raw,bytes) or not 0 < len(raw) <= 12*1024*1024
+            or b"\0" in raw or not isinstance(expected_module,str)
+            or not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,79}",expected_module)
+            or not isinstance(original_occupied_sha256,dict)
+            or not original_occupied_sha256 or len(original_occupied_sha256)>300000
+            or any(KEY.fullmatch(k) is None or SHA256.fullmatch(d) is None
+                   for k,d in original_occupied_sha256.items())):
+        raise UnsafeCommentaryLinkPlan("Untrusted complete native adjacency data")
+    try:
+        lines=raw.decode("ascii").splitlines()
+    except UnicodeError:
+        raise UnsafeCommentaryLinkPlan("Non-ASCII native linked adjacency") from None
+    if len(lines)<3 or len(lines)>300000:
+        raise UnsafeCommentaryLinkPlan("Missing/oversize native adjacency framing")
+    header=lines[0].split("\t")
+    if (len(header)!=5 or header[0]!="M" or header[1]!=expected_module
+            or not re.fullmatch(r"[A-Za-z][A-Za-z0-9]{0,31}",header[2])
+            or not re.fullmatch(r"\d+\.\d+\.\d+",header[3])
+            or header[4] not in {"RawCom","RawCom4","zCom","zCom4"}):
+        raise UnsafeCommentaryLinkPlan("Unknown original native linked-index identity")
+    footer=lines[-1].split("\t")
+    if (len(footer)!=4 or footer[0]!="S"
+            or any(not re.fullmatch(r"\d{1,9}",x) for x in footer[1:])):
+        raise UnsafeCommentaryLinkPlan("Missing native linked pair totals")
+    counts=list(map(int,footer[1:]))
+    if counts[0]!=counts[1]+counts[2] or counts[0]!=len(lines)-2:
+        raise UnsafeCommentaryLinkPlan("Native linked adjacency accounting changed")
+    occupied=original_occupied_sha256
+    by_chapter=defaultdict(set)
+    for key in occupied:
+        chapter,verse=key.rsplit(".",1)
+        by_chapter[chapter].add(int(verse))
+    expected={
+        (f"{chapter}.{n}",f"{chapter}.{n+1}")
+        for chapter,verses in by_chapter.items()
+        for n in verses if n+1 in verses
+    }
+    reported=set()
+    linked=0
+    unlinked=0
+    same_raw_but_not_linked=[]
+    different_raw_but_linked=[]
+    for line in lines[1:-1]:
+        parts=line.split("\t")
+        if len(parts)!=4 or parts[0]!="L" or parts[3] not in {"0","1"}:
+            raise UnsafeCommentaryLinkPlan("Unreviewed native linked-pair frame")
+        first,second=parts[1],parts[2]
+        if (first,second) not in expected or (first,second) in reported:
+            raise UnsafeCommentaryLinkPlan("Missing/duplicated/nonadjacent native linked pair")
+        reported.add((first,second))
+        identically_compressed=occupied[first]==occupied[second]
+        is_linked=parts[3]=="1"
+        linked+=int(is_linked)
+        unlinked+=int(not is_linked)
+        if identically_compressed and not is_linked:
+            same_raw_but_not_linked.append([first,second])
+        if is_linked and not identically_compressed:
+            different_raw_but_linked.append([first,second])
+    if reported!=expected or counts!=[len(expected),linked,unlinked]:
+        raise UnsafeCommentaryLinkPlan("Incomplete native linked section boundary scan")
+    return {
+        "status":"COMPLETE_ORIGINAL_NATIVE_LINKED_SECTION_BOUNDARY_AUDIT",
+        "original_native_linked_pair_count":linked,
+        "original_native_separate_adjacent_pair_count":unlinked,
+        "original_adjacent_occupied_K_pair_count":len(expected),
+        "same_original_raw_payload_but_independently_unlinked_pair_count":
+            len(same_raw_but_not_linked),
+        "distinct_original_raw_payload_but_native_linked_pair_count":
+            len(different_raw_but_linked),
+        "same_original_raw_unlinked_first_ten":same_raw_but_not_linked[:10],
+        "distinct_original_raw_linked_first_ten":different_raw_but_linked[:10],
+        "all_original_adjacent_native_section_identities_proven":True,
+        "raw_payload_based_osis_grouping_is_native_identity_faithful":
+            not (same_raw_but_not_linked or different_raw_but_linked),
+        "original_source_text_copied_or_mutated":False,
+        "original_edited_sections_or_releases":0,
+    }
+
+
 def parse_native_commentary_verse_registry(raw: bytes, expected_module: str) -> dict:
     """Parse read-only released-libSWORD chapter bounds, never manuscript data.
 
