@@ -9,6 +9,8 @@ on:
       - 'tests/test_commentary_editorial_topology.py'
       - 'scripts/commentary_reference_registry_triage.py'
       - 'tests/test_commentary_reference_registry_triage.py'
+      - 'scripts/commentary_literal_erratum_preflight.py'
+      - 'tests/test_commentary_literal_erratum_preflight.py'
       - 'scripts/commentary_osis_rebuild_preflight.py'
       - 'scripts/commentary_intro_chapter_text_review.py'
       - 'scripts/commentary_osis_intro_transport_probe.py'
@@ -56,6 +58,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_commentary_section_scope_audit.py' -v
           python -m unittest discover -s tests -p 'test_commentary_editorial_topology.py' -v
           python -m unittest discover -s tests -p 'test_commentary_reference_registry_triage.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_literal_erratum_preflight.py' -v
           python -m unittest discover -s tests -p 'test_commentary_navigation_link_plan.py' -v
           python -m unittest discover -s tests -p 'test_commentary_chapter_ref_labels.py' -v
           python -m unittest discover -s tests -p 'test_commentary_osis_rebuild_preflight.py' -v
@@ -703,6 +706,25 @@ jobs:
           print("Original reversed citations versus independent source and native headings:",
                 inverted["source_original_distinct_body_reversed_reference_count"],
                 json.dumps(inverted["case_rows"],sort_keys=True))
+          # Never apply this trial to private compiled 0.1.1, source stock,
+          # the released version or catalogue. One copied XML fragment only.
+          erratum=r["private_unapproved_original_literal_erratum_byte_preflight"]
+          assert erratum is not None
+          assert erratum["status"]=="PRIVATE_ORIGINAL_SOURCE_ERRATUM_PREVIEW_NOT_APPROVED_OR_COMPILED"
+          assert erratum["case_count"]==1
+          assert erratum["all_original_K_I_TOP_entries_untouched"] is True
+          assert erratum["public_or_private_staged_zcom_package_content_unchanged"] is True
+          assert erratum["text_or_reference_values_exported"] is False
+          assert erratum["publication_authorized"] is False
+          for candidate in erratum["case_rows"]:
+              assert candidate["reverse_restores_exact_original_raw_bytes"] is True
+              assert candidate["exactly_one_original_reference_and_label_changed"] is True
+              assert candidate["no_other_original_xml_text_annotation_or_punctuation_changed"] is True
+              assert candidate["editorial_change_authorized"] is False
+              assert candidate["release_authorized"] is False
+              assert candidate["source_witness_is_citation_not_authorial_scope"] is True
+              print("One private source erratum byte-reversible preview ONLY:",
+                    json.dumps(candidate,sort_keys=True))
           lead=witness["independent_leading_range_citations"]
           assert lead["status"]=="INDEPENDENT_DIGITAL_SECTION_LEAD_TO_STOCK_PROSE_TRIAGE_NOT_APPROVAL"
           assert lead["case_count"]==17
