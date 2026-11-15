@@ -2,6 +2,7 @@
 import sys
 from pathlib import Path
 import unittest
+from tempfile import TemporaryDirectory
 from lxml import etree
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
@@ -10,8 +11,40 @@ from commentary_osis_mixed_transport_probe import (
     validate_private_index_alias_preview, _native_same_chapter_ranges,
     classify_chapter_reader_repetition, probe_private_chapter_reader_repetition,
     probe_native_original_link_identity,
-    mixed_transport_checks_pass, _COVERAGE_FIELDS
+    mixed_transport_checks_pass, _COVERAGE_FIELDS,
+    privately_stage_versioned_zcom_zip
 )
+
+
+class PrivateVersionedCommentaryZipTests(unittest.TestCase):
+    def test_private_package_rejects_same_identity_and_invalid_metadata_without_native_side_effects(self):
+        with TemporaryDirectory() as directory:
+            root=Path(directory)
+            binary=root/"sword-native-raw"
+            binary.write_bytes(b"test-only")
+            output=root/"scratch"
+            output.mkdir()
+            args=dict(
+                compiler_root=root,compiled_module_id="Probe",
+                package_module_id="Curated",previous_version="0.1.0",
+                proposed_version="0.1.1",
+                published_conf_template=(
+                    b"[Curated]\\nDataPath=./modules/comments/zcom/curated/\\n"
+                    b"ModDrv=zCom\\nSourceType=OSIS\\nVersification=KJV\\n"
+                    b"BlockType=BOOK\\nVersion=0.1.0\\n"
+                ).replace(b"\\\\n",b"\\n"),
+                scratch=output,native_raw_binary=binary
+            )
+            with self.assertRaises(ValueError):
+                privately_stage_versioned_zcom_zip(
+                    **{**args,"compiled_module_id":"Curated"})
+            with self.assertRaises(ValueError):
+                privately_stage_versioned_zcom_zip(
+                    **{**args,"proposed_version":"0.1.0"})
+            with self.assertRaises(ValueError):
+                privately_stage_versioned_zcom_zip(
+                    **{**args,"published_conf_template":b"[Unreviewed]\\nVersion=0.1.0\\n"})
+            self.assertEqual(list(output.iterdir()),[])
 
 
 class MixedOriginalTransportTests(unittest.TestCase):
