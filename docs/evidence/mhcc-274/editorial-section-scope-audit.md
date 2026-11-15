@@ -486,3 +486,75 @@ as a temporary isolated CI proof only. No BRMHCC 0.1.1 release, no
 main-branch merge, no automatic restoration of missing links, no
 resumption of English modernization #270/#272 until editorial and real
 reader presentation approval.
+
+
+## Unpaired source citation annotation triage — exact 25-target positions (2026-11-15)
+
+[Exact original-stock + independent CCEL private CI #43657181599](https://github.com/icfmp/Bible-Resources/actions/runs/43657181599)
+**SUCCESS**. Generic synthetic tests also passed. The same source-target
+pairing that established **33 exact/literal-work-qualified existing
+matches** among 58 original CCEL `scripRef` destinations now individually
+attributes all **25 unmatched source target occurrences** to the
+original CrossWire XML **after** consuming exact destination matches and
+then only literal `Bible:`-prefixed matches. It does not match on
+displayed labels, never guesses link targets and never adds XML tags.
+
+| Cross-edition source target absent in CrossWire | Number |
+| --- | ---: |
+| Original CCEL label still literally present as *ordinary* unlinked CrossWire text (**L**) | **18** |
+| Original CCEL label occurs in an existing stock link whose `osisRef` differs (**R**) | **1** |
+| Original label survives only with punctuation/markup difference (**P**) | **3** |
+| Original label not found in the selected stock section (**A**) | **3** |
+| **Total** | **25 across 20 chapters** |
+
+Among the 18 plain-text labels **14 occur in an unambiguous single
+literal position** in the selected CrossWire raw XML. That is a narrow
+candidate for manual hypertext restoration **only after** independent
+target, local passage context, edition/provenance and digital-annotation
+redistribution-rights review. It does NOT authorize insertion or prove
+any authorial wording is missing.
+
+### Case-by-case exact original-stock link-location review
+
+| Original section anchor | Unpaired CCEL targets | Source citation label position in stock | Unique literal plain labels |
+| --- | ---: | --- | ---: |
+| `2Sam.22.1` | 1 | Not found (A) ×1 | 0 |
+| `1Chr.7.1` | 2 | Plain text (L) ×2 | 1 |
+| `1Chr.14.1` | 1 | Plain text (L) ×1 | 1 |
+| `1Chr.17.1` | 2 | Plain text (L) ×1; Different link (R) ×1 | 1 |
+| `1Chr.18.1` | 1 | Plain text (L) ×1 | 1 |
+| `1Chr.19.1` | 1 | Plain text (L) ×1 | 1 |
+| `2Chr.3.1` | 1 | Plain text (L) ×1 | 1 |
+| `2Chr.18.1` | 1 | Plain text (L) ×1 | 1 |
+| `2Chr.23.1` | 1 | Plain text (L) ×1 | 1 |
+| `Ps.16.1` | 1 | Punctuation/markup (P) ×1 | 0 |
+| `Ps.53.1` | 1 | Plain text (L) ×1 | 0 |
+| `Ps.70.1` | 1 | Not found (A) ×1 | 0 |
+| `Ps.111.1` | 2 | Plain text (L) ×2 | 0 |
+| `Isa.36.1` | 1 | Plain text (L) ×1 | 1 |
+| `Isa.37.1` | 1 | Plain text (L) ×1 | 1 |
+| `Isa.39.1` | 1 | Plain text (L) ×1 | 1 |
+| `Jer.45.1` | 1 | Not found (A) ×1 | 0 |
+| `Ezek.40.1` | 3 | Plain text (L) ×1; Punctuation/markup (P) ×2 | 1 |
+| `Ezek.43.1` | 1 | Plain text (L) ×1 | 1 |
+| `Ezek.47.1` | 1 | Plain text (L) ×1 | 1 |
+
+**Editorial triage policy:** L (especially the 14 unique ones) can be
+considered for **annotation-only restoration**, never automatic. R
+requires checking the already-existing target and must not overwrite
+it. P requires preserving exact source punctuation/markup and checking
+destination identity. A may be a **digital-edition difference or
+different section scope** and must not have words inserted to enable
+a hyperlink. This census considers 118 originally single-key chapter
+sections only, not the entire 3,928-section commentary corpus.
+
+Across the 118 originals, none of the **33 CrossWire existing link
+target occurrences** is unmatched in the CCEL source by the limited
+exact/literal-work-prefix comparison; that does NOT prove every
+target is biblically accurate or all hyperlinks render/click correctly.
+The original compiled module, source XML, reference attribute values,
+wording, punctuation and released package remain unchanged. The 25
+discrepancies are not part of the provisional **24 verse-index alias**
+candidate and **not a blocker solved by reindexing**. Owner/editorial
+approval and independent release rights are still needed before any
+annotation mutation.
