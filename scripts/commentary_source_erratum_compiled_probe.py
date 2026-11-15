@@ -13,18 +13,19 @@ source replacement, not an upstream import and not a release mechanism.
 """
 from __future__ import annotations
 
-from collections import Counter
 from hashlib import sha256
 from io import BytesIO
 from pathlib import Path
 import os
-import re
 import subprocess
 
 from lxml import etree
 
 from commentary_literal_erratum_preflight import (
     preview_exact_reversible_commentary_reference_erratum,
+)
+from commentary_reference_registry_triage import (
+    SINGLE_VERSE, _unambiguous_verse_range_endpoints,
 )
 from commentary_osis_mixed_transport_probe import (
     probe_complete_original_transport, privately_stage_versioned_zcom_zip,
@@ -77,7 +78,17 @@ def _read_original_native_link_topology(root: Path, module_id: str, binary: Path
 
 def _original_citation_endpoints(raw: bytes, *, first: str,
                                  expected_end: str) -> int:
-    """Count the literal expected corrected link, without logging source XML."""
+    """Count exact canonical endpoints, not substrings or ambiguous suffixes.
+
+    A substring check can accidentally match e.g. Gen.1.3 in Gen.1.30;
+    a suffix check alone can silently accept an unrelated first verse.
+    This must compare the parsed *entire* reference to the two canonical
+    identities, preserving source bytes and rejecting exotic link grammar.
+    """
+    if (not isinstance(first, str) or not isinstance(expected_end, str)
+            or not SINGLE_VERSE.fullmatch(first)
+            or not SINGLE_VERSE.fullmatch(expected_end)):
+        raise ValueError("Expected canonical section endpoint identifiers")
     try:
         root = etree.fromstring(
             b"<entry>" + raw + b"</entry>",
@@ -87,14 +98,14 @@ def _original_citation_endpoints(raw: bytes, *, first: str,
         )
     except (etree.XMLSyntaxError, ValueError):
         raise ValueError("Source erratum candidate no longer strictly parseable") from None
-    candidates = []
-    for el in root.iter():
-        if isinstance(el.tag, str) and el.tag.rsplit("}", 1)[-1] == "reference":
-            t = el.get("osisRef", "")
-            if first in t:
-                candidates.append(t)
-    return sum(t.endswith("-" + expected_end) or t.endswith("-" + expected_end.rsplit(".", 1)[-1])
-               for t in candidates)
+    if any(isinstance(node, etree._Entity) for node in root.iter()):
+        raise ValueError("Unresolved source entity in commentary reference")
+    return sum(
+        _unambiguous_verse_range_endpoints(el.get("osisRef", ""))
+        == (first, expected_end)
+        for el in root.iter()
+        if isinstance(el.tag, str) and el.tag.rsplit("}", 1)[-1] == "reference"
+    )
 
 
 def _private_changed_reference_xiphos(
