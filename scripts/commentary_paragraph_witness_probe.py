@@ -44,6 +44,48 @@ def _unique_offset(tokens: list[str], anchor: list[str]):
     return positions[0] if len(positions) == 1 else None
 
 
+
+def _word_semantic_locations(element, expected_tokens: list[str]) -> list[str] | None:
+    """Classify matched word positions without returning source words or links.
+
+    Element text belongs to that element; a child's tail belongs to its
+    parent. Inline citation labels can differ in abbreviation independently
+    of the author's exposition. Only use the classification if the exact
+    flattened lexical stream agrees with the caller's token offsets.
+    """
+    fragments: list[tuple[str, bool]] = []
+
+    def walk(node, inside_reference: bool) -> None:
+        active = inside_reference or _name(node) in {"reference", "scripRef"}
+        if node.text:
+            fragments.append((node.text, active))
+        for child in node:
+            if isinstance(child.tag, str):
+                walk(child, active)
+            if child.tail:
+                fragments.append((child.tail, active))
+
+    walk(element, False)
+    flattened = "".join(part for part, _ in fragments)
+    matches = list(WORD.finditer(flattened))
+    if [m.group().casefold() for m in matches] != expected_tokens:
+        return None
+    owned_ranges = []
+    position = 0
+    for part, linked in fragments:
+        end = position + len(part)
+        if linked:
+            owned_ranges.append((position, end))
+        position = end
+    return [
+        "SCRIPTURE_REFERENCE_LABEL"
+        if any(start <= match.start() and match.end() <= end
+               for start, end in owned_ranges)
+        else "EXPOSITION_OR_OTHER_MARKUP"
+        for match in matches
+    ]
+
+
 def _first_reference(osis: str) -> str | None:
     if _parse_reference(osis)[0] not in (
             "work_qualified_chapter", "work_qualified_verse",
@@ -195,6 +237,28 @@ def compare_paragraph_witness(document, samples: list[tuple[str, str, bytes]]) -
                  if source_word != original_word]
                 if aligned is not None else None
             )
+            original_semantics = _word_semantic_locations(own, original_words)
+            source_semantics = _word_semantic_locations(p, pwords)
+            first_mismatch = mismatches[0] if mismatches else None
+            source_context = (
+                source_semantics[first_mismatch]
+                if first_mismatch is not None and source_semantics is not None
+                else None
+            )
+            original_context = (
+                original_semantics[begin + first_mismatch]
+                if first_mismatch is not None and original_semantics is not None
+                and begin is not None
+                else None
+            )
+            mismatch_class = (
+                None if first_mismatch is None
+                else "BOTH_SCRIPTURE_REFERENCE_LABELS"
+                if source_context == original_context == "SCRIPTURE_REFERENCE_LABEL"
+                else "EXPOSITION_OR_MIXED_SEMANTIC_CONTEXT"
+                if source_context is not None and original_context is not None
+                else "TOKEN_OWNERSHIP_UNRESOLVED"
+            )
             whole = (
                 aligned is not None
                 and not mismatches
@@ -216,6 +280,10 @@ def compare_paragraph_witness(document, samples: list[tuple[str, str, bytes]]) -
                 "original_digital_witness_first_difference_token_offset": (
                     mismatches[0] if mismatches else None
                 ),
+                "first_difference_semantic_context": mismatch_class,
+                "first_difference_source_token_owner": source_context,
+                "first_difference_original_token_owner": original_context,
+                "citation_label_variants_are_not_proven_authorial_errors": True,
                 "all_differences_require_independent_editorial_review": True,
                 "original_prefix_word_tokens_before_exact_source_p": (
                     begin if whole else None
