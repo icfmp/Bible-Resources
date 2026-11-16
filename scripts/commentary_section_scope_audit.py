@@ -56,6 +56,7 @@ from commentary_stock_prefix_topology import (
 )
 from commentary_chapter_ref_labels import link_label_location
 from commentary_editorial_topology import NativeCommentaryEditorialTopology
+from commentary_layout_census import NativeCommentaryLayoutCensus
 from commentary_reference_registry_triage import OriginalCommentaryReferenceRegistryTriage
 from commentary_literal_erratum_preflight import preview_exact_reversible_commentary_reference_erratum
 from commentary_source_erratum_compiled_probe import probe_private_compiled_source_erratum
@@ -1646,6 +1647,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
         private_full_K = defaultdict(list)
         osis_rebuild_preflight = NativeOSISRebuildPreflight()
         editorial_topology = NativeCommentaryEditorialTopology()
+        layout_census = NativeCommentaryLayoutCensus()
         original_reference_triage = OriginalCommentaryReferenceRegistryTriage()
         original_opaque_top_records = []
         private_intro_text_raw_by_chapter = {}
@@ -1664,6 +1666,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 rows.append((kind, ref))
                 osis_rebuild_preflight.observe(kind, ref, raw)
                 editorial_topology.observe(kind, ref, raw)
+                layout_census.observe(kind, ref, raw)
                 original_reference_triage.observe(kind, ref, raw)
                 if kind == "U":
                     original_opaque_top_records.append(raw)
@@ -1749,6 +1752,14 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
         if set(records) - registry["verse_keys"]:
             raise PilotError("Stock native occupied key escaped independent versification registry")
         topology_review = editorial_topology.report(registry["chapter_maximums"])
+        layout_review = layout_census.report()
+        if (layout_review["original_native_K_seen"] != len(keys)
+                or layout_review["original_native_I_seen"] != len(intros)
+                or layout_review["original_native_TOP_seen"] != len(top)
+                or layout_review["source_word_text_xml_and_targets_disclosed"]
+                or layout_review["original_module_modified"]
+                or layout_review["publication_authorized"]):
+            raise PilotError("Full original layout census did not reconcile with native source")
         original_reference_review = original_reference_triage.report(
             canonical_verses=registry["verse_keys"],
             canonical_chapters=registry["chapter_maximums"],
@@ -2184,6 +2195,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 chapter_navigation_review,
             "unrecognized_native_slot_review": unknown,
             "independent_original_native_editorial_topology_triage": topology_review,
+            "independent_original_native_layout_census": layout_review,
             "independent_original_native_reference_registry_triage": original_reference_review,
             "private_unapproved_original_literal_erratum_byte_preflight":
                 unapproved_literal_erratum_preflight,
