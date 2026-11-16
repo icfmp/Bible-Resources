@@ -32,5 +32,19 @@
     "merge_authorized": false,
     "public_release_authorized": false,
     "catalogue_update_authorized": false
-  }
+  },
+  "proposed_single_prose_changes": [
+    {
+      "original_native_entry": "1Chr.7.1",
+      "original_phrase": "Zebulun or Dn",
+      "corrected_phrase": "Zebulun or Dan",
+      "external_review_url": "https://github.com/icfmp/Bible-Resources/issues/279",
+      "independent_edition_corrob_url": "https://www.christianity.com/bible/commentary/matthew-henry-concise/1-chronicles/7",
+      "source_error_class": "MISSPELLED_PROPER_NAME_IN_AUTHORIAL_PROSE",
+      "editorial_decision": "PRIVATE_REVERSIBLE_PREFLIGHT_ONLY_NOT_COMPILED",
+      "original_raw_sha256": null,
+      "expected_original_linked_native_K_count": null,
+      "public_release_authorized": false
+    }
+  ]
 }
