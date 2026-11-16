@@ -13,6 +13,7 @@ from hashlib import sha256
 import json
 from pathlib import Path
 import tempfile
+from zipfile import ZipFile
 
 from build import build
 from catalogue_release_coverage import coverage
@@ -52,15 +53,42 @@ def inspect_approved_releases(root: Path, module_ids: tuple[str, ...]) -> dict:
         release_contract = coverage(root, built=dist)
         plans = {p["module_id"]: p
                  for _, p in release_contract["planned"]}
+        legacy = {p["module_id"]: p for p in release_contract["legacy"]}
         evidence = []
         for resource_id in module_ids:
-            if resource_id not in plans:
-                raise PreflightError(
-                    resource_id + ": no current owner-approved versioned plan")
             folder, meta = by_id[resource_id]
-            plan = plans[resource_id]
-            path = root / "config/release-plans" / (plan["tag"] + ".json")
-            checked = approved_release(root, path, dist)
+            plan = plans.get(resource_id)
+            historic = legacy.get(resource_id)
+            if (plan is None) == (historic is None):
+                raise PreflightError(
+                    resource_id + ": ambiguous or missing current release route")
+            if plan:
+                path = root / "config/release-plans" / (plan["tag"] + ".json")
+                checked = approved_release(root, path, dist)
+                archive = checked["package"]
+                evidence_file = checked["evidence"]
+            else:
+                # LSG is deliberately a *frozen historical* release binding:
+                # its public Pages ZIP and versioned GitHub asset have
+                # different, independently pinned checksums. Never make up
+                # an active plan or claim the old GitHub ZIP was downloaded.
+                archive = dist / "sword/packages" / (meta["sword_id"] + ".zip")
+                evidence_file = folder / "SOURCE_VALIDATION.json"
+                if not evidence_file.is_file():
+                    raise PreflightError(resource_id + ": no source receipt")
+                payload = folder / "payload"
+                actual = {
+                    p.relative_to(payload).as_posix(): p
+                    for p in payload.rglob("*") if p.is_file()
+                }
+                with ZipFile(archive) as package:
+                    if (len(package.infolist()) != len(actual)
+                            or set(package.namelist()) != set(actual)
+                            or package.testzip() is not None
+                            or any(p.is_symlink() or package.read(rel) != p.read_bytes()
+                                   for rel, p in actual.items())):
+                        raise PreflightError(
+                            resource_id + ": archived Pages payload member drift")
             conf_paths = list((folder / "payload/mods.d").glob("*.conf"))
             if len(conf_paths) != 1:
                 raise PreflightError(resource_id + ": ambiguous native .conf")
@@ -71,8 +99,16 @@ def inspect_approved_releases(root: Path, module_ids: tuple[str, ...]) -> dict:
             if driver not in ("RawText", "zText", "RawCom", "RawCom4",
                               "zCom", "zCom4"):
                 raise PreflightError(resource_id + ": unsupported driver for this pilot")
-            archive = checked["package"]
             fingerprint = sha256(archive.read_bytes()).hexdigest()
+            reference = plan or historic
+            expected_hash = (plan["package_sha256"] if plan else
+                             historic["catalogue_sha256"])
+            expected_size = (plan["package_size_bytes"] if plan else
+                             historic["catalogue_size_bytes"])
+            if (fingerprint != expected_hash or archive.stat().st_size
+                    != expected_size):
+                raise PreflightError(
+                    resource_id + ": compiled catalogue ZIP differs from frozen release route")
             evidence.append({
                 "resource_id": resource_id,
                 "sword_id": native_id,
@@ -80,15 +116,21 @@ def inspect_approved_releases(root: Path, module_ids: tuple[str, ...]) -> dict:
                 "driver": driver,
                 "versification": conf.get("Versification"),
                 "version": meta["version"],
-                "release_tag": plan["tag"],
+                "release_tag": reference["tag"],
+                "release_route": ("current_reviewed_plan" if plan
+                                  else "frozen_historical_binding"),
+                "historical_github_asset_sha256":
+                    historic["release_sha256"] if historic else None,
+                "historical_github_asset_verified_online": False,
                 "package_sha256": fingerprint,
                 "package_size_bytes": archive.stat().st_size,
                 "source_validation_sha256":
-                    sha256(checked["evidence"].read_bytes()).hexdigest(),
+                    sha256(evidence_file.read_bytes()).hexdigest(),
                 "source_rights_approved_in_pinned_module":
                     bool(meta["rights"]["redistribution_allowed"]),
                 "native_payload_member_identity_verified": True,
-                "release_authorization_verified_in_current_plan": True,
+                "release_authorization_verified_in_current_plan": bool(plan),
+                "frozen_historical_evidence_verified": bool(historic),
                 "public_download_checked": False,
             })
     return {
