@@ -95,6 +95,29 @@ class CommentaryLayoutCensusTests(unittest.TestCase):
         self.assertEqual(profile["largest_effective_prose_block_words"], 5)
         self.assertEqual(profile["prose_words_in_effective_blocks"], 5)
 
+    def test_source_prose_outside_wrapper_div_is_a_review_candidate(self):
+        source_words = b" ".join([b"original"] * 350)
+        original = (
+            b"<div type='book'/><div type='section'/>"
+            b"<hi type='bold'>Verses 1-4.</hi> " + source_words
+        )
+        profile = layout_profile(original)
+        self.assertEqual(profile["div_count"], 2)
+        self.assertEqual(profile["effective_prose_block_count"], 0)
+        self.assertEqual(profile["largest_effective_prose_block_words"], 0)
+        self.assertGreaterEqual(profile["words_outside_any_recognized_block"], 350)
+        self.assertIn("long_prose_outside_any_recognized_block",
+                      layout_flags(profile))
+        self.assertTrue(profile["styled_numbered_verse_lead"])
+        self.assertFalse(profile["words_owned_by_heading_or_note_blocks"])
+
+    def test_text_owned_by_heading_not_misreported_as_unwrapped_prose(self):
+        original = b"<div/><title>Complete original heading</title>"
+        profile = layout_profile(original)
+        self.assertEqual(profile["word_count"], 3)
+        self.assertEqual(profile["words_outside_any_recognized_block"], 0)
+        self.assertEqual(profile["words_owned_by_heading_or_note_blocks"], 3)
+
     def test_highlighted_original_verse_heading_is_not_unstyled(self):
         source = b"<hi type='bold'>Verses 2, 3.</hi><div>Original text.</div>"
         profile = layout_profile(source)
