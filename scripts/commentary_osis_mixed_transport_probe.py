@@ -160,14 +160,17 @@ def probe_original_mixed_transport(chapter: str, book_intro: bytes,
                                    chapter_intro: bytes,
                                    numbered: list[tuple[str, bytes]], *,
                                    scratch: Path, native_raw_binary: Path,
-                                   osis2mod_binary="osis2mod") -> dict:
+                                   osis2mod_binary="osis2mod",
+                                   provisional_index_aliases: dict[str,dict] | None = None) -> dict:
     if (not scratch.is_dir() or scratch.is_symlink()
             or not native_raw_binary.is_file()
             or native_raw_binary.is_symlink()):
         raise ValueError("Untrusted native mixed original probe path")
     module_id="BRMixedProbe"
+    aliases=provisional_index_aliases or {}
     xml, source=build_mixed_original_transport(
-        chapter,book_intro,chapter_intro,numbered,work_id=module_id
+        chapter,book_intro,chapter_intro,numbered,work_id=module_id,
+        provisional_index_aliases=aliases
     )
     root=scratch/"mixed-private-candidate"
     if root.exists() or root.is_symlink():
@@ -269,7 +272,15 @@ def probe_original_mixed_transport(chapter: str, book_intro: bytes,
         missing_intro_keys=missing_I,
         missing_numbered_keys=missing_K,
         extra_intro_keys=extra_I,
-        extra_numbered_keys=extra_K,
+        extra_numbered_keys=[k for k in extra_K if k not in aliases],
+    )
+    exact_extra_keys_only=bool(aliases) and set(extra_K)==set(aliases)
+    aliases_match_original_compiled_master=(
+        exact_extra_keys_only and all(
+            rebuilt_K.get(target) == rebuilt_K.get(claim["link_to"])
+            and rebuilt_K.get(target) is not None
+            for target,claim in aliases.items()
+        )
     )
     return {
         **source,
@@ -285,6 +296,11 @@ def probe_original_mixed_transport(chapter: str, book_intro: bytes,
         "compiled_I_key_count":len(rebuilt_I),
         "compiled_K_key_count":len(rebuilt_K),
         "compiled_TOP_key_count":len(rebuilt_U),
+        "actual_new_private_alias_keys_only":exact_extra_keys_only,
+        "all_provisional_alias_bodies_equal_original_compiled_master":aliases_match_original_compiled_master,
+        "private_alias_candidate_complete_original_K_I_checks_pass":
+            checks_passed and aliases_match_original_compiled_master,
+        "provisional_aliases_editorially_approved":False,
         "raw_source_edition_parity_proven":False,
         "entire_original_native_corpus_preserved":False,
         "published":False,
