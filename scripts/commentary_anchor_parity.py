@@ -71,6 +71,7 @@ def compare_anchors(original_xml: bytes, native_output: bytes, module_id: str,
     hits = Counter()
     misses = Counter()
     samples = []
+    unoccupied_range_end_samples = []
     same_ref_count = Counter()
     ref_hash = sha256()
     text_body_checked = False
@@ -128,6 +129,14 @@ def compare_anchors(original_xml: bytes, native_output: bytes, module_id: str,
                 hits["range_last_native_slot"] += 1
             else:
                 misses["range_last_native_slot"] += 1
+                if len(unoccupied_range_end_samples) < 12:
+                    unoccupied_range_end_samples.append({
+                        "original_work_qualified_reference": original_ref[:120],
+                        "start_key": start,
+                        "end_key": end_key,
+                        "diagnostic":
+                            "stock_native_range_end_not_occupied_not_automatic_text_loss",
+                    })
             ranges.append((start_match.group(1),
                            (int(start_match.group(2)), int(start_match.group(3))),
                            (int(end_match.group(2)), int(end_match.group(3)))))
@@ -169,6 +178,7 @@ def compare_anchors(original_xml: bytes, native_output: bytes, module_id: str,
         "matched_exact_start_by_class": dict(sorted(hits.items())),
         "unoccupied_source_start_by_class": dict(sorted(misses.items())),
         "bounded_unoccupied_start_references": samples,
+        "bounded_unoccupied_range_end_references": unoccupied_range_end_samples,
         "distinct_original_anchors": len(same_ref_count),
         "duplicate_exact_ref_appearances": sum(v-1 for v in same_ref_count.values()),
         "source_books_missing_from_stock": sorted(source_books - set(index_proof["occupied_slots_by_book"])),
@@ -203,6 +213,7 @@ def summarize_volume_anchor_results(volumes: list[dict]) -> dict:
     all_source_books = set()
     missing_books = set()
     samples = []
+    end_samples = []
     total_markers = 0
     total_duplicate_within_volume = 0
     for volume in volumes:
@@ -238,6 +249,10 @@ def summarize_volume_anchor_results(volumes: list[dict]) -> dict:
             if len(samples) >= 24:
                 break
             samples.append({"volume": number, **item})
+        for item in report["bounded_unoccupied_range_end_references"]:
+            if len(end_samples) >= 24:
+                break
+            end_samples.append({"volume": number, **item})
     if [row["volume"] for row in volumes] != sorted(seen_volumes):
         raise PilotError("CCEL volumes must remain in original declared order")
     return {
@@ -252,6 +267,7 @@ def summarize_volume_anchor_results(volumes: list[dict]) -> dict:
         "duplicate_exact_references_within_each_source_volume": total_duplicate_within_volume,
         "cross_volume_identical_reference_identity_not_established": True,
         "bounded_source_start_mismatch_examples": samples,
+        "bounded_source_range_end_mismatch_examples": end_samples,
         "stock_native_key_ordered_sha256": expected_native[0],
         "stock_native_occupied_numbered_count": expected_native[1],
         "stock_native_occupied_intro_count": expected_native[2],

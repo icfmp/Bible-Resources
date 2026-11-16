@@ -140,6 +140,12 @@ jobs:
                                sort_keys=True))
               print("Source book codes without occupied stock entries:",
                     json.dumps(report["source_books_without_any_occupied_stock_native_slots"]))
+              print("Bounded original start exceptions (reference keys only):",
+                    json.dumps(report["bounded_source_start_mismatch_examples"],
+                               sort_keys=True))
+              print("Bounded original range-end exceptions (reference keys only):",
+                    json.dumps(report["bounded_source_range_end_mismatch_examples"],
+                               sort_keys=True))
               for item in report["volume_observations"]:
                   data = item["anchor_diagnostic"]
                   print("Volume", item["volume"], "original markers", data["source_marker_count"],

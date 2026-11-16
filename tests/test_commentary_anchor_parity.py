@@ -105,6 +105,11 @@ class CommentaryAnchorParityTests(unittest.TestCase):
         self.assertTrue(merged["cross_volume_identical_reference_identity_not_established"])
         self.assertFalse(merged["authored_source_to_compiled_text_parity"])
         self.assertFalse(merged["published"])
+        self.assertEqual(
+            merged["bounded_source_range_end_mismatch_examples"][0]["end_key"],
+            "Gen.1.3")
+        self.assertEqual(
+            merged["bounded_source_range_end_mismatch_examples"][0]["volume"], 1)
         self.assertNotIn("Unchanged original source text", json.dumps(merged))
 
         with self.assertRaisesRegex(PilotError, "original declared order"):
