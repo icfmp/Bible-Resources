@@ -22,6 +22,9 @@ ROLES = frozenset({
 # Narrow, verified entry points. The rest are conservatively classified by
 # explicit edition coupling or as pending review, never silently archived.
 CORE = {
+    "bible_intake.py", "bible_stage_runner.py", "guard_osis.py",
+    "normalize_osis.py", "pilot_fetch.py", "pilot_preflight.py",
+    "sword_native_index.cpp", "sword_native_inventory.py",
     "build.py", "validate.py", "release_preflight.py",
     "publish_reviewed_release.py", "catalogue_release_coverage.py",
     "verify_public_catalogue.py", "commentary_intake.py",
@@ -202,11 +205,11 @@ def markdown(report: dict) -> str:
     lines = [
         "# Tool registry — source-bound post-MHCC inventory",
         "",
-        "This generated list covers every tracked \`scripts/*.py\`, \`*.cpp\` "
-        "and \`*.sh\`. It lists static callers and review recommendations, "
+        "This generated list covers every tracked `scripts/*.py`, `*.cpp` "
+        "and `*.sh`. It lists static callers and review recommendations, "
         "**not** a licence to delete scripts or proof that they are exercised.",
-        "Generate/check: \`python scripts/tool_registry.py --write\` / "
-        "\`python scripts/tool_registry.py --check\`.",
+        "Generate/check: `python scripts/tool_registry.py --write` / "
+        "`python scripts/tool_registry.py --check`.",
         "The source-bound detailed registry is [TOOL_REGISTRY.json]"
         "(TOOL_REGISTRY.json). No publishing credentials or raw commentary "
         "content enter the inventory.",
@@ -233,7 +236,7 @@ def markdown(report: dict) -> str:
               "| --- | --- | --- | ---: | --- |"]
     for r in records:
         lines.append(
-            f"| [\`{r['path']}\`](../{r['path']}) | "
+            f"| [`{r['path']}`](../{r['path']}) | "
             f"{r['classification']} | "
             f"{'named test' if r['has_direct_tests_by_filename'] else 'not established'} | "
             f"{r['static_reference_count']} | {r['stage_hint']} |")
