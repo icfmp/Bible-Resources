@@ -453,6 +453,7 @@ def probe_private_compiled_source_erratum(
             sorted(reference_changed_original_keys),
             *[r["affected_original_K_keys"] for r in prose_receipts],
         ],
+        corrected_source_by_original_key=edited_raw_for_original_key,
         aliases=reviewed_aliases, installed_candidate_root=install_root,
         existing_links_preserved=adjacency_a == adjacency_b,
         full_source_semantic_and_structure_parity_verified=(
