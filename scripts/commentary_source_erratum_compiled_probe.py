@@ -19,6 +19,7 @@ from io import BytesIO
 import json
 from pathlib import Path
 import os
+import re
 import subprocess
 
 from lxml import etree
@@ -527,9 +528,18 @@ def probe_private_compiled_source_erratum(
     # Its candidate checksum can be pinned as evidence of today's build, but
     # must be regenerated if the separately approved RELEASE DAY differs.
     # No module is committed, catalogue altered, or release permission set.
-    preparation_day_utc = datetime.now(timezone.utc).date().isoformat()
-    if preparation_day_utc <= source_date:
-        raise ValueError("Candidate preparation day must postdate original source")
+    # An exact date passed by the CI verifier makes the recorded candidate
+    # reproducible on later days. It remains an explicitly PRIVATE revision
+    # date, not a future calendar/publication authorization.
+    today_utc = datetime.now(timezone.utc).date()
+    preparation_day_utc = (
+        os.environ.get("BIBLE_RESOURCES_PRIVATE_CANDIDATE_DAY")
+        or today_utc.isoformat()
+    )
+    if (not re.fullmatch(r"\d{4}-\d{2}-\d{2}", preparation_day_utc)
+            or not date.fromisoformat(source_date)
+            < date.fromisoformat(preparation_day_utc) <= today_utc):
+        raise ValueError("Untrusted or future private candidate preparation date")
     calendar_scratch = scratch / "private-current-calendar-day-rehearsal"
     calendar_scratch.mkdir()
     calendar_candidate = rehearse_private_versioned_commentary_package(
