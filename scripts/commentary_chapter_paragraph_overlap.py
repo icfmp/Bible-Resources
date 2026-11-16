@@ -12,6 +12,7 @@ from collections import Counter, defaultdict
 from hashlib import sha256
 import re
 
+from commentary_text_delta import longest_contiguous_token_run
 from pilot_preflight import PilotError
 
 MAX_SOURCE_P_WORDS = 512
@@ -21,29 +22,19 @@ SOURCE_WORD_RE = re.compile(r"\w+")
 
 
 def longest_common_contiguous_word_run(source: list[str], stock: list[str]) -> int:
-    """Exact token-window intersection, binary search; no heuristic similarity."""
+    """Historic chapter-scope boundary; reuse exact Unicode span primitive.
+
+    These limits are intentionally narrower than the shared algorithm:
+    this private probe only compares source chapter-adjacent paragraphs.
+    """
     if not source or not stock:
         return 0
     if len(source) > MAX_SOURCE_P_WORDS or len(stock) > MAX_STOCK_ENTRY_WORDS:
         raise PilotError("Unreviewed chapter/stock word stream exceeds comparison bound")
-    # Any shared length-n run implies shorter shared runs. Never mask edits
-    # using fuzzy matching, stemming, loose punctuation or inferred tokens.
-    low, high = 0, min(len(source), len(stock))
-    while low < high:
-        n = (low + high + 1) // 2
-        original_runs = {
-            tuple(source[i:i+n]) for i in range(len(source)-n+1)
-        }
-        found = any(
-            tuple(stock[i:i+n]) in original_runs
-            for i in range(len(stock)-n+1)
-        )
-        if found:
-            low = n
-        else:
-            high = n-1
-    return low
-
+    try:
+        return longest_contiguous_token_run(source, stock)
+    except ValueError as exc:
+        raise PilotError("Invalid exact chapter/stock token stream") from exc
 
 class OriginalChapterParagraphSpanProbe:
     """Check actual same-book native K/I content for every explicit source p."""
