@@ -522,6 +522,7 @@
         "commentary_native_inventory",
         "commentary_native_raw_inventory",
         "commentary_navigation_link_plan",
+        "commentary_osis_mixed_transport_probe",
         "commentary_prose_cross_slot",
         "commentary_reference_registry_triage",
         "commentary_text_delta",
@@ -543,7 +544,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "1a8a9bcaf2195b12c4b914184130b8f7a7eddb76891160c2b0198fbf2b7a0e6e",
+      "sha256_at_inventory": "10ba33355bb6e69651742e44c74eb2232833dd9c210f46d251dbe4fc23a2b023",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
@@ -1453,12 +1454,13 @@
         "xiphos"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "3d58fe7a0fd7f9a3b51d1bc632344c4f76c4403b54bf85f920040d2c443e2530",
+      "sha256_at_inventory": "d516b46a732647f8a587efe32af1e74c67258bc5fba02055ebd26d4448a56637",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
+        "scripts/commentary_anchor_parity.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_source_erratum_compiled_probe.py",
         "tests/test_commentary_osis_mixed_transport_probe.py"
