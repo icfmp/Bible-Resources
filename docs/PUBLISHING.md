@@ -23,6 +23,29 @@ For **unchanged, compiled upstream SWORD stock**, require the separate
 full original compiled-data/native-entry identity proof; do not
 fabricate a source OSIS document just to satisfy an XML gate.
 
+## Source-corrected compiled SWORD commentaries
+
+An edited or reconstructed `zCom` is **not** original-stock SWORD data.
+It must never be validated through `stock_reader_keys`, which keeps
+requiring exact original CrossWire compressed-member and native-entry identity.
+
+The separate `reviewed_compiled_commentary_rebuild` route requires a
+**versioned, independently reviewed** original-source identity,
+complete libSWORD original-to-rebuilt native I/K/TOP comparison,
+explicit per-source correction and alias sets, an immutable SHA-256
+of that comparison report, and exact SHA-256s of all seven SWORD payload
+members (six zCom data files and one `.conf`). The module's
+`SOURCE_VALIDATION.json` must reference that same independent report
+and source review. A build that merely sets `validated=true` is rejected.
+
+The offline validator binds the submitted proofs and actual packaged bytes;
+it **does not itself execute libSWORD or authenticate a human signature**.
+Prior to editorial approval, independently regenerate and review the complete
+native comparison from the SHA-pinned source and real candidate, and confirm
+the GitHub authorization record genuinely comes from the project owner.
+See [generic proof contract](evidence/mhcc-274/rebuilt-commentary-validation-contract.md).
+A synthetic passing unit test does not authorize publication.
+
 ## Mandatory publication contract
 
 Every **approved** catalogue entry must have exactly one documented

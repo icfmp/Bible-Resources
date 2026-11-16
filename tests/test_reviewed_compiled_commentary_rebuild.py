@@ -214,6 +214,15 @@ class RebuiltCommentaryContractTests(unittest.TestCase):
         self.meta["index_audit"]["mode"] = "stock_reader_keys"
         self.assertIn("manifest", str(self.errors()))
 
+    def test_unsafe_review_manifest_paths_cannot_switch_source_class(self):
+        for name in ("config/../comments.json", "../review.json",
+                     "config/commentary-rebuilds/../synthetic.json",
+                     "config/commentary-intake/synthetic.json"):
+            with self.subTest(name=name):
+                self.meta["index_audit"]["manifest"] = name
+                self.assertTrue(self.errors())
+        self.meta["index_audit"]["manifest"] = self.review_name
+
     def test_schema_allows_only_reviewed_mode_with_manifest(self):
         schema = json.loads((ROOT / "schemas/module.schema.json").read_text())
         validator = Draft202012Validator(schema)
