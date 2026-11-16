@@ -59,7 +59,10 @@ from commentary_editorial_topology import NativeCommentaryEditorialTopology
 from commentary_layout_census import NativeCommentaryLayoutCensus
 from commentary_paragraph_witness_probe import compare_paragraph_witness
 from commentary_reference_registry_triage import OriginalCommentaryReferenceRegistryTriage
-from commentary_literal_erratum_preflight import preview_exact_reversible_commentary_reference_erratum
+from commentary_literal_erratum_preflight import (
+    preview_exact_reversible_commentary_reference_erratum,
+    preview_exact_reversible_commentary_prose_erratum,
+)
 from commentary_source_erratum_compiled_probe import probe_private_compiled_source_erratum
 from commentary_unresolved_lexical_triage import marked_word_token_indices
 from commentary_xml_witness import _parse_reference, WORK_REF
@@ -1924,6 +1927,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
         # exact-byte reversible preview. The separately staged 0.1.1 package
         # below still uses all ORIGINAL stock entries, never these bytes.
         unapproved_literal_erratum_preflight = None
+        unapproved_prose_erratum_preflight = None
         errata_path = (Path(__file__).resolve().parents[1] /
                        "config" / "commentary-intake" /
                        f"{resource_id}-proposed-literal-errata.json")
@@ -2003,6 +2007,79 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                     "native_existing_aliases_sharing_original_raw": linked_count,
                     **receipt,
                 })
+
+            # Independently reviewed *prose typo* candidates are a distinct
+            # correction class from malformed scripture target endpoints.
+            # This scope-neutral private receipt never changes compiled data.
+            prose_proposals = proposed_errata.get("proposed_single_prose_changes", [])
+            if (not isinstance(prose_proposals, list)
+                    or len(prose_proposals) > 16):
+                raise PilotError("Unbounded original source prose erratum proposals")
+            prose_receipts = []
+            seen_prose = set()
+            for prose_case in prose_proposals:
+                if not isinstance(prose_case, dict):
+                    raise PilotError("Malformed original commentary prose erratum proposal")
+                key = prose_case.get("original_native_entry")
+                issue_url = prose_case.get("external_review_url")
+                corroboration = prose_case.get("independent_edition_corrob_url")
+                if (not isinstance(key, str) or not KEY.fullmatch(key)
+                        or key in seen_prose
+                        or key in used_original_keys
+                        or not isinstance(issue_url, str)
+                        or not issue_url.startswith(
+                            "https://github.com/icfmp/Bible-Resources/issues/")
+                        or not isinstance(corroboration, str)
+                        or not corroboration.startswith("https://")
+                        or prose_case.get("source_error_class")
+                           != "MISSPELLED_PROPER_NAME_IN_AUTHORIAL_PROSE"
+                        or prose_case.get("editorial_decision")
+                           != "PRIVATE_REVERSIBLE_PREFLIGHT_ONLY_NOT_COMPILED"
+                        or prose_case.get("public_release_authorized") is not False):
+                    raise PilotError("Unreviewed original source prose correction request")
+                seen_prose.add(key)
+                source_fragment = dict(private_full_K.get(
+                    key.rsplit(".", 1)[0], [])).get(key)
+                if (source_fragment is None or key not in records
+                        or sha256(source_fragment).hexdigest() != records[key]["sha256"]):
+                    raise PilotError("Source prose erratum master not found in pinned native corpus")
+                expected_hash = prose_case.get("original_raw_sha256")
+                if expected_hash is not None and expected_hash != records[key]["sha256"]:
+                    raise PilotError("Prose source correction has stale original SHA-256")
+                _, text_receipt = preview_exact_reversible_commentary_prose_erratum(
+                    source_fragment,
+                    original_phrase=prose_case.get("original_phrase"),
+                    corrected_phrase=prose_case.get("corrected_phrase"),
+                )
+                aliases = sum(
+                    entry["sha256"] == records[key]["sha256"]
+                    for entry in records.values()
+                )
+                expected_aliases = prose_case.get("expected_original_linked_native_K_count")
+                if expected_aliases is not None and expected_aliases != aliases:
+                    raise PilotError("Original prose master native linked occupancy changed")
+                if (not text_receipt["reverse_restores_exact_original_raw_bytes"]
+                        or text_receipt["release_authorized"]
+                        or text_receipt["original_or_published_module_modified"]):
+                    raise PilotError("Unapproved prose preview did not preserve original")
+                prose_receipts.append({
+                    "original_native_entry": key,
+                    "original_linked_native_K_count": aliases,
+                    "source_original_hash_pinned_in_plan": expected_hash is not None,
+                    "source_native_alias_count_pinned_in_plan": expected_aliases is not None,
+                    **text_receipt
+                })
+            if prose_receipts:
+                unapproved_prose_erratum_preflight = {
+                    "status": "PRIVATE_PROSE_ERRATUMS_REVERSIBLE_NOT_COMPILED",
+                    "case_count": len(prose_receipts),
+                    "case_rows": prose_receipts,
+                    "exact_original_witness_zip_and_native_source_authenticated": True,
+                    "candidate_is_only_an_unpublished_in_memory_preview": True,
+                    "all_original_source_or_compiled_content_unchanged": True,
+                    "source_words_xml_or_reference_targets_exported": False,
+                    "public_release_authorized": False,
+                }
             unapproved_literal_erratum_preflight = {
                 "status": "PRIVATE_ORIGINAL_SOURCE_ERRATUM_PREVIEW_NOT_APPROVED_OR_COMPILED",
                 "case_count": len(receipts),
@@ -2240,6 +2317,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             "independent_original_native_reference_registry_triage": original_reference_review,
             "private_unapproved_original_literal_erratum_byte_preflight":
                 unapproved_literal_erratum_preflight,
+            "private_unapproved_original_prose_erratum_byte_preflight":
+                unapproved_prose_erratum_preflight,
             "independent_thml_witness": witness,
             "section_heading_matching_is_heuristic": True,
             "independent_edition_range_comparison_completed": witness["status"].startswith("PINNED"),
