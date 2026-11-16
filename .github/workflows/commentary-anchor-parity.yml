@@ -109,6 +109,13 @@ jobs:
           g++ -std=c++17 -O2 -I/usr/include/sword \
             scripts/sword_native_commentary_index.cpp \
             -o "${RUNNER_TEMP}/commentary-native-index" -lsword
+      - name: Compile private original commentary raw reader for bounded source-body locations
+        shell: bash
+        run: |
+          set -euo pipefail
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "${RUNNER_TEMP}/commentary-private-raw" -lsword
       - name: Compare complete original reference anchors to exact stock occupied keys
         shell: bash
         run: |
@@ -116,6 +123,7 @@ jobs:
           python scripts/commentary_anchor_parity.py \
             --resource-id "$RESOURCE_ID" \
             --native-inspector "${RUNNER_TEMP}/commentary-native-index" \
+            --native-raw-binary "${RUNNER_TEMP}/commentary-private-raw" \
             --probe-osis-key "$PROBE" \
             --report "${RUNNER_TEMP}/commentary-anchor-receipt.json"
       - name: Report source-to-SWORD key diagnostics without source prose
@@ -129,6 +137,20 @@ jobs:
               (Path(os.environ["RUNNER_TEMP"]) / "commentary-anchor-receipt.json")
               .read_text(encoding="utf-8"))
           if report.get("status") == "ordered_original_xml_volume_anchor_diagnostics_not_parity":
+              location = report["original_unoccupied_start_prose_location"]
+              assert location["status"] in {
+                  "bounded_original_source_prose_location_not_text_parity",
+                  "no_canonically_valid_unoccupied_source_starts_to_scan",
+                  "more_than_reviewed_probe_budget_not_scanned",
+              }
+              assert report["published"] is False
+              if location["status"] == "bounded_original_source_prose_location_not_text_parity":
+                  assert location["fully_crosschecked_original_native_corpus"] is True
+                  print("Canonical unoccupied-start original prose location (not full parity):",
+                        json.dumps(location, sort_keys=True))
+              else:
+                  print("Canonical unoccupied-start source prose location:",
+                        location["status"])
               print("Original XML volumes:", report["original_xml_volume_count"])
               assert report["original_native_versification_registry_checked"] is True
               classes = report["original_reference_registry_classes_across_volumes"]
