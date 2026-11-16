@@ -550,6 +550,21 @@ jobs:
           assert attestation["review_manifest"]["status"]=="private_draft_not_owner_authorized_for_release"
           assert attestation["source_validation"]["status"]=="private_draft_not_release_validated"
           assert attestation["source_audit"]["original_native_corpus_sha256"]==r["original_native_raw_sha256"]
+          package_proof=revised["private_rebuilt_source_and_exact_seven_member_zip_evidence"]
+          assert package_proof["status"]=="PRIVATE_NATIVE_AND_TEST_DATE_ZIP_SEVEN_FILES_RECONCILED_NOT_RELEASE"
+          assert package_proof["source_audit_sha256"]==attestation["source_audit_sha256"]
+          assert package_proof["candidate_native_corpus_sha256"]==rehearsal["native_corpus_sha256"]
+          assert len(package_proof["test_date_only_seven_member_sha256"])==7
+          assert package_proof["test_date_only_zip_sha256"]==rehearsal["zip_sha256"]
+          assert package_proof["actual_release_date_selected"] is False
+          assert package_proof["release_authorized"] is False
+          assert package_proof["catalogue_changed"] is False
+          assert package_proof["public_artifact_generated"] is False
+          print("Real native audit to exact seven-member ZIP bridge:",
+                "original audit",package_proof["source_audit_sha256"],
+                "test-only ZIP",package_proof["test_date_only_zip_sha256"],
+                "member count",len(package_proof["test_date_only_seven_member_sha256"]),
+                "published",package_proof["public_artifact_generated"])
           print("Real native rebuild attestation draft:",
                 "original K",attestation["original_native_K_count"],
                 "new aliases",attestation["added_native_K_count"],
