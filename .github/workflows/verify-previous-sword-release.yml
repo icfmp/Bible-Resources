@@ -41,8 +41,8 @@ jobs:
                   or plan.get("version") != "0.1.0"
                   or not re.fullmatch(r"mhcc-0\.1\.0", plan.get("tag", ""))
                   or not re.fullmatch(r"BRMHCC-0\.1\.0\.zip", plan.get("zip_name", ""))
-                  or not re.fullmatch(r"[a-f0-9]{64}", plan.get("package_sha256", ""))
-                  or type(plan.get("package_size_bytes")) is not int):
+                  or plan.get("package_sha256") != "0faf4376b6b97093ecb94f306886c24d3030ab1f5e194472ad908dd73921f9c0"
+                  or plan.get("package_size_bytes") != 1772960):
               raise ValueError("Previous release plan identity or immutable checksum is invalid")
           verify_historical_release(
               {
