@@ -41,6 +41,9 @@ class ParagraphWitnessProbeTest(unittest.TestCase):
         self.assertTrue(all(
             x["all_source_p_words_exact_contiguous_original_order"]
             for x in row["source_paragraph_lexical_anchors"]))
+        self.assertTrue(all(
+            x["original_digital_witness_same_position_word_difference_count"] == 0
+            for x in row["source_paragraph_lexical_anchors"]))
         self.assertLess(row["source_paragraph_lexical_anchors"][0][
             "unique_native_start_token_offset"], row["source_paragraph_lexical_anchors"][1][
                 "unique_native_start_token_offset"])
@@ -85,6 +88,12 @@ class ParagraphWitnessProbeTest(unittest.TestCase):
         self.assertEqual(row["paragraphs_with_both_unique_8_word_anchors"], 1)
         self.assertEqual(
             row["source_paragraphs_with_all_words_in_exact_original_order"], 0)
+        self.assertEqual(
+            row["source_paragraph_lexical_anchors"][0][
+                "original_digital_witness_same_position_word_difference_count"], 1)
+        self.assertTrue(
+            row["source_paragraph_lexical_anchors"][0][
+                "all_differences_require_independent_editorial_review"])
         self.assertFalse(row["source_digital_edition_equivalence_proven"])
 
     def test_chapter_marker_outside_div2_remains_unresolved(self):
