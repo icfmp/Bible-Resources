@@ -42,7 +42,7 @@ from commentary_xiphos_dual_reader import (
 )
 from pilot_subprocess import present_key, query
 from sword_native_raw_corpus_inventory import parse_native_raw_corpus
-from commentary_rebuild_attestation_draft import private_rebuild_attestation_draft
+from commentary_rebuild_attestation_draft import private_rebuild_attestation_draft, _native_map_digest
 
 MAX_SCAN = 512 * 1024 * 1024
 MAX_ADJACENT = 12 * 1024 * 1024
@@ -66,6 +66,7 @@ def _read_private_native(root: Path, module_id: str, binary: Path, *, with_recei
         else:
             observed[kind][key] = raw
     receipt, _, _, _ = parse_native_raw_corpus(BytesIO(run.stdout), on_entry=collect)
+    receipt["native_identity_map_sha256"] = _native_map_digest(observed)
     return (observed, receipt) if with_receipt else observed
 
 
