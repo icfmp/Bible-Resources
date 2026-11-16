@@ -63,7 +63,7 @@ In heaven there is perfect light, without any darkness. In hell there is complet
 
 Day and night both belong to the Lord. Let us use them both for his honor: working for him each day, resting in him each night, and meditating on his law both day and night.
 
-## God separates the waters and makes the earth fruitful (verses 6–13)
+## God separates the earth from the waters and makes it fruitful (verses 6–13)
 
 The earth was empty. But God spoke, and it was filled with his riches. They still belong to him.
 
@@ -73,7 +73,7 @@ At his command, the earth produces grass, plants and fruit.
 
 We should give God the glory for every benefit we receive from what the earth produces.
 
-If by grace we belong to him who is the Fountain, we can still rejoice in him when the streams of earthly mercy run dry.
+If, through grace, we have a share in him who is the Fountain, we can still rejoice in him when the streams of earthly mercy run dry.
 
 ## God makes the sun, moon and stars (verses 14–19)
 
