@@ -136,9 +136,14 @@ def run(root: Path, metadata_path: Path) -> dict:
     files = sorted(root.rglob("*.DRAFT.md"))
     if not files:
         raise ValueError("No modern chapter draft files to verify")
-    read = [read_chapter_draft(f) for f in files if '"chapter_osis:"' not in f.read_text(encoding="utf-8").split("\n---\n", 1)[0] or "chapter_osis:" in f.read_text(encoding="utf-8").split("\n---\n", 1)[0]]
-    # Intro files lack chapter_osis and are reviewed as separate units.
-    read = [d for d in read if d["chapter"] in chapters]
+    # Read only front matter to distinguish book-level introductions.
+    # Every extra numbered draft must still cause the equality check to fail.
+    chapter_files = []
+    for f in files:
+        header = f.read_text(encoding="utf-8").split("\n---\n", 1)[0]
+        if re.search(r"(?m)^chapter_osis: ", header):
+            chapter_files.append(f)
+    read = [read_chapter_draft(f) for f in chapter_files]
     if len(read) != len(chapters) or {d["chapter"] for d in read} != set(chapters):
         raise ValueError("Draft chapter files and full native receipt have a mismatch or duplicate")
     approved_zip = ledger.get("package_sha256")
