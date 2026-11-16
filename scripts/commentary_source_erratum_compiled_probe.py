@@ -24,6 +24,7 @@ from lxml import etree
 
 from commentary_literal_erratum_preflight import (
     preview_exact_reversible_commentary_reference_erratum,
+    preview_exact_reversible_commentary_prose_erratum,
 )
 from commentary_public_metadata_preflight import (
     prepare_provisional_public_commentary_conf, _exact_conf_value,
@@ -162,6 +163,72 @@ def _private_changed_reference_xiphos(
         "published": False,
     }
 
+
+
+def _apply_private_reviewed_prose_changes(
+        originals: dict[str, list[tuple[str, bytes]]],
+        already_edited: dict[str, list[tuple[str, bytes]]],
+        plans: list[dict]) -> tuple[dict[str, list[tuple[str, bytes]]],
+                                    dict[str, bytes], list[dict]]:
+    """Apply only independently pinned, byte-reversible edits to source bodies.
+
+    One authorial body can occupy several original native addresses. A
+    generic correction follows that same raw body, never restructures it.
+    No text/markup/attributes/rights are emitted in the receipt.
+    """
+    if not isinstance(plans, list) or len(plans) > 16:
+        raise ValueError("Unbounded private source correction plans")
+    original_lookup = {key: raw for rows in originals.values()
+                       for key, raw in rows}
+    modified = dict(already_edited)
+    source_by_key: dict[str, bytes] = {}
+    receipts: list[dict] = []
+    seen_hashes = set()
+    for plan in plans:
+        if not isinstance(plan, dict):
+            raise ValueError("Invalid private source correction plan")
+        key = plan.get("original_native_entry")
+        expected = plan.get("original_raw_sha256")
+        expected_count = plan.get("expected_original_linked_native_K_count")
+        if (not isinstance(key, str) or key not in original_lookup
+                or not isinstance(expected, str) or len(expected) != 64
+                or any(c not in "0123456789abcdef" for c in expected)
+                or type(expected_count) is not int or not 1 <= expected_count <= 250):
+            raise ValueError("Private source correction requires pinned original body and keys")
+        original = original_lookup[key]
+        digest = sha256(original).hexdigest()
+        if digest != expected or digest in seen_hashes:
+            raise ValueError("Stale or duplicated native original source correction")
+        seen_hashes.add(digest)
+        patched, proof = preview_exact_reversible_commentary_prose_erratum(
+            original, original_phrase=plan.get("original_phrase"),
+            corrected_phrase=plan.get("corrected_phrase"),
+        )
+        chapter = key.rsplit(".", 1)[0]
+        matched: set[str] = set()
+        for current_chapter, rows in modified.items():
+            next_rows = []
+            for existing_key, raw in rows:
+                if sha256(raw).hexdigest() == digest:
+                    if current_chapter != chapter:
+                        raise ValueError("Prose source body unexpectedly reused across chapters")
+                    if existing_key in source_by_key:
+                        raise ValueError("Overlapping private source correction plans")
+                    next_rows.append((existing_key, patched))
+                    source_by_key[existing_key] = patched
+                    matched.add(existing_key)
+                else:
+                    next_rows.append((existing_key, raw))
+            modified[current_chapter] = next_rows
+        if key not in matched or len(matched) != expected_count:
+            raise ValueError("Unexpected linked native verse occupancy for prose correction")
+        receipts.append({
+            "original_native_entry": key,
+            "affected_original_K_count": len(matched),
+            "affected_original_K_keys": sorted(matched),
+            **proof,
+        })
+    return modified, source_by_key, receipts
 
 def probe_private_compiled_source_erratum(
         *, original_intros: dict[str, bytes],
