@@ -9,7 +9,7 @@ third-party sources. Both originals are independently SHA-pinned.
 from __future__ import annotations
 
 import argparse
-from collections import Counter
+from collections import Counter, defaultdict
 from hashlib import sha256
 import json
 import os
@@ -30,10 +30,16 @@ from commentary_xml_witness import (
 from commentary_native_inventory import MAX_OUTPUT, parse_index
 from commentary_navigation_link_plan import parse_native_commentary_verse_registry, UnsafeCommentaryLinkPlan
 from commentary_reference_registry_triage import classify_original_reference_target
+from commentary_prose_cross_slot import strict_native_stock_plain_words
+from commentary_text_delta import _contiguous_offset
+from commentary_unresolved_lexical_triage import WORD, marked_word_token_indices
+from commentary_native_raw_inventory import private_crosscheck
+from sword_native_raw_corpus_inventory import parse_native_raw_corpus
 from pilot_fetch import fetch, validate_url
 from pilot_preflight import PilotError, inspect_archive
 
 MAX_XML = 32 * 1024 * 1024
+MAX_PRIVATE_MISSING_START_PROBES = 8
 OSIS_VERSE = re.compile(r"^[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*\.[1-9][0-9]*$")
 
 
@@ -229,6 +235,155 @@ def compare_anchors(original_xml: bytes, native_output: bytes, module_id: str,
         "source_text_rewritten": False,
         "published": False,
     }
+
+
+def _original_unoccupied_source_units(
+        original_xml: bytes, *, volume: int, missing: list[dict],
+        canonical_verses: set[str]) -> list[dict]:
+    """Take only real CCEL bodies with *valid* start refs absent in native keys.
+
+    No independently authored word or body leaves the private inspector; each
+    case receives a fixed set of source-word windows for location evidence.
+    A match cannot establish the full section or reference indexing is correct.
+    """
+    wanted = {
+        item["original_work_qualified_reference"]: item["start_key"]
+        for item in missing if item["start_key"] in canonical_verses
+    }
+    if not wanted:
+        return []
+    root = _root_for_raw_xml(original_xml)
+    cases = []
+    for node in root.iter():
+        if not isinstance(node.tag, str) or node.tag.rsplit("}", 1)[-1] != "scripCom":
+            continue
+        reference = node.get("osisRef", "")
+        if reference not in wanted:
+            continue
+        body = node.getnext()
+        if (body is None or not isinstance(body.tag, str)
+                or body.tag.rsplit("}", 1)[-1] != "div"
+                or (node.tail and node.tail.strip())):
+            raise PilotError("Unoccupied original source reference lacks adjacent authored div")
+        source_text = "".join(body.itertext())
+        if not source_text.strip() or len(source_text) > 2_000_000:
+            raise PilotError("Unreviewed original source unit size or content")
+        full_words = WORD.findall(source_text)
+        linked = set(marked_word_token_indices(body, "scripRef", source_text))
+        if any(type(i) is not int or i < 0 or i >= len(full_words) for i in linked):
+            raise PilotError("Original source scripture-link word masking is inconsistent")
+        words = [word for i, word in enumerate(full_words) if i not in linked]
+        size = 12
+        windows = []
+        if len(words) >= size:
+            last = len(words) - size
+            for numerator in (0, 1, 2, 3, 4):
+                part = words[(last*numerator)//4:(last*numerator)//4 + size]
+                if part not in windows:
+                    windows.append(part)
+        cases.append({
+            "reference": reference, "start_key": wanted[reference],
+            "volume": volume, "original_source_line": node.sourceline,
+            "original_body_sha256": sha256(source_text.encode("utf-8")).hexdigest(),
+            "original_plain_word_count": len(words), "private_windows": windows,
+        })
+    if len(cases) != len(wanted):
+        raise PilotError("Ambiguous or missing authorial body for unoccupied source start")
+    return cases
+
+
+class UnoccupiedSourceProseLocator:
+    """Read-only K/I native candidate locator; only hashed/closed metadata escapes."""
+
+    def __init__(self, units: list[dict]):
+        if not 1 <= len(units) <= MAX_PRIVATE_MISSING_START_PROBES:
+            raise PilotError("Unbounded original unoccupied-start lexical probe")
+        self.units = units
+        self.by_book = defaultdict(list)
+        self.scanned = Counter()
+        self.hits = defaultdict(list)
+        for unit in units:
+            if not OSIS_VERSE.fullmatch(unit["start_key"]):
+                raise PilotError("Unreviewed source missing-start reference")
+            self.by_book[unit["start_key"].split(".", 1)[0]].append(unit)
+
+    @staticmethod
+    def _scope(kind: str, key: str, original: str) -> str | None:
+        book = original.split(".", 1)[0]
+        chapter = original.rsplit(".", 1)[0]
+        if kind == "K" and key.startswith(chapter + "."):
+            return "other_numbered_key_same_chapter"
+        if kind == "I" and key in (chapter, chapter + ".0"):
+            return "same_chapter_intro"
+        if kind == "I" and key in (book, book + ".0.0"):
+            return "book_intro"
+        return None
+
+    def observe(self, kind: str, key: str, raw: bytes):
+        if kind not in ("K", "I"):
+            return
+        book = key.split(".", 1)[0]
+        candidates = []
+        for unit in self.by_book.get(book, []):
+            scope = self._scope(kind, key, unit["start_key"])
+            if scope:
+                candidates.append((unit, scope))
+        if not candidates:
+            return
+        words = strict_native_stock_plain_words(raw)
+        digest = sha256(raw).hexdigest()
+        for unit, scope in candidates:
+            self.scanned[(unit["start_key"], scope)] += 1
+            if not unit["private_windows"]:
+                continue
+            found = sum(_contiguous_offset(sample, words) is not None
+                        for sample in unit["private_windows"])
+            if found:
+                self.hits[unit["start_key"]].append({
+                    "original_stock_native_key": key,
+                    "native_slot_kind": kind,
+                    "scope": scope,
+                    "stock_raw_sha256": digest,
+                    "matched_distinct_original_plain_word_windows": found,
+                    "total_original_windows": len(unit["private_windows"]),
+                })
+
+    def report(self) -> dict:
+        rows = []
+        for unit in self.units:
+            original = unit["start_key"]
+            scores = self.hits.get(original, [])
+            best = sorted(
+                scores, key=lambda x: (
+                    -x["matched_distinct_original_plain_word_windows"],
+                    {"other_numbered_key_same_chapter": 0,
+                     "same_chapter_intro": 1, "book_intro": 2}[x["scope"]],
+                    x["original_stock_native_key"]),
+            )
+            rows.append({
+                "original_source_reference": unit["reference"],
+                "source_volume": unit["volume"],
+                "source_line": unit["original_source_line"],
+                "source_original_body_sha256": unit["original_body_sha256"],
+                "source_plain_words_excluding_link_labels": unit["original_plain_word_count"],
+                "source_probe_window_count": len(unit["private_windows"]),
+                "scanned_native_candidate_count": sum(
+                    count for (key, scope), count in self.scanned.items()
+                    if key == original),
+                "native_candidate_slots_with_any_exact_plain_word_window": len(scores),
+                "bounded_matching_native_candidates": best[:8],
+                "no_match_is_not_proof_of_missing_authorial_text": True,
+                "matching_windows_are_not_full_text_or_section_parity": True,
+            })
+        return {
+            "status": "bounded_original_source_prose_location_not_text_parity",
+            "original_valid_unoccupied_start_units_checked": len(self.units),
+            "units": rows,
+            "other_chapters_and_other_books_not_searched": True,
+            "exact_original_words_and_raw_bytes_never_disclosed": True,
+            "source_or_native_bytes_changed": False,
+            "published": False,
+        }
 
 
 def summarize_volume_anchor_results(volumes: list[dict]) -> dict:
