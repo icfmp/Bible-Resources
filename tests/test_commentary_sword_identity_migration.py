@@ -139,18 +139,37 @@ class CommentarySwordMigrationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "source-identical"):
             self._plan()
 
-    def test_live_repository_transition_proposal_is_private_and_complete(self):
-        result = proposed_sword_identity_migration(
-            ROOT, resource_id="mhcc-crosswire",
-            review_path="config/commentary-intake/mhcc-crosswire-reviewed-links.json"
-        )
-        self.assertEqual(result["previous_sword_id"], "BRMHCC")
-        self.assertEqual(result["proposed_sword_id"], "MHCC")
-        self.assertEqual(result["proposed_version"], "0.1.1")
-        self.assertEqual(result["proposed_new_release_tag"], "mhcc-0.1.1")
-        self.assertEqual(result["old_versioned_asset_must_remain_immutable"],
-                         "BRMHCC-0.1.0.zip")
-        self.assertFalse(result["public_release_authorized"])
+    def test_real_repository_completed_identity_transition_matches_one_active_release(self):
+        """The real repository must now prove its owner-approved current identity.
+
+        Pre-release migration preflight remains tested using invented fixture
+        data above; a completed release cannot also have an old active plan.
+        """
+        from catalogue_release_coverage import coverage
+        metadata=json.loads(
+            (ROOT/"modules/mhcc-crosswire/metadata.json").read_text(encoding="utf-8"))
+        review=json.loads(
+            (ROOT/"config/commentary-intake/mhcc-crosswire-reviewed-links.json").read_text(
+                encoding="utf-8"))
+        plan=json.loads(
+            (ROOT/"config/release-plans/mhcc-0.1.1.json").read_text(encoding="utf-8"))
+        catalogue=json.loads(
+            (ROOT/"catalog/v1/catalog.json").read_text(encoding="utf-8"))
+        row=[x for x in catalogue["modules"] if x["id"]=="mhcc-crosswire"]
+        self.assertEqual(len(row),1)
+        self.assertEqual(metadata["sword_id"],review["proposed_next_sword_id"])
+        self.assertEqual(metadata["version"],review["proposed_next_version"])
+        self.assertEqual(row[0]["sword_id"],metadata["sword_id"])
+        self.assertEqual(row[0]["version"],metadata["version"])
+        self.assertEqual(plan["sword_id"],metadata["sword_id"])
+        self.assertEqual(plan["version"],metadata["version"])
+        self.assertEqual(plan["zip_name"],
+                         metadata["sword_id"]+"-"+metadata["version"]+".zip")
+        self.assertEqual(plan["package_sha256"],row[0]["download"]["sha256"])
+        self.assertEqual(plan["package_size_bytes"],row[0]["download"]["size_bytes"])
+        self.assertFalse((ROOT/"config/release-plans/mhcc-0.1.0.json").exists())
+        self.assertFalse((ROOT/"modules/mhcc-crosswire/profiles/en.json").exists())
+        self.assertEqual(coverage(ROOT)["planned"][0][1]["module_id"],"mhcc-crosswire")
 
 
 if __name__ == "__main__":
