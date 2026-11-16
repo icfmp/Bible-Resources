@@ -30,6 +30,7 @@ from commentary_literal_erratum_preflight import (
 from commentary_public_metadata_preflight import (
     prepare_provisional_public_commentary_conf, _exact_conf_value,
     rehearse_private_versioned_commentary_package,
+    reconcile_private_rebuild_package_evidence,
 )
 from commentary_reference_registry_triage import (
     SINGLE_VERSE, _unambiguous_verse_range_endpoints,
@@ -513,6 +514,14 @@ def probe_private_compiled_source_erratum(
     rehearsal["native_corpus_sha256"] = (
         rehearsal_receipt["all_native_raw_entries_ordered_sha256"]
     )
+    private_package_evidence = reconcile_private_rebuild_package_evidence(
+        attestation, rehearsal,
+        original_install_root=install_root,
+        rehearsal_install_root=rehearsal_scratch / "private-rehearsed-install",
+        rehearsal_zip_path=(
+            rehearsal_scratch / "PRIVATE-REHEARSAL-DO-NOT-RELEASE.zip"
+        ),
+    )
     return {
         "status": "PRIVATE_SOURCE_EDITED_SWORD_ZCOM_CANDIDATE_FULL_PARITY_NOT_PUBLICATION",
         "original_source_chapter_key": original_master_key,
@@ -541,6 +550,7 @@ def probe_private_compiled_source_erratum(
         "corrected_metadata_guard": staged["private_conf_metadata_exact_delta_receipt"],
         "private_real_native_rebuild_attestation_draft": attestation,
         "private_full_release_metadata_and_native_rehearsal": rehearsal,
+        "private_rebuilt_source_and_exact_seven_member_zip_evidence": private_package_evidence,
         "private_package_real_conf_public_metadata_dry_run": {
             **metadata_proposal,
             "test_date_only_no_actual_release_day_selected": True,
