@@ -76,13 +76,28 @@ it at each repeated verse-key address.
 | The work of creation ended and approved (31) | God approves the completed creation |
 
 Native metadata of `Gen.1.1` includes 8 `table` and 8 `row` elements,
-three `title` elements and 16 `cell` elements, representing this
+three `title` elements and 16 `cell` elements, representing the
 original outline and associated wrappers. `Gen.1.3` and `Gen.1.26`
-each have one native `reference` element. The source also contains
-distinct `Gen` (book) and `Gen.1` (chapter) I keys, which must be
-handled separately. The experimental OSIS preview currently declares
-**original introductions and source references not preserved**; a
-successful SWORD build alone cannot satisfy this gate.
+each have one native `reference` element.
+
+**Material original-native ownership finding (CI #43934414871):** the
+separately occupied `I:Gen` (book) and `I:Gen.1` (chapter) raw entries
+contain **zero visible words each**. The actual printed book introduction
+and chapter outline are visible in the reader's first composite
+`K:Gen.1.1` source payload, not as independently authored prose in
+those empty native I placeholders. Therefore **do not claim that the
+modern book introduction's text was natively owned by `I:Gen`**.
+For a new derivative, presenting that book introduction separately may
+be editorially desirable, but it is a deliberate reindexing of a
+logically separate original textual unit: document the source
+`K:Gen.1.1` ownership and prevent duplicating the original
+introduction in both the new book intro and the first verse commentary.
+
+The private modern linked-OSIS preview now embeds the exact two original
+`osisRef` values in-memory under the corrected source SHA and separately
+drafts the book introduction. It still does **not** certify original
+chapter outline or authorial intro layout. A successful SWORD build by
+itself cannot satisfy the remaining structural or semantic gate.
 
 ## Required remaining gates before Genesis 1 validation/commit
 
@@ -97,15 +112,12 @@ successful SWORD build alone cannot satisfy this gate.
 - [ ] Independently **read and compare exact native raw content, punctuation,
       quotation delimiters, and inline references** as actual 0.1.1 XML (not
       merely a rendered CrossWire witness and metadata hashes).
-- [ ] Verify correct original chapter outline/book/chapter introductions and
-      exact source `osisRef` attributes survive the structured derivative.
+- [ ] Verify that original chapter-outline and book-introduction content **within the first K body** is mapped exactly once, despite empty I placeholders; ensure the two exact original `osisRef` attributes survive independently re-read SWORD markup.
 - [ ] Obtain **independent second-reviewer** acceptance of all meanings,
       authorial confidence levels and the final source-to-derivative mapping.
       The current separate second *pass* is by the same assistant, not a
       separately qualified reviewer or authorized Codex run.
-- [ ] Build and independently reread **this complete modernized chapter**
-      in genuine SWORD, including all original source-linked references,
-      marked-up heading structure and correct reader display.
+- [ ] Build and independently reread **this complete modernized chapter** in genuine SWORD, including source-linked reference targets, verse-key assignment, book introduction moved to its declared editorial home, source-outline semantics and genuine reader display. A preliminary chapter-only SWORD readback already passed, but does not satisfy these content and intro gates.
 - [ ] Commit a validated production artifact, then and only then tick
       **Genesis 1** in tracking issue #270 and advance to **Genesis 2**.
 
