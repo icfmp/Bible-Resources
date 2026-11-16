@@ -64,6 +64,13 @@ class SourceReferenceGate:
         self.expected=expected_refs
         self.candidate=candidate
         self.seen={}
+        intro_rows=source_map.get("introductions",[])
+        if not isinstance(intro_rows,list):
+            raise ValueError("Original chapter/book introduction list invalid")
+        self.intro_units={row["native_key"]:row for row in intro_rows}
+        if len(self.intro_units)!=len(intro_rows):
+            raise ValueError("Duplicate original introduction native key")
+        self.intros_seen={}
         for key,entries in expected_refs.items():
             if not isinstance(entries,list):
                 raise ValueError("Expected source references must be a list")
@@ -77,6 +84,23 @@ class SourceReferenceGate:
                     raise ValueError("Modern draft has not retained expected reference: "+key)
 
     def observe(self, kind: str, key: str, raw: bytes):
+        if kind == "I" and key in self.intro_units:
+            original=self.intro_units[key]
+            digest=hashlib.sha256(raw).hexdigest()
+            if digest != original.get("source_sha256") or key in self.intros_seen:
+                raise ValueError("Native book/chapter intro differs from the pinned original")
+            try:
+                node=ET.fromstring(b"<source>" + raw + b"</source>")
+            except ET.ParseError as exc:
+                raise ValueError("Original introduction XML invalid") from exc
+            visible=" ".join(node.itertext())
+            self.intros_seen[key]={
+                "source_raw_sha256":digest,
+                "source_visible_word_count":len(re.findall(r"\\b[\\w’-]+\\b",visible)),
+                "has_visible_text":bool(visible.strip()),
+                "source_introduction_still_not_semantically_approved":True
+            }
+            return
         if kind != "K" or key not in self.units:
             return
         if key in self.seen:
@@ -108,6 +132,8 @@ class SourceReferenceGate:
             raise ValueError("Whole native source changed from approved corpus")
         if set(self.seen)!=set(self.units):
             raise ValueError("Some original first source units were not visited")
+        if set(self.intros_seen)!=set(self.intro_units):
+            raise ValueError("Some original book/chapter introduction keys not visited")
         return {
             "status":"EXACT_ORIGINAL_REFERENCE_ATTRIBUTES_MATCH_EXPECTATIONS_NOT_LINK_SERIALIZATION_ACCEPTANCE",
             "chapter":self.chapter,
@@ -115,6 +141,8 @@ class SourceReferenceGate:
             "source_unique_units_checked":len(self.units),
             "original_reference_links_checked":sum(x["reference_count"] for x in self.seen.values()),
             "per_source_unit":self.seen,
+            "original_intro_units_found":len(self.intros_seen),
+            "per_intro_unit":self.intros_seen,
             "original_prose_or_reference_labels_exported":False,
             "original_osisRef_literal_values_exported":False,
             "original_source_rewritten":False,
