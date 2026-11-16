@@ -82,3 +82,11 @@ promote the CCEL-derived PDF to independent evidence or infer that a
 long digital paragraph is automatically corrupt. Keep #278 open for a
 genuine source-edition facsimile and bounded **actual Xiphos rendering**
 comparison. No SWORD, original source, rights or public release change.
+
+## Owner's scope decision — preserve original segmentation (2026-11-16)
+
+The project owner clarified that **BRMHCC's existing editorial section and paragraph segmentation must remain as transmitted**. The purpose of this source-correction edition is to **correct actual, substantiated errors** in text, references, indexing or markup, **even when an error can be traced back to the historical printed edition**. CrossWire and the historical printing are evidence, not infallible authorities. Every correction must be identifiable, documented, testable and reversible. This is not a blanket rule to perpetuate verified errors.
+
+**Do not introduce new stylistic paragraph divisions, recombine independent sections or reflow the original exposition simply to improve readability.** The 807 long K bodies and one long I body are diagnostics, **not** a pending task to split them. No further Moody facsimile hunt or reader-layout pilot is required merely to justify optional paragraphing. If concrete evidence later shows that a particular existing boundary is *erroneous* (lost/corrupt), investigate that precise error as a separate, bounded correction; do not apply a global layout transformation.
+
+The future **modern-English adaptation** is the appropriate edition for new readability-driven paragraphing, while preserving Matthew Henry's sense, reasoning and theology. This decision supersedes the preceding proposal to hold 0.1.1 for optional paragraph restoration. BRMHCC 0.1.1 remains subject to its real technical, editorial, rights and publication gates, but **not** to an open-ended paragraph-redesign investigation.
