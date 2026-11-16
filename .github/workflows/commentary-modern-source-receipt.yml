@@ -80,7 +80,7 @@ jobs:
             --module-id MHCC \
             --expected-corpus-sha256 \
             '2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e' \
-            --chapters Ruth.1 Ruth.2 Ruth.3 Ruth.4 Rom.3 Heb.7 2John.1 3John.1 Phlm.1 Ps.1 Ps.23 \
+            --chapters Ruth.1 Ruth.2 Ruth.3 Ruth.4 Rom.3 Heb.7 2John.1 3John.1 Phlm.1 Ps.1 Ps.23 Ps.133 Ps.148 Ps.150 \
             --report "${RUNNER_TEMP}/mhcc-modern-source-native-receipt.json"
           python - <<'PY'
           import json,os
