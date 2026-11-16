@@ -1,0 +1,57 @@
+name: Verify immutable previous SWORD release bytes (read-only)
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/verify-previous-sword-release.yml'
+      - 'scripts/publish_reviewed_release.py'
+      - 'config/release-plans/mhcc-0.1.0.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify_previous_release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Independently download and hash the published prior SWORD ZIP
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          command -v gh
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          import re
+          import sys
+
+          sys.path.insert(0, "scripts")
+          from publish_reviewed_release import verify_historical_release
+
+          plan = json.loads(Path("config/release-plans/mhcc-0.1.0.json").read_text(encoding="utf-8"))
+          if (plan.get("module_id") != "mhcc-crosswire"
+                  or plan.get("sword_id") != "BRMHCC"
+                  or plan.get("version") != "0.1.0"
+                  or not re.fullmatch(r"mhcc-0\.1\.0", plan.get("tag", ""))
+                  or not re.fullmatch(r"BRMHCC-0\.1\.0\.zip", plan.get("zip_name", ""))
+                  or not re.fullmatch(r"[a-f0-9]{64}", plan.get("package_sha256", ""))
+                  or type(plan.get("package_size_bytes")) is not int):
+              raise ValueError("Previous release plan identity or immutable checksum is invalid")
+          verify_historical_release(
+              {
+                  "tag": plan["tag"],
+                  "asset_name": plan["zip_name"],
+                  "release_sha256": plan["package_sha256"],
+                  "release_size_bytes": plan["package_size_bytes"],
+              },
+              repository=os.environ["GH_REPO"],
+          )
+          print("Prior published 0.1.0 asset verified against the existing approved release plan; no publication made")
+          PY
