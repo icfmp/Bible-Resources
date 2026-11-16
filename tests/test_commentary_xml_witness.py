@@ -1,6 +1,7 @@
 """Offline structural XML observation tests; no authorial text exposure."""
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -186,6 +187,71 @@ class CommentaryXMLSourceTests(unittest.TestCase):
             path.write_text(json.dumps(manifest))
             with patch("commentary_xml_witness.fetch", side_effect=AssertionError("unexpected fetch")):
                 with self.assertRaisesRegex(PilotError, "provenance"):
+                    inspect_xml("example-commentary", directory=directory)
+
+
+    def test_ordered_multi_volume_xml_sources_are_read_only_and_source_pinned(self):
+        """A six-volume work must retain each independent XML fingerprint."""
+        with tempfile.TemporaryDirectory() as d:
+            directory = Path(d)
+            first = self.sample()
+            second = self.sample().replace(b"Book", b"Volume")
+            digest = hashlib.sha256(first).hexdigest()
+            manifest = {
+                "schema_version": 1,
+                "resource_id": "example-commentary", "category": "commentary",
+                "module_id": "ExampleCom", "title": "Test", "language": "en",
+                "version": "2.0", "provider": "crosswire",
+                "source_page_url": "https://crosswire.org/example",
+                "sword_zip_url": "https://crosswire.org/modules/ExampleCom.zip",
+                "authorial_witness_url": "https://ccel.org/example.txt",
+                "sample_references": ["Gen 1:1", "Ps 23:1"],
+                "archive_sha256": None,
+                "rights": {"status": "research_only", "owner_approved": False,
+                           "evidence_url": "https://crosswire.org/copyright"},
+                "commentary_source": {"xml_witness_volumes": [
+                    {"number": 1, "url": "https://www.ccel.org/ccel/h/sample/vol1.xml",
+                     "sha256": digest},
+                    {"number": 2, "url": "https://www.ccel.org/ccel/h/sample/vol2.xml",
+                     "sha256": None},
+                ]}
+            }
+            path = directory / "example-commentary.json"
+
+            def fake_fetch(url, destination, provider):
+                self.assertEqual(provider, "ccel")
+                content = first if url.endswith("vol1.xml") else second
+                destination.write_bytes(content)
+                return {"bytes": len(content),
+                        "sha256": hashlib.sha256(content).hexdigest()}
+
+            path.write_text(json.dumps(manifest), encoding="utf-8")
+            with patch("commentary_xml_witness.fetch", side_effect=fake_fetch):
+                result = inspect_xml("example-commentary", directory=directory)
+            self.assertEqual(result["volume_count"], 2)
+            self.assertEqual([x["volume"] for x in result["volume_observations"]],
+                             [1, 2])
+            self.assertTrue(result["volume_observations"][0]["source_sha256_pin_verified"])
+            self.assertFalse(result["all_volume_sha256_pins_verified"])
+            self.assertFalse(result["original_source_edition_matched_to_sword"])
+            self.assertFalse(result["published"])
+            self.assertNotIn("Sample original words", json.dumps(result))
+
+            # A changed pinned source must abort before any partial success.
+            manifest["commentary_source"]["xml_witness_volumes"][0]["sha256"] = "f" * 64
+            path.write_text(json.dumps(manifest), encoding="utf-8")
+            with patch("commentary_xml_witness.fetch", side_effect=fake_fetch):
+                with self.assertRaisesRegex(PilotError, "changed"):
+                    inspect_xml("example-commentary", directory=directory)
+
+            # No ambiguous duplicate volume source is accepted.
+            manifest["commentary_source"]["xml_witness_volumes"][0]["sha256"] = digest
+            manifest["commentary_source"]["xml_witness_volumes"][1]["url"] = (
+                manifest["commentary_source"]["xml_witness_volumes"][0]["url"])
+            path.write_text(json.dumps(manifest), encoding="utf-8")
+            with patch("commentary_xml_witness.fetch",
+                       side_effect=AssertionError("Unexpected network access")):
+                with self.assertRaisesRegex(PilotError, "Duplicate"):
                     inspect_xml("example-commentary", directory=directory)
 
 
