@@ -54,6 +54,12 @@ A line in the source might fail with:
 - Preserve attribution, rights statements, the full original textual content
   and the exact editorial record.
 
+## Correct errors without redesigning a source edition
+
+For a correction edition of an existing commentary, **retain the transmitted editorial sectioning and paragraph arrangement**; do not introduce new stylistic breaks, reorganize arguments or merge independent units merely for smoother reading. Long exposition alone is not an error. Readability-led re-paragraphing belongs in a **separately identified modern-language adaptation**, with its own editorial review.
+
+This does **not** make CrossWire, a compiler or even the historical printed edition infallible. **Demonstrable mistakes** in wording, citations, section mapping or markup may be corrected at their actual origin, including defects inherited from a printed edition. Any such change must be specifically supported by evidence, identified as an editorial correction, and reproducible and reversible; never use a general stylistic normalization to conceal it. If an original boundary is *proven corrupt* rather than merely inconvenient, review that specific repair separately.
+
 ## Reader-oriented navigation is not source-text alteration
 
 An upstream SWORD author's section can be indexed at only its first verse,
