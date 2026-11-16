@@ -522,6 +522,68 @@ def probe_private_compiled_source_erratum(
             rehearsal_scratch / "PRIVATE-REHEARSAL-DO-NOT-RELEASE.zip"
         ),
     )
+    # A SECOND private, identical-source assembly exercises the real UTC
+    # preparation day instead of the historic source-date-plus-one control.
+    # Its candidate checksum can be pinned as evidence of today's build, but
+    # must be regenerated if the separately approved RELEASE DAY differs.
+    # No module is committed, catalogue altered, or release permission set.
+    preparation_day_utc = date.today().isoformat()
+    if preparation_day_utc <= source_date:
+        raise ValueError("Candidate preparation day must postdate original source")
+    calendar_scratch = scratch / "private-current-calendar-day-rehearsal"
+    calendar_scratch.mkdir()
+    calendar_candidate = rehearse_private_versioned_commentary_package(
+        install_root, calendar_scratch,
+        module_id=curated_module_id,
+        expected_version=curated_proposed_version,
+        source_provider=source_provider,
+        original_sword_version_date=source_date,
+        hypothetical_revision_day=preparation_day_utc,
+        revision_summary=history_note,
+    )
+    calendar_install, calendar_receipt = _read_private_native(
+        calendar_scratch / "private-rehearsed-install",
+        curated_module_id, native_raw_binary, with_receipt=True,
+    )
+    if (calendar_install != actual_install
+            or calendar_receipt["all_native_raw_entries_ordered_sha256"]
+               != actual_install_receipt["all_native_raw_entries_ordered_sha256"]
+            or calendar_candidate["owner_release_authorized"] is not False
+            or calendar_candidate["actual_release_date_selected"] is not False
+            or calendar_candidate["artifact_published_or_uploaded"] is not False):
+        raise ValueError("Dated private candidate changed real native data or approval status")
+    calendar_candidate["complete_rehearsed_libsword_native_readback_exact"] = True
+    calendar_candidate["native_corpus_sha256"] = (
+        calendar_receipt["all_native_raw_entries_ordered_sha256"]
+    )
+    dated_candidate_proof = reconcile_private_rebuild_package_evidence(
+        attestation, calendar_candidate,
+        original_install_root=install_root,
+        rehearsal_install_root=calendar_scratch / "private-rehearsed-install",
+        rehearsal_zip_path=(
+            calendar_scratch / "PRIVATE-REHEARSAL-DO-NOT-RELEASE.zip"
+        ),
+    )
+    dated_candidate_receipt = {
+        "status": "PRIVATE_REAL_CALENDAR_DAY_SEVEN_MEMBER_ZIP_ATTESTED_NOT_RELEASE",
+        "utc_preparation_day_not_owner_approved_release_day": preparation_day_utc,
+        "module_id": curated_module_id,
+        "version": curated_proposed_version,
+        "exact_native_corpus_sha256": calendar_candidate["native_corpus_sha256"],
+        "full_original_source_audit_sha256": attestation["source_audit_sha256"],
+        "seven_member_sha256": dated_candidate_proof["test_date_only_seven_member_sha256"],
+        "package_sha256": dated_candidate_proof["test_date_only_zip_sha256"],
+        "package_size_bytes": (
+            calendar_scratch / "PRIVATE-REHEARSAL-DO-NOT-RELEASE.zip"
+        ).stat().st_size,
+        "only_about_and_sword_version_date_changed": True,
+        "all_original_native_links_and_content_preserved": True,
+        "official_publication_date_selected": False,
+        "owner_release_authorized": False,
+        "payload_committed": False,
+        "catalogue_updated": False,
+        "zip_uploaded_or_distributed": False,
+    }
     return {
         "status": "PRIVATE_SOURCE_EDITED_SWORD_ZCOM_CANDIDATE_FULL_PARITY_NOT_PUBLICATION",
         "original_source_chapter_key": original_master_key,
@@ -551,6 +613,7 @@ def probe_private_compiled_source_erratum(
         "private_real_native_rebuild_attestation_draft": attestation,
         "private_full_release_metadata_and_native_rehearsal": rehearsal,
         "private_rebuilt_source_and_exact_seven_member_zip_evidence": private_package_evidence,
+        "private_current_calendar_day_package_receipt": dated_candidate_receipt,
         "private_package_real_conf_public_metadata_dry_run": {
             **metadata_proposal,
             "test_date_only_no_actual_release_day_selected": True,
