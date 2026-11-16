@@ -21,7 +21,7 @@
     }
   ],
   "private_revised_candidate_build_authorized": true,
-  "private_revised_candidate_history_note": "Reviewed index navigation links and one documented source citation correction",
+  "private_revised_candidate_history_note": "Reviewed index navigation and two documented source spelling and citation corrections",
   "source_text_changes_for_public_release_authorized": false,
   "private_revised_candidate_build_authorization": {
     "scope": "private_compile_and_validate_only",
@@ -41,9 +41,9 @@
       "external_review_url": "https://github.com/icfmp/Bible-Resources/issues/279",
       "independent_edition_corrob_url": "https://www.christianity.com/bible/commentary/matthew-henry-concise/1-chronicles/7",
       "source_error_class": "MISSPELLED_PROPER_NAME_IN_AUTHORIAL_PROSE",
-      "editorial_decision": "PRIVATE_REVERSIBLE_PREFLIGHT_ONLY_NOT_COMPILED",
-      "original_raw_sha256": null,
-      "expected_original_linked_native_K_count": null,
+      "editorial_decision": "PRIVATE_COMPILATION_AND_TESTS_APPROVED_PUBLICATION_REQUIRES_SEPARATE_SIGNOFF",
+      "original_raw_sha256": "9c6d1cddec83f9b5ebf8a0c146e3d4176408ab2bff4a8b0a7e9dcec2ee7e6c7e",
+      "expected_original_linked_native_K_count": 1,
       "public_release_authorized": false
     }
   ]
