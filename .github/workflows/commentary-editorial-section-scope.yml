@@ -790,6 +790,21 @@ jobs:
               assert case["source_digital_edition_equivalence_proven"] is False
               print("Private paired digital paragraph structure witness",
                     json.dumps(case,sort_keys=True))
+          prose=r.get("private_unapproved_original_prose_erratum_byte_preflight")
+          if prose is not None:
+              assert prose["status"]=="PRIVATE_PROSE_ERRATUMS_REVERSIBLE_NOT_COMPILED"
+              assert prose["candidate_is_only_an_unpublished_in_memory_preview"] is True
+              assert prose["all_original_source_or_compiled_content_unchanged"] is True
+              assert prose["source_words_xml_or_reference_targets_exported"] is False
+              assert prose["public_release_authorized"] is False
+              for row in prose["case_rows"]:
+                  assert row["reverse_restores_exact_original_raw_bytes"] is True
+                  assert row["all_other_original_xml_words_references_and_structure_preserved"] is True
+                  print("Proposed private single-word source erratum", row["original_native_entry"],
+                        "original SHA-256", row["original_raw_sha256"],
+                        "proposed SHA-256", row["proposed_raw_sha256"],
+                        "original linked keys", row["original_linked_native_K_count"],
+                        "word text/markup omitted, not compiled or published")
           inverted=witness["independent_original_reversed_reference_witness"]
           assert inverted["status"]=="SOURCE_NATIVE_AND_INDEPENDENT_DIGITAL_REVERSED_REFERENCE_REVIEW_ONLY"
           assert inverted["source_original_distinct_body_reversed_reference_count"]==(
