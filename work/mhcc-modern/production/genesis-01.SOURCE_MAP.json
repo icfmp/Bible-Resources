@@ -173,5 +173,15 @@
   ],
   "original_word_text_output": false,
   "independent_semantic_text_review_approved": false,
-  "modern_derivative_native_roundtrip_complete": false
+  "modern_derivative_native_roundtrip_complete": false,
+  "intro_provenance_expectations": {
+    "status": "EXPECTED_ORIGINAL_COMPOSITE_LAYOUT_NOT_YET_ATTESTED",
+    "original_first_numbered_key": "Gen.1.1",
+    "expected_original_book_intro_start": "Genesis is a name taken from the Greek",
+    "expected_original_exposition_start": "The first verse of the Bible gives us a satisfying and useful account",
+    "expected_original_chapter_outline_row_count": 8,
+    "expected_original_chapter_outline_table_count": 8,
+    "expected_original_chapter_outline_title_count": 3,
+    "interpretation": "Book-level introduction and chapter outline are separately readable editorial roles inside the original shared first numbered native body; empty I:Gen and I:Gen.1 are not authorial prose owners."
+  }
 }
