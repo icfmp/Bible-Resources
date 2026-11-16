@@ -161,16 +161,38 @@ def compare_paragraph_witness(document, samples: list[tuple[str, str, bytes]]) -
             # NOT proof of editorial/print identity or punctuation parity.
             begin = _unique_offset(original_words, pwords[:MAX_ANCHOR_WORDS])
             tail = _unique_offset(original_words, pwords[-MAX_ANCHOR_WORDS:])
+            # A matched beginning AND end can still conceal changed middle
+            # prose. Check every Unicode word token, in exact original order.
+            # A differently punctuated digital edition may pass this token
+            # test: it is NOT punctuation or original-edition parity proof.
+            end = begin + len(pwords) if begin is not None else None
+            whole = (
+                begin is not None
+                and end <= len(original_words)
+                and original_words[begin:end] == pwords
+                and (tail is None or tail == end - MAX_ANCHOR_WORDS)
+            )
             anchors.append({
                 "source_p_word_tokens": len(pwords),
                 "unique_native_start_token_offset": begin,
                 "unique_native_end_anchor_token_offset": tail,
                 "both_8_word_anchors_uniquely_present":
                     begin is not None and tail is not None and begin <= tail,
+                "all_source_p_words_exact_contiguous_original_order": whole,
+                "original_prefix_word_tokens_before_exact_source_p": (
+                    begin if whole else None
+                ),
+                "original_suffix_word_tokens_after_exact_source_p": (
+                    len(original_words) - end if whole else None
+                ),
             })
         row["source_paragraph_lexical_anchors"] = anchors
         row["paragraphs_with_both_unique_8_word_anchors"] = sum(
             a["both_8_word_anchors_uniquely_present"] for a in anchors
+        )
+        row["source_paragraphs_with_all_words_in_exact_original_order"] = sum(
+            a["all_source_p_words_exact_contiguous_original_order"]
+            for a in anchors
         )
         rows.append(row)
     return {
