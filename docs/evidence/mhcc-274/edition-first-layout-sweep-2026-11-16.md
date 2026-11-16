@@ -109,15 +109,25 @@ unwrapped words of 1,569), `Exod.12.1` (930 of 969) and `Matt.4.1`
 not authorial quote excerpts, paragraph counts, a text-loss claim or
 evidence permitting automatic segmentation.
 
-The separately maintained [CCEL John 3 reading page](https://ccel.org/ccel/henry/mhcc.xxxv.iii.html)
-visibly presents its long initial exposition under a common section heading
-with multiple paragraph separations. This is **useful comparative
-editorial evidence**, *not* proof of equivalence with the exact originally
-claimed CrossWire/Moody Press printing. Before proposing any change to
-`John.3.1`, its exact source word order/notes/references and each proposed
-paragraph boundary must be independently reconciled to the identified
-work/edition, and the changed source/native OSIS roundtrip must preserve
-authorial text byte-for-byte.
+**Correction after the independent pinned XML pilot:** the CCEL *chapter*
+page contains several paragraphs, but these are not necessarily multiple
+paragraphs **inside the same numbered commentary section**. The
+[independently pinned ThML-to-original-source comparison](paragraph-witness-pilot-2026-11-16.md)
+finds that `John.3.1`, `Exod.12.1`, `Matt.4.1`, `Gen.3.1` and
+`2John.1.1` each have **one** source `<p>` enclosing that section's
+exposition, with a unique original SWORD word-anchor match at both ends.
+Four of the five source paragraph word sequences are identical to the
+original native exposition after its prefatory words; the fifth
+(`Exod.12.1`) contains an **internal cross-digital-edition token difference**
+and is not treated as the same text. `Lev.19` remains an I-only
+source-location question. Further source-`<p>` internal break-marker tests
+are tracked with the same pilot.
+
+This establishes **a significant initial fidelity between digital section
+paragraph representations**, not the original author's paragraphing,
+the exact printed Moody Press layout, punctuation parity or reader output.
+Do not split or recopy CCEL prose into the stock edition based on its
+chapter-wide visual appearance.
 
 **Editorial status is OPEN, not “layout perfect”:** the source digital
 witness's `div` wrappers are an unreliable proxy for paragraph ownership.
