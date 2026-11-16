@@ -83,6 +83,12 @@ class ApprovedProfileTests(unittest.TestCase):
         with self.assertRaisesRegex(ProfileError, "does not match released module"):
             self._read()
 
+    def test_renamed_sword_id_invalidates_prior_profile_even_when_version_is_unchanged(self):
+        """A new SWORD name cannot inherit the old edition's signed description."""
+        moved = dict(self.module, sword_id="PROPOSEDNEWID")
+        with self.assertRaisesRegex(ProfileError, "sword_id does not match released module"):
+            self._read(moved)
+
     def test_new_module_version_requires_separately_approved_profile(self):
         """An old original-only edition's approval cannot authorize revised text."""
         next_edition = dict(self.module, version="0.1.1")
