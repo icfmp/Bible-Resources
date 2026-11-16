@@ -511,7 +511,10 @@ jobs:
           assert revised["source_words_or_xml_logged"] is False
           assert revised["owner_publication_authorized"] is False
           print("Corrected MHCC exact source delta and isolated actual Xiphos:",
-                "original K slots changed",revised["source_linked_original_verse_keys_changed"],
+                "total original K addresses corrected",revised["all_source_linked_original_verse_keys_changed"],
+                "Ezekiel reference K addresses",revised["source_linked_original_verse_keys_changed"],
+                "additional prose K addresses",revised["additional_prose_original_verse_keys_changed"],
+                "real Xiphos selected passage matches",xiphos_revised["independent_real_reader_clipboard_matches"],
                 "all other original K/I/TOP exactly preserved",
                 revised["all_other_original_and_alias_K_bytes_identical_to_index_only_compilation"],
                 "all original native links identical",
