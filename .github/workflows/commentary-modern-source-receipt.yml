@@ -21,8 +21,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Test generic bounded source receipt before inspecting any source
-        run: python -m unittest tests/test_commentary_modern_source_receipt.py -v
+      - name: Test source-native and draft-coverage guards on synthetic fixtures
+        run: python -m unittest tests/test_commentary_modern_source_receipt.py tests/test_commentary_modern_draft_guard.py -v
       - name: Install real SWORD source reader
         shell: bash
         run: |
@@ -110,11 +110,21 @@ jobs:
                         " markup="+json.dumps(u["markup"],sort_keys=True))
           print("Full source-native gate PASS (not independent semantic or build acceptance)")
           PY
+      - name: Compare committed 24 draft section labels and source pins with attested native metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_modern_draft_guard.py \
+            --root work/mhcc-modern \
+            --native-map work/mhcc-modern/evidence/MHCC_0.1.1_24_CHAPTER_NATIVE_MAP.json \
+            --report "${RUNNER_TEMP}/mhcc-modern-draft-coverage-report.json"
       - name: Upload metadata-only bounded audit receipt
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: mhcc-modern-0.1.1-source-native-receipt
-          path: ${{ runner.temp }}/mhcc-modern-source-native-receipt.json
+          path: |
+            ${{ runner.temp }}/mhcc-modern-source-native-receipt.json
+            ${{ runner.temp }}/mhcc-modern-draft-coverage-report.json
           if-no-files-found: ignore
           retention-days: 60
