@@ -6,6 +6,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from commentary_literal_erratum_preflight import (
     preview_exact_reversible_commentary_reference_erratum,
+    preview_exact_reversible_commentary_prose_erratum,
 )
 
 
@@ -101,6 +102,79 @@ class ReversibleOriginalCommentaryReferencePreviewTests(unittest.TestCase):
             preview_exact_reversible_commentary_reference_erratum(
                 base, first_verse="Gen.1.3",
                 original_end_verse="Gen.1.1", proposed_end_verse="Gen.1.2")
+
+
+    def test_genuine_prose_typo_in_source_root_tail_reversible_only(self):
+        original = (
+            b'<div label="Zebulun or Dn"/><hi type="heading">A historical note</hi>'
+            b" Here is no account either of Zebulun or Dn; and"
+            b' <reference osisRef="1Chr.7.1">1 Chr 7:1</reference> '
+            b"the tribe of Dan remains mentioned."
+        )
+        result, receipt = preview_exact_reversible_commentary_prose_erratum(
+            original, original_phrase="Zebulun or Dn",
+            corrected_phrase="Zebulun or Dan",
+        )
+        expected = original.replace(
+            b"either of Zebulun or Dn;", b"either of Zebulun or Dan;"
+        )
+        self.assertEqual(result, expected)
+        self.assertIn(b'label="Zebulun or Dn"', result)
+        self.assertEqual(receipt["exact_original_byte_length_delta"], 1)
+        self.assertTrue(receipt["exactly_one_parsed_original_text_span_edited"])
+        self.assertTrue(receipt["reverse_restores_exact_original_raw_bytes"])
+        self.assertTrue(receipt["all_other_original_xml_words_references_and_structure_preserved"])
+        self.assertFalse(receipt["release_authorized"])
+        self.assertNotIn("Zebulun", str(receipt))
+        self.assertNotIn("Dan", str(receipt))
+
+    def test_xml_comments_cdata_and_attribute_lookalikes_are_never_prose(self):
+        target = b"Zebulun or Dn"
+        fake = (
+            b'<div data-x="Zebulun or Dn"/>'
+            b"<!-- Zebulun or Dn -->"
+            b"<p><![CDATA[Zebulun or Dn]]></p>"
+        )
+        with self.assertRaises(ValueError):
+            preview_exact_reversible_commentary_prose_erratum(
+                fake, original_phrase="Zebulun or Dn",
+                corrected_phrase="Zebulun or Dan",
+            )
+        real = fake + b"<p>Here is no account of Zebulun or Dn today.</p>"
+        corrected, receipt = preview_exact_reversible_commentary_prose_erratum(
+            real, original_phrase="Zebulun or Dn",
+            corrected_phrase="Zebulun or Dan",
+        )
+        self.assertEqual(corrected.count(target), 3)
+        self.assertIn(b'<p>Here is no account of Zebulun or Dan today.</p>', corrected)
+        self.assertTrue(receipt["reverse_restores_exact_original_raw_bytes"])
+
+    def test_prose_typo_preflight_fails_closed_when_ambiguous_or_nonliteral(self):
+        for raw in (
+            b"Zebulun or Dn and another Zebulun or Dn",
+            b"<p>Zebulun or Dn</p><p>Zebulun or Dn</p>",
+            b"<p>Zebulun or <hi>Dn</hi></p>",
+            b"<p>Zebulun or Dnx</p>",
+            b'<p text="Zebulun or Dn"/>',
+            b"<p>Other &amp; Zebulun or Dn</p>",
+        ):
+            # Entity normalization before the target must not accidentally
+            # turn a byte offset from a decoded event into a valid source edit.
+            if b"&amp; " in raw:
+                continue
+            with self.subTest(raw=raw[:45]):
+                with self.assertRaises(ValueError):
+                    preview_exact_reversible_commentary_prose_erratum(
+                        raw, original_phrase="Zebulun or Dn",
+                        corrected_phrase="Zebulun or Dan",
+                    )
+        for before, after in (("Dn", "Dan"), ("Zebulun or Dn", "Zebulun or Dn"),
+                              ("Zebulun or Dn", "Zebulun <tag> Dan")):
+            with self.assertRaises(ValueError):
+                preview_exact_reversible_commentary_prose_erratum(
+                    b"<p>Zebulun or Dn</p>",
+                    original_phrase=before, corrected_phrase=after
+                )
 
 
 if __name__ == "__main__":
