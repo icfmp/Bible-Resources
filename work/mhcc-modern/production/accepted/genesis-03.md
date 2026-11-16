@@ -222,7 +222,7 @@ Sin brought sorrow into the world and turned it into a valley of tears.
 
 No wonder our sorrows multiply when our sins do too.
 
-The words “He shall rule over you” express, in Henry's understanding, the same duty found in the command for wives to submit to their husbands.
+The words “He shall rule over you” are God's command: wives are to submit to their husbands.
 
 If the man had not sinned, he would always have ruled with wisdom and love. If the woman had not sinned, she would always have obeyed with humility and gentleness.
 
