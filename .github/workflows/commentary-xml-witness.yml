@@ -97,6 +97,28 @@ jobs:
           python scripts/commentary_xml_witness.py \
             --resource-id "$RESOURCE_ID" \
             --report "${RUNNER_TEMP}/commentary-xml-structure.json"
+      - name: Record verified XML witness fingerprints without source prose
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          report = json.loads(
+              (Path(os.environ["RUNNER_TEMP"]) / "commentary-xml-structure.json").read_text())
+          observations = report.get("volume_observations", [report])
+          for row in observations:
+              tags = row["element_counts"]
+              print("Read-only original CCEL XML volume", row.get("volume", 1),
+                    "sha256", row["xml_sha256"], "bytes", row["bytes"],
+                    "root", row["root_element_name"],
+                    "div1", tags.get("div1", 0), "div2", tags.get("div2", 0),
+                    "scripCom", tags.get("scripCom", 0),
+                    "p", tags.get("p", 0))
+          assert report["rights_approved"] is False
+          assert report["original_source_edition_matched_to_sword"] is False
+          assert report["published"] is False
+          PY
       - name: Keep only metadata without authorial text
         if: always()
         uses: actions/upload-artifact@v4
