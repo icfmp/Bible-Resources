@@ -56,6 +56,45 @@ class CommentaryLayoutCensusTests(unittest.TestCase):
         self.assertNotIn("substantial_text_without_div_table_p_line_title_note",
                          layout_flags(profile))
 
+    def test_two_div_wrappers_can_hide_one_long_unbroken_prose_block(self):
+        words = b" ".join([b"original"] * 350)
+        original = (
+            b"<div type='book'><div type='section'>"
+            b"<hi type='bold'>Verses 1-4.</hi>" + words +
+            b"</div></div>"
+        )
+        profile = layout_profile(original)
+        self.assertEqual(profile["div_count"], 2)
+        self.assertEqual(profile["effective_prose_block_count"], 1)
+        self.assertGreater(profile["largest_effective_prose_block_words"], 340)
+        self.assertIn("long_commentary_with_one_effective_prose_block",
+                      layout_flags(profile))
+        # A heading's <hi> must not become a paragraph on its own.
+        self.assertTrue(profile["styled_numbered_verse_lead"])
+
+    def test_multiple_wrapped_prose_divisions_are_not_the_same_long_block(self):
+        words = b" ".join([b"original"] * 160)
+        original = (b"<div type='book'>"
+                    b"<div type='section'>" + words + b"</div>"
+                    b"<div type='section'>" + words + b"</div>"
+                    b"</div>")
+        profile = layout_profile(original)
+        self.assertEqual(profile["div_count"], 3)
+        self.assertEqual(profile["effective_prose_block_count"], 2)
+        self.assertEqual(profile["largest_effective_prose_block_words"], 160)
+        self.assertNotIn("long_commentary_with_one_effective_prose_block",
+                         layout_flags(profile))
+
+    def test_inline_markup_and_child_tails_stay_in_nearest_prose_block(self):
+        original = (
+            b"<div>One <reference osisRef='Gen.1.1'>two</reference>"
+            b" three <hi>four</hi> five</div>"
+        )
+        profile = layout_profile(original)
+        self.assertEqual(profile["effective_prose_block_count"], 1)
+        self.assertEqual(profile["largest_effective_prose_block_words"], 5)
+        self.assertEqual(profile["prose_words_in_effective_blocks"], 5)
+
     def test_highlighted_original_verse_heading_is_not_unstyled(self):
         source = b"<hi type='bold'>Verses 2, 3.</hi><div>Original text.</div>"
         profile = layout_profile(source)
