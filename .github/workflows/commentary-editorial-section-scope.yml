@@ -1,49 +1,9 @@
 name: Audit original commentary editorial section scopes
 
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/commentary-editorial-section-scope.yml'
-      - 'scripts/commentary_section_scope_audit.py'
-      - 'scripts/commentary_editorial_topology.py'
-      - 'scripts/commentary_layout_census.py'
-      - 'tests/test_commentary_layout_census.py'
-      - 'scripts/commentary_paragraph_witness_probe.py'
-      - 'tests/test_commentary_paragraph_witness_probe.py'
-      - 'tests/test_commentary_editorial_topology.py'
-      - 'scripts/commentary_reference_registry_triage.py'
-      - 'tests/test_commentary_reference_registry_triage.py'
-      - 'scripts/commentary_literal_erratum_preflight.py'
-      - 'scripts/commentary_source_erratum_compiled_probe.py'
-      - 'docs/evidence/mhcc-274/mhcc-0.1.1-2026-11-16-private-dated-candidate-DRAFT.json'
-      - 'tests/test_commentary_source_erratum_compiled_probe.py'
-      - 'scripts/commentary_public_metadata_preflight.py'
-      - 'tests/test_commentary_public_metadata_preflight.py'
-      - 'scripts/commentary_xiphos_dual_reader.py'
-      - 'tests/test_commentary_xiphos_dual_reader.py'
-      - 'scripts/commentary_rebuild_attestation_draft.py'
-      - 'tests/test_commentary_rebuild_attestation_draft.py'
-      - 'scripts/reviewed_compiled_commentary_rebuild.py'
-      - 'tests/test_reviewed_compiled_commentary_rebuild.py'
-      - 'tests/test_commentary_literal_erratum_preflight.py'
-      - 'scripts/commentary_osis_rebuild_preflight.py'
-      - 'scripts/commentary_intro_chapter_text_review.py'
-      - 'scripts/commentary_osis_intro_transport_probe.py'
-      - 'scripts/commentary_osis_mixed_transport_probe.py'
-      - 'scripts/commentary_osis_transport_probe.py'
-      - 'tests/test_commentary_osis_intro_transport_probe.py'
-      - 'tests/test_commentary_osis_mixed_transport_probe.py'
-      - 'tests/test_commentary_intro_chapter_text_review.py'
-      - 'tests/test_commentary_section_scope_audit.py'
-      - 'tests/test_commentary_osis_transport_probe.py'
-      - 'tests/test_commentary_osis_rebuild_preflight.py'
-      - 'scripts/commentary_navigation_link_plan.py'
-      - 'tests/test_commentary_navigation_link_plan.py'
-      - 'scripts/commentary_chapter_ref_labels.py'
-      - 'tests/test_commentary_chapter_ref_labels.py'
-      - 'scripts/sword_native_commentary_index.cpp'
-      - 'scripts/sword_native_commentary_raw_corpus.cpp'
-      - 'config/commentary-intake/**'
+  # Historic MHCC-only research: after publication of corrected 0.1.1,
+  # do not repeat a 0.1.0→0.1.1 candidate test on unrelated PRs.
+  # Preserve the exact original workflow for explicit source-pinned replay.
   workflow_dispatch:
     inputs:
       resource_id:

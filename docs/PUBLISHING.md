@@ -51,43 +51,80 @@ the GitHub authorization record genuinely comes from the project owner.
 See [generic proof contract](evidence/mhcc-274/rebuilt-commentary-validation-contract.md).
 A synthetic passing unit test does not authorize publication.
 
-## Upgrading an existing approved commentary without losing its old release
+## Upgrading an approved resource, including a changed SWORD identifier
 
-There is **one current version per stable module identity** in the catalogue.
-For a source-corrected successor, retain the existing module directory,
-curated module ID, SWORD ID and canonical source-edition lineage. Update its
-version, actual verified SWORD payload, metadata and source-specific proof
-only after the corresponding source/rights decision. Never install a second
-approved module with a duplicate SWORD identity beside the original.
+There is **one current approved version per stable curated resource ID** in
+`catalog/v1/catalog.json`, backed by exactly one active release plan under
+`config/release-plans/`. The curated ID identifies the maintained edition.
+The **SWORD ID is a separate installation identifier**: renaming it changes
+the native module key, `.conf` header, compiled payload paths and download
+URL. It is **not** an automatic in-place client update.
 
-There is likewise **one active release plan per current module ID**. For
-BRMHCC 0.1.1 the eventual authorized change must **replace**
-`config/release-plans/mhcc-0.1.0.json` with a new
-`config/release-plans/mhcc-0.1.1.json`. Do not keep both active; the coverage
-gate deliberately rejects duplicate plans. This does **not** modify, delete
-or repurpose the already published and immutable GitHub Release
-`mhcc-0.1.0` or its ZIP. Its original approved plan remains in Git history.
-Before the new release, independently re-download and verify the 0.1.0
-release checksum as an explicit rollback specimen.
+For every change, review the source edition and distribution rights, prepare
+a reversible diff (text, references, notes, annotations and topology), prove
+the complete native reader corpus, and bind the final seven or other
+driver-appropriate member hashes and deterministic versioned ZIP to that
+review. Then update the single current module, plan and catalogue together.
+Never fabricate an old-to-new version relationship across distinct providers.
+A resource's source URL, editable metadata and public catalogue status must
+not serve as authorization on their own.
 
-An approved descriptive profile is **specific to an exact module version**.
-The current MHCC `profiles/en.json` is for 0.1.0 and states that no source
-words or references were modified; reusing it for 0.1.1 would be false.
-The profile validator rejects the version mismatch. Either obtain a new
-owner-approved, source-hash-pinned 0.1.1 profile with accurate changes and
-rights, or remove the **optional** profile from the new current catalogue
-until a fresh profile has been approved. Never re-pin the old profile merely
-to silence validation. A [separate, unapproved new-profile draft](
-evidence/mhcc-274/0.1.1-reader-profile-DRAFT.md) is prepared for review.
+**MHCC is a completed example, not a recipe with hardcoded identities:**
 
-After editorial/legal approval, the current single catalogue row for
-`mhcc-crosswire` can switch to version 0.1.1 and its new stable
-`sword/packages/BRMHCC.zip` checksum. A separately authorized new immutable
-GitHub Release must be created and verified **before** Pages advertises
-the new ZIP. The previous 0.1.0 GitHub Release remains available, while
-the stable Pages path intentionally points to the current approved version.
-No existing user installation, settings, notes or application-side rollback
-is changed by this repository.
+- On 2026-11-16 the owner approved corrected **MHCC 0.1.1**, retaining the
+  curated ID `mhcc-crosswire`, changing its SWORD ID from `BRMHCC` to
+  `MHCC`, and publishing under [`mhcc-0.1.1`](
+  https://github.com/icfmp/Bible-Resources/releases/tag/mhcc-0.1.1).
+- The sole active plan is `config/release-plans/mhcc-0.1.1.json`. The
+  previously active `mhcc-0.1.0.json` is retained in Git history, and the
+  immutable [`mhcc-0.1.0` release](
+  https://github.com/icfmp/Bible-Resources/releases/tag/mhcc-0.1.0)
+  remains available and independently hash-verified.
+- The current catalogue download is `sword/packages/MHCC.zip`, the
+  versioned release asset is `MHCC-0.1.1.zip`, and the independently
+  verified old release asset was `BRMHCC-0.1.0.zip`. The main repository
+  already contains the seven 0.1.1 compiled members and their exact full
+  source/native evidence.
+- **CrossWire also distributes a distinct `MHCC` module.** The new
+  Bible Resources SWORD ID therefore collides with the original provider;
+  any client-side choice/replacement must be intentional. An old
+  `BRMHCC` installation can remain installed alongside it. The
+  [source/rights record](
+  evidence/mhcc-274/mhcc-0.1.1-editorial-rights-acceptance.md)
+  and [public release notes](releases/MHCC-0.1.1.md) explain this boundary.
+
+An optional public reader-description profile is **specific to the exact
+edition, version, source and SWORD identifier**. Never reuse an approval
+from the old identity; omit the optional profile until the new description
+is separately reviewed, as was done for MHCC 0.1.1.
+
+The public publication contract is ordered: verify source and rights,
+validate/build the **exact** compiled bytes, verify/create the immutable
+GitHub Release **before** advertising the new single Pages catalogue URL,
+then fetch and hash the public HTTPS catalogue and all advertised ZIPs.
+Reviewers must also inspect a real reader's actual source/heading layout.
+A test pass is not legal approval, a build is not publication, and a
+published resource may still expose an application-only display issue.
+
+### Reusable commands and evidence status
+
+Use [`scripts/commentary_intake.py`](../scripts/commentary_intake.py) for
+read-only source observations; source archives must be pinned before a
+stage-2 claim. For an edited compiled source, the reusable
+[`reviewed_compiled_commentary_rebuild.py`](
+../scripts/reviewed_compiled_commentary_rebuild.py) validates a separate
+fully attested source/native correction manifest, rather than pretending
+the corrected module is byte-identical to the upstream stock. Normal
+production validation and release packaging are already shared across
+Bibles/commentaries in `scripts/validate.py`, `scripts/build.py`,
+`scripts/catalogue_release_coverage.py` and
+`scripts/publish_reviewed_release.py`.
+
+The full inventory and known edition-specific diagnostics are maintained in
+[`TOOL_REGISTRY.md`](TOOL_REGISTRY.md). Treat the large historic MHCC
+private orchestration as **historical acceptance evidence**, not a generic
+one-button runner for a new edition. A second commentary requires its own
+source pins, authorial edition/rights review and independent native audit.
 
 ## Mandatory publication contract
 
@@ -166,5 +203,6 @@ auditing their content, metadata and source/compiled identity. A
 future source-grounded update requires its own issue and approval.
 
 By contrast, the current approved **Darby 0.1.1** archive and its
-versioned GitHub asset have the same pinned ZIP checksum. **MHCC
-0.1.0** uses the strict identical-bytes, current release-plan path.
+versioned GitHub asset have the same pinned ZIP checksum. **MHCC 0.1.1** now uses the source-corrected rebuilt-commentary route; its
+current release plan/Pages ZIP is independently verified. The old, immutable
+**BRMHCC 0.1.0** GitHub Release remains separately hash-verified.

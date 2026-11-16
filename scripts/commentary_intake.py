@@ -122,8 +122,14 @@ def inspect_resource(resource_id: str, stage: str, *, directory: Path | None = N
                                    expected_module_id=manifest["module_id"],
                                    expected_category="commentary")
         conf = metadata["sword_conf"]
-        if conf["version"] != manifest["version"] or conf["language"] != manifest["language"]:
-            raise PilotError("Original SWORD .conf release identity/language mismatch")
+        identity_matches = (conf["version"] == manifest["version"]
+                            and conf["language"] == manifest["language"])
+        if stage == "2" and not identity_matches:
+            raise PilotError(
+                "Pinned original SWORD .conf identity/language differs from reviewed manifest")
+        # Observation must reveal publisher metadata drift, not hide it behind
+        # a generic exception. It is never proof that a new identity is valid:
+        # a changed version/locale must be reviewed and re-pinned before stage 2.
         if conf["driver"] not in COMMENTARY_DRIVERS:
             raise PilotError("Unexpected original commentary driver")
         # A licensor's declaration is metadata evidence, NOT a legal determination.
@@ -147,8 +153,17 @@ def inspect_resource(resource_id: str, stage: str, *, directory: Path | None = N
         confirmed = all(probe["successful"] and not probe["short_response_needs_entry_mapping_review"]
                         for probe in sample["samples"])
         report.update({
-            "status": "observed_not_approved" if stage == "observe"
-                      else "pinned_sword_observed_source_comparison_pending",
+            "status": ("observed_not_approved" if identity_matches else
+                       "observed_identity_discrepancy_needs_review")
+                      if stage == "observe" else
+                      "pinned_sword_observed_source_comparison_pending",
+            "observed_identity_matches_manifest": identity_matches,
+            "identity_discrepancy": (
+                {"manifest_version": manifest["version"],
+                 "observed_version": conf["version"],
+                 "manifest_language": manifest["language"],
+                 "observed_language": conf["language"]}
+                if not identity_matches else {}),
             "download_performed": True,
             "archive_sha256": receipt["sha256"],
             "archive_bytes": receipt["bytes"],

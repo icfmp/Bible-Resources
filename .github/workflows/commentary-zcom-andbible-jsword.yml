@@ -1,14 +1,9 @@
 name: Verify exact original commentary zCom in AndBible stable JSword (not Android GUI)
 
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/commentary-zcom-andbible-jsword.yml'
-      - 'scripts/commentary_andbible_jsword.py'
-      - 'tests/test_commentary_andbible_jsword.py'
-      - 'tests/java/org/icfmp/research/CommentaryAndBibleJSwordProbeTest.java'
-      - 'config/commentary-intake/**'
-      - 'scripts/commentary_stock_candidate.py'
+  # Original MHCC 2.0 research against an unchanged source; now manual-only.
+  # Do not apply historic exact-stock reader expectations to unrelated
+  # commentary intake changes or already source-corrected MHCC 0.1.1 releases.
   workflow_dispatch:
     inputs:
       resource_id:
