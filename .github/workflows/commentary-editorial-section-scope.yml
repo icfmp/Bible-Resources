@@ -1224,3 +1224,90 @@ jobs:
           path: ${{ runner.temp }}/mhcc-011-approved-private-stage/
           retention-days: 7
           if-no-files-found: error
+
+  stage_owner_approved_candidate:
+    name: Integrate verified MHCC binary files into existing draft PR only
+    needs: audit
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.number == 275 &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'audit/mhcc-editorial-section-scope'
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          persist-credentials: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: mhcc-011-verified-pr-payload-not-a-release
+          path: ${{ runner.temp }}/mhcc-011-verified
+      - name: Verify and integrate seven candidate SWORD members in draft PR
+        shell: bash
+        env:
+          PR_SOURCE_BRANCH: ${{ github.event.pull_request.head.ref }}
+          VERIFIED_OUTPUT_ROOT: ${{ runner.temp }}/mhcc-011-verified
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          from zipfile import ZipFile
+
+          evidence = json.loads(Path(
+              "docs/evidence/mhcc-274/mhcc-0.1.1-2026-11-16-private-dated-candidate-DRAFT.json"
+          ).read_text(encoding="utf-8"))
+          assert (evidence["status"] == "verified_private_preparation_day_candidate_not_release"
+                  and evidence["sword_id"] == "MHCC"
+                  and evidence["proposed_version"] == "0.1.1"
+                  and evidence["owner_release_authorized"] is False
+                  and evidence["catalogue_updated"] is False)
+          workspace = Path(os.environ["VERIFIED_OUTPUT_ROOT"])
+          package = workspace / "MHCC-0.1.1.zip"
+          assert package.is_file() and not package.is_symlink()
+          archive_data = package.read_bytes()
+          assert len(archive_data) == evidence["zip_size_bytes"]
+          assert hashlib.sha256(archive_data).hexdigest() == evidence["zip_sha256"]
+          expected = evidence["exact_member_sha256"]
+          assert len(expected) == 7
+          stage = Path("staging/reviewed-mhcc-011/payload")
+          for name in expected:
+              assert name == "mods.d/mhcc.conf" or (
+                  name.startswith("modules/comments/zcom/mhcc/")
+                  and name.rsplit("/", 1)[1] in (
+                      "nt.czs", "nt.czv", "nt.czz",
+                      "ot.czs", "ot.czv", "ot.czz"))
+          with ZipFile(package) as z:
+              assert len(z.infolist()) == 7
+              assert set(z.namelist()) == set(expected)
+              assert z.testzip() is None
+              for item in z.infolist():
+                  assert not item.is_dir()
+                  contents = z.read(item)
+                  assert hashlib.sha256(contents).hexdigest() == expected[item.filename]
+                  direct = workspace / "payload" / item.filename
+                  assert direct.is_file() and direct.read_bytes() == contents
+                  destination = stage / item.filename
+                  if destination.exists():
+                      assert destination.read_bytes() == contents
+                  else:
+                      destination.parent.mkdir(parents=True, exist_ok=True)
+                      destination.write_bytes(contents)
+          print("Verified seven staging blobs, identical to source-attested ZIP;",
+                "committed release=", False)
+          PY
+          git add -- staging/reviewed-mhcc-011/payload
+          if git diff --cached --quiet; then
+            echo "Candidate blobs already staged at exact hashes; nothing to commit."
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'stage: source-attested seven MHCC 0.1.1 binary members for release review'
+            git push origin "HEAD:refs/heads/${PR_SOURCE_BRANCH}"
+          fi
