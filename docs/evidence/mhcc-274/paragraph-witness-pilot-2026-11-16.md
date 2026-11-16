@@ -10,12 +10,12 @@ A reusable `scripts/commentary_paragraph_witness_probe.py` compares exact **nati
 
 ## Six representative original source observations
 
-[Exact real corpus pilot #43808286629](https://github.com/icfmp/Bible-Resources/actions/runs/43808286629) **SUCCESS**, including all previous source/compiled I/K/TOP integrity and authentic Xiphos navigation regressions. Preliminary word-whole comparison strengthened in [later PR commits](https://github.com/icfmp/Bible-Resources/pull/275).
+[Full six-case original/native and independent-source pilot #43809632885](https://github.com/icfmp/Bible-Resources/actions/runs/43809632885) **SUCCESS** on the exact full pinned SWORD corpus, including 28,718 K/1,255 I/2 TOP, complete text/markup/reference-preservation checks and real Xiphos 3/3 navigation probes. This extends the successful [initial section-marker pilot #43808286629](https://github.com/icfmp/Bible-Resources/actions/runs/43808286629) with full paragraph word-token checks, first mismatch location and internal break-marker inspection.
 
 | Original native entry | Original SWORD word tokens | Independent CCEL `<p>` per same section | CCEL paragraph word tokens | Original native prefatory word tokens before unique paragraph match | All CCEL paragraph words in same exact order? |
 | --- | ---: | ---: | ---: | ---: | --- |
 | `K:John.3.1` | 1,569 | **1** | 1,544 | 25 | **Yes** |
-| `K:Exod.12.1` | 969 | **1** | 907 | 62 | **No — interior cross-edition difference(s), despite both unique eight-word anchors** |
+| `K:Exod.12.1` | 969 | **1** | 907 | 62 | **No — one internal digital-edition word-token difference, offset 774** |
 | `K:Matt.4.1` | 760 | **1** | 723 | 37 | **Yes** |
 | `K:Gen.3.1` | 578 | **1** | 509 | 69 | **Yes** |
 | `K:2John.1.1` | 220 | **1** | 182 | 38 | **Yes** |
@@ -23,7 +23,9 @@ A reusable `scripts/commentary_paragraph_witness_probe.py` compares exact **nati
 
 In each of the first **five** cases, both beginning and ending eight-word runs are uniquely located at the expected source-section position in the original native SWORD exposition. **Four** independently digitized CCEL paragraph word streams equal the entire contiguous original SWORD exposition word stream after its existing prefatory markup. Their word-order parity is a strong digital-witness concordance, **not** punctuation, XML, rights, historical print paragraphing or complete edition equivalence.
 
-The `Exod.12.1` source paragraph has exactly the same **word-token length** as the remaining SWORD exposition, with unique first and last eight-token anchors, but its **interior** does not match exactly. The added generic difference counter must report the actual position/count and classify it as an **unreviewed cross-digital-edition variant**. Neither text is allowed to replace the other automatically.
+The `Exod.12.1` source paragraph has the same **907-word-token length** as the remaining SWORD exposition, with unique first and last eight-token anchors. The refined full-source audit finds **exactly one different internal case-folded word token**, at **zero-based CCEL paragraph token offset 774** (the 775th token), compared with **zero** differences for the four other K examples. This is an **unreviewed variant between digital editions**, not an established transcription error or a reason to replace one version with another.
+
+**Second-level paragraph-markup proof:** In **all five** matched CCEL source `<p>` elements, the internal `<br>`, `<lb>`, `<l>`, `<lg>`, nested `<p>`, nested `<div>` and literal blank-line counts are **zero**. A synthetic regression demonstrates that a `<br>` inside an otherwise single `<p>` would be detected. Thus the selected CCEL digital sections supply **no additional original internal paragraph or line breaks to restore**. This does not establish authorial or Moody print-edition paragraphing, nor certify real-reader display.
 
 The original `Lev.19` prose is present in native **I chapter-introduction** storage with no original K for the chapter, and the established separate source-chapter audit discusses its source location. Do **not** infer that missing a `scripCom` section-start marker means the prose is lost, or move its text to K addresses.
 
