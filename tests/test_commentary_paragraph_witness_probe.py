@@ -36,6 +36,11 @@ class ParagraphWitnessProbeTest(unittest.TestCase):
         self.assertTrue(row["marker_inside_p"])
         self.assertEqual(row["candidate_source_section_p_count"], 2)
         self.assertEqual(row["paragraphs_with_both_unique_8_word_anchors"], 2)
+        self.assertEqual(
+            row["source_paragraphs_with_all_words_in_exact_original_order"], 2)
+        self.assertTrue(all(
+            x["all_source_p_words_exact_contiguous_original_order"]
+            for x in row["source_paragraph_lexical_anchors"]))
         self.assertLess(row["source_paragraph_lexical_anchors"][0][
             "unique_native_start_token_offset"], row["source_paragraph_lexical_anchors"][1][
                 "unique_native_start_token_offset"])
@@ -49,6 +54,8 @@ class ParagraphWitnessProbeTest(unittest.TestCase):
         result = compare_paragraph_witness(source, [("I", "Lev.19", a)])
         self.assertEqual(result["results"][0]["candidate_source_section_p_count"], 1)
         self.assertEqual(result["results"][0]["paragraphs_with_both_unique_8_word_anchors"], 1)
+        self.assertEqual(result["results"][0][
+            "source_paragraphs_with_all_words_in_exact_original_order"], 1)
         self.assertFalse(result["results"][0]["candidate_para_boundaries_authorized"])
 
     def test_missing_or_duplicate_source_marker_is_not_converted_to_a_boundary(self):
@@ -62,6 +69,23 @@ class ParagraphWitnessProbeTest(unittest.TestCase):
                          ["NO_UNIQUE_INDEPENDENT_MARKER",
                           "NO_UNIQUE_INDEPENDENT_MARKER"])
         self.assertFalse(result["original_stock_or_source_modified"])
+
+    def test_same_8_word_end_anchors_do_not_hide_changed_middle_prose(self):
+        first = b"beginning with eight absolutely unique authorial words for source"
+        last = b"finishing with eight different unique authorial words for source"
+        reference = first + b" faithful original center text " + last
+        altered = first + b" replaced original center text " + last
+        source = document(
+            b"<div1><div2><p><scripCom osisRef='Bible:John.3.1'/>"
+            + reference + b"</p></div2></div1>"
+        )
+        result = compare_paragraph_witness(source, [
+            ("K", "John.3.1", b"<div/>" + altered)])
+        row = result["results"][0]
+        self.assertEqual(row["paragraphs_with_both_unique_8_word_anchors"], 1)
+        self.assertEqual(
+            row["source_paragraphs_with_all_words_in_exact_original_order"], 0)
+        self.assertFalse(row["source_digital_edition_equivalence_proven"])
 
     def test_chapter_marker_outside_div2_remains_unresolved(self):
         source = document(b"<div1><scripCom osisRef='Bible:Lev.19'/>"
