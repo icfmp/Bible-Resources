@@ -86,7 +86,8 @@ class PublicationCoverageTests(unittest.TestCase):
         with TemporaryDirectory() as tmp:
             root = Path(tmp)
             old, catalogue, _ = self.fixture(root)
-            upgraded = dict(old, version="0.1.1", tag="sample-0.1.1")
+            upgraded = dict(old, version="0.1.1", tag="sample-0.1.1",
+                            zip_name="BRSAMPLE-0.1.1.zip")
             next_file = root / "config/release-plans/sample-0.1.1.json"
             next_file.write_text(json.dumps(upgraded))
             with self.assertRaisesRegex(ReleaseCoverageError, "Duplicate"):
