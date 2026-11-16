@@ -15,6 +15,7 @@ on:
       - 'tests/test_commentary_reference_registry_triage.py'
       - 'scripts/commentary_literal_erratum_preflight.py'
       - 'scripts/commentary_source_erratum_compiled_probe.py'
+      - 'docs/evidence/mhcc-274/mhcc-0.1.1-2026-11-16-private-dated-candidate-DRAFT.json'
       - 'tests/test_commentary_source_erratum_compiled_probe.py'
       - 'scripts/commentary_public_metadata_preflight.py'
       - 'tests/test_commentary_public_metadata_preflight.py'
@@ -258,6 +259,8 @@ jobs:
               raise AssertionError("Unknown native module link capability result")
           PY
       - name: Audit all original stock section headings against native occupied slots
+        env:
+          BIBLE_RESOURCES_PRIVATE_CANDIDATE_DAY: '2026-11-16'
         run: |
           set -euo pipefail
           python scripts/commentary_section_scope_audit.py \
@@ -623,6 +626,43 @@ jobs:
                 "ZIP SHA-256",dated["package_sha256"],
                 "uploaded",dated["zip_uploaded_or_distributed"],
                 "published",dated["owner_release_authorized"])
+          # Freeze and independently re-check the genuine 2026-11-16 date
+          # rehearsal against a metadata-only receipt from its first successful
+          # exact-source full SWORD build. No approval or distributable implied.
+          frozen=json.loads(Path(
+              "docs/evidence/mhcc-274/mhcc-0.1.1-2026-11-16-private-dated-candidate-DRAFT.json"
+          ).read_text(encoding="utf-8"))
+          assert frozen["status"]=="verified_private_preparation_day_candidate_not_release"
+          assert frozen["resource_id"]=="mhcc-crosswire"
+          assert frozen["sword_id"]==dated["module_id"]=="MHCC"
+          assert frozen["proposed_version"]==dated["version"]=="0.1.1"
+          assert frozen["candidate_utc_preparation_day"]==dated["utc_preparation_day_not_owner_approved_release_day"]
+          assert frozen["crosswire_original_archive_sha256"]==attestation["review_manifest"]["original_archive_sha256"]
+          assert frozen["source_audit_sha256"]==attestation["source_audit_sha256"]
+          assert frozen["corrected_complete_native_corpus_sha256"]==dated["exact_native_corpus_sha256"]
+          assert frozen["exact_member_sha256"]==dated["seven_member_sha256"]
+          assert frozen["zip_sha256"]==dated["package_sha256"]
+          assert frozen["zip_size_bytes"]==dated["package_size_bytes"]
+          assert frozen["zip_member_count"]==len(dated["seven_member_sha256"])==7
+          assert frozen["original_numbered_K_count"]==attestation["original_native_K_count"]
+          assert frozen["new_reviewed_K_alias_count"]==attestation["added_native_K_count"]
+          assert frozen["source_corrected_original_K_address_count"]==attestation["original_K_keys_edited"]
+          assert frozen["original_intro_I_count"]==attestation["source_audit"]["original_native_counts"]["I"]
+          assert frozen["original_TOP_count"]==attestation["source_audit"]["original_native_counts"]["TOP"]
+          assert frozen["real_corrected_xiphos_passage_matches"]==attestation["real_reader_sample_count"]
+          assert all(frozen[k] is True for k in (
+              "six_compiled_data_files_unchanged_from_verified_source",
+              "only_attributed_conf_and_revision_day_changed"))
+          assert all(frozen[k] is False for k in (
+              "official_release_date_approved","private_zip_uploaded_or_distributed",
+              "source_payload_committed","catalogue_updated",
+              "original_published_BRMHCC_0_1_0_modified",
+              "owner_release_authorized",
+              "editorial_and_rights_release_signoff_complete"))
+          print("Replayed pinned dated private MHCC ZIP:",
+                frozen["candidate_utc_preparation_day"],
+                frozen["zip_size_bytes"],frozen["zip_sha256"],
+                "catalogue",frozen["catalogue_updated"])
           print("Pinned independent private MHCC six-member receipt: source/native/ZIP proofs exact; NOT PUBLIC")
           print("Real native audit to exact seven-member ZIP bridge:",
                 "original audit",package_proof["source_audit_sha256"],
