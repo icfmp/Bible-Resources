@@ -291,5 +291,6 @@
   "chapter_expansion_changes_authorized": false,
   "release_authorized": false,
   "proposed_next_version": "0.1.1",
+  "proposed_next_sword_id": "MHCC",
   "package_staging_only": true
 }
