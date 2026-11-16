@@ -13,21 +13,29 @@ from pathlib import Path
 import re
 from zipfile import ZipFile, ZIP_DEFLATED, ZipInfo
 
+from reviewed_compiled_commentary_rebuild import zcom_member_suffixes
+
 MODULE_ID = re.compile(r"^[A-Za-z][A-Za-z0-9_]{1,39}$")
 STAMP = (1980, 1, 1, 0, 0, 0)
 DRIVER_LAYOUT = {
-    "RawText": ("rawtext", ("nt", "nt.vss", "ot", "ot.vss")),
-    "zText": ("ztext", tuple(
-        f"{book}.{extension}"
-        for book in ("nt", "ot")
-        for extension in ("bzs", "bzv", "bzz")
-    )),
-    "zCom": ("zcom", tuple(
-        f"{book}.{extension}"
-        for book in ("nt", "ot")
-        for extension in ("bzs", "bzv", "bzz")
-    )),
+    "RawText": "rawtext",
+    "zText": "ztext",
+    "zCom": "zcom",
 }
+
+
+def _required_members(driver: str, fields: dict[str, str]) -> tuple[str, ...]:
+    """Return standard SWORD member names for the actual compressed block size.
+
+    A zCom `CHAPTER` corpus contains `*.cz*`, not the `*.bz*` files
+    used by `BOOK` modules. Shared native naming rules are reused rather
+    than deriving filenames from an edition-specific release.
+    """
+    if driver == "RawText":
+        return ("nt", "nt.vss", "ot", "ot.vss")
+    if driver in ("zText", "zCom"):
+        return zcom_member_suffixes(fields["BlockType"])
+    raise ValueError("Unsupported SWORD module driver")
 MAX_ARCHIVE_MEMBER_BYTES = 40_000_000
 MAX_TOTAL_DATA_BYTES = 240_000_000
 
@@ -97,19 +105,23 @@ def promote(source: Path, destination: Path, *, expected_source_sha256: str,
     if driver not in DRIVER_LAYOUT or not re.fullmatch(
             r"[A-Za-z][A-Za-z0-9]{1,31}", versification):
         raise ValueError("Unknown SWORD driver or versification")
-    layout, filenames = DRIVER_LAYOUT[driver]
+    layout = DRIVER_LAYOUT[driver]
     original = source.read_bytes()
     if digest(original) != expected_source_sha256:
         raise ValueError("SWORD source ZIP SHA-256 changed")
     category_dir = "comments" if driver == "zCom" else "texts"
     old_dir = f"modules/{category_dir}/{layout}/{source_id.lower()}/"
     new_dir = f"modules/{category_dir}/{layout}/{destination_id.lower()}/"
-    expected = {f"mods.d/{source_id.lower()}.conf", *(old_dir + f for f in filenames)}
+    original_config = f"mods.d/{source_id.lower()}.conf"
     with ZipFile(source) as archive:
-        # Inspect the bounded declared inventory before CRC/decompression so
-        # an oversized or duplicate member is never needlessly expanded.
+        # The effective `BlockType` determines the exact native member set.
+        # Before reading even the config, bound inventory, member type and
+        # decompressed sizes; a duplicate config/member can never be trusted.
         members = archive.infolist()
-        if len(members) != len(expected) or {i.filename for i in members} != expected:
+        expected_count = 5 if driver == "RawText" else 7
+        if (len(members) != expected_count
+                or len({i.filename for i in members}) != expected_count
+                or original_config not in {i.filename for i in members}):
             raise ValueError("Unexpected SWORD ZIP inventory")
         if any(i.is_dir() or ((i.external_attr >> 16) & 0o170000)
                not in (0, 0o100000) or i.file_size > MAX_ARCHIVE_MEMBER_BYTES
@@ -120,10 +132,15 @@ def promote(source: Path, destination: Path, *, expected_source_sha256: str,
         if archive.testzip() is not None:
             raise ValueError("Corrupt SWORD ZIP")
         source_fields = _require_config_fields(
-            archive.read(f"mods.d/{source_id.lower()}.conf"),
+            archive.read(original_config),
             module_id=source_id, path=old_dir, driver=driver,
             versification=versification)
-        data = {new_dir + f: archive.read(old_dir + f) for f in filenames}
+        filenames = _required_members(driver, source_fields)
+        expected = {original_config, *(old_dir + name for name in filenames)}
+        if {i.filename for i in members} != expected:
+            raise ValueError("Compressed block type does not match native ZIP members")
+        data = {new_dir + name: archive.read(old_dir + name)
+                for name in filenames}
     revised = config.read_bytes()
     destination_fields = _require_config_fields(
         revised, module_id=destination_id, path=new_dir,
@@ -132,6 +149,8 @@ def promote(source: Path, destination: Path, *, expected_source_sha256: str,
             source_fields[k] != destination_fields[k]
             for k in ("BlockType", "CompressType")):
         raise ValueError("Compressed SWORD algorithm or block size changed")
+    if _required_members(driver, destination_fields) != filenames:
+        raise ValueError("Destination block layout does not match original SWORD bytes")
     data[f"mods.d/{destination_id.lower()}.conf"] = revised
     destination.parent.mkdir(parents=True, exist_ok=True)
     try:
