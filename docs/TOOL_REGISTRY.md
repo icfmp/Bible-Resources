@@ -53,7 +53,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_literal_erratum_preflight.py`](../scripts/commentary_literal_erratum_preflight.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/commentary_native_inventory.py`](../scripts/commentary_native_inventory.py) | KEEP_GENERIC | not established | 10 | source/native audit |
 | [`scripts/commentary_native_raw_inventory.py`](../scripts/commentary_native_raw_inventory.py) | KEEP_GENERIC | named test | 11 | source/native audit |
-| [`scripts/commentary_navigation_link_plan.py`](../scripts/commentary_navigation_link_plan.py) | UNDECIDED | named test | 4 | not determined |
+| [`scripts/commentary_navigation_link_plan.py`](../scripts/commentary_navigation_link_plan.py) | UNDECIDED | named test | 5 | not determined |
 | [`scripts/commentary_near_prose_unicode_review.py`](../scripts/commentary_near_prose_unicode_review.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_nonlink_word_alignment.py`](../scripts/commentary_nonlink_word_alignment.py) | MERGE | named test | 9 | not determined |
 | [`scripts/commentary_nonlink_words.py`](../scripts/commentary_nonlink_words.py) | MERGE | named test | 2 | not determined |
@@ -70,7 +70,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_public_metadata_preflight.py`](../scripts/commentary_public_metadata_preflight.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/commentary_rebuild_attestation_draft.py`](../scripts/commentary_rebuild_attestation_draft.py) | UNDECIDED | named test | 3 | publication/release |
 | [`scripts/commentary_reference_cross_slot.py`](../scripts/commentary_reference_cross_slot.py) | MERGE | named test | 4 | not determined |
-| [`scripts/commentary_reference_registry_triage.py`](../scripts/commentary_reference_registry_triage.py) | UNDECIDED | named test | 5 | not determined |
+| [`scripts/commentary_reference_registry_triage.py`](../scripts/commentary_reference_registry_triage.py) | UNDECIDED | named test | 6 | not determined |
 | [`scripts/commentary_section_scope_audit.py`](../scripts/commentary_section_scope_audit.py) | UNDECIDED | named test | 3 | source/native audit |
 | [`scripts/commentary_shared_raw_source_units.py`](../scripts/commentary_shared_raw_source_units.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_source_english_osis_alias.py`](../scripts/commentary_source_english_osis_alias.py) | UNDECIDED | named test | 5 | not determined |
