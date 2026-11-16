@@ -4,6 +4,8 @@ on:
     paths:
       - '.github/workflows/commentary-modern-source-receipt.yml'
       - 'scripts/commentary_modern_source_receipt.py'
+      - 'scripts/commentary_modern_reference_gate.py'
+      - 'tests/test_commentary_modern_reference_gate.py'
       - 'tests/test_commentary_modern_source_receipt.py'
       - 'work/mhcc-modern/**'
   workflow_dispatch:
@@ -22,7 +24,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Test source-native and draft-coverage guards on synthetic fixtures
-        run: python -m unittest tests/test_commentary_modern_source_receipt.py tests/test_commentary_modern_draft_guard.py tests/test_commentary_modern_draft_osis_preview.py -v
+        run: python -m unittest tests/test_commentary_modern_source_receipt.py tests/test_commentary_modern_draft_guard.py tests/test_commentary_modern_draft_osis_preview.py tests/test_commentary_modern_reference_gate.py -v
       - name: Install real SWORD source reader
         shell: bash
         run: |
@@ -109,6 +111,28 @@ jobs:
                         " sha256="+u["raw_sha256"]+
                         " markup="+json.dumps(u["markup"],sort_keys=True))
           print("Full source-native gate PASS (not independent semantic or build acceptance)")
+          PY
+      - name: Verify Genesis 1 native original scripture link identities
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_modern_reference_gate.py \
+            --native-reader "${RUNNER_TEMP}/commentary-modern-source-raw" \
+            --module-directory "${RUNNER_TEMP}/mhcc-source-root" \
+            --module-id MHCC \
+            --source-map work/mhcc-modern/production/genesis-01.SOURCE_MAP.json \
+            --expected-references work/mhcc-modern/production/genesis-01.REFERENCE_EXPECTATIONS.json \
+            --modern-candidate work/mhcc-modern/production/genesis-01.CANDIDATE.md \
+            --report "${RUNNER_TEMP}/mhcc-modern-genesis01-native-reference-proof.json"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          report=json.loads((Path(os.environ["RUNNER_TEMP"])/"mhcc-modern-genesis01-native-reference-proof.json").read_text())
+          assert report["source_unique_units_checked"]==8
+          assert report["original_reference_links_checked"]==2
+          assert report["original_osisRef_literal_values_exported"] is False
+          assert report["new_modern_osis_reference_targets_embedded"] is False
+          print("Exact Genesis 1 native source link identities verified; final OSIS mapping unapproved")
           PY
       - name: Compare committed 24 draft section labels and source pins with attested native metadata
         shell: bash
