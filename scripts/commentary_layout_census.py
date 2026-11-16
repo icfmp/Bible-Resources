@@ -166,17 +166,15 @@ class NativeCommentaryLayoutCensus:
             raise ValueError("Unbounded original native commentary entries")
         if kind == "K":
             self.chapter_keys[key.rsplit(".", 1)[0]].append(key)
-        digest = sha256(raw).hexdigest()
+        digest = (kind, sha256(raw).hexdigest())
         if digest not in self.unique:
             if len(self.unique) >= MAX_BODIES:
                 raise ValueError("Unbounded distinct original commentary layout bodies")
             self.unique[digest] = {"kind": kind, "key": key,
                                    "profile": layout_profile(raw)}
         else:
-            if self.unique[digest]["kind"] != kind:
-                # Legitimate aliases may share K payload; K/I ownership
-                # differences are recorded, not conflated.
-                self.keys["shared_K_I_raw"] += 1
+            # A native K alias shares an authored body, but a structurally
+            # different I/K slot is never collapsed across entry kinds.
             self.aliases += 1
 
     def report(self) -> dict:
