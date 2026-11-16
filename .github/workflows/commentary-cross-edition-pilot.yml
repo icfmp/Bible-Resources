@@ -49,12 +49,17 @@ jobs:
           import json,os
           from pathlib import Path
           r=json.loads((Path(os.environ["RUNNER_TEMP"])/"wesley-intake-observation.json").read_text())
-          assert r["status"] in ("observed_not_approved","pinned_sword_observed_source_comparison_pending")
+          assert r["status"] in (
+              "observed_not_approved",
+              "observed_identity_discrepancy_needs_review",
+              "pinned_sword_observed_source_comparison_pending")
           assert r["module_id"]=="Wesley" and r["published"] is False
           assert r["full_original_to_module_parity"] is False
           assert r["copyright_and_redistribution_approved"] is False
           assert r["editorial_approved"] is False
           assert r["sword_conf"]["driver"] in ("RawCom","RawCom4","zCom","zCom4")
+          print("Wesley publisher identity:", r["sword_conf"]["version"],
+                "lang:",r["sword_conf"]["language"],"status:",r["status"])
           print("Wesley stock observation complete: driver",r["sword_conf"]["driver"],
                 "ZIP SHA-256",r["archive_sha256"],
                 "ZIP bytes",r["archive_bytes"],
