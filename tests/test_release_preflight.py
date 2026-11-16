@@ -32,7 +32,17 @@ class CrossEditionReleasePreflightTests(unittest.TestCase):
             self.assertRegex(record["package_sha256"], r"^[a-f0-9]{64}$")
             self.assertGreater(record["package_size_bytes"], 0)
             self.assertTrue(record["native_payload_member_identity_verified"])
-            self.assertTrue(record["release_authorization_verified_in_current_plan"])
+            if record["resource_id"]=="lsg-1910":
+                self.assertEqual(record["release_route"], "frozen_historical_binding")
+                self.assertFalse(record["release_authorization_verified_in_current_plan"])
+                self.assertTrue(record["frozen_historical_evidence_verified"])
+                self.assertRegex(record["historical_github_asset_sha256"],
+                                 r"^[a-f0-9]{64}$")
+            else:
+                self.assertEqual(record["release_route"], "current_reviewed_plan")
+                self.assertTrue(record["release_authorization_verified_in_current_plan"])
+                self.assertFalse(record["frozen_historical_evidence_verified"])
+            self.assertFalse(record["historical_github_asset_verified_online"])
             self.assertFalse(record["public_download_checked"])
         self.assertFalse(report["source_text_exported"])
         self.assertFalse(report["module_content_mutated"])
@@ -41,17 +51,31 @@ class CrossEditionReleasePreflightTests(unittest.TestCase):
 
     def test_real_preflight_matches_approved_three_distinct_release_plans(self):
         by_id = {r["resource_id"]: r for r in self.report["modules"]}
+        legacy = json.loads((ROOT/"config/release-legacy-bindings.json")
+                            .read_text(encoding="utf-8"))
+        by_legacy = {v["module_id"]: v for v in legacy["entries"]}
         for record in by_id.values():
-            path = ROOT / "config/release-plans" / (
-                record["release_tag"] + ".json")
-            plan = json.loads(path.read_text(encoding="utf-8"))
             with self.subTest(resource=record["resource_id"]):
-                self.assertEqual(record["package_sha256"],
-                                 plan["package_sha256"])
-                self.assertEqual(record["package_size_bytes"],
-                                 plan["package_size_bytes"])
-                self.assertEqual(record["sword_id"], plan["sword_id"])
-                self.assertEqual(record["version"], plan["version"])
+                if record["release_route"] == "frozen_historical_binding":
+                    old = by_legacy[record["resource_id"]]
+                    self.assertEqual(record["package_sha256"],
+                                     old["catalogue_sha256"])
+                    self.assertEqual(record["package_size_bytes"],
+                                     old["catalogue_size_bytes"])
+                    self.assertEqual(record["historical_github_asset_sha256"],
+                                     old["release_sha256"])
+                    self.assertEqual(record["sword_id"], old["sword_id"])
+                    self.assertEqual(record["version"], old["version"])
+                else:
+                    path = ROOT / "config/release-plans" / (
+                        record["release_tag"] + ".json")
+                    plan = json.loads(path.read_text(encoding="utf-8"))
+                    self.assertEqual(record["package_sha256"],
+                                     plan["package_sha256"])
+                    self.assertEqual(record["package_size_bytes"],
+                                     plan["package_size_bytes"])
+                    self.assertEqual(record["sword_id"], plan["sword_id"])
+                    self.assertEqual(record["version"], plan["version"])
 
     def test_unknown_or_repeated_or_malicious_resource_ids_fail_closed(self):
         for values in ((), ("does-not-exist",),
