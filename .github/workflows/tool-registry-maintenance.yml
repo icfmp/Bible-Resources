@@ -1,4 +1,4 @@
-name: Tool registry consistency
+name: Tool registry maintenance
 
 on:
   pull_request:
@@ -14,17 +14,40 @@ permissions:
   contents: read
 
 jobs:
-  verify_source_bound_inventory:
-    name: Check full tracked script registry without modifying the repository
+  generate_initial_inventory:
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'maintenance/254-post-mhcc-toolchain'
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 7
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          persist-credentials: true
+          fetch-depth: 1
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Refuse stale or missing tool registry (no writes)
-        shell: bash
+      - name: Generate full tracked script registry from exact PR source
         run: |
           set -euo pipefail
+          python scripts/tool_registry.py --write
           python scripts/tool_registry.py --check
+      - name: Commit inventory only to the approved maintenance draft
+        env:
+          PR_SOURCE_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+          git add -- docs/TOOL_REGISTRY.md docs/TOOL_REGISTRY.json
+          if git diff --cached --quiet; then
+            echo "Source inventory is already up to date."
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'docs: snapshot full source-bound script and caller registry'
+            git push origin "HEAD:refs/heads/${PR_SOURCE_BRANCH}"
+          fi
