@@ -73,6 +73,10 @@ def approved_release(root: Path, plan_file: Path, built: Path) -> dict:
         raise ReleaseError("Release ID, archive fingerprint or version invalid")
     if not plan["tag"].endswith("-" + plan["version"]):
         raise ReleaseError("Release tag and curated version differ")
+    # A renamed SWORD ID must not silently ship an archive bearing the
+    # previous identifier, despite the ZIP itself containing valid bytes.
+    if plan["zip_name"] != plan["sword_id"] + "-" + plan["version"] + ".zip":
+        raise ReleaseError("Versioned release ZIP name differs from current SWORD ID")
     if (not isinstance(plan["title"], str) or not plan["title"].strip()
             or len(plan["title"]) > 140):
         raise ReleaseError("Missing public release title")
