@@ -444,7 +444,7 @@ jobs:
           assert preview["preflight_candidate_section_count"]==17
           staging=preview["private_versioned_package_install_not_released"]
           assert staging["status"]=="PRIVATE_VERSIONED_SWORD_ZCOM_ZIP_ISOLATED_INSTALL_PARITY_NOT_PUBLICATION"
-          assert staging["curated_module_id"]=="BRMHCC"
+          assert staging["curated_module_id"]=="MHCC"
           assert staging["proposed_version"]=="0.1.1"
           assert staging["original_native_I_count"]==1255
           assert staging["original_and_alias_native_K_count"]==28742
@@ -470,7 +470,7 @@ jobs:
           assert staged_gui["actual_passage_commands_accepted"] is True
           assert staged_gui["source_prose_or_screenshot_uploaded"] is False
           assert staged_gui["published"] is False
-          print("Real versioned BRMHCC 0.1.1 installed ZIP Xiphos navigation:",
+          print("Real versioned MHCC 0.1.1 installed ZIP Xiphos navigation:",
                 "sample",staged_gui["sample_count"],
                 "real GUI matches",staged_gui["independent_gui_commentary_excerpt_match_count"],
                 "commands accepted",staged_gui["actual_passage_commands_accepted"],
@@ -518,7 +518,7 @@ jobs:
           assert revised["owner_publication_authorized"] is False
           rehearsal=revised["private_full_release_metadata_and_native_rehearsal"]
           assert rehearsal["status"]=="PRIVATE_FULL_CONF_AND_SWORD_ZCOM_ZIP_REHEARSAL_NOT_RELEASE"
-          assert rehearsal["module_id"]=="BRMHCC"
+          assert rehearsal["module_id"]=="MHCC"
           assert rehearsal["version"]=="0.1.1"
           assert rehearsal["compiled_block_type"]=="CHAPTER"
           assert rehearsal["all_six_native_compiled_members_preserved"] is True
