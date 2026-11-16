@@ -245,7 +245,8 @@ def probe_private_compiled_source_erratum(
         scratch: Path, native_raw_binary: Path,
         native_index_binary: Path,
         history_note: str, source_provider: str,
-        test_with_real_xiphos: bool = True) -> dict:
+        test_with_real_xiphos: bool = True,
+        additional_original_source_edits: list[dict] | None = None) -> dict:
     """Build and test a second wholly private corrected compiled SWORD ZIP."""
     if (not test_with_real_xiphos or not scratch.is_dir()
             or scratch.is_symlink() or not reviewed_aliases
@@ -284,6 +285,17 @@ def probe_private_compiled_source_erratum(
     if (original_master_key not in modified_original_keys
             or not 1 <= len(modified_original_keys) <= 250):
         raise ValueError("Original source group cardinality unreviewed")
+    reference_changed_original_keys = set(modified_original_keys)
+    edited_raw_for_original_key = {
+        key: patched for key in reference_changed_original_keys
+    }
+    revised, prose_edited_by_key, prose_receipts = _apply_private_reviewed_prose_changes(
+        original_numbered, revised, additional_original_source_edits or []
+    )
+    if set(prose_edited_by_key) & modified_original_keys:
+        raise ValueError("A source citation and prose correction overlap one original body")
+    modified_original_keys.update(prose_edited_by_key)
+    edited_raw_for_original_key.update(prose_edited_by_key)
     revised_private_scratch = scratch / "corrected-standard-compiler"
     revised_private_scratch.mkdir()
     full = probe_complete_original_transport(
@@ -318,7 +330,9 @@ def probe_private_compiled_source_erratum(
     if original_native_differences != modified_original_keys:
         raise ValueError("Private source-edit changed K keys outside one original linked section")
     for key in modified_original_keys:
-        delta = classify_native_osis_roundtrip_delta(patched, revised_compiled["K"][key])
+        delta = classify_native_osis_roundtrip_delta(
+            edited_raw_for_original_key[key], revised_compiled["K"][key]
+        )
         if (delta["word_sequence_relation"] != "EXACT_ORIGINAL_WORD_SEQUENCE"
                 or delta["normalized_whitespace_visible_unicode_equal"] is not True
                 or delta["non_div_element_order_and_exact_attribute_values_preserved"] is not True
@@ -401,8 +415,12 @@ def probe_private_compiled_source_erratum(
     return {
         "status": "PRIVATE_SOURCE_EDITED_SWORD_ZCOM_CANDIDATE_FULL_PARITY_NOT_PUBLICATION",
         "original_source_chapter_key": original_master_key,
-        "source_linked_original_verse_keys_changed": len(modified_original_keys),
-        "only_original_linked_source_group_changed": True,
+        "source_linked_original_verse_keys_changed": len(reference_changed_original_keys),
+        "additional_prose_original_verse_keys_changed": len(prose_edited_by_key),
+        "all_source_linked_original_verse_keys_changed": len(modified_original_keys),
+        "additional_prose_original_source_change_receipts": prose_receipts,
+        "only_original_linked_source_group_changed": len(prose_receipts) == 0,
+        "only_exactly_reviewed_original_source_groups_changed": True,
         "exact_original_K_keys_changed": sorted(modified_original_keys),
         "all_other_original_and_alias_K_bytes_identical_to_index_only_compilation": True,
         "all_original_I_and_TOP_bytes_identical_to_index_only_compilation": True,
