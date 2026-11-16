@@ -38,10 +38,14 @@
     "date": "2026-11-07",
     "receipt": "https://github.com/icfmp/Bible-Resources/blob/main/docs/evidence/normalizer-3/real-pilot-source-signals.json",
     "action": "https://github.com/icfmp/Bible-Resources/actions/runs/42362111699",
-    "original_zip_digest_recheck_pending": true,
+    "original_zip_digest_recheck_pending": false,
     "original_markup_parity_verified": false,
-    "full_native_corpus_verified": false
+    "full_native_corpus_verified": true,
+    "pinned_stock_native_index_run": "https://github.com/icfmp/Bible-Resources/actions/runs/43945404124",
+    "pinned_stock_raw_corpus_run": "https://github.com/icfmp/Bible-Resources/actions/runs/43946314351",
+    "stock_source_native_audit_report": "https://github.com/icfmp/Bible-Resources/blob/feature/mhc-crosswire-intake/docs/evidence/mhc-285/crosswire-mhc-stock-native-audit-2026-11-16.md"
   },
   "import_issue": "https://github.com/icfmp/Bible-Resources/issues/285",
-  "initial_pilot_issue": "https://github.com/icfmp/Bible-Resources/issues/12"
+  "initial_pilot_issue": "https://github.com/icfmp/Bible-Resources/issues/12",
+  "native_raw_corpus_sha256": "2c4fe82710165202fdec300ca9636a150a9998f19c7b19ee4e81db5a6b75f5b5"
 }
