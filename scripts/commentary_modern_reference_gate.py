@@ -35,17 +35,24 @@ def canonical_only_for_comparison(target: str) -> str:
     return target
 
 
-def _original_reference_targets(raw: bytes) -> list[str]:
+def _source_reference_literals(raw: bytes) -> list[str]:
+    """Return exact literal original link targets IN MEMORY ONLY."""
     try:
         node = ET.fromstring(b"<source>" + raw + b"</source>")
     except ET.ParseError as exc:
         raise ValueError("Original native XML is malformed; do not guess links") from exc
-    references = []
+    references=[]
     for element in node.iter():
         if isinstance(element.tag,str) and element.tag.rsplit("}",1)[-1] == "reference":
-            literal = element.attrib.get("osisRef")
-            references.append(canonical_only_for_comparison(literal))
+            literal=element.attrib.get("osisRef")
+            canonical_only_for_comparison(literal)
+            references.append(literal)
     return references
+
+
+def _original_reference_targets(raw: bytes) -> list[str]:
+    return [canonical_only_for_comparison(value)
+            for value in _source_reference_literals(raw)]
 
 
 class SourceReferenceGate:
@@ -64,6 +71,7 @@ class SourceReferenceGate:
         self.expected=expected_refs
         self.candidate=candidate
         self.seen={}
+        self._private_literal_links={}
         intro_rows=source_map.get("introductions",[])
         if not isinstance(intro_rows,list):
             raise ValueError("Original chapter/book introduction list invalid")
@@ -109,7 +117,8 @@ class SourceReferenceGate:
         digest=hashlib.sha256(raw).hexdigest()
         if not _SHA.fullmatch(unit["source_sha256"]) or unit["source_sha256"]!=digest:
             raise ValueError("Source first native section changed from pinned SHA")
-        original=_original_reference_targets(raw)
+        literals=_source_reference_literals(raw)
+        original=[canonical_only_for_comparison(value) for value in literals]
         expected=[i["canonical_target"] for i in self.expected[key]]
         if original != expected:
             raise ValueError("Original reference destinations diverge from predeclared native expectations")
@@ -117,12 +126,18 @@ class SourceReferenceGate:
         source_count=markup.get("tag_counts",{}).get("reference",0)
         if len(original)!=source_count:
             raise ValueError("Exact source-native XML reference count differs from structural inventory")
+        self._private_literal_links[key]=literals
         self.seen[key]={"reference_count":len(original),
                         "source_raw_sha256":digest,
                         "source_original_reference_identity_sha256":[
                             hashlib.sha256(r.encode("utf-8")).hexdigest()
                             for r in original],
                         "draft_marker_present":True}
+
+    def exact_source_link_literals_after_verified_source(self, raw_source_report: dict):
+        """Use only inside an isolated builder, never serialize the returned dict."""
+        self.report(raw_source_report)
+        return {key:list(values) for key,values in self._private_literal_links.items()}
 
     def report(self, raw_source_report: dict) -> dict:
         pin=self.source_map.get("verified_entire_native_corpus_sha256")
