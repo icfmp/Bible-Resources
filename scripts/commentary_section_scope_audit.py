@@ -2402,6 +2402,8 @@ def main(argv=None) -> int:
         # exception arguments, authorial text, OSIS XML or user-provided paths.
         allow = {"commentary_rebuild_attestation_draft.py",
                  "commentary_source_erratum_compiled_probe.py",
+                 "commentary_osis_mixed_transport_probe.py",
+                 "commentary_xiphos_dual_reader.py",
                  "commentary_section_scope_audit.py"}
         frames = [
             (Path(frame.filename).name, frame.name, frame.lineno)
