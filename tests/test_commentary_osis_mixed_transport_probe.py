@@ -1,5 +1,6 @@
 """Invented-only mixed original I and K OSIS transport regression."""
 import sys
+from hashlib import sha256
 from pathlib import Path
 import unittest
 from tempfile import TemporaryDirectory
@@ -199,6 +200,43 @@ class MixedOriginalTransportTests(unittest.TestCase):
         self.assertEqual(len(document.xpath(
             "//*[local-name()='div' and @annotateRef='Gen.36.1-Gen.36.2']"
         )),1)
+
+    def test_private_mixed_original_first_verse_alias_preserves_source_raw_without_approval(self):
+        original = b'<div><p>Invented commentary; punctuation remains!</p></div>'
+        source = [("Gen.36.2", original), ("Gen.36.3", original)]
+        proposed = {"Gen.36.1": {
+            "link_to": "Gen.36.2",
+            "source_raw_sha256": sha256(original).hexdigest(),
+        }}
+        xml, meta = build_mixed_original_transport(
+            "Gen.36", b"<div type='book'/>", b"<div type='chapter'/>",
+            source, work_id="MixedAliasTest",
+            provisional_index_aliases=proposed,
+        )
+        root = etree.fromstring(xml)
+        self.assertEqual(len(root.xpath(
+            "//*[local-name()='div' and @annotateRef='Gen.36.1-Gen.36.3']"
+        )), 1)
+        self.assertEqual(xml.count(original), 1)
+        self.assertEqual(meta["provisional_index_alias_count"], 1)
+        self.assertTrue(meta["provisional_index_aliases_not_editorially_approved"])
+        self.assertFalse(meta["source_intro_raw_modified"])
+        self.assertFalse(meta["source_k_raw_modified"])
+        self.assertFalse(meta["source_published"])
+        for unsafe in (
+            {"Gen.36.2": proposed["Gen.36.1"]},
+            {"Gen.37.1": proposed["Gen.36.1"]},
+            {"Gen.36.1": {"link_to": "Gen.36.99",
+                            "source_raw_sha256": sha256(original).hexdigest()}},
+            {"Gen.36.1": {"link_to": "Gen.36.2",
+                            "source_raw_sha256": "a"*64}},
+        ):
+            with self.subTest(unsafe=unsafe):
+                with self.assertRaises(ValueError):
+                    build_mixed_original_transport(
+                        "Gen.36", b"<div/>", b"<chapter/>", source,
+                        work_id="MixedAliasTest", provisional_index_aliases=unsafe
+                    )
 
     def test_chapter_range_mismatch_and_binary_material_are_blocked(self):
         for rows in (
