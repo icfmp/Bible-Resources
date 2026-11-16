@@ -35,6 +35,9 @@ PUBLIC_REBUILD_ATTESTATION_ERROR_CODES = frozenset({
     "Corrected source hash not tied to reviewed native edit",
     "Added SWORD key does not equal reviewed original master",
     "Missing or unsafe actually installed candidate payload",
+    "Private candidate SWORD config missing",
+    "Private candidate SWORD data member missing",
+    "Private candidate SWORD data member oversized",
 })
 
 SHA = re.compile(r"[0-9a-f]{64}\Z")
@@ -234,9 +237,13 @@ def private_rebuild_attestation_draft(
     package_hashes = {}
     for rel in paths:
         path = installed_candidate_root / rel
-        if (path.is_symlink() or not path.is_file()
-                or path.stat().st_size > 20 * 1024 * 1024):
-            raise ValueError("Missing or unsafe actually installed candidate payload")
+        if path.is_symlink() or not path.is_file():
+            raise ValueError(
+                "Private candidate SWORD config missing" if rel.startswith("mods.d/")
+                else "Private candidate SWORD data member missing"
+            )
+        if path.stat().st_size > 20 * 1024 * 1024:
+            raise ValueError("Private candidate SWORD data member oversized")
         package_hashes[rel] = _sha(path.read_bytes())
     audit = {
         "schema_version": 1,
