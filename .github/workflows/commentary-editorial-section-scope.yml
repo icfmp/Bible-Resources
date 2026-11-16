@@ -8,6 +8,8 @@ on:
       - 'scripts/commentary_editorial_topology.py'
       - 'scripts/commentary_layout_census.py'
       - 'tests/test_commentary_layout_census.py'
+      - 'scripts/commentary_paragraph_witness_probe.py'
+      - 'tests/test_commentary_paragraph_witness_probe.py'
       - 'tests/test_commentary_editorial_topology.py'
       - 'scripts/commentary_reference_registry_triage.py'
       - 'tests/test_commentary_reference_registry_triage.py'
@@ -64,6 +66,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_commentary_section_scope_audit.py' -v
           python -m unittest discover -s tests -p 'test_commentary_editorial_topology.py' -v
           python -m unittest discover -s tests -p 'test_commentary_layout_census.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_paragraph_witness_probe.py' -v
           python -m unittest discover -s tests -p 'test_commentary_reference_registry_triage.py' -v
           python -m unittest discover -s tests -p 'test_commentary_literal_erratum_preflight.py' -v
           python -m unittest discover -s tests -p 'test_commentary_source_erratum_compiled_probe.py' -v
@@ -260,6 +263,7 @@ jobs:
             --temporary-original-intro-sample-chapters Lev.19 Ps.108 \
             --temporary-original-mixed-chapters 2John.1 2Chr.1 Matt.13 \
             --temporary-original-full-transport \
+            --temporary-source-paragraph-witness K:John.3.1 K:Exod.12.1 K:Matt.4.1 K:Gen.3.1 K:2John.1.1 I:Lev.19 \
             --temporary-provisional-range-index-preview \
             --temporary-preview-real-xiphos \
             --synthetic-intro-native-stream "${RUNNER_TEMP}/synthetic-introductions/native.raw"
@@ -773,6 +777,19 @@ jobs:
               print("Candidate range",row["start"],"through",row["declared_end"],
                     row["category"],"missing",",".join(row["missing_slots"]))
           witness=r["independent_thml_witness"]
+          paragraph=witness["independent_original_paragraph_witness_pilot"]
+          assert paragraph["status"]=="PRIVATE_DIGITAL_SOURCE_PARAGRAPH_PILOT_NOT_EDITORIAL_APPROVAL"
+          assert paragraph["selected_original_native_I_K_entries"]==6
+          assert paragraph["source_text_xml_annotation_attributes_exported"] is False
+          assert paragraph["original_stock_or_source_modified"] is False
+          assert paragraph["public_release_authorized"] is False
+          for case in paragraph["results"]:
+              assert case["original_text_or_reference_changed"] is False
+              assert case["source_words_or_xml_in_report"] is False
+              assert case["candidate_para_boundaries_authorized"] is False
+              assert case["source_digital_edition_equivalence_proven"] is False
+              print("Private paired digital paragraph structure witness",
+                    json.dumps(case,sort_keys=True))
           inverted=witness["independent_original_reversed_reference_witness"]
           assert inverted["status"]=="SOURCE_NATIVE_AND_INDEPENDENT_DIGITAL_REVERSED_REFERENCE_REVIEW_ONLY"
           assert inverted["source_original_distinct_body_reversed_reference_count"]==(
