@@ -31,7 +31,7 @@ class CommentaryAnchorParityTests(unittest.TestCase):
             b'<scripCom osisRef="Bible:Gen.1.2"/>'
         )
         stock = self.native(
-            b"I\\tGen.1\\nK\\tGen.1.1\\nK\\tGen.1.2\\n",
+            b"I\tGen.1\nK\tGen.1.1\nK\tGen.1.2\n",
             numbered=2, intros=1,
         )
         registry = {
