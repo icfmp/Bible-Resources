@@ -1246,6 +1246,10 @@ jobs:
         with:
           name: mhcc-011-verified-pr-payload-not-a-release
           path: ${{ runner.temp }}/mhcc-011-verified
+      - uses: actions/download-artifact@v4
+        with:
+          name: original-commentary-section-scope
+          path: ${{ runner.temp }}/mhcc-011-original-source-audit
       - name: Verify and integrate seven candidate SWORD members in draft PR
         shell: bash
         env:
@@ -1299,10 +1303,37 @@ jobs:
                   else:
                       destination.parent.mkdir(parents=True, exist_ok=True)
                       destination.write_bytes(contents)
+          native_report = json.loads((Path(
+              "${{ runner.temp }}/mhcc-011-original-source-audit/editorial-scope.json"
+          )).read_text(encoding="utf-8"))
+          revised = native_report[
+              "private_provisional_range_index_preview_not_approved"][
+                  "private_source_edited_versioned_candidate_not_released"]
+          attested = revised["private_real_native_rebuild_attestation_draft"]
+          assert (attested["source_audit_sha256"] ==
+                  evidence["source_audit_sha256"])
+          assert (attested["source_audit"][
+              "candidate_native_corpus_sha256"] ==
+              evidence["corrected_complete_native_corpus_sha256"])
+          for name, document in (
+              ("SOURCE_AUDIT.json", attested["source_audit"]),
+              ("REVIEW_MANIFEST_DRAFT.json", attested["review_manifest"]),
+              ("SOURCE_VALIDATION_DRAFT.json", attested["source_validation"]),
+          ):
+              content = json.dumps(document, sort_keys=True, indent=2) + "\n"
+              if name == "SOURCE_AUDIT.json":
+                  assert (hashlib.sha256(content.encode()).hexdigest()
+                          == evidence["source_audit_sha256"])
+              target = stage.parent / name
+              if target.exists():
+                  assert target.read_text(encoding="utf-8") == content
+              else:
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  target.write_text(content, encoding="utf-8")
           print("Verified seven staging blobs, identical to source-attested ZIP;",
                 "committed release=", False)
           PY
-          git add -- staging/reviewed-mhcc-011/payload
+          git add -- staging/reviewed-mhcc-011/
           if git diff --cached --quiet; then
             echo "Candidate blobs already staged at exact hashes; nothing to commit."
           else
