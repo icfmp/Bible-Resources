@@ -1,18 +1,20 @@
 # MHCC Modern English — working editorial and technical protocol
 
-**Status (2026-11-14):** preparatory pilot drafts only; **0/1,189 chapters independently validated**. Tracking: [#270](https://github.com/icfmp/Bible-Resources/issues/270). The original published `BRMHCC` 0.1.0 remains untouched.
+**Status (2026-11-16):** Modern English project **RESUMED** by the owner after the verified publication of source `MHCC` 0.1.1. The three prior pilots remain working drafts; **0/1,189 production chapters independently validated**. Tracking: [#270](https://github.com/icfmp/Bible-Resources/issues/270), draft [PR #272](https://github.com/icfmp/Bible-Resources/pull/272). Immutable historical `BRMHCC` 0.1.0 remains untouched.
 
 ## 1. Source and edition boundaries
 
-The authoritative **working reference** is exactly the publicly released `BRMHCC` 0.1.0 zCom edition, itself unchanged in authorial content from CrossWire `MHCC` 2.0. The relevant pins are:
+The authoritative **current production source** is exactly the publicly released, source-audited corrected **`MHCC` 0.1.1** zCom edition (SWORD ID `MHCC`). It is derived from original CrossWire `MHCC` 2.0 / the historical `BRMHCC` 0.1.0, with **24 links to existing 17 original sections** and exactly **two** audited source errata (Ezek. 3 citation/OSIS target, 1 Chr. 7 `Dn` → `Dan`). Its source, ownership and sections must not be confused with the newer Modern English derivative. The key pins are:
 
 | Object | SHA-256 |
 | --- | --- |
 | Upstream original CrossWire `MHCC.zip` | `5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d` |
 | Full ordered upstream 29,975 native-key raw corpus | `8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6` |
-| Released `BRMHCC` 0.1.0 ZIP | `0faf4376b6b97093ecb94f306886c24d3030ab1f5e194472ad908dd73921f9c0` |
+| Historical `BRMHCC` 0.1.0 ZIP (preserved) | `0faf4376b6b97093ecb94f306886c24d3030ab1f5e194472ad908dd73921f9c0` |
+| **Released `MHCC` 0.1.1 ZIP** (2,449,819 bytes) | **`a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746`** |
+| **Reviewed corrected 0.1.1 native SWORD corpus** | **`2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e`** |
 
-See [published release](releases/MHCC-0.1.0.md), [source/editorial evidence](../modules/mhcc-crosswire/EDITORIAL.md) and completed [#177](https://github.com/icfmp/Bible-Resources/issues/177). CrossWire identifies its own digital edition as Public Domain / Copy Freely; this does not license unrelated CCEL digitization or material. The *distinct* CCEL witness is **not** a source substitute or silent correction authority for the released CrossWire corpus.
+See [current published release and notes](releases/MHCC-0.1.1.md), [public release](https://github.com/icfmp/Bible-Resources/releases/tag/mhcc-0.1.1), [source review](../modules/mhcc-crosswire/EDITORIAL.md), [exact 0.1.1 rebuild manifest](../config/commentary-rebuilds/mhcc-crosswire.json) and [approved release issue #276](https://github.com/icfmp/Bible-Resources/issues/276). Historical untouched source: [0.1.0 release](releases/MHCC-0.1.0.md), [original import #177](https://github.com/icfmp/Bible-Resources/issues/177). CrossWire identifies its own digital edition as Public Domain / Copy Freely; this does not license unrelated CCEL digitization or material. The *distinct* CCEL witness is **not** a source substitute or silent correction authority for the released CrossWire corpus.
 
 Preserve all original SWORD binary files, original metadata and original historical text. A modern edition is a **new, independent derivative module** with clearly identified modernized wording, its own edition identifier and catalog entry **only after final approval**.
 
@@ -43,7 +45,7 @@ The owner confirmed the **second, more fluid and airy style** as the target; no 
 
 **Generalize the lessons, not these unvalidated chapter artifacts:** keep the same reading rhythm, but guard particularly against dropped salvation statements, exclusive qualifiers, judgment or curse, doctrinal union with Christ, qualified certainty, source metaphors and the force of pastoral exhortations. A short, pleasant sentence is unacceptable if it weakens a statement. Keep source-meaning checks distinct from prose style checks.
 
-**Production remains paused.** The pilot collation was made against the *rendered* CrossWire text; it is **not an independent second-reviewer sign-off**, not the pinned compiled `BRMHCC` binary/OSIS verification, and not full text-and-range source acceptance. Editorial repair of original `BRMHCC` is handled separately under [#274](https://github.com/icfmp/Bible-Resources/issues/274). No canonical chapter has been certified or released; **0/1,189 validated**.
+**Production resumed on 2026-11-16, but the pilots are still unvalidated.** The earlier pilot collation was against the *rendered* CrossWire text; it is **not an independent second-reviewer sign-off**, not the pinned compiled corrected `MHCC` 0.1.1/OSIS verification, and not full text-and-range source acceptance. The verified original-editorial correction release is [#276](https://github.com/icfmp/Bible-Resources/issues/276); outstanding independent source matters are tracked in [#274](https://github.com/icfmp/Bible-Resources/issues/274), never silently imported into the derivative. **0/1,189 production chapters accepted**.
 
 
 
@@ -82,7 +84,7 @@ Initial three contrasted chapters:
 | Romans 3 | Justification, faith, original rhetoric and doctrinal distinctions | `work/mhcc-modern/pilots/romans-03.DRAFT.md` — **draft only** |
 | Hebrews 7 | Melchizedek typology, priesthood, covenant distinctions | `work/mhcc-modern/pilots/hebrews-07.DRAFT.md` — **draft only** |
 
-The initial prose drafts use STEP Bible's **rendering of CrossWire MHCC**, *not* a byte-attested extraction of the exact `BRMHCC` archive. This is a useful **secondary reading witness** but insufficient for source parity, scriptural link/reference, range, paragraph and note verification. It must be collated with the exact pinned `BRMHCC` source before claiming a validated chapter. Rework the drafts as needed rather than treating them as proven faithful already.
+The initial prose drafts use STEP Bible's **rendering of original CrossWire MHCC**, *not* a byte-attested extraction of the exact corrected `MHCC` 0.1.1 archive. This is a useful **secondary reading witness** but insufficient for source parity, scriptural link/reference, range, paragraph and note verification. It must be collated with the exact pinned corrected `MHCC` 0.1.1 source before claiming a validated chapter. Rework the drafts as needed rather than treating them as proven faithful already.
 
 After three pilots have genuine independent semantic and technical PASS results, document the target style and review findings and proceed by chapter, bounded and restartable.
 
@@ -92,7 +94,7 @@ Dedicated branch: `feature/mhcc-modern-english`. Issue [#270](https://github.com
 
 On every restart: inspect source version/hash and branch/PR; reconcile chapter files, their audit status, successful chapter-specific commit and issue checkmark; repair issue if commit was pushed but update interrupted. If no validated source-derived artifact exists, do not mark done. Preserve failed drafts separately, with concrete blockers. Push small independently auditable changes frequently.
 
-**At launch:** 3 pilot drafts saved as `wip` commits; all remain **UNVALIDATED**. Next action: obtain exact pinned `BRMHCC` raw XML by existing private tools, establish a reversible key/range/intro map for each pilot, then perform independent content/markup audit and corrections. **0/1,189** checked.
+**Restart checkpoint, 2026-11-16:** issue #270 and PR #272 reopened for production work after release #276; three pilot drafts retained unchanged in authorial prose, now re-pinned to source `MHCC` 0.1.1. Source-delta evidence limits edition edits to Ezek. 3 and 1 Chr. 7, outside all three pilots; nevertheless, exact native corrected-source key/range, notes, references and introductory structure still require audit. **Next:** obtain SHA-verified corrected `MHCC` 0.1.1 ZIP/native XML in a working SWORD environment, build exact pilot source-unit and intro map, independently re-review the 13 displayed sections against the exact source, verify structural SWORD roundtrip, record full chapter-specific acceptance **before** checking any chapter in #270. **0/1,189** checked.
 
 ## 6. Final SWORD and release gate
 
