@@ -217,5 +217,134 @@ class PrivateCommentaryZipRehearsalTests(unittest.TestCase):
             self.rehearse(hypothetical_revision_day="invalid")
 
 
+    def _invented_rebuild_evidence(self, rehearsal):
+        """Create only synthetic/native mock attestations, never source text."""
+        import hashlib
+        import json
+        from reviewed_compiled_commentary_rebuild import zcom_member_suffixes
+        native_sha = "a" * 64
+        audit = {
+            "status": "complete_native_rebuild_comparison",
+            "source_kind": "reviewed_compiled_commentary_rebuild",
+            "candidate_native_corpus_sha256": native_sha,
+            "full_original_and_rebuilt_native_inventory_compared": True,
+        }
+        audit_sha = hashlib.sha256(
+            (json.dumps(audit, sort_keys=True, indent=2) + "\n").encode()
+        ).hexdigest()
+        paths = [
+            "mods.d/curated.conf",
+            *("modules/comments/zcom/curated/" + suffix
+              for suffix in zcom_member_suffixes("CHAPTER")),
+        ]
+        review = {
+            "status": "private_draft_not_owner_authorized_for_release",
+            "sword_id": "Curated",
+            "version": "0.1.1",
+            "block_type": "CHAPTER",
+            "source_audit_sha256": audit_sha,
+            "candidate_native_corpus_sha256": native_sha,
+            "payload_sha256": {
+                p: hashlib.sha256((self.root / p).read_bytes()).hexdigest()
+                for p in paths
+            },
+        }
+        validation = {
+            "status": "private_draft_not_release_validated",
+            "source_audit_sha256": audit_sha,
+            "candidate_native_corpus_sha256": native_sha,
+        }
+        return {
+            "status": "PRIVATE_REAL_NATIVE_ATTESTATION_DRAFT_NOT_RELEASE",
+            "source_audit": audit,
+            "source_audit_sha256": audit_sha,
+            "review_manifest": review,
+            "source_validation": validation,
+            "release_authorized": False,
+            "data_text_exported": False,
+        }, {
+            **rehearsal,
+            "native_corpus_sha256": native_sha,
+            "complete_rehearsed_libsword_native_readback_exact": True,
+        }
+
+    def _reconcile(self, attestation, rehearsal):
+        from commentary_public_metadata_preflight import (
+            reconcile_private_rebuild_package_evidence,
+        )
+        return reconcile_private_rebuild_package_evidence(
+            attestation, rehearsal,
+            original_install_root=self.root,
+            rehearsal_install_root=self.out / "private-rehearsed-install",
+            rehearsal_zip_path=self.out / "PRIVATE-REHEARSAL-DO-NOT-RELEASE.zip",
+        )
+
+    def test_reconcile_private_exact_seven_member_evidence(self):
+        rehearsal = self.rehearse()
+        attestation, rehearsal = self._invented_rebuild_evidence(rehearsal)
+        proof = self._reconcile(attestation, rehearsal)
+        self.assertEqual(
+            proof["status"],
+            "PRIVATE_NATIVE_AND_TEST_DATE_ZIP_SEVEN_FILES_RECONCILED_NOT_RELEASE",
+        )
+        self.assertEqual(len(proof["test_date_only_seven_member_sha256"]), 7)
+        self.assertEqual(proof["test_date_only_zip_sha256"], rehearsal["zip_sha256"])
+        self.assertEqual(proof["source_audit_sha256"], attestation["source_audit_sha256"])
+        self.assertFalse(proof["actual_release_date_selected"])
+        self.assertFalse(proof["release_authorized"])
+        self.assertFalse(proof["public_artifact_generated"])
+        self.assertNotIn("Invented native content", str(proof))
+
+    def test_reconcile_rejects_invalid_draft_provenance_and_member_hashes(self):
+        from copy import deepcopy
+        rehearsal = self.rehearse()
+        attestation, rehearsal = self._invented_rebuild_evidence(rehearsal)
+        variants = [
+            ("audit digest", lambda a, r: a.update(source_audit_sha256="0" * 64)),
+            ("audit modified", lambda a, r: a["source_audit"].update(
+                candidate_native_corpus_sha256="b" * 64)),
+            ("false review", lambda a, r: a["review_manifest"].update(
+                status="owner_authorized_for_release")),
+            ("false publication", lambda a, r: r.update(owner_release_authorized=True)),
+            ("no native readback", lambda a, r: r.update(
+                complete_rehearsed_libsword_native_readback_exact=False)),
+            ("incorrect old conf", lambda a, r: a["review_manifest"][
+                "payload_sha256"].update({"mods.d/curated.conf": "0" * 64})),
+            ("wrong native member", lambda a, r: r["native_member_sha256"].update(
+                {"modules/comments/zcom/curated/ot.czv": "0" * 64})),
+            ("wrong ZIP digest", lambda a, r: r.update(zip_sha256="0" * 64)),
+            ("wrong date", lambda a, r: r.update(
+                hypothetical_revision_day_only="2020-01-01")),
+            ("extra native member", lambda a, r: r["native_member_sha256"].update(
+                {"modules/comments/zcom/curated/other": "0" * 64})),
+        ]
+        for label, mutate in variants:
+            with self.subTest(label=label):
+                a, r = deepcopy(attestation), deepcopy(rehearsal)
+                mutate(a, r)
+                with self.assertRaises(ValueError):
+                    self._reconcile(a, r)
+
+    def test_reconcile_rejects_mutated_installed_member_or_archive(self):
+        rehearsal = self.rehearse()
+        attestation, rehearsal = self._invented_rebuild_evidence(rehearsal)
+        member = self.out / "private-rehearsed-install/modules/comments/zcom/curated/ot.czv"
+        original = member.read_bytes()
+        member.write_bytes(original + b"tamper")
+        with self.assertRaises(ValueError):
+            self._reconcile(attestation, rehearsal)
+        member.write_bytes(original)
+        archive = self.out / "PRIVATE-REHEARSAL-DO-NOT-RELEASE.zip"
+        original = archive.read_bytes()
+        archive.write_bytes(original + b"tamper")
+        with self.assertRaises(ValueError):
+            self._reconcile(attestation, rehearsal)
+        archive.write_bytes(original)
+        self.assertEqual(
+            self._reconcile(attestation, rehearsal)["test_date_only_zip_sha256"],
+            rehearsal["zip_sha256"],
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
