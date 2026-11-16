@@ -105,6 +105,14 @@ def layout_profile(raw: bytes) -> dict:
     # title directly to the next paragraph with no intervening XML space,
     # so its apparent lexical token count is NOT an identity invariant.
     visible = "".join(root.itertext())
+    leading = visible.lstrip()
+    styled_verse_lead = any(
+        (label := "".join(node.itertext()).strip())
+        and VERSE_LEAD.match(label)
+        and leading.startswith(label)
+        for node in root.iter()
+        if isinstance(node.tag, str) and _local(node.tag) == "hi"
+    )
     if sum(counts.values()) > 100000:
         raise ValueError("Unbounded original layout element count")
     paragraphs = counts["p"] + counts["l"]
@@ -116,6 +124,13 @@ def layout_profile(raw: bytes) -> dict:
         "line_break_count": counts["lb"] + counts["br"],
         "heading_count": sum(counts[tag] for tag in HEADING),
         "reference_count": counts["reference"],
+        "div_count": counts["div"],
+        "table_count": counts["table"],
+        "row_count": counts["row"],
+        "cell_count": counts["cell"],
+        "hi_count": counts["hi"],
+        "milestone_count": counts["milestone"],
+        "styled_numbered_verse_lead": bool(styled_verse_lead),
         "unwrapped_word_count": words_in_unwrapped_segments,
         "max_unwrapped_segment_words": max_unwrapped_words,
         "longest_paragraph_words": max(paragraph_lengths, default=0),
@@ -131,18 +146,25 @@ def layout_flags(profile: dict) -> set[str]:
     paras = profile["paragraph_count"]
     breaks = profile["line_break_count"]
     flags = set()
-    if word_count >= 250 and paras == 0 and breaks == 0:
-        flags.add("long_prose_without_paragraph_or_line_markup")
+    # <div> and <table> may already provide the source's meaningful
+    # blocks. A naive "no <p> = broken layout" verdict would be wrong.
+    # Even a single <div> is allowed as a general wrapper; only a long
+    # body with no *internal* structural divisions needs first review.
+    if (word_count >= 250 and paras == 0 and breaks == 0
+            and profile["div_count"] <= 1 and profile["table_count"] == 0):
+        flags.add("long_prose_without_internal_block_markup")
     if word_count >= 300 and paras == 1 and profile["longest_paragraph_words"] >= 250:
         flags.add("long_single_paragraph")
-    if profile["unwrapped_word_count"] >= 80:
-        flags.add("substantial_text_outside_p_line_title_note")
+    if (profile["unwrapped_word_count"] >= 80
+            and profile["div_count"] == 0 and profile["table_count"] == 0):
+        flags.add("substantial_text_without_div_table_p_line_title_note")
     if profile["empty_paragraphs"]:
         flags.add("empty_paragraph_or_poetry_line")
     if profile["empty_headings"]:
         flags.add("empty_heading_markup")
-    if profile["visible_numbered_verse_lead"] and profile["heading_count"] == 0:
-        flags.add("visible_verse_lead_without_title_markup")
+    if (profile["visible_numbered_verse_lead"] and profile["heading_count"] == 0
+            and not profile["styled_numbered_verse_lead"]):
+        flags.add("visible_verse_lead_without_title_or_hi_markup")
     return flags
 
 
@@ -195,6 +217,11 @@ class NativeCommentaryLayoutCensus:
             histogram[f"{kind}_paragraphs_{'0' if profile['paragraph_count']==0 else '1' if profile['paragraph_count']==1 else '2plus'}"] += 1
             histogram[f"{kind}_words_{'0' if profile['word_count']==0 else '1-99' if profile['word_count']<100 else '100-249' if profile['word_count']<250 else '250-499' if profile['word_count']<500 else '500plus'}"] += 1
             histogram[f"{kind}_visible_numbered_verse_lead"] += int(profile["visible_numbered_verse_lead"])
+            histogram[f"{kind}_styled_numbered_verse_lead"] += int(profile["styled_numbered_verse_lead"])
+            histogram[f"{kind}_divs_{'0' if profile['div_count']==0 else '1' if profile['div_count']==1 else '2plus'}"] += 1
+            histogram[f"{kind}_tables_present"] += int(profile["table_count"] > 0)
+            histogram[f"{kind}_hi_present"] += int(profile["hi_count"] > 0)
+            histogram[f"{kind}_linebreaks_present"] += int(profile["line_break_count"] > 0)
             if kind == "K" and key.rsplit(".", 1)[0] in original_verse_one_chapters:
                 chapter_one_profiles[f"single_key_chapter_paragraphs_{'0' if profile['paragraph_count']==0 else '1' if profile['paragraph_count']==1 else '2plus'}"] += 1
                 chapter_one_profiles["single_key_chapter_raw_body_count"] += 1
