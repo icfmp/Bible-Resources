@@ -22,7 +22,7 @@ _SINGLE = re.compile(r"\bverse\s+(\d{1,3})\b", re.I)
 _WORD = re.compile(r"[\w’-]+", re.UNICODE)
 
 
-def read_chapter_draft(path: Path) -> dict:
+def read_chapter_draft(path: Path, *, allow_production_candidate: bool = False) -> dict:
     source = path.read_text(encoding="utf-8")
     if not source.startswith("---\n"):
         raise ValueError("Markdown draft lacks exact front matter: " + path.name)
@@ -37,7 +37,10 @@ def read_chapter_draft(path: Path) -> dict:
         if matched is None or matched[1] in fields:
             raise ValueError("Malformed or duplicate draft front matter: " + path.name)
         fields[matched[1]] = matched[2]
-    if fields.get("status") != "DRAFT — NOT VALIDATED":
+    allowed = {"DRAFT — NOT VALIDATED"}
+    if allow_production_candidate:
+        allowed.add("PRODUCTION CANDIDATE — NOT VALIDATED")
+    if fields.get("status") not in allowed:
         raise ValueError("An unapproved draft cannot claim validated status")
     chapter = fields.get("chapter_osis", "")
     if not _OSIS_CHAPTER.fullmatch(chapter):
