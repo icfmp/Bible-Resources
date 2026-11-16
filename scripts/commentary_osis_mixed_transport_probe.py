@@ -17,6 +17,7 @@ from io import BytesIO
 from pathlib import Path
 import os
 import re
+import shutil
 import subprocess
 import zipfile
 
@@ -282,6 +283,36 @@ def probe_original_mixed_transport(chapter: str, book_intro: bytes,
             for target,claim in aliases.items()
         )
     )
+    private_diatheke = []
+    if aliases and checks_passed and aliases_match_original_compiled_master:
+        executable = shutil.which("diatheke")
+        if executable:
+            from pilot_subprocess import query, present_key
+            for target, claim in sorted(aliases.items()):
+                master = claim["link_to"]
+                measurements = []
+                for ref in (target, master):
+                    original_book, original_chapter, original_verse = ref.split(".")
+                    readable = f"{original_book} {original_chapter}:{original_verse}"
+                    code, data = query(
+                        module_id, readable, fmt="internal", root=root,
+                        exe=executable
+                    )
+                    measurements.append({
+                        "original_or_proposed_native_key": ref,
+                        "reader_return_code": code,
+                        "reader_response_bytes": len(data),
+                        "real_commentary_text_was_returned":
+                            present_key(readable, data, code) and len(data) >= 64,
+                    })
+                private_diatheke.append({
+                    "new_alias": target, "existing_master": master,
+                    "both_keys_return_nontrivial_real_diatheke_content":
+                        all(row["real_commentary_text_was_returned"]
+                            for row in measurements),
+                    "readback_evidence": measurements,
+                    "original_reader_response_not_modified": True,
+                })
     return {
         **source,
         "status":"TEMPORARY_MIXED_ORIGINAL_I_K_REBUILT_NOT_EDITION_PARITY",
@@ -301,6 +332,12 @@ def probe_original_mixed_transport(chapter: str, book_intro: bytes,
         "private_alias_candidate_complete_original_K_I_checks_pass":
             checks_passed and aliases_match_original_compiled_master,
         "provisional_aliases_editorially_approved":False,
+        "private_diatheke_candidate_available": bool(shutil.which("diatheke")),
+        "private_actual_diatheke_alias_passed":
+            bool(private_diatheke) and all(
+                r["both_keys_return_nontrivial_real_diatheke_content"]
+                for r in private_diatheke),
+        "private_diatheke_references": private_diatheke,
         "raw_source_edition_parity_proven":False,
         "entire_original_native_corpus_preserved":False,
         "published":False,
