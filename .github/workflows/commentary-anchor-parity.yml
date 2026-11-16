@@ -118,6 +118,40 @@ jobs:
             --native-inspector "${RUNNER_TEMP}/commentary-native-index" \
             --probe-osis-key "$PROBE" \
             --report "${RUNNER_TEMP}/commentary-anchor-receipt.json"
+      - name: Report source-to-SWORD key diagnostics without source prose
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          report = json.loads(
+              (Path(os.environ["RUNNER_TEMP"]) / "commentary-anchor-receipt.json")
+              .read_text(encoding="utf-8"))
+          if report.get("status") == "ordered_original_xml_volume_anchor_diagnostics_not_parity":
+              print("Original XML volumes:", report["original_xml_volume_count"])
+              print("Source annotations:", report["source_annotation_markers_across_volumes"])
+              print("Source classes:", json.dumps(
+                  report["source_annotation_classes_across_volumes"], sort_keys=True))
+              print("Matched original starts by type:", json.dumps(
+                  report["matched_stock_start_by_class_across_volumes"], sort_keys=True))
+              print("Unoccupied original starts and range endpoints by type:",
+                    json.dumps(report["unoccupied_stock_start_by_class_across_volumes"],
+                               sort_keys=True))
+              print("Source book codes without occupied stock entries:",
+                    json.dumps(report["source_books_without_any_occupied_stock_native_slots"]))
+              for item in report["volume_observations"]:
+                  data = item["anchor_diagnostic"]
+                  print("Volume", item["volume"], "original markers", data["source_marker_count"],
+                        "start misses", sum(data["unoccupied_source_start_by_class"].values()),
+                        "original SHA-256", item["original_ccel_xml_sha256"])
+          else:
+              print("Single original XML marker count:", report["source_marker_count"])
+              print("Unoccupied start counts:", json.dumps(
+                  report["unoccupied_source_start_by_class"], sort_keys=True))
+          assert report["authored_source_to_compiled_text_parity"] is False
+          assert report["published"] is False
+          PY
       - name: Keep only metadata-only hash and key diagnostic receipt
         if: always()
         uses: actions/upload-artifact@v4
