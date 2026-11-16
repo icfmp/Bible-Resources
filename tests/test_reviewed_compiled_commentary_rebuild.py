@@ -84,6 +84,7 @@ class RebuiltCommentaryContractTests(unittest.TestCase):
             "original_manifest_sha256": digest(self.original_path.read_bytes()),
             "original_archive_sha256": "a" * 64,
             "original_native_corpus_sha256": "b" * 64,
+            "index_only_rebuild_native_corpus_sha256": "9" * 64,
             "original_module_id": "Original",
             "candidate_native_corpus_sha256": "d" * 64,
             "original_native_counts": {"K": 3, "I": 2, "TOP": 1},
@@ -109,6 +110,8 @@ class RebuiltCommentaryContractTests(unittest.TestCase):
             "original_archive_sha256": self.review["original_archive_sha256"],
             "original_native_corpus_sha256":
                 self.review["original_native_corpus_sha256"],
+            "index_only_rebuild_native_corpus_sha256":
+                self.review["index_only_rebuild_native_corpus_sha256"],
             "candidate_native_corpus_sha256":
                 self.review["candidate_native_corpus_sha256"],
             "original_native_counts": self.review["original_native_counts"],
@@ -163,6 +166,22 @@ class RebuiltCommentaryContractTests(unittest.TestCase):
         self.assertTrue(self.errors())
     def test_exact_attestation_and_payload_pass_synthetic_fixture(self):
         self.assertEqual(self.errors(), [])
+
+    def test_reviewed_index_only_digest_is_bound_to_real_audit(self):
+        self.review["index_only_rebuild_native_corpus_sha256"] = "0" * 64
+        self.write()
+        self.assertIn("Native comparison", str(self.errors()))
+        self.audit["index_only_rebuild_native_corpus_sha256"] = "0" * 64
+        self.write()
+        self.assertEqual(self.errors(), [])
+        self.review["index_only_rebuild_native_corpus_sha256"] = (
+            self.review["candidate_native_corpus_sha256"]
+        )
+        self.audit["index_only_rebuild_native_corpus_sha256"] = (
+            self.review["candidate_native_corpus_sha256"]
+        )
+        self.write()
+        self.assertTrue(self.errors())
 
     def test_tampered_member_or_extra_member_is_rejected(self):
         p = self.payload / "modules/comments/zcom/synth/nt.czz"

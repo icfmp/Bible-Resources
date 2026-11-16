@@ -65,3 +65,15 @@ The normal [`scripts/build.py`](../../../scripts/build.py) builds the public SWO
 - Ask the project owner for **separate express authorization** for the GitHub Release, catalogue update and any merge, then verify genuine public ZIP download, catalogue install/update and unchanged 0.1.0 rollback.
 
 **Not completed:** public date, public versioned ZIP/checksum, release plan, independent approval, GitHub Release, Pages catalogue verification. None is implied by CI tests or this document.
+
+## 2026-11-16 — real native attestation draft completed
+
+On [private full original and rebuilt SWORD CI #43867004627](https://github.com/icfmp/Bible-Resources/actions/runs/43867004627), the actual standard-compiler rebuild and libSWORD readbacks **PASSED**, including the six `BlockType=CHAPTER` `.cz*` members (no missing or extra native files), 24 previously vacant K aliases, 12 original K addresses changed only in the two source-corrected groups, all 1,255 original I and two TOP and four real Xiphos passage matches. The complete source audit was emitted into the existing time-limited, **metadata-only** GitHub Actions artifact, with no original commentary text or public ZIP.
+
+- Pinned original native corpus digest: `8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6`.
+- Separate original-source **index-only recompile** native digest: `badb234e2c36543d8d5cb536ef8b722c31ccb02944177bc043a14e7b1eb0e045`.
+- Current **two-correction private compiled** native digest: `2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e`.
+- Exact metadata-only `SOURCE_AUDIT` draft SHA-256: `e51358a9b10185f2a45bbb63a38d6ccf063e8f492905f8519bf4ed9d54aaa7e4`.
+- Exact compiled private ZIP (CI scratch only): `aeebadbc57d5a891d10ddb3dec520dcc8abd49e7cdd733c4a3542c77765282c4`.
+
+The three corpus digests are **not interchangeable**: the original source bytes differ from the standard compiler's output. Native source/section semantic parity and the edited-source-versus-index-only exact compiled delta are separately checked. The attestation remains `private_draft_not_owner_authorized_for_release`; the production proof must be regenerated against the eventual **final versioned package**, including the owner-approved date and provenance config, before release. No owner authorization is inferred from a checksum.

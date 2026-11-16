@@ -148,6 +148,9 @@ def reviewed_rebuilt_commentary_errors(
                 or original.get("category") != "commentary"
                 or original.get("source_page_url") != metadata["origin"]["url"]
                 or not _digest(review.get("candidate_native_corpus_sha256"))
+                or not _digest(review.get("index_only_rebuild_native_corpus_sha256"))
+                or review["index_only_rebuild_native_corpus_sha256"]
+                   == review["candidate_native_corpus_sha256"]
                 or review.get("source_audit_sha256") != audit_sha):
             raise ValueError("Original, version or source-audit identity differs")
         upstreams = metadata.get("upstreams")
@@ -202,6 +205,8 @@ def reviewed_rebuilt_commentary_errors(
             "source_kind": "reviewed_compiled_commentary_rebuild",
             "original_archive_sha256": review["original_archive_sha256"],
             "original_native_corpus_sha256": review["original_native_corpus_sha256"],
+            "index_only_rebuild_native_corpus_sha256":
+                review["index_only_rebuild_native_corpus_sha256"],
             "candidate_native_corpus_sha256": review["candidate_native_corpus_sha256"],
             "original_native_counts": counts_original,
             "candidate_native_counts": counts_candidate,

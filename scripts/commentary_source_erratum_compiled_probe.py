@@ -325,6 +325,15 @@ def probe_private_compiled_source_erratum(
             or full["all_original_TOP_positions_exact_raw_bytes"] is not True
             or full["all_proposed_new_aliases_same_compiled_raw_as_original_master"] is not True):
         raise ValueError("Original commentary corrected private OSIS does not preserve edited-source parity")
+    linked = full.get("private_native_original_and_provisional_alias_link_identity")
+    if (not isinstance(linked, dict)
+            or linked.get("status") != "REAL_LIBSWORD_NATIVE_NONADJACENT_LINK_IDENTITY"
+            or linked.get("proposed_key_count") != len(reviewed_aliases)
+            or linked.get("native_linked_alias_count") != len(reviewed_aliases)
+            or linked.get("all_original_master_to_proposed_target_pairs_are_native_linked") is not True
+            or linked.get("all_independently_distinct_section_controls_unlinked") is not True
+            or linked.get("non_linked_proposed_pairs") != []):
+        raise ValueError("Actual libSWORD reviewed native alias identities were not proven")
     corrected_root = revised_private_scratch / "complete-original-private-candidate"
     original_compiled, original_index_receipt = _read_private_native(
         original_index_only_compiled_root, "BRIndexProbe", native_raw_binary,
@@ -462,7 +471,9 @@ def probe_private_compiled_source_erratum(
             full["original_indexed_I_K_text_markup_reference_checks_passed"] is True
         ),
         all_new_native_aliases_linked=(
-            full["all_proposed_new_aliases_same_compiled_raw_as_original_master"] is True
+            linked["all_original_master_to_proposed_target_pairs_are_native_linked"] is True
+            and linked["native_linked_alias_count"] == len(reviewed_aliases)
+            and linked["all_independently_distinct_section_controls_unlinked"] is True
         ),
         real_reader_passage_matches=xiphos["independent_real_reader_clipboard_matches"],
     )
