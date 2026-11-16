@@ -26,6 +26,7 @@ CORE = {
     "normalize_osis.py", "pilot_fetch.py", "pilot_preflight.py",
     "sword_native_index.cpp", "sword_native_inventory.py",
     "promote_sword_preview.py", "commentary_text_delta.py",
+    "tool_registry.py",
     "build.py", "validate.py", "release_preflight.py",
     "publish_reviewed_release.py", "catalogue_release_coverage.py",
     "verify_public_catalogue.py", "commentary_intake.py",
