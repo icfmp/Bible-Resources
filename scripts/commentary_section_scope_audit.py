@@ -19,6 +19,7 @@ from urllib.parse import urlsplit
 import re
 import subprocess
 import tempfile
+import traceback
 import zipfile
 
 from lxml import etree
@@ -2397,9 +2398,23 @@ def main(argv=None) -> int:
         }
         public_safe.update(PUBLIC_REBUILD_ATTESTATION_ERROR_CODES)
         reason = str(exc) if str(exc) in public_safe else "OTHER_OR_PRIVATE_ERROR"
+        # Debug only the exact trusted Python function/line. Never log
+        # exception arguments, authorial text, OSIS XML or user-provided paths.
+        allow = {"commentary_rebuild_attestation_draft.py",
+                 "commentary_source_erratum_compiled_probe.py",
+                 "commentary_section_scope_audit.py"}
+        frames = [
+            (Path(frame.filename).name, frame.name, frame.lineno)
+            for frame in traceback.extract_tb(exc.__traceback__)
+            if Path(frame.filename).name in allow
+        ]
         result = {
             "status": "BLOCKED", "reason_class": type(exc).__name__,
             "reason_fixed_code": reason,
+            "internal_failure_site": (
+                f"{frames[-1][0]}:{frames[-1][1]}:{frames[-1][2]}"
+                if frames else "OTHER_OR_PRIVATE_CODE"
+            ),
             "native_scan_completed": False, "original_sword_changed": False
         }
         code = 1
@@ -2409,6 +2424,9 @@ def main(argv=None) -> int:
     print("Commentary editorial section triage:", result["status"],
           "fixed-code", result.get("reason_fixed_code", "NONE"),
           "(metadata-only report; original text never logged)")
+    if code and "internal_failure_site" in result:
+        print("Private failure source-code site:", result["internal_failure_site"],
+              "(source text and exception arguments suppressed)")
     return code
 
 
