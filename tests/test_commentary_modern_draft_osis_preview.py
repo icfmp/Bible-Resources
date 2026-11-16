@@ -88,5 +88,22 @@ class CommentaryPreviewTests(unittest.TestCase):
                 generate(Path(folder),metadata(),work_id="MHCCWORK")
 
 
+    def test_single_unvalidated_production_candidate_uses_original_source_units(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            candidate=md().replace("DRAFT — NOT VALIDATED",
+                                   "PRODUCTION CANDIDATE — NOT VALIDATED")
+            (root/"genesis-01.CANDIDATE.md").write_text(candidate,encoding="utf-8")
+            with self.assertRaisesRegex(ValueError,"Not all source-mapped"):
+                generate(root,metadata(),work_id="MHCCWORK")
+            xml, report=generate(root,metadata(),work_id="MHCCWORK",
+                                 include_candidates=True)
+            self.assertEqual(report["modern_chapter_count"],1)
+            self.assertEqual(report["annotated_commentary_sections"],1)
+            self.assertIn("Grace",xml.decode("utf-8"))
+            self.assertFalse(report["original_inline_reference_or_note_fidelity_approved"])
+            self.assertFalse(report["sword_publication_authorized"])
+
+
 if __name__ == "__main__":
     unittest.main()
