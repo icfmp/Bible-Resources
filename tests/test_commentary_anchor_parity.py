@@ -24,6 +24,36 @@ class CommentaryAnchorParityTests(unittest.TestCase):
         return (b"M\tTestCom\tKJV\t1.9.0\tzCom\n" + rows +
                 f"S\t32000\t{numbered}\t{intros}\t0\n".encode())
 
+    def test_native_kjv_registry_differentiates_invalid_source_endpoint_from_unoccupied_slot(self):
+        xml = self.xml(
+            b'<scripCom osisRef="Bible:Gen.1"/>'
+            b'<scripCom osisRef="Bible:Gen.1.1-Gen.1.3"/>'
+            b'<scripCom osisRef="Bible:Gen.1.2"/>'
+        )
+        stock = self.native(
+            b"I\\tGen.1\\nK\\tGen.1.1\\nK\\tGen.1.2\\n",
+            numbered=2, intros=1,
+        )
+        registry = {
+            "module_id": "TestCom", "versification": "KJV",
+            "verse_keys": {"Gen.1.1", "Gen.1.2"},
+            "chapter_maximums": {"Gen.1": 2},
+        }
+        report = compare_anchors(xml, stock, "TestCom", native_registry=registry)
+        self.assertTrue(report["original_native_versification_registry_checked"])
+        self.assertEqual(report["original_reference_registry_classes"], {
+            "EXACT_CHAPTER_IN_REGISTRY": 1,
+            "EXACT_SINGLE_VERSE_IN_REGISTRY": 1,
+            "SIMPLE_VERSE_RANGE_ENDPOINT_NOT_IN_REGISTRY": 1,
+        })
+        self.assertEqual(len(report["bounded_original_out_of_registry_reference_examples"]), 1)
+        self.assertTrue(report["canonical_validity_does_not_prove_semantic_passage_correctness"])
+        self.assertFalse(report["authored_source_to_compiled_text_parity"])
+        self.assertNotIn("Unchanged original source text", json.dumps(report))
+        wrong_registry = dict(registry, versification="Vulg")
+        with self.assertRaisesRegex(PilotError, "disagree"):
+            compare_anchors(xml, stock, "TestCom", native_registry=wrong_registry)
+
     def test_exact_chapter_verse_range_and_single_anchors_are_diagnostics_only(self):
         xml = self.xml(
             b'<scripCom osisRef="Bible:Gen.1" />'
