@@ -672,11 +672,23 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
                     "valid_source_start_units": len(unoccupied_original_units),
                     "not_proof_of_missing_authorial_text": True,
                 }
+                if private_alias_probe:
+                    observed["private_original_source_first_verse_index_alias_probes"] = {
+                        "status": "SKIPPED_ORIGINAL_CASES_EXCEED_PRIVATE_PROBE_BUDGET",
+                        "probed_chapter_subsets": 0, "attempts": [],
+                        "published": False,
+                    }
             elif not unoccupied_original_units:
                 observed["original_unoccupied_start_prose_location"] = {
                     "status": "no_canonically_valid_unoccupied_source_starts_to_scan",
                     "original_source_or_sword_bytes_modified": False,
                 }
+                if private_alias_probe:
+                    observed["private_original_source_first_verse_index_alias_probes"] = {
+                        "status": "NO_VALID_UNOCCUPIED_AUTHORIAL_SOURCE_UNITS_TO_TEST",
+                        "probed_chapter_subsets": 0, "attempts": [],
+                        "published": False,
+                    }
             else:
                 locator = UnoccupiedSourceProseLocator(unoccupied_original_units)
                 experiment_chapters = {
