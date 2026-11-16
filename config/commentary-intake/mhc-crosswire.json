@@ -37,35 +37,37 @@
       {
         "number": 1,
         "url": "https://www.ccel.org/ccel/h/henry/mhc1.xml",
-        "sha256": null
+        "sha256": "6eb946647f806f46129001f83013d65c51e40ac59b939ac1c51404aa50375971"
       },
       {
         "number": 2,
         "url": "https://www.ccel.org/ccel/h/henry/mhc2.xml",
-        "sha256": null
+        "sha256": "673fcb4168ad946ab1e6923c0e331cc61e4adca4498fc0ee34cf1507285aa2f7"
       },
       {
         "number": 3,
         "url": "https://www.ccel.org/ccel/h/henry/mhc3.xml",
-        "sha256": null
+        "sha256": "8ba9779eba5d326acbfc9acaccf2ea1fa2d6b5c48b03ab86fc5e80b0bfa5b17e"
       },
       {
         "number": 4,
         "url": "https://www.ccel.org/ccel/h/henry/mhc4.xml",
-        "sha256": null
+        "sha256": "7b6ea0800caa1daab6b0c807f5b95c7567fb5d880290bbe91d848048a80486b2"
       },
       {
         "number": 5,
         "url": "https://www.ccel.org/ccel/h/henry/mhc5.xml",
-        "sha256": null
+        "sha256": "8b0853b116e9a68215a594bafe29f45502d4c766e1f128cbf5fb050f45cf2518"
       },
       {
         "number": 6,
         "url": "https://www.ccel.org/ccel/h/henry/mhc6.xml",
-        "sha256": null
+        "sha256": "296195d09d4fbb1e7516ea77c100dbc87ce37542c3109f9f570c3cf155b594c1"
       }
     ],
-    "xml_collection_status": "six separately published CCEL ThML/XML source volumes; observing original structural hashes only, not assuming they equal the CrossWire stock binary or granting derivative rights"
+    "xml_collection_status": "six exact CCEL ThML/XML volume bytes observed, independently SHA-pinned, not yet proven equivalent to MHC stock text or authorized for editorial derivatives",
+    "xml_observation_action": "https://github.com/icfmp/Bible-Resources/actions/runs/43948030420",
+    "xml_observed_total_bytes": 58370898
   },
   "original_archive_observation": {
     "date": "2026-11-07",
