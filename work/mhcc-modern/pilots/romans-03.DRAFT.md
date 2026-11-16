@@ -3,8 +3,10 @@ edition: "Matthew Henry Concise Commentary — Modern English (working edition)"
 chapter: "Romans 3"
 chapter_osis: "Rom.3"
 status: "DRAFT — NOT VALIDATED"
-source_module: "BRMHCC 0.1.0 (CrossWire MHCC 2.0)"
-source_zip_sha256: "0faf4376b6b97093ecb94f306886c24d3030ab1f5e194472ad908dd73921f9c0"
+source_module: "MHCC 0.1.1 (Bible Resources corrected CrossWire MHCC 2.0)"
+source_zip_sha256: "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746"
+source_native_corpus_sha256: "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e"
+source_release: "https://github.com/icfmp/Bible-Resources/releases/tag/mhcc-0.1.1"
 reading_witness: "https://www.stepbible.org/?q=version%3DMHCC@reference%3DRom.3"
 issue: "https://github.com/icfmp/Bible-Resources/issues/270"
 ---
@@ -95,9 +97,11 @@ We cannot be saved by the law as a covenant. Yet we acknowledge and submit to it
 
 ---
 
+> **2026-11-16 source re-pin, not validation:** The published corrected `MHCC` 0.1.1 source supersedes the old `BRMHCC` 0.1.0 reference. Its reviewed only-two-source-errata change list affects Ezekiel 3 and 1 Chronicles 7, not this pilot chapter. The **existing experimental prose is retained without fresh content edits**; the pre-existing STEP-based semantic review is provisional only. Exact new-source native XML/section-link, introductions, quotes, references, independent semantic review and SWORD tests are still required for a validated production chapter.
+
 ## Review queue (not approval)
 
-- [ ] Compare the complete rendered witness above with **all exact native original BRMHCC keys**, introduction/range structure, title and citation markup (the STEP HTML is not an exact key-level proof).
+- [ ] Compare the complete rendered witness above with **all exact native original corrected MHCC 0.1.1 keys**, introduction/range structure, title and citation markup (the STEP HTML is not an exact key-level proof).
 - [ ] Independently audit the doctrinal nuances of “law,” “means of grace,” unbelief and promises, justification, imputed righteousness, Christ's three offices, atonement, Surety, covenant and the rule of law.
 - [ ] Verify that the rhetorical “even one sin / lie,” the alternatives of hope and assurance, crown/robe imagery and final contrast are all preserved with appropriate force.
 - [ ] Verify full original reference/link retention, technical OSIS/SWORD shape, encoding and continuity.
