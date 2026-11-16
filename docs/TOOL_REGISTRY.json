@@ -1803,12 +1803,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_xiphos_dual_reader.py",
-        ".github/workflows/commentary-xiphos-dual-reader.yml",
         "tests/test_commentary_reference_cross_slot.py"
       ]
     },
@@ -2194,14 +2193,13 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 8,
+      "static_reference_count": 7,
       "static_references": [
         "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_private_candidate_xiphos_gui.py",
         "scripts/commentary_xiphos_dual_reader.py",
         "scripts/stage_verified_stock_commentary.py",
         ".github/workflows/commentary-private-candidate-xiphos-gui.yml",
-        ".github/workflows/commentary-zcom-andbible-jsword.yml",
         ".github/workflows/commentary-zcom-private-candidate.yml",
         "tests/test_commentary_stock_candidate.py"
       ]
@@ -6326,7 +6324,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 25,
+      "static_reference_count": 24,
       "static_references": [
         "scripts/commentary_android_text_witness.py",
         "scripts/commentary_native_raw_inventory.py",
@@ -6343,7 +6341,6 @@
         "scripts/source_native_maintext_probe.py",
         "scripts/tool_registry.py",
         ".github/workflows/commentary-editorial-section-scope.yml",
-        ".github/workflows/commentary-xiphos-dual-reader.yml",
         ".github/workflows/commentary-zcom-andbible-android.yml",
         ".github/workflows/second-bible-proof.yml",
         ".github/workflows/validate.yml",
