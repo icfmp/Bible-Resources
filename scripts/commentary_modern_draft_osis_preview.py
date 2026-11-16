@@ -73,14 +73,17 @@ def _range(keys: list[str]) -> str:
                     prefix+str(s)+"-"+prefix+str(e) for s,e in ranges)
 
 
-def _chapters(root: Path, ledger: dict):
+def _chapters(root: Path, ledger: dict, *, include_candidates: bool = False):
     native = ledger["chapters"]
     payload=[]
-    for path in sorted(root.rglob("*.DRAFT.md")):
+    paths = list(root.rglob("*.DRAFT.md"))
+    if include_candidates:
+        paths += list(root.rglob("*.CANDIDATE.md"))
+    for path in sorted(paths):
         heading = path.read_text(encoding="utf-8").split("\n---\n", 1)[0]
         if not re.search(r"(?m)^chapter_osis: ", heading):
             continue
-        draft = read_chapter_draft(path)
+        draft = read_chapter_draft(path,allow_production_candidate=include_candidates)
         ch = draft["chapter"]
         if ch not in native:
             raise ValueError("Chapter not source-mapped in the complete receipt: "+ch)
@@ -107,7 +110,8 @@ def _chapters(root: Path, ledger: dict):
                                              int(item[0].split(".", 1)[1])))
 
 
-def generate(root: Path, ledger: dict, *, work_id: str) -> tuple[bytes, dict]:
+def generate(root: Path, ledger: dict, *, work_id: str,
+             include_candidates: bool = False) -> tuple[bytes, dict]:
     if not re.fullmatch(r"[A-Z][A-Z0-9_]{2,32}", work_id):
         raise ValueError("Invalid temporary test-only module identifier")
     if ledger.get("semantic_translation_review_approved") is not False:
@@ -126,7 +130,7 @@ def generate(root: Path, ledger: dict, *, work_id: str) -> tuple[bytes, dict]:
     book_nodes={}
     total_sections=total_paragraphs=0
     claimed=[]
-    for ch, sections, source_units in _chapters(root,ledger):
+    for ch, sections, source_units in _chapters(root,ledger,include_candidates=include_candidates):
         book=ch.split(".",1)[0]
         if book not in book_nodes:
             book_nodes[book]=ET.SubElement(group,f"{{{NS}}}div",{
@@ -170,13 +174,34 @@ def generate(root: Path, ledger: dict, *, work_id: str) -> tuple[bytes, dict]:
 def main():
     p=argparse.ArgumentParser()
     p.add_argument("--root",type=Path,required=True)
-    p.add_argument("--native-map",type=Path,required=True)
+    sources=p.add_mutually_exclusive_group(required=True)
+    sources.add_argument("--native-map",type=Path)
+    sources.add_argument("--single-chapter-source-map",type=Path)
+    p.add_argument("--include-production-candidates",action="store_true")
     p.add_argument("--osis",type=Path,required=True)
     p.add_argument("--report",type=Path,required=True)
     p.add_argument("--temp-module-id",default="MHCCWORK")
     a=p.parse_args()
-    meta=json.loads(a.native_map.read_text(encoding="utf-8"))
-    data, report=generate(a.root,meta,work_id=a.temp_module_id)
+    if a.single_chapter_source_map:
+        raw=json.loads(a.single_chapter_source_map.read_text(encoding="utf-8"))
+        scope=raw.get("scope")
+        units=raw.get("sections")
+        if not scope or not isinstance(units,list) or not units:
+            raise ValueError("Missing single-chapter native source evidence")
+        meta={
+            "package_sha256":raw["published_zip_sha256"],
+            "whole_native_source_sha256":raw["verified_entire_native_corpus_sha256"],
+            "semantic_translation_review_approved":False,
+            "chapters":{
+                scope:{"units":[{"native_keys":u["native_keys"],
+                                 "raw_sha256":u["source_sha256"]}
+                                for u in units]}
+            }
+        }
+    else:
+        meta=json.loads(a.native_map.read_text(encoding="utf-8"))
+    data, report=generate(a.root,meta,work_id=a.temp_module_id,
+                          include_candidates=a.include_production_candidates)
     a.osis.parent.mkdir(parents=True,exist_ok=True)
     a.report.parent.mkdir(parents=True,exist_ok=True)
     a.osis.write_bytes(data)
