@@ -14,7 +14,7 @@ source replacement, not an upstream import and not a release mechanism.
 from __future__ import annotations
 
 from hashlib import sha256
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime, timezone
 from io import BytesIO
 import json
 from pathlib import Path
@@ -527,7 +527,7 @@ def probe_private_compiled_source_erratum(
     # Its candidate checksum can be pinned as evidence of today's build, but
     # must be regenerated if the separately approved RELEASE DAY differs.
     # No module is committed, catalogue altered, or release permission set.
-    preparation_day_utc = date.today().isoformat()
+    preparation_day_utc = datetime.now(timezone.utc).date().isoformat()
     if preparation_day_utc <= source_date:
         raise ValueError("Candidate preparation day must postdate original source")
     calendar_scratch = scratch / "private-current-calendar-day-rehearsal"
