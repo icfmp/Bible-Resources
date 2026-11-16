@@ -166,6 +166,14 @@ jobs:
           assert census["source_to_other_digital_edition_parity_proven"] is False
           assert census["real_reader_layout_or_click_navigation_proven"] is False
           assert report["original_bytes_changed"] is False and report["published"] is False
+          print("Complete native stock ordered SHA-256:",
+                report["native_raw_corpus_ordered_sha256"])
+          print("Exact original occupied raw-entry totals:",
+                report["raw_entry_count"], "entries,",
+                report["total_native_raw_entry_bytes"], "unfiltered bytes")
+          print("Original stock canonical element counts (categories only): "
+                + json.dumps(census["original_element_counts_by_fixed_category"],
+                             sort_keys=True))
           print("Original-stock markup: {} strictly parsed; {} unresolved XML; "
                 "{} title elements, {} references; no source edits or release".format(
                     census["strict_xml_parseable_numbered_or_intro_entries"],
