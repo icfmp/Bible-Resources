@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from itertools import product
 from pathlib import Path
 import sys
 import unittest
@@ -10,11 +11,49 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 
 from commentary_nonlink_word_alignment import plain_word_alignment
+from commentary_chapter_paragraph_overlap import longest_common_contiguous_word_run
+from commentary_text_delta import longest_contiguous_token_run
 from commentary_private_text_compare import _original_source_markers, compare_private_texts
 from pilot_preflight import PilotError
 
 
 class OriginalPlainWordsAlignmentTests(unittest.TestCase):
+    def test_shared_exact_span_equals_independent_bruteforce_across_short_unicode_cases(self):
+        """Characterize both old consumers, including repeats, case and order."""
+        alphabet = ("a", "A", "β")
+        cases = [[]] + [
+            list(words) for size in range(1, 4)
+            for words in product(alphabet, repeat=size)
+        ]
+
+        def independent_span(left, right):
+            best = 0
+            for i in range(len(left)):
+                for j in range(len(right)):
+                    run = 0
+                    while (i + run < len(left) and j + run < len(right)
+                           and left[i + run] == right[j + run]):
+                        run += 1
+                    best = max(best, run)
+            return best
+
+        for source in cases:
+            for stock in cases:
+                expected = independent_span(source, stock)
+                self.assertEqual(longest_contiguous_token_run(source, stock),
+                                 expected)
+                self.assertEqual(longest_common_contiguous_word_run(source, stock),
+                                 expected)
+                result = plain_word_alignment(source, stock)
+                self.assertEqual(
+                    result["exact_unicode_longest_contiguous_shared_word_run_count"],
+                    expected,
+                )
+                self.assertTrue(result[
+                    "longest_common_subsequence_is_not_textual_or_edition_parity"
+                ])
+                self.assertTrue(result["original_words_never_exposed"])
+
     def test_original_words_exact_in_order_with_extra_stock_words(self):
         result=plain_word_alignment(["before","original","after"],
                                     ["before","extra","original","after"])

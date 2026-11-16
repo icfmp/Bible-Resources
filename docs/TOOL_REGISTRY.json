@@ -823,21 +823,23 @@
       "python_imports": [
         "__future__",
         "collections",
+        "commentary_text_delta",
         "hashlib",
         "pilot_preflight",
         "re"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "219a03c62ceaba81b4cce0bd859201d2d9a8866cc0060d344c11315b9960eafc",
+      "sha256_at_inventory": "c7ba3d578f02f5e0f326a82c030932f494ed7873ef820e7c05fbcc95ce401c50",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/commentary_chapter_p_boundaries.py",
         "scripts/commentary_private_text_compare.py",
-        "tests/test_commentary_chapter_paragraph_overlap.py"
+        "tests/test_commentary_chapter_paragraph_overlap.py",
+        "tests/test_commentary_nonlink_word_alignment.py"
       ]
     },
     {
@@ -1253,11 +1255,12 @@
       "purpose_first_line": "Private bounded alignment of original commentary prose OUTSIDE scripture links.",
       "python_imports": [
         "__future__",
+        "commentary_text_delta",
         "pilot_preflight"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "9c6292b4b98201841396d31f77629e7334ef14e514c3b2d6324fe8413fbd0279",
+      "sha256_at_inventory": "edd8c1645a0a301d6136a435cbc7abce3452dde34dffed524df837aab5bbeaad",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
@@ -2334,18 +2337,21 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "2d5db8407e5abc3deb78539eb04fa44bc2d226e29c30d6053c923571ec5f6c50",
+      "sha256_at_inventory": "8213a5309cd6433f1668d1f28c6776c4dad29ccb66c8c4cb7c2a0fef30a19145",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 7,
+      "static_reference_count": 10,
       "static_references": [
         "scripts/commentary_chapter_cross_slot.py",
         "scripts/commentary_chapter_neighbors.py",
+        "scripts/commentary_chapter_paragraph_overlap.py",
         "scripts/commentary_chapter_ref_labels.py",
+        "scripts/commentary_nonlink_word_alignment.py",
         "scripts/commentary_nonlink_words.py",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_stock_prefix_topology.py",
+        "tests/test_commentary_nonlink_word_alignment.py",
         "tests/test_commentary_text_delta.py"
       ]
     },
