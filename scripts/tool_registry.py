@@ -25,6 +25,7 @@ CORE = {
     "bible_intake.py", "bible_stage_runner.py", "guard_osis.py",
     "normalize_osis.py", "pilot_fetch.py", "pilot_preflight.py",
     "sword_native_index.cpp", "sword_native_inventory.py",
+    "promote_sword_preview.py", "commentary_text_delta.py",
     "build.py", "validate.py", "release_preflight.py",
     "publish_reviewed_release.py", "catalogue_release_coverage.py",
     "verify_public_catalogue.py", "commentary_intake.py",
@@ -34,6 +35,11 @@ CORE = {
     "sword_native_raw_corpus_inventory.py", "sword_native_inventory.py",
     "sword_native_commentary_index.cpp",
     "sword_native_commentary_raw_corpus.cpp",
+}
+HISTORICAL_ADAPTERS = {
+    # Immutable approved old-release recreation, not a current generic
+    # importer or authority for changing rights, versions or source text.
+    "materialize_attested_ztext_release.py",
 }
 EXPERIMENTS = (
     "commentary_chapter_", "commentary_nonlink_",
@@ -79,6 +85,8 @@ def _code(source: str) -> tuple[str, bool, tuple[str, ...]]:
 def classify(name: str, source: str, *, core=CORE) -> tuple[str, str]:
     if name in core:
         return "KEEP_GENERIC", "high"
+    if name in HISTORICAL_ADAPTERS:
+        return "HISTORICAL/ARCHIVE", "high"
     if name.startswith(EDITION_PREFIXES) or (
             any(token in name.lower() for token in ("darby", "mhcc", "lsg"))
             and name != "commentary_sword_identity_migration.py"):
