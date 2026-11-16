@@ -476,22 +476,22 @@ class PrivateCommentarySwordIdRenameTests(unittest.TestCase):
 
     def setUp(self):
         self.source=(
-            b"# Original metadata retained\\n"
-            b"[BRTEST]\\nDescription=Invented commentary\\n"
-            b"DataPath=./modules/comments/zcom/brtest/\\n"
-            b"ModDrv=zCom\\nSourceType=OSIS\\n"
-            b"Version=0.1.0\\nDistributionLicense=Public Domain\\n"
-            b"About=Invented original description retained verbatim!\\n"
-        ).replace(b"\\\\n", b"\\n")
+            b"# Original metadata retained\n"
+            b"[BRTEST]\nDescription=Invented commentary\n"
+            b"DataPath=./modules/comments/zcom/brtest/\n"
+            b"ModDrv=zCom\nSourceType=OSIS\n"
+            b"Version=0.1.0\nDistributionLicense=Public Domain\n"
+            b"About=Invented original description retained verbatim!\n"
+        )
 
     def test_exact_id_and_data_path_only_change_with_byte_reversal(self):
         revised=private_rekey_sword_commentary_conf(
             self.source, original_module_id="BRTEST",
             replacement_module_id="TEST",
         )
-        self.assertIn(b"[TEST]\\n", revised)
-        self.assertIn(b"DataPath=./modules/comments/zcom/test/\\n", revised)
-        self.assertNotIn(b"[BRTEST]\\n", revised)
+        self.assertIn(b"[TEST]\n", revised)
+        self.assertIn(b"DataPath=./modules/comments/zcom/test/\n", revised)
+        self.assertNotIn(b"[BRTEST]\n", revised)
         self.assertEqual(
             private_rekey_sword_commentary_conf(
                 revised, original_module_id="TEST",
@@ -505,11 +505,11 @@ class PrivateCommentarySwordIdRenameTests(unittest.TestCase):
     def test_identity_transition_fails_closed_for_original_mismatch_and_duplicates(self):
         malformed=[
             self.source.replace(b"[BRTEST]", b"[UNKNOWN]"),
-            self.source.replace(b"[BRTEST]", b"[BRTEST]\\n[BRTEST]"),
+            self.source.replace(b"[BRTEST]", b"[BRTEST]\n[BRTEST]"),
             self.source.replace(b"brtest/", b"somewhere/"),
             self.source.replace(b"ModDrv=zCom", b"ModDrv=RawText"),
             self.source.replace(b"SourceType=OSIS", b"SourceType=Plain"),
-            self.source+b"DataPath=./modules/comments/zcom/brtest/\\n",
+            self.source+b"DataPath=./modules/comments/zcom/brtest/\n",
         ]
         for original in malformed:
             with self.subTest(original=original):
@@ -518,7 +518,7 @@ class PrivateCommentarySwordIdRenameTests(unittest.TestCase):
                         original, original_module_id="BRTEST",
                         replacement_module_id="TEST",
                     )
-        for replacement in ("BRTEST", "brtest", "", "../TEST", "TEST\\nAbout=No"):
+        for replacement in ("BRTEST", "brtest", "", "../TEST", "TEST\nAbout=No"):
             with self.subTest(replacement=replacement):
                 with self.assertRaises(ValueError):
                     private_rekey_sword_commentary_conf(
