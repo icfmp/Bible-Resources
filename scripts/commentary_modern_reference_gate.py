@@ -96,7 +96,7 @@ class SourceReferenceGate:
             visible=" ".join(node.itertext())
             self.intros_seen[key]={
                 "source_raw_sha256":digest,
-                "source_visible_word_count":len(re.findall(r"\\b[\\w’-]+\\b",visible)),
+                "source_visible_word_count":len(re.findall(r"\b[\w’-]+\b",visible)),
                 "has_visible_text":bool(visible.strip()),
                 "source_introduction_still_not_semantically_approved":True
             }
