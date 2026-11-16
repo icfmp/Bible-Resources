@@ -80,16 +80,23 @@ def _source_chapter_and_section(marker):
     nodes = [n for n in chapter.iter() if isinstance(n.tag, str)]
     index = {n: i for i, n in enumerate(nodes)}
     start = index[marker]
-    next_marker = next((index[n] for n in numbered if index[n] > start),
-                       len(nodes))
+    next_marker_node = next((n for n in numbered if index[n] > start), None)
+    next_marker = index[next_marker_node] if next_marker_node is not None else len(nodes)
     paragraphs = [n for n in nodes if _name(n) == "p"]
     if len(paragraphs) > MAX_P:
         return {"status": "SOURCE_CHAPTER_HAS_TOO_MANY_PARAGRAPHS"}
     active = []
     for p in paragraphs:
         position = index[p]
-        contains_marker = p is marker or marker in p.iterdescendants()
-        if contains_marker or (start < position < next_marker):
+        contains_marker = marker in p.iterdescendants()
+        contains_next_marker = (
+            next_marker_node is not None
+            and next_marker_node in p.iterdescendants()
+        )
+        # Parent <p> may precede the marker in element preorder. Exclude
+        # the paragraph wrapping a *subsequent* commentary section marker.
+        if contains_marker or (start < position < next_marker
+                               and not contains_next_marker):
             active.append(p)
     return {
         "status": "SOURCE_CHAPTER_SECTION_MARKER_LOCATED",
