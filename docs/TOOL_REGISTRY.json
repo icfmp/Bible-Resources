@@ -948,7 +948,7 @@
         "andbible"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "c905cbdbc101c5123d1fcb7c45bd97c912ae63d1d1040f3d2c12ede1a6c09f22",
+      "sha256_at_inventory": "dca7a7acb43254a2bbd7bf267fa8388fa2653671cef913c20a2b0ede67388e6f",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "intake",
@@ -6454,7 +6454,7 @@
         "webview"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "7d9a8452f1776087d7e5030454b8c01c3e95d6092800b8198bd8316941d4a059",
+      "sha256_at_inventory": "bd0709f285418b1fd04fe18a2e3b2f57febaaf81e70cd7edc9cfae64823898fa",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
