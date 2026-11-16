@@ -214,6 +214,76 @@ jobs:
                 "254 exact numbered keys, real diatheke reading, "
                 "no semantic or source-reference acceptance; no release")
           PY
+      - name: Compile the Genesis 1 production candidate as a separate disposable SWORD preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_modern_draft_osis_preview.py \
+            --root work/mhcc-modern/production \
+            --single-chapter-source-map work/mhcc-modern/production/genesis-01.SOURCE_MAP.json \
+            --include-production-candidates \
+            --osis "${RUNNER_TEMP}/mhcc-genesis01-candidate-preview.osis.xml" \
+            --report "${RUNNER_TEMP}/mhcc-genesis01-candidate-preview.json" \
+            --temp-module-id MHCCGENP
+          mkdir -p "${RUNNER_TEMP}/mhcc-genp-sword/mods.d"
+          mkdir -p "${RUNNER_TEMP}/mhcc-genp-sword/modules/comments/zcom/mhccgenp"
+          osis2mod "${RUNNER_TEMP}/mhcc-genp-sword/modules/comments/zcom/mhccgenp" \
+            "${RUNNER_TEMP}/mhcc-genesis01-candidate-preview.osis.xml" -z z -b 3 \
+            > "${RUNNER_TEMP}/mhcc-genesis01-preview-build.log" 2>&1
+          cat > "${RUNNER_TEMP}/mhcc-genp-sword/mods.d/mhccgenp.conf" <<'EOF'
+          [MHCCGENP]
+          Description=Unvalidated disposable Genesis 1 modern candidate
+          DataPath=./modules/comments/zcom/mhccgenp/
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          Lang=en
+          Versification=KJV
+          SourceType=OSIS
+          DistributionLicense=Private
+          EOF
+          SWORD_PATH="${RUNNER_TEMP}/mhcc-genp-sword" \
+            diatheke -b MHCCGENP -f OSIS -k "Genesis 1:3" \
+            > "${RUNNER_TEMP}/mhcc-genesis01-reader-v3.txt"
+          SWORD_PATH="${RUNNER_TEMP}/mhcc-genp-sword" \
+            diatheke -b MHCCGENP -f OSIS -k "Genesis 1:31" \
+            > "${RUNNER_TEMP}/mhcc-genesis01-reader-v31.txt"
+          python - <<'PY'
+          import json,os,subprocess,sys
+          from pathlib import Path
+          sys.path.insert(0,"scripts")
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          temp=Path(os.environ["RUNNER_TEMP"])
+          report=json.loads((temp/"mhcc-genesis01-candidate-preview.json").read_text())
+          assert report["modern_chapter_count"]==1
+          assert report["annotated_commentary_sections"]==8
+          assert report["new_reading_paragraphs"]>=45
+          assert report["original_book_and_chapter_introductions_included"] is False
+          assert report["original_inline_reference_or_note_fidelity_approved"] is False
+          assert report["semantic_translation_independently_approved"] is False
+          assert report["sword_publication_authorized"] is False
+          a=(temp/"mhcc-genesis01-reader-v3.txt").read_text()
+          b=(temp/"mhcc-genesis01-reader-v31.txt").read_text()
+          assert "Let there be light" in a
+          assert "new heavens" in b
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str((temp/"mhcc-genp-sword").resolve())
+          proc=subprocess.Popen([str(temp/"commentary-modern-source-raw"),"MHCCGENP"],
+                                stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,env=env)
+          try:
+              assert proc.stdout
+              proof,numbered,_,_=parse_native_raw_corpus(proc.stdout)
+              proc.stdout.close()
+              assert proc.wait(timeout=20)==0
+          finally:
+              if proc.poll() is None:
+                  proc.kill()
+                  proc.wait()
+          assert len(numbered)==31
+          assert all(r.startswith("Gen.1.") for r in numbered)
+          assert proof["actual_occupied_numbered_entry_count"]==31
+          print("Genesis 1 temporary candidate OSIS/native readback PASS: 8 source divisions, 31 native positions; source ref/introduction fidelity and semantic signoff still pending")
+          PY
       - name: Upload metadata-only bounded audit receipt
         if: always()
         uses: actions/upload-artifact@v4
