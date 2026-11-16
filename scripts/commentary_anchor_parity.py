@@ -287,6 +287,8 @@ def _original_unoccupied_source_units(
             "original_body_sha256": sha256(source_text.encode("utf-8")).hexdigest(),
             "original_plain_word_count": len(words),
             "private_original_plain_words": words, "private_windows": windows,
+            "private_original_visible_text": source_text,
+            "is_original_single_verse_marker": reference == "Bible:" + wanted[reference],
         })
     if len(cases) != len(wanted):
         raise PilotError("Ambiguous or missing authorial body for unoccupied source start")
@@ -345,8 +347,21 @@ class UnoccupiedSourceProseLocator:
                     unit["private_original_plain_words"], words) is not None
                 if full_span and not all_in_order:
                     raise PilotError("Original complete contiguous prose contradicts word-order check")
+                stock_visible = "".join(etree.fromstring(
+                    b"<entry>" + raw + b"</entry>",
+                    parser=etree.XMLParser(
+                        resolve_entities=False, no_network=True,
+                        load_dtd=False, huge_tree=False, recover=False)
+                ).itertext())
+                original_visible = unit["private_original_visible_text"]
+                whole_text_exact = original_visible in stock_visible
+                whole_text_whitespace = (
+                    " ".join(original_visible.split()) in
+                    " ".join(stock_visible.split()))
                 self.hits[unit["start_key"]].append({
                     "original_stock_native_key": key,
+                    "all_original_visible_unicode_exact_contiguous": whole_text_exact,
+                    "all_original_visible_unicode_whitespace_folded_contiguous": whole_text_whitespace,
                     "native_slot_kind": kind,
                     "scope": scope,
                     "stock_raw_sha256": digest,
@@ -370,8 +385,35 @@ class UnoccupiedSourceProseLocator:
                      "same_chapter_intro": 1, "book_intro": 2}[x["scope"]],
                     x["original_stock_native_key"]),
             )
+            chapter = original.rsplit(".", 1)[0]
+            verse = int(original.rsplit(".", 1)[1])
+            immediate_next = f"{chapter}.{verse + 1}"
+            # This is a *non-buildable* research hint; a single-verse
+            # source marker must not be expanded to a whole authored range.
+            next_entry = next(
+                (entry for entry in scores
+                 if entry["original_stock_native_key"] == immediate_next
+                 and entry["all_original_plain_words_found_as_contiguous_stock_run"]
+                 and entry["scope"] == "other_numbered_key_same_chapter"),
+                None,
+            )
+            first_verse_hint = (
+                {"new_unoccupied_native_key": original,
+                 "original_occupied_master_key": immediate_next,
+                 "original_master_raw_sha256": next_entry["stock_raw_sha256"],
+                 "status": "SOURCE_BOUND_ALIAS_PREVIEW_NOT_AUTHORIZED"}
+                if (verse == 1 and unit["is_original_single_verse_marker"]
+                    and next_entry is not None)
+                else None
+            )
             rows.append({
                 "original_source_reference": unit["reference"],
+                "source_is_single_verse_marker": unit["is_original_single_verse_marker"],
+                "provisional_missing_first_verse_alias_preview": first_verse_hint,
+                "native_candidate_slots_containing_exact_original_visible_unicode": sum(
+                    int(x["all_original_visible_unicode_exact_contiguous"]) for x in scores),
+                "native_candidate_slots_containing_whitespace_folded_original_visible_unicode": sum(
+                    int(x["all_original_visible_unicode_whitespace_folded_contiguous"]) for x in scores),
                 "source_volume": unit["volume"],
                 "source_line": unit["original_source_line"],
                 "source_original_body_sha256": unit["original_body_sha256"],
