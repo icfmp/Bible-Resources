@@ -30,7 +30,14 @@ Nothing in the most ancient surviving book contradicts its account. Indeed, much
 - He cites both **ancient non-Jewish authors** and **national customs** as corroboration.
 - These statements are **Henry's historical claims**, not new assertions independently established by this edition.
 
-**Status:** separate original book-intro unit, not numbered Genesis 1 commentary.
-Must be matched to the exact native `MHCC` 0.1.1 `Gen` introduction
-key and all markup/citation boundaries before validation. No independent
-semantic review or SWORD derivative readback has yet passed.
+**Status:** logically separate authorial book introduction, **not** the
+numbered Genesis 1 exposition. The published native `I:Gen` and
+`I:Gen.1` entries are **wordless** (verified from the real corrected
+source). The visible book introduction is embedded in the first composite
+`K:Gen.1.1` raw body alongside the chapter outline and the 1–2
+commentary. This separately edited candidate must retain that **source
+provenance** when placed as a distinct book introduction in a new
+derivative; it must not be silently copied from an empty `Gen` I slot
+nor duplicated under `Gen.1.1`. Exact intra-source segment boundary,
+all original markup/attributes and independent semantic review remain
+unapproved.
