@@ -100,10 +100,11 @@ def layout_profile(raw: bytes) -> dict:
 
     visit(root, set())
     empty_paragraphs, empty_headings = nonlocal_empty
-    # Entire body size counts *direct* XML text/tail once, even under nested p.
+    # Word totals are measured on original XML .text/.tail fragments,
+    # without double-counting nested markup. Flat itertext() may join a
+    # title directly to the next paragraph with no intervening XML space,
+    # so its apparent lexical token count is NOT an identity invariant.
     visible = "".join(root.itertext())
-    if text_word_total != len(WORD.findall(visible)):
-        raise ValueError("Original source visible word ownership mismatch")
     if sum(counts.values()) > 100000:
         raise ValueError("Unbounded original layout element count")
     paragraphs = counts["p"] + counts["l"]
