@@ -52,6 +52,19 @@ class CommentaryAnchorParityTests(unittest.TestCase):
             "Gen.1.2")
         self.assertGreaterEqual(result["units"][0]["bounded_matching_native_candidates"][0][
             "matched_distinct_original_plain_word_windows"], 1)
+        self.assertTrue(result["units"][0]["bounded_matching_native_candidates"][0][
+            "all_original_plain_words_found_in_stock_order"])
+        self.assertTrue(result["units"][0]["bounded_matching_native_candidates"][0][
+            "all_original_plain_words_found_as_contiguous_stock_run"])
+        incomplete = UnoccupiedSourceProseLocator(original_units)
+        incomplete.observe("K", "Gen.1.3",
+                           b"<div><p>" + original_words.replace(
+                               b"sourceword27", b"alteredword27") + b"</p></div>")
+        incomplete_report = incomplete.report()
+        self.assertEqual(
+            incomplete_report["units"][0]["native_candidate_slots_containing_all_original_words_in_order"], 0)
+        self.assertGreater(
+            incomplete_report["units"][0]["native_candidate_slots_with_any_exact_plain_word_window"], 0)
         self.assertFalse(result["published"])
         self.assertNotIn("sourceword", json.dumps(result))
         self.assertEqual(_original_unoccupied_source_units(
