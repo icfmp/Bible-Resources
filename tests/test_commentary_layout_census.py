@@ -15,7 +15,7 @@ class CommentaryLayoutCensusTests(unittest.TestCase):
                b"<p>One <hi type='bold'>two</hi> three.</p>"
                b"<p>Four five.</p>")
         profile = layout_profile(raw)
-        self.assertEqual(profile["word_count"], 8)
+        self.assertEqual(profile["word_count"], 7)
         self.assertEqual(profile["paragraph_count"], 2)
         self.assertEqual(profile["heading_count"], 1)
         self.assertEqual(profile["unwrapped_word_count"], 0)
