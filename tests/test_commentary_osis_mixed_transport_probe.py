@@ -13,6 +13,7 @@ from commentary_osis_mixed_transport_probe import (
     probe_native_original_link_identity,
     mixed_transport_checks_pass, _COVERAGE_FIELDS,
     privately_stage_versioned_zcom_zip,
+    private_rekey_sword_commentary_conf,
     verify_private_versioned_commentary_conf_delta
 )
 
@@ -468,6 +469,62 @@ class NativeLinkedIdentityTests(unittest.TestCase):
                 )
         self.assertEqual(actual["non_linked_proposed_pairs"],["Gen.1.5"])
         self.assertFalse(actual["all_original_master_to_proposed_target_pairs_are_native_linked"])
+
+
+class PrivateCommentarySwordIdRenameTests(unittest.TestCase):
+    """Use invented-only data to prevent accidental CrossWire/curated mixing."""
+
+    def setUp(self):
+        self.source=(
+            b"# Original metadata retained\\n"
+            b"[BRTEST]\\nDescription=Invented commentary\\n"
+            b"DataPath=./modules/comments/zcom/brtest/\\n"
+            b"ModDrv=zCom\\nSourceType=OSIS\\n"
+            b"Version=0.1.0\\nDistributionLicense=Public Domain\\n"
+            b"About=Invented original description retained verbatim!\\n"
+        ).replace(b"\\\\n", b"\\n")
+
+    def test_exact_id_and_data_path_only_change_with_byte_reversal(self):
+        revised=private_rekey_sword_commentary_conf(
+            self.source, original_module_id="BRTEST",
+            replacement_module_id="TEST",
+        )
+        self.assertIn(b"[TEST]\\n", revised)
+        self.assertIn(b"DataPath=./modules/comments/zcom/test/\\n", revised)
+        self.assertNotIn(b"[BRTEST]\\n", revised)
+        self.assertEqual(
+            private_rekey_sword_commentary_conf(
+                revised, original_module_id="TEST",
+                replacement_module_id="BRTEST",
+            ), self.source,
+        )
+        self.assertIn(b"Original metadata retained", revised)
+        self.assertIn(b"DistributionLicense=Public Domain", revised)
+        self.assertIn(b"About=Invented original description retained verbatim!", revised)
+
+    def test_identity_transition_fails_closed_for_original_mismatch_and_duplicates(self):
+        malformed=[
+            self.source.replace(b"[BRTEST]", b"[UNKNOWN]"),
+            self.source.replace(b"[BRTEST]", b"[BRTEST]\\n[BRTEST]"),
+            self.source.replace(b"brtest/", b"somewhere/"),
+            self.source.replace(b"ModDrv=zCom", b"ModDrv=RawText"),
+            self.source.replace(b"SourceType=OSIS", b"SourceType=Plain"),
+            self.source+b"DataPath=./modules/comments/zcom/brtest/\\n",
+        ]
+        for original in malformed:
+            with self.subTest(original=original):
+                with self.assertRaises(ValueError):
+                    private_rekey_sword_commentary_conf(
+                        original, original_module_id="BRTEST",
+                        replacement_module_id="TEST",
+                    )
+        for replacement in ("BRTEST", "brtest", "", "../TEST", "TEST\\nAbout=No"):
+            with self.subTest(replacement=replacement):
+                with self.assertRaises(ValueError):
+                    private_rekey_sword_commentary_conf(
+                        self.source, original_module_id="BRTEST",
+                        replacement_module_id=replacement,
+                    )
 
 
 if __name__=="__main__":
