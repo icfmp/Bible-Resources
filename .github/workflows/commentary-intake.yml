@@ -4,6 +4,8 @@ on:
     paths:
       - '.github/workflows/commentary-intake.yml'
       - 'scripts/commentary_intake.py'
+      - 'scripts/commentary_native_inventory.py'
+      - 'scripts/sword_native_commentary_index.cpp'
       - 'scripts/pilot_fetch.py'
       - 'config/commentary-intake/**'
       - 'tests/test_commentary_intake.py'
@@ -45,7 +47,7 @@ jobs:
           timeout 90s sudo apt-get -o Acquire::Retries=0 \
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update
           timeout 90s sudo apt-get -o Acquire::Retries=0 \
-            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y diatheke
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y diatheke libsword-dev
       - name: Observe original commentary in disposable workspace
         shell: bash
         run: |
@@ -54,12 +56,60 @@ jobs:
             --resource-id "$RESOURCE_ID" \
             --stage "$STAGE" \
             --report "${RUNNER_TEMP}/commentary-intake-report.json"
+      - name: Real native occupied-key inventory only for independently SHA-pinned source
+        if: env.STAGE != '1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          # This adds a distinct source/native structural observation to the
+          # original read-only intake; no competing SWORD importer or release.
+          if python - <<'PY'
+          import json,os,re
+          from pathlib import Path
+          resource=os.environ["RESOURCE_ID"]
+          assert re.fullmatch(r"[a-z][a-z0-9-]{1,63}",resource)
+          stage=os.environ["STAGE"]
+          p=Path("config/commentary-intake")/(resource+".json")
+          conf=json.loads(p.read_text(encoding="utf-8"))
+          pinned=bool(re.fullmatch(r"[a-f0-9]{64}",conf.get("archive_sha256") or ""))
+          raise SystemExit(0 if stage in ("2","auto") and pinned else 1)
+          PY
+          then
+            python -m pip install -r requirements.txt
+            g++ -std=c++17 -O2 -I/usr/include/sword \
+              scripts/sword_native_commentary_index.cpp \
+              -o "${RUNNER_TEMP}/commentary-native-index" -lsword
+            python scripts/commentary_native_inventory.py \
+              --resource-id "$RESOURCE_ID" \
+              --native-inspector "${RUNNER_TEMP}/commentary-native-index" \
+              --report "${RUNNER_TEMP}/commentary-native-index.json"
+            python - <<'PY'
+          import json,os
+          from pathlib import Path
+          result=json.loads((Path(os.environ["RUNNER_TEMP"])/
+                             "commentary-native-index.json").read_text())
+          assert result["status"]=="occupied_slot_inventory_not_entry_parity"
+          assert result["rights_review_status"]=="research_only"
+          assert result["source_to_native_text_fidelity_verified"] is False
+          assert result["published"] is False
+          print("Pinned real commentary native coverage:",
+                result["module_id"],result["driver"],
+                "K",result["occupied_numbered_slots"],
+                "I",result["occupied_intro_slots"],
+                "TOP",result["occupied_anonymous_top_slots"],
+                "(not authorial parity or permission)")
+          PY
+          else
+            echo "Native inventory not run: this intake is unpinned or metadata-only. No source fidelity PASS inferred."
+          fi
       - name: Keep only metadata-only receipt, never the original module
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: commentary-intake-receipt
-          path: ${{ runner.temp }}/commentary-intake-report.json
+          path: |
+            ${{ runner.temp }}/commentary-intake-report.json
+            ${{ runner.temp }}/commentary-native-index.json
           if-no-files-found: warn
           retention-days: 30
       - name: Explain strict research scope
