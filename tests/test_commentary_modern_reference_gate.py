@@ -74,6 +74,37 @@ class OriginalReferenceGateTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"introduction"):
             g.report({"all_native_raw_entries_ordered_sha256":FULL_HASH})
 
+    def test_compound_original_first_K_owns_book_intro_and_outline_not_empty_I(self):
+        raw=(b'<div><title>Chapter Outline</title>'
+             b'Genesis was written under inspiration.'
+             b'<table><row><cell>Creation</cell><cell>1-2</cell></row></table>'
+             b'The first verse gives an account of Creation.'
+             b'<reference osisRef="Bible:1John.5.20">1Jo</reference></div>')
+        orig_intro=b"<div/>"
+        meta=source()
+        meta["sections"][0]["source_sha256"]=hashlib.sha256(raw).hexdigest()
+        meta["sections"][0]["markup_census"]["tag_counts"]["reference"]=1
+        meta["introductions"]=[{
+            "native_key":"Gen",
+            "source_sha256":hashlib.sha256(orig_intro).hexdigest()
+        }]
+        meta["intro_provenance_expectations"]={
+            "original_first_numbered_key":"Gen.1.3",
+            "expected_original_book_intro_start":"Genesis was written under inspiration",
+            "expected_original_exposition_start":"The first verse gives an account",
+            "expected_original_chapter_outline_table_count":1,
+            "expected_original_chapter_outline_row_count":1,
+            "expected_original_chapter_outline_title_count":1
+        }
+        g=SourceReferenceGate(source_map=meta,expected_refs=expected(),
+                              candidate="This has (1 John 5:20).")
+        g.observe("I","Gen",orig_intro)
+        g.observe("K","Gen.1.3",raw)
+        proof=g.report({"all_native_raw_entries_ordered_sha256":FULL_HASH})
+        self.assertTrue(proof["original_book_intro_and_outline_owned_by_first_numbered_K_attested"])
+        self.assertEqual(proof["per_intro_unit"]["Gen"]["source_visible_word_count"],0)
+        self.assertFalse(proof["original_prose_or_reference_labels_exported"])
+
     def test_no_silent_change_of_source_link_destination(self):
         g=SourceReferenceGate(source_map=source(),expected_refs=expected(),
                                candidate="(1 John 5:20)")
