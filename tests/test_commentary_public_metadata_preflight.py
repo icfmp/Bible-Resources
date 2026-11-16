@@ -152,6 +152,8 @@ class PrivateCommentaryZipRehearsalTests(unittest.TestCase):
         self.assertEqual(hashlib.sha256(package.read_bytes()).hexdigest(),
                          result["zip_sha256"])
         with zipfile.ZipFile(package) as z:
+            self.assertTrue(all(info.compress_type == zipfile.ZIP_DEFLATED
+                                for info in z.infolist()))
             self.assertEqual(len(z.namelist()), 7)
             self.assertEqual(len(set(z.namelist())), 7)
             name = "mods.d/curated.conf"

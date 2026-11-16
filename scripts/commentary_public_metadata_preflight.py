@@ -204,10 +204,14 @@ def rehearse_private_versioned_commentary_package(
 
     def deterministic_archive() -> bytes:
         destination = BytesIO()
-        with zipfile.ZipFile(destination, "w") as package:
+        # Match the actual public catalogue builder's deterministic ZIP,
+        # rather than the original private compiler probe's STORED ZIP.
+        with zipfile.ZipFile(
+                destination, "w", compression=zipfile.ZIP_DEFLATED,
+                compresslevel=9) as package:
             for name, content in sorted(members.items()):
                 info = zipfile.ZipInfo(name, (1980, 1, 1, 0, 0, 0))
-                info.compress_type = zipfile.ZIP_STORED
+                info.compress_type = zipfile.ZIP_DEFLATED
                 info.create_system = 3
                 info.external_attr = 0o100644 << 16
                 package.writestr(info, content)
