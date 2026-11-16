@@ -34,6 +34,7 @@ from commentary_osis_transport_probe import (
 from commentary_osis_mixed_transport_probe import (
     probe_original_mixed_transport, probe_complete_original_transport,
     privately_stage_versioned_zcom_zip,
+    private_rekey_sword_commentary_conf,
 )
 from commentary_osis_intro_transport_probe import probe_original_intro_transport
 from commentary_intro_chapter_text_review import (
@@ -2158,13 +2159,27 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                            (curated["sword_id"].lower()+".conf"))
             if not original_conf.is_file() or original_conf.is_symlink():
                 raise PilotError("Original curated module configuration is missing")
+            proposed_sword_id=decisions.get("proposed_next_sword_id", curated["sword_id"])
+            if (not isinstance(proposed_sword_id, str)
+                    or not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,79}", proposed_sword_id)
+                    or (proposed_sword_id!=curated["sword_id"]
+                        and proposed_sword_id!=manifest["module_id"])):
+                raise PilotError("Unreviewed proposed replacement SWORD ID")
+            candidate_conf=(
+                private_rekey_sword_commentary_conf(
+                    original_conf.read_bytes(),
+                    original_module_id=curated["sword_id"],
+                    replacement_module_id=proposed_sword_id,
+                ) if proposed_sword_id!=curated["sword_id"]
+                else original_conf.read_bytes()
+            )
             package_staging=privately_stage_versioned_zcom_zip(
                 compiler_root=preview_dir/"complete-original-private-candidate",
                 compiled_module_id="BRIndexProbe",
-                package_module_id=curated["sword_id"],
+                package_module_id=proposed_sword_id,
                 previous_version=curated["version"],
                 proposed_version=decisions["proposed_next_version"],
-                published_conf_template=original_conf.read_bytes(),
+                published_conf_template=candidate_conf,
                 scratch=preview_dir,
                 native_raw_binary=raw_binary,
                 provisional_index_aliases=reviewed_scope_plan["new_native_aliases"],
@@ -2208,10 +2223,10 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                     original_index_only_compiled_root=(
                         preview_dir/"complete-original-private-candidate"),
                     reviewed_aliases=reviewed_scope_plan["new_native_aliases"],
-                    curated_module_id=curated["sword_id"],
+                    curated_module_id=proposed_sword_id,
                     curated_previous_version=curated["version"],
                     curated_proposed_version=decisions["proposed_next_version"],
-                    original_curated_conf=original_conf.read_bytes(),
+                    original_curated_conf=candidate_conf,
                     scratch=revised_dir,
                     native_raw_binary=raw_binary,
                     native_index_binary=index_binary,
