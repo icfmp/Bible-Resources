@@ -358,38 +358,98 @@ def xml_structure(data: bytes) -> dict:
     }
 
 
+def _xml_witness_locations(config: dict) -> tuple[list[tuple[int, str, str | None]], bool]:
+    """Validate the source manifest without downloading any third-party prose."""
+    if not isinstance(config, dict):
+        raise PilotError("Missing commentary source identity")
+    collection = config.get("xml_witness_volumes")
+    if collection is None:
+        url = config.get("xml_witness_url")
+        expected = config.get("xml_witness_sha256")
+        locations = [(1, url, expected)]
+        is_collection = False
+    else:
+        if config.get("xml_witness_url") is not None:
+            raise PilotError("Ambiguous single and volume-based XML witnesses")
+        if not isinstance(collection, list) or not 1 <= len(collection) <= 12:
+            raise PilotError("XML volume witness must have 1–12 source records")
+        locations = []
+        for row in collection:
+            if (not isinstance(row, dict)
+                    or set(row) != {"number", "url", "sha256"}
+                    or type(row["number"]) is not int
+                    or not 1 <= row["number"] <= 12):
+                raise PilotError("Unreviewed original XML volume specification")
+            locations.append((row["number"], row["url"], row["sha256"]))
+        is_collection = True
+    seen_numbers = set()
+    seen_urls = set()
+    for number, url, expected in locations:
+        if (number in seen_numbers or not isinstance(url, str)
+                or url in seen_urls):
+            raise PilotError("Duplicate XML witness volume or URL")
+        seen_numbers.add(number)
+        seen_urls.add(url)
+        parsed = urlsplit(url)
+        if (parsed.hostname not in {"ccel.org", "www.ccel.org"}
+                or not parsed.path.endswith(".xml") or parsed.query
+                or parsed.fragment or parsed.username or parsed.password):
+            raise PilotError("Unapproved commentary XML provenance URL")
+        validate_url(url, "ccel")
+        if expected is not None and not (isinstance(expected, str) and SHA.fullmatch(expected)):
+            raise PilotError("Unknown XML witness pin; do not guess a SHA-256")
+    if is_collection and [number for number, _, _ in locations] != sorted(seen_numbers):
+        raise PilotError("XML volumes must preserve their declared source order")
+    return locations, is_collection
+
+
 def inspect_xml(resource_id: str, *, directory: Path | None = None) -> dict:
     manifest = load_manifest(resource_id, directory)
-    config = manifest.get("commentary_source", {})
-    url = config.get("xml_witness_url")
-    if not isinstance(url, str) or not url:
-        raise PilotError("Exact independent XML witness URL missing in reviewed manifest")
-    parsed = urlsplit(url)
-    if (parsed.hostname not in {"ccel.org", "www.ccel.org"}
-            or not parsed.path.endswith(".xml") or parsed.query):
-        raise PilotError("Unapproved commentary XML provenance URL")
-    validate_url(url, "ccel")
-    expected = config.get("xml_witness_sha256")
-    if expected is not None and not (isinstance(expected, str) and SHA.fullmatch(expected)):
-        raise PilotError("Unknown XML witness pin; do not guess a SHA-256")
+    locations, is_collection = _xml_witness_locations(manifest.get("commentary_source"))
+    reports = []
     with tempfile.TemporaryDirectory(prefix="commentary-xml-witness-") as temp:
-        original = Path(temp) / "witness.xml"
-        receipt = fetch(url, original, "ccel")
-        if receipt["bytes"] > MAX_XML:
-            raise PilotError("Original XML exceeds 32 MiB limit")
-        if expected is not None and expected != receipt["sha256"]:
-            raise PilotError("Original XML changed since the reviewed SHA-256 pin")
-        signals = xml_structure(original.read_bytes())
-        if receipt["sha256"] != signals["xml_sha256"]:
-            raise PilotError("XML source mutated while reading")
+        for number, url, expected in locations:
+            original = Path(temp) / f"witness-volume-{number}.xml"
+            receipt = fetch(url, original, "ccel")
+            if receipt["bytes"] > MAX_XML:
+                raise PilotError("Original XML exceeds 32 MiB limit")
+            if expected is not None and expected != receipt["sha256"]:
+                raise PilotError("Original XML changed since the reviewed SHA-256 pin")
+            signals = xml_structure(original.read_bytes())
+            if receipt["sha256"] != signals["xml_sha256"]:
+                raise PilotError("XML source mutated while reading")
+            reports.append({
+                "volume": number,
+                "observed_witness_url": url,
+                "source_sha256_pin_verified": expected is not None,
+                **signals,
+            })
+    if not is_collection:
+        original = reports[0]
+        return {
+            "schema_version": 1,
+            "resource_id": resource_id,
+            "observed_witness_url": original["observed_witness_url"],
+            "source_sha256_pin_verified": original["source_sha256_pin_verified"],
+            **{k: v for k, v in original.items()
+               if k not in ("volume", "observed_witness_url", "source_sha256_pin_verified")},
+            "rights_approved": False,
+            "original_source_edition_matched_to_sword": False,
+            "published": False,
+        }
     return {
         "schema_version": 1,
+        "status": "ordered_original_xml_volumes_observed_not_source_parity",
         "resource_id": resource_id,
-        "observed_witness_url": url,
-        "source_sha256_pin_verified": expected is not None,
-        **signals,
+        "source_witness_kind": "ordered_xml_collection",
+        "volume_count": len(reports),
+        "all_volume_sha256_pins_verified": all(
+            row["source_sha256_pin_verified"] for row in reports),
+        "volume_observations": reports,
         "rights_approved": False,
         "original_source_edition_matched_to_sword": False,
+        "authored_ranges_verified": False,
+        "content_modified": False,
         "published": False,
     }
 
