@@ -60,6 +60,55 @@ def _inject_reference_at_exact_marker(section: ET.Element, *, marker: str,
         parent.insert(index+1,ref)
 
 
+def _copy_authorial_outline_tables(composite: ET.Element,
+                                    first_modern_section: ET.Element,
+                                    *, expected_tables: int) -> int:
+    """Preserve exact original table CELL TEXT and table/row/cell topology.
+
+    The source is the SHA-authenticated original first native K, NOT a
+    reconstruction from a modernized heading. Unexpected nested markup fails
+    instead of silently flattening authorial annotations or headings.
+    """
+    original_tables=[n for n in composite.iter()
+                     if isinstance(n.tag,str) and n.tag.rsplit("}",1)[-1]=="table"]
+    if (type(expected_tables) is not int or expected_tables<=0
+            or len(original_tables)!=expected_tables):
+        raise ValueError("Original chapter-outline table census does not match reviewed source")
+    cloned=[]
+    for original in original_tables:
+        table=ET.Element(f"{{{NS}}}table",{
+            "resp":"BibleResourcesOriginalSourceTable"})
+        for row in list(original):
+            if not isinstance(row.tag,str) or row.tag.rsplit("}",1)[-1]!="row":
+                raise ValueError("Unexpected original source table row layout")
+            new_row=ET.SubElement(table,f"{{{NS}}}row")
+            for cell in list(row):
+                if not isinstance(cell.tag,str) or cell.tag.rsplit("}",1)[-1]!="cell":
+                    raise ValueError("Unexpected original source table cell layout")
+                if list(cell):
+                    raise ValueError("Original outline cell contains markup: preserve it explicitly first")
+                new_cell=ET.SubElement(new_row,f"{{{NS}}}cell")
+                new_cell.text=cell.text or ""
+            if len(new_row)!=2:
+                raise ValueError("Expected original editorial table has two cells")
+        if len(table)!=1:
+            raise ValueError("Original editorial outline must remain a single-row table")
+        cloned.append(table)
+    title=ET.Element(f"{{{NS}}}title",{
+        "type":"sub","resp":"BibleResourcesOriginalSourceOutline"})
+    title.text="Chapter Outline"
+    first_modern_section.insert(0,title)
+    for i,table in enumerate(cloned,1):
+        first_modern_section.insert(i,table)
+    actual_cells=["".join(cell.itertext())
+                  for table in cloned for row in table for cell in row]
+    original_cells=["".join(cell.itertext())
+                    for table in original_tables for row in table for cell in row]
+    if actual_cells!=original_cells or len(actual_cells)!=2*expected_tables:
+        raise ValueError("Original chapter-outline cell bytes/ownership changed")
+    return len(cloned)
+
+
 def read_book_intro_candidate(path: Path, *, book: str,
                               source_zip_sha: str,
                               source_corpus_sha: str) -> list[str]:
@@ -128,6 +177,11 @@ def build_verified_preview(*, root: Path, source_map: dict, expected_refs: dict,
         raise ValueError("Missing or wrong uniquely bounded candidate chapter")
     chapter=chapters[0]
     sections=chapter.findall(f"{{{NS}}}div[@annotateType='commentary']")
+    original_first_K=gate.original_composite_outline_tree_after_verified_source(complete_raw_report)
+    composite=source_map.get("intro_provenance_expectations",{})
+    outline_count=_copy_authorial_outline_tables(
+        original_first_K,sections[0],
+        expected_tables=composite.get("expected_original_chapter_outline_table_count"))
     expected_units=source_map["sections"]
     if len(sections)!=len(expected_units):
         raise ValueError("Original source sections not preserved")
@@ -187,7 +241,9 @@ def build_verified_preview(*, root: Path, source_map: dict, expected_refs: dict,
             for item in gate.intros_seen.values()),
         "modern_book_introduction_editorially_moved_out_of_first_K":True,
         "modern_book_introduction_paragraphs_included":len(intro),
-        "original_chapter_outline_tables_preserved":False,
+        "original_chapter_outline_tables_preserved":True,
+        "original_chapter_outline_tables_retained":outline_count,
+        "original_chapter_outline_cell_text_exactly_preserved":True,
         "original_chapter_intro_native_markup_preserved":False,
         "source_original_book_intro_raw_markup_preserved":False,
         "semantic_translation_independently_approved":False,
