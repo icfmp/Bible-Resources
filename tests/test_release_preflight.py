@@ -32,7 +32,7 @@ class CrossEditionReleasePreflightTests(unittest.TestCase):
             self.assertRegex(record["package_sha256"], r"^[a-f0-9]{64}$")
             self.assertGreater(record["package_size_bytes"], 0)
             self.assertTrue(record["native_payload_member_identity_verified"])
-            if record["resource_id"]=="lsg-1910":
+            if record["resource_id"] in ("lsg-1910", "darby-jnd-2024"):
                 self.assertEqual(record["release_route"], "frozen_historical_binding")
                 self.assertFalse(record["release_authorization_verified_in_current_plan"])
                 self.assertTrue(record["frozen_historical_evidence_verified"])
