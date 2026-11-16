@@ -286,7 +286,7 @@
         },
         "manifest": {
           "type": "string",
-          "pattern": "^config/[A-Za-z0-9._-]+\\.json$"
+          "pattern": "^config/(?:[A-Za-z0-9._-]+|commentary-rebuilds/[a-z0-9-]+)\\.json$"
         }
       },
       "allOf": [
