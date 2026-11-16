@@ -81,3 +81,7 @@ This code is a **proposed verifier**, not a claim that a production
 `SOURCE_AUDIT.json` and `SOURCE_VALIDATION.json` already exist for the
 unpublished BRMHCC 0.1.1. The original stock and public 0.1.0 stay
 immutable.
+
+## Native member naming follows SWORD BlockType
+
+The published original `BlockType=BOOK` uses six `{nt,ot}.bzs/.bzv/.bzz` members. The standard `osis2mod -b 3` private recompilation has `BlockType=CHAPTER` and six `{nt,ot}.czs/.czv/.czz` members; verse-block modules use `{nt,ot}.vzs/.vzv/.vzz`. The new validator derives its **complete six-member inventory** from the candidate's checked `BlockType` instead of requiring the original BOOK-format filenames. Exact per-file SHA-256s, member completeness, original source fidelity and approval remain mandatory.

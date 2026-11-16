@@ -15,7 +15,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from reviewed_compiled_commentary_rebuild import reviewed_rebuilt_commentary_errors
-from compiled_stock_commentary_proof import SUFFIXES
+from reviewed_compiled_commentary_rebuild import zcom_member_suffixes
 from jsonschema import Draft202012Validator
 
 
@@ -69,7 +69,7 @@ class RebuiltCommentaryContractTests(unittest.TestCase):
             **{
                 "modules/comments/zcom/synth/" + name:
                     b"Invented compiled test member: " + name.encode("ascii")
-                for name in SUFFIXES
+                for name in zcom_member_suffixes("CHAPTER")
             },
         }
         for path, raw in file_data.items():
@@ -149,14 +149,26 @@ class RebuiltCommentaryContractTests(unittest.TestCase):
         return reviewed_rebuilt_commentary_errors(
             self.module, self.root, self.meta, self.conf)
 
+    def test_members_follow_real_sword_block_granularity(self):
+        self.assertEqual(zcom_member_suffixes("BOOK"),
+                         ("nt.bzs", "nt.bzv", "nt.bzz", "ot.bzs", "ot.bzv", "ot.bzz"))
+        self.assertEqual(zcom_member_suffixes("CHAPTER"),
+                         ("nt.czs", "nt.czv", "nt.czz", "ot.czs", "ot.czv", "ot.czz"))
+        self.assertEqual(zcom_member_suffixes("VERSE"),
+                         ("nt.vzs", "nt.vzv", "nt.vzz", "ot.vzs", "ot.vzv", "ot.vzz"))
+        with self.assertRaises(ValueError):
+            zcom_member_suffixes("WRONG")
+        self.assertEqual(self.errors(), [])
+        self.conf["BlockType"] = "BOOK"
+        self.assertTrue(self.errors())
     def test_exact_attestation_and_payload_pass_synthetic_fixture(self):
         self.assertEqual(self.errors(), [])
 
     def test_tampered_member_or_extra_member_is_rejected(self):
-        p = self.payload / "modules/comments/zcom/synth/nt.bzz"
+        p = self.payload / "modules/comments/zcom/synth/nt.czz"
         p.write_bytes(b"tampered")
         self.assertIn("checksum mismatch", str(self.errors()))
-        p.write_bytes(b"Invented compiled test member: nt.bzz")
+        p.write_bytes(b"Invented compiled test member: nt.czz")
         (p.parent / "secret").write_bytes(b"hidden")
         self.assertIn("Added or omitted", str(self.errors()))
 

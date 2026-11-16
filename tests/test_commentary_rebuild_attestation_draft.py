@@ -10,7 +10,7 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from commentary_rebuild_attestation_draft import private_rebuild_attestation_draft, _native_map_digest
-from compiled_stock_commentary_proof import SUFFIXES
+from reviewed_compiled_commentary_rebuild import zcom_member_suffixes
 from reviewed_compiled_commentary_rebuild import reviewed_rebuilt_commentary_errors
 
 
@@ -69,7 +69,7 @@ class PrivateNativeRebuildDraftTests(unittest.TestCase):
             "mods.d/brdemo.conf": b"[BRDemo]\nVersion=0.1.1\n",
             **{
                 "modules/comments/zcom/brdemo/"+name: b"Test member "+name.encode()
-                for name in SUFFIXES
+                for name in zcom_member_suffixes("CHAPTER")
             },
         }
         for rel, content in self.payload_data.items():
@@ -80,7 +80,7 @@ class PrivateNativeRebuildDraftTests(unittest.TestCase):
             "repo_root": self.root,
             "original_manifest": self.original_name,
             "module_id": "BRDemo", "version": "0.1.1",
-            "versification": "KJV",
+            "versification": "KJV", "compiled_block_type": "CHAPTER",
             "original_native_corpus_sha256": "b"*64,
             "original_source_numbered": self.source,
             "original_source_intros": self.intros,
@@ -215,7 +215,7 @@ class PrivateNativeRebuildDraftTests(unittest.TestCase):
             self.build(installed_receipt=receipt(self.revised, "f"*64))
         with self.assertRaises(ValueError):
             self.build(revised_receipt=receipt(self.index, "e"*64))
-        path = self.payload / "modules/comments/zcom/brdemo/nt.bzz"
+        path = self.payload / "modules/comments/zcom/brdemo/nt.czz"
         path.unlink()
         with self.assertRaises(ValueError):
             self.build()

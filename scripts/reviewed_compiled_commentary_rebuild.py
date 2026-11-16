@@ -14,7 +14,17 @@ import json
 from pathlib import Path
 import re
 
-from compiled_stock_commentary_proof import SUFFIXES
+
+def zcom_member_suffixes(block_type: str) -> tuple[str, ...]:
+    """Native zCom members follow SWORD compression block granularity."""
+    prefix = {"BOOK": "b", "CHAPTER": "c", "VERSE": "v"}.get(block_type)
+    if prefix is None:
+        raise ValueError("Unsupported standard zCom compression block type")
+    return tuple(
+        f"{testament}.{prefix}z{suffix}"
+        for testament in ("nt", "ot")
+        for suffix in ("s", "v", "z")
+    )
 
 SHA = re.compile(r"[0-9a-f]{64}\Z")
 ORIGINAL = re.compile(r"config/commentary-intake/[a-z0-9-]+\.json\Z")
@@ -223,7 +233,7 @@ def reviewed_rebuilt_commentary_errors(
         paths = {
             "mods.d/" + folder + ".conf",
             *("modules/comments/zcom/" + folder + "/" + name
-              for name in SUFFIXES),
+              for name in zcom_member_suffixes(conf.get("BlockType"))),
         }
         expected_files = review.get("payload_sha256")
         if (not isinstance(expected_files, dict)

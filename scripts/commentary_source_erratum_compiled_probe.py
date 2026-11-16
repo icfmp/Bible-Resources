@@ -438,6 +438,7 @@ def probe_private_compiled_source_erratum(
         original_manifest=original_source_manifest,
         module_id=curated_module_id, version=curated_proposed_version,
         versification=_exact_conf_value(installed_conf.decode("utf-8"), "Versification"),
+        compiled_block_type=_exact_conf_value(installed_conf.decode("utf-8"), "BlockType"),
         original_native_corpus_sha256=original_native_corpus_sha256,
         original_source_numbered=original_numbered,
         original_source_intros=original_intros, original_source_top=original_TOP,

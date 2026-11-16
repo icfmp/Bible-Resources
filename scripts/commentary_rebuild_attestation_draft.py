@@ -14,8 +14,7 @@ import json
 from pathlib import Path
 import re
 
-from compiled_stock_commentary_proof import SUFFIXES
-from reviewed_compiled_commentary_rebuild import _review_deltas
+from reviewed_compiled_commentary_rebuild import _review_deltas, zcom_member_suffixes
 
 # These messages are fixed, source-neutral and intentionally contain no
 # original text, citation labels, XML or user-controlled value interpolation.
@@ -83,7 +82,7 @@ def _sha(raw: bytes) -> str:
 
 def private_rebuild_attestation_draft(
         *, repo_root: Path, original_manifest: str, module_id: str,
-        version: str, versification: str,
+        version: str, versification: str, compiled_block_type: str,
         original_native_corpus_sha256: str,
         original_source_numbered: dict[str, list[tuple[str, bytes]]],
         original_source_intros: dict[str, bytes],
@@ -229,10 +228,11 @@ def private_rebuild_attestation_draft(
         links.append({"new_key": key, "master_key": master})
     _review_deltas(declared_edits, links, original_counts, revised_counts)
     folder = module_id.lower()
+    suffixes = zcom_member_suffixes(compiled_block_type)
     paths = [
         "mods.d/" + folder + ".conf",
         *("modules/comments/zcom/" + folder + "/" + suffix
-          for suffix in SUFFIXES),
+          for suffix in suffixes),
     ]
     package_hashes = {}
     # Source-safe diagnosis: log only the fixed, documented zCom suffixes
@@ -243,9 +243,9 @@ def private_rebuild_attestation_draft(
         if data_dir.is_dir() and not data_dir.is_symlink() else set()
     )
     print("Private compiled zCom member check:",
-          "recognized", len(available & set(SUFFIXES)),
-          "missing standard suffixes", sorted(set(SUFFIXES) - available),
-          "other file count", len(available - set(SUFFIXES)),
+          "recognized", len(available & set(suffixes)),
+          "missing standard suffixes", sorted(set(suffixes) - available),
+          "other file count", len(available - set(suffixes)),
           "(no source text)")
     for rel in paths:
         path = installed_candidate_root / rel
@@ -303,7 +303,7 @@ def private_rebuild_attestation_draft(
         "original_native_counts": original_counts,
         "candidate_native_counts": revised_counts,
         "source_edits": declared_edits, "added_links": links,
-        "block_type": "CHAPTER",
+        "block_type": compiled_block_type,
         "payload_sha256": package_hashes,
         "authorization": {
             "approved_by": "PENDING — project owner decision required",
