@@ -80,7 +80,8 @@ Initial three contrasted chapters:
 
 | Chapter | Purpose | Current evidence |
 | --- | --- | --- |
-| Ruth 1 | Narration, personal exhortation, book introduction vs. chapter text | `work/mhcc-modern/pilots/ruth-01.DRAFT.md` — **draft only** |
+| Ruth 1 | Narration and exhortation, four separate exposition spans | `work/mhcc-modern/pilots/ruth-01.DRAFT.md` — **draft only** |
+| Ruth book introduction | **Independent original book-level unit**, not a fifth Ruth 1 passage or another canonical chapter | `work/mhcc-modern/pilots/ruth-book-introduction.DRAFT.md` — **draft only** |
 | Romans 3 | Justification, faith, original rhetoric and doctrinal distinctions | `work/mhcc-modern/pilots/romans-03.DRAFT.md` — **draft only** |
 | Hebrews 7 | Melchizedek typology, priesthood, covenant distinctions | `work/mhcc-modern/pilots/hebrews-07.DRAFT.md` — **draft only** |
 
@@ -93,6 +94,8 @@ After three pilots have genuine independent semantic and technical PASS results,
 Dedicated branch: `feature/mhcc-modern-english`. Issue [#270](https://github.com/icfmp/Bible-Resources/issues/270) is the public checklist and stage log. Source truth is in **committed files, commit SHAs and audit receipts**, not checked boxes or conversation history.
 
 On every restart: inspect source version/hash and branch/PR; reconcile chapter files, their audit status, successful chapter-specific commit and issue checkmark; repair issue if commit was pushed but update interrupted. If no validated source-derived artifact exists, do not mark done. Preserve failed drafts separately, with concrete blockers. Push small independently auditable changes frequently.
+
+**Read-only current-source verification:** GitHub's official 0.1.1 release API identifies the release as **public, not a draft or prerelease**, published at 2026-11-16T17:19:36Z, with ZIP size 2,449,819 bytes and GitHub asset `digest: sha256:a0639201...` matching the pinned release notes and corrected source metadata. The project-local work runner cannot download the binary ZIP (external DNS/network inaccessible here); this is a **runner-access blocker, not a source defect**. The three unmodified pilot prose drafts were re-pinned, and 13 expected displayed sections, 83 short paragraphs, 9 key semantic phrase regressions, and 12 Ruth book-introduction content markers were checked in the committed files. These assertions are **not** a substitute for native SWORD readback or independent semantic review.
 
 **Restart checkpoint, 2026-11-16:** issue #270 and PR #272 reopened for production work after release #276; three pilot drafts retained unchanged in authorial prose, now re-pinned to source `MHCC` 0.1.1. Source-delta evidence limits edition edits to Ezek. 3 and 1 Chr. 7, outside all three pilots; nevertheless, exact native corrected-source key/range, notes, references and introductory structure still require audit. **Next:** obtain SHA-verified corrected `MHCC` 0.1.1 ZIP/native XML in a working SWORD environment, build exact pilot source-unit and intro map, independently re-review the 13 displayed sections against the exact source, verify structural SWORD roundtrip, record full chapter-specific acceptance **before** checking any chapter in #270. **0/1,189** checked.
 
