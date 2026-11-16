@@ -102,8 +102,9 @@ def generate(root: Path = ROOT) -> dict:
     sources = [p for p in tracked(root, "scripts")
                if p.is_file() and p.suffix in {".py", ".cpp", ".sh"}]
     others = [p for p in tracked(root, ".github/workflows", "tests", "docs")
-              if p.is_file() and p.suffix in {".py", ".cpp", ".sh",
-                                               ".yml", ".yaml", ".md"}]
+              if p.is_file() and p.name != "TOOL_REGISTRY.md"
+              and p.suffix in {".py", ".cpp", ".sh",
+                               ".yml", ".yaml", ".md"}]
     texts = {}
     for path in (*sources, *others):
         if path.is_symlink():
