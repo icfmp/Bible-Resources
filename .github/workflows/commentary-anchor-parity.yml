@@ -130,6 +130,14 @@ jobs:
               .read_text(encoding="utf-8"))
           if report.get("status") == "ordered_original_xml_volume_anchor_diagnostics_not_parity":
               print("Original XML volumes:", report["original_xml_volume_count"])
+              assert report["original_native_versification_registry_checked"] is True
+              classes = report["original_reference_registry_classes_across_volumes"]
+              assert sum(classes.values()) == report["source_annotation_markers_across_volumes"]
+              print("Actual original SWORD KJV verse-registry check:",
+                    json.dumps(classes, sort_keys=True))
+              print("Out-of-registry original source reference examples (not text loss):",
+                    json.dumps(report["bounded_original_out_of_registry_reference_examples"],
+                               sort_keys=True))
               print("Source annotations:", report["source_annotation_markers_across_volumes"])
               print("Source classes:", json.dumps(
                   report["source_annotation_classes_across_volumes"], sort_keys=True))
