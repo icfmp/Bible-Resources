@@ -27,25 +27,50 @@ class CommentaryLayoutCensusTests(unittest.TestCase):
         profile = layout_profile(b"<div type='section'>" + prose + b"</div>")
         self.assertEqual(profile["word_count"], 301)
         self.assertEqual(profile["paragraph_count"], 0)
-        self.assertIn("long_prose_without_paragraph_or_line_markup",
+        self.assertIn("long_prose_without_internal_block_markup",
                       layout_flags(profile))
-        self.assertIn("substantial_text_outside_p_line_title_note",
-                      layout_flags(profile))
+        self.assertNotIn("substantial_text_without_div_table_p_line_title_note",
+                         layout_flags(profile))
         self.assertNotIn("long_single_paragraph", layout_flags(profile))
 
         inline = layout_profile(b"<p>" + prose + b"</p>")
         self.assertEqual(inline["paragraph_count"], 1)
         self.assertIn("long_single_paragraph", layout_flags(inline))
-        self.assertNotIn("long_prose_without_paragraph_or_line_markup",
+        self.assertNotIn("long_prose_without_internal_block_markup",
                          layout_flags(inline))
+
+    def test_division_layout_is_not_misclassified_as_absent_paragraphs(self):
+        words = b" ".join([b"word"] * 160)
+        source = (
+            b"<div type='paragraph'>" + words + b"</div>"
+            b"<div type='paragraph'>" + words + b"</div>"
+            b"<table><row><cell>Original table material</cell></row></table>"
+        )
+        profile = layout_profile(source)
+        self.assertEqual(profile["paragraph_count"], 0)
+        self.assertEqual(profile["div_count"], 2)
+        self.assertEqual(profile["table_count"], 1)
+        self.assertEqual(profile["row_count"], 1)
+        self.assertNotIn("long_prose_without_internal_block_markup",
+                         layout_flags(profile))
+        self.assertNotIn("substantial_text_without_div_table_p_line_title_note",
+                         layout_flags(profile))
+
+    def test_highlighted_original_verse_heading_is_not_unstyled(self):
+        source = b"<hi type='bold'>Verses 2, 3.</hi><div>Original text.</div>"
+        profile = layout_profile(source)
+        self.assertTrue(profile["visible_numbered_verse_lead"])
+        self.assertTrue(profile["styled_numbered_verse_lead"])
+        self.assertNotIn("visible_verse_lead_without_title_or_hi_markup",
+                         layout_flags(profile))
 
     def test_heading_fidelity_and_empty_structural_elements(self):
         plain = layout_profile(b"<div>Verses 1, 2. A section.</div>")
         self.assertTrue(plain["visible_numbered_verse_lead"])
-        self.assertIn("visible_verse_lead_without_title_markup", layout_flags(plain))
+        self.assertIn("visible_verse_lead_without_title_or_hi_markup", layout_flags(plain))
         styled = layout_profile(b"<title>Verses 1, 2.</title><p>A section.</p>")
         self.assertTrue(styled["visible_numbered_verse_lead"])
-        self.assertNotIn("visible_verse_lead_without_title_markup", layout_flags(styled))
+        self.assertNotIn("visible_verse_lead_without_title_or_hi_markup", layout_flags(styled))
         empty = layout_profile(b"<title/><p></p><p>Actual words</p>")
         self.assertEqual(empty["empty_headings"], 1)
         self.assertEqual(empty["empty_paragraphs"], 1)
