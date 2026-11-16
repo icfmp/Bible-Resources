@@ -2215,6 +2215,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                     native_index_binary=index_binary,
                     history_note=proposed_errata["private_revised_candidate_history_note"],
                     source_provider=curated["origin"]["publisher"],
+                    original_source_manifest=f"config/commentary-intake/{resource_id}.json",
+                    original_native_corpus_sha256=actual_raw,
                     additional_original_source_edits=[
                         row for row in prose_proposals
                         if row["editorial_decision"] ==

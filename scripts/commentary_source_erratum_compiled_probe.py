@@ -16,6 +16,7 @@ from __future__ import annotations
 from hashlib import sha256
 from datetime import date, timedelta
 from io import BytesIO
+import json
 from pathlib import Path
 import os
 import subprocess
@@ -41,12 +42,13 @@ from commentary_xiphos_dual_reader import (
 )
 from pilot_subprocess import present_key, query
 from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+from commentary_rebuild_attestation_draft import private_rebuild_attestation_draft
 
 MAX_SCAN = 512 * 1024 * 1024
 MAX_ADJACENT = 12 * 1024 * 1024
 
 
-def _read_private_native(root: Path, module_id: str, binary: Path):
+def _read_private_native(root: Path, module_id: str, binary: Path, *, with_receipt: bool = False):
     if not root.is_dir() or root.is_symlink() or not binary.is_file():
         raise ValueError("Untrusted compiled original SWORD comparison roots")
     run = subprocess.run(
@@ -63,8 +65,8 @@ def _read_private_native(root: Path, module_id: str, binary: Path):
             observed["U"].append(raw)
         else:
             observed[kind][key] = raw
-    parse_native_raw_corpus(BytesIO(run.stdout), on_entry=collect)
-    return observed
+    receipt, _, _, _ = parse_native_raw_corpus(BytesIO(run.stdout), on_entry=collect)
+    return (observed, receipt) if with_receipt else observed
 
 
 def _read_original_native_link_topology(root: Path, module_id: str, binary: Path):
@@ -254,7 +256,9 @@ def probe_private_compiled_source_erratum(
         native_index_binary: Path,
         history_note: str, source_provider: str,
         test_with_real_xiphos: bool = True,
-        additional_original_source_edits: list[dict] | None = None) -> dict:
+        additional_original_source_edits: list[dict] | None = None,
+        original_source_manifest: str | None = None,
+        original_native_corpus_sha256: str | None = None) -> dict:
     """Build and test a second wholly private corrected compiled SWORD ZIP."""
     if (not test_with_real_xiphos or not scratch.is_dir()
             or scratch.is_symlink() or not reviewed_aliases
@@ -321,11 +325,13 @@ def probe_private_compiled_source_erratum(
             or full["all_proposed_new_aliases_same_compiled_raw_as_original_master"] is not True):
         raise ValueError("Original commentary corrected private OSIS does not preserve edited-source parity")
     corrected_root = revised_private_scratch / "complete-original-private-candidate"
-    original_compiled = _read_private_native(
-        original_index_only_compiled_root, "BRIndexProbe", native_raw_binary
+    original_compiled, original_index_receipt = _read_private_native(
+        original_index_only_compiled_root, "BRIndexProbe", native_raw_binary,
+        with_receipt=True,
     )
-    revised_compiled = _read_private_native(
-        corrected_root, "BRIndexProbe", native_raw_binary
+    revised_compiled, revised_receipt = _read_private_native(
+        corrected_root, "BRIndexProbe", native_raw_binary,
+        with_receipt=True,
     )
     if (original_compiled["I"] != revised_compiled["I"]
             or original_compiled["U"] != revised_compiled["U"]
@@ -381,8 +387,9 @@ def probe_private_compiled_source_erratum(
         raise ValueError("Revised private candidate source and versioned metadata unverifiable")
     install_root = (staged_scratch / "curated-package-stage"
                     / "isolated-package-install")
-    actual_install = _read_private_native(
-        install_root, curated_module_id, native_raw_binary
+    actual_install, actual_install_receipt = _read_private_native(
+        install_root, curated_module_id, native_raw_binary,
+        with_receipt=True,
     )
     if actual_install != revised_compiled:
         raise ValueError("New curated SWORD ZIP lost complete corrected native source parity")
@@ -423,6 +430,45 @@ def probe_private_compiled_source_erratum(
             receipt["original_native_entry"] for receipt in prose_receipts
         )
     )
+    if (original_source_manifest is None or original_native_corpus_sha256 is None):
+        raise ValueError("Private source attestation needs the independently pinned original")
+    attestation = private_rebuild_attestation_draft(
+        repo_root=Path(__file__).resolve().parents[1],
+        original_manifest=original_source_manifest,
+        module_id=curated_module_id, version=curated_proposed_version,
+        versification=_exact_conf_value(installed_conf.decode("utf-8"), "Versification"),
+        original_native_corpus_sha256=original_native_corpus_sha256,
+        original_source_numbered=original_numbered,
+        original_source_intros=original_intros, original_source_top=original_TOP,
+        original_index_compiled=original_compiled,
+        revised_compiled=revised_compiled,
+        installed_compiled=actual_install,
+        index_receipt=original_index_receipt, revised_receipt=revised_receipt,
+        installed_receipt=actual_install_receipt,
+        source_edit_receipts=[
+            {"original_native_entry": original_master_key, **byte_receipt},
+            *prose_receipts,
+        ],
+        source_edit_affected_keys=[
+            sorted(reference_changed_original_keys),
+            *[r["affected_original_K_keys"] for r in prose_receipts],
+        ],
+        aliases=reviewed_aliases, installed_candidate_root=install_root,
+        existing_links_preserved=adjacency_a == adjacency_b,
+        full_source_semantic_and_structure_parity_verified=(
+            full["original_indexed_I_K_text_markup_reference_checks_passed"] is True
+        ),
+        all_new_native_aliases_linked=(
+            full["all_proposed_new_aliases_same_compiled_raw_as_original_master"] is True
+        ),
+        real_reader_passage_matches=xiphos["independent_real_reader_clipboard_matches"],
+    )
+    if (attestation["release_authorized"] or attestation["data_text_exported"]
+            or attestation["original_K_keys_edited"] != len(modified_original_keys)
+            or attestation["real_reader_sample_count"] != len(
+                xiphos["additional_prose_source_sample_keys"]
+            ) + 3):
+        raise ValueError("Private source attestation claims an unreviewed release or native edit")
     return {
         "status": "PRIVATE_SOURCE_EDITED_SWORD_ZCOM_CANDIDATE_FULL_PARITY_NOT_PUBLICATION",
         "original_source_chapter_key": original_master_key,
@@ -449,6 +495,7 @@ def probe_private_compiled_source_erratum(
         "package_zip_sha256": staged["staged_package_zip_sha256"],
         "package_isolated_install_exact_compiled_parity": True,
         "corrected_metadata_guard": staged["private_conf_metadata_exact_delta_receipt"],
+        "private_real_native_rebuild_attestation_draft": attestation,
         "private_package_real_conf_public_metadata_dry_run": {
             **metadata_proposal,
             "test_date_only_no_actual_release_day_selected": True,
