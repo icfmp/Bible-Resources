@@ -7,6 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
 from commentary_source_erratum_compiled_probe import (
     _original_citation_endpoints,
+    _apply_private_reviewed_prose_changes,
 )
 
 
@@ -68,6 +69,82 @@ class SourceErratumCorrectedNativeLinkTests(unittest.TestCase):
                 b'<!DOCTYPE x [<!ENTITY t SYSTEM "file:///etc/passwd">]>'
                 b"<reference>&t;</reference>",
                 first="Gen.1.3", expected_end="Gen.1.5"
+            )
+
+
+    def test_private_prose_change_preserves_linked_source_identity_and_others(self):
+        from hashlib import sha256
+        source = b"<div/><hi>Verses 1-3</hi> Zebulun or Dn; other words."
+        distinct = b"<div/><hi>Verses 4-5</hi> Completely independent text."
+        originals = {"1Chr.7": [
+            ("1Chr.7.1", source), ("1Chr.7.2", source), ("1Chr.7.3", source),
+            ("1Chr.7.4", distinct),
+        ]}
+        plan = [{
+            "original_native_entry": "1Chr.7.1",
+            "original_raw_sha256": sha256(source).hexdigest(),
+            "expected_original_linked_native_K_count": 3,
+            "original_phrase": "Zebulun or Dn",
+            "corrected_phrase": "Zebulun or Dan",
+        }]
+        changed, original_keys, receipts = _apply_private_reviewed_prose_changes(
+            originals, originals, plan
+        )
+        self.assertEqual(sorted(original_keys),
+                         ["1Chr.7.1", "1Chr.7.2", "1Chr.7.3"])
+        self.assertEqual(len(receipts), 1)
+        self.assertEqual(receipts[0]["affected_original_K_count"], 3)
+        self.assertEqual(changed["1Chr.7"][0][1],
+                         source.replace(b"Zebulun or Dn", b"Zebulun or Dan"))
+        self.assertEqual(changed["1Chr.7"][3][1], distinct)
+        self.assertEqual(originals["1Chr.7"][0][1], source)
+        self.assertTrue(receipts[0]["reverse_restores_exact_original_raw_bytes"])
+        self.assertNotIn("Zebulun", str(receipts))
+
+    def test_private_prose_change_fails_on_stale_source_or_repeated_plan(self):
+        from hashlib import sha256
+        source = b"<div/>Zebulun or Dn"
+        original = {"1Chr.7": [("1Chr.7.1", source)]}
+        good = {
+            "original_native_entry": "1Chr.7.1",
+            "original_raw_sha256": sha256(source).hexdigest(),
+            "expected_original_linked_native_K_count": 1,
+            "original_phrase": "Zebulun or Dn",
+            "corrected_phrase": "Zebulun or Dan",
+        }
+        for override in (
+            {"original_raw_sha256": "a"*64},
+            {"expected_original_linked_native_K_count": 2},
+            {"original_phrase": "Zebulun or Den"},
+        ):
+            with self.subTest(override=override):
+                with self.assertRaises(ValueError):
+                    _apply_private_reviewed_prose_changes(
+                        original, original, [{**good, **override}]
+                    )
+        with self.assertRaises(ValueError):
+            _apply_private_reviewed_prose_changes(
+                original, original, [good, good]
+            )
+        with self.assertRaises(ValueError):
+            _apply_private_reviewed_prose_changes(
+                original, original, [{**good, "original_raw_sha256": None}]
+            )
+
+    def test_private_prose_change_rejects_same_source_body_across_chapters(self):
+        from hashlib import sha256
+        body = b"<div/>Zebulun or Dn"
+        originals = {"1Chr.7": [("1Chr.7.1", body)],
+                     "1Chr.8": [("1Chr.8.1", body)]}
+        with self.assertRaises(ValueError):
+            _apply_private_reviewed_prose_changes(
+                originals, originals, [{
+                    "original_native_entry": "1Chr.7.1",
+                    "original_raw_sha256": sha256(body).hexdigest(),
+                    "expected_original_linked_native_K_count": 2,
+                    "original_phrase": "Zebulun or Dn",
+                    "corrected_phrase": "Zebulun or Dan",
+                }]
             )
 
 
