@@ -235,6 +235,18 @@ def private_rebuild_attestation_draft(
           for suffix in SUFFIXES),
     ]
     package_hashes = {}
+    # Source-safe diagnosis: log only the fixed, documented zCom suffixes
+    # found in private scratch; never enumerate original source file names.
+    data_dir = installed_candidate_root / "modules/comments/zcom" / folder
+    available = (
+        {p.name for p in data_dir.iterdir() if p.is_file()}
+        if data_dir.is_dir() and not data_dir.is_symlink() else set()
+    )
+    print("Private compiled zCom member check:",
+          "recognized", len(available & set(SUFFIXES)),
+          "missing standard suffixes", sorted(set(SUFFIXES) - available),
+          "other file count", len(available - set(SUFFIXES)),
+          "(no source text)")
     for rel in paths:
         path = installed_candidate_root / rel
         if path.is_symlink() or not path.is_file():
