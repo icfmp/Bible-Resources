@@ -363,7 +363,56 @@ jobs:
                 " v3_bytes="+str(len(a.encode()))+
                 " v26_bytes="+str(len(b.encode())))
           assert "1 John 5:20" in a and "Ecclesiastes 7:29" in b
-          print("Source-linked Genesis 1 temp build: 2 exact original targets, separate modern book introduction and reader visible markers PASS; historic source outline/chapter intro and independent semantic acceptance pending")
+          import hashlib,subprocess,sys
+          sys.path.insert(0,"scripts")
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str((base/"mhcc-genl-sword").resolve())
+          p=subprocess.Popen([str(base/"commentary-modern-source-raw"),"MHCCGENL"],
+                             env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+          native_num={}
+          native_intro={}
+          try:
+              assert p.stdout
+              def collect(kind,ref,raw):
+                  if kind=="K" and ref.startswith("Gen.1."):
+                      native_num[ref]=raw
+                  if kind=="I" and ref.startswith("Gen"):
+                      native_intro[ref]=raw
+              native_report,numbered,_,_=parse_native_raw_corpus(p.stdout,on_entry=collect)
+              p.stdout.close()
+              assert p.wait(timeout=25)==0
+          finally:
+              if p.poll() is None:
+                  p.kill()
+                  p.wait()
+          original_map=json.loads(Path("work/mhcc-modern/production/genesis-01.SOURCE_MAP.json").read_text())
+          expected_native=set(key for section in original_map["sections"]
+                                  for key in section["native_keys"])
+          assert set(native_num)==expected_native and len(native_num)==31
+          def refs(raw):
+              from xml.etree import ElementTree as XML
+              source=XML.fromstring(b"<root>"+raw+b"</root>")
+              return [x.get("osisRef") for x in source.iter()
+                      if isinstance(x.tag,str) and x.tag.rsplit("}",1)[-1]=="reference"]
+          linked_sections=root.findall(".//o:div[@annotateType='commentary']",ns)
+          for first in ("Gen.1.3","Gen.1.26"):
+              linked=next(x for x in linked_sections if x.get("annotateRef","").startswith(first))
+              literal=[x.get("osisRef") for x in linked.iter()
+                       if x.tag=="{http://www.bibletechnologies.net/2003/OSIS/namespace}reference"]
+              built=refs(native_num[first])
+              print("GEN1_LINKED_NATIVE_REFERENCE_READBACK "+first+
+                    " expected="+str(len(literal))+" actual="+str(len(built))+
+                    " same="+str(built==literal))
+              assert built==literal and len(built)==1
+          intro_needle="most ancient surviving book"
+          modern_intro_in_I=any(intro_needle.encode() in raw for raw in native_intro.values())
+          modern_intro_in_K=any(intro_needle.encode() in raw for raw in native_num.values())
+          print("GEN1_LINKED_NATIVE_INTRO_PLACEMENT "+
+                "book_intro_in_I="+str(modern_intro_in_I)+
+                " book_intro_in_K="+str(modern_intro_in_K)+
+                " native_intro_slots="+str(len(native_intro)))
+          print("Source-linked Genesis 1 temp build: 31 exact native verses, two source-identical original linked references, modern book introduction in OSIS, real reader visible markers PASS; original chapter intro/independent semantic acceptance pending")
           PY
       - name: Upload metadata-only bounded audit receipt
         if: always()
