@@ -157,6 +157,27 @@ def compare_paragraph_witness(document, samples: list[tuple[str, str, bytes]]) -
         anchors = []
         for p in pnodes:
             pwords = _tokens("".join(p.itertext()))
+            # A single <p> can still conceal intentional <br>, <lb> or
+            # nested division boundaries. Count source structure, not just
+            # paragraph tags, before assessing a loss of source line breaks.
+            descendants = [node for node in p.iterdescendants()
+                           if isinstance(node.tag, str)]
+            internal_break_markers = sum(
+                _name(node) in {"br", "lb", "l", "lg", "p"}
+                for node in descendants
+            )
+            internal_nested_divisions = sum(
+                _name(node) == "div" for node in descendants
+            )
+            source_text_fragments = [p.text or ""] + [
+                fragment or ""
+                for node in descendants
+                for fragment in (node.text, node.tail)
+            ]
+            source_blankline_count = sum(
+                len(re.findall(r"\r?\n[ \t]*\r?\n", value))
+                for value in source_text_fragments
+            )
             # Eight-word lexical anchoring is only a *location clue*; it is
             # NOT proof of editorial/print identity or punctuation parity.
             begin = _unique_offset(original_words, pwords[:MAX_ANCHOR_WORDS])
@@ -181,6 +202,9 @@ def compare_paragraph_witness(document, samples: list[tuple[str, str, bytes]]) -
             )
             anchors.append({
                 "source_p_word_tokens": len(pwords),
+                "independent_p_internal_break_or_line_markers": internal_break_markers,
+                "independent_p_internal_nested_divisions": internal_nested_divisions,
+                "independent_p_literal_blankline_count": source_blankline_count,
                 "unique_native_start_token_offset": begin,
                 "unique_native_end_anchor_token_offset": tail,
                 "both_8_word_anchors_uniquely_present":
@@ -206,6 +230,12 @@ def compare_paragraph_witness(document, samples: list[tuple[str, str, bytes]]) -
         )
         row["source_paragraphs_with_all_words_in_exact_original_order"] = sum(
             a["all_source_p_words_exact_contiguous_original_order"]
+            for a in anchors
+        )
+        row["independent_p_internal_explicit_breaks_total"] = sum(
+            a["independent_p_internal_break_or_line_markers"]
+            + a["independent_p_internal_nested_divisions"]
+            + a["independent_p_literal_blankline_count"]
             for a in anchors
         )
         rows.append(row)
