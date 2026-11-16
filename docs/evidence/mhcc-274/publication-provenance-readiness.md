@@ -31,6 +31,29 @@ A source-neutral **read-only metadata preparation function** `prepare_provisiona
 
 Original SWORD fields `DistributionLicense`, `TextSource`, `Version=0.1.1`, accurate `History_0.1.1`, `DataPath`, `BlockType=CHAPTER`, compression, filters, description and all other values must be unchanged from the independently verified private candidate. This preflight **creates no asset**, has **no publication side effects**, and **never** reports editorial or release permission; synthetic negative tests reject invalid dates, original licence/claims drift and metadata injection.
 
+## Repository release-path discovery — distinct from a successful private compilation
+
+**16 November 2026, read-only check of the actual repository:** the existing `modules/mhcc-crosswire` is the **published, strictly stock-identical 0.1.0**, and its approved metadata selects `index_audit.mode=stock_reader_keys`. The [current generic stock-commentary validator](../../../../scripts/compiled_stock_commentary_proof.py), called by [`scripts/validate.py`](../../../../scripts/validate.py), **requires** the following exact source assertions:
+
+- `SOURCE_VALIDATION.json.source_kind=compiled_sword_stock`;
+- `all_original_compressed_files_byte_identical=true`, `all_native_original_keys_byte_identical=true`, `no_original_source_text_edited=true`;
+- `only_source_metadata_relabelled=["section_id","DataPath","Version"]`;
+- the six original compressed module members match their pinned stock-source member checksums.
+
+This is correct and essential for 0.1.0. **It MUST reject the separately rebuilt 0.1.1**, which intentionally has 24 added original-section navigation links, one source-citation change affecting 11 native linked addresses, **new compression data**, `BlockType=CHAPTER`, an editorial `History_0.1.1` and appropriately attributed `About` and revision-date metadata. Updating only `metadata.json.version` and the `.conf` would therefore be invalid. **Never forge old stock-identical flags or repin original source member hashes to make it pass.**
+
+The normal [`scripts/build.py`](../../../../scripts/build.py) builds the public SWORD ZIP **from committed** `modules/mhcc-crosswire/payload/`, while our corrected-source compiled ZIP currently exists **only in temporary, auto-deleted GitHub Actions private test scratch**. Its fingerprint `2022c52a8fed69e25d0efaf00fba0ddda17dd492e8567fd95922f31306c70047` proves the private build, **not** existence in the repository or validity of a public release plan. The published module's `SOURCE_VALIDATION.json`, stock `EDITORIAL.md`, `metadata.json`, release plan `config/release-plans/mhcc-0.1.0.json` and previous GitHub release must remain intact as a historical baseline, not be silently rewritten to describe an edited stock release.
+
+**Generic integration path to review before implementing a public update (structural decision, not yet authorized):**
+
+1. **Preserve an independent original baseline.** Keep the CrossWire pinned ZIP, 0.1.0 source/member/native hashes and the 0.1.0 release asset immutable and independently recoverable. Create a separate attested `reviewed_compiled_commentary_rebuild` validation mode for this *class* of resource; do not weaken or bypass `stock_reader_keys`.
+2. **Require comprehensive source-to-candidate proof.** A versioned, reproducible verification record must connect the original source/archive digest, exact source-edited fragment digest, independently reviewed allowed per-key changes and alias map, complete reconstructed I/K/TOP corpus identity and native SWORD link topology, compiled member SHA-256s and the final `.conf` hash. Explicitly distinguish authorial text, original citation corrections, navigational aliases and compiler-produced wrapper/byte differences. Never merely trust a user-supplied Boolean such as `all_original_...=true`.
+3. **Fail closed on partial or mismatched evidence.** Check the actual committed candidate payload against its exact compiled file hashes, installed native counts, unchanged original entries and independently pinned permitted deltas; require a valid source-rights/owner-review decision specifically for the new edited version. A current 0.1.0 stock proof must not be reused to approve edited bytes.
+4. **Only when the owner approves public release and the architecture**: materialize the exact reviewed corrected native files into a **separate protected release-preparation change**, set the actual release-date `SwordVersionDate` and prefixed attributed `About`, update module version and source validation evidence, then produce and check a deterministic `BRMHCC-0.1.1.zip` with its *new* hash and byte size. Record `docs/releases/MHCC-0.1.1.md` and `config/release-plans/mhcc-0.1.1.json` using the real new hashes and explicit authorization link; update the committed catalogue snapshot only through the reviewed build.
+5. **Use the existing ordered publishing workflow.** The exact GitHub Release must be created and independently downloaded/verified **before** GitHub Pages exposes the updated catalogue; after deployment independently check public ZIP, catalogue update/install and unchanged 0.1.0 rollback. **No public release path is functional merely because a private ZIP passes Xiphos.**
+
+**Current implementation:** Steps 1–2 have verified **private SWORD research evidence**, not a production attestation schema, committed final payload or approved new validation strategy. Steps 3–5 are not complete. Do not claim publication readiness, invent final SHA or rely on a not-yet-chosen calendar date.
+
 ### Still explicitly blocked until release approval
 
 - Final independent code/source and rights review, especially the new generic source-correction and final metadata guard.
