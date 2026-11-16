@@ -115,6 +115,11 @@ def build_verified_preview(*, root: Path, source_map: dict, expected_refs: dict,
                            candidate_book_intro: Path, temp_id: str):
     """Return private disposable OSIS and review receipt, never source XML."""
     literal=gate.exact_source_link_literals_after_verified_source(complete_raw_report)
+    intro_proof=gate.report(complete_raw_report)
+    if (intro_proof["original_book_intro_and_outline_owned_by_first_numbered_K_attested"] is not True
+            or not gate.intros_seen
+            or any(row["source_visible_word_count"]!=0 for row in gate.intros_seen.values())):
+        raise ValueError("Do not relocate original book introduction without first-K ownership and empty original I placeholders")
     ledger=_source_map_ledger(source_map)
     osis_bytes,report=generate(root,ledger,work_id=temp_id,include_candidates=True)
     doc=ET.fromstring(osis_bytes)
