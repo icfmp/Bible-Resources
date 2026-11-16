@@ -166,10 +166,17 @@ def compare_paragraph_witness(document, samples: list[tuple[str, str, bytes]]) -
             # A differently punctuated digital edition may pass this token
             # test: it is NOT punctuation or original-edition parity proof.
             end = begin + len(pwords) if begin is not None else None
+            aligned = original_words[begin:end] if begin is not None and (
+                end <= len(original_words)) else None
+            mismatches = (
+                [i for i, (source_word, original_word)
+                 in enumerate(zip(pwords, aligned))
+                 if source_word != original_word]
+                if aligned is not None else None
+            )
             whole = (
-                begin is not None
-                and end <= len(original_words)
-                and original_words[begin:end] == pwords
+                aligned is not None
+                and not mismatches
                 and (tail is None or tail == end - MAX_ANCHOR_WORDS)
             )
             anchors.append({
@@ -179,6 +186,13 @@ def compare_paragraph_witness(document, samples: list[tuple[str, str, bytes]]) -
                 "both_8_word_anchors_uniquely_present":
                     begin is not None and tail is not None and begin <= tail,
                 "all_source_p_words_exact_contiguous_original_order": whole,
+                "original_digital_witness_same_position_word_difference_count": (
+                    len(mismatches) if mismatches is not None else None
+                ),
+                "original_digital_witness_first_difference_token_offset": (
+                    mismatches[0] if mismatches else None
+                ),
+                "all_differences_require_independent_editorial_review": True,
                 "original_prefix_word_tokens_before_exact_source_p": (
                     begin if whole else None
                 ),
