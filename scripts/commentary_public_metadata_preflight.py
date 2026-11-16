@@ -269,3 +269,138 @@ def rehearse_private_versioned_commentary_package(
         "owner_release_authorized": False,
         "artifact_published_or_uploaded": False,
     }
+
+
+
+def reconcile_private_rebuild_package_evidence(
+        attestation: dict, rehearsal: dict, *,
+        original_install_root: Path, rehearsal_install_root: Path,
+        rehearsal_zip_path: Path) -> dict:
+    """Reconcile full native attestation with the seven exact test-ZIP members.
+
+    Metadata-only private evidence, not a chosen release day or permission
+    to modify an approved module, its catalogue or existing releases.
+    """
+    import json
+
+    if (not isinstance(attestation, dict) or not isinstance(rehearsal, dict)
+            or any(not isinstance(p, Path) or p.is_symlink()
+                   for p in (original_install_root, rehearsal_install_root,
+                             rehearsal_zip_path))
+            or not original_install_root.is_dir()
+            or not rehearsal_install_root.is_dir()
+            or not rehearsal_zip_path.is_file()
+            or rehearsal_zip_path.stat().st_size > 64 * 1024 * 1024):
+        raise ValueError("Unsafe or missing private SWORD evidence")
+    audit = attestation.get("source_audit")
+    review = attestation.get("review_manifest")
+    validation = attestation.get("source_validation")
+    if any(not isinstance(x, dict) for x in (audit, review, validation)):
+        raise ValueError("Native audit and review manifest missing")
+    audit_sha = sha256((json.dumps(audit, sort_keys=True, indent=2) + "\n").encode()).hexdigest()
+    native_sha = rehearsal.get("native_corpus_sha256")
+    if (attestation.get("status") != "PRIVATE_REAL_NATIVE_ATTESTATION_DRAFT_NOT_RELEASE"
+            or attestation.get("release_authorized") is not False
+            or attestation.get("data_text_exported") is not False
+            or audit.get("status") != "complete_native_rebuild_comparison"
+            or audit.get("source_kind") != "reviewed_compiled_commentary_rebuild"
+            or audit.get("full_original_and_rebuilt_native_inventory_compared") is not True
+            or review.get("status") != "private_draft_not_owner_authorized_for_release"
+            or validation.get("status") != "private_draft_not_release_validated"
+            or any(x != audit_sha for x in (
+                attestation.get("source_audit_sha256"),
+                review.get("source_audit_sha256"),
+                validation.get("source_audit_sha256")))
+            or not re.fullmatch(r"[a-f0-9]{64}", native_sha or "")
+            or any(x != native_sha for x in (
+                audit.get("candidate_native_corpus_sha256"),
+                review.get("candidate_native_corpus_sha256"),
+                validation.get("candidate_native_corpus_sha256")))):
+        raise ValueError("Private source/native attestation does not reconcile")
+    module_id = rehearsal.get("module_id")
+    version = rehearsal.get("version")
+    block = rehearsal.get("compiled_block_type")
+    if (not isinstance(module_id, str)
+            or not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,79}", module_id)
+            or not isinstance(version, str)
+            or not re.fullmatch(r"\d+\.\d+\.\d+", version)
+            or review.get("sword_id") != module_id
+            or review.get("version") != version
+            or review.get("block_type") != block
+            or rehearsal.get("status")
+               != "PRIVATE_FULL_CONF_AND_SWORD_ZCOM_ZIP_REHEARSAL_NOT_RELEASE"
+            or rehearsal.get("zip_member_count") != 7
+            or rehearsal.get("only_about_and_sword_version_date_changed") is not True
+            or rehearsal.get("all_six_native_compiled_members_preserved") is not True
+            or rehearsal.get("reinstalled_member_bytes_match_exactly") is not True
+            or rehearsal.get("complete_rehearsed_libsword_native_readback_exact") is not True
+            or any(rehearsal.get(k) is not False for k in (
+                "actual_release_date_selected", "owner_release_authorized",
+                "artifact_published_or_uploaded"))):
+        raise ValueError("Unsafe private rehearsal identity or approval claim")
+    if (not isinstance(rehearsal.get("hypothetical_revision_day_only"), str)
+            or not _iso_day(rehearsal["hypothetical_revision_day_only"])
+            > _iso_day(rehearsal["original_sword_version_date"])):
+        raise ValueError("Hypothetical day must follow original source revision")
+    folder = module_id.lower()
+    config_name = "mods.d/" + folder + ".conf"
+    expected = {
+        config_name,
+        *("modules/comments/zcom/" + folder + "/" + suffix
+          for suffix in zcom_member_suffixes(block)),
+    }
+    old_hashes = review.get("payload_sha256")
+    native_hashes = rehearsal.get("native_member_sha256")
+    if (not isinstance(old_hashes, dict) or set(old_hashes) != expected
+            or not isinstance(native_hashes, dict)
+            or set(native_hashes) != expected - {config_name}
+            or old_hashes[config_name] != rehearsal.get("source_conf_sha256")):
+        raise ValueError("Original attested seven member inventory incomplete")
+    staged_hashes = {}
+    for name in sorted(expected):
+        original = original_install_root / name
+        staged = rehearsal_install_root / name
+        if (any(p.is_symlink() or not p.is_file()
+                or not 0 < p.stat().st_size <= 32 * 1024 * 1024
+                for p in (original, staged))):
+            raise ValueError("Untrusted SWORD config or compiled native member")
+        original_sha = sha256(original.read_bytes()).hexdigest()
+        staged_sha = sha256(staged.read_bytes()).hexdigest()
+        if original_sha != old_hashes[name]:
+            raise ValueError("Original compiled member no longer matches source proof")
+        if name == config_name:
+            if (staged_sha != rehearsal.get("proposed_conf_sha256")
+                    or staged_sha == original_sha):
+                raise ValueError("Prepared conf hash did not reconcile")
+        elif staged_sha != original_sha or staged_sha != native_hashes[name]:
+            raise ValueError("Compiled original zCom member changed during rehearsal")
+        staged_hashes[name] = staged_sha
+    try:
+        with zipfile.ZipFile(rehearsal_zip_path) as package:
+            if (len(package.infolist()) != 7
+                    or set(package.namelist()) != expected
+                    or package.testzip() is not None):
+                raise ValueError("Private SWORD ZIP member inventory corrupt")
+            for member in package.infolist():
+                if (member.is_dir()
+                        or member.compress_type != zipfile.ZIP_DEFLATED
+                        or sha256(package.read(member)).hexdigest()
+                           != staged_hashes[member.filename]):
+                    raise ValueError("Private SWORD ZIP differs from installed native members")
+    except zipfile.BadZipFile as exc:
+        raise ValueError("Corrupt private ZIP") from exc
+    package_sha = sha256(rehearsal_zip_path.read_bytes()).hexdigest()
+    if package_sha != rehearsal.get("zip_sha256"):
+        raise ValueError("Private ZIP bytes differ from prior private rehearsal")
+    return {
+        "status": "PRIVATE_NATIVE_AND_TEST_DATE_ZIP_SEVEN_FILES_RECONCILED_NOT_RELEASE",
+        "source_audit_sha256": audit_sha,
+        "candidate_native_corpus_sha256": native_sha,
+        "test_date_only_seven_member_sha256": staged_hashes,
+        "test_date_only_zip_sha256": package_sha,
+        "hypothetical_revision_day_only": rehearsal["hypothetical_revision_day_only"],
+        "actual_release_date_selected": False,
+        "release_authorized": False,
+        "catalogue_changed": False,
+        "public_artifact_generated": False,
+    }
