@@ -31,7 +31,7 @@ from commentary_native_inventory import MAX_OUTPUT, parse_index
 from commentary_navigation_link_plan import parse_native_commentary_verse_registry, UnsafeCommentaryLinkPlan
 from commentary_reference_registry_triage import classify_original_reference_target
 from commentary_prose_cross_slot import strict_native_stock_plain_words
-from commentary_text_delta import _contiguous_offset
+from commentary_text_delta import _contiguous_offset, _is_subsequence
 from commentary_unresolved_lexical_triage import WORD, marked_word_token_indices
 from commentary_native_raw_inventory import private_crosscheck
 from sword_native_raw_corpus_inventory import parse_native_raw_corpus
@@ -285,7 +285,8 @@ def _original_unoccupied_source_units(
             "reference": reference, "start_key": wanted[reference],
             "volume": volume, "original_source_line": node.sourceline,
             "original_body_sha256": sha256(source_text.encode("utf-8")).hexdigest(),
-            "original_plain_word_count": len(words), "private_windows": windows,
+            "original_plain_word_count": len(words),
+            "private_original_plain_words": words, "private_windows": windows,
         })
     if len(cases) != len(wanted):
         raise PilotError("Ambiguous or missing authorial body for unoccupied source start")
@@ -339,12 +340,19 @@ class UnoccupiedSourceProseLocator:
             found = sum(_contiguous_offset(sample, words) is not None
                         for sample in unit["private_windows"])
             if found:
+                all_in_order = _is_subsequence(unit["private_original_plain_words"], words)
+                full_span = _contiguous_offset(
+                    unit["private_original_plain_words"], words) is not None
+                if full_span and not all_in_order:
+                    raise PilotError("Original complete contiguous prose contradicts word-order check")
                 self.hits[unit["start_key"]].append({
                     "original_stock_native_key": key,
                     "native_slot_kind": kind,
                     "scope": scope,
                     "stock_raw_sha256": digest,
                     "matched_distinct_original_plain_word_windows": found,
+                    "all_original_plain_words_found_in_stock_order": all_in_order,
+                    "all_original_plain_words_found_as_contiguous_stock_run": full_span,
                     "total_original_windows": len(unit["private_windows"]),
                 })
 
@@ -355,6 +363,8 @@ class UnoccupiedSourceProseLocator:
             scores = self.hits.get(original, [])
             best = sorted(
                 scores, key=lambda x: (
+                    -int(x["all_original_plain_words_found_in_stock_order"]),
+                    -int(x["all_original_plain_words_found_as_contiguous_stock_run"]),
                     -x["matched_distinct_original_plain_word_windows"],
                     {"other_numbered_key_same_chapter": 0,
                      "same_chapter_intro": 1, "book_intro": 2}[x["scope"]],
@@ -371,6 +381,10 @@ class UnoccupiedSourceProseLocator:
                     count for (key, scope), count in self.scanned.items()
                     if key == original),
                 "native_candidate_slots_with_any_exact_plain_word_window": len(scores),
+                "native_candidate_slots_containing_all_original_words_in_order": sum(
+                    int(x["all_original_plain_words_found_in_stock_order"]) for x in scores),
+                "native_candidate_slots_containing_all_original_words_contiguously": sum(
+                    int(x["all_original_plain_words_found_as_contiguous_stock_run"]) for x in scores),
                 "bounded_matching_native_candidates": best[:8],
                 "no_match_is_not_proof_of_missing_authorial_text": True,
                 "matching_windows_are_not_full_text_or_section_parity": True,
