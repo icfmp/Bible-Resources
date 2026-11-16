@@ -1666,7 +1666,24 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                 rows.append((kind, ref))
                 osis_rebuild_preflight.observe(kind, ref, raw)
                 editorial_topology.observe(kind, ref, raw)
-                layout_census.observe(kind, ref, raw)
+                try:
+                    layout_census.observe(kind, ref, raw)
+                except ValueError as exc:
+                    # A bounded diagnostic on the ephemeral audit runner:
+                    # the original native key and an allowlisted fixed error
+                    # class only; never output original XML, text or attrs.
+                    allowed = {
+                        "Unsafe original commentary source fragment",
+                        "Original commentary layout XML is unparseable",
+                        "Unresolved original commentary XML entity",
+                        "Unbounded original layout element count",
+                        "Malformed commentary native layout key",
+                        "Unbounded original native commentary entries",
+                        "Unbounded distinct original commentary layout bodies",
+                    }
+                    print("Original layout census gate rejected key", ref,
+                          "class", str(exc) if str(exc) in allowed else "UNKNOWN")
+                    raise
                 original_reference_triage.observe(kind, ref, raw)
                 if kind == "U":
                     original_opaque_top_records.append(raw)
