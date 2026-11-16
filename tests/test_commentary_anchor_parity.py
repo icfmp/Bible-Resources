@@ -56,6 +56,18 @@ class CommentaryAnchorParityTests(unittest.TestCase):
             "all_original_plain_words_found_in_stock_order"])
         self.assertTrue(result["units"][0]["bounded_matching_native_candidates"][0][
             "all_original_plain_words_found_as_contiguous_stock_run"])
+        self.assertEqual(
+            result["units"][0]["provisional_missing_first_verse_alias_preview"],
+            {"new_unoccupied_native_key":"Gen.1.1",
+             "original_occupied_master_key":"Gen.1.2",
+             "original_master_raw_sha256":
+                 result["units"][0]["bounded_matching_native_candidates"][0]["stock_raw_sha256"],
+             "status":"SOURCE_BOUND_ALIAS_PREVIEW_NOT_AUTHORIZED"})
+        self.assertGreaterEqual(
+            result["units"][0]["native_candidate_slots_containing_exact_original_visible_unicode"], 1)
+        self.assertGreaterEqual(
+            result["units"][0][
+                "native_candidate_slots_containing_whitespace_folded_original_visible_unicode"], 1)
         incomplete = UnoccupiedSourceProseLocator(original_units)
         incomplete.observe("K", "Gen.1.3",
                            b"<div><p>" + original_words.replace(
@@ -63,6 +75,8 @@ class CommentaryAnchorParityTests(unittest.TestCase):
         incomplete_report = incomplete.report()
         self.assertEqual(
             incomplete_report["units"][0]["native_candidate_slots_containing_all_original_words_in_order"], 0)
+        self.assertIsNone(
+            incomplete_report["units"][0]["provisional_missing_first_verse_alias_preview"])
         self.assertGreater(
             incomplete_report["units"][0]["native_candidate_slots_with_any_exact_plain_word_window"], 0)
         self.assertFalse(result["published"])
