@@ -28,6 +28,8 @@ from commentary_xml_witness import (
     xml_structure,
 )
 from commentary_native_inventory import MAX_OUTPUT, parse_index
+from commentary_navigation_link_plan import parse_native_commentary_verse_registry, UnsafeCommentaryLinkPlan
+from commentary_reference_registry_triage import classify_original_reference_target
 from pilot_fetch import fetch, validate_url
 from pilot_preflight import PilotError, inspect_archive
 
@@ -62,11 +64,19 @@ def _load_native_key_rows(output: bytes, module_id: str) -> tuple[dict, set[str]
 
 
 def compare_anchors(original_xml: bytes, native_output: bytes, module_id: str,
-                    probe_osis_keys: tuple[str, ...] = ()) -> dict:
+                    probe_osis_keys: tuple[str, ...] = (),
+                    native_registry: dict | None = None) -> dict:
     # Preflight entire XML, exact unchanged bytes, grammar and all source tags.
     xml_proof = xml_structure(original_xml)
     index_proof, native_verses, native_intros = _load_native_key_rows(native_output, module_id)
+    if native_registry is not None:
+        if (native_registry.get("module_id") != module_id
+                or native_registry.get("versification") != index_proof["native_versification"]
+                or not native_verses.issubset(native_registry["verse_keys"])):
+            raise PilotError("Original stock key and versification registry disagree")
     root = _root_for_raw_xml(original_xml)
+    registry_classes = Counter()
+    registry_examples = []
     counts = Counter()
     hits = Counter()
     misses = Counter()
@@ -88,6 +98,27 @@ def compare_anchors(original_xml: bytes, native_output: bytes, module_id: str,
         ref_hash.update(original_ref.encode("utf-8") + b"\x00")
         kind, book = _parse_reference(original_ref)
         counts[kind] += 1
+        if native_registry is not None:
+            if not original_ref.startswith("Bible:"):
+                canonical_class = "NON_BIBLE_WORK_OR_UNQUALIFIED_UNREVIEWED"
+            else:
+                canonical_class = classify_original_reference_target(
+                    original_ref,
+                    canonical_verses=native_registry["verse_keys"],
+                    canonical_chapters=native_registry["chapter_maximums"],
+                )
+            registry_classes[canonical_class] += 1
+            if (canonical_class in {
+                    "SIMPLE_SINGLE_VERSE_NOT_IN_REGISTRY",
+                    "SIMPLE_VERSE_RANGE_ENDPOINT_NOT_IN_REGISTRY",
+                    "SIMPLE_CHAPTER_NOT_IN_REGISTRY",
+                    "REVERSED_SAME_CHAPTER_VERSE_RANGE",
+                } and len(registry_examples) < 40):
+                registry_examples.append({
+                    "original_source_reference": original_ref[:160],
+                    "canonical_class": canonical_class,
+                    "not_automatically_an_authorial_text_loss": True,
+                })
         if not book:
             misses["unreviewed_reference_syntax"] += 1
             continue
@@ -169,6 +200,10 @@ def compare_anchors(original_xml: bytes, native_output: bytes, module_id: str,
         "source_marker_count": seen_markers,
         "source_annotation_reference_ordered_sha256": ref_hash.hexdigest(),
         "source_annotation_classes": dict(sorted(counts.items())),
+        "original_native_versification_registry_checked": native_registry is not None,
+        "original_reference_registry_classes": dict(sorted(registry_classes.items())),
+        "bounded_original_out_of_registry_reference_examples": registry_examples,
+        "canonical_validity_does_not_prove_semantic_passage_correctness": True,
         "source_work_id_counts": dict(sorted(source_work_ids.items())),
         "source_book_count": len(source_books),
         "source_books_with_explicit_markers": sorted(source_books),
@@ -216,6 +251,9 @@ def summarize_volume_anchor_results(volumes: list[dict]) -> dict:
     end_samples = []
     total_markers = 0
     total_duplicate_within_volume = 0
+    all_registry_classes = Counter()
+    all_registry_examples = []
+    native_registry_checked = None
     for volume in volumes:
         number = volume.get("volume")
         report = volume.get("anchor_diagnostic")
@@ -240,6 +278,18 @@ def summarize_volume_anchor_results(volumes: list[dict]) -> dict:
             raise PilotError("Unreconciled source annotation categories")
         total_markers += observed
         combined_classes.update(categories)
+        checked = report["original_native_versification_registry_checked"]
+        if native_registry_checked is None:
+            native_registry_checked = checked
+        elif native_registry_checked != checked:
+            raise PilotError("Mixed original verse-registry review states across source volumes")
+        registry_classes = Counter(report["original_reference_registry_classes"])
+        if checked and sum(registry_classes.values()) != observed:
+            raise PilotError("Original reference-to-verse registry census is incomplete")
+        all_registry_classes.update(registry_classes)
+        for example in report["bounded_original_out_of_registry_reference_examples"]:
+            if len(all_registry_examples) < 40:
+                all_registry_examples.append({"volume": number, **example})
         combined_hits.update(report["matched_exact_start_by_class"])
         combined_misses.update(report["unoccupied_source_start_by_class"])
         all_source_books.update(report["source_books_with_explicit_markers"])
@@ -260,6 +310,10 @@ def summarize_volume_anchor_results(volumes: list[dict]) -> dict:
         "original_xml_volume_count": len(volumes),
         "source_annotation_markers_across_volumes": total_markers,
         "source_annotation_classes_across_volumes": dict(sorted(combined_classes.items())),
+        "original_native_versification_registry_checked": bool(native_registry_checked),
+        "original_reference_registry_classes_across_volumes": dict(sorted(all_registry_classes.items())),
+        "bounded_original_out_of_registry_reference_examples": all_registry_examples,
+        "canonical_validity_does_not_prove_semantic_passage_correctness": True,
         "matched_stock_start_by_class_across_volumes": dict(sorted(combined_hits.items())),
         "unoccupied_stock_start_by_class_across_volumes": dict(sorted(combined_misses.items())),
         "source_books_with_explicit_markers_across_volumes": sorted(all_source_books),
@@ -329,6 +383,25 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...]) -> dict:
         if result.returncode or len(result.stdout) > MAX_OUTPUT:
             raise PilotError("Trusted native commentary inventory failed or exceeded output bound")
 
+        try:
+            registry_output = subprocess.run(
+                [str(inspector), manifest["module_id"], "--chapter-registry"],
+                stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                timeout=55, env=dict(os.environ, SWORD_PATH=str(installed)),
+                check=False)
+        except subprocess.TimeoutExpired:
+            raise PilotError("Original native KJV verse registry exceeded time bound") from None
+        if registry_output.returncode:
+            raise PilotError("Original native KJV verse registry unavailable")
+        try:
+            source_registry = parse_native_commentary_verse_registry(
+                registry_output.stdout, manifest["module_id"])
+        except UnsafeCommentaryLinkPlan:
+            raise PilotError("Original module verse registry framing was invalid") from None
+        if (source_registry["versification"] != (conf["versification"] or "KJV")
+                or source_registry["driver"] != conf["driver"]):
+            raise PilotError("Original stock KJV registry disagrees with pinned .conf")
+
         source_reports = []
         for number, xml_url, expected_xml in locations:
             xml_path = root / f"original-volume-{number}.xml"
@@ -339,7 +412,8 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...]) -> dict:
                 raise PilotError("Original XML exceeds source-audit safety bound")
             comparison = compare_anchors(xml_path.read_bytes(), result.stdout,
                                          manifest["module_id"],
-                                         probe_osis_keys=probes)
+                                         probe_osis_keys=probes,
+                                         native_registry=source_registry)
             if comparison["source_xml_sha256"] != xml_receipt["sha256"]:
                 raise PilotError("Original source bytes changed during readback")
             source_reports.append({
