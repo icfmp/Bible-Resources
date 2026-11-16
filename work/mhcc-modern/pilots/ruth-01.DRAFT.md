@@ -3,8 +3,10 @@ edition: "Matthew Henry Concise Commentary — Modern English (working edition)"
 chapter: "Ruth 1"
 chapter_osis: "Ruth.1"
 status: "DRAFT — NOT VALIDATED"
-source_module: "BRMHCC 0.1.0 (CrossWire MHCC 2.0)"
-source_zip_sha256: "0faf4376b6b97093ecb94f306886c24d3030ab1f5e194472ad908dd73921f9c0"
+source_module: "MHCC 0.1.1 (Bible Resources corrected CrossWire MHCC 2.0)"
+source_zip_sha256: "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746"
+source_native_corpus_sha256: "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e"
+source_release: "https://github.com/icfmp/Bible-Resources/releases/tag/mhcc-0.1.1"
 reading_witness: "https://www.stepbible.org/?q=version%3DMHCC@reference%3DRut.1"
 issue: "https://github.com/icfmp/Bible-Resources/issues/270"
 ---
@@ -14,7 +16,7 @@ issue: "https://github.com/icfmp/Bible-Resources/issues/270"
 > **Editorial status:** First-pass modernization from the STEP Bible presentation
 > of CrossWire MHCC, not yet independently collated with the exact native
 > entries, markup, references, verse-range mapping or chapter/book introductions
-> of the pinned BRMHCC binary. The book-wide Ruth introduction displayed before
+> of the pinned corrected MHCC 0.1.1 binary. The book-wide Ruth introduction displayed before
 > chapter 1 is **not** part of the chapter's prose below; it must be separately
 > accounted for and modernized as an introduction in a faithful future module.
 > **Do not build, distribute, tick the chapter checkbox or report a chapter
@@ -78,9 +80,11 @@ Suffering itself does not do us good. It is suffering rightly endured that does 
 
 ---
 
+> **2026-11-16 source re-pin, not validation:** The published corrected `MHCC` 0.1.1 source supersedes the old `BRMHCC` 0.1.0 reference. Its reviewed only-two-source-errata change list affects Ezekiel 3 and 1 Chronicles 7, not this pilot chapter. The **existing experimental prose is retained without fresh content edits**; the pre-existing STEP-based semantic review is provisional only. Exact new-source native XML/section-link, introductions, quotes, references, independent semantic review and SWORD tests are still required for a validated production chapter.
+
 ## Review queue (not approval)
 
-- [ ] Collate the **complete** chapter, original OSIS nodes, direct citations, all source native key/verse ranges and structural markers from SHA-attested `BRMHCC` using the existing private SWORD reader.
+- [ ] Collate the **complete** chapter, original OSIS nodes, direct citations, all source native key/verse ranges and structural markers from SHA-attested corrected `MHCC` 0.1.1 using the existing private SWORD reader.
 - [ ] Verify this draft's four sections against the exact compiled words, punctuation, titles, paragraphs, notes and original reference links. STEP's CrossWire-based reading interface is a **secondary rendering witness**, not an immutable equality proof.
 - [ ] Process the **book-wide Ruth introduction** in its own original intro key(s), without merging it into chapter 1 or silently omitting it from the eventual module.
 - [ ] Independent substantive semantic review, including “public ordinances,” the meaning of the “great change,” and preservation of the degrees of certainty in Henry's judgments.
