@@ -3,8 +3,10 @@ edition: "Matthew Henry Concise Commentary — Modern English (working edition)"
 chapter: "Hebrews 7"
 chapter_osis: "Heb.7"
 status: "DRAFT — NOT VALIDATED"
-source_module: "BRMHCC 0.1.0 (CrossWire MHCC 2.0)"
-source_zip_sha256: "0faf4376b6b97093ecb94f306886c24d3030ab1f5e194472ad908dd73921f9c0"
+source_module: "MHCC 0.1.1 (Bible Resources corrected CrossWire MHCC 2.0)"
+source_zip_sha256: "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746"
+source_native_corpus_sha256: "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e"
+source_release: "https://github.com/icfmp/Bible-Resources/releases/tag/mhcc-0.1.1"
 reading_witness: "https://www.stepbible.org/?q=version%3DMHCC@reference%3DHeb.7"
 issue: "https://github.com/icfmp/Bible-Resources/issues/270"
 ---
@@ -79,9 +81,11 @@ Let them be assured: he will deliver them in times of trial and suffering, in pr
 
 ---
 
+> **2026-11-16 source re-pin, not validation:** The published corrected `MHCC` 0.1.1 source supersedes the old `BRMHCC` 0.1.0 reference. Its reviewed only-two-source-errata change list affects Ezekiel 3 and 1 Chronicles 7, not this pilot chapter. The **existing experimental prose is retained without fresh content edits**; the pre-existing STEP-based semantic review is provisional only. Exact new-source native XML/section-link, introductions, quotes, references, independent semantic review and SWORD tests are still required for a validated production chapter.
+
 ## Review queue (not approval)
 
-- [ ] Read all exact BRMHCC original Hebrew 7 native keys and OSIS markup independently from the pinned ZIP, preserving source granularity and reference targets.
+- [ ] Read all exact MHCC 0.1.1 source Hebrew 7 native keys and OSIS markup independently from the pinned ZIP, preserving source granularity and reference targets.
 - [ ] Confirm the full original argument and *typological*, not literal, identification of Melchizedek; eternal Sonship, superiority to Levitical priests, and Christ's uninterrupted priestly office.
 - [ ] Independently audit the **distinct comparison between the better covenant, Sinai covenant and covenant of works**, with no imposed doctrinal reinterpretation.
 - [ ] Audit nuances of “Surety,” “save to the uttermost,” degrees of holiness, the absence of sinful inclination in Christ, and every stage of the final exhortation.
