@@ -1,0 +1,177 @@
+{
+  "edition": "Bible Resources MHCC 0.1.1",
+  "module_sword_id": "MHCC",
+  "published_zip_sha256": "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746",
+  "verified_entire_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+  "proof_run": "https://github.com/icfmp/Bible-Resources/actions/runs/43931497021",
+  "scope": "Gen.1",
+  "status": "ORIGINAL_NATIVE_SOURCE_MAP_VERIFIED_NOT_DERIVATIVE_ACCEPTANCE",
+  "sections": [
+    {
+      "first_key": "Gen.1.1",
+      "native_keys": [
+        "Gen.1.1",
+        "Gen.1.2"
+      ],
+      "source_sha256": "d0ec7de26fdded3fd6d1d3914e66529ac2eb5f7cd9491cb8cf2c879d9fe4cd4d",
+      "markup_census": {
+        "strict_xml_fragment": true,
+        "tag_counts": {
+          "cell": 16,
+          "div": 35,
+          "hi": 1,
+          "row": 8,
+          "table": 8,
+          "title": 3
+        }
+      }
+    },
+    {
+      "first_key": "Gen.1.3",
+      "native_keys": [
+        "Gen.1.3",
+        "Gen.1.4",
+        "Gen.1.5"
+      ],
+      "source_sha256": "3491adbaf1c976899564d6e68b314062894e68759cc3dd47779add2aeb4b3b33",
+      "markup_census": {
+        "strict_xml_fragment": true,
+        "tag_counts": {
+          "div": 10,
+          "hi": 1,
+          "reference": 1
+        }
+      }
+    },
+    {
+      "first_key": "Gen.1.6",
+      "native_keys": [
+        "Gen.1.6",
+        "Gen.1.7",
+        "Gen.1.8",
+        "Gen.1.9",
+        "Gen.1.10",
+        "Gen.1.11",
+        "Gen.1.12",
+        "Gen.1.13"
+      ],
+      "source_sha256": "24412381ea0e938a814942e81b1f44d792bde7b684f888b9e07fc7fac8b6d288",
+      "markup_census": {
+        "strict_xml_fragment": true,
+        "tag_counts": {
+          "div": 10,
+          "hi": 1
+        }
+      }
+    },
+    {
+      "first_key": "Gen.1.14",
+      "native_keys": [
+        "Gen.1.14",
+        "Gen.1.15",
+        "Gen.1.16",
+        "Gen.1.17",
+        "Gen.1.18",
+        "Gen.1.19"
+      ],
+      "source_sha256": "bc5891840547791ca5c33b0bcde3a678a36d377a461fe193e9a624b6b5f4f9f3",
+      "markup_census": {
+        "strict_xml_fragment": true,
+        "tag_counts": {
+          "div": 10,
+          "hi": 1
+        }
+      }
+    },
+    {
+      "first_key": "Gen.1.20",
+      "native_keys": [
+        "Gen.1.20",
+        "Gen.1.21",
+        "Gen.1.22",
+        "Gen.1.23",
+        "Gen.1.24",
+        "Gen.1.25"
+      ],
+      "source_sha256": "81513438b5664918ddc5128658efbb1fb5b2523f5fbe8e399a4dc4dd2e956cfb",
+      "markup_census": {
+        "strict_xml_fragment": true,
+        "tag_counts": {
+          "div": 10,
+          "hi": 1
+        }
+      }
+    },
+    {
+      "first_key": "Gen.1.26",
+      "native_keys": [
+        "Gen.1.26",
+        "Gen.1.27",
+        "Gen.1.28"
+      ],
+      "source_sha256": "e4b193e713773936940d8affdbc2b85f4b28b828766ba2a9d127d99ab59dca33",
+      "markup_census": {
+        "strict_xml_fragment": true,
+        "tag_counts": {
+          "div": 10,
+          "hi": 1,
+          "reference": 1
+        }
+      }
+    },
+    {
+      "first_key": "Gen.1.29",
+      "native_keys": [
+        "Gen.1.29",
+        "Gen.1.30"
+      ],
+      "source_sha256": "b4639c7488c2e792705e5235650191a0c99dd907aa693bbb5ff03c3ac558a90c",
+      "markup_census": {
+        "strict_xml_fragment": true,
+        "tag_counts": {
+          "div": 10,
+          "hi": 1
+        }
+      }
+    },
+    {
+      "first_key": "Gen.1.31",
+      "native_keys": [
+        "Gen.1.31"
+      ],
+      "source_sha256": "0c74ab9b63664a00a4240e81eebd62af84c5c2d322ab0308a48e5e957c737e5d",
+      "markup_census": {
+        "strict_xml_fragment": true,
+        "tag_counts": {
+          "div": 9,
+          "hi": 1
+        }
+      }
+    }
+  ],
+  "introductions": [
+    {
+      "native_key": "Gen",
+      "source_sha256": "639bde8508032299698e3356fcdbde2fde2f9085f851addf9cff4a9602a1b277",
+      "markup_census": {
+        "strict_xml_fragment": true,
+        "tag_counts": {
+          "div": 3
+        }
+      }
+    },
+    {
+      "native_key": "Gen.1",
+      "source_sha256": "35175e25659679ccf0c1a268e07685751132fc0c177acfc6d4486a818bab0836",
+      "markup_census": {
+        "strict_xml_fragment": true,
+        "tag_counts": {
+          "div": 1
+        }
+      }
+    }
+  ],
+  "original_word_text_output": false,
+  "independent_semantic_text_review_approved": false,
+  "modern_derivative_native_roundtrip_complete": false
+}
