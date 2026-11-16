@@ -78,6 +78,31 @@ class PublicationCoverageTests(unittest.TestCase):
             with self.assertRaisesRegex(ReleaseCoverageError,"Approved modules and catalogue"):
                 coverage(root)
 
+    def test_curated_version_upgrade_replaces_current_plan_without_reusing_old_tag(self):
+        """One current module has one active plan; old tags remain immutable on GitHub."""
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            old, catalogue, _ = self.fixture(root)
+            upgraded = dict(old, version="0.1.1", tag="sample-0.1.1")
+            next_file = root / "config/release-plans/sample-0.1.1.json"
+            next_file.write_text(json.dumps(upgraded))
+            with self.assertRaisesRegex(ReleaseCoverageError, "Duplicate"):
+                coverage(root)
+            (root / "config/release-plans/sample-0.1.0.json").unlink()
+            with self.assertRaisesRegex(ReleaseCoverageError, "planned GitHub Release"):
+                coverage(root)
+            meta_file = root / "modules/sample/metadata.json"
+            meta = json.loads(meta_file.read_text())
+            meta["version"] = "0.1.1"
+            meta_file.write_text(json.dumps(meta))
+            catalogue["modules"][0]["version"] = "0.1.1"
+            (root / "catalog/v1/catalog.json").write_text(json.dumps(catalogue))
+            good = coverage(root)
+            self.assertEqual(good["planned"][0][1]["tag"], "sample-0.1.1")
+            next_file.write_text(json.dumps(dict(upgraded, tag="sample-0.1.0")))
+            with self.assertRaisesRegex(ReleaseCoverageError, "filename must match tag"):
+                coverage(root)
+
     def test_actual_package_must_match_both_byte_length_and_digest(self):
         with TemporaryDirectory() as temporary:
             root=Path(temporary)
