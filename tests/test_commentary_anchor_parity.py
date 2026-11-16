@@ -7,7 +7,9 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from commentary_anchor_parity import compare_anchors, summarize_volume_anchor_results
+from commentary_anchor_parity import (compare_anchors, summarize_volume_anchor_results,
+                                      _original_unoccupied_source_units,
+                                      UnoccupiedSourceProseLocator)
 from pilot_preflight import PilotError
 
 
@@ -23,6 +25,48 @@ class CommentaryAnchorParityTests(unittest.TestCase):
     def native(self, rows, *, numbered, intros=0):
         return (b"M\tTestCom\tKJV\t1.9.0\tzCom\n" + rows +
                 f"S\t32000\t{numbered}\t{intros}\t0\n".encode())
+
+    def test_valid_unoccupied_source_prose_is_located_in_neighboring_original_native_slot(self):
+        original_words = " ".join(f"sourceword{n}" for n in range(55)).encode()
+        original = (
+            b'<?xml version="1.0"?><ThML><div1><div2>'
+            b'<scripCom osisRef="Bible:Gen.1.1"/>'
+            b'<div><p>' + original_words + b'</p></div>'
+            b'</div2></div1></ThML>' + b' ' * 1100
+        )
+        missing = [{"original_work_qualified_reference": "Bible:Gen.1.1",
+                    "start_key": "Gen.1.1"}]
+        original_units = _original_unoccupied_source_units(
+            original, volume=1, missing=missing,
+            canonical_verses={"Gen.1.1", "Gen.1.2"})
+        self.assertEqual(len(original_units), 1)
+        locator = UnoccupiedSourceProseLocator(original_units)
+        locator.observe("K", "Exod.1.1", b"<div>Unrelated</div>")
+        locator.observe("K", "Gen.1.2",
+                        b"<div><p>Earlier context. " + original_words
+                        + b" Follow-on details.</p></div>")
+        result = locator.report()
+        self.assertEqual(result["original_valid_unoccupied_start_units_checked"], 1)
+        self.assertEqual(
+            result["units"][0]["bounded_matching_native_candidates"][0]["original_stock_native_key"],
+            "Gen.1.2")
+        self.assertGreaterEqual(result["units"][0]["bounded_matching_native_candidates"][0][
+            "matched_distinct_original_plain_word_windows"], 1)
+        self.assertFalse(result["published"])
+        self.assertNotIn("sourceword", json.dumps(result))
+        self.assertEqual(_original_unoccupied_source_units(
+            original, volume=1, missing=missing, canonical_verses={"Gen.1.2"}), [])
+
+    def test_unoccupied_source_prose_locator_does_not_invent_absent_body(self):
+        original = (b'<?xml version="1.0"?><ThML>'
+                    b'<scripCom osisRef="Bible:Gen.1.1"/>'
+                    b'<p>Not a matching original div.</p></ThML>' + b' ' * 1100)
+        with self.assertRaisesRegex(PilotError, "lacks adjacent"):
+            _original_unoccupied_source_units(
+                original, volume=1, missing=[
+                    {"original_work_qualified_reference": "Bible:Gen.1.1",
+                     "start_key": "Gen.1.1"}],
+                canonical_verses={"Gen.1.1"})
 
     def test_native_kjv_registry_differentiates_invalid_source_endpoint_from_unoccupied_slot(self):
         xml = self.xml(
