@@ -1,17 +1,8 @@
 name: Verify original MHCC with reviewed LSG in real Xiphos reader (private)
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/commentary-xiphos-dual-reader.yml'
-      - 'scripts/commentary_xiphos_dual_reader.py'
-      - 'scripts/sword_commentary_raw_key.cpp'
-      - 'scripts/sword_native_commentary_raw_corpus.cpp'
-      - 'scripts/sword_native_raw_corpus_inventory.py'
-      - 'scripts/commentary_reference_cross_slot.py'
-      - 'tests/test_commentary_xiphos_dual_reader.py'
-      - 'modules/lsg-1910/payload/**'
-      - 'config/catalogue-import-lsg-0.1.0.json'
-      - 'config/commentary-intake/**'
+  # Original MHCC 2.0 research against an unchanged source; now manual-only.
+  # Do not apply historic exact-stock reader expectations to unrelated
+  # commentary intake changes or already source-corrected MHCC 0.1.1 releases.
   workflow_dispatch:
     inputs:
       resource_id:
