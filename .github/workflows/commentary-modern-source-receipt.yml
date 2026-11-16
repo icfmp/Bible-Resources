@@ -339,7 +339,9 @@ jobs:
           assert m["original_source_link_target_count"]==2
           assert m["original_source_link_targets_embedded_exactly"] is True
           assert m["modern_book_introduction_paragraphs_included"]>=3
-          assert m["original_chapter_outline_tables_preserved"] is False
+          assert m["original_chapter_outline_tables_preserved"] is True
+          assert m["original_chapter_outline_tables_retained"]==8
+          assert m["original_chapter_outline_cell_text_exactly_preserved"] is True
           assert m["original_chapter_intro_native_markup_preserved"] is False
           assert m["sword_publication_authorized"] is False
           ns={"o":"http://www.bibletechnologies.net/2003/OSIS/namespace"}
