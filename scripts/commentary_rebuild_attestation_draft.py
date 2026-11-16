@@ -17,6 +17,26 @@ import re
 from compiled_stock_commentary_proof import SUFFIXES
 from reviewed_compiled_commentary_rebuild import _review_deltas
 
+# These messages are fixed, source-neutral and intentionally contain no
+# original text, citation labels, XML or user-controlled value interpolation.
+PUBLIC_REBUILD_ATTESTATION_ERROR_CODES = frozenset({
+    "Private native evidence or original manifest unavailable",
+    "Source witness manifest absent, linked or oversized",
+    "Real original source fingerprint does not match pin",
+    "Malformed or duplicated original native source bodies",
+    "Complete original/index-only/candidate K-I-TOP parity failed",
+    "Actual native raw stream corpus digest/count not independently confirmed",
+    "Incomplete real native SWORD corpus scan",
+    "Source-delta receipt lacks exact reversible original native keys",
+    "Source-delta master does not belong to edited original group",
+    "Unpinned or mis-scoped original source-body correction",
+    "Unreviewed compiled original K bytes changed",
+    "Corrected original source-byte evidence is incomplete",
+    "Corrected source hash not tied to reviewed native edit",
+    "Added SWORD key does not equal reviewed original master",
+    "Missing or unsafe actually installed candidate payload",
+})
+
 SHA = re.compile(r"[0-9a-f]{64}\Z")
 ORIGINAL_PATH = re.compile(r"config/commentary-intake/[a-z0-9-]+\.json\Z")
 
