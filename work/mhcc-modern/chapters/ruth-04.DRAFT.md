@@ -43,7 +43,7 @@ They neglect the interests of their souls and reject salvation through Christ be
 
 God, however, honored Boaz by bringing him into the family line of the Messiah.
 
-The nearer relative was afraid of losing his standing and damaging his inheritance. Yet his name, family and inheritance have passed into obscurity.
+The nearer relative feared diminishing his standing and damaging his inheritance. Yet his name, family and inheritance are now forgotten.
 
 ## The birth of Obed and the line of David (verses 13–22)
 
@@ -61,7 +61,7 @@ Here we learn how David descended from Ruth.
 
 In time, Bethlehem in Judah would witness wonders greater still than those recorded in this book.
 
-There, a child born to another rejected and helpless woman of the same family line would enter the world. Though he appeared so lowly, he would overcome the purposes of the Roman ruler of the world and draw princes and wise men from the East to his feet, bringing gifts of gold, frankincense and myrrh.
+There, the seemingly outcast child of another poor and desolate woman of the same family line would appear. Though he seemed so lowly, he would direct even the counsels of the Roman ruler of the world and draw princes and wise men from the East to his feet, bearing gold, frankincense and myrrh.
 
 His name will endure forever, and all nations will call him blessed.
 
