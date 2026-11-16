@@ -145,8 +145,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "high",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "OSIS",
@@ -155,7 +155,7 @@
       "has_direct_tests_by_filename": false,
       "owner": "Bible Resources maintainers",
       "path": "scripts/bible_intake.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain stable verified interface; extend test fixtures.",
       "purpose_first_line": "Research-only Bible intake: strict manifest, bounded HTTPS and ZIP hashes.",
       "python_imports": [
         "__future__",
@@ -176,14 +176,15 @@
       ],
       "release_approval": "never inferred from inventory",
       "sha256_at_inventory": "52c7b29889719a5ba5f7127b2aad58cac97fba5096e25e79b7985c135f547357",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "intake",
-      "static_reference_count": 8,
+      "static_reference_count": 9,
       "static_references": [
         "scripts/bible_stage_runner.py",
         "scripts/publisher_osis_sword_candidate.py",
         "scripts/publisher_osis_usfx_parity.py",
+        "scripts/tool_registry.py",
         "scripts/usfx_schema_gate.py",
         ".github/workflows/bible-observe-originals.yml",
         ".github/workflows/bible-staged-audit.yml",
@@ -192,8 +193,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "high",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "RawText",
@@ -205,7 +206,7 @@
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/bible_stage_runner.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain stable verified interface; extend test fixtures.",
       "purpose_first_line": "One bounded, read-only Bible audit checkpoint per independent Actions run.",
       "python_imports": [
         "__future__",
@@ -239,11 +240,12 @@
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
       "sha256_at_inventory": "70384ec90a314991c80d585b66af379dd1df468e54263f1dddec67e13035d0a1",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 6,
       "static_references": [
+        "scripts/tool_registry.py",
         ".github/workflows/bible-staged-audit.yml",
         "docs/BIBLE_STAGE_AUTOMATION.md",
         "docs/SOURCE_USFX_STRUCTURE.md",
@@ -945,7 +947,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "intake",
-      "static_reference_count": 19,
+      "static_reference_count": 20,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_andbible_jsword.py",
@@ -964,6 +966,7 @@
         "docs/COMMENTARY_7_STAGE_WORKFLOW.md",
         "docs/COMMENTARY_PIPELINE.md",
         "docs/PUBLISHING.md",
+        "docs/evidence/post-mhcc/toolchain-pilot-2026-11-16.md",
         "tests/test_commentary_intake.py",
         "tests/test_tool_registry.py"
       ]
@@ -1101,7 +1104,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 9,
+      "static_reference_count": 10,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_native_raw_inventory.py",
@@ -1110,6 +1113,7 @@
         ".github/workflows/commentary-evidence.yml",
         ".github/workflows/commentary-intake.yml",
         "docs/COMMENTARY_PIPELINE.md",
+        "docs/evidence/post-mhcc/toolchain-pilot-2026-11-16.md",
         "tests/test_commentary_stage_evidence.py",
         "tests/test_tool_registry.py"
       ]
@@ -2797,8 +2801,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "high",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "OSIS"
@@ -2806,7 +2810,7 @@
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/guard_osis.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain stable verified interface; extend test fixtures.",
       "purpose_first_line": "Fail-closed OSIS source gate. Read-only: never rewrite Scripture or markup.",
       "python_imports": [
         "__future__",
@@ -2825,10 +2829,10 @@
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
       "sha256_at_inventory": "8f2130eb4f03b420ba120a9785f96ae02365a1b3bf316eea236e7b09e3d2c4cb",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 17,
+      "static_reference_count": 18,
       "static_references": [
         "scripts/audit_osis.py",
         "scripts/bible_stage_runner.py",
@@ -2838,6 +2842,7 @@
         "scripts/normalize_osis.py",
         "scripts/probe_official_osis.py",
         "scripts/probe_private_repaired_darby_sword.py",
+        "scripts/tool_registry.py",
         ".github/workflows/darby-link-repair-research.yml",
         ".github/workflows/osis-schema-review.yml",
         "docs/EDITORIAL_AUDIT_WORKFLOW.md",
@@ -3263,8 +3268,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "high",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "OSIS"
@@ -3272,7 +3277,7 @@
       "has_direct_tests_by_filename": false,
       "owner": "Bible Resources maintainers",
       "path": "scripts/normalize_osis.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain stable verified interface; extend test fixtures.",
       "purpose_first_line": "Apply explicitly approved, strictly text-preserving OSIS layout edits.",
       "python_imports": [
         "__future__",
@@ -3292,12 +3297,13 @@
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
       "sha256_at_inventory": "da4aef9cf66015f46d1cf368656cea25c38f0428a1557f160a9c09f7d115942f",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 8,
+      "static_reference_count": 9,
       "static_references": [
         "scripts/propose_upstream_edit.py",
+        "scripts/tool_registry.py",
         ".github/workflows/pilot-source-audit.yml",
         "docs/EDITORIAL_AUDIT_WORKFLOW.md",
         "docs/NORMALIZATION_POLICY.md",
@@ -3374,14 +3380,14 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "high",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [],
       "has_direct_tests_by_filename": false,
       "owner": "Bible Resources maintainers",
       "path": "scripts/pilot_fetch.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain stable verified interface; extend test fixtures.",
       "purpose_first_line": "Download only registered pilot sources, to temporary workspace, without publishing.",
       "python_imports": [
         "__future__",
@@ -3397,10 +3403,10 @@
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
       "sha256_at_inventory": "8f54146080195cfe67ee9d1f973133834c320cf1ece31bd3f3afb0181f268328",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 22,
+      "static_reference_count": 23,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_andbible_jsword.py",
@@ -3415,6 +3421,7 @@
         "scripts/commentary_witness.py",
         "scripts/commentary_xiphos_dual_reader.py",
         "scripts/commentary_xml_witness.py",
+        "scripts/tool_registry.py",
         ".github/workflows/commentary-evidence.yml",
         ".github/workflows/commentary-intake.yml",
         ".github/workflows/commentary-xml-witness.yml",
@@ -3427,8 +3434,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "high",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "RawText",
@@ -3443,7 +3450,7 @@
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/pilot_preflight.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain stable verified interface; extend test fixtures.",
       "purpose_first_line": "Read-only ZIP and SWORD metadata preflight for the two approved pilot IDs.",
       "python_imports": [
         "__future__",
@@ -3459,10 +3466,10 @@
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
       "sha256_at_inventory": "9c62c34925e5dc6519d1369bce7d5f5045c047881a468daab7144ed0f15cbb11",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 91,
+      "static_reference_count": 92,
       "static_references": [
         "scripts/audit_real_pilot.py",
         "scripts/bible_intake.py",
@@ -3512,6 +3519,7 @@
         "scripts/private_sword_bundle.py",
         "scripts/probe_lsg_v11n.py",
         "scripts/stage_verified_stock_commentary.py",
+        "scripts/tool_registry.py",
         ".github/workflows/lsg-fidelity.yml",
         ".github/workflows/pilot-preflight.yml",
         "docs/PILOT_SEGOND_MHC.md",
@@ -6154,8 +6162,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "high",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
         "RawText",
@@ -6165,18 +6173,19 @@
       "has_direct_tests_by_filename": false,
       "owner": "Bible Resources maintainers",
       "path": "scripts/sword_native_index.cpp",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain stable verified interface; extend test fixtures.",
       "purpose_first_line": "Native stable-SWORD Bible verse-index inventory, independently of source OSIS.",
       "python_imports": [],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
       "sha256_at_inventory": "0d382dd7a26bee7ecb201cb0821002315434250d637ef8d5da22a8febee62617",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 16,
+      "static_reference_count": 17,
       "static_references": [
         "scripts/sword_native_inventory.py",
+        "scripts/tool_registry.py",
         ".github/workflows/bible-staged-audit.yml",
         ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-andbible-android-private.yml",
@@ -6416,7 +6425,7 @@
         "webview"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "bd0709f285418b1fd04fe18a2e3b2f57febaaf81e70cd7edc9cfae64823898fa",
+      "sha256_at_inventory": "ea9038e76921c8f1783bdc065901f09e5c49188dd5dc1c9910aed47b6b2a9c20",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
