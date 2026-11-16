@@ -36,6 +36,7 @@ class ParagraphWitnessProbeTest(unittest.TestCase):
         self.assertTrue(row["marker_inside_p"])
         self.assertEqual(row["candidate_source_section_p_count"], 2)
         self.assertEqual(row["paragraphs_with_both_unique_8_word_anchors"], 2)
+        self.assertEqual(row["independent_p_internal_explicit_breaks_total"], 0)
         self.assertEqual(
             row["source_paragraphs_with_all_words_in_exact_original_order"], 2)
         self.assertTrue(all(
@@ -95,6 +96,22 @@ class ParagraphWitnessProbeTest(unittest.TestCase):
             row["source_paragraph_lexical_anchors"][0][
                 "all_differences_require_independent_editorial_review"])
         self.assertFalse(row["source_digital_edition_equivalence_proven"])
+
+    def test_source_one_p_with_internal_linebreak_is_not_misread_as_no_break(self):
+        first = b"one two three four five six seven eight nine ten"
+        last = b"eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen"
+        source = document(
+            b"<div1><div2><p><scripCom osisRef='Bible:John.3.1'/>"
+            + first + b"<br/> " + last
+            + b"</p></div2></div1>")
+        original = b"<div/>" + first + b" " + last
+        result = compare_paragraph_witness(source, [("K", "John.3.1", original)])
+        row = result["results"][0]
+        self.assertEqual(row["candidate_source_section_p_count"], 1)
+        self.assertEqual(row["independent_p_internal_explicit_breaks_total"], 1)
+        self.assertEqual(
+            row["source_paragraphs_with_all_words_in_exact_original_order"], 1)
+        self.assertFalse(row["candidate_para_boundaries_authorized"])
 
     def test_chapter_marker_outside_div2_remains_unresolved(self):
         source = document(b"<div1><scripCom osisRef='Bible:Lev.19'/>"
