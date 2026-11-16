@@ -1,10 +1,17 @@
-# Source-attested rebuilt SWORD commentary validation — proposal
+# Source-attested rebuilt SWORD commentary validation — accepted architecture
 
-**Status:** draft implementation, synthetic validation tests only.
-Tracked in [PR #275](https://github.com/icfmp/Bible-Resources/pull/275)
-and [release gate #276](https://github.com/icfmp/Bible-Resources/issues/276).
-**No approved compiled module currently uses this new mode.**
-Owner architecture review and publication authorization are separate.
+**Status:** architectural choice accepted on 2026-11-16 under the project
+owner's delegated technical decision, without publication or merge approval.
+Implemented in [draft PR #275](https://github.com/icfmp/Bible-Resources/pull/275)
+and technically verified by [1,329 unit/regression tests](https://github.com/icfmp/Bible-Resources/actions/runs/43867792317)
+and the [complete private libSWORD/Xiphos audit](https://github.com/icfmp/Bible-Resources/actions/runs/43867792111).
+Tracked for final release readiness in
+[issue #276](https://github.com/icfmp/Bible-Resources/issues/276).
+
+**No approved rebuilt module currently uses the new mode.** A source-attested
+private rebuild is **not** a reviewed final release package. Independent
+source/rights review, an exact final release payload, and express owner
+merge/publication permission remain mandatory.
 
 ## Scope
 
@@ -61,12 +68,14 @@ original-stock proof tests remain in the same suite.
 
 ## Remaining gates for BRMHCC 0.1.1
 
-- Owner reviews the generic validation contract and source-comparison
-  process **before** any production proof selects this mode.
-- Adapt the existing full original SWORD/native private CI to **generate
-  an independently reproducible report in this generic schema**, and
-  repeat it against the **actual final committed candidate bytes**.
-  The earlier ephemeral private ZIP is **not a final release artifact**.
+- **Architecture selected and pilot implemented**. The full private
+  original-to-rebuild proof generator now emits metadata-only, explicitly
+  unapproved draft records from actual SWORD/native reader evidence.
+- **Remaining:** independently review that evidence and regenerate the
+  finalized proof and all file digests against the **actual final committed
+  candidate**. The ephemeral private ZIP is not a final release artifact.
+  The offline proof validator checks pinned claims and exact bytes; it
+  cannot replace independent evidence provenance and human approval.
 - Check all **28,718 original K**, **1,255 I**, **two TOP**, **24 added K
   aliases**, and **only 12 originally occupied K addresses reflecting the
   two source corrections** (11 linked in Ezekiel 3; 1 in 1 Chronicles 7).
@@ -97,3 +106,16 @@ On [private full original and rebuilt SWORD CI #43867004627](https://github.com/
 - Exact compiled private ZIP (CI scratch only): `aeebadbc57d5a891d10ddb3dec520dcc8abd49e7cdd733c4a3542c77765282c4`.
 
 The three corpus digests are **not interchangeable**: the original source bytes differ from the standard compiler's output. Native source/section semantic parity and the edited-source-versus-index-only exact compiled delta are separately checked. The attestation remains `private_draft_not_owner_authorized_for_release`; the production proof must be regenerated against the eventual **final versioned package**, including the owner-approved date and provenance config, before release. No owner authorization is inferred from a checksum.
+
+## Decision implications in plain language
+
+The original downloadable edition can be preserved exactly; the corrected
+edition can be distributed later as a **new, traceable version**. Both still
+use regular SWORD files; no new app-specific format and no Bible application
+change are required. A corrected source can never be labelled as unchanged.
+The cost is a separate, independently evidenced reconstruction audit for
+such versions. The benefit is reliable corrections without losing the
+source original or compromising the trustworthiness of the catalogue.
+
+The delegated architecture choice is **not consent to license, release,
+merge, upload, overwrite existing assets, or update public catalogue data**.

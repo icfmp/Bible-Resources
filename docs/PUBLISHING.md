@@ -38,6 +38,11 @@ members (six zCom data files and one `.conf`). The module's
 `SOURCE_VALIDATION.json` must reference that same independent report
 and source review. A build that merely sets `validated=true` is rejected.
 
+**Architecture decision (2026-11-16):** the project owner delegated
+this technical choice and the two separate routes are adopted. This does
+not authorize a particular source correction for public release, a merged PR
+or any public artifact. Independent proof and release gates remain required.
+
 The offline validator binds the submitted proofs and actual packaged bytes;
 it **does not itself execute libSWORD or authenticate a human signature**.
 Prior to editorial approval, independently regenerate and review the complete
