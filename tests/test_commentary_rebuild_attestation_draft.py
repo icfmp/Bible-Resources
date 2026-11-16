@@ -40,7 +40,9 @@ class PrivateNativeRebuildDraftTests(unittest.TestCase):
             "category": "commentary", "archive_sha256": "a"*64,
             "native_raw_corpus_sha256": "b"*64,
             "stock_conf_sha256": "c"*64,
-            "module_id": "Invented",
+            "module_id": "Invented", "version": "2.0",
+            "provider": "synthetic",
+            "source_page_url": "https://example.org/source",
         }))
         self.old = b"<p>Invented source name Dn</p>"
         self.new = b"<p>Invented source name Dan</p>"
@@ -166,8 +168,11 @@ class PrivateNativeRebuildDraftTests(unittest.TestCase):
         }
         errors = reviewed_rebuilt_commentary_errors(mod, self.root, meta, conf)
         self.assertTrue(errors)
-        self.assertIn("original, version or source-audit identity", str(errors).lower()
-                      if False else str(errors).lower()[:0] + str(errors).lower())
+        self.assertIn("Original, version or source-audit identity differs", str(errors))
+        got["review_manifest"]["status"] = "owner_authorized_for_release"
+        review.write_text(json.dumps(got["review_manifest"]))
+        errors = reviewed_rebuilt_commentary_errors(mod, self.root, meta, conf)
+        self.assertIn("owner review unavailable", str(errors))
 
     def test_wrong_original_source_or_pinned_bytes_fails_closed(self):
         for change in (
