@@ -349,6 +349,13 @@ jobs:
           assert len(links)==2 and len(intros)==1
           a=(base/"mhcc-genesis01-linked-v3.txt").read_text()
           b=(base/"mhcc-genesis01-linked-v26.txt").read_text()
+          print("GEN1_LINKED_READER_MARKER_DIAGNOSTIC"+
+                " v3_present="+str("1 John 5:20" in a)+
+                " v26_present="+str("Ecclesiastes 7:29" in b)+
+                " v3_ref_element="+str("reference" in a.lower())+
+                " v26_ref_element="+str("reference" in b.lower())+
+                " v3_bytes="+str(len(a.encode()))+
+                " v26_bytes="+str(len(b.encode())))
           assert "1 John 5:20" in a and "Ecclesiastes 7:29" in b
           print("Source-linked Genesis 1 temp build: 2 exact original targets, separate modern book introduction and reader visible markers PASS; historic source outline/chapter intro and independent semantic acceptance pending")
           PY
