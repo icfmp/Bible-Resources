@@ -99,6 +99,48 @@ drafts the book introduction. It still does **not** certify original
 chapter outline or authorial intro layout. A successful SWORD build by
 itself cannot satisfy the remaining structural or semantic gate.
 
+## Original-source-linked candidate build and readback — 2026-11-16
+
+The actual pinned `MHCC 0.1.1` compiled original is now used by a
+**generic** private chapter-layout builder, not only the STEP textual witness.
+
+- [Real CI #43936954142](https://github.com/icfmp/Bible-Resources/actions/runs/43936954142)
+  **SUCCESS**: original ZIP and complete original native corpus verified by
+  SHA-256, then all **8 distinct Gen.1 commentary bodies / 31 occupied
+  native numbered keys** re-enumerated.
+- Source-read exact **two original biblical `osisRef` attributes** from
+  `K:Gen.1.3` and `K:Gen.1.26` are carried over **verbatim into the
+  temporary new OSIS**, not reconstructed from a different Bible or from
+  nearby verse addresses. A second actual SWORD native readback confirms
+  **both attributes are byte-for-byte identical** after building the private
+  new zCom module. Actual `diatheke` display also shows the associated
+  modern text at the correct Genesis 1:3 and 1:26.
+- The actual first compiled `K:Gen.1.1` body is independently established to
+  contain the logical **book introduction**, **chapter outline**, and the
+  1:1–2 commentary. Both `I:Gen` and `I:Gen.1` original native placeholders
+  have **zero visible words**. That is *not* a proof of an omitted authorial
+  introduction.
+- The derived modern edition **explicitly reindexes its separately
+  modernized book introduction** into the new `I:Gen` location. Real native
+  `MHCCGENL` SWORD readback confirms it **appears in an intro key, and
+  does not reappear within numbered K commentary**. This reindexing is a
+  documented derivative-only editorial mapping; the source ZIP is untouched.
+- Eight distinct authorial chapter-outline tables, their row/cell topology
+  and all **16 original cell texts** are reproduced from the pinned original
+  first-K markup, without creating a guessed outline from modern chapter
+  headings.
+- A real disposable OSIS → `osis2mod` zCom → `diatheke` →
+  native raw-entry traversal has passed for the numbered Genesis 1
+  commentary, using exactly the **31 original verse slots**. This module
+  is in CI temporary storage only; it is **not** the published modern
+  edition, and its license/profile is explicitly private.
+
+**This is a technical source-identity, routing, and presentation PASS,
+not an independent semantic fidelity PASS.** The source has remaining
+inline markup/quotations beyond the two referenced annotations, and the
+final authorial semantics must be independently signed off before any
+validated chapter commit.
+
 ## Required remaining gates before Genesis 1 validation/commit
 
 - [x] Current corrected source release and whole compiled corpus SHA
@@ -112,12 +154,13 @@ itself cannot satisfy the remaining structural or semantic gate.
 - [ ] Independently **read and compare exact native raw content, punctuation,
       quotation delimiters, and inline references** as actual 0.1.1 XML (not
       merely a rendered CrossWire witness and metadata hashes).
-- [ ] Verify that original chapter-outline and book-introduction content **within the first K body** is mapped exactly once, despite empty I placeholders; ensure the two exact original `osisRef` attributes survive independently re-read SWORD markup.
+- [x] Verify original eight-table chapter-outline content and the book-introduction's **first K source provenance** are mapped without duplicate modern text, despite empty original I placeholders; the two literal original `osisRef` attributes survive independent real-SWORD native readback.
 - [ ] Obtain **independent second-reviewer** acceptance of all meanings,
       authorial confidence levels and the final source-to-derivative mapping.
       The current separate second *pass* is by the same assistant, not a
       separately qualified reviewer or authorized Codex run.
-- [ ] Build and independently reread **this complete modernized chapter** in genuine SWORD, including source-linked reference targets, verse-key assignment, book introduction moved to its declared editorial home, source-outline semantics and genuine reader display. A preliminary chapter-only SWORD readback already passed, but does not satisfy these content and intro gates.
+- [x] Privately build/read back an **actual** structured Genesis 1 candidate with all 31 numbered keys, all eight original section scopes, both exact original `osisRef` attributes, the source outline table cells, and a separately accessible modern book introduction, without duplication. CI #43936954142 succeeded. The resulting zCom is temporary; no publication, semantic acceptance or final immutable release artifact has occurred.
+- [ ] Independently approve every translated authorial idea and its presentation, and confirm any remaining source-inline quotation/annotation structure against the exact native text before assigning final production status.
 - [ ] Commit a validated production artifact, then and only then tick
       **Genesis 1** in tracking issue #270 and advance to **Genesis 2**.
 
