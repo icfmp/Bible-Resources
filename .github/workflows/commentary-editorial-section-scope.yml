@@ -510,6 +510,26 @@ jobs:
           assert revised["corrected_package_uploaded_or_distributed"] is False
           assert revised["source_words_or_xml_logged"] is False
           assert revised["owner_publication_authorized"] is False
+          rehearsal=revised["private_full_release_metadata_and_native_rehearsal"]
+          assert rehearsal["status"]=="PRIVATE_FULL_CONF_AND_SWORD_ZCOM_ZIP_REHEARSAL_NOT_RELEASE"
+          assert rehearsal["module_id"]=="BRMHCC"
+          assert rehearsal["version"]=="0.1.1"
+          assert rehearsal["compiled_block_type"]=="CHAPTER"
+          assert rehearsal["all_six_native_compiled_members_preserved"] is True
+          assert rehearsal["only_about_and_sword_version_date_changed"] is True
+          assert rehearsal["reinstalled_member_bytes_match_exactly"] is True
+          assert rehearsal["complete_rehearsed_libsword_native_readback_exact"] is True
+          assert rehearsal["zip_member_count"]==7
+          assert rehearsal["actual_release_date_selected"] is False
+          assert rehearsal["owner_release_authorized"] is False
+          assert rehearsal["artifact_published_or_uploaded"] is False
+          assert rehearsal["native_corpus_sha256"]==revised["private_real_native_rebuild_attestation_draft"]["source_audit"]["candidate_native_corpus_sha256"]
+          assert len(rehearsal["native_member_sha256"])==6
+          print("Private attributed SWORD package rehearsal:",
+                "native original unchanged",rehearsal["complete_rehearsed_libsword_native_readback_exact"],
+                "reinstalled exact members",rehearsal["zip_member_count"],
+                "test-date-only ZIP SHA-256",rehearsal["zip_sha256"],
+                "public",rehearsal["artifact_published_or_uploaded"])
           attestation=revised["private_real_native_rebuild_attestation_draft"]
           assert attestation["status"]=="PRIVATE_REAL_NATIVE_ATTESTATION_DRAFT_NOT_RELEASE"
           assert attestation["release_authorized"] is False
