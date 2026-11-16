@@ -60,7 +60,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_original_bookcode_repair.py`](../scripts/commentary_original_bookcode_repair.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/commentary_original_div1_book_consistency.py`](../scripts/commentary_original_div1_book_consistency.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_osis_intro_transport_probe.py`](../scripts/commentary_osis_intro_transport_probe.py) | UNDECIDED | named test | 2 | source/native audit |
-| [`scripts/commentary_osis_mixed_transport_probe.py`](../scripts/commentary_osis_mixed_transport_probe.py) | UNDECIDED | named test | 3 | source/native audit |
+| [`scripts/commentary_osis_mixed_transport_probe.py`](../scripts/commentary_osis_mixed_transport_probe.py) | UNDECIDED | named test | 4 | source/native audit |
 | [`scripts/commentary_osis_rebuild_preflight.py`](../scripts/commentary_osis_rebuild_preflight.py) | UNDECIDED | named test | 2 | publication/release |
 | [`scripts/commentary_osis_transport_probe.py`](../scripts/commentary_osis_transport_probe.py) | UNDECIDED | named test | 6 | source/native audit |
 | [`scripts/commentary_paragraph_witness_probe.py`](../scripts/commentary_paragraph_witness_probe.py) | UNDECIDED | named test | 3 | source/native audit |
