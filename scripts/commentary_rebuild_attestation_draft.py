@@ -45,6 +45,27 @@ def _counts(data: dict) -> dict:
     return {"K": len(data["K"]), "I": len(data["I"]), "TOP": len(data["U"])}
 
 
+def _native_map_digest(data: dict) -> str:
+    """Bind a native receipt to all observed keys/raw SHA-256s, no prose."""
+    state = sha256()
+    if set(data) != {"K", "I", "U"}:
+        raise ValueError("Incomplete actual observed native K/I/TOP map")
+    for kind in ("K", "I", "U"):
+        values = data[kind]
+        if kind == "U":
+            rows = [(f"TOP:{i}", item) for i, item in enumerate(values, 1)]
+        else:
+            rows = sorted(values.items())
+        for ref, raw in rows:
+            if not isinstance(ref, str) or not isinstance(raw, bytes):
+                raise ValueError("Malformed native raw identity fingerprint")
+            name = ref.encode("ascii")
+            for value in (kind.encode("ascii"), name, sha256(raw).digest()):
+                state.update(len(value).to_bytes(4, "big"))
+                state.update(value)
+    return state.hexdigest()
+
+
 def _receipt_counts(receipt: dict) -> dict:
     return {
         "K": receipt["actual_occupied_numbered_entry_count"],
@@ -135,10 +156,11 @@ def private_rebuild_attestation_draft(
     revised_counts = _counts(revised_compiled)
     installed_counts = _counts(installed_compiled)
     if (any(_receipt_counts(receipt) != counts
-            for receipt, counts in (
-                (index_receipt, index_counts),
-                (revised_receipt, revised_counts),
-                (installed_receipt, installed_counts)))
+            or receipt.get("native_identity_map_sha256") != _native_map_digest(data)
+            for receipt, counts, data in (
+                (index_receipt, index_counts, original_index_compiled),
+                (revised_receipt, revised_counts, revised_compiled),
+                (installed_receipt, installed_counts, installed_compiled)))
             or revised_receipt["all_native_raw_entries_ordered_sha256"]
                != installed_receipt["all_native_raw_entries_ordered_sha256"]):
         raise ValueError("Actual native raw stream corpus digest/count not independently confirmed")
