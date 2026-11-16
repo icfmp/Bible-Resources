@@ -130,6 +130,9 @@ jobs:
           report=json.loads((Path(os.environ["RUNNER_TEMP"])/"mhcc-modern-genesis01-native-reference-proof.json").read_text())
           assert report["source_unique_units_checked"]==8
           assert report["original_reference_links_checked"]==2
+          assert report["original_intro_units_found"]==2
+          for key,intro in report["per_intro_unit"].items():
+              print("ORIGINAL_INTRO_PROSE_PROFILE "+key+" words="+str(intro["source_visible_word_count"]))
           assert report["original_osisRef_literal_values_exported"] is False
           assert report["new_modern_osis_reference_targets_embedded"] is False
           print("Exact Genesis 1 native source link identities verified; final OSIS mapping unapproved")
