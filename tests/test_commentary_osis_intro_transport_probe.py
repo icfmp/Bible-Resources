@@ -1,0 +1,53 @@
+"""Completely synthetic introduction-transport wrapper checks."""
+import sys
+from pathlib import Path
+import unittest
+from lxml import etree
+from io import BytesIO
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+from sword_native_raw_corpus_inventory import parse_native_raw_corpus, RawCorpusError
+from commentary_osis_intro_transport_probe import make_unmodified_intro_osis
+
+
+class IntroTransportTests(unittest.TestCase):
+    def test_original_intro_bytes_stay_verbatim_in_each_candidate(self):
+        raw=b'<chapter osisID="Gen.1"/><div type="section"/>Invented original prose'
+        for mode in ("book_direct", "chapter_wrapper"):
+            xml=make_unmodified_intro_osis("Gen.1",raw,mode=mode,work_id="IntroTest")
+            self.assertIn(raw,xml)
+            root=etree.fromstring(xml)
+            self.assertEqual(root.tag.rsplit("}",1)[-1],"osis")
+            self.assertIn(b'osisID="Gen"',xml)
+            if mode=="chapter_wrapper":
+                self.assertIn(b'<div type="chapter" osisID="Gen.1">',xml)
+
+    def test_intro_only_native_stream_is_rejected_by_default_but_allowed_for_probe(self):
+        raw=b"<p>Synthetic intro</p>"
+        framed=b"I\tGen.1\t"+str(len(raw)).encode()+b"\n"+raw+b"S\t1\t0\t1\t0\n"
+        with self.assertRaises(RawCorpusError):
+            parse_native_raw_corpus(BytesIO(framed))
+        result,K,I,U=parse_native_raw_corpus(
+            BytesIO(framed),allow_intro_only=True
+        )
+        self.assertEqual(K,[])
+        self.assertEqual(I,["Gen.1"])
+        self.assertEqual(U,[])
+        self.assertEqual(result["all_actual_raw_entries_scanned"],1)
+
+    def test_empty_or_invalid_intro_is_rejected(self):
+        for raw in (b'<chapter', b'invalid\x00binary'):
+            with self.assertRaises(ValueError):
+                make_unmodified_intro_osis("Gen.1",raw,mode="book_direct",work_id="IntroTest")
+
+    def test_never_crosses_chapter_or_introduces_custom_module_identifiers(self):
+        with self.assertRaises(ValueError):
+            make_unmodified_intro_osis("Gen.0",b"<div/>",mode="book_direct",work_id="IntroTest")
+        with self.assertRaises(ValueError):
+            make_unmodified_intro_osis("Gen.1",b"<div/>",mode="invalid",work_id="IntroTest")
+        with self.assertRaises(ValueError):
+            make_unmodified_intro_osis("Gen.1",b"<div/>",mode="book_direct",
+                                       work_id='Invalid"Module')
+
+
+if __name__=="__main__":
+    unittest.main()

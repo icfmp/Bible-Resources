@@ -123,6 +123,43 @@ class StockCommentaryReleaseTests(unittest.TestCase):
             (directory/"SOURCE_VALIDATION.json").write_text(json.dumps(proof))
             self.assertTrue(compiled_stock_commentary_errors(directory,root,m,conf))
 
+    def test_reviewed_source_change_cannot_be_disguised_as_original_stock(self):
+        """Edited native source must never reuse the strict stock-identical route."""
+        with TemporaryDirectory() as d:
+            root = Path(d)
+            directory, metadata, conf, proof, _source, data, _confpath = self.fixture(root)
+            metadata["version"] = "0.1.1"
+            proof["curated_version"] = "0.1.1"
+
+            # The new edited edition MUST disclose that source and compiled
+            # content changed. The current stock validator must reject it.
+            for field, value in (
+                ("no_original_source_text_edited", False),
+                ("all_native_original_keys_byte_identical", False),
+                ("all_original_compressed_files_byte_identical", False),
+                ("source_kind", "reviewed_compiled_commentary_rebuild"),
+                ("only_source_metadata_relabelled",
+                 ["section_id", "DataPath", "Version", "History_0.1.1"]),
+            ):
+                with self.subTest(field=field):
+                    changed = {**proof, field: value}
+                    (directory / "SOURCE_VALIDATION.json").write_text(
+                        json.dumps(changed), encoding="utf-8")
+                    issues = compiled_stock_commentary_errors(
+                        directory, root, metadata, conf)
+                    self.assertTrue(issues)
+                    self.assertIn("STOCK_SOURCE_PROOF_INVALID", str(issues))
+                    self.assertNotIn("Original payload", str(issues))
+
+            # Mutating a SWORD compressed data member cannot become approved
+            # just by setting the curated version to 0.1.1.
+            (directory / "SOURCE_VALIDATION.json").write_text(
+                json.dumps(proof), encoding="utf-8")
+            (data / "nt.bzs").write_bytes(b"Different compiled commentary")
+            issues = compiled_stock_commentary_errors(
+                directory, root, metadata, conf)
+            self.assertTrue(any("STOCK_CONTENT_CHANGED" in x for x in issues))
+
     def test_refuse_unattested_osis_source_or_missing_original_binary(self):
         with TemporaryDirectory() as d:
             root=Path(d)

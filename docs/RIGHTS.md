@@ -59,6 +59,32 @@ licensed under CC0 by Bible Resources. Any optional, original Bible
 Resources descriptions should be marked CC0 only when authorized. The
 different CCEL transcription is excluded from the compiled module release.
 
+### CrossWire source versus independently digitized CCEL material
+
+The actual, SHA-256-pinned source for the planned rebuilt BRMHCC edition is
+the **CrossWire MHCC 2.0 module**, whose [official module page](
+https://crosswire.org/sword/modules/ModInfo.jsp?modName=MHCC) declares
+**Public Domain — Copy Freely**. This is an original-provider claim for
+that exact digital module, not a project-issued CC0 licence or proof of a
+particular historic printed edition.
+
+The separately digitized CCEL witness may help corroborate an isolated
+source error, but its **own files and editorial layers are not the release
+source**. In particular, the [CCEL Concise Commentary PDF](
+https://ccel.org/ccel/h/henry/mhcc/cache/mhcc.pdf) expressly claims
+copyright in its *PDF file* and limits copying to unmodified,
+noncommercial uses without separate permission. That statement does
+**not** determine the copyright status of Henry's original work or of
+every CCEL export. It is reason not to assume unrestricted rights over
+an independent digitization, layout or set of annotations.
+
+For BRMHCC 0.1.1, keep the original CrossWire licence wording, attribution
+and archived hash, and document the exact two independently reviewed
+source corrections and 24 linked navigation aliases. Do not import
+CCEL-specific digitization, new markup or source prose into the
+redistributable module without independent permission. The final
+corrected-edition rights and publication decisions remain open.
+
 ## Useful primary licence guidance
 
 - [Creative Commons public-domain tools](

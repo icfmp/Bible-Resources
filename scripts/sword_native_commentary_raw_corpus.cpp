@@ -10,7 +10,12 @@
 #include <string>
 
 int main(int argc, char** argv) {
-    if (argc != 2) return 2;
+    // The three-argument mode exists ONLY for isolated I/TOP source probes.
+    // The production full-original inspector still requires numbered K keys.
+    if (argc != 2 && argc != 3) return 2;
+    const bool allowIntroOnly = argc == 3 &&
+        std::string(argv[2]) == "--allow-intro-only";
+    if (argc == 3 && !allowIntroOnly) return 2;
     const std::string moduleId(argv[1]);
     if (!std::regex_match(moduleId, std::regex("[A-Za-z][A-Za-z0-9_]{0,79}")))
         return 2;
@@ -87,7 +92,7 @@ int main(int argc, char** argv) {
         }
         current.increment();
     }
-    if (!all || !numbered) return 14;
+    if (!all || (!numbered && !allowIntroOnly)) return 14;
     std::cout << "S\t" << all << '\t' << numbered << '\t' << intros
               << '\t' << anonymous << '\n';
     return std::cout.good() ? 0 : 15;

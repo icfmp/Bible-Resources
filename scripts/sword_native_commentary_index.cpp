@@ -12,7 +12,14 @@
 #include <string>
 
 int main(int argc, char** argv) {
-    if (argc != 2) return 2;
+    const bool registryMode =
+        argc == 3 && std::string(argv[2]) == "--chapter-registry";
+    const bool linkedMode =
+        argc == 5 && std::string(argv[2]) == "--is-linked";
+    const bool adjacentLinkedMode =
+        argc == 3 && std::string(argv[2]) == "--adjacent-links";
+    if (argc != 2 && !registryMode && !linkedMode && !adjacentLinkedMode)
+        return 2;
     const std::string moduleId(argv[1]);
     if (!std::regex_match(moduleId, std::regex("[A-Za-z][A-Za-z0-9_]{0,79}")))
         return 2;
@@ -25,6 +32,30 @@ int main(int argc, char** argv) {
     const std::string driver = drv ? drv : "";
     if (driver != "RawCom" && driver != "RawCom4"
             && driver != "zCom" && driver != "zCom4") return 5;
+    if (linkedMode) {
+        const std::regex keyPattern(
+            "[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9][0-9]*\\.[1-9][0-9]*");
+        const std::string first(argv[3]), second(argv[4]);
+        if (!std::regex_match(first, keyPattern)
+                || !std::regex_match(second, keyPattern)) return 20;
+        sword::VerseKey k1, k2;
+        k1.setVersificationSystem(original->getVersificationSystem());
+        k2.setVersificationSystem(original->getVersificationSystem());
+        k1.setIntros(true);
+        k2.setIntros(true);
+        k1.setAutoNormalize(false);
+        k2.setAutoNormalize(false);
+        k1.setText(first.c_str());
+        k2.setText(second.c_str());
+        if (k1.popError() || k2.popError()
+                || k1.getOSISRef() != first || k2.getOSISRef() != second)
+            return 21;
+        if (!module->hasEntry(&k1) || !module->hasEntry(&k2)) return 22;
+        std::cout << "L\t" << first << '\t' << second << '\t'
+                  << (module->isLinked(&k1, &k2) ? "1" : "0")
+                  << '\n';
+        return std::cout.good() ? 0 : 23;
+    }
     const char* v11nPtr = original->getVersificationSystem();
     const std::string v11n = v11nPtr ? v11nPtr : "";
     const std::string ver = sword::SWVersion::currentVersion.getText();
@@ -41,8 +72,67 @@ int main(int argc, char** argv) {
     const std::regex numbered("[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9][0-9]*\\.[1-9][0-9]*");
     const std::regex introduction("[1-4]?[A-Za-z][A-Za-z0-9]*(\\.0\\.0|\\.[1-9][0-9]*(\\.0)?)?");
     unsigned long visited = 0, numberedCount = 0, introCount = 0, topCount = 0;
+    unsigned long registryChapterCount = 0, registryVerseCount = 0;
+    std::string lastRegistryChapter;
+    unsigned long adjacencyPairs = 0, adjacencyLinked = 0;
+    bool havePreviousNumbered = false;
+    sword::VerseKey previousNumbered;
+    previousNumbered.setVersificationSystem(v11n.c_str());
+    previousNumbered.setIntros(true);
+    previousNumbered.setAutoNormalize(false);
+    std::string previousChapter, previousReference;
+    int previousVerse = 0;
     while (!key.popError()) {
         if (++visited > 300000) return 7;
+        if (adjacentLinkedMode) {
+            if (key.getChapter() > 0 && key.getVerse() > 0
+                    && module->hasEntry(&key)) {
+                const std::string ref = key.getOSISRef();
+                const auto split = ref.rfind('.');
+                if (split == std::string::npos
+                        || !std::regex_match(ref, numbered)) return 24;
+                const std::string chapter = ref.substr(0, split);
+                const int verse = key.getVerse();
+                if (havePreviousNumbered && chapter == previousChapter
+                        && verse == previousVerse + 1) {
+                    const bool nativeLinked = module->isLinked(
+                        &previousNumbered, &key);
+                    std::cout << "L\t" << previousReference
+                              << '\t' << ref << '\t'
+                              << (nativeLinked ? "1" : "0") << '\n';
+                    ++adjacencyPairs;
+                    if (nativeLinked) ++adjacencyLinked;
+                }
+                previousNumbered = key;
+                previousChapter = chapter;
+                previousReference = ref;
+                previousVerse = verse;
+                havePreviousNumbered = true;
+            }
+            key++;
+            continue;
+        }
+        if (registryMode) {
+            if (key.getChapter() > 0 && key.getVerse() > 0) {
+                const std::string ref = key.getOSISRef();
+                const auto lastDot = ref.rfind('.');
+                if (lastDot == std::string::npos) return 11;
+                const std::string chapterRef = ref.substr(0, lastDot);
+                if (!std::regex_match(chapterRef, std::regex(
+                    "[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9][0-9]*"))) return 12;
+                if (chapterRef != lastRegistryChapter) {
+                    const int verseMax = key.getVerseMax();
+                    if (verseMax < 1 || verseMax > 1000) return 13;
+                    std::cout << "R\t" << chapterRef << '\t'
+                              << verseMax << '\n';
+                    lastRegistryChapter = chapterRef;
+                    ++registryChapterCount;
+                    registryVerseCount += static_cast<unsigned long>(verseMax);
+                }
+            }
+            key++;
+            continue;
+        }
         if (module->hasEntry(&key)) {
             std::string ref = key.getOSISRef();
             if (ref.empty() && key.getChapter() == 0 && key.getVerse() == 0) {
@@ -58,6 +148,19 @@ int main(int argc, char** argv) {
             }
         }
         key++;
+    }
+    if (adjacentLinkedMode) {
+        if (!adjacencyPairs || adjacencyLinked > adjacencyPairs) return 25;
+        std::cout << "S\t" << adjacencyPairs << '\t'
+                  << adjacencyLinked << '\t'
+                  << (adjacencyPairs-adjacencyLinked) << '\n';
+        return std::cout.good() ? 0 : 26;
+    }
+    if (registryMode) {
+        if (registryChapterCount == 0 || registryVerseCount == 0) return 14;
+        std::cout << "S\t" << registryChapterCount << '\t'
+                  << registryVerseCount << '\n';
+        return std::cout.good() ? 0 : 15;
     }
     if (numberedCount == 0) return 10;
     std::cout << "S\t" << visited << '\t' << numberedCount

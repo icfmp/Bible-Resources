@@ -37,7 +37,7 @@ from pilot_fetch import fetch
 from pilot_preflight import PilotError, inspect_archive
 from pilot_subprocess import present_key, query
 from reader_xiphos_headless_smoke import (
-    _stop_group, _visible_window, _dismiss_transient_xiphos_notice,
+    _stop_group, _dismiss_transient_xiphos_notice,
     install_checked_out_rawtext_comparison,
 )
 
@@ -609,6 +609,30 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
     }
 
 
+def _await_xiphos_visible_window(app, display, env: dict, *, seconds: int) -> None:
+    """Bounded real X11 readiness, never substitute process survival for GUI.
+
+    GitHub runners can load WebKit/GTK asynchronously. Fixed sleep followed
+    by one visibility check produced intermittent false negatives. Poll only
+    for an actual full-size visible Xiphos main window; a crashed process or missing window is
+    always a hard failure. The budget is at most 25 seconds.
+    """
+    if type(seconds) is not int or not 6 <= seconds <= 25:
+        raise PilotError("Unsafe independent-reader GUI readiness window")
+    # Allow slow shared runners a bounded warmup, even if the caller asked
+    # for a shorter typical delay. Faster normal starts return immediately.
+    attempts = max(seconds, 22) * 2
+    for _ in range(attempts):
+        if app.poll() is not None or display.poll() is not None:
+            raise PilotError("Independent reader or X11 display ended unexpectedly")
+        if _main_xiphos_window(env) is not None:
+            # Require the actual full-sized Xiphos reader, not a small splash
+            # or modal dialog; clipboard passage checks remain mandatory.
+            return
+        time.sleep(0.5)
+    raise PilotError("No independently visible Xiphos window with Bible and commentary")
+
+
 def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int,
                   commentary_module_id: str = "MHCC",
                   on_gui_ready=None) -> dict:
@@ -651,12 +675,10 @@ def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int,
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
             start_new_session=True,
         )
-        for _ in range(seconds * 2):
-            if app.poll() is not None or display.poll() is not None:
-                raise PilotError("Independent reader or X11 display ended unexpectedly")
-            time.sleep(0.5)
-        if not _visible_window(env):
-            raise PilotError("No independently visible Xiphos window with Bible and commentary")
+        _await_xiphos_visible_window(app, display, env, seconds=seconds)
+        # Allow the already-visible GTK main window to finish initial layout
+        # before accepting real, passage-specific Xiphos clipboard evidence.
+        time.sleep(1)
         _dismiss_transient_xiphos_notice(env)
         inspection = attempt_real_xiphos_passage_copy(env, comparisons)
         after = on_gui_ready(env) if on_gui_ready is not None else {}

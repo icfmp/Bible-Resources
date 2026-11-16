@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Invented, test-only SWORD OSIS introduction behavior; NO MHCC source prose. -->
+<osis xmlns="http://www.bibletechnologies.net/2003/OSIS/namespace">
+  <osisText osisIDWork="IntroProof" osisRefWork="Commentary" xml:lang="en" canonical="true">
+    <header>
+      <work osisWork="IntroProof">
+        <title>Invented book and chapter introduction fixture</title>
+        <identifier type="OSIS">IntroProof</identifier>
+        <refSystem>Bible.KJV</refSystem>
+      </work>
+    </header>
+    <div type="bookGroup">
+      <div type="book" osisID="Gen">
+        <div type="introduction">
+          <p>Synthetic book preface which must be indexed separately from verse one.</p>
+        </div>
+        <div type="chapter" osisID="Gen.1">
+          <div type="introduction">
+            <p>Synthetic first chapter preface.</p>
+          </div>
+          <div type="section" annotateType="commentary" annotateRef="Gen.1.1-Gen.1.2">
+            <p>Invented original first explanation.</p>
+          </div>
+        </div>
+        <div type="chapter" osisID="Gen.2">
+          <div type="introduction">
+            <p>Synthetic second chapter preface.</p>
+          </div>
+          <div type="section" annotateType="commentary" annotateRef="Gen.2.1">
+            <p>Invented original second explanation.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </osisText>
+</osis>

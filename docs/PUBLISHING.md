@@ -23,6 +23,72 @@ For **unchanged, compiled upstream SWORD stock**, require the separate
 full original compiled-data/native-entry identity proof; do not
 fabricate a source OSIS document just to satisfy an XML gate.
 
+## Source-corrected compiled SWORD commentaries
+
+An edited or reconstructed `zCom` is **not** original-stock SWORD data.
+It must never be validated through `stock_reader_keys`, which keeps
+requiring exact original CrossWire compressed-member and native-entry identity.
+
+The separate `reviewed_compiled_commentary_rebuild` route requires a
+**versioned, independently reviewed** original-source identity,
+complete libSWORD original-to-rebuilt native I/K/TOP comparison,
+explicit per-source correction and alias sets, an immutable SHA-256
+of that comparison report, and exact SHA-256s of all seven SWORD payload
+members (six zCom data files and one `.conf`). The module's
+`SOURCE_VALIDATION.json` must reference that same independent report
+and source review. A build that merely sets `validated=true` is rejected.
+
+**Architecture decision (2026-11-16):** the project owner delegated
+this technical choice and the two separate routes are adopted. This does
+not authorize a particular source correction for public release, a merged PR
+or any public artifact. Independent proof and release gates remain required.
+
+The offline validator binds the submitted proofs and actual packaged bytes;
+it **does not itself execute libSWORD or authenticate a human signature**.
+Prior to editorial approval, independently regenerate and review the complete
+native comparison from the SHA-pinned source and real candidate, and confirm
+the GitHub authorization record genuinely comes from the project owner.
+See [generic proof contract](evidence/mhcc-274/rebuilt-commentary-validation-contract.md).
+A synthetic passing unit test does not authorize publication.
+
+## Upgrading an existing approved commentary without losing its old release
+
+There is **one current version per stable module identity** in the catalogue.
+For a source-corrected successor, retain the existing module directory,
+curated module ID, SWORD ID and canonical source-edition lineage. Update its
+version, actual verified SWORD payload, metadata and source-specific proof
+only after the corresponding source/rights decision. Never install a second
+approved module with a duplicate SWORD identity beside the original.
+
+There is likewise **one active release plan per current module ID**. For
+BRMHCC 0.1.1 the eventual authorized change must **replace**
+`config/release-plans/mhcc-0.1.0.json` with a new
+`config/release-plans/mhcc-0.1.1.json`. Do not keep both active; the coverage
+gate deliberately rejects duplicate plans. This does **not** modify, delete
+or repurpose the already published and immutable GitHub Release
+`mhcc-0.1.0` or its ZIP. Its original approved plan remains in Git history.
+Before the new release, independently re-download and verify the 0.1.0
+release checksum as an explicit rollback specimen.
+
+An approved descriptive profile is **specific to an exact module version**.
+The current MHCC `profiles/en.json` is for 0.1.0 and states that no source
+words or references were modified; reusing it for 0.1.1 would be false.
+The profile validator rejects the version mismatch. Either obtain a new
+owner-approved, source-hash-pinned 0.1.1 profile with accurate changes and
+rights, or remove the **optional** profile from the new current catalogue
+until a fresh profile has been approved. Never re-pin the old profile merely
+to silence validation. A [separate, unapproved new-profile draft](
+evidence/mhcc-274/0.1.1-reader-profile-DRAFT.md) is prepared for review.
+
+After editorial/legal approval, the current single catalogue row for
+`mhcc-crosswire` can switch to version 0.1.1 and its new stable
+`sword/packages/BRMHCC.zip` checksum. A separately authorized new immutable
+GitHub Release must be created and verified **before** Pages advertises
+the new ZIP. The previous 0.1.0 GitHub Release remains available, while
+the stable Pages path intentionally points to the current approved version.
+No existing user installation, settings, notes or application-side rollback
+is changed by this repository.
+
 ## Mandatory publication contract
 
 Every **approved** catalogue entry must have exactly one documented

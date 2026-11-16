@@ -10,6 +10,7 @@ from stable_sword_refs import proof_errors as stable_sword_proof_errors
 from published_reference_audit import archived_release_errors
 from catalogue_profiles import approved_profiles, ProfileError
 from compiled_stock_commentary_proof import compiled_stock_commentary_errors
+from reviewed_compiled_commentary_rebuild import reviewed_rebuilt_commentary_errors
 
 ROOT = Path(__file__).resolve().parents[1]
 DRIVERS = {"RawText","zText","RawCom","RawCom4","zCom","zCom4","RawLD","RawLD4","zLD","RawGenBook"}
@@ -225,6 +226,12 @@ def validate(root=ROOT):
             # Require the complete original archived SWORD/native proof,
             # rather than inventing a source-OSIS commentary file.
             errors.extend(compiled_stock_commentary_errors(d, root, m, conf))
+        elif (m["category"] == "commentary" and
+              m.get("index_audit", {}).get("mode") ==
+              "reviewed_compiled_commentary_rebuild"):
+            # Newly rebuilt compiled commentary has its own source-attested
+            # proof. Never weaken or reuse the original stock-byte route.
+            errors.extend(reviewed_rebuilt_commentary_errors(d, root, m, conf))
         else:
             errors.extend(source_gate_errors(d, conf.get("SourceType"), root, m["category"]))
         if m["category"] == "bible":
