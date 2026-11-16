@@ -89,5 +89,131 @@ class CommentaryFinalDateAndSourceAttributionTests(unittest.TestCase):
         self.assertEqual(candidate.count(b"About="), 1) # only one actual SWORD field; the quoted value stays intact
 
 
+class PrivateCommentaryZipRehearsalTests(unittest.TestCase):
+    """Entirely invented content; never a public source or release fixture."""
+
+    def setUp(self):
+        from tempfile import TemporaryDirectory
+        from reviewed_compiled_commentary_rebuild import zcom_member_suffixes
+        tmp = TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.base = Path(tmp.name)
+        self.root = self.base / "private-original-installed"
+        self.out = self.base / "private-rehearsal"
+        self.root.mkdir()
+        self.out.mkdir()
+        original = CommentaryFinalDateAndSourceAttributionTests()
+        original.setUp()
+        self.conf = (original.private.replace(
+            b"BlockType=CHAPTER\n", b"CompressType=ZIP\nBlockType=CHAPTER\n"
+        ))
+        target = self.root / "mods.d/curated.conf"
+        target.parent.mkdir(parents=True)
+        target.write_bytes(self.conf)
+        for name in zcom_member_suffixes("CHAPTER"):
+            item = self.root / "modules/comments/zcom/curated" / name
+            item.parent.mkdir(parents=True, exist_ok=True)
+            item.write_bytes(("Invented native content " + name).encode("ascii"))
+        self.kw = dict(
+            module_id="Curated", expected_version="0.1.1",
+            source_provider="Invented Source Archive",
+            original_sword_version_date="2021-02-14",
+            hypothetical_revision_day="2026-11-15",
+            revision_summary="Index navigation and one documented source citation correction",
+        )
+
+    def rehearse(self, folder=None, **updates):
+        from commentary_public_metadata_preflight import (
+            rehearse_private_versioned_commentary_package,
+        )
+        return rehearse_private_versioned_commentary_package(
+            self.root, folder or self.out, **{**self.kw, **updates}
+        )
+
+    def test_deterministic_reinstalled_zip_changes_only_two_conf_fields(self):
+        import hashlib
+        import zipfile
+        result = self.rehearse()
+        again = self.base / "independent-run"
+        again.mkdir()
+        copy = self.rehearse(again)
+        self.assertEqual(result["zip_sha256"], copy["zip_sha256"])
+        self.assertEqual(result["zip_member_count"], 7)
+        self.assertEqual(result["status"],
+                         "PRIVATE_FULL_CONF_AND_SWORD_ZCOM_ZIP_REHEARSAL_NOT_RELEASE")
+        self.assertEqual(result["compiled_block_type"], "CHAPTER")
+        self.assertTrue(result["all_six_native_compiled_members_preserved"])
+        self.assertTrue(result["only_about_and_sword_version_date_changed"])
+        self.assertFalse(result["owner_release_authorized"])
+        self.assertFalse(result["artifact_published_or_uploaded"])
+        self.assertFalse(result["actual_release_date_selected"])
+        self.assertNotIn("Invented native content", str(result))
+        package = self.out / "PRIVATE-REHEARSAL-DO-NOT-RELEASE.zip"
+        self.assertEqual(hashlib.sha256(package.read_bytes()).hexdigest(),
+                         result["zip_sha256"])
+        with zipfile.ZipFile(package) as z:
+            self.assertEqual(len(z.namelist()), 7)
+            self.assertEqual(len(set(z.namelist())), 7)
+            name = "mods.d/curated.conf"
+            self.assertEqual(z.read(name), (
+                self.out / "private-rehearsed-install" / name
+            ).read_bytes())
+            self.assertIn(b"SwordVersionDate=2026-11-15", z.read(name))
+            self.assertIn(b"Original upstream Invented Source Archive About", z.read(name))
+            self.assertIn(b"DistributionLicense=Public Domain", z.read(name))
+            self.assertNotEqual(z.read(name), self.conf)
+            for file in z.namelist():
+                if file == name:
+                    continue
+                self.assertEqual(z.read(file), (self.root / file).read_bytes())
+
+    def test_existing_private_output_cannot_be_overwritten(self):
+        self.rehearse()
+        with self.assertRaises(ValueError):
+            self.rehearse()
+
+    def test_extra_missing_empty_or_symlinked_native_member_rejected(self):
+        folder = self.root / "modules/comments/zcom/curated"
+        missing = folder / "ot.czv"
+        content = missing.read_bytes()
+        missing.unlink()
+        with self.assertRaises(ValueError):
+            self.rehearse()
+        missing.write_bytes(content)
+        extra = folder / "random"
+        extra.write_bytes(b"invented")
+        with self.assertRaises(ValueError):
+            self.rehearse()
+        extra.unlink()
+        missing.write_bytes(b"")
+        with self.assertRaises(ValueError):
+            self.rehearse()
+        missing.unlink()
+        missing.symlink_to(folder / "ot.czs")
+        with self.assertRaises(ValueError):
+            self.rehearse()
+
+    def test_incorrect_compilation_descriptor_is_rejected(self):
+        conf = self.root / "mods.d/curated.conf"
+        for before, after in (
+            (b"BlockType=CHAPTER", b"BlockType=BOOK"),
+            (b"CompressType=ZIP", b"CompressType=UNKNOWN"),
+            (b"Version=0.1.1", b"Version=0.1.0"),
+            (b"DataPath=./modules/comments/zcom/curated/",
+             b"DataPath=../../wrong"),
+        ):
+            with self.subTest(before=before):
+                conf.write_bytes(self.conf.replace(before, after))
+                with self.assertRaises(ValueError):
+                    self.rehearse()
+        conf.write_bytes(self.conf)
+
+    def test_test_day_is_never_approved_release_date(self):
+        with self.assertRaises(ValueError):
+            self.rehearse(hypothetical_revision_day="2020-01-01")
+        with self.assertRaises(ValueError):
+            self.rehearse(hypothetical_revision_day="invalid")
+
+
 if __name__ == "__main__":
     unittest.main()

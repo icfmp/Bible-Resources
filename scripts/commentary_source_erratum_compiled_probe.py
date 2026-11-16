@@ -29,6 +29,7 @@ from commentary_literal_erratum_preflight import (
 )
 from commentary_public_metadata_preflight import (
     prepare_provisional_public_commentary_conf, _exact_conf_value,
+    rehearse_private_versioned_commentary_package,
 )
 from commentary_reference_registry_triage import (
     SINGLE_VERSE, _unambiguous_verse_range_endpoints,
@@ -483,6 +484,35 @@ def probe_private_compiled_source_erratum(
                 xiphos["additional_prose_source_sample_keys"]
             ) + 3):
         raise ValueError("Private source attestation claims an unreviewed release or native edit")
+    rehearsal_scratch = scratch / "private-final-conf-rehearsal"
+    rehearsal_scratch.mkdir()
+    rehearsal = rehearse_private_versioned_commentary_package(
+        install_root, rehearsal_scratch,
+        module_id=curated_module_id,
+        expected_version=curated_proposed_version,
+        source_provider=source_provider,
+        original_sword_version_date=source_date,
+        hypothetical_revision_day=dummy_day,
+        revision_summary=history_note,
+    )
+    installed_rehearsal, rehearsal_receipt = _read_private_native(
+        rehearsal_scratch / "private-rehearsed-install",
+        curated_module_id, native_raw_binary, with_receipt=True,
+    )
+    if (installed_rehearsal != actual_install
+            or rehearsal_receipt["all_native_raw_entries_ordered_sha256"]
+               != actual_install_receipt["all_native_raw_entries_ordered_sha256"]
+            or rehearsal["owner_release_authorized"] is not False
+            or rehearsal["actual_release_date_selected"] is not False
+            or rehearsal["artifact_published_or_uploaded"] is not False
+            or rehearsal["all_six_native_compiled_members_preserved"] is not True
+            or rehearsal["reinstalled_member_bytes_match_exactly"] is not True
+            or rehearsal["zip_member_count"] != 7):
+        raise ValueError("Private final-metadata rehearsal changed actual native commentary content")
+    rehearsal["complete_rehearsed_libsword_native_readback_exact"] = True
+    rehearsal["native_corpus_sha256"] = (
+        rehearsal_receipt["all_native_raw_entries_ordered_sha256"]
+    )
     return {
         "status": "PRIVATE_SOURCE_EDITED_SWORD_ZCOM_CANDIDATE_FULL_PARITY_NOT_PUBLICATION",
         "original_source_chapter_key": original_master_key,
@@ -510,6 +540,7 @@ def probe_private_compiled_source_erratum(
         "package_isolated_install_exact_compiled_parity": True,
         "corrected_metadata_guard": staged["private_conf_metadata_exact_delta_receipt"],
         "private_real_native_rebuild_attestation_draft": attestation,
+        "private_full_release_metadata_and_native_rehearsal": rehearsal,
         "private_package_real_conf_public_metadata_dry_run": {
             **metadata_proposal,
             "test_date_only_no_actual_release_day_selected": True,
