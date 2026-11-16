@@ -14,6 +14,7 @@ from collections import Counter, defaultdict
 from hashlib import sha256
 import json
 import os
+import shutil
 from pathlib import Path
 from urllib.parse import urlsplit
 import re
@@ -1576,7 +1577,8 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
           full_transport: bool = False,
           paragraph_pilot_keys: tuple[str, ...] = (),
           provisional_range_preview: bool = False,
-          preview_real_xiphos: bool = False) -> dict:
+          preview_real_xiphos: bool = False,
+          privately_export_verified_candidate_to: Path | None = None) -> dict:
     """Use exact SHA-pinned official stock, existing independently proved readers."""
     manifest = load_manifest(resource_id)
     if provisional_range_preview and not full_transport:
@@ -2257,6 +2259,65 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                                   "PRIVATE_COMPILATION_AND_TESTS_APPROVED_PUBLICATION_REQUIRES_SEPARATE_SIGNOFF")):
                     raise PilotError("Source-corrected private package violated reviewed source boundaries")
                 provisional_preview["private_source_edited_versioned_candidate_not_released"]=private_corrected
+                if privately_export_verified_candidate_to is not None:
+                    # Owner authorized integration into the REVIEW PR only.
+                    # This is verified staging, not a merge/publication grant.
+                    export = privately_export_verified_candidate_to
+                    if (not isinstance(export, Path) or export.exists()
+                            or export.is_symlink()
+                            or not export.is_absolute()
+                            or export.resolve().is_relative_to(directory.resolve())
+                            or export.resolve().is_relative_to(
+                                Path(__file__).resolve().parents[1])
+                            or not preview_real_xiphos):
+                        raise PilotError("Unsafe release-candidate export destination")
+                    receipt = private_corrected[
+                        "private_current_calendar_day_package_receipt"]
+                    if (receipt["module_id"] != proposed_sword_id
+                            or receipt["version"] != decisions["proposed_next_version"]
+                            or receipt["owner_release_authorized"] is not False
+                            or receipt["catalogue_updated"] is not False
+                            or receipt["zip_uploaded_or_distributed"] is not False
+                            or len(receipt["seven_member_sha256"]) != 7):
+                        raise PilotError("Private staged binary lacks source and release proof")
+                    source_zip = (revised_dir /
+                        "private-current-calendar-day-rehearsal" /
+                        "PRIVATE-REHEARSAL-DO-NOT-RELEASE.zip")
+                    if (not source_zip.is_file() or source_zip.is_symlink()
+                            or sha256(source_zip.read_bytes()).hexdigest()
+                               != receipt["package_sha256"]
+                            or source_zip.stat().st_size
+                               != receipt["package_size_bytes"]):
+                        raise PilotError("Private candidate ZIP does not match native receipt")
+                    export.mkdir(parents=True)
+                    name = (proposed_sword_id + "-" +
+                            decisions["proposed_next_version"] + ".zip")
+                    shutil.copyfile(source_zip, export / name)
+                    payload_root = export / "payload"
+                    with zipfile.ZipFile(source_zip) as built:
+                        if (len(built.infolist()) != 7
+                                or set(built.namelist())
+                                   != set(receipt["seven_member_sha256"])
+                                or built.testzip() is not None):
+                            raise PilotError("Seven native SWORD output members missing")
+                        for member in built.infolist():
+                            if (member.is_dir() or
+                                    sha256(built.read(member)).hexdigest()
+                                    != receipt["seven_member_sha256"][member.filename]):
+                                raise PilotError("Candidate compiled member digest mismatch")
+                            target = payload_root / member.filename
+                            target.parent.mkdir(parents=True, exist_ok=True)
+                            target.write_bytes(built.read(member))
+                    (export / "PRIVATE_SOURCE_AUDIT.json").write_text(
+                        json.dumps(private_corrected[
+                            "private_real_native_rebuild_attestation_draft"][
+                                "source_audit"], sort_keys=True, indent=2) + "\n",
+                        encoding="utf-8",
+                    )
+                    (export / "PRIVATE_CANDIDATE_RECEIPT.json").write_text(
+                        json.dumps(receipt, sort_keys=True, indent=2) + "\n",
+                        encoding="utf-8",
+                    )
             provisional_preview["source_scope_corroborated_in_draft_only"] = True
             provisional_preview["source_scope_editorially_approved"] = False
             provisional_preview["preflight_candidate_section_count"] = (
@@ -2385,6 +2446,8 @@ def main(argv=None) -> int:
     parser.add_argument("--native-index-binary", type=Path, required=True)
     parser.add_argument("--native-raw-binary", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
+    parser.add_argument("--private-owner-authorized-export-dir", type=Path,
+                        help="Export only source-verified private candidate bytes for owner-approved PR staging; never publish")
     args = parser.parse_args(argv)
     try:
         result = audit(
@@ -2396,7 +2459,8 @@ def main(argv=None) -> int:
             full_transport=args.temporary_original_full_transport,
             paragraph_pilot_keys=tuple(args.temporary_source_paragraph_witness),
             provisional_range_preview=args.temporary_provisional_range_index_preview,
-            preview_real_xiphos=args.temporary_preview_real_xiphos
+            preview_real_xiphos=args.temporary_preview_real_xiphos,
+            privately_export_verified_candidate_to=args.private_owner_authorized_export_dir
         )
         code = 0
     except (OSError, RuntimeError, ValueError, zipfile.BadZipFile, RawCorpusError) as exc:
