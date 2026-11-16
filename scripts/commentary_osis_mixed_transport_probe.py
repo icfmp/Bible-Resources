@@ -33,7 +33,9 @@ from sword_native_raw_corpus_inventory import parse_native_raw_corpus
 def build_mixed_original_transport(chapter: str, book_intro: bytes,
                                    chapter_intro: bytes,
                                    numbered: list[tuple[str, bytes]],
-                                   *, work_id: str) -> tuple[bytes, dict]:
+                                   *, work_id: str,
+                                   provisional_index_aliases: dict[str, dict] | None = None
+                                   ) -> tuple[bytes, dict]:
     if (not WORK.fullmatch(work_id) or
             re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9]\d*", chapter) is None
             or not numbered or len(numbered) > 200):
@@ -43,6 +45,8 @@ def build_mixed_original_transport(chapter: str, book_intro: bytes,
         if not isinstance(raw,bytes) or not raw or len(raw)>2*1024*1024:
             raise ValueError("Unverified original I bytes")
         _source_visible_text(raw)
+    aliases = provisional_index_aliases or {}
+    by_master = validate_private_index_alias_preview({chapter: numbered}, aliases)
     grouped = []
     occupied = {}
     last_verse = 0
@@ -59,8 +63,10 @@ def build_mixed_original_transport(chapter: str, book_intro: bytes,
         if (grouped and grouped[-1]["digest"]==digest
                 and grouped[-1]["end"]+1==verse):
             grouped[-1]["end"]=verse
+            grouped[-1]["original_keys"].append(key)
         else:
-            grouped.append({"start":verse,"end":verse,"raw":raw,"digest":digest})
+            grouped.append({"start":verse,"end":verse,"raw":raw,"digest":digest,
+                            "original_keys":[key]})
         last_verse=verse
     parts=[
         b'<?xml version="1.0" encoding="UTF-8"?>',
@@ -78,7 +84,9 @@ def build_mixed_original_transport(chapter: str, book_intro: bytes,
     for group in grouped:
         start=f"{chapter}.{group['start']}"
         end=f"{chapter}.{group['end']}"
-        ref=start if start==end else f"{start}-{end}"
+        extra = [target for key in group["original_keys"]
+                 for target in by_master.get(key, [])]
+        ref = _native_same_chapter_ranges(group["original_keys"] + extra)
         parts.append(
             f'<div type="section" annotateType="commentary" annotateRef="{ref}">'.encode()
         )
@@ -99,6 +107,8 @@ def build_mixed_original_transport(chapter: str, book_intro: bytes,
         "chapter":chapter,
         "numbered_source_keys":len(occupied),
         "numbered_source_groups":len(grouped),
+        "provisional_index_alias_count":len(aliases),
+        "provisional_index_aliases_not_editorially_approved":True,
         "source_intro_raw_modified":False,
         "source_k_raw_modified":False,
         "source_published":False
