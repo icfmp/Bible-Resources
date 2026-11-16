@@ -4082,11 +4082,12 @@
         "json",
         "pathlib",
         "re",
+        "reviewed_compiled_commentary_rebuild",
         "zipfile"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "f60eec5de807edb28d496180708e551b0ce65187adac06847a0d4571ec9c31f1",
+      "sha256_at_inventory": "47507d9aa626cb13fce1a5c963efff03827b5bf8d1e9c0d69927047afeb784a0",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
@@ -4851,16 +4852,18 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 10,
+      "static_reference_count": 12,
       "static_references": [
         "scripts/commentary_public_metadata_preflight.py",
         "scripts/commentary_rebuild_attestation_draft.py",
+        "scripts/promote_sword_preview.py",
         "scripts/tool_registry.py",
         "scripts/validate.py",
         "docs/COMMENTARY_PIPELINE.md",
         "docs/PUBLISHING.md",
         "tests/test_commentary_public_metadata_preflight.py",
         "tests/test_commentary_rebuild_attestation_draft.py",
+        "tests/test_promote_sword_preview.py",
         "tests/test_reviewed_compiled_commentary_rebuild.py",
         "tests/test_tool_registry.py"
       ]

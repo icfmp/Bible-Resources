@@ -8,6 +8,7 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from promote_sword_preview import promote
+from reviewed_compiled_commentary_rebuild import zcom_member_suffixes
 
 
 class SwordPromotionTests(unittest.TestCase):
@@ -183,6 +184,108 @@ class SwordPromotionTests(unittest.TestCase):
         self.assertEqual(
             digest,self.promote(driver="zCom",versification="KJV")["release_zip_sha256"]
         )
+
+    def test_zcom_chapter_and_verse_layouts_use_standard_native_member_names(self):
+        """Different compression block types must not be treated as BOOK."""
+        for block, prefix in (("CHAPTER", "cz"), ("VERSE", "vz")):
+            with self.subTest(block=block):
+                self.configure_zcom_fixture()
+                raw = {}
+                with ZipFile(self.src) as archive:
+                    old_conf = archive.read("mods.d/verifiedpreview.conf")
+                    for side in ("nt", "ot"):
+                        for suffix in ("s", "v", "z"):
+                            name = f"modules/comments/zcom/verifiedpreview/{side}.bz{suffix}"
+                            raw[f"modules/comments/zcom/verifiedpreview/{side}.{prefix}{suffix}"] = archive.read(name)
+                with ZipFile(self.src, "w", compression=ZIP_DEFLATED) as new_source:
+                    new_source.writestr("mods.d/verifiedpreview.conf",
+                                        old_conf.replace(b"BlockType=BOOK",
+                                                         f"BlockType={block}".encode()))
+                    for name, value in raw.items():
+                        new_source.writestr(name, value)
+                self.conf.write_text(self.conf.read_text().replace(
+                    "BlockType=BOOK", f"BlockType={block}"), encoding="utf-8")
+                self.sha = hashlib.sha256(self.src.read_bytes()).hexdigest()
+                receipt = self.promote(driver="zCom", versification="KJV")
+                self.assertTrue(receipt["data_byte_equal"])
+                self.assertEqual(set(receipt["per_file_sha256"]), {
+                    f"modules/comments/zcom/publishedmodule/{name}"
+                    for name in zcom_member_suffixes(block)
+                })
+                with ZipFile(self.src) as old, ZipFile(self.out) as new:
+                    for name, expected in raw.items():
+                        target = name.replace("/verifiedpreview/", "/publishedmodule/")
+                        self.assertEqual(old.read(name), new.read(target))
+                        self.assertEqual(new.read(target), expected)
+                self.out.unlink()
+
+    def test_real_published_mhcc_chapter_payload_promotes_without_recompilation(self):
+        """Exercise generic promotion on six real source-reviewed compiled bytes.
+
+        This checks SWORD package compatibility, NOT whether an independently
+        authored text edition is identical to the CrossWire original.
+        """
+        source_root = Path(__file__).resolve().parents[1] / (
+            "modules/mhcc-crosswire/payload")
+        original_conf = (source_root / "mods.d/mhcc.conf").read_bytes()
+        self.assertIn(b"BlockType=CHAPTER", original_conf)
+        self.src.unlink()
+        filenames = zcom_member_suffixes("CHAPTER")
+        with ZipFile(self.src, "w", compression=ZIP_DEFLATED) as archive:
+            archive.writestr("mods.d/mhcc.conf", original_conf)
+            for filename in filenames:
+                native = "modules/comments/zcom/mhcc/" + filename
+                archive.writestr(native, (source_root / native).read_bytes())
+        self.sha = hashlib.sha256(self.src.read_bytes()).hexdigest()
+        self.conf.write_bytes(
+            original_conf.replace(b"[MHCC]", b"[PublishedModule]", 1)
+            .replace(b"modules/comments/zcom/mhcc/",
+                     b"modules/comments/zcom/publishedmodule/", 1)
+        )
+        with ZipFile(self.src) as source:
+            original_native_hashes = {
+                name: hashlib.sha256(source.read("modules/comments/zcom/mhcc/" + name)).hexdigest()
+                for name in filenames
+            }
+        result = promote(self.src, self.out, expected_source_sha256=self.sha,
+                         source_id="MHCC", destination_id="PublishedModule",
+                         config=self.conf, driver="zCom", versification="KJV")
+        self.assertEqual(result["driver"], "zCom")
+        self.assertEqual(result["module_id"], "PublishedModule")
+        self.assertFalse(result["published"])
+        for name, digest in original_native_hashes.items():
+            new_path = "modules/comments/zcom/publishedmodule/" + name
+            self.assertEqual(result["per_file_sha256"][new_path], digest)
+        with ZipFile(self.out) as package:
+            self.assertEqual(len(package.namelist()), 7)
+            self.assertEqual(package.read("mods.d/publishedmodule.conf"),
+                             self.conf.read_bytes())
+        reproducible_digest = result["release_zip_sha256"]
+        self.out.unlink()
+        next_result = promote(self.src, self.out, expected_source_sha256=self.sha,
+                              source_id="MHCC", destination_id="PublishedModule",
+                              config=self.conf, driver="zCom", versification="KJV")
+        self.assertEqual(next_result["release_zip_sha256"], reproducible_digest)
+
+    def test_compressed_layout_mismatch_is_not_repaired_or_silently_relabelled(self):
+        self.configure_zcom_fixture()
+        self.conf.write_text(self.conf.read_text().replace(
+            "BlockType=BOOK", "BlockType=CHAPTER"), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "block size changed"):
+            self.promote(driver="zCom", versification="KJV")
+        self.assertFalse(self.out.exists())
+        self.conf.write_text(self.conf.read_text().replace(
+            "BlockType=CHAPTER", "BlockType=BOOK"), encoding="utf-8")
+        with ZipFile(self.src) as archive:
+            raw = {name: archive.read(name) for name in archive.namelist()}
+        with ZipFile(self.src, "w", compression=ZIP_DEFLATED) as archive:
+            for name, value in raw.items():
+                archive.writestr(name, value.replace(b"BlockType=BOOK", b"BlockType=CHAPTER")
+                                 if name.endswith(".conf") else value)
+        self.sha = hashlib.sha256(self.src.read_bytes()).hexdigest()
+        with self.assertRaisesRegex(ValueError, "block type does not match"):
+            self.promote(driver="zCom", versification="KJV")
+        self.assertFalse(self.out.exists())
 
     def test_zcom_rejects_wrong_block_type_versification_and_unsafe_members(self):
         self.configure_zcom_fixture()
