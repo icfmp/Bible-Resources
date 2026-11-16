@@ -2,6 +2,8 @@
 
 **Date checked:** 2026-11-15. **Status:** `PRIVATE_VERIFIED_CANDIDATE_NOT_PUBLICATION_APPROVED`. Source/metadata analysis is preparatory, not an approval to edit `main`, distribute a ZIP, modify the public catalogue or overwrite BRMHCC 0.1.0. See [publication gate #276](https://github.com/icfmp/Bible-Resources/issues/276), [draft PR #275](https://github.com/icfmp/Bible-Resources/pull/275), [editorial source erratum #277](https://github.com/icfmp/Bible-Resources/issues/277).
 
+**Updated 2026-11-16.** Current private full-authenticated rebuilt source candidate includes **24 reviewed navigation keys and two source corrections**: Ezekiel 3 (11 original linked K) and one original `1Chr.7.1` prose spelling error `Dn` → `Dan` (1 K). [Actual complete source/native/Xiphos 4/4 CI](https://github.com/icfmp/Bible-Resources/actions/runs/43851252431) **PASS**, private ZIP SHA-256 `aeebadbc57d5a891d10ddb3dec520dcc8abd49e7cdd733c4a3542c77765282c4` (**not** the eventual publicly attributed/date-adjusted package). Neither original stock nor catalogue/public 0.1.0 changed; approval remains pending. The Ezekiel-only private hash `2022c52a8fed69e25d0efaf00fba0ddda17dd492e8567fd95922f31306c70047` cited in older checkpoints is **superseded as the current candidate but retained as a control**. [Source spelling issue #279](https://github.com/icfmp/Bible-Resources/issues/279).
+
 ## Official reference evidence and attribution
 
 | Claim | Evidence | Publication treatment |
