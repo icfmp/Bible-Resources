@@ -50,6 +50,7 @@ def private_rebuild_attestation_draft(
         index_receipt: dict, revised_receipt: dict, installed_receipt: dict,
         source_edit_receipts: list[dict],
         source_edit_affected_keys: list[list[str]],
+        corrected_source_by_original_key: dict[str, bytes],
         aliases: dict[str, dict],
         installed_candidate_root: Path,
         existing_links_preserved: bool,
@@ -162,6 +163,15 @@ def private_rebuild_attestation_draft(
         })
     if modifications != declared_changed:
         raise ValueError("Unreviewed compiled original K bytes changed")
+    if (not isinstance(corrected_source_by_original_key, dict)
+            or set(corrected_source_by_original_key) != declared_changed
+            or any(not isinstance(raw, bytes)
+                   for raw in corrected_source_by_original_key.values())):
+        raise ValueError("Corrected original source-byte evidence is incomplete")
+    for edit in declared_edits:
+        if any(_sha(corrected_source_by_original_key[key]) != edit["revised_sha256"]
+               for key in edit["affected_original_keys"]):
+            raise ValueError("Corrected source hash not tied to reviewed native edit")
     links = []
     for key, claim in sorted(aliases.items()):
         master = claim.get("link_to") if isinstance(claim, dict) else None
