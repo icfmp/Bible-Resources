@@ -100,6 +100,48 @@ def layout_profile(raw: bytes) -> dict:
 
     visit(root, set())
     empty_paragraphs, empty_headings = nonlocal_empty
+
+    # A nested div wrapper is not an editorial paragraph. Attribute each
+    # original .text and child .tail span to its nearest actual block owner;
+    # words inside inline <hi> or <reference> belong to the containing div.
+    # Container divs with no directly owned prose contribute zero blocks.
+    BLOCK_OWNERS = {"div", "p", "l", "cell", "title", "head", "h1",
+                    "h2", "h3", "h4", "h5", "h6", "note"}
+    PROSE_OWNERS = {"div", "p", "l", "cell"}
+    owned_words = Counter()
+    owned_kinds = {}
+
+    def assign(text, ancestors):
+        if not text:
+            return
+        n = len(WORD.findall(text))
+        if not n:
+            return
+        owner = next((node for node in reversed(ancestors)
+                      if node is not root and _local(node.tag) in BLOCK_OWNERS),
+                     None)
+        if owner is None:
+            owned_words[0] += n
+            owned_kinds[0] = "unwrapped"
+        else:
+            owned_words[owner] += n
+            owned_kinds[owner] = _local(owner.tag)
+
+    def walk_owners(node, ancestors):
+        stack = ancestors + (node,)
+        assign(node.text, stack)
+        for child in node:
+            if isinstance(child.tag, str):
+                walk_owners(child, stack)
+            assign(child.tail, stack)
+
+    walk_owners(root, ())
+    if sum(owned_words.values()) != text_word_total:
+        raise ValueError("Original commentary block-ownership census incomplete")
+    prose = [count for owner, count in owned_words.items()
+             if owned_kinds[owner] in PROSE_OWNERS]
+    active_prose_blocks = len(prose)
+    largest_prose_block = max(prose, default=0)
     # Word totals are measured on original XML .text/.tail fragments,
     # without double-counting nested markup. Flat itertext() may join a
     # title directly to the next paragraph with no intervening XML space,
@@ -131,6 +173,9 @@ def layout_profile(raw: bytes) -> dict:
         "hi_count": counts["hi"],
         "milestone_count": counts["milestone"],
         "styled_numbered_verse_lead": bool(styled_verse_lead),
+        "effective_prose_block_count": active_prose_blocks,
+        "largest_effective_prose_block_words": largest_prose_block,
+        "prose_words_in_effective_blocks": sum(prose),
         "unwrapped_word_count": words_in_unwrapped_segments,
         "max_unwrapped_segment_words": max_unwrapped_words,
         "longest_paragraph_words": max(paragraph_lengths, default=0),
@@ -155,6 +200,12 @@ def layout_flags(profile: dict) -> set[str]:
         flags.add("long_prose_without_internal_block_markup")
     if word_count >= 300 and paras == 1 and profile["longest_paragraph_words"] >= 250:
         flags.add("long_single_paragraph")
+    # Heuristic candidates only: no invented paragraph boundaries.
+    if (word_count >= 300 and profile["effective_prose_block_count"] <= 1
+            and profile["largest_effective_prose_block_words"] >= 250):
+        flags.add("long_commentary_with_one_effective_prose_block")
+    if profile["largest_effective_prose_block_words"] >= 500:
+        flags.add("very_long_effective_prose_block")
     if (profile["unwrapped_word_count"] >= 80
             and profile["div_count"] == 0 and profile["table_count"] == 0):
         flags.add("substantial_text_without_div_table_p_line_title_note")
@@ -218,26 +269,32 @@ class NativeCommentaryLayoutCensus:
             histogram[f"{kind}_words_{'0' if profile['word_count']==0 else '1-99' if profile['word_count']<100 else '100-249' if profile['word_count']<250 else '250-499' if profile['word_count']<500 else '500plus'}"] += 1
             histogram[f"{kind}_visible_numbered_verse_lead"] += int(profile["visible_numbered_verse_lead"])
             histogram[f"{kind}_styled_numbered_verse_lead"] += int(profile["styled_numbered_verse_lead"])
+            histogram[f"{kind}_effective_prose_blocks_{'0' if profile['effective_prose_block_count']==0 else '1' if profile['effective_prose_block_count']==1 else '2plus'}"] += 1
+            histogram[f"{kind}_largest_prose_block_{'0' if profile['largest_effective_prose_block_words']==0 else '1-99' if profile['largest_effective_prose_block_words']<100 else '100-249' if profile['largest_effective_prose_block_words']<250 else '250-499' if profile['largest_effective_prose_block_words']<500 else '500plus'}"] += 1
             histogram[f"{kind}_divs_{'0' if profile['div_count']==0 else '1' if profile['div_count']==1 else '2plus'}"] += 1
             histogram[f"{kind}_tables_present"] += int(profile["table_count"] > 0)
             histogram[f"{kind}_hi_present"] += int(profile["hi_count"] > 0)
             histogram[f"{kind}_linebreaks_present"] += int(profile["line_break_count"] > 0)
             if kind == "K" and key.rsplit(".", 1)[0] in original_verse_one_chapters:
                 chapter_one_profiles[f"single_key_chapter_paragraphs_{'0' if profile['paragraph_count']==0 else '1' if profile['paragraph_count']==1 else '2plus'}"] += 1
+                chapter_one_profiles[f"single_key_chapter_effective_blocks_{'0' if profile['effective_prose_block_count']==0 else '1' if profile['effective_prose_block_count']==1 else '2plus'}"] += 1
+                chapter_one_profiles["single_key_chapter_large_250plus_effective_prose_block"] += int(profile["largest_effective_prose_block_words"] >= 250)
                 chapter_one_profiles["single_key_chapter_raw_body_count"] += 1
             for flag in sorted(flags):
                 categories[f"{kind}_{flag}"] += 1
                 cases[flag].append((profile["word_count"], key, kind,
-                                    profile["paragraph_count"],
+                                    profile["effective_prose_block_count"],
+                                    profile["largest_effective_prose_block_words"],
                                     profile["unwrapped_word_count"]))
         samples = {}
         for flag, vals in sorted(cases.items()):
             # Native keys and counts only: never a literal source string.
             values = sorted(vals, key=lambda x: (-x[0], x[1]))[:MAX_SAMPLES]
             samples[flag] = [{"original_native_key": key, "entry_kind": kind,
-                              "word_count": words, "paragraph_count": paras,
+                              "word_count": words, "effective_prose_blocks": blocks,
+                              "largest_prose_block_words": largest,
                               "unwrapped_words": loose}
-                             for words, key, kind, paras, loose in values]
+                             for words, key, kind, blocks, largest, loose in values]
         return {
             "status": "COMPLETE_ORIGINAL_COMMENTARY_LAYOUT_HEURISTICS_NOT_EDITORIAL_VERDICT",
             "original_native_K_seen": self.keys["K"],
