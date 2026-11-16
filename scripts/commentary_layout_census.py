@@ -110,8 +110,14 @@ def layout_profile(raw: bytes) -> dict:
     PROSE_OWNERS = {"div", "p", "l", "cell"}
     owned_words = Counter()
     owned_kinds = {}
+    root_unowned_text_spans = 0
+    root_unowned_max_span_words = 0
+    root_unowned_newline_count = 0
+    root_unowned_blankline_count = 0
 
     def assign(text, ancestors):
+        nonlocal root_unowned_text_spans, root_unowned_max_span_words
+        nonlocal root_unowned_newline_count, root_unowned_blankline_count
         if not text:
             return
         n = len(WORD.findall(text))
@@ -123,6 +129,12 @@ def layout_profile(raw: bytes) -> dict:
         if owner is None:
             owned_words[0] += n
             owned_kinds[0] = "unwrapped"
+            root_unowned_text_spans += 1
+            root_unowned_max_span_words = max(root_unowned_max_span_words, n)
+            root_unowned_newline_count += text.count("\n")
+            root_unowned_blankline_count += len(
+                re.findall(r"\r?\n[ \t]*\r?\n", text)
+            )
         else:
             owned_words[owner] += n
             owned_kinds[owner] = _local(owner.tag)
@@ -181,6 +193,10 @@ def layout_profile(raw: bytes) -> dict:
         "largest_effective_prose_block_words": largest_prose_block,
         "prose_words_in_effective_blocks": sum(prose),
         "words_outside_any_recognized_block": root_unowned_words,
+        "unowned_text_span_count": root_unowned_text_spans,
+        "largest_unowned_text_span_words": root_unowned_max_span_words,
+        "unowned_literal_newline_count": root_unowned_newline_count,
+        "unowned_literal_blankline_count": root_unowned_blankline_count,
         "words_owned_by_heading_or_note_blocks": nonprose_owned_words,
         "unwrapped_word_count": words_in_unwrapped_segments,
         "max_unwrapped_segment_words": max_unwrapped_words,
@@ -215,6 +231,10 @@ def layout_flags(profile: dict) -> set[str]:
     if (word_count >= 250
             and profile["words_outside_any_recognized_block"] >= 250):
         flags.add("long_prose_outside_any_recognized_block")
+        if profile["unowned_literal_blankline_count"] == 0:
+            flags.add("long_unwrapped_prose_without_literal_blankline")
+    # Literal whitespace is a source signal, never proof of reader-rendered
+    # paragraphs or authorization to inject new paragraph markup.
     if (profile["unwrapped_word_count"] >= 80
             and profile["div_count"] == 0 and profile["table_count"] == 0):
         flags.add("substantial_text_without_div_table_p_line_title_note")
@@ -282,6 +302,8 @@ class NativeCommentaryLayoutCensus:
             histogram[f"{kind}_largest_prose_block_{'0' if profile['largest_effective_prose_block_words']==0 else '1-99' if profile['largest_effective_prose_block_words']<100 else '100-249' if profile['largest_effective_prose_block_words']<250 else '250-499' if profile['largest_effective_prose_block_words']<500 else '500plus'}"] += 1
             histogram[f"{kind}_unowned_words_{'0' if profile['words_outside_any_recognized_block']==0 else '1-99' if profile['words_outside_any_recognized_block']<100 else '100-249' if profile['words_outside_any_recognized_block']<250 else '250-499' if profile['words_outside_any_recognized_block']<500 else '500plus'}"] += 1
             histogram[f"{kind}_text_outside_any_block"] += int(profile["words_outside_any_recognized_block"] > 0)
+            histogram[f"{kind}_unowned_blanklines_{'0' if profile['unowned_literal_blankline_count']==0 else '1' if profile['unowned_literal_blankline_count']==1 else '2plus'}"] += 1
+            histogram[f"{kind}_largest_unowned_span_{'0' if profile['largest_unowned_text_span_words']==0 else '1-99' if profile['largest_unowned_text_span_words']<100 else '100-249' if profile['largest_unowned_text_span_words']<250 else '250-499' if profile['largest_unowned_text_span_words']<500 else '500plus'}"] += 1
             histogram[f"{kind}_divs_{'0' if profile['div_count']==0 else '1' if profile['div_count']==1 else '2plus'}"] += 1
             histogram[f"{kind}_tables_present"] += int(profile["table_count"] > 0)
             histogram[f"{kind}_hi_present"] += int(profile["hi_count"] > 0)
