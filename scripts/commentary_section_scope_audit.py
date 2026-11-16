@@ -57,6 +57,7 @@ from commentary_stock_prefix_topology import (
 from commentary_chapter_ref_labels import link_label_location
 from commentary_editorial_topology import NativeCommentaryEditorialTopology
 from commentary_layout_census import NativeCommentaryLayoutCensus
+from commentary_paragraph_witness_probe import compare_paragraph_witness
 from commentary_reference_registry_triage import OriginalCommentaryReferenceRegistryTriage
 from commentary_literal_erratum_preflight import preview_exact_reversible_commentary_reference_erratum
 from commentary_source_erratum_compiled_probe import probe_private_compiled_source_erratum
@@ -1331,7 +1332,8 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
                                      original_chapter_intro_raw: dict[str, bytes] | None = None,
                                      original_range_stock_raw: dict[str, bytes] | None = None,
                                      original_reference_triage: OriginalCommentaryReferenceRegistryTriage | None = None,
-                                     original_native_section_spans: dict[str, tuple[int, ...]] | None = None) -> dict:
+                                     original_native_section_spans: dict[str, tuple[int, ...]] | None = None,
+                                     paragraph_pilot_samples: list[tuple[str, str, bytes]] | None = None) -> dict:
     """Compare all start/end section locations with a separately pinned ThML.
 
     Different digital editions are never automatically assumed identical;
@@ -1516,7 +1518,11 @@ def compare_independent_thml_witness(manifest: dict, sections: list[dict],
             native_section_spans=original_native_section_spans or {})
         if original_reference_triage is not None and native_registry is not None else None
     )
+    paragraph_pilot = compare_paragraph_witness(
+        document, paragraph_pilot_samples
+    ) if paragraph_pilot_samples is not None else None
     return {
+        "independent_original_paragraph_witness_pilot": paragraph_pilot,
         "independent_original_reversed_reference_witness": reversed_reference_witness,
         "independent_leading_range_citations": independent_lead_citations,
         "status": "PINNED_DIFFERENT_DIGITAL_EDITION_SCOPE_COMPARISON",
@@ -1562,6 +1568,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
           intro_sample_chapters: tuple[str, ...] = (),
           mixed_sample_chapters: tuple[str, ...] = (),
           full_transport: bool = False,
+          paragraph_pilot_keys: tuple[str, ...] = (),
           provisional_range_preview: bool = False,
           preview_real_xiphos: bool = False) -> dict:
     """Use exact SHA-pinned official stock, existing independently proved readers."""
@@ -1570,6 +1577,14 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
         raise PilotError("Provisional range preview requires original complete transport")
     if preview_real_xiphos and not provisional_range_preview:
         raise PilotError("Real-reader preview requires source-constrained index preview")
+    if ((paragraph_pilot_keys and not full_transport)
+            or len(paragraph_pilot_keys) > 8
+            or len(set(paragraph_pilot_keys)) != len(paragraph_pilot_keys)
+            or any(re.fullmatch(
+                r"(?:I:[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9]\d*|"
+                r"K:[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9]\d*\.[1-9]\d*)",
+                val) is None for val in paragraph_pilot_keys)):
+        raise PilotError("Unbounded or unsafe original paragraph pilot selection")
     if (len(mixed_sample_chapters) > 3
             or len(set(mixed_sample_chapters)) != len(mixed_sample_chapters)
             or any(re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9]\d*", ref) is None
@@ -1883,6 +1898,14 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
         unknown = audit_unrecognized_slots(records)
         if unknown["total"] != result["counts"]["no_recognized_heading"]:
             raise PilotError("Unrecognized heading count diverged from complete native inventory")
+        paragraph_pilot_samples = []
+        for requested in paragraph_pilot_keys:
+            kind, key = requested.split(":", 1)
+            raw = (private_full_I.get(key) if kind == "I"
+                   else dict(private_full_K.get(key.rsplit(".", 1)[0], [])).get(key))
+            if raw is None:
+                raise PilotError("Requested exact original native paragraph pilot key missing")
+            paragraph_pilot_samples.append((kind, key, raw))
         witness = compare_independent_thml_witness(
             manifest, result["start_anchored_section_map"],
             result["anomalies"], directory, unknown["case_rows"],
@@ -1890,6 +1913,7 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
             original_chapter_intro_raw=private_intro_text_raw_by_chapter,
             original_range_stock_raw=private_range_heading_raw,
             original_reference_triage=original_reference_triage,
+            paragraph_pilot_samples=paragraph_pilot_samples if paragraph_pilot_keys else None,
             original_native_section_spans={
                 key: row["heading"][0]
                 for key, row in records.items()
@@ -2236,6 +2260,8 @@ def main(argv=None) -> int:
                         help="Strict private mixed original book I, chapter I and K native OSIS roundtrips")
     parser.add_argument("--temporary-original-full-transport", action="store_true",
                         help="Attempt isolated whole-original I/K OSIS compile and independent TOP reconciliation")
+    parser.add_argument("--temporary-source-paragraph-witness", nargs="*", default=[],
+                        help="Bounded private independent ThML paragraph observations at original I:/K: native keys")
     parser.add_argument("--temporary-provisional-range-index-preview", action="store_true",
                         help="Experimentally compile heading-derived missing links; editorial approval explicitly absent")
     parser.add_argument("--temporary-preview-real-xiphos", action="store_true",
@@ -2254,6 +2280,7 @@ def main(argv=None) -> int:
             intro_sample_chapters=tuple(args.temporary_original_intro_sample_chapters),
             mixed_sample_chapters=tuple(args.temporary_original_mixed_chapters),
             full_transport=args.temporary_original_full_transport,
+            paragraph_pilot_keys=tuple(args.temporary_source_paragraph_witness),
             provisional_range_preview=args.temporary_provisional_range_index_preview,
             preview_real_xiphos=args.temporary_preview_real_xiphos
         )
