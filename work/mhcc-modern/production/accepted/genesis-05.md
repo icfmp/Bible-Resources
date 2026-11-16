@@ -4,11 +4,12 @@ source_module: "MHCC 0.1.1"
 source_zip_sha256: "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746"
 source_native_corpus_sha256: "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e"
 chapter_osis: "Gen.5"
-editorial_status: "PROVISIONAL TRANSLATION — ORIGINAL SOURCE LACUNA"
-publication_status: "NOT RELEASED — ORIGINAL TEXT REPAIR/APPROVAL REQUIRED"
+source_emendation_issue: 291
+editorial_status: "CHAPTER-LEVEL REVIEW COMPLETE — DOCUMENTED SOURCE RESTORATION"
+publication_status: "NOT RELEASED — FULL SWORD REBUILD PENDING"
 ---
 
-# Genesis 5 — Modern English (provisional pending one source repair)
+# Genesis 5 — Modern English
 
 ## Original chapter outline
 
@@ -123,12 +124,23 @@ May we seek and find that comfort in Christ.
 
 ---
 
-## Editorial audit — one source defect prevents final acceptance
+## Editorial verification — Genesis 5
 
-**Original printed MHCC 0.1.1 fragment at Genesis 5:25–32 (quoted only to identify the fault):** `to get a hard livelihood out comfort us.`
+**Source baseline:** the exact published, SHA-pinned `MHCC 0.1.1` original-language edition. Its CrossWire-derived section for Genesis **5:25–32** contains a proven text loss; the published historical module is **not modified** here. The original-source correction remains separately tracked as [MHCC erratum #291](https://github.com/icfmp/Bible-Resources/issues/291).
 
-This expression is **grammatically broken**. The same lacuna appears in STEP Bible's CrossWire rendering and in CCEL's Concise digitization, so it is *not* a viewer-only artifact. An independently available public-domain edition of Matthew Henry's **Concise** text has a coherent reading that explicitly reads `out of it. Lamech hoped for relief by the birth of this son, "This same shall comfort us."` ([independent witness](https://info1.sermon-online.com/english/MatthewHenry/Matthew_Henrys_Concise_Commentary_On_The_Bible.pdf)). This is **evidence of a potential text restoration**, not authorization to silently modify the source module. The missing words are meaningfully indicated in the modern translation above; they are not falsely described as part of the verified `MHCC 0.1.1` literal text.
+**Explicit modern-edition emendation, authorized 2026-11-16:** the corrupt original reading `to get a hard livelihood out comfort us.` is **not** translated literally. The independent *Concise Commentary* witness, [Bible Truth Forum PDF, Genesis 5:25](https://info1.sermon-online.com/english/MatthewHenry/Matthew_Henrys_Concise_Commentary_On_The_Bible.pdf), reads `to get a hard livelihood out of it. Lamech hoped for relief by the birth of this son, "This same shall comfort us."` (also found in [this separate complete online reading](https://www.obohu.cz/bible/index.php?k=Gn&kap=5&kom=MHCC&kv=20&strong=ne&styl=WLC&v=20)). Both the *lost ending* and the *whole missing Lamech sentence* are included in this modern manuscript:
 
-All other arguments and images were compared after drafting against the [STEP original](https://www.stepbible.org/?q=version%3DMHCC@reference%3DGen.5): the lost divine image and inherited sin; Adam's mortality, 930 years and dying by degrees; death refrain and transmission of worship to patriarchs; Enoch's walking with God, Amos 3:3 and Hebrews 11:5; his removal and Christ's return; Methuselah's 969 years and name interpretation; Noah as comfort and a better hope in Christ. The **four** original section boundaries and four outline headings are retained.
+> Because God cursed the ground, even those who work with the greatest care and effort may struggle to earn a bare living from it.
+>
+> Lamech hoped that Noah's birth would bring relief: “This one will comfort us.”
 
-**Gate:** chapter remains **UNCHECKED** in tracking issue #270 until the original corrupt Genesis 5 section is editorially resolved in the source-maintenance workflow and the proposed modern reading is explicitly accepted against the corrected source. This file is a saved provisional translation, not a validated chapter. Continue to Genesis 6 under the established protocol's blocked-chapter exception, without turning this source problem into another software-development project.
+This is a **documented restoration in the modern derivative**, supported by a complete-text witness and the immediate argument, **not** a claim that the missing words survive verbatim in `MHCC 0.1.1`. The other digital witness has separate textual peculiarities and is not used to wholesale replace the accepted CrossWire-based edition. The original four-section structure and section boundaries are preserved.
+
+**Distinct post-drafting comparison:** the four exposition units were checked for their principal claims, theological qualifiers, historical illustrations and biblical allusions against [STEP's CrossWire MHCC display](https://www.stepbible.org/?q=version%3DMHCC@reference%3DGen.5), with the missing original sentence separately collated against the intact witness above:
+
+- **1–5:** divine image versus fallen paternal likeness, inherited sin, Adam's 930 years and mortality, the day of disobedience as the beginning of dying, and gradual death all retained.
+- **6–20:** the repeated death refrain, extraordinary longevity, clay-house image, their differing knowledge of the future life, Adam's ability to teach his living descendants creation/fall/promise/worship, and God's preservation of revealed knowledge all retained.
+- **21–24:** Enoch's seventh-generation position, walking with God as reconciliation and godliness (Amos 3:3), Hebrews 11:5, removal without ordinary death, 365-year lifespan, anticipation of Christ's return, persistence in holiness, and compatibility of walking with God and ordinary responsibilities all retained.
+- **25–32:** the author's interpretation of Methuselah's name (reported as **Henry's interpretation**, not asserted as proven Hebrew etymology); 969-year lifespan; Noah's name/rest; curse on the soil and hard livelihood; **the attested missing Lamech relief sentence restored in contemporary wording**; parental expectations and their possible disappointment; a deeper hope; explicit questions about Christ and heaven; and seeking comfort in Christ all retained.
+
+**Outcome:** chapter-level editorial translation and a separate same-assistant review pass are complete; **this is not an external human review**. The original four section groups and their outline rows are unchanged. As for other editorially accepted Genesis manuscripts, source-native XML/quotation/link mapping, full modern SWORD rebuild and independent reader testing remain outstanding shared publication gates. No modern module has been released and no correction has been applied to original `MHCC 0.1.1`.
