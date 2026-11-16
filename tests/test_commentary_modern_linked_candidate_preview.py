@@ -13,9 +13,13 @@ from commentary_modern_reference_gate import SourceReferenceGate
 
 FULL="b"*64
 ZIP="a"*64
-ORIGINAL=(b'<div><reference osisRef="Bible:1John.5.20">1Jo 5:20</reference>'
+ORIGINAL=(b'<div><title>Chapter outline</title>'
+          b'Genesis was described in the original first section.'
+          b'<table><row><cell>Creation</cell><cell>1-2</cell></row></table>'
+          b'The first verse teaches us about creation.'
+          b'<reference osisRef="Bible:1John.5.20">1Jo 5:20</reference>'
           b' and original theological prose.</div>')
-INTRO=b'<div>Book introduction original content.</div>'
+INTRO=b'<div/>'
 
 
 def fixture():
@@ -27,8 +31,16 @@ def fixture():
         "first_key":"Gen.1.1",
         "native_keys":["Gen.1.1","Gen.1.2"],
         "source_sha256":hashlib.sha256(ORIGINAL).hexdigest(),
-        "markup_census":{"tag_counts":{"reference":1}}
+        "markup_census":{"tag_counts":{"reference":1,"row":1,"table":1,"title":1}}
       }],
+      "intro_provenance_expectations":{
+          "original_first_numbered_key":"Gen.1.1",
+          "expected_original_book_intro_start":"Genesis was described in the original first section",
+          "expected_original_exposition_start":"The first verse teaches us about creation",
+          "expected_original_chapter_outline_table_count":1,
+          "expected_original_chapter_outline_row_count":1,
+          "expected_original_chapter_outline_title_count":1
+      },
       "introductions":[{
         "native_key":"Gen",
         "source_sha256":hashlib.sha256(INTRO).hexdigest(),
