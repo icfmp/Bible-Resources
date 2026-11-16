@@ -90,3 +90,39 @@ The project owner clarified that **BRMHCC's existing editorial section and parag
 **Do not introduce new stylistic paragraph divisions, recombine independent sections or reflow the original exposition simply to improve readability.** The 807 long K bodies and one long I body are diagnostics, **not** a pending task to split them. No further Moody facsimile hunt or reader-layout pilot is required merely to justify optional paragraphing. If concrete evidence later shows that a particular existing boundary is *erroneous* (lost/corrupt), investigate that precise error as a separate, bounded correction; do not apply a global layout transformation.
 
 The future **modern-English adaptation** is the appropriate edition for new readability-driven paragraphing, while preserving Matthew Henry's sense, reasoning and theology. This decision supersedes the preceding proposal to hold 0.1.1 for optional paragraph restoration. BRMHCC 0.1.1 remains subject to its real technical, editorial, rights and publication gates, but **not** to an open-ended paragraph-redesign investigation.
+
+## Exod.12.1 single-word variant classified — full-source rerun (2026-11-16)
+
+The reusable paragraph witness now identifies the **semantic XML owner** of
+the first different case-folded word token, rather than silently labelling all
+different digital tokens as exposition defects. This source-neutral diagnostic
+does **not** compare or overwrite link destinations and returns only
+`SCRIPTURE_REFERENCE_LABEL` or `EXPOSITION_OR_OTHER_MARKUP` classes,
+never source wording or XML.
+
+[Full pinned-original and independently pinned CCEL ThML audit #43848131445](https://github.com/icfmp/Bible-Resources/actions/runs/43848131445)
+**SUCCESS**: `K:Exod.12.1` still has exactly **one** different word
+token at paragraph-relative zero-based offset **774**, and the new
+read-only inspection establishes that **both digital witnesses place
+this differing token inside their existing scripture-reference label
+element**, not in the explanatory prose. The other four sampled K
+section word streams remain identical. Generic synthetic tests also
+distinguish reference-label differences from actual exposition changes.
+
+The publicly rendered [CrossWire MHCC in STEP
+(Exodus 12)](https://www.stepbible.org/?q=version%3DMHCC%40reference%3DExo.12)
+uses the abbreviated book label `He 13:13, 14` at the relevant citation,
+whereas the [CCEL concise Exodus 12
+page](https://ccel.org/ccel/henry/mhcc.iii.xii.html) renders
+`Heb 13:13, 14`. This is consistent with the measured **single
+reference-label word token** difference, not a demonstrated corruption
+of the author's exposition. The publicly visible cited passage is the
+same; the exact underlying XML `osisRef` target equality was **not**
+independently proven by this paragraph witness.
+
+**Disposition:** retain the original CrossWire label and its target
+unchanged. Do not describe the single-word cross-edition difference as
+an authorial-text error, copy CCEL typography or create a stylistic
+paragraph split. No change to the already corrected **private**
+BRMHCC 0.1.1 scope (24 approved-for-testing index aliases and one
+reversible Ezekiel 3 correction); publication remains separately gated.
