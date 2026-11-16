@@ -17,7 +17,9 @@ This applies equally to **Bibles, commentaries, dictionaries, encyclopedias and 
 
 ## Status
 
-**First published module:** [Louis Segond 1910 — Bible Resources 0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/lsg-0.1.0). Its [source-audited files, rights and editorial record](modules/lsg-1910) are now in `main` with approved status. The [JSON catalogue](https://icfmp.github.io/Bible-Resources/catalog/v1/catalog.json) and standard [SWORD repository](https://icfmp.github.io/Bible-Resources/sword/) are deployed by GitHub Pages; the first module is `BRLSG1910`. The [release note](docs/releases/LSG-0.1.0.md) documents known limitations. A French Matthew Henry translation is **not** licensed for republication merely because a supplied JSON archive advertises CC0.
+**Published and verified resources:** [Louis Segond 1910 `BRLSG1910` 0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/lsg-0.1.0), [Darby `BRJND2024` 0.1.1](https://github.com/icfmp/Bible-Resources/releases/tag/darby-jnd-2024-0.1.1), and [Matthew Henry Concise Commentary `MHCC` 0.1.1](https://github.com/icfmp/Bible-Resources/releases/tag/mhcc-0.1.1). Their [source-reviewed files](modules/) and current catalogue entries are in `main`. The [public JSON catalogue](https://icfmp.github.io/Bible-Resources/catalog/v1/catalog.json) and standard [SWORD repository](https://icfmp.github.io/Bible-Resources/sword/) are deployed and verified through the ordered GitHub Release-before-Pages workflow. Historic release ZIPs remain immutable, including the original `BRMHCC` 0.1.0; the newer `MHCC` SWORD ID may collide with CrossWire's original `MHCC` and does **not** automatically remove an old `BRMHCC` installation.
+
+A French Matthew Henry translation is **not** licensed for republication merely because a supplied JSON archive advertises CC0. Source attribution, rights and approvals remain edition-specific.
 
 ## What lives here?
 
@@ -50,7 +52,7 @@ run, unresolved issues and the **next specific action**. A blocked step
 is never silently skipped; completed work is saved on GitHub before
 moving on. Publication still requires separate rights/editorial approval.
 
-## Seven-stage commentary onboarding (research-only)
+## Seven-stage commentary onboarding (source → publication)
 
 Commentaries have a **separate seven-stage evidence process**, based on the
 Bible workflow but preserving commentary entry/range semantics, quotations,
@@ -59,8 +61,13 @@ original editorial divisions and licence distinctions. See the
 [initial MHCC issue #177](https://github.com/icfmp/Bible-Resources/issues/177).
 The read-only [commentary intake Action](.github/workflows/commentary-intake.yml)
 observes the exact original CrossWire SWORD ZIP and produces metadata-only
-fingerprints. This does **not** constitute textual, editorial or legal approval,
-and nothing is published automatically.
+fingerprints. The [compact reusable tool guide](docs/COMMENTARY_PIPELINE.md)
+maps existing commands and publication checks to the same seven stages; it is
+**not a competing process**. The
+[tool registry](docs/TOOL_REGISTRY.md) documents retained source-bound
+diagnostics, approved reusable interfaces and legacy workflows. Intake does
+**not** constitute textual, editorial or legal approval; only the separately
+approved final release pipeline can publish a resource.
 
 ## Automated, resumable Bible source audits
 
