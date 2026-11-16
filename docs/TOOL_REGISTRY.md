@@ -52,7 +52,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_layout_census.py`](../scripts/commentary_layout_census.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/commentary_literal_erratum_preflight.py`](../scripts/commentary_literal_erratum_preflight.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/commentary_native_inventory.py`](../scripts/commentary_native_inventory.py) | KEEP_GENERIC | not established | 10 | source/native audit |
-| [`scripts/commentary_native_raw_inventory.py`](../scripts/commentary_native_raw_inventory.py) | KEEP_GENERIC | named test | 11 | source/native audit |
+| [`scripts/commentary_native_raw_inventory.py`](../scripts/commentary_native_raw_inventory.py) | KEEP_GENERIC | named test | 12 | source/native audit |
 | [`scripts/commentary_navigation_link_plan.py`](../scripts/commentary_navigation_link_plan.py) | UNDECIDED | named test | 5 | not determined |
 | [`scripts/commentary_near_prose_unicode_review.py`](../scripts/commentary_near_prose_unicode_review.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_nonlink_word_alignment.py`](../scripts/commentary_nonlink_word_alignment.py) | MERGE | named test | 9 | not determined |
@@ -66,7 +66,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_paragraph_witness_probe.py`](../scripts/commentary_paragraph_witness_probe.py) | UNDECIDED | named test | 3 | source/native audit |
 | [`scripts/commentary_private_candidate_xiphos_gui.py`](../scripts/commentary_private_candidate_xiphos_gui.py) | GENERALIZE | named test | 2 | not determined |
 | [`scripts/commentary_private_text_compare.py`](../scripts/commentary_private_text_compare.py) | UNDECIDED | named test | 19 | source/native audit |
-| [`scripts/commentary_prose_cross_slot.py`](../scripts/commentary_prose_cross_slot.py) | MERGE | named test | 3 | not determined |
+| [`scripts/commentary_prose_cross_slot.py`](../scripts/commentary_prose_cross_slot.py) | MERGE | named test | 4 | not determined |
 | [`scripts/commentary_public_metadata_preflight.py`](../scripts/commentary_public_metadata_preflight.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/commentary_rebuild_attestation_draft.py`](../scripts/commentary_rebuild_attestation_draft.py) | UNDECIDED | named test | 3 | publication/release |
 | [`scripts/commentary_reference_cross_slot.py`](../scripts/commentary_reference_cross_slot.py) | MERGE | named test | 4 | not determined |
@@ -82,9 +82,9 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_stock_prefix_topology.py`](../scripts/commentary_stock_prefix_topology.py) | UNDECIDED | named test | 6 | not determined |
 | [`scripts/commentary_stock_xiphos_smoke.py`](../scripts/commentary_stock_xiphos_smoke.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_sword_identity_migration.py`](../scripts/commentary_sword_identity_migration.py) | UNDECIDED | named test | 2 | not determined |
-| [`scripts/commentary_text_delta.py`](../scripts/commentary_text_delta.py) | KEEP_GENERIC | named test | 12 | not determined |
+| [`scripts/commentary_text_delta.py`](../scripts/commentary_text_delta.py) | KEEP_GENERIC | named test | 13 | not determined |
 | [`scripts/commentary_unmarked_division_coverage.py`](../scripts/commentary_unmarked_division_coverage.py) | UNDECIDED | named test | 1 | not determined |
-| [`scripts/commentary_unresolved_lexical_triage.py`](../scripts/commentary_unresolved_lexical_triage.py) | MERGE | named test | 6 | not determined |
+| [`scripts/commentary_unresolved_lexical_triage.py`](../scripts/commentary_unresolved_lexical_triage.py) | MERGE | named test | 7 | not determined |
 | [`scripts/commentary_witness.py`](../scripts/commentary_witness.py) | UNDECIDED | not established | 2 | source/native audit |
 | [`scripts/commentary_xiphos_dual_reader.py`](../scripts/commentary_xiphos_dual_reader.py) | GENERALIZE | named test | 11 | not determined |
 | [`scripts/commentary_xiphos_heading_probe.py`](../scripts/commentary_xiphos_heading_probe.py) | UNDECIDED | named test | 3 | source/native audit |
@@ -174,11 +174,11 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/sword_commentary_raw_key.cpp`](../scripts/sword_commentary_raw_key.cpp) | UNDECIDED | not established | 4 | not determined |
 | [`scripts/sword_missing_verse_witness.py`](../scripts/sword_missing_verse_witness.py) | UNDECIDED | named test | 4 | source/native audit |
 | [`scripts/sword_native_commentary_index.cpp`](../scripts/sword_native_commentary_index.cpp) | KEEP_GENERIC | not established | 8 | not determined |
-| [`scripts/sword_native_commentary_raw_corpus.cpp`](../scripts/sword_native_commentary_raw_corpus.cpp) | KEEP_GENERIC | not established | 10 | not determined |
+| [`scripts/sword_native_commentary_raw_corpus.cpp`](../scripts/sword_native_commentary_raw_corpus.cpp) | KEEP_GENERIC | not established | 11 | not determined |
 | [`scripts/sword_native_index.cpp`](../scripts/sword_native_index.cpp) | KEEP_GENERIC | not established | 17 | not determined |
 | [`scripts/sword_native_inventory.py`](../scripts/sword_native_inventory.py) | KEEP_GENERIC | named test | 20 | source/native audit |
 | [`scripts/sword_native_raw_corpus.cpp`](../scripts/sword_native_raw_corpus.cpp) | UNDECIDED | not established | 12 | not determined |
-| [`scripts/sword_native_raw_corpus_inventory.py`](../scripts/sword_native_raw_corpus_inventory.py) | KEEP_GENERIC | named test | 24 | source/native audit |
+| [`scripts/sword_native_raw_corpus_inventory.py`](../scripts/sword_native_raw_corpus_inventory.py) | KEEP_GENERIC | named test | 25 | source/native audit |
 | [`scripts/sword_native_raw_entry.cpp`](../scripts/sword_native_raw_entry.cpp) | UNDECIDED | not established | 7 | not determined |
 | [`scripts/tool_registry.py`](../scripts/tool_registry.py) | KEEP_GENERIC | named test | 2 | not determined |
 | [`scripts/usfx_schema_gate.py`](../scripts/usfx_schema_gate.py) | UNDECIDED | named test | 3 | not determined |
