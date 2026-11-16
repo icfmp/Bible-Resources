@@ -560,6 +560,40 @@ jobs:
           assert package_proof["release_authorized"] is False
           assert package_proof["catalogue_changed"] is False
           assert package_proof["public_artifact_generated"] is False
+          # Immutable reviewed PRIVATE evidence from one complete real audit.
+          # Do not infer the eventual public date or permission from this receipt.
+          from pathlib import Path
+          private_receipt=json.loads(Path(
+              "docs/evidence/mhcc-274/mhcc-0.1.1-private-six-zcom-hashes-DRAFT.json"
+          ).read_text(encoding="utf-8"))
+          assert private_receipt["status"]=="private_ci_observation_not_release_or_editorial_authorization"
+          assert private_receipt["resource_id"]=="mhcc-crosswire"
+          assert private_receipt["sword_id"]=="MHCC"
+          assert private_receipt["proposed_version"]=="0.1.1"
+          assert private_receipt["source_original_archive_sha256"]==attestation["review_manifest"]["original_archive_sha256"]
+          assert private_receipt["source_original_manifest_sha256"]==attestation["review_manifest"]["original_manifest_sha256"]
+          assert private_receipt["complete_native_source_audit_sha256"]==attestation["source_audit_sha256"]
+          assert private_receipt["original_native_corpus_sha256"]==attestation["source_audit"]["original_native_corpus_sha256"]
+          assert private_receipt["index_only_control_native_corpus_sha256"]==attestation["source_audit"]["index_only_rebuild_native_corpus_sha256"]
+          assert private_receipt["corrected_native_corpus_sha256"]==attestation["source_audit"]["candidate_native_corpus_sha256"]
+          assert private_receipt["original_native_counts"]==attestation["source_audit"]["original_native_counts"]
+          assert private_receipt["corrected_native_counts"]==attestation["source_audit"]["candidate_native_counts"]
+          assert private_receipt["added_reviewed_aliases"]==len(attestation["source_audit"]["added_links"])
+          assert private_receipt["original_K_addresses_changed_by_two_exact_source_errata"]==attestation["original_K_keys_edited"]
+          assert private_receipt["corrected_private_xiphos_samples_passed"]==attestation["real_reader_sample_count"]
+          assert private_receipt["compiled_block_type"]==rehearsal["compiled_block_type"]
+          assert private_receipt["exact_six_compiled_data_member_sha256"]==rehearsal["native_member_sha256"]
+          assert private_receipt["original_private_conf_sha256"]==rehearsal["source_conf_sha256"]
+          assert private_receipt["hypothetical_only_test_revision_day"]==rehearsal["hypothetical_revision_day_only"]
+          assert private_receipt["hypothetical_only_test_conf_sha256"]==rehearsal["proposed_conf_sha256"]
+          assert private_receipt["hypothetical_only_test_zip_sha256"]==package_proof["test_date_only_zip_sha256"]
+          assert set(package_proof["test_date_only_seven_member_sha256"])==(
+              set(private_receipt["exact_six_compiled_data_member_sha256"]) | {"mods.d/mhcc.conf"}
+          )
+          assert all(private_receipt[k] is False for k in (
+              "actual_release_date_selected","actual_final_7_member_payload_committed",
+              "publication_authorized","public_release_created","active_catalogue_changed"))
+          print("Pinned independent private MHCC six-member receipt: source/native/ZIP proofs exact; NOT PUBLIC")
           print("Real native audit to exact seven-member ZIP bridge:",
                 "original audit",package_proof["source_audit_sha256"],
                 "test-only ZIP",package_proof["test_date_only_zip_sha256"],
