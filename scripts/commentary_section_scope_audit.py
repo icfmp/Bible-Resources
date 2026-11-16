@@ -2033,8 +2033,10 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                         or not corroboration.startswith("https://")
                         or prose_case.get("source_error_class")
                            != "MISSPELLED_PROPER_NAME_IN_AUTHORIAL_PROSE"
-                        or prose_case.get("editorial_decision")
-                           != "PRIVATE_REVERSIBLE_PREFLIGHT_ONLY_NOT_COMPILED"
+                        or prose_case.get("editorial_decision") not in (
+                            "PRIVATE_REVERSIBLE_PREFLIGHT_ONLY_NOT_COMPILED",
+                            "PRIVATE_COMPILATION_AND_TESTS_APPROVED_PUBLICATION_REQUIRES_SEPARATE_SIGNOFF"
+                        )
                         or prose_case.get("public_release_authorized") is not False):
                     raise PilotError("Unreviewed original source prose correction request")
                 seen_prose.add(key)
@@ -2213,13 +2215,27 @@ def audit(resource_id: str, index_binary: Path, raw_binary: Path,
                     native_index_binary=index_binary,
                     history_note=proposed_errata["private_revised_candidate_history_note"],
                     source_provider=curated["origin"]["publisher"],
+                    additional_original_source_edits=[
+                        row for row in prose_proposals
+                        if row["editorial_decision"] ==
+                        "PRIVATE_COMPILATION_AND_TESTS_APPROVED_PUBLICATION_REQUIRES_SEPARATE_SIGNOFF"
+                    ],
                 )
                 if (private_corrected["source_linked_original_verse_keys_changed"]
                         != correction["expected_original_linked_native_K_count"]
                         or private_corrected["original_raw_source_checksum"]
                            != correction["original_raw_sha256"]
                         or private_corrected["corrected_package_uploaded_or_distributed"]
-                        or private_corrected["owner_publication_authorized"]):
+                        or private_corrected["owner_publication_authorized"]
+                        or private_corrected["additional_prose_original_verse_keys_changed"]
+                           != sum(case["original_linked_native_K_count"]
+                                  for case in prose_receipts
+                                  if next(
+                                      (plan for plan in prose_proposals
+                                       if plan["original_native_entry"] ==
+                                          case["original_native_entry"]), {}
+                                  ).get("editorial_decision") ==
+                                  "PRIVATE_COMPILATION_AND_TESTS_APPROVED_PUBLICATION_REQUIRES_SEPARATE_SIGNOFF")):
                     raise PilotError("Source-corrected private package violated reviewed source boundaries")
                 provisional_preview["private_source_edited_versioned_candidate_not_released"]=private_corrected
             provisional_preview["source_scope_corroborated_in_draft_only"] = True
