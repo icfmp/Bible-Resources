@@ -64,12 +64,12 @@ It makes **no editorial or authorial verdict**.
   **2,202** with 100–249, **808** with 250–499 and **66** with 500+
   per-original-XML-fragment word tokens. These are estimates for
   readability triage, **not** a normalized Scripture/text-length claim.
-- With `div` and table separation and styled `hi` headings properly
-  accounted for, the **conservative automatic layout review-candidate
-  categories are empty**. A prior, invalid “no `p` means no structure”
-  heuristic would have produced hundreds of false positives; it has been
-  replaced and tested using invented paragraph-div, table and styled-title
-  fixtures.
+- **Superseded initial interpretation:** simply allowing two or more
+  `div` wrappers suppressed the first coarse warnings, producing **zero
+  candidates**. That was an overcorrection: `div` presence does **not**
+  demonstrate that the prose belongs to the `div`. See the measured
+  text-ownership and literal-newline follow-up below. Neither “no `p`
+  = error” nor “two `div` = safe paragraph layout” is an adequate rule.
 
 **Limits:** This is a **structural-presence result**, not a full comparison of
 paragraph *boundaries* with the named historical edition, actual GUI
@@ -80,9 +80,75 @@ census. A later visual/edition-aligned check can focus on long originals
 (e.g. John 3, Exodus 12, Matthew 4), but must first establish whether
 actual reader display or source paragraph boundaries are wrong.
 
+## Second layout pass — actual original prose ownership and whitespace (2026-11-16)
+
+**Full corrected-head source-pinned CI**:
+[effective text-owner audit #43805657699](https://github.com/icfmp/Bible-Resources/actions/runs/43805657699)
+and [original literal-whitespace audit #43806071903](https://github.com/icfmp/Bible-Resources/actions/runs/43806071903)
+**both SUCCESS**. Synthetic cases assert that empty/wrapping `div` elements
+cannot hide long prose, inline `hi`/`reference` elements do not become
+paragraphs, true nested text containers are counted once, and real literal
+blank lines remain distinct from absent structural block markup. No words,
+original XML or annotation targets are emitted.
+
+The more precise **nearest containing prose block** analysis yields:
+
+| Category of original digital-witness body | Distinct bodies | Observation |
+| --- | ---: | --- |
+| Original K bodies with **no** prose owned by `div`/`p`/`l`/`cell` | **3,255 / 4,047** | Their structural `div` nodes do **not** enclose substantial prose; do not mistake wrappers for paragraphs |
+| K bodies with **two or more** actual prose-bearing blocks | **792 / 4,047** | All 792 have `table` structures, often containing short outline/citation cells; their remaining exposition may still be outside blocks |
+| K bodies with **some text outside every recognized prose/title/note block** | **4,047 / 4,047** | Source has direct-text / element-tail content; this alone is not necessarily a missing paragraph |
+| K bodies with **250+ original Unicode word tokens** outside any recognized block | **807 / 4,047** | High-priority readability/paragraph-boundary research cases, **not 807 confirmed editorial errors** |
+| Original intro I bodies meeting that same 250+ unwrapped-word threshold | **1 / 1,255** | `Lev.19`, 696 such words out of 698 |
+| Verse-one-only single-key chapter K cases reaching that threshold | **39 / 118** | Need focused reader/source formatting review independently of chapter-verse navigation |
+| K bodies with a literal empty line inside the unwrapped XML text fragments | **0 / 4,047** | XML original has **no literal blank-line paragraph separators** in those nodes; it does **not** exclude other reader-specific layout mechanisms |
+
+Largest measured review cases include source native K `John.3.1` (1,547
+unwrapped words of 1,569), `Exod.12.1` (930 of 969) and `Matt.4.1`
+(726 of 760). These numbers are original XML tokenization observations,
+not authorial quote excerpts, paragraph counts, a text-loss claim or
+evidence permitting automatic segmentation.
+
+The separately maintained [CCEL John 3 reading page](https://ccel.org/ccel/henry/mhcc.xxxv.iii.html)
+visibly presents its long initial exposition under a common section heading
+with multiple paragraph separations. This is **useful comparative
+editorial evidence**, *not* proof of equivalence with the exact originally
+claimed CrossWire/Moody Press printing. Before proposing any change to
+`John.3.1`, its exact source word order/notes/references and each proposed
+paragraph boundary must be independently reconciled to the identified
+work/edition, and the changed source/native OSIS roundtrip must preserve
+authorial text byte-for-byte.
+
+**Editorial status is OPEN, not “layout perfect”:** the source digital
+witness's `div` wrappers are an unreliable proxy for paragraph ownership.
+The 807+1 cases require a staged sampled original-division-to-reader
+comparison. The census is a reusable prioritization tool, **never** a
+normalizer or a blanket permission to split at periods, arbitrary character
+counts, CCEL paragraph positions or only to make the display prettier.
+
+**Conservative next research acceptance gates:**
+1. Select representative cases spanning original native `div`/`hi`/table
+   patterns, including one single-key chapter and one I-only chapter;
+   separately verify the actual reader output and print/digital witness
+   paragraph boundaries.
+2. Demand exact edition-appropriate alignment for *every* proposed
+   paragraph boundary, unmodified authorial words/punctuation/annotations
+   and proof of valid OSIS semantics; explicitly mark where only a
+   different digital edition supports the boundary.
+3. Test only an isolated source-faithful candidate with a full original
+   source/native readback and observable reader behavior. No public edit,
+   no automatic bulk paragraph insertion, no authorial text replacement.
+4. Reassess the editorial scope of `BRMHCC 0.1.1` before approving a release;
+   the navigation/citation-only private technical package is validated,
+   but this newly documented **formatting-quality question is not closed**.
+
 ## Outcome and publication boundary
 
-**No additional content correction is justified by this sweep.** The existing
+**No additional authorial text correction is justified so far.** The new
+paragraph/whitespace audit does reveal **807 original K + one I
+high-priority formatting review candidates**. These are not approved
+rewrites, and any actual layout improvements must be established through
+edition-specific and reader-specific evidence. The existing
 17-section / 24-key navigation plan and narrowly documented Ezekiel 3
 correction remain the only technically tested changes for a private
 `BRMHCC 0.1.1`. The 118 chapter-wide navigation question, 25
