@@ -101,7 +101,7 @@ jobs:
           timeout 90s sudo apt-get -o Acquire::Retries=0 \
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update
           timeout 90s sudo apt-get -o Acquire::Retries=0 \
-            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev libsword-utils
       - name: Build native metadata-only commentary key scanner
         shell: bash
         run: |
@@ -124,6 +124,7 @@ jobs:
             --resource-id "$RESOURCE_ID" \
             --native-inspector "${RUNNER_TEMP}/commentary-native-index" \
             --native-raw-binary "${RUNNER_TEMP}/commentary-private-raw" \
+            --private-alias-probe \
             --probe-osis-key "$PROBE" \
             --report "${RUNNER_TEMP}/commentary-anchor-receipt.json"
       - name: Report source-to-SWORD key diagnostics without source prose
@@ -151,6 +152,10 @@ jobs:
               else:
                   print("Canonical unoccupied-start source prose location:",
                         location["status"])
+              attempt_report = report["private_original_source_first_verse_index_alias_probes"]
+              assert attempt_report["published"] is False
+              print("Private original commentary chapter-only, index-only SWORD experiments (NO RELEASE):",
+                    json.dumps(attempt_report, sort_keys=True))
               print("Original XML volumes:", report["original_xml_volume_count"])
               assert report["original_native_versification_registry_checked"] is True
               classes = report["original_reference_registry_classes_across_volumes"]
