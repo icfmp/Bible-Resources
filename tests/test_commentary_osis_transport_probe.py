@@ -170,7 +170,8 @@ class OriginalRawNumberedTransportTests(unittest.TestCase):
         )
         moved = (
             b"<p/>"
-            b'<p><reference osisRef="Gen.1.1">Gen 1:1</reference> and context</p>'
+            b'<reference osisRef="Gen.1.1">Gen 1:1</reference>'
+            b'<p> and context</p>'
         )
         delta = classify_native_osis_roundtrip_delta(original, moved)
         self.assertEqual(delta["word_sequence_relation"], "EXACT_ORIGINAL_WORD_SEQUENCE")
