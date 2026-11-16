@@ -41,3 +41,44 @@ The original `Lev.19` prose is present in native **I chapter-introduction** stor
 BRMHCC 0.1.1's separately tested **17 index-section / 24-link** changes and **one strictly bounded Ezekiel 3 reference correction** remain private, reproducible and unchanged. All original K/I/TOP words outside the single authorized private test change remain preserved in the existing full corpus audit. Nothing in this paragraph pilot authorizes additional K aliases, CCEL word replacement, a public download, a catalogue release, merge, a modern-English translation restart or Codex invocation.
 
 This research trail is auditable without publishing independent source text. Independent actual **text/punctuation** comparison, exact print-edition boundaries, final metadata and any editorial paragraphing decision remain separate acceptance gates.
+
+
+## Printed-edition identification and digital PDF page inspection (follow-up, 2026-11-16)
+
+CrossWire's original module metadata explicitly **claims**, without an
+independent facsimile receipt, to have followed **Moody Press, 28th
+printing, ISBN 0-8024-5190-X**:
+https://crosswire.org/sword/modules/ModInfo.jsp?modName=MHCC.
+Bibliographic listings associate this ISBN with a **Moody hardcover, 1981,
+1,024 pages** (some sellers give 1982 or describe a later printing):
+https://www.abebooks.co.uk/9780802451903/Matthew-Henry-Concise-Commentary-Whole-080245190X/plp .
+Those listings authenticate the ISBN as a useful **physical-edition
+identification lead**, **not** the precise printing, paragraph positions,
+source wording or source rights of the file shipped by CrossWire.
+
+A separately accessible **typeset CCEL-derived PDF** was checked by actual
+page images, especially John 3 on **printed pages 1047–1049**:
+https://reformed.org/wp-content/uploads/2019/04/MatthewHenrysBibleCommentary.pdf .
+Its title metadata expressly identifies **Christian Classics Ethereal
+Library** as publisher and **Logos Research Systems** as source. The
+*John 3, Verses 1–8* exposition starts on printed p. 1047, flows across
+pp. 1048–1049 without a visibly inserted internal paragraph break, and
+is followed by the distinct *Verses 22–36* heading on p. 1049.
+This aligns with the separately pinned CCEL ThML's **one section-level
+paragraph**, but is **not an independent authorial/print witness**:
+a PDF rendering derived from CCEL cannot be counted as a second edition
+that corroborates CCEL's own editorial decisions. A physical page break
+in its typesetting is not a paragraph boundary.
+
+A public-domain **complete/unabridged** Matthew Henry PDF, or a
+**Thomas Nelson 1997** concise volume (ISBN 0-7852-1247-7), is also not
+evidence of the **specific Moody printing's** pagination/paragraphing:
+https://openlibrary.org/books/OL678768M/Matthew_Henry%27s_concise_commentary_on_the_whole_Bible.
+
+**Disposition:** no accessible authenticated page from the claimed Moody
+**28th printing** was verified in this research pass; consequently **no
+new historically restored paragraph boundary can be certified**. Do not
+promote the CCEL-derived PDF to independent evidence or infer that a
+long digital paragraph is automatically corrupt. Keep #278 open for a
+genuine source-edition facsimile and bounded **actual Xiphos rendering**
+comparison. No SWORD, original source, rights or public release change.
