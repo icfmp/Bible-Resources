@@ -473,8 +473,12 @@ jobs:
           revised=preview["private_source_edited_versioned_candidate_not_released"]
           assert revised["status"]=="PRIVATE_SOURCE_EDITED_SWORD_ZCOM_CANDIDATE_FULL_PARITY_NOT_PUBLICATION"
           assert revised["source_linked_original_verse_keys_changed"]==11
-          assert revised["only_original_linked_source_group_changed"] is True
-          assert len(revised["exact_original_K_keys_changed"])==11
+          extra_source_keys=revised["additional_prose_original_verse_keys_changed"]
+          extra_source_groups=len(revised["additional_prose_original_source_change_receipts"])
+          assert revised["only_exactly_reviewed_original_source_groups_changed"] is True
+          assert revised["only_original_linked_source_group_changed"] is (extra_source_keys==0)
+          assert revised["all_source_linked_original_verse_keys_changed"]==11+extra_source_keys
+          assert len(revised["exact_original_K_keys_changed"])==11+extra_source_keys
           assert revised["all_other_original_and_alias_K_bytes_identical_to_index_only_compilation"] is True
           assert revised["all_original_I_and_TOP_bytes_identical_to_index_only_compilation"] is True
           assert revised["all_original_compiled_native_adjacent_links_identical"] is True
@@ -499,14 +503,14 @@ jobs:
           assert revised["corrected_metadata_guard"]["original_distribution_license_textsource_about_and_date_unchanged"] is True
           xiphos_revised=revised["real_xiphos_three_passage_proof"]
           assert xiphos_revised["actual_xiphos_gui_displayed"] is True
-          assert xiphos_revised["independent_real_reader_sample_count"]==3
-          assert xiphos_revised["independent_real_reader_clipboard_matches"]==3
+          assert xiphos_revised["independent_real_reader_sample_count"]==3+extra_source_groups
+          assert xiphos_revised["independent_real_reader_clipboard_matches"]==3+extra_source_groups
           assert xiphos_revised["source_text_or_screenshot_logged"] is False
           assert revised["original_and_public_module_unchanged"] is True
           assert revised["corrected_package_uploaded_or_distributed"] is False
           assert revised["source_words_or_xml_logged"] is False
           assert revised["owner_publication_authorized"] is False
-          print("Corrected MHCC exact source delta and isolated actual Xiphos 3/3:",
+          print("Corrected MHCC exact source delta and isolated actual Xiphos:",
                 "original K slots changed",revised["source_linked_original_verse_keys_changed"],
                 "all other original K/I/TOP exactly preserved",
                 revised["all_other_original_and_alias_K_bytes_identical_to_index_only_compilation"],
