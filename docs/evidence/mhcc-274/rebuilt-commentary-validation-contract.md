@@ -1,5 +1,31 @@
 # Source-attested rebuilt SWORD commentary validation — accepted architecture
 
+## Latest: private final-shape ZIP rehearsal passed (2026-11-16)
+
+**Not publicly released; not merge-authorized.** [Validate #43882328399](https://github.com/icfmp/Bible-Resources/actions/runs/43882328399) passed **1,334 tests**. The [complete original/source-corrected native SWORD and four-passage Xiphos audit #43882328444](https://github.com/icfmp/Bible-Resources/actions/runs/43882328444) passed on retry after a transient **Xiphos window-not-visible** startup failure in its first attempt; no GUI checks were removed.
+
+The corrected private BRMHCC **0.1.1** remains **exactly two reversible source edits plus 24 original-section navigation links**. A new source-neutral private packaging rehearsal now starts from the *actual verified* six CHAPTER-block SWORD `.cz*` members, changes only the `About` attribution and `SwordVersionDate` in the `.conf` using a **hypothetical test date**, creates a deterministic seven-member ZIP using the **same DEFLATED level-9 ZIP member layout as the real catalogue builder**, extracts it into an isolated SWORD installation and compares the **entire original/rehearsed libSWORD I/K/TOP corpus**. All **28,742 K / 1,255 I / 2 TOP** stay identical to the independently verified corrected candidate; no authorial content or native SWORD links changed. Four genuine Xiphos passage samples remain matched.
+
+The **temporary test-date-only** full-configuration ZIP has SHA-256
+`72f51ee8763019fd3233720a7b99c8aab3b8fc555db26a5ed5533f74732d67c1`.
+That hash **must not be advertised, reused for a public release or treated as
+the eventual approved public-package hash**. The previous source-corrected
+private research ZIP SHA-256 `aeebadbc57d5a891d10ddb3dec520dcc8abd49e7cdd733c4a3542c77765282c4`
+remains a different historic private test control.
+
+The [official original CrossWire MHCC 2.0 entry](https://crosswire.org/sword/modules/ModInfo.jsp?modName=MHCC)
+currently declares `Public Domain` / `Copy Freely`; the attribution of
+independently sourced CCEL content is **not** being imported. Final rights and
+editorial release review remain necessary. **Only** an independently reviewed,
+genuinely date-selected final `.conf`, exact committed SWORD members,
+regenerated source-attested validation receipt and separately authorized
+release plan may move the package into the public pipeline. The published
+BRMHCC 0.1.0, upstream archived source, release and catalogue remain
+unchanged. See [issue #276](https://github.com/icfmp/Bible-Resources/issues/276).
+
+---
+
+
 **Status:** architectural choice accepted on 2026-11-16 under the project
 owner's delegated technical decision, without publication or merge approval.
 Implemented in [draft PR #275](https://github.com/icfmp/Bible-Resources/pull/275)
