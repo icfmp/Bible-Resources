@@ -101,7 +101,10 @@ def _chapters(root: Path, ledger: dict):
         payload.append((ch, sections, native[ch]["units"]))
     if len(payload)!=len(native):
         raise ValueError("Not all source-mapped chapters were included")
-    return payload
+    # Files live in separate pilots/ and chapters/ directories. OSIS chapters
+    # must follow canonical chapter order, not lexicographic file-path order.
+    return sorted(payload, key=lambda item: (item[0].split(".", 1)[0],
+                                             int(item[0].split(".", 1)[1])))
 
 
 def generate(root: Path, ledger: dict, *, work_id: str) -> tuple[bytes, dict]:
