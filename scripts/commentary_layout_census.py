@@ -142,6 +142,10 @@ def layout_profile(raw: bytes) -> dict:
              if owned_kinds[owner] in PROSE_OWNERS]
     active_prose_blocks = len(prose)
     largest_prose_block = max(prose, default=0)
+    root_unowned_words = owned_words.get(0, 0)
+    nonprose_owned_words = text_word_total - sum(prose) - root_unowned_words
+    if nonprose_owned_words < 0:
+        raise ValueError("Original commentary block ownership underflow")
     # Word totals are measured on original XML .text/.tail fragments,
     # without double-counting nested markup. Flat itertext() may join a
     # title directly to the next paragraph with no intervening XML space,
@@ -176,6 +180,8 @@ def layout_profile(raw: bytes) -> dict:
         "effective_prose_block_count": active_prose_blocks,
         "largest_effective_prose_block_words": largest_prose_block,
         "prose_words_in_effective_blocks": sum(prose),
+        "words_outside_any_recognized_block": root_unowned_words,
+        "words_owned_by_heading_or_note_blocks": nonprose_owned_words,
         "unwrapped_word_count": words_in_unwrapped_segments,
         "max_unwrapped_segment_words": max_unwrapped_words,
         "longest_paragraph_words": max(paragraph_lengths, default=0),
@@ -206,6 +212,9 @@ def layout_flags(profile: dict) -> set[str]:
         flags.add("long_commentary_with_one_effective_prose_block")
     if profile["largest_effective_prose_block_words"] >= 500:
         flags.add("very_long_effective_prose_block")
+    if (word_count >= 250
+            and profile["words_outside_any_recognized_block"] >= 250):
+        flags.add("long_prose_outside_any_recognized_block")
     if (profile["unwrapped_word_count"] >= 80
             and profile["div_count"] == 0 and profile["table_count"] == 0):
         flags.add("substantial_text_without_div_table_p_line_title_note")
@@ -271,6 +280,8 @@ class NativeCommentaryLayoutCensus:
             histogram[f"{kind}_styled_numbered_verse_lead"] += int(profile["styled_numbered_verse_lead"])
             histogram[f"{kind}_effective_prose_blocks_{'0' if profile['effective_prose_block_count']==0 else '1' if profile['effective_prose_block_count']==1 else '2plus'}"] += 1
             histogram[f"{kind}_largest_prose_block_{'0' if profile['largest_effective_prose_block_words']==0 else '1-99' if profile['largest_effective_prose_block_words']<100 else '100-249' if profile['largest_effective_prose_block_words']<250 else '250-499' if profile['largest_effective_prose_block_words']<500 else '500plus'}"] += 1
+            histogram[f"{kind}_unowned_words_{'0' if profile['words_outside_any_recognized_block']==0 else '1-99' if profile['words_outside_any_recognized_block']<100 else '100-249' if profile['words_outside_any_recognized_block']<250 else '250-499' if profile['words_outside_any_recognized_block']<500 else '500plus'}"] += 1
+            histogram[f"{kind}_text_outside_any_block"] += int(profile["words_outside_any_recognized_block"] > 0)
             histogram[f"{kind}_divs_{'0' if profile['div_count']==0 else '1' if profile['div_count']==1 else '2plus'}"] += 1
             histogram[f"{kind}_tables_present"] += int(profile["table_count"] > 0)
             histogram[f"{kind}_hi_present"] += int(profile["hi_count"] > 0)
@@ -279,13 +290,14 @@ class NativeCommentaryLayoutCensus:
                 chapter_one_profiles[f"single_key_chapter_paragraphs_{'0' if profile['paragraph_count']==0 else '1' if profile['paragraph_count']==1 else '2plus'}"] += 1
                 chapter_one_profiles[f"single_key_chapter_effective_blocks_{'0' if profile['effective_prose_block_count']==0 else '1' if profile['effective_prose_block_count']==1 else '2plus'}"] += 1
                 chapter_one_profiles["single_key_chapter_large_250plus_effective_prose_block"] += int(profile["largest_effective_prose_block_words"] >= 250)
+                chapter_one_profiles["single_key_chapter_250plus_words_outside_any_block"] += int(profile["words_outside_any_recognized_block"] >= 250)
                 chapter_one_profiles["single_key_chapter_raw_body_count"] += 1
             for flag in sorted(flags):
                 categories[f"{kind}_{flag}"] += 1
                 cases[flag].append((profile["word_count"], key, kind,
                                     profile["effective_prose_block_count"],
                                     profile["largest_effective_prose_block_words"],
-                                    profile["unwrapped_word_count"]))
+                                    profile["words_outside_any_recognized_block"]))
         samples = {}
         for flag, vals in sorted(cases.items()):
             # Native keys and counts only: never a literal source string.
@@ -293,7 +305,7 @@ class NativeCommentaryLayoutCensus:
             samples[flag] = [{"original_native_key": key, "entry_kind": kind,
                               "word_count": words, "effective_prose_blocks": blocks,
                               "largest_prose_block_words": largest,
-                              "unwrapped_words": loose}
+                              "words_outside_any_recognized_block": loose}
                              for words, key, kind, blocks, largest, loose in values]
         return {
             "status": "COMPLETE_ORIGINAL_COMMENTARY_LAYOUT_HEURISTICS_NOT_EDITORIAL_VERDICT",
