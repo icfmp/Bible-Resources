@@ -29,7 +29,7 @@ Humble Christians understand this by faith better than the most learned people's
 
 Our own nature and place in creation should remind us of our duty. As Christians, we must always keep heaven before our eyes and the earth beneath our feet.
 
-The Son of God, who is one with the Father, was with him when he made the world. More than that, Scripture repeatedly tells us that the world was made *through* the Son, and that nothing was made without him.
+The Son of God, who is one with the Father, was with him when he made the world. More than that, Scripture repeatedly tells us that the world was made *by* the Son, and that nothing was made without him.
 
 What high thoughts we should have of the great God we worship, and of the great Mediator in whose name we pray!
 
@@ -137,7 +137,7 @@ God gave people plants and fruit for food, including grain and all the produce o
 
 Let God's people entrust their needs to him. They need not be consumed by worry over what they will eat or drink.
 
-The God who feeds the birds will not let his children starve.
+The God who feeds his birds will not let his little children starve.
 
 ## God approves the completed creation (verse 31)
 
@@ -147,7 +147,7 @@ But when God looked upon everything he had made, it was all very good.
 
 It was good because everything was exactly as its Creator intended.
 
-All God's works, throughout his dominion, praise him. So let my soul praise the Lord!
+All God's works, throughout his dominion, bless him. So let my soul bless the Lord!
 
 Let us thank God for the gospel of Christ. And as we think about his almighty power, let us, as sinners, flee from the wrath to come.
 
