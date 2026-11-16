@@ -44,7 +44,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_chapter_cross_slot.py`](../scripts/commentary_chapter_cross_slot.py) | MERGE | named test | 2 | not determined |
 | [`scripts/commentary_chapter_neighbors.py`](../scripts/commentary_chapter_neighbors.py) | MERGE | named test | 5 | not determined |
 | [`scripts/commentary_chapter_p_boundaries.py`](../scripts/commentary_chapter_p_boundaries.py) | MERGE | named test | 2 | not determined |
-| [`scripts/commentary_chapter_paragraph_overlap.py`](../scripts/commentary_chapter_paragraph_overlap.py) | MERGE | named test | 3 | not determined |
+| [`scripts/commentary_chapter_paragraph_overlap.py`](../scripts/commentary_chapter_paragraph_overlap.py) | MERGE | named test | 4 | not determined |
 | [`scripts/commentary_chapter_ref_labels.py`](../scripts/commentary_chapter_ref_labels.py) | MERGE | named test | 5 | not determined |
 | [`scripts/commentary_editorial_topology.py`](../scripts/commentary_editorial_topology.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_intake.py`](../scripts/commentary_intake.py) | KEEP_GENERIC | named test | 20 | intake |
@@ -82,7 +82,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_stock_prefix_topology.py`](../scripts/commentary_stock_prefix_topology.py) | UNDECIDED | named test | 6 | not determined |
 | [`scripts/commentary_stock_xiphos_smoke.py`](../scripts/commentary_stock_xiphos_smoke.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_sword_identity_migration.py`](../scripts/commentary_sword_identity_migration.py) | UNDECIDED | named test | 2 | not determined |
-| [`scripts/commentary_text_delta.py`](../scripts/commentary_text_delta.py) | UNDECIDED | named test | 7 | not determined |
+| [`scripts/commentary_text_delta.py`](../scripts/commentary_text_delta.py) | UNDECIDED | named test | 10 | not determined |
 | [`scripts/commentary_unmarked_division_coverage.py`](../scripts/commentary_unmarked_division_coverage.py) | UNDECIDED | named test | 1 | not determined |
 | [`scripts/commentary_unresolved_lexical_triage.py`](../scripts/commentary_unresolved_lexical_triage.py) | MERGE | named test | 6 | not determined |
 | [`scripts/commentary_witness.py`](../scripts/commentary_witness.py) | UNDECIDED | not established | 2 | source/native audit |
