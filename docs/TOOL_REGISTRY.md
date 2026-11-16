@@ -47,7 +47,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [\`scripts/commentary_chapter_paragraph_overlap.py\`](../scripts/commentary_chapter_paragraph_overlap.py) | MERGE | named test | 3 | not determined |
 | [\`scripts/commentary_chapter_ref_labels.py\`](../scripts/commentary_chapter_ref_labels.py) | MERGE | named test | 5 | not determined |
 | [\`scripts/commentary_editorial_topology.py\`](../scripts/commentary_editorial_topology.py) | UNDECIDED | named test | 2 | not determined |
-| [\`scripts/commentary_intake.py\`](../scripts/commentary_intake.py) | KEEP_GENERIC | named test | 20 | intake |
+| [\`scripts/commentary_intake.py\`](../scripts/commentary_intake.py) | KEEP_GENERIC | named test | 19 | intake |
 | [\`scripts/commentary_intro_chapter_text_review.py\`](../scripts/commentary_intro_chapter_text_review.py) | UNDECIDED | named test | 2 | not determined |
 | [\`scripts/commentary_layout_census.py\`](../scripts/commentary_layout_census.py) | UNDECIDED | named test | 4 | not determined |
 | [\`scripts/commentary_literal_erratum_preflight.py\`](../scripts/commentary_literal_erratum_preflight.py) | UNDECIDED | named test | 4 | not determined |

@@ -945,7 +945,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "intake",
-      "static_reference_count": 20,
+      "static_reference_count": 19,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_andbible_jsword.py",
@@ -960,7 +960,6 @@
         "scripts/commentary_xiphos_dual_reader.py",
         "scripts/commentary_xml_witness.py",
         "scripts/tool_registry.py",
-        ".github/workflows/commentary-cross-edition-pilot.yml",
         ".github/workflows/commentary-intake.yml",
         "docs/COMMENTARY_7_STAGE_WORKFLOW.md",
         "docs/COMMENTARY_PIPELINE.md",
@@ -1108,8 +1107,8 @@
         "scripts/commentary_native_raw_inventory.py",
         "scripts/tool_registry.py",
         ".github/workflows/commentary-anchor-parity.yml",
-        ".github/workflows/commentary-cross-edition-pilot.yml",
         ".github/workflows/commentary-evidence.yml",
+        ".github/workflows/commentary-intake.yml",
         "docs/COMMENTARY_PIPELINE.md",
         "tests/test_commentary_stage_evidence.py",
         "tests/test_tool_registry.py"
@@ -6110,9 +6109,9 @@
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/commentary-anchor-parity.yml",
-        ".github/workflows/commentary-cross-edition-pilot.yml",
         ".github/workflows/commentary-editorial-section-scope.yml",
         ".github/workflows/commentary-evidence.yml",
+        ".github/workflows/commentary-intake.yml",
         ".github/workflows/commentary-native-raw-corpus.yml",
         ".github/workflows/commentary-private-text-compare.yml",
         "docs/evidence/mhcc-274/editorial-section-scope-audit.md"
