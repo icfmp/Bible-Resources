@@ -34,6 +34,8 @@ jobs:
       resources: ${{ steps.select.outputs.resources }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - name: Select exactly the modified commentary manifests
         id: select
         shell: bash
