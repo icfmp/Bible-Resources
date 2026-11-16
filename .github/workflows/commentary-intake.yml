@@ -111,6 +111,28 @@ jobs:
             --resource-id "$RESOURCE_ID" \
             --stage "$STAGE" \
             --report "${RUNNER_TEMP}/commentary-intake-report.json"
+      - name: Show bounded real diatheke sample evidence without revealing commentary text
+        if: env.STAGE != '1'
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          receipt = json.loads(
+              (Path(os.environ["RUNNER_TEMP"]) / "commentary-intake-report.json")
+              .read_text(encoding="utf-8"))
+          for sample in receipt.get("reader_samples", []):
+              original = sample["reference"]
+              assert re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z ]{0,40} [1-9][0-9]{0,2}:[1-9][0-9]{0,2}", original)
+              assert type(sample["bytes"]) is int and 0 <= sample["bytes"] <= 2000000
+              assert re.fullmatch(r"[0-9a-f]{64}", sample["sha256"])
+              assert type(sample["successful"]) is bool
+              print("Real pinned-stock diatheke reference/bytes/success/short-echo:",
+                    original, sample["bytes"], sample["successful"],
+                    sample["short_response_needs_entry_mapping_review"])
+          assert receipt["published"] is False
+          assert receipt["source_to_sword_comparison_performed"] is False
+          PY
       - name: Real native occupied-key inventory only for independently SHA-pinned source
         if: env.STAGE != '1'
         shell: bash
