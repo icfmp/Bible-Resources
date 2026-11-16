@@ -792,6 +792,12 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
                             "private_original_compiled_alias_verified":
                                 pilot.get("private_alias_candidate_complete_original_K_I_checks_pass")
                                 is True,
+                            "private_real_diatheke_candidate_available":
+                                pilot.get("private_diatheke_candidate_available") is True,
+                            "private_diatheke_first_verse_access_verified":
+                                pilot.get("private_actual_diatheke_alias_passed") is True,
+                            "private_diatheke_reference_sizes":
+                                pilot.get("private_diatheke_references", []),
                             "published": False,
                         })
                     observed["private_original_source_first_verse_index_alias_probes"] = {
