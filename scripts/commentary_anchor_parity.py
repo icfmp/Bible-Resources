@@ -491,7 +491,8 @@ def summarize_volume_anchor_results(volumes: list[dict]) -> dict:
     }
 
 
-def run(resource_id: str, inspector: Path, probes: tuple[str, ...]) -> dict:
+def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
+        *, raw_binary: Path | None = None) -> dict:
     manifest = load_manifest(resource_id)
     locations, is_collection = _xml_witness_locations(
         manifest.get("commentary_source"))
@@ -503,6 +504,8 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...]) -> dict:
         raise PilotError("Stock SWORD and each original XML volume must be SHA-256 pinned")
     if not inspector.is_file() or inspector.is_symlink():
         raise PilotError("Reviewed native commentary inspector executable unavailable")
+    if raw_binary is not None and (not raw_binary.is_file() or raw_binary.is_symlink()):
+        raise PilotError("Reviewed native raw original commentary reader unavailable")
 
     with tempfile.TemporaryDirectory(prefix="commentary-source-native-") as temp:
         root = Path(temp)
@@ -558,6 +561,7 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...]) -> dict:
             raise PilotError("Original stock KJV registry disagrees with pinned .conf")
 
         source_reports = []
+        unoccupied_original_units = []
         for number, xml_url, expected_xml in locations:
             xml_path = root / f"original-volume-{number}.xml"
             xml_receipt = fetch(xml_url, xml_path, "ccel")
@@ -565,12 +569,19 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...]) -> dict:
                 raise PilotError("Pinned original XML witness changed; refuse comparison")
             if xml_receipt["bytes"] > MAX_XML:
                 raise PilotError("Original XML exceeds source-audit safety bound")
-            comparison = compare_anchors(xml_path.read_bytes(), result.stdout,
+            source_xml = xml_path.read_bytes()
+            comparison = compare_anchors(source_xml, result.stdout,
                                          manifest["module_id"],
                                          probe_osis_keys=probes,
                                          native_registry=source_registry)
             if comparison["source_xml_sha256"] != xml_receipt["sha256"]:
                 raise PilotError("Original source bytes changed during readback")
+            if raw_binary is not None:
+                unoccupied_original_units.extend(_original_unoccupied_source_units(
+                    source_xml, volume=number,
+                    missing=comparison["bounded_unoccupied_start_references"],
+                    canonical_verses=source_registry["verse_keys"],
+                ))
             source_reports.append({
                 "volume": number,
                 "original_ccel_xml_sha256": xml_receipt["sha256"],
@@ -584,28 +595,85 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...]) -> dict:
                 "original_sword_conf_sha256": conf["conf_sha256"],
                 "source_and_sword_bytes_remain_temporary": True,
             })
-            return observed
-        comparison = source_reports[0]["anchor_diagnostic"]
-        comparison.update({
-            "resource_id": resource_id,
-            "stock_sword_archive_sha256": sword_receipt["sha256"],
-            "original_ccel_xml_sha256": source_reports[0]["original_ccel_xml_sha256"],
-            "original_sword_conf_sha256": conf["conf_sha256"],
-            "source_and_sword_bytes_remain_temporary": True,
-            "rights_release_and_derivative_approval": False,
-        })
-        return comparison
+        else:
+            observed = source_reports[0]["anchor_diagnostic"]
+            observed.update({
+                "resource_id": resource_id,
+                "stock_sword_archive_sha256": sword_receipt["sha256"],
+                "original_ccel_xml_sha256": source_reports[0]["original_ccel_xml_sha256"],
+                "original_sword_conf_sha256": conf["conf_sha256"],
+                "source_and_sword_bytes_remain_temporary": True,
+                "rights_release_and_derivative_approval": False,
+            })
+        if raw_binary is not None:
+            if len(unoccupied_original_units) > MAX_PRIVATE_MISSING_START_PROBES:
+                observed["original_unoccupied_start_prose_location"] = {
+                    "status": "more_than_reviewed_probe_budget_not_scanned",
+                    "valid_source_start_units": len(unoccupied_original_units),
+                    "not_proof_of_missing_authorial_text": True,
+                }
+            elif not unoccupied_original_units:
+                observed["original_unoccupied_start_prose_location"] = {
+                    "status": "no_canonically_valid_unoccupied_source_starts_to_scan",
+                    "original_source_or_sword_bytes_modified": False,
+                }
+            else:
+                locator = UnoccupiedSourceProseLocator(unoccupied_original_units)
+                env = dict(os.environ, SWORD_PATH=str(installed))
+                process = None
+                rows = []
+                try:
+                    process = subprocess.Popen(
+                        ["timeout", "360s", str(raw_binary), manifest["module_id"]],
+                        stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env=env)
+                    if process.stdout is None:
+                        raise PilotError("Private original stock raw stream not available")
+                    def inspect_one(kind, key, raw):
+                        rows.append((kind, key))
+                        locator.observe(kind, key, raw)
+                    raw_stats, _, _, _ = parse_native_raw_corpus(
+                        process.stdout, on_entry=inspect_one)
+                    process.stdout.close()
+                    if process.wait(timeout=15):
+                        raise PilotError("Original raw SWORD reader stopped before complete scan")
+                except BaseException:
+                    if process is not None and process.poll() is None:
+                        process.kill()
+                        process.wait()
+                    raise
+                crosscheck = private_crosscheck(
+                    result.stdout, manifest["module_id"], rows, raw_stats)
+                if crosscheck["native_versification"] != source_registry["versification"]:
+                    raise PilotError("Original raw SWORD verse registry changed")
+                if (manifest.get("native_raw_corpus_sha256")
+                        and raw_stats["all_native_raw_entries_ordered_sha256"]
+                           != manifest["native_raw_corpus_sha256"]):
+                    raise PilotError("Original pinned complete stock raw corpus changed")
+                observed["original_unoccupied_start_prose_location"] = {
+                    **locator.report(),
+                    "pinned_original_stock_raw_corpus_sha256":
+                        raw_stats["all_native_raw_entries_ordered_sha256"],
+                    "fully_crosschecked_original_native_corpus": True,
+                }
+        else:
+            observed["original_unoccupied_start_prose_location"] = {
+                "status": "raw_text_location_not_attempted",
+                "not_proof_of_missing_authorial_text": True,
+            }
+        return observed
 
 
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--resource-id", required=True)
     p.add_argument("--native-inspector", type=Path, required=True)
+    p.add_argument("--native-raw-binary", type=Path)
     p.add_argument("--probe-osis-key", action="append", default=[])
     p.add_argument("--report", type=Path, required=True)
     args = p.parse_args(argv)
     try:
-        report = run(args.resource_id, args.native_inspector, tuple(args.probe_osis_key))
+        report = run(args.resource_id, args.native_inspector, tuple(args.probe_osis_key),
+                     raw_binary=args.native_raw_binary)
         code = 0
     except (ValueError, OSError, RuntimeError, zipfile.BadZipFile) as exc:
         report = {
