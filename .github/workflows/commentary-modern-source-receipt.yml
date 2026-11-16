@@ -80,7 +80,7 @@ jobs:
             --module-id MHCC \
             --expected-corpus-sha256 \
             '2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e' \
-            --chapters Ruth.1 Ruth.2 Ruth.3 Ruth.4 Rom.3 Heb.7 \
+            --chapters Ruth.1 Ruth.2 Ruth.3 Ruth.4 Rom.3 Heb.7 2John.1 3John.1 \
             --report "${RUNNER_TEMP}/mhcc-modern-source-native-receipt.json"
           python - <<'PY'
           import json,os
@@ -98,6 +98,16 @@ jobs:
                     " occupied native verse keys / "+
                     str(len(x["native_introductions_not_assumed_to_be_exposition"]))+
                     " independently retained introduction keys")
+          for ch,x in r["chapters"].items():
+              for u in x["original_units"]:
+                  print("ORIGINAL_UNIT "+ch+" first_key="+u["first_key"]+
+                        " keys="+",".join(u["keys"])+
+                        " sha256="+u["source_unit_sha256"]+
+                        " markup="+json.dumps(u["markup"],sort_keys=True))
+              for u in x["native_introductions_not_assumed_to_be_exposition"]:
+                  print("ORIGINAL_INTRO "+ch+" key="+u["key"]+
+                        " sha256="+u["raw_sha256"]+
+                        " markup="+json.dumps(u["markup"],sort_keys=True))
           print("Full source-native gate PASS (not independent semantic or build acceptance)")
           PY
       - name: Upload metadata-only bounded audit receipt
