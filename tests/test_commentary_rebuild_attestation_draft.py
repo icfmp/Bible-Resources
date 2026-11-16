@@ -9,7 +9,7 @@ from tempfile import TemporaryDirectory
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from commentary_rebuild_attestation_draft import private_rebuild_attestation_draft
+from commentary_rebuild_attestation_draft import private_rebuild_attestation_draft, _native_map_digest
 from compiled_stock_commentary_proof import SUFFIXES
 from reviewed_compiled_commentary_rebuild import reviewed_rebuilt_commentary_errors
 
@@ -25,6 +25,7 @@ def receipt(data, digest):
         "actual_occupied_intro_entry_count": len(data["I"]),
         "actual_occupied_anonymous_top_entry_count": len(data["U"]),
         "all_native_raw_entries_ordered_sha256": digest,
+        "native_identity_map_sha256": _native_map_digest(data),
     }
 
 
