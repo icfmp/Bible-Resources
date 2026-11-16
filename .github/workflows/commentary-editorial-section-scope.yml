@@ -593,6 +593,36 @@ jobs:
           assert all(private_receipt[k] is False for k in (
               "actual_release_date_selected","actual_final_7_member_payload_committed",
               "publication_authorized","public_release_created","active_catalogue_changed"))
+          # Second real source/ZIP rehearsal uses this UTC preparation date,
+          # never the owner's eventual publication date by assumption.
+          from datetime import datetime, timezone, date
+          dated=revised["private_current_calendar_day_package_receipt"]
+          assert dated["status"]=="PRIVATE_REAL_CALENDAR_DAY_SEVEN_MEMBER_ZIP_ATTESTED_NOT_RELEASE"
+          assert dated["module_id"]=="MHCC"
+          assert dated["version"]=="0.1.1"
+          assert dated["exact_native_corpus_sha256"]==attestation["source_audit"]["candidate_native_corpus_sha256"]
+          assert dated["full_original_source_audit_sha256"]==attestation["source_audit_sha256"]
+          assert dated["only_about_and_sword_version_date_changed"] is True
+          assert dated["all_original_native_links_and_content_preserved"] is True
+          assert dated["package_size_bytes"]>0
+          assert len(dated["seven_member_sha256"])==7
+          assert dated["package_sha256"]!=rehearsal["zip_sha256"]
+          assert (date.fromisoformat(dated["utc_preparation_day_not_owner_approved_release_day"])
+                  == datetime.now(timezone.utc).date())
+          assert {k:v for k,v in dated["seven_member_sha256"].items()
+                  if k!="mods.d/mhcc.conf"}==private_receipt["exact_six_compiled_data_member_sha256"]
+          assert dated["seven_member_sha256"]["mods.d/mhcc.conf"]!=rehearsal["source_conf_sha256"]
+          assert all(dated[k] is False for k in (
+              "official_publication_date_selected","owner_release_authorized",
+              "payload_committed","catalogue_updated","zip_uploaded_or_distributed"))
+          print("Private current UTC-day 0.1.1 SWORD ZIP ready for editorial review:",
+                "day",dated["utc_preparation_day_not_owner_approved_release_day"],
+                "module",dated["module_id"],
+                "seven members",len(dated["seven_member_sha256"]),
+                "ZIP bytes",dated["package_size_bytes"],
+                "ZIP SHA-256",dated["package_sha256"],
+                "uploaded",dated["zip_uploaded_or_distributed"],
+                "published",dated["owner_release_authorized"])
           print("Pinned independent private MHCC six-member receipt: source/native/ZIP proofs exact; NOT PUBLIC")
           print("Real native audit to exact seven-member ZIP bridge:",
                 "original audit",package_proof["source_audit_sha256"],
