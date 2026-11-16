@@ -149,6 +149,36 @@ class OriginalRawNumberedTransportTests(unittest.TestCase):
         self.assertTrue(punctuation["normalized_whitespace_visible_unicode_equal"])
         self.assertFalse(punctuation["original_nondiv_text_and_tail_ownership_preserved"])
 
+    def test_empty_semantic_element_boundary_still_controls_text_tail_position(self):
+        # Both fragments have identical flattened words, identical XML element
+        # order/attributes and the same text owning paragraph. The previous
+        # owner-ID-only check could incorrectly certify both as equivalent.
+        before = b"<p>Before <hi type='q'/> after</p>"
+        after = b"<p>Before after<hi type='q'/></p>"
+        delta = classify_native_osis_roundtrip_delta(before, after)
+        self.assertEqual(delta["word_sequence_relation"], "EXACT_ORIGINAL_WORD_SEQUENCE")
+        self.assertTrue(delta["normalized_whitespace_visible_unicode_equal"])
+        self.assertTrue(delta["non_div_element_order_and_exact_attribute_values_preserved"])
+        self.assertFalse(delta["original_nondiv_text_and_tail_ownership_preserved"])
+        self.assertNotIn("Before", str(delta))
+        self.assertNotIn("after", str(delta))
+
+    def test_semantic_xml_nesting_cannot_move_original_reference_into_other_paragraph(self):
+        original = (
+            b'<p><reference osisRef="Gen.1.1">Gen 1:1</reference></p>'
+            b'<p> and context</p>'
+        )
+        moved = (
+            b"<p/>"
+            b'<p><reference osisRef="Gen.1.1">Gen 1:1</reference> and context</p>'
+        )
+        delta = classify_native_osis_roundtrip_delta(original, moved)
+        self.assertEqual(delta["word_sequence_relation"], "EXACT_ORIGINAL_WORD_SEQUENCE")
+        self.assertTrue(delta["normalized_whitespace_visible_unicode_equal"])
+        self.assertTrue(delta["non_div_element_order_and_exact_attribute_values_preserved"])
+        self.assertTrue(delta["reference_attribute_values_in_original_document_order_preserved"])
+        self.assertFalse(delta["original_nondiv_text_and_tail_ownership_preserved"])
+
     def test_compiler_div_wrappers_do_not_change_semantic_text_ownership(self):
         original = (
             b'<div type="original"><p>Hello '
