@@ -5,14 +5,14 @@
   "module_id": "Wesley",
   "title": "John Wesley's Notes on the Bible",
   "language": "en",
-  "version": "1.1",
+  "version": "2.0",
   "provider": "crosswire",
   "source_page_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=Wesley",
   "sword_zip_url": "https://crosswire.org/ftpmirror/pub/sword/packages/rawzip/Wesley.zip",
   "authorial_witness_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=Wesley",
   "authorial_witness_status": "The publisher description only; independent authored-edition source/text witness and edition equivalence NOT established.",
-  "reference_edition": "Wesley notes; CrossWire 1.1 (2001-11-28), attributed digital edition by Sulu Kelley and Bill Brown; precise written edition not independently checked.",
-  "archive_sha256": null,
+  "reference_edition": "Unresolved CrossWire catalogue listing 1.1 vs actual raw ZIP .conf 2.0; read-only technical pin only.",
+  "archive_sha256": "d9e2d98b11f6b9e62d448c29f76453d7c9a97dec6a3112c83045c9ce592ae24c",
   "sample_references": [
     "Gen 1:1",
     "Ps 23:1",
@@ -31,5 +31,15 @@
     "upstream_editorial_provenance": "CrossWire credits Sulu Kelley and Bill Brown and in-house markup",
     "edition_equivalence": "unverified",
     "no_licensed_source_text_imported": true
-  }
+  },
+  "source_archive_bytes": 2842885,
+  "provider_site_listed_version": "1.1",
+  "observed_compiled_conf_version": "2.0",
+  "observed_compiled_driver": "zCom4",
+  "version_discrepancy": "UNRESOLVED: CrossWire module information page lists 1.1 (2001-11-28), while the live downloaded official raw SWORD ZIP itself declares Version=2.0 and ModDrv=zCom4. Keep these separately; technical pinned native scan is NOT an independent editorial edition match, published version update or rights approval.",
+  "observation_receipts": [
+    "https://github.com/icfmp/Bible-Resources/actions/runs/43924646297",
+    "https://github.com/icfmp/Bible-Resources/actions/runs/43924893157",
+    "https://github.com/icfmp/Bible-Resources/actions/runs/43924948939"
+  ]
 }
