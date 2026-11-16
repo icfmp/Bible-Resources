@@ -2259,8 +2259,21 @@ def main(argv=None) -> int:
         )
         code = 0
     except (OSError, RuntimeError, ValueError, zipfile.BadZipFile, RawCorpusError) as exc:
+        # Only predeclared, source-neutral failure phrases may leave the
+        # ephemeral runner; raw exception messages can include source text.
+        public_safe = {
+            "Original commentary block-ownership census incomplete",
+            "Full original layout census did not reconcile with native source",
+            "Original source visible word ownership mismatch",
+            "Original commentary layout XML is unparseable",
+            "Unbounded original layout element count",
+            "Unbounded distinct original commentary layout bodies",
+            "Unbounded original native commentary entries",
+        }
+        reason = str(exc) if str(exc) in public_safe else "OTHER_OR_PRIVATE_ERROR"
         result = {
             "status": "BLOCKED", "reason_class": type(exc).__name__,
+            "reason_fixed_code": reason,
             "native_scan_completed": False, "original_sword_changed": False
         }
         code = 1
@@ -2268,6 +2281,7 @@ def main(argv=None) -> int:
     args.report.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n",
                            encoding="utf-8")
     print("Commentary editorial section triage:", result["status"],
+          "fixed-code", result.get("reason_fixed_code", "NONE"),
           "(metadata-only report; original text never logged)")
     return code
 
