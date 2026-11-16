@@ -1,11 +1,10 @@
 name: Finalize authorized immutable Darby 2024 0.1.1 release
 
+# Historical Darby release/staging acceptance workflow (immutable 0.1.0/0.1.1).
+# The current shared pages.yml publisher owns all future approved releases.
+# Retain this workflow's exact source for deliberate manual archive replay;
+# never re-trigger old release logic from unrelated main or PR changes.
 on:
-  push:
-    branches: [main]
-    paths:
-      - "modules/darby-jnd-2024/RELEASE_PROVENANCE.json"
-      - ".github/workflows/finalize-darby-0.1.1.yml"
   workflow_dispatch:
 
 permissions:

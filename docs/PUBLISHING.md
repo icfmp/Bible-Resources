@@ -106,6 +106,20 @@ Reviewers must also inspect a real reader's actual source/heading layout.
 A test pass is not legal approval, a build is not publication, and a
 published resource may still expose an application-only display issue.
 
+### Historical release orchestrators are not current publishers
+
+The four Darby-specific historical workflows (`release-darby-jnd-2024.yml`,
+`stage-darby-0.1.1.yml`, `finalize-darby-0.1.1.yml` and
+`finalize-darby-release.yml`) are retained for independent
+release-evidence replay only; they no longer trigger on `main`, temporary
+staging branches or pull requests. This prevents one original source
+correction from activating two competing release publication paths.
+Historical GitHub Release assets, original authorizations, logs and tags
+remain unchanged. These workflows are **not** an alternative to
+`pages.yml`, which is the single current Release-before-Pages publisher.
+A deliberate manual historical workflow run is still bound by its original
+fail-closed authorization rules.
+
 ### Reusable commands and evidence status
 
 Use [`scripts/commentary_intake.py`](../scripts/commentary_intake.py) for

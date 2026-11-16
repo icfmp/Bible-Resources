@@ -1,12 +1,10 @@
 name: Stage exact approved Darby 0.1.1 candidate for protected release PR
 
+# Historical Darby release/staging acceptance workflow (immutable 0.1.0/0.1.1).
+# The current shared pages.yml publisher owns all future approved releases.
+# Retain this workflow's exact source for deliberate manual archive replay;
+# never re-trigger old release logic from unrelated main or PR changes.
 on:
-  push:
-    branches: [release/darby-2024-0.1.1-stage]
-    paths:
-      - ".github/workflows/stage-darby-0.1.1.yml"
-      - "scripts/stage_darby_011_release.py"
-      - "config/darby-0.1.1-release-authorization.json"
   workflow_dispatch:
 
 permissions:
