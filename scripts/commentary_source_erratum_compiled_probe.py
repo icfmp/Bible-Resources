@@ -116,7 +116,8 @@ def _original_citation_endpoints(raw: bytes, *, first: str,
 def _private_changed_reference_xiphos(
         install_root: Path, module_id: str,
         revised_native_K: dict[str, bytes], original_master_key: str,
-        original_section_control_key: str, original_reviewed_alias_key: str) -> dict:
+        original_section_control_key: str, original_reviewed_alias_key: str,
+        additional_sample_keys: tuple[str, ...] = ()) -> dict:
     """Read real corrected source and untouched controls in actual Xiphos GTK."""
     if any(key not in revised_native_K for key in
            (original_master_key, original_section_control_key, original_reviewed_alias_key)):
@@ -125,7 +126,13 @@ def _private_changed_reference_xiphos(
     if bible["module_id"] != BIBLE_MODULE:
         raise ValueError("Independent vetted Bible not available to real Xiphos")
     comparisons = {}
-    for key in (original_master_key, original_section_control_key, original_reviewed_alias_key):
+    required = tuple(dict.fromkeys((
+        original_master_key, original_section_control_key,
+        original_reviewed_alias_key, *additional_sample_keys
+    )))
+    if len(required) > 8:
+        raise ValueError("Unbounded private source-change Xiphos examples")
+    for key in required:
         book, chapter, verse = key.split(".")
         passage = f"{book} {chapter}:{verse}"
         result, commentary_plain = query(
@@ -149,15 +156,16 @@ def _private_changed_reference_xiphos(
         install_root, comparisons, seconds=6, commentary_module_id=module_id)
     if (not observed["real_xiphos_executable_started_and_visible"]
             or not observed["actual_passage_commands_accepted"]
-            or observed["independent_gui_commentary_excerpt_match_count"] != 3):
+            or observed["independent_gui_commentary_excerpt_match_count"] != len(required)):
         raise ValueError("Xiphos could not show corrected reference and unchanged controls")
     return {
         "status": "PRIVATE_REVISED_ZCOM_REAL_XIPHOS_THREE_PASSAGES_VERIFIED",
         "corrected_reference_sample_key": original_master_key,
         "different_original_section_sample_key": original_section_control_key,
         "index_alias_sample_key": original_reviewed_alias_key,
-        "independent_real_reader_sample_count": 3,
-        "independent_real_reader_clipboard_matches": 3,
+        "independent_real_reader_sample_count": len(required),
+        "independent_real_reader_clipboard_matches": len(required),
+        "additional_prose_source_sample_keys": list(additional_sample_keys),
         "actual_xiphos_gui_displayed": True,
         "source_text_or_screenshot_logged": False,
         "published": False,
@@ -410,7 +418,10 @@ def probe_private_compiled_source_erratum(
     alias_key = sorted(reviewed_aliases)[0]
     xiphos = _private_changed_reference_xiphos(
         install_root, curated_module_id, revised_compiled["K"],
-        original_master_key, review_control_key, alias_key
+        original_master_key, review_control_key, alias_key,
+        additional_sample_keys=tuple(
+            receipt["original_native_entry"] for receipt in prose_receipts
+        )
     )
     return {
         "status": "PRIVATE_SOURCE_EDITED_SWORD_ZCOM_CANDIDATE_FULL_PARITY_NOT_PUBLICATION",
