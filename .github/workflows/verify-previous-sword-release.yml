@@ -6,6 +6,8 @@ on:
       - '.github/workflows/verify-previous-sword-release.yml'
       - 'scripts/publish_reviewed_release.py'
       - 'config/release-plans/mhcc-0.1.0.json'
+      - 'config/release-plans/mhcc-0.1.1.json'
+      - 'modules/mhcc-crosswire/**'
   workflow_dispatch:
 
 permissions:
@@ -17,7 +19,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Independently download and hash the published prior SWORD ZIP
+      - name: Independently download and hash the immutable 0.1.0 ZIP
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -29,29 +31,35 @@ jobs:
           import json
           import os
           from pathlib import Path
-          import re
           import sys
 
           sys.path.insert(0, "scripts")
           from publish_reviewed_release import verify_historical_release
 
-          plan = json.loads(Path("config/release-plans/mhcc-0.1.0.json").read_text(encoding="utf-8"))
-          if (plan.get("module_id") != "mhcc-crosswire"
-                  or plan.get("sword_id") != "BRMHCC"
-                  or plan.get("version") != "0.1.0"
-                  or not re.fullmatch(r"mhcc-0\.1\.0", plan.get("tag", ""))
-                  or not re.fullmatch(r"BRMHCC-0\.1\.0\.zip", plan.get("zip_name", ""))
-                  or plan.get("package_sha256") != "0faf4376b6b97093ecb94f306886c24d3030ab1f5e194472ad908dd73921f9c0"
-                  or plan.get("package_size_bytes") != 1772960):
-              raise ValueError("Previous release plan identity or immutable checksum is invalid")
-          verify_historical_release(
-              {
-                  "tag": plan["tag"],
-                  "asset_name": plan["zip_name"],
-                  "release_sha256": plan["package_sha256"],
-                  "release_size_bytes": plan["package_size_bytes"],
-              },
-              repository=os.environ["GH_REPO"],
-          )
-          print("Prior published 0.1.0 asset verified against the existing approved release plan; no publication made")
+          # Frozen independently of the single ACTIVE release plan, which
+          # must disappear when the catalogue advances to version 0.1.1.
+          old = {
+              "tag": "mhcc-0.1.0",
+              "asset_name": "BRMHCC-0.1.0.zip",
+              "release_sha256": "0faf4376b6b97093ecb94f306886c24d3030ab1f5e194472ad908dd73921f9c0",
+              "release_size_bytes": 1772960,
+          }
+          prior_plan = Path("config/release-plans/mhcc-0.1.0.json")
+          if prior_plan.is_symlink():
+              raise ValueError("Original release plan cannot be a symlink")
+          if prior_plan.exists():
+              plan = json.loads(prior_plan.read_text(encoding="utf-8"))
+              if not isinstance(plan, dict) or any((
+                  plan.get("module_id") != "mhcc-crosswire",
+                  plan.get("sword_id") != "BRMHCC",
+                  plan.get("version") != "0.1.0",
+                  plan.get("tag") != old["tag"],
+                  plan.get("zip_name") != old["asset_name"],
+                  plan.get("package_sha256") != old["release_sha256"],
+                  plan.get("package_size_bytes") != old["release_size_bytes"],
+              )):
+                  raise ValueError("Active old plan does not match frozen rollback evidence")
+          # Never fetch the digest from mutable new-version metadata.
+          verify_historical_release(old, repository=os.environ["GH_REPO"])
+          print("Immutable 0.1.0 GitHub ZIP bytes verified; no publication or catalogue write")
           PY
