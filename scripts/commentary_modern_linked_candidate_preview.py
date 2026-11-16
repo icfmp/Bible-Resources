@@ -159,9 +159,11 @@ def build_verified_preview(*, root: Path, source_map: dict, expected_refs: dict,
     intro=read_book_intro_candidate(candidate_book_intro,book=book_code,
         source_zip_sha=source_map["published_zip_sha256"],
         source_corpus_sha=source_map["verified_entire_native_corpus_sha256"])
+    # A book-level annotateRef=Gen covers the *whole* book for a commentary
+    # compiler and can shadow every numbered section. A book introduction is
+    # its own child under the book container, not a ranged commentary annotation.
     node=ET.Element(f"{{{NS}}}div",{
-        "type":"introduction","resp":"BibleResourcesModernEditorial",
-        "annotateType":"commentary","annotateRef":book_code})
+        "type":"introduction","resp":"BibleResourcesModernEditorial"})
     ET.SubElement(node,f"{{{NS}}}title",{
         "type":"main","resp":"BibleResourcesModernEditorial"}).text=book_code+" — Book introduction"
     for paragraph in intro:
