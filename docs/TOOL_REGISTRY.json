@@ -2320,14 +2320,14 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "high",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [],
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/commentary_text_delta.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain stable verified interface; extend test fixtures.",
       "purpose_first_line": "PRIVATE, source-neutral lexical difference diagnostics for commentary audits.",
       "python_imports": [
         "__future__",
@@ -2338,10 +2338,10 @@
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
       "sha256_at_inventory": "8213a5309cd6433f1668d1f28c6776c4dad29ccb66c8c4cb7c2a0fef30a19145",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 10,
+      "static_reference_count": 12,
       "static_references": [
         "scripts/commentary_chapter_cross_slot.py",
         "scripts/commentary_chapter_neighbors.py",
@@ -2351,8 +2351,10 @@
         "scripts/commentary_nonlink_words.py",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_stock_prefix_topology.py",
+        "scripts/tool_registry.py",
         "tests/test_commentary_nonlink_word_alignment.py",
-        "tests/test_commentary_text_delta.py"
+        "tests/test_commentary_text_delta.py",
+        "tests/test_tool_registry.py"
       ]
     },
     {
@@ -3089,8 +3091,8 @@
       ]
     },
     {
-      "classification": "GENERALIZE",
-      "confidence": "medium",
+      "classification": "HISTORICAL/ARCHIVE",
+      "confidence": "high",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "zText",
@@ -3099,8 +3101,8 @@
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/materialize_attested_ztext_release.py",
-      "proposed_action": "Characterize output/provenance and historical callers; extract into reusable code without changing receipts.",
-      "purpose_first_line": "Materialize an already source-audited, owner-approved zText release.",
+      "proposed_action": "Retain runnable historical evidence; extract shared algorithms only after byte-equivalence tests.",
+      "purpose_first_line": "Historical Darby 0.1.0 zText release adapter, retained for replay.",
       "python_imports": [
         "__future__",
         "argparse",
@@ -3117,14 +3119,16 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "38c870730e88ab8a36f81bb9b75f198a36420d332f444e0e6a25c4d150700c14",
+      "sha256_at_inventory": "9b0951bac490b0af70c806913cb0eccb952ea3079e10da4c547cf460f5a3fc0a",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 2,
+      "static_reference_count": 4,
       "static_references": [
+        "scripts/tool_registry.py",
         ".github/workflows/release-darby-jnd-2024.yml",
-        "tests/test_materialize_attested_ztext_release.py"
+        "tests/test_materialize_attested_ztext_release.py",
+        "tests/test_tool_registry.py"
       ]
     },
     {
@@ -4068,8 +4072,8 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
+      "classification": "KEEP_GENERIC",
+      "confidence": "high",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "RawText",
@@ -4079,7 +4083,7 @@
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/promote_sword_preview.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
+      "proposed_action": "Retain stable verified interface; extend test fixtures.",
       "purpose_first_line": "Promote a fully verified private SWORD trial ZIP without changing its data.",
       "python_imports": [
         "__future__",
@@ -4094,19 +4098,21 @@
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
       "sha256_at_inventory": "47507d9aa626cb13fce1a5c963efff03827b5bf8d1e9c0d69927047afeb784a0",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 8,
+      "static_reference_count": 10,
       "static_references": [
         "scripts/commentary_stock_candidate.py",
         "scripts/materialize_attested_ztext_release.py",
         "scripts/prepare_darby_011_private_release_candidate.py",
+        "scripts/tool_registry.py",
         ".github/workflows/commentary-zcom-private-candidate.yml",
         ".github/workflows/lsg-first-release.yml",
         ".github/workflows/private-sword-promotion-proof.yml",
         "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
-        "tests/test_promote_sword_preview.py"
+        "tests/test_promote_sword_preview.py",
+        "tests/test_tool_registry.py"
       ]
     },
     {
@@ -4585,8 +4591,9 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 4,
+      "static_reference_count": 5,
       "static_references": [
+        "scripts/materialize_attested_ztext_release.py",
         "scripts/tool_registry.py",
         "docs/COMMENTARY_PIPELINE.md",
         "tests/test_release_preflight.py",
@@ -6393,8 +6400,8 @@
       ]
     },
     {
-      "classification": "GENERALIZE",
-      "confidence": "medium",
+      "classification": "KEEP_GENERIC",
+      "confidence": "high",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "RawText",
@@ -6411,7 +6418,7 @@
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/tool_registry.py",
-      "proposed_action": "Characterize output/provenance and historical callers; extract into reusable code without changing receipts.",
+      "proposed_action": "Retain stable verified interface; extend test fixtures.",
       "purpose_first_line": "Generate a source-bound, metadata-only inventory of all tracked tool scripts.",
       "python_imports": [
         "__future__",
@@ -6431,8 +6438,8 @@
         "webview"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "ea9038e76921c8f1783bdc065901f09e5c49188dd5dc1c9910aed47b6b2a9c20",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "sha256_at_inventory": "8b1fc4cb3a0b7ce5c85dd8e3318715761ab6481c280ac79c7e8c1fc14e77fef7",
+      "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
       "static_reference_count": 2,

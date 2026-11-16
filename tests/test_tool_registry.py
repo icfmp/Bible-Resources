@@ -42,6 +42,19 @@ class ScriptInventoryTests(unittest.TestCase):
         self.assertTrue(any("workflow" in ref
                             for ref in entries["validate.py"]["static_references"]))
 
+    def test_proven_generic_tools_and_historical_darby_adapter_are_distinct(self):
+        entries = {v["path"].rsplit("/", 1)[-1]: v
+                   for v in self.result["files"]}
+        for name in ("promote_sword_preview.py", "commentary_text_delta.py"):
+            with self.subTest(shared=name):
+                self.assertEqual(entries[name]["classification"], "KEEP_GENERIC")
+                self.assertTrue(entries[name]["has_direct_tests_by_filename"])
+        historic = entries["materialize_attested_ztext_release.py"]
+        self.assertEqual(historic["classification"], "HISTORICAL/ARCHIVE")
+        self.assertIn("Darby", historic["purpose_first_line"])
+        self.assertIn("retain", historic["proposed_action"].lower())
+        self.assertIn("historical", historic["proposed_action"].lower())
+
     def test_registry_has_no_promoted_editorial_or_publication_claims(self):
         for entry in self.result["files"]:
             self.assertEqual(entry["release_approval"],
