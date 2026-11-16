@@ -22,7 +22,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Test source-native and draft-coverage guards on synthetic fixtures
-        run: python -m unittest tests/test_commentary_modern_source_receipt.py tests/test_commentary_modern_draft_guard.py -v
+        run: python -m unittest tests/test_commentary_modern_source_receipt.py tests/test_commentary_modern_draft_guard.py tests/test_commentary_modern_draft_osis_preview.py -v
       - name: Install real SWORD source reader
         shell: bash
         run: |
@@ -30,7 +30,7 @@ jobs:
           timeout 90s sudo apt-get -o Acquire::Retries=0 \
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update
           timeout 90s sudo apt-get -o Acquire::Retries=0 \
-            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev libsword-utils diatheke
           g++ -std=c++17 -O2 -I/usr/include/sword \
             scripts/sword_native_commentary_raw_corpus.cpp \
             -o "${RUNNER_TEMP}/commentary-modern-source-raw" -lsword
@@ -118,6 +118,78 @@ jobs:
             --root work/mhcc-modern \
             --native-map work/mhcc-modern/evidence/MHCC_0.1.1_24_CHAPTER_NATIVE_MAP.json \
             --report "${RUNNER_TEMP}/mhcc-modern-draft-coverage-report.json"
+      - name: Compile disposable annotated OSIS preview and read it with a real SWORD engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_modern_draft_osis_preview.py \
+            --root work/mhcc-modern \
+            --native-map work/mhcc-modern/evidence/MHCC_0.1.1_24_CHAPTER_NATIVE_MAP.json \
+            --osis "${RUNNER_TEMP}/mhcc-modern-preview.osis.xml" \
+            --report "${RUNNER_TEMP}/mhcc-modern-preview-structure.json" \
+            --temp-module-id MHCCWORK
+          mkdir -p "${RUNNER_TEMP}/mhcc-work-sword/mods.d"
+          mkdir -p "${RUNNER_TEMP}/mhcc-work-sword/modules/comments/zcom/mhccwork"
+          osis2mod "${RUNNER_TEMP}/mhcc-work-sword/modules/comments/zcom/mhccwork" \
+            "${RUNNER_TEMP}/mhcc-modern-preview.osis.xml" -z z -b 3 \
+            > "${RUNNER_TEMP}/mhcc-osis2mod-build.log" 2>&1
+          cat > "${RUNNER_TEMP}/mhcc-work-sword/mods.d/mhccwork.conf" <<'EOF'
+          [MHCCWORK]
+          Description=Private unvalidated temporary MHCC Modern English layout preview
+          DataPath=./modules/comments/zcom/mhccwork/
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          Lang=en
+          Versification=KJV
+          SourceType=OSIS
+          DistributionLicense=Private
+          EOF
+          SWORD_PATH="${RUNNER_TEMP}/mhcc-work-sword" \
+            diatheke -b MHCCWORK -f OSIS -k "Psalm 134:1" \
+            > "${RUNNER_TEMP}/mhcc-work-rendered-sample.txt"
+          python - <<'PY'
+          import json,os,subprocess,sys
+          from pathlib import Path
+          sys.path.insert(0,"scripts")
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          root=Path(os.environ["RUNNER_TEMP"])
+          temp_module=root/"mhcc-work-sword"
+          meta=json.loads((root/"mhcc-modern-preview-structure.json").read_text())
+          assert meta["status"]=="TECHNICAL_ONLY_UNVALIDATED_OSIS_PREVIEW"
+          assert meta["modern_chapter_count"]==24
+          assert meta["annotated_commentary_sections"]==54
+          assert not meta["original_inline_reference_or_note_fidelity_approved"]
+          actual_text=(root/"mhcc-work-rendered-sample.txt").read_text()
+          assert "stir ourselves" in actual_text or "give glory to God" in actual_text, (
+              "Real SWORD reader did not return the expected Psalm 134 prose")
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str(temp_module.resolve())
+          p=subprocess.Popen([str(root/"commentary-modern-source-raw"),"MHCCWORK"],
+                             env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+          try:
+              assert p.stdout
+              original_keys=set()
+              def on_entry(kind,ref,raw):
+                  if kind=="K":
+                      original_keys.add(ref)
+              result,*_=parse_native_raw_corpus(p.stdout,on_entry=on_entry)
+              p.stdout.close()
+              assert p.wait(timeout=25)==0
+          finally:
+              if p.poll() is None:
+                  p.kill()
+                  p.wait()
+          ledger=json.loads(Path("work/mhcc-modern/evidence/MHCC_0.1.1_24_CHAPTER_NATIVE_MAP.json").read_text())
+          expected=set(k for chapter in ledger["chapters"].values()
+                         for unit in chapter["units"] for k in unit["native_keys"])
+          assert original_keys==expected, (
+              "Compiled temporary commentary changed the original chapter/section K-key scope")
+          assert result["actual_occupied_numbered_entry_count"]==254
+          print("DISPOSABLE OSIS SWORD PREVIEW PASS: 24 chapters, 54 source anchors, "
+                "254 exact numbered keys, real diatheke reading, "
+                "no semantic or source-reference acceptance; no release")
+          PY
       - name: Upload metadata-only bounded audit receipt
         if: always()
         uses: actions/upload-artifact@v4
@@ -126,5 +198,6 @@ jobs:
           path: |
             ${{ runner.temp }}/mhcc-modern-source-native-receipt.json
             ${{ runner.temp }}/mhcc-modern-draft-coverage-report.json
+            ${{ runner.temp }}/mhcc-modern-preview-structure.json
           if-no-files-found: ignore
           retention-days: 60
