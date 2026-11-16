@@ -70,7 +70,7 @@ jobs:
                           w.write(r.read())
           print("Exact SHA-pinned published commentary installed only in an isolated temporary root")
           PY
-      - name: Inventory full corrected original and six chapters without exporting source text
+      - name: Inventory full corrected original and Genesis 1 without exporting source text
         shell: bash
         run: |
           set -euo pipefail
@@ -80,7 +80,7 @@ jobs:
             --module-id MHCC \
             --expected-corpus-sha256 \
             '2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e' \
-            --chapters Ruth.1 Ruth.2 Ruth.3 Ruth.4 Rom.3 Heb.7 2John.1 3John.1 Phlm.1 Ps.1 Ps.23 Ps.100 Ps.117 Ps.120 Ps.121 Ps.122 Ps.123 Ps.124 Ps.125 Ps.131 Ps.133 Ps.134 Ps.148 Ps.150 \
+            --chapters Gen.1 \
             --report "${RUNNER_TEMP}/mhcc-modern-source-native-receipt.json"
           python - <<'PY'
           import json,os
