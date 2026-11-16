@@ -732,10 +732,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
         "scripts/commentary_private_text_compare.py",
-        ".github/workflows/commentary-private-text-compare.yml",
         "tests/test_commentary_chapter_cross_slot.py"
       ]
     },
@@ -767,10 +766,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 5,
       "static_references": [
         "scripts/commentary_private_text_compare.py",
-        ".github/workflows/commentary-private-text-compare.yml",
         "tests/test_commentary_chapter_cross_slot.py",
         "tests/test_commentary_chapter_neighbors.py",
         "tests/test_commentary_chapter_p_boundaries.py",
@@ -802,10 +800,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
         "scripts/commentary_private_text_compare.py",
-        ".github/workflows/commentary-private-text-compare.yml",
         "tests/test_commentary_chapter_p_boundaries.py"
       ]
     },
@@ -834,11 +831,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/commentary_chapter_p_boundaries.py",
         "scripts/commentary_private_text_compare.py",
-        ".github/workflows/commentary-private-text-compare.yml",
         "tests/test_commentary_chapter_paragraph_overlap.py"
       ]
     },
@@ -869,14 +865,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 7,
+      "static_reference_count": 5,
       "static_references": [
         "scripts/commentary_chapter_p_boundaries.py",
         "scripts/commentary_reference_cross_slot.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_unresolved_lexical_triage.py",
-        ".github/workflows/commentary-editorial-section-scope.yml",
-        ".github/workflows/commentary-private-text-compare.yml",
         "tests/test_commentary_chapter_ref_labels.py"
       ]
     },
@@ -905,10 +899,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
         "scripts/commentary_section_scope_audit.py",
-        ".github/workflows/commentary-editorial-section-scope.yml",
         "tests/test_commentary_editorial_topology.py"
       ]
     },
@@ -1002,10 +995,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
         "scripts/commentary_section_scope_audit.py",
-        ".github/workflows/commentary-editorial-section-scope.yml",
         "tests/test_commentary_intro_chapter_text_review.py"
       ]
     },
@@ -1032,11 +1024,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/commentary_paragraph_witness_probe.py",
         "scripts/commentary_section_scope_audit.py",
-        ".github/workflows/commentary-editorial-section-scope.yml",
         "docs/evidence/mhcc-274/edition-first-layout-sweep-2026-11-16.md",
         "tests/test_commentary_layout_census.py"
       ]
@@ -1065,11 +1056,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_source_erratum_compiled_probe.py",
-        ".github/workflows/commentary-editorial-section-scope.yml",
         "docs/evidence/mhcc-274/editorial-section-scope-audit.md",
         "tests/test_commentary_literal_erratum_preflight.py"
       ]
@@ -1165,7 +1155,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 12,
+      "static_reference_count": 11,
       "static_references": [
         "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_private_text_compare.py",
@@ -1176,7 +1166,6 @@
         "scripts/commentary_xiphos_dual_reader.py",
         "scripts/tool_registry.py",
         ".github/workflows/commentary-native-raw-corpus.yml",
-        ".github/workflows/commentary-private-text-compare.yml",
         "docs/COMMENTARY_PIPELINE.md",
         "tests/test_commentary_native_raw_inventory.py"
       ]
@@ -1208,10 +1197,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/commentary_section_scope_audit.py",
-        ".github/workflows/commentary-editorial-section-scope.yml",
         "docs/COMMENTARY_POLICY.md",
         "docs/evidence/mhcc-274/editorial-section-scope-audit.md",
         "tests/test_commentary_navigation_link_plan.py"
@@ -1244,10 +1232,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
         "scripts/commentary_private_text_compare.py",
-        ".github/workflows/commentary-private-text-compare.yml",
         "tests/test_commentary_near_prose_unicode_review.py"
       ]
     },
@@ -1271,7 +1258,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 10,
+      "static_reference_count": 9,
       "static_references": [
         "scripts/commentary_intro_chapter_text_review.py",
         "scripts/commentary_near_prose_unicode_review.py",
@@ -1281,7 +1268,6 @@
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_shared_raw_source_units.py",
         "scripts/commentary_unresolved_lexical_triage.py",
-        ".github/workflows/commentary-private-text-compare.yml",
         "tests/test_commentary_nonlink_word_alignment.py"
       ]
     },
@@ -1308,10 +1294,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
         "scripts/commentary_unresolved_lexical_triage.py",
-        ".github/workflows/commentary-private-text-compare.yml",
         "tests/test_commentary_nonlink_words.py"
       ]
     },
@@ -1344,11 +1329,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/commentary_bookcode_repair_receipt_guard.py",
         "scripts/commentary_private_text_compare.py",
-        ".github/workflows/commentary-private-text-compare.yml",
         "tests/test_commentary_original_bookcode_repair.py"
       ]
     },
@@ -1377,10 +1361,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
         "scripts/commentary_private_text_compare.py",
-        ".github/workflows/commentary-private-text-compare.yml",
         "tests/test_commentary_original_div1_book_consistency.py"
       ]
     },
@@ -1414,10 +1397,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
         "scripts/commentary_section_scope_audit.py",
-        ".github/workflows/commentary-editorial-section-scope.yml",
         "tests/test_commentary_osis_intro_transport_probe.py"
       ]
     },
@@ -1460,11 +1442,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_source_erratum_compiled_probe.py",
-        ".github/workflows/commentary-editorial-section-scope.yml",
         "tests/test_commentary_osis_mixed_transport_probe.py"
       ]
     },
@@ -1493,10 +1474,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
         "scripts/commentary_section_scope_audit.py",
-        ".github/workflows/commentary-editorial-section-scope.yml",
         "tests/test_commentary_osis_rebuild_preflight.py"
       ]
     },
@@ -1532,13 +1512,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 7,
+      "static_reference_count": 6,
       "static_references": [
         "scripts/commentary_osis_intro_transport_probe.py",
         "scripts/commentary_osis_mixed_transport_probe.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_source_erratum_compiled_probe.py",
-        ".github/workflows/commentary-editorial-section-scope.yml",
         "docs/evidence/mhcc-274/original-osis-transport-preflight.md",
         "tests/test_commentary_osis_transport_probe.py"
       ]
@@ -1569,10 +1548,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/commentary_section_scope_audit.py",
-        ".github/workflows/commentary-editorial-section-scope.yml",
         "docs/evidence/mhcc-274/paragraph-witness-pilot-2026-11-16.md",
         "tests/test_commentary_paragraph_witness_probe.py"
       ]
@@ -1720,11 +1698,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_shared_raw_source_units.py",
-        ".github/workflows/commentary-private-text-compare.yml",
         "tests/test_commentary_prose_cross_slot.py"
       ]
     },
@@ -1758,10 +1735,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/commentary_source_erratum_compiled_probe.py",
-        ".github/workflows/commentary-editorial-section-scope.yml",
         "docs/evidence/mhcc-274/publication-provenance-readiness.md",
         "tests/test_commentary_public_metadata_preflight.py"
       ]
@@ -1792,11 +1768,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_source_erratum_compiled_probe.py",
-        ".github/workflows/commentary-editorial-section-scope.yml",
         "tests/test_commentary_rebuild_attestation_draft.py"
       ]
     },
@@ -1825,12 +1800,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 5,
       "static_references": [
         "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_xiphos_dual_reader.py",
-        ".github/workflows/commentary-private-text-compare.yml",
         ".github/workflows/commentary-xiphos-dual-reader.yml",
         "tests/test_commentary_reference_cross_slot.py"
       ]
@@ -1860,12 +1834,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 5,
       "static_references": [
         "scripts/commentary_literal_erratum_preflight.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_source_erratum_compiled_probe.py",
-        ".github/workflows/commentary-editorial-section-scope.yml",
         "docs/evidence/mhcc-274/editorial-section-scope-audit.md",
         "tests/test_commentary_reference_registry_triage.py"
       ]
@@ -1970,10 +1943,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
         "scripts/commentary_private_text_compare.py",
-        ".github/workflows/commentary-private-text-compare.yml",
         "tests/test_commentary_shared_raw_source_units.py"
       ]
     },
@@ -2006,13 +1978,12 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 5,
       "static_references": [
         "scripts/commentary_original_bookcode_repair.py",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_source_identity_lexical_gate.py",
-        ".github/workflows/commentary-private-text-compare.yml",
         "tests/test_commentary_source_english_osis_alias.py"
       ]
     },
@@ -2057,10 +2028,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
         "scripts/commentary_section_scope_audit.py",
-        ".github/workflows/commentary-editorial-section-scope.yml",
         "tests/test_commentary_source_erratum_compiled_probe.py"
       ]
     },
@@ -2091,10 +2061,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 2,
       "static_references": [
         "scripts/commentary_private_text_compare.py",
-        ".github/workflows/commentary-private-text-compare.yml",
         "tests/test_commentary_source_identity_lexical_gate.py"
       ]
     },
@@ -2124,10 +2093,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 3,
       "static_references": [
         "scripts/commentary_private_text_compare.py",
-        ".github/workflows/commentary-private-text-compare.yml",
         "tests/test_commentary_shared_raw_source_units.py",
         "tests/test_commentary_source_native_boundaries.py"
       ]
@@ -2261,12 +2229,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 7,
+      "static_reference_count": 6,
       "static_references": [
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_unresolved_lexical_triage.py",
-        ".github/workflows/commentary-private-text-compare.yml",
         "tests/test_commentary_prefixed_suffix.py",
         "tests/test_commentary_stock_prefix_topology.py",
         "tests/test_commentary_stock_source_context.py"
@@ -2370,7 +2337,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 8,
+      "static_reference_count": 7,
       "static_references": [
         "scripts/commentary_chapter_cross_slot.py",
         "scripts/commentary_chapter_neighbors.py",
@@ -2378,7 +2345,6 @@
         "scripts/commentary_nonlink_words.py",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_stock_prefix_topology.py",
-        ".github/workflows/commentary-private-text-compare.yml",
         "tests/test_commentary_text_delta.py"
       ]
     },
@@ -2443,14 +2409,13 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 7,
+      "static_reference_count": 6,
       "static_references": [
         "scripts/commentary_near_prose_unicode_review.py",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_prose_cross_slot.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_shared_raw_source_units.py",
-        ".github/workflows/commentary-private-text-compare.yml",
         "tests/test_commentary_unresolved_lexical_triage.py"
       ]
     },
@@ -2536,7 +2501,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 12,
+      "static_reference_count": 11,
       "static_references": [
         "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_android_text_witness.py",
@@ -2546,7 +2511,6 @@
         "scripts/commentary_source_erratum_compiled_probe.py",
         "scripts/commentary_stock_andbible_android.py",
         "scripts/commentary_xiphos_heading_probe.py",
-        ".github/workflows/commentary-editorial-section-scope.yml",
         ".github/workflows/commentary-private-candidate-xiphos-gui.yml",
         ".github/workflows/commentary-xiphos-dual-reader.yml",
         "tests/test_commentary_xiphos_dual_reader.py"
@@ -2624,7 +2588,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 13,
+      "static_reference_count": 12,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_chapter_neighbors.py",
@@ -2636,7 +2600,6 @@
         "scripts/commentary_stock_prefix_topology.py",
         "scripts/commentary_unmarked_division_coverage.py",
         ".github/workflows/commentary-anchor-parity.yml",
-        ".github/workflows/commentary-private-text-compare.yml",
         ".github/workflows/commentary-xml-witness.yml",
         "tests/test_commentary_xml_witness.py"
       ]
@@ -4883,13 +4846,12 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 11,
+      "static_reference_count": 10,
       "static_references": [
         "scripts/commentary_public_metadata_preflight.py",
         "scripts/commentary_rebuild_attestation_draft.py",
         "scripts/tool_registry.py",
         "scripts/validate.py",
-        ".github/workflows/commentary-editorial-section-scope.yml",
         "docs/COMMENTARY_PIPELINE.md",
         "docs/PUBLISHING.md",
         "tests/test_commentary_public_metadata_preflight.py",
