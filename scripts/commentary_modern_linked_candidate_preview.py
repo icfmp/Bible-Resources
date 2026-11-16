@@ -172,9 +172,13 @@ def build_verified_preview(*, root: Path, source_map: dict, expected_refs: dict,
         "source_witness_chapter":source_map["scope"],
         "original_source_link_targets_embedded_exactly":True,
         "original_source_link_target_count":linked,
-        "source_native_book_intro_key_sha256":next(
-            (i["source_sha256"] for i in source_map["introductions"]
-             if i["native_key"]==book_code),None),
+        "original_book_intro_source_owner_first_numbered_K":source_map["sections"][0]["first_key"],
+        "original_book_intro_first_K_ownership_attested":bool(
+            gate.report(complete_raw_report)["original_book_intro_and_outline_owned_by_first_numbered_K_attested"]),
+        "original_I_placeholder_keys_are_empty":all(
+            item["source_visible_word_count"]==0
+            for item in gate.intros_seen.values()),
+        "modern_book_introduction_editorially_moved_out_of_first_K":True,
         "modern_book_introduction_paragraphs_included":len(intro),
         "original_chapter_outline_tables_preserved":False,
         "original_chapter_intro_native_markup_preserved":False,
