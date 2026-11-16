@@ -64,6 +64,7 @@ from commentary_literal_erratum_preflight import (
     preview_exact_reversible_commentary_prose_erratum,
 )
 from commentary_source_erratum_compiled_probe import probe_private_compiled_source_erratum
+from commentary_rebuild_attestation_draft import PUBLIC_REBUILD_ATTESTATION_ERROR_CODES
 from commentary_unresolved_lexical_triage import marked_word_token_indices
 from commentary_xml_witness import _parse_reference, WORK_REF
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
@@ -2394,6 +2395,7 @@ def main(argv=None) -> int:
             "Unbounded distinct original commentary layout bodies",
             "Unbounded original native commentary entries",
         }
+        public_safe.update(PUBLIC_REBUILD_ATTESTATION_ERROR_CODES)
         reason = str(exc) if str(exc) in public_safe else "OTHER_OR_PRIVATE_ERROR"
         result = {
             "status": "BLOCKED", "reason_class": type(exc).__name__,
