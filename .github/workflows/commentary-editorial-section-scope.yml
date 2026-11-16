@@ -6,6 +6,8 @@ on:
       - '.github/workflows/commentary-editorial-section-scope.yml'
       - 'scripts/commentary_section_scope_audit.py'
       - 'scripts/commentary_editorial_topology.py'
+      - 'scripts/commentary_layout_census.py'
+      - 'tests/test_commentary_layout_census.py'
       - 'tests/test_commentary_editorial_topology.py'
       - 'scripts/commentary_reference_registry_triage.py'
       - 'tests/test_commentary_reference_registry_triage.py'
@@ -61,6 +63,7 @@ jobs:
           python -m pip install -r requirements.txt
           python -m unittest discover -s tests -p 'test_commentary_section_scope_audit.py' -v
           python -m unittest discover -s tests -p 'test_commentary_editorial_topology.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_layout_census.py' -v
           python -m unittest discover -s tests -p 'test_commentary_reference_registry_triage.py' -v
           python -m unittest discover -s tests -p 'test_commentary_literal_erratum_preflight.py' -v
           python -m unittest discover -s tests -p 'test_commentary_source_erratum_compiled_probe.py' -v
@@ -703,6 +706,30 @@ jobs:
               print("Original editorial topology review cases",category,
                     json.dumps(cases,sort_keys=True),
                     "additional unlisted",topology["sample_overflow_counts"][category])
+          layout=r["independent_original_native_layout_census"]
+          assert layout["status"]=="COMPLETE_ORIGINAL_COMMENTARY_LAYOUT_HEURISTICS_NOT_EDITORIAL_VERDICT"
+          assert layout["original_native_K_seen"]==r["native_numbered_rows"]
+          assert layout["original_native_I_seen"]==r["native_intro_rows"]
+          assert layout["original_native_TOP_seen"]==r["native_top_rows"]
+          assert layout["source_word_text_xml_and_targets_disclosed"] is False
+          assert layout["all_cases_are_unapproved_diagnostic_only"] is True
+          assert layout["original_module_modified"] is False
+          assert layout["publication_authorized"] is False
+          print("Independent all-original commentary layout census:",
+                "distinct source bodies",layout["distinct_original_raw_bodies"],
+                "native aliases",layout["repeated_raw_native_aliases"],
+                "verse-1-only chapters",layout["original_verse_one_only_chapters"])
+          print("Source-original paragraph and text-length distributions:",
+                json.dumps(layout["distribution"],sort_keys=True))
+          print("Original verse-1-only chapter layout classes:",
+                json.dumps(layout["single_key_chapter_structure"],sort_keys=True))
+          print("Original layout review categories:",
+                json.dumps(layout["candidate_counts"],sort_keys=True))
+          for category,cases in layout["candidate_samples"].items():
+              print("Original layout review location samples",category,
+                    json.dumps(cases,sort_keys=True),
+                    "additional source bodies",
+                    layout["candidate_sample_overflow"][category])
           references=r["independent_original_native_reference_registry_triage"]
           assert references["status"]=="FULL_ORIGINAL_NATIVE_REFERENCE_REGISTRY_TRIAGE_NOT_EDITORIAL_CORRECTION"
           assert references["original_native_K_seen"]==r["native_numbered_rows"]
