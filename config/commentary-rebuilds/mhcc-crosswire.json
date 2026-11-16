@@ -98,9 +98,9 @@
     }
   ],
   "authorization": {
-    "approved_by": "PENDING \u2014 project owner decision required",
-    "evidence_url": "",
-    "scope": "Private complete-source and native SWORD verification; not a public release"
+    "approved_by": "Bible Resources project owner",
+    "evidence_url": "https://github.com/icfmp/Bible-Resources/issues/276",
+    "scope": "Publish exact CrossWire MHCC 0.1.1 source-attested edition with 24 existing-section navigation aliases and the two reversible source corrections, renamed MHCC SWORD identifier, after all final tests and rights checks."
   },
   "block_type": "CHAPTER",
   "candidate_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
@@ -122,7 +122,7 @@
     "TOP": 2
   },
   "payload_sha256": {
-    "mods.d/mhcc.conf": "41b7747e7b0db3413b9d210269e535a806c29c4f96a4188223ac32c43748b12d",
+    "mods.d/mhcc.conf": "04859f158d75ad2fd44fda4a0420095ab3172e3b96a5ed2b2d43b30538bad5d6",
     "modules/comments/zcom/mhcc/nt.czs": "0d7f1347c8a570330d6ef82048281018f30e30a0ce5d40df00f1dafac332f550",
     "modules/comments/zcom/mhcc/nt.czv": "f39b155c597dad8ad37fae98fc14b94e5c3a44ded6abfd3dc58e4c24b8e3b582",
     "modules/comments/zcom/mhcc/nt.czz": "ca87b997b510711012180991ab7230549b3a03b588bf58961fe28e9d5b3cca87",
@@ -160,7 +160,7 @@
       "revised_sha256": "0a4de262b8e7340db7e5f78928e3b3e36095780f87b9b60272bc9f28f8ca08e7"
     }
   ],
-  "status": "private_draft_not_owner_authorized_for_release",
+  "status": "owner_authorized_for_release",
   "sword_id": "MHCC",
   "versification": "KJV",
   "version": "0.1.1"
