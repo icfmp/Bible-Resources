@@ -111,6 +111,21 @@ class CommentaryLayoutCensusTests(unittest.TestCase):
         self.assertTrue(profile["styled_numbered_verse_lead"])
         self.assertFalse(profile["words_owned_by_heading_or_note_blocks"])
 
+    def test_original_literal_blanklines_are_distinguished_from_wrappers(self):
+        words = b" ".join([b"original"] * 260)
+        no_blanks = layout_profile(b"<div/>" + words)
+        self.assertIn("long_unwrapped_prose_without_literal_blankline",
+                      layout_flags(no_blanks))
+        self.assertEqual(no_blanks["unowned_literal_blankline_count"], 0)
+
+        with_blanks = layout_profile(b"<div/>" + words + b"\n\nnext paragraph")
+        self.assertGreaterEqual(with_blanks["unowned_literal_newline_count"], 2)
+        self.assertEqual(with_blanks["unowned_literal_blankline_count"], 1)
+        self.assertNotIn("long_unwrapped_prose_without_literal_blankline",
+                         layout_flags(with_blanks))
+        self.assertIn("long_prose_outside_any_recognized_block",
+                      layout_flags(with_blanks))
+
     def test_text_owned_by_heading_not_misreported_as_unwrapped_prose(self):
         original = b"<div/><title>Complete original heading</title>"
         profile = layout_profile(original)
