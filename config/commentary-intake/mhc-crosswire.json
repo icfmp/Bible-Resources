@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhc-crosswire",
+  "category": "commentary",
+  "module_id": "MHC",
+  "title": "Matthew Henry's Complete Commentary on the Whole Bible",
+  "language": "en",
+  "version": "2.2",
+  "provider": "crosswire",
+  "source_page_url": "https://www.crosswire.org/sword/modules/ModInfo.jsp?modName=MHC",
+  "sword_zip_url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/MHC.zip",
+  "authorial_witness_url": "https://www.ccel.org/ccel/henry/mhc.html",
+  "reference_edition": "CCEL six-volume complete work credited by CrossWire to CCEL/Logos; text/markup equivalence to the SWORD module remains unverified",
+  "archive_sha256": "6bcb936873ca144e317805e5c1677940fd86e2403f7c14517752e44f25c8882b",
+  "sample_references": [
+    "Gen 1:1",
+    "Ps 23:1",
+    "Matt 5:1",
+    "John 3:16",
+    "Rev 22:21"
+  ],
+  "rights": {
+    "status": "research_only",
+    "upstream_license_claim": "Public Domain--Copy Freely (CrossWire MHC 2.2)",
+    "evidence_url": "https://www.crosswire.org/sword/modules/ModInfo.jsp?modName=MHC",
+    "digital_corrections_and_derivatives_reviewed": false,
+    "owner_approved": false
+  },
+  "commentary_source": {
+    "format": "compiled CrossWire zCom4 with SourceType=OSIS; the original authoring OSIS file has not been independently obtained",
+    "observed_compiled_versification": "KJV",
+    "ccel_witness_edition_equivalence": "unverified",
+    "source_provenance": "CrossWire credits Christian Classics Ethereal Library and Logos Research, Inc.",
+    "independent_six_volume_witness": "https://www.ccel.org/ccel/henry/mhc.html",
+    "no_source_text_imported": true
+  },
+  "original_archive_observation": {
+    "date": "2026-11-07",
+    "receipt": "https://github.com/icfmp/Bible-Resources/blob/main/docs/evidence/normalizer-3/real-pilot-source-signals.json",
+    "action": "https://github.com/icfmp/Bible-Resources/actions/runs/42362111699",
+    "original_zip_digest_recheck_pending": true,
+    "original_markup_parity_verified": false,
+    "full_native_corpus_verified": false
+  },
+  "import_issue": "https://github.com/icfmp/Bible-Resources/issues/285",
+  "initial_pilot_issue": "https://github.com/icfmp/Bible-Resources/issues/12"
+}
