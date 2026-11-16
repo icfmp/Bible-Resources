@@ -83,6 +83,7 @@ class SourceReferenceGate:
         if self.composite_expectations is not None and not isinstance(self.composite_expectations,dict):
             raise ValueError("Unstructured original composite intro evidence")
         self.composite_verified=self.composite_expectations is None
+        self._private_original_composite_tree=None
         for key,entries in expected_refs.items():
             if not isinstance(entries,list):
                 raise ValueError("Expected source references must be a list")
@@ -154,6 +155,7 @@ class SourceReferenceGate:
                 if type(compound.get(field)) is not int or counts.get(tag,0)!=compound[field]:
                     raise ValueError("Original composite source editorial outline structure has drifted")
             self.composite_verified=True
+            self._private_original_composite_tree=source
         self._private_literal_links[key]=literals
         self.seen[key]={"reference_count":len(original),
                         "source_raw_sha256":digest,
@@ -161,6 +163,13 @@ class SourceReferenceGate:
                             hashlib.sha256(r.encode("utf-8")).hexdigest()
                             for r in original],
                         "draft_marker_present":True}
+
+    def original_composite_outline_tree_after_verified_source(self, raw_source_report: dict):
+        """Use only for private source-identity-preserving introductory layout."""
+        self.report(raw_source_report)
+        if self._private_original_composite_tree is None:
+            raise ValueError("Composite first native K source not independently attested")
+        return self._private_original_composite_tree
 
     def exact_source_link_literals_after_verified_source(self, raw_source_report: dict):
         """Use only inside an isolated builder, never serialize the returned dict."""
