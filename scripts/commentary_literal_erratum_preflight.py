@@ -226,7 +226,7 @@ def _original_literal_text_spans(raw: bytes) -> list[tuple[int, int]]:
         in_cdata = False
 
     def chars(value):
-        if in_cdata or depth <= 1 or not value:
+        if in_cdata or depth < 1 or not value:
             return
         index = parser.CurrentByteIndex - len(prefix)
         literal = value.encode("utf-8")
