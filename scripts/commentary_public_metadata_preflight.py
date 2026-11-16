@@ -12,7 +12,12 @@ from __future__ import annotations
 
 from datetime import date
 from hashlib import sha256
+from io import BytesIO
+from pathlib import Path
 import re
+import zipfile
+
+from reviewed_compiled_commentary_rebuild import zcom_member_suffixes
 
 
 def _exact_conf_value(conf: str, key: str) -> str:
@@ -126,4 +131,137 @@ def prepare_provisional_public_commentary_conf(
         "proposed_day_must_match_actual_approved_release_day": True,
         "publication_authorized": False,
         "public_asset_generated": False,
+    }
+
+
+
+def rehearse_private_versioned_commentary_package(
+        original_install_root: Path, scratch: Path, *,
+        module_id: str, expected_version: str, source_provider: str,
+        original_sword_version_date: str, hypothetical_revision_day: str,
+        revision_summary: str) -> dict:
+    """Create and privately reinstall a deterministic, never-published ZIP.
+
+    Reuse the already installed and native-verified SWORD zCom binary members.
+    Change ONLY the independently checked About/SwordVersionDate fields and
+    read all seven rebuilt files back. The hypothetical date is strictly a
+    test input, never approval of a public version date or permission to ship.
+    Callers must verify libSWORD's complete native corpus after this function.
+    """
+    if (not isinstance(original_install_root, Path)
+            or not original_install_root.is_dir()
+            or original_install_root.is_symlink()
+            or not isinstance(scratch, Path)
+            or not scratch.is_dir() or scratch.is_symlink()
+            or not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,79}", module_id)
+            or not re.fullmatch(r"\d+\.\d+\.\d+", expected_version)):
+        raise ValueError("Untrusted private commentary package rehearsal paths")
+    folder = module_id.lower()
+    source_conf = original_install_root / "mods.d" / (folder + ".conf")
+    if (source_conf.is_symlink() or not source_conf.is_file()
+            or source_conf.stat().st_size > 128 * 1024):
+        raise ValueError("Source-reviewed original SWORD configuration missing")
+    source_bytes = source_conf.read_bytes()
+    private_conf = source_bytes.decode("utf-8")
+    if (_exact_conf_value(private_conf, "DataPath")
+            != "./modules/comments/zcom/" + folder + "/"
+            or _exact_conf_value(private_conf, "Version") != expected_version
+            or _exact_conf_value(private_conf, "ModDrv") != "zCom"
+            or _exact_conf_value(private_conf, "SourceType") != "OSIS"
+            or _exact_conf_value(private_conf, "CompressType") not in ("ZIP", "LZSS", "BZIP2", "XZ")):
+        raise ValueError("Private compiled configuration does not describe expected zCom")
+    block = _exact_conf_value(private_conf, "BlockType")
+    suffixes = zcom_member_suffixes(block)
+    expected_members = {
+        "mods.d/" + folder + ".conf",
+        *("modules/comments/zcom/" + folder + "/" + name for name in suffixes),
+    }
+    data_folder = original_install_root / "modules/comments/zcom" / folder
+    if data_folder.is_symlink() or not data_folder.is_dir():
+        raise ValueError("Untrusted private SWORD compressed-data location")
+    if any(path.is_symlink() or not path.is_file() for path in data_folder.iterdir()):
+        raise ValueError("Compiled data contains symbolic links or unreviewed directories")
+    if {p.name for p in data_folder.iterdir()} != set(suffixes):
+        raise ValueError("Missing, extra or incorrectly named compiled SWORD members")
+    staged_conf, proposal = prepare_provisional_public_commentary_conf(
+        source_bytes, expected_module_id=module_id,
+        expected_module_version=expected_version,
+        source_provider=source_provider,
+        original_sword_version_date=original_sword_version_date,
+        proposed_public_revision_day=hypothetical_revision_day,
+        revision_summary=revision_summary,
+    )
+    members = {"mods.d/" + folder + ".conf": staged_conf}
+    for member in sorted(expected_members - set(members)):
+        source = original_install_root / member
+        if (source.is_symlink() or not source.is_file()
+                or not 0 < source.stat().st_size < 32 * 1024 * 1024):
+            raise ValueError("Untrusted compiled SWORD member length or file type")
+        members[member] = source.read_bytes()
+    if (set(members) != expected_members
+            or sum(map(len, members.values())) > 64 * 1024 * 1024):
+        raise ValueError("Rehearsal member inventory violates native SWORD contract")
+
+    def deterministic_archive() -> bytes:
+        destination = BytesIO()
+        with zipfile.ZipFile(destination, "w") as package:
+            for name, content in sorted(members.items()):
+                info = zipfile.ZipInfo(name, (1980, 1, 1, 0, 0, 0))
+                info.compress_type = zipfile.ZIP_STORED
+                info.create_system = 3
+                info.external_attr = 0o100644 << 16
+                package.writestr(info, content)
+        return destination.getvalue()
+
+    zip_bytes = deterministic_archive()
+    if zip_bytes != deterministic_archive():
+        raise ValueError("SWORD rehearsal ZIP output is not deterministic")
+    package_path = scratch / "PRIVATE-REHEARSAL-DO-NOT-RELEASE.zip"
+    install = scratch / "private-rehearsed-install"
+    if (package_path.exists() or package_path.is_symlink()
+            or install.exists() or install.is_symlink()):
+        raise ValueError("Private rehearsal may not overwrite earlier output")
+    package_path.write_bytes(zip_bytes)
+    install.mkdir()
+    with zipfile.ZipFile(BytesIO(package_path.read_bytes())) as package:
+        if (set(package.namelist()) != expected_members
+                or len(package.infolist()) != len(expected_members)):
+            raise ValueError("Private package ZIP inventory changed in transit")
+        for info in package.infolist():
+            if (info.is_dir() or info.filename not in members
+                    or package.read(info) != members[info.filename]):
+                raise ValueError("Private SWORD ZIP extraction differs from compiled source")
+            output = install / info.filename
+            output.parent.mkdir(parents=True, exist_ok=True)
+            output.write_bytes(members[info.filename])
+    # Never recompress or transform authorial content, notes or native links.
+    original_binary_sha = {}
+    for name in sorted(expected_members - {"mods.d/" + folder + ".conf"}):
+        a = original_install_root / name
+        b = install / name
+        if a.read_bytes() != b.read_bytes():
+            raise ValueError("Rehearsal changed a compiled commentary source member")
+        original_binary_sha[name] = sha256(b.read_bytes()).hexdigest()
+    if (not proposal["all_other_fields_comments_license_textsource_and_history_exact"]
+            or proposal["publication_authorized"] is not False
+            or proposal["public_asset_generated"] is not False):
+        raise ValueError("Private rehearsal wrongly implies publication authority")
+    return {
+        "status": "PRIVATE_FULL_CONF_AND_SWORD_ZCOM_ZIP_REHEARSAL_NOT_RELEASE",
+        "module_id": module_id,
+        "version": expected_version,
+        "compiled_block_type": block,
+        "original_sword_version_date": original_sword_version_date,
+        "hypothetical_revision_day_only": hypothetical_revision_day,
+        "source_conf_sha256": sha256(source_bytes).hexdigest(),
+        "proposed_conf_sha256": sha256(staged_conf).hexdigest(),
+        "all_six_native_compiled_members_preserved": len(original_binary_sha) == 6,
+        "native_member_sha256": original_binary_sha,
+        "zip_sha256": sha256(zip_bytes).hexdigest(),
+        "zip_member_count": len(expected_members),
+        "reinstalled_member_bytes_match_exactly": True,
+        "only_about_and_sword_version_date_changed": True,
+        "actual_release_date_selected": False,
+        "owner_release_authorized": False,
+        "artifact_published_or_uploaded": False,
     }
