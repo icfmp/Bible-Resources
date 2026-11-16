@@ -1007,6 +1007,53 @@ def verify_private_versioned_commentary_conf_delta(
     }
 
 
+def private_rekey_sword_commentary_conf(
+        original_conf: bytes, *, original_module_id: str,
+        replacement_module_id: str) -> bytes:
+    """Make a reversible, identity-only SWORD header/Datapath transition.
+
+    This is a private version-upgrade template, never a mutation of the
+    installed or published original. SWORD module identifiers are unique:
+    consumers must independently handle coexistence/migration of old IDs.
+    """
+    module_pattern = re.compile(r"[A-Za-z][A-Za-z0-9_]{0,79}\Z")
+    if (not isinstance(original_conf, bytes)
+            or not 0 < len(original_conf) <= 128 * 1024
+            or b"\x00" in original_conf or b"\r" in original_conf
+            or not isinstance(original_module_id, str)
+            or not isinstance(replacement_module_id, str)
+            or not module_pattern.fullmatch(original_module_id)
+            or not module_pattern.fullmatch(replacement_module_id)
+            or original_module_id.casefold() == replacement_module_id.casefold()):
+        raise ValueError("Unsafe original/replacement SWORD module ID")
+    try:
+        old = original_conf.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise ValueError("Original SWORD configuration must be UTF-8") from exc
+    lines = (
+        (f"[{original_module_id}]",
+         f"[{replacement_module_id}]"),
+        (f"DataPath=./modules/comments/zcom/{original_module_id.lower()}/",
+         f"DataPath=./modules/comments/zcom/{replacement_module_id.lower()}/"),
+    )
+    if (any(old.splitlines().count(source) != 1
+            or old.splitlines().count(target) != 0
+            for source, target in lines)
+            or old.count("[") != old.count("]")
+            or old.count("ModDrv=zCom\n") != 1
+            or old.count("SourceType=OSIS\n") != 1):
+        raise ValueError("Original SWORD config identity or driver is not verified")
+    revised = old
+    for source, target in lines:
+        revised = revised.replace(source + "\n", target + "\n", 1)
+    restored = revised
+    for source, target in reversed(lines):
+        restored = restored.replace(target + "\n", source + "\n", 1)
+    if restored != old:
+        raise ValueError("SWORD identity transition is not byte-reversible")
+    return revised.encode("utf-8")
+
+
 def privately_stage_versioned_zcom_zip(
         *, compiler_root: Path, compiled_module_id: str,
         package_module_id: str, previous_version: str, proposed_version: str,
