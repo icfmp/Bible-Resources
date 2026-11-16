@@ -79,6 +79,10 @@ class SourceReferenceGate:
         if len(self.intro_units)!=len(intro_rows):
             raise ValueError("Duplicate original introduction native key")
         self.intros_seen={}
+        self.composite_expectations=source_map.get("intro_provenance_expectations")
+        if self.composite_expectations is not None and not isinstance(self.composite_expectations,dict):
+            raise ValueError("Unstructured original composite intro evidence")
+        self.composite_verified=self.composite_expectations is None
         for key,entries in expected_refs.items():
             if not isinstance(entries,list):
                 raise ValueError("Expected source references must be a list")
@@ -126,6 +130,30 @@ class SourceReferenceGate:
         source_count=markup.get("tag_counts",{}).get("reference",0)
         if len(original)!=source_count:
             raise ValueError("Exact source-native XML reference count differs from structural inventory")
+        compound=self.composite_expectations
+        if compound and key==compound.get("original_first_numbered_key"):
+            try:
+                source=ET.fromstring(b"<source>"+raw+b"</source>")
+            except ET.ParseError as exc:
+                raise ValueError("Invalid original composite first numbered XML") from exc
+            visible=re.sub(r"\s+"," "," ".join(source.itertext())).strip()
+            for field in ("expected_original_book_intro_start",
+                          "expected_original_exposition_start"):
+                phrase=compound.get(field)
+                if not isinstance(phrase,str) or not phrase or phrase not in visible:
+                    raise ValueError("First numbered original source does not contain declared book-intro/exposition boundary")
+            counts={}
+            for node in source.iter():
+                if node is source or not isinstance(node.tag,str):
+                    continue
+                name=node.tag.rsplit("}",1)[-1]
+                counts[name]=counts.get(name,0)+1
+            for field,tag in (("expected_original_chapter_outline_row_count","row"),
+                              ("expected_original_chapter_outline_table_count","table"),
+                              ("expected_original_chapter_outline_title_count","title")):
+                if type(compound.get(field)) is not int or counts.get(tag,0)!=compound[field]:
+                    raise ValueError("Original composite source editorial outline structure has drifted")
+            self.composite_verified=True
         self._private_literal_links[key]=literals
         self.seen[key]={"reference_count":len(original),
                         "source_raw_sha256":digest,
@@ -149,6 +177,12 @@ class SourceReferenceGate:
             raise ValueError("Some original first source units were not visited")
         if set(self.intros_seen)!=set(self.intro_units):
             raise ValueError("Some original book/chapter introduction keys not visited")
+        if not self.composite_verified:
+            raise ValueError("Book intro/outline origin in original first K was never attested")
+        if self.composite_expectations and any(
+                row["source_visible_word_count"]!=0
+                for row in self.intros_seen.values()):
+            raise ValueError("Source I placeholders unexpectedly acquired prose; manual reindex review needed")
         return {
             "status":"EXACT_ORIGINAL_REFERENCE_ATTRIBUTES_MATCH_EXPECTATIONS_NOT_LINK_SERIALIZATION_ACCEPTANCE",
             "chapter":self.chapter,
@@ -157,6 +191,7 @@ class SourceReferenceGate:
             "original_reference_links_checked":sum(x["reference_count"] for x in self.seen.values()),
             "per_source_unit":self.seen,
             "original_intro_units_found":len(self.intros_seen),
+            "original_book_intro_and_outline_owned_by_first_numbered_K_attested":bool(self.composite_expectations and self.composite_verified),
             "per_intro_unit":self.intros_seen,
             "original_prose_or_reference_labels_exported":False,
             "original_osisRef_literal_values_exported":False,
