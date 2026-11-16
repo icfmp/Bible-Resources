@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "resource_id": "wesley-crosswire",
+  "category": "commentary",
+  "module_id": "Wesley",
+  "title": "John Wesley's Notes on the Bible",
+  "language": "en",
+  "version": "1.1",
+  "provider": "crosswire",
+  "source_page_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=Wesley",
+  "sword_zip_url": "https://crosswire.org/ftpmirror/pub/sword/packages/rawzip/Wesley.zip",
+  "authorial_witness_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=Wesley",
+  "authorial_witness_status": "The publisher description only; independent authored-edition source/text witness and edition equivalence NOT established.",
+  "reference_edition": "Wesley notes; CrossWire 1.1 (2001-11-28), attributed digital edition by Sulu Kelley and Bill Brown; precise written edition not independently checked.",
+  "archive_sha256": null,
+  "sample_references": [
+    "Gen 1:1",
+    "Ps 23:1",
+    "John 3:16",
+    "Rom 8:1"
+  ],
+  "rights": {
+    "status": "research_only",
+    "upstream_license_claim": "Public Domain (CrossWire module page)",
+    "evidence_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=Wesley",
+    "digital_corrections_and_derivatives_reviewed": false,
+    "owner_approved": false
+  },
+  "commentary_source": {
+    "format": "official CrossWire compiled SWORD; native format to verify",
+    "upstream_editorial_provenance": "CrossWire credits Sulu Kelley and Bill Brown and in-house markup",
+    "edition_equivalence": "unverified",
+    "no_licensed_source_text_imported": true
+  }
+}
