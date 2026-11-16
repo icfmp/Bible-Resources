@@ -30,6 +30,7 @@ from commentary_xml_witness import (
 from commentary_native_inventory import MAX_OUTPUT, parse_index
 from commentary_navigation_link_plan import parse_native_commentary_verse_registry, UnsafeCommentaryLinkPlan
 from commentary_reference_registry_triage import classify_original_reference_target
+from commentary_osis_mixed_transport_probe import probe_original_mixed_transport
 from commentary_prose_cross_slot import strict_native_stock_plain_words
 from commentary_text_delta import _contiguous_offset, _is_subsequence
 from commentary_unresolved_lexical_triage import WORD, marked_word_token_indices
@@ -548,7 +549,8 @@ def summarize_volume_anchor_results(volumes: list[dict]) -> dict:
 
 
 def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
-        *, raw_binary: Path | None = None) -> dict:
+        *, raw_binary: Path | None = None,
+        private_alias_probe: bool = False) -> dict:
     manifest = load_manifest(resource_id)
     locations, is_collection = _xml_witness_locations(
         manifest.get("commentary_source"))
@@ -562,6 +564,8 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
         raise PilotError("Reviewed native commentary inspector executable unavailable")
     if raw_binary is not None and (not raw_binary.is_file() or raw_binary.is_symlink()):
         raise PilotError("Reviewed native raw original commentary reader unavailable")
+    if private_alias_probe and raw_binary is None:
+        raise PilotError("Private native alias experiment requires complete pinned raw corpus")
 
     with tempfile.TemporaryDirectory(prefix="commentary-source-native-") as temp:
         root = Path(temp)
@@ -675,6 +679,14 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
                 }
             else:
                 locator = UnoccupiedSourceProseLocator(unoccupied_original_units)
+                experiment_chapters = {
+                    u["start_key"].rsplit(".", 1)[0] for u in unoccupied_original_units
+                } if private_alias_probe else set()
+                relevant_introductions = experiment_chapters | {
+                    c.split(".", 1)[0] for c in experiment_chapters
+                }
+                subset_numbered = defaultdict(list)
+                subset_introductions = {}
                 env = dict(os.environ, SWORD_PATH=str(installed))
                 process = None
                 rows = []
@@ -687,6 +699,12 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
                     def inspect_one(kind, key, raw):
                         rows.append((kind, key))
                         locator.observe(kind, key, raw)
+                        if kind == "K" and key.rsplit(".", 1)[0] in experiment_chapters:
+                            subset_numbered[key.rsplit(".", 1)[0]].append((key, raw))
+                        if kind == "I" and key in relevant_introductions:
+                            if key in subset_introductions:
+                                raise PilotError("Repeated original private experiment introduction")
+                            subset_introductions[key] = raw
                     raw_stats, _, _, _ = parse_native_raw_corpus(
                         process.stdout, on_entry=inspect_one)
                     process.stdout.close()
@@ -705,12 +723,74 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
                         and raw_stats["all_native_raw_entries_ordered_sha256"]
                            != manifest["native_raw_corpus_sha256"]):
                     raise PilotError("Original pinned complete stock raw corpus changed")
+                location = locator.report()
                 observed["original_unoccupied_start_prose_location"] = {
-                    **locator.report(),
+                    **location,
                     "pinned_original_stock_raw_corpus_sha256":
                         raw_stats["all_native_raw_entries_ordered_sha256"],
                     "fully_crosschecked_original_native_corpus": True,
                 }
+                if private_alias_probe:
+                    attempts = []
+                    for row in location["units"]:
+                        candidate = row["provisional_missing_first_verse_alias_preview"]
+                        if candidate is None:
+                            continue
+                        chapter = candidate["new_unoccupied_native_key"].rsplit(".",1)[0]
+                        book = chapter.split(".",1)[0]
+                        numbered = subset_numbered.get(chapter, [])
+                        indexed = dict(numbered)
+                        target = candidate["new_unoccupied_native_key"]
+                        master = candidate["original_occupied_master_key"]
+                        if (target in indexed or master not in indexed
+                                or sha256(indexed[master]).hexdigest() !=
+                                   candidate["original_master_raw_sha256"]
+                                or not all(x in subset_introductions
+                                           for x in (book, chapter))):
+                            raise PilotError("Unverified native first-verse alias source master")
+                        scratch = root / ("private-alias-" + str(len(attempts) + 1))
+                        scratch.mkdir()
+                        # Real osis2mod / stock K/I transport only, no signed or
+                        # distributable complete module and NO editorial approval.
+                        pilot = probe_original_mixed_transport(
+                            chapter, subset_introductions[book],
+                            subset_introductions[chapter], numbered,
+                            scratch=scratch, native_raw_binary=raw_binary,
+                            provisional_index_aliases={
+                                target: {"link_to": master,
+                                         "source_raw_sha256":
+                                             candidate["original_master_raw_sha256"]}
+                            },
+                        )
+                        attempts.append({
+                            "target": target, "master": master,
+                            "original_master_raw_sha256":
+                                candidate["original_master_raw_sha256"],
+                            "candidate_probe_status": pilot["status"],
+                            "private_readback_completed":
+                                pilot.get("readback_completed") is True,
+                            "original_K_I_word_markup_reference_checks_passed":
+                                pilot.get("selected_original_I_K_text_markup_reference_checks_passed")
+                                is True,
+                            "one_new_unoccupied_alias_was_compiled":
+                                pilot.get("actual_new_private_alias_keys_only") is True,
+                            "new_alias_equals_compiled_original_master":
+                                pilot.get("all_provisional_alias_bodies_equal_original_compiled_master")
+                                is True,
+                            "private_original_compiled_alias_verified":
+                                pilot.get("private_alias_candidate_complete_original_K_I_checks_pass")
+                                is True,
+                            "published": False,
+                        })
+                    observed["private_original_source_first_verse_index_alias_probes"] = {
+                        "status": "PRIVATE_CHAPTER_SUBSET_OSIS_NATIVE_CANDIDATES_NOT_APPROVAL",
+                        "probed_chapter_subsets": len(attempts),
+                        "attempts": attempts,
+                        "original_full_module_not_replaced_or_approved": True,
+                        "full_original_TOP_and_other_books_outside_private_subset": True,
+                        "no_release_or_editorial_approval": True,
+                        "published": False,
+                    }
         else:
             observed["original_unoccupied_start_prose_location"] = {
                 "status": "raw_text_location_not_attempted",
@@ -724,12 +804,14 @@ def main(argv=None) -> int:
     p.add_argument("--resource-id", required=True)
     p.add_argument("--native-inspector", type=Path, required=True)
     p.add_argument("--native-raw-binary", type=Path)
+    p.add_argument("--private-alias-probe", action="store_true")
     p.add_argument("--probe-osis-key", action="append", default=[])
     p.add_argument("--report", type=Path, required=True)
     args = p.parse_args(argv)
     try:
         report = run(args.resource_id, args.native_inspector, tuple(args.probe_osis_key),
-                     raw_binary=args.native_raw_binary)
+                     raw_binary=args.native_raw_binary,
+                     private_alias_probe=args.private_alias_probe)
         code = 0
     except (ValueError, OSError, RuntimeError, zipfile.BadZipFile) as exc:
         report = {
