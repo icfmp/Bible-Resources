@@ -97,11 +97,11 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
                 )
 
     @patch("commentary_xiphos_dual_reader.time.sleep")
-    @patch("commentary_xiphos_dual_reader._visible_window")
+    @patch("commentary_xiphos_dual_reader._main_xiphos_window")
     def test_real_xiphos_window_appearing_late_is_accepted_without_bypassing_ui(self, window, sleep):
         from commentary_xiphos_dual_reader import _await_xiphos_visible_window
         from unittest.mock import Mock
-        window.side_effect = [False] * 27 + [True]
+        window.side_effect = [None] * 27 + ["12345"]
         app = Mock()
         display = Mock()
         app.poll.return_value = None
@@ -113,7 +113,7 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
         self.assertEqual(display.poll.call_count, 28)
 
     @patch("commentary_xiphos_dual_reader.time.sleep")
-    @patch("commentary_xiphos_dual_reader._visible_window", return_value=False)
+    @patch("commentary_xiphos_dual_reader._main_xiphos_window", return_value=None)
     def test_xiphos_gui_readiness_fails_closed_if_window_never_visible(self, window, sleep):
         from commentary_xiphos_dual_reader import _await_xiphos_visible_window
         from unittest.mock import Mock
@@ -129,7 +129,7 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
             _await_xiphos_visible_window(app, display, {}, seconds=26)
 
     @patch("commentary_xiphos_dual_reader.time.sleep")
-    @patch("commentary_xiphos_dual_reader._visible_window", return_value=False)
+    @patch("commentary_xiphos_dual_reader._main_xiphos_window", return_value=None)
     def test_xiphos_gui_readiness_fails_fast_on_reader_exit(self, window, sleep):
         from commentary_xiphos_dual_reader import _await_xiphos_visible_window
         from unittest.mock import Mock

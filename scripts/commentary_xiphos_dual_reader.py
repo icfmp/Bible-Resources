@@ -37,7 +37,7 @@ from pilot_fetch import fetch
 from pilot_preflight import PilotError, inspect_archive
 from pilot_subprocess import present_key, query
 from reader_xiphos_headless_smoke import (
-    _stop_group, _visible_window, _dismiss_transient_xiphos_notice,
+    _stop_group, _dismiss_transient_xiphos_notice,
     install_checked_out_rawtext_comparison,
 )
 
@@ -614,7 +614,7 @@ def _await_xiphos_visible_window(app, display, env: dict, *, seconds: int) -> No
 
     GitHub runners can load WebKit/GTK asynchronously. Fixed sleep followed
     by one visibility check produced intermittent false negatives. Poll only
-    the actual visible X11 windows; a crashed process or missing window is
+    for an actual full-size visible Xiphos main window; a crashed process or missing window is
     always a hard failure. The budget is at most 25 seconds.
     """
     if type(seconds) is not int or not 6 <= seconds <= 25:
@@ -625,9 +625,9 @@ def _await_xiphos_visible_window(app, display, env: dict, *, seconds: int) -> No
     for _ in range(attempts):
         if app.poll() is not None or display.poll() is not None:
             raise PilotError("Independent reader or X11 display ended unexpectedly")
-        if _visible_window(env):
-            # Readiness means an ACTUAL visible GTK window. The separate
-            # main-reader and clipboard checks still decide passage success.
+        if _main_xiphos_window(env) is not None:
+            # Require the actual full-sized Xiphos reader, not a small splash
+            # or modal dialog; clipboard passage checks remain mandatory.
             return
         time.sleep(0.5)
     raise PilotError("No independently visible Xiphos window with Bible and commentary")
