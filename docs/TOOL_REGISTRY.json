@@ -4601,11 +4601,12 @@
         "pathlib",
         "publish_reviewed_release",
         "tempfile",
-        "validate"
+        "validate",
+        "zipfile"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "b0152cb623653f6038ae7b19717d1fb671e963b3a34ca58d9fc8f19acaca1f26",
+      "sha256_at_inventory": "7d011ea2441cf7116ab3169058caf1b8397fec2eee4c9eb87e4d4049c885609a",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
