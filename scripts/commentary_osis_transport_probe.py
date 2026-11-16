@@ -221,38 +221,43 @@ def classify_native_osis_roundtrip_delta(original_raw: bytes, compiled_raw: byte
         return ordinary, divs, references
 
     def non_div_text_ownership(raw):
-        """Token and punctuation ownership by original non-technical XML nodes.
+        """Preserve semantic XML nesting AND exact text/tail boundaries.
 
-        The standard SWORD compiler may insert structural div wrappers. Skip
-        *only* divs when identifying the owning semantic element, but retain
-        every non-whitespace text token in document order with its owner ID.
-        In particular, moving prose from a reference.tail into reference.text
-        now changes ownership even when the flattened text and link target do
-        not change. Neither word positions nor source content are logged.
+        Build a balanced sequence of opening/closing non-div semantic tags and
+        original non-whitespace text tokens between those boundaries. Standard
+        SWORD can insert div containers without moving authorial content, so
+        only div *boundaries* are ignored; their contained text, children and
+        tail positions remain in their original document order. This rejects
+        moving text into a reference link, between sibling text/tail slots or
+        into a different original paragraph, even if all flattened words,
+        element counts, attributes and reference destinations still match.
+
+        The return value is compared only in memory; neither source words nor
+        markup structure is logged in a diagnostic receipt.
         """
         root = etree.fromstring(b"<fragment>" + raw + b"</fragment>",
                               parser=_strict_parser())
         sequence = []
-        next_owner = 0
 
-        def add(value, owner):
+        def add(value):
             if value:
-                sequence.extend((owner, token) for token in re.findall(r"\S+", value))
+                sequence.extend(("text", token)
+                                for token in re.findall(r"\S+", value))
 
-        def walk(node, parent_owner):
-            nonlocal next_owner
+        def walk(node):
             local = node.tag.rsplit("}", 1)[-1]
-            owner = parent_owner
-            if node is not root and local != "div":
-                next_owner += 1
-                owner = next_owner
-            add(node.text, owner)
+            semantic = node is not root and local != "div"
+            if semantic:
+                sequence.append(("open", local))
+            add(node.text)
             for child in node:
                 if isinstance(child.tag, str):
-                    walk(child, owner)
-                add(child.tail, owner)
+                    walk(child)
+                add(child.tail)
+            if semantic:
+                sequence.append(("close", local))
 
-        walk(root, 0)
+        walk(root)
         return sequence
 
     source_attrs, source_div_attrs, source_references = element_signatures(original_raw)
