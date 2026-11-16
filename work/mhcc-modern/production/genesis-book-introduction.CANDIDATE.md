@@ -17,7 +17,7 @@ It is a fitting name, because the book tells us how all things began.
 
 No other history reaches so far back.
 
-Nothing in the oldest books that have survived contradicts its account. Indeed, many details recorded by ancient non-Jewish writers, and customs found among different nations, support what Genesis tells us.
+Nothing in the most ancient surviving book contradicts its account. Indeed, much that we find in the writings of the earliest pagan authors, or in the customs of different nations, confirms what Genesis tells us.
 
 ---
 
