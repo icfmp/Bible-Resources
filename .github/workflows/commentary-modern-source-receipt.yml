@@ -1,0 +1,110 @@
+name: Modern commentary source-native receipt (metadata-only)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/commentary-modern-source-receipt.yml'
+      - 'scripts/commentary_modern_source_receipt.py'
+      - 'tests/test_commentary_modern_source_receipt.py'
+      - 'work/mhcc-modern/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: modern-source-receipt-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  source_metadata:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test generic bounded source receipt before inspecting any source
+        run: python -m unittest tests/test_commentary_modern_source_receipt.py -v
+      - name: Install real SWORD source reader
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "${RUNNER_TEMP}/commentary-modern-source-raw" -lsword
+      - name: Fetch the exact released and SHA-pinned MHCC 0.1.1 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error --retry 2 \
+            --max-time 90 \
+            'https://github.com/icfmp/Bible-Resources/releases/download/mhcc-0.1.1/MHCC-0.1.1.zip' \
+            --output "${RUNNER_TEMP}/mhcc-0.1.1.zip"
+          printf '%s  %s\n' \
+            'a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746' \
+            "${RUNNER_TEMP}/mhcc-0.1.1.zip" | sha256sum -c -
+          python - <<'PY'
+          from pathlib import Path, PurePosixPath
+          import os
+          import zipfile
+          root = Path(os.environ["RUNNER_TEMP"]) / "mhcc-source-root"
+          root.mkdir()
+          with zipfile.ZipFile(Path(os.environ["RUNNER_TEMP"])/"mhcc-0.1.1.zip") as zf:
+              names = zf.namelist()
+              assert "mods.d/mhcc.conf" in names
+              assert len(names) <= 32
+              for info in zf.infolist():
+                  name = PurePosixPath(info.filename)
+                  assert name.parts and not name.is_absolute() and ".." not in name.parts
+                  assert not (info.external_attr >> 16) & 0o170000 == 0o120000
+                  target = root.joinpath(*name.parts)
+                  assert target.resolve().is_relative_to(root.resolve())
+                  if info.is_dir():
+                      target.mkdir(parents=True, exist_ok=True)
+                  else:
+                      assert info.file_size <= 3 * 1024 * 1024
+                      target.parent.mkdir(parents=True, exist_ok=True)
+                      with zf.open(info) as r, target.open("xb") as w:
+                          w.write(r.read())
+          print("Exact SHA-pinned published commentary installed only in an isolated temporary root")
+          PY
+      - name: Inventory full corrected original and six chapters without exporting source text
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_modern_source_receipt.py \
+            --native-reader "${RUNNER_TEMP}/commentary-modern-source-raw" \
+            --module-directory "${RUNNER_TEMP}/mhcc-source-root" \
+            --module-id MHCC \
+            --expected-corpus-sha256 \
+            '2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e' \
+            --chapters Ruth.1 Ruth.2 Ruth.3 Ruth.4 Rom.3 Heb.7 \
+            --report "${RUNNER_TEMP}/mhcc-modern-source-native-receipt.json"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          path=Path(os.environ["RUNNER_TEMP"])/"mhcc-modern-source-native-receipt.json"
+          r=json.loads(path.read_text())
+          assert r["source_prose_or_original_markup_exported"] is False
+          assert r["semantic_translation_independently_approved"] is False
+          assert r["complete_native_counts"] == {"K":28742,"I":1255,"TOP":2}
+          for ch,x in r["chapters"].items():
+              assert x["original_native_numbered_keys"] > 0
+              assert x["distinct_original_raw_units"] > 0
+              print(ch+": "+str(x["distinct_original_raw_units"])+
+                    " distinct source bodies / "+str(x["original_native_numbered_keys"])+
+                    " occupied native verse keys / "+
+                    str(len(x["native_introductions_not_assumed_to_be_exposition"]))+
+                    " independently retained introduction keys")
+          print("Full source-native gate PASS (not independent semantic or build acceptance)")
+          PY
+      - name: Upload metadata-only bounded audit receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mhcc-modern-0.1.1-source-native-receipt
+          path: ${{ runner.temp }}/mhcc-modern-source-native-receipt.json
+          if-no-files-found: ignore
+          retention-days: 60
