@@ -7,11 +7,13 @@ Bible Resources is an **independent community project**, not an official CrossWi
 ## Principles
 
 1. **SWORD first.** Preserve standard module drivers, versification systems and layout. Never introduce a Bible-only binary format.
-2. **Preserve meaning.** Keep authoritative, immutable original inputs and distinguish faithful corrections from reader-optimized derivatives. Never silently rewrite the text.
+2. **Be faithful to the work, not a distributor's formatting.** The identified author's work, translation, abridgment and edition are our editorial reference; CrossWire, eBible and other providers supply independently preserved digital witnesses, not an untouchable editorial layout. Improve demonstrated markup, sectioning, indexing, references and reader presentation where justified; preserve authorial meaning and edition-specific textual choices, keep original digital inputs immutable, and document every change.
 3. **Rights before release.** Permission to download from CrossWire does *not* imply permission to mirror or modify. Release only after affirmative rights review, recorded evidence and human approval.
 4. **Predictable quality.** Validate metadata, module layout, Unicode, references, transformations and artefact checksums; smoke-test with a real SWORD reader before release.
 5. **Reproducibility.** Build published packages and catalogues from reviewed versioned inputs; record all editorial changes.
 6. **Interoperability.** Publish the standard `mods.d/`, `modules/`, `mods.d.tar.gz`, and `packages/` layout as well as a versioned JSON catalogue.
+
+This applies equally to **Bibles, commentaries, dictionaries, encyclopedias and other resources**. See [editorial authority and transformation rules](docs/EDITORIAL_RULES.md) for the distinction between a work/edition, an immutable upstream witness, and our verified curated digital edition. An exact-source mirror is one possible result, not the project's universal goal.
 
 ## Status
 
