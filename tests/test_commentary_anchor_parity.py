@@ -84,7 +84,7 @@ class CommentaryAnchorParityTests(unittest.TestCase):
 
     def test_two_volumes_share_one_stock_index_without_inventing_sections(self):
         native = self.native(
-            b"K\\tGen.1.1\\nK\\tJohn.3.16\\n", numbered=2)
+            b"K\tGen.1.1\nK\tJohn.3.16\n", numbered=2)
         first = compare_anchors(
             self.xml(b'<scripCom osisRef="Bible:Gen.1.1-Gen.1.3"/>'),
             native, "TestCom")
@@ -113,7 +113,7 @@ class CommentaryAnchorParityTests(unittest.TestCase):
                 {"volume": 1, "anchor_diagnostic": first},
             ])
         with self.assertRaisesRegex(PilotError, "stock native keys"):
-            wrong_index = self.native(b"K\\tGen.1.1\\n", numbered=1)
+            wrong_index = self.native(b"K\tGen.1.1\n", numbered=1)
             wrong = compare_anchors(self.xml(b'<scripCom osisRef="Bible:Gen.1.1"/>'),
                                     wrong_index, "TestCom")
             summarize_volume_anchor_results([
