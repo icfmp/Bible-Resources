@@ -280,7 +280,8 @@
         "mode": {
           "enum": [
             "stock_reader_keys",
-            "published_source_audit"
+            "published_source_audit",
+            "reviewed_compiled_commentary_rebuild"
           ]
         },
         "manifest": {
@@ -293,7 +294,7 @@
           "if": {
             "properties": {
               "mode": {
-                "const": "published_source_audit"
+                "enum": ["published_source_audit", "reviewed_compiled_commentary_rebuild"]
               }
             },
             "required": [
