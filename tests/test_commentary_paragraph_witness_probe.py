@@ -92,10 +92,42 @@ class ParagraphWitnessProbeTest(unittest.TestCase):
         self.assertEqual(
             row["source_paragraph_lexical_anchors"][0][
                 "original_digital_witness_same_position_word_difference_count"], 1)
+        self.assertEqual(
+            row["source_paragraph_lexical_anchors"][0][
+                "first_difference_semantic_context"],
+            "EXPOSITION_OR_MIXED_SEMANTIC_CONTEXT")
         self.assertTrue(
             row["source_paragraph_lexical_anchors"][0][
                 "all_differences_require_independent_editorial_review"])
         self.assertFalse(row["source_digital_edition_equivalence_proven"])
+
+
+    def test_one_word_scripture_abbreviation_variant_is_not_called_prose_error(self):
+        first = b"one two three four five six seven eight nine ten"
+        last = b"alpha beta gamma delta epsilon zeta eta theta iota kappa"
+        source = document(
+            b"<div1><div2><p><scripCom osisRef='Bible:John.3.1'/>"
+            + first + b" <scripRef osisRef='Bible:Heb.13.13'>Heb</scripRef> "
+            + last + b"</p></div2></div1>"
+        )
+        original = (
+            b"<div/><hi>Verses 1-2</hi> " + first
+            + b" <reference osisRef='Heb.13.13'>He</reference> " + last
+        )
+        row = compare_paragraph_witness(
+            source, [("K", "John.3.1", original)]
+        )["results"][0]
+        item = row["source_paragraph_lexical_anchors"][0]
+        self.assertEqual(item["original_digital_witness_same_position_word_difference_count"], 1)
+        self.assertEqual(item["first_difference_semantic_context"],
+                         "BOTH_SCRIPTURE_REFERENCE_LABELS")
+        self.assertEqual(item["first_difference_source_token_owner"],
+                         "SCRIPTURE_REFERENCE_LABEL")
+        self.assertEqual(item["first_difference_original_token_owner"],
+                         "SCRIPTURE_REFERENCE_LABEL")
+        self.assertTrue(item["citation_label_variants_are_not_proven_authorial_errors"])
+        self.assertNotIn("He</reference>", str(row))
+        self.assertNotIn("Heb.13.13", str(row))
 
     def test_source_one_p_with_internal_linebreak_is_not_misread_as_no_break(self):
         first = b"one two three four five six seven eight nine ten"
