@@ -268,6 +268,7 @@ jobs:
             --native-index-binary "${RUNNER_TEMP}/stock-index" \
             --native-raw-binary "${RUNNER_TEMP}/stock-raw" \
             --report "${RUNNER_TEMP}/editorial-scope.json" \
+            --private-owner-authorized-export-dir "${RUNNER_TEMP}/mhcc-011-approved-private-stage" \
             --temporary-numbered-sample-chapters Gen.36 Matt.13 Song.1 \
             --temporary-original-intro-sample-chapters Lev.19 Ps.108 \
             --temporary-original-mixed-chapters 2John.1 2Chr.1 Matt.13 \
@@ -1216,3 +1217,10 @@ jobs:
           name: original-commentary-section-scope
           path: ${{ runner.temp }}/editorial-scope.json
           retention-days: 14
+      - name: Preserve owner-authorized source-attested seven member PR staging files
+        uses: actions/upload-artifact@v4
+        with:
+          name: mhcc-011-verified-pr-payload-not-a-release
+          path: ${{ runner.temp }}/mhcc-011-approved-private-stage/
+          retention-days: 7
+          if-no-files-found: error
