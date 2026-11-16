@@ -16,7 +16,7 @@ import unicodedata
 
 _HEX = re.compile(r"^[0-9a-f]{64}$")
 _OSIS_CHAPTER = re.compile(r"^[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]{0,2}$")
-_FRONT_FIELD = re.compile(r'^([A-Za-z_]+): "([^"\r\n]*)"$')
+_FRONT_FIELD = re.compile(r'^([A-Za-z_][A-Za-z0-9_]*): "([^"\r\n]*)"$')
 _RANGE = re.compile(r"\bverses\s+(\d{1,3})\s*[-–—]\s*(\d{1,3})", re.I)
 _SINGLE = re.compile(r"\bverse\s+(\d{1,3})\b", re.I)
 _WORD = re.compile(r"[\w’-]+", re.UNICODE)
