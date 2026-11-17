@@ -41,7 +41,8 @@ from commentary_original_bookcode_repair import propose_private_source_bookcode_
 from commentary_prose_cross_slot import strict_native_stock_plain_words
 from commentary_nonlink_word_alignment import (plain_word_alignment,
     classify_original_link_label_effect_on_source_longer_words)
-from commentary_nonlink_words import compare_words_outside_links
+from commentary_nonlink_words import (
+    compare_words_outside_links, _private_unique_original_gap_spans)
 from commentary_unresolved_lexical_triage import WORD
 from commentary_near_prose_unicode_review import classify_same_book_unicode_variants
 from commentary_intake import load_manifest
@@ -192,7 +193,20 @@ def _original_source_markers(xml_bytes: bytes, *,
                 "no_visible_source_text_not_proof_of_missing_stock": True,
             })
             continue
+        original_source_p_word_digests=[]
+        for p in sibling.iter():
+            if p is sibling or not isinstance(p.tag,str) or p.tag.rsplit("}",1)[-1]!="p":
+                continue
+            p_words=WORD.findall("".join(p.itertext()))
+            original_source_p_word_digests.append({
+                "original_p_document_ordinal":len(original_source_p_word_digests)+1,
+                "original_p_visible_word_tokens":len(p_words),
+                "original_p_visible_ordered_word_sha256":
+                    sha256(" ".join(p_words).encode("utf-8")).hexdigest(),
+            })
         sources.setdefault(start,[]).append({
+            "private_original_p_visible_word_digest_inventory":
+                original_source_p_word_digests,
             "original_source_line":node.sourceline,
             "original_full_reference_sha256":sha256(full_ref_bytes).hexdigest(),
             "private_original_declared_range_end_key":original_declared_end,
@@ -963,6 +977,9 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
         double_link_rows=[]
         double_link_gap_classes=Counter()
         double_link_gap_by_original_book={}
+        original_extra_p_digest_case_counts=Counter()
+        original_extra_p_digest_book_counts={}
+        original_extra_p_digest_rows=[]
         high_source_extra_span_candidates=[]
         def record_same_start_source_longer(start,item,raw):
             source_longer_cases.append((start,{
@@ -1000,6 +1017,59 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
             extra_layout=two_sided["source_extra_unlinked_word_gap_layout"]
             if extra_layout is not None:
                 layout_class=extra_layout["alignment_topology"]
+                source_words=WORD.findall(item["original_text"])
+                stock_words=WORD.findall(native_visible)
+                source_link_words=set(item["private_original_scripRef_word_indices"])
+                stock_link_words=set(native_reference_positions)
+                source_plain=[word for i,word in enumerate(source_words)
+                              if i not in source_link_words]
+                stock_plain=[word for i,word in enumerate(stock_words)
+                             if i not in stock_link_words]
+                original_gaps=_private_unique_original_gap_spans(
+                    source_plain,stock_plain)
+                p_digests=item["private_original_p_visible_word_digest_inventory"]
+                if len(p_digests)!=item["private_original_body_tag_counts"].get("p",0):
+                    raise PilotError("Original actual paragraph inventory count changed")
+                if original_gaps is None:
+                    p_class="ambiguous_extra_source_words_no_unique_gap_ownership"
+                    paragraph_matches=[]
+                else:
+                    paragraph_matches=[]
+                    for words in original_gaps:
+                        digest=sha256(" ".join(words).encode("utf-8")).hexdigest()
+                        candidates=[
+                            p["original_p_document_ordinal"] for p in p_digests
+                            if p["original_p_visible_word_tokens"]==len(words)
+                            and p["original_p_visible_ordered_word_sha256"]==digest
+                        ]
+                        paragraph_matches.append({
+                            "original_extra_unlinked_word_count":len(words),
+                            "distinct_full_original_p_exact_visible_word_matches":
+                                len(candidates),
+                            "single_matching_original_p_document_ordinal":
+                                candidates[0] if len(candidates)==1 else None,
+                            "exact_original_p_identity_not_bible_heading_classification":
+                                True,
+                        })
+                    p_class=(
+                        "at_least_one_unique_entire_original_p_visible_word_match"
+                        if any(r["distinct_full_original_p_exact_visible_word_matches"]==1
+                               for r in paragraph_matches)
+                        else "unique_gap_no_entire_original_p_visible_word_match"
+                    )
+                original_extra_p_digest_case_counts[p_class]+=1
+                original_extra_p_digest_book_counts.setdefault(book,Counter())[p_class]+=1
+                original_extra_p_digest_rows.append({
+                    "original_book":book,
+                    "original_source_line":item["original_source_line"],
+                    "original_full_reference_sha256":
+                        item["original_full_reference_sha256"],
+                    "original_body_sha256":item["original_text_sha256"],
+                    "selected_native_raw_sha256":sha256(raw).hexdigest(),
+                    "all_extra_gap_full_original_p_digest_candidate_classes":
+                        paragraph_matches,
+                    "source_extra_p_digest_case_class":p_class,
+                })
                 if (layout_class=="unique_alignment_interior_extra_words_only"
                         and extra_layout["source_extra_nonlink_word_count"]>=100):
                     high_source_extra_span_candidates.append(
@@ -1063,6 +1133,17 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
                 k:dict(sorted(v.items())) for k,v in sorted(
                     double_link_gap_by_original_book.items())
             },
+            "source_extra_original_p_visible_word_digest_case_classes":
+                dict(sorted(original_extra_p_digest_case_counts.items())),
+            "original_book_source_extra_original_p_digest_case_classes":{
+                k:dict(sorted(v.items()))
+                for k,v in sorted(original_extra_p_digest_book_counts.items())
+            },
+            "source_extra_original_p_digest_source_line_sha_only_rows":
+                sorted(original_extra_p_digest_rows,key=lambda x:(
+                    x["original_book"],x["original_source_line"],
+                    x["original_full_reference_sha256"])),
+            "exact_source_p_digest_match_not_proof_of_biblical_heading_or_authorship":True,
             "original_line_SHA_and_two_sided_link_word_metadata_only_rows":
                 sorted(double_link_rows,key=lambda x:(
                     x["source_book"],x["original_source_line"],
@@ -1083,6 +1164,11 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
                 sum(sum(group.values()) for group in
                     double_link_gap_by_original_book.values())!=expected_nonlink_extra):
             raise PilotError("Source extra word gap topology does not reconcile")
+        if (sum(original_extra_p_digest_case_counts.values())!=expected_nonlink_extra
+                or len(original_extra_p_digest_rows)!=expected_nonlink_extra
+                or sum(sum(g.values()) for g in
+                       original_extra_p_digest_book_counts.values())!=expected_nonlink_extra):
+            raise PilotError("Source-extra actual original paragraph fingerprints do not reconcile")
         if (len(double_link_rows)!=expected_longer or
                 sum(double_link_class_counts.values())!=expected_longer
                 or sum(double_link_original_book_counts.values())!=expected_longer
