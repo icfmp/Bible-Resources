@@ -1083,6 +1083,16 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
                     "selected_native_raw_sha256":sha256(raw).hexdigest(),
                     "all_extra_gap_full_original_p_digest_candidate_classes":
                         paragraph_matches,
+                    "original_opening_p_document_ordinal":
+                        p_digests[0]["original_p_document_ordinal"] if p_digests else None,
+                    "original_opening_p_visible_word_count":
+                        p_digests[0]["original_p_visible_word_tokens"] if p_digests else None,
+                    "original_opening_p_exact_unicode_word_sha256":
+                        p_digests[0]["original_p_visible_ordered_word_sha256"]
+                        if p_digests else None,
+                    "original_opening_p_casefold_unicode_word_sha256":
+                        p_digests[0]["original_p_visible_casefold_word_sha256"]
+                        if p_digests else None,
                     "source_extra_p_digest_case_class":p_class,
                 })
                 if (layout_class=="unique_alignment_interior_extra_words_only"
