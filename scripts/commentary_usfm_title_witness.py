@@ -133,7 +133,13 @@ def independent_usfm_titles(archive: Path, pinned_sha256: str,
             title = found.group(1)
             visible=reviewed_usfm_title_visible_text(title)
             if visible is None:
-                result[current] = {"status": "unreviewed_inline_usfm_title_markup"}
+                markers=sorted(set(re.findall(r"\\\\[+A-Za-z0-9]+\\*?",title)))
+                if len(markers)>24 or any(len(name)>32 for name in markers):
+                    raise WitnessError("Unbounded original title inline marker vocabulary")
+                result[current] = {
+                    "status": "unreviewed_inline_usfm_title_markup",
+                    "unreviewed_original_usfm_marker_shapes_only": markers,
+                }
                 continue
             tokens = WORD.findall(visible)
             if not 1 <= len(tokens) <= 100:
@@ -206,11 +212,14 @@ def compare_original_first_paragraphs(safe_receipt: dict, titles: dict[int, dict
         if title is None:
             verdict = "no_independent_usfm_d_title_for_original_chapter"
             title_size = None
+            marker_shapes = None
         elif title["status"] == "unreviewed_inline_usfm_title_markup":
             verdict = "unreviewed_inline_usfm_d_title"
             title_size = None
+            marker_shapes = title["unreviewed_original_usfm_marker_shapes_only"]
         else:
             title_size = title["word_count"]
+            marker_shapes = None
             if size != title_size:
                 verdict = "source_p1_and_usfm_d_title_word_counts_differ"
             elif p_sha == title["exact_unicode_word_sha256"]:
@@ -224,6 +233,7 @@ def compare_original_first_paragraphs(safe_receipt: dict, titles: dict[int, dict
             "original_source_full_reference_sha256": orig_sha,
             "original_source_first_p_word_count": size,
             "independent_usfm_d_title_word_count": title_size,
+            "unsupported_usfm_inline_marker_shapes_only": marker_shapes,
             "verdict": verdict,
         })
     if not cases or len(cases) != expected:
