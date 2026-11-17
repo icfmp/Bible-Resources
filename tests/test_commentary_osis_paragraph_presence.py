@@ -790,11 +790,12 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
                        ("<p>"+" ".join(middle)+"</p>").encode())
         census.observe("K","Ps.96.1",
                        ("<p>"+" ".join(ps96)+"</p>").encode())
-        result=census.private_trailing_source_gaps_in_other_original_chapters()
-        self.assertEqual(result["genuine_authored_chapter_trailing_gaps"],1)
+        result=census.private_uncovered_source_gaps_in_other_original_chapters()
+        self.assertEqual(result["genuine_authored_chapter_uncovered_gap_scopes"],1)
         case=result["cases"][0]
-        self.assertEqual(case["source_trailing_gap_word_offset_not_verse_key"],20)
-        self.assertEqual(case["source_trailing_gap_visible_word_tokens"],16)
+        self.assertEqual(case["source_gap_location_class"],"source_terminal_suffix")
+        self.assertEqual(case["source_gap_word_offset_not_verse_key"],20)
+        self.assertEqual(case["source_gap_visible_word_tokens"],16)
         self.assertTrue(case["next_original_chapter_source_has_entire_gap"])
         self.assertTrue(case["next_original_chapter_located_native_has_entire_gap"])
         self.assertEqual(case["other_same_book_source_chapters_with_entire_gap"],1)
@@ -817,13 +818,44 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
                         ("<p>"+" ".join(next_extra+[
                             f"newsource{i:02d}" for i in range(10)])+
                          "</p>").encode())
-        absent=no_next.private_trailing_source_gaps_in_other_original_chapters()
-        self.assertEqual(absent["genuine_authored_chapter_trailing_gaps"],1)
+        absent=no_next.private_uncovered_source_gaps_in_other_original_chapters()
+        self.assertEqual(absent["genuine_authored_chapter_uncovered_gap_scopes"],1)
         other=absent["cases"][0]
         self.assertFalse(other["next_original_chapter_source_has_entire_gap"])
         self.assertFalse(other["next_original_chapter_located_native_has_entire_gap"])
         self.assertEqual(
             other["next_chapter_located_native_eight_word_anchor_hits_of_three"],0)
+
+
+    def test_source_gap_followed_by_authentic_native_K_is_internal_not_terminal(self):
+        intro=[f"intro{i:02d}" for i in range(8)]
+        first=[f"bodyfirst{i:02d}" for i in range(10)]
+        missing=[f"uncovered{i:02d}" for i in range(12)]
+        last=[f"bodylast{i:02d}" for i in range(10)]
+        source=intro+first+missing+last
+        next_source=[f"nextchapword{i:02d}" for i in range(20)]
+        census=PrivateOriginalChapterNativeAnchorCoverage(
+            {"Rom.4":source,"Rom.5":next_source})
+        census.observe("I","Rom.4.0",
+                       ("<title>"+" ".join(intro)+"</title>").encode())
+        census.observe("K","Rom.4.1",
+                       ("<p>"+" ".join(first)+"</p>").encode())
+        census.observe("K","Rom.4.2",
+                       ("<p>"+" ".join(last)+"</p>").encode())
+        census.observe("K","Rom.5.1",
+                       ("<p>"+" ".join(next_source)+"</p>").encode())
+        result=census.private_uncovered_source_gaps_in_other_original_chapters()
+        self.assertEqual(result["genuine_authored_chapter_uncovered_gap_scopes"],1)
+        self.assertEqual(result["genuine_authored_chapter_uncovered_word_intervals"],1)
+        case=result["cases"][0]
+        self.assertEqual(case["source_gap_location_class"],"source_internal_interval")
+        self.assertEqual(case["source_gap_word_offset_not_verse_key"],18)
+        self.assertEqual(case["source_gap_visible_word_tokens"],12)
+        self.assertFalse(case["next_original_chapter_source_has_entire_gap"])
+        self.assertFalse(case["next_original_chapter_located_native_has_entire_gap"])
+        self.assertEqual(case["other_same_book_source_chapters_with_entire_gap"],0)
+        self.assertEqual(case["other_same_book_located_native_chapters_with_entire_gap"],0)
+        self.assertNotIn("uncovered00",json.dumps(result))
 
 
 if __name__=="__main__":
