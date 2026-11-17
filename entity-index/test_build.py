@@ -149,7 +149,8 @@ class EntityIndexTests(unittest.TestCase):
     def test_pinned_absent_word_is_quarantined_from_lookup_not_source(self):
         path = self.write_record(
             "people", "GenericMale", references=["02002013"],
-            subject_referents={"wlc": [["o020020130103"]]})
+            subject_referents={"wlc": [
+                ["o020020130103"], ["o020020130103"]]})
         before = path.read_bytes()
         audit = {
             "schema_version": 1, "corpus": "wlc",
@@ -159,6 +160,7 @@ class EntityIndexTests(unittest.TestCase):
         }
         report = self.build(source_absences=audit)
         self.assertEqual(report["statistics"]["unattested_distinct_source_words"], 1)
+        self.assertEqual(report["statistics"]["unattested_raw_word_assignments"], 2)
         self.assertNotIn("wlc:o020020130103", report["by_word"])
         self.assertEqual(
             report["unattested_source_words"]["wlc:o020020130103"]
@@ -166,7 +168,7 @@ class EntityIndexTests(unittest.TestCase):
             [{"entity_id": "person:GenericMale", "link_type": "subject_referents"}],
         )
         self.assertEqual(report["entities"][0]["occurrences"]["subject_referents"]
-                         ["wlc"], [["o020020130103"]])
+                         ["wlc"], [["o020020130103"], ["o020020130103"]])
         self.assertEqual(path.read_bytes(), before)
 
         with self.assertRaisesRegex(ValueError, "not in source index"):
