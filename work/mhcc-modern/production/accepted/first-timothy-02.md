@@ -21,7 +21,7 @@ publication_status: "NOT RELEASED — FULL SWORD REBUILD PENDING"
 
 Disciples of Jesus should be **people who pray**.
 
-Prayer is appropriate for all, without distinction of **nation, denomination, social rank or political party**.
+Christians should pray without excluding anyone on account of **nation, religious group, social rank or party**.
 
 Our Christian responsibilities can be summed up in two words:
 
@@ -89,13 +89,16 @@ Paul refers to the order of creation and to Eve's earlier participation in trans
 
 But Henry also draws a word of comfort from the promise concerning **childbearing**.
 
-He understands salvation **“in” or “with” childbearing** as coming **through the Messiah born of a woman**, provided people persevere in modest faith and holiness.
+He understands salvation **“in” or “with” childbearing** as coming **through the Messiah born of a woman**, with a word of comfort **for those who continue in sobriety**.
 
 The particular suffering associated with childbearing should also move men to exercise authority **with tenderness, gentleness and loving affection**.
 
 ---
 
 ## Editorial review — 1 Timothy 2
+
+**2026-11-17 second-pass CCEL collation:** restored Henry's unrestricted **“nation, sect, rank, or party”** without narrowing *party* to contemporary political parties; restored his condition **“those who continue in sobriety”** instead of adding *faith and holiness* as though those exact words were in Henry's sentence. Compared directly with [CCEL 1 Timothy 2](https://ccel.org/ccel/henry/mhcc.xlvi.ii.html). The exact released native SWORD 0.1.1 text, original markup and references still require separate native-source editorial approval.
+
 
 **Entire original-English secondary witness read:** [CCEL, 1 Timothy 2](https://ccel.org/ccel/henry/mhcc.xlvi.ii.html). Released `MHCC 0.1.1` remains source authority pending exact native SWORD keys/notes and independent reader validation.
 
