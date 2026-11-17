@@ -749,9 +749,9 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                         break
                     cursor=end
                 if partition and cursor==len(state["source_words"]):
-                    source_flat=re.sub(r"\\s+","",state["source_visible_text"])
+                    source_flat=re.sub(r"\s+","",state["source_visible_text"])
                     native_flat=re.sub(
-                        r"\\s+","", "".join(segment[3] for segment in segments))
+                        r"\s+","", "".join(segment[3] for segment in segments))
                     source_flat_len=len(source_flat)
                     native_flat_len=len(native_flat)
                     source_flat_sha=sha256(source_flat.encode("utf-8")).hexdigest()
