@@ -581,6 +581,45 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes],
     }
 
 
+def select_authorial_word_loss_attention(cases: list[dict]) -> tuple[list[dict], dict]:
+    """Gate only source words genuinely unmatched; keep other differences visible.
+
+    A stock entry with additional heading/quotation material need not have
+    lost an original authorial word. No equality of editions is inferred.
+    """
+    if not isinstance(cases, list) or len(cases) > 256:
+        raise PilotError("Original source lexical triage cases outside reviewed bound")
+    relevant = []
+    categories = Counter()
+    for case in cases:
+        if not isinstance(case, dict):
+            raise PilotError("Malformed original source lexical case")
+        alignment = case.get("exact_plain_word_alignment")
+        if not isinstance(alignment, dict):
+            raise PilotError("Original lexical case without independent word alignment")
+        missing = alignment.get("original_plain_words_not_matched_in_exact_order")
+        if missing is None:
+            categories["original_alignment_budget_not_resolved"] += 1
+        elif type(missing) is not int or missing < 0:
+            raise PilotError("Unreviewed original source missing-word count")
+        elif missing == 0:
+            categories["original_words_all_found_in_order_but_other_differences_remain"] += 1
+        else:
+            relevant.append(case)
+            categories["original_words_not_all_found_in_order_requires_identity_review"] += 1
+    if sum(categories.values()) != len(cases):
+        raise PilotError("Source/stock lexical attention accounting incomplete")
+    return relevant, {
+        "status": "BOUNDED_AUTHORIAL_WORD_LOSS_SELECTION_NOT_SOURCE_TEXT_PARITY",
+        "bounded_original_lexical_attention_cases_checked": len(cases),
+        "selected_original_word_order_loss_cases": len(relevant),
+        "classes": dict(sorted(categories.items())),
+        "all_original_lexical_cases_remain_in_main_text_diagnostic": True,
+        "no_authorial_or_compiled_text_modified": True,
+        "source_punctuation_and_markup_parity_not_proven": True,
+    }
+
+
 def unreviewed_original_chapter_sibling_receipts(proof: dict) -> tuple[dict, dict, dict, dict]:
     """Four explicit NOT-TESTED receipts, never misclassify absent source words."""
     total = proof["explicit_chapter_source_marker_count"]
@@ -815,8 +854,11 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
         # A ThML div1 can claim a different OSIS book than its own title.
         # Preserve BOTH original values: never join different book texts and
         # call their word differences a CrossWire compiled-content defect.
+        source_word_loss_cases, source_word_loss_selection = (
+            select_authorial_word_loss_attention(
+                lexical.get("bounded_plain_word_nontrivial_differences_line_and_hash_cases", [])))
         source_identity_lexical_gate=classify_lexical_source_identity(
-            source,lexical.get("bounded_plain_word_nontrivial_differences_line_and_hash_cases",[])
+            source, source_word_loss_cases
         )
         source_same_book_unicode_prose_review=classify_same_book_unicode_variants(
             source,matches,source_identity_lexical_gate,
@@ -954,6 +996,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
         "source_original_div1_osisRef_book_consistency_census":original_div1_book_consistency,
         "source_original_div1_english_alias_vs_osisRef_book_claim_evidence":original_div1_english_aliases,
         "source_div1_book_identity_safety_gate_for_nonlink_lexical_differences":source_identity_lexical_gate,
+        "source_authorial_word_loss_attention_selection": source_word_loss_selection,
         "original_source_book_marker_private_repair_proposal_stock_review":
             original_source_book_marker_private_repair_stock_review,
         "original_source_same_book_unicode_lexical_witness_review":source_same_book_unicode_prose_review,

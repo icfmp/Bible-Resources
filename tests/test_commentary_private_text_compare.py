@@ -14,6 +14,24 @@ from pilot_preflight import PilotError
 
 
 class CommentaryOriginalStockTextTests(unittest.TestCase):
+    def test_only_source_words_not_found_are_routed_to_loss_identity_gate(self):
+        from commentary_private_text_compare import select_authorial_word_loss_attention
+        candidate = lambda missing: {
+            "exact_plain_word_alignment": {
+                "original_plain_words_not_matched_in_exact_order": missing}}
+        selected, proof = select_authorial_word_loss_attention(
+            [candidate(0), candidate(3), candidate(None)])
+        self.assertEqual(len(selected), 1)
+        self.assertEqual(
+            selected[0]["exact_plain_word_alignment"][
+                "original_plain_words_not_matched_in_exact_order"], 3)
+        self.assertEqual(proof["bounded_original_lexical_attention_cases_checked"], 3)
+        self.assertEqual(sum(proof["classes"].values()), 3)
+        self.assertTrue(proof["all_original_lexical_cases_remain_in_main_text_diagnostic"])
+        self.assertFalse(proof["source_punctuation_and_markup_parity_not_proven"] is False)
+        with self.assertRaises(PilotError):
+            select_authorial_word_loss_attention([candidate(-1)])
+
     def test_all_unreviewed_chapter_siblings_produce_explicit_not_tested_receipts(self):
         from commentary_private_text_compare import unreviewed_original_chapter_sibling_receipts
         proof = {"explicit_chapter_source_marker_count": 2,

@@ -95,6 +95,11 @@ jobs:
                     "unreviewed_tags": report["source_original_chapter_neighbor_evidence"][
                         "original_unreviewed_sibling_tag_counts"],
                 }, sort_keys=True))
+          selection = report["source_authorial_word_loss_attention_selection"]
+          assert selection["no_authorial_or_compiled_text_modified"] is True
+          assert selection["source_punctuation_and_markup_parity_not_proven"] is True
+          print("Authorial word-order loss versus stock-only/other differences:",
+                json.dumps(selection["classes"], sort_keys=True))
           print("An exact source edition/structure proof is NOT established.")
           PY
       - name: Explain private content boundaries
