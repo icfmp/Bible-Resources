@@ -28,6 +28,120 @@ concurrency:
   group: mhc-original-text-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
+  observe_upstream_authoring_osis_metadata:
+    name: Observe CrossWire upstream MHC authoring OSIS without publishing it
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pin upstream public GitLab revision and observe source bytes only
+        shell: bash
+        run: |
+          set -euo pipefail
+          export GIT_TERMINAL_PROMPT=0 GIT_LFS_SKIP_SMUDGE=1
+          upstream=https://gitlab.com/crosswire-bible-society/mhc.git
+          scratch="$(mktemp -d)"
+          trap 'rm -rf "$scratch"' EXIT
+          latest="$(timeout 120s git ls-remote "$upstream" refs/heads/main | awk '{print $1}')"
+          if ! [[ "$latest" =~ ^[0-9a-f]{40}$ ]]; then
+            echo 'Upstream source ref was not verifiable; no source trusted' >&2
+            exit 1
+          fi
+          # Initially confirm the independently observed 2022 publisher revision,
+          # not an unreviewed later commit or arbitrary moving target.
+          if [[ "$latest" != 537591a9* ]]; then
+            echo 'Official CrossWire MHC upstream HEAD changed: require review/re-pin' >&2
+            exit 1
+          fi
+          timeout 240s git -c core.hooksPath=/dev/null clone --depth 1 --branch main \
+            --single-branch --no-tags "$upstream" "$scratch/source" 1>&2
+          actual="$(git -C "$scratch/source" rev-parse HEAD)"
+          if [ "$actual" != "$latest" ]; then
+            echo 'Official CrossWire MHC source ref changed during clone' >&2
+            exit 1
+          fi
+          UPSTREAM_SOURCE="$scratch/source" UPSTREAM_SHA="$actual" python - <<'PY'
+          from hashlib import sha256
+          import os
+          from pathlib import Path
+          import re
+          import xml.parsers.expat as expat
+          import json
+
+          root=Path(os.environ["UPSTREAM_SOURCE"])
+          manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
+          if manifest["module_id"]!="MHC" or manifest["version"]!="2.2":
+              raise SystemExit("Original independently pinned MHC manifest unexpectedly changed")
+          if sorted(p.name for p in root.iterdir() if p.name!=".git") != [
+              "README.md","mhc.conf","mhc.osis.xml","mhcBuild.sh"
+          ]:
+              raise SystemExit("Unreviewed source repository member set")
+          expected={"mhc.osis.xml":180*1024*1024, "mhc.conf":128*1024,
+                    "mhcBuild.sh":128*1024, "README.md":128*1024}
+          metadata={}
+          for name,max_size in expected.items():
+              path=root/name
+              if not path.is_file() or path.is_symlink() or not 0<path.stat().st_size<=max_size:
+                  raise SystemExit("Invalid original upstream source member")
+              digest=sha256()
+              with path.open("rb") as handle:
+                  for block in iter(lambda:handle.read(1024*1024),b""):
+                      digest.update(block)
+              metadata[name]={"sha256":digest.hexdigest(),"size":path.stat().st_size}
+
+          # Parse markup data ONLY; never execute the upstream build script.
+          # Expat rejects DTD/entity extension; streamed events avoid exporting prose.
+          p=expat.ParserCreate()
+          seen={"osis":0,"osisText":0,"div":0,"reference":0}
+          roots=[]
+          depth=0
+          def start(name,attrs):
+              global depth
+              depth+=1
+              tag=name.split(":")[-1]
+              if depth==1: roots.append(tag)
+              if tag in seen: seen[tag]+=1
+          def end(name):
+              global depth
+              depth-=1
+          def reject(*args):
+              raise ValueError("Unreviewed original upstream XML DTD/entity declaration")
+          p.StartElementHandler=start
+          p.EndElementHandler=end
+          p.StartDoctypeDeclHandler=reject
+          p.EntityDeclHandler=reject
+          p.ExternalEntityRefHandler=lambda *args: 0
+          with (root/"mhc.osis.xml").open("rb") as handle:
+              while block:=handle.read(1024*1024):
+                  p.Parse(block,False)
+              p.Parse(b"",True)
+          if roots!=["osis"] or seen["osisText"]<1 or seen["div"]<1:
+              raise SystemExit("Expected original OSIS document structure not confirmed")
+          conf=(root/"mhc.conf").read_text(encoding="utf-8")
+          def confval(key):
+              match=re.findall(r"(?m)^"+re.escape(key)+r"=([^\r\n]*)$",conf)
+              if len(match)!=1: raise SystemExit("Original upstream .conf has ambiguous critical metadata")
+              return match[0].strip()
+          version=confval("Version")
+          driver=confval("ModDrv")
+          source_type=confval("SourceType")
+          if not re.fullmatch(r"[0-9]+(?:\.[0-9]+){1,2}",version):
+              raise SystemExit("Original upstream source version has an unreviewed shape")
+          if driver!="zCom" or source_type!="OSIS":
+              raise SystemExit("Upstream build module driver/format inconsistent")
+          print("Official upstream source commit (not equivalent to compiled ZIP SHA):",
+                os.environ["UPSTREAM_SHA"])
+          print("Authoring-file original bytes and independent SHA256:",
+                json.dumps(metadata,sort_keys=True))
+          print("Original authoring OSIS XML root and closed tag counts:",
+                roots[0],json.dumps(seen,sort_keys=True))
+          print("Upstream .conf version vs pinned downloaded CrossWire 2.2:",
+                version,version==manifest["version"])
+          print("Original build script inspected by SHA only; never executed.")
+          print("Original source OSIS to compiled raw parity: NOT YET TESTED.")
+          print("Electronic rights / CCEL derived layers: NOT AUTHORIZED BY THIS CHECK.")
+          print("Original GitLab source and original ZIP: unmodified and unpublished.")
+          PY
   observe_kjv_independent_usfm_metadata:
     name: Observe independent KJV Psalm USFM witness, without importing source text
     runs-on: ubuntu-24.04
