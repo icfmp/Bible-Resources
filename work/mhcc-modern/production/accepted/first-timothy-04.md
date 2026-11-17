@@ -19,7 +19,7 @@ publication_status: "NOT RELEASED — FULL SWORD REBUILD PENDING"
 
 ## Reject false restrictions and receive God's gifts with thanks (verses 1–5)
 
-Through the Holy Spirit, Scripture foretold **a widespread departure from true faith and from the pure worship of God**.
+The Holy Spirit spoke **in both the Old and New Testaments** of a widespread departure from **faith in Christ and the pure worship of God**.
 
 This would occur during **the Christian era**, described as the last days.
 
@@ -84,6 +84,9 @@ May each seek to experience **the gospel's power within the soul** and produce i
 ---
 
 ## Editorial review — 1 Timothy 4
+
+**2026-11-17 second-pass CCEL collation:** explicitly restored Henry's **both Old and New Testaments** witness and **faith of Christ**, previously reduced to a generic Scripture/faith summary. Source witness: [CCEL 1 Timothy 4](https://ccel.org/ccel/henry/mhcc.xlvi.iv.html). Original native wording, notes and references await independent collation.
+
 
 **Whole secondary original-English witness compared:** [CCEL, 1 Timothy 4](https://ccel.org/ccel/henry/mhcc.xlvi.iv.html). Published `MHCC 0.1.1` remains source of record, source-native SWORD alignment and independent approval outstanding.
 
