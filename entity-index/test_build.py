@@ -45,9 +45,10 @@ class EntityIndexTests(unittest.TestCase):
         self.lock["source_records_expected"] += 1
         return path
 
-    def build(self, decisions=()):
+    def build(self, decisions=(), source_absences=None):
         return builder.build(self.root, self.lock,
-                             {"schema_version": 1, "decisions": list(decisions)})
+                             {"schema_version": 1, "decisions": list(decisions)},
+                             source_absences)
 
     def test_actual_editorial_pilots_preserve_source_and_correct_classification(self):
         path = self.write_record("people", "Jashar",
@@ -144,6 +145,44 @@ class EntityIndexTests(unittest.TestCase):
         self.assertNotIn("Invented biographical prose",
                          json.dumps(report, ensure_ascii=False))
         self.assertNotIn("Never copy", json.dumps(report, ensure_ascii=False))
+
+    def test_pinned_absent_word_is_quarantined_from_lookup_not_source(self):
+        path = self.write_record(
+            "people", "GenericMale", references=["02002013"],
+            subject_referents={"wlc": [["o020020130103"]]})
+        before = path.read_bytes()
+        audit = {
+            "schema_version": 1, "corpus": "wlc",
+            "source_edition": "pinned-test",
+            "provenance": [{"source": "pinned-source-check", "finding": "absent"}],
+            "word_ids": ["o020020130103"],
+        }
+        report = self.build(source_absences=audit)
+        self.assertEqual(report["statistics"]["unattested_distinct_source_words"], 1)
+        self.assertNotIn("wlc:o020020130103", report["by_word"])
+        self.assertEqual(
+            report["unattested_source_words"]["wlc:o020020130103"]
+                  ["source_claims"],
+            [{"entity_id": "person:GenericMale", "link_type": "subject_referents"}],
+        )
+        self.assertEqual(report["entities"][0]["occurrences"]["subject_referents"]
+                         ["wlc"], [["o020020130103"]])
+        self.assertEqual(path.read_bytes(), before)
+
+        with self.assertRaisesRegex(ValueError, "not in source index"):
+            self.build(source_absences=dict(audit, word_ids=["o020020130104"]))
+        with self.assertRaisesRegex(ValueError, "Duplicate source-unattested"):
+            self.build(source_absences=dict(audit, word_ids=[
+                "o020020130103", "o020020130103"]))
+        with self.assertRaisesRegex(ValueError, "not pinned"):
+            self.build(source_absences=dict(audit, source_edition="wrong"))
+        with self.assertRaisesRegex(ValueError, "source provenance"):
+            self.build(source_absences=dict(audit, provenance=[]))
+        self.write_record(
+            "people", "Other", references=["02002013"],
+            explicit_instances={"wlc": [["o020020130103"]]})
+        with self.assertRaisesRegex(ValueError, "direct/pronominal"):
+            self.build(source_absences=audit)
 
     def test_preserve_group_order_repetitions_and_ambiguity(self):
         self.write_record("people", "A", references=["01001001"],
