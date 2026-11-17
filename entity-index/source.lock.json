@@ -10,11 +10,13 @@
   "source_editions": {
     "wlc": {
       "edition": "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c",
-      "word_id_prefix": "o"
+      "word_id_prefix": "o",
+      "word_id_digits": 12
     },
     "sblgnt": {
       "edition": "Clear-Bible/macula-greek@8423afe47b9e8f24b7772e808af45c7159a6fe7e",
-      "word_id_prefix": "n"
+      "word_id_prefix": "n",
+      "word_id_digits": 11
     }
   },
   "source_corpora": {
