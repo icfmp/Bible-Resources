@@ -192,6 +192,7 @@ def build(source_root: Path, source_lock: dict, editorial: dict) -> dict:
             "source_credit": source_lock["source_credit"],
             "reviewed_hebrew_source": source_lock["reviewed_hebrew_source"],
             "reviewed_greek_source": source_lock["reviewed_greek_source"],
+            "source_editions": source_lock["source_editions"],
         },
         "statistics": {
             "source_records": len(originals),
