@@ -233,6 +233,8 @@ class OriginalExtraGapChapterNativeTests(unittest.TestCase):
                          ["extra_span_inside_one_original_p"]*2)
         self.assertEqual([x["distinct_original_p_elements_touched"] for x in spans],[1,1])
         self.assertEqual([x["partially_covered_original_p_elements"] for x in spans],[1,1])
+        self.assertEqual([x["exact_whole_original_p_document_ordinal_when_unique"]
+                          for x in spans],[None,None])
         self.assertNotIn("secretFirst",json.dumps(report))
         self.assertEqual(row["original_ccel_scripCom_osisRef_claim_only"],
                          "Bible:Gen.1.1")
@@ -271,6 +273,7 @@ class OriginalExtraGapChapterNativeTests(unittest.TestCase):
         self.assertEqual(spans[0]["original_paragraph_ownership_class"],
                          "extra_span_crosses_multiple_original_p_elements")
         self.assertEqual(spans[0]["distinct_original_p_elements_touched"],2)
+        self.assertIsNone(spans[0]["exact_whole_original_p_document_ordinal_when_unique"])
 
     def test_no_hit_in_same_chapter_does_not_claim_text_lost(self):
         sample,_,_=self._original_case()
