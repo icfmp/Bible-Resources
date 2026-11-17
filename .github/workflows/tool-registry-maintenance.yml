@@ -28,3 +28,31 @@ jobs:
         run: |
           set -euo pipefail
           python scripts/tool_registry.py --check
+      - name: Explain metadata-only drift without rewriting checked-in files
+        if: failure()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from scripts.tool_registry import generate
+          actual = json.loads(Path("docs/TOOL_REGISTRY.json").read_text())
+          expected = generate()
+          old = {entry["path"]: entry for entry in actual["files"]}
+          new = {entry["path"]: entry for entry in expected["files"]}
+          for path in sorted(set(old) | set(new)):
+              before, after = old.get(path, {}), new.get(path, {})
+              changed = [field for field in sorted(set(before) | set(after))
+                         if before.get(field) != after.get(field)]
+              if changed:
+                  print(path, "drift fields:", ", ".join(changed))
+                  if "static_references" in changed:
+                      print("  missing static callers:",
+                            sorted(set(after.get("static_references", ())) -
+                                   set(before.get("static_references", ()))))
+                      print("  obsolete static callers:",
+                            sorted(set(before.get("static_references", ())) -
+                                   set(after.get("static_references", ()))))
+                  if "sha256_at_inventory" in changed:
+                      print("  expected source SHA-256:", after.get("sha256_at_inventory"))
+          PY
