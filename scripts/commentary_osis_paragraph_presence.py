@@ -396,7 +396,20 @@ class PrivateOriginalChapterNativeAnchorCoverage:
 
     def __init__(self, chapter_words: dict[str, list[str]], *,
                  private_chapter_visible_texts: dict[str, str] | None = None,
-                 private_chapter_reference_targets: dict[str, list[str]] | None = None):
+                 private_chapter_reference_targets: dict[str, list[str]] | None = None,
+                 private_book_pre_chapter_words: dict[str, list[str]] | None = None):
+        if private_book_pre_chapter_words is not None:
+            if (not isinstance(chapter_words,dict)
+                    or not isinstance(private_book_pre_chapter_words,dict)
+                    or not set(private_book_pre_chapter_words).issubset(chapter_words)):
+                raise ValueError("Unreviewed original book prechapter word scopes")
+            for chapter,prelude in private_book_pre_chapter_words.items():
+                if (not chapter.endswith(".1") or not isinstance(prelude,list)
+                        or len(prelude)>100_000
+                        or any(not isinstance(word,str) or not word
+                               for word in prelude)):
+                    raise ValueError("Invalid original pre-first-chapter word witness")
+
         if (private_chapter_reference_targets is not None
                 and (not isinstance(chapter_words,dict)
                      or not isinstance(private_chapter_reference_targets,dict)
@@ -445,6 +458,10 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                 "source_word_spans": source_spans,
                 "native_K_interior_character_relation_classes": defaultdict(int),
                 "native_I_interior_character_relation_classes": defaultdict(int),
+                "source_book_pre_chapter_words":(
+                    None if private_book_pre_chapter_words is None
+                    else private_book_pre_chapter_words.get(chapter)),
+                "intro_book_prelude_exact_location_classes":defaultdict(int),
                 "source_reference_targets": (
                     None if private_chapter_reference_targets is None
                     else list(private_chapter_reference_targets[chapter])),
@@ -504,6 +521,18 @@ class PrivateOriginalChapterNativeAnchorCoverage:
             state["intro_distinct_raw_digests"].add(digest)
             offsets = _private_exact_token_match_offsets(
                 state["source_words"], words)
+            if not offsets and state["source_book_pre_chapter_words"] is not None:
+                before_chapter=_private_exact_token_match_offsets(
+                    state["source_book_pre_chapter_words"], words)
+                if len(before_chapter)==1:
+                    state["intro_book_prelude_exact_location_classes"][
+                        "one_unique_complete_exact_prelude_word_location"]+=1
+                elif before_chapter:
+                    state["intro_book_prelude_exact_location_classes"][
+                        "multiple_exact_prelude_word_locations_ambiguous"]+=1
+                else:
+                    state["intro_book_prelude_exact_location_classes"][
+                        "not_exactly_in_original_book_pre_first_chapter_words"]+=1
             native_references=_private_native_reference_targets(root)
             if len(offsets)==1:
                 state["native_reference_target_segments"].append(
@@ -689,6 +718,7 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                         start == 0 and end >=
                         prefix["source_uncovered_visible_word_tokens"]
                         for start, end in intro_intervals))
+            source_book_pre_chapter=state["source_book_pre_chapter_words"]
             source_reference_targets=state["source_reference_targets"]
             reference_scope_complete=(
                 all_exact_unique and
@@ -717,6 +747,12 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                 "original_chapter_reference_sha256": sha256(
                     chapter.encode("utf-8")).hexdigest(),
                 "original_chapter_visible_words": len(state["source_words"]),
+                "original_book_before_first_chapter_visible_words":(
+                    None if source_book_pre_chapter is None
+                    else len(source_book_pre_chapter)),
+                "native_chapter_I_book_prelude_exact_location_classes":
+                    dict(sorted(state["intro_book_prelude_exact_location_classes"].items())),
+                "book_pre_first_chapter_location_not_editorial_owner_proof":True,
                 "source_chapter_reference_elements": (
                     None if source_reference_targets is None
                     else len(source_reference_targets)),
@@ -779,6 +815,7 @@ class PrivateOriginalChapterNativeAnchorCoverage:
             "minimum_exact_case_sensitive_anchor_words": self.ANCHOR,
             "original_chapter_cases": rows,
             "full_intro_and_top_payload_parity_not_proven": True,
+            "book_pre_first_chapter_word_location_not_intro_owner_proof":True,
             "chapter_I_key_filter_not_editorial_owner_proof": True,
             "original_verse_key_range_and_paragraph_owner_not_inferred": True,
             "casefold_only_categories_do_not_authorize_case_changes": True,
