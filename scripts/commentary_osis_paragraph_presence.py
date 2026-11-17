@@ -923,8 +923,8 @@ class PrivateOriginalChapterNativeAnchorCoverage:
             anchor_lengths=[]
             anchors=[
                 original_suffix[:self.ANCHOR],
-                original_suffix[len(original_suffix)//2:
-                                len(original_suffix)//2+self.ANCHOR],
+                original_suffix[(len(original_suffix)-self.ANCHOR)//2:
+                                (len(original_suffix)-self.ANCHOR)//2+self.ANCHOR],
                 original_suffix[-self.ANCHOR:],
             ]
             for neighbor,other in self._scopes.items():
