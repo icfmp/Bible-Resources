@@ -58,6 +58,24 @@ class Extract(unittest.TestCase):
         self.assertFalse(census["safe_to_write_one_section_per_sword_key"])
         self.assertFalse(census["original_sections_reordered_or_merged"])
 
+    def test_quarantine_all_original_divisions_with_duplicate_starts(self):
+        raw = source('<scripCom osisRef="Bible:Gen.1.1-Gen.1.2"/>'
+                     '<div><p>First original section</p></div>'
+                     '<scripCom osisRef="Bible:Gen.1.1-Gen.1.3"/>'
+                     '<div><p>Second original section</p></div>'
+                     '<scripCom osisRef="Bible:Gen.1.4"/>'
+                     '<div><p>Third unaffected section</p></div>')
+        rows, stats, digest = candidate.extract_volume(
+            raw, hashlib.sha256(raw).hexdigest(),
+            quarantine_repeated_starts=True)
+        self.assertEqual([key for key, _ in rows], ["Gen.1.4"])
+        self.assertEqual(stats["verse_or_range_bodies"], 3)
+        self.assertEqual(stats["original_source_bodies_quarantined"], 2)
+        self.assertEqual(stats["original_colliding_start_groups_quarantined"], 1)
+        self.assertIn("Third unaffected section", rows[0][1])
+        self.assertNotIn("First original section", rows[0][1])
+        self.assertEqual(len(digest), 64)
+
     def test_modified_source_fails_pin(self):
         raw = source('<scripCom osisRef="Bible:Gen.1.1"/><div><p>A</p></div>')
         with self.assertRaisesRegex(ValueError, 'digest'):
