@@ -574,12 +574,12 @@ jobs:
               print("Unmatched genuine original K within original authored whole-book",
                     "word boundaries (closed metadata only):",
                     json.dumps(book_wide_unmatched_K,sort_keys=True))
-              original_source_tails=(
-                  full_authoring_census.private_trailing_source_gaps_in_other_original_chapters())
-              print("Authenticated original OSIS chapter-final unaccounted words",
+              original_source_gaps=(
+                  full_authoring_census.private_uncovered_source_gaps_in_other_original_chapters())
+              print("Authenticated original OSIS chapter-uncovered internal or final words",
                     "versus genuine other same-book original source and native K/I",
                     "(only chapter hashes/counts/closed match classes):",
-                    json.dumps(original_source_tails,sort_keys=True))
+                    json.dumps(original_source_gaps,sort_keys=True))
               all_rows=original_full_corpus["original_chapter_cases"]
               def cases_failing(field):
                   return [row for row in all_rows if row[field] is not True]
