@@ -180,6 +180,64 @@ def original_authoring_chapter_scope_metadata(
 
 
 
+
+def _private_whole_token_contiguous(
+        original: list[str], candidate: list[str]) -> bool:
+    """Exact whole-token contiguous match via KMP; no text is returned."""
+    if not candidate or len(candidate) > len(original):
+        return False
+    failure = [0] * len(candidate)
+    match = 0
+    for i in range(1, len(candidate)):
+        while match and candidate[i] != candidate[match]:
+            match = failure[match-1]
+        if candidate[i] == candidate[match]:
+            match += 1
+            failure[i] = match
+    match = 0
+    for word in original:
+        while match and word != candidate[match]:
+            match = failure[match-1]
+        if word == candidate[match]:
+            match += 1
+            if match == len(candidate):
+                return True
+    return False
+
+
+def _private_whole_token_subsequence(
+        original: list[str], candidate: list[str]) -> bool:
+    """All candidate words in order; skipped source words remain unclaimed."""
+    if not candidate or len(candidate) > len(original):
+        return False
+    position = 0
+    for word in original:
+        if word == candidate[position]:
+            position += 1
+            if position == len(candidate):
+                return True
+    return False
+
+
+def _private_native_word_relation(source: list[str], native: list[str]) -> str:
+    """Conservative token-only category; never maps back to a verse or p."""
+    if not native:
+        return "native_empty_visible_text"
+    if native == source:
+        return "native_whole_chapter_exact_tokens"
+    if _private_whole_token_contiguous(source, native):
+        return "native_contiguous_exact_tokens_in_chapter"
+    if _private_whole_token_subsequence(source, native):
+        return "native_ordered_exact_subsequence_only"
+    source_folded = [word.casefold() for word in source]
+    native_folded = [word.casefold() for word in native]
+    if _private_whole_token_contiguous(source_folded, native_folded):
+        return "native_contiguous_casefold_only"
+    if _private_whole_token_subsequence(source_folded, native_folded):
+        return "native_ordered_casefold_subsequence_only"
+    return "native_full_ordered_token_relation_unresolved"
+
+
 class PrivateOriginalChapterNativeAnchorCoverage:
     """Read-only visible-word *anchor* overlap of original OSIS vs native K.
 
@@ -221,6 +279,7 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                 "native_numbered_slots": 0,
                 "native_distinct_visible_word_total": 0,
                 "native_exact_whole_chapter_equal": False,
+                "distinct_native_relation_classes": defaultdict(int),
             }
 
     def observe(self, kind: str, key: str, raw: bytes) -> None:
@@ -259,6 +318,8 @@ class PrivateOriginalChapterNativeAnchorCoverage:
         state["native_distinct_visible_word_total"] += len(words)
         if words == state["source_words"]:
             state["native_exact_whole_chapter_equal"] = True
+        relation = _private_native_word_relation(state["source_words"], words)
+        state["distinct_native_relation_classes"][relation] += 1
         source_windows = state["source_windows"]
         state["matching_windows"].update(
             tuple(words[i:i+self.ANCHOR])
@@ -274,6 +335,8 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                 raise ValueError("Selected original chapter missing native occupied K")
             if len(state["matching_windows"]) > len(state["source_windows"]):
                 raise ValueError("Original source/native lexical anchor accounting mismatch")
+            if sum(state["distinct_native_relation_classes"].values()) != len(state["native_raw_digests"]):
+                raise ValueError("Unique original native word relation classification incomplete")
             rows.append({
                 "original_chapter_reference_sha256": sha256(
                     chapter.encode("utf-8")).hexdigest(),
@@ -289,6 +352,9 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                     state["native_distinct_visible_word_total"],
                 "one_original_native_raw_payload_matches_entire_original_chapter":
                     state["native_exact_whole_chapter_equal"],
+                "native_distinct_whole_body_ordered_word_relation_classes":
+                    dict(sorted(state["distinct_native_relation_classes"].items())),
+                "whole_body_word_relation_not_equivalent_to_authorial_unit": True,
                 "anchor_overlap_is_not_exact_text_or_structural_parity": True,
                 "unmatched_anchors_not_proven_historical_authorial_omissions": True,
             })
@@ -298,6 +364,8 @@ class PrivateOriginalChapterNativeAnchorCoverage:
             "original_chapter_cases": rows,
             "intro_and_top_payload_parity_not_compared": True,
             "original_verse_key_range_and_paragraph_owner_not_inferred": True,
+            "casefold_only_categories_do_not_authorize_case_changes": True,
+            "exact_containment_does_not_prove_punctuation_or_markup": True,
             "original_punctuation_markup_notes_and_links_not_compared": True,
             "original_source_or_compiled_binary_changed": False,
             "no_original_words_raw_xml_or_verse_keys_exported": True,
