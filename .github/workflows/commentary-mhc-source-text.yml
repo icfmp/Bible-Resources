@@ -131,6 +131,29 @@ jobs:
           assert (chapter["original_chapter_siblings_reviewed_count"] +
                   chapter["original_chapter_siblings_not_reviewed_count"] ==
                   chapter["explicit_chapter_source_marker_count"])
+          details = report["text_diagnostic"]
+          lexical = details["lexical_disagreement_classification"]
+          relationships = details["different_word_sequence_relationship_subtypes"]
+          punctuation = details["same_words_different_punctuation_subtypes"]
+          locations = details["stock_containment_additional_word_position_counts"]
+          for group in (lexical, relationships, punctuation, locations):
+              assert isinstance(group, dict)
+              assert all(type(key) is str and len(key) <= 100
+                         and key.replace("_", "").isalnum()
+                         and key == key.lower()
+                         and type(count) is int and count >= 0
+                         for key, count in group.items())
+          assert sum(lexical.values()) == classes.get(
+              "lexical_text_or_punctuation_difference", 0)
+          assert sum(punctuation.values()) == lexical.get(
+              "same_unicode_word_tokens_different_punctuation", 0)
+          assert sum(locations.values()) == relationships.get(
+              "source_words_contiguous_inside_longer_stock", 0)
+          print("Closed lexical difference kinds:", json.dumps(lexical, sort_keys=True))
+          print("Closed source/stock word-sequence relationships:",
+                json.dumps(relationships, sort_keys=True))
+          print("Closed punctuation-only subtypes:",
+                json.dumps(punctuation, sort_keys=True))
           evidence = {
               "status": "SOURCE_STOCK_ONE_VOLUME_LEXICAL_CENSUS_NOT_PARITY",
               "resource_id": "mhc-crosswire",
@@ -149,6 +172,11 @@ jobs:
                   report["source_original_verse_and_range_body_evidence"][
                       "original_sections_without_visible_text_examples_truncated"],
               "source_section_text_diagnostic_classes": classes,
+              "closed_lexical_difference_types": lexical,
+              "closed_word_sequence_relationship_types": relationships,
+              "closed_same_words_punctuation_difference_types": punctuation,
+              "closed_compiled_extra_word_position_types": locations,
+              "closed_categories_are_diagnostic_not_authorial_edition_parity": True,
               "source_chapter_marker_count":
                   chapter["explicit_chapter_source_marker_count"],
               "source_reviewable_chapter_siblings":
