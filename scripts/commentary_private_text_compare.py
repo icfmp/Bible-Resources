@@ -49,7 +49,7 @@ from commentary_stock_prefix_topology import (
     stock_prefixed_source_body_concordance, unexplained_word_boundary_census,
     stock_prefix_context_correspondence,
 )
-from commentary_xml_witness import _parse_reference, WORK_REF, OSIS_LOC, xml_structure, MAX_XML
+from commentary_xml_witness import _parse_reference, WORK_REF, OSIS_LOC, xml_structure, MAX_XML, _xml_witness_locations
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
 from pilot_fetch import fetch
 from pilot_preflight import PilotError, inspect_archive
@@ -580,11 +580,34 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes],
     }
 
 
-def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
+def select_pinned_source_volume(manifest: dict, number: int | None = None) -> tuple[int, str, str, bool, int]:
+    """Return exactly one SHA-pinned ThML witness; no implicit multi-volume default.
+
+    A single-source intake retains its historical no-volume argument. Six-volume
+    imports are explicit independent checkpoints; never silently audit only one.
+    """
+    locations, collection = _xml_witness_locations(manifest.get("commentary_source"))
+    if collection:
+        if type(number) is not int:
+            raise PilotError("Multi-volume original requires an explicit source volume")
+        selected = [row for row in locations if row[0] == number]
+        if len(selected) != 1:
+            raise PilotError("Unregistered source volume; original source cannot be guessed")
+    else:
+        if number not in (None, 1):
+            raise PilotError("Single-source edition has no requested volume")
+        selected = locations
+    volume, url, digest = selected[0]
+    if not isinstance(digest, str) or not re.fullmatch(r"[a-f0-9]{64}", digest):
+        raise PilotError("Selected original commentary source is not SHA-256 pinned")
+    return volume, url, digest, collection, len(locations)
+
+
+def run(resource_id: str, index_binary: Path, raw_binary: Path,
+        *, source_volume: int | None = None) -> dict:
     manifest=load_manifest(resource_id)
-    original_config=manifest.get("commentary_source",{})
-    url=original_config.get("xml_witness_url")
-    original_sha=original_config.get("xml_witness_sha256")
+    volume, url, original_sha, is_collection, volume_count = (
+        select_pinned_source_volume(manifest, source_volume))
     stock_sha=manifest.get("archive_sha256")
     if not all(isinstance(v,str) and len(v)==64 for v in (original_sha,stock_sha)):
         raise PilotError("Exact original XML and SWORD SHA-256 pins required")
@@ -870,6 +893,10 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
     return {
         "schema_version":1,
         "resource_id":resource_id,
+        "source_volume":volume,
+        "source_is_multivolume_collection":is_collection,
+        "source_collection_volume_count":volume_count,
+        "source_is_independent_one_volume_checkpoint":True,
         "status":"full_source_verse_and_range_body_to_stock_raw_text_diagnostics_not_release_approval",
         "source_original_sha256":original_sha,
         "stock_sword_archive_sha256":stock_sha,
@@ -910,12 +937,15 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
 def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--resource-id",required=True)
+    p.add_argument("--source-volume",type=int,
+                   help="Required on multi-volume sources; single-source remains the default")
     p.add_argument("--native-index-binary",required=True,type=Path)
     p.add_argument("--native-raw-binary",required=True,type=Path)
     p.add_argument("--report",required=True,type=Path)
     args=p.parse_args(argv)
     try:
-        result=run(args.resource_id,args.native_index_binary,args.native_raw_binary)
+        result=run(args.resource_id,args.native_index_binary,args.native_raw_binary,
+                   source_volume=args.source_volume)
         code=0
     except (ValueError,OSError,RuntimeError,zipfile.BadZipFile) as exc:
         result={"status":"blocked","resource_id":args.resource_id,"reason":str(exc),

@@ -1,0 +1,100 @@
+name: Audit one original MHC volume against CrossWire raw commentary privately
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/commentary-mhc-source-text.yml'
+      - 'scripts/commentary_private_text_compare.py'
+      - 'tests/test_commentary_private_text_compare.py'
+      - 'config/commentary-intake/mhc-crosswire.json'
+  workflow_dispatch:
+    inputs:
+      source_volume:
+        description: Exact independently pinned original CCEL volume (1–6)
+        type: choice
+        required: true
+        default: '1'
+        options: ['1', '2', '3', '4', '5', '6']
+permissions:
+  contents: read
+concurrency:
+  group: mhc-original-text-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  review-one-actual-original-volume:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      SOURCE_VOLUME: ${{ inputs.source_volume || '1' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify source-neutral one/collection selection and private text comparison
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          python -m unittest discover -s tests -p 'test_commentary_private_text_compare.py' -v
+      - name: Install real original native SWORD readers
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          timeout 150s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_index.cpp \
+            -o "$RUNNER_TEMP/commentary-native-index" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "$RUNNER_TEMP/commentary-private-raw" -lsword
+      - name: Compare entire SHA-pinned original volume with complete unchanged CrossWire stock
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_private_text_compare.py \
+            --resource-id mhc-crosswire \
+            --source-volume "$SOURCE_VOLUME" \
+            --native-index-binary "$RUNNER_TEMP/commentary-native-index" \
+            --native-raw-binary "$RUNNER_TEMP/commentary-private-raw" \
+            --report "$RUNNER_TEMP/mhc-original-volume-text-evidence.json"
+      - name: Report only bounded metadata and explicitly incomplete authorial parity
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          report = json.loads((Path(os.environ["RUNNER_TEMP"]) /
+              "mhc-original-volume-text-evidence.json").read_text(encoding="utf-8"))
+          assert report["resource_id"] == "mhc-crosswire"
+          assert report["source_volume"] == int(os.environ["SOURCE_VOLUME"])
+          assert report["source_is_multivolume_collection"] is True
+          assert report["source_collection_volume_count"] == 6
+          assert report["native_full_corpus_rechecked"] is True
+          assert report["source_text_or_sword_bytes_in_receipt"] is False
+          assert report["original_exact_edition_proven"] is False
+          assert report["original_structure_notes_quotes_and_paragraphs_parity_proven"] is False
+          assert report["copyright_and_redistribution_approved"] is False
+          assert report["editorial_approved"] is False
+          assert report["published"] is False
+          print("MHC volume:", report["source_volume"])
+          print("Original verse/range source units:",
+                report["source_original_verse_and_range_body_evidence"][
+                    "original_verse_or_range_body_count"])
+          print("Text comparison diagnostic classes only:",
+                json.dumps(report["text_diagnostic"][
+                    "per_source_marker_text_diagnostic_counts"], sort_keys=True))
+          print("An exact source edition/structure proof is NOT established.")
+          PY
+      - name: Explain private content boundaries
+        if: always()
+        run: |
+          {
+            echo '## Original MHC source-to-stock text research'
+            echo 'Exactly one of six independently SHA-pinned CCEL volumes per CI run.'
+            echo 'Private original commentary words, source XML and full SWORD binary are not uploaded.'
+            echo 'A word-count or token match is not edition, punctuation, markup, rights or GUI approval.'
+            echo 'No source or module edits, public catalogue, merge or release.'
+          } >> "$GITHUB_STEP_SUMMARY"

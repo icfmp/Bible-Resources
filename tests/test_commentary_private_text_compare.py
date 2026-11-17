@@ -14,6 +14,36 @@ from pilot_preflight import PilotError
 
 
 class CommentaryOriginalStockTextTests(unittest.TestCase):
+    def test_select_six_volume_source_requires_explicit_original_volume(self):
+        from commentary_private_text_compare import select_pinned_source_volume
+        source = {"commentary_source": {"xml_witness_volumes": [
+            {"number": 1, "url": "https://www.ccel.org/ccel/h/henry/mhc1.xml",
+             "sha256": "a"*64},
+            {"number": 2, "url": "https://www.ccel.org/ccel/h/henry/mhc2.xml",
+             "sha256": "b"*64},
+        ]}}
+        with self.assertRaises(PilotError):
+            select_pinned_source_volume(source)
+        self.assertEqual(
+            select_pinned_source_volume(source, 2),
+            (2, "https://www.ccel.org/ccel/h/henry/mhc2.xml", "b"*64, True, 2))
+        with self.assertRaises(PilotError):
+            select_pinned_source_volume(source, 3)
+        with self.assertRaises(PilotError):
+            select_pinned_source_volume(source, 0)
+
+    def test_select_single_source_keeps_existing_legacy_call(self):
+        from commentary_private_text_compare import select_pinned_source_volume
+        source = {"commentary_source": {
+            "xml_witness_url": "https://www.ccel.org/ccel/h/henry/mhcc.xml",
+            "xml_witness_sha256": "d"*64,
+        }}
+        self.assertEqual(
+            select_pinned_source_volume(source),
+            (1, "https://www.ccel.org/ccel/h/henry/mhcc.xml", "d"*64, False, 1))
+        with self.assertRaises(PilotError):
+            select_pinned_source_volume(source, 2)
+
     def source(self):
         return (
             b'<?xml version="1.0" encoding="UTF-8"?>'
