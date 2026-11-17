@@ -31,11 +31,25 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   observe_upstream_authoring_osis_metadata:
-    name: Observe CrossWire upstream MHC authoring OSIS without publishing it
+    name: Observe CrossWire original MHC OSIS and native K text anchors privately
     runs-on: ubuntu-24.04
-    timeout-minutes: 12
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - name: Build existing independent stock native readers for read-only parity probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          timeout 150s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_index.cpp \
+            -o "${RUNNER_TEMP}/commentary-native-index" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "${RUNNER_TEMP}/commentary-private-raw" -lsword
       - name: Pin upstream public GitLab revision and observe source bytes only
         shell: bash
         run: |
@@ -187,6 +201,7 @@ jobs:
                           if node.get("type")=="book"}
           if len(book_divisions)!=66:
               raise SystemExit("Official source book divisions ambiguous")
+          private_chapter_words={}
           for ref_sha,book,chapter in chapter_scopes:
               book_div=book_divisions.get(book)
               if book_div is None:
@@ -211,8 +226,12 @@ jobs:
                          chapter_ref==item or item.startswith(chapter_ref+".")
                          for item in node.get("osisRef","").split()):
                       linked_targets+=1
+              chapter_private_words=[]
               chapter_scope=original_authoring_chapter_scope_metadata(
-                  book_div,chapter_ref)
+                  book_div,chapter_ref,_private_words_sink=chapter_private_words)
+              if chapter_ref in private_chapter_words:
+                  raise SystemExit("Duplicate authenticated CCEL chapter case")
+              private_chapter_words[chapter_ref]=chapter_private_words
               print("Authenticated source book/chapter structural metadata only:",
                     json.dumps({
                       "original_source_marker_ref_sha256":ref_sha,
@@ -371,6 +390,49 @@ jobs:
                 json.dumps(report,sort_keys=True))
           print("An exact word run ANYWHERE in OSIS does not establish original",
                 "verse ownership, historical edition identity or rights.")
+
+          # Independent *actual compiled stock* readback: every genuine K/I/TOP
+          # frame is reindexed and SHA-pinned. Only selected authentic OSIS
+          # chapter visible 8-word anchors are checked against genuine,
+          # de-duplicated original compiled K payloads in the same chapter.
+          # No raw content, native key or editorial correction leaves runner.
+          from tempfile import TemporaryDirectory
+          from commentary_osis_paragraph_presence import (
+              PrivateOriginalChapterNativeAnchorCoverage,
+          )
+          from commentary_native_raw_inventory import _safe_stock_install
+          from pilot_preflight import inspect_archive
+          from sword_native_raw_corpus_inventory import inspect_native_raw_corpus
+          with TemporaryDirectory(prefix="mhc-authoring-native-private-") as folder:
+              directory=Path(folder)
+              package=directory/"source-authenticated-stock.zip"
+              package.write_bytes(stock_zip)
+              archive=inspect_archive(package,source_kind="sword",
+                  expected_module_id=manifest["module_id"],
+                  expected_category="commentary")
+              installed=directory/"installed-original"
+              _safe_stock_install(package,archive["members"],installed)
+              anchor_census=PrivateOriginalChapterNativeAnchorCoverage(
+                  private_chapter_words)
+              native_report=inspect_native_raw_corpus(
+                  installed,manifest["module_id"],
+                  Path(os.environ["RUNNER_TEMP"])/"commentary-private-raw",
+                  Path(os.environ["RUNNER_TEMP"])/"commentary-native-index",
+                  on_entry=anchor_census.observe)
+              if (native_report["all_native_raw_entries_ordered_sha256"]!=
+                      manifest["native_raw_corpus_sha256"]
+                      or native_report["all_actual_raw_entries_scanned"]!=32355
+                      or not native_report["exact_all_occupied_native_keys_matched_independent_index"]):
+                  raise SystemExit("Original native full-stream identity mismatch")
+              print("Authenticated original source OSIS authentic chapter versus",
+                    "full authentic original native K exact visible-word anchors",
+                    "(closed metadata only, NOT authorial section/parity proof):",
+                    json.dumps(anchor_census.report(),sort_keys=True))
+              print("Whole original compiled K/I/TOP inventory independently",
+                    "reconciled and SHA-verified:",
+                    native_report["all_native_raw_entries_ordered_sha256"],
+                    native_report["all_actual_raw_entries_scanned"])
+          del private_chapter_words,stock_zip
 
           print("Official upstream source commit (not equivalent to compiled ZIP SHA):",
                 os.environ["UPSTREAM_SHA"])
