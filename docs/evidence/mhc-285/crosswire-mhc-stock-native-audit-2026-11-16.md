@@ -306,3 +306,33 @@ These are **principally original source paragraph text, with real inline referen
 ### Decision and next bounded action
 
 Follow [issue #295](https://github.com/icfmp/Bible-Resources/issues/295) for separate source-to-native exception triage; do **not** conflate these ten *CrossWire's own OSIS↔stock* source cases with ten unrelated *CCEL ThML index* mismatches tracked in #287. Independently verify the exact historical printed and CCEL digital-edition text/paragraph correspondence for the six source-only authored OSIS spans, their detailed OSIS paragraph/inline structure and permissible correction/redistribution rights. Review the four book-ending closing milestone differences separately, retaining all genuine source book text and authorial divisions. Only then propose **reversible private candidate corrections** with a full source/native/reader acceptance report and explicit editorial owner permission. [MHC draft PR #286](https://github.com/icfmp/Bible-Resources/pull/286) remains research-only, unmerged and unreleased.
+
+
+## CrossWire original source-only spans against all six independently SHA-pinned CCEL volumes (2026-11-17)
+
+Two independent, fully private, read-only original-source audit jobs have now authenticated the original official CrossWire MHC authoring OSIS, the unchanged published original MHC 2.2 native K/I/TOP frames and the **six separate original CCEL digital ThML/XML volumes**, each acquired from its exact HTTPS publisher location and checked against its reviewed CCEL original-volume SHA-256 fingerprint. No original source words or raw CCEL files were committed, reprinted or redistributed.
+
+- [Initial all-six-volume official digital source witness job #134422601598](https://github.com/icfmp/Bible-Resources/actions/runs/44191706136/job/134422601598) — **SUCCESS**, **35/35 tests**, exact full source interval and original 12-word witness checks.
+- [Source-neutral exact bounded lexical collation job #134425448755](https://github.com/icfmp/Bible-Resources/actions/runs/44192545072/job/134425448755) — **SUCCESS**, **36/36 tests**, additionally verifies unique, monotone first/middle/last original 12-word witnesses and the complete word-token sequence *between* their privately located boundaries. The only publicly retained observations are original gap reference hashes, independently pinned CCEL original volume numbers and closed counts/hashes of exact original token strings. Synthetic tests demonstrate a single changed source token or extra digital token is detected. A similar 12-word anchor in an unrelated passage never authorizes verse ownership or source correction.
+
+### Six real source gaps relative to the published MHC 2.2 original
+
+| Source book/chapter | Actual original authoring-OSIS gap visible words | CCEL independently SHA-pinned original digital volume | Exact whole original gap word sequence in CCEL | Original source ↔ CCEL digital bounded comparison |
+| --- | ---: | ---: | --- | --- |
+| Ps 95 | 1,772 | III | No | CCEL passage contains **89 additional contiguous words**, bounded by 1,322 unchanged source words before and 450 unchanged source words after |
+| Rom 4 | 1,720 | VI | **Yes, exactly once** | All 1,720 case-sensitive tokens identical |
+| Rom 7 | 3,327 | VI | **Yes, exactly once** | All 3,327 case-sensitive tokens identical |
+| 2 Thess 2 | 2,089 | VI | No | One electronic-edition span differs: **2 OSIS tokens versus 1 CCEL token**, with 955 identical initial and 1,132 identical final tokens |
+| 2 Pet 2 | 1,016 | VI | **Yes, exactly once** | All 1,016 case-sensitive tokens identical |
+| Rev 4 | 916 | VI | **Yes, exactly once** | All 916 case-sensitive tokens identical |
+| **Total** | **10,840** | **Volume III and volume VI**, six-volume audit checked | **4 fully identical original spans; 2 digital wording variants** | **No changes applied to any original** |
+
+All **six** gap intervals were previously demonstrated *absent from every one* of **4,249 genuine distinct published native K** and **1,255 genuine I** XML raw texts, with 0/18 intact independent 12-word witnesses found in any original published K/I. The original two opaque TOP/U frames were counted, not text-parsed. Each independent CCEL witness has **all three case-sensitive 12-word start/middle/end windows uniquely located in the appropriate digital volume**. No unrelated CCEL volumes returned any of these complete witnesses.
+
+**Important lexical-variant limitations:** an insertion of 89 original CCEL digital words into a passage of Psalm 95 is *not* evidence those words should be inserted into CrossWire's original OSIS or into a derivative SWORD module. The two-to-one word-token variant in 2 Thess 2 could be hyphenation/spacing, wording or some other electronic encoding choice; the closed numeric audit deliberately does not guess which. CrossWire credits CCEL, so these are two independently SHA-pinned **digital witnesses**, not automatically independent historical authorial editions.
+
+### Rights and permission
+
+The [official CCEL copyright policy](https://www.ccel.org/about/copyright.html) explains that older underlying books may be US public-domain, but some digitized editions contain protected introductions and other special contents. It explicitly requests contacting CCEL for **permission to republish CCEL works**, and notes that different countries' laws may differ. Therefore independently matching CCEL XML words cannot by itself satisfy the project's digital derivative permission or republication criteria. Printed-edition facsimile identity, editorial provenance and permission to redistribute additions/annotations are still unconfirmed.
+
+**Strict action gate:** do not silently import, correct, extend or resegment original authored OSIS commentary; do not restore the six compiled-absent spans or the separate Psalm 95 89-word CCEL electronic addition without a source-bound, reversible, individually reviewed editorial decision and written redistribution clearance where required. The previous four native K bodies crossing book-final source milestones are preserved untouched. Full authored XML paragraph/heading/note/inline reference structure, exact reader navigation and historical print provenance remain independent gates. [Original-source discrepancy #295](https://github.com/icfmp/Bible-Resources/issues/295), [draft research PR #286](https://github.com/icfmp/Bible-Resources/pull/286), and [parent import #285](https://github.com/icfmp/Bible-Resources/issues/285) remain open; none authorizes release.
