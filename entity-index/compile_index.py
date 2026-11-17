@@ -443,6 +443,9 @@ def main():
     args = parser.parse_args()
     lock = read_json(args.lock)
     if args.verify_source_commit:
+        if not lock.get("source_snapshot_sha256"):
+            raise SystemExit(
+                "Pinned source verification requires a source_snapshot_sha256 lock")
         import subprocess
         actual = subprocess.check_output(
             ["git", "-C", str(args.source), "rev-parse", "HEAD"], text=True).strip()
