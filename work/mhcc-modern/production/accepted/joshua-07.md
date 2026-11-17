@@ -10,13 +10,13 @@ publication_status: "NOT RELEASED — FULL SWORD REBUILD PENDING"
 
 # Joshua 7 — Modern English
 
-## Original chapter outline
+## Original chapter outline — explicit verse-label corrections
 
 | Original outline | Verses |
 | --- | --- |
 | The Israelites smitten at Ai. | 1–5 |
 | Joshua's humiliation and prayer. | 6–9 |
-| God instructs Joshua what to do. | 10–5 |
+| God instructs Joshua what to do. | 10–15 |
 | Achan is detected, He is destroyed. | 16–26 |
 
 ## Israel is defeated at Ai (verses 1–5)
@@ -120,6 +120,10 @@ Achan's confession reveals the progress of sin from desire, to action, to concea
 ---
 
 ## Editorial review — Joshua 7
+
+**2026-11-17 traceable outline-reference correction (independent original-native review pending):** The invalid end verse 5 is restored to 15, before Achan's exposure beginning at verse 16. Only the **verse-range cells of the copied original-outline table** have been corrected; source-authored headings, row order, commentary section boundaries, and exposition prose are not edited. Previously transcribed cells: `God instructs Joshua what to do. | 10–5`. Corrected cells: `God instructs Joshua what to do. | 10–15`. The repair is reversible against this recorded before/after; the authoritative published MHCC 0.1.1 outline still requires exact independent native validation.
+
+
 
 **Direct secondary-source comparison:** [CCEL, Joshua 7](https://ccel.org/ccel/henry/mhcc.vii.vii.html). The published immutable `MHCC 0.1.1` is the record for final source-native SWORD collation; independent human review and real-reader tests remain pending.
 
