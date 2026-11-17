@@ -737,5 +737,43 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
         self.assertNotIn("word00",json.dumps(rows))
 
 
+    def test_unmatched_real_native_K_can_extend_past_authored_final_chapter(self):
+        from lxml import etree
+        chapter_words=[f"chapterword{i:02d}" for i in range(12)]
+        after=["epilogueword01","epilogueword02"]
+        original=(
+            '<div type="book" osisID="Deut">'
+            '<chapter sID="Deut.34"/>'
+            '<p>'+" ".join(chapter_words)+'</p>'
+            '<chapter eID="Deut.34"/>'
+            '<p>'+" ".join(after)+'</p></div>')
+        book=etree.fromstring(original.encode())
+        source_words=[]
+        original_authoring_chapter_scope_metadata(
+            book,"Deut.34",_private_words_sink=source_words)
+        self.assertEqual(source_words,chapter_words)
+        census=PrivateOriginalChapterNativeAnchorCoverage(
+            {"Deut.34":source_words})
+        census.observe("K","Deut.34.1",(
+            '<p>'+" ".join(chapter_words+after)+'</p>').encode())
+        census.observe("K","Deut.34.2",
+            b"<p>Entirely different original text not in book</p>")
+        probe=census.private_unmatched_native_K_original_book_location(
+            {"Deut":book})
+        self.assertEqual(probe["original_chapter_cases_checked"],1)
+        item=probe["cases"][0]
+        self.assertEqual(item["original_chapter_full_word_body_locations_in_book"],1)
+        self.assertEqual(item["native_original_book_whole_body_location_classes"],{
+            "native_whole_body_crosses_authored_chapter_end":1,
+            "native_not_exact_whole_word_body_in_original_book":1})
+        self.assertEqual(item["unlocated_original_native_K_body_count"],2)
+        self.assertTrue(probe["no_book_ending_or_authorial_edition_remap_approved"])
+        self.assertNotIn("chapterword",json.dumps(probe))
+        self.assertNotIn("epilogueword",json.dumps(probe))
+        self.assertNotIn('"Deut.34"',json.dumps(probe))
+        with self.assertRaises(ValueError):
+            census.private_unmatched_native_K_original_book_location({})
+
+
 if __name__=="__main__":
     unittest.main()
