@@ -77,7 +77,7 @@ Otherwise, riches may fly away even before death, leaving the desired pleasures 
 
 In any case, **death will soon end all their trade**.
 
-Without reconciliation to God, worldly wealth will be exchanged for the grave and unending judgment.
+Without reconciliation to God, worldly wealth will be exchanged for **the coffin and the worm, and the fire that cannot be quenched**.
 
 ## Heaven rejoices at the end of oppression (verses 20–24)
 
@@ -100,6 +100,9 @@ Recognizing how unstable all earthly possessions and institutions are, **set you
 ---
 
 ## Editorial review — Revelation 18
+
+**2026-11-17 CCEL secondary-witness comparison:** restored Henry's particular image of **coffin, worm and unquenchable fire** instead of replacing it with the abstract “grave and unending judgment.” [CCEL Revelation 18](https://ccel.org/ccel/henry/mhcc.lviii.xviii.html). This is restoration of the author's own rhetorical and doctrinal argument, not independent native SWORD approval.
+
 
 **Full CCEL original-English second witness directly compared:** [CCEL, Revelation 18](https://ccel.org/ccel/henry/mhcc.lviii.xviii.html). Published `MHCC 0.1.1` is authoritative for exact native-SWORD text, reference and independent acceptance.
 
