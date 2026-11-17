@@ -43,8 +43,8 @@ def _xml_stats(raw: bytes) -> dict:
 
 class Receipt:
     def __init__(self, chapters: list[str]):
-        if not chapters or len(chapters) > 24 or len(set(chapters)) != len(chapters):
-            raise ValueError("Supply 1–24 distinct canonical chapter OSIS keys")
+        if not chapters or len(chapters) > 1200 or len(set(chapters)) != len(chapters):
+            raise ValueError("Supply 1–1200 distinct canonical chapter OSIS keys")
         if any(CHAPTER.fullmatch(ch) is None for ch in chapters):
             raise ValueError("Invalid requested chapter OSIS reference")
         self.chapters = chapters
