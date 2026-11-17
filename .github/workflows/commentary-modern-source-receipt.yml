@@ -256,6 +256,178 @@ jobs:
               print("DRAFT_OUTLINE_ORDER_FLAG "+a["manuscript"]+" "+str(a.get("ordered_row_bounds",a["reason"])))
           print("No original authorial outline rewritten; all flags need independent contextual review")
           PY
+      - name: Independently inventory all 69 historically unchecked manuscripts against native source units
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import re
+          base=Path("work/mhcc-modern/production")
+          archive=(base/"checkpoints/issue-270-body-2026-11-17-pre-reconciliation.md").read_text(encoding="utf-8")
+          unchecked=re.findall(r"(?m)^- \[ \] (.+?)\s*$",archive)
+          assert len(unchecked)==69 and len(set(unchecked))==69, (
+              "Historical issue #270 no longer has exactly 69 distinct unchecked chapter rows")
+          all_manuscripts=sorted((base/"accepted").glob("*.md"))
+          assert len(all_manuscripts)==1189, "Canonical draft inventory changed"
+          native=json.loads((Path(os.environ["RUNNER_TEMP"])/
+              "mhcc-modern-whole-canon-native-receipt.json").read_text(encoding="utf-8"))
+          assert native["status"]=="SOURCE_NATIVE_RECEIPT_ONLY_NOT_TRANSLATION_APPROVAL"
+          assert not native["source_prose_or_original_markup_exported"]
+          assert not native["semantic_translation_independently_approved"]
+          titles={}
+          for path in all_manuscripts:
+              raw=path.read_text(encoding="utf-8")
+              title=re.search(r"(?m)^# (.+?) — Modern English\s*$",raw)
+              if title:
+                  if title[1] in titles:
+                      raise ValueError("Duplicate chapter title: "+title[1])
+                  titles[title[1]]=(path,raw)
+          reports=[]
+          issues=[]
+          section_digest_owner={}
+          token=re.compile(r"\b[\w’-]+\b",re.UNICODE)
+          verse_heading=re.compile(
+              r"\(verses?\s+(\d{1,3})(?:\s*(?:[–—-]|and|,)\s*(\d{1,3}))?\)",
+              re.IGNORECASE)
+          for original_label in unchecked:
+              chapter_issues=[]
+              entry=titles.get(original_label)
+              if entry is None:
+                  issues.append({"chapter":original_label,"problem":"missing full modern manuscript"})
+                  continue
+              path,raw=entry
+              if not raw.startswith("---\n") or "\n---\n" not in raw[4:]:
+                  issues.append({"chapter":original_label,"problem":"invalid source frontmatter"})
+                  continue
+              front,rest=raw[4:].split("\n---\n",1)
+              fields=dict(re.findall(r'(?m)^([a-z_]+): "([^"\n]*)"$',front))
+              chapter=fields.get("chapter_osis","")
+              original=native["chapters"].get(chapter)
+              if original is None:
+                  issues.append({"chapter":original_label,"problem":"no original native source chapter mapping"})
+                  continue
+              if (fields.get("source_module")!="MHCC 0.1.1"
+                  or fields.get("source_zip_sha256")!="a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746"
+                  or fields.get("source_native_corpus_sha256")!="2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e"
+                  or not fields.get("publication_status","").startswith("NOT RELEASED")):
+                  chapter_issues.append("wrong original-source pin or false release claim")
+              if "\n---\n" not in rest:
+                  chapter_issues.append("missing prose/editorial boundary")
+                  main=rest
+                  review=""
+              else:
+                  main,review=rest.split("\n---\n",1)
+              if not re.search(r"(?m)^## (?:Editorial|Source) (?:review|audit|verification)",review,re.I):
+                  chapter_issues.append("missing separate original-witness review notes")
+              headings=list(re.finditer(r"(?m)^## ([^\n]+)$",main))
+              source_outline=[h for h in headings if "original chapter outline" in h[1].lower()]
+              if len(source_outline)!=1:
+                  chapter_issues.append("missing or multiple source-outline sections")
+              sections=[h for h in headings
+                        if "original chapter outline" not in h[1].lower()]
+              original_units=original["original_units"]
+              if not original_units or original["source_placement"]!="NUMBERED_KEYS_WITH_SEPARATE_INTRO":
+                  chapter_issues.append("original source is not supported numbered-K commentary")
+              if len(sections)!=len(original_units):
+                  chapter_issues.append(
+                      f"original K bodies={len(original_units)}, modern exposition sections={len(sections)}")
+              source_verses=set()
+              for u in original_units:
+                  for key in u["keys"]:
+                      if not key.startswith(chapter+"."):
+                          chapter_issues.append("original source key in wrong chapter")
+                      if key in source_verses:
+                          chapter_issues.append("duplicate original numbered K key")
+                      source_verses.add(key)
+              if len(source_verses)!=original["original_native_numbered_keys"]:
+                  chapter_issues.append("inconsistent native source occupied-key tally")
+              modern_section_info=[]
+              for i,h in enumerate(sections):
+                  next_head=headings[headings.index(h)+1] if headings.index(h)+1<len(headings) else None
+                  exposition=main[h.end():next_head.start() if next_head else len(main)]
+                  words=len(token.findall(exposition))
+                  marker=verse_heading.search(h[1])
+                  claimed=(int(marker[1]),int(marker[2] or marker[1])) if marker else None
+                  original_bounds=None
+                  if i<len(original_units):
+                      nums=[int(key.rsplit(".",1)[1]) for key in original_units[i]["keys"]]
+                      original_bounds=(min(nums),max(nums)) if nums else None
+                  if not marker:
+                      chapter_issues.append(f"section {i+1}: no explicit verse bounds")
+                  elif original_bounds and claimed!=original_bounds:
+                      chapter_issues.append(
+                          f"section {i+1}: modern verse bounds {claimed} differ from original {original_bounds}")
+                  if words<25:
+                      chapter_issues.append(f"section {i+1}: missing/too-short actual translation ({words} words)")
+                  if re.search(r"(?i)\b(?:TODO|TBD|PLACEHOLDER|NOT YET TRANSLATED|LOREM IPSUM)\b",exposition):
+                      chapter_issues.append(f"section {i+1}: unfinished draft marker")
+                  digest=hashlib.sha256(exposition.strip().encode("utf-8")).hexdigest()
+                  owner=section_digest_owner.setdefault(digest,(chapter,i+1))
+                  if owner!=(chapter,i+1) and words>=50:
+                      chapter_issues.append(f"section {i+1}: possible copied duplicate of {owner}")
+                  modern_section_info.append({
+                      "section_number":i+1,
+                      "modern_words":words,
+                      "claimed_verse_bounds":list(claimed) if claimed else None,
+                      "original_native_verse_bounds":list(original_bounds) if original_bounds else None,
+                      "original_unit_sha256":original_units[i]["source_unit_sha256"] if i<len(original_units) else None
+                  })
+              reports.append({
+                  "historical_issue_label":original_label,
+                  "chapter_osis":chapter,
+                  "manuscript":path.as_posix(),
+                  "manuscript_sha256":hashlib.sha256(raw.encode("utf-8")).hexdigest(),
+                  "original_numbered_K_keys":original["original_native_numbered_keys"],
+                  "original_K_source_units":len(original_units),
+                  "modern_exposition_sections":len(sections),
+                  "modern_exposition_word_count":sum(s["modern_words"] for s in modern_section_info),
+                  "original_separate_introduction_keys":len(original["native_introductions_not_assumed_to_be_exposition"]),
+                  "section_comparison":modern_section_info,
+                  "machine_detected_structural_problems":chapter_issues,
+                  "original_full_prose_meaning_independently_verified":False
+              })
+              if chapter_issues:
+                  issues.append({"chapter":chapter,"problem":"; ".join(chapter_issues)})
+          receipt={
+              "status":"HISTORICALLY_UNCHECKED_DRAFT_SOURCE_UNIT_SCREEN_NOT_EDITORIAL_APPROVAL",
+              "historical_unchecked_rows":len(unchecked),
+              "complete_modern_manuscript_paths_read":len(reports),
+              "original_source_edition":"MHCC 0.1.1",
+              "native_corpus_sha256":native["original_compiled_corpus_sha256"],
+              "original_numbered_source_units":sum(r["original_K_source_units"] for r in reports),
+              "original_occupied_K_keys":sum(r["original_numbered_K_keys"] for r in reports),
+              "modern_exposition_sections":sum(r["modern_exposition_sections"] for r in reports),
+              "modern_exposition_words":sum(r["modern_exposition_word_count"] for r in reports),
+              "structural_flags":issues,
+              "chapters":reports,
+              "source_full_prose_meaning_independently_approved":False,
+              "published_derivative_module_built_or_validated":False,
+              "source_original_prose_or_xml_exported":False
+          }
+          report_path=Path(os.environ["RUNNER_TEMP"])/"mhcc-modern-historical-69-translation-coverage.json"
+          report_path.write_text(json.dumps(receipt,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+          print("HISTORICAL_69_SCOPE original_rows=69 modern_manuscripts="+str(len(reports))+
+                " original_K_units="+str(receipt["original_numbered_source_units"])+
+                " modern_sections="+str(receipt["modern_exposition_sections"])+
+                " original_occupied_K_keys="+str(receipt["original_occupied_K_keys"])+
+                " modern_exposition_words="+str(receipt["modern_exposition_words"])+
+                " problems="+str(len(issues)))
+          for x in reports:
+              print("HISTORICAL_69_CHAPTER "+x["chapter_osis"]+
+                    " source_units="+str(x["original_K_source_units"])+
+                    " modern_units="+str(x["modern_exposition_sections"])+
+                    " words="+str(x["modern_exposition_word_count"])+
+                    " native_K="+str(x["original_numbered_K_keys"]))
+          for issue in issues:
+              print("HISTORICAL_69_UNRESOLVED "+issue["chapter"]+": "+issue["problem"])
+          print("Only original native section/key coverage and real modern prose checked; "+
+                "not native-to-modern authorial meaning, notes, reference targets, or publication rights")
+          assert not issues and len(reports)==69, "Historical 69 source-unit coverage NOT fully demonstrated"
+          PY
       - name: Build private Leviticus 19 and Psalm 108 I-only linked chapter previews
         shell: bash
         run: |
@@ -694,6 +866,7 @@ jobs:
           path: |
             ${{ runner.temp }}/mhcc-modern-source-native-receipt.json
             ${{ runner.temp }}/mhcc-modern-whole-canon-native-receipt.json
+            ${{ runner.temp }}/mhcc-modern-historical-69-translation-coverage.json
             ${{ runner.temp }}/mhcc-ionly-preview-report.json
             ${{ runner.temp }}/mhcc-modern-outline-order-diagnostic.json
             ${{ runner.temp }}/mhcc-modern-draft-coverage-report.json
