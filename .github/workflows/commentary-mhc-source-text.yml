@@ -596,6 +596,12 @@ jobs:
                           row["source_uncovered_word_tokens_after_unique_native_K_body_intervals"],
                       "source_words_not_in_K_or_chapter_I":
                           row["source_uncovered_words_after_unique_K_plus_chapter_I_intervals"],
+                      "uncovered_K_source_word_intervals_not_verse_locations":
+                          row["source_uncovered_word_spans_metadata_only"],
+                      "native_I_covers_source_K_prefix":
+                          row["original_source_K_prefix_fully_covered_by_chapter_I"],
+                      "native_K_source_interval_overlap_words":
+                          row["overlap_word_tokens_among_exact_native_K_body_intervals"],
                       "native_chapter_I_entire_word_location_classes":
                           row["chapter_I_whole_body_exact_source_location_classes"],
                       "all_native_K_whole_bodies_uniquely_in_chapter":
