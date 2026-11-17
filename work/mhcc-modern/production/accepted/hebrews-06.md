@@ -46,7 +46,7 @@ Warn seriously against apostasy, but **do not unnecessarily terrorize weak belie
 
 True believers do more than taste God's word: they drink it in and bear fruit, like well-watered soil.
 
-A merely nominal Christian who remains fruitless or produces deceit and self-interest is in serious danger. We must watch ourselves with humility and prayer.
+A merely nominal Christian who remains fruitless or produces deceit and self-interest comes close to the terrible apostasy just described; **Henry says everlasting misery awaits such a person**. We must watch ourselves with humility and prayer.
 
 ## Works of love accompany salvation (verses 9 and 10)
 
@@ -87,6 +87,9 @@ Set your affection on things above and wait patiently for his appearance, when b
 ---
 
 ## Editorial review — Hebrews 6
+
+**2026-11-17 second-pass CCEL witness repair:** restored Henry's explicit **everlasting misery** warning for the persistently fruitless nominal professor. The old draft had reduced that final consequence to “serious danger,” an unjustified doctrinal weakening. Source: [CCEL Hebrews 6](https://ccel.org/ccel/henry/mhcc.l.vi.html). This remains a secondary-witness correction pending native source and independent editorial review.
+
 
 **Complete CCEL secondary English source directly checked:** [CCEL, Hebrews 6](https://ccel.org/ccel/henry/mhcc.l.vi.html). Exact published `MHCC 0.1.1` remains authoritative for native-SWORD and independent signoff.
 
