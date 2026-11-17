@@ -43,7 +43,8 @@ def _original_tree(data: bytes, expected_sha: str):
     return root
 
 
-def extract_volume(data: bytes, expected_sha: str):
+def extract_volume(data: bytes, expected_sha: str, *,
+                   quarantine_repeated_starts: bool = False):
     """Yield verbatim-body IMP records plus explicitly unhandled source scopes.
 
     Never infer chapter introductions from a marker followed by another marker.
@@ -75,7 +76,7 @@ def extract_volume(data: bytes, expected_sha: str):
         if ending is not None and ending.split(".")[0] != chapter.split(".")[0]:
             raise ValueError("Cross-book source range requires separate review")
         start = f"{chapter}.{verse}"
-        if start in seen_start:
+        if start in seen_start and not quarantine_repeated_starts:
             raise ValueError("Collision at original source start address")
         seen_start.add(start)
         # Retain original source body markup and visible text, including notes,
@@ -99,6 +100,21 @@ def extract_volume(data: bytes, expected_sha: str):
         stats["verse_or_range_bodies"] += 1
         if not "".join(following.itertext()).strip():
             stats["empty_original_bodies_preserved"] += 1
+    if quarantine_repeated_starts:
+        # Private *partial* importer experiment ONLY: quarantine EVERY source
+        # division of a colliding start, never arbitrarily retain one of two.
+        # The digest above commits to all original source sections, including
+        # quarantined divisions, so none can be silently forgotten or reworded.
+        start_counts = Counter(key.split("-", 1)[0] for key, _ in bodies)
+        conflicting_starts = {key for key, n in start_counts.items() if n > 1}
+        stats["original_colliding_start_groups_quarantined"] = len(conflicting_starts)
+        stats["original_source_bodies_quarantined"] = sum(
+            start_counts[key] for key in conflicting_starts)
+        bodies = [(key, markup) for key, markup in bodies
+                  if key.split("-", 1)[0] not in conflicting_starts]
+        if stats["verse_or_range_bodies"] != (
+                len(bodies) + stats["original_source_bodies_quarantined"]):
+            raise ValueError("Quarantine accounting failed closed")
     return bodies, dict(stats), digest.hexdigest()
 
 
@@ -187,7 +203,8 @@ def build_original_collision_census(manifest: dict, source_directory: Path) -> d
     }
 
 
-def build_private_candidate(manifest: dict, source_directory: Path, output: Path):
+def build_private_candidate(manifest: dict, source_directory: Path, output: Path, *,
+                            quarantine_repeated_starts: bool = False):
     volumes = manifest.get("commentary_source", {}).get("xml_witness_volumes", [])
     if (len(volumes) != 6 or sorted(v["number"] for v in volumes) != list(range(1, 7))):
         raise ValueError("Exactly six reviewed volume pins required")
@@ -199,7 +216,9 @@ def build_private_candidate(manifest: dict, source_directory: Path, output: Path
         path = source_directory / f"mhc{number}.xml"
         if path.is_symlink() or not path.is_file():
             raise ValueError("Original source file missing/unsafe")
-        entries, stats, digest = extract_volume(path.read_bytes(), volume["sha256"])
+        entries, stats, digest = extract_volume(
+            path.read_bytes(), volume["sha256"],
+            quarantine_repeated_starts=quarantine_repeated_starts)
         for key, value in entries:
             if key in keys:
                 raise ValueError("Identical original source ranges overlap volumes")
@@ -216,6 +235,14 @@ def build_private_candidate(manifest: dict, source_directory: Path, output: Path
     return {"status": "INCOMPLETE_PRIVATE_VERSE_BODY_FEASIBILITY_ONLY",
             "volumes": receipts,
             "source_body_entry_count": len(all_entries),
+            "original_source_verse_range_body_count": sum(
+                r["verse_or_range_bodies"] for r in receipts),
+            "quarantined_original_source_body_count": sum(
+                r.get("original_source_bodies_quarantined", 0) for r in receipts),
+            "quarantined_original_start_groups": sum(
+                r.get("original_colliding_start_groups_quarantined", 0)
+                for r in receipts),
+            "original_references_corrected_or_assigned": False,
             "unhandled_chapter_markers": sum(r["chapter_markers_unhandled"] for r in receipts),
             "all_source_text_accounted_for": False,
             "imp_roundtrip_against_native": "NOT_TESTED",
@@ -229,6 +256,7 @@ def main(argv=None):
     ap.add_argument("--source-dir", type=Path, required=True)
     ap.add_argument("--private-output", type=Path)
     ap.add_argument("--collision-census", action="store_true")
+    ap.add_argument("--quarantine-repeated-starts", action="store_true")
     args = ap.parse_args(argv)
     manifest = json.loads(args.manifest.read_text("utf-8"))
     if args.collision_census:
@@ -238,7 +266,9 @@ def main(argv=None):
     else:
         if args.private_output is None:
             ap.error("--private-output is required for private IMP generation")
-        report = build_private_candidate(manifest, args.source_dir, args.private_output)
+        report = build_private_candidate(
+            manifest, args.source_dir, args.private_output,
+            quarantine_repeated_starts=args.quarantine_repeated_starts)
     print(json.dumps(report, sort_keys=True))
     return 0
 
