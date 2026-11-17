@@ -11,6 +11,8 @@ on:
       - 'tests/test_commentary_nonlink_word_alignment.py'
       - 'scripts/commentary_nonlink_words.py'
       - 'tests/test_commentary_nonlink_words.py'
+      - 'scripts/commentary_usfm_title_witness.py'
+      - 'tests/test_commentary_usfm_title_witness.py'
       - 'config/commentary-intake/mhc-crosswire.json'
   workflow_dispatch:
     inputs:
