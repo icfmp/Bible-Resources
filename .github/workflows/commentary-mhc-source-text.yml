@@ -194,7 +194,7 @@ jobs:
           # section assignments or trust unbounded user-provided keys.
           additional=manifest["commentary_source"].get(
               "private_authoring_osis_chapter_samples",[])
-          if (not isinstance(additional,list) or not 1<=len(additional)<=6
+          if (not isinstance(additional,list) or not 1<=len(additional)<=10
                   or len(set(additional))!=len(additional)):
               raise SystemExit("Unreviewed additional authoring OSIS chapter samples")
           for chapter_ref in additional:
@@ -205,7 +205,7 @@ jobs:
               chapter_scopes.append((
                   chapter_ref,sha256(chapter_ref.encode("ascii")).hexdigest(),
                   "manifest_authoring_osis_chapter_sample"))
-          if (len(chapter_scopes)>8 or len({row[0] for row in chapter_scopes})
+          if (len(chapter_scopes)>12 or len({row[0] for row in chapter_scopes})
                   != len(chapter_scopes)):
               raise SystemExit("Duplicate or unbounded original authoring OSIS chapter scopes")
           print("Official source OSIS div structural attribute names/counts:",
