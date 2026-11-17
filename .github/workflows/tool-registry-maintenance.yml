@@ -37,7 +37,9 @@ jobs:
           from pathlib import Path
           from scripts.tool_registry import generate
           actual = json.loads(Path("docs/TOOL_REGISTRY.json").read_text())
-          expected = generate()
+          # JSON arrays from checked-in metadata must compare to JSON arrays,
+          # not Python tuples: avoid false import inventory drift reports.
+          expected = json.loads(json.dumps(generate()))
           old = {entry["path"]: entry for entry in actual["files"]}
           new = {entry["path"]: entry for entry in expected["files"]}
           for path in sorted(set(old) | set(new)):
