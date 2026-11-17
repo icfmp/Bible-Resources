@@ -39,7 +39,7 @@ class OriginalPlainWordsAlignmentTests(unittest.TestCase):
         self.assertEqual(b["source_original_link_label_exclusion_class"],
                          "native_words_in_order_with_extra_original_nonlink_words")
         self.assertEqual(b["source_nonlink_word_surplus_vs_native"],1)
-        self.assertNotIn("extra",json.dumps(b))
+        self.assertNotIn('"extra"',json.dumps(b))
 
     def test_source_link_label_classification_never_guesses_order_or_indexes(self):
         from commentary_nonlink_word_alignment import (
