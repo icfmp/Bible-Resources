@@ -7,7 +7,9 @@ on:
       - 'scripts/commentary_stock_xiphos_smoke.py'
       - 'tests/test_commentary_stock_xiphos_smoke.py'
       - 'scripts/reader_xiphos_headless_smoke.py'
-      - 'config/commentary-intake/**'
+      # These original zCom/MHCC checks do not select the changed intake ID.
+      # MHC uses zCom4 and its dedicated full-corpus/JSword validation.
+      - 'config/commentary-intake/mhcc-crosswire.json'
   workflow_dispatch:
     inputs:
       resource_id:
