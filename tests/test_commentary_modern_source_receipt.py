@@ -69,6 +69,18 @@ class NativeModernReceiptTests(unittest.TestCase):
                 "actual_occupied_anonymous_top_entry_count": 0
             }, "a" * 64)
 
+    def test_reports_all_missing_numbered_chapters(self):
+        rec = Receipt(["Lev.19", "Isa.36", "Gen.1"])
+        rec.observe("I", "Lev.19", b"<div>PRIVATE INTRO</div>")
+        rec.observe("K", "Gen.1.1", b"<div>PRIVATE SOURCE</div>")
+        with self.assertRaisesRegex(ValueError, "Lev.19, Isa.36"):
+            rec.report({
+                "all_native_raw_entries_ordered_sha256": "a" * 64,
+                "actual_occupied_numbered_entry_count": 1,
+                "actual_occupied_intro_entry_count": 1,
+                "actual_occupied_anonymous_top_entry_count": 0
+            }, "a" * 64)
+
     def test_invalid_chapters_rejected(self):
         for chapters in ([], ["Ruth.1", "Ruth.1"], ["Ruth.0"],
                          ["Ruth.1;rm -rf /"], ["Rom.3.1"]):
