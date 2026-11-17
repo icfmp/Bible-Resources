@@ -31,6 +31,8 @@ class EntityIndexTests(unittest.TestCase):
                 "wlc": {"edition": "pinned-test", "word_id_prefix": "o"},
                 "sblgnt": {"edition": "pinned-test", "word_id_prefix": "n"},
             },
+            "source_corpora": {"wlc": "wlc", "SBLGNT": "sblgnt",
+                               "sblgnt": "sblgnt"},
         }
 
     def write_record(self, category, name, **fields):
@@ -165,6 +167,26 @@ class EntityIndexTests(unittest.TestCase):
         self.assertNotIn("Invented biographical prose",
                          json.dumps(report, ensure_ascii=False))
         self.assertNotIn("Never copy", json.dumps(report, ensure_ascii=False))
+
+    def test_real_acai_greek_field_name_is_indexed_under_canonical_corpus(self):
+        original = self.write_record(
+            "people", "Phoebe", references=["45016001"],
+            explicit_instances={"SBLGNT": [["n45016001004"]]})
+        before = original.read_bytes()
+        report = self.build()
+        self.assertEqual(report["entities"][0]["occurrences"]
+                         ["explicit_instances"]["SBLGNT"], [["n45016001004"]])
+        self.assertEqual(report["by_word"]["sblgnt:n45016001004"],
+                         [{"entity_id": "person:Phoebe",
+                           "link_type": "explicit_instances"}])
+        self.assertNotIn("SBLGNT:n45016001004", report["by_word"])
+        self.assertEqual(original.read_bytes(), before)
+        self.lock["source_corpora"] = {"wlc": "wlc"}
+        with self.assertRaisesRegex(ValueError, "Unrecognized original source corpus"):
+            self.build()
+        self.lock["source_corpora"] = {"wlc": "wlc", "SBLGNT": "wlc"}
+        with self.assertRaisesRegex(ValueError, "word prefix incompatible"):
+            self.build()
 
     def test_pinned_absent_word_is_quarantined_from_lookup_not_source(self):
         path = self.write_record(
