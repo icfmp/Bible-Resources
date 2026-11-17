@@ -49,6 +49,12 @@ jobs:
           assert stats["index_entities"] == 6641, stats
           assert stats["quarantined_records"] == 3, stats
           assert stats["reviewed_entries"] == 6, stats
+          assert stats["unattested_distinct_source_words"] == 18, stats
+          assert stats["indexed_distinct_source_words"] == 134823, stats
+          assert len(index["unattested_source_words"]) == 18
+          assert sum(len(r["source_claims"]) for r in
+                     index["unattested_source_words"].values()) == 19
+          assert not (set(index["unattested_source_words"]) & set(index["by_word"]))
           by_id={e["id"]:e for e in index["entities"]}
           assert "person:Jashar" not in by_id
           assert "person:Hammelech" not in by_id
@@ -79,6 +85,10 @@ jobs:
           perez=resolver.resolve(corpus="wlc", edition=edition,
                 word_id="o100060080121", verse_id="10006008")
           assert perez["canonical_ids"] == ["place:PerezUzzah"], perez
+          missing=resolver.resolve(corpus="wlc", edition=edition,
+                word_id="o020020130103", verse_id="02002013")
+          assert missing["status"] == "unattested_source_word_id", missing
+          assert missing["candidates"] == [], missing
           philistines=resolver.resolve(corpus="wlc", edition=edition,
                 word_id="o010100140081", verse_id="01010014")
           assert "group:Philistine" in philistines["canonical_ids"], philistines
