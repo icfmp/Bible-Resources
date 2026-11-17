@@ -30,7 +30,8 @@ from commentary_xml_witness import (
 from commentary_native_inventory import MAX_OUTPUT, parse_index
 from commentary_navigation_link_plan import parse_native_commentary_verse_registry, UnsafeCommentaryLinkPlan
 from commentary_reference_registry_triage import classify_original_reference_target
-from commentary_osis_mixed_transport_probe import probe_original_mixed_transport
+from commentary_osis_mixed_transport_probe import (probe_original_mixed_transport,
+    probe_complete_original_transport)
 from commentary_prose_cross_slot import strict_native_stock_plain_words
 from commentary_text_delta import _contiguous_offset, _is_subsequence
 from commentary_unresolved_lexical_triage import WORD, marked_word_token_indices
@@ -550,7 +551,8 @@ def summarize_volume_anchor_results(volumes: list[dict]) -> dict:
 
 def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
         *, raw_binary: Path | None = None,
-        private_alias_probe: bool = False) -> dict:
+        private_alias_probe: bool = False,
+        private_full_probe: bool = False) -> dict:
     manifest = load_manifest(resource_id)
     locations, is_collection = _xml_witness_locations(
         manifest.get("commentary_source"))
@@ -566,6 +568,8 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
         raise PilotError("Reviewed native raw original commentary reader unavailable")
     if private_alias_probe and raw_binary is None:
         raise PilotError("Private native alias experiment requires complete pinned raw corpus")
+    if private_full_probe and (not private_alias_probe or raw_binary is None):
+        raise PilotError("Whole-original private rebuild requires the pinned source-bound alias audit")
 
     with tempfile.TemporaryDirectory(prefix="commentary-source-native-") as temp:
         root = Path(temp)
@@ -699,6 +703,9 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
                 }
                 subset_numbered = defaultdict(list)
                 subset_introductions = {}
+                complete_numbered = defaultdict(list) if private_full_probe else None
+                complete_introductions = {} if private_full_probe else None
+                complete_TOP = [] if private_full_probe else None
                 env = dict(os.environ, SWORD_PATH=str(installed))
                 process = None
                 rows = []
@@ -711,6 +718,15 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
                     def inspect_one(kind, key, raw):
                         rows.append((kind, key))
                         locator.observe(kind, key, raw)
+                        if private_full_probe:
+                            if kind == "K":
+                                complete_numbered[key.rsplit(".", 1)[0]].append((key, raw))
+                            elif kind == "I":
+                                if key in complete_introductions:
+                                    raise PilotError("Repeated original full-module introduction")
+                                complete_introductions[key] = raw
+                            elif kind == "U":
+                                complete_TOP.append(raw)
                         if kind == "K" and key.rsplit(".", 1)[0] in experiment_chapters:
                             subset_numbered[key.rsplit(".", 1)[0]].append((key, raw))
                         if kind == "I" and key in relevant_introductions:
@@ -800,6 +816,32 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
                                 pilot.get("private_diatheke_references", []),
                             "published": False,
                         })
+                    if private_full_probe:
+                        aliases = {}
+                        for row in location["units"]:
+                            claim = row["provisional_missing_first_verse_alias_preview"]
+                            if claim is None:
+                                raise PilotError("Unresolved original missing-start evidence blocks full private alias candidate")
+                            key = claim["new_unoccupied_native_key"]
+                            master = claim["original_occupied_master_key"]
+                            if key in aliases or master not in dict(complete_numbered.get(master.rsplit(".", 1)[0], [])):
+                                raise PilotError("Duplicate or missing original full native alias master")
+                            aliases[key] = {
+                                "link_to": master,
+                                "source_raw_sha256": claim["original_master_raw_sha256"],
+                            }
+                        full_scratch = root / "private-full-original-sword"
+                        full_scratch.mkdir()
+                        full = probe_complete_original_transport(
+                            complete_introductions, dict(complete_numbered),
+                            complete_TOP, scratch=full_scratch,
+                            native_raw_binary=raw_binary,
+                            provisional_index_aliases=aliases,
+                            original_stock_sword_root=installed,
+                            original_stock_module_id=manifest["module_id"],
+                            native_index_binary=inspector,
+                        )
+                        observed["private_complete_original_index_alias_rebuild"] = full
                     observed["private_original_source_first_verse_index_alias_probes"] = {
                         "status": "PRIVATE_CHAPTER_SUBSET_OSIS_NATIVE_CANDIDATES_NOT_APPROVAL",
                         "probed_chapter_subsets": len(attempts),
@@ -823,13 +865,15 @@ def main(argv=None) -> int:
     p.add_argument("--native-inspector", type=Path, required=True)
     p.add_argument("--native-raw-binary", type=Path)
     p.add_argument("--private-alias-probe", action="store_true")
+    p.add_argument("--private-full-probe", action="store_true")
     p.add_argument("--probe-osis-key", action="append", default=[])
     p.add_argument("--report", type=Path, required=True)
     args = p.parse_args(argv)
     try:
         report = run(args.resource_id, args.native_inspector, tuple(args.probe_osis_key),
                      raw_binary=args.native_raw_binary,
-                     private_alias_probe=args.private_alias_probe)
+                     private_alias_probe=args.private_alias_probe,
+                     private_full_probe=args.private_full_probe)
         code = 0
     except (ValueError, OSError, RuntimeError, zipfile.BadZipFile) as exc:
         report = {
