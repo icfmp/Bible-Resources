@@ -103,36 +103,43 @@ def _source_extra_word_layout(original: list[str], compiled: list[str]) -> dict:
     }
 
 
-def _private_unique_original_gap_spans(
+def _private_unique_original_gap_windows(
     original: list[str], compiled: list[str],
-) -> list[list[str]] | None:
-    """Keep exact original extra words PRIVATE for source/stock location review.
+) -> list[tuple[int,int]] | None:
+    """Exact unique extra-word [start,end) windows in *unlinked* source tokens.
 
-    Return None for an ambiguous repeated-token ordered alignment. The caller
-    must never serialize/log the returned words, only bounded counts and SHA
-    identities of the separately pinned original sources.
+    Windows are private lexical coordinates, never authorized section/paragraph
+    corrections. A repeated-token alignment returns None rather than guessing.
     """
-    layout = _source_extra_word_layout(original, compiled)
+    layout = _source_extra_word_layout(original,compiled)
     if layout["alignment_topology"] == (
             "multiple_exact_subsequence_alignments_no_fixed_gap_ownership"):
         return None
-    cursor = 0
-    gaps = []
+    cursor=0
+    windows=[]
     for word in compiled:
-        start = cursor
-        while cursor < len(original) and original[cursor] != word:
-            cursor += 1
-        if cursor >= len(original):
-            raise PilotError("Original source-extra source words unexpectedly not aligned")
-        if cursor > start:
-            gaps.append(original[start:cursor])
-        cursor += 1
-    if cursor < len(original):
-        gaps.append(original[cursor:])
-    if (len(gaps) != layout["fixed_extra_word_spans"]
-            or sum(map(len,gaps)) != layout["source_extra_nonlink_word_count"]):
-        raise PilotError("Private source-gap topology disagrees with public metadata")
-    return gaps
+        start=cursor
+        while cursor<len(original) and original[cursor]!=word:
+            cursor+=1
+        if cursor>=len(original):
+            raise PilotError("Original extra-word windows lost exact compiled alignment")
+        if cursor>start:
+            windows.append((start,cursor))
+        cursor+=1
+    if cursor<len(original):
+        windows.append((cursor,len(original)))
+    if (len(windows)!=layout["fixed_extra_word_spans"]
+            or sum(b-a for a,b in windows)!=layout["source_extra_nonlink_word_count"]):
+        raise PilotError("Original source-only lexical gap window counts do not reconcile")
+    return windows
+
+
+def _private_unique_original_gap_spans(
+    original: list[str], compiled: list[str],
+) -> list[list[str]] | None:
+    """Preserve actual words only in private memory, never any metadata receipt."""
+    windows=_private_unique_original_gap_windows(original,compiled)
+    return None if windows is None else [original[a:b] for a,b in windows]
 
 
 def compare_words_outside_links(
