@@ -76,13 +76,13 @@ Fear of God should restrain us from wrongdoing even when it cannot provoke human
 
 All those entrusted with authority must administer justice without favoritism.
 
-Spreading malicious stories and creating quarrels among neighbors is deeply harmful.
+Spreading malicious stories and sowing discord among neighbors is among the worst things a person can do.
 
 **Correct your neighbor in love** (verse 17).
 
 It is better to rebuke someone gently than to harbor hatred because that person has wronged you.
 
-Failing to warn another person about a serious fault can itself be unloving.
+If we fail to correct our neighbor when we should, we become guilty ourselves; such silence is a form of hatred rather than love.
 
 A loving friend can say, “I will do this person the kindness of pointing out the fault.”
 
@@ -133,5 +133,7 @@ The source offers **one continuous exposition**, not separate authorial commenta
 Original authorial heading is the lower-case, apparently defective **“laws.”** It is preserved without silent correction.
 
 All source comments and their anchors are accounted for: **verses 2, 3, 4, 9, 11, 12, 13, 14, 15, 17, 18, 31, 32, 33 and 35**, including continuing moral law versus fewer ceremonial rules, charity beyond strict property rights, unpaid wages, concern for those unable to defend themselves, loving reproof instead of hatred, occult practices, age, foreigners and honest measures.
+
+**2026-11-17 secondary-witness nuance repair:** restored Henry's unusually strong assessment of malicious tale-bearing and, especially, the explicit claim that failing to reprove a neighbor brings guilt and is a form of hatred; the earlier modern draft softened both claims. This is still a same-assistant CCEL-witness correction, **not** independent collation against the exact native `MHCC 0.1.1` I entry.
 
 Reviewed by same assistant against CCEL. Exact native structure and a possible original heading defect remain pending independent investigation; source `MHCC 0.1.1` is unchanged.
