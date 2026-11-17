@@ -1683,7 +1683,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "d7379cf05e669f2ea3f6272d95e8796c1b854e0d64234cd892c9f9e9f1f58bd5",
+      "sha256_at_inventory": "a7bf77909ba644d64a340b8e49d83ca5db1ac84f741e9556fa93c46de1d21229",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
@@ -2468,6 +2468,40 @@
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_shared_raw_source_units.py",
         "tests/test_commentary_unresolved_lexical_triage.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
+        "USFM"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/commentary_usfm_title_witness.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Research-only exact original commentary paragraph vs independent USFM title audit.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "collections",
+        "hashlib",
+        "json",
+        "pathlib",
+        "re",
+        "zipfile"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "9f736b533c96496fa3a2188defa34b19916e792638f14286f78b1394c663f443",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "source/native audit",
+      "static_reference_count": 2,
+      "static_references": [
+        ".github/workflows/commentary-mhc-source-text.yml",
+        "tests/test_commentary_usfm_title_witness.py"
       ]
     },
     {
