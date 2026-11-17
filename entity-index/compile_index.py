@@ -74,7 +74,8 @@ def apply_word_edits(entry, decision):
         references.append(ref)
 
 
-def build(source_root: Path, source_lock: dict, editorial: dict) -> dict:
+def build(source_root: Path, source_lock: dict, editorial: dict,
+          source_absences: dict | None = None) -> dict:
     if source_lock.get("schema_version") != 1 or editorial.get("schema_version") != 1:
         raise ValueError("Unsupported lock or editorial decision schema")
     decisions = {}
@@ -177,6 +178,48 @@ def build(source_root: Path, source_lock: dict, editorial: dict) -> dict:
                 for group in groups:
                     for word in group:
                         candidates[f"{corpus}:{word}"].add((entry["id"], field))
+    # A pinned-source audit may prove that an imported annotation refers to
+    # a word ID that does not exist in the claimed original-language edition.
+    # Keep all source groups in 'entities'; suppress only unsafe lookup claims
+    # and emit a reversible, provenance-rich diagnostics record.
+    if source_absences is None:
+        source_absences = {
+            "schema_version": 1, "corpus": "wlc",
+            "source_edition": source_lock["source_editions"]["wlc"]["edition"],
+            "word_ids": [], "provenance": [],
+        }
+    if source_absences.get("schema_version") != 1:
+        raise ValueError("Unsupported missing-word audit schema")
+    corpus = source_absences.get("corpus")
+    edition = source_absences.get("source_edition")
+    catalog = source_lock["source_editions"].get(corpus)
+    if not isinstance(catalog, dict) or catalog.get("edition") != edition:
+        raise ValueError("Missing-word audit is not pinned to this original edition")
+    prefix = catalog.get("word_id_prefix")
+    reported_ids = source_absences.get("word_ids")
+    evidence = source_absences.get("provenance")
+    if not isinstance(reported_ids, list) or not isinstance(evidence, list):
+        raise ValueError("Malformed source-word audit manifest")
+    if reported_ids and not evidence:
+        raise ValueError("Unattested word claims require source provenance")
+    if len(set(reported_ids)) != len(reported_ids):
+        raise ValueError("Duplicate source-unattested word ID")
+    unattested = {}
+    for word_id in sorted(reported_ids):
+        if (not isinstance(word_id, str) or len(word_id) < 9
+                or word_id[0] != prefix or not word_id[1:9].isdigit()):
+            raise ValueError(f"Invalid source-unattested word ID: {word_id!r}")
+        key = f"{corpus}:{word_id}"
+        if key not in candidates:
+            raise ValueError(f"Unattested word not in source index: {key}")
+        if any(field != "subject_referents" for _, field in candidates[key]):
+            raise ValueError(f"Unattested word also has direct/pronominal claims: {key}")
+        unattested[key] = {
+            "source_edition": edition,
+            "evidence": evidence,
+            "source_claims": [{"entity_id": entity_id, "link_type": field}
+                              for entity_id, field in sorted(candidates.pop(key))],
+        }
     by_word = {
         word: [{"entity_id": entity_id, "link_type": field}
                for entity_id, field in sorted(hits)]
@@ -201,10 +244,12 @@ def build(source_root: Path, source_lock: dict, editorial: dict) -> dict:
             "reviewed_entries": sum(e["review_status"] == "editorially_reviewed"
                                     for e in entries),
             "indexed_distinct_source_words": len(by_word),
+            "unattested_distinct_source_words": len(unattested),
         },
         "quarantined": sorted(quarantined, key=lambda x: x["source_id"]),
         "entities": entries,
         "by_word": by_word,
+        "unattested_source_words": unattested,
     }
 
 
@@ -214,6 +259,9 @@ def main():
                         help="Local immutable snapshot of the ACAI repository")
     parser.add_argument("--lock", type=Path, default=Path(__file__).with_name("source.lock.json"))
     parser.add_argument("--decisions", type=Path, default=Path(__file__).with_name("editorial-decisions.json"))
+    parser.add_argument("--source-absences", type=Path,
+                        default=Path(__file__).with_name("source-unattested-words.json"),
+                        help="Pinned source-word audit evidence; only affects derived lookup")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--verify-source-commit", action="store_true",
                         help="Require the local Git HEAD to equal the source lock")
@@ -225,7 +273,8 @@ def main():
             ["git", "-C", str(args.source), "rev-parse", "HEAD"], text=True).strip()
         if actual != lock["source_commit"]:
             raise SystemExit(f"Wrong pinned source revision: {actual}")
-    result = build(args.source, lock, read_json(args.decisions))
+    result = build(args.source, lock, read_json(args.decisions),
+                   read_json(args.source_absences))
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n",
