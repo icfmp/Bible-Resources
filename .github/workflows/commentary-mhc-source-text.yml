@@ -154,6 +154,24 @@ jobs:
                 json.dumps(relationships, sort_keys=True))
           print("Closed punctuation-only subtypes:",
                 json.dumps(punctuation, sort_keys=True))
+          by_book = details["book_counts"]
+          if not isinstance(by_book, dict) or len(by_book) > 66:
+              raise SystemExit("Unbounded original per-book source review data")
+          import re
+          assert all(re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]{1,15}", book)
+                     for book in by_book)
+          assert all(isinstance(kinds, dict)
+                     and set(kinds) <= allowed
+                     and all(type(value) is int and value >= 0
+                             for value in kinds.values())
+                     for kinds in by_book.values())
+          total_book = {}
+          for kinds in by_book.values():
+              for status, n in kinds.items():
+                  total_book[status] = total_book.get(status, 0) + n
+          assert total_book == classes
+          print("Source book identifiers and text-diagnostic counts only:",
+                json.dumps(by_book, sort_keys=True))
           evidence = {
               "status": "SOURCE_STOCK_ONE_VOLUME_LEXICAL_CENSUS_NOT_PARITY",
               "resource_id": "mhc-crosswire",
@@ -172,6 +190,8 @@ jobs:
                   report["source_original_verse_and_range_body_evidence"][
                       "original_sections_without_visible_text_examples_truncated"],
               "source_section_text_diagnostic_classes": classes,
+              "source_book_text_diagnostic_classes": by_book,
+              "source_book_counts_are_not_editorial_content_parity": True,
               "closed_lexical_difference_types": lexical,
               "closed_word_sequence_relationship_types": relationships,
               "closed_same_words_punctuation_difference_types": punctuation,
