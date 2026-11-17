@@ -621,6 +621,41 @@ jobs:
                         "(closed metadata, not authorial ownership):",
                         json.dumps(gap_scanner.report(),sort_keys=True))
                   del gap_scanner,native_2,k_2,i_2,u_2
+              # Source-structure ownership is tested on the *exact six
+              # authenticated word intervals*, not guessed from a title or
+              # invented verse key. Keep all original text and markup private.
+              gap_original_structure=[]
+              for chapter,start,actual_gap_words in private_original_gaps:
+                  original_words_rechecked=[]
+                  original_word_owners=[]
+                  source_scope=original_authoring_chapter_scope_metadata(
+                      book_divisions[chapter.rsplit(".",1)[0]],chapter,
+                      _private_words_sink=original_words_rechecked,
+                      _private_word_owner_classes_sink=original_word_owners)
+                  if (original_words_rechecked!=all_authored_chapter_words[chapter]
+                          or original_words_rechecked[
+                              start:start+len(actual_gap_words)]!=actual_gap_words
+                          or len(original_word_owners)!=len(original_words_rechecked)
+                          or source_scope["private_original_word_ownership_verified"] is not True):
+                      raise SystemExit("Original authenticated source gap owner scope lost identity")
+                  original_owner_counts=Counter(
+                      original_word_owners[start:start+len(actual_gap_words)])
+                  if sum(original_owner_counts.values())!=len(actual_gap_words):
+                      raise SystemExit("Original authored paragraph/note word owner counts incomplete")
+                  gap_original_structure.append({
+                      "original_authored_chapter_ref_sha256":sha256(
+                          chapter.encode("ascii")).hexdigest(),
+                      "original_gap_start_word_offset_not_verse_key":start,
+                      "original_gap_visible_word_tokens":len(actual_gap_words),
+                      "actual_authored_XML_word_owner_classes":
+                          dict(sorted(original_owner_counts.items())),
+                      "source_words_owned_exactly_once":True,
+                      "not_historical_edition_or_paragraph_authorship_proof":True,
+                  })
+              print("Exact original OSIS word intervals missing from compiled K/I",
+                    "and their AUTHENTIC original markup word owner classes",
+                    "(no source words/verse keys):",
+                    json.dumps(gap_original_structure,sort_keys=True))
               del private_original_gaps
               all_rows=original_full_corpus["original_chapter_cases"]
               def cases_failing(field):
