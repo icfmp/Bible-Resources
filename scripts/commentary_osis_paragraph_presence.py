@@ -413,7 +413,8 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                 raise ValueError("Unparseable original chapter introduction XML") from None
             if any(isinstance(node, etree._Entity) for node in root.iter()):
                 raise ValueError("Unresolved original chapter introduction XML entity")
-            words = WORD.findall("".join(root.itertext()))
+            native_visible = "".join(root.itertext())
+            words = WORD.findall(native_visible)
             state["intro_distinct_raw_digests"].add(digest)
             offsets = _private_exact_token_match_offsets(
                 state["source_words"], words)
@@ -428,6 +429,15 @@ class PrivateOriginalChapterNativeAnchorCoverage:
             else:
                 state["intro_exact_source_location_classes"][
                     "no_full_exact_source_interval"] += 1
+            if len(offsets) == 1 and state["source_visible_text"] is not None:
+                character_relation = _private_interior_character_relation(
+                    state["source_visible_text"], state["source_word_spans"],
+                    offsets[0], native_visible, words)
+            elif len(offsets) == 1:
+                character_relation = "not_assessed_no_original_source_character_stream"
+            else:
+                character_relation = "not_assessed_without_unique_exact_word_location"
+            state["native_I_interior_character_relation_classes"][character_relation] += 1
             return
         if kind != "K":
             return
@@ -457,7 +467,8 @@ class PrivateOriginalChapterNativeAnchorCoverage:
             raise ValueError("Unparseable authenticated original native raw XML") from None
         if any(isinstance(node, etree._Entity) for node in root.iter()):
             raise ValueError("Unresolved original native raw XML entity")
-        words = WORD.findall("".join(root.itertext()))
+        native_visible = "".join(root.itertext())
+        words = WORD.findall(native_visible)
         state["native_distinct_visible_word_total"] += len(words)
         if words == state["source_words"]:
             state["native_exact_whole_chapter_equal"] = True
@@ -475,6 +486,15 @@ class PrivateOriginalChapterNativeAnchorCoverage:
         else:
             state["native_exact_location_classes"][
                 "no_full_exact_source_interval"] += 1
+        if len(offsets) == 1 and state["source_visible_text"] is not None:
+            character_relation = _private_interior_character_relation(
+                state["source_visible_text"], state["source_word_spans"],
+                offsets[0], native_visible, words)
+        elif len(offsets) == 1:
+            character_relation = "not_assessed_no_original_source_character_stream"
+        else:
+            character_relation = "not_assessed_without_unique_exact_word_location"
+        state["native_K_interior_character_relation_classes"][character_relation] += 1
         source_windows = state["source_windows"]
         state["matching_windows"].update(
             tuple(words[i:i+self.ANCHOR])
@@ -542,6 +562,11 @@ class PrivateOriginalChapterNativeAnchorCoverage:
             intro_intervals = state["intro_unique_exact_intervals"]
             if sum(state["intro_exact_source_location_classes"].values()) != len(intro_digests):
                 raise ValueError("Original chapter introduction classification incomplete")
+            if (sum(state["native_K_interior_character_relation_classes"].values())
+                    != len(state["native_raw_digests"])
+                    or sum(state["native_I_interior_character_relation_classes"].values())
+                    != len(intro_digests)):
+                raise ValueError("Original native K/I interior-character classification incomplete")
             all_intro_unique = bool(intro_digests) and (
                 len(intro_intervals) == len(intro_digests))
             combined_uncovered = None
@@ -597,6 +622,10 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                     len(intro_digests),
                 "chapter_I_whole_body_exact_source_location_classes":
                     dict(sorted(state["intro_exact_source_location_classes"].items())),
+                "native_K_body_interior_visible_character_relation_classes":
+                    dict(sorted(state["native_K_interior_character_relation_classes"].items())),
+                "native_chapter_I_body_interior_visible_character_relation_classes":
+                    dict(sorted(state["native_I_interior_character_relation_classes"].items())),
                 "all_chapter_I_bodies_uniquely_located_in_source":
                     all_intro_unique,
                 "source_uncovered_words_after_unique_K_plus_chapter_I_intervals":
@@ -618,6 +647,8 @@ class PrivateOriginalChapterNativeAnchorCoverage:
             "original_verse_key_range_and_paragraph_owner_not_inferred": True,
             "casefold_only_categories_do_not_authorize_case_changes": True,
             "exact_containment_does_not_prove_punctuation_or_markup": True,
+            "visible_character_test_excludes_section_boundary_nonword_chars": True,
+            "original_xml_markup_and_reference_attributes_not_char_compared": True,
             "source_uncovered_intervals_are_not_scripture_verse_mappings": True,
             "source_uncovered_spans_not_automatically_missing_in_sword": True,
             "original_punctuation_markup_notes_and_links_not_compared": True,
