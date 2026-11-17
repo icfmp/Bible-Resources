@@ -102,7 +102,8 @@ def original_authoring_chapter_scope_metadata(
         book_div: etree._Element, chapter_ref: str,
         *, _private_words_sink: list[str] | None = None,
         _private_visible_text_sink: list[str] | None = None,
-        _private_reference_targets_sink: list[str] | None = None) -> dict:
+        _private_reference_targets_sink: list[str] | None = None,
+        _private_before_first_chapter_words_sink: list[str] | None = None) -> dict:
     """Audit real chapter milestone bounds; never expose or rewrite source words.
 
     Book ownership and section starts are independent of any proposed missing
@@ -116,11 +117,15 @@ def original_authoring_chapter_scope_metadata(
                                 chapter_ref)
             or book_div.get("osisID")!=chapter_ref.rsplit(".",1)[0]):
         raise ValueError("Unreviewed original authoring OSIS book/chapter scope")
+    if (_private_before_first_chapter_words_sink is not None
+            and not chapter_ref.endswith(".1")):
+        raise ValueError("Book prechapter witness requires real chapter one")
     from collections import Counter
     state=0
     opens=0
     closes=0
     parts=[]
+    prechapter_parts=[]
     reference_targets=[]
     elements=Counter()
     def visit(node):
@@ -160,10 +165,18 @@ def original_authoring_chapter_scope_metadata(
                     raise ValueError("Unreviewed original OSIS reference volume")
             if node.text:
                 parts.append(node.text)
+        elif (state==0 and opens==0
+              and _private_before_first_chapter_words_sink is not None
+              and node.text):
+            prechapter_parts.append(node.text)
         for child in node:
             visit(child)
             if state==1 and child.tail:
                 parts.append(child.tail)
+            elif (state==0 and opens==0
+                  and _private_before_first_chapter_words_sink is not None
+                  and child.tail):
+                prechapter_parts.append(child.tail)
     visit(book_div)
     if state!=2 or opens!=1 or closes!=1:
         raise ValueError("Original source chapter milestones incomplete")
@@ -187,10 +200,24 @@ def original_authoring_chapter_scope_metadata(
                 or _private_reference_targets_sink):
             raise ValueError("Original private reference sink must be empty")
         _private_reference_targets_sink.extend(reference_targets)
+    original_pre_chapter_words=None
+    if _private_before_first_chapter_words_sink is not None:
+        if (type(_private_before_first_chapter_words_sink) is not list
+                or _private_before_first_chapter_words_sink):
+            raise ValueError("Original prechapter word sink must be empty")
+        original_pre_chapter_words=WORD.findall("".join(prechapter_parts))
+        if len(original_pre_chapter_words)>100_000:
+            raise ValueError("Unreviewed original first-chapter prelude size")
+        _private_before_first_chapter_words_sink.extend(
+            original_pre_chapter_words)
     return {
         "authentic_chapter_milestone_start_end_count":[opens,closes],
         "bounded_original_chapter_visible_words":len(words),
         "bounded_original_chapter_reference_elements":len(reference_targets),
+        "original_book_text_before_first_chapter_visible_words":(
+            None if original_pre_chapter_words is None
+            else len(original_pre_chapter_words)),
+        "book_prelude_not_inferred_as_chapter_intro_owner":True,
         "original_chapter_visible_text_sha256":sha256(visible.encode("utf-8")).hexdigest(),
         "original_chapter_element_start_counts_by_tag":dict(sorted(elements.items())),
         "no_original_chapter_words_exported":True,
