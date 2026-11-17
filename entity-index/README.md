@@ -180,6 +180,26 @@ also require a distinct pinned-source completeness and traditional epistle
 subscription review (see inherited #86). Variant provenance is therefore
 retained for later source-specific qualification.
 
+## Original corpus labels and stable client-facing corpus names
+
+The pinned ACAI source spells its Greek occurrence field **`SBLGNT`**
+(uppercase), while the public resolver API uses the canonical name
+**`sblgnt`** (lowercase). Before this repair, the generic compiler
+preserved source spelling in its inverse word-key index, causing valid
+Greek `sblgnt:n...` lookups to silently return zero candidates.
+
+The pinned `source.lock.json` now carries the **explicit source-corpus
+crosswalk** (`SBLGNT -> sblgnt`, `wlc -> wlc`); input occurrence
+group names and token arrays are retained **byte-for-byte in meaning** and
+original source JSON is untouched. Only inverse exact-word lookup keys
+are normalized. Unknown source-corpus labels and contradictory source word
+prefixes cause a build failure; no implicit uppercase/lowercase guessing.
+
+A real-corpus QA proof verifies `sblgnt:n45016001004` in Romans 16:1
+resolves to `person:Phoebe` under the pinned Macula Greek edition.
+Greek negative-lookup checks alone are **not** enough to demonstrate that
+the index really supports Greek original-word lookup.
+
 ## Offline lookup and uncertainty handling
 
 `resolve.py` exposes `EntityResolver`. It requires a corpus name, its

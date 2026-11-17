@@ -16,5 +16,10 @@
       "edition": "Clear-Bible/macula-greek@8423afe47b9e8f24b7772e808af45c7159a6fe7e",
       "word_id_prefix": "n"
     }
+  },
+  "source_corpora": {
+    "wlc": "wlc",
+    "SBLGNT": "sblgnt",
+    "sblgnt": "sblgnt"
   }
 }

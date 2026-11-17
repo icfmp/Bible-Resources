@@ -74,6 +74,17 @@ def apply_word_edits(entry, decision):
         references.append(ref)
 
 
+def canonical_source_corpus(source_lock: dict, raw_corpus: str) -> str:
+    """Resolve an observed ACAI field label to a pinned source corpus key."""
+    mapping = source_lock.get("source_corpora")
+    if not isinstance(mapping, dict):
+        raise ValueError("Missing pinned source corpus-name crosswalk")
+    resolved = mapping.get(raw_corpus)
+    if not isinstance(resolved, str) or resolved not in source_lock["source_editions"]:
+        raise ValueError(f"Unrecognized original source corpus: {raw_corpus!r}")
+    return resolved
+
+
 def build(source_root: Path, source_lock: dict, editorial: dict,
           source_absences: dict | None = None,
           source_verse_absences: dict | None = None) -> dict:
@@ -178,7 +189,12 @@ def build(source_root: Path, source_lock: dict, editorial: dict,
             for corpus, groups in corpora.items():
                 for group in groups:
                     for word in group:
-                        candidates[f"{corpus}:{word}"].add((entry["id"], field))
+                        standard_corpus = canonical_source_corpus(source_lock, corpus)
+                        expected_prefix = source_lock["source_editions"][standard_corpus]["word_id_prefix"]
+                        if not word.startswith(expected_prefix):
+                            raise ValueError(
+                                f"{entry['id']}: {corpus} word prefix incompatible: {word!r}")
+                        candidates[f"{standard_corpus}:{word}"].add((entry["id"], field))
     # A pinned-source audit may prove that an imported annotation refers to
     # a word ID that does not exist in the claimed original-language edition.
     # Keep all source groups in 'entities'; suppress only unsafe lookup claims
@@ -235,7 +251,7 @@ def build(source_root: Path, source_lock: dict, editorial: dict,
         for source_corpus, groups in corpora.items()
         for group in groups
         for word in group
-        if f"{source_corpus}:{word}" in unattested
+        if f"{canonical_source_corpus(source_lock, source_corpus)}:{word}" in unattested
     )
     # This is an edition-specific source-WORD-INVENTORY compatibility
     # annotation, not a decision about canonical Bible versification or
@@ -285,6 +301,7 @@ def build(source_root: Path, source_lock: dict, editorial: dict,
             "reviewed_hebrew_source": source_lock["reviewed_hebrew_source"],
             "reviewed_greek_source": source_lock["reviewed_greek_source"],
             "source_editions": source_lock["source_editions"],
+            "source_corpora": source_lock["source_corpora"],
         },
         "statistics": {
             "source_records": len(originals),
