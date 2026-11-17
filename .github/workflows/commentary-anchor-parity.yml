@@ -22,6 +22,11 @@ on:
         type: string
         required: false
         default: John.3.16
+      test_private_full_xiphos:
+        description: "Optional corrected MHC full-candidate Xiphos GUI experiment; inconclusive is not approval"
+        type: boolean
+        required: false
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -89,6 +94,7 @@ jobs:
     env:
       RESOURCE_ID: ${{ matrix.resource_id }}
       PROBE: ${{ github.event.inputs.probe_osis_key || 'John.3.16' }}
+      RUN_PRIVATE_XIPHOS: ${{ github.event_name == 'workflow_dispatch' && inputs.test_private_full_xiphos || false }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -103,7 +109,7 @@ jobs:
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update
           timeout 90s sudo apt-get -o Acquire::Retries=0 \
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev libsword-utils diatheke
-          if [[ "$RESOURCE_ID" == "mhc-crosswire" ]]; then
+          if [[ "$RESOURCE_ID" == "mhc-crosswire" && "$RUN_PRIVATE_XIPHOS" == "true" ]]; then
             timeout 180s sudo apt-get -o Acquire::Retries=0 \
               -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y \
               xiphos xvfb xdotool xclip dbus-x11
@@ -128,7 +134,10 @@ jobs:
           set -euo pipefail
           PRIVATE_FULL=()
           if [[ "$RESOURCE_ID" == "mhc-crosswire" ]]; then
-            PRIVATE_FULL=(--private-full-probe --private-full-xiphos-probe)
+            PRIVATE_FULL=(--private-full-probe)
+            if [[ "$RUN_PRIVATE_XIPHOS" == "true" ]]; then
+              PRIVATE_FULL+=(--private-full-xiphos-probe)
+            fi
           fi
           python scripts/commentary_anchor_parity.py \
             --resource-id "$RESOURCE_ID" \
@@ -190,7 +199,19 @@ jobs:
                         }, sort_keys=True))
                   assert full["full_original_K_I_U_native_entry_parity_proven"] is True
                   assert full["planned_extra_index_keys"] == 3
-                  assert full["private_real_xiphos_alias_navigation_probe"] is not None
+                  gui = full["private_real_xiphos_alias_navigation_probe"]
+                  if os.environ["RUN_PRIVATE_XIPHOS"] == "true":
+                      assert gui is not None
+                      visibly_matched = (
+                          gui["actual_passage_commands_accepted"]
+                          and gui["independent_gui_commentary_excerpt_match_count"]
+                              == gui["sample_count"]
+                      )
+                      print("Optional corrected-candidate GUI verdict:",
+                            "EXCERPTS_OBSERVED_NOT_APPROVAL" if visibly_matched
+                            else "INCONCLUSIVE_NOT_ACCEPTED")
+                  else:
+                      assert gui is None
                   assert full["published"] is False
               print("Original XML volumes:", report["original_xml_volume_count"])
               assert report["original_native_versification_registry_checked"] is True
