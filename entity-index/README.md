@@ -105,6 +105,34 @@ be verified, and different textual editions/versifications cannot be silently
 equated. The index does not assert that ACAI's every `references` entry is
 attested by the pinned critical text.
 
+## Offline lookup and uncertainty handling
+
+`resolve.py` exposes `EntityResolver`. It requires a corpus name, its
+**exact pinned edition identifier**, an original word ID and its original
+eight-digit ORG verse ID. Its outcomes distinguish an unavailable corpus,
+an incompatible edition, malformed identifiers, verse mismatch, no indexed
+entity annotation, a source identity candidate and multiple conflicting
+canonical identity candidates. **No candidate is called verified solely
+because ACAI assigned it a token.** The resolver also reports when the
+entity's separate source reference list omits the token's verse.
+
+The `provenance.source_editions` metadata is data-driven, so different
+language packs can use one shared identity contract without depending on
+language-specific labels. Example after generating the index:
+
+```bash
+python3 -I entity-index/resolve.py \\
+  --index entity-index/dist/index.json \\
+  --corpus wlc \\
+  --edition 'Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c' \\
+  --word-id o060100130142 --verse-id 06010013
+```
+
+This is a **data lookup**, not a final historical interpretation. An
+unrecognized source word is not automatically an ordinary lexical word:
+the annotation may be missing. No network, Strong-based guessing, or
+unverified translation-to-source alignment is used.
+
 The offline producer is independent of the GTK Bible application. This
 prepares a source for a future **single** contextual entity resolver, aligned
 with [Bible issue #284](https://github.com/icfmp/Bible/issues/284), without
