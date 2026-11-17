@@ -10,15 +10,15 @@ publication_status: "NOT RELEASED — FULL SWORD REBUILD PENDING"
 
 # Deuteronomy 32 — Modern English
 
-## Original chapter outline
+## Original chapter outline — explicit verse-label corrections
 
 | Original outline | Verses |
 | --- | --- |
 | The song of Moses. | 1, 2 |
 | The character of God, The character of Israel. | 3–6 |
 | The great things God had done for Israel. | 7–14 |
-| The wickedness of Israel. | 19–25 |
-| The judgments which would come upon them for their sins. | 15–18 |
+| The wickedness of Israel. | 15–18 |
+| The judgments which would come upon them for their sins. | 19–25 |
 | Deserved vengeance withheld. | 26–38 |
 | God's deliverance for his people. | 39–43 |
 | The exhortation with which the song was delivered. | 44–47 |
@@ -189,6 +189,10 @@ A sure hope of eternal life beyond death, founded on faith, allows them to do so
 ---
 
 ## Editorial review — Deuteronomy 32
+
+**2026-11-17 traceable outline-reference correction (independent original-native review pending):** The draft outline transposed Israel's unfaithfulness (15–18) and God's consequent judgments (19–25). Only the **verse-range cells of the copied original-outline table** have been corrected; source-authored headings, row order, commentary section boundaries, and exposition prose are not edited. Previously transcribed cells: `The wickedness of Israel. | 19–25`; `The judgments which would come upon them for their sins. | 15–18`. Corrected cells: `The wickedness of Israel. | 15–18`; `The judgments which would come upon them for their sins. | 19–25`. The repair is reversible against this recorded before/after; the authoritative published MHCC 0.1.1 outline still requires exact independent native validation.
+
+
 
 **Complete independent digital witness inspected:** [CCEL, Deuteronomy 32](https://ccel.org/ccel/henry/mhcc.vi.xxxii.html). Final published baseline remains `MHCC 0.1.1`; native SWORD keys, markup, source bibliography and human acceptance still pending.
 
