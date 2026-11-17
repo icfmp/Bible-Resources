@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "corpus": "sblgnt",
+  "source_edition": "Clear-Bible/macula-greek@8423afe47b9e8f24b7772e808af45c7159a6fe7e",
+  "scope": "original_entity_reference_claim_with_no_word_anchor_in_pinned_edition",
+  "claims": [
+    {
+      "source_id": "place:Bethabara",
+      "verse_id": "43001028",
+      "classification": "textual_variant_name_not_in_pinned_edition",
+      "evidence": [
+        "John 1:28: pinned SBLGNT has Βηθανίᾳ (n43001028003), not the Bethabara textual alternative; inherited ACAI issue #87.",
+        "https://github.com/icfmp/ACAI/issues/87"
+      ]
+    },
+    {
+      "source_id": "place:Trogyllium",
+      "verse_id": "44020015",
+      "classification": "textual_variant_name_not_in_pinned_edition",
+      "evidence": [
+        "Acts 20:15: pinned SBLGNT names Samos (n44020015013) and Miletus (n44020015019), but has no Trogyllium proper name; inherited ACAI issue #87.",
+        "https://github.com/icfmp/ACAI/issues/87"
+      ]
+    },
+    {
+      "source_id": "person:Phoebe",
+      "verse_id": "45016027",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Romans 16:27: Phoebe is named in Romans 16:1 but not the pinned final-verse text; traditional subscription candidate.",
+        "https://github.com/icfmp/ACAI/issues/86"
+      ]
+    },
+    {
+      "source_id": "place:Cenchreae",
+      "verse_id": "45016027",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Romans 16:27: Cenchreae is named in Romans 16:1 but not pinned final-verse text; traditional subscription candidate.",
+        "https://github.com/icfmp/ACAI/issues/86"
+      ]
+    },
+    {
+      "source_id": "place:Corinthus",
+      "verse_id": "45016027",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Romans 16:27: Corinthus in traditional subscription, not a pinned final-verse name.",
+        "https://github.com/icfmp/ACAI/issues/86"
+      ]
+    },
+    {
+      "source_id": "person:Achaicus",
+      "verse_id": "46016024",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "1 Corinthians 16:24: Achaicus is named at 16:17, but not in the canonical final-verse wording; subscription candidate.",
+        "https://github.com/icfmp/ACAI/issues/86"
+      ]
+    },
+    {
+      "source_id": "person:Fortunatus",
+      "verse_id": "46016024",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "1 Corinthians 16:24: Fortunatus is named at 16:17, not the canonical final verse; subscription candidate.",
+        "https://github.com/icfmp/ACAI/issues/86"
+      ]
+    },
+    {
+      "source_id": "person:Epaphroditus",
+      "verse_id": "50004023",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Philippians 4:23: Epaphroditus is named at 2:25 and 4:18, but not the last verse; subscription candidate.",
+        "https://github.com/icfmp/ACAI/issues/86"
+      ]
+    },
+    {
+      "source_id": "person:Philemon",
+      "verse_id": "57001025",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Philemon 1:25: Philemon is named at 1:1, but not the final verse; subscription candidate.",
+        "https://github.com/icfmp/ACAI/issues/86"
+      ]
+    },
+    {
+      "source_id": "person:Nero",
+      "verse_id": "55004022",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "2 Timothy 4:22: Nero is not named in the final canonical verse; later epistle subscription candidate.",
+        "https://github.com/icfmp/ACAI/issues/86"
+      ]
+    },
+    {
+      "source_id": "person:Caesar.3",
+      "verse_id": "55004022",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "2 Timothy 4:22: Caesar.3 alias of Nero is not named in final canonical verse; later subscription candidate.",
+        "https://github.com/icfmp/ACAI/issues/86"
+      ]
+    },
+    {
+      "source_id": "place:Pacatiana",
+      "verse_id": "54006021",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "1 Timothy 6:21: province qualifier Pacatiana appears in a later epistle subscription, not the last canonical verse.",
+        "https://github.com/icfmp/ACAI/issues/86"
+      ]
+    }
+  ],
+  "policy": "Preserve every source verse reference and immutable original word group. Qualify only named source claims with actual pinned-edition evidence; an alternate traditional reading is not a missing or spurious biblical verse. Traditional subscription is a candidate attribution, not a final editorial verdict."
+}
