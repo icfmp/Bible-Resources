@@ -7,6 +7,8 @@
 
 ## Original I-only chapter commentary — narrowly scoped derivative treatment (2026-11-17)
 
+**Technical implementation proof (2026-11-17):** [native SWORD transport report](../work/mhcc-modern/production/IONLY_CHAPTER_SWORD_TRANSPORT_RESULT_2026-11-17.md), [successful GitHub Actions run #44186352658](https://github.com/icfmp/Bible-Resources/actions/runs/44186352658). Using a temporary OSIS/zCom module and both published-source I identities, **all 50 target verse keys are present and linked to exactly two authored bodies**; stock SWORD's native `isLinked` confirms **48/48** intra-chapter adjacent links, first/last verses render in `diatheke`, and 34 synthetic tests pass. **This is a completed technical transport proof only**: independent original-I prose/title/markup collation, Xiphos/AndBible and Bible scrolling acceptance, full derivative assembly, rights, merge and publication remain outstanding.
+
 **Clarification: there is NO general rule that fills missing verse commentaries with a whole-chapter commentary.** The Bible application is responsible for deciding how to present chapter-wide introductions alongside verse-specific commentary. Filling gaps throughout an otherwise partly annotated chapter would repeatedly surface the same text while scrolling and is **not approved**. This protocol makes no general app display-policy decision.
 
 The published original **MHCC 0.1.1** has two verified exceptional chapter layouts:
