@@ -257,6 +257,22 @@ jobs:
                 json.dumps(gap_classes,sort_keys=True))
           print("Source-extra unlinked word location uniqueness by original book:",
                 json.dumps(gap_by_book,sort_keys=True))
+          p_classes=dual["source_extra_original_p_visible_word_digest_case_classes"]
+          p_books=dual["original_book_source_extra_original_p_digest_case_classes"]
+          p_receipts=dual["source_extra_original_p_digest_source_line_sha_only_rows"]
+          assert sum(p_classes.values())==extra_total
+          assert len(p_receipts)==extra_total
+          assert sum(sum(classes.values()) for classes in p_books.values())==extra_total
+          assert all(set(classes)<=set(p_classes) for classes in p_books.values())
+          assert dual["exact_source_p_digest_match_not_proof_of_biblical_heading_or_authorship"]
+          assert all(isinstance(row["original_source_line"],int)
+                     and len(row["original_body_sha256"])==64
+                     and isinstance(row["all_extra_gap_full_original_p_digest_candidate_classes"],list)
+                     for row in p_receipts)
+          print("Original complete ThML paragraph exact digest source-extra categories:",
+                json.dumps(p_classes,sort_keys=True))
+          print("Original whole paragraph gap digest candidates by source book:",
+                json.dumps(p_books,sort_keys=True))
           high=report["source_high_extra_unlinked_spans_other_same_chapter_native_location"]
           selected=high["bounded_cases_selected_for_original_native_replay"]
           assert 0<=selected<=4
