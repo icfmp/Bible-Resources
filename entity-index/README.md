@@ -72,6 +72,20 @@ The builder contains **no chapter-specific or entity-specific code path**.
   1 Chronicles 1:12 become source-verified additions to the existing
   `group:Philistine` record. The 20 original speaker spans are **not**
   indiscriminately copied to the group and remain preserved in frozen ACAI.
+- `person:Shiloh` is **quarantined**: Genesis 49:10 attests a
+  debated expression, but not a demonstrably historical man living in the
+  patriarchal age. Its exact Hebrew word remains in the frozen source for
+  text-critical and Christological review.
+- `keyterm:Universe` and `keyterm:World` retain their distinct source
+  records and word groups, but no longer resolve canonically to
+  `keyterm:Ability` simply because the input had an overly broad
+  `primary_id`. This is identity separation, not a judgment about
+  a particular original word's contextual sense.
+
+The remaining inherited editorial/source-fidelity work is tracked in
+[Bible-Resources #299](https://github.com/icfmp/Bible-Resources/issues/299).
+The old ACAI issue history remains available as evidence; transfer to one
+tracker is **not** equivalent to fixing or validating those records.
 
 The original ACAI IDs survive under `source_id` and the original source
 commit. Crosswalk clients **must not** interpret a historical `person:`
