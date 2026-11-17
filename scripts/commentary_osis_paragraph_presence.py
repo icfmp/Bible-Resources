@@ -103,7 +103,8 @@ def original_authoring_chapter_scope_metadata(
         *, _private_words_sink: list[str] | None = None,
         _private_visible_text_sink: list[str] | None = None,
         _private_reference_targets_sink: list[str] | None = None,
-        _private_before_first_chapter_words_sink: list[str] | None = None) -> dict:
+        _private_before_first_chapter_words_sink: list[str] | None = None,
+        _private_word_owner_classes_sink: list[str] | None = None) -> dict:
     """Audit real chapter milestone bounds; never expose or rewrite source words.
 
     Book ownership and section starts are independent of any proposed missing
@@ -128,7 +129,25 @@ def original_authoring_chapter_scope_metadata(
     prechapter_parts=[]
     reference_targets=[]
     elements=Counter()
-    def visit(node):
+    owner_fragments=[]
+    need_owners=_private_word_owner_classes_sink is not None
+    if need_owners and (
+            type(_private_word_owner_classes_sink) is not list
+            or _private_word_owner_classes_sink):
+        raise ValueError("Original private word owner sink must be empty")
+    def owner_class(path):
+        if "note" in path:
+            return "note"
+        if "title" in path:
+            return "title"
+        if "p" in path:
+            return "paragraph_reference" if "reference" in path else "paragraph"
+        if "q" in path or "l" in path:
+            return "poetry"
+        if "div" in path:
+            return "unwrapped_div"
+        return "unwrapped_other"
+    def visit(node,path=()):
         nonlocal state,opens,closes
         if not isinstance(node.tag,str):
             # XML comments/processing instructions are not visible authored
@@ -138,6 +157,7 @@ def original_authoring_chapter_scope_metadata(
                 return
             raise ValueError("Unexpected original OSIS markup node")
         tag=node.tag.rsplit("}",1)[-1]
+        own_path=path+(tag,) if need_owners else ()
         if tag=="chapter":
             first=(node.get("sID")==chapter_ref or (
                 node.get("osisID")==chapter_ref and not node.get("eID")))
@@ -165,14 +185,18 @@ def original_authoring_chapter_scope_metadata(
                     raise ValueError("Unreviewed original OSIS reference volume")
             if node.text:
                 parts.append(node.text)
+                if need_owners:
+                    owner_fragments.append((node.text,owner_class(own_path)))
         elif (state==0 and opens==0
               and _private_before_first_chapter_words_sink is not None
               and node.text):
             prechapter_parts.append(node.text)
         for child in node:
-            visit(child)
+            visit(child,own_path)
             if state==1 and child.tail:
                 parts.append(child.tail)
+                if need_owners:
+                    owner_fragments.append((child.tail,owner_class(own_path)))
             elif (state==0 and opens==0
                   and _private_before_first_chapter_words_sink is not None
                   and child.tail):
@@ -182,6 +206,26 @@ def original_authoring_chapter_scope_metadata(
         raise ValueError("Original source chapter milestones incomplete")
     visible="".join(parts)
     words=WORD.findall(visible)
+    if need_owners:
+        spans=[]
+        offset=0
+        for segment,owner in owner_fragments:
+            next_offset=offset+len(segment)
+            spans.append((offset,next_offset,owner))
+            offset=next_offset
+        if offset!=len(visible):
+            raise ValueError("Private original word owners do not reconstruct source visible text")
+        pos=0
+        for word in WORD.finditer(visible):
+            while pos<len(spans) and word.start()>=spans[pos][1]:
+                pos+=1
+            if pos>=len(spans) or word.start()<spans[pos][0]:
+                raise ValueError("Unowned original source visible word")
+            owner=(spans[pos][2] if word.end()<=spans[pos][1]
+                   else "cross_fragment_visible_word")
+            _private_word_owner_classes_sink.append(owner)
+        if len(_private_word_owner_classes_sink)!=len(words):
+            raise ValueError("Original private XML word ownership did not align")
     if not words or len(words)>100_000:
         raise ValueError("Original OSIS chapter prose length unreviewed")
     # Only a deliberate in-process private caller can receive the original
@@ -214,6 +258,7 @@ def original_authoring_chapter_scope_metadata(
         "authentic_chapter_milestone_start_end_count":[opens,closes],
         "bounded_original_chapter_visible_words":len(words),
         "bounded_original_chapter_reference_elements":len(reference_targets),
+        "private_original_word_ownership_verified":need_owners,
         "original_book_text_before_first_chapter_visible_words":(
             None if original_pre_chapter_words is None
             else len(original_pre_chapter_words)),
