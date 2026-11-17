@@ -236,9 +236,26 @@ jobs:
           assert dual["no_unlinked_word_category_implies_authorial_edition_parity_or_missing_text"]
           assert sum(dual["original_vs_native_unlinked_word_relation_classes"].values()) == expected_longer
           assert len(dual["original_line_SHA_and_two_sided_link_word_metadata_only_rows"]) == expected_longer
+          extra_classes={
+              "stock_plain_words_contiguous_inside_longer_original_plain_text",
+              "stock_plain_words_in_order_with_extra_original_words",
+          }
+          extra_total=sum(dual["original_vs_native_unlinked_word_relation_classes"].get(
+              name,0) for name in extra_classes)
+          gap_classes=dual["source_extra_unlinked_word_gap_topology_classes"]
+          gap_by_book=dual["original_book_source_extra_word_gap_topology_classes"]
+          assert sum(gap_classes.values())==extra_total
+          assert sum(sum(groups.values()) for groups in gap_by_book.values())==extra_total
+          assert all(isinstance(name,str) and name.islower() and
+                     name.replace("_","").isalnum() and type(count) is int and count>=0
+                     for name,count in gap_classes.items())
           print("Original and native both-side citation label exclusion, unlinked words:",
                 json.dumps(dual["original_vs_native_unlinked_word_relation_classes"],
                            sort_keys=True))
+          print("Source-extra unlinked word location uniqueness, no original text:",
+                json.dumps(gap_classes,sort_keys=True))
+          print("Source-extra unlinked word location uniqueness by original book:",
+                json.dumps(gap_by_book,sort_keys=True))
           evidence = {
               "status": "SOURCE_STOCK_ONE_VOLUME_LEXICAL_CENSUS_NOT_PARITY",
               "resource_id": "mhc-crosswire",
