@@ -14,6 +14,42 @@ from pilot_preflight import PilotError
 
 
 class CommentaryAnchorParityTests(unittest.TestCase):
+    def test_private_original_chapter_ref_witnesses_use_real_source_prose(self):
+        from commentary_anchor_parity import compare_original_source_reference_candidates
+        from hashlib import sha256
+        prose = " ".join("sourceword" + str(i) for i in range(150))
+        xml = (b"<ThML><div1><div2>"
+               b'<scripCom osisRef="Bible:Gen.1.1-Gen.1.3"/>'
+               b"<div><p>" + prose.encode() + b"</p></div></div2></div1></ThML>")
+        plan = {"schema_version": 1,
+                "status": "RESEARCH_ONLY_UNAPPROVED_REFERENCE_CANDIDATES",
+                "source_xml_sha256": sha256(xml).hexdigest(),
+                "candidate_ranges": [{"original_work_qualified_reference":
+                                      "Bible:Gen.1.1-Gen.1.3",
+                                      "proposed_osis_reference": "Gen.2.1-Gen.2.3"}]}
+        native = {"Gen.1": [("Gen.1.1", b"<p>Unrelated book chapter.</p>")],
+                  "Gen.2": [("Gen.2.1", b"<p>" + prose.encode() + b"</p>")]}
+        r = compare_original_source_reference_candidates(
+            xml, plan, native, {"Gen.2.1", "Gen.2.2", "Gen.2.3"})
+        self.assertEqual(r["source_sections_checked"], 1)
+        self.assertEqual(r["section_evidence"][0]["status"],
+                         "CANDIDATE_CHAPTER_STRONGER_WORD_EVIDENCE")
+        self.assertFalse(r["published"])
+        self.assertFalse(r["rights_and_editorial_approved"])
+
+    def test_private_chapter_candidate_rejects_wrong_original_sha(self):
+        from commentary_anchor_parity import compare_original_source_reference_candidates
+        with self.assertRaises(PilotError):
+            compare_original_source_reference_candidates(
+                b"<ThML/>",
+                {"schema_version": 1, "status":
+                 "RESEARCH_ONLY_UNAPPROVED_REFERENCE_CANDIDATES",
+                 "source_xml_sha256": "0" * 64,
+                 "candidate_ranges": [{"original_work_qualified_reference":
+                                       "Bible:Gen.1.1-Gen.1.3",
+                                       "proposed_osis_reference": "Gen.2.1-Gen.2.3"}]},
+                {}, {"Gen.2.1", "Gen.2.3"})
+
     def xml(self, markers):
         return (
             b'<?xml version="1.0"?><ThML><ThML.body><div1 title="Book">'

@@ -239,6 +239,121 @@ def compare_anchors(original_xml: bytes, native_output: bytes, module_id: str,
     }
 
 
+
+
+def compare_original_source_reference_candidates(xml: bytes, plan: dict,
+        numbered: dict[str, list[tuple[str, bytes]]],
+        canonical_verses: set[str]) -> dict:
+    """Read-only source word-window comparison in both original native chapters.
+
+    Never use lexical similarity to authorize a correction or publication.
+    Only SHA-bound metadata leave this private original-text audit.
+    """
+    if (plan.get("schema_version") != 1
+            or plan.get("status") != "RESEARCH_ONLY_UNAPPROVED_REFERENCE_CANDIDATES"
+            or not re.fullmatch(r"[a-f0-9]{64}", plan.get("source_xml_sha256", ""))
+            or sha256(xml).hexdigest() != plan["source_xml_sha256"]
+            or not isinstance(plan.get("candidate_ranges"), list)
+            or not 1 <= len(plan["candidate_ranges"]) <= 12):
+        raise PilotError("Unverified original reference candidate plan")
+    expected = {}
+    for entry in plan["candidate_ranges"]:
+        if not isinstance(entry, dict):
+            raise PilotError("Unreviewed source reference candidate")
+        source = entry.get("original_work_qualified_reference")
+        proposed = entry.get("proposed_osis_reference")
+        if (not isinstance(source, str) or not source.startswith("Bible:")
+                or _parse_reference(source)[0] != "work_qualified_same_book_verse_range"
+                or not isinstance(proposed, str)
+                or len(proposed.split("-")) != 2
+                or not all(OSIS_VERSE.fullmatch(x) for x in proposed.split("-"))
+                or source in expected):
+            raise PilotError("Malformed or duplicated authorial reference proposal")
+        old = WORK_REF.fullmatch(source).group(2).split("-")[0]
+        first, last = proposed.split("-")
+        if (old.split(".")[0] != first.split(".")[0]
+                or old == first
+                or first.rsplit(".", 1)[0] != last.rsplit(".", 1)[0]
+                or int(first.rsplit(".", 1)[1]) > int(last.rsplit(".", 1)[1])
+                or not {first, last}.issubset(canonical_verses)):
+            raise PilotError("Candidate is not a valid reference range in the native registry")
+        expected[source] = (old, proposed)
+    rows, seen = [], set()
+    for marker in _root_for_raw_xml(xml).iter():
+        if not isinstance(marker.tag, str) or marker.tag.rsplit("}", 1)[-1] != "scripCom":
+            continue
+        ref = marker.get("osisRef", "")
+        if ref not in expected:
+            continue
+        if ref in seen:
+            raise PilotError("Original source marker duplicated")
+        seen.add(ref)
+        body = marker.getnext()
+        if (body is None or not isinstance(body.tag, str)
+                or body.tag.rsplit("}", 1)[-1] != "div"
+                or marker.tail and marker.tail.strip()):
+            raise PilotError("Authorial source body not adjacent to reference")
+        visible = "".join(body.itertext())
+        if not visible.strip() or len(visible.encode("utf-8")) > 2_000_000:
+            raise PilotError("Unbounded original authorial commentary body")
+        tokens = WORD.findall(visible)
+        links = set(marked_word_token_indices(body, "scripRef", visible))
+        if any(type(i) is not int or i < 0 or i >= len(tokens) for i in links):
+            raise PilotError("Original scripture labels cannot be excluded reliably")
+        words = [word for i, word in enumerate(tokens) if i not in links]
+        if not 24 <= len(words) <= 40000:
+            raise PilotError("Original source textual witness outside reviewed size bounds")
+        windows, last = [], len(words) - 12
+        for i in range(5):
+            group = words[(last*i)//4:(last*i)//4 + 12]
+            if group not in windows:
+                windows.append(group)
+        if len(windows) < 3:
+            raise PilotError("Insufficient distinct source lexical windows")
+        old, proposed = expected[ref]
+        proposed_key = proposed.split("-")[0]
+        def score(chapter, key):
+            entries = numbered.get(chapter, [])
+            best = 0
+            for native_key, raw in entries:
+                actual = strict_native_stock_plain_words(raw)
+                best = max(best, sum(_contiguous_offset(w, actual) is not None for w in windows))
+            return best, len(entries), key in dict(entries)
+        before, n_before, old_present = score(old.rsplit(".", 1)[0], old)
+        after, n_after, new_present = score(proposed_key.rsplit(".", 1)[0], proposed_key)
+        rows.append({
+            "source_original_reference": ref,
+            "original_source_line": marker.sourceline,
+            "original_source_body_sha256": sha256(visible.encode("utf-8")).hexdigest(),
+            "original_plain_word_count": len(words),
+            "original_12_word_witness_count": len(windows),
+            "original_native_chapter_keys_checked": n_before,
+            "candidate_native_chapter_keys_checked": n_after,
+            "original_native_start_present": old_present,
+            "candidate_native_start_present": new_present,
+            "original_chapter_best_matching_witnesses": before,
+            "candidate_chapter_best_matching_witnesses": after,
+            "proposed_reference": proposed,
+            "status": ("CANDIDATE_CHAPTER_STRONGER_WORD_EVIDENCE"
+                       if after >= 2 and after > before
+                       else "ORIGINAL_CHAPTER_STRONGER_WORD_EVIDENCE"
+                       if before > after else "INCONCLUSIVE_NO_CHANGE"),
+            "authorial_source_full_parity_proven": False,
+            "reference_change_authorized": False,
+        })
+    if len(seen) != len(expected):
+        raise PilotError("Not all original source references uniquely identified")
+    return {
+        "status": "PRIVATE_SOURCE_CHAPTER_REVIEW_NOT_TEXTUAL_PARITY",
+        "source_sections_checked": len(rows),
+        "exact_source_xml_sha256": plan["source_xml_sha256"],
+        "section_evidence": rows,
+        "prose_and_raw_fragments_not_uploaded": True,
+        "original_xml_and_stock_not_modified": True,
+        "rights_and_editorial_approved": False,
+        "published": False,
+    }
+
 def _original_unoccupied_source_units(
         original_xml: bytes, *, volume: int, missing: list[dict],
         canonical_verses: set[str]) -> list[dict]:
@@ -556,6 +671,24 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
         private_full_xiphos_probe: bool = False,
         private_full_jsword_root: Path | None = None) -> dict:
     manifest = load_manifest(resource_id)
+    review_relative = manifest.get("private_reference_candidate_plan")
+    review_plan = None
+    if review_relative is not None:
+        if (not private_full_probe or not isinstance(review_relative, str)
+                or not re.fullmatch(r"config/commentary-reference-plans/[a-z0-9-]+\.json", review_relative)):
+            raise PilotError("Private reference research must run after full original stock audit")
+        review_file = Path(__file__).resolve().parents[1] / review_relative
+        if (review_file.is_symlink() or not review_file.is_file()
+                or review_file.stat().st_size > 20000):
+            raise PilotError("Unreviewed reference plan file")
+        review_plan = json.loads(review_file.read_text(encoding="utf-8"))
+        if (review_plan.get("resource_id") != resource_id
+                or review_plan.get("stock_raw_corpus_sha256")
+                    != manifest.get("native_raw_corpus_sha256")
+                or not any(v.get("number") == review_plan.get("source_volume")
+                           and v.get("sha256") == review_plan.get("source_xml_sha256")
+                           for v in manifest.get("commentary_source", {}).get("xml_witness_volumes", []))):
+            raise PilotError("Private proposal not bound to pinned original editions")
     locations, is_collection = _xml_witness_locations(
         manifest.get("commentary_source"))
     expected_sword = manifest.get("archive_sha256")
@@ -632,6 +765,7 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
 
         source_reports = []
         unoccupied_original_units = []
+        review_source_xml = None
         for number, xml_url, expected_xml in locations:
             xml_path = root / f"original-volume-{number}.xml"
             xml_receipt = fetch(xml_url, xml_path, "ccel")
@@ -640,6 +774,8 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
             if xml_receipt["bytes"] > MAX_XML:
                 raise PilotError("Original XML exceeds source-audit safety bound")
             source_xml = xml_path.read_bytes()
+            if review_plan is not None and number == review_plan["source_volume"]:
+                review_source_xml = source_xml
             comparison = compare_anchors(source_xml, result.stdout,
                                          manifest["module_id"],
                                          probe_osis_keys=probes,
@@ -657,6 +793,8 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
                 "original_ccel_xml_sha256": xml_receipt["sha256"],
                 "anchor_diagnostic": comparison,
             })
+        if review_plan is not None and review_source_xml is None:
+            raise PilotError("Reviewed XML witness volume absent")
         if is_collection:
             observed = summarize_volume_anchor_results(source_reports)
             observed.update({
@@ -823,6 +961,11 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
                             "published": False,
                         })
                     if private_full_probe:
+                        if review_plan is not None:
+                            observed["private_original_reference_candidate_word_review"] = (
+                                compare_original_source_reference_candidates(
+                                    review_source_xml, review_plan,
+                                    dict(complete_numbered), source_registry["verse_keys"]))
                         aliases = {}
                         for row in location["units"]:
                             claim = row["provisional_missing_first_verse_alias_preview"]

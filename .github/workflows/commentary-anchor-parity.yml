@@ -10,6 +10,7 @@ on:
       - 'scripts/sword_native_commentary_index.cpp'
       - 'tests/test_commentary_anchor_parity.py'
       - 'config/commentary-intake/**'
+      - 'config/commentary-reference-plans/**'
   workflow_dispatch:
     inputs:
       resource_id:
@@ -197,6 +198,16 @@ jobs:
                             "private_real_xiphos_alias_navigation_probe":
                                 full.get("private_real_xiphos_alias_navigation_probe"),
                         }, sort_keys=True))
+                  refs = report.get("private_original_reference_candidate_word_review")
+                  if refs is not None:
+                      assert refs["status"] == "PRIVATE_SOURCE_CHAPTER_REVIEW_NOT_TEXTUAL_PARITY"
+                      assert refs["source_sections_checked"] == 6
+                      assert refs["original_xml_and_stock_not_modified"] is True
+                      assert refs["prose_and_raw_fragments_not_uploaded"] is True
+                      assert refs["rights_and_editorial_approved"] is False
+                      assert refs["published"] is False
+                      print("Private original-source chapter reference candidates, NOT approved:",
+                            json.dumps(refs, sort_keys=True))
                   assert full["full_original_K_I_U_native_entry_parity_proven"] is True
                   assert full["planned_extra_index_keys"] == 3
                   gui = full["private_real_xiphos_alias_navigation_probe"]

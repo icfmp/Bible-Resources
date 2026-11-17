@@ -85,5 +85,6 @@
   },
   "import_issue": "https://github.com/icfmp/Bible-Resources/issues/285",
   "initial_pilot_issue": "https://github.com/icfmp/Bible-Resources/issues/12",
-  "native_raw_corpus_sha256": "2c4fe82710165202fdec300ca9636a150a9998f19c7b19ee4e81db5a6b75f5b5"
+  "native_raw_corpus_sha256": "2c4fe82710165202fdec300ca9636a150a9998f19c7b19ee4e81db5a6b75f5b5",
+  "private_reference_candidate_plan": "config/commentary-reference-plans/mhc-2chronicles.json"
 }
