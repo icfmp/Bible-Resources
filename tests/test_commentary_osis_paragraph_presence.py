@@ -50,7 +50,7 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
             b'outside'
             b'<chapter sID="Gen.1"/>'
             b'<div type="introduction"><p>Original introductory words.</p></div>'
-            b'<verse sID="Gen.1.1"/> Exposition text '
+            b'<verse sID="Gen.1.1"/><!-- not displayed --> Exposition text '
             b'<verse eID="Gen.1.1"/>'
             b'<chapter eID="Gen.1"/>'
             b'next chapter words'
