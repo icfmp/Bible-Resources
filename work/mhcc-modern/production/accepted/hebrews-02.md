@@ -61,7 +61,7 @@ His path to the crown ran through the cross; the path of his followers must also
 
 **Jesus sanctifies his people**. He purchased and sent **the Holy Spirit**, who makes believers holy as **the Spirit of Christ**.
 
-Believers are set apart and equipped for sacred purposes. They belong to God's family, through Christ.
+Believers are set apart and equipped for sacred purposes. **Christ and his people have the same heavenly Father, who is God**, and through Christ believers are brought into that family relationship.
 
 When Jesus calls them brothers and sisters, that does **not** make him merely their equal. His grace in calling them family reveals his dignity and their dependence.
 
@@ -92,6 +92,9 @@ When temptation first surprises us, turn immediately to him. **Prompt prayer is 
 ---
 
 ## Editorial review — Hebrews 2
+
+**2026-11-17 renewed secondary-witness comparison:** explicitly restored Henry's claim that **Christ and believers are of one heavenly Father**; the previous text only summarized membership in God's family. Source: [CCEL Hebrews 2](https://ccel.org/ccel/henry/mhcc.l.ii.html). Native SWORD text/markup and independent editorial signoff remain pending.
+
 
 **Complete secondary English text compared:** [CCEL, Hebrews 2](https://ccel.org/ccel/henry/mhcc.l.ii.html). Exact released `MHCC 0.1.1` remains primary for native SWORD and independent approval.
 
