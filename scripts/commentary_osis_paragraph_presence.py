@@ -511,6 +511,7 @@ class PrivateOriginalChapterNativeAnchorCoverage:
 
     ANCHOR = 8
     MAX_SCOPES = 12
+    MAX_COMPLETE_CORPUS_SCOPES = 1500
     MAX_CHAPTER_WORDS = 100_000
     MAX_NATIVE_RAW_BYTES = 2 * 1024 * 1024
     INTRO = re.compile(r"[1-4]?[A-Za-z][A-Za-z0-9]*(?:\.0\.0|\.[1-9][0-9]*(?:\.0)?)?\Z")
@@ -519,7 +520,8 @@ class PrivateOriginalChapterNativeAnchorCoverage:
     def __init__(self, chapter_words: dict[str, list[str]], *,
                  private_chapter_visible_texts: dict[str, str] | None = None,
                  private_chapter_reference_targets: dict[str, list[str]] | None = None,
-                 private_book_pre_chapter_words: dict[str, list[str]] | None = None):
+                 private_book_pre_chapter_words: dict[str, list[str]] | None = None,
+                 full_corpus_mode: bool = False):
         if private_book_pre_chapter_words is not None:
             if (not isinstance(chapter_words,dict)
                     or not isinstance(private_book_pre_chapter_words,dict)
@@ -542,9 +544,17 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                      or not isinstance(private_chapter_visible_texts, dict)
                      or set(private_chapter_visible_texts) != set(chapter_words))):
             raise ValueError("Original chapter visible text scope identities disagree")
+        if type(full_corpus_mode) is not bool:
+            raise ValueError("Full corpus mode must be explicit")
         if (not isinstance(chapter_words, dict)
-                or not 1 <= len(chapter_words) <= self.MAX_SCOPES):
+                or not (100 <= len(chapter_words) <= self.MAX_COMPLETE_CORPUS_SCOPES
+                        if full_corpus_mode
+                        else 1 <= len(chapter_words) <= self.MAX_SCOPES)
+                or (full_corpus_mode and (
+                    private_chapter_visible_texts is None
+                    or len({chapter.split(".",1)[0] for chapter in chapter_words})<20))):
             raise ValueError("Unreviewed original chapter coverage case set")
+        self._full_corpus_mode=full_corpus_mode
         self._scopes = {}
         for chapter, words in chapter_words.items():
             if (not isinstance(chapter, str)
@@ -554,10 +564,13 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                     or not self.ANCHOR <= len(words) <= self.MAX_CHAPTER_WORDS
                     or any(not isinstance(word, str) or not word for word in words)):
                 raise ValueError("Unverified private OSIS chapter words")
-            windows = {
+            # Full-corpus proof uses stronger whole-body positions and final
+            # complete character parity. Avoid millions of redundant eight-
+            # word anchor tuples, whose memory adds no independent evidence.
+            windows = (None if full_corpus_mode else {
                 tuple(words[i:i+self.ANCHOR])
                 for i in range(len(words)-self.ANCHOR+1)
-            }
+            })
             source_visible = (
                 None if private_chapter_visible_texts is None
                 else private_chapter_visible_texts[chapter])
@@ -567,7 +580,7 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                     or WORD.findall(source_visible) != words):
                 raise ValueError("Original chapter visible text not token-identical")
             source_spans = (
-                [] if source_visible is None else
+                [] if source_visible is None or full_corpus_mode else
                 [match.span() for match in WORD.finditer(source_visible)])
             if private_chapter_reference_targets is not None:
                 targets=private_chapter_reference_targets[chapter]
@@ -676,10 +689,13 @@ class PrivateOriginalChapterNativeAnchorCoverage:
             else:
                 state["intro_exact_source_location_classes"][
                     "no_full_exact_source_interval"] += 1
-            if len(offsets) == 1 and state["source_visible_text"] is not None:
+            if (len(offsets) == 1 and state["source_visible_text"] is not None
+                    and not self._full_corpus_mode):
                 character_relation = _private_interior_character_relation(
                     state["source_visible_text"], state["source_word_spans"],
                     offsets[0], native_visible, words)
+            elif len(offsets) == 1 and self._full_corpus_mode:
+                character_relation = "not_needed_full_corpus_complete_visible_character_check"
             elif len(offsets) == 1:
                 character_relation = "not_assessed_no_original_source_character_stream"
             else:
@@ -742,21 +758,25 @@ class PrivateOriginalChapterNativeAnchorCoverage:
         else:
             state["native_exact_location_classes"][
                 "no_full_exact_source_interval"] += 1
-        if len(offsets) == 1 and state["source_visible_text"] is not None:
+        if (len(offsets) == 1 and state["source_visible_text"] is not None
+                and not self._full_corpus_mode):
             character_relation = _private_interior_character_relation(
                 state["source_visible_text"], state["source_word_spans"],
                 offsets[0], native_visible, words)
+        elif len(offsets) == 1 and self._full_corpus_mode:
+            character_relation = "not_needed_full_corpus_complete_visible_character_check"
         elif len(offsets) == 1:
             character_relation = "not_assessed_no_original_source_character_stream"
         else:
             character_relation = "not_assessed_without_unique_exact_word_location"
         state["native_K_interior_character_relation_classes"][character_relation] += 1
         source_windows = state["source_windows"]
-        state["matching_windows"].update(
-            tuple(words[i:i+self.ANCHOR])
-            for i in range(len(words)-self.ANCHOR+1)
-            if tuple(words[i:i+self.ANCHOR]) in source_windows
-        )
+        if source_windows is not None:
+            state["matching_windows"].update(
+                tuple(words[i:i+self.ANCHOR])
+                for i in range(len(words)-self.ANCHOR+1)
+                if tuple(words[i:i+self.ANCHOR]) in source_windows
+            )
 
     def report(self) -> dict:
         """Closed metadata only; never includes words, XML or actual native keys."""
@@ -764,7 +784,8 @@ class PrivateOriginalChapterNativeAnchorCoverage:
         for chapter, state in self._scopes.items():
             if not state["native_numbered_slots"] or not state["native_raw_digests"]:
                 raise ValueError("Selected original chapter missing native occupied K")
-            if len(state["matching_windows"]) > len(state["source_windows"]):
+            if (state["source_windows"] is not None
+                    and len(state["matching_windows"]) > len(state["source_windows"])):
                 raise ValueError("Original source/native lexical anchor accounting mismatch")
             if sum(state["distinct_native_relation_classes"].values()) != len(state["native_raw_digests"]):
                 raise ValueError("Unique original native word relation classification incomplete")
@@ -942,9 +963,12 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                 "native_unlocated_original_reference_elements":
                     state["native_unlocated_reference_target_count"],
                 "reference_attribute_sequence_not_proof_of_link_navigation":True,
-                "original_unique_eight_word_windows": len(state["source_windows"]),
-                "exact_unique_source_eight_word_windows_in_original_native_K":
-                    len(state["matching_windows"]),
+                "original_unique_eight_word_windows": (
+                    None if state["source_windows"] is None
+                    else len(state["source_windows"])),
+                "exact_unique_source_eight_word_windows_in_original_native_K": (
+                    None if state["source_windows"] is None
+                    else len(state["matching_windows"])),
                 "actual_occupied_original_numbered_K_slots":
                     state["native_numbered_slots"],
                 "distinct_original_native_raw_payloads":
