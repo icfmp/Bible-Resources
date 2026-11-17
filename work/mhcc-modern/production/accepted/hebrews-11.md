@@ -153,6 +153,8 @@ Faith enables great achievements without promoting self-importance.
 
 **Gideon** teaches humility amid success. **Barak** sought God's help in danger and gave thanks for deliverance.
 
+Through faith, God's servants can overcome even **the roaring lion seeking someone to devour**.
+
 **Samson** shows faith triumphing over enemies even in death. **Jephthah** reminds us that God graciously uses deeply undeserving people, whose faith still acknowledges him.
 
 **David** endured severe tests and left the Psalms as a lasting witness of faith.
@@ -183,11 +185,18 @@ God receives them from it.
 
 The Hebrew Christians have received **even better privileges** through the gospel.
 
-Therefore they should understand that **God expects greater faithfulness** from them.
+Therefore **obedient faith, patient hope and loving service** should grow in proportion to those greater gifts.
+
+If we do not share the genuine faith of these earlier believers, Henry warns that **their example will condemn us at the last judgment**.
+
+Let us pray continually for **greater faith**, follow their shining examples, and finally be made perfect with them **in holiness and happiness**, shining **like the sun in our Father's kingdom forever**.
 
 ---
 
 ## Editorial review — Hebrews 11
+
+**2026-11-17 renewed complete CCEL Hebrews 11 collation:** restored Henry's **roaring lion** example in 32–38 and, importantly, the omitted final argument of verses 39–40: gospel privileges should yield **obedient faith, patient hope and loving service**; the faithful forebears will condemn faithlessness at judgment; and the author closes with a prayer for growing faith and ultimate perfected holiness/happiness, **shining like the sun in the Father's kingdom**. The previous manuscript had ended before these major pastoral applications. [CCEL Hebrews 11](https://ccel.org/ccel/henry/mhcc.l.xi.html). Actual published native SWORD 0.1.1 authorial prose, notes, key links and independent review still pending.
+
 
 **Full lengthy secondary English witness directly read:** [CCEL, Hebrews 11](https://ccel.org/ccel/henry/mhcc.l.xi.html). The exact published original `MHCC 0.1.1` remains source authority for native SWORD key/annotation mapping and independent QA.
 
