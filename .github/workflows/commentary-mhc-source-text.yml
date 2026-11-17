@@ -564,6 +564,16 @@ jobs:
                           "original_chapter_ref_set_sha256"]):
                   raise SystemExit("Full original chapter source scopes differ from index")
               original_full_corpus=full_authoring_census.report()
+              # Only unmatched complete genuine native K bodies are privately
+              # tested against the complete *original authored book* word stream.
+              # A unique whole-book match crossing the last chapter milestone
+              # is research evidence, NOT authority to reassign that text.
+              book_wide_unmatched_K=(
+                  full_authoring_census.private_unmatched_native_K_original_book_location(
+                      book_divisions))
+              print("Unmatched genuine original K within original authored whole-book",
+                    "word boundaries (closed metadata only):",
+                    json.dumps(book_wide_unmatched_K,sort_keys=True))
               all_rows=original_full_corpus["original_chapter_cases"]
               def cases_failing(field):
                   return [row for row in all_rows if row[field] is not True]
