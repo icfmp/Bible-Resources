@@ -79,7 +79,7 @@ input (no Python dependencies):
 
 ```bash
 python3 -I entity-index/test_build.py
-python3 -I entity-index/build.py \
+python3 -I entity-index/compile_index.py \
   --source /path/to/pinned-ACAI \
   --verify-source-commit \
   --output entity-index/dist/index.json
