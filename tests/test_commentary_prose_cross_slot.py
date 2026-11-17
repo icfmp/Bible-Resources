@@ -200,6 +200,75 @@ class OriginalExtraGapChapterNativeTests(unittest.TestCase):
         with self.assertRaises(PilotError):
             OriginalExtraGapNativeChapterProbe([(sample[0],sample[1],sample[2],badmeta)])
 
+    def test_exact_source_thml_paragraph_ownership_is_metadata_only(self):
+        sample, first, second=self._original_case()
+        marker=b"Bible:Gen.1.1"
+        body=(
+            "<div><p>opening "+" ".join(first)+" middle</p> "
+            "<p>"+" ".join(second)+" closing</p></div>"
+        )
+        xml=(
+            b"<ThML>\\n<div1>\\n<scripCom osisRef='Bible:Gen.1.1'/>"
+            +body.encode("utf-8")
+            +b"<scripCom osisRef='Bible:Gen.1.2'/><div><p>next text</p></div>"
+            +b"</div1></ThML>"
+        )
+        item=dict(sample[1],
+                  original_source_line=3,
+                  original_full_reference_sha256=sha256(marker).hexdigest())
+        probe=OriginalExtraGapNativeChapterProbe([
+            (sample[0],item,sample[2],sample[3])
+        ])
+        report=probe.original_thml_extra_gap_structure(
+            xml,expected_source_sha256=sha256(xml).hexdigest())
+        cases=report["source_line_hash_and_original_adjacent_paragraph_structure_only"]
+        self.assertEqual(len(cases),1)
+        row=cases[0]
+        self.assertEqual(row["original_adjacent_div_p_element_total"],2)
+        self.assertEqual(row["original_next_sibling_element_type_only"],"scripCom")
+        spans=row["original_extra_word_spans_authentically_within_adjacent_source_div"]
+        self.assertEqual([x["exact_original_unlinked_extra_word_count"] for x in spans],
+                         [105,12])
+        self.assertEqual([x["original_paragraph_ownership_class"] for x in spans],
+                         ["extra_span_inside_one_original_p"]*2)
+        self.assertEqual([x["distinct_original_p_elements_touched"] for x in spans],[1,1])
+        self.assertEqual([x["partially_covered_original_p_elements"] for x in spans],[1,1])
+        self.assertNotIn("secretFirst",json.dumps(report))
+        self.assertNotIn("Bible:Gen.1.1",json.dumps(report))
+        with self.assertRaises(PilotError):
+            probe.original_thml_extra_gap_structure(
+                xml,expected_source_sha256="0"*64)
+
+    def test_cross_original_p_gap_is_not_misattributed_to_one_paragraph(self):
+        sample,first,second=self._original_case()
+        first_left=" ".join(first[:60])
+        first_right=" ".join(first[60:])
+        original=sample[1]["original_text"]
+        body=(
+            "<div><p>opening "+first_left+"</p> "
+            "<p>"+first_right+" middle "+" ".join(second)+" closing</p></div>"
+        )
+        self.assertEqual(
+            __import__("lxml.etree",fromlist=["fromstring"]).fromstring(
+                body.encode()).xpath("string(.)"),original)
+        xml=(
+            b"<ThML>\\n<div1>\\n<scripCom osisRef='Bible:Gen.1.1'/>"
+            +body.encode()+b"</div1></ThML>"
+        )
+        item=dict(sample[1],original_source_line=3,
+                  original_full_reference_sha256=sha256(b"Bible:Gen.1.1").hexdigest())
+        probe=OriginalExtraGapNativeChapterProbe([
+            (sample[0],item,sample[2],sample[3])
+        ])
+        structure=probe.original_thml_extra_gap_structure(
+            xml,expected_source_sha256=sha256(xml).hexdigest())
+        spans=structure[
+            "source_line_hash_and_original_adjacent_paragraph_structure_only"][0][
+            "original_extra_word_spans_authentically_within_adjacent_source_div"]
+        self.assertEqual(spans[0]["original_paragraph_ownership_class"],
+                         "extra_span_crosses_multiple_original_p_elements")
+        self.assertEqual(spans[0]["distinct_original_p_elements_touched"],2)
+
     def test_no_hit_in_same_chapter_does_not_claim_text_lost(self):
         sample,_,_=self._original_case()
         probe=OriginalExtraGapNativeChapterProbe([sample])
