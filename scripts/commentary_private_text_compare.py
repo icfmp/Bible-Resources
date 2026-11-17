@@ -203,6 +203,8 @@ def _original_source_markers(xml_bytes: bytes, *,
                 "original_p_visible_word_tokens":len(p_words),
                 "original_p_visible_ordered_word_sha256":
                     sha256(" ".join(p_words).encode("utf-8")).hexdigest(),
+                "original_p_visible_casefold_word_sha256":
+                    sha256(" ".join(word.casefold() for word in p_words).encode("utf-8")).hexdigest(),
             })
         sources.setdefault(start,[]).append({
             "private_original_p_visible_word_digest_inventory":
@@ -1050,6 +1052,11 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
                                 candidates[0] if len(candidates)==1 else None,
                             "single_matching_original_p_exact_unicode_word_sha256":
                                 digest if len(candidates)==1 else None,
+                            "single_matching_original_p_casefold_word_sha256":
+                                next((p["original_p_visible_casefold_word_sha256"]
+                                      for p in p_digests
+                                      if p["original_p_document_ordinal"]==candidates[0]),None)
+                                if len(candidates)==1 else None,
                             "exact_original_p_identity_not_bible_heading_classification":
                                 True,
                         })
