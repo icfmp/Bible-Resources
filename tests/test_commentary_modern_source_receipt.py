@@ -69,17 +69,36 @@ class NativeModernReceiptTests(unittest.TestCase):
                 "actual_occupied_anonymous_top_entry_count": 0
             }, "a" * 64)
 
-    def test_reports_all_missing_numbered_chapters(self):
+    def test_reports_unaccounted_chapters_without_numbered_or_intro_prose(self):
         rec = Receipt(["Lev.19", "Isa.36", "Gen.1"])
         rec.observe("I", "Lev.19", b"<div>PRIVATE INTRO</div>")
         rec.observe("K", "Gen.1.1", b"<div>PRIVATE SOURCE</div>")
-        with self.assertRaisesRegex(ValueError, "Lev.19, Isa.36"):
+        with self.assertRaisesRegex(ValueError, "Isa.36"):
             rec.report({
                 "all_native_raw_entries_ordered_sha256": "a" * 64,
                 "actual_occupied_numbered_entry_count": 1,
                 "actual_occupied_intro_entry_count": 1,
                 "actual_occupied_anonymous_top_entry_count": 0
             }, "a" * 64)
+
+    def test_intro_only_original_is_reported_without_inventing_verses(self):
+        rec = Receipt(["Lev.19", "Gen.1"])
+        rec.observe("I", "Lev.19", b"<div><title>Original law</title><p>Original commentary statement.</p></div>")
+        rec.observe("K", "Gen.1.1", b"<div>PRIVATE SOURCE</div>")
+        result = rec.report({
+            "all_native_raw_entries_ordered_sha256": "a" * 64,
+            "actual_occupied_numbered_entry_count": 1,
+            "actual_occupied_intro_entry_count": 1,
+            "actual_occupied_anonymous_top_entry_count": 0
+        }, "a" * 64)
+        self.assertEqual(result["intro_only_chapters_needing_editorial_review"], ["Lev.19"])
+        missing = result["chapters"]["Lev.19"]
+        self.assertEqual(missing["source_placement"], "INTRO_ONLY_NEEDS_INDEPENDENT_REVIEW")
+        self.assertEqual(missing["original_native_numbered_keys"], 0)
+        self.assertEqual(missing["original_units"], [])
+        self.assertGreater(missing["native_introductions_not_assumed_to_be_exposition"][0]
+                           ["visible_word_tokens"], 0)
+        self.assertNotIn("Original commentary statement", json.dumps(result))
 
     def test_invalid_chapters_rejected(self):
         for chapters in ([], ["Ruth.1", "Ruth.1"], ["Ruth.0"],
