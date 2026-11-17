@@ -99,7 +99,8 @@ def original_ccel_paragraph_words(
 
  
 def original_authoring_chapter_scope_metadata(
-        book_div: etree._Element, chapter_ref: str) -> dict:
+        book_div: etree._Element, chapter_ref: str,
+        *, _private_words_sink: list[str] | None = None) -> dict:
     """Audit real chapter milestone bounds; never expose or rewrite source words.
 
     Book ownership and section starts are independent of any proposed missing
@@ -161,6 +162,12 @@ def original_authoring_chapter_scope_metadata(
     words=WORD.findall(visible)
     if not words or len(words)>100_000:
         raise ValueError("Original OSIS chapter prose length unreviewed")
+    # Only a deliberate in-process private caller can receive the original
+    # tokens; JSON metadata/audit reports never contain this sink.
+    if _private_words_sink is not None:
+        if type(_private_words_sink) is not list or _private_words_sink:
+            raise ValueError("Original chapter private word sink must be an empty list")
+        _private_words_sink.extend(words)
     return {
         "authentic_chapter_milestone_start_end_count":[opens,closes],
         "bounded_original_chapter_visible_words":len(words),
@@ -170,6 +177,132 @@ def original_authoring_chapter_scope_metadata(
         "not_a_proof_of_original_paragraph_or_verse_ownership":True,
         "no_edits_or_release":True,
     }
+
+
+
+class PrivateOriginalChapterNativeAnchorCoverage:
+    """Read-only visible-word *anchor* overlap of original OSIS vs native K.
+
+    The caller pins the source/ZIP hashes and supplies authentically milestone-
+    bounded original OSIS chapter words. Only genuine K records from a complete
+    independent libSWORD raw stream are accepted. Repeated original K bodies
+    count once for lexical coverage, not once per occupied verse key.
+    This is explicitly NOT content, authorial section, I/TOP or markup parity.
+    """
+
+    ANCHOR = 8
+    MAX_SCOPES = 8
+    MAX_CHAPTER_WORDS = 100_000
+    MAX_NATIVE_RAW_BYTES = 2 * 1024 * 1024
+    KEY = re.compile(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*\.[1-9][0-9]*\Z")
+
+    def __init__(self, chapter_words: dict[str, list[str]]):
+        if (not isinstance(chapter_words, dict)
+                or not 1 <= len(chapter_words) <= self.MAX_SCOPES):
+            raise ValueError("Unreviewed original chapter coverage case set")
+        self._scopes = {}
+        for chapter, words in chapter_words.items():
+            if (not isinstance(chapter, str)
+                    or not re.fullmatch(
+                        r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*", chapter)
+                    or not isinstance(words, list)
+                    or not self.ANCHOR <= len(words) <= self.MAX_CHAPTER_WORDS
+                    or any(not isinstance(word, str) or not word for word in words)):
+                raise ValueError("Unverified private OSIS chapter words")
+            windows = {
+                tuple(words[i:i+self.ANCHOR])
+                for i in range(len(words)-self.ANCHOR+1)
+            }
+            self._scopes[chapter] = {
+                "source_words": words,
+                "source_windows": windows,
+                "matching_windows": set(),
+                "native_raw_digests": set(),
+                "native_numbered_slots": 0,
+                "native_distinct_visible_word_total": 0,
+                "native_exact_whole_chapter_equal": False,
+            }
+
+    def observe(self, kind: str, key: str, raw: bytes) -> None:
+        """Private callback for fully indexed original SWORD K/I/TOP scan."""
+        if kind not in ("K", "I", "U"):
+            raise ValueError("Unexpected original SWORD raw frame kind")
+        if kind != "K":
+            return
+        if not isinstance(key, str) or not self.KEY.fullmatch(key):
+            raise ValueError("Invalid original SWORD K reference")
+        chapter = key.rsplit(".", 1)[0]
+        state = self._scopes.get(chapter)
+        if state is None:
+            return
+        if (not isinstance(raw, bytes)
+                or not 0 < len(raw) <= self.MAX_NATIVE_RAW_BYTES
+                or b"\x00" in raw):
+            raise ValueError("Invalid original SWORD raw XML frame")
+        state["native_numbered_slots"] += 1
+        digest = sha256(raw).hexdigest()
+        if digest in state["native_raw_digests"]:
+            return
+        state["native_raw_digests"].add(digest)
+        try:
+            root = etree.fromstring(
+                b"<fragment>" + raw + b"</fragment>",
+                parser=etree.XMLParser(
+                    resolve_entities=False, no_network=True, load_dtd=False,
+                    recover=False, huge_tree=False, remove_blank_text=False,
+                    strip_cdata=False))
+        except (ValueError, etree.XMLSyntaxError):
+            raise ValueError("Unparseable authenticated original native raw XML") from None
+        if any(isinstance(node, etree._Entity) for node in root.iter()):
+            raise ValueError("Unresolved original native raw XML entity")
+        words = WORD.findall("".join(root.itertext()))
+        state["native_distinct_visible_word_total"] += len(words)
+        if words == state["source_words"]:
+            state["native_exact_whole_chapter_equal"] = True
+        source_windows = state["source_windows"]
+        state["matching_windows"].update(
+            tuple(words[i:i+self.ANCHOR])
+            for i in range(len(words)-self.ANCHOR+1)
+            if tuple(words[i:i+self.ANCHOR]) in source_windows
+        )
+
+    def report(self) -> dict:
+        """Closed metadata only; never includes words, XML or actual native keys."""
+        rows = []
+        for chapter, state in self._scopes.items():
+            if not state["native_numbered_slots"] or not state["native_raw_digests"]:
+                raise ValueError("Selected original chapter missing native occupied K")
+            if len(state["matching_windows"]) > len(state["source_windows"]):
+                raise ValueError("Original source/native lexical anchor accounting mismatch")
+            rows.append({
+                "original_chapter_reference_sha256": sha256(
+                    chapter.encode("utf-8")).hexdigest(),
+                "original_chapter_visible_words": len(state["source_words"]),
+                "original_unique_eight_word_windows": len(state["source_windows"]),
+                "exact_unique_source_eight_word_windows_in_original_native_K":
+                    len(state["matching_windows"]),
+                "actual_occupied_original_numbered_K_slots":
+                    state["native_numbered_slots"],
+                "distinct_original_native_raw_payloads":
+                    len(state["native_raw_digests"]),
+                "summed_visible_words_in_distinct_original_native_raw_payloads":
+                    state["native_distinct_visible_word_total"],
+                "one_original_native_raw_payload_matches_entire_original_chapter":
+                    state["native_exact_whole_chapter_equal"],
+                "anchor_overlap_is_not_exact_text_or_structural_parity": True,
+                "unmatched_anchors_not_proven_historical_authorial_omissions": True,
+            })
+        return {
+            "status": "ORIGINAL_AUTHORING_OSIS_TO_COMPILED_NATIVE_K_LEXICAL_ANCHORS_ONLY",
+            "minimum_exact_case_sensitive_anchor_words": self.ANCHOR,
+            "original_chapter_cases": rows,
+            "intro_and_top_payload_parity_not_compared": True,
+            "original_verse_key_range_and_paragraph_owner_not_inferred": True,
+            "original_punctuation_markup_notes_and_links_not_compared": True,
+            "original_source_or_compiled_binary_changed": False,
+            "no_original_words_raw_xml_or_verse_keys_exported": True,
+            "no_source_edition_or_redistribution_rights_approved": True,
+        }
 
 
 def _case_insensitive_length_is_not_used(words: list[str]) -> int:
