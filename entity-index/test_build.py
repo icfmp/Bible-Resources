@@ -114,9 +114,18 @@ class EntityIndexTests(unittest.TestCase):
                           references=["13003015"],
                           explicit_instances={"wlc": [["o130030150101"]]})
         source_before = path.read_bytes()
-        decisions = json.loads(
+        all_decisions = json.loads(
             Path(__file__).with_name("editorial-decisions.json").read_text()
         )["decisions"]
+        # This existing historical pilot fixture covers only its own source
+        # records. Other editorial decisions have independent regressions,
+        # and must not force unrelated mock entities into this test.
+        fixture_ids = {
+            json.loads(path.read_text(encoding="utf-8"))["id"]
+            for category in CATS
+            for path in (self.root / category / "json").glob("*.json")
+        }
+        decisions = [d for d in all_decisions if d["source_id"] in fixture_ids]
         report = self.build(decisions)
         self.assertEqual(report["statistics"]["source_records"], 15)
         self.assertEqual(report["statistics"]["index_entities"], 12)
