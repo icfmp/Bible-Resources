@@ -83,6 +83,19 @@ The builder contains **no chapter-specific or entity-specific code path**.
   derived Jehoahaz direct-name occurrences. The separate Shallum at
   `o130030150101` is now reviewed separately against the Josiah
   royal family and identified with Jehoahaz as below.
+- `person:Dishon` (son of **Seir**) no longer claims either of the
+  two explicit names in 1 Chronicles 1:41, where the contextual subject
+  is the **other Dishon, son of Anah** (`person:Dishon.2`). The exact
+  original WLC words `o130010410031` and `o130010410051` remain under
+  `person:Dishon.2`; the false verse reference `13001041` is removed
+  *only* from derived `person:Dishon`. This resolves two explicit
+  homonym collisions without suppressing either historical man.
+  **Caution:** the pinned Hebrew of Genesis 36:26, source word
+  `o010360260031`, has lexical form **Dishan** (דִּישָׁן), distinct from
+  the other `Dishon` forms. We preserve its source assignment rather
+  than guess whether the text intends a name variant or another person.
+  Every removal is listed in `editorial-decisions.json`; the builder
+  refuses an absent/ambiguous `remove_references` request.
 - `person:Shallum.5` (1 Chronicles 3:15, exact WLC word
   `o130030150101`, *Shallum*) now resolves canonically to
   `person:Jehoahaz.3` — Josiah's successor named in Jeremiah 22:11
