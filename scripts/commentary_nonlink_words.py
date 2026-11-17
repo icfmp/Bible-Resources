@@ -24,6 +24,85 @@ def _validate_indices(indices: list[int], total: int) -> set[int]:
     return unique
 
 
+def _source_extra_word_layout(original: list[str], compiled: list[str]) -> dict:
+    """Bounded exact subsequence positions; never infer authored section ownership.
+
+    Repeated words can permit several valid alignments. In that case no
+    particular omitted-word span is treated as an authenticated source unit.
+    """
+    if (not original or not compiled or len(original) <= len(compiled)
+            or len(original) > MAX_WORDS):
+        raise PilotError("Source-extra word topology requires bounded longer original")
+    earliest = []
+    cursor = 0
+    for word in compiled:
+        while cursor < len(original) and original[cursor] != word:
+            cursor += 1
+        if cursor == len(original):
+            raise PilotError("Selected compiled words are not ordered original tokens")
+        earliest.append(cursor)
+        cursor += 1
+    latest = [0] * len(compiled)
+    cursor = len(original) - 1
+    for index in range(len(compiled) - 1, -1, -1):
+        while cursor >= 0 and original[cursor] != compiled[index]:
+            cursor -= 1
+        if cursor < 0:
+            raise PilotError("Reverse original word alignment disagrees with forward")
+        latest[index] = cursor
+        cursor -= 1
+    excess = len(original) - len(compiled)
+    if earliest != latest:
+        return {
+            "alignment_topology": "multiple_exact_subsequence_alignments_no_fixed_gap_ownership",
+            "source_extra_nonlink_word_count": excess,
+            "fixed_extra_word_spans": None,
+            "fixed_prefix_extra_words": None,
+            "fixed_interior_extra_words": None,
+            "fixed_suffix_extra_words": None,
+            "longest_fixed_extra_word_span": None,
+            "textual_section_or_editional_ownership_established": False,
+        }
+    prefix = earliest[0]
+    suffix = len(original) - 1 - earliest[-1]
+    interior = excess - prefix - suffix
+    if interior < 0:
+        raise PilotError("Source word subsequence span accounting disagreement")
+    if interior and (prefix or suffix):
+        category = "unique_alignment_interior_and_edge_extra_words"
+    elif interior:
+        category = "unique_alignment_interior_extra_words_only"
+    elif prefix and suffix:
+        category = "unique_alignment_both_edges_extra_words_only"
+    elif prefix:
+        category = "unique_alignment_prefix_extra_words_only"
+    else:
+        category = "unique_alignment_suffix_extra_words_only"
+    matched = set(earliest)
+    runs = []
+    run = 0
+    for position in range(len(original)):
+        if position not in matched:
+            run += 1
+        elif run:
+            runs.append(run)
+            run = 0
+    if run:
+        runs.append(run)
+    if sum(runs) != excess:
+        raise PilotError("Exact source extra word spans fail source/stock reconciliation")
+    return {
+        "alignment_topology": category,
+        "source_extra_nonlink_word_count": excess,
+        "fixed_extra_word_spans": len(runs),
+        "fixed_prefix_extra_words": prefix,
+        "fixed_interior_extra_words": interior,
+        "fixed_suffix_extra_words": suffix,
+        "longest_fixed_extra_word_span": max(runs),
+        "textual_section_or_editional_ownership_established": False,
+    }
+
+
 def compare_words_outside_links(
     source_word_tokens: list[str],
     stock_word_tokens: list[str],
@@ -65,11 +144,19 @@ def compare_words_outside_links(
         category="same_plain_word_multiset_but_different_order"
     else:
         category="plain_word_order_or_selection_requires_editorial_review"
+    extra_layout = (
+        _source_extra_word_layout(original, compiled)
+        if category in (
+            "stock_plain_words_contiguous_inside_longer_original_plain_text",
+            "stock_plain_words_in_order_with_extra_original_words",
+        ) else None
+    )
     shared=sum((Counter(original)&Counter(compiled)).values())
     if shared>min(len(original),len(compiled)):
         raise PilotError("Original/compiled plain word overlap exceeds available tokens")
     return {
         "outside_link_word_relation":category,
+        "source_extra_unlinked_word_gap_layout":extra_layout,
         "original_plain_word_tokens":len(original),
         "stock_plain_word_tokens":len(compiled),
         "original_scripture_link_word_tokens_removed":len(marked_source),
