@@ -566,7 +566,25 @@ jobs:
                 " modern_expositions="+str(summary["modern_prose_expositions"])+
                 " affected_chapters="+str(summary["affected_chapters"])+
                 " flags="+str(len(flags)))
-          print("FULL_CANON_FLAG_TYPES "+json.dumps(summary["flag_counts_by_type"],sort_keys=True))
+          topology = [{
+              "chapter":r["chapter"],
+              "original_K_groups":r["source_original_K_groups"],
+              "original_intro_only":r["source_original_intro_only"],
+              "modern_expositions":r["modern_expositions"],
+              "source_versification_issues":[f for f in r["problems"]
+                  if "verse scope differs" in f]
+          } for r in rows if (
+              r["modern_expositions"] !=
+              r["source_original_K_groups"] + (1 if r["source_original_intro_only"] else 0)
+              or any("verse scope differs" in f for f in r["problems"])
+          )]
+          print("FULL_CANON_TOPOLOGY_DEVIATIONS "+json.dumps(topology,sort_keys=True))
+          print("FULL_CANON_FLAG_COUNTS "+json.dumps({
+              "topology_deviation_chapters":len(topology),
+              "no_heading_scope_claims":sum("no parseable verse-scope heading" in f["problem"] for f in flags),
+              "short_prose_sections_lt_25_words":sum(" has " in f["problem"] and
+                  f["problem"].endswith(" words") for f in flags),
+              "raw_diagnostic_flags":len(flags)},sort_keys=True))
           for problem in flags[:90]:
               print("FULL_CANON_FLAG "+json.dumps(problem,sort_keys=True))
           print("Metadata-only diagnostic: source meaning, native refs and notes NOT approved.")
