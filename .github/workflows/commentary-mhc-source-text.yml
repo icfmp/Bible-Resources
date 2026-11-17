@@ -472,6 +472,7 @@ jobs:
           from tempfile import TemporaryDirectory
           from commentary_osis_paragraph_presence import (
               PrivateOriginalChapterNativeAnchorCoverage,
+              PrivateOriginalNativeWholeCorpusGapSearch,
           )
           from commentary_native_raw_inventory import _safe_stock_install
           from pilot_preflight import inspect_archive
@@ -580,6 +581,47 @@ jobs:
                     "versus genuine other same-book original source and native K/I",
                     "(only chapter hashes/counts/closed match classes):",
                     json.dumps(original_source_gaps,sort_keys=True))
+              # Second independent complete native replay: search *every*
+              # original raw K/I entry, including unlocated bodies and all
+              # book introductions. Two anonymous opaque TOP/U entries are
+              # counted, not misrepresented as parseable commentary prose.
+              private_original_gaps=(
+                  full_authoring_census.private_authentic_uncovered_source_word_fragments())
+              if len(private_original_gaps)!=original_source_gaps[
+                      "genuine_authored_chapter_uncovered_word_intervals"]:
+                  raise SystemExit("Original source gap identification changed between private probes")
+              if private_original_gaps:
+                  gap_scanner=PrivateOriginalNativeWholeCorpusGapSearch(
+                      private_original_gaps)
+                  second=None
+                  try:
+                      second=subprocess.Popen(
+                          [str(raw_bin),manifest["module_id"]],
+                          env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+                      if second.stdout is None:
+                          raise SystemExit("Second original K/I full raw stream inaccessible")
+                      native_2,k_2,i_2,u_2=parse_native_raw_corpus(
+                          second.stdout,on_entry=gap_scanner.observe)
+                      second.stdout.close()
+                      if second.wait(timeout=360)!=0:
+                          raise SystemExit("Second complete original raw SWORD scan failed")
+                  except BaseException:
+                      if second is not None and second.poll() is None:
+                          second.kill()
+                          second.wait()
+                      raise
+                  if (native_2["all_native_raw_entries_ordered_sha256"]!=
+                          native_report["all_native_raw_entries_ordered_sha256"]
+                          or k_2!=native_k or i_2!=native_i or u_2!=native_u
+                          or native_2["all_actual_raw_entries_scanned"]!=
+                          native_report["all_actual_raw_entries_scanned"]):
+                      raise SystemExit("Original native second whole-corpus replay differs from pinned first scan")
+                  print("Exact authored source gaps versus ALL genuine original",
+                        "native XML K/I full raw bodies, double source SHA verified",
+                        "(closed metadata, not authorial ownership):",
+                        json.dumps(gap_scanner.report(),sort_keys=True))
+                  del gap_scanner,native_2,k_2,i_2,u_2
+              del private_original_gaps
               all_rows=original_full_corpus["original_chapter_cases"]
               def cases_failing(field):
                   return [row for row in all_rows if row[field] is not True]
