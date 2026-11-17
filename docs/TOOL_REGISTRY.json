@@ -3907,8 +3907,8 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 4,
       "static_references": [
-        "scripts/commentary_osis_mixed_transport_probe.py",
         "scripts/commentary_andbible_jsword.py",
+        "scripts/commentary_osis_mixed_transport_probe.py",
         "scripts/probe_private_repaired_darby_sword.py",
         ".github/workflows/darby-andbible-jsword.yml"
       ]
