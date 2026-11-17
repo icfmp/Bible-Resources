@@ -612,6 +612,26 @@ class OriginalExtraGapNativeChapterProbe:
                     if category=="extra_span_inside_one_original_p"
                     and whole==1 and partial==0 else None
                 )
+                # Independent source-content fingerprint, never a disclosed
+                # passage. A separate public-domain printed heading may be
+                # verified using the same exact Unicode word-token digest.
+                full_p_visible_token_sha=None
+                full_p_visible_word_count=None
+                full_p_linked_word_count=None
+                if uniquely_owned_original_p is not None:
+                    p_start,p_end,_ = next((pa,pb,num) for pa,pb,num
+                                           in paragraphs if num==uniquely_owned_original_p)
+                    p_visible=original[p_start:p_end]
+                    p_words=WORD.findall(p_visible)
+                    full_p_visible_token_sha=sha256(
+                        " ".join(p_words).encode("utf-8")).hexdigest()
+                    full_p_visible_word_count=len(p_words)
+                    full_p_linked_word_count=sum(
+                        paragraph_owners[i]==uniquely_owned_original_p
+                        for i in linked)
+                    if (full_p_visible_word_count!=
+                            b-a+full_p_linked_word_count):
+                        raise PilotError("Original whole-p word-token digest scope cannot be verified")
                 span_rows.append({
                     "exact_original_unlinked_extra_word_count":b-a,
                     "original_paragraph_ownership_class":category,
@@ -620,6 +640,12 @@ class OriginalExtraGapNativeChapterProbe:
                     "partially_covered_original_p_elements":partial,
                     "exact_whole_original_p_document_ordinal_when_unique":
                         uniquely_owned_original_p,
+                    "whole_original_p_visible_word_count_if_unique":
+                        full_p_visible_word_count,
+                    "whole_original_p_source_link_word_count_if_unique":
+                        full_p_linked_word_count,
+                    "whole_original_p_exact_unicode_word_tokens_sha256_if_unique":
+                        full_p_visible_token_sha,
                     "original_unlinked_words_outside_p":outside,
                     "original_tokens_straddling_p_markup":mixed,
                 })
