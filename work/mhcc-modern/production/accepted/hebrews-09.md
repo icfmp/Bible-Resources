@@ -103,7 +103,7 @@ No wisdom, education, virtue, wealth or power can protect human beings from deat
 
 Likewise, only Christ's **atoning sacrifice** can rescue sinners from condemnation on the day of judgment.
 
-Those who deliberately neglect or despise this salvation cannot expect to escape eternal judgment.
+Those who despise or neglect this great salvation will not escape **eternal punishment**, Henry warns.
 
 The believer knows **the Redeemer lives** and trusts that they will see him.
 
@@ -112,6 +112,9 @@ This is the patient hope of the church, expressed in the prayer: **“Come, Lord
 ---
 
 ## Editorial review — Hebrews 9
+
+**2026-11-17 renewed CCEL collation:** restored Henry's specific warning of **“eternal punishment”** for despisers/neglecters of salvation. The prior modernization had softened this to “eternal judgment” and unnecessarily added *deliberately*; both deviations are removed. The original CCEL printed outline groups verses 11–22 as one range but its actual prose has independent 11–14 and 15–22 units; the modern derivative keeps that distinction. [CCEL Hebrews 9](https://ccel.org/ccel/henry/mhcc.l.ix.html). Exact published original SWORD native-source parity, reference targets and editorial acceptance remain pending.
+
 
 **Complete readable English witness checked:** [CCEL, Hebrews 9](https://ccel.org/ccel/henry/mhcc.l.ix.html). Original released `MHCC 0.1.1` remains definitive for native SWORD and independent acceptance.
 
