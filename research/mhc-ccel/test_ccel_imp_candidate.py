@@ -42,6 +42,22 @@ class Extract(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Collision'):
             candidate.extract_volume(raw, hashlib.sha256(raw).hexdigest())
 
+    def test_genuine_duplicate_source_starts_reported_without_merging(self):
+        raw = source('<scripCom osisRef="Bible:Gen.1.1-Gen.1.2"/>'
+                     '<div><p>First original section</p></div>'
+                     '<scripCom osisRef="Bible:Gen.1.1-Gen.1.3"/>'
+                     '<div><p>Second distinct original section</p></div>')
+        census = candidate.inspect_volume_start_collisions(
+            raw, hashlib.sha256(raw).hexdigest())
+        self.assertEqual(census["original_verse_or_range_sections"], 2)
+        self.assertEqual(census["distinct_original_start_addresses"], 1)
+        self.assertEqual(census["duplicated_original_start_groups"], 1)
+        self.assertEqual(census["additional_sections_sharing_original_start"], 1)
+        self.assertEqual(census["additional_sections_different_full_ref"], 1)
+        self.assertEqual(census["additional_sections_different_markup_body_to_prior"], 1)
+        self.assertFalse(census["safe_to_write_one_section_per_sword_key"])
+        self.assertFalse(census["original_sections_reordered_or_merged"])
+
     def test_modified_source_fails_pin(self):
         raw = source('<scripCom osisRef="Bible:Gen.1.1"/><div><p>A</p></div>')
         with self.assertRaisesRegex(ValueError, 'digest'):
