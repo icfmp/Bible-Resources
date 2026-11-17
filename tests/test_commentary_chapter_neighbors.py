@@ -25,6 +25,29 @@ def fixture(marker_body=b"<h2>Chapter commentary.</h2>"):
 
 
 class ChapterSiblingWitnessTests(unittest.TestCase):
+    def test_volume_research_can_inventory_unreviewed_source_siblings_without_loss(self):
+        source, proof = original_chapter_neighbors(
+            fixture(b"<div><p>Original long authorial introduction.</p></div>"),
+            on_unreviewed="record")
+        self.assertEqual(source, {})
+        self.assertEqual(proof["explicit_chapter_source_marker_count"], 1)
+        self.assertEqual(proof["original_chapter_siblings_reviewed_count"], 0)
+        self.assertEqual(proof["original_chapter_siblings_not_reviewed_count"], 1)
+        self.assertEqual(proof["original_unreviewed_sibling_tag_counts"], {"div": 1})
+        self.assertEqual(len(
+            proof["bounded_unreviewed_sibling_original_line_and_reference_hash"]), 1)
+        self.assertTrue(proof[
+            "unreviewed_source_siblings_must_not_be_claimed_as_empty_introductions"])
+        self.assertNotIn("Original long authorial introduction.", json.dumps(proof))
+
+    def test_research_mode_still_blocks_unassigned_source_prose(self):
+        with self.assertRaisesRegex(PilotError, "intervening"):
+            original_chapter_neighbors(
+                fixture(b"<div><p>Body stays authorial.</p></div>").replace(
+                    b"<scripCom osisRef='Bible:Gen.1'/>",
+                    b"<scripCom osisRef='Bible:Gen.1'/>Unassigned prose"),
+                on_unreviewed="record")
+
     def test_marked_h2_vs_exact_intro_is_only_local_witness(self):
         source, proof = original_chapter_neighbors(fixture())
         self.assertEqual(proof["explicit_chapter_source_marker_count"], 1)

@@ -669,7 +669,8 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
         ]:
             raise PilotError("Not all proposed original scripCom book tokens changed anchor books")
         proposed_native_keys={value[2] for value in moved_source_units}
-        chapter_neighbors,chapter_proof=original_chapter_neighbors(original_xml)
+        chapter_neighbors,chapter_proof=original_chapter_neighbors(
+            original_xml, on_unreviewed="record" if is_collection else "block")
         if chapter_proof["explicit_chapter_source_marker_count"]!=source_proof["chapter_source_markers_not_compared"]:
             raise PilotError("Original chapter marker count differs from full independent source audit")
         stock_meta=inspect_archive(stock_file,source_kind="sword",
@@ -888,9 +889,13 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
             chapter_other_slot_location,original_p_word_overlap
         )
         if chapter_analysis["original_chapter_source_siblings_compared"]!=chapter_proof[
-            "explicit_chapter_source_marker_count"
+            "original_chapter_siblings_reviewed_count"
         ]:
-            raise PilotError("Chapter neighbor readback omitted original markers")
+            raise PilotError("Chapter neighbor readback omitted a reviewable source sibling")
+        if (chapter_proof["original_chapter_siblings_reviewed_count"] +
+            chapter_proof["original_chapter_siblings_not_reviewed_count"]
+                != chapter_proof["explicit_chapter_source_marker_count"]):
+            raise PilotError("Original chapter sibling classification did not reconcile")
     return {
         "schema_version":1,
         "resource_id":resource_id,
@@ -919,6 +924,8 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
             original_source_book_marker_private_repair_stock_review,
         "original_source_same_book_unicode_lexical_witness_review":source_same_book_unicode_prose_review,
         "source_original_chapter_neighbor_evidence":chapter_proof,
+        "original_chapter_introduction_siblings_all_reviewed":
+            chapter_proof["original_chapter_siblings_not_reviewed_count"] == 0,
         "source_chapter_neighbor_to_stock_intro_diagnostics":chapter_analysis,
         "source_chapter_neighbor_to_same_chapter_numbered_location":chapter_numbered_location,
         "source_chapter_neighbor_to_same_book_alternative_slots":chapter_other_slot_location,

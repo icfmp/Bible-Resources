@@ -22,8 +22,16 @@ MAX_MARKERS = 20000
 MAX_SIBLING_CHARS = 2 * 1024 * 1024
 
 
-def original_chapter_neighbors(xml_bytes: bytes) -> tuple[dict, dict]:
-    """Extract explicitly marked chapter-neighbor units, never infer books."""
+def original_chapter_neighbors(xml_bytes: bytes, *,
+                               on_unreviewed: str = "block") -> tuple[dict, dict]:
+    """Extract explicitly marked chapter-neighbor units, never infer books.
+
+    Strict by default. A separate research-only 'record' mode inventories
+    genuinely different source sibling shapes without treating their prose
+    as a confirmed chapter introduction or silently losing source content.
+    """
+    if on_unreviewed not in {"block", "record"}:
+        raise PilotError("Unknown original chapter sibling review mode")
     try:
         root = etree.fromstring(xml_bytes, parser=etree.XMLParser(
             resolve_entities=False, no_network=True, load_dtd=False,
@@ -35,6 +43,8 @@ def original_chapter_neighbors(xml_bytes: bytes) -> tuple[dict, dict]:
         raise PilotError("Unresolved original XML entities block chapter comparison")
     observed = {}
     tag_counts = Counter()
+    unreviewed_tags = Counter()
+    bounded_unreviewed = []
     ordered = sha256()
     count = 0
     for node in root.iter():
@@ -54,10 +64,24 @@ def original_chapter_neighbors(xml_bytes: bytes) -> tuple[dict, dict]:
         sibling = node.getnext()
         tag = (sibling.tag.rsplit("}", 1)[-1]
                if sibling is not None and isinstance(sibling.tag, str) else "")
-        if tag not in {"h2", "p"}:
-            raise PilotError("Original chapter marker has an unreviewed next sibling")
         if node.tail and node.tail.strip():
             raise PilotError("Original chapter marker has intervening unassigned text")
+        if tag not in {"h2", "p"}:
+            if on_unreviewed == "block":
+                raise PilotError("Original chapter marker has an unreviewed next sibling")
+            if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_.-]{0,80}", tag):
+                raise PilotError("Unsafe or missing source chapter sibling tag")
+            unreviewed_tags[tag] += 1
+            if len(bounded_unreviewed) < 24:
+                bounded_unreviewed.append({
+                    "original_source_line": node.sourceline,
+                    "original_sibling_tag": tag,
+                    "original_reference_sha256":
+                        sha256(original_ref.encode("utf-8")).hexdigest(),
+                })
+            # Unsupported sibling retains its original position and authored
+            # XML bytes; it is neither empty nor a validated native intro.
+            continue
         body = "".join(sibling.itertext())
         if not body.strip() or len(body) > MAX_SIBLING_CHARS:
             raise PilotError("Original chapter sibling text empty or oversized")
@@ -107,6 +131,13 @@ def original_chapter_neighbors(xml_bytes: bytes) -> tuple[dict, dict]:
         tag_counts[tag] += 1
     return observed, {
         "explicit_chapter_source_marker_count": count,
+        "original_chapter_siblings_reviewed_count": sum(tag_counts.values()),
+        "original_chapter_siblings_not_reviewed_count": sum(unreviewed_tags.values()),
+        "original_unreviewed_sibling_tag_counts":
+            dict(sorted(unreviewed_tags.items())),
+        "bounded_unreviewed_sibling_original_line_and_reference_hash":
+            bounded_unreviewed,
+        "unreviewed_source_siblings_must_not_be_claimed_as_empty_introductions": True,
         "distinct_explicit_chapter_source_start_keys": len(observed),
         "original_chapter_adjacent_sibling_tag_counts": dict(sorted(tag_counts.items())),
         "original_chapter_sibling_ordered_sha256": ordered.hexdigest(),
