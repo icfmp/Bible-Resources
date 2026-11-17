@@ -377,6 +377,128 @@ def _private_reference_sequence_sha256(targets: list[str]) -> str:
     return h.hexdigest()
 
 
+
+def original_authoring_native_chapter_index_receipt(
+        book_divisions: dict[str, etree._Element],
+        native_numbered_keys: list[str],
+        native_intro_keys: list[str]) -> dict:
+    """All-book OSIS chapter milestones vs the *actual* original native index.
+
+    This checks only authenticated book/chapter identities and native K coverage,
+    never inferred ranges or the lexical, XML or historical editorial contents.
+    It does not print original verse/intro addresses or chapter names.
+    """
+    from collections import Counter
+    chapter_re=re.compile(r"([1-4]?[A-Za-z][A-Za-z0-9]*)\.([1-9][0-9]*)\Z")
+    numbered_re=re.compile(
+        r"([1-4]?[A-Za-z][A-Za-z0-9]*)\.([1-9][0-9]*)\.[1-9][0-9]*\Z")
+    intro_re=re.compile(
+        r"[1-4]?[A-Za-z][A-Za-z0-9]*(?:\.[1-9][0-9]*(?:\.0)?)?\Z")
+    if (not isinstance(book_divisions,dict) or len(book_divisions)!=66
+            or not isinstance(native_numbered_keys,list)
+            or not 1<=len(native_numbered_keys)<=50000
+            or not isinstance(native_intro_keys,list)
+            or len(native_intro_keys)>10000):
+        raise ValueError("Unverified full original authoring/native index inventory")
+
+    source_chapters=set()
+    source_books=set()
+    total_start=0
+    total_end=0
+    for book,node in book_divisions.items():
+        if (not isinstance(book,str) or not re.fullmatch(
+                r"[1-4]?[A-Za-z][A-Za-z0-9]*",book)
+                or not isinstance(node,etree._Element)
+                or node.tag.rsplit("}",1)[-1]!="div"
+                or node.get("type")!="book" or node.get("osisID")!=book):
+            raise ValueError("Original source OSIS book division mismatch")
+        source_books.add(book)
+        opened=None
+        for child in node.iter():
+            if not isinstance(child.tag,str):
+                continue
+            if child.tag.rsplit("}",1)[-1]!="chapter":
+                continue
+            start=child.get("sID")
+            if not start and child.get("osisID") and not child.get("eID"):
+                start=child.get("osisID")
+            end=child.get("eID")
+            if bool(start)==bool(end):
+                raise ValueError("Source chapter milestone not a unique start/end")
+            key=start or end
+            match=chapter_re.fullmatch(key)
+            if match is None or match.group(1)!=book:
+                raise ValueError("Original book contains invalid chapter milestone")
+            if start:
+                if opened is not None or key in source_chapters:
+                    raise ValueError("Nested or repeated authored OSIS chapter start")
+                source_chapters.add(key)
+                opened=key
+                total_start+=1
+            else:
+                if opened!=key:
+                    raise ValueError("Original chapter end does not match start")
+                opened=None
+                total_end+=1
+        if opened is not None:
+            raise ValueError("Original OSIS book missing final chapter close")
+
+    native_chapters=Counter()
+    seen_K=set()
+    for key in native_numbered_keys:
+        if not isinstance(key,str) or not numbered_re.fullmatch(key) or key in seen_K:
+            raise ValueError("Duplicate or invalid genuine native K address")
+        seen_K.add(key)
+        native_chapters[key.rsplit(".",1)[0]]+=1
+    native_intro_chapters=set()
+    seen_I=set()
+    for key in native_intro_keys:
+        if not isinstance(key,str) or not intro_re.fullmatch(key) or key in seen_I:
+            raise ValueError("Duplicate or invalid genuine native I address")
+        seen_I.add(key)
+        # Only authentically chapter-shaped I slots can be compared here;
+        # book-wide I and edition-specific .0 ownership stay separate.
+        if chapter_re.fullmatch(key):
+            native_intro_chapters.add(key)
+        elif key.endswith(".0") and chapter_re.fullmatch(key[:-2]):
+            native_intro_chapters.add(key[:-2])
+
+    missing_K=source_chapters-set(native_chapters)
+    unexpected_K=set(native_chapters)-source_chapters
+    missing_I=source_chapters-native_intro_chapters
+    extra_I=native_intro_chapters-source_chapters
+
+    def _digest_refs(refs: set[str]) -> str:
+        digest=sha256()
+        for ref in sorted(refs):
+            data=ref.encode("ascii")
+            digest.update(len(data).to_bytes(4,"big"))
+            digest.update(data)
+        return digest.hexdigest()
+
+    return {
+        "status":"ORIGINAL_AUTHORED_CHAPTER_MILESTONES_VS_NATIVE_OCCUPANCY_ONLY",
+        "original_osis_book_divisions":len(source_books),
+        "original_osis_unique_chapters":len(source_chapters),
+        "original_chapter_start_milestones":total_start,
+        "original_chapter_end_milestones":total_end,
+        "original_chapter_ref_set_sha256":_digest_refs(source_chapters),
+        "actual_native_numbered_K_slots":len(seen_K),
+        "native_unique_chapters_with_numbered_K":len(native_chapters),
+        "source_chapters_without_native_K":len(missing_K),
+        "native_K_chapters_absent_from_authoring_OSIS":len(unexpected_K),
+        "source_only_chapter_ref_set_sha256":_digest_refs(missing_K),
+        "native_only_chapter_ref_set_sha256":_digest_refs(unexpected_K),
+        "actual_native_I_slots":len(seen_I),
+        "actual_native_chapter_I_loci":len(native_intro_chapters),
+        "source_chapters_without_chapter_I":len(missing_I),
+        "native_chapter_I_loci_not_source_chapters":len(extra_I),
+        "original_chapter_prose_punctuation_structure_verified":False,
+        "native_I_book_level_and_TOP_editorial_ownership_verified":False,
+        "source_or_compiled_text_changed":False,
+    }
+
+
 class PrivateOriginalChapterNativeAnchorCoverage:
     """Read-only visible-word *anchor* overlap of original OSIS vs native K.
 
