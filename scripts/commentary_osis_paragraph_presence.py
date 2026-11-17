@@ -877,15 +877,15 @@ class PrivateOriginalChapterNativeAnchorCoverage:
             "no_book_ending_or_authorial_edition_remap_approved":True,
         }
 
-    def private_trailing_source_gaps_in_other_original_chapters(self) -> dict:
-        """Read-only source/native same-book location of chapter-final gaps.
+    def private_uncovered_source_gaps_in_other_original_chapters(self) -> dict:
+        """Diagnose any genuine OSIS word gaps between exact original native K/I.
 
-        Never claim absence from the *entire* native module: only authenticated
-        source-located K/I segments for other chapters are tested here. A
-        source word sequence copied across chapters can be diagnostic but is
-        not proof of authorial paragraph or digital-edition ownership.
+        A gap can be interior OR terminal. Check other original chapters in
+        the same book and their source-located K/I text. This does NOT search
+        every original native raw frame or infer missing authored exposition.
         """
         candidates=[]
+        distinct_chapters=set()
         for chapter,state in self._scopes.items():
             if (len(state["native_unique_whole_body_intervals"])
                     != len(state["native_raw_digests"])
@@ -898,87 +898,102 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                 state["source_located_native_visible_segments"])
             if not intervals:
                 continue
-            # The gap must be one proven terminal suffix, not an arbitrary
-            # discontinuity or artifact of an unmatched native K/I body.
-            end=0
-            valid=True
-            for start,stop in intervals:
-                if start>end or stop<=start:
-                    valid=False
-                    break
-                end=max(end,stop)
             words=state["source_words"]
-            if not valid or end<self.ANCHOR or end>=len(words):
-                continue
-            original_suffix=words[end:]
-            if len(original_suffix)<self.ANCHOR:
-                continue
-            book,num=chapter.rsplit(".",1)
-            next_key=f"{book}.{int(num)+1}"
-            next_state=self._scopes.get(next_key)
-            same_book_source_hits=0
-            same_book_native_hits=0
-            first_source_offsets=0
-            first_native_offsets=0
-            anchor_lengths=[]
-            anchors=[
-                original_suffix[:self.ANCHOR],
-                original_suffix[(len(original_suffix)-self.ANCHOR)//2:
-                                (len(original_suffix)-self.ANCHOR)//2+self.ANCHOR],
-                original_suffix[-self.ANCHOR:],
-            ]
-            for neighbor,other in self._scopes.items():
-                if neighbor==chapter or not neighbor.startswith(book+"."):
+            gaps=[]
+            cursor=0
+            for start,stop in intervals:
+                if start<0 or stop<=start or stop>len(words):
+                    raise ValueError("Invalid original source-located K/I word interval")
+                if start>cursor:
+                    gaps.append((cursor,start))
+                cursor=max(cursor,stop)
+            if cursor<len(words):
+                gaps.append((cursor,len(words)))
+            for gap_start,gap_end in gaps:
+                unaccounted=words[gap_start:gap_end]
+                if len(unaccounted)<self.ANCHOR:
+                    # Short source gaps need their own carefully reviewed
+                    # matching policy; do not mistake common few-word
+                    # phrases in other chapters for uniquely located prose.
                     continue
-                source_hits=_private_exact_token_match_offsets(
-                    other["source_words"],original_suffix,maximum_positions=20)
-                if source_hits:
-                    same_book_source_hits+=1
+                if len(candidates)>=40:
+                    raise ValueError("Unreviewed many original source gap probes")
+                distinct_chapters.add(chapter)
+                book,num=chapter.rsplit(".",1)
+                next_key=f"{book}.{int(num)+1}"
+                next_state=self._scopes.get(next_key)
+                same_book_source_hits=0
+                same_book_native_hits=0
+                first_source_offsets=0
+                first_native_offsets=0
+                anchor_hits=None
+                anchors=[
+                    unaccounted[:self.ANCHOR],
+                    unaccounted[(len(unaccounted)-self.ANCHOR)//2:
+                                (len(unaccounted)-self.ANCHOR)//2+self.ANCHOR],
+                    unaccounted[-self.ANCHOR:],
+                ]
+                for neighbor,other in self._scopes.items():
+                    if neighbor==chapter or not neighbor.startswith(book+"."):
+                        continue
+                    source_hits=_private_exact_token_match_offsets(
+                        other["source_words"],unaccounted,maximum_positions=20)
+                    if source_hits:
+                        same_book_source_hits+=1
+                        if neighbor==next_key:
+                            first_source_offsets=len(source_hits)
+                    segment_words=[]
+                    for first,last,kind,visible in sorted(
+                            other["source_located_native_visible_segments"],
+                            key=lambda item:(item[0],item[1])):
+                        segment_words.extend(WORD.findall(visible))
+                    native_hits=_private_exact_token_match_offsets(
+                        segment_words,unaccounted,maximum_positions=20)
+                    if native_hits:
+                        same_book_native_hits+=1
+                        if neighbor==next_key:
+                            first_native_offsets=len(native_hits)
                     if neighbor==next_key:
-                        first_source_offsets=len(source_hits)
-                segment_words=[]
-                for start,stop,kind,visible in sorted(
-                        other["source_located_native_visible_segments"],
-                        key=lambda item:(item[0],item[1])):
-                    segment_words.extend(WORD.findall(visible))
-                native_hits=_private_exact_token_match_offsets(
-                    segment_words,original_suffix,maximum_positions=20)
-                if native_hits:
-                    same_book_native_hits+=1
-                    if neighbor==next_key:
-                        first_native_offsets=len(native_hits)
-                if neighbor==next_key:
-                    anchor_lengths=[
-                        sum(bool(_private_exact_token_match_offsets(
-                            segment_words,anchor,maximum_positions=20))
-                            for anchor in anchors),
-                        sum(bool(_private_exact_token_match_offsets(
-                            other["source_words"],anchor,maximum_positions=20))
-                            for anchor in anchors),
-                    ]
-            candidates.append({
-                "authored_chapter_ref_sha256":sha256(chapter.encode("ascii")).hexdigest(),
-                "source_trailing_gap_word_offset_not_verse_key":end,
-                "source_trailing_gap_visible_word_tokens":len(original_suffix),
-                "source_trailing_gap_exact_ordered_word_sha256":sha256(
-                    " ".join(original_suffix).encode("utf-8")).hexdigest(),
-                "next_original_chapter_source_has_entire_gap":bool(first_source_offsets),
-                "next_original_chapter_located_native_has_entire_gap":bool(first_native_offsets),
-                "other_same_book_source_chapters_with_entire_gap":
-                    same_book_source_hits,
-                "other_same_book_located_native_chapters_with_entire_gap":
-                    same_book_native_hits,
-                "next_chapter_located_native_eight_word_anchor_hits_of_three":
-                    anchor_lengths[0] if next_state is not None else None,
-                "next_chapter_source_eight_word_anchor_hits_of_three":
-                    anchor_lengths[1] if next_state is not None else None,
-                "not_a_whole_original_module_or_note_ownership_search":True,
-                "no_authorial_prose_or_real_verse_addresses_exported":True,
-            })
+                        anchor_hits=[
+                            sum(bool(_private_exact_token_match_offsets(
+                                segment_words,anchor,maximum_positions=20))
+                                for anchor in anchors),
+                            sum(bool(_private_exact_token_match_offsets(
+                                other["source_words"],anchor,maximum_positions=20))
+                                for anchor in anchors),
+                        ]
+                candidates.append({
+                    "authored_chapter_ref_sha256":sha256(
+                        chapter.encode("ascii")).hexdigest(),
+                    "source_gap_location_class":(
+                        "source_initial_prefix" if gap_start==0
+                        else "source_terminal_suffix" if gap_end==len(words)
+                        else "source_internal_interval"),
+                    "source_gap_word_offset_not_verse_key":gap_start,
+                    "source_gap_visible_word_tokens":len(unaccounted),
+                    "source_gap_exact_ordered_word_sha256":sha256(
+                        " ".join(unaccounted).encode("utf-8")).hexdigest(),
+                    "next_original_chapter_source_has_entire_gap":
+                        bool(first_source_offsets),
+                    "next_original_chapter_located_native_has_entire_gap":
+                        bool(first_native_offsets),
+                    "other_same_book_source_chapters_with_entire_gap":
+                        same_book_source_hits,
+                    "other_same_book_located_native_chapters_with_entire_gap":
+                        same_book_native_hits,
+                    "next_chapter_located_native_eight_word_anchor_hits_of_three":
+                        anchor_hits[0] if next_state is not None else None,
+                    "next_chapter_source_eight_word_anchor_hits_of_three":
+                        anchor_hits[1] if next_state is not None else None,
+                    "not_a_whole_original_module_or_note_ownership_search":True,
+                    "no_authorial_prose_or_real_verse_addresses_exported":True,
+                })
         return {
-            "status":"ORIGINAL_TERMINAL_SOURCE_GAPS_WITHIN_SAME_BOOK_CHAPTER_KI_ONLY",
-            "genuine_authored_chapter_trailing_gaps":len(candidates),
+            "status":"ORIGINAL_UNCOVERED_SOURCE_WORD_INTERVALS_SAME_BOOK_KI_ONLY",
+            "genuine_authored_chapter_uncovered_gap_scopes":len(distinct_chapters),
+            "genuine_authored_chapter_uncovered_word_intervals":len(candidates),
             "cases":candidates,
+            "sub_eight_word_intervals_not_searchable_by_this_probe":True,
             "full_original_native_K_I_TOP_corpus_global_search_not_performed":True,
             "source_or_stock_module_changed":False,
         }
