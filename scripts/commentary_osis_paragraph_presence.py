@@ -998,6 +998,45 @@ class PrivateOriginalChapterNativeAnchorCoverage:
             "source_or_stock_module_changed":False,
         }
 
+    def private_authentic_uncovered_source_word_fragments(self) -> list[tuple[str,int,list[str]]]:
+        """Only genuine source word gaps after uniquely placed original K/I.
+
+        The return value contains original authoring words and MUST remain
+        inside the private CI process; never serialize or log it.
+        """
+        results=[]
+        for chapter,state in self._scopes.items():
+            if (len(state["native_unique_whole_body_intervals"])
+                    != len(state["native_raw_digests"])
+                    or len(state["intro_unique_exact_intervals"])
+                    != len(state["intro_distinct_raw_digests"])
+                    or not state["intro_distinct_raw_digests"]):
+                continue
+            boundaries=sorted(
+                (start,end) for start,end,kind,visible in
+                state["source_located_native_visible_segments"])
+            if not boundaries:
+                continue
+            cursor=0
+            original=state["source_words"]
+            gaps=[]
+            for start,end in boundaries:
+                if start<0 or end<=start or end>len(original):
+                    raise ValueError("Unreviewed source/native interval")
+                if start>cursor:
+                    gaps.append((cursor,start))
+                cursor=max(cursor,end)
+            if cursor<len(original):
+                gaps.append((cursor,len(original)))
+            for start,end in gaps:
+                fragment=original[start:end]
+                if len(fragment)<12:
+                    continue
+                if len(results)>=40 or len(fragment)>100_000:
+                    raise ValueError("Unreviewed large original source gap collection")
+                results.append((chapter,start,list(fragment)))
+        return results
+
     def report(self) -> dict:
         """Closed metadata only; never includes words, XML or actual native keys."""
         rows = []
@@ -1253,6 +1292,132 @@ class PrivateOriginalChapterNativeAnchorCoverage:
             "original_source_or_compiled_binary_changed": False,
             "no_original_words_raw_xml_or_verse_keys_exported": True,
             "no_source_edition_or_redistribution_rights_approved": True,
+        }
+
+
+class PrivateOriginalNativeWholeCorpusGapSearch:
+    """Scan genuine original K/I *raw bodies*, once per distinct kind+SHA.
+
+    The original source gap words never leave this in-memory object. The
+    second full libSWORD scan must be separately SHA-reconciled by the caller.
+    Unknown opaque TOP/U payloads are counted but NOT text-searched.
+    """
+
+    ANCHOR=12
+
+    def __init__(self, original_source_fragments: list[tuple[str,int,list[str]]]):
+        if (not isinstance(original_source_fragments,list)
+                or not 1<=len(original_source_fragments)<=40):
+            raise ValueError("Unreviewed original source gap search set")
+        self._sources=[]
+        self._index=defaultdict(list)
+        self._seen=set()
+        self._kinds={"K":0,"I":0,"U":0}
+        self._parse_failures={"K":0,"I":0}
+        total=0
+        unique=set()
+        for chapter,start,words in original_source_fragments:
+            if (not isinstance(chapter,str) or not re.fullmatch(
+                    r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*",chapter)
+                    or type(start) is not int or start<0
+                    or not isinstance(words,list)
+                    or not self.ANCHOR<=len(words)<=100_000
+                    or any(not isinstance(word,str) or not word for word in words)
+                    or (chapter,start) in unique):
+                raise ValueError("Unverified original source word interval for native search")
+            unique.add((chapter,start))
+            total+=len(words)
+            if total>200_000:
+                raise ValueError("Unbounded original source word gaps in memory")
+            raw=" ".join(words).encode("utf-8")
+            source={
+                "reference_sha256":sha256(chapter.encode("ascii")).hexdigest(),
+                "source_word_offset":start,
+                "word_count":len(words),
+                "source_words_sha256":sha256(raw).hexdigest(),
+                "words":words,
+                "found_anchor_kinds":defaultdict(set),
+                "raw_bodies_with_any_anchor":{"K":0,"I":0},
+                "exact_complete_fragment_raw_bodies":{"K":0,"I":0},
+            }
+            index=len(self._sources)
+            self._sources.append(source)
+            for name,position in (
+                    ("first",0),
+                    ("middle",(len(words)-self.ANCHOR)//2),
+                    ("last",len(words)-self.ANCHOR)):
+                self._index[tuple(words[position:position+self.ANCHOR])].append(
+                    (index,name))
+
+    def observe(self, kind: str, key: str, raw: bytes) -> None:
+        if kind not in ("K","I","U") or not isinstance(raw,bytes):
+            raise ValueError("Invalid genuine native frame kind/bytes")
+        if kind=="U":
+            self._kinds["U"]+=1
+            return
+        if (not isinstance(key,str)
+                or not (PrivateOriginalChapterNativeAnchorCoverage.KEY.fullmatch(key)
+                        if kind=="K" else
+                        PrivateOriginalChapterNativeAnchorCoverage.INTRO.fullmatch(key))
+                or not 0<len(raw)<=2*1024*1024 or b"\x00" in raw):
+            raise ValueError("Unreviewed original native K/I whole-corpus frame")
+        digest=sha256(raw).hexdigest()
+        if (kind,digest) in self._seen:
+            return
+        self._seen.add((kind,digest))
+        self._kinds[kind]+=1
+        try:
+            root=etree.fromstring(
+                b"<fragment>"+raw+b"</fragment>",
+                parser=etree.XMLParser(resolve_entities=False,
+                    no_network=True,load_dtd=False,recover=False,
+                    huge_tree=False,remove_blank_text=False,strip_cdata=False))
+            if any(isinstance(item,etree._Entity) for item in root.iter()):
+                raise ValueError("Unresolved original native XML entity")
+        except (ValueError,etree.XMLSyntaxError):
+            self._parse_failures[kind]+=1
+            return
+        native=WORD.findall("".join(root.itertext()))
+        matching=defaultdict(set)
+        for index in range(max(0,len(native)-self.ANCHOR+1)):
+            key=tuple(native[index:index+self.ANCHOR])
+            for case,which in self._index.get(key,()):
+                matching[case].add(which)
+        for index,parts in matching.items():
+            source=self._sources[index]
+            source["raw_bodies_with_any_anchor"][kind]+=1
+            source["found_anchor_kinds"][kind].update(parts)
+            if "first" in parts and _private_exact_token_match_offsets(
+                    native,source["words"],maximum_positions=20):
+                source["exact_complete_fragment_raw_bodies"][kind]+=1
+
+    def report(self) -> dict:
+        return {
+            "status":"EXACT_ORIGINAL_GAP_PROSE_AGAINST_ALL_GENUINE_NATIVE_K_I_RAW_BODIES",
+            "original_source_word_intervals":len(self._sources),
+            "distinct_genuine_original_native_K_I_raw_frames_scanned":
+                dict(self._kinds),
+            "original_genuine_native_K_I_unparseable_raw_frames":
+                dict(self._parse_failures),
+            "original_opaque_TOP_U_slots_not_text_searched":
+                self._kinds["U"],
+            "cases":[{
+                "authored_chapter_ref_sha256":case["reference_sha256"],
+                "source_word_offset_not_verse_key":case["source_word_offset"],
+                "original_unaccounted_visible_word_tokens":case["word_count"],
+                "source_word_interval_sha256":case["source_words_sha256"],
+                "distinct_original_native_raw_bodies_with_any_12word_anchor":
+                    dict(case["raw_bodies_with_any_anchor"]),
+                "native_K_found_first_middle_last_12word_anchors":
+                    sorted(case["found_anchor_kinds"].get("K",set())),
+                "native_I_found_first_middle_last_12word_anchors":
+                    sorted(case["found_anchor_kinds"].get("I",set())),
+                "original_native_raw_bodies_containing_entire_original_gap":
+                    dict(case["exact_complete_fragment_raw_bodies"]),
+                "not_a_cross_native_frame_or_historic_print_parity_proof":True,
+            } for case in self._sources],
+            "no_original_text_native_keys_or_raw_xml_exported":True,
+            "no_source_module_or_edition_revised":True,
         }
 
 
