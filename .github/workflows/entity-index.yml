@@ -21,6 +21,7 @@ jobs:
         run: |
           python3 -I entity-index/test_build.py
           python3 -I entity-index/test_resolve.py
+          python3 -I entity-index/test_audit_person_overlaps.py
 
       - name: Check out frozen self-hosted ACAI source
         shell: bash
@@ -146,10 +147,30 @@ jobs:
           print("ENTITY_INDEX_QA", json.dumps(stats, sort_keys=True))
           PY
 
+      - name: Audit competing canonical people on the same exact word
+        shell: bash
+        run: |
+          python3 -I entity-index/audit_person_overlaps.py \
+            --index entity-index/dist/index.json \
+            --output entity-index/dist/person-overlaps.json \
+            --sample 30
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path("entity-index/dist/person-overlaps.json").read_text())
+          stats=report["statistics"]
+          assert stats["distinct_person_original_word_overlap_candidates"] == len(report["findings"])
+          assert sum(stats[x] for x in ("multiple_explicit_names", "mixed_name_and_indirect", "indirect_only")) == len(report["findings"])
+          assert all(len(f["canonical_people"]) >= 2 for f in report["findings"])
+          assert len(set((f["corpus"], f["word_id"]) for f in report["findings"])) == len(report["findings"])
+          PY
+
       - name: Upload internal QA-only resource
         uses: actions/upload-artifact@v4
         with:
           name: independent-entity-index-qa
-          path: entity-index/dist/index.json
+          path: |
+            entity-index/dist/index.json
+            entity-index/dist/person-overlaps.json
           if-no-files-found: error
           retention-days: 14
