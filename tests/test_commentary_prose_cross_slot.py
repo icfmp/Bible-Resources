@@ -244,6 +244,36 @@ class OriginalExtraGapChapterNativeTests(unittest.TestCase):
             probe.original_thml_extra_gap_structure(
                 xml,expected_source_sha256="0"*64)
 
+    def test_whole_original_paragraph_ordinals_are_genuine_source_order(self):
+        sample,first,second=self._original_case()
+        body=(
+            "<div><p>opening</p> <p>"+" ".join(first)+"</p> "
+            "<p>middle</p> <p>"+" ".join(second)+"</p> "
+            "<p>closing</p></div>"
+        )
+        self.assertEqual(
+            __import__("lxml.etree",fromlist=["fromstring"]).fromstring(
+                body.encode()).xpath("string(.)"),sample[1]["original_text"])
+        xml=(
+            b"<ThML>\n<div1>\n<scripCom osisRef='Bible:Gen.1.1'/>"
+            +body.encode()+b"</div1></ThML>"
+        )
+        item=dict(sample[1],original_source_line=3,
+                  original_full_reference_sha256=sha256(b"Bible:Gen.1.1").hexdigest())
+        probe=OriginalExtraGapNativeChapterProbe([
+            (sample[0],item,sample[2],sample[3])
+        ])
+        doc=probe.original_thml_extra_gap_structure(
+            xml,expected_source_sha256=sha256(xml).hexdigest())
+        gaps=doc["source_line_hash_and_original_adjacent_paragraph_structure_only"][0][
+            "original_extra_word_spans_authentically_within_adjacent_source_div"]
+        self.assertEqual([g["original_paragraph_ownership_class"] for g in gaps],
+                         ["extra_span_inside_one_original_p"]*2)
+        self.assertEqual(
+            [g["exact_whole_original_p_document_ordinal_when_unique"] for g in gaps],
+            [2,4])
+        self.assertNotIn("secretFirst",json.dumps(doc))
+
     def test_cross_original_p_gap_is_not_misattributed_to_one_paragraph(self):
         sample,first,second=self._original_case()
         first_left=" ".join(first[:60])
