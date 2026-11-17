@@ -25,9 +25,9 @@ Original K units and verse key counts are independently drawn from the published
 | Titus 1 | 3 → 3 | 16 | Gospel hope, free grace/mercy/peace, pastoral qualifications, self-examination and charitable reproof covered; no change necessary | [chapter 1](https://ccel.org/ccel/henry/mhcc.xlviii.i.html) |
 | Titus 2 | 3 → 3 | 15 | **1 restoration**: God in Christ expressly the object of our hope and worship; Christ as God-man, law/grace/good works covered | [chapter 2](https://ccel.org/ccel/henry/mhcc.xlviii.ii.html) |
 | Titus 3 | 3 → 3 | 15 | Justification not earned, salvation through Christ/Spirit, baptism as outward sign not automatic salvation, grace and work covered; no change necessary | [chapter 3](https://ccel.org/ccel/henry/mhcc.xlviii.iii.html) |
-| **Total** | **43 → 43** | **242** | **8 transparent sentence-level repairs in six manuscripts** | **13 separately opened original-English witnesses** |
+| **Total** | **44 → 44** | **242** | **8 transparent sentence-level repairs in six manuscripts** | **13 separately opened original-English witnesses** |
 
-**Important count reconciliation:** 1 Timothy has **20** original K source units, 2 Timothy **15**, and Titus **9**: total **44**, not 43. Any machine-generated inventory/count mismatch must be treated as blocking until independently reconciled; recheck this row before using it as a validation receipt.
+**Count cross-check:** 1 Timothy **20** original K units + 2 Timothy **15** + Titus **9** = **44** distinct original source units, with **44** corresponding modern exposition sections; 242 occupied original K verse keys. These figures count source bodies, not 242 distinct authored paragraphs.
 
 ## Eight precise, reversible sentence-level editorial changes
 
