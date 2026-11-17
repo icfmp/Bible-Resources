@@ -269,15 +269,19 @@ def compare_original_source_reference_candidates(xml: bytes, plan: dict,
                 or not all(OSIS_VERSE.fullmatch(x) for x in proposed.split("-"))
                 or source in expected):
             raise PilotError("Malformed or duplicated authorial reference proposal")
-        old = WORK_REF.fullmatch(source).group(2).split("-")[0]
+        original_ends = WORK_REF.fullmatch(source).group(2).split("-")
+        old, old_end = original_ends
         first, last = proposed.split("-")
+        endpoint_only = old == first
         if (old.split(".")[0] != first.split(".")[0]
-                or old == first
                 or first.rsplit(".", 1)[0] != last.rsplit(".", 1)[0]
                 or int(first.rsplit(".", 1)[1]) > int(last.rsplit(".", 1)[1])
-                or not {first, last}.issubset(canonical_verses)):
-            raise PilotError("Candidate is not a valid reference range in the native registry")
-        expected[source] = (old, proposed)
+                or not {first, last}.issubset(canonical_verses)
+                or (endpoint_only and (old_end in canonical_verses
+                                      or old_end == last))
+                or (not endpoint_only and old_end == last)):
+            raise PilotError("Candidate is not a reviewed native chapter or endpoint correction")
+        expected[source] = (old, proposed, endpoint_only, old_end)
     rows, seen = [], set()
     for marker in _root_for_raw_xml(xml).iter():
         if not isinstance(marker.tag, str) or marker.tag.rsplit("}", 1)[-1] != "scripCom":
@@ -310,7 +314,7 @@ def compare_original_source_reference_candidates(xml: bytes, plan: dict,
                 windows.append(group)
         if len(windows) < 3:
             raise PilotError("Insufficient distinct source lexical windows")
-        old, proposed = expected[ref]
+        old, proposed, endpoint_only, original_end = expected[ref]
         proposed_key = proposed.split("-")[0]
         def score(chapter, key):
             entries = numbered.get(chapter, [])
@@ -321,6 +325,9 @@ def compare_original_source_reference_candidates(xml: bytes, plan: dict,
             return best, len(entries), key in dict(entries)
         before, n_before, old_present = score(old.rsplit(".", 1)[0], old)
         after, n_after, new_present = score(proposed_key.rsplit(".", 1)[0], proposed_key)
+        proposed_last = proposed.split("-")[1]
+        candidate_end_occupied = proposed_last in dict(numbered.get(
+            proposed_key.rsplit(".", 1)[0], []))
         rows.append({
             "source_original_reference": ref,
             "original_source_line": marker.sourceline,
@@ -334,7 +341,13 @@ def compare_original_source_reference_candidates(xml: bytes, plan: dict,
             "original_chapter_best_matching_witnesses": before,
             "candidate_chapter_best_matching_witnesses": after,
             "proposed_reference": proposed,
-            "status": ("CANDIDATE_CHAPTER_STRONGER_WORD_EVIDENCE"
+            "invalid_original_endpoint": original_end if endpoint_only else None,
+            "candidate_endpoint_native_occupied": candidate_end_occupied,
+            "status": ("ENDPOINT_OUTSIDE_ORIGINAL_REGISTRY_WITH_AUTHORED_PROSE_AT_NATIVE_START"
+                       if endpoint_only and old_present and after >= 2
+                       else "ENDPOINT_EVIDENCE_INCONCLUSIVE_NO_EDIT"
+                       if endpoint_only
+                       else "CANDIDATE_CHAPTER_STRONGER_WORD_EVIDENCE"
                        if after >= 2 and after > before
                        else "ORIGINAL_CHAPTER_STRONGER_WORD_EVIDENCE"
                        if before > after else "INCONCLUSIVE_NO_CHANGE"),
@@ -689,6 +702,35 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
                            and v.get("sha256") == review_plan.get("source_xml_sha256")
                            for v in manifest.get("commentary_source", {}).get("xml_witness_volumes", []))):
             raise PilotError("Private proposal not bound to pinned original editions")
+    endpoint_plan_paths = manifest.get("private_reference_endpoint_plans", [])
+    if (not isinstance(endpoint_plan_paths, list)
+            or len(endpoint_plan_paths) > 6
+            or len(set(map(str, endpoint_plan_paths))) != len(endpoint_plan_paths)
+            or (endpoint_plan_paths and not private_full_probe)):
+        raise PilotError("Unbounded or unreviewed private endpoint source plans")
+    endpoint_plans = {}
+    for relative in endpoint_plan_paths:
+        if (not isinstance(relative, str)
+                or not re.fullmatch(r"config/commentary-reference-plans/[a-z0-9-]+\.json", relative)):
+            raise PilotError("Unreviewed private endpoint source plan path")
+        path = Path(__file__).resolve().parents[1] / relative
+        if path.is_symlink() or not path.is_file() or path.stat().st_size > 20000:
+            raise PilotError("Invalid private endpoint source plan file")
+        try:
+            checked = json.loads(path.read_text(encoding="utf-8"))
+        except (ValueError, UnicodeError, OSError):
+            raise PilotError("Invalid endpoint source plan JSON") from None
+        volume = checked.get("source_volume")
+        if (type(volume) is not int or volume in endpoint_plans
+                or checked.get("resource_id") != resource_id
+                or checked.get("stock_raw_corpus_sha256") !=
+                    manifest.get("native_raw_corpus_sha256")
+                or not any(row.get("number") == volume
+                           and row.get("sha256") == checked.get("source_xml_sha256")
+                           for row in manifest.get("commentary_source", {}).get(
+                               "xml_witness_volumes", []))):
+            raise PilotError("Endpoint plan is not tied to a distinct pinned source volume")
+        endpoint_plans[volume] = checked
     locations, is_collection = _xml_witness_locations(
         manifest.get("commentary_source"))
     expected_sword = manifest.get("archive_sha256")
@@ -766,6 +808,7 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
         source_reports = []
         unoccupied_original_units = []
         review_source_xml = None
+        endpoint_source_xml = {}
         for number, xml_url, expected_xml in locations:
             xml_path = root / f"original-volume-{number}.xml"
             xml_receipt = fetch(xml_url, xml_path, "ccel")
@@ -776,6 +819,8 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
             source_xml = xml_path.read_bytes()
             if review_plan is not None and number == review_plan["source_volume"]:
                 review_source_xml = source_xml
+            if number in endpoint_plans:
+                endpoint_source_xml[number] = source_xml
             comparison = compare_anchors(source_xml, result.stdout,
                                          manifest["module_id"],
                                          probe_osis_keys=probes,
@@ -795,6 +840,8 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
             })
         if review_plan is not None and review_source_xml is None:
             raise PilotError("Reviewed XML witness volume absent")
+        if set(endpoint_source_xml) != set(endpoint_plans):
+            raise PilotError("An independently pinned endpoint source volume is missing")
         if is_collection:
             observed = summarize_volume_anchor_results(source_reports)
             observed.update({
@@ -966,6 +1013,13 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
                                 compare_original_source_reference_candidates(
                                     review_source_xml, review_plan,
                                     dict(complete_numbered), source_registry["verse_keys"]))
+                        if endpoint_plans:
+                            observed["private_original_endpoint_reference_reviews"] = [
+                                compare_original_source_reference_candidates(
+                                    endpoint_source_xml[vol], endpoint_plans[vol],
+                                    dict(complete_numbered), source_registry["verse_keys"])
+                                for vol in sorted(endpoint_plans)
+                            ]
                         aliases = {}
                         for row in location["units"]:
                             claim = row["provisional_missing_first_verse_alias_preview"]

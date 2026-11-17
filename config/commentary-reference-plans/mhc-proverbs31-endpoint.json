@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "status": "RESEARCH_ONLY_UNAPPROVED_REFERENCE_CANDIDATES",
+  "resource_id": "mhc-crosswire",
+  "source_volume": 3,
+  "source_xml_sha256": "8ba9779eba5d326acbfc9acaccf2ea1fa2d6b5c48b03ab86fc5e80b0bfa5b17e",
+  "stock_raw_corpus_sha256": "2c4fe82710165202fdec300ca9636a150a9998f19c7b19ee4e81db5a6b75f5b5",
+  "note": "Unapproved original out-of-range reference endpoint; original source/stock words unchanged. Issue #289.",
+  "candidate_ranges": [
+    {
+      "original_work_qualified_reference": "Bible:Prov.31.10-Prov.31.33",
+      "proposed_osis_reference": "Prov.31.10-Prov.31.31"
+    }
+  ]
+}

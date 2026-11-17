@@ -208,6 +208,16 @@ jobs:
                       assert refs["published"] is False
                       print("Private original-source chapter reference candidates, NOT approved:",
                             json.dumps(refs, sort_keys=True))
+                  endpoints = report.get("private_original_endpoint_reference_reviews")
+                  if endpoints is not None:
+                      assert len(endpoints) == 3
+                      assert sum(r["source_sections_checked"] for r in endpoints) == 3
+                      assert all(r["original_xml_and_stock_not_modified"] is True
+                                 and r["prose_and_raw_fragments_not_uploaded"] is True
+                                 and r["rights_and_editorial_approved"] is False
+                                 and r["published"] is False for r in endpoints)
+                      print("Three private original source endpoint witnesses (not approved):",
+                            json.dumps(endpoints, sort_keys=True))
                   assert full["full_original_K_I_U_native_entry_parity_proven"] is True
                   assert full["planned_extra_index_keys"] == 3
                   gui = full["private_real_xiphos_alias_navigation_probe"]

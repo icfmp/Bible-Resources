@@ -14,6 +14,45 @@ from pilot_preflight import PilotError
 
 
 class CommentaryAnchorParityTests(unittest.TestCase):
+    def test_original_source_invalid_endpoint_is_not_an_invented_native_verse(self):
+        from commentary_anchor_parity import compare_original_source_reference_candidates
+        from hashlib import sha256
+        prose = " ".join("sectionword" + str(i) for i in range(150))
+        xml = (b"<ThML><div1><div2>"
+               b'<scripCom osisRef="Bible:Gen.1.2-Gen.1.44"/>'
+               b"<div><p>" + prose.encode() + b"</p></div></div2></div1></ThML>")
+        plan = {"schema_version": 1,
+                "status": "RESEARCH_ONLY_UNAPPROVED_REFERENCE_CANDIDATES",
+                "source_xml_sha256": sha256(xml).hexdigest(),
+                "candidate_ranges": [{"original_work_qualified_reference":
+                                      "Bible:Gen.1.2-Gen.1.44",
+                                      "proposed_osis_reference": "Gen.1.2-Gen.1.31"}]}
+        native = {"Gen.1": [("Gen.1.2", b"<p>" + prose.encode() + b"</p>")]}
+        registry = {"Gen.1." + str(i) for i in range(1, 32)}
+        report = compare_original_source_reference_candidates(xml, plan, native, registry)
+        row = report["section_evidence"][0]
+        self.assertEqual(row["invalid_original_endpoint"], "Gen.1.44")
+        self.assertEqual(row["status"],
+                         "ENDPOINT_OUTSIDE_ORIGINAL_REGISTRY_WITH_AUTHORED_PROSE_AT_NATIVE_START")
+        self.assertFalse(report["rights_and_editorial_approved"])
+        self.assertFalse(report["published"])
+
+    def test_rejects_endpoint_retarget_when_original_end_is_canonical(self):
+        from commentary_anchor_parity import compare_original_source_reference_candidates
+        from hashlib import sha256
+        xml = (b"<ThML><div1><div2>"
+               b'<scripCom osisRef="Bible:Gen.1.2-Gen.1.6"/>'
+               b"<div><p>Some authorial body.</p></div></div2></div1></ThML>")
+        plan = {"schema_version": 1,
+                "status": "RESEARCH_ONLY_UNAPPROVED_REFERENCE_CANDIDATES",
+                "source_xml_sha256": sha256(xml).hexdigest(),
+                "candidate_ranges": [{"original_work_qualified_reference":
+                                      "Bible:Gen.1.2-Gen.1.6",
+                                      "proposed_osis_reference": "Gen.1.2-Gen.1.5"}]}
+        with self.assertRaises(PilotError):
+            compare_original_source_reference_candidates(
+                xml, plan, {}, {"Gen.1.2", "Gen.1.5", "Gen.1.6"})
+
     def test_private_original_chapter_ref_witnesses_use_real_source_prose(self):
         from commentary_anchor_parity import compare_original_source_reference_candidates
         from hashlib import sha256
