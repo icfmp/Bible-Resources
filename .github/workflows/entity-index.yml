@@ -68,6 +68,9 @@ jobs:
           assert "person:Philistine" not in by_id
           assert "person:Shiloh" not in by_id
           assert by_id["person:Johanan"]["canonical_id"] == "person:Johanan"
+          assert index["provenance"]["source_corpora"]["SBLGNT"] == "sblgnt"
+          assert "sblgnt:n45016001004" in index["by_word"]
+          assert "SBLGNT:n45016001004" not in index["by_word"]
           assert ["o130030150041"] not in by_id["person:Jehoahaz.3"]["occurrences"]["explicit_instances"]["wlc"]
           assert index["by_word"]["wlc:o130030150041"] == [
               {"entity_id":"person:Johanan","link_type":"explicit_instances"}]
@@ -91,6 +94,10 @@ jobs:
           resolver=module.EntityResolver(index)
           edition=index["provenance"]["source_editions"]["wlc"]["edition"]
           greek=index["provenance"]["source_editions"]["sblgnt"]["edition"]
+          greek_hit=resolver.resolve(corpus="sblgnt", edition=greek,
+                word_id="n45016001004", verse_id="45016001")
+          assert "person:Phoebe" in [c["id"] for c in greek_hit["candidates"]], greek_hit
+          assert greek_hit["status"] in ("source_candidate", "ambiguous_source_candidates")
           variant=resolver.resolve(corpus="sblgnt", edition=greek,
                 word_id="n44008037001", verse_id="44008037")
           assert variant["status"] == "verse_not_in_pinned_original_word_inventory", variant
