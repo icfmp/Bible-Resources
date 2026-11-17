@@ -291,7 +291,7 @@ jobs:
               non_fields=[]
               for lineno,line in enumerate(config_text.splitlines(),1):
                   if (not line.strip() or line.lstrip().startswith(("#",";"))
-                          or re.fullmatch(r"\\[[^\\]\\r\\n]{1,128}\\]",line)):
+                          or re.fullmatch(r"\[[^\]\r\n]{1,128}\]",line)):
                       continue
                   match=re.fullmatch(r"([A-Za-z][A-Za-z0-9_-]{0,127})=(.*)",line)
                   if match is None:
