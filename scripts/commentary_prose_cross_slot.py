@@ -460,6 +460,16 @@ class OriginalExtraGapNativeChapterProbe:
                 "book":start.split(".",1)[0],
                 "original_source_extra_span_lengths":list(map(len,spans)),
                 "private_original_extra_spans":[tuple(words) for words in spans],
+                "private_gap_six_word_anchors":[
+                    {tuple(span[i:i+self.MIN_FULL_SPAN_WORDS])
+                     for i in range(len(span)-self.MIN_FULL_SPAN_WORDS+1)}
+                    for span in spans
+                ],
+                "private_gap_word_positions":[
+                    {word:[j for j,w in enumerate(span) if w==word]
+                     for word in set(span)}
+                    for span in spans
+                ],
                 "private_original_unlinked_words":source_plain,
                 "private_selected_stock_unlinked_words":stock_plain,
                 "distinct_other_native_raw_sha":set(),
@@ -470,6 +480,10 @@ class OriginalExtraGapNativeChapterProbe:
                 "other_chapter_payload_counts":Counter(),
                 "other_chapter_full_gap_hits":{"K":set(),"I":set()},
                 "identical_original_raw_other_chapter_repeat_keys":0,
+                "same_chapter_partial_six_word_raw_counts":Counter(),
+                "other_chapter_partial_six_word_raw_counts":Counter(),
+                "same_chapter_max_partial_run_by_gap":[0]*len(spans),
+                "other_chapter_max_partial_run_by_gap":[0]*len(spans),
             })
         if len({(u["original_source_line"],u["original_full_reference_sha256"])
                 for u in self.units})!=len(self.units):
@@ -724,10 +738,29 @@ class OriginalExtraGapNativeChapterProbe:
             unit[seen_key].add(raw_sha)
             unit[counts_key][kind]+=1
             words=strict_native_stock_plain_words(raw)
+            partial_count_key=("same_chapter_partial_six_word_raw_counts" if same_chapter
+                               else "other_chapter_partial_six_word_raw_counts")
+            partial_max_key=("same_chapter_max_partial_run_by_gap" if same_chapter
+                             else "other_chapter_max_partial_run_by_gap")
+            any_partial_hit=False
             for span_index,span in enumerate(unit["private_original_extra_spans"]):
-                if len(span)>=self.MIN_FULL_SPAN_WORDS and self._full_token_span_present(
-                        span,words):
+                if len(span)<self.MIN_FULL_SPAN_WORDS:
+                    continue
+                if self._full_token_span_present(span,words):
                     unit[hits_key][kind].add(span_index)
+                anchors=unit["private_gap_six_word_anchors"][span_index]
+                if not any(tuple(words[i:i+self.MIN_FULL_SPAN_WORDS]) in anchors
+                           for i in range(len(words)-self.MIN_FULL_SPAN_WORDS+1)):
+                    continue
+                any_partial_hit=True
+                longest=longest_contiguous_original_word_run(
+                    unit["private_gap_word_positions"][span_index],words)
+                if not self.MIN_FULL_SPAN_WORDS<=longest<=len(span):
+                    raise PilotError("Unreviewed partial original gap native run length")
+                unit[partial_max_key][span_index]=max(
+                    unit[partial_max_key][span_index],longest)
+            if any_partial_hit:
+                unit[partial_count_key][kind]+=1
 
     def report(self) -> dict:
         if self.replayed<=0:
@@ -772,11 +805,22 @@ class OriginalExtraGapNativeChapterProbe:
                 "identical_selected_native_raw_other_chapter_repeat_keys_not_independent":
                     unit["identical_original_raw_other_chapter_repeat_keys"],
                 "same_book_no_hit_does_not_prove_absence_other_books_or_authorial_loss":True,
+                "same_chapter_distinct_native_raw_payloads_with_six_word_gap_anchor_by_kind":
+                    dict(sorted(unit["same_chapter_partial_six_word_raw_counts"].items())),
+                "other_chapter_same_book_distinct_native_raw_payloads_with_six_word_gap_anchor_by_kind":
+                    dict(sorted(unit["other_chapter_partial_six_word_raw_counts"].items())),
+                "same_chapter_max_exact_contiguous_partial_gap_word_run_by_source_gap":
+                    unit["same_chapter_max_partial_run_by_gap"],
+                "other_chapter_same_book_max_exact_contiguous_partial_gap_word_run_by_source_gap":
+                    unit["other_chapter_max_partial_run_by_gap"],
+                "six_word_partial_match_is_not_paragraph_ownership_or_a_proven_omission":True,
             })
         return {
             "status":"ORIGINAL_HIGH_EXTRA_SPAN_SAME_BOOK_OTHER_RAW_LOCATION_ONLY",
             "source_extra_outlier_cases_examined":len(findings),
             "minimum_contiguous_exact_original_nonlink_word_span_length":
+                self.MIN_FULL_SPAN_WORDS,
+            "minimum_partial_original_gap_anchor_word_length":
                 self.MIN_FULL_SPAN_WORDS,
             "complete_original_native_raw_entries_replayed":self.replayed,
             "original_source_line_hash_and_native_other_slot_counts_only":findings,
