@@ -81,7 +81,19 @@ The builder contains **no chapter-specific or entity-specific code path**.
   (`o130030150041`) says *Johanan*, not *Jehoahaz*. It remains in
   Johanan's original source group and is removed **only** from the
   derived Jehoahaz direct-name occurrences. The separate Shallum at
-  `o130030150101` remains unresolved; **no unsupported alias merge**.
+  `o130030150101` is now reviewed separately against the Josiah
+  royal family and identified with Jehoahaz as below.
+- `person:Shallum.5` (1 Chronicles 3:15, exact WLC word
+  `o130030150101`, *Shallum*) now resolves canonically to
+  `person:Jehoahaz.3` — Josiah's successor named in Jeremiah 22:11
+  and 2 Kings 23:30–31. This traditional and academically supported
+  identification is documented by
+  [SIL translation notes](https://tips.translation.bible/story/translation-commentary-on-1-chronicles-315/)
+  and study commentaries. The source's distinct name record,
+  exact token, references and original genealogy remain intact.
+  `person:Johanan` remains a **different individual**, not a second
+  name for Jehoahaz. This adjudicates the royal name-form confusion
+  without claiming that disputed chronological birth order is settled.
 - `place:Gadara` is **canonically distinct** from `place:Gerasa`:
   Gadara (Umm Qais) and Gerasa (Jerash) are historically separate Decapolis
   cities (UNESCO's [Gadara documentation](https://whc.unesco.org/en/tentativelists/1558/)).
