@@ -1,0 +1,119 @@
+name: Read private complete MHC index aliases in pinned AndBible JSword (not Android GUI)
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/commentary-mhc-private-jsword.yml'
+      - 'tests/java/org/icfmp/research/CommentaryPrivateAliasJSwordProbeTest.java'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: commentary-mhc-private-jsword-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  independent-original-to-corrected-index-readback:
+    name: Exact original 66-book rebuild plus real pinned JSword aliases (private)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+      - name: Install original source/audit and independent reader dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          timeout 150s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y \
+            libsword-dev libsword-utils diatheke
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_index.cpp \
+            -o "$RUNNER_TEMP/commentary-native-index" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "$RUNNER_TEMP/commentary-private-raw" -lsword
+      - name: Clone exact AndBible stable release JSword source and verify commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --quiet --filter=blob:none --no-checkout \
+            https://github.com/AndBible/jsword.git \
+            "$RUNNER_TEMP/andbible-pinned-jsword"
+          git -C "$RUNNER_TEMP/andbible-pinned-jsword" fetch --quiet --depth=1 origin \
+            6ebd10a005fa7761e611c048ececea1430e22546
+          git -C "$RUNNER_TEMP/andbible-pinned-jsword" checkout --quiet --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/andbible-pinned-jsword" rev-parse HEAD)" = \
+            6ebd10a005fa7761e611c048ececea1430e22546
+      - name: Build only a private complete MHC, check every original key, test exactly three repaired starts in JSword
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_anchor_parity.py \
+            --resource-id mhc-crosswire \
+            --native-inspector "$RUNNER_TEMP/commentary-native-index" \
+            --native-raw-binary "$RUNNER_TEMP/commentary-private-raw" \
+            --private-alias-probe \
+            --private-full-probe \
+            --private-full-jsword-root "$RUNNER_TEMP/andbible-pinned-jsword" \
+            --report "$RUNNER_TEMP/mhc-complete-private-jsword-evidence.json"
+      - name: Enforce original native parity plus actual engine tests, without implying GUI or release approval
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root=Path(os.environ["RUNNER_TEMP"])
+          report=json.loads((root/"mhc-complete-private-jsword-evidence.json").read_text())
+          full=report["private_complete_original_index_alias_rebuild"]
+          engine=full["private_pinned_andbible_jsword_alias_probe"]
+          assert full["readback_completed"] is True
+          assert full["source_numbered_K_coverage"]["source_keys_present"] == 31098
+          assert full["source_intro_I_coverage"]["source_keys_present"] == 1255
+          assert full["source_TOP_count"] == full["compiled_TOP_count"] == 2
+          assert full["all_original_TOP_positions_exact_raw_bytes"] is True
+          assert full["full_original_K_I_U_native_entry_parity_proven"] is True
+          assert full["planned_extra_index_keys"] == 3
+          assert engine["independent_engine_verified"] is True
+          assert engine["pinned_andbible_jsword_commit"] == "6ebd10a005fa7761e611c048ececea1430e22546"
+          assert engine["sample_aliases"] == 3
+          assert engine["junit_counts"] == {"tests":2,"failures":0,"errors":0,"skipped":0}
+          assert engine["private_commentary_text_or_java_log_uploaded"] is False
+          assert engine["android_gui_tested"] is False
+          assert full["published"] is False and engine["published"] is False
+          print("Complete original K/I/TOP parity PASS; three corrected alias/master pairs passed pinned AndBible JSword engine.")
+          print("Reader GUI, editorial rights, historical CCEL edition parity and public release remain unapproved.")
+          PY
+      - name: Upload metadata receipts only; no third-party XML, module, Gradle logs or screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mhc-complete-private-jsword-metadata
+          path: ${{ runner.temp }}/mhc-complete-private-jsword-evidence.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Preserve publication and source-identity boundaries
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo '## Private full MHC candidate and pinned JSword engine'
+            echo 'Original six CCEL XML witnesses and CrossWire 2.2 are individually SHA-pinned.'
+            echo 'No source prose, binary commentary, assembled OSIS or Java test log is published.'
+            echo 'JSword engine sample success is not AndBible Android GUI evidence.'
+            echo 'Publication remains blocked by independent rights and editorial signoff.'
+          } >> "$GITHUB_STEP_SUMMARY"
