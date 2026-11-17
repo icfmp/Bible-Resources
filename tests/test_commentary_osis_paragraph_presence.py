@@ -988,5 +988,52 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
                 original_volume_number=7,source_fragments=case)
 
 
+    def test_private_ccel_collation_quantifies_one_word_substitution_or_insert(self):
+        from commentary_osis_paragraph_presence import (
+            private_original_osis_gap_against_pinned_ccel_volume)
+        original=[f"wordtoken{i:03d}" for i in range(60)]
+        case=[("Ps.95",1747,original)]
+
+        def study(candidate):
+            xml=("<ThML><div><p>Start of source.</p><p>"+
+                 " ".join(candidate)+"</p></div></ThML>").encode("utf-8")
+            result=private_original_osis_gap_against_pinned_ccel_volume(
+                xml,expected_xml_sha256=sha256(xml).hexdigest(),
+                original_volume_number=3,source_fragments=case)
+            row=result["original_source_gap_cases"][0]
+            self.assertEqual(
+                row["first_middle_last_12word_anchors_in_original_ccel"],
+                ["first","last","middle"])
+            self.assertTrue(
+                row["three_unique_ordered_CCEl_anchor_word_positions_verified"])
+            self.assertNotIn("wordtoken",json.dumps(result))
+            return row
+
+        one_change=list(original)
+        one_change[18]="differentlyEncodedOriginalWord"
+        altered=study(one_change)
+        self.assertEqual(
+            altered["full_exact_word_sequence_occurrences_in_original_volume"],0)
+        exact=altered["bounded_original_source_against_ccel_word_collation"]
+        self.assertEqual(exact["identical_case_sensitive_prefix_word_tokens"],18)
+        self.assertEqual(exact["identical_case_sensitive_suffix_word_tokens"],41)
+        self.assertEqual(exact["original_inner_unaligned_word_tokens"],1)
+        self.assertEqual(exact["ccel_inner_unaligned_word_tokens"],1)
+        self.assertEqual(exact["ccel_minus_source_visible_word_count_delta"],0)
+        self.assertFalse(exact["all_bounded_ccel_source_word_tokens_exact"])
+
+        inserted=study(original[:18]+["oneAddedWord"]+original[18:])
+        inside=inserted["bounded_original_source_against_ccel_word_collation"]
+        self.assertEqual(inside["ccel_minus_source_visible_word_count_delta"],1)
+        self.assertEqual(inside["original_inner_unaligned_word_tokens"],0)
+        self.assertEqual(inside["ccel_inner_unaligned_word_tokens"],1)
+        self.assertEqual(inside["identical_case_sensitive_suffix_word_tokens"],42)
+
+        whole=study(original)
+        self.assertTrue(
+            whole["bounded_original_source_against_ccel_word_collation"][
+                "all_bounded_ccel_source_word_tokens_exact"])
+
+
 if __name__=="__main__":
     unittest.main()
