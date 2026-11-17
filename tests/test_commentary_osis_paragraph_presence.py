@@ -12,6 +12,7 @@ from commentary_osis_paragraph_presence import (
     original_ccel_paragraph_words,
     exact_original_paragraph_runs_in_osis,
     original_authoring_chapter_scope_metadata,
+    PrivateOriginalChapterNativeAnchorCoverage,
 )
 
 
@@ -153,6 +154,64 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
             exact_original_paragraph_runs_in_osis(
                 invalid,expected_osis_sha256=sha256(invalid).hexdigest(),
                 original_cases=[(case,words)])
+
+
+    def test_original_milestone_private_sink_matches_authenticated_scope_hash(self):
+        from lxml import etree
+        chapter_words = [f"privateword{i:02d}" for i in range(14)]
+        xml = (
+            '<div type="book" osisID="Gen">outside'
+            '<chapter sID="Gen.1"/><p>' + " ".join(chapter_words) +
+            '</p><chapter eID="Gen.1"/>next</div>'
+        )
+        root = etree.fromstring(xml.encode())
+        sink = []
+        metadata = original_authoring_chapter_scope_metadata(
+            root, "Gen.1", _private_words_sink=sink)
+        self.assertEqual(sink, chapter_words)
+        self.assertEqual(metadata["bounded_original_chapter_visible_words"], 14)
+        self.assertNotIn("privateword", json.dumps(metadata))
+        with self.assertRaises(ValueError):
+            original_authoring_chapter_scope_metadata(
+                root, "Gen.1", _private_words_sink=sink)
+
+    def test_private_source_native_anchor_census_deduplicates_repeated_k_raw(self):
+        words = [f"privateword{i:02d}" for i in range(14)]
+        census = PrivateOriginalChapterNativeAnchorCoverage({"Gen.1": words})
+        first = ("<p>" + " ".join(words[:10]) + "</p>").encode()
+        second = ("<div>" + " ".join(words[5:]) + "</div>").encode()
+        census.observe("I", "Gen.0.0", b"introduction ignored")
+        census.observe("K", "Exod.1.1", b"unrelated chapter ignored")
+        census.observe("K", "Gen.1.1", first)
+        census.observe("K", "Gen.1.2", first)
+        census.observe("K", "Gen.1.3", second)
+        result = census.report()
+        row = result["original_chapter_cases"][0]
+        self.assertEqual(row["actual_occupied_original_numbered_K_slots"], 3)
+        self.assertEqual(row["distinct_original_native_raw_payloads"], 2)
+        self.assertEqual(row["original_unique_eight_word_windows"], 7)
+        self.assertEqual(
+            row["exact_unique_source_eight_word_windows_in_original_native_K"], 5)
+        self.assertFalse(
+            row["one_original_native_raw_payload_matches_entire_original_chapter"])
+        self.assertNotIn("privateword", json.dumps(result))
+        self.assertNotIn("Gen.1", json.dumps(result))
+        self.assertTrue(result["intro_and_top_payload_parity_not_compared"])
+
+    def test_private_source_native_anchor_census_rejects_bad_xml_and_missing_chapter(self):
+        words = [f"privateword{i:02d}" for i in range(10)]
+        census = PrivateOriginalChapterNativeAnchorCoverage({"Gen.1": words})
+        with self.assertRaises(ValueError):
+            census.observe("K", "Gen.1.1", b"<p>unclosed")
+        with self.assertRaises(ValueError):
+            census.observe("K", "Gen.1.2", b"<fragment>bad &entity;</fragment>")
+        empty = PrivateOriginalChapterNativeAnchorCoverage({"Gen.1": words})
+        empty.observe("K", "Exod.1.1", b"no selected original K")
+        with self.assertRaises(ValueError):
+            empty.report()
+        with self.assertRaises(ValueError):
+            PrivateOriginalChapterNativeAnchorCoverage({"Gen.1": ["short"]})
+
 
 
 if __name__=="__main__":
