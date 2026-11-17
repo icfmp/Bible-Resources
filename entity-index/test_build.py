@@ -28,8 +28,10 @@ class EntityIndexTests(unittest.TestCase):
             "source_credit": "ACAI source test", "reviewed_hebrew_source": "pinned-test",
             "reviewed_greek_source": "pinned-test", "source_records_expected": 0,
             "source_editions": {
-                "wlc": {"edition": "pinned-test", "word_id_prefix": "o"},
-                "sblgnt": {"edition": "pinned-test", "word_id_prefix": "n"},
+                "wlc": {"edition": "pinned-test", "word_id_prefix": "o",
+                        "word_id_digits": 12},
+                "sblgnt": {"edition": "pinned-test", "word_id_prefix": "n",
+                           "word_id_digits": 11},
             },
             "source_corpora": {"wlc": "wlc", "SBLGNT": "sblgnt",
                                "sblgnt": "sblgnt"},
@@ -271,6 +273,13 @@ class EntityIndexTests(unittest.TestCase):
             self.build()
         self.lock["source_corpora"] = {"wlc": "wlc", "SBLGNT": "wlc"}
         with self.assertRaisesRegex(ValueError, "word prefix incompatible"):
+            self.build()
+        self.lock["source_corpora"] = {"wlc": "wlc", "SBLGNT": "sblgnt"}
+        original = self.root / "people" / "json" / "Phoebe.json"
+        value = json.loads(original.read_text(encoding="utf-8"))
+        value["explicit_instances"]["SBLGNT"] = [["n45016001004suffix"]]
+        original.write_text(json.dumps(value), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "malformed original word ID"):
             self.build()
 
     def test_pinned_absent_word_is_quarantined_from_lookup_not_source(self):
