@@ -18,6 +18,7 @@ import re
 from pathlib import Path
 import subprocess
 import tempfile
+import traceback
 import zipfile
 
 from lxml import etree
@@ -948,7 +949,20 @@ def main(argv=None):
                    source_volume=args.source_volume)
         code=0
     except (ValueError,OSError,RuntimeError,zipfile.BadZipFile) as exc:
+        # This workflow may fail while reading sensitive original commentary.
+        # Only the source-controlled function and line are safe to show:
+        # exception messages and source-body snippets stay in the private receipt.
+        frames = [
+            (Path(f.filename).name, f.name, f.lineno)
+            for f in traceback.extract_tb(exc.__traceback__)
+            if Path(f.filename).name.startswith(("commentary_", "pilot_", "sword_"))
+        ]
+        site = frames[-1] if frames else ("unclassified", "unclassified", 0)
+        print("Private source-text failure location (no exception text): "
+              + "/".join(map(str, site)) + " (" + type(exc).__name__ + ")")
         result={"status":"blocked","resource_id":args.resource_id,"reason":str(exc),
+                "safe_failure_site":list(site),
+                "safe_exception_class":type(exc).__name__,
                 "full_authored_to_stock_parity_verified":False,"published":False}
         code=1
     args.report.parent.mkdir(parents=True,exist_ok=True)
