@@ -110,15 +110,18 @@ class EntityIndexTests(unittest.TestCase):
                           explicit_instances={"SBLGNT": [
                               ["n40008028011"], ["n41005001012"]]})
         self.write_record("places", "Gadara.2", references=[])
+        self.write_record("people", "Shallum.5",
+                          references=["13003015"],
+                          explicit_instances={"wlc": [["o130030150101"]]})
         source_before = path.read_bytes()
         decisions = json.loads(
             Path(__file__).with_name("editorial-decisions.json").read_text()
         )["decisions"]
         report = self.build(decisions)
-        self.assertEqual(report["statistics"]["source_records"], 14)
-        self.assertEqual(report["statistics"]["index_entities"], 11)
+        self.assertEqual(report["statistics"]["source_records"], 15)
+        self.assertEqual(report["statistics"]["index_entities"], 12)
         self.assertEqual(report["statistics"]["quarantined_records"], 3)
-        self.assertEqual(report["statistics"]["reviewed_entries"], 9)
+        self.assertEqual(report["statistics"]["reviewed_entries"], 10)
         by_id = {row["id"]: row for row in report["entities"]}
         self.assertIn("work:BookOfJashar", by_id)
         self.assertIn("place:PerezUzzah", by_id)
@@ -140,6 +143,15 @@ class EntityIndexTests(unittest.TestCase):
                          ["explicit_instances"]["SBLGNT"], [["n40008028011"]])
         self.assertEqual(by_id["person:Johanan"]["canonical_id"],
                          "person:Johanan")
+        self.assertEqual(by_id["person:Shallum.5"]["canonical_id"],
+                         "person:Jehoahaz.3")
+        self.assertEqual(by_id["person:Shallum.5"]["source_primary_id"],
+                         "person:Shallum.5")
+        self.assertEqual(by_id["person:Shallum.5"]["occurrences"]
+                         ["explicit_instances"]["wlc"], [["o130030150101"]])
+        self.assertEqual(report["by_word"]["wlc:o130030150101"],
+                         [{"entity_id": "person:Shallum.5",
+                           "link_type": "explicit_instances"}])
         self.assertEqual(by_id["person:Johanan"]["source_primary_id"],
                          "person:Jehoahaz.3")
         self.assertEqual(by_id["person:Jehoahaz.3"]["occurrences"]
