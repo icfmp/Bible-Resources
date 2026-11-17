@@ -14,6 +14,24 @@ from pilot_preflight import PilotError
 
 
 class CommentaryOriginalStockTextTests(unittest.TestCase):
+    def test_stock_extra_words_around_source_do_not_invoke_suffix_only_prefix_probe(self):
+        original, proof = _original_source_markers(self.source())
+        observed = compare_private_texts(original, {
+            "Gen.1.1": b"<p>Extra opening words. Exact private text; punctuation? "
+                       b"Extra closing words.</p>",
+            "Gen.1.4": b"<p>Original next paragraph.</p>",
+        })
+        locations = observed["stock_containment_additional_word_position_counts"]
+        self.assertEqual(
+            locations.get("extra_stock_words_before_and_after_original_body"), 1)
+        self.assertEqual(
+            observed["original_body_mid_stock_or_at_start_not_assumed_covered_by_prefix_probe"], 1)
+        self.assertEqual(
+            observed["strict_original_body_at_stock_suffix_prefix_topology_cases"], 0)
+        self.assertEqual(
+            observed["source_neighbor_compared_to_stock_prefix_entry_count"], 0)
+        self.assertFalse(observed["all_selected_verse_range_body_text_exact_matches"])
+
     def test_empty_authorial_div_remains_in_original_marker_census(self):
         xml = self.source().replace(
             b"<div><p>Original next paragraph.</p></div>",
