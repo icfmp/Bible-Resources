@@ -472,7 +472,7 @@ class OriginalExtraGapNativeChapterProbe:
         if not needle or len(needle)>len(haystack):
             return False
         # Explicit token separators keep exact whole-word boundary semantics.
-        sep="\\0"
+        sep=chr(0)
         return (sep+sep.join(needle)+sep) in (sep+sep.join(haystack)+sep)
 
     def observe(self, kind:str, key:str,raw:bytes) -> None:
