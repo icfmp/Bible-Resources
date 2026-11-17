@@ -745,7 +745,7 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
             '<div type="book" osisID="Deut">'
             '<chapter sID="Deut.34"/>'
             '<p>'+" ".join(chapter_words)+'</p>'
-            '<chapter eID="Deut.34"/>'
+            '<chapter eID="Deut.34"/> '
             '<p>'+" ".join(after)+'</p></div>')
         book=etree.fromstring(original.encode())
         source_words=[]
