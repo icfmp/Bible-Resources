@@ -66,6 +66,13 @@ def apply_word_edits(entry, decision):
                 raise ValueError(f"{entry['source_id']}: source group already exists: {group}")
             present.append(group)
     references = entry["references"]
+    for ref in decision.get("remove_references", []):
+        if not isinstance(ref, str) or len(ref) != 8 or not ref.isdigit():
+            raise ValueError(f"{entry['source_id']}: invalid removed verse reference")
+        if references.count(ref) != 1:
+            raise ValueError(
+                f"{entry['source_id']}: cannot remove missing or non-unique verse: {ref}")
+        references.remove(ref)
     for ref in decision.get("add_references", []):
         if not isinstance(ref, str) or len(ref) != 8 or not ref.isdigit():
             raise ValueError(f"{entry['source_id']}: invalid added verse reference")
