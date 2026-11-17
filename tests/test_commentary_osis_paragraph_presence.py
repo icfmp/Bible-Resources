@@ -578,5 +578,69 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
             PrivateOriginalChapterNativeAnchorCoverage({})
 
 
+    def test_complete_visible_nonwhitespace_parity_includes_native_body_punctuation(self):
+        words=[f"chapterword{i:02d}" for i in range(16)]
+        source_visible="("+ " ".join(words[:8]) + "): " + " ".join(words[8:]) + "!"
+        source_words=__import__("re").findall(r"\\w+",source_visible)
+        self.assertEqual(source_words,words)
+
+        def probe(mid_punctuation=")",ending="!",additional_intro=False):
+            census=PrivateOriginalChapterNativeAnchorCoverage(
+                {"Gen.1":list(words)},
+                private_chapter_visible_texts={"Gen.1":source_visible})
+            intro=("<title>( " + " ".join(words[:8]) +
+                   " " + mid_punctuation + " </title>")
+            census.observe("I","Gen.1.0",intro.encode())
+            numbered=("<p> :  "+ " ".join(words[8:]) +
+                      " "+ending+"</p>")
+            census.observe("K","Gen.1.1",numbered.encode())
+            return census.report()["original_chapter_cases"][0]
+
+        accurate=probe()
+        self.assertTrue(accurate[
+            "complete_source_chapter_nonwhitespace_visible_characters_equal"])
+        self.assertEqual(accurate[
+            "complete_source_chapter_nonwhitespace_characters"],
+            accurate["complete_native_chapter_nonwhitespace_characters"])
+        self.assertEqual(accurate[
+            "complete_source_chapter_visible_nonwhitespace_sha256"],
+            accurate["complete_native_chapter_visible_nonwhitespace_sha256"])
+        self.assertIsNone(
+            accurate["first_nonwhitespace_character_mismatch_offset_not_verse"])
+        self.assertTrue(accurate[
+            "complete_character_audit_ignores_whitespace_not_xml_structure"])
+        mismatch=probe(mid_punctuation=";")
+        self.assertFalse(mismatch[
+            "complete_source_chapter_nonwhitespace_visible_characters_equal"])
+        self.assertNotEqual(mismatch[
+            "complete_source_chapter_visible_nonwhitespace_sha256"],
+            mismatch["complete_native_chapter_visible_nonwhitespace_sha256"])
+        self.assertIsInstance(
+            mismatch["first_nonwhitespace_character_mismatch_offset_not_verse"],int)
+        final=probe(ending="?")
+        self.assertFalse(final[
+            "complete_source_chapter_nonwhitespace_visible_characters_equal"])
+        self.assertNotIn("chapterword",json.dumps(mismatch))
+        self.assertNotIn("chapterword",json.dumps(final))
+
+    def test_extra_unlocated_native_intro_not_falsely_required_for_source_k_parity(self):
+        words=[f"originalword{i:02d}" for i in range(12)]
+        source=" ".join(words)+"!"
+        census=PrivateOriginalChapterNativeAnchorCoverage(
+            {"Gen.1":words},private_chapter_visible_texts={"Gen.1":source},
+            private_book_pre_chapter_words={"Gen.1":[]})
+        census.observe("K","Gen.1.1",("<p>"+source+"</p>").encode())
+        census.observe("I","Gen.1.0",
+                       b"<p>Other independently published original introduction</p>")
+        row=census.report()["original_chapter_cases"][0]
+        self.assertTrue(row[
+            "complete_source_chapter_nonwhitespace_visible_characters_equal"])
+        self.assertFalse(row["all_chapter_I_bodies_uniquely_located_in_source"])
+        self.assertIsNone(
+            row["source_uncovered_words_after_unique_K_plus_chapter_I_intervals"])
+        self.assertTrue(row[
+            "complete_character_audit_requires_strict_exact_native_word_partition"])
+
+
 if __name__=="__main__":
     unittest.main()
