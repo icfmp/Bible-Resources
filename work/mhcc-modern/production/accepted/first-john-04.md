@@ -51,7 +51,7 @@ Thus it reveals that **God is love**.
 
 Some mysteries remain dark to our limited understanding.
 
-Nevertheless, salvation is available through this love, while unbelief and refusal to repent exclude sinners from eternal happiness.
+God has shown his love so fully that **only unbelief and refusal to repent** prevent sinners from receiving eternal happiness, although **strict justice would condemn us to hopeless misery** because we have broken our Creator's laws.
 
 We cannot adequately express the greatness of God's free, astonishing love for people who deserved judgment and who could neither increase nor diminish his greatness.
 
@@ -116,6 +116,9 @@ But when natural hostility becomes affection and gratitude, thank God for this p
 ---
 
 ## Editorial review — 1 John 4
+
+**2026-11-17 second CCEL reading:** restored Henry's full **unbelief/impenitence versus strict justice's hopeless misery** contrast; the earlier draft stated only exclusion from eternal happiness, concealing the author's explicit judgment reasoning. [CCEL 1 John 4](https://ccel.org/ccel/henry/mhcc.liv.iv.html). Native released 0.1.1 original prose and independent signoff still pending.
+
 
 **Whole secondary English CCEL witness directly compared:** [CCEL, 1 John 4](https://ccel.org/ccel/henry/mhcc.liv.iv.html). Exact released `MHCC 0.1.1` remains primary for source-native SWORD and independent acceptance.
 
