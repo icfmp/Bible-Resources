@@ -112,7 +112,7 @@ class IndependentBiblicalTitleWitnessTests(unittest.TestCase):
             r'\add A Psalm\w David|strong="H1732"\w*\add*',
             r'\f + \fr 7.1 \ft note\f*',
             r'\nd LORD\nd*',
-            r'\w word|strong="H99999"\w*',
+            r'\w word|strong="H999999"\w*',
         ]
         for title in unsafe:
             with self.subTest(title=title):
