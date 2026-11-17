@@ -87,7 +87,8 @@ def canonical_source_corpus(source_lock: dict, raw_corpus: str) -> str:
 
 def build(source_root: Path, source_lock: dict, editorial: dict,
           source_absences: dict | None = None,
-          source_verse_absences: dict | None = None) -> dict:
+          source_verse_absences: dict | None = None,
+          reference_qualifications: dict | None = None) -> dict:
     if source_lock.get("schema_version") != 1 or editorial.get("schema_version") != 1:
         raise ValueError("Unsupported lock or editorial decision schema")
     decisions = {}
@@ -290,6 +291,72 @@ def build(source_root: Path, source_lock: dict, editorial: dict,
             "evidence": verse_evidence,
             "scope": "absent_from_pinned_original_word_inventory_only",
         }
+    # Reference claims without matching source-edition word anchors may derive
+    # from textual variants, later epistle subscriptions or historical
+    # identifications. Their reference lists stay exactly as imported.
+    if reference_qualifications is None:
+        reference_qualifications = {
+            "schema_version": 1, "corpus": "sblgnt",
+            "source_edition": source_lock["source_editions"]["sblgnt"]["edition"],
+            "claims": [],
+        }
+    if reference_qualifications.get("schema_version") != 1:
+        raise ValueError("Unsupported reference-qualification schema")
+    ref_corpus = reference_qualifications.get("corpus")
+    ref_edition = reference_qualifications.get("source_edition")
+    ref_catalog = source_lock["source_editions"].get(ref_corpus)
+    if not isinstance(ref_catalog, dict) or ref_catalog.get("edition") != ref_edition:
+        raise ValueError("Reference qualifications not pinned to original edition")
+    claim_rows = reference_qualifications.get("claims")
+    if not isinstance(claim_rows, list):
+        raise ValueError("Malformed reference qualification claims")
+    by_source_id = {entry["source_id"]: entry for entry in entries}
+    qualified = defaultdict(list)
+    seen_claims = set()
+    allowed = {
+        "textual_variant_name_not_in_pinned_edition",
+        "traditional_subscription_candidate",
+    }
+    for claim in claim_rows:
+        if not isinstance(claim, dict):
+            raise ValueError("Malformed reference qualification claim")
+        source_id, verse = claim.get("source_id"), claim.get("verse_id")
+        cls, proof = claim.get("classification"), claim.get("evidence")
+        if (not isinstance(source_id, str)
+                or not isinstance(verse, str) or len(verse) != 8
+                or not verse.isdigit() or cls not in allowed
+                or not isinstance(proof, list) or not proof
+                or any(not isinstance(v, str) or not v.strip() for v in proof)):
+            raise ValueError(f"Invalid reference qualification claim: {claim!r}")
+        claim_key = (source_id, verse)
+        if claim_key in seen_claims:
+            raise ValueError(f"Duplicate reference qualification: {claim_key}")
+        seen_claims.add(claim_key)
+        entry = by_source_id.get(source_id)
+        if entry is None:
+            raise ValueError(f"Reference qualification points to absent index record: {source_id}")
+        if verse not in entry["references"]:
+            raise ValueError(f"Reference qualification has no source reference: {claim_key}")
+        for field, corpora in entry["occurrences"].items():
+            for raw_corpus, groups in corpora.items():
+                if canonical_source_corpus(source_lock, raw_corpus) != ref_corpus:
+                    continue
+                for group in groups:
+                    if any(word[1:9] == verse for word in group):
+                        raise ValueError(
+                            f"Reference qualification conflicts with exact original word "
+                            f"anchor: {source_id} {verse} {field}")
+        qualified[f"{ref_corpus}:{verse}"].append({
+            "entity_id": entry["id"],
+            "source_id": source_id,
+            "source_edition": ref_edition,
+            "classification": cls,
+            "evidence": proof,
+        })
+    qualified = {
+        ref: sorted(rows, key=lambda row: (row["entity_id"], row["source_id"]))
+        for ref, rows in sorted(qualified.items())
+    }
     return {
         "format": "bible-entity-index",
         "schema_version": 1,
@@ -316,12 +383,15 @@ def build(source_root: Path, source_lock: dict, editorial: dict,
             "unattested_source_verse_reference_claims": sum(
                 len(x["source_reference_claims"])
                 for x in unattested_verses.values()),
+            "qualified_source_reference_claims": sum(
+                len(rows) for rows in qualified.values()),
         },
         "quarantined": sorted(quarantined, key=lambda x: x["source_id"]),
         "entities": entries,
         "by_word": by_word,
         "unattested_source_words": unattested,
         "unattested_source_verses": unattested_verses,
+        "qualified_source_references": qualified,
     }
 
 
@@ -337,6 +407,9 @@ def main():
     parser.add_argument("--source-verse-absences", type=Path,
                         default=Path(__file__).with_name("source-unattested-verses.json"),
                         help="Edition-specific pinned original-word verse inventory evidence")
+    parser.add_argument("--reference-qualifications", type=Path,
+                        default=Path(__file__).with_name("source-reference-qualifications.json"),
+                        help="Pinned source-specific textual variant/subscription claim receipts")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--verify-source-commit", action="store_true",
                         help="Require the local Git HEAD to equal the source lock")
@@ -350,7 +423,8 @@ def main():
             raise SystemExit(f"Wrong pinned source revision: {actual}")
     result = build(args.source, lock, read_json(args.decisions),
                    read_json(args.source_absences),
-                   read_json(args.source_verse_absences))
+                   read_json(args.source_verse_absences),
+                   read_json(args.reference_qualifications))
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n",

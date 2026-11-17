@@ -200,6 +200,40 @@ resolves to `person:Phoebe` under the pinned Macula Greek edition.
 Greek negative-lookup checks alone are **not** enough to demonstrate that
 the index really supports Greek original-word lookup.
 
+## Version-specific reference provenance: variants and subscriptions
+
+A verse reference can have editorial or historical interest without a matching
+word in the *specific pinned Greek edition* used for lexical navigation.
+The independent `source-reference-qualifications.json` manifest records
+**12 audited source-record/verse claims**, with the exact source record,
+verse, pinned edition, classification and written evidence:
+
+- **2** alternate textual reading/identification cases:
+  `place:Bethabara` (John 1:28, where pinned SBLGNT reads *Bethany*)
+  and `place:Trogyllium` (Acts 20:15, absent as a name in pinned SBLGNT).
+  These are **not deleted** and are not misrepresented as SBLGNT word hits.
+  They remain candidates for a separately sourced textual tradition.
+- **10** named **traditional subscription candidates** drawn from the
+  validated sample in inherited [ACAI #86](https://github.com/icfmp/ACAI/issues/86):
+  Phoebe, Cenchreae, Corinthus, Achaicus, Fortunatus, Epaphroditus,
+  Philemon, Nero, the Caesar.3 alias, and Pacatiana. The names are not
+  attested by the relevant SBLGNT letter-final verse, even though
+  traditional subscriptions may contain them. The designation
+  *candidate* distinguishes this diagnostic from a full critical edition
+  of every letter's subscription history.
+
+Each claim is attached **only** to the original record and verse for which
+the source reference already exists. The builder rejects missing source
+records, unreferenced verses, duplicate classifications, wrong source
+editions, missing proof and claims with a **real original-language word
+anchor in that verse**. The resulting `qualified_source_references`
+is a corpus+verse keyed evidence index. It **does not** alter the original
+`references`, `key_references`, word groups, Bible text or versification.
+It also does not imply the entire 6,641-entry dataset has been reviewed.
+
+Further full-epistle subscription and variant-source checks remain tracked
+in [#299](https://github.com/icfmp/Bible-Resources/issues/299).
+
 ## Offline lookup and uncertainty handling
 
 `resolve.py` exposes `EntityResolver`. It requires a corpus name, its

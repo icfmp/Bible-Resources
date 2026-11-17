@@ -50,10 +50,11 @@ class EntityIndexTests(unittest.TestCase):
         return path
 
     def build(self, decisions=(), source_absences=None,
-              source_verse_absences=None):
+              source_verse_absences=None, reference_qualifications=None):
         return builder.build(self.root, self.lock,
                              {"schema_version": 1, "decisions": list(decisions)},
-                             source_absences, source_verse_absences)
+                             source_absences, source_verse_absences,
+                             reference_qualifications)
 
     def test_actual_editorial_pilots_preserve_source_and_correct_classification(self):
         path = self.write_record("people", "Jashar",
@@ -227,6 +228,56 @@ class EntityIndexTests(unittest.TestCase):
             explicit_instances={"wlc": [["o020020130103"]]})
         with self.assertRaisesRegex(ValueError, "direct/pronominal"):
             self.build(source_absences=audit)
+
+    def test_source_reference_qualifications_preserve_variant_and_subscription(self):
+        bethabara = self.write_record(
+            "places", "Bethabara", references=["43001028"])
+        phoebe = self.write_record(
+            "people", "Phoebe", references=["45016001", "45016027"],
+            explicit_instances={"SBLGNT": [["n45016001004"]]})
+        before = (bethabara.read_bytes(), phoebe.read_bytes())
+        claim_manifest = {
+            "schema_version": 1, "corpus": "sblgnt",
+            "source_edition": "pinned-test",
+            "claims": [
+                {"source_id": "place:Bethabara", "verse_id": "43001028",
+                 "classification": "textual_variant_name_not_in_pinned_edition",
+                 "evidence": ["Greek pinned source says Bethany"]},
+                {"source_id": "person:Phoebe", "verse_id": "45016027",
+                 "classification": "traditional_subscription_candidate",
+                 "evidence": ["No Phoebe in canonical last verse"]},
+            ],
+        }
+        result = self.build(reference_qualifications=claim_manifest)
+        self.assertEqual(result["statistics"]["qualified_source_reference_claims"], 2)
+        qualified = result["qualified_source_references"]
+        self.assertEqual(qualified["sblgnt:43001028"][0]["entity_id"],
+                         "place:Bethabara")
+        self.assertEqual(qualified["sblgnt:45016027"][0]["classification"],
+                         "traditional_subscription_candidate")
+        self.assertEqual(result["entities"][0]["references"], ["45016001", "45016027"])
+        self.assertEqual(result["by_word"]["sblgnt:n45016001004"][0]["entity_id"],
+                         "person:Phoebe")
+        self.assertEqual((bethabara.read_bytes(), phoebe.read_bytes()), before)
+        with self.assertRaisesRegex(ValueError, "Duplicate reference qualification"):
+            self.build(reference_qualifications=dict(
+                claim_manifest, claims=claim_manifest["claims"] * 2))
+        with self.assertRaisesRegex(ValueError, "not pinned"):
+            self.build(reference_qualifications=dict(
+                claim_manifest, source_edition="other"))
+        with self.assertRaisesRegex(ValueError, "no source reference"):
+            self.build(reference_qualifications=dict(
+                claim_manifest, claims=[dict(
+                    claim_manifest["claims"][1], verse_id="45016025")]))
+        with self.assertRaisesRegex(ValueError, "absent index record"):
+            self.build(reference_qualifications=dict(
+                claim_manifest, claims=[dict(
+                    claim_manifest["claims"][1], source_id="person:Unknown")]))
+        changed = json.loads(phoebe.read_text(encoding="utf-8"))
+        changed["explicit_instances"]["SBLGNT"].append(["n45016027001"])
+        phoebe.write_text(json.dumps(changed), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "conflicts with exact original word anchor"):
+            self.build(reference_qualifications=claim_manifest)
 
     def test_source_verse_absence_only_qualifies_raw_references(self):
         original = self.write_record(
