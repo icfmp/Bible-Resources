@@ -1455,6 +1455,7 @@
         "subprocess",
         "sword_native_raw_corpus_inventory",
         "time",
+        "xml",
         "zipfile"
       ],
       "reader_tool_signals": [
