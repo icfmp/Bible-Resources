@@ -33,6 +33,14 @@ def fixture():
              "source_id": "person:OldAlias", "references": [],
              "editorial_reason": "Documented spelling form, not a distinct person."},
         ],
+        "unattested_source_words": {
+            "wlc:o010010010041": {
+                "source_edition": "Macula-WLC@frozen",
+                "evidence": [{"source": "pinned-audit"}],
+                "source_claims": [{"entity_id": "person:Alpha",
+                                   "link_type": "subject_referents"}],
+            },
+        },
         "by_word": {
             "wlc:o010010010011": [
                 {"entity_id": "person:Alpha", "link_type": "explicit_instances"},
@@ -99,6 +107,17 @@ class ResolverTests(unittest.TestCase):
         self.assertEqual(r["candidates"], [])
         self.assertEqual(r["canonical_ids"], [])
 
+    def test_source_unattested_word_never_becomes_entity_candidate(self):
+        r = self.lookup(word_id="o010010010041")
+        self.assertEqual(r["status"], "unattested_source_word_id")
+        self.assertEqual(r["canonical_ids"], [])
+        self.assertEqual(r["candidates"], [])
+        self.assertEqual(r["source_absence"]["evidence"],
+                         [{"source": "pinned-audit"}])
+        self.assertEqual(
+            self.lookup(word_id="o010010010041", edition="incorrect")["status"],
+            "incompatible_source_edition")
+
     def test_rejects_corrupt_or_incompatible_index(self):
         data = fixture()
         data["schema_version"] = 2
@@ -111,6 +130,11 @@ class ResolverTests(unittest.TestCase):
             module.EntityResolver(data).resolve(
                 corpus="wlc", edition="Macula-WLC@frozen",
                 word_id="o010010010011", verse_id="01001001")
+        data = fixture()
+        data["by_word"]["wlc:o010010010041"] = [
+            {"entity_id": "person:Alpha", "link_type": "subject_referents"}]
+        with self.assertRaisesRegex(ValueError, "must not remain lookup-indexed"):
+            module.EntityResolver(data)
         data = fixture()
         data["entities"].append(copy.deepcopy(data["entities"][0]))
         with self.assertRaisesRegex(ValueError, "Duplicate entity IDs"):

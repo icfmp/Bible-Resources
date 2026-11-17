@@ -124,6 +124,34 @@ be verified, and different textual editions/versifications cannot be silently
 equated. The index does not assert that ACAI's every `references` entry is
 attested by the pinned critical text.
 
+## Pinned-source original-word absence protection
+
+The independent index must not present a missing original word ID as if the
+reader clicked an existing word. A source-version-bound manifest
+[`source-unattested-words.json`](source-unattested-words.json) records the
+**18 exact Hebrew word IDs / 19 raw source word assignments** absent in the
+pinned WLC audit ([inherited ACAI #80](https://github.com/icfmp/ACAI/issues/80)).
+All 18 are indirect `subject_referents` source claims, not direct-name words.
+
+This manifest is **data evidence**, not hardcoded logic for specific
+biblical entities. During compilation the generic builder checks that every
+reported ID is actually present in the input annotations, is linked only by
+the audited indirect field, matches the pinned source-edition identifier and
+has source provenance. It then retains the original IDs and token groups
+**unchanged** inside the derived entity records but removes these 18
+unattested IDs from `by_word`. The `unattested_source_words` section lists
+each quarantined ID, the **distinct** affected entity/link-type pairs and its exact
+audit provenance. The `unattested_raw_word_assignments` statistic separately
+counts *all original source-word assignments including any repeated groups*,
+so multiplicity is not mistaken for an additional independent entity. Offline resolution returns `unattested_source_word_id`
+instead of a false match or a fabricated replacement ID.
+
+**Important:** this is protection against the 18 *already documented*
+source-absent IDs, **not** a new full independent comparison of every
+original-language word against both pinned texts. The general source
+parity audit and source-version/versification compatibility remain pending
+in [#299](https://github.com/icfmp/Bible-Resources/issues/299).
+
 ## Offline lookup and uncertainty handling
 
 `resolve.py` exposes `EntityResolver`. It requires a corpus name, its
