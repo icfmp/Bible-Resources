@@ -543,16 +543,18 @@
         "zipfile"
       ],
       "reader_tool_signals": [
-        "xiphos"
+        "xiphos",
+        "jsword"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "fc3a84c4a43ae78213fc598a5851abdf44b3fe9718c22e6a05dffe7711919470",
+      "sha256_at_inventory": "c0004ab0ac4949e1299bece4a30d034ef216cb14197c23672acc5d5b00e0d46e",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 2,
+      "static_reference_count": 3,
       "static_references": [
         ".github/workflows/commentary-anchor-parity.yml",
+        ".github/workflows/commentary-mhc-private-jsword.yml",
         "tests/test_commentary_anchor_parity.py"
       ]
     },
@@ -1447,6 +1449,7 @@
         "pathlib",
         "pilot_preflight",
         "pilot_subprocess",
+        "probe_andbible_jsword",
         "re",
         "shutil",
         "subprocess",
@@ -1455,10 +1458,13 @@
         "zipfile"
       ],
       "reader_tool_signals": [
-        "xiphos"
+        "xiphos",
+        "andbible",
+        "android",
+        "jsword"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "42754539eb47446e43630ddaecb73e6489b9da2fa606cfb3761dd02adb7d942c",
+      "sha256_at_inventory": "ec084d46b8c4bfe123d937019b0e10277a05a22db6839cb9e031407d50ab5bab",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
@@ -3899,8 +3905,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
+        "scripts/commentary_osis_mixed_transport_probe.py",
         "scripts/commentary_andbible_jsword.py",
         "scripts/probe_private_repaired_darby_sword.py",
         ".github/workflows/darby-andbible-jsword.yml"
@@ -6147,13 +6154,14 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 8,
+      "static_reference_count": 9,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/commentary-anchor-parity.yml",
         ".github/workflows/commentary-editorial-section-scope.yml",
         ".github/workflows/commentary-evidence.yml",
         ".github/workflows/commentary-intake.yml",
+        ".github/workflows/commentary-mhc-private-jsword.yml",
         ".github/workflows/commentary-native-raw-corpus.yml",
         ".github/workflows/commentary-private-text-compare.yml",
         "docs/evidence/mhcc-274/editorial-section-scope-audit.md"
@@ -6181,11 +6189,12 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 11,
+      "static_reference_count": 12,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/commentary-anchor-parity.yml",
         ".github/workflows/commentary-editorial-section-scope.yml",
+        ".github/workflows/commentary-mhc-private-jsword.yml",
         ".github/workflows/commentary-native-raw-corpus.yml",
         ".github/workflows/commentary-private-candidate-xiphos-gui.yml",
         ".github/workflows/commentary-private-text-compare.yml",
