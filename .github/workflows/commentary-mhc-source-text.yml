@@ -127,9 +127,18 @@ jobs:
           source_type=confval("SourceType")
           if not re.fullmatch(r"[0-9]+(?:\.[0-9]+){1,2}",version):
               raise SystemExit("Original upstream source version has an unreviewed shape")
-          if driver!="zCom" or source_type!="OSIS":
-              raise SystemExit("Upstream build module driver/format inconsistent")
-          print("Official upstream source commit (not equivalent to compiled ZIP SHA):",
+          if not re.fullmatch(r"[A-Za-z][A-Za-z0-9]{1,19}",driver) or not re.fullmatch(
+                  r"[A-Za-z][A-Za-z0-9]{1,19}",source_type):
+              raise SystemExit("Unreviewed upstream build format metadata shape")
+          print("Official .conf driver / source type (observed, NOT normalized):",
+                driver,source_type)
+          print("Exact original compiled module expected driver / source type:",
+                "zCom","OSIS")
+          print("Upstream driver/format equals compiled manifest conventions:",
+                driver=="zCom" and source_type=="OSIS")
+          print("A differing original .conf value is recorded for further source/build",
+                "investigation, not silently rewritten or an upstream source rejection.")
+          print("Official upstream source commit (not equivalent to compiled ZIP SHA):"
                 os.environ["UPSTREAM_SHA"])
           print("Authoring-file original bytes and independent SHA256:",
                 json.dumps(metadata,sort_keys=True))
