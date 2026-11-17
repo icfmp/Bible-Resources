@@ -1332,7 +1332,7 @@ def probe_complete_original_transport(
         run = subprocess.run([
             str(osis2mod_binary), str(data),
             str(root / "source-original-private.osis.xml"),
-            "-z", "z", "-b", "3", "-v", "KJV"
+            "-z", "z", "-b", "3", "-s", "4", "-v", "KJV"
         ], cwd=root, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
            timeout=360, check=False)
     except (OSError, subprocess.TimeoutExpired):
@@ -1343,7 +1343,7 @@ def probe_complete_original_transport(
                 "readback_completed": False, "published": False}
     conf.write_text(
         f"[{module_id}]\nDataPath=./modules/comments/zcom/{module_id}\n"
-        "ModDrv=zCom\nCompressType=ZIP\nBlockType=CHAPTER\n"
+        "ModDrv=zCom4\nCompressType=ZIP\nBlockType=CHAPTER\n"
         "SourceType=OSIS\nVersification=KJV\nLang=en\n"
         "Description=Private whole-original text transport only\n",
         encoding="utf-8"
