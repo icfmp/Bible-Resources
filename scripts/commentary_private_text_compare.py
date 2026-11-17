@@ -1166,6 +1166,12 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
                 len(high_source_extra_span_candidates)>len(top_extra_span_cases),
             "no_source_or_native_text_exported":True,
         }
+        if high_extra_native_probe is not None:
+            high_extra_native_review[
+                "original_pinned_ccel_extra_gap_paragraph_structure"
+            ]=high_extra_native_probe.original_thml_extra_gap_structure(
+                original_xml,expected_source_sha256=original_sha
+            )
         alternative_probe=(
             OriginalProseAlternativeNativeSlotProbe(source,large_plain_cases)
             if large_plain_cases else None
