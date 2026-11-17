@@ -293,3 +293,21 @@ Public independent displayed-witness links: [CCEL Psalm IX](https://ccel.org/cce
 **Editorial reading:** 108 unique source-only first paragraphs are a **demonstrated biblical-title representation difference**, not missing Matthew Henry expositions. The four remaining source-first-paragraph differences are visibly titled biblical superscriptions but retain their own original editions/wording; do **not** count them as exact lexical matches or silently correct a punctuation/name/number form. **Three other Psalms source-longer alignments remain ambiguous and one has an unrelated source-vs-stock unlinked word-order/selection issue**, outside this 112 case scope. The separate true *expository* Psalm 7 `p` #6 (569 unlinked words) and the Acts 17 `p` #17 (235 words) remain separate human editorial/printed-lineage rights and accuracy gates. The printed 1828 Psalm 7 witness does not establish copy permission for CCEL XML.
 
 **No change** to any original CCEL XML, original CrossWire SWORD 2.2 K/I/TOP content or verse keys, commentary authorial prose, Bible verse text, public resource, package, release, catalogue or licence approval. [PR #286](https://github.com/icfmp/Bible-Resources/pull/286) remains draft/unmerged.
+
+## Four residual non-title Psalm source-vs-stock diagnostics (2026-11-17)
+
+The independent KJV title audit above accounts for **112 distinct CCEL source `p` #1 title differences** (108 token-identical after casefold, four authentic original Bible-title editions/typographic differences). This **does not** account for four further same-start source-longer Psalm word-relationship cases. Those were independently recovered from the **unmodified volume III metadata-only original source comparison** in [fully passing six-volume run #44128611332](https://github.com/icfmp/Bible-Resources/actions/runs/44128611332), artifact `mhc-ccel-volume-3-text-evidence`, ID **14347644321**.
+
+The original source line and SHA-bound original full `scripCom` reference identities are:
+
+| Original CCEL `scripCom` reference **verified by exact original-reference SHA-256**, not a native key correction | Original volume III XML line | Original full `scripCom` reference SHA-256 | Diagnostic classification |
+| --- | ---: | --- | --- |
+| `Bible:Ps.7.10-Ps.7.17` | **28009** | `7e287caceb659a7e811ea5a3842f697705e16b18710b2bab4207a1d933673115` | Ordered extra-source word relation, but several valid subsequence alignments; **no unique omitted-word location** |
+| `Bible:Ps.52.1-Ps.52.5` | **46600** | `b6655faf8863de5d9fb06630db0d3f09a317d7b93336db5c8d4d2401140eb1cd` | Same ambiguity from repeated original words |
+| `Bible:Ps.72.1` | **54125** | `3aca1e5bad6dbe089034f8b739c48c04e830c817a9afd594a0efd9765c1ca818f` | Same ambiguity from repeated original words |
+| `Bible:Ps.8.1-Ps.8.2` | **28212** | `703c962555d077250d516f34f7ae9a19c74a4c95f958a4fb5b1ed0889f3aef44` | Original/native unlinked prose word order or selection **genuinely differs**; outside ordered extra-word subsequence classification |
+
+The Ps 72 source reference is **a single verse**, not an invented multi-verse range. The four names/ranges were checked by recomputing SHA-256 of the exact candidate original `Bible:Ps...` source reference strings, and matching the actual source receipt line/ref hashes. They are *original source claims*, not verified compiled SWORD index assignments. The Psalm 7:10–17 case is **distinct from the previously audited Psalm 7:1–9** source opening `p` #1 (KJV biblical superscription) and `p` #6 (569 unlinked original extra exposition words). Do not conflate them.
+
+**Next limited editorial action:** investigate the real source paragraph, genuine `scripRef`/native reference offsets, original textual range and actual stock K/I payload of exactly these four entries. Ambiguous identical-word alignment alone cannot justify selecting a missing-word span. A true word-selection/order difference cannot be reduced to a generic KJV title treatment. Keep original CCEL XML, native stock archive, printed-edition witness, authorial prose and public resource **unchanged**; retain independent historical textual/rights gates. [Draft PR #286](https://github.com/icfmp/Bible-Resources/pull/286) remains unmerged.
+
