@@ -67,6 +67,11 @@ The builder contains **no chapter-specific or entity-specific code path**.
   rather than asserting that the Hebrew common noun “the king” identifies a
   historical man. No new identification of Jeremiah's kings or fathers is
   invented.
+- `person:Philistine` is **quarantined** as a fictitious singular man;
+  the two attested **plural gentilic** word IDs of Genesis 10:14 and
+  1 Chronicles 1:12 become source-verified additions to the existing
+  `group:Philistine` record. The 20 original speaker spans are **not**
+  indiscriminately copied to the group and remain preserved in frozen ACAI.
 
 The original ACAI IDs survive under `source_id` and the original source
 commit. Crosswalk clients **must not** interpret a historical `person:`
