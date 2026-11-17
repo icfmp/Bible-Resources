@@ -278,6 +278,44 @@ jobs:
                           linked_targets,
                       "source_or_compiled_paragraph_owner_not_inferred":True,
                     },sort_keys=True))
+          # Single original-authoring witness for the *entire* corpus. This
+          # collection is kept only inside this private job and never exported.
+          # Every chapter is revalidated using its actual start/end milestones,
+          # not guessed from a stock SWORD verse address or fixed list.
+          all_authored_chapter_words={}
+          all_authored_chapter_visible={}
+          all_authored_chapter_references={}
+          for original_book,book_div in book_divisions.items():
+              actual_original_starts=[]
+              for node in book_div.iter():
+                  if not isinstance(node.tag,str) or node.tag.rsplit("}",1)[-1]!="chapter":
+                      continue
+                  start=node.get("sID")
+                  if not start and node.get("osisID") and not node.get("eID"):
+                      start=node.get("osisID")
+                  if start:
+                      actual_original_starts.append(start)
+              for chapter_ref in actual_original_starts:
+                  if chapter_ref in all_authored_chapter_words:
+                      raise SystemExit("Original full authored corpus duplicate chapter")
+                  corpus_words=[]
+                  corpus_visible=[]
+                  corpus_targets=[]
+                  original_authoring_chapter_scope_metadata(
+                      book_div,chapter_ref,_private_words_sink=corpus_words,
+                      _private_visible_text_sink=corpus_visible,
+                      _private_reference_targets_sink=corpus_targets)
+                  if len(corpus_visible)!=1:
+                      raise SystemExit("Original full authored chapter has no visible source")
+                  all_authored_chapter_words[chapter_ref]=corpus_words
+                  all_authored_chapter_visible[chapter_ref]=corpus_visible[0]
+                  all_authored_chapter_references[chapter_ref]=corpus_targets
+          if not 100<=len(all_authored_chapter_words)<=1500:
+              raise SystemExit("Unreviewed actual full authored chapter corpus size")
+          print("Independently milestone-bounded full original authoring",
+                "OSIS chapter scopes prepared privately:",
+                len(all_authored_chapter_words),
+                "(original prose, XML, native keys and links not exported)")
           del div_nodes,source_xml
           conf=(root/"mhc.conf").read_text(encoding="utf-8")
           def confval(key):
@@ -454,6 +492,11 @@ jobs:
                   private_chapter_visible_texts=private_chapter_visible_texts,
                   private_chapter_reference_targets=private_chapter_reference_targets,
                   private_book_pre_chapter_words=private_book_pre_chapter_words)
+              full_authoring_census=PrivateOriginalChapterNativeAnchorCoverage(
+                  all_authored_chapter_words,
+                  private_chapter_visible_texts=all_authored_chapter_visible,
+                  private_chapter_reference_targets=all_authored_chapter_references,
+                  full_corpus_mode=True)
               env=dict(os.environ,SWORD_PATH=str(installed))
               index_bin=Path(os.environ["RUNNER_TEMP"])/"commentary-native-index"
               raw_bin=Path(os.environ["RUNNER_TEMP"])/"commentary-private-raw"
@@ -479,7 +522,9 @@ jobs:
                   if process.stdout is None:
                       raise SystemExit("Original commentary raw stream inaccessible")
                   native_report,native_k,native_i,native_u=parse_native_raw_corpus(
-                      process.stdout,on_entry=anchor_census.observe)
+                      process.stdout,on_entry=lambda kind,key,raw: (
+                          anchor_census.observe(kind,key,raw),
+                          full_authoring_census.observe(kind,key,raw)))
                   process.stdout.close()
                   if process.wait(timeout=360)!=0:
                       raise SystemExit("Original commentary raw reader failed")
@@ -505,6 +550,64 @@ jobs:
               print("Authenticated full 66-book source chapter milestones",
                     "versus entire actual native occupied K/I index:",
                     json.dumps(chapter_index_receipt,sort_keys=True))
+              # Exact set equality is independently checked against the
+              # original source/native chapter milestone receipt, not just
+              # equal counts or a preconfigured list of verse keys.
+              digest=sha256()
+              for ref in sorted(all_authored_chapter_words):
+                  raw_ref=ref.encode("ascii")
+                  digest.update(len(raw_ref).to_bytes(4,"big"))
+                  digest.update(raw_ref)
+              if (len(all_authored_chapter_words)!=chapter_index_receipt[
+                      "original_osis_unique_chapters"]
+                      or digest.hexdigest()!=chapter_index_receipt[
+                          "original_chapter_ref_set_sha256"]):
+                  raise SystemExit("Full original chapter source scopes differ from index")
+              original_full_corpus=full_authoring_census.report()
+              all_rows=original_full_corpus["original_chapter_cases"]
+              def cases_failing(field):
+                  return [row for row in all_rows if row[field] is not True]
+              incomplete_K=cases_failing(
+                  "all_distinct_native_K_bodies_have_unique_exact_source_intervals")
+              different_chars=cases_failing(
+                  "complete_source_chapter_nonwhitespace_visible_characters_equal")
+              different_links=cases_failing(
+                  "exact_original_reference_target_sequence_equal_in_source_and_native")
+              def hashed_cases(rows):
+                  return [row["original_chapter_reference_sha256"] for row in rows[:20]]
+              full_summary={
+                  "status":"COMPLETE_AUTHORED_OSIS_ALL_CHAPTERS_NATIVE_TEXT_RESEARCH_ONLY",
+                  "original_chapter_scopes":len(all_rows),
+                  "full_source_visible_word_tokens":sum(
+                      row["original_chapter_visible_words"] for row in all_rows),
+                  "distinct_original_native_K_raw_bodies":sum(
+                      row["distinct_original_native_raw_payloads"] for row in all_rows),
+                  "unique_exact_whole_original_K_chapter_failures":len(incomplete_K),
+                  "first_K_failure_chapter_ref_hashes":hashed_cases(incomplete_K),
+                  "complete_chapter_nonwhitespace_visible_character_matches":
+                      len(all_rows)-len(different_chars),
+                  "complete_chapter_nonwhitespace_visible_character_unverified_or_different":
+                      len(different_chars),
+                  "first_character_failure_chapter_ref_hashes":
+                      hashed_cases(different_chars),
+                  "original_source_inline_osisRef_attributes":sum(
+                      row["source_chapter_reference_elements"] for row in all_rows),
+                  "exact_ordered_native_link_target_chapter_matches":
+                      len(all_rows)-len(different_links),
+                  "link_target_unverified_or_different_chapters":
+                      len(different_links),
+                  "first_link_failure_chapter_ref_hashes":hashed_cases(different_links),
+                  "native_I_and_TOP_editorial_ownership_not_proven":True,
+                  "original_xml_note_paragraph_layout_structure_not_proven":True,
+                  "exact_historic_CCEl_source_equivalence_not_proven":True,
+                  "source_or_original_module_changed":False,
+                  "publication_or_redistribution_approved":False,
+              }
+              print("Full complete authentic original chapter visible text",
+                    "and inline reference original native corpus diagnostic",
+                    "(only closed aggregate metadata):",
+                    json.dumps(full_summary,sort_keys=True))
+              del all_rows,original_full_corpus
               print("Authenticated original source OSIS authentic chapter versus",
                     "full authentic original native K exact visible-word anchors",
                     "(closed metadata only, NOT authorial section/parity proof):",
@@ -515,6 +618,8 @@ jobs:
                     native_report["all_actual_raw_entries_scanned"])
           del private_chapter_words,private_chapter_visible_texts
           del private_chapter_reference_targets,private_book_pre_chapter_words,stock_zip
+          del all_authored_chapter_words,all_authored_chapter_visible
+          del all_authored_chapter_references,full_authoring_census
 
           print("Official upstream source commit (not equivalent to compiled ZIP SHA):",
                 os.environ["UPSTREAM_SHA"])
