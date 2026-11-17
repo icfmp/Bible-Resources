@@ -10,12 +10,12 @@ publication_status: "NOT RELEASED — FULL SWORD REBUILD PENDING"
 
 # Luke 17 — Modern English
 
-## Original chapter outline
+## Original chapter outline — explicit verse-label corrections
 
 | Original outline | Verses |
 | --- | --- |
-| To avoid offences, To pray for increase of faith, Humility taught. | 11–19 |
-| Ten lepers cleansed. | 1–10 |
+| To avoid offences, To pray for increase of faith, Humility taught. | 1–10 |
+| Ten lepers cleansed. | 11–19 |
 | Christ's kingdom. | 20–37 |
 
 ## Avoid causing offense; forgive and serve humbly (verses 1–10)
@@ -73,6 +73,10 @@ Let us therefore be ready for the revelation of the Son of Man.
 ---
 
 ## Editorial review — Luke 17
+
+**2026-11-17 traceable outline-reference correction (independent original-native review pending):** The two thematic ranges were transposed relative to the biblical text and existing commentary sections. Only the **verse-range cells of the copied original-outline table** have been corrected; source-authored headings, row order, commentary section boundaries, and exposition prose are not edited. Previously transcribed cells: `To avoid offences, To pray for increase of faith, Humility taught. | 11–19`; `Ten lepers cleansed. | 1–10`. Corrected cells: `To avoid offences, To pray for increase of faith, Humility taught. | 1–10`; `Ten lepers cleansed. | 11–19`. The repair is reversible against this recorded before/after; the authoritative published MHCC 0.1.1 outline still requires exact independent native validation.
+
+
 
 **Entire secondary original-English source directly inspected:** [CCEL, Luke 17](https://ccel.org/ccel/henry/mhcc.xxxiv.xvii.html). Released `MHCC 0.1.1` remains authoritative for exact native SWORD mapping, independent review and any editorial decision about anomalies.
 
