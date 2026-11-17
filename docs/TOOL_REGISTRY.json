@@ -1470,7 +1470,7 @@
         "jsword"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "ec084d46b8c4bfe123d937019b0e10277a05a22db6839cb9e031407d50ab5bab",
+      "sha256_at_inventory": "5392ab9274851f89f3338d57a2d5a32548b025ee78d765b5a9837595db24df14",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
@@ -2543,7 +2543,7 @@
         "xiphos"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "578b9ee1a5e9f5942cbc14a0b51acd23b6983ad3b86fe8b052a49cd5f14ee24c",
+      "sha256_at_inventory": "feb4df613e0414663d570e273b16f3817585551823c085d8d5e9556740082d20",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",

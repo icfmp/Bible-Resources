@@ -633,9 +633,27 @@ def _await_xiphos_visible_window(app, display, env: dict, *, seconds: int) -> No
     raise PilotError("No independently visible Xiphos window with Bible and commentary")
 
 
+def _reviewed_private_x11_window_manager_command(requested: str | None):
+    """Choose only a real, explicitly reviewed isolated X11 manager, if any.
+
+    The test must never interact with the user's desktop or arbitrary
+    executable paths. A WM may improve GTK focus under Xvfb, but it never
+    proves commentary rendering or source-text fidelity.
+    """
+    if requested is None:
+        return None
+    if requested == "openbox":
+        return ("openbox", "--sm-disable")
+    raise PilotError("Unreviewed real-Xiphos private window-manager mode")
+
+
 def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int,
                   commentary_module_id: str = "MHCC",
-                  on_gui_ready=None) -> dict:
+                  on_gui_ready=None,
+                  window_manager: str | None = None) -> dict:
+    wm_command = _reviewed_private_x11_window_manager_command(window_manager)
+    if wm_command is not None and shutil.which(wm_command[0]) is None:
+        raise PilotError("Reviewed private Xiphos WM dependency unavailable")
     if (not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{1,39}", commentary_module_id)
             or not 6 <= seconds <= 25 or root.is_symlink() or not root.is_dir()
             or not (root / "mods.d" / (commentary_module_id.lower()+".conf")).is_file()
@@ -661,6 +679,7 @@ def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int,
     )
     display = None
     app = None
+    manager = None
     try:
         display = subprocess.Popen(
             ["Xvfb", ":91", "-screen", "0", "1280x800x24", "-nolisten", "tcp"],
@@ -670,6 +689,18 @@ def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int,
         time.sleep(1.5)
         if display.poll() is not None:
             raise PilotError("Actual virtual Xiphos display did not start")
+        if wm_command is not None:
+            try:
+                manager = subprocess.Popen(
+                    list(wm_command), env=env,
+                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                    start_new_session=True,
+                )
+            except OSError as exc:
+                raise PilotError("Isolated X11 window manager failed to launch") from exc
+            time.sleep(1)
+            if manager.poll() is not None:
+                raise PilotError("Isolated X11 window manager exited during startup")
         app = subprocess.Popen(
             ["dbus-run-session", "--", "xiphos"], env=env,
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
@@ -686,6 +717,7 @@ def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int,
             raise PilotError("Invalid private real-Xiphos post-readback observation")
         return {
             "real_xiphos_executable_started_and_visible": True,
+            "real_xiphos_window_manager_process_started": manager is not None,
             "original_source_SWORD_PATH_isolated": True,
             **inspection,
             **after,
@@ -693,6 +725,8 @@ def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int,
     finally:
         if app is not None:
             _stop_group(app)
+        if manager is not None:
+            _stop_group(manager)
         if display is not None:
             _stop_group(display)
 

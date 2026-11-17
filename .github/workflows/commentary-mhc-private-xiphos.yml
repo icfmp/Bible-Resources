@@ -32,7 +32,7 @@ jobs:
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
           timeout 150s sudo apt-get -o Acquire::Retries=0 \
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y \
-            libsword-dev libsword-utils diatheke xiphos xvfb xdotool xclip dbus-x11
+            libsword-dev libsword-utils diatheke xiphos xvfb xdotool xclip dbus-x11 openbox
           g++ -std=c++17 -O2 -I/usr/include/sword \
             scripts/sword_native_commentary_index.cpp \
             -o "$RUNNER_TEMP/commentary-native-index" -lsword
@@ -80,11 +80,14 @@ jobs:
           assert gui["entire_edition_reader_presentation_approved"] is False
           assert gui["published"] is False
           assert gui["real_xiphos_executable_started_and_visible"] is True
+          assert gui["real_xiphos_window_manager_process_started"] is True
           # A real window is meaningful startup evidence, but NEVER text
           # rendering/navigation approval. Even failed clipboard observations
           # stay clearly recorded as INCONCLUSIVE, never upgraded to success.
           summary = {
               "real_xiphos_window_observed": gui["real_xiphos_executable_started_and_visible"],
+              "isolated_real_x11_window_manager_started":
+                  gui["real_xiphos_window_manager_process_started"],
               "sample_count": gui["sample_count"],
               "independent_gui_excerpt_matches":
                   gui["independent_gui_commentary_excerpt_match_count"],
