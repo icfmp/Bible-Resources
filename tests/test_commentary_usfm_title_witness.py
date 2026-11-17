@@ -11,7 +11,8 @@ from zipfile import ZipFile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from commentary_usfm_title_witness import (
-    WitnessError, compare_original_first_paragraphs, independent_usfm_titles,
+    WitnessError, compare_original_first_paragraphs,
+    compare_ambiguous_original_opening_paragraphs, independent_usfm_titles,
     reviewed_usfm_title_visible_text,
 )
 
@@ -178,6 +179,39 @@ class IndependentBiblicalTitleWitnessTests(unittest.TestCase):
         misplaced, pin = self.make_archive("\\id PSA\n\\c 3\n\\v 1 first\n\\d A Psalm\n")
         with self.assertRaises(WitnessError):
             independent_usfm_titles(misplaced, pin, book_id="PSA")
+
+    def test_ambiguous_native_alignment_still_permits_separate_title_identity(self):
+        path,digest=self.make_archive(
+            "\\id PSA\n\\c 7\n\\d To the chief Musician\n\\v 1 First\n")
+        titles=independent_usfm_titles(path,digest,book_id="PSA")
+        words=["to","the","chief","musician"]
+        report=metadata(7,words)
+        scope=report["source_longer_both_source_and_native_reference_label_word_scope"]
+        scope["original_book_source_extra_original_p_digest_case_classes"]["Ps"]={
+            "ambiguous_extra_source_words_no_unique_gap_ownership":1}
+        case=scope["source_extra_original_p_digest_source_line_sha_only_rows"][0]
+        case["source_extra_p_digest_case_class"]=(
+            "ambiguous_extra_source_words_no_unique_gap_ownership")
+        case["all_extra_gap_full_original_p_digest_candidate_classes"]=[]
+        case.update({
+            "original_opening_p_document_ordinal":1,
+            "original_opening_p_visible_word_count":len(words),
+            "original_opening_p_exact_unicode_word_sha256":
+                sha256(" ".join(words).encode("utf-8")).hexdigest(),
+            "original_opening_p_casefold_unicode_word_sha256":
+                sha256(" ".join(w.casefold() for w in words).encode("utf-8")).hexdigest(),
+        })
+        result=compare_ambiguous_original_opening_paragraphs(
+            report,titles,source_book="Ps")
+        self.assertEqual(result["original_source_extra_ambiguous_alignment_cases"],1)
+        self.assertEqual(result["independent_original_opening_p_title_classes"],{
+            "opening_p_casefold_biblical_title_tokens_but_gap_ownership_ambiguous":1})
+        self.assertTrue(result["opening_title_match_never_resolves_extra_word_alignment"])
+        self.assertNotIn("musician",json.dumps(result))
+        case["original_opening_p_document_ordinal"]=2
+        with self.assertRaises(WitnessError):
+            compare_ambiguous_original_opening_paragraphs(
+                report,titles,source_book="Ps")
 
     def test_exact_original_chapter_and_count_reconciliation_are_mandatory(self):
         path, digest = self.make_archive("\\id PSA\n\\c 3\n\\d A Psalm\n\\v 1 LORD\n")
