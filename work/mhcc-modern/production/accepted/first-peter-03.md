@@ -86,7 +86,7 @@ Henry explains that **Christ by his Spirit preached through Noah** to the people
 
 God's patience endured for a long time, but finally came to an end.
 
-The spirits of those who disobeyed and died are now under judgment, according to Henry's interpretation.
+Henry understands the spirits of those who rejected Noah's warning as having been committed after death to **the prison of hell**, from which, in his interpretation, **there is no redemption**.
 
 Noah's rescue in the ark through the flood pictured the rescue of true believers through **the Holy Spirit's saving work**.
 
@@ -102,9 +102,14 @@ Many were baptized and faithfully attended worship yet never trusted Christ, and
 
 Seek instead to be **cleansed by the Spirit and Christ's blood**.
 
+**Christ's resurrection from the dead assures believers of purification and peace**.
+
 ---
 
 ## Editorial review — 1 Peter 3
+
+**2026-11-17 additional CCEL-witness fidelity check:** restored two claims dropped or weakened in verses 14–22: Henry explicitly interprets the departed spirits who rejected Noah as confined in **the prison of hell with no redemption there**, rather than only as “under judgment”; the source ends with **Christ's resurrection as assurance of purification and peace**, previously omitted. These are represented as **Henry's interpretation and pastoral conclusion**, not new biblical text or editorial doctrinal certification. [Original-English CCEL witness](https://ccel.org/ccel/henry/mhcc.lii.iii.html); exact original-native MHCC 0.1.1 wording, markup and reference signoff remain pending.
+
 
 **Complete CCEL original-English witness inspected:** [CCEL, 1 Peter 3](https://ccel.org/ccel/henry/mhcc.lii.iii.html). The published `MHCC 0.1.1` remains source of record; native SWORD and independent approval pending.
 
