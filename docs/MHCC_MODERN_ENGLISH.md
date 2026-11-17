@@ -5,20 +5,25 @@
 
 **Status (2026-11-16):** Modern English production **started at Genesis 1** using corrected published `MHCC` 0.1.1. The prior **24 scattered WIP chapters remain exploratory pilots**, not production progress. Genesis 1 and the separately modernized Genesis book introduction have committed **production CANDIDATES, not accepted chapters**; their native structure, source-linked notes, source outline and temporary SWORD reader/readback checks have passed. A full independent semantic reviewer signoff remains pending. **0 / 1,189 production chapters accepted**. Tracking: [#270](https://github.com/icfmp/Bible-Resources/issues/270) and draft [PR #272](https://github.com/icfmp/Bible-Resources/pull/272). The original published MHCC source and historical BRMHCC releases remain unchanged.
 
-## Chapter-wide commentary fallback and verse-specific precedence (owner decision, 2026-11-17)
+## Original I-only chapter commentary — narrowly scoped derivative treatment (2026-11-17)
 
-**Reader contract for the separate Modern English derivative, not a change to the published MHCC 0.1.1 source:**
+**Clarification: there is NO general rule that fills missing verse commentaries with a whole-chapter commentary.** The Bible application is responsible for deciding how to present chapter-wide introductions alongside verse-specific commentary. Filling gaps throughout an otherwise partly annotated chapter would repeatedly surface the same text while scrolling and is **not approved**. This protocol makes no general app display-policy decision.
 
-- A commentary whose **verified authorial coverage is the entire chapter** must be accessible from **every verse of that chapter** during verse-following reading.
-- If a verified **verse-specific or verse-range exposition** already covers a verse, **that specific exposition takes priority**. Do not replace, merge, duplicate or obscure it with the chapter-wide fallback. The chapter-wide comment is a fallback **only at uncovered verse addresses**.
-- A full-chapter original is **one authored commentary body**, not one invented comment per verse. Reuse a single native body through supported standard SWORD linking/aliasing if reader round-trip proves it safe; never paste independent text copies into 37 or 13 entries.
-- Source intro provenance must be retained explicitly. Where an original I-owned source commentary is made accessible through new derivative K links, document the deliberate editorial relocation/aliasing. Avoid displaying both the same intro and its fallback simultaneously. Keep the original source module unchanged.
-- This is a general precedence rule for all commentary resources, **not** a hardcoded book-specific rendering exception. Map actual original K/I ownership before applying it; never infer that every chapter intro is a full-chapter commentary or overwrite existing K text.
-- Validate every proposed fallback link in actual compiled SWORD data, including native key identity, nonduplicated body storage, independent reader navigation and synchronization behavior, both positive (uncovered verse) and negative (covered verse) test cases. **No live module is approved or published by this decision.**
+The published original **MHCC 0.1.1** has two verified exceptional chapter layouts:
 
-**Confirmed relevant original-native layout:** `Lev.19` (37 KJV verse addresses) and `Ps.108` (13 KJV verse addresses) have source commentary prose in their chapter-introduction `I` entries and **no numbered source `K` commentary entries**. The Modern English derivative should therefore make each respective single chapter-wide commentary available at **all 37** or **all 13** verses, subject to complete verification of the actual verse registry and successful compilation/readback. Do not manufacture 50 different authorial expositions.
+| Chapter | Original native commentary storage | Verse-level entries in original | Modern English derivative treatment |
+| --- | --- | --- | --- |
+| `Lev.19` | Chapter `I` entry contains the authored exposition | **None** | Make the **same complete chapter commentary** accessible at all **37** verses |
+| `Ps.108` | Chapter `I` entry contains the authored exposition | **None** | Make the **same complete chapter commentary** accessible at all **13** verses |
 
-Existing original source evidence: [native introduction ownership research](https://github.com/icfmp/Bible-Resources/blob/main/docs/evidence/mhcc-274/native-intro-text-ownership.md). The structural whole-canon receipt is [Actions #44183321615](https://github.com/icfmp/Bible-Resources/actions/runs/44183321615); it proves original source ownership and key coverage **only**, not these derivative navigation links or semantic acceptance.
+**Implementation requirements for these two chapters only:**
+
+- In the *new Modern English derivative* (never in released `MHCC` 0.1.1), link the single chapter-wide authored commentary to **every actual verse key** of the chapter. Prefer **native SWORD-linked/aliased keys referencing one body**, not 37 or 13 independent copies of the text. Do not invent verse-specific source divisions or headings.
+- Verify chapter scope against the declared module versification and native key readback before linking; reject collisions with any verse-level original/commentary unit. These two chapters are suitable **specifically because they have no native K commentary units**.
+- Retain exact I-origin provenance in build records. Prevent a second independently rendered copy of the same commentary if an introduction is also exposed separately.
+- Confirm both all-verse navigation and unchanged semantics in a compiled test module and real readers before approval. **This is an agreed target behavior, not a completed or published implementation.**
+
+Evidence: [original-native I ownership](https://github.com/icfmp/Bible-Resources/blob/main/docs/evidence/mhcc-274/native-intro-text-ownership.md) and [complete native-structure metadata receipt](https://github.com/icfmp/Bible-Resources/actions/runs/44183321615). The receipt validates source ownership/key coverage, **not** a derivative SWORD build or reader acceptance.
 
 ## 1. Source and edition boundaries
 
