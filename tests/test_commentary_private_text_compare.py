@@ -14,6 +14,24 @@ from pilot_preflight import PilotError
 
 
 class CommentaryOriginalStockTextTests(unittest.TestCase):
+    def test_empty_authorial_div_remains_in_original_marker_census(self):
+        xml = self.source().replace(
+            b"<div><p>Original next paragraph.</p></div>",
+            b"<div><p>  </p></div>")
+        with self.assertRaisesRegex(PilotError, "Empty original source"):
+            _original_source_markers(xml)
+        source, proof = _original_source_markers(xml, on_no_visible_text="record")
+        self.assertEqual(proof["original_verse_or_range_body_count"], 2)
+        self.assertEqual(proof["original_verse_or_range_body_with_visible_text_count"], 1)
+        self.assertEqual(proof["original_sections_without_visible_text_count"], 1)
+        self.assertEqual(sum(map(len, source.values())), 1)
+        self.assertFalse(proof["original_sections_without_visible_text_examples_truncated"])
+        self.assertTrue(proof["original_reference_and_adjacent_divisions_not_modified"])
+        self.assertEqual(
+            proof["bounded_original_sections_without_visible_text_line_sha_structure"][0]
+            ["original_adjacent_div_child_tag_counts"], {"p": 1})
+        self.assertNotIn("Original next paragraph.", json.dumps(proof))
+
     def test_only_source_words_not_found_are_routed_to_loss_identity_gate(self):
         from commentary_private_text_compare import select_authorial_word_loss_attention
         candidate = lambda missing: {

@@ -91,8 +91,11 @@ def _original_thml_neighbor_candidates(marker) -> list[tuple[str,str]]:
     return candidates
 
 
-def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dict]:
+def _original_source_markers(xml_bytes: bytes, *,
+                             on_no_visible_text: str = "block") -> tuple[dict[str,list[dict]],dict]:
     # Must scan the entire actual original with network/entity resolution off.
+    if on_no_visible_text not in {"block", "record"}:
+        raise PilotError("Unreviewed empty original authorial division policy")
     whole=xml_structure(xml_bytes)
     try:
         root=etree.fromstring(xml_bytes,parser=etree.XMLParser(
@@ -114,6 +117,7 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
         raise PilotError("Original document-order ThML div1 inventory differs from whole XML scan")
     sources={}
     counts=Counter()
+    no_visible_text = []
     original_map_digest=sha256()
     for node in root.iter():
         if not isinstance(node.tag,str) or node.tag.rsplit("}",1)[-1]!="scripCom":
@@ -158,7 +162,7 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
         if node.tail and node.tail.strip():
             raise PilotError("Nonwhitespace original source text between marker and body")
         txt="".join(sibling.itertext())
-        if not txt.strip():
+        if not txt.strip() and on_no_visible_text == "block":
             raise PilotError("Empty original source commentary div body")
         text_bytes=txt.encode("utf-8")
         full_ref_bytes=original_ref.encode("utf-8")
@@ -167,6 +171,23 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
             +len(text_bytes).to_bytes(8,"big")
             +sha256(text_bytes).digest()
         )
+        if not txt.strip():
+            # Preserve every original reference/body hash, including an
+            # authored div with no visible text. Exclude only from lexical
+            # comparisons; never call it missing native text or delete it.
+            no_visible_text.append({
+                "original_source_line": node.sourceline,
+                "original_reference_sha256": sha256(full_ref_bytes).hexdigest(),
+                "original_body_sha256": sha256(text_bytes).hexdigest(),
+                "original_adjacent_div_child_tag_counts": dict(sorted(Counter(
+                    child.tag.rsplit("}", 1)[-1]
+                    for child in sibling.iter()
+                    if child is not sibling and isinstance(child.tag, str)
+                ).items())),
+                "source_reference_and_adjacent_div_preserved": True,
+                "no_visible_source_text_not_proof_of_missing_stock": True,
+            })
+            continue
         sources.setdefault(start,[]).append({
             "original_source_line":node.sourceline,
             "original_full_reference_sha256":sha256(full_ref_bytes).hexdigest(),
@@ -205,7 +226,7 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
                 if isinstance(ref.tag,str) and ref.tag.rsplit("}",1)[-1] == "scripRef"
             ],
         })
-    if sum(len(rows) for rows in sources.values()) != (
+    if sum(len(rows) for rows in sources.values()) + len(no_visible_text) != (
         counts["work_qualified_verse"]+counts["work_qualified_same_book_verse_range"]
     ):
         raise PilotError("Original source annotation count diverged from body inventory")
@@ -216,7 +237,16 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
     return sources,{
         "source_xml_sha256":whole["xml_sha256"],
         "source_marker_total":whole["element_counts"]["scripCom"],
-        "original_verse_or_range_body_count":sum(map(len,sources.values())),
+        "original_verse_or_range_body_count":
+            sum(map(len,sources.values())) + len(no_visible_text),
+        "original_verse_or_range_body_with_visible_text_count":
+            sum(map(len,sources.values())),
+        "original_sections_without_visible_text_count":len(no_visible_text),
+        "bounded_original_sections_without_visible_text_line_sha_structure":
+            no_visible_text[:20],
+        "original_sections_without_visible_text_examples_truncated":
+            len(no_visible_text) > 20,
+        "original_reference_and_adjacent_divisions_not_modified":True,
         "distinct_original_start_anchors":len(sources),
         "original_ordered_verse_and_range_body_text_sha256":original_map_digest.hexdigest(),
         "chapter_source_markers_not_compared":counts["work_qualified_chapter"],
@@ -687,7 +717,8 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
         if obs_xml["bytes"]>MAX_XML:
             raise PilotError("Pinned XML exceeds original-source maximum")
         original_xml=xml_file.read_bytes()
-        source,source_proof=_original_source_markers(original_xml)
+        source,source_proof=_original_source_markers(
+            original_xml, on_no_visible_text="record" if is_collection else "block")
         # A changed in-memory copy is NOT a source/stock repair. It resolves
         # contradictory book markers only when the exact authorial div1 title
         # independently identifies a different known book, with a byte-exact
@@ -695,7 +726,8 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
         suggested_xml,source_marker_repair=propose_private_source_bookcode_repair(
             original_xml,expected_source_sha256=original_sha
         )
-        suggested_source,suggested_source_proof=_original_source_markers(suggested_xml)
+        suggested_source,suggested_source_proof=_original_source_markers(
+            suggested_xml, on_no_visible_text="record" if is_collection else "block")
         def by_line_and_hash(items):
             result={}
             for key,units in items.items():

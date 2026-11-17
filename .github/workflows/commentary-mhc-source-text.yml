@@ -89,6 +89,9 @@ jobs:
           print("Original verse/range source units:",
                 report["source_original_verse_and_range_body_evidence"][
                     "original_verse_or_range_body_count"])
+          print("Original sections without visible source text:",
+                report["source_original_verse_and_range_body_evidence"][
+                    "original_sections_without_visible_text_count"])
           print("Text comparison diagnostic classes only:",
                 json.dumps(report["text_diagnostic"][
                     "per_source_marker_text_diagnostic_counts"], sort_keys=True))
@@ -119,7 +122,11 @@ jobs:
           }
           assert set(classes) <= allowed
           assert all(type(v) is int and v >= 0 for v in classes.values())
-          assert sum(classes.values()) == units and units > 0
+          no_visible = report["source_original_verse_and_range_body_evidence"][
+              "original_sections_without_visible_text_count"]
+          assert sum(classes.values()) + no_visible == units and units > 0
+          assert report["source_original_verse_and_range_body_evidence"][
+              "original_reference_and_adjacent_divisions_not_modified"] is True
           chapter = report["source_original_chapter_neighbor_evidence"]
           assert (chapter["original_chapter_siblings_reviewed_count"] +
                   chapter["original_chapter_siblings_not_reviewed_count"] ==
@@ -134,6 +141,13 @@ jobs:
               "original_sword_raw_corpus_sha256":
                   report["stock_full_raw_content_sha256"],
               "original_source_verse_range_units": units,
+              "original_source_divisions_without_visible_text_count": no_visible,
+              "original_source_divisions_without_visible_text_line_sha_structure":
+                  report["source_original_verse_and_range_body_evidence"][
+                      "bounded_original_sections_without_visible_text_line_sha_structure"],
+              "original_source_divisions_without_visible_text_examples_truncated":
+                  report["source_original_verse_and_range_body_evidence"][
+                      "original_sections_without_visible_text_examples_truncated"],
               "source_section_text_diagnostic_classes": classes,
               "source_chapter_marker_count":
                   chapter["explicit_chapter_source_marker_count"],
