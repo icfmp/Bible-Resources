@@ -88,6 +88,12 @@ The structural source receipt is generated using real published libSWORD native 
 | Revelation 21 | 3 | 3 | 27 | 808 | [source candidate](accepted/revelation-21.md) |
 | Revelation 22 | 3 | 3 | 21 | 771 | [source candidate](accepted/revelation-22.md) |
 
+## Related book introductions (separate from the 69 numbered chapters)
+
+All **12 books** in the historic 69-chapter subset also have a **separate, nonempty Modern English book-introduction candidate** under `work/mhcc-modern/production/`: first and second Timothy, Titus, Hebrews, James, first and second Peter, first/second/third John, Jude and Revelation. Each was directly inspected for source-pinned candidate metadata and actual written prose, not just an expected filename.
+
+**Important:** this is **12/12 draft-introduction presence**, not a proof that all authorial source introductions have been recovered from the exact `MHCC 0.1.1` original I/K keys, fully translated or approved for placement. Intro semantic/provenance collation remains a distinct required release gate.
+
 ## What this DOES NOT prove
 
 **The 69 historical unchecked rows concern real produced translations, not 69 missing chapters.** This report establishes substantive prose **coverage and source structural alignment only**. It does **not** independently prove that every original English sentence, theological qualification, example, reference, footnote, book introduction, paragraph or textual nuance has been faithfully carried over. A translation can contain an aligned section yet still omit or distort part of its meaning.
