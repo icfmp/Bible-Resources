@@ -656,6 +656,85 @@ jobs:
                     "and their AUTHENTIC original markup word owner classes",
                     "(no source words/verse keys):",
                     json.dumps(gap_original_structure,sort_keys=True))
+              # Independent digital witness: all SIX unchanged original
+              # SHA-pinned CCEL volumes; never silently treat their digital
+              # wording as an edition/redistribution authorization.
+              from commentary_osis_paragraph_presence import (
+                  private_original_osis_gap_against_pinned_ccel_volume)
+              original_ccel_gap_reports=[]
+              for original_ccel_volume in sorted(volumes):
+                  vol=volumes[original_ccel_volume]
+                  request=Request(
+                      vol["url"],
+                      headers={"User-Agent":
+                               "BibleResources-MHC-OriginalDigitalWitness/1.0"})
+                  with urlopen(request,timeout=90) as response:
+                      if (urlsplit(response.url).hostname
+                              not in ("ccel.org","www.ccel.org")):
+                          raise SystemExit(
+                              "CCEL independently pinned original volume redirect changed")
+                      ccel_raw=response.read(32*1024*1024+1)
+                  if (not ccel_raw or len(ccel_raw)>32*1024*1024
+                          or sha256(ccel_raw).hexdigest()!=vol["sha256"]):
+                      raise SystemExit(
+                          "Separately obtained CCEL original differs from its reviewed SHA")
+                  volume_result=private_original_osis_gap_against_pinned_ccel_volume(
+                      ccel_raw,expected_xml_sha256=vol["sha256"],
+                      original_volume_number=original_ccel_volume,
+                      source_fragments=private_original_gaps)
+                  original_ccel_gap_reports.append(volume_result)
+                  del ccel_raw
+              if (len(original_ccel_gap_reports)!=6
+                      or [row["ccel_volume_number"]
+                          for row in original_ccel_gap_reports]!=[1,2,3,4,5,6]
+                      or any(len(row["original_source_gap_cases"])!=
+                             len(private_original_gaps)
+                             for row in original_ccel_gap_reports)):
+                  raise SystemExit("Independent original six-volume CCEL witness incomplete")
+              original_ccel_gap_summary=[]
+              for index,(source_chapter,source_offset,source_gap_words) in enumerate(
+                      private_original_gaps):
+                  by_volume=[
+                      result["original_source_gap_cases"][index]
+                      for result in original_ccel_gap_reports]
+                  if any(
+                      item["source_gap_visible_word_tokens"]!=len(source_gap_words)
+                      or item["source_gap_word_offset_not_verse_key"]!=source_offset
+                      or item["original_authored_chapter_ref_sha256"]!=
+                         sha256(source_chapter.encode("ascii")).hexdigest()
+                      for item in by_volume):
+                      raise SystemExit("Original OSIS/CCEL witness identity mismatch")
+                  original_ccel_gap_summary.append({
+                      "authentic_authoring_chapter_sha256":
+                          sha256(source_chapter.encode("ascii")).hexdigest(),
+                      "authentic_authoring_gap_visible_words":len(source_gap_words),
+                      "original_CCEl_volumes_with_full_exact_whole_prose":
+                          [item["independent_ccel_volume"] for item in by_volume
+                           if item[
+                               "full_exact_word_sequence_occurrences_in_original_volume"]],
+                      "CCEl_original_full_volume_exact_match_occurrences":
+                          sum(item[
+                              "full_exact_word_sequence_occurrences_in_original_volume"]
+                              for item in by_volume),
+                      "original_CCEl_digital_volume_12word_witness_classes":[{
+                          "volume":item["independent_ccel_volume"],
+                          "first_middle_last_12word_anchors":
+                              item["first_middle_last_12word_anchors_in_original_ccel"],
+                      } for item in by_volume
+                         if item["first_middle_last_12word_anchors_in_original_ccel"]],
+                      "CCEl_original_full_word_match_not_historical_print_or_owner_proof":True,
+                  })
+              print("All SIX SHA-pinned original CCEL volumes independent digital",
+                    "word witnesses for exact original authoring OSIS gaps",
+                    "(wordless volume numbers and hashed source chapter identities only):",
+                    json.dumps({
+                      "original_ccel_volumes_verified":len(original_ccel_gap_reports),
+                      "original_authored_osis_source_gaps":len(original_ccel_gap_summary),
+                      "original_ccel_gap_cases":original_ccel_gap_summary,
+                      "not_historical_print_editorial_attribution_or_rights":True,
+                      "no_original_text_copied_or_transformed":True,
+                    },sort_keys=True))
+              del original_ccel_gap_reports,original_ccel_gap_summary
               del private_original_gaps
               all_rows=original_full_corpus["original_chapter_cases"]
               def cases_failing(field):
