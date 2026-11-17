@@ -1062,7 +1062,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
                 original_extra_p_digest_case_counts[p_class]+=1
                 original_extra_p_digest_book_counts.setdefault(book,Counter())[p_class]+=1
                 if not re.fullmatch(
-                        r"[1-4]?[A-Za-z][A-Za-z0-9]{1,15}\\.[0-9]+\\.[0-9]+",start
+                        r"[1-4]?[A-Za-z][A-Za-z0-9]{1,15}\.[0-9]+\.[0-9]+",start
                 ):
                     raise PilotError("Original source start reference is not a verified OSIS verse")
                 original_extra_p_digest_rows.append({
