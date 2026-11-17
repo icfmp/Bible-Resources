@@ -74,7 +74,7 @@ jobs:
                           w.write(r.read())
           print("Exact SHA-pinned published commentary installed only in an isolated temporary root")
           PY
-      - name: Inventory full corrected original and Genesis 1 without exporting source text
+      - name: Inventory full corrected original and Genesis 1–24 without exporting source text
         shell: bash
         run: |
           set -euo pipefail
@@ -84,13 +84,14 @@ jobs:
             --module-id MHCC \
             --expected-corpus-sha256 \
             '2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e' \
-            --chapters Gen.1 \
+            --chapters Gen.1 Gen.2 Gen.3 Gen.4 Gen.5 Gen.6 Gen.7 Gen.8 Gen.9 Gen.10 Gen.11 Gen.12 Gen.13 Gen.14 Gen.15 Gen.16 Gen.17 Gen.18 Gen.19 Gen.20 Gen.21 Gen.22 Gen.23 Gen.24 \
             --report "${RUNNER_TEMP}/mhcc-modern-source-native-receipt.json"
           python - <<'PY'
           import json,os
           from pathlib import Path
           path=Path(os.environ["RUNNER_TEMP"])/"mhcc-modern-source-native-receipt.json"
           r=json.loads(path.read_text())
+          assert set(r["chapters"]) == {f"Gen.{i}" for i in range(1, 25)}
           assert r["source_prose_or_original_markup_exported"] is False
           assert r["semantic_translation_independently_approved"] is False
           assert r["complete_native_counts"] == {"K":28742,"I":1255,"TOP":2}
