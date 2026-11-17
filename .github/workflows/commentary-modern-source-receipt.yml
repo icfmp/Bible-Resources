@@ -683,6 +683,22 @@ jobs:
                 " native_intro_slots="+str(len(native_intro)))
           print("Source-linked Genesis 1 temp build: 31 exact native verses, two source-identical original linked references, modern book introduction in OSIS, real reader visible markers PASS; original chapter intro/independent semantic acceptance pending")
           PY
+      - name: Regenerate source-bound script inventory for PR registry reconciliation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/tool_registry.py --write
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          for path in (Path("docs/TOOL_REGISTRY.json"),Path("docs/TOOL_REGISTRY.md")):
+              raw=path.read_text(encoding="utf-8")
+              encoded=json.dumps(raw,ensure_ascii=True)
+              for idx in range(0,len(encoded),1800):
+                  print("MHCCTOOLREGISTRY:"+path.name+":"+str(idx//1800).zfill(5)+":"+encoded[idx:idx+1800])
+              print("MHCCTOOLREGISTRY:END:"+path.name+":"+str(len(encoded))+":"+str(len(raw)))
+          print("Generated registry data is metadata-only; source prose and release not modified")
+          PY
       - name: Upload metadata-only bounded audit receipt
         if: always()
         uses: actions/upload-artifact@v4
