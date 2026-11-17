@@ -51,7 +51,7 @@ Christ has equals only **as a human being**, while as Son of God he surpasses ev
 
 **Psalm 102:25–27** speaks of his almighty work in creating the world and transforming it.
 
-He will fold up the earth and heavens like a garment when their present use is finished, yet he remains **forever the same**.
+He will fold up the earth and heavens like a garment when their present use is finished and they will **no longer be abused**, yet he remains **forever the same**.
 
 Like a sovereign who remains sovereign when ceremonial clothing is put away, Christ never loses his dignity.
 
@@ -65,11 +65,14 @@ Believers now possess the status of **heirs**, not yet the full inheritance.
 
 Angels minister to them under Christ and the Spirit: resisting evil spirits, protecting their bodies, and giving instruction or comfort.
 
-At the last day they will gather the saints, while people who set their hopes on perishing treasure will be separated from Christ.
+At the last day they will gather the saints, while people who set their hopes on perishing treasure will be driven from Christ's presence into **everlasting misery**.
 
 ---
 
 ## Editorial review — Hebrews 1
+
+**2026-11-17 renewed secondary-witness comparison:** restored Henry's description of the present world as no longer to be **abused** once folded away and, more importantly, his **everlasting misery** consequence for people whose hopes rest on perishing treasures. The previous modern text softened both assertions. Source: [CCEL Hebrews 1](https://ccel.org/ccel/henry/mhcc.l.i.html). Exact published original-native wording, reference tags and independent editorial acceptance still pending.
+
 
 **Complete CCEL original-English witness read:** [CCEL, Hebrews 1](https://ccel.org/ccel/henry/mhcc.l.i.html). The released original `MHCC 0.1.1` remains authoritative for native SWORD keys, annotations and independent acceptance.
 
