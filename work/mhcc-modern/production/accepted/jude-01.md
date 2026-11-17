@@ -112,7 +112,7 @@ Raging waves frighten people at sea but can no longer harm them once they reach 
 
 False teachers face judgment in the present world and the world to come.
 
-They flash like meteors or falling stars, then vanish into deepest darkness.
+They flash like meteors or falling stars, then sink into **the blackness of darkness forever**.
 
 Jude quotes a prophecy connected with **Enoch**, a passage not recorded elsewhere in Scripture.
 
@@ -191,6 +191,9 @@ Our joy then will exceed everything earth could give, and God's delight in his p
 ---
 
 ## Editorial review — Jude 1
+
+**2026-11-17 CCEL second-pass fidelity repair:** restored Henry's explicitly **permanent** judgment image — false teachers sink into **the blackness of darkness for ever** — where the previous modern draft reduced this to “deepest darkness” and omitted the finality. Source: [CCEL Jude](https://ccel.org/ccel/henry/mhcc.lvii.i.html). The distinction between Henry's conjecture about Moses' body and canonical Scripture stays explicit. Native MHCC 0.1.1 full text/markup and independent semantic approval are pending.
+
 
 **Whole CCEL English secondary source compared:** [CCEL, Jude 1](https://ccel.org/ccel/henry/mhcc.lvii.i.html). Original `MHCC 0.1.1` remains the authority for exact native SWORD keys/markup and independent editorial validation.
 
