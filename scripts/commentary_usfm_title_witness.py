@@ -143,6 +143,8 @@ def independent_usfm_titles(archive: Path, pinned_sha256: str,
                 "word_count": len(tokens),
                 "exact_unicode_word_sha256":
                     sha256(" ".join(tokens).encode("utf-8")).hexdigest(),
+                "casefold_unicode_word_sha256":
+                    sha256(" ".join(token.casefold() for token in tokens).encode("utf-8")).hexdigest(),
             }
     if not seen or not result:
         raise WitnessError("Independent original USFM has no chapter/title inventory")
@@ -189,10 +191,14 @@ def compare_original_first_paragraphs(safe_receipt: dict, titles: dict[int, dict
         chapter = row.get("original_source_chapter_number_from_actual_osis_start")
         orig_sha = row.get("original_full_reference_sha256")
         p_sha = paragraph.get("single_matching_original_p_exact_unicode_word_sha256")
+        p_casefold_sha = paragraph.get(
+            "single_matching_original_p_casefold_word_sha256")
         size = paragraph.get("original_extra_unlinked_word_count")
         if (type(chapter) is not int or not 1 <= chapter <= 200 or chapter in chapters
                 or not isinstance(orig_sha, str) or not PIN.fullmatch(orig_sha)
                 or not isinstance(p_sha, str) or not PIN.fullmatch(p_sha)
+                or not isinstance(p_casefold_sha, str)
+                or not PIN.fullmatch(p_casefold_sha)
                 or type(size) is not int or not 1 <= size <= 100):
             raise WitnessError("Source chapter/reference/paragraph SHA or count is invalid")
         chapters.add(chapter)
@@ -207,10 +213,12 @@ def compare_original_first_paragraphs(safe_receipt: dict, titles: dict[int, dict
             title_size = title["word_count"]
             if size != title_size:
                 verdict = "source_p1_and_usfm_d_title_word_counts_differ"
-            elif p_sha != title["exact_unicode_word_sha256"]:
-                verdict = "same_word_count_but_different_case_sensitive_unicode_tokens"
-            else:
+            elif p_sha == title["exact_unicode_word_sha256"]:
                 verdict = "exact_original_p1_equals_independent_usfm_d_title_word_tokens"
+            elif p_casefold_sha == title["casefold_unicode_word_sha256"]:
+                verdict = "same_unicode_word_tokens_after_only_casefold"
+            else:
+                verdict = "same_word_count_but_different_casefold_unicode_tokens"
         cases.append({
             "original_chapter_from_pinned_source_reference": chapter,
             "original_source_full_reference_sha256": orig_sha,
