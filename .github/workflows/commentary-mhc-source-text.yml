@@ -67,11 +67,16 @@ jobs:
           import re
           import xml.parsers.expat as expat
           import json
+          from io import BytesIO
+          from urllib.request import Request,urlopen
+          from zipfile import ZipFile
 
           root=Path(os.environ["UPSTREAM_SOURCE"])
           manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
-          if manifest["module_id"]!="MHC" or manifest["version"]!="2.2":
-              raise SystemExit("Original independently pinned MHC manifest unexpectedly changed")
+          source_pin=manifest.get("commentary_source",{}).get("original_authoring_osis",{})
+          if (manifest["module_id"]!="MHC" or manifest["version"]!="2.2"
+                  or source_pin.get("observed_upstream_commit_sha")!=os.environ["UPSTREAM_SHA"]):
+              raise SystemExit("Original MHC manifest/upstream source commit pin mismatch")
           if sorted(p.name for p in root.iterdir() if p.name!=".git") != [
               "README.md","mhc.conf","mhc.osis.xml","mhcBuild.sh"
           ]:
@@ -89,6 +94,18 @@ jobs:
                       digest.update(block)
               metadata[name]={"sha256":digest.hexdigest(),"size":path.stat().st_size}
 
+          required_pins={
+              "mhc.osis.xml":("authoring_osis_sha256","authoring_osis_bytes"),
+              "mhc.conf":("source_conf_sha256",None),
+              "mhcBuild.sh":("upstream_build_script_sha256",None),
+              "README.md":("readme_sha256",None),
+          }
+          for filename,(hash_field,size_field) in required_pins.items():
+              observed=metadata[filename]
+              if observed["sha256"]!=source_pin.get(hash_field):
+                  raise SystemExit("Official source differs from independently reviewed SHA pin")
+              if size_field and observed["size"]!=source_pin.get(size_field):
+                  raise SystemExit("Official source differs from reviewed byte length")
           # Parse markup data ONLY; never execute the upstream build script.
           # Expat rejects DTD/entity extension; streamed events avoid exporting prose.
           p=expat.ParserCreate()
@@ -132,12 +149,48 @@ jobs:
               raise SystemExit("Unreviewed upstream build format metadata shape")
           print("Official .conf driver / source type (observed, NOT normalized):",
                 driver,source_type)
-          print("Exact original compiled module expected driver / source type:",
-                "zCom","OSIS")
-          print("Upstream driver/format equals compiled manifest conventions:",
-                driver=="zCom" and source_type=="OSIS")
-          print("A differing original .conf value is recorded for further source/build",
-                "investigation, not silently rewritten or an upstream source rejection.")
+          # Compare against ACTUAL pinned original published .conf, never
+          # against a guessed driver spelling. Do not execute upstream scripts.
+          req=Request(manifest["sword_zip_url"],
+                      headers={"User-Agent":"BibleResources-OriginalMHCSourceParity/1.0"})
+          with urlopen(req,timeout=90) as response:
+              stock_zip=response.read(40*1024*1024+1)
+          if (not stock_zip or len(stock_zip)>40*1024*1024
+                  or sha256(stock_zip).hexdigest()!=manifest["archive_sha256"]):
+              raise SystemExit("Original public SWORD ZIP changed from pin")
+          with ZipFile(BytesIO(stock_zip)) as package:
+              conf_members=[n for n in package.namelist()
+                            if n.lower().endswith("/mhc.conf")]
+              if len(conf_members)!=1 or package.getinfo(conf_members[0]).file_size>128*1024:
+                  raise SystemExit("Pinned original SWORD configuration missing")
+              stock_conf=package.read(conf_members[0]).decode("utf-8")
+          def stockfield(key):
+              m=re.findall(r"(?m)^"+re.escape(key)+r"=([^\r\n]*)$",stock_conf)
+              if len(m)!=1: raise SystemExit("Original stock .conf critical field ambiguous")
+              return m[0].strip()
+          stock_fields={key:stockfield(key) for key in (
+              "Version","ModDrv","SourceType","DistributionLicense"
+          )}
+          source_fields={
+              "Version":version,
+              "ModDrv":driver,
+              "SourceType":source_type,
+              "DistributionLicense":confval("DistributionLicense"),
+          }
+          print("Pinned official SWORD ZIP SHA256 verified:",sha256(stock_zip).hexdigest())
+          print("Original zipped stock .conf SHA256:",
+                sha256(stock_conf.encode("utf-8")).hexdigest())
+          print("Upstream authoring .conf vs ORIGINAL downloaded .conf metadata:",
+                json.dumps({key:{
+                    "upstream":source_fields[key],
+                    "pinned_stock":stock_fields[key],
+                    "equal":source_fields[key]==stock_fields[key]
+                } for key in ("Version","ModDrv","SourceType","DistributionLicense")},
+                sort_keys=True))
+          print("Published .conf matches independently authenticated source .conf",
+                "on these four fields:",
+                all(source_fields[key]==stock_fields[key] for key in source_fields))
+          print("Full source OSIS/native K/I/TOP paragraph parity is NOT YET tested.")
           print("Official upstream source commit (not equivalent to compiled ZIP SHA):",
                 os.environ["UPSTREAM_SHA"])
           print("Authoring-file original bytes and independent SHA256:",
