@@ -1461,10 +1461,10 @@
       "stage_hint": "source/native audit",
       "static_reference_count": 5,
       "static_references": [
-        ".github/workflows/commentary-anchor-parity.yml",
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_source_erratum_compiled_probe.py",
+        ".github/workflows/commentary-anchor-parity.yml",
         "tests/test_commentary_osis_mixed_transport_probe.py"
       ]
     },
