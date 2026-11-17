@@ -1,0 +1,144 @@
+name: Research CCEL full MHC private IMP feasibility (no publication)
+
+on:
+  pull_request:
+    paths:
+      - "research/mhc-ccel/**"
+      - ".github/workflows/commentary-mhc-ccel-private-rebuild.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  private-original-source-feasibility:
+    name: Original six-volume XML to private IMP and SWORD engine only
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install parser and run generic rejection tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt -q
+          python -m unittest discover -s research/mhc-ccel -p "test_*.py" -v
+      - name: Fetch six source-SHA-pinned CCEL XML volumes privately
+        shell: bash
+        run: |
+          set -euo pipefail
+          export INPUT_DIR="$RUNNER_TEMP/mhc-ccel-original"
+          mkdir -p "$INPUT_DIR"
+          python - <<'PY'
+          from hashlib import sha256
+          import json
+          import os
+          from pathlib import Path
+          from urllib.parse import urlsplit
+          from urllib.request import Request, urlopen
+
+          manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
+          volumes=manifest["commentary_source"]["xml_witness_volumes"]
+          if sorted(v["number"] for v in volumes)!=list(range(1,7)):
+              raise SystemExit("Reviewed source collection is not six ordered volumes")
+          for volume in sorted(volumes,key=lambda item:item["number"]):
+              number=volume["number"]
+              url=volume["url"]
+              parsed=urlsplit(url)
+              if (parsed.scheme!="https" or parsed.hostname not in
+                      {"ccel.org","www.ccel.org"} or
+                      parsed.path!=f"/ccel/h/henry/mhc{number}.xml" or
+                      parsed.query or parsed.fragment):
+                  raise SystemExit("Source URL is not an exact official CCEL volume")
+              request=Request(url,headers={"User-Agent":"Bible-Resources-Source-Audit/1"})
+              with urlopen(request,timeout=90) as response:
+                  redirected=urlsplit(response.url)
+                  if redirected.scheme!="https" or redirected.hostname not in {
+                      "ccel.org","www.ccel.org"
+                  }:
+                      raise SystemExit("Unreviewed CCEL source redirect")
+                  data=response.read(32*1024*1024+1)
+              if (not 1000<=len(data)<=32*1024*1024 or
+                      sha256(data).hexdigest()!=volume["sha256"]):
+                  raise SystemExit(f"Original CCEL volume {number} SHA/length drift")
+              (Path(os.environ["INPUT_DIR"])/f"mhc{number}.xml").write_bytes(data)
+              print(f"Official original CCEL volume {number} independently SHA verified")
+          PY
+      - name: Require exact closed census of original verse-body candidates
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          export PRIVATE_IMP="$RUNNER_TEMP/mhc-ccel-trial.imp"
+          export REPORT="$RUNNER_TEMP/mhc-ccel-trial-metadata.json"
+          python research/mhc-ccel/ccel_imp_candidate.py \
+            --manifest config/commentary-intake/mhc-crosswire.json \
+            --source-dir "$RUNNER_TEMP/mhc-ccel-original" \
+            --private-output "$PRIVATE_IMP" > "$REPORT"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          report=json.loads(Path(os.environ["REPORT"]).read_text())
+          assert report["status"]=="INCOMPLETE_PRIVATE_VERSE_BODY_FEASIBILITY_ONLY"
+          assert len(report["volumes"])==6
+          assert report["source_body_entry_count"]==4263
+          assert sum(x["markers"] for x in report["volumes"])==5569
+          assert report["unhandled_chapter_markers"]==1306
+          assert sum(x["empty_original_bodies_preserved"] for x in report["volumes"])==5
+          assert report["all_source_text_accounted_for"] is False
+          assert report["redistribution_authorized"] is False
+          assert report["published"] is False
+          assert Path(os.environ["PRIVATE_IMP"]).is_file()
+          print("Private original CCEL verse/range candidates:",
+                report["source_body_entry_count"])
+          print("Original chapter markers UNHANDLED:",
+                report["unhandled_chapter_markers"])
+          print("All source prose accounted for: NO; no source was published")
+          PY
+      - name: Try real private SWORD import and headless reading, not content acceptance
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          timeout 150s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install \
+            -y --no-install-recommends libsword-utils diatheke
+          export SWORD_PATH="$RUNNER_TEMP/mhc-ccel-private-sword"
+          mkdir -p "$SWORD_PATH/mods.d" \
+            "$SWORD_PATH/modules/comments/zcom/mhc-ccel-trial"
+          cat > "$SWORD_PATH/mods.d/mhc-ccel-trial.conf" <<'CONF'
+          [MHCCCELTRIAL]
+          DataPath=./modules/comments/zcom/mhc-ccel-trial
+          ModDrv=zCom4
+          Encoding=UTF-8
+          SourceType=ThML
+          Lang=en
+          Versification=KJV
+          Version=0.0.0
+          Description=Private nonpublishable CCEL MHC feasibility probe
+          CONF
+          # Never print importer output: it may echo third-party prose or markup.
+          if ! timeout 360s imp2vs "$RUNNER_TEMP/mhc-ccel-trial.imp" \
+            -z z -b 3 -4 -v KJV \
+            -o "$SWORD_PATH/modules/comments/zcom/mhc-ccel-trial" \
+            >/dev/null 2>&1; then
+            echo "Private SWORD IMP compilation FAILED; no source edit or publication"
+            exit 1
+          fi
+          if ! timeout 50s diatheke -b MHCCCELTRIAL -k "Gen 1:1" \
+            >/dev/null 2>&1; then
+            echo "Private SWORD reader invocation FAILED; no GUI/source parity claim"
+            exit 1
+          fi
+          echo "Private compiler and CLI invocation completed; not editorial acceptance"
+          echo "Introductions, structural parity, rights and GUI remain unverified"
+      - name: Confirm no text, package, or screenshots were exported
+        if: always()
+        shell: bash
+        run: |
+          echo "All original XML, generated IMP and unpublished zCom stay in runner storage."
+          echo "No artifact, release, catalogue entry or source text is uploaded."
