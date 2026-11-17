@@ -174,6 +174,46 @@ jobs:
           assert len(set((f["corpus"], f["word_id"]) for f in report["findings"])) == len(report["findings"])
           PY
 
+      - name: Audit frozen ACAI repeated word groups without altering them
+        shell: bash
+        run: |
+          # Reuse the existing, pinned source-audit implementation rather than
+          # maintaining a second competing implementation in this repository.
+          python3 -I /tmp/acai-frozen/.github/scripts/audit_duplicate_word_groups.py \
+            --root /tmp/acai-frozen \
+            --output entity-index/dist/source-multiplicity.json \
+            --top 15
+          python3 - <<'PY'
+          import collections
+          import json
+          from pathlib import Path
+          report=json.loads(Path("entity-index/dist/source-multiplicity.json").read_text())
+          index=json.loads(Path("entity-index/dist/index.json").read_text())
+          summary=report["summary"]
+          findings=report["findings"]
+          assert summary["occurrence_fields_with_any_repeat"] == len(findings)
+          assert sum(r["duplicate_groups"] for r in findings) == summary["exact_duplicate_groups"]
+          assert sum(r["cross_group_word_ids"] for r in findings) == summary["word_ids_in_different_groups"]
+          assert len({r["id"] for r in findings}) == summary["records_with_any_repeat"]
+          assert not any(r["occurrence_field"] == "explicit_instances"
+                         and r["duplicate_groups"] for r in findings), summary
+          entries={e["source_id"]:e for e in index["entities"]}
+          quarantined={e["source_id"] for e in index["quarantined"]}
+          assert not (set(entries) & quarantined)
+          # Raw repeated groups in currently active source entries must not be
+          # silently deduplicated during compilation. The inverse lookup is
+          # intentionally a distinct entity/type candidate set instead.
+          for row in findings:
+              if row["id"] in quarantined:
+                  continue
+              entry=entries[row["id"]]
+              groups=entry["occurrences"][row["occurrence_field"]][row["corpus"]]
+              multiplicity=collections.Counter(tuple(group) for group in groups)
+              count=sum(n-1 for n in multiplicity.values())
+              assert count == row["duplicate_groups"], (row, count)
+          print("ENTITY_GROUP_MULTIPLICITY_QA",json.dumps(summary,sort_keys=True))
+          PY
+
       - name: Upload internal QA-only resource
         uses: actions/upload-artifact@v4
         with:
@@ -181,5 +221,6 @@ jobs:
           path: |
             entity-index/dist/index.json
             entity-index/dist/person-overlaps.json
+            entity-index/dist/source-multiplicity.json
           if-no-files-found: error
           retention-days: 14

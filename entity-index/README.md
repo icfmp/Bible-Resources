@@ -202,6 +202,36 @@ also require a distinct pinned-source completeness and traditional epistle
 subscription review (see inherited #86). Variant provenance is therefore
 retained for later source-specific qualification.
 
+## Repeated original-word group semantics and source QA
+
+The inherited [ACAI #195](https://github.com/icfmp/ACAI/issues/195)
+documents repeated indirect word groups, especially in pronoun and subject
+annotations. A repeated group can represent multiple semantic source links
+(e.g. parallel subject and frame references), not an accidentally doubled
+biblical word. **No repeated group may be removed merely to reduce a count.**
+
+Our independent CI reuses the existing **pinned** self-hosted source auditor
+`/tmp/acai-frozen/.github/scripts/audit_duplicate_word_groups.py`
+directly against the exact locked ACAI checkout. This deliberately avoids
+maintaining two diverging implementations. It uploads a separately labeled
+QA-only `source-multiplicity.json` with every candidate, totals, source
+record and field/corpus. The workflow independently checks internal
+counts, absence of repeated direct `explicit_instances` and that **all
+repeated indirect groups in active derived entries have exactly the same
+multiplicity as in the original**. Quarantined source records remain in
+the immutable checkout and are included in the audit census.
+
+The normal `by_word` index presents **unique entity/link-type candidates**
+per token for the UI and does not imply those repeated raw source assignments
+were editorially declared redundant. Historical figures (105 affected
+records, 593 extra copies and 24 overlapping word IDs) are **not blindly
+assumed to apply** without checking this particular frozen revision.
+
+No original word groups or Scripture are changed. The remaining question
+of whether an import created some redundant repeated indirect edges
+requires original Macula pointer-channel provenance, not a shortcut
+using `set()` on the source JSON.
+
 ## Full exact-word distinct-person collision audit
 
 The independent `audit_person_overlaps.py` reads our **complete generated
