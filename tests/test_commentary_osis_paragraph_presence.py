@@ -642,5 +642,63 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
             "complete_character_audit_requires_strict_exact_native_word_partition"])
 
 
+    def test_full_corpus_source_native_chapter_marker_index_is_fail_closed(self):
+        from lxml import etree
+        from commentary_osis_paragraph_presence import (
+            original_authoring_native_chapter_index_receipt)
+        # 66 genuine-style book divisions; first book owns two chapters,
+        # all later synthetic books own one. No prose/verse addresses leak.
+        books={}
+        for idx in range(1,67):
+            book=f"Book{idx}"
+            second=(idx==1)
+            chapters=(1,2) if second else (1,)
+            raw='<div type="book" osisID="'+book+'">'
+            for chapter in chapters:
+                ref=f"{book}.{chapter}"
+                raw+=f'<chapter sID="{ref}"/>'
+                raw+=f'<p>source body number {chapter}</p>'
+                raw+=f'<chapter eID="{ref}"/>'
+            raw+='</div>'
+            books[book]=etree.fromstring(raw.encode())
+        K=[f"Book{i}.1.1" for i in range(1,67)]+["Book1.2.1"]
+        I=[f"Book{i}.1" for i in range(1,67)]+["Book1.2.0"]
+        good=original_authoring_native_chapter_index_receipt(books,K,I)
+        self.assertEqual(good["original_osis_book_divisions"],66)
+        self.assertEqual(good["original_osis_unique_chapters"],67)
+        self.assertEqual(good["original_chapter_start_milestones"],67)
+        self.assertEqual(good["original_chapter_end_milestones"],67)
+        self.assertEqual(good["actual_native_numbered_K_slots"],67)
+        self.assertEqual(good["source_chapters_without_native_K"],0)
+        self.assertEqual(good["native_K_chapters_absent_from_authoring_OSIS"],0)
+        self.assertEqual(good["source_chapters_without_chapter_I"],0)
+        self.assertNotIn("Book1",json.dumps(good))
+
+        missing=original_authoring_native_chapter_index_receipt(
+            books,K[:-1],I[:-1])
+        self.assertEqual(missing["source_chapters_without_native_K"],1)
+        self.assertEqual(missing["source_chapters_without_chapter_I"],1)
+        self.assertNotEqual(missing["source_only_chapter_ref_set_sha256"],
+                            good["source_only_chapter_ref_set_sha256"])
+
+        with self.assertRaises(ValueError):
+            original_authoring_native_chapter_index_receipt(
+                books,K+["Book1.1.1"],I)
+        with self.assertRaises(ValueError):
+            original_authoring_native_chapter_index_receipt(
+                books,K,["not a real key"])
+        with self.assertRaises(ValueError):
+            original_authoring_native_chapter_index_receipt(
+                {**books,"Book67":etree.fromstring(
+                    b'<div type="book" osisID="Book67"/>')},K,I)
+        broken=books.copy()
+        broken["Book1"]=etree.fromstring(
+            b'<div type="book" osisID="Book1">'
+            b'<chapter sID="Book1.1"/><chapter eID="Book1.2"/>'
+            b'</div>')
+        with self.assertRaises(ValueError):
+            original_authoring_native_chapter_index_receipt(broken,K,I)
+
+
 if __name__=="__main__":
     unittest.main()
