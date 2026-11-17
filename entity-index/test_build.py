@@ -27,8 +27,10 @@ class EntityIndexTests(unittest.TestCase):
             "source_commit": "test-sha", "source_license": "CC BY-SA 4.0",
             "source_credit": "ACAI source test", "reviewed_hebrew_source": "pinned-test",
             "reviewed_greek_source": "pinned-test", "source_records_expected": 0,
-            "source_editions": {"wlc": {"edition": "pinned-test",
-                                        "word_id_prefix": "o"}} ,
+            "source_editions": {
+                "wlc": {"edition": "pinned-test", "word_id_prefix": "o"},
+                "sblgnt": {"edition": "pinned-test", "word_id_prefix": "n"},
+            },
         }
 
     def write_record(self, category, name, **fields):
@@ -45,10 +47,11 @@ class EntityIndexTests(unittest.TestCase):
         self.lock["source_records_expected"] += 1
         return path
 
-    def build(self, decisions=(), source_absences=None):
+    def build(self, decisions=(), source_absences=None,
+              source_verse_absences=None):
         return builder.build(self.root, self.lock,
                              {"schema_version": 1, "decisions": list(decisions)},
-                             source_absences)
+                             source_absences, source_verse_absences)
 
     def test_actual_editorial_pilots_preserve_source_and_correct_classification(self):
         path = self.write_record("people", "Jashar",
@@ -202,6 +205,40 @@ class EntityIndexTests(unittest.TestCase):
             explicit_instances={"wlc": [["o020020130103"]]})
         with self.assertRaisesRegex(ValueError, "direct/pronominal"):
             self.build(source_absences=audit)
+
+    def test_source_verse_absence_only_qualifies_raw_references(self):
+        original = self.write_record(
+            "people", "A", references=["47013014", "45016027", "43001001"])
+        self.write_record("places", "B", references=["47013014"])
+        before = original.read_bytes()
+        audit = {
+            "schema_version": 1, "corpus": "sblgnt",
+            "source_edition": "pinned-test",
+            "verse_ids": ["47013014", "45016027"],
+            "provenance": [{"source": "pinned Greek source verse scan"}],
+        }
+        report = self.build(source_verse_absences=audit)
+        self.assertEqual(report["statistics"]["unattested_source_verses"], 2)
+        self.assertEqual(
+            report["statistics"]["unattested_source_verse_reference_claims"], 3)
+        claims = report["unattested_source_verses"]["sblgnt:47013014"]
+        self.assertEqual(claims["source_reference_claims"],
+                         ["person:A", "place:B"])
+        self.assertEqual(claims["scope"],
+                         "absent_from_pinned_original_word_inventory_only")
+        self.assertEqual(report["entities"][0]["references"],
+                         ["47013014", "45016027", "43001001"])
+        self.assertEqual(original.read_bytes(), before)
+
+        with self.assertRaisesRegex(ValueError, "not pinned"):
+            self.build(source_verse_absences=dict(audit, source_edition="other"))
+        with self.assertRaisesRegex(ValueError, "Duplicate source-absent verse"):
+            self.build(source_verse_absences=dict(
+                audit, verse_ids=["47013014", "47013014"]))
+        with self.assertRaisesRegex(ValueError, "not referenced"):
+            self.build(source_verse_absences=dict(audit, verse_ids=["47013013"]))
+        with self.assertRaisesRegex(ValueError, "source audit provenance"):
+            self.build(source_verse_absences=dict(audit, provenance=[]))
 
     def test_preserve_group_order_repetitions_and_ambiguity(self):
         self.write_record("people", "A", references=["01001001"],
