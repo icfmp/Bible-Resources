@@ -80,7 +80,7 @@ Although Christ was accused of being a sinner and put to death as a criminal, he
 
 Angels attended and served him, because **he is their Lord**.
 
-The Gentiles welcomed the gospel even while many among Israel rejected it.
+The Gentiles welcomed the gospel that the Jews rejected.
 
 Remember that **God was revealed in the flesh** to take away our sins, redeem us from all lawlessness and purify a people for himself **eager to perform good works**.
 
@@ -89,6 +89,9 @@ These magnificent teachings must be made visible through **the Spirit's fruit in
 ---
 
 ## Editorial review — 1 Timothy 3
+
+**2026-11-17 second-pass CCEL collation:** retained Henry's **unqualified contrast** between Gentiles receiving the gospel and Jews rejecting it, rather than silently inserting the modern editorial qualification *many among Israel*. This is a statement of Henry's historical wording, not an assertion that every Jew rejected Jesus. Source witness: [CCEL 1 Timothy 3](https://ccel.org/ccel/henry/mhcc.xlvi.iii.html). The exact published native source/markup and authorial meaning still require independent approval.
+
 
 **Full secondary original-English source directly checked:** [CCEL, 1 Timothy 3](https://ccel.org/ccel/henry/mhcc.xlvi.iii.html). Exact published `MHCC 0.1.1` remains original authority; source-native SWORD entries, annotations, independent review, rebuild and reader QA pending.
 
