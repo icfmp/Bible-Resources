@@ -419,6 +419,31 @@ class EntityIndexTests(unittest.TestCase):
         self.assertEqual(report, self.build())
         self.assertEqual(report["statistics"]["reviewed_entries"], 0)
 
+    def test_exact_snapshot_hash_catches_unchanged_count_with_modified_data(self):
+        path = self.write_record(
+            "people", "A",
+            references=["01001001"],
+            explicit_instances={"wlc": [["o010010010011"]]})
+        original_bytes = path.read_bytes()
+        baseline = self.build()
+        digest = baseline["provenance"]["source_snapshot_sha256"]
+        self.assertEqual(len(digest), 64)
+        self.assertEqual(digest, self.build()["provenance"]["source_snapshot_sha256"])
+        # The real source lock pins this expected fingerprint. A synthetic
+        # fixture can pin its own fingerprint to test fail-closed behavior.
+        self.lock["source_snapshot_sha256"] = digest
+        self.assertEqual(self.build()["provenance"]["source_snapshot_sha256"], digest)
+        tampered = json.loads(path.read_text(encoding="utf-8"))
+        tampered["references"].append("01001002")
+        path.write_text(json.dumps(tampered, ensure_ascii=False), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "source snapshot digest mismatch"):
+            self.build()
+        path.write_bytes(original_bytes)
+        self.assertEqual(self.build()["provenance"]["source_snapshot_sha256"], digest)
+        with self.assertRaisesRegex(ValueError, "Invalid pinned original JSON"):
+            self.lock["source_snapshot_sha256"] = "broken"
+            self.build()
+
     def test_fails_closed_on_missing_group_or_unverified_record_count(self):
         self.write_record("people", "A",
                           explicit_instances={"wlc": [["o010010010011"]]})
