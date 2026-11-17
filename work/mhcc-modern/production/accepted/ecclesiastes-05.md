@@ -10,13 +10,13 @@ publication_status: "NOT RELEASED — FULL SWORD REBUILD PENDING"
 
 # Ecclesiastes 5 — Modern English
 
-## Original chapter outline
+## Original chapter outline — explicit verse-label corrections
 
 | Original outline | Verses |
 | --- | --- |
 | What renders devotion vain. | 1–3 |
 | Of vows, and oppression. | 4–8 |
-| the vanity of riches shown. | 9–7 |
+| the vanity of riches shown. | 9–17 |
 | The right use of riches. | 18–20 |
 
 ## Worship, words and wandering thoughts (verses 1–3)
@@ -112,6 +112,10 @@ Everyone is invited to receive this heavenly provision.
 ---
 
 ## Editorial review — Ecclesiastes 5
+
+**2026-11-17 traceable outline-reference correction (independent original-native review pending):** The prior end verse 7 preceded the start verse 9 and conflicted with the manuscript's already aligned 9–17 exposition. Only the **verse-range cells of the copied original-outline table** have been corrected; source-authored headings, row order, commentary section boundaries, and exposition prose are not edited. Previously transcribed cells: `the vanity of riches shown. | 9–7`. Corrected cells: `the vanity of riches shown. | 9–17`. The repair is reversible against this recorded before/after; the authoritative published MHCC 0.1.1 outline still requires exact independent native validation.
+
+
 
 **Full secondary original-English witness directly read:** [CCEL, Ecclesiastes 5](https://ccel.org/ccel/henry/mhcc.xxii.v.html). The pinned released `MHCC 0.1.1` remains the primary source for final native SWORD alignment and independent acceptance.
 
