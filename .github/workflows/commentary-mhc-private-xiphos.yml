@@ -96,6 +96,21 @@ jobs:
               "editorial_or_rights_approval": False,
               "published": False,
           }
+          # All diagnostics below are booleans, step identifiers or byte counts.
+          # Do not expose copied GUI contents, original SWORD prose or screenshots.
+          from collections import Counter
+          summary.update({
+              "commands_accepted": gui["actual_passage_commands_accepted"],
+              "failed_gui_action_types": dict(sorted(Counter(
+                  gui["bounded_xiphos_ui_failed_action_by_passage"].values()
+              ).items())),
+              "commentary_pane_focus_attempt_counts": sorted(
+                  gui["bounded_right_commentary_pane_focus_attempts_by_passage"].values()
+              ),
+              "copied_gui_clipboard_size_bytes": sorted(
+                  gui["copied_gui_clipboard_byte_count_by_passage"].values()
+              ) if "copied_gui_clipboard_byte_count_by_passage" in gui else [],
+          })
           print("Private actual Xiphos startup/prose-selection research metadata:",
                 json.dumps(summary, sort_keys=True))
           print("This does not assert three GUI passages, chapter rendering, or release approval.")
