@@ -10,14 +10,14 @@ publication_status: "NOT RELEASED — FULL SWORD REBUILD PENDING"
 
 # 2 Samuel 2 — Modern English
 
-## Original chapter outline
+## Original chapter outline — explicit verse-label corrections
 
 | Original outline | Verses |
 | --- | --- |
 | David made king in Hebron. | 1–7 |
 | Abner makes Ishbosheth king Battle between Abner's men and those of Joab. | 8–17 |
-| Asahel slain by Abner. | 25–32 |
-| Both parties retreat. | 18–24 |
+| Asahel slain by Abner. | 18–24 |
+| Both parties retreat. | 25–32 |
 
 ## David is made king at Hebron (verses 1–7)
 
@@ -104,6 +104,10 @@ But at the resurrection only one distinction will endure forever: **godly or ung
 ---
 
 ## Editorial review — 2 Samuel 2
+
+**2026-11-17 traceable outline-reference correction (independent original-native review pending):** The Asahel narrative and withdrawal of the two forces had their verse spans transposed. Only the **verse-range cells of the copied original-outline table** have been corrected; source-authored headings, row order, commentary section boundaries, and exposition prose are not edited. Previously transcribed cells: `Asahel slain by Abner. | 25–32`; `Both parties retreat. | 18–24`. Corrected cells: `Asahel slain by Abner. | 18–24`; `Both parties retreat. | 25–32`. The repair is reversible against this recorded before/after; the authoritative published MHCC 0.1.1 outline still requires exact independent native validation.
+
+
 
 **Complete secondary English witness directly read:** [CCEL, 2 Samuel 2](https://ccel.org/ccel/henry/mhcc.xi.ii.html). The actual authoritative original remains published SHA-pinned **MHCC 0.1.1**, pending native SWORD text/outline reconciliation and independent approval.
 
