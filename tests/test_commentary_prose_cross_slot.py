@@ -208,7 +208,7 @@ class OriginalExtraGapChapterNativeTests(unittest.TestCase):
             "<p>"+" ".join(second)+" closing</p></div>"
         )
         xml=(
-            b"<ThML>\\n<div1>\\n<scripCom osisRef='Bible:Gen.1.1'/>"
+            b"<ThML>\n<div1>\n<scripCom osisRef='Bible:Gen.1.1'/>"
             +body.encode("utf-8")
             +b"<scripCom osisRef='Bible:Gen.1.2'/><div><p>next text</p></div>"
             +b"</div1></ThML>"
@@ -252,7 +252,7 @@ class OriginalExtraGapChapterNativeTests(unittest.TestCase):
             __import__("lxml.etree",fromlist=["fromstring"]).fromstring(
                 body.encode()).xpath("string(.)"),original)
         xml=(
-            b"<ThML>\\n<div1>\\n<scripCom osisRef='Bible:Gen.1.1'/>"
+            b"<ThML>\n<div1>\n<scripCom osisRef='Bible:Gen.1.1'/>"
             +body.encode()+b"</div1></ThML>"
         )
         item=dict(sample[1],original_source_line=3,
