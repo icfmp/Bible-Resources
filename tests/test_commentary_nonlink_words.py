@@ -58,13 +58,13 @@ class CommentaryOriginalOutsideLinkWordsTests(unittest.TestCase):
 
     def test_unique_source_extra_word_gaps_are_only_topology_not_edition_proof(self):
         cases = (
-            (["prefix", "alpha", "beta"], ["alpha", "beta"],
+            (["onlyprefixsecret", "alpha", "beta"], ["alpha", "beta"],
              "unique_alignment_prefix_extra_words_only", (1, 0, 0, 1)),
-            (["alpha", "beta", "suffix"], ["alpha", "beta"],
+            (["alpha", "beta", "onlysuffixsecret"], ["alpha", "beta"],
              "unique_alignment_suffix_extra_words_only", (0, 0, 1, 1)),
-            (["alpha", "middle", "beta"], ["alpha", "beta"],
+            (["alpha", "onlymiddlesecret", "beta"], ["alpha", "beta"],
              "unique_alignment_interior_extra_words_only", (0, 1, 0, 1)),
-            (["prefix", "alpha", "between", "beta", "suffix"], ["alpha", "beta"],
+            (["onlyprefixsecret", "alpha", "onlybetweensecret", "beta", "onlysuffixsecret"], ["alpha", "beta"],
              "unique_alignment_interior_and_edge_extra_words", (1, 1, 1, 3)),
         )
         for source, stock, category, expected in cases:
@@ -80,8 +80,8 @@ class CommentaryOriginalOutsideLinkWordsTests(unittest.TestCase):
                 ),expected)
                 self.assertFalse(layout[
                     "textual_section_or_editional_ownership_established"])
-                self.assertNotIn("prefix",json.dumps(result))
-                self.assertNotIn("middle",json.dumps(result))
+                self.assertNotIn("onlyprefixsecret",json.dumps(result))
+                self.assertNotIn("onlymiddlesecret",json.dumps(result))
 
     def test_repeated_original_tokens_must_not_be_assigned_to_one_gap(self):
         result=compare_words_outside_links(
@@ -97,16 +97,16 @@ class CommentaryOriginalOutsideLinkWordsTests(unittest.TestCase):
 
     def test_real_link_label_exclusion_precedes_extra_word_location(self):
         result=compare_words_outside_links(
-            ["alpha","source","label","extra","beta"],
-            ["alpha","different","reference","beta"],[1,2],[1,2])
+            ["alpha","sourcecitationsecret","label","nonlinkedsecret","beta"],
+            ["alpha","stockcitationsecret","reference","beta"],[1,2],[1,2])
         layout=result["source_extra_unlinked_word_gap_layout"]
         self.assertEqual(layout["alignment_topology"],
                          "unique_alignment_interior_extra_words_only")
         self.assertEqual(layout["source_extra_nonlink_word_count"],1)
         self.assertEqual(result["original_scripture_link_word_tokens_removed"],2)
         self.assertEqual(result["stock_reference_word_tokens_removed"],2)
-        self.assertNotIn("source",json.dumps(result))
-        self.assertNotIn("different",json.dumps(result))
+        self.assertNotIn("nonlinkedsecret",json.dumps(result))
+        self.assertNotIn("stockcitationsecret",json.dumps(result))
 
     def test_word_index_must_be_real_bound_and_unique(self):
         for ids in ([1,1],[-1],[2]):
