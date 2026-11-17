@@ -52,6 +52,8 @@ jobs:
               raise SystemExit("Unreviewed eBible KJV archive size")
           print("Independent eBible KJV USFM archive SHA-256 (observation only):",
                 sha256(data).hexdigest())
+          if sha256(data).hexdigest() != "b6faa67117ccaba49df9e7df224a553f11758ae7c5d58f0f7979e2b73ac4480b":
+              raise SystemExit("Independently pinned eBible KJV USFM changed")
           found=[]
           seen_book_codes=set()
           with ZipFile(BytesIO(data)) as archive:
@@ -106,6 +108,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_commentary_nonlink_word_alignment.py' -v
           python -m unittest discover -s tests -p 'test_commentary_nonlink_words.py' -v
           python -m unittest discover -s tests -p 'test_commentary_prose_cross_slot.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_usfm_title_witness.py' -v
       - name: Install real original native SWORD readers
         shell: bash
         run: |
@@ -409,6 +412,46 @@ jobs:
                           encoding="utf-8")
           print("An exact source edition/structure proof is NOT established.")
           PY
+      - name: Compare original Psalm first paragraphs with pinned independent KJV USFM titles
+        if: env.SOURCE_VOLUME == '3'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from hashlib import sha256
+          import os
+          from pathlib import Path
+          import urllib.request
+          url="https://ebible.org/Scriptures/eng-kjv2006_usfm.zip"
+          pinned="b6faa67117ccaba49df9e7df224a553f11758ae7c5d58f0f7979e2b73ac4480b"
+          request=urllib.request.Request(url,headers={
+              "User-Agent":"BibleResources-SourceResearch/1.0"})
+          with urllib.request.urlopen(request,timeout=60) as response:
+              if response.url!="https://ebible.org/Scriptures/eng-kjv2006_usfm.zip":
+                  raise SystemExit("Independent KJV USFM source redirect changed")
+              data=response.read(16*1024*1024+1)
+          if (not data or len(data)>16*1024*1024
+                  or sha256(data).hexdigest()!=pinned):
+              raise SystemExit("Original independent KJV USFM archive changed its pinned SHA-256")
+          path=Path(os.environ["RUNNER_TEMP"])/"original-independent-kjv-usfm.zip"
+          path.write_bytes(data)
+          print("Independent original KJV USFM SHA-256 pin verified:",pinned)
+          PY
+          python scripts/commentary_usfm_title_witness.py \
+            --source-safe-receipt "$RUNNER_TEMP/mhc-original-volume-safe-receipt.json" \
+            --usfm-zip "$RUNNER_TEMP/original-independent-kjv-usfm.zip" \
+            --usfm-archive-sha256 "b6faa67117ccaba49df9e7df224a553f11758ae7c5d58f0f7979e2b73ac4480b" \
+            --usfm-book-id PSA \
+            --source-book Ps \
+            --report "$RUNNER_TEMP/mhc-independent-usfm-psalm-title-evidence.json"
+      - name: Upload only independent, pinned KJV USFM Psalm-title comparison metadata
+        if: env.SOURCE_VOLUME == '3'
+        uses: actions/upload-artifact@v4
+        with:
+          name: mhc-psalm-title-kjv-usfm-metadata-evidence
+          path: ${{ runner.temp }}/mhc-independent-usfm-psalm-title-evidence.json
+          if-no-files-found: error
+          retention-days: 90
       - name: Upload only independent, source-bound metadata-only volume receipt
         uses: actions/upload-artifact@v4
         with:
