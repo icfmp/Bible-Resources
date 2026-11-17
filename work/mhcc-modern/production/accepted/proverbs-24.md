@@ -60,7 +60,7 @@ Attend to necessary work and responsibilities before optional comforts. **Do not
 
 ## Verses 28 and 29 — The duties of a truthful witness
 
-Henry says these verses identify **three failures of a witness**. We must guard testimony against falsehood, careless accusation and retaliation; do not repay others' wrongs with our own.
+Henry observes that these verses identify **three faults of a witness**. We should examine the warnings carefully and avoid giving false or retaliatory testimony.
 
 ## Verses 30–34 — The neglected field and neglected soul
 
