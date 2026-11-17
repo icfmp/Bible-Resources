@@ -52,8 +52,11 @@ jobs:
           assert stats["unattested_distinct_source_words"] == 18, stats
           assert stats["indexed_distinct_source_words"] == 134822, stats
           assert len(index["unattested_source_words"]) == 18
+          # Candidate lookup claims are distinct (entity, field) pairs, while
+          # original repeated source annotation groups retain multiplicity.
           assert sum(len(r["source_claims"]) for r in
-                     index["unattested_source_words"].values()) == 19
+                     index["unattested_source_words"].values()) == 18
+          assert stats["unattested_raw_word_assignments"] == 19, stats
           assert not (set(index["unattested_source_words"]) & set(index["by_word"]))
           by_id={e["id"]:e for e in index["entities"]}
           assert "person:Jashar" not in by_id
