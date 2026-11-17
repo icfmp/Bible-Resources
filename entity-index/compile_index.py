@@ -217,10 +217,19 @@ def build(source_root: Path, source_lock: dict, editorial: dict,
                 for group in groups:
                     for word in group:
                         standard_corpus = canonical_source_corpus(source_lock, corpus)
-                        expected_prefix = source_lock["source_editions"][standard_corpus]["word_id_prefix"]
+                        source_format = source_lock["source_editions"][standard_corpus]
+                        expected_prefix = source_format["word_id_prefix"]
+                        digits = source_format["word_id_digits"]
+                        if (not isinstance(digits, int) or isinstance(digits, bool)
+                                or digits < 8):
+                            raise ValueError(
+                                f"Invalid original word ID digit count for {standard_corpus}")
                         if not word.startswith(expected_prefix):
                             raise ValueError(
                                 f"{entry['id']}: {corpus} word prefix incompatible: {word!r}")
+                        if len(word) != digits + len(expected_prefix) or not word[len(expected_prefix):].isdigit():
+                            raise ValueError(
+                                f"{entry['id']}: {corpus} malformed original word ID: {word!r}")
                         candidates[f"{standard_corpus}:{word}"].add((entry["id"], field))
     # A pinned-source audit may prove that an imported annotation refers to
     # a word ID that does not exist in the claimed original-language edition.
@@ -240,6 +249,7 @@ def build(source_root: Path, source_lock: dict, editorial: dict,
     if not isinstance(catalog, dict) or catalog.get("edition") != edition:
         raise ValueError("Missing-word audit is not pinned to this original edition")
     prefix = catalog.get("word_id_prefix")
+    digits = catalog.get("word_id_digits")
     reported_ids = source_absences.get("word_ids")
     evidence = source_absences.get("provenance")
     if not isinstance(reported_ids, list) or not isinstance(evidence, list):
@@ -250,8 +260,11 @@ def build(source_root: Path, source_lock: dict, editorial: dict,
         raise ValueError("Duplicate source-unattested word ID")
     unattested = {}
     for word_id in sorted(reported_ids):
-        if (not isinstance(word_id, str) or len(word_id) < 9
-                or word_id[0] != prefix or not word_id[1:9].isdigit()):
+        if (not isinstance(word_id, str) or not isinstance(prefix, str)
+                or not isinstance(digits, int) or isinstance(digits, bool)
+                or len(word_id) != len(prefix) + digits
+                or not word_id.startswith(prefix)
+                or not word_id[len(prefix):].isdigit()):
             raise ValueError(f"Invalid source-unattested word ID: {word_id!r}")
         key = f"{corpus}:{word_id}"
         if key not in candidates:
