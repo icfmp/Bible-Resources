@@ -92,6 +92,39 @@
         "Macula WLC GEN 10:14 o010100140081: Philistines plural",
         "Macula WLC 1CH 1:12 o130010120081: Philistines plural"
       ]
+    },
+    {
+      "source_id": "person:Shiloh",
+      "action": "quarantine",
+      "reason": "Genesis 49:10 contains a debated Hebrew form often glossed Shiloh. The pinned WLC annotates it as a proper noun but does not establish a named historical male individual in patriarchal times. Withhold this personal identity rather than forcing one textual/messianic interpretation; preserve the original token and record for later evidence review.",
+      "evidence": [
+        "Macula Hebrew WLC GEN 49:10 word o010490100121: lexical form Shiloh, noun/proper; personhood unsupported by this word annotation",
+        "icfmp/ACAI issue #57: disputed textual and Christological interpretations"
+      ]
+    },
+    {
+      "source_id": "keyterm:Universe",
+      "action": "replace_identity",
+      "id": "keyterm:Universe",
+      "kind": "keyterm",
+      "canonical_id": "keyterm:Universe",
+      "reason": "The source maps this Greek age/eon concept under keyterm:Ability, which is neither a verified semantic identity nor a legitimate automatic alias. Preserve the Universe entity's original token groups and source ID but separate its canonical ID; do not adjudicate the precise sense of each source occurrence.",
+      "evidence": [
+        "ACAI pinned source keyterms/json/Universe.json: primary_id=keyterm:Ability; Greek lemma αἰών",
+        "icfmp/ACAI issue #74: broad editorial primary-ID conflation requiring distinct candidate identities"
+      ]
+    },
+    {
+      "source_id": "keyterm:World",
+      "action": "replace_identity",
+      "id": "keyterm:World",
+      "kind": "keyterm",
+      "canonical_id": "keyterm:World",
+      "reason": "The source maps World under keyterm:Ability, but a world-related concept is not the identical entity as human ability. Preserve every original word group and verse claim; make the canonical identity independent, without assuming lexical sense unambiguity at any word occurrence.",
+      "evidence": [
+        "ACAI pinned source keyterms/json/World.json: primary_id=keyterm:Ability; concept labeled World",
+        "icfmp/ACAI issue #74: inherited keyterm primary-ID conflation"
+      ]
     }
   ]
 }

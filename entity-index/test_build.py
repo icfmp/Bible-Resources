@@ -75,15 +75,26 @@ class EntityIndexTests(unittest.TestCase):
         self.write_record("groups", "Philistine",
                           references=["07015003"],
                           explicit_instances={"wlc": [["o070150030062"]]})
+        self.write_record("people", "Shiloh",
+                          references=["01049010"],
+                          explicit_instances={"wlc": [["o010490100121"]]})
+        self.write_record("keyterms", "Universe",
+                          primary_id="keyterm:Ability",
+                          references=["40012032"],
+                          explicit_instances={"SBLGNT": [["n40012032029"]]})
+        self.write_record("keyterms", "World",
+                          primary_id="keyterm:Ability",
+                          references=["43003016"],
+                          explicit_instances={"SBLGNT": [["n43003016007"]]})
         source_before = path.read_bytes()
         decisions = json.loads(
             Path(__file__).with_name("editorial-decisions.json").read_text()
         )["decisions"]
         report = self.build(decisions)
-        self.assertEqual(report["statistics"]["source_records"], 6)
-        self.assertEqual(report["statistics"]["index_entities"], 4)
-        self.assertEqual(report["statistics"]["quarantined_records"], 2)
-        self.assertEqual(report["statistics"]["reviewed_entries"], 4)
+        self.assertEqual(report["statistics"]["source_records"], 9)
+        self.assertEqual(report["statistics"]["index_entities"], 6)
+        self.assertEqual(report["statistics"]["quarantined_records"], 3)
+        self.assertEqual(report["statistics"]["reviewed_entries"], 6)
         by_id = {row["id"]: row for row in report["entities"]}
         self.assertIn("work:BookOfJashar", by_id)
         self.assertIn("place:PerezUzzah", by_id)
@@ -91,6 +102,17 @@ class EntityIndexTests(unittest.TestCase):
         self.assertNotIn("person:Jashar", by_id)
         self.assertNotIn("person:Hammelech", by_id)
         self.assertNotIn("person:Philistine", by_id)
+        self.assertNotIn("person:Shiloh", by_id)
+        self.assertNotIn("wlc:o010490100121", report["by_word"])
+        self.assertEqual(by_id["keyterm:Universe"]["canonical_id"],
+                         "keyterm:Universe")
+        self.assertEqual(by_id["keyterm:World"]["canonical_id"],
+                         "keyterm:World")
+        self.assertEqual(by_id["keyterm:Universe"]["source_primary_id"],
+                         "keyterm:Ability")
+        self.assertEqual(by_id["keyterm:World"]["occurrences"]
+                         ["explicit_instances"]["SBLGNT"],
+                         [["n43003016007"]])
         self.assertIn("group:Philistine", by_id)
         self.assertEqual(by_id["group:Philistine"]["references"],
                          ["07015003", "01010014", "13001012"])
