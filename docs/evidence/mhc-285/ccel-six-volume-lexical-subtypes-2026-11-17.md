@@ -311,3 +311,20 @@ The Ps 72 source reference is **a single verse**, not an invented multi-verse ra
 
 **Next limited editorial action:** investigate the real source paragraph, genuine `scripRef`/native reference offsets, original textual range and actual stock K/I payload of exactly these four entries. Ambiguous identical-word alignment alone cannot justify selecting a missing-word span. A true word-selection/order difference cannot be reduced to a generic KJV title treatment. Keep original CCEL XML, native stock archive, printed-edition witness, authorial prose and public resource **unchanged**; retain independent historical textual/rights gates. [Draft PR #286](https://github.com/icfmp/Bible-Resources/pull/286) remains unmerged.
 
+
+
+## The remaining three repeated-token ambiguous Psalm source-extra alignments
+
+The actual SHA-pinned CCEL Volume III [real MHC audit #44130801726](https://github.com/icfmp/Bible-Resources/actions/runs/44130801726) PASSED on its original-source-versus-CrossWire comparison and on the additional independent pinned eBible KJV 2006 Psalm-title comparison. Exact original CCEL first-`p` token SHA digests were exposed only as source-derived metadata, never as original prose, and compared to the independent USFM `\\d` title digests. **No ambiguous source/native token alignment was forced to become unique.**
+
+| Ambiguous original CCEL same-start Psalm case | Original source XML line | Original first `p` visible words | Independent KJV `\\d` title words | Exact private source-only title comparison |
+| --- | ---: | ---: | ---: | --- |
+| **Psalm 7**, another section after the independently reviewed Psalm 7:1–9 | 28009 | **136** | **16** | **Different counts**; this first paragraph is **not** solely the same 16-word biblical superscription |
+| **Psalm 52** | 46600 | **29** | **29** | **Same ordered biblical title tokens after casefold only** |
+| **Psalm 72** | 54125 | **4** | **4** | **Same ordered biblical title tokens after casefold only** |
+
+These are **three separate original source case identities**, securely bound to their original `scripCom` full-reference SHA and source line, not a repetition of the 112 separately unique-gap first-paragraph cases. The original source/reference SHA-256 receipts for these three cases, respectively, are `7e287caceb659a7e811ea5a3842f697705e16b18710b2bab4207a1d933673115`, `b6655faf8863de5d9fb06630db0d3f09a317d7b93336db5c8d4d2401140eb1cd`, and `3aca1e5bad6dbe089034f8b739c48c4e830c817a9afd594a0efd9765c1ca818f`.
+
+**Strict interpretation:** Psalm 52 and 72 now have independent biblical-title *text identity* despite their original/native **extra-word alignment remaining ambiguous**. This is additional confirmed evidence of included biblical superscriptions in the CCEL presentation, but says **nothing** about which repeated words are extra to the native selected entry. Psalm 7's **136-word opening paragraph in its second source section** must be reviewed as a separate original authorial/biblical/editorial division; it is not just a repeated Psalm title and must not be dropped as a title or automatically restored as commentary. The **one other Psalm original/native plain-word order/selection case** is outside both the 112 unique aligned and the three ambiguous cases; it is **still unresolved**.
+
+There is no editorial authorial-loss verdict, source-text correction, KJV title normalization, change to native K/I/TOP stock, rights clearance or release. Original source texts remain unchanged; the PR remains intentionally draft and unmerged.
