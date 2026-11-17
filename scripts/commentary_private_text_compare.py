@@ -1105,8 +1105,23 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
             double_link_original_book_counts[book]=(
                 double_link_original_book_counts.get(book,0)+1)
             double_link_book_classes.setdefault(book,Counter())[category]+=1
+            source_paragraphs=item["private_original_p_visible_word_digest_inventory"]
+            if (source_paragraphs and
+                    source_paragraphs[0]["original_p_document_ordinal"]!=1):
+                raise PilotError("Original source opening paragraph identity changed")
+            first_p=source_paragraphs[0] if source_paragraphs else None
             double_link_rows.append({
                 "source_book":book,
+                "original_source_chapter_number_from_actual_osis_start":
+                    int(start.rsplit(".",2)[1]),
+                "original_first_p_visible_word_identity_only":({
+                    "original_p_document_ordinal":1,
+                    "visible_words":first_p["original_p_visible_word_tokens"],
+                    "exact_unicode_word_sha256":
+                        first_p["original_p_visible_ordered_word_sha256"],
+                    "casefold_unicode_word_sha256":
+                        first_p["original_p_visible_casefold_word_sha256"],
+                } if first_p is not None else None),
                 "original_source_line":item["original_source_line"],
                 "original_full_reference_sha256":item["original_full_reference_sha256"],
                 "original_body_sha256":item["original_text_sha256"],
