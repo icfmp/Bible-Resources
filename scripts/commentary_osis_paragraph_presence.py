@@ -1502,15 +1502,64 @@ def private_original_osis_gap_against_pinned_ccel_volume(
                 ("last",len(original)-12)):
             anchors[tuple(original[offset:offset+12])].append((idx,label))
     hits=defaultdict(set)
+    anchor_offsets=defaultdict(lambda:defaultdict(list))
     for pos in range(max(0,len(words)-11)):
         for idx,label in anchors.get(tuple(words[pos:pos+12]),()):
             hits[idx].add(label)
+            # Bounded, exact whole-word first/mid/last anchor positions.
+            # Repeated generic wording must NOT be used to infer a unique
+            # textual owner or silently collate unrelated paragraphs.
+            found=anchor_offsets[idx][label]
+            if len(found)<=20:
+                found.append(pos)
     cases=[]
     for idx,(chapter,start,original) in enumerate(identities):
         whole=(
             _private_exact_token_match_offsets(
                 words,original,maximum_positions=20)
             if "first" in hits[idx] else [])
+        # A source-only gap can differ by one electronic-edition word yet
+        # share all three original 12-word witnesses. Only uniquely ordered,
+        # size-bounded first/middle/last witnesses permit exact PRIVATE
+        # source-vs-CCEL lexical comparison of the enclosed digital span.
+        collated=None
+        pos=anchor_offsets[idx]
+        if (all(len(pos.get(label,()))==1
+                for label in ("first","middle","last"))
+                and pos["first"][0]<pos["middle"][0]<pos["last"][0]):
+            first=pos["first"][0]
+            after=pos["last"][0]+12
+            candidate=words[first:after]
+            if len(original)//2<=len(candidate)<=len(original)*2:
+                prefix=0
+                while (prefix<min(len(original),len(candidate))
+                       and original[prefix]==candidate[prefix]):
+                    prefix+=1
+                suffix=0
+                while (suffix<min(len(original),len(candidate))-prefix
+                       and original[-1-suffix]==candidate[-1-suffix]):
+                    suffix+=1
+                original_inside=len(original)-prefix-suffix
+                candidate_inside=len(candidate)-prefix-suffix
+                collated={
+                    "original_authored_source_word_tokens":len(original),
+                    "independently_bounded_ccel_digital_word_tokens":len(candidate),
+                    "ccel_minus_source_visible_word_count_delta":
+                        len(candidate)-len(original),
+                    "identical_case_sensitive_prefix_word_tokens":prefix,
+                    "identical_case_sensitive_suffix_word_tokens":suffix,
+                    "original_inner_unaligned_word_tokens":original_inside,
+                    "ccel_inner_unaligned_word_tokens":candidate_inside,
+                    "all_bounded_ccel_source_word_tokens_exact":
+                        candidate==original,
+                    "original_source_gap_ordered_word_sha256":sha256(
+                        " ".join(original).encode("utf-8")).hexdigest(),
+                    "independent_ccel_bounded_word_sha256":sha256(
+                        " ".join(candidate).encode("utf-8")).hexdigest(),
+                    "candidate_anchored_by_three_unique_ordered_12word_windows":
+                        True,
+                    "not_a_proof_of_historical_edition_or_para_owner":True,
+                }
         cases.append({
             "original_authored_chapter_ref_sha256":sha256(
                 chapter.encode("ascii")).hexdigest(),
@@ -1520,6 +1569,9 @@ def private_original_osis_gap_against_pinned_ccel_volume(
             "full_exact_word_sequence_occurrences_in_original_volume":len(whole),
             "first_middle_last_12word_anchors_in_original_ccel":
                 sorted(hits[idx]),
+            "three_unique_ordered_CCEl_anchor_word_positions_verified":
+                collated is not None,
+            "bounded_original_source_against_ccel_word_collation":collated,
             "authored_original_OSIS_gap_not_proven_CCEl_editorial_owner":True,
             "no_original_text_or_native_address_exported":True,
         })
