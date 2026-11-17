@@ -5,6 +5,21 @@
 
 **Status (2026-11-16):** Modern English production **started at Genesis 1** using corrected published `MHCC` 0.1.1. The prior **24 scattered WIP chapters remain exploratory pilots**, not production progress. Genesis 1 and the separately modernized Genesis book introduction have committed **production CANDIDATES, not accepted chapters**; their native structure, source-linked notes, source outline and temporary SWORD reader/readback checks have passed. A full independent semantic reviewer signoff remains pending. **0 / 1,189 production chapters accepted**. Tracking: [#270](https://github.com/icfmp/Bible-Resources/issues/270) and draft [PR #272](https://github.com/icfmp/Bible-Resources/pull/272). The original published MHCC source and historical BRMHCC releases remain unchanged.
 
+## Chapter-wide commentary fallback and verse-specific precedence (owner decision, 2026-11-17)
+
+**Reader contract for the separate Modern English derivative, not a change to the published MHCC 0.1.1 source:**
+
+- A commentary whose **verified authorial coverage is the entire chapter** must be accessible from **every verse of that chapter** during verse-following reading.
+- If a verified **verse-specific or verse-range exposition** already covers a verse, **that specific exposition takes priority**. Do not replace, merge, duplicate or obscure it with the chapter-wide fallback. The chapter-wide comment is a fallback **only at uncovered verse addresses**.
+- A full-chapter original is **one authored commentary body**, not one invented comment per verse. Reuse a single native body through supported standard SWORD linking/aliasing if reader round-trip proves it safe; never paste independent text copies into 37 or 13 entries.
+- Source intro provenance must be retained explicitly. Where an original I-owned source commentary is made accessible through new derivative K links, document the deliberate editorial relocation/aliasing. Avoid displaying both the same intro and its fallback simultaneously. Keep the original source module unchanged.
+- This is a general precedence rule for all commentary resources, **not** a hardcoded book-specific rendering exception. Map actual original K/I ownership before applying it; never infer that every chapter intro is a full-chapter commentary or overwrite existing K text.
+- Validate every proposed fallback link in actual compiled SWORD data, including native key identity, nonduplicated body storage, independent reader navigation and synchronization behavior, both positive (uncovered verse) and negative (covered verse) test cases. **No live module is approved or published by this decision.**
+
+**Confirmed relevant original-native layout:** `Lev.19` (37 KJV verse addresses) and `Ps.108` (13 KJV verse addresses) have source commentary prose in their chapter-introduction `I` entries and **no numbered source `K` commentary entries**. The Modern English derivative should therefore make each respective single chapter-wide commentary available at **all 37** or **all 13** verses, subject to complete verification of the actual verse registry and successful compilation/readback. Do not manufacture 50 different authorial expositions.
+
+Existing original source evidence: [native introduction ownership research](https://github.com/icfmp/Bible-Resources/blob/main/docs/evidence/mhcc-274/native-intro-text-ownership.md). The structural whole-canon receipt is [Actions #44183321615](https://github.com/icfmp/Bible-Resources/actions/runs/44183321615); it proves original source ownership and key coverage **only**, not these derivative navigation links or semantic acceptance.
+
 ## 1. Source and edition boundaries
 
 The authoritative **current production source** is exactly the publicly released, source-audited corrected **`MHCC` 0.1.1** zCom edition (SWORD ID `MHCC`). It is derived from original CrossWire `MHCC` 2.0 / the historical `BRMHCC` 0.1.0, with **24 links to existing 17 original sections** and exactly **two** audited source errata (Ezek. 3 citation/OSIS target, 1 Chr. 7 `Dn` → `Dan`). Its source, ownership and sections must not be confused with the newer Modern English derivative. The key pins are:
