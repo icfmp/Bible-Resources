@@ -103,13 +103,13 @@ jobs:
                   if archive.getinfo(name).file_size>4*1024*1024:
                       raise SystemExit("Unreviewed USFM file size")
                   raw=archive.read(name)
-                  if re.search(rb"(?m)^\\\\id\\s+PSA\\b",raw):
+                  if re.search(rb"(?m)^\\id\\s+PSA\\b",raw):
                       text=raw.decode("utf-8-sig")
                       found.append({
                           "psalm_file_sha256":sha256(raw).hexdigest(),
                           "psalm_file_bytes":len(raw),
-                          "chapter_markers":len(re.findall(r"(?m)^\\\\c\\s+\\d+",text)),
-                          "d_title_markers":len(re.findall(r"(?m)^\\\\d\\s+",text)),
+                          "chapter_markers":len(re.findall(r"(?m)^\\c\\s+\\d+",text)),
+                          "d_title_markers":len(re.findall(r"(?m)^\\d\\s+",text)),
                       })
           if len(found)!=1:
               raise SystemExit("Independent KJV USFM must have exactly one Psalm book")
