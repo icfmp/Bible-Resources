@@ -356,6 +356,87 @@ def compare_ambiguous_original_opening_paragraphs(
     }
 
 
+
+def compare_word_order_mismatch_opening_titles(
+    safe_receipt:dict, titles:dict[int,dict], *, source_book:str,
+)->dict:
+    """Independent opening-title evidence, never resolution of native word order.
+
+    This includes only original same-start source-longer cases whose remaining
+    unlinked source/native word order/selection differs. It does NOT classify
+    the complete commentary or manufacture an original missing-word span.
+    """
+    scope=safe_receipt.get(
+        "source_longer_both_source_and_native_reference_label_word_scope")
+    if (safe_receipt.get("original_source_words_or_binaries_exported") is not False
+            or not isinstance(scope,dict)
+            or scope.get(
+                "excluded_only_original_scripRef_and_real_native_reference_labels"
+            ) is not True):
+        raise WitnessError("Original source-native mismatch scope not authenticated")
+    by_book=scope.get("original_book_unlinked_word_relation_classes",{})
+    classes=by_book.get(source_book,{}) if isinstance(by_book,dict) else {}
+    expected=classes.get("plain_word_order_or_selection_requires_editorial_review",0)
+    rows=scope.get("original_line_SHA_and_two_sided_link_word_metadata_only_rows")
+    if (type(expected) is not int or not 0<=expected<=50
+            or not isinstance(rows,list) or len(rows)>200):
+        raise WitnessError("Original source-native word mismatch census invalid")
+    cases=[]
+    seen=set()
+    for row in rows:
+        if (row.get("source_book")!=source_book
+                or row.get("outside_link_word_relation")!=
+                "plain_word_order_or_selection_requires_editorial_review"):
+            continue
+        chapter=row.get("original_source_chapter_number_from_actual_osis_start")
+        source_sha=row.get("original_full_reference_sha256")
+        p=row.get("original_first_p_visible_word_identity_only")
+        if (type(chapter) is not int or not 1<=chapter<=200 or chapter in seen
+                or not isinstance(source_sha,str) or not PIN.fullmatch(source_sha)
+                or not isinstance(p,dict)
+                or p.get("original_p_document_ordinal")!=1
+                or type(p.get("visible_words")) is not int
+                or not 1<=p["visible_words"]<=1000
+                or any(not isinstance(p.get(k),str) or
+                       not PIN.fullmatch(p[k]) for k in
+                       ("exact_unicode_word_sha256","casefold_unicode_word_sha256"))):
+            raise WitnessError("Unverified original first paragraph at lexical mismatch")
+        seen.add(chapter)
+        title=titles.get(chapter)
+        if title is None:
+            verdict="independent_psalm_title_absent"
+        elif title.get("status")!="plain_original_d_title":
+            verdict="independent_psalm_title_markup_unreviewed"
+        elif title.get("word_count")!=p["visible_words"]:
+            verdict="opening_p_and_title_word_counts_differ"
+        elif title.get("exact_unicode_word_sha256")==p["exact_unicode_word_sha256"]:
+            verdict="opening_p_exactly_matches_title_but_native_order_mismatch_open"
+        elif title.get("casefold_unicode_word_sha256")==p["casefold_unicode_word_sha256"]:
+            verdict="opening_p_casefold_matches_title_but_native_order_mismatch_open"
+        else:
+            verdict="opening_p_and_title_words_differ_native_order_mismatch_open"
+        cases.append({
+            "source_chapter_from_original_osis_start":chapter,
+            "original_source_full_reference_sha256":source_sha,
+            "original_first_p_visible_word_count":p["visible_words"],
+            "independent_psalm_title_word_count":
+                title.get("word_count") if isinstance(title,dict) else None,
+            "verdict":verdict,
+        })
+    if len(cases)!=expected:
+        raise WitnessError("Original native-order mismatch source cases not exhausted")
+    return {
+        "status":"ORIGINAL_NATIVE_WORD_ORDER_REVIEW_INDEPENDENT_OPENING_TITLE_ONLY",
+        "original_native_unlinked_word_order_selection_cases":len(cases),
+        "independent_title_opening_comparison_classes":
+            dict(sorted(Counter(row["verdict"] for row in cases).items())),
+        "original_chapter_source_sha_and_closed_verdict_only":
+            sorted(cases,key=lambda x:x["source_chapter_from_original_osis_start"]),
+        "title_matches_never_resolve_original_native_word_order_selection":True,
+        "source_bible_or_native_text_exposed":False,
+    }
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-safe-receipt", type=Path, required=True)
@@ -372,6 +453,9 @@ def main(argv=None):
         receipt, titles, source_book=args.source_book)
     result["independently_attested_ambiguous_source_opening_paragraphs"] = (
         compare_ambiguous_original_opening_paragraphs(
+            receipt,titles,source_book=args.source_book))
+    result["independently_attested_native_word_order_mismatch_openings"] = (
+        compare_word_order_mismatch_opening_titles(
             receipt,titles,source_book=args.source_book))
     args.report.write_text(
         json.dumps(result, sort_keys=True, indent=2) + "\n", encoding="utf-8")
