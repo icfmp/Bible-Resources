@@ -960,6 +960,8 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
         double_link_original_book_counts={}
         double_link_book_classes={}
         double_link_rows=[]
+        double_link_gap_classes=Counter()
+        double_link_gap_by_original_book={}
         def record_same_start_source_longer(start,item,raw):
             source_longer_cases.append((start,{
                 "original_source_line":item["original_source_line"],
@@ -993,6 +995,11 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
                 WORD.findall(item["original_text"]),WORD.findall(native_visible),
                 item["private_original_scripRef_word_indices"],native_reference_positions)
             category=two_sided["outside_link_word_relation"]
+            extra_layout=two_sided["source_extra_unlinked_word_gap_layout"]
+            if extra_layout is not None:
+                layout_class=extra_layout["alignment_topology"]
+                double_link_gap_classes[layout_class]+=1
+                double_link_gap_by_original_book.setdefault(book,Counter())[layout_class]+=1
             double_link_class_counts[category]+=1
             double_link_original_book_counts[book]=(
                 double_link_original_book_counts.get(book,0)+1)
@@ -1044,6 +1051,12 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
             "original_book_unlinked_word_relation_classes":{
                 k:dict(sorted(v.items())) for k,v in sorted(double_link_book_classes.items())
             },
+            "source_extra_unlinked_word_gap_topology_classes":
+                dict(sorted(double_link_gap_classes.items())),
+            "original_book_source_extra_word_gap_topology_classes":{
+                k:dict(sorted(v.items())) for k,v in sorted(
+                    double_link_gap_by_original_book.items())
+            },
             "original_line_SHA_and_two_sided_link_word_metadata_only_rows":
                 sorted(double_link_rows,key=lambda x:(
                     x["source_book"],x["original_source_line"],
@@ -1054,6 +1067,16 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
             "no_unlinked_word_category_implies_authorial_edition_parity_or_missing_text":True,
             "published":False,
         }
+        expected_nonlink_extra=(
+            double_link_class_counts.get(
+                "stock_plain_words_contiguous_inside_longer_original_plain_text",0)
+            + double_link_class_counts.get(
+                "stock_plain_words_in_order_with_extra_original_words",0)
+        )
+        if (sum(double_link_gap_classes.values())!=expected_nonlink_extra or
+                sum(sum(group.values()) for group in
+                    double_link_gap_by_original_book.values())!=expected_nonlink_extra):
+            raise PilotError("Source extra word gap topology does not reconcile")
         if (len(double_link_rows)!=expected_longer or
                 sum(double_link_class_counts.values())!=expected_longer
                 or sum(double_link_original_book_counts.values())!=expected_longer
