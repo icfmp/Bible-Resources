@@ -167,6 +167,21 @@
         "Pinned ACAI places/json/Gerasa.json: MRK 5:1!12 n41005001012 and LUK 8:26!7 n42008026007 are Gerasenes, while the Matthew Gadarenes token is also claimed; preserve ambiguity until site-specific textual review",
         "Inherited ACAI issue #7: full source-token and regional-demonym audit"
       ]
+    },
+    {
+      "source_id": "person:Shallum.5",
+      "action": "replace_identity",
+      "id": "person:Shallum.5",
+      "kind": "person",
+      "canonical_id": "person:Jehoahaz.3",
+      "reason": "The fourth son Shallum in 1 Chronicles 3:15 is commonly identified with Jehoahaz, Josiah's successor. Jeremiah 22:11 directly names Shallum son of Josiah who reigned in his father's place; 2 Kings 23:30–31 records successor Jehoahaz. Source word n/a: original WLC o130030150101 distinctly reads Shallum and is preserved. This aliases a historical individual without conflating the separate son Johanan (o130030150041), and without silently rewriting the source genealogy.",
+      "evidence": [
+        "Pinned Macula WLC 1CH 3:15!10 o130030150101: Shallum; 1CH 3:15!4 o130030150041: distinct Johanan",
+        "JER 22:11 names Shallum son of Josiah who reigned in place of his father; 2KI 23:30-31 names the successor Jehoahaz",
+        "SIL Translation Commentary on 1 Chronicles 3:15 https://tips.translation.bible/story/translation-commentary-on-1-chronicles-315/ — Shallum also called Jehoahaz",
+        "NET Bible 1 Chronicles 3:15 and ESV Reformation Study Bible 1 Chronicles 3:15 identify Shallum with Jehoahaz; genealogical order remains a contextual textual question",
+        "Inherited ACAI issue #71: distinguish Johanan and other royal name forms"
+      ]
     }
   ]
 }
