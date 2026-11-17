@@ -912,5 +912,39 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
             PrivateOriginalNativeWholeCorpusGapSearch([])
 
 
+    def test_real_osis_milestones_assign_private_word_owners_without_rewriting(self):
+        from lxml import etree
+        original=etree.fromstring(
+            b'<div type="book" osisID="Gen">'
+            b'<chapter sID="Gen.1"/>'
+            b'<title>Heading words.</title> '
+            b'<p>Paragraph words <reference osisRef="Gen.1.1">'
+            b'linked words</reference> following words</p> '
+            b'<note>Note words</note> '
+            b'<chapter eID="Gen.1"/>'
+            b'</div>')
+        words=[]
+        owners=[]
+        metadata=original_authoring_chapter_scope_metadata(
+            original,"Gen.1",_private_words_sink=words,
+            _private_word_owner_classes_sink=owners)
+        self.assertEqual(words,[
+            "Heading","words","Paragraph","words","linked","words",
+            "following","words","Note","words"])
+        self.assertEqual(owners,[
+            "title","title","paragraph","paragraph",
+            "paragraph_reference","paragraph_reference",
+            "paragraph","paragraph","note","note"])
+        self.assertTrue(metadata["private_original_word_ownership_verified"])
+        self.assertEqual(metadata["bounded_original_chapter_visible_words"],10)
+        self.assertEqual(metadata["bounded_original_chapter_reference_elements"],1)
+        self.assertNotIn("Heading",json.dumps(metadata))
+        self.assertNotIn("Paragraph",json.dumps(metadata))
+        with self.assertRaises(ValueError):
+            original_authoring_chapter_scope_metadata(
+                original,"Gen.1",
+                _private_word_owner_classes_sink=["preexisting"])
+
+
 if __name__=="__main__":
     unittest.main()
