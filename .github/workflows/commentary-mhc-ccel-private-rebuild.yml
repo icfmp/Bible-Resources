@@ -106,6 +106,7 @@ jobs:
           python research/mhc-ccel/ccel_imp_candidate.py \
             --manifest config/commentary-intake/mhc-crosswire.json \
             --source-dir "$RUNNER_TEMP/mhc-ccel-original" \
+            --quarantine-repeated-starts \
             --private-output "$PRIVATE_IMP" > "$REPORT"
           python - <<'PY'
           import json,os
@@ -113,7 +114,11 @@ jobs:
           report=json.loads(Path(os.environ["REPORT"]).read_text())
           assert report["status"]=="INCOMPLETE_PRIVATE_VERSE_BODY_FEASIBILITY_ONLY"
           assert len(report["volumes"])==6
-          assert report["source_body_entry_count"]==4263
+          assert report["original_source_verse_range_body_count"]==4263
+          assert report["source_body_entry_count"]==4251
+          assert report["quarantined_original_source_body_count"]==12
+          assert report["quarantined_original_start_groups"]==6
+          assert report["original_references_corrected_or_assigned"] is False
           assert sum(x["markers"] for x in report["volumes"])==5569
           assert report["unhandled_chapter_markers"]==1306
           assert sum(x["empty_original_bodies_preserved"] for x in report["volumes"])==5
@@ -125,6 +130,9 @@ jobs:
                 report["source_body_entry_count"])
           print("Original chapter markers UNHANDLED:",
                 report["unhandled_chapter_markers"])
+          print("Source sections quarantined for unresolved same-start collision:",
+                report["quarantined_original_source_body_count"])
+          print("PRIVATE TRIAL INCOMPLETE: quarantined original bodies remain intact upstream")
           print("All source prose accounted for: NO; no source was published")
           PY
       - name: Try real private SWORD import and headless reading, not content acceptance
