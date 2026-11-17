@@ -86,7 +86,29 @@
       "source_or_digital_editorial_rights_approved": false,
       "original_source_bytes_committed_or_published": false,
       "observation": "https://github.com/icfmp/Bible-Resources/actions/runs/44156141772"
-    }
+    },
+    "original_authoring_source_paragraph_cases": [
+      {
+        "source_volume": 3,
+        "original_marker_line": 27749,
+        "original_full_reference_sha256": "f9a402dda0436aaed29b311707a672f1057df6e7bba16b58a43e5a1a91ac56a0",
+        "original_body_sha256": "48809f08f932d9d68c4cbc56267a6ffdf973bf9bbafc9401d0916296824fb4ea",
+        "original_paragraph_ordinal": 6,
+        "original_paragraph_visible_word_count": 588,
+        "original_paragraph_word_sha256": "0a733673d3b3cb71dee93dc4c454dfaddee08c9fc87d43d879c9e61ec402f68c",
+        "source_only_unlinked_gap_word_count_per_prior_pinned_stock_audit": 569
+      },
+      {
+        "source_volume": 6,
+        "original_marker_line": 23188,
+        "original_full_reference_sha256": "f00b1d632a701e2617522eb9e214b3f6fa6b6547bbe836814a214636556ba06d",
+        "original_body_sha256": "0d3f52a0c7cb4c29694995ecd920d3f4e1f95409e22df3f4025afbe12b51fb7d",
+        "original_paragraph_ordinal": 17,
+        "original_paragraph_visible_word_count": 235,
+        "original_paragraph_word_sha256": "462ec448acf7e29788eeedfbb245ad08ea98faaade8c0dbef7755c042d2779cc",
+        "source_only_unlinked_gap_word_count_per_prior_pinned_stock_audit": 235
+      }
+    ]
   },
   "original_archive_observation": {
     "date": "2026-11-07",
