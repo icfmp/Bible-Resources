@@ -1,4 +1,4 @@
-name: Audit one original MHC volume against CrossWire raw commentary privately
+name: Audit six original MHC volumes against pinned CrossWire raw commentary privately
 on:
   pull_request:
     paths:
@@ -21,10 +21,16 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   review-one-actual-original-volume:
+    name: Original CCEL volume ${{ matrix.source_volume }} — exact stock text diagnostics
     runs-on: ubuntu-24.04
     timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        source_volume: ${{ fromJSON(github.event_name == 'workflow_dispatch' && format('[{0}]', inputs.source_volume) || '[1,2,3,4,5,6]') }}
     env:
-      SOURCE_VOLUME: ${{ inputs.source_volume || '1' }}
+      SOURCE_VOLUME: ${{ matrix.source_volume }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -100,8 +106,63 @@ jobs:
           assert selection["source_punctuation_and_markup_parity_not_proven"] is True
           print("Authorial word-order loss versus stock-only/other differences:",
                 json.dumps(selection["classes"], sort_keys=True))
+          units = report["source_original_verse_and_range_body_evidence"][
+              "original_verse_or_range_body_count"]
+          classes = report["text_diagnostic"][
+              "per_source_marker_text_diagnostic_counts"]
+          allowed = {
+              "exact_unicode_text_match", "edge_whitespace_difference_only",
+              "interior_whitespace_difference_only",
+              "lexical_text_or_punctuation_difference",
+              "missing_original_start_in_native_raw",
+              "stock_raw_fragment_not_strict_xml",
+          }
+          assert set(classes) <= allowed
+          assert all(type(v) is int and v >= 0 for v in classes.values())
+          assert sum(classes.values()) == units and units > 0
+          chapter = report["source_original_chapter_neighbor_evidence"]
+          assert (chapter["original_chapter_siblings_reviewed_count"] +
+                  chapter["original_chapter_siblings_not_reviewed_count"] ==
+                  chapter["explicit_chapter_source_marker_count"])
+          evidence = {
+              "status": "SOURCE_STOCK_ONE_VOLUME_LEXICAL_CENSUS_NOT_PARITY",
+              "resource_id": "mhc-crosswire",
+              "source_volume": report["source_volume"],
+              "volume_count": report["source_collection_volume_count"],
+              "source_xml_sha256": report["source_original_sha256"],
+              "original_sword_zip_sha256": report["stock_sword_archive_sha256"],
+              "original_sword_raw_corpus_sha256":
+                  report["stock_full_raw_content_sha256"],
+              "original_source_verse_range_units": units,
+              "source_section_text_diagnostic_classes": classes,
+              "source_chapter_marker_count":
+                  chapter["explicit_chapter_source_marker_count"],
+              "source_reviewable_chapter_siblings":
+                  chapter["original_chapter_siblings_reviewed_count"],
+              "source_unreviewed_chapter_siblings":
+                  chapter["original_chapter_siblings_not_reviewed_count"],
+              "source_unreviewed_chapter_sibling_tag_counts":
+                  chapter["original_unreviewed_sibling_tag_counts"],
+              "source_authorial_loss_triage_classes": selection["classes"],
+              "original_vs_compiled_full_text_punctuation_markup_parity": False,
+              "rights_approved": False,
+              "editorial_approved": False,
+              "published": False,
+              "original_source_words_or_binaries_exported": False,
+          }
+          path = (Path(os.environ["RUNNER_TEMP"]) /
+                  "mhc-original-volume-safe-receipt.json")
+          path.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n",
+                          encoding="utf-8")
           print("An exact source edition/structure proof is NOT established.")
           PY
+      - name: Upload only independent, source-bound metadata-only volume receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: mhc-ccel-volume-${{ matrix.source_volume }}-text-evidence
+          path: ${{ runner.temp }}/mhc-original-volume-safe-receipt.json
+          if-no-files-found: error
+          retention-days: 90
       - name: Explain private content boundaries
         if: always()
         run: |
