@@ -220,3 +220,30 @@ The audit first requires every **genuine unique K and source-matching chapter I*
 **Strengthened specific acceptance:** these ten original authored OSIS chapters, representing **80,815 complete original visible word tokens**, **33/33** uniquely mapped distinct native K blocks, and **712/712** identical ordered \`reference/@osisRef\` target strings, also have **all original visible non-whitespace characters (including punctuation at individual native segment boundaries) preserved exactly in their genuine published native K and source-matched chapter-I payloads**. The proof applies to the original source-visible chapter scope, **not** the *entire* original SWORD module: the separately native original chapter-I attached to Gen.1 did not match any complete Gen.1 authoring chapter words and was **not included in the reconstruction**, since Gen.1 K alone already forms a strict exact source-word partition and the origin/role of its extra native I remains unresolved. No native original entry was changed or suppressed: exclusion here is only from the *research comparison*.
 
 **Still strictly out of scope:** original XML tag nesting and element semantics, chapter-introduction/book-introduction attribution, note placement and paragraph/poetry/layout preservation (whitespace was ignored), functional \`osisRef\` navigation in actual readers, original authoring OSIS equivalence to separately digitized CCEL six-volume/historical print, possible independent CCEL exposition absent from CrossWire, exact derivative rights and full **66-book/whole-corpus** coverage. Do not present a ten-chapter sample as whole-source parity or as authorization to release/merge. This work is read-only; all CrossWire/CCEL originals, stock SWORD binary and public catalogue remain unchanged. [Draft PR #286](https://github.com/icfmp/Bible-Resources/pull/286) stays open.
+
+
+## Full 66-book original authored chapter milestones vs complete original occupied native index (2026-11-17)
+
+**Verified on real publisher originals:** [CI original authoring OSIS / native stock index audit job #134389457584](https://github.com/icfmp/Bible-Resources/actions/runs/44182277710/job/134389457584) **SUCCESS** at branch revision \`222ec0d05e5fd9e4a3d9a50e8cf4c6d2368747fe\`; **28/28 generic tests** passed. The independently SHA-pinned official original CrossWire 2.2 authoring OSIS, unchanged real stock MHC ZIP, true publisher 66 book divisions, complete compiled K/I/TOP inventory and independent raw-corpus digest were revalidated.
+
+A new **reusable, read-only, closed-metadata** \`original_authoring_native_chapter_index_receipt\` derives *every* chapter source identifier from **actual correctly paired OSIS chapter milestones** within each of the 66 genuine source book divisions. It fails closed on duplicate starts, mismatched or unclosed milestones, invalid book ownership, invalid/duplicate actual native verse or intro addresses. It independently reconciles **all occupied actual compiled K and I native index keys** from the full unmodified libSWORD index (not predicted keys from a conversion). Source-only/native-only chapter identity lists are not printed: only their counts and deterministic length-framed SHA-256 set receipts are emitted.
+
+| Audit field | Authenticated real result |
+| --- | ---: |
+| Original authored OSIS book divisions | **66** |
+| Unique OSIS source chapters | **1,189** |
+| Actual original OSIS chapter start milestones | **1,189** |
+| Actual original OSIS chapter end milestones | **1,189** |
+| Native chapters with genuinely occupied original numbered K slots | **1,189** |
+| Original chapter scopes with no actual compiled K | **0** |
+| Compiled numbered K chapters absent from source OSIS | **0** |
+| Genuine compiled numbered K slots | **31,098** |
+| Genuine original I index slots (chapter + book intro, not yet attributed) | **1,255** |
+| Native chapter-shaped I loci | **1,189** |
+| Authored OSIS chapters without a chapter-shaped native I locus | **0** |
+| Native chapter-shaped I loci not represented by OSIS chapters | **0** |
+| Genuine opaque TOP/U slots in full separately audited 32,355 inventory | **2** |
+
+The all-1189 original chapter identity set is independently fingerprinted SHA-256 \`8d697519f1984ca366107e7ad7282b3303bf1e7f94125c462bdec25ef6b4e1bb\`; both absent-source/native-only empty-set digests are the standard empty SHA-256 \`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\`. **This demonstrates all-chapter index occupancy and authentic source milestone pairing, not correct chapter-specific authored text, note/heading/paragraph contents, citation targets, chapter-I ownership, book-level I/TOP semantics or actual reader navigation.** The genuine independent chapter-I mismatch in Gen.1 remains a separate documented source/stock edition-or-importer question and was not hidden by the full-index match. The ten-chapter independently source-located visible-character/inline-reference proof documented above is strictly a *sample*, not automatically promoted to whole-corpus parity.
+
+The CrossWire and CCEL originals, compiled module, public resource catalogue and source text were not modified, copied into the repository or published; the [draft PR #286](https://github.com/icfmp/Bible-Resources/pull/286) remains unmerged, and all remaining historical-edition, derivative-rights, editorial-signoff and full GUI gates apply.
