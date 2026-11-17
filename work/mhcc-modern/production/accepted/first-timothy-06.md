@@ -53,7 +53,7 @@ At death, even the richest person can finally carry away little more than **a bu
 
 Nature can be satisfied with relatively little.
 
-How much more should **grace teach contentment**!
+If our natural needs can be content with a little, **grace should be content with even less**.
 
 The necessary things of life should limit the Christian's ambitions.
 
@@ -127,7 +127,7 @@ What good is a large estate except as an opportunity **to do more good**?
 
 Let genuine faith in Christ show itself through **loving actions and generosity**.
 
-Prepare for eternal life instead of imitating self-indulgent and greedy people who will eventually awaken to the misery of judgment.
+Take hold of eternal life rather than following the self-indulgent, greedy and ungodly, who will eventually **lift up their eyes in torment**.
 
 Knowledge that contradicts **the truth of Christ's gospel** is not genuine wisdom.
 
@@ -144,6 +144,9 @@ Where God genuinely gives his grace, he will also bring the person into **glory*
 ---
 
 ## Editorial review — 1 Timothy 6
+
+**2026-11-17 second-pass CCEL collation:** restored the more demanding comparison **nature content with little / grace with less** and Henry's distinct **“lift up their eyes in torment”** image (rather than a generic summary about judgment). Source witness: [CCEL 1 Timothy 6](https://ccel.org/ccel/henry/mhcc.xlvi.vi.html). The underlying released SWORD I/K source, links and independent signoff remain unverified.
+
 
 **Whole secondary original-English witness directly compared:** [CCEL, 1 Timothy 6](https://ccel.org/ccel/henry/mhcc.xlvi.vi.html). Released `MHCC 0.1.1` remains original source authority pending full native SWORD mapping, independent QA, derived build and reader testing.
 
