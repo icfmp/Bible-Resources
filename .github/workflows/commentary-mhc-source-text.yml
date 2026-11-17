@@ -402,7 +402,9 @@ jobs:
           )
           from commentary_native_raw_inventory import _safe_stock_install
           from pilot_preflight import inspect_archive
-          from sword_native_raw_corpus_inventory import inspect_native_raw_corpus
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          from commentary_native_inventory import parse_index
+          import subprocess
           with TemporaryDirectory(prefix="mhc-authoring-native-private-") as folder:
               directory=Path(folder)
               package=directory/"source-authenticated-stock.zip"
@@ -414,16 +416,52 @@ jobs:
               _safe_stock_install(package,archive["members"],installed)
               anchor_census=PrivateOriginalChapterNativeAnchorCoverage(
                   private_chapter_words)
-              native_report=inspect_native_raw_corpus(
-                  installed,manifest["module_id"],
-                  Path(os.environ["RUNNER_TEMP"])/"commentary-private-raw",
-                  Path(os.environ["RUNNER_TEMP"])/"commentary-native-index",
-                  on_entry=anchor_census.observe)
-              if (native_report["all_native_raw_entries_ordered_sha256"]!=
-                      manifest["native_raw_corpus_sha256"]
-                      or native_report["all_actual_raw_entries_scanned"]<=0
-                      or not native_report["exact_all_occupied_native_keys_matched_independent_index"]):
-                  raise SystemExit("Original native full-stream identity mismatch")
+              env=dict(os.environ,SWORD_PATH=str(installed))
+              index_bin=Path(os.environ["RUNNER_TEMP"])/"commentary-native-index"
+              raw_bin=Path(os.environ["RUNNER_TEMP"])/"commentary-private-raw"
+              index_run=subprocess.run(
+                  [str(index_bin),manifest["module_id"]],env=env,
+                  stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,
+                  timeout=90,check=False)
+              if index_run.returncode or len(index_run.stdout)>12*1024*1024:
+                  raise SystemExit("Original commentary native occupancy inspector failed")
+              original_index=parse_index(
+                  index_run.stdout,manifest["module_id"])
+              original_lines=index_run.stdout.decode("ascii").splitlines()[1:-1]
+              original_k=[row.split("\\t",1)[1] for row in original_lines
+                          if row.startswith("K\\t")]
+              original_i=[row.split("\\t",1)[1] for row in original_lines
+                          if row.startswith("I\\t")]
+              original_u=[row.split("\\t",1)[1] for row in original_lines
+                          if row.startswith("U\\t")]
+              process=None
+              try:
+                  process=subprocess.Popen([str(raw_bin),manifest["module_id"]],
+                      env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+                  if process.stdout is None:
+                      raise SystemExit("Original commentary raw stream inaccessible")
+                  native_report,native_k,native_i,native_u=parse_native_raw_corpus(
+                      process.stdout,on_entry=anchor_census.observe)
+                  process.stdout.close()
+                  if process.wait(timeout=360)!=0:
+                      raise SystemExit("Original commentary raw reader failed")
+              except BaseException:
+                  if process is not None and process.poll() is None:
+                      process.kill()
+                      process.wait()
+                  raise
+              if (native_k!=original_k or native_i!=original_i or
+                      native_u!=original_u or
+                      native_report["all_native_raw_entries_ordered_sha256"]!=
+                      manifest["native_raw_corpus_sha256"] or
+                      native_report["all_actual_raw_entries_scanned"]<=0 or
+                      original_index["occupied_numbered_slots"]!=len(native_k) or
+                      original_index["occupied_intro_slots"]!=len(native_i) or
+                      original_index["occupied_anonymous_top_slots"]!=len(native_u) or
+                      original_index["driver"]!=stock_fields["ModDrv"] or
+                      original_index["native_versification"]!=
+                          (stock_meta.get("Versification") or ["KJV"])[0]):
+                  raise SystemExit("Original commentary native full-stream identity or v11n mismatch")
               print("Authenticated original source OSIS authentic chapter versus",
                     "full authentic original native K exact visible-word anchors",
                     "(closed metadata only, NOT authorial section/parity proof):",
