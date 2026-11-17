@@ -10,12 +10,12 @@ publication_status: "NOT RELEASED — FULL SWORD REBUILD PENDING"
 
 # Ezekiel 3 — Modern English
 
-## Original chapter outline
+## Original chapter outline — explicit verse-label corrections
 
 | Original outline | Verses |
 | --- | --- |
 | The preparation of the prophet for his work. | 1–11 |
-| His office, as that of a watchman. | 12–2 |
+| His office, as that of a watchman. | 12–21 |
 | The restraining and restoring his speech. | 22–27 |
 
 ## The prophet receives God's words (verses 1–11)
@@ -79,6 +79,10 @@ He must place **life and death, blessing and curse**, before the people, leaving
 ---
 
 ## Editorial review — Ezekiel 3
+
+**2026-11-17 traceable outline-reference correction (independent original-native review pending):** The end verse was truncated to 2; the watchman exposition and succeeding section mark the correct 12–21 range. Only the **verse-range cells of the copied original-outline table** have been corrected; source-authored headings, row order, commentary section boundaries, and exposition prose are not edited. Previously transcribed cells: `His office, as that of a watchman. | 12–2`. Corrected cells: `His office, as that of a watchman. | 12–21`. The repair is reversible against this recorded before/after; the authoritative published MHCC 0.1.1 outline still requires exact independent native validation.
+
+
 
 **Complete secondary original-English witness inspected:** [CCEL, Ezekiel 3](https://ccel.org/ccel/henry/mhcc.xxvii.iii.html). Pinned `MHCC 0.1.1` original remains authoritative for exact native source alignment and independent approval.
 
