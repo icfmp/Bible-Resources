@@ -225,6 +225,17 @@ def build(source_root: Path, source_lock: dict, editorial: dict,
                for entity_id, field in sorted(hits)]
         for word, hits in sorted(candidates.items())
     }
+    # Source may intentionally contain repeated indirect word groups.
+    # Report raw assignments separately from distinct entity/field claims:
+    # the inverse lookup necessarily collapses identical candidate pairs.
+    unattested_raw_assignments = sum(
+        1 for entity in entries
+        for corpora in entity["occurrences"].values()
+        for source_corpus, groups in corpora.items()
+        for group in groups
+        for word in group
+        if f"{source_corpus}:{word}" in unattested
+    )
     return {
         "format": "bible-entity-index",
         "schema_version": 1,
@@ -245,6 +256,7 @@ def build(source_root: Path, source_lock: dict, editorial: dict,
                                     for e in entries),
             "indexed_distinct_source_words": len(by_word),
             "unattested_distinct_source_words": len(unattested),
+            "unattested_raw_word_assignments": unattested_raw_assignments,
         },
         "quarantined": sorted(quarantined, key=lambda x: x["source_id"]),
         "entities": entries,
