@@ -388,7 +388,7 @@ class PrivateOriginalChapterNativeAnchorCoverage:
     """
 
     ANCHOR = 8
-    MAX_SCOPES = 8
+    MAX_SCOPES = 12
     MAX_CHAPTER_WORDS = 100_000
     MAX_NATIVE_RAW_BYTES = 2 * 1024 * 1024
     INTRO = re.compile(r"[1-4]?[A-Za-z][A-Za-z0-9]*(?:\.0\.0|\.[1-9][0-9]*(?:\.0)?)?\Z")
