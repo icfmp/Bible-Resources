@@ -11,7 +11,8 @@ from zipfile import ZipFile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from commentary_usfm_title_witness import (
-    WitnessError, compare_original_first_paragraphs, independent_usfm_titles
+    WitnessError, compare_original_first_paragraphs, independent_usfm_titles,
+    reviewed_usfm_title_visible_text,
 )
 
 
@@ -82,6 +83,42 @@ class IndependentBiblicalTitleWitnessTests(unittest.TestCase):
             titles, source_book="Ps")
         self.assertEqual(result["exact_original_title_case_classes"], {
             "same_word_count_but_different_case_sensitive_unicode_tokens": 1})
+
+    def test_original_strongs_and_translator_additions_preserve_displayed_title(self):
+        rendered=r'To the chief \w Musician|strong="H5329"\w*, \add A Psalm\add* of \w David|strong="H1732"\w*.'
+        visible=reviewed_usfm_title_visible_text(rendered)
+        self.assertEqual(visible,"To the chief Musician, A Psalm of David.")
+        self.assertNotIn("5329",visible)
+        self.assertNotIn("strong",visible)
+        path,digest=self.make_archive(
+            "\\id PSA\n\\c 7\n\\d "+rendered+"\n\\v 1 first\n")
+        titles=independent_usfm_titles(path,digest,book_id="PSA")
+        self.assertEqual(titles[7]["status"],"plain_original_d_title")
+        words=["To","the","chief","Musician","A","Psalm","of","David"]
+        result=compare_original_first_paragraphs(
+            metadata(7,words),titles,source_book="Ps")
+        self.assertEqual(result["exact_original_title_case_classes"],{
+            "exact_original_p1_equals_independent_usfm_d_title_word_tokens":1})
+        self.assertNotIn("Music",json.dumps(result))
+        self.assertNotIn("David",json.dumps(result))
+        self.assertNotIn("H5329",json.dumps(result))
+
+    def test_unverified_usfm_markup_and_strongs_are_not_silently_removed(self):
+        unsafe=[
+            r'\w Musician|lemma="H5329"\w*',
+            r'\w Musician|strong="H5329"|morph="He,N"\w*',
+            r'\w Musician|strong="H5329"',
+            r'\w Musician|strong="H5329"\add*',
+            r'\add A Psalm\w David|strong="H1732"\w*\add*',
+            r'\f + \fr 7.1 \ft note\f*',
+            r'\nd LORD\nd*',
+            r'\w word|strong="H99999"\w*',
+        ]
+        for title in unsafe:
+            with self.subTest(title=title):
+                self.assertIsNone(reviewed_usfm_title_visible_text(title))
+        self.assertIsNone(reviewed_usfm_title_visible_text(""))
+        self.assertIsNone(reviewed_usfm_title_visible_text("A"*8193))
 
     def test_pinned_zip_and_unreviewed_markup_fail_closed(self):
         path, digest = self.make_archive("\\id PSA\n\\c 3\n\\d A Psalm\n\\v 1 LORD\n")
