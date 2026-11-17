@@ -276,7 +276,10 @@ jobs:
               assert structure["source_xml_sha256"]==report["source_original_sha256"]
               assert structure["original_outlier_source_units_reconciled"]==selected
               assert structure["original_reference_markers_and_section_divisions_not_modified"]
-              assert structure["original_words_or_source_ref_or_native_keys_exposed"] is False
+              assert structure["original_words_or_native_keys_exposed"] is False
+              assert structure["only_original_ccel_source_scripCom_claimed_reference_recorded"]
+              assert structure["ccel_claimed_reference_is_not_native_mapping_or_authorial_edition_proof"]
+
               assert structure["original_authorial_print_editional_structure_parity_established"] is False
               items=structure["source_line_hash_and_original_adjacent_paragraph_structure_only"]
               assert len(items)==selected
