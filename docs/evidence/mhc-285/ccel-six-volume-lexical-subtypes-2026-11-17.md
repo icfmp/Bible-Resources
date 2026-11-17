@@ -260,3 +260,36 @@ The three lexical exceptions are consistent with authentic differences of biblic
 These findings support a **systematic inclusion of biblical Psalm superscriptions in CCEL's exposition presentation** that the same-start CrossWire 2.2 commentary does not include: **105/112 source-only first paragraphs are exactly identical to independent KJV title word sequences after casefold**. Do **not** call 112 missing Matthew Henry authored paragraphs, automatically import biblical titles into the commentator's prose, revise verse keys, remove genuine original Hebrew title variants, or silently make capitalization or punctuation changes. Four additional Psalm source-longer same-entry cases had different word-alignment proofs and are outside this 112-case first-paragraph census. The original full Psalm VII 569-unlinked-word exposition gap and Acts XVII 235-word paragraph remain **separate historical authorial/edition audit questions**.
 
 The next bounded check is *markup-only metadata* for `Ps 7/18/36/102`, then strict token handling of only genuinely identified USFM markup. Changes remain research-only, reversible, source-pinned; **no CCEL original, original CrossWire SWORD, public resource, release, or catalogue altered**. Draft [PR #286](https://github.com/icfmp/Bible-Resources/pull/286) stays open/unmerged; digital-edition rights review is still unresolved.
+
+
+## Final independent KJV superscription token audit: nested USFM titles (2026-11-17)
+
+**All six unchanged, SHA-pinned original CCEL volume comparison jobs PASSED** at [MHC original source workflow #44128611332](https://github.com/icfmp/Bible-Resources/actions/runs/44128611332). Its volume III comparison and the separate eBible 2006 KJV USFM source observation both passed. Independent same-revision checks: [Validate #44128611009](https://github.com/icfmp/Bible-Resources/actions/runs/44128611009), [complete registry #44128611154](https://github.com/icfmp/Bible-Resources/actions/runs/44128611154), [native raw corpus #44128611006](https://github.com/icfmp/Bible-Resources/actions/runs/44128611006), [reference anchors #44128610943](https://github.com/icfmp/Bible-Resources/actions/runs/44128610943), [pinned JSword #44128611155](https://github.com/icfmp/Bible-Resources/actions/runs/44128611155) and [Xiphos startup/integrity #44128611443](https://github.com/icfmp/Bible-Resources/actions/runs/44128611443) also passed. **A real Xiphos commentary-pane GUI acceptance is still outstanding**, despite the workflow's successful startup check.
+
+The **separately original-byte-pinned eBible KJV 2006 USFM** ZIP SHA-256 `b6faa67117ccaba49df9e7df224a553f11758ae7c5d58f0f7979e2b73ac4480b`, original `PSA` member SHA-256 `da64243944525513b329b9acf52d20b3a49cebd26e12577c1a85c2847d1bc90f`, contains 150 chapters / 116 actual `\\d` superscription markers. The source-neutral reader now interprets the **observed** original USFM `\\w`, nested `\\+w`, `\\nd` (divine name styling), and `\\add` (translator-visible additions), **keeping all visible words** and dropping only verified structural tags and exact Strong attributes. Unexpected attributes, mismatched closing tags, unsupported markers and unbounded content fail closed. Synthetic tests and all six real volume jobs passed.
+
+The original CCEL whole `p` **#1** word-token digests in each of **112 distinct Psalms** are compared only to corresponding USFM title word-token digests, in exact token order, with *casefold* reported separately rather than overwriting either original:
+
+| Identified relationship of original CCEL Psalm `p` #1 to independent KJV `\\d` | Cases |
+| --- | ---: |
+| Exact Unicode words and case | **6** |
+| Same Unicode words and order after casefold only | **102** |
+| Same count but genuinely different word after casefold | **1** |
+| Distinct word counts, source remains unmodified | **3** |
+| Unsupported USFM markup after verified nested reader | **0** |
+| **Total** | **112** |
+
+Thus **108/112 exact biblical-title word-sequence matches** are independently confirmed (at most differences in capitalization). The **four remaining original source titles are individually explained as biblical-title/edition preparation variants, not identical words**:
+
+| Psalm | CCEL original p#1 token count | eBible KJV USFM title token count | Original-title distinction from independently viewable rendered witnesses |
+| --- | ---: | ---: | --- |
+| **9** | 11 | 10 | CCEL *Muth-labben* vs KJV *Muthlabben*: title proper-name hyphenation changes the Unicode word count |
+| **18** | 38 | 47 | CCEL's original displayed superscription **ends after David's enemies**, while the longer 2006 KJV title adds the phrase concerning Saul and the concluding words **“And he said”**; this is an **edition-specific biblical superscription omission in CCEL presentation**, NOT proven missing Matthew Henry authored commentary |
+| **54** | 26 | 26 | CCEL *Ziphim* vs eBible KJV *Ziphims*: distinct word form |
+| **60** | 35 | 36 | Name hyphenation and rendering of a numerical quantity as *12,000* versus written words differ; no automatic standardization or text substitution |
+
+Public independent displayed-witness links: [CCEL Psalm IX](https://ccel.org/ccel/henry/mhc3/mhc3.Ps.x.html), [CCEL Psalm XVIII](https://ccel.org/ccel/henry/mhc3/mhc3.Ps.xix.html), [CCEL Psalm LIV](https://ccel.org/ccel/henry/mhc3/mhc3.Ps.lv.html), [CCEL Psalm LX](https://ccel.org/ccel/henry/mhc3/mhc3.Ps.lxi.html), and [eBible KJV 2006 Psalms](https://ebible.org/pdf/eng-kjv2006/eng-kjv2006_PSA.pdf). The **exact original-p XML and USFM member token differences are not reprinted in this report**, and the four metadata-only differences must not be silently made identical.
+
+**Editorial reading:** 108 unique source-only first paragraphs are a **demonstrated biblical-title representation difference**, not missing Matthew Henry expositions. The four remaining source-first-paragraph differences are visibly titled biblical superscriptions but retain their own original editions/wording; do **not** count them as exact lexical matches or silently correct a punctuation/name/number form. **Three other Psalms source-longer alignments remain ambiguous and one has an unrelated source-vs-stock unlinked word-order/selection issue**, outside this 112 case scope. The separate true *expository* Psalm 7 `p` #6 (569 unlinked words) and the Acts 17 `p` #17 (235 words) remain separate human editorial/printed-lineage rights and accuracy gates. The printed 1828 Psalm 7 witness does not establish copy permission for CCEL XML.
+
+**No change** to any original CCEL XML, original CrossWire SWORD 2.2 K/I/TOP content or verse keys, commentary authorial prose, Bible verse text, public resource, package, release, catalogue or licence approval. [PR #286](https://github.com/icfmp/Bible-Resources/pull/286) remains draft/unmerged.
