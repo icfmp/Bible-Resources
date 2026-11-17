@@ -1466,6 +1466,74 @@ class PrivateOriginalNativeWholeCorpusGapSearch:
         }
 
 
+def private_original_osis_gap_against_pinned_ccel_volume(
+        original_xml: bytes, *,
+        expected_xml_sha256: str, original_volume_number: int,
+        source_fragments: list[tuple[str,int,list[str]]]) -> dict:
+    """Exact original OSIS gap words vs a separately pinned CCEL digital volume.
+
+    This is a LEXICAL witness only; a full-volume match does not prove its
+    editorial attribution to a verse, original printed edition or permission
+    to correct and redistribute any derived electronic source.
+    """
+    if (type(original_volume_number) is not int
+            or not 1<=original_volume_number<=6
+            or not isinstance(source_fragments,list)
+            or not 1<=len(source_fragments)<=40):
+        raise ValueError("Unreviewed authentic CCEL source volume gap study")
+    root=_safe_root(original_xml,expected_xml_sha256,MAX_CCEL_BYTES)
+    words=WORD.findall("".join(root.itertext()))
+    if not 1<=len(words)<=4_000_000:
+        raise ValueError("Unreviewed original digital volume visible word count")
+    anchors=defaultdict(list)
+    identities=[]
+    for chapter,start,original in source_fragments:
+        if (not isinstance(chapter,str) or not re.fullmatch(
+                r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*",chapter)
+                or type(start) is not int or start<0
+                or not isinstance(original,list)
+                or not 12<=len(original)<=100_000
+                or any(not isinstance(token,str) or not token for token in original)):
+            raise ValueError("Unreviewed source word interval for CCEL comparison")
+        idx=len(identities)
+        identities.append((chapter,start,original))
+        for label,offset in (
+                ("first",0),("middle",(len(original)-12)//2),
+                ("last",len(original)-12)):
+            anchors[tuple(original[offset:offset+12])].append((idx,label))
+    hits=defaultdict(set)
+    for pos in range(max(0,len(words)-11)):
+        for idx,label in anchors.get(tuple(words[pos:pos+12]),()):
+            hits[idx].add(label)
+    cases=[]
+    for idx,(chapter,start,original) in enumerate(identities):
+        whole=(
+            _private_exact_token_match_offsets(
+                words,original,maximum_positions=20)
+            if "first" in hits[idx] else [])
+        cases.append({
+            "original_authored_chapter_ref_sha256":sha256(
+                chapter.encode("ascii")).hexdigest(),
+            "source_gap_word_offset_not_verse_key":start,
+            "source_gap_visible_word_tokens":len(original),
+            "independent_ccel_volume":original_volume_number,
+            "full_exact_word_sequence_occurrences_in_original_volume":len(whole),
+            "first_middle_last_12word_anchors_in_original_ccel":
+                sorted(hits[idx]),
+            "authored_original_OSIS_gap_not_proven_CCEl_editorial_owner":True,
+            "no_original_text_or_native_address_exported":True,
+        })
+    return {
+        "status":"PINNED_ORIGINAL_CCEL_VOLUME_AS_INDEPENDENT_DIGITAL_WORD_WITNESS",
+        "ccel_volume_number":original_volume_number,
+        "original_ccel_volume_sha256":expected_xml_sha256,
+        "ccel_visible_word_token_count":len(words),
+        "original_source_gap_cases":cases,
+        "historical_print_or_derivative_redistribution_not_approved":True,
+        "original_ccel_and_osis_bytes_unmodified":True,
+    }
+
+
 def _case_insensitive_length_is_not_used(words: list[str]) -> int:
     """Do not replace exact authorial case by a lossy casefold comparison."""
     return len(words)
