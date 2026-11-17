@@ -1318,10 +1318,10 @@
       "stage_hint": "not determined",
       "static_reference_count": 7,
       "static_references": [
-        ".github/workflows/commentary-mhc-source-text.yml",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_prose_cross_slot.py",
         "scripts/commentary_unresolved_lexical_triage.py",
+        ".github/workflows/commentary-mhc-source-text.yml",
         "tests/test_commentary_nonlink_words.py",
         "tests/test_commentary_private_text_compare.py",
         "tests/test_commentary_prose_cross_slot.py"
