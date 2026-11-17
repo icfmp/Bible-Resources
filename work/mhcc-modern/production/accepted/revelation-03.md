@@ -94,7 +94,7 @@ Self-conceit and self-deception are among the roots of this spiritual inconsiste
 
 What a difference between **Laodicea's opinion of itself** and **Christ's judgment of it**!
 
-We must not deceive our own souls. Some who thought themselves near heaven have perished.
+We must not deceive our own souls. Henry warns that **many are in hell who once believed themselves far along the road to heaven**.
 
 Pray earnestly that God will keep us from flattering ourselves.
 
@@ -133,6 +133,9 @@ The final call to listen belongs not only to these seven congregations, but to *
 ---
 
 ## Editorial review — Revelation 3
+
+**2026-11-17 second CCEL review:** restored Henry's explicit contrast that **many in hell formerly thought themselves far along the road to heaven**. The original modern draft weakened this to unspecified “perished.” [CCEL Revelation 3](https://ccel.org/ccel/henry/mhcc.lviii.iii.html). Preserve author's strong original assertion without doctrinal smoothing; exact native 0.1.1 verification and independent review remain outstanding.
+
 
 **Full original-English secondary witness read:** [CCEL, Revelation 3](https://ccel.org/ccel/henry/mhcc.lviii.iii.html). The published `MHCC 0.1.1` original remains authoritative; exact native SWORD key/markup alignment and independent validation are pending.
 
