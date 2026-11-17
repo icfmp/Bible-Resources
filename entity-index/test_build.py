@@ -201,6 +201,49 @@ class EntityIndexTests(unittest.TestCase):
                          json.dumps(report, ensure_ascii=False))
         self.assertNotIn("Never copy", json.dumps(report, ensure_ascii=False))
 
+    def test_distinct_dishon_people_keep_exact_sources_and_avoid_false_collisions(self):
+        elder = self.write_record(
+            "people", "Dishon",
+            references=["13001038", "13001041", "01036026"],
+            explicit_instances={"wlc": [
+                ["o130010380072"], ["o130010410031"],
+                ["o130010410051"], ["o010360260031"]]})
+        younger = self.write_record(
+            "people", "Dishon.2",
+            references=["13001041"],
+            explicit_instances={"wlc": [
+                ["o130010410031"], ["o130010410051"]]})
+        unchanged = (elder.read_bytes(), younger.read_bytes())
+        decision = next(
+            d for d in json.loads(
+                Path(__file__).with_name("editorial-decisions.json").read_text()
+            )["decisions"]
+            if d["source_id"] == "person:Dishon"
+        )
+        report = self.build(decisions=[decision])
+        by_id = {e["id"]: e for e in report["entities"]}
+        self.assertEqual(by_id["person:Dishon"]["references"],
+                         ["13001038", "01036026"])
+        self.assertEqual(by_id["person:Dishon"]["occurrences"]
+                         ["explicit_instances"]["wlc"],
+                         [["o130010380072"], ["o010360260031"]])
+        self.assertEqual(by_id["person:Dishon.2"]["references"], ["13001041"])
+        self.assertEqual(report["by_word"]["wlc:o130010410031"],
+                         [{"entity_id": "person:Dishon.2",
+                           "link_type": "explicit_instances"}])
+        self.assertEqual(report["by_word"]["wlc:o130010410051"],
+                         [{"entity_id": "person:Dishon.2",
+                           "link_type": "explicit_instances"}])
+        self.assertIn("wlc:o010360260031", report["by_word"])
+        self.assertEqual((elder.read_bytes(), younger.read_bytes()), unchanged)
+
+        with self.assertRaisesRegex(ValueError, "cannot remove missing"):
+            self.build(decisions=[
+                dict(decision, remove_references=["13001042"])])
+        with self.assertRaisesRegex(ValueError, "invalid removed verse"):
+            self.build(decisions=[
+                dict(decision, remove_references=["invalid"])])
+
     def test_real_acai_greek_field_name_is_indexed_under_canonical_corpus(self):
         original = self.write_record(
             "people", "Phoebe", references=["45016001"],
