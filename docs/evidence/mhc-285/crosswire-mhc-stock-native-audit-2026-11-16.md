@@ -247,3 +247,62 @@ A new **reusable, read-only, closed-metadata** \`original_authoring_native_chapt
 The all-1189 original chapter identity set is independently fingerprinted SHA-256 \`8d697519f1984ca366107e7ad7282b3303bf1e7f94125c462bdec25ef6b4e1bb\`; both absent-source/native-only empty-set digests are the standard empty SHA-256 \`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\`. **This demonstrates all-chapter index occupancy and authentic source milestone pairing, not correct chapter-specific authored text, note/heading/paragraph contents, citation targets, chapter-I ownership, book-level I/TOP semantics or actual reader navigation.** The genuine independent chapter-I mismatch in Gen.1 remains a separate documented source/stock edition-or-importer question and was not hidden by the full-index match. The ten-chapter independently source-located visible-character/inline-reference proof documented above is strictly a *sample*, not automatically promoted to whole-corpus parity.
 
 The CrossWire and CCEL originals, compiled module, public resource catalogue and source text were not modified, copied into the repository or published; the [draft PR #286](https://github.com/icfmp/Bible-Resources/pull/286) remains unmerged, and all remaining historical-edition, derivative-rights, editorial-signoff and full GUI gates apply.
+
+
+## Full 1189-chapter original source-to-published raw-body discrepancy triage (2026-11-17)
+
+### Authentic original full corpus and index baseline
+
+A **single authenticated, SHA-pinned, original publisher CrossWire authoring OSIS** source was independently bounded by the true XML chapter milestones across **66 source book divisions, 1,189 chapters**, and its original published **MHC 2.2** libSWORD **zCom4** corpus was independently read and hashed twice. The true original native corpus contained **31,098 occupied K index slots**, **1,255 original I slots** and **2 opaque TOP/U slots**, matching the pinned **32,355-entry native corpus SHA-256**. This is the original unchanged publisher stock, **not** a new derivative package.
+
+The generic, originally source-neutral [whole-corpus CI proof](https://github.com/icfmp/Bible-Resources/actions/runs/44183062042/job/134392235420) verified **7,355,639 original authored chapter-visible word tokens** and **69,172 exact source inline \`reference/@osisRef\` target attributes**. In **1,179/1,189 original chapters**, the complete authentic OSIS chapter-visible character stream was exactly identical to the assembled genuine source-located original native K and I text, **including every non-whitespace character and all segment boundary punctuation**; exact ordered original \`osisRef\` strings also agreed. Whitespace, XML tree structure, note placement, paragraph nodes and actual reader navigation are separate gates.
+
+### Class A: four authentic original native K bodies cross their book-final chapter close
+
+[Real source/native whole-book read-only audit](https://github.com/icfmp/Bible-Resources/actions/runs/44186393834/job/134404020533): **30/30** generic tests passed and full original native inventory rechecked. Each of four genuine original K bodies that could not be placed completely within its **final chapter** has a **unique complete, exact case-sensitive original authored book word sequence** that spans beyond the closing chapter milestone:
+
+| Last original authoring-OSIS chapter | Entire genuine native K body visible word tokens | Unique whole original authored book match | Exact location relative to closing OSIS chapter marker |
+| --- | ---: | --- | --- |
+| Deut 34 | 1,213 | Yes | Crosses actual chapter close |
+| Song 8 | 1,168 | Yes | Crosses actual chapter close |
+| Mal 4 | 2,341 | Yes | Crosses actual chapter close |
+| John 21 | 4,727 | Yes | Crosses actual chapter close |
+
+This **does not establish missing compiled body content** in these four cases, nor does it authorize altering original chapter marks, native key ownership, book epilogues or literary divisions. Cross-book or original-CCEL/historical-print equivalence is not inferred.
+
+### Class B: six genuine authored OSIS blocks of 10,840 words are not in native K/I
+
+[Real private source gap localization job](https://github.com/icfmp/Bible-Resources/actions/runs/44187854567/job/134409081829): **32/32** unit tests, exact real corpus and six distinct source-word fragment hashes. Each fragment occurs inside its independently authenticated *actual* original OSIS chapter milestones. Each current-chapter original K body and genuine introduction I that was source-located matches the original source **completely**, but these six separate original OSIS intervals are not covered by any of them. The source **interval location was determined by exact ordered word positions, not guessed verse keys**:
+
+| Authenticated authored source chapter | Source gap kind | Original source word offset (not verse) | Entire visible word tokens not compiled into same-chapter K/I | Exact fragment in any *other same-book* original authored source or source-located native K/I |
+| --- | --- | ---: | ---: | --- |
+| Ps 95 | Terminal suffix | 1,747 | 1,772 | None |
+| Rom 4 | Internal interval, followed by real native K | 4,156 | 1,720 | None |
+| Rom 7 | Terminal suffix | 4,180 | 3,327 | None |
+| 2 Thess 2 | Internal interval, followed by real native K | 1,468 | 2,089 | None |
+| 2 Pet 2 | Internal interval, followed by real native K | 863 | 1,016 | None |
+| Rev 4 | Terminal suffix | 1,733 | 916 | None |
+| **All six authentic authoring OSIS intervals** | **Three terminal / three internal** | — | **10,840** | **No exact same-book relocation** |
+
+This corrects an initial oversimplification: **only three** of the six intervals reach the source chapter end. The other three are *internal* authoring-text spans and **genuine subsequent native K text matches again after each gap**.
+
+[Second independent full published original K/I raw replay](https://github.com/icfmp/Bible-Resources/actions/runs/44188668701/job/134412058299), **33/33 generic tests**, independently replayed **all 32,355** original native frame identities and exact original raw SHA, and strictly parsed **all 4,249 distinct original K raw bodies and all 1,255 original I raw payloads** (zero parse failures). **None of the six source intervals occurs anywhere as one complete exact native K or I raw-body word sequence, and none of its three 12-word case-sensitive first/middle/last witness anchors occurs in any K or I raw body.** This is strong evidence of real **official authoring OSIS ↔ published binary text divergence**, not merely absence from a verse-address lookup or one original chapter's native block. Two original TOP/U frames are opaque and **were counted but not text-searched**. No claim is made about arbitrary sequences spanning several native frame boundaries or particular independently digitized historical editions.
+
+### Proven structural ownership of these six authentic source passages
+
+[Original real source element-owner audit](https://github.com/icfmp/Bible-Resources/actions/runs/44189520369/job/134414914653): **34/34 generic tests** and full genuine original source/native checks successful. The six *exact same SHA-identified original OSIS word fragments* were re-extracted from their authentic original XML nodes without a content rewrite. A private source-path inspector identified the owner class of **every one of the 10,840 genuine source words**:
+
+| Original OSIS owner class | Visible words |
+| --- | ---: |
+| Genuine paragraph prose | **10,565** |
+| Original inline reference text inside paragraph | **236** |
+| Original source titles | **37** |
+| Word tokens crossing inline source XML fragment boundaries | **2** |
+| Actual original \`note\` text | **0** |
+| **Total, exactly accounted for** | **10,840** |
+
+These are **principally original source paragraph text, with real inline reference labels and titles**, not notes or technical metadata that could safely be dropped. However, source authorship, exact historically printed edition, editorial choices and rights to prepare/release any new corrected digital derivative remain independent gates. No word, heading, punctuation, note, section, verse pointer, native K/I/TOP raw bytes, source XML, catalogue record or release was edited or published.
+
+### Decision and next bounded action
+
+Follow [issue #295](https://github.com/icfmp/Bible-Resources/issues/295) for separate source-to-native exception triage; do **not** conflate these ten *CrossWire's own OSIS↔stock* source cases with ten unrelated *CCEL ThML index* mismatches tracked in #287. Independently verify the exact historical printed and CCEL digital-edition text/paragraph correspondence for the six source-only authored OSIS spans, their detailed OSIS paragraph/inline structure and permissible correction/redistribution rights. Review the four book-ending closing milestone differences separately, retaining all genuine source book text and authorial divisions. Only then propose **reversible private candidate corrections** with a full source/native/reader acceptance report and explicit editorial owner permission. [MHC draft PR #286](https://github.com/icfmp/Bible-Resources/pull/286) remains research-only, unmerged and unreleased.
