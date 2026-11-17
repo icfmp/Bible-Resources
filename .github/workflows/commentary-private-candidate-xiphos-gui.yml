@@ -14,7 +14,9 @@ on:
       - 'tests/test_commentary_private_candidate_xiphos_gui.py'
       - 'modules/lsg-1910/payload/**'
       - 'config/catalogue-import-lsg-0.1.0.json'
-      - 'config/commentary-intake/**'
+      # These original zCom/MHCC checks do not select the changed intake ID.
+      # MHC uses zCom4 and its dedicated full-corpus/JSword validation.
+      - 'config/commentary-intake/mhcc-crosswire.json'
   workflow_dispatch:
     inputs:
       resource_id:

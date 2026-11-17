@@ -8,7 +8,9 @@ on:
       - 'scripts/promote_sword_preview.py'
       - 'tests/test_commentary_stock_candidate.py'
       - 'tests/test_promote_sword_preview.py'
-      - 'config/commentary-intake/**'
+      # These original zCom/MHCC checks do not select the changed intake ID.
+      # MHC uses zCom4 and its dedicated full-corpus/JSword validation.
+      - 'config/commentary-intake/mhcc-crosswire.json'
   workflow_dispatch:
     inputs:
       resource_id:
