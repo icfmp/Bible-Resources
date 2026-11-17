@@ -57,6 +57,10 @@ jobs:
           assert sum(len(r["source_claims"]) for r in
                      index["unattested_source_words"].values()) == 18
           assert stats["unattested_raw_word_assignments"] == 19, stats
+          assert stats["unattested_source_verses"] == 8, stats
+          assert stats["unattested_source_verse_reference_claims"] == 22, stats
+          assert len(index["unattested_source_verses"]) == 8
+          assert index["unattested_source_verses"]["sblgnt:44008037"]["scope"] == "absent_from_pinned_original_word_inventory_only"
           assert not (set(index["unattested_source_words"]) & set(index["by_word"]))
           by_id={e["id"]:e for e in index["entities"]}
           assert "person:Jashar" not in by_id
@@ -86,6 +90,13 @@ jobs:
           spec.loader.exec_module(module)
           resolver=module.EntityResolver(index)
           edition=index["provenance"]["source_editions"]["wlc"]["edition"]
+          greek=index["provenance"]["source_editions"]["sblgnt"]["edition"]
+          variant=resolver.resolve(corpus="sblgnt", edition=greek,
+                word_id="n44008037001", verse_id="44008037")
+          assert variant["status"] == "verse_not_in_pinned_original_word_inventory", variant
+          shifted=resolver.resolve(corpus="sblgnt", edition=greek,
+                word_id="n47013014001", verse_id="47013014")
+          assert shifted["status"] == "verse_not_in_pinned_original_word_inventory", shifted
           jashar=resolver.resolve(corpus="wlc", edition=edition,
                 word_id="o060100130142", verse_id="06010013")
           assert "work:BookOfJashar" in jashar["canonical_ids"], jashar
