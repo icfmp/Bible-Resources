@@ -51,6 +51,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_commentary_source_native_boundaries.py' -v
           python -m unittest discover -s tests -p 'test_commentary_nonlink_word_alignment.py' -v
           python -m unittest discover -s tests -p 'test_commentary_nonlink_words.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_prose_cross_slot.py' -v
       - name: Install real original native SWORD readers
         shell: bash
         run: |
@@ -256,6 +257,20 @@ jobs:
                 json.dumps(gap_classes,sort_keys=True))
           print("Source-extra unlinked word location uniqueness by original book:",
                 json.dumps(gap_by_book,sort_keys=True))
+          high=report["source_high_extra_unlinked_spans_other_same_chapter_native_location"]
+          selected=high["bounded_cases_selected_for_original_native_replay"]
+          assert 0<=selected<=4
+          assert high["all_genuine_unique_source_extra_span_cases_at_least_100_words"]>=selected
+          assert high["no_source_or_native_text_exported"] is True
+          if selected:
+              assert high["source_extra_outlier_cases_examined"]==selected
+              assert high["complete_original_native_raw_entries_replayed"]>0
+              assert high["no_original_words_or_native_key_strings_exposed"] is True
+              assert high["source_xml_or_original_crosswire_native_binary_modified"] is False
+              assert high["same_chapter_location_not_authorial_section_or_full_edition_parity"]
+              assert len(high["original_source_line_hash_and_native_other_slot_counts_only"])==selected
+          print("Source-extra long original prose same-chapter native exact-span search:",
+                json.dumps(high,sort_keys=True))
           evidence = {
               "status": "SOURCE_STOCK_ONE_VOLUME_LEXICAL_CENSUS_NOT_PARITY",
               "resource_id": "mhc-crosswire",
@@ -279,6 +294,7 @@ jobs:
               "source_longer_original_native_K_run_scope_diagnostics": native_scope,
               "source_longer_original_scripRef_label_word_scope": link_scope,
               "source_longer_both_source_and_native_reference_label_word_scope": dual,
+              "source_high_extra_unlinked_spans_other_same_chapter_native_location": high,
               "source_book_counts_are_not_editorial_content_parity": True,
               "closed_lexical_difference_types": lexical,
               "closed_word_sequence_relationship_types": relationships,
