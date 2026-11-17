@@ -281,6 +281,53 @@ jobs:
           print("Published .conf matches independently authenticated source .conf",
                 "on these four fields:",
                 all(source_fields[key]==stock_fields[key] for key in source_fields))
+
+          # Inventory ALL original .conf key/value occurrences, in sequence.
+          # Duplicate keys have ordered values; never collapse them to a dict.
+          # Report key labels and difference classes only, not original prose.
+          from collections import defaultdict
+          def config_occurrences(config_text):
+              fields=defaultdict(list)
+              non_fields=[]
+              for lineno,line in enumerate(config_text.splitlines(),1):
+                  if (not line.strip() or line.lstrip().startswith(("#",";"))
+                          or re.fullmatch(r"\\[[^\\]\\r\\n]{1,128}\\]",line)):
+                      continue
+                  match=re.fullmatch(r"([A-Za-z][A-Za-z0-9_-]{0,127})=(.*)",line)
+                  if match is None:
+                      non_fields.append(lineno)
+                  else:
+                      fields[match.group(1)].append(match.group(2))
+              return dict(fields),non_fields
+          source_meta,source_nonfields=config_occurrences(conf)
+          stock_meta,stock_nonfields=config_occurrences(stock_conf)
+          if not source_meta or not stock_meta:
+              raise SystemExit("Cannot classify authenticated original configuration")
+          source_names=set(source_meta)
+          stock_names=set(stock_meta)
+          common=source_names & stock_names
+          difference_classification={
+              "exact_ordered_value_fields":sorted(
+                  name for name in common if source_meta[name]==stock_meta[name]),
+              "different_ordered_value_fields":sorted(
+                  name for name in common if source_meta[name]!=stock_meta[name]),
+              "upstream_only_field_names":sorted(source_names-stock_names),
+              "distributed_only_field_names":sorted(stock_names-source_names),
+              "upstream_duplicate_value_field_names":sorted(
+                  name for name,values in source_meta.items() if len(values)>1),
+              "distributed_duplicate_value_field_names":sorted(
+                  name for name,values in stock_meta.items() if len(values)>1),
+              "upstream_unparsed_nonempty_lines":len(source_nonfields),
+              "distributed_unparsed_nonempty_lines":len(stock_nonfields),
+              "no_field_values_exported":True,
+              "not_byte_or_full_metadata_equivalence":True,
+          }
+          # Guard the critical exact fields against a future drift even if
+          # source and package are individually still SHA-pinned.
+          if any(source_fields[key]!=stock_fields[key] for key in source_fields):
+              raise SystemExit("Publisher source and original package diverge on critical .conf fields")
+          print("Source and published original configuration key-level differences",
+                "(values private):",json.dumps(difference_classification,sort_keys=True))
           print("Full source OSIS/native K/I/TOP paragraph parity is NOT YET tested.")
 
           # Target cases are SOURCE-HASH-PINNED data, not content-specific
