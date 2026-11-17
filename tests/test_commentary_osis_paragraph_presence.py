@@ -207,7 +207,7 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
             row["one_original_native_raw_payload_matches_entire_original_chapter"])
         self.assertNotIn("privateword", json.dumps(result))
         self.assertNotIn("Gen.1", json.dumps(result))
-        self.assertTrue(result["intro_and_top_payload_parity_not_compared"])
+        self.assertTrue(result["full_intro_and_top_payload_parity_not_proven"])
 
     def test_private_source_native_anchor_census_rejects_bad_xml_and_missing_chapter(self):
         words = [f"privateword{i:02d}" for i in range(10)]
@@ -336,6 +336,45 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
         self.assertIsNone(result[
             "source_uncovered_word_tokens_after_unique_native_K_body_intervals"])
         self.assertIsNone(result["source_uncovered_word_spans_metadata_only"])
+
+
+    def test_original_chapter_specific_I_can_cover_K_source_prefix(self):
+        words = [f"sourceword{i:02d}" for i in range(14)]
+        census = PrivateOriginalChapterNativeAnchorCoverage({"Gen.1": words})
+        census.observe("I", "Gen.0.0", b"<p>Book introduction excluded</p>")
+        census.observe("I", "Exod.1.0", b"<p>Unrelated chapter excluded</p>")
+        census.observe("I", "Gen.1.0",
+            ("<title>" + " ".join(words[:5]) + "</title>").encode())
+        census.observe("K", "Gen.1.1",
+            ("<div>" + " ".join(words[5:]) + "</div>").encode())
+        row = census.report()["original_chapter_cases"][0]
+        self.assertEqual(row["actual_chapter_specific_original_I_slots"], 1)
+        self.assertEqual(row["distinct_chapter_specific_original_I_raw_payloads"], 1)
+        self.assertEqual(row["chapter_I_whole_body_exact_source_location_classes"],
+                         {"one_unique_exact_source_interval": 1})
+        self.assertTrue(row["all_chapter_I_bodies_uniquely_located_in_source"])
+        self.assertTrue(row["original_source_K_prefix_fully_covered_by_chapter_I"])
+        self.assertEqual(row["source_uncovered_words_after_unique_K_plus_chapter_I_intervals"], 0)
+        self.assertEqual(row["source_uncovered_word_tokens_after_unique_native_K_body_intervals"], 5)
+        self.assertTrue(row["book_level_I_and_opaque_TOP_not_source_compared"])
+
+    def test_original_chapter_I_must_match_exact_source_not_casefold_or_nearest(self):
+        words = [f"sourceword{i:02d}" for i in range(14)]
+        census = PrivateOriginalChapterNativeAnchorCoverage({"Gen.1": words})
+        census.observe("K", "Gen.1.1",
+            ("<p>" + " ".join(words[5:]) + "</p>").encode())
+        census.observe("I", "Gen.1", 
+            ("<p>" + " ".join(x.upper() for x in words[:5]) + "</p>").encode())
+        row = census.report()["original_chapter_cases"][0]
+        self.assertEqual(row["chapter_I_whole_body_exact_source_location_classes"],
+                         {"no_full_exact_source_interval": 1})
+        self.assertFalse(row["all_chapter_I_bodies_uniquely_located_in_source"])
+        self.assertIsNone(row["source_uncovered_words_after_unique_K_plus_chapter_I_intervals"])
+        self.assertIsNone(row["original_source_K_prefix_fully_covered_by_chapter_I"])
+        with self.assertRaises(ValueError):
+            census.observe("I", "Gen.1.9", b"<p>bad key</p>")
+        with self.assertRaises(ValueError):
+            census.observe("I", "Gen.1.0", b"<p>broken")
 
 
 if __name__=="__main__":
