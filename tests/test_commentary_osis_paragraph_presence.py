@@ -581,10 +581,10 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
     def test_complete_visible_nonwhitespace_parity_includes_native_body_punctuation(self):
         words=[f"chapterword{i:02d}" for i in range(16)]
         source_visible="("+ " ".join(words[:8]) + "): " + " ".join(words[8:]) + "!"
-        source_words=__import__("re").findall(r"\\w+",source_visible)
+        source_words=__import__("re").findall(r"\w+",source_visible)
         self.assertEqual(source_words,words)
 
-        def probe(mid_punctuation=")",ending="!",additional_intro=False):
+        def probe(mid_punctuation=")",ending="!"):
             census=PrivateOriginalChapterNativeAnchorCoverage(
                 {"Gen.1":list(words)},
                 private_chapter_visible_texts={"Gen.1":source_visible})
