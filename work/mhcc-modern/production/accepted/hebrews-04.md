@@ -59,7 +59,7 @@ To save humans, he needed fellow-feeling born of genuine human experience. He en
 
 God sent his Son in **the likeness of sinful flesh** (**Romans 8:3**), yet Jesus himself was entirely holy.
 
-Because he knew sin's evil perfectly, he is all the more eager to deliver his people from its guilt and power.
+Because Christ was **perfectly holy and pure**, he was all the more **unwilling in his very nature to sin** and felt its evil more deeply. That makes him all the more concerned to deliver his people from sin's guilt and power.
 
 This excellent High Priest invites us to come **boldly to the throne of grace**.
 
@@ -74,6 +74,9 @@ We enter the holiest place through **Jesus' blood**. He is our Advocate, who has
 ---
 
 ## Editorial review — Hebrews 4
+
+**2026-11-17 second-pass CCEL witness repair:** Henry explicitly links Christ's unique purity to his **complete unwillingness to sin**, a qualification the previous draft replaced with a general statement about knowing sin's evil. Restored the original moral/Christological contrast. Source: [CCEL Hebrews 4](https://ccel.org/ccel/henry/mhcc.l.iv.html). Native original 0.1.1 and reference markup remain unapproved.
+
 
 **Entire CCEL original-English witness inspected:** [CCEL, Hebrews 4](https://ccel.org/ccel/henry/mhcc.l.iv.html). The released `MHCC 0.1.1` remains definitive for native SWORD content, keys and independent QA.
 
