@@ -78,7 +78,7 @@ Jesus loved his church and gave himself to make her holy, cleansing her through 
 
 The Holy Spirit confirms this saving work and cannot lie.
 
-Henry also comments on **three heavenly witnesses** in the wording known from the received text tradition:
+Henry also comments on **three heavenly witnesses**:
 
 **The Father** testified repeatedly from heaven that Jesus is his beloved Son.
 
@@ -169,6 +169,9 @@ To the living and true God belong glory and dominion forever. Amen.
 ---
 
 ## Editorial review — 1 John 5
+
+**2026-11-17 editorial-voice/source separation:** removed the phrase **“in the wording known from the received text tradition”** from the translated commentary body, because it is the modern editor's textual-critical framing rather than a phrase from Henry's own exposition. The text-critical observation properly belongs here, in editorial notes. This correction **does not endorse or alter any Bible verse**, nor invent or restore words to a biblical module. Henry's own discussion of the Father, Word, and Holy Spirit, and his express qualification that the doctrine of the Trinity stands even without citing this particular passage, remain fully preserved. [CCEL 1 John 5](https://ccel.org/ccel/henry/mhcc.liv.v.html); released native source and exact reference/markup signoff still outstanding.
+
 
 **Complete original-English CCEL secondary witness directly inspected:** [CCEL, 1 John 5](https://ccel.org/ccel/henry/mhcc.liv.v.html). The released `MHCC 0.1.1` remains the only authoritative module source until exact native SWORD and independent critical/textual collation are complete.
 
