@@ -10,12 +10,12 @@ publication_status: "NOT RELEASED — FULL SWORD REBUILD PENDING"
 
 # Exodus 1 — Modern English
 
-## Original chapter outline
+## Original chapter outline — corrected verse references
 
 | Original outline | Verses |
 | --- | --- |
-| The children of Israel increase in Egypt after the death of Joseph. | 8–14 |
-| They are oppressed, but multiply exceedingly. | 1–7 |
+| The children of Israel increase in Egypt after the death of Joseph. | 1–7 |
+| They are oppressed, but multiply exceedingly. | 8–14 |
 | The men-children destroyed. | 15–22 |
 
 ## The children of Israel multiply (verses 1–7)
@@ -87,6 +87,9 @@ Those who want to escape this enemy must fear committing sin and cry out immedia
 ---
 
 ## Editorial verification — Exodus 1
+
+**2026-11-17 explicitly logged editorial range correction (secondary witness, pending native confirmation):** The [CCEL concise witness](https://ccel.org/ccel/henry/mhcc.iii.i.html) transposes the ranges in the first two chapter-outline rows: it assigns 8–14 to Israel's earlier increase and 1–7 to Pharaoh's subsequent oppression. The exposition headings and Scripture itself clearly place the increase at **1–7** and the oppression at **8–14**. This separate Modern English manuscript corrects **only the two outline reference labels**, keeps their original order and authorial wording, and does **not** redivide any source comment. Original published `MHCC 0.1.1` is unmodified; exact native I/K title/outline collation and independent editorial signoff remain pending.
+
 
 The three source exposition units were compared in a distinct pass against [CCEL's Concise text for Exodus 1](https://ccel.org/ccel/henry/mhcc.iii.i.html). The book introduction has been preserved separately as [its own production candidate](../exodus-book-introduction.CANDIDATE.md). Exact source-native SWORD matching remains a later release gate.
 
