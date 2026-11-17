@@ -27,7 +27,7 @@ All Christians, and ministers especially, must remain loyal to **Christ their Ca
 
 We must struggle against our sinful desires and corrupt habits, but we cannot expect a crown unless we compete **according to the rules**.
 
-Even zeal for outward ceremonies or doubtful controversies can misdirect our energies.
+We must do good **in the right way**, lest our good actions themselves be spoken against. Even zeal for outward ceremonies or doubtful controversies can misdirect our energies.
 
 The farmer must labor before receiving the harvest; the runner must run before receiving the prize. We must perform God's will patiently as we wait for what he promised.
 
@@ -82,6 +82,9 @@ Sin traps people in the devil's snare and makes them his captives. They cannot e
 ---
 
 ## Editorial review — 2 Timothy 2
+
+**2026-11-17 secondary-witness fidelity correction:** restored Henry's separate requirement to **do good in the right manner, so that our good is not spoken evil of** (2 Timothy 2:1–7). The existing athlete/competition image alone did not express that warning. Compared with [CCEL 2 Timothy 2](https://ccel.org/ccel/henry/mhcc.xlvii.ii.html); this is not proof of independent native SWORD prose or markup parity.
+
 
 **Entire CCEL original-English witness compared:** [CCEL, 2 Timothy 2](https://ccel.org/ccel/henry/mhcc.xlvii.ii.html). `MHCC 0.1.1` remains authoritative for native SWORD and independent signoff.
 
