@@ -63,11 +63,14 @@ Forgiveness opens the door to every other spiritual blessing, while unforgiven s
 
 Let us examine whether the Holy Spirit has taught us to **know, love, fear, trust and obey Christ sincerely**.
 
-All worldly vanity, external religious advantage and empty notions of faith will soon pass away. Those who trust in them rather than Christ will be left without hope.
+All worldly vanity, external religious advantage and empty notions of faith will soon pass away. Those who trust in them rather than Christ will be **miserable forever**, as Henry warns.
 
 ---
 
 ## Editorial review — Hebrews 8
+
+**2026-11-17 renewed CCEL collation:** restored Henry's express **“miserable for ever”** consequence for trusting in worldly vanities or empty religion. The draft phrase “left without hope” weakened his stated outcome. [CCEL Hebrews 8](https://ccel.org/ccel/henry/mhcc.l.viii.html). Exact published SWORD-native wording, markup and independent editorial acceptance remain outstanding.
+
 
 **Complete CCEL English source compared:** [CCEL, Hebrews 8](https://ccel.org/ccel/henry/mhcc.l.viii.html). Published `MHCC 0.1.1` remains definitive for native SWORD, independent review and publication approval.
 
