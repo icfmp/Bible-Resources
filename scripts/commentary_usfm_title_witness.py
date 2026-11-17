@@ -30,43 +30,65 @@ class WitnessError(ValueError):
 
 
 def reviewed_usfm_title_visible_text(source: str) -> str | None:
-    """Keep exact displayed title words; remove only verified USFM inline tags.
+    """Preserve all visible title words in narrowly verified USFM structures.
 
-    Strong annotations \w WORD|strong="H1234"\w* preserve WORD; \add TEXT\add*
-    preserves TEXT, because the added translator-supplied words are visible in
-    the King James Bible. Unsupported nesting, targets and malformed markup
-    are never silently normalised or converted to probable source words.
+    Recognizes Strong-annotated \w words and nested \+w words, along with
+    \nd (divine names) and \add (translator-provided visible additions).
+    Only structural marker delimiters and verified Strong attributes are
+    omitted. Unsupported or incorrectly nested markup fails closed.
     """
     if not isinstance(source,str) or not source or len(source)>8192:
         return None
     result=[]
     cursor=0
+    stack=[]
     strong=re.compile(r'([^\\|\r\n]{1,180})\|strong="([HG]\d{4,5})"\Z')
     while cursor<len(source):
-        if source.startswith("\\w ",cursor):
-            end=source.find("\\w*",cursor+3)
+        lexical = next(
+            (marker for marker in (r"\+w ",r"\w ")
+             if source.startswith(marker,cursor)),None
+        )
+        if lexical is not None:
+            marker=lexical[1:-1]
+            if (marker=="+w" and not stack) or (marker=="w" and stack):
+                return None
+            close="\\"+marker+"*"
+            end=source.find(close,cursor+len(lexical))
             if end<0:
                 return None
-            match=strong.fullmatch(source[cursor+3:end])
+            match=strong.fullmatch(source[cursor+len(lexical):end])
             if match is None:
                 return None
             result.append(match.group(1))
-            cursor=end+3
-        elif source.startswith("\\add ",cursor):
-            end=source.find("\\add*",cursor+5)
-            if end<0:
+            cursor=end+len(close)
+            continue
+        opened=next(
+            (marker for marker in ("nd","add")
+             if source.startswith("\\"+marker+" ",cursor)),None
+        )
+        if opened is not None:
+            if len(stack)>=4:
                 return None
-            visible=source[cursor+5:end]
-            if not visible or "\\" in visible or "|" in visible:
+            stack.append(opened)
+            cursor+=len(opened)+2
+            continue
+        closed=next(
+            (marker for marker in ("nd","add")
+             if source.startswith("\\"+marker+"*",cursor)),None
+        )
+        if closed is not None:
+            if not stack or stack.pop()!=closed:
                 return None
-            result.append(visible)
-            cursor=end+5
-        elif source[cursor]=="\\":
+            cursor+=len(closed)+2
+            continue
+        if source[cursor]=="\\":
             return None
-        else:
-            result.append(source[cursor])
-            cursor+=1
+        result.append(source[cursor])
+        cursor+=1
+    if stack:
+        return None
     return "".join(result)
+
 
 
 def independent_usfm_titles(archive: Path, pinned_sha256: str,
