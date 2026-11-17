@@ -238,7 +238,7 @@ jobs:
           print("An exact word run ANYWHERE in OSIS does not establish original",
                 "verse ownership, historical edition identity or rights.")
 
-          print("Official upstream source commit (not equivalent to compiled ZIP SHA):
+          print("Official upstream source commit (not equivalent to compiled ZIP SHA):",
                 os.environ["UPSTREAM_SHA"])
           print("Authoring-file original bytes and independent SHA256:",
                 json.dumps(metadata,sort_keys=True))
