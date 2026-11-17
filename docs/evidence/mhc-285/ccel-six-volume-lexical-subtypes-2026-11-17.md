@@ -87,3 +87,23 @@ The previous SHA-pinned full six-volume census already accounted for all **4,263
 The bounded separate nonlink-word alignment remains incomplete for **20** source order/selection cases plus **46** original sections exceeding the LCS resource budget. Those should be independently reviewed using explicit exact-source/stock provenance, with any efficient order-only check labelled **not a full word-order difference magnitude or textual identity result**. Inspect cases in volume III first for source/compiled edition differences, then volumes V and VI for oversize alignments.
 
 **No authorial source XML, original CrossWire binary, original scriptural reference, published commentary module or catalogue entry was modified.** The PR remains **draft**. Real corrected-candidate Xiphos/AndBible GUI acceptance, complete source/stock authorial word+punctuation+markup+division parity, copyright permissions and editorial approval remain **OPEN**.
+
+## Full original-source versus genuine native K-run scope census (2026-11-17)
+
+The [six SHA-pinned private CI volume checks #44076596449](https://github.com/icfmp/Bible-Resources/actions/runs/44076596449) **all PASSED** on the unchanged CrossWire MHC 2.2 original and independently pinned original CCEL volumes, after adding a **source-neutral reuse** of the existing `NativeRawRunBoundaryInventory.report` in independently reconciled 20-case batches. Same revision: [Validate #44076596350](https://github.com/icfmp/Bible-Resources/actions/runs/44076596350), [generated tool registry #44076596299](https://github.com/icfmp/Bible-Resources/actions/runs/44076596299), [native stock audit #44076596269](https://github.com/icfmp/Bible-Resources/actions/runs/44076596269), [original source reference anchors #44076596386](https://github.com/icfmp/Bible-Resources/actions/runs/44076596386), and [pinned AndBible JSword #44076596359](https://github.com/icfmp/Bible-Resources/actions/runs/44076596359) also **PASSED**.
+
+Every original CCEL verse/range section previously identified as `stock_words_in_order_with_extra_source_words` was reidentified by its original CCEL XML line, full source reference SHA-256, original body SHA-256 and exact same-start native raw SHA-256. The generic native inspector independently verified the *actual occupied* SWORD K keys, contiguous shared-raw run, the source's declared verse range and its authentic adjacent XML boundary. Every subset, source book, native reference digest and original full raw corpus was reconciled; **no authored text or native bytes were copied, rewritten or published**.
+
+| CCEL original volume | Original book(s) | Source-longer same-start cases | Native raw K occupied-key extent equals original declared source range |
+| --- | --- | ---: | ---: |
+| I | Genesis | 1 | 1 |
+| II | 2 Chronicles | 1 | 1 |
+| III | **Psalms 116**, Ecclesiastes 1 | **117** | **117** |
+| IV | Isaiah 3, Jeremiah 1 | 4 | 4 |
+| V | None | 0 | 0 |
+| VI | Romans 3, Acts 2 | 5 | 5 |
+| **All volumes** | | **128** | **128** |
+
+This is a **negative finding about a single suspected cause**: for this precise set of 128 source-extra-word cases (including all **116 Psalms**), mismatched *occupied K verse-range boundaries* are **not** an adequate explanation. It does **not** prove that the longer original prose is missing from the entire compiled MHC, that every authorial paragraph belongs in the native K payload, that electronic editions are identical, or that the source's XML section divisions are correctly encoded. The original native K raw repetition is independently observed, but is not itself authorial evidence of a section's intended prose.
+
+**Next bounded research gate:** independently classify the **actual CCEL-only word spans** against the original ThML `scripRef` label ownership, neighboring authorial units and the original native intro/other distinct K payloads; distinguish scripture quote labels, embedded book/chapter headings, markup/editorial annotations, intentional digital-edition variants and possible genuine omissions. Do not infer from same-start text or equal occupied ranges that any historical authorial word was dropped. Only prepare corrections after provenance, printed/independent authorial witness, rights and real-reader checks; retain draft #286 and never alter the published catalogue without explicit approval.
