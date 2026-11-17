@@ -138,6 +138,32 @@ jobs:
               p.Parse(b"",True)
           if roots!=["osis"] or seen["osisText"]<1 or seen["div"]<1:
               raise SystemExit("Expected original OSIS document structure not confirmed")
+          # Diagnose whether the publisher's source has addressable chapter
+          # structures before any proposed correction. Count *identifiers*,
+          # never output any unreviewed authorial prose or titles.
+          from collections import Counter
+          from lxml import etree
+          source_xml=etree.parse(str(root/"mhc.osis.xml"),etree.XMLParser(
+              resolve_entities=False,no_network=True,load_dtd=False,
+              recover=False,huge_tree=True))
+          div_nodes=[node for node in source_xml.iter()
+                     if isinstance(node.tag,str)
+                     and node.tag.rsplit("}",1)[-1]=="div"]
+          attrs=Counter(key.rsplit("}",1)[-1] for node in div_nodes
+                        for key in node.attrib)
+          types=Counter(node.get("type","UNSPECIFIED") for node in div_nodes)
+          # Only fixed, canonical test chapter IDs are returned as counters.
+          sample_ids=("Ps.7","Acts.17")
+          ids={key:sum(node.get("osisID","")==key or
+                       key in node.get("osisID","").split()
+                       for node in div_nodes) for key in sample_ids}
+          print("Official source OSIS div structural attribute names/counts:",
+                json.dumps(dict(sorted(attrs.items())),sort_keys=True))
+          print("Official source OSIS div type labels/counts (structural only):",
+                json.dumps(dict(sorted(types.items())),sort_keys=True))
+          print("Official source OSIS exact chapter-ID presence:",
+                json.dumps(ids,sort_keys=True))
+          del div_nodes,source_xml
           conf=(root/"mhc.conf").read_text(encoding="utf-8")
           def confval(key):
               match=re.findall(r"(?m)^"+re.escape(key)+r"=([^\r\n]*)$",conf)
