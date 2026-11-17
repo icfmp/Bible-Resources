@@ -116,6 +116,26 @@ class IndependentBiblicalTitleWitnessTests(unittest.TestCase):
         self.assertNotIn("David",json.dumps(result))
         self.assertNotIn("H5329",json.dumps(result))
 
+    def test_source_attested_nested_plusw_and_divine_name_title_markers(self):
+        title=(
+            r'To the \nd \+w LORD|strong="H3068"\+w*\nd*, '
+            r'a \add psalm by \+w David|strong="H1732"\+w*\add*.'
+        )
+        visible=reviewed_usfm_title_visible_text(title)
+        self.assertEqual(visible, "To the LORD, a psalm by David.")
+        path,digest=self.make_archive(
+            "\\id PSA\n\\c 7\n\\d "+title+"\n\\v 1 first\n")
+        titles=independent_usfm_titles(path,digest,book_id="PSA")
+        self.assertEqual(titles[7]["status"],"plain_original_d_title")
+        result=compare_original_first_paragraphs(
+            metadata(7,["To","the","LORD","a","psalm","by","David"]),
+            titles,source_book="Ps")
+        self.assertEqual(result["exact_original_title_case_classes"],{
+            "exact_original_p1_equals_independent_usfm_d_title_word_tokens":1})
+        self.assertNotIn("H3068",json.dumps(result))
+        self.assertNotIn("LORD",json.dumps(result))
+        self.assertNotIn("David",json.dumps(result))
+
     def test_unverified_usfm_markup_and_strongs_are_not_silently_removed(self):
         unsafe=[
             r'\w Musician|lemma="H5329"\w*',
@@ -124,8 +144,12 @@ class IndependentBiblicalTitleWitnessTests(unittest.TestCase):
             r'\w Musician|strong="H5329"\add*',
             r'\add A Psalm\w David|strong="H1732"\w*\add*',
             r'\f + \fr 7.1 \ft note\f*',
-            r'\nd LORD\nd*',
             r'\w word|strong="H999999"\w*',
+            r'\+w word|strong="H1234"\+w*',
+            r'\nd \+w LORD|strong="H3068"\+w*',
+            r'\nd \+w LORD|strong="H3068"\+w*\add*',
+            r'\add word\nd*',
+            r'\nd \w LORD|strong="H3068"\w*\nd*',
         ]
         for title in unsafe:
             with self.subTest(title=title):
