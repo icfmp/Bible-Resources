@@ -553,7 +553,8 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
         *, raw_binary: Path | None = None,
         private_alias_probe: bool = False,
         private_full_probe: bool = False,
-        private_full_xiphos_probe: bool = False) -> dict:
+        private_full_xiphos_probe: bool = False,
+        private_full_jsword_root: Path | None = None) -> dict:
     manifest = load_manifest(resource_id)
     locations, is_collection = _xml_witness_locations(
         manifest.get("commentary_source"))
@@ -573,6 +574,8 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
         raise PilotError("Whole-original private rebuild requires the pinned source-bound alias audit")
     if private_full_xiphos_probe and not private_full_probe:
         raise PilotError("Xiphos full candidate navigation requires full native parity probe")
+    if private_full_jsword_root is not None and not private_full_probe:
+        raise PilotError("JSword full candidate navigation requires full native parity probe")
 
     with tempfile.TemporaryDirectory(prefix="commentary-source-native-") as temp:
         root = Path(temp)
@@ -844,6 +847,7 @@ def run(resource_id: str, inspector: Path, probes: tuple[str, ...],
                             original_stock_module_id=manifest["module_id"],
                             native_index_binary=inspector,
                             test_preview_in_xiphos=private_full_xiphos_probe,
+                            pinned_jsword_source_root=private_full_jsword_root,
                         )
                         observed["private_complete_original_index_alias_rebuild"] = full
                     observed["private_original_source_first_verse_index_alias_probes"] = {
@@ -871,6 +875,7 @@ def main(argv=None) -> int:
     p.add_argument("--private-alias-probe", action="store_true")
     p.add_argument("--private-full-probe", action="store_true")
     p.add_argument("--private-full-xiphos-probe", action="store_true")
+    p.add_argument("--private-full-jsword-root", type=Path)
     p.add_argument("--probe-osis-key", action="append", default=[])
     p.add_argument("--report", type=Path, required=True)
     args = p.parse_args(argv)
@@ -879,7 +884,8 @@ def main(argv=None) -> int:
                      raw_binary=args.native_raw_binary,
                      private_alias_probe=args.private_alias_probe,
                      private_full_probe=args.private_full_probe,
-                     private_full_xiphos_probe=args.private_full_xiphos_probe)
+                     private_full_xiphos_probe=args.private_full_xiphos_probe,
+                     private_full_jsword_root=args.private_full_jsword_root)
         code = 0
     except (ValueError, OSError, RuntimeError, zipfile.BadZipFile) as exc:
         report = {
