@@ -146,6 +146,11 @@ class IndependentBiblicalTitleWitnessTests(unittest.TestCase):
             metadata(3, ["A", "Psalm"]), titles, source_book="Ps")
         self.assertEqual(output["exact_original_title_case_classes"], {
             "unreviewed_inline_usfm_d_title": 1})
+        case=output["original_chapter_source_sha_and_closed_verdict_only"][0]
+        self.assertEqual(case["unsupported_usfm_inline_marker_shapes_only"], [
+            r"\\w", r"\\w*"])
+        self.assertNotIn("H1234",json.dumps(output))
+        self.assertNotIn("Psalm",json.dumps(output))
         misplaced, pin = self.make_archive("\\id PSA\n\\c 3\n\\v 1 first\n\\d A Psalm\n")
         with self.assertRaises(WitnessError):
             independent_usfm_titles(misplaced, pin, book_id="PSA")
