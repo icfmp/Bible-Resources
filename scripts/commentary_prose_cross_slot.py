@@ -405,11 +405,12 @@ class OriginalProseAlternativeNativeSlotProbe:
 
 
 class OriginalExtraGapNativeChapterProbe:
-    """Private exact entire-extra-span search in authentic other chapter K/I slots.
+    """Private full-extra-span search in other genuine same-book K/I raw slots.
 
-    Only a bounded, source-neutral high-size subset is inspected. A hit is a
-    textual location candidate, never approval to move original annotations.
-    Neither original prose, native keys nor target strings enter the report.
+    Report same-chapter and other-chapter results SEPARATELY. Only a bounded,
+    source-neutral high-size subset is inspected. A hit is a textual location
+    witness, never authorization to move original annotations. Neither original
+    prose, native keys nor target strings leave the private runner.
     """
 
     MIN_FULL_SPAN_WORDS = 6
@@ -456,6 +457,7 @@ class OriginalExtraGapNativeChapterProbe:
                 "original_body_sha256":item["original_text_sha256"],
                 "selected_native_sha256":sha256(selected).hexdigest(),
                 "chapter":start.rsplit(".",1)[0],
+                "book":start.split(".",1)[0],
                 "original_source_extra_span_lengths":list(map(len,spans)),
                 "private_original_extra_spans":[tuple(words) for words in spans],
                 "private_original_unlinked_words":source_plain,
@@ -464,6 +466,10 @@ class OriginalExtraGapNativeChapterProbe:
                 "other_native_payload_counts":Counter(),
                 "full_gap_hits":{ "K":set(), "I":set() },
                 "identical_original_raw_repeat_keys":0,
+                "other_chapter_distinct_native_raw_sha":set(),
+                "other_chapter_payload_counts":Counter(),
+                "other_chapter_full_gap_hits":{"K":set(),"I":set()},
+                "identical_original_raw_other_chapter_repeat_keys":0,
             })
         if len({(u["original_source_line"],u["original_full_reference_sha256"])
                 for u in self.units})!=len(self.units):
@@ -695,22 +701,33 @@ class OriginalExtraGapNativeChapterProbe:
             return
         for unit in self.units:
             chapter=unit["chapter"]
-            if (kind=="K" and key.rsplit(".",1)[0]!=chapter or
-                    kind=="I" and key not in (chapter,chapter+".0")):
+            if key.split(".",1)[0]!=unit["book"]:
                 continue
+            # A same-book intro outside the target chapter (including its
+            # book intro) is not misrepresented as a target-chapter intro.
+            same_chapter=(key.rsplit(".",1)[0]==chapter if kind=="K"
+                          else key in (chapter,chapter+".0"))
+            repeat_key=("identical_original_raw_repeat_keys" if same_chapter
+                        else "identical_original_raw_other_chapter_repeat_keys")
+            seen_key=("distinct_other_native_raw_sha" if same_chapter
+                      else "other_chapter_distinct_native_raw_sha")
+            counts_key=("other_native_payload_counts" if same_chapter
+                        else "other_chapter_payload_counts")
+            hits_key=("full_gap_hits" if same_chapter
+                      else "other_chapter_full_gap_hits")
             raw_sha=sha256(raw).hexdigest()
             if raw_sha==unit["selected_native_sha256"]:
-                unit["identical_original_raw_repeat_keys"]+=1
+                unit[repeat_key]+=1
                 continue
-            if raw_sha in unit["distinct_other_native_raw_sha"]:
+            if raw_sha in unit[seen_key]:
                 continue
-            unit["distinct_other_native_raw_sha"].add(raw_sha)
-            unit["other_native_payload_counts"][kind]+=1
+            unit[seen_key].add(raw_sha)
+            unit[counts_key][kind]+=1
             words=strict_native_stock_plain_words(raw)
             for span_index,span in enumerate(unit["private_original_extra_spans"]):
                 if len(span)>=self.MIN_FULL_SPAN_WORDS and self._full_token_span_present(
                         span,words):
-                    unit["full_gap_hits"][kind].add(span_index)
+                    unit[hits_key][kind].add(span_index)
 
     def report(self) -> dict:
         if self.replayed<=0:
@@ -721,8 +738,10 @@ class OriginalExtraGapNativeChapterProbe:
             examined={i for i,n in enumerate(spans) if n>=self.MIN_FULL_SPAN_WORDS}
             found_k=unit["full_gap_hits"]["K"]
             found_i=unit["full_gap_hits"]["I"]
-            if not found_k.issubset(examined) or not found_i.issubset(examined):
-                raise PilotError("Unreviewed short gap matched in native chapter")
+            other_k=unit["other_chapter_full_gap_hits"]["K"]
+            other_i=unit["other_chapter_full_gap_hits"]["I"]
+            if not (found_k|found_i|other_k|other_i).issubset(examined):
+                raise PilotError("Unreviewed short gap matched in native book")
             findings.append({
                 "original_source_line":unit["original_source_line"],
                 "original_full_reference_sha256":unit["original_full_reference_sha256"],
@@ -742,9 +761,20 @@ class OriginalExtraGapNativeChapterProbe:
                 "identical_selected_native_raw_repeat_keys_not_independent":
                     unit["identical_original_raw_repeat_keys"],
                 "same_chapter_no_hit_does_not_prove_absence_elsewhere_or_authorial_loss":True,
+                "extra_spans_exactly_witnessed_in_other_chapter_same_book_K_raw":
+                    len(other_k),
+                "extra_spans_exactly_witnessed_in_other_chapter_same_book_I_raw":
+                    len(other_i),
+                "distinct_extra_spans_witnessed_in_other_chapter_same_book_raw":
+                    len(other_k|other_i),
+                "other_chapter_same_book_distinct_native_raw_payloads_by_kind":
+                    dict(sorted(unit["other_chapter_payload_counts"].items())),
+                "identical_selected_native_raw_other_chapter_repeat_keys_not_independent":
+                    unit["identical_original_raw_other_chapter_repeat_keys"],
+                "same_book_no_hit_does_not_prove_absence_other_books_or_authorial_loss":True,
             })
         return {
-            "status":"ORIGINAL_HIGH_EXTRA_SPAN_SAME_CHAPTER_OTHER_RAW_LOCATION_ONLY",
+            "status":"ORIGINAL_HIGH_EXTRA_SPAN_SAME_BOOK_OTHER_RAW_LOCATION_ONLY",
             "source_extra_outlier_cases_examined":len(findings),
             "minimum_contiguous_exact_original_nonlink_word_span_length":
                 self.MIN_FULL_SPAN_WORDS,
@@ -753,4 +783,5 @@ class OriginalExtraGapNativeChapterProbe:
             "source_xml_or_original_crosswire_native_binary_modified":False,
             "no_original_words_or_native_key_strings_exposed":True,
             "same_chapter_location_not_authorial_section_or_full_edition_parity":True,
+            "same_book_other_chapter_scope_not_a_whole_corpus_absence_proof":True,
         }
