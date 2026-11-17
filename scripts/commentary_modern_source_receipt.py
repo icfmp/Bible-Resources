@@ -97,11 +97,13 @@ class Receipt:
         actual = source_report["all_native_raw_entries_ordered_sha256"]
         if actual != expected_sha:
             raise ValueError("Complete native raw corpus hash does not match pinned edition")
+        missing = [ch for ch in self.chapters if not self.by_chapter[ch]]
+        if missing:
+            raise ValueError("Requested chapter has no observed numbered source commentary "
+                             "(check intro-only entries): " + ", ".join(missing))
         output = {}
         for chapter in self.chapters:
             blocks = list(self.by_chapter[chapter].values())
-            if not blocks:
-                raise ValueError("Requested chapter has no observed source commentary: " + chapter)
             keys = [key for b in blocks for key in b["keys"]]
             if len(set(keys)) != len(keys):
                 raise ValueError("Repeated original native key in chapter " + chapter)
