@@ -181,13 +181,33 @@ jobs:
                       "original_full_reference_sha256"]:
                   raise SystemExit("Source chapter locator differs from pinned marker SHA")
               match=re.fullmatch(
-                  r"Bible:([1-4]?[A-Za-z][A-Za-z0-9]*)\.([1-9][0-9]*)\.[1-9][0-9]*"
-                  r"(?:-[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*\.[1-9][0-9]*)?",
+                  r"Bible:([1-4]?[A-Za-z][A-Za-z0-9]*)\\.([1-9][0-9]*)\\.[1-9][0-9]*"
+                  r"(?:-[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9][0-9]*\\.[1-9][0-9]*)?",
                   original_ref)
               if match is None:
                   raise SystemExit("Original CCEL section is not an approved verse locator")
-              chapter_scopes.append((case["original_full_reference_sha256"],
-                                    match.group(1),match.group(2)))
+              chapter_scopes.append((match.group(1)+"."+match.group(2),
+                                     case["original_full_reference_sha256"],
+                                     "independent_ccel_marker"))
+          # Extend source-neutral, *read-only* authoring-OSIS sampling from
+          # reviewed manifest chapter IDs; do not invent CCEL witnesses,
+          # section assignments or trust unbounded user-provided keys.
+          additional=manifest["commentary_source"].get(
+              "private_authoring_osis_chapter_samples",[])
+          if (not isinstance(additional,list) or not 1<=len(additional)<=6
+                  or len(set(additional))!=len(additional)):
+              raise SystemExit("Unreviewed additional authoring OSIS chapter samples")
+          for chapter_ref in additional:
+              if (not isinstance(chapter_ref,str) or not re.fullmatch(
+                  r"[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9][0-9]*",
+                  chapter_ref)):
+                  raise SystemExit("Invalid reviewed authoring OSIS chapter locator")
+              chapter_scopes.append((
+                  chapter_ref,sha256(chapter_ref.encode("ascii")).hexdigest(),
+                  "manifest_authoring_osis_chapter_sample"))
+          if (len(chapter_scopes)>8 or len({row[0] for row in chapter_scopes})
+                  != len(chapter_scopes)):
+              raise SystemExit("Duplicate or unbounded original authoring OSIS chapter scopes")
           print("Official source OSIS div structural attribute names/counts:",
                 json.dumps(dict(sorted(attrs.items())),sort_keys=True))
           print("Official source OSIS div type labels/counts (structural only):",
@@ -203,11 +223,11 @@ jobs:
               raise SystemExit("Official source book divisions ambiguous")
           private_chapter_words={}
           private_chapter_visible_texts={}
-          for ref_sha,book,chapter in chapter_scopes:
+          for chapter_ref,ref_sha,scope_kind in chapter_scopes:
+              book,chapter=chapter_ref.rsplit(".",1)
               book_div=book_divisions.get(book)
               if book_div is None:
                   raise SystemExit("Pinned CCEL biblical book lacks an OSIS book division")
-              chapter_ref=book+"."+chapter
               actual_markers=Counter()
               linked_targets=0
               descendants=0
@@ -238,7 +258,8 @@ jobs:
               private_chapter_visible_texts[chapter_ref]=chapter_private_visible[0]
               print("Authenticated source book/chapter structural metadata only:",
                     json.dumps({
-                      "original_source_marker_ref_sha256":ref_sha,
+                      "source_scope_selection_kind":scope_kind,
+                      "source_scope_locator_sha256":ref_sha,
                       "authentic_bounded_chapter_scope":chapter_scope,
                       "book_xml_descendant_element_count":descendants,
                       "local_chapter_addressable_element_tag_counts":
