@@ -17,6 +17,14 @@ class EntityResolver:
         self.editions = provenance.get("source_editions")
         if not isinstance(self.editions, dict) or not self.editions:
             raise ValueError("Missing corpus edition/prefix provenance")
+        for corpus, metadata in self.editions.items():
+            if (not isinstance(metadata, dict)
+                    or not isinstance(metadata.get("word_id_prefix"), str)
+                    or not metadata["word_id_prefix"]
+                    or not isinstance(metadata.get("word_id_digits"), int)
+                    or isinstance(metadata["word_id_digits"], bool)
+                    or metadata["word_id_digits"] < 8):
+                raise ValueError(f"Invalid pinned original-word ID format: {corpus}")
         self.words = index.get("by_word")
         if not isinstance(self.words, dict):
             raise ValueError("Missing exact-word index")
@@ -58,9 +66,11 @@ class EntityResolver:
         elif not (isinstance(verse_id, str) and len(verse_id) == 8
                   and verse_id.isdigit()):
             result["status"] = "invalid_verse_id"
-        elif not (isinstance(word_id, str) and len(word_id) >= 9
-                  and word_id.startswith(expected.get("word_id_prefix", "\0"))
-                  and word_id[1:9].isdigit()):
+        elif not (isinstance(word_id, str)
+                  and len(word_id) == (len(expected["word_id_prefix"])
+                                       + expected["word_id_digits"])
+                  and word_id.startswith(expected["word_id_prefix"])
+                  and word_id[len(expected["word_id_prefix"]):].isdigit()):
             result["status"] = "invalid_source_word_id"
         elif word_id[1:9] != verse_id:
             result["status"] = "verse_context_mismatch"

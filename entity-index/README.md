@@ -291,6 +291,20 @@ the highest-priority collisions for source-by-source follow-up under
 [inherited identity issue #75 / our tracker #299](https://github.com/icfmp/Bible-Resources/issues/299).
 A count from an old unpinned snapshot is not a release gate.
 
+## Strict original-word identifier format
+
+The source edition lock now declares a full, exact source-word ID format:
+**12 digits after `o` for pinned WLC**, and **11 digits after `n` for
+pinned SBLGNT**. Both the compiler and the offline resolver check the
+**entire identifier**, not merely the initial eight-digit verse prefix.
+Wrong length or extra letters/digits cannot silently appear as valid
+candidate annotations or ambiguous unresolved lookups. Existing exact
+original text identifiers and all source groups remain unchanged.
+
+A complete corpus rebuild and positive Hebrew/Greek lookup regressions
+must pass before this stricter validation is accepted; no valid source
+word may be rewritten to satisfy a validator.
+
 ## Original corpus labels and stable client-facing corpus names
 
 The pinned ACAI source spells its Greek occurrence field **`SBLGNT`**

@@ -18,8 +18,10 @@ def fixture():
         "format": "bible-entity-index",
         "schema_version": 1,
         "provenance": {"source_editions": {
-            "wlc": {"edition": "Macula-WLC@frozen", "word_id_prefix": "o"},
-            "sblgnt": {"edition": "Macula-SBLGNT@frozen", "word_id_prefix": "n"},
+            "wlc": {"edition": "Macula-WLC@frozen",
+                    "word_id_prefix": "o", "word_id_digits": 12},
+            "sblgnt": {"edition": "Macula-SBLGNT@frozen",
+                       "word_id_prefix": "n", "word_id_digits": 11},
         }},
         "entities": [
             {"id": "person:Alpha", "canonical_id": "person:Alpha",
@@ -102,6 +104,12 @@ class ResolverTests(unittest.TestCase):
                          "verse_context_mismatch")
         self.assertEqual(self.lookup(verse_id="bad")["status"], "invalid_verse_id")
         self.assertEqual(self.lookup(word_id="n010010010011")["status"],
+                         "invalid_source_word_id")
+        self.assertEqual(self.lookup(word_id="o010010010011suffix")["status"],
+                         "invalid_source_word_id")
+        self.assertEqual(self.lookup(word_id="o01001001001")["status"],
+                         "invalid_source_word_id")
+        self.assertEqual(self.lookup(word_id="o01001001001X")["status"],
                          "invalid_source_word_id")
         self.assertEqual(self.lookup(corpus="lxx")["status"], "unavailable_corpus")
         r = self.lookup(word_id="n40001001001", verse_id="40001001",

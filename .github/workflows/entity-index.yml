@@ -104,6 +104,8 @@ jobs:
           assert by_id["place:Gerasa"]["canonical_id"] == "place:Gerasa"
           assert by_id["place:Gadara.2"]["canonical_id"] == "place:Gadara.2"
           assert index["provenance"]["source_corpora"]["SBLGNT"] == "sblgnt"
+          assert index["provenance"]["source_editions"]["wlc"]["word_id_digits"] == 12
+          assert index["provenance"]["source_editions"]["sblgnt"]["word_id_digits"] == 11
           assert "sblgnt:n45016001004" in index["by_word"]
           assert "SBLGNT:n45016001004" not in index["by_word"]
           assert ["o130030150041"] not in by_id["person:Jehoahaz.3"]["occurrences"]["explicit_instances"]["wlc"]
@@ -136,6 +138,12 @@ jobs:
           greek_hit=resolver.resolve(corpus="sblgnt", edition=greek,
                 word_id="n45016001004", verse_id="45016001")
           assert "person:Phoebe" in [c["id"] for c in greek_hit["candidates"]], greek_hit
+          malformed_greek=resolver.resolve(corpus="sblgnt", edition=greek,
+                word_id="n45016001004x", verse_id="45016001")
+          assert malformed_greek["status"] == "invalid_source_word_id", malformed_greek
+          malformed_hebrew=resolver.resolve(corpus="wlc", edition=edition,
+                word_id="o1300301501010", verse_id="13003015")
+          assert malformed_hebrew["status"] == "invalid_source_word_id", malformed_hebrew
           assert greek_hit["status"] in ("source_candidate", "ambiguous_source_candidates")
           variant=resolver.resolve(corpus="sblgnt", edition=greek,
                 word_id="n44008037001", verse_id="44008037")
