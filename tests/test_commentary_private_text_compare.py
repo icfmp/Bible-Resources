@@ -201,7 +201,7 @@ class CommentaryOriginalStockTextTests(unittest.TestCase):
         item=original["Gen.1.1"][0]
         p=item["private_original_p_visible_word_digest_inventory"]
         self.assertEqual(len(p),2)
-        self.assertEqual([r["original_p_visible_word_tokens"] for r in p],[6,4])
+        self.assertEqual([r["original_p_visible_word_tokens"] for r in p],[5,4])
         self.assertEqual(p[0]["original_p_visible_ordered_word_sha256"],
                          sha256(b"Opening verse label closing prose").hexdigest())
         self.assertEqual(item["private_original_scripRef_word_indices"],[1,2])
