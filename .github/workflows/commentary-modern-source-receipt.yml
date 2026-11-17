@@ -179,6 +179,83 @@ jobs:
                     " source_sha_anchors="+anchors)
           print("COMPLETE NATIVE KEY RECEIPT PASS — metadata only; no draft semantics, links, notes or compiled derivative approved")
           PY
+      - name: Screen all modern manuscript outline tables for out-of-order source ranges
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          import re
+          root=Path("work/mhcc-modern/production/accepted")
+          files=sorted(root.glob("*.md"))
+          assert len(files)==1189
+          ordered=[]
+          inspected=0
+          skipped=0
+          anomalies=[]
+          range_pattern=re.compile(r"^\s*(\d{1,3})(?:\s*[-–—]\s*(\d{1,3}))?\s*$")
+          for path in files:
+              raw=path.read_text(encoding="utf-8")
+              prose=raw.split("\n---\n",2)
+              if len(prose)<3:
+                  raise ValueError("Unterminated manuscript: "+path.name)
+              body=prose[1]
+              h=re.search(r"(?m)^## Original[^\n]*outline[^\n]*$",body,re.I)
+              if not h:
+                  skipped+=1
+                  continue
+              span=body[h.end():]
+              next_h=re.search(r"(?m)^## ",span)
+              if next_h:
+                  span=span[:next_h.start()]
+              bounds=[]
+              for line in span.splitlines():
+                  if not line.strip().startswith("|"):
+                      continue
+                  cols=[p.strip() for p in line.strip().strip("|").split("|")]
+                  if len(cols)<2:
+                      continue
+                  value=cols[-1].strip("() ")
+                  m=range_pattern.fullmatch(value)
+                  if m:
+                      start=int(m[1]);end=int(m[2] or m[1])
+                      if start<1 or end<start:
+                          anomalies.append({"manuscript":path.name,"reason":"invalid original-outline numeric span","range":value})
+                      else:
+                          bounds.append((start,end))
+              if not bounds:
+                  skipped+=1
+                  continue
+              inspected+=1
+              if len(bounds)>1:
+                  bad=[(i+1,a,b) for i,(a,b) in enumerate(zip(bounds,bounds[1:]))
+                       if b[0]<a[0]]
+                  if bad:
+                      anomalies.append({
+                          "manuscript":path.name,
+                          "reason":"source-outline rows out of canonical verse order; manual review only",
+                          "ordered_row_bounds":[f"{a}-{b}" for a,b in bounds]
+                      })
+              ordered.append(path.name)
+          report={
+              "status":"DIAGNOSTIC_ONLY_NOT_ORIGINAL_SOURCE_OR_SEMANTIC_APPROVAL",
+              "all_1189_chapter_manuscripts_examined":len(files),
+              "outlines_with_numeric_rows_screened":inspected,
+              "not_evaluable_by_this_narrow_heuristic":skipped,
+              "anomalies":anomalies,
+              "original_native_heading_or_outline_verified":False,
+              "automatic_editorial_corrections_made":False
+          }
+          dest=Path(os.environ["RUNNER_TEMP"])/"mhcc-modern-outline-order-diagnostic.json"
+          dest.write_text(json.dumps(report,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+          print("DRAFT_OUTLINE_ORDER_DIAGNOSTIC manuscripts=1189 "+
+                f"screened={inspected} unevaluable={skipped} flagged={len(anomalies)}")
+          for a in anomalies[:45]:
+              print("DRAFT_OUTLINE_ORDER_FLAG "+a["manuscript"]+" "+str(a.get("ordered_row_bounds",a["reason"])))
+          print("No original authorial outline rewritten; all flags need independent contextual review")
+          PY
       - name: Build private Leviticus 19 and Psalm 108 I-only linked chapter previews
         shell: bash
         run: |
@@ -615,6 +692,7 @@ jobs:
             ${{ runner.temp }}/mhcc-modern-source-native-receipt.json
             ${{ runner.temp }}/mhcc-modern-whole-canon-native-receipt.json
             ${{ runner.temp }}/mhcc-ionly-preview-report.json
+            ${{ runner.temp }}/mhcc-modern-outline-order-diagnostic.json
             ${{ runner.temp }}/mhcc-modern-draft-coverage-report.json
             ${{ runner.temp }}/mhcc-modern-preview-structure.json
           if-no-files-found: ignore
