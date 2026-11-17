@@ -775,5 +775,56 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
             census.private_unmatched_native_K_original_book_location({})
 
 
+    def test_authentic_chapter_final_gap_found_in_next_chapter_source_and_native(self):
+        intro=[f"intro{i:02d}" for i in range(8)]
+        middle=[f"body{i:02d}" for i in range(12)]
+        tail=[f"gap{i:02d}" for i in range(16)]
+        next_extra=[f"later{i:02d}" for i in range(10)]
+        ps95=intro+middle+tail
+        ps96=tail+next_extra
+        census=PrivateOriginalChapterNativeAnchorCoverage(
+            {"Ps.95":ps95,"Ps.96":ps96})
+        census.observe("I","Ps.95.0",
+                       ("<title>"+" ".join(intro)+"</title>").encode())
+        census.observe("K","Ps.95.1",
+                       ("<p>"+" ".join(middle)+"</p>").encode())
+        census.observe("K","Ps.96.1",
+                       ("<p>"+" ".join(ps96)+"</p>").encode())
+        result=census.private_trailing_source_gaps_in_other_original_chapters()
+        self.assertEqual(result["genuine_authored_chapter_trailing_gaps"],1)
+        case=result["cases"][0]
+        self.assertEqual(case["source_trailing_gap_word_offset_not_verse_key"],20)
+        self.assertEqual(case["source_trailing_gap_visible_word_tokens"],16)
+        self.assertTrue(case["next_original_chapter_source_has_entire_gap"])
+        self.assertTrue(case["next_original_chapter_located_native_has_entire_gap"])
+        self.assertEqual(case["other_same_book_source_chapters_with_entire_gap"],1)
+        self.assertEqual(case["other_same_book_located_native_chapters_with_entire_gap"],1)
+        self.assertEqual(
+            case["next_chapter_located_native_eight_word_anchor_hits_of_three"],3)
+        self.assertEqual(case["next_chapter_source_eight_word_anchor_hits_of_three"],3)
+        self.assertNotIn("gap00",json.dumps(result))
+        self.assertNotIn('"Ps.95"',json.dumps(result))
+        self.assertTrue(result["full_original_native_K_I_TOP_corpus_global_search_not_performed"])
+
+        no_next=PrivateOriginalChapterNativeAnchorCoverage(
+            {"Ps.95":ps95,"Ps.96":next_extra+[
+                f"newsource{i:02d}" for i in range(10)]})
+        no_next.observe("I","Ps.95.0",
+                        ("<title>"+" ".join(intro)+"</title>").encode())
+        no_next.observe("K","Ps.95.1",
+                        ("<p>"+" ".join(middle)+"</p>").encode())
+        no_next.observe("K","Ps.96.1",
+                        ("<p>"+" ".join(next_extra+[
+                            f"newsource{i:02d}" for i in range(10)])+
+                         "</p>").encode())
+        absent=no_next.private_trailing_source_gaps_in_other_original_chapters()
+        self.assertEqual(absent["genuine_authored_chapter_trailing_gaps"],1)
+        other=absent["cases"][0]
+        self.assertFalse(other["next_original_chapter_source_has_entire_gap"])
+        self.assertFalse(other["next_original_chapter_located_native_has_entire_gap"])
+        self.assertEqual(
+            other["next_chapter_located_native_eight_word_anchor_hits_of_three"],0)
+
+
 if __name__=="__main__":
     unittest.main()
