@@ -458,6 +458,8 @@ class OriginalExtraGapNativeChapterProbe:
                 "chapter":start.rsplit(".",1)[0],
                 "original_source_extra_span_lengths":list(map(len,spans)),
                 "private_original_extra_spans":[tuple(words) for words in spans],
+                "private_original_unlinked_words":source_plain,
+                "private_selected_stock_unlinked_words":stock_plain,
                 "distinct_other_native_raw_sha":set(),
                 "other_native_payload_counts":Counter(),
                 "full_gap_hits":{ "K":set(), "I":set() },
@@ -466,6 +468,174 @@ class OriginalExtraGapNativeChapterProbe:
         if len({(u["original_source_line"],u["original_full_reference_sha256"])
                 for u in self.units})!=len(self.units):
             raise PilotError("Duplicate original source extra-span outlier identity")
+
+    def original_thml_extra_gap_structure(
+            self, xml_bytes:bytes, *, expected_source_sha256:str) -> dict:
+        """Read exact original adjacent ThML body paragraphs at outlier lines.
+
+        The original XML source bytes, source ref and text hashes are
+        authenticated again. Report only source line/SHA-bound paragraph and
+        section-element ownership of word spans, never the underlying prose.
+        A CCEL paragraph is *digital source structure*, not independent proof
+        of the historic author's original editorial divisions.
+        """
+        from commentary_nonlink_words import _private_unique_original_gap_windows
+        from commentary_unresolved_lexical_triage import marked_word_token_indices
+        if (not isinstance(xml_bytes,bytes) or len(xml_bytes)>64*1024*1024
+                or not SHA_RE.fullmatch(expected_source_sha256)
+                or sha256(xml_bytes).hexdigest()!=expected_source_sha256):
+            raise PilotError("Original CCEL ThML source bytes are not exactly authenticated")
+        try:
+            root=etree.fromstring(xml_bytes,parser=etree.XMLParser(
+                resolve_entities=False,no_network=True,load_dtd=False,
+                recover=False,huge_tree=False,remove_blank_text=False))
+        except (ValueError,etree.XMLSyntaxError):
+            raise PilotError("Original CCEL markup cannot be parsed without recovery") from None
+        if any(isinstance(node,etree._Entity) for node in root.iter()):
+            raise PilotError("Original CCEL has unreviewed external XML entities")
+        matched={}
+        sought={(u["original_source_line"],u["original_full_reference_sha256"])
+                for u in self.units}
+        for node in root.iter():
+            if not isinstance(node.tag,str) or node.tag.rsplit("}",1)[-1]!="scripCom":
+                continue
+            ident=(node.sourceline,sha256(node.get("osisRef","").encode("utf-8")).hexdigest())
+            if ident in sought:
+                if ident in matched:
+                    raise PilotError("Source line/reference hash points at multiple ThML markers")
+                matched[ident]=node
+        if set(matched)!=sought:
+            raise PilotError("Original source-marker line/ref identity not found in exact XML")
+
+        outputs=[]
+        for unit in self.units:
+            identity=(unit["original_source_line"],unit["original_full_reference_sha256"])
+            marker=matched[identity]
+            body=marker.getnext()
+            if (body is None or not isinstance(body.tag,str)
+                    or body.tag.rsplit("}",1)[-1]!="div"
+                    or (marker.tail and marker.tail.strip())):
+                raise PilotError("Original source marker is not immediately followed by an authored div")
+            original="".join(body.itertext())
+            if sha256(original.encode("utf-8")).hexdigest()!=unit["original_body_sha256"]:
+                raise PilotError("Original source marker's adjacent body text SHA differs")
+            linked=set(marked_word_token_indices(body,"scripRef",original))
+            words=WORD.findall(original)
+            plain=[w for i,w in enumerate(words) if i not in linked]
+            if plain!=unit["private_original_unlinked_words"]:
+                raise PilotError("Original ThML link-word owners differ from earlier source census")
+            windows=_private_unique_original_gap_windows(
+                plain,unit["private_selected_stock_unlinked_words"])
+            if windows is None or [b-a for a,b in windows]!=unit[
+                    "original_source_extra_span_lengths"]:
+                raise PilotError("Original source gap window/word identity changed")
+
+            # Exact authored element text/tail order with character coordinates.
+            fragments=[]
+            paragraphs=[]
+            char_pos=0
+            paragraph_number=0
+            def emit(value):
+                nonlocal char_pos
+                if value:
+                    char_pos+=len(value)
+            def walk(node):
+                nonlocal paragraph_number
+                start=char_pos
+                tag=node.tag.rsplit("}",1)[-1] if isinstance(node.tag,str) else ""
+                num=None
+                if tag=="p":
+                    paragraph_number+=1
+                    num=paragraph_number
+                emit(node.text)
+                for child in node:
+                    walk(child)
+                    emit(child.tail)
+                if num is not None:
+                    paragraphs.append((start,char_pos,num))
+            walk(body)
+            if char_pos!=len(original):
+                raise PilotError("Actual ThML text/tail paragraph offsets did not reconcile")
+            # Every regex token must be placed entirely within ONE original p,
+            # or conservatively classified as outside/ambiguous, not attributed.
+            paragraph_owners=[]
+            mixed_word_boundary_count=0
+            for match in WORD.finditer(original):
+                contained=[n for a,b,n in paragraphs
+                           if a<=match.start() and match.end()<=b]
+                overlapping=[n for a,b,n in paragraphs
+                             if a<match.end() and match.start()<b]
+                if len(contained)==1 and len(overlapping)==1:
+                    paragraph_owners.append(contained[0])
+                elif not overlapping:
+                    paragraph_owners.append(None)
+                else:
+                    paragraph_owners.append(-1)
+                    mixed_word_boundary_count+=1
+            if len(paragraph_owners)!=len(words):
+                raise PilotError("Source original paragraph words no longer equal original tokens")
+            plain_owners=[owner for i,owner in enumerate(paragraph_owners)
+                          if i not in linked]
+            if len(plain_owners)!=len(plain):
+                raise PilotError("Original source unlinked paragraph-owner word count changed")
+            paragraph_positions={}
+            for i,owner in enumerate(plain_owners):
+                if owner is not None and owner!=-1:
+                    paragraph_positions.setdefault(owner,set()).add(i)
+            span_rows=[]
+            for a,b in windows:
+                positions=set(range(a,b))
+                these=plain_owners[a:b]
+                distinct={owner for owner in these if type(owner) is int and owner>0}
+                outside=sum(owner is None for owner in these)
+                mixed=sum(owner==-1 for owner in these)
+                if mixed:
+                    category="word_crosses_original_paragraph_markup_boundary"
+                elif outside and distinct:
+                    category="extra_span_mixes_original_paragraph_and_nonparagraph_words"
+                elif outside:
+                    category="extra_span_entirely_outside_original_p_elements"
+                elif len(distinct)==1:
+                    category="extra_span_inside_one_original_p"
+                else:
+                    category="extra_span_crosses_multiple_original_p_elements"
+                whole=sum(paragraph_positions[n].issubset(positions) for n in distinct)
+                partial=len(distinct)-whole
+                span_rows.append({
+                    "exact_original_unlinked_extra_word_count":b-a,
+                    "original_paragraph_ownership_class":category,
+                    "distinct_original_p_elements_touched":len(distinct),
+                    "whole_original_p_elements_word_covered":whole,
+                    "partially_covered_original_p_elements":partial,
+                    "original_unlinked_words_outside_p":outside,
+                    "original_tokens_straddling_p_markup":mixed,
+                })
+            next_sibling=body.getnext()
+            next_tag=(next_sibling.tag.rsplit("}",1)[-1]
+                      if next_sibling is not None and isinstance(next_sibling.tag,str)
+                      else "none")
+            outputs.append({
+                "original_source_line":unit["original_source_line"],
+                "original_full_reference_sha256":unit["original_full_reference_sha256"],
+                "original_body_sha256":unit["original_body_sha256"],
+                "selected_native_sha256":unit["selected_native_sha256"],
+                "original_adjacent_div_p_element_total":len(paragraphs),
+                "original_adjacent_div_unlinked_word_count":len(plain),
+                "original_word_tokens_spanning_original_p_boundaries":mixed_word_boundary_count,
+                "original_next_sibling_element_type_only":next_tag,
+                "original_extra_word_spans_authentically_within_adjacent_source_div":
+                    span_rows,
+                "original_adjacent_div_structure_not_original_print_edition_identity":True,
+            })
+        return {
+            "status":"PINNED_ORIGINAL_THML_SOURCE_EXTRA_PARAGRAPH_TOPOLOGY_ONLY",
+            "source_xml_sha256":expected_source_sha256,
+            "original_outlier_source_units_reconciled":len(outputs),
+            "source_line_hash_and_original_adjacent_paragraph_structure_only":outputs,
+            "original_reference_markers_and_section_divisions_not_modified":True,
+            "original_words_or_source_ref_or_native_keys_exposed":False,
+            "original_authorial_print_editional_structure_parity_established":False,
+        }
 
     @staticmethod
     def _full_token_span_present(needle: tuple[str,...], haystack:list[str]) -> bool:
