@@ -19,8 +19,8 @@ def synthetic_case():
     ref="Bible:Gen.1.1"
     # The first word and six lexical link-label words are genuine source text,
     # not extracted from inferred source-marker ranges.
-    p="<p>"+ " ".join(words[:5]) + "<scripRef>" + " ".join(
-        words[5:11]) + "</scripRef>" + " ".join(words[11:]) + "</p>"
+    p="<p>"+ " ".join(words[:5]) + " <scripRef>" + " ".join(
+        words[5:11]) + "</scripRef> " + " ".join(words[11:]) + "</p>"
     body="<div>"+p+"</div>"
     original=("<ThML>\n<scripCom osisRef='"+ref+"'/>"+body+"</ThML>").encode()
     from lxml import etree
