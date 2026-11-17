@@ -24,6 +24,15 @@ OSIS_K = re.compile(r"^([1-4]?[A-Za-z][A-Za-z0-9]*)\.([1-9][0-9]{0,2})\.([1-9][0
 HEX_SHA = re.compile(r"^[0-9a-f]{64}$")
 
 
+def _visible_word_tokens(raw: bytes) -> int:
+    """Count source I-entry text tokens only; never export their wording."""
+    try:
+        root = ET.fromstring(b"<original>" + raw + b"</original>")
+    except ET.ParseError:
+        return 0
+    return len(re.findall(r"\b\w+\b", " ".join(root.itertext()), re.UNICODE))
+
+
 def _xml_stats(raw: bytes) -> dict:
     """Count literal original structural markers, never normalize their data."""
     try:
@@ -73,7 +82,7 @@ class Receipt:
             for ch in targets:
                 self.intros[ch].append({
                     "key": ref, "raw_sha256": checksum,
-                    "raw_bytes": len(raw), "markup": _xml_stats(raw)
+                    "raw_bytes": len(raw), "visible_word_tokens": _visible_word_tokens(raw), "markup": _xml_stats(raw)
                 })
             return
         match = OSIS_K.fullmatch(ref)
@@ -98,9 +107,16 @@ class Receipt:
         if actual != expected_sha:
             raise ValueError("Complete native raw corpus hash does not match pinned edition")
         missing = [ch for ch in self.chapters if not self.by_chapter[ch]]
-        if missing:
+        # A chapter may own its entire original exposition in an I slot
+        # rather than any numbered K slot. Do not manufacture K addresses.
+        unaccounted = [
+            ch for ch in missing
+            if not any(i["key"] in (ch, ch + ".0") and
+                       i["visible_word_tokens"] > 0 for i in self.intros[ch])
+        ]
+        if unaccounted:
             raise ValueError("Requested chapter has no observed numbered source commentary "
-                             "(check intro-only entries): " + ", ".join(missing))
+                             "or nonempty chapter-native introduction: " + ", ".join(unaccounted))
         output = {}
         for chapter in self.chapters:
             blocks = list(self.by_chapter[chapter].values())
@@ -108,6 +124,8 @@ class Receipt:
             if len(set(keys)) != len(keys):
                 raise ValueError("Repeated original native key in chapter " + chapter)
             output[chapter] = {
+                "source_placement": ("INTRO_ONLY_NEEDS_INDEPENDENT_REVIEW" if chapter in missing
+                                     else "NUMBERED_KEYS_WITH_SEPARATE_INTRO"),
                 "distinct_original_raw_units": len(blocks),
                 "original_native_numbered_keys": len(keys),
                 "original_units": blocks,
@@ -122,6 +140,7 @@ class Receipt:
                 "I": source_report["actual_occupied_intro_entry_count"],
                 "TOP": source_report["actual_occupied_anonymous_top_entry_count"]
             },
+            "intro_only_chapters_needing_editorial_review": missing,
             "chapters": output,
             "source_prose_or_original_markup_exported": False,
             "semantic_translation_independently_approved": False,
