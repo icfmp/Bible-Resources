@@ -18,6 +18,40 @@ from pilot_preflight import PilotError
 
 
 class OriginalPlainWordsAlignmentTests(unittest.TestCase):
+    def test_source_longer_full_difference_explained_by_actual_scripture_ref_label(self):
+        from commentary_nonlink_word_alignment import (
+            classify_original_link_label_effect_on_source_longer_words as inspect)
+        a=inspect(["Start","cited","verse","End"],["Start","End"],[1,2])
+        self.assertEqual(a["source_original_link_label_exclusion_class"],
+                         "only_original_scripRef_label_words_account_for_full_source_extra")
+        self.assertEqual(a["original_marked_scripRef_label_words"],2)
+        self.assertEqual(a["source_nonlink_word_surplus_vs_native"],0)
+        self.assertFalse(a["full_original_source_or_native_text_modified"])
+
+    def test_original_extra_nonlink_words_remain_unexplained_by_link_labels(self):
+        from commentary_nonlink_word_alignment import (
+            classify_original_link_label_effect_on_source_longer_words as inspect)
+        a=inspect(["Start","extra","End"],["Start","End"],[])
+        self.assertEqual(a["source_original_link_label_exclusion_class"],
+                         "native_words_in_order_with_extra_original_nonlink_words")
+        self.assertEqual(a["source_nonlink_word_surplus_vs_native"],1)
+        b=inspect(["Start","linked","extra","End"],["Start","End"],[1])
+        self.assertEqual(b["source_original_link_label_exclusion_class"],
+                         "native_words_in_order_with_extra_original_nonlink_words")
+        self.assertEqual(b["source_nonlink_word_surplus_vs_native"],1)
+        self.assertNotIn("extra",json.dumps(b))
+
+    def test_source_link_label_classification_never_guesses_order_or_indexes(self):
+        from commentary_nonlink_word_alignment import (
+            classify_original_link_label_effect_on_source_longer_words as inspect)
+        with self.assertRaises(PilotError):
+            inspect(["source","middle","end"],["end","source"],[])
+        with self.assertRaises(PilotError):
+            inspect(["source","middle","end"],["source","end"],[3])
+        with self.assertRaises(PilotError):
+            inspect(["source","middle","end"],["source","end"],[1,1])
+        with self.assertRaises(PilotError):
+            inspect(["source","middle","end"],["source","end"],[True])
     def test_bounded_linear_fallback_for_large_exact_source_word_order(self):
         source=[f"βWord{i}" for i in range(4001)]
         compiled=["prefix"]+source[:1500]+["interposed"]+source[1500:]+["suffix"]

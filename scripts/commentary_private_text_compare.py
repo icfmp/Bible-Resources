@@ -38,7 +38,8 @@ from commentary_source_english_osis_alias import original_div1_english_alias_vs_
 from commentary_source_identity_lexical_gate import classify_lexical_source_identity
 from commentary_original_bookcode_repair import propose_private_source_bookcode_repair
 from commentary_prose_cross_slot import strict_native_stock_plain_words
-from commentary_nonlink_word_alignment import plain_word_alignment
+from commentary_nonlink_word_alignment import (plain_word_alignment,
+    classify_original_link_label_effect_on_source_longer_words)
 from commentary_unresolved_lexical_triage import WORD
 from commentary_near_prose_unicode_review import classify_same_book_unicode_variants
 from commentary_intake import load_manifest
@@ -926,6 +927,10 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
             "independent_authorial_edition_identity_established":False,
         }
         source_longer_cases=[]
+        longer_link_class_counts=Counter()
+        longer_link_original_book_counts={}
+        longer_link_book_classes={}
+        longer_link_rows=[]
         def record_same_start_source_longer(start,item,raw):
             source_longer_cases.append((start,{
                 "original_source_line":item["original_source_line"],
@@ -933,6 +938,26 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
                 "original_body_sha256":item["original_text_sha256"],
                 "stock_raw_sha256":sha256(raw).hexdigest(),
             }))
+            native_visible=raw_as_strict_xml_text(raw)
+            if native_visible is None:
+                raise PilotError("Original selected native K visible text cannot be reviewed")
+            linked_review=classify_original_link_label_effect_on_source_longer_words(
+                WORD.findall(item["original_text"]),WORD.findall(native_visible),
+                item["private_original_scripRef_word_indices"])
+            label=linked_review["source_original_link_label_exclusion_class"]
+            book=start.split(".",1)[0]
+            longer_link_class_counts[label]+=1
+            longer_link_original_book_counts[book]=(
+                longer_link_original_book_counts.get(book,0)+1)
+            longer_link_book_classes.setdefault(book,Counter())[label]+=1
+            longer_link_rows.append({
+                "source_book":book,
+                "original_source_line":item["original_source_line"],
+                "original_full_reference_sha256":item["original_full_reference_sha256"],
+                "original_body_sha256":item["original_text_sha256"],
+                "selected_native_raw_sha256":sha256(raw).hexdigest(),
+                **linked_review,
+            })
         analysis=compare_private_texts(source,matches,
             on_unresolved_word_case=reference_cross_slot.observe_unresolved,
             on_source_longer_stock_case=record_same_start_source_longer)
@@ -942,6 +967,32 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
         expected_longer=analysis[
             "different_word_sequence_relationship_subtypes"].get(
                 "stock_words_in_order_with_extra_source_words",0)
+        source_longer_link_label_review={
+            "status":"SOURCE_EXTRA_WORDS_ORIGINAL_LINK_LABEL_OWNERSHIP_RESEARCH_ONLY",
+            "source_longer_case_count":len(longer_link_rows),
+            "source_link_label_exclusion_classes":
+                dict(sorted(longer_link_class_counts.items())),
+            "original_book_case_counts":
+                dict(sorted(longer_link_original_book_counts.items())),
+            "original_book_link_label_exclusion_classes":{
+                k:dict(sorted(v.items())) for k,v in sorted(longer_link_book_classes.items())
+            },
+            "original_line_sha_and_closed_link_word_metadata_only_rows":
+                sorted(longer_link_rows,key=lambda x:(
+                    x["source_book"],x["original_source_line"],
+                    x["original_full_reference_sha256"])),
+            "removed_only_source_reference_label_word_positions":True,
+            "all_original_source_longer_cases_included":True,
+            "original_source_or_SWORD_binary_modified":False,
+            "source_extra_words_not_proof_of_lost_authorial_text":True,
+            "full_punctuation_markup_paragraph_editional_parity_proven":False,
+        }
+        if (len(longer_link_rows)!=expected_longer or
+                sum(longer_link_class_counts.values())!=expected_longer or
+                sum(longer_link_original_book_counts.values())!=expected_longer
+                or any(sum(groups.values()) != longer_link_original_book_counts[book]
+                       for book,groups in longer_link_book_classes.items())):
+            raise PilotError("Original source linked-word disposition is not exhaustive")
         if (original_source_longer_native_scope[
                 "source_longer_same_start_cases"] != expected_longer
                 or original_source_longer_native_scope[
@@ -1093,6 +1144,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
         "source_unpaired_reference_cross_native_slots":reference_cross_slot_report,
         "source_nonlink_prose_review_stock_raw_duplicate_topology":plain_payload_topology,
         "source_longer_original_native_run_structural_scope":original_source_longer_native_scope,
+        "source_longer_original_link_label_word_scope":source_longer_link_label_review,
         "source_large_nonlink_prose_native_alternative_locations":alternative_prose,
         "source_large_prose_marker_to_native_raw_run_boundary_diagnostics":boundary_case_report,
         "source_complete_original_units_within_shared_stock_raw_K_runs":complete_shared_run_sources,

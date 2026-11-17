@@ -7,6 +7,8 @@ on:
       - 'tests/test_commentary_private_text_compare.py'
       - 'scripts/commentary_source_native_boundaries.py'
       - 'tests/test_commentary_source_native_boundaries.py'
+      - 'scripts/commentary_nonlink_word_alignment.py'
+      - 'tests/test_commentary_nonlink_word_alignment.py'
       - 'config/commentary-intake/mhc-crosswire.json'
   workflow_dispatch:
     inputs:
@@ -45,6 +47,7 @@ jobs:
           python -m pip install -r requirements.txt
           python -m unittest discover -s tests -p 'test_commentary_private_text_compare.py' -v
           python -m unittest discover -s tests -p 'test_commentary_source_native_boundaries.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_nonlink_word_alignment.py' -v
       - name: Install real original native SWORD readers
         shell: bash
         run: |
@@ -210,6 +213,17 @@ jobs:
                            sort_keys=True))
           print("Source-longer original book distribution:",
                 json.dumps(native_scope["original_book_case_counts"], sort_keys=True))
+          link_scope=report["source_longer_original_link_label_word_scope"]
+          assert link_scope["source_longer_case_count"] == expected_longer
+          assert link_scope["all_original_source_longer_cases_included"]
+          assert link_scope["removed_only_source_reference_label_word_positions"]
+          assert link_scope["original_source_or_SWORD_binary_modified"] is False
+          assert link_scope["full_punctuation_markup_paragraph_editional_parity_proven"] is False
+          assert link_scope["original_book_case_counts"] == native_scope["original_book_case_counts"]
+          assert sum(link_scope["source_link_label_exclusion_classes"].values()) == expected_longer
+          assert len(link_scope["original_line_sha_and_closed_link_word_metadata_only_rows"]) == expected_longer
+          print("Source longer word differences after excluding only source scripRef labels:",
+                json.dumps(link_scope["source_link_label_exclusion_classes"],sort_keys=True))
           evidence = {
               "status": "SOURCE_STOCK_ONE_VOLUME_LEXICAL_CENSUS_NOT_PARITY",
               "resource_id": "mhc-crosswire",
@@ -231,6 +245,7 @@ jobs:
               "source_book_text_diagnostic_classes": by_book,
               "source_book_word_relationship_subtypes": by_book_relations,
               "source_longer_original_native_K_run_scope_diagnostics": native_scope,
+              "source_longer_original_scripRef_label_word_scope": link_scope,
               "source_book_counts_are_not_editorial_content_parity": True,
               "closed_lexical_difference_types": lexical,
               "closed_word_sequence_relationship_types": relationships,

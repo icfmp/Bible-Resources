@@ -1274,11 +1274,11 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "b3ef54b367a0a89a0c31d15dbf4bc04ff388c46a2c92e6b9504d6d7f78ae23d3",
+      "sha256_at_inventory": "ed3f030008def79d385182468ec643ad5288ce1b2ec1c7a8d3bc712708010e64",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 9,
+      "static_reference_count": 10,
       "static_references": [
         "scripts/commentary_intro_chapter_text_review.py",
         "scripts/commentary_near_prose_unicode_review.py",
@@ -1288,6 +1288,7 @@
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_shared_raw_source_units.py",
         "scripts/commentary_unresolved_lexical_triage.py",
+        ".github/workflows/commentary-mhc-source-text.yml",
         "tests/test_commentary_nonlink_word_alignment.py"
       ]
     },
@@ -1675,7 +1676,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "f63f1c53bed14c075f6c125a83b136fd1a4784f4e322a943a00afa3d76e98a2e",
+      "sha256_at_inventory": "dc1f4a307d4e3e621d35626873c3a581194b786e688c7257194b12c88bd0879d",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
