@@ -96,7 +96,8 @@
         "original_paragraph_ordinal": 6,
         "original_paragraph_visible_word_count": 588,
         "original_paragraph_word_sha256": "0a733673d3b3cb71dee93dc4c454dfaddee08c9fc87d43d879c9e61ec402f68c",
-        "source_only_unlinked_gap_word_count_per_prior_pinned_stock_audit": 569
+        "source_only_unlinked_gap_word_count_per_prior_pinned_stock_audit": 569,
+        "original_source_marker_osisRef": "Bible:Ps.7.1-Ps.7.9"
       },
       {
         "source_volume": 6,
@@ -106,7 +107,8 @@
         "original_paragraph_ordinal": 17,
         "original_paragraph_visible_word_count": 235,
         "original_paragraph_word_sha256": "462ec448acf7e29788eeedfbb245ad08ea98faaade8c0dbef7755c042d2779cc",
-        "source_only_unlinked_gap_word_count_per_prior_pinned_stock_audit": 235
+        "source_only_unlinked_gap_word_count_per_prior_pinned_stock_audit": 235,
+        "original_source_marker_osisRef": "Bible:Acts.17.22-Acts.17.31"
       }
     ]
   },
