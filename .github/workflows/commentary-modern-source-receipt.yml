@@ -450,7 +450,7 @@ jobs:
           files = sorted(base.glob("*.md"))
           assert len(files) == len(originals) == 1189
           token = re.compile(r"\b[\w’-]+\b", re.UNICODE)
-          heading = re.compile(r"(?m)^## ([^\n]+)\s*$")
+          heading = re.compile(r"(?m)^(#{2,5}) ([^\n]+)\s*$")
           quoted = re.compile(r'(?m)^([a-z_][a-z0-9_]*): "([^"\n]*)"$')
           verse_marker = re.compile(r"\(\s*verses?\s+([^)]+)\)\s*$", re.IGNORECASE)
           flags = []
@@ -483,9 +483,15 @@ jobs:
               heads = list(heading.finditer(main))
               prose_units = []
               for idx, match in enumerate(heads):
-                  title = match[1].strip()
+                  title = match[2].strip()
                   low = title.lower()
                   if low.startswith("original ") or "book introduction" in low:
+                      continue
+                  # A ## heading containing ### authorial sections is a
+                  # navigation/container label, not an extra authored K body.
+                  # Preserve the parent prose separately for human review.
+                  level = len(match[1])
+                  if idx + 1 < len(heads) and len(heads[idx + 1][1]) > level:
                       continue
                   section = main[match.end():heads[idx + 1].start() if idx + 1 < len(heads)
                                  else len(main)]
