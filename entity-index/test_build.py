@@ -67,21 +67,39 @@ class EntityIndexTests(unittest.TestCase):
         self.write_record("people", "Hammelech",
                           references=["24036026"],
                           explicit_instances={"wlc": [["o240360260022"]]})
+
+        self.write_record("people", "Philistine",
+                          references=["01010014", "13001012"],
+                          explicit_instances={"wlc": [
+                              ["o010100140081"], ["o130010120081"]]})
+        self.write_record("groups", "Philistine",
+                          references=["07015003"],
+                          explicit_instances={"wlc": [["o070150030062"]]})
         source_before = path.read_bytes()
         decisions = json.loads(
             Path(__file__).with_name("editorial-decisions.json").read_text()
         )["decisions"]
         report = self.build(decisions)
-        self.assertEqual(report["statistics"]["source_records"], 4)
-        self.assertEqual(report["statistics"]["index_entities"], 3)
-        self.assertEqual(report["statistics"]["quarantined_records"], 1)
-        self.assertEqual(report["statistics"]["reviewed_entries"], 3)
+        self.assertEqual(report["statistics"]["source_records"], 6)
+        self.assertEqual(report["statistics"]["index_entities"], 4)
+        self.assertEqual(report["statistics"]["quarantined_records"], 2)
+        self.assertEqual(report["statistics"]["reviewed_entries"], 4)
         by_id = {row["id"]: row for row in report["entities"]}
         self.assertIn("work:BookOfJashar", by_id)
         self.assertIn("place:PerezUzzah", by_id)
         self.assertIn("person:Uzzah", by_id)
         self.assertNotIn("person:Jashar", by_id)
         self.assertNotIn("person:Hammelech", by_id)
+        self.assertNotIn("person:Philistine", by_id)
+        self.assertIn("group:Philistine", by_id)
+        self.assertEqual(by_id["group:Philistine"]["references"],
+                         ["07015003", "01010014", "13001012"])
+        self.assertEqual(by_id["group:Philistine"]["occurrences"]
+                         ["explicit_instances"]["wlc"][-2:],
+                         [["o010100140081"], ["o130010120081"]])
+        self.assertEqual(report["by_word"]["wlc:o010100140081"],
+                         [{"entity_id": "group:Philistine",
+                           "link_type": "explicit_instances"}])
         self.assertEqual(by_id["work:BookOfJashar"]["source_id"], "person:Jashar")
         self.assertEqual(by_id["place:PerezUzzah"]["canonical_id"],
                          "place:PerezUzzah")

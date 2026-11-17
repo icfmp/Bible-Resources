@@ -60,6 +60,38 @@
         "Macula WLC JER 36:26 o240360260022 o240360260062",
         "Macula WLC JER 38:6 o240380060102"
       ]
+    },
+    {
+      "source_id": "person:Philistine",
+      "action": "quarantine",
+      "reason": "Genesis 10:14 and 1 Chronicles 1:12 speak of the plural Philistine people; ACAI incorrectly creates one male Philistine. Historical speech-span attributions are not part of the compact index and remain unchanged in the frozen original.",
+      "evidence": [
+        "Macula WLC GEN 10:14 o010100140081: Ngmpa plural gentilic",
+        "Macula WLC 1CH 1:12 o130010120081: Ngmpa plural gentilic"
+      ]
+    },
+    {
+      "source_id": "group:Philistine",
+      "action": "amend_occurrences",
+      "add_references": [
+        "01010014",
+        "13001012"
+      ],
+      "add_explicit_instances": {
+        "wlc": [
+          [
+            "o010100140081"
+          ],
+          [
+            "o130010120081"
+          ]
+        ]
+      },
+      "reason": "Both source words explicitly name the Philistines as a plural people and belong in the existing canonical group:Philistine index, not under a fictitious person.",
+      "evidence": [
+        "Macula WLC GEN 10:14 o010100140081: Philistines plural",
+        "Macula WLC 1CH 1:12 o130010120081: Philistines plural"
+      ]
     }
   ]
 }
