@@ -10,14 +10,14 @@ publication_status: "NOT RELEASED — FULL SWORD REBUILD PENDING"
 
 # Genesis 37 — Modern English
 
-## Original chapter outline
+## Original chapter outline — explicit verse-label corrections
 
 | Original outline | Verses |
 | --- | --- |
 | Joseph is loved of Jacob, but hated by his brethren. | 1–4 |
 | Joseph's dreams. | 5–11 |
 | Jacob sends Joseph to visit his brethren, They conspire his death. | 12–22 |
-| Joseph's brethren sell him. | 23–10 |
+| Joseph's brethren sell him. | 23–30 |
 | Jacob deceived, Joseph sold to Potiphar. | 31–36 |
 
 ## Joseph is loved by Jacob and hated by his brothers (verses 1–4)
@@ -107,6 +107,10 @@ Thus human wrath will praise the Lord, and he will restrain the remainder.
 ---
 
 ## Editorial verification — Genesis 37
+
+**2026-11-17 traceable outline-reference correction (independent original-native review pending):** The invalid descending end verse 10 is restored to verse 30, before the next exposition begins at 31. Only the **verse-range cells of the copied original-outline table** have been corrected; source-authored headings, row order, commentary section boundaries, and exposition prose are not edited. Previously transcribed cells: `Joseph's brethren sell him. | 23–10`. Corrected cells: `Joseph's brethren sell him. | 23–30`. The repair is reversible against this recorded before/after; the authoritative published MHCC 0.1.1 outline still requires exact independent native validation.
+
+
 
 **Reading witness:** [CCEL's Concise text, Genesis 37](https://ccel.org/ccel/henry/mhcc.ii.xxxvii.html), compared in a distinct meaning/structure pass; the authoritative published baseline is the separately pinned `MHCC 0.1.1` SWORD source, whose full native XML is **not** attested by this manuscript.
 
