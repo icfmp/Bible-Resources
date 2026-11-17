@@ -205,6 +205,40 @@ def _private_whole_token_contiguous(
     return False
 
 
+def _private_exact_token_match_offsets(
+        original: list[str], candidate: list[str], *,
+        maximum_positions: int = 1000) -> list[int]:
+    """All exact full-body positions, bounded; no source tokens returned.
+
+    This deliberately checks the WHOLE candidate. Short shared anchors are
+    not enough to assign a real native body to an authored source interval.
+    """
+    if not candidate or len(candidate) > len(original):
+        return []
+    failure = [0] * len(candidate)
+    matched = 0
+    for pos in range(1, len(candidate)):
+        while matched and candidate[pos] != candidate[matched]:
+            matched = failure[matched-1]
+        if candidate[pos] == candidate[matched]:
+            matched += 1
+            failure[pos] = matched
+    matched = 0
+    offsets = []
+    for pos, word in enumerate(original):
+        while matched and word != candidate[matched]:
+            matched = failure[matched-1]
+        if word == candidate[matched]:
+            matched += 1
+            if matched == len(candidate):
+                offsets.append(pos + 1 - len(candidate))
+                if len(offsets) > maximum_positions:
+                    raise ValueError(
+                        "Repeated exact original source body locations exceed reviewed bounds")
+                matched = failure[matched-1]
+    return offsets
+
+
 def _private_whole_token_subsequence(
         original: list[str], candidate: list[str]) -> bool:
     """All candidate words in order; skipped source words remain unclaimed."""
@@ -280,6 +314,8 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                 "native_distinct_visible_word_total": 0,
                 "native_exact_whole_chapter_equal": False,
                 "distinct_native_relation_classes": defaultdict(int),
+                "native_exact_location_classes": defaultdict(int),
+                "native_unique_whole_body_intervals": [],
             }
 
     def observe(self, kind: str, key: str, raw: bytes) -> None:
@@ -320,6 +356,18 @@ class PrivateOriginalChapterNativeAnchorCoverage:
             state["native_exact_whole_chapter_equal"] = True
         relation = _private_native_word_relation(state["source_words"], words)
         state["distinct_native_relation_classes"][relation] += 1
+        offsets = _private_exact_token_match_offsets(
+            state["source_words"], words)
+        if len(offsets) == 1:
+            state["native_exact_location_classes"]["one_unique_exact_source_interval"] += 1
+            state["native_unique_whole_body_intervals"].append(
+                (offsets[0], offsets[0] + len(words)))
+        elif offsets:
+            state["native_exact_location_classes"][
+                "multiple_exact_source_intervals_ambiguous"] += 1
+        else:
+            state["native_exact_location_classes"][
+                "no_full_exact_source_interval"] += 1
         source_windows = state["source_windows"]
         state["matching_windows"].update(
             tuple(words[i:i+self.ANCHOR])
@@ -337,6 +385,52 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                 raise ValueError("Original source/native lexical anchor accounting mismatch")
             if sum(state["distinct_native_relation_classes"].values()) != len(state["native_raw_digests"]):
                 raise ValueError("Unique original native word relation classification incomplete")
+            if sum(state["native_exact_location_classes"].values()) != len(state["native_raw_digests"]):
+                raise ValueError("Unique original native source location classification incomplete")
+            all_exact_unique = (
+                len(state["native_unique_whole_body_intervals"])
+                == len(state["native_raw_digests"]))
+            uncovered_spans = None
+            uncovered_word_count = None
+            exact_native_interval_overlap_words = None
+            if all_exact_unique:
+                intervals = sorted(state["native_unique_whole_body_intervals"])
+                if len(intervals) > 512:
+                    raise ValueError("Original chapter contains too many distinct K body locations")
+                merged = []
+                for start, end in intervals:
+                    if merged and start <= merged[-1][1]:
+                        merged[-1] = (merged[-1][0], max(end, merged[-1][1]))
+                    else:
+                        merged.append((start, end))
+                native_interval_words = sum(end-start for start, end in intervals)
+                covered = sum(end-start for start, end in merged)
+                exact_native_interval_overlap_words = native_interval_words-covered
+                original = state["source_words"]
+                uncovered_spans = []
+                cursor = 0
+                for start, end in merged:
+                    if start > cursor:
+                        fragment = original[cursor:start]
+                        uncovered_spans.append({
+                            "original_chapter_word_offset_not_verse_key": cursor,
+                            "source_uncovered_visible_word_tokens": len(fragment),
+                            "original_ordered_source_word_sha256": sha256(
+                                " ".join(fragment).encode("utf-8")).hexdigest(),
+                        })
+                    cursor = end
+                if cursor < len(original):
+                    fragment = original[cursor:]
+                    uncovered_spans.append({
+                        "original_chapter_word_offset_not_verse_key": cursor,
+                        "source_uncovered_visible_word_tokens": len(fragment),
+                        "original_ordered_source_word_sha256": sha256(
+                            " ".join(fragment).encode("utf-8")).hexdigest(),
+                    })
+                uncovered_word_count = len(original)-covered
+                if sum(x["source_uncovered_visible_word_tokens"]
+                       for x in uncovered_spans) != uncovered_word_count:
+                    raise ValueError("Authentic source/native interval accounting failed")
             rows.append({
                 "original_chapter_reference_sha256": sha256(
                     chapter.encode("utf-8")).hexdigest(),
@@ -354,6 +448,17 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                     state["native_exact_whole_chapter_equal"],
                 "native_distinct_whole_body_ordered_word_relation_classes":
                     dict(sorted(state["distinct_native_relation_classes"].items())),
+                "native_distinct_whole_body_exact_source_location_classes":
+                    dict(sorted(state["native_exact_location_classes"].items())),
+                "all_distinct_native_K_bodies_have_unique_exact_source_intervals":
+                    all_exact_unique,
+                "source_uncovered_word_tokens_after_unique_native_K_body_intervals":
+                    uncovered_word_count,
+                "source_uncovered_word_spans_metadata_only":
+                    uncovered_spans,
+                "overlap_word_tokens_among_exact_native_K_body_intervals":
+                    exact_native_interval_overlap_words,
+                "uncovered_osis_tokens_not_proven_missing_authored_exposition": True,
                 "whole_body_word_relation_not_equivalent_to_authorial_unit": True,
                 "anchor_overlap_is_not_exact_text_or_structural_parity": True,
                 "unmatched_anchors_not_proven_historical_authorial_omissions": True,
@@ -366,6 +471,8 @@ class PrivateOriginalChapterNativeAnchorCoverage:
             "original_verse_key_range_and_paragraph_owner_not_inferred": True,
             "casefold_only_categories_do_not_authorize_case_changes": True,
             "exact_containment_does_not_prove_punctuation_or_markup": True,
+            "source_uncovered_intervals_are_not_scripture_verse_mappings": True,
+            "source_uncovered_spans_not_automatically_missing_in_sword": True,
             "original_punctuation_markup_notes_and_links_not_compared": True,
             "original_source_or_compiled_binary_changed": False,
             "no_original_words_raw_xml_or_verse_keys_exported": True,
