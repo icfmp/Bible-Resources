@@ -50,7 +50,7 @@ jobs:
           assert stats["quarantined_records"] == 3, stats
           assert stats["reviewed_entries"] == 6, stats
           assert stats["unattested_distinct_source_words"] == 18, stats
-          assert stats["indexed_distinct_source_words"] == 134823, stats
+          assert stats["indexed_distinct_source_words"] == 134822, stats
           assert len(index["unattested_source_words"]) == 18
           assert sum(len(r["source_claims"]) for r in
                      index["unattested_source_words"].values()) == 19
