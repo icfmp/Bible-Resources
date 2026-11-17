@@ -133,7 +133,7 @@ def independent_usfm_titles(archive: Path, pinned_sha256: str,
             title = found.group(1)
             visible=reviewed_usfm_title_visible_text(title)
             if visible is None:
-                markers=sorted(set(re.findall(r"\\\\[+A-Za-z0-9]+\\*?",title)))
+                markers=sorted(set(re.findall(r"\\[+A-Za-z0-9]+\*?",title)))
                 if len(markers)>24 or any(len(name)>32 for name in markers):
                     raise WitnessError("Unbounded original title inline marker vocabulary")
                 result[current] = {
