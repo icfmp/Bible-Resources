@@ -235,6 +235,8 @@ class OriginalExtraGapChapterNativeTests(unittest.TestCase):
         self.assertEqual([x["partially_covered_original_p_elements"] for x in spans],[1,1])
         self.assertEqual([x["exact_whole_original_p_document_ordinal_when_unique"]
                           for x in spans],[None,None])
+        self.assertTrue(all(x["whole_original_p_exact_unicode_word_tokens_sha256_if_unique"]
+                            is None for x in spans))
         self.assertNotIn("secretFirst",json.dumps(report))
         self.assertEqual(row["original_ccel_scripCom_osisRef_claim_only"],
                          "Bible:Gen.1.1")
@@ -272,6 +274,12 @@ class OriginalExtraGapChapterNativeTests(unittest.TestCase):
         self.assertEqual(
             [g["exact_whole_original_p_document_ordinal_when_unique"] for g in gaps],
             [2,4])
+        for gap,words in zip(gaps,(first,second)):
+            self.assertEqual(gap["whole_original_p_visible_word_count_if_unique"],
+                             len(words))
+            self.assertEqual(gap["whole_original_p_source_link_word_count_if_unique"],0)
+            self.assertEqual(gap["whole_original_p_exact_unicode_word_tokens_sha256_if_unique"],
+                             sha256(" ".join(words).encode()).hexdigest())
         self.assertNotIn("secretFirst",json.dumps(doc))
 
     def test_cross_original_p_gap_is_not_misattributed_to_one_paragraph(self):
