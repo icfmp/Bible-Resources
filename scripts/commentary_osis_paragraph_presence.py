@@ -286,7 +286,7 @@ class PrivateOriginalChapterNativeAnchorCoverage:
     MAX_SCOPES = 8
     MAX_CHAPTER_WORDS = 100_000
     MAX_NATIVE_RAW_BYTES = 2 * 1024 * 1024
-    INTRO = re.compile(r"[1-4]?[A-Za-z][A-Za-z0-9]*(?:\\.0\\.0|\\.[1-9][0-9]*(?:\\.0)?)?\\Z")
+    INTRO = re.compile(r"[1-4]?[A-Za-z][A-Za-z0-9]*(?:\.0\.0|\.[1-9][0-9]*(?:\.0)?)?\Z")
     KEY = re.compile(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*\.[1-9][0-9]*\Z")
 
     def __init__(self, chapter_words: dict[str, list[str]]):
@@ -339,7 +339,7 @@ class PrivateOriginalChapterNativeAnchorCoverage:
             state = self._scopes[matching[0]]
             if (not isinstance(raw, bytes)
                     or not 0 < len(raw) <= self.MAX_NATIVE_RAW_BYTES
-                    or b"\\x00" in raw):
+                    or b"\x00" in raw):
                 raise ValueError("Invalid original chapter introduction raw frame")
             state["intro_occupied_slots"] += 1
             digest = sha256(raw).hexdigest()
