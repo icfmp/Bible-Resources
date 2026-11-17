@@ -86,6 +86,15 @@ jobs:
           print("Text comparison diagnostic classes only:",
                 json.dumps(report["text_diagnostic"][
                     "per_source_marker_text_diagnostic_counts"], sort_keys=True))
+          print("Original chapter-sibling XML review status:",
+                json.dumps({
+                    "reviewed": report["source_original_chapter_neighbor_evidence"][
+                        "original_chapter_siblings_reviewed_count"],
+                    "unreviewed": report["source_original_chapter_neighbor_evidence"][
+                        "original_chapter_siblings_not_reviewed_count"],
+                    "unreviewed_tags": report["source_original_chapter_neighbor_evidence"][
+                        "original_unreviewed_sibling_tag_counts"],
+                }, sort_keys=True))
           print("An exact source edition/structure proof is NOT established.")
           PY
       - name: Explain private content boundaries

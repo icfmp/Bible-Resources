@@ -14,6 +14,22 @@ from pilot_preflight import PilotError
 
 
 class CommentaryOriginalStockTextTests(unittest.TestCase):
+    def test_all_unreviewed_chapter_siblings_produce_explicit_not_tested_receipts(self):
+        from commentary_private_text_compare import unreviewed_original_chapter_sibling_receipts
+        proof = {"explicit_chapter_source_marker_count": 2,
+                 "original_chapter_siblings_reviewed_count": 0,
+                 "original_chapter_siblings_not_reviewed_count": 2}
+        receipts = unreviewed_original_chapter_sibling_receipts(proof)
+        self.assertEqual(len(receipts), 4)
+        self.assertEqual(receipts[0]["original_chapter_source_siblings_compared"], 0)
+        for row in receipts:
+            self.assertFalse(row["authorial_chapter_structure_or_native_introduction_parity"])
+            self.assertTrue(row[
+                "unreviewed_source_sibling_must_not_be_called_missing_content"])
+        with self.assertRaises(PilotError):
+            unreviewed_original_chapter_sibling_receipts({
+                **proof, "original_chapter_siblings_reviewed_count": 1})
+
     def test_select_six_volume_source_requires_explicit_original_volume(self):
         from commentary_private_text_compare import select_pinned_source_volume
         source = {"commentary_source": {"xml_witness_volumes": [

@@ -581,6 +581,27 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes],
     }
 
 
+def unreviewed_original_chapter_sibling_receipts(proof: dict) -> tuple[dict, dict, dict, dict]:
+    """Four explicit NOT-TESTED receipts, never misclassify absent source words."""
+    total = proof["explicit_chapter_source_marker_count"]
+    unreviewed = proof["original_chapter_siblings_not_reviewed_count"]
+    if (type(total) is not int or type(unreviewed) is not int
+            or unreviewed < 1 or total != unreviewed
+            or proof["original_chapter_siblings_reviewed_count"] != 0):
+        raise PilotError("Cannot skip a reviewable or incompletely classified chapter sibling")
+    base = {
+        "status": "UNREVIEWED_ORIGINAL_CHAPTER_ADJACENT_XML_STRUCTURE",
+        "original_chapter_markers_not_lexically_compared": total,
+        "source_or_stock_content_unchanged": True,
+        "unreviewed_source_sibling_must_not_be_called_missing_content": True,
+        "authorial_chapter_structure_or_native_introduction_parity": False,
+    }
+    return (
+        {**base, "original_chapter_source_siblings_compared": 0},
+        base.copy(), base.copy(), base.copy(),
+    )
+
+
 def select_pinned_source_volume(manifest: dict, number: int | None = None) -> tuple[int, str, str, bool, int]:
     """Return exactly one SHA-pinned ThML witness; no implicit multi-volume default.
 
@@ -694,10 +715,13 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
         matches={}
         proposed_original_book_anchor_native_matches={}
         chapter_intros={}
-        numbered_probe=ChapterNeighborNumberedProbe(chapter_neighbors)
-        alternate_probe=ChapterNeighborSameBookAlternativeProbe(chapter_neighbors)
-        source_p_overlap_probe=OriginalChapterParagraphSpanProbe(chapter_neighbors)
-        source_p_boundary_probe=ChapterParagraphBoundaryProbe(chapter_neighbors)
+        if chapter_neighbors:
+            numbered_probe=ChapterNeighborNumberedProbe(chapter_neighbors)
+            alternate_probe=ChapterNeighborSameBookAlternativeProbe(chapter_neighbors)
+            source_p_overlap_probe=OriginalChapterParagraphSpanProbe(chapter_neighbors)
+            source_p_boundary_probe=ChapterParagraphBoundaryProbe(chapter_neighbors)
+        else:
+            numbered_probe=alternate_probe=source_p_overlap_probe=source_p_boundary_probe=None
         reference_cross_slot=ReferenceCrossSlotTopology(source)
         native_run_boundaries=NativeRawRunBoundaryInventory()
         try:
@@ -712,10 +736,11 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
                         matches[ref]=raw
                     if ref in proposed_native_keys:
                         proposed_original_book_anchor_native_matches[ref]=raw
-                numbered_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
-                alternate_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
-                source_p_overlap_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
-                source_p_boundary_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
+                if numbered_probe is not None:
+                    numbered_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
+                    alternate_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
+                    source_p_overlap_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
+                    source_p_boundary_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
                 reference_cross_slot.observe_stock(kind,ref,raw)
                 native_run_boundaries.observe(kind,ref,raw)
                 if kind=="I" and (ref in chapter_neighbors or
@@ -879,15 +904,24 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
         original_div1_english_aliases=original_div1_english_alias_vs_declared_osis(
             source,complete_shared_run_sources
         )
-        chapter_analysis=compare_chapter_neighbors(
-            chapter_neighbors,chapter_intros,raw_as_strict_xml_text
-        )
-        chapter_numbered_location=numbered_probe.report()
-        chapter_other_slot_location=alternate_probe.report(numbered_probe)
-        original_p_word_overlap=source_p_overlap_probe.report(chapter_other_slot_location)
-        original_p_boundaries=source_p_boundary_probe.report(
-            chapter_other_slot_location,original_p_word_overlap
-        )
+        if numbered_probe is not None:
+            chapter_analysis=compare_chapter_neighbors(
+                chapter_neighbors,chapter_intros,raw_as_strict_xml_text
+            )
+            chapter_numbered_location=numbered_probe.report()
+            chapter_other_slot_location=alternate_probe.report(numbered_probe)
+            original_p_word_overlap=source_p_overlap_probe.report(chapter_other_slot_location)
+            original_p_boundaries=source_p_boundary_probe.report(
+                chapter_other_slot_location,original_p_word_overlap
+            )
+        else:
+            (chapter_analysis, chapter_numbered_location,
+             chapter_other_slot_location, original_p_word_overlap) = (
+                unreviewed_original_chapter_sibling_receipts(chapter_proof))
+            original_p_boundaries = {
+                **chapter_analysis,
+                "status": "UNREVIEWED_ORIGINAL_CHAPTER_ADJACENT_XML_STRUCTURE",
+            }
         if chapter_analysis["original_chapter_source_siblings_compared"]!=chapter_proof[
             "original_chapter_siblings_reviewed_count"
         ]:
