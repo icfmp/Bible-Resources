@@ -49,7 +49,7 @@ jobs:
           assert stats["source_records"] == 6644, stats
           assert stats["index_entities"] == 6641, stats
           assert stats["quarantined_records"] == 3, stats
-          assert stats["reviewed_entries"] == 9, stats
+          assert stats["reviewed_entries"] == 10, stats
           assert stats["unattested_distinct_source_words"] == 18, stats
           assert stats["indexed_distinct_source_words"] == 134822, stats
           assert len(index["unattested_source_words"]) == 18
@@ -83,6 +83,9 @@ jobs:
           assert "person:Philistine" not in by_id
           assert "person:Shiloh" not in by_id
           assert by_id["person:Johanan"]["canonical_id"] == "person:Johanan"
+          assert by_id["person:Shallum.5"]["canonical_id"] == "person:Jehoahaz.3"
+          assert index["by_word"]["wlc:o130030150101"] == [
+              {"entity_id":"person:Shallum.5","link_type":"explicit_instances"}]
           assert by_id["place:Gadara"]["canonical_id"] == "place:Gadara"
           assert by_id["place:Gadara"]["source_primary_id"] == "place:Gerasa"
           assert by_id["place:Gerasa"]["canonical_id"] == "place:Gerasa"
@@ -130,6 +133,12 @@ jobs:
           jashar=resolver.resolve(corpus="wlc", edition=edition,
                 word_id="o060100130142", verse_id="06010013")
           assert "work:BookOfJashar" in jashar["canonical_ids"], jashar
+          royal=resolver.resolve(corpus="wlc", edition=edition,
+                word_id="o130030150101", verse_id="13003015")
+          assert royal["canonical_ids"] == ["person:Jehoahaz.3"], royal
+          johanan=resolver.resolve(corpus="wlc", edition=edition,
+                word_id="o130030150041", verse_id="13003015")
+          assert johanan["canonical_ids"] == ["person:Johanan"], johanan
           perez=resolver.resolve(corpus="wlc", edition=edition,
                 word_id="o100060080121", verse_id="10006008")
           assert perez["canonical_ids"] == ["place:PerezUzzah"], perez
