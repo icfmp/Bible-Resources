@@ -76,7 +76,7 @@ The law shows humanity's miserable condition under sin, but it does not provide 
 
 Rational arguments alone often fail to change a person ruled by greed, anger or lust. One piece of gold outweighs every argument for the greedy person; someone furious will not listen; a single tempting smile can defeat mere reasoning.
 
-But the gospel announces **Christ's precious blood**, shed to save sinners from deserved judgment and atone for their sins.
+But the gospel announces **Christ's precious blood**, shed to save sinners **from hell** and to make satisfaction for their sins.
 
 That message has the power to make believing hearts burn and to move even opponents, like **Agrippa**, toward recognizing its truth (**Acts 26:28**).
 
@@ -103,6 +103,9 @@ Receive the word in faith and cherish the Bible as a book written by holy people
 ---
 
 ## Editorial review — 2 Peter 1
+
+**2026-11-17 secondary-witness collation:** restored Henry's specific **“shed to save their souls from hell”** statement rather than the draft's less specific “deserved judgment.” The doctrinal meaning belongs to Henry's argument in 2 Peter 1:16–21. [Full CCEL chapter witness](https://ccel.org/ccel/henry/mhcc.liii.i.html). Native 0.1.1 source/prose reference audit and independent signoff remain pending.
+
 
 **Entire secondary original-English source directly compared:** [CCEL, 2 Peter 1](https://ccel.org/ccel/henry/mhcc.liii.i.html). Published `MHCC 0.1.1` remains authoritative for source-native SWORD entry and independent approval.
 
