@@ -477,6 +477,7 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                 "distinct_native_relation_classes": defaultdict(int),
                 "native_exact_location_classes": defaultdict(int),
                 "native_unique_whole_body_intervals": [],
+                "source_located_native_visible_segments": [],
                 "intro_occupied_slots": 0,
                 "intro_distinct_raw_digests": set(),
                 "intro_exact_source_location_classes": defaultdict(int),
@@ -545,6 +546,8 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                     "one_unique_exact_source_interval"] += 1
                 state["intro_unique_exact_intervals"].append(
                     (offsets[0], offsets[0] + len(words)))
+                state["source_located_native_visible_segments"].append(
+                    (offsets[0], offsets[0] + len(words), "I", native_visible))
             elif offsets:
                 state["intro_exact_source_location_classes"][
                     "multiple_exact_source_intervals_ambiguous"] += 1
@@ -609,6 +612,8 @@ class PrivateOriginalChapterNativeAnchorCoverage:
             state["native_exact_location_classes"]["one_unique_exact_source_interval"] += 1
             state["native_unique_whole_body_intervals"].append(
                 (offsets[0], offsets[0] + len(words)))
+            state["source_located_native_visible_segments"].append(
+                (offsets[0], offsets[0] + len(words), "K", native_visible))
         elif offsets:
             state["native_exact_location_classes"][
                 "multiple_exact_source_intervals_ambiguous"] += 1
@@ -718,6 +723,46 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                         start == 0 and end >=
                         prefix["source_uncovered_visible_word_tokens"]
                         for start, end in intro_intervals))
+            # When authentic source-located original native K/I bodies form
+            # a *strict exact partition* of all genuine original chapter word
+            # positions, compare entire visible chapter character streams,
+            # including punctuation before/after individual bodies. Only
+            # whitespace is removed. Do not treat a duplicated/ambiguous
+            # introduction as proof of editorial chapter ownership.
+            whole_nonwhitespace_relation=None
+            source_flat_sha=None
+            native_flat_sha=None
+            source_flat_len=None
+            native_flat_len=None
+            first_flat_mismatch=None
+            segments=sorted(
+                state["source_located_native_visible_segments"],
+                key=lambda segment:(segment[0],segment[1]))
+            if all_exact_unique and state["source_visible_text"] is not None:
+                cursor=0
+                partition=True
+                for start,end,kind,content in segments:
+                    if (start!=cursor or end<=start
+                            or kind not in ("K","I")
+                            or not isinstance(content,str)):
+                        partition=False
+                        break
+                    cursor=end
+                if partition and cursor==len(state["source_words"]):
+                    source_flat=re.sub(r"\\s+","",state["source_visible_text"])
+                    native_flat=re.sub(
+                        r"\\s+","", "".join(segment[3] for segment in segments))
+                    source_flat_len=len(source_flat)
+                    native_flat_len=len(native_flat)
+                    source_flat_sha=sha256(source_flat.encode("utf-8")).hexdigest()
+                    native_flat_sha=sha256(native_flat.encode("utf-8")).hexdigest()
+                    whole_nonwhitespace_relation=(source_flat==native_flat)
+                    if not whole_nonwhitespace_relation:
+                        first_flat_mismatch=next(
+                            (idx for idx,(left,right) in enumerate(zip(
+                                source_flat,native_flat)) if left!=right),
+                            min(source_flat_len,native_flat_len))
+                    del source_flat,native_flat
             source_book_pre_chapter=state["source_book_pre_chapter_words"]
             source_reference_targets=state["source_reference_targets"]
             reference_scope_complete=(
@@ -747,6 +792,16 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                 "original_chapter_reference_sha256": sha256(
                     chapter.encode("utf-8")).hexdigest(),
                 "original_chapter_visible_words": len(state["source_words"]),
+                "complete_source_chapter_nonwhitespace_visible_characters_equal":
+                    whole_nonwhitespace_relation,
+                "complete_source_chapter_nonwhitespace_characters":source_flat_len,
+                "complete_native_chapter_nonwhitespace_characters":native_flat_len,
+                "complete_source_chapter_visible_nonwhitespace_sha256":source_flat_sha,
+                "complete_native_chapter_visible_nonwhitespace_sha256":native_flat_sha,
+                "first_nonwhitespace_character_mismatch_offset_not_verse":
+                    first_flat_mismatch,
+                "complete_character_audit_requires_strict_exact_native_word_partition":True,
+                "complete_character_audit_ignores_whitespace_not_xml_structure":True,
                 "original_book_before_first_chapter_visible_words":(
                     None if source_book_pre_chapter is None
                     else len(source_book_pre_chapter)),
@@ -820,7 +875,8 @@ class PrivateOriginalChapterNativeAnchorCoverage:
             "original_verse_key_range_and_paragraph_owner_not_inferred": True,
             "casefold_only_categories_do_not_authorize_case_changes": True,
             "exact_containment_does_not_prove_punctuation_or_markup": True,
-            "visible_character_test_excludes_section_boundary_nonword_chars": True,
+            "interior_character_test_excludes_section_boundary_nonword_chars": True,
+            "complete_chapter_nonwhitespace_character_probe_includes_boundaries_if_partition":True,
             "reference_attributes_checked_only_for_uniquely_located_exact_native_bodies": True,
             "matching_reference_target_attributes_not_proof_of_working_links": True,
             "markup_and_structure_parity_not_proven_by_reference_attributes": True,
