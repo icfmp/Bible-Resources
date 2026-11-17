@@ -125,6 +125,34 @@
         "ACAI pinned source keyterms/json/World.json: primary_id=keyterm:Ability; concept labeled World",
         "icfmp/ACAI issue #74: inherited keyterm primary-ID conflation"
       ]
+    },
+    {
+      "source_id": "person:Johanan",
+      "action": "replace_identity",
+      "id": "person:Johanan",
+      "kind": "person",
+      "canonical_id": "person:Johanan",
+      "reason": "1 Chronicles 3:15 explicitly identifies Johanan as a distinct son of Josiah, while the source incorrectly canonicalizes this name form under person:Jehoahaz.3. The precise Johanan word remains attached to its own individual; no guess is made about Shallum.5.",
+      "evidence": [
+        "Macula WLC 1CH 3:15 o130030150041: proper Hebrew name Johanan, ref 1CH 3:15!4",
+        "ACAI issue #71 inherited royal-identity follow-up"
+      ]
+    },
+    {
+      "source_id": "person:Jehoahaz.3",
+      "action": "amend_occurrences",
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o130030150041"
+          ]
+        ]
+      },
+      "reason": "The direct word at 1 Chronicles 3:15!4 actually spells Johanan, a separately listed son of Josiah, and must not simultaneously be asserted as the Jehoahaz personal name. Other Jehoahaz/possibly Shallum references remain exactly as the source supplied them until contextual audit.",
+      "evidence": [
+        "Macula WLC 1CH 3:15 o130030150041: Johanan, not Jehoahaz",
+        "Macula WLC 1CH 3:15 o130030150101: separate Shallum form; no automatic transfer"
+      ]
     }
   ]
 }
