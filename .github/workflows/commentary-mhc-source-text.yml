@@ -271,6 +271,20 @@ jobs:
               assert len(high["original_source_line_hash_and_native_other_slot_counts_only"])==selected
           print("Source-extra long original prose same-chapter native exact-span search:",
                 json.dumps(high,sort_keys=True))
+          if selected:
+              structure=high["original_pinned_ccel_extra_gap_paragraph_structure"]
+              assert structure["source_xml_sha256"]==report["source_original_sha256"]
+              assert structure["original_outlier_source_units_reconciled"]==selected
+              assert structure["original_reference_markers_and_section_divisions_not_modified"]
+              assert structure["original_words_or_source_ref_or_native_keys_exposed"] is False
+              assert structure["original_authorial_print_editional_structure_parity_established"] is False
+              items=structure["source_line_hash_and_original_adjacent_paragraph_structure_only"]
+              assert len(items)==selected
+              assert all(len(x["original_extra_word_spans_authentically_within_adjacent_source_div"])>0
+                         and x["original_adjacent_div_unlinked_word_count"]>0
+                         for x in items)
+              print("Pinned CCEL section paragraph structure at extra-word original positions:",
+                    json.dumps(structure,sort_keys=True))
           evidence = {
               "status": "SOURCE_STOCK_ONE_VOLUME_LEXICAL_CENSUS_NOT_PARITY",
               "resource_id": "mhc-crosswire",
