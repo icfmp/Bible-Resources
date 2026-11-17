@@ -12,7 +12,8 @@ from zipfile import ZipFile
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from commentary_usfm_title_witness import (
     WitnessError, compare_original_first_paragraphs,
-    compare_ambiguous_original_opening_paragraphs, independent_usfm_titles,
+    compare_ambiguous_original_opening_paragraphs,
+    compare_word_order_mismatch_opening_titles, independent_usfm_titles,
     reviewed_usfm_title_visible_text,
 )
 
@@ -211,6 +212,43 @@ class IndependentBiblicalTitleWitnessTests(unittest.TestCase):
         case["original_opening_p_document_ordinal"]=2
         with self.assertRaises(WitnessError):
             compare_ambiguous_original_opening_paragraphs(
+                report,titles,source_book="Ps")
+
+    def test_separate_native_word_order_case_can_match_biblical_title_only(self):
+        path,digest=self.make_archive(
+            "\\id PSA\n\\c 8\n\\d To the chief Musician\n\\v 1 First\n")
+        titles=independent_usfm_titles(path,digest,book_id="PSA")
+        words=["to","the","chief","musician"]
+        report=metadata(8,words)
+        scope=report["source_longer_both_source_and_native_reference_label_word_scope"]
+        scope["original_book_unlinked_word_relation_classes"]={
+            "Ps":{"plain_word_order_or_selection_requires_editorial_review":1}}
+        scope["original_line_SHA_and_two_sided_link_word_metadata_only_rows"]=[{
+            "source_book":"Ps",
+            "outside_link_word_relation":
+                "plain_word_order_or_selection_requires_editorial_review",
+            "original_source_chapter_number_from_actual_osis_start":8,
+            "original_full_reference_sha256":sha256(b"original psalm ref").hexdigest(),
+            "original_first_p_visible_word_identity_only":{
+                "original_p_document_ordinal":1,
+                "visible_words":4,
+                "exact_unicode_word_sha256":
+                    sha256(" ".join(words).encode()).hexdigest(),
+                "casefold_unicode_word_sha256":
+                    sha256(" ".join(w.casefold() for w in words).encode()).hexdigest(),
+            },
+        }]
+        result=compare_word_order_mismatch_opening_titles(
+            report,titles,source_book="Ps")
+        self.assertEqual(result["independent_title_opening_comparison_classes"],{
+            "opening_p_casefold_matches_title_but_native_order_mismatch_open":1})
+        self.assertTrue(
+            result["title_matches_never_resolve_original_native_word_order_selection"])
+        self.assertNotIn("musician",json.dumps(result))
+        scope["original_line_SHA_and_two_sided_link_word_metadata_only_rows"][0][
+            "original_first_p_visible_word_identity_only"]["visible_words"]=0
+        with self.assertRaises(WitnessError):
+            compare_word_order_mismatch_opening_titles(
                 report,titles,source_book="Ps")
 
     def test_exact_original_chapter_and_count_reconciliation_are_mandatory(self):
