@@ -100,7 +100,8 @@ def original_ccel_paragraph_words(
  
 def original_authoring_chapter_scope_metadata(
         book_div: etree._Element, chapter_ref: str,
-        *, _private_words_sink: list[str] | None = None) -> dict:
+        *, _private_words_sink: list[str] | None = None,
+        _private_visible_text_sink: list[str] | None = None) -> dict:
     """Audit real chapter milestone bounds; never expose or rewrite source words.
 
     Book ownership and section starts are independent of any proposed missing
@@ -168,6 +169,11 @@ def original_authoring_chapter_scope_metadata(
         if type(_private_words_sink) is not list or _private_words_sink:
             raise ValueError("Original chapter private word sink must be an empty list")
         _private_words_sink.extend(words)
+    if _private_visible_text_sink is not None:
+        if (type(_private_visible_text_sink) is not list
+                or _private_visible_text_sink):
+            raise ValueError("Original chapter private visible text sink must be empty")
+        _private_visible_text_sink.append(visible)
     return {
         "authentic_chapter_milestone_start_end_count":[opens,closes],
         "bounded_original_chapter_visible_words":len(words),
@@ -272,6 +278,36 @@ def _private_native_word_relation(source: list[str], native: list[str]) -> str:
     return "native_full_ordered_token_relation_unresolved"
 
 
+
+def _private_interior_character_relation(
+        original_visible: str, source_word_spans: list[tuple[int, int]],
+        word_offset: int, candidate_visible: str, candidate_words: list[str]) -> str:
+    """Interior visible chars only: retains punctuation *between* word tokens.
+
+    Leading/trailing nonword characters at section boundaries are excluded;
+    paragraph/note/reference XML structure is never inferred from text.
+    """
+    if (not isinstance(original_visible, str) or not candidate_words
+            or type(word_offset) is not int or word_offset < 0
+            or word_offset + len(candidate_words) > len(source_word_spans)):
+        raise ValueError("Unverified source/native interior-character comparison")
+    candidate_spans = [match.span() for match in WORD.finditer(candidate_visible)]
+    if len(candidate_spans) != len(candidate_words):
+        raise ValueError("Native visible word boundaries changed during comparison")
+    start = source_word_spans[word_offset][0]
+    end = source_word_spans[word_offset + len(candidate_words)-1][1]
+    source_middle = original_visible[start:end]
+    native_middle = candidate_visible[candidate_spans[0][0]:candidate_spans[-1][1]]
+    if WORD.findall(source_middle) != candidate_words:
+        raise ValueError("Original source word offsets do not match native exact body")
+    if source_middle == native_middle:
+        return "all_interior_visible_characters_exact"
+    if (re.sub(r"\\s+", " ", source_middle)
+            == re.sub(r"\\s+", " ", native_middle)):
+        return "interior_whitespace_only_difference"
+    return "interior_nonword_punctuation_or_spacing_difference"
+
+
 class PrivateOriginalChapterNativeAnchorCoverage:
     """Read-only visible-word *anchor* overlap of original OSIS vs native K.
 
@@ -289,7 +325,12 @@ class PrivateOriginalChapterNativeAnchorCoverage:
     INTRO = re.compile(r"[1-4]?[A-Za-z][A-Za-z0-9]*(?:\.0\.0|\.[1-9][0-9]*(?:\.0)?)?\Z")
     KEY = re.compile(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*\.[1-9][0-9]*\Z")
 
-    def __init__(self, chapter_words: dict[str, list[str]]):
+    def __init__(self, chapter_words: dict[str, list[str]], *,
+                 private_chapter_visible_texts: dict[str, str] | None = None):
+        if (private_chapter_visible_texts is not None
+                and (not isinstance(private_chapter_visible_texts, dict)
+                     or set(private_chapter_visible_texts) != set(chapter_words))):
+            raise ValueError("Original chapter visible text scope identities disagree")
         if (not isinstance(chapter_words, dict)
                 or not 1 <= len(chapter_words) <= self.MAX_SCOPES):
             raise ValueError("Unreviewed original chapter coverage case set")
@@ -306,7 +347,22 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                 tuple(words[i:i+self.ANCHOR])
                 for i in range(len(words)-self.ANCHOR+1)
             }
+            source_visible = (
+                None if private_chapter_visible_texts is None
+                else private_chapter_visible_texts[chapter])
+            if source_visible is not None and (
+                    not isinstance(source_visible, str)
+                    or len(source_visible) > 5 * 1024 * 1024
+                    or WORD.findall(source_visible) != words):
+                raise ValueError("Original chapter visible text not token-identical")
+            source_spans = (
+                [] if source_visible is None else
+                [match.span() for match in WORD.finditer(source_visible)])
             self._scopes[chapter] = {
+                "source_visible_text": source_visible,
+                "source_word_spans": source_spans,
+                "native_K_interior_character_relation_classes": defaultdict(int),
+                "native_I_interior_character_relation_classes": defaultdict(int),
                 "source_words": words,
                 "source_windows": windows,
                 "matching_windows": set(),
