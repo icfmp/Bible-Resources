@@ -9,7 +9,7 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 
-from commentary_nonlink_words import compare_words_outside_links
+from commentary_nonlink_words import compare_words_outside_links, _private_unique_original_gap_spans
 from commentary_private_text_compare import _original_source_markers, compare_private_texts
 from pilot_preflight import PilotError
 
@@ -107,6 +107,19 @@ class CommentaryOriginalOutsideLinkWordsTests(unittest.TestCase):
         self.assertEqual(result["stock_reference_word_tokens_removed"],2)
         self.assertNotIn("nonlinkedsecret",json.dumps(result))
         self.assertNotIn("stockcitationsecret",json.dumps(result))
+
+    def test_private_exact_unmatched_original_spans_are_never_automatically_public(self):
+        original=["alpha","secretchapter","secretpassage","beta","secretending","gamma"]
+        stock=["alpha","beta","gamma"]
+        self.assertEqual(_private_unique_original_gap_spans(original,stock),
+                         [["secretchapter","secretpassage"],["secretending"]])
+        self.assertIsNone(_private_unique_original_gap_spans(
+            ["alpha","alpha","beta"],["alpha","beta"]))
+        public=compare_words_outside_links(original,stock,[],[])
+        self.assertNotIn("secretchapter",json.dumps(public))
+        self.assertNotIn("secretending",json.dumps(public))
+        self.assertEqual(public["source_extra_unlinked_word_gap_layout"][
+            "fixed_extra_word_spans"],2)
 
     def test_word_index_must_be_real_bound_and_unique(self):
         for ids in ([1,1],[-1],[2]):
