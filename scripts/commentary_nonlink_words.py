@@ -103,6 +103,38 @@ def _source_extra_word_layout(original: list[str], compiled: list[str]) -> dict:
     }
 
 
+def _private_unique_original_gap_spans(
+    original: list[str], compiled: list[str],
+) -> list[list[str]] | None:
+    """Keep exact original extra words PRIVATE for source/stock location review.
+
+    Return None for an ambiguous repeated-token ordered alignment. The caller
+    must never serialize/log the returned words, only bounded counts and SHA
+    identities of the separately pinned original sources.
+    """
+    layout = _source_extra_word_layout(original, compiled)
+    if layout["alignment_topology"] == (
+            "multiple_exact_subsequence_alignments_no_fixed_gap_ownership"):
+        return None
+    cursor = 0
+    gaps = []
+    for word in compiled:
+        start = cursor
+        while cursor < len(original) and original[cursor] != word:
+            cursor += 1
+        if cursor >= len(original):
+            raise PilotError("Original source-extra source words unexpectedly not aligned")
+        if cursor > start:
+            gaps.append(original[start:cursor])
+        cursor += 1
+    if cursor < len(original):
+        gaps.append(original[cursor:])
+    if (len(gaps) != layout["fixed_extra_word_spans"]
+            or sum(map(len,gaps)) != layout["source_extra_nonlink_word_count"]):
+        raise PilotError("Private source-gap topology disagrees with public metadata")
+    return gaps
+
+
 def compare_words_outside_links(
     source_word_tokens: list[str],
     stock_word_tokens: list[str],
