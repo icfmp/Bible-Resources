@@ -51,7 +51,7 @@ People who understand human history, Scripture and their own hearts should know 
 
 Let sinners seek **repentance through Christ** and the renewing grace of the Holy Spirit now.
 
-Otherwise, they will remain unhumbled and unrepentant, adding guilt to misery.
+Otherwise, Henry warns, they will remain unhumbled and unrepentant, **increasing guilt and misery through all eternity**.
 
 **Darkness** is the opposite of knowledge and wisdom.
 
@@ -110,6 +110,9 @@ Indeed, becoming more stubborn against God in response to his righteous judgment
 ---
 
 ## Editorial review — Revelation 16
+
+**2026-11-17 second CCEL witness collation:** restored Henry's explicit claim that impenitence adds guilt and misery **through all eternity**, which the prior modern text summarized too loosely. [CCEL Revelation 16](https://ccel.org/ccel/henry/mhcc.lviii.xvi.html). Authorial historical prophetic readings remain labelled as proposals, not canonical Scripture facts; native SWORD/semantic independent signoff pending.
+
 
 **Full CCEL original-English secondary witness directly read:** [CCEL, Revelation 16](https://ccel.org/ccel/henry/mhcc.lviii.xvi.html). The exact published `MHCC 0.1.1` remains definitive for native SWORD verification and independent acceptance.
 
