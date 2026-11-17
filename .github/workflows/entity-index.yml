@@ -1,0 +1,70 @@
+name: Independent biblical entity index
+
+on:
+  pull_request:
+    paths:
+      - "entity-index/**"
+      - ".github/workflows/entity-index.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Regression tests (offline, no data download)
+        run: python3 -I entity-index/test_build.py
+
+      - name: Check out frozen self-hosted ACAI source
+        shell: bash
+        run: |
+          git clone --quiet https://github.com/icfmp/ACAI.git /tmp/acai-frozen
+          git -C /tmp/acai-frozen checkout --quiet e80a874e8282f996199c595378a3b3b9a43aac22
+          test "$(git -C /tmp/acai-frozen rev-parse HEAD)" = "e80a874e8282f996199c595378a3b3b9a43aac22"
+
+      - name: Build complete local-only resource
+        run: |
+          python3 -I entity-index/build.py \
+            --source /tmp/acai-frozen \
+            --verify-source-commit \
+            --output entity-index/dist/index.json
+
+      - name: Verify output and identity decisions
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          path=Path("entity-index/dist/index.json")
+          index=json.loads(path.read_text(encoding="utf-8"))
+          stats=index["statistics"]
+          assert stats["source_records"] == 6644, stats
+          assert stats["index_entities"] == 6643, stats
+          assert stats["quarantined_records"] == 1, stats
+          assert stats["reviewed_entries"] == 3, stats
+          by_id={e["id"]:e for e in index["entities"]}
+          assert "person:Jashar" not in by_id
+          assert "person:Hammelech" not in by_id
+          assert by_id["work:BookOfJashar"]["source_id"] == "person:Jashar"
+          assert by_id["place:PerezUzzah"]["references"][-1] == "13013011"
+          assert index["by_word"]["wlc:o100060080121"] == [
+              {"entity_id":"place:PerezUzzah","link_type":"explicit_instances"}]
+          assert ["o100060080082"] in by_id["person:Uzzah"]["occurrences"]["explicit_instances"]["wlc"]
+          assert all("localizations" not in entry and "speeches" not in entry
+                     for entry in index["entities"])
+          assert index["provenance"]["source_license"] == "CC BY-SA 4.0"
+          print("ENTITY_INDEX_QA", json.dumps(stats, sort_keys=True))
+          PY
+
+      - name: Upload internal QA-only resource
+        uses: actions/upload-artifact@v4
+        with:
+          name: independent-entity-index-qa
+          path: entity-index/dist/index.json
+          if-no-files-found: error
+          retention-days: 14
