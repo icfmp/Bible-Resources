@@ -428,6 +428,145 @@ jobs:
                 "not native-to-modern authorial meaning, notes, reference targets, or publication rights")
           assert not issues and len(reports)==69, "Historical 69 source-unit coverage NOT fully demonstrated"
           PY
+      - name: Screen all 1189 modern prose sections against verified native source K and I group topology
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from collections import Counter
+          import json
+          import os
+          from pathlib import Path
+          import re
+          base = Path("work/mhcc-modern/production/accepted")
+          native = json.loads((Path(os.environ["RUNNER_TEMP"]) /
+              "mhcc-modern-whole-canon-native-receipt.json").read_text(encoding="utf-8"))
+          assert native["status"] == "SOURCE_NATIVE_RECEIPT_ONLY_NOT_TRANSLATION_APPROVAL"
+          assert native["original_compiled_corpus_sha256"] == (
+              "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e")
+          assert native["source_prose_or_original_markup_exported"] is False
+          assert native["semantic_translation_independently_approved"] is False
+          originals = native["chapters"]
+          files = sorted(base.glob("*.md"))
+          assert len(files) == len(originals) == 1189
+          token = re.compile(r"\b[\w’-]+\b", re.UNICODE)
+          heading = re.compile(r"(?m)^## ([^\n]+)\s*$")
+          quoted = re.compile(r'(?m)^([a-z_][a-z0-9_]*): "([^"\n]*)"$')
+          verse_marker = re.compile(r"\(\s*verses?\s+([^)]+)\)\s*$", re.IGNORECASE)
+          flags = []
+          rows = []
+          seen = set()
+          for path in files:
+              problems = []
+              source = path.read_text(encoding="utf-8")
+              if not source.startswith("---\n") or "\n---\n" not in source[4:]:
+                  flags.append({"manuscript":path.name, "problem":"invalid frontmatter"})
+                  continue
+              front, rest = source[4:].split("\n---\n", 1)
+              fields = dict(quoted.findall(front))
+              chapter = fields.get("chapter_osis","")
+              if chapter not in originals or chapter in seen:
+                  flags.append({"manuscript":path.name, "problem":"unmapped or duplicate chapter_osis"})
+                  continue
+              seen.add(chapter)
+              if (fields.get("source_module") != "MHCC 0.1.1"
+                  or fields.get("source_native_corpus_sha256") != native["original_compiled_corpus_sha256"]
+                  or fields.get("source_zip_sha256") !=
+                     "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746"
+                  or not fields.get("publication_status","").startswith("NOT RELEASED")):
+                  problems.append("source identity/publication status not pinned")
+              if "\n---\n" not in rest:
+                  problems.append("no clear modern prose versus editorial notes boundary")
+                  main = rest
+              else:
+                  main, _ = rest.split("\n---\n", 1)
+              heads = list(heading.finditer(main))
+              prose_units = []
+              for idx, match in enumerate(heads):
+                  title = match[1].strip()
+                  low = title.lower()
+                  if low.startswith("original ") or "book introduction" in low:
+                      continue
+                  section = main[match.end():heads[idx + 1].start() if idx + 1 < len(heads)
+                                 else len(main)]
+                  prose_units.append((title, len(token.findall(section))))
+              src = originals[chapter]
+              source_units = src["original_units"]
+              is_intro_only = src["source_placement"] == "INTRO_ONLY_NEEDS_INDEPENDENT_REVIEW"
+              expected = 1 if is_intro_only else len(source_units)
+              if is_intro_only:
+                  intros = [i for i in src["native_introductions_not_assumed_to_be_exposition"]
+                            if i["key"] in (chapter,chapter+".0") and i["visible_word_tokens"] > 0]
+                  if len(intros) != 1 or source_units or src["original_native_numbered_keys"] != 0:
+                      problems.append("intro-only original ownership not proven")
+              elif src["source_placement"] != "NUMBERED_KEYS_WITH_SEPARATE_INTRO" or not source_units:
+                  problems.append("unknown original source storage pattern")
+              if len(prose_units) != expected:
+                  problems.append(f"original authorial groups={expected}; modern prose sections={len(prose_units)}")
+              for index, (title, words) in enumerate(prose_units):
+                  if words < 25:
+                      problems.append(f"modern exposition {index+1} has {words} words")
+                  if re.search(r"\b(?:TODO|TBD|PLACEHOLDER|NOT YET TRANSLATED)\b",
+                               main, re.IGNORECASE):
+                      problems.append("untranslated marker in draft")
+                      break
+                  if index < len(source_units):
+                      nums = [int(k.rsplit(".",1)[1]) for k in source_units[index]["keys"]]
+                      m = verse_marker.search(title)
+                      if not m:
+                          problems.append(f"modern exposition {index+1} has no parseable verse-scope heading")
+                      else:
+                          bound = [int(t) for t in re.findall(r"\d+",m[1])]
+                          if not bound or (bound[0],bound[-1]) != (min(nums),max(nums)):
+                              problems.append(f"modern exposition {index+1} verse scope differs from native group")
+              rows.append({
+                  "chapter":chapter,
+                  "manuscript":path.name,
+                  "source_original_K_groups":len(source_units),
+                  "source_original_intro_only":is_intro_only,
+                  "modern_expositions":len(prose_units),
+                  "modern_exposition_words":sum(w for _,w in prose_units),
+                  "original_native_occupied_K_keys":src["original_native_numbered_keys"],
+                  "problems":list(dict.fromkeys(problems))
+              })
+              for problem in dict.fromkeys(problems):
+                  flags.append({"chapter":chapter,"problem":problem})
+          if seen != set(originals):
+              flags.append({"problem":"missing original canonical manuscripts","count":len(set(originals)-seen)})
+          count = Counter(f["problem"].split("=",1)[0] for f in flags)
+          summary = {
+              "status":"FULL_CANON_NATIVE_GROUP_TO_MODERN_DRAFT_DIAGNOSTIC_NOT_EDITORIAL_APPROVAL",
+              "chapters_expected":len(originals),
+              "manuscripts_inspected":len(rows),
+              "native_numbered_K_authorial_units":sum(len(c["original_units"]) for c in originals.values()),
+              "modern_prose_expositions":sum(r["modern_expositions"] for r in rows),
+              "original_intro_only_chapters":sum(r["source_original_intro_only"] for r in rows),
+              "native_occupied_K_addresses":sum(r["original_native_occupied_K_keys"] for r in rows),
+              "total_modern_exposition_words":sum(r["modern_exposition_words"] for r in rows),
+              "affected_chapters":sum(bool(r["problems"]) for r in rows),
+              "diagnostic_flags":flags,
+              "flag_counts_by_type":dict(sorted(count.items())),
+              "original_full_semantic_meaning_verified":False,
+              "original_native_footnotes_references_quotation_and_layout_verified":False,
+              "independent_editorial_signoff":False,
+              "automatic_edits_made":False,
+              "chapters":rows
+          }
+          output = Path(os.environ["RUNNER_TEMP"])/"mhcc-modern-full-canon-source-group-diagnostic.json"
+          output.write_text(json.dumps(summary,sort_keys=True,indent=2)+"\n",encoding="utf-8")
+          print("FULL_CANON_GROUP_DIAGNOSTIC manuscripts="+str(summary["manuscripts_inspected"])+
+                " source_K_groups="+str(summary["native_numbered_K_authorial_units"])+
+                " intro_only="+str(summary["original_intro_only_chapters"])+
+                " modern_expositions="+str(summary["modern_prose_expositions"])+
+                " affected_chapters="+str(summary["affected_chapters"])+
+                " flags="+str(len(flags)))
+          print("FULL_CANON_FLAG_TYPES "+json.dumps(summary["flag_counts_by_type"],sort_keys=True))
+          for problem in flags[:90]:
+              print("FULL_CANON_FLAG "+json.dumps(problem,sort_keys=True))
+          print("Metadata-only diagnostic: source meaning, native refs and notes NOT approved.")
+          # This is triage, never a semantic/editorial approval gate.
+          assert len(rows)==len(originals), "Canonical chapter manuscript missing"
+          PY
       - name: Build private Leviticus 19 and Psalm 108 I-only linked chapter previews
         shell: bash
         run: |
@@ -867,6 +1006,7 @@ jobs:
             ${{ runner.temp }}/mhcc-modern-source-native-receipt.json
             ${{ runner.temp }}/mhcc-modern-whole-canon-native-receipt.json
             ${{ runner.temp }}/mhcc-modern-historical-69-translation-coverage.json
+            ${{ runner.temp }}/mhcc-modern-full-canon-source-group-diagnostic.json
             ${{ runner.temp }}/mhcc-ionly-preview-report.json
             ${{ runner.temp }}/mhcc-modern-outline-order-diagnostic.json
             ${{ runner.temp }}/mhcc-modern-draft-coverage-report.json
