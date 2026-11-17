@@ -17,6 +17,7 @@ from commentary_osis_paragraph_presence import (
     _private_whole_token_subsequence,
     _private_native_word_relation,
     _private_exact_token_match_offsets,
+    _private_interior_character_relation,
 )
 
 
@@ -170,8 +171,11 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
         )
         root = etree.fromstring(xml.encode())
         sink = []
+        visible_sink = []
         metadata = original_authoring_chapter_scope_metadata(
-            root, "Gen.1", _private_words_sink=sink)
+            root, "Gen.1", _private_words_sink=sink,
+            _private_visible_text_sink=visible_sink)
+        self.assertEqual(visible_sink, [" ".join(chapter_words)])
         self.assertEqual(sink, chapter_words)
         self.assertEqual(metadata["bounded_original_chapter_visible_words"], 14)
         self.assertNotIn("privateword", json.dumps(metadata))
@@ -375,6 +379,67 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
             census.observe("I", "Gen.1.9", b"<p>bad key</p>")
         with self.assertRaises(ValueError):
             census.observe("I", "Gen.1.0", b"<p>broken")
+
+
+    def test_original_interior_character_match_is_not_merely_word_parity(self):
+        from scripts.commentary_unresolved_lexical_triage import WORD as WORD_FOR_TEST
+        source = "one,  two; three\tfour"
+        spans = [match.span() for match in WORD_FOR_TEST.finditer(source)]
+        tokens = WORD_FOR_TEST.findall(source)
+        self.assertEqual(
+            _private_interior_character_relation(source, spans, 0, source, tokens),
+            "all_interior_visible_characters_exact")
+        self.assertEqual(
+            _private_interior_character_relation(
+                source, spans, 0, "one,\ntwo; three four", tokens),
+            "interior_whitespace_only_difference")
+        self.assertEqual(
+            _private_interior_character_relation(
+                source, spans, 0, "one. two; three four", tokens),
+            "interior_nonword_punctuation_or_spacing_difference")
+        with self.assertRaises(ValueError):
+            _private_interior_character_relation(
+                source, spans, 2, source, tokens)
+
+    def test_original_K_interior_visible_character_categories_remain_private(self):
+        words = [f"word{i:02d}" for i in range(12)]
+        source = " ".join(words[:3]) + ", " + " ".join(words[3:])
+        census = PrivateOriginalChapterNativeAnchorCoverage(
+            {"Gen.1": words}, private_chapter_visible_texts={"Gen.1": source})
+        census.observe("K", "Gen.1.1", ("<p>" + source + "</p>").encode())
+        census.observe("K", "Gen.1.2",
+            ("<p>" + source.replace("word00 word01", "word00\nword01") + "</p>").encode())
+        census.observe("K", "Gen.1.3",
+            ("<p>" + source.replace("word02,", "word02;") + "</p>").encode())
+        result = census.report()
+        classes = result["original_chapter_cases"][0][
+            "native_K_body_interior_visible_character_relation_classes"]
+        self.assertEqual(classes, {
+            "all_interior_visible_characters_exact": 1,
+            "interior_whitespace_only_difference": 1,
+            "interior_nonword_punctuation_or_spacing_difference": 1,
+        })
+        self.assertNotIn("word02", json.dumps(result))
+        self.assertTrue(result["visible_character_test_excludes_section_boundary_nonword_chars"])
+
+    def test_original_chapter_I_and_K_character_parity_is_checked_separately(self):
+        words = [f"sourceword{i:02d}" for i in range(14)]
+        visible = " ".join(words)
+        census = PrivateOriginalChapterNativeAnchorCoverage(
+            {"Gen.1": words}, private_chapter_visible_texts={"Gen.1": visible})
+        census.observe("I", "Gen.1.0",
+            ("<title>" + " ".join(words[:5]) + "</title>").encode())
+        census.observe("K", "Gen.1.1",
+            ("<div>" + " ".join(words[5:]) + "</div>").encode())
+        row = census.report()["original_chapter_cases"][0]
+        self.assertEqual(row["native_chapter_I_body_interior_visible_character_relation_classes"],
+                         {"all_interior_visible_characters_exact": 1})
+        self.assertEqual(row["native_K_body_interior_visible_character_relation_classes"],
+                         {"all_interior_visible_characters_exact": 1})
+        with self.assertRaises(ValueError):
+            PrivateOriginalChapterNativeAnchorCoverage(
+                {"Gen.1": words},
+                private_chapter_visible_texts={"Gen.1": "different words"})
 
 
 if __name__=="__main__":
