@@ -607,12 +607,19 @@ class OriginalExtraGapNativeChapterProbe:
                     category="extra_span_crosses_multiple_original_p_elements"
                 whole=sum(paragraph_positions[n].issubset(positions) for n in distinct)
                 partial=len(distinct)-whole
+                uniquely_owned_original_p=(
+                    next(iter(distinct))
+                    if category=="extra_span_inside_one_original_p"
+                    and whole==1 and partial==0 else None
+                )
                 span_rows.append({
                     "exact_original_unlinked_extra_word_count":b-a,
                     "original_paragraph_ownership_class":category,
                     "distinct_original_p_elements_touched":len(distinct),
                     "whole_original_p_elements_word_covered":whole,
                     "partially_covered_original_p_elements":partial,
+                    "exact_whole_original_p_document_ordinal_when_unique":
+                        uniquely_owned_original_p,
                     "original_unlinked_words_outside_p":outside,
                     "original_tokens_straddling_p_markup":mixed,
                 })
