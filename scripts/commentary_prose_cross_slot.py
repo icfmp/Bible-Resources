@@ -511,6 +511,12 @@ class OriginalExtraGapNativeChapterProbe:
         for unit in self.units:
             identity=(unit["original_source_line"],unit["original_full_reference_sha256"])
             marker=matched[identity]
+            original_source_ref=marker.get("osisRef","")
+            if (not re.fullmatch(
+                    r"Bible:[A-Za-z0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9]+\\.[0-9]+\\.[0-9]+)?",
+                    original_source_ref)
+                    or len(original_source_ref)>128):
+                raise PilotError("Original source scripCom citation cannot be safely recorded")
             body=marker.getnext()
             if (body is None or not isinstance(body.tag,str)
                     or body.tag.rsplit("}",1)[-1]!="div"
@@ -616,6 +622,7 @@ class OriginalExtraGapNativeChapterProbe:
                       else "none")
             outputs.append({
                 "original_source_line":unit["original_source_line"],
+                "original_ccel_scripCom_osisRef_claim_only":original_source_ref,
                 "original_full_reference_sha256":unit["original_full_reference_sha256"],
                 "original_body_sha256":unit["original_body_sha256"],
                 "selected_native_sha256":unit["selected_native_sha256"],
@@ -633,7 +640,9 @@ class OriginalExtraGapNativeChapterProbe:
             "original_outlier_source_units_reconciled":len(outputs),
             "source_line_hash_and_original_adjacent_paragraph_structure_only":outputs,
             "original_reference_markers_and_section_divisions_not_modified":True,
-            "original_words_or_source_ref_or_native_keys_exposed":False,
+            "only_original_ccel_source_scripCom_claimed_reference_recorded":True,
+            "original_words_or_native_keys_exposed":False,
+            "ccel_claimed_reference_is_not_native_mapping_or_authorial_edition_proof":True,
             "original_authorial_print_editional_structure_parity_established":False,
         }
 
