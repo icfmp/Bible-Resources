@@ -1,0 +1,25 @@
+{
+  "status": "PRIVATE_TECHNICAL_PREVIEW_ONLY_NOT_EDITORIAL_APPROVAL",
+  "source_module": "MHCC 0.1.1",
+  "source_zip_sha256": "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746",
+  "source_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+  "reason": "Only these observed I-only original chapters lack all native numbered K commentary entries; no general chapter fallback policy.",
+  "chapters": [
+    {
+      "chapter_osis": "Lev.19",
+      "verse_count": 37,
+      "manuscript": "work/mhcc-modern/production/accepted/leviticus-19.md",
+      "intro_raw_sha256": "de49e95300a947014836f46997124d9b3e0a1b21d7bc0788dcc6da825958c6ec",
+      "original_source_heading": "laws."
+    },
+    {
+      "chapter_osis": "Ps.108",
+      "verse_count": 13,
+      "manuscript": "work/mhcc-modern/production/accepted/psalms-108.md",
+      "intro_raw_sha256": "596b643eb9807198a002855783abe1981e09d4b254a7aa801c0085ab0e969375",
+      "original_source_heading": null
+    }
+  ],
+  "semantic_translation_independently_approved": false,
+  "publication_authorized": false
+}
