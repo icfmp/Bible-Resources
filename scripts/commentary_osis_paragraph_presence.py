@@ -302,8 +302,8 @@ def _private_interior_character_relation(
         raise ValueError("Original source word offsets do not match native exact body")
     if source_middle == native_middle:
         return "all_interior_visible_characters_exact"
-    if (re.sub(r"\\s+", " ", source_middle)
-            == re.sub(r"\\s+", " ", native_middle)):
+    if (re.sub(r"\s+", " ", source_middle)
+            == re.sub(r"\s+", " ", native_middle)):
         return "interior_whitespace_only_difference"
     return "interior_nonword_punctuation_or_spacing_difference"
 
@@ -328,7 +328,8 @@ class PrivateOriginalChapterNativeAnchorCoverage:
     def __init__(self, chapter_words: dict[str, list[str]], *,
                  private_chapter_visible_texts: dict[str, str] | None = None):
         if (private_chapter_visible_texts is not None
-                and (not isinstance(private_chapter_visible_texts, dict)
+                and (not isinstance(chapter_words, dict)
+                     or not isinstance(private_chapter_visible_texts, dict)
                      or set(private_chapter_visible_texts) != set(chapter_words))):
             raise ValueError("Original chapter visible text scope identities disagree")
         if (not isinstance(chapter_words, dict)
