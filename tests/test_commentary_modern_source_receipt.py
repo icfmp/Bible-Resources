@@ -37,6 +37,17 @@ class NativeModernReceiptTests(unittest.TestCase):
         self.assertFalse(result["semantic_translation_independently_approved"])
         self.assertFalse(result["source_prose_or_original_markup_exported"])
 
+    def test_full_canonical_catalogue_is_bounded(self):
+        # One read-only streaming pass can inventory all 1,189 Protestant
+        # chapters without exposing original commentary words.
+        chapters = [f"A.{i}" for i in range(1, 1000)]
+        chapters += [f"B.{i}" for i in range(1, 191)]
+        rec = Receipt(chapters)
+        self.assertEqual(len(rec.chapters), 1189)
+        with self.assertRaisesRegex(ValueError, "1–1200"):
+            Receipt([f"A.{i}" for i in range(1, 1000)]
+                    + [f"B.{i}" for i in range(1, 203)])
+
     def test_wrong_complete_corpus_hash_is_rejected(self):
         rec = Receipt(["Ruth.1"])
         rec.observe("K", "Ruth.1.1", b"<div>original</div>")
