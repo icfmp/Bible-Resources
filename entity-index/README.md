@@ -82,6 +82,16 @@ The builder contains **no chapter-specific or entity-specific code path**.
   Johanan's original source group and is removed **only** from the
   derived Jehoahaz direct-name occurrences. The separate Shallum at
   `o130030150101` remains unresolved; **no unsupported alias merge**.
+- `place:Gadara` is **canonically distinct** from `place:Gerasa`:
+  Gadara (Umm Qais) and Gerasa (Jerash) are historically separate Decapolis
+  cities (UNESCO's [Gadara documentation](https://whc.unesco.org/en/tentativelists/1558/)).
+  The source's `place:Gadara.primary_id=place:Gerasa` was a false
+  historical city identity merger. The original Gospel **regional demonym**
+  tokens and verse references are *not* silently reassigned: Matthew 8:28
+  still produces **ambiguous regional/site candidates**, rather than an
+  invented precise location. `place:Gadara.2` (Gadara of Perea) remains
+  its own distinct canonical entity. See [inherited ACAI #7](https://github.com/icfmp/ACAI/issues/7)
+  for textual variants and unresolved geographical scope.
 - `keyterm:Universe` and `keyterm:World` retain their distinct source
   records and word groups, but no longer resolve canonically to
   `keyterm:Ability` simply because the input had an overly broad

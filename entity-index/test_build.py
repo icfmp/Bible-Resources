@@ -101,15 +101,24 @@ class EntityIndexTests(unittest.TestCase):
                           references=["12023030", "13003015"],
                           explicit_instances={"wlc": [
                               ["o120230300131"], ["o130030150041"]]})
+        self.write_record("places", "Gadara",
+                          primary_id="place:Gerasa",
+                          references=["40008028", "41005001"],
+                          explicit_instances={"SBLGNT": [["n40008028011"]]})
+        self.write_record("places", "Gerasa",
+                          references=["40008028", "41005001"],
+                          explicit_instances={"SBLGNT": [
+                              ["n40008028011"], ["n41005001012"]]})
+        self.write_record("places", "Gadara.2", references=[])
         source_before = path.read_bytes()
         decisions = json.loads(
             Path(__file__).with_name("editorial-decisions.json").read_text()
         )["decisions"]
         report = self.build(decisions)
-        self.assertEqual(report["statistics"]["source_records"], 11)
-        self.assertEqual(report["statistics"]["index_entities"], 8)
+        self.assertEqual(report["statistics"]["source_records"], 14)
+        self.assertEqual(report["statistics"]["index_entities"], 11)
         self.assertEqual(report["statistics"]["quarantined_records"], 3)
-        self.assertEqual(report["statistics"]["reviewed_entries"], 8)
+        self.assertEqual(report["statistics"]["reviewed_entries"], 9)
         by_id = {row["id"]: row for row in report["entities"]}
         self.assertIn("work:BookOfJashar", by_id)
         self.assertIn("place:PerezUzzah", by_id)
@@ -118,6 +127,17 @@ class EntityIndexTests(unittest.TestCase):
         self.assertNotIn("person:Hammelech", by_id)
         self.assertNotIn("person:Philistine", by_id)
         self.assertNotIn("person:Shiloh", by_id)
+        self.assertEqual(by_id["place:Gadara"]["canonical_id"], "place:Gadara")
+        self.assertEqual(by_id["place:Gadara"]["source_primary_id"],
+                         "place:Gerasa")
+        self.assertEqual(by_id["place:Gerasa"]["canonical_id"], "place:Gerasa")
+        self.assertEqual(by_id["place:Gadara.2"]["canonical_id"], "place:Gadara.2")
+        self.assertEqual(
+            report["by_word"]["sblgnt:n40008028011"],
+            [{"entity_id": "place:Gadara", "link_type": "explicit_instances"},
+             {"entity_id": "place:Gerasa", "link_type": "explicit_instances"}])
+        self.assertEqual(by_id["place:Gadara"]["occurrences"]
+                         ["explicit_instances"]["SBLGNT"], [["n40008028011"]])
         self.assertEqual(by_id["person:Johanan"]["canonical_id"],
                          "person:Johanan")
         self.assertEqual(by_id["person:Johanan"]["source_primary_id"],

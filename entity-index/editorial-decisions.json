@@ -153,6 +153,20 @@
         "Macula WLC 1CH 3:15 o130030150041: Johanan, not Jehoahaz",
         "Macula WLC 1CH 3:15 o130030150101: separate Shallum form; no automatic transfer"
       ]
+    },
+    {
+      "source_id": "place:Gadara",
+      "action": "replace_identity",
+      "id": "place:Gadara",
+      "kind": "place",
+      "canonical_id": "place:Gadara",
+      "reason": "Gadara (Umm Qais) and Gerasa (Jerash) are historically distinct Decapolis cities, not equivalent name forms. The source's Gadara.primary_id=place:Gerasa falsely merges their identities. Preserve ALL exact original Greek demonym word groups and verse references as candidates, including cross-gospel textual variants; a demonym is not proof of the precise miracle site. Gadara.2 (Perea) remains separate.",
+      "evidence": [
+        "UNESCO World Heritage Centre, Gadara (Modern Um Qeis or Qays): https://whc.unesco.org/en/tentativelists/1558/ — explicitly lists Gerasa as another, separate Decapolis city",
+        "Pinned ACAI places/json/Gadara.json: source_id place:Gadara, primary_id place:Gerasa; source word MAT 8:28!11 n40008028011 is Gadarenes",
+        "Pinned ACAI places/json/Gerasa.json: MRK 5:1!12 n41005001012 and LUK 8:26!7 n42008026007 are Gerasenes, while the Matthew Gadarenes token is also claimed; preserve ambiguity until site-specific textual review",
+        "Inherited ACAI issue #7: full source-token and regional-demonym audit"
+      ]
     }
   ]
 }
