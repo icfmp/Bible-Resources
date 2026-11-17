@@ -566,5 +566,17 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
         self.assertNotIn("prefaceword",json.dumps(row))
 
 
+    def test_bounded_multi_chapter_probe_remains_source_neutral(self):
+        base=[f"sourceword{i:02d}" for i in range(12)]
+        twelve={f"Book{i}.1":list(base) for i in range(1,13)}
+        census=PrivateOriginalChapterNativeAnchorCoverage(twelve)
+        self.assertEqual(len(census._scopes),12)
+        with self.assertRaises(ValueError):
+            PrivateOriginalChapterNativeAnchorCoverage(
+                {**twelve,"Book13.1":list(base)})
+        with self.assertRaises(ValueError):
+            PrivateOriginalChapterNativeAnchorCoverage({})
+
+
 if __name__=="__main__":
     unittest.main()
