@@ -13,6 +13,8 @@ on:
       - 'tests/test_commentary_nonlink_words.py'
       - 'scripts/commentary_usfm_title_witness.py'
       - 'tests/test_commentary_usfm_title_witness.py'
+      - 'scripts/commentary_osis_paragraph_presence.py'
+      - 'tests/test_commentary_osis_paragraph_presence.py'
       - 'config/commentary-intake/mhc-crosswire.json'
   workflow_dispatch:
     inputs:
@@ -176,6 +178,11 @@ jobs:
                 json.dumps(dict(sorted(attrs.items())),sort_keys=True))
           print("Official source OSIS div type labels/counts (structural only):",
                 json.dumps(dict(sorted(types.items())),sort_keys=True))
+          import sys
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from commentary_osis_paragraph_presence import (
+              original_authoring_chapter_scope_metadata,
+          )
           book_divisions={node.get("osisID"):node for node in div_nodes
                           if node.get("type")=="book"}
           if len(book_divisions)!=66:
@@ -204,9 +211,12 @@ jobs:
                          chapter_ref==item or item.startswith(chapter_ref+".")
                          for item in node.get("osisRef","").split()):
                       linked_targets+=1
+              chapter_scope=original_authoring_chapter_scope_metadata(
+                  book_div,chapter_ref)
               print("Authenticated source book/chapter structural metadata only:",
                     json.dumps({
                       "original_source_marker_ref_sha256":ref_sha,
+                      "authentic_bounded_chapter_scope":chapter_scope,
                       "book_xml_descendant_element_count":descendants,
                       "local_chapter_addressable_element_tag_counts":
                           dict(sorted(actual_markers.items())),
