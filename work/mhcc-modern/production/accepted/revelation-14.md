@@ -57,7 +57,7 @@ The **everlasting gospel** is God's great means of bringing people to fear him a
 
 Its proclamation shakes the foundations of powers hostile to Christ and hastens their downfall.
 
-Those who continue willingly serving the beast and promoting its cause face judgment and misery of both body and soul.
+Those who continue willingly serving the beast and promoting its cause, Henry warns, face **misery of both soul and body forever**.
 
 Believers, by contrast, should be willing to endure hardship and loss while obeying God's commands and confessing their faith in Jesus.
 
@@ -106,6 +106,9 @@ When sin has reached its full measure, judgment is near.
 ---
 
 ## Editorial review — Revelation 14
+
+**2026-11-17 second CCEL witness collation:** restored Henry's express **perpetuity** of body-and-soul misery for those persisting in worship of the beast, which had been omitted in the modern paraphrase. [CCEL Revelation 14](https://ccel.org/ccel/henry/mhcc.lviii.xiv.html). This remains Henry's authorial warning; no source-native edition approval is implied.
+
 
 **Full original-English CCEL witness directly inspected:** [CCEL, Revelation 14](https://ccel.org/ccel/henry/mhcc.lviii.xiv.html). Released `MHCC 0.1.1` remains the source of record for native SWORD keys, annotations and independent editorial acceptance.
 
