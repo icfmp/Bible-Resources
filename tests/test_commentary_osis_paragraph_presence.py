@@ -858,5 +858,59 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
         self.assertNotIn("uncovered00",json.dumps(result))
 
 
+    def test_full_original_native_raw_KI_search_recovers_entire_source_gap(self):
+        from commentary_osis_paragraph_presence import (
+            PrivateOriginalNativeWholeCorpusGapSearch)
+        intro=[f"intro{i:02d}" for i in range(8)]
+        first=[f"before{i:02d}" for i in range(8)]
+        absent=[f"uncovered{i:02d}" for i in range(24)]
+        final=[f"after{i:02d}" for i in range(8)]
+        source=intro+first+absent+final
+        index=PrivateOriginalChapterNativeAnchorCoverage(
+            {"Rom.4":source})
+        index.observe("I","Rom.4.0",
+            ("<title>"+" ".join(intro)+"</title>").encode())
+        index.observe("K","Rom.4.1",
+            ("<p>"+" ".join(first)+"</p>").encode())
+        index.observe("K","Rom.4.2",
+            ("<p>"+" ".join(final)+"</p>").encode())
+        fragments=index.private_authentic_uncovered_source_word_fragments()
+        self.assertEqual(len(fragments),1)
+        self.assertEqual(fragments[0][0],"Rom.4")
+        self.assertEqual(fragments[0][1],16)
+        self.assertEqual(fragments[0][2],absent)
+
+        inspector=PrivateOriginalNativeWholeCorpusGapSearch(fragments)
+        full=("<p>Previous other book words "+" ".join(absent)+
+              " future additional words</p>").encode()
+        inspector.observe("K","Gen.2.1",full)
+        inspector.observe("K","Gen.2.2",full)  # genuine repeated native alias
+        inspector.observe("K","Gen.3.1",
+            ("<p>"+" ".join(absent[:12])+"</p>").encode())
+        inspector.observe("I","Gen",b"<title>Book introduction unrelated</title>")
+        inspector.observe("U","",b"\x00")
+        result=inspector.report()
+        self.assertEqual(result["original_source_word_intervals"],1)
+        self.assertEqual(result["distinct_genuine_original_native_K_I_raw_frames_scanned"],
+                         {"K":2,"I":1,"U":1})
+        self.assertEqual(result["original_genuine_native_K_I_unparseable_raw_frames"],
+                         {"K":0,"I":0})
+        case=result["cases"][0]
+        self.assertEqual(case["source_word_offset_not_verse_key"],16)
+        self.assertEqual(case["original_unaccounted_visible_word_tokens"],24)
+        self.assertEqual(case["original_native_raw_bodies_containing_entire_original_gap"],
+                         {"K":1,"I":0})
+        self.assertEqual(case["native_K_found_first_middle_last_12word_anchors"],
+                         ["first","last","middle"])
+        self.assertEqual(case["distinct_original_native_raw_bodies_with_any_12word_anchor"],
+                         {"K":2,"I":0})
+        self.assertEqual(case["native_I_found_first_middle_last_12word_anchors"],[])
+        self.assertEqual(result["original_opaque_TOP_U_slots_not_text_searched"],1)
+        self.assertNotIn("uncovered00",json.dumps(result))
+        self.assertNotIn("Gen.2.1",json.dumps(result))
+        with self.assertRaises(ValueError):
+            PrivateOriginalNativeWholeCorpusGapSearch([])
+
+
 if __name__=="__main__":
     unittest.main()
