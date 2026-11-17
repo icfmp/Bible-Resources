@@ -7,15 +7,19 @@ Bible Resources is an **independent community project**, not an official CrossWi
 ## Principles
 
 1. **SWORD first.** Preserve standard module drivers, versification systems and layout. Never introduce a Bible-only binary format.
-2. **Preserve meaning.** Keep authoritative, immutable original inputs and distinguish faithful corrections from reader-optimized derivatives. Never silently rewrite the text.
+2. **Be faithful to the work, not a distributor's formatting.** The identified author's work, translation, abridgment and edition are our editorial reference; CrossWire, eBible and other providers supply independently preserved digital witnesses, not an untouchable editorial layout. Improve demonstrated markup, sectioning, indexing, references and reader presentation where justified; preserve authorial meaning and edition-specific textual choices, keep original digital inputs immutable, and document every change.
 3. **Rights before release.** Permission to download from CrossWire does *not* imply permission to mirror or modify. Release only after affirmative rights review, recorded evidence and human approval.
 4. **Predictable quality.** Validate metadata, module layout, Unicode, references, transformations and artefact checksums; smoke-test with a real SWORD reader before release.
 5. **Reproducibility.** Build published packages and catalogues from reviewed versioned inputs; record all editorial changes.
 6. **Interoperability.** Publish the standard `mods.d/`, `modules/`, `mods.d.tar.gz`, and `packages/` layout as well as a versioned JSON catalogue.
 
+This applies equally to **Bibles, commentaries, dictionaries, encyclopedias and other resources**. See [editorial authority and transformation rules](docs/EDITORIAL_RULES.md) for the distinction between a work/edition, an immutable upstream witness, and our verified curated digital edition. An exact-source mirror is one possible result, not the project's universal goal.
+
 ## Status
 
-**First published module:** [Louis Segond 1910 — Bible Resources 0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/lsg-0.1.0). Its [source-audited files, rights and editorial record](modules/lsg-1910) are now in `main` with approved status. The [JSON catalogue](https://icfmp.github.io/Bible-Resources/catalog/v1/catalog.json) and standard [SWORD repository](https://icfmp.github.io/Bible-Resources/sword/) are deployed by GitHub Pages; the first module is `BRLSG1910`. The [release note](docs/releases/LSG-0.1.0.md) documents known limitations. A French Matthew Henry translation is **not** licensed for republication merely because a supplied JSON archive advertises CC0.
+**Published and verified resources:** [Louis Segond 1910 `BRLSG1910` 0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/lsg-0.1.0), [Darby `BRJND2024` 0.1.1](https://github.com/icfmp/Bible-Resources/releases/tag/darby-jnd-2024-0.1.1), and [Matthew Henry Concise Commentary `MHCC` 0.1.1](https://github.com/icfmp/Bible-Resources/releases/tag/mhcc-0.1.1). Their [source-reviewed files](modules/) and current catalogue entries are in `main`. The [public JSON catalogue](https://icfmp.github.io/Bible-Resources/catalog/v1/catalog.json) and standard [SWORD repository](https://icfmp.github.io/Bible-Resources/sword/) are deployed and verified through the ordered GitHub Release-before-Pages workflow. Historic release ZIPs remain immutable, including the original `BRMHCC` 0.1.0; the newer `MHCC` SWORD ID may collide with CrossWire's original `MHCC` and does **not** automatically remove an old `BRMHCC` installation.
+
+A French Matthew Henry translation is **not** licensed for republication merely because a supplied JSON archive advertises CC0. Source attribution, rights and approvals remain edition-specific.
 
 ## What lives here?
 
@@ -48,7 +52,7 @@ run, unresolved issues and the **next specific action**. A blocked step
 is never silently skipped; completed work is saved on GitHub before
 moving on. Publication still requires separate rights/editorial approval.
 
-## Seven-stage commentary onboarding (research-only)
+## Seven-stage commentary onboarding (source → publication)
 
 Commentaries have a **separate seven-stage evidence process**, based on the
 Bible workflow but preserving commentary entry/range semantics, quotations,
@@ -57,8 +61,13 @@ original editorial divisions and licence distinctions. See the
 [initial MHCC issue #177](https://github.com/icfmp/Bible-Resources/issues/177).
 The read-only [commentary intake Action](.github/workflows/commentary-intake.yml)
 observes the exact original CrossWire SWORD ZIP and produces metadata-only
-fingerprints. This does **not** constitute textual, editorial or legal approval,
-and nothing is published automatically.
+fingerprints. The [compact reusable tool guide](docs/COMMENTARY_PIPELINE.md)
+maps existing commands and publication checks to the same seven stages; it is
+**not a competing process**. The
+[tool registry](docs/TOOL_REGISTRY.md) documents retained source-bound
+diagnostics, approved reusable interfaces and legacy workflows. Intake does
+**not** constitute textual, editorial or legal approval; only the separately
+approved final release pipeline can publish a resource.
 
 ## Automated, resumable Bible source audits
 

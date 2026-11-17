@@ -42,7 +42,8 @@ def _ordered_manifest_entry(type_: str, name: str, raw: bytes) -> bytes:
     return b"".join(len(p).to_bytes(4, "big") + p for p in parts)
 
 
-def parse_native_raw_corpus(stream, *, on_entry=None) -> tuple[dict, list[str], list[str], list[str]]:
+def parse_native_raw_corpus(stream, *, on_entry=None,
+                            allow_intro_only: bool = False) -> tuple[dict, list[str], list[str], list[str]]:
     """Stream actual unfiltered native raw bytes. Never write those to logs."""
     total = Counter()
     unique = {"K": set(), "I": set(), "U": set()}
@@ -68,7 +69,8 @@ def parse_native_raw_corpus(stream, *, on_entry=None) -> tuple[dict, list[str], 
             actual = tuple(int(x) for x in fields[1:])
             expected = (total["K"] + total["I"] + total["U"],
                         total["K"], total["I"], total["U"])
-            if actual != expected or actual[0] == 0 or actual[1] == 0:
+            if (actual != expected or actual[0] == 0
+                    or (actual[1] == 0 and not allow_intro_only)):
                 raise RawCorpusError("Native raw end-of-scan counts are inconsistent")
             if stream.read(1):
                 raise RawCorpusError("Extra data after terminal raw scan summary")

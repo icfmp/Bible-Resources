@@ -8,7 +8,9 @@ on:
       - 'scripts/sword_native_commentary_index.cpp'
       - 'scripts/commentary_witness.py'
       - 'scripts/pilot_fetch.py'
-      - 'config/commentary-intake/**'
+      # This workflow's independent witness reader only accepts CCEL plaintext,
+      # not the MHC six-volume XML witness; do not invoke MHCC for MHC changes.
+      - 'config/commentary-intake/mhcc-crosswire.json'
       - 'tests/test_commentary_stage_evidence.py'
   workflow_dispatch:
     inputs:

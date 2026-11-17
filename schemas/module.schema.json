@@ -280,12 +280,13 @@
         "mode": {
           "enum": [
             "stock_reader_keys",
-            "published_source_audit"
+            "published_source_audit",
+            "reviewed_compiled_commentary_rebuild"
           ]
         },
         "manifest": {
           "type": "string",
-          "pattern": "^config/[A-Za-z0-9._-]+\\.json$"
+          "pattern": "^config/(?:[A-Za-z0-9._-]+|commentary-rebuilds/[a-z0-9-]+)\\.json$"
         }
       },
       "allOf": [
@@ -293,7 +294,7 @@
           "if": {
             "properties": {
               "mode": {
-                "const": "published_source_audit"
+                "enum": ["published_source_audit", "reviewed_compiled_commentary_rebuild"]
               }
             },
             "required": [

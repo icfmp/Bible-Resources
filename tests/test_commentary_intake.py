@@ -115,6 +115,50 @@ class CommentaryIntakeTests(unittest.TestCase):
         self.assertEqual(short["reader_samples_needing_mapping_review"],
                          ["Gen 1:1", "Ps 23:1"])
 
+    def test_observation_exposes_real_publisher_version_drift_but_stage_two_blocks(self):
+        """The research observation reports drift; a pinned release cannot accept it."""
+        original = self.root / "observed-different-source.zip"
+        with zipfile.ZipFile(original, "w") as archive:
+            archive.writestr("mods.d/examplecom.conf",
+                "[ExampleCom]\nModDrv=zCom\nLang=en\nVersion=9.0\n"
+                "DistributionLicense=Public Domain\nVersification=KJV\n"
+                "SourceType=ThML\nDescription=Invented publisher example\n")
+            archive.writestr("modules/comments/zcom/example/ot.bzz",
+                             b"FAKE PRIVATE TEST CONTENT")
+        reader = self.root / "stub-diatheke"
+        reader.write_text(
+            "#!/usr/bin/env python3\n"
+            "print('commentary example' + 'study note' * 20)\n",
+            encoding="utf-8")
+        reader.chmod(0o700)
+        digest = hashlib.sha256(original.read_bytes()).hexdigest()
+
+        def fake_fetch(url, target, provider):
+            shutil.copyfile(original, target)
+            return {"url": url, "sha256": digest,
+                    "bytes": original.stat().st_size}
+
+        with patch("commentary_intake.fetch", side_effect=fake_fetch):
+            observed = inspect_resource("example-commentary", "observe",
+                                        directory=self.manifests, reader=str(reader))
+        self.assertEqual(observed["status"],
+                         "observed_identity_discrepancy_needs_review")
+        self.assertFalse(observed["observed_identity_matches_manifest"])
+        self.assertEqual(observed["identity_discrepancy"]["observed_version"],
+                         "9.0")
+        self.assertEqual(observed["identity_discrepancy"]["manifest_version"],
+                         "2.0")
+        self.assertNotIn("FAKE PRIVATE TEST CONTENT", json.dumps(observed))
+        self.assertFalse(observed["copyright_and_redistribution_approved"])
+        self.assertFalse(observed["published"])
+        future = copy.deepcopy(self.manifest)
+        future["archive_sha256"] = digest
+        self.write_manifest(future)
+        with patch("commentary_intake.fetch", side_effect=fake_fetch):
+            with self.assertRaisesRegex(PilotError, "differs from reviewed"):
+                inspect_resource("example-commentary", "2",
+                                 directory=self.manifests, reader=str(reader))
+
     def test_changed_archive_blocks_stage_two_without_repinning(self):
         value = copy.deepcopy(self.manifest)
         value["archive_sha256"] = "a" * 64

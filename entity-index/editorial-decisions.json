@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "decisions": [
+    {
+      "source_id": "person:Jashar",
+      "action": "replace_identity",
+      "id": "work:BookOfJashar",
+      "kind": "literary_work",
+      "canonical_id": "work:BookOfJashar",
+      "reason": "Joshua 10:13 and 2 Samuel 1:18 name a literary work, not a historical man; aligned Hebrew adjectives are the title epithet, not the whole phrase.",
+      "evidence": [
+        "Macula WLC JOS 10:13 o060100130142",
+        "Macula WLC 2SA 1:18 o100010180102"
+      ]
+    },
+    {
+      "source_id": "person:Perez-uzzah",
+      "action": "replace_identity",
+      "id": "place:PerezUzzah",
+      "kind": "place",
+      "canonical_id": "place:PerezUzzah",
+      "add_references": [
+        "13013011"
+      ],
+      "add_explicit_instances": {
+        "wlc": [
+          [
+            "o130130110111",
+            "o130130110121"
+          ]
+        ]
+      },
+      "reason": "The named place Perez-uzzah is attested at 2 Samuel 6:8 and 1 Chronicles 13:11, distinct from Uzzah the man.",
+      "evidence": [
+        "Macula WLC 2SA 6:8 o100060080121 o100060080131",
+        "Macula WLC 1CH 13:11 o130130110111 o130130110121"
+      ]
+    },
+    {
+      "source_id": "person:Uzzah",
+      "action": "amend_occurrences",
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o100060080121",
+            "o100060080131"
+          ]
+        ]
+      },
+      "reason": "The compound Perez-uzzah is a place-name; genuine personal-name tokens including o100060080082 remain untouched.",
+      "evidence": [
+        "Macula WLC 2SA 6:8"
+      ]
+    },
+    {
+      "source_id": "person:Hammelech",
+      "action": "quarantine",
+      "reason": "Three aligned terms in Jeremiah 36:26 and 38:6 mean 'the king' (common noun, not a named man); do not infer one historical individual or kinship.",
+      "evidence": [
+        "Macula WLC JER 36:26 o240360260022 o240360260062",
+        "Macula WLC JER 38:6 o240380060102"
+      ]
+    },
+    {
+      "source_id": "person:Philistine",
+      "action": "quarantine",
+      "reason": "Genesis 10:14 and 1 Chronicles 1:12 speak of the plural Philistine people; ACAI incorrectly creates one male Philistine. Historical speech-span attributions are not part of the compact index and remain unchanged in the frozen original.",
+      "evidence": [
+        "Macula WLC GEN 10:14 o010100140081: Ngmpa plural gentilic",
+        "Macula WLC 1CH 1:12 o130010120081: Ngmpa plural gentilic"
+      ]
+    },
+    {
+      "source_id": "group:Philistine",
+      "action": "amend_occurrences",
+      "add_references": [
+        "01010014",
+        "13001012"
+      ],
+      "add_explicit_instances": {
+        "wlc": [
+          [
+            "o010100140081"
+          ],
+          [
+            "o130010120081"
+          ]
+        ]
+      },
+      "reason": "Both source words explicitly name the Philistines as a plural people and belong in the existing canonical group:Philistine index, not under a fictitious person.",
+      "evidence": [
+        "Macula WLC GEN 10:14 o010100140081: Philistines plural",
+        "Macula WLC 1CH 1:12 o130010120081: Philistines plural"
+      ]
+    },
+    {
+      "source_id": "person:Shiloh",
+      "action": "quarantine",
+      "reason": "Genesis 49:10 contains a debated Hebrew form often glossed Shiloh. The pinned WLC annotates it as a proper noun but does not establish a named historical male individual in patriarchal times. Withhold this personal identity rather than forcing one textual/messianic interpretation; preserve the original token and record for later evidence review.",
+      "evidence": [
+        "Macula Hebrew WLC GEN 49:10 word o010490100121: lexical form Shiloh, noun/proper; personhood unsupported by this word annotation",
+        "icfmp/ACAI issue #57: disputed textual and Christological interpretations"
+      ]
+    },
+    {
+      "source_id": "keyterm:Universe",
+      "action": "replace_identity",
+      "id": "keyterm:Universe",
+      "kind": "keyterm",
+      "canonical_id": "keyterm:Universe",
+      "reason": "The source maps this Greek age/eon concept under keyterm:Ability, which is neither a verified semantic identity nor a legitimate automatic alias. Preserve the Universe entity's original token groups and source ID but separate its canonical ID; do not adjudicate the precise sense of each source occurrence.",
+      "evidence": [
+        "ACAI pinned source keyterms/json/Universe.json: primary_id=keyterm:Ability; Greek lemma αἰών",
+        "icfmp/ACAI issue #74: broad editorial primary-ID conflation requiring distinct candidate identities"
+      ]
+    },
+    {
+      "source_id": "keyterm:World",
+      "action": "replace_identity",
+      "id": "keyterm:World",
+      "kind": "keyterm",
+      "canonical_id": "keyterm:World",
+      "reason": "The source maps World under keyterm:Ability, but a world-related concept is not the identical entity as human ability. Preserve every original word group and verse claim; make the canonical identity independent, without assuming lexical sense unambiguity at any word occurrence.",
+      "evidence": [
+        "ACAI pinned source keyterms/json/World.json: primary_id=keyterm:Ability; concept labeled World",
+        "icfmp/ACAI issue #74: inherited keyterm primary-ID conflation"
+      ]
+    }
+  ]
+}

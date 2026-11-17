@@ -13,7 +13,9 @@ from subprocess import CompletedProcess
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from catalogue_release_coverage import coverage, ReleaseCoverageError
-from publish_reviewed_release import verify_historical_release, ReleaseError
+from publish_reviewed_release import (
+    verify_historical_release, approved_release, ReleaseError,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 SHA = sha256(b"approved deterministic module ZIP").hexdigest()
@@ -38,6 +40,7 @@ class PublicationCoverageTests(unittest.TestCase):
         plans.mkdir(parents=True)
         plan={"schema_version":1,"module_id":"sample","sword_id":"BRSAMPLE",
               "tag":"sample-0.1.0","version":"0.1.0",
+              "zip_name":"BRSAMPLE-0.1.0.zip",
               "package_sha256":SHA,
               "package_size_bytes":len(b"approved deterministic module ZIP"),
               "authorization":{"reviewed_by":"Project owner"}}
@@ -77,6 +80,84 @@ class PublicationCoverageTests(unittest.TestCase):
             mpath.write_text(json.dumps(data))
             with self.assertRaisesRegex(ReleaseCoverageError,"Approved modules and catalogue"):
                 coverage(root)
+
+    def test_curated_version_upgrade_replaces_current_plan_without_reusing_old_tag(self):
+        """One current module has one active plan; old tags remain immutable on GitHub."""
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            old, catalogue, _ = self.fixture(root)
+            upgraded = dict(old, version="0.1.1", tag="sample-0.1.1",
+                            zip_name="BRSAMPLE-0.1.1.zip")
+            next_file = root / "config/release-plans/sample-0.1.1.json"
+            next_file.write_text(json.dumps(upgraded))
+            with self.assertRaisesRegex(ReleaseCoverageError, "Duplicate"):
+                coverage(root)
+            (root / "config/release-plans/sample-0.1.0.json").unlink()
+            with self.assertRaisesRegex(ReleaseCoverageError, "planned GitHub Release"):
+                coverage(root)
+            meta_file = root / "modules/sample/metadata.json"
+            meta = json.loads(meta_file.read_text())
+            meta["version"] = "0.1.1"
+            meta_file.write_text(json.dumps(meta))
+            catalogue["modules"][0]["version"] = "0.1.1"
+            (root / "catalog/v1/catalog.json").write_text(json.dumps(catalogue))
+            good = coverage(root)
+            self.assertEqual(good["planned"][0][1]["tag"], "sample-0.1.1")
+            next_file.write_text(json.dumps(dict(upgraded, tag="sample-0.1.0")))
+            with self.assertRaisesRegex(ReleaseCoverageError, "filename must match tag"):
+                coverage(root)
+
+    def test_new_sword_id_requires_new_versioned_filename_and_single_catalogue_row(self):
+        """An ID rename is not permission to republish a BR-prefixed old asset."""
+        with TemporaryDirectory() as temporary:
+            root=Path(temporary)
+            plan,catalogue,_=self.fixture(root)
+            old_plan=root/"config/release-plans/sample-0.1.0.json"
+            old_plan.unlink()
+            plan.update(tag="sample-0.1.1",version="0.1.1",
+                        sword_id="DEMO",zip_name="DEMO-0.1.1.zip")
+            new_plan=root/"config/release-plans/sample-0.1.1.json"
+            new_plan.write_text(json.dumps(plan),encoding="utf-8")
+            meta=root/"modules/sample/metadata.json"
+            md=json.loads(meta.read_text(encoding="utf-8"))
+            md.update(sword_id="DEMO",version="0.1.1")
+            meta.write_text(json.dumps(md),encoding="utf-8")
+            row=catalogue["modules"][0]
+            row.update(sword_id="DEMO",version="0.1.1")
+            row["download"]["url"]=(
+                "https://icfmp.github.io/Bible-Resources/sword/packages/DEMO.zip")
+            (root/"catalog/v1/catalog.json").write_text(json.dumps(catalogue),
+                                                       encoding="utf-8")
+            self.assertEqual(coverage(root)["planned"][0][1]["sword_id"],"DEMO")
+            plan["zip_name"]="BRSAMPLE-0.1.1.zip"
+            new_plan.write_text(json.dumps(plan),encoding="utf-8")
+            with self.assertRaisesRegex(ReleaseCoverageError,
+                                        "planned GitHub Release"):
+                coverage(root)
+
+    def test_public_release_guard_rejects_previous_sword_id_asset_name(self):
+        """Do not wait until an upload to catch a renamed edition's old filename."""
+        with TemporaryDirectory() as temporary:
+            root=Path(temporary)
+            path=root/"release.json"
+            path.write_text(json.dumps({
+                "schema_version":1,"tag":"sample-0.1.1",
+                "module_id":"sample","sword_id":"DEMO","version":"0.1.1",
+                "title":"Invented successor edition",
+                "zip_name":"BRSAMPLE-0.1.1.zip",
+                "package_sha256":SHA,"package_size_bytes":1234,
+                "notes_path":"docs/releases/example.md",
+                "evidence_path":"modules/sample/SOURCE_VALIDATION.json",
+                "editorial_path":"modules/sample/EDITORIAL.md",
+                "authorization":{
+                    "reviewed_by":"PENDING","decision":"Not authorized",
+                    "evidence_url":"https://example.invalid/",
+                    "source_rights":"Not reviewed",
+                },
+            }),encoding="utf-8")
+            with self.assertRaisesRegex(ReleaseError,
+                                        "Versioned release ZIP name"):
+                approved_release(root,path,root)
 
     def test_actual_package_must_match_both_byte_length_and_digest(self):
         with TemporaryDirectory() as temporary:

@@ -15,6 +15,35 @@ WORD = re.compile(r"\w+", flags=re.UNICODE)
 RATIO_BOUNDS = (40, 70, 90, 98)
 
 
+def longest_contiguous_token_run(source: list[str], stock: list[str]) -> int:
+    """Find the exact longest consecutive Unicode-token run, without edits.
+
+    Unlike an ordered LCS, this is a shared *location witness* only. Both
+    source/stock caller-specific bounds and independent edition checks
+    remain the caller's responsibility. This returns a number, never words.
+    """
+    if (not isinstance(source, list) or not isinstance(stock, list)
+            or len(source) > 50_000 or len(stock) > 50_000
+            or any(not isinstance(word, str) or not word
+                   for word in source + stock)):
+        raise ValueError("Invalid/oversized exact token stream")
+    if not source or not stock:
+        return 0
+    low, high = 0, min(len(source), len(stock))
+    while low < high:
+        size = (low + high + 1) // 2
+        source_windows = {
+            tuple(source[i:i + size])
+            for i in range(len(source) - size + 1)
+        }
+        if any(tuple(stock[j:j + size]) in source_windows
+               for j in range(len(stock) - size + 1)):
+            low = size
+        else:
+            high = size - 1
+    return low
+
+
 def _contiguous_offset(needle: list[str], haystack: list[str]) -> int | None:
     """First KMP match offset; bounded O(n + m), including repeated words."""
     if not needle:

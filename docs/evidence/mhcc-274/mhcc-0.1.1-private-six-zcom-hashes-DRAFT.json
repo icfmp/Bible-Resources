@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "status": "private_ci_observation_not_release_or_editorial_authorization",
+  "resource_id": "mhcc-crosswire",
+  "sword_id": "MHCC",
+  "proposed_version": "0.1.1",
+  "evidence_commit": "82741770a88a742f323c0898407ca621b783bc63",
+  "evidence_workflow_url": "https://github.com/icfmp/Bible-Resources/actions/runs/43902040155",
+  "source_original_archive_sha256": "5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d",
+  "source_original_manifest_sha256": "4e05385cc1d3ffd194931409b16d9cccc911d851f56b1de00e028232a367981f",
+  "original_native_corpus_sha256": "8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6",
+  "index_only_control_native_corpus_sha256": "badb234e2c36543d8d5cb536ef8b722c31ccb02944177bc043a14e7b1eb0e045",
+  "corrected_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+  "complete_native_source_audit_sha256": "e51358a9b10185f2a45bbb63a38d6ccf063e8f492905f8519bf4ed9d54aaa7e4",
+  "original_native_counts": {
+    "K": 28718,
+    "I": 1255,
+    "TOP": 2
+  },
+  "corrected_native_counts": {
+    "K": 28742,
+    "I": 1255,
+    "TOP": 2
+  },
+  "added_reviewed_aliases": 24,
+  "original_K_addresses_changed_by_two_exact_source_errata": 12,
+  "corrected_private_xiphos_samples_passed": 4,
+  "compiled_block_type": "CHAPTER",
+  "exact_six_compiled_data_member_sha256": {
+    "modules/comments/zcom/mhcc/nt.czs": "0d7f1347c8a570330d6ef82048281018f30e30a0ce5d40df00f1dafac332f550",
+    "modules/comments/zcom/mhcc/nt.czv": "f39b155c597dad8ad37fae98fc14b94e5c3a44ded6abfd3dc58e4c24b8e3b582",
+    "modules/comments/zcom/mhcc/nt.czz": "ca87b997b510711012180991ab7230549b3a03b588bf58961fe28e9d5b3cca87",
+    "modules/comments/zcom/mhcc/ot.czs": "fd4ae8c4558dfc8e0a5b31e0d0dc48954ad183da40c87f5f63b8321fd7f2e17b",
+    "modules/comments/zcom/mhcc/ot.czv": "1a31afe2a132c5b1988eac15a6dfd07cbd718797db450b69ad4b2637c1d806ce",
+    "modules/comments/zcom/mhcc/ot.czz": "c58f099b763687151ed9725031dce59a68193cc296c8998bfb9431f0b0bfe086"
+  },
+  "original_private_conf_sha256": "41b7747e7b0db3413b9d210269e535a806c29c4f96a4188223ac32c43748b12d",
+  "hypothetical_only_test_revision_day": "2021-02-15",
+  "hypothetical_only_test_conf_sha256": "4be7789bc33d94cb608d46a99a1ea13ee302212a859f5d43b9e2cf72464d755e",
+  "hypothetical_only_test_zip_sha256": "863fecd1aa622dcbac56a1f56524060ae90eec2a4c2c85c8f969f2859b064629",
+  "actual_release_date_selected": false,
+  "actual_final_7_member_payload_committed": false,
+  "publication_authorized": false,
+  "public_release_created": false,
+  "active_catalogue_changed": false,
+  "notes": "The six native data member hashes, audit and native corpus digests were read from the real metadata-only artifact of the successful exact-source, full-native SWORD and Xiphos audit. The test-day .conf and ZIP checksums are not valid for public release and must be recalculated for the separately approved actual publication date. No original source prose or compiled payload is stored in this receipt."
+}

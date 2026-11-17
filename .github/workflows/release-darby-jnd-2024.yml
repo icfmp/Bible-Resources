@@ -2,20 +2,11 @@ name: Verify and release source-attested Darby JND 2024 0.1.0
 
 # PRs only verify in temporary storage. The single reviewed authorization
 # manifest added to main triggers a separate immutable publication.
+# Historical Darby release/staging acceptance workflow (immutable 0.1.0/0.1.1).
+# The current shared pages.yml publisher owns all future approved releases.
+# Retain this workflow's exact source for deliberate manual archive replay;
+# never re-trigger old release logic from unrelated main or PR changes.
 on:
-  pull_request:
-    paths:
-      - ".github/workflows/release-darby-jnd-2024.yml"
-      - "config/darby-release-authorization.json"
-      - "config/darby-0.1.0.conf"
-      - "modules/darby-jnd-2024/**"
-      - "scripts/materialize_attested_ztext_release.py"
-      - "scripts/probe_private_repaired_darby_sword.py"
-  push:
-    branches: [main]
-    paths:
-      - "config/darby-release-authorization.json"
-      - ".github/workflows/release-darby-jnd-2024.yml"
   workflow_dispatch:
 
 permissions:

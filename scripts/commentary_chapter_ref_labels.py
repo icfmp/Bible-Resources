@@ -49,6 +49,8 @@ def link_label_location(source_links: list[dict], raw: bytes) -> dict:
     label_categories = Counter()
     attribute_types = Counter()
     source_targets = []
+    source_label_statuses = []
+    source_literal_labels = []
     stock_targets = [child.get("osisRef", "") for child in references]
     for source_link in source_links:
         label = source_link.get("text")
@@ -82,6 +84,8 @@ def link_label_location(source_links: list[dict], raw: bytes) -> dict:
         else:
             status = "original_label_text_not_located_in_selected_stock_entry"
         label_categories[status] += 1
+        source_label_statuses.append(status)
+        source_literal_labels.append(label)
     if sum(label_categories.values()) != len(source_links):
         raise PilotError("Original source scripture-reference label count incomplete")
     nonempty_source_targets = Counter(t for t in source_targets if t)
@@ -100,7 +104,50 @@ def link_label_location(source_links: list[dict], raw: bytes) -> dict:
     work_qualifier_only_occurrences = sum(
         (source_without_literal_bible_work_prefix & remaining_stock).values()
     )
+    # A multiset match for a destination is not a match for its displayed
+    # source citation text. Two-stage exact, then literal Bible: work-prefix,
+    # pairing guarantees deterministic counts even with duplicated targets.
+    # No source label, target or original XML may leave the temporary runner.
+    remaining_exact_budget = Counter(exact_shared)
+    pending = []
+    for value, status, label in zip(
+            source_targets, source_label_statuses, source_literal_labels):
+        if not value:
+            continue
+        if remaining_exact_budget[value] > 0:
+            remaining_exact_budget[value] -= 1
+        else:
+            pending.append((value,status,label))
+    if any(remaining_exact_budget.values()):
+        raise PilotError("Incomplete exact original source destination pairing")
+    remaining_work_budget = Counter(
+        source_without_literal_bible_work_prefix & remaining_stock
+    )
+    unmatched_label_location = Counter()
+    unique_literal_unlinked_anchors = 0
+    for value,status,label in pending:
+        suffix = value[len("Bible:"):] if value.startswith("Bible:") else ""
+        if suffix and remaining_work_budget[suffix] > 0:
+            remaining_work_budget[suffix] -= 1
+            continue
+        unmatched_label_location[status] += 1
+        if (status ==
+                "literal_label_in_stock_text_outside_confirmed_reference_element"
+                and len(label) >= 5 and all_text.count(label) == 1):
+            unique_literal_unlinked_anchors += 1
+    if (sum(unmatched_label_location.values()) !=
+            sum(nonempty_source_targets.values())
+            - exact_target_occurrences - work_qualifier_only_occurrences):
+        raise PilotError("Unpaired source citation annotation census mismatch")
     return {
+        "unpaired_original_source_target_occurrences":
+            sum(unmatched_label_location.values()),
+        "unpaired_original_source_target_label_location_classes":
+            dict(sorted(unmatched_label_location.items())),
+        "unpaired_unique_literal_unlinked_citation_label_candidate_count":
+            unique_literal_unlinked_anchors,
+        "a_unique_literal_label_does_not_validate_edition_or_scripture_target":True,
+        "all_unpaired_cross_edition_annotations_require_independent_review":True,
         "original_scripRef_label_count": len(source_links),
         "original_scripRef_attribute_name_occurrences": dict(sorted(attribute_types.items())),
         "original_scripRef_to_stock_text_location_classes": dict(sorted(label_categories.items())),

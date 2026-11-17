@@ -1,86 +1,37 @@
-# Matthew Henry Concise Commentary — Bible Resources 0.1.0
+# MHCC 0.1.1 — source, rights, editorial disposition and reader migration
 
-**Curated source:** the exact existing CrossWire `MHCC` 2.0 compiled SWORD
-`zCom` module (2021-02-14), **not** the complete `MHC` and **not**
-a rebuilt or harmonized CCEL transcription.
+**Publication reviewed and conditionally authorized by the project owner on 2026-11-16, after independent final checks.** This document is the edited edition's acceptance record, not a claim of exact upstream-stock byte identity.
 
-## Reviewed editorial and rights decision — 2026-11-14
+**Resource:** `mhcc-crosswire`, proposed released SWORD ID `MHCC`, curated edition `0.1.1`.
 
-The project owner directed publication preparation of this exact-source
-commentary and selected the most permissive lawful distribution available
-for the project's own original contributions. The exact CrossWire witness
-explicitly declares `DistributionLicense=Public Domain` and
-"Copy Freely" on the [official module record](
-https://crosswire.org/sword/modules/ModInfo.jsp?modName=MHCC).
-This source-specific declaration is retained unchanged; Bible Resources
-does **not** claim to relicense CrossWire's stock payload under CC0.
-The public-domain claim is positive CrossWire source evidence, not
-independent reconstruction of every correction in the digital edition.
+**Reviewed scope:** the exact historical CrossWire `MHCC` version `2.0` module (2021-02-14), original archive SHA-256 `5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d`, plus *only* the two demonstrated source errata and the 24 navigation aliases that point at 17 existing unchanged sections. This is not a new Modern English adaptation, not the complete Matthew Henry commentary, and not a separate CCEL edition.
 
-The source metadata attributes the text to a Moody Press 28th printing
-(ISBN 0-8024-5190-X), via a previously digitized version with about
-1,200 editorial corrections. This project **does not guarantee**
-word-for-word historical print equivalence. The independently downloaded
-CCEL XML differs in some original annotation and wording, and is **not
-copied into this release**; these differences are not corrected by guessing.
+## Source and rights review (2026-11-16)
 
-## Reproducible exact-stock transformation
+1. [CrossWire's official module record](https://crosswire.org/sword/modules/ModInfo.jsp?modName=MHCC) identifies Matthew Henry's Concise Commentary and explicitly gives **Distribution License: Public Domain**, with the provider's accompanying **Copy Freely** description. This module is the exact source actually fetched and pinned by SHA-256 for the rebuild. Public-domain status is an upstream declaration, not a separate copyright assignment or a claim that the Bible Resources project owns historical prose.
+2. The commentary's historic author lived centuries ago. The source-specific CrossWire distribution declaration supports redistribution and editing of that attested digital text, subject to retaining truthful provenance and the original rights information. The edited release retains the `DistributionLicense=Public Domain` header; no CC0 claim is made for inherited source material.
+3. [CCEL's copyright policy](https://www.ccel.org/about/copyright.html) describes separate restrictions or permissions for CCEL editions, special contents and republication. Its digitization was used solely for comparison, not as replacement prose, formatting, licensing or a source for undocumented editorial changes. No derivative rights over CCEL-specific contents are asserted.
+4. The statement that the text matches a Moody Press 28th printing, and the roughly 1,200 earlier digital corrections, come from CrossWire's own historical module description. The edition preserves those statements as attributed upstream assertions; it does not certify correspondence with any physical printed copy.
 
-- Original archived CrossWire `MHCC.zip` SHA-256:
-  `5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d`.
-- Original upstream `mhcc.conf` SHA-256:
-  `2762a04757ec3ee14bcf5d442fedcd47d2b938d573de4e9100a31aa073bc5863`.
-- Independent full 29,975-key native SWORD raw-corpus SHA-256:
-  `8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6`.
-- Final SWORD module ID: `BRMHCC`, preserving the original `zCom`
-  driver, KJV versification, all 6 compressed data files **byte-for-byte**,
-  all original 29,975 occupied native entries and exact source XML markup.
-- **Only** the curated SWORD header (`MHCC` → `BRMHCC`),
-  matching `DataPath`, and distribution `Version=0.1.0` (replacing
-  upstream `2.0`) differ from the original `.conf`. The CrossWire
-  provenance, licence, citation data, original edition description,
-  and compiled text are preserved.
-- Final archive/Pages catalogue SHA-256 must be independently verified
-  after staging and deployment; an earlier preflight-only `BRMHCC`
-  archive using upstream `Version=2.0` has a different SHA and is
-  **not** the final curated `0.1.0` package.
+## The exact reviewed edits
 
-## Technical verification and limited reader acceptance
+- **17 source-attested original sections, 24 new navigation addresses** linking to those same native section bodies. No redrawing of section boundaries or paragraph/poetry layout.
+- **Ezekiel 3:** `3:12–2` → `3:12–21`, both visible citation and OSIS reference, on one original content body shared by 11 pre-existing verse addresses. The original can be reconstructed byte-for-byte from the reviewed erratum.
+- **1 Chronicles 7:** `Zebulun or Dn` → `Zebulun or Dan`, limited to one original source entry, also reversible.
+- All other original numbered commentary, introduction and TOP content remains native SWORD source-identical. No publication of the 25 unresolved CCEL/CrossWire cross-edition annotation differences; these are distinct editorial decisions.
 
-- Real SHA-attested full private candidate `BRMHCC` and CrossWire
-  stock identity: [PR #261](https://github.com/icfmp/Bible-Resources/pull/261).
-- Full native XML inventory: all **29,973** K/I original fragments
-  strict-parsed, 2 opaque TOP records, all **10,557** source references
-  have an `osisRef` and a visible label, and all **15,985** source
-  titles have content: [#258](https://github.com/icfmp/Bible-Resources/pull/258),
-  [#260](https://github.com/icfmp/Bible-Resources/pull/260).
-- Actual Xiphos **4.2.1** reader + independently verified Bible:
-  **5/5** selected original commentary passages read back correctly,
-  and **2/2** original source reference labels and href destinations
-  preserved in the real GUI: [#224](https://github.com/icfmp/Bible-Resources/pull/224).
-- The project owner explicitly accepted this **representative reader
-  smoke-test scope** for publication preparation on 2026-11-14:
-  [#257](https://github.com/icfmp/Bible-Resources/issues/257).
-  Actual mouse-link navigation, exact heading typography in every
-  reader and modern Android/other-Xiphos-version GUI output remain
-  **NOT VERIFIED**. Those are **not** assertions of a stock source defect.
+**Independent full-source technical receipt:** original 28,718 numbered K plus 1,255 introduction I and two TOP; corrected 28,742 numbered K, same I/TOP; original raw corpus SHA-256 `8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6`; corrected source corpus SHA-256 `2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e`; complete source proof SHA-256 `e51358a9b10185f2a45bbb63a38d6ccf063e8f492905f8519bf4ed9d54aaa7e4`. Four of four real Xiphos selected-passage tests passed. Every final release binary and date-dependent configuration must be rehashed against this record.
 
-## Installation and corrections
+## Reader identity and editorial presentation
 
-The package is intended for normal SWORD readers as a regular
-`mods.d/brmhcc.conf` plus `modules/comments/zcom/brmhcc/`.
-The final immutable release ZIP checksum will be recorded after
-generation. The HTTPS catalogue uses the curated `BRMHCC` ID;
-the original CrossWire module remains independently available.
+The project owner explicitly requested changing the **released SWORD identifier from `BRMHCC` to `MHCC`**. This collides by design with the original CrossWire ID. An installed CrossWire `MHCC` must be deliberately replaced; an old Bible Resources `BRMHCC` may remain installed and must be managed separately. No implicit uninstall, provider supersession or preference migration is claimed. Release notes document the difference. The earlier public `mhcc-0.1.0` release remains unmodified, including its original SHA-256.
 
-Report genuine source discrepancies with the original location and
-the exact upstream/curated module version. Reader rendering defects
-should not cause unreviewed edits to authorial words, punctuation,
-headings, notes or scripture targets.
+**Version-specific reader description:** the 0.1.0 profile's old approval was for a different module ID and text scope; it must not be reused. Publication without an optional reader profile is supported; a separate reviewed English profile can be added later if explicitly approved. The SWORD `About` metadata is independently attributed and must include a revision date matching the actual versioned release.
 
-## Status
+## Owner authorization, boundaries, and remaining conditions
 
-The final module source is approved for this exact **compiled-stock,
-no-authorial-text-change** route. This document is not by itself proof
-that a public ZIP is deployed; public URLs/asset SHA and catalogue
-delivery require a successful independent deployment verification.
+On 2026-11-16, the project owner explicitly authorized integrating the verified seven-file corrected candidate into [draft PR #275](https://github.com/icfmp/Bible-Resources/pull/275) and releasing MHCC 0.1.1 **after** final editorial, legal and technical checks (recorded in [issue #276](https://github.com/icfmp/Bible-Resources/issues/276#issuecomment-6923257588)). This authorization covers the bounded edition and version migration described above, not unrelated source changes and not a waiver of the independent final tests. It is not a personal legal opinion or a new licence issued by the owner.
+
+**Release acceptance criteria:** exact seven files matching the reviewed corrected source; final SWORD `Version=0.1.1`, `SwordVersionDate` equal to the genuine publication date, original descriptive text attributed; one current `MHCC` catalogue entry, one corresponding immutable versioned GitHub Release and source-proof-bound plan; unchanged old 0.1.0 release and verified rollback; regenerated and checked public deterministic ZIP SHA-256; one successful build/validate/reader audit on the actual final commit; no false equivalence to the original upstream binary or CCEL digitization.
+
+This is a transparent provenance and bounded-edition review record. The final release is not declared live by the existence of this document; the actual GitHub Release, package and catalogue endpoints must be checked separately after the publication workflow runs.

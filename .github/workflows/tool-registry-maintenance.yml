@@ -1,0 +1,30 @@
+name: Tool registry consistency
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/**'
+      - 'tests/**'
+      - 'docs/**'
+      - '.github/workflows/**'
+      - 'CONTRIBUTING.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify_source_bound_inventory:
+    name: Check full tracked script registry without modifying the repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Refuse stale or missing tool registry (no writes)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/tool_registry.py --check

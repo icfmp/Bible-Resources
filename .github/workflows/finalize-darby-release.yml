@@ -2,10 +2,11 @@ name: Finalize approved Darby SWORD release and deploy catalogue
 
 # This runs ONLY after the source-attested binary+catalogue have entered
 # protected main through a separately validated pull request.
+# Historical Darby release/staging acceptance workflow (immutable 0.1.0/0.1.1).
+# The current shared pages.yml publisher owns all future approved releases.
+# Retain this workflow's exact source for deliberate manual archive replay;
+# never re-trigger old release logic from unrelated main or PR changes.
 on:
-  push:
-    branches: [main]
-    paths: ["modules/darby-jnd-2024/RELEASE_PROVENANCE.json"]
   workflow_dispatch:
 
 permissions:

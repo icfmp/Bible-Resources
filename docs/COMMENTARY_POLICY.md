@@ -54,6 +54,43 @@ A line in the source might fail with:
 - Preserve attribution, rights statements, the full original textual content
   and the exact editorial record.
 
+## Correct errors without redesigning a source edition
+
+For a correction edition of an existing commentary, **retain the transmitted editorial sectioning and paragraph arrangement**; do not introduce new stylistic breaks, reorganize arguments or merge independent units merely for smoother reading. Long exposition alone is not an error. Readability-led re-paragraphing belongs in a **separately identified modern-language adaptation**, with its own editorial review.
+
+This does **not** make CrossWire, a compiler or even the historical printed edition infallible. **Demonstrable mistakes** in wording, citations, section mapping or markup may be corrected at their actual origin, including defects inherited from a printed edition. Any such change must be specifically supported by evidence, identified as an editorial correction, and reproducible and reversible; never use a general stylistic normalization to conceal it. If an original boundary is *proven corrupt* rather than merely inconvenient, review that specific repair separately.
+
+## Reader-oriented navigation is not source-text alteration
+
+An upstream SWORD author's section can be indexed at only its first verse,
+even when its actual, independently reviewed editorial scope is a whole
+passage or chapter. Source-byte fidelity is **not** a requirement to perpetuate
+an inferior index/navigation choice in a separately tracked Bible Resources
+correction edition. We prefer discoverability at **every verse actually covered**
+while preserving the **one authorial unit** (and displaying it once, not once per
+verse). This is a navigational/editorial improvement, not proof that the author
+composed distinct comments on each verse.
+
+- For verified chapter-level commentary, keep the label and semantics
+  **chapter commentary** and make it discoverable from any verse of that chapter.
+- Use **standard OSIS commentary** annotated continuous/discontinuous ranges
+  and native SWORD linked verse keys; do not invent a proprietary format.
+- Preserve discontinuous sets and all separate commentary sections, and refuse
+  to overwrite already occupied, different-payload original keys.
+- If the original scope is ambiguous, **do not** infer it from the presence of
+  only the chapter's first native key or from a citation `scripRef` alone.
+- All alias proposals require reviewed section bounds, independent actual
+  versification keys, immutable raw text hashes, an explicit delta, real
+  reader deduplication verification and a reversible rollback receipt.
+- Keep the exact upstream source and original release untouched; publish any
+  corrected edition only after normal rights, editorial and owner publication
+  gates.
+
+Generic read-only proposal logic is in
+`scripts/commentary_navigation_link_plan.py`; the initial use case,
+limitations, and the owner's approval of this **direction only** are documented
+in `docs/evidence/mhcc-274/reader-oriented-indexing-decision.md`.
+
 ## Current gate
 
 The **read-only** command \`scripts/guard_commentary.py\` first uses the

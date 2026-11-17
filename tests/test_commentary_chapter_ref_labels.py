@@ -119,6 +119,54 @@ class OriginalScriptureReferenceLabelTests(unittest.TestCase):
             out["original_scripRef_osisRef_targets_exact_value_multiset_matches_in_stock"],2)
         self.assertFalse(out["source_and_selected_stock_reference_targets_exact_ordered_match"])
 
+    def test_unpaired_citation_targets_have_source_label_location_counts_without_leaking_prose(self):
+        x=link_label_location([
+            {"text":"Genesis 1:1","attribute_name_types":["osisRef"],
+             "private_original_osisRef_target":"Bible:Gen.1.1"},
+            {"text":"Exodus 2:3","attribute_name_types":["osisRef"],
+             "private_original_osisRef_target":"Bible:Exod.2.3"},
+            {"text":"John 4:5","attribute_name_types":["osisRef"],
+             "private_original_osisRef_target":"Bible:John.4.5"},
+            {"text":"Mark 7:8","attribute_name_types":["osisRef"],
+             "private_original_osisRef_target":"Bible:Mark.7.8"}
+        ],(b'<p><reference osisRef="Gen.1.1">Genesis 1:1</reference> '
+           b'Exodus 2:3 and John 4:5 appear as plain labels; '
+           b'John 4:5 appears a second time. '
+           b'<reference osisRef="Mark.7.7">Mark 7:8</reference></p>'))
+        self.assertEqual(x["unpaired_original_source_target_occurrences"],3)
+        self.assertEqual(x["unpaired_original_source_target_label_location_classes"],{
+            "literal_label_in_stock_text_outside_confirmed_reference_element":2,
+            "literal_label_inside_stock_reference_element":1
+        })
+        self.assertEqual(
+            x["unpaired_unique_literal_unlinked_citation_label_candidate_count"],1
+        )
+        self.assertTrue(x[
+            "all_unpaired_cross_edition_annotations_require_independent_review"
+        ])
+        self.assertNotIn("Exodus",json.dumps(x))
+        self.assertNotIn("John",json.dumps(x))
+
+    def test_mixed_exact_and_literal_work_prefix_pairing_consumes_each_stock_target_once(self):
+        x=link_label_location([
+            {"text":"first","attribute_name_types":[],
+             "private_original_osisRef_target":"Gen.1.1"},
+            {"text":"second","attribute_name_types":[],
+             "private_original_osisRef_target":"Bible:Gen.1.1"},
+            {"text":"third","attribute_name_types":[],
+             "private_original_osisRef_target":"Bible:Gen.1.1"}
+        ], b'<reference osisRef="Gen.1.1">first</reference>'
+        )
+        self.assertEqual(x["unpaired_original_source_target_occurrences"],2)
+        self.assertEqual(
+            x["original_scripRef_osisRef_targets_exact_value_multiset_matches_in_stock"],1
+        )
+        self.assertEqual(x[
+            "original_scripRef_osisRef_work_qualifier_only_matches_in_stock"],0)
+        self.assertEqual(
+            x["unpaired_unique_literal_unlinked_citation_label_candidate_count"],0
+        )
+
     def test_original_markup_recovery_or_unsafe_attribute_name_fails_closed(self):
         with self.assertRaises(PilotError):
             link_label_location([{"text":"Gen 1","attribute_name_types":[]}],

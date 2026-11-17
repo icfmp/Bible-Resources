@@ -7,6 +7,7 @@ proof of source attribution, edition identity, punctuation or preserved XML.
 """
 from __future__ import annotations
 
+from commentary_text_delta import longest_contiguous_token_run
 from pilot_preflight import PilotError
 
 MAX_WORDS_PER_SIDE = 4000
@@ -16,8 +17,9 @@ MAX_CELLS = 2_000_000
 def plain_word_alignment(source: list[str], stock: list[str]) -> dict:
     """Compute exact Unicode ordered LCS and maximal contiguous word run.
 
-    Two rows of dynamic programming are used for each metric (O(stock words)
-    memory), with a reviewed cell cap; no original word is copied to output.
+    The LCS retains its bounded two-row dynamic-programming witness;
+    the exact contiguous run uses the independently shared, strict-token
+    primitive. Neither output exposes original words or proves fidelity.
     """
     if (not isinstance(source, list) or not isinstance(stock, list)
             or not all(isinstance(w, str) and w for w in source)
@@ -49,21 +51,16 @@ def plain_word_alignment(source: list[str], stock: list[str]) -> dict:
            and source[n - 1 - common_suffix] == stock[m - 1 - common_suffix]):
         common_suffix += 1
     prev_lcs = [0] * (m + 1)
-    prev_run = [0] * (m + 1)
-    longest_run = 0
     for word in source:
         lcs = [0] * (m + 1)
-        run = [0] * (m + 1)
         for j, compiled_word in enumerate(stock, start=1):
             if word == compiled_word:
                 lcs[j] = prev_lcs[j-1] + 1
-                run[j] = prev_run[j-1] + 1
-                if run[j] > longest_run:
-                    longest_run = run[j]
             else:
                 lcs[j] = lcs[j-1] if lcs[j-1] >= prev_lcs[j] else prev_lcs[j]
-        prev_lcs, prev_run = lcs, run
+        prev_lcs = lcs
     common_ordered = prev_lcs[m]
+    longest_run = longest_contiguous_token_run(source, stock)
     if common_ordered > min(n, m) or longest_run > common_ordered:
         raise PilotError("Original/compiled Unicode word alignment accounting invalid")
     source_unmatched, stock_unmatched = n - common_ordered, m - common_ordered

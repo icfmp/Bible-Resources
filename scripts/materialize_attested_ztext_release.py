@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Materialize an already source-audited, owner-approved zText release.
+"""Historical Darby 0.1.0 zText release adapter, retained for replay.
 
-Generic SWORD zText promotion and independent stock-reader index proof.
-The source compiler and full-corpus structural/text/note review run upstream;
-this script consumes their *actual* receipt and exact temporary preview ZIP.
-Never modify official original OSIS, infer approval from passing tests or
-overwrite an approved release. Do not call this from research-only workflows.
+This one-time adapter embeds the original Darby-specific approved source,
+SWORD identity, rights decisions and release SHA; it is NOT a generic
+versioned-publisher. The reusable SWORD promotion and current release checks
+live in promote_sword_preview.py, release_preflight.py and pages.yml.
+Retain the historical reader and source-to-native proofs unchanged.
+Never modify original OSIS, republish the historical release or infer new
+editorial approval from this obsolete, pinned workflow.
 """
 from __future__ import annotations
 

@@ -1,58 +1,8 @@
 name: Compare exact original commentary text to stock SWORD privately
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/commentary-private-text-compare.yml'
-      - 'scripts/commentary_private_text_compare.py'
-      - 'scripts/commentary_chapter_neighbors.py'
-      - 'scripts/commentary_chapter_cross_slot.py'
-      - 'scripts/commentary_chapter_paragraph_overlap.py'
-      - 'scripts/commentary_chapter_p_boundaries.py'
-      - 'scripts/commentary_chapter_ref_labels.py'
-      - 'tests/test_commentary_chapter_ref_labels.py'
-      - 'tests/test_commentary_chapter_p_boundaries.py'
-      - 'tests/test_commentary_chapter_paragraph_overlap.py'
-      - 'tests/test_commentary_chapter_cross_slot.py'
-      - 'tests/test_commentary_chapter_neighbors.py'
-      - 'tests/test_commentary_private_text_compare.py'
-      - 'scripts/commentary_text_delta.py'
-      - 'tests/test_commentary_text_delta.py'
-      - 'scripts/commentary_unresolved_lexical_triage.py'
-      - 'scripts/commentary_source_identity_lexical_gate.py'
-      - 'tests/test_commentary_source_identity_lexical_gate.py'
-      - 'scripts/commentary_original_bookcode_repair.py'
-      - 'scripts/commentary_bookcode_repair_receipt_guard.py'
-      - 'tests/test_commentary_bookcode_repair_receipt_guard.py'
-      - 'tests/test_commentary_original_bookcode_repair.py'
-      - 'scripts/commentary_near_prose_unicode_review.py'
-      - 'tests/test_commentary_near_prose_unicode_review.py'
-      - 'scripts/commentary_nonlink_words.py'
-      - 'scripts/commentary_nonlink_word_alignment.py'
-      - 'scripts/commentary_prose_cross_slot.py'
-      - 'scripts/commentary_source_native_boundaries.py'
-      - 'scripts/commentary_shared_raw_source_units.py'
-      - 'scripts/commentary_original_div1_book_consistency.py'
-      - 'scripts/commentary_source_english_osis_alias.py'
-      - 'tests/test_commentary_source_english_osis_alias.py'
-      - 'config/standard_usfm_osis_66.json'
-      - 'config/diatheke-usfm-book-aliases.json'
-      - 'tests/test_commentary_original_div1_book_consistency.py'
-      - 'tests/test_commentary_shared_raw_source_units.py'
-      - 'tests/test_commentary_source_native_boundaries.py'
-      - 'tests/test_commentary_prose_cross_slot.py'
-      - 'tests/test_commentary_nonlink_word_alignment.py'
-      - 'tests/test_commentary_nonlink_words.py'
-      - 'scripts/commentary_reference_cross_slot.py'
-      - 'tests/test_commentary_reference_cross_slot.py'
-      - 'tests/test_commentary_unresolved_lexical_triage.py'
-      - 'scripts/commentary_stock_prefix_topology.py'
-      - 'tests/test_commentary_stock_prefix_topology.py'
-      - 'tests/test_commentary_prefixed_suffix.py'
-      - 'tests/test_commentary_stock_source_context.py'
-      - 'scripts/commentary_native_raw_inventory.py'
-      - 'scripts/sword_native_commentary_raw_corpus.cpp'
-      - 'scripts/commentary_xml_witness.py'
-      - 'config/commentary-intake/**'
+  # Historic MHCC-only research: after publication of corrected 0.1.1,
+  # do not repeat a 0.1.0→0.1.1 candidate test on unrelated PRs.
+  # Preserve the exact original workflow for explicit source-pinned replay.
   workflow_dispatch:
     inputs:
       resource_id:
@@ -1988,14 +1938,35 @@ jobs:
                     "source_and_stock_targets_only_literal_bible_work_qualifier_ordered_match",
                     "nonmatching_target_values_are_not_auto_normalized_or_rewritten",
                     "matched_label_does_not_validate_reference_target_or_edition",
-                    "original_words_and_stock_XML_never_reported"
+                    "original_words_and_stock_XML_never_reported",
+                    "unpaired_original_source_target_occurrences",
+                    "unpaired_original_source_target_label_location_classes",
+                    "unpaired_unique_literal_unlinked_citation_label_candidate_count",
+                    "a_unique_literal_label_does_not_validate_edition_or_scripture_target",
+                    "all_unpaired_cross_edition_annotations_require_independent_review"
                   } or
                   not all(type(links[k]) is int and links[k] >= 0 for k in (
                     "original_scripRef_label_count","selected_stock_reference_element_count",
                     "selected_stock_reference_elements_with_osisRef_attribute",
                     "original_scripRef_with_nonempty_osisRef_target_count",
                     "original_scripRef_osisRef_targets_exact_value_multiset_matches_in_stock",
-                    "original_scripRef_osisRef_work_qualifier_only_matches_in_stock")) or
+                    "original_scripRef_osisRef_work_qualifier_only_matches_in_stock",
+                    "unpaired_original_source_target_occurrences",
+                    "unpaired_unique_literal_unlinked_citation_label_candidate_count")) or
+                  not isinstance(links["unpaired_original_source_target_label_location_classes"],dict) or
+                  not all(name in allowed_link_classes and type(n) is int and n >= 0
+                          for name,n in links["unpaired_original_source_target_label_location_classes"].items()) or
+                  sum(links["unpaired_original_source_target_label_location_classes"].values()) !=
+                    links["unpaired_original_source_target_occurrences"] or
+                  links["unpaired_original_source_target_occurrences"] !=
+                    (links["original_scripRef_with_nonempty_osisRef_target_count"] -
+                     links["original_scripRef_osisRef_targets_exact_value_multiset_matches_in_stock"] -
+                     links["original_scripRef_osisRef_work_qualifier_only_matches_in_stock"]) or
+                  links["unpaired_unique_literal_unlinked_citation_label_candidate_count"] >
+                    links["unpaired_original_source_target_label_location_classes"].get(
+                      "literal_label_in_stock_text_outside_confirmed_reference_element",0) or
+                  links["a_unique_literal_label_does_not_validate_edition_or_scripture_target"] is not True or
+                  links["all_unpaired_cross_edition_annotations_require_independent_review"] is not True or
                   sum(links["original_scripRef_to_stock_text_location_classes"].values()) !=
                     links["original_scripRef_label_count"] or
                   not all(name in allowed_link_classes and type(n) is int and n >= 0

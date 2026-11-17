@@ -146,6 +146,7 @@ def coverage(root: Path = ROOT, *, built: Path | None = None) -> dict:
                 plan.get("module_id")!=key or
                 plan.get("sword_id")!=m["sword_id"] or
                 plan.get("version")!=m["version"] or
+                plan.get("zip_name")!=m["sword_id"]+"-"+m["version"]+".zip" or
                 plan.get("package_sha256")!=download["sha256"] or
                 plan.get("package_size_bytes")!=download["size_bytes"] or
                 not isinstance(plan.get("authorization"),dict) or

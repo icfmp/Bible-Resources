@@ -1,0 +1,1304 @@
+name: Audit original commentary editorial section scopes
+
+on:
+  # Historic MHCC-only research: after publication of corrected 0.1.1,
+  # do not repeat a 0.1.0→0.1.1 candidate test on unrelated PRs.
+  # Preserve the exact original workflow for explicit source-pinned replay.
+  workflow_dispatch:
+    inputs:
+      resource_id:
+        description: "Pinned original commentary manifest ID"
+        required: true
+        default: mhcc-crosswire
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      RESOURCE_ID: ${{ github.event.inputs.resource_id || 'mhcc-crosswire' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test read-only generic section-scope classifier
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          python -m unittest discover -s tests -p 'test_commentary_section_scope_audit.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_editorial_topology.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_layout_census.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_paragraph_witness_probe.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_reference_registry_triage.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_literal_erratum_preflight.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_source_erratum_compiled_probe.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_public_metadata_preflight.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_navigation_link_plan.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_chapter_ref_labels.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_osis_rebuild_preflight.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_intro_chapter_text_review.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_osis_transport_probe.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_osis_intro_transport_probe.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_osis_mixed_transport_probe.py' -v
+      - name: Install stable upstream native SWORD library
+        run: |
+          set -euo pipefail
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev libsword-utils
+      - name: Install one independent Xiphos reader for the bounded private alias preview
+        run: |
+          set -euo pipefail
+          timeout 180s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y \
+            xiphos xvfb xdotool xclip dbus-x11 diatheke
+      - name: Compile independent stock index and private raw-entry readers
+        run: |
+          set -euo pipefail
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_index.cpp \
+            -o "${RUNNER_TEMP}/stock-index" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "${RUNNER_TEMP}/stock-raw" -lsword
+      - name: Prove standards-based continuous and disjoint commentary links on synthetic OSIS
+        run: |
+          set -euo pipefail
+          command -v osis2mod
+          ROOT="${RUNNER_TEMP}/synthetic-commentary"
+          mkdir -p "$ROOT/mods.d" "$ROOT/modules/comments/zcom/LinkProof"
+          timeout 45s osis2mod "$ROOT/modules/comments/zcom/LinkProof" \
+            tests/fixtures/synthetic-linked-commentary.osis.xml \
+            -z z -b 3 -v KJV > "$ROOT/osis2mod.log" 2>&1
+          if grep -Eq 'FATAL\\(|ERROR\\(' "$ROOT/osis2mod.log"; then
+            echo "Synthetic OSIS importer reported an error"
+            exit 1
+          fi
+          cat > "$ROOT/mods.d/LinkProof.conf" <<'CONF'
+          [LinkProof]
+          DataPath=./modules/comments/zcom/LinkProof
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          SourceType=OSIS
+          Versification=KJV
+          Lang=en
+          Description=Synthetic audit fixture only
+          CONF
+          SWORD_PATH="$ROOT" timeout 60s "${RUNNER_TEMP}/stock-raw" LinkProof > "$ROOT/native.raw"
+          PYTHONPATH=scripts python - "$ROOT/native.raw" <<'PY'
+          import sys
+          from pathlib import Path
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          raw = {}
+          def entry(kind, key, payload):
+              if kind == "K":
+                  raw[key] = payload
+          with Path(sys.argv[1]).open("rb") as f:
+              _, keys, _, _ = parse_native_raw_corpus(f, on_entry=entry)
+          expected = {f"Gen.1.{v}" for v in (1, 2, 3, 4, 5, 7, 8)}
+          assert expected <= set(keys), "Missing a real linked synthetic commentary verse"
+          assert "Gen.1.6" not in keys, "Disjoint range incorrectly linked its gap"
+          assert raw["Gen.1.1"] == raw["Gen.1.2"], "Connected range lost its linked body"
+          assert len({raw[f"Gen.1.{v}"] for v in (4, 5, 7, 8)}) == 1, (
+              "Disjoint annotation does not read back a single original commentary"
+          )
+          assert raw["Gen.1.3"] != raw["Gen.1.4"], "Independent commentary was overwritten"
+          print("Synthetic SWORD linked-commentary readback PASSED:",
+                len(expected), "occupied target verses; independent gap preserved")
+          PY
+      - name: Probe original SWORD book and chapter introduction index mapping using invented OSIS
+        run: |
+          set -euo pipefail
+          ROOT="${RUNNER_TEMP}/synthetic-introductions"
+          mkdir -p "$ROOT/mods.d" "$ROOT/modules/comments/zcom/IntroProof"
+          timeout 45s osis2mod "$ROOT/modules/comments/zcom/IntroProof" \
+            tests/fixtures/synthetic-commentary-introductions.osis.xml \
+            -z z -b 3 -v KJV > "$ROOT/osis2mod.log" 2>&1
+          cat > "$ROOT/mods.d/IntroProof.conf" <<'CONF'
+          [IntroProof]
+          DataPath=./modules/comments/zcom/IntroProof
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          SourceType=OSIS
+          Versification=KJV
+          Lang=en
+          Description=Invented original-source introduction index diagnostic only
+          CONF
+          SWORD_PATH="$ROOT" timeout 60s "${RUNNER_TEMP}/stock-raw" IntroProof > "$ROOT/native.raw"
+          PYTHONPATH=scripts python - "$ROOT/native.raw" <<'PY'
+          from collections import Counter
+          import sys
+          from pathlib import Path
+          from lxml import etree
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          intro={}
+          top={}
+          K={}
+          def collect(kind, ref, raw):
+              if kind=="I":
+                  intro[ref]=raw
+              elif kind=="U":
+                  top[ref]=raw
+              else:
+                  K[ref]=raw
+          with Path(sys.argv[1]).open("rb") as stream:
+              report, numbered, intros, opaque=parse_native_raw_corpus(stream,on_entry=collect)
+          print("Invented book+chapter intro OSIS native keys",
+                "K",len(numbered),"I",len(intros),"U",len(opaque),
+                "I-refs",",".join(intros),"U-refs",",".join(opaque))
+          for ref,raw in intro.items():
+              root=etree.fromstring(b"<r>"+raw+b"</r>")
+              print("Invented SWORD intro slot",ref,
+                    "raw-bytes",len(raw),
+                    "nonblank-text",bool("".join(root.itertext()).strip()),
+                    "child-tags",','.join(x.tag.rsplit('}',1)[-1] for x in root))
+          for ref,raw in top.items():
+              root=etree.fromstring(b"<r>"+raw+b"</r>")
+              print("Invented SWORD opaque top slot",ref,
+                    "raw-bytes",len(raw),
+                    "nonblank-text",bool("".join(root.itertext()).strip()),
+                    "child-tags",','.join(x.tag.rsplit('}',1)[-1] for x in root))
+          assert {"Gen.1.1","Gen.1.2","Gen.2.1"} <= set(K)
+          assert "Gen.1.3" not in K
+          print("Invented introduction mapping exploration complete; no original module modified.")
+          PY
+      - name: Prove isolated native zCom alias links preserve all existing raw entries
+        run: |
+          set -euo pipefail
+          ROOT="${RUNNER_TEMP}/synthetic-commentary"
+          CLONE="${RUNNER_TEMP}/synthetic-commentary-alias"
+          cp -a "$ROOT" "$CLONE"
+          DATA="$CLONE/modules/comments/zcom/LinkProof"
+          # zCom uses .czz for compressed authorial bytes; .czv is its verse index.
+          compgen -G "$DATA/*.czz" > /dev/null
+          (cd "$DATA" && sha256sum ./*.czz) > "$CLONE/compressed-payloads.before.sha256"
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            tests/fixtures/synthetic_zcom_link_entry.cpp \
+            -o "${RUNNER_TEMP}/synthetic-native-link-entry" -lsword
+          MODE=$(SWORD_PATH="$CLONE" timeout 45s "${RUNNER_TEMP}/synthetic-native-link-entry")
+          echo "Synthetic zCom native linking capability: $MODE"
+          (cd "$DATA" && sha256sum -c "$CLONE/compressed-payloads.before.sha256")
+          SWORD_PATH="$CLONE" timeout 60s "${RUNNER_TEMP}/stock-raw" LinkProof > "$CLONE/native.after.raw"
+          PYTHONPATH=scripts python - "$ROOT/native.raw" "$CLONE/native.after.raw" "$MODE" <<'PY'
+          import sys
+          from pathlib import Path
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          def read(path):
+              exact={}
+              def entry(kind,key,raw):
+                  exact[(kind,key)]=raw
+              with Path(path).open("rb") as f:
+                  _,keys,intros,top=parse_native_raw_corpus(f,on_entry=entry)
+              return exact,keys,intros,top
+          before, old_keys, old_intro, old_top=read(sys.argv[1])
+          after, new_keys, new_intro, new_top=read(sys.argv[2])
+          assert old_intro==new_intro and old_top==new_top
+          assert all(after[key]==body for key,body in before.items()), (
+              "A previously occupied original synthetic module entry was altered"
+          )
+          assert "Gen.1.6" not in new_keys
+          mode=sys.argv[3]
+          if mode=="SYNTHETIC_NATIVE_ZCOM_READ_ONLY":
+              assert after==before, "The read-only zCom load unexpectedly changed an index entry"
+              print("Synthetic zCom native link support: READ_ONLY; "
+                    "all",len(before),"original entries and compressed bodies unchanged")
+          elif mode=="SYNTHETIC_NATIVE_ZCOM_LINK_APPLIED":
+              assert set(after)==set(before)|{("K","Gen.1.10")}
+              assert after[("K","Gen.1.10")]==before[("K","Gen.1.9")]
+              print("Synthetic zCom linkEntry: applied one new alias, "
+                    "all",len(before),"original entries and compressed bodies unchanged")
+          else:
+              raise AssertionError("Unknown native module link capability result")
+          PY
+      - name: Audit all original stock section headings against native occupied slots
+        env:
+          BIBLE_RESOURCES_PRIVATE_CANDIDATE_DAY: '2026-11-16'
+        run: |
+          set -euo pipefail
+          python scripts/commentary_section_scope_audit.py \
+            --resource-id "$RESOURCE_ID" \
+            --native-index-binary "${RUNNER_TEMP}/stock-index" \
+            --native-raw-binary "${RUNNER_TEMP}/stock-raw" \
+            --report "${RUNNER_TEMP}/editorial-scope.json" \
+            --private-owner-authorized-export-dir "${RUNNER_TEMP}/mhcc-011-approved-private-stage" \
+            --temporary-numbered-sample-chapters Gen.36 Matt.13 Song.1 \
+            --temporary-original-intro-sample-chapters Lev.19 Ps.108 \
+            --temporary-original-mixed-chapters 2John.1 2Chr.1 Matt.13 \
+            --temporary-original-full-transport \
+            --temporary-source-paragraph-witness K:John.3.1 K:Exod.12.1 K:Matt.4.1 K:Gen.3.1 K:2John.1.1 I:Lev.19 \
+            --temporary-provisional-range-index-preview \
+            --temporary-preview-real-xiphos \
+            --synthetic-intro-native-stream "${RUNNER_TEMP}/synthetic-introductions/native.raw"
+      - name: Summarize scope and known regression probes without original text
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          r=json.loads((Path(os.environ["RUNNER_TEMP"])/"editorial-scope.json").read_text())
+          assert r["status"]=="COMPLETE_NATIVE_SCAN_EDITORIAL_TRIAGE_NOT_APPROVAL"
+          assert r["native_full_key_crosscheck"] is True
+          assert r["original_text_logged_or_published"] is False
+          assert r["original_sword_changed"] is False
+          print("Native slots:",r["native_numbered_rows"],"intros:",r["native_intro_rows"])
+          transport=r["original_osis_rebuild_structure_preflight"]
+          assert transport["status"]=="COMPLETE_NATIVE_OSIS_WRAPPER_PREFLIGHT_NOT_A_REBUILD"
+          assert transport["raw_entries_observed"]==(
+              r["native_numbered_rows"]+r["native_intro_rows"]+r["native_top_rows"])
+          assert transport["compiled_osis_to_stock_byte_parity_proven"] is False
+          assert transport["original_content_or_module_changed"] is False
+          assert transport["publication_authorized"] is False
+          print("Real original XML-to-OSIS-wrapper feasibility observed entries:",
+                transport["raw_entries_observed"],
+                "original-kind-counts",json.dumps(transport["raw_record_kinds"],sort_keys=True),
+                "distinct bodies",transport["unique_nonopaque_payload_sha256_count"])
+          print("OSIS wrapper original element/text structure observations:",
+                json.dumps(transport["original_markup_shape_counts"],sort_keys=True))
+          print("OSIS wrapper blockers / unhandled source structure:",
+                json.dumps(transport["blocking_or_unresolved_structure_counts"],sort_keys=True))
+          print("OSIS source local element names:",
+                json.dumps(transport["original_element_counts_by_name"],sort_keys=True))
+          print("Opaque TOP requiring explicit preservation:",
+                transport["opaque_top_distinct_digest_count"])
+          print("Opaque TOP exact native raw byte length census:",
+                json.dumps(transport["opaque_top_original_raw_length_counts"],sort_keys=True))
+          pilot=r["private_numbered_only_osis2mod_sample_roundtrip"]
+          assert pilot is not None
+          assert pilot["no_publication"] is True
+          assert pilot["original_introductions_preserved_in_candidate"] is False
+          assert pilot["original_top_preserved_in_candidate"] is False
+          print("Private original numbered-only osis2mod source transport:",
+                pilot["status"],
+                "source K",pilot["input_numbered_native_keys"],
+                "source identical-body groups",pilot["contiguous_identical_raw_body_groups"])
+          if not pilot.get("compiled_native_readback_completed"):
+              raise AssertionError("Isolated original native numbered OSIS compiler/readback unavailable")
+          print("Private original numbered-only compiled sample readback:",
+                "original K matched",pilot["original_numbered_keys_in_compiled_sample"],
+                "source K missing",pilot["original_numbered_keys_missing_from_compiled_sample"],
+                "extra K",pilot["additional_numbered_keys_in_compiled_sample"],
+                "original raw bytes identical",pilot["original_raw_xml_exact_byte_matches"],
+                "visible Unicode identical",pilot["original_raw_xml_visible_unicode_text_matches"],
+                "unparseable compiled fragments",
+                pilot["compiled_entries_unparseable_as_original_fragments"])
+          print("Original versus recompilation same-order word classes:",
+                json.dumps(pilot["original_vs_compiled_word_sequence_classes"],
+                           sort_keys=True))
+          print("Original visible text equality ignoring only whitespace:",
+                pilot["original_vs_compiled_whitespace_normalized_visible_text_exact_matches"])
+          print("Original native XML element-name counts exactly retained:",
+                pilot["original_vs_compiled_element_name_count_exact_matches"])
+          print("Original native sample total XML element names:",
+                json.dumps(pilot["original_native_element_name_total_counts_in_sample"],
+                           sort_keys=True))
+          print("Recompiled native sample total XML element names:",
+                json.dumps(pilot["compiled_native_element_name_total_counts_in_sample"],
+                           sort_keys=True))
+          print("Entry-level original-vs-recompiled XML element name count divergences:",
+                json.dumps(pilot["source_to_compiled_element_name_count_changed_entry_counts"],
+                           sort_keys=True))
+          print("Original non-div element order and exact attribute values retained:",
+                pilot["original_non_div_element_order_and_attribute_value_exact_matches"])
+          print("All original div attributes retained despite compiler-generated wrappers:",
+                pilot["original_div_element_attribute_multiset_preserved_entry_count"])
+          print("All original reference element actual attribute values retained:",
+                pilot["original_reference_attribute_value_exact_order_matches"])
+          print("Only additional div tags; all other original element counts retained:",
+                pilot["only_additional_div_tags_other_markup_names_unchanged"])
+          for row in pilot["per_original_key_text_free_delta_classes"]:
+              if row["word_sequence_relation"]!="EXACT_ORIGINAL_WORD_SEQUENCE":
+                  print("Pilot changed words or word order",row["original_native_key"],
+                        row["word_sequence_relation"],
+                        "original words",row["source_word_count"],
+                        "compiled words",row["compiled_word_count"],
+                        "original tags",json.dumps(row["source_markup_elements"],sort_keys=True),
+                        "compiled tags",json.dumps(row["compiled_markup_elements"],sort_keys=True))
+          assert pilot["original_module_content_or_metadata_modified"] is False
+          assert pilot["publication_authorized"] is False
+          print("Introduction original native key classes:",
+                json.dumps(transport["intro_original_native_key_class_counts"],sort_keys=True))
+          print("Original book/chapter introduction top-level XML element names:",
+                json.dumps(transport["intro_original_top_level_element_counts"],sort_keys=True))
+          for sample in r["private_original_mixed_intro_and_numbered_osis2mod_roundtrips"]:
+              print("Private original mixed I+K transport",sample["chapter"],
+                    "status",sample["status"],"completed",sample.get("readback_completed",False),
+                    "original I",json.dumps(sample.get("source_original_intro_I_coverage",{}),sort_keys=True),
+                    "original K",json.dumps(sample.get("source_original_K_coverage",{}),sort_keys=True),
+                    "missing original I",json.dumps(sample.get("original_I_keys_missing_from_compiled",[])),
+                    "missing original K",json.dumps(sample.get("original_K_keys_missing_from_compiled",[])),
+                    "unexpected K",json.dumps(sample.get("unexpected_compiled_K_keys",[])))
+              assert sample["published"] is False
+              if not sample.get("readback_completed",False):
+                  raise AssertionError("Private original mixed source OSIS transport failed")
+              if sample.get("selected_original_I_K_text_markup_reference_checks_passed") is not True:
+                  raise AssertionError("Private original mixed source transport lost or changed I/K content, keys, attributes or reference targets")
+              if sample["original_I_keys_missing_from_compiled"] or sample["original_K_keys_missing_from_compiled"] or sample["unexpected_compiled_I_keys"] or sample["unexpected_compiled_K_keys"]:
+                  raise AssertionError("Private original mixed module has nonidentical indexed I/K locations")
+          full=r["private_complete_original_I_K_U_osis2mod_roundtrip"]
+          assert full is not None and full["published"] is False
+          print("Private complete-original I/K/U compiler result:",full["status"],
+                "completed",full.get("readback_completed",False),
+                "original books",full["source_book_intro_count"],
+                "chapters",full["source_chapter_intro_count"],
+                "numbered native source keys",full["source_numbered_key_count"])
+          if not full.get("readback_completed",False):
+              raise AssertionError("Whole-original isolated OSIS compile/native readback failed")
+          assert full["source_book_intro_count"]==66
+          assert full["source_chapter_intro_count"]==1189
+          assert full["source_numbered_key_count"]==28718
+          print("Whole original intro comparisons:",json.dumps(full["source_intro_I_coverage"],sort_keys=True))
+          print("Whole original numbered comparisons:",json.dumps(full["source_numbered_K_coverage"],sort_keys=True))
+          print("Missing/extra original I/K:",
+                full["missing_I_count"],full["missing_K_count"],
+                full["extra_I_count"],full["extra_K_count"])
+          print("Original versus recompiled TOP raw positions:",
+                full["source_TOP_count"],full["compiled_TOP_count"],
+                "exact original indexed TOP bytes",
+                full["all_original_TOP_positions_exact_raw_bytes"])
+          print("Full-original indexed source I/K semantic checks:",
+                full["original_indexed_I_K_text_markup_reference_checks_passed"])
+          print("All original I/K/U positions and checked semantics reconciled:",
+                full["full_original_K_I_U_native_entry_parity_proven"])
+          assert full["corrections_or_publication_authorized"] is False
+          assert full["historical_print_edition_parity_proven"] is False
+          assert full["reader_layout_parity_proven"] is False
+          if not full["original_indexed_I_K_text_markup_reference_checks_passed"]:
+              raise AssertionError("Full original I/K technical roundtrip differs; see metadata-only artifact")
+          reviewed=r["source_corroborated_reviewed_section_alias_plan_not_release_approved"]
+          assert reviewed is not None
+          assert reviewed["status"]=="SOURCE_SCOPE_CORROBORATED_CANDIDATE_NOT_RELEASE_AUTHORIZED"
+          assert reviewed["added_alias_count"]==24
+          assert reviewed["independent_source_evidence_classes"]=={
+              "EXACT_ORIGINAL_HEADING_AND_INDEPENDENT_LEADING_COMMENTARY_CITATION":16,
+              "EXACT_DISCONTIGUOUS_ORIGINAL_HEADING_AND_INDEPENDENT_DIGITAL_PRESENTATIONS":1,
+          }
+          assert reviewed["release_authorized"] is False
+          assert reviewed["original_keys_overwritten"] is False
+          assert reviewed["original_ccel_annotation_values_copied"] is False
+          assert reviewed["unmarked_first_verse_chapter_aliases_added"] is False
+          print("Reviewed metadata-only original index-correction scope:",
+                reviewed["status"],"classes",
+                json.dumps(reviewed["independent_source_evidence_classes"],sort_keys=True),
+                "source-preserving SWORD aliases",reviewed["added_alias_count"],
+                "publication authorized",reviewed["release_authorized"])
+          preview=r["private_provisional_range_index_preview_not_approved"]
+          assert preview is not None and preview["published"] is False
+          assert preview["corrections_or_publication_authorized"] is False
+          assert preview["source_scope_editorially_approved"] is False
+          assert preview["index_only_control_source_content_edited"] is False
+          assert preview["private_source_corrected_candidate_compiled"] is True
+          print("Provisional missing-section index preview (NOT editorially approved):",
+                preview["status"],"compiled",preview.get("readback_completed",False),
+                "original entries",preview["source_numbered_key_count"],
+                "proposed new aliases",preview["planned_extra_index_keys"],
+                "missing/extra originals I/K",
+                preview["missing_I_count"],preview["missing_K_count"],preview["extra_I_count"],
+                "extra index targets",preview["extra_K_count"],
+                "alias raw payloads identical to original compiled master",
+                preview["all_proposed_new_aliases_same_compiled_raw_as_original_master"],
+                "original TOP unchanged",preview["all_original_TOP_positions_exact_raw_bytes"])
+          assert preview["preflight_candidate_section_count"]==17
+          staging=preview["private_versioned_package_install_not_released"]
+          assert staging["status"]=="PRIVATE_VERSIONED_SWORD_ZCOM_ZIP_ISOLATED_INSTALL_PARITY_NOT_PUBLICATION"
+          assert staging["curated_module_id"]=="MHCC"
+          assert staging["proposed_version"]=="0.1.1"
+          assert staging["original_native_I_count"]==1255
+          assert staging["original_and_alias_native_K_count"]==28742
+          assert staging["original_opaque_TOP_count"]==2
+          assert staging["installed_package_I_K_U_raw_bytes_equal_to_private_compiled_source"] is True
+          assert staging["native_compiled_files_copied_without_recompression_or_byte_edits"] is True
+          metadata=staging["private_conf_metadata_exact_delta_receipt"]
+          assert metadata["private_metadata_exact_reviewed_delta_only"] is True
+          assert metadata["only_changed_original_fields"]==["BlockType","InstallSize","Version"]
+          assert metadata["only_added_metadata_field"]=="History_0.1.1"
+          assert metadata["original_distribution_license_textsource_about_and_date_unchanged"] is True
+          assert metadata["installed_native_bytes_used_for_install_size"] is True
+          assert metadata["original_about_print_claim_is_inherited_not_independently_certified"] is True
+          assert metadata["public_release_or_new_revision_date_authorized"] is False
+          assert staging["package_saved_as_public_artifact"] is False
+          assert staging["published"] is False
+          assert staging["release_authorized"] is False
+          staged_gui=staging["private_versioned_curated_module_real_xiphos_selected_verse_probe"]
+          assert staged_gui is not None
+          assert staged_gui["sample_count"]==3
+          assert staged_gui["independent_gui_commentary_excerpt_match_count"]==3
+          assert staged_gui["real_xiphos_executable_started_and_visible"] is True
+          assert staged_gui["actual_passage_commands_accepted"] is True
+          assert staged_gui["source_prose_or_screenshot_uploaded"] is False
+          assert staged_gui["published"] is False
+          print("Real versioned MHCC 0.1.1 installed ZIP Xiphos navigation:",
+                "sample",staged_gui["sample_count"],
+                "real GUI matches",staged_gui["independent_gui_commentary_excerpt_match_count"],
+                "commands accepted",staged_gui["actual_passage_commands_accepted"],
+                "full chapter deduplication proven",staged_gui["whole_chapter_commentary_deduplication_proven"])
+
+          revised=preview["private_source_edited_versioned_candidate_not_released"]
+          assert revised["status"]=="PRIVATE_SOURCE_EDITED_SWORD_ZCOM_CANDIDATE_FULL_PARITY_NOT_PUBLICATION"
+          assert revised["source_linked_original_verse_keys_changed"]==11
+          extra_source_keys=revised["additional_prose_original_verse_keys_changed"]
+          extra_source_groups=len(revised["additional_prose_original_source_change_receipts"])
+          assert revised["only_exactly_reviewed_original_source_groups_changed"] is True
+          assert revised["only_original_linked_source_group_changed"] is (extra_source_keys==0)
+          assert revised["all_source_linked_original_verse_keys_changed"]==11+extra_source_keys
+          assert len(revised["exact_original_K_keys_changed"])==11+extra_source_keys
+          assert revised["all_other_original_and_alias_K_bytes_identical_to_index_only_compilation"] is True
+          assert revised["all_original_I_and_TOP_bytes_identical_to_index_only_compilation"] is True
+          assert revised["all_original_compiled_native_adjacent_links_identical"] is True
+          assert revised["complete_corrected_source_semantic_and_xml_parity_passed"] is True
+          assert revised["corrected_reference_native_target_present_once"] is True
+          assert revised["reverse_restores_exact_original_raw"] is True
+          assert revised["original_numbered_key_count"]==28718
+          assert revised["revised_numbered_key_count"]==28742
+          assert revised["original_intro_key_count"]==1255
+          assert revised["original_TOP_slot_count"]==2
+          assert revised["package_isolated_install_exact_compiled_parity"] is True
+          assert revised["package_zip_sha256"]!=staging["staged_package_zip_sha256"]
+          assert revised["corrected_metadata_guard"]["private_source_reference_change_verified"] is True
+          proposed_metadata=revised["private_package_real_conf_public_metadata_dry_run"]
+          assert proposed_metadata["status"]=="PROVISIONAL_PUBLIC_SWORD_COMMENTARY_METADATA_TWO_FIELDS_ONLY_NOT_APPROVED"
+          assert proposed_metadata["exact_changed_fields"]==["About","SwordVersionDate"]
+          assert proposed_metadata["original_upstream_about_verbatim_preserved_with_explicit_attribution"] is True
+          assert proposed_metadata["all_other_fields_comments_license_textsource_and_history_exact"] is True
+          assert proposed_metadata["test_date_only_no_actual_release_day_selected"] is True
+          assert proposed_metadata["publication_authorized"] is False
+          assert proposed_metadata["public_asset_generated"] is False
+          assert revised["corrected_metadata_guard"]["original_distribution_license_textsource_about_and_date_unchanged"] is True
+          xiphos_revised=revised["real_xiphos_three_passage_proof"]
+          assert xiphos_revised["actual_xiphos_gui_displayed"] is True
+          assert xiphos_revised["independent_real_reader_sample_count"]==3+extra_source_groups
+          assert xiphos_revised["independent_real_reader_clipboard_matches"]==3+extra_source_groups
+          assert xiphos_revised["source_text_or_screenshot_logged"] is False
+          assert revised["original_and_public_module_unchanged"] is True
+          assert revised["corrected_package_uploaded_or_distributed"] is False
+          assert revised["source_words_or_xml_logged"] is False
+          assert revised["owner_publication_authorized"] is False
+          rehearsal=revised["private_full_release_metadata_and_native_rehearsal"]
+          assert rehearsal["status"]=="PRIVATE_FULL_CONF_AND_SWORD_ZCOM_ZIP_REHEARSAL_NOT_RELEASE"
+          assert rehearsal["module_id"]=="MHCC"
+          assert rehearsal["version"]=="0.1.1"
+          assert rehearsal["compiled_block_type"]=="CHAPTER"
+          assert rehearsal["all_six_native_compiled_members_preserved"] is True
+          assert rehearsal["only_about_and_sword_version_date_changed"] is True
+          assert rehearsal["reinstalled_member_bytes_match_exactly"] is True
+          assert rehearsal["complete_rehearsed_libsword_native_readback_exact"] is True
+          assert rehearsal["zip_member_count"]==7
+          assert rehearsal["actual_release_date_selected"] is False
+          assert rehearsal["owner_release_authorized"] is False
+          assert rehearsal["artifact_published_or_uploaded"] is False
+          assert rehearsal["native_corpus_sha256"]==revised["private_real_native_rebuild_attestation_draft"]["source_audit"]["candidate_native_corpus_sha256"]
+          assert len(rehearsal["native_member_sha256"])==6
+          print("Private attributed SWORD package rehearsal:",
+                "native original unchanged",rehearsal["complete_rehearsed_libsword_native_readback_exact"],
+                "reinstalled exact members",rehearsal["zip_member_count"],
+                "test-date-only ZIP SHA-256",rehearsal["zip_sha256"],
+                "public",rehearsal["artifact_published_or_uploaded"])
+          attestation=revised["private_real_native_rebuild_attestation_draft"]
+          assert attestation["status"]=="PRIVATE_REAL_NATIVE_ATTESTATION_DRAFT_NOT_RELEASE"
+          assert attestation["release_authorized"] is False
+          assert attestation["data_text_exported"] is False
+          assert attestation["original_native_K_count"]==28718
+          assert attestation["added_native_K_count"]==24
+          assert attestation["original_K_keys_edited"]==12
+          assert attestation["real_reader_sample_count"]==4
+          assert attestation["source_audit"]["index_only_rebuild_native_corpus_sha256"]
+          assert attestation["source_audit"]["candidate_native_corpus_sha256"]
+          assert attestation["source_audit"]["candidate_native_corpus_sha256"]!=attestation["source_audit"]["index_only_rebuild_native_corpus_sha256"]
+          assert attestation["review_manifest"]["status"]=="private_draft_not_owner_authorized_for_release"
+          assert attestation["source_validation"]["status"]=="private_draft_not_release_validated"
+          assert attestation["source_audit"]["original_native_corpus_sha256"]==r["original_native_raw_sha256"]
+          package_proof=revised["private_rebuilt_source_and_exact_seven_member_zip_evidence"]
+          assert package_proof["status"]=="PRIVATE_NATIVE_AND_TEST_DATE_ZIP_SEVEN_FILES_RECONCILED_NOT_RELEASE"
+          assert package_proof["source_audit_sha256"]==attestation["source_audit_sha256"]
+          assert package_proof["candidate_native_corpus_sha256"]==rehearsal["native_corpus_sha256"]
+          assert len(package_proof["test_date_only_seven_member_sha256"])==7
+          assert package_proof["test_date_only_zip_sha256"]==rehearsal["zip_sha256"]
+          assert package_proof["actual_release_date_selected"] is False
+          assert package_proof["release_authorized"] is False
+          assert package_proof["catalogue_changed"] is False
+          assert package_proof["public_artifact_generated"] is False
+          # Immutable reviewed PRIVATE evidence from one complete real audit.
+          # Do not infer the eventual public date or permission from this receipt.
+          from pathlib import Path
+          private_receipt=json.loads(Path(
+              "docs/evidence/mhcc-274/mhcc-0.1.1-private-six-zcom-hashes-DRAFT.json"
+          ).read_text(encoding="utf-8"))
+          assert private_receipt["status"]=="private_ci_observation_not_release_or_editorial_authorization"
+          assert private_receipt["resource_id"]=="mhcc-crosswire"
+          assert private_receipt["sword_id"]=="MHCC"
+          assert private_receipt["proposed_version"]=="0.1.1"
+          assert private_receipt["source_original_archive_sha256"]==attestation["review_manifest"]["original_archive_sha256"]
+          assert private_receipt["source_original_manifest_sha256"]==attestation["review_manifest"]["original_manifest_sha256"]
+          assert private_receipt["complete_native_source_audit_sha256"]==attestation["source_audit_sha256"]
+          assert private_receipt["original_native_corpus_sha256"]==attestation["source_audit"]["original_native_corpus_sha256"]
+          assert private_receipt["index_only_control_native_corpus_sha256"]==attestation["source_audit"]["index_only_rebuild_native_corpus_sha256"]
+          assert private_receipt["corrected_native_corpus_sha256"]==attestation["source_audit"]["candidate_native_corpus_sha256"]
+          assert private_receipt["original_native_counts"]==attestation["source_audit"]["original_native_counts"]
+          assert private_receipt["corrected_native_counts"]==attestation["source_audit"]["candidate_native_counts"]
+          assert private_receipt["added_reviewed_aliases"]==len(attestation["source_audit"]["added_links"])
+          assert private_receipt["original_K_addresses_changed_by_two_exact_source_errata"]==attestation["original_K_keys_edited"]
+          assert private_receipt["corrected_private_xiphos_samples_passed"]==attestation["real_reader_sample_count"]
+          assert private_receipt["compiled_block_type"]==rehearsal["compiled_block_type"]
+          assert private_receipt["exact_six_compiled_data_member_sha256"]==rehearsal["native_member_sha256"]
+          assert private_receipt["original_private_conf_sha256"]==rehearsal["source_conf_sha256"]
+          assert private_receipt["hypothetical_only_test_revision_day"]==rehearsal["hypothetical_revision_day_only"]
+          assert private_receipt["hypothetical_only_test_conf_sha256"]==rehearsal["proposed_conf_sha256"]
+          assert private_receipt["hypothetical_only_test_zip_sha256"]==package_proof["test_date_only_zip_sha256"]
+          assert set(package_proof["test_date_only_seven_member_sha256"])==(
+              set(private_receipt["exact_six_compiled_data_member_sha256"]) | {"mods.d/mhcc.conf"}
+          )
+          assert all(private_receipt[k] is False for k in (
+              "actual_release_date_selected","actual_final_7_member_payload_committed",
+              "publication_authorized","public_release_created","active_catalogue_changed"))
+          # Second real source/ZIP rehearsal uses this UTC preparation date,
+          # never the owner's eventual publication date by assumption.
+          from datetime import datetime, timezone, date
+          dated=revised["private_current_calendar_day_package_receipt"]
+          assert dated["status"]=="PRIVATE_REAL_CALENDAR_DAY_SEVEN_MEMBER_ZIP_ATTESTED_NOT_RELEASE"
+          assert dated["module_id"]=="MHCC"
+          assert dated["version"]=="0.1.1"
+          assert dated["exact_native_corpus_sha256"]==attestation["source_audit"]["candidate_native_corpus_sha256"]
+          assert dated["full_original_source_audit_sha256"]==attestation["source_audit_sha256"]
+          assert dated["only_about_and_sword_version_date_changed"] is True
+          assert dated["all_original_native_links_and_content_preserved"] is True
+          assert dated["package_size_bytes"]>0
+          assert len(dated["seven_member_sha256"])==7
+          assert dated["package_sha256"]!=rehearsal["zip_sha256"]
+          assert (date.fromisoformat(dated["utc_preparation_day_not_owner_approved_release_day"])
+                  == datetime.now(timezone.utc).date())
+          assert {k:v for k,v in dated["seven_member_sha256"].items()
+                  if k!="mods.d/mhcc.conf"}==private_receipt["exact_six_compiled_data_member_sha256"]
+          assert dated["seven_member_sha256"]["mods.d/mhcc.conf"]!=rehearsal["source_conf_sha256"]
+          assert all(dated[k] is False for k in (
+              "official_publication_date_selected","owner_release_authorized",
+              "payload_committed","catalogue_updated","zip_uploaded_or_distributed"))
+          print("Private current UTC-day 0.1.1 SWORD ZIP ready for editorial review:",
+                "day",dated["utc_preparation_day_not_owner_approved_release_day"],
+                "module",dated["module_id"],
+                "seven members",len(dated["seven_member_sha256"]),
+                "ZIP bytes",dated["package_size_bytes"],
+                "ZIP SHA-256",dated["package_sha256"],
+                "uploaded",dated["zip_uploaded_or_distributed"],
+                "published",dated["owner_release_authorized"])
+          # Freeze and independently re-check the genuine 2026-11-16 date
+          # rehearsal against a metadata-only receipt from its first successful
+          # exact-source full SWORD build. No approval or distributable implied.
+          frozen=json.loads(Path(
+              "docs/evidence/mhcc-274/mhcc-0.1.1-2026-11-16-private-dated-candidate-DRAFT.json"
+          ).read_text(encoding="utf-8"))
+          assert frozen["status"]=="verified_private_preparation_day_candidate_not_release"
+          assert frozen["resource_id"]=="mhcc-crosswire"
+          assert frozen["sword_id"]==dated["module_id"]=="MHCC"
+          assert frozen["proposed_version"]==dated["version"]=="0.1.1"
+          assert frozen["candidate_utc_preparation_day"]==dated["utc_preparation_day_not_owner_approved_release_day"]
+          assert frozen["crosswire_original_archive_sha256"]==attestation["review_manifest"]["original_archive_sha256"]
+          assert frozen["source_audit_sha256"]==attestation["source_audit_sha256"]
+          assert frozen["corrected_complete_native_corpus_sha256"]==dated["exact_native_corpus_sha256"]
+          assert frozen["exact_member_sha256"]==dated["seven_member_sha256"]
+          assert frozen["zip_sha256"]==dated["package_sha256"]
+          assert frozen["zip_size_bytes"]==dated["package_size_bytes"]
+          assert frozen["zip_member_count"]==len(dated["seven_member_sha256"])==7
+          assert frozen["original_numbered_K_count"]==attestation["original_native_K_count"]
+          assert frozen["new_reviewed_K_alias_count"]==attestation["added_native_K_count"]
+          assert frozen["source_corrected_original_K_address_count"]==attestation["original_K_keys_edited"]
+          assert frozen["original_intro_I_count"]==attestation["source_audit"]["original_native_counts"]["I"]
+          assert frozen["original_TOP_count"]==attestation["source_audit"]["original_native_counts"]["TOP"]
+          assert frozen["real_corrected_xiphos_passage_matches"]==attestation["real_reader_sample_count"]
+          assert all(frozen[k] is True for k in (
+              "six_compiled_data_files_unchanged_from_verified_source",
+              "only_attributed_conf_and_revision_day_changed"))
+          assert all(frozen[k] is False for k in (
+              "official_release_date_approved","private_zip_uploaded_or_distributed",
+              "source_payload_committed","catalogue_updated",
+              "original_published_BRMHCC_0_1_0_modified",
+              "owner_release_authorized",
+              "editorial_and_rights_release_signoff_complete"))
+          print("Replayed pinned dated private MHCC ZIP:",
+                frozen["candidate_utc_preparation_day"],
+                frozen["zip_size_bytes"],frozen["zip_sha256"],
+                "catalogue",frozen["catalogue_updated"])
+          print("Pinned independent private MHCC six-member receipt: source/native/ZIP proofs exact; NOT PUBLIC")
+          print("Real native audit to exact seven-member ZIP bridge:",
+                "original audit",package_proof["source_audit_sha256"],
+                "test-only ZIP",package_proof["test_date_only_zip_sha256"],
+                "member count",len(package_proof["test_date_only_seven_member_sha256"]),
+                "published",package_proof["public_artifact_generated"])
+          print("Real native rebuild attestation draft:",
+                "original K",attestation["original_native_K_count"],
+                "new aliases",attestation["added_native_K_count"],
+                "edited K",attestation["original_K_keys_edited"],
+                "native candidate SHA-256",attestation["source_audit"]["candidate_native_corpus_sha256"],
+                "source audit SHA-256",attestation["source_audit_sha256"],
+                "owner release approved",attestation["release_authorized"])
+          print("Corrected MHCC exact source delta and isolated actual Xiphos:",
+                "total original K addresses corrected",revised["all_source_linked_original_verse_keys_changed"],
+                "Ezekiel reference K addresses",revised["source_linked_original_verse_keys_changed"],
+                "additional prose K addresses",revised["additional_prose_original_verse_keys_changed"],
+                "real Xiphos selected passage matches",xiphos_revised["independent_real_reader_clipboard_matches"],
+                "all other original K/I/TOP exactly preserved",
+                revised["all_other_original_and_alias_K_bytes_identical_to_index_only_compilation"],
+                "all original native links identical",
+                revised["all_original_compiled_native_adjacent_links_identical"],
+                "private revised ZIP checksum",revised["package_zip_sha256"],
+                "public",revised["corrected_package_uploaded_or_distributed"])
+          print("Private curated module ZIP isolated install:",
+                staging["status"],"module",staging["curated_module_id"],
+                "version",staging["proposed_version"],
+                "exact native I/K/TOP installed",staging["original_native_I_count"],
+                staging["original_and_alias_native_K_count"],
+                staging["original_opaque_TOP_count"],
+                "private package checksum",staging["staged_package_zip_sha256"],
+                "downloadable artifact",staging["package_saved_as_public_artifact"])
+
+          native_boundaries=r["complete_original_native_linked_section_boundary_review"]
+          assert native_boundaries["status"]=="COMPLETE_ORIGINAL_NATIVE_LINKED_SECTION_BOUNDARY_AUDIT"
+          assert native_boundaries["all_original_adjacent_native_section_identities_proven"] is True
+          print("All original native linked section boundaries:",
+                "adjacent original K pairs",
+                native_boundaries["original_adjacent_occupied_K_pair_count"],
+                "SWORD actual linked",native_boundaries["original_native_linked_pair_count"],
+                "independently separate",native_boundaries["original_native_separate_adjacent_pair_count"],
+                "same raw but originally UNLINKED",
+                native_boundaries["same_original_raw_payload_but_independently_unlinked_pair_count"],
+                "distinct raw but originally LINKED",
+                native_boundaries["distinct_original_raw_payload_but_native_linked_pair_count"],
+                "grouping faithful to native section identity",
+                native_boundaries["raw_payload_based_osis_grouping_is_native_identity_faithful"])
+          print("Native section identity disagreements (up to first ten each):",
+                native_boundaries["same_original_raw_unlinked_first_ten"],
+                native_boundaries["distinct_original_raw_linked_first_ten"])
+          assert native_boundaries["raw_payload_based_osis_grouping_is_native_identity_faithful"], (
+              "Hash-equal original entries are NOT necessarily the same authorial SWORD section"
+          )
+
+          native_links=preview["private_native_original_and_provisional_alias_link_identity"]
+          assert native_links["status"]=="REAL_LIBSWORD_NATIVE_NONADJACENT_LINK_IDENTITY"
+          print("Real released libSWORD native linked records:",
+                "all new aliases match original native linked identity",
+                native_links["all_original_master_to_proposed_target_pairs_are_native_linked"],
+                "count",native_links["native_linked_alias_count"],
+                "different-source-section negative controls",
+                native_links["negative_distinct_section_controls"],
+                "negative controls truly unlinked",
+                native_links["all_independently_distinct_section_controls_unlinked"])
+          assert native_links["proposed_key_count"]==24
+          assert native_links["native_linked_alias_count"]==24
+          assert native_links["all_original_master_to_proposed_target_pairs_are_native_linked"] is True
+          assert native_links["negative_distinct_section_controls"]>=1
+          assert native_links["all_independently_distinct_section_controls_unlinked"] is True
+          assert native_links["source_text_and_xml_never_logged"] is True
+
+          repeats=preview["private_original_vs_alias_cli_chapter_repetition_probe"]
+          assert repeats["status"]=="GENERIC_NATIVE_COMMENTARY_CLI_CHAPTER_REPEAT_COMPARISON_NOT_GUI_APPROVAL"
+          assert repeats["case_count"]>=1
+          assert repeats["publication_authorized"] is False
+          assert repeats["no_source_text_logged_or_published"] is True
+          print("Original versus candidate chapter-wide CLI repetition:",
+                "cases",repeats["case_count"],
+                "chapters with increased repeated source prose",
+                repeats["chapters_with_proven_increased_repeat_count"],
+                "independent GUI deduplication verified",
+                repeats["chapter_deduplication_in_Xiphos_or_Bible_verified"])
+          for case in repeats["cases"]:
+              print("Chapter CLI linked commentary repetition sample:",
+                    case["chapter"],case["status"],
+                    "original",case["original_repetition"],
+                    "candidate",case["proposed_repetition"])
+
+          xiphos=preview["private_real_xiphos_alias_navigation_probe"]
+          assert xiphos is not None
+          print("Independent real Xiphos/private LSG preview:",
+                xiphos["status"],
+                "sample keys",xiphos["sample_keys"],
+                "diatheke 25-consecutive-word master/alias matches",
+                xiphos["diatheke_alias_master_shared_run_minimum"],
+                "GTK window visible",
+                xiphos["real_xiphos_executable_started_and_visible"],
+                "real selected commentary clipboard matches",
+                xiphos["independent_gui_commentary_excerpt_match_count"],
+                "all real passage commands accepted",
+                xiphos["actual_passage_commands_accepted"],
+                "whole chapter deduplication PROVEN",
+                xiphos["whole_chapter_commentary_deduplication_proven"])
+          assert xiphos["source_prose_or_screenshot_uploaded"] is False
+          assert xiphos["published"] is False
+          assert xiphos["sample_count"]>=2
+          assert xiphos["diatheke_alias_master_shared_run_minimum"]>=25
+          assert xiphos["real_xiphos_executable_started_and_visible"] is True
+          print("Bounded real Xiphos whole-chapter section/de-dup witness:",
+                json.dumps(xiphos["whole_chapter_Xiphos_GTK_proof"],sort_keys=True))
+          assert xiphos["whole_chapter_Xiphos_GTK_proof"][
+              "source_prose_or_screenshot_uploaded"] is False or (
+                xiphos["whole_chapter_Xiphos_GTK_proof"]["status"] in (
+                    "NO_INDEPENDENT_SECTION_WITNESS_IN_CHAPTER",
+                    "INDEPENDENT_SECTION_READBACK_UNAVAILABLE"
+                )
+            )
+
+          assert xiphos["entire_edition_reader_presentation_approved"] is False
+
+          assert preview["planned_extra_index_keys"]==24
+          if not preview.get("readback_completed",False):
+              raise AssertionError("Provisional range preview compiler/native reader failed")
+          if not (preview["all_proposed_new_aliases_same_compiled_raw_as_original_master"]
+                  and preview["full_original_K_I_U_native_entry_parity_proven"]):
+              raise AssertionError("Provisional index preview changed original content or lost aliases")
+          for sample in r["private_original_intro_only_osis2mod_sample_roundtrips"]:
+              print("Isolated actual original I transport proof",sample["original_native_intro_key"],
+                    "modes",json.dumps(sample["test_only_modes"],sort_keys=True),
+                    "original module unchanged",sample["original_module_unchanged"],
+                    "not a full source parity proof",not sample["original_K_I_U_full_parity_proven"])
+          print("Original intro full element names and attribute names:",
+                json.dumps(transport["intro_original_full_element_name_counts"],sort_keys=True),
+                json.dumps(transport["intro_original_full_attribute_name_counts"],sort_keys=True))
+          print("Original intro visible-word-band classes:",
+                json.dumps(transport["intro_original_visible_word_count_bands"],sort_keys=True))
+          opaque_compare=r["synthetic_compiler_opaque_top_original_exact_byte_comparison"]
+          assert opaque_compare is not None
+          assert opaque_compare["original_top_entry_count"]==r["native_top_rows"]
+          assert opaque_compare["original_top_raw_values_disclosed"] is False
+          print("Original opaque TOP compared by exact bytes to independent synthetic osis2mod:",
+                "original U",opaque_compare["original_top_entry_count"],
+                "synthetic U",opaque_compare["synthetic_top_entry_count"],
+                "identical raw TOP",opaque_compare[
+                    "original_top_entry_bytes_equal_any_synthetic"],
+                "all originals matched",opaque_compare[
+                    "all_original_top_byte_payloads_seen_in_synthetic"])
+          for case in transport["intro_visible_text_case_review_queue"]:
+              print("Intro containing original visible text",case["original_native_intro_key"],
+                    "word-count",case["visible_words_count"],
+                    "native-scope",case["native_intro_scope"],
+                    "top-level-tags",",".join(case["top_level_element_names"]),
+                    "text-owner-tags",json.dumps(case["text_owning_element_name_counts"],sort_keys=True))
+          for row in r["original_intro_visible_text_slot_concordance"]:
+              print("Original chapter intro text coverage",row["original_native_intro_key"],
+                    "intro words",row["original_intro_unicode_word_count"],
+                    "original distinct K entries",row["distinct_numbered_raw_bodies_in_original_chapter"],
+                    "native chapter verse limit",row["registered_native_chapter_verse_limit"],
+                    "candidate missing keys ONLY if whole chapter editorially approved",
+                    row["navigation_keys_not_originally_occupied_if_intro_is_approved_as_whole_chapter"],
+                    "intro repeated whole",row["full_original_intro_visible_text_in_a_numbered_body"],
+                    "unrepeated text spans",row["runs_not_exactly_repeated_in_numbered_body"],
+                    "unrepeated words",row["words_in_original_intro_runs_not_exactly_matched"],
+                    "text owner classes",json.dumps(row["unmatched_intro_text_owning_element_classes"],
+                                                    sort_keys=True))
+          print("Original introduction top-level leading text classes:",
+                json.dumps(transport["intro_original_unwrapped_leading_text_presence"],sort_keys=True))
+          print("Original opaque TOP element/attribute names:",
+                json.dumps(transport["opaque_top_original_xml_element_names"],sort_keys=True),
+                json.dumps(transport["opaque_top_original_xml_attribute_names"],sort_keys=True))
+          print("Repeated raw groups crossing chapters/books / intro and numbered:",
+                transport["same_raw_payload_across_chapter_group_count"],
+                transport["same_raw_payload_across_book_group_count"],
+                transport["same_raw_payload_shared_by_intro_and_numbered_keys_count"])
+          registry=r["native_versification_registry"]
+          print("Native versification registry", registry["name"],
+                "chapters",registry["canonical_chapters"],
+                "verse keys",registry["canonical_verse_keys"],
+                "stock keys all within actual registry",
+                registry["original_occupied_numbered_keys_within_registry"])
+          print("Potential newly navigable one-key-chapter slots, NOT APPROVED:",
+                registry["candidate_new_navigation_keys_if_all_chapters_approved"])
+          for one in registry["candidate_single_key_chapter_sizing"]:
+              print("Chapter-size",one["chapter"],one["native_verse_max"],
+                    one["independent_source_class"])
+          print("Section scope triage categories:",json.dumps(r["counts"],sort_keys=True))
+          preflight=r["explicit_heading_native_link_candidate_preflight"]
+          assert preflight["status"]=="PRELIMINARY_NATIVE_INDEX_GAPS_REVIEW_REQUIRED"
+          assert preflight["source_prose_modified"] is False
+          assert preflight["compiled_binary_modified"] is False
+          assert preflight["editorial_approval"] is False
+          assert preflight["release_authorized"] is False
+          print("Original registry-checked section gap preflight:",
+                "sections",preflight["candidate_section_count"],
+                "unoccupied native keys",preflight["candidate_additional_native_target_keys"],
+                "blocked original payload collisions",
+                len(preflight["blocked_sections_with_different_existing_original_payload"]))
+          for section in preflight["candidate_sections"]:
+              print("Candidate unapproved native section",section["original_master_key"],
+                    "unoccupied targets",",".join(section["unoccupied_native_target_keys"]))
+
+          topology=r["independent_original_native_editorial_topology_triage"]
+          assert topology["status"]=="COMPLETE_ORIGINAL_NATIVE_EDITORIAL_TOPOLOGY_TRIAGE_NOT_APPROVAL"
+          assert topology["all_original_native_K_rows_examined"] is True
+          assert topology["original_native_K_rows_seen"]==r["native_numbered_rows"]
+          assert topology["original_native_I_rows_seen"]==r["native_intro_rows"]
+          assert topology["original_native_TOP_rows_seen"]==r["native_top_rows"]
+          assert topology["candidate_is_not_an_editorial_defect_verdict"] is True
+          assert topology["original_words_or_xml_in_report"] is False
+          assert topology["release_authorized"] is False
+          print("Independent whole-original editorial title and reuse topology:",
+                "distinct K bodies",topology["distinct_original_K_raw_bodies"],
+                "numeric title classes",
+                json.dumps(topology["unique_original_body_numeric_title_classes"],sort_keys=True))
+          print("Independent whole-original editorial topology candidate counts:",
+                json.dumps(topology["candidate_counts"],sort_keys=True))
+          for category, cases in topology["candidate_samples"].items():
+              print("Original editorial topology review cases",category,
+                    json.dumps(cases,sort_keys=True),
+                    "additional unlisted",topology["sample_overflow_counts"][category])
+          layout=r["independent_original_native_layout_census"]
+          assert layout["status"]=="COMPLETE_ORIGINAL_COMMENTARY_LAYOUT_HEURISTICS_NOT_EDITORIAL_VERDICT"
+          assert layout["original_native_K_seen"]==r["native_numbered_rows"]
+          assert layout["original_native_I_seen"]==r["native_intro_rows"]
+          assert layout["original_native_TOP_seen"]==r["native_top_rows"]
+          assert layout["source_word_text_xml_and_targets_disclosed"] is False
+          assert layout["all_cases_are_unapproved_diagnostic_only"] is True
+          assert layout["original_module_modified"] is False
+          assert layout["publication_authorized"] is False
+          print("Independent all-original commentary layout census:",
+                "distinct source bodies",layout["distinct_original_raw_bodies"],
+                "native aliases",layout["repeated_raw_native_aliases"],
+                "verse-1-only chapters",layout["original_verse_one_only_chapters"])
+          print("Source-original paragraph and text-length distributions:",
+                json.dumps(layout["distribution"],sort_keys=True))
+          print("Original verse-1-only chapter layout classes:",
+                json.dumps(layout["single_key_chapter_structure"],sort_keys=True))
+          print("Original layout review categories:",
+                json.dumps(layout["candidate_counts"],sort_keys=True))
+          for category,cases in layout["candidate_samples"].items():
+              print("Original layout review location samples",category,
+                    json.dumps(cases,sort_keys=True),
+                    "additional source bodies",
+                    layout["candidate_sample_overflow"][category])
+          references=r["independent_original_native_reference_registry_triage"]
+          assert references["status"]=="FULL_ORIGINAL_NATIVE_REFERENCE_REGISTRY_TRIAGE_NOT_EDITORIAL_CORRECTION"
+          assert references["original_native_K_seen"]==r["native_numbered_rows"]
+          assert references["original_native_I_seen"]==r["native_intro_rows"]
+          assert references["original_native_TOP_seen"]==r["native_top_rows"]
+          assert references["original_reference_targets_or_prose_exported"] is False
+          assert references["original_reference_targets_or_prose_changed"] is False
+          assert references["complex_target_not_classified_as_error"] is True
+          assert references["publication_authorized"] is False
+          print("Full original native reference target registry classes:",
+                references["distinct_body_reference_elements_classified"],
+                json.dumps(references["reference_target_classes"],sort_keys=True))
+          print("Original canonical-registry manual reference review counts:",
+                json.dumps(references["manual_review_candidate_counts"],sort_keys=True))
+          for category, rows in references["manual_review_samples"].items():
+              print("Reference registry candidate category",category,
+                    "first 20 locations",json.dumps(rows[:20],sort_keys=True),
+                    "additional reviewed privately",
+                    references["manual_review_unlisted_counts"][category]+max(0,len(rows)-20))
+          unknown=r["unrecognized_native_slot_review"]
+          assert unknown["total"]==r["counts"]["no_recognized_heading"]
+          assert unknown["all_output_is_original_text_free_metadata"] is True
+          print("Unrecognized slot classes:",json.dumps(unknown["reason_counts"],sort_keys=True))
+          print("Unrecognized distinct raw payloads:",unknown["distinct_native_raw_payload_hashes"])
+          print("Unrecognized slots sharing payload with recognized heading:",
+                unknown["shares_content_with_recognized_heading"])
+          print("Unrecognized first-verse native rows:",unknown["first_verse_entries"])
+          print("Chapter-first unknowns with only one occupied native slot:",
+                unknown["single_occupied_slot_chapters_among_unknown"])
+          for row in unknown["case_rows"]:
+              print("Unrecognized slot",row["native_key"],row["category"],
+                    "same-payload-count",row["same_raw_payload_slot_count"],
+                    "first-in-chapter",row["first_verse_in_chapter"],
+                    "recognized-payload",row["same_payload_with_recognized_heading"])
+          for key in ("Song.1.7","Jer.4.1","Jer.4.3"):
+              probe=r["probes"].get(key)
+              print("Probe",key,json.dumps(
+                  {k:v for k,v in (probe or {}).items() if k!="raw_payload_sha256"},
+                  sort_keys=True))
+          for row in r["anomalies"]:
+              print("Candidate range",row["start"],"through",row["declared_end"],
+                    row["category"],"missing",",".join(row["missing_slots"]))
+          witness=r["independent_thml_witness"]
+          paragraph=witness["independent_original_paragraph_witness_pilot"]
+          assert paragraph["status"]=="PRIVATE_DIGITAL_SOURCE_PARAGRAPH_PILOT_NOT_EDITORIAL_APPROVAL"
+          assert paragraph["selected_original_native_I_K_entries"]==6
+          assert paragraph["source_text_xml_annotation_attributes_exported"] is False
+          assert paragraph["original_stock_or_source_modified"] is False
+          assert paragraph["public_release_authorized"] is False
+          for case in paragraph["results"]:
+              assert case["original_text_or_reference_changed"] is False
+              assert case["source_words_or_xml_in_report"] is False
+              assert case["candidate_para_boundaries_authorized"] is False
+              assert case["source_digital_edition_equivalence_proven"] is False
+              print("Private paired digital paragraph structure witness",
+                    json.dumps(case,sort_keys=True))
+          prose=r.get("private_unapproved_original_prose_erratum_byte_preflight")
+          if prose is not None:
+              assert prose["status"]=="PRIVATE_PROSE_ERRATUMS_REVERSIBLE_NOT_COMPILED"
+              assert prose["candidate_is_only_an_unpublished_in_memory_preview"] is True
+              assert prose["all_original_source_or_compiled_content_unchanged"] is True
+              assert prose["source_words_xml_or_reference_targets_exported"] is False
+              assert prose["public_release_authorized"] is False
+              for row in prose["case_rows"]:
+                  assert row["reverse_restores_exact_original_raw_bytes"] is True
+                  assert row["all_other_original_xml_words_references_and_structure_preserved"] is True
+                  print("Proposed private single-word source erratum", row["original_native_entry"],
+                        "original SHA-256", row["original_raw_sha256"],
+                        "proposed SHA-256", row["proposed_raw_sha256"],
+                        "original linked keys", row["original_linked_native_K_count"],
+                        "word text/markup omitted, not compiled or published")
+          inverted=witness["independent_original_reversed_reference_witness"]
+          assert inverted["status"]=="SOURCE_NATIVE_AND_INDEPENDENT_DIGITAL_REVERSED_REFERENCE_REVIEW_ONLY"
+          assert inverted["source_original_distinct_body_reversed_reference_count"]==(
+              references["manual_review_candidate_counts"].get(
+                  "REVERSED_SAME_CHAPTER_VERSE_RANGE",0))
+          assert inverted["source_text_xml_or_original_reference_target_exported"] is False
+          assert inverted["original_edition_changed"] is False
+          assert inverted["correction_authorized"] is False
+          assert inverted["release_authorized"] is False
+          print("Original reversed citations versus independent source and native headings:",
+                inverted["source_original_distinct_body_reversed_reference_count"],
+                json.dumps(inverted["case_rows"],sort_keys=True))
+          # Never apply this trial to private compiled 0.1.1, source stock,
+          # the released version or catalogue. One copied XML fragment only.
+          erratum=r["private_unapproved_original_literal_erratum_byte_preflight"]
+          assert erratum is not None
+          assert erratum["status"]=="PRIVATE_ORIGINAL_SOURCE_ERRATUM_PREVIEW_NOT_APPROVED_OR_COMPILED"
+          assert erratum["case_count"]==1
+          assert erratum["all_original_K_I_TOP_entries_untouched"] is True
+          assert erratum["public_or_private_staged_zcom_package_content_unchanged"] is True
+          assert erratum["text_or_reference_values_exported"] is False
+          assert erratum["publication_authorized"] is False
+          for candidate in erratum["case_rows"]:
+              assert candidate["reverse_restores_exact_original_raw_bytes"] is True
+              assert candidate["exactly_one_original_reference_and_label_changed"] is True
+              assert candidate["no_other_original_xml_text_annotation_or_punctuation_changed"] is True
+              assert candidate["editorial_change_authorized"] is False
+              assert candidate["release_authorized"] is False
+              assert candidate["source_witness_is_citation_not_authorial_scope"] is True
+              print("One private source erratum byte-reversible preview ONLY:",
+                    json.dumps(candidate,sort_keys=True))
+          lead=witness["independent_leading_range_citations"]
+          assert lead["status"]=="INDEPENDENT_DIGITAL_SECTION_LEAD_TO_STOCK_PROSE_TRIAGE_NOT_APPROVAL"
+          assert lead["case_count"]==17
+          assert lead["publication_authorized"] is False
+          print("Independent real source citation leads: exact range cases",
+                lead["cases_with_independent_exact_range_citation"],
+                "lead with corresponding stock exposition",
+                lead["cases_with_source_lead_prose_and_matching_stock_exposition"])
+          for candidate in lead["case_rows"]:
+              print("Source leading-section citation check:",
+                    candidate["original_section_start"],
+                    "exact original CCEL citations",
+                    candidate["independent_exact_range_citation_count"],
+                    "leading paragraph with substantial prose",
+                    candidate["independent_leading_reference_with_substantial_following_prose"],
+                    "substantive original stock paragraph alignment",
+                    candidate["independent_leading_reference_and_matching_original_stock_exposition"],
+                    "authorially reviewed",candidate["scope_authorially_reviewed"],
+                    "source citation parent/lead shapes",
+                    json.dumps([
+                        {"parent":q["source_markup_parent"],
+                         "inside_paragraph":q["source_reference_inside_paragraph"],
+                         "leads_paragraph":q["source_scripRef_is_leading_paragraph_element"],
+                         "substantial_following_prose":q["reference_has_substantial_following_prose"],
+                         "matching_prose":q["source_and_stock_share_at_least_twenty_contiguous_words"]}
+                        for q in candidate["independent_reference_observations"]
+                    ],sort_keys=True))
+
+          print("Independent ThML status:",witness["status"])
+          print("Independent ThML section agreement:",
+                json.dumps(witness.get("source_range_agreement_counts",{}),sort_keys=True))
+          print("Independent ThML scripRef citation-only agreement:",
+                json.dumps(witness.get("independent_scripref_range_agreement_counts",{}),sort_keys=True))
+          print("Independent source evidence matrix:",
+                json.dumps(witness.get("independent_reference_evidence_matrix",{}),sort_keys=True))
+          print("Unrecognized source section classes:",
+                json.dumps(witness.get("unrecognized_source_annotation_classes",{}),sort_keys=True))
+          intro_source=witness["independent_chapter_intro_text_witness"]
+          assert intro_source["status"]=="INDEPENDENT_THML_CHAPTER_INTRO_ALIGNMENT_NOT_EDITORIAL_APPROVAL"
+          for case in intro_source["case_rows"]:
+              print("Independent CCEL-to-original intro witness",
+                    case["native_original_intro_chapter"],
+                    "source markers",case["independent_explicit_chapter_annotation_div2_count"],
+                    "status",case["status"],
+                    "source words",case.get("independent_source_div2_word_count"),
+                    "original intro words",case.get("original_native_intro_word_count"),
+                    "native original intro words in independent source",
+                    case.get("native_intro_full_word_sequence_is_in_source_div2"),
+                    "original intro words absent from source",
+                    case.get("native_intro_words_not_located_in_source_div2"))
+          div2=witness["independent_div2_chapter_body_review"]
+          for row in div2["independent_source_div2_text_bearing_native_intro_reviews"]:
+              overlap=row["original_intro_vs_witness_word_overlap"]
+              print("Safe book/chapter-mapped independent intro witness",
+                    row["original_native_intro_chapter"],
+                    "classification",row["classification"],
+                    "book mapping",row["source_book_alignment_class"],
+                    "chapter mapping",row["source_chapter_alignment_method"],
+                    "source numbered sections",row["source_numbered_comment_section_markers"],
+                    "source chapter markers",row["source_chapter_comment_section_markers"],
+                    "lexical overlap",overlap.get("overlap_class") if overlap else None,
+                    "ordered words",overlap.get("ordered_word_alignment",{}).get(
+                        "exact_unicode_ordered_alignment_class") if overlap else None,
+                    "source-word-count",overlap.get("source_word_count") if overlap else None,
+                    "original-intro-word-count",overlap.get("stock_word_count") if overlap else None,
+                    "source-words-not-in-original-intro",
+                    overlap.get("ordered_word_alignment",{}).get(
+                        "original_plain_words_not_matched_in_exact_order") if overlap else None,
+                    "original-intro-words-not-in-source",
+                    overlap.get("ordered_word_alignment",{}).get(
+                        "stock_plain_words_not_matched_in_exact_order") if overlap else None)
+          print("Full source div2 chapter-scope classification:",
+                json.dumps(div2.get("candidate_classes",{}),sort_keys=True))
+          chapter_review=r["single_key_chapter_navigation_source_review_not_approved"]
+          assert chapter_review["status"]=="COMPLETE_SINGLE_KEY_CHAPTER_SCOPE_TRIAGE_NOT_APPROVAL"
+          assert chapter_review["original_single_key_chapter_candidates"]==118
+          assert chapter_review["classes"]=={
+              "INDEPENDENT_UNDIVIDED_CHAPTER_SCOPE_STRONGLY_CORROBORATED":116,
+              "SOURCE_FIRST_CHAPTER_PROSE_PRESERVED_OUTSIDE_DIV2":1,
+              "SOURCE_PROSE_PRESERVED_WITH_EXTRA_STOCK_BOOK_HEADING":1,
+          }
+          assert chapter_review["chapter_intro_owner_unchecked_count"]==0
+          assert chapter_review["any_new_aliases_created"] is False
+          assert chapter_review["source_prose_or_index_mutated"] is False
+          assert chapter_review["publication_authorized"] is False
+          print("Conservative original first-verse-only chapter triage:",
+                json.dumps(chapter_review["classes"],sort_keys=True),
+                "possible additional aliases ONLY after source and reader approval",
+                chapter_review["potential_total_new_chapter_aliases_if_every_scope_approved"],
+                "chapters with independently differing citation-target annotations",
+                chapter_review["source_reference_differences_needing_separate_review"],
+                "native original I introductions with visible text",
+                chapter_review["chapter_intro_prose_needing_independent_ownership_review"],
+                "native intro ownership not checked",
+                chapter_review["chapter_intro_owner_unchecked_count"])
+          for chapter_case in chapter_review["case_rows"]:
+              if chapter_case["classification"]!="INDEPENDENT_UNDIVIDED_CHAPTER_SCOPE_STRONGLY_CORROBORATED":
+                  print("Chapter navigation source review exception:",
+                        chapter_case["master_key"],chapter_case["classification"],
+                        "original master sha256",chapter_case["original_master_raw_sha256"],
+                        "original source unmatched words",
+                        chapter_case["independent_original_unmatched_words"],
+                        "native intro contains separate prose",
+                        chapter_case["original_native_chapter_intro_contains_visible_prose"])
+
+          print("Independent source vs unchanged stock chapter-word diagnostic:",
+                json.dumps(div2.get("independent_stock_vs_source_lexical_diagnostic_classes",{}),sort_keys=True))
+          print("Independent source vs unchanged stock ordered-word alignment:",
+                json.dumps(div2.get("independent_stock_vs_source_ordered_word_diagnostic_classes",{}),sort_keys=True))
+          print("Chapter-level original source vs stock link-target classes:",
+                json.dumps(div2.get("independent_stock_vs_source_reference_target_classes",{}),sort_keys=True))
+          print("Chapter-level original source vs stock link-target totals:",
+                json.dumps(div2.get("independent_stock_vs_source_reference_target_totals",{}),sort_keys=True))
+          unpaired=div2["independent_stock_vs_source_reference_target_totals"][
+              "source_target_occurrences_not_paired_in_selected_stock"
+          ]
+          source_labels=div2["unpaired_original_source_reference_target_label_location_classes"]
+          literal_unique=div2["unpaired_unique_literal_reference_label_candidate_count"]
+          print("Unpaired only source citation destination label in original stock:",
+                json.dumps(source_labels,sort_keys=True),
+                "unique exact plain-label locations",literal_unique,
+                "ALL editorially unapproved",div2[
+                    "all_cross_edition_unpaired_source_targets_require_review"])
+          assert unpaired==25
+          assert sum(source_labels.values())==25
+          assert 0<=literal_unique<=25
+          assert div2["all_cross_edition_unpaired_source_targets_require_review"] is True
+          print("Source citation labels where CrossWire selected stock has no clickable links:",
+                json.dumps(div2.get("source_reference_labels_when_stock_has_no_link_markup",{}),
+                           sort_keys=True))
+          print("Changed word position in independent original source markup:",
+                json.dumps(div2.get("isolated_one_word_original_source_markup_location_classes",{}),
+                           sort_keys=True))
+          for row in div2.get("independent_stock_vs_source_reference_target_exception_rows",[]):
+              print("Review unmatched chapter citation annotation",row["native_start"],
+                    "source-unpaired",row["source_target_occurrences_not_paired"],
+                    "stock-unpaired",row["stock_target_occurrences_not_paired"],
+                    "classification",row["classification"],
+                    "source-label-locations",
+                    json.dumps(row["source_link_label_location_classes"],sort_keys=True),
+                    "unpaired targets' label locations",
+                    json.dumps(row["unpaired_source_link_label_location_classes"],sort_keys=True),
+                    "unique exact unlinked label",
+                    row["unique_literal_unlinked_original_source_label_candidates"])
+          print("Source book title/marker alignment:",
+                json.dumps(div2.get("book_alignment_evidence_classes",{}),sort_keys=True))
+          for bookrow in div2.get("book_alignment_evidence_rows",[]):
+              if bookrow["identity_class"]!="SOURCE_BOOK_TITLE_AND_MARKERS_MATCH":
+                  print("Book mapping review",json.dumps(bookrow,sort_keys=True))
+          for divcase in div2.get("case_rows",[]):
+              print("Source div2 chapter",divcase["native_start"],
+                    divcase["source_div2_structure_class"],
+                    "verse-annotation-count",divcase["source_numbered_marker_count"],
+                    "nonempty-paragraphs",divcase["source_nonempty_paragraph_count"],
+                    "source-annotation-chapters",divcase["source_annotated_chapters"],
+                    "source-h2-numeric-chapters",divcase["source_h2_numeric_chapters"])
+              lexical=divcase.get("independent_lexical_comparison")
+              if lexical and (
+                  divcase["native_start"]=="2Chr.1.1"
+                  or lexical.get("overlap_class") != "HIGH_95_PLUS"
+                  or lexical["ordered_word_alignment"]["exact_unicode_ordered_alignment_class"]
+                     not in (
+                         "plain_words_exactly_identical_in_original_order",
+                         "all_source_plain_words_in_stock_order_with_extra_stock_words",
+                         "all_stock_plain_words_in_source_order_with_extra_source_words"
+                     )
+              ):
+                  print("Needs lexical scope review",divcase["native_start"],
+                        json.dumps(lexical,sort_keys=True))
+              if lexical and (
+                  lexical.get("isolated_one_word_xml_location") is not None
+                  or divcase["native_start"] in ("2Chr.1.1","Neh.1.1")
+              ):
+                  refcheck=divcase.get("independent_reference_target_comparison")
+                  if refcheck is None:
+                      raise AssertionError("Source/stock citation target review absent")
+                  print("Private citation target review",divcase["native_start"],
+                        json.dumps(refcheck,sort_keys=True))
+          chapter=witness["independent_whole_chapter_review"]
+          print("Independently witnessed one-key chapter scope candidates:",
+                json.dumps(chapter["source_scope_candidate_classes"],sort_keys=True))
+          print("Complete source chapter annotations:",
+                json.dumps(chapter["independent_source_chapter_marker_inventory"],sort_keys=True))
+          for case in chapter["case_rows"]:
+              print("Chapter-scope witness",case["candidate_chapter"],case["witness_class"],
+                    "markers",case["matching_source_chapter_markers"],
+                    "source-section-count",case["witness_verse_marker_count"])
+          for row in witness.get("unrecognized_distinct_payload_source_rows",[]):
+              print("Unlabelled source section",row["native_start"],
+                    "section-endpoints",",".join(row["source_section_endpoints"]),
+                    "source-explicit-multiverse",row["source_explicit_multiverse_annotation"],
+                    "native-chapter-one-slot",row["only_one_native_occupied_verse_in_chapter"])
+          for row in witness.get("no_exact_independent_reference_evidence_sections",[]):
+              print("Needs editorial witness review",row["start"],row["declared_end"],row["heading_kind"])
+          for case in witness.get("anomaly_source_range_corroboration",[]):
+              print("Candidate witness",case["start"],case["declared_end"],case["relation"])
+          for start,refs in witness.get("unparsed_source_reference_candidates_near_anomalies",{}).items():
+              print("Unparsed source anchor",start,json.dumps(refs,sort_keys=True))
+          for start,attrs in witness.get("source_attributes_near_anomalies",{}).items():
+              print("Source attribute anchor",start,json.dumps(attrs,sort_keys=True))
+          PY
+      - name: Preserve metadata-only complete candidate report for independent review
+        uses: actions/upload-artifact@v4
+        with:
+          name: original-commentary-section-scope
+          path: ${{ runner.temp }}/editorial-scope.json
+          retention-days: 14
+      - name: Preserve owner-authorized source-attested seven member PR staging files
+        uses: actions/upload-artifact@v4
+        with:
+          name: mhcc-011-verified-pr-payload-not-a-release
+          path: ${{ runner.temp }}/mhcc-011-approved-private-stage/
+          retention-days: 7
+          if-no-files-found: error
+
+  stage_owner_approved_candidate:
+    name: Integrate verified MHCC binary files into existing draft PR only
+    needs: audit
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.number == 275 &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'audit/mhcc-editorial-section-scope'
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          persist-credentials: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: mhcc-011-verified-pr-payload-not-a-release
+          path: ${{ runner.temp }}/mhcc-011-verified
+      - uses: actions/download-artifact@v4
+        with:
+          name: original-commentary-section-scope
+          path: ${{ runner.temp }}/mhcc-011-original-source-audit
+      - name: Verify and integrate seven candidate SWORD members in draft PR
+        shell: bash
+        env:
+          PR_SOURCE_BRANCH: ${{ github.event.pull_request.head.ref }}
+          VERIFIED_OUTPUT_ROOT: ${{ runner.temp }}/mhcc-011-verified
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          from zipfile import ZipFile
+
+          evidence = json.loads(Path(
+              "docs/evidence/mhcc-274/mhcc-0.1.1-2026-11-16-private-dated-candidate-DRAFT.json"
+          ).read_text(encoding="utf-8"))
+          assert (evidence["status"] == "verified_private_preparation_day_candidate_not_release"
+                  and evidence["sword_id"] == "MHCC"
+                  and evidence["proposed_version"] == "0.1.1"
+                  and evidence["owner_release_authorized"] is False
+                  and evidence["catalogue_updated"] is False)
+          workspace = Path(os.environ["VERIFIED_OUTPUT_ROOT"])
+          package = workspace / "MHCC-0.1.1.zip"
+          assert package.is_file() and not package.is_symlink()
+          archive_data = package.read_bytes()
+          assert len(archive_data) == evidence["zip_size_bytes"]
+          assert hashlib.sha256(archive_data).hexdigest() == evidence["zip_sha256"]
+          expected = evidence["exact_member_sha256"]
+          assert len(expected) == 7
+          stage = Path("staging/reviewed-mhcc-011/payload")
+          for name in expected:
+              assert name == "mods.d/mhcc.conf" or (
+                  name.startswith("modules/comments/zcom/mhcc/")
+                  and name.rsplit("/", 1)[1] in (
+                      "nt.czs", "nt.czv", "nt.czz",
+                      "ot.czs", "ot.czv", "ot.czz"))
+          with ZipFile(package) as z:
+              assert len(z.infolist()) == 7
+              assert set(z.namelist()) == set(expected)
+              assert z.testzip() is None
+              for item in z.infolist():
+                  assert not item.is_dir()
+                  contents = z.read(item)
+                  assert hashlib.sha256(contents).hexdigest() == expected[item.filename]
+                  direct = workspace / "payload" / item.filename
+                  assert direct.is_file() and direct.read_bytes() == contents
+                  destination = stage / item.filename
+                  if destination.exists():
+                      assert destination.read_bytes() == contents
+                  else:
+                      destination.parent.mkdir(parents=True, exist_ok=True)
+                      destination.write_bytes(contents)
+          native_report = json.loads((Path(
+              "${{ runner.temp }}/mhcc-011-original-source-audit/editorial-scope.json"
+          )).read_text(encoding="utf-8"))
+          revised = native_report[
+              "private_provisional_range_index_preview_not_approved"][
+                  "private_source_edited_versioned_candidate_not_released"]
+          attested = revised["private_real_native_rebuild_attestation_draft"]
+          assert (attested["source_audit_sha256"] ==
+                  evidence["source_audit_sha256"])
+          assert (attested["source_audit"][
+              "candidate_native_corpus_sha256"] ==
+              evidence["corrected_complete_native_corpus_sha256"])
+          for name, document in (
+              ("SOURCE_AUDIT.json", attested["source_audit"]),
+              ("REVIEW_MANIFEST_DRAFT.json", attested["review_manifest"]),
+              ("SOURCE_VALIDATION_DRAFT.json", attested["source_validation"]),
+          ):
+              content = json.dumps(document, sort_keys=True, indent=2) + "\n"
+              if name == "SOURCE_AUDIT.json":
+                  assert (hashlib.sha256(content.encode()).hexdigest()
+                          == evidence["source_audit_sha256"])
+              target = stage.parent / name
+              if target.exists():
+                  assert target.read_text(encoding="utf-8") == content
+              else:
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  target.write_text(content, encoding="utf-8")
+          print("Verified seven staging blobs, identical to source-attested ZIP;",
+                "committed release=", False)
+          PY
+          git add -- staging/reviewed-mhcc-011/
+          if git diff --cached --quiet; then
+            echo "Candidate blobs already staged at exact hashes; nothing to commit."
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'stage: source-attested seven MHCC 0.1.1 binary members for release review'
+            git push origin "HEAD:refs/heads/${PR_SOURCE_BRANCH}"
+          fi

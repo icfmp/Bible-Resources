@@ -96,6 +96,52 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
                     dest, source=source, attestation=receipt
                 )
 
+    @patch("commentary_xiphos_dual_reader.time.sleep")
+    @patch("commentary_xiphos_dual_reader._main_xiphos_window")
+    def test_real_xiphos_window_appearing_late_is_accepted_without_bypassing_ui(self, window, sleep):
+        from commentary_xiphos_dual_reader import _await_xiphos_visible_window
+        from unittest.mock import Mock
+        window.side_effect = [None] * 27 + ["12345"]
+        app = Mock()
+        display = Mock()
+        app.poll.return_value = None
+        display.poll.return_value = None
+        _await_xiphos_visible_window(app, display, {"DISPLAY": ":91"}, seconds=10)
+        self.assertEqual(window.call_count, 28)
+        self.assertEqual(sleep.call_count, 27)
+        self.assertEqual(app.poll.call_count, 28)
+        self.assertEqual(display.poll.call_count, 28)
+
+    @patch("commentary_xiphos_dual_reader.time.sleep")
+    @patch("commentary_xiphos_dual_reader._main_xiphos_window", return_value=None)
+    def test_xiphos_gui_readiness_fails_closed_if_window_never_visible(self, window, sleep):
+        from commentary_xiphos_dual_reader import _await_xiphos_visible_window
+        from unittest.mock import Mock
+        app = Mock()
+        display = Mock()
+        app.poll.return_value = None
+        display.poll.return_value = None
+        with self.assertRaisesRegex(PilotError, "No independently visible"):
+            _await_xiphos_visible_window(app, display, {"DISPLAY": ":91"}, seconds=8)
+        self.assertEqual(window.call_count, 44)
+        self.assertEqual(sleep.call_count, 44)
+        with self.assertRaisesRegex(PilotError, "Unsafe"):
+            _await_xiphos_visible_window(app, display, {}, seconds=26)
+
+    @patch("commentary_xiphos_dual_reader.time.sleep")
+    @patch("commentary_xiphos_dual_reader._main_xiphos_window", return_value=None)
+    def test_xiphos_gui_readiness_fails_fast_on_reader_exit(self, window, sleep):
+        from commentary_xiphos_dual_reader import _await_xiphos_visible_window
+        from unittest.mock import Mock
+        app = Mock()
+        display = Mock()
+        app.poll.return_value = 1
+        display.poll.return_value = None
+        with self.assertRaisesRegex(PilotError, "ended unexpectedly"):
+            _await_xiphos_visible_window(app, display, {"DISPLAY": ":91"}, seconds=8)
+        window.assert_not_called()
+        sleep.assert_not_called()
+
     @patch("commentary_xiphos_dual_reader._x11")
     def test_visible_full_xiphos_window_required_not_tiny_notice(self, command):
         command.side_effect = [
