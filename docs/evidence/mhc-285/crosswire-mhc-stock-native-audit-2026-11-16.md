@@ -88,3 +88,19 @@ The upstream official [CrossWire MHC GitLab repository](https://gitlab.com/cross
 | `DistributionLicense` | `Public Domain` | `Public Domain` | Yes |
 
 **Bounded conclusion:** all **four** explicitly checked critical field values are identical in independently verified upstream and package configurations. The complete `.conf` byte digests **differ**, so byte-for-byte config identity is **not** claimed; other fields have **not** been reconciled. Nor does agreement with an upstream `Public Domain` metadata claim itself clear CCEL/Logos-prepared electronic-edition rights. The authentic full source OSIS and binary zCom4 K/I/TOP contents, formatting, verse mappings and notes have **not yet** been exhaustively paired; no inference of compilation parity, historic printed-edition identity, editorial correction authorization or release follows. The original source, published package, catalogue and commentary prose remain untouched.
+
+
+### Entire original configuration field-name comparison — successful private CI (2026-11-17)
+
+[Original-source job #134334648809](https://github.com/icfmp/Bible-Resources/actions/runs/44165819190/job/134334648809) **SUCCESS** on exact branch SHA `9665f1966f1632b984ce4794238415d35085f1c6`. Independently authenticated both original source/package bytes again; the nine independent workflows at that SHA also all **SUCCESS**, including the six real CCEL volumes. The source-neutral comparison preserves *ordered lists* for repeated keys, does not collapse duplicates into a map or print original field values.
+
+| Observed class | Original configuration field names (metadata only) |
+| --- | --- |
+| **11 ordered-value equal fields** | `About`, `BlockType`, `CompressType`, `Description`, `DistributionLicense`, `Encoding`, `Lang`, `ModDrv`, `SourceType`, `TextSource`, `Version` |
+| **6 changed ordered-value fields** | `DataPath`, `GlobalOptionFilter`, `InstallSize`, `LCSH`, `MinimumVersion`, `SwordVersionDate` |
+| **2 additional distributed-only field names** | `OSISVersion`, `Versification` |
+| Upstream-only field names | None |
+| Duplicate-value field names in **each** original config | `GlobalOptionFilter` |
+| Nonempty unparsed lines | Upstream **9**, distributed **10**; original comments and section headers can account for part of this, but those lines are not semantically classified |
+
+**Implication:** publisher-to-distribution metadata lineage is better established than with the initial four-field check, but the changed field *values have deliberately not been published or semantically adjudicated*. `Versification` appears only in the distributed configuration, making the effective native versioning/versification contract a **distinct source-to-package validation item**, not automatically an error or an indication of textual divergence. The full config SHA hashes differ, and no canonical equivalence of all settings is asserted. This audit still does **not** compare original authoring-OSIS word order, markup, references, notes, or complete K/I/TOP transport against the compiled SWORD stock. Rights and editorial approval remain separate gates; no original files were changed.
