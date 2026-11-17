@@ -71,6 +71,8 @@ Jesus will judge the world.
 
 In the day of his appearing, everyone will see how wise and happy his friends were and how miserable his enemies are.
 
+Henry warns that Christ's coming will terrify those who **wound and crucify him by apostasy** and astonish the ungodly world.
+
 Remember his return often.
 
 He is **the Beginning and the End**, the Almighty, the eternal and unchanging One from whom all things come and for whom they exist.
@@ -150,6 +152,9 @@ Commit yourselves entirely to the One who rules all things wisely.
 ---
 
 ## Editorial review — Revelation 1
+
+**2026-11-17 second CCEL review:** restored Henry's distinctive warning that Christ's coming brings terror to those who **wound and crucify him by apostasy**, absent from the former shortened modern text. [CCEL Revelation 1](https://ccel.org/ccel/henry/mhcc.lviii.i.html). This is a statement of the source author's theological imagery; exact native SWORD words and markup still require independent review.
+
 
 **Entire CCEL second English witness directly inspected:** [CCEL, Revelation 1](https://ccel.org/ccel/henry/mhcc.lviii.i.html). The original published `MHCC 0.1.1` remains authoritative for native SWORD key/reference and independent acceptance.
 
