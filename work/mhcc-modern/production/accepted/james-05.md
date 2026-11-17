@@ -35,7 +35,7 @@ Indulgence in bodily appetites makes people unfit to attend to the concerns of t
 
 Upright people may be condemned and killed by oppressors. **God notices their suffering**.
 
-Above all, the guilty had condemned and crucified **Jesus Christ the righteous One**.
+Above all, **Henry writes in the collective language of his period that “the Jews” had condemned and crucified Jesus Christ, the righteous One**.
 
 ## Wait patiently for the Lord's coming (verses 7–11)
 
@@ -109,8 +109,6 @@ Whatever our position, let us work without sparing effort in God's service, know
 
 Henry marvels that for **six thousand years** God had continued multiplying pardons without exhausting his grace.
 
-That figure reflects his historical perspective, **not a factual determination of the earth's age or a date required by Scripture**.
-
 Divine mercy remains an **ocean always full and always flowing**.
 
 May we receive this mercy through **Christ's blood and the sanctifying work of the Holy Spirit**.
@@ -118,6 +116,9 @@ May we receive this mercy through **Christ's blood and the sanctifying work of t
 ---
 
 ## Editorial review — James 5
+
+**2026-11-17 complete CCEL second-pass fidelity correction:** restored explicit attribution of Henry's **collectively phrased historical statement about “the Jews”** in the crucifixion passage. The old derivative silently removed that named source group. This is **Henry's own historical characterization**, *not* an editorial endorsement of collective or hereditary Jewish guilt; the qualifier identifying the historical author is deliberate. Separately removed an **invented translator/modern editor's interpretation** concerning the six-thousand-year reckoning from the actual commentary prose; Henry's number is preserved verbatim in attribution and any historical-critical explanation belongs in a separate edition note, not in his translation. [CCEL James 5](https://ccel.org/ccel/henry/mhcc.li.v.html). Native SWORD I/K wording, exact note/verse links and independent signoff still pending.
+
 
 **Entire original-English CCEL secondary source examined:** [CCEL, James 5](https://ccel.org/ccel/henry/mhcc.li.v.html). Published `MHCC 0.1.1` remains authoritative for native SWORD markup/key mapping and independent editorial acceptance.
 
