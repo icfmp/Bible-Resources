@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "source_repository": "https://github.com/icfmp/ACAI",
+  "source_commit": "e80a874e8282f996199c595378a3b3b9a43aac22",
+  "source_records_expected": 6644,
+  "source_license": "CC BY-SA 4.0",
+  "source_credit": "ACAI Biblical Entity Data — BiblioNexus / Mission Mutual; original BibleAquifer/ACAI contributors",
+  "reviewed_hebrew_source": "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c",
+  "reviewed_greek_source": "Clear-Bible/macula-greek@8423afe47b9e8f24b7772e808af45c7159a6fe7e"
+}

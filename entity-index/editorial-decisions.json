@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "decisions": [
+    {
+      "source_id": "person:Jashar",
+      "action": "replace_identity",
+      "id": "work:BookOfJashar",
+      "kind": "literary_work",
+      "canonical_id": "work:BookOfJashar",
+      "reason": "Joshua 10:13 and 2 Samuel 1:18 name a literary work, not a historical man; aligned Hebrew adjectives are the title epithet, not the whole phrase.",
+      "evidence": [
+        "Macula WLC JOS 10:13 o060100130142",
+        "Macula WLC 2SA 1:18 o100010180102"
+      ]
+    },
+    {
+      "source_id": "person:Perez-uzzah",
+      "action": "replace_identity",
+      "id": "place:PerezUzzah",
+      "kind": "place",
+      "canonical_id": "place:PerezUzzah",
+      "add_references": [
+        "13013011"
+      ],
+      "add_explicit_instances": {
+        "wlc": [
+          [
+            "o130130110111",
+            "o130130110121"
+          ]
+        ]
+      },
+      "reason": "The named place Perez-uzzah is attested at 2 Samuel 6:8 and 1 Chronicles 13:11, distinct from Uzzah the man.",
+      "evidence": [
+        "Macula WLC 2SA 6:8 o100060080121 o100060080131",
+        "Macula WLC 1CH 13:11 o130130110111 o130130110121"
+      ]
+    },
+    {
+      "source_id": "person:Uzzah",
+      "action": "amend_occurrences",
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o100060080121",
+            "o100060080131"
+          ]
+        ]
+      },
+      "reason": "The compound Perez-uzzah is a place-name; genuine personal-name tokens including o100060080082 remain untouched.",
+      "evidence": [
+        "Macula WLC 2SA 6:8"
+      ]
+    },
+    {
+      "source_id": "person:Hammelech",
+      "action": "quarantine",
+      "reason": "Three aligned terms in Jeremiah 36:26 and 38:6 mean 'the king' (common noun, not a named man); do not infer one historical individual or kinship.",
+      "evidence": [
+        "Macula WLC JER 36:26 o240360260022 o240360260062",
+        "Macula WLC JER 38:6 o240380060102"
+      ]
+    }
+  ]
+}
