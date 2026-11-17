@@ -1048,6 +1048,8 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
                                 len(candidates),
                             "single_matching_original_p_document_ordinal":
                                 candidates[0] if len(candidates)==1 else None,
+                            "single_matching_original_p_exact_unicode_word_sha256":
+                                digest if len(candidates)==1 else None,
                             "exact_original_p_identity_not_bible_heading_classification":
                                 True,
                         })
@@ -1059,8 +1061,14 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
                     )
                 original_extra_p_digest_case_counts[p_class]+=1
                 original_extra_p_digest_book_counts.setdefault(book,Counter())[p_class]+=1
+                if not re.fullmatch(
+                        r"[1-4]?[A-Za-z][A-Za-z0-9]{1,15}\\.[0-9]+\\.[0-9]+",start
+                ):
+                    raise PilotError("Original source start reference is not a verified OSIS verse")
                 original_extra_p_digest_rows.append({
                     "original_book":book,
+                    "original_source_chapter_number_from_actual_osis_start":
+                        int(start.rsplit(".",2)[1]),
                     "original_source_line":item["original_source_line"],
                     "original_full_reference_sha256":
                         item["original_full_reference_sha256"],
