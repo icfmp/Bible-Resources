@@ -18,7 +18,9 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Regression tests (offline, no data download)
-        run: python3 -I entity-index/test_build.py
+        run: |
+          python3 -I entity-index/test_build.py
+          python3 -I entity-index/test_resolve.py
 
       - name: Check out frozen self-hosted ACAI source
         shell: bash
@@ -58,6 +60,22 @@ jobs:
           assert all("localizations" not in entry and "speeches" not in entry
                      for entry in index["entities"])
           assert index["provenance"]["source_license"] == "CC BY-SA 4.0"
+          import importlib.util
+          spec=importlib.util.spec_from_file_location("entity_query",
+               "entity-index/resolve.py")
+          module=importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(module)
+          resolver=module.EntityResolver(index)
+          edition=index["provenance"]["source_editions"]["wlc"]["edition"]
+          jashar=resolver.resolve(corpus="wlc", edition=edition,
+                word_id="o060100130142", verse_id="06010013")
+          assert "work:BookOfJashar" in jashar["canonical_ids"], jashar
+          perez=resolver.resolve(corpus="wlc", edition=edition,
+                word_id="o100060080121", verse_id="10006008")
+          assert perez["canonical_ids"] == ["place:PerezUzzah"], perez
+          mismatch=resolver.resolve(corpus="wlc", edition=edition+"-other",
+                word_id="o100060080121", verse_id="10006008")
+          assert mismatch["status"] == "incompatible_source_edition", mismatch
           print("ENTITY_INDEX_QA", json.dumps(stats, sort_keys=True))
           PY
 
