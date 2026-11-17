@@ -9,6 +9,8 @@ on:
       - 'tests/test_commentary_source_native_boundaries.py'
       - 'scripts/commentary_nonlink_word_alignment.py'
       - 'tests/test_commentary_nonlink_word_alignment.py'
+      - 'scripts/commentary_nonlink_words.py'
+      - 'tests/test_commentary_nonlink_words.py'
       - 'config/commentary-intake/mhc-crosswire.json'
   workflow_dispatch:
     inputs:
@@ -48,6 +50,7 @@ jobs:
           python -m unittest discover -s tests -p 'test_commentary_private_text_compare.py' -v
           python -m unittest discover -s tests -p 'test_commentary_source_native_boundaries.py' -v
           python -m unittest discover -s tests -p 'test_commentary_nonlink_word_alignment.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_nonlink_words.py' -v
       - name: Install real original native SWORD readers
         shell: bash
         run: |
@@ -224,6 +227,18 @@ jobs:
           assert len(link_scope["original_line_sha_and_closed_link_word_metadata_only_rows"]) == expected_longer
           print("Source longer word differences after excluding only source scripRef labels:",
                 json.dumps(link_scope["source_link_label_exclusion_classes"],sort_keys=True))
+          dual=report["source_longer_source_and_native_reference_label_word_scope"]
+          assert dual["source_longer_same_start_cases"] == expected_longer
+          assert dual["original_book_case_counts"] == native_scope["original_book_case_counts"]
+          assert dual["excluded_only_original_scripRef_and_real_native_reference_labels"]
+          assert dual["native_reference_offset_and_visible_text_ownership_strictly_verified"]
+          assert dual["original_source_or_native_binary_modified"] is False
+          assert dual["no_unlinked_word_category_implies_authorial_edition_parity_or_missing_text"]
+          assert sum(dual["original_vs_native_unlinked_word_relation_classes"].values()) == expected_longer
+          assert len(dual["original_line_SHA_and_two_sided_link_word_metadata_only_rows"]) == expected_longer
+          print("Original and native both-side citation label exclusion, unlinked words:",
+                json.dumps(dual["original_vs_native_unlinked_word_relation_classes"],
+                           sort_keys=True))
           evidence = {
               "status": "SOURCE_STOCK_ONE_VOLUME_LEXICAL_CENSUS_NOT_PARITY",
               "resource_id": "mhc-crosswire",
@@ -246,6 +261,7 @@ jobs:
               "source_book_word_relationship_subtypes": by_book_relations,
               "source_longer_original_native_K_run_scope_diagnostics": native_scope,
               "source_longer_original_scripRef_label_word_scope": link_scope,
+              "source_longer_both_source_and_native_reference_label_word_scope": dual,
               "source_book_counts_are_not_editorial_content_parity": True,
               "closed_lexical_difference_types": lexical,
               "closed_word_sequence_relationship_types": relationships,

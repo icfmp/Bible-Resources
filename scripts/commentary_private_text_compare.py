@@ -40,6 +40,7 @@ from commentary_original_bookcode_repair import propose_private_source_bookcode_
 from commentary_prose_cross_slot import strict_native_stock_plain_words
 from commentary_nonlink_word_alignment import (plain_word_alignment,
     classify_original_link_label_effect_on_source_longer_words)
+from commentary_nonlink_words import compare_words_outside_links
 from commentary_unresolved_lexical_triage import WORD
 from commentary_near_prose_unicode_review import classify_same_book_unicode_variants
 from commentary_intake import load_manifest
@@ -271,6 +272,30 @@ def raw_as_strict_xml_text(raw: bytes) -> str | None:
         return "".join(fragment.itertext())
     except (ValueError,UnicodeError,etree.XMLSyntaxError):
         return None
+
+
+def private_actual_native_reference_word_positions(
+        raw: bytes, expected_visible_text: str) -> list[int]:
+    """Re-parse original native reference elements without trusting a display label.
+
+    This uses the same strict XML and exact text/tail accounting as the native
+    text reader. No source or stock words, links or XML are ever reported.
+    """
+    if (not isinstance(raw, bytes) or not isinstance(expected_visible_text, str)
+            or len(raw) > 2*1024*1024 or b"\x00" in raw):
+        raise PilotError("Original native reference word-offset input outside safe bounds")
+    try:
+        node=etree.fromstring(
+            b"<original>"+raw+b"</original>",
+            parser=etree.XMLParser(
+                resolve_entities=False,no_network=True,load_dtd=False,
+                recover=False,huge_tree=False,remove_blank_text=False))
+    except (ValueError,UnicodeError,etree.XMLSyntaxError):
+        raise PilotError("Original native raw markup cannot certify reference labels") from None
+    if (any(isinstance(child,etree._Entity) for child in node.iter())
+            or "".join(node.itertext()) != expected_visible_text):
+        raise PilotError("Original native reference text/tail or entity safety mismatch")
+    return marked_word_token_indices(node,"reference",expected_visible_text)
 
 
 def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes],
@@ -931,6 +956,10 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
         longer_link_original_book_counts={}
         longer_link_book_classes={}
         longer_link_rows=[]
+        double_link_class_counts=Counter()
+        double_link_original_book_counts={}
+        double_link_book_classes={}
+        double_link_rows=[]
         def record_same_start_source_longer(start,item,raw):
             source_longer_cases.append((start,{
                 "original_source_line":item["original_source_line"],
@@ -957,6 +986,24 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
                 "original_body_sha256":item["original_text_sha256"],
                 "selected_native_raw_sha256":sha256(raw).hexdigest(),
                 **linked_review,
+            })
+            native_reference_positions=private_actual_native_reference_word_positions(
+                raw,native_visible)
+            two_sided=compare_words_outside_links(
+                WORD.findall(item["original_text"]),WORD.findall(native_visible),
+                item["private_original_scripRef_word_indices"],native_reference_positions)
+            category=two_sided["outside_link_word_relation"]
+            double_link_class_counts[category]+=1
+            double_link_original_book_counts[book]=(
+                double_link_original_book_counts.get(book,0)+1)
+            double_link_book_classes.setdefault(book,Counter())[category]+=1
+            double_link_rows.append({
+                "source_book":book,
+                "original_source_line":item["original_source_line"],
+                "original_full_reference_sha256":item["original_full_reference_sha256"],
+                "original_body_sha256":item["original_text_sha256"],
+                "selected_native_raw_sha256":sha256(raw).hexdigest(),
+                **two_sided,
             })
         analysis=compare_private_texts(source,matches,
             on_unresolved_word_case=reference_cross_slot.observe_unresolved,
@@ -987,6 +1034,33 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
             "source_extra_words_not_proof_of_lost_authorial_text":True,
             "full_punctuation_markup_paragraph_editional_parity_proven":False,
         }
+        source_stock_both_sides_link_label_review={
+            "status":"ORIGINAL_AND_NATIVE_LINK_LABEL_EXCLUSION_TEXT_SCOPE_RESEARCH_ONLY",
+            "source_longer_same_start_cases":len(double_link_rows),
+            "original_vs_native_unlinked_word_relation_classes":
+                dict(sorted(double_link_class_counts.items())),
+            "original_book_case_counts":
+                dict(sorted(double_link_original_book_counts.items())),
+            "original_book_unlinked_word_relation_classes":{
+                k:dict(sorted(v.items())) for k,v in sorted(double_link_book_classes.items())
+            },
+            "original_line_SHA_and_two_sided_link_word_metadata_only_rows":
+                sorted(double_link_rows,key=lambda x:(
+                    x["source_book"],x["original_source_line"],
+                    x["original_full_reference_sha256"])),
+            "excluded_only_original_scripRef_and_real_native_reference_labels":True,
+            "native_reference_offset_and_visible_text_ownership_strictly_verified":True,
+            "original_source_or_native_binary_modified":False,
+            "no_unlinked_word_category_implies_authorial_edition_parity_or_missing_text":True,
+            "published":False,
+        }
+        if (len(double_link_rows)!=expected_longer or
+                sum(double_link_class_counts.values())!=expected_longer
+                or sum(double_link_original_book_counts.values())!=expected_longer
+                or any(sum(groups.values())!=double_link_original_book_counts[book]
+                       for book,groups in double_link_book_classes.items())
+                or double_link_original_book_counts!=longer_link_original_book_counts):
+            raise PilotError("Actual source/native double-sided link exclusion audit incomplete")
         if (len(longer_link_rows)!=expected_longer or
                 sum(longer_link_class_counts.values())!=expected_longer or
                 sum(longer_link_original_book_counts.values())!=expected_longer
@@ -1145,6 +1219,8 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
         "source_nonlink_prose_review_stock_raw_duplicate_topology":plain_payload_topology,
         "source_longer_original_native_run_structural_scope":original_source_longer_native_scope,
         "source_longer_original_link_label_word_scope":source_longer_link_label_review,
+        "source_longer_source_and_native_reference_label_word_scope":
+            source_stock_both_sides_link_label_review,
         "source_large_nonlink_prose_native_alternative_locations":alternative_prose,
         "source_large_prose_marker_to_native_raw_run_boundary_diagnostics":boundary_case_report,
         "source_complete_original_units_within_shared_stock_raw_K_runs":complete_shared_run_sources,

@@ -14,6 +14,33 @@ from pilot_preflight import PilotError
 
 
 class CommentaryOriginalStockTextTests(unittest.TestCase):
+    def test_real_compiled_reference_markup_exclusion_is_independent_of_text(self):
+        from commentary_private_text_compare import private_actual_native_reference_word_positions
+        from commentary_nonlink_words import compare_words_outside_links
+        raw=b"<p>Alpha <reference osisRef='Gen.2.1'>quoted citation</reference> omega.</p>"
+        visible=raw_as_strict_xml_text(raw)
+        self.assertEqual(visible,"Alpha quoted citation omega.")
+        positions=private_actual_native_reference_word_positions(raw,visible)
+        self.assertEqual(positions,[1,2])
+        checked=compare_words_outside_links(
+            ["Alpha","quoted","citation","omega"],
+            ["Alpha","quoted","citation","omega"],
+            [1,2],positions)
+        self.assertEqual(checked["outside_link_word_relation"],
+                         "same_ordered_case_sensitive_unicode_plain_words")
+        self.assertEqual(checked["stock_reference_word_tokens_removed"],2)
+        self.assertFalse(checked["actual_original_words_or_compiled_content_exposed"])
+        self.assertNotIn('"quoted"',json.dumps(checked))
+
+    def test_compiled_reference_word_positions_block_malformed_markup_or_text_mismatch(self):
+        from commentary_private_text_compare import private_actual_native_reference_word_positions
+        with self.assertRaises(PilotError):
+            private_actual_native_reference_word_positions(
+                b"<p>Unclosed</invalid>","Unclosed")
+        with self.assertRaises(PilotError):
+            private_actual_native_reference_word_positions(
+                b"<p>Original native</p>","Other")
+
     def test_large_ordered_source_witness_never_claims_exact_content_parity(self):
         from commentary_private_text_compare import select_authorial_word_loss_attention
         def case(value):

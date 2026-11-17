@@ -1315,9 +1315,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 2,
+      "static_reference_count": 4,
       "static_references": [
+        "scripts/commentary_private_text_compare.py",
         "scripts/commentary_unresolved_lexical_triage.py",
+        ".github/workflows/commentary-mhc-source-text.yml",
         "tests/test_commentary_nonlink_words.py"
       ]
     },
@@ -1648,6 +1650,7 @@
         "commentary_native_raw_inventory",
         "commentary_near_prose_unicode_review",
         "commentary_nonlink_word_alignment",
+        "commentary_nonlink_words",
         "commentary_original_bookcode_repair",
         "commentary_original_div1_book_consistency",
         "commentary_prose_cross_slot",
@@ -1676,7 +1679,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "dc1f4a307d4e3e621d35626873c3a581194b786e688c7257194b12c88bd0879d",
+      "sha256_at_inventory": "2810c4e58b3cae28332963dafa02ba3297ca6f96024915abe1816ec04d8321ce",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
