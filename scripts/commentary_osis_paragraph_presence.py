@@ -101,7 +101,8 @@ def original_ccel_paragraph_words(
 def original_authoring_chapter_scope_metadata(
         book_div: etree._Element, chapter_ref: str,
         *, _private_words_sink: list[str] | None = None,
-        _private_visible_text_sink: list[str] | None = None) -> dict:
+        _private_visible_text_sink: list[str] | None = None,
+        _private_reference_targets_sink: list[str] | None = None) -> dict:
     """Audit real chapter milestone bounds; never expose or rewrite source words.
 
     Book ownership and section starts are independent of any proposed missing
@@ -120,6 +121,7 @@ def original_authoring_chapter_scope_metadata(
     opens=0
     closes=0
     parts=[]
+    reference_targets=[]
     elements=Counter()
     def visit(node):
         nonlocal state,opens,closes
@@ -150,6 +152,12 @@ def original_authoring_chapter_scope_metadata(
         if state==1:
             if tag in ("p","verse","chapter","title","div","reference","note","q"):
                 elements[tag]+=1
+            if tag == "reference":
+                # Preserve the exact original OSIS link target, including
+                # absent/empty attributes as empty strings. No normalization.
+                reference_targets.append(node.get("osisRef") or "")
+                if len(reference_targets)>5000:
+                    raise ValueError("Unreviewed original OSIS reference volume")
             if node.text:
                 parts.append(node.text)
         for child in node:
@@ -174,9 +182,15 @@ def original_authoring_chapter_scope_metadata(
                 or _private_visible_text_sink):
             raise ValueError("Original chapter private visible text sink must be empty")
         _private_visible_text_sink.append(visible)
+    if _private_reference_targets_sink is not None:
+        if (type(_private_reference_targets_sink) is not list
+                or _private_reference_targets_sink):
+            raise ValueError("Original private reference sink must be empty")
+        _private_reference_targets_sink.extend(reference_targets)
     return {
         "authentic_chapter_milestone_start_end_count":[opens,closes],
         "bounded_original_chapter_visible_words":len(words),
+        "bounded_original_chapter_reference_elements":len(reference_targets),
         "original_chapter_visible_text_sha256":sha256(visible.encode("utf-8")).hexdigest(),
         "original_chapter_element_start_counts_by_tag":dict(sorted(elements.items())),
         "no_original_chapter_words_exported":True,
@@ -308,6 +322,32 @@ def _private_interior_character_relation(
     return "interior_nonword_punctuation_or_spacing_difference"
 
 
+
+def _private_native_reference_targets(root: etree._Element) -> list[str]:
+    """Read exact original SWORD OSIS link targets; never export their values."""
+    targets=[]
+    for node in root.iter():
+        if not isinstance(node.tag, str):
+            raise ValueError("Unreviewed native reference markup node")
+        if node.tag.rsplit("}",1)[-1]=="reference":
+            targets.append(node.get("osisRef") or "")
+            if len(targets)>5000:
+                raise ValueError("Unreviewed native OSIS reference volume")
+    return targets
+
+
+def _private_reference_sequence_sha256(targets: list[str]) -> str:
+    """Unambiguous length-framed link target digest, no raw targets published."""
+    h=sha256()
+    for value in targets:
+        if not isinstance(value,str) or len(value)>8192:
+            raise ValueError("Invalid source/native reference target")
+        raw=value.encode("utf-8")
+        h.update(len(raw).to_bytes(4,"big"))
+        h.update(raw)
+    return h.hexdigest()
+
+
 class PrivateOriginalChapterNativeAnchorCoverage:
     """Read-only visible-word *anchor* overlap of original OSIS vs native K.
 
@@ -326,7 +366,13 @@ class PrivateOriginalChapterNativeAnchorCoverage:
     KEY = re.compile(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*\.[1-9][0-9]*\Z")
 
     def __init__(self, chapter_words: dict[str, list[str]], *,
-                 private_chapter_visible_texts: dict[str, str] | None = None):
+                 private_chapter_visible_texts: dict[str, str] | None = None,
+                 private_chapter_reference_targets: dict[str, list[str]] | None = None):
+        if (private_chapter_reference_targets is not None
+                and (not isinstance(chapter_words,dict)
+                     or not isinstance(private_chapter_reference_targets,dict)
+                     or set(private_chapter_reference_targets)!=set(chapter_words))):
+            raise ValueError("Original chapter reference sample identities disagree")
         if (private_chapter_visible_texts is not None
                 and (not isinstance(chapter_words, dict)
                      or not isinstance(private_chapter_visible_texts, dict)
@@ -359,11 +405,22 @@ class PrivateOriginalChapterNativeAnchorCoverage:
             source_spans = (
                 [] if source_visible is None else
                 [match.span() for match in WORD.finditer(source_visible)])
+            if private_chapter_reference_targets is not None:
+                targets=private_chapter_reference_targets[chapter]
+                if (not isinstance(targets,list) or len(targets)>5000
+                        or any(not isinstance(ref,str) or len(ref)>8192
+                               for ref in targets)):
+                    raise ValueError("Unreviewed original chapter reference targets")
             self._scopes[chapter] = {
                 "source_visible_text": source_visible,
                 "source_word_spans": source_spans,
                 "native_K_interior_character_relation_classes": defaultdict(int),
                 "native_I_interior_character_relation_classes": defaultdict(int),
+                "source_reference_targets": (
+                    None if private_chapter_reference_targets is None
+                    else list(private_chapter_reference_targets[chapter])),
+                "native_reference_target_segments": [],
+                "native_unlocated_reference_target_count": 0,
                 "source_words": words,
                 "source_windows": windows,
                 "matching_windows": set(),
