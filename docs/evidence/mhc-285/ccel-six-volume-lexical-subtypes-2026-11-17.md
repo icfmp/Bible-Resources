@@ -36,6 +36,30 @@ The most striking source-longer-than-stock group is **volume III**, with **117 o
 
 Of **1,222** cases with the **same exact Unicode word tokens**, there are **1,186** with the same nonword symbols but different locations/whitespace, **35** with different nonword character identities/counts, and **1** with the same nonword symbol counts but different order. Even identical word sequences are **not** proof of punctuation, Bible quotations or annotated-reference fidelity.
 
+## Canonical-book localization — independent final source-book reconciliation
+
+[Six real source-book relationship audits #44070922738](https://github.com/icfmp/Bible-Resources/actions/runs/44070922738) **all SUCCESS**, at draft PR head `0b462154351320763efa3eca6a22be3aa5e64bfd`. The generic private comparator now aggregates the *original source reference's book code*, not a book guessed from stock prose, and the workflow independently asserts that the per-book counts sum exactly to each of the prior closed lexical classes. No original words, body fragments or unreviewed editorial headings are exported.
+
+The **128** cases where original CCEL has extra words relative to the native CrossWire entry *at the same start reference* localize exactly as:
+
+| Original biblical book | Source-longer-than-stock in-order cases |
+| --- | ---: |
+| **Psalms (Ps)** | **116** |
+| Isaiah (Isa) | 3 |
+| Romans (Rom) | 3 |
+| Acts | 2 |
+| Genesis (Gen) | 1 |
+| 2 Chronicles (2Chr) | 1 |
+| Ecclesiastes (Eccl) | 1 |
+| Jeremiah (Jer) | 1 |
+| **Total** | **128** |
+
+**Priority for editorial/source-native investigation:** Psalms accounts for **116/128** of this precise relationship class. It is a systematic *same-start stock-versus-source text-scope discrepancy*, but the current evidence does **not** distinguish compiled verse-group sharing, source division ownership, altered historical edition, omitted words or prepared digital headings. Do **not** bulk-copy CCEL paragraphs or mechanically split/merge the SWORD commentary to resolve these counts. The authored text and canonical locations must be authenticated before judging each case. Psalms should be audited as a reusable pattern before reviewing the smaller independent classes.
+
+The separate **82** cases requiring different word-order/selection examination concentrate in **Matthew (13)**, **John (10)**, **Proverbs (9)**, **Acts (6)**, **2 Chronicles (5)**, **Psalms (5)** and **Romans (5)**; other original books account for the remaining **29**. These **82 broad relationship cases** are not the same metric as the **20** bounded definite-LCS original-word-order differences or the **46** LCS-budget-unresolved results noted above.
+
+The independent canonical-book reference is just research metadata, not a source verse reassignment. All six audited original source sections and native original content remain intact.
+
 ## Further gates
 
 The previous SHA-pinned full six-volume census already accounted for all **4,263** original verse/range section markers and **1,306** separate chapter markers (5,569 total `scripCom`). The subsequent detailed lexical comparison is **a classification of the 1,606**, **not** a claim that the other 2,648 whitespace-only cases or the 5 nonvisible source divisions have complete markup/section/edition parity. The four unoccupied original source starts remain under the previously classified CCEL index / source-grounded alias issues #288 and #290.
