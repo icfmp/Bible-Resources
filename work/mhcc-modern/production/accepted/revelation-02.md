@@ -75,7 +75,7 @@ The trials were permitted to **test, not destroy**, his faithful people.
 
 His promised **crown of life** is certain and fitting: a life exhausted or surrendered for Christ is rewarded with a far greater, eternal life.
 
-The **second death** is immeasurably more terrible than bodily death because it is everlasting.
+The **second death** is immeasurably more terrible than bodily death because it is everlasting. Henry describes its terror as **dying and always dying**.
 
 Those spared that judgment through Christ can patiently bear any suffering encountered in this world.
 
@@ -134,6 +134,9 @@ After every spiritual victory, continue resisting the enemy until the end.
 ---
 
 ## Editorial review — Revelation 2
+
+**2026-11-17 second CCEL review:** restored Henry's rhetorical image **“to die, and to be always dying”** for the eternal second death, which the draft only called everlasting. [CCEL Revelation 2](https://ccel.org/ccel/henry/mhcc.lviii.ii.html). Original released native source and independent acceptance remain pending.
+
 
 **Complete original-English second witness inspected:** [CCEL, Revelation 2](https://ccel.org/ccel/henry/mhcc.lviii.ii.html). Released `MHCC 0.1.1` remains authority for native SWORD links/markup and independent QA.
 
