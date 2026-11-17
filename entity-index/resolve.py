@@ -25,6 +25,9 @@ class EntityResolver:
             raise ValueError("Invalid source-unattested word audit")
         if set(self.unattested_words) & set(self.words):
             raise ValueError("Source-unattested word must not remain lookup-indexed")
+        self.unattested_verses = index.get("unattested_source_verses", {})
+        if not isinstance(self.unattested_verses, dict):
+            raise ValueError("Invalid pinned source-absent verse inventory")
         entities = index.get("entities")
         if not isinstance(entities, list):
             raise ValueError("Missing entity records")
@@ -61,6 +64,9 @@ class EntityResolver:
             result["status"] = "invalid_source_word_id"
         elif word_id[1:9] != verse_id:
             result["status"] = "verse_context_mismatch"
+        elif corpus + ":" + verse_id in self.unattested_verses:
+            result["status"] = "verse_not_in_pinned_original_word_inventory"
+            result["source_absence"] = self.unattested_verses[corpus + ":" + verse_id]
         elif corpus + ":" + word_id in self.unattested_words:
             result["status"] = "unattested_source_word_id"
             result["source_absence"] = self.unattested_words[corpus + ":" + word_id]

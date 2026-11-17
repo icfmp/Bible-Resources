@@ -158,6 +158,28 @@ original-language word against both pinned texts. The general source
 parity audit and source-version/versification compatibility remain pending
 in [#299](https://github.com/icfmp/Bible-Resources/issues/299).
 
+## Greek verse inventory compatibility — not a versification rewrite
+
+The pinned Macula SBLGNT original-word inventory and imported ACAI source
+reference claims disagree on **eight verse identifiers (22 entity-reference
+claims)**. The exact evidence is separately recorded in
+[`source-unattested-verses.json`](source-unattested-verses.json), sourced from
+the full original audit [ACAI #88](https://github.com/icfmp/ACAI/issues/88).
+The original source verse references **remain unchanged** in each entity
+entry. The derived `unattested_source_verses` section marks each affected
+verse with the source edition, exact claimant entity IDs and provenance.
+
+An exact Greek word lookup in one of those verses receives the status
+`verse_not_in_pinned_original_word_inventory` rather than a fabricated
+source word or a misleading plain `no_indexed_entity`. This is **strictly
+about missing verse IDs in our pinned word-inventory witness**, not a claim
+that the verse is universally absent from the Bible or should be renumbered.
+Matthew 23:14 and Acts 8:37 are textual variants, while 2 Corinthians 13:14
+reflects a source-versification mismatch relative to 13:13. Romans 16:25/27
+also require a distinct pinned-source completeness and traditional epistle
+subscription review (see inherited #86). Variant provenance is therefore
+retained for later source-specific qualification.
+
 ## Offline lookup and uncertainty handling
 
 `resolve.py` exposes `EntityResolver`. It requires a corpus name, its

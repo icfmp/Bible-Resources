@@ -33,6 +33,14 @@ def fixture():
              "source_id": "person:OldAlias", "references": [],
              "editorial_reason": "Documented spelling form, not a distinct person."},
         ],
+        "unattested_source_verses": {
+            "sblgnt:40001002": {
+                "source_edition": "Macula-SBLGNT@frozen",
+                "scope": "absent_from_pinned_original_word_inventory_only",
+                "source_reference_claims": ["person:Alpha"],
+                "evidence": [{"source": "source-verse-audit"}],
+            },
+        },
         "unattested_source_words": {
             "wlc:o010010010041": {
                 "source_edition": "Macula-WLC@frozen",
@@ -106,6 +114,24 @@ class ResolverTests(unittest.TestCase):
         self.assertEqual(r["status"], "no_indexed_entity")
         self.assertEqual(r["candidates"], [])
         self.assertEqual(r["canonical_ids"], [])
+
+    def test_verse_absent_from_pinned_original_word_source_only(self):
+        r = self.lookup(corpus="sblgnt",
+                        edition="Macula-SBLGNT@frozen",
+                        word_id="n40001002001", verse_id="40001002")
+        self.assertEqual(r["status"],
+                         "verse_not_in_pinned_original_word_inventory")
+        self.assertEqual(r["canonical_ids"], [])
+        self.assertEqual(r["source_absence"]["source_reference_claims"],
+                         ["person:Alpha"])
+        self.assertEqual(
+            self.lookup(corpus="sblgnt", edition="Macula-SBLGNT@other",
+                        word_id="n40001002001", verse_id="40001002")["status"],
+            "incompatible_source_edition")
+        self.assertEqual(
+            self.lookup(corpus="sblgnt", edition="Macula-SBLGNT@frozen",
+                        word_id="n40001001001", verse_id="40001002")["status"],
+            "verse_context_mismatch")
 
     def test_source_unattested_word_never_becomes_entity_candidate(self):
         r = self.lookup(word_id="o010010010041")

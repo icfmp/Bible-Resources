@@ -75,7 +75,8 @@ def apply_word_edits(entry, decision):
 
 
 def build(source_root: Path, source_lock: dict, editorial: dict,
-          source_absences: dict | None = None) -> dict:
+          source_absences: dict | None = None,
+          source_verse_absences: dict | None = None) -> dict:
     if source_lock.get("schema_version") != 1 or editorial.get("schema_version") != 1:
         raise ValueError("Unsupported lock or editorial decision schema")
     decisions = {}
@@ -236,6 +237,43 @@ def build(source_root: Path, source_lock: dict, editorial: dict,
         for word in group
         if f"{source_corpus}:{word}" in unattested
     )
+    # This is an edition-specific source-WORD-INVENTORY compatibility
+    # annotation, not a decision about canonical Bible versification or
+    # which textual readings are genuine. Raw entity references stay intact.
+    if source_verse_absences is None:
+        source_verse_absences = {
+            "schema_version": 1, "corpus": "sblgnt",
+            "source_edition": source_lock["source_editions"]["sblgnt"]["edition"],
+            "verse_ids": [], "provenance": [],
+        }
+    if source_verse_absences.get("schema_version") != 1:
+        raise ValueError("Unsupported absent-verse inventory schema")
+    verse_corpus = source_verse_absences.get("corpus")
+    verse_edition = source_verse_absences.get("source_edition")
+    verse_catalog = source_lock["source_editions"].get(verse_corpus)
+    if not isinstance(verse_catalog, dict) or verse_catalog.get("edition") != verse_edition:
+        raise ValueError("Absent-verse inventory not pinned to this original edition")
+    reported_verses = source_verse_absences.get("verse_ids")
+    verse_evidence = source_verse_absences.get("provenance")
+    if not isinstance(reported_verses, list) or not isinstance(verse_evidence, list):
+        raise ValueError("Malformed absent-verse inventory manifest")
+    if reported_verses and not verse_evidence:
+        raise ValueError("Absent-verse inventory needs source audit provenance")
+    if len(reported_verses) != len(set(reported_verses)):
+        raise ValueError("Duplicate source-absent verse IDs")
+    unattested_verses = {}
+    for verse in sorted(reported_verses):
+        if not isinstance(verse, str) or len(verse) != 8 or not verse.isdigit():
+            raise ValueError(f"Malformed source-absent verse ID: {verse!r}")
+        claims = [entry["id"] for entry in entries if verse in entry["references"]]
+        if not claims:
+            raise ValueError(f"Source-absent verse not referenced in derived index: {verse}")
+        unattested_verses[f"{verse_corpus}:{verse}"] = {
+            "source_edition": verse_edition,
+            "source_reference_claims": claims,
+            "evidence": verse_evidence,
+            "scope": "absent_from_pinned_original_word_inventory_only",
+        }
     return {
         "format": "bible-entity-index",
         "schema_version": 1,
@@ -257,11 +295,16 @@ def build(source_root: Path, source_lock: dict, editorial: dict,
             "indexed_distinct_source_words": len(by_word),
             "unattested_distinct_source_words": len(unattested),
             "unattested_raw_word_assignments": unattested_raw_assignments,
+            "unattested_source_verses": len(unattested_verses),
+            "unattested_source_verse_reference_claims": sum(
+                len(x["source_reference_claims"])
+                for x in unattested_verses.values()),
         },
         "quarantined": sorted(quarantined, key=lambda x: x["source_id"]),
         "entities": entries,
         "by_word": by_word,
         "unattested_source_words": unattested,
+        "unattested_source_verses": unattested_verses,
     }
 
 
@@ -274,6 +317,9 @@ def main():
     parser.add_argument("--source-absences", type=Path,
                         default=Path(__file__).with_name("source-unattested-words.json"),
                         help="Pinned source-word audit evidence; only affects derived lookup")
+    parser.add_argument("--source-verse-absences", type=Path,
+                        default=Path(__file__).with_name("source-unattested-verses.json"),
+                        help="Edition-specific pinned original-word verse inventory evidence")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--verify-source-commit", action="store_true",
                         help="Require the local Git HEAD to equal the source lock")
@@ -286,7 +332,8 @@ def main():
         if actual != lock["source_commit"]:
             raise SystemExit(f"Wrong pinned source revision: {actual}")
     result = build(args.source, lock, read_json(args.decisions),
-                   read_json(args.source_absences))
+                   read_json(args.source_absences),
+                   read_json(args.source_verse_absences))
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n",
