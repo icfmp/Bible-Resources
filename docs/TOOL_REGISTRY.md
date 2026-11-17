@@ -56,7 +56,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_navigation_link_plan.py`](../scripts/commentary_navigation_link_plan.py) | UNDECIDED | named test | 5 | not determined |
 | [`scripts/commentary_near_prose_unicode_review.py`](../scripts/commentary_near_prose_unicode_review.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_nonlink_word_alignment.py`](../scripts/commentary_nonlink_word_alignment.py) | MERGE | named test | 10 | not determined |
-| [`scripts/commentary_nonlink_words.py`](../scripts/commentary_nonlink_words.py) | MERGE | named test | 4 | not determined |
+| [`scripts/commentary_nonlink_words.py`](../scripts/commentary_nonlink_words.py) | MERGE | named test | 5 | not determined |
 | [`scripts/commentary_original_bookcode_repair.py`](../scripts/commentary_original_bookcode_repair.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/commentary_original_div1_book_consistency.py`](../scripts/commentary_original_div1_book_consistency.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_osis_intro_transport_probe.py`](../scripts/commentary_osis_intro_transport_probe.py) | UNDECIDED | named test | 2 | source/native audit |
