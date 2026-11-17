@@ -121,7 +121,7 @@ jobs:
           assert report["original_references_corrected_or_assigned"] is False
           assert sum(x["markers"] for x in report["volumes"])==5569
           assert report["unhandled_chapter_markers"]==1306
-          assert sum(x["empty_original_bodies_preserved"] for x in report["volumes"])==5
+          assert sum(x.get("empty_original_bodies_preserved",0) for x in report["volumes"])==5
           assert report["all_source_text_accounted_for"] is False
           assert report["redistribution_authorized"] is False
           assert report["published"] is False
