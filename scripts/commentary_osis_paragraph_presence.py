@@ -122,6 +122,11 @@ def original_authoring_chapter_scope_metadata(
     def visit(node):
         nonlocal state,opens,closes
         if not isinstance(node.tag,str):
+            # XML comments/processing instructions are not visible authored
+            # prose. Their following tails are consumed by the parent walker.
+            # Keep genuine unresolved entities fail-closed.
+            if isinstance(node,(etree._Comment,etree._ProcessingInstruction)):
+                return
             raise ValueError("Unexpected original OSIS markup node")
         tag=node.tag.rsplit("}",1)[-1]
         if tag=="chapter":
