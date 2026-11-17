@@ -13,6 +13,9 @@ from commentary_osis_paragraph_presence import (
     exact_original_paragraph_runs_in_osis,
     original_authoring_chapter_scope_metadata,
     PrivateOriginalChapterNativeAnchorCoverage,
+    _private_whole_token_contiguous,
+    _private_whole_token_subsequence,
+    _private_native_word_relation,
 )
 
 
@@ -189,6 +192,8 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
         row = result["original_chapter_cases"][0]
         self.assertEqual(row["actual_occupied_original_numbered_K_slots"], 3)
         self.assertEqual(row["distinct_original_native_raw_payloads"], 2)
+        self.assertEqual(row["native_distinct_whole_body_ordered_word_relation_classes"],
+                         {"native_contiguous_exact_tokens_in_chapter": 2})
         self.assertEqual(row["original_unique_eight_word_windows"], 7)
         self.assertEqual(
             row["exact_unique_source_eight_word_windows_in_original_native_K"], 5)
@@ -212,6 +217,69 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             PrivateOriginalChapterNativeAnchorCoverage({"Gen.1": ["short"]})
 
+
+
+    def test_native_whole_body_token_relations_are_distinct_and_noneditorial(self):
+        words = [f"token{i:02d}" for i in range(15)]
+        self.assertEqual(
+            _private_native_word_relation(words, words),
+            "native_whole_chapter_exact_tokens")
+        self.assertEqual(
+            _private_native_word_relation(words, words[3:11]),
+            "native_contiguous_exact_tokens_in_chapter")
+        self.assertEqual(
+            _private_native_word_relation(words, words[1:5] + words[7:13]),
+            "native_ordered_exact_subsequence_only")
+        self.assertEqual(
+            _private_native_word_relation(words, [x.upper() for x in words[2:10]]),
+            "native_contiguous_casefold_only")
+        self.assertEqual(
+            _private_native_word_relation(words,
+                [x.upper() for x in words[1:4] + words[8:13]]),
+            "native_ordered_casefold_subsequence_only")
+        self.assertEqual(
+            _private_native_word_relation(words,
+                words[2:5] + ["unverified"] + words[5:11]),
+            "native_full_ordered_token_relation_unresolved")
+        self.assertEqual(
+            _private_native_word_relation(words, []),
+            "native_empty_visible_text")
+
+    def test_token_contiguity_kmp_does_not_confuse_repeated_words(self):
+        source = ["a", "b", "a", "b", "a", "c"]
+        self.assertTrue(_private_whole_token_contiguous(
+            source, ["a", "b", "a", "c"]))
+        self.assertFalse(_private_whole_token_contiguous(
+            source, ["a", "c", "a"]))
+        self.assertTrue(_private_whole_token_subsequence(
+            source, ["a", "c"]))
+        self.assertFalse(_private_whole_token_subsequence(
+            source, ["c", "a"]))
+        self.assertFalse(_private_whole_token_contiguous(source, []))
+        self.assertFalse(_private_whole_token_subsequence(source, []))
+
+    def test_whole_body_relation_report_remains_closed_without_source_words(self):
+        words = [f"privateword{i:02d}" for i in range(14)]
+        census = PrivateOriginalChapterNativeAnchorCoverage({"Gen.1": words})
+        census.observe("K", "Gen.1.1",
+            ("<p>" + " ".join(words) + "</p>").encode())
+        census.observe("K", "Gen.1.2",
+            ("<p>" + " ".join(words[:8]).upper() + "</p>").encode())
+        census.observe("K", "Gen.1.3",
+            ("<p>" + " ".join(words[:6] + ["added"] + words[6:]) + "</p>").encode())
+        report = census.report()
+        classes = report["original_chapter_cases"][0][
+            "native_distinct_whole_body_ordered_word_relation_classes"]
+        self.assertEqual(classes, {
+            "native_whole_chapter_exact_tokens": 1,
+            "native_contiguous_casefold_only": 1,
+            "native_full_ordered_token_relation_unresolved": 1,
+        })
+        self.assertEqual(sum(classes.values()), 3)
+        self.assertTrue(report["casefold_only_categories_do_not_authorize_case_changes"])
+        self.assertTrue(report["exact_containment_does_not_prove_punctuation_or_markup"])
+        self.assertNotIn("privateword", json.dumps(report))
+        self.assertNotIn("Gen.1", json.dumps(report))
 
 
 if __name__=="__main__":
