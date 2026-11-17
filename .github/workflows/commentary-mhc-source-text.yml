@@ -26,56 +26,12 @@ concurrency:
   group: mhc-original-text-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
-  review-one-actual-original-volume:
-    name: Original CCEL volume ${{ matrix.source_volume }} — exact stock text diagnostics
+  observe_kjv_independent_usfm_metadata:
+    name: Observe independent KJV Psalm USFM witness, without importing source text
     runs-on: ubuntu-24.04
-    timeout-minutes: 35
-    strategy:
-      fail-fast: false
-      max-parallel: 2
-      matrix:
-        source_volume: ${{ fromJSON(github.event_name == 'workflow_dispatch' && format('[{0}]', inputs.source_volume) || '[1,2,3,4,5,6]') }}
-    env:
-      SOURCE_VOLUME: ${{ matrix.source_volume }}
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Verify source-neutral one/collection selection and private text comparison
-        shell: bash
-        run: |
-          set -euo pipefail
-          python -m pip install -r requirements.txt
-          python -m unittest discover -s tests -p 'test_commentary_private_text_compare.py' -v
-          python -m unittest discover -s tests -p 'test_commentary_source_native_boundaries.py' -v
-          python -m unittest discover -s tests -p 'test_commentary_nonlink_word_alignment.py' -v
-          python -m unittest discover -s tests -p 'test_commentary_nonlink_words.py' -v
-          python -m unittest discover -s tests -p 'test_commentary_prose_cross_slot.py' -v
-      - name: Install real original native SWORD readers
-        shell: bash
-        run: |
-          set -euo pipefail
-          timeout 90s sudo apt-get -o Acquire::Retries=0 \
-            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
-          timeout 150s sudo apt-get -o Acquire::Retries=0 \
-            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev
-          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_index.cpp \
-            -o "$RUNNER_TEMP/commentary-native-index" -lsword
-          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_raw_corpus.cpp \
-            -o "$RUNNER_TEMP/commentary-private-raw" -lsword
-      - name: Compare entire SHA-pinned original volume with complete unchanged CrossWire stock
-        shell: bash
-        run: |
-          set -euo pipefail
-          python scripts/commentary_private_text_compare.py \
-            --resource-id mhc-crosswire \
-            --source-volume "$SOURCE_VOLUME" \
-            --native-index-binary "$RUNNER_TEMP/commentary-native-index" \
-            --native-raw-binary "$RUNNER_TEMP/commentary-private-raw" \
-            --report "$RUNNER_TEMP/mhc-original-volume-text-evidence.json"
       - name: Observe independent eBible KJV Psalm USFM title metadata (candidate witness only)
-        if: env.SOURCE_VOLUME == '3'
         shell: bash
         run: |
           set -euo pipefail
@@ -124,6 +80,54 @@ jobs:
           print("Independent eBible KJV Psalm USFM title-only metadata:",found[0])
           print("Only observation: no CCEL or CrossWire word comparison yet; no source text published")
           PY
+  review-one-actual-original-volume:
+    name: Original CCEL volume ${{ matrix.source_volume }} — exact stock text diagnostics
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        source_volume: ${{ fromJSON(github.event_name == 'workflow_dispatch' && format('[{0}]', inputs.source_volume) || '[1,2,3,4,5,6]') }}
+    env:
+      SOURCE_VOLUME: ${{ matrix.source_volume }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify source-neutral one/collection selection and private text comparison
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          python -m unittest discover -s tests -p 'test_commentary_private_text_compare.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_source_native_boundaries.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_nonlink_word_alignment.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_nonlink_words.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_prose_cross_slot.py' -v
+      - name: Install real original native SWORD readers
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          timeout 150s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_index.cpp \
+            -o "$RUNNER_TEMP/commentary-native-index" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "$RUNNER_TEMP/commentary-private-raw" -lsword
+      - name: Compare entire SHA-pinned original volume with complete unchanged CrossWire stock
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_private_text_compare.py \
+            --resource-id mhc-crosswire \
+            --source-volume "$SOURCE_VOLUME" \
+            --native-index-binary "$RUNNER_TEMP/commentary-native-index" \
+            --native-raw-binary "$RUNNER_TEMP/commentary-private-raw" \
+            --report "$RUNNER_TEMP/mhc-original-volume-text-evidence.json"
       - name: Report only bounded metadata and explicitly incomplete authorial parity
         shell: bash
         run: |
