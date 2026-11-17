@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "kind": "pinned_word_corpus_verse_absences",
+  "corpus": "sblgnt",
+  "source_edition": "Clear-Bible/macula-greek@8423afe47b9e8f24b7772e808af45c7159a6fe7e",
+  "verse_ids": [
+    "40023014",
+    "44008037",
+    "44015034",
+    "44024007",
+    "44028029",
+    "45016025",
+    "45016027",
+    "47013014"
+  ],
+  "provenance": [
+    {
+      "source": "https://github.com/icfmp/ACAI/issues/88",
+      "evidence": "Complete pinned SBLGNT Greek word source comparison: 28,379 ACAI NT record-reference associations; eight source-absent verse IDs used by 22 original entity reference claims."
+    }
+  ],
+  "policy": "Flag only absences from this pinned Macula Greek original-word inventory. These are not a declaration of which verses are canonical, not editorial corrections of the Bible, and not proof that references are spurious in other textual traditions. Preserve every original entity-reference claim, classify variants/subscriptions/versification separately."
+}
