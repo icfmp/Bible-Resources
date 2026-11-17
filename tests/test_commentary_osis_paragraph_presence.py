@@ -700,5 +700,42 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
             original_authoring_native_chapter_index_receipt(broken,K,I)
 
 
+    def test_explicit_complete_corpus_mode_skips_redundant_windows_but_retains_full_parity(self):
+        words=[f"word{n:02d}" for n in range(12)]
+        source=" ".join(words)+"!"
+        chapters={}
+        visible={}
+        for book in range(1,21):
+            for chapter in range(1,6):
+                key=f"Book{book}.{chapter}"
+                chapters[key]=list(words)
+                visible[key]=source
+        self.assertEqual(len(chapters),100)
+        with self.assertRaises(ValueError):
+            PrivateOriginalChapterNativeAnchorCoverage(
+                chapters,private_chapter_visible_texts=visible)
+        with self.assertRaises(ValueError):
+            PrivateOriginalChapterNativeAnchorCoverage(
+                chapters,full_corpus_mode=True)
+        with self.assertRaises(ValueError):
+            PrivateOriginalChapterNativeAnchorCoverage(
+                {"Book1.1":words},private_chapter_visible_texts={
+                    "Book1.1":source},full_corpus_mode=True)
+        audit=PrivateOriginalChapterNativeAnchorCoverage(
+            chapters,private_chapter_visible_texts=visible,full_corpus_mode=True)
+        for chapter in chapters:
+            audit.observe("K",chapter+".1",
+                          ("<p>"+source+"</p>").encode("utf-8"))
+        rows=audit.report()["original_chapter_cases"]
+        self.assertEqual(len(rows),100)
+        self.assertTrue(all(
+            row["complete_source_chapter_nonwhitespace_visible_characters_equal"]
+            and row["all_distinct_native_K_bodies_have_unique_exact_source_intervals"]
+            and row["original_unique_eight_word_windows"] is None
+            and row["exact_unique_source_eight_word_windows_in_original_native_K"] is None
+            for row in rows))
+        self.assertNotIn("word00",json.dumps(rows))
+
+
 if __name__=="__main__":
     unittest.main()
