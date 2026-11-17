@@ -191,9 +191,37 @@ class OriginalExtraGapChapterNativeTests(unittest.TestCase):
         self.assertEqual(case["extra_spans_exactly_witnessed_in_other_chapter_same_book_K_raw"],1)
         self.assertEqual(case["extra_spans_exactly_witnessed_in_other_chapter_same_book_I_raw"],0)
         self.assertEqual(case["distinct_extra_spans_witnessed_in_other_chapter_same_book_raw"],1)
+        self.assertEqual(case["same_chapter_max_exact_contiguous_partial_gap_word_run_by_source_gap"],[105,12])
+        self.assertEqual(case["other_chapter_same_book_max_exact_contiguous_partial_gap_word_run_by_source_gap"],[105,0])
+        self.assertEqual(case["same_chapter_distinct_native_raw_payloads_with_six_word_gap_anchor_by_kind"],{"I":1,"K":1})
+        self.assertEqual(case["other_chapter_same_book_distinct_native_raw_payloads_with_six_word_gap_anchor_by_kind"],{"K":1})
         self.assertTrue(result["same_book_other_chapter_scope_not_a_whole_corpus_absence_proof"])
         self.assertNotIn("secretFirst",json.dumps(result))
         self.assertNotIn("Gen.1.3",json.dumps(result))
+
+    def test_partial_six_word_gap_matches_do_not_claim_whole_paragraph(self):
+        sample,first,second=self._original_case()
+        probe=OriginalExtraGapNativeChapterProbe([sample])
+        probe.observe("K","Gen.1.1",sample[2])
+        # Only the original first six consecutive gap words are present,
+        # with a punctuation-boundary equivalent but no full original span.
+        probe.observe("K","Gen.3.2",
+                      ("<p>start "+" ".join(first[:6])+" end</p>").encode())
+        # Five contiguous original words MUST NOT reach the anchor threshold.
+        probe.observe("K","Gen.4.2",
+                      ("<p>start "+" ".join(first[20:25])+" end</p>").encode())
+        report=probe.report()
+        row=report["original_source_line_hash_and_native_other_slot_counts_only"][0]
+        self.assertEqual(row["distinct_extra_spans_witnessed_in_other_chapter_same_book_raw"],0)
+        self.assertEqual(row[
+            "other_chapter_same_book_distinct_native_raw_payloads_with_six_word_gap_anchor_by_kind"
+        ],{"K":1})
+        self.assertEqual(row[
+            "other_chapter_same_book_max_exact_contiguous_partial_gap_word_run_by_source_gap"
+        ],[6,0])
+        self.assertTrue(row["six_word_partial_match_is_not_paragraph_ownership_or_a_proven_omission"])
+        self.assertNotIn("secretFirst",json.dumps(report))
+        self.assertNotIn("Gen.3.2",json.dumps(report))
 
     def test_an_unsupported_or_wrong_source_span_fails_closed(self):
         sample,_,_=self._original_case()
