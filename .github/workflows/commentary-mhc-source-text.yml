@@ -152,17 +152,68 @@ jobs:
           attrs=Counter(key.rsplit("}",1)[-1] for node in div_nodes
                         for key in node.attrib)
           types=Counter(node.get("type","UNSPECIFIED") for node in div_nodes)
-          # Only fixed, canonical test chapter IDs are returned as counters.
-          sample_ids=("Ps.7","Acts.17")
-          ids={key:sum(node.get("osisID","")==key or
-                       key in node.get("osisID","").split()
-                       for node in div_nodes) for key in sample_ids}
+          # Derive requested scopes from original CCEL `scripCom` claims,
+          # never hard-code Bible-book/chapter aliases in the source inspector.
+          sample_cases=manifest["commentary_source"][
+              "original_authoring_source_paragraph_cases"]
+          if not 1<=len(sample_cases)<=8:
+              raise SystemExit("Unreviewed source-bound structural scopes")
+          chapter_scopes=[]
+          for case in sample_cases:
+              original_ref=case.get("original_source_marker_osisRef","")
+              if sha256(original_ref.encode("utf-8")).hexdigest()!=case[
+                      "original_full_reference_sha256"]:
+                  raise SystemExit("Source chapter locator differs from pinned marker SHA")
+              match=re.fullmatch(
+                  r"Bible:([1-4]?[A-Za-z][A-Za-z0-9]*)\\.([1-9][0-9]*)\\.[1-9][0-9]*"
+                  r"(?:-[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9][0-9]*\\.[1-9][0-9]*)?",
+                  original_ref)
+              if match is None:
+                  raise SystemExit("Original CCEL section is not an approved verse locator")
+              chapter_scopes.append((case["original_full_reference_sha256"],
+                                    match.group(1),match.group(2)))
           print("Official source OSIS div structural attribute names/counts:",
                 json.dumps(dict(sorted(attrs.items())),sort_keys=True))
           print("Official source OSIS div type labels/counts (structural only):",
                 json.dumps(dict(sorted(types.items())),sort_keys=True))
-          print("Official source OSIS exact chapter-ID presence:",
-                json.dumps(ids,sort_keys=True))
+          book_divisions={node.get("osisID"):node for node in div_nodes
+                          if node.get("type")=="book"}
+          if len(book_divisions)!=66:
+              raise SystemExit("Official source book divisions ambiguous")
+          for ref_sha,book,chapter in chapter_scopes:
+              book_div=book_divisions.get(book)
+              if book_div is None:
+                  raise SystemExit("Pinned CCEL biblical book lacks an OSIS book division")
+              chapter_ref=book+"."+chapter
+              actual_markers=Counter()
+              linked_targets=0
+              descendants=0
+              for node in book_div.iter():
+                  if not isinstance(node.tag,str):
+                      continue
+                  descendants+=1
+                  tag=node.tag.rsplit("}",1)[-1]
+                  marker_values=[
+                      node.get(key,"") for key in ("osisID","sID","eID")
+                  ]
+                  if any(chapter_ref==item or
+                         item.startswith(chapter_ref+".")
+                         for val in marker_values for item in val.split()):
+                      actual_markers[tag]+=1
+                  if tag=="reference" and any(
+                         chapter_ref==item or item.startswith(chapter_ref+".")
+                         for item in node.get("osisRef","").split()):
+                      linked_targets+=1
+              print("Authenticated source book/chapter structural metadata only:",
+                    json.dumps({
+                      "original_source_marker_ref_sha256":ref_sha,
+                      "book_xml_descendant_element_count":descendants,
+                      "local_chapter_addressable_element_tag_counts":
+                          dict(sorted(actual_markers.items())),
+                      "cross_reference_element_count_targeting_chapter_not_scope":
+                          linked_targets,
+                      "source_or_compiled_paragraph_owner_not_inferred":True,
+                    },sort_keys=True))
           del div_nodes,source_xml
           conf=(root/"mhc.conf").read_text(encoding="utf-8")
           def confval(key):
