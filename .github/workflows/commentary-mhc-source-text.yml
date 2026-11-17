@@ -107,7 +107,7 @@ jobs:
                       raise SystemExit("Unreviewed USFM file size")
                   raw=archive.read(name)
                   text=raw.decode("utf-8-sig")
-                  found_codes=re.findall(r"(?m)^\\\\id\\s+([A-Z0-9]{3})\\b",text)
+                  found_codes=re.findall(r"(?m)^\\id\\s+([A-Z0-9]{3})\\b",text)
                   seen_book_codes.update(found_codes)
                   if "PSA" in found_codes:
                       found.append({
