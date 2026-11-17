@@ -6158,6 +6158,7 @@
       "stage_hint": "not determined",
       "static_reference_count": 10,
       "static_references": [
+        "scripts/tool_registry.py",
         ".github/workflows/commentary-anchor-parity.yml",
         ".github/workflows/commentary-editorial-section-scope.yml",
         ".github/workflows/commentary-evidence.yml",
@@ -6166,8 +6167,7 @@
         ".github/workflows/commentary-mhc-source-text.yml",
         ".github/workflows/commentary-native-raw-corpus.yml",
         ".github/workflows/commentary-private-text-compare.yml",
-        "docs/evidence/mhcc-274/editorial-section-scope-audit.md",
-        "scripts/tool_registry.py"
+        "docs/evidence/mhcc-274/editorial-section-scope-audit.md"
       ]
     },
     {
@@ -6194,6 +6194,7 @@
       "stage_hint": "not determined",
       "static_reference_count": 13,
       "static_references": [
+        "scripts/tool_registry.py",
         ".github/workflows/commentary-anchor-parity.yml",
         ".github/workflows/commentary-editorial-section-scope.yml",
         ".github/workflows/commentary-mhc-private-jsword.yml",
@@ -6205,8 +6206,7 @@
         ".github/workflows/commentary-zcom-andbible-android.yml",
         ".github/workflows/commentary-zcom-andbible-jsword.yml",
         ".github/workflows/commentary-zcom-private-candidate.yml",
-        ".github/workflows/stage-stock-commentary.yml",
-        "scripts/tool_registry.py"
+        ".github/workflows/stage-stock-commentary.yml"
       ]
     },
     {
