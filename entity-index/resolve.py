@@ -20,6 +20,11 @@ class EntityResolver:
         self.words = index.get("by_word")
         if not isinstance(self.words, dict):
             raise ValueError("Missing exact-word index")
+        self.unattested_words = index.get("unattested_source_words", {})
+        if not isinstance(self.unattested_words, dict):
+            raise ValueError("Invalid source-unattested word audit")
+        if set(self.unattested_words) & set(self.words):
+            raise ValueError("Source-unattested word must not remain lookup-indexed")
         entities = index.get("entities")
         if not isinstance(entities, list):
             raise ValueError("Missing entity records")
@@ -56,6 +61,9 @@ class EntityResolver:
             result["status"] = "invalid_source_word_id"
         elif word_id[1:9] != verse_id:
             result["status"] = "verse_context_mismatch"
+        elif corpus + ":" + word_id in self.unattested_words:
+            result["status"] = "unattested_source_word_id"
+            result["source_absence"] = self.unattested_words[corpus + ":" + word_id]
         else:
             hits = self.words.get(corpus + ":" + word_id, [])
             seen = set()
