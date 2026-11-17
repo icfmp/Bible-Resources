@@ -29,6 +29,46 @@ class WitnessError(ValueError):
     pass
 
 
+def reviewed_usfm_title_visible_text(source: str) -> str | None:
+    """Keep exact displayed title words; remove only verified USFM inline tags.
+
+    Strong annotations \w WORD|strong="H1234"\w* preserve WORD; \add TEXT\add*
+    preserves TEXT, because the added translator-supplied words are visible in
+    the King James Bible. Unsupported nesting, targets and malformed markup
+    are never silently normalised or converted to probable source words.
+    """
+    if not isinstance(source,str) or not source or len(source)>8192:
+        return None
+    result=[]
+    cursor=0
+    strong=re.compile(r'([^\\|\r\n]{1,180})\|strong="([HG]\d{4,5})"\Z')
+    while cursor<len(source):
+        if source.startswith("\\w ",cursor):
+            end=source.find("\\w*",cursor+3)
+            if end<0:
+                return None
+            match=strong.fullmatch(source[cursor+3:end])
+            if match is None:
+                return None
+            result.append(match.group(1))
+            cursor=end+3
+        elif source.startswith("\\add ",cursor):
+            end=source.find("\\add*",cursor+5)
+            if end<0:
+                return None
+            visible=source[cursor+5:end]
+            if not visible or "\\" in visible or "|" in visible:
+                return None
+            result.append(visible)
+            cursor=end+5
+        elif source[cursor]=="\\":
+            return None
+        else:
+            result.append(source[cursor])
+            cursor+=1
+    return "".join(result)
+
+
 def independent_usfm_titles(archive: Path, pinned_sha256: str,
                             *, book_id: str) -> dict[int, dict]:
     """Strict zip, original USFM marker and text identity validation, in memory."""
@@ -91,10 +131,11 @@ def independent_usfm_titles(archive: Path, pinned_sha256: str,
             if current is None or in_verse or current in result or not found:
                 raise WitnessError("Unreviewed, duplicated or misplaced original title")
             title = found.group(1)
-            if "\\" in title or len(title) > 1024:
+            visible=reviewed_usfm_title_visible_text(title)
+            if visible is None:
                 result[current] = {"status": "unreviewed_inline_usfm_title_markup"}
                 continue
-            tokens = WORD.findall(title)
+            tokens = WORD.findall(visible)
             if not 1 <= len(tokens) <= 100:
                 raise WitnessError("Unbounded original biblical title")
             result[current] = {
