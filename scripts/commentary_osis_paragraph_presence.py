@@ -328,6 +328,8 @@ def _private_native_reference_targets(root: etree._Element) -> list[str]:
     targets=[]
     for node in root.iter():
         if not isinstance(node.tag, str):
+            if isinstance(node,(etree._Comment,etree._ProcessingInstruction)):
+                continue
             raise ValueError("Unreviewed native reference markup node")
         if node.tag.rsplit("}",1)[-1]=="reference":
             targets.append(node.get("osisRef") or "")
@@ -475,6 +477,13 @@ class PrivateOriginalChapterNativeAnchorCoverage:
             state["intro_distinct_raw_digests"].add(digest)
             offsets = _private_exact_token_match_offsets(
                 state["source_words"], words)
+            native_references=_private_native_reference_targets(root)
+            if len(offsets)==1:
+                state["native_reference_target_segments"].append(
+                    (offsets[0],native_references))
+            else:
+                state["native_unlocated_reference_target_count"]+=len(
+                    native_references)
             if len(offsets) == 1:
                 state["intro_exact_source_location_classes"][
                     "one_unique_exact_source_interval"] += 1
@@ -533,6 +542,13 @@ class PrivateOriginalChapterNativeAnchorCoverage:
         state["distinct_native_relation_classes"][relation] += 1
         offsets = _private_exact_token_match_offsets(
             state["source_words"], words)
+        native_references=_private_native_reference_targets(root)
+        if len(offsets)==1:
+            state["native_reference_target_segments"].append(
+                (offsets[0],native_references))
+        else:
+            state["native_unlocated_reference_target_count"]+=len(
+                native_references)
         if len(offsets) == 1:
             state["native_exact_location_classes"]["one_unique_exact_source_interval"] += 1
             state["native_unique_whole_body_intervals"].append(
@@ -646,10 +662,46 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                         start == 0 and end >=
                         prefix["source_uncovered_visible_word_tokens"]
                         for start, end in intro_intervals))
+            source_reference_targets=state["source_reference_targets"]
+            reference_scope_complete=(
+                all_exact_unique and
+                (uncovered_word_count==0 or (
+                    all_intro_unique and combined_uncovered==0)))
+            reference_targets_exact=None
+            native_located_reference_count=None
+            native_reference_targets_sha=None
+            source_reference_targets_sha=None
+            if source_reference_targets is not None:
+                source_reference_targets_sha=_private_reference_sequence_sha256(
+                    source_reference_targets)
+                if reference_scope_complete:
+                    ordered=[]
+                    for offset,refs in sorted(
+                            state["native_reference_target_segments"],
+                            key=lambda row: row[0]):
+                        ordered.extend(refs)
+                    native_located_reference_count=len(ordered)
+                    native_reference_targets_sha=_private_reference_sequence_sha256(ordered)
+                    reference_targets_exact=(
+                        len(ordered)==len(source_reference_targets)
+                        and native_reference_targets_sha==source_reference_targets_sha
+                        and ordered==source_reference_targets)
             rows.append({
                 "original_chapter_reference_sha256": sha256(
                     chapter.encode("utf-8")).hexdigest(),
                 "original_chapter_visible_words": len(state["source_words"]),
+                "source_chapter_reference_elements": (
+                    None if source_reference_targets is None
+                    else len(source_reference_targets)),
+                "source_reference_target_sequence_sha256":source_reference_targets_sha,
+                "native_located_reference_elements":native_located_reference_count,
+                "native_located_reference_target_sequence_sha256":
+                    native_reference_targets_sha,
+                "exact_original_reference_target_sequence_equal_in_source_and_native":
+                    reference_targets_exact,
+                "native_unlocated_original_reference_elements":
+                    state["native_unlocated_reference_target_count"],
+                "reference_attribute_sequence_not_proof_of_link_navigation":True,
                 "original_unique_eight_word_windows": len(state["source_windows"]),
                 "exact_unique_source_eight_word_windows_in_original_native_K":
                     len(state["matching_windows"]),
@@ -705,7 +757,9 @@ class PrivateOriginalChapterNativeAnchorCoverage:
             "casefold_only_categories_do_not_authorize_case_changes": True,
             "exact_containment_does_not_prove_punctuation_or_markup": True,
             "visible_character_test_excludes_section_boundary_nonword_chars": True,
-            "original_xml_markup_and_reference_attributes_not_char_compared": True,
+            "reference_attributes_checked_only_for_uniquely_located_exact_native_bodies": True,
+            "matching_reference_target_attributes_not_proof_of_working_links": True,
+            "markup_and_structure_parity_not_proven_by_reference_attributes": True,
             "source_uncovered_intervals_are_not_scripture_verse_mappings": True,
             "source_uncovered_spans_not_automatically_missing_in_sword": True,
             "original_punctuation_markup_notes_and_links_not_compared": True,
