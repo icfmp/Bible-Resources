@@ -2104,6 +2104,7 @@
       "confidence": "low",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
+        "OSIS",
         "ThML"
       ],
       "has_direct_tests_by_filename": true,
