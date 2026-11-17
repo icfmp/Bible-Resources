@@ -28,11 +28,66 @@ concurrency:
   group: commentary-intake-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
+  select-source:
+    runs-on: ubuntu-latest
+    outputs:
+      resources: ${{ steps.select.outputs.resources }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Select exactly the modified commentary manifests
+        id: select
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_RESOURCE_ID: ${{ inputs.resource_id || '' }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          import subprocess
+
+          directory = Path("config/commentary-intake")
+          registered = {}
+          for path in sorted(directory.glob("*.json")):
+              data = json.loads(path.read_text(encoding="utf-8"))
+              if data.get("category") == "commentary" and data.get("resource_id") == path.stem:
+                  registered[path.as_posix()] = path.stem
+
+          if os.environ["EVENT_NAME"] == "workflow_dispatch":
+              requested = os.environ["INPUT_RESOURCE_ID"]
+              if requested not in registered.values():
+                  raise SystemExit(f"Unknown commentary manifest: {requested!r}")
+              resources = [requested]
+          else:
+              # Default pull_request checkout is GitHub's synthetic merge commit:
+              # first parent = base, HEAD = tested merged candidate.
+              changed = set(subprocess.check_output(
+                  ["git", "diff", "--name-only", "HEAD^1", "HEAD"],
+                  text=True).splitlines())
+              resources = sorted(set(registered[path] for path in changed if path in registered))
+              if not resources:
+                  # Preserve the historical default when only reusable code or
+                  # a corrections plan changes; no fabricated MHC acceptance.
+                  resources = ["mhcc-crosswire"]
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
+              out.write("resources=" + json.dumps(resources) + "\n")
+          print("Selected source identities:", ", ".join(resources))
+          PY
+
   intake:
+    needs: select-source
+    strategy:
+      fail-fast: false
+      matrix:
+        resource_id: ${{ fromJSON(needs.select-source.outputs.resources) }}
+    name: Read-only intake (${{ matrix.resource_id }})
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      RESOURCE_ID: ${{ github.event.inputs.resource_id || 'mhcc-crosswire' }}
+      RESOURCE_ID: ${{ matrix.resource_id }}
       STAGE: ${{ github.event.inputs.stage || 'auto' }}
     steps:
       - uses: actions/checkout@v4
