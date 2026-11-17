@@ -6,5 +6,15 @@
   "source_license": "CC BY-SA 4.0",
   "source_credit": "ACAI Biblical Entity Data — BiblioNexus / Mission Mutual; original BibleAquifer/ACAI contributors",
   "reviewed_hebrew_source": "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c",
-  "reviewed_greek_source": "Clear-Bible/macula-greek@8423afe47b9e8f24b7772e808af45c7159a6fe7e"
+  "reviewed_greek_source": "Clear-Bible/macula-greek@8423afe47b9e8f24b7772e808af45c7159a6fe7e",
+  "source_editions": {
+    "wlc": {
+      "edition": "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c",
+      "word_id_prefix": "o"
+    },
+    "sblgnt": {
+      "edition": "Clear-Bible/macula-greek@8423afe47b9e8f24b7772e808af45c7159a6fe7e",
+      "word_id_prefix": "n"
+    }
+  }
 }

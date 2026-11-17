@@ -27,6 +27,8 @@ class EntityIndexTests(unittest.TestCase):
             "source_commit": "test-sha", "source_license": "CC BY-SA 4.0",
             "source_credit": "ACAI source test", "reviewed_hebrew_source": "pinned-test",
             "reviewed_greek_source": "pinned-test", "source_records_expected": 0,
+            "source_editions": {"wlc": {"edition": "pinned-test",
+                                        "word_id_prefix": "o"}} ,
         }
 
     def write_record(self, category, name, **fields):
