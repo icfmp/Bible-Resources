@@ -10,14 +10,14 @@ publication_status: "NOT RELEASED — FULL SWORD REBUILD PENDING"
 
 # Numbers 31 — Modern English
 
-## Original chapter outline
+## Original chapter outline — explicit verse-label corrections
 
 | Original outline | Verses |
 | --- | --- |
 | War with Midian. | 1–6 |
 | Balaam slain. | 7–12 |
-| Those slain who caused sin. | 13–38 |
-| Purification of the Israelites. | 39–24 |
+| Those slain who caused sin. | 13–18 |
+| Purification of the Israelites. | 19–24 |
 | Division of the spoil. | 25–47 |
 | Offerings. | 48–54 |
 
@@ -110,6 +110,10 @@ They also wanted to express gratitude that their lives had been preserved, altho
 ---
 
 ## Editorial review — Numbers 31
+
+**2026-11-17 traceable outline-reference correction (independent original-native review pending):** The first end verse 38 and second start verse 39 were incompatible with the 13–18/19–24 exposition boundaries. Only the **verse-range cells of the copied original-outline table** have been corrected; source-authored headings, row order, commentary section boundaries, and exposition prose are not edited. Previously transcribed cells: `Those slain who caused sin. | 13–38`; `Purification of the Israelites. | 39–24`. Corrected cells: `Those slain who caused sin. | 13–18`; `Purification of the Israelites. | 19–24`. The repair is reversible against this recorded before/after; the authoritative published MHCC 0.1.1 outline still requires exact independent native validation.
+
+
 
 **Complete secondary source examined:** [CCEL, Numbers 31](https://ccel.org/ccel/henry/mhcc.v.xxxi.html). The definitive text for publication remains the SHA-pinned **MHCC 0.1.1** SWORD corpus, whose native keys, quotations and markup still require validation.
 
