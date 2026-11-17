@@ -286,6 +286,7 @@ class PrivateOriginalChapterNativeAnchorCoverage:
     MAX_SCOPES = 8
     MAX_CHAPTER_WORDS = 100_000
     MAX_NATIVE_RAW_BYTES = 2 * 1024 * 1024
+    INTRO = re.compile(r"[1-4]?[A-Za-z][A-Za-z0-9]*(?:\\.0\\.0|\\.[1-9][0-9]*(?:\\.0)?)?\\Z")
     KEY = re.compile(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*\.[1-9][0-9]*\Z")
 
     def __init__(self, chapter_words: dict[str, list[str]]):
@@ -316,12 +317,61 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                 "distinct_native_relation_classes": defaultdict(int),
                 "native_exact_location_classes": defaultdict(int),
                 "native_unique_whole_body_intervals": [],
+                "intro_occupied_slots": 0,
+                "intro_distinct_raw_digests": set(),
+                "intro_exact_source_location_classes": defaultdict(int),
+                "intro_unique_exact_intervals": [],
             }
 
     def observe(self, kind: str, key: str, raw: bytes) -> None:
         """Private callback for fully indexed original SWORD K/I/TOP scan."""
         if kind not in ("K", "I", "U"):
             raise ValueError("Unexpected original SWORD raw frame kind")
+        if kind == "I":
+            if not isinstance(key, str) or not self.INTRO.fullmatch(key):
+                raise ValueError("Invalid original commentary introduction key")
+            matching = [scope for scope in self._scopes
+                        if key == scope or key == scope + ".0"]
+            if not matching:
+                return
+            if len(matching) != 1:
+                raise ValueError("Ambiguous original chapter introduction")
+            state = self._scopes[matching[0]]
+            if (not isinstance(raw, bytes)
+                    or not 0 < len(raw) <= self.MAX_NATIVE_RAW_BYTES
+                    or b"\\x00" in raw):
+                raise ValueError("Invalid original chapter introduction raw frame")
+            state["intro_occupied_slots"] += 1
+            digest = sha256(raw).hexdigest()
+            if digest in state["intro_distinct_raw_digests"]:
+                return
+            try:
+                root = etree.fromstring(
+                    b"<fragment>" + raw + b"</fragment>",
+                    parser=etree.XMLParser(
+                        resolve_entities=False, no_network=True,
+                        load_dtd=False, recover=False, huge_tree=False,
+                        remove_blank_text=False, strip_cdata=False))
+            except (ValueError, etree.XMLSyntaxError):
+                raise ValueError("Unparseable original chapter introduction XML") from None
+            if any(isinstance(node, etree._Entity) for node in root.iter()):
+                raise ValueError("Unresolved original chapter introduction XML entity")
+            words = WORD.findall("".join(root.itertext()))
+            state["intro_distinct_raw_digests"].add(digest)
+            offsets = _private_exact_token_match_offsets(
+                state["source_words"], words)
+            if len(offsets) == 1:
+                state["intro_exact_source_location_classes"][
+                    "one_unique_exact_source_interval"] += 1
+                state["intro_unique_exact_intervals"].append(
+                    (offsets[0], offsets[0] + len(words)))
+            elif offsets:
+                state["intro_exact_source_location_classes"][
+                    "multiple_exact_source_intervals_ambiguous"] += 1
+            else:
+                state["intro_exact_source_location_classes"][
+                    "no_full_exact_source_interval"] += 1
+            return
         if kind != "K":
             return
         if not isinstance(key, str) or not self.KEY.fullmatch(key):
@@ -431,6 +481,32 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                 if sum(x["source_uncovered_visible_word_tokens"]
                        for x in uncovered_spans) != uncovered_word_count:
                     raise ValueError("Authentic source/native interval accounting failed")
+            intro_digests = state["intro_distinct_raw_digests"]
+            intro_intervals = state["intro_unique_exact_intervals"]
+            if sum(state["intro_exact_source_location_classes"].values()) != len(intro_digests):
+                raise ValueError("Original chapter introduction classification incomplete")
+            all_intro_unique = bool(intro_digests) and (
+                len(intro_intervals) == len(intro_digests))
+            combined_uncovered = None
+            intro_covers_K_prefix = None
+            if all_exact_unique and all_intro_unique:
+                merged = []
+                for start, end in sorted(
+                        state["native_unique_whole_body_intervals"] + intro_intervals):
+                    if merged and start <= merged[-1][1]:
+                        merged[-1] = (merged[-1][0], max(end, merged[-1][1]))
+                    else:
+                        merged.append((start, end))
+                combined_uncovered = len(state["source_words"]) - sum(
+                    end-start for start, end in merged)
+                prefix = next((span for span in uncovered_spans or []
+                               if span["original_chapter_word_offset_not_verse_key"] == 0),
+                              None)
+                intro_covers_K_prefix = (
+                    prefix is not None and any(
+                        start == 0 and end >=
+                        prefix["source_uncovered_visible_word_tokens"]
+                        for start, end in intro_intervals))
             rows.append({
                 "original_chapter_reference_sha256": sha256(
                     chapter.encode("utf-8")).hexdigest(),
@@ -458,6 +534,19 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                     uncovered_spans,
                 "overlap_word_tokens_among_exact_native_K_body_intervals":
                     exact_native_interval_overlap_words,
+                "actual_chapter_specific_original_I_slots":
+                    state["intro_occupied_slots"],
+                "distinct_chapter_specific_original_I_raw_payloads":
+                    len(intro_digests),
+                "chapter_I_whole_body_exact_source_location_classes":
+                    dict(sorted(state["intro_exact_source_location_classes"].items())),
+                "all_chapter_I_bodies_uniquely_located_in_source":
+                    all_intro_unique,
+                "source_uncovered_words_after_unique_K_plus_chapter_I_intervals":
+                    combined_uncovered,
+                "original_source_K_prefix_fully_covered_by_chapter_I":
+                    intro_covers_K_prefix,
+                "book_level_I_and_opaque_TOP_not_source_compared": True,
                 "uncovered_osis_tokens_not_proven_missing_authored_exposition": True,
                 "whole_body_word_relation_not_equivalent_to_authorial_unit": True,
                 "anchor_overlap_is_not_exact_text_or_structural_parity": True,
@@ -467,7 +556,8 @@ class PrivateOriginalChapterNativeAnchorCoverage:
             "status": "ORIGINAL_AUTHORING_OSIS_TO_COMPILED_NATIVE_K_LEXICAL_ANCHORS_ONLY",
             "minimum_exact_case_sensitive_anchor_words": self.ANCHOR,
             "original_chapter_cases": rows,
-            "intro_and_top_payload_parity_not_compared": True,
+            "full_intro_and_top_payload_parity_not_proven": True,
+            "chapter_I_key_filter_not_editorial_owner_proof": True,
             "original_verse_key_range_and_paragraph_owner_not_inferred": True,
             "casefold_only_categories_do_not_authorize_case_changes": True,
             "exact_containment_does_not_prove_punctuation_or_markup": True,
