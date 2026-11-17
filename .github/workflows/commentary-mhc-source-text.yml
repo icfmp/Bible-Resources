@@ -575,6 +575,61 @@ jobs:
                   "exact_original_reference_target_sequence_equal_in_source_and_native")
               def hashed_cases(rows):
                   return [row["original_chapter_reference_sha256"] for row in rows[:20]]
+              # Only closed source-position/count classes for up to twenty
+              # exceptional scopes. The entire native verse key, original
+              # prose, XML fragment and reference target strings stay private.
+              def summarized_anomaly(row):
+                  return {
+                      "authored_chapter_ref_sha256":
+                          row["original_chapter_reference_sha256"],
+                      "authored_visible_word_count":
+                          row["original_chapter_visible_words"],
+                      "native_K_distinct_bodies":
+                          row["distinct_original_native_raw_payloads"],
+                      "native_K_actual_occupied_slots":
+                          row["actual_occupied_original_numbered_K_slots"],
+                      "native_K_entire_word_relation_classes":
+                          row["native_distinct_whole_body_ordered_word_relation_classes"],
+                      "native_K_exact_source_location_classes":
+                          row["native_distinct_whole_body_exact_source_location_classes"],
+                      "source_words_not_in_K":
+                          row["source_uncovered_word_tokens_after_unique_native_K_body_intervals"],
+                      "source_words_not_in_K_or_chapter_I":
+                          row["source_uncovered_words_after_unique_K_plus_chapter_I_intervals"],
+                      "native_chapter_I_entire_word_location_classes":
+                          row["chapter_I_whole_body_exact_source_location_classes"],
+                      "all_native_K_whole_bodies_uniquely_in_chapter":
+                          row["all_distinct_native_K_bodies_have_unique_exact_source_intervals"],
+                      "complete_visible_nonwhitespace_character_equality":
+                          row["complete_source_chapter_nonwhitespace_visible_characters_equal"],
+                      "complete_visible_nonwhitespace_source_character_count":
+                          row["complete_source_chapter_nonwhitespace_characters"],
+                      "complete_visible_nonwhitespace_native_character_count":
+                          row["complete_native_chapter_nonwhitespace_characters"],
+                      "first_nonwhitespace_character_difference_offset":
+                          row["first_nonwhitespace_character_mismatch_offset_not_verse"],
+                      "source_inline_reference_attribute_count":
+                          row["source_chapter_reference_elements"],
+                      "native_located_inline_reference_attribute_count":
+                          row["native_located_reference_elements"],
+                      "ordered_inline_reference_targets_exact":
+                          row["exact_original_reference_target_sequence_equal_in_source_and_native"],
+                  }
+              exceptional=[row for row in all_rows if (
+                  row["complete_source_chapter_nonwhitespace_visible_characters_equal"]
+                      is not True or
+                  row["exact_original_reference_target_sequence_equal_in_source_and_native"]
+                      is not True or
+                  row["all_distinct_native_K_bodies_have_unique_exact_source_intervals"]
+                      is not True)]
+              if len(exceptional)>20:
+                  print("More than twenty original source/native chapter exceptions;",
+                        "print only counts and compact SHA fingerprints")
+              else:
+                  print("Original complete chapter source/native nontext exception",
+                        "classifications only; no authored prose/verse addresses:",
+                        json.dumps([summarized_anomaly(row) for row in exceptional],
+                                   sort_keys=True))
               full_summary={
                   "status":"COMPLETE_AUTHORED_OSIS_ALL_CHAPTERS_NATIVE_TEXT_RESEARCH_ONLY",
                   "original_chapter_scopes":len(all_rows),
