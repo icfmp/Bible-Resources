@@ -47,7 +47,7 @@ Submit **your mind to God's revealed truth**, your will to his commands, and you
 
 The devil continues pursuing people who yield to him. But those who put on God's whole armor and resist firmly will see him retreat.
 
-Let sinners turn to God and seek his grace. **All sin must be mourned**, either now through godly sorrow or afterward in misery.
+Let sinners turn to God and seek his grace. **All sin must be mourned**, either now through godly sorrow or hereafter in **eternal misery**.
 
 The Lord will comfort a person who genuinely grieves over sin and exalt one who humbles himself before him.
 
@@ -80,6 +80,9 @@ How diligently we should avoid **neglecting prayer, meditation and self-examinat
 ---
 
 ## Editorial review — James 4
+
+**2026-11-17 CCEL second-pass correction:** restored Henry's explicit *eternal* description of the misery awaiting unrepented sin, previously softened to unqualified “misery.” [CCEL James 4](https://ccel.org/ccel/henry/mhcc.li.iv.html). Exact published original-native SWORD source and independent review still pending.
+
 
 **Whole secondary English source directly compared:** [CCEL, James 4](https://ccel.org/ccel/henry/mhcc.li.iv.html). Released original `MHCC 0.1.1` is authoritative for native SWORD structure and independent validation.
 
