@@ -216,6 +216,7 @@ jobs:
           sys.path.insert(0,str(Path.cwd()/"scripts"))
           from commentary_osis_paragraph_presence import (
               original_authoring_chapter_scope_metadata,
+              original_authoring_native_chapter_index_receipt,
           )
           book_divisions={node.get("osisID"):node for node in div_nodes
                           if node.get("type")=="book"}
@@ -499,6 +500,11 @@ jobs:
                       original_index["native_versification"]!=
                           (stock_meta.get("Versification") or ["KJV"])[0]):
                   raise SystemExit("Original commentary native full-stream identity or v11n mismatch")
+              chapter_index_receipt=original_authoring_native_chapter_index_receipt(
+                  book_divisions,original_k,original_i)
+              print("Authenticated full 66-book source chapter milestones",
+                    "versus entire actual native occupied K/I index:",
+                    json.dumps(chapter_index_receipt,sort_keys=True))
               print("Authenticated original source OSIS authentic chapter versus",
                     "full authentic original native K exact visible-word anchors",
                     "(closed metadata only, NOT authorial section/parity proof):",
