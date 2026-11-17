@@ -4,6 +4,7 @@ on:
     paths:
       - '.github/workflows/commentary-anchor-parity.yml'
       - 'scripts/commentary_anchor_parity.py'
+      - 'scripts/commentary_osis_mixed_transport_probe.py'
       - 'scripts/commentary_xml_witness.py'
       - 'scripts/commentary_native_inventory.py'
       - 'scripts/sword_native_commentary_index.cpp'
@@ -84,7 +85,7 @@ jobs:
         resource_id: ${{ fromJSON(needs.select-source.outputs.resources) }}
     name: Original anchors (${{ matrix.resource_id }})
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     env:
       RESOURCE_ID: ${{ matrix.resource_id }}
       PROBE: ${{ github.event.inputs.probe_osis_key || 'John.3.16' }}
@@ -120,11 +121,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          PRIVATE_FULL=()
+          if [[ "$RESOURCE_ID" == "mhc-crosswire" ]]; then
+            PRIVATE_FULL=(--private-full-probe)
+          fi
           python scripts/commentary_anchor_parity.py \
             --resource-id "$RESOURCE_ID" \
             --native-inspector "${RUNNER_TEMP}/commentary-native-index" \
             --native-raw-binary "${RUNNER_TEMP}/commentary-private-raw" \
-            --private-alias-probe \
+            --private-alias-probe "${PRIVATE_FULL[@]}" \
             --probe-osis-key "$PROBE" \
             --report "${RUNNER_TEMP}/commentary-anchor-receipt.json"
       - name: Report source-to-SWORD key diagnostics without source prose
@@ -156,6 +161,29 @@ jobs:
               assert attempt_report["published"] is False
               print("Private original commentary chapter-only, index-only SWORD experiments (NO RELEASE):",
                     json.dumps(attempt_report, sort_keys=True))
+              if os.environ["RESOURCE_ID"] == "mhc-crosswire":
+                  full = report.get("private_complete_original_index_alias_rebuild")
+                  if full is None:
+                      raise AssertionError("Expected complete private MHC rebuild evidence")
+                  print("Whole-module private source/native readback, no release:",
+                        json.dumps({
+                            "status": full["status"],
+                            "readback_completed": full["readback_completed"],
+                            "source_numbered_K_coverage": full.get("source_numbered_K_coverage"),
+                            "source_intro_I_coverage": full.get("source_intro_I_coverage"),
+                            "source_TOP_count": full.get("source_TOP_count"),
+                            "compiled_TOP_count": full.get("compiled_TOP_count"),
+                            "all_original_TOP_positions_exact_raw_bytes":
+                                full.get("all_original_TOP_positions_exact_raw_bytes"),
+                            "planned_extra_index_keys": full.get("planned_extra_index_keys"),
+                            "full_original_K_I_U_native_entry_parity_proven":
+                                full.get("full_original_K_I_U_native_entry_parity_proven"),
+                            "private_original_vs_alias_cli_chapter_repetition_probe":
+                                full.get("private_original_vs_alias_cli_chapter_repetition_probe"),
+                        }, sort_keys=True))
+                  assert full["full_original_K_I_U_native_entry_parity_proven"] is True
+                  assert full["planned_extra_index_keys"] == 3
+                  assert full["published"] is False
               print("Original XML volumes:", report["original_xml_volume_count"])
               assert report["original_native_versification_registry_checked"] is True
               classes = report["original_reference_registry_classes_across_volumes"]
