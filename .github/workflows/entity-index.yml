@@ -46,6 +46,12 @@ jobs:
           path=Path("entity-index/dist/index.json")
           index=json.loads(path.read_text(encoding="utf-8"))
           stats=index["statistics"]
+          original_digest=index["provenance"]["source_snapshot_sha256"]
+          lock=json.loads(Path("entity-index/source.lock.json").read_text())
+          assert len(original_digest) == 64, original_digest
+          assert original_digest == lock["source_snapshot_sha256"], (original_digest,lock)
+          assert original_digest == "e46fa575d6d9946afe9b63a4ed64f4202cbe50f5a61bf855fad655d33259c084"
+          print("SOURCE_SNAPSHOT_SHA256", original_digest)
           assert stats["source_records"] == 6644, stats
           assert stats["index_entities"] == 6641, stats
           assert stats["quarantined_records"] == 3, stats

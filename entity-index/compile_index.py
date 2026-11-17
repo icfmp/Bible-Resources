@@ -110,6 +110,9 @@ def build(source_root: Path, source_lock: dict, editorial: dict,
         decisions[original_id] = decision
 
     originals = []
+    # Hash every original JSON byte stream, in a deterministic relative-path
+    # order. A Git commit label alone does not detect a modified worktree.
+    source_manifest = hashlib.sha256()
     for dirname, prefix in CATEGORIES.items():
         folder = source_root / dirname / "json"
         if not folder.is_dir():
@@ -120,7 +123,23 @@ def build(source_root: Path, source_lock: dict, editorial: dict,
             source_id = record.get("id")
             if source_id != f"{prefix}:{path.stem}":
                 raise ValueError(f"Source ID/path disagreement: {path} ({source_id})")
-            originals.append((record, hashlib.sha256(raw).hexdigest()))
+            rel = path.relative_to(source_root).as_posix().encode("utf-8")
+            raw_hash = hashlib.sha256(raw).digest()
+            source_manifest.update(len(rel).to_bytes(4, "big"))
+            source_manifest.update(rel)
+            source_manifest.update(raw_hash)
+            originals.append((record, raw_hash.hex()))
+    source_snapshot_sha256 = source_manifest.hexdigest()
+    locked_snapshot = source_lock.get("source_snapshot_sha256")
+    if locked_snapshot is not None:
+        if (not isinstance(locked_snapshot, str)
+                or len(locked_snapshot) != 64
+                or any(c not in "0123456789abcdef" for c in locked_snapshot)):
+            raise ValueError("Invalid pinned original JSON snapshot SHA-256")
+        if locked_snapshot != source_snapshot_sha256:
+            raise ValueError(
+                "Original JSON source snapshot digest mismatch: "
+                f"locked {locked_snapshot}; actual {source_snapshot_sha256}")
     expected = source_lock["source_records_expected"]
     if len(originals) != expected:
         raise ValueError(f"Incomplete source snapshot: {len(originals)} entries; expected {expected}")
@@ -370,6 +389,7 @@ def build(source_root: Path, source_lock: dict, editorial: dict,
         "provenance": {
             "source_repository": source_lock["source_repository"],
             "source_commit": source_lock["source_commit"],
+            "source_snapshot_sha256": source_snapshot_sha256,
             "source_license": source_lock["source_license"],
             "source_credit": source_lock["source_credit"],
             "reviewed_hebrew_source": source_lock["reviewed_hebrew_source"],
@@ -423,11 +443,21 @@ def main():
     args = parser.parse_args()
     lock = read_json(args.lock)
     if args.verify_source_commit:
+        if not lock.get("source_snapshot_sha256"):
+            raise SystemExit(
+                "Pinned source verification requires a source_snapshot_sha256 lock")
         import subprocess
         actual = subprocess.check_output(
             ["git", "-C", str(args.source), "rev-parse", "HEAD"], text=True).strip()
         if actual != lock["source_commit"]:
             raise SystemExit(f"Wrong pinned source revision: {actual}")
+        worktree = subprocess.check_output(
+            ["git", "-C", str(args.source), "status", "--porcelain",
+             "--untracked-files=all"], text=True)
+        if worktree.strip():
+            raise SystemExit(
+                "Pinned source checkout has modified or untracked files; "
+                "do not build against a dirty source snapshot")
     result = build(args.source, lock, read_json(args.decisions),
                    read_json(args.source_absences),
                    read_json(args.source_verse_absences),

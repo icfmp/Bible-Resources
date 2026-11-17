@@ -132,6 +132,26 @@ The original ACAI IDs survive under `source_id` and the original source
 commit. Crosswalk clients **must not** interpret a historical `person:`
 identifier as an active person automatically.
 
+## Exact original-source snapshot integrity
+
+The lock records both the immutable `icfmp/ACAI` Git **commit** and a
+content-derived **SHA-256 fingerprint** over the exact original bytes of
+all 6,644 JSON entity files, including their relative paths. The compiler
+calculates the fingerprint deterministically and rejects any mismatch
+against the value in `source.lock.json`. This detects an altered source
+file even when the number of records and their IDs remain unchanged.
+
+`--verify-source-commit` additionally requires a **clean worktree**:
+modified or untracked files in the supposedly frozen checkout cause the
+build to stop. Synthetic unit tests can omit a fingerprint to construct
+small fixtures; the production pinned source lock must supply one.
+The generated resource records the actual source snapshot digest in
+`provenance.source_snapshot_sha256`, in addition to per-record hashes.
+
+This verification concerns **byte integrity and reproducibility**, not the
+separate question of whether every inherited Biblical identity is correct.
+Source content and Scripture are never modified during verification.
+
 ## Build and verify
 
 From a machine with Python 3.10+ and an exact local checkout of the frozen
