@@ -946,5 +946,47 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
                 _private_word_owner_classes_sink=["preexisting"])
 
 
+    def test_original_osis_prose_against_sha_pinned_independent_ccel_digital_volume(self):
+        from commentary_osis_paragraph_presence import (
+            private_original_osis_gap_against_pinned_ccel_volume)
+        original=[f"originalword{i:03d}" for i in range(30)]
+        other=[f"differentword{i:03d}" for i in range(38)]
+        xml=("<ThML><div><p>Introduction outside case.</p><p>"+
+             " ".join(original)+"</p></div></ThML>").encode("utf-8")
+        hashvalue=sha256(xml).hexdigest()
+        case=[("Rom.7",4180,original)]
+        good=private_original_osis_gap_against_pinned_ccel_volume(
+            xml,expected_xml_sha256=hashvalue,
+            original_volume_number=5,source_fragments=case)
+        self.assertEqual(good["ccel_volume_number"],5)
+        self.assertEqual(good["original_ccel_volume_sha256"],hashvalue)
+        self.assertTrue(good["historical_print_or_derivative_redistribution_not_approved"])
+        matched=good["original_source_gap_cases"][0]
+        self.assertEqual(matched["full_exact_word_sequence_occurrences_in_original_volume"],1)
+        self.assertEqual(matched["source_gap_visible_word_tokens"],30)
+        self.assertEqual(matched["first_middle_last_12word_anchors_in_original_ccel"],
+                         ["first","last","middle"])
+        self.assertNotIn("originalword",json.dumps(good))
+        self.assertNotIn('"Rom.7"',json.dumps(good))
+        negative=private_original_osis_gap_against_pinned_ccel_volume(
+            xml,expected_xml_sha256=hashvalue,
+            original_volume_number=4,
+            source_fragments=[("Rom.7",4180,other)])
+        self.assertEqual(
+            negative["original_source_gap_cases"][0][
+                "first_middle_last_12word_anchors_in_original_ccel"],[])
+        self.assertEqual(
+            negative["original_source_gap_cases"][0][
+                "full_exact_word_sequence_occurrences_in_original_volume"],0)
+        with self.assertRaises(ValueError):
+            private_original_osis_gap_against_pinned_ccel_volume(
+                xml,expected_xml_sha256="0"*64,
+                original_volume_number=5,source_fragments=case)
+        with self.assertRaises(ValueError):
+            private_original_osis_gap_against_pinned_ccel_volume(
+                xml,expected_xml_sha256=hashvalue,
+                original_volume_number=7,source_fragments=case)
+
+
 if __name__=="__main__":
     unittest.main()
