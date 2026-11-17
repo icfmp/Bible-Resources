@@ -1312,17 +1312,19 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "54930b3be6e64bf02d4a7985cd0514b7c64cbd11956424235b6c3b6483b2f14a",
+      "sha256_at_inventory": "58af493bb42e635559096f42de9017fae41d64955876cdd8ca6251251a35fe23",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 7,
       "static_references": [
-        "scripts/commentary_private_text_compare.py",
-        "scripts/commentary_unresolved_lexical_triage.py",
         ".github/workflows/commentary-mhc-source-text.yml",
+        "scripts/commentary_private_text_compare.py",
+        "scripts/commentary_prose_cross_slot.py",
+        "scripts/commentary_unresolved_lexical_triage.py",
         "tests/test_commentary_nonlink_words.py",
-        "tests/test_commentary_private_text_compare.py"
+        "tests/test_commentary_private_text_compare.py",
+        "tests/test_commentary_prose_cross_slot.py"
       ]
     },
     {
@@ -1681,7 +1683,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "6f4c430dfd0a2af454fccd9db5298ec62524680e074becc2d002ef799a7221f0",
+      "sha256_at_inventory": "aada5b18031638c70f608926689d204b26a122d440dff806268ad003b84c9424",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
@@ -1731,7 +1733,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "36927c8eb25ab39f0bd18faf28c912a4e6dafaebe03131255a35900f4a8119eb",
+      "sha256_at_inventory": "3c45540a743984c7370bebdedc220e28e5ba41d958f9f767b684bac4445bae81",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
