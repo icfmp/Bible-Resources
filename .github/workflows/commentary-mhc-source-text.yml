@@ -223,6 +223,7 @@ jobs:
               raise SystemExit("Official source book divisions ambiguous")
           private_chapter_words={}
           private_chapter_visible_texts={}
+          private_chapter_reference_targets={}
           for chapter_ref,ref_sha,scope_kind in chapter_scopes:
               book,chapter=chapter_ref.rsplit(".",1)
               book_div=book_divisions.get(book)
@@ -249,13 +250,16 @@ jobs:
                       linked_targets+=1
               chapter_private_words=[]
               chapter_private_visible=[]
+              chapter_private_references=[]
               chapter_scope=original_authoring_chapter_scope_metadata(
                   book_div,chapter_ref,_private_words_sink=chapter_private_words,
-                  _private_visible_text_sink=chapter_private_visible)
+                  _private_visible_text_sink=chapter_private_visible,
+                  _private_reference_targets_sink=chapter_private_references)
               if chapter_ref in private_chapter_words or len(chapter_private_visible)!=1:
                   raise SystemExit("Duplicate or incomplete authenticated CCEL chapter case")
               private_chapter_words[chapter_ref]=chapter_private_words
               private_chapter_visible_texts[chapter_ref]=chapter_private_visible[0]
+              private_chapter_reference_targets[chapter_ref]=chapter_private_references
               print("Authenticated source book/chapter structural metadata only:",
                     json.dumps({
                       "source_scope_selection_kind":scope_kind,
@@ -441,7 +445,8 @@ jobs:
               _safe_stock_install(package,archive["members"],installed)
               anchor_census=PrivateOriginalChapterNativeAnchorCoverage(
                   private_chapter_words,
-                  private_chapter_visible_texts=private_chapter_visible_texts)
+                  private_chapter_visible_texts=private_chapter_visible_texts,
+                  private_chapter_reference_targets=private_chapter_reference_targets)
               env=dict(os.environ,SWORD_PATH=str(installed))
               index_bin=Path(os.environ["RUNNER_TEMP"])/"commentary-native-index"
               raw_bin=Path(os.environ["RUNNER_TEMP"])/"commentary-private-raw"
@@ -496,7 +501,8 @@ jobs:
                     "reconciled and SHA-verified:",
                     native_report["all_native_raw_entries_ordered_sha256"],
                     native_report["all_actual_raw_entries_scanned"])
-          del private_chapter_words,private_chapter_visible_texts,stock_zip
+          del private_chapter_words,private_chapter_visible_texts
+          del private_chapter_reference_targets,stock_zip
 
           print("Official upstream source commit (not equivalent to compiled ZIP SHA):",
                 os.environ["UPSTREAM_SHA"])
