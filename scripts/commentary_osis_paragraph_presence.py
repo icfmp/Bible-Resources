@@ -613,6 +613,7 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                 "native_exact_location_classes": defaultdict(int),
                 "native_unique_whole_body_intervals": [],
                 "source_located_native_visible_segments": [],
+                "unlocated_original_native_K_private_words": [],
                 "intro_occupied_slots": 0,
                 "intro_distinct_raw_digests": set(),
                 "intro_exact_source_location_classes": defaultdict(int),
@@ -758,6 +759,12 @@ class PrivateOriginalChapterNativeAnchorCoverage:
         else:
             state["native_exact_location_classes"][
                 "no_full_exact_source_interval"] += 1
+        if len(offsets)!=1:
+            pending=state["unlocated_original_native_K_private_words"]
+            if (len(pending)>=32 or
+                    sum(len(v) for v in pending)+len(words)>200_000):
+                raise ValueError("Unreviewed original unmatched native K volume")
+            pending.append(words)
         if (len(offsets) == 1 and state["source_visible_text"] is not None
                 and not self._full_corpus_mode):
             character_relation = _private_interior_character_relation(
@@ -777,6 +784,98 @@ class PrivateOriginalChapterNativeAnchorCoverage:
                 for i in range(len(words)-self.ANCHOR+1)
                 if tuple(words[i:i+self.ANCHOR]) in source_windows
             )
+
+    def private_unmatched_native_K_original_book_location(
+            self, book_divisions: dict[str, etree._Element]) -> dict:
+        """Where do unmatched original native K words occur within their book?
+
+        This is NOT proof of source chapter/body ownership or safe remapping.
+        No actual native key, original text, or source-book address is exported.
+        The independently authentic original authored book is read privately.
+        """
+        from collections import Counter
+        if (not isinstance(book_divisions,dict)
+                or len(book_divisions)>66):
+            raise ValueError("Unreviewed original source books for unmatched native K")
+        cases=[]
+        cached_books={}
+        for chapter,state in self._scopes.items():
+            pending=state["unlocated_original_native_K_private_words"]
+            if not pending:
+                continue
+            book=chapter.rsplit(".",1)[0]
+            book_div=book_divisions.get(book)
+            if (not isinstance(book_div,etree._Element)
+                    or book_div.tag.rsplit("}",1)[-1]!="div"
+                    or book_div.get("type")!="book"
+                    or book_div.get("osisID")!=book):
+                raise ValueError("Unmatched native K has no genuine source book")
+            if book not in cached_books:
+                # Original entire book text is private and never logged.
+                book_words=WORD.findall("".join(book_div.itertext()))
+                if not 1<=len(book_words)<=1_000_000:
+                    raise ValueError("Unreviewed original book visible text length")
+                cached_books[book]=book_words
+            book_words=cached_books[book]
+            source_positions=_private_exact_token_match_offsets(
+                book_words,state["source_words"],maximum_positions=20)
+            if len(source_positions)==1:
+                original_start=source_positions[0]
+                original_end=original_start+len(state["source_words"])
+            else:
+                original_start=original_end=None
+            classifications=Counter()
+            candidates=[]
+            for native_words in pending:
+                offsets=_private_exact_token_match_offsets(
+                    book_words,native_words,maximum_positions=20)
+                if len(offsets)==1:
+                    native_start=offsets[0]
+                    native_end=native_start+len(native_words)
+                    if original_start is None:
+                        relation="native_unique_in_book_chapter_scope_ambiguous"
+                    elif native_start>=original_start and native_end<=original_end:
+                        relation="native_within_authoring_chapter_but_not_exact_source_chapter"
+                    elif native_start<original_end and native_end>original_end:
+                        relation="native_whole_body_crosses_authored_chapter_end"
+                    elif native_start<original_start and native_end>original_start:
+                        relation="native_whole_body_crosses_authored_chapter_start"
+                    elif native_end<=original_start:
+                        relation="native_entirely_before_authored_chapter"
+                    elif native_start>=original_end:
+                        relation="native_entirely_after_authored_chapter"
+                    else:
+                        relation="native_unreviewed_partial_chapter_relation"
+                elif offsets:
+                    relation="native_multiple_exact_whole_book_positions_ambiguous"
+                else:
+                    relation="native_not_exact_whole_word_body_in_original_book"
+                classifications[relation]+=1
+                candidates.append({
+                    "unlocated_native_K_visible_word_count":len(native_words),
+                    "complete_native_K_original_book_location_class":relation,
+                    "native_K_entire_body_unique_in_book":len(offsets)==1,
+                    "native_K_complete_token_sha256":sha256(
+                        " ".join(native_words).encode("utf-8")).hexdigest(),
+                })
+            cases.append({
+                "authored_chapter_ref_sha256":sha256(chapter.encode("utf-8")).hexdigest(),
+                "original_authored_book_visible_words":len(book_words),
+                "original_chapter_full_word_body_locations_in_book":len(source_positions),
+                "unlocated_original_native_K_body_count":len(pending),
+                "native_original_book_whole_body_location_classes":
+                    dict(sorted(classifications.items())),
+                "candidate_original_native_K_bodies":candidates,
+                "same_book_whole_word_match_not_authored_chapter_ownership":True,
+                "no_original_text_or_native_verse_key_emitted":True,
+            })
+        return {
+            "status":"ORIGINAL_UNMATCHED_NATIVE_K_WHOLE_BOOK_EXACT_WORD_LOCATIONS_ONLY",
+            "original_chapter_cases_checked":len(cases),
+            "cases":cases,
+            "original_source_or_binary_transformed":False,
+            "no_book_ending_or_authorial_edition_remap_approved":True,
+        }
 
     def report(self) -> dict:
         """Closed metadata only; never includes words, XML or actual native keys."""
