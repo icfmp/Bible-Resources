@@ -56,7 +56,7 @@ God often places surprising obstacles in people's path before they commit sin, a
 
 His wisdom and power ensure that his merciful purposes will be fulfilled.
 
-Some wicked people escape visible punishment now because they are **reserved for final judgment**.
+Some wicked people escape visible punishment now because they are **reserved for the day of judgment, when they will be punished with the devil and his angels**.
 
 ## The arrogance and corruption of deceptive teachers (verses 10–16)
 
@@ -82,7 +82,7 @@ False teachers resemble **empty springs or clouds without rain**, because they p
 
 As clouds can block the sunlight, false teaching can darken people's understanding with words lacking substance.
 
-Those who spread darkness should not be surprised by the judgment awaiting them.
+Because these deceivers spread darkness in this world, Henry says it is just that **the mist of darkness should be their portion in the next**.
 
 While promising freedom, these teachers are themselves **slaves of their sinful desires**.
 
@@ -103,6 +103,9 @@ Just as a leper may be cleansed and a dead person raised, a person grieved by th
 ---
 
 ## Editorial review — 2 Peter 2
+
+**2026-11-17 secondary-witness collation:** restored two explicit original assertions softened in the draft: sinners reserved for punishment **with the devil and his angels** (1–9), and the **mist of darkness** as the future portion of deceivers who spread darkness (17–22). Henry's final assurance that a backslider truly grieving may yet be saved is deliberately retained without weakening. [Complete CCEL chapter witness](https://ccel.org/ccel/henry/mhcc.liii.ii.html). Exact original native SWORD wording and independent signoff still pending.
+
 
 **Complete CCEL original-English secondary witness checked:** [CCEL, 2 Peter 2](https://ccel.org/ccel/henry/mhcc.liii.ii.html). Actual released `MHCC 0.1.1` remains primary for native SWORD/independent signoff.
 
