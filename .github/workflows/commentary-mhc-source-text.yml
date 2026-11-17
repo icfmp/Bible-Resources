@@ -724,6 +724,8 @@ jobs:
                           "volume":item["independent_ccel_volume"],
                           "first_middle_last_12word_anchors":
                               item["first_middle_last_12word_anchors_in_original_ccel"],
+                          "unique_bounded_ccel_source_word_collation":
+                              item["bounded_original_source_against_ccel_word_collation"],
                       } for item in by_volume
                          if item["first_middle_last_12word_anchors_in_original_ccel"]],
                       "CCEl_original_full_word_match_not_historical_print_or_owner_proof":True,
