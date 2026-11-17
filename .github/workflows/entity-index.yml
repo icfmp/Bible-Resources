@@ -59,6 +59,20 @@ jobs:
           assert stats["unattested_raw_word_assignments"] == 19, stats
           assert stats["unattested_source_verses"] == 8, stats
           assert stats["unattested_source_verse_reference_claims"] == 22, stats
+          assert stats["qualified_source_reference_claims"] == 12, stats
+          reviews=index["qualified_source_references"]
+          all_reviews=[x for records in reviews.values() for x in records]
+          assert len(all_reviews) == 12, all_reviews
+          assert sum(x["classification"] == "textual_variant_name_not_in_pinned_edition"
+                     for x in all_reviews) == 2
+          assert sum(x["classification"] == "traditional_subscription_candidate"
+                     for x in all_reviews) == 10
+          assert any(x["source_id"] == "place:Bethabara"
+                     for x in reviews["sblgnt:43001028"])
+          assert any(x["source_id"] == "place:Trogyllium"
+                     for x in reviews["sblgnt:44020015"])
+          assert any(x["source_id"] == "person:Phoebe"
+                     for x in reviews["sblgnt:45016027"])
           assert len(index["unattested_source_verses"]) == 8
           assert index["unattested_source_verses"]["sblgnt:44008037"]["scope"] == "absent_from_pinned_original_word_inventory_only"
           assert not (set(index["unattested_source_words"]) & set(index["by_word"]))
