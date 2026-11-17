@@ -1297,6 +1297,119 @@ def privately_stage_versioned_zcom_zip(
     }
 
 
+
+def probe_private_full_index_alias_jsword(*, candidate_root: Path, module_id: str,
+                                          aliases: dict[str, dict],
+                                          pinned_jsword: Path, scratch: Path) -> dict:
+    """Read actual complete repaired source in AndBible's pinned JSword engine.
+
+    The candidate MUST first pass all original native K/I/TOP and alias checks.
+    No native source, module, Java failure body, HTML or prose is published.
+    This independently tests the engine, not the Android app's GUI.
+    """
+    from xml.etree import ElementTree
+    from probe_andbible_jsword import AND_BIBLE_JSWORD_SHA
+
+    original_test = (Path(__file__).resolve().parents[1] / "tests" / "java"
+                     / "org" / "icfmp" / "research"
+                     / "CommentaryPrivateAliasJSwordProbeTest.java")
+    if (not candidate_root.is_dir() or candidate_root.is_symlink()
+            or not pinned_jsword.is_dir() or pinned_jsword.is_symlink()
+            or not scratch.is_dir() or scratch.is_symlink()
+            or not original_test.is_file() or original_test.is_symlink()
+            or not WORK.fullmatch(module_id)
+            or not isinstance(aliases, dict) or not 1 <= len(aliases) <= 12
+            or not (candidate_root / "mods.d" / (module_id.lower() + ".conf")).is_file()
+            or "commentary-source-native-" not in str(candidate_root)
+            or "complete-original-private-candidate" not in str(candidate_root)
+            or not (pinned_jsword / "gradlew").is_file()
+            or not (pinned_jsword / "build.gradle.kts").is_file()):
+        raise ValueError("Unverified private complete commentary JSword candidate")
+    rows = []
+    for target, claim in sorted(aliases.items()):
+        master = claim.get("link_to") if isinstance(claim, dict) else None
+        if (not isinstance(target, str) or not isinstance(master, str)
+                or KEY.fullmatch(target) is None or KEY.fullmatch(master) is None
+                or target == master
+                or target.rsplit(".", 1)[0] != master.rsplit(".", 1)[0]):
+            raise ValueError("Unverified JSword alias/master pair")
+        rows.append(target + "|" + master)
+    repo = subprocess.run(
+        ["git", "-C", str(pinned_jsword), "rev-parse", "HEAD"],
+        stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=15,
+        check=False,
+    )
+    if repo.returncode or repo.stdout.decode("ascii", errors="replace").strip() != AND_BIBLE_JSWORD_SHA:
+        raise ValueError("JSword engine is not the reviewed AndBible stable revision")
+    destination = (pinned_jsword / "src" / "test" / "java" / "org"
+                   / "icfmp" / "research" / original_test.name)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    if destination.exists() or destination.is_symlink():
+        raise ValueError("Refuse to overwrite a pinned JSword test source")
+    shutil.copyfile(original_test, destination)
+    java_home = scratch / "private-jsword-home"
+    gradle_home = scratch / "private-jsword-gradle"
+    java_home.mkdir(mode=0o700)
+    gradle_home.mkdir(mode=0o700)
+    log = scratch / "private-jsword-build.log"
+    env = dict(
+        os.environ,
+        PRIVATE_COMMENTARY_JSWORD_ROOT=str(candidate_root),
+        PRIVATE_COMMENTARY_JSWORD_ID=module_id,
+        PRIVATE_COMMENTARY_JSWORD_ALIASES=";".join(rows),
+        SWORD_PATH=str(candidate_root),
+        HOME=str(java_home),
+        GRADLE_USER_HOME=str(gradle_home),
+        JAVA_TOOL_OPTIONS="-Duser.home=" + str(java_home),
+        LANG="C.UTF-8", LC_ALL="C.UTF-8",
+    )
+    try:
+        with log.open("xb") as out:
+            proc = subprocess.run(
+                ["bash", str(pinned_jsword / "gradlew"), "--no-daemon",
+                 "--console=plain", "test", "--tests",
+                 "org.icfmp.research.CommentaryPrivateAliasJSwordProbeTest"],
+                cwd=pinned_jsword, env=env, stdout=out,
+                stderr=subprocess.STDOUT, timeout=850, check=False,
+            )
+    except subprocess.TimeoutExpired:
+        return {
+            "status": "PRIVATE_PINNED_JSWORD_TIMEOUT_NOT_READER_PASS",
+            "pinned_jsword_sha256_git_commit": AND_BIBLE_JSWORD_SHA,
+            "sample_aliases": len(rows),
+            "independent_engine_verified": False,
+            "android_gui_tested": False, "published": False,
+        }
+    if log.stat().st_size > 4_000_000:
+        raise ValueError("Private JSword test log exceeded safety bound")
+    junit = (pinned_jsword / "build" / "test-results" / "test"
+             / "TEST-org.icfmp.research.CommentaryPrivateAliasJSwordProbeTest.xml")
+    counts = None
+    if junit.is_file() and not junit.is_symlink() and 0 < junit.stat().st_size <= 500_000:
+        try:
+            root = ElementTree.parse(junit).getroot()
+            if root.tag == "testsuite":
+                counts = {
+                    name: int(root.attrib.get(name, 0))
+                    for name in ("tests", "failures", "errors", "skipped")
+                }
+        except (ValueError, ElementTree.ParseError, OverflowError):
+            counts = None
+    accepted = (proc.returncode == 0 and counts ==
+                {"tests": 2, "failures": 0, "errors": 0, "skipped": 0})
+    return {
+        "status": ("PRIVATE_PINNED_AND_BIBLE_JSWORD_ALIAS_ENGINE_PASS"
+                   if accepted else "PRIVATE_PINNED_JSWORD_ALIAS_ENGINE_INCONCLUSIVE_OR_FAIL"),
+        "pinned_andbible_jsword_commit": AND_BIBLE_JSWORD_SHA,
+        "sample_aliases": len(rows),
+        "junit_counts": counts,
+        "independent_engine_verified": accepted,
+        "android_gui_tested": False,
+        "private_commentary_text_or_java_log_uploaded": False,
+        "published": False,
+    }
+
+
 def probe_complete_original_transport(
         original_intros: dict[str, bytes],
         original_numbered: dict[str, list[tuple[str, bytes]]],
@@ -1307,7 +1420,8 @@ def probe_complete_original_transport(
         test_preview_in_xiphos: bool = False,
         original_stock_sword_root: Path | None = None,
         original_stock_module_id: str = "MHCC",
-        native_index_binary: Path | None = None) -> dict:
+        native_index_binary: Path | None = None,
+        pinned_jsword_source_root: Path | None = None) -> dict:
     """Attempt full private SWORD readback and compare EVERY original native key.
 
     This is diagnostic and cannot authorize a release. TOP is separately
@@ -1448,6 +1562,16 @@ def probe_complete_original_transport(
             original_stock_sword_root, root,
             original_stock_module_id, module_id, aliases
         )
+    independent_jsword = None
+    if pinned_jsword_source_root is not None:
+        if not aliases or not (indexed_checks and alias_identical and top_exact):
+            raise ValueError("Refuse JSword on incomplete original or unverified aliases")
+        java_scratch = scratch / "private-pinned-jsword-check"
+        java_scratch.mkdir()
+        independent_jsword = probe_private_full_index_alias_jsword(
+            candidate_root=root, module_id=module_id, aliases=aliases,
+            pinned_jsword=pinned_jsword_source_root, scratch=java_scratch,
+        )
     gui = None
     if test_preview_in_xiphos:
         if not aliases or not (indexed_checks and alias_identical and top_exact):
@@ -1458,6 +1582,7 @@ def probe_complete_original_transport(
     return {
         **source,
         "private_real_xiphos_alias_navigation_probe": gui,
+        "private_pinned_andbible_jsword_alias_probe": independent_jsword,
         "private_original_vs_alias_cli_chapter_repetition_probe": chapter_repeat,
         "private_native_original_and_provisional_alias_link_identity": link_identity,
         "status": "COMPLETE_ORIGINAL_PRIVATE_I_K_U_COMPILED_READBACK_NOT_APPROVAL",
