@@ -77,7 +77,7 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
                         etree.fromstring(data),"Gen.1")
         with self.assertRaises(ValueError):
             original_authoring_chapter_scope_metadata(
-                etree.fromstring(b'<div type="book" osisID="Exod"/>x</div>'),
+                etree.fromstring(b'<div type="book" osisID="Exod">x</div>'),
                 "Gen.1")
     def test_whole_paragraph_source_presence_with_nested_reference_labels(self):
         ccel,case,words=synthetic_case()
