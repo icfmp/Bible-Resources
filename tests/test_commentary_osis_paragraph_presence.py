@@ -517,5 +517,54 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
         self.assertTrue(row["book_level_I_and_opaque_TOP_not_source_compared"])
 
 
+    def test_real_milestone_book_prelude_does_not_include_chapter_or_aftertext(self):
+        from lxml import etree
+        book=etree.fromstring(
+            b'<div type="book" osisID="Gen">Preface opening words. '
+            b'<title>Another authored preface sentence.</title> '
+            b'<chapter sID="Gen.1"/>'
+            b'<p>Chapter one has ten authentic words here in original source.</p>'
+            b'<chapter eID="Gen.1"/>'
+            b'Some outside closing text</div>')
+        words,prelude=[],[]
+        meta=original_authoring_chapter_scope_metadata(
+            book,"Gen.1",_private_words_sink=words,
+            _private_before_first_chapter_words_sink=prelude)
+        self.assertEqual(prelude,
+                         ["Preface","opening","words","Another",
+                          "authored","preface","sentence"])
+        self.assertEqual(words,
+                         ["Chapter","one","has","ten","authentic","words",
+                          "here","in","original","source"])
+        self.assertEqual(
+            meta["original_book_text_before_first_chapter_visible_words"],7)
+        self.assertNotIn("Preface opening",json.dumps(meta))
+        with self.assertRaises(ValueError):
+            original_authoring_chapter_scope_metadata(
+                book,"Gen.2",_private_before_first_chapter_words_sink=[])
+        with self.assertRaises(ValueError):
+            original_authoring_chapter_scope_metadata(
+                book,"Gen.1",_private_before_first_chapter_words_sink=["bad"])
+
+    def test_nonmatching_first_chapter_native_intro_and_book_prelude_are_not_reassigned(self):
+        words=[f"chapterword{i:02d}" for i in range(12)]
+        prelude=[f"prefaceword{i:02d}" for i in range(10)]
+        census=PrivateOriginalChapterNativeAnchorCoverage(
+            {"Gen.1":words},private_book_pre_chapter_words={"Gen.1":prelude})
+        census.observe("K","Gen.1.1",("<p>"+" ".join(words)+"</p>").encode())
+        census.observe("I","Gen.1.0",
+                       b'<title>Different separately compiled original introduction</title>')
+        row=census.report()["original_chapter_cases"][0]
+        self.assertEqual(row["original_book_before_first_chapter_visible_words"],10)
+        self.assertEqual(
+            row["native_chapter_I_book_prelude_exact_location_classes"],
+            {"not_exactly_in_original_book_pre_first_chapter_words":1})
+        self.assertFalse(row["all_chapter_I_bodies_uniquely_located_in_source"])
+        self.assertEqual(row["source_uncovered_word_tokens_after_unique_native_K_body_intervals"],0)
+        self.assertIsNone(row["source_uncovered_words_after_unique_K_plus_chapter_I_intervals"])
+        self.assertTrue(row["book_pre_first_chapter_location_not_editorial_owner_proof"])
+        self.assertNotIn("prefaceword",json.dumps(row))
+
+
 if __name__=="__main__":
     unittest.main()
