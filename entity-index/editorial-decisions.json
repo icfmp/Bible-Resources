@@ -182,6 +182,31 @@
         "NET Bible 1 Chronicles 3:15 and ESV Reformation Study Bible 1 Chronicles 3:15 identify Shallum with Jehoahaz; genealogical order remains a contextual textual question",
         "Inherited ACAI issue #71: distinguish Johanan and other royal name forms"
       ]
+    },
+    {
+      "source_id": "person:Dishon",
+      "action": "amend_occurrences",
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o130010410031"
+          ],
+          [
+            "o130010410051"
+          ]
+        ]
+      },
+      "remove_references": [
+        "13001041"
+      ],
+      "reason": "1 Chronicles 1:38 names Dishon among the sons of Seir, while 1 Chronicles 1:41 explicitly lists a different Dishon as a son of Anah and immediately repeats his name before naming his sons. Both WLC word tokens in 1:41 therefore refer to person:Dishon.2 (Anah's son), not person:Dishon (Seir's son). Only these two wrong direct-name claims and the now-unsupported 1:41 source reference are removed in the derived index; their original source fields remain immutable. Genesis 36:26 has a lexically different Dishan word in pinned WLC, so it is not guessed or reassigned here.",
+      "evidence": [
+        "Pinned Macula WLC 1CH 1:38 o130010380072: Dishon among Seir's sons",
+        "Pinned Macula WLC 1CH 1:41 o130010410031 and o130010410051: Dishon introduced as son of Anah then repeated as father of named sons",
+        "ACAI pinned person:Dishon father=person:Seir; person:Dishon.2 father=person:Anah.2; both had the 1CH 1:41 tokens",
+        "Pinned Macula WLC GEN 36:26 o010360260031 has Hebrew lemma דִּישָׁן (Dishan), not assumed a Dishon identity in this edit",
+        "Inherited ACAI #75 exact-person token collisions; our derived-index audit #307"
+      ]
     }
   ]
 }

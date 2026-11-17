@@ -49,7 +49,7 @@ jobs:
           assert stats["source_records"] == 6644, stats
           assert stats["index_entities"] == 6641, stats
           assert stats["quarantined_records"] == 3, stats
-          assert stats["reviewed_entries"] == 10, stats
+          assert stats["reviewed_entries"] == 11, stats
           assert stats["unattested_distinct_source_words"] == 18, stats
           assert stats["indexed_distinct_source_words"] == 134822, stats
           assert len(index["unattested_source_words"]) == 18
@@ -83,6 +83,13 @@ jobs:
           assert "person:Philistine" not in by_id
           assert "person:Shiloh" not in by_id
           assert by_id["person:Johanan"]["canonical_id"] == "person:Johanan"
+          assert "13001041" not in by_id["person:Dishon"]["references"]
+          assert "13001041" in by_id["person:Dishon.2"]["references"]
+          assert index["by_word"]["wlc:o130010410031"] == [
+              {"entity_id":"person:Dishon.2","link_type":"explicit_instances"}]
+          assert index["by_word"]["wlc:o130010410051"] == [
+              {"entity_id":"person:Dishon.2","link_type":"explicit_instances"}]
+          assert "wlc:o010360260031" in index["by_word"]
           assert by_id["person:Shallum.5"]["canonical_id"] == "person:Jehoahaz.3"
           assert index["by_word"]["wlc:o130030150101"] == [
               {"entity_id":"person:Shallum.5","link_type":"explicit_instances"}]
@@ -169,6 +176,9 @@ jobs:
           report=json.loads(Path("entity-index/dist/person-overlaps.json").read_text())
           stats=report["statistics"]
           assert stats["distinct_person_original_word_overlap_candidates"] == len(report["findings"])
+          assert stats["multiple_explicit_names"] == 11, stats
+          assert stats["mixed_name_and_indirect"] == 18, stats
+          assert stats["indirect_only"] == 2388, stats
           assert sum(stats[x] for x in ("multiple_explicit_names", "mixed_name_and_indirect", "indirect_only")) == len(report["findings"])
           assert all(len(f["canonical_people"]) >= 2 for f in report["findings"])
           assert len(set((f["corpus"], f["word_id"]) for f in report["findings"])) == len(report["findings"])
