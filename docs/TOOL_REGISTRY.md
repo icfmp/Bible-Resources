@@ -76,7 +76,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_source_english_osis_alias.py`](../scripts/commentary_source_english_osis_alias.py) | UNDECIDED | named test | 5 | not determined |
 | [`scripts/commentary_source_erratum_compiled_probe.py`](../scripts/commentary_source_erratum_compiled_probe.py) | UNDECIDED | named test | 2 | source/native audit |
 | [`scripts/commentary_source_identity_lexical_gate.py`](../scripts/commentary_source_identity_lexical_gate.py) | UNDECIDED | named test | 2 | not determined |
-| [`scripts/commentary_source_native_boundaries.py`](../scripts/commentary_source_native_boundaries.py) | UNDECIDED | named test | 3 | not determined |
+| [`scripts/commentary_source_native_boundaries.py`](../scripts/commentary_source_native_boundaries.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/commentary_stock_andbible_android.py`](../scripts/commentary_stock_andbible_android.py) | GENERALIZE | named test | 2 | not determined |
 | [`scripts/commentary_stock_candidate.py`](../scripts/commentary_stock_candidate.py) | UNDECIDED | named test | 7 | not determined |
 | [`scripts/commentary_stock_prefix_topology.py`](../scripts/commentary_stock_prefix_topology.py) | UNDECIDED | named test | 6 | not determined |

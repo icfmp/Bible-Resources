@@ -5,6 +5,8 @@ on:
       - '.github/workflows/commentary-mhc-source-text.yml'
       - 'scripts/commentary_private_text_compare.py'
       - 'tests/test_commentary_private_text_compare.py'
+      - 'scripts/commentary_source_native_boundaries.py'
+      - 'tests/test_commentary_source_native_boundaries.py'
       - 'config/commentary-intake/mhc-crosswire.json'
   workflow_dispatch:
     inputs:
@@ -42,6 +44,7 @@ jobs:
           set -euo pipefail
           python -m pip install -r requirements.txt
           python -m unittest discover -s tests -p 'test_commentary_private_text_compare.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_source_native_boundaries.py' -v
       - name: Install real original native SWORD readers
         shell: bash
         run: |
@@ -188,6 +191,25 @@ jobs:
           assert summed == relationships
           print("Source book word-order/selection relationship counts:",
                 json.dumps(by_book_relations, sort_keys=True))
+          native_scope=report["source_longer_original_native_run_structural_scope"]
+          expected_longer=relationships.get("stock_words_in_order_with_extra_source_words",0)
+          assert native_scope["source_longer_same_start_cases"] == expected_longer
+          assert native_scope["all_original_source_longer_cases_have_exact_native_K_SHA_attestation"]
+          assert native_scope["all_original_source_longer_cases_reviewed_without_sampling"]
+          assert native_scope["original_source_or_stock_binary_modified"] is False
+          assert native_scope["original_edition_or_section_layout_parity_proven"] is False
+          assert sum(native_scope["native_run_vs_source_declared_scope_classes"].values()) == expected_longer
+          assert len(native_scope["original_source_native_K_run_bounded_sha_only_rows"]) == expected_longer
+          assert native_scope["original_book_case_counts"] == {
+              book:groups["stock_words_in_order_with_extra_source_words"]
+              for book,groups in by_book_relations.items()
+              if groups.get("stock_words_in_order_with_extra_source_words",0)
+          }
+          print("Original longer-source native occupied K-run scope classes:",
+                json.dumps(native_scope["native_run_vs_source_declared_scope_classes"],
+                           sort_keys=True))
+          print("Source-longer original book distribution:",
+                json.dumps(native_scope["original_book_case_counts"], sort_keys=True))
           evidence = {
               "status": "SOURCE_STOCK_ONE_VOLUME_LEXICAL_CENSUS_NOT_PARITY",
               "resource_id": "mhc-crosswire",
@@ -208,6 +230,7 @@ jobs:
               "source_section_text_diagnostic_classes": classes,
               "source_book_text_diagnostic_classes": by_book,
               "source_book_word_relationship_subtypes": by_book_relations,
+              "source_longer_original_native_K_run_scope_diagnostics": native_scope,
               "source_book_counts_are_not_editorial_content_parity": True,
               "closed_lexical_difference_types": lexical,
               "closed_word_sequence_relationship_types": relationships,

@@ -30,7 +30,8 @@ from commentary_chapter_paragraph_overlap import OriginalChapterParagraphSpanPro
 from commentary_chapter_p_boundaries import ChapterParagraphBoundaryProbe
 from commentary_reference_cross_slot import ReferenceCrossSlotTopology
 from commentary_prose_cross_slot import OriginalProseAlternativeNativeSlotProbe
-from commentary_source_native_boundaries import original_marker_boundary, NativeRawRunBoundaryInventory
+from commentary_source_native_boundaries import (original_marker_boundary,
+    NativeRawRunBoundaryInventory, compare_longer_original_source_to_occupied_native_runs)
 from commentary_shared_raw_source_units import inspect_shared_original_units_in_native_runs
 from commentary_original_div1_book_consistency import private_original_div1_book_code_consistency
 from commentary_source_english_osis_alias import original_div1_english_alias_vs_declared_osis
@@ -272,7 +273,8 @@ def raw_as_strict_xml_text(raw: bytes) -> str | None:
 
 
 def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes],
-                          *, on_unresolved_word_case=None) -> dict:
+                          *, on_unresolved_word_case=None,
+                          on_source_longer_stock_case=None) -> dict:
     counters=Counter()
     issues=[]
     lexical_details=Counter()
@@ -369,6 +371,9 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes],
                         word_relationship_subtypes[category]+=1
                         book_relationship_counts[category]+=1
                         word_overlap_buckets[diagnostic["overlap_bucket"]]+=1
+                        if (category == "stock_words_in_order_with_extra_source_words"
+                                and on_source_longer_stock_case is not None):
+                            on_source_longer_stock_case(start,item,raw)
                         if category=="source_words_contiguous_inside_longer_stock":
                             position=diagnostic["original_words_contiguous_in_stock_location"]
                             stock_containment_locations[position]+=1
@@ -920,8 +925,33 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
             "original_XML_or_stock_SWORD_mutated":False,
             "independent_authorial_edition_identity_established":False,
         }
+        source_longer_cases=[]
+        def record_same_start_source_longer(start,item,raw):
+            source_longer_cases.append((start,{
+                "original_source_line":item["original_source_line"],
+                "original_full_reference_sha256":item["original_full_reference_sha256"],
+                "original_body_sha256":item["original_text_sha256"],
+                "stock_raw_sha256":sha256(raw).hexdigest(),
+            }))
         analysis=compare_private_texts(source,matches,
-            on_unresolved_word_case=reference_cross_slot.observe_unresolved)
+            on_unresolved_word_case=reference_cross_slot.observe_unresolved,
+            on_source_longer_stock_case=record_same_start_source_longer)
+        original_source_longer_native_scope=(
+            compare_longer_original_source_to_occupied_native_runs(
+                source,native_run_boundaries,source_longer_cases))
+        expected_longer=analysis[
+            "different_word_sequence_relationship_subtypes"].get(
+                "stock_words_in_order_with_extra_source_words",0)
+        if (original_source_longer_native_scope[
+                "source_longer_same_start_cases"] != expected_longer
+                or original_source_longer_native_scope[
+                    "original_book_case_counts"] != {
+                        book:groups["stock_words_in_order_with_extra_source_words"]
+                        for book,groups in analysis[
+                            "source_book_word_relationship_subtypes"].items()
+                        if groups.get("stock_words_in_order_with_extra_source_words",0)
+                    }):
+            raise PilotError("Full source-longer original/native evidence differs from lexical census")
         lexical=analysis['unresolved_source_stock_lexical_selection_triage']
         # A ThML div1 can claim a different OSIS book than its own title.
         # Preserve BOTH original values: never join different book texts and
@@ -1062,6 +1092,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
         "text_diagnostic":analysis,
         "source_unpaired_reference_cross_native_slots":reference_cross_slot_report,
         "source_nonlink_prose_review_stock_raw_duplicate_topology":plain_payload_topology,
+        "source_longer_original_native_run_structural_scope":original_source_longer_native_scope,
         "source_large_nonlink_prose_native_alternative_locations":alternative_prose,
         "source_large_prose_marker_to_native_raw_run_boundary_diagnostics":boundary_case_report,
         "source_complete_original_units_within_shared_stock_raw_K_runs":complete_shared_run_sources,

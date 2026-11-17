@@ -1675,7 +1675,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "3ba4793873342ab19c26d5b6d445682e942ae30aa62fe72c07bcb82147d188d7",
+      "sha256_at_inventory": "f63f1c53bed14c075f6c125a83b136fd1a4784f4e322a943a00afa3d76e98a2e",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
@@ -2121,13 +2121,14 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "4518be0512fa5be6674a2cfc5a71a48951840f413987ca74cc5cecac3f34559c",
+      "sha256_at_inventory": "3fd573837e12cabda6dd3a8fe905cd82ef6a19a06329e0161fcd6100931380aa",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/commentary_private_text_compare.py",
+        ".github/workflows/commentary-mhc-source-text.yml",
         "tests/test_commentary_shared_raw_source_units.py",
         "tests/test_commentary_source_native_boundaries.py"
       ]
