@@ -102,6 +102,91 @@ def extract_volume(data: bytes, expected_sha: str):
     return bodies, dict(stats), digest.hexdigest()
 
 
+
+def inspect_volume_start_collisions(data: bytes, expected_sha: str) -> dict:
+    """Closed census of genuine CCEL duplicate verse-start ownership.
+
+    Count all authentic annotated source bodies before choosing any SWORD
+    encoding. Do not expose original refs or texts or automatically merge.
+    """
+    root = _original_tree(data, expected_sha)
+    seen = {}
+    duplicate_starts = set()
+    same_ref_extra = 0
+    changed_ref_extra = 0
+    same_body_extra = 0
+    changed_body_extra = 0
+    total_sections = 0
+    for marker in root.iter():
+        if _tag(marker) != "scripCom":
+            continue
+        match = OSIS_REF.fullmatch(marker.get("osisRef", ""))
+        if match is None:
+            raise ValueError("Original reference unclassified in collision census")
+        chapter, verse, ending = match.groups()
+        if verse is None:
+            continue
+        following = marker.getnext()
+        if _tag(following) != "div" or (marker.tail and marker.tail.strip()):
+            raise ValueError("Original body adjacency unverified in collision census")
+        total_sections += 1
+        start = chapter + "." + verse
+        original_ref = marker.get("osisRef", "")
+        # Only hashes of original text are compared in memory, never logged.
+        body_hash = sha256(etree.tostring(following, encoding="utf-8",
+                                         with_tail=False)).hexdigest()
+        previous = seen.setdefault(start, [])
+        if previous:
+            duplicate_starts.add(start)
+            same_ref_extra += int(any(ref == original_ref for ref, _ in previous))
+            changed_ref_extra += int(not any(ref == original_ref for ref, _ in previous))
+            same_body_extra += int(any(digest == body_hash for _, digest in previous))
+            changed_body_extra += int(not any(digest == body_hash for _, digest in previous))
+        previous.append((original_ref, body_hash))
+    extra = sum(len(group) - 1 for group in seen.values())
+    if extra != same_ref_extra + changed_ref_extra or extra != same_body_extra + changed_body_extra:
+        raise ValueError("Collision census internal contradiction")
+    return {
+        "original_verse_or_range_sections": total_sections,
+        "distinct_original_start_addresses": len(seen),
+        "duplicated_original_start_groups": len(duplicate_starts),
+        "additional_sections_sharing_original_start": extra,
+        "additional_sections_same_full_ref": same_ref_extra,
+        "additional_sections_different_full_ref": changed_ref_extra,
+        "additional_sections_identical_markup_body_to_prior": same_body_extra,
+        "additional_sections_different_markup_body_to_prior": changed_body_extra,
+        "largest_same_start_group": max(map(len, seen.values()), default=0),
+        "safe_to_write_one_section_per_sword_key": extra == 0,
+        "original_sections_reordered_or_merged": False,
+        "source_text_or_references_in_report": False,
+    }
+
+
+def build_original_collision_census(manifest: dict, source_directory: Path) -> dict:
+    volumes = manifest.get("commentary_source", {}).get("xml_witness_volumes", [])
+    if len(volumes) != 6 or sorted(v["number"] for v in volumes) != list(range(1, 7)):
+        raise ValueError("Exactly six reviewed volume pins required")
+    receipt = []
+    for volume in sorted(volumes, key=lambda v: v["number"]):
+        path = source_directory / f'mhc{volume["number"]}.xml'
+        if path.is_symlink() or not path.is_file():
+            raise ValueError("Original source file missing/unsafe")
+        observed = inspect_volume_start_collisions(path.read_bytes(), volume["sha256"])
+        receipt.append({"volume": volume["number"], "original_xml_sha256": volume["sha256"],
+                        **observed})
+    return {
+        "status": "ORIGINAL_START_COLLISION_CENSUS_ONLY",
+        "volumes": receipt,
+        "all_authored_sections_preserved_in_census": True,
+        "all_source_text_accounted_for": False,
+        "any_unresolved_duplicate_starts": any(
+            x["additional_sections_sharing_original_start"] for x in receipt),
+        "source_text_or_references_exported": False,
+        "redistribution_authorized": False,
+        "published": False,
+    }
+
+
 def build_private_candidate(manifest: dict, source_directory: Path, output: Path):
     volumes = manifest.get("commentary_source", {}).get("xml_witness_volumes", [])
     if (len(volumes) != 6 or sorted(v["number"] for v in volumes) != list(range(1, 7))):
@@ -142,10 +227,18 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--manifest", type=Path, required=True)
     ap.add_argument("--source-dir", type=Path, required=True)
-    ap.add_argument("--private-output", type=Path, required=True)
+    ap.add_argument("--private-output", type=Path)
+    ap.add_argument("--collision-census", action="store_true")
     args = ap.parse_args(argv)
-    report = build_private_candidate(json.loads(args.manifest.read_text("utf-8")),
-                                     args.source_dir, args.private_output)
+    manifest = json.loads(args.manifest.read_text("utf-8"))
+    if args.collision_census:
+        if args.private_output is not None:
+            ap.error("--private-output is not used for the collision census")
+        report = build_original_collision_census(manifest, args.source_dir)
+    else:
+        if args.private_output is None:
+            ap.error("--private-output is required for private IMP generation")
+        report = build_private_candidate(manifest, args.source_dir, args.private_output)
     print(json.dumps(report, sort_keys=True))
     return 0
 
