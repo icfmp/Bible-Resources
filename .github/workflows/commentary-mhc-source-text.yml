@@ -38,6 +38,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python -m pip install -r requirements.txt -q
+          python -m unittest discover -s tests -p 'test_commentary_osis_paragraph_presence.py' -v
           export GIT_TERMINAL_PROMPT=0 GIT_LFS_SKIP_SMUDGE=1
           upstream=https://gitlab.com/crosswire-bible-society/mhc.git
           scratch="$(mktemp -d)"
@@ -67,6 +69,8 @@ jobs:
           import re
           import xml.parsers.expat as expat
           import json
+          import sys
+          from urllib.parse import urlsplit
           from io import BytesIO
           from urllib.request import Request,urlopen
           from zipfile import ZipFile
@@ -191,7 +195,50 @@ jobs:
                 "on these four fields:",
                 all(source_fields[key]==stock_fields[key] for key in source_fields))
           print("Full source OSIS/native K/I/TOP paragraph parity is NOT YET tested.")
-          print("Official upstream source commit (not equivalent to compiled ZIP SHA):",
+
+          # Target cases are SOURCE-HASH-PINNED data, not content-specific
+          # code exceptions or guessed verse mappings. The generic search
+          # reports only bounded token lengths and presence/absence, never
+          # original CrossWire/CCEL XML words or native verse strings.
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from commentary_osis_paragraph_presence import (
+              original_ccel_paragraph_words,
+              exact_original_paragraph_runs_in_osis,
+          )
+          source_cases=manifest["commentary_source"][
+              "original_authoring_source_paragraph_cases"]
+          volumes={v["number"]:v for v in manifest[
+              "commentary_source"]["xml_witness_volumes"]}
+          if (not isinstance(source_cases,list) or not 1<=len(source_cases)<=8
+                  or len({c["source_volume"] for c in source_cases})!=len(source_cases)):
+              raise SystemExit("Unreviewed original CCEL paragraph selection")
+          original_cases=[]
+          for candidate in source_cases:
+              volume=volumes[candidate["source_volume"]]
+              req=Request(volume["url"],
+                          headers={"User-Agent":"BibleResources-MHC-OriginalParagraphStudy/1.0"})
+              with urlopen(req,timeout=90) as response:
+                  if urlsplit(response.url).hostname not in ("ccel.org","www.ccel.org"):
+                      raise SystemExit("Unreviewed original CCEL source origin redirect")
+                  original_xml=response.read(32*1024*1024+1)
+              if (not original_xml or len(original_xml)>32*1024*1024
+                      or sha256(original_xml).hexdigest()!=volume["sha256"]):
+                  raise SystemExit("Original CCEL XML differs from pinned SHA")
+              verified_words=original_ccel_paragraph_words(
+                  original_xml,expected_xml_sha256=volume["sha256"],
+                  case=candidate)
+              original_cases.append((candidate,verified_words))
+          report=exact_original_paragraph_runs_in_osis(
+              (root/"mhc.osis.xml").read_bytes(),
+              expected_osis_sha256=source_pin["authoring_osis_sha256"],
+              original_cases=original_cases)
+          print("Pinned CCEL exact original paragraph vs official original",
+                "authoring OSIS (closed metadata; no prose, no key addresses):",
+                json.dumps(report,sort_keys=True))
+          print("An exact word run ANYWHERE in OSIS does not establish original",
+                "verse ownership, historical edition identity or rights.")
+
+          print("Official upstream source commit (not equivalent to compiled ZIP SHA):
                 os.environ["UPSTREAM_SHA"])
           print("Authoring-file original bytes and independent SHA256:",
                 json.dumps(metadata,sort_keys=True))
