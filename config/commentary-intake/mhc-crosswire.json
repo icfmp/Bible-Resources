@@ -30,7 +30,7 @@
     "owner_approved": false
   },
   "commentary_source": {
-    "format": "compiled CrossWire zCom4 with SourceType=OSIS; the original authoring OSIS file has not been independently obtained",
+    "format": "compiled CrossWire zCom4 with SourceType=OSIS; official original authoring OSIS now independently SHA-pinned, but source/native parity is still unverified",
     "observed_compiled_versification": "KJV",
     "ccel_witness_edition_equivalence": "unverified",
     "source_provenance": "CrossWire credits Christian Classics Ethereal Library and Logos Research, Inc.",
@@ -70,7 +70,23 @@
     ],
     "xml_collection_status": "six exact CCEL ThML/XML volume bytes observed, independently SHA-pinned, not yet proven equivalent to MHC stock text or authorized for editorial derivatives",
     "xml_observation_action": "https://github.com/icfmp/Bible-Resources/actions/runs/43948030420",
-    "xml_observed_total_bytes": 58370898
+    "xml_observed_total_bytes": 58370898,
+    "original_authoring_osis": {
+      "repository_url": "https://gitlab.com/crosswire-bible-society/mhc",
+      "observed_upstream_commit_sha": "537591a94c991941877b47a06666b6a7812e05d8",
+      "authoring_osis_file": "mhc.osis.xml",
+      "authoring_osis_sha256": "3cf367f00c498a3124b339c00896aaef4ef1196a2d5c310ecb20ea42abd130f6",
+      "authoring_osis_bytes": 48020985,
+      "source_conf_sha256": "813160b22ea9662273269600bc16d48af0d5dc07de7a918f8f0f267c1400caf2",
+      "upstream_build_script_sha256": "85b247a271d1f5aaddf848845056254db8e7ee724d127f16babb42ea51ea0536",
+      "readme_sha256": "b9e6efc2b770f91ad5fb6cef06253b5eb25da074dc379b82d106ad17f359b022",
+      "source_format": "OSIS",
+      "observed_source_module_version": "2.2",
+      "source_to_compiled_full_native_parity_verified": false,
+      "source_or_digital_editorial_rights_approved": false,
+      "original_source_bytes_committed_or_published": false,
+      "observation": "https://github.com/icfmp/Bible-Resources/actions/runs/44156141772"
+    }
   },
   "original_archive_observation": {
     "date": "2026-11-07",
