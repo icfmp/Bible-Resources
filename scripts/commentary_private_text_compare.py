@@ -29,7 +29,8 @@ from commentary_chapter_cross_slot import ChapterNeighborSameBookAlternativeProb
 from commentary_chapter_paragraph_overlap import OriginalChapterParagraphSpanProbe
 from commentary_chapter_p_boundaries import ChapterParagraphBoundaryProbe
 from commentary_reference_cross_slot import ReferenceCrossSlotTopology
-from commentary_prose_cross_slot import OriginalProseAlternativeNativeSlotProbe
+from commentary_prose_cross_slot import (OriginalProseAlternativeNativeSlotProbe,
+    OriginalExtraGapNativeChapterProbe)
 from commentary_source_native_boundaries import (original_marker_boundary,
     NativeRawRunBoundaryInventory, compare_longer_original_source_to_occupied_native_runs)
 from commentary_shared_raw_source_units import inspect_shared_original_units_in_native_runs
@@ -962,6 +963,7 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
         double_link_rows=[]
         double_link_gap_classes=Counter()
         double_link_gap_by_original_book={}
+        high_source_extra_span_candidates=[]
         def record_same_start_source_longer(start,item,raw):
             source_longer_cases.append((start,{
                 "original_source_line":item["original_source_line"],
@@ -998,6 +1000,10 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
             extra_layout=two_sided["source_extra_unlinked_word_gap_layout"]
             if extra_layout is not None:
                 layout_class=extra_layout["alignment_topology"]
+                if (layout_class=="unique_alignment_interior_extra_words_only"
+                        and extra_layout["source_extra_nonlink_word_count"]>=100):
+                    high_source_extra_span_candidates.append(
+                        (start,item,raw,two_sided))
                 double_link_gap_classes[layout_class]+=1
                 double_link_gap_by_original_book.setdefault(book,Counter())[layout_class]+=1
             double_link_class_counts[category]+=1
@@ -1135,15 +1141,41 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
                 and case["exact_plain_word_alignment"][
                     "original_plain_words_not_matched_in_exact_order"] > 10)
         ]
-        if not large_plain_cases:
+        # Source-neutral, bounded high-impact gap review: no passage special case.
+        # The same fully attested native replay is reused by both independent
+        # probes, never a third download, second edition, or presumed verse join.
+        top_extra_span_cases=sorted(
+            high_source_extra_span_candidates,
+            key=lambda case:(
+                -case[3]["source_extra_unlinked_word_gap_layout"][
+                    "source_extra_nonlink_word_count"],
+                case[1]["original_source_line"],
+                case[1]["original_full_reference_sha256"],
+            ),
+        )[:OriginalExtraGapNativeChapterProbe.MAX_OUTLIER_CASES]
+        high_extra_native_probe=(
+            OriginalExtraGapNativeChapterProbe(top_extra_span_cases)
+            if top_extra_span_cases else None
+        )
+        high_extra_native_review={
+            "all_genuine_unique_source_extra_span_cases_at_least_100_words":
+                len(high_source_extra_span_candidates),
+            "bounded_cases_selected_for_original_native_replay":
+                len(top_extra_span_cases),
+            "original_high_extra_case_sampling_truncated":
+                len(high_source_extra_span_candidates)>len(top_extra_span_cases),
+            "no_source_or_native_text_exported":True,
+        }
+        alternative_probe=(
+            OriginalProseAlternativeNativeSlotProbe(source,large_plain_cases)
+            if large_plain_cases else None
+        )
+        if alternative_probe is None and high_extra_native_probe is None:
             alternative_prose={
                 "original_source_large_plain_word_cases":0,
                 "no_large_original_plain_word_cases_to_scan":True,
             }
         else:
-            alternative_probe=OriginalProseAlternativeNativeSlotProbe(
-                source,large_plain_cases
-            )
             replay_rows=[]
             replay_process=None
             try:
@@ -1155,7 +1187,10 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
                     raise PilotError("Second exact native stock reader cannot stream")
                 def collect_original_prose_alternatives(kind,ref,raw):
                     replay_rows.append((kind,ref))
-                    alternative_probe.observe(kind,ref,raw)
+                    if alternative_probe is not None:
+                        alternative_probe.observe(kind,ref,raw)
+                    if high_extra_native_probe is not None:
+                        high_extra_native_probe.observe(kind,ref,raw)
                 replay_summary,_,_,_=parse_native_raw_corpus(
                     replay_process.stdout,on_entry=collect_original_prose_alternatives
                 )
@@ -1172,9 +1207,20 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
                     replay_process.kill()
                     replay_process.wait()
                 raise
-            alternative_prose=alternative_probe.report()
-            if alternative_prose["all_native_raw_entries_replayed"] != len(rows):
+            alternative_prose=(
+                alternative_probe.report() if alternative_probe is not None
+                else {
+                    "original_source_large_plain_word_cases":0,
+                    "no_large_original_plain_word_cases_to_scan":True,
+                }
+            )
+            if (alternative_probe is not None
+                    and alternative_prose["all_native_raw_entries_replayed"] != len(rows)):
                 raise PilotError("Original second native prose scan omitted occupied keys")
+            if high_extra_native_probe is not None:
+                high_extra_native_review.update(high_extra_native_probe.report())
+                if high_extra_native_review["complete_original_native_raw_entries_replayed"]!=len(rows):
+                    raise PilotError("Original high extra-span same-chapter native replay incomplete")
         if large_plain_cases:
             boundary_case_report=native_run_boundaries.report(source,large_plain_cases)
             complete_shared_run_sources=inspect_shared_original_units_in_native_runs(
@@ -1245,6 +1291,8 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path,
         "source_longer_source_and_native_reference_label_word_scope":
             source_stock_both_sides_link_label_review,
         "source_large_nonlink_prose_native_alternative_locations":alternative_prose,
+        "source_high_extra_unlinked_spans_other_same_chapter_native_location":
+            high_extra_native_review,
         "source_large_prose_marker_to_native_raw_run_boundary_diagnostics":boundary_case_report,
         "source_complete_original_units_within_shared_stock_raw_K_runs":complete_shared_run_sources,
         "source_original_div1_osisRef_book_consistency_census":original_div1_book_consistency,
