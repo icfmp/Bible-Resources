@@ -11,6 +11,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from commentary_osis_paragraph_presence import (
     original_ccel_paragraph_words,
     exact_original_paragraph_runs_in_osis,
+    original_authoring_chapter_scope_metadata,
 )
 
 
@@ -42,6 +43,42 @@ def synthetic_case():
 
 
 class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
+    def test_original_osis_chapter_milestones_define_private_prose_scope(self):
+        from lxml import etree
+        original=etree.fromstring(
+            b'<div type="book" osisID="Gen">'
+            b'outside'
+            b'<chapter sID="Gen.1"/>'
+            b'<div type="introduction"><p>Original introductory words.</p></div>'
+            b'<verse sID="Gen.1.1"/> Exposition text '
+            b'<verse eID="Gen.1.1"/>'
+            b'<chapter eID="Gen.1"/>'
+            b'next chapter words'
+            b'</div>')
+        result=original_authoring_chapter_scope_metadata(original,"Gen.1")
+        self.assertEqual(result["authentic_chapter_milestone_start_end_count"],[1,1])
+        self.assertEqual(result["bounded_original_chapter_visible_words"],5)
+        self.assertEqual(result["original_chapter_element_start_counts_by_tag"]["p"],1)
+        self.assertEqual(result["original_chapter_element_start_counts_by_tag"]["verse"],2)
+        self.assertNotIn("introductory",json.dumps(result))
+        self.assertTrue(result["not_a_proof_of_original_paragraph_or_verse_ownership"])
+
+    def test_missing_or_duplicate_original_chapter_marker_fails_closed(self):
+        from lxml import etree
+        for data in (
+            b'<div type="book" osisID="Gen"><chapter sID="Gen.1"/>only</div>',
+            b'<div type="book" osisID="Gen"><chapter sID="Gen.1"/>'
+            b'<chapter sID="Gen.1"/><chapter eID="Gen.1"/></div>',
+            b'<div type="book" osisID="Gen"><chapter eID="Gen.1"/></div>',
+        ):
+            with self.subTest(data=data):
+                with self.assertRaises(ValueError):
+                    original_authoring_chapter_scope_metadata(
+                        etree.fromstring(data),"Gen.1")
+        with self.assertRaises(ValueError):
+            original_authoring_chapter_scope_metadata(
+                etree.fromstring(b'<div type="book" osisID="Exod"/>x</div>'),
+                "Gen.1")
     def test_whole_paragraph_source_presence_with_nested_reference_labels(self):
         ccel,case,words=synthetic_case()
         witness=original_ccel_paragraph_words(
