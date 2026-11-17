@@ -1,0 +1,121 @@
+name: Real private complete MHC zCom4 candidate in Xiphos (reader research, no release)
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/commentary-mhc-private-xiphos.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mhc-complete-real-xiphos-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  complete-mhc-real-xiphos-preview:
+    name: Pinned original full MHC rebuild + independent real GTK window (not GUI approval)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 38
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install source-bound audit and real independent Xiphos dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          timeout 150s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y \
+            libsword-dev libsword-utils diatheke xiphos xvfb xdotool xclip dbus-x11
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_index.cpp \
+            -o "$RUNNER_TEMP/commentary-native-index" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "$RUNNER_TEMP/commentary-private-raw" -lsword
+      - name: Rebuild entire private original MHC and attempt actual Xiphos aliases
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_anchor_parity.py \
+            --resource-id mhc-crosswire \
+            --native-inspector "$RUNNER_TEMP/commentary-native-index" \
+            --native-raw-binary "$RUNNER_TEMP/commentary-private-raw" \
+            --private-alias-probe \
+            --private-full-probe \
+            --private-full-xiphos-probe \
+            --report "$RUNNER_TEMP/mhc-complete-private-real-xiphos-evidence.json"
+      - name: Require original text/index integrity and one real Xiphos window, never infer prose rendering
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          report=json.loads((Path(os.environ["RUNNER_TEMP"]) /
+              "mhc-complete-private-real-xiphos-evidence.json").read_text())
+          full=report["private_complete_original_index_alias_rebuild"]
+          gui=full["private_real_xiphos_alias_navigation_probe"]
+          assert full["readback_completed"] is True
+          assert full["source_numbered_K_coverage"]["source_keys_present"] == 31098
+          assert full["source_intro_I_coverage"]["source_keys_present"] == 1255
+          assert full["source_TOP_count"] == full["compiled_TOP_count"] == 2
+          assert full["full_original_K_I_U_native_entry_parity_proven"] is True
+          assert full["planned_extra_index_keys"] == 3
+          assert full["published"] is False
+          assert isinstance(gui, dict)
+          assert gui["status"] == "PRIVATE_XIPHOS_REAL_GUI_EXPERIMENT_NOT_PRESENTATION_APPROVAL"
+          assert gui["sample_count"] == 3
+          assert gui["diatheke_alias_master_shared_run_minimum"] >= 25
+          assert gui["source_prose_or_screenshot_uploaded"] is False
+          assert gui["whole_chapter_commentary_deduplication_proven"] is False
+          assert gui["entire_edition_reader_presentation_approved"] is False
+          assert gui["published"] is False
+          assert gui["real_xiphos_executable_started_and_visible"] is True
+          # A real window is meaningful startup evidence, but NEVER text
+          # rendering/navigation approval. Even failed clipboard observations
+          # stay clearly recorded as INCONCLUSIVE, never upgraded to success.
+          summary = {
+              "real_xiphos_window_observed": gui["real_xiphos_executable_started_and_visible"],
+              "sample_count": gui["sample_count"],
+              "independent_gui_excerpt_matches":
+                  gui["independent_gui_commentary_excerpt_match_count"],
+              "source_prose_or_screenshot_exported": False,
+              "whole_chapter_gui_proof":
+                  gui["whole_chapter_Xiphos_GTK_proof"]["status"],
+              "whole_chapter_deduplication_proven": False,
+              "reader_layout_parity_proven": False,
+              "editorial_or_rights_approval": False,
+              "published": False,
+          }
+          print("Private actual Xiphos startup/prose-selection research metadata:",
+                json.dumps(summary, sort_keys=True))
+          print("This does not assert three GUI passages, chapter rendering, or release approval.")
+          PY
+      - name: Upload only bounded private metadata receipt; never binaries, screenshots or original prose
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mhc-complete-private-xiphos-metadata
+          path: ${{ runner.temp }}/mhc-complete-private-real-xiphos-evidence.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Explain separate native, Java, Xiphos and editorial evidence
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo '## Pinned original complete MHC in actual Xiphos'
+            echo 'Index-only private original+3-alias preview; original CrossWire K/I/TOP unchanged.'
+            echo 'Independent GUI startup, real clipboard and whole-chapter attempts produce separate outcomes.'
+            echo 'A displayed window alone is not a demonstrated rendering or navigation match.'
+            echo 'No commentary words, original XML, screenshots, compiled module or legal approval published.'
+          } >> "$GITHUB_STEP_SUMMARY"

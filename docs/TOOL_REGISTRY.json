@@ -551,10 +551,11 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
         ".github/workflows/commentary-anchor-parity.yml",
         ".github/workflows/commentary-mhc-private-jsword.yml",
+        ".github/workflows/commentary-mhc-private-xiphos.yml",
         "tests/test_commentary_anchor_parity.py"
       ]
     },
@@ -6164,7 +6165,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 10,
+      "static_reference_count": 11,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/commentary-anchor-parity.yml",
@@ -6172,6 +6173,7 @@
         ".github/workflows/commentary-evidence.yml",
         ".github/workflows/commentary-intake.yml",
         ".github/workflows/commentary-mhc-private-jsword.yml",
+        ".github/workflows/commentary-mhc-private-xiphos.yml",
         ".github/workflows/commentary-mhc-source-text.yml",
         ".github/workflows/commentary-native-raw-corpus.yml",
         ".github/workflows/commentary-private-text-compare.yml",
@@ -6200,12 +6202,13 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 13,
+      "static_reference_count": 14,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/commentary-anchor-parity.yml",
         ".github/workflows/commentary-editorial-section-scope.yml",
         ".github/workflows/commentary-mhc-private-jsword.yml",
+        ".github/workflows/commentary-mhc-private-xiphos.yml",
         ".github/workflows/commentary-mhc-source-text.yml",
         ".github/workflows/commentary-native-raw-corpus.yml",
         ".github/workflows/commentary-private-candidate-xiphos-gui.yml",

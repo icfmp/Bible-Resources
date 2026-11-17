@@ -36,7 +36,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/catalogue_release_coverage.py`](../scripts/catalogue_release_coverage.py) | KEEP_GENERIC | named test | 9 | publication/release |
 | [`scripts/check_provider_parity.py`](../scripts/check_provider_parity.py) | UNDECIDED | not established | 4 | not determined |
 | [`scripts/check_updates.py`](../scripts/check_updates.py) | UNDECIDED | not established | 12 | not determined |
-| [`scripts/commentary_anchor_parity.py`](../scripts/commentary_anchor_parity.py) | UNDECIDED | named test | 3 | not determined |
+| [`scripts/commentary_anchor_parity.py`](../scripts/commentary_anchor_parity.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/commentary_andbible_jsword.py`](../scripts/commentary_andbible_jsword.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_android_text_witness.py`](../scripts/commentary_android_text_witness.py) | UNDECIDED | named test | 3 | source/native audit |
 | [`scripts/commentary_android_webview_debug.py`](../scripts/commentary_android_webview_debug.py) | UNDECIDED | named test | 3 | not determined |
@@ -173,8 +173,8 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/stock_reuse_preflight.py`](../scripts/stock_reuse_preflight.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/sword_commentary_raw_key.cpp`](../scripts/sword_commentary_raw_key.cpp) | UNDECIDED | not established | 4 | not determined |
 | [`scripts/sword_missing_verse_witness.py`](../scripts/sword_missing_verse_witness.py) | UNDECIDED | named test | 4 | source/native audit |
-| [`scripts/sword_native_commentary_index.cpp`](../scripts/sword_native_commentary_index.cpp) | KEEP_GENERIC | not established | 10 | not determined |
-| [`scripts/sword_native_commentary_raw_corpus.cpp`](../scripts/sword_native_commentary_raw_corpus.cpp) | KEEP_GENERIC | not established | 13 | not determined |
+| [`scripts/sword_native_commentary_index.cpp`](../scripts/sword_native_commentary_index.cpp) | KEEP_GENERIC | not established | 11 | not determined |
+| [`scripts/sword_native_commentary_raw_corpus.cpp`](../scripts/sword_native_commentary_raw_corpus.cpp) | KEEP_GENERIC | not established | 14 | not determined |
 | [`scripts/sword_native_index.cpp`](../scripts/sword_native_index.cpp) | KEEP_GENERIC | not established | 17 | not determined |
 | [`scripts/sword_native_inventory.py`](../scripts/sword_native_inventory.py) | KEEP_GENERIC | named test | 20 | source/native audit |
 | [`scripts/sword_native_raw_corpus.cpp`](../scripts/sword_native_raw_corpus.cpp) | UNDECIDED | not established | 12 | not determined |
