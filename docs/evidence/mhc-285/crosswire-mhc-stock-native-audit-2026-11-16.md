@@ -72,3 +72,19 @@ The **82 unclassified** targets and compound forms require source-bound examinat
 - Keep rights and editorial approval and public release **blocked**. Existing MHCC/LSG/Darby packages, catalogue and published assets are unchanged.
 
 **Status boundary:** independently complete **stock native key/raw/XML inventory**, **not** full authenticated historical-source parity, editorial review, an accepted corrected version or publication. This is evidence toward stage 3 and stage 4a/4b only; those stages are not thereby declared complete.
+
+
+## Official authoring OSIS versus published stock metadata (2026-11-17)
+
+**Independently executed exact-head observation:** [read-only original-source job #134322183231](https://github.com/icfmp/Bible-Resources/actions/runs/44163145497/job/134322183231) in [six-volume workflow run #44163145497](https://github.com/icfmp/Bible-Resources/actions/runs/44163145497), branch revision `bcb1035f16d43bc6935a715d96f2df4d88da89e6`; job **SUCCESS**, as were the other eight separate workflows on that revision. This is a source/metadata acceptance checkpoint only, not a rebuilt commentary.
+
+The upstream official [CrossWire MHC GitLab repository](https://gitlab.com/crosswire-bible-society/mhc) was read **at pinned commit** `537591a94c991941877b47a06666b6a7812e05d8`. The original authoring `mhc.osis.xml` is 48,020,985 bytes, SHA-256 `3cf367f00c498a3124b339c00896aaef4ef1196a2d5c310ecb20ea42abd130f6`; source `mhc.conf` is SHA-256 `813160b22ea9662273269600bc16d48af0d5dc07de7a918f8f0f267c1400caf2`. The job also independently downloaded and authenticated the *published original* `MHC.zip` against its pinned package SHA `6bcb936873ca144e317805e5c1677940fd86e2403f7c14517752e44f25c8882b`, then extracted its genuine original `mhc.conf`, SHA-256 `889f178712b8bcc1794284f0c2dec042a0680e501587a553cdb6ed4bc6beb537`.
+
+| Critical config field | Original official authoring source | Pinned distributed original | Exact field agreement |
+| --- | --- | --- | --- |
+| `Version` | `2.2` | `2.2` | Yes |
+| `ModDrv` | `zCom4` | `zCom4` | Yes |
+| `SourceType` | `OSIS` | `OSIS` | Yes |
+| `DistributionLicense` | `Public Domain` | `Public Domain` | Yes |
+
+**Bounded conclusion:** all **four** explicitly checked critical field values are identical in independently verified upstream and package configurations. The complete `.conf` byte digests **differ**, so byte-for-byte config identity is **not** claimed; other fields have **not** been reconciled. Nor does agreement with an upstream `Public Domain` metadata claim itself clear CCEL/Logos-prepared electronic-edition rights. The authentic full source OSIS and binary zCom4 K/I/TOP contents, formatting, verse mappings and notes have **not yet** been exhaustively paired; no inference of compilation parity, historic printed-edition identity, editorial correction authorization or release follows. The original source, published package, catalogue and commentary prose remain untouched.
