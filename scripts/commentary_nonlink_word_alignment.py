@@ -12,6 +12,24 @@ from pilot_preflight import PilotError
 
 MAX_WORDS_PER_SIDE = 4000
 MAX_CELLS = 2_000_000
+MAX_LINEAR_SUBSEQUENCE_WORDS = 100_000
+
+
+def exact_unicode_source_ordered_subsequence(source: list[str], stock: list[str]) -> bool | None:
+    """Linear exact-case Unicode word-order witness, not an edit-distance or edition check.
+
+    True proves only that every source token occurs in order in the stock.
+    False is NOT evidence that original prose was omitted; different order is possible.
+    None means even the independent linear input bound was exceeded.
+    """
+    if max(len(source), len(stock)) > MAX_LINEAR_SUBSEQUENCE_WORDS:
+        return None
+    matched = 0
+    for token in stock:
+        if matched < len(source) and token == source[matched]:
+            matched += 1
+    return matched == len(source)
+
 
 
 def plain_word_alignment(source: list[str], stock: list[str]) -> dict:
@@ -36,6 +54,9 @@ def plain_word_alignment(source: list[str], stock: list[str]) -> dict:
             "stock_plain_words_not_matched_in_exact_order": None,
             "exact_unicode_longest_common_subsequence_word_count": None,
             "exact_unicode_longest_contiguous_shared_word_run_count": None,
+            "linear_exact_source_subsequence_in_stock":
+                exact_unicode_source_ordered_subsequence(source, stock),
+            "linear_source_subsequence_does_not_certify_original_text_or_markup_parity": True,
             "common_start_word_tokens": None,
             "common_end_word_tokens": None,
             "alignment_budget_cells": MAX_CELLS,

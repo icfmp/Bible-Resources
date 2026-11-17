@@ -661,7 +661,15 @@ def select_authorial_word_loss_attention(cases: list[dict]) -> tuple[list[dict],
             raise PilotError("Original lexical case without independent word alignment")
         missing = alignment.get("original_plain_words_not_matched_in_exact_order")
         if missing is None:
-            categories["original_alignment_budget_not_resolved"] += 1
+            in_order = alignment.get("linear_exact_source_subsequence_in_stock")
+            if in_order is True:
+                categories["over_budget_all_source_words_in_stock_order"] += 1
+            elif in_order is False:
+                categories["over_budget_source_order_not_proven"] += 1
+            elif in_order is None:
+                categories["original_alignment_budget_not_resolved"] += 1
+            else:
+                raise PilotError("Unreviewed original source linear sequence evidence")
         elif type(missing) is not int or missing < 0:
             raise PilotError("Unreviewed original source missing-word count")
         elif missing == 0:

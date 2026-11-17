@@ -18,6 +18,26 @@ from pilot_preflight import PilotError
 
 
 class OriginalPlainWordsAlignmentTests(unittest.TestCase):
+    def test_bounded_linear_fallback_for_large_exact_source_word_order(self):
+        source=[f"βWord{i}" for i in range(4001)]
+        compiled=["prefix"]+source[:1500]+["interposed"]+source[1500:]+["suffix"]
+        result=plain_word_alignment(source,compiled)
+        self.assertEqual(result["exact_unicode_ordered_alignment_class"],
+                         "alignment_skipped_exceeds_reviewed_word_or_cell_bound")
+        self.assertTrue(result["linear_exact_source_subsequence_in_stock"])
+        self.assertIsNone(result["original_plain_words_not_matched_in_exact_order"])
+        self.assertTrue(result[
+            "linear_source_subsequence_does_not_certify_original_text_or_markup_parity"])
+        missing=plain_word_alignment(source,source[:2000]+source[2001:])
+        self.assertFalse(missing["linear_exact_source_subsequence_in_stock"])
+        repeated=plain_word_alignment(["repeat"]*4001,["repeat"]*4000)
+        self.assertFalse(repeated["linear_exact_source_subsequence_in_stock"])
+
+    def test_linear_subsequence_limit_remains_explicit(self):
+        result=plain_word_alignment(["word"]*100001,["word"])
+        self.assertIsNone(result["linear_exact_source_subsequence_in_stock"])
+        self.assertIsNone(result["original_plain_words_not_matched_in_exact_order"])
+
     def test_shared_exact_span_equals_independent_bruteforce_across_short_unicode_cases(self):
         """Characterize both old consumers, including repeats, case and order."""
         alphabet = ("a", "A", "β")

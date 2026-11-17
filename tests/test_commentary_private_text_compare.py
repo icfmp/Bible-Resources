@@ -14,6 +14,23 @@ from pilot_preflight import PilotError
 
 
 class CommentaryOriginalStockTextTests(unittest.TestCase):
+    def test_large_ordered_source_witness_never_claims_exact_content_parity(self):
+        from commentary_private_text_compare import select_authorial_word_loss_attention
+        def case(value):
+            return {"exact_plain_word_alignment": {
+                "original_plain_words_not_matched_in_exact_order": None,
+                "linear_exact_source_subsequence_in_stock": value}}
+        selected,receipt=select_authorial_word_loss_attention(
+            [case(True),case(False),case(None)])
+        self.assertEqual(selected,[])
+        self.assertEqual(receipt["classes"],{
+            "original_alignment_budget_not_resolved":1,
+            "over_budget_all_source_words_in_stock_order":1,
+            "over_budget_source_order_not_proven":1})
+        self.assertTrue(receipt["source_punctuation_and_markup_parity_not_proven"])
+        with self.assertRaises(PilotError):
+            select_authorial_word_loss_attention([case("unsafe")])
+
     def test_stock_extra_words_around_source_do_not_invoke_suffix_only_prefix_probe(self):
         original, proof = _original_source_markers(self.source())
         observed = compare_private_texts(original, {
