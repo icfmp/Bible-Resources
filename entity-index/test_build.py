@@ -8,7 +8,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-SCRIPT = Path(__file__).with_name("build.py")
+SCRIPT = Path(__file__).with_name("compile_index.py")
 spec = importlib.util.spec_from_file_location("entity_index_builder", SCRIPT)
 builder = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(builder)
