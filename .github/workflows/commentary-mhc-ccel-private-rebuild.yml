@@ -67,6 +67,35 @@ jobs:
               (Path(os.environ["INPUT_DIR"])/f"mhc{number}.xml").write_bytes(data)
               print(f"Official original CCEL volume {number} independently SHA verified")
           PY
+      - name: Diagnose all true original source-start collisions before IMP mapping
+        shell: bash
+        run: |
+          set -euo pipefail
+          python research/mhc-ccel/ccel_imp_candidate.py \
+            --manifest config/commentary-intake/mhc-crosswire.json \
+            --source-dir "$RUNNER_TEMP/mhc-ccel-original" \
+            --collision-census > "$RUNNER_TEMP/mhc-ccel-start-census.json"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          report=json.loads((Path(os.environ["RUNNER_TEMP"]) /
+              "mhc-ccel-start-census.json").read_text())
+          if report["status"]!="ORIGINAL_START_COLLISION_CENSUS_ONLY":
+              raise SystemExit("Unreviewed original CCEL census")
+          print("Original CCEL volume structural collision counts only:")
+          for item in report["volumes"]:
+              print("volume",item["volume"],"sections",
+                    item["original_verse_or_range_sections"],
+                    "distinct starts",item["distinct_original_start_addresses"],
+                    "multi-section starts",item["duplicated_original_start_groups"],
+                    "extra divisions",item["additional_sections_sharing_original_start"],
+                    "same-full-ref",item["additional_sections_same_full_ref"],
+                    "different-full-ref",item["additional_sections_different_full_ref"],
+                    "same-body",item["additional_sections_identical_markup_body_to_prior"],
+                    "different-body",item["additional_sections_different_markup_body_to_prior"],
+                    "largest group",item["largest_same_start_group"])
+          print("Original source bodies not rekeyed or merged.")
+          PY
       - name: Require exact closed census of original verse-body candidates
         shell: bash
         run: |
