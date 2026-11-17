@@ -172,6 +172,41 @@ class CommentaryOriginalStockTextTests(unittest.TestCase):
             b"<h2>Chapter heading not a verse unit.</h2>"
             b"</div2></div1></ThML.body></ThML>" + b" " * 1100)
 
+    def test_original_all_p_word_sha_fingerprints_preserve_source_order_without_prose_leak(self):
+        from hashlib import sha256
+        original,_=_original_source_markers(self.source())
+        parts=original["Gen.1.1"][0][
+            "private_original_p_visible_word_digest_inventory"]
+        self.assertEqual(len(parts),1)
+        self.assertEqual(parts[0]["original_p_document_ordinal"],1)
+        self.assertEqual(parts[0]["original_p_visible_word_tokens"],4)
+        self.assertEqual(parts[0]["original_p_visible_ordered_word_sha256"],
+                         sha256(b"Exact private text punctuation").hexdigest())
+        other=original["Gen.1.4"][0][
+            "private_original_p_visible_word_digest_inventory"]
+        self.assertEqual(len(other),1)
+        self.assertEqual(other[0]["original_p_visible_word_tokens"],3)
+        self.assertEqual(other[0]["original_p_visible_ordered_word_sha256"],
+                         sha256(b"Original next paragraph").hexdigest())
+        self.assertNotIn("Exact private text",json.dumps(parts))
+        self.assertNotIn("Original next paragraph",json.dumps(other))
+
+    def test_original_p_sha_keeps_real_inline_reference_label_words(self):
+        from hashlib import sha256
+        xml=self.source().replace(
+            b"<div><p>Exact private text, punctuation!</p></div>",
+            b"<div><p>Opening <scripRef osisRef='Bible:Gen.2.1'>verse label</scripRef> "
+            b"closing prose.</p><p>Second genuine source section.</p></div>")
+        original,_=_original_source_markers(xml)
+        item=original["Gen.1.1"][0]
+        p=item["private_original_p_visible_word_digest_inventory"]
+        self.assertEqual(len(p),2)
+        self.assertEqual([r["original_p_visible_word_tokens"] for r in p],[6,4])
+        self.assertEqual(p[0]["original_p_visible_ordered_word_sha256"],
+                         sha256(b"Opening verse label closing prose").hexdigest())
+        self.assertEqual(item["private_original_scripRef_word_indices"],[1,2])
+        self.assertNotIn("verse label",json.dumps(p))
+
     def test_exact_and_changed_punctuation_are_distinct_and_private(self):
         units,proof=_original_source_markers(self.source())
         self.assertEqual(proof["original_verse_or_range_body_count"],2)
