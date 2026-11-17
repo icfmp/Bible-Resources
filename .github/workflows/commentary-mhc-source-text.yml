@@ -94,7 +94,10 @@ jobs:
               data=response.read(16*1024*1024+1)
           if not data or len(data)>16*1024*1024:
               raise SystemExit("Unreviewed eBible KJV archive size")
+          print("Independent eBible KJV USFM archive SHA-256 (observation only):",
+                sha256(data).hexdigest())
           found=[]
+          seen_book_codes=set()
           with ZipFile(BytesIO(data)) as archive:
               files=[n for n in archive.namelist() if n.lower().endswith((".usfm",".sfm"))]
               if len(files)>100:
@@ -103,14 +106,18 @@ jobs:
                   if archive.getinfo(name).file_size>4*1024*1024:
                       raise SystemExit("Unreviewed USFM file size")
                   raw=archive.read(name)
-                  if re.search(rb"(?m)^\\id\\s+PSA\\b",raw):
-                      text=raw.decode("utf-8-sig")
+                  text=raw.decode("utf-8-sig")
+                  found_codes=re.findall(r"(?m)^\\\\id\\s+([A-Z0-9]{3})\\b",text)
+                  seen_book_codes.update(found_codes)
+                  if "PSA" in found_codes:
                       found.append({
                           "psalm_file_sha256":sha256(raw).hexdigest(),
                           "psalm_file_bytes":len(raw),
                           "chapter_markers":len(re.findall(r"(?m)^\\c\\s+\\d+",text)),
                           "d_title_markers":len(re.findall(r"(?m)^\\d\\s+",text)),
                       })
+          print("Independent USFM observed book codes and Psalm candidate count:",
+                sorted(seen_book_codes),len(found))
           if len(found)!=1:
               raise SystemExit("Independent KJV USFM must have exactly one Psalm book")
           print("Independent eBible KJV USFM candidate ZIP SHA-256:",sha256(data).hexdigest())
