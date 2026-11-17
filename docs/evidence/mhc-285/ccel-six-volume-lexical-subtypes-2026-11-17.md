@@ -107,3 +107,33 @@ Every original CCEL verse/range section previously identified as `stock_words_in
 This is a **negative finding about a single suspected cause**: for this precise set of 128 source-extra-word cases (including all **116 Psalms**), mismatched *occupied K verse-range boundaries* are **not** an adequate explanation. It does **not** prove that the longer original prose is missing from the entire compiled MHC, that every authorial paragraph belongs in the native K payload, that electronic editions are identical, or that the source's XML section divisions are correctly encoded. The original native K raw repetition is independently observed, but is not itself authorial evidence of a section's intended prose.
 
 **Next bounded research gate:** independently classify the **actual CCEL-only word spans** against the original ThML `scripRef` label ownership, neighboring authorial units and the original native intro/other distinct K payloads; distinguish scripture quote labels, embedded book/chapter headings, markup/editorial annotations, intentional digital-edition variants and possible genuine omissions. Do not infer from same-start text or equal occupied ranges that any historical authorial word was dropped. Only prepare corrections after provenance, printed/independent authorial witness, rights and real-reader checks; retain draft #286 and never alter the published catalogue without explicit approval.
+
+
+## Whole six-volume exact source-extra word-gap topology (2026-11-17)
+
+The new [six SHA-pinned original CCEL volume jobs #44084387688](https://github.com/icfmp/Bible-Resources/actions/runs/44084387688) **all PASSED** against the original complete, unchanged CrossWire MHC 2.2. The [full Validate run #44084387907](https://github.com/icfmp/Bible-Resources/actions/runs/44084387907), [tool registry #44084387698](https://github.com/icfmp/Bible-Resources/actions/runs/44084387698), [original full native stock #44084387857](https://github.com/icfmp/Bible-Resources/actions/runs/44084387857) and [pinned JSword #44084387677](https://github.com/icfmp/Bible-Resources/actions/runs/44084387677) independently passed on the exact same source commit `6c69a24037807f6334da459e40b9729fdbc4519e`.
+
+Every reported word is compared **after removing only actual source ThML `scripRef` labels and independently parsed actual native `reference` labels**. Both forward-earliest and reverse-latest exact case-sensitive Unicode subsequence alignments are calculated. Only when those positions agree is the location and span count of original extra **unlinked** words called *unambiguous*. Otherwise the result is explicitly indeterminate. The report never exposes text, word tokens, XML or SWORD content.
+
+| Original CCEL volume | Strictly unique alignment with only internal original extra words | Ambiguous repeated-word subsequence alignment | Original-source-longer same-start cases outside these two classes |
+| --- | ---: | ---: | ---: |
+| I | 1 | 0 | 0 |
+| II | 0 | 0 | 1 (the genuine unlinked word sequences match after link-label removal) |
+| III | 113 | 3 | 1 (unlinked word order/selection unresolved) |
+| IV | 3 | 1 | 0 |
+| V | 0 | 0 | 0 |
+| VI | 3 | 0 | 2 (unlinked word order/selection unresolved) |
+| **Total** | **120** | **4** | **4** |
+
+The **128/128** original same-start source-longer relationship census therefore reconciles as **124 ordered unlinked source-extra cases**, **one actual unlinked-word equality after label removal**, and **three other unlinked order/selection cases**. The 124 source-extra cases comprise **120 uniquely interior** and **four ambiguous positions**; *none* is a certified authorial omission or source-edition corruption.
+
+### Focus: all 116 original Psalms source-longer cases
+
+- **112** have one or more **uniquely localized interior extra-word spans**, **three** have multiple exact subsequence alignments, and **one** has original-vs-stock unlinked word order/selection unresolved.
+- Of the 112 uniquely localized cases, **111 have exactly one extra-word span** and **one has exactly two**.
+- **97/112** have **at most 12** extra original unlinked word tokens, **106/112** at most 20, and **111/112** at most 40.
+- The single largest anomaly has **585 extra source unlinked words** distributed into **two interior spans** (longest one: 569 words). It is bound to original CCEL Volume III **XML source line 27749**, original full reference SHA-256 `f9a402dda0436aaed29b311707a672f1057df6e7bba16b58a43e5a1a91ac56a0`, original body SHA-256 `48809f08f932d9d68c4cbc56267a6ffdf973bf9bbafc9401d0916296824fb4ea`, and authentic original native K raw SHA-256 `77f3d7bf9699b9cafadceabb62c8b192f554e485d997c85293666f38aa210ac4`. **This is a prioritized exact original-source witness, not permission to copy prose into the prepared module.**
+
+The metadata-only per-volume ZIP receipts were uploaded by that run. All numbers above are directly reconciled from the original source-bound receipts, not an estimate from screenshots, headings, or textual excerpts.
+
+**Next research gate:** distinguish these uniquely localized extra spans against the **actual adjacent original ThML authored division(s)** and **other original occupied native K/I payloads**, especially the 585-word outlier, before deciding whether the cause is structure, transformed references/markup, edition variation or an omission. Even a match in another native key is a textual location witness, **not** proof of correct authorial attribution. Verify source and legal ownership of any prospective correction. No original book/chapter/verse key, exposition, raw SWORD bytes or public resource has been edited. Draft PR #286 remains unmerged.
