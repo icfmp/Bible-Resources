@@ -165,8 +165,8 @@ jobs:
                       "original_full_reference_sha256"]:
                   raise SystemExit("Source chapter locator differs from pinned marker SHA")
               match=re.fullmatch(
-                  r"Bible:([1-4]?[A-Za-z][A-Za-z0-9]*)\\.([1-9][0-9]*)\\.[1-9][0-9]*"
-                  r"(?:-[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9][0-9]*\\.[1-9][0-9]*)?",
+                  r"Bible:([1-4]?[A-Za-z][A-Za-z0-9]*)\.([1-9][0-9]*)\.[1-9][0-9]*"
+                  r"(?:-[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*\.[1-9][0-9]*)?",
                   original_ref)
               if match is None:
                   raise SystemExit("Original CCEL section is not an approved verse locator")
