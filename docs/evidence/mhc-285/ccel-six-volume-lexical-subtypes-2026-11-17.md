@@ -60,6 +60,26 @@ The separate **82** cases requiring different word-order/selection examination c
 
 The independent canonical-book reference is just research metadata, not a source verse reassignment. All six audited original source sections and native original content remain intact.
 
+## Linear order-only check for oversized word alignments
+
+The previous 46 over-budget original **nonlink-prose** alignments used a quadratic-cost longest common subsequence (LCS) gate and could not report a numerical mismatch. A new **generic** exact Unicode case-sensitive linear subsequence check (max 100,000 word tokens per side; no original words emitted) tests only whether *all original nonlinked source words* occur **in the same order** inside the original CrossWire native entry selected by the original source start.
+
+All six original text comparison jobs in [GitHub Actions #44071936525](https://github.com/icfmp/Bible-Resources/actions/runs/44071936525) **SUCCEEDED**, plus full [Validate #44071936541](https://github.com/icfmp/Bible-Resources/actions/runs/44071936541) and [tool registry #44071936516](https://github.com/icfmp/Bible-Resources/actions/runs/44071936516). Real SHA-pinned exact source and stock original editions remain unchanged.
+
+| CCEL volume | Previously LCS over budget; now independently checked for full in-order original source word containment | Shorter exact LCS source word-order review cases |
+| --- | ---: | ---: |
+| I | 1 | 0 |
+| II | 1 | 5 |
+| III | 7 | 10 |
+| IV | 2 | 0 |
+| V | 18 | 2 |
+| VI | 17 | 3 |
+| **Total** | **46** | **20** |
+
+All **46** oversized cases had **`over_budget_source_order_not_proven`**: none contained **all** original nonlink-prose tokens in their original order *within the original same-start stock entry* under this exact linear test. **Zero** exceeded the separate 100,000-token linear processing limit. The other 20 cases already had a bounded exact LCS identifying at least one original word-order difference. Thus **66** cases have an explicit **same-start, original-nonlink-word ordering discrepancy**, not necessarily absent prose, wrong canonical keys, or a corrupted CrossWire prepared edition. Remaining 16 of the broad 82 unresolved original word comparisons were not in these attention classes and must not be conflated with the 66.
+
+**This is a deliberately narrow negative witness:** finding no complete ordered subsequence in *one* native stock entry does **not** show the original authored text was lost. Reordering, separate linked Bible reference labels, different commentary edition/source scope, a neighboring native entry, or shared compiled raw blocks could account for the result. The exact LCS mismatch *magnitude* for these 46 is **still unavailable**; no case was declared word-for-word/markup/authorial parity. A careful private cross-slot/source-bound follow-up is necessary before any editorial change.
+
 ## Further gates
 
 The previous SHA-pinned full six-volume census already accounted for all **4,263** original verse/range section markers and **1,306** separate chapter markers (5,569 total `scripCom`). The subsequent detailed lexical comparison is **a classification of the 1,606**, **not** a claim that the other 2,648 whitespace-only cases or the 5 nonvisible source divisions have complete markup/section/edition parity. The four unoccupied original source starts remain under the previously classified CCEL index / source-grounded alias issues #288 and #290.
