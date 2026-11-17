@@ -83,11 +83,14 @@ God has given us **his word as the rule of life**.
 
 Neither the conduct of the majority nor the orders of powerful people can justify disobeying it.
 
-Those who blindly follow the multitude in sin will also share the multitude's judgment.
+Those who blindly follow the multitude in sin will go where that multitude goes, Henry warns: **into the burning lake**.
 
 ---
 
 ## Editorial review — Revelation 19
+
+**2026-11-17 CCEL secondary-witness comparison:** restored Henry's specific **burning lake** judgment image instead of ending his rhetorical warning with only “the multitude's judgment.” [CCEL Revelation 19](https://ccel.org/ccel/henry/mhcc.lviii.xix.html). Original published SWORD native wording, links and independent editorial acceptance remain open.
+
 
 **Complete original-English secondary witness directly reviewed:** [CCEL, Revelation 19](https://ccel.org/ccel/henry/mhcc.lviii.xix.html). The precise released **MHCC 0.1.1** remains the authoritative original for native SWORD text, links and independent approval.
 
