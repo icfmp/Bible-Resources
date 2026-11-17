@@ -304,7 +304,7 @@ The original source line and SHA-bound original full `scripCom` reference identi
 | --- | ---: | --- | --- |
 | `Bible:Ps.7.10-Ps.7.17` | **28009** | `7e287caceb659a7e811ea5a3842f697705e16b18710b2bab4207a1d933673115` | Ordered extra-source word relation, but several valid subsequence alignments; **no unique omitted-word location** |
 | `Bible:Ps.52.1-Ps.52.5` | **46600** | `b6655faf8863de5d9fb06630db0d3f09a317d7b93336db5c8d4d2401140eb1cd` | Same ambiguity from repeated original words |
-| `Bible:Ps.72.1` | **54125** | `3aca1e5bad6dbe089034f8b739c48c04e830c817a9afd594a0efd9765c1ca818f` | Same ambiguity from repeated original words |
+| `Bible:Ps.72.1` | **54125** | `3aca1e5bad6dbe089034f8b739c48c4e830c817a9afd594a0efd9765c1ca818f` | Same ambiguity from repeated original words |
 | `Bible:Ps.8.1-Ps.8.2` | **28212** | `703c962555d077250d516f34f7ae9a19c74a4c95f958a4fb5b1ed0889f3aef44` | Original/native unlinked prose word order or selection **genuinely differs**; outside ordered extra-word subsequence classification |
 
 The Ps 72 source reference is **a single verse**, not an invented multi-verse range. The four names/ranges were checked by recomputing SHA-256 of the exact candidate original `Bible:Ps...` source reference strings, and matching the actual source receipt line/ref hashes. They are *original source claims*, not verified compiled SWORD index assignments. The Psalm 7:10–17 case is **distinct from the previously audited Psalm 7:1–9** source opening `p` #1 (KJV biblical superscription) and `p` #6 (569 unlinked original extra exposition words). Do not conflate them.
