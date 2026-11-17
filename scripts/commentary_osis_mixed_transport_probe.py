@@ -944,8 +944,7 @@ def _probe_private_alias_real_xiphos(root: Path, module_id: str, aliases: dict,
             )}
     gui = _run_real_gui(
         root, comparisons, seconds=6, commentary_module_id=module_id,
-        on_gui_ready=chapter_readback,
-        window_manager="openbox",
+        on_gui_ready=chapter_readback
     )
     return {
         "status": "PRIVATE_XIPHOS_REAL_GUI_EXPERIMENT_NOT_PRESENTATION_APPROVAL",
@@ -954,8 +953,6 @@ def _probe_private_alias_real_xiphos(root: Path, module_id: str, aliases: dict,
         "diatheke_alias_master_shared_run_minimum": min(shared_runs.values()),
         "real_xiphos_executable_started_and_visible":
             gui["real_xiphos_executable_started_and_visible"],
-        "real_xiphos_window_manager_process_started":
-            gui["real_xiphos_window_manager_process_started"],
         "actual_passage_commands_accepted":
             gui["actual_passage_commands_accepted"],
         "commentary_clipboard_match_by_passage":

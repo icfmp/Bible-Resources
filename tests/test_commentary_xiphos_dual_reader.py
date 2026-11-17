@@ -22,20 +22,6 @@ from pilot_preflight import PilotError
 
 
 class ExactDualModuleXiphosReaderTests(unittest.TestCase):
-    def test_real_private_x11_window_manager_is_reviewed_and_optional(self):
-        from commentary_xiphos_dual_reader import (
-            _reviewed_private_x11_window_manager_command,
-        )
-        self.assertIsNone(_reviewed_private_x11_window_manager_command(None))
-        self.assertEqual(
-            _reviewed_private_x11_window_manager_command("openbox"),
-            ("openbox", "--sm-disable"),
-        )
-        for unsafe in ("", "bash", "/bin/sh", "openbox --replace", "Xvfb"):
-            with self.subTest(unsafe=unsafe):
-                with self.assertRaises(PilotError):
-                    _reviewed_private_x11_window_manager_command(unsafe)
-
     def test_long_distinct_original_commentary_in_real_clipboard(self):
         text = ("Original commentary source. " +
                 " ".join("exegeticalword%03d" % n for n in range(100)))
