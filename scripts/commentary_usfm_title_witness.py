@@ -274,6 +274,88 @@ def compare_original_first_paragraphs(safe_receipt: dict, titles: dict[int, dict
     }
 
 
+
+def compare_ambiguous_original_opening_paragraphs(
+    safe_receipt: dict, titles: dict[int, dict], *, source_book: str,
+) -> dict:
+    """Compare original p#1 title tokens when *extra span ownership* is unknown.
+
+    Matching the independently pinned biblical superscription does not resolve
+    repeated-token native alignment, nor establish any missing authorial prose.
+    """
+    scope=safe_receipt.get(
+        "source_longer_both_source_and_native_reference_label_word_scope")
+    if (safe_receipt.get("original_source_words_or_binaries_exported") is not False
+            or not isinstance(scope,dict)
+            or scope.get(
+                "excluded_only_original_scripRef_and_real_native_reference_labels"
+            ) is not True):
+        raise WitnessError("Ambiguous original source receipt lacks authenticated scope")
+    classes=scope.get("original_book_source_extra_original_p_digest_case_classes",{})
+    by_book=classes.get(source_book,{}) if isinstance(classes,dict) else {}
+    expected=by_book.get("ambiguous_extra_source_words_no_unique_gap_ownership",0)
+    if type(expected) is not int or expected<0 or expected>50:
+        raise WitnessError("Original ambiguous source word case census is invalid")
+    rows=scope.get("source_extra_original_p_digest_source_line_sha_only_rows")
+    if not isinstance(rows,list) or len(rows)>200:
+        raise WitnessError("Original ambiguous source paragraph row census missing")
+    cases=[]
+    chapters=set()
+    for row in rows:
+        if (row.get("original_book")!=source_book
+                or row.get("source_extra_p_digest_case_class")!=
+                "ambiguous_extra_source_words_no_unique_gap_ownership"):
+            continue
+        chapter=row.get("original_source_chapter_number_from_actual_osis_start")
+        source_sha=row.get("original_full_reference_sha256")
+        size=row.get("original_opening_p_visible_word_count")
+        exact=row.get("original_opening_p_exact_unicode_word_sha256")
+        folded=row.get("original_opening_p_casefold_unicode_word_sha256")
+        if (type(chapter) is not int or not 1<=chapter<=200
+                or chapter in chapters
+                or row.get("original_opening_p_document_ordinal")!=1
+                or not isinstance(source_sha,str) or not PIN.fullmatch(source_sha)
+                or type(size) is not int or not 1<=size<=1000
+                or not isinstance(exact,str) or not PIN.fullmatch(exact)
+                or not isinstance(folded,str) or not PIN.fullmatch(folded)
+                or row.get("all_extra_gap_full_original_p_digest_candidate_classes")!=[]):
+            raise WitnessError("Original ambiguous source opening paragraph proof incomplete")
+        chapters.add(chapter)
+        title=titles.get(chapter)
+        if title is None:
+            verdict="independent_title_missing"
+        elif title.get("status")!="plain_original_d_title":
+            verdict="independent_title_markup_unreviewed"
+        elif title.get("word_count")!=size:
+            verdict="opening_p_and_independent_title_word_counts_differ"
+        elif exact==title.get("exact_unicode_word_sha256"):
+            verdict="opening_p_exact_biblical_title_tokens_but_gap_ownership_ambiguous"
+        elif folded==title.get("casefold_unicode_word_sha256"):
+            verdict="opening_p_casefold_biblical_title_tokens_but_gap_ownership_ambiguous"
+        else:
+            verdict="opening_p_and_title_tokens_differ_gap_ownership_ambiguous"
+        cases.append({
+            "original_chapter_from_pinned_source_reference":chapter,
+            "original_source_full_reference_sha256":source_sha,
+            "original_opening_p_word_count":size,
+            "independent_title_word_count":(
+                title.get("word_count") if isinstance(title,dict) else None),
+            "verdict":verdict,
+        })
+    if len(cases)!=expected:
+        raise WitnessError("Original ambiguous source population not fully reconciled")
+    return {
+        "status":"AMBIGUOUS_EXTRA_WORD_ALIGNMENT_INDEPENDENT_OPENING_TITLE_WITNESS_ONLY",
+        "original_source_extra_ambiguous_alignment_cases":expected,
+        "independent_original_opening_p_title_classes":
+            dict(sorted(Counter(row["verdict"] for row in cases).items())),
+        "original_chapter_source_sha_and_closed_verdict_only":
+            sorted(cases,key=lambda row:row["original_chapter_from_pinned_source_reference"]),
+        "opening_title_match_never_resolves_extra_word_alignment":True,
+        "source_or_bible_text_or_native_verse_keys_exported":False,
+    }
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-safe-receipt", type=Path, required=True)
@@ -288,6 +370,9 @@ def main(argv=None):
     receipt = json.loads(args.source_safe_receipt.read_text(encoding="utf-8"))
     result = compare_original_first_paragraphs(
         receipt, titles, source_book=args.source_book)
+    result["independently_attested_ambiguous_source_opening_paragraphs"] = (
+        compare_ambiguous_original_opening_paragraphs(
+            receipt,titles,source_book=args.source_book))
     args.report.write_text(
         json.dumps(result, sort_keys=True, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({
