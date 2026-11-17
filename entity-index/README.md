@@ -76,6 +76,12 @@ The builder contains **no chapter-specific or entity-specific code path**.
   debated expression, but not a demonstrably historical man living in the
   patriarchal age. Its exact Hebrew word remains in the frozen source for
   text-critical and Christological review.
+- `person:Johanan` is now **canonically distinct** from
+  `person:Jehoahaz.3`: the exact Hebrew token in 1 Chronicles 3:15
+  (`o130030150041`) says *Johanan*, not *Jehoahaz*. It remains in
+  Johanan's original source group and is removed **only** from the
+  derived Jehoahaz direct-name occurrences. The separate Shallum at
+  `o130030150101` remains unresolved; **no unsupported alias merge**.
 - `keyterm:Universe` and `keyterm:World` retain their distinct source
   records and word groups, but no longer resolve canonically to
   `keyterm:Ability` simply because the input had an overly broad
