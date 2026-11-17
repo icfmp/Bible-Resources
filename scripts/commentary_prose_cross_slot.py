@@ -513,7 +513,7 @@ class OriginalExtraGapNativeChapterProbe:
             marker=matched[identity]
             original_source_ref=marker.get("osisRef","")
             if (not re.fullmatch(
-                    r"Bible:[A-Za-z0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9]+\\.[0-9]+\\.[0-9]+)?",
+                    r"Bible:[A-Za-z0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9]+\.[0-9]+\.[0-9]+)?",
                     original_source_ref)
                     or len(original_source_ref)>128):
                 raise PilotError("Original source scripCom citation cannot be safely recorded")
