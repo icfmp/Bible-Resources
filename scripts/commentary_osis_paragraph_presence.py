@@ -96,6 +96,77 @@ def original_ccel_paragraph_words(
     return words
 
 
+
+ 
+def original_authoring_chapter_scope_metadata(
+        book_div: etree._Element, chapter_ref: str) -> dict:
+    """Audit real chapter milestone bounds; never expose or rewrite source words.
+
+    Book ownership and section starts are independent of any proposed missing
+    CCEL paragraph; this detects only the authentic OSIS chapter's structural
+    span, not historical authorial paragraphs or their verse attribution.
+    """
+    if (not isinstance(book_div, etree._Element)
+            or book_div.tag.rsplit("}",1)[-1]!="div"
+            or book_div.get("type")!="book"
+            or not re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*",
+                                chapter_ref)
+            or book_div.get("osisID")!=chapter_ref.rsplit(".",1)[0]):
+        raise ValueError("Unreviewed original authoring OSIS book/chapter scope")
+    from collections import Counter
+    state=0
+    opens=0
+    closes=0
+    parts=[]
+    elements=Counter()
+    def visit(node):
+        nonlocal state,opens,closes
+        if not isinstance(node.tag,str):
+            raise ValueError("Unexpected original OSIS markup node")
+        tag=node.tag.rsplit("}",1)[-1]
+        if tag=="chapter":
+            first=(node.get("sID")==chapter_ref or (
+                node.get("osisID")==chapter_ref and not node.get("eID")))
+            last=node.get("eID")==chapter_ref
+            if first and last:
+                raise ValueError("Source chapter start/end conflated")
+            if first:
+                if opens or state:
+                    raise ValueError("Duplicate original source chapter start")
+                opens+=1
+                state=1
+            if last:
+                if state!=1 or closes:
+                    raise ValueError("Unreviewed original chapter close")
+                closes+=1
+                state=2
+        if state==1:
+            if tag in ("p","verse","chapter","title","div","reference","note","q"):
+                elements[tag]+=1
+            if node.text:
+                parts.append(node.text)
+        for child in node:
+            visit(child)
+            if state==1 and child.tail:
+                parts.append(child.tail)
+    visit(book_div)
+    if state!=2 or opens!=1 or closes!=1:
+        raise ValueError("Original source chapter milestones incomplete")
+    visible="".join(parts)
+    words=WORD.findall(visible)
+    if not words or len(words)>100_000:
+        raise ValueError("Original OSIS chapter prose length unreviewed")
+    return {
+        "authentic_chapter_milestone_start_end_count":[opens,closes],
+        "bounded_original_chapter_visible_words":len(words),
+        "original_chapter_visible_text_sha256":sha256(visible.encode("utf-8")).hexdigest(),
+        "original_chapter_element_start_counts_by_tag":dict(sorted(elements.items())),
+        "no_original_chapter_words_exported":True,
+        "not_a_proof_of_original_paragraph_or_verse_ownership":True,
+        "no_edits_or_release":True,
+    }
+
+
 def _case_insensitive_length_is_not_used(words: list[str]) -> int:
     """Do not replace exact authorial case by a lossy casefold comparison."""
     return len(words)
