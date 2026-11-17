@@ -311,10 +311,12 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes],
     bounded_priority_examples=[]
     priority_example_counts=Counter()
     per_book={}
+    per_book_word_relationships={}
     tested=0
     for start,items in source.items():
         book=start.split(".")[0]
         book_counts=per_book.setdefault(book,Counter())
+        book_relationship_counts=per_book_word_relationships.setdefault(book,Counter())
         raw=stocked.get(start)
         for item in items:
             tested+=1
@@ -365,6 +367,7 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes],
                         diagnostic=word_relationship(a,b)
                         category=diagnostic["relationship"]
                         word_relationship_subtypes[category]+=1
+                        book_relationship_counts[category]+=1
                         word_overlap_buckets[diagnostic["overlap_bucket"]]+=1
                         if category=="source_words_contiguous_inside_longer_stock":
                             position=diagnostic["original_words_contiguous_in_stock_location"]
@@ -498,6 +501,13 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes],
         +lexical_details["different_unicode_word_token_sequence_or_selection"]
     ):
         raise PilotError("Unequal-word relationships have incomplete full-corpus accounting")
+    if sum(sum(v.values()) for v in per_book_word_relationships.values()) != (
+        sum(word_relationship_subtypes.values())
+    ) or any(
+        sum(v.get(category,0) for v in per_book_word_relationships.values()) != n
+        for category,n in word_relationship_subtypes.items()
+    ):
+        raise PilotError("Original source-book word relation counts do not reconcile")
     if sum(word_overlap_buckets.values())!=sum(word_relationship_subtypes.values()):
         raise PilotError("Word overlap ratio categories have incomplete accounting")
     if sum(stock_containment_locations.values())!=word_relationship_subtypes[
@@ -620,6 +630,10 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes],
         "disagreement_categories_are_only_exploratory_not_text_parity":True,
         "per_source_marker_text_diagnostic_counts":dict(sorted(counters.items())),
         "book_counts":{name:dict(sorted(counts.items())) for name,counts in sorted(per_book.items())},
+        "source_book_word_relationship_subtypes":{
+            name:dict(sorted(counts.items()))
+            for name,counts in sorted(per_book_word_relationships.items())
+        },
         "bounded_private_content_discrepancy_hash_samples":issues,
         "whitespace_only_status_is_not_exact_text_parity":True,
         "no_autocorrection_or_content_normalization_performed":True,

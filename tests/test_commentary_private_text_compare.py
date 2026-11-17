@@ -24,6 +24,8 @@ class CommentaryOriginalStockTextTests(unittest.TestCase):
         locations = observed["stock_containment_additional_word_position_counts"]
         self.assertEqual(
             locations.get("extra_stock_words_before_and_after_original_body"), 1)
+        self.assertEqual(observed["source_book_word_relationship_subtypes"],
+                         {"Gen":{"source_words_contiguous_inside_longer_stock":1}})
         self.assertEqual(
             observed["original_body_mid_stock_or_at_start_not_assumed_covered_by_prefix_probe"], 1)
         self.assertEqual(

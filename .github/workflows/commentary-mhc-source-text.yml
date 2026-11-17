@@ -172,6 +172,22 @@ jobs:
           assert total_book == classes
           print("Source book identifiers and text-diagnostic counts only:",
                 json.dumps(by_book, sort_keys=True))
+          by_book_relations = details["source_book_word_relationship_subtypes"]
+          if not isinstance(by_book_relations, dict) or len(by_book_relations)>66:
+              raise SystemExit("Unbounded original source-book word relations")
+          assert set(by_book_relations) == set(by_book)
+          assert all(re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]{1,15}", name)
+                     and isinstance(kinds,dict)
+                     and set(kinds) <= set(relationships)
+                     and all(type(n) is int and n>=0 for n in kinds.values())
+                     for name,kinds in by_book_relations.items())
+          summed = {}
+          for kinds in by_book_relations.values():
+              for category,count in kinds.items():
+                  summed[category] = summed.get(category,0) + count
+          assert summed == relationships
+          print("Source book word-order/selection relationship counts:",
+                json.dumps(by_book_relations, sort_keys=True))
           evidence = {
               "status": "SOURCE_STOCK_ONE_VOLUME_LEXICAL_CENSUS_NOT_PARITY",
               "resource_id": "mhc-crosswire",
@@ -191,6 +207,7 @@ jobs:
                       "original_sections_without_visible_text_examples_truncated"],
               "source_section_text_diagnostic_classes": classes,
               "source_book_text_diagnostic_classes": by_book,
+              "source_book_word_relationship_subtypes": by_book_relations,
               "source_book_counts_are_not_editorial_content_parity": True,
               "closed_lexical_difference_types": lexical,
               "closed_word_sequence_relationship_types": relationships,
