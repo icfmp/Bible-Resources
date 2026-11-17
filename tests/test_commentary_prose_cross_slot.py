@@ -234,7 +234,10 @@ class OriginalExtraGapChapterNativeTests(unittest.TestCase):
         self.assertEqual([x["distinct_original_p_elements_touched"] for x in spans],[1,1])
         self.assertEqual([x["partially_covered_original_p_elements"] for x in spans],[1,1])
         self.assertNotIn("secretFirst",json.dumps(report))
-        self.assertNotIn("Bible:Gen.1.1",json.dumps(report))
+        self.assertEqual(row["original_ccel_scripCom_osisRef_claim_only"],
+                         "Bible:Gen.1.1")
+        self.assertTrue(report["only_original_ccel_source_scripCom_claimed_reference_recorded"])
+        self.assertFalse(report["original_words_or_native_keys_exposed"])
         with self.assertRaises(PilotError):
             probe.original_thml_extra_gap_structure(
                 xml,expected_source_sha256="0"*64)
