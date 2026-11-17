@@ -6156,17 +6156,18 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 9,
+      "static_reference_count": 10,
       "static_references": [
-        "scripts/tool_registry.py",
         ".github/workflows/commentary-anchor-parity.yml",
         ".github/workflows/commentary-editorial-section-scope.yml",
         ".github/workflows/commentary-evidence.yml",
         ".github/workflows/commentary-intake.yml",
         ".github/workflows/commentary-mhc-private-jsword.yml",
+        ".github/workflows/commentary-mhc-source-text.yml",
         ".github/workflows/commentary-native-raw-corpus.yml",
         ".github/workflows/commentary-private-text-compare.yml",
-        "docs/evidence/mhcc-274/editorial-section-scope-audit.md"
+        "docs/evidence/mhcc-274/editorial-section-scope-audit.md",
+        "scripts/tool_registry.py"
       ]
     },
     {
@@ -6191,12 +6192,12 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 12,
+      "static_reference_count": 13,
       "static_references": [
-        "scripts/tool_registry.py",
         ".github/workflows/commentary-anchor-parity.yml",
         ".github/workflows/commentary-editorial-section-scope.yml",
         ".github/workflows/commentary-mhc-private-jsword.yml",
+        ".github/workflows/commentary-mhc-source-text.yml",
         ".github/workflows/commentary-native-raw-corpus.yml",
         ".github/workflows/commentary-private-candidate-xiphos-gui.yml",
         ".github/workflows/commentary-private-text-compare.yml",
@@ -6204,7 +6205,8 @@
         ".github/workflows/commentary-zcom-andbible-android.yml",
         ".github/workflows/commentary-zcom-andbible-jsword.yml",
         ".github/workflows/commentary-zcom-private-candidate.yml",
-        ".github/workflows/stage-stock-commentary.yml"
+        ".github/workflows/stage-stock-commentary.yml",
+        "scripts/tool_registry.py"
       ]
     },
     {
