@@ -875,6 +875,7 @@ class PrivateOriginalChapterNativeAnchorCoverage:
             "original_verse_key_range_and_paragraph_owner_not_inferred": True,
             "casefold_only_categories_do_not_authorize_case_changes": True,
             "exact_containment_does_not_prove_punctuation_or_markup": True,
+            "visible_character_test_excludes_section_boundary_nonword_chars": True,
             "interior_character_test_excludes_section_boundary_nonword_chars": True,
             "complete_chapter_nonwhitespace_character_probe_includes_boundaries_if_partition":True,
             "reference_attributes_checked_only_for_uniquely_located_exact_native_bodies": True,
