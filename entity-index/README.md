@@ -190,6 +190,32 @@ also require a distinct pinned-source completeness and traditional epistle
 subscription review (see inherited #86). Variant provenance is therefore
 retained for later source-specific qualification.
 
+## Full exact-word distinct-person collision audit
+
+The independent `audit_person_overlaps.py` reads our **complete generated
+index**, not the outdated historical list of 93 source collisions from an
+earlier ACAI revision. It detects when two or more *different canonical
+people* claim **one identical original-language word ID**, and separates:
+
+- `multiple_explicit_names`: two different people claim the same explicit
+  original-language name token — **highest manual-review priority**;
+- `mixed_name_and_indirect`: one explicit name intersects another person's
+  pronoun/subject pointer — contextual evidence required;
+- `indirect_only`: multiple person referent annotations on one token;
+  these can be legitimate reference multiplicity, **not automatic errors**.
+
+Aliases resolving to one canonical ID are not counted as competing people.
+Non-person entities are ignored in this *person-specific* audit. It never
+deduplicates source groups, changes source evidence, merges individuals or
+accepts a token based solely on Strong/lemma/name spelling.
+
+CI regenerates `dist/person-overlaps.json` deterministically from all
+6,644 frozen ACAI source records and uploads it as **QA-only evidence**,
+alongside the unapproved local index artifact. The concise CI log exposes
+the highest-priority collisions for source-by-source follow-up under
+[inherited identity issue #75 / our tracker #299](https://github.com/icfmp/Bible-Resources/issues/299).
+A count from an old unpinned snapshot is not a release gate.
+
 ## Original corpus labels and stable client-facing corpus names
 
 The pinned ACAI source spells its Greek occurrence field **`SBLGNT`**
