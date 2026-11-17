@@ -62,6 +62,8 @@ It teaches us to renounce sin and refuse an earthly, sensual life inconsistent w
 
 We are called to live **self-controlled, upright and godly lives**, despite temptations, bad examples, mistreatment and the sinful desires still remaining in believers.
 
+We must look to **God in Christ as the one we hope in and worship**.
+
 The gospel also teaches us to anticipate another world's glory. Our **blessed hope** will be complete when Christ appears in glory.
 
 The purpose of his death was to bring us into **holiness and happiness**.
@@ -81,6 +83,9 @@ The less we boast of supposed good works or trust them for acceptance, and the m
 ---
 
 ## Editorial review — Titus 2
+
+**2026-11-17 second-pass CCEL fidelity correction:** explicitly restored Henry's instruction to regard **God in Christ as the object of hope and worship**, a distinct doctrinal/pastoral point not stated in the prior modernization. Source witness: [CCEL Titus 2](https://ccel.org/ccel/henry/mhcc.xlviii.ii.html). Exact native MHCC 0.1.1 text and reference markup, independent editorial signoff, and publication remain outstanding.
+
 
 **Whole original-English source read:** [CCEL, Titus 2](https://ccel.org/ccel/henry/mhcc.xlviii.ii.html). `MHCC 0.1.1` remains original source for native SWORD structure, independent QA and compiled reader checks.
 
