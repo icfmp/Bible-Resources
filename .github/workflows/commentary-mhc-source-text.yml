@@ -138,7 +138,7 @@ jobs:
                 driver=="zCom" and source_type=="OSIS")
           print("A differing original .conf value is recorded for further source/build",
                 "investigation, not silently rewritten or an upstream source rejection.")
-          print("Official upstream source commit (not equivalent to compiled ZIP SHA):"
+          print("Official upstream source commit (not equivalent to compiled ZIP SHA):",
                 os.environ["UPSTREAM_SHA"])
           print("Authoring-file original bytes and independent SHA256:",
                 json.dumps(metadata,sort_keys=True))
