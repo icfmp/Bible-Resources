@@ -402,3 +402,143 @@ class OriginalProseAlternativeNativeSlotProbe:
             "no_original_words_native_key_strings_scripture_targets_or_raw_XML_exposed":True,
             "source_annotation_and_original_stock_module_unchanged":True,
         }
+
+
+class OriginalExtraGapNativeChapterProbe:
+    """Private exact entire-extra-span search in authentic other chapter K/I slots.
+
+    Only a bounded, source-neutral high-size subset is inspected. A hit is a
+    textual location candidate, never approval to move original annotations.
+    Neither original prose, native keys nor target strings enter the report.
+    """
+
+    MIN_FULL_SPAN_WORDS = 6
+    MAX_OUTLIER_CASES = 4
+    MAX_NATIVE_REPLAY_KEYS = 50_000
+
+    def __init__(self, cases: list[tuple[str,dict,bytes,dict]]):
+        from commentary_nonlink_words import _private_unique_original_gap_spans
+        if not 1 <= len(cases) <= self.MAX_OUTLIER_CASES:
+            raise PilotError("Source-extra native outlier research exceeds bounded cases")
+        self.units = []
+        self.replayed = 0
+        for start,item,selected,metadata in cases:
+            if (not isinstance(start,str) or start.count(".")!=2
+                    or not isinstance(selected,bytes) or not isinstance(item,dict)
+                    or not isinstance(metadata,dict)):
+                raise PilotError("Original extra-span candidate lacks genuine source and native identities")
+            original=item.get("original_text")
+            line=item.get("original_source_line")
+            if (not isinstance(original,str) or type(line) is not int or line<=0
+                    or sha256(original.encode("utf-8")).hexdigest()!=item.get("original_text_sha256")
+                    or not isinstance(item.get("original_full_reference_sha256"),str)
+                    or not SHA_RE.fullmatch(item["original_full_reference_sha256"])):
+                raise PilotError("Original extra-span candidate identity or text SHA is unverified")
+            tokens=WORD.findall(original)
+            linked=item.get("private_original_scripRef_word_indices")
+            if (not isinstance(linked,list) or len(linked)!=len(set(linked))
+                    or any(type(n) is not int or n<0 or n>=len(tokens) for n in linked)):
+                raise PilotError("Original extra-span genuine link offsets unverified")
+            linked_set=set(linked)
+            source_plain=[w for i,w in enumerate(tokens) if i not in linked_set]
+            stock_plain=strict_native_stock_plain_words(selected)
+            spans=_private_unique_original_gap_spans(source_plain,stock_plain)
+            layout=metadata.get("source_extra_unlinked_word_gap_layout")
+            if (spans is None or not isinstance(layout,dict)
+                    or layout.get("alignment_topology")!="unique_alignment_interior_extra_words_only"
+                    or sum(map(len,spans))!=layout.get("source_extra_nonlink_word_count")
+                    or len(spans)!=layout.get("fixed_extra_word_spans")
+                    or sum(map(len,spans)) < 100):
+                raise PilotError("Unapproved source-extra outlier selection or unique gap alignment")
+            self.units.append({
+                "original_source_line":line,
+                "original_full_reference_sha256":item["original_full_reference_sha256"],
+                "original_body_sha256":item["original_text_sha256"],
+                "selected_native_sha256":sha256(selected).hexdigest(),
+                "chapter":start.rsplit(".",1)[0],
+                "original_source_extra_span_lengths":list(map(len,spans)),
+                "private_original_extra_spans":[tuple(words) for words in spans],
+                "distinct_other_native_raw_sha":set(),
+                "other_native_payload_counts":Counter(),
+                "full_gap_hits":{ "K":set(), "I":set() },
+                "identical_original_raw_repeat_keys":0,
+            })
+        if len({(u["original_source_line"],u["original_full_reference_sha256"])
+                for u in self.units})!=len(self.units):
+            raise PilotError("Duplicate original source extra-span outlier identity")
+
+    @staticmethod
+    def _full_token_span_present(needle: tuple[str,...], haystack:list[str]) -> bool:
+        if not needle or len(needle)>len(haystack):
+            return False
+        # Explicit token separators keep exact whole-word boundary semantics.
+        sep="\\0"
+        return (sep+sep.join(needle)+sep) in (sep+sep.join(haystack)+sep)
+
+    def observe(self, kind:str, key:str,raw:bytes) -> None:
+        self.replayed+=1
+        if self.replayed>self.MAX_NATIVE_REPLAY_KEYS:
+            raise PilotError("Actual full native corpus replay exceeds outlier audit bound")
+        if kind not in ("K","I"):
+            return
+        for unit in self.units:
+            chapter=unit["chapter"]
+            if (kind=="K" and key.rsplit(".",1)[0]!=chapter or
+                    kind=="I" and key not in (chapter,chapter+".0")):
+                continue
+            raw_sha=sha256(raw).hexdigest()
+            if raw_sha==unit["selected_native_sha256"]:
+                unit["identical_original_raw_repeat_keys"]+=1
+                continue
+            if raw_sha in unit["distinct_other_native_raw_sha"]:
+                continue
+            unit["distinct_other_native_raw_sha"].add(raw_sha)
+            unit["other_native_payload_counts"][kind]+=1
+            words=strict_native_stock_plain_words(raw)
+            for span_index,span in enumerate(unit["private_original_extra_spans"]):
+                if len(span)>=self.MIN_FULL_SPAN_WORDS and self._full_token_span_present(
+                        span,words):
+                    unit["full_gap_hits"][kind].add(span_index)
+
+    def report(self) -> dict:
+        if self.replayed<=0:
+            raise PilotError("Source-extra original native corpus was not actually replayed")
+        findings=[]
+        for unit in self.units:
+            spans=unit["original_source_extra_span_lengths"]
+            examined={i for i,n in enumerate(spans) if n>=self.MIN_FULL_SPAN_WORDS}
+            found_k=unit["full_gap_hits"]["K"]
+            found_i=unit["full_gap_hits"]["I"]
+            if not found_k.issubset(examined) or not found_i.issubset(examined):
+                raise PilotError("Unreviewed short gap matched in native chapter")
+            findings.append({
+                "original_source_line":unit["original_source_line"],
+                "original_full_reference_sha256":unit["original_full_reference_sha256"],
+                "original_body_sha256":unit["original_body_sha256"],
+                "selected_native_sha256":unit["selected_native_sha256"],
+                "original_unlinked_extra_word_span_lengths":spans,
+                "extra_spans_tested_with_minimum_six_original_words":len(examined),
+                "extra_spans_not_tested_under_six_original_words":len(spans)-len(examined),
+                "extra_spans_exactly_witnessed_in_distinct_same_chapter_K_raw":
+                    len(found_k),
+                "extra_spans_exactly_witnessed_in_distinct_same_chapter_I_raw":
+                    len(found_i),
+                "distinct_extra_spans_witnessed_in_any_other_same_chapter_raw":
+                    len(found_k|found_i),
+                "same_chapter_other_distinct_native_raw_payloads_by_kind":
+                    dict(sorted(unit["other_native_payload_counts"].items())),
+                "identical_selected_native_raw_repeat_keys_not_independent":
+                    unit["identical_original_raw_repeat_keys"],
+                "same_chapter_no_hit_does_not_prove_absence_elsewhere_or_authorial_loss":True,
+            })
+        return {
+            "status":"ORIGINAL_HIGH_EXTRA_SPAN_SAME_CHAPTER_OTHER_RAW_LOCATION_ONLY",
+            "source_extra_outlier_cases_examined":len(findings),
+            "minimum_contiguous_exact_original_nonlink_word_span_length":
+                self.MIN_FULL_SPAN_WORDS,
+            "complete_original_native_raw_entries_replayed":self.replayed,
+            "original_source_line_hash_and_native_other_slot_counts_only":findings,
+            "source_xml_or_original_crosswire_native_binary_modified":False,
+            "no_original_words_or_native_key_strings_exposed":True,
+            "same_chapter_location_not_authorial_section_or_full_edition_parity":True,
+        }
