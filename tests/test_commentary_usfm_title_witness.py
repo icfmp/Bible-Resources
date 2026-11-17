@@ -36,6 +36,8 @@ def metadata(chapter: int, tokens: list[str]) -> dict:
                     "distinct_full_original_p_exact_visible_word_matches": 1,
                     "single_matching_original_p_exact_unicode_word_sha256":
                         sha256(" ".join(tokens).encode("utf-8")).hexdigest(),
+                    "single_matching_original_p_casefold_word_sha256":
+                        sha256(" ".join(t.casefold() for t in tokens).encode("utf-8")).hexdigest(),
                     "original_extra_unlinked_word_count": len(tokens),
                 }],
             }],
@@ -82,7 +84,18 @@ class IndependentBiblicalTitleWitnessTests(unittest.TestCase):
             metadata(7, ["To", "the", "chief", "MusicianX"]),
             titles, source_book="Ps")
         self.assertEqual(result["exact_original_title_case_classes"], {
-            "same_word_count_but_different_case_sensitive_unicode_tokens": 1})
+            "same_word_count_but_different_casefold_unicode_tokens": 1})
+
+    def test_letter_case_variation_is_classified_without_text_edit(self):
+        path, digest = self.make_archive(
+            "\\id PSA\n\\c 7\n\\d To the chief Musician\n\\v 1 First\n")
+        titles = independent_usfm_titles(path, digest, book_id="PSA")
+        case = compare_original_first_paragraphs(
+            metadata(7, ["to", "The", "CHIEF", "musician"]), titles, source_book="Ps")
+        self.assertEqual(case["exact_original_title_case_classes"], {
+            "same_unicode_word_tokens_after_only_casefold": 1})
+        self.assertNotIn("CHIEF", json.dumps(case))
+        self.assertFalse(case["matching_title_not_original_authorial_edition_or_redistribution_approval"] is False)
 
     def test_original_strongs_and_translator_additions_preserve_displayed_title(self):
         rendered=r'To the chief \w Musician|strong="H5329"\w*, \add A Psalm\add* of \w David|strong="H1732"\w*.'
