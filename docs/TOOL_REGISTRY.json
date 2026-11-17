@@ -1725,6 +1725,7 @@
         "__future__",
         "collections",
         "commentary_nonlink_word_alignment",
+        "commentary_nonlink_words",
         "commentary_unresolved_lexical_triage",
         "hashlib",
         "lxml",
