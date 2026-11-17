@@ -188,6 +188,10 @@ class OriginalExtraGapChapterNativeTests(unittest.TestCase):
         self.assertEqual(case["extra_spans_exactly_witnessed_in_distinct_same_chapter_I_raw"],1)
         self.assertEqual(case["distinct_extra_spans_witnessed_in_any_other_same_chapter_raw"],2)
         self.assertEqual(case["identical_selected_native_raw_repeat_keys_not_independent"],2)
+        self.assertEqual(case["extra_spans_exactly_witnessed_in_other_chapter_same_book_K_raw"],1)
+        self.assertEqual(case["extra_spans_exactly_witnessed_in_other_chapter_same_book_I_raw"],0)
+        self.assertEqual(case["distinct_extra_spans_witnessed_in_other_chapter_same_book_raw"],1)
+        self.assertTrue(result["same_book_other_chapter_scope_not_a_whole_corpus_absence_proof"])
         self.assertNotIn("secretFirst",json.dumps(result))
         self.assertNotIn("Gen.1.3",json.dumps(result))
 
@@ -312,6 +316,17 @@ class OriginalExtraGapChapterNativeTests(unittest.TestCase):
                          "extra_span_crosses_multiple_original_p_elements")
         self.assertEqual(spans[0]["distinct_original_p_elements_touched"],2)
         self.assertIsNone(spans[0]["exact_whole_original_p_document_ordinal_when_unique"])
+
+    def test_other_book_is_not_miscounted_as_same_book_other_chapter(self):
+        sample,first,_=self._original_case()
+        probe=OriginalExtraGapNativeChapterProbe([sample])
+        probe.observe("K","Gen.1.1",sample[2])
+        probe.observe("K","Exod.2.1",("<p>"+" ".join(first)+"</p>").encode())
+        report=probe.report()
+        case=report["original_source_line_hash_and_native_other_slot_counts_only"][0]
+        self.assertEqual(case["distinct_extra_spans_witnessed_in_other_chapter_same_book_raw"],0)
+        self.assertEqual(case["other_chapter_same_book_distinct_native_raw_payloads_by_kind"],{})
+        self.assertTrue(case["same_book_no_hit_does_not_prove_absence_other_books_or_authorial_loss"])
 
     def test_no_hit_in_same_chapter_does_not_claim_text_lost(self):
         sample,_,_=self._original_case()
