@@ -103,6 +103,11 @@ jobs:
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update
           timeout 90s sudo apt-get -o Acquire::Retries=0 \
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev libsword-utils diatheke
+          if [[ "$RESOURCE_ID" == "mhc-crosswire" ]]; then
+            timeout 180s sudo apt-get -o Acquire::Retries=0 \
+              -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y \
+              xiphos xvfb xdotool xclip dbus-x11
+          fi
       - name: Build native metadata-only commentary key scanner
         shell: bash
         run: |
@@ -123,7 +128,7 @@ jobs:
           set -euo pipefail
           PRIVATE_FULL=()
           if [[ "$RESOURCE_ID" == "mhc-crosswire" ]]; then
-            PRIVATE_FULL=(--private-full-probe)
+            PRIVATE_FULL=(--private-full-probe --private-full-xiphos-probe)
           fi
           python scripts/commentary_anchor_parity.py \
             --resource-id "$RESOURCE_ID" \
@@ -180,9 +185,12 @@ jobs:
                                 full.get("full_original_K_I_U_native_entry_parity_proven"),
                             "private_original_vs_alias_cli_chapter_repetition_probe":
                                 full.get("private_original_vs_alias_cli_chapter_repetition_probe"),
+                            "private_real_xiphos_alias_navigation_probe":
+                                full.get("private_real_xiphos_alias_navigation_probe"),
                         }, sort_keys=True))
                   assert full["full_original_K_I_U_native_entry_parity_proven"] is True
                   assert full["planned_extra_index_keys"] == 3
+                  assert full["private_real_xiphos_alias_navigation_probe"] is not None
                   assert full["published"] is False
               print("Original XML volumes:", report["original_xml_volume_count"])
               assert report["original_native_versification_registry_checked"] is True
