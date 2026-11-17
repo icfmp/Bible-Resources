@@ -442,5 +442,80 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
                 private_chapter_visible_texts={"Gen.1": "different words"})
 
 
+    def test_original_reference_targets_exact_order_not_just_displayed_words(self):
+        from lxml import etree
+        words = [f"privateword{i:02d}" for i in range(14)]
+        first = " ".join(words[:5])
+        last = " ".join(words[5:])
+        original_xml = (
+            '<div type="book" osisID="Gen">'
+            '<chapter sID="Gen.1"/>'
+            '<p><reference osisRef="Gen.1.1"> ' + first +
+            ' </reference></p>'
+            '<p><reference osisRef="Gen.1.6"> ' + last +
+            ' </reference></p>'
+            '<chapter eID="Gen.1"/>'
+            '</div>')
+        root = etree.fromstring(original_xml.encode())
+        source_words, source_visible, source_targets = [], [], []
+        metadata = original_authoring_chapter_scope_metadata(
+            root, "Gen.1",
+            _private_words_sink=source_words,
+            _private_visible_text_sink=source_visible,
+            _private_reference_targets_sink=source_targets)
+        self.assertEqual(source_words, words)
+        self.assertEqual(source_targets, ["Gen.1.1", "Gen.1.6"])
+        self.assertEqual(metadata["bounded_original_chapter_reference_elements"], 2)
+        self.assertNotIn("privateword", json.dumps(metadata))
+
+        def check(native_second_target):
+            census = PrivateOriginalChapterNativeAnchorCoverage(
+                {"Gen.1": source_words},
+                private_chapter_visible_texts={"Gen.1": source_visible[0]},
+                private_chapter_reference_targets={"Gen.1": source_targets})
+            census.observe("I", "Gen.1.0", (
+                '<title><reference osisRef="Gen.1.1">' + first +
+                '</reference></title>').encode())
+            census.observe("K", "Gen.1.1", (
+                '<p><reference osisRef="' + native_second_target + '">' +
+                last + '</reference></p>').encode())
+            return census.report()["original_chapter_cases"][0]
+        exact=check("Gen.1.6")
+        self.assertTrue(exact[
+            "exact_original_reference_target_sequence_equal_in_source_and_native"])
+        self.assertEqual(exact["source_chapter_reference_elements"], 2)
+        self.assertEqual(exact["native_located_reference_elements"], 2)
+        self.assertEqual(exact["source_reference_target_sequence_sha256"],
+                         exact["native_located_reference_target_sequence_sha256"])
+        self.assertEqual(exact["native_unlocated_original_reference_elements"], 0)
+        self.assertTrue(exact["reference_attribute_sequence_not_proof_of_link_navigation"])
+
+        changed=check("Gen.1.7")
+        self.assertFalse(changed[
+            "exact_original_reference_target_sequence_equal_in_source_and_native"])
+        self.assertEqual(changed["source_chapter_reference_elements"], 2)
+        self.assertEqual(changed["native_located_reference_elements"], 2)
+        self.assertNotEqual(changed["source_reference_target_sequence_sha256"],
+                            changed["native_located_reference_target_sequence_sha256"])
+        self.assertNotIn("privateword", json.dumps(changed))
+
+    def test_unlocated_original_intro_does_not_imply_original_chapter_link_loss(self):
+        words = [f"privateword{i:02d}" for i in range(14)]
+        census = PrivateOriginalChapterNativeAnchorCoverage(
+            {"Gen.1": words},
+            private_chapter_reference_targets={"Gen.1": ["Gen.1.1"]})
+        census.observe("K", "Gen.1.1",
+            ('<p><reference osisRef="Gen.1.1">' +
+             " ".join(words) + '</reference></p>').encode())
+        census.observe("I", "Gen.1.0",
+            b'<p><reference osisRef="Gen.0.0">Unmapped book introduction</reference></p>')
+        row = census.report()["original_chapter_cases"][0]
+        self.assertTrue(row[
+            "exact_original_reference_target_sequence_equal_in_source_and_native"])
+        self.assertEqual(row["native_unlocated_original_reference_elements"], 1)
+        self.assertFalse(row["all_chapter_I_bodies_uniquely_located_in_source"])
+        self.assertTrue(row["book_level_I_and_opaque_TOP_not_source_compared"])
+
+
 if __name__=="__main__":
     unittest.main()
