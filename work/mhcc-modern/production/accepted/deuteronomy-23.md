@@ -10,13 +10,13 @@ publication_status: "NOT RELEASED — FULL SWORD REBUILD PENDING"
 
 # Deuteronomy 23 — Modern English
 
-## Original chapter outline
+## Original chapter outline — explicit verse-label corrections
 
 | Original outline | Verses |
 | --- | --- |
 | Who are shut out from the congregation. | 1–8 |
-| Cleanliness enjoined. | 15–25 |
-| Of fugitive servants, Usury, and other precepts. | 9–14 |
+| Cleanliness enjoined. | 9–14 |
+| Of fugitive servants, Usury, and other precepts. | 15–25 |
 
 ## Those excluded from Israel's assembly (verses 1–8)
 
@@ -63,6 +63,10 @@ Faithfulness in our commitments and respect for other people's property should c
 ---
 
 ## Editorial review — Deuteronomy 23
+
+**2026-11-17 traceable outline-reference correction (independent original-native review pending):** The draft outline transposed the camp-cleanliness passage (9–14) and the subsequent servant/usury/vow precepts (15–25). Only the **verse-range cells of the copied original-outline table** have been corrected; source-authored headings, row order, commentary section boundaries, and exposition prose are not edited. Previously transcribed cells: `Cleanliness enjoined. | 15–25`; `Of fugitive servants, Usury, and other precepts. | 9–14`. Corrected cells: `Cleanliness enjoined. | 9–14`; `Of fugitive servants, Usury, and other precepts. | 15–25`. The repair is reversible against this recorded before/after; the authoritative published MHCC 0.1.1 outline still requires exact independent native validation.
+
+
 
 **Complete secondary witness directly inspected:** [CCEL, Deuteronomy 23](https://ccel.org/ccel/henry/mhcc.vi.xxiii.html). The exact original for production remains published `MHCC 0.1.1`; source-native key and entry links pending verification.
 
