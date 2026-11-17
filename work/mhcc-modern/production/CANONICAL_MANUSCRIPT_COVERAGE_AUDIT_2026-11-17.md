@@ -59,6 +59,6 @@ The audit enumerated **all 1,294 changed file paths** reported for PR #272, insp
 
 ## Tracking reconciliation
 
-Issue #270 previously had **1,120 checked chapter rows and 69 unchecked rows** for 1 Timothy through Revelation, although the exact files were already present. Each of those 69 paths was checked against the 1,189-file PR manifest, then the issue was reconciled to **1,189/1,189 chapter *manuscripts***. No row is intended to claim original-native acceptance or published status.
+Issue #270 previously held **1,120 checked chapter rows and 69 unchecked rows**, even though all 69 manuscripts from 1 Timothy through Revelation were independently identified in the PR. Every previously unchecked entry was verified against the PR path inventory. Because the full issue body had grown to about **259 KB**, it was **archived verbatim** in [the historical snapshot](checkpoints/issue-270-body-2026-11-17-pre-reconciliation.md) and the live issue was **compacted** to an actionable release-gate checklist (with successful issue readback). The live issue now reports **1,189/1,189 manuscript files present**, *not* 1,189 independently accepted chapters; the archived historical checkbox state remains available for audit and has not been retroactively edited.
 
 **Next actionable work:** resolve the actual registry check blocker in the proper scope, expand source-native receipts beyond the historical pilot, then independently collate the manuscripts against `MHCC` 0.1.1 in small, reviewable batches. Do not produce duplicate translations.
