@@ -959,6 +959,10 @@ def _probe_private_alias_real_xiphos(root: Path, module_id: str, aliases: dict,
             gui["commentary_clipboard_match_by_passage"],
         "independent_gui_commentary_excerpt_match_count":
             gui["independent_gui_commentary_excerpt_match_count"],
+        "bounded_xiphos_ui_failed_action_by_passage":
+            gui["bounded_xiphos_ui_failed_action_by_passage"],
+        "bounded_right_commentary_pane_focus_attempts_by_passage":
+            gui["bounded_right_commentary_pane_focus_attempts_by_passage"],
         "whole_chapter_Xiphos_GTK_proof":
             gui["whole_chapter_Xiphos_GTK_proof"],
         "whole_chapter_commentary_deduplication_proven": False,
