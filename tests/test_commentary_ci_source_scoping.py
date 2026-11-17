@@ -17,6 +17,7 @@ MHCC_ONLY_WORKFLOWS = (
     "commentary-zcom-private-candidate.yml",
     "commentary-zcom-andbible-android.yml",
     "commentary-zcom-xiphos-private-smoke.yml",
+    "commentary-evidence.yml",
 )
 ORIGINAL_MANIFEST = "config/commentary-intake/mhcc-crosswire.json"
 UNRELATED_MANIFEST = "config/commentary-intake/mhc-crosswire.json"
