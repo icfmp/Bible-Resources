@@ -382,7 +382,7 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
 
 
     def test_original_interior_character_match_is_not_merely_word_parity(self):
-        from scripts.commentary_unresolved_lexical_triage import WORD as WORD_FOR_TEST
+        from commentary_unresolved_lexical_triage import WORD as WORD_FOR_TEST
         source = "one,  two; three\tfour"
         spans = [match.span() for match in WORD_FOR_TEST.finditer(source)]
         tokens = WORD_FOR_TEST.findall(source)
