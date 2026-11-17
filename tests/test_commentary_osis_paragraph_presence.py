@@ -16,6 +16,7 @@ from commentary_osis_paragraph_presence import (
     _private_whole_token_contiguous,
     _private_whole_token_subsequence,
     _private_native_word_relation,
+    _private_exact_token_match_offsets,
 )
 
 
@@ -194,6 +195,11 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
         self.assertEqual(row["distinct_original_native_raw_payloads"], 2)
         self.assertEqual(row["native_distinct_whole_body_ordered_word_relation_classes"],
                          {"native_contiguous_exact_tokens_in_chapter": 2})
+        self.assertTrue(row["all_distinct_native_K_bodies_have_unique_exact_source_intervals"])
+        self.assertEqual(row[
+            "source_uncovered_word_tokens_after_unique_native_K_body_intervals"], 0)
+        self.assertEqual(row["overlap_word_tokens_among_exact_native_K_body_intervals"], 5)
+        self.assertEqual(row["source_uncovered_word_spans_metadata_only"], [])
         self.assertEqual(row["original_unique_eight_word_windows"], 7)
         self.assertEqual(
             row["exact_unique_source_eight_word_windows_in_original_native_K"], 5)
@@ -276,10 +282,60 @@ class OriginalAuthoringOsisParagraphPresenceTests(unittest.TestCase):
             "native_full_ordered_token_relation_unresolved": 1,
         })
         self.assertEqual(sum(classes.values()), 3)
+        self.assertFalse(report["original_chapter_cases"][0][
+            "all_distinct_native_K_bodies_have_unique_exact_source_intervals"])
+        self.assertIsNone(report["original_chapter_cases"][0][
+            "source_uncovered_word_tokens_after_unique_native_K_body_intervals"])
         self.assertTrue(report["casefold_only_categories_do_not_authorize_case_changes"])
         self.assertTrue(report["exact_containment_does_not_prove_punctuation_or_markup"])
         self.assertNotIn("privateword", json.dumps(report))
         self.assertNotIn("Gen.1", json.dumps(report))
+
+
+    def test_unique_native_full_body_placements_reveal_only_hashed_source_gaps(self):
+        words = [f"gapword{i:02d}" for i in range(16)]
+        probe = PrivateOriginalChapterNativeAnchorCoverage({"Gen.1": words})
+        probe.observe("K", "Gen.1.1",
+            ("<p>" + " ".join(words[1:6]) + "</p>").encode())
+        probe.observe("K", "Gen.1.2",
+            ("<div>" + " ".join(words[9:14]) + "</div>").encode())
+        result = probe.report()
+        row = result["original_chapter_cases"][0]
+        self.assertEqual(row["native_distinct_whole_body_exact_source_location_classes"],
+                         {"one_unique_exact_source_interval": 2})
+        self.assertTrue(row["all_distinct_native_K_bodies_have_unique_exact_source_intervals"])
+        self.assertEqual(row["overlap_word_tokens_among_exact_native_K_body_intervals"], 0)
+        self.assertEqual(row[
+            "source_uncovered_word_tokens_after_unique_native_K_body_intervals"], 6)
+        spans = row["source_uncovered_word_spans_metadata_only"]
+        self.assertEqual([entry["original_chapter_word_offset_not_verse_key"]
+                          for entry in spans], [0, 6, 14])
+        self.assertEqual([entry["source_uncovered_visible_word_tokens"]
+                          for entry in spans], [1, 3, 2])
+        self.assertEqual(spans[1]["original_ordered_source_word_sha256"],
+                         sha256(" ".join(words[6:9]).encode()).hexdigest())
+        self.assertNotIn("gapword", json.dumps(result))
+        self.assertNotIn("Gen.1", json.dumps(result))
+        self.assertTrue(result["source_uncovered_spans_not_automatically_missing_in_sword"])
+
+    def test_repeated_native_body_source_positions_are_not_assigned(self):
+        source = ["repeat"] * 14
+        self.assertEqual(
+            _private_exact_token_match_offsets(source, source[:8]),
+            list(range(7)))
+        with self.assertRaises(ValueError):
+            _private_exact_token_match_offsets(source, source[:8],
+                                              maximum_positions=2)
+        probe = PrivateOriginalChapterNativeAnchorCoverage({"Gen.1": source})
+        probe.observe("K", "Gen.1.1", ("<p>" + " ".join(source[:8]) + "</p>").encode())
+        result = probe.report()["original_chapter_cases"][0]
+        self.assertEqual(result["native_distinct_whole_body_exact_source_location_classes"],
+                         {"multiple_exact_source_intervals_ambiguous": 1})
+        self.assertFalse(result[
+            "all_distinct_native_K_bodies_have_unique_exact_source_intervals"])
+        self.assertIsNone(result[
+            "source_uncovered_word_tokens_after_unique_native_K_body_intervals"])
+        self.assertIsNone(result["source_uncovered_word_spans_metadata_only"])
 
 
 if __name__=="__main__":
