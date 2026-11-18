@@ -185,6 +185,8 @@ def build(source: Path, expected_sha: str, work: Path, *,
         "native_occupied_numbered_keys": counts[0],
         "native_occupied_introduction_keys": counts[1],
         "native_occupied_opaque_top_keys": counts[2],
+        "native_full_raw_corpus_sha256": observed_native["all_native_raw_entries_ordered_sha256"],
+        "native_full_raw_corpus_bytes": observed_native["actual_native_unfiltered_raw_bytes_total"],
         "compiled_member_sha256": {
             str(p.relative_to(work)): sha256(p.read_bytes()).hexdigest()
             for p in files
