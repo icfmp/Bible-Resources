@@ -1127,9 +1127,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 7,
       "static_references": [
         "scripts/commentary_modern_ionly_preview.py",
+        "scripts/commentary_modern_k_scope_preview.py",
         "scripts/commentary_modern_linked_candidate_preview.py",
         ".github/workflows/commentary-modern-source-receipt.yml",
         "docs/MHCC_MODERN_ENGLISH.md",
@@ -1168,6 +1169,40 @@
       "static_references": [
         ".github/workflows/commentary-modern-source-receipt.yml",
         "tests/test_commentary_modern_ionly_preview.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
+        "zCom",
+        "OSIS"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/commentary_modern_k_scope_preview.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Private, source-identity-checked zCom link preview for underindexed K groups.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "commentary_modern_draft_osis_preview",
+        "json",
+        "pathlib",
+        "re",
+        "xml"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "33d144ab758b9d330e7c3cdfae727ad738e9b314d528d8c0cb729b66ded9b3b3",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 2,
+      "static_references": [
+        ".github/workflows/commentary-modern-source-receipt.yml",
+        "tests/test_commentary_modern_k_scope_preview.py"
       ]
     },
     {
@@ -1514,7 +1549,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 9,
+      "static_reference_count": 10,
       "static_references": [
         "scripts/commentary_intro_chapter_text_review.py",
         "scripts/commentary_near_prose_unicode_review.py",
@@ -1524,6 +1559,7 @@
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_shared_raw_source_units.py",
         "scripts/commentary_unresolved_lexical_triage.py",
+        ".github/workflows/commentary-modern-source-receipt.yml",
         "tests/test_commentary_nonlink_word_alignment.py"
       ]
     },
@@ -1905,8 +1941,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 19,
+      "static_reference_count": 20,
       "static_references": [
+        ".github/workflows/commentary-modern-source-receipt.yml",
         ".github/workflows/commentary-private-text-compare.yml",
         "tests/test_commentary_chapter_cross_slot.py",
         "tests/test_commentary_chapter_neighbors.py",
