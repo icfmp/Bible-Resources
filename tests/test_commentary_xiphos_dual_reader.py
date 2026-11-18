@@ -309,6 +309,34 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
         self.assertNotIn("The first creation", str(report))
         self.assertNotIn("Gen.2.1", str(report))
 
+    def test_compound_reference_reports_independent_exact_label_components(self):
+        from commentary_xiphos_dual_reader import _markup_display_witness
+        old=b'<reference osisRef="Ps.60 2Sam.8.13 2Sam.8.14">Psalm 60 title; 2 Samuel 8:13-14</reference>'
+        label=b"Psalm 60 title; 2 Samuel 8:13-14"
+        target=b"Ps.60 2Sam.8.13 2Sam.8.14"
+        digest=sha256(target).hexdigest()
+        for href,count in (
+                (b"sword://Bible/Ps.60",1),
+                (b"sword://Bible/Ps.60%202Sam.8.13",2),
+                (b"sword://Bible/Ps.60%202Sam.8.13%202Sam.8.14",3)):
+            with self.subTest(components=count):
+                rendered=b'<a href="'+href+b'">'+label+b'</a>'
+                report=_markup_display_witness(old,label,rendered)
+                self.assertTrue(report["real_gui_rich_html_selection_available"])
+                self.assertEqual(
+                    report["composite_target_href_progress_by_sha256"][digest]
+                    ["components_found_in_one_same_label_real_GUI_href"],count)
+                self.assertEqual(
+                    report["composite_target_href_progress_by_sha256"][digest]
+                    ["all_components_found_in_one_GUI_href"], count==3)
+        # The same URI without matching displayed citation label proves nothing.
+        forged=b'<a href="sword://Bible/Ps.60%202Sam.8.13%202Sam.8.14">unrelated</a>'
+        report=_markup_display_witness(old,label,forged)
+        self.assertFalse(report["composite_target_href_progress_by_sha256"][digest]
+                         ["source_label_is_an_actual_GUI_anchor"])
+        self.assertEqual(report["composite_target_href_progress_by_sha256"][digest]
+                         ["components_found_in_one_same_label_real_GUI_href"],0)
+
     def test_no_rich_clipboard_or_wrong_heading_never_counts_as_gui_markup(self):
         from commentary_xiphos_dual_reader import _markup_display_witness
         original = b"<title>A real section heading</title><reference osisRef='John.3.16'>ref</reference>"
