@@ -504,6 +504,35 @@ def _commentary_pane_focus_points(env: dict, window: str) -> tuple[tuple[int,int
     )
 
 
+
+def _focus_real_xiphos_main_window(env: dict, window: str) -> str:
+    """Bounded X11 focus with fresh real-window re-discovery on transient error.
+
+    Virtual Xvfb sessions can change focus while Xiphos finishes rendering.
+    Avoid 'xdotool windowfocus --sync', whose wait itself can time out despite
+    a visible real GTK window. A copy still needs independent source-word
+    evidence; merely returning from a focus command never proves rendering.
+    """
+    if (not isinstance(window,str) or not window.isdecimal()
+            or env.get("DISPLAY")!=":91" or env.get("GDK_BACKEND")!="x11"):
+        raise PilotError("Unreviewed real Xiphos focus target")
+    current=window
+    for attempt in range(3):
+        if attempt:
+            newly_visible=_main_xiphos_window(env)
+            if newly_visible is None or not newly_visible.isdecimal():
+                raise PilotError("Original visible Xiphos main window disappeared")
+            current=newly_visible
+            time.sleep(0.4)
+        try:
+            # An X11 direct focus request does not rely on an external WM.
+            _x11(["xdotool","windowfocus",current],env,timeout=5)
+            return current
+        except PilotError:
+            pass
+    raise PilotError("Cannot focus independently located Xiphos main window")
+
+
 def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) -> dict:
     """Actual GUI passage changes in Bible + commentary pane (Alt+C).
 
@@ -546,7 +575,7 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
     for ref, originals in comparisons.items():
         stage = "focus_main_window"
         try:
-            _x11(["xdotool", "windowfocus", "--sync", window], env)
+            window = _focus_real_xiphos_main_window(env, window)
             for action, command in (
                 ("select_reference", ["xdotool", "key", "--clearmodifiers", "ctrl+l"]),
                 ("enter_reference", ["xdotool", "type", "--clearmodifiers", "--delay", "25", ref]),
