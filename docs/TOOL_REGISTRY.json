@@ -1293,6 +1293,7 @@
       "python_imports": [
         "__future__",
         "argparse",
+        "commentary_modern_draft_guard",
         "hashlib",
         "json",
         "os",
