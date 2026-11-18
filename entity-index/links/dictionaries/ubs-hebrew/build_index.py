@@ -339,6 +339,37 @@ def main():
     coverage, sample = audit(index, args.macula)
     index["coverage"] = coverage
     index["coverage_with_word_ids"] = audit_word_links(index, args.macula)
+    # Report edition-specific headword scope separately from the immutable
+    # original-corpus coverage. No outside-scope entry becomes a fake link.
+    from runpy import run_path
+    scope_audit = run_path(
+        str(Path(__file__).with_name("audit_dictionary_scope.py"))
+    )["analyze"]
+    scope = scope_audit(index, en, args.macula)["summary"]
+    if scope["lexical_source_occurrences"] != 248680:
+        raise ValueError("Unexpected pinned lexical-class source inventory")
+    if scope["linked_occurrences"] + scope["indexable_scope_unresolved"] + scope["outside_indexed_ubs_headword_scope"] != scope["lexical_source_occurrences"]:
+        raise AssertionError("Source lexical occurrences were lost in scope filtering")
+    index["coverage_scope"] = {
+        "name": "indexed_ubs_0_9_4_headword_scope",
+        "limitations": "no_attested_exact_or_shin_sin_preserving_consonantal_headword_and_no_same_strong_family_is_out_of_scope_not_absolute_semantic_absence",
+        "original_lexical_source_occurrences": scope["lexical_source_occurrences"],
+        "linked_occurrences": scope["linked_occurrences"],
+        "outside_indexed_headword_scope": scope["outside_indexed_ubs_headword_scope"],
+        "indexable_denominator": scope["indexable_scope_denominator"],
+        "indexable_unresolved": scope["indexable_scope_unresolved"],
+        "coverage_pct": scope["indexable_scope_coverage_pct"],
+        "full_source_coverage_pct": scope["all_source_lexical_coverage_pct"],
+        "excluded_reason": "no_matching_strong_or_headword_in_ubs_inventory",
+        "review": {
+            key: scope[key] for key in (
+                "different_strong_same_exact_headword_review",
+                "different_strong_same_consonants_review",
+                "matching_strong_family_unresolved_review",
+                "source_code_unreadable_review",
+            )
+        },
+    }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(index, ensure_ascii=False, sort_keys=True,
@@ -346,6 +377,7 @@ def main():
     print("BSI_UBS_HEBREW_BUILD", json.dumps(index["statistics"], sort_keys=True))
     print("BSI_UBS_HEBREW_COVERAGE", json.dumps(coverage, sort_keys=True))
     print("BSI_UBS_HEBREW_WORD_LINKS", json.dumps(index["coverage_with_word_ids"], sort_keys=True))
+    print("BSI_UBS_HEBREW_SCOPE", json.dumps(index["coverage_scope"], sort_keys=True))
     print("BSI_UBS_HEBREW_SAMPLES", json.dumps(sample, ensure_ascii=False, sort_keys=True))
 
 
