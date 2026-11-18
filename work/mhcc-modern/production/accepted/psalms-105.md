@@ -54,7 +54,7 @@ Likewise, **God's word sustains the soul** and is the bread of spiritual life.
 
 Among the worst judgments is **a famine of hearing the Lord's word**.
 
-Henry sees such a famine across many lands before Christ's appearance in the flesh.
+Such a famine was severe in all lands when Christ appeared in the flesh.
 
 Joseph's story pictures Christ's coming and its blessings.
 
@@ -87,6 +87,8 @@ He redeems them from iniquity and purifies them as his own people, **eager to do
 ---
 
 ## Editorial review — Psalm 105
+
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Corrected a factual/source-meaning distortion: Henry locates the famine of hearing God's word *in all lands when Christ appeared in the flesh*, not merely in many lands **before** that event. The precise timing and universal extent of his claim are restored, without presenting his interpretation as independently proven history. No native-SWORD or independent chapter acceptance is claimed.
 
 **Complete CCEL English witness read:** [CCEL, Psalm 105](https://ccel.org/ccel/henry/mhcc.xx.cv.html). Exact published `MHCC 0.1.1` remains definitive; native-SWORD and independent editorial acceptance pending.
 
