@@ -1397,6 +1397,99 @@ def _unplaced_original_link_review_ledger(*, original: dict, insertions: list,
     }
 
 
+
+def validate_pending_source_reference_errata(*, manifest: dict,
+                                              ledger: dict,
+                                              native: dict) -> dict:
+    """Validate reversible proposed source-link errata against native receipts.
+
+    The caller must first authenticate the complete native SWORD source and
+    original K/ordinal hyperlink ledger. This function does not inspect prose,
+    edit source links, or mark a proposed canonical destination as approved.
+    Its return value contains no original source target or printed label.
+    """
+    if (manifest.get("status") !=
+            "PINNED_ORIGINAL_LINK_ERRATA_REVIEW_ONLY_NOT_APPLIED"
+            or manifest.get("original_source") != "MHCC 0.1.1 SWORD"
+            or manifest.get("original_native_corpus_sha256") !=
+            native.get("original_compiled_corpus_sha256")
+            or any(manifest.get(flag) is not False for flag in (
+                "original_sword_changed", "modern_prose_changed",
+                "modern_osis_links_automatically_changed",
+                "editorial_target_corrections_approved", "redistributed"))):
+        raise ValueError("Untrusted native-link errata proposal or source SHA")
+    if (ledger.get("status") !=
+            "SOURCE_NATIVE_WHOLE_CANON_HYPERLINK_DISPOSITION_QUEUE_NOT_FINAL_APPROVAL"
+            or ledger.get("source_reference_labels_or_literal_targets_exported")
+                is not False
+            or ledger.get("publication_authorized") is not False):
+        raise ValueError("Source-link errata need a private original receipt")
+    pending = {
+        (row["source_first_key"], row["source_reference_ordinal"]): row
+        for row in ledger.get("pending", [])
+    }
+    if len(pending) != len(ledger.get("pending", [])):
+        raise ValueError("Duplicate original hyperlink identity in review queue")
+    cases = manifest.get("cases")
+    if not isinstance(cases, list) or not cases:
+        raise ValueError("Original-link errata review list is empty")
+    seen = set()
+    for case in cases:
+        if not isinstance(case, dict):
+            raise ValueError("Invalid original-link errata row")
+        first, ordinal = case.get("source_first_key"), case.get(
+            "original_reference_ordinal")
+        key = (first, ordinal)
+        if (not isinstance(first, str) or type(ordinal) is not int
+                or key in seen or key not in pending
+                or case.get("approval") is not False):
+            raise ValueError("Source-link proposal is duplicated, unbound or approved")
+        seen.add(key)
+        original_target = case.get("original_target")
+        label_hash = case.get("original_visible_label_sha256")
+        actual = pending[key]
+        if (not isinstance(original_target, str) or not original_target
+                or not isinstance(label_hash, str) or not _SHA.fullmatch(label_hash)
+                or hashlib.sha256(original_target.encode("utf-8")).hexdigest()
+                    != actual.get("original_osisRef_sha256")
+                or case.get("original_target_sha256")
+                    != actual.get("original_osisRef_sha256")
+                or label_hash != actual.get("original_visible_label_sha256")):
+            raise ValueError("Proposed erratum does not match original K/ordinal")
+        chapter = first.rsplit(".", 1)[0]
+        chapters = native.get("chapters", {})
+        groups = chapters.get(chapter, {}).get("original_units", [])
+        source = next((row for row in groups
+                       if row.get("first_key") == first), None)
+        if (source is None or case.get("original_native_unit_sha256")
+                != source.get("source_unit_sha256")):
+            raise ValueError("Original authorial K prose SHA changed")
+        if case.get("finding") == "INVALID_CROSS_CHAPTER_NAVIGATION_IN_ORIGINAL_OSISREF":
+            if (_full_endpoint_source_range_rejection(original_target)
+                    != "CROSS_CHAPTER_RANGE"
+                    or actual.get("full_range_rejection_reason")
+                        != "CROSS_CHAPTER_RANGE"
+                    or not _source_same_chapter_verse_range(
+                        case.get("candidate_fragment"))):
+                raise ValueError("Proposed malformed range lacks source-bound evidence")
+        elif case.get("finding") == "ORIGINAL_DIGITAL_WITNESS_POINTS_TO_WRONG_VERSE":
+            candidate = case.get("proposed_corrected_target")
+            if (not _REF.fullmatch(candidate or "")
+                    or not canonical_only_for_comparison(original_target)
+                    or candidate == canonical_only_for_comparison(original_target)):
+                raise ValueError("Proposed wrong-verse correction is not distinct")
+        else:
+            raise ValueError("Unrecognized original-link editorial finding")
+    return {
+        "status": "SOURCE_PINNED_PROPOSALS_VERIFIED_NOT_APPLIED_OR_APPROVED",
+        "original_link_occurrences_reconciled": len(cases),
+        "source_link_edits_applied": 0,
+        "modern_prose_edits_applied": 0,
+        "original_source_target_or_label_exported": False,
+        "publication_authorized": False,
+    }
+
+
 def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                                     native: dict, identities: dict,
                                     dispositions: dict, repo_root: Path,
