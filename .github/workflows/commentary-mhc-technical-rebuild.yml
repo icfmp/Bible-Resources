@@ -765,7 +765,8 @@ jobs:
           from pathlib import Path
           sys.path.insert(0,str(Path.cwd()/"scripts"))
           from audit_osis import (source_commentary_overlap_witness,
-                                  compare_all_commentary_source_group_words)
+                                  compare_all_commentary_source_group_words,
+                                  compare_all_commentary_source_group_semantics)
           from sword_native_raw_corpus_inventory import parse_native_raw_corpus
           root=Path(os.environ["RUNNER_TEMP"])
           source=root/"mhc-overlap-experimental.osis.xml"
@@ -802,6 +803,16 @@ jobs:
           if evidence["status"]!="PRIVATE_ALL_AUTHORED_GROUP_WORD_BLOCKS_PRESENT_NOT_NOTE_PARITY":
               raise SystemExit("Not every original source group's word blocks survive compilation")
           print("All authored source group word blocks preserved at their first native keys")
+          semantics=compare_all_commentary_source_group_semantics(groups,raws)
+          print("Entire MHC source/native punctuation, note and link-body triage:",
+                semantics["status"])
+          print("Exact original punctuation/notes/links compared by category:",
+                semantics["counts"])
+          print("Bounded original-reference-only semantic review candidates:",
+                semantics["bounded_reference_only_findings"][:30])
+          if semantics["counts"].get("source_groups")!=4256:
+              raise SystemExit("Incomplete source/native punctuation and note-body census")
+          print("This is a complete punctuation/notes triage, NOT blanket editorial approval")
           print("Still NOT an independent historical collation or note/markup identity certificate")
           PY
       - name: Verify all source verse-group boundaries against real compiled SWORD keys and linked bodies
