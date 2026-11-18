@@ -806,6 +806,38 @@ def triage_commentary_introduction_relocation(
         book=ref.split(".",1)[0]
         home=("I",ref)
         counts["source_intro_scopes_checked"]+=1
+        # Inspect source note/reference identity separately: even when the
+        # prose is at its home key, XML note callers may have moved or lost
+        # attributes. A match in any alternative slot is evidence of
+        # relocation only, never proof of identical display placement.
+        for name in ("note","reference"):
+            for element in original["semantic_nodes"]:
+                if element["tag"]!=name:
+                    continue
+                attr=element["attributes"]
+                value=(name," ".join(element["body"].split()),
+                       attr.get("osisRef"),attr.get("type"),attr.get("n"))
+                if frames[home]["semantic"].get(value,0):
+                    counts[name+"_metadata_present_in_original_intro_slot"]+=1
+                    continue
+                counts[name+"_metadata_absent_from_original_intro_slot"]+=1
+                alternatives=[
+                    dest for dest in bybook[book] if dest!=home
+                    and frames[dest]["semantic"].get(value,0)
+                ]
+                if not alternatives:
+                    counts[name+"_metadata_not_relocated_in_same_book_I_or_first_K"]+=1
+                elif any(dest==("I",book) for dest in alternatives):
+                    counts[name+"_metadata_relocated_to_book_intro"]+=1
+                elif any(dest[0]=="I" for dest in alternatives):
+                    counts[name+"_metadata_relocated_to_other_chapter_intro"]+=1
+                elif any(dest[0]=="K" and (
+                    (ref==book and dest[1].startswith(book+".1."))
+                    or (ref!=book and dest[1].startswith(ref+".")))
+                         for dest in alternatives):
+                    counts[name+"_metadata_relocated_to_same_chapter_first_K"]+=1
+                else:
+                    counts[name+"_metadata_relocated_to_other_first_K"]+=1
         if not orig_words or orig_words in frames[home]["words"]:
             continue
         matches=[
