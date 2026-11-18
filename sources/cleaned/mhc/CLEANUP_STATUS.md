@@ -60,6 +60,33 @@ formatting inside non-leaf paragraphs and real reader rendering still need
 source-specific review. No source words, quotations, note markers or references
 were removed.
 
+## Byte-local cleaned candidate — verification still in progress
+
+**Research-only candidate generated privately on 2026-11-18:**
+
+- Source SHA-256: `3cf367f00c498a3124b339c00896aaef4ef1196a2d5c310ecb20ea42abd130f6`
+- Transformation: removal of **11 truly empty `hi` styling leaves**
+  (no children, no text, presentation-only `type` attribute,
+  not inside notes or references)
+- The improved cleaner now removes **only the exact source byte spans**;
+  all other original XML bytes are carried forward unchanged
+- Private cleaned OSIS candidate SHA-256:
+  `ded53fe37e83609790433a01b2dabf0ea3a13e929bd3bded39262ce4a5b24016`
+- Complete authored visible text SHA-256 remained identical before/after:
+  `defe78fc9c56be07e0eeb577c73c52ac0c21a443342a5a10bd1c28d12e8029ff`
+- The private rebuilt module retained **31,098 K**, **1,255 I**, **2 TOP**
+  keys, the same counts as the pristine input
+- Receipt: [private byte-preserving source and SWORD build](https://github.com/icfmp/Bible-Resources/actions/runs/44269148673)
+
+**Not yet accepted:** Comparing the entire native SWORD output against a
+second, separately compiled pristine OSIS module revealed **73 occupied
+native keys** with different raw XML and visible text. The note/reference
+bodies and links were unchanged in the first differential probe.
+This proves why matching keys and an XML-level text checksum are
+**insufficient** for full acceptance. The difference must be classified
+before approval; do not call the cleaned MHC a validated complete edition.
+A more specific diagnostic is recorded in the follow-up Actions run.
+
 ## Next review, kept separate
 
 1. Investigate *actual* source-structure anomalies using source-defined
