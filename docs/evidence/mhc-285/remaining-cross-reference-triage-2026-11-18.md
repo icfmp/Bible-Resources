@@ -145,8 +145,7 @@ source-line/book/visible-label-SHA-pinned private machine-attribute plan.
 | 67688 / Hosea 9 | `Ho 4.15 12.11 Am 4.4 5.5` | `Hos.4.15 Hos.12.11 Amos.4.4 Amos.5.5` | [CCEL Hosea 9](https://www.ccel.org/h/henry/mhc2/MHC28009.HTM) cites ch. 4:15; 12:11 and Amos 4:4; 5:5 |
 | 98022 / Acts 10 | `De.7.7 8 9.5 6 Mt 20.10` | `Deut.7.7 Deut.7.8 Deut.9.5 Deut.9.6 Matt.20.10` | [CCEL Acts 10](https://www.ccel.org/h/henry/mhc2/MHC44010.HTM) cites these five verses |
 
-The newly proposed private references have **not yet passed** the full
-seventeen-link SWORD compilation/parity workflow on the new PR head.
+The [seventeen-link private OSIS/SWORD rebuild and complete native XML comparison](https://github.com/icfmp/Bible-Resources/actions/runs/44297900635) **PASSED** on exact reviewed source-plan revision `0ef3633655770e0b9555bbcef6ef0f742c0bb0f6`. All 17 machine-target transformations were observed within compiled native reference nodes, preserving source words, notes, headings, other attributes and the 31,098 K / 1,255 I / 2 TOP native records. This is still **not** historical-edition identity, rights approval or actual Xiphos/AndBible clicked navigation.
 No original text, notes, displayed citation, commentary scope, bibliography,
 public release, or catalogue were changed.
 
