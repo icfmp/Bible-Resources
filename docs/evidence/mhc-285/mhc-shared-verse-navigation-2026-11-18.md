@@ -73,9 +73,27 @@ Unicode and source-identical / invalid-index cases.
 PASS; 4,256 original authored groups, seven original overlapping keys,
 14 involved sections, independently verified native retrieval
 `Rom.4.9` + `Rom.4.17` and same-key `2Chr.1.1`.
-The narrower editorially reviewed **2-key plan** requires its own
-later private full-source CI result: [run #44330720083](https://github.com/icfmp/Bible-Resources/actions/runs/44330720083).
-No successful outcome is claimed here until its job logs confirm it.
+**Final edited-source versus actual compiled SWORD validation PASSED:**
+[real private full MHC Actions run #44331003046](https://github.com/icfmp/Bible-Resources/actions/runs/44331003046).
+The actual pinned source/native run reported:
+
+- Original source: **4,256** authored section groups, **7** original
+  syntactic overlapping verse addresses and **14** participating sections.
+- Independently reviewed machine-boundary errors: exactly **5**
+  original shared-verse addresses **not** carried into the reader plan.
+- Real double-owner keys still required: exactly **2**, with
+  `Rom.4.9` + `Rom.4.17` as two distinct native retrieval keys and
+  `2Chr.1.1` as one native key containing two separate source bodies.
+- All **4,256** original source group word streams verified present at
+  their actual native first keys; the separately recompiled **25**
+  reference-only changes and all **32,355** occupied SWORD keys remain
+  valid. **Zero** source prose exported by the navigation map.
+- A deterministic, versioned, metadata-only JSON proof was serialized
+  and independently re-read inside `RUNNER_TEMP`, with **no uploaded
+  artifact, public catalogue item or published sidecar**.
+
+This is an actual private source-to-compiled native retrieval result,
+not merely a proposed grouping or a GUI test.
 
 ## Acceptance boundary and next implementation owner
 
