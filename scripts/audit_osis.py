@@ -381,10 +381,17 @@ def source_commentary_overlap_witness(
                 "sID":node.get("sID"),
                 "keys":tuple((node.get("osisID") or "").split()),
                 "line":node.sourceline,
-                "parts":[]
+                "parts":[],
+                "semantic_nodes":[],
             }
         elif _tag(node)=="verse" and node.get("eID"):
             finish(node)
+        if (active[0] is not None and _tag(node) in {"note","reference"}):
+            active[0]["semantic_nodes"].append({
+                "tag":_tag(node),
+                "body":"".join(node.itertext()),
+                "attributes":dict(node.attrib),
+            })
         if active[0] is not None and node.text:
             active[0]["parts"].append(node.text)
         for child in node:
@@ -607,6 +614,122 @@ def compare_all_commentary_source_group_words(
         "entire_authorial_source_reviewed_against_native_keys":True,
         "exact_note_and_markup_parity_verified":False,
         "published":False,
+    }
+
+
+def compare_all_commentary_source_group_semantics(
+        groups: list[dict], native_first_raw: dict[str,bytes],
+        *, max_cases: int = 40) -> dict:
+    """Research-only source↔native punctuation, note and reference inventory.
+
+    Structural normalization in osis2mod may add wrappers or change layouts.
+    Full text and note-body equality is stronger than word parity; a mismatch
+    is reported for review, NEVER auto-modified or certified as text loss.
+    All source/private note text, reference labels and raw XML stay in memory.
+    """
+    from lxml import etree
+    import unicodedata
+    if (not isinstance(groups,list) or not groups or len(groups)>100000
+            or not isinstance(native_first_raw,dict)
+            or not 0<=max_cases<=100):
+        raise ValueError("Invalid or oversized source-native semantic witness")
+    first={g["keys"][0] for g in groups if g.get("keys")}
+    if not first or set(native_first_raw)!=first:
+        raise ValueError("Native first keys incomplete for semantic comparison")
+
+    def folded(t):
+        return " ".join(unicodedata.normalize("NFC",t).split())
+
+    def sem(e):
+        tag=e.tag.rsplit("}",1)[-1]
+        return {"tag":tag,"body":"".join(e.itertext()),
+                "attributes":dict(e.attrib)}
+
+    parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
+                           no_network=True,recover=False,huge_tree=False)
+    frames={}
+    for ref,raw in native_first_raw.items():
+        if not isinstance(raw,bytes) or len(raw)>2*1024*1024:
+            raise ValueError("Unsafe raw native SWORD body")
+        try:
+            root=etree.fromstring(b"<fragment>"+raw+b"</fragment>",parser)
+        except (etree.XMLSyntaxError,ValueError):
+            raise ValueError("Unparseable native commentary raw frame") from None
+        frames[ref]={
+            "text":"".join(root.itertext()),
+            "semantic":[sem(n) for n in root.iter()
+                        if isinstance(n.tag,str)
+                        and n.tag.rsplit("}",1)[-1] in {"note","reference"}],
+        }
+    counts=Counter()
+    cases=[]
+    for group in groups:
+        if not isinstance(group.get("text"),str) or not isinstance(
+                group.get("semantic_nodes"),list) or not group.get("keys"):
+            raise ValueError("Incomplete original authored group semantics")
+        native=frames[group["keys"][0]]
+        source_text=group["text"]
+        compiled=native["text"]
+        counts["source_groups"]+=1
+        counts["source_text_codepoints"]+=len(source_text)
+        if source_text in compiled:
+            counts["source_text_exact_raw_unicode_substring"]+=1
+        elif folded(source_text) in folded(compiled):
+            counts["source_text_equal_after_nfc_whitespace_folding"]+=1
+        elif folded(source_text).casefold() in folded(compiled).casefold():
+            counts["source_text_equal_after_unicode_casefold"]+=1
+        else:
+            counts["source_group_full_punctuation_or_spacing_needs_review"]+=1
+            if len(cases)<max_cases:
+                cases.append({
+                    "source_line":group["line"],
+                    "source_ref":group["sID"],
+                    "category":"source_text_punctuation_or_spacing_diff",
+                    "source_text_sha256":hashlib.sha256(source_text.encode()).hexdigest(),
+                })
+        for tag in ("note","reference"):
+            source_nodes=[n for n in group["semantic_nodes"] if n["tag"]==tag]
+            native_nodes=[n for n in native["semantic"] if n["tag"]==tag]
+            counts["source_"+tag+"_elements"]+=len(source_nodes)
+            counts["native_"+tag+"_elements_seen_on_source_first_keys"]+=len(native_nodes)
+            from collections import Counter as Bag
+            source_bodies=Bag(folded(n["body"]) for n in source_nodes)
+            native_bodies=Bag(folded(n["body"]) for n in native_nodes)
+            missing_bodies=sum((source_bodies-native_bodies).values())
+            counts["source_"+tag+"_bodies_missing_from_native"]+=missing_bodies
+            source_exact=Bag((
+                folded(n["body"]),
+                n["attributes"].get("osisRef"),
+                n["attributes"].get("type"),
+                n["attributes"].get("n"),
+            ) for n in source_nodes)
+            native_exact=Bag((
+                folded(n["body"]),
+                n["attributes"].get("osisRef"),
+                n["attributes"].get("type"),
+                n["attributes"].get("n"),
+            ) for n in native_nodes)
+            missing_semantic=sum((source_exact-native_exact).values())
+            counts["source_"+tag+"_body_and_metadata_not_exactly_in_native"]+=missing_semantic
+            if (missing_bodies or missing_semantic) and len(cases)<max_cases:
+                cases.append({
+                    "source_line":group["line"],
+                    "source_ref":group["sID"],
+                    "category":tag+"_semantic_mismatch",
+                    "source_element_count":len(source_nodes),
+                    "native_element_count":len(native_nodes),
+                    "original_bodies_missing":missing_bodies,
+                    "body_and_allowlisted_metadata_not_exact":missing_semantic,
+                })
+    return {
+        "schema_version":1,
+        "status":"PRIVATE_SOURCE_NATIVE_PUNCTUATION_NOTE_LINK_TRIAGE_NOT_EDITION_PARITY",
+        "counts":dict(sorted(counts.items())),
+        "bounded_reference_only_findings":cases,
+        "all_source_groups_examined":True,
+        "raw_xml_or_note_bodies_exported":False,
+        "editorial_changes":False,
+        "publication_approved":False,
     }
 
 
