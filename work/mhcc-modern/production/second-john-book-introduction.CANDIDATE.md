@@ -29,6 +29,6 @@ Above all, he appeals to her to practice the great command of **Christian love a
 
 **Separate authorial introduction directly read:** [CCEL, 2 John](https://ccel.org/ccel/henry/mhcc.lv.html). All original themes retained.
 
-This remains a distinct candidate, **not a proven native SWORD book-entry** in published `MHCC 0.1.1`. Original source not altered and no placement guessed.
+The candidate is anchored to the original **chapter-I** introduction shown below, not to a book-I prose entry. Its translated meaning and native presentation still require editorial review; the published source is unmodified.
 
 **Exact-native placement update (2026-11-18):** The published, whole-corpus-SHA-authenticated `MHCC 0.1.1` source has an occupied introductory prose entry at `I:2John.1` (71 original visible word tokens; SHA-256 `66b0ff85b9755dd658d202b223ce2d6f2c80a568cde6a4f8e1a7c98f33686ced`). The separate `I:2John` entry contains a short book title, **not the introductory exposition**. Evidence: [real original-native 1,189-chapter receipt, CI #44270683938](https://github.com/icfmp/Bible-Resources/actions/runs/44270683938) (metadata-only artifact). This resolves **native entry ownership** only: the modern prose has **not** been compared clause by clause to that exact original I entry or proven source-markup-equivalent. A final SWORD builder must avoid generating this preface both in chapter I and under an invented book-level or numbered K key. Original published entries untouched.
