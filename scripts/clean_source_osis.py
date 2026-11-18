@@ -1,0 +1,198 @@
+#!/usr/bin/env python3
+"""Review and conservatively clean source OSIS without altering its edition.
+
+The output is a *private candidate*, not a new authoritative edition. Read
+source SHA pins, leave the source unchanged, count suspicious punctuation and
+markup (never output prose), and apply only precisely specified cosmetic
+transformations. Do not remove asterisks or note callers on heuristics.
+Works with all OSIS languages and is independent of CrossWire/MHC.
+"""
+from __future__ import annotations
+
+import argparse
+from collections import Counter
+from hashlib import sha256
+import json
+from pathlib import Path
+import re
+
+from lxml import etree
+
+MAX_BYTES = 128 * 1024 * 1024
+MAX_ELEMENTS = 800_000
+SHA = re.compile(r"[0-9a-f]{64}\Z")
+INTERNAL_SPACES = re.compile(r"(?<=\S) {2,}(?=\S)")
+PROTECTED = frozenset({"note", "reference", "lg", "l", "q", "table", "row", "cell"})
+
+
+class CleanupError(ValueError):
+    pass
+
+
+def _local(node) -> str:
+    return node.tag.rsplit("}", 1)[-1] if isinstance(node.tag, str) else "#other"
+
+
+def _tree(raw: bytes):
+    if b"<!DOCTYPE" in raw.upper():
+        raise CleanupError("OSIS DTD must not be present")
+    parser = etree.XMLParser(
+        resolve_entities=False, load_dtd=False, no_network=True,
+        recover=False, remove_blank_text=False, remove_comments=False,
+        strip_cdata=False, huge_tree=True
+    )
+    try:
+        root = etree.fromstring(raw, parser=parser)
+    except (etree.XMLSyntaxError, ValueError):
+        raise CleanupError("Original OSIS XML is invalid") from None
+    if _local(root) != "osis":
+        raise CleanupError("Input is not an OSIS source")
+    if any(isinstance(n, etree._Entity) for n in root.iter()):
+        raise CleanupError("Unresolved XML entity in source")
+    return root
+
+
+def _load(path: Path, digest: str) -> bytes:
+    if (path.is_symlink() or not path.is_file()
+            or not isinstance(digest, str) or not SHA.fullmatch(digest)
+            or not 100 <= path.stat().st_size <= MAX_BYTES):
+        raise CleanupError("Missing, unsafe or unpinned source")
+    raw = path.read_bytes()
+    if sha256(raw).hexdigest() != digest:
+        raise CleanupError("Original source SHA-256 differs from reviewed pin")
+    return raw
+
+
+def _structure(root):
+    items = []
+    for node in root.iter():
+        if len(items) >= MAX_ELEMENTS:
+            raise CleanupError("Too many source XML nodes")
+        if isinstance(node.tag, str):
+            items.append((node.tag, tuple(sorted(node.attrib.items()))))
+        else:
+            # Do not erase comments or processing instructions.
+            items.append((type(node).__name__, node.text or ""))
+    return tuple(items)
+
+
+def _protected_text(root):
+    # Node-by-node exact Unicode semantics of notes and cited links.
+    return tuple((_local(node), "".join(node.itertext()))
+                 for node in root.iter()
+                 if _local(node) in {"note", "reference"})
+
+
+def _census(root):
+    hits = Counter()
+    by_owner = Counter()
+    for node in root.iter():
+        if not isinstance(node.tag, str):
+            continue
+        owner = _local(node)
+        for value in (node.text, node.tail):
+            if not value:
+                continue
+            hits["literal_escaped_asterisks"] += value.count(r"\*")
+            hits["triple_asterisk_runs"] += value.count("***")
+            hits["double_asterisk_runs"] += value.count("**")
+            hits["standalone_asterisk_characters"] += value.count("*")
+            hits["nonbreaking_spaces"] += value.count("\u00a0")
+            hits["zero_width_spaces"] += value.count("\u200b")
+            hits["tab_characters"] += value.count("\t")
+            hits["repeated_internal_ascii_spaces"] += len(INTERNAL_SPACES.findall(value))
+            by_owner[owner] += len(value)
+    return dict(sorted(hits.items())), dict(sorted(by_owner.items()))
+
+
+def clean(source: Path, expected_sha: str, *, output: Path | None = None) -> dict:
+    """Inspect original; optionally write an independently checked new XML.
+
+    Safe automatic edits are intentionally narrow:
+    - collapse internal doubled ASCII spaces in plain leaf <p> text only;
+    - trim leading/trailing ASCII spaces in plain leaf <title> text only.
+    Text with star symbols, protected descendants or nested markup is not
+    rewritten. All source note/reference bodies and attributes remain exact.
+    """
+    raw = _load(source, expected_sha)
+    root = _tree(raw)
+    before = _structure(root)
+    protected = _protected_text(root)
+    original_census, by_owner = _census(root)
+    changes = Counter()
+    candidate = root
+    for node in candidate.iter():
+        if not isinstance(node.tag, str) or len(node) or node.text is None:
+            continue
+        local = _local(node)
+        if local not in {"p", "title"}:
+            continue
+        if any(_local(parent) in PROTECTED for parent in node.iterancestors()):
+            continue
+        text = node.text
+        if "*" in text or r"\*" in text:
+            continue
+        if local == "p":
+            revised, n = INTERNAL_SPACES.subn(" ", text)
+            if n:
+                changes["plain_paragraph_internal_space_runs_collapsed"] += n
+        else:
+            revised = text.strip(" ")
+            if revised != text and revised:
+                changes["plain_title_edge_spaces_trimmed"] += len(text) - len(revised)
+        if revised != text:
+            node.text = revised
+            changes["changed_plain_nodes"] += 1
+
+    if before != _structure(root) or protected != _protected_text(root):
+        raise CleanupError("Cleanup altered source structure, note or reference content")
+
+    result = {
+        "status": "PRIVATE_OSIS_COSMETIC_CANDIDATE_NOT_EDITORIALLY_APPROVED",
+        "source_sha256": expected_sha,
+        "source_bytes": len(raw),
+        "source_element_count": len(before),
+        "original_suspicious_token_census": original_census,
+        "text_character_counts_by_xml_owner": by_owner,
+        "cleanup_changes": dict(sorted(changes.items())),
+        "all_original_osis_elements_and_attributes_preserved": True,
+        "all_note_and_reference_text_preserved": True,
+        "asterisks_and_potential_note_markers_unmodified": True,
+        "text_collated_against_independent_edition": False,
+        "permission_to_republish_this_digital_source_verified": False,
+        "published": False,
+    }
+    if output is not None:
+        if source.absolute() == output.absolute() or output.is_symlink() or output.exists():
+            raise CleanupError("Private cleaned output must be a fresh separate file")
+        if not output.parent.is_dir() or output.parent.is_symlink():
+            raise CleanupError("Private output parent must already exist")
+        if changes:
+            xml = etree.tostring(root, encoding="UTF-8", xml_declaration=True)
+            rebuilt = _tree(xml)
+            if before != _structure(rebuilt) or protected != _protected_text(rebuilt):
+                raise CleanupError("Serialized candidate changed structure, notes or references")
+        else:
+            xml = raw
+        output.write_bytes(xml)
+        result["cleaned_sha256"] = sha256(xml).hexdigest()
+        result["cleaned_bytes"] = len(xml)
+        result["cleaned_file_written_privately"] = True
+    else:
+        result["cleaned_file_written_privately"] = False
+    return result
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--source", type=Path, required=True)
+    parser.add_argument("--sha256", required=True)
+    parser.add_argument("--private-output", type=Path)
+    arguments = parser.parse_args()
+    result = clean(arguments.source, arguments.sha256,
+                   output=arguments.private_output)
+    print(json.dumps(result, ensure_ascii=True, sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()
