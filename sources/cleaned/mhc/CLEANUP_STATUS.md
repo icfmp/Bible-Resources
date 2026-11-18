@@ -268,6 +268,41 @@ byte-identical native note/markup parity. Historical comparison, cross-reference
 normalization, reader acceptance and digital-edition redistribution rights
 remain separate gates. This is *not* a release claim.
 
+## Complete authored-group word integrity — PASS in private, 2026-11-18
+
+The reusable `source_commentary_overlap_witness(...,groups_out=...)` and
+`compare_all_commentary_source_group_words` auditors now re-read **every
+authored source verse group** against an independently compiled SWORD
+native raw frame at its first assigned key. Repeated source text is **not**
+mistaken for separate commentary sections; the counts are based on actual
+source opening/closing milestones.
+
+**Verified [private full reconstruction and complete group audit](
+https://github.com/icfmp/Bible-Resources/actions/runs/44282290155):**
+
+| Audit invariant | Verified result |
+| --- | ---: |
+| Original commentary source groups | 4,256 |
+| Source group word tokens examined | 7,073,234 |
+| Groups with their entire normalized word stream present contiguously in SWORD | **4,256 / 4,256** |
+| Groups with missing 40-token text blocks | **0** |
+| First-key original source group presence | **Every group verified** |
+| Out-of-range original verse IDs repaired in private technical candidate | 17 |
+| Authored overlap bodies restored in private technical candidate | 6 |
+| Remaining boundary overlap with both prose bodies present | 1 (`2Chr.1.1`) |
+
+This directly prevents the MHC/MHCC failure class where a module has an
+apparently healthy verse index but the actual authorial text is not
+recoverable at its passage. The comparison uses actual private SWORD raw
+bodies, not a self-reported converter inventory.
+
+**Scope limits:** normalized word-stream equivalence does not certify exact
+punctuation, whitespace, each note caller, footnote markup, heading/poetry
+topology, reference-link correctness, display in Xiphos/AndBible, or
+equivalence to a historically authenticated printed edition. These remain
+separate checks before editorial acceptance. The SWORD file and reconstructed
+OSIS were not uploaded or released; the original OSIS remains untouched.
+
 ## Next review, kept separate
 
 1. Investigate *actual* source-structure anomalies using source-defined
@@ -278,8 +313,9 @@ remain separate gates. This is *not* a release claim.
 2. Compare the cleaned text against an **independent**, authenticated historic
    edition. Record text repairs separately from structural cleanup and make
    them reversible.
-3. Repeat complete source-to-compiled text, references, notes, divisions and
-   reader proof, not just native key counts, before accepting a final SWORD.
+3. Extend the now-verified complete **group word** comparison to exact
+   punctuation, notes/callers, references, ordered divisions and graphical
+   reader proof before accepting a final SWORD.
 
 ## Public source/redistribution rights remain a gate
 
