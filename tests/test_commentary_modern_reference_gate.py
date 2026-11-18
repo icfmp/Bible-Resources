@@ -1175,5 +1175,96 @@ class WholeOriginalSourceLinkLedgerTests(unittest.TestCase):
                 manifest=manifest, ledger=ledger, native=native)
 
 
+    def test_private_unplaced_native_note_preview_segregates_prose_and_links(self):
+        from copy import deepcopy
+        from commentary_modern_reference_gate import (
+            build_private_source_reference_supplement)
+        ns="http://www.bibletechnologies.net/2003/OSIS/namespace"
+        doc=ET.Element(f"{{{ns}}}osis")
+        chapter=ET.SubElement(doc,f"{{{ns}}}chapter",{"osisID":"Gen.1"})
+        section=ET.SubElement(chapter,f"{{{ns}}}div",{
+            "annotateType":"commentary","annotateRef":"Gen.1.1"})
+        p=ET.SubElement(section,f"{{{ns}}}p")
+        p.text="Modern prose preserves an existing "
+        ref=ET.SubElement(p,f"{{{ns}}}reference",{"osisRef":"John.3.16"})
+        ref.text="John 3:16"
+        ref.tail=" citation."
+        base=ET.tostring(doc,encoding="utf-8")
+        original={
+            "Gen.1.1":[
+                ("Bible:Acts.2.1", "2"),
+                ("Gen.1.1-Gen.1.4", "1-4"),
+                ("Gen.1.1-Gen.2.3", "source heading"),
+            ]}
+        def row(n):
+            literal,label=original["Gen.1.1"][n-1]
+            return {
+                "source_first_key":"Gen.1.1",
+                "source_reference_ordinal":n,
+                "original_osisRef_sha256":hashlib.sha256(
+                    literal.encode()).hexdigest(),
+                "original_visible_label_sha256":hashlib.sha256(
+                    label.encode()).hexdigest(),
+            }
+        ledger={"status":
+                "SOURCE_NATIVE_WHOLE_CANON_HYPERLINK_DISPOSITION_QUEUE_NOT_FINAL_APPROVAL",
+                "source_reference_labels_or_literal_targets_exported":False,
+                "publication_authorized":False,
+                "source_original_links_still_requiring_placement_review":3,
+                "pending":[row(1),row(2),row(3)]}
+        native={"original_compiled_corpus_sha256":"a"*64,
+                "chapters":{"Gen.1":{"original_units":[{
+                    "first_key":"Gen.1.1","keys":["Gen.1.1"]}]}}}
+        errata={
+            "status":"PINNED_ORIGINAL_LINK_ERRATA_REVIEW_ONLY_NOT_APPLIED",
+            "original_native_corpus_sha256":"a"*64,
+            "original_sword_changed":False,
+            "modern_prose_changed":False,
+            "modern_osis_links_automatically_changed":False,
+            "editorial_target_corrections_approved":False,
+            "redistributed":False,
+            "cases":[{
+                "source_first_key":"Gen.1.1",
+                "original_reference_ordinal":3,
+                "approval":False,
+            }],
+        }
+        output,receipt=build_private_source_reference_supplement(
+            linked_osis=base, ledger=ledger, original=original,
+            native=native, errata=errata)
+        self.assertEqual(
+            receipt["original_link_occurrences_preserved_only_in_separate_source_notes"],2)
+        self.assertEqual(receipt["malformed_or_wrong_original_links_excluded_for_review"],1)
+        self.assertTrue(receipt["modern_source_text_and_existing_links_unchanged"])
+        result=ET.fromstring(output)
+        note=result.find(
+            f".//{{{ns}}}note[@resp='BibleResourcesPrivateSourceOnlyLinkSupplement']")
+        self.assertIsNotNone(note)
+        self.assertEqual(
+            [x.get("osisRef") for x in note.findall(f"./{{{ns}}}reference")],
+            ["Bible:Acts.2.1","Gen.1.1-Gen.1.4"])
+        self.assertEqual(
+            ["".join(x.itertext()) for x in note.findall(
+                f"./{{{ns}}}reference")],
+            ["Acts 2:1","Genesis 1:1–4"])
+        self.assertNotIn("Gen.1.1-Gen.2.3",output.decode())
+        self.assertEqual(len(result.findall(f".//{{{ns}}}reference")),3)
+        self.assertEqual(
+            "".join(result.find(f".//{{{ns}}}p").itertext()),
+            "".join(ET.fromstring(base).find(f".//{{{ns}}}p").itertext()))
+        tampered=deepcopy(ledger)
+        tampered["pending"][0]["original_visible_label_sha256"]="0"*64
+        with self.assertRaises(ValueError):
+            build_private_source_reference_supplement(
+                linked_osis=base,ledger=tampered,original=original,
+                native=native,errata=errata)
+        bad=deepcopy(errata)
+        bad["editorial_target_corrections_approved"]=True
+        with self.assertRaises(ValueError):
+            build_private_source_reference_supplement(
+                linked_osis=base,ledger=ledger,original=original,
+                native=native,errata=bad)
+
+
 if __name__=="__main__":
     unittest.main()
