@@ -242,7 +242,7 @@ def audit_word_links(index, macula):
                 results["generic_entry_links"] += 1
             if new["entry_ids"]:
                 results["word_aware_entry_links"] += 1
-            if new["evidence"] == "macula_word_exact_lemma_unique_ubs_strong_family":
+            if new["evidence"] == "macula_word_exact_lemma_unique_entry_within_ubs_strong_family":
                 results["additional_entry_only_links"] += 1
             if new["sense_ids"]:
                 results["sense_links"] += 1
