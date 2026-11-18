@@ -843,12 +843,48 @@ def main():
     p.add_argument("--original-link-identity-report",type=Path)
     p.add_argument("--native-receipt",type=Path)
     p.add_argument("--repository-root",type=Path)
+    p.add_argument("--base-unlinked-osis",type=Path)
+    p.add_argument("--reviewed-link-placement-manifest",type=Path)
+    p.add_argument("--linked-osis",type=Path)
     p.add_argument("--report",required=True,type=Path)
     a=p.parse_args()
     if not a.native_reader.is_file() or not a.module_directory.is_dir():
         p.error("Trusted real native reader and installed source module directory required")
     if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{1,39}",a.module_id):
         p.error("Unexpected SWORD module ID")
+    if a.reviewed_link_placement_manifest is not None:
+        if (any(x is not None for x in (
+                a.whole_native_receipt, a.source_map, a.expected_references,
+                a.modern_candidate)) or any(x is None for x in (
+                a.base_unlinked_osis, a.linked_osis, a.disposition_manifest,
+                a.native_receipt, a.original_link_identity_report,
+                a.repository_root))):
+            p.error("Full-canon linked OSIS needs authentic source, identity, "
+                    "documented corrections and private source reader")
+        osis, result = overlay_reviewed_private_links(
+            base_osis=a.base_unlinked_osis.read_bytes(),
+            placements=json.loads(a.reviewed_link_placement_manifest.read_text(
+                encoding="utf-8")),
+            native=json.loads(a.native_receipt.read_text(encoding="utf-8")),
+            identities=json.loads(a.original_link_identity_report.read_text(
+                encoding="utf-8")),
+            dispositions=json.loads(a.disposition_manifest.read_text(
+                encoding="utf-8")),
+            repo_root=a.repository_root, reader=a.native_reader,
+            module_directory=a.module_directory, module_id=a.module_id)
+        a.linked_osis.parent.mkdir(parents=True,exist_ok=True)
+        a.report.parent.mkdir(parents=True,exist_ok=True)
+        a.linked_osis.write_bytes(osis)
+        a.report.write_text(json.dumps(result,indent=2,sort_keys=True)+"\n",
+                            encoding="utf-8")
+        print("BOUNDED SOURCE-LINKED MODERN MHCC OSIS PASS: " +
+              str(result["modern_inline_links_inserted"]) +
+              " independently source-pinned inline links across all 1189 chapters; " +
+              "most original hyperlinks remain editorially UNPLACED, NO release")
+        return 0
+    if any(x is not None for x in (
+            a.base_unlinked_osis, a.linked_osis)):
+        p.error("Full-canon OSIS arguments require reviewed placement manifest")
     if a.disposition_manifest is not None:
         if (any(x is not None for x in (a.whole_native_receipt,
                                         a.source_map,
