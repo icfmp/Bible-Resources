@@ -212,6 +212,34 @@ class EntityIndexTests(unittest.TestCase):
                          json.dumps(report, ensure_ascii=False))
         self.assertNotIn("Never copy", json.dumps(report, ensure_ascii=False))
 
+    def test_hur_father_name_excludes_lexical_ben_but_son_keeps_compound(self):
+        father = self.write_record(
+            "people", "Hur", references=["11004008"],
+            explicit_instances={"wlc":[["o110040080031","o110040080041"]]})
+        son = self.write_record(
+            "people", "Ben-hur", references=["11004008"],
+            explicit_instances={"wlc":[["o110040080031","o110040080041"]]})
+        original = (father.read_bytes(), son.read_bytes())
+        review = next(row for row in json.loads(
+            Path(__file__).with_name("editorial-decisions.json").read_text()
+        )["decisions"] if row["source_id"]=="person:Hur")
+        index = self.build(decisions=[review])
+        by_id={entry["id"]:entry for entry in index["entities"]}
+        self.assertEqual(by_id["person:Hur"]["occurrences"]
+                         ["explicit_instances"]["wlc"],[["o110040080041"]])
+        self.assertEqual(by_id["person:Ben-hur"]["occurrences"]
+                         ["explicit_instances"]["wlc"],
+                         [["o110040080031","o110040080041"]])
+        self.assertEqual(index["by_word"]["wlc:o110040080031"],
+                         [{"entity_id":"person:Ben-hur","link_type":"explicit_instances"}])
+        self.assertEqual(index["by_word"]["wlc:o110040080041"],
+                         [{"entity_id":"person:Ben-hur","link_type":"explicit_instances"},
+                          {"entity_id":"person:Hur","link_type":"explicit_instances"}])
+        self.assertEqual((father.read_bytes(),son.read_bytes()),original)
+        with self.assertRaisesRegex(ValueError,"absent group cannot be removed"):
+            self.build(decisions=[dict(review,remove_explicit_instances={
+                "wlc":[["o110040080031"]]})])
+
     def test_bebai_family_ancestor_and_zechariah_father_are_distinct_word_mentions(self):
         ancestor = self.write_record(
             "people", "Bebai", references=["15002011", "15008011"],

@@ -83,6 +83,14 @@ The builder contains **no chapter-specific or entity-specific code path**.
   derived Jehoahaz direct-name occurrences. The separate Shallum at
   `o130030150101` is now reviewed separately against the Josiah
   royal family and identified with Jehoahaz as below.
+- `person:Hur` (the father) now has only the proper-name word
+  `o110040080041` (*Hur*) in 1 Kings 4:8. The preceding token
+  `o110040080031` is the Hebrew common noun `בֵּן` (*son*), not the
+  father's personal name; it remains correctly attached to the full
+  two-word expression under `person:Ben-hur` (the son/administrator).
+  This clears one provably incorrect exact-name word claim while
+  **retaining the legitimate shared proper-name component** and the
+  two distinct historical identities. See [#299](https://github.com/icfmp/Bible-Resources/issues/299).
 - `person:Dishon` (son of **Seir**) no longer claims either of the
   two explicit names in 1 Chronicles 1:41, where the contextual subject
   is the **other Dishon, son of Anah** (`person:Dishon.2`). The exact
