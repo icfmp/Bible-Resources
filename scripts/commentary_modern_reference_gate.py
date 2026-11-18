@@ -570,9 +570,13 @@ def _wrap_exact_authored_modern_text(section: ET.Element, *, anchor: str,
         raise ValueError("Invalid reviewed modern citation/text placement")
     positions = []
     for node in section.iter():
-        if node.tag.rsplit("}", 1)[-1] == "reference":
-            raise ValueError("Do not overlay onto an already source-linked section")
+        # A source body can legitimately contain several distinct hyperlinks.
+        # Existing reference *text* is protected against nested wrapping;
+        # its trailing text is ordinary modern prose and can hold a next link.
+        already_ref = node.tag.rsplit("}", 1)[-1] == "reference"
         for kind in ("text", "tail"):
+            if already_ref and kind == "text":
+                continue
             slot = getattr(node, kind)
             if isinstance(slot, str) and anchor in slot:
                 for _ in range(slot.count(anchor)):
