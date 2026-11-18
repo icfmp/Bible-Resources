@@ -1055,5 +1055,125 @@ class WholeOriginalSourceLinkLedgerTests(unittest.TestCase):
         self.assertNotIn("Jer. 50–51", repr(ledger))
 
 
+    def test_source_pin_verified_pending_errata_are_never_applied(self):
+        from copy import deepcopy
+        from commentary_modern_reference_gate import (
+            validate_pending_source_reference_errata)
+        target = "Jer.50.1-Jer.3.8"
+        digest = hashlib.sha256(target.encode()).hexdigest()
+        label_hash = hashlib.sha256(b"original printed citation").hexdigest()
+        native = {
+            "original_compiled_corpus_sha256": "a" * 64,
+            "chapters": {"Jer.50": {"original_units": [{
+                "first_key": "Jer.50.1",
+                "source_unit_sha256": "b" * 64
+            }]}}
+        }
+        ledger = {
+            "status":
+                "SOURCE_NATIVE_WHOLE_CANON_HYPERLINK_DISPOSITION_QUEUE_NOT_FINAL_APPROVAL",
+            "source_reference_labels_or_literal_targets_exported": False,
+            "publication_authorized": False,
+            "pending": [{
+                "source_first_key": "Jer.50.1",
+                "source_reference_ordinal": 1,
+                "original_osisRef_sha256": digest,
+                "original_visible_label_sha256": label_hash,
+                "full_range_rejection_reason": "CROSS_CHAPTER_RANGE",
+            }],
+        }
+        case = {
+            "source_first_key": "Jer.50.1",
+            "original_native_unit_sha256": "b" * 64,
+            "original_reference_ordinal": 1,
+            "original_target": target,
+            "original_target_sha256": digest,
+            "original_visible_label_sha256": label_hash,
+            "finding": "INVALID_CROSS_CHAPTER_NAVIGATION_IN_ORIGINAL_OSISREF",
+            "candidate_fragment": "Jer.50.1-Jer.50.3",
+            "approval": False,
+        }
+        manifest = {
+            "status": "PINNED_ORIGINAL_LINK_ERRATA_REVIEW_ONLY_NOT_APPLIED",
+            "original_source": "MHCC 0.1.1 SWORD",
+            "original_native_corpus_sha256": "a" * 64,
+            "original_sword_changed": False,
+            "modern_prose_changed": False,
+            "modern_osis_links_automatically_changed": False,
+            "editorial_target_corrections_approved": False,
+            "redistributed": False,
+            "cases": [case],
+        }
+        receipt = validate_pending_source_reference_errata(
+            manifest=manifest, ledger=ledger, native=native)
+        self.assertEqual(
+            receipt["status"],
+            "SOURCE_PINNED_PROPOSALS_VERIFIED_NOT_APPLIED_OR_APPROVED")
+        self.assertEqual(receipt["source_link_edits_applied"], 0)
+        self.assertNotIn(target, repr(receipt))
+        for mutate in (
+            lambda x: x["cases"][0].update(
+                {"original_target": "Jer.50.1-Jer.50.4"}),
+            lambda x: x["cases"][0].update(
+                {"candidate_fragment": "Jer.50.1-Jer.51.4"}),
+            lambda x: x["cases"][0].update(
+                {"original_native_unit_sha256": "c" * 64}),
+            lambda x: x.update({"editorial_target_corrections_approved": True}),
+            lambda x: x["cases"].append(deepcopy(case)),
+        ):
+            bad = deepcopy(manifest)
+            mutate(bad)
+            with self.assertRaises(ValueError):
+                validate_pending_source_reference_errata(
+                    manifest=bad, ledger=ledger, native=native)
+
+    def test_source_pin_wrong_verse_proposal_is_only_diagnostic(self):
+        from commentary_modern_reference_gate import (
+            validate_pending_source_reference_errata)
+        source_target = "Isa.25.8"
+        digest = hashlib.sha256(source_target.encode()).hexdigest()
+        label_digest = hashlib.sha256(b"Is. 25:8").hexdigest()
+        native = {"original_compiled_corpus_sha256": "a" * 64,
+                  "chapters": {"Eccl.10": {"original_units": [{
+                      "first_key": "Eccl.10.11",
+                      "source_unit_sha256": "b" * 64}]}}}
+        ledger = {"status":
+                  "SOURCE_NATIVE_WHOLE_CANON_HYPERLINK_DISPOSITION_QUEUE_NOT_FINAL_APPROVAL",
+                  "source_reference_labels_or_literal_targets_exported": False,
+                  "publication_authorized": False,
+                  "pending": [{
+                      "source_first_key": "Eccl.10.11",
+                      "source_reference_ordinal": 1,
+                      "original_osisRef_sha256": digest,
+                      "original_visible_label_sha256": label_digest,
+                  }]}
+        case = {"source_first_key": "Eccl.10.11",
+                "original_reference_ordinal": 1,
+                "original_native_unit_sha256": "b" * 64,
+                "original_target": source_target,
+                "original_target_sha256": digest,
+                "original_visible_label_sha256": label_digest,
+                "finding": "ORIGINAL_DIGITAL_WITNESS_POINTS_TO_WRONG_VERSE",
+                "proposed_corrected_target": "Isa.35.8",
+                "approval": False}
+        manifest = {"status":
+                    "PINNED_ORIGINAL_LINK_ERRATA_REVIEW_ONLY_NOT_APPLIED",
+                    "original_source": "MHCC 0.1.1 SWORD",
+                    "original_native_corpus_sha256": "a" * 64,
+                    "original_sword_changed": False,
+                    "modern_prose_changed": False,
+                    "modern_osis_links_automatically_changed": False,
+                    "editorial_target_corrections_approved": False,
+                    "redistributed": False, "cases": [case]}
+        receipt = validate_pending_source_reference_errata(
+            manifest=manifest, ledger=ledger, native=native)
+        self.assertEqual(receipt["original_link_occurrences_reconciled"], 1)
+        self.assertFalse(receipt["publication_authorized"])
+        manifest["cases"][0]["proposed_corrected_target"] = source_target
+        with self.assertRaises(ValueError):
+            validate_pending_source_reference_errata(
+                manifest=manifest, ledger=ledger, native=native)
+
+
 if __name__=="__main__":
     unittest.main()
