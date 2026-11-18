@@ -1825,5 +1825,62 @@ class OriginalKTargetRangeHeadingLinksTests(unittest.TestCase):
         self.assertEqual(receipt["source_original_links_restored_to_matching_modern_K_headings"],0)
         self.assertEqual(len(ledger["pending"]),5)
 
+
+    def test_explicit_partial_verse_span_inside_its_authenticated_original_K(self):
+        from commentary_modern_draft_osis_preview import NS
+        raw,ledger,original,native,errata=self.fixture(
+            range_literal="Gen.8.7-Gen.8.9",printed_label="Gen 8:7-9")
+        doc=ET.fromstring(raw)
+        section=next(x for x in doc.iter()
+                     if x.get("annotateRef")=="Gen.8.4-Gen.8.12")
+        p=section.find(f"./{{{NS}}}p")
+        p.text="Noah followed God's plan. Verses 7–9 describe the birds."
+        before="".join(doc.itertext())
+        out,remaining,receipt=build_private_owned_K_heading_range_links(
+            compact_osis=ET.tostring(doc),ledger=ledger,original=original,
+            native=native,errata=errata)
+        fixed=ET.fromstring(out)
+        references=[x for x in fixed.iter() if x.tag==f"{{{NS}}}reference"]
+        self.assertEqual(len(references),1)
+        self.assertEqual(references[0].get("osisRef"),"Gen.8.7-Gen.8.9")
+        self.assertEqual(references[0].text,"Verses 7–9")
+        self.assertEqual(receipt["source_original_links_restored_to_matching_modern_K_headings"],0)
+        self.assertEqual(receipt["source_original_partial_ranges_restored_in_K_exposition"],1)
+        self.assertEqual(len(remaining["pending"]),4)
+        self.assertEqual("".join(fixed.itertext()),before)
+
+    def test_original_single_first_verse_K_preserves_authored_later_chapter_range(self):
+        from commentary_modern_draft_osis_preview import NS, _range
+        raw,ledger,original,native,errata=self.fixture(
+            range_literal="Isa.12.4-Isa.12.6",printed_label="Is. 12:4-6")
+        doc=ET.fromstring(raw)
+        chapter=next(x for x in doc.iter() if x.tag==f"{{{NS}}}chapter")
+        chapter.set("osisID","Isa.12")
+        secs=chapter.findall(f"./{{{NS}}}div[@annotateType='commentary']")
+        chapter.remove(secs[1])
+        secs[0].set("annotateRef","Isa.12.1")
+        secs[0].find(f"./{{{NS}}}p").text=(
+            "In the latter part of the song (verses 4–6), believers urge "
+            "each other to praise the Lord.")
+        old=original.pop("Gen.8.4")
+        original["Isa.12.1"]=old
+        for row in ledger["pending"]:
+            row["source_first_key"]="Isa.12.1"
+        native["chapters"]={"Isa.12":{"original_units":[{
+            "first_key":"Isa.12.1","keys":["Isa.12.1"]}]}}
+        for case in errata["cases"]:
+            case["source_first_key"]="Isa.12.1"
+        before="".join(doc.itertext())
+        out,remaining,receipt=build_private_owned_K_heading_range_links(
+            compact_osis=ET.tostring(doc),ledger=ledger,
+            original=original,native=native,errata=errata)
+        fixed=ET.fromstring(out)
+        references=[x for x in fixed.iter() if x.tag==f"{{{NS}}}reference"]
+        self.assertEqual(len(references),1)
+        self.assertEqual(references[0].get("osisRef"),"Isa.12.4-Isa.12.6")
+        self.assertEqual(references[0].text,"verses 4–6")
+        self.assertEqual(receipt["source_original_partial_ranges_restored_in_K_exposition"],1)
+        self.assertEqual("".join(fixed.itertext()),before)
+
 if __name__=="__main__":
     unittest.main()
