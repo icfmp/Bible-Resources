@@ -1111,7 +1111,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                                     reader: Path, module_directory: Path,
                                     module_id: str,
                                     auto_single_verse: bool = False,
-                                    auto_ranges: bool = False) -> tuple[bytes, dict]:
+                                    auto_ranges: bool = False,
+                                    auto_outline_links: bool = False) -> tuple[bytes, dict]:
     """Authenticate and place an explicitly bounded set of source-backed links.
 
     Real original SWORD attributes stay in private memory/isolated new OSIS,
@@ -1121,6 +1122,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
     from commentary_modern_draft_osis_preview import NS, _range
     if auto_ranges and not auto_single_verse:
         raise ValueError("Range mapping requires source-matched single-verse mode")
+    if auto_outline_links and not auto_ranges:
+        raise ValueError("Outline mapping requires original source range validation")
     if (placements.get("status") !=
             "PRIVATE_REVIEWED_BOUNDED_LINK_PLACEMENT_NOT_FINAL_EDIT_OR_RELEASE"
             or placements.get("published_source_module") != "MHCC 0.1.1"
@@ -1272,7 +1275,9 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         raise ValueError("Source-linked OSIS needs all 1189 modern chapters")
     original_visible = "".join(doc.itertext())
     inserted = []
-    auto_counts = {"automatically_inserted":0,"automatically_inserted_ranges":0}
+    auto_counts = {"automatically_inserted":0,
+                   "automatically_inserted_ranges":0,
+                   "automatically_inserted_outline_links":0}
     for row in proposed:
         chapter, first = row["modern_chapter"], row["source_first_key"]
         units = native["chapters"][chapter]["original_units"]
@@ -1316,7 +1321,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
             private_original=private_original, groups=groups,
             modern_chapters=modern_chapters, native=native,
             blocked=already, corrections=correction_by_key,
-            include_ranges=auto_ranges)
+            include_ranges=auto_ranges,
+            include_outline_links=auto_outline_links)
         # The original raw source and its complete identity hashes are already
         # validated by observe(). Retain original literal osisRef unchanged.
         for row in automatic:
@@ -1327,7 +1333,9 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
             section=modern_chapters[chapter].findall(
                 f"./{{{NS}}}div[@annotateType='commentary']")[nth]
             literal=private_original[first][row["original_link_ordinal"]-1][0]
-            if row["action"]=="AUTO_EXACT_SOURCE_TARGET_AND_UNIQUE_MODERN_RANGE":
+            is_outline=(row["action"]==
+                        "AUTO_ORIGINAL_FIRST_K_CHAPTER_OUTLINE_RANGE")
+            if row["action"]=="AUTO_EXACT_SOURCE_TARGET_AND_UNIQUE_MODERN_RANGE" or is_outline:
                 normalized="RANGE:"+(literal[6:] if literal.startswith("Bible:")
                                       else literal)
                 if (_source_same_chapter_verse_range(literal) is None or
@@ -1335,8 +1343,23 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                     raise ValueError("Source range autolink failed exact original target")
             elif canonical_only_for_comparison(literal)!=row["expected_modern_target"]:
                 raise ValueError("Autolink changed original authenticated destination")
+            location=section
+            if is_outline:
+                source_label=private_original[first][row["original_link_ordinal"]-1][1]
+                confirmed=_source_first_K_outline_row_evidence(
+                    literal=literal,label=source_label,first_key=first,
+                    native_chapter=native["chapters"][chapter],
+                    modern_chapter=modern_chapters[chapter])
+                if not (confirmed["source_first_K_owns_link"] and
+                        confirmed["unique_modern_outline_row_matches_source_target"] and
+                        confirmed["original_visible_label_explicitly_names_same_verse_span"]):
+                    raise ValueError("Original chapter-outline link cannot be relocated safely")
+                location=_find_exact_modern_original_outline_range_cell(
+                    modern_chapters[chapter],literal)
+                if location is None or "".join(location.itertext()).strip()!=row["modern_anchor"]:
+                    raise ValueError("Original outline verse table cell changed after review")
             _wrap_exact_authored_modern_text(
-                section, anchor=row["modern_anchor"],
+                location, anchor=row["modern_anchor"],
                 display=row["linked_display_text"],
                 occurrence="last", target=literal)
             inserted.append({
@@ -1350,6 +1373,9 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         auto_counts = {"automatically_inserted":len(automatic),
                        "automatically_inserted_ranges":sum(
                            row["action"]=="AUTO_EXACT_SOURCE_TARGET_AND_UNIQUE_MODERN_RANGE"
+                           for row in automatic),
+                       "automatically_inserted_outline_links":sum(
+                           row["action"]=="AUTO_ORIGINAL_FIRST_K_CHAPTER_OUTLINE_RANGE"
                            for row in automatic),
                        **skips}
         proposed = list(proposed)+automatic
