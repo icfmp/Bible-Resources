@@ -512,12 +512,14 @@ singular source word as erroneous:
 - **2 Kings 14:13 / 2 Chronicles 25:23** name the Judahite king Joash
   (Amaziah's father) **first**, and the distinct Israelite king
   Joash/Jehoash (Amaziah's captor) **second**. The inherited ACAI
-  source *reversed the two exact name tokens in both verses*.
-  The derived index now swaps the four exact source-name groups
-  to the correct historical kings, retains both individuals and both
-  verse references, and removes **seven** singular action-verb
-  subjects erroneously attached to the deceased king of Judah.
-  The correct Israelite king's seven subject groups remain.
+  source *reversed the two exact name tokens in both verses*,
+  as well as the separate Jehoash/Jehoash.2 alias records in
+  2 Kings 14:13. The derived index now swaps **six** original name
+  groups in total: four Joash, two Jehoash, retaining the aliases
+  and both historical king identities. **Eleven** erroneous source
+  subject groups are detached (seven Joash.3, four Jehoash) across
+  **seven distinct action-word IDs**, all of which remain correctly
+  linked to Joash of Israel.
 - **Luke 6:16** has the relative pronoun `ὃς` at
   `n42006016007`: it refers to Judas Iscariot, **not**
   Judas son of James, who is named separately in the same verse.
