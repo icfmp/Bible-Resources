@@ -1,4 +1,4 @@
-# MHC — 25 source machine Scripture-link anchors, 11 not yet trialled (2026-11-18)
+# MHC — 25 source machine Scripture-link anchors, 8 not yet trialled (2026-11-18)
 
 **Research inventory, not a corrected edition, module release, or editorial approval.**
 This is the original **complete MHC** authored OSIS, *not MHCC*. The original
@@ -13,7 +13,7 @@ The separate [private two-link correction preview](https://github.com/icfmp/Bibl
 safely trialled **line 7237** (`15.1` → `Jer.15.1`) and
 **line 57059** (`Ezr 1.7 8.23` → `Ezra.1.7 Ezra.8.24`), leaving
 authorial visible labels and prose untouched. Neither is published.
-The original **23** pending anchors are preserved in the inventory below, without commentary prose. Subsequently **5** of these 23 were added to the same reversible private plan after independent citation checks. That brought the first private plan to **7**. A second batch of seven reviewed citation links now raises it to **14**, leaving **11** untrialled; see dated continuations below.
+The original **23** pending anchors are preserved in the inventory below, without commentary prose. Subsequently **5** of these 23 were added to the same reversible private plan after independent citation checks. That brought the first private plan to **7**. A second batch of seven reviewed citation links raised it to **14**, and a third batch of three brought it to **17**, leaving **8** untrialled; see the dated continuations below.
 
 ## Five originally pending bookless numeric machine targets
 
@@ -130,7 +130,30 @@ silently flatten a span into unreviewed separate citation semantics.
 **Isaiah line 58059 refers to Psalm 60's title**, not necessarily verse 1:
 this also needs reader/edition-specific checking, not a guessed location.
 
-The fourteen-candidate complete native recompilation is pending on the
-latest PR head: until it passes, **the seven newly added targets are trial
-proposals, not technically verified corrections**. Independent historical
+The [fourteen-candidate real SWORD recompile and exhaustive native XML comparison](https://github.com/icfmp/Bible-Resources/actions/runs/44297283141) **PASSED**. Every approved target transformation occurred in compiled native SWORD, with the original 31,098 numbered/1,255 introduction/2 opaque keys preserved and no changed non-reference text or XML. This does not establish GUI click navigation, rights or print-edition parity. Independent historical
 print/rights review and actual reader click navigation remain separate gates.
+
+## Third continuation — seventeen private link proposals; eight untrialled
+
+Three further *individual* compound citations have been independently verified
+in the matching CCEL MHC commentary chapter and placed in the existing
+source-line/book/visible-label-SHA-pinned private machine-attribute plan.
+
+| Original line / context | Original target | Proposed machine-only target | Independent corresponding commentary text |
+| --- | --- | --- | --- |
+| 62922 / Ezekiel 4 | `La 4.3 4 5.10` | `Lam.4.3 Lam.4.4 Lam.5.10` | [CCEL Ezekiel 4](https://ccel.org/ccel/henry/mhc4/mhc4.Ez.v.html) quotes the corresponding Lamentations references |
+| 67688 / Hosea 9 | `Ho 4.15 12.11 Am 4.4 5.5` | `Hos.4.15 Hos.12.11 Amos.4.4 Amos.5.5` | [CCEL Hosea 9](https://www.ccel.org/h/henry/mhc2/MHC28009.HTM) cites ch. 4:15; 12:11 and Amos 4:4; 5:5 |
+| 98022 / Acts 10 | `De.7.7 8 9.5 6 Mt 20.10` | `Deut.7.7 Deut.7.8 Deut.9.5 Deut.9.6 Matt.20.10` | [CCEL Acts 10](https://www.ccel.org/h/henry/mhc2/MHC44010.HTM) cites these five verses |
+
+The newly proposed private references have **not yet passed** the full
+seventeen-link SWORD compilation/parity workflow on the new PR head.
+No original text, notes, displayed citation, commentary scope, bibliography,
+public release, or catalogue were changed.
+
+**Eight untrialled machine links remain:** bookless original lines **3108**,
+**37835**, **41584**, **47698**; complex original lines **50772**,
+**58059**, **76239**, **81529**. Those involving a range, chapter title, or
+ambiguous inherited punctuation need independent scope confirmation and
+explicit support from the source/reader representation, not inferred
+`osisRef` targets. Printed-edition and digital redistribution rights,
+real GUI link navigation and final editorial approval remain open.
