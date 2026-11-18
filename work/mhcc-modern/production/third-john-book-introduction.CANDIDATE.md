@@ -25,6 +25,6 @@ Its chief purpose is to commend his **steadfastness in faith** and his **hospita
 
 **Separate authorial introduction directly read:** [CCEL, 3 John](https://ccel.org/ccel/henry/mhcc.lvi.html). All original themes retained.
 
-This remains a distinct candidate, **not a proven native SWORD book-entry** in published `MHCC 0.1.1`. Original source not altered and no placement guessed.
+The candidate is anchored to the original **chapter-I** introduction shown below, not to a book-I prose entry. Its translated meaning and native presentation still require editorial review; the published source is unmodified.
 
 **Exact-native placement update (2026-11-18):** The published, whole-corpus-SHA-authenticated `MHCC 0.1.1` source has an occupied introductory prose entry at `I:3John.1` (27 original visible word tokens; SHA-256 `8dac353b7cc7a8bfff92570c5a62568c1bbbc94f678dabf8fda8f4001e15c137`). The separate `I:3John` entry contains a short book title, **not the introductory exposition**. Evidence: [real original-native 1,189-chapter receipt, CI #44270683938](https://github.com/icfmp/Bible-Resources/actions/runs/44270683938) (metadata-only artifact). This resolves **native entry ownership** only: the modern prose has **not** been compared clause by clause to that exact original I entry or proven source-markup-equivalent. A final SWORD builder must avoid generating this preface both in chapter I and under an invented book-level or numbered K key. Original published entries untouched.
