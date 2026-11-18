@@ -42,7 +42,7 @@ He is always near his people to protect and refresh them.
 
 Our right hand represents our working hand.
 
-When we turn toward the duties he has given us, we may find him ready to bless our service.
+When we turn toward the duties he has given us, we may find him ready to grant us success.
 
 He guards his people from being finally overthrown.
 
@@ -63,6 +63,8 @@ Let us therefore remain faithful in our work, confident in the blessing promised
 ---
 
 ## Editorial review — Psalm 121
+
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Restored Henry's definite wording that the Lord is ready to grant *success* as his people attend to their duty; the prior manuscript generalized that claim into a blessing on service. No claim is made that Henry promised any particular worldly outcome. Original SWORD/native and independent approval are pending.
 
 **Complete secondary original-English source read:** [CCEL, Psalm 121](https://ccel.org/ccel/henry/mhcc.xx.cxxi.html). Published `MHCC 0.1.1` remains source authority, native SWORD/independent acceptance pending.
 
