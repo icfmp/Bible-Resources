@@ -6,7 +6,7 @@ on:
       - "entity-index/links/dictionaries/ubs-hebrew/**"
       - ".github/workflows/bsi-ubs-hebrew.yml"
   push:
-    branches: [main]
+    branches: [audit/ubs-hebrew-alternate-lemmas]
     paths:
       - "entity-index/links/dictionaries/ubs-hebrew/**"
       - ".github/workflows/bsi-ubs-hebrew.yml"
@@ -52,6 +52,22 @@ jobs:
           test "$(git -C ubs hash-object dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON)" = "aabf1eeccc7fcf573b2346e8d2e3533a614ac055"
           test "$(git -C ubs hash-object dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-fr.JSON)" = "47dcfa6b17c455287e812305c8bf0bb15d213521"
           test "$(wc -c < macula-hebrew/WLC/tsv/macula-hebrew.tsv)" -gt 80000000
+      - name: Inspect original UBS headword alternate form metadata
+        run: |
+          python3 - <<'PY'
+          import json
+          from collections import Counter
+          path="ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON"
+          entries=json.load(open(path,encoding="utf-8"))
+          print("UBS_HEADWORD_FIELDS",sorted({k for item in entries for k in item}))
+          by_field=Counter(k for e in entries for k,v in e.items() if v)
+          print("UBS_HEADWORD_POPULATED_FIELDS",dict(by_field))
+          for e in entries:
+              keys=[k for k in e if any(x in k.lower() for x in ("alternate","variant","form","lemma","script","spell"))]
+              if any(k not in ("Lemma","BaseForms") and e.get(k) for k in keys):
+                  print("UBS_ALTERNATE_FIELD_SAMPLE",json.dumps({k:e[k] for k in keys},ensure_ascii=False)[:1500])
+                  break
+          PY
       - name: Analyze exact bilingual sense IDs and WLC source links
         run: |
           python3 -I entity-index/links/dictionaries/ubs-hebrew/analyze_alignment.py \
