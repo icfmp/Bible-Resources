@@ -18,7 +18,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 - HISTORICAL/ARCHIVE: 9
 - KEEP_GENERIC: 26
 - MERGE: 10
-- UNDECIDED: 118
+- UNDECIDED: 119
 
 ## All tracked tools
 
@@ -55,6 +55,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_modern_draft_osis_preview.py`](../scripts/commentary_modern_draft_osis_preview.py) | UNDECIDED | named test | 6 | not determined |
 | [`scripts/commentary_modern_ionly_preview.py`](../scripts/commentary_modern_ionly_preview.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_modern_linked_candidate_preview.py`](../scripts/commentary_modern_linked_candidate_preview.py) | UNDECIDED | named test | 2 | not determined |
+| [`scripts/commentary_modern_native_witness_probe.py`](../scripts/commentary_modern_native_witness_probe.py) | UNDECIDED | named test | 2 | source/native audit |
 | [`scripts/commentary_modern_reference_gate.py`](../scripts/commentary_modern_reference_gate.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/commentary_modern_source_receipt.py`](../scripts/commentary_modern_source_receipt.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/commentary_native_inventory.py`](../scripts/commentary_native_inventory.py) | KEEP_GENERIC | not established | 10 | source/native audit |
@@ -184,7 +185,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/sword_native_index.cpp`](../scripts/sword_native_index.cpp) | KEEP_GENERIC | not established | 17 | not determined |
 | [`scripts/sword_native_inventory.py`](../scripts/sword_native_inventory.py) | KEEP_GENERIC | named test | 20 | source/native audit |
 | [`scripts/sword_native_raw_corpus.cpp`](../scripts/sword_native_raw_corpus.cpp) | UNDECIDED | not established | 12 | not determined |
-| [`scripts/sword_native_raw_corpus_inventory.py`](../scripts/sword_native_raw_corpus_inventory.py) | KEEP_GENERIC | named test | 28 | source/native audit |
+| [`scripts/sword_native_raw_corpus_inventory.py`](../scripts/sword_native_raw_corpus_inventory.py) | KEEP_GENERIC | named test | 29 | source/native audit |
 | [`scripts/sword_native_raw_entry.cpp`](../scripts/sword_native_raw_entry.cpp) | UNDECIDED | not established | 7 | not determined |
 | [`scripts/tool_registry.py`](../scripts/tool_registry.py) | KEEP_GENERIC | named test | 4 | not determined |
 | [`scripts/usfx_schema_gate.py`](../scripts/usfx_schema_gate.py) | UNDECIDED | named test | 3 | not determined |
