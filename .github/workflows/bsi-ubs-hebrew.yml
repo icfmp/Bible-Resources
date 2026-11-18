@@ -22,7 +22,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Offline regression tests
-        run: python3 -I entity-index/links/dictionaries/ubs-hebrew/test_index.py
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_index.py
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_lexical_gaps.py
       - name: Check out exact UBS Hebrew EN/FR 0.9.4 source
         uses: actions/checkout@v4
         with:
