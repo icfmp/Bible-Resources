@@ -125,6 +125,57 @@ Only then compile and test each corrected link in a real SWORD reader.
 This makes reference repair a distinct reviewed step from the already
 proven no-word-loss mechanical OSIS cleanup.
 
+## Exhaustive OSIS milestone-to-SWORD integrity audit — 2026-11-18
+
+**Status: FAIL-CLOSED, not structurally approved.** The real MHC uses
+`verse/@osisID`, `verse/@sID` and `verse/@eID` milestones, **not**
+commentary `div/@annotateRef`. A first investigation of `annotateRef` therefore
+found no applicable sections; it was **not** evidence of structural validity.
+The audit was corrected to parse the actual source structure.
+
+[Actual full-source/full-native diagnostic — deliberately failed on real
+mismatches](https://github.com/icfmp/Bible-Resources/actions/runs/44276073483).
+
+| Full corpus check | Result |
+| --- | --- |
+| Source verse-group opening/closing pairs | **4,256 / 4,256**; no unmatched milestone reported |
+| Source chapter opening/closing pairs | **1,189 / 1,189**; no unmatched milestone reported |
+| Source book divisions | **66** |
+| Source book/chapter introduction IDs vs native I keys | **1,255 / 1,255, identical** |
+| OSIS verse groups linked to multiple verses | **3,701** |
+| Groups whose compiled linked bodies were compared | **3,698**; no mismatched group-body hash reported |
+| Verse range `sID`, `osisID`, `n` consistency | **No malformed/comma notation detected in actual verse-group labels** |
+| Source distinct assigned verse IDs | **31,115** |
+| Actual compiled occupied native verse keys | **31,098** |
+| Source IDs absent from SWORD | **17** |
+| Groups with duplicate verse ownership | **7** (not yet established to be invalid authorial content) |
+
+The **17** OSIS-identified but non-indexed verses are
+`Acts.26.33`–`Acts.26.44` (12), `Isa.7.26`–`Isa.7.28` (3), and
+`Prov.31.32`–`Prov.31.33` (2). These are out-of-range in the declared
+KJV versification. Three prior **research-only** proposed endpoint repairs
+already exist: `config/commentary-reference-plans/mhc-acts26-endpoint.json`,
+`mhc-isaiah7-endpoint.json` and `mhc-proverbs31-endpoint.json`.
+Those plans originate from the separately pinned CCEL ThML witness; the
+present source is the CrossWire authoring OSIS. Cross-edition corrections
+require confirming the actual OSIS `sID`, `eID`, `osisID` and `n` identities
+before applying any byte-local repair. **No invalid verse has been invented
+or deleted from a Bible; these are commentary *addressing* errors.**
+
+The **7 duplicated ownership groups** require separate source-section/text
+ownership examination before deciding whether two independent authored
+comments must be combined, separately indexed, or represented differently.
+Observed review anchors: `2Chr.1`, `Ps.95`, `Rom.4`, `Rom.7`,
+`2Thess.2`, `2Pet.2` and `Rev.4`. Merely having the correct number
+of compiled keys cannot prove that both original source passages survived.
+
+**Next validation gate:** verify the three exact source ranges, propose
+reversible attribute-only harmonization with original and candidate SHA
+proof; then reconcile duplicated groups against the original authorial
+text and actual native body selection. Rebuild and demand zero unexpected
+index/ownership differences. Keep the 25 separate inline cross-reference
+syntax cases on their own track.
+
 ## Next review, kept separate
 
 1. Investigate *actual* source-structure anomalies using source-defined
