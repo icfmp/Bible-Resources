@@ -36,7 +36,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/catalogue_release_coverage.py`](../scripts/catalogue_release_coverage.py) | KEEP_GENERIC | named test | 9 | publication/release |
 | [`scripts/check_provider_parity.py`](../scripts/check_provider_parity.py) | UNDECIDED | not established | 4 | not determined |
 | [`scripts/check_updates.py`](../scripts/check_updates.py) | UNDECIDED | not established | 12 | not determined |
-| [`scripts/clean_source_osis.py`](../scripts/clean_source_osis.py) | UNDECIDED | named test | 3 | not determined |
+| [`scripts/clean_source_osis.py`](../scripts/clean_source_osis.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/commentary_anchor_parity.py`](../scripts/commentary_anchor_parity.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/commentary_andbible_jsword.py`](../scripts/commentary_andbible_jsword.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_android_text_witness.py`](../scripts/commentary_android_text_witness.py) | UNDECIDED | named test | 3 | source/native audit |
