@@ -52,7 +52,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_layout_census.py`](../scripts/commentary_layout_census.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/commentary_literal_erratum_preflight.py`](../scripts/commentary_literal_erratum_preflight.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/commentary_modern_draft_guard.py`](../scripts/commentary_modern_draft_guard.py) | UNDECIDED | named test | 5 | not determined |
-| [`scripts/commentary_modern_draft_osis_preview.py`](../scripts/commentary_modern_draft_osis_preview.py) | UNDECIDED | named test | 7 | not determined |
+| [`scripts/commentary_modern_draft_osis_preview.py`](../scripts/commentary_modern_draft_osis_preview.py) | UNDECIDED | named test | 8 | not determined |
 | [`scripts/commentary_modern_ionly_preview.py`](../scripts/commentary_modern_ionly_preview.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_modern_k_scope_preview.py`](../scripts/commentary_modern_k_scope_preview.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_modern_linked_candidate_preview.py`](../scripts/commentary_modern_linked_candidate_preview.py) | UNDECIDED | named test | 2 | not determined |
