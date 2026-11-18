@@ -4,7 +4,7 @@
   "source_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
   "source_link_identity_receipt_status": "SOURCE_NATIVE_ALL_K_REFERENCE_IDENTITIES_NOT_MODERN_LINK_PARITY",
   "source_evidence_ci": "https://github.com/icfmp/Bible-Resources/actions/runs/44276719759",
-  "scope": "Source-authenticated Genesis 2, 3, 21 and Exodus 12, 14, 28, 29 only",
+  "scope": "Source-witness-audited original link groups in Genesis, Exodus, Leviticus, Numbers, Deuteronomy and Romans only",
   "explicit_owner_publication_authorization": false,
   "independent_original_semantic_signoff": false,
   "modern_sword_compiled_or_published": false,
@@ -175,6 +175,111 @@
           "disposition": "RETARGET_VERIFIED_CONTINUATION_REFERENCE",
           "modern_context_anchor": "(Revelation 1:5–6)",
           "corrected_target": "Rev.1.6"
+        }
+      ]
+    },
+    {
+      "chapter": "Lev.8",
+      "source_first_key": "Lev.8.1",
+      "source_unit_sha256": "1d20d277fb19fb57b208d9311ee9391e4331d361e6c2a13ec4ec4b4a333c1bca",
+      "modern_path": "work/mhcc-modern/production/accepted/leviticus-08.md",
+      "modern_section_heading": "Aaron and his sons are consecrated (verses 1–13)",
+      "witness_url": "https://ccel.org/ccel/henry/mhcc.iv.viii.html",
+      "corrections": [
+        {
+          "source_link_ordinal": 2,
+          "original_target": "1Cor.1.6",
+          "original_label": "6",
+          "disposition": "RETARGET_VERIFIED_CONTINUATION_REFERENCE",
+          "modern_context_anchor": "(Revelation 1:5–6)",
+          "corrected_target": "Rev.1.6"
+        }
+      ]
+    },
+    {
+      "chapter": "Lev.14",
+      "source_first_key": "Lev.14.54",
+      "source_unit_sha256": "82ccd3a4c7b9ba2ee7f13c528b1395d0a5b3795c67101c7b320af014ee4dd7e1",
+      "modern_path": "work/mhcc-modern/production/accepted/leviticus-14.md",
+      "modern_section_heading": "Concluding instruction on the law of leprosy (verses 54–57)",
+      "witness_url": "https://ccel.org/ccel/henry/mhcc.iv.xiv.html",
+      "corrections": [
+        {
+          "source_link_ordinal": 2,
+          "original_target": "2Cor.2.5",
+          "original_label": "5",
+          "disposition": "RETARGET_VERIFIED_CONTINUATION_REFERENCE",
+          "modern_context_anchor": "(Ephesians 2:4–5)",
+          "corrected_target": "Eph.2.5"
+        }
+      ]
+    },
+    {
+      "chapter": "Num.5",
+      "source_first_key": "Num.5.11",
+      "source_unit_sha256": "df76d2b9b2575baec03db44e2a16c984652fbec600547575cf575023e94dd75f",
+      "modern_path": "work/mhcc-modern/production/accepted/numbers-05.md",
+      "modern_section_heading": "The trial of jealousy (verses 11–31)",
+      "witness_url": "https://ccel.org/ccel/henry/mhcc.v.v.html",
+      "corrections": [
+        {
+          "source_link_ordinal": 2,
+          "original_target": "2Cor.2.2",
+          "original_label": "2",
+          "disposition": "OMIT_SPURIOUS_ENUMERATOR_LINK",
+          "modern_context_anchor": "**Second**, God will judge sexual immorality and adultery."
+        }
+      ]
+    },
+    {
+      "chapter": "Num.18",
+      "source_first_key": "Num.18.20",
+      "source_unit_sha256": "5092ae267428d0727f35cd327ceeaab03bc927f9aacb47c9079a819e988cbd7a",
+      "modern_path": "work/mhcc-modern/production/accepted/numbers-18.md",
+      "modern_section_heading": "God's provision for the Levites (verses 20–32)",
+      "witness_url": "https://ccel.org/ccel/henry/mhcc.v.xviii.html",
+      "corrections": [
+        {
+          "source_link_ordinal": 2,
+          "original_target": "2Cor.3.2",
+          "original_label": "2",
+          "disposition": "OMIT_SPURIOUS_ENUMERATOR_LINK",
+          "modern_context_anchor": "**Second**, God must receive the portion due to him."
+        }
+      ]
+    },
+    {
+      "chapter": "Deut.11",
+      "source_first_key": "Deut.11.18",
+      "source_unit_sha256": "f308d9c33a89c887c305005573acfdd764d7841ef22fa29939eee3640ede3142",
+      "modern_path": "work/mhcc-modern/production/accepted/deuteronomy-11.md",
+      "modern_section_heading": "Keeping God's word in heart, sight and speech (verses 18–25)",
+      "witness_url": "https://ccel.org/ccel/henry/mhcc.vi.xi.html",
+      "corrections": [
+        {
+          "source_link_ordinal": 2,
+          "original_target": "Ps.119.3",
+          "original_label": "3",
+          "disposition": "OMIT_SPURIOUS_ENUMERATOR_LINK",
+          "modern_context_anchor": "**Third, employ the tongue in speaking about God's word.**"
+        }
+      ]
+    },
+    {
+      "chapter": "Rom.13",
+      "source_first_key": "Rom.13.1",
+      "source_unit_sha256": "43c1423816927187219638565a96a6b74004991f3800ca897dec81b2f704bad9",
+      "modern_path": "work/mhcc-modern/production/accepted/romans-13.md",
+      "modern_section_heading": "Submit to lawful civil authority (verses 1–7)",
+      "witness_url": "https://ccel.org/ccel/henry/mhcc.xxxvii.xiii.html",
+      "corrections": [
+        {
+          "source_link_ordinal": 2,
+          "original_target": "2Cor.2.2",
+          "original_label": "2",
+          "disposition": "RETARGET_VERIFIED_CONTINUATION_REFERENCE",
+          "modern_context_anchor": "1 Timothy 2:1–2",
+          "corrected_target": "1Tim.2.2"
         }
       ]
     }
