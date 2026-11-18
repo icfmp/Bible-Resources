@@ -111,7 +111,7 @@ Not approved.
     def test_false_original_hash_is_not_accepted(self):
         manifest,receipt=data()
         manifest["cases"][0]["source_original_raw_sha256"]="f"*64
-        with self.assertRaisesRegex(ValueError,"original numbered-K body hash/bounds"):
+        with self.assertRaisesRegex(ValueError,"Original numbered-K body hash/bounds"):
             generate(manifest,receipt,self.root,"TESTKLINK")
 
     def test_guide_cannot_be_used_as_global_intro_fallback(self):
@@ -129,7 +129,7 @@ Not approved.
     def test_target_must_extend_genuine_authored_group(self):
         manifest,receipt=data()
         manifest["cases"][0]["modern_declared_last_verse"]=12
-        with self.assertRaisesRegex(ValueError,"original editorial wider verse range"):
+        with self.assertRaisesRegex(ValueError,"Original editorial wider verse range"):
             generate(manifest,receipt,self.root,"TESTKLINK")
 
 
