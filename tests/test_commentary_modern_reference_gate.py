@@ -516,6 +516,37 @@ class ExactSingleVerseSourceConcordanceTests(unittest.TestCase):
         self.assertEqual(_unambiguous_explicit_modern_verse(n,"Song.2.1"),
                          "Song of Songs 2:1")
 
+    def test_conventional_punctuated_abbreviations_match_only_exact_source_verse(self):
+        cases = [
+            ("Gen. 12:3", "Gen.12.3"),
+            ("Exod. 14:21", "Exod.14.21"),
+            ("Ps. 23:1", "Ps.23.1"),
+            ("Rom. 8:1", "Rom.8.1"),
+            ("1 Cor. 5:7", "1Cor.5.7"),
+            ("2 Thess. 3:10", "2Thess.3.10"),
+            ("1 Jn. 3:16", "1John.3.16"),
+            ("Rev. 22:2", "Rev.22.2"),
+        ]
+        for literal, target in cases:
+            with self.subTest(target=target):
+                p = self.section("Compare the passage ("+literal+").")
+                self.assertEqual(_unambiguous_explicit_modern_verse(p,target),literal)
+        self.assertIsNone(_unambiguous_explicit_modern_verse(
+            self.section("1 Jn. 3:16 is cited."),"John.3.16"))
+        self.assertIsNone(_unambiguous_explicit_modern_verse(
+            self.section("Rom 8:1 is not an accepted punctuated alias."),"Rom.8.1"))
+
+    def test_punctuated_abbreviated_ranges_preserve_original_targets(self):
+        p=self.section("See Rom. 8:1–4 and 1 Cor. 5:7–8.")
+        self.assertEqual(_unambiguous_explicit_modern_range(
+            p,"Rom.8.1-Rom.8.4"),"Rom. 8:1–4")
+        self.assertEqual(_unambiguous_explicit_modern_range(
+            p,"Bible:1Cor.5.7-1Cor.5.8"),"1 Cor. 5:7–8")
+        # No inference of a source range from two disjoint citations.
+        self.assertIsNone(_unambiguous_explicit_modern_range(
+            self.section("Compare Rom. 8:1 and Rom. 8:4."),
+            "Rom.8.1-Rom.8.4"))
+
     def test_original_target_identity_unapproved_or_ambiguous_skips(self):
         import types
         # A miniature, genuine-like one-group inventory. The method must
