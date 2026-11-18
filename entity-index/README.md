@@ -4,6 +4,37 @@
 hosted under Bible-Resources until a dedicated repository can be created. It
 does **not** publish or modify any existing SWORD resource or catalogue.
 
+## Workspace layout (post-v0.1 organization)
+
+```text
+entity-index/
+├── sources/               Original frozen source checkouts and provenance
+│   ├── checkout-acai.sh   Retrieve the exact ACAI source witness
+│   └── checkouts/         Local Git-ignored immutable checkouts
+├── work/                  BSI editorial work, audits and future working records
+├── links/                 Future compact dictionary/encyclopedia crosswalks
+│   ├── dictionaries/
+│   ├── encyclopedias/
+│   └── schema.v1.json
+├── source.lock.json       Locked original source revision + content fingerprint
+├── compile_index.py       Existing stable v0.1 build entry point
+└── ...                    Existing CI scripts and reviewed decisions
+```
+
+**Source and work are never mixed:** `sources/checkouts/acai/` contains the original immutable ACAI input; our derived data and code remain under `entity-index/`, with `work/` reserved for new editorial batches. The existing v0.1 root-level files remain at their tested paths to avoid breaking the published release and CI. See [work/README.md](work/README.md) for the current compatibility boundary.
+
+To retrieve the pinned ACAI source locally from the exact source lock:
+
+```bash
+bash entity-index/sources/checkout-acai.sh
+python3 -I entity-index/compile_index.py \
+  --source entity-index/sources/checkouts/acai \
+  --verify-source-commit \
+  --output entity-index/dist/index.json
+```
+
+The [links/](links/) area currently contains **no imported dictionary/encyclopedia matches**; its versioned schema prevents us from claiming automatic semantic identity based solely on Strong numbers or lemmas.
+
 ## Scope
 
 ACAI provides an initial *historical data witness*, not an unquestioned
