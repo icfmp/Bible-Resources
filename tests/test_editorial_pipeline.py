@@ -289,20 +289,26 @@ class EditorialPipelineTests(unittest.TestCase):
                                 triage_commentary_introduction_relocation)
         self.write(
             '<chapter sID="Gen.1" osisID="Gen.1" n="1"/>'
-            '<p>Original authorial preface and historical references.</p>'
+            '<p>Original authorial preface and historical references.'
+            '<note type="study" n="1">Note authored with intro.</note>'
+            '<reference osisRef="Gen.1.2">See Genesis.</reference></p>'
             '<verse sID="Gen.1.1" osisID="Gen.1.1" n="1"/>'
             '<p>First indexed body.</p>'
             '<verse eID="Gen.1.1"/><chapter eID="Gen.1"/>',
             kind="commentary")
         originals=source_commentary_introductions(self.source)
         native_i={
-            "Gen":b'<p>Original authorial preface and historical references.</p>',
+            "Gen":(b'<p>Original authorial preface and historical references.'
+                   b'<note type="study" n="1">Note authored with intro.</note>'
+                   b'<reference osisRef="Gen.1.2">See Genesis.</reference></p>'),
             "Gen.1":b'<p/>',
         }
         nat_k={"Gen.1.1":b"<p>First indexed body.</p>"}
         outcome=triage_commentary_introduction_relocation(originals,native_i,nat_k)
         self.assertEqual(
             outcome["counts"]["intro_word_stream_found_in_book_intro"],1)
+        self.assertEqual(outcome["counts"]["note_metadata_relocated_to_book_intro"],1)
+        self.assertEqual(outcome["counts"]["reference_metadata_relocated_to_book_intro"],1)
         self.assertEqual(outcome["bounded_source_scope_cases"][0]["source_intro"],"Gen.1")
         native_i["Gen"]=b"<p>Not the original preface.</p>"
         outcome=triage_commentary_introduction_relocation(originals,native_i,nat_k)
