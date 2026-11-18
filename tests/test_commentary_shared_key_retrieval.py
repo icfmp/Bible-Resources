@@ -9,7 +9,8 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from audit_osis import source_commentary_shared_key_retrieval_map
+from audit_osis import (source_commentary_shared_key_retrieval_map,
+                        source_commentary_reviewed_shared_key_plan)
 
 
 class SharedCommentaryScopeTests(unittest.TestCase):
@@ -85,6 +86,54 @@ class SharedCommentaryScopeTests(unittest.TestCase):
         ):
             with self.subTest(invalid=invalid[-1]),self.assertRaises(ValueError):
                 source_commentary_shared_key_retrieval_map(invalid,self.native)
+
+    def test_reviewed_index_keeps_only_real_authored_multiowners(self):
+        original=source_commentary_shared_key_retrieval_map(
+            self.groups,self.native)
+        revised=deepcopy(self.groups)
+        revised[0]["keys"]=tuple(f"Rom.4.{v}" for v in range(9,17))
+        revised[0]["sID"]="Rom.4.9-16"
+        candidate=source_commentary_shared_key_retrieval_map(revised,self.native)
+        self.assertEqual(candidate["original_shared_verse_keys"],1)
+        pin="a"*64
+        plan={
+            "schema_version":1,
+            "status":"RESEARCH_ONLY_PRIVATE_SCOPE_REVIEW",
+            "original_authoring_osis_sha256":pin,
+            "retain_original_overlaps":[{
+                "bible_verse_key":"Rom.4.17",
+                "evidence_url":"https://example.org/independent-half-verse-index",
+            }],
+        }
+        result=source_commentary_reviewed_shared_key_plan(
+            original,candidate,plan,pinned_original_sha256=pin)
+        self.assertEqual(result["original_syntactic_shared_verses"],2)
+        self.assertEqual(result["compiled_source_shared_verses"],1)
+        self.assertEqual(result["retained_original_intra_verse_boundaries"],1)
+        self.assertEqual(result["reader_multiowner_verse_count"],2)
+        self.assertEqual(result["non_reader_shared_source_index_ranges"],0)
+        members={v["bible_verse_key"]:v for v in
+                 result["reader_multiowner_verses"]}
+        self.assertEqual(members["Rom.4.17"]["native_retrieval_keys_in_authorial_order"],
+                         ["Rom.4.9","Rom.4.17"])
+        self.assertEqual(members["2Chr.1.1"]["native_retrieval_keys_in_authorial_order"],
+                         ["2Chr.1.1"])
+        self.assertEqual(members["2Chr.1.1"]["ownership_basis"],
+                         "PRESENT_IN_COMPILED_SOURCE_MULTIOWNER")
+        for invalid in (
+            dict(plan,retain_original_overlaps=[
+                {"bible_verse_key":"Rom.4.18","evidence_url":"https://a.org"}]),
+            dict(plan,retain_original_overlaps=[
+                {"bible_verse_key":"2Chr.1.1","evidence_url":"https://a.org"}]),
+            dict(plan,original_authoring_osis_sha256="b"*64),
+            dict(plan,retain_original_overlaps=[
+                plan["retain_original_overlaps"][0],
+                plan["retain_original_overlaps"][0]]),
+        ):
+            with self.subTest(invalid=invalid),self.assertRaises(ValueError):
+                source_commentary_reviewed_shared_key_plan(
+                    original,candidate,invalid,pinned_original_sha256=pin)
+        self.assertNotIn("L'interprétation",json.dumps(result))
 
     def test_nonoverlapping_source_has_no_synthetic_shared_verse(self):
         a=[self.groups[0],dict(self.groups[1],keys=("Rom.4.18",),
