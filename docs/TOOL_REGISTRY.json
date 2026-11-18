@@ -254,6 +254,40 @@
       ]
     },
     {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [],
+      "has_direct_tests_by_filename": false,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/build_place_context.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Acquire source-backed context for explicit OpenBible modern-site identities.",
+      "python_imports": [
+        "argparse",
+        "datetime",
+        "hashlib",
+        "html",
+        "json",
+        "pathlib",
+        "re",
+        "urllib"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "9190e3437e120a5dab996eeae8fa7e111885bdf9e32122d29bf1c97a487468b0",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "publication/release",
+      "static_reference_count": 4,
+      "static_references": [
+        "scripts/build.py",
+        "scripts/prepare_place_manifest.py",
+        "docs/PLACE_CONTEXT.md",
+        "tests/test_place_context.py"
+      ]
+    },
+    {
       "classification": "KEEP_GENERIC",
       "confidence": "high",
       "entrypoint_hint": "CLI or __main__ present",
@@ -309,40 +343,6 @@
         "tests/test_place_context.py",
         "tests/test_repository.py",
         "tests/test_tool_registry.py"
-      ]
-    },
-    {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [],
-      "has_direct_tests_by_filename": false,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/build_place_context.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Acquire source-backed context for explicit OpenBible modern-site identities.",
-      "python_imports": [
-        "argparse",
-        "datetime",
-        "hashlib",
-        "html",
-        "json",
-        "pathlib",
-        "re",
-        "urllib"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "9190e3437e120a5dab996eeae8fa7e111885bdf9e32122d29bf1c97a487468b0",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "publication/release",
-      "static_reference_count": 4,
-      "static_references": [
-        "scripts/build.py",
-        "scripts/prepare_place_manifest.py",
-        "docs/PLACE_CONTEXT.md",
-        "tests/test_place_context.py"
       ]
     },
     {
@@ -499,6 +499,40 @@
         "tests/test_provider_parity.py",
         "tests/test_source_selection.py",
         "tests/test_updates.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
+        "OSIS"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/clean_source_osis.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Review and conservatively clean source OSIS without altering its edition.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "collections",
+        "hashlib",
+        "json",
+        "lxml",
+        "pathlib",
+        "re"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "ea3ada7250cd28c7940154313893138e0f3a5430d95483fdd07388cc7936f9fa",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 2,
+      "static_references": [
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
+        "tests/test_clean_source_osis.py"
       ]
     },
     {
@@ -4670,6 +4704,45 @@
       ]
     },
     {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
+        "zCom4",
+        "OSIS"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/rebuild_osis_commentary.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Recompile pinned, original OSIS commentary as private native SWORD.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "collections",
+        "hashlib",
+        "json",
+        "os",
+        "pathlib",
+        "re",
+        "shutil",
+        "subprocess",
+        "sword_native_raw_corpus_inventory",
+        "xml"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "7dd9b99aeeb76885ccbb1c2eb3d275695e165a2c86903e53a1fc76ee2d555836",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "publication/release",
+      "static_reference_count": 2,
+      "static_references": [
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
+        "tests/test_rebuild_osis_commentary.py"
+      ]
+    },
+    {
       "classification": "KEEP_GENERIC",
       "confidence": "high",
       "entrypoint_hint": "CLI or __main__ present",
@@ -6008,36 +6081,6 @@
       ]
     },
     {
-      "classification": "UNDECIDED",
-      "confidence": "low",
-      "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/stage4_subcheck_receipts.py",
-      "proposed_action": "Review source and callers before changing lifecycle.",
-      "purpose_first_line": "Versioned, content-free source/native Bible stage-4 subcheck receipts.",
-      "python_imports": [
-        "__future__",
-        "hashlib",
-        "json",
-        "re"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "de996718ad9f30616a9f7f3a966b58123c7e5f0aa653f1b44cdd915cf3af93e1",
-      "side_effects": "unknown; inspect CLI and subprocesses before use",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "not determined",
-      "static_reference_count": 4,
-      "static_references": [
-        "scripts/bible_stage_runner.py",
-        ".github/workflows/bible-staged-audit.yml",
-        "tests/test_stage4_receipt_replay.py",
-        "tests/test_stage4_subcheck_receipts.py"
-      ]
-    },
-    {
       "classification": "HISTORICAL/ARCHIVE",
       "confidence": "medium",
       "entrypoint_hint": "CLI or __main__ present",
@@ -6113,6 +6156,36 @@
       "static_references": [
         ".github/workflows/stage-stock-commentary.yml",
         "tests/test_compiled_stock_commentary_proof.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/stage4_subcheck_receipts.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Versioned, content-free source/native Bible stage-4 subcheck receipts.",
+      "python_imports": [
+        "__future__",
+        "hashlib",
+        "json",
+        "re"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "de996718ad9f30616a9f7f3a966b58123c7e5f0aa653f1b44cdd915cf3af93e1",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 4,
+      "static_references": [
+        "scripts/bible_stage_runner.py",
+        ".github/workflows/bible-staged-audit.yml",
+        "tests/test_stage4_receipt_replay.py",
+        "tests/test_stage4_subcheck_receipts.py"
       ]
     },
     {
@@ -6278,7 +6351,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 14,
+      "static_reference_count": 15,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/commentary-anchor-parity.yml",
@@ -6286,6 +6359,7 @@
         ".github/workflows/commentary-mhc-private-jsword.yml",
         ".github/workflows/commentary-mhc-private-xiphos.yml",
         ".github/workflows/commentary-mhc-source-text.yml",
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/commentary-native-raw-corpus.yml",
         ".github/workflows/commentary-private-candidate-xiphos-gui.yml",
         ".github/workflows/commentary-private-text-compare.yml",
@@ -6395,6 +6469,68 @@
       ]
     },
     {
+      "classification": "KEEP_GENERIC",
+      "confidence": "high",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/sword_native_raw_corpus_inventory.py",
+      "proposed_action": "Retain stable verified interface; extend test fixtures.",
+      "purpose_first_line": "Hash every actual native stock-SWORD raw entry without exposing Bible text.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "collections",
+        "hashlib",
+        "io",
+        "json",
+        "os",
+        "pathlib",
+        "re",
+        "stable_sword_refs",
+        "subprocess",
+        "sword_native_inventory",
+        "tempfile"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "52f4fff324f7f084fa0fca6348bcfffb02f711684404f5cd525acaf5e4a7b3ba",
+      "side_effects": "consult the documented core tool contract",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "source/native audit",
+      "static_reference_count": 27,
+      "static_references": [
+        "scripts/commentary_anchor_parity.py",
+        "scripts/commentary_android_text_witness.py",
+        "scripts/commentary_native_raw_inventory.py",
+        "scripts/commentary_osis_intro_transport_probe.py",
+        "scripts/commentary_osis_mixed_transport_probe.py",
+        "scripts/commentary_osis_transport_probe.py",
+        "scripts/commentary_private_text_compare.py",
+        "scripts/commentary_section_scope_audit.py",
+        "scripts/commentary_source_erratum_compiled_probe.py",
+        "scripts/commentary_stock_candidate.py",
+        "scripts/commentary_xiphos_dual_reader.py",
+        "scripts/commentary_xiphos_heading_probe.py",
+        "scripts/real_second_bible_probe.py",
+        "scripts/rebuild_osis_commentary.py",
+        "scripts/source_native_maintext_probe.py",
+        "scripts/tool_registry.py",
+        ".github/workflows/commentary-editorial-section-scope.yml",
+        ".github/workflows/commentary-mhc-source-text.yml",
+        ".github/workflows/commentary-zcom-andbible-android.yml",
+        ".github/workflows/second-bible-proof.yml",
+        ".github/workflows/validate.yml",
+        "docs/NATIVE_SWORD_WHOLE_CORPUS.md",
+        "docs/SOURCE_NATIVE_MAIN_TEXT.md",
+        "tests/test_commentary_native_raw_inventory.py",
+        "tests/test_commentary_osis_intro_transport_probe.py",
+        "tests/test_source_native_maintext_probe.py",
+        "tests/test_sword_native_raw_corpus_inventory.py"
+      ]
+    },
+    {
       "classification": "UNDECIDED",
       "confidence": "low",
       "entrypoint_hint": "library, native helper or workflow-invoked",
@@ -6428,67 +6564,6 @@
         ".github/workflows/validate.yml",
         "docs/NATIVE_SWORD_WHOLE_CORPUS.md",
         "docs/SOURCE_NATIVE_MAIN_TEXT.md"
-      ]
-    },
-    {
-      "classification": "KEEP_GENERIC",
-      "confidence": "high",
-      "entrypoint_hint": "CLI or __main__ present",
-      "format_signals_not_certified_support": [],
-      "has_direct_tests_by_filename": true,
-      "owner": "Bible Resources maintainers",
-      "path": "scripts/sword_native_raw_corpus_inventory.py",
-      "proposed_action": "Retain stable verified interface; extend test fixtures.",
-      "purpose_first_line": "Hash every actual native stock-SWORD raw entry without exposing Bible text.",
-      "python_imports": [
-        "__future__",
-        "argparse",
-        "collections",
-        "hashlib",
-        "io",
-        "json",
-        "os",
-        "pathlib",
-        "re",
-        "stable_sword_refs",
-        "subprocess",
-        "sword_native_inventory",
-        "tempfile"
-      ],
-      "reader_tool_signals": [],
-      "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "52f4fff324f7f084fa0fca6348bcfffb02f711684404f5cd525acaf5e4a7b3ba",
-      "side_effects": "consult the documented core tool contract",
-      "source_sha_requirement": "must be separately checked; static scan is not proof",
-      "stage_hint": "source/native audit",
-      "static_reference_count": 26,
-      "static_references": [
-        "scripts/commentary_anchor_parity.py",
-        "scripts/commentary_android_text_witness.py",
-        "scripts/commentary_native_raw_inventory.py",
-        "scripts/commentary_osis_intro_transport_probe.py",
-        "scripts/commentary_osis_mixed_transport_probe.py",
-        "scripts/commentary_osis_transport_probe.py",
-        "scripts/commentary_private_text_compare.py",
-        "scripts/commentary_section_scope_audit.py",
-        "scripts/commentary_source_erratum_compiled_probe.py",
-        "scripts/commentary_stock_candidate.py",
-        "scripts/commentary_xiphos_dual_reader.py",
-        "scripts/commentary_xiphos_heading_probe.py",
-        "scripts/real_second_bible_probe.py",
-        "scripts/source_native_maintext_probe.py",
-        "scripts/tool_registry.py",
-        ".github/workflows/commentary-editorial-section-scope.yml",
-        ".github/workflows/commentary-mhc-source-text.yml",
-        ".github/workflows/commentary-zcom-andbible-android.yml",
-        ".github/workflows/second-bible-proof.yml",
-        ".github/workflows/validate.yml",
-        "docs/NATIVE_SWORD_WHOLE_CORPUS.md",
-        "docs/SOURCE_NATIVE_MAIN_TEXT.md",
-        "tests/test_commentary_native_raw_inventory.py",
-        "tests/test_commentary_osis_intro_transport_probe.py",
-        "tests/test_source_native_maintext_probe.py",
-        "tests/test_sword_native_raw_corpus_inventory.py"
       ]
     },
     {
