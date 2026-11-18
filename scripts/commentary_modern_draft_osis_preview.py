@@ -360,6 +360,14 @@ def same_scripture_reference_book_word(
                 previous=codes.setdefault(word,osis)
                 if previous!=osis:
                     raise ValueError("Ambiguous single-word biblical book alias")
+    # Conventional two-letter Bible reference names: Jr=Jeremiah and
+    # Mi=Micah are independently attested in the SWORD Bible locale
+    # abbreviation tables. They are names, never arbitrary text rewrites.
+    short_book_names={"jr":"Jer","mi":"Mic"}
+    for alias,osis in short_book_names.items():
+        if alias in codes and codes[alias]!=osis:
+            raise ValueError("Legacy Bible abbreviation has multiple meanings")
+        codes[alias]=osis
     a=witness_token.casefold()
     b=native_token.casefold()
     if a==b:
