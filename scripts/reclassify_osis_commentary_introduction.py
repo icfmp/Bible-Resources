@@ -72,6 +72,22 @@ def repair_private_bytes(raw: bytes, plan: dict) -> tuple[bytes, dict]:
     intro_div = intro_p.getparent()
     leading_p = begin.getparent()
     book = leading_p.getparent()
+    if book is None:
+        raise IntroRepairError("Unattached source intro")
+    book_children=list(book)
+    if leading_p not in book_children or intro_div not in book_children:
+        raise IntroRepairError("Intro paragraph and division have different owners")
+    first=book_children.index(leading_p)
+    last=book_children.index(intro_div)
+    between=book_children[first+1:last]
+    # Source may contain several consecutive introductory paragraphs before
+    # its existing div introduction. None may contain an unrelated verse.
+    if (last <= first or any(
+            not isinstance(n.tag,str) or _local(n)!="p"
+            or any(_local(e)=="verse" for e in n.iter()
+                   if isinstance(e.tag,str))
+            for n in between)):
+        raise IntroRepairError("Nonintroductory content divides the original preface")
     if (not all(isinstance(node.tag, str) for node in
                 (intro_p, intro_div, leading_p, book))
             or _local(leading_p) != "p"
@@ -84,7 +100,6 @@ def repair_private_bytes(raw: bytes, plan: dict) -> tuple[bytes, dict]:
             or _local(book) != "div"
             or book.get("type") != "book"
             or book.get("osisID") != m.group(1)
-            or leading_p.getnext() is not intro_div
             or len(intro_div) != 1
             or intro_div[0] is not intro_p
             or not len(intro_p)
@@ -208,7 +223,8 @@ def repair_private_bytes(raw: bytes, plan: dict) -> tuple[bytes, dict]:
                       and x.get("type") == "introduction"
                       and x.sourceline >= leading_p.sourceline - 2
                       and x.sourceline <= intro_div.sourceline), None)
-    if (new_intro is None or len(new_intro) != 2
+    if (new_intro is None or len(new_intro) != len(between)+2
+            or any(_local(n)!="p" for n in new_intro)
             or rewritten_start[0].getparent() is new_intro
             or new_intro.getparent().get("osisID") != m.group(1)):
         raise IntroRepairError("Semantic introduction still contains verse commentary")
