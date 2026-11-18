@@ -307,32 +307,6 @@ also require a distinct pinned-source completeness and traditional epistle
 subscription review (see inherited #86). Variant provenance is therefore
 retained for later source-specific qualification.
 
-## Epistle-ending traditional subscriptions: source-aware classification
-
-The [21-epistle original-word audit](https://github.com/icfmp/Bible-Resources/pull/315)
-found 69 distinct unanchored or edition-absent ACAI record/verse candidates.
-A source-pinned review now qualifies **63** of these as
-`traditional_subscription_candidate` in
-[source-reference-qualifications.json](source-reference-qualifications.json)
-(10 earlier + 53 newly collated). The historical
-[King James epistle subscription list](https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450) documents
-added locations, addressees and letter carriers. Such notes are
-**editorial paratext**, not canonical SBLGNT words, and their historical
-accuracy cannot be presumed.
-
-The **six remaining candidates** are `person:Christ` and
-`person:Jesus.2` at Romans 16:25/27 and 2 Corinthians 13:14.
-These instead belong to the original-language edition's
-doxology apparatus / 2 Corinthians 13:13 alternative versification,
-as already qualified in
-[source-unattested-verses.json](source-unattested-verses.json).
-They must not be misclassified as postscript personnel or locations.
-
-Original frozen ACAI references, original-word assignments, Bible text and
-entity identities remain untouched. CI rechecks every annotated postscript
-claim against the independent source-defined final-verse candidate inventory,
-and keeps the other six contexts visibly separate.
-
 ## Original-source lexical lemma diagnostics (not imported)
 
 The inherited [ACAI #100](https://github.com/icfmp/ACAI/issues/100)
@@ -494,21 +468,25 @@ from the source word IDs, without inventing an English/traditional
 versification table.
 
 This produces `dist/epistle-ending-review.json` as a private
-source-audit artifact, distinguishing a source-present final verse
-without a record's word anchor from a final-chapter source-absent
-verse reference. CI independently reconciles our **10 already
-qualified traditional-subscription *candidates*** to actual source
-audit rows. For this locked source revision, the complete audit finds
-**79 records referencing a last attested letter verse**,
-**35 records / 52 unanchored last-verse claims**, plus
-**17 source-absent last-chapter references from 12 records**.
-These make **69 distinct candidate record/verse pairs**. Only **10**
-have explicit source-specific traditional-subscription qualifications;
-**59 remain unreviewed**. Other candidate records remain **unreviewed** until a
-pinned text and historical-subscription witness are checked: a record
-without a word anchor could be an implied participant, valid indirect
-claim, different edition, or inaccurate original attribution, and it
-must not be mechanically deleted or automatically called a postscript.
+source-audit artifact, distinguishing an attested final verse without a
+record's direct word/referent anchor from a final-chapter verse reference
+absent in the pinned source edition. For this locked source revision,
+the full audit finds **79 records referring to a last attested letter
+verse**, **35 records / 52 unanchored last-verse references** and
+**17 source-absent final-chapter references from 12 records**.
+These total **69 distinct candidate record/verse pairs**.
+
+We have now collated the later
+[King James epistle subscription witness](https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450)
+with each exact candidate pair: **63** are qualified as possible
+traditional-subscription claims (the original 10 plus 53 additional),
+not as words in the canonical Greek verse or as verified historical
+assertions. The remaining **six** involve `person:Christ` and
+`person:Jesus.2` at Romans 16:25/27 and 2 Corinthians 13:14:
+their source text belongs to the separately classified doxology
+apparatus / alternate-versification evidence, **not** to a traditional
+carrier/location postscript. CI ensures all 69 pairs remain accounted
+for. A record without a word anchor must never be mechanically deleted.
 
 No Scriptural reference, original word, verse number or original
 source biography is changed by this process.
@@ -558,7 +536,7 @@ Scripture rewrite or an identity correction**. See
 A verse reference can have editorial or historical interest without a matching
 word in the *specific pinned Greek edition* used for lexical navigation.
 The independent `source-reference-qualifications.json` manifest records
-**12 audited source-record/verse claims**, with the exact source record,
+**65 audited source-record/verse claims**, with the exact source record,
 verse, pinned edition, classification and written evidence:
 
 - **2** alternate textual reading/identification cases:
@@ -566,14 +544,18 @@ verse, pinned edition, classification and written evidence:
   and `place:Trogyllium` (Acts 20:15, absent as a name in pinned SBLGNT).
   These are **not deleted** and are not misrepresented as SBLGNT word hits.
   They remain candidates for a separately sourced textual tradition.
-- **10** named **traditional subscription candidates** drawn from the
-  validated sample in inherited [ACAI #86](https://github.com/icfmp/ACAI/issues/86):
-  Phoebe, Cenchreae, Corinthus, Achaicus, Fortunatus, Epaphroditus,
-  Philemon, Nero, the Caesar.3 alias, and Pacatiana. The names are not
-  attested by the relevant SBLGNT letter-final verse, even though
-  traditional subscriptions may contain them. The designation
-  *candidate* distinguishes this diagnostic from a full critical edition
-  of every letter's subscription history.
+- **63** historical **traditional-subscription candidates**, comprising
+  10 initial individually audited examples from inherited
+  [ACAI #86](https://github.com/icfmp/ACAI/issues/86) and 53 further
+  exact record/verse claims matched against the inherited final-verse
+  audit and the documented KJV subscription tradition. These include
+  letter recipients, traditional places of writing, letter carriers
+  and other named people. They are **later paratext**, not statements
+  in the pinned SBLGNT canonical last verse or proven historical facts.
+  Manuscript-level attribution remains a separate editorial task.
+  The remaining six final-letter candidate claims concern Jesus/Christ
+  in source-edition-apparatus and alternative-versification contexts,
+  as described above, not such postscript material.
 
 Each claim is attached **only** to the original record and verse for which
 the source reference already exists. The builder rejects missing source
@@ -584,7 +566,7 @@ is a corpus+verse keyed evidence index. It **does not** alter the original
 `references`, `key_references`, word groups, Bible text or versification.
 It also does not imply the entire 6,641-entry dataset has been reviewed.
 
-Further full-epistle subscription and variant-source checks remain tracked
+Further manuscript-level subscription and variant-source checks remain tracked
 in [#299](https://github.com/icfmp/Bible-Resources/issues/299).
 
 ## Offline lookup and uncertainty handling
