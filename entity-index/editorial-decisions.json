@@ -756,6 +756,44 @@
         "Pinned WLC 2 Kings 14:13 first Jehoash o120140130061 is the father of Amaziah; second o120140130101 is the Israelite king",
         "Frozen ACAI person:Jehoash.2 primary_id=person:Joash.4, originally pointing to first name token"
       ]
+    },
+    {
+      "source_id": "person:Marymagdalene",
+      "action": "amend_occurrences",
+      "remove_pronominal_referents": {
+        "SBLGNT": [
+          [
+            "n40027061009"
+          ],
+          [
+            "n40028001015"
+          ]
+        ]
+      },
+      "reason": "Matthew 27:61 and 28:1 each distinguish Mary Magdalene from the other Mary. The singular Greek adjective ἄλλη ('other') at both exact tokens qualifies Mary.2 (the mother of James/Joses), not Mary Magdalene. Preserve Magdalene's separate explicit name instances, both original references and the other Mary's inherited candidates; remove only two false Magdalene pronoun-word associations.",
+      "evidence": [
+        "Pinned Macula SBLGNT Mt 27:61 n40027061009 ἄλλη A-NSF and Mt 28:1 n40028001015 ἄλλη A-NSF; exact source occurrences assigned in frozen ACAI to person:Marymagdalene and person:Mary.2",
+        "Matthew 27:61 names Mary Magdalene and the other Mary as different women; 28:1 repeats the same distinction",
+        "https://biblehub.com/interlinear/matthew/27-61.htm",
+        "https://biblehub.com/interlinear/matthew/28-1.htm"
+      ]
+    },
+    {
+      "source_id": "person:GenericSon",
+      "action": "amend_occurrences",
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o120040010012"
+          ]
+        ]
+      },
+      "reason": "2 Kings 4:1 uses the feminine singular Hebrew אִשָּׁה ('a woman') at o120040010012 to name the widow, not an unnamed son. The same verse separately mentions sons of prophets and her two children with other exact Hebrew tokens; without resolving those distinct child roles, remove only this demonstrably false source word from GenericSon. Preserve the source verse reference and original record; do not fabricate a replacement child word or merge the widow and her sons.",
+      "evidence": [
+        "Pinned Macula WLC 2 Kings 4:1 o120040010012 feminine noun 'woman' Ncfsa; other genuine plural child terms o120040010041 ('sons') and o120040010261 ('children') are distinct source tokens",
+        "https://github.com/Clear-Bible/macula-hebrew/blob/47db250bd55d0d8577f2a94fba114ef16c35b23c/WLC/lowfat/12-2Ki-004-lowfat.xml",
+        "Frozen ACAI person:GenericSon incorrectly claims the woman word; person:Widow has two original repeated singleton subject groups for the same word, preserved untouched"
+      ]
     }
   ]
 }

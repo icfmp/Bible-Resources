@@ -156,6 +156,38 @@ class EntityIndexTests(unittest.TestCase):
             {"entity_id":"person:Speaker","link_type":"subject_referents"}])
         self.assertEqual((speaker.read_bytes(),listener.read_bytes()),before)
 
+    def test_other_mary_word_not_magdalene_and_widow_not_son(self):
+        other=self.write_record("people","OtherMary",references=["40027061"],
+            pronominal_referents={"SBLGNT":[["n40027061009"]]})
+        magdalene=self.write_record("people","Magdalene",
+            references=["40027061"],pronominal_referents={
+                "SBLGNT":[["n40027061009"]]})
+        widow=self.write_record("people","Widow",references=["12004001"],
+            subject_referents={"wlc":[["o120040010012"],["o120040010012"]]})
+        son=self.write_record("people","Son",references=["12004001"],
+            subject_referents={"wlc":[["o120040010012"]]})
+        originals=[p.read_bytes() for p in (other,magdalene,widow,son)]
+        corrected=self.build([
+            {"source_id":"person:Magdalene","action":"amend_occurrences",
+             "reason":"Other woman is a separate named Mary",
+             "evidence":["Pinned exact Greek adjective word"],
+             "remove_pronominal_referents":{"SBLGNT":[["n40027061009"]]}},
+            {"source_id":"person:Son","action":"amend_occurrences",
+             "reason":"Woman has feminine noun, not a son",
+             "evidence":["Pinned Hebrew noun morphology"],
+             "remove_subject_referents":{"wlc":[["o120040010012"]]}},
+        ])
+        self.assertEqual(corrected["by_word"]["sblgnt:n40027061009"],[
+            {"entity_id":"person:OtherMary","link_type":"pronominal_referents"}])
+        self.assertEqual(corrected["by_word"]["wlc:o120040010012"],[
+            {"entity_id":"person:Widow","link_type":"subject_referents"}])
+        widow_entry=next(x for x in corrected["entities"]
+                         if x["id"]=="person:Widow")
+        self.assertEqual(widow_entry["occurrences"]["subject_referents"]
+                         ["wlc"],[["o120040010012"],["o120040010012"]])
+        self.assertEqual([p.read_bytes() for p in
+                          (other,magdalene,widow,son)],originals)
+
     def test_same_verse_two_kings_with_same_name_preserves_both(self):
         """Two same-name men in one verse cannot be distinguished by lemma."""
         father = self.write_record(
