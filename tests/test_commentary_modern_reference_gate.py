@@ -833,10 +833,10 @@ class ExactSingleVerseSourceConcordanceTests(unittest.TestCase):
                     self.section(verse),target,source_label))
 
     def test_source_label_autolink_requires_explicit_opt_in(self):
-        n=self.section("Paul makes this point in Rom. 3:23.")
+        n=self.section("Paul makes this point in Rom 3:23.")
         native={"chapters":{"Gen.2":{"original_units":[{
             "first_key":"Gen.2.1","keys":["Gen.2.1","Gen.2.2"]}]}}}
-        refs={"Gen.2.1":[("Bible:Rom.3.23","Rom. 3:23")]}
+        refs={"Gen.2.1":[("Bible:Rom.3.23","Rom 3:23")]}
         modern={"Gen.2":ET.Element(f"{{{self.NS}}}chapter")}
         modern["Gen.2"].append(n)
         ordinary,_=_auto_single_verse_placements(
@@ -851,8 +851,8 @@ class ExactSingleVerseSourceConcordanceTests(unittest.TestCase):
         self.assertEqual(fallback[0]["action"],
                          "AUTO_UNIQUE_AUTHENTIC_ORIGINAL_SINGLE_VERSE_LABEL")
         self.assertEqual(fallback[0]["expected_modern_target"],"Rom.3.23")
-        repeated={"Gen.2.1":[("Bible:Rom.3.23","Rom. 3:23"),
-                             ("Matt.5.3","Rom. 3:23")]}
+        repeated={"Gen.2.1":[("Bible:Rom.3.23","Rom 3:23"),
+                             ("Matt.5.3","Rom 3:23")]}
         fallback,_=_auto_single_verse_placements(
             private_original=repeated,groups={},modern_chapters=modern,
             native=native,blocked=set(),corrections={},
