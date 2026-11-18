@@ -275,6 +275,136 @@ jobs:
           print("STOCK_TO_CURATED_SOURCE_WITNESS_DIFFERENCES "+json.dumps(differences))
           assert not differences,"Historic original-stock witness evidence differs from curated edition"
           PY
+      - name: Collate four exact CCEL ThML authored sections against two authentic native K groups
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          curl --fail --location --silent --show-error --retry 2 --max-time 120 \
+            'https://www.ccel.org/ccel/h/henry/mhcc.xml' \
+            --output "$RUNNER_TEMP/mhcc-independent-ccel.xml"
+          printf '%s  %s\n' \
+            '4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6' \
+            "$RUNNER_TEMP/mhcc-independent-ccel.xml" | sha256sum -c -
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import re
+          import subprocess
+          import sys
+          sys.path.insert(0,"scripts")
+          from commentary_private_text_compare import (
+              _original_source_markers,raw_as_strict_xml_text)
+          from commentary_nonlink_word_alignment import plain_word_alignment
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+
+          temp=Path(os.environ["RUNNER_TEMP"])
+          raw_xml=(temp/"mhcc-independent-ccel.xml").read_bytes()
+          assert len(raw_xml)==7952268
+          assert hashlib.sha256(raw_xml).hexdigest()==(
+              "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6")
+          units,full_metadata=_original_source_markers(raw_xml)
+          # Each tuple is one actually authored CCEL ThML scripCom section,
+          # its original declared end, and the *existing* compiled native K
+          # raw body it may or may not be represented within. Selection is
+          # a bounded review scope, not an encoding or versification rule.
+          selection=[
+              ("1Sam.25.32","1Sam.25.39","1Sam.25.32","1Sam.25.44"),
+              ("1Sam.25.39","1Sam.25.44","1Sam.25.32","1Sam.25.44"),
+              ("Ps.95.1","Ps.95.7","Ps.95.1","Ps.95.11"),
+              ("Ps.95.7","Ps.95.11","Ps.95.1","Ps.95.11"),
+          ]
+          original=json.loads((temp/"mhcc-modern-whole-canon-native-receipt.json").read_text())
+          assert original["original_compiled_corpus_sha256"]==(
+              "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e")
+          need={k for _s,_e,k,last in selection for k in (k,last)}
+          stored={}
+          def on_entry(kind,key,raw):
+              if kind=="K" and key in need:
+                  if key in stored:
+                      raise ValueError("Duplicate original K key in exact source")
+                  stored[key]=raw
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str((temp/"mhcc-source-root").resolve())
+          proc=subprocess.Popen(
+              [str((temp/"commentary-modern-source-raw").resolve()),"MHCC"],
+              stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,env=env)
+          try:
+              counters,*_=parse_native_raw_corpus(proc.stdout,on_entry=on_entry)
+              proc.stdout.close()
+              if proc.wait(timeout=30)!=0:
+                  raise ValueError("Native source reader failed")
+          finally:
+              if proc.poll() is None:
+                  proc.kill();proc.wait()
+          assert counters["all_native_raw_entries_ordered_sha256"]==original[
+              "original_compiled_corpus_sha256"]
+          assert set(stored)==need
+          rows=[]
+          for source_key,source_end,native_first,native_last in selection:
+              matched=[u for u in units.get(source_key,[]) if
+                       u["private_original_declared_range_end_key"]==source_end]
+              if len(matched)!=1:
+                  raise ValueError("CCEL exact authored source section is ambiguous or missing: "+source_key)
+              u=matched[0]
+              chapter=native_first.rsplit(".",1)[0]
+              native_groups=original["chapters"][chapter]["original_units"]
+              group=[x for x in native_groups if
+                     x["first_key"]==native_first and x["keys"][-1]==native_last]
+              if len(group)!=1:
+                  raise ValueError("Authentic compiled original source unit mismatched")
+              raw=stored[native_first]
+              if raw!=stored[native_last] or hashlib.sha256(raw).hexdigest()!=group[0]["source_unit_sha256"]:
+                  raise ValueError("Source body not linked/attested as one native K unit")
+              native_text=raw_as_strict_xml_text(raw)
+              if native_text is None:raise ValueError("Native source XML unparseable")
+              if hashlib.sha256(u["original_text"].encode()).hexdigest()!=u["original_text_sha256"]:
+                  raise ValueError("Original source ThML text SHA changed")
+              original_words=re.findall(r"\w+",u["original_text"].casefold())
+              compiled_words=re.findall(r"\w+",native_text.casefold())
+              alignment=plain_word_alignment(original_words,compiled_words)
+              assert alignment["exact_unicode_longest_common_subsequence_word_count"] is not None
+              rows.append({
+                  "original_ccel_scripCom_start":source_key,
+                  "original_ccel_scripCom_end":source_end,
+                  "ccel_original_source_line":u["original_source_line"],
+                  "source_text_sha256":u["original_text_sha256"],
+                  "source_original_word_tokens":len(original_words),
+                  "compiled_native_first_key":native_first,
+                  "compiled_native_last_key":native_last,
+                  "source_compiled_group_sha256":group[0]["source_unit_sha256"],
+                  "compiled_source_word_tokens":len(compiled_words),
+                  "ordered_exact_unicode_word_alignment":alignment,
+                  "original_source_body_or_markup_emitted":False,
+                  "source_edition_parity_or_redistribution_approved":False,
+              })
+              print("PRIVATE_CCEl_WORD_ALIGNMENT "+json.dumps({
+                  "section":source_key+"-"+source_end,
+                  "native_key":native_first+"-"+native_last,
+                  "source_words":len(original_words),
+                  "native_words":len(compiled_words),
+                  "lcs":alignment["exact_unicode_longest_common_subsequence_word_count"],
+                  "longest_contiguous_shared_words":alignment["exact_unicode_longest_contiguous_shared_word_run_count"],
+                  "source_unmatched":alignment["original_plain_words_not_matched_in_exact_order"],
+              },sort_keys=True))
+          output={
+              "status":"PRIVATE_TWO_CHAPTER_FULL_CCEl_AUTHORIAL_SECTION_TO_NATIVE_WORD_ALIGNMENT_NOT_EDITION_PARITY",
+              "original_ccel_sha256":"4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+              "original_native_mhcc_0_1_1_sha256":original["original_compiled_corpus_sha256"],
+              "ccel_source_chapter_or_book_intro_prose_counted":False,
+              "sections_selected":len(rows),
+              "no_compiled_or_original_prose_exported":True,
+              "full_authorial_markup_equivalence_approved":False,
+              "redistribution_approved":False,
+              "rows":rows,
+          }
+          (temp/"mhcc-two-ccel-to-native-section-word-alignment.json").write_text(
+              json.dumps(output,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+          assert len(rows)==4
+          print("PRIVATE_CCEl_NATIVE_SECTION_AUDIT complete metadata-only 4 sections; not editorial signoff")
+          PY
       - name: Screen all modern manuscript outline tables for out-of-order source ranges
         shell: bash
         run: |
@@ -1128,6 +1258,7 @@ jobs:
             ${{ runner.temp }}/mhcc-modern-five-native-source-witness-probes.json
             ${{ runner.temp }}/mhcc-crosswire-five-native-source-receipt.json
             ${{ runner.temp }}/mhcc-crosswire-five-native-witness-probes.json
+            ${{ runner.temp }}/mhcc-two-ccel-to-native-section-word-alignment.json
             ${{ runner.temp }}/mhcc-modern-historical-69-translation-coverage.json
             ${{ runner.temp }}/mhcc-modern-full-canon-source-group-diagnostic.json
             ${{ runner.temp }}/mhcc-ionly-preview-report.json
