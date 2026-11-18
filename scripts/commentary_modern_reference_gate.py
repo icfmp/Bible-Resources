@@ -2169,6 +2169,67 @@ def build_private_compact_original_crossrefs(
             if node.tail:
                 yield node,"tail",node.tail
 
+    def projected_slots(paragraph):
+        """Read one authored paragraph, retaining exact XML text-slot offsets.
+
+        Existing hyperlinks supply *context* but their own verse digits are
+        never eligible for a second, nested link.
+        """
+        chunks=[]
+        parts=[]
+        cursor=0
+
+        def emit(node, attr, linked):
+            nonlocal cursor
+            val=getattr(node,attr)
+            if isinstance(val,str) and val:
+                chunks.append((cursor,cursor+len(val),node,attr,linked,val))
+                parts.append(val)
+                cursor+=len(val)
+        def walk(node, inside_link=False):
+            own_link=(node.tag==f"{{{NS}}}reference")
+            emit(node,"text",inside_link or own_link)
+            for child in node:
+                walk(child,inside_link or own_link)
+                emit(child,"tail",inside_link)
+        walk(paragraph)
+        return "".join(parts),chunks
+
+    def inherited_book_verse_candidates(section,*,book,chapter,verse,names):
+        # Chapters 1-verse texts of genuinely single-chapter canonical books
+        # may be authored as "Jude 15", not "Jude 1:15".
+        single_chapter={"Obad","Phlm","2John","3John","Jude"}
+        aliases="|".join(re.escape(x) for x in sorted(names,key=len,reverse=True))
+        full=re.compile(
+            r"(?<![A-Za-z0-9])(?:"+aliases+r")\s+"
+            r"\d+\s*:\s*\d+(?:\s*[,;–-]\s*\d+)*"
+            r"(?:\s*;\s*\d+\s*:\s*\d+(?:\s*[,;–-]\s*\d+)*)+",
+            flags=re.IGNORECASE)
+        solitary=(re.compile(r"(?<![A-Za-z0-9])(?:"+aliases+
+                             r")\s+("+re.escape(verse)+r")(?![\d:])",
+                             flags=re.IGNORECASE)
+                  if book in single_chapter and chapter=="1" else None)
+        out=[]
+        for paragraph in section.findall(f"{{{NS}}}p"):
+            projected,chunks=projected_slots(paragraph)
+            for hit in full.finditer(projected):
+                excerpt=hit.group()
+                for candidate in re.finditer(r"(?<!\d)(\d+)\s*:\s*(\d+)",excerpt):
+                    if candidate[1]!=chapter or candidate[2]!=verse:
+                        continue
+                    start=hit.start()+candidate.start(2)
+                    end=hit.start()+candidate.end(2)
+                    out.extend((node,attr,value,start-a,end-a)
+                               for a,b,node,attr,linked,value in chunks
+                               if not linked and a<=start and end<=b)
+            if solitary is not None:
+                for hit in solitary.finditer(projected):
+                    start,end=hit.start(1),hit.end(1)
+                    out.extend((node,attr,value,start-a,end-a)
+                               for a,b,node,attr,linked,value in chunks
+                               if not linked and a<=start and end<=b)
+        return out
+
     chosen={}
     grouped={}
     unmatched=[]
@@ -2214,6 +2275,12 @@ def build_private_compact_original_crossrefs(
                     a=match.start()+colon+1+number.start()
                     b=match.start()+colon+1+number.end()
                     candidates.append((node,attr,value,a,b))
+        match_type="EXPLICIT_FULL_BOOK_CHAPTER_WITH_VERSE_TOKENS"
+        if not candidates:
+            candidates=inherited_book_verse_candidates(
+                k_sections[first],book=book,chapter=chapter,verse=verse,
+                names=names)
+            match_type="EXPLICIT_INHERITED_BOOK_OR_SINGLE_CHAPTER_REFERENCE"
         if len(candidates)!=1:
             unmatched.append(key)
             continue
@@ -2224,7 +2291,7 @@ def build_private_compact_original_crossrefs(
                      "original_visible_label_sha256":row["original_visible_label_sha256"],
                      "linked_visible_token_sha256":hashlib.sha256(
                          value[start:end].encode()).hexdigest(),
-                     "source_target":literal,"slotid":slotid,
+                     "source_target":literal,"slotid":slotid,"match_type":match_type,
                      "node":node,"attr":attr,"value":value,"start":start,"end":end}
         grouped.setdefault(slotid,[]).append(key)
 
@@ -2286,7 +2353,7 @@ def build_private_compact_original_crossrefs(
         "original_literal_target_sha256":x["original_literal_target_sha256"],
         "original_visible_label_sha256":x["original_visible_label_sha256"],
         "linked_visible_token_sha256":x["linked_visible_token_sha256"],
-        "placement_basis":"EXACT_UNIQUE_AUTHORED_BOOK_CHAPTER_VERSE_TOKEN",
+        "placement_basis":x["match_type"],
     } for _,x in sorted(chosen.items())]
     remainder=[x for x in ledger["pending"]
                if (x["source_first_key"],x["source_reference_ordinal"]) not in chosen]
