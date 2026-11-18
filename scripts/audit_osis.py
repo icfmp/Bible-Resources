@@ -756,6 +756,92 @@ def compare_commentary_source_native_introductions(
     }
 
 
+def triage_commentary_introduction_relocation(
+        source_intros: dict[str,dict],
+        native_intros: dict[str,bytes],
+        native_first_verses: dict[str,bytes],
+        *, max_cases: int = 80) -> dict:
+    """Locate apparently absent intro wording/notes in SAME BOOK native slots.
+
+    A source-vs-own-intro mismatch can be a libSWORD scope relocation, not
+    lost prose. Compare independently retrieved I and K frames first;
+    never silently change authorial locations or approve a different scope.
+    """
+    from lxml import etree
+    if (not source_intros or set(source_intros)!=set(native_intros)
+            or not native_first_verses or not 0<=max_cases<=120):
+        raise ValueError("Source/native introduction inventories incomplete")
+    frames={}
+    def parsed(kind,ref,raw):
+        if not isinstance(raw,bytes) or len(raw)>2*1024*1024:
+            raise ValueError("Unsafe intro relocation frame")
+        try:
+            root=etree.fromstring(b"<fragment>"+raw+b"</fragment>",
+                etree.XMLParser(resolve_entities=False,load_dtd=False,
+                                no_network=True,recover=False,huge_tree=False))
+        except (ValueError,etree.XMLSyntaxError):
+            raise ValueError("Unparseable native intro relocation frame") from None
+        words=" ".join(re.findall(r"\w+","".join(root.itertext()).casefold()))
+        sem=Counter()
+        for node in root.iter():
+            if not isinstance(node.tag,str):
+                continue
+            name=node.tag.rsplit("}",1)[-1]
+            if name in {"note","reference"}:
+                sem[(name,
+                     " ".join("".join(node.itertext()).split()),
+                     node.get("osisRef"),node.get("type"),node.get("n"))]+=1
+        frames[(kind,ref)]={"words":words,"semantic":sem}
+    for ref,raw in native_intros.items():
+        parsed("I",ref,raw)
+    for ref,raw in native_first_verses.items():
+        parsed("K",ref,raw)
+    bybook=defaultdict(list)
+    for kind,ref in frames:
+        bybook[ref.split(".",1)[0]].append((kind,ref))
+    counts=Counter()
+    cases=[]
+    for ref,original in source_intros.items():
+        orig_words=" ".join(re.findall(r"\w+",original["text"].casefold()))
+        book=ref.split(".",1)[0]
+        home=("I",ref)
+        counts["source_intro_scopes_checked"]+=1
+        if not orig_words or orig_words in frames[home]["words"]:
+            continue
+        matches=[
+            dest for dest in bybook[book]
+            if dest!=home and orig_words in frames[dest]["words"]
+        ]
+        if not matches:
+            status="intro_word_stream_not_found_contiguously_in_same_book_I_or_first_K"
+        elif any(dest==("I",book) for dest in matches):
+            status="intro_word_stream_found_in_book_intro"
+        elif any(dest[0]=="I" for dest in matches):
+            status="intro_word_stream_found_in_other_chapter_intro"
+        elif any(dest[0]=="K" and dest[1].startswith(ref+".")
+                 for dest in matches):
+            status="intro_word_stream_found_in_same_chapter_numbered_commentary"
+        else:
+            status="intro_word_stream_found_in_other_first_verse"
+        counts[status]+=1
+        if len(cases)<max_cases:
+            cases.append({
+                "source_intro":ref,"source_line":original["line"],
+                "classification":status,
+                "matching_native_slot_count":len(matches),
+                "first_matching_native_slot":("/".join(matches[0]) if matches else None),
+                "original_intro_word_count":len(orig_words.split()),
+            })
+    return {
+        "schema_version":1,
+        "status":"INTRO_SCOPE_RELOCATION_RESEARCH_ONLY_NO_TEXT_RELEASE",
+        "counts":dict(sorted(counts.items())),
+        "bounded_source_scope_cases":cases,
+        "source_intro_wording_exposed":False,
+        "publication_approved":False,
+    }
+
+
 def _source_native_interword_punctuation_shape(source: str, native: str) -> dict:
     """Compare punctuation-only gaps aligned by the complete source word run.
 
