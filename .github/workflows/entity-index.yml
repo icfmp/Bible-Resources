@@ -91,6 +91,26 @@ jobs:
           print("BSI_KEYTERM_EXCLUSION_PASS", public["distribution_profile"])
           PY
 
+      - name: Verify minimal labels without descriptions or excluded categories
+        run: |
+          python3 -I entity-index/minimal_labels.py \
+            --source /tmp/acai-frozen \
+            --index entity-index/dist/bsi-v0.1-without-keyterms.json \
+            --output entity-index/dist/bsi-v0.1-labels-en.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          index=json.loads(Path("entity-index/dist/bsi-v0.1-without-keyterms.json").read_text())
+          labels=json.loads(Path("entity-index/dist/bsi-v0.1-labels-en.json").read_text())
+          assert set(labels["labels"]) <= {e["id"] for e in index["entities"]}
+          assert not any(k.startswith("keyterm:") for k in labels["labels"])
+          assert labels["source_snapshot_sha256"] == index["provenance"]["source_snapshot_sha256"]
+          assert len(labels["labels"]) + len(labels["missing_ids"]) == len(index["entities"])
+          assert all(set(v) == {"label", "language", "source_id", "review_status"}
+                     for v in labels["labels"].values())
+          print("BSI_MINIMAL_LABELS_PASS", len(labels["labels"]), "missing", len(labels["missing_ids"]))
+          PY
+
       - name: Check v0.1 reader common-noun and study-topic sample on full pinned index
         run: |
           python3 - <<'PY'
