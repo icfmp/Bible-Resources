@@ -576,11 +576,15 @@ jobs:
           from sword_native_raw_corpus_inventory import parse_native_raw_corpus
           base=Path(os.environ["RUNNER_TEMP"])
           report=json.loads((base/"mhcc-modern-complete-bounded-linked-osis-structure.json").read_text())
-          expected={r["original_source_first_key"]:
-                    r["source_linked_modern_osisRef_hashes_in_actual_document_order"]
-                    for r in report["linked_source_K_groups_with_exact_derived_target_order"]}
+          expected={
+              r["original_source_first_key"]: {
+                  "targets":r["source_linked_modern_osisRef_hashes_in_actual_document_order"],
+                  "labels":r["source_linked_modern_label_hashes_in_actual_document_order"],
+              } for r in report["linked_source_K_groups_with_exact_derived_target_order"]
+          }
           assert len(expected)==19
-          assert sum(len(v) for v in expected.values())==39
+          assert sum(len(v["targets"]) for v in expected.values())==39
+          assert all(len(v["targets"])==len(v["labels"]) for v in expected.values())
           seen={}
           def observe(kind,key,raw):
               if kind!="K" or key not in expected:
@@ -588,14 +592,21 @@ jobs:
               if key in seen:
                   raise ValueError("Duplicated private SWORD readback K body")
               node=ET.fromstring(b"<derived>"+raw+b"</derived>")
-              links=[v.attrib.get("osisRef") for v in node.iter() if
+              links=[v for v in node.iter() if
                      isinstance(v.tag,str) and v.tag.rsplit("}",1)[-1]=="reference"]
-              if any(not isinstance(link,str) or not link for link in links):
-                  raise ValueError("Private compiled SWORD lost reviewed link target")
-              actual=[hashlib.sha256(x.encode("utf-8")).hexdigest() for x in links]
-              if actual!=expected[key]:
-                  raise ValueError("Private compiled SWORD lost original repeated "
-                                   "link occurrences, changed link order or altered target")
+              values=[v.attrib.get("osisRef") for v in links]
+              labels=["".join(v.itertext()) for v in links]
+              if (any(not isinstance(t,str) or not t for t in values)
+                      or any(not label for label in labels)):
+                  raise ValueError("Private compiled SWORD lost reviewed link or visible label")
+              actual_targets=[hashlib.sha256(t.encode("utf-8")).hexdigest()
+                              for t in values]
+              actual_labels=[hashlib.sha256(t.encode("utf-8")).hexdigest()
+                             for t in labels]
+              if (actual_targets!=expected[key]["targets"]
+                      or actual_labels!=expected[key]["labels"]):
+                  raise ValueError("Private compiled SWORD changed repeated occurrences, "
+                                   "original source-link destinations, order or modern labels")
               seen[key]=len(links)
           env=os.environ.copy()
           env["SWORD_PATH"]=str((base/"mhcc-bounded-linked-root").resolve())
@@ -611,7 +622,19 @@ jobs:
               if proc.poll() is None:
                   proc.kill();proc.wait()
           assert set(seen)==set(expected)
-          assert len(numbered)==28792 and len(set(numbered))==28792
+          source=json.loads((base/"mhcc-modern-whole-canon-native-receipt.json").read_text())
+          ionly=json.loads(Path(
+              "work/mhcc-modern/production/IONLY_CHAPTER_LINK_PREVIEW.json"
+          ).read_text())
+          intended={key for chapter in source["chapters"].values()
+                    for unit in chapter["original_units"] for key in unit["keys"]}
+          assert len(intended)==28742
+          for row in ionly["chapters"]:
+              ch=row["chapter_osis"]
+              assert not source["chapters"][ch]["original_units"]
+              intended.update(ch+"."+str(v) for v in range(1,row["verse_count"]+1))
+          assert len(intended)==28792
+          assert set(numbered)==intended and len(numbered)==28792
           assert sum(seen.values())==39
           proof={
               "status":"PRIVATE_39_REVIEWED_LINKS_COMPILED_SWORD_NATIVE_TARGETS_PASS",
@@ -619,6 +642,8 @@ jobs:
               "reviewed_original_link_section_targets_verified":len(seen),
               "reviewed_original_link_occurrences_verified":sum(seen.values()),
               "source_repeated_links_and_modern_order_preserved":True,
+              "modern_link_labels_sha256_identical_after_native_compilation":True,
+              "exact_28792_original_plus_I_only_indexed_keys_preserved":True,
               "original_literal_links_preserved":30,
               "source_witness_corrected_link_targets":8,
               "witness_missing_original_link_added":1,
@@ -629,7 +654,7 @@ jobs:
           (base/"mhcc-modern-39-links-native-SWORD-readback.json").write_text(
               json.dumps(proof,indent=2,sort_keys=True)+"\n",encoding="utf-8")
           print("PRIVATE COMPILED MHCC REVIEWED SOURCE LINKS PASS "
-                "39/39 exact target hashes in 28792 native K keys; NO release")
+                "39/39 exact targets and visible labels in 28792 exact original/I-only keys; NO release")
           PY
       - name: Probe five original SWORD source-body scopes against independent English anchors
         shell: bash
@@ -1809,6 +1834,8 @@ jobs:
             ${{ runner.temp }}/mhcc-modern-whole-canon-native-receipt.json
             ${{ runner.temp }}/mhcc-modern-all-original-link-identity-sha.json
             ${{ runner.temp }}/mhcc-modern-proposed-link-correction-dispositions.json
+            ${{ runner.temp }}/mhcc-modern-complete-bounded-linked-osis-structure.json
+            ${{ runner.temp }}/mhcc-modern-39-links-native-SWORD-readback.json
             ${{ runner.temp }}/mhcc-modern-complete-unlinked-osis-structure.json
             ${{ runner.temp }}/mhcc-modern-complete-private-sword-smoke.json
             ${{ runner.temp }}/mhcc-modern-complete-private-native-key-audit.json
