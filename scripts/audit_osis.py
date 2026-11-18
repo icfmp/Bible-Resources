@@ -343,6 +343,143 @@ def compare_source_milestone_index(path: Path, *,
     }
 
 
+
+def source_commentary_overlap_witness(path: Path) -> tuple[dict, set[str]]:
+    """Observe overlapping authorial verse-group bodies without rewriting them.
+
+    A group may span many verse IDs. This private in-memory witness retains
+    original text temporarily for strict comparison with native SWORD.
+    Public diagnostics must contain counts, line numbers, references and SHA,
+    not the source prose. A group can be retrieved at another verse even if
+    one overlapping key is overwritten; do not equate overlap with text loss.
+    """
+    raw=require_regular_file(Path(path).absolute(),MAX_SOURCE_BYTES,"SOURCE_UNAVAILABLE")
+    root=parse_xml(Path(path).absolute(),raw,"MALFORMED_XML")
+    owners=defaultdict(list)
+    groups=[]
+    active=[None]
+    def finish(node):
+        current=active[0]
+        if current is None or node.get("eID")!=current["sID"]:
+            raise ValueError("Unbalanced original commentary verse group")
+        current["text"]="".join(current.pop("parts"))
+        if len(current["text"]) > 1000000:
+            raise ValueError("Oversized original commentary group text")
+        for key in current["keys"]:
+            owners[key].append(current)
+        groups.append(current)
+        active[0]=None
+    def walk(node):
+        if not isinstance(node.tag,str):
+            return
+        if _tag(node)=="verse" and node.get("sID"):
+            if active[0] is not None:
+                raise ValueError("Source commentary verse groups nested unexpectedly")
+            active[0]={
+                "sID":node.get("sID"),
+                "keys":tuple((node.get("osisID") or "").split()),
+                "line":node.sourceline,
+                "parts":[]
+            }
+        elif _tag(node)=="verse" and node.get("eID"):
+            finish(node)
+        if active[0] is not None and node.text:
+            active[0]["parts"].append(node.text)
+        for child in node:
+            walk(child)
+            if active[0] is not None and child.tail:
+                active[0]["parts"].append(child.tail)
+    walk(root)
+    if active[0] is not None:
+        raise ValueError("Original commentary verse group remains unclosed")
+    if len(groups)==0:
+        raise ValueError("No actual original authored commentary groups")
+    overlapping={
+        key:tuple(chapters) for key,chapters in owners.items()
+        if len(chapters)>1
+    }
+    needed={key for instances in overlapping.values()
+            for instance in instances for key in instance["keys"]}
+    return overlapping, needed
+
+
+def compare_source_overlap_native_bodies(
+        overlapping: dict, native_raw: dict[str, bytes],
+        *, max_cases: int = 35) -> dict:
+    """Classify per-*authored group* whether its full word stream survives.
+
+    Matching raw source prose against any indexed SWORD key is stronger than
+    counting verse-address collisions; however exact word substring checks
+    alone cannot prove full notes/markup fidelity or printed edition identity.
+    """
+    from lxml import etree
+    if (not isinstance(overlapping,dict) or not overlapping
+            or not isinstance(native_raw,dict) or not native_raw):
+        raise ValueError("No source/native overlap evidence")
+    involved={}
+    for key,groups in overlapping.items():
+        for group in groups:
+            involved[id(group)]=group
+    required={key for g in involved.values() for key in g["keys"]}
+    if not required.issubset(native_raw):
+        raise ValueError("Native commentary overlap group keys not all available")
+    native_words={}
+    for key in required:
+        raw=native_raw[key]
+        if not isinstance(raw,bytes) or len(raw)>2*1024*1024:
+            raise ValueError("Untrusted compiled overlap XML frame")
+        parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
+                               no_network=True,recover=False,huge_tree=False)
+        try:
+            root=etree.fromstring(b"<fragment>"+raw+b"</fragment>",parser)
+        except etree.XMLSyntaxError:
+            raise ValueError("Unparseable compiled overlap frame") from None
+        native_words[key]=" ".join(re.findall(r"\w+",
+                                              "".join(root.itertext()).casefold()))
+    cases=[]
+    counts=Counter()
+    for group in sorted(involved.values(),key=lambda x:x["line"]):
+        words=" ".join(re.findall(r"\w+",group["text"].casefold()))
+        if not words:
+            classification="source_group_without_searchable_words"
+            matching=[]
+        else:
+            matching=[key for key in group["keys"] if
+                      words in native_words[key]]
+            if len(matching)==len(group["keys"]):
+                classification="full_prose_in_every_original_native_key"
+            elif matching:
+                classification="full_prose_present_in_some_native_keys"
+            else:
+                classification="full_source_word_sequence_not_found_in_group_native_keys"
+        counts[classification]+=1
+        if len(cases)<max_cases:
+            cases.append({
+                "source_xml_line":group["line"],
+                "original_source_sid":group["sID"],
+                "authored_verse_addresses":len(group["keys"]),
+                "full_source_word_count":len(words.split()),
+                "full_source_word_stream_sha256":hashlib.sha256(
+                    words.encode("utf-8")).hexdigest(),
+                "indexed_key_word_sequence_matches":len(matching),
+                "first_matching_native_key":matching[0] if matching else None,
+                "class":classification,
+            })
+    return {
+        "schema_version":1,
+        "status":"SOURCE_NATIVE_OVERLAP_WORD_PRESENCE_TRIAGE_NOT_FINAL_PARITY",
+        "source_keys_claimed_by_multiple_groups":len(overlapping),
+        "source_distinct_overlapping_groups_examined":len(involved),
+        "all_related_native_keys_read":len(required),
+        "classification_counts":dict(sorted(counts.items())),
+        "bounded_source_group_cases":cases,
+        "source_group_text_or_native_body_exported":False,
+        "all_word_streams_in_source_evaluated":True,
+        "notes_markup_and_independent_editions_not_verified":True,
+        "source_or_sword_edited_or_released":False,
+    }
+
+
 def audit_osis(path: Path, *, kind: str = "bible") -> dict:
     if kind not in {"bible", "commentary"}:
         raise ValueError("Only Bible/commentary OSIS sources are supported")
