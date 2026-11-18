@@ -858,6 +858,27 @@ def _auto_single_verse_placements(*, private_original: dict, groups: dict,
     return found, skipped
 
 
+
+def _original_reference_table_ownership(fragment: ET.Element) -> list[bool]:
+    """Source-native reference ancestry, in exact original document order.
+
+    Tables and their nested XML containers are tracked without exporting
+    original prose, headings, link labels or raw OSIS reference values.
+    """
+    result=[]
+    def visit(node: ET.Element, in_table: bool) -> None:
+        if not isinstance(node.tag,str):
+            return
+        tag=node.tag.rsplit("}",1)[-1]
+        current=in_table or tag=="table"
+        if tag=="reference":
+            result.append(current)
+        for child in node:
+            visit(child,current)
+    visit(fragment,False)
+    return result
+
+
 def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                                     native: dict, identities: dict,
                                     dispositions: dict, repo_root: Path,
@@ -960,6 +981,7 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
     if not reader.is_file() or not module_directory.is_dir() or module_id != "MHCC":
         raise ValueError("Only isolated published MHCC original SWORD reader is supported")
     private_original = {}
+    private_table_ownership = {}
     env = os.environ.copy()
     env["SWORD_PATH"] = str(module_directory.resolve())
     def observe(kind: str, key: str, raw: bytes):
@@ -982,8 +1004,9 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                     raise ValueError("Invalid original source-native hyperlink target")
                 label = "".join(element.itertext())
                 refs.append((literal, label))
-        if len(refs) != identity["reference_count"]:
-            raise ValueError("Original linked-element count differs from real native ledger")
+        table_context=_original_reference_table_ownership(node)
+        if len(refs) != identity["reference_count"] or len(table_context)!=len(refs):
+            raise ValueError("Original link/authorial-table ancestry count mismatch")
         for n, (literal, label) in enumerate(refs):
             if (hashlib.sha256(literal.encode("utf-8")).hexdigest() !=
                     identity["original_osisRef_sha256_in_document_order"][n]
@@ -991,6 +1014,7 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                     identity["original_visible_link_label_sha256_in_document_order"][n]):
                 raise ValueError("Original link identity or order differs from authenticated ledger")
         private_original[key] = refs
+        private_table_ownership[key] = table_context
     proc = subprocess.Popen([str(reader.resolve()), module_id], env=env,
                             stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     try:
@@ -1101,6 +1125,32 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         proposed = list(proposed)+automatic
     if "".join(doc.itertext()) != original_visible:
         raise ValueError("Modern commentary wording changed while adding source links")
+    # Diagnose authorial source outline-table references separately. A text
+    # range in the original chapter outline must NOT be treated as a
+    # passage cited by Henry inside modern explanatory paragraphs.
+    context_count={"all_original_references":0,
+                   "source_links_in_original_tables":0,
+                   "source_links_outside_original_tables":0,
+                   "source_full_verse_ranges_inside_original_tables":0,
+                   "source_full_verse_ranges_outside_original_tables":0,
+                   "unplaced_full_verse_ranges_inside_original_tables":0,
+                   "unplaced_full_verse_ranges_outside_original_tables":0}
+    placed={(row["original_source_first_key"],row.get("original_link_ordinal"))
+            for row in inserted if row.get("original_link_ordinal") is not None}
+    for first,links in private_original.items():
+        flags=private_table_ownership[first]
+        for i,((literal,_),in_table) in enumerate(zip(links,flags),1):
+            context_count["all_original_references"]+=1
+            context_count["source_links_in_original_tables" if in_table else
+                          "source_links_outside_original_tables"]+=1
+            if _unrecognized_original_ref_class(literal)=="full_verse_range":
+                context_count["source_full_verse_ranges_inside_original_tables" if in_table
+                              else "source_full_verse_ranges_outside_original_tables"]+=1
+                if (first,i) not in placed:
+                    context_count["unplaced_full_verse_ranges_inside_original_tables" if in_table
+                                  else "unplaced_full_verse_ranges_outside_original_tables"]+=1
+    if auto_single_verse and context_count["all_original_references"]!=1204:
+        raise ValueError("Source table ancestry audit did not cover all source K hyperlinks")
     embedded = [x for x in doc.iter() if x.tag == f"{{{NS}}}reference"]
     if len(embedded) != len(proposed):
         raise ValueError("Wrong source-anchored link count after modern OSIS insertion")
@@ -1145,6 +1195,7 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         "source_K_groups_with_links_inserted":len(linked_keys),
         "modern_inline_links_inserted":len(embedded),
         "automatic_source_matched_references":auto_counts,
+        "source_original_hyperlink_table_ownership_census":context_count,
         "actual_original_links_copied_without_correction":counted[
             "COPY_EXACT_AUTHENTIC_SOURCE"],
         "documented_wrong_original_links_retargeted":counted[
