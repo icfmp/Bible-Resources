@@ -105,6 +105,43 @@ def _census(root):
     return dict(sorted(hits.items())), dict(sorted(by_owner.items()))
 
 
+def _markup_profile(root):
+    """Metadata-only source markup risk profile, never a deletion instruction."""
+    elements = Counter()
+    emphasis = Counter()
+    emphasis_parent = Counter()
+    emphasis_text_size = Counter()
+    nbsp_owner = Counter()
+    for node in root.iter():
+        if not isinstance(node.tag, str):
+            continue
+        name = _local(node)
+        elements[name] += 1
+        for fragment in (node.text, node.tail):
+            if fragment:
+                nbsp_owner[name] += fragment.count("\u00a0")
+        if name == "hi":
+            emphasis[node.get("type") or "(unspecified)"] += 1
+            parent = node.getparent()
+            emphasis_parent[_local(parent) if parent is not None else "(root)"] += 1
+            length = len("".join(node.itertext()))
+            label = ("no_visible_text" if length == 0 else
+                     "short_1_to_40" if length <= 40 else
+                     "medium_41_to_500" if length <= 500 else
+                     "long_over_500")
+            emphasis_text_size[label] += 1
+    return {
+        "xml_element_counts": dict(sorted(elements.items())),
+        "hi_emphasis_type_counts": dict(sorted(emphasis.items())),
+        "hi_direct_parent_counts": dict(sorted(emphasis_parent.items())),
+        "hi_visible_length_band_counts": dict(sorted(emphasis_text_size.items())),
+        "nonbreaking_spaces_by_xml_owner": dict(sorted(
+            (key, value) for key, value in nbsp_owner.items() if value
+        )),
+        "markup_profile_is_diagnostic_only": True,
+    }
+
+
 def clean(source: Path, expected_sha: str, *, output: Path | None = None) -> dict:
     """Inspect original; optionally write an independently checked new XML.
 
@@ -119,6 +156,7 @@ def clean(source: Path, expected_sha: str, *, output: Path | None = None) -> dic
     before = _structure(root)
     protected = _protected_text(root)
     original_census, by_owner = _census(root)
+    markup_profile = _markup_profile(root)
     changes = Counter()
     candidate = root
     for node in candidate.iter():
@@ -154,6 +192,7 @@ def clean(source: Path, expected_sha: str, *, output: Path | None = None) -> dic
         "source_element_count": len(before),
         "original_suspicious_token_census": original_census,
         "text_character_counts_by_xml_owner": by_owner,
+        "original_markup_profile": markup_profile,
         "cleanup_changes": dict(sorted(changes.items())),
         "all_original_osis_elements_and_attributes_preserved": True,
         "all_note_and_reference_text_preserved": True,
