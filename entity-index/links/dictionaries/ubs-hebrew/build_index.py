@@ -22,7 +22,6 @@ UBS_FILES = {
 STRONG = re.compile(r"^([HA])0*([0-9]+)$")
 MACULA_STRONG = re.compile(r"^[0-9]+$")
 LEX_ID = re.compile(r"^[0-9]{15}$")
-WLC_WORD_ID = re.compile(r"^o[0-9]{12}\\S*$")
 
 
 def senses(entry):
@@ -144,7 +143,9 @@ def audit(index, macula):
         if not required.issubset(set(reader.fieldnames or [])):
             raise ValueError(f"Macula WLC TSV lacks columns {sorted(required)}")
         for row in reader:
-            if not WLC_WORD_ID.fullmatch(row["xml:id"]):
+            if not (len(row["xml:id"]) >= 13 and row["xml:id"][0] == "o"
+                    and row["xml:id"][1:13].isdigit()
+                    and not any(ch.isspace() for ch in row["xml:id"][13:])):
                 raise ValueError(f"Malformed pinned original word: {row['xml:id']}")
             count["macula_words"] += 1
             if row["sdbh"].strip():
