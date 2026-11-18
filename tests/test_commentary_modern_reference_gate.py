@@ -4,11 +4,12 @@ import tempfile
 from pathlib import Path
 import sys
 import unittest
+from xml.etree import ElementTree as ET
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from commentary_modern_reference_gate import (SourceReferenceGate,
     WholeCanonOriginalLinkIdentityReceipt, canonical_only_for_comparison,
-    validate_proposed_link_dispositions)
+    validate_proposed_link_dispositions, _wrap_exact_authored_modern_text)
 
 
 ORIGINAL=(b'<div><reference osisRef="Bible:1John.5.20">1Jo 5:20</reference>'
@@ -383,6 +384,83 @@ class ProposedLinkDispositionTests(unittest.TestCase):
                 validate_proposed_link_dispositions(
                     manifest=manifest, native=native, identities=ids,
                     repository_root=root)
+
+
+class BoundedOriginalSourceLinkInsertionTests(unittest.TestCase):
+    NS = "http://www.bibletechnologies.net/2003/OSIS/namespace"
+
+    def test_same_modern_wording_after_bounded_cross_reference_injection(self):
+        ns=self.NS
+        section=ET.Element(f"{{{ns}}}div",{"annotateType":"commentary"})
+        para=ET.SubElement(section,f"{{{ns}}}p")
+        para.text="The Savior is truly our brother (Hebrews 2:11, 14), and is risen."
+        before="".join(section.itertext())
+        _wrap_exact_authored_modern_text(
+            section,anchor="(Hebrews 2:11, 14)",display="14",
+            occurrence="last",target="Heb.2.14")
+        self.assertEqual("".join(section.itertext()),before)
+        link=section.find(f".//{{{ns}}}reference")
+        self.assertIsNotNone(link)
+        self.assertEqual(link.attrib["osisRef"],"Heb.2.14")
+        self.assertEqual(link.text,"14")
+        self.assertEqual(len(section.findall(f".//{{{ns}}}reference")),1)
+        with self.assertRaisesRegex(ValueError,"already source-linked"):
+            _wrap_exact_authored_modern_text(
+                section,anchor="(Hebrews 2:11, 14)",display="14",
+                occurrence="last",target="Heb.2.14")
+
+    def test_original_literal_osisRef_and_modern_full_citation_survive(self):
+        ns=self.NS
+        section=ET.Element(f"{{{ns}}}div")
+        para=ET.SubElement(section,f"{{{ns}}}p")
+        para.text="God is revealed (1 John 5:20)."
+        original="".join(section.itertext())
+        _wrap_exact_authored_modern_text(
+            section,anchor="(1 John 5:20)",display="(1 John 5:20)",
+            occurrence="last",target="Bible:1John.5.20")
+        self.assertEqual("".join(section.itertext()),original)
+        self.assertEqual(section.find(f".//{{{ns}}}reference").get("osisRef"),
+                         "Bible:1John.5.20")
+
+    def test_bold_markdown_citation_and_tail_after_highlight_are_linked(self):
+        ns=self.NS
+        section=ET.Element(f"{{{ns}}}div")
+        para=ET.SubElement(section,f"{{{ns}}}p")
+        para.text="The apostle calls for prayer ("
+        bold=ET.SubElement(para,f"{{{ns}}}hi",{"type":"bold"})
+        bold.text="1 Timothy 2:1–2"
+        bold.tail="). He points us to God (Revelation 1:5–6)."
+        original="".join(section.itertext())
+        _wrap_exact_authored_modern_text(
+            section,anchor="1 Timothy 2:1–2",display="2",
+            occurrence="last",target="1Tim.2.2")
+        self.assertEqual("".join(section.itertext()),original)
+        self.assertEqual(bold.find(f"{{{ns}}}reference").text,"2")
+        _wrap_exact_authored_modern_text(
+            section,anchor="(Revelation 1:5–6)",display="6",
+            occurrence="last",target="Rev.1.6")
+        self.assertEqual("".join(section.itertext()),original)
+        links=section.findall(f".//{{{ns}}}reference")
+        self.assertEqual([x.get("osisRef") for x in links],
+                         ["1Tim.2.2","Rev.1.6"])
+
+    def test_absent_ambiguous_and_fuzzy_markers_rejected_without_guessing(self):
+        ns=self.NS
+        section=ET.Element(f"{{{ns}}}div")
+        for line in ("(Hebrews 2:11, 14)", "(Hebrews 2:11, 14)"):
+            ET.SubElement(section,f"{{{ns}}}p").text=line
+        with self.assertRaisesRegex(ValueError,"missing or ambiguous"):
+            _wrap_exact_authored_modern_text(
+                section,anchor="(Hebrews 2:11, 14)",display="14",
+                occurrence="last",target="Heb.2.14")
+        with self.assertRaisesRegex(ValueError,"missing or ambiguous"):
+            _wrap_exact_authored_modern_text(
+                section,anchor="(Revelation 3:1)",display="1",
+                occurrence="last",target="Rev.3.1")
+        with self.assertRaises(ValueError):
+            _wrap_exact_authored_modern_text(
+                section,anchor="(Hebrews 2:11, 14)",display="14",
+                occurrence="last",target="not-a-bible-osisref")
 
 
 if __name__=="__main__":
