@@ -1766,13 +1766,20 @@ jobs:
                            and x.tag.rsplit("}",1)[-1]=="div" and
                            x.get("resp")==
                               "BibleResourcesModernRelocatedFirstNativeKBookPreface"]
-                  if len(matches)!=1:
-                      raise ValueError("SWORD I entry lost relocated source-K book preface")
-                  body=normalized("".join("".join(x.itertext())
-                                          for x in list(matches[0])
-                                          if x.tag.rsplit("}",1)[-1]!="title"))
-                  if body!=in_osis[key]:
-                      raise ValueError("SWORD native I changed modern preface text")
+                  def word_stream(value):
+                      return re.findall(r"[^\\W_]+",unicodedata.normalize(
+                          "NFKC",value).casefold())
+                  # osis2mod can change which div attributes survive and wrap
+                  # chapter-I content. Verify the complete authored modern
+                  # preface word stream INSIDE this original first-chapter I
+                  # entry, without relying on derived XML resp persistence.
+                  needle=word_stream(in_osis[key])
+                  actual=word_stream("".join(fragment.itertext()))
+                  locations=[i for i in range(len(actual)-len(needle)+1)
+                             if actual[i:i+len(needle)]==needle]
+                  if len(locations)!=1:
+                      raise ValueError("SWORD chapter I did not preserve exactly "
+                                       "one complete modern book preface word stream at "+key)
                   seen_I[key]=True
           env=os.environ.copy()
           env["SWORD_PATH"]=str((base/"mhcc-prefaces-root").resolve())
