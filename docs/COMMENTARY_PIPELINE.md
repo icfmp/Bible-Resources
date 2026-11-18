@@ -25,6 +25,55 @@ seven source-controlled completion gates. A completed stage is not another
 publication permission, and a published source may still expose separate
 application display bugs.
 
+
+## Source-format and language neutrality — design constraint (2026-11-18)
+
+**The import/reconstruction engine must not be built around English MHC, CCEL,
+a particular commentary, or one book/verse scheme.** Research-only MHC
+experiments under \`research/mhc-ccel/\` are historical feasibility evidence,
+not a new production importer, accepted data model, or instruction to add
+MHC-specific exceptions. The CCEL trial's SWORD CLI success is not a complete
+source-structure or reader-parity proof.
+
+The reusable design should extend existing tooling in this order:
+
+1. **Source acquisition and source-native inventory:** keep exact original
+   bytes, formats, encoding, language metadata, edition and rights provenance;
+   use format-aware adapters for *actual* SWORD, OSIS, USFM or ThML sources.
+   Do not translate, silently normalize Unicode/punctuation or assume English
+   book names. Preserve original labels separately from canonical reference
+   identifiers; use the source's own versification.
+2. **Lossless structural inspection:** represent, in memory, ordered original
+   text nodes, paragraphs, poetry, headings, quotes, notes, hyperlinks,
+   introductions, section identities, original full ranges and source
+   positions. The source markup remains authoritative, not a hand-invented
+   proprietary replacement. Flag structures the chosen standards cannot
+   express without loss rather than dropping them.
+3. **Language-independent mapping and diagnostics:** preserve duplicate-start
+   sections as distinct source identities; classify incompatible SWORD address
+   ownership without selecting a winner, concatenating silently, or inventing
+   first-verse aliases. Use exact text/markup and reference comparisons as
+   baseline. Any optional linguistic tokenization must be language-aware,
+   explicitly configured, advisory, and never a source mutation or release
+   requirement (e.g. no English-only word regex or case heuristics).
+4. **Standard output and reversible build:** choose a supported
+   SWORD/OSIS/USFM conversion route appropriate to the *actual* source;
+   retain evidence for unsupported mappings. Compile only after every
+   independently inventoried source unit has an explicit preserved, mapped
+   or blocked disposition. Audit the compiled SWORD native index, complete
+   text, punctuation, headings, note/reference targets, structure, and
+   introductions against the originals; record every transformation.
+5. **Cross-language acceptance:** validate the same engine with at least one
+   real English and one real French source, including accents, apostrophes,
+   Unicode, names/references and source-specific versification; add other
+   languages without branching the core by language. A passing English
+   example alone is not a generic implementation certificate.
+
+The existing seven-stage, per-edition rights/editorial/reader approval gates
+remain unchanged. MHC is a demanding **fixture** for the reusable pipeline,
+not an architectural dependency. A temporary incomplete MHC experiment must
+not become an automatically required CI job for unrelated resource changes.
+
 ## Commands (metadata-only preflight, no release)
 
 For an existing manifest, source observation performs network access but must
