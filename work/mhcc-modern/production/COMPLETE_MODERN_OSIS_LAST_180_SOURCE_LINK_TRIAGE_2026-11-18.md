@@ -39,3 +39,58 @@ The **180** unresolved occurrences are **145 singleton verse links**, **32 authe
 - All modern OSIS/derived SWORD packages remain **private, reproducible technical candidates**; no original SWORD package is modified or public derivative released. Additional open blocks include **51 quarantined book-introduction candidates**, reader-specific rendering checks for modern chapter-I links, verified rights, and explicit publisher/owner approval.
 
 **Next work:** use the small 180-case K/ordinal ledger as the only outstanding original-link review scope, resolve evident source-ledger cases in bounded, testable groups, preserve original literal `osisRef` where valid, and rerun original-source SHA + 28,792-key full native SWORD + all visible label/target checks after each batch. Keep [draft PR #272](https://github.com/icfmp/Bible-Resources/pull/272) and [issue #270](https://github.com/icfmp/Bible-Resources/issues/270) open.
+
+## Exact original-context review of all 180 pending links — 2026-11-18
+
+A bounded private K/ordinal diagnostic now supplements the existing disposition
+ledger without modifying translated commentary or placing additional links.
+The original published SHA-pinned SWORD module was re-read and compared with
+every source-owned modern K group. The [source + complete derived native SWORD
+run #44315771975](https://github.com/icfmp/Bible-Resources/actions/runs/44315771975),
+[Validate #44315771916](https://github.com/icfmp/Bible-Resources/actions/runs/44315771916),
+and [tool registry #44315772097](https://github.com/icfmp/Bible-Resources/actions/runs/44315772097)
+all **passed** on code head `fc7bf79c32fdbe4c8eec472ab7b9c7e0f1c8841e`.
+
+| Source-verified diagnostic (pending links only) | Count |
+| --- | ---: |
+| Original source links outside both titles and tables | **180** |
+| Recognized single-verse canonical source targets | **145** |
+| Recognized full same-book, same-chapter verse ranges | **32** |
+| Other full OSIS two-endpoint ranges requiring special source-scope review | **3** |
+| Original printed labels absent verbatim from corresponding modern K paragraphs | **114** |
+| Too short or non-distinctive original printed labels to compare safely | **65** |
+| Unique verbatim original printed label found in modern source-owned K | **1** |
+
+The sole pending **verbatim unique** printed-label correspondence belongs to
+original source `Eccl.10.11`, original reference ordinal **1**. The existing
+[Ecclesiastes 10 modern manuscript](accepted/ecclesiastes-10.md) already
+documents a primary-biblical-citation concern in that exact subsection;
+therefore **unique text presence is not sufficient to approve its linked
+destination**. Do not insert a hyperlink until its original source target,
+biblical verse and any intended authorial erratum are independently assessed.
+Its original target identity hash is
+`8c30222385edb1d5e6b2a404e4532f6d1734d65bd6a45625ae9ebbfb02921fef`.
+
+The three **non-standard full-endpoint original range** link identities are:
+- `Jer.50.1`, original ordinal **1**: target SHA-256
+  `70e54e46af7bf90a9c58a1a17cfb3cff04ba80a6fe7f608eb199361404f2b6df`.
+- `Jer.50.1`, original ordinal **2**: target SHA-256
+  `f6b8ecb3d15ba597fc3b17911c3a5807b2188ba12d9195623e989c57eb4f2ec5`.
+- `Matt.23.1`, original ordinal **1**: target SHA-256
+  `86fe8cf0c4b5b95e324c3ac6cd3b3ee84744a96eb7ae2870fba23b0a6327218a`.
+
+All three are outside original title/table markup, their original printed
+labels are absent verbatim from the corresponding modern K paragraphs, and
+their full-range syntax did **not** pass the deliberately restricted same-chapter
+range matcher. This establishes the **exact original elements to review**, not
+safe link targets or a reason to broaden the parser globally. Their actual
+OSIS grammar/verse boundaries, section ownership, translated presentation and
+reader behavior require an independently verified original-native inspection.
+
+All **1,204** original source-link dispositions remain accounted for:
+**1,015 represented**, **9 authenticated spurious enumerator links omitted**,
+and **180** pending review; the derivative still contains **1,016** link
+elements including the separately attested originally unlinked citation.
+No original prose, source label or literal original `osisRef` was exported in
+the metadata log or receipt. No extra source link was approved, and
+**no merge, rights clearance or publication** has been authorized.
