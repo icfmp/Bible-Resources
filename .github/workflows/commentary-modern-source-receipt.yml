@@ -191,6 +191,85 @@ jobs:
             --native-receipt "$RUNNER_TEMP/mhcc-modern-whole-canon-native-receipt.json" \
             --witness-manifest "work/mhcc-modern/production/NATIVE_FIVE_CHAPTER_ANCHOR_PROBES.json" \
             --report "$RUNNER_TEMP/mhcc-modern-five-native-source-witness-probes.json"
+      - name: Compare five bounded source witnesses with SHA-pinned official CrossWire MHCC 2.0
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error --retry 2 --max-time 90 \
+            'https://crosswire.org/ftpmirror/pub/sword/packages/rawzip/MHCC.zip' \
+            --output "$RUNNER_TEMP/mhcc-crosswire-stock-2.0.zip"
+          printf '%s  %s\n' \
+            '5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d' \
+            "$RUNNER_TEMP/mhcc-crosswire-stock-2.0.zip" | sha256sum -c -
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path, PurePosixPath
+          import zipfile
+          temp=Path(os.environ["RUNNER_TEMP"])
+          root=temp/"mhcc-crosswire-stock-root"
+          root.mkdir()
+          with zipfile.ZipFile(temp/"mhcc-crosswire-stock-2.0.zip") as archive:
+              infos=archive.infolist()
+              assert len(infos)<32
+              for info in infos:
+                  rel=PurePosixPath(info.filename)
+                  assert rel.parts and not rel.is_absolute() and ".." not in rel.parts
+                  assert not (info.external_attr >> 16) & 0o170000 == 0o120000
+                  assert info.file_size<5*1024*1024
+                  dest=root.joinpath(*rel.parts)
+                  assert dest.resolve().is_relative_to(root.resolve())
+                  if info.is_dir():
+                      dest.mkdir(parents=True,exist_ok=True)
+                  else:
+                      dest.parent.mkdir(parents=True,exist_ok=True)
+                      with archive.open(info) as src,dest.open("xb") as dst:
+                          dst.write(src.read())
+          assert (root/"mods.d/mhcc.conf").is_file()
+          original=json.loads(Path(
+              "work/mhcc-modern/production/NATIVE_FIVE_CHAPTER_ANCHOR_PROBES.json"
+          ).read_text(encoding="utf-8"))
+          original["source_module"]="Official CrossWire MHCC 2.0"
+          original["source_zip_sha256"]="5599108faf01753864d51136a87f120d022e70867cc9df70206a0af3c3a5ef7d"
+          original["source_native_corpus_sha256"]="8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
+          (temp/"mhcc-crosswire-five-witness-manifest.json").write_text(
+              json.dumps(original,indent=2)+"\n",encoding="utf-8")
+          print("Original CrossWire source installed privately from exact SHA-pinned ZIP")
+          PY
+          python scripts/commentary_modern_source_receipt.py \
+            --native-reader "$RUNNER_TEMP/commentary-modern-source-raw" \
+            --module-directory "$RUNNER_TEMP/mhcc-crosswire-stock-root" \
+            --module-id MHCC \
+            --expected-corpus-sha256 \
+            '8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6' \
+            --chapters Deut.20 1Sam.25 John.3 Ps.95 Zech.9 \
+            --report "$RUNNER_TEMP/mhcc-crosswire-five-native-source-receipt.json"
+          python scripts/commentary_modern_native_witness_probe.py \
+            --native-reader "$RUNNER_TEMP/commentary-modern-source-raw" \
+            --module-directory "$RUNNER_TEMP/mhcc-crosswire-stock-root" \
+            --native-receipt "$RUNNER_TEMP/mhcc-crosswire-five-native-source-receipt.json" \
+            --witness-manifest "$RUNNER_TEMP/mhcc-crosswire-five-witness-manifest.json" \
+            --report "$RUNNER_TEMP/mhcc-crosswire-five-native-witness-probes.json"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          temp=Path(os.environ["RUNNER_TEMP"])
+          new=json.loads((temp/"mhcc-modern-five-native-source-witness-probes.json").read_text())
+          old=json.loads((temp/"mhcc-crosswire-five-native-witness-probes.json").read_text())
+          old_by={(x["chapter"],x["original_first_key"]):x for x in old["groups"]}
+          assert len(old_by)==len(old["groups"])==len(new["groups"])==6
+          differences=[]
+          for newcase in new["groups"]:
+              oldcase=old_by[newcase["chapter"],newcase["original_first_key"]]
+              if oldcase["source_unit_sha256_matches"] != newcase["source_unit_sha256_matches"]:
+                  differences.append((newcase["chapter"],"raw group proof"))
+              oldanchors=[x["found_in_exact_published_native_body"] for x in oldcase["secondary_witness_anchor_checks"]]
+              newanchors=[x["found_in_exact_published_native_body"] for x in newcase["secondary_witness_anchor_checks"]]
+              if oldanchors!=newanchors:
+                  differences.append((newcase["chapter"],"authorial witness anchors"))
+          print("CROSSWIRE_TO_CURATED_SOURCE_DIFFERENCES "+json.dumps(differences))
+          assert not differences,"New source witness mismatch relative to pinned CrossWire source"
+          PY
       - name: Screen all modern manuscript outline tables for out-of-order source ranges
         shell: bash
         run: |
@@ -1042,6 +1121,8 @@ jobs:
             ${{ runner.temp }}/mhcc-modern-source-native-receipt.json
             ${{ runner.temp }}/mhcc-modern-whole-canon-native-receipt.json
             ${{ runner.temp }}/mhcc-modern-five-native-source-witness-probes.json
+            ${{ runner.temp }}/mhcc-crosswire-five-native-source-receipt.json
+            ${{ runner.temp }}/mhcc-crosswire-five-native-witness-probes.json
             ${{ runner.temp }}/mhcc-modern-historical-69-translation-coverage.json
             ${{ runner.temp }}/mhcc-modern-full-canon-source-group-diagnostic.json
             ${{ runner.temp }}/mhcc-ionly-preview-report.json
