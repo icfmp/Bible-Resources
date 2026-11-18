@@ -1490,6 +1490,160 @@ def validate_pending_source_reference_errata(*, manifest: dict,
     }
 
 
+
+def _source_link_supplement_display(literal: str) -> str:
+    """Readable normalized index label, NOT an original printed source label."""
+    try:
+        canonical = canonical_only_for_comparison(literal)
+    except ValueError:
+        parsed = _source_same_chapter_verse_range(literal)
+        if parsed is None:
+            raise ValueError("Private supplement cannot index malformed source link")
+        book, chapter, first, last = parsed
+        return (_ENGLISH_NAME_BY_OSIS[book] + " " + chapter + ":" +
+                first + "–" + last)
+    book, chapter, verse = canonical.rsplit(".", 2)
+    name = _ENGLISH_NAME_BY_OSIS.get(book)
+    if name is None:
+        raise ValueError("Private supplement requires canonical book identity")
+    return name + " " + chapter + ":" + verse
+
+
+def build_private_source_reference_supplement(
+        *, linked_osis: bytes, ledger: dict, original: dict,
+        native: dict, errata: dict) -> tuple[bytes, dict]:
+    """Safely PARK unplaced original links in separate, flagged OSIS notes.
+
+    The modern commentary remains untouched and its existing inline
+    hyperlinks retain their destinations, labels and ordering. Notes store
+    unmodified, source-hashed original target literals, but intentionally
+    display *normalized derived index labels*, not original linked words.
+    Unverified or visibly wrong links are explicitly excluded by a pinned
+    review manifest; they are not silently retargeted. This is a private
+    alternate reader candidate, NOT an inline authorial link reconstruction
+    or permission to publish.
+    """
+    from commentary_modern_draft_osis_preview import NS, _range
+
+    if (ledger.get("status") !=
+            "SOURCE_NATIVE_WHOLE_CANON_HYPERLINK_DISPOSITION_QUEUE_NOT_FINAL_APPROVAL"
+            or ledger.get("source_reference_labels_or_literal_targets_exported")
+                is not False
+            or ledger.get("publication_authorized") is not False
+            or errata.get("status") !=
+            "PINNED_ORIGINAL_LINK_ERRATA_REVIEW_ONLY_NOT_APPLIED"
+            or errata.get("original_native_corpus_sha256") !=
+            native.get("original_compiled_corpus_sha256")
+            or any(errata.get(k) is not False for k in (
+                "original_sword_changed", "modern_prose_changed",
+                "modern_osis_links_automatically_changed",
+                "editorial_target_corrections_approved", "redistributed"))):
+        raise ValueError("Private original-link supplement requires sealed receipts")
+    cases=errata.get("cases")
+    if not isinstance(cases,list) or len(cases)!=4:
+        raise ValueError("Private source-note preview needs all four errata blockers")
+    blocked={(x.get("source_first_key"),x.get("original_reference_ordinal"))
+             for x in cases}
+    if len(blocked)!=len(cases) or any(x.get("approval") is not False
+                                     for x in cases):
+        raise ValueError("Cannot silently approve or duplicate source errata")
+    pending=ledger.get("pending")
+    if not isinstance(pending,list) or len(pending)!=180:
+        raise ValueError("Private supplement requires full 180-case native ledger")
+    available={(row["source_first_key"],row["source_reference_ordinal"]):row
+               for row in pending}
+    if len(available)!=len(pending) or not blocked<=set(available):
+        raise ValueError("Unverified pending reference identity or errata exclusion")
+    doc=ET.fromstring(linked_osis)
+    before="".join(doc.itertext())
+    chapters={c.get("osisID"):c for c in doc.iter()
+              if c.tag==f"{{{NS}}}chapter"}
+    if len(chapters)!=1189:
+        raise ValueError("Modern commentary whole-canon inventory changed")
+    expected=[]
+    count=0
+    for first in sorted({key[0] for key in available}):
+        chapter=first.rsplit(".",1)[0]
+        units=native["chapters"][chapter]["original_units"]
+        positions=[i for i,u in enumerate(units) if u["first_key"]==first]
+        if len(positions)!=1 or first not in original:
+            raise ValueError("Source first-K section missing in private link notes")
+        sections=chapters[chapter].findall(
+            f"./{{{NS}}}div[@annotateType='commentary']")
+        i=positions[0]
+        if (len(sections)!=len(units)
+                or sections[i].get("annotateRef") != _range(units[i]["keys"])):
+            raise ValueError("Source-owned modern note location changed")
+        section=sections[i]
+        eligible=[(n,row) for (owner,n),row in sorted(available.items())
+                  if owner==first and (owner,n) not in blocked]
+        if not eligible:
+            continue
+        note=ET.SubElement(section,f"{{{NS}}}note",{
+            "type":"crossReference",
+            "resp":"BibleResourcesPrivateSourceOnlyLinkSupplement",
+        })
+        note.text="Unplaced links from original edition (not translated citations): "
+        hashes=[]
+        for j,(ordinal,row) in enumerate(eligible):
+            if not 1 <= ordinal <= len(original[first]):
+                raise ValueError("Original source link ordinal out of bounds")
+            literal,label=original[first][ordinal-1]
+            target_sha=hashlib.sha256(literal.encode("utf-8")).hexdigest()
+            label_sha=hashlib.sha256(label.encode("utf-8")).hexdigest()
+            if (row.get("original_osisRef_sha256")!=target_sha
+                    or row.get("original_visible_label_sha256")!=label_sha
+                    or not _allowed_source_link_target(literal)):
+                raise ValueError("Original note target/label SHA or grammar changed")
+            display=_source_link_supplement_display(literal)
+            reference=ET.SubElement(note,f"{{{NS}}}reference",{"osisRef":literal})
+            reference.text=display
+            reference.tail="; " if j<len(eligible)-1 else "."
+            hashes.append({
+                "source_reference_ordinal":ordinal,
+                "source_original_literal_target_sha256":target_sha,
+                "supplement_display_sha256":hashlib.sha256(
+                    display.encode("utf-8")).hexdigest(),
+            })
+            count+=1
+        expected.append({"source_first_key":first,
+                         "original_source_reference_hashes":hashes})
+    if (count!=len(pending)-len(blocked)
+            or len(expected)!=len({
+                r["source_first_key"] for r in pending
+                if (r["source_first_key"],r["source_reference_ordinal"])
+                   not in blocked})):
+        raise ValueError("Incomplete original source-note representation")
+    def without_supplement(node: ET.Element) -> str:
+        pieces=[]
+        if node.text:
+            pieces.append(node.text)
+        for child in node:
+            if (child.tag!=f"{{{NS}}}note" or child.get("resp") !=
+                    "BibleResourcesPrivateSourceOnlyLinkSupplement"):
+                pieces.append(without_supplement(child))
+            if child.tail:
+                pieces.append(child.tail)
+        return "".join(pieces)
+    if without_supplement(doc)!=before:
+        raise ValueError("Modern commentary visible prose changed in source note preview")
+    serialized=ET.tostring(doc,encoding="utf-8",xml_declaration=True)
+    ET.fromstring(serialized)
+    return serialized, {
+        "status":"PRIVATE_NATIVE_SOURCE_NOTE_ALTERNATIVE_NOT_AUTHORED_INLINE_PARITY",
+        "original_native_corpus_sha256":
+            native["original_compiled_corpus_sha256"],
+        "modern_source_text_and_existing_links_unchanged":True,
+        "original_link_occurrences_preserved_only_in_separate_source_notes":count,
+        "source_first_K_sections_with_note":len(expected),
+        "malformed_or_wrong_original_links_excluded_for_review":len(blocked),
+        "source_link_supplement_not_authorial_or_inline":True,
+        "published_or_distributed":False,
+        "editorial_relocation_approved":False,
+        "note_source_K_reference_hashes_for_private_native_readback":expected,
+    }
+
+
 def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                                     native: dict, identities: dict,
                                     dispositions: dict, repo_root: Path,
