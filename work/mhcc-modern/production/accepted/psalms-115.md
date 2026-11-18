@@ -27,7 +27,7 @@ He therefore deserves all the praise.
 
 When we seek mercy and wrestle in prayer, we should look for encouragement **in God alone**.
 
-Lord, act for us—not so that we will receive the honor, but so that **your mercy and faithfulness will be glorified**.
+Lord, act for us—not so that we may take the credit or comfort for ourselves, but so that **your mercy and faithfulness will receive the glory**.
 
 The gods of the nations are lifeless things, made by human hands.
 
@@ -76,6 +76,8 @@ May your name be first and last upon our lips, and may its sweetness refresh our
 ---
 
 ## Editorial review — Psalm 115
+
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Restored the double source contrast *credit and comfort*, which the prior draft reduced to credit/honor alone. No verse range, original published source, or authorial unit was modified; independent exact-native acceptance remains open.
 
 **Complete original-English secondary witness directly read:** [CCEL, Psalm 115](https://ccel.org/ccel/henry/mhcc.xx.cxv.html). Pinned published `MHCC 0.1.1` remains original source, native SWORD and independent acceptance pending.
 
