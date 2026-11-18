@@ -1,7 +1,7 @@
-# MHCC Modern English — authenticated original-reference anomalies, seven Genesis / Exodus chapters
+# MHCC Modern English — authenticated source-link error dispositions in Genesis through Romans
 
 **Date:** 2026-11-18  
-**Scope:** seven modern manuscript chapters (Gen.2, 3, 21; Exod.12, 14, 28, 29), not a whole-canon link correction.  
+**Scope:** 13 distinct modern manuscript chapters across 14 original K source groups (Genesis 2, 3, 21; Exodus 12, 14, 28, 29; Leviticus 8, 14; Numbers 5, 18; Deuteronomy 11; Romans 13), not a whole-canon link correction.  
 **Status:** **SOURCE-NATIVE IDENTITY CONFIRMED / SECONDARY SOURCE WITNESS REVIEWED / PROPOSED DERIVATIVE LINK DISPOSITIONS — NOT SWORD PUBLICATION**.
 
 ## Exact-original evidence and caveats
@@ -53,7 +53,31 @@ Each original ordinal, literal target and short-label digest independently match
 
 Two **additional source-original single-digit labels that are already correct** were independently attested and must *not* be changed: `Gen.32.24`, ordinal 2, genuine `Hos.12.5` in [CCEL Gen.32](https://ccel.org/ccel/henry/mhcc.ii.xxxii.html); `Exod.16.13`, ordinal 2, genuine `Jas.5.3` in [CCEL Exod.16](https://ccel.org/ccel/henry/mhcc.iii.xvi.html). Their corresponding [modern Gen.32](accepted/genesis-32.md) and [modern Exod.16](accepted/exodus-16.md) have the full citations.
 
-**Cumulative scoped proposed corrections:** **11 original elements** across **8 source K bodies**: **6** spurious prose-number links to omit, **5** wrong-book destinations to retarget, plus **1** genuinely intended cross-reference (`Rev.22.2`) lacking its own link in the authentic published SWORD. All 11 have source-authenticated fingerprints and secondary source-witness evidence; the machine-readable [manifest](GENESIS_EXODUS_REFERENCE_DISPOSITIONS.json) is reviewed mechanically without approving any publication.
+**Intermediate checkpoint (Genesis/Exodus):** 11 source links across eight K groups comprised six spurious enumeration links and five wrong-book destinations, plus one separate witness-backed missing `Rev.22.2` link. The expanded 14-group / 17-correction totals below supersede this intermediate figure.
+
+## Follow-up source-witness review: six more error cases in the Pentateuch and Romans
+
+The next six source-original K groups were independently matched by **full original raw group SHA-256**, exact original reference occurrence ordinal, exact original literal target SHA and original displayed-label SHA. Each proposed correction is restricted to the corresponding authored modern manuscript section; other original links and published module bytes remain untouched.
+
+| Original K body / 1-based link ordinal | Authentic SWORD link and label | Documented proposal **for the future modern module** | Independent English witness and modern wording |
+| --- | --- | --- | --- |
+| `Lev.8.1` #2 | `1Cor.1.6` / `6` | Retarget genuine shorthand to **`Rev.1.6`** | [CCEL Lev.8](https://ccel.org/ccel/henry/mhcc.iv.viii.html) cites Revelation 1:5, 6; [modern Leviticus 8](accepted/leviticus-08.md) has Revelation 1:5–6 |
+| `Lev.14.54` #2 | `2Cor.2.5` / `5` | Retarget to **`Eph.2.5`** | [CCEL Lev.14](https://ccel.org/ccel/henry/mhcc.iv.xiv.html) cites Ephesians 2:4, 5; [modern Leviticus 14](accepted/leviticus-14.md) has Ephesians 2:4–5 |
+| `Num.5.11` #2 | `2Cor.2.2` / `2` | **Omit spurious link on numbered lesson 2** | [CCEL Num.5](https://ccel.org/ccel/henry/mhcc.v.v.html) numbered teaching; [modern Numbers 5](accepted/numbers-05.md) says “Second, God will judge sexual immorality” |
+| `Num.18.20` #2 | `2Cor.3.2` / `2` | **Omit spurious link on numbered lesson 2** | [CCEL Num.18](https://ccel.org/ccel/henry/mhcc.v.xviii.html) numbered teaching; [modern Numbers 18](accepted/numbers-18.md) says “Second, God must receive the portion due to him” |
+| `Deut.11.18` #2 | `Ps.119.3` / `3` | **Omit spurious link on third rule** | [CCEL Deut.11](https://ccel.org/ccel/henry/mhcc.vi.xi.html) third rule in exposition; [modern Deuteronomy 11](accepted/deuteronomy-11.md) says “Third, employ the tongue” |
+| `Rom.13.1` #2 | `2Cor.2.2` / `2` | Retarget genuine shortened citation to **`1Tim.2.2`** | [CCEL Rom.13](https://ccel.org/ccel/henry/mhcc.xxxvii.xiii.html) cites 1 Timothy 2:1, 2; [modern Romans 13](accepted/romans-13.md) already cites 1 Timothy 2:1–2 |
+
+These are not free-standing insertions of new Scripture claims. Each restored target follows an explicit original prose citation, with exact target and location present in the modern manuscript. The existing authorial prose and manuscript divisions were **not rewritten** in this batch.
+
+## Exact cumulative disposition and quarantine
+
+- **17 source-original hyperlink error proposals** in **14 distinct numbered-K bodies**, encompassing **59 original link elements** in those bodies: **9** spurious links on ordinary prose enumeration numbers to *omit* and **8** incorrectly directed legitimate citations to *retarget*.
+- **1 secondary-source-witness-backed genuine citation without its own correct native hyperlink:** Revelation 22:2 in Genesis 2, to add only as the original authorial cited verse in the modern derivative.
+- **30 original single-digit displayed link labels** were triaged in a separate [full-case inventory](ORIGINAL_SINGLE_DIGIT_LINK_TRIAGE_2026-11-18.md): **9** spurious enumerators; **7** wrong-book but genuine verse-continuation links; **13** confirmed correct shortened reference labels that must remain untouched; **1 quarantined unresolved case** `Song.1.1` #2 (`Isa.54.6` / `6`) pending stronger witness evidence. The eighth wrong-book case is the original two-digit `Gen.3.14` #2 (`2Cor.2.14` / `14`).
+- The published original `MHCC 0.1.1` remains the **unaltered** source of all 1,204 links. The source hash/ordinal validator checks only these explicit exception proposals; it does **not** compile or alter either SWORD module. The nonexception links still require a separate actual compiled **derived** roundtrip and a complete editorial reference placement check.
+
+**Important count scope:** the earlier three-chapter/35-link table remains a *narrow initial subset*, **not** an estimate of whole-canon link errors. The source-wide count of 1,204 includes every legitimate link and every identified defective original hyperlink alike.
 
 ## Boundaries and next technical gate
 
