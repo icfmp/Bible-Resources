@@ -1563,6 +1563,23 @@ jobs:
               else:
                   result=("NO_SEPARATE_CCEL_BOOK_PREFACE_IN_BOUNDED_DIRECT_DIV1"
                           if sections else "ORIGINAL_CCEL_BOOK_IDENTITY_AMBIGUOUS")
+              owner=(source_blocks[0] if len(source_blocks)==1
+                     and presence[0] else
+                     lexical_matches[0][0] if len(lexical_matches)==1 else None)
+              all_words=owner["prefix_words"] if owner is not None else []
+              full_matches=[ix for ix in range(
+                  max(0,len(actual)-len(all_words)+1))
+                  if all_words and actual[ix:ix+len(all_words)]==all_words]
+              modern_first=Path("work/mhcc-modern/production/accepted")/(
+                  path.name.split("-book-introduction.CANDIDATE.md")[0]+"-01.md")
+              if not modern_first.is_file():
+                  raise ValueError("Book candidate does not own chapter 1 modern manuscript")
+              modern_fields,modern_prose=_modern_front(modern_first)
+              if modern_fields.get("chapter_osis")!=book+".1":
+                  raise ValueError("Book's first modern chapter ownership changed")
+              first_headings=re.findall(r"(?m)^## ([^\n]+)",modern_prose)
+              modern_intro_own_heading=any(
+                  "book introduction" in h.casefold() for h in first_headings[:2])
               report.append({
                   "book":book,
                   "candidate_path":str(path),
@@ -1581,6 +1598,14 @@ jobs:
                   "cross_div1_match_first_500_word_offset":(
                       lexical_matches[0][1] if len(lexical_matches)==1 else None),
                   "classification":result,
+                  "source_div1_prose_all_tokens_contiguous_in_original_first_K":
+                      len(full_matches)==1,
+                  "source_book_preface_original_word_count":len(all_words),
+                  "source_div1_original_book_preface_sha256":(
+                      owner["prefix_sha256"] if owner is not None else None),
+                  "source_native_first_K_raw_sha256":expected[original_first][1],
+                  "modern_accepted_first_chapter_has_book_intro_heading":
+                      modern_intro_own_heading,
                   "individual_source_text_or_labels_exported":False,
               })
           counts=Counter(r["classification"] for r in report)
@@ -1603,8 +1628,24 @@ jobs:
           print("MHCC 51 BOOK INTRO SOURCE BOUNDARIES TRIAGE (metadata only): "+
                 json.dumps(dict(sorted(counts.items())),sort_keys=True))
           print("MHCC 51 BOOK INTRO FIRST-K CLASSIFICATION (metadata only): "+
-                json.dumps([{"book":r["book"],"status":r["classification"]}
+                json.dumps([{"book":r["book"],"status":r["classification"],
+                             "full_source_word_match":
+                                 r["source_div1_prose_all_tokens_contiguous_in_original_first_K"],
+                             "modern_already_present":
+                                 r["modern_accepted_first_chapter_has_book_intro_heading"]}
                             for r in report],sort_keys=True))
+          print("MHCC 51 BOOK INTRO COMPLETE SOURCE-WORD AND MODERN-PRESENCE SUMMARY: "+
+                json.dumps({
+                    "source_whole_preface_matches":sum(
+                        r["source_div1_prose_all_tokens_contiguous_in_original_first_K"]
+                        for r in report),
+                    "modern_first_chapter_already_has_preface":sum(
+                        r["modern_accepted_first_chapter_has_book_intro_heading"]
+                        for r in report),
+                    "source_word_count_distribution":dict(sorted(Counter(
+                        r["source_book_preface_original_word_count"]//100
+                        for r in report).items())),
+                },sort_keys=True))
           PY
       - name: Screen all modern manuscript outline tables for out-of-order source ranges
         shell: bash
