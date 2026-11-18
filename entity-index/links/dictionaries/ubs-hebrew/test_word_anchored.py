@@ -86,9 +86,9 @@ class OriginalWordAnchoredLinksTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / "words.tsv"
             source.write_text(
-                "xml:id\\tlemma\\tsdbh\\tstrongnumberx\\tlang\\tclass\\n"
-                "o010010010011\\tקוֹל\\t\\t6963\\tH\\tnoun\\n"
-                "o010010010021\\tקֹל\\t\\t6963\\tH\\tnoun\\n",
+                "xml:id\tlemma\tsdbh\tstrongnumberx\tlang\tclass\n"
+                "o010010010011\tקוֹל\t\t6963\tH\tnoun\n"
+                "o010010010021\tקֹל\t\t6963\tH\tnoun\n",
                 encoding="utf-8",
             )
             links = build_word_links(ix, [voice, sound, other], source)
@@ -102,8 +102,8 @@ class OriginalWordAnchoredLinksTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / "words.tsv"
             source.write_text(
-                "xml:id\\tlemma\\tsdbh\\tstrongnumberx\\tlang\\tclass\\n"
-                "o010010010011\\tקוֹל\\t\\t6963\\tH\\tnoun\\n",
+                "xml:id\tlemma\tsdbh\tstrongnumberx\tlang\tclass\n"
+                "o010010010011\tקוֹל\t\t6963\tH\tnoun\n",
                 encoding="utf-8",
             )
             self.assertEqual(build_word_links(ix, [a, b], source), {})
