@@ -52,7 +52,7 @@ Those who refuse to wait for God's counsel may justly be left to follow their ow
 
 **Excessive desire can become sinful even when the thing desired is lawful**.
 
-God showed displeasure toward that conduct by allowing unrest, an accusing conscience and painful self-reproach.
+God showed his displeasure by filling them with uneasiness of mind, terror of conscience and painful self-reproach.
 
 Some people eat lavishly every day and possess strong, healthy bodies, yet their souls are wasting away.
 
@@ -70,7 +70,7 @@ God dealt severely even with Moses for **rash words**.
 
 What, then, do people deserve when they frequently speak proudly and wickedly?
 
-The Lord may justly remove people whose friendship is a blessing to us when we irritate them, provoke them and grieve them continually.
+The Lord may justly take away relatives and others whose relationships have blessed us when we are irritable toward them, provoke them and grieve them.
 
 ## Israel's failures in Canaan and the final appeal (verses 34–48)
 
@@ -107,6 +107,8 @@ May the entire world soon answer **Amen**.
 ---
 
 ## Editorial review — Psalm 106
+
+**2026-11-18 targeted CCEL re-collation (secondary witness):** Restored the source's explicit *terror of conscience* (13–33), which had been weakened to an accusing conscience. Also restored the broader source category of *relations* whom God may take away, rather than limiting the warning to friendship. The changes affect only this unreleased modern draft; exact published 0.1.1 native-source and independent approval are pending.
 
 **Complete secondary English original witness read:** [CCEL, Psalm 106](https://ccel.org/ccel/henry/mhcc.xx.cvi.html). Published source `MHCC 0.1.1` remains authoritative for exact native SWORD entries/markup and independent acceptance.
 
