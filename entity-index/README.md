@@ -275,6 +275,32 @@ also require a distinct pinned-source completeness and traditional epistle
 subscription review (see inherited #86). Variant provenance is therefore
 retained for later source-specific qualification.
 
+## Original-source lexical lemma diagnostics (not imported)
+
+The inherited [ACAI #100](https://github.com/icfmp/ACAI/issues/100)
+identified a number of declared `lemmas.he` / `lemmas.gr` values
+that do not exactly match the lexical forms of the source record's
+original-language word IDs. **Our compact resource does not import
+those declared lemma lists** and never infers an original word from
+them. A lexical mismatch in the old source does **not** invalidate
+an otherwise correctly anchored source word or imply that a person
+or place must be silently merged with another.
+
+CI now runs the **existing** read-only source
+`audit_lemma_alignment.py` from our exact locked ACAI revision,
+using both locked Macula Hebrew and Greek word TSVs. Its
+`lemma-alignment-candidates.json` report records all exact,
+partial and zero-overlap results with source-word examples for
+future word-study feature decisions. CI checks report arithmetic,
+but deliberately **does not fail on a high mismatch count or rewrite
+an inherited lemma merely to make the counter decrease**.
+
+A human/editorial follow-up must distinguish multiword named
+expressions, morphologically different surface forms, homonyms and
+genuine lexical imports from the wrong biblical person or place.
+A future published lexicon bridge needs its own source-provenance
+and rights review: this diagnostic report is private QA evidence only.
+
 ## Repeated original-word group semantics and source QA
 
 The inherited [ACAI #195](https://github.com/icfmp/ACAI/issues/195)
