@@ -14,7 +14,7 @@ from commentary_modern_reference_gate import (SourceReferenceGate,
     _unrecognized_original_ref_class, _source_same_chapter_verse_range,
     _unambiguous_explicit_modern_range, _allowed_source_link_target,
     _original_reference_table_ownership, _original_reference_title_ownership,
-    _source_range_section_ownership)
+    _source_range_section_ownership, _source_first_K_outline_row_evidence)
 
 
 ORIGINAL=(b'<div><reference osisRef="Bible:1John.5.20">1Jo 5:20</reference>'
@@ -677,6 +677,48 @@ class ExactSingleVerseSourceConcordanceTests(unittest.TestCase):
             native=source,blocked=set(),corrections={},include_ranges=False)
         self.assertEqual(candidates,[])
         self.assertEqual(skipped["unsupported_original_reference_syntax"],1)
+
+    def test_source_first_K_navigation_only_matches_unique_exact_outline_row(self):
+        ns=self.NS
+        modern=ET.Element(f"{{{ns}}}chapter",{"osisID":"Isa.1"})
+        intro=ET.SubElement(modern,f"{{{ns}}}div",{"type":"introduction"})
+        ET.SubElement(intro,f"{{{ns}}}title").text="Original chapter outline"
+        table=ET.SubElement(intro,f"{{{ns}}}table")
+        head=ET.SubElement(table,f"{{{ns}}}row")
+        for text in ("Original outline","Verses"):
+            ET.SubElement(head,f"{{{ns}}}cell").text=text
+        for a,b in (("Judah is corrupt","1–9"),
+                    ("The Lord exhorts","10–15")):
+            row=ET.SubElement(table,f"{{{ns}}}row")
+            ET.SubElement(row,f"{{{ns}}}cell").text=a
+            ET.SubElement(row,f"{{{ns}}}cell").text=b
+        native={"original_units":[{"first_key":"Isa.1.1","keys":[
+            "Isa.1."+str(i) for i in range(1,10)]},
+            {"first_key":"Isa.1.10","keys":[
+                "Isa.1."+str(i) for i in range(10,16)]}]}
+        result=_source_first_K_outline_row_evidence(
+            literal="Bible:Isa.1.1-Isa.1.9",label="Is. 1:1-9",
+            first_key="Isa.1.1",native_chapter=native,modern_chapter=modern)
+        self.assertEqual(result,{
+            "source_first_K_owns_link":True,
+            "unique_modern_outline_row_matches_source_target":True,
+            "original_visible_label_explicitly_names_same_verse_span":True})
+        later=_source_first_K_outline_row_evidence(
+            literal="Bible:Isa.1.10-Isa.1.15",label="Is. 1:10-15",
+            first_key="Isa.1.10",native_chapter=native,modern_chapter=modern)
+        self.assertFalse(later["source_first_K_owns_link"])
+        corrupted_label=_source_first_K_outline_row_evidence(
+            literal="Bible:Isa.1.1-Isa.1.9",label="Is. 1:1-10",
+            first_key="Isa.1.1",native_chapter=native,modern_chapter=modern)
+        self.assertTrue(corrupted_label["unique_modern_outline_row_matches_source_target"])
+        self.assertFalse(corrupted_label["original_visible_label_explicitly_names_same_verse_span"])
+        duplicate=ET.SubElement(table,f"{{{ns}}}row")
+        ET.SubElement(duplicate,f"{{{ns}}}cell").text="Different"
+        ET.SubElement(duplicate,f"{{{ns}}}cell").text="1–9"
+        ambiguous=_source_first_K_outline_row_evidence(
+            literal="Bible:Isa.1.1-Isa.1.9",label="Is. 1:1-9",
+            first_key="Isa.1.1",native_chapter=native,modern_chapter=modern)
+        self.assertFalse(ambiguous["unique_modern_outline_row_matches_source_target"])
 
     def test_exact_original_authorial_range_and_matching_modern_heading(self):
         section=ET.Element(f"{{{self.NS}}}div",{
