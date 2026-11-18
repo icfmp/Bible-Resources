@@ -67,7 +67,7 @@ A further **12,385** lexical occurrences have no such joint evidence, and 2 lack
 
 ## Verified improvement: original-word-anchored headword links
 
-The pinned WLC source and UBS Hebrew 0.9.4 confirm **10,483 additional
+The pinned WLC source and UBS Hebrew 0.9.4 confirm **10,794 additional
 entry-only links** beyond the conservative four-field lookup. The word-aware
 path is deliberately **not** an alias from unsuffixed Strong to suffixed
 Strong: such a rule could conflate homonyms.
@@ -77,10 +77,10 @@ MACULA WLC source word:
 
 1. Its ordinary exact source `sdbh`/Strong lookup has no UBS entry.
 2. Its original source class is `noun`, `verb`, `adj`, `adv`, or `num`.
-3. Its exact NFC lemma matches UBS **or**, for verbs only, the original
-   Hebrew consonants match after removing vowel/cantillation marks while
-   **preserving shin versus sin dots**. This is not generalized to nouns,
-   adjectives, adverbs or numerals.
+3. Its exact NFC lemma matches UBS **or**, for original WLC classes
+   `verb`, `noun`, `adj`, or `adv`, the consonants match after removing only
+   Hebrew vowel/cantillation marks, always **preserving shin versus sin dots**.
+   Numerals and grammatical classes are never matched by this fallback.
 4. Its H/A numeric Strong family plus the relevant lemma form identify
    **exactly one UBS headword**. If multiple UBS entries match the same
    consonantal form, the homograph remains unresolved.
@@ -98,10 +98,14 @@ are explicitly rejected. The added link is **entry-only**; no original
 `sdbh` is translated or assumed to preserve its sense between editions.
 
 The full-source [orthography audit](audit_orthography_gaps.py) identified
-12,387 originally unresolved selected lexical-class occurrences. After the
-verb-only corrections, **9,492** remain, with many lacking any matching
-UBS Strong family (including `כֹּל` H3605). Other classes and ambiguous
-same-consonant forms remain untouched pending stronger evidence.
+12,387 originally unresolved selected lexical-class occurrences. In addition
+to the 2,895 verb corrections, **311** nouns, adjectives and adverbs with a
+unique matching consonantal UBS headword and independent same-language Strong
+family can now resolve to **entry-only** matches. The **183** original
+same-consonant ambiguous candidates still remain deliberately unresolved.
+There are now **9,181** unresolved selected lexical-class occurrences, including
+8,156 for which the UBS 0.9.4 dictionary has no matching Strong family
+(e.g., `כֹּל` H3605).
 
 The new `lookup_word(index, word_id, sdbh, strongnumberx, lang, lemma)`
 accepts that original word identity and returns **entry-only** evidence
@@ -112,11 +116,11 @@ for callers that do not have WLC word IDs.
 
 | Measure | Generic exact-source path | Original-word-aware path |
 | --- | ---: | ---: |
-| WLC occurrences with a candidate UBS headword | 257,038 | **267,521** |
-| Additional unique-source headword links | — | **10,483** |
+| WLC occurrences with a candidate UBS headword | 257,038 | **267,832** |
+| Additional unique-source headword links | — | **10,794** |
 | WLC occurrences with Strong-corroborated SDBH sense IDs | 30,492 | **30,492** |
-| Selected lexical-class occurrences with an UBS headword | 228,705 | **239,188** |
-| Selected lexical-class coverage | 91.97% | **96.18%** |
+| Selected lexical-class occurrences with an UBS headword | 228,705 | **239,499** |
+| Selected lexical-class coverage | 91.97% | **96.31%** |
 
 Both paths remain pinned to the **same unmodified UBS and MACULA editions**.
 The word-anchored path is an opt-in query using a frozen original MACULA
@@ -127,11 +131,12 @@ dictionary prose is unchanged.
 The generator now stores `by_macula_word` plus
 `coverage_with_word_ids` in [index.json](index.json); the
 [full original-corpus CI](../../../../.github/workflows/bsi-ubs-hebrew.yml)
-rebuilds both and verifies **10,483** new links and **267,521**
+rebuilds both and verifies **10,794** new links and **267,832**
 word-aware candidates. [test_word_anchored.py](test_word_anchored.py)
 tests source identity isolation, H/A separation, disambiguation of entries
 with *different* exact lemmas inside one Strong family, rejection of identical
-homograph lemmas, and prevention of cross-edition `sdbh` collisions.
+homograph and same-consonant entries, nonverb class exclusions, and prevention
+of cross-edition `sdbh` collisions.
 
 ## Source integrity and test workflow
 

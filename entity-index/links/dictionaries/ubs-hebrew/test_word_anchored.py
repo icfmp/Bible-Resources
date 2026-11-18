@@ -120,7 +120,7 @@ class OriginalWordAnchoredLinksTest(unittest.TestCase):
                 encoding="utf-8",
             )
             ix["by_macula_word"] = build_word_links(ix, [root], source)
-        self.assertEqual(list(ix["by_macula_word"]), ["o010010010011"])
+        self.assertEqual(list(ix["by_macula_word"]), ["o010010010011", "o010010010021"])
         out = lookup_word(ix, "o010010010011", "", "3205", "H", "יָלַד")
         self.assertEqual(out["entry_ids"], [root["MainId"]])
         self.assertEqual(out["sense_ids"], [])
@@ -158,6 +158,47 @@ class OriginalWordAnchoredLinksTest(unittest.TestCase):
                 encoding="utf-8",
             )
             self.assertEqual(build_word_links(ix, [shin, sin, conflicting], source), {})
+
+    def test_nonverb_vocalization_same_strong_and_original_word_only(self):
+        item = entry("000020000000000", "קול", ["H6963a"])
+        ix = build([item], [item])
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "words.tsv"
+            source.write_text(
+                "xml:id\tlemma\tsdbh\tstrongnumberx\tlang\tclass\n"
+                "o010010010011\tקוֹל\t\t6963\tH\tnoun\n"
+                "o010010010021\tקוֹל\t\t6963\tH\tadj\n"
+                "o010010010031\tקוֹל\t\t6963\tH\tadv\n"
+                "o010010010041\tקוֹל\t\t6963\tH\tptcl\n",
+                encoding="utf-8",
+            )
+            ix["by_macula_word"] = build_word_links(ix, [item], source)
+        self.assertEqual(len(ix["by_macula_word"]), 3)
+        for wid in ("o010010010011", "o010010010021", "o010010010031"):
+            response = lookup_word(ix, wid, "", "6963", "H", "קוֹל")
+            self.assertEqual(response["entry_ids"], [item["MainId"]])
+            self.assertEqual(response["sense_ids"], [])
+            self.assertEqual(
+                response["evidence"],
+                "macula_word_nonverb_consonants_unique_entry_same_strong_family",
+            )
+        self.assertEqual(
+            lookup_word(ix, "o010010010041", "", "6963", "H", "קוֹל")["entry_ids"],
+            [],
+        )
+
+    def test_nonverb_consonantal_homographs_remain_unresolved(self):
+        first = entry("000020000000000", "קָרְבָּן", ["H7133a"])
+        second = entry("000021000000000", "קֻרְבָּן", ["H7133b"])
+        ix = build([first, second], [first, second])
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "words.tsv"
+            source.write_text(
+                "xml:id\tlemma\tsdbh\tstrongnumberx\tlang\tclass\n"
+                "o010010010011\tקׇרְבָּן\t\t7133\tH\tnoun\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(build_word_links(ix, [first, second], source), {})
 
     def test_no_promotion_of_sense_id_collision(self):
         wrong = entry("006653000000000", "רֹאשׁ", ["H7218"])
