@@ -43,6 +43,21 @@ A stronger, **whole-section** CCEL ThML ↔ authenticated native MHCC 0.1.1 word
 
 **Fidelity and editorial limits:** Exact matching of visible words for one CCEL source section does not prove identical original punctuation, typography, markup, edition lineage, or rights; and a missing passage in the compiled module compared with CCEL does not independently prove every original historical print edition contained it. Whole-chapter independent editorial acceptance, note/reference identity review and CCEL rights clearance remain outstanding. Do not silently add CCEL-only source to the published MHCC 0.1.1; the *modern derivative* may retain it with explicit source provenance until cleared.
 
+## Private zCom native-K range transport — completed 2026-11-18, NOT a released module
+
+A separate **source-agnostic, metadata-pinned** technical preview now tests the two proven **K-index under-scope cases**; this has nothing to do with adding the missing CCEL passages in 1 Samuel 25 or Psalm 95.
+
+- Original native source `MHCC 0.1.1` source ZIP, full native corpus, exact K-group first/last keys and original raw body SHA256 are checked against the immutable independently generated **1,189-chapter native receipt**.
+- [Private test-only case manifest](NATIVE_K_UNDERSCOPED_RANGE_PREVIEW.json) identifies the original authors' K body, wider modern source scope and original KJV chapter verse count. [Reusable generator](../../../scripts/commentary_modern_k_scope_preview.py) enforces that **every newly linked target K key was empty in the original source**, that the larger range follows the same original body and that no neighboring source K group is overwritten; six synthetic regression tests cover source identity, collisions, missing scope and misuse as a global chapter-fallback.
+- The generated OSIS uses **one unshipped modern body** and `annotateRef` across its source-authorial scope, then a temporary `osis2mod` **zCom** module is compiled in an isolated runner. The native SWORD chapter registry, `isLinked` adjacency, raw K body SHA equality and real `diatheke` text readback are all checked.
+- **Deut.20.10–20**: **11** accessible K verse keys; **8** additional original-empty K addresses 13–20; **10** adjacent linked pairs, **one** modern body and **zero** original authorial source bodies added/split.
+- **John.3.1–21**: **21** accessible K verse keys; **13** additional original-empty K addresses 9–21; **20** adjacent linked pairs, **one** modern body and **zero** original authorial source bodies added/split.
+- **Total: 32 K verse keys, 30 native adjacent linked pairs, two independent modern body SHA identities, zero existing original K key collisions**. Four `diatheke` sample readbacks confirmed the modern text is actually shown at both the first and last verse of each wider scope.
+
+[Real native `K_SCOPE_SWORD_LINK_PASS` at CI #44264605819](https://github.com/icfmp/Bible-Resources/actions/runs/44264605819) completed **successfully as a step**. The **overall job subsequently failed only at the generated tool-registry maintenance gate**; this is recorded separately and requires registry regeneration/re-run, not ignoring the check.
+
+**Mandatory limitation:** this is deliberately **not** a full-chapter, fully source-faithful compiled modern module: only the single selected modern section of each of the two chapters is present in the temporary test module, and source-inline original footnotes, references, introductions, and paragraph markup are not yet collated and restored. The other native original K unit(s) of these chapters are **not** claimed to be included in this disposable proof. No Xiphos/AndBible frontend result, semantic editorial approval, catalogue publication or rights signoff is inferred. The original MHCC 0.1.1 module remains untouched.
+
 ## What has and has not been changed
 
 1. In the unreleased modern derivative only, [John 3](accepted/john-03.md) now preserves Henry's precise **“No stronger expression”** for regeneration and his original **“forever”** warning in the closing comment; [Psalm 95](accepted/psalms-95.md) now includes Henry's explicit **anger at both sin and sinners**. All three reversibly committed wording changes have the secondary CCEL witness in their manuscript editorial notes.
