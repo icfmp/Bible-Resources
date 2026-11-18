@@ -18,6 +18,7 @@ from commentary_modern_reference_gate import (SourceReferenceGate,
     _find_exact_modern_original_outline_range_cell,
     _unique_authentic_original_visible_label,
     _unplaced_original_link_review_ledger,
+    build_private_compact_original_crossrefs,
     build_private_inline_original_reference_index,
     _source_owned_ordered_alignment,
     _original_source_link_contexts, _source_context_unique_paragraph_anchor,
@@ -1596,6 +1597,85 @@ class PrivateOriginalContextRelocationTests(unittest.TestCase):
                     "published_or_distributed":False,
                     "original_native_corpus_sha256":"0"*64
                 },native=native)
+
+
+
+class PrivateCompactOriginalCrossReferenceTests(unittest.TestCase):
+    def fixture(self, repeat=False):
+        from commentary_modern_draft_osis_preview import NS
+        root=ET.Element(f"{{{NS}}}osis")
+        chapter=ET.SubElement(root,f"{{{NS}}}chapter",{"osisID":"1Cor.13"})
+        sec=ET.SubElement(chapter,f"{{{NS}}}div",{
+            "annotateType":"commentary","annotateRef":"1Cor.13.8"})
+        p=ET.SubElement(sec,f"{{{NS}}}p")
+        p.text="God is love (1 John 4:8, 16). He is faithful."
+        if repeat:
+            ET.SubElement(sec,f"{{{NS}}}p").text=(
+                "God is love (1 John 4:8, 16).")
+        old=[("1John.4.8","1Jo 4:8"),("1John.4.16","16")]
+        old.extend([("Matt.23.1","x")]*4)
+        pending=[{
+            "source_first_key":"1Cor.13.8",
+            "source_reference_ordinal":i,
+            "original_osisRef_sha256":hashlib.sha256(t.encode()).hexdigest(),
+            "original_visible_label_sha256":hashlib.sha256(l.encode()).hexdigest(),
+            "disposition":"UNPLACED_SINGLE_VERSE_REFERENCE"
+        } for i,(t,l) in enumerate(old,1)]
+        native={
+            "source_prose_or_original_markup_exported":False,
+            "original_compiled_corpus_sha256":FULL_HASH,
+            "chapters":{"1Cor.13":{"original_units":[{
+                "first_key":"1Cor.13.8","keys":["1Cor.13.8"]}]}}
+        }
+        ledger={
+            "status":"SOURCE_NATIVE_WHOLE_CANON_HYPERLINK_DISPOSITION_QUEUE_NOT_FINAL_APPROVAL",
+            "source_reference_labels_or_literal_targets_exported":False,
+            "publication_authorized":False,
+            "original_native_reference_elements":6,
+            "source_spurious_link_occurrences_explicitly_omitted":0,
+            "source_link_occurrences_verified_in_derived_osis":0,
+            "source_original_links_still_requiring_placement_review":6,
+            "pending":pending,
+        }
+        errata={
+            "status":"PINNED_ORIGINAL_LINK_ERRATA_REVIEW_ONLY_NOT_APPLIED",
+            "original_native_corpus_sha256":FULL_HASH,
+            "cases":[{"source_first_key":"1Cor.13.8",
+                      "original_reference_ordinal":i,"approval":False}
+                     for i in range(3,7)]}
+        return ET.tostring(root),ledger,{"1Cor.13.8":old},native,errata
+
+    def test_two_separate_real_verse_targets_in_one_compact_english_citation(self):
+        from commentary_modern_draft_osis_preview import NS
+        root,ledger,old,native,errata=self.fixture()
+        result,revised,receipt=build_private_compact_original_crossrefs(
+            linked_osis=root,ledger=ledger,original=old,native=native,errata=errata)
+        doc=ET.fromstring(result)
+        refs=[n for n in doc.iter() if n.tag==f"{{{NS}}}reference"]
+        self.assertEqual(len(refs),2)
+        self.assertEqual([(r.text,r.get("osisRef")) for r in refs],
+                         [("8","1John.4.8"),("16","1John.4.16")])
+        self.assertEqual("".join(doc.itertext()),
+                         "God is love (1 John 4:8, 16). He is faithful.")
+        self.assertEqual(receipt["original_exact_compact_verse_links_restored"],2)
+        self.assertEqual(receipt["original_defective_link_proposals_never_retargeted"],4)
+        self.assertEqual(len(revised["pending"]),4)
+        self.assertFalse(receipt["released_or_distributed"])
+
+    def test_duplicate_english_citation_in_same_K_remains_unplaced(self):
+        root,ledger,old,native,errata=self.fixture(repeat=True)
+        _,revised,receipt=build_private_compact_original_crossrefs(
+            linked_osis=root,ledger=ledger,original=old,native=native,errata=errata)
+        self.assertEqual(receipt["original_exact_compact_verse_links_restored"],0)
+        self.assertEqual(len(revised["pending"]),6)
+
+    def test_wrong_original_sha_blocks_recovery(self):
+        root,ledger,old,native,errata=self.fixture()
+        ledger["pending"][0]["original_osisRef_sha256"]="0"*64
+        with self.assertRaisesRegex(ValueError,"Original exact source link receipt changed"):
+            build_private_compact_original_crossrefs(
+                linked_osis=root,ledger=ledger,original=old,native=native,
+                errata=errata)
 
 if __name__=="__main__":
     unittest.main()
