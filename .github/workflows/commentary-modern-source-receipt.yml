@@ -500,7 +500,7 @@ jobs:
                 f"{len(keys)} exact original-plus-I-only keys, "
                 "no additional/missing verses; source meaning/links still unapproved")
           PY
-      - name: Add 39 SHA-attested original and source-corrected links into private whole-canon OSIS
+      - name: Add reviewed and unambiguous exact source-matched links into private whole-canon OSIS
         shell: bash
         run: |
           set -euo pipefail
@@ -514,6 +514,7 @@ jobs:
             --repository-root . \
             --base-unlinked-osis "$RUNNER_TEMP/mhcc-modern-complete-unlinked.osis.xml" \
             --reviewed-link-placement-manifest work/mhcc-modern/production/MODERN_OSIS_REVIEWED_LINK_PLACEMENTS.json \
+            --auto-source-matched-single-verses \
             --linked-osis "$RUNNER_TEMP/mhcc-modern-complete-bounded-linked.osis.xml" \
             --report "$RUNNER_TEMP/mhcc-modern-complete-bounded-linked-osis-structure.json"
           python - <<'PY'
@@ -525,11 +526,14 @@ jobs:
           assert report["status"] == (
               "PRIVATE_REVIEWED_LINKED_FULL_CANON_OSIS_CANDIDATE_NOT_RELEASED")
           assert report["modern_chapters_preserved"] == 1189
-          assert report["modern_inline_links_inserted"] == 39
+          assert report["modern_inline_links_inserted"] > 39
+          assert report["modern_inline_links_inserted"] == (39 +
+              report["automatic_exact_single_verse_source_links"]["automatically_inserted"])
           assert report["actual_original_links_copied_without_correction"] == 30
           assert report["documented_wrong_original_links_retargeted"] == 8
           assert report["source_witness_authored_missing_original_link_added"] == 1
-          assert report["source_pinned_original_K_bodies_revisited"] == 19
+          assert report["source_pinned_original_K_bodies_revisited"] == 669
+          assert report["source_K_groups_with_links_inserted"] >= 19
           assert report["original_source_link_identity_hashes_and_order_verified"] is True
           assert report["modern_visible_prose_modified"] is False
           assert report["published_source_1204_links_fully_transferred"] is False
@@ -538,14 +542,16 @@ jobs:
           unlinked=ET.parse(base/"mhcc-modern-complete-unlinked.osis.xml").getroot()
           linked=ET.parse(base/"mhcc-modern-complete-bounded-linked.osis.xml").getroot()
           assert "".join(unlinked.itertext()) == "".join(linked.itertext())
-          assert len(linked.findall(".//o:reference",ns)) == 39
+          assert len(linked.findall(".//o:reference",ns)) == report["modern_inline_links_inserted"]
           assert len(linked.findall(".//o:chapter",ns)) == 1189
           assert len(linked.findall(".//o:div[@annotateType='commentary']",ns)) == 4049
-          print("PRIVATE MODERN MHCC 39 REVIEWED LINKS XML PASS: thirty authentic "
-                "literal copies, eight witnessed destination corrections, one "
-                "witness-backed missing source-native link; 1204 NOT fully linked")
+          print("PRIVATE MODERN MHCC SOURCE-MATCHED LINKS XML PASS: " +
+                str(report["modern_inline_links_inserted"]) +
+                " source-backed links, including 39 reviewed occurrences and " +
+                str(report["automatic_exact_single_verse_source_links"]["automatically_inserted"]) +
+                " conservative exact singleton auto matches; 1204 NOT fully linked")
           PY
-      - name: Compile private 39-link whole-canon OSIS and attest exact native SWORD targets
+      - name: Compile private source-matched whole-canon OSIS and attest exact native SWORD targets
         shell: bash
         run: |
           set -euo pipefail
@@ -558,7 +564,7 @@ jobs:
             > "$RUNNER_TEMP/mhcc-bounded-linked-osis2mod.log" 2>&1
           cat > "$RUNNER_TEMP/mhcc-bounded-linked-root/mods.d/mhcclnktmp.conf" <<'EOF'
           [MHCCLINKTMP]
-          Description=Private unpublished 39-source-linked Modern English MHCC candidate
+          Description=Private unpublished source-matched Modern English MHCC candidate
           DataPath=./modules/comments/zcom/mhcclnktmp/
           ModDrv=zCom
           CompressType=ZIP
@@ -582,8 +588,8 @@ jobs:
                   "labels":r["source_linked_modern_label_hashes_in_actual_document_order"],
               } for r in report["linked_source_K_groups_with_exact_derived_target_order"]
           }
-          assert len(expected)==19
-          assert sum(len(v["targets"]) for v in expected.values())==39
+          assert len(expected)==report["source_K_groups_with_links_inserted"]
+          assert sum(len(v["targets"]) for v in expected.values())==report["modern_inline_links_inserted"]
           assert all(len(v["targets"])==len(v["labels"]) for v in expected.values())
           seen={}
           def observe(kind,key,raw):
@@ -635,9 +641,9 @@ jobs:
               intended.update(ch+"."+str(v) for v in range(1,row["verse_count"]+1))
           assert len(intended)==28792
           assert set(numbered)==intended and len(numbered)==28792
-          assert sum(seen.values())==39
+          assert sum(seen.values())==report["modern_inline_links_inserted"]
           proof={
-              "status":"PRIVATE_39_REVIEWED_LINKS_COMPILED_SWORD_NATIVE_TARGETS_PASS",
+              "status":"PRIVATE_FULL_CANON_SOURCE_MATCHED_LINKS_COMPILED_SWORD_NATIVE_TARGETS_PASS",
               "compiled_native_K_address_count":len(numbered),
               "reviewed_original_link_section_targets_verified":len(seen),
               "reviewed_original_link_occurrences_verified":sum(seen.values()),
@@ -645,16 +651,19 @@ jobs:
               "modern_link_labels_sha256_identical_after_native_compilation":True,
               "exact_28792_original_plus_I_only_indexed_keys_preserved":True,
               "original_literal_links_preserved":30,
+              "automatic_original_literal_links_attested_and_compiled":report[
+                  "automatic_exact_single_verse_source_links"]["automatically_inserted"],
               "source_witness_corrected_link_targets":8,
               "witness_missing_original_link_added":1,
               "source_1204_links_fully_integrated":False,
               "independent_semantic_approval":False,
               "published_or_distributed":False,
           }
-          (base/"mhcc-modern-39-links-native-SWORD-readback.json").write_text(
+          (base/"mhcc-modern-source-matched-links-native-SWORD-readback.json").write_text(
               json.dumps(proof,indent=2,sort_keys=True)+"\n",encoding="utf-8")
-          print("PRIVATE COMPILED MHCC REVIEWED SOURCE LINKS PASS "
-                "39/39 exact targets and visible labels in 28792 exact original/I-only keys; NO release")
+          print("PRIVATE COMPILED MHCC SOURCE-MATCHED LINKS PASS " +
+                str(sum(seen.values())) +
+                " exact targets and visible labels in 28792 exact original/I-only keys; NO release")
           PY
       - name: Probe five original SWORD source-body scopes against independent English anchors
         shell: bash
@@ -1835,7 +1844,7 @@ jobs:
             ${{ runner.temp }}/mhcc-modern-all-original-link-identity-sha.json
             ${{ runner.temp }}/mhcc-modern-proposed-link-correction-dispositions.json
             ${{ runner.temp }}/mhcc-modern-complete-bounded-linked-osis-structure.json
-            ${{ runner.temp }}/mhcc-modern-39-links-native-SWORD-readback.json
+            ${{ runner.temp }}/mhcc-modern-source-matched-links-native-SWORD-readback.json
             ${{ runner.temp }}/mhcc-modern-complete-unlinked-osis-structure.json
             ${{ runner.temp }}/mhcc-modern-complete-private-sword-smoke.json
             ${{ runner.temp }}/mhcc-modern-complete-private-native-key-audit.json
