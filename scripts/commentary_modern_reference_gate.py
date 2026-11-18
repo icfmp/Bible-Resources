@@ -630,8 +630,60 @@ if len(_ENGLISH_CANONICAL_NAMES) != len(_ORIGINAL_CANON):
     raise RuntimeError("Canonical Bible book-name mapping cannot be trusted")
 _ENGLISH_NAME_BY_OSIS = dict(zip(_ORIGINAL_CANON, _ENGLISH_CANONICAL_NAMES))
 _ENGLISH_NAME_BY_OSIS["Ps"] = "Psalm"
-_AUTO_ALIASES = {"Ps": ("Psalm", "Psalms"),
-                 "Song": ("Song of Solomon", "Song of Songs")}
+# Exact, conventional, period-terminated English book abbreviations can be
+# matched only inside the already authenticated source-owned K exposition.
+# Do not accept unpunctuated lookalikes or infer any abbreviated verse numbers.
+_AUTO_ALIASES = {
+    "Gen": ("Genesis", "Gen."),
+    "Exod": ("Exodus", "Exod.", "Ex."),
+    "Lev": ("Leviticus", "Lev."),
+    "Num": ("Numbers", "Num."),
+    "Deut": ("Deuteronomy", "Deut."),
+    "Josh": ("Joshua", "Josh."),
+    "Judg": ("Judges", "Judg."),
+    "1Sam": ("1 Samuel", "1 Sam."),
+    "2Sam": ("2 Samuel", "2 Sam."),
+    "1Kgs": ("1 Kings", "1 Kgs."),
+    "2Kgs": ("2 Kings", "2 Kgs."),
+    "1Chr": ("1 Chronicles", "1 Chr."),
+    "2Chr": ("2 Chronicles", "2 Chr."),
+    "Neh": ("Nehemiah", "Neh."),
+    "Esth": ("Esther", "Esth."),
+    "Ps": ("Psalm", "Psalms", "Ps."),
+    "Prov": ("Proverbs", "Prov."),
+    "Eccl": ("Ecclesiastes", "Eccl."),
+    "Song": ("Song of Solomon", "Song of Songs"),
+    "Isa": ("Isaiah", "Isa."),
+    "Jer": ("Jeremiah", "Jer."),
+    "Ezek": ("Ezekiel", "Ezek."),
+    "Dan": ("Daniel", "Dan."),
+    "Hos": ("Hosea", "Hos."),
+    "Zech": ("Zechariah", "Zech."),
+    "Matt": ("Matthew", "Matt."),
+    "Mark": ("Mark", "Mk."),
+    "Luke": ("Luke", "Lk."),
+    "John": ("John", "Jn."),
+    "Acts": ("Acts", "Acts."),
+    "Rom": ("Romans", "Rom."),
+    "1Cor": ("1 Corinthians", "1 Cor."),
+    "2Cor": ("2 Corinthians", "2 Cor."),
+    "Gal": ("Galatians", "Gal."),
+    "Eph": ("Ephesians", "Eph."),
+    "Phil": ("Philippians", "Phil."),
+    "Col": ("Colossians", "Col."),
+    "1Thess": ("1 Thessalonians", "1 Thess."),
+    "2Thess": ("2 Thessalonians", "2 Thess."),
+    "1Tim": ("1 Timothy", "1 Tim."),
+    "2Tim": ("2 Timothy", "2 Tim."),
+    "Heb": ("Hebrews", "Heb."),
+    "Jas": ("James", "Jas."),
+    "1Pet": ("1 Peter", "1 Pet."),
+    "2Pet": ("2 Peter", "2 Pet."),
+    "1John": ("1 John", "1 Jn."),
+    "2John": ("2 John", "2 Jn."),
+    "3John": ("3 John", "3 Jn."),
+    "Rev": ("Revelation", "Rev."),
+}
 
 
 def _unambiguous_explicit_modern_verse(section: ET.Element, target: str):
