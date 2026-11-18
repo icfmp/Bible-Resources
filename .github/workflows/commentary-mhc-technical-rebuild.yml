@@ -1353,9 +1353,19 @@ jobs:
               return result,counts
           old,old_counts=frames(root/"mhc-links-preview-sword","MHCLinkPreview")
           new,new_counts=frames(native_work,"MHCIntroPreview")
-          intro_key=("I","2Chr.1.0")
+          # SWORD VerseKey::getOSISRef() omits the trailing .0 for
+          # chapter-introduction native locations; the independent complete
+          # source/native intro census also uses the canonical "2Chr.1" ID.
+          intro_key=("I","2Chr.1")
           verse_key=("K","2Chr.1.1")
           if intro_key not in new or verse_key not in new:
+              print("Actual private 2Chr introduction key diagnostic (metadata only):",
+                    {"chapter_I_keys":[key for kind,key in new
+                                       if kind=="I" and key.startswith("2Chr.1")][:12],
+                     "chapter_K_first_keys":[key for kind,key in new
+                                          if kind=="K" and key.startswith("2Chr.1.")][:12],
+                     "chapter_intro_has_entry":intro_key in new,
+                     "exposition_start_has_entry":verse_key in new})
               raise SystemExit("Source-authored introduction missing from actual chapter intro key")
           def words(raw):
               xml=etree.fromstring(b"<fragment>"+raw+b"</fragment>",
