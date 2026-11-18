@@ -144,7 +144,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/repair_osis_inline_markup.py`](../scripts/repair_osis_inline_markup.py) | UNDECIDED | named test | 6 | not determined |
 | [`scripts/repair_osis_note_links.py`](../scripts/repair_osis_note_links.py) | UNDECIDED | named test | 12 | not determined |
 | [`scripts/repair_osis_paragraph_indentation.py`](../scripts/repair_osis_paragraph_indentation.py) | UNDECIDED | named test | 6 | not determined |
-| [`scripts/repair_osis_source_bytes.py`](../scripts/repair_osis_source_bytes.py) | UNDECIDED | named test | 9 | not determined |
+| [`scripts/repair_osis_source_bytes.py`](../scripts/repair_osis_source_bytes.py) | UNDECIDED | named test | 10 | not determined |
 | [`scripts/repair_osis_unlinked_reference_labels.py`](../scripts/repair_osis_unlinked_reference_labels.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/reviewed_compiled_commentary_rebuild.py`](../scripts/reviewed_compiled_commentary_rebuild.py) | KEEP_GENERIC | named test | 12 | publication/release |
 | [`scripts/select_sources.py`](../scripts/select_sources.py) | UNDECIDED | not established | 5 | not determined |
