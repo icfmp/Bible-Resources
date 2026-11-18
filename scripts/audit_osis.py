@@ -888,6 +888,124 @@ def triage_commentary_introduction_relocation(
     }
 
 
+
+def source_commentary_book_closing_text(path: Path) -> dict[str,dict]:
+    """Private book-tail text after each book's last closed verse milestone.
+
+    Do not classify a SWORD-added suffix as invented until it has been
+    compared with originally authored post-verse/book-closing material.
+    """
+    raw=require_regular_file(Path(path).absolute(),MAX_SOURCE_BYTES,"SOURCE_UNAVAILABLE")
+    doc=parse_xml(Path(path).absolute(),raw,"MALFORMED_XML")
+    books={}
+    for node in doc.iter():
+        if not isinstance(node.tag,str) or _tag(node)!="div" or node.get("type")!="book":
+            continue
+        book=node.get("osisID")
+        if not book or book in books:
+            raise ValueError("Duplicate or missing authored commentary book")
+        state={"seen_opener":False,"open":False,"after_closer":False,
+               "last_scope":None,"parts":[],"line":node.sourceline}
+        def walk(el):
+            if not isinstance(el.tag,str):
+                return
+            if _tag(el)=="verse":
+                if el.get("osisID"):
+                    if state["open"]:
+                        raise ValueError("Overlapping source verse openers")
+                    state["seen_opener"]=True
+                    state["open"]=True
+                    state["after_closer"]=False
+                    state["parts"]=[]
+                    state["last_scope"]=el.get("sID")
+                elif el.get("eID"):
+                    if not state["open"] or el.get("eID")!=state["last_scope"]:
+                        raise ValueError("Nonmatching source verse closer")
+                    state["open"]=False
+                    state["after_closer"]=True
+            if state["after_closer"] and el.text:
+                state["parts"].append(el.text)
+            for child in el:
+                walk(child)
+                if state["after_closer"] and child.tail:
+                    state["parts"].append(child.tail)
+        walk(node)
+        if not state["seen_opener"] or state["open"]:
+            raise ValueError("Unverified original book final commentary range")
+        books[book]={
+            "last_source_scope":state["last_scope"],
+            "closing_text":"".join(state["parts"]),
+            "source_line":state["line"],
+        }
+    if len(books)<1:
+        raise ValueError("No authored book closing witnesses")
+    return books
+
+
+def classify_commentary_native_final_boundary(
+        original_group: dict, compiled_raw: bytes, book_closing_text: str) -> dict:
+    """Classify source/native trailing visible text without exposing prose.
+
+    Compare *after* the final aligned word of the authored verse group.
+    Extra native text that exactly matches authored book-closing material is
+    not a punctuation corruption; exact target ownership still needs review.
+    """
+    from lxml import etree
+    import unicodedata
+    if (not isinstance(original_group,dict)
+            or not isinstance(original_group.get("text"),str)
+            or not isinstance(compiled_raw,bytes)
+            or len(compiled_raw)>2*1024*1024
+            or not isinstance(book_closing_text,str)):
+        raise ValueError("Untrusted original/native book-ending evidence")
+    doc=etree.fromstring(b"<fragment>"+compiled_raw+b"</fragment>",
+                        etree.XMLParser(resolve_entities=False,load_dtd=False,
+                                        no_network=True,recover=False,huge_tree=False))
+    original=unicodedata.normalize("NFC",original_group["text"])
+    compiled=unicodedata.normalize("NFC","".join(doc.itertext()))
+    source_tokens=list(re.finditer(r"\w+",original))
+    native_tokens=list(re.finditer(r"\w+",compiled))
+    expected=[m.group().casefold() for m in source_tokens]
+    observed=[m.group().casefold() for m in native_tokens]
+    if not expected or len(observed)<len(expected):
+        return {"class":"unmatched_end_boundary_source_word_run"}
+    matches=[i for i in range(len(observed)-len(expected)+1)
+             if observed[i:i+len(expected)]==expected]
+    if len(matches)!=1:
+        return {"class":"ambiguous_final_group_word_alignment",
+                "word_runs_matching":len(matches)}
+    start=matches[0]
+    native_tail=compiled[native_tokens[start+len(expected)-1].end():]
+    source_tail=original[source_tokens[-1].end():]
+    expected_tail=source_tail+unicodedata.normalize("NFC",book_closing_text)
+    def fold(s):
+        return " ".join(s.split())
+    def nonspace(s):
+        return "".join(s.split())
+    if fold(native_tail)==fold(source_tail):
+        category="native_suffix_equals_original_group_boundary"
+    elif fold(native_tail)==fold(expected_tail):
+        category="native_suffix_exactly_contains_original_book_closing_text"
+    elif nonspace(native_tail)==nonspace(expected_tail):
+        category="native_suffix_matches_authored_closing_without_whitespace"
+    elif nonspace(native_tail)==nonspace(source_tail):
+        category="native_suffix_only_spacing_differs_from_original_group"
+    else:
+        category="native_suffix_not_explained_by_source_book_closing"
+    return {
+        "class":category,
+        "matched_source_word_run_starts_at_native_word":start+1,
+        "original_closing_visible_codepoints":len(book_closing_text),
+        "compiled_trailing_nonspace_codepoints":len(nonspace(native_tail)),
+        "original_group_trailing_nonspace_codepoints":len(nonspace(source_tail)),
+        "original_book_closing_sha256":hashlib.sha256(
+            book_closing_text.encode("utf-8")).hexdigest(),
+        "native_trailing_sha256":hashlib.sha256(
+            native_tail.encode("utf-8")).hexdigest(),
+        "source_word_or_commentary_prose_exposed":False,
+    }
+
+
 def _source_native_interword_punctuation_shape(source: str, native: str) -> dict:
     """Compare punctuation-only gaps aligned by the complete source word run.
 
