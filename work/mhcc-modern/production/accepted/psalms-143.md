@@ -55,7 +55,7 @@ But the night of affliction will eventually end in **a morning of comfort and pr
 
 He asked to understand God's will.
 
-This is one of **the Spirit's first works in the believer**.
+Henry calls this **the first work of the Spirit**.
 
 The faithful person does not ask merely which road is easiest or most pleasant.
 
@@ -72,6 +72,8 @@ Above all, we should ask for **our sins to be destroyed**, since they are our mo
 ---
 
 ## Editorial review — Psalm 143
+
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Preserved the definite source claim that illumination concerning God's will is *the first work of the Spirit*, rather than diluting it into *one of the first*. The phrasing is expressly attributed to Henry; it is not an independently affirmed universal theological sequence. Original SWORD and independent manuscript acceptance remain pending.
 
 **Complete original-English secondary witness read:** [CCEL, Psalm 143](https://ccel.org/ccel/henry/mhcc.xx.cxliii.html). Released original `MHCC 0.1.1` remains source of record, exact native-SWORD and independent QA pending.
 
