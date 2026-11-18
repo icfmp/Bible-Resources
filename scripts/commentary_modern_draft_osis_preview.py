@@ -530,11 +530,37 @@ def main():
     sources=p.add_mutually_exclusive_group(required=True)
     sources.add_argument("--native-map",type=Path)
     sources.add_argument("--single-chapter-source-map",type=Path)
+    sources.add_argument("--accepted-native-receipt",type=Path)
+    p.add_argument("--source-topology-manifest",type=Path)
+    p.add_argument("--ionly-manifest",type=Path)
+    p.add_argument("--book-intro-candidate-root",type=Path)
     p.add_argument("--include-production-candidates",action="store_true")
     p.add_argument("--osis",type=Path,required=True)
     p.add_argument("--report",type=Path,required=True)
     p.add_argument("--temp-module-id",default="MHCCWORK")
     a=p.parse_args()
+    if a.accepted_native_receipt:
+        if (not a.source_topology_manifest or not a.ionly_manifest
+                or not a.book_intro_candidate_root
+                or a.include_production_candidates):
+            p.error("Full-canon mode requires topology, I-only and chapter-I candidates")
+        data, report=generate_accepted_canon_osis(
+            a.root,
+            json.loads(a.accepted_native_receipt.read_text(encoding="utf-8")),
+            json.loads(a.source_topology_manifest.read_text(encoding="utf-8")),
+            json.loads(a.ionly_manifest.read_text(encoding="utf-8")),
+            a.book_intro_candidate_root,work_id=a.temp_module_id)
+        a.osis.parent.mkdir(parents=True,exist_ok=True)
+        a.report.parent.mkdir(parents=True,exist_ok=True)
+        a.osis.write_bytes(data)
+        a.report.write_text(json.dumps(report,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+        print("FULL-CANON MODERN MHCC UNLINKED OSIS: 66 books, 1189 chapters, " +
+              str(report["annotated_sections"])+" original-indexed sections, " +
+              "SHA256="+report["osis_sha256"]+
+              "; source hyperlinks, source markup and publication NOT approved")
+        return 0
+    if a.source_topology_manifest or a.ionly_manifest or a.book_intro_candidate_root:
+        p.error("Whole-canon manifests require --accepted-native-receipt")
     if a.single_chapter_source_map:
         raw=json.loads(a.single_chapter_source_map.read_text(encoding="utf-8"))
         scope=raw.get("scope")
