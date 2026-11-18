@@ -49,6 +49,7 @@ def source_census(source: Path, expected_sha: str) -> dict:
     root = []
     depth = [0]
     lang = [None]
+    commentary_sections = [0]
 
     def begin(tag, attrs):
         depth[0] += 1
@@ -60,6 +61,8 @@ def source_census(source: Path, expected_sha: str) -> dict:
             root.append(name)
         if name == "osisText":
             lang[0] = attrs.get("http://www.w3.org/XML/1998/namespace}lang")
+        if name == "div" and attrs.get("annotateType") == "commentary":
+            commentary_sections[0] += 1
 
     def end(_tag):
         depth[0] -= 1
@@ -86,7 +89,7 @@ def source_census(source: Path, expected_sha: str) -> dict:
         "source_bytes": source.stat().st_size,
         "source_language_declared": lang[0],
         "osis_div_elements": counts["div"],
-        "osis_sections_annotated": counts["div"],
+        "osis_sections_annotated": commentary_sections[0],
         "osis_reference_elements": counts["reference"],
         "osis_note_elements": counts["note"],
         "osis_title_elements": counts["title"],
