@@ -1,6 +1,6 @@
-# Bible Entity Index — independent offline resource (bootstrap)
+# Bible Semantic Index (BSI) — independent offline resource
 
-This directory is a **portable, independent dataset builder**. It is currently
+**Bible Semantic Index (BSI)** is a portable, independent dataset builder. It is currently
 hosted under Bible-Resources until a dedicated repository can be created. It
 does **not** publish or modify any existing SWORD resource or catalogue.
 
@@ -58,7 +58,7 @@ nonexhaustive source-candidate study, not a dictionary or published release.
 The first version's **internal-only** build receipt, licensing caveats and
 Bible consumer integration contract are in
 [the v0.1 candidate handoff](V0_1_CANDIDATE_HANDOFF.md).
-This is not a released or approved resource.
+This is not a released or approved resource. The [BSI v0.1 release-readiness record](BSI_V0_1_RELEASE_READINESS.md) documents the adopted name, field-level rights questions and release gates; integration into the Bible app is owned separately.
 
 ## Initial independent editorial corrections
 
