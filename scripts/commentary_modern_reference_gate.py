@@ -2386,6 +2386,167 @@ def build_private_compact_original_crossrefs(
 
 
 
+
+def build_private_owned_K_heading_range_links(
+        *, compact_osis: bytes, ledger: dict, original: dict, native: dict,
+        errata: dict) -> tuple[bytes, dict, dict]:
+    """Attach authenticated original SAME-CHAPTER complete K ranges to their heading.
+
+    An original link may end the PRECEDING K body as a section navigation
+    hint; only the single source-owned NEXT (or current/future) K section
+    whose original native verse occupancy exactly equals the range may
+    receive it. The displayed modern heading must explicitly name those
+    same verse endpoints. This is a provenance-marked EDITORIAL heading
+    relocation, not a claim about Henry's original inline words.
+    """
+    from commentary_modern_draft_osis_preview import NS, _range
+    if (ledger.get("status") !=
+            "SOURCE_NATIVE_WHOLE_CANON_HYPERLINK_DISPOSITION_QUEUE_NOT_FINAL_APPROVAL"
+            or ledger.get("publication_authorized") is not False
+            or ledger.get("source_reference_labels_or_literal_targets_exported") is not False
+            or native.get("source_prose_or_original_markup_exported") is not False
+            or errata.get("status") !=
+                "PINNED_ORIGINAL_LINK_ERRATA_REVIEW_ONLY_NOT_APPLIED"
+            or errata.get("original_native_corpus_sha256") !=
+                native.get("original_compiled_corpus_sha256")):
+        raise ValueError("Authentic source K and errata receipts required for range headings")
+    blocked={(case["source_first_key"],case["original_reference_ordinal"])
+             for case in errata["cases"]}
+    if len(blocked)!=4 or any(case["approval"] is not False for case in errata["cases"]):
+        raise ValueError("Unapproved original target errors must remain blocked")
+    doc=ET.fromstring(compact_osis)
+    original_prose="".join(doc.itertext())
+    chapters={x.get("osisID"):x for x in doc.iter() if x.tag==f"{{{NS}}}chapter"}
+    if set(chapters)!=set(native.get("chapters",{})):
+        raise ValueError("Source/modern chapter coverage mismatch for heading link repair")
+    original_groups={}
+    for chapter,ch in chapters.items():
+        units=native["chapters"][chapter]["original_units"]
+        sections=ch.findall(f"./{{{NS}}}div[@annotateType='commentary']")
+        if not units:
+            continue
+        if len(units)!=len(sections):
+            raise ValueError("Original K and modern section count differs")
+        original_groups[chapter]=(units,sections)
+        for unit,section in zip(units,sections):
+            if section.get("annotateRef") != _range(unit["keys"]):
+                raise ValueError("Original K verse occupancy drift")
+
+    # Multiple source links must not be silently attached to the same
+    # derived verse-heading text. Restore neither if ambiguous.
+    candidates={}
+    for row in ledger["pending"]:
+        first,ordinal=row["source_first_key"],row["source_reference_ordinal"]
+        key=(first,ordinal)
+        if key in blocked:
+            continue
+        if first not in original or not 1<=ordinal<=len(original[first]):
+            raise ValueError("Missing original link K/ordinal")
+        literal,label=original[first][ordinal-1]
+        if (hashlib.sha256(literal.encode()).hexdigest()!=row["original_osisRef_sha256"]
+                or hashlib.sha256(label.encode()).hexdigest()!=
+                row["original_visible_label_sha256"]):
+            raise ValueError("Unpinned original link target/printed label")
+        parsed=_source_same_chapter_verse_range(literal)
+        if parsed is None:
+            continue
+        book,chapter,start,end=parsed
+        source_chapter=first.rsplit(".",1)[0]
+        if source_chapter!=book+"."+chapter or source_chapter not in original_groups:
+            continue
+        if re.search(
+                r"(?<![0-9])"+re.escape(chapter)+r"\s*:\s*"+
+                re.escape(start)+r"\s*[-–—]\s*"+re.escape(end)+r"(?!\d)",
+                label) is None:
+            continue
+        units,sections=original_groups[source_chapter]
+        source_index=next((i for i,u in enumerate(units)
+                           if u["first_key"]==first),None)
+        raw_target=literal[6:] if literal.startswith("Bible:") else literal
+        owning=[i for i,u in enumerate(units)
+                if _range(u["keys"])==raw_target]
+        if (source_index is None or len(owning)!=1
+                or owning[0]<source_index):
+            continue
+        target_index=owning[0]
+        section=sections[target_index]
+        titles=section.findall(f"./{{{NS}}}title[@type='sub']")
+        label_pattern=re.compile(
+            r"\bverses?\s+"+re.escape(start)+r"\s*[-–—]\s*"+
+            re.escape(end)+r"\b", re.I)
+        matches=[]
+        for title in titles:
+            if len(title)!=0 or not isinstance(title.text,str):
+                continue
+            for m in label_pattern.finditer(title.text):
+                matches.append((title,m.start(),m.end()))
+        if len(matches)!=1:
+            continue
+        title,start_pos,end_pos=matches[0]
+        candidates[key]={
+            "source_first_key":first,"source_reference_ordinal":ordinal,
+            "target_native_first_key":units[target_index]["first_key"],
+            "original_literal_target_sha256":row["original_osisRef_sha256"],
+            "original_visible_label_sha256":row["original_visible_label_sha256"],
+            "source_literal":literal,
+            "title":title,"start":start_pos,"end":end_pos,
+        }
+
+    from collections import Counter
+    counts=Counter(id(x["title"]) for x in candidates.values())
+    candidates={k:v for k,v in candidates.items() if counts[id(v["title"])]==1}
+    for key,x in candidates.items():
+        title=x["title"]
+        original_text=title.text
+        display=original_text[x["start"]:x["end"]]
+        if not display or len(title):
+            raise ValueError("Original modern heading changed during source target mapping")
+        link=ET.Element(f"{{{NS}}}reference",{
+            "osisRef":x["source_literal"],
+            "resp":"BibleResourcesOriginalSourceRangeInModernSectionHeading"})
+        link.text=display
+        link.tail=original_text[x["end"]:]
+        title.text=original_text[:x["start"]]
+        title.insert(0,link)
+        x["linked_display_sha256"]=hashlib.sha256(display.encode()).hexdigest()
+    if "".join(doc.itertext())!=original_prose:
+        raise ValueError("Source range heading link changed modern visible prose")
+    remaining=[r for r in ledger["pending"]
+               if (r["source_first_key"],r["source_reference_ordinal"]) not in candidates]
+    revised={**ledger,
+        "source_link_occurrences_verified_in_derived_osis":
+            ledger["source_link_occurrences_verified_in_derived_osis"]+len(candidates),
+        "source_original_links_still_requiring_placement_review":len(remaining),
+        "pending":remaining,
+        "publication_authorized":False}
+    if (revised["source_link_occurrences_verified_in_derived_osis"]+
+            ledger["source_spurious_link_occurrences_explicitly_omitted"]+
+            len(remaining)!=ledger["original_native_reference_elements"]):
+        raise ValueError("Source original reference inventory changed")
+    result=ET.tostring(doc,encoding="utf-8",xml_declaration=True)
+    ET.fromstring(result)
+    receipt={
+        "status":"PRIVATE_SOURCE_OWNED_EXACT_K_HEADING_RANGE_NAVIGATION_NOT_RELEASE",
+        "original_native_corpus_sha256":native["original_compiled_corpus_sha256"],
+        "source_original_links_restored_to_matching_modern_K_headings":len(candidates),
+        "source_valid_references_still_in_section_notes":len(remaining)-len(blocked),
+        "original_defective_references_remain_blocked":len(blocked),
+        "original_text_and_authored_modern_prose_modified":False,
+        "heading_relocation_is_an_editorial_transport_not_original_inline_parity":True,
+        "publication_authorized":False,
+        "placements":[{
+            "source_first_key":v["source_first_key"],
+            "source_reference_ordinal":v["source_reference_ordinal"],
+            "target_native_first_key":v["target_native_first_key"],
+            "original_literal_target_sha256":v["original_literal_target_sha256"],
+            "original_visible_label_sha256":v["original_visible_label_sha256"],
+            "modern_heading_reference_display_sha256":v["linked_display_sha256"],
+        } for _,v in sorted(candidates.items())],
+    }
+    return result,revised,receipt
+
+
+
 def build_private_inline_original_reference_index(
         *, source_note_osis: bytes, source_receipt: dict,
         native: dict) -> tuple[bytes,dict]:
@@ -2625,7 +2786,9 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                                     inline_source_index_output: Path | None = None,
                                     editorial_review_output: Path | None = None,
                                     compact_source_osis_output: Path | None = None,
-                                    compact_source_notes_output: Path | None = None) -> tuple[bytes, dict]:
+                                    compact_source_notes_output: Path | None = None,
+                                    heading_source_osis_output: Path | None = None,
+                                    heading_source_notes_output: Path | None = None) -> tuple[bytes, dict]:
     """Authenticate and place an explicitly bounded set of source-backed links.
 
     Real original SWORD attributes stay in private memory/isolated new OSIS,
@@ -2654,6 +2817,10 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         raise ValueError("Compact source-linked OSIS and fallback notes must be built together")
     if compact_source_osis_output is not None and source_notes_output is None:
         raise ValueError("Compact source links require pinned original link ledger")
+    if (heading_source_osis_output is None) != (heading_source_notes_output is None):
+        raise ValueError("Source heading-links and remaining notes must travel together")
+    if heading_source_osis_output is not None and compact_source_osis_output is None:
+        raise ValueError("Heading source navigation requires compiled compact candidate")
     if (placements.get("status") !=
             "PRIVATE_REVIEWED_BOUNDED_LINK_PLACEMENT_NOT_FINAL_EDIT_OR_RELEASE"
             or placements.get("published_source_module") != "MHCC 0.1.1"
@@ -3093,6 +3260,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
             "citation_count":len(rows),
             "references":rows,
         },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    heading_receipt = None
+    heading_notes_receipt = None
     compact_receipt = None
     compact_notes_receipt = None
     notes_receipt = None
@@ -3120,6 +3289,21 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
             compact_source_notes_output.parent.mkdir(parents=True,exist_ok=True)
             compact_source_osis_output.write_bytes(compact_osis)
             compact_source_notes_output.write_bytes(compact_notes_osis)
+            if heading_source_osis_output is not None:
+                heading_osis,heading_ledger,heading_receipt=(
+                    build_private_owned_K_heading_range_links(
+                        compact_osis=compact_osis,ledger=compact_ledger,
+                        original=private_original,native=native,
+                        errata=errata_review))
+                heading_notes_osis,heading_notes_receipt=(
+                    build_private_source_reference_supplement(
+                        linked_osis=heading_osis,ledger=heading_ledger,
+                        original=private_original,native=native,
+                        errata=errata_review))
+                heading_source_osis_output.parent.mkdir(parents=True,exist_ok=True)
+                heading_source_notes_output.parent.mkdir(parents=True,exist_ok=True)
+                heading_source_osis_output.write_bytes(heading_osis)
+                heading_source_notes_output.write_bytes(heading_notes_osis)
         if inline_source_index_output is not None:
             inlined,index_receipt=build_private_inline_original_reference_index(
                 source_note_osis=notes_osis,source_receipt=notes_receipt,
@@ -3188,6 +3372,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         "private_visible_source_reference_index_preview":inline_source_index_receipt,
         "private_exact_compact_reference_recovery":compact_receipt,
         "private_compact_remaining_source_notes":compact_notes_receipt,
+        "private_source_owned_heading_range_recovery":heading_receipt,
+        "private_heading_range_remaining_source_notes":heading_notes_receipt,
         "private_unapproved_errata_navigation_preview":errata_preview_receipt,
         "modern_SWORD_readback_verified":False,
         "independent_editorial_semantic_signoff":False,
@@ -3223,6 +3409,8 @@ def main():
     p.add_argument("--ephemeral-editorial-review-json",type=Path)
     p.add_argument("--compact-source-linked-osis",type=Path)
     p.add_argument("--compact-source-notes-osis",type=Path)
+    p.add_argument("--source-K-heading-range-linked-osis",type=Path)
+    p.add_argument("--source-K-heading-range-notes-osis",type=Path)
     p.add_argument("--source-notes-errata-manifest",type=Path)
     p.add_argument("--source-errata-proposals-osis",type=Path)
     p.add_argument("--linked-osis",type=Path)
@@ -3278,7 +3466,9 @@ def main():
             inline_source_index_output=a.visible_source_reference_index_osis,
             editorial_review_output=a.ephemeral_editorial_review_json,
             compact_source_osis_output=a.compact_source_linked_osis,
-            compact_source_notes_output=a.compact_source_notes_osis)
+            compact_source_notes_output=a.compact_source_notes_osis,
+            heading_source_osis_output=a.source_K_heading_range_linked_osis,
+            heading_source_notes_output=a.source_K_heading_range_notes_osis)
         a.linked_osis.parent.mkdir(parents=True,exist_ok=True)
         a.report.parent.mkdir(parents=True,exist_ok=True)
         a.linked_osis.write_bytes(osis)
