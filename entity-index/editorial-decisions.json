@@ -565,12 +565,13 @@
     {
       "source_id": "person:GenericMale",
       "action": "amend_occurrences",
-      "reason": "Daniel 10:7 explicitly distinguishes Daniel from unnamed other men, and Zechariah 1:7 explicitly names the prophet Zechariah. Their proper-name words do not refer to a separate anonymous generic man. Daniel 10:19: exact original word o270100190132 is the speaking subject of person:Daniel.3 (The Hebrew verb is first-person singular 'I said', spoken by Daniel), not person:GenericMale. Preserve the actual named speaker and the unaltered original source record.",
+      "reason": "Daniel 10:7 explicitly distinguishes Daniel from unnamed other men, and Zechariah 1:7 explicitly names the prophet Zechariah. Their proper-name words do not refer to a separate anonymous generic man. Daniel 10:19: exact original word o270100190132 is the speaking subject of person:Daniel.3 (The Hebrew verb is first-person singular 'I said', spoken by Daniel), not person:GenericMale. Preserve the actual named speaker and the unaltered original source record. Zechariah 2:6 (pinned WLC source wording) opens with the narrator's first-person singular 'I said' (o380020060012). Its actor frame points to the named prophet Zechariah.17, not to an otherwise unidentified GenericMale speaker. Remove only the erroneous overlapping indirect subject pointer, not any original word or other person record.",
       "evidence": [
         "Pinned WLC Daniel 10:7 o270100070031 under person:Daniel.3; Zechariah 1:7 o380010070171 under person:Zechariah.17; frozen GenericMale source subject pointers",
         "https://www.biblegateway.com/verse/en/Daniel%2010%3A7",
         "https://classic.net.bible.org/bible.php/d/b/o/verse.php?book=Zec&chapter=1&verse=7",
-        "Pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/27-Dan-010-lowfat.xml, Daniel 10:19, word o270100190132; inherited ACAI source tags both person:GenericMale and person:Daniel.3"
+        "Pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/27-Dan-010-lowfat.xml, Daniel 10:19, word o270100190132; inherited ACAI source tags both person:GenericMale and person:Daniel.3",
+        "Pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/38-Zec-002-lowfat.xml: Zechariah 2:6 o380020060012 first-person Vqw1cs 'I said'; frame A0:380010070171 (Zechariah) and exact source index person:Zechariah.17."
       ],
       "remove_subject_referents": {
         "wlc": [
@@ -582,6 +583,9 @@
           ],
           [
             "o270100190132"
+          ],
+          [
+            "o380020060012"
           ]
         ]
       }
