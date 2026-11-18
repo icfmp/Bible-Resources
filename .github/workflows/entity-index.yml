@@ -257,6 +257,37 @@ jobs:
           assert len(set((f["corpus"], f["word_id"]) for f in report["findings"])) == len(report["findings"])
           PY
 
+      - name: Triage every indirect-only person overlap against exact source morphology
+        shell: bash
+        run: |
+          # Source grammar is diagnostic: plural doesn't certify shared
+          # identities; singular doesn't prove an erroneous co-reference.
+          python3 - <<'PY'
+          import importlib.util
+          import json
+          from pathlib import Path
+          script=Path("entity-index/audit_person_overlaps.py")
+          spec=importlib.util.spec_from_file_location("person_source_forms",script)
+          module=importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(module)
+          report=json.loads(Path("entity-index/dist/person-overlaps.json").read_text())
+          reviewed=module.audit_indirect_source_forms(report,{
+              "wlc":Path("macula-hebrew/WLC/tsv/macula-hebrew.tsv"),
+              "sblgnt":Path("macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv"),
+          })
+          stats=reviewed["statistics"]
+          assert stats["indirect_only_source_words"]==report["statistics"]["indirect_only"]==2385
+          assert stats["by_corpus"]=={"wlc":1096,"sblgnt":1289},stats
+          assert sum(stats["source_word_number_buckets"].values())==2385
+          assert sum(stats["different_canonical_people_per_word"].values())==2385
+          assert len({(x["corpus"],x["word_id"]) for x in reviewed["cases"]})==2385
+          output=Path("entity-index/dist/indirect-person-source-forms.json")
+          output.write_text(json.dumps(reviewed,ensure_ascii=False,indent=2,
+                                       sort_keys=True)+"\\n",encoding="utf-8")
+          print("ENTITY_INDIRECT_SOURCE_FORM_AUDIT",
+                json.dumps(stats,sort_keys=True))
+          PY
+
       - name: Classify exact-person direct-name overlaps by pinned source context
         shell: bash
         run: |
@@ -595,6 +626,7 @@ jobs:
             entity-index/dist/index.json
             entity-index/dist/person-overlaps.json
             entity-index/dist/reviewed-person-overlaps.json
+            entity-index/dist/indirect-person-source-forms.json
             entity-index/dist/source-multiplicity.json
             entity-index/dist/macula-hebrew-existence.json
             entity-index/dist/macula-greek-existence.json
