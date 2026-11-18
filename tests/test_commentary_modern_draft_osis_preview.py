@@ -7,7 +7,8 @@ import unittest
 from xml.etree import ElementTree as ET
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from commentary_modern_draft_osis_preview import generate, _range, NS
+from commentary_modern_draft_osis_preview import (generate, _range, NS, _modern_front,
+    _modern_items, _write_reading_blocks, _original_intro_candidates)
 
 H = "a"*64
 S = "b"*64
@@ -115,6 +116,65 @@ class CommentaryPreviewTests(unittest.TestCase):
             self.assertIn("Grace",xml.decode("utf-8"))
             self.assertFalse(report["original_inline_reference_or_note_fidelity_approved"])
             self.assertFalse(report["sword_publication_authorized"])
+
+
+class FullCanonicalProductionMarkupTests(unittest.TestCase):
+    def test_original_outline_table_and_paragraph_markup_do_not_flatten(self):
+        root=ET.Element(f"{{{NS}}}div")
+        table=("| Original outline | Verses |\n| --- | --- |\n"
+               "| First topic *italic* | 1–3 |\n| Last topic | 4–6 |\n")
+        stats=_write_reading_blocks(root,table+
+            "\n**Grace** and *wisdom* remain together.\n\n"
+            "We preserve the next paragraph separately.\n")
+        self.assertEqual(stats["tables"],1)
+        self.assertEqual(stats["table_cells"],6)
+        self.assertEqual(stats["paragraphs"],2)
+        self.assertEqual(len(root.findall(f"{{{NS}}}table")),1)
+        self.assertEqual(len(root.findall(f"{{{NS}}}p")),2)
+        self.assertEqual(len(root.findall(f".//{{{NS}}}hi")),3)
+        self.assertIn("Last topic", "".join(root.itertext()))
+
+    def test_nested_editorial_parent_does_not_invent_authorial_unit(self):
+        prose=("# Acts 2 — Modern English\n\n## Original chapter outline\n\n"
+               "| Original outline | Verses |\n| --- | --- |\n"
+               "| Sermon | 14–36 |\n\n"
+               "## Peter preaches (verses 14–36)\n\n"
+               "### Peter begins (verses 14–21)\n\n"
+               "Christ is preached and Scripture explained.\n\n"
+               "### Peter continues (verses 22–36)\n\n"
+               "The resurrection is preached to the crowd.\n")
+        items=_modern_items(prose)
+        self.assertEqual([i["kind"] for i in items],
+                         ["prelude","parent","leaf","leaf"])
+        self.assertEqual(len([i for i in items if i["kind"]=="leaf"]),2)
+
+    def test_accepted_manuscript_notes_not_serialized_into_source_prose(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path=Path(folder)/"chapter.md"
+            path.write_text(
+                '---\nchapter_osis: "Gen.1"\npublication_status: "NOT RELEASED"\n'
+                '---\n# Genesis 1\n\n## Original chapter outline\n\n'
+                '| Section | Verses |\n| --- | --- |\n| A | 1 |\n\n'
+                '## Exposition (verse 1)\n\nModern text.\n\n'
+                '---\n\n## Editorial review — not for final OSIS\n\n'
+                'This editorial note MUST NOT appear in the OSIS.\n',
+                encoding="utf-8")
+            fields,main=_modern_front(path)
+            self.assertEqual(fields["chapter_osis"],"Gen.1")
+            self.assertNotIn("MUST NOT appear",main)
+            self.assertEqual(len(_modern_items(main)),2)
+
+    def test_unsupported_markdown_and_damaged_tables_fail_closed(self):
+        node=ET.Element(f"{{{NS}}}div")
+        for markup in (
+            "| A | B |\n| ---- |",
+            "| A | B |\n| --- | --- |\n| one | two | three |",
+            "> A block quotation needing explicit treatment",
+            "### A nested heading in body",
+        ):
+            with self.subTest(markup=markup):
+                with self.assertRaises(ValueError):
+                    _write_reading_blocks(node,markup)
 
 
 if __name__ == "__main__":
