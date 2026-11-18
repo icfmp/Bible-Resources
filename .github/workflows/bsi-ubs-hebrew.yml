@@ -1,0 +1,45 @@
+name: BSI UBS Hebrew dictionary crosswalk
+
+on:
+  pull_request:
+    paths:
+      - "entity-index/links/dictionaries/ubs-hebrew/**"
+      - ".github/workflows/bsi-ubs-hebrew.yml"
+  push:
+    branches: [feat/bsi-ubs-hebrew-crosswalk]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkout frozen UBS Hebrew English and French
+        uses: actions/checkout@v4
+        with:
+          repository: ubsicap/ubs-open-license
+          ref: a15a96cfaa4ca18a6c0339016645ba1e534db3c8
+          path: ubs
+          sparse-checkout: dictionaries/hebrew/JSON
+          persist-credentials: false
+      - name: Checkout pinned Macula Hebrew WLC
+        uses: actions/checkout@v4
+        with:
+          repository: Clear-Bible/macula-hebrew
+          ref: 47db250bd55d0d8577f2a94fba114ef16c35b23c
+          path: macula-hebrew
+          sparse-checkout: WLC/tsv
+          lfs: true
+          persist-credentials: false
+      - name: Read-only inspect UBS bilingual and WLC schema
+        run: |
+          test "$(git -C ubs rev-parse HEAD)" = "a15a96cfaa4ca18a6c0339016645ba1e534db3c8"
+          test "$(git -C macula-hebrew rev-parse HEAD)" = "47db250bd55d0d8577f2a94fba114ef16c35b23c"
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/inspect_sources.py \
+            ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
+            ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-fr.JSON \
+            macula-hebrew/WLC/tsv/macula-hebrew.tsv
