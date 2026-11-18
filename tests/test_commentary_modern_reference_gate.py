@@ -17,7 +17,9 @@ from commentary_modern_reference_gate import (SourceReferenceGate,
     _source_range_section_ownership, _source_first_K_outline_row_evidence,
     _find_exact_modern_original_outline_range_cell,
     _unique_authentic_original_visible_label,
-    _unplaced_original_link_review_ledger)
+    _unplaced_original_link_review_ledger,
+    _original_source_link_contexts, _source_context_unique_paragraph_anchor,
+    build_private_contextual_source_note_preview)
 
 
 ORIGINAL=(b'<div><reference osisRef="Bible:1John.5.20">1Jo 5:20</reference>'
@@ -1358,6 +1360,113 @@ class WholeOriginalSourceLinkLedgerTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             build_unapproved_source_errata_notes_preview(
                 source_note_osis=base,ledger=ledger,native=native,errata=failed)
+
+
+
+def _private_context_relocation_fixture():
+    from commentary_modern_draft_osis_preview import NS
+    original = (b'<div><p>We recognize how the mighty king shows unusual '
+                b'compassion to faithful servants '
+                b'<reference osisRef="Bible:John.3.16">John 3:16</reference>'
+                b' and sends help.</p></div>')
+    contexts = _original_source_link_contexts(original)
+    doc = ET.Element(f"{{{NS}}}osis")
+    chapter = ET.SubElement(doc,f"{{{NS}}}chapter",{"osisID":"Gen.1"})
+    section = ET.SubElement(chapter,f"{{{NS}}}div",{
+        "annotateType":"commentary","annotateRef":"Gen.1.1"})
+    ET.SubElement(section,f"{{{NS}}}p").text = (
+        "The mighty king shows unusual compassion to faithful servants, "
+        "even at great personal cost.")
+    grouped = ET.SubElement(section,f"{{{NS}}}note",{
+        "type":"crossReference",
+        "resp":"BibleResourcesPrivateSourceOnlyLinkSupplement"})
+    grouped.text="Unplaced links from original edition (not translated citations): "
+    target="Bible:John.3.16"
+    for ordinal in range(1,177):
+        ref=ET.SubElement(grouped,f"{{{NS}}}reference",{"osisRef":target})
+        ref.text="John 3:16"
+        ref.tail="; " if ordinal <176 else "."
+    h=hashlib.sha256(target.encode()).hexdigest()
+    pending=[{"source_first_key":"Gen.1.1","source_reference_ordinal":ordinal,
+              "original_osisRef_sha256":h,
+              "original_visible_label_sha256":"f"*64}
+             for ordinal in range(1,181)]
+    native={
+        "source_prose_or_original_markup_exported":False,
+        "original_compiled_corpus_sha256":FULL_HASH,
+        "chapters":{"Gen.1":{"original_units":[
+            {"first_key":"Gen.1.1","keys":["Gen.1.1"]}]}}}
+    errata={"status":"PINNED_ORIGINAL_LINK_ERRATA_REVIEW_ONLY_NOT_APPLIED",
+            "original_native_corpus_sha256":FULL_HASH,
+            "cases":[{"source_first_key":"Gen.1.1",
+                      "original_reference_ordinal":n,"approval":False}
+                     for n in range(177,181)]}
+    ledger={
+        "status":"SOURCE_NATIVE_WHOLE_CANON_HYPERLINK_DISPOSITION_QUEUE_NOT_FINAL_APPROVAL",
+        "source_reference_labels_or_literal_targets_exported":False,
+        "publication_authorized":False,
+        "source_original_links_still_requiring_placement_review":180,
+        "pending":pending,
+    }
+    by_ordinal=[contexts[0]]+ [("", "")]*179
+    return ET.tostring(doc), ledger, native, errata, {"Gen.1.1":by_ordinal}
+
+
+class PrivateOriginalContextRelocationTests(unittest.TestCase):
+    def test_original_context_is_extracted_without_changing_the_source(self):
+        raw=(b'<div>Some substantial leading exposition before '
+             b'<reference osisRef="Bible:John.3.16">Jn 3:16</reference>'
+             b' and then the original conclusion.</div>')
+        contexts=_original_source_link_contexts(raw)
+        self.assertEqual(len(contexts),1)
+        self.assertTrue(contexts[0][0].endswith("before "))
+        self.assertTrue(contexts[0][1].startswith(" and then"))
+
+    def test_unique_context_moves_one_link_without_losing_the_other_175(self):
+        from commentary_modern_draft_osis_preview import NS
+        source,ledger,native,errata,contexts=_private_context_relocation_fixture()
+        output,report=build_private_contextual_source_note_preview(
+            source_note_osis=source,ledger=ledger,native=native,
+            errata=errata,original_contexts=contexts)
+        root=ET.fromstring(output)
+        self.assertEqual(report["source_notes_moved_to_authored_paragraphs"],1)
+        self.assertEqual(report["source_notes_still_grouped_by_K"],175)
+        notes=[x for x in root.iter() if x.tag==f"{{{NS}}}note"]
+        self.assertEqual(len(notes),2)
+        local=[n for n in notes if n.get("resp")==
+               "BibleResourcesPrivateContextSourceLink"]
+        self.assertEqual(len(local),1)
+        self.assertIn("context matches",local[0].text)
+        self.assertEqual(local[0][0].get("osisRef"),"Bible:John.3.16")
+        links=[x for n in notes for x in n if x.tag==f"{{{NS}}}reference"]
+        self.assertEqual(len(links),176)
+        self.assertIn("faithful servants", "".join(root.itertext()))
+
+    def test_repeated_generic_or_ambiguous_context_remains_unplaced(self):
+        from commentary_modern_draft_osis_preview import NS
+        source,ledger,native,errata,contexts=_private_context_relocation_fixture()
+        root=ET.fromstring(source)
+        p=next(n for n in root.iter() if n.tag==f"{{{NS}}}p")
+        p.text=p.text+" Again, the mighty king shows unusual compassion to faithful servants."
+        self.assertIsNone(_source_context_unique_paragraph_anchor(
+            next(n for n in root.iter() if n.get("annotateRef")=="Gen.1.1"),
+            contexts["Gen.1.1"][0]))
+        output,report=build_private_contextual_source_note_preview(
+            source_note_osis=ET.tostring(root),ledger=ledger,native=native,
+            errata=errata,original_contexts=contexts)
+        self.assertEqual(report["source_notes_moved_to_authored_paragraphs"],0)
+        self.assertEqual(report["source_notes_still_grouped_by_K"],176)
+
+    def test_rewritten_original_link_target_fails_closed(self):
+        from commentary_modern_draft_osis_preview import NS
+        source,ledger,native,errata,contexts=_private_context_relocation_fixture()
+        root=ET.fromstring(source)
+        link=next(n for n in root.iter() if n.tag==f"{{{NS}}}reference")
+        link.set("osisRef","Bible:John.3.17")
+        with self.assertRaisesRegex(ValueError,"authenticated source target"):
+            build_private_contextual_source_note_preview(
+                source_note_osis=ET.tostring(root),ledger=ledger,native=native,
+                errata=errata,original_contexts=contexts)
 
 
 if __name__=="__main__":
