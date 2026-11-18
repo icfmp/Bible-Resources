@@ -248,6 +248,59 @@ provides the top original word/Strong examples and per-class diagnostics;
 mistaking an alternate Strong for dictionary absence. The CI checks the
 complete count conservation before accepting the generated snapshot.
 
+## UBS-published alternate lemmas: edition-aware reconciliation
+
+The exact pinned UBS Hebrew 0.9.4 English source has **1,041 headword
+entries with source-authored `AlternateLemmas`**. These editorial forms
+are preferable to guessing our own spelling variants.
+
+The source-word-anchored crosswalk now accepts a published alternate lemma
+only when its NFC spelling equals the **unchanged original MACULA lemma**,
+the original H/A numeric Strong family agrees, and the match identifies
+**exactly one UBS headword** in that family. Contextual sense IDs are never
+inferred; existing exact links always take priority. Ambiguous aliases
+remain unresolved. The same original WLC word-ID and original source
+fields remain mandatory at lookup.
+
+| Word-aware evidence type | New-source-word occurrence count |
+| --- | ---: |
+| Exact UBS headword lemma + Strong numeric family | 7,588 |
+| UBS-published alternate lemma + Strong numeric family | **610** |
+| Same-language consonants + Strong family, verbs | 2,881 |
+| Same-language consonants + Strong family, nonverbs | 295 |
+| Exact lemma + original SDBH owner | 16 |
+| Same-language consonants + original SDBH owner | 2 |
+| **Total source-word-anchored additional entry-only links** | **11,392** |
+
+The alternate-lemma route accounts for **580 net new linked WLC lexical-class
+occurrences** beyond the previous snapshot: 610 alternate-lemma successes
+include 30 formerly linked through consonantal-only fallback.
+
+### Updated inventory-attested denominator
+
+The source-attested UBS indexed-headword inventory used to define the
+**scope denominator** now includes *all UBS-published `AlternateLemmas`*
+alongside main headword `Lemma`. That avoids declaring 21 original WLC
+occurrences absent from UBS merely because the dictionary listed them under
+an alternate spelling.
+
+| Pinned source metric | Occurrences |
+| --- | ---: |
+| All five original WLC lexical classes | **248,680** |
+| UBS headwords linked in source-word-aware lookup | **240,097** |
+| Outside UBS headword inventory (no Strong family, canonical **or alternate** lemma, or matching Hebrew consonants) | **5,933** |
+| UBS indexed-headword denominator | **242,747** |
+| Still unresolved inside indexed-headword scope | **2,650** |
+| Complete original lexical corpus coverage | **96.549%** |
+| **UBS indexed-headword-scope coverage** | **98.908%** |
+
+The original WLC corpus total and the 5,933 omitted-from-scope occurrence
+records remain preserved. The scope metric reports edition-specific
+*indexed-headword attestation*, **not** an absolute claim that missing
+words or meanings never occur in definitions or another edition.
+This section supersedes earlier numerical status snapshots in this README;
+those historical snapshots are retained to document how the index evolved.
+
 ## Source integrity and test workflow
 
 - [build_index.py](build_index.py) produces `index.json`, preserving `by_sdbh` and `by_strong`, adding `by_entry_strong_family` for corroboration and retaining full coverage statistics. The generated index never contains dictionary definitions.
