@@ -1,4 +1,4 @@
-# MHC — remaining 23 machine Scripture-link review anchors (2026-11-18)
+# MHC — 25 source machine Scripture-link anchors, 18 not yet trialled (2026-11-18)
 
 **Research inventory, not a corrected edition, module release, or editorial approval.**
 This is the original **complete MHC** authored OSIS, *not MHCC*. The original
@@ -13,14 +13,14 @@ The separate [private two-link correction preview](https://github.com/icfmp/Bibl
 safely trialled **line 7237** (`15.1` → `Jer.15.1`) and
 **line 57059** (`Ezr 1.7 8.23` → `Ezra.1.7 Ezra.8.24`), leaving
 authorial visible labels and prose untouched. Neither is published.
-The remaining **23** anchors are listed below, without commentary prose.
+The original **23** pending anchors are preserved in the inventory below, without commentary prose. Subsequently **5** of these 23 were added to the same reversible private plan after independent citation checks. That brings the plan to **7** and leaves **18** untrialled; see the dated continuation at the end.
 
-## Five bookless numeric machine targets
+## Five originally pending bookless numeric machine targets
 
 | Original line | Enclosing source book | Original `osisRef` | Exact short displayed citation | Triage, not approval |
 | ---: | --- | --- | --- | --- |
 | 3108 | Gen | `21.13` | `xxi. 13` | `Gen.21.13` is a *candidate only*; check actual host prose/citation first |
-| 32130 | Job | `18.24` | `xviii. 24` | **Cannot** infer `Job.18.24`: that KJV verse does not exist; inspect which book is cited |
+| 32130 | Job | `18.24` | `xviii. 24` | Resolved as **`Ps.18.24`** in the independent CCEL Job 15 witness; included in private plan, **CI acceptance pending** |
 | 37835 | Ps | `10.1-4` | `x. 1-4` | `Ps.10.1-Ps.10.4` is a *candidate*; keep the entire range |
 | 41584 | Ps | `4.4` | `iv. 4` | `Ps.4.4` is a *candidate*; independently verify target book |
 | 47698 | Prov | `5.7` | `v. 7` | `Prov.5.7` is a *candidate*; independently verify target book |
@@ -28,7 +28,7 @@ The remaining **23** anchors are listed below, without commentary prose.
 The source book and citation alone are not independent proof of the cited
 Bible book. No numeric target has been silently prefixed or edited.
 
-## Eighteen compound / inherited-context machine targets
+## Eighteen originally pending compound / inherited-context machine targets
 
 These forms may encode several **independent** destinations, inherited
 chapters or verses, or a whole range. Whitespace tokenization alone can
@@ -76,3 +76,30 @@ source-bound review can be resumed without rereading full logs.
 None of the 23 links is asserted repaired, and none of these hypotheses
 authorizes changes to historical wording, punctuation, section ownership,
 copyright status, public OSIS, or published SWORD.
+
+## Continuation — 7 private link previews; 18 remain untrialled
+
+Five further source-bound link candidates have been recorded in the existing
+`config/commentary-osis-repair-plans/mhc-crossreferences-private-preview.json`.
+The independent CCEL page for the **same commentary chapter** attests each
+original displayed citation. The proposed new machine values explicitly
+preserve every individually cited verse, including repeated book context.
+The public inventory retains the original machine syntax and label hashes;
+no private XML, commentary prose or compiled SWORD was published.
+
+| Original line / source location | Original machine target | Research-only proposed target | Independent citation witness |
+| --- | --- | --- | --- |
+| 32130 / Job 15 | `18.24` | `Ps.18.24` | [CCEL Job 15](https://ccel.org/h/henry/mhc2/MHC18015.HTM), which cites **Ps. xviii. 24**, not nonexistent Job 18:24 |
+| 58803 / Jeremiah 4 | `De 4.29 30.2` | `Deut.4.29 Deut.30.2` | [CCEL Jeremiah 4](https://ccel.org/ccel/henry/mhc4/mhc4.Jer.v.html), displaying **Deut. iv. 29; xxx. 2** |
+| 63871 / Ezekiel 18 | `Le 18.19 20.18` | `Lev.18.19 Lev.20.18` | [CCEL Ezekiel 18](https://www.ccel.org/h/henry/mhc2/MHC26018.HTM), displaying **Lev. xviii. 19; xx. 18** |
+| 97929 / Acts 10 | `Ac.23.23 24 25.6` | `Acts.23.23 Acts.23.24 Acts.25.6` | [CCEL Acts 10](https://www.ccel.org/h/henry/mhc2/MHC44010.HTM), displaying **ch. xxiii. 23, 24; xxv. 6** |
+| 98544 / Acts 13 | `Heb.9.9 10.1 4` | `Heb.9.9 Heb.10.1 Heb.10.4` | [CCEL Acts 13](https://ccel.org/h/henry/mhc2/MHC44013.HTM), displaying **Heb. ix. 9; x. 1, 4** |
+
+**Remaining untrialled:** 4 original bookless targets and 14 composite targets.
+The private patcher is configured to reject any incorrect original source
+SHA, original XML line/book/value, visible-label hash, target outside the
+actual SWORD verse registry, or change to unrelated source markup/text.
+The latest seven-candidate private pipeline must succeed before these edits
+are called **technically verified**; no real GUI-click success is implied.
+The independently published CCEL page is a citation *witness*, not approval
+to copy CCEL's digital text or an assertion of complete edition equivalence.
