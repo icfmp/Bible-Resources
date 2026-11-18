@@ -32,11 +32,13 @@ They may therefore expect God's help in every trouble and victory in every confl
 
 Whatever we accomplish or obtain, **God must receive all the glory**.
 
-Lord, visit us all with this salvation and show us the favor you bear toward your chosen people.
+Lord, visit all our souls with this salvation and with the favor you show your chosen people.
 
 ---
 
 ## Editorial review — Psalm 108
+
+**2026-11-18 targeted CCEL re-collation (secondary witness):** The final petition now retains Henry's explicit *all our souls*, not merely *us all*. This is a bounded wording correction within the existing authorial chapter-wide unit, not a new native verse entry. Native I ownership and independent source-fidelity acceptance remain separate.
 
 **Complete brief CCEL witness read:** [CCEL, Psalm 108](https://ccel.org/ccel/henry/mhcc.xx.cviii.html). The exact published `MHCC 0.1.1` remains authoritative; native SWORD and independent acceptance pending.
 
