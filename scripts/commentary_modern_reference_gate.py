@@ -1218,7 +1218,17 @@ def _original_label_in_modern_k(section: ET.Element, label: str) -> str:
                     continue
                 for hit in re.finditer(re.escape(needle), fragment):
                     start, end = hit.span()
-                    if ((start == 0 or not fragment[start - 1].isalnum())
+                    # A source "John 3:16" label must not match inside
+                    # "1 John 3:16" (or 2/3 John); nor may any unnumbered
+                    # book label inherit a preceding numbered-book prefix.
+                    prefix = fragment[:start]
+                    numbered_book_prefix = (
+                        not re.match(r"^[1-4]\\s", needle)
+                        and bool(re.search(
+                            r"(?:^|[^A-Za-z0-9])[1-4]\\s+$", prefix)))
+                    if (not numbered_book_prefix
+                            and (start == 0
+                                 or not fragment[start - 1].isalnum())
                             and (end == len(fragment)
                                  or not fragment[end].isalnum())):
                         count += 1
