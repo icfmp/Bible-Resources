@@ -431,19 +431,25 @@ Jeremiah (Jeremiah 11:1), Daniel (Daniel 10:7) and Zechariah
 a *different* person's generic/anonymous subject or pronoun pointer.
 All the correctly anchored named-person source tokens remain unchanged.
 
-**Two mixed-name candidates deliberately remain:**
+**A thirteenth mixed-name correction is source-verified:**
+at **1 Samuel 9:10**, pinned Hebrew `o090090100021` names Saul,
+and the distinct `o090090100032` is the common noun *servant*
+(with separately segmented possessive suffix `o090090100033`).
+The frozen `person:GenericServant` pointer incorrectly combines Saul
+and servant in a single two-word group. The derived index now replaces
+**only that exact group** with the validated singleton servant word,
+preserving the legitimate unnamed servant without treating Saul as
+the servant, while the frozen source group stays byte-for-byte intact.
 
-- **1 Samuel 9:10**, source `person:GenericServant` has a *two-word*
-  group containing Saul's proper name and a following part of
-  "his servant". Deleting the entire group would also discard a
-  potentially valid servant expression; the right original-language
-  segmentation must be established before editing that exact group.
-- **1 Kings 3:22**, `person:FirstProstitute` explicit vs
-  `person:SecondProstitute` pronominal assignment to the same
-  word in the "other woman" expression. Resolve the interlocutor,
-  compound segment and the source's role-specific distinction from
-  actual pinned morphology, rather than mechanically prioritizing
-  the `explicit_instances` field.
+**One mixed-name case remains unresolved:** **1 Kings 3:22**,
+`person:FirstProstitute` explicit vs `person:SecondProstitute`
+pronominal reference to `o110030220022` in the "other woman"
+expression. The exact WLC word is *woman*, within a larger phrase.
+The narrative does not conclusively specify which of the two women
+is the true mother solely from the order of the speakers; critical
+discussion warns against importing that identification into the Hebrew.
+Do not assign or remove the word based on inherited "first"/"second"
+descriptions without firmer person-role evidence.
 
 No anonymous person was merged with an explicitly named historical
 person. No other referent groups were removed. Exact pinned original
@@ -479,7 +485,7 @@ one exact word ID, exact canonical candidate pair, exact pinned source
 edition and explanatory evidence; unknown/new conflicts or stale reviews
 fail the build. The review is a separate **QA-only** artifact, and
 `by_word`, the resolver's candidate multiplicity, source files and
-original-language tokens remain **untouched**. The remaining **2 mixed**
+original-language tokens remain **untouched**. The remaining **1 mixed**
 and **2,385 indirect-only** person overlaps are not certified by this
 direct-name review. The remaining three name/identity questions need
 contextual historical review before any final interpretation.
