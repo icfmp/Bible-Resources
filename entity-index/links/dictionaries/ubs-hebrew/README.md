@@ -54,6 +54,47 @@ The crosswalk now indexes **8,979** distinct Hebrew/Aramaic Strong codes (includ
 
 The remaining **192,692 unresolved occurrences** deserve separate investigation; the largest group has variant Strong forms absent from this edition, and **14,867** unresolved rows still carry `sdbh` references. The [audit_unmatched.py](audit_unmatched.py) tool produces exhaustive, reversible classification from original pinned input without silently adding doubtful links.
 
+## Why 59.5% is misleading as a vocabulary coverage figure
+
+The audited source-class breakdown is much more useful than one all-token
+percentage. All counts below come from the **same frozen WLC + UBS 0.9.4
+sources**, not from guesses or altered dictionary data.
+
+| Original MACULA class | Exact senses | Entry only | Unresolved | Coverage with an UBS entry |
+| --- | ---: | ---: | ---: | ---: |
+| noun | 95,517 | 42,152 | 8,612 | 94.1% |
+| verb | 34,742 | 36,323 | 1,990 | 97.3% |
+| adj | 5,025 | 3,934 | 843 | 91.4% |
+| adv | 982 | 9,388 | 2,291 | 81.9% |
+| num | 4,976 | 1,905 | 0 | 100.0% |
+| **Selected lexical classes** | **141,242** | **93,702** | **13,736** | **94.48%** |
+
+The reporting subset includes only source classes `noun`, `verb`, `adj`,
+`adv` and `num`. It is **not** a claim that all lexical material is limited
+to these classes, nor that the dictionary covers all vocabulary types.
+Other grammatical classes (including pronouns and particles) can have real
+lexical entries and are still available through the original index.
+
+The original `art`, `cj`, `prep`, and `pron` classes together account
+for **176,085 unresolved rows**. A large part of the apparent 40.5% gap is
+therefore composed of grammatical elements, notably:
+
+- conjunction וְ, WLC `H2050b`: 50,217 rows
+- article הַ, WLC `H1886a`: 30,273 rows
+- preposition לְ, WLC `H3807a`: 20,186 rows
+- preposition בְּ, WLC `H0871a`: 15,521 rows
+
+**Crucial source-fidelity finding:** stripping the suffix in those four
+cases can resolve to an *unrelated UBS Hebrew lemma*. It is not a
+permissible shortcut. Exact lexical ID matching remains the only way a
+new verified crosswalk link enters the index.
+
+The read-only [audit_variants.py](audit_variants.py) reconstructs the
+complete coverage breakdown by original `class`, morphology prefix, and
+Hebrew vs Aramaic source language, including representative exact source
+word IDs for the top suffix families. The original v0.1 edition pairing
+and all published BSI content remain unchanged.
+
 ## Index design
 
 - `by_sdbh`: exact fifteen-digit original Macula `sdbh` sense ID → one or more stable UBS `MainId` values. The `sdbh` value itself is the exact `LEXID` sense.
