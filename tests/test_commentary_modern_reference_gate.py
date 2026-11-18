@@ -404,7 +404,7 @@ class BoundedOriginalSourceLinkInsertionTests(unittest.TestCase):
         self.assertEqual(link.attrib["osisRef"],"Heb.2.14")
         self.assertEqual(link.text,"14")
         self.assertEqual(len(section.findall(f".//{{{ns}}}reference")),1)
-        with self.assertRaisesRegex(ValueError,"already source-linked"):
+        with self.assertRaisesRegex(ValueError,"missing or ambiguous"):
             _wrap_exact_authored_modern_text(
                 section,anchor="(Hebrews 2:11, 14)",display="14",
                 occurrence="last",target="Heb.2.14")
