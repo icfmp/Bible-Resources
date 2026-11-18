@@ -5,7 +5,8 @@ import sys
 import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
-from commentary_modern_reference_gate import SourceReferenceGate,canonical_only_for_comparison
+from commentary_modern_reference_gate import (SourceReferenceGate,
+    WholeCanonOriginalLinkIdentityReceipt, canonical_only_for_comparison)
 
 
 ORIGINAL=(b'<div><reference osisRef="Bible:1John.5.20">1Jo 5:20</reference>'
@@ -133,6 +134,99 @@ class OriginalReferenceGateTests(unittest.TestCase):
             with self.subTest(value=val):
                 with self.assertRaises(ValueError):
                     canonical_only_for_comparison(val)
+
+
+def whole_source_receipt(*, reference_count=1):
+    return {
+        "status": "SOURCE_NATIVE_RECEIPT_ONLY_NOT_TRANSLATION_APPROVAL",
+        "original_compiled_corpus_sha256": FULL_HASH,
+        "source_prose_or_original_markup_exported": False,
+        "semantic_translation_independently_approved": False,
+        "chapters": {
+            "Gen.1": {
+                "original_units": [{
+                    "first_key": "Gen.1.3",
+                    "keys": ["Gen.1.3", "Gen.1.4"],
+                    "source_unit_sha256": SOURCE_HASH,
+                    "markup": {
+                        "strict_xml_fragment": True,
+                        "tag_counts": {"reference": reference_count}
+                    }
+                }]
+            }
+        }
+    }
+
+
+class WholeNativeReferenceIdentityTests(unittest.TestCase):
+    def test_exact_link_and_label_hashes_are_private_and_ordered(self):
+        gate = WholeCanonOriginalLinkIdentityReceipt(whole_source_receipt())
+        gate.observe("I", "Gen.1", b"<div>unrelated introduction</div>")
+        gate.observe("K", "Gen.1.3", ORIGINAL)
+        gate.observe("K", "Gen.1.4", ORIGINAL)
+        report = gate.report({"all_native_raw_entries_ordered_sha256": FULL_HASH})
+        self.assertEqual(report["original_numbered_K_keys_verified"], 2)
+        self.assertEqual(report["original_unique_K_bodies_verified"], 1)
+        self.assertEqual(report["original_reference_elements_verified"], 1)
+        self.assertEqual(report["original_link_bearing_K_bodies"], 1)
+        group = report["source_link_groups"][0]
+        self.assertEqual(group["source_raw_sha256"], SOURCE_HASH)
+        self.assertEqual(group["original_osisRef_sha256_in_document_order"],
+                         [hashlib.sha256(b"Bible:1John.5.20").hexdigest()])
+        self.assertEqual(group["original_visible_link_label_sha256_in_document_order"],
+                         [hashlib.sha256(b"1Jo 5:20").hexdigest()])
+        self.assertNotIn("Bible:1John.5.20", str(report))
+        self.assertNotIn("1Jo 5:20", str(report))
+        self.assertFalse(report["modern_osisRef_targets_or_order_verified"])
+        self.assertFalse(report["modern_module_built_or_published"])
+
+    def test_complex_original_link_target_is_hashed_not_normalized(self):
+        raw = (b'<div><reference osisRef="Bible:Gen.1.1-Gen.1.3">'
+               b'original linked label</reference></div>')
+        receipt = whole_source_receipt()
+        receipt["chapters"]["Gen.1"]["original_units"][0][
+            "source_unit_sha256"] = hashlib.sha256(raw).hexdigest()
+        gate = WholeCanonOriginalLinkIdentityReceipt(receipt)
+        gate.observe("K", "Gen.1.3", raw)
+        gate.observe("K", "Gen.1.4", raw)
+        report = gate.report({"all_native_raw_entries_ordered_sha256": FULL_HASH})
+        self.assertEqual(report["source_link_groups"][0][
+            "original_osisRef_sha256_in_document_order"], [
+                hashlib.sha256(b"Bible:Gen.1.1-Gen.1.3").hexdigest()])
+        self.assertFalse(report["original_source_prose_or_XML_exported"])
+
+    def test_missing_or_corrupt_original_aliases_fail_closed(self):
+        gate = WholeCanonOriginalLinkIdentityReceipt(whole_source_receipt())
+        gate.observe("K", "Gen.1.3", ORIGINAL)
+        with self.assertRaisesRegex(ValueError, "not completely read"):
+            gate.report({"all_native_raw_entries_ordered_sha256": FULL_HASH})
+        with self.assertRaisesRegex(ValueError, "source SHA differ"):
+            gate.observe("K", "Gen.1.4", ORIGINAL.replace(b"5.20", b"5.21"))
+        gate.observe("K", "Gen.1.4", ORIGINAL)
+        with self.assertRaisesRegex(ValueError, "SHA does not match"):
+            gate.report({"all_native_raw_entries_ordered_sha256": "b" * 64})
+        with self.assertRaisesRegex(ValueError, "duplicate"):
+            gate.observe("K", "Gen.1.4", ORIGINAL)
+
+    def test_source_reference_count_drift_and_missing_osisref_are_rejected(self):
+        wrong_census = WholeCanonOriginalLinkIdentityReceipt(
+            whole_source_receipt(reference_count=2))
+        with self.assertRaisesRegex(ValueError, "reference count"):
+            wrong_census.observe("K", "Gen.1.3", ORIGINAL)
+
+        raw = b"<div><reference>original label without destination</reference></div>"
+        source = whole_source_receipt()
+        source["chapters"]["Gen.1"]["original_units"][0][
+            "source_unit_sha256"] = hashlib.sha256(raw).hexdigest()
+        gate = WholeCanonOriginalLinkIdentityReceipt(source)
+        with self.assertRaisesRegex(ValueError, "missing/unsafe"):
+            gate.observe("K", "Gen.1.3", raw)
+
+    def test_duplicate_key_in_source_receipt_is_rejected(self):
+        receipt = whole_source_receipt()
+        receipt["chapters"]["Gen.1"]["original_units"][0]["keys"].append("Gen.1.4")
+        with self.assertRaisesRegex(ValueError, "Repeated"):
+            WholeCanonOriginalLinkIdentityReceipt(receipt)
 
 
 if __name__=="__main__":
