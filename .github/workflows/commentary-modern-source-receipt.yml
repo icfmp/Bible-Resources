@@ -892,9 +892,10 @@ jobs:
               doc=ET.fromstring(b"<original>"+raw+b"</original>")
               paragraphs=[p for p in doc.iter()
                           if isinstance(p.tag,str) and p.tag.rsplit("}",1)[-1]=="p"
-                          and p.get("resp")=="BibleResourcesOriginalSourceReferenceIndexOnly"]
+                          and isinstance(p.text,str) and p.text.startswith(
+                              "Original-edition Bible references for this commentary section")]
               if len(paragraphs)!=1:
-                  raise ValueError("Source-only inline index was not retained in native SWORD")
+                  raise ValueError("Source-only visible reference paragraph was not retained in native SWORD")
               refs=[r for r in paragraphs[0].iter()
                     if isinstance(r.tag,str) and r.tag.rsplit("}",1)[-1]=="reference"]
               hashes=[{
