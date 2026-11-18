@@ -41,8 +41,16 @@ def inventory(english):
     for entry in english:
         mid=entry["MainId"]
         by_id[mid]=entry
-        by_full_lemma[unicodedata.normalize("NFC",entry["Lemma"])].add(mid)
-        by_consonants[consonants(entry["Lemma"])].add(mid)
+        # Source-authored AlternateLemmas are genuine UBS headword
+        # inventory evidence, not inferred spelling. Never exclude a WLC
+        # occurrence from denominator merely because it is listed under an
+        # official alternate spelling instead of the canonical Lemma.
+        attested_forms=[entry["Lemma"],*(entry.get("AlternateLemmas") or [])]
+        for attested in attested_forms:
+            if not isinstance(attested,str) or not attested:
+                continue
+            by_full_lemma[unicodedata.normalize("NFC",attested)].add(mid)
+            by_consonants[consonants(attested)].add(mid)
         for raw in entry.get("StrongCodes") or []:
             match=UBS_STRONG.fullmatch(str(raw))
             if match:
@@ -110,7 +118,7 @@ def analyze(index, english, macula):
                     "strong":key[3],"occurrences":val["occurrences"],
                     "example_words":val["examples"],"ubs_headword_candidates":val["ubs_entry_ids"]}
                    for key,val in groups.items()),key=lambda v:(-v["occurrences"],v["language"],v["lemma"]))
-    return {"policy":"absence_means_no_matching_ubs_strong_and_no_exact_or_shin_sin_preserving_consonantal_indexed_lemma_anywhere",
+    return {"policy":"absence_means_no_matching_ubs_strong_and_no_exact_or_shin_sin_preserving_consonantal_indexed_canonical_or_alternate_lemma_anywhere",
             "dictionary_edition":"UBS Hebrew 0.9.4","scope_notice":"headword_inventory_only_not_dictionary_prose_or_semantic_completeness",
             "summary":dict(summary),
             "by_source_class":{k:dict(v) for k,v in sorted(by_class.items())},

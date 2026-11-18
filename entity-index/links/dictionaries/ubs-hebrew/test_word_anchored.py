@@ -285,6 +285,42 @@ class OriginalWordAnchoredLinksTest(unittest.TestCase):
             )
             self.assertEqual(build_word_links(ix,[a],source),{})
 
+    def test_original_ubs_alternate_lemma_matches_only_unique_strong_family(self):
+        original=entry("000009000000000", "אֲבַדּוֹן", ["H11a"])
+        original["AlternateLemmas"]=["אֲבַדּוֹ", "אֲבַדֹּה"]
+        ix=build([original],[original])
+        with tempfile.TemporaryDirectory() as folder:
+            src=Path(folder)/"words.tsv"
+            src.write_text(
+                "xml:id\tlemma\tsdbh\tstrongnumberx\tlang\tclass\n"
+                "o010010010011\tאֲבַדּוֹ\t\t0011\tH\tnoun\n"
+                "o010010010021\tאֲבַדּוֹ\t\t0011\tA\tnoun\n"
+                "o010010010031\tאֲבַדּוֹ\t\t0012\tH\tnoun\n",
+                encoding="utf-8",
+            )
+            links=build_word_links(ix,[original],src)
+        self.assertEqual(list(links),["o010010010011"])
+        ix["by_macula_word"]=links
+        out=lookup_word(ix,"o010010010011","","0011","H","אֲבַדּוֹ")
+        self.assertEqual(out["entry_ids"],[original["MainId"]])
+        self.assertEqual(out["sense_ids"],[])
+        self.assertEqual(out["evidence"],"macula_word_ubs_published_alternate_lemma_same_strong_family")
+
+    def test_alternate_headword_homographs_are_rejected(self):
+        a=entry("000009000000000","אֲבַדּוֹן",["H11a"])
+        b=entry("000010000000000","אֲבַדּ",["H11b"])
+        a["AlternateLemmas"]=["אֲבַדּוֹ"]
+        b["AlternateLemmas"]=["אֲבַדּוֹ"]
+        ix=build([a,b],[a,b])
+        with tempfile.TemporaryDirectory() as folder:
+            src=Path(folder)/"words.tsv"
+            src.write_text(
+                "xml:id\tlemma\tsdbh\tstrongnumberx\tlang\tclass\n"
+                "o010010010011\tאֲבַדּוֹ\t\t0011\tH\tnoun\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(build_word_links(ix,[a,b],src),{})
+
     def test_no_promotion_of_sense_id_collision(self):
         wrong = entry("006653000000000", "רֹאשׁ", ["H7218"])
         right = entry("006660000000000", "רֵאשִׁית", ["H7225a"])
