@@ -35,6 +35,7 @@ jobs:
           PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_rebuild_osis_commentary.py' -v
           PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_clean_source_osis.py' -v
           PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_repair_commentary_osis_milestones.py' -v
+          PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_commentary_shared_key_retrieval.py' -v
       - name: Install stock libSWORD compiler and native reader headers
         shell: bash
         run: |
@@ -823,6 +824,7 @@ jobs:
           from pathlib import Path
           sys.path.insert(0,str(Path.cwd()/"scripts"))
           from audit_osis import (source_commentary_overlap_witness,
+                                  source_commentary_shared_key_retrieval_map,
                                   compare_all_commentary_source_group_words,
                                   compare_all_commentary_source_group_semantics,
                                   source_commentary_introductions,
@@ -869,6 +871,46 @@ jobs:
           if evidence["status"]!="PRIVATE_ALL_AUTHORED_GROUP_WORD_BLOCKS_PRESENT_NOT_NOTE_PARITY":
               raise SystemExit("Not every original source group's word blocks survive compilation")
           print("All authored source group word blocks preserved at their first native keys")
+          # Restore ORIGINAL source scope claims from the pinned first private
+          # preview (before any experimental range trims), without modifying
+          # the compiled SWORD or repeating exposition on every verse.
+          original_groups=[]
+          original_overlaps,_=source_commentary_overlap_witness(
+              root/"mhc-repaired-preview.osis.xml",groups_out=original_groups)
+          if len(original_groups)!=4256 or len(original_overlaps)!=7:
+              raise SystemExit("Original authored section-overlap inventory changed")
+          original_word_proof=compare_all_commentary_source_group_words(
+              original_groups,raws)
+          if original_word_proof["status"]!=(
+                  "PRIVATE_ALL_AUTHORED_GROUP_WORD_BLOCKS_PRESENT_NOT_NOTE_PARITY"):
+              raise SystemExit("Original overlapping source sections lost native first-key access")
+          scope_bridge=source_commentary_shared_key_retrieval_map(
+              original_groups,set(keys))
+          shared=scope_bridge["shared_verses"]
+          by_key={item["bible_verse_key"]:item for item in shared}
+          from collections import Counter
+          categories=Counter(item["presentation_class"] for item in shared)
+          if (scope_bridge["original_shared_verse_keys"]!=7
+                  or scope_bridge["shared_verse_source_sections"]!=14
+                  or categories!={"DISTINCT_FIRST_KEYS_REQUIRE_MULTISECTION_READER":6,
+                                  "SAME_FIRST_KEY_REQUIRES_INNER_SECTION_MARKUP_CHECK":1}
+                  or by_key["Rom.4.17"]["native_retrieval_keys_in_authorial_order"]
+                     !=["Rom.4.9","Rom.4.17"]
+                  or by_key["2Chr.1.1"]["native_retrieval_keys_in_authorial_order"]
+                     !=["2Chr.1.1"]
+                  or scope_bridge["source_groups_rewritten"]
+                  or scope_bridge["original_prose_in_report"]):
+              raise SystemExit("Actual source shared-verse recovery bridge lost its invariants")
+          print("Original-source multiple-section retrieval bridge verified:",
+                {"source_groups":scope_bridge["original_authored_groups"],
+                 "shared_verse_keys":scope_bridge["original_shared_verse_keys"],
+                 "distinct_source_sections":scope_bridge["shared_verse_source_sections"],
+                 "navigation_classes":dict(categories)})
+          print("Real Romans shared-verse first-key retrieval:",
+                by_key["Rom.4.17"]["native_retrieval_keys_in_authorial_order"])
+          print("Real 2 Chronicles shared-verse first-key retrieval:",
+                by_key["2Chr.1.1"]["native_retrieval_keys_in_authorial_order"])
+          print("Source text preserved; no added verse, repeated prose or proprietary published module")
           semantics=compare_all_commentary_source_group_semantics(groups,raws)
           print("Entire MHC source/native punctuation, note and link-body triage:",
                 semantics["status"])
