@@ -219,7 +219,7 @@ def _indexed_osis_reference_target(token: str, native_keys: set[str],
     """
     if atomic_pattern.fullmatch(token):
         return token in native_keys
-    chapter_pattern=re.compile(r"[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9]\\d*")
+    chapter_pattern=re.compile(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9]\d*")
     if chapter_pattern.fullmatch(token):
         return any(ref.startswith(token+".") for ref in native_keys)
     ends=token.split("-")
