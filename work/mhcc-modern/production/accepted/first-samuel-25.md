@@ -81,6 +81,8 @@ Abigail's gift made up for Nabal's refusal.
 
 She approached David with great humility, speaking as someone asking for pardon.
 
+A humble, yielding response can calm even a serious offense.
+
 She could not defend her husband's conduct.
 
 Rather than trusting the cleverness of her own arguments, she depended on God's grace to soften David's anger.
@@ -117,6 +119,8 @@ Few are grateful for correction or praise the person who gives it as a friend.
 
 Yet **the closer we have come to doing wrong, the greater the mercy of being stopped**.
 
+Sinners are often most confident of their safety when their danger is greatest.
+
 Nabal, meanwhile, was drunk and felt completely secure.
 
 He could not enjoy abundance with moderation or be pleasant with his companions without becoming beastlike through excess.
@@ -128,6 +132,8 @@ The next morning his joy gave way to terror.
 His heart, lively with wine the previous evening, became heavy as stone.
 
 Such is the deception of fleshly pleasures: laughter quickly gives way to grief.
+
+Those who drink to excess are saddened when they reflect on their own foolishness.
 
 About ten days later, the Lord struck Nabal and he died.
 
@@ -152,6 +158,8 @@ Those who unite themselves to Christ must similarly be willing **to suffer with 
 ---
 
 ## Editorial review — 1 Samuel 25
+
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Restored three distinct source statements previously lost by condensation: yielding can pacify great offenses (18–31), sinners' false security amid danger (32–39), and the drunkard's sorrow on reflecting upon folly (32–39). These are changes to the unreleased modern manuscript only. The distinct CCEL 39–44 section still requires source provenance/rights review because it is absent as a separate body in the exact published MHCC 0.1.1 K source. No independent original-native acceptance is claimed.
 
 **Full CCEL witness read:** [CCEL, 1 Samuel 25](https://ccel.org/ccel/henry/mhcc.x.xxv.html). Pinned published **MHCC 0.1.1** remains the original source, requiring native SWORD entry/annotation and independent final acceptance.
 
