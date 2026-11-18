@@ -327,6 +327,203 @@ def _original_intro_candidates(root: Path, receipt: dict) -> dict:
     return intros
 
 
+def generate_accepted_canon_osis(accepted: Path, source: dict,
+                                  topology: dict, ionly: dict, intro_root: Path,
+                                  *, work_id: str) -> tuple[bytes, dict]:
+    """Build complete **unlinked/unapproved** OSIS; never change published SWORD."""
+    import hashlib
+    from commentary_modern_draft_guard import _claimed_verse_keys_in_heading
+    if (not re.fullmatch(r"MHCC[A-Z0-9]{2,20}", work_id)
+            or source.get("status")!="SOURCE_NATIVE_RECEIPT_ONLY_NOT_TRANSLATION_APPROVAL"
+            or source.get("original_compiled_corpus_sha256")!=_SOURCE_CORPUS
+            or source.get("semantic_translation_independently_approved") is not False
+            or source.get("source_prose_or_original_markup_exported") is not False):
+        raise ValueError("Original real-native source receipt is not authentic")
+    originals=source.get("chapters")
+    if (not isinstance(originals,dict) or len(originals)!=1189
+            or {s.split(".",1)[0] for s in originals}!=set(_CANON)):
+        raise ValueError("Whole canonical real-source chapter set is missing")
+    if (topology.get("status") !=
+        "REVIEWED_SOURCE_VS_EDITORIAL_TOPOLOGY_EXCEPTIONS_NOT_RELEASE_APPROVAL"
+        or topology.get("original_compiled_corpus_sha256")!=_SOURCE_CORPUS
+        or topology.get("publication_authorized") is not False
+        or topology.get("derived_markup_and_links_independently_approved") is not False):
+        raise ValueError("Non-reviewed modern source-topology manifest")
+    cases=topology.get("cases")
+    if not isinstance(cases,list):
+        raise ValueError("No source-vs-modern topology attestations")
+    overrides={item["chapter"]:item for item in cases}
+    if len(overrides)!=len(cases) or any(k not in originals for k in overrides):
+        raise ValueError("Duplicate/foreign modern topology case")
+    if (ionly.get("status")!="PRIVATE_TECHNICAL_PREVIEW_ONLY_NOT_EDITORIAL_APPROVAL"
+            or ionly.get("source_native_corpus_sha256")!=_SOURCE_CORPUS
+            or ionly.get("source_zip_sha256")!=_SOURCE_ZIP
+            or ionly.get("publication_authorized") is not False
+            or ionly.get("semantic_translation_independently_approved") is not False):
+        raise ValueError("I-only original source chapter manifest is not authentic")
+    i_rows=ionly.get("chapters")
+    if not isinstance(i_rows,list):
+        raise ValueError("I-only original chapter source mapping absent")
+    i_map={row["chapter_osis"]:row for row in i_rows}
+    if (len(i_map)!=len(i_rows) or set(i_map)!=
+            set(source.get("intro_only_chapters_needing_editorial_review",[]))):
+        raise ValueError("Wrong chapter-I-only original source selection")
+    files=sorted(accepted.glob("*.md"))
+    if len(files)!=1189:
+        raise ValueError("Incomplete 1189 modern manuscript inventory")
+    modern={}
+    for path in files:
+        fields,main=_modern_front(path)
+        chapter=fields.get("chapter_osis")
+        if (chapter not in originals or chapter in modern
+                or fields.get("source_module")!="MHCC 0.1.1"
+                or fields.get("source_zip_sha256")!=_SOURCE_ZIP
+                or fields.get("source_native_corpus_sha256")!=_SOURCE_CORPUS
+                or not fields.get("publication_status","").startswith("NOT RELEASED")):
+            raise ValueError("Modern manuscript source/version/status drift: "+path.name)
+        modern[chapter]=_modern_items(main)
+    if set(modern)!=set(originals):
+        raise ValueError("Missing/duplicate canonical modern chapters")
+    intros=_original_intro_candidates(intro_root,source)
+    doc=ET.Element(f"{{{NS}}}osis")
+    osis=ET.SubElement(doc,f"{{{NS}}}osisText",{
+        "osisIDWork":work_id,"osisRefWork":"Bible",
+        f"{{{XML}}}lang":"en","canonical":"false"})
+    header=ET.SubElement(osis,f"{{{NS}}}header")
+    work=ET.SubElement(header,f"{{{NS}}}work",{"osisWork":work_id})
+    ET.SubElement(work,f"{{{NS}}}title").text=(
+        "Unlinked Modern MHCC — source fidelity and release NOT APPROVED")
+    ET.SubElement(work,f"{{{NS}}}identifier",{"type":"OSIS"}).text=work_id
+    ET.SubElement(work,f"{{{NS}}}language",{"type":"IETF"}).text="en"
+    ET.SubElement(work,f"{{{NS}}}description").text=(
+        "All 1189 modern manuscripts; source-native Bible links and layout "
+        "not transferred; authorial meaning not independently certified")
+    group=ET.SubElement(osis,f"{{{NS}}}div",{"type":"bookGroup"})
+    totals=dict(chapters=0,groups=0,leaves=0,keys=0,
+                paragraphs=0,tables=0,table_cells=0,lists=0,unscoped=0)
+    used_cases=set()
+    for book in _CANON:
+        book_node=ET.SubElement(group,f"{{{NS}}}div",{"type":"book","osisID":book})
+        book_chapters=sorted((k for k in originals if k.startswith(book+".")),
+                             key=lambda key:int(key.rsplit(".",1)[1]))
+        if [int(k.rsplit(".",1)[1]) for k in book_chapters]!=list(
+                range(1,len(book_chapters)+1)):
+            raise ValueError("Missing/surplus canonical source chapter: "+book)
+        for chapter in book_chapters:
+            info=originals[chapter]
+            items=modern[chapter]
+            leaves=[item for item in items if item["kind"]=="leaf"]
+            if chapter in i_map:
+                case=i_map[chapter]
+                ii=[r for r in info["native_introductions_not_assumed_to_be_exposition"]
+                    if r["key"]==chapter and r["visible_word_tokens"]>40]
+                if (info["original_units"] or len(leaves)!=1 or len(ii)!=1
+                        or info["source_placement"]!="INTRO_ONLY_NEEDS_INDEPENDENT_REVIEW"
+                        or ii[0]["raw_sha256"]!=case["intro_raw_sha256"]
+                        or type(case.get("verse_count")) is not int
+                        or not 1<=case["verse_count"]<=200):
+                    raise ValueError("Unverified full-chapter I-only original: "+chapter)
+                keys=[[chapter+"."+str(n) for n in range(
+                    1,case["verse_count"]+1)]]
+                mapping=[[0]]
+            else:
+                if (not info["original_units"] or
+                        info["source_placement"]!="NUMBERED_KEYS_WITH_SEPARATE_INTRO"):
+                    raise ValueError("Unmapped genuine original K body in "+chapter)
+                keys=[u["keys"] for u in info["original_units"]]
+                if chapter in overrides:
+                    mapping=overrides[chapter].get("modern_leaf_indices_by_original_K")
+                    used_cases.add(chapter)
+                    if (not isinstance(mapping,list) or len(mapping)!=len(keys)
+                            or any(not isinstance(row,list) or not row for row in mapping)
+                            or sum(mapping,[])!=list(range(len(leaves)))):
+                        raise ValueError("Modern topical groups do not map to original K: "+chapter)
+                else:
+                    if len(leaves)!=len(keys):
+                        raise ValueError("Undeclared modern/original source topology drift: "+chapter)
+                    mapping=[[i] for i in range(len(keys))]
+            for n,ids in enumerate(mapping):
+                claim=[_claimed_verse_keys_in_heading(leaves[i]["title"]) for i in ids]
+                original_verses=[int(k.rsplit(".",1)[1]) for k in keys[n]]
+                if len(ids)>1:
+                    if any(row is None for row in claim) or set(sum(claim,[]))!=set(original_verses):
+                        raise ValueError("Joined modern headings fail original K span: "+chapter)
+                elif claim[0] is None:
+                    totals["unscoped"]+=1
+                elif claim[0]!=original_verses and chapter not in overrides:
+                    raise ValueError("Undeclared modern verse range differs from native K: "+chapter)
+            chapter_node=ET.SubElement(book_node,f"{{{NS}}}chapter",{"osisID":chapter})
+            if book in intros and chapter.endswith(".1"):
+                title,body=intros[book]
+                intro=ET.SubElement(chapter_node,f"{{{NS}}}div",{
+                    "type":"introduction",
+                    "resp":"BibleResourcesModernCandidateExactOriginalChapterI"})
+                ET.SubElement(intro,f"{{{NS}}}title").text=title
+                _write_reading_blocks(intro,body)
+            group_for_leaf={leaf:n for n,idxs in enumerate(mapping) for leaf in idxs}
+            first_for_group={idxs[0]:n for n,idxs in enumerate(mapping)}
+            if len(group_for_leaf)!=len(leaves):
+                raise ValueError("Unassigned modern authorial section")
+            current=None
+            leaf_index=0
+            for item in items:
+                if item["kind"]!="leaf":
+                    pre=ET.SubElement(chapter_node,f"{{{NS}}}div",{
+                        "type":"introduction",
+                        "resp":"BibleResourcesModernManuscriptEditorialGrouping"})
+                    ET.SubElement(pre,f"{{{NS}}}title").text=item["title"]
+                    count=_write_reading_blocks(pre,item["body"])
+                else:
+                    source_n=group_for_leaf[leaf_index]
+                    if leaf_index in first_for_group:
+                        current=ET.SubElement(chapter_node,f"{{{NS}}}div",{
+                            "type":"section","annotateType":"commentary",
+                            "annotateRef":_range(keys[source_n])})
+                        totals["groups"]+=1
+                        totals["keys"]+=len(keys[source_n])
+                    if current is None:
+                        raise ValueError("Missing source-bound commentary unit")
+                    ET.SubElement(current,f"{{{NS}}}title",{
+                        "type":"sub",
+                        "resp":"BibleResourcesModernEditorialHeading"}).text=item["title"]
+                    count=_write_reading_blocks(current,item["body"])
+                    totals["leaves"]+=1
+                    leaf_index+=1
+                for field in ("paragraphs","tables","table_cells","lists"):
+                    totals[field]+=count[field]
+            totals["chapters"]+=1
+    if used_cases!=set(overrides):
+        raise ValueError("Unreconciled explicitly reviewed source topology exception")
+    if (totals["chapters"]!=1189 or totals["groups"]!=4049
+            or totals["leaves"]!=4052 or
+            totals["keys"]!=28742+sum(c["verse_count"] for c in i_rows)):
+        raise ValueError("Whole-canon authorial structure/key coverage incomplete")
+    result=ET.tostring(doc,encoding="utf-8",xml_declaration=True)
+    ET.fromstring(result)
+    return result,{
+        "status":"FULL_CANON_UNLINKED_MODERN_ENGLISH_OSIS_TECHNICAL_CANDIDATE_NOT_RELEASE",
+        "books":len(_CANON),"chapters":totals["chapters"],
+        "original_K_authorial_bodies":totals["groups"]-len(i_rows),
+        "source_I_only_chapter_bodies":len(i_rows),
+        "annotated_sections":totals["groups"],
+        "modern_topical_expositions":totals["leaves"],
+        "total_source_and_I_only_verse_alias_keys":totals["keys"],
+        "chapter_I_preface_candidates":len(intros),
+        "paragraphs":totals["paragraphs"],
+        "tables":totals["tables"],"table_cells":totals["table_cells"],
+        "lists":totals["lists"],
+        "headings_without_exact_parsed_verse_scope":totals["unscoped"],
+        "source_topology_exceptions_used":sorted(used_cases),
+        "source_native_corpus_sha256":_SOURCE_CORPUS,
+        "osis_sha256":hashlib.sha256(result).hexdigest(),
+        "original_1204_reference_links_transferred":False,
+        "original_native_inline_markup_and_notes_verified":False,
+        "independent_semantic_signoff":False,
+        "sword_publication_authorized":False,
+        "original_sword_changed":False,
+    }
+
+
 def main():
     p=argparse.ArgumentParser()
     p.add_argument("--root",type=Path,required=True)
