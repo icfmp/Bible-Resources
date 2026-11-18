@@ -25,7 +25,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | Script | Classification | Tests | Static callers | Stage hint |
 | --- | --- | --- | ---: | --- |
 | [`scripts/audit_omitted_verse_notes.py`](../scripts/audit_omitted_verse_notes.py) | UNDECIDED | named test | 4 | source/native audit |
-| [`scripts/audit_osis.py`](../scripts/audit_osis.py) | UNDECIDED | not established | 6 | source/native audit |
+| [`scripts/audit_osis.py`](../scripts/audit_osis.py) | UNDECIDED | not established | 7 | source/native audit |
 | [`scripts/audit_real_pilot.py`](../scripts/audit_real_pilot.py) | UNDECIDED | not established | 3 | source/native audit |
 | [`scripts/audit_text.py`](../scripts/audit_text.py) | UNDECIDED | not established | 1 | source/native audit |
 | [`scripts/bible_intake.py`](../scripts/bible_intake.py) | KEEP_GENERIC | not established | 9 | intake |
