@@ -54,7 +54,7 @@ The source audit also reported counts for the remaining source hyperlink element
 
 These categories **are not proof of errors in the original text**. In particular, the 513 unsupported `osisRef` values may be valid OSIS ranges or compound expressions: they need a separate, format-aware analysis before any further automatic transfer. The 134 nonmatches may include legitimate abbreviations and citations whose reader-friendly presentation differs from original markup. No reference was invented or silently removed to increase coverage.
 
-The original 1,204 reference occurrences comprise **535 mapped original links, 9 documented original link dispositions (including eight target corrections already mapped plus spurious references), and other unmatched original links**. Never classify all unmatched source markup as wrong or unimportant.
+The 1,204 original hyperlink elements break down as **535 represented in the derivative (including eight verified target corrections), 9 spurious original hyperlink elements deliberately excluded under existing documented source dispositions, and 660 other occurrences still to place or review** (513 + 134 + 13). There is also one added authorial citation that was never linked in the original module. Never classify unmatched source markup as automatically wrong or unimportant.
 
 ## Safe next actions
 
