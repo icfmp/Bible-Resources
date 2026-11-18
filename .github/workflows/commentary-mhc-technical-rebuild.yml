@@ -1113,16 +1113,25 @@ jobs:
           print("No corrected OSIS or SWORD binary uploaded or published")
           PY
       - name: Install real Xiphos GUI dependencies in disposable runner
+        id: install_corrected_xiphos
         shell: bash
         continue-on-error: true
-        timeout-minutes: 8
+        timeout-minutes: 13
         run: |
           set -euo pipefail
-          # This independent GUI setup is nonblocking for the complete native
-          # content proof, and a dependency failure must remain explicit.
+          # The default EC2 Ubuntu mirror has previously timed out after
+          # fetching only part of the WebKit/GTK dependency closure. Use the
+          # canonical Ubuntu archive instead of silently increasing timeouts
+          # against the same stalled regional mirror.
+          sources=/etc/apt/sources.list.d/ubuntu.sources
+          if sudo test -f "$sources" && sudo grep -q 'us-east-2.ec2.archive.ubuntu.com' "$sources"; then
+            sudo sed -i 's|http://us-east-2.ec2.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' "$sources"
+          fi
           export DEBIAN_FRONTEND=noninteractive
-          timeout 390s sudo -E apt-get -o Acquire::Retries=1 \
-            -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 \
+          timeout 120s sudo apt-get -o Acquire::Retries=1 \
+            -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 update -qq
+          timeout 660s sudo -E apt-get -o Acquire::Retries=1 \
+            -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 \
             -o DPkg::Lock::Timeout=15 install -y --no-install-recommends \
               xiphos xvfb xdotool xclip dbus-x11
           for binary in xiphos Xvfb xdotool xclip dbus-run-session; do
@@ -1132,6 +1141,7 @@ jobs:
             }
           done
       - name: Observe real Xiphos with corrected private 25-link MHC (not hyperlink approval)
+        id: observe_corrected_xiphos
         shell: bash
         continue-on-error: true
         timeout-minutes: 6
@@ -1249,6 +1259,22 @@ jobs:
           print("Corrected private MHC actual Xiphos research (metadata only):",
                 json.dumps(outcome,sort_keys=True))
           PY
+      - name: Report corrected-MHC GUI status independently from native-source integrity
+        if: always()
+        shell: bash
+        env:
+          GUI_DEPS: ${{ steps.install_corrected_xiphos.outcome }}
+          GUI_TEST: ${{ steps.observe_corrected_xiphos.outcome }}
+        run: |
+          {
+            echo "## Actual Xiphos on corrected private 25-link MHC"
+            echo "Dependency installation: ${GUI_DEPS}"
+            echo "Reader GUI experiment: ${GUI_TEST}"
+            echo "GUI success is not clicked hyperlink navigation or Psalm 60 title acceptance."
+            echo "Any dependency/GUI failure is independently unresolved; full native-source integrity remains separate."
+            echo "No source text, corrected module, screenshots or original prose published."
+          } >> "$GITHUB_STEP_SUMMARY"
+          printf 'Corrected-MHC Xiphos dependency=%s GUI experiment=%s\n' "$GUI_DEPS" "$GUI_TEST"
       - name: Verify all source verse-group boundaries against real compiled SWORD keys and linked bodies
         shell: bash
         run: |
