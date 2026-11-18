@@ -57,7 +57,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_modern_k_scope_preview.py`](../scripts/commentary_modern_k_scope_preview.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_modern_linked_candidate_preview.py`](../scripts/commentary_modern_linked_candidate_preview.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/commentary_modern_native_witness_probe.py`](../scripts/commentary_modern_native_witness_probe.py) | UNDECIDED | named test | 2 | source/native audit |
-| [`scripts/commentary_modern_reference_gate.py`](../scripts/commentary_modern_reference_gate.py) | UNDECIDED | named test | 4 | not determined |
+| [`scripts/commentary_modern_reference_gate.py`](../scripts/commentary_modern_reference_gate.py) | UNDECIDED | named test | 5 | not determined |
 | [`scripts/commentary_modern_source_receipt.py`](../scripts/commentary_modern_source_receipt.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/commentary_native_inventory.py`](../scripts/commentary_native_inventory.py) | KEEP_GENERIC | not established | 10 | source/native audit |
 | [`scripts/commentary_native_raw_inventory.py`](../scripts/commentary_native_raw_inventory.py) | KEEP_GENERIC | named test | 11 | source/native audit |
