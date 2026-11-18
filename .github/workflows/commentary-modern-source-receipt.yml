@@ -1767,7 +1767,7 @@ jobs:
                            x.get("resp")==
                               "BibleResourcesModernRelocatedFirstNativeKBookPreface"]
                   def word_stream(value):
-                      return re.findall(r"[^\\W_]+",unicodedata.normalize(
+                      return re.findall(r"[^\W_]+",unicodedata.normalize(
                           "NFKC",value).casefold())
                   # osis2mod can change which div attributes survive and wrap
                   # chapter-I content. Verify the complete authored modern
