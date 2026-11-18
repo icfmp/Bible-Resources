@@ -16,7 +16,7 @@ from pathlib import Path
 LEXICAL_CLASSES = frozenset(("noun", "verb", "adj", "adv", "num"))
 
 
-def analyze(index, dictionary, source, top=60):
+def analyze(index, dictionary, source, top=60, expected_unresolved=None):
     from runpy import run_path
     lookup = run_path(str(Path(__file__).with_name("build_index.py")))["lookup"]
     ubs_lemmas = defaultdict(set)
@@ -71,8 +71,8 @@ def analyze(index, dictionary, source, top=60):
                 group["refs"].append({"id": row["xml:id"], "ref": row["ref"],
                                       "strong": row["strongnumberx"],
                                       "sdbh": row["sdbh"], "class": cls})
-    if counts["lexical_unresolved"] != 13736:
-        raise ValueError("Pinned lexical gap unexpectedly changed: " +
+    if expected_unresolved is not None and counts["lexical_unresolved"] != expected_unresolved:
+        raise ValueError("Lexical gap unexpectedly changed: " +
                          str(counts["lexical_unresolved"]))
     rows = []
     bucket_occurrences = Counter()
@@ -131,10 +131,12 @@ def main():
     parser.add_argument("--english", type=Path, required=True)
     parser.add_argument("--macula", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--expected-unresolved", type=int)
     a = parser.parse_args()
     result = analyze(
         json.loads(a.index.read_text(encoding="utf-8")),
-        json.loads(a.english.read_text(encoding="utf-8")), a.macula)
+        json.loads(a.english.read_text(encoding="utf-8")), a.macula,
+        expected_unresolved=a.expected_unresolved)
     a.output.parent.mkdir(parents=True, exist_ok=True)
     a.output.write_text(json.dumps(result, ensure_ascii=False,
                                    indent=2, sort_keys=True) + "\n", encoding="utf-8")
