@@ -64,11 +64,11 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "9f4c8f0b2ab3b68d677051bf732c21b5ecd0e5bdc9f076e36dd0bad4a7bfed81",
+      "sha256_at_inventory": "8f9a49a1a6034d627ae1ea4647c76d0c85bfff4c0da4a4e36e44920c81050169",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 7,
+      "static_reference_count": 8,
       "static_references": [
         ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/pilot-source-audit.yml",
@@ -76,6 +76,7 @@
         "docs/NORMALIZATION_POLICY.md",
         "docs/QUALITY_POLICY.md",
         "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
+        "tests/test_commentary_shared_key_retrieval.py",
         "tests/test_editorial_pipeline.py"
       ]
     },
