@@ -26,6 +26,38 @@
       "new_target": "Ps.18.24",
       "visible_label_sha256": "f78d643df7d3402d9c05b112340d6d2b538a82008038417e870777d2ba813f8c",
       "evidence_url": "https://ccel.org/h/henry/mhc2/MHC18015.HTM"
+    },
+    {
+      "original_line": 58803,
+      "source_book": "Jer",
+      "old_target": "De 4.29 30.2",
+      "new_target": "Deut.4.29 Deut.30.2",
+      "visible_label_sha256": "cccd2aa35125491fa243dc2098c62ab81ace3f9e4539e85737bf8e555d2eaab5",
+      "evidence_url": "https://ccel.org/ccel/henry/mhc4/mhc4.Jer.v.html"
+    },
+    {
+      "original_line": 63871,
+      "source_book": "Ezek",
+      "old_target": "Le 18.19 20.18",
+      "new_target": "Lev.18.19 Lev.20.18",
+      "visible_label_sha256": "91198920836b9fa7553a923ab0847a84b6d6dc6ccf4e9fdb90174283b2ea09b1",
+      "evidence_url": "https://www.ccel.org/h/henry/mhc2/MHC26018.HTM"
+    },
+    {
+      "original_line": 97929,
+      "source_book": "Acts",
+      "old_target": "Ac.23.23 24 25.6",
+      "new_target": "Acts.23.23 Acts.23.24 Acts.25.6",
+      "visible_label_sha256": "eb80963d62ecc60c3cbe12f98ed0722d3cfcb7be249759b908eb676df4bb03da",
+      "evidence_url": "https://www.ccel.org/h/henry/mhc2/MHC44010.HTM"
+    },
+    {
+      "original_line": 98544,
+      "source_book": "Acts",
+      "old_target": "Heb.9.9 10.1 4",
+      "new_target": "Heb.9.9 Heb.10.1 Heb.10.4",
+      "visible_label_sha256": "1ee6ae04b61b4169d42932f305e6651db5c07d67632041ef79752d7e453fd2fd",
+      "evidence_url": "https://ccel.org/h/henry/mhc2/MHC44013.HTM"
     }
   ]
 }
