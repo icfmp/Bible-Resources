@@ -567,7 +567,11 @@ jobs:
           assert Path(base/"mhcc-modern-contextual-crossref.osis.xml").is_file()
           print("SOURCE CONTEXT PROXIMITY PREVIEW (not original-inline proof): " +
                 str(contextual["source_notes_moved_to_authored_paragraphs"]) +
-                "/176 located beside an exact adjacent original phrase; " +
+                "/176 provisional contextual placements (exact phrase=" +
+                str(contextual["exact_phrase_proximity_count"]) +
+                ", paragraph lexical=" +
+                str(contextual["paragraph_lexical_context_proximity_count"]) +
+                "); " +
                 str(contextual["source_notes_still_grouped_by_K"]) +
                 " still separate; no release")
           print("SOURCE FOUR BAD ORIGINAL LINK REPAIRS PREVIEW: 13 separate " +
@@ -910,7 +914,7 @@ jobs:
               book,chapter,verse=key.rsplit(".",2)
               # Native readback above verifies all 176 destinations even if a
               # frontend suppresses footnote display; no UI claim is made.
-          print("PRIVATE EXACT-CONTEXT SWORD PASS: 28792 K keys, 176 exact " +
+          print("PRIVATE CONTEXT-CANDIDATE SWORD PASS: 28792 K keys, 176 exact " +
                 "source-note destinations and displays, relocated="+
                 str(summary["source_notes_moved_to_authored_paragraphs"])+
                 ", section-only="+str(summary["source_notes_still_grouped_by_K"])+
