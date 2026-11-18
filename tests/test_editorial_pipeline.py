@@ -284,6 +284,32 @@ class EditorialPipelineTests(unittest.TestCase):
             "This is repeated.", "This is repeated. This is repeated.")
         self.assertEqual(repeat["class"],"ambiguous_or_unaligned_source_word_window")
 
+    def test_intro_moved_to_book_or_verse_slot_is_not_automatically_called_lost(self):
+        from audit_osis import (source_commentary_introductions,
+                                triage_commentary_introduction_relocation)
+        self.write(
+            '<chapter sID="Gen.1" osisID="Gen.1" n="1"/>'
+            '<p>Original authorial preface and historical references.</p>'
+            '<verse sID="Gen.1.1" osisID="Gen.1.1" n="1"/>'
+            '<p>First indexed body.</p>'
+            '<verse eID="Gen.1.1"/><chapter eID="Gen.1"/>',
+            kind="commentary")
+        originals=source_commentary_introductions(self.source)
+        native_i={
+            "Gen":b'<p>Original authorial preface and historical references.</p>',
+            "Gen.1":b'<p/>',
+        }
+        nat_k={"Gen.1.1":b"<p>First indexed body.</p>"}
+        outcome=triage_commentary_introduction_relocation(originals,native_i,nat_k)
+        self.assertEqual(
+            outcome["counts"]["intro_word_stream_found_in_book_intro"],1)
+        self.assertEqual(outcome["bounded_source_scope_cases"][0]["source_intro"],"Gen.1")
+        native_i["Gen"]=b"<p>Not the original preface.</p>"
+        outcome=triage_commentary_introduction_relocation(originals,native_i,nat_k)
+        self.assertEqual(
+            outcome["counts"][
+                "intro_word_stream_not_found_contiguously_in_same_book_I_or_first_K"],1)
+
     def test_book_and_chapter_commentary_intro_note_and_link_parity(self):
         from audit_osis import (source_commentary_introductions,
                                 compare_commentary_source_native_introductions)
