@@ -98,6 +98,11 @@ jobs:
                 receipt["original_suspicious_token_census"])
           print("Original text ownership by XML tag (characters only):",
                 receipt["text_character_counts_by_xml_owner"])
+          profile=receipt["original_markup_profile"]
+          print("Emphasis style labels/counts:",profile["hi_emphasis_type_counts"])
+          print("Emphasis text-length bands:",profile["hi_visible_length_band_counts"])
+          print("Emphasis immediate XML owners:",profile["hi_direct_parent_counts"])
+          print("NBSP source XML owners:",profile["nonbreaking_spaces_by_xml_owner"])
           print("All elements, attributes, note bodies, link bodies retained")
           PY
       - name: Compile fresh private zCom4, then independently read EVERY occupied key
