@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "status": "research_only_private_not_release",
+  "source_sha256": "95a12ad88decbfe975de747825492abb7944b8de6dd30176cc23afdc9d2daa5d",
+  "edits": [
+    {
+      "original_line": 7237,
+      "source_book": "Exod",
+      "old_target": "15.1",
+      "new_target": "Jer.15.1",
+      "visible_label_sha256": "71d1ca3a55426923d99891ff72a1f46a7bbca23212ff35b6066554c04f20b75e",
+      "evidence_url": "https://github.com/icfmp/Bible-Resources/actions/runs/44290514885"
+    },
+    {
+      "original_line": 57059,
+      "source_book": "Isa",
+      "old_target": "Ezr 1.7 8.23",
+      "new_target": "Ezra.1.7 Ezra.8.24",
+      "visible_label_sha256": "b5c41088c8e116de627e447d115ccbdf40260cbb968e415feeb4fb26a665ff98",
+      "evidence_url": "https://github.com/icfmp/Bible-Resources/actions/runs/44290514885"
+    }
+  ]
+}
