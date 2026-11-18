@@ -108,6 +108,57 @@ class OriginalWordAnchoredLinksTest(unittest.TestCase):
             )
             self.assertEqual(build_word_links(ix, [a, b], source), {})
 
+    def test_verb_vocalization_only_same_strong_family(self):
+        root = entry("000010000000000", "ילד", ["H3205a"])
+        ix = build([root], [root])
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "words.tsv"
+            source.write_text(
+                "xml:id\tlemma\tsdbh\tstrongnumberx\tlang\tclass\n"
+                "o010010010011\tיָלַד\t\t3205\tH\tverb\n"
+                "o010010010021\tיָלַד\t\t3205\tH\tnoun\n",
+                encoding="utf-8",
+            )
+            ix["by_macula_word"] = build_word_links(ix, [root], source)
+        self.assertEqual(list(ix["by_macula_word"]), ["o010010010011"])
+        out = lookup_word(ix, "o010010010011", "", "3205", "H", "יָלַד")
+        self.assertEqual(out["entry_ids"], [root["MainId"]])
+        self.assertEqual(out["sense_ids"], [])
+        self.assertEqual(
+            out["evidence"],
+            "macula_word_verb_consonants_unique_entry_same_strong_family",
+        )
+        self.assertEqual(
+            lookup_word(ix, "o010010010011", "", "3205", "H", "יַלַד")["status"],
+            "source_word_mismatch",
+        )
+
+    def test_verb_shin_sin_and_homographs_remain_distinct(self):
+        shin = entry("000010000000000", "שׁבר", ["H7665a"])
+        sin = entry("000011000000000", "שׂבר", ["H7665b"])
+        ix = build([shin, sin], [shin, sin])
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "words.tsv"
+            source.write_text(
+                "xml:id\tlemma\tsdbh\tstrongnumberx\tlang\tclass\n"
+                "o010010010011\tשָׁבַר\t\t7665\tH\tverb\n"
+                "o010010010021\tשָׂבַר\t\t7665\tH\tverb\n",
+                encoding="utf-8",
+            )
+            links = build_word_links(ix, [shin, sin], source)
+        self.assertEqual(links["o010010010011"]["entry_id"], shin["MainId"])
+        self.assertEqual(links["o010010010021"]["entry_id"], sin["MainId"])
+        conflicting = entry("000012000000000", "שׁבר", ["H7665c"])
+        ix = build([shin, sin, conflicting], [shin, sin, conflicting])
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "words.tsv"
+            source.write_text(
+                "xml:id\tlemma\tsdbh\tstrongnumberx\tlang\tclass\n"
+                "o010010010011\tשָׁבַר\t\t7665\tH\tverb\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(build_word_links(ix, [shin, sin, conflicting], source), {})
+
     def test_no_promotion_of_sense_id_collision(self):
         wrong = entry("006653000000000", "רֹאשׁ", ["H7218"])
         right = entry("006660000000000", "רֵאשִׁית", ["H7225a"])
