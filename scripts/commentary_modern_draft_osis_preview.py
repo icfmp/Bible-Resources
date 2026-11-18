@@ -181,6 +181,7 @@ _CANON = ("Gen Exod Lev Num Deut Josh Judg Ruth 1Sam 2Sam 1Kgs 2Kgs 1Chr "
           "Titus Phlm Heb Jas 1Pet 2Pet 1John 2John 3John Jude Rev").split()
 _HEADING = re.compile(r"(?m)^(#{2,5}) ([^\n]+?)\s*$")
 _FIELD = re.compile(r'^([a-z_][a-z0-9_]*): "([^"\r\n]*)"$')
+_FIELD_INT = re.compile(r"^([a-z_][a-z0-9_]*): ([0-9]+)$")
 _SOURCE_ZIP = "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746"
 _SOURCE_CORPUS = "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e"
 
@@ -194,7 +195,7 @@ def _modern_front(path: Path) -> tuple[dict, str]:
     for line in head.splitlines():
         if not line.strip():
             continue
-        match = _FIELD.fullmatch(line)
+        match = _FIELD.fullmatch(line) or _FIELD_INT.fullmatch(line)
         if not match or match[1] in fields:
             raise ValueError("Unexpected or duplicate modern manuscript field: " + path.name)
         fields[match[1]] = match[2]
