@@ -89,6 +89,7 @@ jobs:
                   or not receipt["all_nonempty_osis_elements_and_attributes_preserved"]
                   or not receipt["only_verified_inert_display_elements_removed"]
                   or not receipt["all_source_nonspace_text_preserved"]
+                  or not receipt["original_byte_regions_preserved_except_empty_hi"]
                   or not receipt["all_note_and_reference_text_preserved"]
                   or not receipt["asterisks_and_potential_note_markers_unmodified"]
                   or receipt["published"]):
