@@ -932,7 +932,8 @@ def _unrecognized_original_ref_class(literal: str) -> str:
 def _auto_single_verse_placements(*, private_original: dict, groups: dict,
                                   modern_chapters: dict, native: dict,
                                   blocked: set, corrections: dict,
-                                  include_ranges: bool = False):
+                                  include_ranges: bool = False,
+                                  include_outline_links: bool = False):
     """Return conservative placements plus classified counts, no private text."""
     from commentary_modern_draft_osis_preview import NS, _range
     found = []
@@ -1007,8 +1008,6 @@ def _auto_single_verse_placements(*, private_original: dict, groups: dict,
             else:
                 display=_unambiguous_explicit_modern_verse(section,literal)
             if display is None:
-                skipped["no_unique_full_modern_verse_range_citation" if is_range
-                        else "no_unique_full_modern_verse_citation"] += 1
                 if is_range:
                     ownership=_source_range_section_ownership(
                         literal=literal,label=label,source_chapter=chapter,
@@ -1033,6 +1032,25 @@ def _auto_single_verse_placements(*, private_original: dict, groups: dict,
                     if (outline["unique_modern_outline_row_matches_source_target"]
                             and outline["original_visible_label_explicitly_names_same_verse_span"]):
                         skipped["unmatched_source_range_outline_row_and_source_label_match"]+=1
+                        if include_outline_links and outline["source_first_K_owns_link"]:
+                            cell=_find_exact_modern_original_outline_range_cell(
+                                modern_chapters[chapter],literal)
+                            if cell is None:
+                                raise ValueError("Source-attested outline range cell vanished")
+                            cell_text="".join(cell.itertext()).strip()
+                            found.append({
+                                "modern_chapter":chapter,
+                                "source_first_key":first,
+                                "original_link_ordinal":pos,
+                                "action":"AUTO_ORIGINAL_FIRST_K_CHAPTER_OUTLINE_RANGE",
+                                "expected_modern_target":canon,
+                                "modern_anchor":cell_text,
+                                "linked_display_text":cell_text,
+                                "display_occurrence":"last",
+                            })
+                            continue
+                skipped["no_unique_full_modern_verse_range_citation" if is_range
+                        else "no_unique_full_modern_verse_citation"] += 1
                 continue
             found.append({
                 "modern_chapter": chapter,
