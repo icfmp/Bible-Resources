@@ -23,6 +23,7 @@ MAX_ELEMENTS = 800_000
 SHA = re.compile(r"[0-9a-f]{64}\Z")
 INTERNAL_SPACES = re.compile(r"(?<=\S) {2,}(?=\S)")
 PROTECTED = frozenset({"note", "reference", "lg", "l", "q", "table", "row", "cell"})
+DISPLAY_ONLY_HI = frozenset({"italic", "bold", "small-caps", "super", "underline"})
 
 
 class CleanupError(ValueError):
@@ -63,9 +64,49 @@ def _load(path: Path, digest: str) -> bytes:
     return raw
 
 
-def _structure(root):
+def _inert_hi(node) -> bool:
+    """Only a truly empty styling leaf, outside protected note/reference data."""
+    return (
+        _local(node) == "hi"
+        and not len(node)
+        and node.text in (None, "")
+        and set(node.attrib) == {"type"}
+        and node.get("type") in DISPLAY_ONLY_HI
+        and node.getparent() is not None
+        and not any(_local(parent) in PROTECTED
+                    for parent in node.iterancestors())
+    )
+
+
+def _text_hashes(root) -> tuple[str, str]:
+    """Hash exact text and all text without ASCII spaces, in XML document order."""
+    exact = sha256()
+    no_ascii_spaces = sha256()
+    for fragment in root.itertext():
+        exact.update(fragment.encode("utf-8"))
+        no_ascii_spaces.update(fragment.replace(" ", "").encode("utf-8"))
+    return exact.hexdigest(), no_ascii_spaces.hexdigest()
+
+
+def _remove_empty_hi(node) -> None:
+    """Splice an inert styling leaf without altering a single text character."""
+    if not _inert_hi(node):
+        raise CleanupError("Attempt to remove a non-inert emphasis element")
+    parent = node.getparent()
+    previous = node.getprevious()
+    if node.tail:
+        if previous is None:
+            parent.text = (parent.text or "") + node.tail
+        else:
+            previous.tail = (previous.tail or "") + node.tail
+    parent.remove(node)
+
+
+def _structure(root, *, skip_inert_hi: bool = False):
     items = []
     for node in root.iter():
+        if skip_inert_hi and _inert_hi(node):
+            continue
         if len(items) >= MAX_ELEMENTS:
             raise CleanupError("Too many source XML nodes")
         if isinstance(node.tag, str):
@@ -154,13 +195,16 @@ def clean(source: Path, expected_sha: str, *, output: Path | None = None) -> dic
 
     Safe automatic edits are intentionally narrow:
     - collapse internal doubled ASCII spaces in plain leaf <p> text only;
-    - trim leading/trailing ASCII spaces in plain leaf <title> text only.
+    - trim leading/trailing ASCII spaces in plain leaf <title> text only;
+    - remove zero-content, presentation-only <hi> leaves outside notes/refs.
     Text with star symbols, protected descendants or nested markup is not
     rewritten. All source note/reference bodies and attributes remain exact.
     """
     raw = _load(source, expected_sha)
     root = _tree(raw)
     before = _structure(root)
+    before_without_inert = _structure(root, skip_inert_hi=True)
+    original_exact_text_sha, original_nonspace_sha = _text_hashes(root)
     protected = _protected_text(root)
     original_census, by_owner = _census(root)
     markup_profile = _markup_profile(root)
@@ -189,8 +233,18 @@ def clean(source: Path, expected_sha: str, *, output: Path | None = None) -> dic
             node.text = revised
             changes["changed_plain_nodes"] += 1
 
-    if before != _structure(root) or protected != _protected_text(root):
-        raise CleanupError("Cleanup altered source structure, note or reference content")
+    for node in list(root.iter()):
+        if _inert_hi(node):
+            _remove_empty_hi(node)
+            changes["empty_display_hi_elements_removed"] += 1
+
+    after_exact_text_sha, after_nonspace_sha = _text_hashes(root)
+    if (before_without_inert != _structure(root)
+            or protected != _protected_text(root)
+            or original_nonspace_sha != after_nonspace_sha
+            or (not changes.get("changed_plain_nodes")
+                and original_exact_text_sha != after_exact_text_sha)):
+        raise CleanupError("Cleanup altered protected markup or non-space text")
 
     result = {
         "status": "PRIVATE_OSIS_COSMETIC_CANDIDATE_NOT_EDITORIALLY_APPROVED",
@@ -201,7 +255,11 @@ def clean(source: Path, expected_sha: str, *, output: Path | None = None) -> dic
         "text_character_counts_by_xml_owner": by_owner,
         "original_markup_profile": markup_profile,
         "cleanup_changes": dict(sorted(changes.items())),
-        "all_original_osis_elements_and_attributes_preserved": True,
+        "all_nonempty_osis_elements_and_attributes_preserved": True,
+        "only_verified_inert_display_elements_removed": True,
+        "all_source_nonspace_text_preserved": True,
+        "original_nonspace_text_sha256": original_nonspace_sha,
+        "cleaned_nonspace_text_sha256": after_nonspace_sha,
         "all_note_and_reference_text_preserved": True,
         "asterisks_and_potential_note_markers_unmodified": True,
         "text_collated_against_independent_edition": False,
@@ -216,8 +274,12 @@ def clean(source: Path, expected_sha: str, *, output: Path | None = None) -> dic
         if changes:
             xml = etree.tostring(root, encoding="UTF-8", xml_declaration=True)
             rebuilt = _tree(xml)
-            if before != _structure(rebuilt) or protected != _protected_text(rebuilt):
-                raise CleanupError("Serialized candidate changed structure, notes or references")
+            serialized_exact, serialized_nonspace = _text_hashes(rebuilt)
+            if (before_without_inert != _structure(rebuilt)
+                    or protected != _protected_text(rebuilt)
+                    or serialized_nonspace != original_nonspace_sha
+                    or serialized_exact != after_exact_text_sha):
+                raise CleanupError("Serialized candidate changed source text or protected markup")
         else:
             xml = raw
         output.write_bytes(xml)
