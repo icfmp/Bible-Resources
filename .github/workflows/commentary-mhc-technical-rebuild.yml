@@ -13,6 +13,9 @@ on:
       - "config/commentary-osis-repair-plans/mhc-endpoints-private-preview.json"
       - "config/commentary-osis-repair-plans/mhc-overlap-reindex-private-experiment.json"
       - "config/commentary-osis-repair-plans/mhc-shared-scope-review-private.json"
+      - "scripts/reclassify_osis_commentary_introduction.py"
+      - "tests/test_reclassify_osis_commentary_introduction.py"
+      - "config/commentary-osis-repair-plans/mhc-chapter-introduction-private.json"
       - "config/commentary-osis-repair-plans/mhc-crossreferences-private-preview.json"
       - "tests/test_clean_source_osis.py"
       - ".github/workflows/commentary-mhc-technical-rebuild.yml"
@@ -37,6 +40,7 @@ jobs:
           PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_clean_source_osis.py' -v
           PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_repair_commentary_osis_milestones.py' -v
           PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_commentary_shared_key_retrieval.py' -v
+          PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_reclassify_osis_commentary_introduction.py' -v
       - name: Install stock libSWORD compiler and native reader headers
         shell: bash
         run: |
@@ -1278,6 +1282,132 @@ jobs:
           print("Complete native body text, non-link XML, notes, introductions and opaque records unchanged")
           print("This is native SWORD integrity, NOT clicked Xiphos/AndBible GUI navigation")
           print("No corrected OSIS or SWORD binary uploaded or published")
+          PY
+      - name: Private trial of real OSIS chapter introduction at 2 Chronicles 1
+        continue-on-error: true
+        timeout-minutes: 8
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          python - <<'PY'
+          import json,os,re,subprocess,sys
+          from pathlib import Path
+          from hashlib import sha256
+          from lxml import etree
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from reclassify_osis_commentary_introduction import repair_private_bytes
+          from audit_osis import source_commentary_overlap_witness
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          root=Path(os.environ["RUNNER_TEMP"])
+          manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
+          plan=json.loads(Path(
+              "config/commentary-osis-repair-plans/mhc-chapter-introduction-private.json"
+          ).read_text())
+          if (plan["original_authoring_osis_sha256"]!=
+                  manifest["commentary_source"]["original_authoring_osis"]["authoring_osis_sha256"]
+                  or plan["publication_approved"] or plan["source_text_edit_approved"]):
+              raise SystemExit("Unreviewed OSIS introduction source identity")
+          before=root/"mhc-links-private-only.osis.xml"
+          raw=before.read_bytes()
+          receipt_source=json.loads((root/"mhc-links-private-receipt.json").read_text())
+          if (sha256(raw).hexdigest()!=receipt_source["candidate_sha256"]):
+              raise SystemExit("Private intro trial input does not match reviewed link candidate")
+          plan["source_sha256"]=sha256(raw).hexdigest()
+          changed,receipt=repair_private_bytes(raw,plan)
+          output=root/"mhc-chapter-intro-private.osis.xml"
+          with output.open("xb") as handle:handle.write(changed)
+          assert sha256(output.read_bytes()).hexdigest()==receipt["candidate_sha256"]
+          print("Real 2Chr 1 source OSIS introduction move proof (metadata only):",
+                receipt)
+          groups=[]
+          source_commentary_overlap_witness(before,groups_out=groups)
+          intro=next(g for g in groups if g["sID"]=="2Chr.1.1")
+          following=next(g for g in groups if g["sID"]=="2Chr.1.1-12")
+          native_work=root/"mhc-chapter-intro-private-sword"
+          cmd=[sys.executable,"scripts/rebuild_osis_commentary.py",
+               "--source",str(output),"--sha256",receipt["candidate_sha256"],
+               "--private-work",str(native_work),"--module","MHCIntroPreview",
+               "--language",manifest["language"],
+               "--versification",manifest["commentary_source"]["observed_compiled_versification"],
+               "--native-reader",str(root/"commentary-native-raw"),
+               "--min-numbered","20000"]
+          with (root/"mhc-chapter-intro-native.json").open("xb") as output_json:
+              subprocess.run(cmd,stdout=output_json,stderr=subprocess.DEVNULL,
+                             check=True,timeout=450)
+          outcome=json.loads((root/"mhc-chapter-intro-native.json").read_text())
+          def frames(work,name):
+              env=dict(os.environ,SWORD_PATH=str(work))
+              p=subprocess.Popen([str(root/"commentary-native-raw"),name],
+                                 env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+              result={}
+              def on_entry(kind,key,data):
+                  result[(kind,key)]=data
+              try:
+                  counts,*_=parse_native_raw_corpus(p.stdout,on_entry=on_entry)
+                  if p.wait(timeout=45):
+                      raise SystemExit("Full native SWORD preview read failed")
+              finally:
+                  if p.stdout:p.stdout.close()
+                  if p.poll() is None:p.kill()
+                  p.wait()
+              return result,counts
+          old,old_counts=frames(root/"mhc-links-preview-sword","MHCLinkPreview")
+          new,new_counts=frames(native_work,"MHCIntroPreview")
+          intro_key=("I","2Chr.1.0")
+          verse_key=("K","2Chr.1.1")
+          if intro_key not in new or verse_key not in new:
+              raise SystemExit("Source-authored introduction missing from actual chapter intro key")
+          def words(raw):
+              xml=etree.fromstring(b"<fragment>"+raw+b"</fragment>",
+                   etree.XMLParser(resolve_entities=False,load_dtd=False,no_network=True))
+              return " ".join(re.findall(r"\\w+","".join(xml.itertext()).casefold()))
+          def source_words(text):
+              return " ".join(re.findall(r"\\w+",text.casefold()))
+          original_intro=source_words(intro["text"])
+          original_next=source_words(following["text"])
+          native_intro=words(new[intro_key])
+          native_verse=words(new[verse_key])
+          def shingles(text):
+              tokens=text.split()
+              width=min(30,max(5,len(tokens)//8))
+              return [" ".join(tokens[i:i+width])
+                      for i in sorted(set(
+                          [0,len(tokens)//3,len(tokens)//2,len(tokens)-width]))]
+          intro_pieces=shingles(original_intro)
+          next_pieces=shingles(original_next)
+          intro_found=sum(piece in native_intro for piece in intro_pieces)
+          next_found=sum(piece in native_verse for piece in next_pieces)
+          intro_still_in_verse=sum(piece in native_verse for piece in intro_pieces)
+          changed_keys=[(kind,key) for kind,key in new if
+                        old.get((kind,key))!=new[(kind,key)]]
+          removed_keys=[(kind,key) for kind,key in old if
+                        (kind,key) not in new]
+          remote=[(kind,key) for kind,key in changed_keys+removed_keys
+                  if not (kind=="I" and key=="2Chr.1.0")
+                  and not (kind=="K" and key.startswith("2Chr.1."))]
+          print("Actual private compiled 2Chr 1 intro placement (metadata only):",
+                {"before_intro_entries":old_counts["actual_occupied_intro_entry_count"],
+                 "after_intro_entries":new_counts["actual_occupied_intro_entry_count"],
+                 "all_intro_shingles_found":intro_found==len(intro_pieces),
+                 "source_intro_shingles":len(intro_pieces),
+                 "intro_shingles_in_verse_1":intro_still_in_verse,
+                 "all_1_to_12_commentary_shingles_found":
+                     next_found==len(next_pieces),
+                 "unexpected_modified_other_bible_slots":len(remote),
+                 "changed_native_slots":len(changed_keys),
+                 "new_native_2Chr_chapter_intro_present":True,
+                 "source_text_notes_and_references_unchanged":True})
+          if (intro_found!=len(intro_pieces)
+                  or next_found!=len(next_pieces)
+                  or intro_still_in_verse
+                  or remote
+                  or old_counts["actual_occupied_numbered_entry_count"]
+                     !=new_counts["actual_occupied_numbered_entry_count"]
+                  or old_counts["actual_occupied_anonymous_top_entry_count"]
+                     !=new_counts["actual_occupied_anonymous_top_entry_count"]):
+              raise SystemExit("OSIS introduction reclassification is not source-faithful in real SWORD")
+          print("REAL_OSIS_CHAPTER_INTRO_PROOF_PASS; candidate private and unpublished")
           PY
       - name: Install real Xiphos GUI dependencies in disposable runner
         if: github.event_name == 'workflow_dispatch'
