@@ -498,6 +498,88 @@ def source_commentary_shared_key_retrieval_map(
     }
 
 
+
+def source_commentary_reviewed_shared_key_plan(
+        original: dict, candidate: dict, review: dict,
+        *, pinned_original_sha256: str
+) -> dict:
+    """Select true multiple-owner verses without resurrecting erroneous spans.
+
+    Distinguish original *syntactic* overlapping addresses from editorially
+    attested shared ownership. A corrected OSIS source may have already
+    removed false overlaps; additional true intra-verse boundaries must be
+    recorded explicitly, with independent evidence, before a reader can look
+    up both original section starts. No prose, notes or references change.
+    """
+    if (not isinstance(original,dict) or not isinstance(candidate,dict)
+            or not isinstance(review,dict)
+            or not isinstance(pinned_original_sha256,str)
+            or not re.fullmatch(r"[0-9a-f]{64}",pinned_original_sha256)
+            or review.get("schema_version")!=1
+            or review.get("status")!="RESEARCH_ONLY_PRIVATE_SCOPE_REVIEW"
+            or review.get("original_authoring_osis_sha256")!=pinned_original_sha256
+            or not isinstance(review.get("retain_original_overlaps"),list)):
+        raise ValueError("Private original-source scope review is not SHA-attested")
+    if (original.get("original_authored_groups")
+            != candidate.get("original_authored_groups")
+            or original.get("source_groups_rewritten")
+            or candidate.get("source_groups_rewritten")):
+        raise ValueError("Candidate authorial source group census changed")
+    original_map={x["bible_verse_key"]:x for x in original["shared_verses"]}
+    candidate_map={x["bible_verse_key"]:x for x in candidate["shared_verses"]}
+    if not set(candidate_map).issubset(original_map):
+        raise ValueError("Candidate unexpectedly introduced a new shared verse")
+    for key,item in candidate_map.items():
+        original_lines={
+            x["original_source_start_line"]
+            for x in original_map[key]["original_sections_in_source_order"]
+        }
+        if (item["original_independent_section_count"]
+                != original_map[key]["original_independent_section_count"]
+                or {x["original_source_start_line"]
+                    for x in item["original_sections_in_source_order"]}
+                   !=original_lines):
+            raise ValueError("Original source section identity lost at shared key")
+    approved={}
+    for item in review["retain_original_overlaps"]:
+        if (not isinstance(item,dict)
+                or set(item)!={"bible_verse_key","evidence_url"}
+                or not isinstance(item["bible_verse_key"],str)
+                or item["bible_verse_key"] not in original_map
+                or item["bible_verse_key"] in candidate_map
+                or item["bible_verse_key"] in approved
+                or not isinstance(item["evidence_url"],str)
+                or not item["evidence_url"].startswith("https://")
+                or len(item["evidence_url"])>500):
+            raise ValueError("Unreviewed or redundant editorial overlap decision")
+        approved[item["bible_verse_key"]]=item["evidence_url"]
+    selected=set(candidate_map)|set(approved)
+    indexed=[]
+    for key,item in original_map.items():
+        if key not in selected:
+            continue
+        indexed.append({
+            **item,
+            "ownership_basis":(
+                "RETAINED_SOURCE_MULTIOWNER_WITH_INDEPENDENT_WITNESS"
+                if key in approved else
+                "PRESENT_IN_COMPILED_SOURCE_MULTIOWNER"),
+            "independent_evidence_url":approved.get(key),
+        })
+    return {
+        "status":"PRIVATE_REVIEWED_SCOPE_INDEX_NOT_PUBLISHED",
+        "original_source_sha256":pinned_original_sha256,
+        "original_syntactic_shared_verses":len(original_map),
+        "compiled_source_shared_verses":len(candidate_map),
+        "retained_original_intra_verse_boundaries":len(approved),
+        "reader_multiowner_verse_count":len(indexed),
+        "non_reader_shared_source_index_ranges":len(original_map)-len(indexed),
+        "reader_multiowner_verses":indexed,
+        "original_prose_in_report":False,
+        "source_groups_rewritten":False,
+    }
+
+
 def compare_source_overlap_native_bodies(
         overlapping: dict, native_raw: dict[str, bytes],
         *, max_cases: int = 35) -> dict:
