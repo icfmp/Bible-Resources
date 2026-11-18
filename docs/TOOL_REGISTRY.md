@@ -138,6 +138,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/reader_xiphos_headless_smoke.py`](../scripts/reader_xiphos_headless_smoke.py) | UNDECIDED | named test | 9 | not determined |
 | [`scripts/real_second_bible_probe.py`](../scripts/real_second_bible_probe.py) | UNDECIDED | named test | 6 | source/native audit |
 | [`scripts/rebuild_osis_commentary.py`](../scripts/rebuild_osis_commentary.py) | UNDECIDED | named test | 2 | publication/release |
+| [`scripts/reclassify_osis_commentary_introduction.py`](../scripts/reclassify_osis_commentary_introduction.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/release_preflight.py`](../scripts/release_preflight.py) | KEEP_GENERIC | named test | 5 | publication/release |
 | [`scripts/repair_commentary_osis_milestones.py`](../scripts/repair_commentary_osis_milestones.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/repair_osis_division_markers.py`](../scripts/repair_osis_division_markers.py) | UNDECIDED | named test | 6 | not determined |
