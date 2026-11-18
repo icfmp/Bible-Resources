@@ -172,6 +172,52 @@ jobs:
                   "shape":safe_shape(row.get("details",{}).get("osis_ref","")),
                   "sha256":sha256(row.get("details",{}).get("osis_ref","").encode("utf-8")).hexdigest()}
                  for row in references])
+          # Only short, machine-readable Bible reference IDs are eligible for
+          # diagnostic disclosure. Never expose arbitrary commentary prose.
+          from lxml import etree
+          xml=etree.parse(os.environ["CLEANED"],
+                          parser=etree.XMLParser(resolve_entities=False,
+                                                 load_dtd=False,no_network=True,
+                                                 recover=False,huge_tree=True))
+          suspicious_lines={row["original_xml_line"] for row in references}
+          expected_sha={
+              row["original_xml_line"]:
+              sha256(row.get("details",{}).get("osis_ref","").encode()).hexdigest()
+              for row in references
+          }
+          detailed=[]
+          for element in xml.iter():
+              if not isinstance(element.tag,str) or not element.tag.endswith("}reference"):
+                  continue
+              if element.sourceline not in suspicious_lines:
+                  continue
+              value=element.get("osisRef","")
+              if sha256(value.encode()).hexdigest()!=expected_sha[element.sourceline]:
+                  raise SystemExit("Unreviewed target identity unexpectedly changed")
+              scope=next((x.get("annotateRef") for x in element.iterancestors()
+                          if x.get("annotateType")=="commentary"),None)
+              book=next((x.get("osisID") for x in element.iterancestors()
+                         if x.get("type")=="book" and x.get("osisID")),None)
+              label="".join(element.itertext()).strip()
+              # No free-form source language is emitted, just grammar class.
+              numeric_label=bool(re.fullmatch(r"\d{1,3}(?:[.:]\d{1,3})?"
+                                               r"(?:[-–]\d{1,3})?",label))
+              literal_target=value if (
+                  len(value)<=120 and
+                  re.fullmatch(r"[A-Za-z0-9_.: \-]{1,120}",value)
+              ) else None
+              detailed.append({
+                  "line":element.sourceline,
+                  "type":element.get("type"),
+                  "source_host":scope,
+                  "source_book":book,
+                  "reference_is_just_numeric_label":numeric_label,
+                  "machine_reference":literal_target,
+              })
+          if len(detailed)!=len(references):
+              raise SystemExit("Source target line/key correspondence incomplete")
+          print("Unreviewed machine references and source scopes (no commentary prose):",
+                detailed)
           print("No editorial changes or historical text correction performed")
           PY
       - name: Compile fresh private zCom4, then independently read EVERY occupied key
