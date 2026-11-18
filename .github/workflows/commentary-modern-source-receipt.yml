@@ -1442,14 +1442,14 @@ jobs:
               for record in records:
                   owned[record["private_original_enclosing_div1_document_ordinal"]].add(book)
           bybook=defaultdict(list)
+          all_div1_prefaces=[]
           def words(text):
               return re.findall(r"[^\W_]+",unicodedata.normalize(
                   "NFKC",text).casefold())
           for i,node in enumerate(div1,1):
               codes=owned.get(i,set())
-              if len(codes)!=1 or next(iter(codes)) not in _CANON:
-                  continue
-              book=next(iter(codes))
+              book=(next(iter(codes)) if len(codes)==1 and
+                    next(iter(codes)) in _CANON else None)
               first_chapter=next((n for n,v in enumerate(node)
                   if isinstance(v.tag,str) and
                   v.tag.rsplit("}",1)[-1]=="div2"),None)
@@ -1464,11 +1464,15 @@ jobs:
                       continue
                   prefix.append("".join(child.itertext()))
               passage=" ".join(prefix)
-              bybook[book].append({
+              block={
                   "source_div1_ordinal":i,
                   "prefix_words":words(passage),
                   "prefix_sha256":hashlib.sha256(passage.encode()).hexdigest(),
-              })
+              }
+              if len(block["prefix_words"])>=15:
+                  all_div1_prefaces.append(block)
+              if book is not None:
+                  bybook[book].append(block)
 
           candidates=list(sorted(Path("work/mhcc-modern/production").glob(
               "*-book-introduction.CANDIDATE.md")))
@@ -1538,12 +1542,24 @@ jobs:
                   found=any(actual[i:i+len(needle)]==needle
                             for i in range(len(actual)-len(needle)+1))
                   presence.append(found)
-              if len(source_blocks)==1:
-                  result=("CCEL_BOOK_PREFACE_WORDS_MATCH_ORIGINAL_FIRST_K"
-                          if presence[0] else
-                          "CCEL_BOOK_PREFACE_NOT_MATCHED_IN_ORIGINAL_FIRST_K")
+              lexical_matches=[]
+              for block in all_div1_prefaces:
+                  needle=block["prefix_words"][:20]
+                  locations=[ix for ix in range(
+                      min(500,len(actual))-len(needle)+1)
+                      if actual[ix:ix+len(needle)]==needle]
+                  if len(locations)==1:
+                      lexical_matches.append((block,locations[0]))
+              if len(source_blocks)==1 and presence[0]:
+                  result="CCEL_BOOK_PREFACE_WORDS_MATCH_ORIGINAL_FIRST_K"
+              elif len(lexical_matches)==1:
+                  result="CCEL_BOOK_PREFACE_UNIQUE_LEXICAL_FIRST_K_MATCH_CROSS_DIV1"
+              elif len(lexical_matches)>1:
+                  result="MULTIPLE_DIFFERENT_CCEL_PREFACES_IN_ORIGINAL_FIRST_K"
               elif len(source_blocks)>1:
                   result="AMBIGUOUS_MULTIPLE_CCEL_PREFACE_BLOCKS"
+              elif len(source_blocks)==1:
+                  result="CCEL_BOOK_PREFACE_NOT_MATCHED_IN_ORIGINAL_FIRST_K"
               else:
                   result=("NO_SEPARATE_CCEL_BOOK_PREFACE_IN_BOUNDED_DIRECT_DIV1"
                           if sections else "ORIGINAL_CCEL_BOOK_IDENTITY_AMBIGUOUS")
@@ -1558,6 +1574,12 @@ jobs:
                       len(b["prefix_words"]) for b in source_blocks),
                   "preface_exact_20_word_prefix_in_original_first_K":(
                       bool(presence[0]) if len(presence)==1 else None),
+                  "unique_cross_div1_lexical_match":len(lexical_matches)==1,
+                  "cross_div1_lexical_match_ordinal":(
+                      lexical_matches[0][0]["source_div1_ordinal"]
+                      if len(lexical_matches)==1 else None),
+                  "cross_div1_match_first_500_word_offset":(
+                      lexical_matches[0][1] if len(lexical_matches)==1 else None),
                   "classification":result,
                   "individual_source_text_or_labels_exported":False,
               })
