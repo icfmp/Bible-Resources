@@ -610,6 +610,118 @@ def _wrap_exact_authored_modern_text(section: ET.Element, *, anchor: str,
         raise ValueError("Link insertion must not modify modern authorial visible text")
 
 
+# This generic concordance is a *recognition* aid, not a replacement for
+# authored Scripture references. Only exact, full "Book chapter:verse" forms
+# inside one real modern commentary K body can be auto-attached to an
+# authenticated original osisRef. Ranges and ellipses are NEVER guessed.
+_ENGLISH_CANONICAL_NAMES = (
+    "Genesis|Exodus|Leviticus|Numbers|Deuteronomy|Joshua|Judges|Ruth|"
+    "1 Samuel|2 Samuel|1 Kings|2 Kings|1 Chronicles|2 Chronicles|"
+    "Ezra|Nehemiah|Esther|Job|Psalm|Proverbs|Ecclesiastes|Song of Solomon|"
+    "Isaiah|Jeremiah|Lamentations|Ezekiel|Daniel|Hosea|Joel|Amos|Obadiah|"
+    "Jonah|Micah|Nahum|Habakkuk|Zephaniah|Haggai|Zechariah|Malachi|"
+    "Matthew|Mark|Luke|John|Acts|Romans|1 Corinthians|2 Corinthians|"
+    "Galatians|Ephesians|Philippians|Colossians|1 Thessalonians|"
+    "2 Thessalonians|1 Timothy|2 Timothy|Titus|Philemon|Hebrews|James|"
+    "1 Peter|2 Peter|1 John|2 John|3 John|Jude|Revelation"
+).split("|")
+from commentary_modern_draft_osis_preview import _CANON as _ORIGINAL_CANON
+if len(_ENGLISH_CANONICAL_NAMES) != len(_ORIGINAL_CANON):
+    raise RuntimeError("Canonical Bible book-name mapping cannot be trusted")
+_ENGLISH_NAME_BY_OSIS = dict(zip(_ORIGINAL_CANON, _ENGLISH_CANONICAL_NAMES))
+_ENGLISH_NAME_BY_OSIS["Ps"] = "Psalm"
+_AUTO_ALIASES = {"Ps": ("Psalm", "Psalms"),
+                 "Song": ("Song of Solomon", "Song of Songs")}
+
+
+def _unambiguous_explicit_modern_verse(section: ET.Element, target: str):
+    """Find one literal English full-name single-verse citation, otherwise None.
+
+    No source XML or modern prose is changed by this recognition function.
+    In particular it deliberately rejects 3:16–17, 3:16,17, ambiguous
+    repetitions, existing links and citations that cross markup boundaries.
+    """
+    canonical = canonical_only_for_comparison(target)
+    book, chapter, verse = canonical.rsplit(".", 2)
+    names = _AUTO_ALIASES.get(book, (_ENGLISH_NAME_BY_OSIS.get(book),))
+    if any(not x for x in names):
+        return None
+    candidates = []
+    for name in names:
+        regex = re.compile(r"(?<![A-Za-z0-9])" + re.escape(name) +
+                           r"\s+" + re.escape(chapter) + ":" +
+                           re.escape(verse) + r"(?![0-9])", re.I)
+        for node in section.iter():
+            if not isinstance(node.tag, str):
+                continue
+            # Never overwrite existing reviewed links, but allow their tails.
+            for part in ("text", "tail"):
+                if part == "text" and node.tag.rsplit("}", 1)[-1] == "reference":
+                    continue
+                value = getattr(node, part)
+                if not isinstance(value, str):
+                    continue
+                for hit in regex.finditer(value):
+                    suffix = value[hit.end():]
+                    if re.match(r"\s*[-–—,]\s*\d", suffix):
+                        continue
+                    candidates.append(hit[0])
+    return candidates[0] if len(candidates) == 1 else None
+
+
+def _auto_single_verse_placements(*, private_original: dict, groups: dict,
+                                  modern_chapters: dict, native: dict,
+                                  blocked: set, corrections: dict):
+    """Return conservative placements plus classified counts, no private text."""
+    from commentary_modern_draft_osis_preview import NS, _range
+    found = []
+    skipped = {"already_reviewed": 0, "proposed_original_correction": 0,
+               "repeated_original_target": 0, "unverified_or_single_digit_label": 0,
+               "no_unique_full_modern_verse_citation": 0}
+    for first, links in private_original.items():
+        chapter = first.rsplit(".", 1)[0]
+        units = native["chapters"][chapter]["original_units"]
+        ordinal = next(i for i, u in enumerate(units) if u["first_key"] == first)
+        sections = modern_chapters[chapter].findall(
+            f"./{{{NS}}}div[@annotateType='commentary']")
+        if len(sections) != len(units):
+            raise ValueError("Source-group count changed during automatic citation lookup")
+        section = sections[ordinal]
+        if section.get("annotateRef") != _range(units[ordinal]["keys"]):
+            raise ValueError("Auto lookup cannot use a non-original commentary scope")
+        targets = [canonical_only_for_comparison(literal) for literal, _ in links]
+        for pos, (literal, label) in enumerate(links, 1):
+            key = (first, pos)
+            if key in blocked:
+                skipped["already_reviewed"] += 1
+                continue
+            if key in corrections:
+                skipped["proposed_original_correction"] += 1
+                continue
+            canon = targets[pos-1]
+            if targets.count(canon) != 1:
+                skipped["repeated_original_target"] += 1
+                continue
+            if not label.strip() or re.fullmatch(r"[1-9]", label.strip()):
+                skipped["unverified_or_single_digit_label"] += 1
+                continue
+            display = _unambiguous_explicit_modern_verse(section, literal)
+            if display is None:
+                skipped["no_unique_full_modern_verse_citation"] += 1
+                continue
+            found.append({
+                "modern_chapter": chapter,
+                "source_first_key": first,
+                "original_link_ordinal": pos,
+                "action": "AUTO_EXACT_SOURCE_TARGET_AND_UNIQUE_MODERN_VERSE",
+                "expected_modern_target": canon,
+                "modern_anchor": display,
+                "linked_display_text": display,
+                "display_occurrence": "last",
+            })
+    return found, skipped
+
+
 def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                                     native: dict, identities: dict,
                                     dispositions: dict, repo_root: Path,
