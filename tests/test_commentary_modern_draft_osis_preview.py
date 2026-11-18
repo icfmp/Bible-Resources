@@ -82,6 +82,18 @@ class CommentaryPreviewTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             _range(["Matt.13.1", "Matt.14.2"])
 
+    def test_source_native_discontinuous_group_does_not_swallow_other_body(self):
+        first = [f"Matt.13.{v}" for v in list(range(24, 31)) + list(range(36, 44))]
+        second = [f"Matt.13.{v}" for v in range(31, 36)]
+        self.assertEqual(
+            _range(first),
+            "Matt.13.24-Matt.13.30 Matt.13.36-Matt.13.43")
+        self.assertEqual(_range(second), "Matt.13.31-Matt.13.35")
+        self.assertTrue(set(first).isdisjoint(second))
+        # The source identities must remain separate when source XML/OSIS
+        # is serialized; a min/max collapsed span would overwrite the gap.
+        self.assertNotEqual(_range(first), "Matt.13.24-Matt.13.43")
+
     def test_missing_chapter_cannot_produce_partial_preview(self):
         with tempfile.TemporaryDirectory() as folder:
             with self.assertRaisesRegex(ValueError, "Not all source-mapped"):
