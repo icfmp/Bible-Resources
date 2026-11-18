@@ -51,7 +51,7 @@ But a godly person's desires and prayers agree with **God's will and commands**.
 
 We cannot expect obedience in one duty to purchase permission for disobedience in others.
 
-Such hypocrisy will eventually be exposed and bring shame.
+Such hypocrisy will be exposed: if its shame is not faced in this life, **everlasting shame** will be its portion.
 
 The psalmist wanted to learn God's law and give him glory.
 
@@ -379,7 +379,7 @@ A faithful believer carries the Bible everywhere—not necessarily in the hand, 
 
 Meditating on Scripture can give us deeper understanding than respected teachers possess, particularly when we learn to understand our own hearts.
 
-**The written word is a more reliable guide to heaven** than all the church's older teachers and traditions.
+**The written word is a more reliable guide to heaven** than all the fathers, teachers and ancient authorities of the church.
 
 We cannot confidently approach God in worship while knowingly clinging to guilt or walking along sinful paths.
 
@@ -445,9 +445,7 @@ Departing from the Lord's statutes is error that leads toward destruction.
 
 Wicked people's clever schemes are ultimately deceitful.
 
-A day is coming when they will face divine judgment.
-
-They will be removed like **dross cast into a fire**.
+A day is coming when the wicked will face **everlasting fire**, the fitting place for dross.
 
 Considering sin's consequences, we should fear coming short of the promised heavenly rest (**Hebrews 4:1**).
 
@@ -501,7 +499,7 @@ The God who knows our frame can remove that pressure in answer to prayer.
 
 Henry argues that the ancient Israelites' confidence in approaching God's throne indicates they understood more of **gospel blessings through sacrifices and worship** than people often suppose.
 
-We should approach the same gracious throne through **the name and merit of Jesus**.
+We should approach the same gracious throne through **the name and merit of Jesus**. We will not, and cannot, plead there in vain.
 
 Those whose hearts have been transformed by grace often express that grace in tears.
 
@@ -670,6 +668,8 @@ Happy are those who find delight in living this way.
 ---
 
 ## Editorial verification — Psalm 119
+
+**2026-11-18 targeted whole-chapter CCEL re-collation (secondary English witness only):** All 22 eight-verse authorial sections and the separate source introduction were read against this manuscript again. Four bounded source-meaning changes restore (1) the **everlasting shame** explicitly warned of in 1–8; (2) the original comparison to the *fathers, teachers and ancients* of the church in 97–104, without introducing the different claim about church *traditions*; (3) the **everlasting fire** of the wicked in 113–120, rather than generic judgment; and (4) Henry's assurance that pleading Christ's name and merits **cannot be in vain** in 129–136. This is a same-assistant check against a **separate digital witness**, not a full original native I/K/text/notes/refs/markup signoff. All published `MHCC 0.1.1` bytes and original source key identities remain untouched. The additional known CCEL textual blemishes remain documented below and are not silently reconstructed.
 
 **Full source inspected:** [CCEL, Psalm 119](https://ccel.org/ccel/henry/mhcc.xx.cxix.html). Source of record remains the published SHA-pinned **MHCC 0.1.1** module, pending native SWORD and independent editorial acceptance.
 
