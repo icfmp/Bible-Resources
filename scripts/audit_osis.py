@@ -617,6 +617,63 @@ def compare_all_commentary_source_group_words(
     }
 
 
+def _source_native_interword_punctuation_shape(source: str, native: str) -> dict:
+    """Compare punctuation-only gaps aligned by the complete source word run.
+
+    Never print original words or punctuation strings: only categorical
+    per-position differences. A repeated phrase in native requires review.
+    """
+    import unicodedata
+    a=unicodedata.normalize("NFC",source)
+    b=unicodedata.normalize("NFC",native)
+    src=list(re.finditer(r"\w+",a))
+    nat=list(re.finditer(r"\w+",b))
+    tokens=[m.group().casefold() for m in src]
+    native_tokens=[m.group().casefold() for m in nat]
+    if not tokens:
+        return {"class":"source_no_word_tokens"}
+    starts=[i for i,tok in enumerate(native_tokens) if tok==tokens[0]
+            and native_tokens[i:i+len(tokens)]==tokens]
+    if len(starts)!=1:
+        return {"class":"ambiguous_or_unaligned_source_word_window",
+                "matching_windows":len(starts)}
+    base=starts[0]
+    changes=Counter()
+    examples=[]
+    for pos in range(len(src)-1):
+        left=a[src[pos].end():src[pos+1].start()]
+        right=b[nat[base+pos].end():nat[base+pos+1].start()]
+        if left==right:
+            changes["exact_interword_gaps"]+=1
+        elif " ".join(left.split())==" ".join(right.split()):
+            changes["whitespace_only_interword_gaps"]+=1
+        elif "".join(left.split())=="".join(right.split()):
+            changes["all_whitespace_removed_gap_equal"]+=1
+        else:
+            changes["punctuation_codepoints_differ"]+=1
+            if len(examples)<12:
+                examples.append({
+                    "gap_ordinal":pos+1,
+                    "source_nonspace_symbols":len("".join(left.split())),
+                    "native_nonspace_symbols":len("".join(right.split())),
+                    "source_symbol_categories":dict(sorted(Counter(
+                        unicodedata.category(x) for x in left if not x.isspace()
+                    ).items())),
+                    "native_symbol_categories":dict(sorted(Counter(
+                        unicodedata.category(x) for x in right if not x.isspace()
+                    ).items())),
+                })
+    return {
+        "class":("punctuation_changes_between_word_anchors"
+                 if changes["punctuation_codepoints_differ"] else
+                 "word_internal_gaps_equal_or_whitespace_only"),
+        "counts":dict(sorted(changes.items())),
+        "bounded_symbol_category_examples":examples,
+        "word_run_start_native_ordinal":base+1,
+        "unreviewed_boundary_text":False,
+    }
+
+
 def compare_all_commentary_source_group_semantics(
         groups: list[dict], native_first_raw: dict[str,bytes],
         *, max_cases: int = 40) -> dict:
@@ -686,6 +743,8 @@ def compare_all_commentary_source_group_semantics(
                     "source_ref":group["sID"],
                     "category":"source_text_punctuation_or_spacing_diff",
                     "source_text_sha256":hashlib.sha256(source_text.encode()).hexdigest(),
+                    "aligned_punctuation":_source_native_interword_punctuation_shape(
+                        source_text,compiled),
                 })
         for tag in ("note","reference"):
             source_nodes=[n for n in group["semantic_nodes"] if n["tag"]==tag]
