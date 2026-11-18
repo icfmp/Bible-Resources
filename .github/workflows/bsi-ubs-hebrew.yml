@@ -73,7 +73,8 @@ jobs:
             --index /tmp/bsi-ubs-hebrew-index.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
-            --output /tmp/bsi-ubs-hebrew-variants.json
+            --output /tmp/bsi-ubs-hebrew-variants.json \
+            --expected-rows 475911
       - name: Compare pinned generated index or prepare initial reproducible snapshot
         run: |
           python3 - <<'PY'
