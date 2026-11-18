@@ -111,14 +111,14 @@ jobs:
           assert contexts["sblgnt:45016027"]["classification"] == (
               "doxology_in_edition_apparatus_not_main_word_inventory")
           print("ENTITY_VERSE_SOURCE_CONTEXTS",json.dumps(kind_counts,sort_keys=True))
-          assert stats["qualified_source_reference_claims"] == 12, stats
+          assert stats["qualified_source_reference_claims"] == 65, stats
           reviews=index["qualified_source_references"]
           all_reviews=[x for records in reviews.values() for x in records]
-          assert len(all_reviews) == 12, all_reviews
+          assert len(all_reviews) == 65, all_reviews
           assert sum(x["classification"] == "textual_variant_name_not_in_pinned_edition"
                      for x in all_reviews) == 2
           assert sum(x["classification"] == "traditional_subscription_candidate"
-                     for x in all_reviews) == 10
+                     for x in all_reviews) == 63
           assert any(x["source_id"] == "place:Bethabara"
                      for x in reviews["sblgnt:43001028"])
           assert any(x["source_id"] == "place:Trogyllium"
@@ -457,9 +457,17 @@ jobs:
               for row in manifest["claims"]
               if row["classification"]=="traditional_subscription_candidate"
           }
-          assert len(qualified)==10, len(qualified)
+          assert len(qualified)==63, len(qualified)
           assert len(candidate_links)==69, len(candidate_links)
-          assert len(candidate_links-qualified)==59, len(candidate_links-qualified)
+          assert len(candidate_links-qualified)==6, len(candidate_links-qualified)
+          # The six remaining source claims concern Jesus/Christ in Greek
+          # apparatus or alternate 2 Corinthians versification, not subscriptions.
+          outstanding=candidate_links-qualified
+          absent_source_verses={
+              row["verse_id"] for row in
+              report["absent_source_final_chapter_references"]
+          }
+          assert all(verse in absent_source_verses for _,verse in outstanding), sorted(outstanding)
           # A reviewed subscription claimant must be traceable to the
           # source-defined, unanchored letter-end inventory. This does NOT
           # mean all other unanchored references are subscriptions.
