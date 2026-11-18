@@ -536,8 +536,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
+        "scripts/reclassify_osis_commentary_introduction.py",
         "scripts/repair_commentary_osis_milestones.py",
         ".github/workflows/commentary-mhc-technical-rebuild.yml",
         "tests/test_clean_source_osis.py"
@@ -4751,6 +4752,40 @@
       "static_references": [
         ".github/workflows/commentary-mhc-technical-rebuild.yml",
         "tests/test_rebuild_osis_commentary.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [
+        "OSIS"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/reclassify_osis_commentary_introduction.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Private, byte-local OSIS repair for a source-authored chapter introduction.",
+      "python_imports": [
+        "__future__",
+        "clean_source_osis",
+        "hashlib",
+        "itertools",
+        "json",
+        "pathlib",
+        "re",
+        "xml"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "afe655097696379518ca84a456af5f4086c094c6da8146eb4469d358e671d42f",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 2,
+      "static_references": [
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
+        "tests/test_reclassify_osis_commentary_introduction.py"
       ]
     },
     {
