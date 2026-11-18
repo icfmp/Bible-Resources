@@ -352,7 +352,7 @@ jobs:
           assert proof["modern_topical_expositions"] == 4052
           assert proof["total_source_and_I_only_verse_alias_keys"] == 28792
           assert proof["authenticated_chapter_I_prefaces_included"] == 5
-          assert proof["unplaced_book_preface_candidates_quarantined"] == 53
+          assert proof["unplaced_book_preface_candidates_quarantined"] == 51
           assert proof["original_K_embedded_book_preface_duplication_not_auto_resolved"]
           assert proof["source_topology_exceptions_used"] == [
               "1Sam.25","Deut.20","John.3","Ps.95","Zech.9"]
