@@ -176,6 +176,18 @@ def build_word_links(index, english, macula):
             match = STRONG.fullmatch(str(raw))
             if match:
                 numeric_family[f"{match.group(1)}{int(match.group(2))}"].add(mid)
+    # Alternative entry-only evidence when cross-edition Strong numbers differ:
+    # identical original fully pointed lemma + exact original 15-digit SDBH
+    # identifier owned by a unique UBS entry, corroborated by H/A language.
+    # The ID is never promoted to a contextual sense.
+    by_exact_lemma_language = defaultdict(set)
+    for mid, entry in by_entry.items():
+        for raw in entry.get("StrongCodes") or []:
+            m = STRONG.fullmatch(str(raw))
+            if m:
+                by_exact_lemma_language[
+                    (m.group(1), unicodedata.normalize("NFC", entry["Lemma"]))
+                ].add(mid)
     word_links = {}
     seen = set()
     with macula.open(encoding="utf-8-sig", newline="") as stream:
@@ -220,8 +232,22 @@ def build_word_links(index, english, macula):
                 match_type = ("verb_consonants_same_strong_family" if row["class"] == "verb"
                               else "nonverb_consonants_same_strong_family")
             if len(matching) != 1:
-                continue
-            mid = matching[0]
+                # Do not equate the original SDBH source ID with a UBS
+                # contextual sense. However, when an *exact* original SDBH
+                # identifier and the independently identical source lemma
+                # both identify one language-correct UBS headword, allow
+                # an entry-only link. A different Strong number is permitted
+                # only by this stricter path, never by spelling alone.
+                sid = row["sdbh"].strip()
+                lemma_owners = by_exact_lemma_language.get((row["lang"], normalized), set())
+                sid_owners = set(index["by_sdbh"].get(sid, [])) if LEX_ID.fullmatch(sid) else set()
+                corroborated = lemma_owners & sid_owners
+                if len(corroborated) != 1 or len(lemma_owners) != 1 or len(sid_owners) != 1:
+                    continue
+                mid = next(iter(corroborated))
+                match_type = "exact_lemma_and_original_sdbh_owning_ubs_entry"
+            else:
+                mid = matching[0]
             word_links[wid] = {
                 "entry_id": mid,
                 "match_type": match_type,
@@ -256,6 +282,8 @@ def lookup_word(index, word_id, sdbh, strongnumberx, lang, lemma):
             if record.get("match_type") == "verb_consonants_same_strong_family"
             else "macula_word_nonverb_consonants_unique_entry_same_strong_family"
             if record.get("match_type") == "nonverb_consonants_same_strong_family"
+            else "macula_word_exact_lemma_and_source_sdbh_ubs_owner_entry_only"
+            if record.get("match_type") == "exact_lemma_and_original_sdbh_owning_ubs_entry"
             else "macula_word_exact_lemma_unique_entry_within_ubs_strong_family"
         ),
     }
@@ -278,6 +306,7 @@ def audit_word_links(index, macula):
                 "macula_word_exact_lemma_unique_entry_within_ubs_strong_family",
                 "macula_word_verb_consonants_unique_entry_same_strong_family",
                 "macula_word_nonverb_consonants_unique_entry_same_strong_family",
+                "macula_word_exact_lemma_and_source_sdbh_ubs_owner_entry_only",
             ):
                 results["additional_entry_only_links"] += 1
                 results[new["evidence"]] += 1
