@@ -16,7 +16,8 @@ from commentary_modern_reference_gate import (SourceReferenceGate,
     _original_reference_table_ownership, _original_reference_title_ownership,
     _source_range_section_ownership, _source_first_K_outline_row_evidence,
     _find_exact_modern_original_outline_range_cell,
-    _unique_authentic_original_visible_label)
+    _unique_authentic_original_visible_label,
+    _unplaced_original_link_review_ledger)
 
 
 ORIGINAL=(b'<div><reference osisRef="Bible:1John.5.20">1Jo 5:20</reference>'
@@ -873,6 +874,49 @@ class ExactSingleVerseSourceConcordanceTests(unittest.TestCase):
         self.assertEqual(candidates[0]["source_first_key"],"Gen.2.1")
         self.assertEqual(candidates[0]["original_link_ordinal"],1)
         self.assertEqual(candidates[0]["expected_modern_target"],"Rom.3.23")
+
+
+class WholeOriginalSourceLinkLedgerTests(unittest.TestCase):
+    def test_source_link_occurrences_have_one_exact_review_disposition(self):
+        native={
+            "Gen.1.1":[
+                ("Bible:John.3.16","John 3:16"),
+                ("Bible:Ps.1.1-Ps.1.3","Ps. 1:1-3"),
+                ("Matt.5.2","2"),
+            ]
+        }
+        inserted=[{
+            "original_source_first_key":"Gen.1.1",
+            "original_link_ordinal":1,
+            "placement_action":"AUTO_EXACT_SOURCE_TARGET_AND_UNIQUE_MODERN_VERSE",
+        },{
+            "original_source_first_key":"Gen.1.1",
+            "original_link_ordinal":None,
+            "placement_action":"ADD_AUTHORED_UNLINKED_SOURCE_WITNESS",
+        }]
+        corrections={("Gen.1.1",3):{
+            "disposition":"OMIT_SPURIOUS_ENUMERATOR_LINK"}}
+        ledger=_unplaced_original_link_review_ledger(
+            original=native,insertions=inserted,corrections=corrections)
+        self.assertEqual(ledger["original_native_reference_elements"],3)
+        self.assertEqual(ledger["source_link_occurrences_verified_in_derived_osis"],1)
+        self.assertEqual(ledger["source_spurious_link_occurrences_explicitly_omitted"],1)
+        self.assertEqual(ledger["source_original_links_still_requiring_placement_review"],1)
+        self.assertEqual(ledger["pending"][0]["disposition"],
+                         "UNPLACED_SAME_CHAPTER_VERSE_RANGE")
+        self.assertEqual(ledger["pending"][0]["source_first_key"],"Gen.1.1")
+        self.assertEqual(ledger["pending"][0]["source_reference_ordinal"],2)
+        self.assertNotIn("Bible:Ps.1.1",repr(ledger))
+        self.assertNotIn("John 3:16",repr(ledger))
+        with self.assertRaisesRegex(ValueError,"never applied"):
+            _unplaced_original_link_review_ledger(
+                original=native,insertions=[],corrections={
+                    ("Gen.1.1",1):{"disposition":"RETARGET_VERIFIED_CONTINUATION_REFERENCE"},
+                    ("Gen.1.1",3):{"disposition":"OMIT_SPURIOUS_ENUMERATOR_LINK"}})
+        with self.assertRaisesRegex(ValueError,"placed twice"):
+            _unplaced_original_link_review_ledger(
+                original=native,insertions=[inserted[0],inserted[0]],
+                corrections=corrections)
 
 
 if __name__=="__main__":
