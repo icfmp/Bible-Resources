@@ -15,7 +15,8 @@ from commentary_modern_reference_gate import (SourceReferenceGate,
     _unambiguous_explicit_modern_range, _allowed_source_link_target,
     _original_reference_table_ownership, _original_reference_title_ownership,
     _source_range_section_ownership, _source_first_K_outline_row_evidence,
-    _find_exact_modern_original_outline_range_cell)
+    _find_exact_modern_original_outline_range_cell,
+    _unique_authentic_original_visible_label)
 
 
 ORIGINAL=(b'<div><reference osisRef="Bible:1John.5.20">1Jo 5:20</reference>'
@@ -802,6 +803,60 @@ class ExactSingleVerseSourceConcordanceTests(unittest.TestCase):
             source_chapter="Isa.1",keys=keys,section=other)
         self.assertTrue(mismatch["exact_K_scope"])
         self.assertFalse(mismatch["matching_modern_heading"])
+
+    def test_original_printed_abbreviation_unique_and_source_attested(self):
+        n=self.section("The apostle points us to Rom. 3:23.")
+        match=_unique_authentic_original_visible_label(
+            n,"Bible:Rom.3.23","Rom. 3:23")
+        self.assertEqual(match,"Rom. 3:23")
+        prior="".join(n.itertext())
+        _wrap_exact_authored_modern_text(
+            n,anchor=match,display=match,occurrence="last",
+            target="Bible:Rom.3.23")
+        self.assertEqual("".join(n.itertext()),prior)
+        self.assertEqual(
+            n.find(f".//{{{self.NS}}}reference").get("osisRef"),
+            "Bible:Rom.3.23")
+
+    def test_original_printed_label_fallback_refuses_wrong_target_and_ambiguity(self):
+        cases=(
+            ("We read Rom. 3:23.","Bible:Rom.3.24","Rom. 3:23"),
+            ("We read Mark 3:23.","Bible:Rom.3.23","Mark 3:23"),
+            ("Rom. 3:23 is clear; Rom. 3:23 is repeated.","Rom.3.23","Rom. 3:23"),
+            ("Romans 3:23 is clear.","Rom.3.23","3"),
+            ("The old citation Rom. 3:23-24 is used.","Rom.3.23-Rom.3.24","Rom. 3:23-24"),
+        )
+        for verse,target,source_label in cases:
+            with self.subTest(verse=verse,target=target):
+                self.assertIsNone(_unique_authentic_original_visible_label(
+                    self.section(verse),target,source_label))
+
+    def test_source_label_autolink_requires_explicit_opt_in(self):
+        n=self.section("Paul makes this point in Rom. 3:23.")
+        native={"chapters":{"Gen.2":{"original_units":[{
+            "first_key":"Gen.2.1","keys":["Gen.2.1","Gen.2.2"]}]}}}
+        refs={"Gen.2.1":[("Bible:Rom.3.23","Rom. 3:23")]}
+        modern={"Gen.2":ET.Element(f"{{{self.NS}}}chapter")}
+        modern["Gen.2"].append(n)
+        ordinary,_=_auto_single_verse_placements(
+            private_original=refs,groups={},modern_chapters=modern,
+            native=native,blocked=set(),corrections={})
+        self.assertEqual(ordinary,[])
+        fallback,_=_auto_single_verse_placements(
+            private_original=refs,groups={},modern_chapters=modern,
+            native=native,blocked=set(),corrections={},
+            include_authentic_labels=True)
+        self.assertEqual(len(fallback),1)
+        self.assertEqual(fallback[0]["action"],
+                         "AUTO_UNIQUE_AUTHENTIC_ORIGINAL_SINGLE_VERSE_LABEL")
+        self.assertEqual(fallback[0]["expected_modern_target"],"Rom.3.23")
+        repeated={"Gen.2.1":[("Bible:Rom.3.23","Rom. 3:23"),
+                             ("Matt.5.3","Rom. 3:23")]}
+        fallback,_=_auto_single_verse_placements(
+            private_original=repeated,groups={},modern_chapters=modern,
+            native=native,blocked=set(),corrections={},
+            include_authentic_labels=True)
+        self.assertEqual(fallback,[])
 
     def test_only_one_exact_original_target_is_proposed(self):
         n=self.section("Paul mentions (Romans 3:23), but there is more.")
