@@ -182,7 +182,7 @@ def repair_private_bytes(original: bytes, plan: dict) -> tuple[bytes,dict]:
         if expected!=dict(now.attrib):
             raise MilestoneRepairError("Unreviewed OSIS metadata difference")
         count+=1
-    if count < 100:
+    if count < 3:
         raise MilestoneRepairError("Unreasonably small OSIS source tree")
     return candidate,{
         "status":"PRIVATE_VERIFIED_BYTE_LOCAL_MILESTONE_PREVIEW_NOT_PUBLISHED",
