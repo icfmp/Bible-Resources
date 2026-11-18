@@ -521,6 +521,7 @@ jobs:
             --source-notes-osis "$RUNNER_TEMP/mhcc-modern-original-crossref-supplement.osis.xml" \
             --context-source-notes-osis "$RUNNER_TEMP/mhcc-modern-contextual-crossref.osis.xml" \
             --visible-source-reference-index-osis "$RUNNER_TEMP/mhcc-modern-visible-original-references.osis.xml" \
+            --ephemeral-editorial-review-json "$RUNNER_TEMP/mhcc-modern-original-inline-review-brief.json" \
             --source-notes-errata-manifest work/mhcc-modern/production/FOUR_NATIVE_LINK_ERRATA_REVIEW_2026-11-18.json \
             --source-errata-proposals-osis "$RUNNER_TEMP/mhcc-modern-proposed-errata-navigation.osis.xml" \
             --linked-osis "$RUNNER_TEMP/mhcc-modern-complete-bounded-linked.osis.xml" \
@@ -849,6 +850,13 @@ jobs:
                 " are source-authenticated modern chapter-I outline links; "
                 "28792 exact original/I-only numbered K keys; NO release")
           PY
+      - name: Upload short-lived source-linked editorial excerpt packet (not part of metadata receipts)
+        uses: actions/upload-artifact@v4
+        with:
+          name: mhcc-modern-ephemeral-original-link-review-excerpts
+          path: ${{ runner.temp }}/mhcc-modern-original-inline-review-brief.json
+          if-no-files-found: error
+          retention-days: 1
       - name: Compile private visible in-commentary source reference index and verify 176 targets
         shell: bash
         run: |
