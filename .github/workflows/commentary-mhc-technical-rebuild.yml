@@ -279,7 +279,7 @@ jobs:
               label="".join(element.itertext()).strip()
               # Citation-only, punctuation+numbers with optional roman numerals.
               if (not 1<=len(label)<=160 or len(label.split())>48
-                      or not re.fullmatch(r"[A-Za-z0-9 .,:;()\\-/–]+",label)):
+                      or not re.fullmatch(r"[-A-Za-z0-9 .,:;()/–]+",label)):
                   raise SystemExit("Unresolved citation label requires private-only inspection")
               still_unresolved.append({
                   "source_line":element.sourceline,
