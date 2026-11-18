@@ -41,15 +41,34 @@ python3 -I entity-index/distribution_profile.py \
   --output entity-index/dist/bsi-v0.1-without-keyterms.json
 ```
 
-The file is a *candidate distribution projection*, **not yet a published release**. A separate minimal-label candidate is produced with:\n\n```bash\npython3 -I entity-index/minimal_labels.py \\\n  --source /path/to/pinned-ACAI \\\n  --index entity-index/dist/bsi-v0.1-without-keyterms.json \\\n  --output entity-index/dist/bsi-v0.1-labels-en.json\n``` Remaining categories still need rights verification, labels and packaging.
+The file is a *candidate distribution projection*, **not yet a published release**. The minimal label file comes from the pinned, SHA-verified English `preferred_label` field only:
+
+```bash
+python3 -I entity-index/minimal_labels.py \
+  --source /path/to/pinned-ACAI \
+  --index entity-index/dist/bsi-v0.1-without-keyterms.json \
+  --output entity-index/dist/bsi-v0.1-labels-en.json
+```
+
+The reproducible candidate ZIP additionally includes the derived index, these labels, the exact source lock, a file-hash manifest and attribution notices:
+
+```bash
+python3 -I entity-index/package_candidate.py \
+  --index entity-index/dist/bsi-v0.1-without-keyterms.json \
+  --labels entity-index/dist/bsi-v0.1-labels-en.json \
+  --lock entity-index/source.lock.json \
+  --output entity-index/dist/BSI-0.1.0-RELEASE-CANDIDATE.zip
+```
+
+A successful artifact upload in CI remains an **internal candidate**, never a GitHub Release. Actual release bytes must be independently verified, attributed and approved for redistribution.
 
 ## Required gates before public release
 
 - [ ] Verify upstream provenance and rights at **field level**, including whether `keyterms` or other categories contain permission-only data. Attach dated evidence.
-- [x] Implement a separate deterministic projection excluding **all keyterms**; CI validation is configured and still needs to pass on the final revision. Recheck rights in remaining categories independently.
-- [x] Implement minimal **source-hash-checked, English-only label extraction** in a separate candidate artifact, with provenance and unreviewed labeling; final CI and any editorial certification remain to be confirmed.
+- [x] Implement a separate deterministic projection excluding **all keyterms**; CI was green on merged PR #345; archive-level validation remains required on the packaging revision. Recheck rights in remaining categories independently.
+- [x] Implement minimal **source-hash-checked, English-only label extraction** in a separate candidate artifact, with provenance and unreviewed labeling; CI was green on merged PR #345; labels remain source-unreviewed, not editorially certified.
 - [ ] Regenerate from pinned sources on final commit; verify index parity, active-token coverage, category readback and resulting content SHA-256; retain permanent build instructions.
-- [ ] Package BSI `v0.1.0` with attribution, license file, excluded-feature disclosure, version/source lock and checksum.
+- [x] Implement a reproducible candidate ZIP generator with attribution, excluded-feature notice, version, source lock and member/archive SHA-256; archive CI must pass before release.
 - [ ] Publish only after the above checks pass. App integration is **not owned by this repository** and is not a condition of releasing a properly scoped standalone BSI dataset.
 
 ## Traceability
