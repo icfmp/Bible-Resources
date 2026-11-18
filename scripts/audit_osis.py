@@ -617,6 +617,145 @@ def compare_all_commentary_source_group_words(
     }
 
 
+def source_commentary_introductions(path: Path) -> dict[str,dict]:
+    """Extract authorial book/chapter pre-verse introductions without editing.
+
+    A book introduction is source text prior to its first chapter opener; a
+    chapter introduction is source text after its chapter opener but before
+    its first verse opener. Content in other/ambiguous scopes is not silently
+    assigned to an introduction. Original prose stays only in private memory.
+    """
+    from lxml import etree
+    raw=require_regular_file(Path(path).absolute(),MAX_SOURCE_BYTES,"SOURCE_UNAVAILABLE")
+    document=parse_xml(Path(path).absolute(),raw,"MALFORMED_XML")
+    result={}
+    for book in document.iter():
+        if not isinstance(book.tag,str) or _tag(book)!="div" or book.get("type")!="book":
+            continue
+        book_ref=book.get("osisID")
+        if not book_ref or book_ref in result:
+            raise ValueError("Missing/duplicate authored commentary book")
+        result[book_ref]={"parts":[],"semantic_nodes":[],"line":book.sourceline}
+        active=[book_ref]
+        chapter=[None]
+        def walk(node):
+            if not isinstance(node.tag,str):
+                return
+            kind=_tag(node)
+            if kind=="chapter" and node.get("osisID"):
+                chap=node.get("osisID")
+                if not chap.startswith(book_ref+".") or chap in result:
+                    raise ValueError("Unparseable or duplicate source chapter intro")
+                result[chap]={"parts":[],"semantic_nodes":[],"line":node.sourceline}
+                active[0]=chap
+                chapter[0]=chap
+            elif kind=="verse" and node.get("osisID"):
+                active[0]=None
+            elif kind=="chapter" and node.get("eID"):
+                if chapter[0]!=node.get("eID"):
+                    raise ValueError("Unpaired source chapter boundary")
+                active[0]=None
+                chapter[0]=None
+            if active[0] is not None:
+                if kind in {"note","reference"}:
+                    result[active[0]]["semantic_nodes"].append({
+                        "tag":kind, "body":"".join(node.itertext()),
+                        "attributes":dict(node.attrib),
+                    })
+                if node.text:
+                    result[active[0]]["parts"].append(node.text)
+            for child in node:
+                walk(child)
+                if active[0] is not None and child.tail:
+                    result[active[0]]["parts"].append(child.tail)
+        walk(book)
+    if not result:
+        raise ValueError("No authored source introductions")
+    for record in result.values():
+        record["text"]="".join(record.pop("parts"))
+    return result
+
+
+def compare_commentary_source_native_introductions(
+        source: dict[str,dict], native_intro: dict[str,bytes],
+        *, max_cases: int = 40) -> dict:
+    """Research-only book/chapter source→SWORD introduction parity screen."""
+    from lxml import etree
+    import unicodedata
+    if (not isinstance(source,dict) or not source or
+            not isinstance(native_intro,dict) or set(source)!=set(native_intro)
+            or not 0<=max_cases<=100):
+        raise ValueError("Source/native introduction key coverage mismatch")
+    def fold(t):
+        return " ".join(unicodedata.normalize("NFC",t).split())
+    count=Counter()
+    issues=[]
+    for ref,original in source.items():
+        raw=native_intro[ref]
+        if not isinstance(raw,bytes) or len(raw)>2*1024*1024:
+            raise ValueError("Unsafe native introduction payload")
+        parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
+                               no_network=True,recover=False,huge_tree=False)
+        try:
+            doc=etree.fromstring(b"<fragment>"+raw+b"</fragment>",parser)
+        except (etree.XMLSyntaxError,ValueError):
+            raise ValueError("Unparseable SWORD book/chapter introduction") from None
+        native_text="".join(doc.itertext())
+        text=original["text"]
+        count["source_intro_records"]+=1
+        count["authored_intro_word_tokens"]+=len(re.findall(r"\w+",text))
+        if not text.strip():
+            count["source_intro_no_visible_text"]+=1
+        elif text in native_text:
+            count["source_intro_exact_unicode_text_in_native"]+=1
+        elif fold(text) in fold(native_text):
+            count["source_intro_text_equal_after_nfc_whitespace_folding"]+=1
+        elif (" ".join(re.findall(r"\w+",text.casefold())) in
+              " ".join(re.findall(r"\w+",native_text.casefold()))):
+            count["source_intro_words_present_but_punctuation_differs"]+=1
+            if len(issues)<max_cases:
+                issues.append({"intro_key":ref,"line":original["line"],
+                               "category":"intro_punctuation_spacing_requires_review"})
+        else:
+            count["source_intro_words_not_contiguously_present"]+=1
+            if len(issues)<max_cases:
+                issues.append({"intro_key":ref,"line":original["line"],
+                               "category":"intro_source_word_stream_not_found"})
+        native_sem=[{
+            "tag":n.tag.rsplit("}",1)[-1],
+            "body":"".join(n.itertext()),
+            "attrs":dict(n.attrib),
+        } for n in doc.iter() if isinstance(n.tag,str)
+          and n.tag.rsplit("}",1)[-1] in {"note","reference"}]
+        for kind in ("note","reference"):
+            src=[n for n in original["semantic_nodes"] if n["tag"]==kind]
+            out=[n for n in native_sem if n["tag"]==kind]
+            count["source_intro_"+kind+"_elements"]+=len(src)
+            from collections import Counter as Bag
+            one=Bag((fold(n["body"]),n["attributes"].get("osisRef"),
+                     n["attributes"].get("type"),n["attributes"].get("n"))
+                    for n in src)
+            two=Bag((fold(n["body"]),n["attrs"].get("osisRef"),
+                     n["attrs"].get("type"),n["attrs"].get("n"))
+                    for n in out)
+            missing=sum((one-two).values())
+            count["source_intro_"+kind+"_body_metadata_missing_from_native"]+=missing
+            if missing and len(issues)<max_cases:
+                issues.append({"intro_key":ref,"line":original["line"],
+                               "category":kind+"_body_metadata_not_identical",
+                               "original_count":len(src),"native_count":len(out),
+                               "missing_original":missing})
+    return {
+        "schema_version":1,
+        "status":"PRIVATE_INTRO_TEXT_NOTE_LINK_AUDIT_NOT_EDITION_PARITY",
+        "counts":dict(sorted(count.items())),
+        "bounded_reference_only_cases":issues,
+        "all_source_and_native_introductions_indexed":True,
+        "original_text_or_notes_exposed":False,
+        "editorial_or_licensing_approved":False,
+    }
+
+
 def _source_native_interword_punctuation_shape(source: str, native: str) -> dict:
     """Compare punctuation-only gaps aligned by the complete source word run.
 
