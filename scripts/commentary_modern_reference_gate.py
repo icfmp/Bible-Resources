@@ -910,6 +910,65 @@ def _source_first_K_outline_row_evidence(*, literal: str, label: str,
     return result
 
 
+
+_AUTHENTIC_SINGLE_VERSE_LABEL = re.compile(
+    r"^((?:[1-4]\s*)?[A-Za-z][A-Za-z. ]{0,27}?)\s+"
+    r"([1-9][0-9]{0,2}):([1-9][0-9]{0,2})\.?$")
+
+
+def _unique_authentic_original_visible_label(
+        section: ET.Element, literal: str, label: str) -> str | None:
+    """Match the *source-owned* printed single-verse citation, unchanged.
+
+    A fallback for abbreviations already authored in both editions; it cannot
+    invent a target, modern wording, link location, a Bible book identity or a
+    range. The exact original osisRef and link-label hashes are authenticated
+    separately by the full original native SWORD reader.
+    """
+    try:
+        book, chapter, verse = canonical_only_for_comparison(literal).rsplit(".", 2)
+    except ValueError:
+        return None
+    name = _ENGLISH_NAME_BY_OSIS.get(book)
+    raw = label.strip()
+    match = _AUTHENTIC_SINGLE_VERSE_LABEL.fullmatch(raw)
+    if not name or match is None or match[2] != chapter or match[3] != verse:
+        return None
+    def norm(value: str) -> str:
+        return re.sub(r"[^a-z0-9]", "", value.casefold())
+    permitted = {norm(book), norm(re.sub(r"^([1-4])([A-Z])", r"\1 \2", book)),
+                 norm(name)}
+    if book=="Ps":
+        permitted.update(("ps", "psalm", "psalms"))
+    if book=="Song":
+        permitted.update(("songofsolomon", "songofsongs"))
+    if norm(match[1]) not in permitted:
+        return None
+    instances=[]
+    from commentary_modern_draft_osis_preview import NS
+    for p in section.iter():
+        if p.tag!=f"{{{NS}}}p":
+            continue
+        for node in p.iter():
+            for field in ("text","tail"):
+                if field=="text" and node.tag==f"{{{NS}}}reference":
+                    continue
+                value=getattr(node,field)
+                if not isinstance(value,str):
+                    continue
+                at=0
+                while True:
+                    i=value.find(raw,at)
+                    if i<0:
+                        break
+                    j=i+len(raw)
+                    if ((i==0 or not value[i-1].isalnum()) and
+                            (j==len(value) or not value[j].isalnum())):
+                        instances.append(raw)
+                    at=i+1
+    return instances[0] if len(instances)==1 else None
+
+
 def _unrecognized_original_ref_class(literal: str) -> str:
     """Only classify syntax in metadata; never emit literal source osisRef."""
     raw = literal[6:] if literal.startswith("Bible:") else literal
@@ -933,7 +992,8 @@ def _auto_single_verse_placements(*, private_original: dict, groups: dict,
                                   modern_chapters: dict, native: dict,
                                   blocked: set, corrections: dict,
                                   include_ranges: bool = False,
-                                  include_outline_links: bool = False):
+                                  include_outline_links: bool = False,
+                                  include_authentic_labels: bool = False):
     """Return conservative placements plus classified counts, no private text."""
     from commentary_modern_draft_osis_preview import NS, _range
     found = []
@@ -949,6 +1009,7 @@ def _auto_single_verse_placements(*, private_original: dict, groups: dict,
                "repeated_original_target": 0, "unverified_or_single_digit_label": 0,
                "no_unique_full_modern_verse_citation": 0,
                "no_unique_full_modern_verse_range_citation":0,
+               "matching_unique_authenticated_original_visible_label":0,
                "source_range_spans_chapters_or_has_unsafe_bounds":0,
                "unmatched_source_range_same_chapter":0,
                "unmatched_source_range_exact_original_K_scope":0,
@@ -1007,6 +1068,22 @@ def _auto_single_verse_placements(*, private_original: dict, groups: dict,
                 display=_unambiguous_explicit_modern_range(section,literal)
             else:
                 display=_unambiguous_explicit_modern_verse(section,literal)
+            if display is None and not is_range and include_authentic_labels:
+                authentic=_unique_authentic_original_visible_label(
+                    section,literal,label)
+                if authentic is not None:
+                    skipped["matching_unique_authenticated_original_visible_label"]+=1
+                    found.append({
+                        "modern_chapter": chapter,
+                        "source_first_key": first,
+                        "original_link_ordinal": pos,
+                        "action": "AUTO_UNIQUE_AUTHENTIC_ORIGINAL_SINGLE_VERSE_LABEL",
+                        "expected_modern_target": canon,
+                        "modern_anchor": authentic,
+                        "linked_display_text": authentic,
+                        "display_occurrence": "last",
+                    })
+                    continue
             if display is None:
                 if is_range:
                     ownership=_source_range_section_ownership(
