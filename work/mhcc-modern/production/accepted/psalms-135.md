@@ -32,7 +32,7 @@ If they fail to thank him for this special favor, they show extraordinary ingrat
 
 The Lord is, and will always be, **the same gracious, faithful God who works wonders** for his church.
 
-And his church, in response, is called to remain **a thankful people who praise him**.
+And his church, in response, will remain **a thankful people who praise him**.
 
 In this way his name endures through every generation.
 
@@ -51,6 +51,8 @@ May we glorify God's name and commend his truth not merely through speech, but a
 ---
 
 ## Editorial review — Psalm 135
+
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Restored Henry's affirmation of the church's continued praise, which the earlier draft reduced to a normative *call* to remain thankful. This preserves the declarative force of the original secondary witness without making any change to released MHCC or its source groups.
 
 **Complete CCEL English witness read:** [CCEL, Psalm 135](https://ccel.org/ccel/henry/mhcc.xx.cxxxv.html). Exact released `MHCC 0.1.1` remains source authority, native-SWORD and independent acceptance pending.
 
