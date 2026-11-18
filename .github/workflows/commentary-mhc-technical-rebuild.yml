@@ -131,6 +131,14 @@ jobs:
           summary=report["summary"]
           print("Private MHC OSIS audit structural finding counts:",summary["finding_counts"])
           print("Private MHC OSIS audit source paragraphs:",summary["paragraphs"])
+          print("Actual source annotated commentary sections:",
+                summary["commentary_annotated_section_count"])
+          print("Full annotation range/section grammar census:",
+                summary["commentary_annotation_scope_shapes"])
+          print("Structural range/order/book diagnostics:",
+                summary["commentary_annotation_structural_counts"])
+          print("Bounded annotated source section cases (no prose):",
+                summary["commentary_nonstandard_scope_examples"][:30])
           # Exact source text, titles, note bodies and references stay private.
           findings=report["findings"]
           print("First structural finding positions (code and XML line only):",
