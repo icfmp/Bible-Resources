@@ -1881,6 +1881,84 @@ jobs:
                 "introductions in real chapter-I keys; 1 existing Genesis " +
                 "not duplicated; 28792 exact keys; NO release")
           PY
+      - name: Prove all 4049 compiled K commentary bodies and embedded Scripture links survive 50 introduced I prefaces unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,os,subprocess,sys
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+          sys.path.insert(0,"scripts")
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          base=Path(os.environ["RUNNER_TEMP"])
+          native=json.loads(
+              (base/"mhcc-modern-whole-canon-native-receipt.json").read_text())
+          ionly=json.loads(Path(
+              "work/mhcc-modern/production/IONLY_CHAPTER_LINK_PREVIEW.json"
+          ).read_text())
+          firsts={unit["first_key"]
+                  for chapter in native["chapters"].values()
+                  for unit in chapter["original_units"]}
+          firsts.update(row["chapter_osis"]+".1" for row in ionly["chapters"])
+          assert len(firsts)==4049
+          def collect(module_id,root_path):
+              seen={}
+              def observe(kind,key,raw):
+                  if kind!="K" or key not in firsts:
+                      return
+                  if key in seen:
+                      raise ValueError("Duplicate canonical first-K after preface overlay")
+                  fragment=ET.fromstring(b"<raw>"+raw+b"</raw>")
+                  body="".join(fragment.itertext())
+                  refs=[(node.get("osisRef"),"".join(node.itertext()))
+                        for node in fragment.iter()
+                        if isinstance(node.tag,str)
+                        and node.tag.rsplit("}",1)[-1]=="reference"]
+                  if not body.strip():
+                      raise ValueError("Original source-owned modern K became empty")
+                  if any(not isinstance(ref,str) or not ref for ref,_ in refs):
+                      raise ValueError("Original commentary K lost a reference destination")
+                  seen[key]=(
+                      hashlib.sha256(body.encode("utf-8")).hexdigest(),
+                      hashlib.sha256(json.dumps(
+                          refs,ensure_ascii=False,separators=(",",":")
+                      ).encode("utf-8")).hexdigest(),
+                      len(refs),
+                  )
+              env=os.environ.copy()
+              env["SWORD_PATH"]=str((base/root_path).resolve())
+              proc=subprocess.Popen([
+                  str((base/"commentary-modern-source-raw").resolve()),module_id],
+                  env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+              try:
+                  _,numbered,_,_=parse_native_raw_corpus(
+                      proc.stdout,on_entry=observe)
+                  proc.stdout.close()
+                  if proc.wait(timeout=120)!=0:
+                      raise ValueError("Private original-first-K SWORD scan failed")
+              finally:
+                  if proc.poll() is None:
+                      proc.kill();proc.wait()
+              if set(seen)!=firsts or len(numbered)!=28792:
+                  raise ValueError("Source-owned K or numbered keys missing")
+              return seen
+          prior=collect("MHCCREPAIR","mhcc-original-errata-root")
+          final=collect("MHCCPREFACES","mhcc-prefaces-root")
+          disagreements=[key for key in firsts if prior[key]!=final[key]]
+          if disagreements:
+              print("PREFACE OVERLAY K PARITY DIAGNOSTIC first="
+                    +json.dumps(sorted(disagreements)[:12])+
+                    " count="+str(len(disagreements)))
+              raise ValueError("Adding book introductions changed prior K"
+                               " commentary prose or exact Scripture links")
+          total=sum(r[2] for r in final.values())
+          print("ALL 4049 ORIGINAL FIRST-K UNITS EXACT SWORD TEXT/LINK PARITY PASS: " +
+                "4049/4049 unmodified visible modern K bodies, " +
+                str(total)+" exact matching K-level reference targets and " +
+                "labels, all 28792 indexed SWORD keys; " +
+                "50 restored chapter-I book intros did not alter K; NO release")
+          PY
       - name: Screen all modern manuscript outline tables for out-of-order source ranges
         shell: bash
         run: |
