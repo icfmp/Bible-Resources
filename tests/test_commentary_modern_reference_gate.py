@@ -1843,11 +1843,36 @@ class OriginalKTargetRangeHeadingLinksTests(unittest.TestCase):
         references=[x for x in fixed.iter() if x.tag==f"{{{NS}}}reference"]
         self.assertEqual(len(references),1)
         self.assertEqual(references[0].get("osisRef"),"Gen.8.7-Gen.8.9")
-        self.assertEqual(references[0].text,"Verses 7–9")
+        self.assertEqual(references[0].text,"7–9")
         self.assertEqual(receipt["source_original_links_restored_to_matching_modern_K_headings"],0)
         self.assertEqual(receipt["source_original_partial_ranges_restored_in_K_exposition"],1)
         self.assertEqual(len(remaining["pending"]),4)
         self.assertEqual("".join(fixed.itertext()),before)
+
+    def test_styled_bold_verse_label_is_preserved_as_a_styled_inline_link(self):
+        from commentary_modern_draft_osis_preview import NS
+        raw,ledger,original,native,errata=self.fixture(
+            range_literal="Gen.8.7-Gen.8.9",printed_label="Gen 8:7-9")
+        doc=ET.fromstring(raw)
+        section=next(x for x in doc.iter()
+                     if x.get("annotateRef")=="Gen.8.4-Gen.8.12")
+        p=section.find(f"./{{{NS}}}p")
+        p.text="These words refer to Verses "
+        emphasis=ET.SubElement(p,f"{{{NS}}}hi")
+        emphasis.text="7–9"
+        emphasis.tail=", which describe the first birds."
+        original_visible="".join(doc.itertext())
+        out,remaining,receipt=build_private_owned_K_heading_range_links(
+            compact_osis=ET.tostring(doc),ledger=ledger,original=original,
+            native=native,errata=errata)
+        root=ET.fromstring(out)
+        refs=[x for x in root.iter() if x.tag==f"{{{NS}}}reference"]
+        self.assertEqual(len(refs),1)
+        self.assertEqual(refs[0].text,"7–9")
+        self.assertEqual(refs[0].get("osisRef"),"Gen.8.7-Gen.8.9")
+        self.assertEqual(refs[0].getparent() if hasattr(refs[0],"getparent") else None,None)
+        self.assertEqual("".join(root.itertext()),original_visible)
+        self.assertEqual(receipt["source_original_partial_ranges_restored_in_K_exposition"],1)
 
     def test_original_single_first_verse_K_preserves_authored_later_chapter_range(self):
         from commentary_modern_draft_osis_preview import NS, _range
@@ -1878,7 +1903,7 @@ class OriginalKTargetRangeHeadingLinksTests(unittest.TestCase):
         references=[x for x in fixed.iter() if x.tag==f"{{{NS}}}reference"]
         self.assertEqual(len(references),1)
         self.assertEqual(references[0].get("osisRef"),"Isa.12.4-Isa.12.6")
-        self.assertEqual(references[0].text,"verses 4–6")
+        self.assertEqual(references[0].text,"4–6")
         self.assertEqual(receipt["source_original_partial_ranges_restored_in_K_exposition"],1)
         self.assertEqual("".join(fixed.itertext()),before)
 
