@@ -1677,5 +1677,50 @@ class PrivateCompactOriginalCrossReferenceTests(unittest.TestCase):
                 linked_osis=root,ledger=ledger,original=old,native=native,
                 errata=errata)
 
+
+    def test_inherited_book_in_parenthetical_citation_crosses_existing_link(self):
+        from commentary_modern_draft_osis_preview import NS
+        raw,ledger,original,native,errata=self.fixture()
+        root=ET.fromstring(raw)
+        p=next(x for x in root.iter() if x.tag==f"{{{NS}}}p")
+        p.text="Jeremiah 32:"
+        present=ET.SubElement(p,f"{{{NS}}}reference",{"osisRef":"Jer.32.5"})
+        present.text="5"
+        present.tail="; 34:3."
+        original["1Cor.13.8"][0]=("Jer.34.3","34:3")
+        target,label=original["1Cor.13.8"][0]
+        ledger["pending"][0]["original_osisRef_sha256"]=hashlib.sha256(target.encode()).hexdigest()
+        ledger["pending"][0]["original_visible_label_sha256"]=hashlib.sha256(label.encode()).hexdigest()
+        output,_,receipt=build_private_compact_original_crossrefs(
+            linked_osis=ET.tostring(root),ledger=ledger,
+            original=original,native=native,errata=errata)
+        new=ET.fromstring(output)
+        links=[x for x in new.iter() if x.tag==f"{{{NS}}}reference"]
+        self.assertEqual([(x.text,x.get("osisRef")) for x in links],
+                         [("5","Jer.32.5"),("3","Jer.34.3")])
+        self.assertEqual("".join(new.itertext()),"Jeremiah 32:5; 34:3.")
+        self.assertEqual(receipt["original_exact_compact_verse_links_restored"],1)
+
+    def test_single_chapter_citation_jude_15_is_unambiguous(self):
+        from commentary_modern_draft_osis_preview import NS
+        raw,ledger,original,native,errata=self.fixture()
+        root=ET.fromstring(raw)
+        p=next(x for x in root.iter() if x.tag==f"{{{NS}}}p")
+        p.text="God will judge every cruel word (Jude 15)."
+        original["1Cor.13.8"][0]=("Jude.1.15","Jude 1:15")
+        target,label=original["1Cor.13.8"][0]
+        ledger["pending"][0]["original_osisRef_sha256"]=hashlib.sha256(target.encode()).hexdigest()
+        ledger["pending"][0]["original_visible_label_sha256"]=hashlib.sha256(label.encode()).hexdigest()
+        output,_,receipt=build_private_compact_original_crossrefs(
+            linked_osis=ET.tostring(root),ledger=ledger,
+            original=original,native=native,errata=errata)
+        new=ET.fromstring(output)
+        links=[x for x in new.iter() if x.tag==f"{{{NS}}}reference"]
+        self.assertEqual([(x.text,x.get("osisRef")) for x in links],
+                         [("15","Jude.1.15")])
+        self.assertEqual("".join(new.itertext()),
+                         "God will judge every cruel word (Jude 15).")
+        self.assertEqual(receipt["original_exact_compact_verse_links_restored"],1)
+
 if __name__=="__main__":
     unittest.main()
