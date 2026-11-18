@@ -257,6 +257,34 @@ jobs:
                 dict(sorted((str(k),v) for k,v in element_shapes.items())))
           print("Actual OSIS source marker samples (machine attributes only):",
                 examples)
+          # Three independently attested source-range endpoint repair candidates.
+          # Show only machine IDs, exact source line and markers; no MHC prose.
+          attention={"Acts.26.33","Isa.7.26","Prov.31.32"}
+          matching=[]
+          close_ids=collections.Counter(
+              n.get("eID") for n in xml.iter()
+              if isinstance(n.tag,str) and n.tag.endswith("}verse") and n.get("eID"))
+          for n in xml.iter():
+              if (not isinstance(n.tag,str)
+                      or not n.tag.endswith("}verse")
+                      or not n.get("osisID")):
+                  continue
+              ids=n.get("osisID").split()
+              if attention.isdisjoint(ids):
+                  continue
+              matching.append({
+                  "line":n.sourceline,
+                  "original_sid":n.get("sID"),
+                  "original_display_n":n.get("n"),
+                  "original_first_osisID":ids[0],
+                  "original_last_osisID":ids[-1],
+                  "original_assigned_osisID_count":len(ids),
+                  "matching_eID_count":close_ids[n.get("sID")],
+              })
+          if len(matching)!=3:
+              raise SystemExit("Pinned OSIS three known out-of-range groups not located")
+          print("Three source range endpoint candidates (machine attributes only):",
+                matching)
           print("No editorial changes or historical text correction performed")
           PY
       - name: Compile fresh private zCom4, then independently read EVERY occupied key
