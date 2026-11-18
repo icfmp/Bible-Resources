@@ -596,6 +596,20 @@ jobs:
                       "UNIQUE_VERBATIM"]
           print("SOURCE UNPLACED REF FOCUS (metadata only): " +
                 json.dumps(focus, sort_keys=True))
+          full_endpoint_reasons=Counter(
+              row["full_range_rejection_reason"] for row in pending
+              if row["original_target_grammar"] == "full_verse_range")
+          assert sum(full_endpoint_reasons.values()) == 3
+          assert "VALID_SAME_CHAPTER_RANGE_UNEXPECTEDLY_UNPLACED" not in (
+              full_endpoint_reasons)
+          assert set(full_endpoint_reasons) <= {
+              "CROSS_BOOK_RANGE", "CROSS_CHAPTER_RANGE",
+              "DEGENERATE_SAME_VERSE_RANGE", "REVERSED_SAME_CHAPTER_RANGE",
+              "ZERO_OR_NONCANONICAL_NUMERIC_SPELLING",
+              "OUTSIDE_BOUNDED_VERSE_RANGE", "UNRECOGNIZED_BOOK_CODE"}
+          print("SOURCE THREE FULL-ENDPOINT REJECTION CLASSES (metadata only): " +
+                json.dumps(dict(sorted(full_endpoint_reasons.items())),
+                           sort_keys=True))
           print("SOURCE FULL 1204-REFERENCE DISPOSITION PASS: " +
                 str(ledger["source_link_occurrences_verified_in_derived_osis"]) +
                 " represented, 9 source markup exclusions, " +
