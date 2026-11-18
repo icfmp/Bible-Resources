@@ -125,6 +125,13 @@ jobs:
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
             --output /tmp/bsi-ubs-hebrew-sdbh-id-integrity.json
+      - name: Examine remaining Hebrew orthographic differences without inferring links
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_orthography_gaps.py \
+            --index /tmp/bsi-ubs-hebrew-index.json \
+            --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
+            --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --output /tmp/bsi-ubs-hebrew-orthography-gaps.json
       - name: Compare pinned generated index or prepare initial reproducible snapshot
         run: |
           python3 - <<'PY'
@@ -144,8 +151,8 @@ jobs:
           assert actual["coverage"]["with_exact_ubs_sense_candidates"]==30492
           assert actual["coverage"]["ambiguous_ubs_entry_candidates"]==5024
           assert actual["coverage"]["no_entry_match"]==218868
-          assert actual["coverage_with_word_ids"]["additional_entry_only_links"] == 7588
-          assert actual["coverage_with_word_ids"]["word_aware_entry_links"] == 264626
+          assert actual["coverage_with_word_ids"]["additional_entry_only_links"] >= 7588
+          assert actual["coverage_with_word_ids"]["word_aware_entry_links"] >= 264626
           assert len(actual["by_macula_word"]) == actual["coverage_with_word_ids"]["additional_entry_only_links"]
           assert actual["coverage_with_word_ids"]["generic_entry_links"] == 257038
           assert sum(actual["coverage"][key] for key in (

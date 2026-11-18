@@ -10,6 +10,7 @@ import argparse
 import csv
 import json
 import re
+import unicodedata
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -145,6 +146,19 @@ def lookup(index, sdbh, strongnumberx, lang):
 
 
 
+def normalized_hebrew_consonants(text):
+    """Strip vowel/cantillation marks, preserving shin and sin identity.
+
+    Only suitable together with original language-specific Strong family,
+    original word ID, and unique UBS entry; never a stand-alone match.
+    """
+    decomposed = unicodedata.normalize("NFD", text)
+    return "".join(
+        char for char in decomposed
+        if not unicodedata.combining(char) or char in ("\u05c1", "\u05c2")
+    )
+
+
 def build_word_links(index, english, macula):
     """Resolve WLC words using exact lemma in a Strong family without homonym guessing.
 
@@ -153,8 +167,6 @@ def build_word_links(index, english, macula):
     matching original lemma, language and Strong code are checked at lookup.
     No contextual sense identifier is inferred.
     """
-    import unicodedata
-
     numeric_family = defaultdict(set)
     by_entry = {}
     for entry in english:
@@ -194,11 +206,22 @@ def build_word_links(index, english, macula):
                 mid for mid in numeric_family.get(family, set())
                 if unicodedata.normalize("NFC", by_entry[mid]["Lemma"]) == normalized
             ]
+            match_type = "exact_lemma"
+            if not matching and row["class"] == "verb":
+                # UBS often indexes verbs under an unvocalized root; original
+                # MACULA lemmata are pointed. Preserve shin/sin distinctions.
+                root = normalized_hebrew_consonants(lemma)
+                matching = [
+                    mid for mid in numeric_family.get(family, set())
+                    if normalized_hebrew_consonants(by_entry[mid]["Lemma"]) == root
+                ]
+                match_type = "verb_consonants_same_strong_family"
             if len(matching) != 1:
                 continue
             mid = matching[0]
             word_links[wid] = {
                 "entry_id": mid,
+                "match_type": match_type,
                 "lemma": lemma,
                 "strong": row["strongnumberx"],
                 "lang": row["lang"],
@@ -225,7 +248,9 @@ def lookup_word(index, word_id, sdbh, strongnumberx, lang, lemma):
         "status": "entry_only",
         "entry_ids": [record["entry_id"]],
         "sense_ids": [],
-        "evidence": "macula_word_exact_lemma_unique_entry_within_ubs_strong_family",
+        "evidence": ("macula_word_verb_consonants_unique_entry_same_strong_family"
+                     if record.get("match_type") == "verb_consonants_same_strong_family"
+                     else "macula_word_exact_lemma_unique_entry_within_ubs_strong_family"),
     }
 
 
@@ -242,8 +267,12 @@ def audit_word_links(index, macula):
                 results["generic_entry_links"] += 1
             if new["entry_ids"]:
                 results["word_aware_entry_links"] += 1
-            if new["evidence"] == "macula_word_exact_lemma_unique_entry_within_ubs_strong_family":
+            if new["evidence"] in (
+                "macula_word_exact_lemma_unique_entry_within_ubs_strong_family",
+                "macula_word_verb_consonants_unique_entry_same_strong_family",
+            ):
                 results["additional_entry_only_links"] += 1
+                results[new["evidence"]] += 1
             if new["sense_ids"]:
                 results["sense_links"] += 1
             if old["entry_ids"] and old["entry_ids"] != new["entry_ids"]:
