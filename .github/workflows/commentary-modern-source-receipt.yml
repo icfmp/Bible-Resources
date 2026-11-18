@@ -904,6 +904,127 @@ jobs:
                 "references in visibly marked separate notes, 28792 indexed " +
                 "keys; existing 1016 inline links left unchanged; NO release")
           PY
+      - name: Compile and independently read back all four unapproved repaired original-link proposals
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/mhcc-original-errata-root/mods.d"
+          mkdir -p "$RUNNER_TEMP/mhcc-original-errata-root/modules/comments/zcom/mhccrepair"
+          timeout 240s osis2mod \
+            "$RUNNER_TEMP/mhcc-original-errata-root/modules/comments/zcom/mhccrepair" \
+            "$RUNNER_TEMP/mhcc-modern-proposed-errata-navigation.osis.xml" \
+            -z z -b 3 \
+            > "$RUNNER_TEMP/mhcc-original-errata-osis2mod.log" 2>&1
+          cat > "$RUNNER_TEMP/mhcc-original-errata-root/mods.d/mhccrepair.conf" <<'EOF'
+          [MHCCREPAIR]
+          Description=Private unpublished and unapproved proposed original source-link repairs
+          DataPath=./modules/comments/zcom/mhccrepair/
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          Lang=en
+          Versification=KJV
+          SourceType=OSIS
+          DistributionLicense=Private
+          EOF
+          python - <<'PY'
+          import hashlib,json,os,subprocess,sys
+          from collections import defaultdict
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+          sys.path.insert(0,"scripts")
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          base=Path(os.environ["RUNNER_TEMP"])
+          report=json.loads((base/"mhcc-modern-complete-bounded-linked-osis-structure.json").read_text())
+          proposal=report["private_unapproved_errata_navigation_preview"]
+          expected=defaultdict(list)
+          for item in proposal["original_source_K_ordinal_proposed_navigation_hashes"]:
+              expected[item["source_first_key"]].append(item["candidate_references"])
+          assert len(expected)==3
+          assert sum(map(len,expected.values()))==4
+          expected_note={
+              item["source_first_key"]:item["original_source_reference_hashes"]
+              for item in report["private_source_note_alternative"][
+                  "note_source_K_reference_hashes_for_private_native_readback"]
+          }
+          assert sum(map(len,expected_note.values()))==176
+          seen={}
+          note_seen={}
+          def observe(kind,key,raw):
+              if kind!="K" or (key not in expected and key not in expected_note):
+                  return
+              node=ET.fromstring(b"<derived>"+raw+b"</derived>")
+              if key in expected:
+                  if key in seen:
+                      raise ValueError("Duplicate private proposed-errata K")
+                  notes=[x for x in node.iter() if isinstance(x.tag,str)
+                         and x.tag.rsplit("}",1)[-1]=="note"
+                         and x.get("resp")=="BibleResourcesPrivateUnapprovedOriginalErrataPreview"]
+                  if len(notes)!=len(expected[key]):
+                      raise ValueError("Proposed native-source error notes lost")
+                  count=0
+                  for note,proposals in zip(notes,expected[key]):
+                      refs=[r for r in note.iter() if isinstance(r.tag,str)
+                            and r.tag.rsplit("}",1)[-1]=="reference"]
+                      if len(refs)!=len(proposals):
+                          raise ValueError("One-to-many editorial repair changed")
+                      for ref,item in zip(refs,proposals):
+                          target=ref.get("osisRef")
+                          display="".join(ref.itertext())
+                          if (not target or
+                                  hashlib.sha256(target.encode()).hexdigest()!=
+                                      item["candidate_target_sha256"]
+                                  or hashlib.sha256(display.encode()).hexdigest()!=
+                                      item["candidate_derived_display_sha256"]):
+                              raise ValueError("Source error preview changed proposed destination")
+                          count+=1
+                  seen[key]=count
+              if key in expected_note:
+                  if key in note_seen:
+                      raise ValueError("Duplicate source-only note K in repair preview")
+                  notes=[x for x in node.iter() if isinstance(x.tag,str)
+                         and x.tag.rsplit("}",1)[-1]=="note"
+                         and x.get("resp")=="BibleResourcesPrivateSourceOnlyLinkSupplement"]
+                  if len(notes)!=1:
+                      raise ValueError("Proposed repair erased prior source-only notes")
+                  refs=[r for r in notes[0].iter() if isinstance(r.tag,str)
+                        and r.tag.rsplit("}",1)[-1]=="reference"]
+                  if len(refs)!=len(expected_note[key]):
+                      raise ValueError("Proposed repair altered 176 existing source notes")
+                  for r,item in zip(refs,expected_note[key]):
+                      literal=r.get("osisRef")
+                      display="".join(r.itertext())
+                      if (not literal or
+                              hashlib.sha256(literal.encode()).hexdigest()!=
+                                  item["source_original_literal_target_sha256"]
+                              or hashlib.sha256(display.encode()).hexdigest()!=
+                                  item["supplement_display_sha256"]):
+                          raise ValueError("Source-only note lost its exact original target")
+                  note_seen[key]=len(refs)
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str((base/"mhcc-original-errata-root").resolve())
+          proc=subprocess.Popen([
+              str((base/"commentary-modern-source-raw").resolve()),
+              "MHCCREPAIR"],env=env,stdout=subprocess.PIPE,
+              stderr=subprocess.DEVNULL)
+          try:
+              _,numbered,_,_=parse_native_raw_corpus(proc.stdout,on_entry=observe)
+              proc.stdout.close()
+              if proc.wait(timeout=120)!=0:
+                  raise ValueError("Unapproved source repair SWORD raw stream incomplete")
+          finally:
+              if proc.poll() is None:
+                  proc.kill();proc.wait()
+          assert set(seen)==set(expected)
+          assert set(note_seen)==set(expected_note)
+          assert sum(seen.values())==13
+          assert sum(note_seen.values())==176
+          assert len(numbered)==28792
+          print("PRIVATE FOUR SOURCE-ERRATA REPAIR CANDIDATES SWORD PASS: " +
+                "4 hash-bound original links, 13 separate witness-corroborated " +
+                "proposed navigation targets, all 176 original source-only notes " +
+                "still exact, 28792 source addresses; UNAPPROVED and NOT RELEASED")
+          PY
       - name: Diagnose full 4049 authored modern OSIS text bodies through compiled private native SWORD
         shell: bash
         run: |
