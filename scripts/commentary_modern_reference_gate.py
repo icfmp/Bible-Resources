@@ -1069,8 +1069,14 @@ def _auto_single_verse_placements(*, private_original: dict, groups: dict,
             else:
                 display=_unambiguous_explicit_modern_verse(section,literal)
             if display is None and not is_range and include_authentic_labels:
-                authentic=_unique_authentic_original_visible_label(
+                # Distinct source links sharing an identical printed marker
+                # cannot be disambiguated by a unique modern text occurrence.
+                original_label_occurrences=sum(
+                    old_label.strip()==label.strip()
+                    for _,old_label in links)
+                authentic=(_unique_authentic_original_visible_label(
                     section,literal,label)
+                    if original_label_occurrences==1 else None)
                 if authentic is not None:
                     skipped["matching_unique_authenticated_original_visible_label"]+=1
                     found.append({
