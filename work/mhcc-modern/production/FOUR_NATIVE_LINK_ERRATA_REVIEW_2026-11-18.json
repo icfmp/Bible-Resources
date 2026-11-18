@@ -10,7 +10,7 @@
     "jeremiah_50": "https://ccel.org/ccel/henry/mhcc.xxv.l.html",
     "matthew_23": "https://ccel.org/ccel/henry/mhcc.xxxii.xxiii.html"
   },
-  "provenance_note": "Exact literal native osisRef values were reverse-matched against the source-hashed K/ordinal review queue. CCEL text is a secondary editorial witness, not a source rights license or proof of bytewise edition equivalence.",
+  "provenance_note": "Exact literal native osisRef values were reverse-matched against the source-hashed K/ordinal review queue. CCEL text is a secondary editorial witness, not a source rights license or proof of bytewise edition equivalence. The four candidate literal targets were tested against the exact native osisRef SHA-256 hashes, not guessed from the commentary alone.",
   "original_sword_changed": false,
   "modern_prose_changed": false,
   "modern_osis_links_automatically_changed": false,
@@ -19,7 +19,7 @@
   "cases": [
     {
       "source_first_key": "Eccl.10.11",
-      "original_native_unit_sha256": null,
+      "original_native_unit_sha256": "df7c5d1b82b50b7683ebbd918ab73c0a0ec567a56d4b5e65092fc4f2ffbd30d9",
       "original_reference_ordinal": 1,
       "original_target": "Isa.25.8",
       "original_target_sha256": "8c30222385edb1d5e6b2a404e4532f6d1734d65bd6a45625ae9ebbfb02921fef",
