@@ -1189,14 +1189,87 @@ def _original_reference_title_ownership(fragment: ET.Element) -> list[bool]:
 
 
 
+def _original_label_in_modern_k(section: ET.Element, label: str) -> str:
+    """Classify verbatim printed-label presence without exporting source words.
+
+    A non-distinctive one-digit or bare-number label is never treated as
+    evidence of a biblical citation. A unique match is *diagnostic only*:
+    its presence does not establish correct target, scope or link placement.
+    """
+    from commentary_modern_draft_osis_preview import NS
+
+    needle = label.strip()
+    if (len(needle) < 5 or not re.search(r"[A-Za-z]", needle)
+            or not re.search(r"[0-9]", needle)):
+        return "NON_DISTINCTIVE_NOT_SCANNED"
+    count = 0
+    for paragraph in section.iter():
+        if paragraph.tag != f"{{{NS}}}p":
+            continue
+        for node in paragraph.iter():
+            if not isinstance(node.tag, str):
+                continue
+            for field in ("text", "tail"):
+                if (field == "text"
+                        and node.tag == f"{{{NS}}}reference"):
+                    continue
+                fragment = getattr(node, field)
+                if not isinstance(fragment, str):
+                    continue
+                for hit in re.finditer(re.escape(needle), fragment):
+                    start, end = hit.span()
+                    if ((start == 0 or not fragment[start - 1].isalnum())
+                            and (end == len(fragment)
+                                 or not fragment[end].isalnum())):
+                        count += 1
+                        if count > 1:
+                            return "REPEATED_NOT_UNIQUE"
+    return "UNIQUE_VERBATIM" if count == 1 else "ABSENT_VERBATIM"
+
+
 def _unplaced_original_link_review_ledger(*, original: dict, insertions: list,
-                                           corrections: dict) -> dict:
+                                           corrections: dict,
+                                           source_table_ownership: dict | None = None,
+                                           source_title_ownership: dict | None = None,
+                                           modern_chapters: dict | None = None,
+                                           native: dict | None = None) -> dict:
     """Account for every original hyperlink without exporting source text.
 
-    This review queue exposes only exact original K addresses, occurrence
-    ordinals, SHA-256 identity hashes, OSIS-grammar class and disposition.
-    Source-visible labels and original literal OSIS targets are not serialized.
+    The optional authenticated K/ordinal context adds source-ancestry and
+    exact label-correspondence diagnostics. Neither diagnostic grants
+    automatic placement or editorial approval, and no source literal leaves
+    the isolated native-SWORD workflow.
     """
+    context = (source_table_ownership, source_title_ownership,
+               modern_chapters, native)
+    if any(value is not None for value in context) and any(
+            value is None for value in context):
+        raise ValueError("Original link review context must be complete")
+    with_context = all(value is not None for value in context)
+    section_by_first = {}
+    if with_context:
+        from commentary_modern_draft_osis_preview import NS, _range
+        if set(original) != set(source_table_ownership) or set(original) != set(
+                source_title_ownership):
+            raise ValueError("Original source link ancestry K inventory changed")
+        for first, links in original.items():
+            if (len(source_table_ownership[first]) != len(links)
+                    or len(source_title_ownership[first]) != len(links)
+                    or any(type(flag) is not bool for flag in
+                           source_table_ownership[first] + source_title_ownership[first])):
+                raise ValueError("Original source link ordinal ancestry changed")
+            chapter = first.rsplit(".", 1)[0]
+            units = native["chapters"][chapter]["original_units"]
+            index = next((i for i, unit in enumerate(units)
+                          if unit["first_key"] == first), None)
+            if index is None:
+                raise ValueError("Original source section missing for link review")
+            sections = modern_chapters[chapter].findall(
+                f"./{{{NS}}}div[@annotateType='commentary']")
+            if (len(sections) != len(units)
+                    or sections[index].get("annotateRef") != _range(units[index]["keys"])):
+                raise ValueError("Modern section/source-K ownership changed")
+            section_by_first[first] = sections[index]
     placed={}
     for row in insertions:
         ordinal=row.get("original_link_ordinal")
@@ -1240,6 +1313,20 @@ def _unplaced_original_link_review_ledger(*, original: dict, insertions: list,
                     label.encode("utf-8")).hexdigest(),
                 "disposition":status
             }
+            if with_context:
+                in_table = source_table_ownership[first][ordinal - 1]
+                in_title = source_title_ownership[first][ordinal - 1]
+                item["native_markup_location"] = (
+                    "TABLE_AND_TITLE" if in_table and in_title else
+                    "TABLE" if in_table else "TITLE" if in_title else
+                    "EXPOSITION_OR_OTHER")
+                item["original_target_grammar"] = (
+                    "SINGLE_VERSE" if status == "UNPLACED_SINGLE_VERSE_REFERENCE"
+                    else "SAME_CHAPTER_FULL_RANGE"
+                    if status == "UNPLACED_SAME_CHAPTER_VERSE_RANGE"
+                    else _unrecognized_original_ref_class(target))
+                item["verbatim_original_label_in_modern_K"] = (
+                    _original_label_in_modern_k(section_by_first[first], label))
             (omitted if correction is not None else pending).append(item)
     if set(placed)-seen:
         raise ValueError("Linked source occurrence is not in original pinned SWORD")
@@ -1659,7 +1746,11 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         _unplaced_original_link_review_ledger(
             original=private_original,
             insertions=inserted,
-            corrections=correction_by_key)
+            corrections=correction_by_key,
+            source_table_ownership=private_table_ownership,
+            source_title_ownership=private_title_ownership,
+            modern_chapters=modern_chapters,
+            native=native)
         if auto_single_verse else None)
     output = ET.tostring(doc, encoding="utf-8", xml_declaration=True)
     ET.fromstring(output)
