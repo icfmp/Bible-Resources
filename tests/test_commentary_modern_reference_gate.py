@@ -13,7 +13,8 @@ from commentary_modern_reference_gate import (SourceReferenceGate,
     _unambiguous_explicit_modern_verse, _auto_single_verse_placements,
     _unrecognized_original_ref_class, _source_same_chapter_verse_range,
     _unambiguous_explicit_modern_range, _allowed_source_link_target,
-    _original_reference_table_ownership, _original_reference_title_ownership)
+    _original_reference_table_ownership, _original_reference_title_ownership,
+    _source_range_section_ownership)
 
 
 ORIGINAL=(b'<div><reference osisRef="Bible:1John.5.20">1Jo 5:20</reference>'
@@ -676,6 +677,39 @@ class ExactSingleVerseSourceConcordanceTests(unittest.TestCase):
             native=source,blocked=set(),corrections={},include_ranges=False)
         self.assertEqual(candidates,[])
         self.assertEqual(skipped["unsupported_original_reference_syntax"],1)
+
+    def test_exact_original_authorial_range_and_matching_modern_heading(self):
+        section=ET.Element(f"{{{self.NS}}}div",{
+            "annotateType":"commentary","annotateRef":"Isa.1.1-Isa.1.9"})
+        ET.SubElement(section,f"{{{self.NS}}}title",{"type":"sub"}).text=(
+            "Judah's corruption (verses 1–9)")
+        keys=["Isa.1."+str(v) for v in range(1,10)]
+        exact=_source_range_section_ownership(
+            literal="Bible:Isa.1.1-Isa.1.9",label="1-9",
+            source_chapter="Isa.1",keys=keys,section=section)
+        self.assertEqual(exact,{"same_chapter":True,"exact_K_scope":True,
+                                "matching_modern_heading":True,
+                                "source_label_is_verse_span":True})
+        different=_source_range_section_ownership(
+            literal="Bible:Isa.1.1-Isa.1.9",label="1–9",
+            source_chapter="Jer.1",
+            keys=["Jer.1."+str(v) for v in range(1,10)],section=section)
+        self.assertFalse(different["exact_K_scope"])
+        self.assertFalse(different["matching_modern_heading"])
+        partial=_source_range_section_ownership(
+            literal="Bible:Isa.1.1-Isa.1.9",label="1–9",
+            source_chapter="Isa.1",keys=keys[:-1],section=section)
+        self.assertFalse(partial["exact_K_scope"])
+        self.assertFalse(partial["matching_modern_heading"])
+        self.assertTrue(partial["same_chapter"])
+        other=ET.Element(f"{{{self.NS}}}div")
+        ET.SubElement(other,f"{{{self.NS}}}title",{"type":"sub"}).text=(
+            "A different topic (verses 4–12)")
+        mismatch=_source_range_section_ownership(
+            literal="Isa.1.1-Isa.1.9",label="1–9",
+            source_chapter="Isa.1",keys=keys,section=other)
+        self.assertTrue(mismatch["exact_K_scope"])
+        self.assertFalse(mismatch["matching_modern_heading"])
 
     def test_only_one_exact_original_target_is_proposed(self):
         n=self.section("Paul mentions (Romans 3:23), but there is more.")
