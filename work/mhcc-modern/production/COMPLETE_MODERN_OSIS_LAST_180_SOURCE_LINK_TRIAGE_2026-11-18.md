@@ -94,3 +94,66 @@ elements including the separately attested originally unlinked citation.
 No original prose, source label or literal original `osisRef` was exported in
 the metadata log or receipt. No extra source link was approved, and
 **no merge, rights clearance or publication** has been authorized.
+
+
+## Major source-reference preservation batch — 2026-11-18
+
+**Verified in one full-canon private build, not merely planned.** After the
+original K/ordinal + literal source target/label SHA receipts had already passed,
+we generated a *second*, unpublished complete OSIS/SWORD candidate. The base
+linked modern commentary is not modified: its **1,016** original-inline-or-witness
+links remain exactly as before. The separate candidate adds plainly marked
+`note type="crossReference"` annotations with
+`resp="BibleResourcesPrivateSourceOnlyLinkSupplement"` inside the corresponding
+source-owned K commentary groups.
+
+| Original native hyperlink disposition in the source-note alternative | Occurrences |
+| --- | ---: |
+| Source-linked references already present in modern inline text / original chapter-outline links | **1,015** |
+| **Previously unplaced original links now separately preserved as source-only notes** | **176** |
+| Original hyperlinks to prose enumerators, independently disproved and excluded | **9** |
+| Original defective/unsafe targets blocked with exact native K/ordinal SHA evidence | **4** |
+| **Original whole-canon SWORD linked elements** | **1,204** |
+
+The separate notes preserve **the original literal `osisRef` unchanged**, not
+a guessed destination. Their **visible note label is a normalized derived
+English reference**, rather than the original source's potentially non-standalone
+label (e.g. bare numeric continuation). The original printed link-label SHA-256
+is still authenticated privately and remains in the source receipt. Each note
+explicitly says that its linked references are *original-edition links not
+placed in modern wording*. This is source provenance attached to the correct
+source-owned K scope, **not a claim that the 176 hyperlinks have been restored
+at their original prose positions or independently deemed semantically
+accurate**. The four [proposed legacy source link errata](FOUR_NATIVE_LINK_ERRATA_REVIEW_2026-11-18.json)
+remain excluded from the notes pending a separately justified correction.
+
+### Real SWORD verification
+
+All three workflows passed for code head `1de2896416906f0c0eede7d41f16b9125cba4ae4`:
+- [Full native source / modern OSIS / private SWORD #44322196017](https://github.com/icfmp/Bible-Resources/actions/runs/44322196017):
+  **102** source-owned K groups containing **176** supplemental original target
+  references; exact source literal target SHA-256 **and** normalized derived
+  visible-label SHA-256 verified after real `osis2mod` plus libSWORD raw readback.
+  All **28,792** expected numbered SWORD addresses intact.
+- [Validate #44322195862](https://github.com/icfmp/Bible-Resources/actions/runs/44322195862):
+  **SUCCESS**, including synthetic fail-closed source-note/errata tests.
+- [Tool registry #44322196089](https://github.com/icfmp/Bible-Resources/actions/runs/44322196089):
+  **SUCCESS**, with exact script SHA-256 inventory.
+
+The **original source and the modern manuscript prose are unchanged**, the base
+1,016 inline links remain unchanged, and the second candidate is disposable CI
+work product only. No source annotation text/labels were uploaded as a public
+CI artifact. The reproducible generic source-note supplement and tests live
+in the existing `scripts/commentary_modern_reference_gate.py`, its tests,
+and `.github/workflows/commentary-modern-source-receipt.yml`.
+
+**Next:** independently review the four demonstrably malformed or mismatched
+original targets, including the two composite Jeremiah 50 verse spans,
+Matthew 23's multipart Pentateuch references, and Ecclesiastes 10's wrong
+Isaiah chapter. Source notes are a transparent preservation fallback; they do
+not replace a safe editorial judgment about each modern inline placement.
+Additionally verify Xiphos/AndBible/Bible reader display, quarantined book
+introductions, and rights before any public derivative. **The baseline
+editorial inline-placement queue is still 180; the number of original hyperlinks
+missing from the *separate source-notes candidate* is now four, not 180.**
+No premature issue close, no PR merge or publication.
