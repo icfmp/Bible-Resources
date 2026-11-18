@@ -1025,6 +1025,45 @@ jobs:
                 "proposed navigation targets, all 176 original source-only notes " +
                 "still exact, 28792 source addresses; UNAPPROVED and NOT RELEASED")
           PY
+      - name: Probe actual diatheke rendering of source-notes and proposed-repair alternatives
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,subprocess,sys
+          from pathlib import Path
+          sys.path.insert(0,"scripts")
+          from commentary_modern_reference_gate import _ENGLISH_NAME_BY_OSIS
+          base=Path(os.environ["RUNNER_TEMP"])
+          report=json.loads((base/"mhcc-modern-complete-bounded-linked-osis-structure.json").read_text())
+          source_first=report["private_source_note_alternative"][
+              "note_source_K_reference_hashes_for_private_native_readback"][0]["source_first_key"]
+          def as_readable_key(key):
+              book,chapter,verse=key.rsplit(".",2)
+              return _ENGLISH_NAME_BY_OSIS[book]+" "+chapter+":"+verse
+          scenarios=[
+              ("source-original-176","MHCCNOTES","mhcc-source-notes-root",
+               source_first,"Unplaced links from original edition"),
+              ("proposed-4-original","MHCCREPAIR","mhcc-original-errata-root",
+               "Jer.50.1","Proposed editorial repair of a faulty original-edition link"),
+          ]
+          results=[]
+          for name,mod,path,key,marker in scenarios:
+              env=os.environ.copy()
+              env["SWORD_PATH"]=str((base/path).resolve())
+              res=subprocess.run([
+                  "diatheke","-b",mod,"-o","fx","-f","OSIS",
+                  "-k",as_readable_key(key)],env=env,text=True,
+                  stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=30)
+              if res.returncode!=0 or len(res.stdout.strip())<50:
+                  raise ValueError("No representative diatheke reader body for "+name)
+              results.append({
+                  "probe":name,"reader_nonempty":True,
+                  "source_note_marker_rendered":marker in res.stdout,
+                  "rendered_characters":len(res.stdout)})
+          print("PRIVATE NOTE RENDERING DIATHEKE DIAGNOSTICS (no source prose): "+
+                json.dumps(results,sort_keys=True))
+          PY
       - name: Diagnose full 4049 authored modern OSIS text bodies through compiled private native SWORD
         shell: bash
         run: |
