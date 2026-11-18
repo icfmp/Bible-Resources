@@ -22,7 +22,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python -m unittest discover -s tests -p 'test_rebuild_osis_commentary.py' -v
+          PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_rebuild_osis_commentary.py' -v
       - name: Install stock libSWORD compiler and native reader headers
         shell: bash
         run: |
