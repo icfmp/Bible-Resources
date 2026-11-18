@@ -50,7 +50,7 @@ The psalmist did not really want to escape the Lord.
 
 He asked where anyone could go to leave God's presence.
 
-Neither the furthest parts of the world nor heaven nor the depths of the grave lie beyond his reach.
+Neither the furthest parts of the world nor heaven nor hell lie beyond his reach.
 
 No veil of darkness hides an action or person from him.
 
@@ -76,7 +76,7 @@ God's plans for his people are too deep for us to search out.
 
 We cannot count his many mercies.
 
-What a help it would be if our first thoughts each morning were of the Lord!
+What a help it would be in keeping us reverent toward the Lord throughout the day if our first thoughts each morning were of him!
 
 And how much more will we praise him when **we awaken in the world of glory**!
 
@@ -107,6 +107,8 @@ All saints want to remain on that path without wandering away or growing weary.
 ---
 
 ## Editorial review — Psalm 139
+
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Restored the source's explicit *hell* in the omnipresence claim (the earlier paraphrase *depths of the grave* introduced a materially different referent) and restored the omitted purpose of early-morning meditation: reverence for God *all day long*. No edits to original biblical text, published original commentary, original native refs, or source verse spans; independent source-native approval remains outstanding.
 
 **Complete secondary original-English witness read:** [CCEL, Psalm 139](https://ccel.org/ccel/henry/mhcc.xx.cxxxix.html). Original `MHCC 0.1.1` native keys, markup and independent editorial approval remain pending.
 
