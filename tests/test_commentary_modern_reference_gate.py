@@ -1266,5 +1266,99 @@ class WholeOriginalSourceLinkLedgerTests(unittest.TestCase):
                 native=native,errata=bad)
 
 
+    def test_four_case_errata_navigation_preview_never_mutates_native_links(self):
+        from copy import deepcopy
+        from commentary_modern_reference_gate import (
+            build_unapproved_source_errata_notes_preview)
+        ns="http://www.bibletechnologies.net/2003/OSIS/namespace"
+        doc=ET.Element(f"{{{ns}}}osis")
+        chapter=ET.SubElement(doc,f"{{{ns}}}chapter",{"osisID":"Jer.50"})
+        section=ET.SubElement(chapter,f"{{{ns}}}div",{
+            "annotateType":"commentary","annotateRef":"Jer.50.1"})
+        ET.SubElement(section,f"{{{ns}}}p").text="Original paragraph modernized."
+        source_note=ET.SubElement(section,f"{{{ns}}}note",{
+            "type":"crossReference",
+            "resp":"BibleResourcesPrivateSourceOnlyLinkSupplement"})
+        source_note.text="Earlier source-only note."
+        base=ET.tostring(doc,encoding="utf-8")
+        literal="Jer.50.1-Jer.3.8"
+        source_digest=hashlib.sha256(literal.encode()).hexdigest()
+        label_digest=hashlib.sha256(b"1-3,8-16").hexdigest()
+        ledger={
+            "status":
+                "SOURCE_NATIVE_WHOLE_CANON_HYPERLINK_DISPOSITION_QUEUE_NOT_FINAL_APPROVAL",
+            "source_reference_labels_or_literal_targets_exported":False,
+            "publication_authorized":False,
+            "pending":[{
+                "source_first_key":"Jer.50.1",
+                "source_reference_ordinal":1,
+                "original_osisRef_sha256":source_digest,
+                "original_visible_label_sha256":label_digest,
+                "full_range_rejection_reason":"CROSS_CHAPTER_RANGE"
+            }],
+        }
+        native={
+            "original_compiled_corpus_sha256":"a"*64,
+            "chapters":{"Jer.50":{"original_units":[{
+                "first_key":"Jer.50.1",
+                "keys":["Jer.50.1"],
+                "source_unit_sha256":"b"*64
+            }]}}
+        }
+        case={
+            "source_first_key":"Jer.50.1",
+            "original_reference_ordinal":1,
+            "original_native_unit_sha256":"b"*64,
+            "original_target":literal,
+            "original_target_sha256":source_digest,
+            "original_visible_label_sha256":label_digest,
+            "finding":"INVALID_CROSS_CHAPTER_NAVIGATION_IN_ORIGINAL_OSISREF",
+            "candidate_fragment":"Jer.50.1-Jer.50.3",
+            "proposed_navigation_targets_for_unpublished_review":[
+                "Jer.50.1-Jer.50.3","Jer.50.8-Jer.50.16"],
+            "proposed_navigation_witness_class":"INDEPENDENT_EXPLICIT_OUTLINE",
+            "approval":False
+        }
+        errata={
+            "status":"PINNED_ORIGINAL_LINK_ERRATA_REVIEW_ONLY_NOT_APPLIED",
+            "original_source":"MHCC 0.1.1 SWORD",
+            "original_native_corpus_sha256":"a"*64,
+            "original_sword_changed":False,
+            "modern_prose_changed":False,
+            "modern_osis_links_automatically_changed":False,
+            "editorial_target_corrections_approved":False,
+            "redistributed":False,
+            "cases":[case],
+            "proposed_navigation_note_status":
+                "UNAPPROVED_SEPARATE_EDITORIAL_REPAIR_PREVIEW_NOT_IN_ORIGINAL_SOURCE",
+            "proposed_navigation_note_publication_authorized":False,
+            "proposed_navigation_source_links_repaired_in_editorial_preview":1,
+            "proposed_navigation_note_count":2
+        }
+        output,receipt=build_unapproved_source_errata_notes_preview(
+            source_note_osis=base,ledger=ledger,native=native,errata=errata)
+        self.assertEqual(receipt["original_source_link_occurrences_provisionally_repaired"],1)
+        self.assertEqual(receipt["derived_navigation_links_from_corroborating_witnesses"],2)
+        self.assertFalse(receipt["editorial_approval"])
+        self.assertNotIn(literal,output.decode())
+        root=ET.fromstring(output)
+        prior=root.find(
+            f".//{{{ns}}}note[@resp='BibleResourcesPrivateSourceOnlyLinkSupplement']")
+        self.assertEqual(prior.text,source_note.text)
+        proposal=root.find(
+            f".//{{{ns}}}note[@resp='BibleResourcesPrivateUnapprovedOriginalErrataPreview']")
+        self.assertEqual(
+            [r.get("osisRef") for r in proposal.findall(f"./{{{ns}}}reference")],
+            ["Jer.50.1-Jer.50.3","Jer.50.8-Jer.50.16"])
+        self.assertEqual(
+            "".join(root.find(f".//{{{ns}}}p").itertext()),
+            "Original paragraph modernized.")
+        failed=deepcopy(errata)
+        failed["cases"][0]["candidate_fragment"]="Jer.51.1-Jer.51.3"
+        with self.assertRaises(ValueError):
+            build_unapproved_source_errata_notes_preview(
+                source_note_osis=base,ledger=ledger,native=native,errata=failed)
+
+
 if __name__=="__main__":
     unittest.main()
