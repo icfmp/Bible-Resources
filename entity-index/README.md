@@ -454,7 +454,7 @@ descriptions without firmer person-role evidence.
 No anonymous person was merged with an explicitly named historical
 person. No other referent groups were removed. Exact pinned original
 source records remain byte-identical, and source edits stay declarative,
-reversible and fully audited. The **2,337 indirect-only overlaps** still
+reversible and fully audited. The **2,333 indirect-only overlaps** still
 require separate source-role and participant semantics review.
 
 ## Indirect person-overlap source-grammar triage — no mass deduplication
@@ -478,10 +478,10 @@ event or whether one anonymous pronoun refers to them.
 
 The original complete pinned morphology audit found **1,289 Greek**
 and **1,096 Hebrew** indirect-only word overlaps. A subsequent
-exact-token contextual correction in the derived index removed forty-eight
-false exact-word person-overlap cases; the remaining **2,337** word overlaps comprise
-**1,281 Greek** and **1,056 Hebrew**. Their source-word grammatical
-counts are **2,087 plural**, **56 singular** and **194 without number**
+exact-token contextual correction in the derived index removed fifty-two
+false exact-word person-overlap cases; the remaining **2,333** word overlaps comprise
+**1,281 Greek** and **1,052 Hebrew**. Their source-word grammatical
+counts are **2,084 plural**, **55 singular** and **194 without number**
 (often infinitives).
 These are categories of the source word, not conclusions about the
 people tagged on it. Several repeated candidate cohorts (e.g. Paul/Silas/Timothy; Aaron/Moses;
@@ -789,6 +789,33 @@ maps automatically to a particular group. Original texts,
 verse numbers, source annotations and all unrelated
 word-identity links stay unchanged; the full original-word
 inventory and source snapshot remain pinned and verified.
+
+## Jeremiah 51:6 — exiles fleeing Babylon are not two patriarchs
+
+The Hebrew imperative “**Flee** from Babylon”,
+the command “**save yourselves**”, the distributive
+“**each person**”, and the further plural warning are
+original source words `o240510060011`,
+`o240510060042`, `o240510060051`, and
+`o240510060081`. These refer to the contemporaneous
+deportees being instructed to flee Babylon. The
+frozen ACAI witness wrongly assigns every one of
+these words to **both** `person:Israel` (Jacob)
+and `person:Judah.4` (Jacob's son), long deceased.
+
+The existing `group:Judah` original-source record
+already contains each of the four exact word IDs.
+The derived index removes only the **eight false
+ancestor-to-word assignments**, preserving the
+four source words, their correct group and every
+other source record. Each original singleton group
+was checked against the frozen input; the underlying
+ACAI JSON is not edited or silently normalized.
+
+This is not a general assertion that every mention of
+“Israel” or “Judah” represents the same group.
+The verified local source context and original
+token grammar govern this specific verse only.
 
 ## Scoped review of all eight remaining explicit-person overlaps
 
