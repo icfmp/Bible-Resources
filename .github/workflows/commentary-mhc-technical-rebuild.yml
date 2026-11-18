@@ -6,6 +6,9 @@ on:
       - "scripts/rebuild_osis_commentary.py"
       - "tests/test_rebuild_osis_commentary.py"
       - "scripts/clean_source_osis.py"
+      - "scripts/repair_commentary_osis_milestones.py"
+      - "tests/test_repair_commentary_osis_milestones.py"
+      - "config/commentary-osis-repair-plans/mhc-endpoints-private-preview.json"
       - "tests/test_clean_source_osis.py"
       - ".github/workflows/commentary-mhc-technical-rebuild.yml"
       - "config/commentary-intake/mhc-crosswire.json"
@@ -27,6 +30,7 @@ jobs:
           python -m pip install -r requirements.txt -q
           PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_rebuild_osis_commentary.py' -v
           PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_clean_source_osis.py' -v
+          PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_repair_commentary_osis_milestones.py' -v
       - name: Install stock libSWORD compiler and native reader headers
         shell: bash
         run: |
@@ -336,49 +340,6 @@ jobs:
             exit 1
           fi
           echo "Private CLI invocation completed"
-      - name: Verify all source verse-group boundaries against real compiled SWORD keys and linked bodies
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          import os,subprocess,sys
-          from hashlib import sha256
-          from pathlib import Path
-          sys.path.insert(0,str(Path.cwd()/"scripts"))
-          from audit_osis import compare_source_milestone_index
-          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
-          root=Path(os.environ["RUNNER_TEMP"])
-          reader=root/"commentary-native-raw"
-          env=dict(os.environ,SWORD_PATH=str(root/"mhc-stage1-private"))
-          process=subprocess.Popen([str(reader),"MHCStage1"],
-                                   env=env,stdout=subprocess.PIPE,
-                                   stderr=subprocess.DEVNULL)
-          body_hash={}
-          def receive(kind,key,raw):
-              if kind=="K":
-                  body_hash[key]=sha256(raw).hexdigest()
-          try:
-              _report,verses,intros,_opaque=parse_native_raw_corpus(
-                  process.stdout,on_entry=receive)
-              if process.wait(timeout=35)!=0:
-                  raise SystemExit("Native corpus reader returned error")
-          finally:
-              if process.stdout:process.stdout.close()
-              if process.poll() is None:process.kill()
-              process.wait()
-          outcome=compare_source_milestone_index(
-              root/"mhc-cleaned.osis.xml",
-              numbered_keys=verses,intro_keys=intros,body_sha_by_verse=body_hash)
-          print("Source/native complete OSIS milestone structural status:",outcome["status"])
-          print("Source-native verse and chapter marker statistics:",outcome["structure_counts"])
-          print("Source/native structural violations by class:",outcome["anomaly_counts"])
-          print("Bounded reference-only source/native structural cases:",
-                outcome["bounded_reference_only_findings"][:30])
-          if outcome["status"]!="SOURCE_NATIVE_INDEX_AND_MILESTONE_GEOMETRY_MATCH":
-              raise SystemExit("MHC source-native verse group geometry NOT APPROVED")
-          print("Verified complete source verse+intro IDs, exact grouped verse"
-                " coverage, paired milestones and native linked commentary bodies")
-          PY
       - name: Compare full clean candidate against pristine independent SWORD rebuild
         shell: bash
         run: |
@@ -588,6 +549,138 @@ jobs:
                 "notes, links and non-hi XML structure; only original empty styling "
                 "and harmless importer-generated spaces differ")
           print("No historical edition collation or public release performed")
+          PY
+      - name: Build private repaired-endpoint preview and independently re-read every key
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          python - <<'PY'
+          import json,os,subprocess,sys
+          from pathlib import Path
+          from hashlib import sha256
+          root=Path(os.environ["RUNNER_TEMP"])
+          plan=Path("config/commentary-osis-repair-plans/mhc-endpoints-private-preview.json")
+          receipt=json.loads((root/"mhc-cleanup-receipt.json").read_text())
+          input_path=root/"mhc-cleaned.osis.xml"
+          output=root/"mhc-repaired-preview.osis.xml"
+          if receipt["cleaned_sha256"]!=json.loads(plan.read_text())["source_sha256"]:
+              raise SystemExit("MHC private repair plan is not pinned to exact cleaned original")
+          command=[sys.executable,"scripts/repair_commentary_osis_milestones.py",
+                   "--source",str(input_path),"--sha256",receipt["cleaned_sha256"],
+                   "--plan",str(plan),"--private-output",str(output)]
+          receipt_path=root/"mhc-range-preview-receipt.json"
+          with receipt_path.open("xb") as out:
+              subprocess.run(command,stdout=out,stderr=subprocess.DEVNULL,
+                             check=True,timeout=120)
+          preview=json.loads(receipt_path.read_text())
+          if (preview["status"]!="PRIVATE_VERIFIED_BYTE_LOCAL_MILESTONE_PREVIEW_NOT_PUBLISHED"
+                  or preview["corrected_source_verse_groups"]!=3
+                  or preview["original_machine_attribute_values_replaced"]!=12
+                  or preview["removed_invalid_verse_assignments"]!=17
+                  or not preview["all_source_text_notes_links_and_other_markup_identical"]):
+              raise SystemExit("Private range repair candidate failed identity proof")
+          print("Private OSIS candidate exact SHA:",preview["candidate_sha256"])
+          print("Machine-only source range patches:",preview["corrected_source_verse_groups"])
+          print("Removed out-of-canon source addresses:",preview["removed_invalid_verse_assignments"])
+          manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
+          cmd=[sys.executable,"scripts/rebuild_osis_commentary.py",
+               "--source",str(output),"--sha256",preview["candidate_sha256"],
+               "--private-work",str(root/"mhc-endpoints-preview-sword"),
+               "--module","MHCEndpointPreview",
+               "--language",manifest["language"],
+               "--versification",manifest["commentary_source"]["observed_compiled_versification"],
+               "--native-reader",str(root/"commentary-native-raw"),
+               "--min-numbered","20000"]
+          with (root/"mhc-endpoints-preview-native.json").open("xb") as out:
+              subprocess.run(cmd,stdout=out,check=True,stderr=subprocess.DEVNULL,timeout=650)
+          native=json.loads((root/"mhc-endpoints-preview-native.json").read_text())
+          print("Preview native numbered keys:",native["native_occupied_numbered_keys"])
+          print("Preview native intro keys:",native["native_occupied_introduction_keys"])
+          print("Preview native opaque top:",native["native_occupied_opaque_top_keys"])
+          if (native["native_occupied_numbered_keys"]!=31098 or
+                  native["native_occupied_introduction_keys"]!=1255 or
+                  native["native_occupied_opaque_top_keys"]!=2):
+              raise SystemExit("Private repaired endpoint preview changed native index coverage")
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from audit_osis import compare_source_milestone_index
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          raw_reader=root/"commentary-native-raw"
+          env=dict(os.environ,SWORD_PATH=str(root/"mhc-endpoints-preview-sword"))
+          process=subprocess.Popen([str(raw_reader),"MHCEndpointPreview"],
+                                   env=env,stdout=subprocess.PIPE,
+                                   stderr=subprocess.DEVNULL)
+          bodies={}
+          def get_body(kind,key,raw):
+              if kind=="K":
+                  bodies[key]=sha256(raw).hexdigest()
+          try:
+              _full,keys,intros,_tops=parse_native_raw_corpus(
+                  process.stdout,on_entry=get_body)
+              if process.wait(timeout=30):
+                  raise SystemExit("Private preview native raw readback failed")
+          finally:
+              if process.stdout:process.stdout.close()
+              if process.poll() is None:process.kill()
+              process.wait()
+          audit=compare_source_milestone_index(
+              output,numbered_keys=keys,intro_keys=intros,
+              body_sha_by_verse=bodies)
+          print("Endpoint-only preview full source-native geometry status:",audit["status"])
+          print("Endpoint-only preview integrity categories:",audit["anomaly_counts"])
+          print("Remaining groups needing separate ownership research:",
+                audit["structure_counts"]["same_verse_assigned_more_than_once"])
+          if audit["structure_counts"]["missing_source_verses_in_native"] or (
+                  not audit["all_source_verse_ids_match_occupied_native_keys"] or
+                  not audit["all_source_book_chapter_ids_match_occupied_native_intros"]):
+              raise SystemExit("Out-of-range source addresses were not corrected in preview")
+          if audit["status"]=="SOURCE_NATIVE_INDEX_AND_MILESTONE_GEOMETRY_MATCH":
+              print("Preview source-native structural integrity complete")
+          else:
+              print("Source/native overlap remains a SEPARATE research-only blocker; NO release")
+          PY
+      - name: Verify all source verse-group boundaries against real compiled SWORD keys and linked bodies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,subprocess,sys
+          from hashlib import sha256
+          from pathlib import Path
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from audit_osis import compare_source_milestone_index
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          root=Path(os.environ["RUNNER_TEMP"])
+          reader=root/"commentary-native-raw"
+          env=dict(os.environ,SWORD_PATH=str(root/"mhc-stage1-private"))
+          process=subprocess.Popen([str(reader),"MHCStage1"],
+                                   env=env,stdout=subprocess.PIPE,
+                                   stderr=subprocess.DEVNULL)
+          body_hash={}
+          def receive(kind,key,raw):
+              if kind=="K":
+                  body_hash[key]=sha256(raw).hexdigest()
+          try:
+              _report,verses,intros,_opaque=parse_native_raw_corpus(
+                  process.stdout,on_entry=receive)
+              if process.wait(timeout=35)!=0:
+                  raise SystemExit("Native corpus reader returned error")
+          finally:
+              if process.stdout:process.stdout.close()
+              if process.poll() is None:process.kill()
+              process.wait()
+          outcome=compare_source_milestone_index(
+              root/"mhc-cleaned.osis.xml",
+              numbered_keys=verses,intro_keys=intros,body_sha_by_verse=body_hash)
+          print("Source/native complete OSIS milestone structural status:",outcome["status"])
+          print("Source-native verse and chapter marker statistics:",outcome["structure_counts"])
+          print("Source/native structural violations by class:",outcome["anomaly_counts"])
+          print("Bounded reference-only source/native structural cases:",
+                outcome["bounded_reference_only_findings"][:30])
+          if outcome["status"]!="SOURCE_NATIVE_INDEX_AND_MILESTONE_GEOMETRY_MATCH":
+              raise SystemExit("MHC source-native verse group geometry NOT APPROVED")
+          print("Verified complete source verse+intro IDs, exact grouped verse"
+                " coverage, paired milestones and native linked commentary bodies")
           PY
       - name: No distribution or editorial phase in this workflow
         if: always()
