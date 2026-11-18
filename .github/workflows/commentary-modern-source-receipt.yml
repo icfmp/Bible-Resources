@@ -610,6 +610,23 @@ jobs:
           print("SOURCE THREE FULL-ENDPOINT REJECTION CLASSES (metadata only): " +
                 json.dumps(dict(sorted(full_endpoint_reasons.items())),
                            sort_keys=True))
+          import sys
+          sys.path.insert(0, str(Path("scripts").resolve()))
+          from commentary_modern_reference_gate import (
+              validate_pending_source_reference_errata)
+          source_native=json.loads(
+              (base/"mhcc-modern-whole-canon-native-receipt.json").read_text())
+          proposals=json.loads(Path(
+              "work/mhcc-modern/production/FOUR_NATIVE_LINK_ERRATA_REVIEW_2026-11-18.json"
+              ).read_text(encoding="utf-8"))
+          proposed_receipt=validate_pending_source_reference_errata(
+              manifest=proposals, ledger=ledger, native=source_native)
+          assert proposed_receipt["original_link_occurrences_reconciled"] == 4
+          assert proposed_receipt["source_link_edits_applied"] == 0
+          assert not proposed_receipt["original_source_target_or_label_exported"]
+          assert not proposed_receipt["publication_authorized"]
+          print("SOURCE LINK FOUR ORIGINAL K/ORDINAL ERRATA PROPOSALS PASS: " +
+                json.dumps(proposed_receipt, sort_keys=True))
           print("SOURCE FULL 1204-REFERENCE DISPOSITION PASS: " +
                 str(ledger["source_link_occurrences_verified_in_derived_osis"]) +
                 " represented, 9 source markup exclusions, " +
