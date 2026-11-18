@@ -76,6 +76,66 @@ class EditorialPipelineTests(unittest.TestCase):
                           osis_policy=self.policy, commentary_policy=self.commentary_policy,
                           diff_path=diff)
 
+    def test_commentary_structural_range_grammar_and_comma_regression(self):
+        from audit_osis import _commentary_ref_tokens
+        valid = {
+            "Gen.8.5": "single_verse",
+            "Gen.8": "chapter_intro",
+            "Gen": "book_intro",
+            "Gen.8.5-Gen.8.6": "continuous_verse_range",
+            "Gen.8.5 Gen.8.6": "discontinuous_list",
+        }
+        for reference,expected in valid.items():
+            with self.subTest(reference=reference):
+                self.assertEqual(_commentary_ref_tokens(reference)[0], expected)
+        invalid = {
+            "Gen.8.5,6": "comma_verse_list_or_range_requires_review",
+            "Gen.8.5-6": "unqualified_or_other_syntax",
+            "Gen.8.6-Gen.8.5": "reversed_or_zero_length_range",
+            "Gen.8.5-Gen.8.5": "reversed_or_zero_length_range",
+            "Gen.8.5-Exod.8.6": "cross_book_range_requires_order_review",
+            "Bible:Gen.8.5": "work_prefix_or_unreviewed_colon",
+        }
+        for reference,expected in invalid.items():
+            with self.subTest(reference=reference):
+                self.assertEqual(_commentary_ref_tokens(reference)[0], expected)
+
+    def test_commentary_structure_reports_bad_machine_range_without_rewriting(self):
+        self.write('<title>8.5,6</title><p>Exact historical exposition.</p>',
+                   kind="commentary")
+        original=self.source.read_bytes()
+        altered=original.replace(b'annotateRef="Gen.1.1"',
+                                 b'annotateRef="Gen.8.5,6"')
+        self.source.write_bytes(altered)
+        result=audit_osis(self.source,kind="commentary")
+        self.assertEqual(result["summary"]["commentary_annotated_section_count"],1)
+        self.assertEqual(result["summary"]["commentary_annotation_scope_shapes"],
+                         {"comma_verse_list_or_range_requires_review":1})
+        self.assertIn("commentary_comma_range_candidate",
+                      result["summary"]["finding_counts"])
+        self.assertIn("commentary_title_numeric_comma_candidate",
+                      result["summary"]["finding_counts"])
+        self.assertEqual(self.source.read_bytes(),altered)
+        self.assertTrue(result["no_content_changes"])
+
+    def test_commentary_sections_check_scope_order_and_book_membership(self):
+        self.write('<p>A source body.</p>',kind="commentary")
+        original=self.source.read_bytes()
+        additional=(b'<div type="section" annotateType="commentary" '
+                    b'annotateRef="Exod.1.3-Exod.1.4"><p>Other book.</p></div>'
+                    b'<div type="section" annotateType="commentary" '
+                    b'annotateRef="Gen.1.2-Gen.1.4"><p>Range.</p></div>'
+                    b'<div type="section" annotateType="commentary" '
+                    b'annotateRef="Gen.1.1"><p>Duplicate scope.</p></div>')
+        self.source.write_bytes(original.replace(
+            b'</div></osisText>',additional+b'</div></osisText>'))
+        result=audit_osis(self.source,kind="commentary")
+        codes=result["summary"]["finding_counts"]
+        self.assertGreaterEqual(codes.get("commentary_book_scope_mismatch",0),1)
+        self.assertGreaterEqual(codes.get("commentary_out_of_order",0),1)
+        self.assertGreaterEqual(codes.get("duplicate_commentary_reference",0),1)
+        self.assertEqual(result["summary"]["commentary_annotated_section_count"],4)
+
     def test_bible_split_preserves_all_text_verse_ids_and_original(self):
         self.write('<verse osisID="Gen.1.1" sID="v1"/><p>First sentence. Second sentence.</p><verse eID="v1"/>')
         node = self.p()
