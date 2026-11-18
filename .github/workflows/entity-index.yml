@@ -283,7 +283,7 @@ jobs:
           assert len({(x["corpus"],x["word_id"]) for x in reviewed["cases"]})==2385
           output=Path("entity-index/dist/indirect-person-source-forms.json")
           output.write_text(json.dumps(reviewed,ensure_ascii=False,indent=2,
-                                       sort_keys=True)+"\\n",encoding="utf-8")
+                                       sort_keys=True)+"\n",encoding="utf-8")
           print("ENTITY_INDIRECT_SOURCE_FORM_AUDIT",
                 json.dumps(stats,sort_keys=True))
           PY
