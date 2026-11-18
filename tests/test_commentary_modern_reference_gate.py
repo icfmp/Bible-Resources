@@ -18,6 +18,7 @@ from commentary_modern_reference_gate import (SourceReferenceGate,
     _find_exact_modern_original_outline_range_cell,
     _unique_authentic_original_visible_label,
     _unplaced_original_link_review_ledger,
+    build_private_inline_original_reference_index,
     _source_owned_ordered_alignment,
     _original_source_link_contexts, _source_context_unique_paragraph_anchor,
     build_private_contextual_source_note_preview)
@@ -1543,6 +1544,58 @@ class PrivateOriginalContextRelocationTests(unittest.TestCase):
         result=_source_owned_ordered_alignment(raw,section)
         self.assertEqual(result["suggestions"],{})
 
+
+
+    def test_all_176_original_references_visible_without_claiming_inline_words(self):
+        from commentary_modern_draft_osis_preview import NS
+        source,ledger,native,errata,contexts=_private_context_relocation_fixture()
+        target="Bible:John.3.16"
+        hash_target=hashlib.sha256(target.encode()).hexdigest()
+        hash_display=hashlib.sha256(b"John 3:16").hexdigest()
+        receipt={
+            "status":"PRIVATE_NATIVE_SOURCE_NOTE_ALTERNATIVE_NOT_AUTHORED_INLINE_PARITY",
+            "original_link_occurrences_preserved_only_in_separate_source_notes":176,
+            "source_link_supplement_not_authorial_or_inline":True,
+            "published_or_distributed":False,
+            "original_native_corpus_sha256":FULL_HASH,
+            "source_first_K_sections_with_note":1,
+            "note_source_K_reference_hashes_for_private_native_readback":[{
+                "source_first_key":"Gen.1.1",
+                "original_source_reference_hashes":[{
+                    "source_original_literal_target_sha256":hash_target,
+                    "supplement_display_sha256":hash_display,
+                } for _ in range(176)]
+            }]
+        }
+        output,report=build_private_inline_original_reference_index(
+            source_note_osis=source,source_receipt=receipt,native=native)
+        root=ET.fromstring(output)
+        self.assertEqual(report["original_unplaced_valid_references_visible_in_commentary"],176)
+        self.assertEqual(report["original_K_groups_with_reference_index"],1)
+        self.assertFalse(report["precise_original_sentence_locations_proven"])
+        self.assertFalse(report["published_or_distributed"])
+        self.assertEqual(len([x for x in root.iter()
+            if x.tag==f"{{{NS}}}reference"]),176)
+        self.assertEqual(len([x for x in root.iter()
+            if x.tag==f"{{{NS}}}note"]),0)
+        ref_p=[x for x in root.iter() if x.tag==f"{{{NS}}}p" and
+               x.get("resp")=="BibleResourcesOriginalSourceReferenceIndexOnly"]
+        self.assertEqual(len(ref_p),1)
+        self.assertEqual(len(ref_p[0]),176)
+        self.assertIn("exact original sentence locations unverified",ref_p[0].text)
+        self.assertIn("faithful servants", "".join(root.itertext()))
+
+    def test_visible_reference_index_rejects_wrong_source_sha(self):
+        source,ledger,native,errata,contexts=_private_context_relocation_fixture()
+        with self.assertRaisesRegex(ValueError,"Cannot promote unsourced"):
+            build_private_inline_original_reference_index(
+                source_note_osis=source,source_receipt={
+                    "status":"PRIVATE_NATIVE_SOURCE_NOTE_ALTERNATIVE_NOT_AUTHORED_INLINE_PARITY",
+                    "original_link_occurrences_preserved_only_in_separate_source_notes":176,
+                    "source_link_supplement_not_authorial_or_inline":True,
+                    "published_or_distributed":False,
+                    "original_native_corpus_sha256":"0"*64
+                },native=native)
 
 if __name__=="__main__":
     unittest.main()
