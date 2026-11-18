@@ -225,11 +225,15 @@ class EditorialPipelineTests(unittest.TestCase):
         self.assertEqual(
             result["classification_counts"]["full_prose_in_every_original_native_key"],1)
         self.assertEqual(self.source.read_bytes(),original)
+        self.assertEqual(result["classification_counts"]["source_group_shingles_checked"],2)
+        self.assertEqual(result["classification_counts"]["source_group_shingles_found_in_native"],2)
         frames["Gen.1.1"]=b"<p>An unrelated commentary.</p>"
         result=compare_source_overlap_native_bodies(overlap,frames)
         self.assertEqual(
             result["classification_counts"][
                 "full_source_word_sequence_not_found_in_group_native_keys"],1)
+        self.assertEqual(
+            result["classification_counts"]["source_groups_with_zero_native_shingle_evidence"],1)
 
     def test_bible_split_preserves_all_text_verse_ids_and_original(self):
         self.write('<verse osisID="Gen.1.1" sID="v1"/><p>First sentence. Second sentence.</p><verse eID="v1"/>')
