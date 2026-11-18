@@ -39,19 +39,19 @@ The Jewish exiles resolved never to lose that affection.
 
 During suffering, we should recall with godly sorrow the mercies we forfeited and the sins through which they were lost.
 
-Henry's text then contains a sentence apparently missing words concerning **temporal advantages and Christian profession**. This must be collated before any supposed reconstruction is accepted.
-
-The psalm's severe ending is not permission for **private revenge**. On the contrary, Henry says explicitly that vengeance belongs to the Lord.
+Far from taking **private revenge**, we must leave vengeance to the Lord, who has declared that it belongs to him.
 
 People who rejoice in others' suffering, especially the calamities of Jerusalem, will not escape judgment.
 
-When praying for the promised success of God's church, we recognize that its enemies' designs must fail. This is not the same as seeking personal vengeance.
+We cannot pray for the promised success of God's church without looking toward the ruin of her enemies, even if we do not voice a prayer for that ruin.
 
 Above all, remember that our hope of reaching **the heavenly Jerusalem** rests entirely on **God's grace and Christ's finished salvation**.
 
 ---
 
 ## Editorial review — Psalm 137
+
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Removed a modern editorial remark about the broken sentence from Henry's *translated exposition* and kept the source defect here in the editorial record. Restored his direct instruction to leave personal vengeance to the Lord and his strong distinction between foreseeing enemies' ruin and actually praying for it. The exact original secondary sentence is defective and is **not** conjecturally reconstructed: “If temporal advantages ever render a profession, the worst calamity has befallen him.” That unresolved passage has **no approved semantic translation**. Exact 0.1.1 native/print witnesses and independent editorial review are essential before publication.
 
 **Entire secondary English witness directly inspected:** [CCEL, Psalm 137](https://ccel.org/ccel/henry/mhcc.xx.cxxxvii.html). Released source `MHCC 0.1.1` remains authoritative for exact native text, markup and independent acceptance.
 
