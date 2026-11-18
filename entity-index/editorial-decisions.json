@@ -393,6 +393,154 @@
         "https://classic.net.bible.org/verse.php?book=Hos&chapter=13&verse=1",
         "https://tips.translation.bible/story/sil-translators-notes-on-hosea-131/"
       ]
+    },
+    {
+      "source_id": "person:GenericDisciple",
+      "action": "amend_occurrences",
+      "reason": "Luke 9:58, 24:15 and 24:19 explicitly name Jesus at these three exact pinned Greek name tokens; the inherited GenericDisciple's subject/pronominal pointer to those same name tokens incorrectly identifies a different person. Other genuine disciple pointers stay intact.",
+      "evidence": [
+        "Pinned Macula SBLGNT: Luke 9:58 n42009058005; Luke 24:15 n42024015011; Luke 24:19 n42024019011, all exact name instances under person:Jesus.2; frozen GenericDisciple original indirect fields",
+        "https://www.openbible.com/text/luke/9-58.htm",
+        "https://biblehub.com/luke/24-15.htm",
+        "https://biblehub.com/luke/24-19.htm"
+      ],
+      "remove_subject_referents": {
+        "SBLGNT": [
+          [
+            "n42009058005"
+          ],
+          [
+            "n42024015011"
+          ]
+        ]
+      },
+      "remove_pronominal_referents": {
+        "SBLGNT": [
+          [
+            "n42024019011"
+          ]
+        ]
+      }
+    },
+    {
+      "source_id": "person:MotherOfRebekah",
+      "action": "amend_occurrences",
+      "reason": "Genesis 24:58 directly names Rebekah as the woman being called to answer; the Hebrew Rebekah token is not an anonymous indirect word for her mother, who is a separate person in 24:55.",
+      "evidence": [
+        "Pinned WLC Gen 24:58 o010240580022, explicit record person:Rebekah vs frozen MotherOfRebekah subject pointer",
+        "https://www.biblegateway.com/passage/?search=Genesis+24%3A55-58&version=NIV"
+      ],
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o010240580022"
+          ]
+        ]
+      }
+    },
+    {
+      "source_id": "person:WifeOfSamson",
+      "action": "amend_occurrences",
+      "reason": "Judges 14:16 mentions both Samson (explicit personal name) and Samson's wife (the speaking woman). The exact word spelling Samson is not her own subject/identity mention; keep the wife entity's other pointers untouched.",
+      "evidence": [
+        "Pinned WLC Judg 14:16 o070140160031, explicit person:Samson, false indirect WifeOfSamson subject",
+        "https://www.biblegateway.com/verse/en/Judges%2014%3A16"
+      ],
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o070140160031"
+          ]
+        ]
+      }
+    },
+    {
+      "source_id": "person:UncleOfSaul",
+      "action": "amend_occurrences",
+      "reason": "1 Samuel 10:14 explicitly distinguishes Saul, his uncle and his servant. The word naming Saul is not an indirect naming of the uncle who is the speaker.",
+      "evidence": [
+        "Pinned WLC 1 Sam 10:14 o090100140031, explicit person:Saul.2 and unrelated uncle's subject pointer",
+        "https://classic.net.bible.org/passage.php?passage=1Sa+10%3A14-16"
+      ],
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o090100140031"
+          ]
+        ]
+      }
+    },
+    {
+      "source_id": "person:GenericPerson",
+      "action": "amend_occurrences",
+      "reason": "1 Kings 2:29 explicitly names King Solomon (person:Solomon); the generic anonymous person subject does not refer to a different individual on that proper-name word. Do not change other GenericPerson positions.",
+      "evidence": [
+        "Pinned WLC 1 Kings 2:29 o110020290141 under explicit person:Solomon, frozen GenericPerson subject pointer on same word",
+        "https://classic.net.bible.org/verse.php?book=1ki&chapter=2&verse=29"
+      ],
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o110020290141"
+          ]
+        ]
+      }
+    },
+    {
+      "source_id": "person:GenericServant",
+      "action": "amend_occurrences",
+      "reason": "1 Kings 18:42 explicitly names Elijah on this word, while his servant is referred to later in 18:43. Remove only the mistaken singleton indirect pointer; keep the separate 1 Samuel 9:10 multiword servant expression for further segmentation review.",
+      "evidence": [
+        "Pinned WLC 1 Kings 18:42 o110180420052 under explicit person:Elijah and frozen GenericServant singleton subject group",
+        "https://www.biblegateway.com/passage/?search=1+Kings+18%3A42-46&version=NIV"
+      ],
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o110180420052"
+          ]
+        ]
+      }
+    },
+    {
+      "source_id": "person:Messenger",
+      "action": "amend_occurrences",
+      "reason": "2 Kings 10:5 names Jehu as recipient of a message; Jeremiah 11:1 names the prophet as recipient of the LORD's word. Neither proper-name word directly names a separate anonymous messenger. Distinguish the messenger in 2 Kings 10:8 and the actual prophet in Jeremiah.",
+      "evidence": [
+        "Pinned WLC 2 Kings 10:5 o120100050111 under explicit person:Jehu.2, and Jeremiah 11:1 o240110010051 under explicit person:Jeremiah.6; frozen Messenger indirect pointers",
+        "https://classic.net.bible.org/passage.php?mode=text&passage=2ki+10%3A1-8",
+        "https://classic.net.bible.org/verse.php?book=Jer&chapter=11&verse=1"
+      ],
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o120100050111"
+          ],
+          [
+            "o240110010051"
+          ]
+        ]
+      }
+    },
+    {
+      "source_id": "person:GenericMale",
+      "action": "amend_occurrences",
+      "reason": "Daniel 10:7 explicitly distinguishes Daniel from unnamed other men, and Zechariah 1:7 explicitly names the prophet Zechariah. Their proper-name words do not refer to a separate anonymous generic man.",
+      "evidence": [
+        "Pinned WLC Daniel 10:7 o270100070031 under person:Daniel.3; Zechariah 1:7 o380010070171 under person:Zechariah.17; frozen GenericMale source subject pointers",
+        "https://www.biblegateway.com/verse/en/Daniel%2010%3A7",
+        "https://classic.net.bible.org/bible.php/d/b/o/verse.php?book=Zec&chapter=1&verse=7"
+      ],
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o270100070031"
+          ],
+          [
+            "o380010070171"
+          ]
+        ]
+      }
     }
   ]
 }
