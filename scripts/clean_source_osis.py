@@ -112,6 +112,7 @@ def _markup_profile(root):
     emphasis_parent = Counter()
     emphasis_text_size = Counter()
     nbsp_owner = Counter()
+    empty_emphasis_shape = Counter()
     for node in root.iter():
         if not isinstance(node.tag, str):
             continue
@@ -121,6 +122,11 @@ def _markup_profile(root):
             if fragment:
                 nbsp_owner[name] += fragment.count("\u00a0")
         if name == "hi":
+            if not len(node) and not (node.text or ""):
+                if set(node.attrib)=={"type"}:
+                    empty_emphasis_shape["empty_leaf_with_type_only"] += 1
+                else:
+                    empty_emphasis_shape["empty_leaf_has_other_attributes"] += 1
             emphasis[node.get("type") or "(unspecified)"] += 1
             parent = node.getparent()
             emphasis_parent[_local(parent) if parent is not None else "(root)"] += 1
@@ -135,6 +141,7 @@ def _markup_profile(root):
         "hi_emphasis_type_counts": dict(sorted(emphasis.items())),
         "hi_direct_parent_counts": dict(sorted(emphasis_parent.items())),
         "hi_visible_length_band_counts": dict(sorted(emphasis_text_size.items())),
+        "truly_empty_hi_leaf_shape_counts": dict(sorted(empty_emphasis_shape.items())),
         "nonbreaking_spaces_by_xml_owner": dict(sorted(
             (key, value) for key, value in nbsp_owner.items() if value
         )),
