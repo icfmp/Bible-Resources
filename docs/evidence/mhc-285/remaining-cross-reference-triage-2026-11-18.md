@@ -1,4 +1,4 @@
-# MHC — 25 source machine Scripture-link anchors, one title reference outstanding (2026-11-18)
+# MHC — 25 machine Scripture-link corrections: private native PASS, GUI pending (2026-11-18)
 
 **Research inventory, not a corrected edition, module release, or editorial approval.**
 This is the original **complete MHC** authored OSIS, *not MHCC*. The original
@@ -212,3 +212,54 @@ target outstanding; 17 previously native-verified before the new
 range-aware changes. **24/25 is NOT yet a compiled SWORD or GUI acceptance
 claim** until fresh complete native and real-reader checks pass. No rights,
 editorial or release approval is implied.
+
+## Fifth continuation — 25/25 private technical reference previews PASS
+
+The final original OSIS outlier is the **Isaiah 63:1–6** citation at XML
+line **58059**, whose original printed label explicitly names **"Ps. lx.,
+title, 2 Sam. viii. 13, 14"**. Its original machine target was
+`Ps 60.1 2Sa 8.13 14`, which could not convey the printed **Psalm
+superscription** correctly by blindly mapping it to numbered verse 1.
+
+A source-bound, machine-attribute-only **private research** candidate now
+uses `Ps.60 2Sam.8.13 2Sam.8.14`: an OSIS **chapter root** for the Psalm,
+plus the two exact numbered 2 Samuel destinations. This is a navigation
+scope, **not an invented Psalm 60:0, not a rewritten printed label, and not
+proof that a specific reader selects the Psalm superscription**.
+The existing generic patcher was extended to admit `Book.Chapter`
+only when at least one `Book.Chapter.Verse` exists in the **real native
+commentary index**, and its chapter-root and range guards have synthetic
+regression coverage. An initial draft of that extension was rejected by
+both real CI and the synthetic test because of a regex escaping defect:
+[failed first attempt #44302926984](https://github.com/icfmp/Bible-Resources/actions/runs/44302926984).
+The general regex was corrected without weakening its canonical-target or
+source-integrity restrictions.
+
+**The next exact code revision passed all three independent validations:**
+
+- [Full original-source to corrected private SWORD rebuild, complete
+  25/25 native `reference/@osisRef` delta audit — PASS
+  #44303621614](https://github.com/icfmp/Bible-Resources/actions/runs/44303621614).
+  All source-section text, visible citation labels, notes, unrelated markup,
+  chapter/range milestones and all **31,098 numbered K, 1,255 introduction I,
+  2 opaque TOP** native records are preserved; changes are limited to the
+  25 separately evidenced machine targets.
+- [Full repository Validate — PASS
+  #44303621603](https://github.com/icfmp/Bible-Resources/actions/runs/44303621603),
+  including source-byte-preservation, same-chapter range and chapter-root
+  rejection/acceptance tests.
+- [Tool registry consistency — PASS
+  #44303621820](https://github.com/icfmp/Bible-Resources/actions/runs/44303621820).
+
+Verified implementation revision: `3cae3329afa66991fc3f3fc167a8296f62fedfd8`.
+No corrected 48 MB authoring OSIS or compiled commentary payload was committed,
+uploaded, released, merged or published.
+
+**Remaining separate acceptance gates:** actual **Xiphos/AndBible clicked
+hyperlink navigation** (especially whether clicking the printed Psalm 60
+*title* citation reveals its superscription rather than just first verse);
+authentic edition and possible Psalm 7 / Acts 17 source textual differences;
+chapter-section shared-verse presentation; exact editorial annotation
+geometry and independent print collation; and electronic-edition rights /
+owner release approval. This is **25/25 technically sound source machine
+reference mappings**, **not** full authorial/editorial or reader acceptance.
