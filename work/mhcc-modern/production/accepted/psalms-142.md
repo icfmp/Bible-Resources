@@ -30,7 +30,7 @@ When our spirits are overwhelmed and discouraged, when enemies have placed traps
 
 Those who sincerely receive the Lord as their God find him completely sufficient as **their Refuge and their Portion**.
 
-Everything else is an unreliable refuge and an inheritance of little value.
+Everything else is a refuge of lies and an inheritance of no value.
 
 David therefore prayed earnestly.
 
@@ -49,6 +49,8 @@ All genuine believers will finally be delivered from **this evil world, sin and 
 ---
 
 ## Editorial review — Psalm 142
+
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Restored Henry's strong *refuge of lies* image and *portion of no value*, which had been weakened to general unreliability and *little value*. Only the unreleased modern manuscript changed; exact native/independent approval is pending.
 
 **Full CCEL original-English witness inspected:** [CCEL, Psalm 142](https://ccel.org/ccel/henry/mhcc.xx.cxlii.html). The pinned original `MHCC 0.1.1` remains authoritative; original-native SWORD/independent acceptance pending.
 
