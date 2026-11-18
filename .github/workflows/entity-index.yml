@@ -83,7 +83,7 @@ jobs:
           assert stats["source_records"] == 6644, stats
           assert stats["index_entities"] == 6641, stats
           assert stats["quarantined_records"] == 3, stats
-          assert stats["reviewed_entries"] == 33, stats
+          assert stats["reviewed_entries"] == 34, stats
           assert stats["unattested_distinct_source_words"] == 18, stats
           assert stats["indexed_distinct_source_words"] == 134822, stats
           assert len(index["unattested_source_words"]) == 18
@@ -297,6 +297,29 @@ jobs:
               ["o120040010012"])==2
           son=next(x for x in index["entities"] if x["id"]=="person:GenericSon")
           assert "12004001" in son["references"]
+          # Historical patriarchs must not absorb later collective people.
+          named_communities={
+              "o110050050021":"group:Judah",
+              "o110050050032":"group:Israel",
+              "o140230080022":"group:Levi",
+              "o140230080041":"group:Judah",
+              "o160110030081":"group:Judah",
+              "o160110030131":"group:Israel",
+              "o160110030153":"group:Levi",
+          }
+          for word,group in named_communities.items():
+              assert index["by_word"]["wlc:"+word] == [{
+                  "entity_id":group,"link_type":"explicit_instances"}],(word,index["by_word"].get("wlc:"+word))
+          collective_indirect={
+              "o110050050051":("pronominal_referents",{"group:Judah","group:Israel"}),
+              "o140230080102":("subject_referents",{"group:Judah","group:Levi"}),
+              "o140230080111":("pronominal_referents",{"group:Judah","group:Levi"}),
+              "o160110030101":("pronominal_referents",{"group:Israel","group:Levi"}),
+          }
+          for word,(field,groups) in collective_indirect.items():
+              hits=index["by_word"]["wlc:"+word]
+              assert {x["entity_id"] for x in hits}==groups,(word,hits)
+              assert all(x["link_type"]==field for x in hits)
           print("ENTITY_INDEX_QA", json.dumps(stats, sort_keys=True))
           PY
 
@@ -315,7 +338,7 @@ jobs:
           assert stats["distinct_person_original_word_overlap_candidates"] == len(report["findings"])
           assert stats["multiple_explicit_names"] == 8, stats
           assert stats["mixed_name_and_indirect"] == 1, stats
-          assert stats["indirect_only"] == 2365, stats
+          assert stats["indirect_only"] == 2361, stats
           assert sum(stats[x] for x in ("multiple_explicit_names", "mixed_name_and_indirect", "indirect_only")) == len(report["findings"])
           assert all(len(f["canonical_people"]) >= 2 for f in report["findings"])
           assert len(set((f["corpus"], f["word_id"]) for f in report["findings"])) == len(report["findings"])
@@ -340,11 +363,11 @@ jobs:
               "sblgnt":Path("macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv"),
           })
           stats=reviewed["statistics"]
-          assert stats["indirect_only_source_words"]==report["statistics"]["indirect_only"]==2365
-          assert stats["by_corpus"]=={"wlc":1081,"sblgnt":1284},stats
-          assert sum(stats["source_word_number_buckets"].values())==2365
-          assert sum(stats["different_canonical_people_per_word"].values())==2365
-          assert len({(x["corpus"],x["word_id"]) for x in reviewed["cases"]})==2365
+          assert stats["indirect_only_source_words"]==report["statistics"]["indirect_only"]==2361
+          assert stats["by_corpus"]=={"wlc":1077,"sblgnt":1284},stats
+          assert sum(stats["source_word_number_buckets"].values())==2361
+          assert sum(stats["different_canonical_people_per_word"].values())==2361
+          assert len({(x["corpus"],x["word_id"]) for x in reviewed["cases"]})==2361
           output=Path("entity-index/dist/indirect-person-source-forms.json")
           output.write_text(json.dumps(reviewed,ensure_ascii=False,indent=2,
                                        sort_keys=True)+"\n",encoding="utf-8")
