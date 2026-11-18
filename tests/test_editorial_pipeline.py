@@ -235,6 +235,40 @@ class EditorialPipelineTests(unittest.TestCase):
         self.assertEqual(
             result["classification_counts"]["source_groups_with_zero_native_shingle_evidence"],1)
 
+    def test_full_commentary_group_text_is_checked_at_native_first_key(self):
+        from audit_osis import (source_commentary_overlap_witness,
+                                compare_all_commentary_source_group_words)
+        self.write(
+            '<chapter sID="Gen.1" osisID="Gen.1" n="1"/>'
+            '<verse sID="Gen.1.1-2" osisID="Gen.1.1 Gen.1.2" n="1-2"/>'
+            '<p>The first complete commentary paragraph.</p>'
+            '<verse eID="Gen.1.1-2"/>'
+            '<verse sID="Gen.1.3" osisID="Gen.1.3" n="3"/>'
+            '<p>The second full commentary paragraph.</p>'
+            '<verse eID="Gen.1.3"/>'
+            '<chapter eID="Gen.1"/>',kind="commentary")
+        saved=self.source.read_bytes()
+        groups=[]
+        overlapping,needed=source_commentary_overlap_witness(
+            self.source,groups_out=groups)
+        self.assertEqual(len(groups),2)
+        self.assertFalse(overlapping)
+        self.assertFalse(needed)
+        frames={
+            "Gen.1.1":b"<p>The first complete commentary paragraph.</p>",
+            "Gen.1.3":b"<p>The second full commentary paragraph.</p>",
+        }
+        result=compare_all_commentary_source_group_words(groups,frames)
+        self.assertEqual(
+            result["counts"]["groups_with_contiguous_full_source_word_stream"],2)
+        self.assertEqual(result["counts"].get("groups_with_missing_40word_chunks",0),0)
+        frames["Gen.1.3"]=b"<p>Unrelated text that cannot possibly match.</p>"
+        result=compare_all_commentary_source_group_words(groups,frames)
+        self.assertEqual(result["counts"]["groups_with_missing_40word_chunks"],1)
+        self.assertEqual(result["bounded_reference_only_missing_word_cases"][0]["source_section"],
+                         "Gen.1.3")
+        self.assertEqual(saved,self.source.read_bytes())
+
     def test_bible_split_preserves_all_text_verse_ids_and_original(self):
         self.write('<verse osisID="Gen.1.1" sID="v1"/><p>First sentence. Second sentence.</p><verse eID="v1"/>')
         node = self.p()
