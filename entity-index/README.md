@@ -454,7 +454,7 @@ descriptions without firmer person-role evidence.
 No anonymous person was merged with an explicitly named historical
 person. No other referent groups were removed. Exact pinned original
 source records remain byte-identical, and source edits stay declarative,
-reversible and fully audited. The **2,341 indirect-only overlaps** still
+reversible and fully audited. The **2,337 indirect-only overlaps** still
 require separate source-role and participant semantics review.
 
 ## Indirect person-overlap source-grammar triage — no mass deduplication
@@ -478,10 +478,10 @@ event or whether one anonymous pronoun refers to them.
 
 The original complete pinned morphology audit found **1,289 Greek**
 and **1,096 Hebrew** indirect-only word overlaps. A subsequent
-exact-token contextual correction in the derived index removed forty-four
-false exact-word person-overlap cases; the remaining **2,341** word overlaps comprise
-**1,281 Greek** and **1,060 Hebrew**. Their source-word grammatical
-counts are **2,089 plural**, **58 singular** and **194 without number**
+exact-token contextual correction in the derived index removed forty-eight
+false exact-word person-overlap cases; the remaining **2,337** word overlaps comprise
+**1,281 Greek** and **1,056 Hebrew**. Their source-word grammatical
+counts are **2,087 plural**, **56 singular** and **194 without number**
 (often infinitives).
 These are categories of the source word, not conclusions about the
 people tagged on it. Several repeated candidate cohorts (e.g. Paul/Silas/Timothy; Aaron/Moses;
@@ -752,6 +752,43 @@ text, original source groups and their multiplicities,
 exact source-word IDs and versification are preserved.
 The transfer is a reviewed, documented and reversible
 **derived-index edit**, not a source rewrite.
+
+## Living Israel in Moses' address versus the biblical patriarch
+
+The frozen ACAI `person:Israel` record denotes **Jacob himself**.
+The pinned WLC exposes two more source-text contexts where that
+specific person is not the referenced living speaker/participant:
+
+- **Deuteronomy 12:8:** Moses addresses Israel about how “**you**”
+  must worship, how “**we**” are currently acting, and what
+  “**each**” person does. The original-source words
+  `o050120080021` (second-person plural),
+  `o050120080051` (first-person plural) and
+  `o050120080091` (distributive singular) identify Moses
+  together with the **living Israelite community**; Macula's
+  source participant references name the actual audience and
+  Moses. The derived index moves only the three source groups
+  from `person:Israel` to the existing `group:Israel`,
+  preserving both the group and `person:Moses` source words.
+- **Isaiah 53:6:** the confession “**we** all like sheep have
+  wandered; **each** has turned to his own way” is voiced
+  in the prophet's poem. Neither the exact singular
+  distributive word `o230530060041` nor the first-plural
+  `o230530060061` denotes the deceased patriarch Jacob as
+  a present speaker. The two unsupported `person:Israel`
+  pointers are detached in the derived index while the
+  original `person:Isaiah` source claims are preserved
+  **without claiming** that this debated prophetic “we”
+  refers exclusively to one historical ethnic group.
+  No speculative `group:Israel` reference is added to
+  Isaiah 53.
+
+This is a **narrow contextual correction**, not a policy
+that any first-person plural or every Hebrew `אִישׁ`
+maps automatically to a particular group. Original texts,
+verse numbers, source annotations and all unrelated
+word-identity links stay unchanged; the full original-word
+inventory and source snapshot remain pinned and verified.
 
 ## Scoped review of all eight remaining explicit-person overlaps
 
