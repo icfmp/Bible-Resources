@@ -14,6 +14,7 @@ from pathlib import Path
 SENSE = re.compile(r"^[0-9]{15}$")
 NUMERIC = re.compile(r"^[0-9]+$")
 STRONG = re.compile(r"^[HA]0*([0-9]+)$")
+SUFFIX_STRONG = re.compile(r"^([HA])0*([0-9]+)([a-z])$")
 
 
 def analyze(index, dictionary, source):
@@ -24,10 +25,18 @@ def analyze(index, dictionary, source):
             match = STRONG.fullmatch(str(raw))
             if match:
                 entry_strongs[item["MainId"]].add(f"{raw[0]}{int(match.group(1))}")
+    variant_index = defaultdict(set)
+    for item in dictionary:
+        for raw in item.get("StrongCodes") or []:
+            matched = SUFFIX_STRONG.fullmatch(str(raw))
+            if matched:
+                variant_index[f"{matched.group(1)}{int(matched.group(2))}{matched.group(3)}"].add(item["MainId"])
     summary = Counter()
     examples = {}
     sdbh_prefixes = Counter()
     suffixes = Counter()
+    matched_variants = Counter()
+    unmatched_variants = Counter()
     conflicts = Counter()
     statuses = Counter()
     from runpy import run_path
@@ -72,6 +81,14 @@ def analyze(index, dictionary, source):
             summary[category] += 1
             if strong and not NUMERIC.fullmatch(strong):
                 suffixes[strong] += 1
+                match=SUFFIX_STRONG.fullmatch(f"{language}{strong}")
+                if match:
+                    normalized=f"{match.group(1)}{int(match.group(2))}{match.group(3)}"
+                    if normalized in variant_index:
+                        summary["exact_ubs_suffix_strong_match"] += 1
+                        matched_variants[(normalized, tuple(sorted(variant_index[normalized])))] += 1
+                    else:
+                        unmatched_variants[normalized] += 1
             if category not in examples:
                 examples[category] = {
                     "word_id":row["xml:id"],"ref":row["ref"],
@@ -84,6 +101,12 @@ def analyze(index, dictionary, source):
         "examples":examples,
         "top_unresolved_sdbh_entry_prefixes":sdbh_prefixes.most_common(15),
         "top_non_numeric_macula_strongs":suffixes.most_common(15),
+        "distinct_ubs_suffix_strong_codes":len(variant_index),
+        "top_exact_ubs_suffix_matches": [
+            {"strong":code,"entry_ids":list(ids),"rows":count}
+            for (code,ids),count in matched_variants.most_common(20)
+        ],
+        "top_unmatched_suffix_codes":unmatched_variants.most_common(20),
         "top_sdbh_parent_strong_conflicts": [
             {"parent":parent,"strong":strong,"rows":n}
             for (parent,strong),n in conflicts.most_common(15)
@@ -105,6 +128,8 @@ def main():
     a.output.write_text(json.dumps(report,indent=2,ensure_ascii=False,sort_keys=True)+"\n",encoding="utf-8")
     print("UNRESOLVED_REASON_SUMMARY",json.dumps(report["summary"],ensure_ascii=False))
     print("UNRESOLVED_TOP_NON_NUMERIC_STRONG",json.dumps(report["top_non_numeric_macula_strongs"],ensure_ascii=False))
+    print("UNRESOLVED_UBS_EXACT_SUFFIX_MATCHES",json.dumps(report["top_exact_ubs_suffix_matches"],ensure_ascii=False))
+    print("UNRESOLVED_UBS_SUFFIX_CODE_COUNT",report["distinct_ubs_suffix_strong_codes"])
     print("UNRESOLVED_TOP_SDBH_CONFLICTS",json.dumps(report["top_sdbh_parent_strong_conflicts"],ensure_ascii=False))
 
 
