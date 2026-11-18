@@ -136,6 +136,66 @@ class EditorialPipelineTests(unittest.TestCase):
         self.assertGreaterEqual(codes.get("duplicate_commentary_reference",0),1)
         self.assertEqual(result["summary"]["commentary_annotated_section_count"],4)
 
+    def test_real_commentary_milestone_ranges_match_native_index(self):
+        from audit_osis import compare_source_milestone_index
+        self.write(
+            '<verse sID="Gen.1.1-2" osisID="Gen.1.1 Gen.1.2" n="1-2"/>'
+            '<p>Two authentic verses, one shared commentary body.</p>'
+            '<verse eID="Gen.1.1-2"/>',kind="commentary")
+        data=self.source.read_bytes().replace(
+            b'<div type="book" osisID="Gen">',
+            b'<div type="book" osisID="Gen">'
+            b'<chapter sID="Gen.1" osisID="Gen.1" n="1"/>'
+        ).replace(b'</div></osisText>',b'<chapter eID="Gen.1"/></div></osisText>')
+        self.source.write_bytes(data)
+        result=compare_source_milestone_index(
+            self.source,numbered_keys=["Gen.1.1","Gen.1.2"],
+            intro_keys=["Gen","Gen.1"],
+            body_sha_by_verse={"Gen.1.1":"a"*64,"Gen.1.2":"a"*64})
+        self.assertEqual(result["status"],"SOURCE_NATIVE_INDEX_AND_MILESTONE_GEOMETRY_MATCH")
+        self.assertTrue(result["all_source_verse_ids_match_occupied_native_keys"])
+        self.assertTrue(result["all_source_book_chapter_ids_match_occupied_native_intros"])
+        self.assertEqual(result["structure_counts"]["native_linked_groups_checked"],1)
+
+    def test_mhc_regression_comma_in_range_misses_native_verse(self):
+        from audit_osis import compare_source_milestone_index
+        self.write(
+            '<verse sID="Gen.8.5,6" osisID="Gen.8.5 Gen.8.6" n="5,6"/>'
+            '<p>Genuine commentary text.</p>'
+            '<verse eID="Gen.8.5,6"/>',kind="commentary")
+        raw=self.source.read_bytes().replace(
+            b'<div type="book" osisID="Gen">',
+            b'<div type="book" osisID="Gen">'
+            b'<chapter sID="Gen.8" osisID="Gen.8" n="8"/>'
+        ).replace(b'</div></osisText>',b'<chapter eID="Gen.8"/></div></osisText>')
+        self.source.write_bytes(raw)
+        result=compare_source_milestone_index(
+            self.source,numbered_keys=["Gen.8.5"],
+            intro_keys=["Gen","Gen.8"])
+        bad=result["anomaly_counts"]
+        self.assertEqual(result["status"],"SOURCE_NATIVE_STRUCTURE_REQUIRES_REVIEW")
+        self.assertEqual(bad["visible_verse_range_label_needs_harmonization"],1)
+        self.assertEqual(bad["verse_start_label_disagrees_with_osisID_list"],1)
+        self.assertEqual(bad["missing_source_verses_in_native"],1)
+        self.assertEqual(self.source.read_bytes(),raw)
+
+    def test_source_native_linked_groups_must_have_identical_compiled_bodies(self):
+        from audit_osis import compare_source_milestone_index
+        self.write(
+            '<verse sID="Gen.1.1-2" osisID="Gen.1.1 Gen.1.2" n="1-2"/>'
+            '<p>Unchanged.</p><verse eID="Gen.1.1-2"/>',kind="commentary")
+        raw=self.source.read_bytes().replace(
+            b'<div type="book" osisID="Gen">',
+            b'<div type="book" osisID="Gen">'
+            b'<chapter sID="Gen.1" osisID="Gen.1" n="1"/>'
+        ).replace(b'</div></osisText>',b'<chapter eID="Gen.1"/></div></osisText>')
+        self.source.write_bytes(raw)
+        result=compare_source_milestone_index(
+            self.source,numbered_keys=["Gen.1.1","Gen.1.2"],
+            intro_keys=["Gen","Gen.1"],
+            body_sha_by_verse={"Gen.1.1":"a"*64,"Gen.1.2":"b"*64})
+        self.assertEqual(result["anomaly_counts"]["native_group_has_different_entry_bodies"],1)
+
     def test_bible_split_preserves_all_text_verse_ids_and_original(self):
         self.write('<verse osisID="Gen.1.1" sID="v1"/><p>First sentence. Second sentence.</p><verse eID="v1"/>')
         node = self.p()
