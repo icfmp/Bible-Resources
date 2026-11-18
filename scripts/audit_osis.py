@@ -146,6 +146,203 @@ def _verse_key(value: str):
     return match[1], int(match[2]), int(match[3])
 
 
+
+def compare_source_milestone_index(path: Path, *,
+                                   numbered_keys: list[str],
+                                   intro_keys: list[str],
+                                   body_sha_by_verse: dict[str, str] | None = None) -> dict:
+    """Independently compare *every* source OSIS verse/chapter/book assignment
+    to the compiled SWORD's actual occupied keys.
+
+    The OSIS source can be a Bible-structured commentary, with <verse
+    osisID="Gen.1.1 Gen.1.2" sID="Gen.1.1-2" n="1-2"/> and its paired
+    <verse eID="Gen.1.1-2"/>. These IDs are NOT annotateRef sections.
+
+    Report exact/index/label/overlap anomalies only as bounded reference
+    identifiers and counts. Never mutate source or infer omitted verse text.
+    """
+    if (not isinstance(numbered_keys, list) or not numbered_keys
+            or not isinstance(intro_keys, list)
+            or not isinstance(body_sha_by_verse, (dict, type(None)))):
+        raise ValueError("Actual compiled native numbered/introduction keys required")
+    source=Path(path).absolute()
+    raw=require_regular_file(source,MAX_SOURCE_BYTES,"SOURCE_UNAVAILABLE")
+    if re.search(rb"<!DOCTYPE\b",raw,flags=re.IGNORECASE):
+        raise ValueError("Unreviewed source DTD")
+    document=parse_xml(source,raw,"MALFORMED_XML")
+    full_verse=re.compile(r"^([1-4]?[A-Za-z][A-Za-z0-9]*)\.([1-9][0-9]*)\.([1-9][0-9]*)$")
+    full_chapter=re.compile(r"^([1-4]?[A-Za-z][A-Za-z0-9]*)\.([1-9][0-9]*)$")
+    book_id=re.compile(r"^[1-4]?[A-Za-z][A-Za-z0-9]*$")
+    expected_k=set()
+    source_chapters=set()
+    source_books=set()
+    groups=[]
+    counts=Counter()
+    cases=[]
+    seen={}
+    active_chapter=None
+    active_verse=None
+    previous_book=None
+    previous_chapter=None
+
+    def fault(code, node, ref=None):
+        counts[code]+=1
+        if len(cases)<MAX_STRUCTURAL_SAMPLES:
+            cases.append({"code":code, "line":node.sourceline,
+                          "reference":ref[:120] if isinstance(ref,str) else None})
+
+    for el in document.iter():
+        if not isinstance(el.tag,str):
+            continue
+        tag=_tag(el)
+        if tag=="div" and el.get("type")=="book":
+            ref=el.get("osisID")
+            counts["source_book_divisions"]+=1
+            if not ref or not book_id.fullmatch(ref) or ref in source_books:
+                fault("invalid_or_repeated_book_division",el,ref)
+            else:
+                source_books.add(ref)
+                previous_book=ref
+                previous_chapter=None
+        if tag=="chapter":
+            opened=el.get("osisID")
+            closing=el.get("eID")
+            if opened is not None:
+                counts["source_chapter_openers"]+=1
+                if (full_chapter.fullmatch(opened) is None
+                        or opened!=el.get("sID")
+                        or opened in source_chapters
+                        or (previous_book and not opened.startswith(previous_book+"."))):
+                    fault("invalid_or_duplicate_chapter_open",el,opened)
+                else:
+                    source_chapters.add(opened)
+                if active_chapter is not None or active_verse is not None:
+                    fault("overlapping_chapter_or_unclosed_verse",el,opened)
+                active_chapter=opened
+                if full_chapter.fullmatch(opened):
+                    chapnum=int(opened.rsplit(".",1)[-1])
+                    if previous_chapter is not None and chapnum<=previous_chapter:
+                        fault("chapter_number_nonincreasing",el,opened)
+                    previous_chapter=chapnum
+                    if el.get("n") != str(chapnum):
+                        fault("chapter_display_label_disagrees",el,opened)
+            elif closing is not None:
+                counts["source_chapter_closers"]+=1
+                if active_chapter!=closing or active_verse is not None:
+                    fault("unpaired_chapter_end",el,closing)
+                active_chapter=None
+            else:
+                fault("chapter_missing_start_and_end",el)
+        if tag=="verse":
+            opened=el.get("osisID")
+            closing=el.get("eID")
+            if opened is not None:
+                counts["source_verse_group_openers"]+=1
+                if active_verse is not None:
+                    fault("overlapping_or_unclosed_verse",el,opened)
+                active_verse=el.get("sID")
+                tokens=opened.split()
+                parsed=[full_verse.fullmatch(token) for token in tokens]
+                if not tokens or not all(parsed):
+                    fault("unparseable_source_verse_assignment",el,opened)
+                    continue
+                if any(token in seen for token in tokens):
+                    fault("same_verse_assigned_more_than_once",el,opened)
+                for token in tokens:
+                    expected_k.add(token)
+                    seen.setdefault(token,el.sourceline)
+                first,last=tokens[0],tokens[-1]
+                fb,fc,fv=parsed[0].groups()
+                lb,lc,lv=parsed[-1].groups()
+                if active_chapter!=f"{fb}.{fc}" or previous_book != fb:
+                    fault("verse_not_in_its_source_chapter_or_book",el,first)
+                numbers=[int(match.group(3)) for match in parsed]
+                same_chapter=all(match.group(1)==fb and match.group(2)==fc
+                                 for match in parsed)
+                contiguous=same_chapter and numbers==list(range(numbers[0],numbers[0]+len(numbers)))
+                if not contiguous:
+                    fault("noncontiguous_or_crosschapter_verse_group",el,opened)
+                expected_sid=(first if len(tokens)==1
+                              else f"{first}-{lv}" if same_chapter else None)
+                expected_label=(str(fv) if len(tokens)==1
+                                else f"{fv}-{lv}" if same_chapter else None)
+                if expected_sid is None or el.get("sID")!=expected_sid:
+                    fault("verse_start_label_disagrees_with_osisID_list",el,opened)
+                if expected_label is None or el.get("n")!=expected_label:
+                    fault("visible_verse_range_label_needs_harmonization",el,
+                          el.get("n"))
+                groups.append((tokens,el.sourceline))
+            elif closing is not None:
+                counts["source_verse_group_closers"]+=1
+                if not active_verse or closing!=active_verse:
+                    fault("unpaired_or_mismatched_verse_end",el,closing)
+                active_verse=None
+            else:
+                fault("verse_without_machine_marker",el)
+    if active_chapter is not None:
+        counts["unterminated_chapter_at_end_of_source"]+=1
+    if active_verse is not None:
+        counts["unterminated_verse_at_end_of_source"]+=1
+
+    native_k=set(numbered_keys)
+    native_i=set(intro_keys)
+    expected_i=source_books | source_chapters
+    missing_k=expected_k-native_k
+    extra_k=native_k-expected_k
+    missing_i=expected_i-native_i
+    extra_i=native_i-expected_i
+    if body_sha_by_verse is not None:
+        if set(body_sha_by_verse)!=native_k:
+            raise ValueError("Native linked-body digest covers different keys")
+        for group,line in groups:
+            if len(group)>1 and all(key in body_sha_by_verse for key in group):
+                counts["native_linked_groups_checked"]+=1
+                if len({body_sha_by_verse[key] for key in group})!=1:
+                    counts["native_group_has_different_entry_bodies"]+=1
+                    if len(cases)<MAX_STRUCTURAL_SAMPLES:
+                        cases.append({"code":"native_group_has_different_entry_bodies",
+                                      "line":line,"reference":group[0]})
+    counts["distinct_source_verse_osisIDs"]=len(expected_k)
+    counts["distinct_source_intro_osisIDs"]=len(expected_i)
+    counts["native_numbered_refs"]=len(native_k)
+    counts["native_intro_refs"]=len(native_i)
+    counts["missing_source_verses_in_native"]=len(missing_k)
+    counts["native_verses_without_source_osisID"]=len(extra_k)
+    counts["missing_source_intros_in_native"]=len(missing_i)
+    counts["native_intros_without_source_intro_osisID"]=len(extra_i)
+    for code,refs in (("missing_source_verses_in_native",missing_k),
+                      ("native_verses_without_source_osisID",extra_k),
+                      ("missing_source_intros_in_native",missing_i),
+                      ("native_intros_without_source_intro_osisID",extra_i)):
+        for ref in sorted(refs)[:max(0,MAX_STRUCTURAL_SAMPLES-len(cases))]:
+            cases.append({"code":code,"reference":ref,"line":None})
+    problems={key:value for key,value in counts.items()
+              if key.startswith(("invalid_","overlapping_","unpaired_",
+                                 "chapter_number_nonincreasing",
+                                 "verse_start_label_disagrees",
+                                 "visible_verse_range_label_needs",
+                                 "noncontiguous_","same_verse_","verse_not_",
+                                 "verse_without_","chapter_missing_",
+                                 "unterminated_","missing_source_",
+                                 "native_verses_without_","native_intros_without_",
+                                 "native_group_has_")) and value}
+    return {
+        "schema_version":1,
+        "source_sha256":hashlib.sha256(raw).hexdigest(),
+        "status":"SOURCE_NATIVE_INDEX_AND_MILESTONE_GEOMETRY_MATCH"
+                 if not problems else "SOURCE_NATIVE_STRUCTURE_REQUIRES_REVIEW",
+        "all_source_verse_ids_match_occupied_native_keys":not (missing_k or extra_k),
+        "all_source_book_chapter_ids_match_occupied_native_intros":not (missing_i or extra_i),
+        "all_linked_verse_bodies_consistent_if_checked":not counts["native_group_has_different_entry_bodies"],
+        "structure_counts":dict(sorted(counts.items())),
+        "anomaly_counts":problems,
+        "bounded_reference_only_findings":cases,
+        "source_text_or_notes_changed":False,
+        "historical_edition_text_verified":False,
+        "published":False,
+    }
+
+
 def audit_osis(path: Path, *, kind: str = "bible") -> dict:
     if kind not in {"bible", "commentary"}:
         raise ValueError("Only Bible/commentary OSIS sources are supported")
