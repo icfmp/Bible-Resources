@@ -422,6 +422,43 @@ jobs:
           }, sort_keys=True))
           PY
 
+      - name: Audit original-source lemma declarations against exact Macula words
+        shell: bash
+        run: |
+          # The compact index does not import ACAI lemmas. This checks the
+          # frozen witness for future use without treating mismatches as errors.
+          python3 -I /tmp/acai-frozen/.github/scripts/audit_lemma_alignment.py \
+            --root /tmp/acai-frozen \
+            --hebrew macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --greek macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
+            --output entity-index/dist/lemma-alignment-candidates.json --top 20
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path("entity-index/dist/lemma-alignment-candidates.json").read_text())
+          summary=report["summary"]
+          findings=report["findings"]
+          expected={
+              "zero_exact_lemma_overlap":summary.get("zero_exact_lemma_overlap",0),
+              "partial_exact_lemma_overlap":summary.get("partial_exact_lemma_overlap",0),
+          }
+          assert len(findings)==sum(expected.values()), (len(findings),summary)
+          assert sum(row["rule"]=="zero_exact_lemma_overlap" for row in findings)==expected["zero_exact_lemma_overlap"]
+          assert sum(row["rule"]=="partial_exact_lemma_overlap" for row in findings)==expected["partial_exact_lemma_overlap"]
+          assert summary["records_scanned"]==(
+              summary.get("without_explicit_source_ids",0)
+              +summary.get("without_matching_source_ids",0)
+              +summary.get("all_declared_lemmas_found",0)
+              +sum(expected.values())
+          ), summary
+          assert all(row["source_word_ids"]>0 and row["id"] for row in findings)
+          # A zero lexical overlap is diagnostic only: compounds, variants
+          # and alias identifiers can legitimately lack a verbatim lemma.
+          print("ENTITY_LEMMA_DIAGNOSTICS",
+                json.dumps({"records_scanned":summary["records_scanned"],
+                            **expected}, sort_keys=True))
+          PY
+
       - name: Upload internal QA-only resource
         uses: actions/upload-artifact@v4
         with:
@@ -435,5 +472,6 @@ jobs:
             entity-index/dist/nt-source-verse-compatibility.json
             entity-index/dist/ot-source-verse-compatibility.json
             entity-index/dist/epistle-ending-review.json
+            entity-index/dist/lemma-alignment-candidates.json
           if-no-files-found: error
           retention-days: 14
