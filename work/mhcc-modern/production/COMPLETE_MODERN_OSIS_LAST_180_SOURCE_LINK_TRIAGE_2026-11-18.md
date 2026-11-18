@@ -157,3 +157,56 @@ introductions, and rights before any public derivative. **The baseline
 editorial inline-placement queue is still 180; the number of original hyperlinks
 missing from the *separate source-notes candidate* is now four, not 180.**
 No premature issue close, no PR merge or publication.
+
+## Source-witnessed proposed navigation for the final four defective original links
+
+**Verified 2026-11-18; not editorially approved and not published.** The two
+Jeremiah 50 original hyperlinks use malformed OSIS cross-chapter targets for
+multiple discontinuous chapter-50 spans; Matthew 23's original hyperlink
+similarly misencodes the four distinct Pentateuch passages; Ecclesiastes
+10's old digital witness points the highway allusion to the wrong Isaiah
+chapter. A [source-hash-pinned, reversible proposal manifest](FOUR_NATIVE_LINK_ERRATA_REVIEW_2026-11-18.json)
+now stores the original literal target identity **and** the candidate
+citation spans. The independent corroborating textual edition includes
+[Matthew Henry's concise exposition of Matthew 23](https://ccel.org/ccel/henry/mhcc.xxxii.xxiii.html)
+and the concise Jeremiah 50 outline. This is an editorial proposal, not an
+assertion that the original digital source's corruption cause has been traced.
+
+| Original K / original linked ordinal | Proposed navigable destinations in a *third* unapproved private candidate | Count |
+| --- | --- | ---: |
+| `Eccl.10.11` / 1 | `Isa.35.8` | 1 |
+| `Jer.50.1` / 1 | `Jer.50.1–3`; `Jer.50.8–16`; `Jer.50.21–32`; `Jer.50.35–46` | 4 |
+| `Jer.50.1` / 2 | `Jer.50.4–7`; `Jer.50.17–20`; `Jer.50.33`; `Jer.50.34` | 4 |
+| `Matt.23.1` / 1 | `Exod.13.2–10`; `Exod.13.11–16`; `Deut.6.4–9`; `Deut.11.13–21` | 4 |
+| **All original defective link occurrences** | **13 candidate navigable OSIS destinations** | **13** |
+
+This third candidate is built from the second **176-original-link note**
+candidate: the modern source text, its 1,016 existing inline links, and all
+176 exact source-only note references remain unchanged. The four repairs are
+represented by additional `note type="crossReference"` blocks tagged
+`resp="BibleResourcesPrivateUnapprovedOriginalErrataPreview"`, explicitly
+distinguished from the authorial original linked labels. The notes mark
+*proposed* navigations, not links transferred from the original source.
+There is no global parser normalization, source alteration, silent editorial
+rewriting, or final inline hyperlink placement approval.
+
+[Full real source + proposed repairs SWORD #44324164040](https://github.com/icfmp/Bible-Resources/actions/runs/44324164040):
+**SUCCESS**. Original SHA/K/ordinal link identity checks passed; the
+third private candidate compiled and exact native readback verified **13**
+candidate destinations across the four known original link occurrences,
+all **176** unchanged source-only notes, and **28,792/28,792** exact native
+numbered SWORD addresses. [Validate #44324164508](https://github.com/icfmp/Bible-Resources/actions/runs/44324164508)
+and [registry #44324164106](https://github.com/icfmp/Bible-Resources/actions/runs/44324164106)
+**SUCCESS**. Proposed-repair output is disposable private CI work only,
+not a published SWORD package, new accepted text, or approved OSIS edition.
+
+**Operational checkpoint:** original source reference *provenance* is now
+either inline (1,015 original source links), source-only in a private
+alternative (176), explicitly excluded as spurious (9), or covered by
+four privately demonstrated one-to-many/single corrected navigation
+**proposals** (4). Original source elements remain **1,204**. The baseline
+modern inline review ledger still identifies **180** cases without inline
+authorial placement; no count is cosmetically decremented. The source
+errors' four independent editorial decisions, reader behavior of the
+note variants, 51 quarantined preface candidates, rights, and publication
+approval are **still outstanding**.
