@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - "scripts/rebuild_osis_commentary.py"
+      - "scripts/audit_osis.py"
+      - "tests/test_editorial_pipeline.py"
       - "tests/test_rebuild_osis_commentary.py"
       - "scripts/clean_source_osis.py"
       - "scripts/repair_commentary_osis_milestones.py"
@@ -753,6 +755,54 @@ jobs:
                 "2Chr.1.1 overlap has both complete source bodies in SWORD")
           print("This research candidate is NOT an authorial scope editorial approval.")
           print("No OSIS transcript or compiled module uploaded or published.")
+          PY
+      - name: Audit all 4256 authored verse groups against private compiled SWORD word streams
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,subprocess,sys
+          from pathlib import Path
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from audit_osis import (source_commentary_overlap_witness,
+                                  compare_all_commentary_source_group_words)
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          root=Path(os.environ["RUNNER_TEMP"])
+          source=root/"mhc-overlap-experimental.osis.xml"
+          groups=[]
+          overlapping,_=source_commentary_overlap_witness(source,groups_out=groups)
+          if len(groups)!=4256 or len(overlapping)!=1:
+              raise SystemExit("Authored source group census changed in private candidate")
+          targets={g["keys"][0] for g in groups if g["keys"]}
+          raws={}
+          env=dict(os.environ,SWORD_PATH=str(root/"mhc-overlap-experiment-sword"))
+          process=subprocess.Popen([str(root/"commentary-native-raw"),
+                                    "MHCOverlapPreview"],env=env,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.DEVNULL)
+          def collect(kind,key,raw):
+              if kind=="K" and key in targets:
+                  raws[key]=raw
+          try:
+              actual,keys,_intros,_tops=parse_native_raw_corpus(
+                  process.stdout,on_entry=collect)
+              if process.wait(timeout=40):
+                  raise SystemExit("Full private SWORD native stream incomplete")
+          finally:
+              if process.stdout:process.stdout.close()
+              if process.poll() is None:process.kill()
+              process.wait()
+          if len(keys)!=31098 or len(raws)!=len(targets):
+              raise SystemExit("Source group's native first keys not fully occupied")
+          evidence=compare_all_commentary_source_group_words(groups,raws)
+          print("All authored MHC source group text proof status:",evidence["status"])
+          print("Authorial group word-stream census:",evidence["counts"])
+          print("Bounded references requiring source/native content review:",
+                evidence["bounded_reference_only_missing_word_cases"])
+          if evidence["status"]!="PRIVATE_ALL_AUTHORED_GROUP_WORD_BLOCKS_PRESENT_NOT_NOTE_PARITY":
+              raise SystemExit("Not every original source group's word blocks survive compilation")
+          print("All authored source group word blocks preserved at their first native keys")
+          print("Still NOT an independent historical collation or note/markup identity certificate")
           PY
       - name: Verify all source verse-group boundaries against real compiled SWORD keys and linked bodies
         shell: bash
