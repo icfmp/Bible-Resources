@@ -1144,7 +1144,7 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         "source_pinned_original_K_bodies_revisited":len(requested),
         "source_K_groups_with_links_inserted":len(linked_keys),
         "modern_inline_links_inserted":len(embedded),
-        "automatic_exact_single_verse_source_links":auto_counts,
+        "automatic_source_matched_references":auto_counts,
         "actual_original_links_copied_without_correction":counted[
             "COPY_EXACT_AUTHENTIC_SOURCE"],
         "documented_wrong_original_links_retargeted":counted[
@@ -1219,7 +1219,7 @@ def main():
         print("BOUNDED SOURCE-LINKED MODERN MHCC OSIS PASS: " +
               str(result["modern_inline_links_inserted"]) +
               " source-verified inline links (" +
-              str(result["automatic_exact_single_verse_source_links"]["automatically_inserted"]) +
+              str(result["automatic_source_matched_references"]["automatically_inserted"]) +
               " exact automatically matched citations) across all 1189 chapters; " +
               "unmatched original hyperlinks still need editorial placement; NO release")
         return 0
