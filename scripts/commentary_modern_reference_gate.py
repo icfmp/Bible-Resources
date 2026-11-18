@@ -2465,49 +2465,79 @@ def build_private_owned_K_heading_range_links(
         raw_target=literal[6:] if literal.startswith("Bible:") else literal
         owning=[i for i,u in enumerate(units)
                 if _range(u["keys"])==raw_target]
-        if (source_index is None or len(owning)!=1
-                or owning[0]<source_index):
+        if source_index is None:
             continue
-        target_index=owning[0]
-        section=sections[target_index]
-        titles=section.findall(f"./{{{NS}}}title[@type='sub']")
         label_pattern=re.compile(
             r"\bverses?\s+"+re.escape(start)+r"\s*[-–—]\s*"+
             re.escape(end)+r"\b", re.I)
         matches=[]
-        for title in titles:
-            if len(title)!=0 or not isinstance(title.text,str):
-                continue
-            for m in label_pattern.finditer(title.text):
-                matches.append((title,m.start(),m.end()))
-        if len(matches)!=1:
+        placement_basis=None
+        target_index=source_index
+        if len(owning)==1 and owning[0]>=source_index:
+            target_index=owning[0]
+            # Exact source K occupancy is the only safe heading transport.
+            for title in sections[target_index].findall(
+                    f"./{{{NS}}}title[@type='sub']"):
+                if len(title)!=0 or not isinstance(title.text,str):
+                    continue
+                for m in label_pattern.finditer(title.text):
+                    matches.append((title,m.start(),m.end()))
+            if len(matches)==1:
+                placement_basis="EXACT_ORIGINAL_K_SECTION_HEADING"
+        if not matches:
+            # A complete original cross-reference may span SOME verses inside
+            # one source-owned K, rather than the K's complete heading.
+            # A genuinely single first-verse-indexed original K (Isa 12/15)
+            # is eligible only with the original same-chapter link and a
+            # unique, explicitly printed modern verse range.
+            own=units[source_index]
+            own_keys=set(own["keys"])
+            source_cover=all(f"{book}.{chapter}.{v}" in own_keys
+                             for v in range(int(start),int(end)+1))
+            underindexed_single_K=(len(units)==1 and
+                own["first_key"]==f"{book}.{chapter}.1")
+            if source_cover or underindexed_single_K:
+                target_index=source_index
+                matches=[]
+                for p in sections[source_index].findall(f"./{{{NS}}}p"):
+                    # Never flatten modern markup or nest an existing link.
+                    if len(p)!=0 or not isinstance(p.text,str):
+                        continue
+                    for m in label_pattern.finditer(p.text):
+                        matches.append((p,m.start(),m.end()))
+                if len(matches)==1:
+                    placement_basis="UNIQUE_SOURCE_SAME_CHAPTER_RANGE_IN_AUTHORED_K_PROSE"
+        if len(matches)!=1 or placement_basis is None:
             continue
-        title,start_pos,end_pos=matches[0]
+        element,start_pos,end_pos=matches[0]
         candidates[key]={
             "source_first_key":first,"source_reference_ordinal":ordinal,
             "target_native_first_key":units[target_index]["first_key"],
             "original_literal_target_sha256":row["original_osisRef_sha256"],
             "original_visible_label_sha256":row["original_visible_label_sha256"],
             "source_literal":literal,
-            "title":title,"start":start_pos,"end":end_pos,
+            "anchor_node":element,"start":start_pos,"end":end_pos,
+            "placement_basis":placement_basis,
         }
 
     from collections import Counter
-    counts=Counter(id(x["title"]) for x in candidates.values())
-    candidates={k:v for k,v in candidates.items() if counts[id(v["title"])]==1}
+    counts=Counter(id(x["anchor_node"]) for x in candidates.values())
+    candidates={k:v for k,v in candidates.items() if counts[id(v["anchor_node"])]==1}
     for key,x in candidates.items():
-        title=x["title"]
-        original_text=title.text
+        anchor=x["anchor_node"]
+        original_text=anchor.text
         display=original_text[x["start"]:x["end"]]
-        if not display or len(title):
-            raise ValueError("Original modern heading changed during source target mapping")
+        if not display or len(anchor):
+            raise ValueError("Source K heading/prose anchor changed during link mapping")
         link=ET.Element(f"{{{NS}}}reference",{
             "osisRef":x["source_literal"],
-            "resp":"BibleResourcesOriginalSourceRangeInModernSectionHeading"})
+            "resp":("BibleResourcesOriginalSourceRangeInModernSectionHeading"
+                    if x["placement_basis"]=="EXACT_ORIGINAL_K_SECTION_HEADING"
+                    else "BibleResourcesOriginalSourceRangeInModernKProse")})
         link.text=display
         link.tail=original_text[x["end"]:]
-        title.text=original_text[:x["start"]]
-        title.insert(0,link)
+        anchor.text=original_text[:x["start"]]
+        anchor.insert(0,link)
         x["linked_display_sha256"]=hashlib.sha256(display.encode()).hexdigest()
     if "".join(doc.itertext())!=original_prose:
         raise ValueError("Source range heading link changed modern visible prose")
@@ -2528,7 +2558,12 @@ def build_private_owned_K_heading_range_links(
     receipt={
         "status":"PRIVATE_SOURCE_OWNED_EXACT_K_HEADING_RANGE_NAVIGATION_NOT_RELEASE",
         "original_native_corpus_sha256":native["original_compiled_corpus_sha256"],
-        "source_original_links_restored_to_matching_modern_K_headings":len(candidates),
+        "source_original_links_restored_to_matching_modern_K_headings":sum(
+            x["placement_basis"]=="EXACT_ORIGINAL_K_SECTION_HEADING"
+            for x in candidates.values()),
+        "source_original_partial_ranges_restored_in_K_exposition":sum(
+            x["placement_basis"]=="UNIQUE_SOURCE_SAME_CHAPTER_RANGE_IN_AUTHORED_K_PROSE"
+            for x in candidates.values()),
         "source_valid_references_still_in_section_notes":len(remaining)-len(blocked),
         "original_defective_references_remain_blocked":len(blocked),
         "original_text_and_authored_modern_prose_modified":False,
@@ -2538,9 +2573,11 @@ def build_private_owned_K_heading_range_links(
             "source_first_key":v["source_first_key"],
             "source_reference_ordinal":v["source_reference_ordinal"],
             "target_native_first_key":v["target_native_first_key"],
+            "placement_basis":v["placement_basis"],
             "original_literal_target_sha256":v["original_literal_target_sha256"],
             "original_visible_label_sha256":v["original_visible_label_sha256"],
             "modern_heading_reference_display_sha256":v["linked_display_sha256"],
+            "modern_reference_display_sha256":v["linked_display_sha256"],
         } for _,v in sorted(candidates.items())],
     }
     return result,revised,receipt
