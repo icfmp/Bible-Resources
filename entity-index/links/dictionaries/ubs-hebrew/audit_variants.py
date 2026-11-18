@@ -26,9 +26,16 @@ def analyze(index, lexicon, tsv):
       "lemmas":Counter(),"sdbh_populated":0,"prefix_in_ubs":0,"base_in_ubs":0,
       "samples":[]})
     overall=Counter()
+    by_class=defaultdict(Counter)
+    by_morph=defaultdict(Counter)
+    by_language=defaultdict(Counter)
     with Path(tsv).open(encoding="utf-8-sig",newline="") as stream:
         for row in csv.DictReader(stream,delimiter="\t"):
             r=lookup(index,row["sdbh"],row["strongnumberx"],row["lang"])
+            status="sense" if r["sense_ids"] else ("entry_only" if r["entry_ids"] else "unresolved")
+            by_class[row["class"]][status]+=1
+            by_morph[row["morph"][:2]][status]+=1
+            by_language[row["lang"]][status]+=1
             if r["entry_ids"]:
                 continue
             code=row["strongnumberx"]
@@ -68,7 +75,11 @@ def analyze(index, lexicon, tsv):
           "lemmas":a["lemmas"].most_common(4),
           "sdbh_populated":a["sdbh_populated"],"parent_in_ubs":a["prefix_in_ubs"],
           "base_ubs_exists":a["base_in_ubs"],"examples":a["samples"]})
-    return {"summary":dict(overall),"distinct_suffix_families":len(aggregate),"families":top}
+    return {"summary":dict(overall),"distinct_suffix_families":len(aggregate),
+        "by_original_class":{k:dict(v) for k,v in sorted(by_class.items())},
+        "by_morph_prefix":{k:dict(v) for k,v in sorted(by_morph.items())},
+        "by_original_language":{k:dict(v) for k,v in sorted(by_language.items())},
+        "families":top}
 
 def main():
     p=argparse.ArgumentParser()
@@ -81,6 +92,9 @@ def main():
     a.output.write_text(json.dumps(result,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print("VARIANT_TOTAL",result["summary"])
     print("VARIANT_DISTINCT_FAMILIES",result["distinct_suffix_families"])
+    print("COVERAGE_BY_ORIGINAL_CLASS",json.dumps(result["by_original_class"],ensure_ascii=False))
+    print("COVERAGE_BY_MORPH_PREFIX",json.dumps(result["by_morph_prefix"],ensure_ascii=False))
+    print("COVERAGE_BY_ORIGINAL_LANGUAGE",json.dumps(result["by_original_language"],ensure_ascii=False))
     for row in result["families"][:20]:
         print("VARIANT_FAMILY",json.dumps(row,ensure_ascii=False))
 if __name__=="__main__":
