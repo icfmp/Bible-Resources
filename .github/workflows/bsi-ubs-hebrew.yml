@@ -73,6 +73,23 @@ jobs:
           assert actual["coverage"]["macula_words"] > 300000
           assert actual["coverage"]["with_ubs_entry_candidates"] > 200000
           assert actual["statistics"]["shared_entries"]==7943
+          assert actual["statistics"]["shared_senses"]==16619
+          assert actual["statistics"]["indexed_strong_numbers"]==8286
+          assert actual["coverage"]["macula_words"]==475911
+          assert actual["coverage"]["with_ubs_entry_candidates"]==281269
+          assert actual["coverage"]["with_exact_ubs_sense_candidates"]==165214
+          assert actual["coverage"]["ambiguous_ubs_entry_candidates"]==2741
+          assert sum(actual["coverage"][key] for key in (
+              "direct_sense","entry_only","ambiguous_entry_only",
+              "no_entry_match","no_verified_lexical_link"))==475911
+          assert actual["by_sdbh"]["006653001001000"]==["006653000000000"]
+          import runpy
+          lookup=runpy.run_path("entity-index/links/dictionaries/ubs-hebrew/build_index.py")["lookup"]
+          direct=lookup(actual,"006653001001000","7225","H")
+          assert direct["entry_ids"]==["006653000000000"] and direct["sense_ids"]==["006653001001000"]
+          fallback=lookup(actual,"001156001002000","1254","H")
+          assert fallback["sense_ids"]==[] and fallback["status"]=="entry_only"
+
           if target.is_file():
               assert json.loads(target.read_text(encoding="utf-8")) == actual, "Committed index differs from regenerated data"
               print("BSI_UBS_HEBREW_COMMITTED_INDEX_VERIFIED")
