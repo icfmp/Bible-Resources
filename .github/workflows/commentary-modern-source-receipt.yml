@@ -1418,6 +1418,7 @@ jobs:
           from lxml import etree
           sys.path.insert(0,"scripts")
           from commentary_private_text_compare import _original_source_markers
+          from commentary_nonlink_word_alignment import plain_word_alignment
           from commentary_modern_draft_osis_preview import (
               _CANON,_modern_front,_SOURCE_CORPUS)
           from sword_native_raw_corpus_inventory import parse_native_raw_corpus
@@ -1570,6 +1571,38 @@ jobs:
               full_matches=[ix for ix in range(
                   max(0,len(actual)-len(all_words)+1))
                   if all_words and actual[ix:ix+len(all_words)]==all_words]
+              discrepancy=None
+              if owner is not None and not full_matches:
+                  # Resolve the original native K offset from the unique
+                  # 20-word anchored source prefix; never expose its words.
+                  needle=all_words[:20]
+                  starts=[j for j in range(min(500,len(actual))-len(needle)+1)
+                          if actual[j:j+len(needle)]==needle]
+                  if len(starts)!=1:
+                      raise ValueError("Source-original first-K preface has no unique anchor")
+                  start=starts[0]
+                  tail=actual[start:]
+                  ending=min(10,max(5,len(all_words)//5))
+                  suffix=all_words[-ending:]
+                  ends=[j+ending for j in range(len(tail)-ending+1)
+                        if tail[j:j+ending]==suffix]
+                  end=next((n for n in ends if
+                            len(all_words)-50<=n<=len(all_words)+80),None)
+                  if end is None:
+                      end=min(len(tail),len(all_words))
+                  native_prefix=tail[:end]
+                  alignment=plain_word_alignment(all_words,native_prefix)
+                  discrepancy={
+                      "exact_20_word_start_K_offset":start,
+                      "original_ccel_book_preface_word_count":len(all_words),
+                      "original_K_prefix_word_count_for_alignment":len(native_prefix),
+                      "source_ccel_last_10_word_suffix_found":bool(ends),
+                      "exact_word_alignment":alignment,
+                      "native_word_window_sha256":hashlib.sha256(
+                          "\\x00".join(native_prefix).encode()).hexdigest(),
+                      "source_original_prose_not_exported":True,
+                      "difference_not_automatically_approved":True
+                  }
               modern_first=Path("work/mhcc-modern/production/accepted")/(
                   path.name.split("-book-introduction.CANDIDATE.md")[0]+"-01.md")
               if not modern_first.is_file():
@@ -1604,6 +1637,7 @@ jobs:
                   "source_div1_original_book_preface_sha256":(
                       owner["prefix_sha256"] if owner is not None else None),
                   "source_native_first_K_raw_sha256":expected[original_first][1],
+                  "private_three_exception_word_alignment":discrepancy,
                   "modern_accepted_first_chapter_has_book_intro_heading":
                       modern_intro_own_heading,
                   "individual_source_text_or_labels_exported":False,
@@ -1634,6 +1668,11 @@ jobs:
                              "modern_already_present":
                                  r["modern_accepted_first_chapter_has_book_intro_heading"]}
                             for r in report],sort_keys=True))
+          print("MHCC THREE BOOK PREFACE ORIGINAL-NATIVE VS CCEL DIFF: "+
+                json.dumps({r["book"]:
+                    r["private_three_exception_word_alignment"]
+                    for r in report if r["private_three_exception_word_alignment"]
+                },sort_keys=True))
           print("MHCC 51 BOOK INTRO COMPLETE SOURCE-WORD AND MODERN-PRESENCE SUMMARY: "+
                 json.dumps({
                     "source_whole_preface_matches":sum(
