@@ -44,7 +44,7 @@ class OriginalWordAnchoredLinksTest(unittest.TestCase):
         self.assertEqual(out["entry_ids"], [voice["MainId"]])
         self.assertEqual(out["sense_ids"], [])
         self.assertEqual(
-            out["evidence"], "macula_word_exact_lemma_unique_ubs_strong_family"
+            out["evidence"], "macula_word_exact_lemma_unique_entry_within_ubs_strong_family"
         )
         self.assertEqual(
             lookup_word(ix, "o010010010011", "", "6963a", "H", "קוֹל")["evidence"],
@@ -63,7 +63,7 @@ class OriginalWordAnchoredLinksTest(unittest.TestCase):
             [],
         )
 
-    def test_ubs_family_ambiguous_even_if_only_one_same_lemma(self):
+    def test_unique_exact_lemma_is_selected_within_family(self):
         voice = entry("000001000000000", "קוֹל", ["H6963a"])
         different = entry("000002000000000", "קֹל", ["H6963b"])
         ix = build([voice, different], [voice, different])
@@ -75,7 +75,38 @@ class OriginalWordAnchoredLinksTest(unittest.TestCase):
                 encoding="utf-8",
             )
             result = build_word_links(ix, [voice, different], source)
-        self.assertEqual(result, {})
+        self.assertEqual(result["o010010010011"]["entry_id"], voice["MainId"])
+
+    def test_different_lemmas_within_same_strong_family_are_resolved(self):
+        # Homonymous Strong numeric families can split by actual lemma.
+        voice = entry("000001000000000", "קוֹל", ["H6963a"])
+        sound = entry("000002000000000", "קֹל", ["H6963b"])
+        other = entry("000003000000000", "שִׁיר", ["H7892a"])
+        ix = build([voice, sound, other], [voice, sound, other])
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "words.tsv"
+            source.write_text(
+                "xml:id\\tlemma\\tsdbh\\tstrongnumberx\\tlang\\tclass\\n"
+                "o010010010011\\tקוֹל\\t\\t6963\\tH\\tnoun\\n"
+                "o010010010021\\tקֹל\\t\\t6963\\tH\\tnoun\\n",
+                encoding="utf-8",
+            )
+            links = build_word_links(ix, [voice, sound, other], source)
+        self.assertEqual(links["o010010010011"]["entry_id"], voice["MainId"])
+        self.assertEqual(links["o010010010021"]["entry_id"], sound["MainId"])
+
+    def test_identical_homograph_lemma_stays_ambiguous(self):
+        a = entry("000001000000000", "קוֹל", ["H6963a"])
+        b = entry("000002000000000", "קוֹל", ["H6963b"])
+        ix = build([a, b], [a, b])
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "words.tsv"
+            source.write_text(
+                "xml:id\\tlemma\\tsdbh\\tstrongnumberx\\tlang\\tclass\\n"
+                "o010010010011\\tקוֹל\\t\\t6963\\tH\\tnoun\\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(build_word_links(ix, [a, b], source), {})
 
     def test_no_promotion_of_sense_id_collision(self):
         wrong = entry("006653000000000", "רֹאשׁ", ["H7218"])
