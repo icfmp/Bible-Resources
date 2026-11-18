@@ -115,6 +115,37 @@ class EntityResolver:
                 result["status"] = "source_candidate"
         return result
 
+    def resolve_for_reader(self, *, corpus: str, edition: str,
+                           word_id: str, verse_id: str) -> dict:
+        """Return only exact explicit-word candidates for a reader UI.
+
+        Preserve the raw resolver and every source annotation. A pronominal
+        or implicit-subject link is useful audit evidence, but must never
+        make Bible display a person's card on an unrelated 'we' or 'you'.
+        This presentation policy does not certify any source identity.
+        """
+        result = self.resolve(
+            corpus=corpus, edition=edition, word_id=word_id, verse_id=verse_id)
+        result["lookup_policy"] = "explicit_only"
+        if result["status"] not in (
+                "source_candidate", "ambiguous_source_candidates"):
+            return result
+
+        result["candidates"] = [
+            row for row in result["candidates"]
+            if row["link_type"] == "explicit_instances"
+        ]
+        result["canonical_ids"] = sorted({
+            row["canonical_id"] for row in result["candidates"]
+        })
+        if not result["canonical_ids"]:
+            result["status"] = "no_explicit_entity"
+        elif len(result["canonical_ids"]) > 1:
+            result["status"] = "ambiguous_source_candidates"
+        else:
+            result["status"] = "source_candidate"
+        return result
+
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -125,9 +156,14 @@ def main():
     parser.add_argument("--word-id", required=True)
     parser.add_argument("--verse-id", required=True,
                         help="Eight-digit original ORG book/chapter/verse ID")
+    parser.add_argument("--reader-facing", action="store_true",
+                        help="Only suggest explicit original-word entities; "
+                             "never show pronoun or implied-subject participants")
     args = parser.parse_args()
     index = json.loads(args.index.read_text(encoding="utf-8"))
-    result = EntityResolver(index).resolve(
+    resolver = EntityResolver(index)
+    lookup = resolver.resolve_for_reader if args.reader_facing else resolver.resolve
+    result = lookup(
         corpus=args.corpus, edition=args.edition,
         word_id=args.word_id, verse_id=args.verse_id)
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
