@@ -1855,6 +1855,12 @@ def build_private_contextual_source_note_preview(
         group_note[:] = []
         remaining = []
         for ref, row in zip(source_refs, eligible):
+            literal = ref.get("osisRef")
+            if (not isinstance(literal, str) or
+                    hashlib.sha256(literal.encode("utf-8")).hexdigest() !=
+                        row["original_osisRef_sha256"] or
+                    ref.text != _source_link_supplement_display(literal)):
+                raise ValueError("A candidate changed the authenticated source target")
             ordinal = row["source_reference_ordinal"]
             key = (first, ordinal)
             if key not in candidates:
