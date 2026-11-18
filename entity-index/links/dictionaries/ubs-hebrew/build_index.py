@@ -22,7 +22,7 @@ UBS_FILES = {
 STRONG = re.compile(r"^([HA])0*([0-9]+)$")
 MACULA_STRONG = re.compile(r"^[0-9]+$")
 LEX_ID = re.compile(r"^[0-9]{15}$")
-WLC_WORD_ID = re.compile(r"^o[0-9]{12}[^0-9\\s]*$")
+WLC_WORD_ID = re.compile(r"^o[0-9]{12}\\S*$")
 
 
 def senses(entry):
