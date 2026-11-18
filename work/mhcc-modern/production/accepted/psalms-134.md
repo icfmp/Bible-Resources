@@ -30,7 +30,7 @@ We should pray for spiritual blessings **not only for ourselves, but also for ot
 
 Let our prayer be more than **Lord, bless me**.
 
-Let us also say, **Lord, bless you**.
+Let us also say to another person, **May the Lord bless you**.
 
 In doing so we declare that **God has enough mercy for others as well as for us**.
 
@@ -39,6 +39,8 @@ We also demonstrate genuine love and goodwill toward them.
 ---
 
 ## Editorial review — Psalm 134
+
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Corrected a real English addressee error: *Lord, bless you* sounded like a prayer that God be blessed, whereas Henry's *The Lord bless thee* is a blessing spoken **to another person**. The modern text now says *May the Lord bless you* and identifies the addressee. Original module and native structure unchanged; independent approval pending.
 
 **Entire brief secondary witness read:** [CCEL, Psalm 134](https://ccel.org/ccel/henry/mhcc.xx.cxxxiv.html). Published `MHCC 0.1.1` remains authoritative; native SWORD and independent review pending.
 
