@@ -118,7 +118,32 @@ jobs:
                     root.xpath("//o:div[@type='introduction']",namespaces=ns))})
           # Different XML parents are valid for OSIS verse milestones.
           # Do not assume that source verses are container elements.
-          # Only metadata, no paragraphs or user-facing authorial text.
+          second=root.xpath("//o:verse[@sID='2Chr.1.1-12']",namespaces=ns)
+          second_end=root.xpath("//o:verse[@eID='2Chr.1.1-12']",namespaces=ns)
+          if len(second)!=1 or len(second_end)!=1:
+              raise SystemExit("Unattested following section of 2Chr 1")
+          intro=next((node for node in closer.iterancestors()
+                      if local(node)=="div"
+                      and node.get("type")=="introduction"),None)
+          if intro is None:
+              raise SystemExit("Original intro div missing")
+          contained=list(intro.iter())
+          print("Original 2Chr introduction division versus following authored section:",
+                {"intro_div":hint(intro),
+                 "intro_parent":hint(intro.getparent()),
+                 "intro_direct_child_tags":[hint(n) for n in list(intro)[:8]],
+                 "intro_last_direct_children":[hint(n) for n in list(intro)[-5:]],
+                 "intro_contained_section_start_markers":
+                    [hint(n) for n in contained if local(n)=="verse"
+                     and n.get("sID")][:10],
+                 "intro_contained_section_end_markers":
+                    [hint(n) for n in contained if local(n)=="verse"
+                     and n.get("eID")][:10],
+                 "second_start":context(second[0]),
+                 "second_end":context(second_end[0]),
+                 "intro_contains_second_start":second[0] in contained,
+                 "intro_contains_second_end":second_end[0] in contained})
+          # Only structural metadata, no paragraphs or authorial prose.
           PY
       - name: Audit and clean original OSIS cosmetic artifacts in isolated storage
         shell: bash
