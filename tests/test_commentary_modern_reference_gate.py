@@ -1002,5 +1002,58 @@ class WholeOriginalSourceLinkLedgerTests(unittest.TestCase):
             "ABSENT_VERBATIM")
 
 
+    def test_two_endpoint_native_range_rejection_classes_are_not_links(self):
+        from commentary_modern_reference_gate import (
+            _full_endpoint_source_range_rejection,
+            _source_same_chapter_verse_range)
+        examples = {
+            "Jer.50.1-Jer.51.5": "CROSS_CHAPTER_RANGE",
+            "Exod.13.2-Deut.11.21": "CROSS_BOOK_RANGE",
+            "Bible:Isa.35.8-Isa.35.8": "DEGENERATE_SAME_VERSE_RANGE",
+            "Jer.50.7-Jer.50.3": "REVERSED_SAME_CHAPTER_RANGE",
+            "Ps.01.1-Ps.01.5": "ZERO_OR_NONCANONICAL_NUMERIC_SPELLING",
+            "Ps.119.1-Ps.119.201": "OUTSIDE_BOUNDED_VERSE_RANGE",
+            "Bogus.2.1-Bogus.2.8": "UNRECOGNIZED_BOOK_CODE",
+            "Gen.1.1": "NOT_TWO_ENDPOINT_RANGE",
+            "Bible:Jer.50.1-Jer.50.7":
+                "VALID_SAME_CHAPTER_RANGE_UNEXPECTEDLY_UNPLACED",
+        }
+        for literal, expected in examples.items():
+            with self.subTest(expected=expected):
+                self.assertEqual(
+                    _full_endpoint_source_range_rejection(literal), expected)
+                if expected not in (
+                        "VALID_SAME_CHAPTER_RANGE_UNEXPECTEDLY_UNPLACED",):
+                    self.assertIsNone(_source_same_chapter_verse_range(literal))
+
+    def test_unsupported_native_range_has_a_reversible_private_locator(self):
+        ns = "http://www.bibletechnologies.net/2003/OSIS/namespace"
+        chapter = ET.Element(f"{{{ns}}}chapter", {"osisID": "Jer.50"})
+        section = ET.SubElement(chapter, f"{{{ns}}}div", {
+            "annotateType": "commentary", "annotateRef": "Jer.50.1"})
+        ET.SubElement(section, f"{{{ns}}}p").text = (
+            "The prophecy concerns Babylon and the restoration of Israel.")
+        original = {"Jer.50.1": [
+            ("Bible:Jer.50.1-Jer.51.5", "Jer. 50–51")]}
+        ledger = _unplaced_original_link_review_ledger(
+            original=original, insertions=[], corrections={},
+            source_table_ownership={"Jer.50.1": [False]},
+            source_title_ownership={"Jer.50.1": [False]},
+            modern_chapters={"Jer.50": chapter},
+            native={"chapters": {"Jer.50": {"original_units": [{
+                "first_key": "Jer.50.1", "keys": ["Jer.50.1"]}]}}})
+        self.assertEqual(
+            ledger["source_original_links_still_requiring_placement_review"], 1)
+        row = ledger["pending"][0]
+        self.assertEqual(row["source_first_key"], "Jer.50.1")
+        self.assertEqual(row["source_reference_ordinal"], 1)
+        self.assertEqual(row["original_target_grammar"], "full_verse_range")
+        self.assertEqual(row["full_range_rejection_reason"],
+                         "CROSS_CHAPTER_RANGE")
+        self.assertEqual(row["native_markup_location"], "EXPOSITION_OR_OTHER")
+        self.assertNotIn("Jer.50.1-Jer.51.5", repr(ledger))
+        self.assertNotIn("Jer. 50–51", repr(ledger))
+
+
 if __name__=="__main__":
     unittest.main()
