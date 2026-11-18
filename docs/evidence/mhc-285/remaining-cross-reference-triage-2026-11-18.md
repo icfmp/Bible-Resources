@@ -1,4 +1,4 @@
-# MHC — 25 source machine Scripture-link anchors, 8 not yet trialled (2026-11-18)
+# MHC — 25 source machine Scripture-link anchors, one title reference outstanding (2026-11-18)
 
 **Research inventory, not a corrected edition, module release, or editorial approval.**
 This is the original **complete MHC** authored OSIS, *not MHCC*. The original
@@ -156,3 +156,59 @@ ambiguous inherited punctuation need independent scope confirmation and
 explicit support from the source/reader representation, not inferred
 `osisRef` targets. Printed-edition and digital redistribution rights,
 real GUI link navigation and final editorial approval remain open.
+
+## Fourth continuation — 24 private link previews, one title-link exception
+
+The [real original OSIS pass #44300475841](https://github.com/icfmp/Bible-Resources/actions/runs/44300475841)
+found the **exact passage host, original machine attribute, short visible
+citation and citation-label SHA** for each of the eight remaining references.
+This result is crucial: **three bookless original references point outside
+the containing book**. The unchanged original and independent CCEL
+commentary are cited below. All new proposals are strictly machine-only,
+SHA/line/visible-label-guarded and remain unpublished.
+
+| Original source line / host | Original machine locator | Original visible citation | Proposed private OSIS destination | Independent witness |
+| --- | --- | --- | --- | --- |
+| 3108 / Genesis 25:11–18 | `21.13` | `xxi. 13` | `Gen.21.13` | [CCEL Genesis 25](https://ccel.org/h/henry/mhc2/MHC01025.HTM) explicitly cites Abraham's promise concerning Ishmael |
+| 37835 / Psalm 40:6–10 | `10.1-4` | `x. 1-4` | **`Heb.10.1-Heb.10.4`** | [CCEL Psalm 40](https://ccel.org/h/henry/mhc2/MHC19040.HTM) has **Heb. ix. 9; x. 1–4** at the corresponding source sentence |
+| 41584 / Psalm 97:8–12 | `4.4` | `iv. 4` | **`Phil.4.4`** | [CCEL Psalm 97](https://www.ccel.org/ccel/henry/mhc3/mhc3.Ps.xcviii.html) has **Phil. iii. 3; iv. 4** |
+| 47698 / Proverbs 15:28 | `5.7` | `v. 7` | **`Neh.5.7`** | [CCEL Proverbs 15](https://ccel.org/h/henry/mhc2/MHC20015.HTM) has **Neh. ii. 4; v. 7** |
+| 50772 / Proverbs 31 thematic index | `Pr.11.14 15.22 18.13 19.2 20.5 18 21.29 22.3 25.8-10` | `ch. xi. 14; xv. 22; xviii. 13; xix. 2; xx. 5, 18; xxi. 29; xxii. 3; xxv. 8-10` | `Prov.11.14 Prov.15.22 Prov.18.13 Prov.19.2 Prov.20.5 Prov.20.18 Prov.21.29 Prov.22.3 Prov.25.8-Prov.25.10` | [CCEL Proverbs 31](https://www.ccel.org/ccel/henry/mhc3/mhc3.Prov.xxxii.html), preserving **the complete 25:8–10 range** |
+| 76239 / Matthew 15:1–9 | `1Ti.4.1 2Ti 3.1 2 3.3` | `1 Tim. iv. 1; 2 Tim. iii. 1; 2 Pet. iii. 3` | `1Tim.4.1 2Tim.3.1 2Pet.3.3` | [CCEL Matthew 15](https://ccel.org/h/henry/mhc2/MHC40015.HTM), correcting a **different biblical book** in the last machine target |
+| 81529 / Matthew 28:1–10 | `Lu.24.6 7-44 Mk 16.7` | `Luke xxiv. 6, 7-44; Mark xvi. 7` | `Luke.24.6 Luke.24.7-Luke.24.44 Mark.16.7` | [CCEL Matthew 28](https://ccel.org/h/henry/mhc2/MHC40028.HTM), preserving the printed **7–44 range** |
+
+The **generic** private source patcher now admits only a canonical
+same-chapter `Book.C.V-Book.C.V` OSIS range when **every included native
+KJV verse is independently indexed**. It rejects reversed, incomplete,
+cross-book, cross-chapter, missing-verse and excessively large ranges.
+Synthetic source-byte-preservation tests also cover this path. The new
+24-link private compiled-module audit must pass before calling the seven
+new proposals technically verified. No source words, note callers, visible
+citations, printed layout or authorial section ownership have changed.
+
+### Last untrialled machine reference — Psalm 60 title
+
+- Original authored OSIS **line 58059**, inside Isaiah 63:1–6.
+- Original `osisRef="Ps 60.1 2Sa 8.13 14"`.
+- Original visible citation: `Ps. lx., title, 2 Sam. viii. 13, 14`.
+- Independent [CCEL Isaiah 63](https://ccel.org/h/henry/mhc2/MHC23063.HTM)
+  also specifies **Psalm 60's superscription/title**, not simply its first
+  numbered verse.
+
+The two 2 Samuel destinations are unambiguous:
+`2Sam.8.13` and `2Sam.8.14`. The Psalm part, however, is a
+**title/superscription** and cannot be silently replaced with
+`Ps.60.1` while claiming accurate click navigation. The existing
+native-KJV verse-only private patcher has no proven explicit title target.
+We therefore leave this whole compound attribute original and record one
+**unresolved UI/link transport choice**. A correct private fix requires
+proving where the KJV module stores Psalm 60's superscription and which
+standard SWORD/OSIS link target actually navigates to it in the intended
+reader. This is not a missing Henry passage or permission to change the
+printed label.
+
+**Current state:** 24 proposed machine-only corrections, 1 source
+target outstanding; 17 previously native-verified before the new
+range-aware changes. **24/25 is NOT yet a compiled SWORD or GUI acceptance
+claim** until fresh complete native and real-reader checks pass. No rights,
+editorial or release approval is implied.
