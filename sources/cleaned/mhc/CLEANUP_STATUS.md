@@ -385,12 +385,35 @@ Two source-internal contradictions are immediately evident:
 | 7,237 (source book Exodus) | `15.1` | `Jer. xv. 1` | `Jer.15.1` |
 | 57,059 (source book Isaiah) | `Ezr 1.7 8.23` | `Ezra i. 7; viii. 24` | `Ezra.1.7 Ezra.8.24` |
 
-These are **proposed machine-only corrections**, not claims that an
-independent historical edition has validated the printed citation. Confirm
-against an independent reliable witness and actual KJV/SWORD endpoint
-addressability before patching. Preserve both original values, XML line,
-source SHA and visible label digest in a reversible plan; never alter the
-displayed author's label merely to match the faulty target.
+These two visible citations have now been independently corroborated
+against CCEL's published *Complete Commentary*: [Exodus 32](
+https://ccel.org/h/henry/mhc2/MHC02032.HTM) contains the
+`Jer. xv. 1` citation and [Isaiah 52](
+https://www.ccel.org/ccel/henry/mhc4.Is.liii.html) contains
+`Ezra i. 7; viii. 24`. The historic author's displayed references
+remain **untouched**.
+
+A **private machine-only correction preview PASSED**:
+[Actions #44291942651](https://github.com/icfmp/Bible-Resources/actions/runs/44291942651).
+The generic, reversible exact-byte patcher
+`patch_reviewed_osis_reference_attributes`, driven by
+`config/commentary-osis-repair-plans/mhc-crossreferences-private-preview.json`,
+verified the original source SHA, exact XML line, book, original
+`osisRef`, visible citation SHA and the **three actual SWORD verse
+destinations**. It changed exactly **two** `osisRef` attribute values
+and no original prose, note, visible label, section scope, or unrelated
+XML bytes.
+
+- Exact pre-link-trial private OSIS SHA-256:
+  `95a12ad88decbfe975de747825492abb7944b8de6dd30176cc23afdc9d2daa5d`
+- Private post-link-trial SHA-256:
+  `c88864b996e12b72928e74739feb90b56283abcee7c45aa212785225ce000cbd`
+
+**Still research-only:** independent CCEL text agreement and canonical
+index validity do not prove native GUI click navigation, full note/markup
+identity, legal redistribution rights, or editorial authorization for
+publication. The remaining 23 unsupported machine-link expressions are
+untouched.
 
 The remaining nonstandard references (bookless numeric locators and
 compound citation lists with inherited chapters) must be resolved using
