@@ -307,6 +307,32 @@ also require a distinct pinned-source completeness and traditional epistle
 subscription review (see inherited #86). Variant provenance is therefore
 retained for later source-specific qualification.
 
+## Epistle-ending traditional subscriptions: source-aware classification
+
+The [21-epistle original-word audit](https://github.com/icfmp/Bible-Resources/pull/315)
+found 69 distinct unanchored or edition-absent ACAI record/verse candidates.
+A source-pinned review now qualifies **63** of these as
+`traditional_subscription_candidate` in
+[source-reference-qualifications.json](source-reference-qualifications.json)
+(10 earlier + 53 newly collated). The historical
+[King James epistle subscription list](https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450) documents
+added locations, addressees and letter carriers. Such notes are
+**editorial paratext**, not canonical SBLGNT words, and their historical
+accuracy cannot be presumed.
+
+The **six remaining candidates** are `person:Christ` and
+`person:Jesus.2` at Romans 16:25/27 and 2 Corinthians 13:14.
+These instead belong to the original-language edition's
+doxology apparatus / 2 Corinthians 13:13 alternative versification,
+as already qualified in
+[source-unattested-verses.json](source-unattested-verses.json).
+They must not be misclassified as postscript personnel or locations.
+
+Original frozen ACAI references, original-word assignments, Bible text and
+entity identities remain untouched. CI rechecks every annotated postscript
+claim against the independent source-defined final-verse candidate inventory,
+and keeps the other six contexts visibly separate.
+
 ## Original-source lexical lemma diagnostics (not imported)
 
 The inherited [ACAI #100](https://github.com/icfmp/ACAI/issues/100)
