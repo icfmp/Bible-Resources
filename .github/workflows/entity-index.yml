@@ -919,7 +919,7 @@ jobs:
           spec.loader.exec_module(mod)
           raw = Path("entity-index/dist/BSI-0.1.0-RELEASE-CANDIDATE.zip").read_bytes()
           manifest = mod.verify_archive(raw)
-          assert manifest["status"] == "release_candidate"
+          assert manifest["status"] == "versioned_distribution"
           assert manifest["excluded_categories"] == ["keyterm"]
           assert manifest["record_count"] > 5000
           print("BSI_CANDIDATE_ARCHIVE_VERIFIED", json.dumps({
