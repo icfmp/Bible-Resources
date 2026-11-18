@@ -2,6 +2,33 @@
 
 ## Final verified whole-canon result
 
+**Two distinct final private reader candidates are now compiled and fully
+tested**, rather than allowing unapproved corrections into the conservative
+OSIS candidate:
+
+| Candidate | Original/source-preserving and proposed hyperlinks in full OSIS | K-level links | First-K text and link parity |
+| --- | ---: | ---: | --- |
+| `MHCCPREFACES` — conservative 56-intro edition, 176 source-only provenance notes, no unapproved source-target repairs | **1,192** | **744** | **4,049 / 4,049 exact** |
+| `MHCCPREFACEREPAIR` — separately labelled **UNAPPROVED** 56-intro review candidate with 13 additional independently witnessed proposed navigations for four defective original links | **1,205** | **757** | **4,049 / 4,049 exact** |
+
+The **1,192 conservative links** comprise **1,015** original native source
+links already represented in modern inline text/outline, **176** original
+literal source-linked references separately stored as transparent provenance
+notes, and **one** independently authenticated originally-unlinked authorial
+citation. **Nine** source markup errors and **four** unsafe original link
+destinations are intentionally excluded (the latter have a distinct 13-link
+review-only alternative). The conservative preface module **does not
+incorporate** these 13 unapproved editorial fixes.
+
+[Independent native SWORD dual-variant gate #44338583819](
+https://github.com/icfmp/Bible-Resources/actions/runs/44338583819)
+**SUCCESS**: both variants built through `osis2mod`, then all
+**4,049 / 4,049 original source-owned first-K modern text bodies and their
+ordered embedded cross-reference target/label identities** matched the
+respective prior linked version, with all **28,792** numbered SWORD keys
+preserved. The 50 new introductions did not change existing commentary.
+No compiled payload or unpublished authored prose was distributed.
+
 **All 56/56 prepared modern book introductions have now been placed once
 in a separate, still-unpublished private OSIS/SWORD candidate.** The pinned
 original SWORD source, all 1,189 modern manuscripts and all previous
@@ -31,12 +58,13 @@ cross-references remain unchanged.
 https://github.com/icfmp/Bible-Resources/actions/runs/44337517917)
 **SUCCESS**. It verified all **50** newly inserted introductions in
 their compiled real chapter-I entries; the existing Genesis was not
-duplicated. Crucially, independent full-SWORD comparison against the
-previous modern candidate proved that **4,049 / 4,049 source-owned
-commentary K bodies have identical complete visible Unicode text and
-identical original link-target/display ordering**. Their **757 K-level
-Scripture reference elements** remain exactly matched; all **28,792
-SWORD indexed verse addresses** are preserved. [General Validate
+duplicated. Crucially, independent full-SWORD comparison proved that **4,049 /
+4,049 source-owned commentary K bodies have identical complete visible
+Unicode text and identical original link-target/display ordering** in
+both separately compiled variants: **744** K-level Scripture links in
+the conservative candidate and **757** in the separately flagged 13-link
+correction proposal candidate. All **28,792 SWORD indexed verse
+addresses** are preserved. [General Validate
 #44337517632](https://github.com/icfmp/Bible-Resources/actions/runs/44337517632)
 and [tool registry #44337517743](
 https://github.com/icfmp/Bible-Resources/actions/runs/44337517743)
