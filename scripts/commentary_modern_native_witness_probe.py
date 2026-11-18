@@ -68,6 +68,7 @@ def inspect_source(*, reader: Path, root: Path, receipt: Path,
     if not isinstance(cases, list) or not cases:
         raise ValueError("No source witness probes supplied")
     keys_needed = set()
+    chapters_to_check = {case["chapter"] for case in cases}
     for case in cases:
         if len(case.get("anchors", [])) < 2 and not case.get("reference_targets_to_probe"):
             raise ValueError("Case must have multiple independent source anchors")
@@ -81,6 +82,10 @@ def inspect_source(*, reader: Path, root: Path, receipt: Path,
             raise ValueError("Source-group SHA or exact native key boundary mismatch: " + chapter)
         keys_needed.update((case["first"], case["last"]))
     original_raw: dict[str, bytes] = {}
+    # Inspect other native K/I bodies in each affected chapter when a lexical
+    # source witness is absent from its expected source body. Keep raw in
+    # memory only, deduplicated by content hash.
+    chapter_bodies: dict[str, dict[str, bytes]] = {ch: {} for ch in chapters_to_check}
     env = os.environ.copy()
     env["SWORD_PATH"] = str(root.resolve())
     module_id = witness.get("native_module_id", "")
@@ -96,6 +101,12 @@ def inspect_source(*, reader: Path, root: Path, receipt: Path,
                 if key in original_raw:
                     raise ValueError("Duplicate exact original K key")
                 original_raw[key] = raw
+            chapter = (key.rsplit(".", 1)[0] if kind == "K" else
+                       key[:-2] if kind == "I" and key.endswith(".0") else
+                       key if kind == "I" else "")
+            if chapter in chapter_bodies:
+                chapter_bodies[chapter].setdefault(
+                    hashlib.sha256(raw).hexdigest(), raw)
         report, _, _, _ = parse_native_raw_corpus(proc.stdout, on_entry=collect)
         proc.stdout.close()
         if proc.wait(timeout=30) != 0:
@@ -126,6 +137,22 @@ def inspect_source(*, reader: Path, root: Path, receipt: Path,
             "found_in_exact_published_native_body": (
                 anchor_found(words, a["words"]) if parseable else False)
         } for a in case["anchors"]]
+        for anchor, result in zip(case["anchors"], checks):
+            if not result["found_in_exact_published_native_body"]:
+                # A missing phrase could be indexed under another entry in
+                # the same chapter. Test that possibility without exporting
+                # original authorial words or raw markup.
+                matches = 0
+                for other_hash, other_raw in chapter_bodies[case["chapter"]].items():
+                    if other_hash == case["sha"]:
+                        continue
+                    try:
+                        other_text, _, _ = visible_text_and_references(other_raw)
+                    except ET.ParseError:
+                        continue
+                    if anchor_found(word_tokens(other_text), anchor["words"]):
+                        matches += 1
+                result["matching_other_native_K_I_bodies_in_same_chapter"] = matches
         targets = [{
             "expected_target": t,
             "exact_native_reference_attribute_present": t in refs,
@@ -139,6 +166,7 @@ def inspect_source(*, reader: Path, root: Path, receipt: Path,
             "original_visible_words_count": len(words),
             "markup_counts": markup,
             "secondary_witness_anchor_checks": checks,
+            "distinct_native_K_I_bodies_examined_in_chapter": len(chapter_bodies[case["chapter"]]),
             "requested_original_reference_checks": targets,
             "all_witness_anchors_found": all(c["found_in_exact_published_native_body"] for c in checks),
             "lexical_anchor_only_not_complete_semantic_review": True,
