@@ -58,6 +58,62 @@
       "new_target": "Heb.9.9 Heb.10.1 Heb.10.4",
       "visible_label_sha256": "1ee6ae04b61b4169d42932f305e6651db5c07d67632041ef79752d7e453fd2fd",
       "evidence_url": "https://ccel.org/h/henry/mhc2/MHC44013.HTM"
+    },
+    {
+      "original_line": 50767,
+      "source_book": "Prov",
+      "old_target": "Pr.10.19 11.12 12.23 13.3 17.27 28 29.11 20",
+      "new_target": "Prov.10.19 Prov.11.12 Prov.12.23 Prov.13.3 Prov.17.27 Prov.17.28 Prov.29.11 Prov.29.20",
+      "visible_label_sha256": "f2a5221bc12b4304be0ab5a80bb0de77fa115c60fc60027ab3798e2b123146b4",
+      "evidence_url": "https://ccel.org/h/henry/mhc2/MHC20031.HTM"
+    },
+    {
+      "original_line": 50794,
+      "source_book": "Prov",
+      "old_target": "Pr.16.3 18.10 23.26 27.1 28.25 29.25",
+      "new_target": "Prov.16.3 Prov.18.10 Prov.23.26 Prov.27.1 Prov.28.25 Prov.29.25",
+      "visible_label_sha256": "54d5410331b0e2b3b1f64ffac3efba4b2e1e2e6ff97904a87ce539e0492a2d7c",
+      "evidence_url": "https://ccel.org/h/henry/mhc2/MHC20031.HTM"
+    },
+    {
+      "original_line": 50803,
+      "source_book": "Prov",
+      "old_target": "Pr.17.17 18.24 27.9 10 14 17",
+      "new_target": "Prov.17.17 Prov.18.24 Prov.27.9 Prov.27.10 Prov.27.14 Prov.27.17",
+      "visible_label_sha256": "a41928126a4bbfa188e0ab514d1e4fc8d4ceecac8cb7f1081d9ae4fb3edb3f5d",
+      "evidence_url": "https://ccel.org/h/henry/mhc2/MHC20031.HTM"
+    },
+    {
+      "original_line": 52749,
+      "source_book": "Isa",
+      "old_target": "2Ki 2.3 4.1 38 5.22 6.1",
+      "new_target": "2Kgs.2.3 2Kgs.4.1 2Kgs.4.38 2Kgs.5.22 2Kgs.6.1",
+      "visible_label_sha256": "6d91396b8e3749505b53c0649581d4b0f09003ade377403e63526f578bd83240",
+      "evidence_url": "https://www.ccel.org/h/henry/mhc2/MHC00004.HTM"
+    },
+    {
+      "original_line": 95558,
+      "source_book": "John",
+      "old_target": "1Jo.1.1 2Pe 1.16",
+      "new_target": "1John.1.1 2Pet.1.16",
+      "visible_label_sha256": "407e93b91f388dfeb592e3a85d73242b0c649205620dbb3ee247e25f916b0bfc",
+      "evidence_url": "https://ccel.org/h/henry/mhc2/MHC43019.HTM"
+    },
+    {
+      "original_line": 109003,
+      "source_book": "Phlm",
+      "old_target": "Col.3.1 2Pe 2.4",
+      "new_target": "Col.3.1 2Pet.2.4",
+      "visible_label_sha256": "b01904e727eb7a3cd1d5aa986937bd96df211eb702310a358133eb14929a062e",
+      "evidence_url": "https://www.ccel.org/h/henry/mhc2/MHC57001.HTM"
+    },
+    {
+      "original_line": 112877,
+      "source_book": "Jude",
+      "old_target": "1Ti.4.1 2Ti 3.1 2Pe 3.3",
+      "new_target": "1Tim.4.1 2Tim.3.1 2Pet.3.3",
+      "visible_label_sha256": "1891daa20a835a752788232beccc02c648652692e97e1b0a5847f0f5e456d036",
+      "evidence_url": "https://www.ccel.org/h/henry/mhc2/MHC65001.HTM"
     }
   ]
 }
