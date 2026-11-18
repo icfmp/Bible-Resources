@@ -287,6 +287,42 @@ jobs:
           print("ALL_ORIGINAL_LINK_IDENTITIES_PASS K=28742 units=4047 "
                 "original_links=1204 linked_units=669; modern fidelity unapproved")
           PY
+      - name: Check proposed original cross-reference error dispositions against modern manuscripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_modern_reference_gate.py \
+            --native-reader "$RUNNER_TEMP/commentary-modern-source-raw" \
+            --module-directory "$RUNNER_TEMP/mhcc-source-root" \
+            --module-id MHCC \
+            --native-receipt "$RUNNER_TEMP/mhcc-modern-whole-canon-native-receipt.json" \
+            --original-link-identity-report "$RUNNER_TEMP/mhcc-modern-all-original-link-identity-sha.json" \
+            --disposition-manifest work/mhcc-modern/production/GENESIS_EXODUS_REFERENCE_DISPOSITIONS.json \
+            --repository-root . \
+            --report "$RUNNER_TEMP/mhcc-modern-proposed-link-correction-dispositions.json"
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          result = json.loads((Path(os.environ["RUNNER_TEMP"]) /
+              "mhcc-modern-proposed-link-correction-dispositions.json").read_text())
+          assert result["status"] == (
+              "PINNED_SOURCE_AND_MODERN_CORRECTION_CANDIDATES_CHECKED_NOT_RELEASED")
+          assert result["reviewed_source_link_groups"] == 4
+          assert result["reviewed_original_hyperlink_elements_in_groups"] == 25
+          assert result["source_links_proposed_to_omit"] == 6
+          assert result["source_links_proposed_to_retarget"] == 1
+          assert result["secondary_witness_links_proposed_to_add"] == 1
+          assert result["original_link_proposal_actions_reviewed"] == 7
+          assert result["source_link_target_and_label_hashes_checked_in_original_order"]
+          assert result["modern_section_scope_and_marker_presence_checked"]
+          assert not result["real_native_source_changes"]
+          assert not result["derived_SWORD_link_placements_or_native_readbacks_tested"]
+          assert not result["editorial_translation_approved"]
+          assert not result["release_authorized"]
+          print("PROPOSED_SOURCE_LINK_ANOMALY_DISPOSITIONS_PASS 7 bad published "
+                "link elements, 6 list-number omissions, 1 corrected reference "
+                "target, 1 witness-backed missing link; NO release")
+          PY
       - name: Probe five original SWORD source-body scopes against independent English anchors
         shell: bash
         run: |
@@ -1464,6 +1500,7 @@ jobs:
             ${{ runner.temp }}/mhcc-modern-source-native-receipt.json
             ${{ runner.temp }}/mhcc-modern-whole-canon-native-receipt.json
             ${{ runner.temp }}/mhcc-modern-all-original-link-identity-sha.json
+            ${{ runner.temp }}/mhcc-modern-proposed-link-correction-dispositions.json
             ${{ runner.temp }}/mhcc-modern-five-native-source-witness-probes.json
             ${{ runner.temp }}/mhcc-crosswire-five-native-source-receipt.json
             ${{ runner.temp }}/mhcc-crosswire-five-native-witness-probes.json
