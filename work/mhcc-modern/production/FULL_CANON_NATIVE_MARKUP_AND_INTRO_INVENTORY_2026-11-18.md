@@ -45,6 +45,12 @@ All counts below traverse each chapter's **distinct original K raw body once**, 
 
 Highest individually linked original bodies for focused preservation testing include: `Exod.12.1–20` (**13** reference elements), `Ezek.8.1–6` (**8**), `Exod.14.21–31` (**7**), `Exod.29.1–37` (**7**), and `Gen.3.6–8` (**5**). These scopes come from the original native receipt; no conclusion about missing modern links can be drawn merely from their original counts.
 
+## One noncontiguous native K body — Matthew 13
+
+The same whole-canon SHA-pinned source-group inventory identified **one** source body whose original occupied K addresses form disjoint runs: `Matt.13.24–30` **and** `Matt.13.36–43` (15 addresses), with one authored original body. **`Matt.13.31–35` belongs to a separate original raw K body** (five addresses). This is a source-key topology property, **not** an invitation to write or reassign text. The modern manuscript `accepted/matthew-13.md` already expresses these two disjoint runs in one heading and separately covers 31–35. No new textual correction is warranted.
+
+The generic metadata-to-modern draft guard must validate the **exact occupied verse-key set**, not merely the first and last key. In particular, it must reject an apparently convenient `Matt.13.24–43` continuous range because that would shadow the genuine intervening commentary body. A regression test now covers correct and invalid noncontiguous headings; the temporary OSIS `annotateRef` serialization is also tested for two separated groups. The already established five source-to-modern **topology mismatch** cases remain a different category; this Matthew 13 topology is present and correctly represented in the draft.
+
 ## Proven actual introduction ownership (the original I namespace is not uniform)
 
 The same authenticated receipt records twelve nonempty I addresses, whose content **types are not equivalent**:
