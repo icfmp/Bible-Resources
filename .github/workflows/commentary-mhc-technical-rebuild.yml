@@ -5,6 +5,8 @@ on:
     paths:
       - "scripts/rebuild_osis_commentary.py"
       - "tests/test_rebuild_osis_commentary.py"
+      - "scripts/clean_source_osis.py"
+      - "tests/test_clean_source_osis.py"
       - ".github/workflows/commentary-mhc-technical-rebuild.yml"
       - "config/commentary-intake/mhc-crosswire.json"
   workflow_dispatch:
@@ -22,7 +24,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python -m pip install -r requirements.txt -q
           PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_rebuild_osis_commentary.py' -v
+          PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_clean_source_osis.py' -v
       - name: Install stock libSWORD compiler and native reader headers
         shell: bash
         run: |
@@ -61,6 +65,40 @@ jobs:
               raise SystemExit("MHC original OSIS size/SHA mismatch; abort")
           print("Verified pinned official OSIS commit, exact bytes and checksum")
           PY
+      - name: Audit and clean original OSIS cosmetic artifacts in isolated storage
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          export ORIGINAL="$RUNNER_TEMP/original-mhc/mhc.osis.xml"
+          export CLEANED="$RUNNER_TEMP/mhc-cleaned.osis.xml"
+          export RECEIPT="$RUNNER_TEMP/mhc-cleanup-receipt.json"
+          python - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
+          source_sha=manifest["commentary_source"]["original_authoring_osis"]["authoring_osis_sha256"]
+          args=[sys.executable,"scripts/clean_source_osis.py",
+                "--source",os.environ["ORIGINAL"],"--sha256",source_sha,
+                "--private-output",os.environ["CLEANED"]]
+          with Path(os.environ["RECEIPT"]).open("xb") as result:
+              subprocess.run(args,stdout=result,check=True,timeout=140)
+          receipt=json.loads(Path(os.environ["RECEIPT"]).read_text())
+          if (receipt["status"]!="PRIVATE_OSIS_COSMETIC_CANDIDATE_NOT_EDITORIALLY_APPROVED"
+                  or receipt["source_sha256"]!=source_sha
+                  or not receipt["all_original_osis_elements_and_attributes_preserved"]
+                  or not receipt["all_note_and_reference_text_preserved"]
+                  or not receipt["asterisks_and_potential_note_markers_unmodified"]
+                  or receipt["published"]):
+              raise SystemExit("Unreviewed OSIS cleanup scope or failure")
+          print("Exact SHA-pinned original OSIS processed as a private cleaned candidate")
+          print("Cleaned source SHA-256:",receipt["cleaned_sha256"])
+          print("Cosmetic operations (text-free):",receipt["cleanup_changes"])
+          print("Potential marker counts (not automatically removed):",
+                {k:v for k,v in receipt["original_suspicious_token_census"].items()
+                 if "asterisk" in k or "zero_width" in k})
+          print("All elements, attributes, note bodies, link bodies retained")
+          PY
       - name: Compile fresh private zCom4, then independently read EVERY occupied key
         shell: bash
         run: |
@@ -73,9 +111,10 @@ jobs:
           manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
           source=manifest["commentary_source"]["original_authoring_osis"]
           root=Path(os.environ["RUNNER_TEMP"])
+          cleanup=json.loads((root/"mhc-cleanup-receipt.json").read_text())
           cmd=[sys.executable, "scripts/rebuild_osis_commentary.py",
-               "--source",str(root/"original-mhc"/source["authoring_osis_file"]),
-               "--sha256",source["authoring_osis_sha256"],
+               "--source",str(root/"mhc-cleaned.osis.xml"),
+               "--sha256",cleanup["cleaned_sha256"],
                "--private-work",os.environ["SWORD_PATH"],
                "--module","MHCStage1",
                "--language",manifest["language"],
@@ -96,6 +135,11 @@ jobs:
           print("Native numbered entries:",data["native_occupied_numbered_keys"])
           print("Native introduction entries:",data["native_occupied_introduction_keys"])
           print("Native TOP entries:",data["native_occupied_opaque_top_keys"])
+          if (data["native_occupied_numbered_keys"]!=31098
+                  or data["native_occupied_introduction_keys"]!=1255
+                  or data["native_occupied_opaque_top_keys"]!=2):
+              raise SystemExit("Cleaned rebuild changed original native key coverage")
+          print("Index key counts exactly match pinned original MHC")
           print("No historical source collations or editorial corrections performed")
           print("Full source-to-output textual parity is NOT yet certified")
           PY
