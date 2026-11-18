@@ -114,6 +114,30 @@
       "new_target": "1Tim.4.1 2Tim.3.1 2Pet.3.3",
       "visible_label_sha256": "1891daa20a835a752788232beccc02c648652692e97e1b0a5847f0f5e456d036",
       "evidence_url": "https://www.ccel.org/h/henry/mhc2/MHC65001.HTM"
+    },
+    {
+      "original_line": 62922,
+      "source_book": "Ezek",
+      "old_target": "La 4.3 4 5.10",
+      "new_target": "Lam.4.3 Lam.4.4 Lam.5.10",
+      "visible_label_sha256": "0409f782bfa828b0c0eba8ec5ce2b27c40b760c3e8f25cf90e480ea715bf8d43",
+      "evidence_url": "https://ccel.org/ccel/henry/mhc4/mhc4.Ez.v.html"
+    },
+    {
+      "original_line": 67688,
+      "source_book": "Hos",
+      "old_target": "Ho 4.15 12.11 Am 4.4 5.5",
+      "new_target": "Hos.4.15 Hos.12.11 Amos.4.4 Amos.5.5",
+      "visible_label_sha256": "f753b797b890fb028fdd69d87013ee04e339a3313f120cc1eb6d348f549e5d1c",
+      "evidence_url": "https://www.ccel.org/h/henry/mhc2/MHC28009.HTM"
+    },
+    {
+      "original_line": 98022,
+      "source_book": "Acts",
+      "old_target": "De.7.7 8 9.5 6 Mt 20.10",
+      "new_target": "Deut.7.7 Deut.7.8 Deut.9.5 Deut.9.6 Matt.20.10",
+      "visible_label_sha256": "65e4c70c357a607c1c4640d85777c252afdddbb6b6dce442aa444c884ed2d7d4",
+      "evidence_url": "https://www.ccel.org/h/henry/mhc2/MHC44010.HTM"
     }
   ]
 }
