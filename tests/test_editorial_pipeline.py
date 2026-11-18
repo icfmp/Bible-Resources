@@ -369,6 +369,37 @@ class EditorialPipelineTests(unittest.TestCase):
         self.assertEqual(bad["counts"]["source_intro_reference_body_metadata_missing_from_native"],1)
         self.assertEqual(self.source.read_bytes(),original)
 
+    def test_commentary_book_end_tail_is_not_mistaken_for_corrupted_verse(self):
+        from audit_osis import (source_commentary_overlap_witness,
+                                source_commentary_book_closing_text,
+                                classify_commentary_native_final_boundary)
+        self.write(
+            '<chapter sID="Gen.1" osisID="Gen.1" n="1"/>'
+            '<verse sID="Gen.1.1" osisID="Gen.1.1" n="1"/>'
+            '<p>Authored final passage.</p>'
+            '<verse eID="Gen.1.1"/>'
+            '<p>AFTERWORD.</p>'
+            '<chapter eID="Gen.1"/>',kind="commentary")
+        before=self.source.read_bytes()
+        groups=[]
+        source_commentary_overlap_witness(self.source,groups_out=groups)
+        closings=source_commentary_book_closing_text(self.source)
+        self.assertEqual(closings["Gen"]["last_source_scope"],"Gen.1.1")
+        self.assertIn("AFTERWORD.",closings["Gen"]["closing_text"])
+        result=classify_commentary_native_final_boundary(
+            groups[0],b"<p>Authored final passage. AFTERWORD.</p>",
+            closings["Gen"]["closing_text"])
+        self.assertIn(result["class"],{
+            "native_suffix_exactly_contains_original_book_closing_text",
+            "native_suffix_matches_authored_closing_without_whitespace",
+        })
+        lost=classify_commentary_native_final_boundary(
+            groups[0],b"<p>Authored final passage. INVALID END.</p>",
+            closings["Gen"]["closing_text"])
+        self.assertEqual(lost["class"],
+                         "native_suffix_not_explained_by_source_book_closing")
+        self.assertEqual(before,self.source.read_bytes())
+
     def test_commentary_punctuation_notes_and_reference_targets_not_silently_lost(self):
         from audit_osis import (
             source_commentary_overlap_witness,
