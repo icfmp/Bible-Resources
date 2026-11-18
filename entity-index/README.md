@@ -55,6 +55,11 @@ For the first version's bounded common-noun/topic acceptance examples, see
 [24-case named-entity review](V0_1_NAME_PILOT.md). This is an explicitly
 nonexhaustive source-candidate study, not a dictionary or published release.
 
+The first version's **internal-only** build receipt, licensing caveats and
+Bible consumer integration contract are in
+[the v0.1 candidate handoff](V0_1_CANDIDATE_HANDOFF.md).
+This is not a released or approved resource.
+
 ## Initial independent editorial corrections
 
 The declarative file `editorial-decisions.json` describes all changes.
