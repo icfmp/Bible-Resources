@@ -222,5 +222,113 @@ class FullCanonicalProductionMarkupTests(unittest.TestCase):
 
 
 
+
+class OriginalFirstKBookPrefaceOverlayTests(unittest.TestCase):
+    def test_two_verified_native_first_K_prefaces_include_existing_once(self):
+        from copy import deepcopy
+        from commentary_modern_draft_osis_preview import (
+            overlay_native_first_K_book_prefaces, _SOURCE_CORPUS, _SOURCE_ZIP)
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            bookdata={
+                "Gen":("genesis","Genesis"),
+                "Ruth":("ruth","Ruth"),
+            }
+            source={"original_compiled_corpus_sha256":_SOURCE_CORPUS,
+                    "chapters":{}}
+            cases=[]
+            xml=ET.Element(f"{{{NS}}}osis")
+            for book,(slug,name) in bookdata.items():
+                chapter=ET.SubElement(xml,f"{{{NS}}}chapter",{
+                    "osisID":book+".1"})
+                if book=="Gen":
+                    intro=ET.SubElement(chapter,f"{{{NS}}}div",{
+                        "type":"introduction",
+                        "resp":"BibleResourcesModernManuscriptEditorialGrouping"})
+                    ET.SubElement(intro,f"{{{NS}}}title").text=(
+                        "Genesis — Book introduction")
+                    ET.SubElement(intro,f"{{{NS}}}p").text=(
+                        "These words already describe the book faithfully.")
+                sec=ET.SubElement(chapter,f"{{{NS}}}div",{
+                    "type":"section","annotateType":"commentary",
+                    "annotateRef":book+".1.1"})
+                ET.SubElement(sec,f"{{{NS}}}p").text="Authenticated chapter prose."
+                if book=="Ruth":
+                    ref=ET.SubElement(sec,f"{{{NS}}}reference",{
+                        "osisRef":"John.1.1"})
+                    ref.text="John 1:1"
+                source["chapters"][book+".1"]={
+                    "original_units":[{
+                        "first_key":book+".1.1",
+                        "source_unit_sha256":("a" if book=="Gen" else "b")*64
+                    }]
+                }
+                body=("These words already describe the book faithfully."
+                      if book=="Gen" else
+                      "A separately presented first-K original book preface.")
+                path=root/(slug+"-book-introduction.CANDIDATE.md")
+                path.write_text(
+                    '---\n'
+                    f'book_osis: "{book}"\n'
+                    'status: "PRODUCTION CANDIDATE — EDITORIAL ACCEPTANCE PENDING"\n'
+                    'source_module: "MHCC 0.1.1"\n'
+                    f'source_zip_sha256: "{_SOURCE_ZIP}"\n'
+                    f'source_native_corpus_sha256: "{_SOURCE_CORPUS}"\n'
+                    '---\n'
+                    f'# {name} — Book introduction (candidate)\n\n'
+                    f'{body}\n'
+                    '---\n## Editorial witness\nSource privately checked.\n',
+                    encoding="utf-8")
+                cases.append({
+                    "book":book,
+                    "candidate_path":"work/mhcc-modern/production/"+path.name,
+                    "original_first_K":book+".1.1",
+                    "source_native_first_K_raw_sha256":
+                        ("a" if book=="Gen" else "b")*64,
+                    "source_div1_prose_all_tokens_contiguous_in_original_first_K":True,
+                    "modern_accepted_first_chapter_has_book_intro_heading":
+                        book=="Gen",
+                })
+            review={
+                "status":"PINNED_SOURCE_NATIVE_VS_CCEL_51_BOOK_PREFACE_TRIAGE_NOT_APPROVAL",
+                "source_native_corpus_sha256":_SOURCE_CORPUS,
+                "CCEL_text_sha256":
+                    "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+                "source_or_modern_prose_exported":False,
+                "silent_intro_insertion_approved":False,
+                "release_authorized":False,
+                "original_first_K_source_pinned_book_intro_candidates":2,
+                "cases":cases}
+            base=ET.tostring(xml,encoding="utf-8")
+            out,report=overlay_native_first_K_book_prefaces(
+                base_osis=base,native=source,review=review,candidates_dir=root)
+            self.assertEqual(report["source_attested_first_K_candidate_book_intros"],2)
+            self.assertEqual(report["already_in_modern_manuscript_not_duplicated"],1)
+            self.assertEqual(report["new_book_intros_inserted_as_separate_introduction_OSIS"],1)
+            self.assertEqual(report["quarantined_original_word_stream_mismatches"],0)
+            doc=ET.fromstring(out)
+            for book in bookdata:
+                ch=doc.find(f".//{{{NS}}}chapter[@osisID='{book}.1']")
+                self.assertEqual(len(ch.findall(
+                    f"./{{{NS}}}div[@type='introduction']")),1)
+                self.assertEqual(len(ch.findall(
+                    f"./{{{NS}}}div[@annotateType='commentary']")),1)
+            self.assertEqual(len(doc.findall(f".//{{{NS}}}reference")),1)
+            wrong=deepcopy(review)
+            wrong["cases"][1]["source_native_first_K_raw_sha256"]="c"*64
+            with self.assertRaises(ValueError):
+                overlay_native_first_K_book_prefaces(
+                    base_osis=base,native=source,review=wrong,
+                    candidates_dir=root)
+            quarantine=deepcopy(review)
+            quarantine["cases"][1][
+                "source_div1_prose_all_tokens_contiguous_in_original_first_K"]=False
+            out2,report2=overlay_native_first_K_book_prefaces(
+                base_osis=base,native=source,review=quarantine,
+                candidates_dir=root)
+            self.assertEqual(report2["quarantined_original_word_stream_mismatches"],1)
+            self.assertEqual(report2["new_book_intros_inserted_as_separate_introduction_OSIS"],0)
+
+
 if __name__ == "__main__":
     unittest.main()
