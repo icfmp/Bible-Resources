@@ -454,7 +454,7 @@ descriptions without firmer person-role evidence.
 No anonymous person was merged with an explicitly named historical
 person. No other referent groups were removed. Exact pinned original
 source records remain byte-identical, and source edits stay declarative,
-reversible and fully audited. The **2,353 indirect-only overlaps** still
+reversible and fully audited. The **2,348 indirect-only overlaps** still
 require separate source-role and participant semantics review.
 
 ## Indirect person-overlap source-grammar triage — no mass deduplication
@@ -478,10 +478,10 @@ event or whether one anonymous pronoun refers to them.
 
 The original complete pinned morphology audit found **1,289 Greek**
 and **1,096 Hebrew** indirect-only word overlaps. A subsequent
-exact-token contextual correction in the derived index removed thirty-two
-false exact-word person-overlap cases; the remaining **2,353** word overlaps comprise
-**1,281 Greek** and **1,072 Hebrew**. Their source-word grammatical
-counts are **2,094 plural**, **64 singular** and **195 without number**
+exact-token contextual correction in the derived index removed thirty-seven
+false exact-word person-overlap cases; the remaining **2,348** word overlaps comprise
+**1,281 Greek** and **1,067 Hebrew**. Their source-word grammatical
+counts are **2,094 plural**, **59 singular** and **195 without number**
 (often infinitives).
 These are categories of the source word, not conclusions about the
 people tagged on it. Several repeated candidate cohorts (e.g. Paul/Silas/Timothy; Aaron/Moses;
@@ -685,6 +685,43 @@ versification, repeated original annotations and all unrelated
 identity candidates are unchanged. Other singular, plural and
 unmarked indirect claims remain **uncertified** pending their
 own passage-by-passage review.
+
+## Distinguishing similarly named men at exact source pronouns
+
+Two further source-level homonym groups previously conflated
+historically distinct individuals on five grammatically singular
+original-word IDs, despite correct explicit names being present:
+
+- **Ezra 2:61 and Nehemiah 7:63:** `person:Barzillai` is
+  the Gileadite elder who aided King David, and
+  `person:Barzillai.3` is a priestly-family descendant
+  who married a daughter of that elder's line and acquired
+  the name Barzillai. In both verses the verbs
+  *had taken [a wife]* and *was called [by their name]*
+  describe **the priestly man**, not the separate Gileadite elder.
+  The latter person's four false verb-subject pointers are removed;
+  the two original name tokens for each distinct individual,
+  both verse references, and the priest's original verb groups
+  are retained.
+- **2 Chronicles 22:6:** `person:Jehoram` is the king of
+  **Judah** (father of Ahaziah) named earlier in the verse;
+  `person:Joram.3` is the different king of **Israel**
+  (son of Ahab), whom Ahaziah visits at Jezreel. The last
+  Hebrew personal pronoun `o140220060281` ("he was sick")
+  has a pinned Macula `participantref=140220060221`,
+  identifying the Israelite king. Frozen ACAI also has the
+  `person:Jehoram.3` **source alias** for canonical
+  `person:Joram.3`; keep **both source records** and
+  both exact original name/pronoun claims. Remove only the erroneous
+  Judahite king's claim on that pronoun, preserving both
+  distinct historical persons and the valid original verse.
+
+These five contextual edits do not equate namesakes and make
+no change to the underlying source. They are reversible exact
+group removals with evidence in `editorial-decisions.json`;
+the original Hebrew words, source group multiplicity, verse
+numbers, frozen original source and all 134,822 active word
+identifiers remain unchanged.
 
 ## Scoped review of all eight remaining explicit-person overlaps
 

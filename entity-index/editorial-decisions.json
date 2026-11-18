@@ -984,6 +984,49 @@
         "Pinned SBLGNT Acts 21:37 n44021037023 γινώσκεις V-PAI-2S, second-person-singular 'do you know', addressed by the tribune to Paul in the exact quoted question.",
         "Clear-Bible/macula-greek@8423afe47b9e8f24b7772e808af45c7159a6fe7e SBLGNT original TSV and frozen ACAI person:MilitaryMember / person:Paul"
       ]
+    },
+    {
+      "source_id": "person:Barzillai",
+      "action": "amend_occurrences",
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o150020610101"
+          ],
+          [
+            "o150020610152"
+          ],
+          [
+            "o160070630101"
+          ],
+          [
+            "o160070630152"
+          ]
+        ]
+      },
+      "reason": "Ezra 2:61 and Nehemiah 7:63 distinguish the descendant priest who married a daughter of Barzillai the Gileadite and assumed that family name from Barzillai the Gileadite himself (the older family namesake who supported David). The Hebrew singular verb 'took [a woman]' and passive 'was called [by their name]' refer to the marrying priest, already indexed as person:Barzillai.3, not the historically distinct Gileadite elder in person:Barzillai. The two direct proper-name tokens naming the Gileadite elder and both original verse references remain unchanged.",
+      "evidence": [
+        "Pinned WLC Ezra 2:61 o150020610101 (לָקַח 'had taken'), o150020610152 (יִּקָּרֵא 'was called'); Nehemiah 7:63 o160070630101 and o160070630152. In both verses the priest first named Barzillai marries a daughter of Barzillai the Gileadite. Original frozen ACAI person:Barzillai is the Gileadite elder, person:Barzillai.3 the marrying priest; both have independent explicit name records and original word groups.",
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/15-Ezr-002-lowfat.xml and WLC/lowfat/16-Neh-007-lowfat.xml",
+        "Frozen ACAI names at icfmp/ACAI@e80a874e8282f996199c595378a3b3b9a43aac22 people/json/Barzillai.json and Barzillai.3.json"
+      ]
+    },
+    {
+      "source_id": "person:Jehoram",
+      "action": "amend_occurrences",
+      "remove_pronominal_referents": {
+        "wlc": [
+          [
+            "o140220060281"
+          ]
+        ]
+      },
+      "reason": "2 Chronicles 22:6 explicitly names two different rulers: Jehoram king of Judah, the father of Ahaziah, and Joram son of Ahab king of Israel. The final singular personal pronoun הוּא ('he was sick') directly follows the second man and the visit to him at Jezreel, while the pinned Macula Hebrew participantref 140220060221 points at Joram king of Israel. Do not attach the sick man pronoun to the historically distinct father of Ahaziah (person:Jehoram); preserve both kings' explicit name words and the valid source verse reference for Jehoram.",
+      "evidence": [
+        "Pinned WLC 2 Chronicles 22:6 o140220060281 personal pronoun Pp3ms 'he', Macula participantref 140220060221 (= Joram son of Ahab), while o140220060161 separately names Jehoram king of Judah as father of Ahaziah.",
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/14-2Ch-022-lowfat.xml",
+        "Frozen ACAI person:Jehoram = Judahite son of Jehoshaphat, person:Joram.3 = Israelite son of Ahab (distinct people)."
+      ]
     }
   ]
 }

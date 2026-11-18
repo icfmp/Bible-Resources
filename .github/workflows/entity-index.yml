@@ -83,7 +83,7 @@ jobs:
           assert stats["source_records"] == 6644, stats
           assert stats["index_entities"] == 6641, stats
           assert stats["quarantined_records"] == 3, stats
-          assert stats["reviewed_entries"] == 36, stats
+          assert stats["reviewed_entries"] == 38, stats
           assert stats["unattested_distinct_source_words"] == 18, stats
           assert stats["indexed_distinct_source_words"] == 134822, stats
           assert len(index["unattested_source_words"]) == 18
@@ -349,6 +349,32 @@ jobs:
                                   for hit in hits),(word,hits)
           assert not any(x["entity_id"]=="person:Levi.3"
                          for x in index["by_word"]["wlc:o160080100012"])
+          # Namesakes remain separate, original proper-name references
+          # survive, and exact singular verbs/pronoun use the correct person.
+          for word in ("o150020610101","o150020610152",
+                       "o160070630101","o160070630152"):
+              assert index["by_word"]["wlc:"+word]==[{
+                  "entity_id":"person:Barzillai.3",
+                  "link_type":"subject_referents"}],word
+          for word,person in (
+              ("o150020610081","person:Barzillai.3"),
+              ("o150020610121","person:Barzillai"),
+              ("o160070630081","person:Barzillai.3"),
+              ("o160070630121","person:Barzillai"),
+              ("o140220060161","person:Jehoram"),
+          ):
+              assert index["by_word"]["wlc:"+word]==[{
+                  "entity_id":person,"link_type":"explicit_instances"}],word
+          # Frozen ACAI has *two* source records for Israel's Joram
+          # (Jehoram.3 + Joram.3), but only one canonical person.
+          israelite_aliases={"person:Joram.3","person:Jehoram.3"}
+          for word,link in (
+              ("o140220060221","explicit_instances"),
+              ("o140220060281","pronominal_referents"),
+          ):
+              hits=index["by_word"]["wlc:"+word]
+              assert {x["entity_id"] for x in hits}==israelite_aliases,(word,hits)
+              assert all(x["link_type"]==link for x in hits),(word,hits)
           print("ENTITY_INDEX_QA", json.dumps(stats, sort_keys=True))
           PY
 
@@ -367,7 +393,7 @@ jobs:
           assert stats["distinct_person_original_word_overlap_candidates"] == len(report["findings"])
           assert stats["multiple_explicit_names"] == 8, stats
           assert stats["mixed_name_and_indirect"] == 1, stats
-          assert stats["indirect_only"] == 2353, stats
+          assert stats["indirect_only"] == 2348, stats
           assert sum(stats[x] for x in ("multiple_explicit_names", "mixed_name_and_indirect", "indirect_only")) == len(report["findings"])
           assert all(len(f["canonical_people"]) >= 2 for f in report["findings"])
           assert len(set((f["corpus"], f["word_id"]) for f in report["findings"])) == len(report["findings"])
@@ -392,11 +418,11 @@ jobs:
               "sblgnt":Path("macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv"),
           })
           stats=reviewed["statistics"]
-          assert stats["indirect_only_source_words"]==report["statistics"]["indirect_only"]==2353
-          assert stats["by_corpus"]=={"wlc":1072,"sblgnt":1281},stats
-          assert sum(stats["source_word_number_buckets"].values())==2353
-          assert sum(stats["different_canonical_people_per_word"].values())==2353
-          assert len({(x["corpus"],x["word_id"]) for x in reviewed["cases"]})==2353
+          assert stats["indirect_only_source_words"]==report["statistics"]["indirect_only"]==2348
+          assert stats["by_corpus"]=={"wlc":1067,"sblgnt":1281},stats
+          assert sum(stats["source_word_number_buckets"].values())==2348
+          assert sum(stats["different_canonical_people_per_word"].values())==2348
+          assert len({(x["corpus"],x["word_id"]) for x in reviewed["cases"]})==2348
           output=Path("entity-index/dist/indirect-person-source-forms.json")
           output.write_text(json.dumps(reviewed,ensure_ascii=False,indent=2,
                                        sort_keys=True)+"\n",encoding="utf-8")

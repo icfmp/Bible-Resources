@@ -58,6 +58,43 @@ class EntityIndexTests(unittest.TestCase):
                              source_absences, source_verse_absences,
                              reference_qualifications)
 
+    def test_namesakes_keep_distinct_explicit_names_when_speaker_is_fixed(self):
+        elder=self.write_record("people","OlderNamesake",
+            references=["15002061"],
+            explicit_instances={"wlc":[["o150020610121"]]},
+            subject_referents={"wlc":[["o150020610101"],
+                                       ["o150020610152"]]})
+        younger=self.write_record("people","MarryingNamesake",
+            references=["15002061"],
+            explicit_instances={"wlc":[["o150020610081"]]},
+            subject_referents={"wlc":[["o150020610101"],
+                                       ["o150020610152"]]})
+        before=(elder.read_bytes(),younger.read_bytes())
+        decision={
+            "source_id":"person:OlderNamesake","action":"amend_occurrences",
+            "reason":"Only the priestly descendant married and acquired a name",
+            "evidence":["Pinned original verbs and two separate persons"],
+            "remove_subject_referents":{"wlc":[
+                ["o150020610101"],["o150020610152"]]}
+        }
+        result=self.build([decision])
+        self.assertEqual(result["by_word"]["wlc:o150020610101"],[
+            {"entity_id":"person:MarryingNamesake",
+             "link_type":"subject_referents"}])
+        self.assertEqual(result["by_word"]["wlc:o150020610152"],[
+            {"entity_id":"person:MarryingNamesake",
+             "link_type":"subject_referents"}])
+        self.assertEqual(result["by_word"]["wlc:o150020610081"],[
+            {"entity_id":"person:MarryingNamesake",
+             "link_type":"explicit_instances"}])
+        self.assertEqual(result["by_word"]["wlc:o150020610121"],[
+            {"entity_id":"person:OlderNamesake",
+             "link_type":"explicit_instances"}])
+        self.assertEqual((elder.read_bytes(),younger.read_bytes()),before)
+        with self.assertRaisesRegex(ValueError,"absent group cannot be removed"):
+            self.build([dict(decision,remove_subject_referents={
+                "wlc":[["o150020610102"]]})])
+
     def test_exact_role_corrections_preserve_other_source_roles(self):
         # A role in a later narrative cannot be retroactively attached to
         # the earlier legal expert merely because the same language is used.
