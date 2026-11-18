@@ -19,8 +19,8 @@ UBS_FILES = {
     "en": "dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON",
     "fr": "dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-fr.JSON",
 }
-STRONG = re.compile(r"^([HA])0*([0-9]+)$")
-MACULA_STRONG = re.compile(r"^[0-9]+$")
+STRONG = re.compile(r"^([HA])0*([0-9]+)([a-z]?)$")
+MACULA_STRONG = re.compile(r"^([0-9]+)([a-z]?)$")
 LEX_ID = re.compile(r"^[0-9]{15}$")
 
 
@@ -62,7 +62,7 @@ def build(english, french):
             if not m:
                 skipped.add(str(raw))
                 continue
-            by_strong[f"{m.group(1)}{int(m.group(2))}"].add(mid)
+            by_strong[f"{m.group(1)}{int(m.group(2))}{m.group(3)}"].add(mid)
         for sense in senses(entry):
             sid = str(sense["LEXID"])
             if not LEX_ID.fullmatch(sid):
@@ -89,7 +89,7 @@ def build(english, french):
         },
         "policy": {
             "sdbh": "exact_15_digit_original_source_sense_id",
-            "strong": "entry_only_exact_language_specific_numeric_code",
+            "strong": "entry_only_exact_language_specific_numeric_or_suffix_code",
             "unresolved": "return_all_candidates_never_guess_contextual_sense",
             "definitions": "not_redistributed_look_up_UBS_original_edition",
         },
@@ -119,10 +119,11 @@ def lookup(index, sdbh, strongnumberx, lang):
                 "sense_ids": [sdbh],
                 "evidence": "macula_sdbh_exact",
             }
-    if lang not in ("H", "A") or not MACULA_STRONG.fullmatch(raw_strong):
+    m = MACULA_STRONG.fullmatch(raw_strong)
+    if lang not in ("H", "A") or not m:
         return {"status": "no_verified_lexical_link", "entry_ids": [],
                 "sense_ids": [], "evidence": "none"}
-    key = f"{lang}{int(raw_strong)}"
+    key = f"{lang}{int(m.group(1))}{m.group(2)}"
     candidates = index["by_strong"].get(key, [])
     return {
         "status": ("no_entry_match" if not candidates else
