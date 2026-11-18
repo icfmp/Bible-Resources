@@ -389,6 +389,35 @@ the highest-priority collisions for source-by-source follow-up under
 [inherited identity issue #75 / our tracker #299](https://github.com/icfmp/Bible-Resources/issues/299).
 A count from an old unpinned snapshot is not a release gate.
 
+## Context-specific collective names must not index as ancestors
+
+Four original mixed-candidate direct-name records have been corrected
+only in our derived index (inherited identity audit #75, original-person/
+group distinction #10). Frozen source files remain completely unchanged:
+
+- Exodus 3:18: **Israel** names the Israelite community ("elders of
+  Israel"), not Jacob, the deceased patriarch. The explicit original
+  name is added to existing `group:Israel`; the false `person:Israel`
+  verse/name and its two indirect pointer groups are detached.
+- Isaiah 22:8 and Jeremiah 22:18: **Judah** names a nation/kingdom,
+  not Jacob's son as an individual. The already-attested `group:Judah`
+  exact original-name and referent links remain. The erroneous
+  `person:Judah.4` assignments for these two verses are detached.
+- Hosea 13:1: **Ephraim** names the people/territory of the Northern
+  Kingdom through personification/metonymy, not Joseph's son personally.
+  Existing `group:Ephraim` contains all the exact source names and
+  indirect referents. Remove the identical false `person:Ephraim` links
+  only for this verse.
+
+These edits are **not** a blanket reclassification of other occurrences
+of Israel, Judah or Ephraim: the same names can legitimately refer to
+historical individuals in other passages. Generic editing support
+handles original explicit groups, pronominal groups and subject groups
+without a book-specific code branch; all removals are checked to exist
+and all additions checked to be new. Derived source-claim modifications
+are declarative, documented and reversible. This is not an edit of
+biblical words, nor a merge between an ancestor and their descendants.
+
 ## Scoped review of all eight remaining explicit-person overlaps
 
 The current complete pinned-source audit has **eight** exact original-word
@@ -417,7 +446,7 @@ one exact word ID, exact canonical candidate pair, exact pinned source
 edition and explanatory evidence; unknown/new conflicts or stale reviews
 fail the build. The review is a separate **QA-only** artifact, and
 `by_word`, the resolver's candidate multiplicity, source files and
-original-language tokens remain **untouched**. The other **18 mixed**
+original-language tokens remain **untouched**. The remaining **14 mixed**
 and **2,388 indirect-only** person overlaps are not certified by this
 direct-name review. The remaining three name/identity questions need
 contextual historical review before any final interpretation.
