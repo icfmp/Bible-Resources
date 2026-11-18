@@ -269,6 +269,130 @@
         "Pinned ACAI source e80a874e... people/json/Hur.json and people/json/Ben-hur.json explicitly claim same two-word group; the former is parent and latter is son",
         "Bible-Resources issue #299 / original ACAI #75 distinct-person word audit"
       ]
+    },
+    {
+      "source_id": "person:Israel",
+      "action": "amend_occurrences",
+      "remove_references": [
+        "02003018"
+      ],
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o020030180061"
+          ]
+        ]
+      },
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o020030180181"
+          ],
+          [
+            "o020030180242"
+          ]
+        ]
+      },
+      "reason": "Exodus 3:18 says 'elders of Israel' and speaks of the Israelite people centuries after Jacob; its proper-name Israel word and plural representative roles do not identify the deceased patriarch Jacob/Israel.",
+      "evidence": [
+        "Pinned WLC Exodus 3:18 exact word o020030180061 and following referent groups o020030180181, o020030180242; frozen person:Israel source record",
+        "https://classic.net.bible.org/verse.php?book=Exo&chapter=3&verse=18",
+        "https://github.com/icfmp/ACAI/issues/10"
+      ]
+    },
+    {
+      "source_id": "group:Israel",
+      "action": "amend_occurrences",
+      "add_references": [
+        "02003018"
+      ],
+      "add_explicit_instances": {
+        "wlc": [
+          [
+            "o020030180061"
+          ]
+        ]
+      },
+      "reason": "The named Israel of 'elders of Israel' in Exodus 3:18 is the Israelite community, not the dead patriarch; attach the attested proper name to the existing Israelite group, without inferring links for other words.",
+      "evidence": [
+        "Pinned WLC Exodus 3:18 exact Hebrew Israel proper-name o020030180061",
+        "https://classic.net.bible.org/verse.php?book=Exo&chapter=3&verse=18",
+        "https://github.com/icfmp/ACAI/issues/10"
+      ]
+    },
+    {
+      "source_id": "person:Judah.4",
+      "action": "amend_occurrences",
+      "remove_references": [
+        "23022008",
+        "24022018"
+      ],
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o230220080041"
+          ],
+          [
+            "o240220180101"
+          ]
+        ]
+      },
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o230220080052"
+          ],
+          [
+            "o240220180121"
+          ],
+          [
+            "o240220180191"
+          ]
+        ]
+      },
+      "reason": "Isaiah 22:8 speaks of the defense of the nation of Judah, and Jeremiah 22:18 calls Jehoiakim king of Judah; neither passage names the patriarch Judah as a living individual. Frozen group:Judah already owns exactly these name and referent tokens, so remove only the false patriarch links.",
+      "evidence": [
+        "Pinned WLC Isaiah 22:8 o230220080041 and Jeremiah 22:18 o240220180101, plus context-linked source referents; frozen group:Judah has all five exact pointers",
+        "https://classic.net.bible.org/verse.php?book=Isa&chapter=22&verse=8",
+        "https://classic.net.bible.org/verse.php?book=jer&chapter=22&verse=18"
+      ]
+    },
+    {
+      "source_id": "person:Ephraim",
+      "action": "amend_occurrences",
+      "remove_references": [
+        "28013001"
+      ],
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o280130010021"
+          ]
+        ]
+      },
+      "remove_pronominal_referents": {
+        "wlc": [
+          [
+            "o280130010051"
+          ]
+        ]
+      },
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o280130010072"
+          ],
+          [
+            "o280130010092"
+          ]
+        ]
+      },
+      "reason": "Hosea 13:1 uses Ephraim as a metonymic/collective designation for the northern tribe/kingdom, not the historical son of Joseph. Frozen group:Ephraim already has the full exact explicit, pronoun and subject word groups, which remain unchanged.",
+      "evidence": [
+        "Pinned WLC Hosea 13:1 explicit Ephraim o280130010021, pronominal o280130010051 and subjects o280130010072 / o280130010092; source group:Ephraim already carries them",
+        "https://classic.net.bible.org/verse.php?book=Hos&chapter=13&verse=1",
+        "https://tips.translation.bible/story/sil-translators-notes-on-hosea-131/"
+      ]
     }
   ]
 }
