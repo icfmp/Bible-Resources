@@ -28,7 +28,11 @@
       "proposed_corrected_target": "Isa.35.8",
       "evidence": "The wayfaring highway phrase aligns with Isaiah 35:8; original SWORD and CCEL reproduce Isaiah 25:8.",
       "action": "REVIEW_AND_APPROVE_EXPLICIT_EDIT_BEFORE_LINK_INSERTION",
-      "approval": false
+      "approval": false,
+      "proposed_navigation_targets_for_unpublished_review": [
+        "Isa.35.8"
+      ],
+      "proposed_navigation_witness_class": "ISAIAH_HIGHWAY_EVIDENCE_ISAIAH_35_8"
     },
     {
       "source_first_key": "Jer.50.1",
@@ -41,7 +45,14 @@
       "printed_secondary_witness_section": "Jeremiah 50 topical outline: ruin of Babylon (1–3, 8–16, 21–32, 35–46)",
       "candidate_fragment": "Jer.50.1-Jer.50.3",
       "action": "VERIFY_EXACT_SOURCE_VISIBLE_LABEL_AND_COMPOUND_OUTLINE_SPAN_OWNERSHIP_BEFORE_FIXING",
-      "approval": false
+      "approval": false,
+      "proposed_navigation_targets_for_unpublished_review": [
+        "Jer.50.1-Jer.50.3",
+        "Jer.50.8-Jer.50.16",
+        "Jer.50.21-Jer.50.32",
+        "Jer.50.35-Jer.50.46"
+      ],
+      "proposed_navigation_witness_class": "CCEL_CONCISE_JEREMIAH_50_RUIN_FOUR_DISJOINT_SPANS"
     },
     {
       "source_first_key": "Jer.50.1",
@@ -54,7 +65,14 @@
       "printed_secondary_witness_section": "Jeremiah 50 topical outline: redemption of God's people (4–7, 17–20, 33–34)",
       "candidate_fragment": "Jer.50.4-Jer.50.7",
       "action": "VERIFY_EXACT_SOURCE_VISIBLE_LABEL_AND_COMPOUND_OUTLINE_SPAN_OWNERSHIP_BEFORE_FIXING",
-      "approval": false
+      "approval": false,
+      "proposed_navigation_targets_for_unpublished_review": [
+        "Jer.50.4-Jer.50.7",
+        "Jer.50.17-Jer.50.20",
+        "Jer.50.33",
+        "Jer.50.34"
+      ],
+      "proposed_navigation_witness_class": "CCEL_CONCISE_JEREMIAH_50_REDEMPTION_FOUR_DISJOINT_SPANS"
     },
     {
       "source_first_key": "Matt.23.1",
@@ -67,7 +85,14 @@
       "printed_secondary_witness_section": "Matthew 23 phylacteries: Ex 13:2–10; 13:11–16; Deut 6:4–9; 11:13–21",
       "candidate_fragment": "Exod.13.2-Exod.13.10",
       "action": "VERIFY_EXACT_SOURCE_VISIBLE_LABEL_AND_COMPOUND_CITATION_BEFORE_FIXING",
-      "approval": false
+      "approval": false,
+      "proposed_navigation_targets_for_unpublished_review": [
+        "Exod.13.2-Exod.13.10",
+        "Exod.13.11-Exod.13.16",
+        "Deut.6.4-Deut.6.9",
+        "Deut.11.13-Deut.11.21"
+      ],
+      "proposed_navigation_witness_class": "CCEL_CONCISE_MATTHEW_23_FOUR_PENTATEUCH_PORTIONS"
     }
   ],
   "remaining_link_ledger_unchanged": {
@@ -75,5 +100,9 @@
     "represented": 1015,
     "spurious_excluded": 9,
     "pending": 180
-  }
+  },
+  "proposed_navigation_note_status": "UNAPPROVED_SEPARATE_EDITORIAL_REPAIR_PREVIEW_NOT_IN_ORIGINAL_SOURCE",
+  "proposed_navigation_note_count": 13,
+  "proposed_navigation_source_links_repaired_in_editorial_preview": 4,
+  "proposed_navigation_note_publication_authorized": false
 }
