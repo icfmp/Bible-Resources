@@ -176,6 +176,54 @@ text and actual native body selection. Rebuild and demand zero unexpected
 index/ownership differences. Keep the 25 separate inline cross-reference
 syntax cases on their own track.
 
+## Private six-overlap reindex experiment — all source prose recoverable
+
+**Private experiment executed 2026-11-18**, following the byte-local
+endpoint-only three-range correction. No commentary words or notes were
+edited, and nothing was exported or published.
+
+- [Before/after full source-to-native report](https://github.com/icfmp/Bible-Resources/actions/runs/44280366837)
+- First private endpoint-corrected source SHA-256:
+  `dbf5aedadf7ef4f2f02ddedf8cc22de1ecc51b0b8ee2ece7c29acaf540a8d93c`
+- Experimental reindexed source SHA-256:
+  `95a12ad88decbfe975de747825492abb7944b8de6dd30176cc23afdc9d2daa5d`
+- Plan: `config/commentary-osis-repair-plans/mhc-overlap-reindex-private-experiment.json`
+- Exactly **six** original first-group range ends were shortened by **one**
+  shared boundary verse; **24** original XML machine-attribute values
+  changed (`sID`, `osisID`, `n`, paired `eID`). This is a private
+  **navigation experiment**, not a conclusion about the original author's
+  preferred section divisions. All source prose, notes, links and other
+  markup remained identical by exact-byte guarded patching.
+- With the original unmodified overlapping ranges, source word streams of
+  **6/14** involved original authored groups could not be found in any
+  of their native SWORD keys; no continuous 40-word source block was found
+  for those six. This is strong evidence of an import/navigation loss.
+- In the experimental nonoverlapping compilation, **all 14** original
+  authored groups' *complete* word sequences were found in at least one
+  of their related native verse entries; all 70 independently sampled
+  24-word source shingles were also present. Of the 14, 8 were present
+  at every originally claimed key and 6 at some original keys, as
+  expected because their shared boundary addresses were reassigned.
+- No original authorial group words were deleted, but **a formerly shared
+  verse now maps to the later group rather than both groups**. This
+  is a material navigation choice that needs editorial acceptance and
+  explicit consideration of how Bible should display two distinct
+  commentary sections both applicable to the same verse.
+- The **only remaining machine-overlap case** is 2 Chronicles 1.1 versus
+  1.1–12. Both source text streams were found intact in the compiled
+  SWORD at every original claimed key; do not shorten or discard either.
+- All 17 previously out-of-KJV source addressing IDs remain resolved in
+  the private trial. The corrected full SWORD K/I/TOP index populations
+  remain unchanged: 31,098 / 1,255 / 2.
+
+**Gate remains blocking:** the real structural check intentionally fails
+until all overlapping source claims have a reviewed, reproducible
+representation. The experimental trim is not the final published choice:
+the editor may instead select a transport retaining **both** original
+commentaries at the shared verse. An authorial and independent historic
+edition comparison, link/notes parity, actual Xiphos/AndBible GUI review,
+digital-edition reuse rights and explicit publication approval remain open.
+
 ## Next review, kept separate
 
 1. Investigate *actual* source-structure anomalies using source-defined
