@@ -43,11 +43,13 @@ Through **the blood of the Lamb and his testimony**, believers will become more 
 
 Henry also asks us to picture Christ and his gospel church, especially in what he calls **her millennial condition**.
 
-Christ and his people rejoice in each other and work through prayer and service as he advances salvation by grace and brings judgment upon those who remain opposed to him.
+Christ and his people rejoice in one another. Through their prayers and efforts, they work with him as he advances in the **chariots of salvation**, conquering sinners by grace, or in **chariots of vengeance**, bringing destruction upon his enemies.
 
 ---
 
 ## Editorial review — Psalm 149
+
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Restored Henry's contrast between *chariots of salvation* and *chariots of vengeance* and his explicit contrast between conquering sinners by grace and destroying enemies in judgment. The earlier draft softened this into an undifferentiated reference to judgment. These are **Henry's eschatological images**, not any mandate for believers to spread the gospel through coercion; the same authorial section expressly rejects fire and sword as gospel means. No original module, reader keys or independent acceptance changed.
 
 **Complete original-English secondary witness read:** [CCEL, Psalm 149](https://ccel.org/ccel/henry/mhcc.xx.cxlix.html). The exact published `MHCC 0.1.1` original remains authority, native SWORD and independent review pending.
 
