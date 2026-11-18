@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "kind": "exact_word_distinct_person_review",
+  "source_editions": {
+    "wlc": "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c",
+    "sblgnt": "Clear-Bible/macula-greek@8423afe47b9e8f24b7772e808af45c7159a6fe7e"
+  },
+  "policy": "Classifications annotate exact source claims without removing, merging or privileging a candidate. Shared genealogical components are legitimate contextual co-references, not two possible readings of one person's identity; unresolved cases must remain unresolved.",
+  "cases": [
+    {
+      "corpus": "sblgnt",
+      "word_id": "n40016017010",
+      "canonical_people": [
+        "person:John.4",
+        "person:Peter"
+      ],
+      "classification": "unresolved_patronymic_name_variant",
+      "reason": "Matthew 16:17 uses Simon's Bar-Jonah patronymic (the tenth Greek word); the spelling/name-form relationship between father John/Jonah and the separate person Simon Peter requires textual and identity review. The shared token itself must not merge father and son.",
+      "evidence": [
+        "Pinned SBLGNT Matthew 16:17 word n40016017010; Matthew 16:17 addresses Simon as Bar-Jonah",
+        "Frozen ACAI person:John.4 lists offspring Peter and Andrew; person:Peter includes 40016017; inherited pilot #6"
+      ]
+    },
+    {
+      "corpus": "wlc",
+      "word_id": "o110040080041",
+      "canonical_people": [
+        "person:Ben-hur",
+        "person:Hur"
+      ],
+      "classification": "shared_genealogical_name_component",
+      "reason": "The proper-name token Hur is one component of the complete Ben-Hur expression and also names the father; the adjacent common noun 'son' is separately attached only to Ben-Hur by reviewed PR #317.",
+      "evidence": [
+        "Pinned Macula WLC 1 Kings 4:8!3-4 o110040080031=son, o110040080041=Hur",
+        "Frozen ACAI person:Ben-hur (father Hur), person:Hur (son Ben-hur); PR #317 exact name-group split"
+      ]
+    },
+    {
+      "corpus": "wlc",
+      "word_id": "o110040090021",
+      "canonical_people": [
+        "person:Ben-deker",
+        "person:Deker"
+      ],
+      "classification": "shared_genealogical_name_component",
+      "reason": "The Hebrew proper-name token Deker occurs as the father's named component of the administrator's patronymic 'son of Deker'; it can legitimately supply both the father's proper name and part of the son's identifying expression.",
+      "evidence": [
+        "Pinned WLC 1 Kings 4:9 word o110040090021 lemma דֶּקֶר, gloss Deker",
+        "Frozen ACAI person:Ben-deker father=person:Deker and person:Deker offspring=person:Ben-deker; 1 Kings 4:9"
+      ]
+    },
+    {
+      "corpus": "wlc",
+      "word_id": "o110040100021",
+      "canonical_people": [
+        "person:Ben-hesed",
+        "person:Hesed"
+      ],
+      "classification": "shared_genealogical_name_component",
+      "reason": "The source word Hesed is the father's proper name within the patronymic Ben-Hesed; one word can be an embedded component of the son's designation while also naming his father.",
+      "evidence": [
+        "Pinned WLC 1 Kings 4:10 word o110040100021 lemma חֶסֶד, gloss Hesed",
+        "Frozen ACAI person:Ben-hesed father=person:Hesed, 1 Kings 4:10"
+      ]
+    },
+    {
+      "corpus": "wlc",
+      "word_id": "o110040110021",
+      "canonical_people": [
+        "person:Abinadab.4",
+        "person:Ben-abinadab"
+      ],
+      "classification": "shared_genealogical_name_component",
+      "reason": "Abinadab is the paternal proper-name component in 'son of Abinadab'; the word remains relevant to both the father and the son identified by patronymic, without equating the individuals.",
+      "evidence": [
+        "Pinned WLC 1 Kings 4:11 word o110040110021 lemma אֲבִינָדָב, gloss Abinadab",
+        "Frozen ACAI person:Ben-abinadab father=person:Abinadab.4, 1 Kings 4:11"
+      ]
+    },
+    {
+      "corpus": "wlc",
+      "word_id": "o130020030101",
+      "canonical_people": [
+        "person:Bath-shua",
+        "person:Shua"
+      ],
+      "classification": "shared_genealogical_name_component",
+      "reason": "First Chronicles 2:3 spells the daughter-of-Shua designation with a separate 'daughter' token and this proper-name token Shua; the name compound identifies the woman and separately includes the father Shua. The two persons remain distinct.",
+      "evidence": [
+        "Pinned Macula WLC 1 Chronicles 2:3 o130020030092=בַת 'daughter', o130020030101=שׁוּעַ 'Shua' within בַת־שׁוּעַ",
+        "Frozen ACAI person:Bath-shua father=person:Shua and source name groups overlap"
+      ]
+    },
+    {
+      "corpus": "wlc",
+      "word_id": "o150030090081",
+      "canonical_people": [
+        "person:Hodaviah.4",
+        "person:Hodiah.2"
+      ],
+      "classification": "unresolved_person_identity",
+      "reason": "The exact Hebrew word in Ezra 3:9 spells Judah; both Hodaviah.4 and Hodiah.2 source records claim it, but their historical equivalence and the textual/family naming shifts are not sufficiently established from an exact word alone.",
+      "evidence": [
+        "Pinned Macula WLC Ezra 3:9 o150030090081: proper-name form יְהוּדָה ('Judah')",
+        "Pinned ACAI Hodaviah.4 refs Ezra 2:40, Ezra 3:9, Nehemiah 7:43; Hodiah.2 also claims Ezra 3:9 and Nehemiah 12:8"
+      ]
+    },
+    {
+      "corpus": "wlc",
+      "word_id": "o160120080061",
+      "canonical_people": [
+        "person:Hodiah.2",
+        "person:Judah.7"
+      ],
+      "classification": "unresolved_person_identity",
+      "reason": "Nehemiah 12:8 original token spells Judah, while the frozen source assigns it to both Hodiah.2 and Judah.7. The relationship between these separate records is uncertain and must not be resolved by similar names or a simplistic alias rule.",
+      "evidence": [
+        "Pinned Macula WLC Nehemiah 12:8 o160120080061: proper-name יְהוּדָה ('Judah')",
+        "Pinned ACAI person:Hodiah.2 and person:Judah.7 both claim Nehemiah 12:8; identities remain separate"
+      ]
+    }
+  ]
+}
