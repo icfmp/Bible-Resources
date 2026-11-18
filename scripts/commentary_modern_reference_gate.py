@@ -802,6 +802,39 @@ def _unambiguous_explicit_modern_range(section: ET.Element, literal: str):
                         matches.append(match[0])
     return matches[0] if len(matches)==1 else None
 
+
+def _source_range_section_ownership(*, literal: str, label: str,
+                                    source_chapter: str, keys: list[str],
+                                    section: ET.Element) -> dict[str, bool]:
+    """Diagnostic only: does a genuine source self-range own a modern heading?
+
+    Exact authored K key occupancy is decisive. A source cross-reference to
+    another passage must never be silently relocated to an editorial heading.
+    This classifier returns no text and does not add a hyperlink.
+    """
+    parsed = _source_same_chapter_verse_range(literal)
+    if parsed is None:
+        return {"same_chapter":False,"exact_K_scope":False,
+                "matching_modern_heading":False,"source_label_is_verse_span":False}
+    book, chapter, first, last = parsed
+    same=source_chapter==book+"."+chapter
+    from commentary_modern_draft_osis_preview import NS, _range
+    target=literal[6:] if literal.startswith("Bible:") else literal
+    exact=same and target==_range(keys)
+    names=[v for v in section.findall(f"./{{{NS}}}title") if
+           v.get("type")=="sub"]
+    pattern=re.compile(r"\bverses?\s+"+re.escape(first)+
+                       r"\s*[-–—]\s*"+re.escape(last)+r"\b", re.I)
+    title=exact and len(names)==1 and bool(pattern.search(
+        "".join(names[0].itertext())))
+    source_label=re.fullmatch(
+        r"(?:v(?:erses?)?\.?\s*)?"+re.escape(first)+r"\s*[-–—]\s*"+
+        re.escape(last)+r"\.?", label.strip(), re.I)
+    return {"same_chapter":same,"exact_K_scope":exact,
+            "matching_modern_heading":bool(title),
+            "source_label_is_verse_span":bool(source_label)}
+
+
 def _unrecognized_original_ref_class(literal: str) -> str:
     """Only classify syntax in metadata; never emit literal source osisRef."""
     raw = literal[6:] if literal.startswith("Bible:") else literal
@@ -840,7 +873,11 @@ def _auto_single_verse_placements(*, private_original: dict, groups: dict,
                "repeated_original_target": 0, "unverified_or_single_digit_label": 0,
                "no_unique_full_modern_verse_citation": 0,
                "no_unique_full_modern_verse_range_citation":0,
-               "source_range_spans_chapters_or_has_unsafe_bounds":0}
+               "source_range_spans_chapters_or_has_unsafe_bounds":0,
+               "unmatched_source_range_same_chapter":0,
+               "unmatched_source_range_exact_original_K_scope":0,
+               "unmatched_source_range_exact_K_scope_with_modern_heading":0,
+               "unmatched_source_range_source_label_matches_scope":0}
     for first, links in private_original.items():
         chapter = first.rsplit(".", 1)[0]
         units = native["chapters"][chapter]["original_units"]
@@ -894,6 +931,19 @@ def _auto_single_verse_placements(*, private_original: dict, groups: dict,
             if display is None:
                 skipped["no_unique_full_modern_verse_range_citation" if is_range
                         else "no_unique_full_modern_verse_citation"] += 1
+                if is_range:
+                    ownership=_source_range_section_ownership(
+                        literal=literal,label=label,source_chapter=chapter,
+                        keys=units[ordinal]["keys"],section=section)
+                    for field,category in (
+                        ("same_chapter","unmatched_source_range_same_chapter"),
+                        ("exact_K_scope","unmatched_source_range_exact_original_K_scope"),
+                        ("matching_modern_heading",
+                         "unmatched_source_range_exact_K_scope_with_modern_heading"),
+                        ("source_label_is_verse_span",
+                         "unmatched_source_range_source_label_matches_scope")):
+                        if ownership[field]:
+                            skipped[category]+=1
                 continue
             found.append({
                 "modern_chapter": chapter,
