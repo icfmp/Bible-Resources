@@ -545,6 +545,27 @@ jobs:
           assert report["source_K_groups_with_links_inserted"] >= 19
           assert report["original_source_link_identity_hashes_and_order_verified"] is True
           assert report["modern_visible_prose_modified"] is False
+          ledger=report["source_original_link_review_ledger"]
+          assert ledger["status"] == (
+              "SOURCE_NATIVE_WHOLE_CANON_HYPERLINK_DISPOSITION_QUEUE_NOT_FINAL_APPROVAL")
+          assert ledger["original_native_reference_elements"] == 1204
+          assert ledger["source_link_occurrences_verified_in_derived_osis"] == (
+              report["modern_inline_links_inserted"]-1)
+          assert ledger["source_spurious_link_occurrences_explicitly_omitted"] == 9
+          assert len(ledger["pending"]) == (
+              ledger["source_original_links_still_requiring_placement_review"])
+          assert len(ledger["documented_omitted"]) == 9
+          assert sum(ledger[k] for k in (
+              "source_link_occurrences_verified_in_derived_osis",
+              "source_spurious_link_occurrences_explicitly_omitted",
+              "source_original_links_still_requiring_placement_review")) == 1204
+          assert not ledger["source_reference_labels_or_literal_targets_exported"]
+          assert not ledger["publication_authorized"]
+          print("SOURCE FULL 1204-REFERENCE DISPOSITION PASS: " +
+                str(ledger["source_link_occurrences_verified_in_derived_osis"]) +
+                " represented, 9 source markup exclusions, " +
+                str(ledger["source_original_links_still_requiring_placement_review"]) +
+                " exact original K/ordinal review items; metadata only")
           assert report["published_source_1204_links_fully_transferred"] is False
           assert report["publication_authorized"] is False
           ns={"o":"http://www.bibletechnologies.net/2003/OSIS/namespace"}
