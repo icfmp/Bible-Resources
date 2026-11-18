@@ -138,6 +138,36 @@ with *different* exact lemmas inside one Strong family, rejection of identical
 homograph and same-consonant entries, nonverb class exclusions, and prevention
 of cross-edition `sdbh` collisions.
 
+## Source sense owner as independent headword evidence
+
+A second source-anchored, **entry-only** recovery route identifies **16
+additional WLC occurrences** that were unresolved by exact/normalized Strong
+and lemma matching. It requires *all* of the following:
+
+1. Original WLC word ID and exact original source fields are preserved.
+2. A valid original 15-digit MACULA `sdbh` ID is **actually owned by one
+   UBS 0.9.4 headword**.
+3. The owning UBS entry has exactly the same **NFC-vocalized original lemma**
+   as the MACULA source token.
+4. The matching headword is **unique among all entries with that lemma and
+   same H/A language**. No duplicate homograph and no H/A crossover.
+
+Because the `sdbh` sense inventories diverge between editions, **the
+original source sense ID is never transferred as a contextual sense** under
+this new rule. It confirms only a dictionary headword.
+
+The pinned full-corpus result changes **10,794** to **10,810** additional
+word-anchored entry links (total **267,848** original WLC tokens linked).
+For selected original lexical classes, **239,515 / 248,680 = 96.315%**
+linked, and the edition-attested coverage becomes **239,515 / 242,726 =
+98.677%**, with **3,211** occurrences still unresolved inside the edition's
+indexed headword scope. All **5,954** inventory-unattested occurrences remain
+separately excluded from that specific denominator only.
+
+This is an incremental source-correlated identity check, **not** a claim that
+the remaining entries sharing a lemma under different Strong numbers are
+automatically equivalent. They remain flagged for independent review.
+
 ## Coverage within the attested headword inventory (UBS 0.9.4)
 
 The original WLC denominator must remain available, but an edition-specific
