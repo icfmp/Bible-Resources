@@ -454,7 +454,7 @@ descriptions without firmer person-role evidence.
 No anonymous person was merged with an explicitly named historical
 person. No other referent groups were removed. Exact pinned original
 source records remain byte-identical, and source edits stay declarative,
-reversible and fully audited. The **2,348 indirect-only overlaps** still
+reversible and fully audited. The **2,341 indirect-only overlaps** still
 require separate source-role and participant semantics review.
 
 ## Indirect person-overlap source-grammar triage — no mass deduplication
@@ -478,10 +478,10 @@ event or whether one anonymous pronoun refers to them.
 
 The original complete pinned morphology audit found **1,289 Greek**
 and **1,096 Hebrew** indirect-only word overlaps. A subsequent
-exact-token contextual correction in the derived index removed thirty-seven
-false exact-word person-overlap cases; the remaining **2,348** word overlaps comprise
-**1,281 Greek** and **1,067 Hebrew**. Their source-word grammatical
-counts are **2,094 plural**, **59 singular** and **195 without number**
+exact-token contextual correction in the derived index removed forty-four
+false exact-word person-overlap cases; the remaining **2,341** word overlaps comprise
+**1,281 Greek** and **1,060 Hebrew**. Their source-word grammatical
+counts are **2,089 plural**, **58 singular** and **194 without number**
 (often infinitives).
 These are categories of the source word, not conclusions about the
 people tagged on it. Several repeated candidate cohorts (e.g. Paul/Silas/Timothy; Aaron/Moses;
@@ -722,6 +722,36 @@ group removals with evidence in `editorial-decisions.json`;
 the original Hebrew words, source group multiplicity, verse
 numbers, frozen original source and all 134,822 active word
 identifiers remain unchanged.
+
+## Israel under Rehoboam is a living group, not Jacob
+
+**2 Chronicles 11:3–4** is explicit: the prophet addresses
+Rehoboam **and all Israel living in Judah and Benjamin**.
+The original name word `o140110030101` names that
+living group, not the patriarch Jacob (`person:Israel`).
+At the next verse, one distributive *each* word
+`o140110040111` and six action words that forbid
+war against their brothers and record their obedience
+refer to the contemporary subjects of Rehoboam and the
+Israelite troops. The pinned Hebrew grammar includes
+plural verbs and an infinitive, and every relevant
+`subjref`/`participantref` cites the original
+`o140110030101` community along with Rehoboam.
+
+The derived index therefore transfers the exact proper
+name word and seven verb/pronoun participant groups from
+`person:Israel` (Jacob) to the existing
+`group:Israel` (Israelites). It removes only the former
+`person:Israel` source verse `14011003` and
+corresponding original-word groups. All `person:Rehoboam`
+source words and his identity remain unchanged.
+
+No general policy is inferred for every occurrence of
+*Israel*. The immutable ACAI source, original Hebrew
+text, original source groups and their multiplicities,
+exact source-word IDs and versification are preserved.
+The transfer is a reviewed, documented and reversible
+**derived-index edit**, not a source rewrite.
 
 ## Scoped review of all eight remaining explicit-person overlaps
 
