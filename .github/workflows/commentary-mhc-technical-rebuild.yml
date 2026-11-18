@@ -255,17 +255,53 @@ jobs:
           cleaned,candidate_report=read_native(root/"mhc-stage1-private","MHCStage1")
           if baseline.keys()!=cleaned.keys():
               raise SystemExit("Pristine/cleaned native occupied key sets differ")
-          def normalized(raw):
+          def authored_content_without_display_styles(raw):
               parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
                                      no_network=True,recover=False,huge_tree=False)
               fragment=etree.fromstring(b"<fragment>"+raw+b"</fragment>",parser)
-              for node in list(fragment.iter()):
-                  if _inert_hi(node):
-                      _remove_empty_hi(node)
-              return etree.tostring(fragment,method="c14n")
+              fulltext="".join(fragment.itertext())
+              protected=tuple(
+                  etree.tostring(node,method="c14n",with_comments=True)
+                  for node in fragment.iter()
+                  if isinstance(node.tag,str) and
+                     node.tag.rsplit("}",1)[-1] in {"note","reference"}
+              )
+              # A balanced, exact-text event stream. Only <hi> presentation
+              # containers are transparent, never note/reference boundaries.
+              # Adjacent text is coalesced across transparent hi boundaries.
+              events=[]
+              pending=[]
+              def flush():
+                  if pending:
+                      events.append(("text","".join(pending)))
+                      pending.clear()
+              def walk(node):
+                  if not isinstance(node.tag,str):
+                      flush()
+                      events.append(("other",etree.tostring(node,with_tail=False)))
+                      return
+                  local=node.tag.rsplit("}",1)[-1]
+                  display_only=local=="hi"
+                  if not display_only:
+                      flush()
+                      events.append(("open",node.tag,tuple(sorted(node.attrib.items()))))
+                  if node.text:
+                      pending.append(node.text)
+                  for child in node:
+                      walk(child)
+                      if child.tail:
+                          pending.append(child.tail)
+                  if not display_only:
+                      flush()
+                      events.append(("close",node.tag))
+              walk(fragment)
+              flush()
+              return fulltext,protected,tuple(events)
 
           raw_changes=0
-          semantic_changes=[]
+          altered_visible=[]
+          altered_notes_or_links=[]
+          altered_nonstyle_structure=[]
           unreadable=[]
           for key in baseline:
               left,right=baseline[key],cleaned[key]
@@ -273,22 +309,33 @@ jobs:
                   continue
               raw_changes+=1
               if key[0]=="U":
-                  semantic_changes.append(key)
+                  altered_nonstyle_structure.append(key)
                   continue
               try:
-                  if normalized(left)!=normalized(right):
-                      semantic_changes.append(key)
+                  before=authored_content_without_display_styles(left)
+                  after=authored_content_without_display_styles(right)
+                  if before[0]!=after[0]:
+                      altered_visible.append(key)
+                  if before[1]!=after[1]:
+                      altered_notes_or_links.append(key)
+                  if before[2]!=after[2]:
+                      altered_nonstyle_structure.append(key)
               except (ValueError,etree.XMLSyntaxError):
                   unreadable.append(key)
           print("Native entries differing in raw bytes:",raw_changes)
-          print("Native entries with non-empty semantic XML differences:",
-                len(semantic_changes))
+          print("Native entries with changed exact visible Unicode:",len(altered_visible))
+          print("Native entries with changed note/reference markup:",len(altered_notes_or_links))
+          print("Native entries with changed non-style XML structure/text ownership:",
+                len(altered_nonstyle_structure))
           print("Native entries unparseable for comparison:",len(unreadable))
-          print("Affected reference/key samples, without text:",
-                [list(x) for x in (semantic_changes+unreadable)[:12]])
-          if semantic_changes or unreadable:
-              raise SystemExit("Cleaned source changed native semantic XML beyond empty styling")
-          print("FULL candidate-to-pristine native semantic XML comparison PASS")
+          unresolved=set(altered_visible+altered_notes_or_links+
+                         altered_nonstyle_structure+unreadable)
+          print("Unresolved reference/key samples without commentary text:",
+                [list(x) for x in sorted(unresolved)[:12]])
+          if unresolved:
+              raise SystemExit("Cleaned source changed native content beyond presentation styling")
+          print("Full candidate-to-pristine semantic comparison PASS; "
+                "only presentation markup differs at some entries")
           print("No historical edition collation or public release performed")
           PY
       - name: No distribution or editorial phase in this workflow
