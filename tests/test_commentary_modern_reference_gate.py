@@ -19,6 +19,7 @@ from commentary_modern_reference_gate import (SourceReferenceGate,
     _unique_authentic_original_visible_label,
     _unplaced_original_link_review_ledger,
     build_private_compact_original_crossrefs,
+    build_private_owned_K_heading_range_links,
     build_private_inline_original_reference_index,
     _source_owned_ordered_alignment,
     _original_source_link_contexts, _source_context_unique_paragraph_anchor,
@@ -1721,6 +1722,108 @@ class PrivateCompactOriginalCrossReferenceTests(unittest.TestCase):
         self.assertEqual("".join(new.itertext()),
                          "God will judge every cruel word (Jude 15).")
         self.assertEqual(receipt["original_exact_compact_verse_links_restored"],1)
+
+
+class OriginalKTargetRangeHeadingLinksTests(unittest.TestCase):
+    @staticmethod
+    def fixture(range_literal="Gen.8.13-Gen.8.19",
+                printed_label="Gen 8:13-19",
+                next_title="The waters recede (verses 13–19)"):
+        from commentary_modern_draft_osis_preview import NS, _range
+        doc=ET.Element(f"{{{NS}}}osis")
+        ch=ET.SubElement(doc,f"{{{NS}}}chapter",{"osisID":"Gen.8"})
+        groups=[
+            {"first_key":"Gen.8.4",
+             "keys":[f"Gen.8.{x}" for x in range(4,13)]},
+            {"first_key":"Gen.8.13",
+             "keys":[f"Gen.8.{x}" for x in range(13,20)]},
+        ]
+        first=ET.SubElement(ch,f"{{{NS}}}div",{
+            "annotateType":"commentary","annotateRef":_range(groups[0]["keys"])})
+        ET.SubElement(first,f"{{{NS}}}title",{"type":"sub"}).text=(
+            "The waters slowly retreat (verses 4–12)")
+        ET.SubElement(first,f"{{{NS}}}p").text="The Lord preserved Noah's family."
+        following=ET.SubElement(ch,f"{{{NS}}}div",{
+            "annotateType":"commentary","annotateRef":_range(groups[1]["keys"])})
+        ET.SubElement(following,f"{{{NS}}}title",{"type":"sub"}).text=next_title
+        ET.SubElement(following,f"{{{NS}}}p").text="The earth became dry."
+        originals=[(range_literal,printed_label)]
+        originals.extend([("John.3.16","not applicable")]*4)
+        pending=[{
+            "source_first_key":"Gen.8.4","source_reference_ordinal":i,
+            "original_osisRef_sha256":hashlib.sha256(t.encode()).hexdigest(),
+            "original_visible_label_sha256":hashlib.sha256(l.encode()).hexdigest(),
+        } for i,(t,l) in enumerate(originals,1)]
+        ledger={
+            "status":"SOURCE_NATIVE_WHOLE_CANON_HYPERLINK_DISPOSITION_QUEUE_NOT_FINAL_APPROVAL",
+            "original_native_reference_elements":5,
+            "source_link_occurrences_verified_in_derived_osis":0,
+            "source_spurious_link_occurrences_explicitly_omitted":0,
+            "source_original_links_still_requiring_placement_review":5,
+            "source_reference_labels_or_literal_targets_exported":False,
+            "publication_authorized":False,"pending":pending}
+        native={"source_prose_or_original_markup_exported":False,
+                "original_compiled_corpus_sha256":FULL_HASH,
+                "chapters":{"Gen.8":{"original_units":groups}}}
+        errata={"status":"PINNED_ORIGINAL_LINK_ERRATA_REVIEW_ONLY_NOT_APPLIED",
+                "original_native_corpus_sha256":FULL_HASH,
+                "cases":[{"source_first_key":"Gen.8.4",
+                          "original_reference_ordinal":i,"approval":False}
+                         for i in range(2,6)]}
+        return ET.tostring(doc),ledger,{"Gen.8.4":originals},native,errata
+
+    def test_source_trailing_link_becomes_exact_next_K_heading_navigation(self):
+        from commentary_modern_draft_osis_preview import NS
+        args=self.fixture()
+        output,ledger,receipt=build_private_owned_K_heading_range_links(
+            compact_osis=args[0],ledger=args[1],original=args[2],
+            native=args[3],errata=args[4])
+        root=ET.fromstring(output)
+        matches=[x for x in root.iter()
+                 if x.tag==f"{{{NS}}}reference"]
+        self.assertEqual(len(matches),1)
+        self.assertEqual(matches[0].get("osisRef"),"Gen.8.13-Gen.8.19")
+        self.assertEqual(matches[0].text,"verses 13–19")
+        self.assertEqual(receipt["source_original_links_restored_to_matching_modern_K_headings"],1)
+        self.assertEqual(receipt["source_valid_references_still_in_section_notes"],0)
+        self.assertEqual(len(ledger["pending"]),4)
+        self.assertEqual("".join(root.itertext()),
+                         "The waters slowly retreat (verses 4–12)"
+                         "The Lord preserved Noah's family."
+                         "The waters recede (verses 13–19)"
+                         "The earth became dry.")
+
+    def test_partial_target_original_K_or_nonmatching_heading_is_not_linked(self):
+        for literal,heading in [
+            ("Gen.8.13-Gen.8.18","The waters recede (verses 13–18)"),
+            ("Gen.8.13-Gen.8.19","The waters recede (verses 13–18)"),
+        ]:
+            with self.subTest(literal=literal,heading=heading):
+                args=self.fixture(range_literal=literal,
+                    printed_label=("Gen 8:13-18" if literal.endswith(".18")
+                                   else "Gen 8:13-19"),next_title=heading)
+                output,ledger,receipt=build_private_owned_K_heading_range_links(
+                    compact_osis=args[0],ledger=args[1],original=args[2],
+                    native=args[3],errata=args[4])
+                self.assertEqual(receipt["source_original_links_restored_to_matching_modern_K_headings"],0)
+                self.assertEqual(receipt["source_valid_references_still_in_section_notes"],1)
+                self.assertEqual(len(ledger["pending"]),5)
+
+    def test_original_source_link_identity_mismatch_fails_closed(self):
+        args=self.fixture()
+        args[1]["pending"][0]["original_osisRef_sha256"]="f"*64
+        with self.assertRaisesRegex(ValueError,"Unpinned original link"):
+            build_private_owned_K_heading_range_links(
+                compact_osis=args[0],ledger=args[1],original=args[2],
+                native=args[3],errata=args[4])
+
+    def test_source_printed_verse_span_must_agree_with_target(self):
+        args=self.fixture(printed_label="Gen 8:13-18")
+        _,ledger,receipt=build_private_owned_K_heading_range_links(
+            compact_osis=args[0],ledger=args[1],original=args[2],
+            native=args[3],errata=args[4])
+        self.assertEqual(receipt["source_original_links_restored_to_matching_modern_K_headings"],0)
+        self.assertEqual(len(ledger["pending"]),5)
 
 if __name__=="__main__":
     unittest.main()
