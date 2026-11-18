@@ -83,7 +83,10 @@ def inspect_source(*, reader: Path, root: Path, receipt: Path,
     original_raw: dict[str, bytes] = {}
     env = os.environ.copy()
     env["SWORD_PATH"] = str(root.resolve())
-    proc = subprocess.Popen([str(reader.resolve()), witness["source_module"]],
+    module_id = witness.get("native_module_id", "")
+    if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{1,39}", module_id):
+        raise ValueError("Invalid real SWORD module ID in witness manifest")
+    proc = subprocess.Popen([str(reader.resolve()), module_id],
                             env=env, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     try:
         if proc.stdout is None:
