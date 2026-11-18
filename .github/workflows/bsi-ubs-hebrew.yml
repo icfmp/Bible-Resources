@@ -7,18 +7,23 @@ on:
       - ".github/workflows/bsi-ubs-hebrew.yml"
   push:
     branches: [feat/bsi-ubs-hebrew-crosswalk]
+    paths:
+      - "entity-index/links/dictionaries/ubs-hebrew/**"
+      - ".github/workflows/bsi-ubs-hebrew.yml"
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  inspect:
+  verify-lexical-index:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-      - name: Checkout frozen UBS Hebrew English and French
+      - name: Offline regression tests
+        run: python3 -I entity-index/links/dictionaries/ubs-hebrew/test_index.py
+      - name: Check out exact UBS Hebrew EN/FR 0.9.4 source
         uses: actions/checkout@v4
         with:
           repository: ubsicap/ubs-open-license
@@ -26,7 +31,7 @@ jobs:
           path: ubs
           sparse-checkout: dictionaries/hebrew/JSON
           persist-credentials: false
-      - name: Checkout pinned Macula Hebrew WLC
+      - name: Check out exact Macula Hebrew WLC original words
         uses: actions/checkout@v4
         with:
           repository: Clear-Bible/macula-hebrew
@@ -35,18 +40,59 @@ jobs:
           sparse-checkout: WLC/tsv
           lfs: true
           persist-credentials: false
-      - name: Read-only inspect UBS bilingual and WLC schema
+      - name: Verify immutable commits and exact UBS Git blobs
         run: |
           test "$(git -C ubs rev-parse HEAD)" = "a15a96cfaa4ca18a6c0339016645ba1e534db3c8"
           test "$(git -C macula-hebrew rev-parse HEAD)" = "47db250bd55d0d8577f2a94fba114ef16c35b23c"
-          python3 -I entity-index/links/dictionaries/ubs-hebrew/inspect_sources.py \
-            ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
-            ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-fr.JSON \
-            macula-hebrew/WLC/tsv/macula-hebrew.tsv
-
-      - name: Audit exact bilingual sense IDs and Macula sdbh coverage
+          test "$(git -C ubs hash-object dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON)" = "aabf1eeccc7fcf573b2346e8d2e3533a614ac055"
+          test "$(git -C ubs hash-object dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-fr.JSON)" = "47dcfa6b17c455287e812305c8bf0bb15d213521"
+          test "$(wc -c < macula-hebrew/WLC/tsv/macula-hebrew.tsv)" -gt 80000000
+      - name: Analyze exact bilingual sense IDs and WLC source links
         run: |
           python3 -I entity-index/links/dictionaries/ubs-hebrew/analyze_alignment.py \
             ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-fr.JSON \
             macula-hebrew/WLC/tsv/macula-hebrew.tsv
+      - name: Build full bilingual lexical crosswalk
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/build_index.py \
+            --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
+            --french ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-fr.JSON \
+            --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --output /tmp/bsi-ubs-hebrew-index.json
+      - name: Compare pinned generated index or prepare initial reproducible snapshot
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          generated=Path("/tmp/bsi-ubs-hebrew-index.json")
+          target=Path("entity-index/links/dictionaries/ubs-hebrew/index.json")
+          actual=json.loads(generated.read_text(encoding="utf-8"))
+          assert actual["format"]=="bsi-ubs-hebrew-lexical-crosswalk"
+          assert actual["languages"]==["en","fr"]
+          assert actual["coverage"]["macula_words"] > 300000
+          assert actual["coverage"]["with_ubs_entry_candidates"] > 200000
+          assert actual["statistics"]["shared_entries"]==7943
+          if target.is_file():
+              assert json.loads(target.read_text(encoding="utf-8")) == actual, "Committed index differs from regenerated data"
+              print("BSI_UBS_HEBREW_COMMITTED_INDEX_VERIFIED")
+          else:
+              print("BSI_UBS_HEBREW_INITIAL_INDEX_PENDING_COMMIT")
+          PY
+      - name: Commit generated index only to the dedicated source branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/feat/bsi-ubs-hebrew-crosswalk'
+        run: |
+          cp /tmp/bsi-ubs-hebrew-index.json entity-index/links/dictionaries/ubs-hebrew/index.json
+          if ! git diff --quiet -- entity-index/links/dictionaries/ubs-hebrew/index.json || test -n "$(git ls-files --others --exclude-standard entity-index/links/dictionaries/ubs-hebrew/index.json)"; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add entity-index/links/dictionaries/ubs-hebrew/index.json
+            git commit -m "data(bsi): add deterministic UBS Hebrew EN/FR Macula crosswalk"
+            git push origin HEAD:feat/bsi-ubs-hebrew-crosswalk
+          fi
+      - name: Upload generated QA index (not upstream dictionary definitions)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-hebrew-index-candidate
+          path: /tmp/bsi-ubs-hebrew-index.json
+          retention-days: 14
