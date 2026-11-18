@@ -959,6 +959,111 @@ jobs:
           print("Research-only link target trial, NOT printed-edition editorial approval")
           print("No OSIS or SWORD text uploaded or published")
           PY
+      - name: Recompile seven-link private OSIS and audit exact native markup changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          python - <<'PY'
+          import json,os,subprocess,sys
+          from collections import Counter
+          from hashlib import sha256
+          from pathlib import Path
+          from lxml import etree
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          root=Path(os.environ["RUNNER_TEMP"])
+          source=root/"mhc-links-private-only.osis.xml"
+          plan=json.loads(Path(
+              "config/commentary-osis-repair-plans/mhc-crossreferences-private-preview.json"
+          ).read_text())
+          manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
+          approved={(e["old_target"],e["new_target"]) for e in plan["edits"]}
+          if len(approved)!=7 or len(plan["edits"])!=7:
+              raise SystemExit("Unexpected private reference change inventory")
+          work=root/"mhc-links-preview-sword"
+          cmd=[sys.executable,"scripts/rebuild_osis_commentary.py",
+               "--source",str(source),"--sha256",sha256(source.read_bytes()).hexdigest(),
+               "--private-work",str(work),"--module","MHCLinkPreview",
+               "--language",manifest["language"],
+               "--versification",manifest["commentary_source"]["observed_compiled_versification"],
+               "--native-reader",str(root/"commentary-native-raw"),
+               "--min-numbered","20000"]
+          with (root/"mhc-links-private-rebuild.json").open("xb") as output:
+              subprocess.run(cmd,stdout=output,stderr=subprocess.DEVNULL,
+                             check=True,timeout=650)
+          outcome=json.loads((root/"mhc-links-private-rebuild.json").read_text())
+          for field,expect in (
+              ("native_occupied_numbered_keys",31098),
+              ("native_occupied_introduction_keys",1255),
+              ("native_occupied_opaque_top_keys",2)):
+              if outcome[field]!=expect:
+                  raise SystemExit("Link-only rebuild changed native key coverage")
+          reader=root/"commentary-native-raw"
+          def read_frames(location,module):
+              env=dict(os.environ,SWORD_PATH=str(location.resolve(strict=True)))
+              proc=subprocess.Popen([str(reader),module],env=env,
+                                    stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+              frames={}
+              def receive(kind,key,raw):
+                  identity=(kind,key)
+                  if identity in frames:
+                      raise ValueError("Duplicate native frame identity")
+                  frames[identity]=raw
+              try:
+                  scan,*_=parse_native_raw_corpus(proc.stdout,on_entry=receive)
+                  if proc.wait(timeout=40):
+                      raise ValueError("Native reader exited unsuccessfully")
+              finally:
+                  if proc.stdout:proc.stdout.close()
+                  if proc.poll() is None:proc.kill()
+                  proc.wait()
+              return frames
+          before=read_frames(root/"mhc-overlap-experiment-sword","MHCOverlapPreview")
+          after=read_frames(work,"MHCLinkPreview")
+          if before.keys()!=after.keys() or len(before)!=32355:
+              raise SystemExit("Link-only build changed original occupied native key set")
+          parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
+                                 no_network=True,recover=False,huge_tree=True)
+          differences=Counter()
+          changed_keys=0
+          for key,old_raw in before.items():
+              new_raw=after[key]
+              if old_raw==new_raw:
+                  continue
+              if key[0] not in {"K","I"}:
+                  raise SystemExit("Link-only rebuild changed opaque native record")
+              left=etree.fromstring(b"<frame>"+old_raw+b"</frame>",parser)
+              right=etree.fromstring(b"<frame>"+new_raw+b"</frame>",parser)
+              old_nodes=list(left.iter())
+              new_nodes=list(right.iter())
+              if len(old_nodes)!=len(new_nodes):
+                  raise SystemExit("Compiled link edit changed native XML element count")
+              for a,b in zip(old_nodes,new_nodes):
+                  if a.tag!=b.tag or a.text!=b.text or a.tail!=b.tail:
+                      raise SystemExit("Compiled link edit changed commentary text or markup")
+                  attrs_a=dict(a.attrib)
+                  attrs_b=dict(b.attrib)
+                  if attrs_a==attrs_b:
+                      continue
+                  if a.tag.rsplit("}",1)[-1]!="reference":
+                      raise SystemExit("Compiled link edit changed a nonreference element")
+                  old_target=attrs_a.pop("osisRef",None)
+                  new_target=attrs_b.pop("osisRef",None)
+                  if attrs_a!=attrs_b or (old_target,new_target) not in approved:
+                      raise SystemExit("Compiled link edit changed an unreviewed XML attribute")
+                  differences[(old_target,new_target)]+=1
+              changed_keys+=1
+          if set(differences)!=approved:
+              raise SystemExit("Not every original reviewed reference survived in the SWORD native body")
+          print("Private SWORD link-only rebuild native keys:",len(before))
+          print("Native entries affected by reviewed reference attributes:",changed_keys)
+          print("Distinct source-reviewed target changes present:",len(differences))
+          print("Each approved reference mapping was found at least once in compiled SWORD")
+          print("Complete native body text, non-link XML, notes, introductions and opaque records unchanged")
+          print("This is native SWORD integrity, NOT clicked Xiphos/AndBible GUI navigation")
+          print("No corrected OSIS or SWORD binary uploaded or published")
+          PY
       - name: Verify all source verse-group boundaries against real compiled SWORD keys and linked bodies
         shell: bash
         run: |
