@@ -210,3 +210,20 @@ authorial placement; no count is cosmetically decremented. The source
 errors' four independent editorial decisions, reader behavior of the
 note variants, 51 quarantined preface candidates, rights, and publication
 approval are **still outstanding**.
+
+
+### Real command-line reader note-visibility evidence
+
+In addition to raw libSWORD attribute/target readback, [CI #44325214135](https://github.com/icfmp/Bible-Resources/actions/runs/44325214135)
+compiled all three private candidates and queried actual `diatheke`
+with Scripture cross-references and footnotes enabled (`-o fx -f OSIS`).
+The implementation checked only metadata booleans and rendered length:
+a representative K from the **176 source notes** rendered the explicit
+original-source-notes marker; a separate **Jeremiah 50** probe rendered the
+unapproved-repair marker. Both probes returned nonempty commentary, and
+both markers were **present** in the actual reader output.
+
+This is confirmed visibility in one command-line SWORD frontend for
+representative cases, **not blanket Xiphos, AndBible or Bible application
+reader acceptance** and not editorial signoff. The note text itself was
+not exported into public workflow logs.
