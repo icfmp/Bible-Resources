@@ -1420,7 +1420,8 @@ jobs:
           from commentary_private_text_compare import _original_source_markers
           from commentary_nonlink_word_alignment import plain_word_alignment
           from commentary_modern_draft_osis_preview import (
-              _CANON,_modern_front,_SOURCE_CORPUS)
+              _CANON,_modern_front,_SOURCE_CORPUS,
+              same_scripture_reference_book_word)
           from sword_native_raw_corpus_inventory import parse_native_raw_corpus
           from commentary_modern_reference_gate import _ENGLISH_NAME_BY_OSIS
 
@@ -1572,6 +1573,7 @@ jobs:
                   max(0,len(actual)-len(all_words)+1))
                   if all_words and actual[ix:ix+len(all_words)]==all_words]
               discrepancy=None
+              book_ref_variant=False
               if owner is not None and not full_matches:
                   # Resolve the original native K offset from the unique
                   # 20-word anchored source prefix; never expose its words.
@@ -1592,7 +1594,20 @@ jobs:
                       end=min(len(tail),len(all_words))
                   native_prefix=tail[:end]
                   alignment=plain_word_alignment(all_words,native_prefix)
+                  if (len(native_prefix)==len(all_words)
+                          and alignment["original_plain_words_not_matched_in_exact_order"]==1
+                          and alignment["stock_plain_words_not_matched_in_exact_order"]==1
+                          and alignment["common_start_word_tokens"]+
+                              alignment["common_end_word_tokens"]==len(all_words)-1):
+                      changed=alignment["common_start_word_tokens"]
+                      book_ref_variant=same_scripture_reference_book_word(
+                          all_words[changed],native_prefix[changed],
+                          source_book=book,next_word=(
+                              all_words[changed+1]
+                              if changed+1<len(all_words) else ""))
                   discrepancy={
+                      "a_single_bible_book_reference_display_variant":
+                          book_ref_variant,
                       "exact_20_word_start_K_offset":start,
                       "original_ccel_book_preface_word_count":len(all_words),
                       "original_K_prefix_word_count_for_alignment":len(native_prefix),
@@ -1638,6 +1653,8 @@ jobs:
                       owner["prefix_sha256"] if owner is not None else None),
                   "source_native_first_K_raw_sha256":expected[original_first][1],
                   "private_three_exception_word_alignment":discrepancy,
+                  "source_book_intro_one_scripture_alias_variation_supported":
+                      book_ref_variant,
                   "modern_accepted_first_chapter_has_book_intro_heading":
                       modern_intro_own_heading,
                   "individual_source_text_or_labels_exported":False,
@@ -1665,6 +1682,8 @@ jobs:
                 json.dumps([{"book":r["book"],"status":r["classification"],
                              "full_source_word_match":
                                  r["source_div1_prose_all_tokens_contiguous_in_original_first_K"],
+                             "one_scripture_alias_only":
+                                 r["source_book_intro_one_scripture_alias_variation_supported"],
                              "modern_already_present":
                                  r["modern_accepted_first_chapter_has_book_intro_heading"]}
                             for r in report],sort_keys=True))
@@ -1678,6 +1697,9 @@ jobs:
                     "source_whole_preface_matches":sum(
                         r["source_div1_prose_all_tokens_contiguous_in_original_first_K"]
                         for r in report),
+                    "one_book_reference_alias_only":sum(
+                        r["source_book_intro_one_scripture_alias_variation_supported"]
+                        for r in report),
                     "modern_first_chapter_already_has_preface":sum(
                         r["modern_accepted_first_chapter_has_book_intro_heading"]
                         for r in report),
@@ -1686,7 +1708,7 @@ jobs:
                         for r in report).items())),
                 },sort_keys=True))
           PY
-      - name: Restore 47 exact-native first-K book prefaces in private OSIS, preserve Genesis and quarantine 3
+      - name: Restore 50 first-K source-equivalent book prefaces in private OSIS, preserve Genesis
         shell: bash
         run: |
           set -euo pipefail
@@ -1711,8 +1733,8 @@ jobs:
               candidates_dir=Path("work/mhcc-modern/production"))
           assert proof["source_attested_first_K_candidate_book_intros"]==51
           assert proof["already_in_modern_manuscript_not_duplicated"]==1
-          assert proof["new_book_intros_inserted_as_separate_introduction_OSIS"]==47
-          assert proof["quarantined_original_word_stream_mismatches"]==3
+          assert proof["new_book_intros_inserted_as_separate_introduction_OSIS"]==50
+          assert proof["quarantined_original_word_stream_mismatches"]==0
           assert proof["original_K_section_and_existing_links_unchanged"]
           assert proof["native_source_and_modern_manuscript_unmodified"]
           assert not proof["editorial_final_approval"]
@@ -1722,11 +1744,12 @@ jobs:
           (base/"mhcc-modern-original-book-prefaces-restored-metadata.json").write_text(
               json.dumps(proof,sort_keys=True,indent=2)+"\n",encoding="utf-8")
           print("MHCC FIRST-K BOOK PREFACES PRIVATE RESTORATION PASS: " +
-                "47 separately placed, one already in Gen.1 not duplicated, " +
-                "three exact-source textual witness differences quarantined; " +
+                "50 separately placed (47 exact words plus 3 with one " +
+                "canonical Scripture book-label display variant); " +
+                "one already in Gen.1 not duplicated; " +
                 "all original K modern expositions and 176/13 notes unmodified")
           PY
-      - name: Compile complete first-K book-preface edition in private SWORD and verify no K or original link displacement
+      - name: Compile all 51 original-first-K book-prefaces in private SWORD and verify native-I readback
         shell: bash
         run: |
           set -euo pipefail
@@ -1761,12 +1784,12 @@ jobs:
               (base/"mhcc-modern-original-book-prefaces-restored-metadata.json").read_text())
           links=json.loads(
               (base/"mhcc-modern-complete-bounded-linked-osis-structure.json").read_text())
-          assert proof["new_book_intros_inserted_as_separate_introduction_OSIS"]==47
+          assert proof["new_book_intros_inserted_as_separate_introduction_OSIS"]==50
           expected={row["book"]+".1":row["modern_intro_visible_sha256"]
                     for row in proof["cases"] if row[
                         "source_K_intro_disposition"]==
                         "INSERTED_SEPARATE_MODERN_INTRO_FROM_VERIFIED_ORIGINAL_K"}
-          assert len(expected)==47
+          assert len(expected)==50
           ns=f"{{{NS}}}"
           originals=ET.parse(
               base/"mhcc-modern-original-book-prefaces-restored.osis.xml").getroot()
@@ -1841,10 +1864,11 @@ jobs:
               "original_link_occurrences_preserved_only_in_separate_source_notes"]==176
           assert links["private_unapproved_errata_navigation_preview"][
               "derived_navigation_links_from_corroborating_witnesses"]==13
-          print("PRIVATE 47 RESTORED BOOK PREFACES SWORD READBACK PASS: " +
-                "47 independently verified original-first-K-derived introductions in " +
-                "corresponding real chapter-I keys; 1 existing Genesis not duplicated; " +
-                "3 edition-text variants still quarantined; 28792 exact keys; NO release")
+          print("PRIVATE 50 RESTORED BOOK PREFACES SWORD READBACK PASS: " +
+                "50 individually source-K-attested introductions in real " +
+                "chapter-I keys (47 full-word exact and 3 one-canonical-book-" +
+                "label display variants); 1 existing Genesis not duplicated; " +
+                "28792 exact keys; NO release")
           PY
       - name: Screen all modern manuscript outline tables for out-of-order source ranges
         shell: bash
