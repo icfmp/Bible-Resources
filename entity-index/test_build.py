@@ -106,6 +106,41 @@ class EntityIndexTests(unittest.TestCase):
                 "wlc": [["o010010010031"]]})])
         self.assertEqual((original.read_bytes(), group.read_bytes()), before)
 
+    def test_split_a_mixed_name_servant_group_without_losing_servant(self):
+        """Keep the valid person-word while removing only an unrelated name."""
+        servant = self.write_record(
+            "people", "GenericServant", references=["09009010"],
+            subject_referents={"wlc": [["o090090100021", "o090090100032"]]})
+        named = self.write_record(
+            "people", "Saul", references=["09009010"],
+            explicit_instances={"wlc": [["o090090100021"]]})
+        originals = (servant.read_bytes(), named.read_bytes())
+        decision = {
+            "source_id": "person:GenericServant",
+            "action": "amend_occurrences",
+            "reason": "The name Saul and following servant are distinct words",
+            "evidence": ["Locked source word IDs", "Exact source morphology"],
+            "remove_subject_referents": {
+                "wlc": [["o090090100021", "o090090100032"]]},
+            "add_subject_referents": {
+                "wlc": [["o090090100032"]]},
+        }
+        index = self.build([decision])
+        by_id = {e["id"]: e for e in index["entities"]}
+        self.assertEqual(
+            by_id["person:GenericServant"]["occurrences"]
+            ["subject_referents"]["wlc"], [["o090090100032"]])
+        self.assertEqual(index["by_word"]["wlc:o090090100021"], [
+            {"entity_id": "person:Saul", "link_type": "explicit_instances"}])
+        self.assertEqual(index["by_word"]["wlc:o090090100032"], [
+            {"entity_id": "person:GenericServant",
+             "link_type": "subject_referents"}])
+        self.assertEqual((servant.read_bytes(), named.read_bytes()), originals)
+        with self.assertRaisesRegex(ValueError,
+                                    "absent group cannot be removed"):
+            self.build([dict(decision, remove_subject_referents={
+                "wlc": [["o090090100032"]]})])
+
     def test_actual_editorial_pilots_preserve_source_and_correct_classification(self):
         path = self.write_record("people", "Jashar",
                                  references=["06010013", "10001018"],

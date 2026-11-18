@@ -83,7 +83,7 @@ jobs:
           assert stats["source_records"] == 6644, stats
           assert stats["index_entities"] == 6641, stats
           assert stats["quarantined_records"] == 3, stats
-          assert stats["reviewed_entries"] == 18, stats
+          assert stats["reviewed_entries"] == 26, stats
           assert stats["unattested_distinct_source_words"] == 18, stats
           assert stats["indexed_distinct_source_words"] == 134822, stats
           assert len(index["unattested_source_words"]) == 18
@@ -250,7 +250,7 @@ jobs:
           stats=report["statistics"]
           assert stats["distinct_person_original_word_overlap_candidates"] == len(report["findings"])
           assert stats["multiple_explicit_names"] == 8, stats
-          assert stats["mixed_name_and_indirect"] == 14, stats
+          assert stats["mixed_name_and_indirect"] == 1, stats
           assert stats["indirect_only"] == 2385, stats
           assert sum(stats[x] for x in ("multiple_explicit_names", "mixed_name_and_indirect", "indirect_only")) == len(report["findings"])
           assert all(len(f["canonical_people"]) >= 2 for f in report["findings"])

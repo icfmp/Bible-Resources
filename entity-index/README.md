@@ -418,6 +418,45 @@ and all additions checked to be new. Derived source-claim modifications
 are declarative, documented and reversible. This is not an edit of
 biblical words, nor a merge between an ancestor and their descendants.
 
+## Direct name words incorrectly marked as another person's indirect referent
+
+A subsequent context review of the remaining 14 mixed person overlaps has
+removed **12 source-unjustified indirect word-group pointers** in the derived
+index, affecting eight original source record IDs. These are exact source
+words explicitly naming Jesus (Luke 9:58, 24:15, 24:19), Rebekah
+(Genesis 24:58), Samson (Judges 14:16), Saul (1 Samuel 10:14),
+Solomon (1 Kings 2:29), Elijah (1 Kings 18:42), Jehu (2 Kings 10:5),
+Jeremiah (Jeremiah 11:1), Daniel (Daniel 10:7) and Zechariah
+(Zechariah 1:7). The frozen ACAI source had also put those words under
+a *different* person's generic/anonymous subject or pronoun pointer.
+All the correctly anchored named-person source tokens remain unchanged.
+
+**A thirteenth mixed-name correction is source-verified:**
+at **1 Samuel 9:10**, pinned Hebrew `o090090100021` names Saul,
+and the distinct `o090090100032` is the common noun *servant*
+(with separately segmented possessive suffix `o090090100033`).
+The frozen `person:GenericServant` pointer incorrectly combines Saul
+and servant in a single two-word group. The derived index now replaces
+**only that exact group** with the validated singleton servant word,
+preserving the legitimate unnamed servant without treating Saul as
+the servant, while the frozen source group stays byte-for-byte intact.
+
+**One mixed-name case remains unresolved:** **1 Kings 3:22**,
+`person:FirstProstitute` explicit vs `person:SecondProstitute`
+pronominal reference to `o110030220022` in the "other woman"
+expression. The exact WLC word is *woman*, within a larger phrase.
+The narrative does not conclusively specify which of the two women
+is the true mother solely from the order of the speakers; critical
+discussion warns against importing that identification into the Hebrew.
+Do not assign or remove the word based on inherited "first"/"second"
+descriptions without firmer person-role evidence.
+
+No anonymous person was merged with an explicitly named historical
+person. No other referent groups were removed. Exact pinned original
+source records remain byte-identical, and source edits stay declarative,
+reversible and fully audited. The **2,385 indirect-only overlaps** still
+require separate source-role and participant semantics review.
+
 ## Scoped review of all eight remaining explicit-person overlaps
 
 The current complete pinned-source audit has **eight** exact original-word
@@ -446,7 +485,7 @@ one exact word ID, exact canonical candidate pair, exact pinned source
 edition and explanatory evidence; unknown/new conflicts or stale reviews
 fail the build. The review is a separate **QA-only** artifact, and
 `by_word`, the resolver's candidate multiplicity, source files and
-original-language tokens remain **untouched**. The remaining **14 mixed**
+original-language tokens remain **untouched**. The remaining **1 mixed**
 and **2,385 indirect-only** person overlaps are not certified by this
 direct-name review. The remaining three name/identity questions need
 contextual historical review before any final interpretation.
