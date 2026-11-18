@@ -18,7 +18,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 - HISTORICAL/ARCHIVE: 9
 - KEEP_GENERIC: 26
 - MERGE: 10
-- UNDECIDED: 117
+- UNDECIDED: 118
 
 ## All tracked tools
 
