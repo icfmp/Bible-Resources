@@ -519,6 +519,7 @@ jobs:
             --auto-original-first-K-outline-links \
             --auto-authenticated-original-printed-single-verses \
             --source-notes-osis "$RUNNER_TEMP/mhcc-modern-original-crossref-supplement.osis.xml" \
+            --context-source-notes-osis "$RUNNER_TEMP/mhcc-modern-contextual-crossref.osis.xml" \
             --source-notes-errata-manifest work/mhcc-modern/production/FOUR_NATIVE_LINK_ERRATA_REVIEW_2026-11-18.json \
             --source-errata-proposals-osis "$RUNNER_TEMP/mhcc-modern-proposed-errata-navigation.osis.xml" \
             --linked-osis "$RUNNER_TEMP/mhcc-modern-complete-bounded-linked.osis.xml" \
@@ -554,6 +555,21 @@ jobs:
           assert not provisional["editorial_approval"]
           assert not provisional["public_distribution"]
           assert Path(base/"mhcc-modern-proposed-errata-navigation.osis.xml").is_file()
+          contextual=report["private_contextual_note_relocation_preview"]
+          assert contextual["status"] == (
+              "PRIVATE_EXACT_CONTEXT_PROXIMITY_REVIEW_NOT_AUTHORIAL_INLINE_PARITY")
+          assert contextual["source_note_occurrences_total"] == 176
+          assert (contextual["source_notes_moved_to_authored_paragraphs"] +
+                  contextual["source_notes_still_grouped_by_K"]) == 176
+          assert contextual["original_source_target_and_label_identities_preserved"]
+          assert not contextual["published_or_distributed"]
+          assert not contextual["source_prose_or_modern_authored_text_modified"]
+          assert Path(base/"mhcc-modern-contextual-crossref.osis.xml").is_file()
+          print("SOURCE CONTEXT PROXIMITY PREVIEW (not original-inline proof): " +
+                str(contextual["source_notes_moved_to_authored_paragraphs"]) +
+                "/176 located beside an exact adjacent original phrase; " +
+                str(contextual["source_notes_still_grouped_by_K"]) +
+                " still separate; no release")
           print("SOURCE FOUR BAD ORIGINAL LINK REPAIRS PREVIEW: 13 separate " +
                 "corroborated Scripture destinations are navigable only in a " +
                 "THIRD private unapproved candidate; zero source/modern prose edits")
@@ -816,6 +832,89 @@ jobs:
                 str(sum(seen_I.values())) +
                 " are source-authenticated modern chapter-I outline links; "
                 "28792 exact original/I-only numbered K keys; NO release")
+          PY
+      - name: Compile and read back source-context-located private note candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/mhcc-context-notes-root/mods.d"
+          mkdir -p "$RUNNER_TEMP/mhcc-context-notes-root/modules/comments/zcom/mhcccontext"
+          timeout 240s osis2mod \
+            "$RUNNER_TEMP/mhcc-context-notes-root/modules/comments/zcom/mhcccontext" \
+            "$RUNNER_TEMP/mhcc-modern-contextual-crossref.osis.xml" \
+            -z z -b 3 \
+            > "$RUNNER_TEMP/mhcc-contextual-source-osis2mod.log" 2>&1
+          cat > "$RUNNER_TEMP/mhcc-context-notes-root/mods.d/mhcccontext.conf" <<'EOF'
+          [MHCCCONTEXT]
+          Description=Private source-context-proximity notes; not original-inline parity
+          DataPath=./modules/comments/zcom/mhcccontext/
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          Lang=en
+          Versification=KJV
+          SourceType=OSIS
+          DistributionLicense=Private
+          EOF
+          python - <<'PY'
+          import hashlib,json,os,subprocess,sys
+          from collections import Counter
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+          sys.path.insert(0,"scripts")
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          base=Path(os.environ["RUNNER_TEMP"])
+          data=json.loads((base/"mhcc-modern-complete-bounded-linked-osis-structure.json").read_text())
+          summary=data["private_contextual_note_relocation_preview"]
+          previous=data["private_source_note_alternative"]
+          expected={x["source_first_key"]:Counter(
+              (y["source_original_literal_target_sha256"],
+               y["supplement_display_sha256"])
+              for y in x["original_source_reference_hashes"])
+              for x in previous["note_source_K_reference_hashes_for_private_native_readback"]}
+          seen={}
+          def observe(kind,key,raw):
+              if kind!="K" or key not in expected:
+                  return
+              if key in seen:
+                  raise ValueError("Source-context source K repeated")
+              node=ET.fromstring(b"<source>"+raw+b"</source>")
+              notes=[e for e in node.iter()
+                     if isinstance(e.tag,str) and e.tag.rsplit("}",1)[-1]=="note"]
+              actual=Counter(
+                  (hashlib.sha256(ref.get("osisRef").encode()).hexdigest(),
+                   hashlib.sha256("".join(ref.itertext()).encode()).hexdigest())
+                  for note in notes for ref in note.iter()
+                  if isinstance(ref.tag,str) and ref.tag.rsplit("}",1)[-1]=="reference")
+              if actual!=expected[key]:
+                  raise ValueError("Exact K original-reference identity lost after context placement")
+              seen[key]=sum(actual.values())
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str((base/"mhcc-context-notes-root").resolve())
+          proc=subprocess.Popen([str((base/"commentary-modern-source-raw").resolve()),
+                                 "MHCCCONTEXT"],env=env,stdout=subprocess.PIPE,
+                                stderr=subprocess.DEVNULL)
+          try:
+              native,keys,_,_=parse_native_raw_corpus(proc.stdout,on_entry=observe)
+              proc.stdout.close()
+              if proc.wait(timeout=120)!=0:
+                  raise ValueError("Contextual private SWORD scan failed")
+          finally:
+              if proc.poll() is None:
+                  proc.kill()
+                  proc.wait()
+          if len(keys)!=28792 or set(seen)!=set(expected) or sum(seen.values())!=176:
+              raise ValueError("Contextual SWORD lost numbered keys or source references")
+          if summary["source_notes_moved_to_authored_paragraphs"]:
+              key=summary["context_relocations"][0]["source_first_key"]
+              book,chapter,verse=key.rsplit(".",2)
+              # Native readback above verifies all 176 destinations even if a
+              # frontend suppresses footnote display; no UI claim is made.
+          print("PRIVATE EXACT-CONTEXT SWORD PASS: 28792 K keys, 176 exact " +
+                "source-note destinations and displays, relocated="+
+                str(summary["source_notes_moved_to_authored_paragraphs"])+
+                ", section-only="+str(summary["source_notes_still_grouped_by_K"])+
+                "; not authorial-inline parity or publication")
           PY
       - name: Compile and independently read back private 176-link original-source note alternative
         shell: bash
