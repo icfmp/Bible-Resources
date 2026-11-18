@@ -110,6 +110,38 @@ class TestLexicalSourcePatches(unittest.TestCase):
             patch_reviewed_osis_reference_attributes(
                 SOURCE,tampered,{"Gen.1.1","Exod.2.1"})
 
+    def test_real_indexed_osis_ranges_are_preserved_and_missing_verses_rejected(self):
+        root=etree.fromstring(SOURCE)
+        refs=[n for n in root.iter(OSIS+"reference")]
+        edit={
+            "original_line":refs[1].sourceline,
+            "source_book":"Gen",
+            "old_target":"Gen.1.2",
+            "new_target":"Gen.1.1-Gen.1.3",
+            "visible_label_sha256":sha256(
+                "".join(refs[1].itertext()).strip().encode()).hexdigest(),
+            "evidence_url":"https://example.org/reviewed-range",
+        }
+        plan={"schema_version":1,"status":"research_only_private_not_release",
+              "source_sha256":sha256(SOURCE).hexdigest(),"edits":[edit]}
+        full={"Gen.1.1","Gen.1.2","Gen.1.3","Exod.2.1"}
+        revised,receipt=patch_reviewed_osis_reference_attributes(SOURCE,plan,full)
+        self.assertEqual(receipt["exact_reference_attribute_only_changes"],1)
+        self.assertEqual(revised,SOURCE.replace(
+            b"osisRef='Gen.1.2'",b"osisRef='Gen.1.1-Gen.1.3'"))
+        self.assertEqual("".join(etree.fromstring(revised).itertext()),
+                         "".join(root.itertext()))
+        # A range may not pretend a missing native verse is included.
+        with self.assertRaises(LexicalPatchError):
+            patch_reviewed_osis_reference_attributes(SOURCE,plan,full-{"Gen.1.2"})
+        for invalid in ("Gen.1.3-Gen.1.1", "Gen.1.1-Exod.2.1",
+                        "Gen.1.1-Gen.2.1", "Gen.1.1-Gen.1.9",
+                        "Gen.1.1-Gen.1.1", "Gen.1.1-Gen.1.3-Gen.1.4",
+                        "Gen.1.1-Gen.1.0", "Gen.1.1-Gen.1.202"):
+            with self.subTest(invalid=invalid),self.assertRaises(LexicalPatchError):
+                patch_reviewed_osis_reference_attributes(
+                    SOURCE,dict(plan,edits=[dict(edit,new_target=invalid)]),full)
+
     def test_only_fourteen_original_byte_spans_changed_and_no_wholesale_serialization(self):
         link,inline=plans()
         result,report=patch_exact_original(SOURCE,link,inline)
