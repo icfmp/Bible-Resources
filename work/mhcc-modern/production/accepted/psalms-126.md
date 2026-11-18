@@ -33,7 +33,7 @@ As long as we remain in this world, there will always be something to pray for, 
 
 Suffering believers often cry.
 
-They share the hardships of human life and sometimes endure more than others.
+They share the hardships of human life and commonly endure an even greater share than others.
 
 Yet **they sow while they weep**.
 
@@ -60,6 +60,8 @@ The day is coming when your harvest will be abundant and **your joy in the Lord 
 ---
 
 ## Editorial review — Psalm 126
+
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Restored Henry's stronger observation that suffering believers *commonly* have more than others, weakened by the earlier draft into *sometimes*. This records his pastoral claim, not an independent sociological finding. Original module unchanged; native and independent editorial acceptance pending.
 
 **Whole CCEL source directly inspected:** [CCEL, Psalm 126](https://ccel.org/ccel/henry/mhcc.xx.cxxvi.html). Released original `MHCC 0.1.1` remains definitive for exact native SWORD key/markup and independent acceptance.
 
