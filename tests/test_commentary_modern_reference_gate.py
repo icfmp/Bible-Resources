@@ -1469,5 +1469,47 @@ class PrivateOriginalContextRelocationTests(unittest.TestCase):
                 errata=errata,original_contexts=contexts)
 
 
+
+    def test_modernized_sentence_can_only_get_paragraph_local_provenance(self):
+        from commentary_modern_draft_osis_preview import NS
+        source,ledger,native,errata,contexts=_private_context_relocation_fixture()
+        root=ET.fromstring(source)
+        paragraph=next(n for n in root.iter() if n.tag==f"{{{NS}}}p")
+        paragraph.text=(
+            "The covenant promises redemption and mercy to scattered families "
+            "through endurance, humble service and lasting hope.")
+        contexts["Gen.1.1"][0]=(
+            "The ancient covenant promised redemption and mercy for scattered "
+            "families through patient endurance, humble service, and steadfast hope.",
+            " Other unrelated original exposition follows.")
+        section=next(n for n in root.iter() if n.get("annotateRef")=="Gen.1.1")
+        place=_source_context_unique_paragraph_anchor(section,contexts["Gen.1.1"][0])
+        self.assertIsNotNone(place)
+        self.assertIs(place[0],paragraph)
+        self.assertEqual(place[1],-1)
+        _,report=build_private_contextual_source_note_preview(
+            source_note_osis=ET.tostring(root),ledger=ledger,native=native,
+            errata=errata,original_contexts=contexts)
+        self.assertEqual(report["source_notes_moved_to_authored_paragraphs"],1)
+        self.assertEqual(report["paragraph_lexical_context_proximity_count"],1)
+        self.assertEqual(report["exact_phrase_proximity_count"],0)
+
+    def test_shared_semantic_vocab_in_two_paragraphs_is_not_enough(self):
+        from commentary_modern_draft_osis_preview import NS
+        source,ledger,native,errata,contexts=_private_context_relocation_fixture()
+        root=ET.fromstring(source)
+        section=next(n for n in root.iter() if n.get("annotateRef")=="Gen.1.1")
+        first=next(n for n in section if n.tag==f"{{{NS}}}p")
+        first.text=("The covenant promises redemption and mercy to scattered "
+                    "families through endurance, humble service and lasting hope.")
+        second=ET.Element(f"{{{NS}}}p")
+        second.text=("The same covenant promises redemption and mercy to "
+                     "scattered families through endurance, humble service and hope.")
+        section.insert(1,second)
+        context=("The ancient covenant promised redemption and mercy for scattered "
+                 "families through patient endurance, humble service, and steadfast hope.",
+                 " Other unrelated original exposition follows.")
+        self.assertIsNone(_source_context_unique_paragraph_anchor(section,context))
+
 if __name__=="__main__":
     unittest.main()
