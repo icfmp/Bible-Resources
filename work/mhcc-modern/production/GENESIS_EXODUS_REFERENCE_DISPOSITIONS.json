@@ -1,0 +1,110 @@
+{
+  "status": "SECONDARY_WITNESS_LINK_CORRECTION_PROPOSALS_NOT_EDITORIAL_RELEASE_APPROVAL",
+  "source_module": "MHCC 0.1.1",
+  "source_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+  "source_link_identity_receipt_status": "SOURCE_NATIVE_ALL_K_REFERENCE_IDENTITIES_NOT_MODERN_LINK_PARITY",
+  "source_evidence_ci": "https://github.com/icfmp/Bible-Resources/actions/runs/44276719759",
+  "scope": "Only source-authenticated Gen.2, Gen.3 and Exod.12",
+  "explicit_owner_publication_authorization": false,
+  "independent_original_semantic_signoff": false,
+  "modern_sword_compiled_or_published": false,
+  "cases": [
+    {
+      "source_first_key": "Gen.2.8",
+      "source_unit_sha256": "6691e0a1b2f028891750d54d1c6f7370aee4dc824bb785a6e86394c50f3e200d",
+      "chapter": "Gen.2",
+      "modern_path": "work/mhcc-modern/production/accepted/genesis-02.md",
+      "modern_section_heading": "The garden of Eden and its two trees (verses 8–14)",
+      "witness_url": "https://ccel.org/ccel/henry/mhcc.ii.ii.html",
+      "corrections": [
+        {
+          "source_link_ordinal": 4,
+          "original_target": "2Cor.6.2",
+          "original_label": "2",
+          "disposition": "OMIT_SPURIOUS_ENUMERATOR_LINK",
+          "modern_context_anchor": "Second, there was the tree of the knowledge of good and evil."
+        }
+      ],
+      "modern_witness_links": [
+        {
+          "target": "Rev.22.2",
+          "modern_text_marker": "(Revelation 2:7; 22:2)",
+          "disposition": "ADD_SECONDARY_WITNESS_AUTHORED_REFERENCE_NOT_IN_NATIVE_LINKS"
+        }
+      ]
+    },
+    {
+      "source_first_key": "Gen.3.6",
+      "source_unit_sha256": "c897f4474b718227c209deddc89da8420bf21913447b38e9837e1bf3a2a78fd6",
+      "chapter": "Gen.3",
+      "modern_path": "work/mhcc-modern/production/accepted/genesis-03.md",
+      "modern_section_heading": "Adam and Eve fall into sin and misery (verses 6–8)",
+      "witness_url": "https://ccel.org/ccel/henry/mhcc.ii.iii.html",
+      "corrections": [
+        {
+          "source_link_ordinal": 2,
+          "original_target": "2Cor.5.2",
+          "original_label": "2",
+          "disposition": "OMIT_SPURIOUS_ENUMERATOR_LINK",
+          "modern_context_anchor": "Second, **she took.**"
+        },
+        {
+          "source_link_ordinal": 4,
+          "original_target": "Matt.4.3",
+          "original_label": "3",
+          "disposition": "OMIT_SPURIOUS_ENUMERATOR_LINK",
+          "modern_context_anchor": "Third, **she ate.**"
+        }
+      ]
+    },
+    {
+      "source_first_key": "Gen.3.14",
+      "source_unit_sha256": "11e705e34aa5f151f349dbbd5a7f433033120f94db8a7496429fda3169f2a84b",
+      "chapter": "Gen.3",
+      "modern_path": "work/mhcc-modern/production/accepted/genesis-03.md",
+      "modern_section_heading": "The serpent is cursed and the promised Seed is revealed (verses 14–15)",
+      "witness_url": "https://ccel.org/ccel/henry/mhcc.ii.iii.html",
+      "corrections": [
+        {
+          "source_link_ordinal": 2,
+          "original_target": "2Cor.2.14",
+          "original_label": "14",
+          "disposition": "RETARGET_VERIFIED_CONTINUATION_REFERENCE",
+          "modern_context_anchor": "(Hebrews 2:11, 14)",
+          "corrected_target": "Heb.2.14"
+        },
+        {
+          "source_link_ordinal": 3,
+          "original_target": "2Cor.2.2",
+          "original_label": "2",
+          "disposition": "OMIT_SPURIOUS_ENUMERATOR_LINK",
+          "modern_context_anchor": "Second, **his sufferings and death**"
+        }
+      ]
+    },
+    {
+      "source_first_key": "Exod.12.1",
+      "source_unit_sha256": "74224ba3bb93c5d51b09277fcc79c99a6772af50936d59d5d7e3c1260428a4b3",
+      "chapter": "Exod.12",
+      "modern_path": "work/mhcc-modern/production/accepted/exodus-12.md",
+      "modern_section_heading": "The Passover is instituted (verses 1–20)",
+      "witness_url": "https://ccel.org/ccel/henry/mhcc.iii.xii.html",
+      "corrections": [
+        {
+          "source_link_ordinal": 6,
+          "original_target": "Rom.8.3",
+          "original_label": "3",
+          "disposition": "OMIT_SPURIOUS_ENUMERATOR_LINK",
+          "modern_context_anchor": "**Third, eating the lamb pictured our duty to receive Christ by faith.**"
+        },
+        {
+          "source_link_ordinal": 11,
+          "original_target": "Heb.13.4",
+          "original_label": "4",
+          "disposition": "OMIT_SPURIOUS_ENUMERATOR_LINK",
+          "modern_context_anchor": "**Fourth, the feast of unleavened bread pictured the Christian life (1 Corinthians 5:7–8).**"
+        }
+      ]
+    }
+  ]
+}
