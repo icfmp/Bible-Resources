@@ -591,7 +591,10 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
             markup_by_passage[ref] = _markup_display_witness(
                 originals.get("commentary_internal", b""), b"", None
             )
-            for px, py in right_side_points:
+            # Two bounded passes over the same independently checked pane
+            # coordinates allow lazy GTK/WebKit repaint after navigation.
+            # Each copy still requires substantial authorial prose equality.
+            for px, py in right_side_points * 2:
                 stage = "focus_right_hand_commentary_pane"
                 _x11(
                     # Do not use --sync here: the same coordinate can be
@@ -713,7 +716,7 @@ def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int,
         _await_xiphos_visible_window(app, display, env, seconds=seconds)
         # Allow the already-visible GTK main window to finish initial layout
         # before accepting real, passage-specific Xiphos clipboard evidence.
-        time.sleep(1)
+        time.sleep(2)
         _dismiss_transient_xiphos_notice(env)
         inspection = attempt_real_xiphos_passage_copy(env, comparisons)
         after = on_gui_ready(env) if on_gui_ready is not None else {}
