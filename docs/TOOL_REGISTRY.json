@@ -1211,6 +1211,41 @@
       "classification": "UNDECIDED",
       "confidence": "low",
       "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/commentary_modern_native_witness_probe.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Source-neutral, read-only secondary-witness anchors in SHA-pinned native SWORD.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "hashlib",
+        "json",
+        "os",
+        "pathlib",
+        "re",
+        "subprocess",
+        "sword_native_raw_corpus_inventory",
+        "unicodedata",
+        "xml"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "c6901b3a3e0907eb8b039690684b4991bec0eadec66046b8efdae9d46ae6096c",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "source/native audit",
+      "static_reference_count": 2,
+      "static_references": [
+        ".github/workflows/commentary-modern-source-receipt.yml",
+        "tests/test_commentary_modern_native_witness_probe.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
         "OSIS"
       ],
@@ -6559,10 +6594,11 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 28,
+      "static_reference_count": 29,
       "static_references": [
         "scripts/commentary_android_text_witness.py",
         "scripts/commentary_modern_linked_candidate_preview.py",
+        "scripts/commentary_modern_native_witness_probe.py",
         "scripts/commentary_modern_reference_gate.py",
         "scripts/commentary_modern_source_receipt.py",
         "scripts/commentary_native_raw_inventory.py",
