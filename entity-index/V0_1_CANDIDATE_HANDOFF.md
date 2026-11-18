@@ -1,6 +1,6 @@
-# Bible entity index v0.1 — internal candidate handoff (NOT RELEASED)
+# Bible Semantic Index v0.1 — historical internal candidate handoff
 
-Tracked by [#339](https://github.com/icfmp/Bible-Resources/issues/339). This is a **bounded internal QA candidate**, not a SWORD module, application deployment or publicly distributed entity resource.
+This document preserves the **historical internal QA-candidate evidence** as originally recorded. Since then, the independent, keyterm-free [BSI v0.1.0 data artifact has been published](https://github.com/icfmp/Bible-Resources/releases/tag/bsi-v0.1.0). The full unfiltered internal index remains QA-only; this historical handoff is not itself the release manifest. Tracked in completed [#339](https://github.com/icfmp/Bible-Resources/issues/339).
 
 ## Reproducible candidate and observed gates
 
