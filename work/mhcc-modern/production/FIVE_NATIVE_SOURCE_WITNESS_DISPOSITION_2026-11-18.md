@@ -26,6 +26,23 @@ The new [generic native lexical-witness probe](../../../scripts/commentary_moder
 
 **Crucial distinction:** absence of several short exact CCEL phrase sequences in authenticated CrossWire SWORD is strong evidence that **these particular CCEL formulations** are absent. It is **not** exhaustive proof that every word of an authored unit was omitted, that two separately digitized editions have identical authorship, or that release rights for CCEL-specific content have been granted. The final decision needs exact full primary-original versus independently documented source edition clause/paragraph comparison.
 
+## Full authored-section word alignment — completed 2026-11-18
+
+A stronger, **whole-section** CCEL ThML ↔ authenticated native MHCC 0.1.1 word-sequence comparison now follows the earlier short-anchor probes. The CCEL ThML entire original XML was downloaded **only in an isolated GitHub Actions job**, checked against the independent previously attested full 7,952,268-byte source SHA256 `4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6`, and parsed using the **existing** source-authenticated `_original_source_markers` helper. The original compiled full native MHCC 0.1.1 corpus was also authenticated end-to-end. Four exact `scripCom` authorial bodies, including their actual declared ends, were compared using the **existing** bounded longest-common-subsequence and longest-contiguous-token-run algorithm, without writing original words, source XML, Bible references or manuscript text to logs or artifacts. Private comparison metrics and only SHA/line identifiers were saved.
+
+[Full 4-section, exact-authenticated comparison, run #44263366313](https://github.com/icfmp/Bible-Resources/actions/runs/44263366313) **completed its native source alignment step with four results**, although the overall run subsequently failed on an unrelated stale generated tool-registry inventory. The new step emitted `PRIVATE_CCEl_NATIVE_SECTION_AUDIT complete metadata-only 4 sections; not editorial signoff`.
+
+| Entire CCEL authored passage | CCEL words | Ordered common words in native K | Longest *contiguous* shared word sequence | CCEL words *not* present in native K in exact order | Native body indexed as |
+| --- | ---: | ---: | ---: | ---: | --- |
+| **1Sam.25.32–39** | 273 | **273** | **273** | **0** | 1Sam.25.32–44, total **273** words |
+| **1Sam.25.39–44** | 78 | **18** | **2** | **60** | Same original body, 273 words |
+| **Ps.95.1–7** | 141 | **141** | **141** | **0** | Ps.95.1–11, total **161** words including original headings |
+| **Ps.95.7–11** | 204 | **36** | **3** | **168** | Same original body, 161 words |
+
+**Interpretation:** The printed SWORD indexed span **does not mean** its original raw body contains the full authored passage. In 1 Samuel 25 the raw source body carries the **whole earlier CCEL 32–39 exposition**, in the same ordered text (273/273), and **not** the later 39–44 prose; 18/78 matched words across the latter are dispersed short/common vocabulary, with a maximum two-word contiguous run. In Psalm 95, the entire earlier 1–7 exposition matches in order (141/141), while the 7–11 separate exposition is **not represented**, with only three consecutive words in common at most. These are now **strong direct original-source missing-coverage findings relative to the independently pinned CCEL edition**, not merely an isolated phrase mismatch or a missing SWORD navigation alias.
+
+**Fidelity and editorial limits:** Exact matching of visible words for one CCEL source section does not prove identical original punctuation, typography, markup, edition lineage, or rights; and a missing passage in the compiled module compared with CCEL does not independently prove every original historical print edition contained it. Whole-chapter independent editorial acceptance, note/reference identity review and CCEL rights clearance remain outstanding. Do not silently add CCEL-only source to the published MHCC 0.1.1; the *modern derivative* may retain it with explicit source provenance until cleared.
+
 ## What has and has not been changed
 
 1. In the unreleased modern derivative only, [John 3](accepted/john-03.md) now preserves Henry's precise **“No stronger expression”** for regeneration and his original **“forever”** warning in the closing comment; [Psalm 95](accepted/psalms-95.md) now includes Henry's explicit **anger at both sin and sinners**. All three reversibly committed wording changes have the secondary CCEL witness in their manuscript editorial notes.
