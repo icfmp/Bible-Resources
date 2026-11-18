@@ -1742,7 +1742,8 @@ jobs:
                     x.get("resp")=="BibleResourcesModernRelocatedFirstNativeKBookPreface"]
               if len(divs)!=1:
                   raise ValueError("Missing unique modern book preface in OSIS: "+key)
-              content=normalized("".join(x.itertext() for x in list(divs[0])
+              content=normalized("".join("".join(x.itertext())
+                                         for x in list(divs[0])
                                          if x.tag!=ns+"title"))
               digest=hashlib.sha256(content.encode()).hexdigest()
               if digest!=expected[key]:
@@ -1767,7 +1768,8 @@ jobs:
                               "BibleResourcesModernRelocatedFirstNativeKBookPreface"]
                   if len(matches)!=1:
                       raise ValueError("SWORD I entry lost relocated source-K book preface")
-                  body=normalized("".join(x.itertext() for x in list(matches[0])
+                  body=normalized("".join("".join(x.itertext())
+                                          for x in list(matches[0])
                                           if x.tag.rsplit("}",1)[-1]!="title"))
                   if body!=in_osis[key]:
                       raise ValueError("SWORD native I changed modern preface text")
