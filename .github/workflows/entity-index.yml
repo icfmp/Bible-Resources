@@ -988,7 +988,7 @@ jobs:
           Path('bsi-release/BSI-0.1.0.zip').write_bytes(raw)
           print('RELEASE_ARCHIVE_SHA256',mod.sha(raw))
           PY
-          sha256sum bsi-release/BSI-0.1.0.zip > bsi-release/BSI-0.1.0.zip.sha256
+          (cd bsi-release && sha256sum BSI-0.1.0.zip > BSI-0.1.0.zip.sha256)
       - name: Publish a single immutable version if not already released
         env:
           GH_TOKEN: ${{ github.token }}
