@@ -330,5 +330,20 @@ class OriginalFirstKBookPrefaceOverlayTests(unittest.TestCase):
             self.assertEqual(report2["new_book_intros_inserted_as_separate_introduction_OSIS"],0)
 
 
+    def test_only_canonical_scripture_book_name_not_prose_is_a_safe_variant(self):
+        from commentary_modern_draft_osis_preview import (
+            same_scripture_reference_book_word as equivalent)
+        self.assertTrue(equivalent("Mic","Micah",source_book="Mic",next_word="5"))
+        self.assertTrue(equivalent("Jer","Jeremiah",source_book="Song",next_word="2"))
+        self.assertTrue(equivalent("Jer","ch",source_book="Jer",next_word="1"))
+        self.assertTrue(equivalent("ch","Jeremiah",source_book="Jer",next_word="1"))
+        self.assertFalse(equivalent("Jer","ch",source_book="Song",next_word="2"))
+        self.assertFalse(equivalent("Mic","Micah",source_book="Mic",next_word="Messiah"))
+        self.assertFalse(equivalent("Mic","Jeremiah",source_book="Mic",next_word="5"))
+        self.assertFalse(equivalent("Mic","Mic",source_book="Mic",next_word="5"))
+        self.assertFalse(equivalent("love","truth",source_book="Mic",next_word="5"))
+        self.assertFalse(equivalent("Isa","Is",source_book="Isa",next_word="54"))
+
+
 if __name__ == "__main__":
     unittest.main()
