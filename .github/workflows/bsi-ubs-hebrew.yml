@@ -125,6 +125,13 @@ jobs:
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
             --output /tmp/bsi-ubs-hebrew-sdbh-id-integrity.json
+      - name: Examine remaining Hebrew orthographic differences without inferring links
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_orthography_gaps.py \
+            --index /tmp/bsi-ubs-hebrew-index.json \
+            --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
+            --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --output /tmp/bsi-ubs-hebrew-orthography-gaps.json
       - name: Compare pinned generated index or prepare initial reproducible snapshot
         run: |
           python3 - <<'PY'
