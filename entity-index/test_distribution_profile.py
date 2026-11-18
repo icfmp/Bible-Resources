@@ -2,7 +2,10 @@
 """Synthetic regression tests for public BSI projection."""
 import copy
 import unittest
-from distribution_profile import exclude_kinds
+from pathlib import Path
+import runpy
+
+exclude_kinds = runpy.run_path(str(Path(__file__).with_name('distribution_profile.py')))['exclude_kinds']
 
 
 def entry(entity_id, kind, word):
