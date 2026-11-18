@@ -1,0 +1,65 @@
+name: BSI UBS Greek dictionary crosswalk
+
+on:
+  pull_request:
+    paths:
+      - "entity-index/links/dictionaries/ubs-greek/**"
+      - ".github/workflows/bsi-ubs-greek.yml"
+  push:
+    branches: [main]
+    paths:
+      - "entity-index/links/dictionaries/ubs-greek/**"
+      - ".github/workflows/bsi-ubs-greek.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-lexical-index:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Offline regression tests
+        run: python3 -I entity-index/links/dictionaries/ubs-greek/test_index.py
+      - name: Pin UBS source JSON (English and French edition 1.0)
+        uses: actions/checkout@v4
+        with:
+          repository: ubsicap/ubs-open-license
+          ref: a15a96cfaa4ca18a6c0339016645ba1e534db3c8
+          path: ubs-source
+          sparse-checkout: dictionaries/greek/JSON
+          persist-credentials: false
+      - name: Pin Macula SBLGNT Greek original-word inventory
+        uses: actions/checkout@v4
+        with:
+          repository: Clear-Bible/macula-greek
+          ref: 8423afe47b9e8f24b7772e808af45c7159a6fe7e
+          path: macula-greek
+          sparse-checkout: SBLGNT/tsv
+          persist-credentials: false
+      - name: Verify exact pinned source files and regenerate index
+        run: |
+          test "$(git -C ubs-source rev-parse HEAD)" = "a15a96cfaa4ca18a6c0339016645ba1e534db3c8"
+          test "$(git -C macula-greek rev-parse HEAD)" = "8423afe47b9e8f24b7772e808af45c7159a6fe7e"
+          test "$(git -C ubs-source hash-object dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON)" = "b6f2535c3ed8988480f479fdaf4f69867a776119"
+          test "$(git -C ubs-source hash-object dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON)" = "42b1abeaa7f7f7abaf72f6edd7e45badea42b90f"
+          python3 -I entity-index/links/dictionaries/ubs-greek/build_index.py \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --macula macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
+            --output /tmp/bsi-ubs-greek-index.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          actual=json.loads(Path("/tmp/bsi-ubs-greek-index.json").read_text(encoding="utf-8"))
+          pinned=json.loads(Path("entity-index/links/dictionaries/ubs-greek/index.json").read_text(encoding="utf-8"))
+          assert actual==pinned, "Generated UBS index differs from committed index"
+          assert actual["statistics"]["shared_entries"]==5507
+          assert actual["statistics"]["shared_senses"]==9160
+          assert actual["coverage"]["macula_words"]==137741
+          assert actual["coverage"]["with_ubs_entry_candidates"]==128090
+          assert actual["coverage"]["with_corresponding_sense_candidates"]==118272
+          print("BSI_UBS_GREEK_INDEX_VERIFIED",actual["statistics"],actual["coverage"])
+          PY
