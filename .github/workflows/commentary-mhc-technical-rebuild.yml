@@ -766,7 +766,9 @@ jobs:
           sys.path.insert(0,str(Path.cwd()/"scripts"))
           from audit_osis import (source_commentary_overlap_witness,
                                   compare_all_commentary_source_group_words,
-                                  compare_all_commentary_source_group_semantics)
+                                  compare_all_commentary_source_group_semantics,
+                                  source_commentary_introductions,
+                                  compare_commentary_source_native_introductions)
           from sword_native_raw_corpus_inventory import parse_native_raw_corpus
           root=Path(os.environ["RUNNER_TEMP"])
           source=root/"mhc-overlap-experimental.osis.xml"
@@ -776,6 +778,7 @@ jobs:
               raise SystemExit("Authored source group census changed in private candidate")
           targets={g["keys"][0] for g in groups if g["keys"]}
           raws={}
+          intro_raw={}
           env=dict(os.environ,SWORD_PATH=str(root/"mhc-overlap-experiment-sword"))
           process=subprocess.Popen([str(root/"commentary-native-raw"),
                                     "MHCOverlapPreview"],env=env,
@@ -784,6 +787,8 @@ jobs:
           def collect(kind,key,raw):
               if kind=="K" and key in targets:
                   raws[key]=raw
+              elif kind=="I":
+                  intro_raw[key]=raw
           try:
               actual,keys,_intros,_tops=parse_native_raw_corpus(
                   process.stdout,on_entry=collect)
@@ -813,6 +818,17 @@ jobs:
           if semantics["counts"].get("source_groups")!=4256:
               raise SystemExit("Incomplete source/native punctuation and note-body census")
           print("This is a complete punctuation/notes triage, NOT blanket editorial approval")
+          introductions=source_commentary_introductions(source)
+          if (len(introductions)!=1255 or len(intro_raw)!=1255
+                  or set(introductions)!=set(intro_raw)):
+              raise SystemExit("Book/chapter source-native introduction coverage differs")
+          intro_evidence=compare_commentary_source_native_introductions(
+              introductions,intro_raw)
+          print("ALL book/chapter source-native introductions semantic census:",
+                intro_evidence["counts"])
+          print("Bounded introduction source/native discrepancy references:",
+                intro_evidence["bounded_reference_only_cases"][:30])
+          print("Introduction contents and note bodies remain private")
           print("Still NOT an independent historical collation or note/markup identity certificate")
           PY
       - name: Verify all source verse-group boundaries against real compiled SWORD keys and linked bodies
