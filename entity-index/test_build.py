@@ -58,6 +58,39 @@ class EntityIndexTests(unittest.TestCase):
                              source_absences, source_verse_absences,
                              reference_qualifications)
 
+    def test_collective_name_does_not_become_dead_founder_identity(self):
+        patriarch=self.write_record(
+            "people","Ancestor",references=["01001001"],
+            explicit_instances={"wlc":[["o010010010021"]]},
+            pronominal_referents={"wlc":[["o010010010031"]]})
+        nation=self.write_record(
+            "groups","Community",references=[],
+            explicit_instances={},pronominal_referents={})
+        before=(patriarch.read_bytes(),nation.read_bytes())
+        decisions=[
+            {"source_id":"person:Ancestor","action":"amend_occurrences",
+             "reason":"Verse concerns later descendants rather than ancestor",
+             "evidence":["Exact name and group source words","Original context"],
+             "remove_references":["01001001"],
+             "remove_explicit_instances":{"wlc":[["o010010010021"]]},
+             "remove_pronominal_referents":{"wlc":[["o010010010031"]]}},
+            {"source_id":"group:Community","action":"amend_occurrences",
+             "reason":"Source names a current group of descendants",
+             "evidence":["Exact original source word","Named community context"],
+             "add_references":["01001001"],
+             "add_explicit_instances":{"wlc":[["o010010010021"]]},
+             "add_pronominal_referents":{"wlc":[["o010010010031"]]}}
+        ]
+        index=self.build(decisions)
+        by_id={item["id"]:item for item in index["entities"]}
+        self.assertEqual(by_id["person:Ancestor"]["references"],[])
+        self.assertEqual(by_id["group:Community"]["references"],["01001001"])
+        self.assertEqual(index["by_word"]["wlc:o010010010021"],[
+            {"entity_id":"group:Community","link_type":"explicit_instances"}])
+        self.assertEqual(index["by_word"]["wlc:o010010010031"],[
+            {"entity_id":"group:Community","link_type":"pronominal_referents"}])
+        self.assertEqual((patriarch.read_bytes(),nation.read_bytes()),before)
+
     def test_generic_indirect_and_explicit_group_edits_are_reversible(self):
         original = self.write_record(
             "people", "NamedAncestor", references=["01001001", "01001002"],

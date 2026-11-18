@@ -454,7 +454,7 @@ descriptions without firmer person-role evidence.
 No anonymous person was merged with an explicitly named historical
 person. No other referent groups were removed. Exact pinned original
 source records remain byte-identical, and source edits stay declarative,
-reversible and fully audited. The **2,365 indirect-only overlaps** still
+reversible and fully audited. The **2,361 indirect-only overlaps** still
 require separate source-role and participant semantics review.
 
 ## Indirect person-overlap source-grammar triage — no mass deduplication
@@ -478,10 +478,10 @@ event or whether one anonymous pronoun refers to them.
 
 The original complete pinned morphology audit found **1,289 Greek**
 and **1,096 Hebrew** indirect-only word overlaps. A subsequent
-exact-token contextual correction in the derived index removed twenty
-false source claims; the remaining **2,365** word overlaps comprise
-**1,284 Greek** and **1,081 Hebrew**. Their source-word grammatical
-counts are **2,096 plural**, **73 singular** and **196 without number**
+exact-token contextual correction in the derived index removed twenty-four
+false source overlap claims; the remaining **2,361** word overlaps comprise
+**1,284 Greek** and **1,077 Hebrew**. Their source-word grammatical
+counts are **2,095 plural**, **70 singular** and **196 without number**
 (often infinitives).
 These are categories of the source word, not conclusions about the
 people tagged on it. Several repeated candidate cohorts (e.g. Paul/Silas/Timothy; Aaron/Moses;
@@ -585,6 +585,47 @@ has **two repeated identical original subject groups** for
 this word; both are preserved with exact multiplicity.
 Source original JSON, all Bible words and their numbering
 remain unchanged.
+
+## Collective Israel, Judah and Levi are not their patriarchs
+
+Three additional historical contexts have exact source words naming
+**communities of descendants**, not the long-deceased founders whose names
+the source records reused. All conclusions are tied to one pinned edition,
+original-word IDs and the immediate clause; they do **not** reclassify
+every occurrence of these names across Scripture:
+
+- **1 Kings 5:5 (WLC numbering):** Judah and Israel dwell in safety
+  during Solomon's reign, each inhabitant under vine and fig tree.
+  `o110050050021` identifies people of Judah,
+  `o110050050032` people of Israel, and `o110050050051`
+  is the distributive *each person*. The literal patriarchs
+  `person:Judah.4` and `person:Israel` are not living under
+  Solomon; existing `group:Judah` already holds its word, and
+  the exact missing Israel name and its documented distributive group
+  pointer are added to `group:Israel`.
+- **2 Chronicles 23:8:** `o140230080022` names the plural
+  *Levites*, `o140230080041` names *all Judah*, the action
+  `o140230080102` is grammatically plural, and
+  `o140230080111` is *each person*. The already-indexed
+  `group:Levi` and `group:Judah` original source groups
+  represent these people; detach only the false ancestral
+  `person:Levi.3` and `person:Judah.4` exact-word links.
+- **Nehemiah 11:3:** the narrator lists postexilic residents in
+  towns of Judah (`o160110030081`), Israelites
+  (`o160110030131`), and plural Levites
+  (`o160110030153`); `o160110030101` is the distributive
+  *each*. These are living returnees, not sons of Jacob.
+  The appropriate `group:Judah` and `group:Levi` already
+  hold their original links; add only the attested Israelite
+  group word/referent to `group:Israel` and detach
+  the three false patriarch-person claims.
+
+Only these three verse contexts are amended in the derived output
+using existing **generic** occurrence/ref editing. Original source
+files, repeated source annotations, Hebrew text and verse numbers are
+untouched. The complete 134,822 active original-word inventory is
+still required by CI, and no missing person token is automatically
+retagged with a Strong number or an unrelated person.
 
 ## Scoped review of all eight remaining explicit-person overlaps
 
