@@ -9,7 +9,8 @@ from xml.etree import ElementTree as ET
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from commentary_modern_reference_gate import (SourceReferenceGate,
     WholeCanonOriginalLinkIdentityReceipt, canonical_only_for_comparison,
-    validate_proposed_link_dispositions, _wrap_exact_authored_modern_text)
+    validate_proposed_link_dispositions, _wrap_exact_authored_modern_text,
+    _unambiguous_explicit_modern_verse, _auto_single_verse_placements)
 
 
 ORIGINAL=(b'<div><reference osisRef="Bible:1John.5.20">1Jo 5:20</reference>'
@@ -461,6 +462,108 @@ class BoundedOriginalSourceLinkInsertionTests(unittest.TestCase):
             _wrap_exact_authored_modern_text(
                 section,anchor="(Hebrews 2:11, 14)",display="14",
                 occurrence="last",target="not-a-bible-osisref")
+
+
+class ExactSingleVerseSourceConcordanceTests(unittest.TestCase):
+    NS="http://www.bibletechnologies.net/2003/OSIS/namespace"
+
+    def section(self,*paragraphs):
+        node=ET.Element(f"{{{self.NS}}}div",{
+            "annotateType":"commentary","annotateRef":"Gen.2.1-Gen.2.2"})
+        for value in paragraphs:
+            ET.SubElement(node,f"{{{self.NS}}}p").text=value
+        return node
+
+    def test_named_single_verse_and_numbered_book_are_unique(self):
+        n=self.section("He remembers (John 3:16).", "And (1 John 3:16).")
+        self.assertEqual(_unambiguous_explicit_modern_verse(n,"John.3.16"),
+                         "John 3:16")
+        self.assertEqual(_unambiguous_explicit_modern_verse(n,"1John.3.16"),
+                         "1 John 3:16")
+        n=self.section("The apostles (1 John 3:16).")
+        self.assertIsNone(_unambiguous_explicit_modern_verse(n,"John.3.16"))
+
+    def test_repeated_or_ambiguous_labels_do_not_auto_map(self):
+        for values in (
+            ("Look at John 3:16 and John 3:16.",),
+            ("A whole range (John 3:16–17) is cited.",),
+            ("A comma range (John 3:16, 17) is cited.",),
+            ("A short reference (Jn 3:16) is cited.",),
+            ("A different book (John 3:17) is cited.",),
+        ):
+            with self.subTest(values=values):
+                self.assertIsNone(_unambiguous_explicit_modern_verse(
+                    self.section(*values),"John.3.16"))
+
+    def test_existing_inline_links_do_not_match_themselves(self):
+        n=self.section("The Father loved the world (John 3:16).")
+        _wrap_exact_authored_modern_text(
+            n,anchor="John 3:16",display="John 3:16",
+            target="Bible:John.3.16",occurrence="last")
+        self.assertIsNone(_unambiguous_explicit_modern_verse(n,"John.3.16"))
+
+    def test_expository_bold_name_and_two_aliases(self):
+        n=self.section("A psalm reminds us that (Psalm 23:1).")
+        self.assertEqual(_unambiguous_explicit_modern_verse(n,"Ps.23.1"),
+                         "Psalm 23:1")
+        n=self.section("These words are in Psalms 23:1.")
+        self.assertEqual(_unambiguous_explicit_modern_verse(n,"Ps.23.1"),
+                         "Psalms 23:1")
+        n=self.section("Song of Songs 2:1 directs us to hope.")
+        self.assertEqual(_unambiguous_explicit_modern_verse(n,"Song.2.1"),
+                         "Song of Songs 2:1")
+
+    def test_original_target_identity_unapproved_or_ambiguous_skips(self):
+        import types
+        # A miniature, genuine-like one-group inventory. The method must
+        # reject bare "2" source enumerators and repeated source targets.
+        n=self.section("One cites John 3:16; another cites Matthew 5:9.")
+        source={"chapters":{"Gen.2":{"original_units":[{
+            "first_key":"Gen.2.1","keys":["Gen.2.1","Gen.2.2"]}]}}}
+        originals={"Gen.2.1":[
+            ("Bible:John.3.16","John 3:16"),
+            ("Matt.5.9","2"),
+            ("John.3.16","another source link to John 3:16")]}
+        docs={"Gen.2":ET.Element(f"{{{self.NS}}}chapter")}
+        docs["Gen.2"].append(n)
+        candidates,skipped=_auto_single_verse_placements(
+            private_original=originals,groups={},modern_chapters=docs,
+            native=source,blocked=set(),corrections={})
+        self.assertEqual(candidates,[])
+        self.assertEqual(skipped["repeated_original_target"],2)
+        self.assertEqual(skipped["unverified_or_single_digit_label"],1)
+
+    def test_corrected_or_already_reviewed_original_link_not_auto_duplicated(self):
+        n=self.section("Read John 3:16 and Matthew 5:9.")
+        source={"chapters":{"Gen.2":{"original_units":[{
+            "first_key":"Gen.2.1","keys":["Gen.2.1","Gen.2.2"]}]}}}
+        originals={"Gen.2.1":[("John.3.16","John 3:16"),
+                               ("Matt.5.9","Matthew 5:9")]}
+        docs={"Gen.2":ET.Element(f"{{{self.NS}}}chapter")}
+        docs["Gen.2"].append(n)
+        candidates,skipped=_auto_single_verse_placements(
+            private_original=originals,groups={},modern_chapters=docs,
+            native=source,blocked={("Gen.2.1",1)},
+            corrections={("Gen.2.1",2):{}})
+        self.assertEqual(candidates,[])
+        self.assertEqual(skipped["already_reviewed"],1)
+        self.assertEqual(skipped["proposed_original_correction"],1)
+
+    def test_only_one_exact_original_target_is_proposed(self):
+        n=self.section("Paul mentions (Romans 3:23), but there is more.")
+        source={"chapters":{"Gen.2":{"original_units":[{
+            "first_key":"Gen.2.1","keys":["Gen.2.1","Gen.2.2"]}]}}}
+        originals={"Gen.2.1":[("Bible:Rom.3.23","Romans 3:23")]}
+        docs={"Gen.2":ET.Element(f"{{{self.NS}}}chapter")}
+        docs["Gen.2"].append(n)
+        candidates,skipped=_auto_single_verse_placements(
+            private_original=originals,groups={},modern_chapters=docs,
+            native=source,blocked=set(),corrections={})
+        self.assertEqual(len(candidates),1)
+        self.assertEqual(candidates[0]["modern_anchor"],"Romans 3:23")
+        self.assertEqual(candidates[0]["source_first_key"],"Gen.2.1")
+        self.assertEqual(candidates[0]["original_link_ordinal"],1)
+        self.assertEqual(candidates[0]["expected_modern_target"],"Rom.3.23")
 
 
 if __name__=="__main__":
