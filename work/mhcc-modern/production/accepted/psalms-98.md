@@ -45,7 +45,7 @@ Our lives will proclaim the Redeemer's praise.
 
 Everyone has reason to rejoice in the establishment of **Christ's kingdom**, because all may benefit from it.
 
-The psalm's pictures of rejoicing creation use figurative language to describe the wide reach of the Messiah's reign.
+The psalm seems to use figurative language to describe different orders of rational creatures throughout the universe rejoicing under the great Messiah's reign.
 
 Christ's kingdom will bring blessing to the whole creation.
 
@@ -60,6 +60,8 @@ Because we await these things, we should strive to be found by him **at peace, s
 ---
 
 ## Editorial review — Psalm 98
+
+**2026-11-18 targeted secondary-witness recheck:** Restored Henry's tentative (“seem”) reading of the poetic figures as different orders of rational creatures in the universe. The former modern phrasing reduced this specific, qualified interpretation to the generic “wide reach” of Messiah's reign. This corrects the unreleased manuscript, not the original module; exact-native and independent editorial verification remain outstanding.
 
 **Complete secondary English witness read:** [CCEL, Psalm 98](https://ccel.org/ccel/henry/mhcc.xx.xcviii.html). Published original `MHCC 0.1.1` remains authoritative, source-native SWORD and independent review pending.
 
