@@ -2339,7 +2339,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                                     errata_review: dict | None = None,
                                     errata_proposals_output: Path | None = None,
                                     context_notes_output: Path | None = None,
-                                    inline_source_index_output: Path | None = None) -> tuple[bytes, dict]:
+                                    inline_source_index_output: Path | None = None,
+                                    editorial_review_output: Path | None = None) -> tuple[bytes, dict]:
     """Authenticate and place an explicitly bounded set of source-backed links.
 
     Real original SWORD attributes stay in private memory/isolated new OSIS,
@@ -2362,6 +2363,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         raise ValueError("Context placement requires separate source-note alternative")
     if inline_source_index_output is not None and source_notes_output is None:
         raise ValueError("Visible source reference index requires original source notes")
+    if editorial_review_output is not None and source_notes_output is None:
+        raise ValueError("Editorial review excerpts require pinned source and review ledger")
     if (placements.get("status") !=
             "PRIVATE_REVIEWED_BOUNDED_LINK_PLACEMENT_NOT_FINAL_EDIT_OR_RELEASE"
             or placements.get("published_source_module") != "MHCC 0.1.1"
@@ -2749,6 +2752,58 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         if auto_single_verse else None)
     output = ET.tostring(doc, encoding="utf-8", xml_declaration=True)
     ET.fromstring(output)
+    if editorial_review_output is not None:
+        # Deliberate ephemeral, bounded, human-readable private editorial
+        # packet; NEVER included in the metadata-only audit report, logs, or
+        # committed prose. No original raw K bodies or markup are exported.
+        if not auto_single_verse or source_link_ledger is None or errata_review is None:
+            raise ValueError("Source-checked editorial review ledger required")
+        blocked_errata = {(c["source_first_key"],c["original_reference_ordinal"])
+                          for c in errata_review["cases"]}
+        rows=[]
+        for item in source_link_ledger["pending"]:
+            first,ord_ = item["source_first_key"],item["source_reference_ordinal"]
+            if (first,ord_) in blocked_errata:
+                continue
+            refs=private_original[first]
+            contexts=private_original_contexts.get(first)
+            if contexts is None or len(contexts)!=len(refs):
+                raise ValueError("Missing original contextual source witnesses")
+            target,label=refs[ord_-1]
+            chapter=first.rsplit(".",1)[0]
+            units=native["chapters"][chapter]["original_units"]
+            index=next(i for i,x in enumerate(units) if x["first_key"]==first)
+            sec=modern_chapters[chapter].findall(
+                f"./{{{NS}}}div[@annotateType='commentary']")[index]
+            # Modern prose is the already-public branch manuscript, not the
+            # historical raw original source. Limit it to the owning K group.
+            modern_paragraphs=[
+                "".join(p.itertext()) for p in sec.findall(f"{{{NS}}}p")
+            ]
+            rows.append({
+                "source_first_key":first,
+                "source_reference_ordinal":ord_,
+                "original_literal_osisRef":target,
+                "original_printed_link_label":label,
+                "original_text_before_link":contexts[ord_-1][0],
+                "original_text_after_link":contexts[ord_-1][1],
+                "modern_K_paragraphs":modern_paragraphs,
+                "source_literal_target_sha256":item["original_osisRef_sha256"],
+                "original_visible_label_sha256":item["original_visible_label_sha256"],
+                "disposition":"HUMAN_REVIEW_REQUIRED_NOT_SOURCE_LINK_EDIT",
+            })
+        if len(rows)!=len(source_link_ledger["pending"])-len(blocked_errata):
+            raise ValueError("Unplaced original source reference review packet incomplete")
+        editorial_review_output.parent.mkdir(parents=True,exist_ok=True)
+        editorial_review_output.write_text(json.dumps({
+            "status":"EPHEMERAL_EXCERPTS_PRIVATE_EDITORIAL_REVIEW_ONLY",
+            "source_pinned_corpus_sha256":pin,
+            "original_full_K_prose_or_markup_exported":False,
+            "original_source_changed":False,
+            "original_link_placement_approved":False,
+            "citation_count":len(rows),
+            "references":rows,
+        },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     notes_receipt = None
     context_receipt = None
     inline_source_index_receipt = None
@@ -2861,6 +2916,7 @@ def main():
     p.add_argument("--source-notes-osis",type=Path)
     p.add_argument("--context-source-notes-osis",type=Path)
     p.add_argument("--visible-source-reference-index-osis",type=Path)
+    p.add_argument("--ephemeral-editorial-review-json",type=Path)
     p.add_argument("--source-notes-errata-manifest",type=Path)
     p.add_argument("--source-errata-proposals-osis",type=Path)
     p.add_argument("--linked-osis",type=Path)
@@ -2877,6 +2933,8 @@ def main():
         p.error("Private context relocation needs the source-note alternative")
     if a.visible_source_reference_index_osis is not None and a.source_notes_osis is None:
         p.error("Visible inline index needs original source note alternative")
+    if a.ephemeral_editorial_review_json is not None and a.source_notes_osis is None:
+        p.error("Review excerpts require original source notes and pinned inventory")
     if not a.native_reader.is_file() or not a.module_directory.is_dir():
         p.error("Trusted real native reader and installed source module directory required")
     if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{1,39}",a.module_id):
@@ -2911,7 +2969,8 @@ def main():
                 else None),
             errata_proposals_output=a.source_errata_proposals_osis,
             context_notes_output=a.context_source_notes_osis,
-            inline_source_index_output=a.visible_source_reference_index_osis)
+            inline_source_index_output=a.visible_source_reference_index_osis,
+            editorial_review_output=a.ephemeral_editorial_review_json)
         a.linked_osis.parent.mkdir(parents=True,exist_ok=True)
         a.report.parent.mkdir(parents=True,exist_ok=True)
         a.linked_osis.write_bytes(osis)
