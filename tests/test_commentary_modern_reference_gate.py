@@ -1870,7 +1870,8 @@ class OriginalKTargetRangeHeadingLinksTests(unittest.TestCase):
         self.assertEqual(len(refs),1)
         self.assertEqual(refs[0].text,"7–9")
         self.assertEqual(refs[0].get("osisRef"),"Gen.8.7-Gen.8.9")
-        self.assertEqual(refs[0].getparent() if hasattr(refs[0],"getparent") else None,None)
+        hi=next(x for x in root.iter() if x.tag==f"{{{NS}}}hi")
+        self.assertIn(refs[0],list(hi))
         self.assertEqual("".join(root.itertext()),original_visible)
         self.assertEqual(receipt["source_original_partial_ranges_restored_in_K_exposition"],1)
 
