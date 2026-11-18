@@ -1223,9 +1223,9 @@ def _original_label_in_modern_k(section: ET.Element, label: str) -> str:
                     # book label inherit a preceding numbered-book prefix.
                     prefix = fragment[:start]
                     numbered_book_prefix = (
-                        not re.match(r"^[1-4]\\s", needle)
+                        not re.match(r"^[1-4]\s", needle)
                         and bool(re.search(
-                            r"(?:^|[^A-Za-z0-9])[1-4]\\s+$", prefix)))
+                            r"(?:^|[^A-Za-z0-9])[1-4]\s+$", prefix)))
                     if (not numbered_book_prefix
                             and (start == 0
                                  or not fragment[start - 1].isalnum())
