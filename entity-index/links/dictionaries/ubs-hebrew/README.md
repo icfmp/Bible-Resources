@@ -1,214 +1,78 @@
-# UBS Hebrew Bible dictionary — bilingual MACULA WLC crosswalk (v0.1)
+# UBS Hebrew dictionary — source-guarded bilingual MACULA WLC crosswalk
 
-This is a **compact lexical index**, not a rewritten dictionary. It joins the
-pinned Macula WLC word annotations to the shared, original stable identifiers
-of the **UBS Dictionary of Biblical Hebrew** in French and English.
+This source-pinned index links MACULA WLC words to **UBS Dictionary of Biblical Hebrew 0.9.4 (EN/FR)** without copying definitions. Lexical correctness and edition identity take priority over a high coverage percentage.
 
-## Source and rights
+## Original editions, provenance and rights
 
-- Original EN: [UBSHebrewDic-v0.9.4-en.JSON](https://github.com/ubsicap/ubs-open-license/blob/a15a96cfaa4ca18a6c0339016645ba1e534db3c8/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON)
-- Original FR: [UBSHebrewDic-v0.9.4-fr.JSON](https://github.com/ubsicap/ubs-open-license/blob/a15a96cfaa4ca18a6c0339016645ba1e534db3c8/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-fr.JSON)
-- Fixed UBS commit: `a15a96cfaa4ca18a6c0339016645ba1e534db3c8`
-- Original [MACULA Hebrew WLC TSV](https://github.com/Clear-Bible/macula-hebrew/blob/47db250bd55d0d8577f2a94fba114ef16c35b23c/WLC/tsv/macula-hebrew.tsv), fixed revision `47db250bd55d0d8577f2a94fba114ef16c35b23c`.
-- Original dictionary copyright © United Bible Societies; adapted from the **Semantic Dictionary of Biblical Hebrew**. Source license **CC BY-SA 4.0**, preserving UBS attribution and ShareAlike. MACULA linguistic annotations: **CC BY 4.0**, credited separately.
+- [UBS English 0.9.4](https://github.com/ubsicap/ubs-open-license/blob/a15a96cfaa4ca18a6c0339016645ba1e534db3c8/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON) and [UBS French 0.9.4](https://github.com/ubsicap/ubs-open-license/blob/a15a96cfaa4ca18a6c0339016645ba1e534db3c8/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-fr.JSON), commit `a15a96cfaa4ca18a6c0339016645ba1e534db3c8`.
+- [MACULA Hebrew WLC](https://github.com/Clear-Bible/macula-hebrew/blob/47db250bd55d0d8577f2a94fba114ef16c35b23c/WLC/tsv/macula-hebrew.tsv), commit `47db250bd55d0d8577f2a94fba114ef16c35b23c`.
+- UBS copyright © United Bible Societies, **CC BY-SA 4.0**; MACULA source **CC BY 4.0**. Keep original attributions and ShareAlike obligations. Neither dictionary prose nor original WLC text is redistributed in this index.
+- Source inventories: 7,943 matching UBS EN/FR headword IDs and 16,619 sense IDs, with zero EN/FR identifier drift in these pinned files.
 
-No UBS definitions, translations, lexicon articles, or original Macula word text are copied into the crosswalk. They remain in their licensed source datasets and must be read there. This index only contains verifiable relationships between lexical identifiers and edition/revision metadata.
+## Critical edition-identity correction
 
-## Key finding: exact `sdbh` pointers
+An earlier index trusted the fact that a 15-digit MACULA `sdbh` identifier also occurred as a UBS `LEXID`. **This is not a sufficient identity check across source editions**. The full corpus comparison demonstrated that identical numeric identifiers can refer to unrelated lexemes.
 
-MACULA WLC already has an `sdbh` field which, when present and attested in the exact UBS edition, can identify a **specific UBS `LEXID` sense**, not just a headword.
+For instance, WLC Genesis 1:1 annotates `רֵאשִׁית`, Strong H7225, with `sdbh=006653001001000`. In this UBS edition, `006653001001000` belongs to `רֹאשׁ`, whose Strong codes are H7218, H7219 and H7220. The old direct-sense link was not established by a genuine lexical identity match.
 
-The complete source comparison found:
+The new generic `lookup(index, sdbh, strongnumberx, lang)` enforces **independent numeric Strong-family corroboration** for every direct `sdbh` candidate. It verifies the original H/A language and the numeric Strong base against the actual owning UBS headword. When those differ, the direct sense is **quarantined**; only the **original exact** Strong value (including a letter suffix, if present) may yield an `entry_only` fallback. An unmatched word is left unresolved. Original source data and IDs are never modified.
 
-| Metric | Count |
+This conservative check validates the **lexeme identity** supporting a candidate sense ID. It is *not* proof that sense inventories remain semantically identical between editions. Do not market the retained direct matches as independently editorially validated contextual meanings.
+
+### Full corpus results after quarantine
+
+| WLC occurrence outcome | Count |
 | --- | ---: |
-| Shared UBS MainId entries, EN/FR | 7,943 |
-| Shared UBS LEXID senses, EN/FR | 16,619 |
-| EN/FR lexical identifier drift | 0 |
-| Full Macula WLC source word rows | 475,911 |
-| WLC rows with populated `sdbh` | 244,734 |
-| WLC rows whose `sdbh` exactly matches a UBS sense | 165,214 |
+| Corroborated UBS source sense ID (Strong numeric family agrees) | **30,492** |
+| Single UBS headword via exact Strong, contextual sense unknown | **221,522** |
+| Multiple UBS headwords via exact Strong, ambiguous | **5,024** |
+| Exact Strong without a corresponding UBS entry | **218,868** |
+| Unsupported Strong structure | **5** |
+| **Total original WLC word occurrences** | **475,911** |
 
-## Full generated index coverage
+**257,038 / 475,911 (54.0%)** have at least one verifiable headword candidate; **30,492 (6.4%)** retain a source sense ID with corroborating Strong-family evidence. Compare the previous **283,219** linked occurrences and **165,214** raw equal-ID matches; those historical numbers counted links which may cross into unrelated lexemes, and must not be used as present accuracy figures.
 
-The source-pinned generator was executed against all 475,911 WLC rows:
+A separate source-identity audit counts the former 165,214 raw numeric `sdbh` overlaps:
 
-| Link classification | Occurrences |
+| Independent lexical evidence for equal-ID entries | Original WLC rows |
 | --- | ---: |
-| Exact UBS sense (`sdbh` → `LEXID`) | 165,214 |
-| Single UBS headword via language-specific Strong, **sense unknown** | 115,264 |
-| Multiple candidate UBS headwords via Strong, **ambiguous** | 2,741 |
-| Valid Strong without a matching dictionary entry | 192,689 |
-| Unsupported Strong structure | 3 |
-| **Total** | **475,911** |
+| Identical lemma and identical Strong | 17,378 |
+| Identical lemma and same Strong numeric family (suffix differs) | 6,329 |
+| Different lemma spelling but identical Strong | 5,879 |
+| Different lemma spelling but same Strong numeric family | 906 |
+| Same lemma with different or missing Strong | 804 |
+| **Different lemma and different Strong family (untrusted)** | **133,918** |
+| **Total raw equal-ID rows** | **165,214** |
 
-**283,219 / 475,911 (59.5%)** have at least one UBS entry candidate, but only **165,214 (34.7%)** have an exact sense match. These are measured results for **these pinned source editions**, not a claim that all remaining original Greek/Hebrew words lack dictionary definitions. We preserve source suffixes **exactly**: `2050a` cannot become `2050`, and only a matching UBS suffixed code can produce an entry candidate. We never infer from spelling or silently reinterpret source `sdbh` IDs to increase percentages.
+The first four classes above sum to **30,492**, matching the new corroborated count. The 804 exact spelling matches without Strong corroboration are deliberately not promoted to an authoritative sense. Similar spelling alone is insufficient.
 
-The other source `sdbh` pointers **must not be fabricated or silently remapped**: the source has more values than are attested in the pinned dictionary edition. The index returns the relevant entry *only* when an independently exact matching original `Strong` code exists, with `entry_only` status, **never** a guessed contextual sense. A match to multiple entries returns the complete candidate list.
+### Content-word coverage
 
-## Audited improvement: exact suffix matching
+MACULA classes `noun`, `verb`, `adj`, `adv`, `num` contain 248,680 source occurrences:
 
-The first v0.1 bridge omitted all suffixed Strong codes, even when a **matching suffixed code was present verbatim in UBS**. A full pinned-source audit confirmed **1,950 additional original-word rows** whose exact suffix was represented by a published UBS entry, enabling a safe entry-only link. These rows are now included in the 115,264 entry-only matches above.
+| Metric | Occurrences |
+| --- | ---: |
+| Corroborated source sense IDs | 29,449 |
+| UBS entry-only matches | 199,256 |
+| Unresolved | 19,975 |
+| **With UBS headword** | **228,705 (91.97%)** |
 
-The crosswalk now indexes **8,979** distinct Hebrew/Aramaic Strong codes (including 693 exact UBS suffix codes) and leaves nine nonconforming UBS Strong codes unindexed. The confirmed contextual-sense count remains **165,214**, unchanged. No suffix was removed to force a match, and the earlier v0.1 dictionary editions remain pinned.
+This is coverage of **selected original WLC source classes**, not the dictionary's theoretical completeness or the number of distinct lexemes. Grammatical morphemes remain part of the full WLC denominator.
 
-The remaining **192,692 unresolved occurrences** deserve separate investigation; the largest group has variant Strong forms absent from this edition, and **14,867** unresolved rows still carry `sdbh` references. The [audit_unmatched.py](audit_unmatched.py) tool produces exhaustive, reversible classification from original pinned input without silently adding doubtful links.
+## Reconciliation candidates — not accepted links
 
-## Why 59.5% is misleading as a vocabulary coverage figure
+The separately generated [reconciliation_candidates.json](reconciliation_candidates.json) contains **508 original lemma + Strong-family candidate groups**, representing **7,588 occurrences** among the current 19,975 unresolved lexical occurrences. To enter the *review-only* file, a group requires identical NFC lemma, matching H/A numeric Strong family, and a unique original UBS headword. The suffix schemes may differ; that is **not evidence of an exact Strong code**, and **no candidate is added to the authoritative dictionary lookup**.
 
-The audited source-class breakdown is much more useful than one all-token
-percentage. All counts below come from the **same frozen WLC + UBS 0.9.4
-sources**, not from guesses or altered dictionary data.
+A further **12,385** lexical occurrences have no such joint evidence, and 2 lack supported source Strong syntax. Frequent groups include `עַיִן`, `קוֹל`, `פֶּה`, `טוֹב`, `שַׁעַר`, `רַע`. In particular, `כֹּל` (H3605) has no matching UBS original Strong/headword in this edition and must not be linked using its numerically coincident `sdbh` parent.
 
-| Original MACULA class | Exact senses | Entry only | Unresolved | Coverage with an UBS entry |
-| --- | ---: | ---: | ---: | ---: |
-| noun | 95,517 | 42,152 | 8,612 | 94.1% |
-| verb | 34,742 | 36,323 | 1,990 | 97.3% |
-| adj | 5,025 | 3,934 | 843 | 91.4% |
-| adv | 982 | 9,388 | 2,291 | 81.9% |
-| num | 4,976 | 1,905 | 0 | 100.0% |
-| **Selected lexical classes** | **141,242** | **93,702** | **13,736** | **94.48%** |
+## Source integrity and test workflow
 
-The reporting subset includes only source classes `noun`, `verb`, `adj`,
-`adv` and `num`. It is **not** a claim that all lexical material is limited
-to these classes, nor that the dictionary covers all vocabulary types.
-Other grammatical classes (including pronouns and particles) can have real
-lexical entries and are still available through the original index.
+- [build_index.py](build_index.py) produces `index.json`, preserving `by_sdbh` and `by_strong`, adding `by_entry_strong_family` for corroboration and retaining full coverage statistics. The generated index never contains dictionary definitions.
+- [audit_direct_sense_fidelity.py](audit_direct_sense_fidelity.py) measures 165,214 raw equal-ID overlaps against independent MACULA/UBS lemmas and Strong identities.
+- [audit_unmatched.py](audit_unmatched.py) categorizes unresolved original rows; [audit_variants.py](audit_variants.py) reports source morphology and lexical-class coverage.
+- [audit_lexical_gaps.py](audit_lexical_gaps.py) groups unresolved lexical occurrences by original language/lemma; [audit_top_lemmas.py](audit_top_lemmas.py) examines frequent problem families.
+- [audit_strong_reconciliation.py](audit_strong_reconciliation.py) reconstructs the **review-only** candidate report. Its original word-ID witnesses allow review without inventing entries.
+- [test_index.py](test_index.py), [test_lexical_gaps.py](test_lexical_gaps.py), and [test_strong_reconciliation.py](test_strong_reconciliation.py) include offline synthetic regression tests.
+- The [GitHub Actions workflow](../../../../.github/workflows/bsi-ubs-hebrew.yml) verifies the exact pinned sources, runs all audits, regenerates both committed JSON datasets, and compares them deterministically. It operates in **read-only mode** after the validated source snapshot is committed.
 
-The original `art`, `cj`, `prep`, and `pron` classes together account
-for **176,085 unresolved rows**. A large part of the apparent 40.5% gap is
-therefore composed of grammatical elements, notably:
-
-- conjunction וְ, WLC `H2050b`: 50,217 rows
-- article הַ, WLC `H1886a`: 30,273 rows
-- preposition לְ, WLC `H3807a`: 20,186 rows
-- preposition בְּ, WLC `H0871a`: 15,521 rows
-
-**Crucial source-fidelity finding:** stripping the suffix in those four
-cases can resolve to an *unrelated UBS Hebrew lemma*. It is not a
-permissible shortcut. Exact lexical ID matching remains the only way a
-new verified crosswalk link enters the index.
-
-The read-only [audit_variants.py](audit_variants.py) reconstructs the
-complete coverage breakdown by original `class`, morphology prefix, and
-Hebrew vs Aramaic source language, including representative exact source
-word IDs for the top suffix families. The original v0.1 edition pairing
-and all published BSI content remain unchanged.
-
-## Prioritizing the remaining 13,736 lexical occurrence gaps
-
-A read-only, full-original-WLC audit groups **unresolved occurrences**, *not
-distinct dictionary words*, by original source language plus original lemma.
-The audit finds **579 language/lemma groups**; the ten most frequent account
-for **66.02%** of the unresolved occurrences, the first 50 for **83.04%**, and
-the first 100 for **90.19%**.
-
-| Original lemma | Source class / illustration | Unresolved occurrences |
-| --- | --- | ---: |
-| כֹּל | noun, Strong 3605; Genesis 1:21 | 5,409 |
-| אַל | adverb/negative, Strong 0408 | 726 |
-| כֹּה | adverb, Strong 3541 | 577 |
-| קוֹל | noun, Strong 6963 | 505 |
-| עוֹד | adverb, Strong 5750 | 488 |
-| טוֹב | adjective, Strong 2896 | 333 |
-| רַע | adjective, Strong 7451 | 324 |
-| מְאֹד | adverb, Strong 3966 | 300 |
-| חָטָא | verb, Strong 2398 | 236 |
-| חוה | verb, Strong 7812a | 170 |
-
-**Important:** the raw MACULA lemma and its UBS counterpart may differ
-in orthography, vowel points, source edition numbering, word class,
-or lexical identity. In particular, the old MACULA `sdbh` for an
-attested root may point to **another UBS version/ID inventory**. The
-audit's exact-NFC lemma matches are *review candidates*, not independently
-verified sense or entry links. Even a unique matching spelling is **not**
-enough to add a crosswalk relation.
-
-The reproducible [audit_lexical_gaps.py](audit_lexical_gaps.py) reports all
-579 original language/lemma groups with original word IDs, reference examples,
-frequent Strong codes, original `sdbh` evidence, and morphology. It
-distinguishes four *triage buckets* that do not imply final editorial
-findings. The baseline includes 13,736 unresolved lexical occurrences;
-no dictionary definitions or Bible text are changed.
-
-**Next manual review priority:** resolve high-frequency original lemmas
-using authoritative edition-specific identity evidence (not stripped
-suffixes, not surface-string similarity), beginning with `כֹּל`.
-
-## Top-frequency lexical gaps: pinned-source reconciliation investigation
-
-The audit tools provide a conservative path forward without equating two
-different editions' Strong suffix schemes or lexical sense identifiers:
-
-- **13,736** unresolved selected lexical-class word occurrences (579 original
-  language+lemma groups).
-- **3,439** occurrences / **278** source lemma+numeric-Strong families have
-  *dual evidence*: (1) the **identical NFC original lemma** and (2) the same
-  **H/A numeric Strong family**, with a **single candidate UBS MainId**.
-- **10,297** occurrences do **not** satisfy both independent conditions.
-- Of the 3,439 candidate occurrences, 2,485 have unsuffixed MACULA vs
-  suffixed UBS codes; 947 have suffixed MACULA vs unsuffixed UBS codes; 7
-  have different suffix letters. These are **review candidates only**, not
-  additions to the verified `by_strong` or `by_sdbh` mappings.
-
-| MACULA lemma | Original Strong | UBS entry / Strong | Unlinked WLC rows |
-| --- | --- | --- | ---: |
-| קוֹל | H6963 | `006416000000000` / H6963a | 505 |
-| טוֹב | H2896 | `002670000000000` / H2896a,b | 333 |
-| רַע | H7451 | `006851000000000` / H7451a,b | 324 |
-| חוה | H7812a | `002157000000000` / H7812 | 170 |
-
-### Important negative controls
-
-- כֹּל (H3605, **5,409** unresolved WLC rows) has no
-  exact matching UBS lemma or original H3605 code in this pinned edition.
-  Its occasional MACULA `sdbh` prefix leads to **an unrelated UBS lemma**
-  and must not be treated as an entry.
-- אַל (H0408) is not equivalent to similarly unpointed אֵל (UBS H0410
-  etc.) merely because the consonants match.
-- כֹּה (H3541) is not the same as Aramaic כָּה (UBS A3542).
-- The original MACULA `sdbh` for טוֹב points to a UBS
-  `MainId` belonging to a **different lemma** in 0.9.4. Treating this
-  prefix as a stable entry identifier would silently corrupt meanings.
-
-Use [audit_top_lemmas.py](audit_top_lemmas.py) for exact source witnesses
-and [audit_strong_reconciliation.py](audit_strong_reconciliation.py)
-for *every* unique lemma-plus-Strong-family candidate, ambiguity exclusions,
-and source word-ID examples. They produce machine-readable QA JSON in CI,
-not dictionary edits. **No candidate is automatically promoted to an
-authoritative dictionary lookup**; editorial validation of suffix semantics
-and UBS sense alignment is still needed.
-
-## Index design
-
-- `by_sdbh`: exact fifteen-digit original Macula `sdbh` sense ID → one or more stable UBS `MainId` values. The `sdbh` value itself is the exact `LEXID` sense.
-- `by_strong`: language-aware `H` (Hebrew) / `A` (Aramaic) Strong ID with an optional **exact, single-letter suffix** → zero or more stable UBS `MainId` values. A suffix is matched against its corresponding UBS suffix, **never stripped**; compound and unmatched forms are not guessed.
-- `coverage`: complete WLC audit, distinguishing exact senses, entry-only fallback, ambiguous entries and unmatched words.
-- `statistics`: bilingual lexical ID inventory and excluded forms.
-
-Lookup order for one original WLC word: try the exact `sdbh` sense first; if no exact UBS sense is present, try the *language-specific* exact numeric or explicitly suffixed Strong headword only. An unsupported or missing match returns an explicit no-link result. An `entry_only` result is **not an assertion that any one dictionary meaning applies**.
-
-The index is shared by French and English: use the same `MainId`/`LEXID` to open the corresponding language edition. No second set of lexical links needs to be built.
-
-## Connection to BSI entities
-
-BSI and the dictionaries share the original Macula word anchor but answer different questions:
-
-- `BSI → original word`: who or what is being referred to?
-- `original word → UBS lexeme / sense`: what lexical meaning(s) are available?
-
-No entity identity is inferred from a shared lemma, spelling or Strong code. Dictionary article content stays outside the BSI core, and encyclopedia crosswalks belong under `links/encyclopedias/`.
-
-## Reproducibility
-
-```bash
-python3 -I entity-index/links/dictionaries/ubs-hebrew/test_index.py
-
-python3 -I entity-index/links/dictionaries/ubs-hebrew/build_index.py \
-  --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
-  --french ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-fr.JSON \
-  --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
-  --output entity-index/links/dictionaries/ubs-hebrew/index.json
-```
-
-The [GitHub Actions workflow](../../../../.github/workflows/bsi-ubs-hebrew.yml) uses exact source revisions and UBS file blob hashes, verifies all word rows, and compares the generated output with the committed index. No upstream resource is modified.
+The original source annotations and original WLC IDs are never rewritten. The next appropriate step is **edition-aware lexical reconciliation with an editorially validated sense policy**, not assuming numeric `LEXID` equality is a semantic guarantee.
