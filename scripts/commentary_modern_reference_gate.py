@@ -1655,6 +1655,12 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
     if (sum(r["modern_link_occurrences"] for r in modern_groups)+
             sum(r["modern_link_occurrences"] for r in intro_groups)!=len(proposed)):
         raise ValueError("Modern K and chapter-I source-link counts differ from original")
+    source_link_ledger=(
+        _unplaced_original_link_review_ledger(
+            original=private_original,
+            insertions=inserted,
+            corrections=correction_by_key)
+        if auto_single_verse else None)
     output = ET.tostring(doc, encoding="utf-8", xml_declaration=True)
     ET.fromstring(output)
     return output, {
@@ -1680,6 +1686,7 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         "modern_linked_osis_sha256":hashlib.sha256(output).hexdigest(),
         "published_source_1204_links_fully_transferred":False,
         "remaining_source_links_require_individual_placement_review":True,
+        "source_original_link_review_ledger":source_link_ledger,
         "modern_SWORD_readback_verified":False,
         "independent_editorial_semantic_signoff":False,
         "publication_authorized":False,
