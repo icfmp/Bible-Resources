@@ -651,21 +651,24 @@ def _unambiguous_explicit_modern_verse(section: ET.Element, target: str):
         regex = re.compile(r"(?<![A-Za-z0-9])" + re.escape(name) +
                            r"\s+" + re.escape(chapter) + ":" +
                            re.escape(verse) + r"(?![0-9])", re.I)
-        for node in section.iter():
-            if not isinstance(node.tag, str):
+        for paragraph in section.iter():
+            if paragraph.tag.rsplit("}",1)[-1] != "p":
                 continue
-            # Never overwrite existing reviewed links, but allow their tails.
-            for part in ("text", "tail"):
-                if part == "text" and node.tag.rsplit("}", 1)[-1] == "reference":
+            for node in paragraph.iter():
+                if not isinstance(node.tag, str):
                     continue
-                value = getattr(node, part)
-                if not isinstance(value, str):
-                    continue
-                for hit in regex.finditer(value):
-                    suffix = value[hit.end():]
-                    if re.match(r"\s*[-–—,]\s*\d", suffix):
+                # Never overwrite existing reviewed links, but allow tails.
+                for part in ("text", "tail"):
+                    if part == "text" and node.tag.rsplit("}", 1)[-1] == "reference":
                         continue
-                    candidates.append(hit[0])
+                    value = getattr(node, part)
+                    if not isinstance(value, str):
+                        continue
+                    for hit in regex.finditer(value):
+                        suffix = value[hit.end():]
+                        if re.match(r"\s*[-–—,]\s*\d", suffix):
+                            continue
+                        candidates.append(hit[0])
     return candidates[0] if len(candidates) == 1 else None
 
 
