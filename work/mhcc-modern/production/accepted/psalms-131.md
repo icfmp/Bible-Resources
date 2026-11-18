@@ -20,7 +20,7 @@ The psalmist did not aim at worldly greatness.
 
 He wanted to be content in whatever circumstances God assigned him.
 
-Humble believers often think less highly of themselves than other people think of them.
+Humble believers think less highly of themselves than other people think of them.
 
 When **love for God rules the heart**, it weakens selfish pride.
 
@@ -57,6 +57,8 @@ It is good to **hope in the Lord and quietly wait for his salvation** throughout
 ---
 
 ## Editorial review — Psalm 131
+
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Removed the added frequency qualifier *often* from Henry's unqualified observation that humble believers esteem themselves less highly than others do. This is a source-meaning repair in an unreleased manuscript, not an original-native signoff.
 
 **Entire CCEL witness directly read:** [CCEL, Psalm 131](https://ccel.org/ccel/henry/mhcc.xx.cxxxi.html). Published source `MHCC 0.1.1` remains authoritative for native SWORD and independent acceptance.
 
