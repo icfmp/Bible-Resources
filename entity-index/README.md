@@ -487,6 +487,46 @@ must not be mechanically deleted or automatically called a postscript.
 No Scriptural reference, original word, verse number or original
 source biography is changed by this process.
 
+## Text-critical provenance of eight Greek source-absent verse IDs
+
+The source has **22 original entity-reference claims at eight verse IDs**
+with no exact words in the **pinned** Macula/SBLGNT main-word inventory.
+The source claim is kept intact: the eight absence IDs are **not** an
+assertion that a biblical verse is universally spurious or must be
+invented, deleted or renumbered. The source-locked
+`source-unattested-verses.json` now contains a separate, fully
+evidenced classification for each verse:
+
+- **Five traditional-textual-reading differences**:
+  Matthew 23:14, Acts 8:37, 15:34, 24:7, 28:29. They have no words
+  in this particular pinned SBLGNT main stream. Historical
+  originality and other editions' readings remain textual-critical
+  questions; no editorial judgment on canonicity is asserted.
+- **Two doxology/apparatus readings**:
+  Romans 16:25 and 16:27 are part of the doxology which is represented
+  as an **alternative reading in the SBLGNT critical apparatus**,
+  rather than in its main text (whose words end at 16:24).
+  [SBLGNT Romans 16 on BibleGateway](https://www.biblegateway.com/passage/?search=Romans+16&version=SBLGNT)
+  specifically supplies the 16:25–27 doxology in the note to 16:24.
+  This is **not** evidence that the doxology is invalid, nor that
+  Phoebe/Cenchreae names in later letter subscriptions are part of it.
+- **One verse-numbering difference**:
+  the closing benediction commonly called **2 Corinthians 13:14**
+  corresponds to the existing final **2 Corinthians 13:13** in
+  [SBLGNT's chapter](https://www.biblegateway.com/passage/?search=2+Corinthians+13&version=SBLGNT).
+  The source index may display this numbering explanation, but it
+  must **not automatically transfer every entity claim** at 13:14
+  (notably traditional letter-subscription participants) to 13:13.
+
+The generic builder checks each verse ID, exact source edition,
+all eight source-cited claims, deduplication, the narrow
+benediction-numbering comparison and original raw-reference
+preservation. The offline resolver can return `source_context`
+with the unchanged `verse_not_in_pinned_original_word_inventory`
+result. The **source context is explanatory metadata, not a
+Scripture rewrite or an identity correction**. See
+[inherited ACAI #88 / our #299](https://github.com/icfmp/Bible-Resources/issues/299).
+
 ## Version-specific reference provenance: variants and subscriptions
 
 A verse reference can have editorial or historical interest without a matching
