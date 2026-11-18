@@ -284,6 +284,23 @@ class EditorialPipelineTests(unittest.TestCase):
             "This is repeated.", "This is repeated. This is repeated.")
         self.assertEqual(repeat["class"],"ambiguous_or_unaligned_source_word_window")
 
+    def test_osis_preverse_section_is_not_false_chapter_introduction(self):
+        from audit_osis import source_commentary_introductions
+        self.write(
+            '<chapter sID="Gen.1" osisID="Gen.1" n="1"/>'
+            '<title type="chapter">Authentic chapter introduction.</title>'
+            '<title type="section">Section before the first verse.</title>'
+            '<p>This belongs with verse one, not the chapter introduction.</p>'
+            '<verse sID="Gen.1.1" osisID="Gen.1.1" n="1"/>'
+            '<p>Original verse commentary.</p>'
+            '<verse eID="Gen.1.1"/><chapter eID="Gen.1"/>',
+            kind="commentary")
+        source=source_commentary_introductions(self.source)
+        self.assertIn("Authentic chapter introduction.",source["Gen.1"]["text"])
+        self.assertNotIn("Section before the first verse.",source["Gen.1"]["text"])
+        self.assertNotIn("This belongs with verse one",source["Gen.1"]["text"])
+        self.assertEqual(source["Gen.1"]["preverse_boundary"]["kind"],"title")
+
     def test_intro_moved_to_book_or_verse_slot_is_not_automatically_called_lost(self):
         from audit_osis import (source_commentary_introductions,
                                 triage_commentary_introduction_relocation)
