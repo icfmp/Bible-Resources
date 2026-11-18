@@ -99,6 +99,25 @@ class CleanSourceTests(unittest.TestCase):
         self.assertEqual("".join(before.itertext()), "".join(after.itertext()))
         self.assertIn(b'note  <hi type="italic"/>has double spaces', self.output.read_bytes())
         self.assertEqual(self.source.read_bytes(), raw)
+        self.assertTrue(receipt["original_byte_regions_preserved_except_empty_hi"])
+        self.assertEqual(self.output.read_bytes(),
+                         raw.replace(b'<hi type="italic"/>', b'', 1))
+
+    def test_removes_empty_paired_hi_without_reserializing(self):
+        raw = OSIS.replace("Grâce  fidèle".encode("utf-8"),
+            "Grâce fidèle".encode("utf-8")).replace(
+            "<title>  L'Évangile  </title>".encode("utf-8"),
+            "<title>L'Évangile</title>".encode("utf-8"))
+        raw = raw.replace(
+            "<p>Grâce fidèle — paix.</p>".encode("utf-8"),
+            b'<p>Before <hi type="bold"></hi>after</p>'
+        )
+        self.source.write_bytes(raw)
+        result = clean(self.source, sha256(raw).hexdigest(), output=self.output)
+        self.assertEqual(result["cleanup_changes"]["empty_display_hi_elements_removed"], 1)
+        self.assertTrue(result["original_byte_regions_preserved_except_empty_hi"])
+        self.assertEqual(self.output.read_bytes(),
+                         raw.replace(b'<hi type="bold"></hi>', b'', 1))
 
     def test_preserves_empty_emphasis_with_semantic_attributes(self):
         raw = OSIS.replace(
