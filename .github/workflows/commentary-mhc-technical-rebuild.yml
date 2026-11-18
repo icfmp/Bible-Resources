@@ -175,7 +175,7 @@ jobs:
           # Only short, machine-readable Bible reference IDs are eligible for
           # diagnostic disclosure. Never expose arbitrary commentary prose.
           from lxml import etree
-          xml=etree.parse(os.environ["CLEANED"],
+          xml=etree.parse(str(Path(os.environ["RUNNER_TEMP"])/"mhc-cleaned.osis.xml"),
                           parser=etree.XMLParser(resolve_entities=False,
                                                  load_dtd=False,no_network=True,
                                                  recover=False,huge_tree=True))
