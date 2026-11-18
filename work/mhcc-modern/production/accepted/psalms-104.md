@@ -65,7 +65,7 @@ Everything is **made in wisdom**, answering the purpose for which it was created
 
 Each spring suggests **the resurrection**, when new life seems to rise out of the ruin of the old world.
 
-But human beings live beyond bodily death.
+But unlike the other creatures described, human beings alone live beyond bodily death.
 
 When God takes away breath, **the soul enters another condition**, and the body will rise again either to **glory or misery**.
 
@@ -88,6 +88,8 @@ May our souls, transformed by grace, keep reflecting upon him and praising his n
 ---
 
 ## Editorial review — Psalm 104
+
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Restored Henry's explicit contrast that humans *alone*, among the creatures under consideration, live beyond death. The earlier draft omitted the comparative claim. No change to the unreleased manuscript's verse grouping, and no original-native editorial approval inferred.
 
 **Full second English witness directly inspected:** [CCEL, Psalm 104](https://ccel.org/ccel/henry/mhcc.xx.civ.html). Released original `MHCC 0.1.1` remains authoritative; exact native SWORD/independent validation pending.
 
