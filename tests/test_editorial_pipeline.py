@@ -196,6 +196,41 @@ class EditorialPipelineTests(unittest.TestCase):
             body_sha_by_verse={"Gen.1.1":"a"*64,"Gen.1.2":"b"*64})
         self.assertEqual(result["anomaly_counts"]["native_group_has_different_entry_bodies"],1)
 
+    def test_overlapping_commentary_groups_are_traced_to_actual_native_words(self):
+        from audit_osis import (source_commentary_overlap_witness,
+                                compare_source_overlap_native_bodies)
+        self.write(
+            '<chapter sID="Gen.1" osisID="Gen.1" n="1"/>'
+            '<verse sID="Gen.1.1-2" osisID="Gen.1.1 Gen.1.2" n="1-2"/>'
+            '<p>First authored source comment.</p>'
+            '<verse eID="Gen.1.1-2"/>'
+            '<verse sID="Gen.1.2-3" osisID="Gen.1.2 Gen.1.3" n="2-3"/>'
+            '<p>Second authored source comment.</p>'
+            '<verse eID="Gen.1.2-3"/>'
+            '<chapter eID="Gen.1"/>',kind="commentary")
+        original=self.source.read_bytes()
+        overlap,needed=source_commentary_overlap_witness(self.source)
+        self.assertEqual(set(overlap),{"Gen.1.2"})
+        self.assertEqual(needed,{"Gen.1.1","Gen.1.2","Gen.1.3"})
+        frames={
+            "Gen.1.1":b"<p>First authored source comment.</p>",
+            "Gen.1.2":b"<p>Second authored source comment.</p>",
+            "Gen.1.3":b"<p>Second authored source comment.</p>",
+        }
+        result=compare_source_overlap_native_bodies(overlap,frames)
+        self.assertEqual(result["source_keys_claimed_by_multiple_groups"],1)
+        self.assertEqual(result["source_distinct_overlapping_groups_examined"],2)
+        self.assertEqual(
+            result["classification_counts"]["full_prose_present_in_some_native_keys"],1)
+        self.assertEqual(
+            result["classification_counts"]["full_prose_in_every_original_native_key"],1)
+        self.assertEqual(self.source.read_bytes(),original)
+        frames["Gen.1.1"]=b"<p>An unrelated commentary.</p>"
+        result=compare_source_overlap_native_bodies(overlap,frames)
+        self.assertEqual(
+            result["classification_counts"][
+                "full_source_word_sequence_not_found_in_group_native_keys"],1)
+
     def test_bible_split_preserves_all_text_verse_ids_and_original(self):
         self.write('<verse osisID="Gen.1.1" sID="v1"/><p>First sentence. Second sentence.</p><verse eID="v1"/>')
         node = self.p()
