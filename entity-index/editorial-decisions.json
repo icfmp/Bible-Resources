@@ -298,15 +298,23 @@
           ],
           [
             "o020030180242"
+          ],
+          [
+            "o390020100101"
+          ],
+          [
+            "o390020100132"
           ]
         ]
       },
-      "reason": "Exodus 3:18 says 'elders of Israel' and speaks of the Israelite people centuries after Jacob; its proper-name Israel word and plural representative roles do not identify the deceased patriarch Jacob/Israel. In 1 Kings 5:5 Israel is a contemporary people dwelling safely under Solomon, not the long-dead patriarch Jacob; in Nehemiah 11:3 the name explicitly means the Israelite residents of Persian-era Judah, not Jacob. The singular 'each person' words inherit participant links to communities, not historical persons. Remove only these two complete verse-specific false-person groups.",
+      "reason": "Exodus 3:18 says 'elders of Israel' and speaks of the Israelite people centuries after Jacob; its proper-name Israel word and plural representative roles do not identify the deceased patriarch Jacob/Israel. In 1 Kings 5:5 Israel is a contemporary people dwelling safely under Solomon, not the long-dead patriarch Jacob; in Nehemiah 11:3 the name explicitly means the Israelite residents of Persian-era Judah, not Jacob. The singular 'each person' words inherit participant links to communities, not historical persons. Remove only these two complete verse-specific false-person groups. Jeremiah 33:10 the demonstrative 'this' indicates the desolate place in Judah/Israel awaiting restoration, not a historical reference to the deceased patriarch Israel/Jacob; remove only his incorrect indirect claim. Malachi 2:10 speaks as the living covenant community ('we', 'each one', 'our fathers') and cannot assign three present-day discourse words to the deceased founder Israel/Jacob. Retain the source's other participating people/collective links without automatically asserting an identity.",
       "evidence": [
         "Pinned WLC Exodus 3:18 exact word o020030180061 and following referent groups o020030180181, o020030180242; frozen person:Israel source record",
         "https://classic.net.bible.org/verse.php?book=Exo&chapter=3&verse=18",
         "https://github.com/icfmp/ACAI/issues/10",
-        "Pinned WLC 1 Kings 5:5 o110050050032 = Israel as a people; o110050050051 = each resident, participantref Judah+Israel; Nehemiah 11:3 o160110030131 = Israelite residents, o160110030101 = each, participantref includes Israel and Levites. Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c."
+        "Pinned WLC 1 Kings 5:5 o110050050032 = Israel as a people; o110050050051 = each resident, participantref Judah+Israel; Nehemiah 11:3 o160110030131 = Israelite residents, o160110030101 = each, participantref includes Israel and Levites. Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c.",
+        "Pinned WLC Jeremiah 33:10 word o240330100072 = singular demonstrative 'this' qualifying a place, with group:Judah already preserving the source word; Malachi 2:10 o390020100101 first-plural action, o390020100111 common noun 'each', o390020100132 covenant-of-fathers infinitive, none identifies Jacob.",
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/24-Jer-033-lowfat.xml and WLC/lowfat/39-Mal-002-lowfat.xml"
       ],
       "remove_pronominal_referents": {
         "wlc": [
@@ -315,6 +323,12 @@
           ],
           [
             "o160110030101"
+          ],
+          [
+            "o240330100072"
+          ],
+          [
+            "o390020100111"
           ]
         ]
       }
@@ -366,7 +380,8 @@
         "24022018",
         "11005005",
         "14023008",
-        "16011003"
+        "16011003",
+        "24033010"
       ],
       "remove_explicit_instances": {
         "wlc": [
@@ -384,6 +399,9 @@
           ],
           [
             "o160110030081"
+          ],
+          [
+            "o240330100181"
           ]
         ]
       },
@@ -400,15 +418,32 @@
           ],
           [
             "o140230080102"
+          ],
+          [
+            "o230360080021"
+          ],
+          [
+            "o230360080131"
+          ],
+          [
+            "o230360080142"
+          ],
+          [
+            "o230360090021"
+          ],
+          [
+            "o230360090102"
           ]
         ]
       },
-      "reason": "Isaiah 22:8 speaks of the defense of the nation of Judah, and Jeremiah 22:18 calls Jehoiakim king of Judah; neither passage names the patriarch Judah as a living individual. Frozen group:Judah already owns exactly these name and referent tokens, so remove only the false patriarch links. 1 Kings 5:5 speaks of the people of Judah during Solomon; 2 Chronicles 23:8 explicitly says 'all Judah' alongside the Levites carrying out Jehoiada's orders, not their deceased tribal founders; Nehemiah 11:3 refers to towns of Judah after exile, not the son of Jacob. The existing group:Judah has each correct source word and subject referent. Remove only these false patriarch-specific words and verse claims in the derived output.",
+      "reason": "Isaiah 22:8 speaks of the defense of the nation of Judah, and Jeremiah 22:18 calls Jehoiakim king of Judah; neither passage names the patriarch Judah as a living individual. Frozen group:Judah already owns exactly these name and referent tokens, so remove only the false patriarch links. 1 Kings 5:5 speaks of the people of Judah during Solomon; 2 Chronicles 23:8 explicitly says 'all Judah' alongside the Levites carrying out Jehoiada's orders, not their deceased tribal founders; Nehemiah 11:3 refers to towns of Judah after exile, not the son of Jacob. The existing group:Judah has each correct source word and subject referent. Remove only these false patriarch-specific words and verse claims in the derived output. Isaiah 36:8-9 the Assyrian spokesman addresses the representatives and contemporary inhabitants of Judah; five original Hebrew second-person speech-role words cannot denote Jacob's son centuries later (the collective group:Judah already owns these same original-word pointers). Jeremiah 33:10 names the towns of Judah and 'this' desolate place, not the ancient person Judah; group:Judah already retains the exact name and demonstrative groups.",
       "evidence": [
         "Pinned WLC Isaiah 22:8 o230220080041 and Jeremiah 22:18 o240220180101, plus context-linked source referents; frozen group:Judah has all five exact pointers",
         "https://classic.net.bible.org/verse.php?book=Isa&chapter=22&verse=8",
         "https://classic.net.bible.org/verse.php?book=jer&chapter=22&verse=18",
-        "Pinned WLC 1KI 5:5 o110050050021 (Judah) and o110050050051 (each); 2CH 23:8 o140230080041 (all Judah), o140230080102 (they took), o140230080111 (each); NEH 11:3 o160110030081 (towns of Judah). Existing group:Judah has the exact original groups."
+        "Pinned WLC 1KI 5:5 o110050050021 (Judah) and o110050050051 (each); 2CH 23:8 o140230080041 (all Judah), o140230080102 (they took), o140230080111 (each); NEH 11:3 o160110030081 (towns of Judah). Existing group:Judah has the exact original groups.",
+        "Pinned WLC Isaiah 36:8 exact o230360080021 o230360080131 o230360080142, 36:9 o230360090021 o230360090102; Macula source frames cite 36:3 contemporary royal officials/representatives, not the patriarch. Jeremiah 33:10 o240330100181 names the towns of Judah, o240330100072 the demonstrative 'this place'; frozen group:Judah already indexes both.",
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/23-Isa-036-lowfat.xml and WLC/lowfat/24-Jer-033-lowfat.xml"
       ],
       "remove_pronominal_referents": {
         "wlc": [
@@ -417,6 +452,9 @@
           ],
           [
             "o140230080111"
+          ],
+          [
+            "o240330100072"
           ]
         ]
       }
@@ -864,7 +902,8 @@
       "action": "amend_occurrences",
       "remove_references": [
         "14023008",
-        "16011003"
+        "16011003",
+        "15008033"
       ],
       "remove_explicit_instances": {
         "wlc": [
@@ -873,6 +912,9 @@
           ],
           [
             "o160110030153"
+          ],
+          [
+            "o150080330262"
           ]
         ]
       },
@@ -890,14 +932,57 @@
         "wlc": [
           [
             "o140230080102"
+          ],
+          [
+            "o150080330031"
+          ],
+          [
+            "o160080100012"
           ]
         ]
       },
-      "reason": "2 Chronicles 23:8 explicitly names the plural gentilic Levites cooperating with all Judah in Jehoiada's time; Nehemiah 11:3 lists the postexilic Levite residents. Neither text refers to the ancient individual Levi, son of Jacob. The already-existing group:Levi holds the exact plural word, distributive 'each' and 2 Chronicles action verb groups. Remove only those false son-of-Jacob links, preserving the frozen source.",
+      "reason": "2 Chronicles 23:8 explicitly names the plural gentilic Levites cooperating with all Judah in Jehoiada's time; Nehemiah 11:3 lists the postexilic Levite residents. Neither text refers to the ancient individual Levi, son of Jacob. The already-existing group:Levi holds the exact plural word, distributive 'each' and 2 Chronicles action verb groups. Remove only those false son-of-Jacob links, preserving the frozen source. Ezra 8:33 explicitly mentions the plural Levites who helped weigh the returned treasures, not the long-deceased son of Jacob Levi: group:Levi already retains the exact plural gentilic word and passive weighing token. Nehemiah 8:10 follows Nehemiah, Ezra and the Levites teaching contemporary returnees; its speech verb can refer to these living participants, never to the patriarch Levi. Remove only two erroneous source subject words plus the exact Ezra 8:33 name/verse from person:Levi.3, not the legitimate Levitical community.",
       "evidence": [
         "Pinned WLC 2CH 23:8 o140230080022 Ngmpa 'Levites', o140230080102 Vqw3mp plural 'they took' (subjref the Levites and all Judah), o140230080111 distributive 'each'; NEH 11:3 o160110030153 Ngmpa 'Levites', o160110030101 each. All source words remain attached to group:Levi.",
         "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/14-2Ch-023-lowfat.xml and WLC/lowfat/16-Neh-011-lowfat.xml",
-        "Frozen ACAI person:Levi.3 identifies the patriarch, not the later collective."
+        "Frozen ACAI person:Levi.3 identifies the patriarch, not the later collective.",
+        "Pinned WLC Ezra 8:33 o150080330262 plural 'Levites', o150080330031 passive 'it was weighed' with silver/gold participants; Nehemiah 8:10 o160080100012 'he said' and Macula frame points to Neh 8:9 Nehemiah/Ezra/Levites, not Jacob's son.",
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/15-Ezr-008-lowfat.xml and WLC/lowfat/16-Neh-008-lowfat.xml"
+      ]
+    },
+    {
+      "source_id": "person:GenericPriest",
+      "action": "amend_occurrences",
+      "remove_subject_referents": {
+        "SBLGNT": [
+          [
+            "n42010025003"
+          ],
+          [
+            "n42010025008"
+          ]
+        ]
+      },
+      "reason": "Luke 10:25 introduces a singular 'law expert' (νομικός) who asks Jesus a question; the priest appears only in the later Good Samaritan parable (Luke 10:31), so the two source tokens naming the lawyer and his speaking role are not references to an anonymous priest. Keep the inherited person:Scribe source witness and any other claims untouched.",
+      "evidence": [
+        "Pinned SBLGNT Luke 10:25 n42010025003 νομικός A-NSM substantive 'expert in the Law', and n42010025008 λέγων V-PAP-NSM 'saying'; the speaker is the lawyer and not the priest who is introduced much later at Luke 10:31.",
+        "Clear-Bible/macula-greek@8423afe47b9e8f24b7772e808af45c7159a6fe7e, SBLGNT/tsv/macula-greek-SBLGNT.tsv and original frozen ACAI person:GenericPriest / person:Scribe records"
+      ]
+    },
+    {
+      "source_id": "person:MilitaryMember",
+      "action": "amend_occurrences",
+      "remove_subject_referents": {
+        "SBLGNT": [
+          [
+            "n44021037023"
+          ]
+        ]
+      },
+      "reason": "Acts 21:37 reports a Roman commander asking Paul 'Do you know Greek?' The pinned second-person-singular verb γινώσκεις is predicated of Paul, the one addressed, not of the military officer asking the question. Retain the explicit named Paul source claim and the military participant's other original words and narrative role.",
+      "evidence": [
+        "Pinned SBLGNT Acts 21:37 n44021037023 γινώσκεις V-PAI-2S, second-person-singular 'do you know', addressed by the tribune to Paul in the exact quoted question.",
+        "Clear-Bible/macula-greek@8423afe47b9e8f24b7772e808af45c7159a6fe7e SBLGNT original TSV and frozen ACAI person:MilitaryMember / person:Paul"
       ]
     }
   ]
