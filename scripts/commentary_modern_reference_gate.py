@@ -1039,6 +1039,7 @@ def main():
     p.add_argument("--repository-root",type=Path)
     p.add_argument("--base-unlinked-osis",type=Path)
     p.add_argument("--reviewed-link-placement-manifest",type=Path)
+    p.add_argument("--auto-source-matched-single-verses",action="store_true")
     p.add_argument("--linked-osis",type=Path)
     p.add_argument("--report",required=True,type=Path)
     a=p.parse_args()
@@ -1065,7 +1066,8 @@ def main():
             dispositions=json.loads(a.disposition_manifest.read_text(
                 encoding="utf-8")),
             repo_root=a.repository_root, reader=a.native_reader,
-            module_directory=a.module_directory, module_id=a.module_id)
+            module_directory=a.module_directory, module_id=a.module_id,
+            auto_single_verse=a.auto_source_matched_single_verses)
         a.linked_osis.parent.mkdir(parents=True,exist_ok=True)
         a.report.parent.mkdir(parents=True,exist_ok=True)
         a.linked_osis.write_bytes(osis)
@@ -1073,9 +1075,14 @@ def main():
                             encoding="utf-8")
         print("BOUNDED SOURCE-LINKED MODERN MHCC OSIS PASS: " +
               str(result["modern_inline_links_inserted"]) +
-              " independently source-pinned inline links across all 1189 chapters; " +
-              "most original hyperlinks remain editorially UNPLACED, NO release")
+              " source-verified inline links (" +
+              str(result["automatic_exact_single_verse_source_links"]["automatically_inserted"]) +
+              " exact automatically matched citations) across all 1189 chapters; " +
+              "unmatched original hyperlinks still need editorial placement; NO release")
         return 0
+    if (a.auto_source_matched_single_verses and
+            a.reviewed_link_placement_manifest is None):
+        p.error("Automatic source-linked citation lookup needs reviewed base manifests")
     if any(x is not None for x in (
             a.base_unlinked_osis, a.linked_osis)):
         p.error("Full-canon OSIS arguments require reviewed placement manifest")
