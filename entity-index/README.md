@@ -50,6 +50,10 @@ annotations**, not certified identifications. A reviewed record is reviewed
 only for the stated, source-cited editorial decision, not for every fact
 conceivably implied by that entity.
 
+For the first version's bounded common-noun/topic acceptance examples, see
+[the v0.1 source-word pilot](V0_1_TOPIC_PILOT.md). This is an explicitly
+nonexhaustive source-candidate study, not a dictionary or published release.
+
 ## Initial independent editorial corrections
 
 The declarative file `editorial-decisions.json` describes all changes.
