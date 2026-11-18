@@ -86,7 +86,9 @@ jobs:
           receipt=json.loads(Path(os.environ["RECEIPT"]).read_text())
           if (receipt["status"]!="PRIVATE_OSIS_COSMETIC_CANDIDATE_NOT_EDITORIALLY_APPROVED"
                   or receipt["source_sha256"]!=source_sha
-                  or not receipt["all_original_osis_elements_and_attributes_preserved"]
+                  or not receipt["all_nonempty_osis_elements_and_attributes_preserved"]
+                  or not receipt["only_verified_inert_display_elements_removed"]
+                  or not receipt["all_source_nonspace_text_preserved"]
                   or not receipt["all_note_and_reference_text_preserved"]
                   or not receipt["asterisks_and_potential_note_markers_unmodified"]
                   or receipt["published"]):
@@ -94,6 +96,9 @@ jobs:
           print("Exact SHA-pinned original OSIS processed as a private cleaned candidate")
           print("Cleaned source SHA-256:",receipt["cleaned_sha256"])
           print("Cosmetic operations (text-free):",receipt["cleanup_changes"])
+          print("Text-preservation SHA-256 before/after:",
+                receipt["original_nonspace_text_sha256"],
+                receipt["cleaned_nonspace_text_sha256"])
           print("Original typographical/spacing candidate census (counts only):",
                 receipt["original_suspicious_token_census"])
           print("Original text ownership by XML tag (characters only):",
@@ -104,7 +109,7 @@ jobs:
           print("Truly empty emphasis elements:",profile["truly_empty_hi_leaf_shape_counts"])
           print("Emphasis immediate XML owners:",profile["hi_direct_parent_counts"])
           print("NBSP source XML owners:",profile["nonbreaking_spaces_by_xml_owner"])
-          print("All elements, attributes, note bodies, link bodies retained")
+          print("Only inert empty hi styling may be removed; all other elements, attributes and note/link bodies retained")
           PY
       - name: Run existing commentary OSIS structural audit, report only metadata
         shell: bash
