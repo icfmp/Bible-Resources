@@ -144,6 +144,111 @@ def lookup(index, sdbh, strongnumberx, lang):
     }
 
 
+
+def build_word_links(index, english, macula):
+    """Resolve WLC words only with exact lemma and a globally unique Strong family.
+
+    A suffix mismatch is NEVER promoted to an ordinary Strong synonym. Every
+    inferred headword is pinned to a particular original WLC word ID, and
+    matching original lemma, language and Strong code are checked at lookup.
+    No contextual sense identifier is inferred.
+    """
+    import unicodedata
+
+    numeric_family = defaultdict(set)
+    by_entry = {}
+    for entry in english:
+        mid = entry["MainId"]
+        by_entry[mid] = entry
+        for raw in entry.get("StrongCodes") or []:
+            match = STRONG.fullmatch(str(raw))
+            if match:
+                numeric_family[f"{match.group(1)}{int(match.group(2))}"].add(mid)
+    word_links = {}
+    seen = set()
+    with macula.open(encoding="utf-8-sig", newline="") as stream:
+        reader = csv.DictReader(stream, delimiter="\t")
+        required = {"xml:id", "lemma", "sdbh", "strongnumberx", "lang", "class"}
+        if not required.issubset(reader.fieldnames or []):
+            raise ValueError(f"Missing original Macula fields: {sorted(required)}")
+        for row in reader:
+            wid = row["xml:id"]
+            if wid in seen:
+                raise ValueError(f"Duplicate original WLC word ID: {wid}")
+            seen.add(wid)
+            if row["class"] not in ("noun", "verb", "adj", "adv", "num"):
+                continue
+            # Original exact sense/Strong matches always take precedence.
+            if lookup(index, row["sdbh"], row["strongnumberx"], row["lang"])["entry_ids"]:
+                continue
+            source_code = MACULA_STRONG.fullmatch(row["strongnumberx"])
+            if row["lang"] not in ("H", "A") or not source_code:
+                continue
+            family = f"{row['lang']}{int(source_code.group(1))}"
+            mids = numeric_family.get(family, set())
+            if len(mids) != 1:
+                continue
+            mid = next(iter(mids))
+            lemma = row["lemma"]
+            if unicodedata.normalize("NFC", lemma) != unicodedata.normalize(
+                "NFC", by_entry[mid]["Lemma"]
+            ):
+                continue
+            word_links[wid] = {
+                "entry_id": mid,
+                "lemma": lemma,
+                "strong": row["strongnumberx"],
+                "lang": row["lang"],
+            }
+    return dict(sorted(word_links.items()))
+
+
+def lookup_word(index, word_id, sdbh, strongnumberx, lang, lemma):
+    """Use an original pinned WLC word ID when exact ordinary matching fails."""
+    ordinary = lookup(index, sdbh, strongnumberx, lang)
+    if ordinary["entry_ids"]:
+        return ordinary
+    record = index.get("by_macula_word", {}).get(str(word_id))
+    if record is None:
+        return ordinary
+    if (record["lemma"], record["strong"], record["lang"]) != (
+        str(lemma), str(strongnumberx), str(lang)
+    ):
+        return {
+            "status": "source_word_mismatch",
+            "entry_ids": [], "sense_ids": [], "evidence": "source_identity_mismatch",
+        }
+    return {
+        "status": "entry_only",
+        "entry_ids": [record["entry_id"]],
+        "sense_ids": [],
+        "evidence": "macula_word_exact_lemma_unique_ubs_strong_family",
+    }
+
+
+def audit_word_links(index, macula):
+    """Independent full-corpus delta, retaining the legacy generic lookup."""
+    results = Counter()
+    with macula.open(encoding="utf-8-sig", newline="") as source:
+        for row in csv.DictReader(source, delimiter="\t"):
+            old = lookup(index, row["sdbh"], row["strongnumberx"], row["lang"])
+            new = lookup_word(index, row["xml:id"], row["sdbh"],
+                              row["strongnumberx"], row["lang"], row["lemma"])
+            results["original_word_rows"] += 1
+            if old["entry_ids"]:
+                results["generic_entry_links"] += 1
+            if new["entry_ids"]:
+                results["word_aware_entry_links"] += 1
+            if new["evidence"] == "macula_word_exact_lemma_unique_ubs_strong_family":
+                results["additional_entry_only_links"] += 1
+            if new["sense_ids"]:
+                results["sense_links"] += 1
+            if old["entry_ids"] and old["entry_ids"] != new["entry_ids"]:
+                raise AssertionError(f"Previously linked word changed: {row['xml:id']}")
+    if results["additional_entry_only_links"] != len(index["by_macula_word"]):
+        raise AssertionError("Original word-ID link count drift")
+    return dict(sorted(results.items()))
+
 def audit(index, macula):
     count = Counter()
     sample = {"direct_sense": None, "entry_only": None, "no_entry_match": None}
@@ -190,14 +295,17 @@ def main():
     en = json.loads(args.english.read_text(encoding="utf-8"))
     fr = json.loads(args.french.read_text(encoding="utf-8"))
     index = build(en, fr)
+    index["by_macula_word"] = build_word_links(index, en, args.macula)
     coverage, sample = audit(index, args.macula)
     index["coverage"] = coverage
+    index["coverage_with_word_ids"] = audit_word_links(index, args.macula)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(index, ensure_ascii=False, sort_keys=True,
                    separators=(",", ":")) + "\n", encoding="utf-8")
     print("BSI_UBS_HEBREW_BUILD", json.dumps(index["statistics"], sort_keys=True))
     print("BSI_UBS_HEBREW_COVERAGE", json.dumps(coverage, sort_keys=True))
+    print("BSI_UBS_HEBREW_WORD_LINKS", json.dumps(index["coverage_with_word_ids"], sort_keys=True))
     print("BSI_UBS_HEBREW_SAMPLES", json.dumps(sample, ensure_ascii=False, sort_keys=True))
 
 

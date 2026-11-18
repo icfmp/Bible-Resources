@@ -65,6 +65,53 @@ The separately generated [reconciliation_candidates.json](reconciliation_candida
 
 A further **12,385** lexical occurrences have no such joint evidence, and 2 lack supported source Strong syntax. Frequent groups include `עַיִן`, `קוֹל`, `פֶּה`, `טוֹב`, `שַׁעַר`, `רַע`. In particular, `כֹּל` (H3605) has no matching UBS original Strong/headword in this edition and must not be linked using its numerically coincident `sdbh` parent.
 
+## Verified improvement: original-word-anchored headword links
+
+The pinned WLC source and UBS Hebrew 0.9.4 confirm **2,695 additional
+entry-only links** beyond the conservative four-field lookup. The word-aware
+path is deliberately **not** an alias from unsuffixed Strong to suffixed
+Strong: such a rule could conflate homonyms.
+
+A link is permitted only when **all** of the following hold for an original
+MACULA WLC source word:
+
+1. Its ordinary exact source `sdbh`/Strong lookup has no UBS entry.
+2. Its original source class is `noun`, `verb`, `adj`, `adv`, or `num`.
+3. Its exact NFC lemma equals the UBS headword's original lemma.
+4. Its H/A numeric Strong family identifies **exactly one headword across
+   the entire UBS source**, including entries with different suffix letters.
+5. Its **original complete MACULA word ID** is retained; source lemma,
+   Strong code, and language must also match at lookup.
+
+The new `lookup_word(index, word_id, sdbh, strongnumberx, lang, lemma)`
+accepts that original word identity and returns **entry-only** evidence
+(`sense_ids=[]`). It rejects mismatched original source fields instead of
+silently picking a different entry. The existing four-argument
+`lookup(index, sdbh, strongnumberx, lang)` stays unchanged and conservative
+for callers that do not have WLC word IDs.
+
+| Measure | Generic exact-source path | Original-word-aware path |
+| --- | ---: | ---: |
+| WLC occurrences with a candidate UBS headword | 257,038 | **259,733** |
+| Additional unique-source headword links | — | **2,695** |
+| WLC occurrences with Strong-corroborated SDBH sense IDs | 30,492 | **30,492** |
+| Selected lexical-class occurrences with an UBS headword | 228,705 | **231,400** |
+| Selected lexical-class coverage | 91.97% | **93.05%** |
+
+Both paths remain pinned to the **same unmodified UBS and MACULA editions**.
+The word-anchored path is an opt-in query using a frozen original MACULA
+word ID; it cannot safely be substituted by a general Strong-prefix lookup.
+No contextual sense is inferred, no original `sdbh` is rewritten, and
+dictionary prose is unchanged.
+
+The generator now stores `by_macula_word` plus
+`coverage_with_word_ids` in [index.json](index.json); the
+[full original-corpus CI](../../../../.github/workflows/bsi-ubs-hebrew.yml)
+rebuilds both and verifies **2,695** new links and **259,733**
+word-aware candidates. [test_word_anchored.py](test_word_anchored.py)
+tests source identity isolation, H/A separation, ambiguous UBS Strong
+families, and preventing cross-edition `sdbh` collisions.
+
 ## Source integrity and test workflow
 
 - [build_index.py](build_index.py) produces `index.json`, preserving `by_sdbh` and `by_strong`, adding `by_entry_strong_family` for corroboration and retaining full coverage statistics. The generated index never contains dictionary definitions.
@@ -72,7 +119,7 @@ A further **12,385** lexical occurrences have no such joint evidence, and 2 lack
 - [audit_unmatched.py](audit_unmatched.py) categorizes unresolved original rows; [audit_variants.py](audit_variants.py) reports source morphology and lexical-class coverage.
 - [audit_lexical_gaps.py](audit_lexical_gaps.py) groups unresolved lexical occurrences by original language/lemma; [audit_top_lemmas.py](audit_top_lemmas.py) examines frequent problem families.
 - [audit_strong_reconciliation.py](audit_strong_reconciliation.py) reconstructs the **review-only** candidate report. Its original word-ID witnesses allow review without inventing entries.
-- [test_index.py](test_index.py), [test_lexical_gaps.py](test_lexical_gaps.py), and [test_strong_reconciliation.py](test_strong_reconciliation.py) include offline synthetic regression tests.
+- [test_index.py](test_index.py), [test_lexical_gaps.py](test_lexical_gaps.py), [test_strong_reconciliation.py](test_strong_reconciliation.py), and [test_word_anchored.py](test_word_anchored.py) include offline synthetic regression tests.
 - The [GitHub Actions workflow](../../../../.github/workflows/bsi-ubs-hebrew.yml) verifies the exact pinned sources, runs all audits, regenerates both committed JSON datasets, and compares them deterministically. It operates in **read-only mode** after the validated source snapshot is committed.
 
 The original source annotations and original WLC IDs are never rewritten. The next appropriate step is **edition-aware lexical reconciliation with an editorially validated sense policy**, not assuming numeric `LEXID` equality is a semantic guarantee.
