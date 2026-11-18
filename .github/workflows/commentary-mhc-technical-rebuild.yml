@@ -101,21 +101,23 @@ jobs:
           if len(begin)!=1 or len(end)!=1:
               raise SystemExit("Unattested 2Chr 1 source introduction milestone pair")
           opener=begin[0];closer=end[0]
-          parent=opener.getparent()
-          siblings=list(parent)
-          a=siblings.index(opener);z=siblings.index(closer)
-          if not a<z:
-              raise SystemExit("Unexpected 2Chr chapter introduction XML nesting")
+          def context(node):
+              parent=node.getparent()
+              siblings=list(parent) if parent is not None else [node]
+              index=siblings.index(node)
+              return {
+                  "element":hint(node),
+                  "parents":[hint(n) for n in list(node.iterancestors())[:6]],
+                  "preceding_siblings":[hint(n) for n in siblings[max(0,index-3):index]],
+                  "following_siblings":[hint(n) for n in siblings[index+1:index+4]],
+              }
           print("Original 2Chr chapter introduction markup (no prose):",
-                {"opening":hint(opener),"closing":hint(closer),
-                 "parents":[hint(n) for n in list(opener.iterancestors())[:4]],
-                 "nearest_sibling_before":hint(siblings[a-1]) if a else None,
-                 "first_three_inside": [hint(n) for n in siblings[a+1:a+4]],
-                 "last_three_inside":[hint(n) for n in siblings[max(a+1,z-3):z]],
-                 "nearest_sibling_after":hint(siblings[z+1])
-                   if z+1<len(siblings) else None,
+                {"opening":context(opener),"closing":context(closer),
+                 "same_xml_parent":opener.getparent() is closer.getparent(),
                  "original_introduction_element_count":len(
                     root.xpath("//o:div[@type='introduction']",namespaces=ns))})
+          # Different XML parents are valid for OSIS verse milestones.
+          # Do not assume that source verses are container elements.
           # Only metadata, no paragraphs or user-facing authorial text.
           PY
       - name: Audit and clean original OSIS cosmetic artifacts in isolated storage
