@@ -5,6 +5,11 @@ on:
     paths:
       - "entity-index/**"
       - ".github/workflows/entity-index.yml"
+  push:
+    branches: [main]
+    paths:
+      - "entity-index/**"
+      - ".github/workflows/entity-index.yml"
   workflow_dispatch:
 
 permissions:
@@ -951,3 +956,50 @@ jobs:
             entity-index/dist/hebrew-missing-neighbor-review.json
           if-no-files-found: error
           retention-days: 14
+
+  publish-bsi:
+    name: Publish verified BSI v0.1.0
+    needs: test-and-build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download the verified BSI archive from the same workflow run
+        uses: actions/download-artifact@v4
+        with:
+          name: bsi-0.1.0-release-candidate-internal
+          path: bsi-release
+      - name: Verify and rename exact bytes for release
+        run: |
+          python3 - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          spec=importlib.util.spec_from_file_location('bsi_pack','entity-index/package_candidate.py')
+          mod=importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(mod)
+          source=Path('bsi-release/BSI-0.1.0-RELEASE-CANDIDATE.zip')
+          raw=source.read_bytes()
+          manifest=mod.verify_archive(raw)
+          assert manifest['version']=='0.1.0'
+          assert manifest['distribution_profile']=='bsi-v0.1-without-keyterms'
+          assert manifest['license']=='CC BY-SA 4.0'
+          Path('bsi-release/BSI-0.1.0.zip').write_bytes(raw)
+          print('RELEASE_ARCHIVE_SHA256',mod.sha(raw))
+          PY
+          sha256sum bsi-release/BSI-0.1.0.zip > bsi-release/BSI-0.1.0.zip.sha256
+      - name: Publish a single immutable version if not already released
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view bsi-v0.1.0 >/dev/null 2>&1; then
+            echo 'BSI v0.1.0 already published; leave immutable release unchanged.'
+            exit 0
+          fi
+          gh release create bsi-v0.1.0 \
+            bsi-release/BSI-0.1.0.zip \
+            bsi-release/BSI-0.1.0.zip.sha256 \
+            --target "$GITHUB_SHA" \
+            --title 'Bible Semantic Index v0.1.0' \
+            --notes 'First standalone, source-pinned word-level biblical entity index. Licensed CC BY-SA 4.0 with attribution in the archive. Key Terms are excluded; descriptions, biographies and multilingual content are not distributed. English names are source labels, not independently verified identities. Original-language references are edition-qualified and ambiguous results must remain qualified. The Bible application integration is separate.'
