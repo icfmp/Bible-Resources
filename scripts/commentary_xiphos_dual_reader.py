@@ -353,6 +353,7 @@ def _markup_display_witness(internal: bytes, rendered_plain: bytes,
         1 for label in source_reference_labels if label in actual_anchor_labels
     )
     exact_source_target_hrefs = 0
+    verified_target_sha256 = set()
     for attrs, raw_label in _REFERENCE_WITH_ATTRIBUTES.findall(original)[:256]:
         osis = _OSIS_REF_ATTRIBUTE.search(attrs)
         if not osis:
@@ -374,6 +375,7 @@ def _markup_display_witness(internal: bytes, rendered_plain: bytes,
                 uri,
             )):
                 exact_source_target_hrefs += 1
+                verified_target_sha256.add(sha256(raw_target.encode("utf-8")).hexdigest())
                 break
     return {
         "original_internal_title_elements_found": len(extracted_titles),
@@ -389,6 +391,10 @@ def _markup_display_witness(internal: bytes, rendered_plain: bytes,
             matched_anchor_labels,
         "exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations":
             exact_source_target_hrefs,
+        # SHA-only, source-bound proof of the *specific* linked target.
+        # A generic "some other link matched" must never certify Ps.60.
+        "exact_matching_source_target_sha256_in_real_gui_HTML":
+            sorted(verified_target_sha256),
         "real_gui_rich_html_selection_available": bool(rendered_html),
         "real_gui_rich_html_anchor_elements_found": rich_link_count,
         "xiphos_link_click_target_and_navigation_verified": False,
