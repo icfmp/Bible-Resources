@@ -1809,6 +1809,10 @@ def build_private_contextual_source_note_preview(
     notes_by_first = {}
     for chapter, node in chapters.items():
         units = native["chapters"][chapter]["original_units"]
+        if not units:
+            # Leviticus 19 and Psalm 108 have only whole-chapter I source
+            # material, never a numbered original K reference group.
+            continue
         sections = node.findall(f"./{{{NS}}}div[@annotateType='commentary']")
         if len(sections) != len(units):
             raise ValueError("Modern chapter/source group count drift")
