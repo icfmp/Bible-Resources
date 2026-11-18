@@ -117,6 +117,13 @@ jobs:
           else:
               print("RECONCILIATION_CANDIDATE_REPORT_PENDING_INITIAL_PIN")
           PY
+      - name: Audit SDBH exact sense identity against independent lexical evidence
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_direct_sense_fidelity.py \
+            --index /tmp/bsi-ubs-hebrew-index.json \
+            --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
+            --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --output /tmp/bsi-ubs-hebrew-sdbh-id-integrity.json
       - name: Compare pinned generated index or prepare initial reproducible snapshot
         run: |
           python3 - <<'PY'
@@ -162,4 +169,5 @@ jobs:
             /tmp/bsi-ubs-hebrew-lexical-gaps.json
             /tmp/bsi-ubs-hebrew-reconciliation.json
             /tmp/bsi-ubs-hebrew-top-lemmas.json
+            /tmp/bsi-ubs-hebrew-sdbh-id-integrity.json
           retention-days: 14
