@@ -447,7 +447,7 @@ edition and explanatory evidence; unknown/new conflicts or stale reviews
 fail the build. The review is a separate **QA-only** artifact, and
 `by_word`, the resolver's candidate multiplicity, source files and
 original-language tokens remain **untouched**. The remaining **14 mixed**
-and **2,388 indirect-only** person overlaps are not certified by this
+and **2,385 indirect-only** person overlaps are not certified by this
 direct-name review. The remaining three name/identity questions need
 contextual historical review before any final interpretation.
 
