@@ -284,6 +284,42 @@ class EditorialPipelineTests(unittest.TestCase):
             "This is repeated.", "This is repeated. This is repeated.")
         self.assertEqual(repeat["class"],"ambiguous_or_unaligned_source_word_window")
 
+    def test_book_and_chapter_commentary_intro_note_and_link_parity(self):
+        from audit_osis import (source_commentary_introductions,
+                                compare_commentary_source_native_introductions)
+        self.write(
+            '<title>Authorial book preface.</title>'
+            '<chapter sID="Gen.1" osisID="Gen.1" n="1"/>'
+            '<p>Chapter introduction: essential.'
+            '<note type="study" n="a">Original note text.</note>'
+            '<reference osisRef="Exod.1.1">Exodus cross-reference.</reference>'
+            '</p>'
+            '<verse sID="Gen.1.1" osisID="Gen.1.1" n="1"/>'
+            '<p>Verse commentary.</p><verse eID="Gen.1.1"/>'
+            '<chapter eID="Gen.1"/>',kind="commentary")
+        original=self.source.read_bytes()
+        intros=source_commentary_introductions(self.source)
+        self.assertEqual(set(intros),{"Gen","Gen.1"})
+        native={
+            "Gen":b"<title>Authorial book preface.</title>",
+            "Gen.1":(
+                b'<p>Chapter introduction: essential.'
+                b'<note type="study" n="a">Original note text.</note>'
+                b'<reference osisRef="Exod.1.1">Exodus cross-reference.</reference>'
+                b'</p>'),
+        }
+        good=compare_commentary_source_native_introductions(intros,native)
+        self.assertEqual(good["counts"]["source_intro_records"],2)
+        self.assertEqual(good["counts"]["source_intro_note_elements"],1)
+        self.assertEqual(good["counts"]["source_intro_reference_elements"],1)
+        self.assertEqual(good["counts"]["source_intro_note_body_metadata_missing_from_native"],0)
+        self.assertEqual(good["counts"]["source_intro_reference_body_metadata_missing_from_native"],0)
+        native["Gen.1"]=native["Gen.1"].replace(
+            b'osisRef="Exod.1.1"',b'osisRef="Exod.1.2"')
+        bad=compare_commentary_source_native_introductions(intros,native)
+        self.assertEqual(bad["counts"]["source_intro_reference_body_metadata_missing_from_native"],1)
+        self.assertEqual(self.source.read_bytes(),original)
+
     def test_commentary_punctuation_notes_and_reference_targets_not_silently_lost(self):
         from audit_osis import (
             source_commentary_overlap_witness,
