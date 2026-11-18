@@ -191,6 +191,37 @@ The builder aborts on incomplete input, duplicate entity IDs, unknown editorial
 targets, malformed links or edits that cannot be applied exactly. Source files
 are never opened for writing.
 
+## Reader-facing explicit-word lookup (v0.1)
+
+For Bible's first usable entity resource, the **reader-facing** API is
+`EntityResolver.resolve_for_reader(corpus=..., edition=..., word_id=..., verse_id=...)`,
+or `python3 -I entity-index/resolve.py ... --reader-facing` at the CLI.
+
+This uses the **same unchanged edition-qualified source index** and the same
+source-ID/verse checks as `resolve()`, but filters candidates to exact
+`explicit_instances` only. It **does not** surface `pronominal_referents`
+or `subject_referents`: selecting "we", "you" or an implied subject must
+not flood the reader with all the possible historical participants. The
+raw `resolve()` remains unchanged for internal QA and future enrichment.
+Neither the source JSON nor the generated `by_word` evidence is deleted.
+
+For a valid word with **only indirect** annotations, the reader method returns
+`no_explicit_entity` with empty candidates. A completely unindexed word
+still returns `no_indexed_entity`. Exact-verse/source edition checks and
+textual-variant or absent-source statuses are unchanged. Distinct direct
+candidates remain `ambiguous_source_candidates`, while different source
+records pointing to the **same canonical entity** do not create false
+identity ambiguity. Every reader result states
+`lookup_policy: "explicit_only"` for safe consumer integration.
+
+**Critical limitation:** an explicit source annotation is *not* necessarily
+an editorially verified historical identity. Check each candidate's
+`review_status`, original edition/verse, editorial scope and any
+unresolved individual-versus-people name collision before presenting it as
+certain. This is a **candidate selection policy**, not full ACAI editorial
+certification or publication approval. Common-noun/keyterm coverage and
+rights are reviewed separately in the v0.1 tracker.
+
 ## Data contract (v1)
 
 `index.json` has `schema_version=1`, `provenance`, `statistics`,

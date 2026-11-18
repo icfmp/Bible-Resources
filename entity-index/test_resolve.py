@@ -4,6 +4,9 @@ from __future__ import annotations
 import copy
 import importlib.util
 import json
+import subprocess
+import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -158,6 +161,115 @@ class ResolverTests(unittest.TestCase):
         self.assertEqual(
             self.lookup(word_id="o010010010041", edition="incorrect")["status"],
             "incompatible_source_edition")
+
+
+    def reader_lookup(self, word_id="o010010010011",
+                      verse_id="01001001",
+                      edition="Macula-WLC@frozen", corpus="wlc"):
+        return self.resolver.resolve_for_reader(
+            corpus=corpus, edition=edition,
+            word_id=word_id, verse_id=verse_id)
+
+    def test_reader_preserves_direct_ambiguity_and_source_qualifications(self):
+        raw = self.lookup()
+        reader = self.reader_lookup()
+        self.assertEqual(reader["lookup_policy"], "explicit_only")
+        self.assertEqual(reader["status"], "ambiguous_source_candidates")
+        self.assertEqual(reader["canonical_ids"], ["person:Alpha", "place:Alpha"])
+        self.assertEqual(reader["candidates"], raw["candidates"])
+        self.assertTrue(all(row["review_status"] == "source_unreviewed"
+                            for row in reader["candidates"]))
+
+    def test_reader_ignores_indirect_actors_and_keeps_raw_data(self):
+        data = fixture()
+        data["entities"].append({
+            "id": "person:Beta", "canonical_id": "person:Beta",
+            "kind": "person", "review_status": "source_unreviewed",
+            "source_id": "person:Beta", "references": ["01001001"],
+        })
+        data["by_word"]["wlc:o010010010021"].append({
+            "entity_id": "person:Beta",
+            "link_type": "pronominal_referents",
+        })
+        data["by_word"]["wlc:o010010010051"] = [
+            {"entity_id": "person:Beta", "link_type": "pronominal_referents"},
+            {"entity_id": "person:Alias", "link_type": "subject_referents"},
+        ]
+        original = copy.deepcopy(data)
+        resolver = module.EntityResolver(data)
+        lookup = {"corpus": "wlc", "edition": "Macula-WLC@frozen",
+                  "verse_id": "01001001"}
+        self.assertEqual(
+            resolver.resolve(word_id="o010010010021", **lookup)["status"],
+            "ambiguous_source_candidates")
+        direct = resolver.resolve_for_reader(word_id="o010010010021", **lookup)
+        self.assertEqual(direct["status"], "source_candidate")
+        self.assertEqual(direct["canonical_ids"], ["person:Alpha"])
+        self.assertEqual([x["id"] for x in direct["candidates"]], ["person:Alpha"])
+        indirect = resolver.resolve_for_reader(
+            word_id="o010010010051", **lookup)
+        self.assertEqual(indirect["status"], "no_explicit_entity")
+        self.assertEqual(indirect["candidates"], [])
+        self.assertEqual(indirect["canonical_ids"], [])
+        self.assertEqual(
+            resolver.resolve(word_id="o010010010051", **lookup)["status"],
+            "ambiguous_source_candidates")
+        self.assertEqual(data, original)
+
+    def test_reader_aliases_do_not_create_second_identity(self):
+        data = fixture()
+        data["by_word"]["wlc:o010010010021"][1]["link_type"] = (
+            "explicit_instances")
+        resolver = module.EntityResolver(data)
+        result = resolver.resolve_for_reader(
+            corpus="wlc", edition="Macula-WLC@frozen",
+            word_id="o010010010021", verse_id="01001001")
+        self.assertEqual(result["status"], "source_candidate")
+        self.assertEqual(result["canonical_ids"], ["person:Alpha"])
+        self.assertEqual({x["id"] for x in result["candidates"]},
+                         {"person:Alpha", "person:Alias"})
+
+    def test_reader_does_not_bypass_source_version_or_missing_guards(self):
+        cases = [
+            ("o010010010011", "01001001", "other", "wlc",
+             "incompatible_source_edition"),
+            ("o010010010011", "01001002", "Macula-WLC@frozen", "wlc",
+             "verse_context_mismatch"),
+            ("o010010010041", "01001001", "Macula-WLC@frozen", "wlc",
+             "unattested_source_word_id"),
+            ("o010010010032", "01001001", "Macula-WLC@frozen", "wlc",
+             "no_indexed_entity"),
+            ("n40001002001", "40001002", "Macula-SBLGNT@frozen", "sblgnt",
+             "verse_not_in_pinned_original_word_inventory"),
+        ]
+        for word, verse, edition, corpus, status in cases:
+            with self.subTest(word=word, status=status):
+                result = self.reader_lookup(
+                    word_id=word, verse_id=verse,
+                    edition=edition, corpus=corpus)
+                self.assertEqual(result["status"], status)
+                self.assertEqual(result["lookup_policy"], "explicit_only")
+                self.assertEqual(result["candidates"], [])
+
+    def test_cli_reader_mode_is_opt_in_and_raw_mode_unchanged(self):
+        data = fixture()
+        data["by_word"]["wlc:o010010010051"] = [
+            {"entity_id": "person:Alias", "link_type": "subject_referents"},
+        ]
+        with tempfile.TemporaryDirectory() as directory:
+            index = Path(directory) / "index.json"
+            index.write_text(json.dumps(data), encoding="utf-8")
+            args = [sys.executable, "-I", str(path), "--index", str(index),
+                    "--corpus", "wlc", "--edition", "Macula-WLC@frozen",
+                    "--word-id", "o010010010051", "--verse-id", "01001001"]
+            raw = subprocess.run(args, check=True, text=True,
+                                 capture_output=True)
+            reader = subprocess.run(args + ["--reader-facing"], check=True,
+                                    text=True, capture_output=True)
+            self.assertEqual(json.loads(raw.stdout)["status"], "source_candidate")
+            self.assertEqual(json.loads(reader.stdout)["status"],
+                             "no_explicit_entity")
+            self.assertEqual(json.loads(reader.stdout)["candidates"], [])
 
     def test_rejects_corrupt_or_incompatible_index(self):
         data = fixture()
