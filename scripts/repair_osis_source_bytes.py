@@ -206,6 +206,32 @@ def patch_exact_original(original: bytes, link_plan: dict, inline_plan: dict):
 
 
 
+
+def _indexed_osis_reference_target(token: str, native_keys: set[str],
+                                   atomic_pattern: re.Pattern) -> bool:
+    """Accept a real indexed verse or one *complete*, same-chapter OSIS range.
+
+    Every included verse must exist in the independently scanned module. A
+    whitespace-delimited multi-target plan remains separate; no invented
+    endpoints, cross-book spans or implicit inherited references are accepted.
+    """
+    if atomic_pattern.fullmatch(token):
+        return token in native_keys
+    ends=token.split("-")
+    if len(ends)!=2 or any(atomic_pattern.fullmatch(x) is None for x in ends):
+        return False
+    start,end=ends
+    left=start.rsplit(".",2)
+    right=end.rsplit(".",2)
+    if (len(left)!=3 or len(right)!=3 or left[:2]!=right[:2]):
+        return False
+    first,last=int(left[2]),int(right[2])
+    if first>=last or last-first+1>200:
+        return False
+    prefix=left[0]+"."+left[1]+"."
+    return all(prefix+str(v) in native_keys for v in range(first,last+1))
+
+
 def patch_reviewed_osis_reference_attributes(
         original: bytes, plan: dict, native_verse_keys: set[str],
 ) -> tuple[bytes,dict]:
@@ -261,8 +287,8 @@ def patch_reviewed_osis_reference_attributes(
             raise LexicalPatchError("Invalid original-target identity or evidence")
         targets=new.split()
         if (not targets or len(targets)>100
-                or any(native_pattern.fullmatch(x) is None or
-                       x not in native_verse_keys for x in targets)):
+                or any(not _indexed_osis_reference_target(
+                        x,native_verse_keys,native_pattern) for x in targets)):
             raise LexicalPatchError("Proposed link contains an unindexed SWORD verse")
         identity=(line,book,old)
         if identity in plans:
