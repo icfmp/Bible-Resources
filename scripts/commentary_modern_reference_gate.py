@@ -879,6 +879,23 @@ def _original_reference_table_ownership(fragment: ET.Element) -> list[bool]:
     return result
 
 
+
+def _original_reference_title_ownership(fragment: ET.Element) -> list[bool]:
+    """Track authentic title-contained hyperlinks, never source text."""
+    flags=[]
+    def walk(node: ET.Element, inside_title: bool) -> None:
+        if not isinstance(node.tag,str):
+            return
+        tag=node.tag.rsplit("}",1)[-1]
+        inside=inside_title or tag=="title"
+        if tag=="reference":
+            flags.append(inside)
+        for child in node:
+            walk(child,inside)
+    walk(fragment,False)
+    return flags
+
+
 def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                                     native: dict, identities: dict,
                                     dispositions: dict, repo_root: Path,
@@ -982,6 +999,7 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         raise ValueError("Only isolated published MHCC original SWORD reader is supported")
     private_original = {}
     private_table_ownership = {}
+    private_title_ownership = {}
     env = os.environ.copy()
     env["SWORD_PATH"] = str(module_directory.resolve())
     def observe(kind: str, key: str, raw: bytes):
@@ -1005,8 +1023,10 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                 label = "".join(element.itertext())
                 refs.append((literal, label))
         table_context=_original_reference_table_ownership(node)
-        if len(refs) != identity["reference_count"] or len(table_context)!=len(refs):
-            raise ValueError("Original link/authorial-table ancestry count mismatch")
+        title_context=_original_reference_title_ownership(node)
+        if (len(refs) != identity["reference_count"]
+                or len(table_context)!=len(refs) or len(title_context)!=len(refs)):
+            raise ValueError("Original link/authorial title-table ancestry count mismatch")
         for n, (literal, label) in enumerate(refs):
             if (hashlib.sha256(literal.encode("utf-8")).hexdigest() !=
                     identity["original_osisRef_sha256_in_document_order"][n]
@@ -1015,6 +1035,7 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                 raise ValueError("Original link identity or order differs from authenticated ledger")
         private_original[key] = refs
         private_table_ownership[key] = table_context
+        private_title_ownership[key] = title_context
     proc = subprocess.Popen([str(reader.resolve()), module_id], env=env,
                             stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     try:
@@ -1131,6 +1152,12 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
     context_count={"all_original_references":0,
                    "source_links_in_original_tables":0,
                    "source_links_outside_original_tables":0,
+                   "source_links_in_original_titles":0,
+                   "source_links_outside_original_titles":0,
+                   "source_full_verse_ranges_inside_original_titles":0,
+                   "source_full_verse_ranges_outside_original_titles":0,
+                   "unplaced_full_verse_ranges_inside_original_titles":0,
+                   "unplaced_full_verse_ranges_outside_original_titles":0,
                    "source_full_verse_ranges_inside_original_tables":0,
                    "source_full_verse_ranges_outside_original_tables":0,
                    "unplaced_full_verse_ranges_inside_original_tables":0,
@@ -1139,11 +1166,20 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
             for row in inserted if row.get("original_link_ordinal") is not None}
     for first,links in private_original.items():
         flags=private_table_ownership[first]
-        for i,((literal,_),in_table) in enumerate(zip(links,flags),1):
+        title_flags=private_title_ownership[first]
+        for i,((literal,_),in_table,in_title) in enumerate(
+                zip(links,flags,title_flags),1):
             context_count["all_original_references"]+=1
             context_count["source_links_in_original_tables" if in_table else
                           "source_links_outside_original_tables"]+=1
+            context_count["source_links_in_original_titles" if in_title else
+                          "source_links_outside_original_titles"]+=1
             if _unrecognized_original_ref_class(literal)=="full_verse_range":
+                context_count["source_full_verse_ranges_inside_original_titles" if in_title
+                              else "source_full_verse_ranges_outside_original_titles"]+=1
+                if (first,i) not in placed:
+                    context_count["unplaced_full_verse_ranges_inside_original_titles" if in_title
+                                  else "unplaced_full_verse_ranges_outside_original_titles"]+=1
                 context_count["source_full_verse_ranges_inside_original_tables" if in_table
                               else "source_full_verse_ranges_outside_original_tables"]+=1
                 if (first,i) not in placed:
