@@ -835,6 +835,59 @@ def _source_range_section_ownership(*, literal: str, label: str,
             "source_label_is_verse_span":bool(source_label)}
 
 
+
+def _source_first_K_outline_row_evidence(*, literal: str, label: str,
+                                         first_key: str, native_chapter: dict,
+                                         modern_chapter: ET.Element) -> dict[str,bool]:
+    """Classify authenticated original chapter-outline links without editing.
+
+    Original cross-references must not be conflated with source-K outline
+    navigation, which is often carried inside the first original K body but
+    is represented by a separate original-outline table in modern manuscripts.
+    """
+    result={"source_first_K_owns_link":False,
+            "unique_modern_outline_row_matches_source_target":False,
+            "original_visible_label_explicitly_names_same_verse_span":False}
+    parsed=_source_same_chapter_verse_range(literal)
+    if parsed is None:
+        return result
+    book, chapter, first, last=parsed
+    if modern_chapter.get("osisID")!=book+"."+chapter:
+        return result
+    units=native_chapter.get("original_units",[])
+    if not units or units[0]["first_key"]!=first_key:
+        return result
+    result["source_first_K_owns_link"]=True
+    from commentary_modern_draft_osis_preview import NS
+    introductions=modern_chapter.findall(f"./{{{NS}}}div[@type='introduction']")
+    matches=[]
+    for intro in introductions:
+        titles=intro.findall(f"./{{{NS}}}title")
+        if len(titles)!=1 or titles[0].text!="Original chapter outline":
+            continue
+        tables=intro.findall(f"./{{{NS}}}table")
+        if len(tables)!=1:
+            continue
+        rows=tables[0].findall(f"./{{{NS}}}row")
+        if len(rows)<2:
+            continue
+        for row in rows[1:]:
+            cells=row.findall(f"./{{{NS}}}cell")
+            if len(cells)!=2:
+                continue
+            text="".join(cells[1].itertext()).strip()
+            if re.fullmatch(re.escape(first)+r"\s*[-–—]\s*"+re.escape(last),text):
+                matches.append(cells[1])
+    result["unique_modern_outline_row_matches_source_target"]=len(matches)==1
+    # No arbitrary source prose: the original visible link's numeric chapter
+    # and verse span must agree too (e.g., "Is. 1:1-9").
+    result["original_visible_label_explicitly_names_same_verse_span"]=bool(
+        re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z .]{0,28}\s+"+
+                     re.escape(chapter)+":"+re.escape(first)+
+                     r"\s*[-–—]\s*"+re.escape(last),label.strip()))
+    return result
+
+
 def _unrecognized_original_ref_class(literal: str) -> str:
     """Only classify syntax in metadata; never emit literal source osisRef."""
     raw = literal[6:] if literal.startswith("Bible:") else literal
@@ -877,7 +930,10 @@ def _auto_single_verse_placements(*, private_original: dict, groups: dict,
                "unmatched_source_range_same_chapter":0,
                "unmatched_source_range_exact_original_K_scope":0,
                "unmatched_source_range_exact_K_scope_with_modern_heading":0,
-               "unmatched_source_range_source_label_matches_scope":0}
+               "unmatched_source_range_source_label_matches_scope":0,
+               "unmatched_source_range_first_K_owns_chapter_outline_link":0,
+               "unmatched_source_range_unique_modern_outline_row":0,
+               "unmatched_source_range_outline_row_and_source_label_match":0}
     for first, links in private_original.items():
         chapter = first.rsplit(".", 1)[0]
         units = native["chapters"][chapter]["original_units"]
@@ -944,6 +1000,17 @@ def _auto_single_verse_placements(*, private_original: dict, groups: dict,
                          "unmatched_source_range_source_label_matches_scope")):
                         if ownership[field]:
                             skipped[category]+=1
+                    outline=_source_first_K_outline_row_evidence(
+                        literal=literal,label=label,first_key=first,
+                        native_chapter=native["chapters"][chapter],
+                        modern_chapter=modern_chapters[chapter])
+                    if outline["source_first_K_owns_link"]:
+                        skipped["unmatched_source_range_first_K_owns_chapter_outline_link"]+=1
+                    if outline["unique_modern_outline_row_matches_source_target"]:
+                        skipped["unmatched_source_range_unique_modern_outline_row"]+=1
+                    if (outline["unique_modern_outline_row_matches_source_target"]
+                            and outline["original_visible_label_explicitly_names_same_verse_span"]):
+                        skipped["unmatched_source_range_outline_row_and_source_label_match"]+=1
                 continue
             found.append({
                 "modern_chapter": chapter,
