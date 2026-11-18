@@ -397,12 +397,13 @@
     {
       "source_id": "person:GenericDisciple",
       "action": "amend_occurrences",
-      "reason": "Luke 9:58, 24:15 and 24:19 explicitly name Jesus at these three exact pinned Greek name tokens; the inherited GenericDisciple's subject/pronominal pointer to those same name tokens incorrectly identifies a different person. Other genuine disciple pointers stay intact.",
+      "reason": "Luke 9:58, 24:15 and 24:19 explicitly name Jesus at these three exact pinned Greek name tokens; the inherited GenericDisciple's subject/pronominal pointer to those same name tokens incorrectly identifies a different person. Other genuine disciple pointers stay intact. Luke 9:59 n42009059001 and Luke 24:19 n42024019002 are additionally third-singular 'he said' verbs spoken by Jesus, not by the unnamed disciple; retain all other actual disciple referents.",
       "evidence": [
         "Pinned Macula SBLGNT: Luke 9:58 n42009058005; Luke 24:15 n42024015011; Luke 24:19 n42024019011, all exact name instances under person:Jesus.2; frozen GenericDisciple original indirect fields",
         "https://www.openbible.com/text/luke/9-58.htm",
         "https://biblehub.com/luke/24-15.htm",
-        "https://biblehub.com/luke/24-19.htm"
+        "https://biblehub.com/luke/24-19.htm",
+        "Pinned SBLGNT Luke 9:59 n42009059001 (= Jesus speaks 'Follow me'); Luke 24:19 n42024019002 (= Jesus asks 'What things?') — both source forms are third singular and source participant roles distinguish the interlocutors"
       ],
       "remove_subject_referents": {
         "SBLGNT": [
@@ -411,6 +412,12 @@
           ],
           [
             "n42024015011"
+          ],
+          [
+            "n42009059001"
+          ],
+          [
+            "n42024019002"
           ]
         ]
       },
@@ -554,6 +561,109 @@
           ]
         ]
       }
+    },
+    {
+      "source_id": "person:Judas",
+      "action": "amend_occurrences",
+      "remove_pronominal_referents": {
+        "SBLGNT": [
+          [
+            "n42006016007"
+          ]
+        ]
+      },
+      "reason": "Luke 6:16 names Judas son of James and Judas Iscariot separately. The Greek relative ὃς ('who became a traitor') grammatically refers to Judas Iscariot, not the other apostle. Retain both explicit names and the correct pronominal claim under person:Judas.2.",
+      "evidence": [
+        "Pinned SBLGNT Luke 6:16 exact n42006016007 ὃς R-NSM; source person:Judas names the apostle son of James at n42006016002; person:Judas.2 names Iscariot at n42006016005/n42006016006",
+        "https://biblehub.com/interlinear/luke/6-16.htm"
+      ]
+    },
+    {
+      "source_id": "person:Joash.3",
+      "action": "amend_occurrences",
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o120140130101"
+          ],
+          [
+            "o140250230101"
+          ]
+        ]
+      },
+      "add_explicit_instances": {
+        "wlc": [
+          [
+            "o120140130061"
+          ],
+          [
+            "o140250230061"
+          ]
+        ]
+      },
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o120140130162"
+          ],
+          [
+            "o120140130182"
+          ],
+          [
+            "o120140140012"
+          ],
+          [
+            "o120140140182"
+          ],
+          [
+            "o140250230152"
+          ],
+          [
+            "o140250230172"
+          ],
+          [
+            "o140250240202"
+          ]
+        ]
+      },
+      "reason": "2 Kings 14:13 and 2 Chronicles 25:23 each mention two kings named Joash: the first name is Amaziah's father Joash of Judah, the second is the capturing Joash/Jehoash of Israel. The source assigned the two exact explicit Hebrew words to the opposite men and additionally attributed seven singular action-verbs of the Israelite king to the deceased king of Judah. Correct only these two exact name groups and seven role pointers; preserve both historically distinct kings and all original source files and verse references.",
+      "evidence": [
+        "Pinned WLC 2 Kings 14:13 first Jehoash o120140130061 = father of Amaziah (Judah); second o120140130101 = Jehoash king of Israel; verbs o120140130162, o120140130182, 14:14 o120140140012, o120140140182 follow Israelite king",
+        "Pinned WLC 2 Chronicles 25:23 first Joash o140250230061 = father of Amaziah; second o140250230101 = king of Israel; verbs o140250230152, o140250230172, 25:24 o140250240202 follow Israelite king",
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/12-2Ki-014-lowfat.xml and WLC/lowfat/14-2Ch-025-lowfat.xml",
+        "https://biblehub.com/2_kings/14-13.htm",
+        "https://biblehub.com/2_chronicles/25-23.htm"
+      ]
+    },
+    {
+      "source_id": "person:Joash.4",
+      "action": "amend_occurrences",
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o120140130061"
+          ],
+          [
+            "o140250230061"
+          ]
+        ]
+      },
+      "add_explicit_instances": {
+        "wlc": [
+          [
+            "o120140130101"
+          ],
+          [
+            "o140250230101"
+          ]
+        ]
+      },
+      "reason": "The second named Jehoash/Joash in 2 Kings 14:13 and 2 Chronicles 25:23 is the king of Israel (the captor of Amaziah), not the Judahite father named immediately beforehand. Restore both exact Israelite king name tokens while leaving existing correctly associated Israelite action-word subject groups intact.",
+      "evidence": [
+        "Pinned WLC 2 Kings 14:13 o120140130061 = Judahite father, o120140130101 = Israelite king who captures Amaziah and then breaks Jerusalem's wall",
+        "Pinned WLC 2 Chronicles 25:23 o140250230061 = Judahite father, o140250230101 = Israelite king as explicit subject of 'captured'",
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/12-2Ki-014-lowfat.xml and WLC/lowfat/14-2Ch-025-lowfat.xml"
+      ]
     }
   ]
 }
