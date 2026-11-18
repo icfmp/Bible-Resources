@@ -212,6 +212,39 @@ class EntityIndexTests(unittest.TestCase):
                          json.dumps(report, ensure_ascii=False))
         self.assertNotIn("Never copy", json.dumps(report, ensure_ascii=False))
 
+    def test_bebai_family_ancestor_and_zechariah_father_are_distinct_word_mentions(self):
+        ancestor = self.write_record(
+            "people", "Bebai", references=["15002011", "15008011"],
+            explicit_instances={"wlc":[
+                ["o150020110021"],["o150080110021"],["o150080110051"]]})
+        father = self.write_record(
+            "people", "Bebai.2", references=["15008011"],
+            explicit_instances={"wlc":[
+                ["o150080110021"],["o150080110051"]]})
+        source_before = (ancestor.read_bytes(), father.read_bytes())
+        editorial = json.loads(
+            Path(__file__).with_name("editorial-decisions.json").read_text()
+        )["decisions"]
+        decisions = [row for row in editorial
+                     if row["source_id"] in ("person:Bebai", "person:Bebai.2")]
+        self.assertEqual(len(decisions), 2)
+        report = self.build(decisions=decisions)
+        by_id = {entity["id"]:entity for entity in report["entities"]}
+        self.assertEqual(
+            by_id["person:Bebai"]["occurrences"]["explicit_instances"]["wlc"],
+            [["o150020110021"],["o150080110021"]])
+        self.assertEqual(
+            by_id["person:Bebai.2"]["occurrences"]["explicit_instances"]["wlc"],
+            [["o150080110051"]])
+        self.assertEqual(report["by_word"]["wlc:o150080110021"],
+                         [{"entity_id":"person:Bebai","link_type":"explicit_instances"}])
+        self.assertEqual(report["by_word"]["wlc:o150080110051"],
+                         [{"entity_id":"person:Bebai.2","link_type":"explicit_instances"}])
+        self.assertEqual(by_id["person:Bebai"]["references"],
+                         ["15002011","15008011"])
+        self.assertEqual(by_id["person:Bebai.2"]["references"],["15008011"])
+        self.assertEqual((ancestor.read_bytes(),father.read_bytes()),source_before)
+
     def test_distinct_dishon_people_keep_exact_sources_and_avoid_false_collisions(self):
         elder = self.write_record(
             "people", "Dishon",
