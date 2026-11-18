@@ -45,7 +45,7 @@ The sea can roar, but we do not know how trees show their rejoicing.
 
 God searches hearts and knows the mind of the Spirit.
 
-He understands even the weak, broken words of people who struggle to pray.
+He understands even the halting words and broken language of the weakest.
 
 **Christ will come to judge the earth**, justly punishing his enemies and fully accomplishing his greatest promises to his people.
 
@@ -58,6 +58,8 @@ If we are not prepared, now is the time to get ready to meet God through **forgi
 ---
 
 ## Editorial review — Psalm 96
+
+**2026-11-18 targeted secondary-witness recheck:** Removed a limiting gloss that turned Henry's general statement about God understanding the broken language of the weakest into a statement specifically about people struggling *to pray*. The original CCEL sentence does not impose that restriction. The authorial meaning is now preserved without adding a new verse scope or source claim. Exact-native and independent approval are still pending.
 
 **Complete original-English secondary witness read:** [CCEL, Psalm 96](https://ccel.org/ccel/henry/mhcc.xx.xcvi.html). Published `MHCC 0.1.1` remains authoritative, exact native-SWORD and independent acceptance pending.
 
