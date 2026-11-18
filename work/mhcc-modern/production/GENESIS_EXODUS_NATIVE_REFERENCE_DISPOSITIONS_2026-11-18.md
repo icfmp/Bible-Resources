@@ -1,7 +1,7 @@
-# MHCC Modern English — authenticated original-reference anomalies, Genesis 2–3 / Exodus 12
+# MHCC Modern English — authenticated original-reference anomalies, seven Genesis / Exodus chapters
 
 **Date:** 2026-11-18  
-**Scope:** 3 modern manuscript chapters, not a whole-canon link correction.  
+**Scope:** seven modern manuscript chapters (Gen.2, 3, 21; Exod.12, 14, 28, 29), not a whole-canon link correction.  
 **Status:** **SOURCE-NATIVE IDENTITY CONFIRMED / SECONDARY SOURCE WITNESS REVIEWED / PROPOSED DERIVATIVE LINK DISPOSITIONS — NOT SWORD PUBLICATION**.
 
 ## Exact-original evidence and caveats
@@ -37,6 +37,23 @@ A bounded comparison of that **primary source fingerprint evidence** to the actu
 **Correction:** in Genesis 2, the actual four source-original **correct** hyperlinks are `Rev.2.7`, `John.6.48`, `John.6.51`, and `2Thess.3.10`; `Rev.22.2` is text-supported but not correctly hyperlinked in original. In Exodus 12, an original single-digit `8` is a **legitimate shortened cross-reference to 1 Corinthians 5:8**, whereas short digits `3` and `4` are spurious. **Never automatically suppress all single-digit reference labels.** The two `1Cor.5.7` occurrences in the same Exodus 12 exposition also remain distinct; the source repeats the link in two places.
 
 The fully authenticated original contains **1,204** elements, including the seven suspect elements listed above. This research does **not** reduce or rewrite that original count and cannot be extrapolated to every original linked element outside these three chapters.
+
+## Follow-up source-witness review: four more misdirected abbreviated references
+
+The authenticated original whole-canon link receipt shows another **four wrong-book destinations** despite correct original one-digit *display labels*. Their secondary original-English witnesses and modern manuscripts preserve the corresponding complete citations. The correction must **retarget the existing link occurrence**, not delete it or add a second occurrence.
+
+| Original numbered-K group / link ordinal | Existing compiled `osisRef` and single-digit label | Proposed exact derived target | Independent passage evidence and existing modern manuscript |
+| --- | --- | --- | --- |
+| `Gen.21.1` (#4) | `2Cor.11.2`, label `2` | **`Hos.11.2`** | [CCEL Gen.21](https://ccel.org/ccel/henry/mhcc.ii.xxi.html): Hosea 11:1, **2**; [modern Gen.21](accepted/genesis-21.md) already says Hosea 11:1–2 |
+| `Exod.14.21` (#6) | `2Cor.10.2`, label `2` | **`1Cor.10.2`** | [CCEL Exod.14](https://ccel.org/ccel/henry/mhcc.iii.xiv.html): 1 Corinthians 10:1, **2**; [modern Exod.14](accepted/exodus-14.md) says 1 Corinthians 10:1–2 |
+| `Exod.28.15` (#2) | `2Cor.1.2`, label `2` | **`Heb.1.2`** | [CCEL Exod.28](https://ccel.org/ccel/henry/mhcc.iii.xxviii.html): Hebrews 1:1, **2**; [modern Exod.28](accepted/exodus-28.md) says Hebrews 1:1–2 |
+| `Exod.29.1` (#4) | `1Cor.1.6`, label `6` | **`Rev.1.6`** | [CCEL Exod.29](https://ccel.org/ccel/henry/mhcc.iii.xxix.html): Revelation 1:5, **6**; [modern Exod.29](accepted/exodus-29.md) says Revelation 1:5–6 |
+
+Each original ordinal, literal target and short-label digest independently matched the exact original-K raw SHA (the metadata-only source receipt). All four modern chapter files were inspected and already contain the complete intended citation. **No changes to their existing modern prose are required.**
+
+Two **additional source-original single-digit labels that are already correct** were independently attested and must *not* be changed: `Gen.32.24`, ordinal 2, genuine `Hos.12.5` in [CCEL Gen.32](https://ccel.org/ccel/henry/mhcc.ii.xxxii.html); `Exod.16.13`, ordinal 2, genuine `Jas.5.3` in [CCEL Exod.16](https://ccel.org/ccel/henry/mhcc.iii.xvi.html). Their corresponding [modern Gen.32](accepted/genesis-32.md) and [modern Exod.16](accepted/exodus-16.md) have the full citations.
+
+**Cumulative scoped proposed corrections:** **11 original elements** across **8 source K bodies**: **6** spurious prose-number links to omit, **5** wrong-book destinations to retarget, plus **1** genuinely intended cross-reference (`Rev.22.2`) lacking its own link in the authentic published SWORD. All 11 have source-authenticated fingerprints and secondary source-witness evidence; the machine-readable [manifest](GENESIS_EXODUS_REFERENCE_DISPOSITIONS.json) is reviewed mechanically without approving any publication.
 
 ## Boundaries and next technical gate
 
