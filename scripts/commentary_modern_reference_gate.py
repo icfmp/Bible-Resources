@@ -1733,7 +1733,51 @@ def _source_context_unique_paragraph_anchor(
                     placements.append((length, proximity, side_priority, id(para),
                                        tokens[i+length-1][2], para))
     if not placements:
-        return None
+        # Exact multiword prose almost never survives a substantive
+        # modernization verbatim. A second, explicitly weaker *paragraph*
+        # candidate requires many distinctive lexical anchors from one
+        # side of the original reference. It NEVER claims the original
+        # linked word or exact inline location. Its note belongs only at
+        # the end of a uniquely supported modern paragraph.
+        def root(word: str) -> str:
+            word = word.casefold()
+            if len(word) >= 8 and word.endswith("ing"):
+                return word[:-3]
+            if len(word) >= 7 and word.endswith("ed"):
+                return word[:-2]
+            if len(word) >= 6 and word.endswith("s") and not word.endswith("ss"):
+                return word[:-1]
+            return word
+
+        def significant(words: str) -> set[str]:
+            common = _CONTEXT_COMMON | {
+                "god", "lord", "christ", "jesus", "believe", "believer",
+                "faith", "chapter", "verse", "verses", "scripture",
+                "heaven", "earth", "children", "father", "spirit",
+                "which", "their", "those", "these", "given", "shall"}
+            return {root(m.group()) for m in _CONTEXT_WORD.finditer(words)
+                    if len(m.group()) >= 5 and m.group().casefold() not in common}
+
+        proposals=[]
+        for side, original_window in enumerate(context):
+            source_terms=significant(original_window)
+            if not 7 <= len(source_terms) <= 45:
+                continue
+            for para in section.findall(f"{{{NS}}}p"):
+                modern_terms=significant("".join(para.itertext()))
+                shared=len(source_terms & modern_terms)
+                overlap=shared/len(source_terms)
+                if shared >= 6 and overlap >= 0.64:
+                    proposals.append((shared,overlap,side,para))
+        if not proposals:
+            return None
+        proposals.sort(key=lambda row:(row[0],row[1]),reverse=True)
+        best_score,coverage,_,chosen=proposals[0]
+        # Multiple qualifying paragraphs or source-side windows naming
+        # different paragraphs are not a verified contextual placement.
+        if any(row[3] is not chosen for row in proposals[1:]):
+            return None
+        return chosen,-1  # Paragraph-end SOURCE-ONLY note, never inline parity.
     # A unique largest exact preserved phrase. Different positions with the
     # same maximal strength are ambiguous and MUST remain at section level.
     highest = max(row[:3] for row in placements)
@@ -1883,6 +1927,8 @@ def build_private_contextual_source_note_preview(
             moved.append({
                 "source_first_key":first,
                 "source_reference_ordinal":ordinal,
+                "placement_basis":("UNIQUE_EXACT_SOURCE_NEAR_PHRASE" if end>=0
+                                   else "CONSERVATIVE_UNIQUE_PARAGRAPH_LEXICAL_MATCH"),
                 "source_literal_target_sha256":row["original_osisRef_sha256"],
                 "original_label_sha256":row["original_visible_label_sha256"]})
         if remaining:
@@ -1897,6 +1943,9 @@ def build_private_contextual_source_note_preview(
     # Descending offsets maintain original paragraph ordering when more than
     # one different, verified context lands in the same modern paragraph.
     for para, end, note in sorted(para_inserts, key=lambda x:(id(x[0]), -x[1])):
+        if end == -1:
+            para.append(note)  # Explicitly non-authorial paragraph-local note.
+            continue
         text = para.text or ""
         if not (0 < end <= len(text)):
             raise ValueError("A previous insertion moved a context anchor")
@@ -1915,6 +1964,10 @@ def build_private_contextual_source_note_preview(
         "source_note_occurrences_total":176,
         "source_notes_moved_to_authored_paragraphs":len(moved),
         "source_notes_still_grouped_by_K":176-len(moved),
+        "exact_phrase_proximity_count":sum(x["placement_basis"] ==
+            "UNIQUE_EXACT_SOURCE_NEAR_PHRASE" for x in moved),
+        "paragraph_lexical_context_proximity_count":sum(x["placement_basis"] ==
+            "CONSERVATIVE_UNIQUE_PARAGRAPH_LEXICAL_MATCH" for x in moved),
         "whole_original_K_ownership_retained":True,
         "source_prose_or_modern_authored_text_modified":False,
         "original_source_target_and_label_identities_preserved":True,
