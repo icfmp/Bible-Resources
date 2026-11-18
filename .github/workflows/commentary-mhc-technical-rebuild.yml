@@ -1260,7 +1260,18 @@ jobs:
                   "this_specific_reviewed_target_in_actual_gui_href":
                       expected_digest in matches_hrefs,
               }
+          gui_copy_diagnostics_by_line={}
+          clipboard_bytes=result["copied_gui_clipboard_byte_count_by_passage"]
+          pane_attempts=result["bounded_right_commentary_pane_focus_attempts_by_passage"]
+          for passage in comparisons:
+              gui_copy_diagnostics_by_line[str(source_line_by_passage[passage])]={
+                  "actual_commentary_pane_copy_attempts":pane_attempts[passage],
+                  "last_clipboard_byte_count":clipboard_bytes[passage],
+                  "independently_verified_original_commentary_excerpt":
+                      result["commentary_clipboard_match_by_passage"][passage],
+              }
           outcome={
+              "gui_copy_diagnostics_by_line":gui_copy_diagnostics_by_line,
               "status":("CORRECTED_COMMENTARY_REAL_GUI_EXCERPTS_MATCHED"
                         if matches==3 else
                         "INCONCLUSIVE_REAL_GUI_SELECTION_NOT_A_RELEASE_GATE"),
