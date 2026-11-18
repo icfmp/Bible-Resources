@@ -55,6 +55,42 @@ class MilestoneRepairTests(unittest.TestCase):
             "".join(etree.fromstring(FIXTURE).itertext())
         )
 
+    def test_private_one_verse_overlap_repair_retains_both_source_bodies(self):
+        prior_ids=" ".join("Prov.31."+str(i) for i in range(5,11))
+        previous=(
+            '<verse sID="Prov.31.5-10" osisID="'+prior_ids+'" n="5-10"/>'
+            '<p>Distinct first source section.</p>'
+            '<verse eID="Prov.31.5-10"/>'
+        ).encode("utf-8")
+        raw=FIXTURE.replace(
+            b'<verse sID="Prov.31.10-33"',previous+b'<verse sID="Prov.31.10-33"')
+        op=plan(raw)
+        edit=op["edits"][0]
+        del edit["new_end_verse"]
+        edit["new_start_verse"]=11
+        edit["overlap_predecessor_sid"]="Prov.31.5-10"
+        candidate,receipt=repair_private_bytes(raw,op)
+        self.assertEqual(receipt["resolved_single_verse_overlap_assignments"],1)
+        self.assertEqual(receipt["removed_invalid_verse_assignments"],0)
+        self.assertIn(previous,candidate)
+        self.assertIn(b'<verse sID="Prov.31.11-33"',candidate)
+        self.assertIn(b'<verse eID="Prov.31.11-33"',candidate)
+        self.assertIn(b'n="11-33"',candidate)
+        self.assertTrue(receipt["all_source_text_notes_links_and_other_markup_identical"])
+        self.assertEqual(
+            "".join(etree.fromstring(raw).itertext()),
+            "".join(etree.fromstring(candidate).itertext()))
+        bad=plan(raw)
+        del bad["edits"][0]["new_end_verse"]
+        bad["edits"][0].update(
+            new_start_verse=12,overlap_predecessor_sid="Prov.31.5-10")
+        with self.assertRaises(MilestoneRepairError):
+            repair_private_bytes(raw,bad)
+        bad["edits"][0]["new_start_verse"]=11
+        bad["edits"][0]["overlap_predecessor_sid"]="Prov.31.8-10"
+        with self.assertRaises(MilestoneRepairError):
+            repair_private_bytes(raw,bad)
+
     def test_must_match_line_original_hash_and_paired_eid(self):
         invalid=plan(FIXTURE,original_line=1)
         with self.assertRaises(MilestoneRepairError):
