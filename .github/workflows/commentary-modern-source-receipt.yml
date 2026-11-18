@@ -434,6 +434,72 @@ jobs:
           print("PRIVATE WHOLE-CANON MHCC SWORD SMOKE PASS: "
                 +str(len(probes))+" readback probes; no source/derived publication")
           PY
+      - name: Compare private compiled modern SWORD native occupancy with original authored K aliases
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,subprocess,sys
+          from pathlib import Path
+          sys.path.insert(0,"scripts")
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          root=Path(os.environ["RUNNER_TEMP"])
+          source=json.loads((root/"mhcc-modern-whole-canon-native-receipt.json").read_text())
+          ionly=json.loads(Path("work/mhcc-modern/production/IONLY_CHAPTER_LINK_PREVIEW.json").read_text())
+          intended={
+              key for c in source["chapters"].values()
+              for group in c["original_units"]
+              for key in group["keys"]
+          }
+          assert len(intended)==28742
+          for row in ionly["chapters"]:
+              chapter=row["chapter_osis"]
+              assert not source["chapters"][chapter]["original_units"]
+              intended.update(chapter+"."+str(v) for v in range(1,row["verse_count"]+1))
+          assert len(intended)==28792
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str((root/"mhcc-complete-private-root").resolve())
+          proc=subprocess.Popen([str((root/"commentary-modern-source-raw").resolve()),
+                                 "MHCCFULLTMP"],env=env,
+                                 stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+          try:
+              result,keys,intro,anon=parse_native_raw_corpus(proc.stdout)
+              proc.stdout.close()
+              if proc.wait(timeout=120)!=0:
+                  raise ValueError("Private SWORD raw scan did not complete")
+          finally:
+              if proc.poll() is None:
+                  proc.kill()
+                  proc.wait()
+          actual=set(keys)
+          if len(keys)!=len(actual) or actual!=intended:
+              missing=sorted(intended-actual)
+              extras=sorted(actual-intended)
+              raise ValueError(
+                  "Compiled private modern module changes original K verse occupancy: "
+                  f"expected={len(intended)} observed={len(actual)} "
+                  f"missing={missing[:12]} extraneous={extras[:12]}")
+          proof={
+              "status":"PRIVATE_FULL_CANON_MODERN_SWORD_NATIVE_K_OCCUPANCY_MATCH_NOT_EDITORIAL_APPROVAL",
+              "original_compiled_corpus_sha256":source["original_compiled_corpus_sha256"],
+              "original_native_K_addresses_preserved":28742,
+              "reviewed_original_I_only_verse_transport_keys":50,
+              "compiled_private_modern_K_addresses_verified":len(keys),
+              "compiled_intro_keys_observed_not_authorial_parity":len(intro),
+              "anonymous_native_keys_observed":len(anon),
+              "full_compiled_modern_raw_sha256_not_original_parity":result[
+                  "all_native_raw_entries_ordered_sha256"],
+              "source_original_modified":False,
+              "original_inline_reference_links_verified_in_modern":False,
+              "modern_editorial_and_native_markup_parity_approved":False,
+              "publication_authorized":False,
+          }
+          (root/"mhcc-modern-complete-private-native-key-audit.json").write_text(
+              json.dumps(proof,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+          print("PRIVATE COMPLETE MODERN SWORD K ALIASES VERIFIED "
+                f"{len(keys)} exact original-plus-I-only keys, "
+                "no additional/missing verses; source meaning/links still unapproved")
+          PY
       - name: Probe five original SWORD source-body scopes against independent English anchors
         shell: bash
         run: |
@@ -1614,6 +1680,7 @@ jobs:
             ${{ runner.temp }}/mhcc-modern-proposed-link-correction-dispositions.json
             ${{ runner.temp }}/mhcc-modern-complete-unlinked-osis-structure.json
             ${{ runner.temp }}/mhcc-modern-complete-private-sword-smoke.json
+            ${{ runner.temp }}/mhcc-modern-complete-private-native-key-audit.json
             ${{ runner.temp }}/mhcc-modern-five-native-source-witness-probes.json
             ${{ runner.temp }}/mhcc-crosswire-five-native-source-receipt.json
             ${{ runner.temp }}/mhcc-crosswire-five-native-witness-probes.json
