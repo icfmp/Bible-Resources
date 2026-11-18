@@ -62,15 +62,16 @@ class UBSHebrewBridgeTest(unittest.TestCase):
             ("o010010010011","000001001001000","0430","H"),
             ("o010010010021","","0430","H"),
             ("o010010010031","","0871a","H"),
+            ("o010010010041ה","000001001001000","0430","H"),
         ]
         with tempfile.TemporaryDirectory() as directory:
             path=Path(directory)/"wlc.tsv"
             path.write_text("xml:id\tsdbh\tstrongnumberx\tlang\n"+"".join(
                 "\t".join(row)+"\n" for row in rows),encoding="utf-8")
             coverage,_=audit(ix,path)
-        self.assertEqual(coverage["macula_words"],3)
-        self.assertEqual(coverage["with_exact_ubs_sense_candidates"],1)
-        self.assertEqual(coverage["with_ubs_entry_candidates"],2)
+        self.assertEqual(coverage["macula_words"],4)
+        self.assertEqual(coverage["with_exact_ubs_sense_candidates"],2)
+        self.assertEqual(coverage["with_ubs_entry_candidates"],3)
         self.assertEqual(coverage["no_verified_lexical_link"],1)
         self.assertEqual(coverage["entry_only"],1)
 
