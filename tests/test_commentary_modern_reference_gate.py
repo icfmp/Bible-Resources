@@ -919,5 +919,88 @@ class WholeOriginalSourceLinkLedgerTests(unittest.TestCase):
                 corrections=corrections)
 
 
+    def test_native_context_and_literal_presence_are_metadata_only(self):
+        ns = "http://www.bibletechnologies.net/2003/OSIS/namespace"
+        ch = ET.Element(f"{{{ns}}}chapter", {"osisID": "Gen.1"})
+        section = ET.SubElement(ch, f"{{{ns}}}div", {
+            "annotateType": "commentary",
+            "annotateRef": "Gen.1.1-Gen.1.2",
+        })
+        ET.SubElement(section, f"{{{ns}}}p").text = (
+            "This author cites John 3:16 and the printed Ps. 1:1-3.")
+        original = {"Gen.1.1": [
+            ("Bible:John.3.16", "John 3:16"),
+            ("Bible:Ps.1.1-Ps.1.3", "Ps. 1:1-3"),
+            ("Matt.5.2", "2"),
+        ]}
+        context = {
+            "source_table_ownership": {"Gen.1.1": [False, True, False]},
+            "source_title_ownership": {"Gen.1.1": [False, True, False]},
+            "modern_chapters": {"Gen.1": ch},
+            "native": {"chapters": {"Gen.1": {"original_units": [
+                {"first_key": "Gen.1.1", "keys": ["Gen.1.1", "Gen.1.2"]}
+            ]}}},
+        }
+        ledger = _unplaced_original_link_review_ledger(
+            original=original, insertions=[], corrections={}, **context)
+        self.assertEqual(len(ledger["pending"]), 3)
+        self.assertEqual(
+            [x["native_markup_location"] for x in ledger["pending"]],
+            ["EXPOSITION_OR_OTHER", "TABLE_AND_TITLE", "EXPOSITION_OR_OTHER"])
+        self.assertEqual(
+            [x["original_target_grammar"] for x in ledger["pending"]],
+            ["SINGLE_VERSE", "SAME_CHAPTER_FULL_RANGE", "SINGLE_VERSE"])
+        self.assertEqual(
+            [x["verbatim_original_label_in_modern_K"] for x in ledger["pending"]],
+            ["UNIQUE_VERBATIM", "UNIQUE_VERBATIM",
+             "NON_DISTINCTIVE_NOT_SCANNED"])
+        self.assertNotIn("John 3:16", repr(ledger))
+        self.assertNotIn("Ps. 1:1-3", repr(ledger))
+        self.assertNotIn("Bible:John.3.16", repr(ledger))
+        # Only one coherent, authenticated provenance tuple is acceptable.
+        with self.assertRaisesRegex(ValueError, "complete"):
+            _unplaced_original_link_review_ledger(
+                original=original, insertions=[], corrections={},
+                source_table_ownership=context["source_table_ownership"])
+        wrong = dict(context)
+        wrong["source_title_ownership"] = {"Gen.1.1": [True]}
+        with self.assertRaisesRegex(ValueError, "ancestry"):
+            _unplaced_original_link_review_ledger(
+                original=original, insertions=[], corrections={}, **wrong)
+        wrong = dict(context)
+        wrong["native"] = {"chapters": {"Gen.1": {"original_units": [
+            {"first_key": "Gen.1.1", "keys": ["Gen.1.1"]}
+        ]}}}
+        with self.assertRaisesRegex(ValueError, "ownership"):
+            _unplaced_original_link_review_ledger(
+                original=original, insertions=[], corrections={}, **wrong)
+
+    def test_printed_label_diagnostic_never_invents_source_reference(self):
+        from commentary_modern_reference_gate import _original_label_in_modern_k
+        ns = "http://www.bibletechnologies.net/2003/OSIS/namespace"
+        section = ET.Element(f"{{{ns}}}div")
+        ET.SubElement(section, f"{{{ns}}}p").text = (
+            "John 3:16 and then again John 3:16. John 3:161 is different.")
+        self.assertEqual(
+            _original_label_in_modern_k(section, "John 3:16"),
+            "REPEATED_NOT_UNIQUE")
+        self.assertEqual(
+            _original_label_in_modern_k(section, "John 3:17"),
+            "ABSENT_VERBATIM")
+        self.assertEqual(
+            _original_label_in_modern_k(section, "16"),
+            "NON_DISTINCTIVE_NOT_SCANNED")
+        section.clear()
+        para = ET.SubElement(section, f"{{{ns}}}p")
+        para.text = "Read "
+        link = ET.SubElement(para, f"{{{ns}}}reference", {
+            "osisRef": "Bible:John.3.16"})
+        link.text = "John 3:16"
+        link.tail = " and 1 John 3:16 in context."
+        self.assertEqual(
+            _original_label_in_modern_k(section, "John 3:16"),
+            "ABSENT_VERBATIM")
+
+
 if __name__=="__main__":
     unittest.main()
