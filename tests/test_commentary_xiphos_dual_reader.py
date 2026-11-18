@@ -225,6 +225,31 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
         self.assertEqual(len(pointer), 2)
         self.assertTrue(all("--sync" not in command for command in pointer))
 
+    def test_inconclusive_gui_copy_is_bounded_and_does_not_invent_prose(self):
+        from commentary_xiphos_dual_reader import attempt_real_xiphos_passage_copy
+        probes={"Isa 63:1":{
+            "commentary":b"confirmed real original commentary "+b"longword "*100,
+            "bible":b"distinct original Bible verse.",
+            "commentary_internal":b'<reference osisRef="Ps.60">Psalm title</reference>',
+        }}
+        with patch("commentary_xiphos_dual_reader._main_xiphos_window",
+                   return_value="101"), \
+             patch("commentary_xiphos_dual_reader._commentary_pane_focus_points",
+                   return_value=((970,320),(1050,500))), \
+             patch("commentary_xiphos_dual_reader._seed_x11_clipboard"), \
+             patch("commentary_xiphos_dual_reader.time.sleep"), \
+             patch("commentary_xiphos_dual_reader._x11",return_value=b"stale or unrelated"):
+            result=attempt_real_xiphos_passage_copy(
+                {"DISPLAY":":91","GDK_BACKEND":"x11"},probes)
+        self.assertTrue(result["actual_passage_commands_accepted"])
+        self.assertEqual(result["independent_gui_commentary_excerpt_match_count"],0)
+        self.assertFalse(result["commentary_clipboard_match_by_passage"]["Isa 63:1"])
+        self.assertEqual(
+            result["bounded_right_commentary_pane_focus_attempts_by_passage"]["Isa 63:1"],
+            4)
+        self.assertFalse(result["real_markup_rendering_observation_by_passage"]
+                         ["Isa 63:1"]["xiphos_link_click_target_and_navigation_verified"])
+
     @patch("commentary_xiphos_dual_reader.time.sleep")
     @patch("commentary_xiphos_dual_reader._main_xiphos_window")
     @patch("commentary_xiphos_dual_reader._x11")
