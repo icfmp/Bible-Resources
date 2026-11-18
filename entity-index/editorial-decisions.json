@@ -276,7 +276,8 @@
       "remove_references": [
         "02003018",
         "11005005",
-        "16011003"
+        "16011003",
+        "14011003"
       ],
       "remove_explicit_instances": {
         "wlc": [
@@ -288,6 +289,9 @@
           ],
           [
             "o160110030131"
+          ],
+          [
+            "o140110030101"
           ]
         ]
       },
@@ -304,17 +308,37 @@
           ],
           [
             "o390020100132"
+          ],
+          [
+            "o140110040051"
+          ],
+          [
+            "o140110040071"
+          ],
+          [
+            "o140110040101"
+          ],
+          [
+            "o140110040182"
+          ],
+          [
+            "o140110040222"
+          ],
+          [
+            "o140110040232"
           ]
         ]
       },
-      "reason": "Exodus 3:18 says 'elders of Israel' and speaks of the Israelite people centuries after Jacob; its proper-name Israel word and plural representative roles do not identify the deceased patriarch Jacob/Israel. In 1 Kings 5:5 Israel is a contemporary people dwelling safely under Solomon, not the long-dead patriarch Jacob; in Nehemiah 11:3 the name explicitly means the Israelite residents of Persian-era Judah, not Jacob. The singular 'each person' words inherit participant links to communities, not historical persons. Remove only these two complete verse-specific false-person groups. Jeremiah 33:10 the demonstrative 'this' indicates the desolate place in Judah/Israel awaiting restoration, not a historical reference to the deceased patriarch Israel/Jacob; remove only his incorrect indirect claim. Malachi 2:10 speaks as the living covenant community ('we', 'each one', 'our fathers') and cannot assign three present-day discourse words to the deceased founder Israel/Jacob. Retain the source's other participating people/collective links without automatically asserting an identity.",
+      "reason": "Exodus 3:18 says 'elders of Israel' and speaks of the Israelite people centuries after Jacob; its proper-name Israel word and plural representative roles do not identify the deceased patriarch Jacob/Israel. In 1 Kings 5:5 Israel is a contemporary people dwelling safely under Solomon, not the long-dead patriarch Jacob; in Nehemiah 11:3 the name explicitly means the Israelite residents of Persian-era Judah, not Jacob. The singular 'each person' words inherit participant links to communities, not historical persons. Remove only these two complete verse-specific false-person groups. Jeremiah 33:10 the demonstrative 'this' indicates the desolate place in Judah/Israel awaiting restoration, not a historical reference to the deceased patriarch Israel/Jacob; remove only his incorrect indirect claim. Malachi 2:10 speaks as the living covenant community ('we', 'each one', 'our fathers') and cannot assign three present-day discourse words to the deceased founder Israel/Jacob. Retain the source's other participating people/collective links without automatically asserting an identity. 2 Chronicles 11:3 names 'all Israel in Judah and Benjamin' as the people commanded alongside Rehoboam; 11:4 orders these living representatives not to fight their brothers and to return home. The singular distributive 'each man' and six plural/infinitive action words cannot refer to the patriarch Jacob/Israel long deceased before this divided kingdom context. The frozen person:Israel name and seven referent tokens are retained in the original witness, but detached only from the derived historical-person entry.",
       "evidence": [
         "Pinned WLC Exodus 3:18 exact word o020030180061 and following referent groups o020030180181, o020030180242; frozen person:Israel source record",
         "https://classic.net.bible.org/verse.php?book=Exo&chapter=3&verse=18",
         "https://github.com/icfmp/ACAI/issues/10",
         "Pinned WLC 1 Kings 5:5 o110050050032 = Israel as a people; o110050050051 = each resident, participantref Judah+Israel; Nehemiah 11:3 o160110030131 = Israelite residents, o160110030101 = each, participantref includes Israel and Levites. Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c.",
         "Pinned WLC Jeremiah 33:10 word o240330100072 = singular demonstrative 'this' qualifying a place, with group:Judah already preserving the source word; Malachi 2:10 o390020100101 first-plural action, o390020100111 common noun 'each', o390020100132 covenant-of-fathers infinitive, none identifies Jacob.",
-        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/24-Jer-033-lowfat.xml and WLC/lowfat/39-Mal-002-lowfat.xml"
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/24-Jer-033-lowfat.xml and WLC/lowfat/39-Mal-002-lowfat.xml",
+        "Pinned WLC 2 Chronicles 11:3 o140110030101 names 'Israel' as the group alongside Rehoboam and Judah/Benjamin; 11:4 six actions at o140110040051, o140110040071, o140110040101, o140110040182, o140110040222, o140110040232 have Macula actor frames 140110030031 (Rehoboam) and 140110030101 (all Israel living in Judah/Benjamin); o140110040111 'each' participantref likewise names these contemporary actors.",
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/14-2Ch-011-lowfat.xml; frozen ACAI person:Israel describes Jacob, group:Israel describes the Israelites."
       ],
       "remove_pronominal_referents": {
         "wlc": [
@@ -329,6 +353,9 @@
           ],
           [
             "o390020100111"
+          ],
+          [
+            "o140110040111"
           ]
         ]
       }
@@ -339,7 +366,8 @@
       "add_references": [
         "02003018",
         "11005005",
-        "16011003"
+        "16011003",
+        "14011003"
       ],
       "add_explicit_instances": {
         "wlc": [
@@ -351,15 +379,19 @@
           ],
           [
             "o160110030131"
+          ],
+          [
+            "o140110030101"
           ]
         ]
       },
-      "reason": "The named Israel of 'elders of Israel' in Exodus 3:18 is the Israelite community, not the dead patriarch; attach the attested proper name to the existing Israelite group, without inferring links for other words. Add two exact attested collective Israel names to the existing Israelite people, not the ancient patriarch: Solomon-era Judah and Israel dwelling safely (1 Kings 5:5) and postexilic Israelite residents (Nehemiah 11:3). Their distributive 'each person' original words carry explicit Macula participantref pointers to Israelite people; retain the corresponding group links, not the dead founder.",
+      "reason": "The named Israel of 'elders of Israel' in Exodus 3:18 is the Israelite community, not the dead patriarch; attach the attested proper name to the existing Israelite group, without inferring links for other words. Add two exact attested collective Israel names to the existing Israelite people, not the ancient patriarch: Solomon-era Judah and Israel dwelling safely (1 Kings 5:5) and postexilic Israelite residents (Nehemiah 11:3). Their distributive 'each person' original words carry explicit Macula participantref pointers to Israelite people; retain the corresponding group links, not the dead founder. In 2 Chronicles 11:3-4, the exact living 'all Israel' cohort in Judah and Benjamin obeys the LORD's command alongside Rehoboam. Add source-proven collective Israel proper name in 11:3, and seven Macula source participant-referent tokens in 11:4 to the already existing group:Israel; retain the independently indexed king Rehoboam's roles. No new person or group identity is invented.",
       "evidence": [
         "Pinned WLC Exodus 3:18 exact Hebrew Israel proper-name o020030180061",
         "https://classic.net.bible.org/verse.php?book=Exo&chapter=3&verse=18",
         "https://github.com/icfmp/ACAI/issues/10",
-        "Pinned WLC 1 Kings 5:5 o110050050032 + o110050050051 and Nehemiah 11:3 o160110030131 + o160110030101; source participantref labels the community of Israel rather than Jacob individually."
+        "Pinned WLC 1 Kings 5:5 o110050050032 + o110050050051 and Nehemiah 11:3 o160110030131 + o160110030101; source participantref labels the community of Israel rather than Jacob individually.",
+        "Pinned Macula WLC 2 Chronicles 11:3 o140110030101 'all Israel'; 11:4 original participantref/subjref frames on o140110040051, o140110040071, o140110040101, o140110040111, o140110040182, o140110040222, o140110040232 directly point to 140110030101; the historical Jacob is not present."
       ],
       "add_pronominal_referents": {
         "wlc": [
@@ -368,6 +400,31 @@
           ],
           [
             "o160110030101"
+          ],
+          [
+            "o140110040111"
+          ]
+        ]
+      },
+      "add_subject_referents": {
+        "wlc": [
+          [
+            "o140110040051"
+          ],
+          [
+            "o140110040071"
+          ],
+          [
+            "o140110040101"
+          ],
+          [
+            "o140110040182"
+          ],
+          [
+            "o140110040222"
+          ],
+          [
+            "o140110040232"
           ]
         ]
       }
