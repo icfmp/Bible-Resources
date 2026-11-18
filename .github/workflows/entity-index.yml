@@ -299,6 +299,22 @@ jobs:
           missing_hebrew={r["id"] for r in reports["wlc"]["missing_id_details"]}
           assert missing_hebrew == set(manifest["word_ids"]), (missing_hebrew,manifest["word_ids"])
           assert reports["wlc"]["summary"]["missing_from_pinned_macula"] == 18
+          assert reports["sblgnt"]["summary"]["missing_from_pinned_macula"] == 0
+          assert reports["wlc"]["summary"]["unique_mentioned_source_ids"] == 97977
+          assert reports["sblgnt"]["summary"]["unique_mentioned_source_ids"] == 36867
+          nt=json.loads((root/"dist/nt-source-verse-compatibility.json").read_text())
+          ot=json.loads((root/"dist/ot-source-verse-compatibility.json").read_text())
+          verse_manifest=json.loads((root/"source-unattested-verses.json").read_text())
+          assert nt["summary"]["record_reference_entries_absent_from_source"] == 22
+          assert nt["summary"]["distinct_referenced_verses_absent_from_source"] == 8
+          assert ot["summary"]["record_reference_entries_absent_from_source"] == 0
+          assert ot["summary"]["distinct_referenced_verses_absent_from_source"] == 0
+          assert {r["verse_id"] for r in nt["verses_absent_from_pinned_source"]} == set(verse_manifest["verse_ids"])
+          original_ids={e["id"]:e["source_id"] for e in index["entities"]}
+          for row in nt["verses_absent_from_pinned_source"]:
+              derived=index["unattested_source_verses"]["sblgnt:"+row["verse_id"]]
+              claimants=[original_ids[entity_id] for entity_id in derived["source_reference_claims"]]
+              assert sorted(row["entities"]) == sorted(claimants), row["verse_id"]
           corpus_paths={
               "wlc":Path("macula-hebrew/WLC/tsv/macula-hebrew.tsv"),
               "sblgnt":Path("macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv"),
@@ -323,6 +339,9 @@ jobs:
                               raise ValueError(f"Duplicate source word ID {word!r}")
                           words.add(word)
               by_corpus[corpus]=words
+              # Counts are source-edition compatibility signals, not claims of
+              # semantic or editorial correctness for every tagged referent.
+              assert len(words) == {"wlc":469476,"sblgnt":137741}[corpus], (corpus,len(words))
               unresolved=sorted(word for key in all_indexed
                                 if key.startswith(corpus+":")
                                 for word in [key.split(":",1)[1]]
