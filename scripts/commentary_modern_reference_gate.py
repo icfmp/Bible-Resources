@@ -1718,7 +1718,7 @@ def _source_context_unique_paragraph_anchor(
                               if len(w) >= 5 and w not in _CONTEXT_COMMON}
                 if len(meaningful) < 3:
                     continue
-                candidates.append((length, side, tuple(subset)))
+                candidates.append((length, -offset, -side, tuple(subset)))
 
     if not candidates:
         return None
@@ -1727,17 +1727,17 @@ def _source_context_unique_paragraph_anchor(
         value = para.text or ""
         tokens = [(m.group().casefold(), m.start(), m.end())
                   for m in _CONTEXT_WORD.finditer(value)]
-        for length, side, phrase in candidates:
+        for length, proximity, side_priority, phrase in candidates:
             for i in range(len(tokens)-length+1):
                 if tuple(t[0] for t in tokens[i:i+length]) == phrase:
-                    placements.append((length, side, id(para),
+                    placements.append((length, proximity, side_priority, id(para),
                                        tokens[i+length-1][2], para))
     if not placements:
         return None
     # A unique largest exact preserved phrase. Different positions with the
     # same maximal strength are ambiguous and MUST remain at section level.
-    highest = max(row[0] for row in placements)
-    best = {(row[2], row[3]): row for row in placements if row[0] == highest}
+    highest = max(row[:3] for row in placements)
+    best = {(row[3], row[4]): row for row in placements if row[:3] == highest}
     if len(best) != 1:
         return None
     return next(iter(best.values()))[-2:]
