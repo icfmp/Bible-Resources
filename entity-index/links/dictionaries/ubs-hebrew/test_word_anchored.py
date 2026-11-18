@@ -245,6 +245,46 @@ class OriginalWordAnchoredLinksTest(unittest.TestCase):
             )
             self.assertEqual(build_word_links(ix,[different],source),{})
 
+    def test_consonantal_sdbh_owner_allows_entry_only_for_unique_headword(self):
+        lemma=entry("000010000000000","יָלַד",["H3204"])
+        ix=build([lemma],[lemma])
+        with tempfile.TemporaryDirectory() as folder:
+            source=Path(folder)/"words.tsv"
+            source.write_text(
+                "xml:id\tlemma\tsdbh\tstrongnumberx\tlang\tclass\n"
+                "o010010010011\tיָלָד\t000010001001000\t3205\tH\tverb\n",
+                encoding="utf-8",
+            )
+            links=build_word_links(ix,[lemma],source)
+        self.assertEqual(links["o010010010011"]["entry_id"],lemma["MainId"])
+        ix["by_macula_word"]=links
+        out=lookup_word(ix,"o010010010011","000010001001000","3205","H","יָלָד")
+        self.assertEqual(out["sense_ids"],[])
+        self.assertEqual(out["evidence"],"macula_word_consonants_and_source_sdbh_ubs_owner_entry_only")
+
+    def test_consonantal_sdbh_owner_rejects_homographs_and_language_mismatch(self):
+        a=entry("000010000000000","יָלַד",["H3204"])
+        b=entry("000011000000000","יָלְד",["H3206"])
+        ix=build([a,b],[a,b])
+        with tempfile.TemporaryDirectory() as folder:
+            source=Path(folder)/"words.tsv"
+            source.write_text(
+                "xml:id\tlemma\tsdbh\tstrongnumberx\tlang\tclass\n"
+                "o010010010011\tיָלָד\t000010001001000\t3205\tH\tverb\n"
+                "o010010010021\tיָלָד\t000010001001000\t3205\tA\tverb\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(build_word_links(ix,[a,b],source),{})
+        ix=build([a],[a])
+        with tempfile.TemporaryDirectory() as folder:
+            source=Path(folder)/"words.tsv"
+            source.write_text(
+                "xml:id\tlemma\tsdbh\tstrongnumberx\tlang\tclass\n"
+                "o010010010011\tיָלָד\t000010001001000\t3205\tA\tverb\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(build_word_links(ix,[a],source),{})
+
     def test_no_promotion_of_sense_id_collision(self):
         wrong = entry("006653000000000", "רֹאשׁ", ["H7218"])
         right = entry("006660000000000", "רֵאשִׁית", ["H7225a"])

@@ -168,6 +168,26 @@ This is an incremental source-correlated identity check, **not** a claim that
 the remaining entries sharing a lemma under different Strong numbers are
 automatically equivalent. They remain flagged for independent review.
 
+## Independent source-ID plus unique consonantal headword
+
+Extending the strict source-ID-owner lookup to vocalization-only differences,
+with the original same-language Hebrew consonants (shin/sin dots preserved)
+and a unique matching UBS headword, recovered **2 additional original WLC
+entry-only links**. This is separate from the 16 exact-lemma corroborations:
+**10,812** extra source-word entries are now available, and **267,850**
+original WLC tokens have a linked UBS headword candidate.
+
+The original lexical-class coverage is **239,517 / 248,680 = 96.315%**,
+and the edition-indexed-headword scope covers **239,517 / 242,726 =
+98.678%**, leaving **3,209** in-scope lexical occurrences unresolved.
+The excluded headword-inventory nonattestations remain **5,954**.
+These two new links do **not** introduce any new contextual sense IDs.
+
+Original source words, original SDBH IDs and UBS dictionary entries remain
+unaltered. All same-consonant homographs, mismatched languages and ambiguous
+source-ID owners are rejected. The absence of corroboration is **not**
+treated as permission to guess.
+
 ## Coverage within the attested headword inventory (UBS 0.9.4)
 
 The original WLC denominator must remain available, but an edition-specific
