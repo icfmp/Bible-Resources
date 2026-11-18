@@ -94,9 +94,10 @@ jobs:
           print("Exact SHA-pinned original OSIS processed as a private cleaned candidate")
           print("Cleaned source SHA-256:",receipt["cleaned_sha256"])
           print("Cosmetic operations (text-free):",receipt["cleanup_changes"])
-          print("Potential marker counts (not automatically removed):",
-                {k:v for k,v in receipt["original_suspicious_token_census"].items()
-                 if "asterisk" in k or "zero_width" in k})
+          print("Original typographical/spacing candidate census (counts only):",
+                receipt["original_suspicious_token_census"])
+          print("Original text ownership by XML tag (characters only):",
+                receipt["text_character_counts_by_xml_owner"])
           print("All elements, attributes, note bodies, link bodies retained")
           PY
       - name: Compile fresh private zCom4, then independently read EVERY occupied key
