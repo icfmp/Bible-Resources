@@ -77,7 +77,8 @@ class CleanSourceTests(unittest.TestCase):
             clean(self.source, sha256(raw).hexdigest())
 
     def test_unmodified_source_stays_byte_identical(self):
-        raw = OSIS.replace(b"Grâce  fidèle", b"Grâce fidèle").replace(
+        raw = OSIS.replace("Grâce  fidèle".encode("utf-8"),
+            "Grâce fidèle".encode("utf-8")).replace(
             "<title>  L'Évangile  </title>".encode("utf-8"),
             "<title>L'Évangile</title>".encode("utf-8"))
         self.source.write_bytes(raw)
