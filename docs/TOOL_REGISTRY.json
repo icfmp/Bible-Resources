@@ -59,11 +59,12 @@
         "lxml",
         "pathlib",
         "re",
-        "sys"
+        "sys",
+        "unicodedata"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "6704514997fe374318baaa13112cd3f01cad871ffe54c873b6005a9bcb5234ae",
+      "sha256_at_inventory": "c54830beab27040b8e566014c1b92dac2b655686d0b85421e6c3eeb0cc41e400",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
