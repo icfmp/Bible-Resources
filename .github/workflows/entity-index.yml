@@ -240,6 +240,31 @@ jobs:
           assert len(set((f["corpus"], f["word_id"]) for f in report["findings"])) == len(report["findings"])
           PY
 
+      - name: Classify exact-person direct-name overlaps by pinned source context
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import importlib.util
+          import json
+          from pathlib import Path
+          source=Path("entity-index/audit_person_overlaps.py")
+          spec=importlib.util.spec_from_file_location("person_name_review",source)
+          module=importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(module)
+          audit=json.loads(Path("entity-index/dist/person-overlaps.json").read_text())
+          manifest=json.loads(Path("entity-index/reviewed-person-word-overlaps.json").read_text())
+          reviewed=module.verify_explicit_name_reviews(audit,manifest)
+          stats=reviewed["statistics"]
+          assert stats["reviewed_explicit_name_word_overlaps"]==8, stats
+          assert stats["shared_genealogical_name_component"]==5, stats
+          assert stats["unresolved_patronymic_name_variant"]==1, stats
+          assert stats["unresolved_person_identity"]==2, stats
+          Path("entity-index/dist/reviewed-person-overlaps.json").write_text(
+              json.dumps(reviewed,ensure_ascii=False,indent=2,sort_keys=True)+"\n")
+          print("ENTITY_EXPLICIT_NAME_OVERLAP_REVIEW",
+                json.dumps(stats,sort_keys=True))
+          PY
+
       - name: Audit frozen ACAI repeated word groups without altering them
         shell: bash
         run: |
@@ -544,6 +569,7 @@ jobs:
           path: |
             entity-index/dist/index.json
             entity-index/dist/person-overlaps.json
+            entity-index/dist/reviewed-person-overlaps.json
             entity-index/dist/source-multiplicity.json
             entity-index/dist/macula-hebrew-existence.json
             entity-index/dist/macula-greek-existence.json

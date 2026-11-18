@@ -93,6 +93,83 @@ def audit(index: dict) -> dict:
     }
 
 
+
+REVIEW_CLASSES = {
+    "shared_genealogical_name_component",
+    "unresolved_patronymic_name_variant",
+    "unresolved_person_identity",
+}
+
+
+def verify_explicit_name_reviews(audit_report: dict, manifest: dict) -> dict:
+    """Check every distinct-person direct-name overlap against pinned receipts.
+
+    This does not change the original ambiguity audit or resolve any word.
+    A legitimate compound component may name two historical persons without
+    being an error. Other identity claims remain explicitly unresolved.
+    """
+    if manifest.get("schema_version") != 1 or manifest.get("kind") != "exact_word_distinct_person_review":
+        raise ValueError("Unsupported exact-person overlap review format")
+    for corpus, source_edition in manifest.get("source_editions", {}).items():
+        edition = audit_report.get("source_editions", {}).get(corpus, {}).get("edition")
+        if source_edition != edition:
+            raise ValueError(f"Wrong original-language review edition: {corpus}")
+    if set(manifest.get("source_editions", {})) != set(audit_report.get("source_editions", {})):
+        raise ValueError("Incomplete review source-edition pin")
+    original = {
+        (row["corpus"], row["word_id"]): row
+        for row in audit_report["findings"]
+        if row["classification"] == "multiple_explicit_names"
+    }
+    if len(original) != audit_report["statistics"]["multiple_explicit_names"]:
+        raise ValueError("Duplicate original explicit-name word audit rows")
+    reviewed = {}
+    for item in manifest.get("cases", []):
+        key = (item["corpus"], item["word_id"])
+        if key in reviewed:
+            raise ValueError(f"Duplicate exact-word review {key}")
+        if key not in original:
+            raise ValueError(f"Review does not match any live explicit name overlap: {key}")
+        if item.get("classification") not in REVIEW_CLASSES:
+            raise ValueError(f"Invalid exact-word review classification: {key}")
+        evidence = item.get("evidence")
+        if (not isinstance(evidence, list) or len(evidence) < 2
+                or any(not isinstance(x, str) or not x.strip() for x in evidence)
+                or not isinstance(item.get("reason"), str) or not item["reason"].strip()):
+            raise ValueError(f"Source evidence required for exact-word review: {key}")
+        people = [person["canonical_id"] for person in original[key]["canonical_people"]]
+        if people != item.get("canonical_people"):
+            raise ValueError(f"Stale or incorrect distinct-person identities: {key}")
+        reviewed[key] = {
+            "corpus": key[0],
+            "word_id": key[1],
+            "source_verse_id": original[key]["source_verse_id"],
+            "canonical_people": people,
+            "classification": item["classification"],
+            "reason": item["reason"],
+            "evidence": evidence,
+        }
+    if set(reviewed) != set(original):
+        raise ValueError(
+            f"Unreviewed exact-person name overlaps: {sorted(set(original)-set(reviewed))}")
+    counts = {label: sum(
+        item["classification"] == label for item in reviewed.values()
+    ) for label in sorted(REVIEW_CLASSES)}
+    return {
+        "format": "bible-entity-reviewed-explicit-name-overlaps",
+        "schema_version": 1,
+        "source_commit": audit_report["source_commit"],
+        "source_editions": audit_report["source_editions"],
+        "statistics": {"reviewed_explicit_name_word_overlaps": len(reviewed), **counts},
+        "cases": [reviewed[key] for key in sorted(reviewed)],
+        "policy": (
+            "Shared genealogical components are not competing alternative "
+            "identifications; unresolved source identities remain unresolved. "
+            "Do not delete, merge, prioritize or alter original source words."
+        ),
+    }
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--index", type=Path, required=True)

@@ -65,6 +65,44 @@ class PersonOverlapTests(unittest.TestCase):
             e["word_id"] for e in report["findings"]])
         self.assertIn("candidate ambiguities", report["warning"])
 
+    def test_contextual_overlap_reviews_require_exact_ids_people_and_editions(self):
+        report=module.audit(sample())
+        entry={
+            "corpus":"wlc", "word_id":"o010010010021",
+            "canonical_people":["person:Abel","person:Adam"],
+            "classification":"shared_genealogical_name_component",
+            "reason":"A source-cited compound in a synthetic fixture",
+            "evidence":["Pinned source word claim","Contextual source role"],
+        }
+        manifest={
+            "schema_version":1,
+            "kind":"exact_word_distinct_person_review",
+            "source_editions":{"wlc":"test-edition"},
+            "cases":[entry],
+        }
+        verified=module.verify_explicit_name_reviews(report,manifest)
+        self.assertEqual(verified["statistics"]["reviewed_explicit_name_word_overlaps"],1)
+        self.assertEqual(verified["statistics"]["shared_genealogical_name_component"],1)
+        self.assertEqual(verified["cases"][0]["canonical_people"],
+                         ["person:Abel","person:Adam"])
+        with self.assertRaisesRegex(ValueError,"Wrong original-language review edition"):
+            module.verify_explicit_name_reviews(report,dict(
+                manifest,source_editions={"wlc":"wrong-edition"}))
+        with self.assertRaisesRegex(ValueError,"Unreviewed exact-person"):
+            module.verify_explicit_name_reviews(report,dict(manifest,cases=[]))
+        with self.assertRaisesRegex(ValueError,"Stale or incorrect"):
+            module.verify_explicit_name_reviews(report,dict(
+                manifest,cases=[dict(entry,canonical_people=["person:Adam"])]))
+        with self.assertRaisesRegex(ValueError,"Duplicate exact-word"):
+            module.verify_explicit_name_reviews(report,dict(
+                manifest,cases=[entry,entry]))
+        with self.assertRaisesRegex(ValueError,"Source evidence required"):
+            module.verify_explicit_name_reviews(report,dict(
+                manifest,cases=[dict(entry,evidence=[])]))
+        with self.assertRaisesRegex(ValueError,"Invalid exact-word"):
+            module.verify_explicit_name_reviews(report,dict(
+                manifest,cases=[dict(entry,classification="all_resolved")]))
+
     def test_fail_closed_for_broken_index(self):
         data = sample()
         data["schema_version"] = 2
