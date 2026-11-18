@@ -9,6 +9,7 @@ on:
       - "scripts/repair_commentary_osis_milestones.py"
       - "tests/test_repair_commentary_osis_milestones.py"
       - "config/commentary-osis-repair-plans/mhc-endpoints-private-preview.json"
+      - "config/commentary-osis-repair-plans/mhc-overlap-reindex-private-experiment.json"
       - "tests/test_clean_source_osis.py"
       - ".github/workflows/commentary-mhc-technical-rebuild.yml"
       - "config/commentary-intake/mhc-crosswire.json"
@@ -653,6 +654,95 @@ jobs:
               print("Preview source-native structural integrity complete")
           else:
               print("Source/native overlap remains a SEPARATE research-only blocker; NO release")
+          PY
+      - name: Research-only trial of six overlapping commentary machine ranges
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          python - <<'PY'
+          import json,os,subprocess,sys
+          from hashlib import sha256
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])
+          source=root/"mhc-repaired-preview.osis.xml"
+          plan=Path("config/commentary-osis-repair-plans/mhc-overlap-reindex-private-experiment.json")
+          original_receipt=json.loads((root/"mhc-range-preview-receipt.json").read_text())
+          planned=json.loads(plan.read_text())
+          if planned["source_sha256"]!=original_receipt["candidate_sha256"]:
+              raise SystemExit("Overlap repair research plan is not SHA-pinned to first preview")
+          preview=root/"mhc-overlap-experimental.osis.xml"
+          cmd=[sys.executable,"scripts/repair_commentary_osis_milestones.py",
+               "--source",str(source),"--sha256",planned["source_sha256"],
+               "--plan",str(plan),"--private-output",str(preview)]
+          with (root/"mhc-overlap-patch-receipt.json").open("xb") as out:
+              subprocess.run(cmd,stdout=out,stderr=subprocess.DEVNULL,
+                             check=True,timeout=150)
+          receipt=json.loads((root/"mhc-overlap-patch-receipt.json").read_text())
+          if (receipt["corrected_source_verse_groups"]!=6 or
+                  receipt["original_machine_attribute_values_replaced"]!=24 or
+                  receipt["removed_invalid_verse_assignments"]!=6 or
+                  not receipt["all_source_text_notes_links_and_other_markup_identical"]):
+              raise SystemExit("Six-group research-only scope repair corrupted original witness")
+          print("Experimental overlap repair source SHA:",receipt["candidate_sha256"])
+          print("Edited original machine attribute values:",receipt["original_machine_attribute_values_replaced"])
+          print("Authored content changes: NONE (original text, notes, links unchanged)")
+          manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
+          work=root/"mhc-overlap-experiment-sword"
+          compile_cmd=[sys.executable,"scripts/rebuild_osis_commentary.py",
+               "--source",str(preview),"--sha256",receipt["candidate_sha256"],
+               "--private-work",str(work),"--module","MHCOverlapPreview",
+               "--language",manifest["language"],
+               "--versification",manifest["commentary_source"]["observed_compiled_versification"],
+               "--native-reader",str(root/"commentary-native-raw"),
+               "--min-numbered","20000"]
+          with (root/"mhc-overlap-rebuild.json").open("xb") as out:
+              subprocess.run(compile_cmd,stdout=out,
+                             stderr=subprocess.DEVNULL,check=True,timeout=650)
+          from sys import path as pythonpath
+          pythonpath.insert(0,str(Path.cwd()/"scripts"))
+          from audit_osis import (source_commentary_overlap_witness,
+              compare_source_overlap_native_bodies,compare_source_milestone_index)
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          original_overlap,needed=source_commentary_overlap_witness(source)
+          if not original_overlap or not needed:
+              raise SystemExit("Original overlap witness missing; do not infer repair")
+          body_sha={}
+          related={}
+          env=dict(os.environ,SWORD_PATH=str(work))
+          proc=subprocess.Popen([str(root/"commentary-native-raw"),"MHCOverlapPreview"],
+                                env=env,stdout=subprocess.PIPE,
+                                stderr=subprocess.DEVNULL)
+          def on_entry(kind,key,raw):
+              if kind=="K":
+                  body_sha[key]=sha256(raw).hexdigest()
+                  if key in needed:
+                      related[key]=raw
+          try:
+              _scan,keys,intros,_opaque=parse_native_raw_corpus(
+                  proc.stdout,on_entry=on_entry)
+              if proc.wait(timeout=35):
+                  raise SystemExit("Experimental overlap preview native scan failed")
+          finally:
+              if proc.stdout:proc.stdout.close()
+              if proc.poll() is None:proc.kill()
+              proc.wait()
+          diagnostic=compare_source_overlap_native_bodies(original_overlap,related)
+          print("Experimental overlap source-body preservation class counts:",
+                diagnostic["classification_counts"])
+          print("Experimental overlap per-comment proof (reference metadata only):",
+                diagnostic["bounded_source_group_cases"])
+          audit=compare_source_milestone_index(
+              preview,numbered_keys=keys,intro_keys=intros,body_sha_by_verse=body_sha)
+          print("Experimental reindexed OSIS/native structural state:",audit["status"])
+          print("Experimental remaining structural issue classes:",audit["anomaly_counts"])
+          if diagnostic["classification_counts"].get(
+              "full_source_word_sequence_not_found_in_group_native_keys",0):
+              raise SystemExit("Trial could not recover all six source group word streams")
+          if not audit["all_source_verse_ids_match_occupied_native_keys"]:
+              raise SystemExit("Experimental source-native verse indexes differ")
+          print("This research candidate is NOT an authorial scope editorial approval.")
+          print("No OSIS transcript or compiled module uploaded or published.")
           PY
       - name: Verify all source verse-group boundaries against real compiled SWORD keys and linked bodies
         shell: bash
