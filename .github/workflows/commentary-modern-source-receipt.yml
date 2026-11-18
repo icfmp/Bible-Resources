@@ -1903,6 +1903,30 @@ jobs:
                 "introductions in real chapter-I keys; 1 existing Genesis " +
                 "not duplicated; 28792 exact keys; NO release")
           PY
+      - name: Compile explicitly unapproved four-link editorial-repair variant with all 56 book prefaces
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/mhcc-preface-repair-root/mods.d"
+          mkdir -p "$RUNNER_TEMP/mhcc-preface-repair-root/modules/comments/zcom/mhccprefacerepair"
+          timeout 240s osis2mod \
+            "$RUNNER_TEMP/mhcc-preface-repair-root/modules/comments/zcom/mhccprefacerepair" \
+            "$RUNNER_TEMP/mhcc-modern-book-prefaces-proposed-errata-review.osis.xml" \
+            -z z -b 3 \
+            > "$RUNNER_TEMP/mhcc-preface-repair-osis2mod.log" 2>&1
+          cat > "$RUNNER_TEMP/mhcc-preface-repair-root/mods.d/mhccprefacerepair.conf" <<'EOF'
+          [MHCCPREFACEREPAIR]
+          Description=Private unpublished unapproved 13-target MHCC reference repair trial with 56 introductions
+          DataPath=./modules/comments/zcom/mhccprefacerepair/
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          Lang=en
+          Versification=KJV
+          SourceType=OSIS
+          DistributionLicense=Private
+          EOF
+          touch "$RUNNER_TEMP/mhcc-prefaces-proposed-errata-compiled-success.marker"
       - name: Prove all 4049 compiled K commentary bodies and embedded Scripture links survive 50 introduced I prefaces unchanged
         shell: bash
         run: |
