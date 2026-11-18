@@ -274,12 +274,20 @@
       "source_id": "person:Israel",
       "action": "amend_occurrences",
       "remove_references": [
-        "02003018"
+        "02003018",
+        "11005005",
+        "16011003"
       ],
       "remove_explicit_instances": {
         "wlc": [
           [
             "o020030180061"
+          ],
+          [
+            "o110050050032"
+          ],
+          [
+            "o160110030131"
           ]
         ]
       },
@@ -293,39 +301,72 @@
           ]
         ]
       },
-      "reason": "Exodus 3:18 says 'elders of Israel' and speaks of the Israelite people centuries after Jacob; its proper-name Israel word and plural representative roles do not identify the deceased patriarch Jacob/Israel.",
+      "reason": "Exodus 3:18 says 'elders of Israel' and speaks of the Israelite people centuries after Jacob; its proper-name Israel word and plural representative roles do not identify the deceased patriarch Jacob/Israel. In 1 Kings 5:5 Israel is a contemporary people dwelling safely under Solomon, not the long-dead patriarch Jacob; in Nehemiah 11:3 the name explicitly means the Israelite residents of Persian-era Judah, not Jacob. The singular 'each person' words inherit participant links to communities, not historical persons. Remove only these two complete verse-specific false-person groups.",
       "evidence": [
         "Pinned WLC Exodus 3:18 exact word o020030180061 and following referent groups o020030180181, o020030180242; frozen person:Israel source record",
         "https://classic.net.bible.org/verse.php?book=Exo&chapter=3&verse=18",
-        "https://github.com/icfmp/ACAI/issues/10"
-      ]
+        "https://github.com/icfmp/ACAI/issues/10",
+        "Pinned WLC 1 Kings 5:5 o110050050032 = Israel as a people; o110050050051 = each resident, participantref Judah+Israel; Nehemiah 11:3 o160110030131 = Israelite residents, o160110030101 = each, participantref includes Israel and Levites. Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c."
+      ],
+      "remove_pronominal_referents": {
+        "wlc": [
+          [
+            "o110050050051"
+          ],
+          [
+            "o160110030101"
+          ]
+        ]
+      }
     },
     {
       "source_id": "group:Israel",
       "action": "amend_occurrences",
       "add_references": [
-        "02003018"
+        "02003018",
+        "11005005",
+        "16011003"
       ],
       "add_explicit_instances": {
         "wlc": [
           [
             "o020030180061"
+          ],
+          [
+            "o110050050032"
+          ],
+          [
+            "o160110030131"
           ]
         ]
       },
-      "reason": "The named Israel of 'elders of Israel' in Exodus 3:18 is the Israelite community, not the dead patriarch; attach the attested proper name to the existing Israelite group, without inferring links for other words.",
+      "reason": "The named Israel of 'elders of Israel' in Exodus 3:18 is the Israelite community, not the dead patriarch; attach the attested proper name to the existing Israelite group, without inferring links for other words. Add two exact attested collective Israel names to the existing Israelite people, not the ancient patriarch: Solomon-era Judah and Israel dwelling safely (1 Kings 5:5) and postexilic Israelite residents (Nehemiah 11:3). Their distributive 'each person' original words carry explicit Macula participantref pointers to Israelite people; retain the corresponding group links, not the dead founder.",
       "evidence": [
         "Pinned WLC Exodus 3:18 exact Hebrew Israel proper-name o020030180061",
         "https://classic.net.bible.org/verse.php?book=Exo&chapter=3&verse=18",
-        "https://github.com/icfmp/ACAI/issues/10"
-      ]
+        "https://github.com/icfmp/ACAI/issues/10",
+        "Pinned WLC 1 Kings 5:5 o110050050032 + o110050050051 and Nehemiah 11:3 o160110030131 + o160110030101; source participantref labels the community of Israel rather than Jacob individually."
+      ],
+      "add_pronominal_referents": {
+        "wlc": [
+          [
+            "o110050050051"
+          ],
+          [
+            "o160110030101"
+          ]
+        ]
+      }
     },
     {
       "source_id": "person:Judah.4",
       "action": "amend_occurrences",
       "remove_references": [
         "23022008",
-        "24022018"
+        "24022018",
+        "11005005",
+        "14023008",
+        "16011003"
       ],
       "remove_explicit_instances": {
         "wlc": [
@@ -334,6 +375,15 @@
           ],
           [
             "o240220180101"
+          ],
+          [
+            "o110050050021"
+          ],
+          [
+            "o140230080041"
+          ],
+          [
+            "o160110030081"
           ]
         ]
       },
@@ -347,15 +397,29 @@
           ],
           [
             "o240220180191"
+          ],
+          [
+            "o140230080102"
           ]
         ]
       },
-      "reason": "Isaiah 22:8 speaks of the defense of the nation of Judah, and Jeremiah 22:18 calls Jehoiakim king of Judah; neither passage names the patriarch Judah as a living individual. Frozen group:Judah already owns exactly these name and referent tokens, so remove only the false patriarch links.",
+      "reason": "Isaiah 22:8 speaks of the defense of the nation of Judah, and Jeremiah 22:18 calls Jehoiakim king of Judah; neither passage names the patriarch Judah as a living individual. Frozen group:Judah already owns exactly these name and referent tokens, so remove only the false patriarch links. 1 Kings 5:5 speaks of the people of Judah during Solomon; 2 Chronicles 23:8 explicitly says 'all Judah' alongside the Levites carrying out Jehoiada's orders, not their deceased tribal founders; Nehemiah 11:3 refers to towns of Judah after exile, not the son of Jacob. The existing group:Judah has each correct source word and subject referent. Remove only these false patriarch-specific words and verse claims in the derived output.",
       "evidence": [
         "Pinned WLC Isaiah 22:8 o230220080041 and Jeremiah 22:18 o240220180101, plus context-linked source referents; frozen group:Judah has all five exact pointers",
         "https://classic.net.bible.org/verse.php?book=Isa&chapter=22&verse=8",
-        "https://classic.net.bible.org/verse.php?book=jer&chapter=22&verse=18"
-      ]
+        "https://classic.net.bible.org/verse.php?book=jer&chapter=22&verse=18",
+        "Pinned WLC 1KI 5:5 o110050050021 (Judah) and o110050050051 (each); 2CH 23:8 o140230080041 (all Judah), o140230080102 (they took), o140230080111 (each); NEH 11:3 o160110030081 (towns of Judah). Existing group:Judah has the exact original groups."
+      ],
+      "remove_pronominal_referents": {
+        "wlc": [
+          [
+            "o110050050051"
+          ],
+          [
+            "o140230080111"
+          ]
+        ]
+      }
     },
     {
       "source_id": "person:Ephraim",
@@ -793,6 +857,47 @@
         "Pinned Macula WLC 2 Kings 4:1 o120040010012 feminine noun 'woman' Ncfsa; other genuine plural child terms o120040010041 ('sons') and o120040010261 ('children') are distinct source tokens",
         "https://github.com/Clear-Bible/macula-hebrew/blob/47db250bd55d0d8577f2a94fba114ef16c35b23c/WLC/lowfat/12-2Ki-004-lowfat.xml",
         "Frozen ACAI person:GenericSon incorrectly claims the woman word; person:Widow has two original repeated singleton subject groups for the same word, preserved untouched"
+      ]
+    },
+    {
+      "source_id": "person:Levi.3",
+      "action": "amend_occurrences",
+      "remove_references": [
+        "14023008",
+        "16011003"
+      ],
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o140230080022"
+          ],
+          [
+            "o160110030153"
+          ]
+        ]
+      },
+      "remove_pronominal_referents": {
+        "wlc": [
+          [
+            "o140230080111"
+          ],
+          [
+            "o160110030101"
+          ]
+        ]
+      },
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o140230080102"
+          ]
+        ]
+      },
+      "reason": "2 Chronicles 23:8 explicitly names the plural gentilic Levites cooperating with all Judah in Jehoiada's time; Nehemiah 11:3 lists the postexilic Levite residents. Neither text refers to the ancient individual Levi, son of Jacob. The already-existing group:Levi holds the exact plural word, distributive 'each' and 2 Chronicles action verb groups. Remove only those false son-of-Jacob links, preserving the frozen source.",
+      "evidence": [
+        "Pinned WLC 2CH 23:8 o140230080022 Ngmpa 'Levites', o140230080102 Vqw3mp plural 'they took' (subjref the Levites and all Judah), o140230080111 distributive 'each'; NEH 11:3 o160110030153 Ngmpa 'Levites', o160110030101 each. All source words remain attached to group:Levi.",
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/14-2Ch-023-lowfat.xml and WLC/lowfat/16-Neh-011-lowfat.xml",
+        "Frozen ACAI person:Levi.3 identifies the patriarch, not the later collective."
       ]
     }
   ]
