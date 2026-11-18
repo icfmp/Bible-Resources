@@ -489,15 +489,28 @@
     {
       "source_id": "person:GenericServant",
       "action": "amend_occurrences",
-      "reason": "1 Kings 18:42 explicitly names Elijah on this word, while his servant is referred to later in 18:43. Remove only the mistaken singleton indirect pointer; keep the separate 1 Samuel 9:10 multiword servant expression for further segmentation review.",
+      "reason": "1 Samuel 9:10 has distinct pinned Hebrew word segments for the spoken subject Saul (o090090100021) and the addressee's common noun 'servant' (o090090100032). The inherited two-word GenericServant group falsely included Saul's proper name. Replace only that group with the verified singleton servant word; keep every other original segment, including the suffix 'his' in its original witness. Separately, 1 Kings 18:42 names Elijah, not his servant, so detach its erroneous GenericServant singleton pointer while leaving other roles untouched.",
       "evidence": [
         "Pinned WLC 1 Kings 18:42 o110180420052 under explicit person:Elijah and frozen GenericServant singleton subject group",
-        "https://www.biblegateway.com/passage/?search=1+Kings+18%3A42-46&version=NIV"
+        "https://www.biblegateway.com/passage/?search=1+Kings+18%3A42-46&version=NIV",
+        "Pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/09-1Sa-009-lowfat.xml: 1 Samuel 9:10 o090090100021 proper-name Saul, o090090100032 common noun servant, o090090100033 possessive suffix his",
+        "https://www.openbible.com/text/1_samuel/9-10.htm"
       ],
       "remove_subject_referents": {
         "wlc": [
           [
+            "o090090100021",
+            "o090090100032"
+          ],
+          [
             "o110180420052"
+          ]
+        ]
+      },
+      "add_subject_referents": {
+        "wlc": [
+          [
+            "o090090100032"
           ]
         ]
       }
