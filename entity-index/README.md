@@ -51,7 +51,8 @@ only for the stated, source-cited editorial decision, not for every fact
 conceivably implied by that entity.
 
 For the first version's bounded common-noun/topic acceptance examples, see
-[the v0.1 source-word pilot](V0_1_TOPIC_PILOT.md). This is an explicitly
+[the v0.1 source-word pilot](V0_1_TOPIC_PILOT.md) and the
+[24-case named-entity review](V0_1_NAME_PILOT.md). This is an explicitly
 nonexhaustive source-candidate study, not a dictionary or published release.
 
 ## Initial independent editorial corrections
