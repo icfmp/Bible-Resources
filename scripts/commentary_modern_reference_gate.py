@@ -566,7 +566,7 @@ def _wrap_exact_authored_modern_text(section: ET.Element, *, anchor: str,
     if (not isinstance(anchor, str) or not anchor or len(anchor) > 512
             or not isinstance(display, str) or not display
             or display not in anchor or occurrence not in ("first", "last")
-            or canonical_only_for_comparison(target) is None):
+            or not _allowed_source_link_target(target)):
         raise ValueError("Invalid reviewed modern citation/text placement")
     positions = []
     for node in section.iter():
@@ -705,6 +705,15 @@ def _source_same_chapter_verse_range(literal: str):
     return book, chapter, start, end
 
 
+
+def _allowed_source_link_target(target: str) -> bool:
+    try:
+        canonical_only_for_comparison(target)
+        return True
+    except ValueError:
+        return _source_same_chapter_verse_range(target) is not None
+
+
 def _unambiguous_explicit_modern_range(section: ET.Element, literal: str):
     """Return one explicit same-book same-chapter modern 3:16–18, else None."""
     parsed = _source_same_chapter_verse_range(literal)
@@ -762,7 +771,8 @@ def _unrecognized_original_ref_class(literal: str) -> str:
 
 def _auto_single_verse_placements(*, private_original: dict, groups: dict,
                                   modern_chapters: dict, native: dict,
-                                  blocked: set, corrections: dict):
+                                  blocked: set, corrections: dict,
+                                  include_ranges: bool = False):
     """Return conservative placements plus classified counts, no private text."""
     from commentary_modern_draft_osis_preview import NS, _range
     found = []
@@ -776,7 +786,9 @@ def _auto_single_verse_placements(*, private_original: dict, groups: dict,
                "unrecognized_format_other_compound_syntax":0,
                "unrecognized_format_other_original_syntax":0,
                "repeated_original_target": 0, "unverified_or_single_digit_label": 0,
-               "no_unique_full_modern_verse_citation": 0}
+               "no_unique_full_modern_verse_citation": 0,
+               "no_unique_full_modern_verse_range_citation":0,
+               "source_range_spans_chapters_or_has_unsafe_bounds":0}
     for first, links in private_original.items():
         chapter = first.rsplit(".", 1)[0]
         units = native["chapters"][chapter]["original_units"]
@@ -793,10 +805,15 @@ def _auto_single_verse_placements(*, private_original: dict, groups: dict,
             try:
                 targets.append(canonical_only_for_comparison(literal))
             except ValueError:
-                # Original source can legitimately use ranges, unusual
-                # identifiers or bad historic hyperlinks. Identity is already
-                # attested above; their disposition is manual, never guessed.
-                targets.append(None)
+                # Full original range syntax remains an immutable source
+                # literal. Never infer abbreviated or cross-chapter spans.
+                parsed=(_source_same_chapter_verse_range(literal)
+                        if include_ranges else None)
+                if parsed is not None:
+                    targets.append("RANGE:"+
+                        (literal[6:] if literal.startswith("Bible:") else literal))
+                else:
+                    targets.append(None)
         for pos, (literal, label) in enumerate(links, 1):
             key = (first, pos)
             if key in blocked:
@@ -817,15 +834,22 @@ def _auto_single_verse_placements(*, private_original: dict, groups: dict,
             if not label.strip() or re.fullmatch(r"[1-9]", label.strip()):
                 skipped["unverified_or_single_digit_label"] += 1
                 continue
-            display = _unambiguous_explicit_modern_verse(section, literal)
+            is_range=canon.startswith("RANGE:")
+            if is_range:
+                display=_unambiguous_explicit_modern_range(section,literal)
+            else:
+                display=_unambiguous_explicit_modern_verse(section,literal)
             if display is None:
-                skipped["no_unique_full_modern_verse_citation"] += 1
+                skipped["no_unique_full_modern_verse_range_citation" if is_range
+                        else "no_unique_full_modern_verse_citation"] += 1
                 continue
             found.append({
                 "modern_chapter": chapter,
                 "source_first_key": first,
                 "original_link_ordinal": pos,
-                "action": "AUTO_EXACT_SOURCE_TARGET_AND_UNIQUE_MODERN_VERSE",
+                "action": ("AUTO_EXACT_SOURCE_TARGET_AND_UNIQUE_MODERN_RANGE"
+                          if is_range else
+                          "AUTO_EXACT_SOURCE_TARGET_AND_UNIQUE_MODERN_VERSE"),
                 "expected_modern_target": canon,
                 "modern_anchor": display,
                 "linked_display_text": display,
