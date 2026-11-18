@@ -12,5 +12,6 @@
   "source_text_edit_approved": false,
   "chapter_introduction_remapping_approved": true,
   "publication_approved": false,
-  "source_sha256_runtime_requirement": "The exact currently rebuilt private OSIS digest must be verified in memory against its receipt and provided to the generic byte-local repair; it must never replace the official original authoring SHA pin."
+  "source_sha256_runtime_requirement": "The exact currently rebuilt private OSIS digest must be verified in memory against its receipt and provided to the generic byte-local repair; it must never replace the official original authoring SHA pin.",
+  "private_candidate_before_intro_sha256": "49da878758587e52fa25fe59a0b55fc3d058c511fb7c31c4f42f7163fab70f10"
 }
