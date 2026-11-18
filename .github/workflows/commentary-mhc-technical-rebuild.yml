@@ -1283,7 +1283,11 @@ jobs:
               "rights_or_publication_approved":False,
           }
           print("Corrected private MHC actual Xiphos research (metadata only):",
-                json.dumps(outcome,sort_keys=True))
+                json.dumps(outcome,sort_keys=True),flush=True)
+          # Keep native source integrity a separate blocking gate, but a
+          # green GUI step must never hide zero verified real-window content.
+          if matches!=len(comparisons) or not result["actual_passage_commands_accepted"]:
+              raise SystemExit("INCONCLUSIVE_REAL_GUI_SELECTION: real commentary excerpts not verified")
           PY
       - name: Report corrected-MHC GUI status independently from native-source integrity
         if: always()
