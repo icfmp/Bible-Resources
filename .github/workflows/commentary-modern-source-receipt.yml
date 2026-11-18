@@ -4,6 +4,8 @@ on:
     paths:
       - '.github/workflows/commentary-modern-source-receipt.yml'
       - 'scripts/commentary_modern_source_receipt.py'
+      - 'scripts/commentary_modern_native_witness_probe.py'
+      - 'tests/test_commentary_modern_native_witness_probe.py'
       - 'scripts/commentary_modern_ionly_preview.py'
       - 'scripts/sword_native_commentary_index.cpp'
       - 'scripts/commentary_modern_reference_gate.py'
@@ -29,7 +31,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Test source-native and draft-coverage guards on synthetic fixtures
-        run: python -m unittest tests/test_commentary_modern_source_receipt.py tests/test_commentary_modern_ionly_preview.py tests/test_commentary_modern_draft_guard.py tests/test_commentary_modern_draft_osis_preview.py tests/test_commentary_modern_reference_gate.py tests/test_commentary_modern_linked_candidate_preview.py -v
+        run: python -m unittest tests/test_commentary_modern_source_receipt.py tests/test_commentary_modern_ionly_preview.py tests/test_commentary_modern_draft_guard.py tests/test_commentary_modern_draft_osis_preview.py tests/test_commentary_modern_reference_gate.py tests/test_commentary_modern_linked_candidate_preview.py tests/test_commentary_modern_native_witness_probe.py -v
       - name: Install real SWORD source reader
         shell: bash
         run: |
@@ -179,6 +181,16 @@ jobs:
                     " source_sha_anchors="+anchors)
           print("COMPLETE NATIVE KEY RECEIPT PASS — metadata only; no draft semantics, links, notes or compiled derivative approved")
           PY
+      - name: Probe five original SWORD source-body scopes against independent English anchors
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_modern_native_witness_probe.py \
+            --native-reader "$RUNNER_TEMP/commentary-modern-source-raw" \
+            --module-directory "$RUNNER_TEMP/mhcc-source-root" \
+            --native-receipt "$RUNNER_TEMP/mhcc-modern-whole-canon-native-receipt.json" \
+            --witness-manifest "work/mhcc-modern/production/NATIVE_FIVE_CHAPTER_ANCHOR_PROBES.json" \
+            --report "$RUNNER_TEMP/mhcc-modern-five-native-source-witness-probes.json"
       - name: Screen all modern manuscript outline tables for out-of-order source ranges
         shell: bash
         run: |
@@ -1029,6 +1041,7 @@ jobs:
           path: |
             ${{ runner.temp }}/mhcc-modern-source-native-receipt.json
             ${{ runner.temp }}/mhcc-modern-whole-canon-native-receipt.json
+            ${{ runner.temp }}/mhcc-modern-five-native-source-witness-probes.json
             ${{ runner.temp }}/mhcc-modern-historical-69-translation-coverage.json
             ${{ runner.temp }}/mhcc-modern-full-canon-source-group-diagnostic.json
             ${{ runner.temp }}/mhcc-ionly-preview-report.json
