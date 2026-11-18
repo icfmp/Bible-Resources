@@ -2102,6 +2102,117 @@ def build_private_contextual_source_note_preview(
 
 
 
+
+def build_private_inline_original_reference_index(
+        *, source_note_osis: bytes, source_receipt: dict,
+        native: dict) -> tuple[bytes,dict]:
+    """Expose all source-owned unplaced links visibly in their K section.
+
+    This is a *separate unpublished reader alternative*, not a repair of the
+    original in-prose position. Every source link is usable immediately,
+    while its unproven precise prose placement stays explicitly labelled.
+    """
+    from collections import Counter
+    from commentary_modern_draft_osis_preview import NS, _range
+    if (source_receipt.get("status") !=
+            "PRIVATE_NATIVE_SOURCE_NOTE_ALTERNATIVE_NOT_AUTHORED_INLINE_PARITY"
+            or source_receipt.get("original_link_occurrences_preserved_only_in_separate_source_notes") != 176
+            or source_receipt.get("source_link_supplement_not_authorial_or_inline") is not True
+            or source_receipt.get("published_or_distributed") is not False
+            or source_receipt.get("original_native_corpus_sha256") !=
+            native.get("original_compiled_corpus_sha256")):
+        raise ValueError("Cannot promote unsourced original notes into inline index")
+
+    root=ET.fromstring(source_note_osis)
+    authored_before=[]
+    original_links=[]
+    original_groups={}
+    chapters={x.get("osisID"):x for x in root.iter()
+              if x.tag==f"{{{NS}}}chapter"}
+    if set(chapters)!=set(native.get("chapters",{})):
+        raise ValueError("Original chapter coverage changed in inline index")
+    expected_groups={x["source_first_key"]:x
+                     for x in source_receipt["note_source_K_reference_hashes_for_private_native_readback"]}
+    if len(expected_groups)!=source_receipt["source_first_K_sections_with_note"]:
+        raise ValueError("Source reference K group identity duplicated")
+    for chapter, ch in chapters.items():
+        units=native["chapters"][chapter]["original_units"]
+        if not units:
+            continue
+        sections=ch.findall(f"./{{{NS}}}div[@annotateType='commentary']")
+        if len(sections)!=len(units):
+            raise ValueError("Different K authorial section count")
+        for source,sec in zip(units,sections):
+            if sec.get("annotateRef")!=_range(source["keys"]):
+                raise ValueError("SWORD K section identity changed")
+            notes=[n for n in sec if n.tag==f"{{{NS}}}note"
+                   and n.get("resp")=="BibleResourcesPrivateSourceOnlyLinkSupplement"]
+            first=source["first_key"]
+            if first not in expected_groups:
+                if notes:
+                    raise ValueError("Unexpected original link appendix")
+                continue
+            if len(notes)!=1:
+                raise ValueError("Missing source-pinned original link appendix")
+            source_note=notes[0]
+            ref_nodes=[x for x in source_note
+                       if x.tag==f"{{{NS}}}reference"]
+            hashes=expected_groups[first]["original_source_reference_hashes"]
+            if len(ref_nodes)!=len(hashes):
+                raise ValueError("Unplaced original hyperlinks lost on transfer")
+            for n,receipt in zip(ref_nodes,hashes):
+                literal=n.get("osisRef")
+                visible="".join(n.itertext())
+                if (not isinstance(literal,str)
+                        or hashlib.sha256(literal.encode()).hexdigest()!=
+                        receipt["source_original_literal_target_sha256"]
+                        or hashlib.sha256(visible.encode()).hexdigest()!=
+                        receipt["supplement_display_sha256"]):
+                    raise ValueError("Original link target or label drift in inline index")
+                original_links.append((first,literal,visible))
+            p=ET.Element(f"{{{NS}}}p",{
+                "resp":"BibleResourcesOriginalSourceReferenceIndexOnly",
+            })
+            p.text=("Original-edition Bible references for this commentary "
+                    "section (exact original sentence locations unverified): ")
+            # Move the SAME XML hyperlink nodes, without replacement,
+            # normalization, coalescing, or rerouting.
+            for n in ref_nodes:
+                source_note.remove(n)
+                p.append(n)
+            index=list(sec).index(source_note)
+            sec.remove(source_note)
+            sec.insert(index,p)
+            original_groups[first]=len(ref_nodes)
+    if set(original_groups)!=set(expected_groups):
+        raise ValueError("Missing original K groups in visible source-reference index")
+    if len(original_links)!=176 or sum(original_groups.values())!=176:
+        raise ValueError("Not all 176 authentic original references are visible")
+    if any(n.get("resp")=="BibleResourcesPrivateSourceOnlyLinkSupplement"
+           for n in root.iter() if n.tag==f"{{{NS}}}note"):
+        raise ValueError("An old hidden source-only note survived")
+
+    output=ET.tostring(root,encoding="utf-8",xml_declaration=True)
+    ET.fromstring(output)
+    return output,{
+        "status":"PRIVATE_SOURCE_REFERENCES_VISIBLE_IN_K_NOT_EXACT_AUTHORIAL_INLINE",
+        "original_native_corpus_sha256":native["original_compiled_corpus_sha256"],
+        "original_unplaced_valid_references_visible_in_commentary":len(original_links),
+        "original_K_groups_with_reference_index":len(original_groups),
+        "original_literal_targets_and_displays_reused_without_rewriting":True,
+        "original_text_or_modern_authored_prose_edited":False,
+        "precise_original_sentence_locations_proven":False,
+        "published_or_distributed":False,
+        "reference_index_by_source_first_key":[{
+            "source_first_key":first,"reference_count":original_groups[first],
+            "original_reference_target_display_hashes":[{
+                "target_sha256":hashlib.sha256(literal.encode()).hexdigest(),
+                "display_sha256":hashlib.sha256(label.encode()).hexdigest(),
+            } for key,literal,label in original_links if key==first]
+        } for first in sorted(original_groups)],
+    }
+
+
 def build_unapproved_source_errata_notes_preview(
         *, source_note_osis: bytes, ledger: dict,
         native: dict, errata: dict) -> tuple[bytes, dict]:
@@ -2227,7 +2338,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                                     source_notes_output: Path | None = None,
                                     errata_review: dict | None = None,
                                     errata_proposals_output: Path | None = None,
-                                    context_notes_output: Path | None = None) -> tuple[bytes, dict]:
+                                    context_notes_output: Path | None = None,
+                                    inline_source_index_output: Path | None = None) -> tuple[bytes, dict]:
     """Authenticate and place an explicitly bounded set of source-backed links.
 
     Real original SWORD attributes stay in private memory/isolated new OSIS,
@@ -2248,6 +2360,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         raise ValueError("Private errata proposals require separate source-note candidate")
     if context_notes_output is not None and source_notes_output is None:
         raise ValueError("Context placement requires separate source-note alternative")
+    if inline_source_index_output is not None and source_notes_output is None:
+        raise ValueError("Visible source reference index requires original source notes")
     if (placements.get("status") !=
             "PRIVATE_REVIEWED_BOUNDED_LINK_PLACEMENT_NOT_FINAL_EDIT_OR_RELEASE"
             or placements.get("published_source_module") != "MHCC 0.1.1"
@@ -2637,6 +2751,7 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
     ET.fromstring(output)
     notes_receipt = None
     context_receipt = None
+    inline_source_index_receipt = None
     errata_preview_receipt = None
     if source_notes_output is not None:
         if source_link_ledger is None:
@@ -2648,6 +2763,13 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
             original=private_original, native=native, errata=errata_review)
         source_notes_output.parent.mkdir(parents=True,exist_ok=True)
         source_notes_output.write_bytes(notes_osis)
+        if inline_source_index_output is not None:
+            inlined,index_receipt=build_private_inline_original_reference_index(
+                source_note_osis=notes_osis,source_receipt=notes_receipt,
+                native=native)
+            inline_source_index_output.parent.mkdir(parents=True,exist_ok=True)
+            inline_source_index_output.write_bytes(inlined)
+            inline_source_index_receipt=index_receipt
         if context_notes_output is not None:
             # Build the extra ordered alignment only inside the isolated,
             # source-hash-verified native reader. No original prose is exported.
@@ -2706,6 +2828,7 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         "source_original_link_review_ledger":source_link_ledger,
         "private_source_note_alternative":notes_receipt,
         "private_contextual_note_relocation_preview":context_receipt,
+        "private_visible_source_reference_index_preview":inline_source_index_receipt,
         "private_unapproved_errata_navigation_preview":errata_preview_receipt,
         "modern_SWORD_readback_verified":False,
         "independent_editorial_semantic_signoff":False,
@@ -2737,6 +2860,7 @@ def main():
     p.add_argument("--auto-authenticated-original-printed-single-verses",action="store_true")
     p.add_argument("--source-notes-osis",type=Path)
     p.add_argument("--context-source-notes-osis",type=Path)
+    p.add_argument("--visible-source-reference-index-osis",type=Path)
     p.add_argument("--source-notes-errata-manifest",type=Path)
     p.add_argument("--source-errata-proposals-osis",type=Path)
     p.add_argument("--linked-osis",type=Path)
@@ -2751,6 +2875,8 @@ def main():
         p.error("Private source errata proposals require original source notes")
     if a.context_source_notes_osis is not None and a.source_notes_osis is None:
         p.error("Private context relocation needs the source-note alternative")
+    if a.visible_source_reference_index_osis is not None and a.source_notes_osis is None:
+        p.error("Visible inline index needs original source note alternative")
     if not a.native_reader.is_file() or not a.module_directory.is_dir():
         p.error("Trusted real native reader and installed source module directory required")
     if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{1,39}",a.module_id):
@@ -2784,7 +2910,8 @@ def main():
                 encoding="utf-8")) if a.source_notes_errata_manifest is not None
                 else None),
             errata_proposals_output=a.source_errata_proposals_osis,
-            context_notes_output=a.context_source_notes_osis)
+            context_notes_output=a.context_source_notes_osis,
+            inline_source_index_output=a.visible_source_reference_index_osis)
         a.linked_osis.parent.mkdir(parents=True,exist_ok=True)
         a.report.parent.mkdir(parents=True,exist_ok=True)
         a.linked_osis.write_bytes(osis)
