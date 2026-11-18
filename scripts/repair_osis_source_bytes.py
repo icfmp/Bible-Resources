@@ -209,14 +209,19 @@ def patch_exact_original(original: bytes, link_plan: dict, inline_plan: dict):
 
 def _indexed_osis_reference_target(token: str, native_keys: set[str],
                                    atomic_pattern: re.Pattern) -> bool:
-    """Accept a real indexed verse or one *complete*, same-chapter OSIS range.
+    """Accept indexed verses, complete same-chapter ranges, or chapter roots.
 
-    Every included verse must exist in the independently scanned module. A
-    whitespace-delimited multi-target plan remains separate; no invented
-    endpoints, cross-book spans or implicit inherited references are accepted.
+    Every range verse must exist in the independently scanned module.
+    A chapter root is a *navigation scope*, not proof that an unindexed
+    superscription/title is visible or selectable in any reader.
+    Whitespace-delimited separate targets stay independent. No invented
+    endpoints, cross-book spans or inherited references are accepted.
     """
     if atomic_pattern.fullmatch(token):
         return token in native_keys
+    chapter_pattern=re.compile(r"[1-4]?[A-Za-z][A-Za-z0-9]*\\.[1-9]\\d*")
+    if chapter_pattern.fullmatch(token):
+        return any(ref.startswith(token+".") for ref in native_keys)
     ends=token.split("-")
     if len(ends)!=2 or any(atomic_pattern.fullmatch(x) is None for x in ends):
         return False
