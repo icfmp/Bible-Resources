@@ -105,6 +105,32 @@ jobs:
           print("NBSP source XML owners:",profile["nonbreaking_spaces_by_xml_owner"])
           print("All elements, attributes, note bodies, link bodies retained")
           PY
+      - name: Run existing commentary OSIS structural audit, report only metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          timeout 180s python scripts/audit_osis.py \
+            "$RUNNER_TEMP/mhc-cleaned.osis.xml" --kind commentary \
+            --report "$RUNNER_TEMP/mhc-structural-private.json" >/dev/null
+          python - <<'PY'
+          from collections import Counter
+          import json, os
+          from pathlib import Path
+          path=Path(os.environ["RUNNER_TEMP"])/"mhc-structural-private.json"
+          report=json.loads(path.read_text())
+          if report.get("status")!="audited_not_normalized" or not report.get("no_content_changes"):
+              raise SystemExit("Structural source audit failed")
+          summary=report["summary"]
+          print("Private MHC OSIS audit structural finding counts:",summary["finding_counts"])
+          print("Private MHC OSIS audit source paragraphs:",summary["paragraphs"])
+          # Exact source text, titles, note bodies and references stay private.
+          findings=report["findings"]
+          print("First structural finding positions (code and XML line only):",
+                [{"code":row["code"],"line":row["original_xml_line"]}
+                 for row in findings[:20]])
+          print("No editorial changes or historical text correction performed")
+          PY
       - name: Compile fresh private zCom4, then independently read EVERY occupied key
         shell: bash
         run: |
