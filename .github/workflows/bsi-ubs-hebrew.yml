@@ -22,7 +22,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Offline regression tests
-        run: python3 -I entity-index/links/dictionaries/ubs-hebrew/test_index.py
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_index.py
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_lexical_gaps.py
       - name: Check out exact UBS Hebrew EN/FR 0.9.4 source
         uses: actions/checkout@v4
         with:
@@ -75,6 +77,14 @@ jobs:
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
             --output /tmp/bsi-ubs-hebrew-variants.json \
             --expected-rows 475911
+      - name: Rank every unresolved lexical occurrence by original language and lemma
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_lexical_gaps.py \
+            --index /tmp/bsi-ubs-hebrew-index.json \
+            --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
+            --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --output /tmp/bsi-ubs-hebrew-lexical-gaps.json \
+            --expected-unresolved 13736
       - name: Compare pinned generated index or prepare initial reproducible snapshot
         run: |
           python3 - <<'PY'
@@ -126,5 +136,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bsi-ubs-hebrew-index-candidate
-          path: /tmp/bsi-ubs-hebrew-index.json
+          path: |
+            /tmp/bsi-ubs-hebrew-index.json
+            /tmp/bsi-ubs-hebrew-lexical-gaps.json
           retention-days: 14
