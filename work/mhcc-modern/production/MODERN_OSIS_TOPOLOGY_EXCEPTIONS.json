@@ -1,0 +1,79 @@
+{
+  "status": "REVIEWED_SOURCE_VS_EDITORIAL_TOPOLOGY_EXCEPTIONS_NOT_RELEASE_APPROVAL",
+  "original_source_module": "MHCC 0.1.1",
+  "original_compiled_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+  "source_evidence": "work/mhcc-modern/production/FULL_CANON_NATIVE_GROUP_TRIAGE_2026-11-17.md",
+  "cases": [
+    {
+      "chapter": "Deut.20",
+      "modern_leaf_indices_by_original_K": [
+        [
+          0
+        ],
+        [
+          1
+        ]
+      ],
+      "reason": "modern printed 10–20 topical scope exceeds published indexed K 10–12; retain original keys, do not manufacture 13–20"
+    },
+    {
+      "chapter": "1Sam.25",
+      "modern_leaf_indices_by_original_K": [
+        [
+          0
+        ],
+        [
+          1
+        ],
+        [
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4,
+          5
+        ]
+      ],
+      "reason": "two modern topical divisions 32–39 and 39–44 reflect one original K group 32–44; do not split it or duplicate verse 39"
+    },
+    {
+      "chapter": "John.3",
+      "modern_leaf_indices_by_original_K": [
+        [
+          0
+        ],
+        [
+          1
+        ]
+      ],
+      "reason": "modern 1–21 heading while authentic first K covers only 1–8; do not invent indexed 9–21"
+    },
+    {
+      "chapter": "Ps.95",
+      "modern_leaf_indices_by_original_K": [
+        [
+          0,
+          1
+        ]
+      ],
+      "reason": "two modern topical divisions 1–7 and 7–11 reflect one original K group 1–11; do not duplicate verse 7"
+    },
+    {
+      "chapter": "Zech.9",
+      "modern_leaf_indices_by_original_K": [
+        [
+          0
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "reason": "modern topical divisions 9–11 and 12–17 share one original K group 9–17"
+    }
+  ],
+  "derived_markup_and_links_independently_approved": false,
+  "publication_authorized": false
+}
