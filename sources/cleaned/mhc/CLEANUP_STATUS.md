@@ -32,6 +32,27 @@ These tests and the CLI smoke passed.
 - Rebuilt introduction keys: **1,255**
 - Rebuilt anonymous TOP keys: **2**
 
+### Follow-up source typography census
+
+The later metadata-only profile was verified in
+[private run #44266026639](https://github.com/icfmp/Bible-Resources/actions/runs/44266026639).
+It confirmed the same **zero edits**, the same original candidate SHA and the
+same native key counts. It also identified:
+
+- **122** nonbreaking spaces: 85 in direct `hi` text ownership, 23 in
+  `reference`, and 14 in `l` poetry lines; changing them without examining
+  their contextual purpose could affect citation or line layout
+- `hi` emphasis types: **160,448 italic**, **29,218 superscript**,
+  **9,326 small caps**, **1,113 bold**, and **1 underline**
+- Most `hi` ranges are short (175,877 with 1–40 visible characters);
+  **8** exceed 500 characters and warrant targeted inspection, not blanket
+  deletion of emphasis
+
+These are genuine source-structure observations. They do **not** establish
+which emphasis is authorial, which is editorial, or which is harmless layout
+noise. None was automatically removed; a full textual comparison is still
+pending.
+
 This is a completed **mechanical baseline**, not evidence that the entire OSIS
 is editorially pristine. In particular, source markup, heading placement,
 reference-link correctness, repeated source scopes, meaningful punctuation,
