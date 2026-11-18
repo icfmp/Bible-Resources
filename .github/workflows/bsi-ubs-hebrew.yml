@@ -161,7 +161,6 @@ jobs:
           assert actual["coverage"]["no_entry_match"]==218868
           assert actual["coverage_with_word_ids"]["additional_entry_only_links"] == 10810
           assert actual["coverage_with_word_ids"]["macula_word_exact_lemma_and_source_sdbh_ubs_owner_entry_only"] == 16
-          assert actual["coverage_with_word_ids"]["additional_entry_only_links"] == 10794
           assert actual["coverage_with_word_ids"]["word_aware_entry_links"] == 267848
           scope=actual["coverage_scope"]
           assert scope["original_lexical_source_occurrences"] == 248680
