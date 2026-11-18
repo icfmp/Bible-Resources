@@ -1112,6 +1112,123 @@ jobs:
           print("This is native SWORD integrity, NOT clicked Xiphos/AndBible GUI navigation")
           print("No corrected OSIS or SWORD binary uploaded or published")
           PY
+      - name: Observe real Xiphos with corrected private 25-link MHC (not hyperlink approval)
+        shell: bash
+        continue-on-error: true
+        timeout-minutes: 8
+        run: |
+          set -euo pipefail
+          umask 077
+          # This GUI research is deliberately separate from the blocking
+          # compiled-content proof. Absence of GUI clipboard evidence is NOT
+          # falsely treated as a Bible/commentary data failure.
+          timeout 240s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 \
+            install -y --no-install-recommends \
+              xiphos xvfb xdotool xclip dbus-x11 >/dev/null
+          python - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          from lxml import etree
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from commentary_xiphos_dual_reader import (
+              _run_real_gui, verify_and_install_reviewed_bible
+          )
+          from pilot_subprocess import query,present_key
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          root=Path(os.environ["RUNNER_TEMP"])
+          work=root/"mhc-links-preview-sword"
+          module="MHCLinkPreview"
+          plan=json.loads(Path(
+              "config/commentary-osis-repair-plans/mhc-crossreferences-private-preview.json"
+          ).read_text())
+          # Independent categories: an OT multi-link, a full NT verse range,
+          # and the exceptional Psalm superscription/chapter-root citation.
+          audited_lines=(50772,81529,58059)
+          proof={e["original_line"]:e["new_target"] for e in plan["edits"]
+                 if e["original_line"] in audited_lines}
+          if len(proof)!=3 or len(plan["edits"])!=25:
+              raise SystemExit("Original 25-link proof/sample inventory changed")
+          native=root/"commentary-native-raw"
+          env=dict(os.environ,SWORD_PATH=str(work.resolve(strict=True)))
+          proc=subprocess.Popen([str(native),module],env=env,
+                                stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+          native_samples={}
+          parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
+                                 no_network=True,recover=False,huge_tree=True)
+          def capture(kind,key,raw):
+              if kind!="K" or len(native_samples)==len(proof):
+                  return
+              if not any(value.encode() in raw for value in proof.values()):
+                  return
+              fragment=etree.fromstring(b"<fragment>"+raw+b"</fragment>",parser)
+              values={n.get("osisRef") for n in fragment.iter()
+                      if isinstance(n.tag,str) and
+                         n.tag.rsplit("}",1)[-1]=="reference"}
+              for line,target in proof.items():
+                  if target in values and line not in native_samples:
+                      native_samples[line]=(key,raw)
+          try:
+              _meta,*_=parse_native_raw_corpus(proc.stdout,on_entry=capture)
+              if proc.wait(timeout=45):
+                  raise SystemExit("Cannot independently read corrected native module")
+          finally:
+              if proc.stdout:proc.stdout.close()
+              if proc.poll() is None:proc.kill()
+              proc.wait()
+          if set(native_samples)!=set(proof):
+              raise SystemExit("Corrected source targets absent from native GUI test keys")
+          identity=verify_and_install_reviewed_bible(work)
+          if not identity["all_five_published_bible_files_sha256_attested"]:
+              raise SystemExit("GUI reader Bible identity changed")
+          comparisons={}
+          sample_book_by_anchor={}
+          for line in audited_lines:
+              key,raw=native_samples[line]
+              book,chapter,verse=key.split(".")
+              passage=f"{book} {chapter}:{verse}"
+              rc,comment=query(module,passage,fmt="plain",root=work,
+                               timeout=30,limit=256*1024)
+              bc,bible=query(identity["module_id"],passage,fmt="plain",root=work,
+                             timeout=30,limit=256*1024)
+              if (not present_key(passage,comment,rc)
+                      or not present_key(passage,bible,bc)
+                      or len(comment)<64):
+                  raise SystemExit("Independent CLI reader lacks one private GUI sample")
+              if passage in comparisons:
+                  raise SystemExit("Different link proof cases share one GUI sample")
+              comparisons[passage]={
+                  "commentary":comment,"bible":bible,
+                  "commentary_internal":raw,
+              }
+              sample_book_by_anchor[line]=book
+          if len(set(sample_book_by_anchor.values()))!=3:
+              raise SystemExit("Independent GUI sample books are not distinct")
+          result=_run_real_gui(work,comparisons,seconds=12,
+                               commentary_module_id=module)
+          matches=result["independent_gui_commentary_excerpt_match_count"]
+          if not 0<=matches<=3:
+              raise SystemExit("Invalid real GUI excerpt evidence")
+          outcome={
+              "status":("CORRECTED_COMMENTARY_REAL_GUI_EXCERPTS_MATCHED"
+                        if matches==3 else
+                        "INCONCLUSIVE_REAL_GUI_SELECTION_NOT_A_RELEASE_GATE"),
+              "real_xiphos_window":result["real_xiphos_executable_started_and_visible"],
+              "sample_count":len(comparisons),
+              "sampled_authored_link_source_lines":list(audited_lines),
+              "independent_gui_excerpt_matches":matches,
+              "accepted_passage_commands":result["actual_passage_commands_accepted"],
+              "copy_failure_action_categories":sorted(set(
+                  result["bounded_xiphos_ui_failed_action_by_passage"].values())),
+              "no_original_words_or_screenshots_exposed":True,
+              "clicked_hyperlinks_tested":False,
+              "psalm_60_superscription_click_proven":False,
+              "full_chapter_layout_and_note_presentation_approved":False,
+              "rights_or_publication_approved":False,
+          }
+          print("Corrected private MHC actual Xiphos research (metadata only):",
+                json.dumps(outcome,sort_keys=True))
+          PY
       - name: Verify all source verse-group boundaries against real compiled SWORD keys and linked bodies
         shell: bash
         run: |
