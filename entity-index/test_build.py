@@ -58,6 +58,68 @@ class EntityIndexTests(unittest.TestCase):
                              source_absences, source_verse_absences,
                              reference_qualifications)
 
+    def test_exact_role_corrections_preserve_other_source_roles(self):
+        # A role in a later narrative cannot be retroactively attached to
+        # the earlier legal expert merely because the same language is used.
+        lawyer=self.write_record(
+            "people","LawExpert",references=["42010025"],
+            subject_referents={"SBLGNT":[
+                ["n42010025003"],["n42010025008"]]})
+        priest=self.write_record(
+            "people","PriestInLaterStory",references=["42010031"],
+            subject_referents={"SBLGNT":[
+                ["n42010025003"],["n42010025008"],
+                ["n42010031012"]]})
+        dead_ancestor=self.write_record(
+            "people","JudahAncestor",references=["24033010"],
+            explicit_instances={"wlc":[["o240330100181"]]},
+            pronominal_referents={"wlc":[["o240330100072"]]})
+        contemporaries=self.write_record(
+            "groups","JudahCommunity",references=["24033010"],
+            explicit_instances={"wlc":[["o240330100181"]]},
+            pronominal_referents={"wlc":[["o240330100072"]]})
+        originals=tuple(x.read_bytes() for x in
+                        (lawyer,priest,dead_ancestor,contemporaries))
+        decisions=[
+            {"source_id":"person:PriestInLaterStory",
+             "action":"amend_occurrences",
+             "remove_subject_referents":{"SBLGNT":[
+                 ["n42010025003"],["n42010025008"]]},
+             "reason":"Distinct earlier law expert and later priest",
+             "evidence":["Original singular Greek word IDs"]},
+            {"source_id":"person:JudahAncestor",
+             "action":"amend_occurrences",
+             "remove_references":["24033010"],
+             "remove_explicit_instances":{"wlc":[["o240330100181"]]},
+             "remove_pronominal_referents":{"wlc":[["o240330100072"]]},
+             "reason":"Later towns of Judah, not the dead patriarch",
+             "evidence":["Context-specific proper-name and demonstrative groups"]},
+        ]
+        derived=self.build(decisions)
+        for word in ("n42010025003","n42010025008"):
+            self.assertEqual(derived["by_word"]["sblgnt:"+word],[
+                {"entity_id":"person:LawExpert",
+                 "link_type":"subject_referents"}])
+        self.assertEqual(derived["by_word"]["sblgnt:n42010031012"],[
+            {"entity_id":"person:PriestInLaterStory",
+             "link_type":"subject_referents"}])
+        self.assertEqual(derived["by_word"]["wlc:o240330100181"],[
+            {"entity_id":"group:JudahCommunity",
+             "link_type":"explicit_instances"}])
+        self.assertEqual(derived["by_word"]["wlc:o240330100072"],[
+            {"entity_id":"group:JudahCommunity",
+             "link_type":"pronominal_referents"}])
+        by_id={x["id"]:x for x in derived["entities"]}
+        self.assertEqual(by_id["person:JudahAncestor"]["references"],[])
+        self.assertEqual(tuple(x.read_bytes() for x in
+                         (lawyer,priest,dead_ancestor,contemporaries)),
+                         originals)
+        with self.assertRaisesRegex(ValueError,
+                                    "absent group cannot be removed"):
+            self.build([dict(decisions[0],
+                             remove_subject_referents={"SBLGNT":[
+                                 ["n42010025004"]]})])
+
     def test_collective_name_does_not_become_dead_founder_identity(self):
         patriarch=self.write_record(
             "people","Ancestor",references=["01001001"],

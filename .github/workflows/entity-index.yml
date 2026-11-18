@@ -83,7 +83,7 @@ jobs:
           assert stats["source_records"] == 6644, stats
           assert stats["index_entities"] == 6641, stats
           assert stats["quarantined_records"] == 3, stats
-          assert stats["reviewed_entries"] == 34, stats
+          assert stats["reviewed_entries"] == 36, stats
           assert stats["unattested_distinct_source_words"] == 18, stats
           assert stats["indexed_distinct_source_words"] == 134822, stats
           assert len(index["unattested_source_words"]) == 18
@@ -320,6 +320,35 @@ jobs:
               hits=index["by_word"]["wlc:"+word]
               assert {x["entity_id"] for x in hits}==groups,(word,hits)
               assert all(x["link_type"]==field for x in hits)
+          # Validate exact actor/identity corrections, preserving each
+          # underlying original-word ID for the contextually correct hit.
+          for word,expected in (
+              ("n42010025003","person:Scribe"),
+              ("n42010025008","person:Scribe"),
+              ("n44021037023","person:Paul"),
+          ):
+              hits=index["by_word"]["sblgnt:"+word]
+              assert hits==[{"entity_id":expected,
+                             "link_type":"subject_referents"}],(word,hits)
+          for word,expected in (
+              ("o150080330262","group:Levi"),
+              ("o240330100181","group:Judah"),
+          ):
+              hits=index["by_word"]["wlc:"+word]
+              assert hits==[{"entity_id":expected,
+                             "link_type":"explicit_instances"}],(word,hits)
+          assert index["by_word"]["wlc:o240330100072"]==[{
+              "entity_id":"group:Judah","link_type":"pronominal_referents"}]
+          assert index["by_word"]["wlc:o390020100111"]==[{
+              "entity_id":"person:Malachi","link_type":"pronominal_referents"}]
+          for word in ("o230360080021","o230360080131",
+                       "o230360080142","o230360090021",
+                       "o230360090102"):
+              hits=index["by_word"]["wlc:"+word]
+              assert hits and all(hit["entity_id"]!="person:Judah.4"
+                                  for hit in hits),(word,hits)
+          assert not any(x["entity_id"]=="person:Levi.3"
+                         for x in index["by_word"]["wlc:o160080100012"])
           print("ENTITY_INDEX_QA", json.dumps(stats, sort_keys=True))
           PY
 
@@ -338,7 +367,7 @@ jobs:
           assert stats["distinct_person_original_word_overlap_candidates"] == len(report["findings"])
           assert stats["multiple_explicit_names"] == 8, stats
           assert stats["mixed_name_and_indirect"] == 1, stats
-          assert stats["indirect_only"] == 2361, stats
+          assert stats["indirect_only"] == 2353, stats
           assert sum(stats[x] for x in ("multiple_explicit_names", "mixed_name_and_indirect", "indirect_only")) == len(report["findings"])
           assert all(len(f["canonical_people"]) >= 2 for f in report["findings"])
           assert len(set((f["corpus"], f["word_id"]) for f in report["findings"])) == len(report["findings"])
@@ -363,11 +392,11 @@ jobs:
               "sblgnt":Path("macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv"),
           })
           stats=reviewed["statistics"]
-          assert stats["indirect_only_source_words"]==report["statistics"]["indirect_only"]==2361
-          assert stats["by_corpus"]=={"wlc":1077,"sblgnt":1284},stats
-          assert sum(stats["source_word_number_buckets"].values())==2361
-          assert sum(stats["different_canonical_people_per_word"].values())==2361
-          assert len({(x["corpus"],x["word_id"]) for x in reviewed["cases"]})==2361
+          assert stats["indirect_only_source_words"]==report["statistics"]["indirect_only"]==2353
+          assert stats["by_corpus"]=={"wlc":1072,"sblgnt":1281},stats
+          assert sum(stats["source_word_number_buckets"].values())==2353
+          assert sum(stats["different_canonical_people_per_word"].values())==2353
+          assert len({(x["corpus"],x["word_id"]) for x in reviewed["cases"]})==2353
           output=Path("entity-index/dist/indirect-person-source-forms.json")
           output.write_text(json.dumps(reviewed,ensure_ascii=False,indent=2,
                                        sort_keys=True)+"\n",encoding="utf-8")
