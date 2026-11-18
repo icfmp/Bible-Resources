@@ -141,6 +141,60 @@ class EntityIndexTests(unittest.TestCase):
             self.build([dict(decision, remove_subject_referents={
                 "wlc": [["o090090100032"]]})])
 
+    def test_same_verse_two_kings_with_same_name_preserves_both(self):
+        """Two same-name men in one verse cannot be distinguished by lemma."""
+        father = self.write_record(
+            "people", "JoashJudah", references=["12014013"],
+            explicit_instances={"wlc": [["o120140130101"]]},
+            subject_referents={"wlc": [["o120140130162"]]})
+        king = self.write_record(
+            "people", "JoashIsrael", references=["12014013"],
+            explicit_instances={"wlc": [["o120140130061"]]},
+            subject_referents={"wlc": [["o120140130162"]]})
+        original = (father.read_bytes(), king.read_bytes())
+        decisions = [
+            {"source_id":"person:JoashJudah","action":"amend_occurrences",
+             "reason":"The first original-name word identifies Amaziah's father",
+             "evidence":["Pinned WLC 2KI 14:13 exact name positions"],
+             "remove_explicit_instances":{"wlc":[["o120140130101"]]},
+             "add_explicit_instances":{"wlc":[["o120140130061"]]},
+             "remove_subject_referents":{"wlc":[["o120140130162"]]}},
+            {"source_id":"person:JoashIsrael","action":"amend_occurrences",
+             "reason":"The later name identifies the capturing Israelite king",
+             "evidence":["Pinned WLC 2KI 14:13 exact name positions"],
+             "remove_explicit_instances":{"wlc":[["o120140130061"]]},
+             "add_explicit_instances":{"wlc":[["o120140130101"]]}},
+        ]
+        result=self.build(decisions)
+        hits=result["by_word"]
+        self.assertEqual(hits["wlc:o120140130061"],[
+            {"entity_id":"person:JoashJudah","link_type":"explicit_instances"}])
+        self.assertEqual(hits["wlc:o120140130101"],[
+            {"entity_id":"person:JoashIsrael","link_type":"explicit_instances"}])
+        self.assertEqual(hits["wlc:o120140130162"],[
+            {"entity_id":"person:JoashIsrael","link_type":"subject_referents"}])
+        self.assertEqual((father.read_bytes(),king.read_bytes()),original)
+
+    def test_homonymous_judas_relative_and_jesus_speech_are_not_merged(self):
+        first=self.write_record(
+            "people","JudasFirst",references=["42006016"],
+            explicit_instances={"SBLGNT":[["n42006016002"]]},
+            pronominal_referents={"SBLGNT":[["n42006016007"]]})
+        second=self.write_record(
+            "people","JudasIscariot",references=["42006016"],
+            explicit_instances={"SBLGNT":[["n42006016005","n42006016006"]]},
+            pronominal_referents={"SBLGNT":[["n42006016007"]]})
+        before=(first.read_bytes(),second.read_bytes())
+        decision={"source_id":"person:JudasFirst","action":"amend_occurrences",
+                  "reason":"The relative pronoun refers to Iscariot",
+                  "evidence":["Luke 6:16 source word number 7"],
+                  "remove_pronominal_referents":{"SBLGNT":[["n42006016007"]]}}
+        result=self.build([decision])
+        self.assertEqual(result["by_word"]["sblgnt:n42006016007"],[
+            {"entity_id":"person:JudasIscariot",
+             "link_type":"pronominal_referents"}])
+        self.assertEqual((first.read_bytes(),second.read_bytes()),before)
+
     def test_actual_editorial_pilots_preserve_source_and_correct_classification(self):
         path = self.write_record("people", "Jashar",
                                  references=["06010013", "10001018"],
