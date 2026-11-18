@@ -84,7 +84,7 @@ class UBSHebrewBridgeTest(unittest.TestCase):
         self.assertEqual(coverage["macula_words"],4)
         self.assertEqual(coverage["with_exact_ubs_sense_candidates"],2)
         self.assertEqual(coverage["with_ubs_entry_candidates"],3)
-        self.assertEqual(coverage["no_verified_lexical_link"],1)
+        self.assertEqual(coverage["no_entry_match"],1)
         self.assertEqual(coverage["entry_only"],1)
 
 
