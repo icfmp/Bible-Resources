@@ -6,7 +6,7 @@
   "modern_chapter_prose_modified": false,
   "proposed_navigation_approved": false,
   "publication_authorized": false,
-  "provenance": "Source-private native K/ordinal label and destination SHA receipts; printed short citation and modern candidate are not authorization to silently retarget.",
+  "provenance": "Source-private native K/ordinal target + label SHA receipts authenticated against the pinned original MHCC 0.1.1; the proposed target is not automatically approved. Eight newly catalogued discrepancies are separate from the four original malformed/wrong targets already in FOUR_NATIVE_LINK_ERRATA_REVIEW_2026-11-18.json.",
   "cases": [
     {
       "source_first_key": "Deut.9.1",
@@ -93,6 +93,34 @@
         "Song.1.8"
       ],
       "finding": "Source chapter-outline expression (Song 1:7,8) is linked digitally to 1 Corinthians 7:8.",
+      "approval": false
+    },
+    {
+      "source_first_key": "Jude.1.8",
+      "source_reference_ordinal": 2,
+      "original_osisRef": "Judg.1.17-Judg.1.23",
+      "original_target_sha256": "d81a4a5696be98f43223147cedd3854066f9c22e92cda8c71c376398b630fa2e",
+      "original_link_label": "Jud 1:17-23",
+      "original_label_sha256": "7c10bbbe26499f6b8f43bbf857efc964e6ffc2d96cecfada79b9dc56e34e9d08",
+      "printed_antecedent": "Jude 1 (commentary K is Jude.1.8)",
+      "proposed_destinations": [
+        "Jude.1.17-Jude.1.23"
+      ],
+      "finding": "The link appears in the original Jude commentary and the ambiguous printed abbreviation 'Jud' may refer to Jude, yet the original digital osisRef unexpectedly targets Judges 1:17-23. Confirm the exact historical printed edition before any retargeting; this is only a source-native anomaly candidate.",
+      "approval": false
+    },
+    {
+      "source_first_key": "Matt.23.1",
+      "source_reference_ordinal": 2,
+      "original_osisRef": "Deut.9.13-Deut.9.21",
+      "original_target_sha256": "310e1a216e643067538eb133c4332c089c207a3e094069104b108f4ab48194e8",
+      "original_link_label": "13-21",
+      "original_label_sha256": "8ba02b6c4de95971fbb106c6bf26d3d851b0dcb8421c707a4c2c7db1dc0b7d6f",
+      "printed_antecedent": "De 6:4-9; 11:13-21 (phylacteries; original link 1 of this K separately listed in the four existing errata)",
+      "proposed_destinations": [
+        "Deut.11.13-Deut.11.21"
+      ],
+      "finding": "The second source-native Matthew 23 hyperlink (ordinal 2) leads to Deuteronomy 9:13-21 while Henry's printed phylactery citation immediately before it specifies Deuteronomy 11:13-21. Distinct from the already-known ordinal-1 error; investigate separately and preserve original label/hash.",
       "approval": false
     }
   ]
