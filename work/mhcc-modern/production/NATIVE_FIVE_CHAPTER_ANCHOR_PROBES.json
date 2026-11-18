@@ -51,11 +51,15 @@
       "anchors": [
         {
           "id": "david_abigail",
-          "words": "David gives God thanks for sending him this happy check"
+          "words": "David gives God thanks for sending"
         },
         {
           "id": "abigail_marriage",
-          "words": "Abigail believed that David would be king over Israel"
+          "words": "Abigail believed that David would be king"
+        },
+        {
+          "id": "christ_suffering",
+          "words": "those who join themselves to Christ"
         }
       ]
     },
@@ -87,11 +91,19 @@
       "anchors": [
         {
           "id": "praise",
-          "words": "Whenever we come into God's presence we must come with thanksgiving"
+          "words": "Whenever we come into God's presence"
         },
         {
           "id": "listen",
-          "words": "Christ calls upon his people to hear his voice"
+          "words": "Christ calls upon his people"
+        },
+        {
+          "id": "unbelief",
+          "words": "Hardness of heart is at the bottom"
+        },
+        {
+          "id": "rest",
+          "words": "a rest ordained for believers"
         }
       ]
     },
