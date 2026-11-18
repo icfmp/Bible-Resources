@@ -454,7 +454,7 @@ descriptions without firmer person-role evidence.
 No anonymous person was merged with an explicitly named historical
 person. No other referent groups were removed. Exact pinned original
 source records remain byte-identical, and source edits stay declarative,
-reversible and fully audited. The **2,375 indirect-only overlaps** still
+reversible and fully audited. The **2,369 indirect-only overlaps** still
 require separate source-role and participant semantics review.
 
 ## Indirect person-overlap source-grammar triage — no mass deduplication
@@ -478,10 +478,10 @@ event or whether one anonymous pronoun refers to them.
 
 The original complete pinned morphology audit found **1,289 Greek**
 and **1,096 Hebrew** indirect-only word overlaps. A subsequent
-exact-token contextual correction in the derived index removed ten
-false source claims; the remaining **2,375** word overlaps comprise
-**1,286 Greek** and **1,089 Hebrew**. Their source-word grammatical
-counts are **2,096 plural**, **83 singular** and **196 without number**
+exact-token contextual correction in the derived index removed sixteen
+false source claims; the remaining **2,369** word overlaps comprise
+**1,286 Greek** and **1,083 Hebrew**. Their source-word grammatical
+counts are **2,096 plural**, **77 singular** and **196 without number**
 (often infinitives).
 These are categories of the source word, not conclusions about the
 people tagged on it. Several repeated candidate cohorts (e.g. Paul/Silas/Timothy; Aaron/Moses;
@@ -537,6 +537,19 @@ source word IDs remain unchanged, with no source text rewriting.
 The remaining singular-source candidates still require contextual
 review: some refer to distributive expressions ("each man") or
 collective speech, and singular grammar alone cannot disprove them.
+
+### Six distinct speaker-versus-interlocutor corrections
+
+The pinned Hebrew contexts also show six *singular* subject-word
+assignments wrongly attached to a different participant. Rebekah
+speaks in Genesis 24:58 (not her mother); Samson answers his wife
+in Judges 14:16; Saul answers his uncle in 1 Samuel 10:14;
+Elijah directs his servant in 1 Kings 18:44; Jehu answers the
+messenger in 2 Kings 10:8; and Daniel 10:19 explicitly has the
+first-person verb *"I said"* spoken by Daniel, not the angelic
+visitor. Six exact wrong `subject_referents` groups are detached
+in the derived index. The corresponding correct person pointers,
+source text, and all frozen ACAI JSON remain unchanged.
 
 ## Scoped review of all eight remaining explicit-person overlaps
 
