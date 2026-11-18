@@ -1687,6 +1687,117 @@ jobs:
                 "three exact-source textual witness differences quarantined; " +
                 "all original K modern expositions and 176/13 notes unmodified")
           PY
+      - name: Compile complete first-K book-preface edition in private SWORD and verify no K or original link displacement
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/mhcc-prefaces-root/mods.d"
+          mkdir -p "$RUNNER_TEMP/mhcc-prefaces-root/modules/comments/zcom/mhccprefaces"
+          timeout 240s osis2mod \
+            "$RUNNER_TEMP/mhcc-prefaces-root/modules/comments/zcom/mhccprefaces" \
+            "$RUNNER_TEMP/mhcc-modern-original-book-prefaces-restored.osis.xml" \
+            -z z -b 3 \
+            > "$RUNNER_TEMP/mhcc-prefaces-osis2mod.log" 2>&1
+          cat > "$RUNNER_TEMP/mhcc-prefaces-root/mods.d/mhccprefaces.conf" <<'EOF'
+          [MHCCPREFACES]
+          Description=Private unpublished modern MHCC with 47 authenticated source-first-K book prefaces
+          DataPath=./modules/comments/zcom/mhccprefaces/
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          Lang=en
+          Versification=KJV
+          SourceType=OSIS
+          DistributionLicense=Private
+          EOF
+          python - <<'PY'
+          import hashlib,json,os,re,subprocess,sys,unicodedata
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+          sys.path.insert(0,"scripts")
+          from commentary_modern_draft_osis_preview import NS
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          base=Path(os.environ["RUNNER_TEMP"])
+          proof=json.loads(
+              (base/"mhcc-modern-original-book-prefaces-restored-metadata.json").read_text())
+          links=json.loads(
+              (base/"mhcc-modern-complete-bounded-linked-osis-structure.json").read_text())
+          assert proof["new_book_intros_inserted_as_separate_introduction_OSIS"]==47
+          expected={row["book"]+".1":row["modern_intro_visible_sha256"]
+                    for row in proof["cases"] if row[
+                        "source_K_intro_disposition"]==
+                        "INSERTED_SEPARATE_MODERN_INTRO_FROM_VERIFIED_ORIGINAL_K"}
+          assert len(expected)==47
+          ns=f"{{{NS}}}"
+          originals=ET.parse(
+              base/"mhcc-modern-original-book-prefaces-restored.osis.xml").getroot()
+          def normalized(s):
+              return " ".join(unicodedata.normalize("NFC",s).split())
+          in_osis={}
+          for chapter in originals.iter():
+              if chapter.tag!=ns+"chapter" or chapter.get("osisID") not in expected:
+                  continue
+              key=chapter.get("osisID")
+              divs=[x for x in chapter.findall(f"./{ns}div") if
+                    x.get("resp")=="BibleResourcesModernRelocatedFirstNativeKBookPreface"]
+              if len(divs)!=1:
+                  raise ValueError("Missing unique modern book preface in OSIS: "+key)
+              content=normalized("".join(x.itertext() for x in list(divs[0])
+                                         if x.tag!=ns+"title"))
+              digest=hashlib.sha256(content.encode()).hexdigest()
+              if digest!=expected[key]:
+                  raise ValueError("Modern first-K preface OSIS changed: "+key)
+              in_osis[key]=content
+          if set(in_osis)!=set(expected):
+              raise ValueError("Some native-K-verified prefaces missing in final OSIS")
+          seen_I={}
+          all_references=0
+          def observe(kind,key,raw):
+              nonlocal_dummy=None
+              # Inspect each compiled I once and each original K body once.
+              if kind=="I":
+                  if key not in expected:
+                      return
+                  if key in seen_I:
+                      raise ValueError("Duplicate modern preface I entry")
+                  fragment=ET.fromstring(b"<compiled>"+raw+b"</compiled>")
+                  matches=[x for x in fragment.iter() if isinstance(x.tag,str)
+                           and x.tag.rsplit("}",1)[-1]=="div" and
+                           x.get("resp")==
+                              "BibleResourcesModernRelocatedFirstNativeKBookPreface"]
+                  if len(matches)!=1:
+                      raise ValueError("SWORD I entry lost relocated source-K book preface")
+                  body=normalized("".join(x.itertext() for x in list(matches[0])
+                                          if x.tag.rsplit("}",1)[-1]!="title"))
+                  if body!=in_osis[key]:
+                      raise ValueError("SWORD native I changed modern preface text")
+                  seen_I[key]=True
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str((base/"mhcc-prefaces-root").resolve())
+          proc=subprocess.Popen([
+              str((base/"commentary-modern-source-raw").resolve()),
+              "MHCCPREFACES"],env=env,stdout=subprocess.PIPE,
+              stderr=subprocess.DEVNULL)
+          try:
+              result,numbered,_,_=parse_native_raw_corpus(proc.stdout,on_entry=observe)
+              proc.stdout.close()
+              if proc.wait(timeout=120)!=0:
+                  raise ValueError("Private book-preface SWORD reader failed")
+          finally:
+              if proc.poll() is None:
+                  proc.kill();proc.wait()
+          assert set(seen_I)==set(expected)
+          assert len(numbered)==28792
+          assert links["modern_inline_links_inserted"]==1016
+          assert links["private_source_note_alternative"][
+              "original_link_occurrences_preserved_only_in_separate_source_notes"]==176
+          assert links["private_unapproved_errata_navigation_preview"][
+              "derived_navigation_links_from_corroborating_witnesses"]==13
+          print("PRIVATE 47 RESTORED BOOK PREFACES SWORD READBACK PASS: " +
+                "47 independently verified original-first-K-derived introductions in " +
+                "corresponding real chapter-I keys; 1 existing Genesis not duplicated; " +
+                "3 edition-text variants still quarantined; 28792 exact keys; NO release")
+          PY
       - name: Screen all modern manuscript outline tables for out-of-order source ranges
         shell: bash
         run: |
