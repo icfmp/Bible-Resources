@@ -706,6 +706,7 @@ jobs:
               return re.sub(r"\s+"," ",unicodedata.normalize("NFC",value)).strip()
           counts=Counter()
           first_review=[]
+          wrapper_cases=[]
           seen=set()
           def compare(kind,key,raw):
               if kind!="K" or key not in expected:
@@ -727,6 +728,15 @@ jobs:
                   counts["NFC_and_whitespace_only_matches"]+=1
               elif normalized(authored) in normalized(compiled):
                   counts["authored_visible_content_contiguous_in_wrapper"]+=1
+                  text_normal=normalized(compiled)
+                  authored_normal=normalized(authored)
+                  offset=text_normal.index(authored_normal)
+                  wrapper_cases.append({
+                      "first_native_key":key,
+                      "extra_visible_prefix_unicode_characters":offset,
+                      "extra_visible_suffix_unicode_characters":
+                          len(text_normal)-offset-len(authored_normal),
+                  })
               else:
                   counts["unmatched_visible_text_needs_investigation"]+=1
                   if len(first_review)<12:first_review.append(key)
@@ -757,6 +767,7 @@ jobs:
               "exact_indexed_native_first_K_groups_present":len(seen),
               "all_numbered_native_verse_keys_present":len(numbered),
               "observed_visible_text_comparison_categories":dict(counts),
+              "first_K_groups_with_additional_wrapping_visible_text":wrapper_cases,
               "unmatched_or_unparseable_first_K_keys_for_manual_diagnosis":first_review,
               "visible_text_content_is_not_exported":True,
               "editorial_translation_review_restarted":False,
@@ -771,6 +782,9 @@ jobs:
                 f"whitespace={counts['NFC_and_whitespace_only_matches']}, "
                 f"wrapper={counts['authored_visible_content_contiguous_in_wrapper']}, "
                 f"nonmatching={failures}; ORIGINAL/MODERN NOT PUBLISHED")
+          if failures:
+              raise ValueError("Full 4049 modern authorial bodies lost or altered "
+                               "visible text in compiled SWORD; examine private report")
           PY
       - name: Probe five original SWORD source-body scopes against independent English anchors
         shell: bash
