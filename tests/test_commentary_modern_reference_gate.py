@@ -1,12 +1,14 @@
 """Synthetic source-native biblical-link provenance and fail-closed tests."""
 import hashlib
+import tempfile
 from pathlib import Path
 import sys
 import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from commentary_modern_reference_gate import (SourceReferenceGate,
-    WholeCanonOriginalLinkIdentityReceipt, canonical_only_for_comparison)
+    WholeCanonOriginalLinkIdentityReceipt, canonical_only_for_comparison,
+    validate_proposed_link_dispositions)
 
 
 ORIGINAL=(b'<div><reference osisRef="Bible:1John.5.20">1Jo 5:20</reference>'
@@ -247,6 +249,140 @@ class WholeNativeReferenceIdentityTests(unittest.TestCase):
         receipt["chapters"]["Gen.1"]["original_units"][0]["keys"].append("Gen.1.4")
         with self.assertRaisesRegex(ValueError, "Repeated"):
             WholeCanonOriginalLinkIdentityReceipt(receipt)
+
+
+def correction_fixture(root: Path):
+    raw = b'<div><reference osisRef="2Cor.6.2">2</reference></div>'
+    digest = hashlib.sha256(raw).hexdigest()
+    chapter = "Gen.2"
+    path = "work/mhcc-modern/production/accepted/genesis-02.md"
+    output = root / path
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(
+        '---\nchapter_osis: "Gen.2"\nsource_native_corpus_sha256: "' +
+        FULL_HASH + '"\npublication_status: "NOT RELEASED"\n---\n'
+        '# Genesis 2\n\n## Two trees (verses 8–9)\n'
+        'Second, the tree of knowledge. (Revelation 22:2)\n'
+        '\n---\n## Editorial notes\n', encoding="utf-8")
+    manifest = {
+        "status": "SECONDARY_WITNESS_LINK_CORRECTION_PROPOSALS_NOT_EDITORIAL_RELEASE_APPROVAL",
+        "source_module": "MHCC 0.1.1",
+        "source_native_corpus_sha256": FULL_HASH,
+        "explicit_owner_publication_authorization": False,
+        "independent_original_semantic_signoff": False,
+        "modern_sword_compiled_or_published": False,
+        "cases": [{
+            "chapter": chapter,
+            "source_first_key": "Gen.2.8",
+            "source_unit_sha256": digest,
+            "modern_path": path,
+            "modern_section_heading": "Two trees (verses 8–9)",
+            "witness_url": "https://example.org/authorial-primary-witness",
+            "corrections": [{
+                "source_link_ordinal": 1,
+                "original_target": "2Cor.6.2",
+                "original_label": "2",
+                "disposition": "OMIT_SPURIOUS_ENUMERATOR_LINK",
+                "modern_context_anchor": "Second, the tree of knowledge."
+            }],
+            "modern_witness_links": [{
+                "target": "Rev.22.2",
+                "modern_text_marker": "(Revelation 22:2)",
+                "disposition":
+                    "ADD_SECONDARY_WITNESS_AUTHORED_REFERENCE_NOT_IN_NATIVE_LINKS"
+            }]
+        }]
+    }
+    native = {
+        "status": "SOURCE_NATIVE_RECEIPT_ONLY_NOT_TRANSLATION_APPROVAL",
+        "original_compiled_corpus_sha256": FULL_HASH,
+        "source_prose_or_original_markup_exported": False,
+        "chapters": {"Gen.2": {
+            "original_units": [{
+                "first_key": "Gen.2.8",
+                "keys": ["Gen.2.8", "Gen.2.9"],
+                "source_unit_sha256": digest
+            }]
+        }}
+    }
+    ids = {
+        "status": WholeCanonOriginalLinkIdentityReceipt.STATUS,
+        "whole_native_source_sha256": FULL_HASH,
+        "original_link_destinations_only_sha256_not_exported": True,
+        "original_visible_link_text_only_sha256_not_exported": True,
+        "original_source_prose_or_XML_exported": False,
+        "original_numbered_K_keys_verified": 28742,
+        "original_unique_K_bodies_verified": 4047,
+        "original_reference_elements_verified": 1204,
+        "original_link_bearing_K_bodies": 1,
+        "source_link_groups": [{
+            "first_key": "Gen.2.8",
+            "source_raw_sha256": digest,
+            "reference_count": 1,
+            "original_osisRef_sha256_in_document_order": [
+                hashlib.sha256(b"2Cor.6.2").hexdigest()
+            ],
+            "original_visible_link_label_sha256_in_document_order": [
+                hashlib.sha256(b"2").hexdigest()
+            ]
+        }]
+    }
+    return manifest, native, ids
+
+
+class ProposedLinkDispositionTests(unittest.TestCase):
+    def test_bounded_original_source_and_modern_section_both_verified(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            manifest, native, ids = correction_fixture(root)
+            report = validate_proposed_link_dispositions(
+                manifest=manifest, native=native, identities=ids,
+                repository_root=root)
+            self.assertEqual(report["source_links_proposed_to_omit"], 1)
+            self.assertEqual(report["secondary_witness_links_proposed_to_add"], 1)
+            self.assertEqual(report["reviewed_source_link_groups"], 1)
+            self.assertFalse(report["derived_SWORD_link_placements_or_native_readbacks_tested"])
+            self.assertFalse(report["release_authorized"])
+
+    def test_mismatch_missing_modern_marker_and_unreviewed_status_fail(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            manifest, native, ids = correction_fixture(root)
+            case = manifest["cases"][0]
+            case["corrections"][0]["original_target"] = "2Cor.6.3"
+            with self.assertRaisesRegex(ValueError, "fingerprint mismatch"):
+                validate_proposed_link_dispositions(
+                    manifest=manifest, native=native, identities=ids,
+                    repository_root=root)
+            case["corrections"][0]["original_target"] = "2Cor.6.2"
+            case["modern_witness_links"][0]["modern_text_marker"] = "(Not in manuscript)"
+            with self.assertRaisesRegex(ValueError, "not tied"):
+                validate_proposed_link_dispositions(
+                    manifest=manifest, native=native, identities=ids,
+                    repository_root=root)
+            case["modern_witness_links"][0]["modern_text_marker"] = "(Revelation 22:2)"
+            manifest["explicit_owner_publication_authorization"] = True
+            with self.assertRaisesRegex(ValueError, "release signoff"):
+                validate_proposed_link_dispositions(
+                    manifest=manifest, native=native, identities=ids,
+                    repository_root=root)
+
+    def test_no_scope_change_or_duplicate_source_link_ordinal(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            manifest, native, ids = correction_fixture(root)
+            case = manifest["cases"][0]
+            case["modern_section_heading"] = "Two trees (verses 8–10)"
+            with self.assertRaisesRegex(ValueError, "heading not uniquely"):
+                validate_proposed_link_dispositions(
+                    manifest=manifest, native=native, identities=ids,
+                    repository_root=root)
+            case["modern_section_heading"] = "Two trees (verses 8–9)"
+            case["corrections"].append(dict(case["corrections"][0]))
+            with self.assertRaisesRegex(ValueError, "duplicated"):
+                validate_proposed_link_dispositions(
+                    manifest=manifest, native=native, identities=ids,
+                    repository_root=root)
 
 
 if __name__=="__main__":
