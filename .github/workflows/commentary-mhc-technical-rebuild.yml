@@ -1252,6 +1252,11 @@ jobs:
               matches_hrefs=observation["exact_matching_source_target_sha256_in_real_gui_HTML"]
               if not isinstance(matches_hrefs,list):
                   raise SystemExit("GUI href source witness has invalid shape")
+              target_progress=observation[
+                  "composite_target_href_progress_by_sha256"
+              ].get(expected_digest)
+              if target_progress is None:
+                  raise SystemExit("Missing source-bound composite href analysis")
               source_target_href_by_line[str(original_line)]={
                   "actual_gui_rich_html_selection_available":
                       bool(observation["real_gui_rich_html_selection_available"]),
@@ -1259,6 +1264,14 @@ jobs:
                       observation["exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations"],
                   "this_specific_reviewed_target_in_actual_gui_href":
                       expected_digest in matches_hrefs,
+                  "specific_source_label_is_real_GUI_anchor":
+                      target_progress["source_label_is_an_actual_GUI_anchor"],
+                  "source_target_components_in_same_label_GUI_href":
+                      target_progress["components_found_in_one_same_label_real_GUI_href"],
+                  "original_source_target_component_count":
+                      target_progress["original_component_count"],
+                  "all_components_in_one_same_label_GUI_href":
+                      target_progress["all_components_found_in_one_GUI_href"],
               }
           gui_copy_diagnostics_by_line={}
           clipboard_bytes=result["copied_gui_clipboard_byte_count_by_passage"]
