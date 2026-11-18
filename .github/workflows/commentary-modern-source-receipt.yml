@@ -500,7 +500,7 @@ jobs:
                 f"{len(keys)} exact original-plus-I-only keys, "
                 "no additional/missing verses; source meaning/links still unapproved")
           PY
-      - name: Add only eleven SHA-attested original and source-corrected links into private whole-canon OSIS
+      - name: Add 39 SHA-attested original and source-corrected links into private whole-canon OSIS
         shell: bash
         run: |
           set -euo pipefail
@@ -525,11 +525,11 @@ jobs:
           assert report["status"] == (
               "PRIVATE_REVIEWED_LINKED_FULL_CANON_OSIS_CANDIDATE_NOT_RELEASED")
           assert report["modern_chapters_preserved"] == 1189
-          assert report["modern_inline_links_inserted"] == 11
-          assert report["actual_original_links_copied_without_correction"] == 2
+          assert report["modern_inline_links_inserted"] == 39
+          assert report["actual_original_links_copied_without_correction"] == 30
           assert report["documented_wrong_original_links_retargeted"] == 8
           assert report["source_witness_authored_missing_original_link_added"] == 1
-          assert report["source_pinned_original_K_bodies_revisited"] == 11
+          assert report["source_pinned_original_K_bodies_revisited"] == 19
           assert report["original_source_link_identity_hashes_and_order_verified"] is True
           assert report["modern_visible_prose_modified"] is False
           assert report["published_source_1204_links_fully_transferred"] is False
@@ -538,14 +538,14 @@ jobs:
           unlinked=ET.parse(base/"mhcc-modern-complete-unlinked.osis.xml").getroot()
           linked=ET.parse(base/"mhcc-modern-complete-bounded-linked.osis.xml").getroot()
           assert "".join(unlinked.itertext()) == "".join(linked.itertext())
-          assert len(linked.findall(".//o:reference",ns)) == 11
+          assert len(linked.findall(".//o:reference",ns)) == 39
           assert len(linked.findall(".//o:chapter",ns)) == 1189
           assert len(linked.findall(".//o:div[@annotateType='commentary']",ns)) == 4049
-          print("PRIVATE MODERN MHCC 11 REVIEWED LINKS XML PASS: two authentic "
+          print("PRIVATE MODERN MHCC 39 REVIEWED LINKS XML PASS: thirty authentic "
                 "literal copies, eight witnessed destination corrections, one "
                 "witness-backed missing source-native link; 1204 NOT fully linked")
           PY
-      - name: Compile private eleven-link whole-canon OSIS and attest exact native SWORD targets
+      - name: Compile private 39-link whole-canon OSIS and attest exact native SWORD targets
         shell: bash
         run: |
           set -euo pipefail
@@ -558,7 +558,7 @@ jobs:
             > "$RUNNER_TEMP/mhcc-bounded-linked-osis2mod.log" 2>&1
           cat > "$RUNNER_TEMP/mhcc-bounded-linked-root/mods.d/mhcclnktmp.conf" <<'EOF'
           [MHCCLINKTMP]
-          Description=Private unpublished eleven-source-linked Modern English MHCC candidate
+          Description=Private unpublished 39-source-linked Modern English MHCC candidate
           DataPath=./modules/comments/zcom/mhcclnktmp/
           ModDrv=zCom
           CompressType=ZIP
@@ -576,23 +576,27 @@ jobs:
           from sword_native_raw_corpus_inventory import parse_native_raw_corpus
           base=Path(os.environ["RUNNER_TEMP"])
           report=json.loads((base/"mhcc-modern-complete-bounded-linked-osis-structure.json").read_text())
-          expected={r["original_source_first_key"]:r["derived_target_sha256"]
-                    for r in report["insertions"]}
-          assert len(expected)==11
+          expected={r["original_source_first_key"]:
+                    r["source_linked_modern_osisRef_hashes_in_actual_document_order"]
+                    for r in report["linked_source_K_groups_with_exact_derived_target_order"]}
+          assert len(expected)==19
+          assert sum(len(v) for v in expected.values())==39
           seen={}
           def observe(kind,key,raw):
               if kind!="K" or key not in expected:
                   return
               if key in seen:
-                  raise ValueError("Duplicated private SWORD readback key")
+                  raise ValueError("Duplicated private SWORD readback K body")
               node=ET.fromstring(b"<derived>"+raw+b"</derived>")
               links=[v.attrib.get("osisRef") for v in node.iter() if
                      isinstance(v.tag,str) and v.tag.rsplit("}",1)[-1]=="reference"]
-              if len(links)!=1 or not isinstance(links[0],str):
-                  raise ValueError("Private compiled SWORD original section lost exact link count")
-              if hashlib.sha256(links[0].encode("utf-8")).hexdigest()!=expected[key]:
-                  raise ValueError("Private compiled SWORD mutated a reviewed link's literal target")
-              seen[key]=True
+              if any(not isinstance(link,str) or not link for link in links):
+                  raise ValueError("Private compiled SWORD lost reviewed link target")
+              actual=[hashlib.sha256(x.encode("utf-8")).hexdigest() for x in links]
+              if actual!=expected[key]:
+                  raise ValueError("Private compiled SWORD lost original repeated "
+                                   "link occurrences, changed link order or altered target")
+              seen[key]=len(links)
           env=os.environ.copy()
           env["SWORD_PATH"]=str((base/"mhcc-bounded-linked-root").resolve())
           proc=subprocess.Popen([str((base/"commentary-modern-source-raw").resolve()),
@@ -608,22 +612,24 @@ jobs:
                   proc.kill();proc.wait()
           assert set(seen)==set(expected)
           assert len(numbered)==28792 and len(set(numbered))==28792
-          assert all(seen.values())
+          assert sum(seen.values())==39
           proof={
-              "status":"PRIVATE_11_REVIEWED_LINKS_COMPILED_SWORD_NATIVE_TARGETS_PASS",
+              "status":"PRIVATE_39_REVIEWED_LINKS_COMPILED_SWORD_NATIVE_TARGETS_PASS",
               "compiled_native_K_address_count":len(numbered),
               "reviewed_original_link_section_targets_verified":len(seen),
-              "original_literal_links_preserved":2,
+              "reviewed_original_link_occurrences_verified":sum(seen.values()),
+              "source_repeated_links_and_modern_order_preserved":True,
+              "original_literal_links_preserved":30,
               "source_witness_corrected_link_targets":8,
               "witness_missing_original_link_added":1,
               "source_1204_links_fully_integrated":False,
               "independent_semantic_approval":False,
               "published_or_distributed":False,
           }
-          (base/"mhcc-modern-11-links-native-SWORD-readback.json").write_text(
+          (base/"mhcc-modern-39-links-native-SWORD-readback.json").write_text(
               json.dumps(proof,indent=2,sort_keys=True)+"\n",encoding="utf-8")
           print("PRIVATE COMPILED MHCC REVIEWED SOURCE LINKS PASS "
-                "11/11 exact target hashes in 28792 native K keys; NO release")
+                "39/39 exact target hashes in 28792 native K keys; NO release")
           PY
       - name: Probe five original SWORD source-body scopes against independent English anchors
         shell: bash
