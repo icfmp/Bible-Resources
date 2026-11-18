@@ -65,7 +65,7 @@ Other people's sins should warn us not to repeat them.
 
 Israel's murmuring in the wilderness was recorded for our instruction.
 
-God does not experience unruly passions as we do, yet **his anger against sin is truly righteous and serious**.
+God is not ruled by passions as we are, yet **he is truly angry at sin and at sinners**, as Henry explicitly says.
 
 His threats are as certain as his promises.
 
@@ -78,6 +78,9 @@ This is the rest God calls **his own rest**.
 ---
 
 ## Editorial review — Psalm 95
+
+**2026-11-18 CCEL fidelity correction (secondary witness only):** Henry says not only that God is angry *at sin* but also **“at sin and sinners”**. The draft had silently dropped the latter object; it is now preserved while retaining Henry's distinction from disordered human passions. The original CCEL prints separate overlapping 1–7 and 7–11 exposition units; the pinned MHCC 0.1.1 SWORD source physically groups them in one K raw body. [CCEL Psalm 95](https://ccel.org/ccel/henry/mhcc.xx.xcv.html).
+
 
 **Full secondary English source directly read:** [CCEL, Psalm 95](https://ccel.org/ccel/henry/mhcc.xx.xcv.html). Released `MHCC 0.1.1` remains definitive; native SWORD entry/reference and independent review pending.
 
