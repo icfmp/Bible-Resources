@@ -802,14 +802,35 @@ def _source_native_interword_punctuation_shape(source: str, native: str) -> dict
                         unicodedata.category(x) for x in right if not x.isspace()
                     ).items())),
                 })
+    left_prefix=a[:src[0].start()]
+    right_prefix=b[:nat[base].start()]
+    left_suffix=a[src[-1].end():]
+    right_suffix=b[nat[base+len(src)-1].end():]
+    def symbol_fingerprint(value):
+        nonspace="".join(value.split())
+        return {
+            "nonspace_symbols":len(nonspace),
+            "unicode_category_counts":dict(sorted(Counter(
+                unicodedata.category(x) for x in nonspace).items())),
+            "symbol_sha256":hashlib.sha256(nonspace.encode("utf-8")).hexdigest(),
+        }
+    prefix_equal="".join(left_prefix.split())=="".join(right_prefix.split())
+    suffix_equal="".join(left_suffix.split())=="".join(right_suffix.split())
     return {
         "class":("punctuation_changes_between_word_anchors"
                  if changes["punctuation_codepoints_differ"] else
-                 "word_internal_gaps_equal_or_whitespace_only"),
+                 "boundary_punctuation_differs" if not(prefix_equal and suffix_equal)
+                 else "word_internal_gaps_equal_or_whitespace_only"),
         "counts":dict(sorted(changes.items())),
         "bounded_symbol_category_examples":examples,
         "word_run_start_native_ordinal":base+1,
-        "unreviewed_boundary_text":False,
+        "prefix_symbols_equal_ignoring_whitespace":prefix_equal,
+        "suffix_symbols_equal_ignoring_whitespace":suffix_equal,
+        "source_prefix_symbols":symbol_fingerprint(left_prefix),
+        "native_prefix_symbols":symbol_fingerprint(right_prefix),
+        "source_suffix_symbols":symbol_fingerprint(left_suffix),
+        "native_suffix_symbols":symbol_fingerprint(right_suffix),
+        "unreviewed_boundary_text":not(prefix_equal and suffix_equal),
     }
 
 
