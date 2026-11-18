@@ -75,6 +75,49 @@ jobs:
               raise SystemExit("MHC original OSIS size/SHA mismatch; abort")
           print("Verified pinned official OSIS commit, exact bytes and checksum")
           PY
+      - name: Inspect actual original 2 Chronicles introduction structure (metadata only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from lxml import etree
+          from hashlib import sha256
+          src=Path(os.environ["RUNNER_TEMP"])/"original-mhc"/"mhc.osis.xml"
+          parser=etree.XMLParser(resolve_entities=False,no_network=True,load_dtd=False,
+                                 remove_blank_text=False,huge_tree=False)
+          root=etree.parse(str(src),parser)
+          ns={"o":"http://www.bibletechnologies.net/2003/OSIS/namespace"}
+          def local(node):return etree.QName(node).localname
+          def hint(node):
+              keys=("type","subType","annotateType","annotateRef","sID",
+                    "eID","osisID","n","canonical")
+              return {"tag":local(node),"attrs":{k:node.get(k)
+                      for k in keys if node.get(k) is not None},
+                      "line":node.sourceline}
+          begin=root.xpath("//o:verse[@sID='2Chr.1.1']",namespaces=ns)
+          end=root.xpath("//o:verse[@eID='2Chr.1.1']",namespaces=ns)
+          if len(begin)!=1 or len(end)!=1:
+              raise SystemExit("Unattested 2Chr 1 source introduction milestone pair")
+          opener=begin[0];closer=end[0]
+          parent=opener.getparent()
+          siblings=list(parent)
+          a=siblings.index(opener);z=siblings.index(closer)
+          if not a<z:
+              raise SystemExit("Unexpected 2Chr chapter introduction XML nesting")
+          print("Original 2Chr chapter introduction markup (no prose):",
+                {"opening":hint(opener),"closing":hint(closer),
+                 "parents":[hint(n) for n in list(opener.iterancestors())[:4]],
+                 "nearest_sibling_before":hint(siblings[a-1]) if a else None,
+                 "first_three_inside": [hint(n) for n in siblings[a+1:a+4]],
+                 "last_three_inside":[hint(n) for n in siblings[max(a+1,z-3):z]],
+                 "nearest_sibling_after":hint(siblings[z+1])
+                   if z+1<len(siblings) else None,
+                 "original_introduction_element_count":len(
+                    root.xpath("//o:div[@type='introduction']",namespaces=ns))})
+          # Only metadata, no paragraphs or user-facing authorial text.
+          PY
       - name: Audit and clean original OSIS cosmetic artifacts in isolated storage
         shell: bash
         run: |
@@ -941,11 +984,10 @@ jobs:
                   !=plan["expected_reader_multiowner_verse_count"]
                   or reviewed["non_reader_shared_source_index_ranges"]
                   !=plan["expected_non_reader_shared_source_index_ranges"]
-                  or set(actual)!={"Rom.4.17","2Chr.1.1"}
-                  or actual["Rom.4.17"]["native_retrieval_keys_in_authorial_order"]
-                     !=["Rom.4.9","Rom.4.17"]
+                  or set(actual)!={"2Chr.1.1"}
                   or actual["2Chr.1.1"]["native_retrieval_keys_in_authorial_order"]
                      !=["2Chr.1.1"]
+                  or "Rom.4.17" in actual
                   or reviewed["source_groups_rewritten"]
                   or reviewed["original_prose_in_report"]):
               raise SystemExit("Private editorially narrowed shared-scope reader index failed")
@@ -962,8 +1004,8 @@ jobs:
                     reviewed["non_reader_shared_source_index_ranges"],
                  "required_actual_multiowner_verse_keys":
                     reviewed["reader_multiowner_verse_count"],
-                 "distinct_Romans_retrieval_keys":
-                    len(actual["Rom.4.17"]["native_retrieval_keys_in_authorial_order"]),
+                 "romans_verse_17_kept_exclusively_in_second_group":
+                    "Rom.4.17" not in actual,
                  "same_key_double_section_count":
                     actual["2Chr.1.1"]["original_independent_section_count"],
                  "no_authorial_prose_exported":True})
