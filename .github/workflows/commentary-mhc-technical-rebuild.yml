@@ -829,6 +829,20 @@ jobs:
                 semantics["bounded_reference_only_findings"][:30])
           if semantics["counts"].get("source_groups")!=4256:
               raise SystemExit("Incomplete source/native punctuation and note-body census")
+          proof=semantics["counts"]
+          for name in ("source_note_bodies_missing_from_native",
+                       "source_note_body_and_metadata_not_exactly_in_native",
+                       "source_reference_bodies_missing_from_native",
+                       "source_reference_body_and_metadata_not_exactly_in_native"):
+              if proof.get(name,0):
+                  raise SystemExit("Authored commentary note/reference metadata regression: "+name)
+          if (proof.get("source_reference_elements")!=61421
+                  or proof.get("source_text_equal_after_nfc_whitespace_folding",0)
+                     +proof.get("source_text_exact_raw_unicode_substring",0)
+                     +proof.get("source_text_equal_after_unicode_casefold",0)
+                     +proof.get("source_group_full_punctuation_or_spacing_needs_review",0)
+                     !=4256):
+              raise SystemExit("Unexpected punctuation/source-link corpus drift")
           print("This is a complete punctuation/notes triage, NOT blanket editorial approval")
           closings=source_commentary_book_closing_text(source)
           last_groups={}
@@ -853,6 +867,17 @@ jobs:
                 dict(sorted(tail_classes.items())))
           print("Bounded book-ending source/native diagnostics without prose:",
                 tail_cases[:30])
+          if (sum(tail_classes.values())!=66
+                  or any(key not in {
+                      "native_suffix_equals_original_group_boundary",
+                      "native_suffix_exactly_contains_original_book_closing_text",
+                      "native_suffix_matches_authored_closing_without_whitespace",
+                      "native_suffix_only_spacing_differs_from_original_group"}
+                         for key in tail_classes)
+                  or proof.get("source_group_full_punctuation_or_spacing_needs_review",0)
+                     !=sum(count for key,count in tail_classes.items()
+                            if key!="native_suffix_equals_original_group_boundary")):
+              raise SystemExit("Unexplained native punctuation or book-ending material")
           print("Book-ending text was not added to the original source or exported")
           introductions=source_commentary_introductions(source)
           if (len(introductions)!=1255 or len(intro_raw)!=1255
@@ -864,6 +889,16 @@ jobs:
                 intro_evidence["counts"])
           print("Bounded introduction source/native discrepancy references:",
                 intro_evidence["bounded_reference_only_cases"][:30])
+          intro_counts=intro_evidence["counts"]
+          if (intro_counts.get("source_intro_records")!=1255
+                  or intro_counts.get("source_intro_no_visible_text")!=144
+                  or intro_counts.get("source_intro_text_equal_after_nfc_whitespace_folding")
+                     +intro_counts.get("source_intro_exact_unicode_text_in_native",0)!=1111
+                  or intro_counts.get("source_intro_reference_elements")!=6710
+                  or intro_evidence["bounded_reference_only_cases"]
+                  or any(value for key,value in intro_counts.items()
+                         if key.endswith("_body_metadata_missing_from_native"))):
+              raise SystemExit("Authorial source intro or source reference data changed")
           relocation=triage_commentary_introduction_relocation(
               introductions,intro_raw,raws)
           print("Original book/chapter introduction SWORD relocation categories:",
