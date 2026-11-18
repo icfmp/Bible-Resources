@@ -677,6 +677,70 @@ def _unambiguous_explicit_modern_verse(section: ET.Element, target: str):
     return candidates[0] if len(candidates) == 1 else None
 
 
+
+_SOURCE_FULL_RANGE = re.compile(
+    r"^([1-4]?[A-Za-z][A-Za-z0-9]*)\.(\d+)\.(\d+)-"
+    r"([1-4]?[A-Za-z][A-Za-z0-9]*)\.(\d+)\.(\d+)$")
+
+
+def _source_same_chapter_verse_range(literal: str):
+    """Parse ONLY original full OSIS ranges with one book and chapter.
+
+    Preserve the source literal in the final XML, including any work prefix.
+    This is no general conversion of OSIS expression syntax or versification.
+    """
+    if not isinstance(literal, str):
+        return None
+    raw = literal[6:] if literal.startswith("Bible:") else literal
+    hit = _SOURCE_FULL_RANGE.fullmatch(raw)
+    if not hit:
+        return None
+    book, chapter, start, end_book, end_chapter, end = hit.groups()
+    if (book != end_book or chapter != end_chapter
+            or book not in _ENGLISH_NAME_BY_OSIS
+            or not 1 <= int(start) < int(end) <= 200):
+        return None
+    if any(s.startswith("0") for s in (chapter, start, end)):
+        return None
+    return book, chapter, start, end
+
+
+def _unambiguous_explicit_modern_range(section: ET.Element, literal: str):
+    """Return one explicit same-book same-chapter modern 3:16–18, else None."""
+    parsed = _source_same_chapter_verse_range(literal)
+    if parsed is None:
+        return None
+    book, chapter, first, last = parsed
+    names = _AUTO_ALIASES.get(book, (_ENGLISH_NAME_BY_OSIS.get(book),))
+    matches=[]
+    for name in names:
+        if not name:
+            continue
+        rex=re.compile(r"(?<![A-Za-z0-9])" + re.escape(name) + r"\s+" +
+                       re.escape(chapter) + ":" + re.escape(first) +
+                       r"\s*[-–—]\s*" + re.escape(last) + r"(?![0-9])", re.I)
+        for para in section.iter():
+            if para.tag.rsplit("}",1)[-1] != "p":
+                continue
+            for node in para.iter():
+                if not isinstance(node.tag,str):
+                    continue
+                for field in ("text","tail"):
+                    if field=="text" and node.tag.rsplit("}",1)[-1]=="reference":
+                        continue
+                    slot=getattr(node,field)
+                    if not isinstance(slot,str):
+                        continue
+                    for match in rex.finditer(slot):
+                        prefix,suffix=slot[:match.start()],slot[match.end():]
+                        if book=="John" and re.search(
+                            r"(?:^|[^A-Za-z0-9])[1-3]\s+$",prefix):
+                            continue
+                        if re.match(r"\s*[-–—,]\s*\d",suffix):
+                            continue
+                        matches.append(match[0])
+    return matches[0] if len(matches)==1 else None
+
 def _unrecognized_original_ref_class(literal: str) -> str:
     """Only classify syntax in metadata; never emit literal source osisRef."""
     raw = literal[6:] if literal.startswith("Bible:") else literal
