@@ -969,6 +969,38 @@ def _unique_authentic_original_visible_label(
     return instances[0] if len(instances)==1 else None
 
 
+def _full_endpoint_source_range_rejection(literal: str) -> str:
+    """Explain why an original two-endpoint range needs manual review.
+
+    This is a source-literal grammar diagnostic only. In particular,
+    cross-book/chapter intervals are not automatically made navigable;
+    canonical book identity and versification must be reviewed separately.
+    No source target spelling or prose is returned.
+    """
+    if not isinstance(literal, str):
+        return "NOT_TWO_ENDPOINT_RANGE"
+    raw = literal[6:] if literal.startswith("Bible:") else literal
+    match = _SOURCE_FULL_RANGE.fullmatch(raw)
+    if match is None:
+        return "NOT_TWO_ENDPOINT_RANGE"
+    book, chapter, first, end_book, end_chapter, last = match.groups()
+    if book not in _ENGLISH_NAME_BY_OSIS or end_book not in _ENGLISH_NAME_BY_OSIS:
+        return "UNRECOGNIZED_BOOK_CODE"
+    if book != end_book:
+        return "CROSS_BOOK_RANGE"
+    if chapter != end_chapter:
+        return "CROSS_CHAPTER_RANGE"
+    if any(s.startswith("0") for s in (chapter, first, last)):
+        return "ZERO_OR_NONCANONICAL_NUMERIC_SPELLING"
+    if int(first) == int(last):
+        return "DEGENERATE_SAME_VERSE_RANGE"
+    if int(first) > int(last):
+        return "REVERSED_SAME_CHAPTER_RANGE"
+    if int(last) > 200:
+        return "OUTSIDE_BOUNDED_VERSE_RANGE"
+    return "VALID_SAME_CHAPTER_RANGE_UNEXPECTEDLY_UNPLACED"
+
+
 def _unrecognized_original_ref_class(literal: str) -> str:
     """Only classify syntax in metadata; never emit literal source osisRef."""
     raw = literal[6:] if literal.startswith("Bible:") else literal
@@ -1335,6 +1367,9 @@ def _unplaced_original_link_review_ledger(*, original: dict, insertions: list,
                     else "SAME_CHAPTER_FULL_RANGE"
                     if status == "UNPLACED_SAME_CHAPTER_VERSE_RANGE"
                     else _unrecognized_original_ref_class(target))
+                if item["original_target_grammar"] == "full_verse_range":
+                    item["full_range_rejection_reason"] = (
+                        _full_endpoint_source_range_rejection(target))
                 item["verbatim_original_label_in_modern_K"] = (
                     _original_label_in_modern_k(section_by_first[first], label))
             (omitted if correction is not None else pending).append(item)
