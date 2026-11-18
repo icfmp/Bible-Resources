@@ -159,21 +159,22 @@ jobs:
           assert actual["coverage"]["with_exact_ubs_sense_candidates"]==30492
           assert actual["coverage"]["ambiguous_ubs_entry_candidates"]==5024
           assert actual["coverage"]["no_entry_match"]==218868
-          assert actual["coverage_with_word_ids"]["additional_entry_only_links"] >= 10810
+          assert actual["coverage_with_word_ids"]["additional_entry_only_links"] == 10812
+          assert actual["coverage_with_word_ids"]["macula_word_consonants_and_source_sdbh_ubs_owner_entry_only"] == 2
           assert actual["coverage_with_word_ids"]["macula_word_exact_lemma_and_source_sdbh_ubs_owner_entry_only"] == 16
-          assert actual["coverage_with_word_ids"]["word_aware_entry_links"] >= 267848
+          assert actual["coverage_with_word_ids"]["word_aware_entry_links"] == 267850
           scope=actual["coverage_scope"]
           assert scope["original_lexical_source_occurrences"] == 248680
-          assert scope["linked_occurrences"] >= 239515
+          assert scope["linked_occurrences"] == 239517
           assert scope["outside_indexed_headword_scope"] == 5954
           assert scope["indexable_denominator"] == 242726
-          assert scope["indexable_unresolved"] <= 3211
-          assert scope["coverage_pct"] >= 98.677
+          assert scope["indexable_unresolved"] == 3209
+          assert scope["coverage_pct"] == 98.678
           assert scope["full_source_coverage_pct"] >= 96.315
           assert scope["review"] == {
               "different_strong_same_exact_headword_review": 186,
-              "different_strong_same_consonants_review": 2016,
-              "matching_strong_family_unresolved_review": scope["review"]["matching_strong_family_unresolved_review"],
+              "different_strong_same_consonants_review": 2014,
+              "matching_strong_family_unresolved_review": 1007,
               "source_code_unreadable_review": 2,
           }
           assert len(actual["by_macula_word"]) == actual["coverage_with_word_ids"]["additional_entry_only_links"]
