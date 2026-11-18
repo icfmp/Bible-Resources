@@ -22,6 +22,75 @@ SIMPLE_REF = re.compile(
     r"(?:\.\d+(?:\.\d+)?)?(?:-(?:[1-4]?[A-Za-z][A-Za-z0-9]*"
     r"(?:\.\d+(?:\.\d+)?)?))?$"
 )
+# Reviewed SWORD OSIS commentary section grammar (CrossWire OSIS_Commentaries).
+# A continuous range needs TWO FULL endpoints; a discontinuous list uses
+# whitespace-separated complete references. A comma is NOT a range delimiter.
+SECTION_ATOM = re.compile(
+    r"^(?P<book>[1-4]?[A-Za-z][A-Za-z0-9]*)"
+    r"(?:\.(?P<chapter>[1-9][0-9]*)(?:\.(?P<verse>[1-9][0-9]*))?)?$"
+)
+SHORT_COMMA_VERSES = re.compile(
+    r"(?<![A-Za-z0-9])(?:[1-9][0-9]{0,2}[.:])?"
+    r"[1-9][0-9]{0,2},[1-9][0-9]{0,2}(?![0-9])"
+)
+MACHINE_COMMA_RANGE = re.compile(
+    r"^[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*\."
+    r"[1-9][0-9]*,[1-9][0-9]*$"
+)
+MAX_STRUCTURAL_SAMPLES = 80
+
+def _commentary_ref_tokens(value: str) -> tuple[str, list[tuple]] :
+    """Syntactically audit one complete source annotateRef without repairs.
+
+    Return a category and full machine book/chapter/verse tuple for each
+    endpoint. No canonical verse existence is inferred from a regex.
+    """
+    if not isinstance(value, str) or not value or value.strip() != value:
+        return "missing_or_padded", []
+    if "," in value:
+        return ("comma_verse_list_or_range_requires_review"
+                if MACHINE_COMMA_RANGE.fullmatch(value)
+                else "comma_other_annotation_requires_review"), []
+    if ":" in value:
+        return "work_prefix_or_unreviewed_colon", []
+    tokens = value.split()
+    endpoints = []
+    ranged = 0
+    for token in tokens:
+        parts = token.split("-")
+        if len(parts) not in (1, 2):
+            return "multi_hyphen_unsupported", []
+        parsed = []
+        for part in parts:
+            match = SECTION_ATOM.fullmatch(part)
+            if not match:
+                return "unqualified_or_other_syntax", []
+            book = match.group("book")
+            chapter = int(match.group("chapter")) if match.group("chapter") else 0
+            verse = int(match.group("verse")) if match.group("verse") else 0
+            parsed.append((book, chapter, verse))
+        if len(parsed) == 2:
+            ranged += 1
+            if parsed[0][0] != parsed[1][0]:
+                return "cross_book_range_requires_order_review", []
+            if parsed[0][1:] >= parsed[1][1:]:
+                return "reversed_or_zero_length_range", []
+            if not (parsed[0][2] and parsed[1][2]):
+                return "range_needs_complete_verse_endpoints", []
+        endpoints.append(tuple(parsed))
+    flat = [v for group in endpoints for v in group]
+    if not flat:
+        return "missing_or_padded", []
+    if len({v[0] for v in flat}) > 1:
+        return "discontinuous_cross_book_list", flat
+    if len(tokens) > 1:
+        return "discontinuous_list", flat
+    if ranged:
+        return "continuous_verse_range", flat
+    one = flat[0]
+    return ("single_verse" if one[2] else
+            "chapter_intro" if one[1] else "book_intro"), flat
+
 VERSE_MARKER = re.compile(r"(?<!\d)(?:[1-9]\d{0,2})(?=\s|\u00a0|[.:])")
 RISKS = {
     "long_bold_range": "typography",
@@ -34,6 +103,13 @@ RISKS = {
     "invalid_cross_reference": "reference_error",
     "duplicate_verse_id": "structure_error",
     "duplicate_commentary_reference": "structure_candidate",
+    "commentary_annotation_missing": "structure_error",
+    "commentary_annotation_unreviewed": "structure_candidate",
+    "commentary_comma_range_candidate": "structure_candidate",
+    "commentary_range_reversed": "structure_error",
+    "commentary_book_scope_mismatch": "structure_candidate",
+    "commentary_out_of_order": "structure_candidate",
+    "commentary_title_numeric_comma_candidate": "structure_candidate",
     "empty_verse_identifier": "structure_error",
     "verse_key_out_of_sequence": "structure_candidate",
 }
@@ -87,6 +163,11 @@ def audit_osis(path: Path, *, kind: str = "bible") -> dict:
     annotations = defaultdict(list)
     paragraph_count = 0
     previous_verse = None
+    commentary_shape_counts = Counter()
+    commentary_reference_examples = []
+    last_commentary_by_book = {}
+    source_annotated_count = 0
+    bounded_source_structural_findings = Counter()
 
     for node in document.iter():
         if not isinstance(node.tag, str):
@@ -159,15 +240,80 @@ def audit_osis(path: Path, *, kind: str = "bible") -> dict:
                         details={"osis_ref": ref}))
                 if key:
                     previous_verse = key
-        if kind == "commentary" and name == "div" and node.get("annotateType") == "commentary":
-            reference = node.get("annotateRef")
+        if kind == "commentary" and name == "div" and (
+                node.get("annotateType") == "commentary" or "annotateRef" in node.attrib):
+            source_annotated_count += 1
+            reference = node.get("annotateRef") or ""
+            typ = node.get("annotateType")
+            category, endpoints = _commentary_ref_tokens(reference)
+            commentary_shape_counts[category] += 1
+            if typ != "commentary" or not reference:
+                code = "commentary_annotation_missing"
+                reason = "Missing or non-commentary annotated section type/reference"
+            elif category.startswith("comma_"):
+                code = "commentary_comma_range_candidate"
+                reason = "Comma inside source annotation is not a SWORD range"
+            elif category == "reversed_or_zero_length_range":
+                code = "commentary_range_reversed"
+                reason = "Source annotation has non-increasing range endpoints"
+            elif category in {"single_verse","chapter_intro","book_intro",
+                              "continuous_verse_range","discontinuous_list",
+                              "discontinuous_cross_book_list"}:
+                code = None
+                reason = None
+            else:
+                code = "commentary_annotation_unreviewed"
+                reason = "Unsupported source annotation syntax needs reviewed normalization"
+            if code:
+                bounded_source_structural_findings[code] += 1
+                if bounded_source_structural_findings[code] <= MAX_STRUCTURAL_SAMPLES:
+                    findings.append(_entry(path,node,code,reason=reason,
+                        details={"source_annotation_sha256":hashlib.sha256(
+                            reference.encode("utf-8")).hexdigest(),
+                                 "reference_shape":category}))
             if reference:
                 if reference in annotations:
-                    findings.append(_entry(path,node,"duplicate_commentary_reference",
-                        reason="Multiple commentary entries share an annotation key; may be intentional separate sections",
-                        details={"annotate_ref":reference[:150],
-                                 "other_entries":len(annotations[reference])}))
+                    if len(annotations[reference]) < MAX_STRUCTURAL_SAMPLES:
+                        findings.append(_entry(path,node,"duplicate_commentary_reference",
+                            reason="Repeated entire source scope; needs collision review",
+                            details={"reference_sha256":hashlib.sha256(
+                                reference.encode("utf-8")).hexdigest(),
+                                "other_entries":len(annotations[reference])}))
                 annotations[reference].append(node.sourceline)
+            if endpoints:
+                first = endpoints[0]
+                enclosing = next(
+                    (anc.get("osisID") for anc in node.iterancestors()
+                     if anc.get("type") == "book" and anc.get("osisID")), None)
+                if enclosing and enclosing != first[0]:
+                    bounded_source_structural_findings["commentary_book_scope_mismatch"] += 1
+                    if bounded_source_structural_findings["commentary_book_scope_mismatch"] <= MAX_STRUCTURAL_SAMPLES:
+                        findings.append(_entry(path,node,"commentary_book_scope_mismatch",
+                            reason="Annotated section book differs from enclosing source book",
+                            details={"enclosing_book":enclosing,
+                                     "section_first_book":first[0]}))
+                if first[0] in last_commentary_by_book:
+                    last = last_commentary_by_book[first[0]]
+                    if first[1:] < last:
+                        bounded_source_structural_findings["commentary_out_of_order"] += 1
+                        if bounded_source_structural_findings["commentary_out_of_order"] <= MAX_STRUCTURAL_SAMPLES:
+                            findings.append(_entry(path,node,"commentary_out_of_order",
+                                reason="Commentary sections decrease in verse order within the same book",
+                                details={"reference_sha256":hashlib.sha256(reference.encode()).hexdigest()}))
+                last_commentary_by_book[first[0]] = first[1:]
+            if (category not in {"single_verse", "continuous_verse_range"}
+                    and len(commentary_reference_examples) < MAX_STRUCTURAL_SAMPLES):
+                commentary_reference_examples.append({
+                    "line":node.sourceline, "shape":category,
+                    "source_ref_sha256":hashlib.sha256(reference.encode()).hexdigest(),
+                })
+        if kind == "commentary" and name == "title" and len(content) <= 110:
+            if SHORT_COMMA_VERSES.search(content):
+                bounded_source_structural_findings["commentary_title_numeric_comma_candidate"] += 1
+                if bounded_source_structural_findings["commentary_title_numeric_comma_candidate"] <= MAX_STRUCTURAL_SAMPLES:
+                    findings.append(_entry(path,node,"commentary_title_numeric_comma_candidate",
+                        reason="Displayed verse list may differ from machine annotation; do not auto-convert commas into ranges",
+                        details={"title_sha256":hashlib.sha256(content.encode()).hexdigest()}))
 
         # A likely Bible quotation repeated in commentary is NOT automatically
         # removable. Limit to styled segments/paragraphs with several numbered
@@ -199,6 +345,11 @@ def audit_osis(path: Path, *, kind: str = "bible") -> dict:
             "verse_keys": len(verses),
             "commentary_reference_keys": len(annotations),
             "paragraphs": paragraph_count,
+            "commentary_annotated_section_count": source_annotated_count,
+            "commentary_annotation_scope_shapes": dict(sorted(commentary_shape_counts.items())),
+            "commentary_annotation_structural_counts": dict(sorted(bounded_source_structural_findings.items())),
+            "commentary_nonstandard_scope_examples": commentary_reference_examples,
+            "commentary_section_shape_review_does_not_validate_canonical_versification": True,
             "finding_counts": dict(sorted(Counter(x["code"] for x in findings).items())),
         },
         "no_content_changes": True,
