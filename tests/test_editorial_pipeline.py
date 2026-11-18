@@ -269,6 +269,21 @@ class EditorialPipelineTests(unittest.TestCase):
                          "Gen.1.3")
         self.assertEqual(saved,self.source.read_bytes())
 
+    def test_private_word_aligned_punctuation_gap_triage(self):
+        from audit_osis import _source_native_interword_punctuation_shape
+        result=_source_native_interword_punctuation_shape(
+            "They trust—Christ! Amen.", "Preamble: They trust-Christ! Amen.")
+        self.assertEqual(result["class"],"punctuation_changes_between_word_anchors")
+        self.assertEqual(result["counts"]["punctuation_codepoints_differ"],1)
+        self.assertEqual(result["word_run_start_native_ordinal"],2)
+        same=_source_native_interword_punctuation_shape(
+            "They  trust Christ.", "They trust Christ.")
+        self.assertEqual(same["class"],"word_internal_gaps_equal_or_whitespace_only")
+        self.assertEqual(same["counts"]["whitespace_only_interword_gaps"],1)
+        repeat=_source_native_interword_punctuation_shape(
+            "This is repeated.", "This is repeated. This is repeated.")
+        self.assertEqual(repeat["class"],"ambiguous_or_unaligned_source_word_window")
+
     def test_commentary_punctuation_notes_and_reference_targets_not_silently_lost(self):
         from audit_osis import (
             source_commentary_overlap_witness,
