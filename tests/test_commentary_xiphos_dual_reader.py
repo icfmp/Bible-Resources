@@ -225,6 +225,41 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
         self.assertEqual(len(pointer), 2)
         self.assertTrue(all("--sync" not in command for command in pointer))
 
+    @patch("commentary_xiphos_dual_reader.time.sleep")
+    @patch("commentary_xiphos_dual_reader._main_xiphos_window")
+    @patch("commentary_xiphos_dual_reader._x11")
+    def test_transient_real_xiphos_focus_failure_recovers_only_with_real_window(
+            self, x11, main_window, sleep):
+        from commentary_xiphos_dual_reader import _focus_real_xiphos_main_window
+        x11.side_effect=[PilotError("transient X11 change"),b""]
+        main_window.return_value="202"
+        target=_focus_real_xiphos_main_window(
+            {"DISPLAY":":91","GDK_BACKEND":"x11"},"101")
+        self.assertEqual(target,"202")
+        self.assertEqual([call.args[0] for call in x11.call_args_list],[
+            ["xdotool","windowfocus","101"],
+            ["xdotool","windowfocus","202"],
+        ])
+        self.assertTrue(all("--sync" not in c.args[0] for c in x11.call_args_list))
+        main_window.assert_called_once()
+
+    @patch("commentary_xiphos_dual_reader.time.sleep")
+    @patch("commentary_xiphos_dual_reader._main_xiphos_window")
+    @patch("commentary_xiphos_dual_reader._x11")
+    def test_no_real_window_after_focus_failure_does_not_claim_rendering(
+            self, x11, main_window, sleep):
+        from commentary_xiphos_dual_reader import _focus_real_xiphos_main_window
+        x11.side_effect=PilotError("X11 unavailable")
+        main_window.return_value=None
+        with self.assertRaisesRegex(PilotError,"disappeared"):
+            _focus_real_xiphos_main_window(
+                {"DISPLAY":":91","GDK_BACKEND":"x11"},"101")
+        self.assertEqual(x11.call_count,1)
+        main_window.assert_called_once()
+        with self.assertRaisesRegex(PilotError,"Unreviewed"):
+            _focus_real_xiphos_main_window(
+                {"DISPLAY":":91","GDK_BACKEND":"wayland"},"101")
+
     def test_actual_source_heading_and_rich_html_are_measured_without_leaking_text(self):
         from commentary_xiphos_dual_reader import _markup_display_witness
         original = (
