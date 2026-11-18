@@ -36,7 +36,7 @@ Egypt became a place of slavery for Israel.
 
 A place where we once found happiness may soon become the place where we suffer.
 
-What we once expected to bring us the greatest comfort may become our heaviest burden.
+What we once welcomed with the words “This same shall comfort us” may become our heaviest burden.
 
 We must not put our trust in people or say of any place short of heaven, “Here I will rest.”
 
@@ -88,12 +88,14 @@ Those who want to escape this enemy must fear committing sin and cry out immedia
 
 ## Editorial verification — Exodus 1
 
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Restored the quoted scriptural allusion “This same shall comfort us” (cf. Gen. 5:29) in the 8–14 exposition. The earlier generalized paraphrase preserved the contrast but silently omitted Henry's deliberate biblical wording. This is an editorial citation in the review, not a claim of an original native `osisRef` link. Also corrected the review's contradictory claim that the transposed outline range cells remained preserved verbatim: their original order and wording remain, but their verse labels were deliberately amended on 2026-11-17. No original source or native key modified; independent source-native acceptance pending.
+
 **2026-11-17 explicitly logged editorial range correction (secondary witness, pending native confirmation):** The [CCEL concise witness](https://ccel.org/ccel/henry/mhcc.iii.i.html) transposes the ranges in the first two chapter-outline rows: it assigns 8–14 to Israel's earlier increase and 1–7 to Pharaoh's subsequent oppression. The exposition headings and Scripture itself clearly place the increase at **1–7** and the oppression at **8–14**. This separate Modern English manuscript corrects **only the two outline reference labels**, keeps their original order and authorial wording, and does **not** redivide any source comment. Original published `MHCC 0.1.1` is unmodified; exact native I/K title/outline collation and independent editorial signoff remain pending.
 
 
 The three source exposition units were compared in a distinct pass against [CCEL's Concise text for Exodus 1](https://ccel.org/ccel/henry/mhcc.iii.i.html). The book introduction has been preserved separately as [its own production candidate](../exodus-book-introduction.CANDIDATE.md). Exact source-native SWORD matching remains a later release gate.
 
-**Original outline anomaly preserved:** the supplied chapter outline places “8–14” first and “1–7” second, although the actual exposition proceeds correctly through **1–7, 8–14, 15–22**. The outline is reproduced in its original sequence; no source verse range has been silently rearranged.
+**Original outline anomaly documented, not reproduced in the corrected range cells:** the secondary CCEL source assigns “8–14” to the first outline row and “1–7” to the second. The modern draft retains the original topical wording and row order but explicitly corrects those two verse labels; original exposition spans and the published MHCC 0.1.1 source remain unchanged.
 
 - **1–7:** more than 200 years, initial seventy people, similar period of rapid growth under bondage, and certainty despite delayed promises — retained.
 - **8–14:** happiness becoming affliction, rejected earthly rest, forgotten Joseph, the Lord remembering loving service, envy of righteous prosperity, unjust cowardly oppression, taskmasters' deliberate bitterness, proliferation under persecution, **martyrs' blood as the church's seed** — retained.
