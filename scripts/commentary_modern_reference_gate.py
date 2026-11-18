@@ -2103,6 +2103,222 @@ def build_private_contextual_source_note_preview(
 
 
 
+
+def build_private_compact_original_crossrefs(
+        *, linked_osis: bytes, ledger: dict, original: dict,
+        native: dict, errata: dict) -> tuple[bytes,dict,dict]:
+    """Recover exact source-linked *verse tokens* inside compressed citations.
+
+    e.g. the authored "(1 John 4:8, 16)" supplies distinct printed '8'
+    and '16' anchors for authenticated original 1John.4.8/.16 links.
+    This is NOT fuzzy semantic interpolation: only an unambiguous, explicit
+    book+chapter+verse token within the very same source-owned modern K is
+    eligible. No modern prose or original source wording changes.
+    """
+    from collections import Counter
+    from commentary_modern_draft_osis_preview import NS, _range
+
+    if (ledger.get("status") !=
+            "SOURCE_NATIVE_WHOLE_CANON_HYPERLINK_DISPOSITION_QUEUE_NOT_FINAL_APPROVAL"
+            or ledger.get("source_reference_labels_or_literal_targets_exported") is not False
+            or ledger.get("publication_authorized") is not False
+            or native.get("source_prose_or_original_markup_exported") is not False
+            or errata.get("original_native_corpus_sha256") !=
+                native.get("original_compiled_corpus_sha256")
+            or errata.get("status") !=
+                "PINNED_ORIGINAL_LINK_ERRATA_REVIEW_ONLY_NOT_APPLIED"):
+        raise ValueError("Compact citation recovery lacks original SHA evidence")
+    blocked={(c["source_first_key"],c["original_reference_ordinal"])
+             for c in errata["cases"]}
+    if len(blocked)!=4 or any(c.get("approval") is not False
+                             for c in errata["cases"]):
+        raise ValueError("Four bad original target identities remain blocked")
+    doc=ET.fromstring(linked_osis)
+    authored_before="".join(doc.itertext())
+    chapters={n.get("osisID"):n for n in doc.iter()
+              if n.tag==f"{{{NS}}}chapter"}
+    if set(chapters)!=set(native.get("chapters",{})):
+        raise ValueError("Original canonical chapter inventory changed")
+
+    k_sections={}
+    for chapter, node in chapters.items():
+        units=native["chapters"][chapter]["original_units"]
+        sections=node.findall(f"./{{{NS}}}div[@annotateType='commentary']")
+        if not units:
+            continue
+        if len(units)!=len(sections):
+            raise ValueError("Original K groups changed before compact link repair")
+        for src,sec in zip(units,sections):
+            if sec.get("annotateRef")!=_range(src["keys"]):
+                raise ValueError("Original modern K section scope changed")
+            k_sections[src["first_key"]]=sec
+
+    # A slot is one actual XML text/tail field, not normalized XML itertext.
+    # In particular, previously linked labels are not eligible a second time.
+    def slots(section):
+        for node in section.iter():
+            if node.tag==f"{{{NS}}}reference":
+                if node.tail:
+                    yield node,"tail",node.tail
+                continue
+            # Source link recovery must never refer to existing notes.
+            if node.tag==f"{{{NS}}}note":
+                continue
+            if node.text:
+                yield node,"text",node.text
+            if node.tail:
+                yield node,"tail",node.tail
+
+    chosen={}
+    grouped={}
+    unmatched=[]
+    for row in ledger["pending"]:
+        first,ordinal=row["source_first_key"],row["source_reference_ordinal"]
+        key=(first,ordinal)
+        if key in blocked:
+            continue
+        if first not in original or not 1<=ordinal<=len(original[first]):
+            raise ValueError("Pending source ref lacks original K/ordinal evidence")
+        literal,label=original[first][ordinal-1]
+        if (hashlib.sha256(literal.encode()).hexdigest()!=row["original_osisRef_sha256"]
+                or hashlib.sha256(label.encode()).hexdigest()!=
+                    row["original_visible_label_sha256"]):
+            raise ValueError("Original exact source link receipt changed")
+        try:
+            book,chapter,verse=canonical_only_for_comparison(literal).rsplit(".",2)
+        except ValueError:
+            unmatched.append(key)
+            continue
+        names=set(_AUTO_ALIASES.get(book,()))
+        names.add(_ENGLISH_NAME_BY_OSIS[book])
+        # Canonical full English names and standard recognized abbreviations.
+        aliases="|".join(re.escape(x) for x in sorted(names,key=len,reverse=True))
+        expression=re.compile(
+            r"(?<![A-Za-z0-9])(?:"+aliases+r")\s+"+re.escape(chapter)+
+            r"\s*:\s*\d+(?:\s*[,;–-]\s*\d+)*",
+            flags=re.IGNORECASE)
+        candidates=[]
+        for node,attr,value in slots(k_sections[first]):
+            for match in expression.finditer(value):
+                rel=match.group()
+                colon=rel.find(":")
+                if colon<0:
+                    raise ValueError("Invalid normalized Scripture chapter:verse citation")
+                rest=rel[colon+1:]
+                nums=[m for m in re.finditer(r"\d+",rest)]
+                if len(nums)!=len({int(m.group()) for m in nums}):
+                    continue  # repeated verse tokens are not distinctive.
+                for number in nums:
+                    if number.group()!=verse:  # require exact canonical numeric spelling
+                        continue
+                    a=match.start()+colon+1+number.start()
+                    b=match.start()+colon+1+number.end()
+                    candidates.append((node,attr,value,a,b))
+        if len(candidates)!=1:
+            unmatched.append(key)
+            continue
+        node,attr,value,start,end=candidates[0]
+        slotid=(id(node),attr)
+        chosen[key]={"source_first_key":first,"source_reference_ordinal":ordinal,
+                     "original_literal_target_sha256":row["original_osisRef_sha256"],
+                     "original_visible_label_sha256":row["original_visible_label_sha256"],
+                     "linked_visible_token_sha256":hashlib.sha256(
+                         value[start:end].encode()).hexdigest(),
+                     "source_target":literal,"slotid":slotid,
+                     "node":node,"attr":attr,"value":value,"start":start,"end":end}
+        grouped.setdefault(slotid,[]).append(key)
+
+    # No distinct original links may claim the same character interval.
+    collisions=set()
+    for keys in grouped.values():
+        offsets=Counter((chosen[k]["start"],chosen[k]["end"]) for k in keys)
+        collisions.update(k for k in keys if offsets[
+            (chosen[k]["start"],chosen[k]["end"])]!=1)
+    for key in collisions:
+        old=chosen.pop(key)
+        unmatched.append(key)
+        grouped[old["slotid"]].remove(key)
+    if len(set(unmatched))+len(chosen)+len(blocked)!=len(ledger["pending"]):
+        raise ValueError("Incomplete original source K/ordinal compact citation disposition")
+
+    # Reconstruct each original literal XML text slot only once, retaining
+    # its exact visible text, sibling order, punctuation, whitespace and
+    # full original target spelling. Previously linked text is untouched.
+    for slotid,keys in grouped.items():
+        if not keys:
+            continue
+        entries=sorted([chosen[k] for k in keys],key=lambda v:v["start"])
+        node,attr,value=entries[0]["node"],entries[0]["attr"],entries[0]["value"]
+        if any(e["value"]!=value or e["node"] is not node or
+               e["attr"]!=attr for e in entries):
+            raise ValueError("Compact source citation slot disagreement")
+        prev=0
+        built=[]
+        for entry in entries:
+            if entry["start"]<prev:
+                raise ValueError("Overlapping source-literal citation spans")
+            link=ET.Element(f"{{{NS}}}reference",{"osisRef":entry["source_target"]})
+            link.text=value[entry["start"]:entry["end"]]
+            built.append((value[prev:entry["start"]],link))
+            prev=entry["end"]
+        trailing=value[prev:]
+        if attr=="text":
+            node.text=built[0][0]
+            for i,(prefix,ref) in enumerate(built):
+                ref.tail=(built[i+1][0] if i+1<len(built) else trailing)
+                node.insert(i,ref)
+        else:
+            parent=next((p for p in k_sections[entries[0]["source_first_key"]].iter()
+                         if node in list(p)),None)
+            if parent is None:
+                raise ValueError("Original compact tail reference lost parent")
+            node.tail=built[0][0]
+            index=list(parent).index(node)+1
+            for i,(prefix,ref) in enumerate(built):
+                ref.tail=(built[i+1][0] if i+1<len(built) else trailing)
+                parent.insert(index+i,ref)
+    if "".join(doc.itertext())!=authored_before:
+        raise ValueError("Compact source links changed modern commentary visible prose")
+
+    moved=[{
+        "source_first_key":x["source_first_key"],
+        "source_reference_ordinal":x["source_reference_ordinal"],
+        "original_literal_target_sha256":x["original_literal_target_sha256"],
+        "original_visible_label_sha256":x["original_visible_label_sha256"],
+        "linked_visible_token_sha256":x["linked_visible_token_sha256"],
+        "placement_basis":"EXACT_UNIQUE_AUTHORED_BOOK_CHAPTER_VERSE_TOKEN",
+    } for _,x in sorted(chosen.items())]
+    remainder=[x for x in ledger["pending"]
+               if (x["source_first_key"],x["source_reference_ordinal"]) not in chosen]
+    revised={**ledger,
+        "source_link_occurrences_verified_in_derived_osis":
+            ledger["source_link_occurrences_verified_in_derived_osis"]+len(moved),
+        "source_original_links_still_requiring_placement_review":len(remainder),
+        "pending":remainder,
+        "publication_authorized":False}
+    if (revised["source_link_occurrences_verified_in_derived_osis"]+
+        ledger["source_spurious_link_occurrences_explicitly_omitted"]+
+        len(remainder)!=ledger["original_native_reference_elements"]):
+        raise ValueError("All original hyperlink identities must still be accounted for")
+    result=ET.tostring(doc,encoding="utf-8",xml_declaration=True)
+    ET.fromstring(result)
+    return result,revised,{
+        "status":"PRIVATE_EXACT_BOOK_CHAPTER_VERSE_COMPACT_SOURCE_LINK_RECONSTRUCTION",
+        "original_native_corpus_sha256":native["original_compiled_corpus_sha256"],
+        "original_unplaced_valid_links_considered":
+            len(ledger["pending"])-len(blocked),
+        "original_exact_compact_verse_links_restored":len(moved),
+        "original_valid_link_positions_still_unplaced":len(remainder)-len(blocked),
+        "original_defective_link_proposals_never_retargeted":len(blocked),
+        "all_original_k_text_in_derived_osis_unchanged":True,
+        "original_crossreference_literal_targets_and_labels_sha_verified":True,
+        "source_only_note_fallback_available":True,
+        "released_or_distributed":False,
+        "placements":moved,
+    }
+
+
+
 def build_private_inline_original_reference_index(
         *, source_note_osis: bytes, source_receipt: dict,
         native: dict) -> tuple[bytes,dict]:
@@ -2340,7 +2556,9 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                                     errata_proposals_output: Path | None = None,
                                     context_notes_output: Path | None = None,
                                     inline_source_index_output: Path | None = None,
-                                    editorial_review_output: Path | None = None) -> tuple[bytes, dict]:
+                                    editorial_review_output: Path | None = None,
+                                    compact_source_osis_output: Path | None = None,
+                                    compact_source_notes_output: Path | None = None) -> tuple[bytes, dict]:
     """Authenticate and place an explicitly bounded set of source-backed links.
 
     Real original SWORD attributes stay in private memory/isolated new OSIS,
@@ -2365,6 +2583,10 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         raise ValueError("Visible source reference index requires original source notes")
     if editorial_review_output is not None and source_notes_output is None:
         raise ValueError("Editorial review excerpts require pinned source and review ledger")
+    if (compact_source_osis_output is None) != (compact_source_notes_output is None):
+        raise ValueError("Compact source-linked OSIS and fallback notes must be built together")
+    if compact_source_osis_output is not None and source_notes_output is None:
+        raise ValueError("Compact source links require pinned original link ledger")
     if (placements.get("status") !=
             "PRIVATE_REVIEWED_BOUNDED_LINK_PLACEMENT_NOT_FINAL_EDIT_OR_RELEASE"
             or placements.get("published_source_module") != "MHCC 0.1.1"
@@ -2804,6 +3026,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
             "citation_count":len(rows),
             "references":rows,
         },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    compact_receipt = None
+    compact_notes_receipt = None
     notes_receipt = None
     context_receipt = None
     inline_source_index_receipt = None
@@ -2818,6 +3042,17 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
             original=private_original, native=native, errata=errata_review)
         source_notes_output.parent.mkdir(parents=True,exist_ok=True)
         source_notes_output.write_bytes(notes_osis)
+        if compact_source_osis_output is not None:
+            compact_osis,compact_ledger,compact_receipt=build_private_compact_original_crossrefs(
+                linked_osis=output,ledger=source_link_ledger,
+                original=private_original,native=native,errata=errata_review)
+            compact_notes_osis,compact_notes_receipt=build_private_source_reference_supplement(
+                linked_osis=compact_osis,ledger=compact_ledger,
+                original=private_original,native=native,errata=errata_review)
+            compact_source_osis_output.parent.mkdir(parents=True,exist_ok=True)
+            compact_source_notes_output.parent.mkdir(parents=True,exist_ok=True)
+            compact_source_osis_output.write_bytes(compact_osis)
+            compact_source_notes_output.write_bytes(compact_notes_osis)
         if inline_source_index_output is not None:
             inlined,index_receipt=build_private_inline_original_reference_index(
                 source_note_osis=notes_osis,source_receipt=notes_receipt,
@@ -2884,6 +3119,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         "private_source_note_alternative":notes_receipt,
         "private_contextual_note_relocation_preview":context_receipt,
         "private_visible_source_reference_index_preview":inline_source_index_receipt,
+        "private_exact_compact_reference_recovery":compact_receipt,
+        "private_compact_remaining_source_notes":compact_notes_receipt,
         "private_unapproved_errata_navigation_preview":errata_preview_receipt,
         "modern_SWORD_readback_verified":False,
         "independent_editorial_semantic_signoff":False,
@@ -2917,6 +3154,8 @@ def main():
     p.add_argument("--context-source-notes-osis",type=Path)
     p.add_argument("--visible-source-reference-index-osis",type=Path)
     p.add_argument("--ephemeral-editorial-review-json",type=Path)
+    p.add_argument("--compact-source-linked-osis",type=Path)
+    p.add_argument("--compact-source-notes-osis",type=Path)
     p.add_argument("--source-notes-errata-manifest",type=Path)
     p.add_argument("--source-errata-proposals-osis",type=Path)
     p.add_argument("--linked-osis",type=Path)
@@ -2970,7 +3209,9 @@ def main():
             errata_proposals_output=a.source_errata_proposals_osis,
             context_notes_output=a.context_source_notes_osis,
             inline_source_index_output=a.visible_source_reference_index_osis,
-            editorial_review_output=a.ephemeral_editorial_review_json)
+            editorial_review_output=a.ephemeral_editorial_review_json,
+            compact_source_osis_output=a.compact_source_linked_osis,
+            compact_source_notes_output=a.compact_source_notes_osis)
         a.linked_osis.parent.mkdir(parents=True,exist_ok=True)
         a.report.parent.mkdir(parents=True,exist_ok=True)
         a.linked_osis.write_bytes(osis)
