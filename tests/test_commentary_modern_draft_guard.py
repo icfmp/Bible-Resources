@@ -70,6 +70,38 @@ class DraftGuardTests(unittest.TestCase):
                 verify_draft_against_native_map(read_chapter_draft(path), native(),
                     source_zip_sha256=H, source_native_sha256=R)
 
+    def test_discontinuous_original_verse_group_exactly_matches_modern_heading(self):
+        chapter = "Matt.13"
+        # One authenticated-style authored unit can address two nonadjacent
+        # verse runs. Another, separate authored unit occupies the gap.
+        original = native(chapter)
+        verses = list(range(24, 31)) + list(range(36, 44))
+        original["units"][0]["first_key"] = "Matt.13.24"
+        original["units"][0]["native_keys"] = [f"Matt.13.{v}" for v in verses]
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "matthew-13.DRAFT.md"
+            path.write_text(draft(ch=chapter, title=
+                "Weeds (verses 24–30 and 36–43)"), encoding="utf-8")
+            report = verify_draft_against_native_map(
+                read_chapter_draft(path), original,
+                source_zip_sha256=H, source_native_sha256=R)
+            self.assertEqual(report["source_key_count"], 15)
+            self.assertTrue(report["exact_source_unit_anchors"][0][
+                "editorial_heading_range_claim_checked"])
+            for invalid in (
+                "Weeds (verses 24–43)",  # Swallows the distinct 31–35 body.
+                "Weeds (verses 24–30 and 31–43)",
+                "Weeds (verses 24–30 and 36–42)",
+                "Weeds (verses 24–30, 36–43, 43)"
+            ):
+                with self.subTest(heading=invalid):
+                    path.write_text(draft(ch=chapter, title=invalid),
+                                    encoding="utf-8")
+                    with self.assertRaises(ValueError):
+                        verify_draft_against_native_map(
+                            read_chapter_draft(path), original,
+                            source_zip_sha256=H, source_native_sha256=R)
+
     def test_changed_hash_or_approved_status_rejected(self):
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / "chapter.DRAFT.md"
