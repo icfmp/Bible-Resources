@@ -194,6 +194,14 @@
       "new_target": "Luke.24.6 Luke.24.7-Luke.24.44 Mark.16.7",
       "visible_label_sha256": "7e292c1bbb4a0ac110da2b665b0b45feced44d45ee09668d72df1dd9e69265ba",
       "evidence_url": "https://ccel.org/h/henry/mhc2/MHC40028.HTM"
+    },
+    {
+      "original_line": 58059,
+      "source_book": "Isa",
+      "old_target": "Ps 60.1 2Sa 8.13 14",
+      "new_target": "Ps.60 2Sam.8.13 2Sam.8.14",
+      "visible_label_sha256": "e1d19a796de5c2db6d9ef6be1b924f145d7002d499c3e041d6d16a73a097da1f",
+      "evidence_url": "https://ccel.org/h/henry/mhc2/MHC23063.HTM"
     }
   ]
 }
