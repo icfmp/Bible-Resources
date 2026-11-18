@@ -66,13 +66,15 @@ They remember what their parents have done for them and care for them in old age
 
 All earthly comforts remain uncertain.
 
-Yet the Lord will not fail to care for those who serve him.
+Yet the Lord will surely comfort and bless those who serve him.
 
 And those who labor for **the conversion of sinners** will find that their spiritual children are **their joy and crown at the day of Jesus Christ**.
 
 ---
 
 ## Editorial review — Psalm 127
+
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Restored the explicit twin claim that the Lord will *comfort and bless* his servants; previous prose flattened it to a general promise of care. No change to original published MHCC or to its source unit; exact native and independent acceptance still outstanding.
 
 **Entire secondary original-English source read:** [CCEL, Psalm 127](https://ccel.org/ccel/henry/mhcc.xx.cxxvii.html). Published pinned `MHCC 0.1.1` remains original, native SWORD/independent acceptance pending.
 
