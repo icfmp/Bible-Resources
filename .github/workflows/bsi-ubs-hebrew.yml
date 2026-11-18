@@ -6,7 +6,7 @@ on:
       - "entity-index/links/dictionaries/ubs-hebrew/**"
       - ".github/workflows/bsi-ubs-hebrew.yml"
   push:
-    branches: [audit/ubs-hebrew-unmatched-evidence]
+    branches: [audit/ubs-hebrew-top-lexemes]
     paths:
       - "entity-index/links/dictionaries/ubs-hebrew/**"
       - ".github/workflows/bsi-ubs-hebrew.yml"
@@ -100,6 +100,23 @@ jobs:
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
             --output /tmp/bsi-ubs-hebrew-reconciliation.json
+      - name: Compare reproducible candidate-review report when committed
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          actual=json.loads(Path("/tmp/bsi-ubs-hebrew-reconciliation.json").read_text(encoding="utf-8"))
+          assert actual["counts"]["unresolved_lexical_rows"] == 13736
+          assert actual["counts"]["dual_evidence_candidate_occurrences"] == 3439
+          assert actual["distinct_candidate_lexemes"] == 278
+          assert all(x["verification_state"] == "candidate_only_not_accepted_link" for x in actual["candidates"])
+          dest=Path("entity-index/links/dictionaries/ubs-hebrew/reconciliation_candidates.json")
+          if dest.exists():
+              assert json.loads(dest.read_text(encoding="utf-8")) == actual, "Candidate report differs from current pinned original sources"
+              print("RECONCILIATION_CANDIDATE_REPORT_VERIFIED")
+          else:
+              print("RECONCILIATION_CANDIDATE_REPORT_PENDING_INITIAL_PIN")
+          PY
       - name: Compare pinned generated index or prepare initial reproducible snapshot
         run: |
           python3 - <<'PY'
@@ -146,6 +163,17 @@ jobs:
             git add entity-index/links/dictionaries/ubs-hebrew/index.json
             git commit -m "data(bsi): add deterministic UBS Hebrew EN/FR Macula crosswalk"
             git push origin HEAD:audit/ubs-hebrew-unmatched-evidence
+          fi
+      - name: Commit frozen review-only candidate report on dedicated audit branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/audit/ubs-hebrew-top-lexemes'
+        run: |
+          cp /tmp/bsi-ubs-hebrew-reconciliation.json entity-index/links/dictionaries/ubs-hebrew/reconciliation_candidates.json
+          if ! git diff --quiet -- entity-index/links/dictionaries/ubs-hebrew/reconciliation_candidates.json || test -n "$(git ls-files --others --exclude-standard entity-index/links/dictionaries/ubs-hebrew/reconciliation_candidates.json)"; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add entity-index/links/dictionaries/ubs-hebrew/reconciliation_candidates.json
+            git commit -m "data(bsi): pin 278 source-verified lexical review candidates"
+            git push origin HEAD:audit/ubs-hebrew-top-lexemes
           fi
       - name: Upload generated QA index (not upstream dictionary definitions)
         uses: actions/upload-artifact@v4
