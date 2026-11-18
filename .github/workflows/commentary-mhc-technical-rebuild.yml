@@ -186,6 +186,110 @@ jobs:
             exit 1
           fi
           echo "Private CLI invocation completed"
+      - name: Compare full clean candidate against pristine independent SWORD rebuild
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          python - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          from lxml import etree
+          root=Path(os.environ["RUNNER_TEMP"])
+          manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
+          pinned=manifest["commentary_source"]["original_authoring_osis"]
+          native=root/"commentary-native-raw"
+          pristine_work=root/"mhc-pristine-private"
+          original_source=root/"original-mhc"/pinned["authoring_osis_file"]
+          cmd=[sys.executable,"scripts/rebuild_osis_commentary.py",
+               "--source",str(original_source),
+               "--sha256",pinned["authoring_osis_sha256"],
+               "--private-work",str(pristine_work),
+               "--module","MHCPristine",
+               "--language",manifest["language"],
+               "--versification",manifest["commentary_source"]["observed_compiled_versification"],
+               "--native-reader",str(native),"--min-numbered","20000"]
+          pristine_report=root/"mhc-pristine-report.json"
+          with pristine_report.open("xb") as handle:
+              subprocess.run(cmd,stdout=handle,stderr=subprocess.DEVNULL,
+                             check=True,timeout=650)
+          pristine=json.loads(pristine_report.read_text())
+          clean=json.loads((root/"rebuild-mhc-stage1-report.json").read_text())
+          counts=("native_occupied_numbered_keys",
+                  "native_occupied_introduction_keys",
+                  "native_occupied_opaque_top_keys")
+          if any(pristine[k]!=clean[k] for k in counts):
+              raise SystemExit("MHC clean rebuild differs in native index populations")
+          same_raw=(pristine["native_full_raw_corpus_sha256"]
+                    == clean["native_full_raw_corpus_sha256"])
+          print("Pristine vs cleaned full native raw corpus byte-identical:",same_raw)
+          if same_raw:
+              print("All native bodies and occupied keys exactly match original recompilation")
+              print("This is technical comparison, NOT independent historical edition collation")
+              raise SystemExit(0)
+
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from clean_source_osis import _inert_hi, _remove_empty_hi
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+
+          def read_native(work,module):
+              env=dict(os.environ,SWORD_PATH=str(work.resolve(strict=True)))
+              proc=subprocess.Popen([str(native),module],
+                                    env=env,stdout=subprocess.PIPE,
+                                    stderr=subprocess.DEVNULL)
+              raw_by_key={}
+              def receive(kind,ref,raw):
+                  raw_by_key[(kind,ref)]=raw
+              try:
+                  report,*_=parse_native_raw_corpus(proc.stdout,on_entry=receive)
+                  if proc.wait(timeout=30)!=0:
+                      raise ValueError("Native source reader failed")
+              finally:
+                  if proc.stdout: proc.stdout.close()
+                  if proc.poll() is None: proc.kill()
+                  proc.wait()
+              return raw_by_key,report
+
+          baseline,source_report=read_native(pristine_work,"MHCPristine")
+          cleaned,candidate_report=read_native(root/"mhc-stage1-private","MHCStage1")
+          if baseline.keys()!=cleaned.keys():
+              raise SystemExit("Pristine/cleaned native occupied key sets differ")
+          def normalized(raw):
+              parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
+                                     no_network=True,recover=False,huge_tree=False)
+              fragment=etree.fromstring(b"<fragment>"+raw+b"</fragment>",parser)
+              for node in list(fragment.iter()):
+                  if _inert_hi(node):
+                      _remove_empty_hi(node)
+              return etree.tostring(fragment,method="c14n")
+
+          raw_changes=0
+          semantic_changes=[]
+          unreadable=[]
+          for key in baseline:
+              left,right=baseline[key],cleaned[key]
+              if left==right:
+                  continue
+              raw_changes+=1
+              if key[0]=="U":
+                  semantic_changes.append(key)
+                  continue
+              try:
+                  if normalized(left)!=normalized(right):
+                      semantic_changes.append(key)
+              except (ValueError,etree.XMLSyntaxError):
+                  unreadable.append(key)
+          print("Native entries differing in raw bytes:",raw_changes)
+          print("Native entries with non-empty semantic XML differences:",
+                len(semantic_changes))
+          print("Native entries unparseable for comparison:",len(unreadable))
+          print("Affected reference/key samples, without text:",
+                [list(x) for x in (semantic_changes+unreadable)[:12]])
+          if semantic_changes or unreadable:
+              raise SystemExit("Cleaned source changed native semantic XML beyond empty styling")
+          print("FULL candidate-to-pristine native semantic XML comparison PASS")
+          print("No historical edition collation or public release performed")
+          PY
       - name: No distribution or editorial phase in this workflow
         if: always()
         shell: bash
