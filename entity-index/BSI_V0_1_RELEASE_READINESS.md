@@ -15,7 +15,7 @@
 
 The generated index retains entity IDs/canonical IDs, original word ID groups, Bible reference claims, link types, editable provenance, editorial decisions and inverse word lookup. It excludes ACAI localizations (including names), narrative descriptions, biographies, speeches, encyclopedia text, coordinates and speculative genealogies. The immutable 6,644-file ACAI source witness is not changed.
 
-The current index has **no validated reader-friendly display-name layer**. A label fallback to `person:Mary.2` is not equivalent to a verified name. Prepare and license an explicit, independently reviewed label layer before a reader-facing release.
+The internal index intentionally contains no display-name layer. The new `minimal_labels.py` generates a **separate** English-only preferred-label candidate from the exact ACAI source files, enforcing each original SHA-256, without copying descriptions or other localizations. The labels are marked `source_unreviewed_label`; an ambiguous name such as Mary does **not** assert a unique identity. Human editorial acceptance and attribution remain required before describing this as a reviewed reader-label layer.
 
 ## Rights audit — evidence and decisions still required
 
@@ -41,13 +41,13 @@ python3 -I entity-index/distribution_profile.py \
   --output entity-index/dist/bsi-v0.1-without-keyterms.json
 ```
 
-The file is a *candidate distribution projection*, **not yet a published release**. Remaining categories still need rights verification, labels and packaging.
+The file is a *candidate distribution projection*, **not yet a published release**. A separate minimal-label candidate is produced with:\n\n```bash\npython3 -I entity-index/minimal_labels.py \\\n  --source /path/to/pinned-ACAI \\\n  --index entity-index/dist/bsi-v0.1-without-keyterms.json \\\n  --output entity-index/dist/bsi-v0.1-labels-en.json\n``` Remaining categories still need rights verification, labels and packaging.
 
 ## Required gates before public release
 
 - [ ] Verify upstream provenance and rights at **field level**, including whether `keyterms` or other categories contain permission-only data. Attach dated evidence.
 - [x] Implement a separate deterministic projection excluding **all keyterms**; CI validation is configured and still needs to pass on the final revision. Recheck rights in remaining categories independently.
-- [ ] Prepare a minimal reviewed display-label layer, including provenance and rights.
+- [x] Implement minimal **source-hash-checked, English-only label extraction** in a separate candidate artifact, with provenance and unreviewed labeling; final CI and any editorial certification remain to be confirmed.
 - [ ] Regenerate from pinned sources on final commit; verify index parity, active-token coverage, category readback and resulting content SHA-256; retain permanent build instructions.
 - [ ] Package BSI `v0.1.0` with attribution, license file, excluded-feature disclosure, version/source lock and checksum.
 - [ ] Publish only after the above checks pass. App integration is **not owned by this repository** and is not a condition of releasing a properly scoped standalone BSI dataset.
