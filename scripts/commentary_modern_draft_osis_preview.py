@@ -301,13 +301,18 @@ def _original_intro_candidates(root: Path, receipt: dict) -> dict:
     for path in candidates:
         fields, prose = _modern_front(path)
         book=fields.get("book_osis")
-        if (book in intros or book not in _CANON
+        if (book not in _CANON
                 or fields.get("source_module") != "MHCC 0.1.1"
                 or fields.get("source_zip_sha256") != _SOURCE_ZIP
                 or fields.get("source_native_corpus_sha256") != _SOURCE_CORPUS
-                or not fields.get("status","").startswith("PRODUCTION CANDIDATE")
-                or fields.get("source_native_intro_key") != "I:"+book+".1"):
-            raise ValueError("Unverified original chapter-I introduction candidate")
+                or not fields.get("status","").startswith("PRODUCTION CANDIDATE")):
+            raise ValueError("Unapproved original book-introduction candidate")
+        # Do not invent a source-I key for 53 separately drafted book prefaces.
+        # These remain quarantined until exact original K/I ownership is proved.
+        if not fields.get("source_native_intro_key"):
+            continue
+        if book in intros or fields["source_native_intro_key"] != "I:"+book+".1":
+            raise ValueError("Duplicate/incorrectly attributed chapter-I introduction")
         sources=[i for i in receipt["chapters"][book+".1"][
             "native_introductions_not_assumed_to_be_exposition"]
             if i["key"]==book+".1" and i["visible_word_tokens"]>=20]
@@ -509,7 +514,10 @@ def generate_accepted_canon_osis(accepted: Path, source: dict,
         "annotated_sections":totals["groups"],
         "modern_topical_expositions":totals["leaves"],
         "total_source_and_I_only_verse_alias_keys":totals["keys"],
-        "chapter_I_preface_candidates":len(intros),
+        "authenticated_chapter_I_prefaces_included":len(intros),
+        "unplaced_book_preface_candidates_quarantined":len(list(
+            intro_root.glob("*-book-introduction.CANDIDATE.md")))-len(intros),
+        "original_K_embedded_book_preface_duplication_not_auto_resolved":True,
         "paragraphs":totals["paragraphs"],
         "tables":totals["tables"],"table_cells":totals["table_cells"],
         "lists":totals["lists"],
