@@ -381,7 +381,13 @@ source-audit artifact, distinguishing a source-present final verse
 without a record's word anchor from a final-chapter source-absent
 verse reference. CI independently reconciles our **10 already
 qualified traditional-subscription *candidates*** to actual source
-audit rows. Other candidate records remain **unreviewed** until a
+audit rows. For this locked source revision, the complete audit finds
+**79 records referencing a last attested letter verse**,
+**35 records / 52 unanchored last-verse claims**, plus
+**17 source-absent last-chapter references from 12 records**.
+These make **69 distinct candidate record/verse pairs**. Only **10**
+have explicit source-specific traditional-subscription qualifications;
+**59 remain unreviewed**. Other candidate records remain **unreviewed** until a
 pinned text and historical-subscription witness are checked: a record
 without a word anchor could be an implied participant, valid indirect
 claim, different edition, or inaccurate original attribution, and it
