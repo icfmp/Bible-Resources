@@ -433,6 +433,69 @@ class EntityIndexTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "conflicts with exact original word anchor"):
             self.build(reference_qualifications=claim_manifest)
 
+    def test_distinguish_edition_apparatus_from_alternate_verse_numbering(self):
+        original=self.write_record(
+            "people","A",references=["45016027","47013014"])
+        unchanged=original.read_bytes()
+        manifest={
+            "schema_version":1,"corpus":"sblgnt","source_edition":"pinned-test",
+            "verse_ids":["45016027","47013014"],
+            "provenance":[{"source":"pinned edition inventory"}],
+            "verse_qualifications":[
+                {
+                    "verse_id":"45016027",
+                    "classification":"doxology_in_edition_apparatus_not_main_word_inventory",
+                    "explanation":"A doxology in the alternate edition apparatus",
+                    "evidence":["Pinned Greek source end","SBL main/apparatus comparison"],
+                },
+                {
+                    "verse_id":"47013014",
+                    "classification":"alternate_verse_number_for_final_benediction",
+                    "explanation":"The final benediction bears another verse number",
+                    "equivalent_benediction_source_verse":"47013013",
+                    "evidence":["Pinned Greek end","Alternative numbered edition"],
+                },
+            ],
+        }
+        result=self.build(source_verse_absences=manifest)
+        self.assertEqual(result["statistics"]["qualified_source_verse_contexts"],2)
+        self.assertEqual(
+            result["unattested_source_verses"]["sblgnt:47013014"]["source_context"]
+            ["equivalent_benediction_source_verse"],"47013013")
+        self.assertEqual(
+            result["unattested_source_verses"]["sblgnt:45016027"]["source_context"]
+            ["classification"],
+            "doxology_in_edition_apparatus_not_main_word_inventory")
+        self.assertEqual(result["entities"][0]["references"],
+                         ["45016027","47013014"])
+        self.assertEqual(original.read_bytes(),unchanged)
+        with self.assertRaisesRegex(ValueError,"Unqualified pinned source verses"):
+            self.build(source_verse_absences=dict(
+                manifest,verse_qualifications=manifest["verse_qualifications"][:1]))
+        with self.assertRaisesRegex(ValueError,"Duplicate source verse qualification"):
+            self.build(source_verse_absences=dict(
+                manifest,verse_qualifications=manifest["verse_qualifications"]*2))
+        with self.assertRaisesRegex(ValueError,"Invalid verse-number comparison"):
+            self.build(source_verse_absences=dict(
+                manifest,verse_qualifications=[
+                    manifest["verse_qualifications"][0],
+                    dict(manifest["verse_qualifications"][1],
+                         equivalent_benediction_source_verse="45016027"),
+                ]))
+        with self.assertRaisesRegex(ValueError,"Invalid source verse-qualification evidence"):
+            self.build(source_verse_absences=dict(
+                manifest,verse_qualifications=[
+                    dict(manifest["verse_qualifications"][0],evidence=[]),
+                    manifest["verse_qualifications"][1],
+                ]))
+        with self.assertRaisesRegex(ValueError,"Invalid source verse-qualification evidence"):
+            self.build(source_verse_absences=dict(
+                manifest,verse_qualifications=[
+                    dict(manifest["verse_qualifications"][0],
+                         classification="all_verses_spurious"),
+                    manifest["verse_qualifications"][1],
+                ]))
+
     def test_source_verse_absence_only_qualifies_raw_references(self):
         original = self.write_record(
             "people", "A", references=["47013014", "45016027", "43001001"])
