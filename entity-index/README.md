@@ -709,9 +709,12 @@ original-word IDs, despite correct explicit names being present:
   (son of Ahab), whom Ahaziah visits at Jezreel. The last
   Hebrew personal pronoun `o140220060281` ("he was sick")
   has a pinned Macula `participantref=140220060221`,
-  identifying the Israelite king. Remove only the erroneous
+  identifying the Israelite king. Frozen ACAI also has the
+  `person:Jehoram.3` **source alias** for canonical
+  `person:Joram.3`; keep **both source records** and
+  both exact original name/pronoun claims. Remove only the erroneous
   Judahite king's claim on that pronoun, preserving both
-  distinct proper-name occurrences and the valid original verse.
+  distinct historical persons and the valid original verse.
 
 These five contextual edits do not equate namesakes and make
 no change to the underlying source. They are reversible exact
