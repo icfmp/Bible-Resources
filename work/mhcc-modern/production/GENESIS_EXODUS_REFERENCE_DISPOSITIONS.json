@@ -4,7 +4,7 @@
   "source_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
   "source_link_identity_receipt_status": "SOURCE_NATIVE_ALL_K_REFERENCE_IDENTITIES_NOT_MODERN_LINK_PARITY",
   "source_evidence_ci": "https://github.com/icfmp/Bible-Resources/actions/runs/44276719759",
-  "scope": "Only source-authenticated Gen.2, Gen.3 and Exod.12",
+  "scope": "Source-authenticated Genesis 2, 3, 21 and Exodus 12, 14, 28, 29 only",
   "explicit_owner_publication_authorization": false,
   "independent_original_semantic_signoff": false,
   "modern_sword_compiled_or_published": false,
@@ -103,6 +103,78 @@
           "original_label": "4",
           "disposition": "OMIT_SPURIOUS_ENUMERATOR_LINK",
           "modern_context_anchor": "**Fourth, the feast of unleavened bread pictured the Christian life (1 Corinthians 5:7–8).**"
+        }
+      ]
+    },
+    {
+      "chapter": "Gen.21",
+      "source_first_key": "Gen.21.1",
+      "source_unit_sha256": "505ab0c3c598d1ae23b85eaacc2c96598ec4965eef65037a8382f5474c95294e",
+      "modern_path": "work/mhcc-modern/production/accepted/genesis-21.md",
+      "modern_section_heading": "Isaac's birth and Sarah's joy (verses 1–8)",
+      "witness_url": "https://ccel.org/ccel/henry/mhcc.ii.xxi.html",
+      "corrections": [
+        {
+          "source_link_ordinal": 4,
+          "original_target": "2Cor.11.2",
+          "original_label": "2",
+          "disposition": "RETARGET_VERIFIED_CONTINUATION_REFERENCE",
+          "modern_context_anchor": "(Psalm 22:9–10; Hosea 11:1–2)",
+          "corrected_target": "Hos.11.2"
+        }
+      ]
+    },
+    {
+      "chapter": "Exod.14",
+      "source_first_key": "Exod.14.21",
+      "source_unit_sha256": "adc933488cead9e903bfb390c14faeaa915202b36ec4e7c2bfc4f18eacb72eb3",
+      "modern_path": "work/mhcc-modern/production/accepted/exodus-14.md",
+      "modern_section_heading": "Israel crosses the sea; Egypt's army is destroyed (verses 21–31)",
+      "witness_url": "https://ccel.org/ccel/henry/mhcc.iii.xiv.html",
+      "corrections": [
+        {
+          "source_link_ordinal": 6,
+          "original_target": "2Cor.10.2",
+          "original_label": "2",
+          "disposition": "RETARGET_VERIFIED_CONTINUATION_REFERENCE",
+          "modern_context_anchor": "(1 Corinthians 10:1–2)",
+          "corrected_target": "1Cor.10.2"
+        }
+      ]
+    },
+    {
+      "chapter": "Exod.28",
+      "source_first_key": "Exod.28.15",
+      "source_unit_sha256": "a94a3fcfa3bf22fb197386bbe93fe0c4bc22bf6a240b1ba4f97467172676ebc2",
+      "modern_path": "work/mhcc-modern/production/accepted/exodus-28.md",
+      "modern_section_heading": "The breastplate; the Urim and Thummim (verses 15–30)",
+      "witness_url": "https://ccel.org/ccel/henry/mhcc.iii.xxviii.html",
+      "corrections": [
+        {
+          "source_link_ordinal": 2,
+          "original_target": "2Cor.1.2",
+          "original_label": "2",
+          "disposition": "RETARGET_VERIFIED_CONTINUATION_REFERENCE",
+          "modern_context_anchor": "(Hebrews 1:1–2; John 1:18)",
+          "corrected_target": "Heb.1.2"
+        }
+      ]
+    },
+    {
+      "chapter": "Exod.29",
+      "source_first_key": "Exod.29.1",
+      "source_unit_sha256": "d0920cde5a620f7ef49e6a299ba954e01444aed8f11ca45eb633ad6566457788",
+      "modern_path": "work/mhcc-modern/production/accepted/exodus-29.md",
+      "modern_section_heading": "Aaron and his sons are consecrated (verses 1–37)",
+      "witness_url": "https://ccel.org/ccel/henry/mhcc.iii.xxix.html",
+      "corrections": [
+        {
+          "source_link_ordinal": 4,
+          "original_target": "1Cor.1.6",
+          "original_label": "6",
+          "disposition": "RETARGET_VERIFIED_CONTINUATION_REFERENCE",
+          "modern_context_anchor": "(Revelation 1:5–6)",
+          "corrected_target": "Rev.1.6"
         }
       ]
     }
