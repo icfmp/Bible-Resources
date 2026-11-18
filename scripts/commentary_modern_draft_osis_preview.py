@@ -334,6 +334,46 @@ def _original_intro_candidates(root: Path, receipt: dict) -> dict:
 
 
 
+
+def same_scripture_reference_book_word(
+        witness_token: str, native_token: str, *,
+        source_book: str, next_word: str) -> bool:
+    """Check one source book-name display variant, never arbitrary prose.
+
+    A verified `Mic. 5` / `Micah 5` type difference is textual
+    presentation, not a new authorial assertion. Only a *single* lexical
+    book name preceding a numeric chapter is eligible, with both tokens
+    agreeing on the same canonical biblical book. The local `ch.`
+    abbreviation is allowed only when the other token explicitly names
+    this *source* book, not an unrelated referenced book.
+    """
+    if (not isinstance(witness_token,str) or
+            not isinstance(native_token,str) or
+            not isinstance(source_book,str) or
+            not re.fullmatch(r"[1-9][0-9]{0,2}",next_word)):
+        return False
+    from commentary_modern_reference_gate import _ENGLISH_NAME_BY_OSIS
+    codes={}
+    for osis,full in _ENGLISH_NAME_BY_OSIS.items():
+        for word in (osis.lower(),full.lower()):
+            if re.fullmatch(r"[a-z]+",word):
+                previous=codes.setdefault(word,osis)
+                if previous!=osis:
+                    raise ValueError("Ambiguous single-word biblical book alias")
+    a=witness_token.casefold()
+    b=native_token.casefold()
+    if a==b:
+        return False
+    left,right=codes.get(a),codes.get(b)
+    if left is not None and left==right:
+        return True
+    if a in {"ch","chapter"} and right==source_book:
+        return True
+    if b in {"ch","chapter"} and left==source_book:
+        return True
+    return False
+
+
 def overlay_native_first_K_book_prefaces(
         *, base_osis: bytes, native: dict, review: dict,
         candidates_dir: Path) -> tuple[bytes, dict]:
@@ -444,7 +484,10 @@ def overlay_native_first_K_book_prefaces(
                 raise ValueError("Modern existing book preface differs from candidate: "+book)
             already+=1
             state="PRESENT_IN_MODERN_FIRST_CHAPTER_EXACT_NO_DUPLICATION"
-        elif row.get("source_div1_prose_all_tokens_contiguous_in_original_first_K"):
+        elif (row.get("source_div1_prose_all_tokens_contiguous_in_original_first_K")
+              is True or
+              row.get("source_book_intro_one_scripture_alias_variation_supported")
+              is True):
             chapters[chapter].insert(0,intro)
             inserted+=1
             state="INSERTED_SEPARATE_MODERN_INTRO_FROM_VERIFIED_ORIGINAL_K"
