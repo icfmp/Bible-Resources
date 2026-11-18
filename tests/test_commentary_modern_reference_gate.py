@@ -13,7 +13,7 @@ from commentary_modern_reference_gate import (SourceReferenceGate,
     _unambiguous_explicit_modern_verse, _auto_single_verse_placements,
     _unrecognized_original_ref_class, _source_same_chapter_verse_range,
     _unambiguous_explicit_modern_range, _allowed_source_link_target,
-    _original_reference_table_ownership)
+    _original_reference_table_ownership, _original_reference_title_ownership)
 
 
 ORIGINAL=(b'<div><reference osisRef="Bible:1John.5.20">1Jo 5:20</reference>'
@@ -577,6 +577,16 @@ class ExactSingleVerseSourceConcordanceTests(unittest.TestCase):
             '</cell></row></table></div></div>')
         self.assertEqual(_original_reference_table_ownership(fragment),
                          [True,False,True])
+        self.assertEqual(_original_reference_title_ownership(fragment),
+                         [False,False,False])
+
+    def test_original_ranges_can_be_inside_a_title_not_a_table(self):
+        fragment=ET.fromstring(
+            '<div><title>Acts <reference osisRef="Acts.2.1-Acts.2.4">'
+            '1–4</reference></title><div><reference osisRef="John.1.1">'
+            'John 1:1</reference></div></div>')
+        self.assertEqual(_original_reference_title_ownership(fragment),[True,False])
+        self.assertEqual(_original_reference_table_ownership(fragment),[False,False])
 
     def test_full_original_same_chapter_range_and_exact_modern_citation(self):
         source="Bible:John.3.16-John.3.18"
