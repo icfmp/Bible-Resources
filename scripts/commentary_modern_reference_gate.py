@@ -553,6 +553,283 @@ def validate_proposed_link_dispositions(*, manifest: dict, native: dict,
     }
 
 
+
+def _wrap_exact_authored_modern_text(section: ET.Element, *, anchor: str,
+                                      display: str, occurrence: str,
+                                      target: str) -> None:
+    """Insert one reviewed Bible link without changing ANY modern visible prose.
+
+    One full authored citation anchor must be present in exactly one XML text
+    slot of one source-indexed section. No fuzzy search, source-word rewriting,
+    markup flattening or implicit verse guessing is permitted.
+    """
+    if (not isinstance(anchor, str) or not anchor or len(anchor) > 512
+            or not isinstance(display, str) or not display
+            or display not in anchor or occurrence not in ("first", "last")
+            or canonical_only_for_comparison(target) is None):
+        raise ValueError("Invalid reviewed modern citation/text placement")
+    positions = []
+    for node in section.iter():
+        if node.tag.rsplit("}", 1)[-1] == "reference":
+            raise ValueError("Do not overlay onto an already source-linked section")
+        for kind in ("text", "tail"):
+            slot = getattr(node, kind)
+            if isinstance(slot, str) and anchor in slot:
+                for _ in range(slot.count(anchor)):
+                    positions.append((node, kind, slot))
+    if len(positions) != 1:
+        raise ValueError("Reviewed modern citation anchor is missing or ambiguous")
+    node, kind, original = positions[0]
+    anchor_start = original.find(anchor)
+    inner_at = (anchor.rfind(display) if occurrence == "last"
+                else anchor.find(display))
+    if inner_at < 0:
+        raise ValueError("Reviewed linked text missing inside its full anchor")
+    start = anchor_start + inner_at
+    end = start + len(display)
+    before, after = original[:start], original[end:]
+    old_prose = "".join(section.itertext())
+    ref = ET.Element("{http://www.bibletechnologies.net/2003/OSIS/namespace}reference",
+                     {"osisRef": target})
+    ref.text = display
+    ref.tail = after
+    if kind == "text":
+        node.text = before
+        node.insert(0, ref)
+    else:
+        parent = next((p for p in section.iter() if node in list(p)), None)
+        if parent is None:
+            raise ValueError("Reviewed citation tail has no XML parent")
+        node.tail = before
+        parent.insert(list(parent).index(node) + 1, ref)
+    if "".join(section.itertext()) != old_prose:
+        raise ValueError("Link insertion must not modify modern authorial visible text")
+
+
+def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
+                                    native: dict, identities: dict,
+                                    dispositions: dict, repo_root: Path,
+                                    reader: Path, module_directory: Path,
+                                    module_id: str) -> tuple[bytes, dict]:
+    """Authenticate and place an explicitly bounded set of source-backed links.
+
+    Real original SWORD attributes stay in private memory/isolated new OSIS,
+    never in logs or metadata-only CI artifacts. This is one technical batch;
+    it does not assert the 1,204 original source links have been transferred.
+    """
+    from commentary_modern_draft_osis_preview import NS, _range
+    if (placements.get("status") !=
+            "PRIVATE_REVIEWED_BOUNDED_LINK_PLACEMENT_NOT_FINAL_EDIT_OR_RELEASE"
+            or placements.get("published_source_module") != "MHCC 0.1.1"
+            or any(placements.get(k) is not False for k in
+                ("source_original_changed", "modern_prose_modified",
+                 "independent_semantic_and_link_review_approved",
+                 "publication_authorized"))):
+        raise ValueError("Link placement manifest may not declare approval")
+    pin = placements.get("published_source_corpus_sha256")
+    if (pin != native.get("original_compiled_corpus_sha256")
+            or pin != identities.get("whole_native_source_sha256")
+            or pin != "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e"
+            or native.get("source_prose_or_original_markup_exported") is not False
+            or identities.get("status") != WholeCanonOriginalLinkIdentityReceipt.STATUS
+            or identities.get("original_reference_elements_verified") != 1204):
+        raise ValueError("Missing complete authenticated original native reference source")
+    correction_receipt = validate_proposed_link_dispositions(
+        manifest=dispositions, native=native, identities=identities,
+        repository_root=repo_root)
+    if (not correction_receipt["source_link_target_and_label_hashes_checked_in_original_order"]
+            or correction_receipt["original_link_proposal_actions_reviewed"] != 17):
+        raise ValueError("Existing proposed error corrections not source-attested")
+    proposed = placements.get("placements")
+    if not isinstance(proposed, list) or not 1 <= len(proposed) <= 40:
+        raise ValueError("Private bounded link placement list missing")
+    groups = {r["first_key"]: r for r in identities["source_link_groups"]}
+    requested = set()
+    seen = set()
+    correction_by_key = {
+        (case["source_first_key"], edit["source_link_ordinal"]):
+        edit for case in dispositions["cases"]
+        for edit in case["corrections"]
+    }
+    addition_by_key = {
+        (case["source_first_key"], item["target"]): item
+        for case in dispositions["cases"]
+        for item in case.get("modern_witness_links", [])
+    }
+    counted = {"COPY_EXACT_AUTHENTIC_SOURCE": 0,
+               "CORRECT_AUTHENTIC_WRONG_TARGET": 0,
+               "ADD_AUTHORED_UNLINKED_SOURCE_WITNESS": 0}
+    for row in proposed:
+        chapter = row.get("modern_chapter")
+        first = row.get("source_first_key")
+        action = row.get("action")
+        dest = row.get("expected_modern_target")
+        ordinal = row.get("original_link_ordinal")
+        if (not isinstance(chapter, str) or not isinstance(first, str)
+                or not first.startswith(chapter+".") or action not in counted
+                or not isinstance(dest, str) or not _REF.fullmatch(dest)
+                or not isinstance(row.get("modern_anchor"), str)
+                or not isinstance(row.get("linked_display_text"), str)):
+            raise ValueError("Malformed source-owned modern link placement")
+        key = (first, ordinal, dest)
+        if key in seen:
+            raise ValueError("Duplicate modern link placement from original source")
+        seen.add(key)
+        units = native["chapters"].get(chapter, {}).get("original_units", [])
+        source_unit = next((g for g in units if g["first_key"] == first), None)
+        identity = groups.get(first)
+        if (source_unit is None or identity is None
+                or identity["source_raw_sha256"] != source_unit["source_unit_sha256"]):
+            raise ValueError("Unattested original K group for modern link placement")
+        if action == "ADD_AUTHORED_UNLINKED_SOURCE_WITNESS":
+            if "original_link_ordinal" in row:
+                raise ValueError("Cannot invent an original linked-element ordinal")
+            witness = addition_by_key.get((first, dest))
+            if (witness is None or
+                    witness.get("modern_text_marker") != row["modern_anchor"]):
+                raise ValueError("Added link lacks actual independent source witness disposition")
+        else:
+            if type(ordinal) is not int or not 1 <= ordinal <= identity["reference_count"]:
+                raise ValueError("Original link placement lacks exact source occurrence ordinal")
+            correction = correction_by_key.get((first, ordinal))
+            if action == "COPY_EXACT_AUTHENTIC_SOURCE" and correction is not None:
+                raise ValueError("Never copy a known wrong/spurious original hyperlink")
+            if action == "CORRECT_AUTHENTIC_WRONG_TARGET":
+                if (correction is None or correction.get("disposition") !=
+                        "RETARGET_VERIFIED_CONTINUATION_REFERENCE"
+                        or correction.get("corrected_target") != dest):
+                    raise ValueError("Proposed corrected target is not independently documented")
+        requested.add(first)
+        counted[action] += 1
+    if not reader.is_file() or not module_directory.is_dir() or module_id != "MHCC":
+        raise ValueError("Only isolated published MHCC original SWORD reader is supported")
+    private_original = {}
+    env = os.environ.copy()
+    env["SWORD_PATH"] = str(module_directory.resolve())
+    def observe(kind: str, key: str, raw: bytes):
+        if kind != "K" or key not in requested:
+            return
+        if key in private_original:
+            raise ValueError("Original first-K raw source repeated")
+        chapter = key.rsplit(".", 1)[0]
+        original_unit = next(r for r in native["chapters"][chapter]["original_units"]
+                             if r["first_key"] == key)
+        identity = groups[key]
+        if hashlib.sha256(raw).hexdigest() != original_unit["source_unit_sha256"]:
+            raise ValueError("Original K body failed source-pinned SHA verification")
+        refs = []
+        node = ET.fromstring(b"<original>" + raw + b"</original>")
+        for element in node.iter():
+            if isinstance(element.tag, str) and element.tag.rsplit("}",1)[-1] == "reference":
+                literal = element.attrib.get("osisRef")
+                if not isinstance(literal, str) or not literal:
+                    raise ValueError("Invalid original source-native hyperlink target")
+                label = "".join(element.itertext())
+                refs.append((literal, label))
+        if len(refs) != identity["reference_count"]:
+            raise ValueError("Original linked-element count differs from real native ledger")
+        for n, (literal, label) in enumerate(refs):
+            if (hashlib.sha256(literal.encode("utf-8")).hexdigest() !=
+                    identity["original_osisRef_sha256_in_document_order"][n]
+                    or hashlib.sha256(label.encode("utf-8")).hexdigest() !=
+                    identity["original_visible_link_label_sha256_in_document_order"][n]):
+                raise ValueError("Original link identity or order differs from authenticated ledger")
+        private_original[key] = refs
+    proc = subprocess.Popen([str(reader.resolve()), module_id], env=env,
+                            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    try:
+        if proc.stdout is None:
+            raise ValueError("No private full-original source stream")
+        source_report, *_ = parse_native_raw_corpus(proc.stdout, on_entry=observe)
+        proc.stdout.close()
+        if proc.wait(timeout=45) != 0:
+            raise ValueError("Original native SWORD stream failed to complete")
+    finally:
+        if proc.poll() is None:
+            proc.kill()
+            proc.wait()
+    if (source_report["all_native_raw_entries_ordered_sha256"] != pin
+            or set(private_original) != requested):
+        raise ValueError("Unverified original whole corpus SHA or missing original source K")
+    doc = ET.fromstring(base_osis)
+    if any(x.tag == f"{{{NS}}}reference" for x in doc.iter()):
+        raise ValueError("Source-link overlay accepts only the fully UNLINKED candidate")
+    modern_chapters = {
+        node.attrib["osisID"]: node for node in doc.iter()
+        if node.tag == f"{{{NS}}}chapter"
+    }
+    if len(modern_chapters) != 1189:
+        raise ValueError("Source-linked OSIS needs all 1189 modern chapters")
+    original_visible = "".join(doc.itertext())
+    inserted = []
+    for row in proposed:
+        chapter, first = row["modern_chapter"], row["source_first_key"]
+        units = native["chapters"][chapter]["original_units"]
+        nth = next(i for i, item in enumerate(units) if item["first_key"] == first)
+        sections = modern_chapters[chapter].findall(
+            f"./{{{NS}}}div[@annotateType='commentary']")
+        if len(sections) != len(units):
+            raise ValueError("Modern OSIS original authorial section count drift")
+        section = sections[nth]
+        if section.attrib.get("annotateRef") != _range(units[nth]["keys"]):
+            raise ValueError("Modern OSIS commentary verse scope differs from native source")
+        ordinal = row.get("original_link_ordinal")
+        action = row["action"]
+        if action == "ADD_AUTHORED_UNLINKED_SOURCE_WITNESS":
+            actual_target = row["expected_modern_target"]
+        else:
+            original_literal = private_original[first][ordinal-1][0]
+            original_canon = canonical_only_for_comparison(original_literal)
+            if action == "COPY_EXACT_AUTHENTIC_SOURCE":
+                if original_canon != row["expected_modern_target"]:
+                    raise ValueError("Original link copy target differs from native literal")
+                actual_target = original_literal
+            else:
+                correction = correction_by_key[(first, ordinal)]
+                if original_canon != correction["original_target"]:
+                    raise ValueError("Correction original link was not its attested literal")
+                actual_target = row["expected_modern_target"]
+        _wrap_exact_authored_modern_text(
+            section, anchor=row["modern_anchor"],
+            display=row["linked_display_text"],
+            occurrence=row["display_occurrence"], target=actual_target)
+        inserted.append({"chapter": chapter, "original_source_first_key": first,
+                         "original_link_ordinal": ordinal,
+                         "placement_action": action,
+                         "derived_target_sha256": hashlib.sha256(
+                            actual_target.encode("utf-8")).hexdigest()})
+    if "".join(doc.itertext()) != original_visible:
+        raise ValueError("Modern commentary wording changed while adding source links")
+    embedded = [x for x in doc.iter() if x.tag == f"{{{NS}}}reference"]
+    if len(embedded) != len(proposed):
+        raise ValueError("Wrong source-anchored link count after modern OSIS insertion")
+    output = ET.tostring(doc, encoding="utf-8", xml_declaration=True)
+    ET.fromstring(output)
+    return output, {
+        "status":"PRIVATE_REVIEWED_LINKED_FULL_CANON_OSIS_CANDIDATE_NOT_RELEASED",
+        "full_original_native_corpus_sha256":pin,
+        "modern_chapters_preserved":1189,
+        "source_pinned_original_K_bodies_revisited":len(requested),
+        "modern_inline_links_inserted":len(embedded),
+        "actual_original_links_copied_without_correction":counted[
+            "COPY_EXACT_AUTHENTIC_SOURCE"],
+        "documented_wrong_original_links_retargeted":counted[
+            "CORRECT_AUTHENTIC_WRONG_TARGET"],
+        "source_witness_authored_missing_original_link_added":counted[
+            "ADD_AUTHORED_UNLINKED_SOURCE_WITNESS"],
+        "source_prose_modified":False,
+        "modern_visible_prose_modified":False,
+        "original_source_link_identity_hashes_and_order_verified":True,
+        "modern_linked_osis_sha256":hashlib.sha256(output).hexdigest(),
+        "published_source_1204_links_fully_transferred":False,
+        "remaining_source_links_require_individual_placement_review":True,
+        "modern_SWORD_readback_verified":False,
+        "independent_editorial_semantic_signoff":False,
+        "publication_authorized":False,
+        "insertions":inserted,
+    }
+
+
 def main():
     p=argparse.ArgumentParser()
     p.add_argument("--native-reader",required=True,type=Path)
