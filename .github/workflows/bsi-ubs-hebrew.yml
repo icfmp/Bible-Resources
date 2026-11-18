@@ -43,3 +43,10 @@ jobs:
             ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-fr.JSON \
             macula-hebrew/WLC/tsv/macula-hebrew.tsv
+
+      - name: Audit exact bilingual sense IDs and Macula sdbh coverage
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/analyze_alignment.py \
+            ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
+            ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-fr.JSON \
+            macula-hebrew/WLC/tsv/macula-hebrew.tsv
