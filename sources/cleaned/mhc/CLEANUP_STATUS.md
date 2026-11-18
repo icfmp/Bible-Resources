@@ -86,6 +86,45 @@ were removed.
 text collation, a verified new scholarly edition, Xiphos/AndBible GUI approval,
 a rights clearance, or publication of a cleaned OSIS/SWORD artifact.
 
+## Source link triage — 25 non-canonical machine-reference forms
+
+**Verified private source examination:**
+[GitHub Actions #44272465420](https://github.com/icfmp/Bible-Resources/actions/runs/44272465420),
+on the same pinned source and cleaned private candidate. Full native SWORD
+comparison and repository validation also passed on this revision.
+
+The generic `audit_osis.py` reports **25 syntactically unreviewed
+`reference/@osisRef` values**. Their actual machine-reference strings
+and enclosing source book were examined individually without exporting
+commentary prose.
+
+- **6** contain only chapter/verse numbers, missing the Bible book code:
+  observed in source books Genesis (line 3108), Exodus (7237), Job (32130),
+  Psalms (37835, 41584) and Proverbs (47698). A missing book code must
+  **not** be inferred blindly from the containing commentary book:
+  `18.24` at Job line 32130, for example, cannot be identified
+  as Job 18:24 because that verse does not exist.
+- **19** are multi-passage shorthand strings mixing book names,
+  abbreviated chapters, verses and numeric ranges. They include
+  source book aliases such as `Pr`, `2Ki`, `La`, `1Ti` and
+  `2Pe`. These are source machine-address strings, not 19
+  proven corrupt verses.
+- No confirmed missing `osisRef` attribute or duplicate annotated
+  commentary scope was reported by this diagnostic. The upstream
+  source's visible prose has not been edited.
+
+**Technical action:** do not automatically prepend the enclosing book
+to a numeric target and do not convert composite strings by splitting on
+spaces. A correction proposal must establish the intended Bible book and
+range from the displayed original reference, compare against an independent
+witness where possible, and verify each proposed endpoint against the
+declared KJV versification. Keep the original source `osisRef`, exact
+line, SHA-256 and proposed normalized target in a reversible private plan.
+Only then compile and test each corrected link in a real SWORD reader.
+
+This makes reference repair a distinct reviewed step from the already
+proven no-word-loss mechanical OSIS cleanup.
+
 ## Next review, kept separate
 
 1. Investigate *actual* source-structure anomalies using source-defined
