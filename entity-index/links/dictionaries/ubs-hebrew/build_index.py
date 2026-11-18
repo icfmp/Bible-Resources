@@ -223,6 +223,21 @@ def build_word_links(index, english, macula):
                 if unicodedata.normalize("NFC", by_entry[mid]["Lemma"]) == normalized
             ]
             match_type = "exact_lemma"
+            if not matching:
+                # The 0.9.4 dictionary itself publishes AlternateLemmas.
+                # These spellings, unlike inferred orthographic variants,
+                # are authoritative editorial entry aliases. Strong family
+                # and unique UBS headword are still mandatory.
+                matching = [
+                    mid for mid in numeric_family.get(family, set())
+                    if any(
+                        unicodedata.normalize("NFC", alternate) == normalized
+                        for alternate in (by_entry[mid].get("AlternateLemmas") or [])
+                        if isinstance(alternate, str)
+                    )
+                ]
+                if matching:
+                    match_type = "ubs_original_alternate_lemma_same_strong_family"
             if not matching and row["class"] in ("verb", "noun", "adj", "adv"):
                 # Different vocalization is allowed only with independent
                 # numeric Strong-family agreement and a unique consonantal
@@ -301,6 +316,8 @@ def lookup_word(index, word_id, sdbh, strongnumberx, lang, lemma):
             if record.get("match_type") == "exact_lemma_and_original_sdbh_owning_ubs_entry"
             else "macula_word_consonants_and_source_sdbh_ubs_owner_entry_only"
             if record.get("match_type") == "consonants_and_original_sdbh_owning_ubs_entry"
+            else "macula_word_ubs_published_alternate_lemma_same_strong_family"
+            if record.get("match_type") == "ubs_original_alternate_lemma_same_strong_family"
             else "macula_word_exact_lemma_unique_entry_within_ubs_strong_family"
         ),
     }
@@ -325,6 +342,7 @@ def audit_word_links(index, macula):
                 "macula_word_nonverb_consonants_unique_entry_same_strong_family",
                 "macula_word_exact_lemma_and_source_sdbh_ubs_owner_entry_only",
                 "macula_word_consonants_and_source_sdbh_ubs_owner_entry_only",
+                "macula_word_ubs_published_alternate_lemma_same_strong_family",
             ):
                 results["additional_entry_only_links"] += 1
                 results[new["evidence"]] += 1
