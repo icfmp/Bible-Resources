@@ -101,6 +101,7 @@ jobs:
           profile=receipt["original_markup_profile"]
           print("Emphasis style labels/counts:",profile["hi_emphasis_type_counts"])
           print("Emphasis text-length bands:",profile["hi_visible_length_band_counts"])
+          print("Truly empty emphasis elements:",profile["truly_empty_hi_leaf_shape_counts"])
           print("Emphasis immediate XML owners:",profile["hi_direct_parent_counts"])
           print("NBSP source XML owners:",profile["nonbreaking_spaces_by_xml_owner"])
           print("All elements, attributes, note bodies, link bodies retained")
