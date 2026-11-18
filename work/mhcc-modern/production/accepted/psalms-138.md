@@ -23,7 +23,7 @@ When we can praise the Lord with all our hearts, we should not hesitate to let t
 
 Those who depend on God's **lovingkindness and truth through Jesus Christ** will always find him faithful to his word.
 
-If God did not spare his own Son, will he not also freely give us everything we need together with him?
+If God did not spare his own Son, will he not also freely give us all things with him?
 
 The Lord may strengthen our souls even while outward affliction remains.
 
@@ -56,6 +56,8 @@ He will complete the salvation of every genuine believer and will not abandon th
 ---
 
 ## Editorial review — Psalm 138
+
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Preserved Henry's unrestricted *all things* in the Romans 8:32 allusion, rather than narrowing it to *everything we need*. This records the commentator's biblical phrasing without asserting material prosperity. Exact native links and independent approval remain outstanding.
 
 **Whole English witness read:** [CCEL, Psalm 138](https://ccel.org/ccel/henry/mhcc.xx.cxxxviii.html). Published `MHCC 0.1.1` source remains authoritative for native SWORD and independent QA.
 
