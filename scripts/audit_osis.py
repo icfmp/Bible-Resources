@@ -344,7 +344,9 @@ def compare_source_milestone_index(path: Path, *,
 
 
 
-def source_commentary_overlap_witness(path: Path) -> tuple[dict, set[str]]:
+def source_commentary_overlap_witness(
+        path: Path, *, groups_out: list | None = None
+) -> tuple[dict, set[str]]:
     """Observe overlapping authorial verse-group bodies without rewriting them.
 
     A group may span many verse IDs. This private in-memory witness retains
@@ -394,6 +396,10 @@ def source_commentary_overlap_witness(path: Path) -> tuple[dict, set[str]]:
         raise ValueError("Original commentary verse group remains unclosed")
     if len(groups)==0:
         raise ValueError("No actual original authored commentary groups")
+    if groups_out is not None:
+        if not isinstance(groups_out,list) or groups_out:
+            raise ValueError("Private source group output must be an empty list")
+        groups_out.extend(groups)
     overlapping={
         key:tuple(chapters) for key,chapters in owners.items()
         if len(chapters)>1
@@ -522,6 +528,85 @@ def compare_source_overlap_native_bodies(
         "all_word_streams_in_source_evaluated":True,
         "notes_markup_and_independent_editions_not_verified":True,
         "source_or_sword_edited_or_released":False,
+    }
+
+
+def compare_all_commentary_source_group_words(
+        groups: list[dict], native_first_raw: dict[str,bytes],
+        *, max_cases: int = 50) -> dict:
+    """Read every authored source group against its compiled native first key.
+
+    Stronger than a native key count. A missing 40-word block is a REVIEW
+    finding, not proof that particular Bible words were never authored.
+    No source prose, note body, inline XML or raw SWORD is released.
+    """
+    from lxml import etree
+    if (not isinstance(groups,list) or not 1 <= len(groups) <= 100000
+            or not isinstance(native_first_raw,dict)
+            or not 0 <= max_cases <= 100):
+        raise ValueError("Unbounded or missing source/native groups")
+    first_refs={g["keys"][0] for g in groups if g.get("keys")}
+    if not first_refs or first_refs!=set(native_first_raw):
+        raise ValueError("Native first-key raw frames do not match source groups")
+    native_words={}
+    for key,raw in native_first_raw.items():
+        if not isinstance(raw,bytes) or len(raw)>2*1024*1024:
+            raise ValueError("Oversized or non-binary native commentary body")
+        parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
+                               no_network=True,recover=False,huge_tree=False)
+        try:
+            root=etree.fromstring(b"<fragment>"+raw+b"</fragment>",parser)
+        except (ValueError,etree.XMLSyntaxError):
+            raise ValueError("Unparseable compiled native commentary body") from None
+        native_words[key]=" ".join(re.findall(r"\w+",
+                                              "".join(root.itertext()).casefold()))
+    counts=Counter()
+    problematic=[]
+    for group in groups:
+        if not isinstance(group.get("text"),str) or not group.get("keys"):
+            raise ValueError("Invalid private source group body or verse scope")
+        ref=group["keys"][0]
+        words=" ".join(re.findall(r"\w+",group["text"].casefold()))
+        tokens=words.split()
+        compiled=native_words[ref]
+        counts["authored_groups_checked"]+=1
+        if not tokens:
+            counts["source_groups_without_word_tokens"]+=1
+            continue
+        counts["authored_word_tokens_checked"]+=len(tokens)
+        if words in compiled:
+            counts["groups_with_contiguous_full_source_word_stream"]+=1
+            continue
+        chunks=[tokens[i:i+40] for i in range(0,len(tokens),40)]
+        hits=sum((" "+" ".join(chunk)+" ") in (" "+compiled+" ")
+                 for chunk in chunks)
+        counts["groups_without_full_contiguous_word_match"]+=1
+        counts["unmatched_group_40word_chunks"]+=len(chunks)-hits
+        if hits==len(chunks):
+            counts["groups_with_all_40word_chunks_present"]+=1
+        else:
+            counts["groups_with_missing_40word_chunks"]+=1
+            if len(problematic)<max_cases:
+                problematic.append({
+                    "source_line":group["line"],
+                    "source_section":group["sID"],
+                    "native_first_ref":ref,
+                    "source_word_count":len(tokens),
+                    "source_word_stream_sha256":hashlib.sha256(
+                        words.encode("utf-8")).hexdigest(),
+                    "source_40word_chunks":len(chunks),
+                    "chunks_present_in_native_first_key":hits,
+                })
+    return {
+        "schema_version":1,
+        "status":("PRIVATE_ALL_AUTHORED_GROUP_WORD_BLOCKS_PRESENT_NOT_NOTE_PARITY"
+                  if not counts["groups_with_missing_40word_chunks"] else
+                  "PRIVATE_SOURCE_NATIVE_GROUP_WORDS_REQUIRE_REVIEW"),
+        "counts":dict(sorted(counts.items())),
+        "bounded_reference_only_missing_word_cases":problematic,
+        "entire_authorial_source_reviewed_against_native_keys":True,
+        "exact_note_and_markup_parity_verified":False,
+        "published":False,
     }
 
 
