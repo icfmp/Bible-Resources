@@ -684,6 +684,7 @@ def _auto_single_verse_placements(*, private_original: dict, groups: dict,
     from commentary_modern_draft_osis_preview import NS, _range
     found = []
     skipped = {"already_reviewed": 0, "proposed_original_correction": 0,
+               "unsupported_original_reference_syntax": 0,
                "repeated_original_target": 0, "unverified_or_single_digit_label": 0,
                "no_unique_full_modern_verse_citation": 0}
     for first, links in private_original.items():
@@ -697,7 +698,15 @@ def _auto_single_verse_placements(*, private_original: dict, groups: dict,
         section = sections[ordinal]
         if section.get("annotateRef") != _range(units[ordinal]["keys"]):
             raise ValueError("Auto lookup cannot use a non-original commentary scope")
-        targets = [canonical_only_for_comparison(literal) for literal, _ in links]
+        targets=[]
+        for literal, _ in links:
+            try:
+                targets.append(canonical_only_for_comparison(literal))
+            except ValueError:
+                # Original source can legitimately use ranges, unusual
+                # identifiers or bad historic hyperlinks. Identity is already
+                # attested above; their disposition is manual, never guessed.
+                targets.append(None)
         for pos, (literal, label) in enumerate(links, 1):
             key = (first, pos)
             if key in blocked:
@@ -707,6 +716,9 @@ def _auto_single_verse_placements(*, private_original: dict, groups: dict,
                 skipped["proposed_original_correction"] += 1
                 continue
             canon = targets[pos-1]
+            if canon is None:
+                skipped["unsupported_original_reference_syntax"] += 1
+                continue
             if targets.count(canon) != 1:
                 skipped["repeated_original_target"] += 1
                 continue
