@@ -474,6 +474,23 @@ def compare_source_overlap_native_bodies(
         if not matching and chunk_fraction is not None and chunk_fraction<1:
             counts["no_contiguous_match_with_some_unmatched_40word_blocks"]+=1
         counts[classification]+=1
+        # Independent stronger missing-text check: fixed long word shingles
+        # from start, quarters, midpoint and end of EACH authored source.
+        # Full contiguous prose can fail when XML import inserts labels or
+        # nested notes, whereas a truly dropped section has no native shingles.
+        parts=words.split()
+        width=min(24,max(4,len(parts)//6)) if parts else 0
+        positions=(sorted(set(
+            (0,(len(parts)-width)//4,(len(parts)-width)//2,
+             3*(len(parts)-width)//4,len(parts)-width)))
+            if width else [])
+        shingles=[" ".join(parts[pos:pos+width]) for pos in positions]
+        hit_count=sum(any(shingle in native_words[key]
+                          for key in group["keys"]) for shingle in shingles)
+        counts["source_group_shingles_checked"]+=len(shingles)
+        counts["source_group_shingles_found_in_native"]+=hit_count
+        if shingles and not hit_count:
+            counts["source_groups_with_zero_native_shingle_evidence"]+=1
         if len(cases)<max_cases:
             cases.append({
                 "source_xml_line":group["line"],
@@ -483,6 +500,9 @@ def compare_source_overlap_native_bodies(
                 "full_source_word_stream_sha256":hashlib.sha256(
                     words.encode("utf-8")).hexdigest(),
                 "indexed_key_word_sequence_matches":len(matching),
+                "fixed_source_shingles_checked":len(shingles),
+                "fixed_source_shingles_found_in_any_claimed_native_key":hit_count,
+                "source_shingle_word_width":width,
                 "first_matching_native_key":matching[0] if matching else None,
                 "source_words_in_order_native_keys":len(ordered_keys),
                 "source_40word_chunk_count":len(chunks),
