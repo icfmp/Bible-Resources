@@ -297,7 +297,42 @@
         "14028019",
         "14028023",
         "14028026",
-        "14028027"
+        "14028027",
+        "13015012",
+        "13015014",
+        "13015025",
+        "13023001",
+        "13023002",
+        "13023025",
+        "13024019",
+        "14029007",
+        "14029010",
+        "14029024",
+        "14029027",
+        "14030006",
+        "14030021",
+        "14030025",
+        "14030026",
+        "14031005",
+        "14031006",
+        "14031008",
+        "14034007",
+        "14034009",
+        "14034021",
+        "14034023",
+        "14034026",
+        "14034033",
+        "14035003",
+        "14035004",
+        "14035017",
+        "14035025",
+        "14035027",
+        "16010034",
+        "16010040",
+        "16013002",
+        "16013003",
+        "16013018",
+        "16013026"
       ],
       "remove_explicit_instances": {
         "wlc": [
@@ -381,6 +416,171 @@
           ],
           [
             "o140280270131"
+          ],
+          [
+            "o130150030051"
+          ],
+          [
+            "o130150120151"
+          ],
+          [
+            "o130150140091"
+          ],
+          [
+            "o130150250041"
+          ],
+          [
+            "o130150280021"
+          ],
+          [
+            "o130230010101"
+          ],
+          [
+            "o130230020051"
+          ],
+          [
+            "o130230250071"
+          ],
+          [
+            "o130240190151"
+          ],
+          [
+            "o140290070161"
+          ],
+          [
+            "o140290100081"
+          ],
+          [
+            "o140290240101"
+          ],
+          [
+            "o140290240131"
+          ],
+          [
+            "o140290270181"
+          ],
+          [
+            "o140300010051"
+          ],
+          [
+            "o140300010211"
+          ],
+          [
+            "o140300050061"
+          ],
+          [
+            "o140300050161"
+          ],
+          [
+            "o140300060081"
+          ],
+          [
+            "o140300060141"
+          ],
+          [
+            "o140300060212"
+          ],
+          [
+            "o140300210031"
+          ],
+          [
+            "o140300250102"
+          ],
+          [
+            "o140300250141"
+          ],
+          [
+            "o140300260111"
+          ],
+          [
+            "o140310010061"
+          ],
+          [
+            "o140310010291"
+          ],
+          [
+            "o140310050051"
+          ],
+          [
+            "o140310060021"
+          ],
+          [
+            "o140310080121"
+          ],
+          [
+            "o140340070141"
+          ],
+          [
+            "o140340090221"
+          ],
+          [
+            "o140340210082"
+          ],
+          [
+            "o140340230071"
+          ],
+          [
+            "o140340260151"
+          ],
+          [
+            "o140340330101"
+          ],
+          [
+            "o140340330152"
+          ],
+          [
+            "o140350030061"
+          ],
+          [
+            "o140350030201"
+          ],
+          [
+            "o140350030321"
+          ],
+          [
+            "o140350040081"
+          ],
+          [
+            "o140350170031"
+          ],
+          [
+            "o140350180052"
+          ],
+          [
+            "o140350180111"
+          ],
+          [
+            "o140350180222"
+          ],
+          [
+            "o140350250171"
+          ],
+          [
+            "o140350270091"
+          ],
+          [
+            "o160100340141"
+          ],
+          [
+            "o160100400061"
+          ],
+          [
+            "o160120470021"
+          ],
+          [
+            "o160130020061"
+          ],
+          [
+            "o160130030082"
+          ],
+          [
+            "o160130180191"
+          ],
+          [
+            "o160130260071"
+          ],
+          [
+            "o160130260221"
           ]
         ]
       },
@@ -433,7 +633,7 @@
           ]
         ]
       },
-      "reason": "Exodus 3:18 says 'elders of Israel' and speaks of the Israelite people centuries after Jacob; its proper-name Israel word and plural representative roles do not identify the deceased patriarch Jacob/Israel. In 1 Kings 5:5 Israel is a contemporary people dwelling safely under Solomon, not the long-dead patriarch Jacob; in Nehemiah 11:3 the name explicitly means the Israelite residents of Persian-era Judah, not Jacob. The singular 'each person' words inherit participant links to communities, not historical persons. Remove only these two complete verse-specific false-person groups. Jeremiah 33:10 the demonstrative 'this' indicates the desolate place in Judah/Israel awaiting restoration, not a historical reference to the deceased patriarch Israel/Jacob; remove only his incorrect indirect claim. Malachi 2:10 speaks as the living covenant community ('we', 'each one', 'our fathers') and cannot assign three present-day discourse words to the deceased founder Israel/Jacob. Retain the source's other participating people/collective links without automatically asserting an identity. 2 Chronicles 11:3 names 'all Israel in Judah and Benjamin' as the people commanded alongside Rehoboam; 11:4 orders these living representatives not to fight their brothers and to return home. The singular distributive 'each man' and six plural/infinitive action words cannot refer to the patriarch Jacob/Israel long deceased before this divided kingdom context. The frozen person:Israel name and seven referent tokens are retained in the original witness, but detached only from the derived historical-person entry. Deuteronomy 12:8 the plural 'you' and first-plural 'we' concern the living covenant community and Moses speaking in the wilderness, not Jacob centuries after his death. Pinned Macula source participantref on 'we' and distributive 'each' includes Moses and the contemporary people, rather than the historical founder. Isaiah 53:6's 'we all' and 'each' are an inclusive collective confession within the prophet's poem; the historical individual Jacob/Israel cannot be an independent living speaker here. Remove only these precisely attested false person:Israel words, without asserting that this interpretively debated prophetic 'we' exclusively denotes group:Israel. Jeremiah 51:6 directly orders the contemporary deportees to flee Babylon and for 'each person' to save his life, followed by a further second-person-plural warning. Both frozen historical-person records person:Israel (Jacob) and person:Judah.4 (Jacob's son) wrongly claim all four exact speech/imperative words, although neither ancient patriarch was alive during the Babylonian exile. Detach only these original person-to-word claims in the derived index; the frozen group:Judah source record already retains all four exact word groups. Batch follow-up (2 Chronicles 1, 5, 11, 23, 28): these exact word occurrences designate contemporary Israelite communities; source wording and original frozen witness remain untouched.",
+      "reason": "Exodus 3:18 says 'elders of Israel' and speaks of the Israelite people centuries after Jacob; its proper-name Israel word and plural representative roles do not identify the deceased patriarch Jacob/Israel. In 1 Kings 5:5 Israel is a contemporary people dwelling safely under Solomon, not the long-dead patriarch Jacob; in Nehemiah 11:3 the name explicitly means the Israelite residents of Persian-era Judah, not Jacob. The singular 'each person' words inherit participant links to communities, not historical persons. Remove only these two complete verse-specific false-person groups. Jeremiah 33:10 the demonstrative 'this' indicates the desolate place in Judah/Israel awaiting restoration, not a historical reference to the deceased patriarch Israel/Jacob; remove only his incorrect indirect claim. Malachi 2:10 speaks as the living covenant community ('we', 'each one', 'our fathers') and cannot assign three present-day discourse words to the deceased founder Israel/Jacob. Retain the source's other participating people/collective links without automatically asserting an identity. 2 Chronicles 11:3 names 'all Israel in Judah and Benjamin' as the people commanded alongside Rehoboam; 11:4 orders these living representatives not to fight their brothers and to return home. The singular distributive 'each man' and six plural/infinitive action words cannot refer to the patriarch Jacob/Israel long deceased before this divided kingdom context. The frozen person:Israel name and seven referent tokens are retained in the original witness, but detached only from the derived historical-person entry. Deuteronomy 12:8 the plural 'you' and first-plural 'we' concern the living covenant community and Moses speaking in the wilderness, not Jacob centuries after his death. Pinned Macula source participantref on 'we' and distributive 'each' includes Moses and the contemporary people, rather than the historical founder. Isaiah 53:6's 'we all' and 'each' are an inclusive collective confession within the prophet's poem; the historical individual Jacob/Israel cannot be an independent living speaker here. Remove only these precisely attested false person:Israel words, without asserting that this interpretively debated prophetic 'we' exclusively denotes group:Israel. Jeremiah 51:6 directly orders the contemporary deportees to flee Babylon and for 'each person' to save his life, followed by a further second-person-plural warning. Both frozen historical-person records person:Israel (Jacob) and person:Judah.4 (Jacob's son) wrongly claim all four exact speech/imperative words, although neither ancient patriarch was alive during the Babylonian exile. Detach only these original person-to-word claims in the derived index; the frozen group:Judah source record already retains all four exact word groups. Batch follow-up (2 Chronicles 1, 5, 11, 23, 28): these exact word occurrences designate contemporary Israelite communities; source wording and original frozen witness remain untouched. Historical narrative source-name batch: Israelite community/nation rather than patriarch Jacob; original source bytes remain untouched and all chosen exact source words remain in the existing group (or are added to group:Israel).",
       "evidence": [
         "Pinned WLC Exodus 3:18 exact word o020030180061 and following referent groups o020030180181, o020030180242; frozen person:Israel source record",
         "https://classic.net.bible.org/verse.php?book=Exo&chapter=3&verse=18",
@@ -447,7 +647,8 @@
         "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/05-Deu-012-lowfat.xml and WLC/lowfat/23-Isa-053-lowfat.xml; frozen ACAI person:Israel identifies the historical patriarch Jacob.",
         "Pinned Macula WLC Jeremiah 51:6 exact original words o240510060011 Vqv2mp 'flee', o240510060042 Vpv2mp 'save yourselves', o240510060051 Ncmsa 'each person', o240510060081 VNj2mp 'do not perish'; all source words exist in frozen group:Judah and are explicitly not the deceased ancestral individuals person:Israel/person:Judah.4.",
         "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/24-Jer-051-lowfat.xml and pinned Macula Hebrew TSV. Frozen original ACAI records and verb multiplicities retained.",
-        "Pinned Macula Hebrew WLC XML 2 Chronicles chapters 1, 5, 11, 23, 28 at 47db250bd55d0d8577f2a94fba114ef16c35b23c; verified exact original source-word ID/labels, source group crosswalk, and frozen ACAI e80a874e8282f996199c595378a3b3b9a43aac22."
+        "Pinned Macula Hebrew WLC XML 2 Chronicles chapters 1, 5, 11, 23, 28 at 47db250bd55d0d8577f2a94fba114ef16c35b23c; verified exact original source-word ID/labels, source group crosswalk, and frozen ACAI e80a874e8282f996199c595378a3b3b9a43aac22.",
+        "Original-word and source-label verification in pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c lowfat chapters 13:15,23,24; 14:29,30,31,34,35; 16:10,12,13; frozen ACAI@e80a874e8282f996199c595378a3b3b9a43aac22; existing group exact source links. The six genealogical Levi proper-name words remain intact."
       ],
       "remove_pronominal_referents": {
         "wlc": [
@@ -508,7 +709,49 @@
         "14028019",
         "14028023",
         "14028026",
-        "14028027"
+        "14028027",
+        "13015003",
+        "13015012",
+        "13015014",
+        "13015025",
+        "13015028",
+        "13023001",
+        "13023002",
+        "13023025",
+        "13024019",
+        "14029007",
+        "14029010",
+        "14029024",
+        "14029027",
+        "14030001",
+        "14030005",
+        "14030006",
+        "14030021",
+        "14030025",
+        "14030026",
+        "14031001",
+        "14031005",
+        "14031006",
+        "14031008",
+        "14034007",
+        "14034009",
+        "14034021",
+        "14034023",
+        "14034026",
+        "14034033",
+        "14035003",
+        "14035004",
+        "14035017",
+        "14035018",
+        "14035025",
+        "14035027",
+        "16010034",
+        "16010040",
+        "16012047",
+        "16013002",
+        "16013003",
+        "16013018",
+        "16013026"
       ],
       "add_explicit_instances": {
         "wlc": [
@@ -592,10 +835,175 @@
           ],
           [
             "o140280270131"
+          ],
+          [
+            "o130150030051"
+          ],
+          [
+            "o130150120151"
+          ],
+          [
+            "o130150140091"
+          ],
+          [
+            "o130150250041"
+          ],
+          [
+            "o130150280021"
+          ],
+          [
+            "o130230010101"
+          ],
+          [
+            "o130230020051"
+          ],
+          [
+            "o130230250071"
+          ],
+          [
+            "o130240190151"
+          ],
+          [
+            "o140290070161"
+          ],
+          [
+            "o140290100081"
+          ],
+          [
+            "o140290240101"
+          ],
+          [
+            "o140290240131"
+          ],
+          [
+            "o140290270181"
+          ],
+          [
+            "o140300010051"
+          ],
+          [
+            "o140300010211"
+          ],
+          [
+            "o140300050061"
+          ],
+          [
+            "o140300050161"
+          ],
+          [
+            "o140300060081"
+          ],
+          [
+            "o140300060141"
+          ],
+          [
+            "o140300060212"
+          ],
+          [
+            "o140300210031"
+          ],
+          [
+            "o140300250102"
+          ],
+          [
+            "o140300250141"
+          ],
+          [
+            "o140300260111"
+          ],
+          [
+            "o140310010061"
+          ],
+          [
+            "o140310010291"
+          ],
+          [
+            "o140310050051"
+          ],
+          [
+            "o140310060021"
+          ],
+          [
+            "o140310080121"
+          ],
+          [
+            "o140340070141"
+          ],
+          [
+            "o140340090221"
+          ],
+          [
+            "o140340210082"
+          ],
+          [
+            "o140340230071"
+          ],
+          [
+            "o140340260151"
+          ],
+          [
+            "o140340330101"
+          ],
+          [
+            "o140340330152"
+          ],
+          [
+            "o140350030061"
+          ],
+          [
+            "o140350030201"
+          ],
+          [
+            "o140350030321"
+          ],
+          [
+            "o140350040081"
+          ],
+          [
+            "o140350170031"
+          ],
+          [
+            "o140350180052"
+          ],
+          [
+            "o140350180111"
+          ],
+          [
+            "o140350180222"
+          ],
+          [
+            "o140350250171"
+          ],
+          [
+            "o140350270091"
+          ],
+          [
+            "o160100340141"
+          ],
+          [
+            "o160100400061"
+          ],
+          [
+            "o160120470021"
+          ],
+          [
+            "o160130020061"
+          ],
+          [
+            "o160130030082"
+          ],
+          [
+            "o160130180191"
+          ],
+          [
+            "o160130260071"
+          ],
+          [
+            "o160130260221"
           ]
         ]
       },
-      "reason": "The named Israel of 'elders of Israel' in Exodus 3:18 is the Israelite community, not the dead patriarch; attach the attested proper name to the existing Israelite group, without inferring links for other words. Add two exact attested collective Israel names to the existing Israelite people, not the ancient patriarch: Solomon-era Judah and Israel dwelling safely (1 Kings 5:5) and postexilic Israelite residents (Nehemiah 11:3). Their distributive 'each person' original words carry explicit Macula participantref pointers to Israelite people; retain the corresponding group links, not the dead founder. In 2 Chronicles 11:3-4, the exact living 'all Israel' cohort in Judah and Benjamin obeys the LORD's command alongside Rehoboam. Add source-proven collective Israel proper name in 11:3, and seven Macula source participant-referent tokens in 11:4 to the already existing group:Israel; retain the independently indexed king Rehoboam's roles. No new person or group identity is invented. Deuteronomy 12:8 source 'you', 'we' and 'each' in Moses' address to the living people of Israel are direct grammatical references to the Israelite community. Transfer exactly these original word groups from the wrongly inherited patriarch to the existing group:Israel while retaining person:Moses' original role and refraining from any interpretation-specific group assignment in Isaiah 53:6. Batch follow-up: in 2 Chronicles 1, 5, 11, 23 and 28 these precise named Israel occurrences concern Solomon's/Israel's/Judah's living communities, rulers and tribes, not Jacob personally; the original Hebrew names and existing historical-person source records remain frozen.",
+      "reason": "The named Israel of 'elders of Israel' in Exodus 3:18 is the Israelite community, not the dead patriarch; attach the attested proper name to the existing Israelite group, without inferring links for other words. Add two exact attested collective Israel names to the existing Israelite people, not the ancient patriarch: Solomon-era Judah and Israel dwelling safely (1 Kings 5:5) and postexilic Israelite residents (Nehemiah 11:3). Their distributive 'each person' original words carry explicit Macula participantref pointers to Israelite people; retain the corresponding group links, not the dead founder. In 2 Chronicles 11:3-4, the exact living 'all Israel' cohort in Judah and Benjamin obeys the LORD's command alongside Rehoboam. Add source-proven collective Israel proper name in 11:3, and seven Macula source participant-referent tokens in 11:4 to the already existing group:Israel; retain the independently indexed king Rehoboam's roles. No new person or group identity is invented. Deuteronomy 12:8 source 'you', 'we' and 'each' in Moses' address to the living people of Israel are direct grammatical references to the Israelite community. Transfer exactly these original word groups from the wrongly inherited patriarch to the existing group:Israel while retaining person:Moses' original role and refraining from any interpretation-specific group assignment in Isaiah 53:6. Batch follow-up: in 2 Chronicles 1, 5, 11, 23 and 28 these precise named Israel occurrences concern Solomon's/Israel's/Judah's living communities, rulers and tribes, not Jacob personally; the original Hebrew names and existing historical-person source records remain frozen. Historical narrative follow-up: in 1 Chronicles 15/23/24, 2 Chronicles 29/30/31/34/35 and Nehemiah 10/12/13 these exact Israel occurrences refer to contemporaneous Israelites/nation, not the deceased founder Jacob.",
       "evidence": [
         "Pinned WLC Exodus 3:18 exact Hebrew Israel proper-name o020030180061",
         "https://classic.net.bible.org/verse.php?book=Exo&chapter=3&verse=18",
@@ -603,7 +1011,8 @@
         "Pinned WLC 1 Kings 5:5 o110050050032 + o110050050051 and Nehemiah 11:3 o160110030131 + o160110030101; source participantref labels the community of Israel rather than Jacob individually.",
         "Pinned Macula WLC 2 Chronicles 11:3 o140110030101 'all Israel'; 11:4 original participantref/subjref frames on o140110040051, o140110040071, o140110040101, o140110040111, o140110040182, o140110040222, o140110040232 directly point to 140110030101; the historical Jacob is not present.",
         "Pinned WLC Deuteronomy 12:8 o050120080021 second-plural 'you', o050120080051 first-plural 'we' (source participants include Moses and the community), o050120080091 singular distributive 'each'; Macula participantref 050110060261 points to the contemporaneous Israelite audience.",
-        "Pinned Macula WLC 2 Chronicles 1, 5, 11, 23 and 28 exact original-word proper names; 47db250bd55d0d8577f2a94fba114ef16c35b23c, frozen ACAI e80a874e8282f996199c595378a3b3b9a43aac22, source-person/group explicit-word comparison."
+        "Pinned Macula WLC 2 Chronicles 1, 5, 11, 23 and 28 exact original-word proper names; 47db250bd55d0d8577f2a94fba114ef16c35b23c, frozen ACAI e80a874e8282f996199c595378a3b3b9a43aac22, source-person/group explicit-word comparison.",
+        "Exact WLC original-word receipts checked at frozen Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c; 1 Chronicles 15,23,24; 2 Chronicles 29,30,31,34,35; Nehemiah 10,12,13; frozen ACAI e80a874e8282f996199c595378a3b3b9a43aac22."
       ],
       "add_pronominal_referents": {
         "wlc": [
@@ -676,7 +1085,28 @@
         "14028018",
         "14028019",
         "14028025",
-        "14028026"
+        "14028026",
+        "14029008",
+        "14029021",
+        "14030006",
+        "14030024",
+        "14030025",
+        "14031001",
+        "14031006",
+        "14031020",
+        "14034003",
+        "14034005",
+        "14034009",
+        "14034011",
+        "14034021",
+        "14034024",
+        "14034026",
+        "14034029",
+        "14034030",
+        "14035018",
+        "14035021",
+        "14035024",
+        "14035027"
       ],
       "remove_explicit_instances": {
         "wlc": [
@@ -757,6 +1187,84 @@
           ],
           [
             "o140280260121"
+          ],
+          [
+            "o140290080051"
+          ],
+          [
+            "o140290210171"
+          ],
+          [
+            "o140300010062"
+          ],
+          [
+            "o140300060092"
+          ],
+          [
+            "o140300120022"
+          ],
+          [
+            "o140300240041"
+          ],
+          [
+            "o140300250041"
+          ],
+          [
+            "o140300250162"
+          ],
+          [
+            "o140310010091"
+          ],
+          [
+            "o140310010201"
+          ],
+          [
+            "o140310060032"
+          ],
+          [
+            "o140310060061"
+          ],
+          [
+            "o140310200051"
+          ],
+          [
+            "o140340030181"
+          ],
+          [
+            "o140340050091"
+          ],
+          [
+            "o140340090241"
+          ],
+          [
+            "o140340110151"
+          ],
+          [
+            "o140340210093"
+          ],
+          [
+            "o140340240221"
+          ],
+          [
+            "o140340260031"
+          ],
+          [
+            "o140340290071"
+          ],
+          [
+            "o140340300071"
+          ],
+          [
+            "o140350180211"
+          ],
+          [
+            "o140350210091"
+          ],
+          [
+            "o140350240181"
+          ],
+          [
+            "o140350270102"
           ]
         ]
       },
@@ -800,7 +1308,7 @@
           ]
         ]
       },
-      "reason": "Isaiah 22:8 speaks of the defense of the nation of Judah, and Jeremiah 22:18 calls Jehoiakim king of Judah; neither passage names the patriarch Judah as a living individual. Frozen group:Judah already owns exactly these name and referent tokens, so remove only the false patriarch links. 1 Kings 5:5 speaks of the people of Judah during Solomon; 2 Chronicles 23:8 explicitly says 'all Judah' alongside the Levites carrying out Jehoiada's orders, not their deceased tribal founders; Nehemiah 11:3 refers to towns of Judah after exile, not the son of Jacob. The existing group:Judah has each correct source word and subject referent. Remove only these false patriarch-specific words and verse claims in the derived output. Isaiah 36:8-9 the Assyrian spokesman addresses the representatives and contemporary inhabitants of Judah; five original Hebrew second-person speech-role words cannot denote Jacob's son centuries later (the collective group:Judah already owns these same original-word pointers). Jeremiah 33:10 names the towns of Judah and 'this' desolate place, not the ancient person Judah; group:Judah already retains the exact name and demonstrative groups. Jeremiah 51:6 directly orders the contemporary deportees to flee Babylon and for 'each person' to save his life, followed by a further second-person-plural warning. Both frozen historical-person records person:Israel (Jacob) and person:Judah.4 (Jacob's son) wrongly claim all four exact speech/imperative words, although neither ancient patriarch was alive during the Babylonian exile. Detach only these original person-to-word claims in the derived index; the frozen group:Judah source record already retains all four exact word groups. Batch follow-up (2 Chronicles 11, 23, 28): these exact word occurrences designate the kingdom/people of Judah; source wording and original frozen witness remain untouched.",
+      "reason": "Isaiah 22:8 speaks of the defense of the nation of Judah, and Jeremiah 22:18 calls Jehoiakim king of Judah; neither passage names the patriarch Judah as a living individual. Frozen group:Judah already owns exactly these name and referent tokens, so remove only the false patriarch links. 1 Kings 5:5 speaks of the people of Judah during Solomon; 2 Chronicles 23:8 explicitly says 'all Judah' alongside the Levites carrying out Jehoiada's orders, not their deceased tribal founders; Nehemiah 11:3 refers to towns of Judah after exile, not the son of Jacob. The existing group:Judah has each correct source word and subject referent. Remove only these false patriarch-specific words and verse claims in the derived output. Isaiah 36:8-9 the Assyrian spokesman addresses the representatives and contemporary inhabitants of Judah; five original Hebrew second-person speech-role words cannot denote Jacob's son centuries later (the collective group:Judah already owns these same original-word pointers). Jeremiah 33:10 names the towns of Judah and 'this' desolate place, not the ancient person Judah; group:Judah already retains the exact name and demonstrative groups. Jeremiah 51:6 directly orders the contemporary deportees to flee Babylon and for 'each person' to save his life, followed by a further second-person-plural warning. Both frozen historical-person records person:Israel (Jacob) and person:Judah.4 (Jacob's son) wrongly claim all four exact speech/imperative words, although neither ancient patriarch was alive during the Babylonian exile. Detach only these original person-to-word claims in the derived index; the frozen group:Judah source record already retains all four exact word groups. Batch follow-up (2 Chronicles 11, 23, 28): these exact word occurrences designate the kingdom/people of Judah; source wording and original frozen witness remain untouched. Historical narrative source-name batch: Judah's kingdom and population rather than the patriarch; original source bytes remain untouched and all chosen exact source words remain in the existing group (or are added to group:Israel).",
       "evidence": [
         "Pinned WLC Isaiah 22:8 o230220080041 and Jeremiah 22:18 o240220180101, plus context-linked source referents; frozen group:Judah has all five exact pointers",
         "https://classic.net.bible.org/verse.php?book=Isa&chapter=22&verse=8",
@@ -810,7 +1318,8 @@
         "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/23-Isa-036-lowfat.xml and WLC/lowfat/24-Jer-033-lowfat.xml",
         "Pinned Macula WLC Jeremiah 51:6 exact original words o240510060011 Vqv2mp 'flee', o240510060042 Vpv2mp 'save yourselves', o240510060051 Ncmsa 'each person', o240510060081 VNj2mp 'do not perish'; all source words exist in frozen group:Judah and are explicitly not the deceased ancestral individuals person:Israel/person:Judah.4.",
         "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/24-Jer-051-lowfat.xml and pinned Macula Hebrew TSV. Frozen original ACAI records and verb multiplicities retained.",
-        "Pinned Macula Hebrew WLC XML 2 Chronicles chapters 11, 23, 28 at 47db250bd55d0d8577f2a94fba114ef16c35b23c; verified exact original source-word ID/labels, source group crosswalk, and frozen ACAI e80a874e8282f996199c595378a3b3b9a43aac22."
+        "Pinned Macula Hebrew WLC XML 2 Chronicles chapters 11, 23, 28 at 47db250bd55d0d8577f2a94fba114ef16c35b23c; verified exact original source-word ID/labels, source group crosswalk, and frozen ACAI e80a874e8282f996199c595378a3b3b9a43aac22.",
+        "Original-word and source-label verification in pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c lowfat chapters 14:29,30,31,34,35; frozen ACAI@e80a874e8282f996199c595378a3b3b9a43aac22; existing group exact source links. The six genealogical Levi proper-name words remain intact."
       ],
       "remove_pronominal_referents": {
         "wlc": [
@@ -835,7 +1344,12 @@
       "remove_references": [
         "28013001",
         "14028007",
-        "14028012"
+        "14028012",
+        "14030010",
+        "14030018",
+        "14031001",
+        "14034006",
+        "14034009"
       ],
       "remove_explicit_instances": {
         "wlc": [
@@ -847,6 +1361,24 @@
           ],
           [
             "o140280120051"
+          ],
+          [
+            "o140300010111"
+          ],
+          [
+            "o140300100071"
+          ],
+          [
+            "o140300180052"
+          ],
+          [
+            "o140310010223"
+          ],
+          [
+            "o140340060032"
+          ],
+          [
+            "o140340090192"
           ]
         ]
       },
@@ -867,12 +1399,13 @@
           ]
         ]
       },
-      "reason": "Hosea 13:1 uses Ephraim as a metonymic/collective designation for the northern tribe/kingdom, not the historical son of Joseph. Frozen group:Ephraim already has the full exact explicit, pronoun and subject word groups, which remain unchanged. Batch follow-up (2 Chronicles 28): these exact word occurrences designate Ephraim's tribal affiliation, not Joseph's son; source wording and original frozen witness remain untouched.",
+      "reason": "Hosea 13:1 uses Ephraim as a metonymic/collective designation for the northern tribe/kingdom, not the historical son of Joseph. Frozen group:Ephraim already has the full exact explicit, pronoun and subject word groups, which remain unchanged. Batch follow-up (2 Chronicles 28): these exact word occurrences designate Ephraim's tribal affiliation, not Joseph's son; source wording and original frozen witness remain untouched. Historical narrative source-name batch: Ephraimite tribe rather than the patriarch; original source bytes remain untouched and all chosen exact source words remain in the existing group (or are added to group:Israel).",
       "evidence": [
         "Pinned WLC Hosea 13:1 explicit Ephraim o280130010021, pronominal o280130010051 and subjects o280130010072 / o280130010092; source group:Ephraim already carries them",
         "https://classic.net.bible.org/verse.php?book=Hos&chapter=13&verse=1",
         "https://tips.translation.bible/story/sil-translators-notes-on-hosea-131/",
-        "Pinned Macula Hebrew WLC XML 2 Chronicles chapters 28 at 47db250bd55d0d8577f2a94fba114ef16c35b23c; verified exact original source-word ID/labels, source group crosswalk, and frozen ACAI e80a874e8282f996199c595378a3b3b9a43aac22."
+        "Pinned Macula Hebrew WLC XML 2 Chronicles chapters 28 at 47db250bd55d0d8577f2a94fba114ef16c35b23c; verified exact original source-word ID/labels, source group crosswalk, and frozen ACAI e80a874e8282f996199c595378a3b3b9a43aac22.",
+        "Original-word and source-label verification in pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c lowfat chapters 14:30,31,34; frozen ACAI@e80a874e8282f996199c595378a3b3b9a43aac22; existing group exact source links. The six genealogical Levi proper-name words remain intact."
       ]
     },
     {
@@ -1292,7 +1825,53 @@
         "14023004",
         "14023006",
         "14023007",
-        "14023018"
+        "14023018",
+        "13015004",
+        "13015011",
+        "13015012",
+        "13015015",
+        "13015016",
+        "13015017",
+        "13015022",
+        "13023002",
+        "13023003",
+        "13023014",
+        "13023026",
+        "13024006",
+        "13024030",
+        "13024031",
+        "14029004",
+        "14029012",
+        "14029025",
+        "14029026",
+        "14029030",
+        "14030021",
+        "14030025",
+        "14031009",
+        "14031014",
+        "14031017",
+        "14031019",
+        "14034012",
+        "14034030",
+        "14035003",
+        "14035005",
+        "14035008",
+        "14035009",
+        "14035010",
+        "14035015",
+        "14035018",
+        "16010010",
+        "16010029",
+        "16010039",
+        "16012008",
+        "16012022",
+        "16012024",
+        "16012047",
+        "16013005",
+        "16013013",
+        "16013022",
+        "16013029",
+        "16013030"
       ],
       "remove_explicit_instances": {
         "wlc": [
@@ -1334,6 +1913,258 @@
           ],
           [
             "o140230180082"
+          ],
+          [
+            "o130150020112"
+          ],
+          [
+            "o130150040072"
+          ],
+          [
+            "o130150110063"
+          ],
+          [
+            "o130150120062"
+          ],
+          [
+            "o130150140033"
+          ],
+          [
+            "o130150150032"
+          ],
+          [
+            "o130150160042"
+          ],
+          [
+            "o130150170022"
+          ],
+          [
+            "o130150220032"
+          ],
+          [
+            "o130150260052"
+          ],
+          [
+            "o130150270062"
+          ],
+          [
+            "o130230020073"
+          ],
+          [
+            "o130230030022"
+          ],
+          [
+            "o130230140082"
+          ],
+          [
+            "o130230260022"
+          ],
+          [
+            "o130240060072"
+          ],
+          [
+            "o130240060193"
+          ],
+          [
+            "o130240300082"
+          ],
+          [
+            "o130240310173"
+          ],
+          [
+            "o140290040052"
+          ],
+          [
+            "o140290050042"
+          ],
+          [
+            "o140290120022"
+          ],
+          [
+            "o140290160192"
+          ],
+          [
+            "o140290250032"
+          ],
+          [
+            "o140290260022"
+          ],
+          [
+            "o140290300052"
+          ],
+          [
+            "o140290340132"
+          ],
+          [
+            "o140290340212"
+          ],
+          [
+            "o140300150083"
+          ],
+          [
+            "o140300160142"
+          ],
+          [
+            "o140300170073"
+          ],
+          [
+            "o140300210172"
+          ],
+          [
+            "o140300220062"
+          ],
+          [
+            "o140300250063"
+          ],
+          [
+            "o140300270032"
+          ],
+          [
+            "o140310020063"
+          ],
+          [
+            "o140310020133"
+          ],
+          [
+            "o140310040083"
+          ],
+          [
+            "o140310090053"
+          ],
+          [
+            "o140310120112"
+          ],
+          [
+            "o140310140042"
+          ],
+          [
+            "o140310170063"
+          ],
+          [
+            "o140310190212"
+          ],
+          [
+            "o140340090142"
+          ],
+          [
+            "o140340120092"
+          ],
+          [
+            "o140340120193"
+          ],
+          [
+            "o140340130094"
+          ],
+          [
+            "o140340300113"
+          ],
+          [
+            "o140350030022"
+          ],
+          [
+            "o140350050122"
+          ],
+          [
+            "o140350080053"
+          ],
+          [
+            "o140350090102"
+          ],
+          [
+            "o140350090122"
+          ],
+          [
+            "o140350100073"
+          ],
+          [
+            "o140350110063"
+          ],
+          [
+            "o140350140143"
+          ],
+          [
+            "o140350150232"
+          ],
+          [
+            "o140350180193"
+          ],
+          [
+            "o160100010101"
+          ],
+          [
+            "o160100100013"
+          ],
+          [
+            "o160100290042"
+          ],
+          [
+            "o160100350072"
+          ],
+          [
+            "o160100380182"
+          ],
+          [
+            "o160100380202"
+          ],
+          [
+            "o160100390062"
+          ],
+          [
+            "o160100390082"
+          ],
+          [
+            "o160100390093"
+          ],
+          [
+            "o160120010033"
+          ],
+          [
+            "o160120080013"
+          ],
+          [
+            "o160120220012"
+          ],
+          [
+            "o160120240022"
+          ],
+          [
+            "o160120270062"
+          ],
+          [
+            "o160120300033"
+          ],
+          [
+            "o160120440183"
+          ],
+          [
+            "o160120440252"
+          ],
+          [
+            "o160120470152"
+          ],
+          [
+            "o160120470163"
+          ],
+          [
+            "o160130050182"
+          ],
+          [
+            "o160130100042"
+          ],
+          [
+            "o160130100102"
+          ],
+          [
+            "o160130130102"
+          ],
+          [
+            "o160130220022"
+          ],
+          [
+            "o160130290093"
+          ],
+          [
+            "o160130300073"
           ]
         ]
       },
@@ -1393,14 +2224,15 @@
           ]
         ]
       },
-      "reason": "2 Chronicles 23:8 explicitly names the plural gentilic Levites cooperating with all Judah in Jehoiada's time; Nehemiah 11:3 lists the postexilic Levite residents. Neither text refers to the ancient individual Levi, son of Jacob. The already-existing group:Levi holds the exact plural word, distributive 'each' and 2 Chronicles action verb groups. Remove only those false son-of-Jacob links, preserving the frozen source. Ezra 8:33 explicitly mentions the plural Levites who helped weigh the returned treasures, not the long-deceased son of Jacob Levi: group:Levi already retains the exact plural gentilic word and passive weighing token. Nehemiah 8:10 follows Nehemiah, Ezra and the Levites teaching contemporary returnees; its speech verb can refer to these living participants, never to the patriarch Levi. Remove only two erroneous source subject words plus the exact Ezra 8:33 name/verse from person:Levi.3, not the legitimate Levitical community. Batch follow-up (2 Chronicles 5, 11, 23): these exact word occurrences designate plural Levites, never the deceased patriarch Levi; source wording and original frozen witness remain untouched.",
+      "reason": "2 Chronicles 23:8 explicitly names the plural gentilic Levites cooperating with all Judah in Jehoiada's time; Nehemiah 11:3 lists the postexilic Levite residents. Neither text refers to the ancient individual Levi, son of Jacob. The already-existing group:Levi holds the exact plural word, distributive 'each' and 2 Chronicles action verb groups. Remove only those false son-of-Jacob links, preserving the frozen source. Ezra 8:33 explicitly mentions the plural Levites who helped weigh the returned treasures, not the long-deceased son of Jacob Levi: group:Levi already retains the exact plural gentilic word and passive weighing token. Nehemiah 8:10 follows Nehemiah, Ezra and the Levites teaching contemporary returnees; its speech verb can refer to these living participants, never to the patriarch Levi. Remove only two erroneous source subject words plus the exact Ezra 8:33 name/verse from person:Levi.3, not the legitimate Levitical community. Batch follow-up (2 Chronicles 5, 11, 23): these exact word occurrences designate plural Levites, never the deceased patriarch Levi; source wording and original frozen witness remain untouched. Historical narrative source-name batch: 84 exact singular/plural gentilic 'Levite(s)' words; all six proper-name Levi words in the same selected chapters remain untouched; original source bytes remain untouched and all chosen exact source words remain in the existing group (or are added to group:Israel).",
       "evidence": [
         "Pinned WLC 2CH 23:8 o140230080022 Ngmpa 'Levites', o140230080102 Vqw3mp plural 'they took' (subjref the Levites and all Judah), o140230080111 distributive 'each'; NEH 11:3 o160110030153 Ngmpa 'Levites', o160110030101 each. All source words remain attached to group:Levi.",
         "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/14-2Ch-023-lowfat.xml and WLC/lowfat/16-Neh-011-lowfat.xml",
         "Frozen ACAI person:Levi.3 identifies the patriarch, not the later collective.",
         "Pinned WLC Ezra 8:33 o150080330262 plural 'Levites', o150080330031 passive 'it was weighed' with silver/gold participants; Nehemiah 8:10 o160080100012 'he said' and Macula frame points to Neh 8:9 Nehemiah/Ezra/Levites, not Jacob's son.",
         "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/15-Ezr-008-lowfat.xml and WLC/lowfat/16-Neh-008-lowfat.xml",
-        "Pinned Macula Hebrew WLC XML 2 Chronicles chapters 5, 11, 23 at 47db250bd55d0d8577f2a94fba114ef16c35b23c; verified exact original source-word ID/labels, source group crosswalk, and frozen ACAI e80a874e8282f996199c595378a3b3b9a43aac22."
+        "Pinned Macula Hebrew WLC XML 2 Chronicles chapters 5, 11, 23 at 47db250bd55d0d8577f2a94fba114ef16c35b23c; verified exact original source-word ID/labels, source group crosswalk, and frozen ACAI e80a874e8282f996199c595378a3b3b9a43aac22.",
+        "Original-word and source-label verification in pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c lowfat chapters 13:15,23,24; 14:29,30,31,34,35; 16:10,12,13; frozen ACAI@e80a874e8282f996199c595378a3b3b9a43aac22; existing group exact source links. The six genealogical Levi proper-name words remain intact."
       ]
     },
     {
