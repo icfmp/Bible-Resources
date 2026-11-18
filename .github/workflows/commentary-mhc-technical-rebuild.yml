@@ -12,6 +12,7 @@ on:
       - "tests/test_repair_commentary_osis_milestones.py"
       - "config/commentary-osis-repair-plans/mhc-endpoints-private-preview.json"
       - "config/commentary-osis-repair-plans/mhc-overlap-reindex-private-experiment.json"
+      - "config/commentary-osis-repair-plans/mhc-shared-scope-review-private.json"
       - "config/commentary-osis-repair-plans/mhc-crossreferences-private-preview.json"
       - "tests/test_clean_source_osis.py"
       - ".github/workflows/commentary-mhc-technical-rebuild.yml"
@@ -820,11 +821,12 @@ jobs:
         run: |
           set -euo pipefail
           python - <<'PY'
-          import os,subprocess,sys
+          import json,os,subprocess,sys
           from pathlib import Path
           sys.path.insert(0,str(Path.cwd()/"scripts"))
           from audit_osis import (source_commentary_overlap_witness,
                                   source_commentary_shared_key_retrieval_map,
+                                  source_commentary_reviewed_shared_key_plan,
                                   compare_all_commentary_source_group_words,
                                   compare_all_commentary_source_group_semantics,
                                   source_commentary_introductions,
@@ -911,6 +913,60 @@ jobs:
           print("Real 2 Chronicles shared-verse first-key retrieval:",
                 by_key["2Chr.1.1"]["native_retrieval_keys_in_authorial_order"])
           print("Source text preserved; no added verse, repeated prose or proprietary published module")
+          # A syntactic overlap is not automatically an authored intra-verse
+          # division. Five of six machine-range fixes agree with published
+          # complete-MHC section boundaries; Romans 4:17a/17b is the
+          # independent exception. The accepted-versus-exception evidence
+          # belongs in a separate private, source-SHA-bound plan.
+          plan=json.loads(Path(
+              "config/commentary-osis-repair-plans/mhc-shared-scope-review-private.json"
+          ).read_text())
+          manifest=json.loads(Path(
+              "config/commentary-intake/mhc-crosswire.json"
+          ).read_text())
+          source_sha=manifest["commentary_source"][
+              "original_authoring_osis"]["authoring_osis_sha256"]
+          candidate_bridge=source_commentary_shared_key_retrieval_map(
+              groups,set(keys))
+          reviewed=source_commentary_reviewed_shared_key_plan(
+              scope_bridge,candidate_bridge,plan,
+              pinned_original_sha256=source_sha)
+          actual={item["bible_verse_key"]:item
+                  for item in reviewed["reader_multiowner_verses"]}
+          if (reviewed["original_syntactic_shared_verses"]
+                  !=plan["expected_original_syntactic_shared_verse_count"]
+                  or reviewed["compiled_source_shared_verses"]
+                  !=plan["expected_rebuilt_source_shared_verse_count"]
+                  or reviewed["reader_multiowner_verse_count"]
+                  !=plan["expected_reader_multiowner_verse_count"]
+                  or reviewed["non_reader_shared_source_index_ranges"]
+                  !=plan["expected_non_reader_shared_source_index_ranges"]
+                  or set(actual)!={"Rom.4.17","2Chr.1.1"}
+                  or actual["Rom.4.17"]["native_retrieval_keys_in_authorial_order"]
+                     !=["Rom.4.9","Rom.4.17"]
+                  or actual["2Chr.1.1"]["native_retrieval_keys_in_authorial_order"]
+                     !=["2Chr.1.1"]
+                  or reviewed["source_groups_rewritten"]
+                  or reviewed["original_prose_in_report"]):
+              raise SystemExit("Private editorially narrowed shared-scope reader index failed")
+          # No authorial prose, note or linked Bible text enters this
+          # research-only metadata file. No artifact or public module upload.
+          destination=root/"mhc-shared-section-retrieval-private.json"
+          with destination.open("x",encoding="utf-8") as out:
+              json.dump(reviewed,out,ensure_ascii=False,indent=2,sort_keys=True)
+          assert json.loads(destination.read_text())==reviewed
+          print("Private candidate shared-scope reader proof:",
+                {"original_syntactic_overlap_keys":
+                    reviewed["original_syntactic_shared_verses"],
+                 "reviewed_false_shared_scopes":
+                    reviewed["non_reader_shared_source_index_ranges"],
+                 "required_actual_multiowner_verse_keys":
+                    reviewed["reader_multiowner_verse_count"],
+                 "distinct_Romans_retrieval_keys":
+                    len(actual["Rom.4.17"]["native_retrieval_keys_in_authorial_order"]),
+                 "same_key_double_section_count":
+                    actual["2Chr.1.1"]["original_independent_section_count"],
+                 "no_authorial_prose_exported":True})
           semantics=compare_all_commentary_source_group_semantics(groups,raws)
           print("Entire MHC source/native punctuation, note and link-body triage:",
                 semantics["status"])
