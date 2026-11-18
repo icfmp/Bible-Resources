@@ -96,6 +96,17 @@ The builder contains **no chapter-specific or entity-specific code path**.
   than guess whether the text intends a name variant or another person.
   Every removal is listed in `editorial-decisions.json`; the builder
   refuses an absent/ambiguous `remove_references` request.
+- The two exact words spelled **Bebai** in Ezra 8:11 now have
+  **context-specific candidate links**. `o150080110021` occurs in
+  *the descendants of Bebai* and remains with the source's family
+  ancestor `person:Bebai`; `o150080110051` follows *Zechariah son
+  of Bebai* and remains with `person:Bebai.2`, the separately modeled
+  father of Zechariah. Both original records, their verse references
+  and the complete untouched source groups remain traceable. This
+  resolves two false cross-assigned original **word** links, **not**
+  an argument that every occurrence of a repeated proper name
+  necessarily denotes two historically distinct persons. See
+  [#299](https://github.com/icfmp/Bible-Resources/issues/299).
 - `person:Shallum.5` (1 Chronicles 3:15, exact WLC word
   `o130030150101`, *Shallum*) now resolves canonically to
   `person:Jehoahaz.3` — Josiah's successor named in Jeremiah 22:11
