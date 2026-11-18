@@ -207,15 +207,18 @@ def build_word_links(index, english, macula):
                 if unicodedata.normalize("NFC", by_entry[mid]["Lemma"]) == normalized
             ]
             match_type = "exact_lemma"
-            if not matching and row["class"] == "verb":
-                # UBS often indexes verbs under an unvocalized root; original
-                # MACULA lemmata are pointed. Preserve shin/sin distinctions.
+            if not matching and row["class"] in ("verb", "noun", "adj", "adv"):
+                # Different vocalization is allowed only with independent
+                # numeric Strong-family agreement and a unique consonantal
+                # UBS headword. Reject all consonantal homographs; preserve
+                # distinct shin/sin and do not alter the original lemma.
                 root = normalized_hebrew_consonants(lemma)
                 matching = [
                     mid for mid in numeric_family.get(family, set())
                     if normalized_hebrew_consonants(by_entry[mid]["Lemma"]) == root
                 ]
-                match_type = "verb_consonants_same_strong_family"
+                match_type = ("verb_consonants_same_strong_family" if row["class"] == "verb"
+                              else "nonverb_consonants_same_strong_family")
             if len(matching) != 1:
                 continue
             mid = matching[0]
@@ -248,9 +251,13 @@ def lookup_word(index, word_id, sdbh, strongnumberx, lang, lemma):
         "status": "entry_only",
         "entry_ids": [record["entry_id"]],
         "sense_ids": [],
-        "evidence": ("macula_word_verb_consonants_unique_entry_same_strong_family"
-                     if record.get("match_type") == "verb_consonants_same_strong_family"
-                     else "macula_word_exact_lemma_unique_entry_within_ubs_strong_family"),
+        "evidence": (
+            "macula_word_verb_consonants_unique_entry_same_strong_family"
+            if record.get("match_type") == "verb_consonants_same_strong_family"
+            else "macula_word_nonverb_consonants_unique_entry_same_strong_family"
+            if record.get("match_type") == "nonverb_consonants_same_strong_family"
+            else "macula_word_exact_lemma_unique_entry_within_ubs_strong_family"
+        ),
     }
 
 
@@ -270,6 +277,7 @@ def audit_word_links(index, macula):
             if new["evidence"] in (
                 "macula_word_exact_lemma_unique_entry_within_ubs_strong_family",
                 "macula_word_verb_consonants_unique_entry_same_strong_family",
+                "macula_word_nonverb_consonants_unique_entry_same_strong_family",
             ):
                 results["additional_entry_only_links"] += 1
                 results[new["evidence"]] += 1
