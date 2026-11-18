@@ -535,8 +535,8 @@ jobs:
           reviewed=module.verify_explicit_name_reviews(audit,manifest)
           stats=reviewed["statistics"]
           assert stats["reviewed_explicit_name_word_overlaps"]==8, stats
-          assert stats["shared_genealogical_name_component"]==5, stats
-          assert stats["unresolved_patronymic_name_variant"]==1, stats
+          assert stats["shared_genealogical_name_component"]==6, stats
+          assert stats["unresolved_patronymic_name_variant"]==0, stats
           assert stats["unresolved_person_identity"]==2, stats
           Path("entity-index/dist/reviewed-person-overlaps.json").write_text(
               json.dumps(reviewed,ensure_ascii=False,indent=2,sort_keys=True)+"\n")
