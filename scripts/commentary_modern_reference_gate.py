@@ -1560,8 +1560,8 @@ def build_private_source_reference_supplement(
     before="".join(doc.itertext())
     chapters={c.get("osisID"):c for c in doc.iter()
               if c.tag==f"{{{NS}}}chapter"}
-    if len(chapters)!=1189:
-        raise ValueError("Modern commentary whole-canon inventory changed")
+    if set(chapters)!=set(native.get("chapters", {})):
+        raise ValueError("Modern commentary native-chapter inventory changed")
     expected=[]
     count=0
     for first in sorted({key[0] for key in available}):
