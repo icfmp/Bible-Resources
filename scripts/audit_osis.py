@@ -389,7 +389,7 @@ def source_commentary_overlap_witness(path: Path) -> tuple[dict, set[str]]:
             walk(child)
             if active[0] is not None and child.tail:
                 active[0]["parts"].append(child.tail)
-    walk(root)
+    walk(root.getroot())
     if active[0] is not None:
         raise ValueError("Original commentary verse group remains unclosed")
     if len(groups)==0:
