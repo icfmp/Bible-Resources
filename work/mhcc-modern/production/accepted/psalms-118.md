@@ -65,7 +65,7 @@ We should rejoice in **the Lord's day**, not only because he has appointed it, b
 
 Let this Savior be **my Savior and Ruler**.
 
-May my soul prosper with the peace and righteousness of his reign.
+May my soul prosper and be in health through the peace and righteousness of his reign.
 
 May he give me victory over desires that fight against my soul and, through grace, bring my heart under his rule.
 
@@ -73,7 +73,7 @@ The duties he commands come with **true light**.
 
 Our response to the privilege of redemption must include sacrifices of gratitude.
 
-These are **not dead bodies offered upon an altar**, but **ourselves as living sacrifices** dedicated to God.
+These are **not bodies killed upon an altar**, but **ourselves as living sacrifices**, bound to the altar in grateful dedication to God.
 
 They also include spiritual sacrifices of **prayer and praise** in which our hearts sincerely participate.
 
@@ -84,6 +84,8 @@ In him **the covenant of grace is secure and everlasting**.
 ---
 
 ## Editorial review — Psalm 118
+
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Restored the source's paired *prosper and be in health* petition and its striking image of living sacrifices *bound to the altar*, both compressed in the prior modern text. Source verse scopes and original module unchanged. No independent source-native or publication signoff is inferred.
 
 **Complete secondary English witness read:** [CCEL, Psalm 118](https://ccel.org/ccel/henry/mhcc.xx.cxviii.html). Published `MHCC 0.1.1` remains source authority, exact native SWORD notes and independent acceptance pending.
 
