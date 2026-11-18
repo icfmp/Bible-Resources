@@ -118,6 +118,286 @@
       "modern_anchor": "(Revelation 2:7; 22:2)",
       "linked_display_text": "22:2",
       "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Gen.2",
+      "source_first_key": "Gen.2.8",
+      "original_link_ordinal": 1,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "Rev.2.7",
+      "modern_anchor": "Revelation 2:7",
+      "linked_display_text": "Revelation 2:7",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Gen.2",
+      "source_first_key": "Gen.2.8",
+      "original_link_ordinal": 2,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "John.6.48",
+      "modern_anchor": "John 6:48",
+      "linked_display_text": "John 6:48",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Gen.2",
+      "source_first_key": "Gen.2.8",
+      "original_link_ordinal": 3,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "John.6.51",
+      "modern_anchor": ", 51)",
+      "linked_display_text": "51",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Gen.2",
+      "source_first_key": "Gen.2.15",
+      "original_link_ordinal": 1,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "2Thess.3.10",
+      "modern_anchor": "(2 Thessalonians 3:10)",
+      "linked_display_text": "(2 Thessalonians 3:10)",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Gen.3",
+      "source_first_key": "Gen.3.6",
+      "original_link_ordinal": 1,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "Matt.5.28",
+      "modern_anchor": "(Matthew 5:28)",
+      "linked_display_text": "(Matthew 5:28)",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Gen.3",
+      "source_first_key": "Gen.3.6",
+      "original_link_ordinal": 3,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "Matt.4.6",
+      "modern_anchor": "(Matthew 4:6)",
+      "linked_display_text": "(Matthew 4:6)",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Gen.3",
+      "source_first_key": "Gen.3.6",
+      "original_link_ordinal": 5,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "Rom.5.19",
+      "modern_anchor": "(Romans 5:19)",
+      "linked_display_text": "(Romans 5:19)",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Gen.3",
+      "source_first_key": "Gen.3.9",
+      "original_link_ordinal": 1,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "Rom.7.11",
+      "modern_anchor": "Romans 7:11",
+      "linked_display_text": "Romans 7:11",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Gen.3",
+      "source_first_key": "Gen.3.9",
+      "original_link_ordinal": 2,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "Heb.3.13",
+      "modern_anchor": "Hebrews 3:13",
+      "linked_display_text": "Hebrews 3:13",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Gen.3",
+      "source_first_key": "Gen.3.14",
+      "original_link_ordinal": 1,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "Heb.2.11",
+      "modern_anchor": "Hebrews 2:11",
+      "linked_display_text": "Hebrews 2:11",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Gen.3",
+      "source_first_key": "Gen.3.16",
+      "original_link_ordinal": 1,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "Isa.53.11",
+      "modern_anchor": "(Isaiah 53:11)",
+      "linked_display_text": "(Isaiah 53:11)",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Gen.3",
+      "source_first_key": "Gen.3.16",
+      "original_link_ordinal": 2,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "Acts.2.24",
+      "modern_anchor": "(Acts 2:24)",
+      "linked_display_text": "(Acts 2:24)",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Gen.3",
+      "source_first_key": "Gen.3.16",
+      "original_link_ordinal": 3,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "Gal.4.4",
+      "modern_anchor": "(Galatians 4:4)",
+      "linked_display_text": "(Galatians 4:4)",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Gen.3",
+      "source_first_key": "Gen.3.16",
+      "original_link_ordinal": 4,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "Gal.3.13",
+      "modern_anchor": "(Galatians 3:13)",
+      "linked_display_text": "(Galatians 3:13)",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Gen.3",
+      "source_first_key": "Gen.3.20",
+      "original_link_ordinal": 1,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "Isa.28.20",
+      "modern_anchor": "(Isaiah 28:20)",
+      "linked_display_text": "(Isaiah 28:20)",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Exod.12",
+      "source_first_key": "Exod.12.1",
+      "original_link_ordinal": 1,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "1Cor.5.7",
+      "modern_anchor": "(1 Corinthians 5:7)",
+      "linked_display_text": "(1 Corinthians 5:7)",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Exod.12",
+      "source_first_key": "Exod.12.1",
+      "original_link_ordinal": 2,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "John.1.29",
+      "modern_anchor": "(John 1:29)",
+      "linked_display_text": "(John 1:29)",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Exod.12",
+      "source_first_key": "Exod.12.1",
+      "original_link_ordinal": 3,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "John.19.33",
+      "modern_anchor": "(John 19:33)",
+      "linked_display_text": "(John 19:33)",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Exod.12",
+      "source_first_key": "Exod.12.1",
+      "original_link_ordinal": 4,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "Rom.5.11",
+      "modern_anchor": "(Romans 5:11)",
+      "linked_display_text": "(Romans 5:11)",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Exod.12",
+      "source_first_key": "Exod.12.1",
+      "original_link_ordinal": 5,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "Rom.8.1",
+      "modern_anchor": "(Romans 8:1)",
+      "linked_display_text": "(Romans 8:1)",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Exod.12",
+      "source_first_key": "Exod.12.1",
+      "original_link_ordinal": 7,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "John.6.53",
+      "modern_anchor": "John 6:53",
+      "linked_display_text": "John 6:53",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Exod.12",
+      "source_first_key": "Exod.12.1",
+      "original_link_ordinal": 8,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "John.6.55",
+      "modern_anchor": ", 55)",
+      "linked_display_text": "55",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Exod.12",
+      "source_first_key": "Exod.12.1",
+      "original_link_ordinal": 9,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "Heb.13.13",
+      "modern_anchor": "Hebrews 13:13",
+      "linked_display_text": "Hebrews 13:13",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Exod.12",
+      "source_first_key": "Exod.12.1",
+      "original_link_ordinal": 10,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "Heb.13.14",
+      "modern_anchor": "–14)",
+      "linked_display_text": "14",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Exod.12",
+      "source_first_key": "Exod.12.1",
+      "original_link_ordinal": 12,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "1Cor.5.7",
+      "modern_anchor": "1 Corinthians 5:7–8",
+      "linked_display_text": "1 Corinthians 5:7",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Exod.12",
+      "source_first_key": "Exod.12.1",
+      "original_link_ordinal": 13,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "1Cor.5.8",
+      "modern_anchor": "–8)",
+      "linked_display_text": "8",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Exod.12",
+      "source_first_key": "Exod.12.37",
+      "original_link_ordinal": 1,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "Gal.3.17",
+      "modern_anchor": "(Galatians 3:17)",
+      "linked_display_text": "(Galatians 3:17)",
+      "display_occurrence": "last"
+    },
+    {
+      "modern_chapter": "Exod.12",
+      "source_first_key": "Exod.12.43",
+      "original_link_ordinal": 1,
+      "action": "COPY_EXACT_AUTHENTIC_SOURCE",
+      "expected_modern_target": "1Cor.5.7",
+      "modern_anchor": "(1 Corinthians 5:7)",
+      "linked_display_text": "(1 Corinthians 5:7)",
+      "display_occurrence": "last"
     }
   ]
 }
