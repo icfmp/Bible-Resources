@@ -666,6 +666,11 @@ def _unambiguous_explicit_modern_verse(section: ET.Element, target: str):
                         continue
                     for hit in regex.finditer(value):
                         suffix = value[hit.end():]
+                        prefix = value[:hit.start()]
+                        # "John 3:16" must not match inside "1 John 3:16".
+                        if (book == "John" and
+                                re.search(r"(?:^|[^A-Za-z0-9])[1-3]\s+$", prefix)):
+                            continue
                         if re.match(r"\s*[-–—,]\s*\d", suffix):
                             continue
                         candidates.append(hit[0])
