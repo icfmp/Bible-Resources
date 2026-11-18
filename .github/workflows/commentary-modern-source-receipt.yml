@@ -1735,8 +1735,9 @@ jobs:
           assert review["modern_book_intro_candidates"]==56
           assert review["verified_native_chapter_I_intros"]==5
           assert len(review["cases"])==51
+          source_only=(base/"mhcc-modern-original-crossref-supplement.osis.xml").read_bytes()
           output,proof=overlay_native_first_K_book_prefaces(
-              base_osis=(base/"mhcc-modern-proposed-errata-navigation.osis.xml").read_bytes(),
+              base_osis=source_only,
               native=native,
               review=review,
               candidates_dir=Path("work/mhcc-modern/production"))
@@ -1752,8 +1753,29 @@ jobs:
           assert not proof["publication_authorized"]
           (base/"mhcc-modern-original-book-prefaces-restored.osis.xml").write_bytes(
               output)
+          from xml.etree import ElementTree as ET
+          def count_references(xml):
+              root=ET.fromstring(xml)
+              return sum(1 for n in root.iter()
+                         if isinstance(n.tag,str) and
+                         n.tag.rsplit("}",1)[-1]=="reference")
+          repaired,repair_proof=overlay_native_first_K_book_prefaces(
+              base_osis=(base/"mhcc-modern-proposed-errata-navigation.osis.xml").read_bytes(),
+              native=native,
+              review=review,
+              candidates_dir=Path("work/mhcc-modern/production"))
+          if (repair_proof!=proof or
+                  count_references(repaired)!=count_references(output)+13):
+              raise ValueError("Optional proposed source repairs mixed into conservative edition")
+          (base/"mhcc-modern-book-prefaces-proposed-errata-review.osis.xml").write_bytes(
+              repaired)
           (base/"mhcc-modern-original-book-prefaces-restored-metadata.json").write_text(
               json.dumps(proof,sort_keys=True,indent=2)+"\n",encoding="utf-8")
+          print("CONSERVATIVE MHCC PRIVATE BASE SEPARATION PASS: " +
+                str(count_references(output))+" source-preserving references " +
+                "in conservative 56-preface OSIS, optional unapproved review " +
+                "variant contains exactly 13 extra proposed links; original " +
+                "and modern manuscript texts unchanged")
           print("MHCC FIRST-K BOOK PREFACES PRIVATE RESTORATION PASS: " +
                 str(47+alias_count)+" separately placed (47 exact words plus "+
                 str(alias_count)+" independently tested chapter/book labels); " +
@@ -1774,7 +1796,7 @@ jobs:
             > "$RUNNER_TEMP/mhcc-prefaces-osis2mod.log" 2>&1
           cat > "$RUNNER_TEMP/mhcc-prefaces-root/mods.d/mhccprefaces.conf" <<'EOF'
           [MHCCPREFACES]
-          Description=Private unpublished modern MHCC with 47 authenticated source-first-K book prefaces
+          Description=Private conservative modern MHCC with 50 restored first-K prefaces and source-only links
           DataPath=./modules/comments/zcom/mhccprefaces/
           ModDrv=zCom
           CompressType=ZIP
@@ -1943,21 +1965,31 @@ jobs:
               if set(seen)!=firsts or len(numbered)!=28792:
                   raise ValueError("Source-owned K or numbered keys missing")
               return seen
-          prior=collect("MHCCREPAIR","mhcc-original-errata-root")
+          prior=collect("MHCCNOTES","mhcc-source-notes-root")
           final=collect("MHCCPREFACES","mhcc-prefaces-root")
           disagreements=[key for key in firsts if prior[key]!=final[key]]
           if disagreements:
-              print("PREFACE OVERLAY K PARITY DIAGNOSTIC first="
+              print("CONSERVATIVE PREFACE K PARITY first="
                     +json.dumps(sorted(disagreements)[:12])+
                     " count="+str(len(disagreements)))
-              raise ValueError("Adding book introductions changed prior K"
-                               " commentary prose or exact Scripture links")
-          total=sum(r[2] for r in final.values())
-          print("ALL 4049 ORIGINAL FIRST-K UNITS EXACT SWORD TEXT/LINK PARITY PASS: " +
-                "4049/4049 unmodified visible modern K bodies, " +
-                str(total)+" exact matching K-level reference targets and " +
-                "labels, all 28792 indexed SWORD keys; " +
-                "50 restored chapter-I book intros did not alter K; NO release")
+              raise ValueError("Book introductions changed original-conservative K content")
+          total=sum(row[2] for row in final.values())
+          print("ALL 4049 CONSERVATIVE FIRST-K UNITS EXACT SWORD TEXT/LINK PARITY PASS: " +
+                "4049/4049 identical modern K visible bodies, " +
+                str(total)+" exact unchanged conservative K reference targets " +
+                "and labels, 28792 keys; optional 13 proposed repairs excluded")
+          if not (base/"mhcc-prefaces-proposed-errata-compiled-success.marker").is_file():
+              raise ValueError("Unapproved extra-reference candidate SWORD build omitted")
+          proposed_prior=collect("MHCCREPAIR","mhcc-original-errata-root")
+          proposed_final=collect("MHCCPREFACEREPAIR","mhcc-preface-repair-root")
+          if proposed_prior!=proposed_final:
+              changed=sorted(key for key in firsts
+                             if proposed_prior[key]!=proposed_final[key])
+              raise ValueError("Proposed repair notes changed K during preface overlay: "+
+                               str(changed[:12]))
+          print("ALL 4049 OPTIONAL PROPOSED REPAIR FIRST-K UNITS EXACT SWORD TEXT/LINK PARITY PASS: " +
+                "4049/4049 same K texts and source/experimental links in its " +
+                "distinct private repair candidate, 28792 exact keys; NO release")
           PY
       - name: Screen all modern manuscript outline tables for out-of-order source ranges
         shell: bash
