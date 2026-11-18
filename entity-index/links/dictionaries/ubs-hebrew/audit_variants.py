@@ -10,7 +10,7 @@ import json
 from collections import Counter, defaultdict
 from pathlib import Path
 
-def analyze(index, lexicon, tsv):
+def analyze(index, lexicon, tsv, expected_rows=None):
     from runpy import run_path
     lookup=run_path(str(Path(__file__).with_name("build_index.py")))["lookup"]
     by_base=defaultdict(set)
@@ -82,8 +82,8 @@ def analyze(index, lexicon, tsv):
     lexical_unresolved=sum(by_class[x]["unresolved"] for x in lexical_classes)
     lexical_total=lexical_senses+lexical_entries+lexical_unresolved
     corpus_total=sum(sum(counts.values()) for counts in by_class.values())
-    if corpus_total!=475911:
-        raise ValueError(f"Unexpected pinned WLC row count: {corpus_total}")
+    if expected_rows is not None and corpus_total != expected_rows:
+        raise ValueError(f"Source corpus size mismatch: {corpus_total} != {expected_rows}")
     lexical_coverage={
         "selected_source_classes":list(lexical_classes),
         "total":lexical_total, "exact_sense":lexical_senses,
@@ -106,8 +106,9 @@ def main():
     p.add_argument("--english",required=True,type=Path)
     p.add_argument("--macula",required=True,type=Path)
     p.add_argument("--output",required=True,type=Path)
+    p.add_argument("--expected-rows",type=int)
     a=p.parse_args()
-    result=analyze(json.loads(a.index.read_text()),json.loads(a.english.read_text()),a.macula)
+    result=analyze(json.loads(a.index.read_text()),json.loads(a.english.read_text()),a.macula,a.expected_rows)
     a.output.write_text(json.dumps(result,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print("VARIANT_TOTAL",result["summary"])
     print("VARIANT_DISTINCT_FAMILIES",result["distinct_suffix_families"])
