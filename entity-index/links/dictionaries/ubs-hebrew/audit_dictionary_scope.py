@@ -104,7 +104,7 @@ def analyze(index, english, macula):
     summary["outside_indexed_ubs_headword_scope"]=excluded
     summary["indexable_scope_denominator"]=denominator
     summary["indexable_scope_unresolved"]=denominator-summary["linked_occurrences"]
-    summary["indexable_scope_coverage_pct"]=round(100*summary["linked_occurrences"]/denominator,3)
+    summary["indexable_scope_coverage_pct"]=(round(100*summary["linked_occurrences"]/denominator,3) if denominator else None)
     summary["all_source_lexical_coverage_pct"]=round(100*summary["linked_occurrences"]/summary["lexical_source_occurrences"],3)
     ranked=sorted(({"reason":key[0],"language":key[1],"lemma":key[2],
                     "strong":key[3],"occurrences":val["occurrences"],
