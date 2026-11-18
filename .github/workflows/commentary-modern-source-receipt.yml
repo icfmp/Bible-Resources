@@ -1407,6 +1407,183 @@ jobs:
           assert len(rows)==4
           print("PRIVATE_CCEl_NATIVE_SECTION_AUDIT complete metadata-only 4 sections; not editorial signoff")
           PY
+      - name: Audit all 51 unplaced book prefaces against exact CCEL div1 and pinned original SWORD first-K
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,os,re,subprocess,sys,unicodedata
+          from collections import Counter,defaultdict
+          from pathlib import Path
+          from lxml import etree
+          sys.path.insert(0,"scripts")
+          from commentary_private_text_compare import _original_source_markers
+          from commentary_modern_draft_osis_preview import (
+              _CANON,_modern_front,_SOURCE_CORPUS)
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          from commentary_modern_reference_gate import _ENGLISH_NAME_BY_OSIS
+
+          base=Path(os.environ["RUNNER_TEMP"])
+          source=json.loads((base/"mhcc-modern-whole-canon-native-receipt.json").read_text())
+          assert source["original_compiled_corpus_sha256"]==_SOURCE_CORPUS
+          source_bytes=(base/"mhcc-independent-ccel.xml").read_bytes()
+          assert hashlib.sha256(source_bytes).hexdigest()==(
+              "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6")
+          units,_metadata=_original_source_markers(source_bytes)
+          raw_root=etree.fromstring(
+              source_bytes,parser=etree.XMLParser(
+                  resolve_entities=False,no_network=True,load_dtd=False,
+                  recover=False,huge_tree=False,remove_blank_text=False))
+          div1=[v for v in raw_root.iter() if
+                isinstance(v.tag,str) and v.tag.rsplit("}",1)[-1]=="div1"]
+          owned=defaultdict(set)
+          for start,records in units.items():
+              book=start.split(".",1)[0]
+              for record in records:
+                  owned[record["private_original_enclosing_div1_document_ordinal"]].add(book)
+          bybook=defaultdict(list)
+          def words(text):
+              return re.findall(r"[^\W_]+",unicodedata.normalize(
+                  "NFKC",text).casefold())
+          for i,node in enumerate(div1,1):
+              codes=owned.get(i,set())
+              if len(codes)!=1 or next(iter(codes)) not in _CANON:
+                  continue
+              book=next(iter(codes))
+              first_chapter=next((n for n,v in enumerate(node)
+                  if isinstance(v.tag,str) and
+                  v.tag.rsplit("}",1)[-1]=="div2"),None)
+              if first_chapter is None:
+                  continue
+              # Only direct-book prose ahead of its first chapter, NEVER
+              # annex chapter titles, verses, or any later commentary.
+              prefix=[]
+              for child in list(node)[:first_chapter]:
+                  if isinstance(child.tag,str) and child.tag.rsplit("}",1)[-1] in (
+                      "title","h1","h2","h3","h4"):
+                      continue
+                  prefix.append("".join(child.itertext()))
+              passage=" ".join(prefix)
+              bybook[book].append({
+                  "source_div1_ordinal":i,
+                  "prefix_words":words(passage),
+                  "prefix_sha256":hashlib.sha256(passage.encode()).hexdigest(),
+              })
+
+          candidates=list(sorted(Path("work/mhcc-modern/production").glob(
+              "*-book-introduction.CANDIDATE.md")))
+          assert len(candidates)==56
+          candidates_by_book={}
+          for path in candidates:
+              meta,modern=_modern_front(path)
+              book=meta["book_osis"]
+              if (book in candidates_by_book or book not in _CANON
+                      or meta["source_native_corpus_sha256"]!=_SOURCE_CORPUS):
+                  raise ValueError("Duplicate, foreign or stale book introduction")
+              candidates_by_book[book]=(path,meta,modern)
+          source_attested={
+              book for book,(_p,meta,_text) in candidates_by_book.items()
+              if meta.get("source_native_intro_key")=="I:"+book+".1"}
+          assert source_attested=={"2John","3John","Jude","Obad","Phlm"}
+          review=set(candidates_by_book)-source_attested
+          assert len(review)==51
+          expected={}
+          for book in review:
+              original_units=source["chapters"][book+".1"]["original_units"]
+              if not original_units:
+                  raise ValueError("Unresolved book lacks numbered original K: "+book)
+              first=original_units[0]["first_key"]
+              expected[first]=(book,original_units[0]["source_unit_sha256"])
+          if len(expected)!=51:
+              raise ValueError("Book prefatory original K owners are not unique")
+          observed={}
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str((base/"mhcc-source-root").resolve())
+          def observe(kind,key,raw):
+              if kind!="K" or key not in expected:
+                  return
+              book,digest=expected[key]
+              if key in observed or hashlib.sha256(raw).hexdigest()!=digest:
+                  raise ValueError("Original first-K book source hash mismatch: "+book)
+              fragment=etree.fromstring(
+                  b"<native>"+raw+b"</native>",
+                  parser=etree.XMLParser(resolve_entities=False,no_network=True,
+                                         load_dtd=False,recover=False))
+              observed[key]=words("".join(fragment.itertext()))
+          proc=subprocess.Popen([
+              str((base/"commentary-modern-source-raw").resolve()),"MHCC"],
+              stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,env=env)
+          try:
+              native,*_=parse_native_raw_corpus(proc.stdout,on_entry=observe)
+              proc.stdout.close()
+              if proc.wait(timeout=120)!=0:
+                  raise ValueError("Original native introduction K scan failed")
+          finally:
+              if proc.poll() is None:
+                  proc.kill();proc.wait()
+          if (native["all_native_raw_entries_ordered_sha256"]!=_SOURCE_CORPUS
+                  or set(observed)!=set(expected)):
+              raise ValueError("Incomplete original K book-intro survey")
+
+          report=[]
+          for book in sorted(review):
+              path,meta,modern=candidates_by_book[book]
+              sections=bybook.get(book,[])
+              source_blocks=[p for p in sections if len(p["prefix_words"])>=15]
+              original_first=source["chapters"][book+".1"]["original_units"][0]["first_key"]
+              actual=observed[original_first]
+              presence=[]
+              for block in source_blocks:
+                  needle=block["prefix_words"][:min(20,len(block["prefix_words"]))]
+                  found=any(actual[i:i+len(needle)]==needle
+                            for i in range(len(actual)-len(needle)+1))
+                  presence.append(found)
+              if len(source_blocks)==1:
+                  result=("CCEL_BOOK_PREFACE_WORDS_MATCH_ORIGINAL_FIRST_K"
+                          if presence[0] else
+                          "CCEL_BOOK_PREFACE_NOT_MATCHED_IN_ORIGINAL_FIRST_K")
+              elif len(source_blocks)>1:
+                  result="AMBIGUOUS_MULTIPLE_CCEL_PREFACE_BLOCKS"
+              else:
+                  result=("NO_SEPARATE_CCEL_BOOK_PREFACE_IN_BOUNDED_DIRECT_DIV1"
+                          if sections else "ORIGINAL_CCEL_BOOK_IDENTITY_AMBIGUOUS")
+              report.append({
+                  "book":book,
+                  "candidate_path":str(path),
+                  "candidate_source_url":meta.get("reading_witness") or
+                      meta.get("initial_readable_witness"),
+                  "original_first_K":original_first,
+                  "CCEL_direct_book_prefix_count":len(source_blocks),
+                  "CCEL_book_prefix_source_word_count":sum(
+                      len(b["prefix_words"]) for b in source_blocks),
+                  "preface_exact_20_word_prefix_in_original_first_K":(
+                      bool(presence[0]) if len(presence)==1 else None),
+                  "classification":result,
+                  "individual_source_text_or_labels_exported":False,
+              })
+          counts=Counter(r["classification"] for r in report)
+          assert len(report)==51
+          result={
+              "status":"PINNED_SOURCE_NATIVE_VS_CCEL_51_BOOK_PREFACE_TRIAGE_NOT_APPROVAL",
+              "source_native_corpus_sha256":_SOURCE_CORPUS,
+              "CCEL_text_sha256":hashlib.sha256(source_bytes).hexdigest(),
+              "modern_book_intro_candidates":56,
+              "verified_native_chapter_I_intros":5,
+              "original_first_K_source_pinned_book_intro_candidates":51,
+              "classification":dict(sorted(counts.items())),
+              "cases":report,
+              "source_or_modern_prose_exported":False,
+              "silent_intro_insertion_approved":False,
+              "release_authorized":False,
+          }
+          (base/"mhcc-51-intro-native-vs-ccel-triage.json").write_text(
+              json.dumps(result,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+          print("MHCC 51 BOOK INTRO SOURCE BOUNDARIES TRIAGE (metadata only): "+
+                json.dumps(dict(sorted(counts.items())),sort_keys=True))
+          print("MHCC 51 BOOK INTRO FIRST-K CLASSIFICATION (metadata only): "+
+                json.dumps([{"book":r["book"],"status":r["classification"]}
+                            for r in report],sort_keys=True))
+          PY
       - name: Screen all modern manuscript outline tables for out-of-order source ranges
         shell: bash
         run: |
