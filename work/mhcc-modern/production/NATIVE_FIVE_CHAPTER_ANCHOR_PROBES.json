@@ -1,0 +1,117 @@
+{
+  "status": "SOURCE_TEXT_SECONDARY_WITNESS_ANCHOR_CANDIDATES_NOT_EDITORIAL_APPROVAL",
+  "source_module": "MHCC 0.1.1",
+  "source_zip_sha256": "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746",
+  "source_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
+  "purpose": "Check short secondary English-witness lexical anchors against authentic SHA-pinned SWORD-native raw commentary bodies and detect reference targets; a positive anchor is not proof of full prose parity or a release authorization.",
+  "source_group_probes": [
+    {
+      "chapter": "Deut.20",
+      "first": "Deut.20.1",
+      "last": "Deut.20.9",
+      "sha": "0ee8548dd7403e46ef65056b328193baed5c29f20afb48ddcba4206fecc16128",
+      "label": "first original exposition and candidate biblical reference discrepancy",
+      "witness": "https://www.christianity.com/bible/commentary/matthew-henry-concise/deuteronomy/20",
+      "anchors": [
+        {
+          "id": "willing_service",
+          "words": "God would not be served by men forced against their will"
+        }
+      ],
+      "reference_targets_to_probe": [
+        "Isa.8.12",
+        "Ps.110.3"
+      ]
+    },
+    {
+      "chapter": "Deut.20",
+      "first": "Deut.20.10",
+      "last": "Deut.20.12",
+      "sha": "879b2bc3a1063ff407809a4053dc103b4dfe66dd3bdb07d28f7f583d51d6d998",
+      "label": "10–12 original K index vs chapter-wide authored prose through verse 20",
+      "witness": "https://www.christianity.com/bible/commentary/matthew-henry-concise/deuteronomy/20",
+      "anchors": [
+        {
+          "id": "peace_offer",
+          "words": "The Israelites are here directed about the nations"
+        },
+        {
+          "id": "fruit_tree_rule",
+          "words": "in besieging cities the fruit trees should not be destroyed"
+        }
+      ]
+    },
+    {
+      "chapter": "1Sam.25",
+      "first": "1Sam.25.32",
+      "last": "1Sam.25.44",
+      "sha": "a7219b836582c17e1032af2733abd881e6d37e23a22c04d3b6d11ba7d1a6c272",
+      "label": "two original authored 32–39 and 39–44 expositions in one physical K group",
+      "witness": "https://ccel.org/ccel/henry/mhcc.x.xxv.html",
+      "anchors": [
+        {
+          "id": "david_abigail",
+          "words": "David gives God thanks for sending him this happy check"
+        },
+        {
+          "id": "abigail_marriage",
+          "words": "Abigail believed that David would be king over Israel"
+        }
+      ]
+    },
+    {
+      "chapter": "John.3",
+      "first": "John.3.1",
+      "last": "John.3.8",
+      "sha": "ef8bf2de82e6e9af42b4a9f7735757544a459eaad6c53fa7eafb559198f90e44",
+      "label": "source key index only 1–8, complete prose addresses 1–21",
+      "witness": "https://ccel.org/ccel/henry/mhcc.xxxv.iii.html",
+      "anchors": [
+        {
+          "id": "nicodemus_opening",
+          "words": "Nicodemus was afraid or ashamed to be seen with Christ"
+        },
+        {
+          "id": "christ_pardons",
+          "words": "Jesus Christ came to save us by pardoning us"
+        }
+      ]
+    },
+    {
+      "chapter": "Ps.95",
+      "first": "Ps.95.1",
+      "last": "Ps.95.11",
+      "sha": "8fd73ec5b07b5f38a39677d632196db2ee35061ecb33dd5d2511758f229dca8c",
+      "label": "two overlapping 1–7 and 7–11 CCEL authored expositions combined in one physical K group",
+      "witness": "https://ccel.org/ccel/henry/mhcc.xx.xcv.html",
+      "anchors": [
+        {
+          "id": "praise",
+          "words": "Whenever we come into Gods presence we must come with thanksgiving"
+        },
+        {
+          "id": "listen",
+          "words": "Christ calls upon his people to hear his voice"
+        }
+      ]
+    },
+    {
+      "chapter": "Zech.9",
+      "first": "Zech.9.9",
+      "last": "Zech.9.17",
+      "sha": "d1f20b04dc79386de38109d51c2a5a3d3ad1289e575623954980489e6064744c",
+      "label": "one original 9–17 authored exposition but two editorial outline topics",
+      "witness": "https://ccel.org/ccel/henry/mhcc.xxx_1.ix.html",
+      "anchors": [
+        {
+          "id": "messiah",
+          "words": "The prophet breaks forth into a joyful representation"
+        },
+        {
+          "id": "pentecost",
+          "words": "The gifts graces and consolations of the Spirit"
+        }
+      ]
+    }
+  ]
+}
