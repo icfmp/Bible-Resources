@@ -245,6 +245,54 @@ jobs:
               raise SystemExit("Source target line/key correspondence incomplete")
           print("Unreviewed machine references and source scopes (no commentary prose):",
                 detailed)
+          # Only the eight unresolved original machine citations. Record
+          # exact matching citation-only labels and their chapter/verse host
+          # (never commentary exposition), for independent editorial triage.
+          unresolved_original_lines={3108,37835,41584,47698,
+                                     50772,58059,76239,81529}
+          unresolved_old_targets={
+              3108:"21.13",37835:"10.1-4",41584:"4.4",47698:"5.7",
+              50772:"Pr.11.14 15.22 18.13 19.2 20.5 18 21.29 22.3 25.8-10",
+              58059:"Ps 60.1 2Sa 8.13 14",
+              76239:"1Ti.4.1 2Ti 3.1 2 3.3",
+              81529:"Lu.24.6 7-44 Mk 16.7",
+          }
+          host_chapter=None
+          host_group=None
+          still_unresolved=[]
+          for element in xml.iter():
+              if not isinstance(element.tag,str):
+                  continue
+              local=element.tag.rsplit("}",1)[-1]
+              if local=="chapter" and element.get("osisID"):
+                  host_chapter=element.get("osisID")
+                  host_group=None
+              if local=="verse" and element.get("osisID"):
+                  host_group=element.get("osisID")
+              if local=="verse" and element.get("eID"):
+                  host_group=None
+              if local!="reference" or element.sourceline not in unresolved_original_lines:
+                  continue
+              old=unresolved_old_targets[element.sourceline]
+              if element.get("osisRef")!=old:
+                  continue
+              label="".join(element.itertext()).strip()
+              # Citation-only, punctuation+numbers with optional roman numerals.
+              if (not 1<=len(label)<=160 or len(label.split())>48
+                      or not re.fullmatch(r"[A-Za-z0-9 .,:;()\\-/–]+",label)):
+                  raise SystemExit("Unresolved citation label requires private-only inspection")
+              still_unresolved.append({
+                  "source_line":element.sourceline,
+                  "source_chapter":host_chapter,
+                  "active_source_verse_group":host_group,
+                  "original_machine_reference":old,
+                  "original_visible_citation":label,
+                  "visible_label_sha256":sha256(label.encode()).hexdigest(),
+              })
+          if (len(still_unresolved)!=len(unresolved_original_lines)
+                  or {x["source_line"] for x in still_unresolved}!=unresolved_original_lines):
+              raise SystemExit("Eight source-bound unresolved reference anchors not unique")
+          print("Eight unresolved citation-only source identities:",still_unresolved)
           # Source here is a Bible-structured OSIS commentary (verse/chapter
           # elements), NOT annotateRef sections. Inspect the actual index data.
           import collections
