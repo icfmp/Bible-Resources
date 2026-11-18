@@ -14,7 +14,8 @@ from commentary_modern_reference_gate import (SourceReferenceGate,
     _unrecognized_original_ref_class, _source_same_chapter_verse_range,
     _unambiguous_explicit_modern_range, _allowed_source_link_target,
     _original_reference_table_ownership, _original_reference_title_ownership,
-    _source_range_section_ownership, _source_first_K_outline_row_evidence)
+    _source_range_section_ownership, _source_first_K_outline_row_evidence,
+    _find_exact_modern_original_outline_range_cell)
 
 
 ORIGINAL=(b'<div><reference osisRef="Bible:1John.5.20">1Jo 5:20</reference>'
@@ -719,6 +720,55 @@ class ExactSingleVerseSourceConcordanceTests(unittest.TestCase):
             literal="Bible:Isa.1.1-Isa.1.9",label="Is. 1:1-9",
             first_key="Isa.1.1",native_chapter=native,modern_chapter=modern)
         self.assertFalse(ambiguous["unique_modern_outline_row_matches_source_target"])
+
+    def test_original_first_K_full_chapter_outline_links_are_not_prose_crossrefs(self):
+        ns=self.NS
+        chapter=ET.Element(f"{{{ns}}}chapter",{"osisID":"Isa.1"})
+        intro=ET.SubElement(chapter,f"{{{ns}}}div",{"type":"introduction"})
+        ET.SubElement(intro,f"{{{ns}}}title").text="Original chapter outline"
+        table=ET.SubElement(intro,f"{{{ns}}}table")
+        for left,right in (("Original outline","Verses"),
+                           ("Corruption","1–9"),("Repentance","10–15")):
+            row=ET.SubElement(table,f"{{{ns}}}row")
+            ET.SubElement(row,f"{{{ns}}}cell").text=left
+            ET.SubElement(row,f"{{{ns}}}cell").text=right
+        units=[]
+        for start,end in ((1,9),(10,15)):
+            keys=["Isa.1."+str(i) for i in range(start,end+1)]
+            units.append({"first_key":keys[0],"keys":keys})
+            unit=ET.SubElement(chapter,f"{{{ns}}}div",{
+                "annotateType":"commentary",
+                "annotateRef":keys[0]+"-"+keys[-1]})
+            ET.SubElement(unit,f"{{{ns}}}p").text="Authorial modern prose."
+        source={"chapters":{"Isa.1":{"original_units":units}}}
+        original={"Isa.1.1":[
+            ("Bible:Isa.1.1-Isa.1.9","Is. 1:1-9"),
+            ("Bible:Isa.1.10-Isa.1.15","Is. 1:10-15")]}
+        modern={"Isa.1":chapter}
+        candidates,counts=_auto_single_verse_placements(
+            private_original=original,groups={},modern_chapters=modern,
+            native=source,blocked=set(),corrections={},
+            include_ranges=True,include_outline_links=True)
+        self.assertEqual(len(candidates),2)
+        self.assertEqual([c["action"] for c in candidates],[
+            "AUTO_ORIGINAL_FIRST_K_CHAPTER_OUTLINE_RANGE"]*2)
+        self.assertEqual([c["modern_anchor"] for c in candidates],
+                         ["1–9","10–15"])
+        cell=_find_exact_modern_original_outline_range_cell(
+            chapter,"Bible:Isa.1.10-Isa.1.15")
+        self.assertIsNotNone(cell)
+        before="".join(chapter.itertext())
+        _wrap_exact_authored_modern_text(
+            cell,anchor="10–15",display="10–15",occurrence="last",
+            target="Bible:Isa.1.10-Isa.1.15")
+        self.assertEqual("".join(chapter.itertext()),before)
+        self.assertEqual(cell.find(f"./{{{ns}}}reference").get("osisRef"),
+                         "Bible:Isa.1.10-Isa.1.15")
+        without,skips=_auto_single_verse_placements(
+            private_original=original,groups={},modern_chapters=modern,
+            native=source,blocked=set(),corrections={},
+            include_ranges=True,include_outline_links=False)
+        self.assertEqual(without,[])
 
     def test_exact_original_authorial_range_and_matching_modern_heading(self):
         section=ET.Element(f"{{{self.NS}}}div",{
