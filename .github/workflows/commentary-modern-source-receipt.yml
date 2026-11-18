@@ -522,6 +522,8 @@ jobs:
             --context-source-notes-osis "$RUNNER_TEMP/mhcc-modern-contextual-crossref.osis.xml" \
             --visible-source-reference-index-osis "$RUNNER_TEMP/mhcc-modern-visible-original-references.osis.xml" \
             --ephemeral-editorial-review-json "$RUNNER_TEMP/mhcc-modern-original-inline-review-brief.json" \
+            --compact-source-linked-osis "$RUNNER_TEMP/mhcc-modern-compact-restored.osis.xml" \
+            --compact-source-notes-osis "$RUNNER_TEMP/mhcc-modern-compact-restored-with-source-notes.osis.xml" \
             --source-notes-errata-manifest work/mhcc-modern/production/FOUR_NATIVE_LINK_ERRATA_REVIEW_2026-11-18.json \
             --source-errata-proposals-osis "$RUNNER_TEMP/mhcc-modern-proposed-errata-navigation.osis.xml" \
             --linked-osis "$RUNNER_TEMP/mhcc-modern-complete-bounded-linked.osis.xml" \
@@ -557,6 +559,27 @@ jobs:
           assert not provisional["editorial_approval"]
           assert not provisional["public_distribution"]
           assert Path(base/"mhcc-modern-proposed-errata-navigation.osis.xml").is_file()
+          compact=report["private_exact_compact_reference_recovery"]
+          compact_fallback=report["private_compact_remaining_source_notes"]
+          assert compact["status"] == (
+              "PRIVATE_EXACT_BOOK_CHAPTER_VERSE_COMPACT_SOURCE_LINK_RECONSTRUCTION")
+          assert compact["original_unplaced_valid_links_considered"] == 176
+          assert compact["original_exact_compact_verse_links_restored"] >= 65
+          assert compact["original_defective_link_proposals_never_retargeted"] == 4
+          assert (compact["original_exact_compact_verse_links_restored"] +
+                  compact["original_valid_link_positions_still_unplaced"]) == 176
+          assert compact["all_original_k_text_in_derived_osis_unchanged"]
+          assert compact["original_crossreference_literal_targets_and_labels_sha_verified"]
+          assert not compact["released_or_distributed"]
+          assert (compact_fallback["original_link_occurrences_preserved_only_in_separate_source_notes"]
+                  ==compact["original_valid_link_positions_still_unplaced"])
+          assert Path(base/"mhcc-modern-compact-restored.osis.xml").is_file()
+          assert Path(base/"mhcc-modern-compact-restored-with-source-notes.osis.xml").is_file()
+          print("SOURCE COMPACT ORIGINAL CROSS-REFERENCES RECOVERED: " +
+                str(compact["original_exact_compact_verse_links_restored"]) +
+                " separately clickable on original verse digits; " +
+                str(compact["original_valid_link_positions_still_unplaced"]) +
+                " retain pinned separate source notes, plus four blocked original errors")
           inline_index=report["private_visible_source_reference_index_preview"]
           assert inline_index["status"] == (
               "PRIVATE_SOURCE_REFERENCES_VISIBLE_IN_K_NOT_EXACT_AUTHORIAL_INLINE")
@@ -857,6 +880,125 @@ jobs:
           path: ${{ runner.temp }}/mhcc-modern-original-inline-review-brief.json
           if-no-files-found: error
           retention-days: 1
+      - name: Compile and independently read back compact English Bible references with original SWORD destinations
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/mhcc-compact-root/mods.d"
+          mkdir -p "$RUNNER_TEMP/mhcc-compact-root/modules/comments/zcom/mhcccompact"
+          timeout 240s osis2mod \
+            "$RUNNER_TEMP/mhcc-compact-root/modules/comments/zcom/mhcccompact" \
+            "$RUNNER_TEMP/mhcc-modern-compact-restored-with-source-notes.osis.xml" \
+            -z z -b 3 > "$RUNNER_TEMP/mhcc-compact-osis2mod.log" 2>&1
+          cat > "$RUNNER_TEMP/mhcc-compact-root/mods.d/mhcccompact.conf" <<'EOF'
+          [MHCCCOMPACT]
+          Description=Private MHCC source-pinned restored compact Bible citations
+          DataPath=./modules/comments/zcom/mhcccompact/
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          Lang=en
+          Versification=KJV
+          SourceType=OSIS
+          DistributionLicense=Private
+          EOF
+          python - <<'PY'
+          import hashlib,json,os,subprocess,sys
+          from collections import Counter
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+          sys.path.insert(0,"scripts")
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          base=Path(os.environ["RUNNER_TEMP"])
+          all_reports=json.loads(
+              (base/"mhcc-modern-complete-bounded-linked-osis-structure.json").read_text())
+          comp=all_reports["private_exact_compact_reference_recovery"]
+          fallback=all_reports["private_compact_remaining_source_notes"]
+          expected={}
+          for row in comp["placements"]:
+              expected.setdefault(row["source_first_key"],[]).append((
+                  row["original_literal_target_sha256"],
+                  row["linked_visible_token_sha256"]))
+          fallback_by_K={
+              r["source_first_key"]:r["original_source_reference_hashes"]
+              for r in fallback["note_source_K_reference_hashes_for_private_native_readback"]}
+          seen={}
+          fallback_seen={}
+          def observe(kind,key,raw):
+              if kind!="K" or key not in expected and key not in fallback_by_K:
+                  return
+              if key in seen:
+                  raise ValueError("Repeated restored compact original source K")
+              node=ET.fromstring(b"<native>"+raw+b"</native>")
+              notes=[n for n in node.iter() if isinstance(n.tag,str)
+                     and n.tag.rsplit("}",1)[-1]=="note"]
+              if key in expected:
+                  in_prose=[]
+                  for ref in node.iter():
+                      if not isinstance(ref.tag,str) or ref.tag.rsplit("}",1)[-1]!="reference":
+                          continue
+                      if any(ref in list(n.iter()) for n in notes):
+                          continue
+                      in_prose.append((
+                          hashlib.sha256(ref.get("osisRef").encode()).hexdigest(),
+                          hashlib.sha256("".join(ref.itertext()).encode()).hexdigest()))
+                  counts=Counter(in_prose)
+                  for item in expected[key]:
+                      if counts[item]<=0:
+                          raise ValueError("Restored original compact verse source link lost in compiled SWORD")
+                      counts[item]-=1
+              if key in fallback_by_K:
+                  source_notes=[n for n in notes if "Unplaced links from original edition"
+                                in "".join(n.itertext())]
+                  if len(source_notes)!=1:
+                      raise ValueError("One source original fallback note missing")
+                  actual=[(
+                      hashlib.sha256(r.get("osisRef").encode()).hexdigest(),
+                      hashlib.sha256("".join(r.itertext()).encode()).hexdigest())
+                      for r in source_notes[0].iter()
+                      if isinstance(r.tag,str) and r.tag.rsplit("}",1)[-1]=="reference"]
+                  wanted=[(
+                      x["source_original_literal_target_sha256"],
+                      x["supplement_display_sha256"])
+                      for x in fallback_by_K[key]]
+                  if actual!=wanted:
+                      raise ValueError("Remaining source-only crossreference note drift")
+                  fallback_seen[key]=len(actual)
+              seen[key]=True
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str((base/"mhcc-compact-root").resolve())
+          process=subprocess.Popen([
+              str((base/"commentary-modern-source-raw").resolve()),
+              "MHCCCOMPACT"],env=env,stdout=subprocess.PIPE,
+              stderr=subprocess.DEVNULL)
+          try:
+              output,keys,_,_=parse_native_raw_corpus(process.stdout,on_entry=observe)
+              process.stdout.close()
+              if process.wait(timeout=120)!=0:
+                  raise ValueError("Private restored compact SWORD scan failed")
+          finally:
+              if process.poll() is None:
+                  process.kill()
+                  process.wait()
+          if (len(keys)!=28792 or set(seen)!=set(expected)|set(fallback_by_K)
+                  or set(fallback_seen)!=set(fallback_by_K)
+                  or sum(fallback_seen.values())!=
+                     comp["original_valid_link_positions_still_unplaced"]):
+              raise ValueError("Private restored compact SWORD integrity mismatch")
+          if sum(map(len,expected.values()))!=comp["original_exact_compact_verse_links_restored"]:
+              raise ValueError("Original compact verse recovered count changed")
+          check=subprocess.run([
+              "diatheke","-b","MHCCCOMPACT","-f","OSIS","-k",
+              "1 Corinthians 13:8"],env=env,text=True,capture_output=True,timeout=30)
+          if (check.returncode!=0 or "1John.4.8" not in check.stdout
+                  or "1John.4.16" not in check.stdout):
+              raise ValueError("Real diatheke did not render 1 John 4:8 and 4:16 as distinct restored references")
+          print("PRIVATE COMPACT SWORD PASS: restored="+
+                str(comp["original_exact_compact_verse_links_restored"])+
+                " distinct authorial inline verse links, source-only fallback="+
+                str(sum(fallback_seen.values()))+
+                ", 28792 K keys, real diatheke two-target navigation; NO release")
+          PY
       - name: Compile private visible in-commentary source reference index and verify 176 targets
         shell: bash
         run: |
