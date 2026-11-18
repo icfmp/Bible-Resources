@@ -603,17 +603,25 @@ jobs:
                   native["native_occupied_opaque_top_keys"]!=2):
               raise SystemExit("Private repaired endpoint preview changed native index coverage")
           sys.path.insert(0,str(Path.cwd()/"scripts"))
-          from audit_osis import compare_source_milestone_index
+          from audit_osis import (compare_source_milestone_index,
+                                  source_commentary_overlap_witness,
+                                  compare_source_overlap_native_bodies)
           from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          overlapping,related_refs=source_commentary_overlap_witness(output)
+          print("Original OSIS distinct overlapping verse-address keys:",len(overlapping))
+          print("Native keys to examine for both authored overlapping comments:",len(related_refs))
           raw_reader=root/"commentary-native-raw"
           env=dict(os.environ,SWORD_PATH=str(root/"mhc-endpoints-preview-sword"))
           process=subprocess.Popen([str(raw_reader),"MHCEndpointPreview"],
                                    env=env,stdout=subprocess.PIPE,
                                    stderr=subprocess.DEVNULL)
           bodies={}
+          related_raw={}
           def get_body(kind,key,raw):
               if kind=="K":
                   bodies[key]=sha256(raw).hexdigest()
+                  if key in related_refs:
+                      related_raw[key]=raw
           try:
               _full,keys,intros,_tops=parse_native_raw_corpus(
                   process.stdout,on_entry=get_body)
@@ -630,6 +638,13 @@ jobs:
           print("Endpoint-only preview integrity categories:",audit["anomaly_counts"])
           print("Remaining groups needing separate ownership research:",
                 audit["structure_counts"]["same_verse_assigned_more_than_once"])
+          if overlapping:
+              report=compare_source_overlap_native_bodies(overlapping,related_raw)
+              print("Authored source overlap text preservation classes:",
+                    report["classification_counts"])
+              print("Bounded source group/body ownership results (no text):",
+                    report["bounded_source_group_cases"])
+              print("Overlap word presence is a diagnostic, NOT final notes/markup fidelity")
           if audit["structure_counts"]["missing_source_verses_in_native"] or (
                   not audit["all_source_verse_ids_match_occupied_native_keys"] or
                   not audit["all_source_book_chapter_ids_match_occupied_native_intros"]):
