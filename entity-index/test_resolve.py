@@ -41,6 +41,11 @@ def fixture():
                 "scope": "absent_from_pinned_original_word_inventory_only",
                 "source_reference_claims": ["person:Alpha"],
                 "evidence": [{"source": "source-verse-audit"}],
+                "source_context": {
+                    "classification": "traditional_textual_variant_not_in_pinned_main_text",
+                    "explanation": "Source-specific verse wording difference",
+                    "evidence": ["Pinned Greek word scan", "Variant-source comparison"],
+                },
             },
         },
         "unattested_source_words": {
@@ -132,6 +137,8 @@ class ResolverTests(unittest.TestCase):
         self.assertEqual(r["canonical_ids"], [])
         self.assertEqual(r["source_absence"]["source_reference_claims"],
                          ["person:Alpha"])
+        self.assertEqual(r["source_absence"]["source_context"]["classification"],
+                         "traditional_textual_variant_not_in_pinned_main_text")
         self.assertEqual(
             self.lookup(corpus="sblgnt", edition="Macula-SBLGNT@other",
                         word_id="n40001002001", verse_id="40001002")["status"],
