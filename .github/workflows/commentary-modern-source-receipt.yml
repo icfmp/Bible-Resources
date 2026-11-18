@@ -7,6 +7,8 @@ on:
       - 'scripts/commentary_modern_native_witness_probe.py'
       - 'tests/test_commentary_modern_native_witness_probe.py'
       - 'scripts/commentary_modern_ionly_preview.py'
+      - 'scripts/commentary_modern_k_scope_preview.py'
+      - 'tests/test_commentary_modern_k_scope_preview.py'
       - 'scripts/sword_native_commentary_index.cpp'
       - 'scripts/commentary_modern_reference_gate.py'
       - 'scripts/commentary_modern_linked_candidate_preview.py'
@@ -31,7 +33,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Test source-native and draft-coverage guards on synthetic fixtures
-        run: python -m unittest tests/test_commentary_modern_source_receipt.py tests/test_commentary_modern_ionly_preview.py tests/test_commentary_modern_draft_guard.py tests/test_commentary_modern_draft_osis_preview.py tests/test_commentary_modern_reference_gate.py tests/test_commentary_modern_linked_candidate_preview.py tests/test_commentary_modern_native_witness_probe.py -v
+        run: python -m unittest tests/test_commentary_modern_source_receipt.py tests/test_commentary_modern_ionly_preview.py tests/test_commentary_modern_draft_guard.py tests/test_commentary_modern_draft_osis_preview.py tests/test_commentary_modern_reference_gate.py tests/test_commentary_modern_linked_candidate_preview.py tests/test_commentary_modern_native_witness_probe.py tests/test_commentary_modern_k_scope_preview.py -v
       - name: Install real SWORD source reader
         shell: bash
         run: |
@@ -944,6 +946,108 @@ jobs:
           print("Real temporary SWORD readback proved the transport only; "+
                 "original headings/meaning, independent readers, licensing and release remain unapproved")
           PY
+      - name: Compile and read back original-K underindexed authorial scope in private zCom
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_modern_k_scope_preview.py \
+            --manifest work/mhcc-modern/production/NATIVE_K_UNDERSCOPED_RANGE_PREVIEW.json \
+            --source-receipt "$RUNNER_TEMP/mhcc-modern-whole-canon-native-receipt.json" \
+            --osis "$RUNNER_TEMP/mhcc-krange-preview.xml" \
+            --report "$RUNNER_TEMP/mhcc-krange-preview-report.json" \
+            --temp-module-id MHCCKRANGE
+          mkdir -p "$RUNNER_TEMP/mhcc-krange-root/mods.d"
+          mkdir -p "$RUNNER_TEMP/mhcc-krange-root/modules/comments/zcom/mhcckrange"
+          osis2mod "$RUNNER_TEMP/mhcc-krange-root/modules/comments/zcom/mhcckrange" \
+            "$RUNNER_TEMP/mhcc-krange-preview.xml" -z z -b 3 \
+            > "$RUNNER_TEMP/mhcc-krange-osis2mod.log" 2>&1
+          cat > "$RUNNER_TEMP/mhcc-krange-root/mods.d/mhcckrange.conf" <<'EOF'
+          [MHCCKRANGE]
+          Description=Private unvalidated original K range navigation transport test
+          DataPath=./modules/comments/zcom/mhcckrange/
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          Lang=en
+          Versification=KJV
+          SourceType=OSIS
+          DistributionLicense=Private
+          EOF
+          SWORD_PATH="$RUNNER_TEMP/mhcc-krange-root" \
+            "$RUNNER_TEMP/mhcc-ionly-native-index" MHCCKRANGE --chapter-registry \
+            > "$RUNNER_TEMP/mhcc-krange-registry.txt"
+          SWORD_PATH="$RUNNER_TEMP/mhcc-krange-root" \
+            "$RUNNER_TEMP/mhcc-ionly-native-index" MHCCKRANGE --adjacent-links \
+            > "$RUNNER_TEMP/mhcc-krange-linked.txt"
+          for key in 'Deuteronomy 20:10' 'Deuteronomy 20:20' 'John 3:1' 'John 3:21'; do
+            SWORD_PATH="$RUNNER_TEMP/mhcc-krange-root" \
+              diatheke -b MHCCKRANGE -f OSIS -k "$key" \
+              > "$RUNNER_TEMP/mhcc-krange-readback-$(echo "$key" | tr ' :' '__').txt"
+          done
+          python - <<'PY'
+          import hashlib,json,os,subprocess,sys
+          from pathlib import Path
+          from collections import defaultdict
+          sys.path.insert(0,"scripts")
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          temp=Path(os.environ["RUNNER_TEMP"])
+          report=json.loads((temp/"mhcc-krange-preview-report.json").read_text())
+          assert report["status"]=="PRIVATE_UNVALIDATED_SINGLE_ORIGINAL_K_BODY_EXTENDED_RANGE_PREVIEW"
+          assert not report["sword_published"] and not report["independent_source_prose_meaning_approved"]
+          expected={"Deut.20":(10,20,20),"John.3":(1,21,36)}
+          assert set(expected)=={x["chapter"] for x in report["cases"]}
+          for row in report["cases"]:
+              start,last,cap=expected[row["chapter"]]
+              assert row["linked_modern_verse_count"]==last-start+1
+              assert row["authorial_source_K_bodies_added_or_split"]==0
+          register={}
+          for line in (temp/"mhcc-krange-registry.txt").read_text().splitlines():
+              fields=line.split("\t")
+              if len(fields)==3 and fields[0]=="R" and fields[1] in expected:
+                  register[fields[1]]=int(fields[2])
+          assert register=={key:val[2] for key,val in expected.items()}
+          pairs=defaultdict(set)
+          for line in (temp/"mhcc-krange-linked.txt").read_text().splitlines():
+              fields=line.split("\t")
+              if len(fields)!=4 or fields[0]!="L":
+                  continue
+              chapter=fields[1].rsplit(".",1)[0]
+              assert chapter in expected and fields[3]=="1"
+              pairs[chapter].add((fields[1],fields[2]))
+          for chapter,(start,last,_cap) in expected.items():
+              wanted={(f"{chapter}.{v}",f"{chapter}.{v+1}") for v in range(start,last)}
+              assert pairs[chapter]==wanted,(chapter,"incorrect transport link or duplicate commentary")
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str((temp/"mhcc-krange-root").resolve())
+          proc=subprocess.Popen([str(temp/"commentary-modern-source-raw"),"MHCCKRANGE"],
+              stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,env=env)
+          hashes=defaultdict(dict)
+          try:
+              def collect(kind,key,raw):
+                  if kind=="K":
+                      chapter=key.rsplit(".",1)[0]
+                      assert chapter in expected,"Unrequested extra source commentary key"
+                      hashes[chapter][key]=hashlib.sha256(raw).hexdigest()
+              counters,_,_,_=parse_native_raw_corpus(proc.stdout,on_entry=collect)
+              proc.stdout.close()
+              assert proc.wait(timeout=30)==0
+          finally:
+              if proc.poll() is None:proc.kill();proc.wait()
+          assert counters["actual_occupied_numbered_entry_count"]==32
+          for chapter,(start,last,_cap) in expected.items():
+              assert set(hashes[chapter])=={f"{chapter}.{v}" for v in range(start,last+1)}
+              assert len(set(hashes[chapter].values()))==1
+          readbacks=list(temp.glob("mhcc-krange-readback-*.txt"))
+          assert len(readbacks)==4
+          for p in readbacks:
+              rendered=p.read_text(encoding="utf-8")
+              assert "Israel received laws about warfare" in rendered or (
+                  "Nicodemus was afraid" in rendered)
+          print("K_SCOPE_SWORD_LINK_PASS original_source_K_groups=2 modern_K_bodies=2 "+
+                "accessible_K_verse_keys=32 linked_pairs=30 no_original_K_overwrites=true")
+          print("Real temporary SWORD linked transport only: source semantics, "+
+                "inline reference preservation, independent reader QA and release NOT approved")
+          PY
       - name: Verify Genesis 1 native original scripture link identities
         shell: bash
         run: |
@@ -1262,6 +1366,7 @@ jobs:
             ${{ runner.temp }}/mhcc-modern-historical-69-translation-coverage.json
             ${{ runner.temp }}/mhcc-modern-full-canon-source-group-diagnostic.json
             ${{ runner.temp }}/mhcc-ionly-preview-report.json
+            ${{ runner.temp }}/mhcc-krange-preview-report.json
             ${{ runner.temp }}/mhcc-modern-outline-order-diagnostic.json
             ${{ runner.temp }}/mhcc-modern-draft-coverage-report.json
             ${{ runner.temp }}/mhcc-modern-preview-structure.json
