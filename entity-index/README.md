@@ -454,7 +454,7 @@ descriptions without firmer person-role evidence.
 No anonymous person was merged with an explicitly named historical
 person. No other referent groups were removed. Exact pinned original
 source records remain byte-identical, and source edits stay declarative,
-reversible and fully audited. The **2,361 indirect-only overlaps** still
+reversible and fully audited. The **2,353 indirect-only overlaps** still
 require separate source-role and participant semantics review.
 
 ## Indirect person-overlap source-grammar triage — no mass deduplication
@@ -478,10 +478,10 @@ event or whether one anonymous pronoun refers to them.
 
 The original complete pinned morphology audit found **1,289 Greek**
 and **1,096 Hebrew** indirect-only word overlaps. A subsequent
-exact-token contextual correction in the derived index removed twenty-four
-false source overlap claims; the remaining **2,361** word overlaps comprise
-**1,284 Greek** and **1,077 Hebrew**. Their source-word grammatical
-counts are **2,095 plural**, **70 singular** and **196 without number**
+exact-token contextual correction in the derived index removed thirty-two
+false exact-word person-overlap cases; the remaining **2,353** word overlaps comprise
+**1,281 Greek** and **1,072 Hebrew**. Their source-word grammatical
+counts are **2,094 plural**, **64 singular** and **195 without number**
 (often infinitives).
 These are categories of the source word, not conclusions about the
 people tagged on it. Several repeated candidate cohorts (e.g. Paul/Silas/Timothy; Aaron/Moses;
@@ -626,6 +626,65 @@ files, repeated source annotations, Hebrew text and verse numbers are
 untouched. The complete 134,822 active original-word inventory is
 still required by CI, and no missing person token is automatically
 retagged with a Strong number or an unrelated person.
+
+## Source-context review of singular person actors — no global deduplication
+
+A further exact-word review of the remaining singular-source person
+candidates corrected **eight overlapping original-word cases** in
+the derived index, of which six were grammatically singular, one plural
+and one without an annotated grammatical number. The additional words
+removed from incorrect people are not erased from the index: their
+proper source-linked group or alternate participant remains.
+
+- **Luke 10:25 (SBLGNT):** the `νομικός` law expert and his
+  singular participle `λέγων` are the speaker introduced here.
+  `person:GenericPriest` actually denotes the priest in Jesus'
+  *later* Good Samaritan story (Luke 10:31); remove its two
+  exact Greek false subject links, while retaining the frozen
+  `person:Scribe` witness and all other claims.
+- **Acts 21:37 (SBLGNT):** the Greek singular `γινώσκεις`
+  in the Roman officer's question “Do you know Greek?” addresses
+  **Paul**. The military speaker is not the subject of *know*;
+  detach only his false second-person subject link.
+- **Ezra 8:33 (WLC):** original `o150080330262` denotes
+  **the Levites** who assisted with weighing precious objects,
+  not the historic Levi son of Jacob. The singular passive
+  `o150080330031` cannot name the ancient patriarch as actor.
+  Keep existing `group:Levi` and all unrelated people.
+- **Nehemiah 8:10 (WLC):** the speech follows Nehemiah, Ezra
+  and the Levites teaching the postexilic people. The individual
+  `person:Levi.3` does not exist as a contemporary speaker.
+  Remove only that false speech-word assignment; preserve the
+  other unresolved present-day speaker possibilities.
+- **Isaiah 36:8–9 (WLC):** five singular second-person words
+  address Jerusalem/Judah's living representatives facing
+  Assyria; they do not refer to **the deceased patriarch Judah**.
+  Existing named officials, city and `group:Judah` links are
+  untouched. Singular morphology alone would not establish
+  exactly which living representative is addressed, so
+  **no** official is arbitrarily selected.
+- **Jeremiah 33:10 (WLC):** the singular demonstrative “this”
+  is part of “this place”, describing desolated Judah,
+  and the verse's *Judah* proper name denotes the towns,
+  not Jacob's son. Detach the exact false `person:Israel` and
+  `person:Judah.4` claims; existing `group:Judah` links
+  retain the name and demonstrative.
+- **Malachi 2:10 (WLC):** the living covenant community's
+  words “we”, “each one”, and the covenant of its fathers
+  cannot name **Jacob/Israel** as a present-day participant.
+  Three erroneous patriarch word groups are detached; all
+  existing source words remain anchored independently to the
+  original `person:Malachi` witness. This does **not**
+  certify that every other role in the verse is fully resolved.
+
+Exact source receipts, reasons and reversible group edits are in
+`editorial-decisions.json`. Macula original-language editions
+and immutable ACAI source snapshots remain pinned. The entire
+134,822-word index, exact Hebrew and Greek text, source
+versification, repeated original annotations and all unrelated
+identity candidates are unchanged. Other singular, plural and
+unmarked indirect claims remain **uncertified** pending their
+own passage-by-passage review.
 
 ## Scoped review of all eight remaining explicit-person overlaps
 
