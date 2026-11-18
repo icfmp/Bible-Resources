@@ -1,6 +1,6 @@
 # Bible Semantic Index (BSI) — v0.1 release readiness
 
-**Status: NOT RELEASED. Key Terms are explicitly deferred beyond v0.1 by project-owner decision.** This document records the adopted project name and the specific publication gates. It does not grant redistribution permission or assert that all source-derived material is cleared.
+**Status: PUBLISHED 2026-11-18** — [Bible Semantic Index v0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/bsi-v0.1.0). Key Terms are excluded from this version. This page preserves the preparation evidence and release criteria; see [the scoped rights audit](BSI_V0_1_RIGHTS_AUDIT.md).
 
 ## Identity and scope
 
@@ -41,7 +41,7 @@ python3 -I entity-index/distribution_profile.py \
   --output entity-index/dist/bsi-v0.1-without-keyterms.json
 ```
 
-The file is a *candidate distribution projection*, **not yet a published release**. The minimal label file comes from the pinned, SHA-verified English `preferred_label` field only:
+The file is a *candidate distribution projection* for reproducible builds; the **published** release is the archived, checked ZIP linked above. The minimal label file comes from the pinned, SHA-verified English `preferred_label` field only:
 
 ```bash
 python3 -I entity-index/minimal_labels.py \
@@ -64,12 +64,12 @@ A successful artifact upload in CI remains an **internal candidate**, never a Gi
 
 ## Required gates before public release
 
-- [ ] Verify upstream provenance and rights at **field level**, including whether `keyterms` or other categories contain permission-only data. Attach dated evidence.
+- [x] Document a scoped upstream field-level licensing review in [BSI_V0_1_RIGHTS_AUDIT.md](BSI_V0_1_RIGHTS_AUDIT.md), excluding permission-only Key Terms. This is a documented license-scope review, not legal advice.
 - [x] Implement a separate deterministic projection excluding **all keyterms**; CI was green on merged PR #345; archive-level validation remains required on the packaging revision. Recheck rights in remaining categories independently.
 - [x] Implement minimal **source-hash-checked, English-only label extraction** in a separate candidate artifact, with provenance and unreviewed labeling; CI was green on merged PR #345; labels remain source-unreviewed, not editorially certified.
-- [ ] Regenerate from pinned sources on final commit; verify index parity, active-token coverage, category readback and resulting content SHA-256; retain permanent build instructions.
+- [x] Rebuilt on merged `main` commit `4b45f384c3769431a2e761573cef14554a16b044` in the [successful publishing workflow](https://github.com/icfmp/Bible-Resources/actions/runs/44305997133), checked index parity and ZIP readback.
 - [x] Implement a reproducible candidate ZIP generator with attribution, excluded-feature notice, version, source lock and member/archive SHA-256; archive CI must pass before release.
-- [ ] Publish only after the above checks pass. App integration is **not owned by this repository** and is not a condition of releasing a properly scoped standalone BSI dataset.
+- [x] GitHub Release [bsi-v0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/bsi-v0.1.0) published with `BSI-0.1.0.zip` (1,867,962 bytes; SHA-256 `3685b09b157f89c42f7766c4f42cf7d5c9fe1e8cde153c8f633afc7a6d2d4c41`) and portable checksum receipt. App integration remains separate.
 
 ## Traceability
 
