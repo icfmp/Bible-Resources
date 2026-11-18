@@ -183,6 +183,1264 @@ jobs:
                     " source_sha_anchors="+anchors)
           print("COMPLETE NATIVE KEY RECEIPT PASS — metadata only; no draft semantics, links, notes or compiled derivative approved")
           PY
+      - name: Verify all separately attested chapter-I modern book prefaces against authenticated original
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          import re
+
+          native = json.loads((Path(os.environ["RUNNER_TEMP"]) /
+              "mhcc-modern-whole-canon-native-receipt.json").read_text(encoding="utf-8"))
+          assert native["status"] == "SOURCE_NATIVE_RECEIPT_ONLY_NOT_TRANSLATION_APPROVAL"
+          assert native["original_compiled_corpus_sha256"] == (
+              "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e")
+          assert native["source_prose_or_original_markup_exported"] is False
+
+          # Select the native evidence, not a hand-picked list of books:
+          # distinct chapter-I prose can coexist with original numbered-K bodies.
+          # Short book-I titles are not introductory authorial prose.
+          expected = {}
+          for chapter, data in native["chapters"].items():
+              if not data["original_units"]:
+                  continue  # Lev.19 and Ps.108 are separately tested whole-I expositions.
+              for intro in data["native_introductions_not_assumed_to_be_exposition"]:
+                  if intro["key"] != chapter or not intro["visible_word_tokens"]:
+                      continue
+                  book = chapter.rsplit(".", 1)[0]
+                  assert book not in expected, "Multiple chapter-I prose candidates for book"
+                  expected[book] = intro
+          assert expected, "No authentic original chapter-I prose units were identified"
+
+          observed = {}
+          for path in Path("work/mhcc-modern/production").glob(
+                  "*-book-introduction.CANDIDATE.md"):
+              source = path.read_text(encoding="utf-8")
+              front = source.split("\n---\n", 1)[0]
+              if not re.search(r'^source_native_intro_key: "', front, re.M):
+                  continue  # Other book prefaces may instead originate in numbered K.
+              attrs = {}
+              for key, val in re.findall(r'^([a-z_]+): "([^"]*)"
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_modern_native_witness_probe.py \
+            --native-reader "$RUNNER_TEMP/commentary-modern-source-raw" \
+            --module-directory "$RUNNER_TEMP/mhcc-source-root" \
+            --native-receipt "$RUNNER_TEMP/mhcc-modern-whole-canon-native-receipt.json" \
+            --witness-manifest "work/mhcc-modern/production/NATIVE_FIVE_CHAPTER_ANCHOR_PROBES.json" \
+            --report "$RUNNER_TEMP/mhcc-modern-five-native-source-witness-probes.json"
+      - name: Compare five original-source witnesses with immutable MHCC 0.1.0 stock-preserving release
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The exact historic upstream MHCC 2.0 source was preserved,
+          # without original commentary or K/I edits, as Bible Resources
+          # BRMHCC 0.1.0. The live CrossWire mirror is NOT a trusted pin.
+          curl --fail --location --silent --show-error --retry 2 --max-time 90 \
+            'https://github.com/icfmp/Bible-Resources/releases/download/mhcc-0.1.0/BRMHCC-0.1.0.zip' \
+            --output "$RUNNER_TEMP/mhcc-crosswire-stock-preserving-0.1.0.zip"
+          printf '%s  %s\n' \
+            '0faf4376b6b97093ecb94f306886c24d3030ab1f5e194472ad908dd73921f9c0' \
+            "$RUNNER_TEMP/mhcc-crosswire-stock-preserving-0.1.0.zip" | sha256sum -c -
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path, PurePosixPath
+          import zipfile
+          temp=Path(os.environ["RUNNER_TEMP"])
+          root=temp/"mhcc-crosswire-stock-root"
+          root.mkdir()
+          with zipfile.ZipFile(temp/"mhcc-crosswire-stock-preserving-0.1.0.zip") as archive:
+              infos=archive.infolist()
+              assert len(infos)<32
+              for info in infos:
+                  rel=PurePosixPath(info.filename)
+                  assert rel.parts and not rel.is_absolute() and ".." not in rel.parts
+                  assert not (info.external_attr >> 16) & 0o170000 == 0o120000
+                  assert info.file_size<5*1024*1024
+                  dest=root.joinpath(*rel.parts)
+                  assert dest.resolve().is_relative_to(root.resolve())
+                  if info.is_dir():
+                      dest.mkdir(parents=True,exist_ok=True)
+                  else:
+                      dest.parent.mkdir(parents=True,exist_ok=True)
+                      with archive.open(info) as src,dest.open("xb") as dst:
+                          dst.write(src.read())
+          assert (root/"mods.d/brmhcc.conf").is_file()
+          original=json.loads(Path(
+              "work/mhcc-modern/production/NATIVE_FIVE_CHAPTER_ANCHOR_PROBES.json"
+          ).read_text(encoding="utf-8"))
+          original["source_module"]="Original CrossWire MHCC 2.0 native content preserved in BRMHCC 0.1.0"
+          original["native_module_id"]="BRMHCC"
+          original["source_group_hash_policy"]="authenticated_native_receipt"
+          original["source_zip_sha256"]="0faf4376b6b97093ecb94f306886c24d3030ab1f5e194472ad908dd73921f9c0"
+          original["source_native_corpus_sha256"]="8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
+          (temp/"mhcc-crosswire-five-witness-manifest.json").write_text(
+              json.dumps(original,indent=2)+"\n",encoding="utf-8")
+          print("Original CrossWire content read from immutable SHA-pinned BRMHCC 0.1.0 release")
+          PY
+          python scripts/commentary_modern_source_receipt.py \
+            --native-reader "$RUNNER_TEMP/commentary-modern-source-raw" \
+            --module-directory "$RUNNER_TEMP/mhcc-crosswire-stock-root" \
+            --module-id BRMHCC \
+            --expected-corpus-sha256 \
+            '8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6' \
+            --chapters Deut.20 1Sam.25 John.3 Ps.95 Zech.9 \
+            --report "$RUNNER_TEMP/mhcc-crosswire-five-native-source-receipt.json"
+          python scripts/commentary_modern_native_witness_probe.py \
+            --native-reader "$RUNNER_TEMP/commentary-modern-source-raw" \
+            --module-directory "$RUNNER_TEMP/mhcc-crosswire-stock-root" \
+            --native-receipt "$RUNNER_TEMP/mhcc-crosswire-five-native-source-receipt.json" \
+            --witness-manifest "$RUNNER_TEMP/mhcc-crosswire-five-witness-manifest.json" \
+            --report "$RUNNER_TEMP/mhcc-crosswire-five-native-witness-probes.json"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          temp=Path(os.environ["RUNNER_TEMP"])
+          curated=json.loads((temp/"mhcc-modern-five-native-source-witness-probes.json").read_text())
+          stock=json.loads((temp/"mhcc-crosswire-five-native-witness-probes.json").read_text())
+          by_group={(x["chapter"],x["original_first_key"]):x for x in stock["groups"]}
+          assert len(by_group)==len(stock["groups"])==len(curated["groups"])==6
+          differences=[]
+          for case in curated["groups"]:
+              old=by_group[case["chapter"],case["original_first_key"]]
+              expected=[a["found_in_exact_published_native_body"]
+                        for a in case["secondary_witness_anchor_checks"]]
+              earlier=[a["found_in_exact_published_native_body"]
+                       for a in old["secondary_witness_anchor_checks"]]
+              if old["source_unit_sha256_matches"] is not True or earlier!=expected:
+                  differences.append(case["chapter"]+"."+case["original_first_key"])
+          print("STOCK_TO_CURATED_SOURCE_WITNESS_DIFFERENCES "+json.dumps(differences))
+          assert not differences,"Historic original-stock witness evidence differs from curated edition"
+          PY
+      - name: Collate four exact CCEL ThML authored sections against two authentic native K groups
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          curl --fail --location --silent --show-error --retry 2 --max-time 120 \
+            'https://www.ccel.org/ccel/h/henry/mhcc.xml' \
+            --output "$RUNNER_TEMP/mhcc-independent-ccel.xml"
+          printf '%s  %s\n' \
+            '4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6' \
+            "$RUNNER_TEMP/mhcc-independent-ccel.xml" | sha256sum -c -
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import re
+          import subprocess
+          import sys
+          sys.path.insert(0,"scripts")
+          from commentary_private_text_compare import (
+              _original_source_markers,raw_as_strict_xml_text)
+          from commentary_nonlink_word_alignment import plain_word_alignment
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+
+          temp=Path(os.environ["RUNNER_TEMP"])
+          raw_xml=(temp/"mhcc-independent-ccel.xml").read_bytes()
+          assert len(raw_xml)==7952268
+          assert hashlib.sha256(raw_xml).hexdigest()==(
+              "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6")
+          units,full_metadata=_original_source_markers(raw_xml)
+          # Each tuple is one actually authored CCEL ThML scripCom section,
+          # its original declared end, and the *existing* compiled native K
+          # raw body it may or may not be represented within. Selection is
+          # a bounded review scope, not an encoding or versification rule.
+          selection=[
+              ("1Sam.25.32","1Sam.25.39","1Sam.25.32","1Sam.25.44"),
+              ("1Sam.25.39","1Sam.25.44","1Sam.25.32","1Sam.25.44"),
+              ("Ps.95.1","Ps.95.7","Ps.95.1","Ps.95.11"),
+              ("Ps.95.7","Ps.95.11","Ps.95.1","Ps.95.11"),
+          ]
+          original=json.loads((temp/"mhcc-modern-whole-canon-native-receipt.json").read_text())
+          assert original["original_compiled_corpus_sha256"]==(
+              "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e")
+          need={k for _s,_e,k,last in selection for k in (k,last)}
+          stored={}
+          def on_entry(kind,key,raw):
+              if kind=="K" and key in need:
+                  if key in stored:
+                      raise ValueError("Duplicate original K key in exact source")
+                  stored[key]=raw
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str((temp/"mhcc-source-root").resolve())
+          proc=subprocess.Popen(
+              [str((temp/"commentary-modern-source-raw").resolve()),"MHCC"],
+              stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,env=env)
+          try:
+              counters,*_=parse_native_raw_corpus(proc.stdout,on_entry=on_entry)
+              proc.stdout.close()
+              if proc.wait(timeout=30)!=0:
+                  raise ValueError("Native source reader failed")
+          finally:
+              if proc.poll() is None:
+                  proc.kill();proc.wait()
+          assert counters["all_native_raw_entries_ordered_sha256"]==original[
+              "original_compiled_corpus_sha256"]
+          assert set(stored)==need
+          rows=[]
+          for source_key,source_end,native_first,native_last in selection:
+              matched=[u for u in units.get(source_key,[]) if
+                       u["private_original_declared_range_end_key"]==source_end]
+              if len(matched)!=1:
+                  raise ValueError("CCEL exact authored source section is ambiguous or missing: "+source_key)
+              u=matched[0]
+              chapter=native_first.rsplit(".",1)[0]
+              native_groups=original["chapters"][chapter]["original_units"]
+              group=[x for x in native_groups if
+                     x["first_key"]==native_first and x["keys"][-1]==native_last]
+              if len(group)!=1:
+                  raise ValueError("Authentic compiled original source unit mismatched")
+              raw=stored[native_first]
+              if raw!=stored[native_last] or hashlib.sha256(raw).hexdigest()!=group[0]["source_unit_sha256"]:
+                  raise ValueError("Source body not linked/attested as one native K unit")
+              native_text=raw_as_strict_xml_text(raw)
+              if native_text is None:raise ValueError("Native source XML unparseable")
+              if hashlib.sha256(u["original_text"].encode()).hexdigest()!=u["original_text_sha256"]:
+                  raise ValueError("Original source ThML text SHA changed")
+              original_words=re.findall(r"\w+",u["original_text"].casefold())
+              compiled_words=re.findall(r"\w+",native_text.casefold())
+              alignment=plain_word_alignment(original_words,compiled_words)
+              assert alignment["exact_unicode_longest_common_subsequence_word_count"] is not None
+              rows.append({
+                  "original_ccel_scripCom_start":source_key,
+                  "original_ccel_scripCom_end":source_end,
+                  "ccel_original_source_line":u["original_source_line"],
+                  "source_text_sha256":u["original_text_sha256"],
+                  "source_original_word_tokens":len(original_words),
+                  "compiled_native_first_key":native_first,
+                  "compiled_native_last_key":native_last,
+                  "source_compiled_group_sha256":group[0]["source_unit_sha256"],
+                  "compiled_source_word_tokens":len(compiled_words),
+                  "ordered_exact_unicode_word_alignment":alignment,
+                  "original_source_body_or_markup_emitted":False,
+                  "source_edition_parity_or_redistribution_approved":False,
+              })
+              print("PRIVATE_CCEl_WORD_ALIGNMENT "+json.dumps({
+                  "section":source_key+"-"+source_end,
+                  "native_key":native_first+"-"+native_last,
+                  "source_words":len(original_words),
+                  "native_words":len(compiled_words),
+                  "lcs":alignment["exact_unicode_longest_common_subsequence_word_count"],
+                  "longest_contiguous_shared_words":alignment["exact_unicode_longest_contiguous_shared_word_run_count"],
+                  "source_unmatched":alignment["original_plain_words_not_matched_in_exact_order"],
+              },sort_keys=True))
+          output={
+              "status":"PRIVATE_TWO_CHAPTER_FULL_CCEl_AUTHORIAL_SECTION_TO_NATIVE_WORD_ALIGNMENT_NOT_EDITION_PARITY",
+              "original_ccel_sha256":"4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6",
+              "original_native_mhcc_0_1_1_sha256":original["original_compiled_corpus_sha256"],
+              "ccel_source_chapter_or_book_intro_prose_counted":False,
+              "sections_selected":len(rows),
+              "no_compiled_or_original_prose_exported":True,
+              "full_authorial_markup_equivalence_approved":False,
+              "redistribution_approved":False,
+              "rows":rows,
+          }
+          (temp/"mhcc-two-ccel-to-native-section-word-alignment.json").write_text(
+              json.dumps(output,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+          assert len(rows)==4
+          print("PRIVATE_CCEl_NATIVE_SECTION_AUDIT complete metadata-only 4 sections; not editorial signoff")
+          PY
+      - name: Screen all modern manuscript outline tables for out-of-order source ranges
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          import re
+          root=Path("work/mhcc-modern/production/accepted")
+          files=sorted(root.glob("*.md"))
+          assert len(files)==1189
+          ordered=[]
+          inspected=0
+          skipped=0
+          anomalies=[]
+          range_pattern=re.compile(r"^\s*(\d{1,3})(?:\s*[-–—]\s*(\d{1,3}))?\s*$")
+          for path in files:
+              raw=path.read_text(encoding="utf-8")
+              prose=raw.split("\n---\n",2)
+              if len(prose)<3:
+                  raise ValueError("Unterminated manuscript: "+path.name)
+              body=prose[1]
+              h=re.search(r"(?m)^## Original[^\n]*outline[^\n]*$",body,re.I)
+              if not h:
+                  skipped+=1
+                  continue
+              span=body[h.end():]
+              next_h=re.search(r"(?m)^## ",span)
+              if next_h:
+                  span=span[:next_h.start()]
+              bounds=[]
+              for line in span.splitlines():
+                  if not line.strip().startswith("|"):
+                      continue
+                  cols=[p.strip() for p in line.strip().strip("|").split("|")]
+                  if len(cols)<2:
+                      continue
+                  value=cols[-1].strip("() ")
+                  m=range_pattern.fullmatch(value)
+                  if m:
+                      start=int(m[1]);end=int(m[2] or m[1])
+                      if start<1 or end<start:
+                          anomalies.append({"manuscript":path.name,"reason":"invalid original-outline numeric span","range":value})
+                      else:
+                          bounds.append((start,end))
+              if not bounds:
+                  skipped+=1
+                  continue
+              inspected+=1
+              if len(bounds)>1:
+                  bad=[(i+1,a,b) for i,(a,b) in enumerate(zip(bounds,bounds[1:]))
+                       if b[0]<a[0]]
+                  if bad:
+                      anomalies.append({
+                          "manuscript":path.name,
+                          "reason":"source-outline rows out of canonical verse order; manual review only",
+                          "ordered_row_bounds":[f"{a}-{b}" for a,b in bounds]
+                      })
+              ordered.append(path.name)
+          report={
+              "status":"DIAGNOSTIC_ONLY_NOT_ORIGINAL_SOURCE_OR_SEMANTIC_APPROVAL",
+              "all_1189_chapter_manuscripts_examined":len(files),
+              "outlines_with_numeric_rows_screened":inspected,
+              "not_evaluable_by_this_narrow_heuristic":skipped,
+              "anomalies":anomalies,
+              "original_native_heading_or_outline_verified":False,
+              "automatic_editorial_corrections_made":False
+          }
+          dest=Path(os.environ["RUNNER_TEMP"])/"mhcc-modern-outline-order-diagnostic.json"
+          dest.write_text(json.dumps(report,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+          print("DRAFT_OUTLINE_ORDER_DIAGNOSTIC manuscripts=1189 "+
+                f"screened={inspected} unevaluable={skipped} flagged={len(anomalies)}")
+          for a in anomalies[:45]:
+              print("DRAFT_OUTLINE_ORDER_FLAG "+a["manuscript"]+" "+str(a.get("ordered_row_bounds",a["reason"])))
+          print("No original authorial outline rewritten; all flags need independent contextual review")
+          PY
+      - name: Independently inventory all 69 historically unchecked manuscripts against native source units
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import re
+          base=Path("work/mhcc-modern/production")
+          archive=(base/"checkpoints/issue-270-body-2026-11-17-pre-reconciliation.md").read_text(encoding="utf-8")
+          unchecked=re.findall(r"(?m)^- \[ \] (.+?)\s*$",archive)
+          assert len(unchecked)==69 and len(set(unchecked))==69, (
+              "Historical issue #270 no longer has exactly 69 distinct unchecked chapter rows")
+          all_manuscripts=sorted((base/"accepted").glob("*.md"))
+          assert len(all_manuscripts)==1189, "Canonical draft inventory changed"
+          native=json.loads((Path(os.environ["RUNNER_TEMP"])/
+              "mhcc-modern-whole-canon-native-receipt.json").read_text(encoding="utf-8"))
+          assert native["status"]=="SOURCE_NATIVE_RECEIPT_ONLY_NOT_TRANSLATION_APPROVAL"
+          assert not native["source_prose_or_original_markup_exported"]
+          assert not native["semantic_translation_independently_approved"]
+          titles={}
+          for path in all_manuscripts:
+              raw=path.read_text(encoding="utf-8")
+              title=re.search(r"(?m)^# (.+?) — Modern English\s*$",raw)
+              if title:
+                  if title[1] in titles:
+                      raise ValueError("Duplicate chapter title: "+title[1])
+                  titles[title[1]]=(path,raw)
+          reports=[]
+          issues=[]
+          section_digest_owner={}
+          token=re.compile(r"\b[\w’-]+\b",re.UNICODE)
+          verse_heading=re.compile(
+              r"\(verses?\s+(\d{1,3})(?:\s*(?:[–—-]|and|,)\s*(\d{1,3}))?\)",
+              re.IGNORECASE)
+          for original_label in unchecked:
+              chapter_issues=[]
+              entry=titles.get(original_label)
+              if entry is None:
+                  issues.append({"chapter":original_label,"problem":"missing full modern manuscript"})
+                  continue
+              path,raw=entry
+              if not raw.startswith("---\n") or "\n---\n" not in raw[4:]:
+                  issues.append({"chapter":original_label,"problem":"invalid source frontmatter"})
+                  continue
+              front,rest=raw[4:].split("\n---\n",1)
+              fields=dict(re.findall(r'(?m)^([a-z_][a-z0-9_]*): "([^"\n]*)"$',front))
+              chapter=fields.get("chapter_osis","")
+              original=native["chapters"].get(chapter)
+              if original is None:
+                  issues.append({"chapter":original_label,"problem":"no original native source chapter mapping"})
+                  continue
+              if (fields.get("source_module")!="MHCC 0.1.1"
+                  or fields.get("source_zip_sha256")!="a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746"
+                  or fields.get("source_native_corpus_sha256")!="2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e"
+                  or not fields.get("publication_status","").startswith("NOT RELEASED")):
+                  chapter_issues.append("wrong original-source pin or false release claim")
+              if "\n---\n" not in rest:
+                  chapter_issues.append("missing prose/editorial boundary")
+                  main=rest
+                  review=""
+              else:
+                  main,review=rest.split("\n---\n",1)
+              if not re.search(r"(?m)^## (?:Editorial|Source) (?:review|audit|verification)",review,re.I):
+                  chapter_issues.append("missing separate original-witness review notes")
+              headings=list(re.finditer(r"(?m)^## ([^\n]+)$",main))
+              source_outline=[h for h in headings if "original chapter outline" in h[1].lower()]
+              if len(source_outline)!=1:
+                  chapter_issues.append("missing or multiple source-outline sections")
+              sections=[h for h in headings
+                        if "original chapter outline" not in h[1].lower()]
+              original_units=original["original_units"]
+              if not original_units or original["source_placement"]!="NUMBERED_KEYS_WITH_SEPARATE_INTRO":
+                  chapter_issues.append("original source is not supported numbered-K commentary")
+              if len(sections)!=len(original_units):
+                  chapter_issues.append(
+                      f"original K bodies={len(original_units)}, modern exposition sections={len(sections)}")
+              source_verses=set()
+              for u in original_units:
+                  for key in u["keys"]:
+                      if not key.startswith(chapter+"."):
+                          chapter_issues.append("original source key in wrong chapter")
+                      if key in source_verses:
+                          chapter_issues.append("duplicate original numbered K key")
+                      source_verses.add(key)
+              if len(source_verses)!=original["original_native_numbered_keys"]:
+                  chapter_issues.append("inconsistent native source occupied-key tally")
+              modern_section_info=[]
+              for i,h in enumerate(sections):
+                  next_head=headings[headings.index(h)+1] if headings.index(h)+1<len(headings) else None
+                  exposition=main[h.end():next_head.start() if next_head else len(main)]
+                  words=len(token.findall(exposition))
+                  marker=verse_heading.search(h[1])
+                  claimed=(int(marker[1]),int(marker[2] or marker[1])) if marker else None
+                  original_bounds=None
+                  if i<len(original_units):
+                      nums=[int(key.rsplit(".",1)[1]) for key in original_units[i]["keys"]]
+                      original_bounds=(min(nums),max(nums)) if nums else None
+                  if not marker:
+                      chapter_issues.append(f"section {i+1}: no explicit verse bounds")
+                  elif original_bounds and claimed!=original_bounds:
+                      chapter_issues.append(
+                          f"section {i+1}: modern verse bounds {claimed} differ from original {original_bounds}")
+                  if words<25:
+                      chapter_issues.append(f"section {i+1}: missing/too-short actual translation ({words} words)")
+                  if re.search(r"(?i)\b(?:TODO|TBD|PLACEHOLDER|NOT YET TRANSLATED|LOREM IPSUM)\b",exposition):
+                      chapter_issues.append(f"section {i+1}: unfinished draft marker")
+                  digest=hashlib.sha256(exposition.strip().encode("utf-8")).hexdigest()
+                  owner=section_digest_owner.setdefault(digest,(chapter,i+1))
+                  if owner!=(chapter,i+1) and words>=50:
+                      chapter_issues.append(f"section {i+1}: possible copied duplicate of {owner}")
+                  modern_section_info.append({
+                      "section_number":i+1,
+                      "modern_words":words,
+                      "claimed_verse_bounds":list(claimed) if claimed else None,
+                      "original_native_verse_bounds":list(original_bounds) if original_bounds else None,
+                      "original_unit_sha256":original_units[i]["source_unit_sha256"] if i<len(original_units) else None
+                  })
+              reports.append({
+                  "historical_issue_label":original_label,
+                  "chapter_osis":chapter,
+                  "manuscript":path.as_posix(),
+                  "manuscript_sha256":hashlib.sha256(raw.encode("utf-8")).hexdigest(),
+                  "original_numbered_K_keys":original["original_native_numbered_keys"],
+                  "original_K_source_units":len(original_units),
+                  "modern_exposition_sections":len(sections),
+                  "modern_exposition_word_count":sum(s["modern_words"] for s in modern_section_info),
+                  "original_separate_introduction_keys":len(original["native_introductions_not_assumed_to_be_exposition"]),
+                  "section_comparison":modern_section_info,
+                  "machine_detected_structural_problems":chapter_issues,
+                  "original_full_prose_meaning_independently_verified":False
+              })
+              if chapter_issues:
+                  issues.append({"chapter":chapter,"problem":"; ".join(chapter_issues)})
+          receipt={
+              "status":"HISTORICALLY_UNCHECKED_DRAFT_SOURCE_UNIT_SCREEN_NOT_EDITORIAL_APPROVAL",
+              "historical_unchecked_rows":len(unchecked),
+              "complete_modern_manuscript_paths_read":len(reports),
+              "original_source_edition":"MHCC 0.1.1",
+              "native_corpus_sha256":native["original_compiled_corpus_sha256"],
+              "original_numbered_source_units":sum(r["original_K_source_units"] for r in reports),
+              "original_occupied_K_keys":sum(r["original_numbered_K_keys"] for r in reports),
+              "modern_exposition_sections":sum(r["modern_exposition_sections"] for r in reports),
+              "modern_exposition_words":sum(r["modern_exposition_word_count"] for r in reports),
+              "structural_flags":issues,
+              "chapters":reports,
+              "source_full_prose_meaning_independently_approved":False,
+              "published_derivative_module_built_or_validated":False,
+              "source_original_prose_or_xml_exported":False
+          }
+          report_path=Path(os.environ["RUNNER_TEMP"])/"mhcc-modern-historical-69-translation-coverage.json"
+          report_path.write_text(json.dumps(receipt,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+          print("HISTORICAL_69_SCOPE original_rows=69 modern_manuscripts="+str(len(reports))+
+                " original_K_units="+str(receipt["original_numbered_source_units"])+
+                " modern_sections="+str(receipt["modern_exposition_sections"])+
+                " original_occupied_K_keys="+str(receipt["original_occupied_K_keys"])+
+                " modern_exposition_words="+str(receipt["modern_exposition_words"])+
+                " problems="+str(len(issues)))
+          for x in reports:
+              print("HISTORICAL_69_CHAPTER "+x["chapter_osis"]+
+                    " source_units="+str(x["original_K_source_units"])+
+                    " modern_units="+str(x["modern_exposition_sections"])+
+                    " words="+str(x["modern_exposition_word_count"])+
+                    " native_K="+str(x["original_numbered_K_keys"]))
+          for issue in issues:
+              print("HISTORICAL_69_UNRESOLVED "+issue["chapter"]+": "+issue["problem"])
+          print("Only original native section/key coverage and real modern prose checked; "+
+                "not native-to-modern authorial meaning, notes, reference targets, or publication rights")
+          assert not issues and len(reports)==69, "Historical 69 source-unit coverage NOT fully demonstrated"
+          PY
+      - name: Screen all 1189 modern prose sections against verified native source K and I group topology
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from collections import Counter
+          import json
+          import os
+          from pathlib import Path
+          import re
+          base = Path("work/mhcc-modern/production/accepted")
+          native = json.loads((Path(os.environ["RUNNER_TEMP"]) /
+              "mhcc-modern-whole-canon-native-receipt.json").read_text(encoding="utf-8"))
+          assert native["status"] == "SOURCE_NATIVE_RECEIPT_ONLY_NOT_TRANSLATION_APPROVAL"
+          assert native["original_compiled_corpus_sha256"] == (
+              "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e")
+          assert native["source_prose_or_original_markup_exported"] is False
+          assert native["semantic_translation_independently_approved"] is False
+          originals = native["chapters"]
+          files = sorted(base.glob("*.md"))
+          assert len(files) == len(originals) == 1189
+          token = re.compile(r"\b[\w’-]+\b", re.UNICODE)
+          heading = re.compile(r"(?m)^(#{2,5}) ([^\n]+)\s*$")
+          quoted = re.compile(r'(?m)^([a-z_][a-z0-9_]*): "([^"\n]*)"$')
+          verse_marker = re.compile(r"\(\s*verses?\s+([^)]+)\)\s*$", re.IGNORECASE)
+          flags = []
+          rows = []
+          seen = set()
+          for path in files:
+              problems = []
+              source = path.read_text(encoding="utf-8")
+              if not source.startswith("---\n") or "\n---\n" not in source[4:]:
+                  flags.append({"manuscript":path.name, "problem":"invalid frontmatter"})
+                  continue
+              front, rest = source[4:].split("\n---\n", 1)
+              fields = dict(quoted.findall(front))
+              chapter = fields.get("chapter_osis","")
+              if chapter not in originals or chapter in seen:
+                  flags.append({"manuscript":path.name, "problem":"unmapped or duplicate chapter_osis"})
+                  continue
+              seen.add(chapter)
+              if (fields.get("source_module") != "MHCC 0.1.1"
+                  or fields.get("source_native_corpus_sha256") != native["original_compiled_corpus_sha256"]
+                  or fields.get("source_zip_sha256") !=
+                     "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746"
+                  or not fields.get("publication_status","").startswith("NOT RELEASED")):
+                  problems.append("source identity/publication status not pinned")
+              if "\n---\n" not in rest:
+                  problems.append("no clear modern prose versus editorial notes boundary")
+                  main = rest
+              else:
+                  main, _ = rest.split("\n---\n", 1)
+              heads = list(heading.finditer(main))
+              prose_units = []
+              for idx, match in enumerate(heads):
+                  title = match[2].strip()
+                  low = title.lower()
+                  if low.startswith("original ") or "book introduction" in low:
+                      continue
+                  # A ## heading containing ### authorial sections is a
+                  # navigation/container label, not an extra authored K body.
+                  # Preserve the parent prose separately for human review.
+                  level = len(match[1])
+                  if idx + 1 < len(heads) and len(heads[idx + 1][1]) > level:
+                      continue
+                  section = main[match.end():heads[idx + 1].start() if idx + 1 < len(heads)
+                                 else len(main)]
+                  prose_units.append((title, len(token.findall(section))))
+              src = originals[chapter]
+              source_units = src["original_units"]
+              is_intro_only = src["source_placement"] == "INTRO_ONLY_NEEDS_INDEPENDENT_REVIEW"
+              expected = 1 if is_intro_only else len(source_units)
+              if is_intro_only:
+                  intros = [i for i in src["native_introductions_not_assumed_to_be_exposition"]
+                            if i["key"] in (chapter,chapter+".0") and i["visible_word_tokens"] > 0]
+                  if len(intros) != 1 or source_units or src["original_native_numbered_keys"] != 0:
+                      problems.append("intro-only original ownership not proven")
+              elif src["source_placement"] != "NUMBERED_KEYS_WITH_SEPARATE_INTRO" or not source_units:
+                  problems.append("unknown original source storage pattern")
+              if len(prose_units) != expected:
+                  problems.append(f"original authorial groups={expected}; modern prose sections={len(prose_units)}")
+              for index, (title, words) in enumerate(prose_units):
+                  if words < 25:
+                      problems.append(f"modern exposition {index+1} has {words} words")
+                  if re.search(r"\b(?:TODO|TBD|PLACEHOLDER|NOT YET TRANSLATED)\b",
+                               main, re.IGNORECASE):
+                      problems.append("untranslated marker in draft")
+                      break
+                  if index < len(source_units):
+                      nums = [int(k.rsplit(".",1)[1]) for k in source_units[index]["keys"]]
+                      m = verse_marker.search(title)
+                      if not m:
+                          problems.append(f"modern exposition {index+1} has no parseable verse-scope heading")
+                      else:
+                          bound = [int(t) for t in re.findall(r"\d+",m[1])]
+                          if not bound or (bound[0],bound[-1]) != (min(nums),max(nums)):
+                              problems.append(f"modern exposition {index+1} verse scope differs from native group")
+              rows.append({
+                  "chapter":chapter,
+                  "manuscript":path.name,
+                  "source_original_K_groups":len(source_units),
+                  "source_original_intro_only":is_intro_only,
+                  "modern_expositions":len(prose_units),
+                  "modern_exposition_words":sum(w for _,w in prose_units),
+                  "original_native_occupied_K_keys":src["original_native_numbered_keys"],
+                  "problems":list(dict.fromkeys(problems))
+              })
+              for problem in dict.fromkeys(problems):
+                  flags.append({"chapter":chapter,"problem":problem})
+          if seen != set(originals):
+              flags.append({"problem":"missing original canonical manuscripts","count":len(set(originals)-seen)})
+          count = Counter(f["problem"].split("=",1)[0] for f in flags)
+          summary = {
+              "status":"FULL_CANON_NATIVE_GROUP_TO_MODERN_DRAFT_DIAGNOSTIC_NOT_EDITORIAL_APPROVAL",
+              "chapters_expected":len(originals),
+              "manuscripts_inspected":len(rows),
+              "native_numbered_K_authorial_units":sum(len(c["original_units"]) for c in originals.values()),
+              "modern_prose_expositions":sum(r["modern_expositions"] for r in rows),
+              "original_intro_only_chapters":sum(r["source_original_intro_only"] for r in rows),
+              "native_occupied_K_addresses":sum(r["original_native_occupied_K_keys"] for r in rows),
+              "total_modern_exposition_words":sum(r["modern_exposition_words"] for r in rows),
+              "affected_chapters":sum(bool(r["problems"]) for r in rows),
+              "diagnostic_flags":flags,
+              "flag_counts_by_type":dict(sorted(count.items())),
+              "original_full_semantic_meaning_verified":False,
+              "original_native_footnotes_references_quotation_and_layout_verified":False,
+              "independent_editorial_signoff":False,
+              "automatic_edits_made":False,
+              "chapters":rows
+          }
+          output = Path(os.environ["RUNNER_TEMP"])/"mhcc-modern-full-canon-source-group-diagnostic.json"
+          output.write_text(json.dumps(summary,sort_keys=True,indent=2)+"\n",encoding="utf-8")
+          print("FULL_CANON_GROUP_DIAGNOSTIC manuscripts="+str(summary["manuscripts_inspected"])+
+                " source_K_groups="+str(summary["native_numbered_K_authorial_units"])+
+                " intro_only="+str(summary["original_intro_only_chapters"])+
+                " modern_expositions="+str(summary["modern_prose_expositions"])+
+                " affected_chapters="+str(summary["affected_chapters"])+
+                " flags="+str(len(flags)))
+          topology = [{
+              "chapter":r["chapter"],
+              "original_K_groups":r["source_original_K_groups"],
+              "original_intro_only":r["source_original_intro_only"],
+              "modern_expositions":r["modern_expositions"],
+              "source_versification_issues":[f for f in r["problems"]
+                  if "verse scope differs" in f]
+          } for r in rows if (
+              r["modern_expositions"] !=
+              r["source_original_K_groups"] + (1 if r["source_original_intro_only"] else 0)
+              or any("verse scope differs" in f for f in r["problems"])
+          )]
+          print("FULL_CANON_TOPOLOGY_DEVIATIONS "+json.dumps(topology,sort_keys=True))
+          print("FULL_CANON_FLAG_COUNTS "+json.dumps({
+              "topology_deviation_chapters":len(topology),
+              "no_heading_scope_claims":sum("no parseable verse-scope heading" in f["problem"] for f in flags),
+              "short_prose_sections_lt_25_words":sum(" has " in f["problem"] and
+                  f["problem"].endswith(" words") for f in flags),
+              "raw_diagnostic_flags":len(flags)},sort_keys=True))
+          for problem in flags[:90]:
+              print("FULL_CANON_FLAG "+json.dumps(problem,sort_keys=True))
+          print("Metadata-only diagnostic: source meaning, native refs and notes NOT approved.")
+          # This is triage, never a semantic/editorial approval gate.
+          assert len(rows)==len(originals), "Canonical chapter manuscript missing"
+          PY
+      - name: Build private Leviticus 19 and Psalm 108 I-only linked chapter previews
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_modern_ionly_preview.py \
+            --manifest work/mhcc-modern/production/IONLY_CHAPTER_LINK_PREVIEW.json \
+            --source-receipt "$RUNNER_TEMP/mhcc-modern-whole-canon-native-receipt.json" \
+            --osis "$RUNNER_TEMP/mhcc-ionly-preview.xml" \
+            --report "$RUNNER_TEMP/mhcc-ionly-preview-report.json" \
+            --temp-module-id MHCCIONLY
+          mkdir -p "$RUNNER_TEMP/mhcc-ionly-root/mods.d"
+          mkdir -p "$RUNNER_TEMP/mhcc-ionly-root/modules/comments/zcom/mhccionly"
+          osis2mod "$RUNNER_TEMP/mhcc-ionly-root/modules/comments/zcom/mhccionly" \
+            "$RUNNER_TEMP/mhcc-ionly-preview.xml" -z z -b 3 \
+            > "$RUNNER_TEMP/mhcc-ionly-build.log" 2>&1
+          cat > "$RUNNER_TEMP/mhcc-ionly-root/mods.d/mhccionly.conf" <<'EOF'
+          [MHCCIONLY]
+          Description=Unvalidated temporary whole-chapter I-only link transport proof
+          DataPath=./modules/comments/zcom/mhccionly/
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          Lang=en
+          Versification=KJV
+          SourceType=OSIS
+          DistributionLicense=Private
+          EOF
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_index.cpp \
+            -o "$RUNNER_TEMP/mhcc-ionly-native-index" -lsword
+          SWORD_PATH="$RUNNER_TEMP/mhcc-ionly-root" \
+            "$RUNNER_TEMP/mhcc-ionly-native-index" MHCCIONLY --chapter-registry \
+            > "$RUNNER_TEMP/mhcc-ionly-chapter-registry.txt"
+          SWORD_PATH="$RUNNER_TEMP/mhcc-ionly-root" \
+            "$RUNNER_TEMP/mhcc-ionly-native-index" MHCCIONLY --adjacent-links \
+            > "$RUNNER_TEMP/mhcc-ionly-native-links.txt"
+          for key in 'Leviticus 19:1' 'Leviticus 19:37' 'Psalms 108:1' 'Psalms 108:13'; do
+            SWORD_PATH="$RUNNER_TEMP/mhcc-ionly-root" \
+              diatheke -b MHCCIONLY -f OSIS -k "$key" \
+              > "$RUNNER_TEMP/mhcc-ionly-diath-$(echo "$key" | tr ' :' '__').txt"
+          done
+          python - <<'PY'
+          from collections import defaultdict
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import subprocess
+          import sys
+          sys.path.insert(0, "scripts")
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+
+          temp=Path(os.environ["RUNNER_TEMP"])
+          report=json.loads((temp/"mhcc-ionly-preview-report.json").read_text())
+          assert report["status"] == "PRIVATE_UNVALIDATED_IONLY_SWORD_TRANSPORT_PREVIEW"
+          assert not report["sword_publication_authorized"]
+          expected={"Lev.19":37,"Ps.108":13}
+          assert {x["chapter"]:x["expected_compiled_linked_verse_keys"]
+                  for x in report["chapters"]} == expected
+          registry=(temp/"mhcc-ionly-chapter-registry.txt").read_text().splitlines()
+          actual={}
+          for row in registry:
+              fields=row.split("\t")
+              if len(fields)==3 and fields[0]=="R" and fields[1] in expected:
+                  actual[fields[1]]=int(fields[2])
+          assert actual==expected, ("Declared range does not match actual native KJV registry",actual)
+
+          linked=(temp/"mhcc-ionly-native-links.txt").read_text().splitlines()
+          seen_pairs=defaultdict(set)
+          for row in linked:
+              fields=row.split("\t")
+              if len(fields)!=4 or fields[0]!="L":
+                  continue
+              before,after,flag=fields[1:]
+              chapter=before.rsplit(".",1)[0]
+              assert chapter in expected and after.startswith(chapter+".")
+              assert flag=="1", ("A verse key has an independently stored duplicate body", before, after)
+              seen_pairs[chapter].add((before,after))
+          for chapter,count in expected.items():
+              pairs={(f"{chapter}.{v}",f"{chapter}.{v+1}") for v in range(1,count)}
+              assert seen_pairs[chapter]==pairs, (chapter,"missing or extra native links")
+          assert linked[-1]=="S\t48\t48\t0", ("Incorrect native isLinked summary",linked[-1])
+
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str((temp/"mhcc-ionly-root").resolve())
+          proc=subprocess.Popen([str(temp/"commentary-modern-source-raw"),"MHCCIONLY"],
+              env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+          source_raw=defaultdict(dict)
+          intro_raw={}
+          try:
+              assert proc.stdout
+              def collect(kind,ref,raw):
+                  if kind=="K":
+                      chapter=ref.rsplit(".",1)[0]
+                      if chapter not in expected:
+                          raise ValueError("Unexpected populated verse in the private module")
+                      source_raw[chapter][ref]=hashlib.sha256(raw).hexdigest()
+                  elif kind=="I":
+                      intro_raw[ref]=raw
+              counters,numbered,_,_=parse_native_raw_corpus(proc.stdout,on_entry=collect)
+              proc.stdout.close()
+              assert proc.wait(timeout=30)==0
+          finally:
+              if proc.poll() is None:
+                  proc.kill()
+                  proc.wait()
+          assert counters["actual_occupied_numbered_entry_count"]==50
+          assert len(numbered)==50
+          for chapter,count in expected.items():
+              assert set(source_raw[chapter])=={f"{chapter}.{v}" for v in range(1,count+1)}
+              assert len(set(source_raw[chapter].values()))==1
+          # Do not present the same modern body both as a native I introduction
+          # and again through K aliases.
+          for raw in intro_raw.values():
+              assert b"This chapter includes a few ceremonial regulations" not in raw
+              assert b"We can help our worship" not in raw
+          samples=list(temp.glob("mhcc-ionly-diath-*.txt"))
+          assert len(samples)==4
+          for sample in samples:
+              rendered=sample.read_text(encoding="utf-8")
+              assert ("This chapter includes a few ceremonial regulations" in rendered
+                      or "We can help our worship" in rendered), sample.name
+          print("I_ONLY_SWORD_NATIVE_LINK_PASS chapters=2 linked_verse_keys=50 "+
+                "adjacent_isLinked_pairs=48 independent_authorial_sections=2")
+          print("Real temporary SWORD readback proved the transport only; "+
+                "original headings/meaning, independent readers, licensing and release remain unapproved")
+          PY
+      - name: Compile and read back original-K underindexed authorial scope in private zCom
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_modern_k_scope_preview.py \
+            --manifest work/mhcc-modern/production/NATIVE_K_UNDERSCOPED_RANGE_PREVIEW.json \
+            --source-receipt "$RUNNER_TEMP/mhcc-modern-whole-canon-native-receipt.json" \
+            --osis "$RUNNER_TEMP/mhcc-krange-preview.xml" \
+            --report "$RUNNER_TEMP/mhcc-krange-preview-report.json" \
+            --temp-module-id MHCCKRANGE
+          mkdir -p "$RUNNER_TEMP/mhcc-krange-root/mods.d"
+          mkdir -p "$RUNNER_TEMP/mhcc-krange-root/modules/comments/zcom/mhcckrange"
+          osis2mod "$RUNNER_TEMP/mhcc-krange-root/modules/comments/zcom/mhcckrange" \
+            "$RUNNER_TEMP/mhcc-krange-preview.xml" -z z -b 3 \
+            > "$RUNNER_TEMP/mhcc-krange-osis2mod.log" 2>&1
+          cat > "$RUNNER_TEMP/mhcc-krange-root/mods.d/mhcckrange.conf" <<'EOF'
+          [MHCCKRANGE]
+          Description=Private unvalidated original K range navigation transport test
+          DataPath=./modules/comments/zcom/mhcckrange/
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          Lang=en
+          Versification=KJV
+          SourceType=OSIS
+          DistributionLicense=Private
+          EOF
+          SWORD_PATH="$RUNNER_TEMP/mhcc-krange-root" \
+            "$RUNNER_TEMP/mhcc-ionly-native-index" MHCCKRANGE --chapter-registry \
+            > "$RUNNER_TEMP/mhcc-krange-registry.txt"
+          SWORD_PATH="$RUNNER_TEMP/mhcc-krange-root" \
+            "$RUNNER_TEMP/mhcc-ionly-native-index" MHCCKRANGE --adjacent-links \
+            > "$RUNNER_TEMP/mhcc-krange-linked.txt"
+          for key in 'Deuteronomy 20:10' 'Deuteronomy 20:20' 'John 3:1' 'John 3:21'; do
+            SWORD_PATH="$RUNNER_TEMP/mhcc-krange-root" \
+              diatheke -b MHCCKRANGE -f OSIS -k "$key" \
+              > "$RUNNER_TEMP/mhcc-krange-readback-$(echo "$key" | tr ' :' '__').txt"
+          done
+          python - <<'PY'
+          import hashlib,json,os,subprocess,sys
+          from pathlib import Path
+          from collections import defaultdict
+          sys.path.insert(0,"scripts")
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          temp=Path(os.environ["RUNNER_TEMP"])
+          report=json.loads((temp/"mhcc-krange-preview-report.json").read_text())
+          assert report["status"]=="PRIVATE_UNVALIDATED_SINGLE_ORIGINAL_K_BODY_EXTENDED_RANGE_PREVIEW"
+          assert not report["sword_published"] and not report["independent_source_prose_meaning_approved"]
+          expected={"Deut.20":(10,20,20),"John.3":(1,21,36)}
+          assert set(expected)=={x["chapter"] for x in report["cases"]}
+          for row in report["cases"]:
+              start,last,cap=expected[row["chapter"]]
+              assert row["linked_modern_verse_count"]==last-start+1
+              assert row["authorial_source_K_bodies_added_or_split"]==0
+          register={}
+          for line in (temp/"mhcc-krange-registry.txt").read_text().splitlines():
+              fields=line.split("\t")
+              if len(fields)==3 and fields[0]=="R" and fields[1] in expected:
+                  register[fields[1]]=int(fields[2])
+          assert register=={key:val[2] for key,val in expected.items()}
+          pairs=defaultdict(set)
+          for line in (temp/"mhcc-krange-linked.txt").read_text().splitlines():
+              fields=line.split("\t")
+              if len(fields)!=4 or fields[0]!="L":
+                  continue
+              chapter=fields[1].rsplit(".",1)[0]
+              assert chapter in expected and fields[3]=="1"
+              pairs[chapter].add((fields[1],fields[2]))
+          for chapter,(start,last,_cap) in expected.items():
+              wanted={(f"{chapter}.{v}",f"{chapter}.{v+1}") for v in range(start,last)}
+              assert pairs[chapter]==wanted,(chapter,"incorrect transport link or duplicate commentary")
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str((temp/"mhcc-krange-root").resolve())
+          proc=subprocess.Popen([str(temp/"commentary-modern-source-raw"),"MHCCKRANGE"],
+              stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,env=env)
+          hashes=defaultdict(dict)
+          try:
+              def collect(kind,key,raw):
+                  if kind=="K":
+                      chapter=key.rsplit(".",1)[0]
+                      assert chapter in expected,"Unrequested extra source commentary key"
+                      hashes[chapter][key]=hashlib.sha256(raw).hexdigest()
+              counters,_,_,_=parse_native_raw_corpus(proc.stdout,on_entry=collect)
+              proc.stdout.close()
+              assert proc.wait(timeout=30)==0
+          finally:
+              if proc.poll() is None:proc.kill();proc.wait()
+          assert counters["actual_occupied_numbered_entry_count"]==32
+          for chapter,(start,last,_cap) in expected.items():
+              assert set(hashes[chapter])=={f"{chapter}.{v}" for v in range(start,last+1)}
+              assert len(set(hashes[chapter].values()))==1
+          readbacks=list(temp.glob("mhcc-krange-readback-*.txt"))
+          assert len(readbacks)==4
+          for p in readbacks:
+              rendered=p.read_text(encoding="utf-8")
+              assert "Israel received laws about warfare" in rendered or (
+                  "Nicodemus was afraid" in rendered)
+          print("K_SCOPE_SWORD_LINK_PASS original_source_K_groups=2 modern_K_bodies=2 "+
+                "accessible_K_verse_keys=32 linked_pairs=30 no_original_K_overwrites=true")
+          print("Real temporary SWORD linked transport only: source semantics, "+
+                "inline reference preservation, independent reader QA and release NOT approved")
+          PY
+      - name: Verify Genesis 1 native original scripture link identities
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_modern_reference_gate.py \
+            --native-reader "${RUNNER_TEMP}/commentary-modern-source-raw" \
+            --module-directory "${RUNNER_TEMP}/mhcc-source-root" \
+            --module-id MHCC \
+            --source-map work/mhcc-modern/production/genesis-01.SOURCE_MAP.json \
+            --expected-references work/mhcc-modern/production/genesis-01.REFERENCE_EXPECTATIONS.json \
+            --modern-candidate work/mhcc-modern/production/genesis-01.CANDIDATE.md \
+            --report "${RUNNER_TEMP}/mhcc-modern-genesis01-native-reference-proof.json"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          report=json.loads((Path(os.environ["RUNNER_TEMP"])/"mhcc-modern-genesis01-native-reference-proof.json").read_text())
+          assert report["source_unique_units_checked"]==8
+          assert report["original_reference_links_checked"]==2
+          assert report["original_intro_units_found"]==2
+          for key,intro in report["per_intro_unit"].items():
+              print("ORIGINAL_INTRO_PROSE_PROFILE "+key+" words="+str(intro["source_visible_word_count"]))
+          assert report["original_osisRef_literal_values_exported"] is False
+          assert report["new_modern_osis_reference_targets_embedded"] is False
+          print("Exact Genesis 1 native source link identities verified; final OSIS mapping unapproved")
+          PY
+      - name: Compare committed 24 draft section labels and source pins with attested native metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_modern_draft_guard.py \
+            --root work/mhcc-modern \
+            --native-map work/mhcc-modern/evidence/MHCC_0.1.1_24_CHAPTER_NATIVE_MAP.json \
+            --report "${RUNNER_TEMP}/mhcc-modern-draft-coverage-report.json"
+      - name: Compile disposable annotated OSIS preview and read it with a real SWORD engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_modern_draft_osis_preview.py \
+            --root work/mhcc-modern \
+            --native-map work/mhcc-modern/evidence/MHCC_0.1.1_24_CHAPTER_NATIVE_MAP.json \
+            --osis "${RUNNER_TEMP}/mhcc-modern-preview.osis.xml" \
+            --report "${RUNNER_TEMP}/mhcc-modern-preview-structure.json" \
+            --temp-module-id MHCCWORK
+          mkdir -p "${RUNNER_TEMP}/mhcc-work-sword/mods.d"
+          mkdir -p "${RUNNER_TEMP}/mhcc-work-sword/modules/comments/zcom/mhccwork"
+          osis2mod "${RUNNER_TEMP}/mhcc-work-sword/modules/comments/zcom/mhccwork" \
+            "${RUNNER_TEMP}/mhcc-modern-preview.osis.xml" -z z -b 3 \
+            > "${RUNNER_TEMP}/mhcc-osis2mod-build.log" 2>&1
+          cat > "${RUNNER_TEMP}/mhcc-work-sword/mods.d/mhccwork.conf" <<'EOF'
+          [MHCCWORK]
+          Description=Private unvalidated temporary MHCC Modern English layout preview
+          DataPath=./modules/comments/zcom/mhccwork/
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          Lang=en
+          Versification=KJV
+          SourceType=OSIS
+          DistributionLicense=Private
+          EOF
+          SWORD_PATH="${RUNNER_TEMP}/mhcc-work-sword" \
+            diatheke -b MHCCWORK -f OSIS -k "Psalm 134:1" \
+            > "${RUNNER_TEMP}/mhcc-work-rendered-sample.txt"
+          python - <<'PY'
+          import json,os,subprocess,sys
+          from pathlib import Path
+          sys.path.insert(0,"scripts")
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          root=Path(os.environ["RUNNER_TEMP"])
+          temp_module=root/"mhcc-work-sword"
+          meta=json.loads((root/"mhcc-modern-preview-structure.json").read_text())
+          assert meta["status"]=="TECHNICAL_ONLY_UNVALIDATED_OSIS_PREVIEW"
+          assert meta["modern_chapter_count"]==24
+          assert meta["annotated_commentary_sections"]==54
+          assert not meta["original_inline_reference_or_note_fidelity_approved"]
+          actual_text=(root/"mhcc-work-rendered-sample.txt").read_text()
+          assert "stir ourselves" in actual_text or "give glory to God" in actual_text, (
+              "Real SWORD reader did not return the expected Psalm 134 prose")
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str(temp_module.resolve())
+          p=subprocess.Popen([str(root/"commentary-modern-source-raw"),"MHCCWORK"],
+                             env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+          try:
+              assert p.stdout
+              original_keys=set()
+              def on_entry(kind,ref,raw):
+                  if kind=="K":
+                      original_keys.add(ref)
+              result,*_=parse_native_raw_corpus(p.stdout,on_entry=on_entry)
+              p.stdout.close()
+              assert p.wait(timeout=25)==0
+          finally:
+              if p.poll() is None:
+                  p.kill()
+                  p.wait()
+          ledger=json.loads(Path("work/mhcc-modern/evidence/MHCC_0.1.1_24_CHAPTER_NATIVE_MAP.json").read_text())
+          expected=set(k for chapter in ledger["chapters"].values()
+                         for unit in chapter["units"] for k in unit["native_keys"])
+          assert original_keys==expected, (
+              "Compiled temporary commentary changed the original chapter/section K-key scope")
+          assert result["actual_occupied_numbered_entry_count"]==254
+          print("DISPOSABLE OSIS SWORD PREVIEW PASS: 24 chapters, 54 source anchors, "
+                "254 exact numbered keys, real diatheke reading, "
+                "no semantic or source-reference acceptance; no release")
+          PY
+      - name: Compile the Genesis 1 production candidate as a separate disposable SWORD preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_modern_draft_osis_preview.py \
+            --root work/mhcc-modern/production \
+            --single-chapter-source-map work/mhcc-modern/production/genesis-01.SOURCE_MAP.json \
+            --include-production-candidates \
+            --osis "${RUNNER_TEMP}/mhcc-genesis01-candidate-preview.osis.xml" \
+            --report "${RUNNER_TEMP}/mhcc-genesis01-candidate-preview.json" \
+            --temp-module-id MHCCGENP
+          mkdir -p "${RUNNER_TEMP}/mhcc-genp-sword/mods.d"
+          mkdir -p "${RUNNER_TEMP}/mhcc-genp-sword/modules/comments/zcom/mhccgenp"
+          osis2mod "${RUNNER_TEMP}/mhcc-genp-sword/modules/comments/zcom/mhccgenp" \
+            "${RUNNER_TEMP}/mhcc-genesis01-candidate-preview.osis.xml" -z z -b 3 \
+            > "${RUNNER_TEMP}/mhcc-genesis01-preview-build.log" 2>&1
+          cat > "${RUNNER_TEMP}/mhcc-genp-sword/mods.d/mhccgenp.conf" <<'EOF'
+          [MHCCGENP]
+          Description=Unvalidated disposable Genesis 1 modern candidate
+          DataPath=./modules/comments/zcom/mhccgenp/
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          Lang=en
+          Versification=KJV
+          SourceType=OSIS
+          DistributionLicense=Private
+          EOF
+          SWORD_PATH="${RUNNER_TEMP}/mhcc-genp-sword" \
+            diatheke -b MHCCGENP -f OSIS -k "Genesis 1:3" \
+            > "${RUNNER_TEMP}/mhcc-genesis01-reader-v3.txt"
+          SWORD_PATH="${RUNNER_TEMP}/mhcc-genp-sword" \
+            diatheke -b MHCCGENP -f OSIS -k "Genesis 1:31" \
+            > "${RUNNER_TEMP}/mhcc-genesis01-reader-v31.txt"
+          python - <<'PY'
+          import json,os,subprocess,sys
+          from pathlib import Path
+          sys.path.insert(0,"scripts")
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          temp=Path(os.environ["RUNNER_TEMP"])
+          report=json.loads((temp/"mhcc-genesis01-candidate-preview.json").read_text())
+          assert report["modern_chapter_count"]==1
+          assert report["annotated_commentary_sections"]==8
+          assert report["new_reading_paragraphs"]>=45
+          assert report["original_book_and_chapter_introductions_included"] is False
+          assert report["original_inline_reference_or_note_fidelity_approved"] is False
+          assert report["semantic_translation_independently_approved"] is False
+          assert report["sword_publication_authorized"] is False
+          a=(temp/"mhcc-genesis01-reader-v3.txt").read_text()
+          b=(temp/"mhcc-genesis01-reader-v31.txt").read_text()
+          assert "Let there be light" in a
+          assert "new heavens" in b
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str((temp/"mhcc-genp-sword").resolve())
+          proc=subprocess.Popen([str(temp/"commentary-modern-source-raw"),"MHCCGENP"],
+                                stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,env=env)
+          try:
+              assert proc.stdout
+              proof,numbered,_,_=parse_native_raw_corpus(proc.stdout)
+              proc.stdout.close()
+              assert proc.wait(timeout=20)==0
+          finally:
+              if proc.poll() is None:
+                  proc.kill()
+                  proc.wait()
+          assert len(numbered)==31
+          assert all(r.startswith("Gen.1.") for r in numbered)
+          assert proof["actual_occupied_numbered_entry_count"]==31
+          print("Genesis 1 temporary candidate OSIS/native readback PASS: 8 source divisions, 31 native positions; source ref/introduction fidelity and semantic signoff still pending")
+          PY
+      - name: Build Genesis 1 candidate preview with the original source's exact verified links and a separate modern book introduction
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_modern_linked_candidate_preview.py \
+            --root work/mhcc-modern/production \
+            --source-map work/mhcc-modern/production/genesis-01.SOURCE_MAP.json \
+            --expected-references work/mhcc-modern/production/genesis-01.REFERENCE_EXPECTATIONS.json \
+            --book-intro-candidate work/mhcc-modern/production/genesis-book-introduction.CANDIDATE.md \
+            --chapter-candidate work/mhcc-modern/production/genesis-01.CANDIDATE.md \
+            --native-reader "${RUNNER_TEMP}/commentary-modern-source-raw" \
+            --module-directory "${RUNNER_TEMP}/mhcc-source-root" \
+            --module-id MHCC \
+            --temp-module-id MHCCGENL \
+            --osis "${RUNNER_TEMP}/mhcc-genesis01-linked-preview.xml" \
+            --report "${RUNNER_TEMP}/mhcc-genesis01-linked-preview-metadata.json"
+          mkdir -p "${RUNNER_TEMP}/mhcc-genl-sword/mods.d"
+          mkdir -p "${RUNNER_TEMP}/mhcc-genl-sword/modules/comments/zcom/mhccgenl"
+          osis2mod "${RUNNER_TEMP}/mhcc-genl-sword/modules/comments/zcom/mhccgenl" \
+            "${RUNNER_TEMP}/mhcc-genesis01-linked-preview.xml" -z z -b 3 \
+            > "${RUNNER_TEMP}/mhcc-genesis01-linked-build.log" 2>&1
+          cat > "${RUNNER_TEMP}/mhcc-genl-sword/mods.d/mhccgenl.conf" <<'EOF'
+          [MHCCGENL]
+          Description=Temporary source-linked, semantically unapproved MHCC Modern Genesis 1
+          DataPath=./modules/comments/zcom/mhccgenl/
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          Lang=en
+          Versification=KJV
+          SourceType=OSIS
+          DistributionLicense=Private
+          EOF
+          SWORD_PATH="${RUNNER_TEMP}/mhcc-genl-sword" \
+            diatheke -b MHCCGENL -f OSIS -k "Genesis 1:3" \
+            > "${RUNNER_TEMP}/mhcc-genesis01-linked-v3.txt"
+          SWORD_PATH="${RUNNER_TEMP}/mhcc-genl-sword" \
+            diatheke -b MHCCGENL -f OSIS -k "Genesis 1:26" \
+            > "${RUNNER_TEMP}/mhcc-genesis01-linked-v26.txt"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+          base=Path(os.environ["RUNNER_TEMP"])
+          m=json.loads((base/"mhcc-genesis01-linked-preview-metadata.json").read_text())
+          assert m["status"]=="DISPOSABLE_SOURCE_LINKED_CANDIDATE_LAYOUT_NOT_EDITORIALLY_APPROVED"
+          assert m["annotated_commentary_sections"]==8
+          assert m["original_source_link_target_count"]==2
+          assert m["original_source_link_targets_embedded_exactly"] is True
+          assert m["modern_book_introduction_paragraphs_included"]>=3
+          assert m["original_chapter_outline_tables_preserved"] is True
+          assert m["original_chapter_outline_tables_retained"]==8
+          assert m["original_chapter_outline_cell_text_exactly_preserved"] is True
+          assert m["original_chapter_intro_native_markup_preserved"] is False
+          assert m["sword_publication_authorized"] is False
+          ns={"o":"http://www.bibletechnologies.net/2003/OSIS/namespace"}
+          root=ET.parse(base/"mhcc-genesis01-linked-preview.xml").getroot()
+          links=root.findall(".//o:reference",ns)
+          intros=root.findall(".//o:div[@type='introduction']",ns)
+          assert len(links)==2 and len(intros)==1
+          a=(base/"mhcc-genesis01-linked-v3.txt").read_text()
+          b=(base/"mhcc-genesis01-linked-v26.txt").read_text()
+          def rendered_flags(value):
+              markers=("The Bible's opening verse","Let there be light",
+                       "1 John 5:20","Let us make man",
+                       "Ecclesiastes 7:29","Nothing in the most ancient",
+                       "Genesis 1","Genesis")
+              return {marker:(marker in value) for marker in markers}
+          print("GEN1_LINKED_READER_MARKER_DIAGNOSTIC"+
+                " verse3="+str(rendered_flags(a))+
+                " verse26="+str(rendered_flags(b))+
+                " v3_bytes="+str(len(a.encode()))+
+                " v26_bytes="+str(len(b.encode())))
+          assert "1 John 5:20" in a and "Ecclesiastes 7:29" in b
+          import hashlib,subprocess,sys
+          sys.path.insert(0,"scripts")
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str((base/"mhcc-genl-sword").resolve())
+          p=subprocess.Popen([str(base/"commentary-modern-source-raw"),"MHCCGENL"],
+                             env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+          native_num={}
+          native_intro={}
+          try:
+              assert p.stdout
+              def collect(kind,ref,raw):
+                  if kind=="K" and ref.startswith("Gen.1."):
+                      native_num[ref]=raw
+                  if kind=="I" and ref.startswith("Gen"):
+                      native_intro[ref]=raw
+              native_report,numbered,_,_=parse_native_raw_corpus(p.stdout,on_entry=collect)
+              p.stdout.close()
+              assert p.wait(timeout=25)==0
+          finally:
+              if p.poll() is None:
+                  p.kill()
+                  p.wait()
+          original_map=json.loads(Path("work/mhcc-modern/production/genesis-01.SOURCE_MAP.json").read_text())
+          expected_native=set(key for section in original_map["sections"]
+                                  for key in section["native_keys"])
+          assert set(native_num)==expected_native and len(native_num)==31
+          def refs(raw):
+              from xml.etree import ElementTree as XML
+              source=XML.fromstring(b"<root>"+raw+b"</root>")
+              return [x.get("osisRef") for x in source.iter()
+                      if isinstance(x.tag,str) and x.tag.rsplit("}",1)[-1]=="reference"]
+          linked_sections=root.findall(".//o:div[@annotateType='commentary']",ns)
+          for first in ("Gen.1.3","Gen.1.26"):
+              linked=next(x for x in linked_sections if x.get("annotateRef","").startswith(first))
+              literal=[x.get("osisRef") for x in linked.iter()
+                       if x.tag=="{http://www.bibletechnologies.net/2003/OSIS/namespace}reference"]
+              built=refs(native_num[first])
+              print("GEN1_LINKED_NATIVE_REFERENCE_READBACK "+first+
+                    " expected="+str(len(literal))+" actual="+str(len(built))+
+                    " same="+str(built==literal))
+              assert built==literal and len(built)==1
+          intro_needle="most ancient surviving book"
+          modern_intro_in_I=any(intro_needle.encode() in raw for raw in native_intro.values())
+          modern_intro_in_K=any(intro_needle.encode() in raw for raw in native_num.values())
+          print("GEN1_LINKED_NATIVE_INTRO_PLACEMENT "+
+                "book_intro_in_I="+str(modern_intro_in_I)+
+                " book_intro_in_K="+str(modern_intro_in_K)+
+                " native_intro_slots="+str(len(native_intro)))
+          print("Source-linked Genesis 1 temp build: 31 exact native verses, two source-identical original linked references, modern book introduction in OSIS, real reader visible markers PASS; original chapter intro/independent semantic acceptance pending")
+          PY
+      - name: Verify source-bound script inventory is current
+        shell: bash
+        run: python scripts/tool_registry.py --check
+      - name: Upload metadata-only bounded audit receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mhcc-modern-0.1.1-source-native-receipt
+          path: |
+            ${{ runner.temp }}/mhcc-modern-source-native-receipt.json
+            ${{ runner.temp }}/mhcc-modern-whole-canon-native-receipt.json
+            ${{ runner.temp }}/mhcc-modern-five-native-source-witness-probes.json
+            ${{ runner.temp }}/mhcc-crosswire-five-native-source-receipt.json
+            ${{ runner.temp }}/mhcc-crosswire-five-native-witness-probes.json
+            ${{ runner.temp }}/mhcc-two-ccel-to-native-section-word-alignment.json
+            ${{ runner.temp }}/mhcc-modern-historical-69-translation-coverage.json
+            ${{ runner.temp }}/mhcc-modern-full-canon-source-group-diagnostic.json
+            ${{ runner.temp }}/mhcc-ionly-preview-report.json
+            ${{ runner.temp }}/mhcc-krange-preview-report.json
+            ${{ runner.temp }}/mhcc-modern-outline-order-diagnostic.json
+            ${{ runner.temp }}/mhcc-modern-draft-coverage-report.json
+            ${{ runner.temp }}/mhcc-modern-preview-structure.json
+          if-no-files-found: ignore
+          retention-days: 60
+, front, re.M):
+                  assert key not in attrs, "Repeated candidate front-matter key"
+                  attrs[key] = val
+              book = attrs.get("book_osis")
+              assert book in expected and book not in observed, (
+                  "Spurious or duplicate chapter-I introduction candidate: " + path.name)
+              native_intro = expected[book]
+              assert attrs.get("source_module") == "MHCC 0.1.1"
+              assert attrs.get("source_native_intro_key") == "I:" + native_intro["key"]
+              assert attrs.get("source_native_book_title_key") == "I:" + book
+              assert attrs.get("source_native_intro_raw_sha256") == native_intro["raw_sha256"]
+              assert attrs.get("source_native_intro_visible_word_tokens") == str(
+                  native_intro["visible_word_tokens"])
+              assert attrs.get("status", "").startswith(
+                  "PRODUCTION CANDIDATE — NATIVE CHAPTER-I PLACEMENT VERIFIED")
+              original_book_titles = [
+                  row for row in native["chapters"][book + ".1"][
+                      "native_introductions_not_assumed_to_be_exposition"]
+                  if row["key"] == book
+              ]
+              assert len(original_book_titles) == 1
+              assert original_book_titles[0]["raw_sha256"] != native_intro["raw_sha256"]
+              observed[book] = path.name
+          assert set(observed) == set(expected), (
+              "Missing exact-source-pinned modern candidate for chapter-I authored preface")
+          print("NATIVE_CHAPTER_I_PREFACE_OWNERSHIP_PASS source_intro_units=" +
+                str(len(expected)) + " modern_candidates=" + str(len(observed)) +
+                "; chapter-I source identity only, not translation semantic acceptance")
+          PY
       - name: Probe five original SWORD source-body scopes against independent English anchors
         shell: bash
         run: |
