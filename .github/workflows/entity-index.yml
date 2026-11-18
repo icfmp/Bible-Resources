@@ -19,6 +19,7 @@ jobs:
 
       - name: Regression tests (offline, no data download)
         run: |
+          python3 -I entity-index/test_distribution_profile.py
           python3 -I entity-index/test_build.py
           python3 -I entity-index/test_resolve.py
           python3 -I entity-index/test_audit_person_overlaps.py
@@ -64,6 +65,51 @@ jobs:
             --source /tmp/acai-frozen \
             --verify-source-commit \
             --output entity-index/dist/index.json
+
+      - name: Verify restricted keyterms are absent from projected BSI distribution
+        run: |
+          python3 -I entity-index/distribution_profile.py \
+            --input entity-index/dist/index.json \
+            --output entity-index/dist/bsi-v0.1-without-keyterms.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          full = json.loads(Path("entity-index/dist/index.json").read_text())
+          public = json.loads(Path("entity-index/dist/bsi-v0.1-without-keyterms.json").read_text())
+          assert any(e["kind"] == "keyterm" for e in full["entities"])
+          assert all(e["kind"] != "keyterm" for e in public["entities"])
+          assert public["distribution_profile"]["excluded_kinds"] == ["keyterm"]
+          assert public["statistics"]["index_entities"] < full["statistics"]["index_entities"]
+          assert all(not any(h["entity_id"].startswith("keyterm:") for h in hits)
+                     for hits in public["by_word"].values())
+          assert all(not any(c["entity_id"].startswith("keyterm:") for c in row["source_claims"])
+                     for row in public["unattested_source_words"].values())
+          assert all(not any(c.startswith("keyterm:") for c in row["source_reference_claims"])
+                     for row in public["unattested_source_verses"].values())
+          assert all(not any(c["entity_id"].startswith("keyterm:") for c in hits)
+                     for hits in public["qualified_source_references"].values())
+          print("BSI_KEYTERM_EXCLUSION_PASS", public["distribution_profile"])
+          PY
+
+      - name: Verify minimal labels without descriptions or excluded categories
+        run: |
+          python3 -I entity-index/minimal_labels.py \
+            --source /tmp/acai-frozen \
+            --index entity-index/dist/bsi-v0.1-without-keyterms.json \
+            --output entity-index/dist/bsi-v0.1-labels-en.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          index=json.loads(Path("entity-index/dist/bsi-v0.1-without-keyterms.json").read_text())
+          labels=json.loads(Path("entity-index/dist/bsi-v0.1-labels-en.json").read_text())
+          assert set(labels["labels"]) <= {e["id"] for e in index["entities"]}
+          assert not any(k.startswith("keyterm:") for k in labels["labels"])
+          assert labels["source_snapshot_sha256"] == index["provenance"]["source_snapshot_sha256"]
+          assert len(labels["labels"]) + len(labels["missing_ids"]) == len(index["entities"])
+          assert all(set(v) == {"label", "language", "source_id", "review_status"}
+                     for v in labels["labels"].values())
+          print("BSI_MINIMAL_LABELS_PASS", len(labels["labels"]), "missing", len(labels["missing_ids"]))
+          PY
 
       - name: Check v0.1 reader common-noun and study-topic sample on full pinned index
         run: |
