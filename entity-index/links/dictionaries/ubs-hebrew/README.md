@@ -95,6 +95,46 @@ Hebrew vs Aramaic source language, including representative exact source
 word IDs for the top suffix families. The original v0.1 edition pairing
 and all published BSI content remain unchanged.
 
+## Prioritizing the remaining 13,736 lexical occurrence gaps
+
+A read-only, full-original-WLC audit groups **unresolved occurrences**, *not
+distinct dictionary words*, by original source language plus original lemma.
+The audit finds **579 language/lemma groups**; the ten most frequent account
+for **66.02%** of the unresolved occurrences, the first 50 for **83.04%**, and
+the first 100 for **90.19%**.
+
+| Original lemma | Source class / illustration | Unresolved occurrences |
+| --- | --- | ---: |
+| כֹּל | noun, Strong 3605; Genesis 1:21 | 5,409 |
+| אַל | adverb/negative, Strong 0408 | 726 |
+| כֹּה | adverb, Strong 3541 | 577 |
+| קוֹל | noun, Strong 6963 | 505 |
+| עוֹד | adverb, Strong 5750 | 488 |
+| טוֹב | adjective, Strong 2896 | 333 |
+| רַע | adjective, Strong 7451 | 324 |
+| מְאֹד | adverb, Strong 3966 | 300 |
+| חָטָא | verb, Strong 2398 | 236 |
+| חוה | verb, Strong 7812a | 170 |
+
+**Important:** the raw MACULA lemma and its UBS counterpart may differ
+in orthography, vowel points, source edition numbering, word class,
+or lexical identity. In particular, the old MACULA `sdbh` for an
+attested root may point to **another UBS version/ID inventory**. The
+audit's exact-NFC lemma matches are *review candidates*, not independently
+verified sense or entry links. Even a unique matching spelling is **not**
+enough to add a crosswalk relation.
+
+The reproducible [audit_lexical_gaps.py](audit_lexical_gaps.py) reports all
+579 original language/lemma groups with original word IDs, reference examples,
+frequent Strong codes, original `sdbh` evidence, and morphology. It
+distinguishes four *triage buckets* that do not imply final editorial
+findings. The baseline includes 13,736 unresolved lexical occurrences;
+no dictionary definitions or Bible text are changed.
+
+**Next manual review priority:** resolve high-frequency original lemmas
+using authoritative edition-specific identity evidence (not stripped
+suffixes, not surface-string similarity), beginning with `כֹּל`.
+
 ## Index design
 
 - `by_sdbh`: exact fifteen-digit original Macula `sdbh` sense ID → one or more stable UBS `MainId` values. The `sdbh` value itself is the exact `LEXID` sense.
