@@ -93,8 +93,10 @@ class IntroductionMoveTests(unittest.TestCase):
 
     def test_missing_original_introduction_markup_fails_without_editing(self):
         altered=SOURCE.replace(b'<div type="introduction">',b'<div type="section">')
+        plan=reviewed()
+        plan["source_sha256"]=sha256(altered).hexdigest()
         with self.assertRaises(IntroRepairError):
-            repair_private_bytes(altered,reviewed(altered))
+            repair_private_bytes(altered,plan)
 
 
 if __name__=="__main__":
