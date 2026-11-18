@@ -807,6 +807,31 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
     embedded = [x for x in doc.iter() if x.tag == f"{{{NS}}}reference"]
     if len(embedded) != len(proposed):
         raise ValueError("Wrong source-anchored link count after modern OSIS insertion")
+    # Capture exact derived order after all insertions. Modern English placement
+    # may legitimately differ from source-XML order, and one K body may contain
+    # multiple independent links (including the duplicated 1 Cor. 5:7 source).
+    # No literal original source targets or linked words enter this receipt.
+    modern_groups = []
+    for first in sorted(requested):
+        ch = first.rsplit(".",1)[0]
+        units = native["chapters"][ch]["original_units"]
+        nth = next(i for i,u in enumerate(units) if u["first_key"]==first)
+        scope = modern_chapters[ch].findall(
+            f"./{{{NS}}}div[@annotateType='commentary']")[nth]
+        targets = [v.attrib.get("osisRef") for v in scope.iter()
+                   if v.tag == f"{{{NS}}}reference"]
+        expected_count = sum(row["source_first_key"] == first for row in proposed)
+        if (len(targets)!=expected_count or
+                any(not isinstance(t,str) or not t for t in targets)):
+            raise ValueError("Grouped modern source-linked occurrence count changed")
+        modern_groups.append({
+            "original_source_first_key":first,
+            "source_linked_modern_osisRef_hashes_in_actual_document_order":[
+                hashlib.sha256(t.encode("utf-8")).hexdigest() for t in targets],
+            "modern_link_occurrences":len(targets)
+        })
+    if sum(r["modern_link_occurrences"] for r in modern_groups) != len(proposed):
+        raise ValueError("Modern source-linked group count differs from source review")
     output = ET.tostring(doc, encoding="utf-8", xml_declaration=True)
     ET.fromstring(output)
     return output, {
@@ -830,6 +855,7 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         "modern_SWORD_readback_verified":False,
         "independent_editorial_semantic_signoff":False,
         "publication_authorized":False,
+        "linked_source_K_groups_with_exact_derived_target_order":modern_groups,
         "insertions":inserted,
     }
 
