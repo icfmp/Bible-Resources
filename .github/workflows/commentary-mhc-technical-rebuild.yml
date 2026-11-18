@@ -957,7 +957,7 @@ jobs:
           print("Introduction contents and note bodies remain private")
           print("Still NOT an independent historical collation or note/markup identity certificate")
           PY
-      - name: Private preview of seventeen source-label-attested inline reference destinations
+      - name: Private preview of twenty-four source-label-attested inline reference destinations
         shell: bash
         run: |
           set -euo pipefail
@@ -989,7 +989,7 @@ jobs:
           original=source.read_bytes()
           corrected,receipt=patch_reviewed_osis_reference_attributes(
               original,plan,set(real_keys))
-          if (len(plan["edits"])!=17 or receipt["exact_reference_attribute_only_changes"]!=len(plan["edits"])
+          if (len(plan["edits"])!=24 or receipt["exact_reference_attribute_only_changes"]!=len(plan["edits"])
                   or not receipt["entire_original_commentary_characters_unchanged"]
                   or not receipt["all_other_original_xml_elements_and_attributes_unchanged"]
                   or not receipt["new_verse_targets_present_in_real_native_index"]):
@@ -997,17 +997,17 @@ jobs:
           output=root/"mhc-links-private-only.osis.xml"
           with output.open("xb") as file:
               file.write(corrected)
-          print("Seventeen independently read source-attested Bible citation links verified")
+          print("Twenty-four independently read source-attested Bible citation links verified")
           print("Source hash before machine-only reference preview:",
                 receipt["original_sha256"])
-          print("Private source hash after seventeen source-anchored link edits:",
+          print("Private source hash after twenty-four source-anchored link edits:",
                 receipt["private_candidate_sha256"])
           print("Original text, displayed citation labels, notes, verse groups"
                 " and all non-reviewed XML byte spans unchanged")
           print("Research-only link target trial, NOT printed-edition editorial approval")
           print("No OSIS or SWORD text uploaded or published")
           PY
-      - name: Recompile seventeen-link private OSIS and audit exact native markup changes
+      - name: Recompile twenty-four-link private OSIS and audit exact native markup changes
         shell: bash
         run: |
           set -euo pipefail
@@ -1027,7 +1027,7 @@ jobs:
           ).read_text())
           manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
           approved={(e["old_target"],e["new_target"]) for e in plan["edits"]}
-          if len(approved)!=17 or len(plan["edits"])!=17:
+          if len(approved)!=24 or len(plan["edits"])!=24:
               raise SystemExit("Unexpected private reference change inventory")
           work=root/"mhc-links-preview-sword"
           cmd=[sys.executable,"scripts/rebuild_osis_commentary.py",
