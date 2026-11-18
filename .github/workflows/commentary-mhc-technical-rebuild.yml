@@ -298,8 +298,12 @@ jobs:
               flush()
               return fulltext,protected,tuple(events)
 
+          from collections import Counter
           raw_changes=0
           altered_visible=[]
+          visible_whitespace_only=[]
+          visible_nonwhitespace_changed=[]
+          exact_visible_length_deltas=Counter()
           altered_notes_or_links=[]
           altered_nonstyle_structure=[]
           unreadable=[]
@@ -316,6 +320,13 @@ jobs:
                   after=authored_content_without_display_styles(right)
                   if before[0]!=after[0]:
                       altered_visible.append(key)
+                      exact_visible_length_deltas[len(after[0])-len(before[0])]+=1
+                      before_without_spaces="".join(c for c in before[0] if not c.isspace())
+                      after_without_spaces="".join(c for c in after[0] if not c.isspace())
+                      if before_without_spaces==after_without_spaces:
+                          visible_whitespace_only.append(key)
+                      else:
+                          visible_nonwhitespace_changed.append(key)
                   if before[1]!=after[1]:
                       altered_notes_or_links.append(key)
                   if before[2]!=after[2]:
@@ -324,12 +335,26 @@ jobs:
                   unreadable.append(key)
           print("Native entries differing in raw bytes:",raw_changes)
           print("Native entries with changed exact visible Unicode:",len(altered_visible))
+          print("Of those, whitespace-only Unicode differences:",
+                len(visible_whitespace_only))
+          print("Of those, nonwhitespace Unicode differences:",
+                len(visible_nonwhitespace_changed))
+          print("Native visible-text length delta histogram (candidate minus original):",
+                dict(sorted(exact_visible_length_deltas.items())))
           print("Native entries with changed note/reference markup:",len(altered_notes_or_links))
           print("Native entries with changed non-style XML structure/text ownership:",
                 len(altered_nonstyle_structure))
           print("Native entries unparseable for comparison:",len(unreadable))
           unresolved=set(altered_visible+altered_notes_or_links+
                          altered_nonstyle_structure+unreadable)
+          from clean_source_osis import _tree, _inert_hi
+          original_root=_tree(original_source.read_bytes())
+          source_empty_hi=[
+              {"line":node.sourceline,"type":node.get("type"),
+               "parent":node.getparent().tag.rsplit("}",1)[-1]}
+              for node in original_root.iter() if _inert_hi(node)
+          ]
+          print("Original empty-hi source locators (markup only):",source_empty_hi)
           print("Unresolved reference/key samples without commentary text:",
                 [list(x) for x in sorted(unresolved)[:12]])
           if unresolved:
