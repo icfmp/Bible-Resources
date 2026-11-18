@@ -210,20 +210,193 @@ class SourceReferenceGate:
         }
 
 
+
+class WholeCanonOriginalLinkIdentityReceipt:
+    """Attest every published original-K link and its order, without exporting prose.
+
+    The pre-existing whole-canon source receipt supplies immutable group hashes,
+    occupied verse keys and counts. This independent traversal validates them
+    against the *same complete* SHA-pinned real SWORD raw stream. Link targets,
+    linked display text and source XML are hashed in private memory only.
+    This class does not match a translated word, inject a link, or build a module.
+    """
+
+    STATUS = "SOURCE_NATIVE_ALL_K_REFERENCE_IDENTITIES_NOT_MODERN_LINK_PARITY"
+
+    def __init__(self, native: dict):
+        if (native.get("status") != "SOURCE_NATIVE_RECEIPT_ONLY_NOT_TRANSLATION_APPROVAL"
+                or native.get("source_prose_or_original_markup_exported") is not False
+                or native.get("semantic_translation_independently_approved") is not False):
+            raise ValueError("Whole-canon source receipt is not an admissible original")
+        pin = native.get("original_compiled_corpus_sha256")
+        if not isinstance(pin, str) or not _SHA.fullmatch(pin):
+            raise ValueError("Missing pinned original full SWORD corpus SHA")
+        chapters = native.get("chapters")
+        if not isinstance(chapters, dict) or not chapters:
+            raise ValueError("Original chapter inventory is empty")
+        self.corpus_sha = pin
+        self.units: dict[str, dict] = {}
+        self.keys: dict[str, str] = {}
+        self.seen_keys: set[str] = set()
+        self.seen_first: set[str] = set()
+        self.linked_units: dict[str, dict] = {}
+        self.link_count = 0
+        for chapter, contents in chapters.items():
+            groups = contents.get("original_units")
+            if not isinstance(groups, list):
+                raise ValueError("Original source chapter groups missing: " + chapter)
+            for group in groups:
+                first = group.get("first_key")
+                keys = group.get("keys")
+                sha = group.get("source_unit_sha256")
+                tags = group.get("markup", {}).get("tag_counts", {})
+                count = tags.get("reference", 0)
+                if (not isinstance(first, str) or not isinstance(keys, list)
+                        or not keys or keys[0] != first or first in self.units
+                        or not isinstance(sha, str) or not _SHA.fullmatch(sha)
+                        or type(count) is not int or count < 0):
+                    raise ValueError("Unreliable original source group record: " + chapter)
+                if not isinstance(tags, dict) or group["markup"].get(
+                        "strict_xml_fragment") is not True:
+                    raise ValueError("Original K group has not passed strict XML parsing")
+                self.units[first] = {"sha": sha, "ref_count": count,
+                                     "last": keys[-1]}
+                for key in keys:
+                    if (not isinstance(key, str) or not key.startswith(chapter + ".")
+                            or key in self.keys):
+                        raise ValueError("Repeated or foreign original K address")
+                    self.keys[key] = first
+        if not self.units or not self.keys:
+            raise ValueError("No authentic original numbered commentary entries")
+
+    def observe(self, kind: str, key: str, raw: bytes) -> None:
+        if kind != "K":
+            return
+        owner = self.keys.get(key)
+        if owner is None or key in self.seen_keys:
+            raise ValueError("Unexpected or duplicate original numbered SWORD key: " + key)
+        group = self.units[owner]
+        if hashlib.sha256(raw).hexdigest() != group["sha"]:
+            raise ValueError("Original K alias and source SHA differ: " + key)
+        self.seen_keys.add(key)
+        if key != owner:
+            return
+        if owner in self.seen_first:
+            raise ValueError("Duplicate first original K group key")
+        self.seen_first.add(owner)
+        try:
+            node = ET.fromstring(b"<original>" + raw + b"</original>")
+        except ET.ParseError as exc:
+            raise ValueError("Original link-bearing K XML is malformed: " + owner) from exc
+        targets = []
+        labels = []
+        for element in node.iter():
+            if not isinstance(element.tag, str) or element.tag.rsplit("}", 1)[-1] != "reference":
+                continue
+            literal = element.attrib.get("osisRef")
+            if (not isinstance(literal, str) or not literal or len(literal) > 2048
+                    or any(ord(char) < 32 for char in literal)):
+                raise ValueError("Original reference has missing/unsafe literal target: " + owner)
+            # Preserve exact literal attribute spelling and occurrence order.
+            # Do not impose the restricted single-verse parser from the Gen.1 pilot.
+            targets.append(hashlib.sha256(literal.encode("utf-8")).hexdigest())
+            labels.append(hashlib.sha256(
+                "".join(element.itertext()).encode("utf-8")).hexdigest())
+        if len(targets) != group["ref_count"]:
+            raise ValueError("Original XML reference count differs from authenticated census: "
+                             + owner)
+        self.link_count += len(targets)
+        if targets:
+            self.linked_units[owner] = {
+                "first_key": owner,
+                "last_key": group["last"],
+                "source_raw_sha256": group["sha"],
+                "reference_count": len(targets),
+                "original_osisRef_sha256_in_document_order": targets,
+                "original_visible_link_label_sha256_in_document_order": labels,
+            }
+
+    def report(self, reader_report: dict) -> dict:
+        if reader_report.get("all_native_raw_entries_ordered_sha256") != self.corpus_sha:
+            raise ValueError("Full original native SWORD SHA does not match pinned edition")
+        if (self.seen_keys != set(self.keys)
+                or self.seen_first != set(self.units)):
+            raise ValueError("Original K keys or source body groups were not completely read")
+        return {
+            "status": self.STATUS,
+            "whole_native_source_sha256": self.corpus_sha,
+            "original_numbered_K_keys_verified": len(self.seen_keys),
+            "original_unique_K_bodies_verified": len(self.seen_first),
+            "original_reference_elements_verified": self.link_count,
+            "original_link_bearing_K_bodies": len(self.linked_units),
+            "source_link_groups": [
+                self.linked_units[k] for k in sorted(self.linked_units)
+            ],
+            "original_link_destinations_only_sha256_not_exported": True,
+            "original_visible_link_text_only_sha256_not_exported": True,
+            "original_source_prose_or_XML_exported": False,
+            "modern_manuscript_reference_presence_approved": False,
+            "modern_osisRef_targets_or_order_verified": False,
+            "translated_link_display_text_reviewed": False,
+            "source_original_mutated": False,
+            "modern_module_built_or_published": False,
+        }
+
+
+def run_whole_native_link_identity(*, reader: Path, root: Path,
+                                    module_id: str, native_receipt: Path) -> dict:
+    native = json.loads(native_receipt.read_text(encoding="utf-8"))
+    gate = WholeCanonOriginalLinkIdentityReceipt(native)
+    env = os.environ.copy()
+    env["SWORD_PATH"] = str(root.resolve())
+    proc = subprocess.Popen([str(reader.resolve()), module_id], env=env,
+                            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    try:
+        if proc.stdout is None:
+            raise ValueError("Original native raw stream is unavailable")
+        complete, *_ = parse_native_raw_corpus(proc.stdout, on_entry=gate.observe)
+        proc.stdout.close()
+        if proc.wait(timeout=30) != 0:
+            raise ValueError("Original native raw reader failed")
+        return gate.report(complete)
+    finally:
+        if proc.poll() is None:
+            proc.kill()
+            proc.wait()
+
 def main():
     p=argparse.ArgumentParser()
     p.add_argument("--native-reader",required=True,type=Path)
     p.add_argument("--module-directory",required=True,type=Path)
     p.add_argument("--module-id",required=True)
-    p.add_argument("--source-map",required=True,type=Path)
-    p.add_argument("--expected-references",required=True,type=Path)
-    p.add_argument("--modern-candidate",required=True,type=Path)
+    p.add_argument("--source-map",type=Path)
+    p.add_argument("--expected-references",type=Path)
+    p.add_argument("--modern-candidate",type=Path)
+    p.add_argument("--whole-native-receipt",type=Path)
     p.add_argument("--report",required=True,type=Path)
     a=p.parse_args()
     if not a.native_reader.is_file() or not a.module_directory.is_dir():
         p.error("Trusted real native reader and installed source module directory required")
     if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{1,39}",a.module_id):
         p.error("Unexpected SWORD module ID")
+    if a.whole_native_receipt is not None:
+        if any(x is not None for x in
+               (a.source_map, a.expected_references, a.modern_candidate)):
+            p.error("Whole-canon original-only mode cannot claim modern marker parity")
+        result = run_whole_native_link_identity(
+            reader=a.native_reader, root=a.module_directory,
+            module_id=a.module_id, native_receipt=a.whole_native_receipt)
+        a.report.parent.mkdir(parents=True, exist_ok=True)
+        a.report.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n",
+                            encoding="utf-8")
+        print("SOURCE-NATIVE COMPLETE ORIGINAL LINK IDENTITY PASS: groups=" +
+              str(result["original_unique_K_bodies_verified"]) +
+              ", native links=" + str(result["original_reference_elements_verified"]) +
+              "; destination and label hashes only; zero modern link approval")
+        return 0
+    if any(x is None for x in
+           (a.source_map, a.expected_references, a.modern_candidate)):
+        p.error("Pilot mode requires --source-map, --expected-references and --modern-candidate")
     source=json.loads(a.source_map.read_text(encoding="utf-8"))
     expectation=json.loads(a.expected_references.read_text(encoding="utf-8"))
     gate=SourceReferenceGate(source_map=source,expected_refs=expectation,
