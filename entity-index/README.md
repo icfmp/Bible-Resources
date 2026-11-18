@@ -389,6 +389,39 @@ the highest-priority collisions for source-by-source follow-up under
 [inherited identity issue #75 / our tracker #299](https://github.com/icfmp/Bible-Resources/issues/299).
 A count from an old unpinned snapshot is not a release gate.
 
+## Scoped review of all eight remaining explicit-person overlaps
+
+The current complete pinned-source audit has **eight** exact original-word
+IDs claimed as explicit name tokens by **different canonical people**.
+It is incorrect to call every shared token an identity error.
+`reviewed-person-word-overlaps.json` carries independently
+source-cited, reversible **review classifications**:
+
+- **5 shared genealogical proper-name components**: the name portions
+  Hur (1 Kings 4:8), Deker (4:9), Hesed (4:10), Abinadab (4:11) and
+  Shua (1 Chronicles 2:3) may name an ancestor while also being a part
+  of the child's identifying patronymic. Both source candidates remain
+  available; they are not two competing identities for one man.
+- **1 unresolved father-name/form question**:
+  Matthew 16:17's Bar-Jonah/Bar-Jonas term is a patronymic of Simon Peter;
+  attribution to the separate father indexed as John must retain the
+  name-form/textual qualification, **not** merge father with son.
+- **2 unresolved Judean name-form/identity attributions**:
+  Ezra 3:9 (`person:Hodaviah.4` / `person:Hodiah.2`) and
+  Nehemiah 12:8 (`person:Hodiah.2` / `person:Judah.7`).
+  Pinned WLC in both places spells Judah. Exact spelling does not
+  settle the historical equivalence of those source records.
+
+CI requires **all** currently detected explicit-person overlaps to have
+one exact word ID, exact canonical candidate pair, exact pinned source
+edition and explanatory evidence; unknown/new conflicts or stale reviews
+fail the build. The review is a separate **QA-only** artifact, and
+`by_word`, the resolver's candidate multiplicity, source files and
+original-language tokens remain **untouched**. The other **18 mixed**
+and **2,388 indirect-only** person overlaps are not certified by this
+direct-name review. The remaining three name/identity questions need
+contextual historical review before any final interpretation.
+
 ## Strict original-word identifier format
 
 The source edition lock now declares a full, exact source-word ID format:
