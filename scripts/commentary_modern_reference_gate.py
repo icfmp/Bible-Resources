@@ -1538,6 +1538,7 @@ def main():
     p.add_argument("--reviewed-link-placement-manifest",type=Path)
     p.add_argument("--auto-source-matched-single-verses",action="store_true")
     p.add_argument("--auto-source-matched-same-chapter-ranges",action="store_true")
+    p.add_argument("--auto-original-first-K-outline-links",action="store_true")
     p.add_argument("--linked-osis",type=Path)
     p.add_argument("--report",required=True,type=Path)
     a=p.parse_args()
@@ -1566,7 +1567,8 @@ def main():
             repo_root=a.repository_root, reader=a.native_reader,
             module_directory=a.module_directory, module_id=a.module_id,
             auto_single_verse=a.auto_source_matched_single_verses,
-            auto_ranges=a.auto_source_matched_same_chapter_ranges)
+            auto_ranges=a.auto_source_matched_same_chapter_ranges,
+            auto_outline_links=a.auto_original_first_K_outline_links)
         a.linked_osis.parent.mkdir(parents=True,exist_ok=True)
         a.report.parent.mkdir(parents=True,exist_ok=True)
         a.linked_osis.write_bytes(osis)
@@ -1576,11 +1578,14 @@ def main():
               str(result["modern_inline_links_inserted"]) +
               " source-verified inline links (" +
               str(result["automatic_source_matched_references"]["automatically_inserted"]) +
-              " exact automatically matched citations) across all 1189 chapters; " +
+              " exact matches, including " +
+              str(result["modern_original_outline_links_inserted"]) +
+              " original first-K chapter outline links) across all 1189 chapters; " +
               "unmatched original hyperlinks still need editorial placement; NO release")
         return 0
     if ((a.auto_source_matched_single_verses or
-         a.auto_source_matched_same_chapter_ranges) and
+         a.auto_source_matched_same_chapter_ranges or
+         a.auto_original_first_K_outline_links) and
             a.reviewed_link_placement_manifest is None):
         p.error("Automatic source-linked citation lookup needs reviewed base manifests")
     if any(x is not None for x in (
