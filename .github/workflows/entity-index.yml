@@ -65,6 +65,53 @@ jobs:
             --verify-source-commit \
             --output entity-index/dist/index.json
 
+      - name: Check v0.1 reader common-noun and study-topic sample on full pinned index
+        run: |
+          python3 - <<'PY'
+          import importlib.util
+          import json
+          from pathlib import Path
+          index = json.loads(Path("entity-index/dist/index.json").read_text(encoding="utf-8"))
+          spec = importlib.util.spec_from_file_location(
+              "entity_reader", "entity-index/resolve.py")
+          module = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(module)
+          resolver = module.EntityResolver(index)
+          samples = [
+              ("flora:Fig", "wlc", "o230280040112"),
+              ("flora:OliveTree", "wlc", "o010080110081"),
+              ("flora:Wheat", "wlc", "o010300140051"),
+              ("flora:Barley", "wlc", "o020090310023"),
+              ("fauna:Dove", "wlc", "o010080080032"),
+              ("fauna:Fish", "wlc", "o010010260082"),
+              ("fauna:Lion", "wlc", "o010490090021"),
+              ("fauna:Camel", "wlc", "o010120160122"),
+              ("realia:ArkOfTheCovenant", "wlc", "o020250100021"),
+              ("realia:Altar", "wlc", "o010080200031"),
+              ("realia:Arrow", "wlc", "o050320230041"),
+              ("realia:Anchor", "sblgnt", "n44027029012"),
+              ("keyterm:Faith", "sblgnt", "n40008010016"),
+              ("keyterm:Mercy", "sblgnt", "n40009013006"),
+              ("keyterm:Love", "wlc", "o010220020091"),
+              ("keyterm:Covenant", "wlc", "o010060180031"),
+          ]
+          assert len(samples) == 16
+          for entity_id, corpus, word_id in samples:
+              exact = resolver.resolve_for_reader(
+                  corpus=corpus,
+                  edition=index["provenance"]["source_editions"][corpus]["edition"],
+                  word_id=word_id, verse_id=word_id[1:9])
+              assert exact["status"] in (
+                  "source_candidate", "ambiguous_source_candidates"), (entity_id, exact)
+              assert exact["lookup_policy"] == "explicit_only"
+              assert any(row["id"] == entity_id
+                         and row["link_type"] == "explicit_instances"
+                         for row in exact["candidates"]), (entity_id, word_id, exact)
+              assert all(row["link_type"] == "explicit_instances"
+                         for row in exact["candidates"]), (entity_id, exact)
+          print("ENTITY_V0_1_TOPIC_SAMPLE", len(samples), "source-backed direct links")
+          PY
+
       - name: Verify output and identity decisions
         shell: bash
         run: |
