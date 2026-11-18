@@ -28,7 +28,7 @@ Sitting is a posture of rest after labor and suffering, and one from which the K
 
 It also signifies permanence: **he reigns forever**.
 
-His enemies are already restrained, though they have not yet been made **his footstool**.
+All his enemies are already **in chains**, though they have not yet been made **his footstool**.
 
 His kingdom has been established and will continue despite every power of darkness.
 
@@ -85,6 +85,8 @@ Those transformed in this way receive the blessings of **his sacrifice, interces
 ---
 
 ## Editorial review — Psalm 110
+
+**2026-11-18 targeted CCEL re-collation (secondary witness):** Restored Henry's deliberate image of Christ's enemies already being *in chains* rather than reducing it to generic restraint. The anomalous concise-witness wording about the Spirit, word/world and people of Christ remains documented as a source-witness defect; it was not silently rewritten in the published original. This manuscript remains unreleased and unapproved by an independent original-native reviewer.
 
 **Full original-English secondary witness directly read:** [CCEL, Psalm 110](https://ccel.org/ccel/henry/mhcc.xx.cx.html). Published original `MHCC 0.1.1` remains authority, requiring full native SWORD/independent acceptance.
 
