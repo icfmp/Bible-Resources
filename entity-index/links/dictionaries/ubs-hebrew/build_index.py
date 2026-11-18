@@ -54,6 +54,7 @@ def build(english, french):
         raise ValueError(f"EN/FR lexical ID drift; refusing to infer bilingual identity: {drift[:10]} (total {len(drift)})")
     by_strong = defaultdict(set)
     by_sdbh = defaultdict(set)
+    by_entry_strong_family = defaultdict(set)
     skipped = set()
     sense_assignments = 0
     for mid, entry in en.items():
@@ -63,6 +64,7 @@ def build(english, french):
                 skipped.add(str(raw))
                 continue
             by_strong[f"{m.group(1)}{int(m.group(2))}{m.group(3)}"].add(mid)
+            by_entry_strong_family[mid].add(f"{m.group(1)}{int(m.group(2))}")
         for sense in senses(entry):
             sid = str(sense["LEXID"])
             if not LEX_ID.fullmatch(sid):
@@ -88,7 +90,7 @@ def build(english, french):
             "lookup": ["sdbh", "strongnumberx", "lang"],
         },
         "policy": {
-            "sdbh": "exact_15_digit_original_source_sense_id",
+            "sdbh": "original_sense_id_only_if_corrobated_by_matching_ubs_entry_strong_family",
             "strong": "entry_only_exact_language_specific_numeric_or_suffix_code",
             "unresolved": "return_all_candidates_never_guess_contextual_sense",
             "definitions": "not_redistributed_look_up_UBS_original_edition",
@@ -101,25 +103,32 @@ def build(english, french):
             "excluded_non_numeric_strong_codes": len(skipped),
         },
         "by_sdbh": {k: sorted(v) for k, v in sorted(by_sdbh.items())},
+        "by_entry_strong_family": {mid: sorted(by_entry_strong_family[mid]) for mid in sorted(en)},
         "by_strong": {k: sorted(v) for k, v in sorted(by_strong.items())},
     }
 
 
 def lookup(index, sdbh, strongnumberx, lang):
-    """A sense ID is authoritative only on exact match; Strong is entry-only."""
+    """Cross-check a sense ID against the UBS lexeme Strong family before use."""
     sdbh = str(sdbh or "").strip()
     raw_strong = str(strongnumberx or "").strip()
     lang = str(lang or "").strip()
-    if sdbh and LEX_ID.fullmatch(sdbh):
-        direct = index["by_sdbh"].get(sdbh, [])
+    m = MACULA_STRONG.fullmatch(raw_strong)
+    if sdbh and LEX_ID.fullmatch(sdbh) and m and lang in ("H", "A"):
+        family = f"{lang}{int(m.group(1))}"
+        # A numerically identical SDBH/LEXID can now point to a DIFFERENT
+        # lexeme in the UBS edition. Never trust an ID without corroboration.
+        direct = [mid for mid in index["by_sdbh"].get(sdbh, [])
+                  if family in index["by_entry_strong_family"].get(mid, [])]
         if direct:
             return {
                 "status": "direct_sense_candidates" if len(direct) > 1 else "direct_sense",
                 "entry_ids": list(direct),
                 "sense_ids": [sdbh],
-                "evidence": "macula_sdbh_exact",
+                "evidence": "macula_sdbh_and_ubs_strong_numeric_family",
             }
-    m = MACULA_STRONG.fullmatch(raw_strong)
+    # Incompatible SDBH IDs are ignored: only the ORIGINAL exact Strong may
+    # supply an entry-only fallback; never steal a sense from an unrelated ID.
     if lang not in ("H", "A") or not m:
         return {"status": "no_verified_lexical_link", "entry_ids": [],
                 "sense_ids": [], "evidence": "none"}

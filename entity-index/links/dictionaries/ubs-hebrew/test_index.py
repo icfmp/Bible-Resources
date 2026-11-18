@@ -58,6 +58,31 @@ class UBSHebrewBridgeTest(unittest.TestCase):
         self.assertEqual(lookup(index, "", "0430a", "A")["entry_ids"], [])
         self.assertEqual(lookup(index, "", "430a 430b", "H")["status"], "no_verified_lexical_link")
 
+    def test_sdbh_numeric_id_collision_cannot_steal_unrelated_lexeme(self):
+        # Old edition's 'beginning' ID now belongs to a 'head' UBS entry.
+        wrong=entry("006653000000000", ["H7218"], "006653001001000", lemma="רֹאשׁ")
+        right=entry("006660000000000", ["H7225"], "006660001001000", lemma="רֵאשִׁית")
+        ix=build([wrong,right],[wrong,right])
+        out=lookup(ix,"006653001001000","7225","H")
+        self.assertEqual(out["status"],"entry_only")
+        self.assertEqual(out["entry_ids"],[right["MainId"]])
+        self.assertEqual(out["sense_ids"],[])
+        self.assertEqual(out["evidence"],"macula_strong_exact_only")
+        # No fallback may silently choose the unrelated entry.
+        missing=lookup(ix,"006653001001000","9999","H")
+        self.assertEqual(missing["status"],"no_entry_match")
+        self.assertEqual(missing["entry_ids"],[])
+        self.assertEqual(missing["sense_ids"],[])
+
+    def test_correlated_sdbh_strong_family_allows_original_sense(self):
+        only=entry("000001000000000",["H0430a"],"000001001001000")
+        ix=build([only],[only])
+        out=lookup(ix,"000001001001000","0430","H")
+        self.assertEqual(out["status"],"direct_sense")
+        self.assertEqual(out["sense_ids"],["000001001001000"])
+        self.assertEqual(out["evidence"],"macula_sdbh_and_ubs_strong_numeric_family")
+        self.assertEqual(lookup(ix,"000001001001000","0430","A")["entry_ids"],[])
+
     def test_fails_on_bilingual_drift_and_duplicates(self):
         changed=json.loads(json.dumps(self.a))
         changed["BaseForms"][0]["LEXMeanings"][0]["LEXID"]="000001001002000"
