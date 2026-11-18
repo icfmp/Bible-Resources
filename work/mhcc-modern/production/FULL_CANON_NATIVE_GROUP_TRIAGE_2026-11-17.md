@@ -23,6 +23,8 @@ GitHub Actions: [native-group diagnostic #44199549714](https://github.com/icfmp/
 
 **Why the first diagnostic overreported discrepancies:** Acts 2, 3, 7, 13 and John 5, 6, 7, 8, 13, 14, 17, 18 have source-aligned Modern English exposition **subheadings marked `###`** inside parent presentation headings `##`. Counting only top-level `##` labels understated the number of translated source units. The revised source-neutral parser counts *leaf sections*, without counting a parent heading as another authored source unit. This removes those false group-count alarms. It does **not** imply their prose/notes/markup has passed a semantic review.
 
+> **2026-11-18 additional positive coverage finding (not a sixth discrepancy):** authenticated whole-canon source metadata contains one native K commentary group in `Matt.13` covering **24–30 and 36–43** with a distinct group covering **31–35**. The modern manuscript already represents the noncontiguous section correctly. Generic draft-to-native scope matching and OSIS preview tests are now strengthened to reject collapsing these gaps; see [full native XML census and ownership](FULL_CANON_NATIVE_MARKUP_AND_INTRO_INVENTORY_2026-11-18.md). This does not certify the semantic translation or source references.
+
 ## Five source-topology cases, NO automatic source/editorial changes
 
 | Chapter | Published source's actual original K body keys | Separate modern manuscript exposition labels | Observed situation / next proof |
