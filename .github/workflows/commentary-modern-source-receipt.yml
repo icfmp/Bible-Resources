@@ -307,20 +307,20 @@ jobs:
               "mhcc-modern-proposed-link-correction-dispositions.json").read_text())
           assert result["status"] == (
               "PINNED_SOURCE_AND_MODERN_CORRECTION_CANDIDATES_CHECKED_NOT_RELEASED")
-          assert result["reviewed_source_link_groups"] == 4
-          assert result["reviewed_original_hyperlink_elements_in_groups"] == 25
+          assert result["reviewed_source_link_groups"] == 8
+          assert result["reviewed_original_hyperlink_elements_in_groups"] == 46
           assert result["source_links_proposed_to_omit"] == 6
-          assert result["source_links_proposed_to_retarget"] == 1
+          assert result["source_links_proposed_to_retarget"] == 5
           assert result["secondary_witness_links_proposed_to_add"] == 1
-          assert result["original_link_proposal_actions_reviewed"] == 7
+          assert result["original_link_proposal_actions_reviewed"] == 11
           assert result["source_link_target_and_label_hashes_checked_in_original_order"]
           assert result["modern_section_scope_and_marker_presence_checked"]
           assert not result["real_native_source_changes"]
           assert not result["derived_SWORD_link_placements_or_native_readbacks_tested"]
           assert not result["editorial_translation_approved"]
           assert not result["release_authorized"]
-          print("PROPOSED_SOURCE_LINK_ANOMALY_DISPOSITIONS_PASS 7 bad published "
-                "link elements, 6 list-number omissions, 1 corrected reference "
+          print("PROPOSED_SOURCE_LINK_ANOMALY_DISPOSITIONS_PASS 11 bad published "
+                "link elements, 6 list-number omissions, 5 corrected reference "
                 "target, 1 witness-backed missing link; NO release")
           PY
       - name: Probe five original SWORD source-body scopes against independent English anchors
