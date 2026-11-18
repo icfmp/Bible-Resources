@@ -2663,7 +2663,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 11,
+      "static_reference_count": 12,
       "static_references": [
         "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_android_text_witness.py",
@@ -2673,6 +2673,7 @@
         "scripts/commentary_source_erratum_compiled_probe.py",
         "scripts/commentary_stock_andbible_android.py",
         "scripts/commentary_xiphos_heading_probe.py",
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/commentary-private-candidate-xiphos-gui.yml",
         ".github/workflows/commentary-xiphos-dual-reader.yml",
         "tests/test_commentary_xiphos_dual_reader.py"
@@ -3791,7 +3792,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 13,
+      "static_reference_count": 14,
       "static_references": [
         "scripts/audit_real_pilot.py",
         "scripts/commentary_andbible_jsword.py",
@@ -3804,6 +3805,7 @@
         "scripts/pilot_runtime.py",
         "scripts/private_sword_bundle.py",
         "scripts/probe_lsg_v11n.py",
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/lsg-fidelity.yml",
         "tests/test_pilot_subprocess.py"
       ]
