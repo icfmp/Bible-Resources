@@ -78,7 +78,7 @@ These are more than a few words of synthetic test commentary and none of them de
 
 A second paragraph demonstrates that a single original body can keep its scope without duplication.
 
-A third paragraph makes the shape unambiguous and allows the preview to refuse a missing passage.
+A third paragraph makes the shape unambiguous and allows the preview to refuse a missing passage, without changing any original authorial boundaries, notes, reference targets, punctuation, headings, or source contents.
 
 ---
 
