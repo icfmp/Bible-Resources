@@ -1,4 +1,4 @@
-# MHC — 25 source machine Scripture-link anchors, 18 not yet trialled (2026-11-18)
+# MHC — 25 source machine Scripture-link anchors, 11 not yet trialled (2026-11-18)
 
 **Research inventory, not a corrected edition, module release, or editorial approval.**
 This is the original **complete MHC** authored OSIS, *not MHCC*. The original
@@ -13,7 +13,7 @@ The separate [private two-link correction preview](https://github.com/icfmp/Bibl
 safely trialled **line 7237** (`15.1` → `Jer.15.1`) and
 **line 57059** (`Ezr 1.7 8.23` → `Ezra.1.7 Ezra.8.24`), leaving
 authorial visible labels and prose untouched. Neither is published.
-The original **23** pending anchors are preserved in the inventory below, without commentary prose. Subsequently **5** of these 23 were added to the same reversible private plan after independent citation checks. That brings the plan to **7** and leaves **18** untrialled; see the dated continuation at the end.
+The original **23** pending anchors are preserved in the inventory below, without commentary prose. Subsequently **5** of these 23 were added to the same reversible private plan after independent citation checks. That brought the first private plan to **7**. A second batch of seven reviewed citation links now raises it to **14**, leaving **11** untrialled; see dated continuations below.
 
 ## Five originally pending bookless numeric machine targets
 
@@ -77,7 +77,7 @@ None of the 23 links is asserted repaired, and none of these hypotheses
 authorizes changes to historical wording, punctuation, section ownership,
 copyright status, public OSIS, or published SWORD.
 
-## Continuation — 7 private link previews; 18 remain untrialled
+## First continuation — 7 private link previews
 
 Five further source-bound link candidates have been recorded in the existing
 `config/commentary-osis-repair-plans/mhc-crossreferences-private-preview.json`.
@@ -95,11 +95,42 @@ no private XML, commentary prose or compiled SWORD was published.
 | 97929 / Acts 10 | `Ac.23.23 24 25.6` | `Acts.23.23 Acts.23.24 Acts.25.6` | [CCEL Acts 10](https://www.ccel.org/h/henry/mhc2/MHC44010.HTM), displaying **ch. xxiii. 23, 24; xxv. 6** |
 | 98544 / Acts 13 | `Heb.9.9 10.1 4` | `Heb.9.9 Heb.10.1 Heb.10.4` | [CCEL Acts 13](https://ccel.org/h/henry/mhc2/MHC44013.HTM), displaying **Heb. ix. 9; x. 1, 4** |
 
-**Remaining untrialled:** 4 original bookless targets and 14 composite targets.
+**At this first checkpoint:** 4 original bookless targets and 14 composite targets remained untrialled.
 The private patcher is configured to reject any incorrect original source
 SHA, original XML line/book/value, visible-label hash, target outside the
 actual SWORD verse registry, or change to unrelated source markup/text.
-The latest seven-candidate private pipeline must succeed before these edits
-are called **technically verified**; no real GUI-click success is implied.
+The [first seven-candidate private rebuild and complete native XML delta audit](https://github.com/icfmp/Bible-Resources/actions/runs/44296333738) **PASSED**. This proves byte-local intent, all seven target changes in independently compiled native SWORD, unchanged non-reference markup/text and unchanged complete 31,098/1,255/2 key population. It is not a real GUI-click navigation test.
 The independently published CCEL page is a citation *witness*, not approval
 to copy CCEL's digital text or an assertion of complete edition equivalence.
+
+## Second continuation — 14 private links proposed, 11 still untrialled
+
+Seven additional original machine links have been checked against the
+**matching commentary chapter** in a separate CCEL digital witness and added
+to the same SHA/line/visible-label-bound private patch plan. Original English
+prose, displayed citations, ranges, notes and unreviewed XML remain untouched.
+The exact seven *new* machine-only transformations are:
+
+| Original line / context | Original target | Proposed private target | Source citation witness |
+| --- | --- | --- | --- |
+| 50767 / Proverbs 31 thematic index | `Pr.10.19 11.12 12.23 13.3 17.27 28 29.11 20` | `Prov.10.19 Prov.11.12 Prov.12.23 Prov.13.3 Prov.17.27 Prov.17.28 Prov.29.11 Prov.29.20` | [CCEL Proverbs 31, topic 13](https://ccel.org/h/henry/mhc2/MHC20031.HTM) |
+| 50794 / Proverbs 31 thematic index | `Pr.16.3 18.10 23.26 27.1 28.25 29.25` | `Prov.16.3 Prov.18.10 Prov.23.26 Prov.27.1 Prov.28.25 Prov.29.25` | [CCEL Proverbs 31, topic 40](https://ccel.org/h/henry/mhc2/MHC20031.HTM) |
+| 50803 / Proverbs 31 thematic index | `Pr.17.17 18.24 27.9 10 14 17` | `Prov.17.17 Prov.18.24 Prov.27.9 Prov.27.10 Prov.27.14 Prov.27.17` | [CCEL Proverbs 31, topic 49](https://ccel.org/h/henry/mhc2/MHC20031.HTM) |
+| 52749 / Isaiah volume preface | `2Ki 2.3 4.1 38 5.22 6.1` | `2Kgs.2.3 2Kgs.4.1 2Kgs.4.38 2Kgs.5.22 2Kgs.6.1` | [CCEL MHC volume IV preface](https://www.ccel.org/h/henry/mhc2/MHC00004.HTM) |
+| 95558 / John 19 | `1Jo.1.1 2Pe 1.16` | `1John.1.1 2Pet.1.16` | [CCEL John 19](https://ccel.org/h/henry/mhc2/MHC43019.HTM) |
+| 109003 / Philemon 1 | `Col.3.1 2Pe 2.4` | `Col.3.1 2Pet.2.4` | [CCEL Philemon 1](https://www.ccel.org/h/henry/mhc2/MHC57001.HTM) |
+| 112877 / Jude 1 | `1Ti.4.1 2Ti 3.1 2Pe 3.3` | `1Tim.4.1 2Tim.3.1 2Pet.3.3` | [CCEL Jude 1](https://www.ccel.org/h/henry/mhc2/MHC65001.HTM) |
+
+The original 25 source exceptions are now partitioned into **14 private
+proposals** and **11 untouched references**, specifically: four bookless
+numerical targets (lines 3108, 37835, 41584, 47698) and seven compound
+expressions (50772, 58059, 62922, 67688, 76239, 81529, 98022).
+**Proverbs line 50772 must preserve its actual 25:8–10 range**; do not
+silently flatten a span into unreviewed separate citation semantics.
+**Isaiah line 58059 refers to Psalm 60's title**, not necessarily verse 1:
+this also needs reader/edition-specific checking, not a guessed location.
+
+The fourteen-candidate complete native recompilation is pending on the
+latest PR head: until it passes, **the seven newly added targets are trial
+proposals, not technically verified corrections**. Independent historical
+print/rights review and actual reader click navigation remain separate gates.
