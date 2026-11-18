@@ -83,7 +83,7 @@ jobs:
           assert stats["source_records"] == 6644, stats
           assert stats["index_entities"] == 6641, stats
           assert stats["quarantined_records"] == 3, stats
-          assert stats["reviewed_entries"] == 11, stats
+          assert stats["reviewed_entries"] == 13, stats
           assert stats["unattested_distinct_source_words"] == 18, stats
           assert stats["indexed_distinct_source_words"] == 134822, stats
           assert len(index["unattested_source_words"]) == 18
@@ -118,6 +118,12 @@ jobs:
           assert "person:Shiloh" not in by_id
           assert by_id["person:Johanan"]["canonical_id"] == "person:Johanan"
           assert "13001041" not in by_id["person:Dishon"]["references"]
+          assert ["o150080110051"] not in by_id["person:Bebai"]["occurrences"]["explicit_instances"]["wlc"]
+          assert ["o150080110021"] not in by_id["person:Bebai.2"]["occurrences"]["explicit_instances"]["wlc"]
+          assert {"entity_id":"person:Bebai","link_type":"explicit_instances"} in index["by_word"]["wlc:o150080110021"]
+          assert {"entity_id":"person:Bebai.2","link_type":"explicit_instances"} in index["by_word"]["wlc:o150080110051"]
+          assert not any(c["entity_id"]=="person:Bebai.2" for c in index["by_word"]["wlc:o150080110021"])
+          assert not any(c["entity_id"]=="person:Bebai" for c in index["by_word"]["wlc:o150080110051"])
           assert "13001041" in by_id["person:Dishon.2"]["references"]
           assert index["by_word"]["wlc:o130010410031"] == [
               {"entity_id":"person:Dishon.2","link_type":"explicit_instances"}]
@@ -218,7 +224,7 @@ jobs:
           report=json.loads(Path("entity-index/dist/person-overlaps.json").read_text())
           stats=report["statistics"]
           assert stats["distinct_person_original_word_overlap_candidates"] == len(report["findings"])
-          assert stats["multiple_explicit_names"] == 11, stats
+          assert stats["multiple_explicit_names"] == 9, stats
           assert stats["mixed_name_and_indirect"] == 18, stats
           assert stats["indirect_only"] == 2388, stats
           assert sum(stats[x] for x in ("multiple_explicit_names", "mixed_name_and_indirect", "indirect_only")) == len(report["findings"])
