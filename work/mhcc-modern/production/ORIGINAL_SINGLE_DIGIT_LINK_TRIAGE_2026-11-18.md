@@ -18,16 +18,16 @@ The real libSWORD whole-canon reference fingerprint receipt [#44276719759](https
 | `Exod.12.1` | 6 | `3` | `Rom.8.3` | **Source-witness confirmed spurious list number** |
 | `Exod.12.1` | 11 | `4` | `Heb.13.4` | **Source-witness confirmed spurious list number** |
 | `Exod.12.1` | 13 | `8` | `1Cor.5.8` | **Source-witness confirmed legitimate abbreviated verse** |
-| `Exod.14.21` | 6 | `2` | `2Cor.10.2` | Await separate source-witness review |
-| `Exod.16.13` | 2 | `3` | `Jas.5.3` | Await separate source-witness review |
-| `Exod.28.15` | 2 | `2` | `2Cor.1.2` | Await separate source-witness review |
-| `Exod.29.1` | 4 | `6` | `1Cor.1.6` | Await separate source-witness review |
+| `Exod.14.21` | 6 | `2` | `2Cor.10.2` | **Confirmed wrong-book link → 1Cor.10.2** |
+| `Exod.16.13` | 2 | `3` | `Jas.5.3` | **Confirmed correct abbreviated Jas.5.3** |
+| `Exod.28.15` | 2 | `2` | `2Cor.1.2` | **Confirmed wrong-book link → Heb.1.2** |
+| `Exod.29.1` | 4 | `6` | `1Cor.1.6` | **Confirmed wrong-book link → Rev.1.6** |
 | `Gen.2.8` | 4 | `2` | `2Cor.6.2` | **Source-witness confirmed spurious list number** |
-| `Gen.21.1` | 4 | `2` | `2Cor.11.2` | Await separate source-witness review |
+| `Gen.21.1` | 4 | `2` | `2Cor.11.2` | **Confirmed wrong-book link → Hos.11.2** |
 | `Gen.3.14` | 3 | `2` | `2Cor.2.2` | **Source-witness confirmed spurious list number** |
 | `Gen.3.6` | 2 | `2` | `2Cor.5.2` | **Source-witness confirmed spurious list number** |
 | `Gen.3.6` | 4 | `3` | `Matt.4.3` | **Source-witness confirmed spurious list number** |
-| `Gen.32.24` | 2 | `5` | `Hos.12.5` | Await separate source-witness review |
+| `Gen.32.24` | 2 | `5` | `Hos.12.5` | **Confirmed correct abbreviated Hos.12.5** |
 | `Judg.7.16` | 2 | `7` | `2Cor.4.7` | Await separate source-witness review |
 | `Lev.14.54` | 2 | `5` | `2Cor.2.5` | Await separate source-witness review |
 | `Lev.16.1` | 2 | `3` | `Heb.10.3` | Await separate source-witness review |
@@ -39,6 +39,6 @@ The real libSWORD whole-canon reference fingerprint receipt [#44276719759](https
 | `Rom.13.1` | 2 | `2` | `2Cor.2.2` | Await separate source-witness review |
 | `Song.1.1` | 2 | `6` | `Isa.54.6` | Await separate source-witness review |
 
-**Disposition status (30 occurrences):** **6** proven spurious enum-number links across Genesis 2, Genesis 3, Exodus 12; **1** genuine shortened `1Cor.5.8` link in Exodus 12 that must be retained; **23** source-link occurrence candidates requiring individual witness review. These seven adjudicated cases are documented with full native source-group SHA, ordinal and modern passage evidence in [the bounded correction disposition report](GENESIS_EXODUS_NATIVE_REFERENCE_DISPOSITIONS_2026-11-18.md), with its separate machine-checkable [proposal](GENESIS_EXODUS_REFERENCE_DISPOSITIONS.json). A **different** real-source error, the two-digit `14` linked to `2Cor.2.14` instead of `Heb.2.14` in Genesis 3, is not in this single-digit inventory and is tracked in the same bounded report.
+**Disposition status (30 occurrences):** **6** proven spurious enum-number links; **4** proven wrong-book abbreviated verse links (all with independent witness-backed proposed targets); **3** independently proven correct single-digit abbreviations (`1Cor.5.8`, `Hos.12.5`, `Jas.5.3`) that must be retained; **17** single-digit occurrence candidates still requiring individual witness review. These thirteen adjudicated cases are documented with full native source-group SHA, ordinal and modern passage evidence in [the bounded correction disposition report](GENESIS_EXODUS_NATIVE_REFERENCE_DISPOSITIONS_2026-11-18.md), with its separate machine-checkable [proposal](GENESIS_EXODUS_REFERENCE_DISPOSITIONS.json). A **different** real-source error, the two-digit `14` linked to `2Cor.2.14` instead of `Heb.2.14` in Genesis 3, is not in this single-digit inventory and is tracked in the same bounded report.
 
 **No change** to any of the original 1,204 reference elements or to the original compiled `MHCC 0.1.1` module. No derivative link corrections, full SWORD roundtrip, independent semantic signoff or publication approved. Next review the remaining 23 one-digit candidate contexts in small source-attested groups, and separately validate *non-digit* wrong-link and missing-link cases. Do not conflate original-source link identity proof with correct derived hyperlink destination.
