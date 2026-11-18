@@ -219,7 +219,7 @@ jobs:
               front = candidate.read_text(encoding="utf-8").split("\n---\n", 1)[0]
               fields = {}
               for line in front.splitlines():
-                  match = re.fullmatch(r'([a-z_]+): "([^"]*)"', line)
+                  match = re.fullmatch(r'([a-z0-9_]+): "([^"]*)"', line)
                   if match:
                       assert match[1] not in fields
                       fields[match[1]] = match[2]
