@@ -234,6 +234,7 @@ jobs:
           ).read_text(encoding="utf-8"))
           original["source_module"]="Original CrossWire MHCC 2.0 native content preserved in BRMHCC 0.1.0"
           original["native_module_id"]="BRMHCC"
+          original["source_group_hash_policy"]="authenticated_native_receipt"
           original["source_zip_sha256"]="0faf4376b6b97093ecb94f306886c24d3030ab1f5e194472ad908dd73921f9c0"
           original["source_native_corpus_sha256"]="8abd8bedb4eb0ff425999a9435e18d3c302d3a4f47863e3af5b1de36dfd538e6"
           (temp/"mhcc-crosswire-five-witness-manifest.json").write_text(
