@@ -36,51 +36,36 @@ def _validated_plan(raw: bytes, plan: dict):
             or not 1 <= len(plan["edits"]) <= MAX_EDITS):
         raise MilestoneRepairError("Unpinned or unreviewed source-geometry plan")
     targets = {}
-    common={"old_sid","original_line","source_witness"}
     for op in plan["edits"]:
-        if not isinstance(op,dict):
-            raise MilestoneRepairError("Malformed source milestone edit")
-        endpoint=(set(op)==common|{"new_end_verse"})
-        shared=(set(op)==common|{"new_start_verse","overlap_predecessor_sid"})
-        if (not (endpoint or shared)
+        if (not isinstance(op, dict)
+                or set(op) != {"old_sid", "new_end_verse", "original_line", "source_witness"}
                 or type(op["original_line"]) is not int
                 or op["original_line"] < 1
-                or not isinstance(op["source_witness"],str)
+                or not isinstance(op["source_witness"], str)
                 or not op["source_witness"].startswith("https://")
-                or len(op["source_witness"]) > 500):
-            raise MilestoneRepairError("Unattested source machine-only range correction")
+                or len(op["source_witness"]) > 500
+                or type(op["new_end_verse"]) is not int):
+            raise MilestoneRepairError("Malformed or unattested source endpoint correction")
         sid=op["old_sid"]
         m=START.fullmatch(sid) if isinstance(sid,str) else None
-        if not m or sid in targets:
-            raise MilestoneRepairError("Repeated or unparseable original verse group")
+        if not m:
+            raise MilestoneRepairError("Expected single-book same-chapter source verse range")
         book,chapter,a,b=m.groups()
         first,last=int(a),int(b)
+        target=op["new_end_verse"]
+        if not first <= target < last:
+            raise MilestoneRepairError("Correction is not a strict range endpoint reduction")
+        if sid in targets:
+            raise MilestoneRepairError("Two repairs target the same source range")
         prefix=f"{book}.{chapter}."
-        if endpoint:
-            target=op["new_end_verse"]
-            if type(target) is not int or not first <= target < last:
-                raise MilestoneRepairError("Out-of-v11n endpoint repair must shrink range")
-            revised_first,revised_last=first,target
-        else:
-            target=op["new_start_verse"]
-            predecessor=op["overlap_predecessor_sid"]
-            if (type(target) is not int or target!=first+1
-                    or target>last or not isinstance(predecessor,str)
-                    or predecessor==sid):
-                raise MilestoneRepairError("Overlap repair must remove exactly one shared start verse")
-            # A source-verified earlier group must actually claim the common
-            # boundary. The original edition remains available unchanged.
-            pred=predecessor.split(".",2)
-            if len(pred)!=3 or pred[:2]!=[book,chapter]:
-                raise MilestoneRepairError("Source overlap predecessor has different book/chapter")
-            revised_first,revised_last=target,last
         original_ids=" ".join(prefix+str(i) for i in range(first,last+1))
-        final_ids=" ".join(prefix+str(i) for i in range(revised_first,revised_last+1))
-        expected_open={"sID":sid,"osisID":original_ids,"n":f"{first}-{last}"}
+        final_ids=" ".join(prefix+str(i) for i in range(first,target+1))
+        expected_open={
+            "sID":sid,"osisID":original_ids,"n":f"{first}-{last}"
+        }
         revised_open={
-            "sID":prefix+str(revised_first)+("-"+str(revised_last) if revised_first!=revised_last else ""),
-            "osisID":final_ids,
-            "n":str(revised_first)+("-"+str(revised_last) if revised_first!=revised_last else ""),
+            "sID":f"{prefix}{first}-{target}",
+            "osisID":final_ids,"n":f"{first}-{target}"
         }
         targets[sid]=(op,expected_open,revised_open)
     return targets
@@ -119,29 +104,6 @@ def repair_private_bytes(original: bytes, plan: dict) -> tuple[bytes,dict]:
             by_node[node]={"eID":planned[eid][2]["sID"]}
     if set(opening)!=set(planned) or set(closing)!=set(planned):
         raise MilestoneRepairError("Missing source opener or paired closer")
-    # A repaired shared boundary must be confirmed against the earlier
-    # authored source marker, not inferred from a numeric coincidence.
-    all_starts={}
-    positions={}
-    for ordinal,n in enumerate(source.iter()):
-        positions[n]=ordinal
-        if isinstance(n.tag,str) and _local(n)=="verse" and n.get("sID"):
-            if n.get("sID") in all_starts:
-                raise MilestoneRepairError("Duplicate source opener prevents proving overlap")
-            all_starts[n.get("sID")]=n
-    for sid,(op,_old,_new) in planned.items():
-        if "new_start_verse" not in op:
-            continue
-        preceding=all_starts.get(op["overlap_predecessor_sid"])
-        if preceding is None or positions[preceding]>=positions[opening[sid]]:
-            raise MilestoneRepairError("Missing earlier authored overlap predecessor")
-        shared=sid.rsplit(".",1)[0]+"."+str(START.fullmatch(sid).group(3))
-        predecessor_tokens=(preceding.get("osisID") or "").split()
-        if (not predecessor_tokens or predecessor_tokens[-1]!=shared
-                or preceding.get("n") is None
-                or shared not in predecessor_tokens):
-            raise MilestoneRepairError("Proposed overlap repair does not remove a real shared boundary")
-
 
     # Independently map lxml element identities to original lexical byte offsets.
     nodes=(node for node in source.iter() if isinstance(node.tag,str))
@@ -231,9 +193,7 @@ def repair_private_bytes(original: bytes, plan: dict) -> tuple[bytes,dict]:
         "original_machine_attribute_values_replaced":len(patches),
         "removed_invalid_verse_assignments":sum(
             int(START.fullmatch(x).group(4))-op[0]["new_end_verse"]
-            for x,op in planned.items() if "new_end_verse" in op[0]),
-        "resolved_single_verse_overlap_assignments":sum(
-            1 for op in planned.values() if "new_start_verse" in op[0]),
+            for x,op in planned.items()),
         "edited_original_bytes_outside_exact_machine_attribute_values":False,
         "all_source_text_notes_links_and_other_markup_identical":True,
         "historical_edition_collation_complete":False,
