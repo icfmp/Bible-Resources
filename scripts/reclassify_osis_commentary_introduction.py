@@ -199,11 +199,17 @@ def repair_private_bytes(raw: bytes, plan: dict) -> tuple[bytes, dict]:
     if original_text != revised_text:
         raise IntroRepairError("Authored prose, punctuation or whitespace changed")
     def metadata(t):
-        return sorted(((_local(n), tuple(sorted(n.attrib.items())),
-                        n.text, n.tail)
-                       for n in t.iter()
-                       if isinstance(n.tag, str) and _local(n) in
-                          {"note", "reference", "title", "hi"}), key=repr)
+        # Tail belongs to the PARENT context, not the note/reference itself.
+        # Moving a source div may transfer the same literal tail bytes from
+        # one XML owner to another; the full-document character stream above
+        # already proves every such byte still exists in identical order.
+        # Verify *every* note, citation, title and emphasis body plus all its
+        # actual attributes in authorial document order.
+        return [(_local(n), tuple(sorted(n.attrib.items())),
+                 "".join(n.itertext()))
+                for n in t.iter()
+                if isinstance(n.tag, str) and _local(n) in
+                   {"note", "reference", "title", "hi"}]
     if metadata(tree) != metadata(candidate):
         raise IntroRepairError("Original source note/citation/title markup changed")
     new_begin = [x for x in candidate.iter()
