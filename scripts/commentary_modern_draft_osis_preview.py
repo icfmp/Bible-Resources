@@ -333,6 +333,165 @@ def _original_intro_candidates(root: Path, receipt: dict) -> dict:
     return intros
 
 
+
+def overlay_native_first_K_book_prefaces(
+        *, base_osis: bytes, native: dict, review: dict,
+        candidates_dir: Path) -> tuple[bytes, dict]:
+    """Restore separately presented, source-attested first-K book prefaces.
+
+    This is a *private candidate*, not a new source-I claim. The entire
+    original ThML book-preface word stream must match the published native
+    first K; the modernized candidate stays separately source-attributed.
+    The original authored K and every existing modern XML link are preserved
+    byte-for-byte at the element level. Any mismatched source witness stays
+    quarantined for targeted editorial review.
+    """
+    import hashlib
+    import unicodedata
+
+    if (native.get("original_compiled_corpus_sha256") != _SOURCE_CORPUS
+            or review.get("status") !=
+            "PINNED_SOURCE_NATIVE_VS_CCEL_51_BOOK_PREFACE_TRIAGE_NOT_APPROVAL"
+            or review.get("source_native_corpus_sha256") != _SOURCE_CORPUS
+            or review.get("CCEL_text_sha256") !=
+            "4a5509ba5064b54572397ae1a796561ff6ce4a1e18f366af0141a09c5d06fcd6"
+            or review.get("source_or_modern_prose_exported") is not False
+            or review.get("silent_intro_insertion_approved") is not False
+            or review.get("release_authorized") is not False):
+        raise ValueError("Book prefaces require an authenticated unpublished source receipt")
+    cases=review.get("cases")
+    if (not isinstance(cases,list) or not cases
+            or len(cases)!=review.get(
+                "original_first_K_source_pinned_book_intro_candidates")):
+        raise ValueError("Incomplete original first-K book preface review")
+    bybook={row["book"]:row for row in cases}
+    if len(bybook)!=len(cases):
+        raise ValueError("Duplicate original first-K book preface identity")
+
+    doc=ET.fromstring(base_osis)
+    chapters={v.get("osisID"):v for v in doc.iter()
+              if v.tag==f"{{{NS}}}chapter"}
+    if set(chapters)!=set(native.get("chapters",{})):
+        raise ValueError("Modern book-preface chapter inventory changed")
+    source_sections={
+        chapter: [ET.tostring(node,encoding="utf-8") for node in chapters[chapter]
+                  if node.tag==f"{{{NS}}}div" and
+                  node.get("annotateType")=="commentary"]
+        for chapter in chapters}
+    original_links=[
+        (x.get("osisRef"),"".join(x.itertext()))
+        for x in doc.iter() if x.tag==f"{{{NS}}}reference"]
+    outcomes=[]
+    inserted=already=quarantined=0
+
+    for book in sorted(bybook):
+        row=bybook[book]
+        chapter=book+".1"
+        if (book not in _CANON or chapter not in chapters or
+                row.get("book")!=book or
+                not isinstance(row.get("candidate_path"),str)):
+            raise ValueError("Unrecognized source-owned book introduction")
+        units=native["chapters"][chapter]["original_units"]
+        if (not units or row.get("original_first_K")!=units[0]["first_key"]
+                or row.get("source_native_first_K_raw_sha256")
+                    !=units[0]["source_unit_sha256"]):
+            raise ValueError("Book introduction is not pinned to exact first-K source")
+        file=candidates_dir/Path(row["candidate_path"]).name
+        if not file.is_file():
+            raise ValueError("Missing modern candidate preface: "+book)
+        fields,prose=_modern_front(file)
+        if (fields.get("book_osis")!=book or
+                fields.get("source_module")!="MHCC 0.1.1"
+                or fields.get("source_native_corpus_sha256")!=_SOURCE_CORPUS
+                or fields.get("source_zip_sha256")!=_SOURCE_ZIP
+                or not fields.get("status","").startswith("PRODUCTION CANDIDATE")):
+            raise ValueError("Unpinned original-first-K modern book introduction")
+        match=re.fullmatch(r"\s*# ([^\n]+)\n+([\s\S]*?)\s*",prose)
+        if not match or "book introduction" not in match[1].casefold():
+            raise ValueError("Modern book-preface manuscript structure changed: "+book)
+        title=match[1].strip()
+        body=match[2].strip()
+        if len(body)<20 or re.search(r"(?m)^#{1,6} ",body):
+            raise ValueError("Unexpected missing/nested modern book-preface prose: "+book)
+        intro=ET.Element(f"{{{NS}}}div",{
+            "type":"introduction",
+            "resp":"BibleResourcesModernRelocatedFirstNativeKBookPreface",
+        })
+        ET.SubElement(intro,f"{{{NS}}}title").text=title
+        _write_reading_blocks(intro,body)
+        def normalized(v):
+            return " ".join(unicodedata.normalize("NFC",v).split())
+        prose_new=normalized("".join(x.itertext() for x in list(intro)[1:]))
+        if not prose_new:
+            raise ValueError("Empty modern preface after OSIS reading block conversion")
+        existing=[]
+        for element in chapters[chapter]:
+            if (element.tag!=f"{{{NS}}}div"
+                    or element.get("type")!="introduction"):
+                continue
+            one=element.find(f"./{{{NS}}}title")
+            if one is not None and "book introduction" in (
+                    "".join(one.itertext()).casefold()):
+                existing.append(element)
+        if len(existing)>1:
+            raise ValueError("Book introduction already duplicated in modern OSIS")
+        if existing:
+            old=normalized("".join(x.itertext() for x in list(existing[0])
+                                   if x.tag!=f"{{{NS}}}title"))
+            if old!=prose_new:
+                raise ValueError("Modern existing book preface differs from candidate: "+book)
+            already+=1
+            state="PRESENT_IN_MODERN_FIRST_CHAPTER_EXACT_NO_DUPLICATION"
+        elif row.get("source_div1_prose_all_tokens_contiguous_in_original_first_K"):
+            chapters[chapter].insert(0,intro)
+            inserted+=1
+            state="INSERTED_SEPARATE_MODERN_INTRO_FROM_VERIFIED_ORIGINAL_K"
+        else:
+            quarantined+=1
+            state="QUARANTINED_SOURCE_WORD_STREAM_DIFFERS"
+        if bool(existing)!=bool(
+                row.get("modern_accepted_first_chapter_has_book_intro_heading")):
+            raise ValueError("Modern first-chapter original preface census changed")
+        outcomes.append({
+            "book":book,
+            "original_source_first_K":row["original_first_K"],
+            "original_source_raw_sha256":row[
+                "source_native_first_K_raw_sha256"],
+            "modern_candidate_source_osis_path":str(file),
+            "modern_intro_visible_sha256":hashlib.sha256(
+                prose_new.encode("utf-8")).hexdigest(),
+            "source_K_intro_disposition":state,
+            "original_K_does_not_become_a_new_verse_commentary":True,
+        })
+    current_sections={
+        chapter: [ET.tostring(node,encoding="utf-8") for node in chapters[chapter]
+                  if node.tag==f"{{{NS}}}div" and
+                  node.get("annotateType")=="commentary"]
+        for chapter in chapters}
+    current_links=[
+        (x.get("osisRef"),"".join(x.itertext()))
+        for x in doc.iter() if x.tag==f"{{{NS}}}reference"]
+    if (current_sections!=source_sections
+            or current_links!=original_links
+            or inserted+already+quarantined!=len(cases)):
+        raise ValueError("Book introduction overlay changed authorial K or original Bible links")
+    output=ET.tostring(doc,encoding="utf-8",xml_declaration=True)
+    ET.fromstring(output)
+    return output,{
+        "status":"PRIVATE_SOURCE_K_BOOK_PREFACE_RESTORATION_NOT_EDIT_OR_RELEASE",
+        "original_native_corpus_sha256":_SOURCE_CORPUS,
+        "source_attested_first_K_candidate_book_intros":len(cases),
+        "already_in_modern_manuscript_not_duplicated":already,
+        "new_book_intros_inserted_as_separate_introduction_OSIS":inserted,
+        "quarantined_original_word_stream_mismatches":quarantined,
+        "original_K_section_and_existing_links_unchanged":True,
+        "native_source_and_modern_manuscript_unmodified":True,
+        "editorial_final_approval":False,
+        "publication_authorized":False,
+        "cases":outcomes,
+    }
+
+
 def generate_accepted_canon_osis(accepted: Path, source: dict,
                                   topology: dict, ionly: dict, intro_root: Path,
                                   *, work_id: str) -> tuple[bytes, dict]:
