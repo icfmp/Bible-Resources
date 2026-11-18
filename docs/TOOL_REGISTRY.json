@@ -55,13 +55,14 @@
         "guard_osis",
         "hashlib",
         "json",
+        "lxml",
         "pathlib",
         "re",
         "sys"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "410b6cf5a6b56314aeeb0b60bfd346a50a34178f121fc68b53dbb008dbf6d255",
+      "sha256_at_inventory": "e9cf78ade1e77b7b43295cc2de8313d87b9a77665602e3a514d0791c7a00e719",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
@@ -533,8 +534,8 @@
       "stage_hint": "not determined",
       "static_reference_count": 3,
       "static_references": [
-        ".github/workflows/commentary-mhc-technical-rebuild.yml",
         "scripts/repair_commentary_osis_milestones.py",
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
         "tests/test_clean_source_osis.py"
       ]
     },
