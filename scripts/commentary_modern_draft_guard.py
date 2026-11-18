@@ -141,7 +141,7 @@ def verify_draft_against_native_map(draft: dict, native: dict, *,
         # A simple min/max comparison could overwrite another source body.
         if exact_scope is not None:
             if exact_scope != nums:
-                raise ValueError("Editor heading misstates original occupied verse keys: "
+                raise ValueError("Editor heading misstates original range or occupied verse keys: "
                                  + draft["chapter"])
         elif rg is not None:
             claimed = (int(rg[1]), int(rg[2]))
