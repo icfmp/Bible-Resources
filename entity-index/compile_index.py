@@ -317,6 +317,56 @@ def build(source_root: Path, source_lock: dict, editorial: dict,
         raise ValueError("Absent-verse inventory needs source audit provenance")
     if len(reported_verses) != len(set(reported_verses)):
         raise ValueError("Duplicate source-absent verse IDs")
+    # An optional source-cited interpretive layer distinguishes an alternate
+    # verse number from a textual-variant reading. No source references or
+    # original words are reclassified or rewritten by this metadata.
+    context_by_verse = {}
+    if "verse_qualifications" in source_verse_absences:
+        contexts = source_verse_absences["verse_qualifications"]
+        if not isinstance(contexts, list):
+            raise ValueError("Malformed source verse-qualification list")
+        permitted = {
+            "traditional_textual_variant_not_in_pinned_main_text",
+            "doxology_in_edition_apparatus_not_main_word_inventory",
+            "alternate_verse_number_for_final_benediction",
+        }
+        for context in contexts:
+            if not isinstance(context, dict):
+                raise ValueError("Invalid source verse-qualification record")
+            verse = context.get("verse_id")
+            explanation = context.get("explanation")
+            evidence = context.get("evidence")
+            classification = context.get("classification")
+            if (not isinstance(verse, str)
+                    or len(verse) != 8 or not verse.isdigit()
+                    or classification not in permitted
+                    or not isinstance(explanation, str) or not explanation.strip()
+                    or not isinstance(evidence, list) or len(evidence) < 2
+                    or any(not isinstance(e, str) or not e.strip() for e in evidence)):
+                raise ValueError(f"Invalid source verse-qualification evidence: {context!r}")
+            if verse in context_by_verse:
+                raise ValueError(f"Duplicate source verse qualification: {verse}")
+            equivalent = context.get("equivalent_benediction_source_verse")
+            if equivalent is not None:
+                if (classification != "alternate_verse_number_for_final_benediction"
+                        or not isinstance(equivalent, str)
+                        or len(equivalent) != 8 or not equivalent.isdigit()
+                        or equivalent == verse or equivalent[:5] != verse[:5]):
+                    raise ValueError(f"Invalid verse-number comparison: {verse}")
+            if (classification == "alternate_verse_number_for_final_benediction"
+                    and equivalent is None):
+                raise ValueError(f"Missing benediction comparison verse: {verse}")
+            context_by_verse[verse] = {
+                "classification": classification,
+                "explanation": explanation,
+                "evidence": evidence,
+            }
+            if equivalent is not None:
+                context_by_verse[verse]["equivalent_benediction_source_verse"] = equivalent
+        if set(context_by_verse) != set(reported_verses):
+            raise ValueError(
+                f"Unqualified pinned source verses: "
+                f"{sorted(set(reported_verses) - set(context_by_verse))}")
     unattested_verses = {}
     for verse in sorted(reported_verses):
         if not isinstance(verse, str) or len(verse) != 8 or not verse.isdigit():
@@ -329,6 +379,8 @@ def build(source_root: Path, source_lock: dict, editorial: dict,
             "source_reference_claims": claims,
             "evidence": verse_evidence,
             "scope": "absent_from_pinned_original_word_inventory_only",
+            **({"source_context": context_by_verse[verse]}
+               if verse in context_by_verse else {}),
         }
     # Reference claims without matching source-edition word anchors may derive
     # from textual variants, later epistle subscriptions or historical
@@ -420,6 +472,7 @@ def build(source_root: Path, source_lock: dict, editorial: dict,
             "unattested_distinct_source_words": len(unattested),
             "unattested_raw_word_assignments": unattested_raw_assignments,
             "unattested_source_verses": len(unattested_verses),
+            "qualified_source_verse_contexts": len(context_by_verse),
             "unattested_source_verse_reference_claims": sum(
                 len(x["source_reference_claims"])
                 for x in unattested_verses.values()),
