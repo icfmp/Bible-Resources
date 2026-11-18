@@ -304,6 +304,8 @@ jobs:
           visible_whitespace_only=[]
           visible_nonwhitespace_changed=[]
           exact_visible_length_deltas=Counter()
+          deleted_whitespace_contexts=Counter()
+          unsafe_visible_differences=[]
           altered_notes_or_links=[]
           altered_nonstyle_structure=[]
           unreadable=[]
@@ -320,16 +322,43 @@ jobs:
                   after=authored_content_without_display_styles(right)
                   if before[0]!=after[0]:
                       altered_visible.append(key)
-                      exact_visible_length_deltas[len(after[0])-len(before[0])]+=1
-                      before_without_spaces="".join(c for c in before[0] if not c.isspace())
-                      after_without_spaces="".join(c for c in after[0] if not c.isspace())
-                      if before_without_spaces==after_without_spaces:
+                      old_text,new_text=before[0],after[0]
+                      exact_visible_length_deltas[len(new_text)-len(old_text)]+=1
+                      old_nonspace="".join(c for c in old_text if not c.isspace())
+                      new_nonspace="".join(c for c in new_text if not c.isspace())
+                      if old_nonspace==new_nonspace:
                           visible_whitespace_only.append(key)
                       else:
                           visible_nonwhitespace_changed.append(key)
+                      # An extra importer-generated space is cosmetic ONLY
+                      # if removing it cannot join two alphanumeric words.
+                      position=0
+                      while (position<len(new_text)
+                             and old_text[position]==new_text[position]):
+                          position+=1
+                      if (len(old_text)!=len(new_text)+1
+                              or old_text[:position]+old_text[position+1:]!=new_text
+                              or not old_text[position].isspace()):
+                          deleted_whitespace_contexts["unexplained_text_delta"]+=1
+                          unsafe_visible_differences.append(key)
+                      else:
+                          left=old_text[position-1] if position else ""
+                          right=old_text[position+1] if position+1<len(old_text) else ""
+                          if left.isalnum() and right.isalnum():
+                              deleted_whitespace_contexts["word_join_risk"]+=1
+                              unsafe_visible_differences.append(key)
+                          elif left.isspace() or right.isspace():
+                              deleted_whitespace_contexts["excess_whitespace_run"]+=1
+                          elif not left or not right:
+                              deleted_whitespace_contexts["entry_boundary"]+=1
+                          else:
+                              deleted_whitespace_contexts["one_space_next_to_punctuation_or_symbol"]+=1
+                              unsafe_visible_differences.append(key)
                   if before[1]!=after[1]:
                       altered_notes_or_links.append(key)
-                  if before[2]!=after[2]:
+                  baseline_tags=[ev for ev in before[2] if ev[0]!="text"]
+                  candidate_tags=[ev for ev in after[2] if ev[0]!="text"]
+                  if baseline_tags!=candidate_tags:
                       altered_nonstyle_structure.append(key)
               except (ValueError,etree.XMLSyntaxError):
                   unreadable.append(key)
@@ -341,11 +370,15 @@ jobs:
                 len(visible_nonwhitespace_changed))
           print("Native visible-text length delta histogram (candidate minus original):",
                 dict(sorted(exact_visible_length_deltas.items())))
+          print("Single-space deletion context counts (no words emitted):",
+                dict(sorted(deleted_whitespace_contexts.items())))
+          print("Native entries with unsafe or unexplained text changes:",
+                len(unsafe_visible_differences))
           print("Native entries with changed note/reference markup:",len(altered_notes_or_links))
           print("Native entries with changed non-style XML structure/text ownership:",
                 len(altered_nonstyle_structure))
           print("Native entries unparseable for comparison:",len(unreadable))
-          unresolved=set(altered_visible+altered_notes_or_links+
+          unresolved=set(unsafe_visible_differences+altered_notes_or_links+
                          altered_nonstyle_structure+unreadable)
           from clean_source_osis import _tree, _inert_hi
           original_root=_tree(original_source.read_bytes())
@@ -359,8 +392,9 @@ jobs:
                 [list(x) for x in sorted(unresolved)[:12]])
           if unresolved:
               raise SystemExit("Cleaned source changed native content beyond presentation styling")
-          print("Full candidate-to-pristine semantic comparison PASS; "
-                "only presentation markup differs at some entries")
+          print("FULL candidate-to-pristine parity PASS: same words, punctuation, "
+                "notes, links and non-hi XML structure; only original empty styling "
+                "and harmless importer-generated spaces differ")
           print("No historical edition collation or public release performed")
           PY
       - name: No distribution or editorial phase in this workflow
