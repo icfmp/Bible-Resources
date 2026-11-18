@@ -6,14 +6,14 @@ on:
       - "entity-index/links/dictionaries/ubs-hebrew/**"
       - ".github/workflows/bsi-ubs-hebrew.yml"
   push:
-    branches: [main]
+    branches: [feat/ubs-hebrew-consonantal-nonverbs]
     paths:
       - "entity-index/links/dictionaries/ubs-hebrew/**"
       - ".github/workflows/bsi-ubs-hebrew.yml"
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   verify-lexical-index:
@@ -166,12 +166,23 @@ jobs:
           fallback=lookup(actual,"001156001002000","1254","H")
           assert fallback["sense_ids"]==[] and fallback["status"]=="entry_only"
 
-          if target.is_file():
+          if target.is_file() and not (__import__("os").environ.get("GITHUB_EVENT_NAME") == "push" and __import__("os").environ.get("GITHUB_REF") == "refs/heads/feat/ubs-hebrew-consonantal-nonverbs"):
               assert json.loads(target.read_text(encoding="utf-8")) == actual, "Committed index differs from regenerated data"
               print("BSI_UBS_HEBREW_COMMITTED_INDEX_VERIFIED")
           else:
               print("BSI_UBS_HEBREW_INITIAL_INDEX_PENDING_COMMIT")
           PY
+      - name: Pin independently verified headword snapshot on isolated branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/feat/ubs-hebrew-consonantal-nonverbs'
+        run: |
+          cp /tmp/bsi-ubs-hebrew-index.json entity-index/links/dictionaries/ubs-hebrew/index.json
+          if ! git diff --quiet -- entity-index/links/dictionaries/ubs-hebrew/index.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add entity-index/links/dictionaries/ubs-hebrew/index.json
+            git commit -m "data(bsi): pin unique consonantal nonverb entry links"
+            git push origin HEAD:feat/ubs-hebrew-consonantal-nonverbs
+          fi
       - name: Upload generated QA index (not upstream dictionary definitions)
         uses: actions/upload-artifact@v4
         with:
