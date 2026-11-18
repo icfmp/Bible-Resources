@@ -1158,6 +1158,7 @@ jobs:
           done
           python - <<'PY'
           import json, os, subprocess, sys
+          from hashlib import sha256
           from pathlib import Path
           from lxml import etree
           sys.path.insert(0,str(Path.cwd()/"scripts"))
@@ -1213,6 +1214,7 @@ jobs:
               raise SystemExit("GUI reader Bible identity changed")
           comparisons={}
           sample_book_by_anchor={}
+          source_line_by_passage={}
           for line in audited_lines:
               key,raw=native_samples[line]
               book,chapter,verse=key.split(".")
@@ -1232,6 +1234,7 @@ jobs:
                   "commentary_internal":raw,
               }
               sample_book_by_anchor[line]=book
+              source_line_by_passage[passage]=line
           if len(set(sample_book_by_anchor.values()))!=3:
               raise SystemExit("Independent GUI sample books are not distinct")
           result=_run_real_gui(work,comparisons,seconds=12,
@@ -1239,6 +1242,24 @@ jobs:
           matches=result["independent_gui_commentary_excerpt_match_count"]
           if not 0<=matches<=3:
               raise SystemExit("Invalid real GUI excerpt evidence")
+          markup=result["real_markup_rendering_observation_by_passage"]
+          if set(markup)!=set(comparisons):
+              raise SystemExit("GUI markup evidence is missing a real reader sample")
+          source_target_href_by_line={}
+          for passage,observation in markup.items():
+              original_line=source_line_by_passage[passage]
+              expected_digest=sha256(proof[original_line].encode("utf-8")).hexdigest()
+              matches_hrefs=observation["exact_matching_source_target_sha256_in_real_gui_HTML"]
+              if not isinstance(matches_hrefs,list):
+                  raise SystemExit("GUI href source witness has invalid shape")
+              source_target_href_by_line[str(original_line)]={
+                  "actual_gui_rich_html_selection_available":
+                      bool(observation["real_gui_rich_html_selection_available"]),
+                  "source_href_and_printed_label_matches":
+                      observation["exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations"],
+                  "this_specific_reviewed_target_in_actual_gui_href":
+                      expected_digest in matches_hrefs,
+              }
           outcome={
               "status":("CORRECTED_COMMENTARY_REAL_GUI_EXCERPTS_MATCHED"
                         if matches==3 else
@@ -1247,6 +1268,11 @@ jobs:
               "sample_count":len(comparisons),
               "sampled_authored_link_source_lines":list(audited_lines),
               "independent_gui_excerpt_matches":matches,
+              "corrected_source_target_href_evidence_by_line":
+                  source_target_href_by_line,
+              "reviewed_link_targets_in_actual_rich_HTML":
+                  sum(item["this_specific_reviewed_target_in_actual_gui_href"]
+                      for item in source_target_href_by_line.values()),
               "accepted_passage_commands":result["actual_passage_commands_accepted"],
               "copy_failure_action_categories":sorted(set(
                   result["bounded_xiphos_ui_failed_action_by_passage"].values())),
