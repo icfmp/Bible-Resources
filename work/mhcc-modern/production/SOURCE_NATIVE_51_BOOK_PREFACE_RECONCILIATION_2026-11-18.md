@@ -1,5 +1,58 @@
 # Modern MHCC — final first-K book preface reconciliation (2026-11-18)
 
+## Final verified whole-canon result
+
+**All 56/56 prepared modern book introductions have now been placed once
+in a separate, still-unpublished private OSIS/SWORD candidate.** The pinned
+original SWORD source, all 1,189 modern manuscripts and all previous
+cross-references remain unchanged.
+
+- **Five** introductions come from verified original chapter-I data.
+- **One** first-K-origin introduction (Genesis) was already in the
+  modern manuscript and was not duplicated.
+- The remaining **50** first-K-origin introductions were added only as
+  derivative `div type="introduction"` chapter-I readings. **47** have
+  exact whole-word correspondence between the pinned original SWORD
+  first-K text and the distinct original CCEL book preface. The remaining
+  **three** have exactly one conventional biblical book-name abbreviation
+  substituted, directly before a numerical chapter reference:
+  `Jer` ↔ `Jr` in Jeremiah and Song of Solomon; `Mic` ↔ `Mi`
+  in Micah. No actual prose or scriptural referent differs.
+- These short abbreviations are independently documented in the
+  [SWORD locales file](https://sources.debian.org/src/sword/1.7.3%2Bdfsg-2/locales.d/fr_abbrev.conf/)
+  and other Bible book abbreviation lists. The generic gate accepts them
+  **only for one otherwise-identical word stream with a uniquely verified
+  original first-K SHA, a following numeric chapter, and a single
+  unambiguous canonical book identity**. It rejects arbitrary changes.
+- Original authorial K content was neither deleted nor moved. The
+  preface's original K identity is recorded in each private receipt.
+
+**Actual OSIS → SWORD → libSWORD validation:** [#44337517917](
+https://github.com/icfmp/Bible-Resources/actions/runs/44337517917)
+**SUCCESS**. It verified all **50** newly inserted introductions in
+their compiled real chapter-I entries; the existing Genesis was not
+duplicated. Crucially, independent full-SWORD comparison against the
+previous modern candidate proved that **4,049 / 4,049 source-owned
+commentary K bodies have identical complete visible Unicode text and
+identical original link-target/display ordering**. Their **757 K-level
+Scripture reference elements** remain exactly matched; all **28,792
+SWORD indexed verse addresses** are preserved. [General Validate
+#44337517632](https://github.com/icfmp/Bible-Resources/actions/runs/44337517632)
+and [tool registry #44337517743](
+https://github.com/icfmp/Bible-Resources/actions/runs/44337517743)
+also **SUCCESS** on that code head.
+
+**Gate closed:** 51 unplaced introduction source-location cases; no
+remaining modern-preface candidate is excluded for a source-location
+or source-abbreviation issue. **Still pending:** final editorial
+signoff, the separate 176 reference-note placement policy and four
+unapproved source-link corrections, independent Xiphos/AndBible/Bible
+reader compatibility, rights and owner-authorized publication. This
+private technical preview **is not a publicly released or approved
+modern MHCC edition**.
+
+---
+
 ## Source inventory, not inferred from CCEL chapter order
 
 The exact published MHCC 0.1.1 libSWORD source remains immutable
@@ -30,11 +83,13 @@ https://github.com/icfmp/Bible-Resources/actions/runs/44329637601)
 confirmed **48 / 51 entire direct-book preface word sequences** are
 contiguous in the correct original numbered K body.
 
-The **three genuine source-witness text-sequence differences** are:
-`Jer.1`, `Mic.1`, and `Song.1`. Their opening authorial prefix is
-authenticated against the exact original raw K, but the entire CCEL
-word stream cannot yet be equated with the original; do not silently
-borrow the independently edited CCEL passage for these three.
+**Interim three-case lexical diagnostic (now resolved):** initially
+`Jer.1`, `Mic.1` and `Song.1` failed literal whole-word identity.
+Independent SHA-pinned comparison later proved they differ **only**
+in one conventional book abbreviation before a chapter number:
+`Jr`/`Jer` or `Mi`/`Mic`. The strict canonical reference-name
+check now reconciles them without altering a single manuscript word.
+See the final checkpoint above.
 
 ## Concrete technical disposition
 
@@ -50,17 +105,13 @@ pinned original first-K**. It records the original first K SHA and marks the
 relocation as a modern edition decision, never a source I entry. Source K
 commentary is not duplicated or overwritten.
 
-**Expected private technical outcome (subject to actual CI validation):**
-47 previously absent first-K-derived modern introductions added to chapter 1,
-Genesis first-K preface already present and retained only once,
-3 mismatched source-witness cases excluded pending targeted review, and
-5 actual chapter-I introductions already present. This is **53/56** existing
-modern book-preface manuscripts represented in the private OSIS candidate
-if all the new tests pass.
-
-The remaining three belong to the exact literary-source collation queue,
-not a further corpus-wide retranslation. No introduced source-label or
-title is editorially approved for public publication. Do not merge PR #272
+**Implemented and verified:** the accepted generic procedure now inserts
+50 first-K-origin modern introductions (47 byte-identical witness word streams
+and three authenticated source book-reference abbreviation variants); Genesis
+and the five native-I introductions remain in place. **56/56** introductory
+units are represented exactly once in the private OSIS candidate.
+No introduced source label or modern book title is thereby approved for
+public publication. Do not merge PR #272
 or publish a module until later reader, rights and owner gates pass.
 
 The source-only CI report
