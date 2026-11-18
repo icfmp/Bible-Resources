@@ -523,7 +523,8 @@ class ExactSingleVerseSourceConcordanceTests(unittest.TestCase):
         originals={"Gen.2.1":[
             ("Bible:John.3.16","John 3:16"),
             ("Matt.5.9","2"),
-            ("John.3.16","another source link to John 3:16")]}
+            ("John.3.16","another source link to John 3:16"),
+            ("Matt.5.9-Matt.5.11","Matthew 5:9–11")]}
         docs={"Gen.2":ET.Element(f"{{{self.NS}}}chapter")}
         docs["Gen.2"].append(n)
         candidates,skipped=_auto_single_verse_placements(
@@ -532,6 +533,7 @@ class ExactSingleVerseSourceConcordanceTests(unittest.TestCase):
         self.assertEqual(candidates,[])
         self.assertEqual(skipped["repeated_original_target"],2)
         self.assertEqual(skipped["unverified_or_single_digit_label"],1)
+        self.assertEqual(skipped["unsupported_original_reference_syntax"],1)
 
     def test_corrected_or_already_reviewed_original_link_not_auto_duplicated(self):
         n=self.section("Read John 3:16 and Matthew 5:9.")
