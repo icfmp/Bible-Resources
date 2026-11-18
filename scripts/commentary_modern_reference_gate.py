@@ -836,6 +836,46 @@ def _source_range_section_ownership(*, literal: str, label: str,
 
 
 
+
+def _find_exact_modern_original_outline_range_cell(
+        modern_chapter: ET.Element, literal: str) -> ET.Element | None:
+    """The ONE manuscript outline-table verse cell matching a source OSIS span.
+
+    This does not infer new ranges, transpose chapter order or rewrite any
+    authorial text; it returns None on missing, ambiguous or decorated cells.
+    """
+    parsed=_source_same_chapter_verse_range(literal)
+    if parsed is None:
+        return None
+    book,chapter,start,end=parsed
+    if modern_chapter.get("osisID")!=book+"."+chapter:
+        return None
+    from commentary_modern_draft_osis_preview import NS
+    matches=[]
+    for intro in modern_chapter.findall(f"./{{{NS}}}div[@type='introduction']"):
+        titles=intro.findall(f"./{{{NS}}}title")
+        if len(titles)!=1 or titles[0].text!="Original chapter outline":
+            continue
+        tables=intro.findall(f"./{{{NS}}}table")
+        if len(tables)!=1:
+            continue
+        rows=tables[0].findall(f"./{{{NS}}}row")
+        if len(rows)<2:
+            continue
+        header=rows[0].findall(f"./{{{NS}}}cell")
+        if (len(header)!=2 or
+                "".join(header[0].itertext()).strip()!="Original outline" or
+                "".join(header[1].itertext()).strip()!="Verses"):
+            continue
+        for row in rows[1:]:
+            cells=row.findall(f"./{{{NS}}}cell")
+            if len(cells)!=2:
+                continue
+            text="".join(cells[1].itertext()).strip()
+            if re.fullmatch(re.escape(start)+r"\s*[-–—]\s*"+re.escape(end),text):
+                matches.append(cells[1])
+    return matches[0] if len(matches)==1 else None
+
 def _source_first_K_outline_row_evidence(*, literal: str, label: str,
                                          first_key: str, native_chapter: dict,
                                          modern_chapter: ET.Element) -> dict[str,bool]:
@@ -858,27 +898,9 @@ def _source_first_K_outline_row_evidence(*, literal: str, label: str,
     if not units or units[0]["first_key"]!=first_key:
         return result
     result["source_first_K_owns_link"]=True
-    from commentary_modern_draft_osis_preview import NS
-    introductions=modern_chapter.findall(f"./{{{NS}}}div[@type='introduction']")
-    matches=[]
-    for intro in introductions:
-        titles=intro.findall(f"./{{{NS}}}title")
-        if len(titles)!=1 or titles[0].text!="Original chapter outline":
-            continue
-        tables=intro.findall(f"./{{{NS}}}table")
-        if len(tables)!=1:
-            continue
-        rows=tables[0].findall(f"./{{{NS}}}row")
-        if len(rows)<2:
-            continue
-        for row in rows[1:]:
-            cells=row.findall(f"./{{{NS}}}cell")
-            if len(cells)!=2:
-                continue
-            text="".join(cells[1].itertext()).strip()
-            if re.fullmatch(re.escape(first)+r"\s*[-–—]\s*"+re.escape(last),text):
-                matches.append(cells[1])
-    result["unique_modern_outline_row_matches_source_target"]=len(matches)==1
+    result["unique_modern_outline_row_matches_source_target"]=(
+        _find_exact_modern_original_outline_range_cell(
+            modern_chapter,literal) is not None)
     # No arbitrary source prose: the original visible link's numeric chapter
     # and verse span must agree too (e.g., "Is. 1:1-9").
     result["original_visible_label_explicitly_names_same_verse_span"]=bool(
