@@ -59,9 +59,9 @@ When we humble ourselves for distrusting God's promises, we can experience his f
 
 What can a forgiven sinner, or anyone rescued from danger, offer in return for the Lord's goodness?
 
-We cannot add anything to his wealth or happiness.
+We cannot benefit him in any way.
 
-Our very best falls short of what he deserves.
+Even our very best offering is unworthy of his acceptance.
 
 Yet we should dedicate **ourselves and all we possess** to him.
 
@@ -98,6 +98,8 @@ Such are God's genuine saints, whose lives and deaths will bring him glory.
 ---
 
 ## Editorial review — Psalm 116
+
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Replaced a limiting modern gloss about God's *wealth or happiness* with Henry's unrestricted claim that we cannot profit God in any way. Also restored his stronger judgment that our best offerings are unworthy of divine acceptance, rather than merely falling short of what he deserves. The unchanged published source and independent native-source verification remain separate.
 
 **Complete CCEL secondary witness read:** [CCEL, Psalm 116](https://ccel.org/ccel/henry/mhcc.xx.cxvi.html). Published original `MHCC 0.1.1` remains source authority, exact native SWORD and independent acceptance pending.
 
