@@ -19,6 +19,7 @@ SOURCE=("""<?xml version="1.0" encoding="UTF-8"?>
 <chapter sID="Gen.1" osisID="Gen.1" n="1"/>
 <p><verse sID="Gen.1.1" osisID="Gen.1.1" n="1"/>
 Chapter foreword — préface originale. <hi type="italic">Ω</hi></p>
+<p>Second original introduction paragraph, with faithful punctuation.</p>
 <div type="introduction"><p subType="x-introduction">
 Further introduction: <reference osisRef="Exod.1.1">see Exodus</reference>
 <note n="a">Footnote, unchanged.</note>
@@ -60,7 +61,8 @@ class IntroductionMoveTests(unittest.TestCase):
         orig=etree.fromstring(SOURCE)
         self.assertEqual("".join(root.itertext()),"".join(orig.itertext()))
         intro=root.xpath("//*[local-name()='div' and @type='introduction']")[0]
-        self.assertEqual([etree.QName(child).localname for child in intro],["p","p"])
+        self.assertEqual([etree.QName(child).localname for child in intro],["p","p","p"])
+        self.assertIn("Second original introduction", "".join(intro.itertext()))
         self.assertIn("Chapter foreword", "".join(intro.itertext()))
         self.assertIn("Further introduction", "".join(intro.itertext()))
         self.assertNotIn("Separate authored exposition", "".join(intro.itertext()))
@@ -90,6 +92,15 @@ class IntroductionMoveTests(unittest.TestCase):
         for op in cases:
             with self.subTest(op=op),self.assertRaises(IntroRepairError):
                 repair_private_bytes(SOURCE,op)
+
+    def test_an_intervening_other_verse_cannot_be_reclassified(self):
+        altered=SOURCE.replace(
+            b'<p>Second original introduction paragraph',
+            b'<p><verse sID="Gen.1.5" osisID="Gen.1.5"/>'
+            b'Second original introduction paragraph')
+        with self.assertRaisesRegex(IntroRepairError,
+                                    "Nonintroductory content"):
+            repair_private_bytes(altered,reviewed(altered))
 
     def test_missing_original_introduction_markup_fails_without_editing(self):
         altered=SOURCE.replace(b'<div type="introduction">',b'<div type="section">')
