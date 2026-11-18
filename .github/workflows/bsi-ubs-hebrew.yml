@@ -6,14 +6,14 @@ on:
       - "entity-index/links/dictionaries/ubs-hebrew/**"
       - ".github/workflows/bsi-ubs-hebrew.yml"
   push:
-    branches: [audit/ubs-hebrew-unmatched-evidence]
+    branches: [main]
     paths:
       - "entity-index/links/dictionaries/ubs-hebrew/**"
       - ".github/workflows/bsi-ubs-hebrew.yml"
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   verify-lexical-index:
@@ -25,6 +25,7 @@ jobs:
         run: |
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_index.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_lexical_gaps.py
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_strong_reconciliation.py
       - name: Check out exact UBS Hebrew EN/FR 0.9.4 source
         uses: actions/checkout@v4
         with:
@@ -85,6 +86,37 @@ jobs:
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
             --output /tmp/bsi-ubs-hebrew-lexical-gaps.json \
             --expected-unresolved 13736
+      - name: Investigate ten high-frequency unresolved Hebrew lexemes
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_top_lemmas.py \
+            --index /tmp/bsi-ubs-hebrew-index.json \
+            --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
+            --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --output /tmp/bsi-ubs-hebrew-top-lemmas.json
+      - name: Audit source-grounded Strong numeric-family reconciliation candidates
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_strong_reconciliation.py \
+            --index /tmp/bsi-ubs-hebrew-index.json \
+            --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
+            --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --output /tmp/bsi-ubs-hebrew-reconciliation.json
+      - name: Compare reproducible candidate-review report when committed
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          actual=json.loads(Path("/tmp/bsi-ubs-hebrew-reconciliation.json").read_text(encoding="utf-8"))
+          assert actual["counts"]["unresolved_lexical_rows"] == 13736
+          assert actual["counts"]["dual_evidence_candidate_occurrences"] == 3439
+          assert actual["distinct_candidate_lexemes"] == 278
+          assert all(x["verification_state"] == "candidate_only_not_accepted_link" for x in actual["candidates"])
+          dest=Path("entity-index/links/dictionaries/ubs-hebrew/reconciliation_candidates.json")
+          if dest.exists():
+              assert json.loads(dest.read_text(encoding="utf-8")) == actual, "Candidate report differs from current pinned original sources"
+              print("RECONCILIATION_CANDIDATE_REPORT_VERIFIED")
+          else:
+              print("RECONCILIATION_CANDIDATE_REPORT_PENDING_INITIAL_PIN")
+          PY
       - name: Compare pinned generated index or prepare initial reproducible snapshot
         run: |
           python3 - <<'PY'
@@ -121,17 +153,6 @@ jobs:
           else:
               print("BSI_UBS_HEBREW_INITIAL_INDEX_PENDING_COMMIT")
           PY
-      - name: Commit generated index only to the dedicated source branch
-        if: github.event_name == 'push' && github.ref == 'refs/heads/audit/ubs-hebrew-unmatched-evidence'
-        run: |
-          cp /tmp/bsi-ubs-hebrew-index.json entity-index/links/dictionaries/ubs-hebrew/index.json
-          if ! git diff --quiet -- entity-index/links/dictionaries/ubs-hebrew/index.json || test -n "$(git ls-files --others --exclude-standard entity-index/links/dictionaries/ubs-hebrew/index.json)"; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add entity-index/links/dictionaries/ubs-hebrew/index.json
-            git commit -m "data(bsi): add deterministic UBS Hebrew EN/FR Macula crosswalk"
-            git push origin HEAD:audit/ubs-hebrew-unmatched-evidence
-          fi
       - name: Upload generated QA index (not upstream dictionary definitions)
         uses: actions/upload-artifact@v4
         with:
@@ -139,4 +160,6 @@ jobs:
           path: |
             /tmp/bsi-ubs-hebrew-index.json
             /tmp/bsi-ubs-hebrew-lexical-gaps.json
+            /tmp/bsi-ubs-hebrew-reconciliation.json
+            /tmp/bsi-ubs-hebrew-top-lemmas.json
           retention-days: 14

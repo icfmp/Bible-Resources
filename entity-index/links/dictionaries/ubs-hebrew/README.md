@@ -135,6 +135,50 @@ no dictionary definitions or Bible text are changed.
 using authoritative edition-specific identity evidence (not stripped
 suffixes, not surface-string similarity), beginning with `כֹּל`.
 
+## Top-frequency lexical gaps: pinned-source reconciliation investigation
+
+The audit tools provide a conservative path forward without equating two
+different editions' Strong suffix schemes or lexical sense identifiers:
+
+- **13,736** unresolved selected lexical-class word occurrences (579 original
+  language+lemma groups).
+- **3,439** occurrences / **278** source lemma+numeric-Strong families have
+  *dual evidence*: (1) the **identical NFC original lemma** and (2) the same
+  **H/A numeric Strong family**, with a **single candidate UBS MainId**.
+- **10,297** occurrences do **not** satisfy both independent conditions.
+- Of the 3,439 candidate occurrences, 2,485 have unsuffixed MACULA vs
+  suffixed UBS codes; 947 have suffixed MACULA vs unsuffixed UBS codes; 7
+  have different suffix letters. These are **review candidates only**, not
+  additions to the verified `by_strong` or `by_sdbh` mappings.
+
+| MACULA lemma | Original Strong | UBS entry / Strong | Unlinked WLC rows |
+| --- | --- | --- | ---: |
+| קוֹל | H6963 | `006416000000000` / H6963a | 505 |
+| טוֹב | H2896 | `002670000000000` / H2896a,b | 333 |
+| רַע | H7451 | `006851000000000` / H7451a,b | 324 |
+| חוה | H7812a | `002157000000000` / H7812 | 170 |
+
+### Important negative controls
+
+- כֹּל (H3605, **5,409** unresolved WLC rows) has no
+  exact matching UBS lemma or original H3605 code in this pinned edition.
+  Its occasional MACULA `sdbh` prefix leads to **an unrelated UBS lemma**
+  and must not be treated as an entry.
+- אַל (H0408) is not equivalent to similarly unpointed אֵל (UBS H0410
+  etc.) merely because the consonants match.
+- כֹּה (H3541) is not the same as Aramaic כָּה (UBS A3542).
+- The original MACULA `sdbh` for טוֹב points to a UBS
+  `MainId` belonging to a **different lemma** in 0.9.4. Treating this
+  prefix as a stable entry identifier would silently corrupt meanings.
+
+Use [audit_top_lemmas.py](audit_top_lemmas.py) for exact source witnesses
+and [audit_strong_reconciliation.py](audit_strong_reconciliation.py)
+for *every* unique lemma-plus-Strong-family candidate, ambiguity exclusions,
+and source word-ID examples. They produce machine-readable QA JSON in CI,
+not dictionary edits. **No candidate is automatically promoted to an
+authoritative dictionary lookup**; editorial validation of suffix semantics
+and UBS sense alignment is still needed.
+
 ## Index design
 
 - `by_sdbh`: exact fifteen-digit original Macula `sdbh` sense ID → one or more stable UBS `MainId` values. The `sdbh` value itself is the exact `LEXID` sense.
