@@ -24,6 +24,7 @@ jobs:
 
       - name: Regression tests (offline, no data download)
         run: |
+          python3 -I entity-index/test_workspace_layout.py
           python3 -I entity-index/test_distribution_profile.py
           python3 -I entity-index/test_build.py
           python3 -I entity-index/test_resolve.py
