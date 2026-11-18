@@ -1646,6 +1646,120 @@ def build_private_source_reference_supplement(
     }
 
 
+
+def build_unapproved_source_errata_notes_preview(
+        *, source_note_osis: bytes, ledger: dict,
+        native: dict, errata: dict) -> tuple[bytes, dict]:
+    """A *third* private preview of proposed fixes, never source-native links.
+
+    Four wrong original target identities are SHA authenticated by the
+    separate source-only validation. Candidate Scripture destinations come
+    from an explicitly versioned secondary-witness editorial manifest.
+    Proposed links are never substituted into authorial modern text or the
+    unchanged original source note candidate.
+    """
+    from commentary_modern_draft_osis_preview import NS, _range
+
+    validate_pending_source_reference_errata(
+        manifest=errata, ledger=ledger, native=native)
+    if (errata.get("proposed_navigation_note_status") !=
+            "UNAPPROVED_SEPARATE_EDITORIAL_REPAIR_PREVIEW_NOT_IN_ORIGINAL_SOURCE"
+            or errata.get("proposed_navigation_note_publication_authorized")
+                is not False):
+        raise ValueError("Proposed source-link repair is not an unpublished review")
+    cases=errata.get("cases")
+    if not isinstance(cases,list) or not cases:
+        raise ValueError("Source errata review has no canonical cases")
+    doc=ET.fromstring(source_note_osis)
+    before="".join(doc.itertext())
+    chapters={ch.get("osisID"):ch for ch in doc.iter()
+              if ch.tag==f"{{{NS}}}chapter"}
+    if set(chapters)!=set(native.get("chapters",{})):
+        raise ValueError("Private errata preview chapter source inventory changed")
+    receipts=[]
+    n=0
+    for case in cases:
+        first=case["source_first_key"]
+        ordinal=case["original_reference_ordinal"]
+        chapter=first.rsplit(".",1)[0]
+        units=native["chapters"][chapter]["original_units"]
+        indices=[i for i,u in enumerate(units) if u["first_key"]==first]
+        if len(indices)!=1:
+            raise ValueError("No unique K owner for original link repair")
+        sections=chapters[chapter].findall(
+            f"./{{{NS}}}div[@annotateType='commentary']")
+        idx=indices[0]
+        if (len(sections)!=len(units)
+                or sections[idx].get("annotateRef")!=_range(units[idx]["keys"])):
+            raise ValueError("Unapproved repair cannot change modern source scope")
+        proposed=case.get("proposed_navigation_targets_for_unpublished_review")
+        if (not isinstance(proposed,list) or not proposed
+                or len(proposed)!=len(set(proposed))
+                or any(not isinstance(x,str) or not _allowed_source_link_target(x)
+                       for x in proposed)
+                or not isinstance(case.get("proposed_navigation_witness_class"),str)):
+            raise ValueError("Malformed proposed repair candidate navigation")
+        if (case.get("finding")=="ORIGINAL_DIGITAL_WITNESS_POINTS_TO_WRONG_VERSE"
+                and proposed!=[case.get("proposed_corrected_target")]):
+            raise ValueError("Wrong-verse repair does not match witnessed correction")
+        if (case.get("finding")=="INVALID_CROSS_CHAPTER_NAVIGATION_IN_ORIGINAL_OSISREF"
+                and case.get("candidate_fragment") not in proposed):
+            raise ValueError("Composite original repair omits verified initial span")
+        section=sections[idx]
+        note=ET.SubElement(section,f"{{{NS}}}note",{
+            "type":"crossReference",
+            "resp":"BibleResourcesPrivateUnapprovedOriginalErrataPreview",
+        })
+        note.text=(
+            "Proposed editorial repair of a faulty original-edition link "
+            "(unapproved; not an original authorial link): ")
+        spans=[]
+        for i,literal in enumerate(proposed):
+            display=_source_link_supplement_display(literal)
+            ref=ET.SubElement(note,f"{{{NS}}}reference",{"osisRef":literal})
+            ref.text=display
+            ref.tail="; " if i<len(proposed)-1 else "."
+            spans.append({
+                "candidate_target_sha256":hashlib.sha256(
+                    literal.encode("utf-8")).hexdigest(),
+                "candidate_derived_display_sha256":hashlib.sha256(
+                    display.encode("utf-8")).hexdigest()
+            })
+            n+=1
+        receipts.append({
+            "source_first_key":first,
+            "source_original_link_ordinal":ordinal,
+            "original_source_literal_target_sha256":case["original_target_sha256"],
+            "candidate_references":spans
+        })
+    if (len(receipts)!=errata.get("proposed_navigation_source_links_repaired_in_editorial_preview")
+            or n!=errata.get("proposed_navigation_note_count")):
+        raise ValueError("Editorial repair proposed link candidate count drift")
+    def original_without_repairs(node):
+        parts=[node.text or ""]
+        for child in node:
+            if (child.tag!=f"{{{NS}}}note" or child.get("resp")!=
+                    "BibleResourcesPrivateUnapprovedOriginalErrataPreview"):
+                parts.append(original_without_repairs(child))
+            parts.append(child.tail or "")
+        return "".join(parts)
+    if original_without_repairs(doc)!=before:
+        raise ValueError("Unapproved errata preview changed prior modern/source-note text")
+    output=ET.tostring(doc,encoding="utf-8",xml_declaration=True)
+    ET.fromstring(output)
+    return output,{
+        "status":"PRIVATE_UNAPPROVED_ORIGINAL_ERRATA_NAVIGATION_PREVIEW_NOT_SOURCE_OR_RELEASE",
+        "original_source_link_occurrences_provisionally_repaired":len(receipts),
+        "derived_navigation_links_from_corroborating_witnesses":n,
+        "original_and_modern_edition_text_unchanged":True,
+        "prior_source_only_notes_unchanged":True,
+        "original_invalid_source_targets_retained_in_source_errata_evidence":True,
+        "editorial_approval":False,
+        "public_distribution":False,
+        "original_source_K_ordinal_proposed_navigation_hashes":receipts,
+    }
+
+
 def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                                     native: dict, identities: dict,
                                     dispositions: dict, repo_root: Path,
