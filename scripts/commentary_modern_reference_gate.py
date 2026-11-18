@@ -1647,6 +1647,262 @@ def build_private_source_reference_supplement(
 
 
 
+
+# Private, conservative recovery of link context. These are not authorial
+# inline labels and never rewrite a translated sentence.
+_CONTEXT_WORD = re.compile(r"[A-Za-z]+(?:'[A-Za-z]+)?")
+_CONTEXT_COMMON = frozenset((
+    "about after again also among because before being between could every "
+    "first from given great have having into itself more must neither other "
+    "shall should since some such than that their them there these those "
+    "through thus under until upon very were when where which while whose "
+    "with would your they this what then been himself herself themselves "
+    "therefore indeed only make made many might much once over even every "
+    "people things words said says says one two three that those whose"
+).split())
+
+
+def _original_source_link_contexts(raw: bytes) -> list[tuple[str, str]]:
+    """In-memory prose immediately before/after each original reference.
+
+    The caller authenticates the entire native K raw SHA and original link
+    ordinals before using these contexts; no original prose is exported.
+    """
+    source = ET.fromstring(b"<source>" + raw + b"</source>")
+    fragments: list[str] = []
+    positions: list[tuple[int, int]] = []
+    current = 0
+
+    def emit(value: str | None) -> None:
+        nonlocal current
+        if value:
+            fragments.append(value)
+            current += len(value)
+
+    def walk(node: ET.Element) -> None:
+        emit(node.text)
+        for child in node:
+            if isinstance(child.tag, str) and child.tag.rsplit("}", 1)[-1] == "reference":
+                positions.append((current, len("".join(child.itertext()))))
+            walk(child)
+            emit(child.tail)
+
+    walk(source)
+    prose = "".join(fragments)
+    return [(prose[max(0, start-180):start],
+             prose[start+label_length:start+label_length+180])
+            for start, label_length in positions]
+
+
+def _source_context_unique_paragraph_anchor(
+        section: ET.Element, context: tuple[str, str]):
+    """Find a uniquely preserved, non-generic ORIGINAL nearby phrase.
+
+    This finds proximity, not the original position of the linked label.
+    Therefore the link can only become a visibly tagged source-only note,
+    never a falsely attributed hyperlink wrapping Henry's modernized words.
+    """
+    from commentary_modern_draft_osis_preview import NS
+    candidates = []
+    for side, part in enumerate(context):
+        words = [m.group().casefold() for m in _CONTEXT_WORD.finditer(part)]
+        # In the following source context allow up to two leading tokens of
+        # punctuation/citation residue; stay close to the original reference.
+        for offset in (0, 1, 2):
+            for length in (8, 7, 6, 5):
+                subset = (words[-offset-length:len(words)-offset or None]
+                          if side == 0 else words[offset:offset+length])
+                if len(subset) != length:
+                    continue
+                meaningful = {w for w in subset
+                              if len(w) >= 5 and w not in _CONTEXT_COMMON}
+                if len(meaningful) < 3:
+                    continue
+                candidates.append((length, side, tuple(subset)))
+
+    if not candidates:
+        return None
+    placements = []
+    for para in section.findall(f"{{{NS}}}p"):
+        value = para.text or ""
+        tokens = [(m.group().casefold(), m.start(), m.end())
+                  for m in _CONTEXT_WORD.finditer(value)]
+        for length, side, phrase in candidates:
+            for i in range(len(tokens)-length+1):
+                if tuple(t[0] for t in tokens[i:i+length]) == phrase:
+                    placements.append((length, side, id(para),
+                                       tokens[i+length-1][2], para))
+    if not placements:
+        return None
+    # A unique largest exact preserved phrase. Different positions with the
+    # same maximal strength are ambiguous and MUST remain at section level.
+    highest = max(row[0] for row in placements)
+    best = {(row[2], row[3]): row for row in placements if row[0] == highest}
+    if len(best) != 1:
+        return None
+    return next(iter(best.values()))[-2:]
+
+
+def build_private_contextual_source_note_preview(
+        *, source_note_osis: bytes, ledger: dict, native: dict,
+        original_contexts: dict) -> tuple[bytes, dict]:
+    """Relocate only proven same-K source notes adjacent to exact prose context.
+
+    An unchanged *separate* source-note SWORD candidate remains authoritative
+    for the 176 unplaced links. This additional candidate is NOT approved or
+    publishable; it does not invent original inline link locations.
+    """
+    from collections import Counter
+    from commentary_modern_draft_osis_preview import NS, _range
+
+    if (ledger.get("status") !=
+            "SOURCE_NATIVE_WHOLE_CANON_HYPERLINK_DISPOSITION_QUEUE_NOT_FINAL_APPROVAL"
+            or ledger.get("source_reference_labels_or_literal_targets_exported") is not False
+            or ledger.get("publication_authorized") is not False
+            or native.get("source_prose_or_original_markup_exported") is not False):
+        raise ValueError("Context location requires an authenticated native ledger")
+    doc = ET.fromstring(source_note_osis)
+    chapters = {x.get("osisID"):x for x in doc.iter()
+                if x.tag == f"{{{NS}}}chapter"}
+    pending = ledger["pending"]
+    if len(pending) != ledger["source_original_links_still_requiring_placement_review"]:
+        raise ValueError("Original source pending ledger was truncated")
+
+    def authored_text_without_source_notes(root: ET.Element) -> str:
+        parts = []
+        def walk(node):
+            if node.text:
+                parts.append(node.text)
+            for child in node:
+                if (child.tag != f"{{{NS}}}note"
+                        or child.get("resp") not in (
+                            "BibleResourcesPrivateSourceOnlyLinkSupplement",
+                            "BibleResourcesPrivateContextSourceLink")):
+                    walk(child)
+                if child.tail:
+                    parts.append(child.tail)
+        walk(root)
+        return "".join(parts)
+
+    def source_note_links(root):
+        return Counter((ref.get("osisRef"), ref.text or "")
+            for note in root.iter() if note.tag == f"{{{NS}}}note"
+            and note.get("resp") in (
+                "BibleResourcesPrivateSourceOnlyLinkSupplement",
+                "BibleResourcesPrivateContextSourceLink")
+            for ref in note if ref.tag == f"{{{NS}}}reference")
+
+    original_authored = authored_text_without_source_notes(doc)
+    before_links = source_note_links(doc)
+    notes_by_first = {}
+    for chapter, node in chapters.items():
+        units = native["chapters"][chapter]["original_units"]
+        sections = node.findall(f"./{{{NS}}}div[@annotateType='commentary']")
+        if len(sections) != len(units):
+            raise ValueError("Modern chapter/source group count drift")
+        for source, section in zip(units, sections):
+            if section.get("annotateRef") != _range(source["keys"]):
+                raise ValueError("Original commentary K scope drift")
+            group_notes = [x for x in section
+                           if x.tag == f"{{{NS}}}note" and x.get("resp") ==
+                           "BibleResourcesPrivateSourceOnlyLinkSupplement"]
+            if group_notes:
+                if len(group_notes) != 1:
+                    raise ValueError("Duplicate section-level original source note")
+                notes_by_first[source["first_key"]] = (section, group_notes[0])
+
+    candidates = {}
+    blocked = set()
+    for row in pending:
+        first, ordinal = row["source_first_key"], row["source_reference_ordinal"]
+        if first not in notes_by_first:
+            blocked.add((first, ordinal))
+            continue
+        contexts = original_contexts.get(first)
+        if contexts is None or not 1 <= ordinal <= len(contexts):
+            raise ValueError("Source context unavailable for authenticated original K")
+        section, note = notes_by_first[first]
+        found = _source_context_unique_paragraph_anchor(section, contexts[ordinal-1])
+        if found is not None:
+            candidates[(first, ordinal)] = found
+
+    # A shared anchor is not proof that two original citations belong there.
+    repeats = Counter((id(p), end) for p, end in candidates.values())
+    for key, (p, end) in list(candidates.items()):
+        if repeats[(id(p),end)] > 1:
+            candidates.pop(key)
+
+    moved = []
+    para_inserts = []
+    for first, (section, group_note) in notes_by_first.items():
+        eligible = [row for row in pending if row["source_first_key"] == first
+                    and (first, row["source_reference_ordinal"]) not in blocked]
+        source_refs = [x for x in group_note
+                       if x.tag == f"{{{NS}}}reference"]
+        if len(source_refs) != len(eligible):
+            raise ValueError("Original source note order/count changed")
+        group_note[:] = []
+        remaining = []
+        for ref, row in zip(source_refs, eligible):
+            ordinal = row["source_reference_ordinal"]
+            key = (first, ordinal)
+            if key not in candidates:
+                remaining.append(ref)
+                continue
+            p, end = candidates[key]
+            local = ET.Element(f"{{{NS}}}note",{
+                "type":"crossReference",
+                "resp":"BibleResourcesPrivateContextSourceLink"})
+            local.text = ("Original-edition reference (nearby context matches; "
+                          "original link placement not certified): ")
+            ref.tail = "."
+            local.append(ref)
+            para_inserts.append((p, end, local))
+            moved.append({
+                "source_first_key":first,
+                "source_reference_ordinal":ordinal,
+                "source_literal_target_sha256":row["original_osisRef_sha256"],
+                "original_label_sha256":row["original_visible_label_sha256"]})
+        if remaining:
+            group_note.text = ("Unplaced links from original edition "
+                               "(not translated citations): ")
+            for i, r in enumerate(remaining):
+                r.tail = "; " if i < len(remaining)-1 else "."
+                group_note.append(r)
+        else:
+            section.remove(group_note)
+
+    # Descending offsets maintain original paragraph ordering when more than
+    # one different, verified context lands in the same modern paragraph.
+    for para, end, note in sorted(para_inserts, key=lambda x:(id(x[0]), -x[1])):
+        text = para.text or ""
+        if not (0 < end <= len(text)):
+            raise ValueError("A previous insertion moved a context anchor")
+        para.text = text[:end]
+        note.tail = text[end:]
+        para.insert(0, note)
+
+    if authored_text_without_source_notes(doc) != original_authored:
+        raise ValueError("Contextual notes changed translated commentary words")
+    if source_note_links(doc) != before_links or sum(before_links.values()) != 176:
+        raise ValueError("Contextual notes lost/duplicated original source links")
+    output=ET.tostring(doc,encoding="utf-8",xml_declaration=True)
+    ET.fromstring(output)
+    return output, {
+        "status":"PRIVATE_EXACT_CONTEXT_PROXIMITY_REVIEW_NOT_AUTHORIAL_INLINE_PARITY",
+        "source_note_occurrences_total":176,
+        "source_notes_moved_to_authored_paragraphs":len(moved),
+        "source_notes_still_grouped_by_K":176-len(moved),
+        "whole_original_K_ownership_retained":True,
+        "source_prose_or_modern_authored_text_modified":False,
+        "original_source_target_and_label_identities_preserved":True,
+        "context_match_is_not_original_inline_placement_approval":True,
+        "published_or_distributed":False,
+        "context_relocations":moved,
+    }
+
+
+
 def build_unapproved_source_errata_notes_preview(
         *, source_note_osis: bytes, ledger: dict,
         native: dict, errata: dict) -> tuple[bytes, dict]:
@@ -1771,7 +2027,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                                     auto_authentic_labels: bool = False,
                                     source_notes_output: Path | None = None,
                                     errata_review: dict | None = None,
-                                    errata_proposals_output: Path | None = None) -> tuple[bytes, dict]:
+                                    errata_proposals_output: Path | None = None,
+                                    context_notes_output: Path | None = None) -> tuple[bytes, dict]:
     """Authenticate and place an explicitly bounded set of source-backed links.
 
     Real original SWORD attributes stay in private memory/isolated new OSIS,
@@ -1790,6 +2047,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         raise ValueError("Source notes require full native inventory and errata exclusions")
     if errata_proposals_output is not None and source_notes_output is None:
         raise ValueError("Private errata proposals require separate source-note candidate")
+    if context_notes_output is not None and source_notes_output is None:
+        raise ValueError("Context placement requires separate source-note alternative")
     if (placements.get("status") !=
             "PRIVATE_REVIEWED_BOUNDED_LINK_PLACEMENT_NOT_FINAL_EDIT_OR_RELEASE"
             or placements.get("published_source_module") != "MHCC 0.1.1"
@@ -1876,6 +2135,7 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
     if not reader.is_file() or not module_directory.is_dir() or module_id != "MHCC":
         raise ValueError("Only isolated published MHCC original SWORD reader is supported")
     private_original = {}
+    private_original_contexts = {}
     private_table_ownership = {}
     private_title_ownership = {}
     env = os.environ.copy()
@@ -1912,6 +2172,10 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                     identity["original_visible_link_label_sha256_in_document_order"][n]):
                 raise ValueError("Original link identity or order differs from authenticated ledger")
         private_original[key] = refs
+        if context_notes_output is not None:
+            private_original_contexts[key] = _original_source_link_contexts(raw)
+            if len(private_original_contexts[key]) != len(refs):
+                raise ValueError("Original context/ref inventory mismatch")
         private_table_ownership[key] = table_context
         private_title_ownership[key] = title_context
     proc = subprocess.Popen([str(reader.resolve()), module_id], env=env,
@@ -2171,6 +2435,7 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
     output = ET.tostring(doc, encoding="utf-8", xml_declaration=True)
     ET.fromstring(output)
     notes_receipt = None
+    context_receipt = None
     errata_preview_receipt = None
     if source_notes_output is not None:
         if source_link_ledger is None:
@@ -2182,6 +2447,12 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
             original=private_original, native=native, errata=errata_review)
         source_notes_output.parent.mkdir(parents=True,exist_ok=True)
         source_notes_output.write_bytes(notes_osis)
+        if context_notes_output is not None:
+            context_osis, context_receipt = build_private_contextual_source_note_preview(
+                source_note_osis=notes_osis, ledger=source_link_ledger,
+                native=native, original_contexts=private_original_contexts)
+            context_notes_output.parent.mkdir(parents=True,exist_ok=True)
+            context_notes_output.write_bytes(context_osis)
         if errata_proposals_output is not None:
             proposals_osis, errata_preview_receipt = (
                 build_unapproved_source_errata_notes_preview(
@@ -2214,6 +2485,7 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         "remaining_source_links_require_individual_placement_review":True,
         "source_original_link_review_ledger":source_link_ledger,
         "private_source_note_alternative":notes_receipt,
+        "private_contextual_note_relocation_preview":context_receipt,
         "private_unapproved_errata_navigation_preview":errata_preview_receipt,
         "modern_SWORD_readback_verified":False,
         "independent_editorial_semantic_signoff":False,
@@ -2244,6 +2516,7 @@ def main():
     p.add_argument("--auto-original-first-K-outline-links",action="store_true")
     p.add_argument("--auto-authenticated-original-printed-single-verses",action="store_true")
     p.add_argument("--source-notes-osis",type=Path)
+    p.add_argument("--context-source-notes-osis",type=Path)
     p.add_argument("--source-notes-errata-manifest",type=Path)
     p.add_argument("--source-errata-proposals-osis",type=Path)
     p.add_argument("--linked-osis",type=Path)
@@ -2256,6 +2529,8 @@ def main():
         p.error("Private source notes need original full-canon linked preview")
     if a.source_errata_proposals_osis is not None and a.source_notes_osis is None:
         p.error("Private source errata proposals require original source notes")
+    if a.context_source_notes_osis is not None and a.source_notes_osis is None:
+        p.error("Private context relocation needs the source-note alternative")
     if not a.native_reader.is_file() or not a.module_directory.is_dir():
         p.error("Trusted real native reader and installed source module directory required")
     if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{1,39}",a.module_id):
@@ -2288,7 +2563,8 @@ def main():
             errata_review=(json.loads(a.source_notes_errata_manifest.read_text(
                 encoding="utf-8")) if a.source_notes_errata_manifest is not None
                 else None),
-            errata_proposals_output=a.source_errata_proposals_osis)
+            errata_proposals_output=a.source_errata_proposals_osis,
+            context_notes_output=a.context_source_notes_osis)
         a.linked_osis.parent.mkdir(parents=True,exist_ok=True)
         a.report.parent.mkdir(parents=True,exist_ok=True)
         a.linked_osis.write_bytes(osis)
