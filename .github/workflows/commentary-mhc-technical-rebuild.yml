@@ -308,6 +308,49 @@ jobs:
             exit 1
           fi
           echo "Private CLI invocation completed"
+      - name: Verify all source verse-group boundaries against real compiled SWORD keys and linked bodies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,subprocess,sys
+          from hashlib import sha256
+          from pathlib import Path
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from audit_osis import compare_source_milestone_index
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          root=Path(os.environ["RUNNER_TEMP"])
+          reader=root/"commentary-native-raw"
+          env=dict(os.environ,SWORD_PATH=str(root/"mhc-stage1-private"))
+          process=subprocess.Popen([str(reader),"MHCStage1"],
+                                   env=env,stdout=subprocess.PIPE,
+                                   stderr=subprocess.DEVNULL)
+          body_hash={}
+          def receive(kind,key,raw):
+              if kind=="K":
+                  body_hash[key]=sha256(raw).hexdigest()
+          try:
+              _report,verses,intros,_opaque=parse_native_raw_corpus(
+                  process.stdout,on_entry=receive)
+              if process.wait(timeout=35)!=0:
+                  raise SystemExit("Native corpus reader returned error")
+          finally:
+              if process.stdout:process.stdout.close()
+              if process.poll() is None:process.kill()
+              process.wait()
+          outcome=compare_source_milestone_index(
+              root/"mhc-cleaned.osis.xml",
+              numbered_keys=verses,intro_keys=intros,body_sha_by_verse=body_hash)
+          print("Source/native complete OSIS milestone structural status:",outcome["status"])
+          print("Source-native verse and chapter marker statistics:",outcome["structure_counts"])
+          print("Source/native structural violations by class:",outcome["anomaly_counts"])
+          print("Bounded reference-only source/native structural cases:",
+                outcome["bounded_reference_only_findings"][:30])
+          if outcome["status"]!="SOURCE_NATIVE_INDEX_AND_MILESTONE_GEOMETRY_MATCH":
+              raise SystemExit("MHC source-native verse group geometry NOT APPROVED")
+          print("Verified complete source verse+intro IDs, exact grouped verse"
+                " coverage, paired milestones and native linked commentary bodies")
+          PY
       - name: Compare full clean candidate against pristine independent SWORD rebuild
         shell: bash
         run: |
