@@ -176,6 +176,51 @@ class FullCanonicalProductionMarkupTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     _write_reading_blocks(node,markup)
 
+    def test_numeric_source_emendation_field_is_retained_without_prose_leak(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path=Path(folder)/"genesis-05.md"
+            path.write_text(
+                '---\nchapter_osis: "Gen.5"\nsource_emendation_issue: 291\n'
+                'publication_status: "NOT RELEASED"\n---\n'
+                '# Genesis 5\n\n## Exposition (verse 1)\n\nModern reading text.\n'
+                '\n---\n## Editorial audit\nNo release.\n',encoding="utf-8")
+            fields, prose=_modern_front(path)
+            self.assertEqual(fields["source_emendation_issue"],"291")
+            self.assertNotIn("No release.",prose)
+
+    def test_unlocated_book_prefaces_are_quarantined_not_invented_as_chapter_I(self):
+        from commentary_modern_draft_osis_preview import (
+            _SOURCE_ZIP, _SOURCE_CORPUS)
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            common=(
+                'unit: "separate book introduction"\n'
+                'status: "PRODUCTION CANDIDATE — EDITORIAL ACCEPTANCE PENDING"\n'
+                'source_module: "MHCC 0.1.1"\n'
+                f'source_zip_sha256: "{_SOURCE_ZIP}"\n'
+                f'source_native_corpus_sha256: "{_SOURCE_CORPUS}"\n')
+            (root/"acts-book-introduction.CANDIDATE.md").write_text(
+                '---\nbook_osis: "Acts"\n'+common+'---\n'
+                '# Acts — Unlocated preface\n\nEditorial draft only.\n'
+                '\n---\n## Review\nNot source-position approved.\n',encoding="utf-8")
+            (root/"second-john-book-introduction.CANDIDATE.md").write_text(
+                '---\nbook_osis: "2John"\n'+common+
+                'source_native_intro_key: "I:2John.1"\n'
+                'source_native_intro_raw_sha256: "'+"a"*64+'"\n'
+                '---\n# 2 John — Book preface\n\nModern intro prose.\n'
+                '\n---\n## Review\nNot independently approved.\n',encoding="utf-8")
+            source={"chapters":{
+                "Acts.1":{"source_placement":"NUMBERED_KEYS_WITH_SEPARATE_INTRO",
+                          "native_introductions_not_assumed_to_be_exposition":[]},
+                "2John.1":{"source_placement":"NUMBERED_KEYS_WITH_SEPARATE_INTRO",
+                    "native_introductions_not_assumed_to_be_exposition":[{
+                        "key":"2John.1","visible_word_tokens":71,
+                        "raw_sha256":"a"*64}]}}}
+            selected=_original_intro_candidates(root,source)
+            self.assertEqual(set(selected),{"2John"})
+            self.assertNotIn("Acts",selected)
+
+
 
 if __name__ == "__main__":
     unittest.main()
