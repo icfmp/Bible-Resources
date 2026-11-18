@@ -8,7 +8,8 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/"scripts"))
 from lxml import etree
-from repair_osis_source_bytes import patch_exact_original, LexicalPatchError
+from repair_osis_source_bytes import (patch_exact_original, LexicalPatchError,
+                                      patch_reviewed_osis_reference_attributes)
 from repair_osis_note_links import propose as link_propose
 from source_osis_inventory import OSIS, _source_tree
 
@@ -63,6 +64,52 @@ def plans(src=SOURCE):
 
 
 class TestLexicalSourcePatches(unittest.TestCase):
+    def test_private_source_link_target_harmonization_preserves_all_other_bytes(self):
+        root=etree.fromstring(SOURCE)
+        refs=[n for n in root.iter() if n.tag==OSIS+"reference"]
+        self.assertEqual(len(refs),2)
+        edits=[]
+        for node,target in zip(refs,("Exod.2.1","Gen.1.1 Exod.2.1")):
+            original_book=next(
+                a.get("osisID") for a in node.iterancestors()
+                if a.tag==OSIS+"div" and a.get("type")=="book")
+            edits.append({
+                "original_line":node.sourceline,
+                "source_book":original_book,
+                "old_target":node.get("osisRef"),
+                "new_target":target,
+                "visible_label_sha256":sha256(
+                    "".join(node.itertext()).strip().encode("utf-8")).hexdigest(),
+                "evidence_url":"https://example.org/verified-label",
+            })
+        plan={"schema_version":1,
+              "status":"research_only_private_not_release",
+              "source_sha256":sha256(SOURCE).hexdigest(),
+              "edits":edits}
+        before=SOURCE
+        result,receipt=patch_reviewed_osis_reference_attributes(
+            before,plan,{"Gen.1.1","Exod.2.1"})
+        expected=SOURCE.replace(b"osisRef='Gen.9.1'",b"osisRef='Exod.2.1'")
+        expected=expected.replace(b"osisRef='Gen.1.2'",
+                                  b"osisRef='Gen.1.1 Exod.2.1'")
+        self.assertEqual(result,expected)
+        self.assertEqual(receipt["exact_reference_attribute_only_changes"],2)
+        self.assertTrue(receipt["entire_original_commentary_characters_unchanged"])
+        self.assertEqual(before,SOURCE)
+        tampered=dict(plan,edits=[dict(edits[0],original_line=9999),edits[1]])
+        with self.assertRaises(LexicalPatchError):
+            patch_reviewed_osis_reference_attributes(
+                SOURCE,tampered,{"Gen.1.1","Exod.2.1"})
+        tampered=dict(plan,edits=[dict(edits[0],new_target="Exod.2.99"),edits[1]])
+        with self.assertRaises(LexicalPatchError):
+            patch_reviewed_osis_reference_attributes(
+                SOURCE,tampered,{"Gen.1.1","Exod.2.1"})
+        tampered=dict(plan,edits=[dict(edits[0],
+            visible_label_sha256="0"*64),edits[1]])
+        with self.assertRaises(LexicalPatchError):
+            patch_reviewed_osis_reference_attributes(
+                SOURCE,tampered,{"Gen.1.1","Exod.2.1"})
+
     def test_only_fourteen_original_byte_spans_changed_and_no_wholesale_serialization(self):
         link,inline=plans()
         result,report=patch_exact_original(SOURCE,link,inline)
