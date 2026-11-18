@@ -30,6 +30,34 @@ jobs:
           git -C /tmp/acai-frozen checkout --quiet e80a874e8282f996199c595378a3b3b9a43aac22
           test "$(git -C /tmp/acai-frozen rev-parse HEAD)" = "e80a874e8282f996199c595378a3b3b9a43aac22"
 
+      - name: Check out exact original-language Macula WLC
+        uses: actions/checkout@v4
+        with:
+          repository: Clear-Bible/macula-hebrew
+          ref: 47db250bd55d0d8577f2a94fba114ef16c35b23c
+          path: macula-hebrew
+          sparse-checkout: WLC/tsv
+          lfs: true
+          persist-credentials: false
+
+      - name: Check out exact original-language Macula SBLGNT
+        uses: actions/checkout@v4
+        with:
+          repository: Clear-Bible/macula-greek
+          ref: 8423afe47b9e8f24b7772e808af45c7159a6fe7e
+          path: macula-greek
+          sparse-checkout: SBLGNT/tsv
+          lfs: true
+          persist-credentials: false
+
+      - name: Validate complete Macula source files and pinned revisions
+        shell: bash
+        run: |
+          test "$(git -C macula-hebrew rev-parse HEAD)" = "47db250bd55d0d8577f2a94fba114ef16c35b23c"
+          test "$(git -C macula-greek rev-parse HEAD)" = "8423afe47b9e8f24b7772e808af45c7159a6fe7e"
+          test "$(wc -c < macula-hebrew/WLC/tsv/macula-hebrew.tsv)" -gt 80000000
+          test "$(wc -c < macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv)" -gt 20000000
+
       - name: Build complete local-only resource
         run: |
           python3 -I entity-index/compile_index.py \
@@ -238,6 +266,102 @@ jobs:
           print("ENTITY_GROUP_MULTIPLICITY_QA",json.dumps(summary,sort_keys=True))
           PY
 
+      - name: Verify every original word against both pinned Macula sources
+        shell: bash
+        run: |
+          python3 -I /tmp/acai-frozen/.github/scripts/audit_macula_hebrew_ids.py \
+            --root /tmp/acai-frozen \
+            --tsv macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --output entity-index/dist/macula-hebrew-existence.json
+          python3 -I /tmp/acai-frozen/.github/scripts/audit_macula_greek_ids.py \
+            --root /tmp/acai-frozen \
+            --tsv macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
+            --output entity-index/dist/macula-greek-existence.json
+          python3 -I /tmp/acai-frozen/.github/scripts/audit_nt_source_verses.py \
+            --root /tmp/acai-frozen \
+            --source macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
+            --corpus nt --output entity-index/dist/nt-source-verse-compatibility.json
+          python3 -I /tmp/acai-frozen/.github/scripts/audit_nt_source_verses.py \
+            --root /tmp/acai-frozen \
+            --source macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --corpus ot --output entity-index/dist/ot-source-verse-compatibility.json
+          python3 - <<'PY'
+          import csv
+          import json
+          from pathlib import Path
+          root=Path("entity-index")
+          index=json.loads((root/"dist/index.json").read_text())
+          reports={
+              "wlc":json.loads((root/"dist/macula-hebrew-existence.json").read_text()),
+              "sblgnt":json.loads((root/"dist/macula-greek-existence.json").read_text()),
+          }
+          manifest=json.loads((root/"source-unattested-words.json").read_text())
+          missing_hebrew={r["id"] for r in reports["wlc"]["missing_id_details"]}
+          assert missing_hebrew == set(manifest["word_ids"]), (missing_hebrew,manifest["word_ids"])
+          assert reports["wlc"]["summary"]["missing_from_pinned_macula"] == 18
+          assert reports["sblgnt"]["summary"]["missing_from_pinned_macula"] == 0
+          assert reports["wlc"]["summary"]["unique_mentioned_source_ids"] == 97977
+          assert reports["sblgnt"]["summary"]["unique_mentioned_source_ids"] == 36867
+          nt=json.loads((root/"dist/nt-source-verse-compatibility.json").read_text())
+          ot=json.loads((root/"dist/ot-source-verse-compatibility.json").read_text())
+          verse_manifest=json.loads((root/"source-unattested-verses.json").read_text())
+          assert nt["summary"]["record_reference_entries_absent_from_source"] == 22
+          assert nt["summary"]["distinct_referenced_verses_absent_from_source"] == 8
+          assert ot["summary"]["record_reference_entries_absent_from_source"] == 0
+          assert ot["summary"]["distinct_referenced_verses_absent_from_source"] == 0
+          assert {r["verse_id"] for r in nt["verses_absent_from_pinned_source"]} == set(verse_manifest["verse_ids"])
+          original_ids={e["id"]:e["source_id"] for e in index["entities"]}
+          for row in nt["verses_absent_from_pinned_source"]:
+              derived=index["unattested_source_verses"]["sblgnt:"+row["verse_id"]]
+              claimants=[original_ids[entity_id] for entity_id in derived["source_reference_claims"]]
+              assert sorted(row["entities"]) == sorted(claimants), row["verse_id"]
+          corpus_paths={
+              "wlc":Path("macula-hebrew/WLC/tsv/macula-hebrew.tsv"),
+              "sblgnt":Path("macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv"),
+          }
+          all_indexed=set(index["by_word"])
+          by_corpus={}
+          for corpus,path in corpus_paths.items():
+              fmt=index["provenance"]["source_editions"][corpus]
+              prefix=fmt["word_id_prefix"]
+              digits=fmt["word_id_digits"]
+              words=set()
+              with path.open(encoding="utf-8-sig",newline="") as handle:
+                  reader=csv.DictReader(handle,delimiter="\t")
+                  if "xml:id" not in (reader.fieldnames or []):
+                      raise ValueError(f"No Macula xml:id column in {path}")
+                  for row in reader:
+                      word=row.get("xml:id","")
+                      if len(word)==digits+len(prefix) and word.startswith(prefix):
+                          if not word[len(prefix):].isdigit():
+                              raise ValueError(f"Malformed Macula ID {word!r}")
+                          if word in words:
+                              raise ValueError(f"Duplicate source word ID {word!r}")
+                          words.add(word)
+              by_corpus[corpus]=words
+              # Counts are source-edition compatibility signals, not claims of
+              # semantic or editorial correctness for every tagged referent.
+              assert len(words) == {"wlc":469476,"sblgnt":137741}[corpus], (corpus,len(words))
+              unresolved=sorted(word for key in all_indexed
+                                if key.startswith(corpus+":")
+                                for word in [key.split(":",1)[1]]
+                                if word not in words)
+              print("ENTITY_SOURCE_WORD_PARITY",
+                    json.dumps({"corpus":corpus,"source_words":len(words),
+                                "indexed_words":sum(key.startswith(corpus+":") for key in all_indexed),
+                                "missing_indexed_ids":len(unresolved),
+                                "samples":unresolved[:15]}))
+              if unresolved:
+                  raise ValueError(f"{corpus}: Indexed words missing from locked source: {unresolved[:20]}")
+          assert not (set(index["unattested_source_words"]) & all_indexed)
+          for key in index["unattested_source_words"]:
+              corpus,word=key.split(":",1)
+              assert word not in by_corpus[corpus], key
+          print("ENTITY_SOURCE_PARITY_COMPLETE",
+                json.dumps({c:len(words) for c,words in by_corpus.items()},
+                           sort_keys=True))
+          PY
+
       - name: Upload internal QA-only resource
         uses: actions/upload-artifact@v4
         with:
@@ -246,5 +370,9 @@ jobs:
             entity-index/dist/index.json
             entity-index/dist/person-overlaps.json
             entity-index/dist/source-multiplicity.json
+            entity-index/dist/macula-hebrew-existence.json
+            entity-index/dist/macula-greek-existence.json
+            entity-index/dist/nt-source-verse-compatibility.json
+            entity-index/dist/ot-source-verse-compatibility.json
           if-no-files-found: error
           retention-days: 14
