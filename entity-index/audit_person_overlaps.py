@@ -7,7 +7,8 @@ resolve to one canonical identity and repeated indirect pointers remain intact.
 from __future__ import annotations
 
 import argparse
-from collections import defaultdict
+from collections import Counter, defaultdict
+import csv
 import json
 from pathlib import Path
 
@@ -92,6 +93,118 @@ def audit(index: dict) -> dict:
         ),
     }
 
+
+
+def audit_indirect_source_forms(overlap_report: dict, source_tsvs: dict[str, Path]) -> dict:
+    """Correlate *all* indirect-person claims with pinned Macula morphology.
+
+    Number is the annotated source WORD's grammatical number. It is NOT
+    evidence that all associated people have the same historical identity,
+    or even proof that that source word denotes each person. QA only.
+    """
+    if (overlap_report.get("format") != "bible-entity-identity-overlap-audit"
+            or overlap_report.get("schema_version") != 1):
+        raise ValueError("Incompatible person overlap audit for source-form review")
+    expected_editions = overlap_report.get("source_editions")
+    if not isinstance(expected_editions, dict) or set(source_tsvs) != set(expected_editions):
+        raise ValueError("Incomplete pinned source edition / TSV mapping")
+
+    findings = [row for row in overlap_report["findings"]
+                if row["classification"] == "indirect_only"]
+    if len(findings) != overlap_report["statistics"]["indirect_only"]:
+        raise ValueError("Incomplete indirect-only overlap inventory")
+    wanted = {corpus: set() for corpus in expected_editions}
+    for row in findings:
+        corpus, word_id = row["corpus"], row["word_id"]
+        if corpus not in wanted or not isinstance(word_id, str):
+            raise ValueError(f"Unknown word corpus in indirect review: {corpus!r}")
+        if word_id in wanted[corpus]:
+            raise ValueError(f"Duplicate indirect person word: {corpus}:{word_id}")
+        wanted[corpus].add(word_id)
+
+    source_by_corpus = {}
+    for corpus, path in sorted(source_tsvs.items()):
+        found = {}
+        with path.open(encoding="utf-8-sig", newline="") as handle:
+            reader = csv.DictReader(handle, delimiter="\t")
+            required = {"xml:id", "ref", "number", "morph", "text"}
+            if not required.issubset(reader.fieldnames or ()):
+                raise ValueError(f"Unexpected pinned {corpus} TSV schema: {path}")
+            for row in reader:
+                word = row["xml:id"]
+                if word not in wanted[corpus]:
+                    continue
+                if word in found:
+                    raise ValueError(f"Duplicated pinned source word: {corpus}:{word}")
+                found[word] = {
+                    "ref": row["ref"], "text": row["text"],
+                    "number": row["number"], "morph": row["morph"],
+                    "person": row.get("person", ""),
+                    "type": row.get("type", ""), "pos": row.get("pos", ""),
+                }
+        missing = wanted[corpus] - set(found)
+        if missing:
+            raise ValueError(
+                f"Indirect person words absent from pinned {corpus}: "
+                f"{sorted(missing)[:15]}")
+        source_by_corpus[corpus] = found
+
+    buckets = Counter()
+    corpus_counts = Counter()
+    candidate_sizes = Counter()
+    lexical_numbers = Counter()
+    reviewed = []
+    for row in findings:
+        corpus, word = row["corpus"], row["word_id"]
+        details = source_by_corpus[corpus][word]
+        original_number = details["number"].strip().lower()
+        if original_number in ("plural", "pl", "p"):
+            bucket = "source_word_plural"
+        elif original_number in ("singular", "sg", "s"):
+            bucket = "source_word_singular"
+        elif original_number in ("dual", "d"):
+            bucket = "source_word_dual"
+        else:
+            bucket = "source_number_other_or_unavailable"
+        people = [p["canonical_id"] for p in row["canonical_people"]]
+        if len(people) < 2 or len(set(people)) != len(people):
+            raise ValueError(f"Invalid canonical people in indirect review: {word}")
+        if any("explicit_instances" in p["link_types"] for p in row["canonical_people"]):
+            raise ValueError(f"Explicit name found in indirect-only report: {word}")
+        buckets[bucket] += 1
+        corpus_counts[corpus] += 1
+        candidate_sizes[str(len(people))] += 1
+        lexical_numbers[original_number or "(blank)"] += 1
+        reviewed.append({
+            "corpus": corpus, "word_id": word,
+            "source_verse_id": row["source_verse_id"],
+            "source_word": details,
+            "source_number_bucket": bucket,
+            "canonical_people": row["canonical_people"],
+        })
+    reviewed.sort(key=lambda row: (row["corpus"], row["source_verse_id"], row["word_id"]))
+    if sum(buckets.values()) != len(findings):
+        raise ValueError("Incomplete source-form review")
+    return {
+        "format": "bible-entity-indirect-source-form-triage",
+        "schema_version": 1,
+        "source_commit": overlap_report["source_commit"],
+        "source_editions": expected_editions,
+        "statistics": {
+            "indirect_only_source_words": len(reviewed),
+            "by_corpus": dict(sorted(corpus_counts.items())),
+            "source_word_number_buckets": dict(sorted(buckets.items())),
+            "grammatical_number_values": dict(sorted(lexical_numbers.items())),
+            "different_canonical_people_per_word": dict(sorted(candidate_sizes.items())),
+        },
+        "cases": reviewed,
+        "warning": (
+            "Source-word grammatical number is a read-only triage signal, "
+            "NOT proof of collective participant identity, co-reference "
+            "correctness or an erroneous source assignment. Retain all "
+            "source candidates; require source-context review before edits."
+        ),
+    }
 
 
 REVIEW_CLASSES = {

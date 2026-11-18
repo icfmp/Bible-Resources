@@ -457,6 +457,48 @@ source records remain byte-identical, and source edits stay declarative,
 reversible and fully audited. The **2,385 indirect-only overlaps** still
 require separate source-role and participant semantics review.
 
+## Indirect person-overlap source-grammar triage — no mass deduplication
+
+The independent identity audit already contains every indirect-only
+person overlap and keeps each original-word candidate intact. The next
+QA phase uses its **existing** audit implementation plus the locked
+Macula Hebrew/Greek original-word TSVs to inspect **all 2,385**
+indirect-only source-word collisions. This is not a new automatic
+entity-identification engine or another source importer.
+
+The read-only `indirect-person-source-forms.json` CI artifact records
+the **exact source-word morphology**, grammatical number, lemma ref,
+source text and all competing entity candidates per source-word ID.
+The report is source-pinned, checks every requested word exists
+in its exact original-language inventory, rejects repeated/missing
+rows and reports counts by corpus and grammatical number. Its
+classification is deliberately **word-level grammatical morphology**,
+not a certification of whether two people participate in the same
+event or whether one anonymous pronoun refers to them.
+
+The complete pinned morphology audit confirms **1,289 Greek** and
+**1,096 Hebrew** indirect-only word overlaps. Of the **2,385 exact
+source words**, **2,096 are grammatically plural**, **93 singular**
+and **196 have no grammatical number recorded** (often infinitives).
+These are categories of the source word, not conclusions about the
+people tagged on it. Several repeated candidate cohorts (e.g. Paul/Silas/Timothy; Aaron/Moses;
+Job's friends) are consistent with grammatical *collective* speakers
+or groups of participants, but the report must still distinguish
+plural forms from singular/unmarked forms and verify each occurrence.
+A plural form is not a blanket permission to join people; a singular
+form is not enough, by itself, to delete one source person's link.
+
+For example, Luke 6:16 has the **singular** relative pronoun
+`n42006016007` (`ὃς`) linked to both distinct Judas source records,
+whereas the verse distinguishes the two men. This is a concrete
+*human-review candidate*, not an automatic correction made by this
+morphology-only stage.
+
+The **complete report** remains a temporary, QA-only Actions
+artifact, not a packaged resource or editorially approved revision.
+No original ACAI person record, source-word ID, verse or biblical
+text is changed during this audit.
+
 ## Scoped review of all eight remaining explicit-person overlaps
 
 The current complete pinned-source audit has **eight** exact original-word
