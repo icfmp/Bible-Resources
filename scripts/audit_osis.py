@@ -651,6 +651,19 @@ def source_commentary_introductions(path: Path) -> dict[str,dict]:
                 chapter[0]=chap
             elif kind=="verse" and node.get("osisID"):
                 active[0]=None
+            elif (active[0] is not None and active[0]==chapter[0]
+                  and ((kind=="div" and node.get("type")=="section")
+                       or (kind=="title" and node.get("type")
+                           not in {"main","chapter","sub"}))):
+                # osis2mod assigns subsequent material to the FIRST verse.
+                # Distinguish pre-verse section prose from genuine chapter I.
+                # https://wiki.crosswire.org/Osis2mod
+                result[active[0]]["preverse_boundary"]={
+                    "kind":kind,
+                    "type":node.get("type"),
+                    "line":node.sourceline,
+                }
+                active[0]=None
             elif kind=="chapter" and node.get("eID"):
                 if chapter[0]!=node.get("eID"):
                     raise ValueError("Unpaired source chapter boundary")
@@ -673,6 +686,7 @@ def source_commentary_introductions(path: Path) -> dict[str,dict]:
         raise ValueError("No authored source introductions")
     for record in result.values():
         record["text"]="".join(record.pop("parts"))
+        record.setdefault("preverse_boundary",None)
     return result
 
 
