@@ -432,15 +432,19 @@
     {
       "source_id": "person:MotherOfRebekah",
       "action": "amend_occurrences",
-      "reason": "Genesis 24:58 directly names Rebekah as the woman being called to answer; the Hebrew Rebekah token is not an anonymous indirect word for her mother, who is a separate person in 24:55.",
+      "reason": "Genesis 24:58 directly names Rebekah as the woman being called to answer; the Hebrew Rebekah token is not an anonymous indirect word for her mother, who is a separate person in 24:55. Genesis 24:58: exact original word o010240580092 is the speaking subject of person:Rebekah (Rebekah replies 'I will go'; the mother does not speak), not person:MotherOfRebekah. Preserve the actual named speaker and the unaltered original source record.",
       "evidence": [
         "Pinned WLC Gen 24:58 o010240580022, explicit record person:Rebekah vs frozen MotherOfRebekah subject pointer",
-        "https://www.biblegateway.com/passage/?search=Genesis+24%3A55-58&version=NIV"
+        "https://www.biblegateway.com/passage/?search=Genesis+24%3A55-58&version=NIV",
+        "Pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/01-Gen-024-lowfat.xml, Genesis 24:58, word o010240580092; inherited ACAI source tags both person:MotherOfRebekah and person:Rebekah"
       ],
       "remove_subject_referents": {
         "wlc": [
           [
             "o010240580022"
+          ],
+          [
+            "o010240580092"
           ]
         ]
       }
@@ -448,15 +452,19 @@
     {
       "source_id": "person:WifeOfSamson",
       "action": "amend_occurrences",
-      "reason": "Judges 14:16 mentions both Samson (explicit personal name) and Samson's wife (the speaking woman). The exact word spelling Samson is not her own subject/identity mention; keep the wife entity's other pointers untouched.",
+      "reason": "Judges 14:16 mentions both Samson (explicit personal name) and Samson's wife (the speaking woman). The exact word spelling Samson is not her own subject/identity mention; keep the wife entity's other pointers untouched. Judges 14:16: exact original word o070140160172 is the speaking subject of person:Samson (Samson answers his wife 'I have not told my father or mother'), not person:WifeOfSamson. Preserve the actual named speaker and the unaltered original source record.",
       "evidence": [
         "Pinned WLC Judg 14:16 o070140160031, explicit person:Samson, false indirect WifeOfSamson subject",
-        "https://www.biblegateway.com/verse/en/Judges%2014%3A16"
+        "https://www.biblegateway.com/verse/en/Judges%2014%3A16",
+        "Pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/07-Jdg-014-lowfat.xml, Judges 14:16, word o070140160172; inherited ACAI source tags both person:WifeOfSamson and person:Samson"
       ],
       "remove_subject_referents": {
         "wlc": [
           [
             "o070140160031"
+          ],
+          [
+            "o070140160172"
           ]
         ]
       }
@@ -464,15 +472,19 @@
     {
       "source_id": "person:UncleOfSaul",
       "action": "amend_occurrences",
-      "reason": "1 Samuel 10:14 explicitly distinguishes Saul, his uncle and his servant. The word naming Saul is not an indirect naming of the uncle who is the speaker.",
+      "reason": "1 Samuel 10:14 explicitly distinguishes Saul, his uncle and his servant. The word naming Saul is not an indirect naming of the uncle who is the speaker. 1 Samuel 10:14: exact original word o090100140092 is the speaking subject of person:Saul.2 (Saul replies to his uncle's question about the missing donkeys), not person:UncleOfSaul. Preserve the actual named speaker and the unaltered original source record.",
       "evidence": [
         "Pinned WLC 1 Sam 10:14 o090100140031, explicit person:Saul.2 and unrelated uncle's subject pointer",
-        "https://classic.net.bible.org/passage.php?passage=1Sa+10%3A14-16"
+        "https://classic.net.bible.org/passage.php?passage=1Sa+10%3A14-16",
+        "Pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/09-1Sa-010-lowfat.xml, 1 Samuel 10:14, word o090100140092; inherited ACAI source tags both person:UncleOfSaul and person:Saul.2"
       ],
       "remove_subject_referents": {
         "wlc": [
           [
             "o090100140031"
+          ],
+          [
+            "o090100140092"
           ]
         ]
       }
@@ -496,12 +508,13 @@
     {
       "source_id": "person:GenericServant",
       "action": "amend_occurrences",
-      "reason": "1 Samuel 9:10 has distinct pinned Hebrew word segments for the spoken subject Saul (o090090100021) and the addressee's common noun 'servant' (o090090100032). The inherited two-word GenericServant group falsely included Saul's proper name. Replace only that group with the verified singleton servant word; keep every other original segment, including the suffix 'his' in its original witness. Separately, 1 Kings 18:42 names Elijah, not his servant, so detach its erroneous GenericServant singleton pointer while leaving other roles untouched.",
+      "reason": "1 Samuel 9:10 has distinct pinned Hebrew word segments for the spoken subject Saul (o090090100021) and the addressee's common noun 'servant' (o090090100032). The inherited two-word GenericServant group falsely included Saul's proper name. Replace only that group with the verified singleton servant word; keep every other original segment, including the suffix 'his' in its original witness. Separately, 1 Kings 18:42 names Elijah, not his servant, so detach its erroneous GenericServant singleton pointer while leaving other roles untouched. 1 Kings 18:44: exact original word o110180440112 is the speaking subject of person:Elijah (Elijah tells the servant to warn Ahab after the cloud report), not person:GenericServant. Preserve the actual named speaker and the unaltered original source record.",
       "evidence": [
         "Pinned WLC 1 Kings 18:42 o110180420052 under explicit person:Elijah and frozen GenericServant singleton subject group",
         "https://www.biblegateway.com/passage/?search=1+Kings+18%3A42-46&version=NIV",
         "Pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/09-1Sa-009-lowfat.xml: 1 Samuel 9:10 o090090100021 proper-name Saul, o090090100032 common noun servant, o090090100033 possessive suffix his",
-        "https://www.openbible.com/text/1_samuel/9-10.htm"
+        "https://www.openbible.com/text/1_samuel/9-10.htm",
+        "Pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/11-1Ki-018-lowfat.xml, 1 Kings 18:44, word o110180440112; inherited ACAI source tags both person:GenericServant and person:Elijah"
       ],
       "remove_subject_referents": {
         "wlc": [
@@ -511,6 +524,9 @@
           ],
           [
             "o110180420052"
+          ],
+          [
+            "o110180440112"
           ]
         ]
       },
@@ -525,11 +541,12 @@
     {
       "source_id": "person:Messenger",
       "action": "amend_occurrences",
-      "reason": "2 Kings 10:5 names Jehu as recipient of a message; Jeremiah 11:1 names the prophet as recipient of the LORD's word. Neither proper-name word directly names a separate anonymous messenger. Distinguish the messenger in 2 Kings 10:8 and the actual prophet in Jeremiah.",
+      "reason": "2 Kings 10:5 names Jehu as recipient of a message; Jeremiah 11:1 names the prophet as recipient of the LORD's word. Neither proper-name word directly names a separate anonymous messenger. Distinguish the messenger in 2 Kings 10:8 and the actual prophet in Jeremiah. 2 Kings 10:8: exact original word o120100080102 is the speaking subject of person:Jehu.2 (Jehu commands the heads to be put in heaps after the messenger reports), not person:Messenger. Preserve the actual named speaker and the unaltered original source record.",
       "evidence": [
         "Pinned WLC 2 Kings 10:5 o120100050111 under explicit person:Jehu.2, and Jeremiah 11:1 o240110010051 under explicit person:Jeremiah.6; frozen Messenger indirect pointers",
         "https://classic.net.bible.org/passage.php?mode=text&passage=2ki+10%3A1-8",
-        "https://classic.net.bible.org/verse.php?book=Jer&chapter=11&verse=1"
+        "https://classic.net.bible.org/verse.php?book=Jer&chapter=11&verse=1",
+        "Pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/12-2Ki-010-lowfat.xml, 2 Kings 10:8, word o120100080102; inherited ACAI source tags both person:Messenger and person:Jehu.2"
       ],
       "remove_subject_referents": {
         "wlc": [
@@ -538,6 +555,9 @@
           ],
           [
             "o240110010051"
+          ],
+          [
+            "o120100080102"
           ]
         ]
       }
@@ -545,11 +565,12 @@
     {
       "source_id": "person:GenericMale",
       "action": "amend_occurrences",
-      "reason": "Daniel 10:7 explicitly distinguishes Daniel from unnamed other men, and Zechariah 1:7 explicitly names the prophet Zechariah. Their proper-name words do not refer to a separate anonymous generic man.",
+      "reason": "Daniel 10:7 explicitly distinguishes Daniel from unnamed other men, and Zechariah 1:7 explicitly names the prophet Zechariah. Their proper-name words do not refer to a separate anonymous generic man. Daniel 10:19: exact original word o270100190132 is the speaking subject of person:Daniel.3 (The Hebrew verb is first-person singular 'I said', spoken by Daniel), not person:GenericMale. Preserve the actual named speaker and the unaltered original source record.",
       "evidence": [
         "Pinned WLC Daniel 10:7 o270100070031 under person:Daniel.3; Zechariah 1:7 o380010070171 under person:Zechariah.17; frozen GenericMale source subject pointers",
         "https://www.biblegateway.com/verse/en/Daniel%2010%3A7",
-        "https://classic.net.bible.org/bible.php/d/b/o/verse.php?book=Zec&chapter=1&verse=7"
+        "https://classic.net.bible.org/bible.php/d/b/o/verse.php?book=Zec&chapter=1&verse=7",
+        "Pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/27-Dan-010-lowfat.xml, Daniel 10:19, word o270100190132; inherited ACAI source tags both person:GenericMale and person:Daniel.3"
       ],
       "remove_subject_referents": {
         "wlc": [
@@ -558,6 +579,9 @@
           ],
           [
             "o380010070171"
+          ],
+          [
+            "o270100190132"
           ]
         ]
       }
