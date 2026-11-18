@@ -1113,6 +1113,7 @@ jobs:
           print("No corrected OSIS or SWORD binary uploaded or published")
           PY
       - name: Install real Xiphos GUI dependencies in disposable runner
+        if: github.event_name == 'workflow_dispatch'
         id: install_corrected_xiphos
         shell: bash
         continue-on-error: true
@@ -1141,6 +1142,7 @@ jobs:
             }
           done
       - name: Observe real Xiphos with corrected private 25-link MHC (not hyperlink approval)
+        if: github.event_name == 'workflow_dispatch' && steps.install_corrected_xiphos.outcome == 'success'
         id: observe_corrected_xiphos
         shell: bash
         continue-on-error: true
@@ -1314,7 +1316,7 @@ jobs:
               raise SystemExit("INCONCLUSIVE_REAL_GUI_SELECTION: real commentary excerpts not verified")
           PY
       - name: Report corrected-MHC GUI status independently from native-source integrity
-        if: always()
+        if: always() && github.event_name == 'workflow_dispatch'
         shell: bash
         env:
           GUI_DEPS: ${{ steps.install_corrected_xiphos.outcome }}
