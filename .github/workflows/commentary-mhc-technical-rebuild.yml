@@ -1,0 +1,113 @@
+name: Rebuild MHC from pinned original OSIS (private technical phase 1)
+
+on:
+  pull_request:
+    paths:
+      - "scripts/rebuild_osis_commentary.py"
+      - "tests/test_rebuild_osis_commentary.py"
+      - ".github/workflows/commentary-mhc-technical-rebuild.yml"
+      - "config/commentary-intake/mhc-crosswire.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  private-stage1:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unit tests for source identity and safe OSIS reading
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p 'test_rebuild_osis_commentary.py' -v
+      - name: Install stock libSWORD compiler and native reader headers
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          timeout 240s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 \
+            install -y --no-install-recommends libsword-dev libsword-utils diatheke
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "$RUNNER_TEMP/commentary-native-raw" -lsword
+      - name: Download and verify exact official original authoring OSIS (never execute upstream scripts)
+        shell: bash
+        run: |
+          set -euo pipefail
+          export GIT_TERMINAL_PROMPT=0 GIT_LFS_SKIP_SMUDGE=1
+          timeout 240s git -c core.hooksPath=/dev/null clone \
+            --depth 1 --branch main --single-branch --no-tags \
+            https://gitlab.com/crosswire-bible-society/mhc.git \
+            "$RUNNER_TEMP/original-mhc" >/dev/null 2>&1
+          python - <<'PY'
+          from hashlib import sha256
+          import json, os, subprocess
+          from pathlib import Path
+          original=Path(os.environ["RUNNER_TEMP"])/"original-mhc"
+          manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
+          pin=manifest["commentary_source"]["original_authoring_osis"]
+          assert manifest["language"]=="en" and manifest["module_id"]=="MHC"
+          commit=subprocess.check_output(["git","-C",str(original),"rev-parse","HEAD"],text=True).strip()
+          if commit!=pin["observed_upstream_commit_sha"]:
+              raise SystemExit("Original authoring source Git commit changed; abort")
+          source=original/pin["authoring_osis_file"]
+          if (source.is_symlink() or source.stat().st_size!=pin["authoring_osis_bytes"]
+                  or sha256(source.read_bytes()).hexdigest()!=pin["authoring_osis_sha256"]):
+              raise SystemExit("MHC original OSIS size/SHA mismatch; abort")
+          print("Verified pinned official OSIS commit, exact bytes and checksum")
+          PY
+      - name: Compile fresh private zCom4, then independently read EVERY occupied key
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          export SWORD_PATH="$RUNNER_TEMP/mhc-stage1-private"
+          python - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
+          source=manifest["commentary_source"]["original_authoring_osis"]
+          root=Path(os.environ["RUNNER_TEMP"])
+          cmd=[sys.executable, "scripts/rebuild_osis_commentary.py",
+               "--source",str(root/"original-mhc"/source["authoring_osis_file"]),
+               "--sha256",source["authoring_osis_sha256"],
+               "--private-work",os.environ["SWORD_PATH"],
+               "--module","MHCStage1",
+               "--language",manifest["language"],
+               "--versification",manifest["commentary_source"]["observed_compiled_versification"],
+               "--native-reader",str(root/"commentary-native-raw"),
+               "--min-numbered","20000"]
+          with (root/"rebuild-mhc-stage1-report.json").open("xb") as report:
+              result=subprocess.run(cmd, stdout=report, stderr=subprocess.DEVNULL,
+                                    check=False, timeout=650)
+          if result.returncode:
+              raise SystemExit("Technical rebuild FAILED; no module uploaded or published")
+          data=json.loads((root/"rebuild-mhc-stage1-report.json").read_text())
+          if (data["status"]!="COMPILED_AND_FULL_NATIVE_INDEX_READBACK_ONLY"
+                  or data["editorial_text_changes_performed"] is not False
+                  or data["publication_or_release_performed"] is not False):
+              raise SystemExit("Unreviewed technical reconstruction receipt")
+          print("Private MHC stage 1 compiled with zCom4 and fully enumerated")
+          print("Native numbered entries:",data["native_occupied_numbered_keys"])
+          print("Native introduction entries:",data["native_occupied_introduction_keys"])
+          print("Native TOP entries:",data["native_occupied_opaque_top_keys"])
+          print("No historical source collations or editorial corrections performed")
+          print("Full source-to-output textual parity is NOT yet certified")
+          PY
+          if ! timeout 45s diatheke -b MHCStage1 -k "Gen 1:1" >/dev/null 2>&1; then
+            echo "Native CLI invocation failed; no technical acceptance"
+            exit 1
+          fi
+          echo "Private CLI invocation completed"
+      - name: No distribution or editorial phase in this workflow
+        if: always()
+        shell: bash
+        run: |
+          echo "Original OSIS, private zCom4 and reports are confined to runner ephemeral storage."
+          echo "No binaries, ZIPs or commentary text are uploaded as artifacts."
+          echo "Historical textual comparison and corrections are a distinct future phase."
