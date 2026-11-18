@@ -171,6 +171,162 @@ def generate(root: Path, ledger: dict, *, work_id: str,
     }
 
 
+
+# Full-canon *structural* export, deliberately separate from the old 24-chapter
+# pilot. No source hyperlink is silently copied or guessed in this mode.
+_CANON = ("Gen Exod Lev Num Deut Josh Judg Ruth 1Sam 2Sam 1Kgs 2Kgs 1Chr "
+          "2Chr Ezra Neh Esth Job Ps Prov Eccl Song Isa Jer Lam Ezek Dan Hos "
+          "Joel Amos Obad Jonah Mic Nah Hab Zeph Hag Zech Mal Matt Mark Luke "
+          "John Acts Rom 1Cor 2Cor Gal Eph Phil Col 1Thess 2Thess 1Tim 2Tim "
+          "Titus Phlm Heb Jas 1Pet 2Pet 1John 2John 3John Jude Rev").split()
+_HEADING = re.compile(r"(?m)^(#{2,5}) ([^\n]+?)\s*$")
+_FIELD = re.compile(r'^([a-z_][a-z0-9_]*): "([^"\r\n]*)"$')
+_SOURCE_ZIP = "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746"
+_SOURCE_CORPUS = "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e"
+
+
+def _modern_front(path: Path) -> tuple[dict, str]:
+    raw = path.read_text(encoding="utf-8")
+    if not raw.startswith("---\n") or "\n---\n" not in raw[4:]:
+        raise ValueError("Modern manuscript frontmatter absent: " + path.name)
+    head, rest = raw[4:].split("\n---\n", 1)
+    fields = {}
+    for line in head.splitlines():
+        if not line.strip():
+            continue
+        match = _FIELD.fullmatch(line)
+        if not match or match[1] in fields:
+            raise ValueError("Unexpected or duplicate modern manuscript field: " + path.name)
+        fields[match[1]] = match[2]
+    if "\n---\n" not in rest:
+        raise ValueError("Modern manuscript review delimiter absent: " + path.name)
+    prose, audit = rest.split("\n---\n", 1)
+    if not audit.strip() or any(x in prose for x in ("\x00", "\ufffd")):
+        raise ValueError("Missing editorial notes or invalid original manuscript Unicode")
+    return fields, prose
+
+
+def _modern_items(prose: str) -> list[dict]:
+    heads = list(_HEADING.finditer(prose))
+    if not heads or not re.search(r"(?m)^# [^\n]+$", prose[:heads[0].start()]):
+        raise ValueError("Missing canonical modern reading title/exposition sections")
+    lead = re.sub(r"(?m)^# [^\n]+$", "", prose[:heads[0].start()]).strip()
+    if lead:
+        raise ValueError("Unowned modern prose before the first section")
+    out = []
+    for i, h in enumerate(heads):
+        next_head = heads[i+1] if i+1 < len(heads) else None
+        body = prose[h.end():next_head.start() if next_head else len(prose)].strip()
+        heading = h[2].strip()
+        lower = heading.lower()
+        if lower.startswith("original ") or "book introduction" in lower:
+            kind = "prelude"
+        elif next_head and len(next_head[1]) > len(h[1]):
+            kind = "parent"
+        else:
+            kind = "leaf"
+        if kind == "leaf" and not body:
+            raise ValueError("Empty modern authorial exposition: " + heading)
+        out.append({"kind":kind, "title":heading, "body":body})
+    return out
+
+
+def _write_reading_blocks(parent: ET.Element, source: str) -> dict:
+    """Preserve authored paragraph/table/list ordering. Unsupported syntax stops."""
+    lines = source.splitlines()
+    counts = {"paragraphs":0, "tables":0, "table_cells":0, "lists":0}
+    i = 0
+    while i < len(lines):
+        line = lines[i].strip()
+        if not line:
+            i += 1
+            continue
+        if (line.startswith((">", "![", chr(96)*3, "~~~"))
+                or re.match(r"^#{1,6} ", line)):
+            raise ValueError("Unsupported Markdown block must not be silently flattened")
+        if line.startswith("|"):
+            if i+2 >= len(lines):
+                raise ValueError("Truncated original-outline Markdown table")
+            cols = [x.strip() for x in line.strip("|").split("|")]
+            rule = [x.strip() for x in lines[i+1].strip().strip("|").split("|")]
+            if (len(cols) < 2 or len(cols) != len(rule)
+                    or any(not re.fullmatch(r":?-{2,}:?", x) for x in rule)):
+                raise ValueError("Original-outline table delimiter/column drift")
+            table = ET.SubElement(parent, f"{{{NS}}}table",
+                                  {"resp":"BibleResourcesModernManuscriptNotNativeVerified"})
+            counts["tables"] += 1
+            i += 2
+            cells = [cols]
+            while i < len(lines) and lines[i].strip().startswith("|"):
+                row = [x.strip() for x in lines[i].strip().strip("|").split("|")]
+                if len(row) != len(cols):
+                    raise ValueError("Original-outline table row changed column count")
+                cells.append(row)
+                i += 1
+            if len(cells) < 2:
+                raise ValueError("Original-outline table lacks actual rows")
+            for row in cells:
+                element = ET.SubElement(table, f"{{{NS}}}row")
+                for value in row:
+                    _inline(ET.SubElement(element, f"{{{NS}}}cell"), value)
+                    counts["table_cells"] += 1
+            continue
+        if re.match(r"^[-*] ", line):
+            node = ET.SubElement(parent, f"{{{NS}}}list")
+            counts["lists"] += 1
+            while i < len(lines) and re.match(r"^[-*] ", lines[i].strip()):
+                item = ET.SubElement(node, f"{{{NS}}}item")
+                _inline(item, lines[i].strip()[2:].strip())
+                i += 1
+            continue
+        para=[]
+        while i < len(lines):
+            value = lines[i].strip()
+            if (not value or value.startswith(("|", ">", "![", chr(96)*3, "~~~"))
+                    or re.match(r"^(?:#{1,6}|[-*]) ", value)):
+                break
+            para.append(value)
+            i += 1
+        if not para:
+            raise ValueError("Unsupported Markdown cannot be exported without loss")
+        _inline(ET.SubElement(parent, f"{{{NS}}}p"), " ".join(para))
+        counts["paragraphs"] += 1
+    return counts
+
+
+def _original_intro_candidates(root: Path, receipt: dict) -> dict:
+    intros={}
+    candidates=sorted(root.glob("*-book-introduction.CANDIDATE.md"))
+    for path in candidates:
+        fields, prose = _modern_front(path)
+        book=fields.get("book_osis")
+        if (book in intros or book not in _CANON
+                or fields.get("source_module") != "MHCC 0.1.1"
+                or fields.get("source_zip_sha256") != _SOURCE_ZIP
+                or fields.get("source_native_corpus_sha256") != _SOURCE_CORPUS
+                or not fields.get("status","").startswith("PRODUCTION CANDIDATE")
+                or fields.get("source_native_intro_key") != "I:"+book+".1"):
+            raise ValueError("Unverified original chapter-I introduction candidate")
+        sources=[i for i in receipt["chapters"][book+".1"][
+            "native_introductions_not_assumed_to_be_exposition"]
+            if i["key"]==book+".1" and i["visible_word_tokens"]>=20]
+        if (len(sources)!=1 or sources[0]["raw_sha256"]!=
+                fields.get("source_native_intro_raw_sha256")):
+            raise ValueError("Modern introduction does not belong to original chapter-I")
+        title = re.search(r"(?m)^# ([^\n]+)$", prose)
+        if not title or not prose[title.end():].strip():
+            raise ValueError("Empty source-linked modern introduction")
+        intros[book]=(title[1],prose[title.end():].strip())
+    expected={x["key"].split(".",1)[0]
+              for c in receipt["chapters"].values()
+              for x in c["native_introductions_not_assumed_to_be_exposition"]
+              if x["key"].count(".")==1 and x["visible_word_tokens"]>=20
+              and c["source_placement"]!="INTRO_ONLY_NEEDS_INDEPENDENT_REVIEW"}
+    if set(intros)!=expected:
+        raise ValueError("Original chapter-I prefaces do not match candidates")
+    return intros
+
+
 def main():
     p=argparse.ArgumentParser()
     p.add_argument("--root",type=Path,required=True)
