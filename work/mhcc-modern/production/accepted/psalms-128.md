@@ -40,7 +40,7 @@ They and their families may enjoy the results of that labor.
 
 Those who fear the Lord and follow his ways are blessed regardless of social position.
 
-They may also receive great comfort through their family relationships and the good gifts God has promised.
+They will find abundant comfort in their family relationships and receive the good things God has promised and for which they pray.
 
 Yet a good person gains little lasting consolation from seeing grandchildren if there is **no peace for Israel**.
 
@@ -51,6 +51,8 @@ Beyond this life we will see far greater blessings: the **everlasting peace and 
 ---
 
 ## Editorial review — Psalm 128
+
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Restored Henry's strong assurance of *abundant comfort* in family relations rather than merely a possibility, and his explicit link to gifts both promised by God and prayed for by believers. This is a translation-fidelity correction to an unreleased manuscript, not an independent theological endorsement or source-native approval.
 
 **Complete CCEL source inspected:** [CCEL, Psalm 128](https://ccel.org/ccel/henry/mhcc.xx.cxxviii.html). Released `MHCC 0.1.1` remains authoritative for primary-native structure/links and independent QA.
 
