@@ -48,23 +48,28 @@ def checked_groups(groups, context):
 
 
 def apply_word_edits(entry, decision):
-    occurrence = entry["occurrences"]["explicit_instances"]
-    for corpus, groups in checked_groups(
-            decision.get("remove_explicit_instances", {}),
-            f"{entry['source_id']} removal").items():
-        present = occurrence.get(corpus, [])
-        for group in groups:
-            if group not in present:
-                raise ValueError(f"{entry['source_id']}: absent group cannot be removed: {group}")
-            present.remove(group)
-    for corpus, groups in checked_groups(
-            decision.get("add_explicit_instances", {}),
-            f"{entry['source_id']} addition").items():
-        present = occurrence.setdefault(corpus, [])
-        for group in groups:
-            if group in present:
-                raise ValueError(f"{entry['source_id']}: source group already exists: {group}")
-            present.append(group)
+    # Generic, reversible changes to exact source groups: no special cases
+    # for particular books, entity names, or types of referents.
+    for field in LINK_FIELDS:
+        occurrence = entry["occurrences"][field]
+        for corpus, groups in checked_groups(
+                decision.get(f"remove_{field}", {}),
+                f"{entry['source_id']} {field} removal").items():
+            present = occurrence.get(corpus, [])
+            for group in groups:
+                if group not in present:
+                    raise ValueError(
+                        f"{entry['source_id']}: absent group cannot be removed: {group}")
+                present.remove(group)
+        for corpus, groups in checked_groups(
+                decision.get(f"add_{field}", {}),
+                f"{entry['source_id']} {field} addition").items():
+            present = occurrence.setdefault(corpus, [])
+            for group in groups:
+                if group in present:
+                    raise ValueError(
+                        f"{entry['source_id']}: source group already exists: {group}")
+                present.append(group)
     references = entry["references"]
     for ref in decision.get("remove_references", []):
         if not isinstance(ref, str) or len(ref) != 8 or not ref.isdigit():
