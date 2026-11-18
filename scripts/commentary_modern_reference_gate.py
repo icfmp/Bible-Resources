@@ -677,6 +677,25 @@ def _unambiguous_explicit_modern_verse(section: ET.Element, target: str):
     return candidates[0] if len(candidates) == 1 else None
 
 
+def _unrecognized_original_ref_class(literal: str) -> str:
+    """Only classify syntax in metadata; never emit literal source osisRef."""
+    raw = literal[6:] if literal.startswith("Bible:") else literal
+    atom = r"[1-4]?[A-Za-z][A-Za-z0-9]*\.\d+\.\d+"
+    if re.fullmatch(atom + "-" + atom, raw):
+        return "full_verse_range"
+    if re.fullmatch(atom + r"-\d+", raw):
+        return "abbreviated_verse_range"
+    if re.fullmatch(atom + r"\s+" + atom + r"(?:\s+" + atom + ")*", raw):
+        return "space_joined_verses"
+    if re.fullmatch(atom + r"[;,]\s*" + atom + r"(?:[;,]\s*" + atom + ")*", raw):
+        return "punctuation_joined_verses"
+    if re.match(atom + r"-", raw):
+        return "other_range_syntax"
+    if re.search(r"[\s;,]", raw):
+        return "other_compound_syntax"
+    return "other_original_syntax"
+
+
 def _auto_single_verse_placements(*, private_original: dict, groups: dict,
                                   modern_chapters: dict, native: dict,
                                   blocked: set, corrections: dict):
@@ -685,6 +704,13 @@ def _auto_single_verse_placements(*, private_original: dict, groups: dict,
     found = []
     skipped = {"already_reviewed": 0, "proposed_original_correction": 0,
                "unsupported_original_reference_syntax": 0,
+               "unrecognized_format_full_verse_range":0,
+               "unrecognized_format_abbreviated_verse_range":0,
+               "unrecognized_format_space_joined_verses":0,
+               "unrecognized_format_punctuation_joined_verses":0,
+               "unrecognized_format_other_range_syntax":0,
+               "unrecognized_format_other_compound_syntax":0,
+               "unrecognized_format_other_original_syntax":0,
                "repeated_original_target": 0, "unverified_or_single_digit_label": 0,
                "no_unique_full_modern_verse_citation": 0}
     for first, links in private_original.items():
@@ -718,6 +744,8 @@ def _auto_single_verse_placements(*, private_original: dict, groups: dict,
             canon = targets[pos-1]
             if canon is None:
                 skipped["unsupported_original_reference_syntax"] += 1
+                syntax = _unrecognized_original_ref_class(literal)
+                skipped["unrecognized_format_"+syntax] += 1
                 continue
             if targets.count(canon) != 1:
                 skipped["repeated_original_target"] += 1
