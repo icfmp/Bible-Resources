@@ -174,6 +174,31 @@ class EntityIndexTests(unittest.TestCase):
         self.assertEqual(hits["wlc:o120140130162"],[
             {"entity_id":"person:JoashIsrael","link_type":"subject_referents"}])
         self.assertEqual((father.read_bytes(),king.read_bytes()),original)
+        source_alias=self.write_record(
+            "people","JehoashJudah",primary_id="person:JoashJudah",
+            references=["12014013"],
+            explicit_instances={"wlc":[["o120140130101"]]},
+            subject_referents={"wlc":[["o120140130162"]]})
+        alias_bytes=source_alias.read_bytes()
+        alias_correction={
+            "source_id":"person:JehoashJudah",
+            "action":"amend_occurrences",
+            "reason":"A name-form alias also claimed the other king",
+            "evidence":["Pinned 2 Kings 14:13 two identical name forms"],
+            "remove_explicit_instances":{"wlc":[["o120140130101"]]},
+            "add_explicit_instances":{"wlc":[["o120140130061"]]},
+            "remove_subject_referents":{"wlc":[["o120140130162"]]},
+        }
+        alias_result=self.build(decisions+[alias_correction])
+        alias_hits=alias_result["by_word"]["wlc:o120140130061"]
+        self.assertEqual(
+            {h["entity_id"] for h in alias_hits},
+            {"person:JoashJudah","person:JehoashJudah"})
+        self.assertTrue(all(h["link_type"]=="explicit_instances" for h in alias_hits))
+        canonical={e["id"]:e["canonical_id"] for e in alias_result["entities"]}
+        self.assertEqual(canonical["person:JehoashJudah"],"person:JoashJudah")
+        self.assertEqual(source_alias.read_bytes(),alias_bytes)
+
 
     def test_homonymous_judas_relative_and_jesus_speech_are_not_merged(self):
         first=self.write_record(
