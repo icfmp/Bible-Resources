@@ -138,6 +138,66 @@ with *different* exact lemmas inside one Strong family, rejection of identical
 homograph and same-consonant entries, nonverb class exclusions, and prevention
 of cross-edition `sdbh` collisions.
 
+## Coverage within the attested headword inventory (UBS 0.9.4)
+
+The original WLC denominator must remain available, but an edition-specific
+crosswalk should not be penalized for a headword **not identifiable anywhere
+in this dictionary edition**. The complete pinned 7,943-entry UBS EN/FR
+headword inventory was compared against every one of the 9,181 currently
+unresolved WLC lexical-class occurrences—not just their Strong identifiers.
+
+For this calculation, a source occurrence is considered **outside the
+verifiable indexed UBS headword scope** only if all three checks fail:
+
+1. The original same-language H/A numeric Strong family does not occur in
+   any UBS 0.9.4 headword.
+2. The source's exact NFC original lemma does not occur among *any* UBS
+   headwords, including entries indexed under another Strong number.
+3. The source's Hebrew consonants do not match any UBS headword after
+   removing vowel/cantillation signs **while preserving shin/sin dots**.
+
+This is **an operational headword-inventory test**, not a claim that the
+word or its meaning cannot occur in the prose of a dictionary definition,
+under a more remote orthographic variant or in a different edition. No
+entry is invented or omitted from the original source corpus.
+
+| Outcome on still-unresolved WLC lexical occurrences | Occurrences |
+| --- | ---: |
+| No compatible UBS Strong family or indexed headword spelling | **5,954** |
+| Indexed headword evidence under a *different* Strong number | 2,202 |
+| Same Strong family exists; original lexical identity unresolved | 1,023 |
+| Unreadable or complex source code | 2 |
+| **Total unresolved on the original corpus** | **9,181** |
+
+In particular, **5,412** unmatched Hebrew occurrences of `כֹּל`
+(H3605) have neither H3605 nor a matching indexed UBS Hebrew headword
+in this pinned edition. Contrast `אַל`, `כֹּה`, and `עוֹד`:
+their source Strong family is absent, but *another* UBS headword
+shares the same consonantal spelling. They are **retained for review**
+rather than declared absent. The 2,202 cross-Strong headword candidates
+must never be silently treated as equivalent entries.
+
+### Two denominators, explicitly separated
+
+| Metric for MACULA classes noun/verb/adj/adv/num | Occurrences |
+| --- | ---: |
+| Original source corpus | **248,680** |
+| UBS-linked WLC occurrences, unchanged | **239,499** |
+| Not attested in UBS's indexed headword inventory under checked criteria | **5,954** |
+| UBS-indexed-headword-scope denominator | **242,726** |
+| Still unresolved **within this scope** | **3,227** |
+| Full-source lexical coverage (retained) | **96.308%** |
+| **UBS indexed-headword-scope coverage** | **98.671%** |
+
+The generated index retains `coverage` (all original WLC occurrences),
+`coverage_with_word_ids` (all word-anchored links), and adds
+`coverage_scope` (this edition-specific denominator and explicit exclusion
+criteria). The reproducible [scope audit](audit_dictionary_scope.py)
+provides the top original word/Strong examples and per-class diagnostics;
+[test_dictionary_scope.py](test_dictionary_scope.py) guards against
+mistaking an alternate Strong for dictionary absence. The CI checks the
+complete count conservation before accepting the generated snapshot.
+
 ## Source integrity and test workflow
 
 - [build_index.py](build_index.py) produces `index.json`, preserving `by_sdbh` and `by_strong`, adding `by_entry_strong_family` for corroboration and retaining full coverage statistics. The generated index never contains dictionary definitions.
@@ -145,7 +205,7 @@ of cross-edition `sdbh` collisions.
 - [audit_unmatched.py](audit_unmatched.py) categorizes unresolved original rows; [audit_variants.py](audit_variants.py) reports source morphology and lexical-class coverage.
 - [audit_lexical_gaps.py](audit_lexical_gaps.py) groups unresolved lexical occurrences by original language/lemma; [audit_top_lemmas.py](audit_top_lemmas.py) examines frequent problem families.
 - [audit_strong_reconciliation.py](audit_strong_reconciliation.py) reconstructs the **review-only** candidate report. Its original word-ID witnesses allow review without inventing entries.
-- [test_index.py](test_index.py), [test_lexical_gaps.py](test_lexical_gaps.py), [test_strong_reconciliation.py](test_strong_reconciliation.py), and [test_word_anchored.py](test_word_anchored.py) include offline synthetic regression tests.
+- [test_index.py](test_index.py), [test_lexical_gaps.py](test_lexical_gaps.py), [test_strong_reconciliation.py](test_strong_reconciliation.py), [test_word_anchored.py](test_word_anchored.py), and [test_dictionary_scope.py](test_dictionary_scope.py) include offline synthetic regression tests.
 - The [GitHub Actions workflow](../../../../.github/workflows/bsi-ubs-hebrew.yml) verifies the exact pinned sources, runs all audits, regenerates both committed JSON datasets, and compares them deterministically. It operates in **read-only mode** after the validated source snapshot is committed.
 
 The original source annotations and original WLC IDs are never rewritten. The next appropriate step is **edition-aware lexical reconciliation with an editorially validated sense policy**, not assuming numeric `LEXID` equality is a semantic guarantee.
