@@ -207,6 +207,42 @@
         "Pinned Macula WLC GEN 36:26 o010360260031 has Hebrew lemma דִּישָׁן (Dishan), not assumed a Dishon identity in this edit",
         "Inherited ACAI #75 exact-person token collisions; our derived-index audit #307"
       ]
+    },
+    {
+      "source_id": "person:Bebai",
+      "action": "amend_occurrences",
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o150080110051"
+          ]
+        ]
+      },
+      "reason": "In Ezra 8:11, the first exact name token o150080110021 belongs to the phrase 'of the sons of Bebai', describing the older family/clan ancestor listed in Ezra 2:11 and Nehemiah 7:16; the second exact name token o150080110051 belongs to the separate phrase 'Zechariah son of Bebai'. The pinned ACAI source already distinguishes person:Bebai from person:Bebai.2, but assigns both tokens to both entries. Keep the ancestry token and remove only the misattributed father-name token from this first entry.",
+      "evidence": [
+        "Pinned Macula Hebrew WLC Ezra 8:11: o150080110013 'sons/descendants' plus o150080110021 'Bebai'; separate o150080110041 'son' plus o150080110051 'Bebai'",
+        "Pinned ACAI person:Bebai references Ezra 2:11, Ezra 8:11, Ezra 10:28, Nehemiah 7:16; its explicit word references both Ezra 8:11 names",
+        "Pinned ACAI person:Bebai.2 explicitly relates to person:Zechariah.19 as father, and is distinct in the source",
+        "Bible-Resources #299 / inherited ACAI #75: direct person-name token collision audit"
+      ]
+    },
+    {
+      "source_id": "person:Bebai.2",
+      "action": "amend_occurrences",
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o150080110021"
+          ]
+        ]
+      },
+      "reason": "In Ezra 8:11, the second name token o150080110051 specifically follows 'Zechariah son of', referring to the separate Bebai recorded by ACAI as father of Zechariah. The earlier word o150080110021 occurs in the clan expression 'sons of Bebai'. As the imported source models those as two distinct people, the two separate occurrences must not both be assigned to the father's record without independent evidence that they describe the same individual. Preserve the true father-name token and all original source fields.",
+      "evidence": [
+        "Pinned WLC Ezra 8:11: o150080110021 in 'sons of Bebai', o150080110051 following 'Zechariah son of'",
+        "Pinned ACAI person:Bebai.2 offspring=[person:Zechariah.19], explicit_instances.wlc contains both tokens",
+        "Intra-source identity separation: person:Bebai and person:Bebai.2 use different canonical IDs and roles; no conflation by matching spelling",
+        "Bible-Resources #299 / inherited ACAI #75: distinct original-word occurrence review"
+      ]
     }
   ]
 }
