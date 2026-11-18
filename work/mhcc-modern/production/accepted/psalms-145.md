@@ -63,7 +63,7 @@ He is present everywhere, yet in a special way **near to those who call upon him
 
 By faith he lives within their hearts, and they remain in him.
 
-He comes near in every hour of need.
+He comes near in every hour of need, so that those who call upon him in truth and sincerity may receive what they ask and find what they seek.
 
 He has taught them to love his name and holy ways.
 
@@ -74,6 +74,8 @@ May we love his name, obey his ways and pray that **all humanity will praise his
 ---
 
 ## Editorial review — Psalm 145
+
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Restored Henry's particular promise that sincere petitioners may *receive what they ask and find what they seek*. The earlier draft reduced this to general divine nearness and help. This is the commentator's claim, not a new promise inserted into biblical text; original-native and independent approval remain outstanding.
 
 **Complete secondary English source read:** [CCEL, Psalm 145](https://ccel.org/ccel/henry/mhcc.xx.cxlv.html). Published `MHCC 0.1.1` remains the source authority, native key/markup and independent SWORD acceptance pending.
 
