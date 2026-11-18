@@ -516,6 +516,7 @@ jobs:
             --reviewed-link-placement-manifest work/mhcc-modern/production/MODERN_OSIS_REVIEWED_LINK_PLACEMENTS.json \
             --auto-source-matched-single-verses \
             --auto-source-matched-same-chapter-ranges \
+            --auto-original-first-K-outline-links \
             --linked-osis "$RUNNER_TEMP/mhcc-modern-complete-bounded-linked.osis.xml" \
             --report "$RUNNER_TEMP/mhcc-modern-complete-bounded-linked-osis-structure.json"
           python - <<'PY'
@@ -529,6 +530,10 @@ jobs:
           assert report["modern_chapters_preserved"] == 1189
           assert report["modern_inline_links_inserted"] > 536
           assert report["automatic_source_matched_references"]["automatically_inserted_ranges"] > 0
+          assert report["modern_original_outline_links_inserted"] > 0
+          assert report["automatic_source_matched_references"]["automatically_inserted_outline_links"] == (
+              report["modern_original_outline_links_inserted"])
+          assert report["modern_chapter_I_outline_groups_with_links"] > 0
           assert report["modern_inline_links_inserted"] == (39 +
               report["automatic_source_matched_references"]["automatically_inserted"])
           assert report["actual_original_links_copied_without_correction"] == 30
@@ -551,7 +556,9 @@ jobs:
                 str(report["modern_inline_links_inserted"]) +
                 " source-backed links, including 39 reviewed occurrences and " +
                 str(report["automatic_source_matched_references"]["automatically_inserted"]) +
-                " conservative exact source-linked singletons and ranges; 1204 NOT fully linked")
+                " conservative exact matches, including " +
+                str(report["modern_original_outline_links_inserted"]) +
+                " source-attested original outline links; 1204 NOT fully linked")
           PY
       - name: Compile private source-matched whole-canon OSIS and attest exact native SWORD targets
         shell: bash
@@ -584,21 +591,40 @@ jobs:
           from sword_native_raw_corpus_inventory import parse_native_raw_corpus
           base=Path(os.environ["RUNNER_TEMP"])
           report=json.loads((base/"mhcc-modern-complete-bounded-linked-osis-structure.json").read_text())
-          expected={
+          expected_K={
               r["original_source_first_key"]: {
                   "targets":r["source_linked_modern_osisRef_hashes_in_actual_document_order"],
                   "labels":r["source_linked_modern_label_hashes_in_actual_document_order"],
               } for r in report["linked_source_K_groups_with_exact_derived_target_order"]
           }
-          assert len(expected)==report["source_K_groups_with_links_inserted"]
-          assert sum(len(v["targets"]) for v in expected.values())==report["modern_inline_links_inserted"]
-          assert all(len(v["targets"])==len(v["labels"]) for v in expected.values())
-          seen={}
+          expected_I={
+              r["modern_chapter"]: {
+                  "targets":r["modern_intro_osisRef_hashes_in_actual_document_order"],
+                  "labels":r["modern_intro_label_hashes_in_actual_document_order"],
+              } for r in report[
+                  "linked_modern_chapter_I_outline_groups_with_exact_derived_order"]
+          }
+          assert len(expected_K)==report["source_K_groups_with_links_inserted"]
+          assert len(expected_I)==report["modern_chapter_I_outline_groups_with_links"]
+          assert sum(len(v["targets"]) for v in expected_K.values())+sum(
+              len(v["targets"]) for v in expected_I.values())==report["modern_inline_links_inserted"]
+          assert all(len(v["targets"])==len(v["labels"]) for v in (
+              list(expected_K.values())+list(expected_I.values())))
+          seen_K={}
+          seen_I={}
           def observe(kind,key,raw):
-              if kind!="K" or key not in expected:
+              if kind=="K":
+                  expected=expected_K
+                  seen=seen_K
+              elif kind=="I":
+                  expected=expected_I
+                  seen=seen_I
+              else:
+                  return
+              if key not in expected:
                   return
               if key in seen:
-                  raise ValueError("Duplicated private SWORD readback K body")
+                  raise ValueError("Duplicated private SWORD K or I link entry")
               node=ET.fromstring(b"<derived>"+raw+b"</derived>")
               links=[v for v in node.iter() if
                      isinstance(v.tag,str) and v.tag.rsplit("}",1)[-1]=="reference"]
@@ -606,15 +632,15 @@ jobs:
               labels=["".join(v.itertext()) for v in links]
               if (any(not isinstance(t,str) or not t for t in values)
                       or any(not label for label in labels)):
-                  raise ValueError("Private compiled SWORD lost reviewed link or visible label")
+                  raise ValueError("Private compiled SWORD lost exact source-linked reference or label")
               actual_targets=[hashlib.sha256(t.encode("utf-8")).hexdigest()
                               for t in values]
               actual_labels=[hashlib.sha256(t.encode("utf-8")).hexdigest()
                              for t in labels]
               if (actual_targets!=expected[key]["targets"]
                       or actual_labels!=expected[key]["labels"]):
-                  raise ValueError("Private compiled SWORD changed repeated occurrences, "
-                                   "original source-link destinations, order or modern labels")
+                  raise ValueError("Private compiled SWORD changed K/I original "
+                                   "hyperlink targets, multiplicity, order or modern visible labels")
               seen[key]=len(links)
           env=os.environ.copy()
           env["SWORD_PATH"]=str((base/"mhcc-bounded-linked-root").resolve())
@@ -629,7 +655,8 @@ jobs:
           finally:
               if proc.poll() is None:
                   proc.kill();proc.wait()
-          assert set(seen)==set(expected)
+          assert set(seen_K)==set(expected_K)
+          assert set(seen_I)==set(expected_I)
           source=json.loads((base/"mhcc-modern-whole-canon-native-receipt.json").read_text())
           ionly=json.loads(Path(
               "work/mhcc-modern/production/IONLY_CHAPTER_LINK_PREVIEW.json"
@@ -643,12 +670,15 @@ jobs:
               intended.update(ch+"."+str(v) for v in range(1,row["verse_count"]+1))
           assert len(intended)==28792
           assert set(numbered)==intended and len(numbered)==28792
-          assert sum(seen.values())==report["modern_inline_links_inserted"]
+          assert (sum(seen_K.values())+sum(seen_I.values())
+                  ==report["modern_inline_links_inserted"])
           proof={
               "status":"PRIVATE_FULL_CANON_SOURCE_MATCHED_LINKS_COMPILED_SWORD_NATIVE_TARGETS_PASS",
               "compiled_native_K_address_count":len(numbered),
-              "reviewed_original_link_section_targets_verified":len(seen),
-              "reviewed_original_link_occurrences_verified":sum(seen.values()),
+              "reviewed_original_link_K_sections_verified":len(seen_K),
+              "reviewed_original_link_chapter_I_outline_sections_verified":len(seen_I),
+              "reviewed_original_link_occurrences_verified":sum(seen_K.values())+sum(seen_I.values()),
+              "compiled_original_source_outline_links_verified":sum(seen_I.values()),
               "source_repeated_links_and_modern_order_preserved":True,
               "modern_link_labels_sha256_identical_after_native_compilation":True,
               "exact_28792_original_plus_I_only_indexed_keys_preserved":True,
@@ -664,8 +694,11 @@ jobs:
           (base/"mhcc-modern-source-matched-links-native-SWORD-readback.json").write_text(
               json.dumps(proof,indent=2,sort_keys=True)+"\n",encoding="utf-8")
           print("PRIVATE COMPILED MHCC SOURCE-MATCHED LINKS PASS " +
-                str(sum(seen.values())) +
-                " exact targets and visible labels in 28792 exact original/I-only keys; NO release")
+                str(sum(seen_K.values())+sum(seen_I.values())) +
+                " exact targets and visible labels, of which " +
+                str(sum(seen_I.values())) +
+                " are source-authenticated modern chapter-I outline links; "
+                "28792 exact original/I-only numbered K keys; NO release")
           PY
       - name: Diagnose full 4049 authored modern OSIS text bodies through compiled private native SWORD
         shell: bash
