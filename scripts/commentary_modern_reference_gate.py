@@ -818,16 +818,21 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         nth = next(i for i,u in enumerate(units) if u["first_key"]==first)
         scope = modern_chapters[ch].findall(
             f"./{{{NS}}}div[@annotateType='commentary']")[nth]
-        targets = [v.attrib.get("osisRef") for v in scope.iter()
-                   if v.tag == f"{{{NS}}}reference"]
+        nodes = [v for v in scope.iter()
+                 if v.tag == f"{{{NS}}}reference"]
+        targets = [v.attrib.get("osisRef") for v in nodes]
+        labels = ["".join(v.itertext()) for v in nodes]
         expected_count = sum(row["source_first_key"] == first for row in proposed)
         if (len(targets)!=expected_count or
-                any(not isinstance(t,str) or not t for t in targets)):
+                any(not isinstance(t,str) or not t for t in targets)
+                or any(not label for label in labels)):
             raise ValueError("Grouped modern source-linked occurrence count changed")
         modern_groups.append({
             "original_source_first_key":first,
             "source_linked_modern_osisRef_hashes_in_actual_document_order":[
                 hashlib.sha256(t.encode("utf-8")).hexdigest() for t in targets],
+            "source_linked_modern_label_hashes_in_actual_document_order":[
+                hashlib.sha256(label.encode("utf-8")).hexdigest() for label in labels],
             "modern_link_occurrences":len(targets)
         })
     if sum(r["modern_link_occurrences"] for r in modern_groups) != len(proposed):
