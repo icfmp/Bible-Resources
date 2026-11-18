@@ -227,3 +227,17 @@ This is confirmed visibility in one command-line SWORD frontend for
 representative cases, **not blanket Xiphos, AndBible or Bible application
 reader acceptance** and not editorial signoff. The note text itself was
 not exported into public workflow logs.
+
+## Source-authenticated contextual relocation experiment — 2026-11-18
+
+At [real full-canon CI #44347371308](https://github.com/icfmp/Bible-Resources/actions/runs/44347371308) (**SUCCESS**; Validate and tool registry also green), the separate private reference-context edition was compiled and independently read back through actual SWORD. Original SHA-pinned native K raw bodies were inspected in private to obtain 180-character text neighborhoods before/after each source link. Two strictly conservative context finders were applied only to the **176 legitimate source-only reference notes** (not the four wrong-target links):
+
+1. A unique distinctive **5–8-word exact adjoining phrase** in the modern source-owned exposition: **0** safe relocations.
+2. A unique, strongly supported **paragraph-level lexical correspondence** between the original near-link context and modern prose (at least six uncommon shared terms and 64% coverage of at least seven source terms, without competing paragraph): **1** tentative paragraph-local source-only note, **not** an authorial inline hyperlink or evidence of exact original link placement.
+
+**Result: 1 / 176 provisionally grouped with a matching modern paragraph; 175 / 176 remain in original K-section source-only notes.** The newly associated link is retained as a visibly marked *source-provenance note*, not silently attached to a word. Private receipt records its source K, ordinal, original literal-target SHA and label SHA and match class (no source prose exported).
+
+The additional private SWORD `MHCCCONTEXT` roundtrip verified **all 176/176** original literal source link target and display identities, plus **28,792/28,792** native numbered K keys; the underlying 1,189 modern chapter manuscripts, original 0.1.1 SWORD, conservative 176-note candidate and separate four-errata proposal edition remain unchanged. The four defective links are never eligible for context relocation. Four synthetic regression tests plus two lexical-specific tests cover duplicate target protection, source errata exclusion, ambiguity and modern prose nonmutation.
+
+**Important limitation:** because the modernization substantially rephrased the historical English source, literal/fuzzy word-based automatic correspondence is *not* adequate for most of the 176 source references. The remaining work is **individual original-source to modern-translation semantic alignment, including the source-reference location in its sentence**, with reviewed exact inline anchor decisions where justified. No automatic nearest-text anchoring should be represented as authorial inline fidelity. No release, approval, or PR merge.
+
