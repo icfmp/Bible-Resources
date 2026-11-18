@@ -362,13 +362,19 @@ jobs:
               ("o160070630081","person:Barzillai.3"),
               ("o160070630121","person:Barzillai"),
               ("o140220060161","person:Jehoram"),
-              ("o140220060221","person:Joram.3"),
           ):
               assert index["by_word"]["wlc:"+word]==[{
                   "entity_id":person,"link_type":"explicit_instances"}],word
-          assert index["by_word"]["wlc:o140220060281"]==[{
-              "entity_id":"person:Joram.3",
-              "link_type":"pronominal_referents"}]
+          # Frozen ACAI has *two* source records for Israel's Joram
+          # (Jehoram.3 + Joram.3), but only one canonical person.
+          israelite_aliases={"person:Joram.3","person:Jehoram.3"}
+          for word,link in (
+              ("o140220060221","explicit_instances"),
+              ("o140220060281","pronominal_referents"),
+          ):
+              hits=index["by_word"]["wlc:"+word]
+              assert {x["entity_id"] for x in hits}==israelite_aliases,(word,hits)
+              assert all(x["link_type"]==link for x in hits),(word,hits)
           print("ENTITY_INDEX_QA", json.dumps(stats, sort_keys=True))
           PY
 
