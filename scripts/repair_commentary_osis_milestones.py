@@ -121,15 +121,19 @@ def repair_private_bytes(original: bytes, plan: dict) -> tuple[bytes,dict]:
         raise MilestoneRepairError("Missing source opener or paired closer")
     # A repaired shared boundary must be confirmed against the earlier
     # authored source marker, not inferred from a numeric coincidence.
-    all_starts={
-        n.get("sID"):n for n in source.iter()
-        if isinstance(n.tag,str) and _local(n)=="verse" and n.get("sID")
-    }
+    all_starts={}
+    positions={}
+    for ordinal,n in enumerate(source.iter()):
+        positions[n]=ordinal
+        if isinstance(n.tag,str) and _local(n)=="verse" and n.get("sID"):
+            if n.get("sID") in all_starts:
+                raise MilestoneRepairError("Duplicate source opener prevents proving overlap")
+            all_starts[n.get("sID")]=n
     for sid,(op,_old,_new) in planned.items():
         if "new_start_verse" not in op:
             continue
         preceding=all_starts.get(op["overlap_predecessor_sid"])
-        if preceding is None or preceding.sourceline>=opening[sid].sourceline:
+        if preceding is None or positions[preceding]>=positions[opening[sid]]:
             raise MilestoneRepairError("Missing earlier authored overlap predecessor")
         shared=sid.rsplit(".",1)[0]+"."+str(START.fullmatch(sid).group(3))
         predecessor_tokens=(preceding.get("osisID") or "").split()
