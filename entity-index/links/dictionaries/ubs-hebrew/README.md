@@ -67,7 +67,7 @@ A further **12,385** lexical occurrences have no such joint evidence, and 2 lack
 
 ## Verified improvement: original-word-anchored headword links
 
-The pinned WLC source and UBS Hebrew 0.9.4 confirm **7,588 additional
+The pinned WLC source and UBS Hebrew 0.9.4 confirm **10,483 additional
 entry-only links** beyond the conservative four-field lookup. The word-aware
 path is deliberately **not** an alias from unsuffixed Strong to suffixed
 Strong: such a rule could conflate homonyms.
@@ -77,13 +77,31 @@ MACULA WLC source word:
 
 1. Its ordinary exact source `sdbh`/Strong lookup has no UBS entry.
 2. Its original source class is `noun`, `verb`, `adj`, `adv`, or `num`.
-3. Its exact NFC lemma equals the UBS headword's original lemma.
-4. Its H/A numeric Strong family and identical NFC original lemma identify
-   **exactly one UBS headword**. Other entries in the same Strong family are
-   allowed only if they have *different* lemmas. If multiple UBS entries share
-   the same lemma within that family, the original homograph remains unresolved.
+3. Its exact NFC lemma matches UBS **or**, for verbs only, the original
+   Hebrew consonants match after removing vowel/cantillation marks while
+   **preserving shin versus sin dots**. This is not generalized to nouns,
+   adjectives, adverbs or numerals.
+4. Its H/A numeric Strong family plus the relevant lemma form identify
+   **exactly one UBS headword**. If multiple UBS entries match the same
+   consonantal form, the homograph remains unresolved.
 5. Its **original complete MACULA word ID** is retained; source lemma,
    Strong code, and language must also match at lookup.
+
+The verb-only orthographic step added **2,895** entries beyond the prior
+7,588 exact-NFC lemma matches. Examples from original WLC words and pinned UBS
+headwords include `יָלַד` → `ילד` (H3205), `חָטָא` → `חטא` (H2398)
+and `זָכַר` → `זכר` (H2142). Consonant identity alone is **never**
+considered sufficient: the original word ID, Hebrew/Aramaic Strong numeric
+family, original WLC class `verb` and a unique UBS candidate must all agree.
+Shin and sin marks remain meaningful, and multiple matching UBS headwords
+are explicitly rejected. The added link is **entry-only**; no original
+`sdbh` is translated or assumed to preserve its sense between editions.
+
+The full-source [orthography audit](audit_orthography_gaps.py) identified
+12,387 originally unresolved selected lexical-class occurrences. After the
+verb-only corrections, **9,492** remain, with many lacking any matching
+UBS Strong family (including `כֹּל` H3605). Other classes and ambiguous
+same-consonant forms remain untouched pending stronger evidence.
 
 The new `lookup_word(index, word_id, sdbh, strongnumberx, lang, lemma)`
 accepts that original word identity and returns **entry-only** evidence
@@ -94,11 +112,11 @@ for callers that do not have WLC word IDs.
 
 | Measure | Generic exact-source path | Original-word-aware path |
 | --- | ---: | ---: |
-| WLC occurrences with a candidate UBS headword | 257,038 | **264,626** |
-| Additional unique-source headword links | — | **7,588** |
+| WLC occurrences with a candidate UBS headword | 257,038 | **267,521** |
+| Additional unique-source headword links | — | **10,483** |
 | WLC occurrences with Strong-corroborated SDBH sense IDs | 30,492 | **30,492** |
-| Selected lexical-class occurrences with an UBS headword | 228,705 | **236,293** |
-| Selected lexical-class coverage | 91.97% | **95.02%** |
+| Selected lexical-class occurrences with an UBS headword | 228,705 | **239,188** |
+| Selected lexical-class coverage | 91.97% | **96.18%** |
 
 Both paths remain pinned to the **same unmodified UBS and MACULA editions**.
 The word-anchored path is an opt-in query using a frozen original MACULA
@@ -109,7 +127,7 @@ dictionary prose is unchanged.
 The generator now stores `by_macula_word` plus
 `coverage_with_word_ids` in [index.json](index.json); the
 [full original-corpus CI](../../../../.github/workflows/bsi-ubs-hebrew.yml)
-rebuilds both and verifies **7,588** new links and **264,626**
+rebuilds both and verifies **10,483** new links and **267,521**
 word-aware candidates. [test_word_anchored.py](test_word_anchored.py)
 tests source identity isolation, H/A separation, disambiguation of entries
 with *different* exact lemmas inside one Strong family, rejection of identical
