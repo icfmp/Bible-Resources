@@ -134,6 +134,20 @@ class SharedCommentaryScopeTests(unittest.TestCase):
                 source_commentary_reviewed_shared_key_plan(
                     original,candidate,invalid,pinned_original_sha256=pin)
         self.assertNotIn("L'interprétation",json.dumps(result))
+        # A legitimate editorial decision may deliberately attach the whole
+        # boundary verse to the second section, without deleting a single
+        # source word from the original first section.
+        whole_verse=source_commentary_reviewed_shared_key_plan(
+            original,candidate,dict(plan,retain_original_overlaps=[]),
+            pinned_original_sha256=pin)
+        self.assertEqual(whole_verse["reader_multiowner_verse_count"],1)
+        self.assertEqual(whole_verse["non_reader_shared_source_index_ranges"],1)
+        self.assertEqual(
+            [item["bible_verse_key"]
+             for item in whole_verse["reader_multiowner_verses"]],
+            ["2Chr.1.1"])
+        self.assertEqual(
+            candidate["shared_verses"][0]["original_independent_section_count"],2)
 
     def test_nonoverlapping_source_has_no_synthetic_shared_verse(self):
         a=[self.groups[0],dict(self.groups[1],keys=("Rom.4.18",),
