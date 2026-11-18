@@ -233,6 +233,30 @@ to renumber the passage. Exact source-versification comparison reports
 are produced separately. All original source annotations, references,
 repeated groups and manuscripts remain unchanged.
 
+## Original-language context for 18 missing WLC subject pointers
+
+The full pinned Macula word audit confirms **18 inherited Hebrew
+`subject_referents` original-word IDs are absent** (19 original
+assignments). Their exact IDs are already excluded from active word
+lookup; no verse, source annotation group or Bible text was altered.
+
+CI now runs the **pre-existing** read-only ACAI
+`triage_missing_hebrew_subjects.py` against the same pinned WLC TSV
+and source-absence receipt. The QA-only
+`hebrew-missing-neighbor-review.json` records the four nearest
+*actually attested* words from the **same verse**, distinguishing
+neighbors with the same original-word position prefix from others.
+This helps identify possible **source segmentation differences**,
+but does not prove that a missing fourth segment should instead
+refer to one of the first three segments.
+
+The compiler rejects manifest drift, duplicate/missing findings,
+incompatible verses and unexpected source outputs. Its audit report
+explicitly refuses to infer replacement words or new entity
+identities. The full set of 18 remains in the original source
+for historical provenance and in the derived missing-ID metadata;
+all 18 remain absent from consumer-facing exact lookup.
+
 ## Pinned-source original-word absence protection
 
 The independent index must not present a missing original word ID as if the
