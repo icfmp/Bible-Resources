@@ -23,24 +23,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: TEMPORARY deterministic registry snapshot to reconcile generated files
-        shell: bash
-        run: |
-          set -euo pipefail
-          python scripts/tool_registry.py --write
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          for name in ("docs/TOOL_REGISTRY.json","docs/TOOL_REGISTRY.md"):
-              text=Path(name).read_text(encoding="utf-8")
-              chunks=[text[i:i+8000] for i in range(0,len(text),8000)]
-              print("REGISTRY_SNAPSHOT_METADATA "+json.dumps({
-                  "path":name,"chunks":len(chunks),"length":len(text)}))
-              for index,chunk in enumerate(chunks):
-                  print("REGISTRY_SNAPSHOT_CHUNK "+json.dumps({
-                      "path":name,"index":index,"content":chunk},ensure_ascii=True))
-          PY
-          git restore -- docs/TOOL_REGISTRY.json docs/TOOL_REGISTRY.md
       - name: Refuse stale or missing tool registry (no writes)
         shell: bash
         run: |
