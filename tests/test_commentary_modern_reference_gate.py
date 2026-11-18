@@ -10,7 +10,8 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
 from commentary_modern_reference_gate import (SourceReferenceGate,
     WholeCanonOriginalLinkIdentityReceipt, canonical_only_for_comparison,
     validate_proposed_link_dispositions, _wrap_exact_authored_modern_text,
-    _unambiguous_explicit_modern_verse, _auto_single_verse_placements)
+    _unambiguous_explicit_modern_verse, _auto_single_verse_placements,
+    _unrecognized_original_ref_class)
 
 
 ORIGINAL=(b'<div><reference osisRef="Bible:1John.5.20">1Jo 5:20</reference>'
@@ -550,6 +551,19 @@ class ExactSingleVerseSourceConcordanceTests(unittest.TestCase):
         self.assertEqual(candidates,[])
         self.assertEqual(skipped["already_reviewed"],1)
         self.assertEqual(skipped["proposed_original_correction"],1)
+
+    def test_unrecognized_original_osisref_shape_is_classified_not_guessed(self):
+        cases={
+            "Bible:John.3.16-John.3.18":"full_verse_range",
+            "John.3.16-18":"abbreviated_verse_range",
+            "John.3.16 John.3.18":"space_joined_verses",
+            "John.3.16,John.3.18":"punctuation_joined_verses",
+            "John.3.16-Acts.2":"other_range_syntax",
+            "Genesis 3":"other_compound_syntax",
+        }
+        for value, expected in cases.items():
+            with self.subTest(value=value):
+                self.assertEqual(_unrecognized_original_ref_class(value), expected)
 
     def test_only_one_exact_original_target_is_proposed(self):
         n=self.section("Paul mentions (Romans 3:23), but there is more.")
