@@ -467,6 +467,76 @@ jobs:
                             **expected}, sort_keys=True))
           PY
 
+      - name: Investigate missing Hebrew subject word IDs without guessing replacements
+        shell: bash
+        run: |
+          # Reuse the pinned ACAI neighbor-source witness: this is
+          # investigation-only and never rewrites an original word ID.
+          python3 -I /tmp/acai-frozen/.github/scripts/triage_missing_hebrew_subjects.py \
+            --tsv macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --missing entity-index/dist/macula-hebrew-existence.json \
+            > entity-index/dist/hebrew-missing-neighbor-source.log
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          out=Path("entity-index/dist")
+          missing=json.loads((out/"macula-hebrew-existence.json").read_text())
+          manifest=json.loads(Path("entity-index/source-unattested-words.json").read_text())
+          expected=set(manifest["word_ids"])
+          assert expected=={row["id"] for row in missing["missing_id_details"]}
+          entries={}
+          prefix="MACULA_NEAREST_MISSING_SUBJECT "
+          for line in (out/"hebrew-missing-neighbor-source.log").read_text().splitlines():
+              if not line.startswith(prefix):
+                  raise ValueError(f"Unexpected source audit output: {line[:120]}")
+              row=json.loads(line[len(prefix):])
+              token=row["missing"]
+              assert token in expected and token not in entries, token
+              assert isinstance(row["candidates"],list) and row["candidates"], token
+              for neighbor in row["candidates"]:
+                  assert neighbor["id"]!=token
+                  assert neighbor["id"][1:9]==token[1:9], (token,neighbor)
+              entries[token]={
+                  "source_word_id":token,
+                  "verse_id":token[1:9],
+                  "source_assignment_status":"unattested_in_exact_pinned_word_inventory",
+                  "same_word_position_neighbors":[
+                      neighbor for neighbor in row["candidates"]
+                      if neighbor["id"][:-1]==token[:-1]],
+                  "other_nearby_source_words":[
+                      neighbor for neighbor in row["candidates"]
+                      if neighbor["id"][:-1]!=token[:-1]],
+              }
+          assert len(entries)==len(expected)==18
+          report={
+              "format":"bible-entity-unattested-word-neighbor-review",
+              "schema_version":1,
+              "source_edition":manifest["source_edition"],
+              "scope":"exact_original_word_inventory_diagnostic_only",
+              "word_ids":[entries[token] for token in sorted(entries)],
+              "statistics":{
+                  "unattested_word_ids":len(entries),
+                  "with_same_word_position_neighbor":sum(
+                      bool(row["same_word_position_neighbors"])
+                      for row in entries.values()),
+                  "without_same_word_position_neighbor":sum(
+                      not row["same_word_position_neighbors"]
+                      for row in entries.values()),
+              },
+              "policy":"Neighbor IDs are original-language context, never automatic replacements; retain every source record and original pointer unchanged."
+          }
+          (out/"hebrew-missing-neighbor-review.json").write_text(
+              json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+          print("ENTITY_MISSING_HEBREW_WORD_NEIGHBORS",
+                json.dumps(report["statistics"],sort_keys=True))
+          for row in report["word_ids"]:
+              print("ENTITY_MISSING_HEBREW_SOURCE_CONTEXT",json.dumps({
+                  "missing":row["source_word_id"],
+                  "same_position":[x["id"] for x in row["same_word_position_neighbors"]],
+                  "other_neighbors":[x["id"] for x in row["other_nearby_source_words"]],
+              },sort_keys=True))
+          PY
+
       - name: Upload internal QA-only resource
         uses: actions/upload-artifact@v4
         with:
@@ -481,5 +551,6 @@ jobs:
             entity-index/dist/ot-source-verse-compatibility.json
             entity-index/dist/epistle-ending-review.json
             entity-index/dist/lemma-alignment-candidates.json
+            entity-index/dist/hebrew-missing-neighbor-review.json
           if-no-files-found: error
           retention-days: 14
