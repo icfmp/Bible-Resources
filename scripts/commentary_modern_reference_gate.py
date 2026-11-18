@@ -1770,7 +1770,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                                     auto_outline_links: bool = False,
                                     auto_authentic_labels: bool = False,
                                     source_notes_output: Path | None = None,
-                                    errata_review: dict | None = None) -> tuple[bytes, dict]:
+                                    errata_review: dict | None = None,
+                                    errata_proposals_output: Path | None = None) -> tuple[bytes, dict]:
     """Authenticate and place an explicitly bounded set of source-backed links.
 
     Real original SWORD attributes stay in private memory/isolated new OSIS,
@@ -1787,6 +1788,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
     if source_notes_output is not None and (not auto_single_verse
                                            or errata_review is None):
         raise ValueError("Source notes require full native inventory and errata exclusions")
+    if errata_proposals_output is not None and source_notes_output is None:
+        raise ValueError("Private errata proposals require separate source-note candidate")
     if (placements.get("status") !=
             "PRIVATE_REVIEWED_BOUNDED_LINK_PLACEMENT_NOT_FINAL_EDIT_OR_RELEASE"
             or placements.get("published_source_module") != "MHCC 0.1.1"
@@ -2168,6 +2171,7 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
     output = ET.tostring(doc, encoding="utf-8", xml_declaration=True)
     ET.fromstring(output)
     notes_receipt = None
+    errata_preview_receipt = None
     if source_notes_output is not None:
         if source_link_ledger is None:
             raise ValueError("Source note preview requires full original link ledger")
@@ -2178,6 +2182,13 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
             original=private_original, native=native, errata=errata_review)
         source_notes_output.parent.mkdir(parents=True,exist_ok=True)
         source_notes_output.write_bytes(notes_osis)
+        if errata_proposals_output is not None:
+            proposals_osis, errata_preview_receipt = (
+                build_unapproved_source_errata_notes_preview(
+                    source_note_osis=notes_osis, ledger=source_link_ledger,
+                    native=native, errata=errata_review))
+            errata_proposals_output.parent.mkdir(parents=True,exist_ok=True)
+            errata_proposals_output.write_bytes(proposals_osis)
     return output, {
         "status":"PRIVATE_REVIEWED_LINKED_FULL_CANON_OSIS_CANDIDATE_NOT_RELEASED",
         "full_original_native_corpus_sha256":pin,
@@ -2203,6 +2214,7 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         "remaining_source_links_require_individual_placement_review":True,
         "source_original_link_review_ledger":source_link_ledger,
         "private_source_note_alternative":notes_receipt,
+        "private_unapproved_errata_navigation_preview":errata_preview_receipt,
         "modern_SWORD_readback_verified":False,
         "independent_editorial_semantic_signoff":False,
         "publication_authorized":False,
@@ -2233,6 +2245,7 @@ def main():
     p.add_argument("--auto-authenticated-original-printed-single-verses",action="store_true")
     p.add_argument("--source-notes-osis",type=Path)
     p.add_argument("--source-notes-errata-manifest",type=Path)
+    p.add_argument("--source-errata-proposals-osis",type=Path)
     p.add_argument("--linked-osis",type=Path)
     p.add_argument("--report",required=True,type=Path)
     a=p.parse_args()
@@ -2241,6 +2254,8 @@ def main():
         p.error("Private source notes and original errata manifest must be supplied together")
     if a.source_notes_osis is not None and a.reviewed_link_placement_manifest is None:
         p.error("Private source notes need original full-canon linked preview")
+    if a.source_errata_proposals_osis is not None and a.source_notes_osis is None:
+        p.error("Private source errata proposals require original source notes")
     if not a.native_reader.is_file() or not a.module_directory.is_dir():
         p.error("Trusted real native reader and installed source module directory required")
     if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{1,39}",a.module_id):
@@ -2272,7 +2287,8 @@ def main():
             source_notes_output=a.source_notes_osis,
             errata_review=(json.loads(a.source_notes_errata_manifest.read_text(
                 encoding="utf-8")) if a.source_notes_errata_manifest is not None
-                else None))
+                else None),
+            errata_proposals_output=a.source_errata_proposals_osis)
         a.linked_osis.parent.mkdir(parents=True,exist_ok=True)
         a.report.parent.mkdir(parents=True,exist_ok=True)
         a.linked_osis.write_bytes(osis)
