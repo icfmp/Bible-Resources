@@ -41,10 +41,22 @@ class UBSHebrewBridgeTest(unittest.TestCase):
                     [self.a,entry("000003000000000",["A0430"],"000003001001000")])
         aramaic=lookup(index,"","0430","A")
         self.assertEqual(aramaic["entry_ids"],["000003000000000"])
-        self.assertEqual(lookup(index,"","0430a","H")["status"],"no_verified_lexical_link")
+        self.assertEqual(lookup(index,"","0430a","H")["status"],"no_entry_match")
         self.assertEqual(lookup(index,"","430 431","H")["sense_ids"],[])
         self.assertEqual(lookup(index,"","0430","H")["entry_ids"],["000001000000000"])
         self.assertEqual(lookup(index,"999999999999999","0430","H")["status"],"entry_only")
+
+    def test_exact_suffix_strong_is_distinct_and_never_collapsed(self):
+        variant = entry("000004000000000", ["H0430a"], "000004001001000")
+        other = entry("000005000000000", ["H0430b"], "000005001001000")
+        index = build([self.a, variant, other], [self.a, variant, other])
+        self.assertEqual(lookup(index, "", "0430a", "H")["entry_ids"], [variant["MainId"]])
+        self.assertEqual(lookup(index, "", "0430b", "H")["entry_ids"], [other["MainId"]])
+        self.assertEqual(lookup(index, "", "0430", "H")["entry_ids"], [self.a["MainId"]])
+        self.assertEqual(lookup(index, "", "0430c", "H")["status"], "no_entry_match")
+        self.assertEqual(lookup(index, "", "0430a", "H")["sense_ids"], [])
+        self.assertEqual(lookup(index, "", "0430a", "A")["entry_ids"], [])
+        self.assertEqual(lookup(index, "", "430a 430b", "H")["status"], "no_verified_lexical_link")
 
     def test_fails_on_bilingual_drift_and_duplicates(self):
         changed=json.loads(json.dumps(self.a))
