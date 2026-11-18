@@ -587,7 +587,9 @@ jobs:
           assert headings["status"] == (
               "PRIVATE_SOURCE_OWNED_EXACT_K_HEADING_RANGE_NAVIGATION_NOT_RELEASE")
           assert headings["source_original_links_restored_to_matching_modern_K_headings"] >= 18
+          assert headings["source_original_partial_ranges_restored_in_K_exposition"] >= 3
           assert (headings["source_original_links_restored_to_matching_modern_K_headings"] +
+                  headings["source_original_partial_ranges_restored_in_K_exposition"] +
                   headings["source_valid_references_still_in_section_notes"] ==
                   compact["original_valid_link_positions_still_unplaced"])
           assert headings["original_defective_references_remain_blocked"] == 4
@@ -601,6 +603,8 @@ jobs:
           print("SOURCE SECTION-HEADING RANGE RESTORATION: " +
                 str(headings["source_original_links_restored_to_matching_modern_K_headings"]) +
                 " source-authenticated ranges placed on matching modern K headings; " +
+                str(headings["source_original_partial_ranges_restored_in_K_exposition"]) +
+                " exact partial ranges now linked inside authored K prose; " +
                 str(headings["source_valid_references_still_in_section_notes"]) +
                 " valid source links remain in section notes (four bad targets separately withheld)")
           inline_index=report["private_visible_source_reference_index_preview"]
@@ -1058,7 +1062,7 @@ jobs:
           for placement in rec["placements"]:
               expected.setdefault(placement["target_native_first_key"],[]).append((
                   placement["original_literal_target_sha256"],
-                  placement["modern_heading_reference_display_sha256"]))
+                  placement["modern_reference_display_sha256"]))
           pending={
               r["source_first_key"]:r["original_source_reference_hashes"]
               for r in note_rec["note_source_K_reference_hashes_for_private_native_readback"]}
@@ -1120,8 +1124,9 @@ jobs:
                   proc.wait()
           if (len(keys)!=28792 or set(expected)!=set(seen_links)
                   or set(pending)!=set(seen_notes)
-                  or sum(seen_links.values())!=
-                     rec["source_original_links_restored_to_matching_modern_K_headings"]
+                  or sum(seen_links.values())!=(
+                     rec["source_original_links_restored_to_matching_modern_K_headings"]+
+                     rec["source_original_partial_ranges_restored_in_K_exposition"])
                   or sum(seen_notes.values())!=
                      rec["source_valid_references_still_in_section_notes"]):
               raise ValueError("SWORD heading candidate changed original linked inventory")
@@ -1131,7 +1136,8 @@ jobs:
           if check.returncode!=0 or len(check.stdout.strip())<80:
               raise ValueError("Reader did not display a real next-K range heading")
           print("PRIVATE ORIGINAL K HEADING SWORD PASS: "+str(sum(seen_links.values()))+
-                " heading navigation references, "+str(sum(seen_notes.values()))+
+                " original source K range navigation references (headings + prose), "+
+                str(sum(seen_notes.values()))+
                 " remaining source notes, all 28792 exact K keys and real diatheke "+
                 "render confirmed; not an approved original-inline link transfer")
           PY
