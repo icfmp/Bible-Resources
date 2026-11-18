@@ -21,6 +21,40 @@ _RANGE = re.compile(r"\bverses\s+(\d{1,3})\s*[-–—]\s*(\d{1,3})", re.I)
 _SINGLE = re.compile(r"\bverse\s+(\d{1,3})\b", re.I)
 _WORD = re.compile(r"[\w’-]+", re.UNICODE)
 
+_SCOPE_CLAIM = re.compile(r"\\(\\s*verses?\\s+([^)]+)\\)", re.I)
+_EXACT_SCOPE_SEGMENT = re.compile(r"(\\d{1,3})(?:\\s*[-–—]\\s*(\\d{1,3}))?")
+
+
+def _claimed_verse_keys_in_heading(heading: str) -> list[int] | None:
+    """Expand explicit parenthesized authorial scopes; do not span source gaps.
+
+    Supports a single verse, a continuous range, or disjoint source ranges
+    joined by commas, semicolons or 'and' (e.g. verses 24–30 and 36–43).
+    Other source headings are left to the established narrow legacy checks.
+    """
+    found = _SCOPE_CLAIM.search(heading)
+    if not found:
+        return None
+    # Normalize syntactic separators, not authorial verse addresses.
+    scope = re.sub(r"\\s+and\\s+", ",", found[1], flags=re.I)
+    parts = [part.strip() for part in re.split(r"[,;]", scope)]
+    if not parts or any(not part for part in parts):
+        raise ValueError("Malformed modern commentary verse scope")
+    claimed = []
+    for part in parts:
+        match = _EXACT_SCOPE_SEGMENT.fullmatch(part)
+        if not match:
+            raise ValueError("Unrecognized modern commentary verse scope")
+        start = int(match[1])
+        end = int(match[2]) if match[2] is not None else start
+        if start < 1 or end < start:
+            raise ValueError("Reversed/zero modern commentary verse scope")
+        claimed.extend(range(start, end + 1))
+    if len(set(claimed)) != len(claimed):
+        raise ValueError("Duplicated modern commentary verse scope")
+    return claimed
+
+
 
 def read_chapter_draft(path: Path, *, allow_production_candidate: bool = False) -> dict:
     source = path.read_text(encoding="utf-8")
@@ -99,11 +133,17 @@ def verify_draft_against_native_map(draft: dict, native: dict, *,
             raise ValueError("Duplicate native source verse in unit")
         bounds = (min(nums), max(nums))
         h = editorial["heading"]
+        exact_scope = _claimed_verse_keys_in_heading(h)
         rg = _RANGE.search(h)
         sn = _SINGLE.search(h)
-        # Check a *claimed verse range* only. Free-text descriptive headings
-        # need not repeat verse numbers; their section count is still guarded.
-        if rg is not None:
+        # Parenthesized scopes MUST identify the actual *set and order* of
+        # original occupied K keys, including gaps between nonadjacent ranges.
+        # A simple min/max comparison could overwrite another source body.
+        if exact_scope is not None:
+            if exact_scope != nums:
+                raise ValueError("Editor heading misstates original occupied verse keys: "
+                                 + draft["chapter"])
+        elif rg is not None:
             claimed = (int(rg[1]), int(rg[2]))
             if claimed != bounds:
                 raise ValueError("Editor heading misstates original range: " + draft["chapter"])
@@ -112,7 +152,8 @@ def verify_draft_against_native_map(draft: dict, native: dict, *,
         anchors.append({"first_native_key": native_keys[0],
                         "last_native_key": native_keys[-1],
                         "source_raw_sha256": original.get("raw_sha256"),
-                        "editorial_heading_range_claim_checked": rg is not None or sn is not None,
+                        "editorial_heading_range_claim_checked":
+                            exact_scope is not None or rg is not None or sn is not None,
                         "draft_exposition_words": editorial["word_count"]})
     return {
         "chapter": draft["chapter"],
