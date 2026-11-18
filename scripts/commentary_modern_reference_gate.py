@@ -1788,9 +1788,125 @@ def _source_context_unique_paragraph_anchor(
     return selected[-1], selected[-2]  # (paragraph node, character offset)
 
 
+
+def _source_owned_ordered_alignment(raw: bytes, section: ET.Element) -> dict:
+    """Align ORIGINAL authenticated full-K word order with modern K paragraphs.
+
+    No source prose is exported, no target is guessed, and no citation is
+    automatically embedded in translated wording. Only unique, ordered,
+    distinctive anchors on both sides of a source hyperlink can establish
+    a tentative position for a visibly tagged provenance note.
+    """
+    from difflib import SequenceMatcher
+    from bisect import bisect_right
+    from commentary_modern_draft_osis_preview import NS
+
+    root = ET.fromstring(b"<source>" + raw + b"</source>")
+    raw_parts = []
+    original_positions = []
+    length = 0
+
+    def append(value):
+        nonlocal length
+        if value:
+            raw_parts.append(value)
+            length += len(value)
+
+    def walk(node):
+        append(node.text)
+        for child in node:
+            if isinstance(child.tag, str) and child.tag.rsplit("}",1)[-1] == "reference":
+                original_positions.append(length)
+            walk(child)
+            append(child.tail)
+
+    walk(root)
+    text = "".join(raw_parts)
+    if not original_positions:
+        return {"original_link_offsets":[],"suggestions":{}}
+
+    def stem(word):
+        word = word.casefold()
+        if len(word) >= 8 and word.endswith("ing"):
+            return word[:-3]
+        if len(word) >= 7 and word.endswith("ed"):
+            return word[:-2]
+        if len(word) >= 6 and word.endswith("s") and not word.endswith("ss"):
+            return word[:-1]
+        return word
+
+    def tokens(value):
+        return [(stem(m.group()),m.start(),m.end())
+                for m in _CONTEXT_WORD.finditer(value)]
+
+    old = tokens(text)
+    paras = section.findall(f"{{{NS}}}p")
+    modern = []
+    # Source notes, if present, cannot be used as authored modern anchors.
+    for para in paras:
+        for w,a,b in tokens(para.text or ""):
+            modern.append((w,para,a,b))
+    if not old or not modern:
+        return {"original_link_offsets":original_positions,"suggestions":{}}
+    blocks = SequenceMatcher(None,[t[0] for t in old],
+                             [t[0] for t in modern],
+                             autojunk=False).get_matching_blocks()
+    common = _CONTEXT_COMMON | {
+        "god","lord","christ","jesus","spirit","faith","grace","children",
+        "therefore","indeed","people","believe","believer","heaven","earth"
+    }
+    strong=[]
+    for b in blocks:
+        if b.size < 3:
+            continue
+        meaningful={old[n][0] for n in range(b.a,b.a+b.size)
+                    if len(old[n][0])>=5 and old[n][0] not in common}
+        if len(meaningful)<2:
+            continue
+        strong.append(b)
+
+    suggestions={}
+    for ordinal,position in enumerate(original_positions,1):
+        src_token=bisect_right([x[1] for x in old], position)
+        before=[b for b in strong if b.a+b.size<=src_token
+                and src_token-(b.a+b.size)<=75]
+        after=[b for b in strong if b.a>=src_token
+               and b.a-src_token<=75]
+        if not before or not after:
+            continue
+        left=max(before,key=lambda b:b.a+b.size)
+        right=min(after,key=lambda b:b.a)
+        if left.b+left.size>right.b or right.b-(left.b+left.size)>85:
+            continue
+        leftEnd=modern[left.b+left.size-1]
+        rightStart=modern[right.b]
+        if leftEnd[1] is not rightStart[1]:
+            continue
+        para=leftEnd[1]
+        prose=para.text or ""
+        start,end=leftEnd[3],rightStart[2]
+        if start>=end or end>len(prose):
+            continue
+        # A citation may occupy the gap between the two source-verified
+        # anchors; prefer an actual modern sentence boundary in that gap.
+        punctuation=[m.end() for m in re.finditer(r"[.!?](?=\s|$)",prose[start:end])]
+        if not punctuation:
+            continue
+        if len(punctuation)!=1:
+            continue
+        mark=start+punctuation[0]
+        if not (start<mark<=end):
+            continue
+        suggestions[ordinal]=(para,mark)
+    return {"original_link_offsets":original_positions,
+            "suggestions":suggestions}
+
+
+
 def build_private_contextual_source_note_preview(
         *, source_note_osis: bytes, ledger: dict, native: dict,
-        original_contexts: dict, errata: dict) -> tuple[bytes, dict]:
+        original_contexts: dict, errata: dict,
+        original_ordered_anchors: dict | None = None) -> tuple[bytes, dict]:
     """Relocate only proven same-K source notes adjacent to exact prose context.
 
     An unchanged *separate* source-note SWORD candidate remains authoritative
@@ -1884,11 +2000,18 @@ def build_private_contextual_source_note_preview(
         section, note = notes_by_first[first]
         found = _source_context_unique_paragraph_anchor(section, contexts[ordinal-1])
         if found is not None:
-            candidates[(first, ordinal)] = found
+            candidates[(first, ordinal)] = (*found,
+                ("UNIQUE_EXACT_SOURCE_NEAR_PHRASE" if found[1]>=0 else
+                 "CONSERVATIVE_UNIQUE_PARAGRAPH_LEXICAL_MATCH"))
+        elif original_ordered_anchors is not None:
+            aligned = original_ordered_anchors.get(first,{}).get("suggestions",{}).get(ordinal)
+            if aligned is not None:
+                candidates[(first, ordinal)] = (*aligned,
+                    "TWO_SIDED_ORDERED_SOURCE_K_ALIGNMENT")
 
     # A shared anchor is not proof that two original citations belong there.
-    repeats = Counter((id(p), end) for p, end in candidates.values())
-    for key, (p, end) in list(candidates.items()):
+    repeats = Counter((id(p), end) for p, end, _ in candidates.values())
+    for key, (p, end, basis) in list(candidates.items()):
         if repeats[(id(p),end)] > 1:
             candidates.pop(key)
 
@@ -1915,7 +2038,7 @@ def build_private_contextual_source_note_preview(
             if key not in candidates:
                 remaining.append(ref)
                 continue
-            p, end = candidates[key]
+            p, end, basis = candidates[key]
             local = ET.Element(f"{{{NS}}}note",{
                 "type":"crossReference",
                 "resp":"BibleResourcesPrivateContextSourceLink"})
@@ -1927,8 +2050,7 @@ def build_private_contextual_source_note_preview(
             moved.append({
                 "source_first_key":first,
                 "source_reference_ordinal":ordinal,
-                "placement_basis":("UNIQUE_EXACT_SOURCE_NEAR_PHRASE" if end>=0
-                                   else "CONSERVATIVE_UNIQUE_PARAGRAPH_LEXICAL_MATCH"),
+                "placement_basis":basis,
                 "source_literal_target_sha256":row["original_osisRef_sha256"],
                 "original_label_sha256":row["original_visible_label_sha256"]})
         if remaining:
@@ -1968,6 +2090,8 @@ def build_private_contextual_source_note_preview(
             "UNIQUE_EXACT_SOURCE_NEAR_PHRASE" for x in moved),
         "paragraph_lexical_context_proximity_count":sum(x["placement_basis"] ==
             "CONSERVATIVE_UNIQUE_PARAGRAPH_LEXICAL_MATCH" for x in moved),
+        "ordered_source_alignment_count":sum(x["placement_basis"] ==
+            "TWO_SIDED_ORDERED_SOURCE_K_ALIGNMENT" for x in moved),
         "whole_original_K_ownership_retained":True,
         "source_prose_or_modern_authored_text_modified":False,
         "original_source_target_and_label_identities_preserved":True,
@@ -2211,6 +2335,7 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         raise ValueError("Only isolated published MHCC original SWORD reader is supported")
     private_original = {}
     private_original_contexts = {}
+    private_original_raw_K = {}
     private_table_ownership = {}
     private_title_ownership = {}
     env = os.environ.copy()
@@ -2249,6 +2374,7 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         private_original[key] = refs
         if context_notes_output is not None:
             private_original_contexts[key] = _original_source_link_contexts(raw)
+            private_original_raw_K[key] = raw
             if len(private_original_contexts[key]) != len(refs):
                 raise ValueError("Original context/ref inventory mismatch")
         private_table_ownership[key] = table_context
@@ -2523,10 +2649,28 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         source_notes_output.parent.mkdir(parents=True,exist_ok=True)
         source_notes_output.write_bytes(notes_osis)
         if context_notes_output is not None:
+            # Build the extra ordered alignment only inside the isolated,
+            # source-hash-verified native reader. No original prose is exported.
+            ordered_anchors={}
+            notes_doc=ET.fromstring(notes_osis)
+            note_chapters={c.get("osisID"):c for c in notes_doc.iter()
+                           if c.tag==f"{{{NS}}}chapter"}
+            for first,source_raw in private_original_raw_K.items():
+                chapter=first.rsplit(".",1)[0]
+                original_units=native["chapters"][chapter]["original_units"]
+                nth=next(i for i,u in enumerate(original_units)
+                         if u["first_key"]==first)
+                sections=note_chapters[chapter].findall(
+                    f"./{{{NS}}}div[@annotateType='commentary']")
+                ordered_anchors[first]=_source_owned_ordered_alignment(
+                    source_raw,sections[nth])
+                if len(ordered_anchors[first]["original_link_offsets"]) != len(
+                        private_original[first]):
+                    raise ValueError("Full original link alignment ordinal drift")
             context_osis, context_receipt = build_private_contextual_source_note_preview(
                 source_note_osis=notes_osis, ledger=source_link_ledger,
                 native=native, original_contexts=private_original_contexts,
-                errata=errata_review)
+                errata=errata_review,original_ordered_anchors=ordered_anchors)
             context_notes_output.parent.mkdir(parents=True,exist_ok=True)
             context_notes_output.write_bytes(context_osis)
         if errata_proposals_output is not None:
