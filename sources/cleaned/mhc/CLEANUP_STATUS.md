@@ -224,6 +224,50 @@ commentaries at the shared verse. An authorial and independent historic
 edition comparison, link/notes parity, actual Xiphos/AndBible GUI review,
 digital-edition reuse rights and explicit publication approval remain open.
 
+## Private reference harmonization and overlap rescue — 2026-11-18
+
+The staged, **reversible and unpublished** source technical preview reuses
+`scripts/repair_commentary_osis_milestones.py` with two independent
+SHA-pinned plans:
+
+1. `config/commentary-osis-repair-plans/mhc-endpoints-private-preview.json`
+   updates **only 12 existing OSIS verse milestone attribute values**,
+   repairing the three out-of-canon range endpoints and eliminating all **17**
+   impossible source assignments. The rebuilt K/I/TOP index remains
+   **31,098 / 1,255 / 2**.
+2. `config/commentary-osis-repair-plans/mhc-overlap-reindex-private-experiment.json`
+   makes **24 attribute-value updates** in six earlier groups whose ending
+   verse was also the first verse of the next group. This is a
+   **research-only addressing experiment**, not a settled editorial judgment
+   about which authorial paragraph should cover the shared verse.
+
+[Private recompiled two-stage experiment and native readback](
+https://github.com/icfmp/Bible-Resources/actions/runs/44280366837)
+proved the technical possibility with complete first/second group witness
+checks (the workflow's final check deliberately failed only because it
+still tested the *known flawed original* rather than the corrected preview):
+
+- Six previously unindexable source prose bodies are now present, each at
+  one or more intended passage locations; **zero** of the 14 original groups
+  has a completely missing word stream.
+- Of 70 independently selected 24-word source snippets, **70/70** occur in
+  the rebuilt SWORD, covering all 14 authored source group bodies.
+- The original 7 shared verse ownerships become **1**; the remaining
+  `2Chr.1.1` source duplication already has both independent authored
+  bodies findable in native SWORD. Do not falsely "correct" this without
+  checking printed-section semantics.
+- The private candidate's complete OSIS exact SHA is
+  `95a12ad88decbfe975de747825492abb7944b8de6dd30176cc23afdc9d2daa5d`.
+- **Neither the authorial wording nor notes, cross-reference targets,
+  inline markup, titles or other original source bytes were changed.**
+  All old and new machine attributes remain replayable from the two plans.
+
+**Limits:** the overlap candidate's shared-verse display choice has not been
+independently editorially approved; word-presence is not equivalent to
+byte-identical native note/markup parity. Historical comparison, cross-reference
+normalization, reader acceptance and digital-edition redistribution rights
+remain separate gates. This is *not* a release claim.
+
 ## Next review, kept separate
 
 1. Investigate *actual* source-structure anomalies using source-defined
