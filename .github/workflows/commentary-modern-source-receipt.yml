@@ -1647,6 +1647,46 @@ jobs:
                         for r in report).items())),
                 },sort_keys=True))
           PY
+      - name: Restore 47 exact-native first-K book prefaces in private OSIS, preserve Genesis and quarantine 3
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,sys
+          from pathlib import Path
+          sys.path.insert(0,"scripts")
+          from commentary_modern_draft_osis_preview import (
+              overlay_native_first_K_book_prefaces)
+          base=Path(os.environ["RUNNER_TEMP"])
+          native=json.loads(
+              (base/"mhcc-modern-whole-canon-native-receipt.json").read_text())
+          review=json.loads(
+              (base/"mhcc-51-intro-native-vs-ccel-triage.json").read_text())
+          assert review["modern_book_intro_candidates"]==56
+          assert review["verified_native_chapter_I_intros"]==5
+          assert len(review["cases"])==51
+          output,proof=overlay_native_first_K_book_prefaces(
+              base_osis=(base/"mhcc-modern-proposed-errata-navigation.osis.xml").read_bytes(),
+              native=native,
+              review=review,
+              candidates_dir=Path("work/mhcc-modern/production"))
+          assert proof["source_attested_first_K_candidate_book_intros"]==51
+          assert proof["already_in_modern_manuscript_not_duplicated"]==1
+          assert proof["new_book_intros_inserted_as_separate_introduction_OSIS"]==47
+          assert proof["quarantined_original_word_stream_mismatches"]==3
+          assert proof["original_K_section_and_existing_links_unchanged"]
+          assert proof["native_source_and_modern_manuscript_unmodified"]
+          assert not proof["editorial_final_approval"]
+          assert not proof["publication_authorized"]
+          (base/"mhcc-modern-original-book-prefaces-restored.osis.xml").write_bytes(
+              output)
+          (base/"mhcc-modern-original-book-prefaces-restored-metadata.json").write_text(
+              json.dumps(proof,sort_keys=True,indent=2)+"\n",encoding="utf-8")
+          print("MHCC FIRST-K BOOK PREFACES PRIVATE RESTORATION PASS: " +
+                "47 separately placed, one already in Gen.1 not duplicated, " +
+                "three exact-source textual witness differences quarantined; " +
+                "all original K modern expositions and 176/13 notes unmodified")
+          PY
       - name: Screen all modern manuscript outline tables for out-of-order source ranges
         shell: bash
         run: |
