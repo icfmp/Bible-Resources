@@ -734,7 +734,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                                     native: dict, identities: dict,
                                     dispositions: dict, repo_root: Path,
                                     reader: Path, module_directory: Path,
-                                    module_id: str) -> tuple[bytes, dict]:
+                                    module_id: str,
+                                    auto_single_verse: bool = False) -> tuple[bytes, dict]:
     """Authenticate and place an explicitly bounded set of source-backed links.
 
     Real original SWORD attributes stay in private memory/isolated new OSIS,
@@ -768,7 +769,7 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
     if not isinstance(proposed, list) or not 1 <= len(proposed) <= 40:
         raise ValueError("Private bounded link placement list missing")
     groups = {r["first_key"]: r for r in identities["source_link_groups"]}
-    requested = set()
+    requested = set(groups) if auto_single_verse else set()
     seen = set()
     correction_by_key = {
         (case["source_first_key"], edit["source_link_ordinal"]):
@@ -886,6 +887,7 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         raise ValueError("Source-linked OSIS needs all 1189 modern chapters")
     original_visible = "".join(doc.itertext())
     inserted = []
+    auto_counts = {"automatically_inserted":0}
     for row in proposed:
         chapter, first = row["modern_chapter"], row["source_first_key"]
         units = native["chapters"][chapter]["original_units"]
@@ -922,6 +924,40 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                          "placement_action": action,
                          "derived_target_sha256": hashlib.sha256(
                             actual_target.encode("utf-8")).hexdigest()})
+    if auto_single_verse:
+        already={(row["source_first_key"],row["original_link_ordinal"])
+                 for row in proposed if row.get("original_link_ordinal") is not None}
+        automatic, skips = _auto_single_verse_placements(
+            private_original=private_original, groups=groups,
+            modern_chapters=modern_chapters, native=native,
+            blocked=already, corrections=correction_by_key)
+        # The original raw source and its complete identity hashes are already
+        # validated by observe(). Retain original literal osisRef unchanged.
+        for row in automatic:
+            first=row["source_first_key"]
+            chapter=row["modern_chapter"]
+            units=native["chapters"][chapter]["original_units"]
+            nth=next(i for i,u in enumerate(units) if u["first_key"]==first)
+            section=modern_chapters[chapter].findall(
+                f"./{{{NS}}}div[@annotateType='commentary']")[nth]
+            literal=private_original[first][row["original_link_ordinal"]-1][0]
+            if canonical_only_for_comparison(literal)!=row["expected_modern_target"]:
+                raise ValueError("Autolink changed original authenticated destination")
+            _wrap_exact_authored_modern_text(
+                section, anchor=row["modern_anchor"],
+                display=row["linked_display_text"],
+                occurrence="last", target=literal)
+            inserted.append({
+                "chapter":chapter,
+                "original_source_first_key":first,
+                "original_link_ordinal":row["original_link_ordinal"],
+                "placement_action":row["action"],
+                "derived_target_sha256":hashlib.sha256(
+                    literal.encode("utf-8")).hexdigest(),
+            })
+        auto_counts = {"automatically_inserted":len(automatic),
+                       **skips}
+        proposed = list(proposed)+automatic
     if "".join(doc.itertext()) != original_visible:
         raise ValueError("Modern commentary wording changed while adding source links")
     embedded = [x for x in doc.iter() if x.tag == f"{{{NS}}}reference"]
@@ -932,7 +968,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
     # multiple independent links (including the duplicated 1 Cor. 5:7 source).
     # No literal original source targets or linked words enter this receipt.
     modern_groups = []
-    for first in sorted(requested):
+    linked_keys={row["source_first_key"] for row in proposed}
+    for first in sorted(linked_keys):
         ch = first.rsplit(".",1)[0]
         units = native["chapters"][ch]["original_units"]
         nth = next(i for i,u in enumerate(units) if u["first_key"]==first)
@@ -964,7 +1001,9 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         "full_original_native_corpus_sha256":pin,
         "modern_chapters_preserved":1189,
         "source_pinned_original_K_bodies_revisited":len(requested),
+        "source_K_groups_with_links_inserted":len(linked_keys),
         "modern_inline_links_inserted":len(embedded),
+        "automatic_exact_single_verse_source_links":auto_counts,
         "actual_original_links_copied_without_correction":counted[
             "COPY_EXACT_AUTHENTIC_SOURCE"],
         "documented_wrong_original_links_retargeted":counted[
