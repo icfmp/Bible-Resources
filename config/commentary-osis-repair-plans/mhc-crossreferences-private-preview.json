@@ -18,6 +18,14 @@
       "new_target": "Ezra.1.7 Ezra.8.24",
       "visible_label_sha256": "b5c41088c8e116de627e447d115ccbdf40260cbb968e415feeb4fb26a665ff98",
       "evidence_url": "https://www.ccel.org/ccel/henry/mhc4.Is.liii.html"
+    },
+    {
+      "original_line": 32130,
+      "source_book": "Job",
+      "old_target": "18.24",
+      "new_target": "Ps.18.24",
+      "visible_label_sha256": "f78d643df7d3402d9c05b112340d6d2b538a82008038417e870777d2ba813f8c",
+      "evidence_url": "https://ccel.org/h/henry/mhc2/MHC18015.HTM"
     }
   ]
 }
