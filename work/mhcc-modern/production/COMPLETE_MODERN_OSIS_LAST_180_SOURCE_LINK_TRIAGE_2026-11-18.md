@@ -1,5 +1,32 @@
 # MHCC Modern English — exact source reference disposition and final 180-case queue
 
+## 2026-11-18 — source-native bulk reference restoration: 111/176 resolved
+
+Latest real isolated whole-canon runs: [source SWORD / readback #44390972953](https://github.com/icfmp/Bible-Resources/actions/runs/44390972953) **SUCCESS**; [Validate #44390972988](https://github.com/icfmp/Bible-Resources/actions/runs/44390972988) **SUCCESS**; [tool registry #44390972806](https://github.com/icfmp/Bible-Resources/actions/runs/44390972806) **SUCCESS**.
+
+**Original 1,204 source link disposition (no unapproved repairs):**
+
+| Editorial disposition | Count |
+| --- | ---: |
+| Prior accepted original source links represented in modern OSIS | 1,015 |
+| New links on unique, modern-printed biblical verse tokens | 81 |
+| New exact original K-range links on matching modern editorial headings | 25 |
+| New source-authenticated partial-range links on uniquely printed modern prose verse spans | 5 |
+| **Total source links now directly navigable (excluding source notes)** | **1,126** |
+| Source-attested legitimate links still preserved in separate source-only K notes | 65 |
+| Documented spurious digital original link markers excluded | 9 |
+| Four independently documented corrupt original targets withheld for review | 4 |
+| **Original digital link occurrences all accounted for** | **1,204** |
+
+The **81** modern-printed verse links and **five** partial-range links are actual in-prose hyperlinks. Their original literal source targets and source K/ordinal identities are authenticated against **MHCC 0.1.1**. The five new partial ranges are **Daniel 11:5–30, Ezekiel 1:4–14, Isaiah 10:28–34, Isaiah 12:4–6 and Isaiah 15:6–9**. Because the authored modern manuscript displays some numbers in bold, the implementation inserts the real original link on the exactly matching printed verse digits *within the existing OSIS emphasis node*, retaining all paragraph text, formatting, punctuation, and original K structure. Isaiah 12 and 15 each have a single underindexed original K body; these references are not fabricated additional commentary bodies or numbered K entries.
+
+The **25** exact complete-K range links are carried on the matching modern **editorial section headings**: the target matches the original native SWORD K occupancy, but the editorial navigation location is **not claimed to be Henry's original inline anchor**.
+
+Disposable private whole-canon **MHCCHEADINGS** compiled successfully and independent raw SWORD readback confirmed **30/30** new authenticated range references (25 headings + 5 in modern prose), **65/65** original source-note target/display identities and **28,792/28,792** numbered K keys. Real diatheke successfully displayed the commentary probe. Original MHCC 0.1.1, all 1,189 modern English manuscripts and previous conservative candidates are unchanged.
+
+**Remaining editorial work:** 65 legitimate original references are still clearly identified as source-only notes because exact modern in-sentence placement is not proven. Six additional suspect original digital targets are in [the review-only error manifest](ADDITIONAL_ORIGINAL_LINK_TARGET_ERRATA_2026-11-18.json), and four earlier malformed source targets remain unapproved; none is silently corrected. Further source/editorial decisions, actual GUI reader compatibility, edition/redistribution rights, and independent approval remain explicit publication gates. **PR #272 stays draft; nothing has been merged or released.**
+
+
 **2026-11-18 — complete private 1,189-chapter OSIS/SWORD transport verified; outstanding source-link treatment remains editorially constrained. No publication authorization.**
 
 ## This checkpoint
