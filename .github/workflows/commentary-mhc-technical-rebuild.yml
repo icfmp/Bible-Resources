@@ -692,6 +692,101 @@ jobs:
           print("Source/native structural violations by class:",outcome["anomaly_counts"])
           print("Bounded reference-only source/native structural cases:",
                 outcome["bounded_reference_only_findings"][:30])
+          # Source-only metadata investigation of the exact machine-address
+          # anomalies. No commentary prose, original XML or extracted notes.
+          from collections import defaultdict
+          from lxml import etree
+          source_bytes=(root/"mhc-cleaned.osis.xml").read_bytes()
+          source_root=etree.fromstring(
+              source_bytes,
+              etree.XMLParser(resolve_entities=False,load_dtd=False,
+                              no_network=True,recover=False,huge_tree=True))
+          seen={}
+          source_groups=[]
+          occurrences=defaultdict(list)
+          active=[None]
+          def walk(node):
+              if not isinstance(node.tag,str):
+                  return
+              is_verse=node.tag.rsplit("}",1)[-1]=="verse"
+              if is_verse and node.get("osisID"):
+                  if active[0] is not None:
+                      raise ValueError("Source overlapping verse scope")
+                  ids=node.get("osisID").split()
+                  record={
+                      "line":node.sourceline,
+                      "sID":node.get("sID"),
+                      "n":node.get("n"),
+                      "first":ids[0],
+                      "last":ids[-1],
+                      "count":len(ids),
+                      "ids":ids,
+                      "chunks":[],
+                  }
+                  source_groups.append(record)
+                  active[0]=record
+                  for ref in ids:
+                      occurrences[ref].append(record)
+              if is_verse and node.get("eID"):
+                  if active[0] is None or active[0]["sID"]!=node.get("eID"):
+                      raise ValueError("Mismatched original verse milestone")
+                  active[0]=None
+              if node.text and active[0] is not None:
+                  active[0]["chunks"].append(node.text)
+              for child in node:
+                  walk(child)
+              if node.tail and active[0] is not None:
+                  active[0]["chunks"].append(node.tail)
+          walk(source_root)
+          if active[0] is not None:
+              raise ValueError("Original source verse group unclosed")
+          if len(source_groups)!=outcome["structure_counts"]["source_verse_group_openers"]:
+              raise ValueError("Source group fingerprints incomplete")
+          for group in source_groups:
+              value="".join(group["chunks"])
+              group["text_sha256"]=sha256(value.encode("utf-8")).hexdigest()
+              group["text_characters"]=len(value)
+              group["words"]=len(value.split())
+              del group["chunks"]
+          actual_refs=set(verses)
+          invalid=[]
+          for group in source_groups:
+              missing=[ref for ref in group["ids"] if ref not in actual_refs]
+              if missing:
+                  invalid.append({
+                      "line":group["line"],"sID":group["sID"],"label":group["n"],
+                      "first":group["first"],"last":group["last"],
+                      "missing_first":missing[0],"missing_last":missing[-1],
+                      "missing_count":len(missing),
+                      "source_text_sha256":group["text_sha256"],
+                      "source_word_count":group["words"],
+                  })
+          print("Out-of-v11n source group machine attributes, no prose:",invalid)
+          collisions=[]
+          for ref,owners in occurrences.items():
+              if len(owners)>1:
+                  pair=(owners[0],owners[-1])
+                  if not any(x["first_line"]==pair[0]["line"]
+                             and x["second_line"]==pair[1]["line"]
+                             for x in collisions):
+                      shared=[k for k in pair[0]["ids"] if k in pair[1]["ids"]]
+                      collisions.append({
+                          "first_line":pair[0]["line"],
+                          "first_sID":pair[0]["sID"],
+                          "first_label":pair[0]["n"],
+                          "first_text_sha256":pair[0]["text_sha256"],
+                          "first_words":pair[0]["words"],
+                          "second_line":pair[1]["line"],
+                          "second_sID":pair[1]["sID"],
+                          "second_label":pair[1]["n"],
+                          "second_text_sha256":pair[1]["text_sha256"],
+                          "second_words":pair[1]["words"],
+                          "common_verse_count":len(shared),
+                          "common_first":shared[0],
+                          "common_last":shared[-1],
+                          "distinct_commentary_prose":pair[0]["text_sha256"]!=pair[1]["text_sha256"],
+                      })
+          print("Original source duplicate-group provenance and text fingerprints:",collisions)
           if outcome["status"]!="SOURCE_NATIVE_INDEX_AND_MILESTONE_GEOMETRY_MATCH":
               raise SystemExit("MHC source-native verse group geometry NOT APPROVED")
           print("Verified complete source verse+intro IDs, exact grouped verse"
