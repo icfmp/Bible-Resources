@@ -30,6 +30,8 @@ class LexicalGapAuditTests(unittest.TestCase):
                 "xml:id\tref\tclass\tlemma\ttext\tstrongnumberx\tsdbh\tmorph\tlang\n" +
                 "".join("\t".join(r) + "\n" for r in rows), encoding="utf-8")
             result = gap(ix, records, path, expected_unresolved=3)
+            with self.assertRaisesRegex(ValueError, "Lexical gap unexpectedly changed"):
+                gap(ix, records, path, expected_unresolved=4)
         self.assertEqual(result["summary"]["all_source_rows"], 4)
         self.assertEqual(result["summary"]["lexical_unresolved"], 3)
         self.assertEqual(result["distinct_language_lemma_groups"], 2)
@@ -37,8 +39,6 @@ class LexicalGapAuditTests(unittest.TestCase):
         self.assertEqual(result["top_groups"][0]["exact_lemma_candidate_count"], 1)
         self.assertEqual(result["top_groups"][0]["triage_bucket"], "exact_nfc_lemma_candidate_only")
         self.assertEqual(result["top_groups"][1]["language"], "A")
-        with self.assertRaisesRegex(ValueError, "Lexical gap unexpectedly changed"):
-            gap(ix, records, path, expected_unresolved=4)
 
 
 if __name__ == "__main__":
