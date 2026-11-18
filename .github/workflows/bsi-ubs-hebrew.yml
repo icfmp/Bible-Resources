@@ -25,6 +25,7 @@ jobs:
         run: |
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_index.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_lexical_gaps.py
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_strong_reconciliation.py
       - name: Check out exact UBS Hebrew EN/FR 0.9.4 source
         uses: actions/checkout@v4
         with:
@@ -153,4 +154,6 @@ jobs:
           path: |
             /tmp/bsi-ubs-hebrew-index.json
             /tmp/bsi-ubs-hebrew-lexical-gaps.json
+            /tmp/bsi-ubs-hebrew-reconciliation.json
+            /tmp/bsi-ubs-hebrew-top-lemmas.json
           retention-days: 14
