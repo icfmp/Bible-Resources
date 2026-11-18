@@ -60,7 +60,7 @@ Illness can quickly weaken our strength and cut short the years we expected to h
 
 We should prepare for that possibility.
 
-We must acknowledge God's hand even when it seems difficult to reconcile an early death with his love.
+We must acknowledge God's hand in this and recognize that even an early death can be consistent with his love.
 
 People who have used their strength faithfully sometimes grow weak.
 
@@ -83,6 +83,8 @@ He has promised, **Because I live, you also will live**.
 ---
 
 ## Editorial review — Psalm 102
+
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Restored Henry's positive pastoral obligation to reconcile the shortening of life with God's love, rather than treating that reconciliation merely as an emotional difficulty. Original native wording, annotations and independent verification remain pending.
 
 **Whole English secondary witness read:** [CCEL, Psalm 102](https://ccel.org/ccel/henry/mhcc.xx.cii.html). Released `MHCC 0.1.1` remains the authoritative original; exact native SWORD and independent acceptance pending.
 
