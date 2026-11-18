@@ -29,6 +29,21 @@ The complete source comparison found:
 | WLC rows with populated `sdbh` | 244,734 |
 | WLC rows whose `sdbh` exactly matches a UBS sense | 165,214 |
 
+## Full generated index coverage
+
+The source-pinned generator was executed against all 475,911 WLC rows:
+
+| Link classification | Occurrences |
+| --- | ---: |
+| Exact UBS sense (`sdbh` → `LEXID`) | 165,214 |
+| Single UBS headword via language-specific Strong, **sense unknown** | 113,314 |
+| Multiple candidate UBS headwords via Strong, **ambiguous** | 2,741 |
+| Numeric Strong without a matching dictionary entry | 40,747 |
+| Unsupported / non-numeric or otherwise unverifiable lexical link | 153,895 |
+| **Total** | **475,911** |
+
+**281,269 / 475,911 (59.1%)** have at least one UBS entry candidate, but only **165,214 (34.7%)** have an exact sense match. These are measured results for **these pinned source editions**, not a claim that all remaining original Greek/Hebrew words lack dictionary definitions. We do **not** collapse suffixes, infer from spelling, or silently reinterpret source `sdbh` IDs to increase percentages.
+
 The other source `sdbh` pointers **must not be fabricated or silently remapped**: the source has more values than are attested in the pinned dictionary edition. The index returns the relevant entry *only* when an independently exact matching original `Strong` code exists, with `entry_only` status, **never** a guessed contextual sense. A match to multiple entries returns the complete candidate list.
 
 ## Index design
