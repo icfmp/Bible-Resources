@@ -58,6 +58,54 @@ class EntityIndexTests(unittest.TestCase):
                              source_absences, source_verse_absences,
                              reference_qualifications)
 
+    def test_generic_indirect_and_explicit_group_edits_are_reversible(self):
+        original = self.write_record(
+            "people", "NamedAncestor", references=["01001001", "01001002"],
+            explicit_instances={"wlc": [
+                ["o010010010011"], ["o010010020011"]]},
+            pronominal_referents={"wlc": [
+                ["o010010010021"], ["o010010020021"]]},
+            subject_referents={"wlc": [
+                ["o010010010031"], ["o010010020031"]]})
+        group = self.write_record("groups", "NamedCommunity",
+                                  references=["01001002"],
+                                  explicit_instances={"wlc": [["o010010020011"]]})
+        before = (original.read_bytes(), group.read_bytes())
+        remove = {
+            "source_id": "person:NamedAncestor",
+            "action": "amend_occurrences",
+            "remove_references": ["01001002"],
+            "remove_explicit_instances": {"wlc": [["o010010020011"]]},
+            "remove_pronominal_referents": {"wlc": [["o010010020021"]]},
+            "remove_subject_referents": {"wlc": [["o010010020031"]]},
+            "reason": "A source-specific collective context excludes ancestor",
+            "evidence": ["Exact pinned source group", "Independent context"],
+        }
+        result = self.build([remove])
+        by_id = {x["id"]: x for x in result["entities"]}
+        self.assertEqual(by_id["person:NamedAncestor"]["references"],
+                         ["01001001"])
+        for field, expected in (
+            ("explicit_instances", [["o010010010011"]]),
+            ("pronominal_referents", [["o010010010021"]]),
+            ("subject_referents", [["o010010010031"]]),
+        ):
+            self.assertEqual(by_id["person:NamedAncestor"]["occurrences"]
+                             [field]["wlc"], expected)
+        self.assertEqual(result["by_word"]["wlc:o010010020011"], [
+            {"entity_id": "group:NamedCommunity",
+             "link_type": "explicit_instances"}])
+        self.assertEqual((original.read_bytes(), group.read_bytes()), before)
+        for field in ("remove_subject_referents", "remove_pronominal_referents"):
+            broken = dict(remove, **{field: {"wlc": [["o010010030011"]]}})
+            with self.assertRaisesRegex(ValueError,
+                                        "absent group cannot be removed"):
+                self.build([broken])
+        with self.assertRaisesRegex(ValueError, "source group already exists"):
+            self.build([dict(remove, add_subject_referents={
+                "wlc": [["o010010010031"]]})])
+        self.assertEqual((original.read_bytes(), group.read_bytes()), before)
+
     def test_actual_editorial_pilots_preserve_source_and_correct_classification(self):
         path = self.write_record("people", "Jashar",
                                  references=["06010013", "10001018"],
