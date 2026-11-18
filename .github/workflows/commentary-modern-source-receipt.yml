@@ -249,6 +249,44 @@ jobs:
                 str(len(expected)) + " modern_candidates=" + str(len(observed)) +
                 "; native location only; no semantic or derivative approval")
           PY
+      - name: Authenticate all original numbered-K Bible link attributes in source order
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_modern_reference_gate.py \
+            --native-reader "$RUNNER_TEMP/commentary-modern-source-raw" \
+            --module-directory "$RUNNER_TEMP/mhcc-source-root" \
+            --module-id MHCC \
+            --whole-native-receipt "$RUNNER_TEMP/mhcc-modern-whole-canon-native-receipt.json" \
+            --report "$RUNNER_TEMP/mhcc-modern-all-original-link-identity-sha.json"
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          report = json.loads((Path(os.environ["RUNNER_TEMP"]) /
+              "mhcc-modern-all-original-link-identity-sha.json").read_text())
+          assert report["status"] == (
+              "SOURCE_NATIVE_ALL_K_REFERENCE_IDENTITIES_NOT_MODERN_LINK_PARITY")
+          assert report["whole_native_source_sha256"] == (
+              "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e")
+          assert report["original_unique_K_bodies_verified"] == 4047
+          assert report["original_numbered_K_keys_verified"] == 28742
+          assert report["original_reference_elements_verified"] == 1204
+          assert report["original_link_bearing_K_bodies"] == 669
+          assert len(report["source_link_groups"]) == 669
+          assert sum(g["reference_count"] for g in report["source_link_groups"]) == 1204
+          assert all(len(g["original_osisRef_sha256_in_document_order"]) ==
+                     len(g["original_visible_link_label_sha256_in_document_order"]) ==
+                     g["reference_count"] for g in report["source_link_groups"])
+          assert report["original_link_destinations_only_sha256_not_exported"] is True
+          assert report["original_visible_link_text_only_sha256_not_exported"] is True
+          assert report["original_source_prose_or_XML_exported"] is False
+          assert report["modern_manuscript_reference_presence_approved"] is False
+          assert report["modern_osisRef_targets_or_order_verified"] is False
+          assert report["modern_module_built_or_published"] is False
+          print("ALL_ORIGINAL_LINK_IDENTITIES_PASS K=28742 units=4047 "
+                "original_links=1204 linked_units=669; modern fidelity unapproved")
+          PY
       - name: Probe five original SWORD source-body scopes against independent English anchors
         shell: bash
         run: |
@@ -1425,6 +1463,7 @@ jobs:
           path: |
             ${{ runner.temp }}/mhcc-modern-source-native-receipt.json
             ${{ runner.temp }}/mhcc-modern-whole-canon-native-receipt.json
+            ${{ runner.temp }}/mhcc-modern-all-original-link-identity-sha.json
             ${{ runner.temp }}/mhcc-modern-five-native-source-witness-probes.json
             ${{ runner.temp }}/mhcc-crosswire-five-native-source-receipt.json
             ${{ runner.temp }}/mhcc-crosswire-five-native-witness-probes.json
