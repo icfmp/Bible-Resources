@@ -36,24 +36,32 @@ The source-pinned generator was executed against all 475,911 WLC rows:
 | Link classification | Occurrences |
 | --- | ---: |
 | Exact UBS sense (`sdbh` → `LEXID`) | 165,214 |
-| Single UBS headword via language-specific Strong, **sense unknown** | 113,314 |
+| Single UBS headword via language-specific Strong, **sense unknown** | 115,264 |
 | Multiple candidate UBS headwords via Strong, **ambiguous** | 2,741 |
-| Numeric Strong without a matching dictionary entry | 40,747 |
-| Unsupported / non-numeric or otherwise unverifiable lexical link | 153,895 |
+| Valid Strong without a matching dictionary entry | 192,689 |
+| Unsupported Strong structure | 3 |
 | **Total** | **475,911** |
 
-**281,269 / 475,911 (59.1%)** have at least one UBS entry candidate, but only **165,214 (34.7%)** have an exact sense match. These are measured results for **these pinned source editions**, not a claim that all remaining original Greek/Hebrew words lack dictionary definitions. We do **not** collapse suffixes, infer from spelling, or silently reinterpret source `sdbh` IDs to increase percentages.
+**283,219 / 475,911 (59.5%)** have at least one UBS entry candidate, but only **165,214 (34.7%)** have an exact sense match. These are measured results for **these pinned source editions**, not a claim that all remaining original Greek/Hebrew words lack dictionary definitions. We preserve source suffixes **exactly**: `2050a` cannot become `2050`, and only a matching UBS suffixed code can produce an entry candidate. We never infer from spelling or silently reinterpret source `sdbh` IDs to increase percentages.
 
 The other source `sdbh` pointers **must not be fabricated or silently remapped**: the source has more values than are attested in the pinned dictionary edition. The index returns the relevant entry *only* when an independently exact matching original `Strong` code exists, with `entry_only` status, **never** a guessed contextual sense. A match to multiple entries returns the complete candidate list.
+
+## Audited improvement: exact suffix matching
+
+The first v0.1 bridge omitted all suffixed Strong codes, even when a **matching suffixed code was present verbatim in UBS**. A full pinned-source audit confirmed **1,950 additional original-word rows** whose exact suffix was represented by a published UBS entry, enabling a safe entry-only link. These rows are now included in the 115,264 entry-only matches above.
+
+The crosswalk now indexes **8,979** distinct Hebrew/Aramaic Strong codes (including 693 exact UBS suffix codes) and leaves nine nonconforming UBS Strong codes unindexed. The confirmed contextual-sense count remains **165,214**, unchanged. No suffix was removed to force a match, and the earlier v0.1 dictionary editions remain pinned.
+
+The remaining **192,692 unresolved occurrences** deserve separate investigation; the largest group has variant Strong forms absent from this edition, and **14,867** unresolved rows still carry `sdbh` references. The [audit_unmatched.py](audit_unmatched.py) tool produces exhaustive, reversible classification from original pinned input without silently adding doubtful links.
 
 ## Index design
 
 - `by_sdbh`: exact fifteen-digit original Macula `sdbh` sense ID → one or more stable UBS `MainId` values. The `sdbh` value itself is the exact `LEXID` sense.
-- `by_strong`: language-aware, numeric-only `H` (Hebrew) / `A` (Aramaic) Strong ID → zero or more stable UBS `MainId` values. Suffixes, compound identifiers, and ambiguous forms are not guessed.
+- `by_strong`: language-aware `H` (Hebrew) / `A` (Aramaic) Strong ID with an optional **exact, single-letter suffix** → zero or more stable UBS `MainId` values. A suffix is matched against its corresponding UBS suffix, **never stripped**; compound and unmatched forms are not guessed.
 - `coverage`: complete WLC audit, distinguishing exact senses, entry-only fallback, ambiguous entries and unmatched words.
 - `statistics`: bilingual lexical ID inventory and excluded forms.
 
-Lookup order for one original WLC word: try the exact `sdbh` sense first; if no exact UBS sense is present, try the *language-specific* numeric Strong headword only. An unsupported or missing match returns an explicit no-link result. An `entry_only` result is **not an assertion that any one dictionary meaning applies**.
+Lookup order for one original WLC word: try the exact `sdbh` sense first; if no exact UBS sense is present, try the *language-specific* exact numeric or explicitly suffixed Strong headword only. An unsupported or missing match returns an explicit no-link result. An `entry_only` result is **not an assertion that any one dictionary meaning applies**.
 
 The index is shared by French and English: use the same `MainId`/`LEXID` to open the corresponding language edition. No second set of lexical links needs to be built.
 
