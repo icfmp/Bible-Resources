@@ -230,6 +230,15 @@ jobs:
                   "source_book":book,
                   "reference_is_just_numeric_label":numeric_label,
                   "machine_reference":literal_target,
+                  # Reveal only short Bible-citation labels, never commentary
+                  # paragraphs or source edition prose.
+                  "citation_label_if_short_and_machine_like":(
+                      label if len(label)<=75 and len(label.split())<=6
+                      and any(x.isdigit() for x in label)
+                      and re.fullmatch(r"[A-Za-z0-9 .,:;()\-/]{1,75}",label)
+                      else None),
+                  "visible_label_sha256":sha256(label.encode()).hexdigest(),
+                  "visible_label_characters":len(label),
               })
           if len(detailed)!=len(references):
               raise SystemExit("Source target line/key correspondence incomplete")
