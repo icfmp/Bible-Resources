@@ -75,7 +75,26 @@ def analyze(index, lexicon, tsv):
           "lemmas":a["lemmas"].most_common(4),
           "sdbh_populated":a["sdbh_populated"],"parent_in_ubs":a["prefix_in_ubs"],
           "base_ubs_exists":a["base_in_ubs"],"examples":a["samples"]})
+    # Editorially transparent reporting subset, NOT a new matching policy.
+    lexical_classes=("noun","verb","adj","adv","num")
+    lexical_senses=sum(by_class[x]["sense"] for x in lexical_classes)
+    lexical_entries=sum(by_class[x]["entry_only"] for x in lexical_classes)
+    lexical_unresolved=sum(by_class[x]["unresolved"] for x in lexical_classes)
+    lexical_total=lexical_senses+lexical_entries+lexical_unresolved
+    corpus_total=sum(sum(counts.values()) for counts in by_class.values())
+    if corpus_total!=475911:
+        raise ValueError(f"Unexpected pinned WLC row count: {corpus_total}")
+    lexical_coverage={
+        "selected_source_classes":list(lexical_classes),
+        "total":lexical_total, "exact_sense":lexical_senses,
+        "entry_only":lexical_entries,
+        "unresolved":lexical_unresolved,
+        "with_ubs_entry":lexical_senses+lexical_entries,
+        "percentage":round(100*(lexical_senses+lexical_entries)/lexical_total,2),
+        "interpretation":"source_class_subset_not_a_word_type_or_dictionary_completeness_claim",
+    }
     return {"summary":dict(overall),"distinct_suffix_families":len(aggregate),
+        "lexical_class_coverage":lexical_coverage,
         "by_original_class":{k:dict(v) for k,v in sorted(by_class.items())},
         "by_morph_prefix":{k:dict(v) for k,v in sorted(by_morph.items())},
         "by_original_language":{k:dict(v) for k,v in sorted(by_language.items())},
@@ -92,6 +111,7 @@ def main():
     a.output.write_text(json.dumps(result,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print("VARIANT_TOTAL",result["summary"])
     print("VARIANT_DISTINCT_FAMILIES",result["distinct_suffix_families"])
+    print("LEXICAL_CLASS_COVERAGE",json.dumps(result["lexical_class_coverage"],ensure_ascii=False))
     print("COVERAGE_BY_ORIGINAL_CLASS",json.dumps(result["by_original_class"],ensure_ascii=False))
     print("COVERAGE_BY_MORPH_PREFIX",json.dumps(result["by_morph_prefix"],ensure_ascii=False))
     print("COVERAGE_BY_ORIGINAL_LANGUAGE",json.dumps(result["by_original_language"],ensure_ascii=False))
