@@ -303,6 +303,57 @@ equivalence to a historically authenticated printed edition. These remain
 separate checks before editorial acceptance. The SWORD file and reconstructed
 OSIS were not uploaded or released; the original OSIS remains untouched.
 
+## Complete source↔native punctuation, genuine introductions and links — 2026-11-18
+
+**Source-aware full-corpus audit:** [private SWORD reconstruction #44286709497](
+https://github.com/icfmp/Bible-Resources/actions/runs/44286709497) passed.
+The source-derived classification follows CrossWire's documented
+[OSIS2MOD introduction/pre-verse boundary semantics](
+https://wiki.crosswire.org/Osis2mod): after a chapter starts, a section
+`div` or non-introductory `title` can correctly assign following prose to
+the first verse, not the chapter-zero introduction. An earlier naive
+pre-first-verse census had falsely attributed 85 pre-verse passages and
+their notes/references to chapter introductions. This **was an audit
+classification defect, not demonstrable SWORD data loss**; the canonical
+scanner has been corrected, tested and re-run on the pinned complete OSIS.
+
+| Verified scope | Result |
+| --- | ---: |
+| Original authored verse-group prose | 4,256 / 4,256 full word streams |
+| Source group Unicode text with exact punctuation after NFC/whitespace normalization | 4,250 / 4,256 |
+| Remaining groups requiring punctuation/edge review | 6 |
+| Source-authored reference nodes within verse groups, including label/target metadata | 61,421 / 61,421, all present at their first native keys |
+| Genuine source book/chapter introductions (including empty) | 1,255 / 1,255 |
+| Genuine introduction text with identical normalized Unicode | 1,111 / 1,111 nonempty |
+| Source intro keys with no visible text | 144 |
+| Source-authored reference nodes within genuine introductions | 6,710 / 6,710, full body/metadata match |
+| Source-authored notes within genuine introductions | 0, so no missing source intro note to repair |
+
+The six exceptional verse-group spans are `Deut.34.9-12`,
+`Esth.10.1-3`, `Song.8.13-14`, `Mal.4.4-6`,
+`John.21.20-25`, and `Rev.22.20-21`. Their original
+word streams are complete; every **inter-word** punctuation gap was
+checked by aligned token positions and **no changed nonwhitespace
+punctuation character was found between words**. Two cases are
+whitespace-only at the boundaries; four require investigation of
+extra/differing nonwhite symbols **after the final word**. No
+source punctuation has been edited or silently dropped.
+
+**Reference navigation remains a distinct open technical issue:** 25
+source `reference/@osisRef` values use unsupported abbreviated or
+bookless machine addressing. All 25 original targets are conserved in
+the compiled module, but retained bytes do **not** guarantee usable
+click navigation. A short visible original reference label even
+disagrees with a machine target in an Ezra 8 citation; repair requires
+checking the original displayed citation and canonical verse limits,
+then a reversible machine-attribute-only plan. Keep original English
+commentary, note text and displayed reference labels unchanged.
+
+This is NOT printed-edition collation, note/caller rendering acceptance,
+editorial authorization for a changed reference scope, or redistribution
+rights clearance. The complete original/edited OSIS and compiled zCom4
+remain on isolated private runners only.
+
 ## Next review, kept separate
 
 1. Investigate *actual* source-structure anomalies using source-defined
