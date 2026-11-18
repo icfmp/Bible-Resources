@@ -778,7 +778,9 @@ jobs:
                                   compare_all_commentary_source_group_semantics,
                                   source_commentary_introductions,
                                   compare_commentary_source_native_introductions,
-                                  triage_commentary_introduction_relocation)
+                                  triage_commentary_introduction_relocation,
+                                  source_commentary_book_closing_text,
+                                  classify_commentary_native_final_boundary)
           from sword_native_raw_corpus_inventory import parse_native_raw_corpus
           root=Path(os.environ["RUNNER_TEMP"])
           source=root/"mhc-overlap-experimental.osis.xml"
@@ -828,6 +830,30 @@ jobs:
           if semantics["counts"].get("source_groups")!=4256:
               raise SystemExit("Incomplete source/native punctuation and note-body census")
           print("This is a complete punctuation/notes triage, NOT blanket editorial approval")
+          closings=source_commentary_book_closing_text(source)
+          last_groups={}
+          for group in groups:
+              last_groups[group["keys"][0].split(".",1)[0]]=group
+          if len(closings)!=66 or set(closings)!=set(last_groups):
+              raise SystemExit("Closing text audit has missing authored books")
+          from collections import Counter
+          tail_classes=Counter()
+          tail_cases=[]
+          for book,closing in closings.items():
+              group=last_groups[book]
+              if closing["last_source_scope"]!=group["sID"]:
+                  raise SystemExit("Book end scope does not match source final verse group")
+              review=classify_commentary_native_final_boundary(
+                  group,raws[group["keys"][0]],closing["closing_text"])
+              tail_classes[review["class"]]+=1
+              if review["class"]!="native_suffix_equals_original_group_boundary":
+                  tail_cases.append({"book":book,"final_scope":group["sID"],
+                                     **review})
+          print("Original book-end versus final-native-verse text classes:",
+                dict(sorted(tail_classes.items())))
+          print("Bounded book-ending source/native diagnostics without prose:",
+                tail_cases[:30])
+          print("Book-ending text was not added to the original source or exported")
           introductions=source_commentary_introductions(source)
           if (len(introductions)!=1255 or len(intro_raw)!=1255
                   or set(introductions)!=set(intro_raw)):
