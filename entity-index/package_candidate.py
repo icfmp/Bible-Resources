@@ -16,7 +16,7 @@ VERSION = "0.1.0"
 PREFIX = f"BSI-{VERSION}/"
 LICENSE_URL = "https://creativecommons.org/licenses/by-sa/4.0/"
 
-README = """# Bible Semantic Index (BSI) 0.1.0 — release candidate
+README = """# Bible Semantic Index (BSI) 0.1.0
 
 Original-language word-level biblical entity index, anchored to pinned
 Macula WLC and SBLGNT word IDs. This edition excludes the entire ACAI
@@ -128,7 +128,7 @@ def build_archive(index: dict, labels: dict, lock: dict) -> tuple[bytes, dict]:
     manifest = {
         "name": "Bible Semantic Index",
         "version": VERSION,
-        "status": "release_candidate",
+        "status": "versioned_distribution",
         "license": "CC BY-SA 4.0",
         "license_url": LICENSE_URL,
         "source_snapshot_sha256": lock["source_snapshot_sha256"],
