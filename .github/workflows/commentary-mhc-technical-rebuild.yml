@@ -24,7 +24,7 @@ permissions:
 jobs:
   private-stage1:
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - name: Unit tests for source identity and safe OSIS reading
@@ -1112,20 +1112,40 @@ jobs:
           print("This is native SWORD integrity, NOT clicked Xiphos/AndBible GUI navigation")
           print("No corrected OSIS or SWORD binary uploaded or published")
           PY
-      - name: Observe real Xiphos with corrected private 25-link MHC (not hyperlink approval)
+      - name: Install real Xiphos GUI dependencies in disposable runner
         shell: bash
         continue-on-error: true
         timeout-minutes: 8
         run: |
           set -euo pipefail
+          # This independent GUI setup is nonblocking for the complete native
+          # content proof, and a dependency failure must remain explicit.
+          export DEBIAN_FRONTEND=noninteractive
+          timeout 390s sudo -E apt-get -o Acquire::Retries=1 \
+            -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 \
+            -o DPkg::Lock::Timeout=15 install -y --no-install-recommends \
+              xiphos xvfb xdotool xclip dbus-x11
+          for binary in xiphos Xvfb xdotool xclip dbus-run-session; do
+            command -v "$binary" >/dev/null || {
+              echo "Missing real-Xiphos GUI dependency: $binary" >&2
+              exit 1
+            }
+          done
+      - name: Observe real Xiphos with corrected private 25-link MHC (not hyperlink approval)
+        shell: bash
+        continue-on-error: true
+        timeout-minutes: 6
+        run: |
+          set -euo pipefail
           umask 077
-          # This GUI research is deliberately separate from the blocking
-          # compiled-content proof. Absence of GUI clipboard evidence is NOT
-          # falsely treated as a Bible/commentary data failure.
-          timeout 240s sudo apt-get -o Acquire::Retries=0 \
-            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 \
-            install -y --no-install-recommends \
-              xiphos xvfb xdotool xclip dbus-x11 >/dev/null
+          # An opened Xiphos window and successful keyboard dispatch alone
+          # are never accepted as a commentary rendering or clicked-link proof.
+          for binary in xiphos Xvfb xdotool xclip dbus-run-session; do
+            command -v "$binary" >/dev/null || {
+              echo "Xiphos reader test INCONCLUSIVE: missing $binary" >&2
+              exit 1
+            }
+          done
           python - <<'PY'
           import json, os, subprocess, sys
           from pathlib import Path
