@@ -18,6 +18,7 @@ from commentary_modern_reference_gate import (SourceReferenceGate,
     _find_exact_modern_original_outline_range_cell,
     _unique_authentic_original_visible_label,
     _unplaced_original_link_review_ledger,
+    _source_owned_ordered_alignment,
     _original_source_link_contexts, _source_context_unique_paragraph_anchor,
     build_private_contextual_source_note_preview)
 
@@ -1510,6 +1511,38 @@ class PrivateOriginalContextRelocationTests(unittest.TestCase):
                  "families through patient endurance, humble service, and steadfast hope.",
                  " Other unrelated original exposition follows.")
         self.assertIsNone(_source_context_unique_paragraph_anchor(section,context))
+
+
+    def test_original_full_k_order_brackets_a_modern_sentence(self):
+        from commentary_modern_draft_osis_preview import NS
+        section=ET.Element(f"{{{NS}}}div")
+        p=ET.SubElement(section,f"{{{NS}}}p")
+        p.text=("The entire congregation gathered together beside the mountain "
+                "and listened with careful attention. Then the servant returned "
+                "with unexpected gifts and a message of peace.")
+        raw=(b"<div>The entire congregation gathered together beside the mountain "
+             b"and listened with careful attention "
+             b'<reference osisRef="Bible:Ps.4.2">Psalm 4:2</reference>'
+             b". Then the servant returned with unexpected gifts "
+             b"and a message of peace.</div>")
+        result=_source_owned_ordered_alignment(raw,section)
+        self.assertEqual(len(result["original_link_offsets"]),1)
+        self.assertIn(1,result["suggestions"])
+        para,offset=result["suggestions"][1]
+        self.assertIs(para,p)
+        self.assertEqual(p.text[:offset][-10:],"attention.")
+
+    def test_full_k_order_without_two_sided_distinctive_anchors_is_unplaced(self):
+        from commentary_modern_draft_osis_preview import NS
+        section=ET.Element(f"{{{NS}}}div")
+        ET.SubElement(section,f"{{{NS}}}p").text=(
+            "A person is kind and should listen. Everyone remembers grace.")
+        raw=(b'<div>Some other words unrelated to the modern statement '
+             b'<reference osisRef="Bible:Gen.1.2">Genesis 1:2</reference>'
+             b'and unlike everything following it.</div>')
+        result=_source_owned_ordered_alignment(raw,section)
+        self.assertEqual(result["suggestions"],{})
+
 
 if __name__=="__main__":
     unittest.main()
