@@ -667,6 +667,111 @@ jobs:
                 str(sum(seen.values())) +
                 " exact targets and visible labels in 28792 exact original/I-only keys; NO release")
           PY
+      - name: Diagnose full 4049 authored modern OSIS text bodies through compiled private native SWORD
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,re,subprocess,sys,unicodedata
+          from collections import Counter
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+          sys.path.insert(0,"scripts")
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          base=Path(os.environ["RUNNER_TEMP"])
+          ns="{http://www.bibletechnologies.net/2003/OSIS/namespace}"
+          source=json.loads((base/"mhcc-modern-whole-canon-native-receipt.json").read_text())
+          ionly=json.loads(Path(
+              "work/mhcc-modern/production/IONLY_CHAPTER_LINK_PREVIEW.json"
+          ).read_text())
+          native_firsts={unit["first_key"]
+                         for chapter in source["chapters"].values()
+                         for unit in chapter["original_units"]}
+          native_firsts.update(row["chapter_osis"]+".1" for row in ionly["chapters"])
+          assert len(native_firsts)==4049
+          root=ET.parse(base/"mhcc-modern-complete-bounded-linked.osis.xml").getroot()
+          sections=[x for x in root.iter()
+                    if x.tag==ns+"div" and x.get("annotateType")=="commentary"]
+          expected={}
+          for section in sections:
+              ref=section.get("annotateRef","")
+              first=ref.split(" ",1)[0].split("-",1)[0]
+              assert re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.\d+\.\d+", first)
+              assert first not in expected
+              authored="".join(section.itertext())
+              assert authored.strip(), "Empty modern authorial section: "+first
+              expected[first]=authored
+          assert set(expected)==native_firsts and len(expected)==4049
+          def normalized(value):
+              return re.sub(r"\s+"," ",unicodedata.normalize("NFC",value)).strip()
+          counts=Counter()
+          first_review=[]
+          seen=set()
+          def compare(kind,key,raw):
+              if kind!="K" or key not in expected:
+                  return
+              if key in seen:
+                  raise ValueError("Same first-K modern body read more than once")
+              seen.add(key)
+              try:
+                  compiled="".join(ET.fromstring(
+                      b"<compiled>"+raw+b"</compiled>").itertext())
+              except ET.ParseError:
+                  counts["native_XML_parse_errors"]+=1
+                  if len(first_review)<12:first_review.append(key)
+                  return
+              authored=expected[key]
+              if compiled==authored:
+                  counts["exact_visible_unicode_matches"]+=1
+              elif normalized(compiled)==normalized(authored):
+                  counts["NFC_and_whitespace_only_matches"]+=1
+              elif normalized(authored) in normalized(compiled):
+                  counts["authored_visible_content_contiguous_in_wrapper"]+=1
+              else:
+                  counts["unmatched_visible_text_needs_investigation"]+=1
+                  if len(first_review)<12:first_review.append(key)
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str((base/"mhcc-bounded-linked-root").resolve())
+          proc=subprocess.Popen(
+              [str((base/"commentary-modern-source-raw").resolve()),"MHCCLINKTMP"],
+              env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+          try:
+              native,numbered,_,_=parse_native_raw_corpus(
+                  proc.stdout,on_entry=compare)
+              proc.stdout.close()
+              if proc.wait(timeout=120)!=0:
+                  raise ValueError("Private SWORD native text roundtrip did not complete")
+          finally:
+              if proc.poll() is None:
+                  proc.kill();proc.wait()
+          assert seen==set(expected), "First-K body omitted in actual SWORD index"
+          assert len(numbered)==28792
+          assert sum(counts.values())==4049
+          failures=counts["native_XML_parse_errors"]+counts[
+              "unmatched_visible_text_needs_investigation"]
+          report={
+              "status":("PRIVATE_FULL_CANON_TEXT_ROUNDTRIP_VISIBLE_BODY_PASS"
+                        if failures==0 else
+                        "PRIVATE_FULL_CANON_TEXT_ROUNDTRIP_DIAGNOSTIC_REVIEW_REQUIRED"),
+              "whole_canon_modern_OSIS_groups_compared":len(expected),
+              "exact_indexed_native_first_K_groups_present":len(seen),
+              "all_numbered_native_verse_keys_present":len(numbered),
+              "observed_visible_text_comparison_categories":dict(counts),
+              "unmatched_or_unparseable_first_K_keys_for_manual_diagnosis":first_review,
+              "visible_text_content_is_not_exported":True,
+              "editorial_translation_review_restarted":False,
+              "original_source_module_mutated":False,
+              "source_native_markup_and_link_parity_approved":False,
+              "publication_authorized":False,
+          }
+          (base/"mhcc-modern-compiled-body-text-parity-diagnostic.json").write_text(
+              json.dumps(report,sort_keys=True,indent=2)+"\n",encoding="utf-8")
+          print("PRIVATE WHOLE-CANON MODERN OSIS->SWORD VISIBLE TEXT DIAGNOSTIC "
+                f"units={len(expected)}, exact={counts['exact_visible_unicode_matches']}, "
+                f"whitespace={counts['NFC_and_whitespace_only_matches']}, "
+                f"wrapper={counts['authored_visible_content_contiguous_in_wrapper']}, "
+                f"nonmatching={failures}; ORIGINAL/MODERN NOT PUBLISHED")
+          PY
       - name: Probe five original SWORD source-body scopes against independent English anchors
         shell: bash
         run: |
@@ -1846,6 +1951,7 @@ jobs:
             ${{ runner.temp }}/mhcc-modern-all-original-link-identity-sha.json
             ${{ runner.temp }}/mhcc-modern-proposed-link-correction-dispositions.json
             ${{ runner.temp }}/mhcc-modern-complete-bounded-linked-osis-structure.json
+            ${{ runner.temp }}/mhcc-modern-compiled-body-text-parity-diagnostic.json
             ${{ runner.temp }}/mhcc-modern-source-matched-links-native-SWORD-readback.json
             ${{ runner.temp }}/mhcc-modern-complete-unlinked-osis-structure.json
             ${{ runner.temp }}/mhcc-modern-complete-private-sword-smoke.json
