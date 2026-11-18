@@ -31,13 +31,15 @@ For this life we hope in **God's providence**, and for the next we hope in **his
 
 The God of heaven became human in order to save us. He died upon the cross for our sins and was laid in the grave; nevertheless, his purposes of love did not end there. **He rose again to fulfill them**.
 
-Christ's earthly miracles picture his continuing works of salvation. He liberates prisoners from **sin and Satan**, opens the eyes of understanding, feeds people who hunger for salvation with **the bread of life**, and shows mercy to the poor in spirit, the helpless and the spiritually fatherless.
+Christ's earthly miracles picture the saving works he continues to perform every day. He liberates prisoners from **sin and Satan**, opens the eyes of understanding, feeds people who hunger for salvation with **the bread of life**, and shows mercy to the poor in spirit, the helpless and the spiritually fatherless.
 
 His kingdom continues forever. Let sinners turn to him and believers rejoice in him. Let us encourage one another to praise his name.
 
 ---
 
 ## Editorial review — Psalm 146
+
+**2026-11-18 targeted CCEL re-collation (secondary witness only):** Restored Henry's *every day* time qualifier concerning Christ's ongoing saving work, omitted in the first modern draft. The published original and native groups remain unchanged; exact primary and independent approval are pending.
 
 **Complete second witness read:** [CCEL, Psalm 146](https://ccel.org/ccel/henry/mhcc.xx.cxlvi.html). Pinned published `MHCC 0.1.1` is original authority, with native-SWORD and independent review pending.
 
