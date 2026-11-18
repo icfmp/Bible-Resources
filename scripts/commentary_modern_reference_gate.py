@@ -2499,12 +2499,45 @@ def build_private_owned_K_heading_range_links(
             if source_cover or underindexed_single_K:
                 target_index=source_index
                 matches=[]
+                # Authored Markdown emphasis creates distinct XML <hi> nodes.
+                # Search the full rendered paragraph for the EXACT explicit
+                # original chapter's verse span, then wrap only the visible
+                # numeric token inside ONE physical XML text slot. No
+                # flattening, deletion, duplicated text or ref nesting.
+                number_pattern=re.compile(
+                    re.escape(start)+r"\s*[-–—]\s*"+re.escape(end))
                 for p in sections[source_index].findall(f"./{{{NS}}}p"):
-                    # Never flatten modern markup or nest an existing link.
-                    if len(p)!=0 or not isinstance(p.text,str):
-                        continue
-                    for m in label_pattern.finditer(p.text):
-                        matches.append((p,m.start(),m.end()))
+                    slots=[]
+                    fragments=[]
+                    offset=0
+                    def emit(node,attr,blocked=False):
+                        nonlocal offset
+                        value=getattr(node,attr)
+                        if isinstance(value,str) and value:
+                            slots.append((offset,offset+len(value),
+                                          node,attr,blocked,value))
+                            fragments.append(value)
+                            offset+=len(value)
+                    def walk(node,in_link=False):
+                        if node.tag==f"{{{NS}}}note":
+                            return
+                        current_link=in_link or node.tag==f"{{{NS}}}reference"
+                        emit(node,"text",current_link)
+                        for child in node:
+                            walk(child,current_link)
+                            emit(child,"tail",current_link)
+                    walk(p)
+                    rendered="".join(fragments)
+                    for hit in label_pattern.finditer(rendered):
+                        numeric=number_pattern.search(hit.group())
+                        if numeric is None:
+                            continue
+                        a=hit.start()+numeric.start()
+                        b=hit.start()+numeric.end()
+                        matches.extend((node,a-first_pos,b-first_pos)
+                          for first_pos,last_pos,node,attr,blocked,value in slots
+                          if not blocked and attr=="text"
+                          and first_pos<=a and b<=last_pos)
                 if len(matches)==1:
                     placement_basis="UNIQUE_SOURCE_SAME_CHAPTER_RANGE_IN_AUTHORED_K_PROSE"
         if len(matches)!=1 or placement_basis is None:
