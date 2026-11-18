@@ -269,6 +269,43 @@ class EditorialPipelineTests(unittest.TestCase):
                          "Gen.1.3")
         self.assertEqual(saved,self.source.read_bytes())
 
+    def test_commentary_punctuation_notes_and_reference_targets_not_silently_lost(self):
+        from audit_osis import (
+            source_commentary_overlap_witness,
+            compare_all_commentary_source_group_semantics,
+        )
+        body=(
+            '<p>Same—punctuation! '
+            '<note type="explanation" n="a">Note body: preserve punctuation.</note>'
+            ' Linked <reference osisRef="Gen.1.1">Gen. 1:1</reference>.</p>'
+        )
+        self.write(
+            '<chapter sID="Gen.1" osisID="Gen.1" n="1"/>'
+            '<verse sID="Gen.1.1" osisID="Gen.1.1" n="1"/>'
+            +body+
+            '<verse eID="Gen.1.1"/><chapter eID="Gen.1"/>',
+            kind="commentary")
+        before=self.source.read_bytes()
+        groups=[]
+        source_commentary_overlap_witness(self.source,groups_out=groups)
+        raw={"Gen.1.1":body.encode("utf-8")}
+        good=compare_all_commentary_source_group_semantics(groups,raw)
+        self.assertEqual(good["counts"]["source_text_exact_raw_unicode_substring"],1)
+        self.assertEqual(good["counts"]["source_note_bodies_missing_from_native"],0)
+        self.assertEqual(good["counts"]["source_reference_bodies_missing_from_native"],0)
+        self.assertEqual(good["counts"]["source_note_body_and_metadata_not_exactly_in_native"],0)
+        self.assertEqual(good["counts"]["source_reference_body_and_metadata_not_exactly_in_native"],0)
+        changed=body.replace("Same—punctuation!","Same-punctuation!")
+        changed=changed.replace('osisRef="Gen.1.1"','osisRef="Gen.1.2"')
+        changed=changed.replace('Note body: preserve punctuation.',
+                                'Altered note body: preserve punctuation.')
+        bad=compare_all_commentary_source_group_semantics(
+            groups,{"Gen.1.1":changed.encode("utf-8")})
+        self.assertEqual(bad["counts"]["source_group_full_punctuation_or_spacing_needs_review"],1)
+        self.assertEqual(bad["counts"]["source_note_bodies_missing_from_native"],1)
+        self.assertEqual(bad["counts"]["source_reference_body_and_metadata_not_exactly_in_native"],1)
+        self.assertEqual(self.source.read_bytes(),before)
+
     def test_bible_split_preserves_all_text_verse_ids_and_original(self):
         self.write('<verse osisID="Gen.1.1" sID="v1"/><p>First sentence. Second sentence.</p><verse eID="v1"/>')
         node = self.p()
