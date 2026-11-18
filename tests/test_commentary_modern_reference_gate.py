@@ -195,6 +195,26 @@ class WholeNativeReferenceIdentityTests(unittest.TestCase):
                 hashlib.sha256(b"Bible:Gen.1.1-Gen.1.3").hexdigest()])
         self.assertFalse(report["original_source_prose_or_XML_exported"])
 
+    def test_repeated_original_target_and_label_remain_two_occurrences(self):
+        # Repeated authorial link elements must not be deduplicated simply
+        # because the literal destination and displayed labels are identical.
+        raw = (b'<div><reference osisRef="Bible:Gen.1.1">the same label</reference> '
+               b'and <reference osisRef="Bible:Gen.1.1">the same label</reference></div>')
+        receipt = whole_source_receipt(reference_count=2)
+        receipt["chapters"]["Gen.1"]["original_units"][0][
+            "source_unit_sha256"] = hashlib.sha256(raw).hexdigest()
+        gate = WholeCanonOriginalLinkIdentityReceipt(receipt)
+        gate.observe("K", "Gen.1.3", raw)
+        gate.observe("K", "Gen.1.4", raw)
+        result = gate.report({"all_native_raw_entries_ordered_sha256": FULL_HASH})
+        group = result["source_link_groups"][0]
+        self.assertEqual(result["original_reference_elements_verified"], 2)
+        self.assertEqual(group["reference_count"], 2)
+        self.assertEqual(len(group["original_osisRef_sha256_in_document_order"]), 2)
+        self.assertEqual(len(set(group["original_osisRef_sha256_in_document_order"])), 1)
+        self.assertEqual(len(set(
+            group["original_visible_link_label_sha256_in_document_order"])), 1)
+
     def test_missing_or_corrupt_original_aliases_fail_closed(self):
         gate = WholeCanonOriginalLinkIdentityReceipt(whole_source_receipt())
         gate.observe("K", "Gen.1.3", ORIGINAL)
