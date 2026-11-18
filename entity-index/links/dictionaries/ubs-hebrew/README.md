@@ -67,7 +67,7 @@ A further **12,385** lexical occurrences have no such joint evidence, and 2 lack
 
 ## Verified improvement: original-word-anchored headword links
 
-The pinned WLC source and UBS Hebrew 0.9.4 confirm **2,695 additional
+The pinned WLC source and UBS Hebrew 0.9.4 confirm **7,588 additional
 entry-only links** beyond the conservative four-field lookup. The word-aware
 path is deliberately **not** an alias from unsuffixed Strong to suffixed
 Strong: such a rule could conflate homonyms.
@@ -78,8 +78,10 @@ MACULA WLC source word:
 1. Its ordinary exact source `sdbh`/Strong lookup has no UBS entry.
 2. Its original source class is `noun`, `verb`, `adj`, `adv`, or `num`.
 3. Its exact NFC lemma equals the UBS headword's original lemma.
-4. Its H/A numeric Strong family identifies **exactly one headword across
-   the entire UBS source**, including entries with different suffix letters.
+4. Its H/A numeric Strong family and identical NFC original lemma identify
+   **exactly one UBS headword**. Other entries in the same Strong family are
+   allowed only if they have *different* lemmas. If multiple UBS entries share
+   the same lemma within that family, the original homograph remains unresolved.
 5. Its **original complete MACULA word ID** is retained; source lemma,
    Strong code, and language must also match at lookup.
 
@@ -92,11 +94,11 @@ for callers that do not have WLC word IDs.
 
 | Measure | Generic exact-source path | Original-word-aware path |
 | --- | ---: | ---: |
-| WLC occurrences with a candidate UBS headword | 257,038 | **259,733** |
-| Additional unique-source headword links | — | **2,695** |
+| WLC occurrences with a candidate UBS headword | 257,038 | **264,626** |
+| Additional unique-source headword links | — | **7,588** |
 | WLC occurrences with Strong-corroborated SDBH sense IDs | 30,492 | **30,492** |
-| Selected lexical-class occurrences with an UBS headword | 228,705 | **231,400** |
-| Selected lexical-class coverage | 91.97% | **93.05%** |
+| Selected lexical-class occurrences with an UBS headword | 228,705 | **236,293** |
+| Selected lexical-class coverage | 91.97% | **95.02%** |
 
 Both paths remain pinned to the **same unmodified UBS and MACULA editions**.
 The word-anchored path is an opt-in query using a frozen original MACULA
@@ -107,10 +109,11 @@ dictionary prose is unchanged.
 The generator now stores `by_macula_word` plus
 `coverage_with_word_ids` in [index.json](index.json); the
 [full original-corpus CI](../../../../.github/workflows/bsi-ubs-hebrew.yml)
-rebuilds both and verifies **2,695** new links and **259,733**
+rebuilds both and verifies **7,588** new links and **264,626**
 word-aware candidates. [test_word_anchored.py](test_word_anchored.py)
-tests source identity isolation, H/A separation, ambiguous UBS Strong
-families, and preventing cross-edition `sdbh` collisions.
+tests source identity isolation, H/A separation, disambiguation of entries
+with *different* exact lemmas inside one Strong family, rejection of identical
+homograph lemmas, and prevention of cross-edition `sdbh` collisions.
 
 ## Source integrity and test workflow
 

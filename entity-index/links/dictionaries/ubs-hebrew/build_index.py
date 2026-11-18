@@ -146,7 +146,7 @@ def lookup(index, sdbh, strongnumberx, lang):
 
 
 def build_word_links(index, english, macula):
-    """Resolve WLC words only with exact lemma and a globally unique Strong family.
+    """Resolve WLC words using exact lemma in a Strong family without homonym guessing.
 
     A suffix mismatch is NEVER promoted to an ordinary Strong synonym. Every
     inferred headword is pinned to a particular original WLC word ID, and
@@ -185,15 +185,18 @@ def build_word_links(index, english, macula):
             if row["lang"] not in ("H", "A") or not source_code:
                 continue
             family = f"{row['lang']}{int(source_code.group(1))}"
-            mids = numeric_family.get(family, set())
-            if len(mids) != 1:
-                continue
-            mid = next(iter(mids))
+            # A numeric Strong family can contain several unrelated lexical
+            # entries. Restrict to identical original lemma before deciding
+            # uniqueness; still reject true homographs (same lemma, >1 ID).
             lemma = row["lemma"]
-            if unicodedata.normalize("NFC", lemma) != unicodedata.normalize(
-                "NFC", by_entry[mid]["Lemma"]
-            ):
+            normalized = unicodedata.normalize("NFC", lemma)
+            matching = [
+                mid for mid in numeric_family.get(family, set())
+                if unicodedata.normalize("NFC", by_entry[mid]["Lemma"]) == normalized
+            ]
+            if len(matching) != 1:
                 continue
+            mid = matching[0]
             word_links[wid] = {
                 "entry_id": mid,
                 "lemma": lemma,
@@ -222,7 +225,7 @@ def lookup_word(index, word_id, sdbh, strongnumberx, lang, lemma):
         "status": "entry_only",
         "entry_ids": [record["entry_id"]],
         "sense_ids": [],
-        "evidence": "macula_word_exact_lemma_unique_ubs_strong_family",
+        "evidence": "macula_word_exact_lemma_unique_entry_within_ubs_strong_family",
     }
 
 
@@ -239,7 +242,7 @@ def audit_word_links(index, macula):
                 results["generic_entry_links"] += 1
             if new["entry_ids"]:
                 results["word_aware_entry_links"] += 1
-            if new["evidence"] == "macula_word_exact_lemma_unique_ubs_strong_family":
+            if new["evidence"] == "macula_word_exact_lemma_unique_entry_within_ubs_strong_family":
                 results["additional_entry_only_links"] += 1
             if new["sense_ids"]:
                 results["sense_links"] += 1

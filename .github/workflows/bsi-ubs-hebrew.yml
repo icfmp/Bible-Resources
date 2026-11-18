@@ -144,8 +144,8 @@ jobs:
           assert actual["coverage"]["with_exact_ubs_sense_candidates"]==30492
           assert actual["coverage"]["ambiguous_ubs_entry_candidates"]==5024
           assert actual["coverage"]["no_entry_match"]==218868
-          assert actual["coverage_with_word_ids"]["additional_entry_only_links"] == 2695
-          assert actual["coverage_with_word_ids"]["word_aware_entry_links"] == 259733
+          assert actual["coverage_with_word_ids"]["additional_entry_only_links"] == 7588
+          assert actual["coverage_with_word_ids"]["word_aware_entry_links"] == 264626
           assert len(actual["by_macula_word"]) == actual["coverage_with_word_ids"]["additional_entry_only_links"]
           assert actual["coverage_with_word_ids"]["generic_entry_links"] == 257038
           assert sum(actual["coverage"][key] for key in (
