@@ -136,6 +136,42 @@ jobs:
           print("First structural finding positions (code and XML line only):",
                 [{"code":row["code"],"line":row["original_xml_line"]}
                  for row in findings[:20]])
+          from collections import Counter
+          from hashlib import sha256
+          import re
+          references=[row for row in findings if row["code"]=="unreviewed_cross_reference"]
+          def classify_target(value):
+              if not value:
+                  return "empty"
+              if ";" in value or "," in value:
+                  return "punctuation_separated"
+              if any(x in value for x in ("–","—","‑")):
+                  return "unicode_dash"
+              if "@" in value or "!" in value:
+                  return "extended_subreference"
+              if ":" in value and not value.startswith("Bible:"):
+                  return "other_work_prefix"
+              if re.search(r"\\.\\d+[A-Za-z]+(?:$|\\s)",value):
+                  return "letter_suffixed_endpoint"
+              if re.search(r"-\\d+(?:$|\\s)",value):
+                  return "abbreviated_range"
+              if re.search(r"\\s",value.strip()):
+                  return "compound_or_whitespace"
+              return "other_unreviewed_osis_syntax"
+          categories=Counter(classify_target(row.get("details",{}).get("osis_ref",""))
+                             for row in references)
+          print("Unreviewed source link-target grammar categories:",
+                dict(sorted(categories.items())))
+          def safe_shape(value):
+              return re.sub(r"9+","9",re.sub(r"A+","A",
+                  "".join("A" if x.isalpha() else "9" if x.isdigit()
+                          else x for x in value)))[:100]
+          print("Unreviewed source link-target locators (line/category/shape/SHA):",
+                [{"line":row["original_xml_line"],
+                  "category":classify_target(row.get("details",{}).get("osis_ref","")),
+                  "shape":safe_shape(row.get("details",{}).get("osis_ref","")),
+                  "sha256":sha256(row.get("details",{}).get("osis_ref","").encode("utf-8")).hexdigest()}
+                 for row in references])
           print("No editorial changes or historical text correction performed")
           PY
       - name: Compile fresh private zCom4, then independently read EVERY occupied key
