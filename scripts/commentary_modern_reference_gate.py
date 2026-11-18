@@ -1740,7 +1740,8 @@ def _source_context_unique_paragraph_anchor(
     best = {(row[3], row[4]): row for row in placements if row[:3] == highest}
     if len(best) != 1:
         return None
-    return next(iter(best.values()))[-2:]
+    selected = next(iter(best.values()))
+    return selected[-1], selected[-2]  # (paragraph node, character offset)
 
 
 def build_private_contextual_source_note_preview(
