@@ -323,6 +323,58 @@ jobs:
                 "link elements, 9 list-number omissions, 8 corrected reference "
                 "target, 1 witness-backed missing link; NO release")
           PY
+      - name: Generate and audit one full-canon unpublished modern-English OSIS candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_modern_draft_osis_preview.py \
+            --root work/mhcc-modern/production/accepted \
+            --accepted-native-receipt "$RUNNER_TEMP/mhcc-modern-whole-canon-native-receipt.json" \
+            --source-topology-manifest work/mhcc-modern/production/MODERN_OSIS_TOPOLOGY_EXCEPTIONS.json \
+            --ionly-manifest work/mhcc-modern/production/IONLY_CHAPTER_LINK_PREVIEW.json \
+            --book-intro-candidate-root work/mhcc-modern/production \
+            --osis "$RUNNER_TEMP/mhcc-modern-complete-unlinked.osis.xml" \
+            --report "$RUNNER_TEMP/mhcc-modern-complete-unlinked-osis-structure.json" \
+            --temp-module-id MHCCFULLTMP
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+          base=Path(os.environ["RUNNER_TEMP"])
+          proof=json.loads((base/"mhcc-modern-complete-unlinked-osis-structure.json").read_text())
+          assert proof["status"] == (
+              "FULL_CANON_UNLINKED_MODERN_ENGLISH_OSIS_TECHNICAL_CANDIDATE_NOT_RELEASE")
+          assert proof["books"] == 66
+          assert proof["chapters"] == 1189
+          assert proof["original_K_authorial_bodies"] == 4047
+          assert proof["source_I_only_chapter_bodies"] == 2
+          assert proof["annotated_sections"] == 4049
+          assert proof["modern_topical_expositions"] == 4052
+          assert proof["total_source_and_I_only_verse_alias_keys"] == 28792
+          assert proof["chapter_I_preface_candidates"] == 5
+          assert proof["source_topology_exceptions_used"] == [
+              "1Sam.25","Deut.20","John.3","Ps.95","Zech.9"]
+          assert proof["paragraphs"] > 10000
+          assert proof["tables"] >= 800
+          assert not proof["original_1204_reference_links_transferred"]
+          assert not proof["original_native_inline_markup_and_notes_verified"]
+          assert not proof["independent_semantic_signoff"]
+          assert not proof["sword_publication_authorized"]
+          assert not proof["original_sword_changed"]
+          ns={"o":"http://www.bibletechnologies.net/2003/OSIS/namespace"}
+          root=ET.parse(base/"mhcc-modern-complete-unlinked.osis.xml").getroot()
+          books=root.findall(".//o:div[@type='book']",ns)
+          chapters=root.findall(".//o:chapter",ns)
+          sections=root.findall(".//o:div[@annotateType='commentary']",ns)
+          assert len(books)==66 and len(chapters)==1189 and len(sections)==4049
+          assert len({c.attrib["osisID"] for c in chapters})==1189
+          assert len(root.findall(".//o:reference",ns))==0, (
+              "No original link may be silently guessed or asserted by this draft")
+          print("UNPUBLISHED MODERN OSIS TECHNICAL STRUCTURE PASS "
+                "books=66 chapters=1189 K=4047 I-only=2 sections=4049 "
+                "modern_leaf_headings=4052 native_keys_plus_I_transport=28792 "
+                "source_html_links=UNLINKED no semantic or publisher approval")
+          PY
       - name: Probe five original SWORD source-body scopes against independent English anchors
         shell: bash
         run: |
@@ -1501,6 +1553,7 @@ jobs:
             ${{ runner.temp }}/mhcc-modern-whole-canon-native-receipt.json
             ${{ runner.temp }}/mhcc-modern-all-original-link-identity-sha.json
             ${{ runner.temp }}/mhcc-modern-proposed-link-correction-dispositions.json
+            ${{ runner.temp }}/mhcc-modern-complete-unlinked-osis-structure.json
             ${{ runner.temp }}/mhcc-modern-five-native-source-witness-probes.json
             ${{ runner.temp }}/mhcc-crosswire-five-native-source-receipt.json
             ${{ runner.temp }}/mhcc-crosswire-five-native-witness-probes.json
