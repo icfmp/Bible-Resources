@@ -664,6 +664,70 @@
         "Pinned WLC 2 Chronicles 25:23 o140250230061 = Judahite father, o140250230101 = Israelite king as explicit subject of 'captured'",
         "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/12-2Ki-014-lowfat.xml and WLC/lowfat/14-2Ch-025-lowfat.xml"
       ]
+    },
+    {
+      "source_id": "person:Jehoash",
+      "action": "amend_occurrences",
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o120140130101"
+          ]
+        ]
+      },
+      "add_explicit_instances": {
+        "wlc": [
+          [
+            "o120140130061"
+          ]
+        ]
+      },
+      "remove_subject_referents": {
+        "wlc": [
+          [
+            "o120140130162"
+          ],
+          [
+            "o120140130182"
+          ],
+          [
+            "o120140140012"
+          ],
+          [
+            "o120140140182"
+          ]
+        ]
+      },
+      "reason": "2 Kings 14:13 separately names Jehoash the Judahite father of Amaziah at the first name token and Jehoash the Israelite captor at the second; the frozen person:Jehoash (alias of Joash.3, Judah) mistakenly claims the second name and four subsequent action words describing Israel's king. Correct only those words, preserving the source alias and source JSON unchanged.",
+      "evidence": [
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/12-2Ki-014-lowfat.xml",
+        "Pinned WLC 2 Kings 14:13 o120140130061 = Amaziah's father (Judah); o120140130101 = Israel's king; 14:13-14 four verbs describe Israelite king",
+        "Frozen ACAI person:Jehoash primary_id=person:Joash.3; person:Jehoash.2 primary_id=person:Joash.4"
+      ]
+    },
+    {
+      "source_id": "person:Jehoash.2",
+      "action": "amend_occurrences",
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o120140130061"
+          ]
+        ]
+      },
+      "add_explicit_instances": {
+        "wlc": [
+          [
+            "o120140130101"
+          ]
+        ]
+      },
+      "reason": "The frozen person:Jehoash.2 is the separate source alias of Joash.4, king of Israel. It incorrectly claims the first Jehoash name in 2 Kings 14:13 (Amaziah's Judahite father); assign its explicit occurrence to the second named Jehoash, the Israelite king who captures Amaziah, without altering valid subject pointers.",
+      "evidence": [
+        "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/12-2Ki-014-lowfat.xml",
+        "Pinned WLC 2 Kings 14:13 first Jehoash o120140130061 is the father of Amaziah; second o120140130101 is the Israelite king",
+        "Frozen ACAI person:Jehoash.2 primary_id=person:Joash.4, originally pointing to first name token"
+      ]
     }
   ]
 }
