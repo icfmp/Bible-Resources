@@ -1745,7 +1745,7 @@ def _source_context_unique_paragraph_anchor(
 
 def build_private_contextual_source_note_preview(
         *, source_note_osis: bytes, ledger: dict, native: dict,
-        original_contexts: dict) -> tuple[bytes, dict]:
+        original_contexts: dict, errata: dict) -> tuple[bytes, dict]:
     """Relocate only proven same-K source notes adjacent to exact prose context.
 
     An unchanged *separate* source-note SWORD candidate remains authoritative
@@ -1765,6 +1765,17 @@ def build_private_contextual_source_note_preview(
     chapters = {x.get("osisID"):x for x in doc.iter()
                 if x.tag == f"{{{NS}}}chapter"}
     pending = ledger["pending"]
+    original_errata = errata.get("cases")
+    if (errata.get("status") != "PINNED_ORIGINAL_LINK_ERRATA_REVIEW_ONLY_NOT_APPLIED"
+            or errata.get("original_native_corpus_sha256") !=
+               native.get("original_compiled_corpus_sha256")
+            or not isinstance(original_errata,list) or len(original_errata)!=4
+            or any(c.get("approval") is not False for c in original_errata)):
+        raise ValueError("Unapproved defective original source references were not pinned")
+    blocked_keys = {(c["source_first_key"], c["original_reference_ordinal"])
+                    for c in original_errata}
+    if len(blocked_keys)!=4:
+        raise ValueError("Four source errors must remain distinct")
     if len(pending) != ledger["source_original_links_still_requiring_placement_review"]:
         raise ValueError("Original source pending ledger was truncated")
 
@@ -1812,7 +1823,7 @@ def build_private_contextual_source_note_preview(
                 notes_by_first[source["first_key"]] = (section, group_notes[0])
 
     candidates = {}
-    blocked = set()
+    blocked = set(blocked_keys)
     for row in pending:
         first, ordinal = row["source_first_key"], row["source_reference_ordinal"]
         if first not in notes_by_first:
@@ -2450,7 +2461,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         if context_notes_output is not None:
             context_osis, context_receipt = build_private_contextual_source_note_preview(
                 source_note_osis=notes_osis, ledger=source_link_ledger,
-                native=native, original_contexts=private_original_contexts)
+                native=native, original_contexts=private_original_contexts,
+                errata=errata_review)
             context_notes_output.parent.mkdir(parents=True,exist_ok=True)
             context_notes_output.write_bytes(context_osis)
         if errata_proposals_output is not None:
