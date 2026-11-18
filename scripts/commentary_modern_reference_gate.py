@@ -1430,7 +1430,10 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
     # multiple independent links (including the duplicated 1 Cor. 5:7 source).
     # No literal original source targets or linked words enter this receipt.
     modern_groups = []
-    linked_keys={row["source_first_key"] for row in proposed}
+    outline_action="AUTO_ORIGINAL_FIRST_K_CHAPTER_OUTLINE_RANGE"
+    K_placements=[row for row in proposed if row["action"]!=outline_action]
+    I_placements=[row for row in proposed if row["action"]==outline_action]
+    linked_keys={row["source_first_key"] for row in K_placements}
     for first in sorted(linked_keys):
         ch = first.rsplit(".",1)[0]
         units = native["chapters"][ch]["original_units"]
@@ -1441,7 +1444,7 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                  if v.tag == f"{{{NS}}}reference"]
         targets = [v.attrib.get("osisRef") for v in nodes]
         labels = ["".join(v.itertext()) for v in nodes]
-        expected_count = sum(row["source_first_key"] == first for row in proposed)
+        expected_count = sum(row["source_first_key"] == first for row in K_placements)
         if (len(targets)!=expected_count or
                 any(not isinstance(t,str) or not t for t in targets)
                 or any(not label for label in labels)):
@@ -1454,8 +1457,36 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                 hashlib.sha256(label.encode("utf-8")).hexdigest() for label in labels],
             "modern_link_occurrences":len(targets)
         })
-    if sum(r["modern_link_occurrences"] for r in modern_groups) != len(proposed):
-        raise ValueError("Modern source-linked group count differs from source review")
+    if sum(r["modern_link_occurrences"] for r in modern_groups) != len(K_placements):
+        raise ValueError("Modern K-owned linked group count differs from source review")
+    intro_groups=[]
+    outline_chapters={row["modern_chapter"] for row in I_placements}
+    for chapter in sorted(outline_chapters):
+        root=modern_chapters[chapter]
+        sources=[v for v in root.findall(f"./{{{NS}}}div[@type='introduction']")
+                 if len(v.findall(f"./{{{NS}}}title"))==1 and
+                 v.find(f"./{{{NS}}}title").text=="Original chapter outline"]
+        if len(sources)!=1:
+            raise ValueError("Source-owned original chapter outline introduction is ambiguous")
+        nodes=[v for v in sources[0].iter() if v.tag==f"{{{NS}}}reference"]
+        expected_count=sum(row["modern_chapter"]==chapter for row in I_placements)
+        if (len(nodes)!=expected_count or
+                any(not v.get("osisRef") or not "".join(v.itertext()) for v in nodes)):
+            raise ValueError("Original chapter outline link count or placement changed")
+        intro_groups.append({
+            "modern_chapter":chapter,
+            "modern_intro_osisRef_hashes_in_actual_document_order":[
+                hashlib.sha256(v.get("osisRef").encode("utf-8")).hexdigest()
+                for v in nodes],
+            "modern_intro_label_hashes_in_actual_document_order":[
+                hashlib.sha256("".join(v.itertext()).encode("utf-8")).hexdigest()
+                for v in nodes],
+            "modern_link_occurrences":len(nodes),
+            "source_ownership":"ORIGINAL_FIRST_K_CHAPTER_OUTLINE_RELOCATED_TO_MODERN_CHAPTER_I",
+        })
+    if (sum(r["modern_link_occurrences"] for r in modern_groups)+
+            sum(r["modern_link_occurrences"] for r in intro_groups)!=len(proposed)):
+        raise ValueError("Modern K and chapter-I source-link counts differ from original")
     output = ET.tostring(doc, encoding="utf-8", xml_declaration=True)
     ET.fromstring(output)
     return output, {
@@ -1464,6 +1495,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         "modern_chapters_preserved":1189,
         "source_pinned_original_K_bodies_revisited":len(requested),
         "source_K_groups_with_links_inserted":len(linked_keys),
+        "modern_chapter_I_outline_groups_with_links":len(outline_chapters),
+        "modern_original_outline_links_inserted":len(I_placements),
         "modern_inline_links_inserted":len(embedded),
         "automatic_source_matched_references":auto_counts,
         "source_original_hyperlink_table_ownership_census":context_count,
@@ -1483,6 +1516,7 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         "independent_editorial_semantic_signoff":False,
         "publication_authorized":False,
         "linked_source_K_groups_with_exact_derived_target_order":modern_groups,
+        "linked_modern_chapter_I_outline_groups_with_exact_derived_order":intro_groups,
         "insertions":inserted,
     }
 
