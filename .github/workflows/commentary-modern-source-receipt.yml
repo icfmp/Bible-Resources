@@ -518,6 +518,8 @@ jobs:
             --auto-source-matched-same-chapter-ranges \
             --auto-original-first-K-outline-links \
             --auto-authenticated-original-printed-single-verses \
+            --source-notes-osis "$RUNNER_TEMP/mhcc-modern-original-crossref-supplement.osis.xml" \
+            --source-notes-errata-manifest work/mhcc-modern/production/FOUR_NATIVE_LINK_ERRATA_REVIEW_2026-11-18.json \
             --linked-osis "$RUNNER_TEMP/mhcc-modern-complete-bounded-linked.osis.xml" \
             --report "$RUNNER_TEMP/mhcc-modern-complete-bounded-linked-osis-structure.json"
           python - <<'PY'
@@ -529,6 +531,18 @@ jobs:
           assert report["status"] == (
               "PRIVATE_REVIEWED_LINKED_FULL_CANON_OSIS_CANDIDATE_NOT_RELEASED")
           assert report["modern_chapters_preserved"] == 1189
+          supplement=report["private_source_note_alternative"]
+          assert supplement["status"] == (
+              "PRIVATE_NATIVE_SOURCE_NOTE_ALTERNATIVE_NOT_AUTHORED_INLINE_PARITY")
+          assert supplement["original_link_occurrences_preserved_only_in_separate_source_notes"] == 176
+          assert supplement["malformed_or_wrong_original_links_excluded_for_review"] == 4
+          assert supplement["modern_source_text_and_existing_links_unchanged"]
+          assert not supplement["editorial_relocation_approved"]
+          assert not supplement["published_or_distributed"]
+          assert Path(base/"mhcc-modern-original-crossref-supplement.osis.xml").is_file()
+          print("SOURCE REFERENCE SUPPLEMENT PREVIEW: 176 exact native links " +
+                "retained as source-only notes in a separate candidate; " +
+                "4 bad native targets excluded; modern inline links unchanged")
           assert report["modern_inline_links_inserted"] >= 1014
           assert report["automatic_source_matched_references"]["automatically_inserted_source_labels"] >= 0
           assert report["automatic_source_matched_references"]["automatically_inserted_ranges"] > 0
