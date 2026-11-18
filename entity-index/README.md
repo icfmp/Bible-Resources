@@ -454,7 +454,7 @@ descriptions without firmer person-role evidence.
 No anonymous person was merged with an explicitly named historical
 person. No other referent groups were removed. Exact pinned original
 source records remain byte-identical, and source edits stay declarative,
-reversible and fully audited. The **2,369 indirect-only overlaps** still
+reversible and fully audited. The **2,366 indirect-only overlaps** still
 require separate source-role and participant semantics review.
 
 ## Indirect person-overlap source-grammar triage — no mass deduplication
@@ -479,9 +479,9 @@ event or whether one anonymous pronoun refers to them.
 The original complete pinned morphology audit found **1,289 Greek**
 and **1,096 Hebrew** indirect-only word overlaps. A subsequent
 exact-token contextual correction in the derived index removed sixteen
-false source claims; the remaining **2,369** word overlaps comprise
-**1,286 Greek** and **1,083 Hebrew**. Their source-word grammatical
-counts are **2,096 plural**, **77 singular** and **196 without number**
+false source claims; the remaining **2,366** word overlaps comprise
+**1,284 Greek** and **1,082 Hebrew**. Their source-word grammatical
+counts are **2,096 plural**, **74 singular** and **196 without number**
 (often infinitives).
 These are categories of the source word, not conclusions about the
 people tagged on it. Several repeated candidate cohorts (e.g. Paul/Silas/Timothy; Aaron/Moses;
@@ -550,6 +550,26 @@ first-person verb *"I said"* spoken by Daniel, not the angelic
 visitor. Six exact wrong `subject_referents` groups are detached
 in the derived index. The corresponding correct person pointers,
 source text, and all frozen ACAI JSON remain unchanged.
+
+### Separating two different Marys and the widow's children
+
+The pinned Greek Matthew 27:61 and 28:1 both explicitly list
+**Mary Magdalene** alongside **the other Mary**, who is a
+distinct woman. The adjective `ἄλλη` at `n40027061009` and
+`n40028001015` refers to the latter woman only; two exact
+false pronominal links are detached from `person:Marymagdalene`
+without changing either woman's other source references.
+
+In 2 Kings 4:1 `o120040010012` is a feminine singular
+Hebrew word for **woman**, not a son; the widow's sons
+are mentioned with different source-word IDs. Remove this
+one false `person:GenericSon` subject link, without
+inventing which of the other son/children words identifies
+one specific boy. Crucially, the inherited `person:Widow`
+has **two repeated identical original subject groups** for
+this word; both are preserved with exact multiplicity.
+Source original JSON, all Bible words and their numbering
+remain unchanged.
 
 ## Scoped review of all eight remaining explicit-person overlaps
 
