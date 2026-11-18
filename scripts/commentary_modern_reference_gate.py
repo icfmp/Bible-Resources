@@ -863,7 +863,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                                     dispositions: dict, repo_root: Path,
                                     reader: Path, module_directory: Path,
                                     module_id: str,
-                                    auto_single_verse: bool = False) -> tuple[bytes, dict]:
+                                    auto_single_verse: bool = False,
+                                    auto_ranges: bool = False) -> tuple[bytes, dict]:
     """Authenticate and place an explicitly bounded set of source-backed links.
 
     Real original SWORD attributes stay in private memory/isolated new OSIS,
@@ -871,6 +872,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
     it does not assert the 1,204 original source links have been transferred.
     """
     from commentary_modern_draft_osis_preview import NS, _range
+    if auto_ranges and not auto_single_verse:
+        raise ValueError("Range mapping requires source-matched single-verse mode")
     if (placements.get("status") !=
             "PRIVATE_REVIEWED_BOUNDED_LINK_PLACEMENT_NOT_FINAL_EDIT_OR_RELEASE"
             or placements.get("published_source_module") != "MHCC 0.1.1"
@@ -1015,7 +1018,7 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         raise ValueError("Source-linked OSIS needs all 1189 modern chapters")
     original_visible = "".join(doc.itertext())
     inserted = []
-    auto_counts = {"automatically_inserted":0}
+    auto_counts = {"automatically_inserted":0,"automatically_inserted_ranges":0}
     for row in proposed:
         chapter, first = row["modern_chapter"], row["source_first_key"]
         units = native["chapters"][chapter]["original_units"]
@@ -1058,7 +1061,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         automatic, skips = _auto_single_verse_placements(
             private_original=private_original, groups=groups,
             modern_chapters=modern_chapters, native=native,
-            blocked=already, corrections=correction_by_key)
+            blocked=already, corrections=correction_by_key,
+            include_ranges=auto_ranges)
         # The original raw source and its complete identity hashes are already
         # validated by observe(). Retain original literal osisRef unchanged.
         for row in automatic:
@@ -1069,7 +1073,13 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
             section=modern_chapters[chapter].findall(
                 f"./{{{NS}}}div[@annotateType='commentary']")[nth]
             literal=private_original[first][row["original_link_ordinal"]-1][0]
-            if canonical_only_for_comparison(literal)!=row["expected_modern_target"]:
+            if row["action"]=="AUTO_EXACT_SOURCE_TARGET_AND_UNIQUE_MODERN_RANGE":
+                normalized="RANGE:"+(literal[6:] if literal.startswith("Bible:")
+                                      else literal)
+                if (_source_same_chapter_verse_range(literal) is None or
+                        normalized!=row["expected_modern_target"]):
+                    raise ValueError("Source range autolink failed exact original target")
+            elif canonical_only_for_comparison(literal)!=row["expected_modern_target"]:
                 raise ValueError("Autolink changed original authenticated destination")
             _wrap_exact_authored_modern_text(
                 section, anchor=row["modern_anchor"],
@@ -1084,6 +1094,9 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                     literal.encode("utf-8")).hexdigest(),
             })
         auto_counts = {"automatically_inserted":len(automatic),
+                       "automatically_inserted_ranges":sum(
+                           row["action"]=="AUTO_EXACT_SOURCE_TARGET_AND_UNIQUE_MODERN_RANGE"
+                           for row in automatic),
                        **skips}
         proposed = list(proposed)+automatic
     if "".join(doc.itertext()) != original_visible:
@@ -1168,6 +1181,7 @@ def main():
     p.add_argument("--base-unlinked-osis",type=Path)
     p.add_argument("--reviewed-link-placement-manifest",type=Path)
     p.add_argument("--auto-source-matched-single-verses",action="store_true")
+    p.add_argument("--auto-source-matched-same-chapter-ranges",action="store_true")
     p.add_argument("--linked-osis",type=Path)
     p.add_argument("--report",required=True,type=Path)
     a=p.parse_args()
@@ -1195,7 +1209,8 @@ def main():
                 encoding="utf-8")),
             repo_root=a.repository_root, reader=a.native_reader,
             module_directory=a.module_directory, module_id=a.module_id,
-            auto_single_verse=a.auto_source_matched_single_verses)
+            auto_single_verse=a.auto_source_matched_single_verses,
+            auto_ranges=a.auto_source_matched_same_chapter_ranges)
         a.linked_osis.parent.mkdir(parents=True,exist_ok=True)
         a.report.parent.mkdir(parents=True,exist_ok=True)
         a.linked_osis.write_bytes(osis)
@@ -1208,7 +1223,8 @@ def main():
               " exact automatically matched citations) across all 1189 chapters; " +
               "unmatched original hyperlinks still need editorial placement; NO release")
         return 0
-    if (a.auto_source_matched_single_verses and
+    if ((a.auto_source_matched_single_verses or
+         a.auto_source_matched_same_chapter_ranges) and
             a.reviewed_link_placement_manifest is None):
         p.error("Automatic source-linked citation lookup needs reviewed base manifests")
     if any(x is not None for x in (
