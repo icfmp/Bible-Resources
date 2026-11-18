@@ -803,6 +803,93 @@ jobs:
                 " are source-authenticated modern chapter-I outline links; "
                 "28792 exact original/I-only numbered K keys; NO release")
           PY
+      - name: Compile and independently read back private 176-link original-source note alternative
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/mhcc-source-notes-root/mods.d"
+          mkdir -p "$RUNNER_TEMP/mhcc-source-notes-root/modules/comments/zcom/mhccnotes"
+          timeout 240s osis2mod \
+            "$RUNNER_TEMP/mhcc-source-notes-root/modules/comments/zcom/mhccnotes" \
+            "$RUNNER_TEMP/mhcc-modern-original-crossref-supplement.osis.xml" \
+            -z z -b 3 \
+            > "$RUNNER_TEMP/mhcc-original-source-notes-osis2mod.log" 2>&1
+          cat > "$RUNNER_TEMP/mhcc-source-notes-root/mods.d/mhccnotes.conf" <<'EOF'
+          [MHCCNOTES]
+          Description=Private unpublished MHCC original-source reference notes alternative
+          DataPath=./modules/comments/zcom/mhccnotes/
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          Lang=en
+          Versification=KJV
+          SourceType=OSIS
+          DistributionLicense=Private
+          EOF
+          python - <<'PY'
+          import hashlib,json,os,subprocess,sys
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+          sys.path.insert(0,"scripts")
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          base=Path(os.environ["RUNNER_TEMP"])
+          report=json.loads(
+              (base/"mhcc-modern-complete-bounded-linked-osis-structure.json").read_text())
+          appendix=report["private_source_note_alternative"]
+          expected={
+              r["source_first_key"]:r["original_source_reference_hashes"]
+              for r in appendix["note_source_K_reference_hashes_for_private_native_readback"]
+          }
+          assert len(expected)==appendix["source_first_K_sections_with_note"]
+          assert sum(map(len,expected.values()))==176
+          seen={}
+          def observe(kind,key,raw):
+              if kind!="K" or key not in expected:
+                  return
+              if key in seen:
+                  raise ValueError("Duplicated native K with original-source supplement")
+              root=ET.fromstring(b"<derived>"+raw+b"</derived>")
+              notes=[x for x in root.iter() if isinstance(x.tag,str)
+                     and x.tag.rsplit("}",1)[-1]=="note"
+                     and x.get("resp")=="BibleResourcesPrivateSourceOnlyLinkSupplement"]
+              if len(notes)!=1:
+                  raise ValueError("Compiled source-note candidate lost its one provenance note")
+              links=[x for x in notes[0].iter() if isinstance(x.tag,str)
+                     and x.tag.rsplit("}",1)[-1]=="reference"]
+              if len(links)!=len(expected[key]):
+                  raise ValueError("Compiled source-note lost original reference multiplicity")
+              for link,row in zip(links,expected[key]):
+                  literal=link.get("osisRef")
+                  label="".join(link.itertext())
+                  if (not isinstance(literal,str) or
+                      hashlib.sha256(literal.encode("utf-8")).hexdigest()
+                          !=row["source_original_literal_target_sha256"] or
+                      hashlib.sha256(label.encode("utf-8")).hexdigest()
+                          !=row["supplement_display_sha256"]):
+                      raise ValueError("Compiled source note changed target or derived label")
+              seen[key]=len(links)
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str((base/"mhcc-source-notes-root").resolve())
+          proc=subprocess.Popen([
+              str((base/"commentary-modern-source-raw").resolve()),
+              "MHCCNOTES"],env=env,stdout=subprocess.PIPE,
+              stderr=subprocess.DEVNULL)
+          try:
+              _,numbered,_,_=parse_native_raw_corpus(proc.stdout,on_entry=observe)
+              proc.stdout.close()
+              if proc.wait(timeout=120)!=0:
+                  raise ValueError("Private source-notes SWORD readback incomplete")
+          finally:
+              if proc.poll() is None:
+                  proc.kill();proc.wait()
+          assert set(seen)==set(expected)
+          assert len(numbered)==28792
+          assert sum(seen.values())==176
+          print("PRIVATE SOURCE-NOTE WHOLE-CANON SWORD READBACK PASS: " +
+                f"{len(seen)} original source-K groups, 176 original-linked " +
+                "references in visibly marked separate notes, 28792 indexed " +
+                "keys; existing 1016 inline links left unchanged; NO release")
+          PY
       - name: Diagnose full 4049 authored modern OSIS text bodies through compiled private native SWORD
         shell: bash
         run: |
