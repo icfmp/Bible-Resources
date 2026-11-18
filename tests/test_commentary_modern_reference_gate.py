@@ -11,7 +11,8 @@ from commentary_modern_reference_gate import (SourceReferenceGate,
     WholeCanonOriginalLinkIdentityReceipt, canonical_only_for_comparison,
     validate_proposed_link_dispositions, _wrap_exact_authored_modern_text,
     _unambiguous_explicit_modern_verse, _auto_single_verse_placements,
-    _unrecognized_original_ref_class)
+    _unrecognized_original_ref_class, _source_same_chapter_verse_range,
+    _unambiguous_explicit_modern_range, _allowed_source_link_target)
 
 
 ORIGINAL=(b'<div><reference osisRef="Bible:1John.5.20">1Jo 5:20</reference>'
@@ -564,6 +565,64 @@ class ExactSingleVerseSourceConcordanceTests(unittest.TestCase):
         for value, expected in cases.items():
             with self.subTest(value=value):
                 self.assertEqual(_unrecognized_original_ref_class(value), expected)
+
+    def test_full_original_same_chapter_range_and_exact_modern_citation(self):
+        source="Bible:John.3.16-John.3.18"
+        self.assertEqual(_source_same_chapter_verse_range(source),
+                         ("John","3","16","18"))
+        self.assertTrue(_allowed_source_link_target(source))
+        section=self.section(
+            "We read the whole passage in (John 3:16–18), in context.")
+        marker=_unambiguous_explicit_modern_range(section,source)
+        self.assertEqual(marker,"John 3:16–18")
+        before="".join(section.itertext())
+        _wrap_exact_authored_modern_text(
+            section,anchor=marker,display=marker,occurrence="last",
+            target=source)
+        self.assertEqual("".join(section.itertext()),before)
+        self.assertEqual(section.find(f".//{{{self.NS}}}reference").get("osisRef"),
+                         source)
+
+    def test_ambiguous_and_cross_chapter_source_ranges_are_rejected(self):
+        for original in ("Bible:John.3.16-John.4.18",
+                         "Bible:John.3.16-Rom.3.18",
+                         "John.3.18-John.3.16",
+                         "John.03.16-John.03.18",
+                         "John.3.16-18"):
+            with self.subTest(original=original):
+                self.assertIsNone(_source_same_chapter_verse_range(original))
+        original="Bible:John.3.16-John.3.18"
+        for passage in ("John 3:16–18 and John 3:16–18",
+                        "John 3:16–18, 19",
+                        "1 John 3:16–18",
+                        "John 3:16–17",
+                        "John 3:16, 18"):
+            with self.subTest(passage=passage):
+                self.assertIsNone(_unambiguous_explicit_modern_range(
+                    self.section(passage),original))
+
+    def test_only_original_exact_source_range_enters_auto_placement(self):
+        n=self.section("The words of Jesus (John 3:16–18) teach grace.")
+        source={"chapters":{"Gen.2":{"original_units":[{
+            "first_key":"Gen.2.1","keys":["Gen.2.1","Gen.2.2"]}]}}}
+        original={"Gen.2.1":[("Bible:John.3.16-John.3.18",
+                               "John 3:16–18")]}
+        modern={"Gen.2":ET.Element(f"{{{self.NS}}}chapter")}
+        modern["Gen.2"].append(n)
+        candidates,skipped=_auto_single_verse_placements(
+            private_original=original,groups={},modern_chapters=modern,
+            native=source,blocked=set(),corrections={},include_ranges=True)
+        self.assertEqual(len(candidates),1)
+        self.assertEqual(candidates[0]["action"],
+                         "AUTO_EXACT_SOURCE_TARGET_AND_UNIQUE_MODERN_RANGE")
+        self.assertEqual(candidates[0]["modern_anchor"],"John 3:16–18")
+        self.assertEqual(candidates[0]["expected_modern_target"],
+                         "RANGE:John.3.16-John.3.18")
+        candidates,skipped=_auto_single_verse_placements(
+            private_original=original,groups={},modern_chapters=modern,
+            native=source,blocked=set(),corrections={},include_ranges=False)
+        self.assertEqual(candidates,[])
+        self.assertEqual(skipped["unsupported_original_reference_syntax"],1)
 
     def test_only_one_exact_original_target_is_proposed(self):
         n=self.section("Paul mentions (Romans 3:23), but there is more.")
