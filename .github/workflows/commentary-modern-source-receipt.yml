@@ -517,6 +517,7 @@ jobs:
             --auto-source-matched-single-verses \
             --auto-source-matched-same-chapter-ranges \
             --auto-original-first-K-outline-links \
+            --auto-authenticated-original-printed-single-verses \
             --linked-osis "$RUNNER_TEMP/mhcc-modern-complete-bounded-linked.osis.xml" \
             --report "$RUNNER_TEMP/mhcc-modern-complete-bounded-linked-osis-structure.json"
           python - <<'PY'
@@ -528,7 +529,8 @@ jobs:
           assert report["status"] == (
               "PRIVATE_REVIEWED_LINKED_FULL_CANON_OSIS_CANDIDATE_NOT_RELEASED")
           assert report["modern_chapters_preserved"] == 1189
-          assert report["modern_inline_links_inserted"] > 536
+          assert report["modern_inline_links_inserted"] >= 1014
+          assert report["automatic_source_matched_references"]["automatically_inserted_source_labels"] >= 0
           assert report["automatic_source_matched_references"]["automatically_inserted_ranges"] > 0
           assert report["modern_original_outline_links_inserted"] > 0
           assert report["automatic_source_matched_references"]["automatically_inserted_outline_links"] == (
