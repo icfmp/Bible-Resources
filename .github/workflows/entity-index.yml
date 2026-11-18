@@ -93,7 +93,24 @@ jobs:
                      index["unattested_source_words"].values()) == 18
           assert stats["unattested_raw_word_assignments"] == 19, stats
           assert stats["unattested_source_verses"] == 8, stats
+          assert stats["qualified_source_verse_contexts"] == 8, stats
           assert stats["unattested_source_verse_reference_claims"] == 22, stats
+          from collections import Counter
+          contexts={key:row["source_context"] for key,row
+                    in index["unattested_source_verses"].items()}
+          assert len(contexts)==8
+          kind_counts=Counter(row["classification"] for row in contexts.values())
+          assert kind_counts == {
+              "traditional_textual_variant_not_in_pinned_main_text":5,
+              "doxology_in_edition_apparatus_not_main_word_inventory":2,
+              "alternate_verse_number_for_final_benediction":1,
+          }, kind_counts
+          assert contexts["sblgnt:47013014"]["equivalent_benediction_source_verse"] == "47013013"
+          assert contexts["sblgnt:45016025"]["classification"] == (
+              "doxology_in_edition_apparatus_not_main_word_inventory")
+          assert contexts["sblgnt:45016027"]["classification"] == (
+              "doxology_in_edition_apparatus_not_main_word_inventory")
+          print("ENTITY_VERSE_SOURCE_CONTEXTS",json.dumps(kind_counts,sort_keys=True))
           assert stats["qualified_source_reference_claims"] == 12, stats
           reviews=index["qualified_source_references"]
           all_reviews=[x for records in reviews.values() for x in records]
