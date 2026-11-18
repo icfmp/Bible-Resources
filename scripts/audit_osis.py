@@ -413,6 +413,7 @@ def compare_source_overlap_native_bodies(
     alone cannot prove full notes/markup fidelity or printed edition identity.
     """
     from lxml import etree
+    from commentary_nonlink_word_alignment import exact_unicode_source_ordered_subsequence
     if (not isinstance(overlapping,dict) or not overlapping
             or not isinstance(native_raw,dict) or not native_raw):
         raise ValueError("No source/native overlap evidence")
@@ -452,6 +453,26 @@ def compare_source_overlap_native_bodies(
                 classification="full_prose_present_in_some_native_keys"
             else:
                 classification="full_source_word_sequence_not_found_in_group_native_keys"
+        # Full contiguous string mismatches may arise from interleaved
+        # passages: compare whole source words in order, then 40-word blocks,
+        # with explicit word boundaries. Partial presence is NOT a loss proof.
+        tokens=words.split()
+        ordered_keys=[
+            key for key in group["keys"] if
+            exact_unicode_source_ordered_subsequence(
+                tokens,native_words[key].split()) is True
+        ] if tokens else []
+        chunk_width=40
+        chunks=[tokens[i:i+chunk_width] for i in range(0,len(tokens),chunk_width)]
+        chunks_found=sum(
+            any((" "+" ".join(chunk)+" ") in (" "+native_words[key]+" ")
+                for key in group["keys"]) for chunk in chunks
+        )
+        chunk_fraction=(round(chunks_found/len(chunks),4) if chunks else None)
+        if not matching and ordered_keys:
+            counts["no_contiguous_match_but_full_source_words_in_native_order"]+=1
+        if not matching and chunk_fraction is not None and chunk_fraction<1:
+            counts["no_contiguous_match_with_some_unmatched_40word_blocks"]+=1
         counts[classification]+=1
         if len(cases)<max_cases:
             cases.append({
@@ -463,6 +484,10 @@ def compare_source_overlap_native_bodies(
                     words.encode("utf-8")).hexdigest(),
                 "indexed_key_word_sequence_matches":len(matching),
                 "first_matching_native_key":matching[0] if matching else None,
+                "source_words_in_order_native_keys":len(ordered_keys),
+                "source_40word_chunk_count":len(chunks),
+                "source_40word_chunks_found_in_any_group_native_key":chunks_found,
+                "source_40word_chunks_found_fraction":chunk_fraction,
                 "class":classification,
             })
     return {
