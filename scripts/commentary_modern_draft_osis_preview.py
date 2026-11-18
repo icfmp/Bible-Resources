@@ -421,7 +421,8 @@ def overlay_native_first_K_book_prefaces(
         _write_reading_blocks(intro,body)
         def normalized(v):
             return " ".join(unicodedata.normalize("NFC",v).split())
-        prose_new=normalized("".join(x.itertext() for x in list(intro)[1:]))
+        prose_new=normalized("".join("".join(x.itertext())
+                                    for x in list(intro)[1:]))
         if not prose_new:
             raise ValueError("Empty modern preface after OSIS reading block conversion")
         existing=[]
@@ -436,8 +437,9 @@ def overlay_native_first_K_book_prefaces(
         if len(existing)>1:
             raise ValueError("Book introduction already duplicated in modern OSIS")
         if existing:
-            old=normalized("".join(x.itertext() for x in list(existing[0])
-                                   if x.tag!=f"{{{NS}}}title"))
+            old=normalized("".join("".join(x.itertext())
+                                  for x in list(existing[0])
+                                  if x.tag!=f"{{{NS}}}title"))
             if old!=prose_new:
                 raise ValueError("Modern existing book preface differs from candidate: "+book)
             already+=1
