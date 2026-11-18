@@ -354,6 +354,50 @@ editorial authorization for a changed reference scope, or redistribution
 rights clearance. The complete original/edited OSIS and compiled zCom4
 remain on isolated private runners only.
 
+## Book-end suffix attribution and two explicit cross-link contradictions — 2026-11-18
+
+[Complete private source/native book-end trial](https://github.com/icfmp/Bible-Resources/actions/runs/44290514885)
+checked the **66 authored final verse groups** against their compiled first-key
+native entry, using original source text *after each final `verse/@eID`*.
+The results are:
+
+- **60**: compiled final visible text ends at the same authorial word/punctuation
+  boundary as the original final verse group.
+- **6**: the native suffix equals the final group punctuation **plus original
+  authored post-verse book-closing material**, allowing for whitespace.
+  Exact source-word and symbol ordering remains intact.
+- **0**: newly invented final-book wording or unexplained suffix differences.
+
+The six are `Deut.34.9-12`, `Esth.10.1-3`,
+`Song.8.13-14`, `Mal.4.4-6`, `John.21.20-25`,
+and `Rev.22.20-21`. No textual repair is appropriate: the question is
+whether the reader should show closing material attached to a final verse or
+in a separate section. Test with actual Xiphos/AndBible before deciding.
+
+The **25 nonstandard original `reference/@osisRef` machine links** were
+independently matched to their original short *visible biblical citation*
+labels in [private source review #44290514885](
+https://github.com/icfmp/Bible-Resources/actions/runs/44290514885).
+Two source-internal contradictions are immediately evident:
+
+| Original XML line | Machine value (not a valid canonical destination) | Original visible citation | Technical review candidate |
+| --- | --- | --- | --- |
+| 7,237 (source book Exodus) | `15.1` | `Jer. xv. 1` | `Jer.15.1` |
+| 57,059 (source book Isaiah) | `Ezr 1.7 8.23` | `Ezra i. 7; viii. 24` | `Ezra.1.7 Ezra.8.24` |
+
+These are **proposed machine-only corrections**, not claims that an
+independent historical edition has validated the printed citation. Confirm
+against an independent reliable witness and actual KJV/SWORD endpoint
+addressability before patching. Preserve both original values, XML line,
+source SHA and visible label digest in a reversible plan; never alter the
+displayed author's label merely to match the faulty target.
+
+The remaining nonstandard references (bookless numeric locators and
+compound citation lists with inherited chapters) must be resolved using
+their **actual displayed text**, not by assuming the current commentary
+book or blindly splitting on whitespace. In particular, original Job
+`18.24` is not the canonical `Job.18.24` (which does not exist).
+
 ## Next review, kept separate
 
 1. Investigate *actual* source-structure anomalies using source-defined
