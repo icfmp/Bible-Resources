@@ -200,6 +200,51 @@ class OriginalWordAnchoredLinksTest(unittest.TestCase):
             )
             self.assertEqual(build_word_links(ix, [first, second], source), {})
 
+    def test_source_sdbh_owner_and_exact_lemma_recover_different_strong_entry_only(self):
+        # An original sense ID and independently identical headword corroborate
+        # a different-Strong UBS entry. Never infer a contextual sense.
+        entry_a = entry("001695000000000", "דָּנִיֵּאל", ["A1840"])
+        ix = build([entry_a], [entry_a])
+        with tempfile.TemporaryDirectory() as folder:
+            source = Path(folder) / "words.tsv"
+            source.write_text(
+                "xml:id\tlemma\tsdbh\tstrongnumberx\tlang\tclass\n"
+                "o270020130061\tדָּנִיֵּאל\t001695001001000\t1841\tA\tnoun\n"
+                "o270020130071\tדָּנִיֵּאל\t001695001001000\t1841\tH\tnoun\n"
+                "o270020130081\tדָּנִיֵּאל\t001695001001000\t1841\tA\tprep\n",
+                encoding="utf-8",
+            )
+            links = build_word_links(ix, [entry_a], source)
+        self.assertEqual(list(links), ["o270020130061"])
+        ix["by_macula_word"] = links
+        out=lookup_word(ix,"o270020130061","001695001001000","1841","A","דָּנִיֵּאל")
+        self.assertEqual(out["entry_ids"],[entry_a["MainId"]])
+        self.assertEqual(out["sense_ids"],[])
+        self.assertEqual(out["evidence"],"macula_word_exact_lemma_and_source_sdbh_ubs_owner_entry_only")
+
+    def test_cross_strong_sdbh_collision_different_lemma_and_duplicate_owners_fail_closed(self):
+        root=entry("001695000000000","דָּנִיֵּאל",["A1840"])
+        wrong=entry("001696000000000","דָּנִיֵּאל",["A1842"])
+        ix=build([root,wrong],[root,wrong])
+        with tempfile.TemporaryDirectory() as folder:
+            source=Path(folder)/"words.tsv"
+            source.write_text(
+                "xml:id\tlemma\tsdbh\tstrongnumberx\tlang\tclass\n"
+                "o270020130061\tדָּנִיֵּאל\t001695001001000\t1841\tA\tnoun\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(build_word_links(ix,[root,wrong],source),{})
+        different=entry("001695000000000","רֹאשׁ",["A1840"])
+        ix=build([different],[different])
+        with tempfile.TemporaryDirectory() as folder:
+            source=Path(folder)/"words.tsv"
+            source.write_text(
+                "xml:id\tlemma\tsdbh\tstrongnumberx\tlang\tclass\n"
+                "o270020130061\tדָּנִיֵּאל\t001695001001000\t1841\tA\tnoun\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(build_word_links(ix,[different],source),{})
+
     def test_no_promotion_of_sense_id_collision(self):
         wrong = entry("006653000000000", "רֹאשׁ", ["H7218"])
         right = entry("006660000000000", "רֵאשִׁית", ["H7225a"])
