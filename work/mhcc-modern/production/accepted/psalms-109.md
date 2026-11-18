@@ -34,7 +34,7 @@ When people reject Christ's salvation, even their prayers may become sinful.
 
 What leads some people to shameful deaths and causes others' families and property to collapse?
 
-What brings disgrace, poverty, misery and ruin upon their descendants?
+What brings disgrace, poverty, misery and ruin upon their descendants, making them and their families despised and hateful to others?
 
 **Sin**—that destructive and poisonous evil—is the source of such devastation.
 
@@ -43,8 +43,6 @@ Consider the effect of the final sentence **“Go, you cursed”** upon the bodi
 What fear, pain, horror, anguish and despair it brings!
 
 Sinners, take these warnings seriously: **tremble and repent**.
-
-These judicial statements are presented as prophetic warnings of divine judgment, not a command to believers to pursue personal revenge.
 
 ## Praying for mercy and trusting the risen Advocate (verses 21–31)
 
@@ -77,6 +75,8 @@ He is always ready to appear on their behalf against a corrupt world and the gre
 ---
 
 ## Editorial review — Psalm 109
+
+**2026-11-18 targeted CCEL re-collation (secondary witness):** Restored the explicit outcome of becoming *despised and hateful* in the 6–20 exposition, which the draft had reduced to general disgrace. Moved the modern interpretive warning about personal revenge out of Henry's translated body: **Editorial note:** These denunciations are treated here as warnings of divine judgment; the text is not an instruction to Christians to pursue personal vengeance. This note is the modern editor's clarification, not a sentence authored by Henry. No original source/verse identity changed; independent original-native collation remains pending.
 
 **Whole secondary English witness read:** [CCEL, Psalm 109](https://ccel.org/ccel/henry/mhcc.xx.cix.html). Published `MHCC 0.1.1` remains authoritative; native SWORD and independent editorial approval pending.
 
