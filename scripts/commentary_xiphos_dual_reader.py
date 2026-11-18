@@ -354,6 +354,7 @@ def _markup_display_witness(internal: bytes, rendered_plain: bytes,
     )
     exact_source_target_hrefs = 0
     verified_target_sha256 = set()
+    composite_target_progress_by_sha256 = {}
     for attrs, raw_label in _REFERENCE_WITH_ATTRIBUTES.findall(original)[:256]:
         osis = _OSIS_REF_ATTRIBUTE.search(attrs)
         if not osis:
@@ -368,15 +369,39 @@ def _markup_display_witness(internal: bytes, rendered_plain: bytes,
         label = " ".join("".join(parser.text_chunks).split())
         if len(label) < 5:
             continue
+        # A source OSIS reference may list *multiple* destinations separated
+        # by spaces, or denote a complete canonical verse range. Xiphos may
+        # transport these through a different href syntax. Record only bounded
+        # component counts for an EXACT matching printed source label: do not
+        # confuse a partly linked label with a working multi-target hyperlink.
+        atoms = raw_target.split()
+        target_sha = sha256(raw_target.encode("utf-8")).hexdigest()
+        best = 0
+        has_exact_label_anchor = False
         for rendered_label, href in actual_anchor_destinations:
+            if rendered_label != label:
+                continue
+            has_exact_label_anchor = True
             uri = unquote(unescape(href)).casefold()
-            if (rendered_label == label and re.search(
+            count = sum(bool(re.search(
+                r"(?<![a-z0-9])" + re.escape(atom.casefold()) + r"(?![a-z0-9])",
+                uri)) for atom in atoms)
+            best = max(best, count)
+            if re.search(
                 r"(?<![a-z0-9])" + re.escape(raw_target.casefold()) + r"(?![a-z0-9])",
                 uri,
-            )):
+            ):
                 exact_source_target_hrefs += 1
-                verified_target_sha256.add(sha256(raw_target.encode("utf-8")).hexdigest())
+                verified_target_sha256.add(target_sha)
                 break
+        if len(atoms) > 1:
+            composite_target_progress_by_sha256[target_sha] = {
+                "original_component_count": len(atoms),
+                "components_found_in_one_same_label_real_GUI_href": best,
+                "source_label_is_an_actual_GUI_anchor": has_exact_label_anchor,
+                # This is still NOT an actual click/navigation test.
+                "all_components_found_in_one_GUI_href": best == len(atoms),
+            }
     return {
         "original_internal_title_elements_found": len(extracted_titles),
         "exact_original_titles_in_copied_gui_text": exact_titles,
@@ -395,6 +420,9 @@ def _markup_display_witness(internal: bytes, rendered_plain: bytes,
         # A generic "some other link matched" must never certify Ps.60.
         "exact_matching_source_target_sha256_in_real_gui_HTML":
             sorted(verified_target_sha256),
+        # No authorial words, source locators or actual href text in output.
+        "composite_target_href_progress_by_sha256":
+            composite_target_progress_by_sha256,
         "real_gui_rich_html_selection_available": bool(rendered_html),
         "real_gui_rich_html_anchor_elements_found": rich_link_count,
         "xiphos_link_click_target_and_navigation_verified": False,
