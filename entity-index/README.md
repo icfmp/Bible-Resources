@@ -454,7 +454,7 @@ descriptions without firmer person-role evidence.
 No anonymous person was merged with an explicitly named historical
 person. No other referent groups were removed. Exact pinned original
 source records remain byte-identical, and source edits stay declarative,
-reversible and fully audited. The **2,385 indirect-only overlaps** still
+reversible and fully audited. The **2,369 indirect-only overlaps** still
 require separate source-role and participant semantics review.
 
 ## Indirect person-overlap source-grammar triage — no mass deduplication
@@ -476,10 +476,13 @@ classification is deliberately **word-level grammatical morphology**,
 not a certification of whether two people participate in the same
 event or whether one anonymous pronoun refers to them.
 
-The complete pinned morphology audit confirms **1,289 Greek** and
-**1,096 Hebrew** indirect-only word overlaps. Of the **2,385 exact
-source words**, **2,096 are grammatically plural**, **93 singular**
-and **196 have no grammatical number recorded** (often infinitives).
+The original complete pinned morphology audit found **1,289 Greek**
+and **1,096 Hebrew** indirect-only word overlaps. A subsequent
+exact-token contextual correction in the derived index removed sixteen
+false source claims; the remaining **2,369** word overlaps comprise
+**1,286 Greek** and **1,083 Hebrew**. Their source-word grammatical
+counts are **2,096 plural**, **77 singular** and **196 without number**
+(often infinitives).
 These are categories of the source word, not conclusions about the
 people tagged on it. Several repeated candidate cohorts (e.g. Paul/Silas/Timothy; Aaron/Moses;
 Job's friends) are consistent with grammatical *collective* speakers
@@ -498,6 +501,55 @@ The **complete report** remains a temporary, QA-only Actions
 artifact, not a packaged resource or editorially approved revision.
 No original ACAI person record, source-word ID, verse or biblical
 text is changed during this audit.
+
+## Singular overlap follow-up: two Joash kings and two Judas apostles
+
+The first complete pinned morphology report showed 93 singular-source-word
+person collisions (plus plural and unnumbered forms). Exact local context
+verifies **ten false indirect person links**, without treating every
+singular source word as erroneous:
+
+- **2 Kings 14:13 / 2 Chronicles 25:23** name the Judahite king Joash
+  (Amaziah's father) **first**, and the distinct Israelite king
+  Joash/Jehoash (Amaziah's captor) **second**. The inherited ACAI
+  source *reversed the two exact name tokens in both verses*,
+  as well as the separate Jehoash/Jehoash.2 alias records in
+  2 Kings 14:13. The derived index now swaps **six** original name
+  groups in total: four Joash, two Jehoash, retaining the aliases
+  and both historical king identities. **Eleven** erroneous source
+  subject groups are detached (seven Joash.3, four Jehoash) across
+  **seven distinct action-word IDs**, all of which remain correctly
+  linked to Joash of Israel.
+- **Luke 6:16** has the relative pronoun `ὃς` at
+  `n42006016007`: it refers to Judas Iscariot, **not**
+  Judas son of James, who is named separately in the same verse.
+  Detach only the incorrect pronoun pointer from `person:Judas`.
+- **Luke 9:59** and **Luke 24:19** use a singular "he said"
+  for Jesus' words to disciples or travellers. Remove the
+  two source subject pointers to the `person:GenericDisciple`
+  record at the exact Greek word IDs; no disciple's valid actual
+  words or person identities are changed.
+
+These edits are recorded in `editorial-decisions.json`, verified by
+source-token exact-ID regression and independent Macula readings,
+and occur **only in our derived index**. The frozen ACAI JSON and
+source word IDs remain unchanged, with no source text rewriting.
+The remaining singular-source candidates still require contextual
+review: some refer to distributive expressions ("each man") or
+collective speech, and singular grammar alone cannot disprove them.
+
+### Six distinct speaker-versus-interlocutor corrections
+
+The pinned Hebrew contexts also show six *singular* subject-word
+assignments wrongly attached to a different participant. Rebekah
+speaks in Genesis 24:58 (not her mother); Samson answers his wife
+in Judges 14:16; Saul answers his uncle in 1 Samuel 10:14;
+Elijah directs his servant in 1 Kings 18:44; Jehu answers the
+messenger in 2 Kings 10:8; and Daniel 10:19 explicitly has the
+first-person verb *"I said"* spoken by Daniel, not the angelic
+visitor. Six exact wrong `subject_referents` groups are detached
+in the derived index. The corresponding correct person pointers,
+source text, and all frozen ACAI JSON remain unchanged.
 
 ## Scoped review of all eight remaining explicit-person overlaps
 

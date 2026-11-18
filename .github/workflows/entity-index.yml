@@ -83,7 +83,7 @@ jobs:
           assert stats["source_records"] == 6644, stats
           assert stats["index_entities"] == 6641, stats
           assert stats["quarantined_records"] == 3, stats
-          assert stats["reviewed_entries"] == 26, stats
+          assert stats["reviewed_entries"] == 31, stats
           assert stats["unattested_distinct_source_words"] == 18, stats
           assert stats["indexed_distinct_source_words"] == 134822, stats
           assert len(index["unattested_source_words"]) == 18
@@ -233,6 +233,50 @@ jobs:
           mismatch=resolver.resolve(corpus="wlc", edition=edition+"-other",
                 word_id="o100060080121", verse_id="10006008")
           assert mismatch["status"] == "incompatible_source_edition", mismatch
+          # Same-person Jehoash aliases are separate original records.
+          # Require exact right historical canonical identity for every hit.
+          exact_names={
+              "o120140130061":{"person:Jehoash","person:Joash.3"},
+              "o120140130101":{"person:Jehoash.2","person:Joash.4"},
+              "o140250230061":{"person:Joash.3"},
+              "o140250230101":{"person:Joash.4"},
+          }
+          for word,source_ids in exact_names.items():
+              hits=index["by_word"]["wlc:"+word]
+              assert {x["entity_id"] for x in hits}==source_ids,(word,hits)
+              assert all(x["link_type"]=="explicit_instances" for x in hits)
+          for word in (
+              "o120140130162","o120140130182",
+              "o120140140012","o120140140182",
+          ):
+              hits=index["by_word"]["wlc:"+word]
+              assert {x["entity_id"] for x in hits}=={
+                  "person:Jehoash.2","person:Joash.4"},(word,hits)
+              assert all(x["link_type"]=="subject_referents" for x in hits)
+          for word in (
+              "o140250230152","o140250230172","o140250240202",
+          ):
+              assert index["by_word"]["wlc:"+word]==[{
+                  "entity_id":"person:Joash.4",
+                  "link_type":"subject_referents"}]
+          assert index["by_word"]["sblgnt:n42006016007"] == [{
+              "entity_id":"person:Judas.2",
+              "link_type":"pronominal_referents"}]
+          for word in ("n42009059001","n42024019002"):
+              assert not any(hit["entity_id"]=="person:GenericDisciple"
+                             for hit in index["by_word"].get("sblgnt:"+word,[]))
+          # Source-verified singular dialogue roles (six exact Hebrew tokens).
+          for word,correct in (
+              ("o010240580092","person:Rebekah"),
+              ("o070140160172","person:Samson"),
+              ("o090100140092","person:Saul.2"),
+              ("o110180440112","person:Elijah"),
+              ("o120100080102","person:Jehu.2"),
+              ("o270100190132","person:Daniel.3"),
+          ):
+              assert index["by_word"]["wlc:"+word]==[{
+                  "entity_id":correct,
+                  "link_type":"subject_referents"}],(word,index["by_word"].get("wlc:"+word))
           print("ENTITY_INDEX_QA", json.dumps(stats, sort_keys=True))
           PY
 
@@ -251,7 +295,7 @@ jobs:
           assert stats["distinct_person_original_word_overlap_candidates"] == len(report["findings"])
           assert stats["multiple_explicit_names"] == 8, stats
           assert stats["mixed_name_and_indirect"] == 1, stats
-          assert stats["indirect_only"] == 2385, stats
+          assert stats["indirect_only"] == 2369, stats
           assert sum(stats[x] for x in ("multiple_explicit_names", "mixed_name_and_indirect", "indirect_only")) == len(report["findings"])
           assert all(len(f["canonical_people"]) >= 2 for f in report["findings"])
           assert len(set((f["corpus"], f["word_id"]) for f in report["findings"])) == len(report["findings"])
@@ -276,11 +320,11 @@ jobs:
               "sblgnt":Path("macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv"),
           })
           stats=reviewed["statistics"]
-          assert stats["indirect_only_source_words"]==report["statistics"]["indirect_only"]==2385
-          assert stats["by_corpus"]=={"wlc":1096,"sblgnt":1289},stats
-          assert sum(stats["source_word_number_buckets"].values())==2385
-          assert sum(stats["different_canonical_people_per_word"].values())==2385
-          assert len({(x["corpus"],x["word_id"]) for x in reviewed["cases"]})==2385
+          assert stats["indirect_only_source_words"]==report["statistics"]["indirect_only"]==2369
+          assert stats["by_corpus"]=={"wlc":1083,"sblgnt":1286},stats
+          assert sum(stats["source_word_number_buckets"].values())==2369
+          assert sum(stats["different_canonical_people_per_word"].values())==2369
+          assert len({(x["corpus"],x["word_id"]) for x in reviewed["cases"]})==2369
           output=Path("entity-index/dist/indirect-person-source-forms.json")
           output.write_text(json.dumps(reviewed,ensure_ascii=False,indent=2,
                                        sort_keys=True)+"\n",encoding="utf-8")
