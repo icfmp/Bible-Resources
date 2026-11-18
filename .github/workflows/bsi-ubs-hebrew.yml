@@ -27,6 +27,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_lexical_gaps.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_strong_reconciliation.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_word_anchored.py
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_dictionary_scope.py
       - name: Check out exact UBS Hebrew EN/FR 0.9.4 source
         uses: actions/checkout@v4
         with:
