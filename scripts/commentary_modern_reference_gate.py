@@ -1188,6 +1188,83 @@ def _original_reference_title_ownership(fragment: ET.Element) -> list[bool]:
     return flags
 
 
+
+def _unplaced_original_link_review_ledger(*, original: dict, insertions: list,
+                                           corrections: dict) -> dict:
+    """Account for every original hyperlink without exporting source text.
+
+    This review queue exposes only exact original K addresses, occurrence
+    ordinals, SHA-256 identity hashes, OSIS-grammar class and disposition.
+    Source-visible labels and original literal OSIS targets are not serialized.
+    """
+    placed={}
+    for row in insertions:
+        ordinal=row.get("original_link_ordinal")
+        if ordinal is None:
+            continue  # separately supported authored witness, not original markup
+        key=(row["original_source_first_key"],ordinal)
+        if key in placed:
+            raise ValueError("Original source link was independently placed twice")
+        placed[key]=row["placement_action"]
+    seen=set()
+    omitted=[]
+    pending=[]
+    for first,links in sorted(original.items()):
+        for ordinal,(target,label) in enumerate(links,1):
+            key=(first,ordinal)
+            if key in seen:
+                raise ValueError("Duplicate source link occurrence in original inventory")
+            seen.add(key)
+            if key in placed:
+                continue
+            correction=corrections.get(key)
+            if correction is not None:
+                if correction.get("disposition")!="OMIT_SPURIOUS_ENUMERATOR_LINK":
+                    raise ValueError("Documented original link correction was never applied")
+                status="EXPLICITLY_OMITTED_SPURIOUS_NATIVE_HYPERLINK"
+            else:
+                try:
+                    canonical_only_for_comparison(target)
+                    status="UNPLACED_SINGLE_VERSE_REFERENCE"
+                except ValueError:
+                    if _source_same_chapter_verse_range(target):
+                        status="UNPLACED_SAME_CHAPTER_VERSE_RANGE"
+                    else:
+                        status="UNPLACED_OTHER_OR_COMPOSITE_OSIS_TARGET"
+            item={
+                "source_first_key":first,
+                "source_reference_ordinal":ordinal,
+                "original_osisRef_sha256":hashlib.sha256(
+                    target.encode("utf-8")).hexdigest(),
+                "original_visible_label_sha256":hashlib.sha256(
+                    label.encode("utf-8")).hexdigest(),
+                "disposition":status
+            }
+            (omitted if correction is not None else pending).append(item)
+    if set(placed)-seen:
+        raise ValueError("Linked source occurrence is not in original pinned SWORD")
+    if sum(map(len,original.values()))!=len(seen):
+        raise ValueError("Original linked element tally inconsistent")
+    if len(placed)+len(omitted)+len(pending)!=len(seen):
+        raise ValueError("Whole-source hyperlink audit disposition incomplete")
+    status_counts={}
+    for row in pending+omitted:
+        state=row["disposition"]
+        status_counts[state]=status_counts.get(state,0)+1
+    return {
+        "status":"SOURCE_NATIVE_WHOLE_CANON_HYPERLINK_DISPOSITION_QUEUE_NOT_FINAL_APPROVAL",
+        "original_native_reference_elements":len(seen),
+        "source_link_occurrences_verified_in_derived_osis":len(placed),
+        "source_spurious_link_occurrences_explicitly_omitted":len(omitted),
+        "source_original_links_still_requiring_placement_review":len(pending),
+        "pending_and_omitted_by_disposition":status_counts,
+        "source_reference_labels_or_literal_targets_exported":False,
+        "publication_authorized":False,
+        "pending":pending,
+        "documented_omitted":omitted,
+    }
+
+
 def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                                     native: dict, identities: dict,
                                     dispositions: dict, repo_root: Path,
