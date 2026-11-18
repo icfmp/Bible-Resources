@@ -365,6 +365,37 @@ resolves to `person:Phoebe` under the pinned Macula Greek edition.
 Greek negative-lookup checks alone are **not** enough to demonstrate that
 the index really supports Greek original-word lookup.
 
+## All-epistle final-verse source audit
+
+The [#86](https://github.com/icfmp/ACAI/issues/86) examples of
+traditional epistle subscriptions are **not** assumed to be the only
+unanchored last-verse references in ACAI. The independent CI runs the
+existing, **pinned** `audit_epistle_endings.py` over the complete
+6,644-record original dataset and the exact Macula SBLGNT Greek TSV.
+It derives the final existing verse of **each of the 21 NT letters**
+from the source word IDs, without inventing an English/traditional
+versification table.
+
+This produces `dist/epistle-ending-review.json` as a private
+source-audit artifact, distinguishing a source-present final verse
+without a record's word anchor from a final-chapter source-absent
+verse reference. CI independently reconciles our **10 already
+qualified traditional-subscription *candidates*** to actual source
+audit rows. For this locked source revision, the complete audit finds
+**79 records referencing a last attested letter verse**,
+**35 records / 52 unanchored last-verse claims**, plus
+**17 source-absent last-chapter references from 12 records**.
+These make **69 distinct candidate record/verse pairs**. Only **10**
+have explicit source-specific traditional-subscription qualifications;
+**59 remain unreviewed**. Other candidate records remain **unreviewed** until a
+pinned text and historical-subscription witness are checked: a record
+without a word anchor could be an implied participant, valid indirect
+claim, different edition, or inaccurate original attribution, and it
+must not be mechanically deleted or automatically called a postscript.
+
+No Scriptural reference, original word, verse number or original
+source biography is changed by this process.
+
 ## Version-specific reference provenance: variants and subscriptions
 
 A verse reference can have editorial or historical interest without a matching
