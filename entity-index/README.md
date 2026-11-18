@@ -476,14 +476,23 @@ classification is deliberately **word-level grammatical morphology**,
 not a certification of whether two people participate in the same
 event or whether one anonymous pronoun refers to them.
 
-In the pinned pre-triage audit there are **1,289 Greek** and
-**1,096 Hebrew** indirect-only word overlaps. Several repeated
-candidate cohorts (e.g. Paul/Silas/Timothy; Aaron/Moses;
+The complete pinned morphology audit confirms **1,289 Greek** and
+**1,096 Hebrew** indirect-only word overlaps. Of the **2,385 exact
+source words**, **2,096 are grammatically plural**, **93 singular**
+and **196 have no grammatical number recorded** (often infinitives).
+These are categories of the source word, not conclusions about the
+people tagged on it. Several repeated candidate cohorts (e.g. Paul/Silas/Timothy; Aaron/Moses;
 Job's friends) are consistent with grammatical *collective* speakers
 or groups of participants, but the report must still distinguish
 plural forms from singular/unmarked forms and verify each occurrence.
 A plural form is not a blanket permission to join people; a singular
 form is not enough, by itself, to delete one source person's link.
+
+For example, Luke 6:16 has the **singular** relative pronoun
+`n42006016007` (`ὃς`) linked to both distinct Judas source records,
+whereas the verse distinguishes the two men. This is a concrete
+*human-review candidate*, not an automatic correction made by this
+morphology-only stage.
 
 The **complete report** remains a temporary, QA-only Actions
 artifact, not a packaged resource or editorially approved revision.
