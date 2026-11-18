@@ -141,6 +141,21 @@ class EntityIndexTests(unittest.TestCase):
             self.build([dict(decision, remove_subject_referents={
                 "wlc": [["o090090100032"]]})])
 
+    def test_one_speaker_cannot_be_another_person_subject(self):
+        speaker=self.write_record("people","Speaker",
+            subject_referents={"wlc":[["o010240580092"]]})
+        listener=self.write_record("people","Listener",
+            subject_referents={"wlc":[["o010240580092"]]})
+        before=(speaker.read_bytes(),listener.read_bytes())
+        correction={"source_id":"person:Listener","action":"amend_occurrences",
+                    "reason":"Pinned grammatical and narrative speaker",
+                    "evidence":["Full source dialogue","Exact word ID"],
+                    "remove_subject_referents":{"wlc":[["o010240580092"]]}}
+        result=self.build([correction])
+        self.assertEqual(result["by_word"]["wlc:o010240580092"],[
+            {"entity_id":"person:Speaker","link_type":"subject_referents"}])
+        self.assertEqual((speaker.read_bytes(),listener.read_bytes()),before)
+
     def test_same_verse_two_kings_with_same_name_preserves_both(self):
         """Two same-name men in one verse cannot be distinguished by lemma."""
         father = self.write_record(
