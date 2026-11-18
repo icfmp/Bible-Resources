@@ -76,6 +76,40 @@ class CleanSourceTests(unittest.TestCase):
         with self.assertRaises(CleanupError):
             clean(self.source, sha256(raw).hexdigest())
 
+    def test_removes_genuinely_empty_emphasis_without_dropping_tail(self):
+        raw = OSIS.replace("Grâce  fidèle".encode("utf-8"),
+            "Grâce fidèle".encode("utf-8")).replace(
+            "<title>  L'Évangile  </title>".encode("utf-8"),
+            "<title>L'Évangile</title>".encode("utf-8"))
+        raw = raw.replace(
+            "<p>Grâce fidèle — paix.</p>".encode("utf-8"),
+            '<p>Avant <hi type="italic"/>après. Grâce fidèle — paix.</p>'.encode("utf-8")
+        )
+        raw = raw.replace(
+            b'<p>note  has double spaces</p>',
+            b'<p>note  <hi type="italic"/>has double spaces</p>'
+        )
+        self.source.write_bytes(raw)
+        receipt = clean(self.source, sha256(raw).hexdigest(), output=self.output)
+        self.assertEqual(receipt["cleanup_changes"]["empty_display_hi_elements_removed"], 1)
+        self.assertTrue(receipt["all_source_nonspace_text_preserved"])
+        self.assertNotIn(b'Avant <hi type="italic"/>apres', self.output.read_bytes())
+        before = etree.fromstring(raw)
+        after = etree.fromstring(self.output.read_bytes())
+        self.assertEqual("".join(before.itertext()), "".join(after.itertext()))
+        self.assertIn(b'note  <hi type="italic"/>has double spaces', self.output.read_bytes())
+        self.assertEqual(self.source.read_bytes(), raw)
+
+    def test_preserves_empty_emphasis_with_semantic_attributes(self):
+        raw = OSIS.replace(
+            "<p>Grâce  fidèle — paix.</p>".encode("utf-8"),
+            '<p>Avant <hi type="italic" osisID="X"/>après.</p>'.encode("utf-8")
+        )
+        self.source.write_bytes(raw)
+        receipt = clean(self.source, sha256(raw).hexdigest(), output=self.output)
+        self.assertEqual(receipt["cleanup_changes"].get("empty_display_hi_elements_removed", 0), 0)
+        self.assertIn(b'osisID="X"', self.output.read_bytes())
+
     def test_unmodified_source_stays_byte_identical(self):
         raw = OSIS.replace("Grâce  fidèle".encode("utf-8"),
             "Grâce fidèle".encode("utf-8")).replace(
