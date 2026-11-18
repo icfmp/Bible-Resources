@@ -588,6 +588,14 @@ jobs:
                             "original_target_grammar": dict(sorted(grammar.items())),
                             "verbatim_original_label_in_modern_K":
                                 dict(sorted(labels.items()))}, sort_keys=True))
+          # Prioritise only source-identity hashes and original K/ordinal.
+          # Do not print the original linked text, osisRef or modern prose.
+          focus = [row for row in pending
+                   if row["original_target_grammar"] == "full_verse_range"
+                   or row["verbatim_original_label_in_modern_K"] ==
+                      "UNIQUE_VERBATIM"]
+          print("SOURCE UNPLACED REF FOCUS (metadata only): " +
+                json.dumps(focus, sort_keys=True))
           print("SOURCE FULL 1204-REFERENCE DISPOSITION PASS: " +
                 str(ledger["source_link_occurrences_verified_in_derived_osis"]) +
                 " represented, 9 source markup exclusions, " +
