@@ -243,6 +243,32 @@
         "Intra-source identity separation: person:Bebai and person:Bebai.2 use different canonical IDs and roles; no conflation by matching spelling",
         "Bible-Resources #299 / inherited ACAI #75: distinct original-word occurrence review"
       ]
+    },
+    {
+      "source_id": "person:Hur",
+      "action": "amend_occurrences",
+      "remove_explicit_instances": {
+        "wlc": [
+          [
+            "o110040080031",
+            "o110040080041"
+          ]
+        ]
+      },
+      "add_explicit_instances": {
+        "wlc": [
+          [
+            "o110040080041"
+          ]
+        ]
+      },
+      "reason": "1 Kings 4:8 explicitly spells Ben-Hur as two segmented original words, o110040080031 Hebrew בֵּן ('son'), and o110040080041 Hebrew חוּר ('Hur'). The Ben-Hur administrator requires the complete two-word expression. The father's person:Hur annotation must point only to the actual Hur name, not the separate lexical 'son' word; the source originally assigned the compound two-word group to both. Keep the father Hur word and family relationship. This removes the demonstrably false overlap of the common noun with the father's independent proper name, while preserving the legitimate shared Hur component of the patronymic. No canonical identities are merged.",
+      "evidence": [
+        "Pinned Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c WLC/lowfat/11-1Ki-004-lowfat.xml 1KI 4:8!3 o110040080031: pos=noun,type=common,lemma=בֵּן,gloss='Ben-'",
+        "Same pinned source 1KI 4:8!4 o110040080041: pos=noun,type=proper,lemma=חוּר,gloss='Hur'",
+        "Pinned ACAI source e80a874e... people/json/Hur.json and people/json/Ben-hur.json explicitly claim same two-word group; the former is parent and latter is son",
+        "Bible-Resources issue #299 / original ACAI #75 distinct-person word audit"
+      ]
     }
   ]
 }
