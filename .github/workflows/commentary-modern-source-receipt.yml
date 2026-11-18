@@ -515,6 +515,7 @@ jobs:
             --base-unlinked-osis "$RUNNER_TEMP/mhcc-modern-complete-unlinked.osis.xml" \
             --reviewed-link-placement-manifest work/mhcc-modern/production/MODERN_OSIS_REVIEWED_LINK_PLACEMENTS.json \
             --auto-source-matched-single-verses \
+            --auto-source-matched-same-chapter-ranges \
             --linked-osis "$RUNNER_TEMP/mhcc-modern-complete-bounded-linked.osis.xml" \
             --report "$RUNNER_TEMP/mhcc-modern-complete-bounded-linked-osis-structure.json"
           python - <<'PY'
@@ -526,9 +527,10 @@ jobs:
           assert report["status"] == (
               "PRIVATE_REVIEWED_LINKED_FULL_CANON_OSIS_CANDIDATE_NOT_RELEASED")
           assert report["modern_chapters_preserved"] == 1189
-          assert report["modern_inline_links_inserted"] > 39
+          assert report["modern_inline_links_inserted"] > 536
+          assert report["automatic_source_matched_references"]["automatically_inserted_ranges"] > 0
           assert report["modern_inline_links_inserted"] == (39 +
-              report["automatic_exact_single_verse_source_links"]["automatically_inserted"])
+              report["automatic_source_matched_references"]["automatically_inserted"])
           assert report["actual_original_links_copied_without_correction"] == 30
           assert report["documented_wrong_original_links_retargeted"] == 8
           assert report["source_witness_authored_missing_original_link_added"] == 1
@@ -548,8 +550,8 @@ jobs:
           print("PRIVATE MODERN MHCC SOURCE-MATCHED LINKS XML PASS: " +
                 str(report["modern_inline_links_inserted"]) +
                 " source-backed links, including 39 reviewed occurrences and " +
-                str(report["automatic_exact_single_verse_source_links"]["automatically_inserted"]) +
-                " conservative exact singleton auto matches; 1204 NOT fully linked")
+                str(report["automatic_source_matched_references"]["automatically_inserted"]) +
+                " conservative exact source-linked singletons and ranges; 1204 NOT fully linked")
           PY
       - name: Compile private source-matched whole-canon OSIS and attest exact native SWORD targets
         shell: bash
@@ -652,7 +654,7 @@ jobs:
               "exact_28792_original_plus_I_only_indexed_keys_preserved":True,
               "original_literal_links_preserved":30,
               "automatic_original_literal_links_attested_and_compiled":report[
-                  "automatic_exact_single_verse_source_links"]["automatically_inserted"],
+                  "automatic_source_matched_references"]["automatically_inserted"],
               "source_witness_corrected_link_targets":8,
               "witness_missing_original_link_added":1,
               "source_1204_links_fully_integrated":False,
