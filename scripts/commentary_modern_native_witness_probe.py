@@ -68,6 +68,9 @@ def inspect_source(*, reader: Path, root: Path, receipt: Path,
     if not isinstance(cases, list) or not cases:
         raise ValueError("No source witness probes supplied")
     keys_needed = set()
+    hash_policy = witness.get("source_group_hash_policy", "manifest_exact")
+    if hash_policy not in ("manifest_exact", "authenticated_native_receipt"):
+        raise ValueError("Unknown source group hash policy")
     chapters_to_check = {case["chapter"] for case in cases}
     for case in cases:
         if len(case.get("anchors", [])) < 2 and not case.get("reference_targets_to_probe"):
@@ -76,10 +79,11 @@ def inspect_source(*, reader: Path, root: Path, receipt: Path,
         groups = inventory["chapters"][chapter]["original_units"]
         matched = [group for group in groups
                    if group["first_key"] == case["first"] and
-                   group["keys"][-1] == case["last"] and
-                   group["source_unit_sha256"] == case["sha"]]
+                   group["keys"][-1] == case["last"]]
         if len(matched) != 1:
-            raise ValueError("Source-group SHA or exact native key boundary mismatch: " + chapter)
+            raise ValueError("Exact native key boundary mismatch: " + chapter)
+        if hash_policy == "manifest_exact" and matched[0]["source_unit_sha256"] != case["sha"]:
+            raise ValueError("Source-group SHA is not the pinned modern edition: " + chapter)
         keys_needed.update((case["first"], case["last"]))
     original_raw: dict[str, bytes] = {}
     # Inspect other native K/I bodies in each affected chapter when a lexical
@@ -123,8 +127,14 @@ def inspect_source(*, reader: Path, root: Path, receipt: Path,
     for case in cases:
         first = original_raw[case["first"]]
         last = original_raw[case["last"]]
-        if first != last or hashlib.sha256(first).hexdigest() != case["sha"]:
-            raise ValueError("Original native linked unit is not byte-identical or SHA-pinned")
+        native_sha = hashlib.sha256(first).hexdigest()
+        unit = next(group for group in inventory["chapters"][case["chapter"]]["original_units"]
+                    if group["first_key"] == case["first"] and
+                    group["keys"][-1] == case["last"])
+        if first != last or native_sha != unit["source_unit_sha256"]:
+            raise ValueError("Native linked unit differs from authenticated native receipt")
+        if hash_policy == "manifest_exact" and native_sha != case["sha"]:
+            raise ValueError("Modern edition source group did not match pinned manuscript SHA")
         try:
             text, refs, markup = visible_text_and_references(first)
             parseable = True
@@ -144,7 +154,7 @@ def inspect_source(*, reader: Path, root: Path, receipt: Path,
                 # original authorial words or raw markup.
                 matches = 0
                 for other_hash, other_raw in chapter_bodies[case["chapter"]].items():
-                    if other_hash == case["sha"]:
+                    if other_hash == native_sha:
                         continue
                     try:
                         other_text, _, _ = visible_text_and_references(other_raw)
@@ -162,6 +172,7 @@ def inspect_source(*, reader: Path, root: Path, receipt: Path,
             "original_first_key": case["first"],
             "original_last_key": case["last"],
             "source_unit_sha256_matches": True,
+            "compiled_raw_sha_matches_modern_manifest": native_sha == case["sha"],
             "native_xml_fragment_parseable": parseable,
             "original_visible_words_count": len(words),
             "markup_counts": markup,
