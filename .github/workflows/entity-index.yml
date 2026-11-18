@@ -368,6 +368,53 @@ jobs:
                            sort_keys=True))
           PY
 
+      - name: Audit every epistle ending against pinned canonical Greek words
+        shell: bash
+        run: |
+          # Source-defined final verses, not a hardcoded English-Bible table.
+          # This script reports candidate claims only and preserves all data.
+          python3 -I /tmp/acai-frozen/.github/scripts/audit_epistle_endings.py \
+            --root /tmp/acai-frozen \
+            --greek macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
+            --output entity-index/dist/epistle-ending-review.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path("entity-index/dist/epistle-ending-review.json").read_text())
+          manifest=json.loads(Path("entity-index/source-reference-qualifications.json").read_text())
+          finales=report["source_defined_final_verses"]
+          assert len(finales)==21, finales
+          assert report["unanchored_record_count"]==len(report["findings"])
+          assert report["unanchored_reference_count"]==sum(
+              len(row["unanchored_end_verses"]) for row in report["findings"])
+          assert report["absent_source_final_chapter_reference_count"]==len(
+              report["absent_source_final_chapter_references"])
+          candidate_links={
+              (row["id"],verse)
+              for row in report["findings"]
+              for verse in row["unanchored_end_verses"]
+          }
+          candidate_links.update(
+              (row["id"],row["verse_id"])
+              for row in report["absent_source_final_chapter_references"])
+          qualified={
+              (row["source_id"],row["verse_id"])
+              for row in manifest["claims"]
+              if row["classification"]=="traditional_subscription_candidate"
+          }
+          assert len(qualified)==10, len(qualified)
+          # A reviewed subscription claimant must be traceable to the
+          # source-defined, unanchored letter-end inventory. This does NOT
+          # mean all other unanchored references are subscriptions.
+          missing=qualified-candidate_links
+          assert not missing, sorted(missing)
+          print("ENTITY_EPISTLE_ENDING_COVERAGE", json.dumps({
+              "candidate_links":len(candidate_links),
+              "qualified_subscription_sample":len(qualified),
+              "unreviewed_candidates":len(candidate_links-qualified),
+          }, sort_keys=True))
+          PY
+
       - name: Upload internal QA-only resource
         uses: actions/upload-artifact@v4
         with:
@@ -380,5 +427,6 @@ jobs:
             entity-index/dist/macula-greek-existence.json
             entity-index/dist/nt-source-verse-compatibility.json
             entity-index/dist/ot-source-verse-compatibility.json
+            entity-index/dist/epistle-ending-review.json
           if-no-files-found: error
           retention-days: 14
