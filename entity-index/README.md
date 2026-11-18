@@ -185,6 +185,35 @@ be verified, and different textual editions/versifications cannot be silently
 equated. The index does not assert that ACAI's every `references` entry is
 attested by the pinned critical text.
 
+## Full original-language word inventory parity (CI-only)
+
+The independent index now rebuilds **both original source witnesses** at the
+exact versions in `source.lock.json`: Macula WLC `WLC/tsv` (including
+its real Git LFS bytes, not the pointer file), and Macula SBLGNT
+`SBLGNT/tsv`. CI checks the Git commits and rejects truncated source
+downloads. No original-language text is copied into the derived resource.
+
+Rather than invent another ACAI source checker, it runs the existing
+read-only `audit_macula_hebrew_ids.py`,
+`audit_macula_greek_ids.py` and `audit_nt_source_verses.py`
+**from the same pinned fork checkout** as the index's original data.
+The resulting Hebrew/Greek exact-word and OT/NT verse compatibility reports
+are retained as QA-only artifacts, with no editorial auto-fixes.
+
+A separate **complete-corpus positive gate** walks *every*
+`by_word` key from the compiled independent resource and checks that
+the exact original word exists in that specific Macula edition. It also
+proves that the 18 documented quarantined WLC IDs really remain absent,
+and rejects newly missing indexed words; no source-backed identification
+is inferred from a similar lemma or translation. This is deliberately
+more demanding than testing a handful of known examples.
+
+The source claim that a verse is absent from an edition's *word
+inventory* is not a judgment about textual canonicity or a command
+to renumber the passage. Exact source-versification comparison reports
+are produced separately. All original source annotations, references,
+repeated groups and manuscripts remain unchanged.
+
 ## Pinned-source original-word absence protection
 
 The independent index must not present a missing original word ID as if the
