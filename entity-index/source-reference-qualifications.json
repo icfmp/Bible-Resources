@@ -111,7 +111,537 @@
         "1 Timothy 6:21: province qualifier Pacatiana appears in a later epistle subscription, not the last canonical verse.",
         "https://github.com/icfmp/ACAI/issues/86"
       ]
+    },
+    {
+      "source_id": "place:Corinth",
+      "verse_id": "45016027",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Romans: historical KJV epistle subscription associates place:Corinth with this letter (to the Romans from Corinthus, carried by Phoebe). Frozen ACAI's verse claim has no Greek source verse in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Rome",
+      "verse_id": "45016027",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Romans: historical KJV epistle subscription associates place:Rome with this letter (to the Romans from Corinthus, carried by Phoebe). Frozen ACAI's verse claim has no Greek source verse in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "group:Corinth",
+      "verse_id": "46016024",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "1 Corinthians: historical KJV epistle subscription associates group:Corinth with this letter (to Corinthians from Philippi, carried by Stephanas, Fortunatus, Achaicus and Timothy). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "person:Stephanas",
+      "verse_id": "46016024",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "1 Corinthians: historical KJV epistle subscription associates person:Stephanas with this letter (to Corinthians from Philippi, carried by Stephanas, Fortunatus, Achaicus and Timothy). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "person:Timothy",
+      "verse_id": "46016024",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "1 Corinthians: historical KJV epistle subscription associates person:Timothy with this letter (to Corinthians from Philippi, carried by Stephanas, Fortunatus, Achaicus and Timothy). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Corinth",
+      "verse_id": "46016024",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "1 Corinthians: historical KJV epistle subscription associates place:Corinth with this letter (to Corinthians from Philippi, carried by Stephanas, Fortunatus, Achaicus and Timothy). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Philippi",
+      "verse_id": "46016024",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "1 Corinthians: historical KJV epistle subscription associates place:Philippi with this letter (to Corinthians from Philippi, carried by Stephanas, Fortunatus, Achaicus and Timothy). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "group:Corinth",
+      "verse_id": "47013013",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "2 Corinthians: historical KJV epistle subscription associates group:Corinth with this letter (to Corinthians from Philippi in Macedonia, carried by Titus and Luke). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "person:Luke",
+      "verse_id": "47013013",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "2 Corinthians: historical KJV epistle subscription associates person:Luke with this letter (to Corinthians from Philippi in Macedonia, carried by Titus and Luke). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "person:Titus",
+      "verse_id": "47013013",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "2 Corinthians: historical KJV epistle subscription associates person:Titus with this letter (to Corinthians from Philippi in Macedonia, carried by Titus and Luke). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Corinth",
+      "verse_id": "47013013",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "2 Corinthians: historical KJV epistle subscription associates place:Corinth with this letter (to Corinthians from Philippi in Macedonia, carried by Titus and Luke). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Macedonia",
+      "verse_id": "47013013",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "2 Corinthians: historical KJV epistle subscription associates place:Macedonia with this letter (to Corinthians from Philippi in Macedonia, carried by Titus and Luke). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Philippi",
+      "verse_id": "47013013",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "2 Corinthians: historical KJV epistle subscription associates place:Philippi with this letter (to Corinthians from Philippi in Macedonia, carried by Titus and Luke). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "group:Corinth",
+      "verse_id": "47013014",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "2 Corinthians: historical KJV epistle subscription associates group:Corinth with this letter (to Corinthians from Philippi in Macedonia, carried by Titus and Luke). Frozen ACAI's verse claim has no Greek source verse in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "person:Luke",
+      "verse_id": "47013014",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "2 Corinthians: historical KJV epistle subscription associates person:Luke with this letter (to Corinthians from Philippi in Macedonia, carried by Titus and Luke). Frozen ACAI's verse claim has no Greek source verse in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "person:Titus",
+      "verse_id": "47013014",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "2 Corinthians: historical KJV epistle subscription associates person:Titus with this letter (to Corinthians from Philippi in Macedonia, carried by Titus and Luke). Frozen ACAI's verse claim has no Greek source verse in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Corinth",
+      "verse_id": "47013014",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "2 Corinthians: historical KJV epistle subscription associates place:Corinth with this letter (to Corinthians from Philippi in Macedonia, carried by Titus and Luke). Frozen ACAI's verse claim has no Greek source verse in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Macedonia",
+      "verse_id": "47013014",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "2 Corinthians: historical KJV epistle subscription associates place:Macedonia with this letter (to Corinthians from Philippi in Macedonia, carried by Titus and Luke). Frozen ACAI's verse claim has no Greek source verse in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Philippi",
+      "verse_id": "47013014",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "2 Corinthians: historical KJV epistle subscription associates place:Philippi with this letter (to Corinthians from Philippi in Macedonia, carried by Titus and Luke). Frozen ACAI's verse claim has no Greek source verse in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "group:Galatia",
+      "verse_id": "48006018",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Galatians: historical KJV epistle subscription associates group:Galatia with this letter (to Galatians from Rome). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Galatia",
+      "verse_id": "48006018",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Galatians: historical KJV epistle subscription associates place:Galatia with this letter (to Galatians from Rome). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Rome",
+      "verse_id": "48006018",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Galatians: historical KJV epistle subscription associates place:Rome with this letter (to Galatians from Rome). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "group:Ephesus",
+      "verse_id": "49006024",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Ephesians: historical KJV epistle subscription associates group:Ephesus with this letter (to Ephesians from Rome). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Ephesus",
+      "verse_id": "49006024",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Ephesians: historical KJV epistle subscription associates place:Ephesus with this letter (to Ephesians from Rome). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Rome",
+      "verse_id": "49006024",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Ephesians: historical KJV epistle subscription associates place:Rome with this letter (to Ephesians from Rome). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Rome",
+      "verse_id": "50004023",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Philippians: historical KJV epistle subscription associates place:Rome with this letter (to Philippians from Rome). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "group:Colossae",
+      "verse_id": "51004018",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Colossians: historical KJV epistle subscription associates group:Colossae with this letter (to Colossians from Rome, by Tychicus and Onesimus). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "person:Onesimus",
+      "verse_id": "51004018",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Colossians: historical KJV epistle subscription associates person:Onesimus with this letter (to Colossians from Rome, by Tychicus and Onesimus). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "person:Tychicus",
+      "verse_id": "51004018",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Colossians: historical KJV epistle subscription associates person:Tychicus with this letter (to Colossians from Rome, by Tychicus and Onesimus). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Colossae",
+      "verse_id": "51004018",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Colossians: historical KJV epistle subscription associates place:Colossae with this letter (to Colossians from Rome, by Tychicus and Onesimus). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Rome",
+      "verse_id": "51004018",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Colossians: historical KJV epistle subscription associates place:Rome with this letter (to Colossians from Rome, by Tychicus and Onesimus). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "group:Thessalonica",
+      "verse_id": "52005028",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "1 Thessalonians: historical KJV epistle subscription associates group:Thessalonica with this letter (to Thessalonians from Athens). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Athens",
+      "verse_id": "52005028",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "1 Thessalonians: historical KJV epistle subscription associates place:Athens with this letter (to Thessalonians from Athens). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Thessalonica",
+      "verse_id": "52005028",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "1 Thessalonians: historical KJV epistle subscription associates place:Thessalonica with this letter (to Thessalonians from Athens). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "group:Thessalonica",
+      "verse_id": "53003018",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "2 Thessalonians: historical KJV epistle subscription associates group:Thessalonica with this letter (to Thessalonians from Athens). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Athens",
+      "verse_id": "53003018",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "2 Thessalonians: historical KJV epistle subscription associates place:Athens with this letter (to Thessalonians from Athens). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Thessalonica",
+      "verse_id": "53003018",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "2 Thessalonians: historical KJV epistle subscription associates place:Thessalonica with this letter (to Thessalonians from Athens). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Laodicea",
+      "verse_id": "54006021",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "1 Timothy: historical KJV epistle subscription associates place:Laodicea with this letter (1 Timothy from Laodicea of Phrygia Pacatiana). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Phrygia",
+      "verse_id": "54006021",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "1 Timothy: historical KJV epistle subscription associates place:Phrygia with this letter (1 Timothy from Laodicea of Phrygia Pacatiana). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "group:Ephesus",
+      "verse_id": "55004022",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "2 Timothy: historical KJV epistle subscription associates group:Ephesus with this letter (to Timothy in Ephesus from Rome during Paul's appearance before Nero). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "person:Paul",
+      "verse_id": "55004022",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "2 Timothy: historical KJV epistle subscription associates person:Paul with this letter (to Timothy in Ephesus from Rome during Paul's appearance before Nero). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "person:Timothy",
+      "verse_id": "55004022",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "2 Timothy: historical KJV epistle subscription associates person:Timothy with this letter (to Timothy in Ephesus from Rome during Paul's appearance before Nero). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Ephesus",
+      "verse_id": "55004022",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "2 Timothy: historical KJV epistle subscription associates place:Ephesus with this letter (to Timothy in Ephesus from Rome during Paul's appearance before Nero). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Rome",
+      "verse_id": "55004022",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "2 Timothy: historical KJV epistle subscription associates place:Rome with this letter (to Timothy in Ephesus from Rome during Paul's appearance before Nero). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "group:Cretan",
+      "verse_id": "56003015",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Titus: historical KJV epistle subscription associates group:Cretan with this letter (to Titus associated with Cretans, from Nicopolis of Macedonia). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Crete",
+      "verse_id": "56003015",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Titus: historical KJV epistle subscription associates place:Crete with this letter (to Titus associated with Cretans, from Nicopolis of Macedonia). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Macedonia",
+      "verse_id": "56003015",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Titus: historical KJV epistle subscription associates place:Macedonia with this letter (to Titus associated with Cretans, from Nicopolis of Macedonia). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Nicopolis",
+      "verse_id": "56003015",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Titus: historical KJV epistle subscription associates place:Nicopolis with this letter (to Titus associated with Cretans, from Nicopolis of Macedonia). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "person:Onesimus",
+      "verse_id": "57001025",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Philemon: historical KJV epistle subscription associates person:Onesimus with this letter (to Philemon from Rome by Onesimus). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Rome",
+      "verse_id": "57001025",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Philemon: historical KJV epistle subscription associates place:Rome with this letter (to Philemon from Rome by Onesimus). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "group:Hebrews",
+      "verse_id": "58013025",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Hebrews: historical KJV epistle subscription associates group:Hebrews with this letter (to Hebrews from Italy by Timothy). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "person:Timothy",
+      "verse_id": "58013025",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Hebrews: historical KJV epistle subscription associates person:Timothy with this letter (to Hebrews from Italy by Timothy). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
+    },
+    {
+      "source_id": "place:Italy",
+      "verse_id": "58013025",
+      "classification": "traditional_subscription_candidate",
+      "evidence": [
+        "Hebrews: historical KJV epistle subscription associates place:Italy with this letter (to Hebrews from Italy by Timothy). Frozen ACAI's verse claim has no exact original-word/referent anchor in the pinned Macula SBLGNT inventory. This is later-paratext candidate attribution, not canonical wording or verified historical fact.",
+        "https://www.teachingtheword.org/apps/articles/?articleid=59199&columnid=5450",
+        "https://github.com/icfmp/Bible-Resources/pull/315"
+      ]
     }
   ],
-  "policy": "Preserve every source verse reference and immutable original word group. Qualify only named source claims with actual pinned-edition evidence; an alternate traditional reading is not a missing or spurious biblical verse. Traditional subscription is a candidate attribution, not a final editorial verdict."
+  "policy": "Preserve every source verse reference and immutable original word group. Qualify only named source claims with pinned-edition evidence. An alternate traditional reading is not a missing or spurious biblical verse. The KJV historical postscript witness is later paratext, not canonical Greek text or a verified historical assertion. 'traditional_subscription_candidate' means a compatible inherited reference claim, never a conclusion about where, by whom or to whom a letter was actually sent."
 }
