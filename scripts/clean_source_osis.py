@@ -15,6 +15,7 @@ from hashlib import sha256
 import json
 from pathlib import Path
 import re
+from xml.parsers import expat
 
 from lxml import etree
 
@@ -76,6 +77,95 @@ def _inert_hi(node) -> bool:
         and not any(_local(parent) in PROTECTED
                     for parent in node.iterancestors())
     )
+
+
+def _xml_tag_end(raw: bytes, start: int) -> int:
+    """Find original XML opening/closing tag boundary without entity rewriting."""
+    if raw[start:start + 1] != b"<":
+        raise CleanupError("Original XML tag byte offset is not a tag")
+    quote = None
+    for index in range(start + 1, min(start + 4096, len(raw))):
+        byte = raw[index]
+        if quote is None:
+            if byte in (34, 39):
+                quote = byte
+            elif byte == 62:
+                return index + 1
+        elif byte == quote:
+            quote = None
+    raise CleanupError("Oversized or unclosed original XML tag")
+
+
+def _lexically_remove_empty_hi(raw: bytes) -> tuple[bytes, int]:
+    """Delete only proven inert styling tags from exact original byte spans.
+
+    No XML reserialization, Unicode normalization, whitespace changes or
+    attribute rewriting. Semantic validation is performed by the caller.
+    """
+    root = _tree(raw)
+    nodes = [node for node in root.iter() if isinstance(node.tag, str)]
+    expected = sum(_inert_hi(node) for node in nodes)
+    parser = expat.ParserCreate(namespace_separator="}")
+    positions = [0]
+    stack = []
+    deletions = []
+
+    def display_tag(name):
+        return "{" + name if "}" in name else name
+
+    def begin(name, _attrs):
+        position = positions[0]
+        positions[0] += 1
+        if position >= len(nodes) or nodes[position].tag != display_tag(name):
+            raise CleanupError("Original XML event order differs from structural parser")
+        node = nodes[position]
+        offset = parser.CurrentByteIndex
+        end = _xml_tag_end(raw, offset)
+        opening = raw[offset:end]
+        selfclosing = opening.endswith(b"/>")
+        eligible = _inert_hi(node)
+        if eligible and selfclosing:
+            deletions.append((offset, end))
+        stack.append((name, eligible, selfclosing, offset, end))
+
+    def finish(name):
+        if not stack:
+            raise CleanupError("Original XML close event has no start")
+        opened, eligible, selfclosing, start, open_end = stack.pop()
+        if name != opened:
+            raise CleanupError("Original XML element names were not balanced")
+        if eligible and not selfclosing:
+            close_start = parser.CurrentByteIndex
+            if close_start != open_end:
+                raise CleanupError("Empty emphasis contains unexpected source bytes")
+            close_end = _xml_tag_end(raw, close_start)
+            if not raw[close_start:close_end].startswith(b"</"):
+                raise CleanupError("Missing explicit original empty-hi closing tag")
+            deletions.append((start, close_end))
+
+    def deny(*_args):
+        raise CleanupError("Original XML DTD/entities are not authorized")
+
+    parser.StartElementHandler = begin
+    parser.EndElementHandler = finish
+    parser.StartDoctypeDeclHandler = deny
+    parser.EntityDeclHandler = deny
+    parser.ExternalEntityRefHandler = lambda *_args: 0
+    try:
+        parser.Parse(raw, True)
+    except expat.ExpatError:
+        raise CleanupError("Original lexical XML cannot be parsed") from None
+    if stack or positions[0] != len(nodes) or len(deletions) != expected:
+        raise CleanupError("Not all inert source emphasis fragments were found")
+    output = bytearray()
+    position = 0
+    for begin_at, end_at in sorted(deletions):
+        if begin_at < position or end_at > len(raw) or begin_at >= end_at:
+            raise CleanupError("Overlapping or malformed original byte edit")
+        output.extend(raw[position:begin_at])
+        position = end_at
+    output.extend(raw[position:])
+    return bytes(output), len(deletions)
 
 
 def _text_hashes(root) -> tuple[str, str]:
@@ -271,8 +361,21 @@ def clean(source: Path, expected_sha: str, *, output: Path | None = None) -> dic
             raise CleanupError("Private cleaned output must be a fresh separate file")
         if not output.parent.is_dir() or output.parent.is_symlink():
             raise CleanupError("Private output parent must already exist")
-        if changes:
+        if (changes.get("empty_display_hi_elements_removed")
+                and not changes.get("changed_plain_nodes")):
+            xml, removed = _lexically_remove_empty_hi(raw)
+            if removed != changes["empty_display_hi_elements_removed"]:
+                raise CleanupError("Lexical and semantic empty styling counts differ")
+            result["original_byte_regions_preserved_except_empty_hi"] = True
+        elif changes:
+            # Whitespace-editing fallback still requires full native comparison;
+            # only exact lexical patches earn the byte-preservation assertion.
             xml = etree.tostring(root, encoding="UTF-8", xml_declaration=True)
+            result["original_byte_regions_preserved_except_empty_hi"] = False
+        else:
+            xml = raw
+            result["original_byte_regions_preserved_except_empty_hi"] = True
+        if changes:
             rebuilt = _tree(xml)
             serialized_exact, serialized_nonspace = _text_hashes(rebuilt)
             if (before_without_inert != _structure(rebuilt)
@@ -280,8 +383,6 @@ def clean(source: Path, expected_sha: str, *, output: Path | None = None) -> dic
                     or serialized_nonspace != original_nonspace_sha
                     or serialized_exact != after_exact_text_sha):
                 raise CleanupError("Serialized candidate changed source text or protected markup")
-        else:
-            xml = raw
         output.write_bytes(xml)
         result["cleaned_sha256"] = sha256(xml).hexdigest()
         result["cleaned_bytes"] = len(xml)
