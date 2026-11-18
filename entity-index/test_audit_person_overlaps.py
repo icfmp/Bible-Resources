@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import importlib.util
 import unittest
+import tempfile
 from pathlib import Path
 
 script = Path(__file__).with_name("audit_person_overlaps.py")
@@ -102,6 +103,50 @@ class PersonOverlapTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"Invalid exact-word"):
             module.verify_explicit_name_reviews(report,dict(
                 manifest,cases=[dict(entry,classification="all_resolved")]))
+
+    def test_indirect_source_form_triage_is_complete_and_non_editorial(self):
+        report = module.audit(sample())
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "macula.tsv"
+            header = "xml:id\tref\tnumber\tmorph\ttext\n"
+            word = "o010010010041"
+            path.write_text(header + word + "\tGEN 1:1!4\tplural\tSp3mp\tthey\n",
+                            encoding="utf-8")
+            reviewed = module.audit_indirect_source_forms(report, {"wlc": path})
+            self.assertEqual(reviewed["statistics"]["indirect_only_source_words"], 1)
+            self.assertEqual(reviewed["statistics"]["by_corpus"], {"wlc": 1})
+            self.assertEqual(reviewed["statistics"]["source_word_number_buckets"],
+                             {"source_word_plural": 1})
+            self.assertEqual(reviewed["statistics"]["different_canonical_people_per_word"],
+                             {"2": 1})
+            self.assertEqual(reviewed["cases"][0]["source_word"]["morph"], "Sp3mp")
+            self.assertEqual(reviewed["cases"][0]["canonical_people"],
+                             report["findings"][-1]["canonical_people"])
+            self.assertIn("NOT proof", reviewed["warning"])
+            # A singular source word is only a review signal, never
+            # an automatic identity correction or candidate deletion.
+            path.write_text(header + word + "\tGEN 1:1!4\tsingular\tSp3ms\the\n",
+                            encoding="utf-8")
+            singular = module.audit_indirect_source_forms(report, {"wlc": path})
+            self.assertEqual(singular["statistics"]["source_word_number_buckets"],
+                             {"source_word_singular": 1})
+            self.assertEqual(singular["cases"][0]["canonical_people"],
+                             reviewed["cases"][0]["canonical_people"])
+            # Missing/duplicated ID and wrong TSV schema fail closed.
+            path.write_text(header + "o010010010099\tGEN 1:1\tplural\tPp\tthey\n",
+                            encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "absent from pinned"):
+                module.audit_indirect_source_forms(report, {"wlc": path})
+            path.write_text(header + (word + "\tGEN 1:1\tplural\tPp\tthey\n") * 2,
+                            encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "Duplicated pinned"):
+                module.audit_indirect_source_forms(report, {"wlc": path})
+            path.write_text("xml:id\tword\n" + word + "\tthey\n",
+                            encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "TSV schema"):
+                module.audit_indirect_source_forms(report, {"wlc": path})
+            with self.assertRaisesRegex(ValueError, "Incomplete pinned source"):
+                module.audit_indirect_source_forms(report, {})
 
     def test_fail_closed_for_broken_index(self):
         data = sample()
