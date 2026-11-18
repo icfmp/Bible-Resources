@@ -37,6 +37,22 @@ Frozen evidence:
 | Mixed / text traditions | 2 Corinthians final benediction | 2 Corinthians 13:14 | No original-word verse ID in pinned SBLGNT | verse mapping to pinned 13:13, not invented names | Qualified in #320; edition numbering difference |
 | Mixed / text traditions | Two women in Solomon's judgment | 1 Kings 3:22 | wlc:o110030220022 | explicit candidate vs indirect candidate; historic identity unresolved | #323: do not infer true mother from source role label |
 
+## Final three word-overlap dispositions for v0.1 (reviewed 18 November 2026)
+
+The final three previously unresolved **direct-person name collisions** were checked against the original pinned word and competing external textual explanations. This completes their **bounded review**, not an assertion that the two historical identity puzzles have a demonstrable single answer.
+
+| Original word | Observed original form | Disposition |
+| --- | --- | --- |
+| `sblgnt:n40016017010` (Matthew 16:17) | Single Greek vocative `Βαριωνᾶ`, *Bar-Jonah*, immediately after `Σίμων` | **Legitimate shared patronymic component:** Simon Peter is addressed by a patronymic containing his father's name. Father/son remain distinct; debate over father **John/Jonah** does not make this an erroneous shared-word assignment. |
+| `wlc:o150030090081` (Ezra 3:9) | `יְהוּדָה` (*Judah*) within `sons of Judah` | **Editorially reviewed, historically unresolved:** family name may reflect Hodaviah from Ezra 2:40 / Nehemiah 7:43, but commentators debate alternate name vs scribal transmission. No proof of identity between original records `Hodaviah.4` and `Hodiah.2`. Keep both qualified claims; do not substitute a hypothesized Hebrew word. |
+| `wlc:o160120080061` (Nehemiah 12:8) | `יְהוּדָה` (*Judah*) among listed Levites | **Editorially reviewed, historically unresolved:** connecting this Judah with the Hodiah named in Nehemiah 10 is a disputed historical/name-form hypothesis, potentially conflating generations. Retain the distinct `Judah.7` and `Hodiah.2` source claims without asserting equivalence. |
+
+Source discussion: [NET Ezra 3:9](https://classic.net.bible.org/verse.php?book=Ezr&chapter=3&verse=9), [Cambridge Ezra 3](https://biblehub.com/commentaries/cambridge/ezra/3.htm), [Cambridge Nehemiah 12](https://biblehub.com/commentaries/nehemiah/12-8.htm), [Lange Nehemiah 12](https://mail.biblehub.com/commentaries/lange/nehemiah/12.htm), [Keil–Delitzsch Nehemiah 12](https://www.bible.armeniancathedral.org/comments/kad/Neh_12.htm), and the [John 1:42 name-form note](https://www.biblegateway.com/passage/?search=John.1.42&version=NABRE). Exact case-level technical evidence and original-word IDs are retained in [reviewed-person-word-overlaps.json](reviewed-person-word-overlaps.json).
+
+**v0.1 reader contract:** the Bar-Jonah overlap is not an *either/or* choice of which person the Greek word denotes; it is a compound name containing a paternal reference. The two Hebrew cases remain genuinely uncertain and therefore must never be presented as historically established aliases or auto-merged identities. Keep source candidate ambiguity and label the uncertainty in any later UI that presents those cases; the raw source words and every frozen ACAI JSON record remain unchanged.
+
+**Final reviewed-person overlap statistics: 8 direct word collisions = 6 legitimate shared genealogical/patronymic name components + 2 historically unresolved source identity/name variants.** Zero unreviewed direct-person collisions in **this pinned audit**, but this does not establish that all proper names throughout the entire corpus are correct. The 2,332 indirect-only person collisions remain outside v0.1 reader-facing coverage.
+
 ## Acceptance boundary
 
 The six source-word absence/variant entries do **not** all have a direct source word: `No matching word` means **no original-word identifier exists for the named claim in the pinned edition**, never a permission to invent one. Other original words may exist in the verse, and textual traditions/versification differ.
