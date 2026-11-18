@@ -561,6 +561,33 @@ jobs:
               "source_original_links_still_requiring_placement_review")) == 1204
           assert not ledger["source_reference_labels_or_literal_targets_exported"]
           assert not ledger["publication_authorized"]
+          # Every remaining original source K/ordinal has a private, hash-only
+          # syntactic and XML-ancestry review context. Unique literal text
+          # presence is diagnostic evidence, NOT an automatic hyperlink.
+          from collections import Counter
+          pending=ledger["pending"]
+          assert len(pending) == 180
+          assert Counter(row["disposition"] for row in pending) == {
+              "UNPLACED_SINGLE_VERSE_REFERENCE": 145,
+              "UNPLACED_SAME_CHAPTER_VERSE_RANGE": 32,
+              "UNPLACED_OTHER_OR_COMPOSITE_OSIS_TARGET": 3,
+          }
+          ancestry=Counter(row["native_markup_location"] for row in pending)
+          grammar=Counter(row["original_target_grammar"] for row in pending)
+          labels=Counter(row["verbatim_original_label_in_modern_K"]
+                         for row in pending)
+          assert set(ancestry) <= {
+              "EXPOSITION_OR_OTHER", "TABLE", "TITLE", "TABLE_AND_TITLE"}
+          assert set(labels) <= {
+              "NON_DISTINCTIVE_NOT_SCANNED", "UNIQUE_VERBATIM",
+              "ABSENT_VERBATIM", "REPEATED_NOT_UNIQUE"}
+          assert sum(ancestry.values()) == sum(grammar.values()) == (
+              sum(labels.values())) == 180
+          print("SOURCE UNPLACED 180 CONTEXT DIAGNOSTICS (not editorial approval): " +
+                json.dumps({"native_markup_location": dict(sorted(ancestry.items())),
+                            "original_target_grammar": dict(sorted(grammar.items())),
+                            "verbatim_original_label_in_modern_K":
+                                dict(sorted(labels.items()))}, sort_keys=True))
           print("SOURCE FULL 1204-REFERENCE DISPOSITION PASS: " +
                 str(ledger["source_link_occurrences_verified_in_derived_osis"]) +
                 " represented, 9 source markup exclusions, " +
