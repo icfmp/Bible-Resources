@@ -416,6 +416,88 @@ def source_commentary_overlap_witness(
     return overlapping, needed
 
 
+
+def source_commentary_shared_key_retrieval_map(
+        original_groups: list[dict], native_first_keys: set[str]
+) -> dict:
+    """Private, metadata-only lookup for authentic multi-owner Bible verses.
+
+    Uses a source OSIS author's actual (possibly overlapping) verse-group
+    membership *before* any machine-scope trimming. A SWORD lookup supplies
+    one raw entry per verse, so two different original commentary sections
+    may require looking up two distinct first keys. Return only source IDs,
+    key addresses, SHA fingerprints and counts; never the original prose.
+
+    This is research evidence and a retrieval contract, NOT a published
+    proprietary companion format or proof of GUI section presentation.
+    """
+    if (not isinstance(original_groups,list) or not original_groups
+            or not isinstance(native_first_keys,set) or not native_first_keys):
+        raise ValueError("Missing actual authorial source groups or native index")
+    owners=defaultdict(list)
+    seen=set()
+    for group in original_groups:
+        if not isinstance(group,dict):
+            raise ValueError("Invalid authored group identity")
+        sid,keys,line=group.get("sID"),group.get("keys"),group.get("line")
+        body=group.get("text")
+        if (not isinstance(sid,str) or not sid
+                or not isinstance(keys,(list,tuple)) or not keys
+                or type(line) is not int or line<1
+                or not isinstance(body,str) or not body
+                or any(not isinstance(k,str)
+                       or len(k.split("."))!=3
+                       or SECTION_ATOM.fullmatch(k) is None for k in keys)):
+            raise ValueError("Unattested commentary source verse group")
+        fingerprint=hashlib.sha256(
+            (str(line)+"\\n"+sid+"\\n"+body).encode("utf-8")
+        ).hexdigest()
+        if fingerprint in seen:
+            raise ValueError("Identical authored source group identity repeated")
+        seen.add(fingerprint)
+        first=keys[0]
+        if first not in native_first_keys:
+            raise ValueError("Original authored section has no real native first key")
+        identity={
+            "source_section_sha256":fingerprint,
+            "original_source_start_line":line,
+            "original_source_scope":sid,
+            "native_first_key":first,
+            "original_source_verse_count":len(keys),
+        }
+        for key in keys:
+            owners[key].append(identity)
+    shared=[]
+    for key,members in owners.items():
+        if len(members)<=1:
+            continue
+        first_keys={m["native_first_key"] for m in members}
+        shared.append({
+            "bible_verse_key":key,
+            "original_independent_section_count":len(members),
+            "distinct_native_first_key_count":len(first_keys),
+            "native_retrieval_keys_in_authorial_order":
+                list(dict.fromkeys(m["native_first_key"] for m in members)),
+            "original_sections_in_source_order":members,
+            "presentation_class":(
+                "DISTINCT_FIRST_KEYS_REQUIRE_MULTISECTION_READER"
+                if len(first_keys)==len(members) else
+                "SAME_FIRST_KEY_REQUIRES_INNER_SECTION_MARKUP_CHECK"
+            ),
+        })
+    return {
+        "status":"PRIVATE_SOURCE_SCOPE_BRIDGE_NOT_RELEASE_OR_GUI_APPROVAL",
+        "original_authored_groups":len(original_groups),
+        "original_shared_verse_keys":len(shared),
+        "shared_verse_source_sections":sum(
+            item["original_independent_section_count"] for item in shared
+        ),
+        "shared_verses":shared,
+        "original_prose_in_report":False,
+        "source_groups_rewritten":False,
+    }
+
+
 def compare_source_overlap_native_bodies(
         overlapping: dict, native_raw: dict[str, bytes],
         *, max_cases: int = 35) -> dict:
