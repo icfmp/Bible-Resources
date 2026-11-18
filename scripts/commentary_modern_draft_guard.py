@@ -21,8 +21,8 @@ _RANGE = re.compile(r"\bverses\s+(\d{1,3})\s*[-–—]\s*(\d{1,3})", re.I)
 _SINGLE = re.compile(r"\bverse\s+(\d{1,3})\b", re.I)
 _WORD = re.compile(r"[\w’-]+", re.UNICODE)
 
-_SCOPE_CLAIM = re.compile(r"\\(\\s*verses?\\s+([^)]+)\\)", re.I)
-_EXACT_SCOPE_SEGMENT = re.compile(r"(\\d{1,3})(?:\\s*[-–—]\\s*(\\d{1,3}))?")
+_SCOPE_CLAIM = re.compile(r"\(\s*verses?\s+([^)]+)\)", re.I)
+_EXACT_SCOPE_SEGMENT = re.compile(r"(\d{1,3})(?:\s*[-–—]\s*(\d{1,3}))?")
 
 
 def _claimed_verse_keys_in_heading(heading: str) -> list[int] | None:
@@ -36,7 +36,7 @@ def _claimed_verse_keys_in_heading(heading: str) -> list[int] | None:
     if not found:
         return None
     # Normalize syntactic separators, not authorial verse addresses.
-    scope = re.sub(r"\\s+and\\s+", ",", found[1], flags=re.I)
+    scope = re.sub(r"\s+and\s+", ",", found[1], flags=re.I)
     parts = [part.strip() for part in re.split(r"[,;]", scope)]
     if not parts or any(not part for part in parts):
         raise ValueError("Malformed modern commentary verse scope")
