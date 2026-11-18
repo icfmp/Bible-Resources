@@ -768,7 +768,8 @@ jobs:
                                   compare_all_commentary_source_group_words,
                                   compare_all_commentary_source_group_semantics,
                                   source_commentary_introductions,
-                                  compare_commentary_source_native_introductions)
+                                  compare_commentary_source_native_introductions,
+                                  triage_commentary_introduction_relocation)
           from sword_native_raw_corpus_inventory import parse_native_raw_corpus
           root=Path(os.environ["RUNNER_TEMP"])
           source=root/"mhc-overlap-experimental.osis.xml"
@@ -828,6 +829,12 @@ jobs:
                 intro_evidence["counts"])
           print("Bounded introduction source/native discrepancy references:",
                 intro_evidence["bounded_reference_only_cases"][:30])
+          relocation=triage_commentary_introduction_relocation(
+              introductions,intro_raw,raws)
+          print("Original book/chapter introduction SWORD relocation categories:",
+                relocation["counts"])
+          print("Bounded original introduction same-book relocation cases:",
+                relocation["bounded_source_scope_cases"][:45])
           print("Introduction contents and note bodies remain private")
           print("Still NOT an independent historical collation or note/markup identity certificate")
           PY
