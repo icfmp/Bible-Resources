@@ -45,7 +45,7 @@ At our first birth we were corrupted by sin.
 
 We must therefore become **new creatures**.
 
-No weaker expression than new birth could adequately describe this fundamental change.
+**No stronger expression** could have been chosen to describe so great a change in a person's state and character.
 
 Something is done **within us and for us** that we cannot accomplish by our own efforts.
 
@@ -185,11 +185,14 @@ The Holy Spirit was given to him **without measure**, unlike prophets who receiv
 
 Those refusing to believe in him cannot share in salvation.
 
-God's wrath remains upon them.
+God's wrath remains upon them **forever**, as Henry explicitly warns.
 
 ---
 
 ## Editorial review — John 3
+
+**2026-11-18 CCEL fidelity corrections (secondary witness, not native signoff):** restored Henry's precise **“No stronger expression”** claim about new birth instead of the draft's inverted **“No weaker expression”**, and retained the omitted **“for ever”** in his closing comment on John 3:36. The original CCEL chapter has a printed outline covering 1–21 but an *authored heading* 1–8 whose substantive prose continues through the theology of verses 9–21; native MHCC 0.1.1 indexing is confined to 1–8. Exact original-source words/references and proposed wider derivative navigation require source-native checking. [CCEL John 3](https://ccel.org/ccel/henry/mhcc.xxxv.iii.html).
+
 
 **Complete original-English secondary witness directly read:** [CCEL, John 3](https://ccel.org/ccel/henry/mhcc.xxxv.iii.html). Published `MHCC 0.1.1` remains the primary authority for native SWORD key and markup checks.
 
