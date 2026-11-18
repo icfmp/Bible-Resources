@@ -228,6 +228,35 @@ jobs:
               raise SystemExit("Source target line/key correspondence incomplete")
           print("Unreviewed machine references and source scopes (no commentary prose):",
                 detailed)
+          # Source here is a Bible-structured OSIS commentary (verse/chapter
+          # elements), NOT annotateRef sections. Inspect the actual index data.
+          import collections
+          attributes=collections.Counter()
+          element_shapes=collections.Counter()
+          examples={"verse":[],"chapter":[],"milestone":[],"div":[]}
+          for el in xml.iter():
+              if not isinstance(el.tag,str):
+                  continue
+              local=el.tag.rsplit("}",1)[-1]
+              if local not in examples:
+                  continue
+              current={k:v for k,v in el.attrib.items()
+                       if k in {"osisID","sID","eID","n","type","subType"}}
+              for name,value in current.items():
+                  attributes[(local,name)]+=1
+                  if name in {"osisID","sID","eID","n"}:
+                      element_shapes[(local,name,
+                                      "comma" if "," in value else
+                                      "whitespace" if len(value.split())>1 else
+                                      "range" if "-" in value else "atomic")]+=1
+              if len(examples[local])<8:
+                  examples[local].append({"line":el.sourceline, "attrs":current})
+          print("Original MHC actual source reference-attribute census:",
+                dict(sorted((str(k),v) for k,v in attributes.items())))
+          print("Original MHC verse/chapter reference syntax counts:",
+                dict(sorted((str(k),v) for k,v in element_shapes.items())))
+          print("Actual OSIS source marker samples (machine attributes only):",
+                examples)
           print("No editorial changes or historical text correction performed")
           PY
       - name: Compile fresh private zCom4, then independently read EVERY occupied key
