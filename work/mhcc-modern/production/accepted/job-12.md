@@ -78,13 +78,15 @@ God's ways are beyond searching, and his judgments cannot be fully traced.
 
 Scripture contains many wonderful examples of divine wisdom in sovereignty.
 
-But the greatest and most important is **the crucifixion of Jesus Christ through human malice**.
+But the greatest and most important is **the crucifixion of Jesus Christ**—which Henry attributes to what he calls **“the malice of the Jews.”**
 
 Only God could have known that this terrible act would become **the salvation of the world**.
 
 ---
 
 ## Editorial review — Job 12
+
+**2026-11-19 secondary-witness fidelity proposal (sensitive historical wording; publication unapproved):** Job 12:12–25 previously generalized Henry's explicit phrase *“the malice of the Jews”* to *“human malice”*. The modern draft now **attributes this historical expression directly to Henry**, rather than treating its collective phrasing as an independently established historical claim or endorsing collective Jewish guilt. The source's theological point about divine sovereignty in the crucifixion is retained. Compared to [CCEL Job 12](https://ccel.org/ccel/henry/mhcc.xix.xii.html). Exact original-native K check, further editorial review of historical framing and explicit owner publication approval are required. No source was altered.
 
 **Whole CCEL secondary witness inspected:** [CCEL, Job 12](https://ccel.org/ccel/henry/mhcc.xix.xii.html). Published original **MHCC 0.1.1** remains authoritative, native SWORD and independent acceptance pending.
 
