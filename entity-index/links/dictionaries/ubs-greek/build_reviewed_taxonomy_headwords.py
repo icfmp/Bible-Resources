@@ -107,6 +107,8 @@ def build(candidate, previous_ledger, residual, taxonomy_ledger, english, french
     deferred_keys = set()
     for family in residual["families"]:
         key = (family["lemma_nfc"], family["ubs_main_id"])
+        if key not in from_prior:
+            continue  # The other 101 families were already approved in batch 4.
         decision = reviewed.get(key)
         if decision is None:
             d = deferred.get(key)
