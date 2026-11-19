@@ -62,7 +62,10 @@ is presented separately and legibly. This treatment follows CrossWire's
   landing were **not tested**.
 
 **Stop repeatedly invoking Xiphos on every source commit.** Optional corrected-candidate
-GUI steps use `workflow_dispatch`; source/OSIS/native integrity remains mandatory.
+GUI steps use `workflow_dispatch`. The older private alias Xiphos workflow is
+opt-in by applying the `run-mhc-xiphos` PR label (or by `workflow_dispatch`
+once available on the default branch). Ordinary PR pushes no longer invoke that
+expensive real-GTK experiment. Source/OSIS/native integrity remains mandatory.
 At the latest tested PR head, [the source-first private build #44346559230](https://github.com/icfmp/Bible-Resources/actions/runs/44346559230)
 passed including the chapter-introduction readback, while the separate
 [original-alias Xiphos run #44346559060](https://github.com/icfmp/Bible-Resources/actions/runs/44346559060)
