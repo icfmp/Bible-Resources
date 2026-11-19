@@ -66,6 +66,33 @@ class VerifyNonidentityTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Unexplained or unsupported"):
             verify["verify_metadata"](ledger, report, entries)
 
+    def test_same_strong_false_candidate_with_actual_gloss_evidence(self):
+        ledger, report, entries = fixture()
+        report["families"][0]["reason"] = "same_strong_family_unresolved"
+        ledger["decisions"][0]["candidate_relation"] = "same_strong_family_unresolved"
+        ledger["decisions"][0]["ubs_attested_gloss"] = "god"
+        ledger["decisions"][0]["ubs_candidate"]["strong_codes"] = ["H0408a"]
+        entries[0]["StrongCodes"] = ["H0408a"]
+        entries[0]["BaseForms"][0]["LEXMeanings"] = [
+            {"LEXSenses": [{"Glosses": ["god"]}]}
+        ]
+        self.assertEqual(verify["verify_metadata"](ledger, report, entries)["families"], 1)
+        changed = deepcopy(ledger)
+        changed["decisions"][0]["ubs_attested_gloss"] = "not in source"
+        with self.assertRaisesRegex(ValueError, "meaning evidence changed"):
+            verify["verify_metadata"](changed, report, entries)
+
+    def test_reject_candidate_relation_drift_and_sdbh_word_drift(self):
+        ledger, report, entries = fixture()
+        ledger["decisions"][0]["candidate_relation"] = "same_strong_family_unresolved"
+        with self.assertRaisesRegex(ValueError, "source-classified"):
+            verify["verify_metadata"](ledger, report, entries)
+        ledger, report, entries = fixture()
+        ledger["decisions"][0]["source_witness"]["original_sdbh"] = "original-sense"
+        report["families"][0]["source_witnesses"][0]["original_sdbh"] = "other-sense"
+        with self.assertRaisesRegex(ValueError, "Witness not in pinned"):
+            verify["verify_metadata"](ledger, report, entries)
+
     def test_non_exhaustive_candidate_rejection_is_rejected(self):
         ledger, report, entries = fixture()
         report["families"][0]["ubs_candidate_entries"].append("000002000000000")

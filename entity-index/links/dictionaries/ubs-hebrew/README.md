@@ -754,3 +754,54 @@ in-scope total to **125/197 lexical families / 2,542 of 2,649 original
 occurrences**. **72 families / 107 occurrences** still need resolution,
 including two preserved composite Strong annotations tracked as source
 syntax cases. The UBS v1.0 release remains explicitly unapproved.
+
+### Fourth source-review batch: 15 false single-headword candidates
+
+The frozen original MACULA WLC lowfat words were independently inspected
+for 15 more single-candidate UBS false matches: **38 original occurrences**.
+These new negative lexical decisions cover exact original source word ID,
+reference, language, full Strong, lemma, class, original POS, English (including
+the deliberately empty original field when unannotated), and original SDBH,
+as well as UBS exact MainId, lemma, Strong, original POS and a **verbatim
+attested UBS gloss**.
+
+The distinctions are editorial, not automatic rules for rejecting all
+cross-Strong or same-Strong links:
+
+- **Different lexical referents:** H שָׁתַן H8366a (6), original *one
+  urinating* versus UBS source headword *male*; H לַיִשׁ H3919a (4),
+  original city Laish in Judges 18, versus UBS *Laishah*; H רִמּוֹן
+  H7417b (3), the deity in 2 Kings 5:18, versus the UBS settlement
+  *Rimmono*.
+- **Original components of larger names or locations:** H גּוֹי H2800a
+  (3, Haggoyim within Harosheth-Haggoyim); H עֵמֶק H0425b (3,
+  *valley* of Elah, not the Elah noun/name); H שְׁכֶם H4026b (3,
+  *Shechem* in Tower of Shechem, not *tower*); H אָב H2361a (2,
+  *Abi* title following Huram, not Huram himself); H שַׁעַר H3466a
+  (2, Gate component in the Jeshanah Gate); H שְׁלִישִׁי H5697a
+  (2, second source component of Eglath-Shelishiyah); H עֵמֶק H7104a
+  (1, Emek component of Emek-Keziz).
+- **Distinct lexical word and UBS meaning:** H אֶל H0413 (2),
+  grammatical negative/preposition versus UBS divine being *god*;
+  H בּוֹא H3820b (2), source *entrance* versus UBS *heart*;
+  H קְוֵא / קֹוֶה H6961a (2+2), geographic *Kue* versus UBS
+  *measuring line*; H יַעְרָה H3295a (1), actual Jonathan
+  *honeycomb* versus the personal-name UBS *Jaarah*.
+
+The existing [negative candidate ledger](v1_lexical_nonidentity_dispositions.json)
+and [read-only pinned-source verifier](verify_lexical_nonidentity.py) are
+extended rather than introducing a second negative-match algorithm.
+A positive semantic mapping for an entire multiword construction would need
+a separately documented, source-span-aware index; individual original-word
+components are never silently promoted to an entire UBS name/headword.
+The original Macula and UBS data remain untouched; no contextual senses
+or new dictionary word links are inferred.
+
+**After this batch:** negative decisions are **26 families / 1,847
+occurrences**. Together with 48 previously reviewed multi-headword
+abstentions (458), 10 grammatical segment nonlinks (27), and 56
+positive headword-only identities (248), this is **140/197 in-scope
+families / 2,580 of 2,649 original occurrences dispositioned**.
+**57 families / 69 original occurrences** remain (including two
+preserved composite source Strong annotations). The generated
+word-linked index and UBS edition-scope metrics remain unchanged.

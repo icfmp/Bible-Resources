@@ -15,6 +15,13 @@ import unicodedata
 from pathlib import Path
 
 
+VALID_REASONS = {
+    "different_strong_same_consonants",
+    "different_strong_exact_attested_lemma",
+    "same_strong_family_unresolved",
+}
+
+
 def norm(value):
     return unicodedata.normalize("NFC", value)
 
@@ -39,6 +46,8 @@ def verify_metadata(ledger, register, entries):
         raise ValueError("Unsupported editorial ledger format")
     families = {key(f): f for f in register["families"]}
     by_id = {e["MainId"]: e for e in entries}
+    if len(by_id) != len(entries):
+        raise ValueError("Duplicate original UBS headword MainId")
     checked = set()
     total = 0
     ids = set()
@@ -48,16 +57,21 @@ def verify_metadata(ledger, register, entries):
             raise ValueError("Duplicate editorial family decision")
         checked.add(k)
         f = families.get(k)
-        if not f or f["reason"] != "different_strong_same_consonants":
-            raise ValueError("Decision does not concern an unresolved same-consonant family")
+        if (not f or f["reason"] not in VALID_REASONS
+                or d.get("candidate_relation", f["reason"]) != f["reason"]):
+            raise ValueError("Decision does not concern a source-classified unresolved lexical family")
         if f["occurrences"] != d["occurrences"]:
             raise ValueError("Original family occurrence count changed")
         if d.get("decision") != "candidate_lexical_nonidentity" or not d.get("rationale"):
             raise ValueError("Unexplained or unsupported editorial conclusion")
         w = d["source_witness"]
-        if (w["word_id"], w["reference"]) not in [
-            (x["original_word_id"], x["reference"]) for x in f["source_witnesses"]
-        ]:
+        if not any(
+            w["word_id"] == x["original_word_id"]
+            and w["reference"] == x["reference"]
+            and ("original_sdbh" not in w
+                 or w["original_sdbh"] == x["original_sdbh"])
+            for x in f["source_witnesses"]
+        ):
             raise ValueError("Witness not in pinned unresolved family")
         candidate = d["ubs_candidate"]
         mid = candidate["main_id"]
@@ -74,6 +88,18 @@ def verify_metadata(ledger, register, entries):
             raise ValueError("UBS original candidate POS metadata changed")
         if d["lang"] + d["original_strong"] in entry["StrongCodes"]:
             raise ValueError("Original Strong unexpectedly matches UBS candidate")
+        # The actual published UBS gloss is an evidence anchor, not a
+        # machine rule for no-link status or a contextual sense assignment.
+        if d.get("ubs_attested_gloss"):
+            observed = {
+                gloss
+                for form in (entry.get("BaseForms") or [])
+                for sense in (form.get("LEXMeanings") or [])
+                for detail in (sense.get("LEXSenses") or [])
+                for gloss in (detail.get("Glosses") or [])
+            }
+            if d["ubs_attested_gloss"] not in observed:
+                raise ValueError("UBS lexical meaning evidence changed")
         total += d["occurrences"]
         ids.add(w["word_id"])
     return {"families": len(checked), "occurrences": total, "word_ids": ids}
@@ -97,6 +123,8 @@ def verify_witness_words(ledger, macula):
                 "pos": w["pos"],
                 "class": w["class"],
             }
+            if "original_sdbh" in w:
+                expected["sdbh"] = w["original_sdbh"]
             for col, wanted in expected.items():
                 actual = row[col]
                 if (norm(actual) if col == "lemma" else actual) != (
