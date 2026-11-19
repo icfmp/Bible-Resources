@@ -3388,6 +3388,100 @@ jobs:
                 "deterministic local-only ZIP metadata, "+str(len(observed))+
                 " real diatheke passage readbacks; NO binary upload or public release")
           PY
+      - name: Install real Xiphos GUI in an isolated virtual display for HMCC Modern
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          timeout 330s sudo apt-get -o Acquire::Retries=2 \
+            -o Acquire::http::Timeout=45 -o Acquire::https::Timeout=45 install -y \
+            xiphos xvfb xdotool xclip dbus-x11
+          command -v xiphos
+          command -v Xvfb
+          command -v xclip
+      - name: Observe actual HMCC Modern commentary prose inside private Xiphos GUI
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,subprocess,sys
+          from pathlib import Path
+          sys.path.insert(0,"scripts")
+          from commentary_xiphos_dual_reader import (
+              _run_real_gui,verify_and_install_reviewed_bible)
+          from pilot_subprocess import present_key,query
+          base=Path(os.environ["RUNNER_TEMP"])
+          root=base/"mhcc-modern-rc-root"
+          assert (root/"mods.d/mhccmodrc.conf").is_file()
+          proof=json.loads((base/"mhcc-modern-private-rc-metadata-only.json").read_text())
+          if (proof["status"]!="PRIVATE_SWORD_ZCOM_CANDIDATE_BUILT_AND_NATIVE_READER_VERIFIED_NOT_RELEASE"
+                  or proof["candidate_sword_id"]!="MHCCMODRC"
+                  or proof["selected_full_display_name"]!="Henry's Modern Concise Commentary"
+                  or proof["selected_short_display_name"]!="HMCC Modern"
+                  or proof["sword_safe_abbreviation"]!="HMCCModern"
+                  or proof["published"] is not False):
+              raise ValueError("Cannot Xiphos-test a foreign or approved modern commentary")
+          bible=verify_and_install_reviewed_bible(root)
+          if bible["module_id"]!="BRLSG1910" or not bible["all_five_published_bible_files_sha256_attested"]:
+              raise ValueError("Xiphos private test needs source-attested published Bible")
+          samples=("Gen 1:1","Matt 3:7","Ps 95:1","Rev 22:2")
+          comparisons={}
+          for ref in samples:
+              code,commentary=query(
+                  "MHCCMODRC",ref,fmt="plain",root=root,
+                  exe="diatheke",limit=256*1024,timeout=25)
+              bcode,bible_text=query(
+                  "BRLSG1910",ref,fmt="plain",root=root,
+                  exe="diatheke",limit=256*1024,timeout=25)
+              if (code!=0 or bcode!=0
+                      or not present_key(ref,commentary,code)
+                      or not present_key(ref,bible_text,bcode)
+                      or len(commentary)<=100 or len(bible_text)<=64):
+                  raise ValueError("Xiphos sample not backed by two substantial real SWORD texts: "+ref)
+              comparisons[ref]={"commentary":commentary,"bible":bible_text}
+          result=_run_real_gui(root,comparisons,seconds=18,
+                               commentary_module_id="MHCCMODRC")
+          matches=result.get("commentary_clipboard_match_by_passage",{})
+          if set(matches)!=set(samples):
+              raise ValueError("Real Xiphos did not inspect every chosen commentary passage")
+          if not result.get("real_xiphos_executable_started_and_visible"):
+              raise ValueError("Real Xiphos main window was not observed")
+          if not result.get("real_main_reader_window_found"):
+              raise ValueError("Real Xiphos main reader was not observed")
+          if any(type(x) is not bool for x in matches.values()):
+              raise ValueError("Actual GUI clipboard evidence is not boolean")
+          positives=sum(matches.values())
+          receipt={
+              "status":(
+                  "PRIVATE_MODERN_REAL_XIPHOS_GUI_SUBSTANTIVE_CLIPBOARD_PASS"
+                  if positives>=2 else
+                  "PRIVATE_MODERN_REAL_XIPHOS_GUI_OBSERVATION_INCONCLUSIVE"),
+              "candidate_sword_id":"MHCCMODRC",
+              "full_display_name":"Henry's Modern Concise Commentary",
+              "short_display_name":"HMCC Modern",
+              "pinned_bible":"BRLSG1910",
+              "true_xiphos_X11_main_window":True,
+              "isolated_GUI_home_and_SWORD_PATH":result.get("original_source_SWORD_PATH_isolated") is True,
+              "passages_checked":len(samples),
+              "actual_commentary_excerpts_matched_to_SWORD_not_Bible":positives,
+              "per_passage_substantive_GUI_match":dict(matches),
+              "actual_GUI_actions_completed":result.get("actual_passage_commands_accepted") is True,
+              "xiphos_link_mouse_click_and_target_verified":False,
+              "xiphos_gui_all_pages_approved":False,
+              "andbible_android_GUI_verified":False,
+              "rights_approved":False,
+              "public_release_authorized":False,
+              "source_or_rendered_text_uploaded":False
+          }
+          (base/"mhcc-modern-private-xiphos-actual-gui-metadata.json").write_text(
+              json.dumps(receipt,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+          print("PRIVATE REAL XIPHOS HMCC MODERN GUI: "+str(positives)+"/"+
+                str(len(samples))+" distinct substantive commentary excerpts proven "
+                "in actual GTK pane and clipboard vs independently read SWORD, "
+                "full authorial text not logged; no click-navigation, rights or release claim")
+          if positives<2:
+              raise ValueError("Actual Xiphos modern commentary GUI clipboard observation inconclusive")
+          PY
       - name: Compile all 51 original-first-K book-prefaces in private SWORD and verify native-I readback
         shell: bash
         run: |
@@ -4579,6 +4673,7 @@ jobs:
             ${{ runner.temp }}/mhcc-modern-private-preface-original-crossref-receipt.json
             ${{ runner.temp }}/mhcc-modern-private-release-candidate-preflight.json
             ${{ runner.temp }}/mhcc-modern-private-rc-metadata-only.json
+            ${{ runner.temp }}/mhcc-modern-private-xiphos-actual-gui-metadata.json
             ${{ runner.temp }}/mhcc-modern-strict-primary-only-receipt.json
             ${{ runner.temp }}/mhcc-modern-compiled-body-text-parity-diagnostic.json
             ${{ runner.temp }}/mhcc-modern-source-matched-links-native-SWORD-readback.json
