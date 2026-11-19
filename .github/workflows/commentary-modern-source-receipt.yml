@@ -1504,7 +1504,7 @@ jobs:
                   process.kill()
                   process.wait()
           if (len(keys)!=28792 or set(found)!=set(expected) or
-              sum(found.values())!=summary["original_unplaced_valid_references_visible_in_commentary"]):
+              sum(found.values())!=receipt["original_unplaced_valid_references_visible_in_commentary"]):
               raise ValueError("Visible in-commentary original citation index incomplete")
           source_first=next(iter(expected))
           book,chapter,verse=source_first.rsplit(".",2)
@@ -1513,7 +1513,7 @@ jobs:
           reader=subprocess.run(cmd,env=env,text=True,capture_output=True,timeout=30)
           if reader.returncode!=0 or "Original-edition Bible references" not in reader.stdout:
               raise ValueError("Visible original reference index not displayed by diatheke")
-          print("PRIVATE VISIBLE ORIGINAL REFERENCE SWORD PASS: " + str(summary["original_unplaced_valid_references_visible_in_commentary"]) + " source-verified " +
+          print("PRIVATE VISIBLE ORIGINAL REFERENCE SWORD PASS: " + str(receipt["original_unplaced_valid_references_visible_in_commentary"]) + " source-verified " +
                 "in-commentary links, 28792 native K keys; real diatheke visible " +
                 "without footnote mode, no authorial inline-location claim or publication")
           PY
