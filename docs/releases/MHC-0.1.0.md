@@ -20,4 +20,4 @@ The released module uses the standard SWORD **zCom4** commentary format, KJV ver
 
 Project-owner source rights and publication decisions dated November 19, 2026 are tracked in [issue #285](https://github.com/icfmp/Bible-Resources/issues/285). A public-domain declaration from CrossWire is used as the distribution basis; no project re-licensing of inherited text is claimed.
 
-The immutable versioned release asset is `MHC-0.1.0.zip`; the continuously served catalogue download is `sword/packages/MHC.zip`. The published ZIP checksum is pinned in the official release plan and must match the catalogue.
+The immutable versioned release asset is `MHC-0.1.0.zip`; the continuously served catalogue download is `sword/packages/MHC.zip`. The final SWORD `.conf` includes a single provenance-only `TextSource` line added to the reviewed artifact; this is recorded with reversible original/new hashes in the editorial record and does not alter any compiled commentary bytes. The published ZIP checksum is pinned in the official release plan and must match the catalogue.
