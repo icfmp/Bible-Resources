@@ -22,7 +22,7 @@ publication_status: "NOT RELEASED — FULL SWORD REBUILD PENDING"
 
 Job now recognized his guilt.
 
-He stopped making excuses and hated the sin he saw in his heart and conduct, especially his **complaints against God**.
+He stopped making excuses and **abhorred himself as a sinner in heart and conduct**, especially for his **complaints against God**.
 
 He was ashamed and repented.
 
@@ -34,7 +34,7 @@ But through the Spirit he reveals his Son **within us** (**Galatians 1:16**), ch
 
 When we recognize our sins, we must humble ourselves deeply for them.
 
-True repentance brings sincere sorrow over one's wrongdoing.
+Henry says **self-abhorrence accompanies true repentance**.
 
 God will bring those he loves to worship him humbly.
 
@@ -127,6 +127,8 @@ The believer's path resembles **the light of morning**, growing brighter and bri
 ---
 
 ## Editorial review — Job 42
+
+**2026-11-19 secondary-witness fidelity repair (unapproved draft):** The earlier modern Job 42:1–6 shifted Henry's explicit *abhorring himself as a sinner* and *self-loathing accompanying repentance* into the weaker ideas of hating sins and feeling sorrow for wrongdoing. Retained the original distinction with clear attribution to Henry in the second formulation. Compared against [CCEL Job 42](https://ccel.org/ccel/henry/mhcc.xix.xlii.html). Not an independent theological endorsement, exact original-native validation or final editorial approval.
 
 **Complete original-English secondary witness compared:** [CCEL, Job 42](https://ccel.org/ccel/henry/mhcc.xix.xlii.html). Exact released `MHCC 0.1.1` remains authoritative, native SWORD entry/reference check and independent sign-off pending.
 
