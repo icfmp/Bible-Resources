@@ -28,7 +28,8 @@ concurrency:
 jobs:
   source_metadata:
     # Source-native validation is independent of optional Xiphos display packages.
-    runs-on: ubuntu-latest
+    # Match the runner that already passed real MHC Xiphos GTK GUI tests.
+    runs-on: ubuntu-24.04
     timeout-minutes: 34
     steps:
       - uses: actions/checkout@v4
@@ -3398,12 +3399,34 @@ jobs:
         run: |
           set -euo pipefail
           python -m pip install -r requirements.txt
-          timeout 180s sudo apt-get -o Acquire::Retries=0 \
-            -o Acquire::http::Timeout=45 -o Acquire::https::Timeout=45 install -y \
+          # Reuse the proven MHC Xiphos GUI runner package source strategy.
+          # A regional EC2 mirror previously stalled WebKit dependencies.
+          for sources in /etc/apt/sources.list /etc/apt/sources.list.d/ubuntu.sources \
+              /etc/apt/apt-mirrors.txt /etc/apt/mirrors.txt; do
+            if sudo test -f "$sources" && sudo grep -q 'us-east-2.ec2.archive.ubuntu.com' "$sources"; then
+              sudo sed -i \
+                -e 's|http://us-east-2.ec2.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' \
+                -e 's|https://us-east-2.ec2.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' \
+                "$sources"
+            fi
+          done
+          if sudo test -d /etc/apt/mirrors; then
+            for sources in /etc/apt/mirrors/*; do
+              if sudo test -f "$sources" && sudo grep -q 'us-east-2.ec2.archive.ubuntu.com' "$sources"; then
+                sudo sed -i 's|us-east-2.ec2.archive.ubuntu.com|archive.ubuntu.com|g' "$sources"
+              fi
+            done
+          fi
+          export DEBIAN_FRONTEND=noninteractive
+          timeout 120s sudo apt-get -o Acquire::Retries=1 \
+            -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 update -qq
+          timeout 660s sudo -E apt-get -o Acquire::Retries=1 \
+            -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 \
+            -o DPkg::Lock::Timeout=15 install -y --no-install-recommends \
             xiphos xvfb xdotool xclip dbus-x11
-          command -v xiphos
-          command -v Xvfb
-          command -v xclip
+          for binary in xiphos Xvfb xdotool xclip dbus-run-session; do
+            command -v "$binary" >/dev/null || exit 1
+          done
       - name: Observe actual HMCC Modern commentary prose inside private Xiphos GUI
         id: xiphos_prose
         if: steps.xiphos_deps.outcome == 'success'
