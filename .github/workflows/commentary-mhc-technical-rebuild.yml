@@ -1699,7 +1699,7 @@ jobs:
           provisional="MHCIntroPreview"
           final="MHC"
           manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
-          plan=json.loads(Path("config/release-plans/mhc-0.1.0-DRAFT.json").read_text())
+          plan=json.loads(Path("config/release-drafts/mhc-0.1.0.json").read_text())
           rights=manifest["rights"]
           if (plan["status"]!="private_candidate_only_not_authorized_for_publication"
                   or plan["sword_id"]!=final or plan["module_driver"]!="zCom4"
