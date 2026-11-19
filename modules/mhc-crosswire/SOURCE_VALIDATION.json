@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "status": "validated",
+  "source_kind": "reviewed_osis_commentary_rebuild",
+  "review_manifest": "config/commentary-rebuilds/mhc-crosswire.json",
+  "curated_module_id": "MHC",
+  "curated_version": "0.1.0",
+  "original_authoring_osis_sha256": "3cf367f00c498a3124b339c00896aaef4ef1196a2d5c310ecb20ea42abd130f6",
+  "original_compiled_zip_sha256": "6bcb936873ca144e317805e5c1677940fd86e2403f7c14517752e44f25c8882b",
+  "release_artifact_sha256": "c8d70166dd569674e936874cd9a94809bceb9642a76af7220ef86f2b71af93b2",
+  "full_native_corpus_readback_equal": true,
+  "original_commentary_bodies": 4256,
+  "original_commentary_word_tokens": 7073234,
+  "numbered_native_entries": 31098,
+  "introduction_entries": 1255,
+  "opaque_top_entries": 2,
+  "reviewed_cross_reference_target_repairs": 25,
+  "source_attestation_run": "https://github.com/icfmp/Bible-Resources/actions/runs/44554276085"
+}

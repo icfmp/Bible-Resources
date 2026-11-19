@@ -1,0 +1,1144 @@
+{
+  "schema_version": 1,
+  "policy": "Reject only the listed UBS 0.9.4 orthographic candidate, never infer a new link or change original WLC words, Strong, refs or textual identity Added 15 explicit source-word no-link dispositions for distinct lexical referents or independently segmented components: original MACULA word context and a verbatim UBS 0.9.4 candidate gloss were each separately inspected. An atomic word's nonidentity with a combined named entity is not a claim that the entire phrase is absent from UBS.",
+  "source_editions": {
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8",
+    "macula_revision": "47db250bd55d0d8577f2a94fba114ef16c35b23c"
+  },
+  "decisions": [
+    {
+      "lang": "H",
+      "lemma": "אַל",
+      "original_strong": "0408",
+      "occurrences": 726,
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o010130080051",
+        "reference": "GEN 13:8!5",
+        "english": "not",
+        "pos": "particle",
+        "class": "adv"
+      },
+      "ubs_candidate": {
+        "main_id": "000381000000000",
+        "lemma": "אֵל",
+        "strong_codes": [
+          "H0410",
+          "H0411",
+          "A0412",
+          "H0415",
+          "H0416"
+        ],
+        "parts_of_speech": [
+          "noun m",
+          "dem.pron"
+        ]
+      },
+      "rationale": "Original H0408 is the prohibitive negative particle ('not'); the sole consonant-only UBS candidate is אֵל, a divine-being/common-noun and pronoun entry with unrelated Strong codes. Identical bare consonants do not establish lexical identity."
+    },
+    {
+      "lang": "H",
+      "lemma": "כֹּה",
+      "original_strong": "3541",
+      "occurrences": 577,
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o010150050161",
+        "reference": "GEN 15:5!16",
+        "english": "so",
+        "pos": "adverb",
+        "class": "adv"
+      },
+      "ubs_candidate": {
+        "main_id": "003248000000000",
+        "lemma": "כָּה",
+        "strong_codes": [
+          "A3542"
+        ],
+        "parts_of_speech": [
+          "adv"
+        ]
+      },
+      "rationale": "Original Hebrew H3541 כֹּה means 'thus/so' in Genesis 15:5; the sole indexed same-consonant UBS candidate is Aramaic A3542 כָּה ('here'). Language, lemma and lexical meaning disagree; do not link them."
+    },
+    {
+      "lang": "H",
+      "lemma": "עוֹד",
+      "original_strong": "5750",
+      "occurrences": 488,
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o010040250031",
+        "reference": "GEN 4:25!3",
+        "english": "again",
+        "pos": "adverb",
+        "class": "adv"
+      },
+      "ubs_candidate": {
+        "main_id": "005287000000000",
+        "lemma": "עוד",
+        "strong_codes": [
+          "H5749"
+        ],
+        "parts_of_speech": [
+          "verb"
+        ]
+      },
+      "rationale": "Original H5750 עוֹד is a temporal adverb ('again/still'); UBS candidate H5749 עוד is a verb ('testify/warn'), a distinct lexeme sharing unvocalized consonants. Do not map the adverb to that verb."
+    },
+    {
+      "lang": "H",
+      "lemma": "עַל",
+      "original_strong": "5920",
+      "occurrences": 6,
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o010270390132",
+        "reference": "GEN 27:39!13",
+        "english": "above",
+        "pos": "noun",
+        "class": "noun"
+      },
+      "ubs_candidate": {
+        "main_id": "005444000000000",
+        "lemma": "עֹל",
+        "strong_codes": [
+          "H5923"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ]
+      },
+      "rationale": "The source means 'above' in Gen 27:39, not an ox-yoke or figurative burden; UBS עֹל H5923 is the latter noun."
+    },
+    {
+      "lang": "A",
+      "lemma": "אַל",
+      "original_strong": "0409",
+      "occurrences": 4,
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o270020240201",
+        "reference": "DAN 2:24!20",
+        "english": "not",
+        "pos": "particle",
+        "class": "adv"
+      },
+      "ubs_candidate": {
+        "main_id": "000381000000000",
+        "lemma": "אֵל",
+        "strong_codes": [
+          "H0410",
+          "H0411",
+          "A0412",
+          "H0415",
+          "H0416"
+        ],
+        "parts_of_speech": [
+          "noun m",
+          "dem.pron"
+        ]
+      },
+      "rationale": "Aramaic prohibitive 'not' (Dan 2:24) is not UBS divine noun/pronoun אֵל."
+    },
+    {
+      "lang": "H",
+      "lemma": "נֶגֶד",
+      "original_strong": "5048",
+      "occurrences": 2,
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o010020180122",
+        "reference": "GEN 2:18!12",
+        "english": "suitable",
+        "pos": "preposition",
+        "class": "noun"
+      },
+      "ubs_candidate": {
+        "main_id": "004632000000000",
+        "lemma": "נגד",
+        "strong_codes": [
+          "H5046",
+          "A5047"
+        ],
+        "parts_of_speech": [
+          "verb"
+        ]
+      },
+      "rationale": "Hebrew spatial relation ('before/opposite', Gen 2:18) is not the UBS verb נגד meaning 'to report/tell/flow'."
+    },
+    {
+      "lang": "H",
+      "lemma": "עֹוד",
+      "original_strong": "5750",
+      "occurrences": 2,
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o190390020092",
+        "reference": "PSA 39:2!9",
+        "english": "long as",
+        "pos": "adverb",
+        "class": "adv"
+      },
+      "ubs_candidate": {
+        "main_id": "005287000000000",
+        "lemma": "עוד",
+        "strong_codes": [
+          "H5749"
+        ],
+        "parts_of_speech": [
+          "verb"
+        ]
+      },
+      "rationale": "The source temporal adverb ('still', Ps 39:2) does not denote UBS H5749 verbal acts of testifying, warning, surrounding, or restoring."
+    },
+    {
+      "lang": "A",
+      "lemma": "עוֹד",
+      "original_strong": "5751",
+      "occurrences": 1,
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o270040280011",
+        "reference": "DAN 4:28!1",
+        "english": "still",
+        "pos": "adverb",
+        "class": "adv"
+      },
+      "ubs_candidate": {
+        "main_id": "005287000000000",
+        "lemma": "עוד",
+        "strong_codes": [
+          "H5749"
+        ],
+        "parts_of_speech": [
+          "verb"
+        ]
+      },
+      "rationale": "The Aramaic temporal adverb ('still', Dan 4:28) is not the UBS Hebrew verb H5749."
+    },
+    {
+      "lang": "H",
+      "lemma": "אֶל",
+      "original_strong": "0408",
+      "occurrences": 1,
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o240510030092",
+        "reference": "JER 51:3!9",
+        "english": "not",
+        "pos": "particle",
+        "class": "adv"
+      },
+      "ubs_candidate": {
+        "main_id": "000381000000000",
+        "lemma": "אֵל",
+        "strong_codes": [
+          "H0410",
+          "H0411",
+          "A0412",
+          "H0415",
+          "H0416"
+        ],
+        "parts_of_speech": [
+          "noun m",
+          "dem.pron"
+        ]
+      },
+      "rationale": "Source prohibited/negative 'not' (Jer 51:3) is not UBS אֵל divine noun/demonstrative pronoun."
+    },
+    {
+      "lang": "H",
+      "lemma": "נָא",
+      "original_strong": "4995",
+      "occurrences": 1,
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o020120090041",
+        "reference": "EXO 12:9!4",
+        "english": "raw",
+        "pos": "particle",
+        "class": "adj"
+      },
+      "ubs_candidate": {
+        "main_id": "004585000000000",
+        "lemma": "נֹא",
+        "strong_codes": [
+          "H4996"
+        ],
+        "parts_of_speech": [
+          "name"
+        ]
+      },
+      "rationale": "Hebrew uncooked/raw food in Exod 12:9 is not the UBS proper place-name נֹא/Thebes H4996."
+    },
+    {
+      "lang": "H",
+      "lemma": "עַל",
+      "original_strong": "5921",
+      "occurrences": 1,
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o090020100061",
+        "reference": "1SA 2:10!6",
+        "english": "against",
+        "pos": "preposition",
+        "class": "noun"
+      },
+      "ubs_candidate": {
+        "main_id": "005444000000000",
+        "lemma": "עֹל",
+        "strong_codes": [
+          "H5923"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ]
+      },
+      "rationale": "The source preposition ('against', 1 Sam 2:10) is not UBS עֹל 'yoke' H5923."
+    },
+    {
+      "lang": "H",
+      "lemma": "שָׁתַן",
+      "original_strong": "8366a",
+      "occurrences": 6,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o090250220151",
+        "reference": "1SA 25:22!15",
+        "english": "one urinating",
+        "pos": "verb",
+        "class": "verb",
+        "original_sdbh": "007329001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "007333000000000",
+        "lemma": "שׁין",
+        "strong_codes": [
+          "H8366"
+        ],
+        "parts_of_speech": [
+          "verb"
+        ]
+      },
+      "ubs_attested_gloss": "male",
+      "rationale": "At 1 Samuel 25:22 the original verb describes urination in a male idiom; the sole indexed UBS H8366 candidate שׁין labels 'male', not this original grammatical verb. Keep source verb unlinked rather than recast it as the UBS male headword."
+    },
+    {
+      "lang": "H",
+      "lemma": "לַיִשׁ",
+      "original_strong": "3919a",
+      "occurrences": 4,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o070180070051",
+        "reference": "JDG 18:7!5",
+        "english": "Laish",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "003585002001000"
+      },
+      "ubs_candidate": {
+        "main_id": "003590000000000",
+        "lemma": "לַיְשָׁה",
+        "strong_codes": [
+          "H3919"
+        ],
+        "parts_of_speech": [
+          "name"
+        ]
+      },
+      "ubs_attested_gloss": "Laishah",
+      "rationale": "Judges 18:7 refers to the city Laish, later renamed Dan; the UBS lexical candidate is the separately named Laishah. Similar name spelling and Strong family are not evidence that the distinct locations are the same."
+    },
+    {
+      "lang": "H",
+      "lemma": "גּוֹי",
+      "original_strong": "2800a",
+      "occurrences": 3,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o070040020161",
+        "reference": "JDG 4:2!16",
+        "english": "",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "002574001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "002577000000000",
+        "lemma": "חֲרֹשֶׁת הַגּוֹיִם",
+        "strong_codes": [
+          "H2800"
+        ],
+        "parts_of_speech": [
+          "name"
+        ]
+      },
+      "ubs_attested_gloss": "Harosheth-Haggoyim",
+      "rationale": "Judges 4:2 is a split source-word segment Haggoyim in the larger proper place-name Harosheth-Haggoyim. The single original word גּוֹי is not independently the entire UBS compound town name."
+    },
+    {
+      "lang": "H",
+      "lemma": "עֵמֶק",
+      "original_strong": "0425b",
+      "occurrences": 3,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o090170020062",
+        "reference": "1SA 17:2!6",
+        "english": "",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": ""
+      },
+      "ubs_candidate": {
+        "main_id": "000392000000000",
+        "lemma": "אֵלָה",
+        "strong_codes": [
+          "H0424",
+          "H0425"
+        ],
+        "parts_of_speech": [
+          "noun f",
+          "name"
+        ]
+      },
+      "ubs_attested_gloss": "Elah",
+      "rationale": "1 Samuel 17:2 speaks of the valley of Elah. The source word עֵמֶק is the valley noun, not the UBS Elah/terebinth referent indexed under the inherited composite Strong family."
+    },
+    {
+      "lang": "H",
+      "lemma": "רִמּוֹן",
+      "original_strong": "7417b",
+      "occurrences": 3,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o120050180091",
+        "reference": "2KI 5:18!9",
+        "english": "Rimmon",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "006818002005000"
+      },
+      "ubs_candidate": {
+        "main_id": "006826000000000",
+        "lemma": "רִמּוֹנוֹ",
+        "strong_codes": [
+          "H7417"
+        ],
+        "parts_of_speech": [
+          "name"
+        ]
+      },
+      "ubs_attested_gloss": "Rimmono",
+      "rationale": "2 Kings 5:18 describes Rimmon as a deity worshiped in the temple. UBS's sole H7417 candidate Rimmono is a named locality; a deity must not be turned into that place."
+    },
+    {
+      "lang": "H",
+      "lemma": "שְׁכֶם",
+      "original_strong": "4026b",
+      "occurrences": 3,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o070090460051",
+        "reference": "JDG 9:46!5",
+        "english": "",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "007354002002000"
+      },
+      "ubs_candidate": {
+        "main_id": "003689000000000",
+        "lemma": "מִגְדָּל",
+        "strong_codes": [
+          "H4026"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ]
+      },
+      "ubs_attested_gloss": "tower",
+      "rationale": "Judges 9:46 explicitly distinguishes the Tower of Shechem; original שְׁכֶם denotes Shechem, not the UBS lexical tower noun, despite the source compound inheriting the tower Strong family."
+    },
+    {
+      "lang": "H",
+      "lemma": "אֶל",
+      "original_strong": "0413",
+      "occurrences": 2,
+      "candidate_relation": "different_strong_same_consonants",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o070190230181",
+        "reference": "JDG 19:23!18",
+        "english": "into",
+        "pos": "particle",
+        "class": "adv",
+        "original_sdbh": ""
+      },
+      "ubs_candidate": {
+        "main_id": "000381000000000",
+        "lemma": "אֵל",
+        "strong_codes": [
+          "H0410",
+          "H0411",
+          "A0412",
+          "H0415",
+          "H0416"
+        ],
+        "parts_of_speech": [
+          "noun m",
+          "dem.pron"
+        ]
+      },
+      "ubs_attested_gloss": "god",
+      "rationale": "Judges 19:23 uses a grammatical prohibitive negative/preposition token, not the UBS אֵל divine being or demonstrative pronoun. Preserve the original source grammatical annotation."
+    },
+    {
+      "lang": "H",
+      "lemma": "אָב",
+      "original_strong": "2361a",
+      "occurrences": 2,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o140020120081",
+        "reference": "2CH 2:12!8",
+        "english": "",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": ""
+      },
+      "ubs_candidate": {
+        "main_id": "002180000000000",
+        "lemma": "חוּרָם",
+        "strong_codes": [
+          "H2361"
+        ],
+        "parts_of_speech": [
+          "name"
+        ]
+      },
+      "ubs_attested_gloss": "Huram",
+      "rationale": "2 Chronicles 2:12 records the epithet/title 'Abi' after Huram, not an independent repetition of the person's name Huram under the UBS name headword."
+    },
+    {
+      "lang": "H",
+      "lemma": "בּוֹא",
+      "original_strong": "3820b",
+      "occurrences": 2,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o130050090042",
+        "reference": "1CH 5:9!4",
+        "english": "",
+        "pos": "verb",
+        "class": "verb",
+        "original_sdbh": ""
+      },
+      "ubs_candidate": {
+        "main_id": "003499000000000",
+        "lemma": "לֵב",
+        "strong_codes": [
+          "H3820",
+          "A3821"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ]
+      },
+      "ubs_attested_gloss": "heart",
+      "rationale": "1 Chronicles 5:9 uses the original lexical entrance/coming verb, not the UBS לֵב heart noun sharing the inherited numeric Strong family."
+    },
+    {
+      "lang": "H",
+      "lemma": "שַׁעַר",
+      "original_strong": "3466a",
+      "occurrences": 2,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o160030060021",
+        "reference": "NEH 3:6!2",
+        "english": "",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "007551001012000"
+      },
+      "ubs_candidate": {
+        "main_id": "003179000000000",
+        "lemma": "יְשָׁנָה",
+        "strong_codes": [
+          "H3466"
+        ],
+        "parts_of_speech": [
+          "name"
+        ]
+      },
+      "ubs_attested_gloss": "Jeshanah",
+      "rationale": "Nehemiah 3:6 says 'Jeshanah Gate' (Old Gate). The original source שַׁעַר gate component is not the UBS proper-name adjective Jeshanah itself."
+    },
+    {
+      "lang": "H",
+      "lemma": "קְוֵא",
+      "original_strong": "6961a",
+      "occurrences": 2,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o140010160063",
+        "reference": "2CH 1:16!6",
+        "english": "Kue",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "006408001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "006411000000000",
+        "lemma": "קַו",
+        "strong_codes": [
+          "H6961",
+          "H6957",
+          "H6978"
+        ],
+        "parts_of_speech": [
+          "noun m",
+          "noun c"
+        ]
+      },
+      "ubs_attested_gloss": "measuring line",
+      "rationale": "2 Chronicles 1:16 names Kue as a geographical source of horses; UBS קַו 'measuring line' is a distinct lexical referent despite the overlapping source Strong numeric family."
+    },
+    {
+      "lang": "H",
+      "lemma": "קֹוֶה",
+      "original_strong": "6961a",
+      "occurrences": 2,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o110100280063",
+        "reference": "1KI 10:28!6",
+        "english": "Kue",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "006408001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "006411000000000",
+        "lemma": "קַו",
+        "strong_codes": [
+          "H6961",
+          "H6957",
+          "H6978"
+        ],
+        "parts_of_speech": [
+          "noun m",
+          "noun c"
+        ]
+      },
+      "ubs_attested_gloss": "measuring line",
+      "rationale": "1 Kings 10:28 names Kue in the trade of horses; the UBS candidate is the common noun 'measuring line' and not this place."
+    },
+    {
+      "lang": "H",
+      "lemma": "שְׁלִישִׁי",
+      "original_strong": "5697a",
+      "occurrences": 2,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o230150050081",
+        "reference": "ISA 15:5!8",
+        "english": "",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "005233001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "005238000000000",
+        "lemma": "עֶגְלָה",
+        "strong_codes": [
+          "H5697",
+          "H5698"
+        ],
+        "parts_of_speech": [
+          "noun f",
+          "name"
+        ]
+      },
+      "ubs_attested_gloss": "heifer",
+      "rationale": "Isaiah 15:5 uses the second original word of the place-name Eglath-Shelishiyah. The word 'Shelishiyah' is not independently the UBS עֶגְלָה heifer headword, though both parts share the source compound Strong family."
+    },
+    {
+      "lang": "H",
+      "lemma": "עֵמֶק",
+      "original_strong": "7104a",
+      "occurrences": 1,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o060180210102",
+        "reference": "JOS 18:21!10",
+        "english": "",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "005519001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "005526000000000",
+        "lemma": "עֵמֶק קְצִיץ",
+        "strong_codes": [
+          "H6010",
+          "H7104"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ]
+      },
+      "ubs_attested_gloss": "Emek-Keziz",
+      "rationale": "Joshua 18:21 uses a first lexical component Emek/valley in the compound Emek-Keziz. The single original word is not the complete UBS place name 'Emek-Keziz'."
+    },
+    {
+      "lang": "H",
+      "lemma": "יַעְרָה",
+      "original_strong": "3295a",
+      "occurrences": 1,
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o090140270162",
+        "reference": "1SA 14:27!16",
+        "english": "honeycomb of",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "003012002001000"
+      },
+      "ubs_candidate": {
+        "main_id": "003017000000000",
+        "lemma": "יַעְרָה",
+        "strong_codes": [
+          "H3294"
+        ],
+        "parts_of_speech": [
+          "name"
+        ]
+      },
+      "ubs_attested_gloss": "Jaarah",
+      "rationale": "1 Samuel 14:27 concerns the honeycomb from which Jonathan ate; UBS's sole exact-spelling candidate names a person Jaarah. The food noun must not be linked to that person."
+    },
+    {
+      "lang": "H",
+      "lemma": "אַלְמָנָה",
+      "original_strong": "0488a",
+      "occurrences": 2,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o230130220032",
+        "reference": "ISA 13:22!3",
+        "english": "towers",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "000455001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "000453000000000",
+        "lemma": "אַלְמָן",
+        "strong_codes": [
+          "H0488"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ]
+      },
+      "ubs_attested_gloss": "forsaken",
+      "rationale": "Isaiah 13:22 (towers) and Ezekiel 19:7 (strongholds) use אַלְמָנָה for architectural strongholds; the sole pinned UBS candidate אַלְמָן means a person who is forsaken or widowed, not palace towers or fortified places. No general orthographic/Strong equivalence may be presumed."
+    },
+    {
+      "lang": "H",
+      "lemma": "בֵּית הַגָּן",
+      "original_strong": "1019a",
+      "occurrences": 1,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o120090270071",
+        "reference": "2KI 9:27!7",
+        "english": "",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "000946001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "000945000000000",
+        "lemma": "בֵּית הַגִּלְגָּל",
+        "strong_codes": [
+          "H1019"
+        ],
+        "parts_of_speech": [
+          "name"
+        ]
+      },
+      "ubs_attested_gloss": "Beth-gilgal",
+      "rationale": "2 Kings 9:27 names the distinct location Beth-Haggan (House of the Garden) on the flight of Ahaziah. UBS candidate בֵּית הַגִּלְגָּל denotes Beth-gilgal, a separate town indexed in Nehemiah 12:29, not the similarly prefixed Beth-Haggan location."
+    },
+    {
+      "lang": "H",
+      "lemma": "גַּן",
+      "original_strong": "1019a",
+      "occurrences": 1,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o120090270081",
+        "reference": "2KI 9:27!8",
+        "english": "",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "000946001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "000945000000000",
+        "lemma": "בֵּית הַגִּלְגָּל",
+        "strong_codes": [
+          "H1019"
+        ],
+        "parts_of_speech": [
+          "name"
+        ]
+      },
+      "ubs_attested_gloss": "Beth-gilgal",
+      "rationale": "2 Kings 9:27 supplies the second original source word Haggan of the Beth-Haggan place name. The sole UBS candidate is the *different complete place name* Beth-gilgal, not the independent 'garden' component or this named place."
+    },
+    {
+      "lang": "H",
+      "lemma": "שֵׂפֶק",
+      "original_strong": "8230b",
+      "occurrences": 1,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o180200220021",
+        "reference": "JOB 20:22!2",
+        "english": "plenty",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "007081001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "007598000000000",
+        "lemma": "שִׁפְעִי",
+        "strong_codes": [
+          "H8230"
+        ],
+        "parts_of_speech": [
+          "name"
+        ]
+      },
+      "ubs_attested_gloss": "Shiphi",
+      "rationale": "Job 20:22 uses שֵׂפֶק for a wicked man's plenty/sufficiency during prosperity. The UBS candidate שִׁפְעִי denotes the person Shiphi, son of Allon (1 Chronicles 4:37), not the common noun 'plenty'."
+    },
+    {
+      "lang": "H",
+      "lemma": "עָנָה",
+      "original_strong": "3939a",
+      "occurrences": 1,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o190880010082",
+        "reference": "PSA 88:1!8",
+        "english": "leannoth",
+        "pos": "verb",
+        "class": "verb",
+        "original_sdbh": "005536001003000"
+      },
+      "ubs_candidate": {
+        "main_id": "003611000000000",
+        "lemma": "לַעֲנָה",
+        "strong_codes": [
+          "H3939"
+        ],
+        "parts_of_speech": [
+          "noun f"
+        ]
+      },
+      "ubs_attested_gloss": "wormwood",
+      "rationale": "The original superscription Psalm 88:1 has the instruction לְעַנּוֹת, transcribed 'leannoth', a verb/form associated with affliction or response. The UBS candidate לַעֲנָה denotes the bitter plant wormwood, not that original verbal superscription form. No contextual sense is inferred."
+    },
+    {
+      "lang": "H",
+      "lemma": "רָמֹות",
+      "original_strong": "7414a",
+      "occurrences": 1,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o150100290092",
+        "reference": "EZR 10:29!9",
+        "english": "Jeremoth",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": ""
+      },
+      "ubs_candidate": {
+        "main_id": "006823000000000",
+        "lemma": "רָמָה",
+        "strong_codes": [
+          "H7413",
+          "H7414",
+          "H7434",
+          "H7437"
+        ],
+        "parts_of_speech": [
+          "noun f",
+          "name"
+        ]
+      },
+      "ubs_attested_gloss": "Ramah",
+      "rationale": "Ezra 10:29 lists a man Jeremoth (source lemma רָמֹות); the UBS רָמָה headword's attested Ramah meanings denote heights and geographical towns, not the person Jeremoth. Similar Hebrew surface letters and an overlapping Strong family cannot establish personal-name identity."
+    },
+    {
+      "lang": "H",
+      "lemma": "מַד",
+      "original_strong": "4060",
+      "occurrences": 1,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o191330020131",
+        "reference": "PSA 133:2!13",
+        "english": "robes",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "003711001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "003719000000000",
+        "lemma": "מִדָּה",
+        "strong_codes": [
+          "H4060a",
+          "H4060b",
+          "H4061"
+        ],
+        "parts_of_speech": [
+          "noun f"
+        ]
+      },
+      "ubs_attested_gloss": "measure",
+      "rationale": "Psalm 133:2 refers to the collar/edge of Aaron's robes. UBS מִדָּה with Strong H4060a/b and H4061 describes dimensions, measurement and administrative taxation; no garment or robe gloss is present. Source מַד here is a robe, not 'measure'."
+    },
+    {
+      "lang": "H",
+      "lemma": "מְנוּחָה",
+      "original_strong": "2680a",
+      "occurrences": 1,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o130020520092",
+        "reference": "1CH 2:52!9",
+        "english": "Manahathites",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "004111003001000 004119001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "002472000000000",
+        "lemma": "חֲצִי",
+        "strong_codes": [
+          "H2677",
+          "H2680"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ]
+      },
+      "ubs_attested_gloss": "half (of object or substance)",
+      "rationale": "1 Chronicles 2:52 identifies the Manahathites as a genealogical clan, whereas UBS חֲצִי H2677/H2680 denotes the fraction 'half'. The inherited original composite Strong family does not make a clan name equal to the common fractional noun."
+    },
+    {
+      "lang": "H",
+      "lemma": "מָנַחְתִּי",
+      "original_strong": "2680a",
+      "occurrences": 1,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o130020540102",
+        "reference": "1CH 2:54!10",
+        "english": "Manahathites",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "004122001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "002472000000000",
+        "lemma": "חֲצִי",
+        "strong_codes": [
+          "H2677",
+          "H2680"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ]
+      },
+      "ubs_attested_gloss": "half (of object or substance)",
+      "rationale": "1 Chronicles 2:54 has the named Manahathite(s), a gentilic/people designation, not the noun 'half' in the sole UBS חֲצִי candidate despite the original shared Strong family."
+    },
+    {
+      "lang": "H",
+      "lemma": "לְהָטִים",
+      "original_strong": "3858a",
+      "occurrences": 1,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o020070110112",
+        "reference": "EXO 7:11!11",
+        "english": "secret arts",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "003529001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "003532000000000",
+        "lemma": "לַהַט",
+        "strong_codes": [
+          "H3858"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ]
+      },
+      "ubs_attested_gloss": "blaze",
+      "rationale": "Exodus 7:11 speaks of the Egyptian magicians' secret arts/enchantments. UBS לַהַט describes a physical blaze or fire, not a magical art or incantation. This is a different atomic lexical meaning despite sharing H3858 numeric family."
+    },
+    {
+      "lang": "H",
+      "lemma": "הוּא",
+      "original_strong": "5993",
+      "occurrences": 1,
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o220060120062",
+        "reference": "SNG 6:12!6",
+        "english": "",
+        "pos": "suffix",
+        "class": "noun",
+        "original_sdbh": ""
+      },
+      "ubs_candidate": {
+        "main_id": "001778000000000",
+        "lemma": "הוּא",
+        "strong_codes": [
+          "H1931a",
+          "A1932"
+        ],
+        "parts_of_speech": [
+          "pers.pron"
+        ]
+      },
+      "ubs_attested_gloss": "he",
+      "rationale": "Song of Songs 6:12 segments the proper name Ammi-nadib into original source morphemes. This original הוּא witness is a name-associated suffix with source gloss 'Ammi-', not the masculine third-person personal pronoun 'he' that is the sole UBS הוּא candidate. Preserve the source segmentation and the full original H5993 annotation; do not link the proper-name fragment to a pronoun."
+    },
+    {
+      "lang": "H",
+      "lemma": "חֲפֹר",
+      "original_strong": "2661a",
+      "occurrences": 1,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o230020200152",
+        "reference": "ISA 2:20!15",
+        "english": "",
+        "pos": "verb",
+        "class": "noun",
+        "original_sdbh": ""
+      },
+      "ubs_candidate": {
+        "main_id": "002457000000000",
+        "lemma": "חֲפַרְפָּרָה",
+        "strong_codes": [
+          "H2661",
+          "H6512"
+        ],
+        "parts_of_speech": [
+          "noun f"
+        ]
+      },
+      "ubs_attested_gloss": "mole rat",
+      "rationale": "Isaiah 2:20 has the first original segment חֲפֹר of the expression חְפֹּר פֵּרוֹת, glossed in the pinned WLC 'digging' (a verbal infinitive). The sole UBS lexical candidate חֲפַרְפָּרָה designates the *entire* animal mole rat, not this separate verbal segment. No atomic word link is justified."
+    },
+    {
+      "lang": "H",
+      "lemma": "עֶגְלַת שְׁלִשִׁיָּה",
+      "original_strong": "5697a",
+      "occurrences": 2,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o230150050071",
+        "reference": "ISA 15:5!7",
+        "english": "",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "005233001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "005238000000000",
+        "lemma": "עֶגְלָה",
+        "strong_codes": [
+          "H5697",
+          "H5698"
+        ],
+        "parts_of_speech": [
+          "noun f",
+          "name"
+        ]
+      },
+      "ubs_attested_gloss": "Eglah",
+      "rationale": "Isaiah 15:5 and Jeremiah 48:34 name the Moabite locality Eglath-Shelishiyah (the original compound source form). The sole UBS עֶגְלָה candidate denotes a heifer or Eglah, a wife of David, and contains no attested location Eglath-Shelishiyah. This compound place name is not the wife or standalone animal noun merely because its first constituent resembles Eglah."
+    },
+    {
+      "lang": "H",
+      "lemma": "צפה",
+      "original_strong": "7436",
+      "occurrences": 1,
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o090010010061",
+        "reference": "1SA 1:1!6",
+        "english": "Zuphite",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "006835001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "006285000000000",
+        "lemma": "צפה",
+        "strong_codes": [
+          "H6822",
+          "H6823",
+          "H6839"
+        ],
+        "parts_of_speech": [
+          "verb"
+        ]
+      },
+      "ubs_attested_gloss": "field of Zophim",
+      "rationale": "1 Samuel 1:1 describes Samuel's family as Zuphite / Ramathaim-Zophim in Ephraim. The sole UBS צפה candidate's location 'field of Zophim' lies in Moab (Numbers 23:14), a distinct named place; the remaining UBS verbal meanings watch/cover also do not identify the original Zuphite gentilitial name. No lexical headword identity is approved."
+    }
+  ]
+}

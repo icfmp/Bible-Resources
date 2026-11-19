@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "kind": "exact_word_distinct_person_review",
+  "source_editions": {
+    "wlc": "Clear-Bible/macula-hebrew@47db250bd55d0d8577f2a94fba114ef16c35b23c",
+    "sblgnt": "Clear-Bible/macula-greek@8423afe47b9e8f24b7772e808af45c7159a6fe7e"
+  },
+  "policy": "Classifications annotate exact source claims without removing, merging or privileging a candidate. Shared genealogical components are legitimate contextual co-references, not two possible readings of one person's identity; unresolved cases must remain unresolved.",
+  "cases": [
+    {
+      "corpus": "sblgnt",
+      "word_id": "n40016017010",
+      "canonical_people": [
+        "person:John.4",
+        "person:Peter"
+      ],
+      "classification": "shared_genealogical_name_component",
+      "reason": "The pinned Greek word Βαριωνᾶ (Bar-Jonah), a single fused patronymic in Matthew 16:17, directly addresses Simon Peter while embedding the name of his father Jonah. This source word can legitimately point to both the son and his father as a name component; it does NOT claim those two men are identical or represent two competing identities. The separately debated historical relationship of John/Jonah as a father's name (John 1:42; 21:15–17 vs Matthew 16:17) remains a textual/name-form question and is not certified by this overlap classification.",
+      "evidence": [
+        "Pinned Clear-Bible/macula-greek@8423afe47b9e8f24b7772e808af45c7159a6fe7e, SBLGNT/lowfat/01-matthew.xml: n40016017010, lemma Βαριωνᾶ, N-PRI singular vocative, English 'son of Jonah'; the preceding n40016017009 names Simon.",
+        "Frozen ACAI person:Peter includes the two-word Simon Bar-Jonah expression; source person:Jonah is a name form under person:John.4; both father and son remain distinct historical individuals.",
+        "Matthew 16:17 and John 1:42; comparison of John/Jonah witness note: https://www.biblegateway.com/passage/?search=John.1.42&version=NABRE"
+      ]
+    },
+    {
+      "corpus": "wlc",
+      "word_id": "o110040080041",
+      "canonical_people": [
+        "person:Ben-hur",
+        "person:Hur"
+      ],
+      "classification": "shared_genealogical_name_component",
+      "reason": "The proper-name token Hur is one component of the complete Ben-Hur expression and also names the father; the adjacent common noun 'son' is separately attached only to Ben-Hur by reviewed PR #317.",
+      "evidence": [
+        "Pinned Macula WLC 1 Kings 4:8!3-4 o110040080031=son, o110040080041=Hur",
+        "Frozen ACAI person:Ben-hur (father Hur), person:Hur (son Ben-hur); PR #317 exact name-group split"
+      ]
+    },
+    {
+      "corpus": "wlc",
+      "word_id": "o110040090021",
+      "canonical_people": [
+        "person:Ben-deker",
+        "person:Deker"
+      ],
+      "classification": "shared_genealogical_name_component",
+      "reason": "The Hebrew proper-name token Deker occurs as the father's named component of the administrator's patronymic 'son of Deker'; it can legitimately supply both the father's proper name and part of the son's identifying expression.",
+      "evidence": [
+        "Pinned WLC 1 Kings 4:9 word o110040090021 lemma דֶּקֶר, gloss Deker",
+        "Frozen ACAI person:Ben-deker father=person:Deker and person:Deker offspring=person:Ben-deker; 1 Kings 4:9"
+      ]
+    },
+    {
+      "corpus": "wlc",
+      "word_id": "o110040100021",
+      "canonical_people": [
+        "person:Ben-hesed",
+        "person:Hesed"
+      ],
+      "classification": "shared_genealogical_name_component",
+      "reason": "The source word Hesed is the father's proper name within the patronymic Ben-Hesed; one word can be an embedded component of the son's designation while also naming his father.",
+      "evidence": [
+        "Pinned WLC 1 Kings 4:10 word o110040100021 lemma חֶסֶד, gloss Hesed",
+        "Frozen ACAI person:Ben-hesed father=person:Hesed, 1 Kings 4:10"
+      ]
+    },
+    {
+      "corpus": "wlc",
+      "word_id": "o110040110021",
+      "canonical_people": [
+        "person:Abinadab.4",
+        "person:Ben-abinadab"
+      ],
+      "classification": "shared_genealogical_name_component",
+      "reason": "Abinadab is the paternal proper-name component in 'son of Abinadab'; the word remains relevant to both the father and the son identified by patronymic, without equating the individuals.",
+      "evidence": [
+        "Pinned WLC 1 Kings 4:11 word o110040110021 lemma אֲבִינָדָב, gloss Abinadab",
+        "Frozen ACAI person:Ben-abinadab father=person:Abinadab.4, 1 Kings 4:11"
+      ]
+    },
+    {
+      "corpus": "wlc",
+      "word_id": "o130020030101",
+      "canonical_people": [
+        "person:Bath-shua",
+        "person:Shua"
+      ],
+      "classification": "shared_genealogical_name_component",
+      "reason": "First Chronicles 2:3 spells the daughter-of-Shua designation with a separate 'daughter' token and this proper-name token Shua; the name compound identifies the woman and separately includes the father Shua. The two persons remain distinct.",
+      "evidence": [
+        "Pinned Macula WLC 1 Chronicles 2:3 o130020030092=בַת 'daughter', o130020030101=שׁוּעַ 'Shua' within בַת־שׁוּעַ",
+        "Frozen ACAI person:Bath-shua father=person:Shua and source name groups overlap"
+      ]
+    },
+    {
+      "corpus": "wlc",
+      "word_id": "o150030090081",
+      "canonical_people": [
+        "person:Hodaviah.4",
+        "person:Hodiah.2"
+      ],
+      "classification": "unresolved_person_identity",
+      "reason": "Ezra 3:9's exact Masoretic word is יְהוּדָה (Judah), as the ancestor in the family expression 'sons of Judah' rather than an explicit spelling of Hodaviah or Hodiah. Ezra 2:40 and Nehemiah 7:43 instead name the Levitical family as Hodaviah/Hodevah. Some scholarship treats Judah as an alternate reading/name for Hodaviah; other textual criticism argues for a scribal misreading, not two securely identical individuals. Frozen Hodiah.2 also claims this word while its other named witnesses occur in Nehemiah. The original name tokens cannot prove Hodiah.2 = Hodaviah.4, and automatically changing either record would silently choose a debated textual/genealogical reconstruction. Keep both source-based candidates as explicitly unresolved in v0.1; do not introduce a Judah.7 link or invent a different word.",
+      "evidence": [
+        "Pinned Macula WLC/lowfat/15-Ezr-003-lowfat.xml word o150030090081 = יְהוּדָה, 'Judah', proper noun; immediate previous o150030090071 = 'sons of'.",
+        "ACAI Hodaviah.4 refs Ezra 2:40/Ezra 3:9/Nehemiah 7:43, Hodiah.2 refs Ezra 3:9 and several Nehemiah-period Levites; both original records preserved.",
+        "NET Bible Ezra 3:9 note: textual Judah is probably a variant of Hodaviah; https://classic.net.bible.org/verse.php?book=Ezr&chapter=3&verse=9",
+        "Cambridge Bible for Schools and Colleges Ezra 3:9 alternatively proposes a misreading for Hodaviah rather than an alternative name; https://biblehub.com/commentaries/cambridge/ezra/3.htm"
+      ]
+    },
+    {
+      "corpus": "wlc",
+      "word_id": "o160120080061",
+      "canonical_people": [
+        "person:Hodiah.2",
+        "person:Judah.7"
+      ],
+      "classification": "unresolved_person_identity",
+      "reason": "Nehemiah 12:8 names a Levite יְהוּדָה (Judah) in a list associated with the return under Zerubbabel; no Hebrew Hodiah is written at this location. The source links both the named Judah.7 record and Hodiah.2 (whose other source verses include Nehemiah 8:7, 9:5, 10:11). Commentators disagree whether the earlier Judah is the later Hodiah/Hodijah, a manuscript/transmission variant, or an unrelated individual/family of a different generation. Neither a silent alias merge nor deletion of the source Hodiah.2 claim is textually certain. Preserve both as distinct candidates flagged unresolved in v0.1, with no assertion that they are the same person.",
+      "evidence": [
+        "Pinned Macula WLC/lowfat/16-Neh-012-lowfat.xml word o160120080061: proper noun יְהוּדָה 'Judah', in the enumerated Levites, before Mattaniah.",
+        "Frozen ACAI Judah.7 and Hodiah.2 both claim this exact source word; Judah.7 additionally claims Nehemiah 12:34; Hodiah.2 also cites Nehemiah 8:7, 9:5 and 10:11.",
+        "Cambridge Bible for Schools and Colleges on Nehemiah 12:8 suggests a link with Hodijah at 10:10; https://biblehub.com/commentaries/nehemiah/12-8.htm",
+        "Lange commentary argues such a link conflates Zerubbabel- and Nehemiah-era figures; https://mail.biblehub.com/commentaries/lange/nehemiah/12.htm",
+        "Keil & Delitzsch notes a possible scribal variant of Judah/Hodiah without proving the historical identity; https://www.bible.armeniancathedral.org/comments/kad/Neh_12.htm"
+      ]
+    }
+  ]
+}

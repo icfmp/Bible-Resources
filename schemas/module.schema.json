@@ -281,7 +281,8 @@
           "enum": [
             "stock_reader_keys",
             "published_source_audit",
-            "reviewed_compiled_commentary_rebuild"
+            "reviewed_compiled_commentary_rebuild",
+            "reviewed_osis_commentary_rebuild"
           ]
         },
         "manifest": {
@@ -294,7 +295,7 @@
           "if": {
             "properties": {
               "mode": {
-                "enum": ["published_source_audit", "reviewed_compiled_commentary_rebuild"]
+                "enum": ["published_source_audit", "reviewed_compiled_commentary_rebuild", "reviewed_osis_commentary_rebuild"]
               }
             },
             "required": [

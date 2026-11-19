@@ -5,6 +5,11 @@ on:
     paths:
       - "entity-index/**"
       - ".github/workflows/entity-index.yml"
+  push:
+    branches: [main]
+    paths:
+      - "entity-index/**"
+      - ".github/workflows/entity-index.yml"
   workflow_dispatch:
 
 permissions:
@@ -19,8 +24,11 @@ jobs:
 
       - name: Regression tests (offline, no data download)
         run: |
+          python3 -I entity-index/test_workspace_layout.py
+          python3 -I entity-index/test_distribution_profile.py
           python3 -I entity-index/test_build.py
           python3 -I entity-index/test_resolve.py
+          python3 -I entity-index/test_audit_person_overlaps.py
 
       - name: Check out frozen self-hosted ACAI source
         shell: bash
@@ -29,12 +37,132 @@ jobs:
           git -C /tmp/acai-frozen checkout --quiet e80a874e8282f996199c595378a3b3b9a43aac22
           test "$(git -C /tmp/acai-frozen rev-parse HEAD)" = "e80a874e8282f996199c595378a3b3b9a43aac22"
 
+      - name: Check out exact original-language Macula WLC
+        uses: actions/checkout@v4
+        with:
+          repository: Clear-Bible/macula-hebrew
+          ref: 47db250bd55d0d8577f2a94fba114ef16c35b23c
+          path: macula-hebrew
+          sparse-checkout: WLC/tsv
+          lfs: true
+          persist-credentials: false
+
+      - name: Check out exact original-language Macula SBLGNT
+        uses: actions/checkout@v4
+        with:
+          repository: Clear-Bible/macula-greek
+          ref: 8423afe47b9e8f24b7772e808af45c7159a6fe7e
+          path: macula-greek
+          sparse-checkout: SBLGNT/tsv
+          lfs: true
+          persist-credentials: false
+
+      - name: Validate complete Macula source files and pinned revisions
+        shell: bash
+        run: |
+          test "$(git -C macula-hebrew rev-parse HEAD)" = "47db250bd55d0d8577f2a94fba114ef16c35b23c"
+          test "$(git -C macula-greek rev-parse HEAD)" = "8423afe47b9e8f24b7772e808af45c7159a6fe7e"
+          test "$(wc -c < macula-hebrew/WLC/tsv/macula-hebrew.tsv)" -gt 80000000
+          test "$(wc -c < macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv)" -gt 20000000
+
       - name: Build complete local-only resource
         run: |
           python3 -I entity-index/compile_index.py \
             --source /tmp/acai-frozen \
             --verify-source-commit \
             --output entity-index/dist/index.json
+
+      - name: Verify restricted keyterms are absent from projected BSI distribution
+        run: |
+          python3 -I entity-index/distribution_profile.py \
+            --input entity-index/dist/index.json \
+            --output entity-index/dist/bsi-v0.1-without-keyterms.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          full = json.loads(Path("entity-index/dist/index.json").read_text())
+          public = json.loads(Path("entity-index/dist/bsi-v0.1-without-keyterms.json").read_text())
+          assert any(e["kind"] == "keyterm" for e in full["entities"])
+          assert all(e["kind"] != "keyterm" for e in public["entities"])
+          assert public["distribution_profile"]["excluded_kinds"] == ["keyterm"]
+          assert public["statistics"]["index_entities"] < full["statistics"]["index_entities"]
+          assert all(not any(h["entity_id"].startswith("keyterm:") for h in hits)
+                     for hits in public["by_word"].values())
+          assert all(not any(c["entity_id"].startswith("keyterm:") for c in row["source_claims"])
+                     for row in public["unattested_source_words"].values())
+          assert all(not any(c.startswith("keyterm:") for c in row["source_reference_claims"])
+                     for row in public["unattested_source_verses"].values())
+          assert all(not any(c["entity_id"].startswith("keyterm:") for c in hits)
+                     for hits in public["qualified_source_references"].values())
+          print("BSI_KEYTERM_EXCLUSION_PASS", public["distribution_profile"])
+          PY
+
+      - name: Verify minimal labels without descriptions or excluded categories
+        run: |
+          python3 -I entity-index/minimal_labels.py \
+            --source /tmp/acai-frozen \
+            --index entity-index/dist/bsi-v0.1-without-keyterms.json \
+            --output entity-index/dist/bsi-v0.1-labels-en.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          index=json.loads(Path("entity-index/dist/bsi-v0.1-without-keyterms.json").read_text())
+          labels=json.loads(Path("entity-index/dist/bsi-v0.1-labels-en.json").read_text())
+          assert set(labels["labels"]) <= {e["id"] for e in index["entities"]}
+          assert not any(k.startswith("keyterm:") for k in labels["labels"])
+          assert labels["source_snapshot_sha256"] == index["provenance"]["source_snapshot_sha256"]
+          assert len(labels["labels"]) + len(labels["missing_ids"]) == len(index["entities"])
+          assert all(set(v) == {"label", "language", "source_id", "review_status"}
+                     for v in labels["labels"].values())
+          print("BSI_MINIMAL_LABELS_PASS", len(labels["labels"]), "missing", len(labels["missing_ids"]))
+          PY
+
+      - name: Check v0.1 reader common-noun and study-topic sample on full pinned index
+        run: |
+          python3 - <<'PY'
+          import importlib.util
+          import json
+          from pathlib import Path
+          index = json.loads(Path("entity-index/dist/index.json").read_text(encoding="utf-8"))
+          spec = importlib.util.spec_from_file_location(
+              "entity_reader", "entity-index/resolve.py")
+          module = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(module)
+          resolver = module.EntityResolver(index)
+          samples = [
+              ("flora:Fig", "wlc", "o230280040112"),
+              ("flora:OliveTree", "wlc", "o010080110081"),
+              ("flora:Wheat", "wlc", "o010300140051"),
+              ("flora:Barley", "wlc", "o020090310023"),
+              ("fauna:Dove", "wlc", "o010080080032"),
+              ("fauna:Fish", "wlc", "o010010260082"),
+              ("fauna:Lion", "wlc", "o010490090021"),
+              ("fauna:Camel", "wlc", "o010120160122"),
+              ("realia:ArkOfTheCovenant", "wlc", "o020250100021"),
+              ("realia:Altar", "wlc", "o010080200031"),
+              ("realia:Arrow", "wlc", "o050320230041"),
+              ("realia:Anchor", "sblgnt", "n44027029012"),
+              ("keyterm:Faith", "sblgnt", "n40008010016"),
+              ("keyterm:Mercy", "sblgnt", "n40009013006"),
+              ("keyterm:Love", "wlc", "o010220020091"),
+              ("keyterm:Covenant", "wlc", "o010060180031"),
+          ]
+          assert len(samples) == 16
+          for entity_id, corpus, word_id in samples:
+              exact = resolver.resolve_for_reader(
+                  corpus=corpus,
+                  edition=index["provenance"]["source_editions"][corpus]["edition"],
+                  word_id=word_id, verse_id=word_id[1:9])
+              assert exact["status"] in (
+                  "source_candidate", "ambiguous_source_candidates"), (entity_id, exact)
+              assert exact["lookup_policy"] == "explicit_only"
+              assert any(row["id"] == entity_id
+                         and row["link_type"] == "explicit_instances"
+                         for row in exact["candidates"]), (entity_id, word_id, exact)
+              assert all(row["link_type"] == "explicit_instances"
+                         for row in exact["candidates"]), (entity_id, exact)
+          print("ENTITY_V0_1_TOPIC_SAMPLE", len(samples), "source-backed direct links")
+          PY
 
       - name: Verify output and identity decisions
         shell: bash
@@ -45,15 +173,102 @@ jobs:
           path=Path("entity-index/dist/index.json")
           index=json.loads(path.read_text(encoding="utf-8"))
           stats=index["statistics"]
+          original_digest=index["provenance"]["source_snapshot_sha256"]
+          lock=json.loads(Path("entity-index/source.lock.json").read_text())
+          assert len(original_digest) == 64, original_digest
+          assert original_digest == lock["source_snapshot_sha256"], (original_digest,lock)
+          assert original_digest == "e46fa575d6d9946afe9b63a4ed64f4202cbe50f5a61bf855fad655d33259c084"
+          print("SOURCE_SNAPSHOT_SHA256", original_digest)
           assert stats["source_records"] == 6644, stats
           assert stats["index_entities"] == 6641, stats
           assert stats["quarantined_records"] == 3, stats
-          assert stats["reviewed_entries"] == 6, stats
+          assert stats["reviewed_entries"] == 38, stats
+          assert stats["unattested_distinct_source_words"] == 18, stats
+          assert stats["indexed_distinct_source_words"] == 134822, stats
+          assert len(index["unattested_source_words"]) == 18
+          # Candidate lookup claims are distinct (entity, field) pairs, while
+          # original repeated source annotation groups retain multiplicity.
+          assert sum(len(r["source_claims"]) for r in
+                     index["unattested_source_words"].values()) == 18
+          assert stats["unattested_raw_word_assignments"] == 19, stats
+          assert stats["unattested_source_verses"] == 8, stats
+          assert stats["qualified_source_verse_contexts"] == 8, stats
+          assert stats["unattested_source_verse_reference_claims"] == 22, stats
+          from collections import Counter
+          contexts={key:row["source_context"] for key,row
+                    in index["unattested_source_verses"].items()}
+          assert len(contexts)==8
+          kind_counts=Counter(row["classification"] for row in contexts.values())
+          assert kind_counts == {
+              "traditional_textual_variant_not_in_pinned_main_text":5,
+              "doxology_in_edition_apparatus_not_main_word_inventory":2,
+              "alternate_verse_number_for_final_benediction":1,
+          }, kind_counts
+          assert contexts["sblgnt:47013014"]["equivalent_benediction_source_verse"] == "47013013"
+          assert contexts["sblgnt:45016025"]["classification"] == (
+              "doxology_in_edition_apparatus_not_main_word_inventory")
+          assert contexts["sblgnt:45016027"]["classification"] == (
+              "doxology_in_edition_apparatus_not_main_word_inventory")
+          print("ENTITY_VERSE_SOURCE_CONTEXTS",json.dumps(kind_counts,sort_keys=True))
+          assert stats["qualified_source_reference_claims"] == 65, stats
+          reviews=index["qualified_source_references"]
+          all_reviews=[x for records in reviews.values() for x in records]
+          assert len(all_reviews) == 65, all_reviews
+          assert sum(x["classification"] == "textual_variant_name_not_in_pinned_edition"
+                     for x in all_reviews) == 2
+          assert sum(x["classification"] == "traditional_subscription_candidate"
+                     for x in all_reviews) == 63
+          assert any(x["source_id"] == "place:Bethabara"
+                     for x in reviews["sblgnt:43001028"])
+          assert any(x["source_id"] == "place:Trogyllium"
+                     for x in reviews["sblgnt:44020015"])
+          assert any(x["source_id"] == "person:Phoebe"
+                     for x in reviews["sblgnt:45016027"])
+          assert len(index["unattested_source_verses"]) == 8
+          assert index["unattested_source_verses"]["sblgnt:44008037"]["scope"] == "absent_from_pinned_original_word_inventory_only"
+          assert not (set(index["unattested_source_words"]) & set(index["by_word"]))
           by_id={e["id"]:e for e in index["entities"]}
           assert "person:Jashar" not in by_id
           assert "person:Hammelech" not in by_id
           assert "person:Philistine" not in by_id
           assert "person:Shiloh" not in by_id
+          assert by_id["person:Johanan"]["canonical_id"] == "person:Johanan"
+          assert by_id["person:Hur"]["occurrences"]["explicit_instances"]["wlc"] == [
+              ["o110040080041"]]
+          assert by_id["person:Ben-hur"]["occurrences"]["explicit_instances"]["wlc"] == [
+              ["o110040080031","o110040080041"]]
+          assert index["by_word"]["wlc:o110040080031"] == [
+              {"entity_id":"person:Ben-hur","link_type":"explicit_instances"}]
+          assert {c["entity_id"] for c in index["by_word"]["wlc:o110040080041"]} == {
+              "person:Hur","person:Ben-hur"}
+          assert "13001041" not in by_id["person:Dishon"]["references"]
+          assert ["o150080110051"] not in by_id["person:Bebai"]["occurrences"]["explicit_instances"]["wlc"]
+          assert ["o150080110021"] not in by_id["person:Bebai.2"]["occurrences"]["explicit_instances"]["wlc"]
+          assert {"entity_id":"person:Bebai","link_type":"explicit_instances"} in index["by_word"]["wlc:o150080110021"]
+          assert {"entity_id":"person:Bebai.2","link_type":"explicit_instances"} in index["by_word"]["wlc:o150080110051"]
+          assert not any(c["entity_id"]=="person:Bebai.2" for c in index["by_word"]["wlc:o150080110021"])
+          assert not any(c["entity_id"]=="person:Bebai" for c in index["by_word"]["wlc:o150080110051"])
+          assert "13001041" in by_id["person:Dishon.2"]["references"]
+          assert index["by_word"]["wlc:o130010410031"] == [
+              {"entity_id":"person:Dishon.2","link_type":"explicit_instances"}]
+          assert index["by_word"]["wlc:o130010410051"] == [
+              {"entity_id":"person:Dishon.2","link_type":"explicit_instances"}]
+          assert "wlc:o010360260031" in index["by_word"]
+          assert by_id["person:Shallum.5"]["canonical_id"] == "person:Jehoahaz.3"
+          assert index["by_word"]["wlc:o130030150101"] == [
+              {"entity_id":"person:Shallum.5","link_type":"explicit_instances"}]
+          assert by_id["place:Gadara"]["canonical_id"] == "place:Gadara"
+          assert by_id["place:Gadara"]["source_primary_id"] == "place:Gerasa"
+          assert by_id["place:Gerasa"]["canonical_id"] == "place:Gerasa"
+          assert by_id["place:Gadara.2"]["canonical_id"] == "place:Gadara.2"
+          assert index["provenance"]["source_corpora"]["SBLGNT"] == "sblgnt"
+          assert index["provenance"]["source_editions"]["wlc"]["word_id_digits"] == 12
+          assert index["provenance"]["source_editions"]["sblgnt"]["word_id_digits"] == 11
+          assert "sblgnt:n45016001004" in index["by_word"]
+          assert "SBLGNT:n45016001004" not in index["by_word"]
+          assert ["o130030150041"] not in by_id["person:Jehoahaz.3"]["occurrences"]["explicit_instances"]["wlc"]
+          assert index["by_word"]["wlc:o130030150041"] == [
+              {"entity_id":"person:Johanan","link_type":"explicit_instances"}]
           assert by_id["keyterm:World"]["canonical_id"] == "keyterm:World"
           assert by_id["keyterm:Universe"]["canonical_id"] == "keyterm:Universe"
           assert "group:Philistine" in by_id
@@ -73,12 +288,43 @@ jobs:
           spec.loader.exec_module(module)
           resolver=module.EntityResolver(index)
           edition=index["provenance"]["source_editions"]["wlc"]["edition"]
+          greek=index["provenance"]["source_editions"]["sblgnt"]["edition"]
+          region=resolver.resolve(corpus="sblgnt", edition=greek,
+                word_id="n40008028011", verse_id="40008028")
+          assert region["status"] == "ambiguous_source_candidates", region
+          assert region["canonical_ids"] == ["place:Gadara", "place:Gerasa"], region
+          greek_hit=resolver.resolve(corpus="sblgnt", edition=greek,
+                word_id="n45016001004", verse_id="45016001")
+          assert "person:Phoebe" in [c["id"] for c in greek_hit["candidates"]], greek_hit
+          malformed_greek=resolver.resolve(corpus="sblgnt", edition=greek,
+                word_id="n45016001004x", verse_id="45016001")
+          assert malformed_greek["status"] == "invalid_source_word_id", malformed_greek
+          malformed_hebrew=resolver.resolve(corpus="wlc", edition=edition,
+                word_id="o1300301501010", verse_id="13003015")
+          assert malformed_hebrew["status"] == "invalid_source_word_id", malformed_hebrew
+          assert greek_hit["status"] in ("source_candidate", "ambiguous_source_candidates")
+          variant=resolver.resolve(corpus="sblgnt", edition=greek,
+                word_id="n44008037001", verse_id="44008037")
+          assert variant["status"] == "verse_not_in_pinned_original_word_inventory", variant
+          shifted=resolver.resolve(corpus="sblgnt", edition=greek,
+                word_id="n47013014001", verse_id="47013014")
+          assert shifted["status"] == "verse_not_in_pinned_original_word_inventory", shifted
           jashar=resolver.resolve(corpus="wlc", edition=edition,
                 word_id="o060100130142", verse_id="06010013")
           assert "work:BookOfJashar" in jashar["canonical_ids"], jashar
+          royal=resolver.resolve(corpus="wlc", edition=edition,
+                word_id="o130030150101", verse_id="13003015")
+          assert royal["canonical_ids"] == ["person:Jehoahaz.3"], royal
+          johanan=resolver.resolve(corpus="wlc", edition=edition,
+                word_id="o130030150041", verse_id="13003015")
+          assert johanan["canonical_ids"] == ["person:Johanan"], johanan
           perez=resolver.resolve(corpus="wlc", edition=edition,
                 word_id="o100060080121", verse_id="10006008")
           assert perez["canonical_ids"] == ["place:PerezUzzah"], perez
+          missing=resolver.resolve(corpus="wlc", edition=edition,
+                word_id="o020020130103", verse_id="02002013")
+          assert missing["status"] == "unattested_source_word_id", missing
+          assert missing["candidates"] == [], missing
           philistines=resolver.resolve(corpus="wlc", edition=edition,
                 word_id="o010100140081", verse_id="01010014")
           assert "group:Philistine" in philistines["canonical_ids"], philistines
@@ -86,13 +332,675 @@ jobs:
           mismatch=resolver.resolve(corpus="wlc", edition=edition+"-other",
                 word_id="o100060080121", verse_id="10006008")
           assert mismatch["status"] == "incompatible_source_edition", mismatch
+          # Same-person Jehoash aliases are separate original records.
+          # Require exact right historical canonical identity for every hit.
+          exact_names={
+              "o120140130061":{"person:Jehoash","person:Joash.3"},
+              "o120140130101":{"person:Jehoash.2","person:Joash.4"},
+              "o140250230061":{"person:Joash.3"},
+              "o140250230101":{"person:Joash.4"},
+          }
+          for word,source_ids in exact_names.items():
+              hits=index["by_word"]["wlc:"+word]
+              assert {x["entity_id"] for x in hits}==source_ids,(word,hits)
+              assert all(x["link_type"]=="explicit_instances" for x in hits)
+          for word in (
+              "o120140130162","o120140130182",
+              "o120140140012","o120140140182",
+          ):
+              hits=index["by_word"]["wlc:"+word]
+              assert {x["entity_id"] for x in hits}=={
+                  "person:Jehoash.2","person:Joash.4"},(word,hits)
+              assert all(x["link_type"]=="subject_referents" for x in hits)
+          for word in (
+              "o140250230152","o140250230172","o140250240202",
+          ):
+              assert index["by_word"]["wlc:"+word]==[{
+                  "entity_id":"person:Joash.4",
+                  "link_type":"subject_referents"}]
+          assert index["by_word"]["sblgnt:n42006016007"] == [{
+              "entity_id":"person:Judas.2",
+              "link_type":"pronominal_referents"}]
+          for word in ("n42009059001","n42024019002"):
+              assert not any(hit["entity_id"]=="person:GenericDisciple"
+                             for hit in index["by_word"].get("sblgnt:"+word,[]))
+          # Source-verified singular dialogue roles (six exact Hebrew tokens).
+          for word,correct in (
+              ("o010240580092","person:Rebekah"),
+              ("o070140160172","person:Samson"),
+              ("o090100140092","person:Saul.2"),
+              ("o110180440112","person:Elijah"),
+              ("o120100080102","person:Jehu.2"),
+              ("o270100190132","person:Daniel.3"),
+          ):
+              assert index["by_word"]["wlc:"+word]==[{
+                  "entity_id":correct,
+                  "link_type":"subject_referents"}],(word,index["by_word"].get("wlc:"+word))
+          # A first-person speaker from pinned WLC must never link
+          # the prophet's words to a different anonymous man.
+          assert index["by_word"]["wlc:o380020060012"] == [{
+              "entity_id":"person:Zechariah.17",
+              "link_type":"subject_referents"}]
+          # The two distinct Marys and the widow's children do not share
+          # their source-name/subject word, while original repeated group
+          # multiplicity is unchanged.
+          for word in ("n40027061009","n40028001015"):
+              assert index["by_word"]["sblgnt:"+word]==[{
+                  "entity_id":"person:Mary.2",
+                  "link_type":"pronominal_referents"}]
+          assert index["by_word"]["wlc:o120040010012"]==[{
+              "entity_id":"person:Widow",
+              "link_type":"subject_referents"}]
+          widow=next(x for x in index["entities"] if x["id"]=="person:Widow")
+          assert widow["occurrences"]["subject_referents"]["wlc"].count(
+              ["o120040010012"])==2
+          son=next(x for x in index["entities"] if x["id"]=="person:GenericSon")
+          assert "12004001" in son["references"]
+          # Historical patriarchs must not absorb later collective people.
+          named_communities={
+              "o110050050021":"group:Judah",
+              "o110050050032":"group:Israel",
+              "o140230080022":"group:Levi",
+              "o140230080041":"group:Judah",
+              "o160110030081":"group:Judah",
+              "o160110030131":"group:Israel",
+              "o160110030153":"group:Levi",
+          }
+          for word,group in named_communities.items():
+              assert index["by_word"]["wlc:"+word] == [{
+                  "entity_id":group,"link_type":"explicit_instances"}],(word,index["by_word"].get("wlc:"+word))
+          collective_indirect={
+              "o110050050051":("pronominal_referents",{"group:Judah","group:Israel"}),
+              "o140230080102":("subject_referents",{"group:Judah","group:Levi"}),
+              "o140230080111":("pronominal_referents",{"group:Judah","group:Levi"}),
+              "o160110030101":("pronominal_referents",{"group:Israel","group:Levi"}),
+          }
+          for word,(field,groups) in collective_indirect.items():
+              hits=index["by_word"]["wlc:"+word]
+              assert {x["entity_id"] for x in hits}==groups,(word,hits)
+              assert all(x["link_type"]==field for x in hits)
+          # Validate exact actor/identity corrections, preserving each
+          # underlying original-word ID for the contextually correct hit.
+          for word,expected in (
+              ("n42010025003","person:Scribe"),
+              ("n42010025008","person:Scribe"),
+              ("n44021037023","person:Paul"),
+          ):
+              hits=index["by_word"]["sblgnt:"+word]
+              assert hits==[{"entity_id":expected,
+                             "link_type":"subject_referents"}],(word,hits)
+          for word,expected in (
+              ("o150080330262","group:Levi"),
+              ("o240330100181","group:Judah"),
+          ):
+              hits=index["by_word"]["wlc:"+word]
+              assert hits==[{"entity_id":expected,
+                             "link_type":"explicit_instances"}],(word,hits)
+          assert index["by_word"]["wlc:o240330100072"]==[{
+              "entity_id":"group:Judah","link_type":"pronominal_referents"}]
+          assert index["by_word"]["wlc:o390020100111"]==[{
+              "entity_id":"person:Malachi","link_type":"pronominal_referents"}]
+          for word in ("o230360080021","o230360080131",
+                       "o230360080142","o230360090021",
+                       "o230360090102"):
+              hits=index["by_word"]["wlc:"+word]
+              assert hits and all(hit["entity_id"]!="person:Judah.4"
+                                  for hit in hits),(word,hits)
+          assert not any(x["entity_id"]=="person:Levi.3"
+                         for x in index["by_word"]["wlc:o160080100012"])
+          # Namesakes remain separate, original proper-name references
+          # survive, and exact singular verbs/pronoun use the correct person.
+          for word in ("o150020610101","o150020610152",
+                       "o160070630101","o160070630152"):
+              assert index["by_word"]["wlc:"+word]==[{
+                  "entity_id":"person:Barzillai.3",
+                  "link_type":"subject_referents"}],word
+          for word,person in (
+              ("o150020610081","person:Barzillai.3"),
+              ("o150020610121","person:Barzillai"),
+              ("o160070630081","person:Barzillai.3"),
+              ("o160070630121","person:Barzillai"),
+              ("o140220060161","person:Jehoram"),
+          ):
+              assert index["by_word"]["wlc:"+word]==[{
+                  "entity_id":person,"link_type":"explicit_instances"}],word
+          # Frozen ACAI has *two* source records for Israel's Joram
+          # (Jehoram.3 + Joram.3), but only one canonical person.
+          israelite_aliases={"person:Joram.3","person:Jehoram.3"}
+          for word,link in (
+              ("o140220060221","explicit_instances"),
+              ("o140220060281","pronominal_referents"),
+          ):
+              hits=index["by_word"]["wlc:"+word]
+              assert {x["entity_id"] for x in hits}==israelite_aliases,(word,hits)
+              assert all(x["link_type"]==link for x in hits),(word,hits)
+          # Rehoboam's contemporary Israelite troops are never Jacob,
+          # the deceased patriarch. Preserve both living referent groups.
+          assert index["by_word"]["wlc:o140110030101"]==[{
+              "entity_id":"group:Israel","link_type":"explicit_instances"}]
+          for word,field in (
+              ("o140110040111","pronominal_referents"),
+              ("o140110040051","subject_referents"),
+              ("o140110040071","subject_referents"),
+              ("o140110040101","subject_referents"),
+              ("o140110040182","subject_referents"),
+              ("o140110040222","subject_referents"),
+              ("o140110040232","subject_referents"),
+          ):
+              hits=index["by_word"]["wlc:"+word]
+              assert {x["entity_id"] for x in hits}=={
+                  "group:Israel","person:Rehoboam"},(word,hits)
+              assert all(x["link_type"]==field for x in hits),(word,hits)
+          # Living Israel under Moses is a community, not Jacob; the
+          # inclusive poetic first-person Isaiah 53 'we' is not Jacob.
+          assert index["by_word"]["wlc:o050120080021"]==[{
+              "entity_id":"group:Israel","link_type":"subject_referents"}]
+          for word in ("o050120080051","o050120080091"):
+              hits=index["by_word"]["wlc:"+word]
+              assert {x["entity_id"] for x in hits}=={
+                  "group:Israel","person:Moses"},(word,hits)
+              assert all(x["link_type"]=="pronominal_referents"
+                         for x in hits),(word,hits)
+          assert index["by_word"]["wlc:o230530060041"]==[{
+              "entity_id":"person:Isaiah","link_type":"pronominal_referents"}]
+          assert index["by_word"]["wlc:o230530060061"]==[{
+              "entity_id":"person:Isaiah","link_type":"subject_referents"}]
+          # Deportees fleeing Babylon are not the ancient individual
+          # Jacob or Judah; retain the original Israelite-exile group.
+          for word,link in (
+              ("o240510060011","subject_referents"),
+              ("o240510060042","subject_referents"),
+              ("o240510060051","pronominal_referents"),
+              ("o240510060081","subject_referents"),
+          ):
+              hits=index["by_word"]["wlc:"+word]
+              assert hits==[{"entity_id":"group:Judah",
+                             "link_type":link}],(word,hits)
           print("ENTITY_INDEX_QA", json.dumps(stats, sort_keys=True))
           PY
+
+      - name: Audit competing canonical people on the same exact word
+        shell: bash
+        run: |
+          python3 -I entity-index/audit_person_overlaps.py \
+            --index entity-index/dist/index.json \
+            --output entity-index/dist/person-overlaps.json \
+            --sample 30
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path("entity-index/dist/person-overlaps.json").read_text())
+          stats=report["statistics"]
+          assert stats["distinct_person_original_word_overlap_candidates"] == len(report["findings"])
+          assert stats["multiple_explicit_names"] == 8, stats
+          assert stats["mixed_name_and_indirect"] == 1, stats
+          assert stats["indirect_only"] == 2332, stats
+          assert sum(stats[x] for x in ("multiple_explicit_names", "mixed_name_and_indirect", "indirect_only")) == len(report["findings"])
+          assert all(len(f["canonical_people"]) >= 2 for f in report["findings"])
+          assert len(set((f["corpus"], f["word_id"]) for f in report["findings"])) == len(report["findings"])
+          PY
+
+      - name: Triage every indirect-only person overlap against exact source morphology
+        shell: bash
+        run: |
+          # Source grammar is diagnostic: plural doesn't certify shared
+          # identities; singular doesn't prove an erroneous co-reference.
+          python3 - <<'PY'
+          import importlib.util
+          import json
+          from pathlib import Path
+          script=Path("entity-index/audit_person_overlaps.py")
+          spec=importlib.util.spec_from_file_location("person_source_forms",script)
+          module=importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(module)
+          report=json.loads(Path("entity-index/dist/person-overlaps.json").read_text())
+          reviewed=module.audit_indirect_source_forms(report,{
+              "wlc":Path("macula-hebrew/WLC/tsv/macula-hebrew.tsv"),
+              "sblgnt":Path("macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv"),
+          })
+          stats=reviewed["statistics"]
+          assert stats["indirect_only_source_words"]==report["statistics"]["indirect_only"]==2332
+          assert stats["by_corpus"]=={"wlc":1051,"sblgnt":1281},stats
+          assert sum(stats["source_word_number_buckets"].values())==2332
+          assert sum(stats["different_canonical_people_per_word"].values())==2332
+          assert len({(x["corpus"],x["word_id"]) for x in reviewed["cases"]})==2332
+          output=Path("entity-index/dist/indirect-person-source-forms.json")
+          output.write_text(json.dumps(reviewed,ensure_ascii=False,indent=2,
+                                       sort_keys=True)+"\n",encoding="utf-8")
+          print("ENTITY_INDIRECT_SOURCE_FORM_AUDIT",
+                json.dumps(stats,sort_keys=True))
+          PY
+
+      - name: Classify exact-person direct-name overlaps by pinned source context
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import importlib.util
+          import json
+          from pathlib import Path
+          source=Path("entity-index/audit_person_overlaps.py")
+          spec=importlib.util.spec_from_file_location("person_name_review",source)
+          module=importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(module)
+          audit=json.loads(Path("entity-index/dist/person-overlaps.json").read_text())
+          manifest=json.loads(Path("entity-index/reviewed-person-word-overlaps.json").read_text())
+          reviewed=module.verify_explicit_name_reviews(audit,manifest)
+          stats=reviewed["statistics"]
+          assert stats["reviewed_explicit_name_word_overlaps"]==8, stats
+          assert stats["shared_genealogical_name_component"]==6, stats
+          assert stats["unresolved_patronymic_name_variant"]==0, stats
+          assert stats["unresolved_person_identity"]==2, stats
+          Path("entity-index/dist/reviewed-person-overlaps.json").write_text(
+              json.dumps(reviewed,ensure_ascii=False,indent=2,sort_keys=True)+"\n")
+          print("ENTITY_EXPLICIT_NAME_OVERLAP_REVIEW",
+                json.dumps(stats,sort_keys=True))
+          PY
+
+      - name: Audit frozen ACAI repeated word groups without altering them
+        shell: bash
+        run: |
+          # Reuse the existing, pinned source-audit implementation rather than
+          # maintaining a second competing implementation in this repository.
+          python3 -I /tmp/acai-frozen/.github/scripts/audit_duplicate_word_groups.py \
+            --root /tmp/acai-frozen \
+            --output entity-index/dist/source-multiplicity.json \
+            --top 15
+          python3 - <<'PY'
+          import collections
+          import json
+          from pathlib import Path
+          report=json.loads(Path("entity-index/dist/source-multiplicity.json").read_text())
+          index=json.loads(Path("entity-index/dist/index.json").read_text())
+          summary=report["summary"]
+          findings=report["findings"]
+          assert summary["occurrence_fields_with_any_repeat"] == len(findings)
+          assert sum(r["duplicate_groups"] for r in findings) == summary["exact_duplicate_groups"]
+          assert sum(r["cross_group_word_ids"] for r in findings) == summary["word_ids_in_different_groups"]
+          assert len({r["id"] for r in findings}) == summary["records_with_any_repeat"]
+          assert not any(r["occurrence_field"] == "explicit_instances"
+                         and r["duplicate_groups"] for r in findings), summary
+          entries={e["source_id"]:e for e in index["entities"]}
+          quarantined={e["source_id"] for e in index["quarantined"]}
+          assert not (set(entries) & quarantined)
+          # Raw repeated groups in currently active source entries must not be
+          # silently deduplicated during compilation. The inverse lookup is
+          # intentionally a distinct entity/type candidate set instead.
+          for row in findings:
+              if row["id"] in quarantined:
+                  continue
+              entry=entries[row["id"]]
+              groups=entry["occurrences"][row["occurrence_field"]][row["corpus"]]
+              multiplicity=collections.Counter(tuple(group) for group in groups)
+              count=sum(n-1 for n in multiplicity.values())
+              assert count == row["duplicate_groups"], (row, count)
+          print("ENTITY_GROUP_MULTIPLICITY_QA",json.dumps(summary,sort_keys=True))
+          PY
+
+      - name: Verify every original word against both pinned Macula sources
+        shell: bash
+        run: |
+          python3 -I /tmp/acai-frozen/.github/scripts/audit_macula_hebrew_ids.py \
+            --root /tmp/acai-frozen \
+            --tsv macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --output entity-index/dist/macula-hebrew-existence.json
+          python3 -I /tmp/acai-frozen/.github/scripts/audit_macula_greek_ids.py \
+            --root /tmp/acai-frozen \
+            --tsv macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
+            --output entity-index/dist/macula-greek-existence.json
+          python3 -I /tmp/acai-frozen/.github/scripts/audit_nt_source_verses.py \
+            --root /tmp/acai-frozen \
+            --source macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
+            --corpus nt --output entity-index/dist/nt-source-verse-compatibility.json
+          python3 -I /tmp/acai-frozen/.github/scripts/audit_nt_source_verses.py \
+            --root /tmp/acai-frozen \
+            --source macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --corpus ot --output entity-index/dist/ot-source-verse-compatibility.json
+          python3 - <<'PY'
+          import csv
+          import json
+          from pathlib import Path
+          root=Path("entity-index")
+          index=json.loads((root/"dist/index.json").read_text())
+          reports={
+              "wlc":json.loads((root/"dist/macula-hebrew-existence.json").read_text()),
+              "sblgnt":json.loads((root/"dist/macula-greek-existence.json").read_text()),
+          }
+          manifest=json.loads((root/"source-unattested-words.json").read_text())
+          missing_hebrew={r["id"] for r in reports["wlc"]["missing_id_details"]}
+          assert missing_hebrew == set(manifest["word_ids"]), (missing_hebrew,manifest["word_ids"])
+          assert reports["wlc"]["summary"]["missing_from_pinned_macula"] == 18
+          assert reports["sblgnt"]["summary"]["missing_from_pinned_macula"] == 0
+          assert reports["wlc"]["summary"]["unique_mentioned_source_ids"] == 97977
+          assert reports["sblgnt"]["summary"]["unique_mentioned_source_ids"] == 36867
+          nt=json.loads((root/"dist/nt-source-verse-compatibility.json").read_text())
+          ot=json.loads((root/"dist/ot-source-verse-compatibility.json").read_text())
+          verse_manifest=json.loads((root/"source-unattested-verses.json").read_text())
+          assert nt["summary"]["record_reference_entries_absent_from_source"] == 22
+          assert nt["summary"]["distinct_referenced_verses_absent_from_source"] == 8
+          assert ot["summary"]["record_reference_entries_absent_from_source"] == 0
+          assert ot["summary"]["distinct_referenced_verses_absent_from_source"] == 0
+          assert {r["verse_id"] for r in nt["verses_absent_from_pinned_source"]} == set(verse_manifest["verse_ids"])
+          original_ids={e["id"]:e["source_id"] for e in index["entities"]}
+          for row in nt["verses_absent_from_pinned_source"]:
+              derived=index["unattested_source_verses"]["sblgnt:"+row["verse_id"]]
+              claimants=[original_ids[entity_id] for entity_id in derived["source_reference_claims"]]
+              assert sorted(row["entities"]) == sorted(claimants), row["verse_id"]
+          corpus_paths={
+              "wlc":Path("macula-hebrew/WLC/tsv/macula-hebrew.tsv"),
+              "sblgnt":Path("macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv"),
+          }
+          all_indexed=set(index["by_word"])
+          by_corpus={}
+          for corpus,path in corpus_paths.items():
+              fmt=index["provenance"]["source_editions"][corpus]
+              prefix=fmt["word_id_prefix"]
+              digits=fmt["word_id_digits"]
+              words=set()
+              with path.open(encoding="utf-8-sig",newline="") as handle:
+                  reader=csv.DictReader(handle,delimiter="\t")
+                  if "xml:id" not in (reader.fieldnames or []):
+                      raise ValueError(f"No Macula xml:id column in {path}")
+                  for row in reader:
+                      word=row.get("xml:id","")
+                      if len(word)==digits+len(prefix) and word.startswith(prefix):
+                          if not word[len(prefix):].isdigit():
+                              raise ValueError(f"Malformed Macula ID {word!r}")
+                          if word in words:
+                              raise ValueError(f"Duplicate source word ID {word!r}")
+                          words.add(word)
+              by_corpus[corpus]=words
+              # Counts are source-edition compatibility signals, not claims of
+              # semantic or editorial correctness for every tagged referent.
+              assert len(words) == {"wlc":469476,"sblgnt":137741}[corpus], (corpus,len(words))
+              unresolved=sorted(word for key in all_indexed
+                                if key.startswith(corpus+":")
+                                for word in [key.split(":",1)[1]]
+                                if word not in words)
+              print("ENTITY_SOURCE_WORD_PARITY",
+                    json.dumps({"corpus":corpus,"source_words":len(words),
+                                "indexed_words":sum(key.startswith(corpus+":") for key in all_indexed),
+                                "missing_indexed_ids":len(unresolved),
+                                "samples":unresolved[:15]}))
+              if unresolved:
+                  raise ValueError(f"{corpus}: Indexed words missing from locked source: {unresolved[:20]}")
+          assert not (set(index["unattested_source_words"]) & all_indexed)
+          for key in index["unattested_source_words"]:
+              corpus,word=key.split(":",1)
+              assert word not in by_corpus[corpus], key
+          print("ENTITY_SOURCE_PARITY_COMPLETE",
+                json.dumps({c:len(words) for c,words in by_corpus.items()},
+                           sort_keys=True))
+          PY
+
+      - name: Audit every epistle ending against pinned canonical Greek words
+        shell: bash
+        run: |
+          # Source-defined final verses, not a hardcoded English-Bible table.
+          # This script reports candidate claims only and preserves all data.
+          python3 -I /tmp/acai-frozen/.github/scripts/audit_epistle_endings.py \
+            --root /tmp/acai-frozen \
+            --greek macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
+            --output entity-index/dist/epistle-ending-review.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path("entity-index/dist/epistle-ending-review.json").read_text())
+          manifest=json.loads(Path("entity-index/source-reference-qualifications.json").read_text())
+          finales=report["source_defined_final_verses"]
+          assert len(finales)==21, finales
+          assert report["records_referencing_any_final_verse"]==79, report
+          assert report["unanchored_record_count"]==35, report
+          assert report["unanchored_reference_count"]==52, report
+          assert report["absent_source_final_chapter_record_count"]==12, report
+          assert report["absent_source_final_chapter_reference_count"]==17, report
+          assert report["unanchored_record_count"]==len(report["findings"])
+          assert report["unanchored_reference_count"]==sum(
+              len(row["unanchored_end_verses"]) for row in report["findings"])
+          assert report["absent_source_final_chapter_reference_count"]==len(
+              report["absent_source_final_chapter_references"])
+          candidate_links={
+              (row["id"],verse)
+              for row in report["findings"]
+              for verse in row["unanchored_end_verses"]
+          }
+          candidate_links.update(
+              (row["id"],row["verse_id"])
+              for row in report["absent_source_final_chapter_references"])
+          qualified={
+              (row["source_id"],row["verse_id"])
+              for row in manifest["claims"]
+              if row["classification"]=="traditional_subscription_candidate"
+          }
+          assert len(qualified)==63, len(qualified)
+          assert len(candidate_links)==69, len(candidate_links)
+          assert len(candidate_links-qualified)==6, len(candidate_links-qualified)
+          # The six remaining source claims concern Jesus/Christ in Greek
+          # apparatus or alternate 2 Corinthians versification, not subscriptions.
+          outstanding=candidate_links-qualified
+          absent_source_verses={
+              row["verse_id"] for row in
+              report["absent_source_final_chapter_references"]
+          }
+          assert all(verse in absent_source_verses for _,verse in outstanding), sorted(outstanding)
+          # A reviewed subscription claimant must be traceable to the
+          # source-defined, unanchored letter-end inventory. This does NOT
+          # mean all other unanchored references are subscriptions.
+          missing=qualified-candidate_links
+          assert not missing, sorted(missing)
+          print("ENTITY_EPISTLE_ENDING_COVERAGE", json.dumps({
+              "candidate_links":len(candidate_links),
+              "qualified_subscription_sample":len(qualified),
+              "unreviewed_candidates":len(candidate_links-qualified),
+          }, sort_keys=True))
+          PY
+
+      - name: Audit original-source lemma declarations against exact Macula words
+        shell: bash
+        run: |
+          # The compact index does not import ACAI lemmas. This checks the
+          # frozen witness for future use without treating mismatches as errors.
+          python3 -I /tmp/acai-frozen/.github/scripts/audit_lemma_alignment.py \
+            --root /tmp/acai-frozen \
+            --hebrew macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --greek macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
+            --output entity-index/dist/lemma-alignment-candidates.json --top 20
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path("entity-index/dist/lemma-alignment-candidates.json").read_text())
+          summary=report["summary"]
+          findings=report["findings"]
+          expected={
+              "zero_exact_lemma_overlap":summary.get("zero_exact_lemma_overlap",0),
+              "partial_exact_lemma_overlap":summary.get("partial_exact_lemma_overlap",0),
+          }
+          assert len(findings)==sum(expected.values()), (len(findings),summary)
+          assert sum(row["rule"]=="zero_exact_lemma_overlap" for row in findings)==expected["zero_exact_lemma_overlap"]
+          assert sum(row["rule"]=="partial_exact_lemma_overlap" for row in findings)==expected["partial_exact_lemma_overlap"]
+          assert summary["records_scanned"]==(
+              summary.get("without_explicit_source_ids",0)
+              +summary.get("without_matching_source_ids",0)
+              +summary.get("all_declared_lemmas_found",0)
+              +sum(expected.values())
+          ), summary
+          assert all(row["source_word_ids"]>0 and row["id"] for row in findings)
+          # A zero lexical overlap is diagnostic only: compounds, variants
+          # and alias identifiers can legitimately lack a verbatim lemma.
+          print("ENTITY_LEMMA_DIAGNOSTICS",
+                json.dumps({"records_scanned":summary["records_scanned"],
+                            **expected}, sort_keys=True))
+          PY
+
+      - name: Investigate missing Hebrew subject word IDs without guessing replacements
+        shell: bash
+        run: |
+          # Reuse the pinned ACAI neighbor-source witness: this is
+          # investigation-only and never rewrites an original word ID.
+          python3 -I /tmp/acai-frozen/.github/scripts/triage_missing_hebrew_subjects.py \
+            --tsv macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --missing entity-index/dist/macula-hebrew-existence.json \
+            > entity-index/dist/hebrew-missing-neighbor-source.log
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          out=Path("entity-index/dist")
+          missing=json.loads((out/"macula-hebrew-existence.json").read_text())
+          manifest=json.loads(Path("entity-index/source-unattested-words.json").read_text())
+          expected=set(manifest["word_ids"])
+          assert expected=={row["id"] for row in missing["missing_id_details"]}
+          entries={}
+          prefix="MACULA_NEAREST_MISSING_SUBJECT "
+          for line in (out/"hebrew-missing-neighbor-source.log").read_text().splitlines():
+              if not line.startswith(prefix):
+                  raise ValueError(f"Unexpected source audit output: {line[:120]}")
+              row=json.loads(line[len(prefix):])
+              token=row["missing"]
+              assert token in expected and token not in entries, token
+              assert isinstance(row["candidates"],list) and row["candidates"], token
+              for neighbor in row["candidates"]:
+                  assert neighbor["id"]!=token
+                  assert neighbor["id"][1:9]==token[1:9], (token,neighbor)
+              entries[token]={
+                  "source_word_id":token,
+                  "verse_id":token[1:9],
+                  "source_assignment_status":"unattested_in_exact_pinned_word_inventory",
+                  "same_word_position_neighbors":[
+                      neighbor for neighbor in row["candidates"]
+                      if neighbor["id"][:-1]==token[:-1]],
+                  "other_nearby_source_words":[
+                      neighbor for neighbor in row["candidates"]
+                      if neighbor["id"][:-1]!=token[:-1]],
+              }
+          assert len(entries)==len(expected)==18
+          report={
+              "format":"bible-entity-unattested-word-neighbor-review",
+              "schema_version":1,
+              "source_edition":manifest["source_edition"],
+              "scope":"exact_original_word_inventory_diagnostic_only",
+              "word_ids":[entries[token] for token in sorted(entries)],
+              "statistics":{
+                  "unattested_word_ids":len(entries),
+                  "with_same_word_position_neighbor":sum(
+                      bool(row["same_word_position_neighbors"])
+                      for row in entries.values()),
+                  "without_same_word_position_neighbor":sum(
+                      not row["same_word_position_neighbors"]
+                      for row in entries.values()),
+              },
+              "policy":"Neighbor IDs are original-language context, never automatic replacements; retain every source record and original pointer unchanged."
+          }
+          (out/"hebrew-missing-neighbor-review.json").write_text(
+              json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+          print("ENTITY_MISSING_HEBREW_WORD_NEIGHBORS",
+                json.dumps(report["statistics"],sort_keys=True))
+          for row in report["word_ids"]:
+              print("ENTITY_MISSING_HEBREW_SOURCE_CONTEXT",json.dumps({
+                  "missing":row["source_word_id"],
+                  "same_position":[x["id"] for x in row["same_word_position_neighbors"]],
+                  "other_neighbors":[x["id"] for x in row["other_nearby_source_words"]],
+              },sort_keys=True))
+          PY
+
+      - name: Build and verify offline BSI v0.1 release candidate
+        run: |
+          python3 -I entity-index/package_candidate.py \
+            --index entity-index/dist/bsi-v0.1-without-keyterms.json \
+            --labels entity-index/dist/bsi-v0.1-labels-en.json \
+            --lock entity-index/source.lock.json \
+            --output entity-index/dist/BSI-0.1.0-RELEASE-CANDIDATE.zip
+          sha256sum entity-index/dist/BSI-0.1.0-RELEASE-CANDIDATE.zip
+          python3 - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          import json
+          import zipfile
+          path = Path("entity-index/package_candidate.py")
+          spec = importlib.util.spec_from_file_location("bsi_package", path)
+          mod = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(mod)
+          raw = Path("entity-index/dist/BSI-0.1.0-RELEASE-CANDIDATE.zip").read_bytes()
+          manifest = mod.verify_archive(raw)
+          assert manifest["status"] == "versioned_distribution"
+          assert manifest["excluded_categories"] == ["keyterm"]
+          assert manifest["record_count"] > 5000
+          print("BSI_CANDIDATE_ARCHIVE_VERIFIED", json.dumps({
+              "records": manifest["record_count"],
+              "labels": manifest["label_count"],
+              "sha256": mod.sha(raw),
+          }, sort_keys=True))
+          PY
+
+      - name: Upload BSI v0.1 candidate for review (not a published release)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-0.1.0-release-candidate-internal
+          path: entity-index/dist/BSI-0.1.0-RELEASE-CANDIDATE.zip
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Upload internal QA-only resource
         uses: actions/upload-artifact@v4
         with:
           name: independent-entity-index-qa
-          path: entity-index/dist/index.json
+          path: |
+            entity-index/dist/index.json
+            entity-index/dist/person-overlaps.json
+            entity-index/dist/reviewed-person-overlaps.json
+            entity-index/dist/indirect-person-source-forms.json
+            entity-index/dist/source-multiplicity.json
+            entity-index/dist/macula-hebrew-existence.json
+            entity-index/dist/macula-greek-existence.json
+            entity-index/dist/nt-source-verse-compatibility.json
+            entity-index/dist/ot-source-verse-compatibility.json
+            entity-index/dist/epistle-ending-review.json
+            entity-index/dist/lemma-alignment-candidates.json
+            entity-index/dist/hebrew-missing-neighbor-review.json
           if-no-files-found: error
           retention-days: 14
+
+  publish-bsi:
+    name: Publish verified BSI v0.1.0
+    needs: test-and-build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download the verified BSI archive from the same workflow run
+        uses: actions/download-artifact@v4
+        with:
+          name: bsi-0.1.0-release-candidate-internal
+          path: bsi-release
+      - name: Verify and rename exact bytes for release
+        run: |
+          python3 - <<'PY'
+          import importlib.util
+          from pathlib import Path
+          spec=importlib.util.spec_from_file_location('bsi_pack','entity-index/package_candidate.py')
+          mod=importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(mod)
+          source=Path('bsi-release/BSI-0.1.0-RELEASE-CANDIDATE.zip')
+          raw=source.read_bytes()
+          manifest=mod.verify_archive(raw)
+          assert manifest['version']=='0.1.0'
+          assert manifest['distribution_profile']=='bsi-v0.1-without-keyterms'
+          assert manifest['license']=='CC BY-SA 4.0'
+          Path('bsi-release/BSI-0.1.0.zip').write_bytes(raw)
+          print('RELEASE_ARCHIVE_SHA256',mod.sha(raw))
+          PY
+          (cd bsi-release && sha256sum BSI-0.1.0.zip > BSI-0.1.0.zip.sha256)
+      - name: Publish a single immutable version if not already released
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view bsi-v0.1.0 >/dev/null 2>&1; then
+            echo 'BSI v0.1.0 already published; leave immutable release unchanged.'
+            exit 0
+          fi
+          gh release create bsi-v0.1.0 \
+            bsi-release/BSI-0.1.0.zip \
+            bsi-release/BSI-0.1.0.zip.sha256 \
+            --target "$GITHUB_SHA" \
+            --title 'Bible Semantic Index v0.1.0' \
+            --notes 'First standalone, source-pinned word-level biblical entity index. Licensed CC BY-SA 4.0 with attribution in the archive. Key Terms are excluded; descriptions, biographies and multilingual content are not distributed. English names are source labels, not independently verified identities. Original-language references are edition-qualified and ambiguous results must remain qualified. The Bible application integration is separate.'

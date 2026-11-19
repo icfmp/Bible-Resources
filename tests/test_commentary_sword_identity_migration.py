@@ -169,7 +169,7 @@ class CommentarySwordMigrationTests(unittest.TestCase):
         self.assertEqual(plan["package_size_bytes"],row[0]["download"]["size_bytes"])
         self.assertFalse((ROOT/"config/release-plans/mhcc-0.1.0.json").exists())
         self.assertFalse((ROOT/"modules/mhcc-crosswire/profiles/en.json").exists())
-        self.assertEqual(coverage(ROOT)["planned"][0][1]["module_id"],"mhcc-crosswire")
+        self.assertEqual(sum(p["module_id"]=="mhcc-crosswire" for _,p in coverage(ROOT)["planned"]),1)
 
 
 if __name__ == "__main__":

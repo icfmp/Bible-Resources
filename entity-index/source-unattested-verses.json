@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "kind": "pinned_word_corpus_verse_absences",
+  "corpus": "sblgnt",
+  "source_edition": "Clear-Bible/macula-greek@8423afe47b9e8f24b7772e808af45c7159a6fe7e",
+  "verse_ids": [
+    "40023014",
+    "44008037",
+    "44015034",
+    "44024007",
+    "44028029",
+    "45016025",
+    "45016027",
+    "47013014"
+  ],
+  "provenance": [
+    {
+      "source": "https://github.com/icfmp/ACAI/issues/88",
+      "evidence": "Complete pinned SBLGNT Greek word source comparison: 28,379 ACAI NT record-reference associations; eight source-absent verse IDs used by 22 original entity reference claims."
+    }
+  ],
+  "policy": "Flag only absences from this pinned Macula Greek original-word inventory. These are not a declaration of which verses are canonical, not editorial corrections of the Bible, and not proof that references are spurious in other textual traditions. Preserve every original entity-reference claim, classify variants/subscriptions/versification separately.",
+  "verse_qualifications": [
+    {
+      "verse_id": "40023014",
+      "classification": "traditional_textual_variant_not_in_pinned_main_text",
+      "explanation": "Matthew 23:14 is not a verse in pinned Macula SBLGNT main-word inventory; other Greek/textual traditions print an additional woe verse at this conventional reference. No declaration of historical authenticity or canonical status.",
+      "evidence": [
+        "Pinned Macula SBLGNT word inventory for Matthew 23 has no original word at 23:14; ACAI has inherited references",
+        "https://www.biblegateway.com/passage/?search=Matthew+23&version=SBLGNT"
+      ]
+    },
+    {
+      "verse_id": "44008037",
+      "classification": "traditional_textual_variant_not_in_pinned_main_text",
+      "explanation": "Acts 8:37 appears in a longer traditional textual reading associated with the eunuch's confession, but has no words in pinned Macula SBLGNT. Preserve source reference claims without inventing any confession verse in this edition.",
+      "evidence": [
+        "Pinned Macula SBLGNT Acts 8 original-word inventory lacks verse 37",
+        "https://www.biblegateway.com/passage/?search=Acts+8&version=SBLGNT"
+      ]
+    },
+    {
+      "verse_id": "44015034",
+      "classification": "traditional_textual_variant_not_in_pinned_main_text",
+      "explanation": "Acts 15:34 is found in longer textual traditions involving Silas, but no pinned Macula SBLGNT words are assigned to this conventional verse number. Do not silently insert or renumber it.",
+      "evidence": [
+        "Pinned Macula SBLGNT Acts 15 original-word inventory lacks verse 34",
+        "https://www.biblegateway.com/passage/?search=Acts+15&version=SBLGNT"
+      ]
+    },
+    {
+      "verse_id": "44024007",
+      "classification": "traditional_textual_variant_not_in_pinned_main_text",
+      "explanation": "Acts 24:7 belongs to a longer textual reading around Paul's legal accusation, absent from the pinned Macula SBLGNT main-word inventory; its source entity references are retained as different-tradition claims.",
+      "evidence": [
+        "Pinned Macula SBLGNT Acts 24 original-word inventory lacks verse 7",
+        "https://www.biblegateway.com/passage/?search=Acts+24&version=SBLGNT"
+      ]
+    },
+    {
+      "verse_id": "44028029",
+      "classification": "traditional_textual_variant_not_in_pinned_main_text",
+      "explanation": "Acts 28:29, an additional departure statement in some textual traditions, is not present in pinned Macula SBLGNT main-word inventory. This must not be interpreted as an instruction to remove the traditional verse from other editions.",
+      "evidence": [
+        "Pinned Macula SBLGNT Acts 28 original-word inventory lacks verse 29",
+        "https://www.biblegateway.com/passage/?search=Acts+28&version=SBLGNT"
+      ]
+    },
+    {
+      "verse_id": "45016025",
+      "classification": "doxology_in_edition_apparatus_not_main_word_inventory",
+      "explanation": "Romans 16:25 belongs to the doxology quoted in the SBLGNT's critical apparatus at the end of Romans 16:24; the edition's main word stream ends at verse 24. The doxology must not be described as an absent or unauthentic biblical passage; source-specific entity claims still require their own audit.",
+      "evidence": [
+        "Pinned Macula Greek SBLGNT/tei/06-romans.xml ends original words at ROM 16:24, no ROM 16:25 word IDs",
+        "https://www.biblegateway.com/passage/?search=Romans+16&version=SBLGNT (footnote on 16:24 includes alternative doxology 16:25-27)"
+      ]
+    },
+    {
+      "verse_id": "45016027",
+      "classification": "doxology_in_edition_apparatus_not_main_word_inventory",
+      "explanation": "Romans 16:27 closes a doxology attested as an alternative in the SBLGNT apparatus, not in its pinned main word stream. The source's traditional subscription names at this verse (such as Phoebe) are a *separate* source-claim issue; doxology provenance does not validate those names.",
+      "evidence": [
+        "Pinned Macula SBLGNT TEI Romans ends at 16:24, while SBLGNT Bible Gateway apparatus to 16:24 references the longer doxology ending at 16:27",
+        "https://www.biblegateway.com/passage/?search=Romans+16&version=SBLGNT"
+      ]
+    },
+    {
+      "verse_id": "47013014",
+      "classification": "alternate_verse_number_for_final_benediction",
+      "explanation": "The blessing cited as 2 Corinthians 13:14 in traditions with 14 verses is numbered 2 Corinthians 13:13 in the pinned Macula/SBLGNT original-word stream. This is a source-specific numbering difference, not a textual absence. The existence of that blessing in 13:13 does NOT independently prove that all source entity claims at 13:14 (e.g., persons in traditional subscriptions) belong in the main text.",
+      "equivalent_benediction_source_verse": "47013013",
+      "evidence": [
+        "Pinned Macula SBLGNT/tei/08-2corinthians.xml has 2CO 13:13 final blessing through word n47013013020 and no 13:14 original words",
+        "https://www.biblegateway.com/passage/?search=2+Corinthians+13&version=SBLGNT (final verse numbered 13:13)"
+      ]
+    }
+  ]
+}

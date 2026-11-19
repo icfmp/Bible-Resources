@@ -43,6 +43,55 @@ def review_case(source,key="Gen.1.1",raw=b"<div>Raw shared</div>"):
 
 
 class SourceVersusNativeRunBoundaryTests(unittest.TestCase):
+
+    def test_source_longer_scope_reuses_original_native_boundary_proof(self):
+        from commentary_source_native_boundaries import (
+            compare_longer_original_source_to_occupied_native_runs)
+        source=original_fixture()
+        original=source["Gen.1.1"][0]
+        stock=b"<p>First original paragraph.</p>"
+        ledger=NativeRawRunBoundaryInventory()
+        for key in ("Gen.1.1","Gen.1.2","Gen.1.3"):
+            ledger.observe("K",key,stock)
+        ledger.observe("K","Gen.1.4",b"<p>Second original paragraph.</p>")
+        cases=[("Gen.1.1",{
+            "original_source_line":original["original_source_line"],
+            "original_full_reference_sha256":original["original_full_reference_sha256"],
+            "original_body_sha256":original["original_text_sha256"],
+            "stock_raw_sha256":sha256(stock).hexdigest(),
+        })]
+        out=compare_longer_original_source_to_occupied_native_runs(source,ledger,cases)
+        self.assertEqual(out["source_longer_same_start_cases"],1)
+        self.assertEqual(out["original_book_case_counts"],{"Gen":1})
+        self.assertEqual(out["native_run_vs_source_declared_scope_classes"],
+                         {"same_occupied_K_extent_as_original_declared_source_range":1})
+        row=out["original_source_native_K_run_bounded_sha_only_rows"][0]
+        self.assertEqual(row["same_raw_contiguous_occupied_native_K_run_size"],3)
+        self.assertEqual(row["declared_source_range_native_occupied_K_count"],3)
+        self.assertEqual(row["source_division_immediate_child_tag_counts"],{"p":1})
+        self.assertNotIn("First original plain paragraph",json.dumps(out))
+        self.assertFalse(out["original_edition_or_section_layout_parity_proven"])
+
+    def test_source_longer_scope_fails_closed_on_original_or_native_mutation(self):
+        from commentary_source_native_boundaries import (
+            compare_longer_original_source_to_occupied_native_runs)
+        source=original_fixture()
+        unit=source["Gen.1.1"][0]
+        stock=b"<p>First original paragraph.</p>"
+        ledger=NativeRawRunBoundaryInventory()
+        ledger.observe("K","Gen.1.1",stock)
+        case=("Gen.1.1",{
+            "original_source_line":unit["original_source_line"],
+            "original_full_reference_sha256":unit["original_full_reference_sha256"],
+            "original_body_sha256":unit["original_text_sha256"],
+            "stock_raw_sha256":sha256(stock).hexdigest(),
+        })
+        with self.assertRaises(PilotError):
+            compare_longer_original_source_to_occupied_native_runs(
+                source,ledger,[case,case])
+        with self.assertRaises(PilotError):
+            compare_longer_original_source_to_occupied_native_runs(
+                source,ledger,[(case[0],{**case[1],"stock_raw_sha256":"0"*64})])
     def test_source_sibling_neighbors_preserve_actual_original_marker_order(self):
         source=original_fixture()
         first=source["Gen.1.1"][0]["private_source_marker_boundary"]

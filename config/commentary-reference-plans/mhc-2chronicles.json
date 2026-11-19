@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "status": "RESEARCH_ONLY_UNAPPROVED_REFERENCE_CANDIDATES",
+  "resource_id": "mhc-crosswire",
+  "source_volume": 2,
+  "source_xml_sha256": "673fcb4168ad946ab1e6923c0e331cc61e4adca4498fc0ee34cf1507285aa2f7",
+  "stock_raw_corpus_sha256": "2c4fe82710165202fdec300ca9636a150a9998f19c7b19ee4e81db5a6b75f5b5",
+  "note": "Chapter-index discrepancy from issue #288. Candidate addresses are not applied or editorially approved.",
+  "candidate_ranges": [
+    {
+      "original_work_qualified_reference": "Bible:2Chr.27.1-2Chr.27.5",
+      "proposed_osis_reference": "2Chr.28.1-2Chr.28.5"
+    },
+    {
+      "original_work_qualified_reference": "Bible:2Chr.27.6-2Chr.27.15",
+      "proposed_osis_reference": "2Chr.28.6-2Chr.28.15"
+    },
+    {
+      "original_work_qualified_reference": "Bible:2Chr.27.16-2Chr.27.27",
+      "proposed_osis_reference": "2Chr.28.16-2Chr.28.27"
+    },
+    {
+      "original_work_qualified_reference": "Bible:2Chr.28.1-2Chr.28.11",
+      "proposed_osis_reference": "2Chr.29.1-2Chr.29.11"
+    },
+    {
+      "original_work_qualified_reference": "Bible:2Chr.28.12-2Chr.28.19",
+      "proposed_osis_reference": "2Chr.29.12-2Chr.29.19"
+    },
+    {
+      "original_work_qualified_reference": "Bible:2Chr.28.20-2Chr.28.36",
+      "proposed_osis_reference": "2Chr.29.20-2Chr.29.36"
+    }
+  ]
+}

@@ -353,6 +353,8 @@ def _markup_display_witness(internal: bytes, rendered_plain: bytes,
         1 for label in source_reference_labels if label in actual_anchor_labels
     )
     exact_source_target_hrefs = 0
+    verified_target_sha256 = set()
+    composite_target_progress_by_sha256 = {}
     for attrs, raw_label in _REFERENCE_WITH_ATTRIBUTES.findall(original)[:256]:
         osis = _OSIS_REF_ATTRIBUTE.search(attrs)
         if not osis:
@@ -367,14 +369,39 @@ def _markup_display_witness(internal: bytes, rendered_plain: bytes,
         label = " ".join("".join(parser.text_chunks).split())
         if len(label) < 5:
             continue
+        # A source OSIS reference may list *multiple* destinations separated
+        # by spaces, or denote a complete canonical verse range. Xiphos may
+        # transport these through a different href syntax. Record only bounded
+        # component counts for an EXACT matching printed source label: do not
+        # confuse a partly linked label with a working multi-target hyperlink.
+        atoms = raw_target.split()
+        target_sha = sha256(raw_target.encode("utf-8")).hexdigest()
+        best = 0
+        has_exact_label_anchor = False
         for rendered_label, href in actual_anchor_destinations:
+            if rendered_label != label:
+                continue
+            has_exact_label_anchor = True
             uri = unquote(unescape(href)).casefold()
-            if (rendered_label == label and re.search(
+            count = sum(bool(re.search(
+                r"(?<![a-z0-9])" + re.escape(atom.casefold()) + r"(?![a-z0-9])",
+                uri)) for atom in atoms)
+            best = max(best, count)
+            if re.search(
                 r"(?<![a-z0-9])" + re.escape(raw_target.casefold()) + r"(?![a-z0-9])",
                 uri,
-            )):
+            ):
                 exact_source_target_hrefs += 1
+                verified_target_sha256.add(target_sha)
                 break
+        if len(atoms) > 1:
+            composite_target_progress_by_sha256[target_sha] = {
+                "original_component_count": len(atoms),
+                "components_found_in_one_same_label_real_GUI_href": best,
+                "source_label_is_an_actual_GUI_anchor": has_exact_label_anchor,
+                # This is still NOT an actual click/navigation test.
+                "all_components_found_in_one_GUI_href": best == len(atoms),
+            }
     return {
         "original_internal_title_elements_found": len(extracted_titles),
         "exact_original_titles_in_copied_gui_text": exact_titles,
@@ -389,6 +416,13 @@ def _markup_display_witness(internal: bytes, rendered_plain: bytes,
             matched_anchor_labels,
         "exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations":
             exact_source_target_hrefs,
+        # SHA-only, source-bound proof of the *specific* linked target.
+        # A generic "some other link matched" must never certify Ps.60.
+        "exact_matching_source_target_sha256_in_real_gui_HTML":
+            sorted(verified_target_sha256),
+        # No authorial words, source locators or actual href text in output.
+        "composite_target_href_progress_by_sha256":
+            composite_target_progress_by_sha256,
         "real_gui_rich_html_selection_available": bool(rendered_html),
         "real_gui_rich_html_anchor_elements_found": rich_link_count,
         "xiphos_link_click_target_and_navigation_verified": False,
@@ -498,6 +532,35 @@ def _commentary_pane_focus_points(env: dict, window: str) -> tuple[tuple[int,int
     )
 
 
+
+def _focus_real_xiphos_main_window(env: dict, window: str) -> str:
+    """Bounded X11 focus with fresh real-window re-discovery on transient error.
+
+    Virtual Xvfb sessions can change focus while Xiphos finishes rendering.
+    Avoid 'xdotool windowfocus --sync', whose wait itself can time out despite
+    a visible real GTK window. A copy still needs independent source-word
+    evidence; merely returning from a focus command never proves rendering.
+    """
+    if (not isinstance(window,str) or not window.isdecimal()
+            or env.get("DISPLAY")!=":91" or env.get("GDK_BACKEND")!="x11"):
+        raise PilotError("Unreviewed real Xiphos focus target")
+    current=window
+    for attempt in range(3):
+        if attempt:
+            newly_visible=_main_xiphos_window(env)
+            if newly_visible is None or not newly_visible.isdecimal():
+                raise PilotError("Original visible Xiphos main window disappeared")
+            current=newly_visible
+            time.sleep(0.4)
+        try:
+            # An X11 direct focus request does not rely on an external WM.
+            _x11(["xdotool","windowfocus",current],env,timeout=5)
+            return current
+        except PilotError:
+            pass
+    raise PilotError("Cannot focus independently located Xiphos main window")
+
+
 def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) -> dict:
     """Actual GUI passage changes in Bible + commentary pane (Alt+C).
 
@@ -526,12 +589,20 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
                         item.get("commentary_internal", b""), b"", None
                     ) for key, item in comparisons.items()
                 },
+                "chapter_intro_prose_clipboard_match_by_passage": {
+                    key: False for key, item in comparisons.items()
+                    if item.get("intro_expected")
+                },
                 "independent_gui_commentary_excerpt_match_count": 0}
     result = {}
     failures = {}
     copied_sizes = {}
     focus_attempts = {}
     markup_by_passage = {}
+    intro_matches = {
+        key: False for key, item in comparisons.items()
+        if item.get("intro_expected")
+    }
     accepted = True
     try:
         right_side_points = _commentary_pane_focus_points(env, window)
@@ -540,7 +611,7 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
     for ref, originals in comparisons.items():
         stage = "focus_main_window"
         try:
-            _x11(["xdotool", "windowfocus", "--sync", window], env)
+            window = _focus_real_xiphos_main_window(env, window)
             for action, command in (
                 ("select_reference", ["xdotool", "key", "--clearmodifiers", "ctrl+l"]),
                 ("enter_reference", ["xdotool", "type", "--clearmodifiers", "--delay", "25", ref]),
@@ -556,7 +627,10 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
             markup_by_passage[ref] = _markup_display_witness(
                 originals.get("commentary_internal", b""), b"", None
             )
-            for px, py in right_side_points:
+            # Two bounded passes over the same independently checked pane
+            # coordinates allow lazy GTK/WebKit repaint after navigation.
+            # Each copy still requires substantial authorial prose equality.
+            for px, py in right_side_points * 2:
                 stage = "focus_right_hand_commentary_pane"
                 _x11(
                     # Do not use --sync here: the same coordinate can be
@@ -586,7 +660,18 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
                     originals.get("commentary_internal", b""),
                     selected, _optional_real_rich_xiphos_selection(env),
                 )
-                if result[ref]:
+                if ref in intro_matches:
+                    # The expected chapter preface must originate from the
+                    # independently read SWORD introduction entry. This
+                    # observer never creates or reconstructs authorial prose.
+                    intro_matches[ref] = (
+                        intro_matches[ref] or
+                        _long_commentary_excerpt_is_on_gui_clipboard(
+                            originals["intro_expected"], originals["bible"],
+                            selected,
+                        )
+                    )
+                if result[ref] and (ref not in intro_matches or intro_matches[ref]):
                     break
         except PilotError:
             accepted = False
@@ -605,6 +690,7 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
         "copied_gui_clipboard_byte_count_by_passage": copied_sizes,
         "bounded_right_commentary_pane_focus_attempts_by_passage": focus_attempts,
         "real_markup_rendering_observation_by_passage": markup_by_passage,
+        "chapter_intro_prose_clipboard_match_by_passage": intro_matches,
         "independent_gui_commentary_excerpt_match_count": sum(result.values()),
     }
 
@@ -738,7 +824,7 @@ def _run_real_gui(root: Path, comparisons: dict[str, dict], *, seconds: int,
                 ) from exc
         # Allow the already-visible GTK main window to finish initial layout
         # before accepting real, passage-specific Xiphos clipboard evidence.
-        time.sleep(1)
+        time.sleep(2)
         _dismiss_transient_xiphos_notice(env)
         inspection = _observe_real_xiphos_with_bounded_retries(env, comparisons)
         after = on_gui_ready(env) if on_gui_ready is not None else {}

@@ -15,9 +15,22 @@ Bible Resources is an **independent community project**, not an official CrossWi
 
 This applies equally to **Bibles, commentaries, dictionaries, encyclopedias and other resources**. See [editorial authority and transformation rules](docs/EDITORIAL_RULES.md) for the distinction between a work/edition, an immutable upstream witness, and our verified curated digital edition. An exact-source mirror is one possible result, not the project's universal goal.
 
+## Source-first editorial production
+
+The standard practical workflow is **acquire original OSIS/USFM → normalize
+structure and eliminate nonsemantic editorial formatting → compare the entire
+curated source with a reliable witness → verify and correct references →
+compile standard SWORD and test actual Xiphos/readers → approve and publish**.
+
+We preserve authors' substantive content and exact-edition identity; the
+curated source is the preferred maintained master, and SWORD is its
+reproducible distribution package. This six-phase production path operates
+**inside** the existing seven-stage source/rights/evidence checkpoints.
+See [the source-first OSIS/USFM production policy](docs/SOURCE_FIRST_EDITORIAL_PIPELINE.md).
+
 ## Status
 
-**Published and verified resources:** [Louis Segond 1910 `BRLSG1910` 0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/lsg-0.1.0), [Darby `BRJND2024` 0.1.1](https://github.com/icfmp/Bible-Resources/releases/tag/darby-jnd-2024-0.1.1), and [Matthew Henry Concise Commentary `MHCC` 0.1.1](https://github.com/icfmp/Bible-Resources/releases/tag/mhcc-0.1.1). Their [source-reviewed files](modules/) and current catalogue entries are in `main`. The [public JSON catalogue](https://icfmp.github.io/Bible-Resources/catalog/v1/catalog.json) and standard [SWORD repository](https://icfmp.github.io/Bible-Resources/sword/) are deployed and verified through the ordered GitHub Release-before-Pages workflow. Historic release ZIPs remain immutable, including the original `BRMHCC` 0.1.0; the newer `MHCC` SWORD ID may collide with CrossWire's original `MHCC` and does **not** automatically remove an old `BRMHCC` installation.
+**Published and verified resources:** [Louis Segond 1910 `BRLSG1910` 0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/lsg-0.1.0), [Darby `BRJND2024` 0.1.1](https://github.com/icfmp/Bible-Resources/releases/tag/darby-jnd-2024-0.1.1), and [Matthew Henry Concise Commentary `MHCC` 0.1.1](https://github.com/icfmp/Bible-Resources/releases/tag/mhcc-0.1.1), plus [Matthew Henry Complete Commentary `MHC` 0.1.0](https://github.com/icfmp/Bible-Resources/releases/tag/mhc-0.1.0). Their [source-reviewed files](modules/) and current catalogue entries are in `main`. The [public JSON catalogue](https://icfmp.github.io/Bible-Resources/catalog/v1/catalog.json) and standard [SWORD repository](https://icfmp.github.io/Bible-Resources/sword/) are deployed and verified through the ordered GitHub Release-before-Pages workflow. Historic release ZIPs remain immutable, including the original `BRMHCC` 0.1.0; the newer `MHCC` SWORD ID may collide with CrossWire's original `MHCC` and does **not** automatically remove an old `BRMHCC` installation.
 
 A French Matthew Henry translation is **not** licensed for republication merely because a supplied JSON archive advertises CC0. Source attribution, rights and approvals remain edition-specific.
 
@@ -29,6 +42,7 @@ modules/<slug>/payload/mods.d/     exactly one SWORD .conf file
 modules/<slug>/payload/modules/    compiled SWORD module files
 modules/<slug>/EDITORIAL.md        transformation / review record
 schemas/module.schema.json         machine-readable format contract
+sources/cleaned/<resource-id>/   maintained OSIS/USFM source (rights-cleared only)
 scripts/validate.py               metadata and structure checks
 scripts/audit_text.py              non-destructive editorial warnings
 scripts/guard_osis.py               schema-pinned OSIS structure gate; no rewrites

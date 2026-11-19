@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "resource_id": "mhc-crosswire",
+  "category": "commentary",
+  "module_id": "MHC",
+  "title": "Matthew Henry's Complete Commentary on the Whole Bible",
+  "language": "en",
+  "version": "2.2",
+  "provider": "crosswire",
+  "source_page_url": "https://www.crosswire.org/sword/modules/ModInfo.jsp?modName=MHC",
+  "sword_zip_url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/MHC.zip",
+  "authorial_witness_url": "https://www.ccel.org/ccel/henry/mhc.html",
+  "reference_edition": "CCEL six-volume complete work credited by CrossWire to CCEL/Logos; text/markup equivalence to the SWORD module remains unverified",
+  "archive_sha256": "6bcb936873ca144e317805e5c1677940fd86e2403f7c14517752e44f25c8882b",
+  "sample_references": [
+    "Gen 1:1",
+    "Joshua 18:1",
+    "1 Samuel 25:1",
+    "2 Samuel 22:1",
+    "Ps 23:1",
+    "Matt 5:1",
+    "John 3:16",
+    "Rev 22:21"
+  ],
+  "rights": {
+    "status": "research_only",
+    "upstream_license_claim": "Public Domain--Copy Freely (CrossWire MHC 2.2)",
+    "evidence_url": "https://www.crosswire.org/sword/modules/ModInfo.jsp?modName=MHC",
+    "digital_corrections_and_derivatives_reviewed": true,
+    "owner_approved": false,
+    "owner_approval_scope": "Accept CrossWire official MHC 2.2 Public Domain / Copy Freely declaration as the project's working rights basis; does not authorize release or certify all derivative/jurisdiction questions.",
+    "owner_approval_date": "2026-11-19",
+    "owner_publication_approved": false,
+    "publication_rights_basis": "official CrossWire MHC 2.2 module page, attribution retained to CrossWire, CCEL, and Logos",
+    "rights_review_decision": "The project owner accepts CrossWire MHC 2.2 Public Domain--Copy Freely as sufficient distribution and technical-derivative basis; no additional CCEL permission request is required by project policy.",
+    "rights_review_independent_legal_opinion": false,
+    "intake_stage_explanation": "This manifest is the immutable research/intake contract; project acceptance of CrossWire's license is separately documented in the private release readiness and rights-review decision."
+  },
+  "commentary_source": {
+    "format": "compiled CrossWire zCom4 with SourceType=OSIS; official original authoring OSIS now independently SHA-pinned, but source/native parity is still unverified",
+    "observed_compiled_versification": "KJV",
+    "ccel_witness_edition_equivalence": "unverified",
+    "source_provenance": "CrossWire credits Christian Classics Ethereal Library and Logos Research, Inc.",
+    "independent_six_volume_witness": "https://www.ccel.org/ccel/henry/mhc.html",
+    "no_source_text_imported": true,
+    "xml_witness_volumes": [
+      {
+        "number": 1,
+        "url": "https://www.ccel.org/ccel/h/henry/mhc1.xml",
+        "sha256": "6eb946647f806f46129001f83013d65c51e40ac59b939ac1c51404aa50375971"
+      },
+      {
+        "number": 2,
+        "url": "https://www.ccel.org/ccel/h/henry/mhc2.xml",
+        "sha256": "673fcb4168ad946ab1e6923c0e331cc61e4adca4498fc0ee34cf1507285aa2f7"
+      },
+      {
+        "number": 3,
+        "url": "https://www.ccel.org/ccel/h/henry/mhc3.xml",
+        "sha256": "8ba9779eba5d326acbfc9acaccf2ea1fa2d6b5c48b03ab86fc5e80b0bfa5b17e"
+      },
+      {
+        "number": 4,
+        "url": "https://www.ccel.org/ccel/h/henry/mhc4.xml",
+        "sha256": "7b6ea0800caa1daab6b0c807f5b95c7567fb5d880290bbe91d848048a80486b2"
+      },
+      {
+        "number": 5,
+        "url": "https://www.ccel.org/ccel/h/henry/mhc5.xml",
+        "sha256": "8b0853b116e9a68215a594bafe29f45502d4c766e1f128cbf5fb050f45cf2518"
+      },
+      {
+        "number": 6,
+        "url": "https://www.ccel.org/ccel/h/henry/mhc6.xml",
+        "sha256": "296195d09d4fbb1e7516ea77c100dbc87ce37542c3109f9f570c3cf155b594c1"
+      }
+    ],
+    "xml_collection_status": "six exact CCEL ThML/XML volume bytes observed, independently SHA-pinned, not yet proven equivalent to MHC stock text or authorized for editorial derivatives",
+    "xml_observation_action": "https://github.com/icfmp/Bible-Resources/actions/runs/43948030420",
+    "xml_observed_total_bytes": 58370898,
+    "original_authoring_osis": {
+      "repository_url": "https://gitlab.com/crosswire-bible-society/mhc",
+      "observed_upstream_commit_sha": "537591a94c991941877b47a06666b6a7812e05d8",
+      "authoring_osis_file": "mhc.osis.xml",
+      "authoring_osis_sha256": "3cf367f00c498a3124b339c00896aaef4ef1196a2d5c310ecb20ea42abd130f6",
+      "authoring_osis_bytes": 48020985,
+      "source_conf_sha256": "813160b22ea9662273269600bc16d48af0d5dc07de7a918f8f0f267c1400caf2",
+      "upstream_build_script_sha256": "85b247a271d1f5aaddf848845056254db8e7ee724d127f16babb42ea51ea0536",
+      "readme_sha256": "b9e6efc2b770f91ad5fb6cef06253b5eb25da074dc379b82d106ad17f359b022",
+      "source_format": "OSIS",
+      "observed_source_module_version": "2.2",
+      "source_to_compiled_full_native_parity_verified": false,
+      "source_or_digital_editorial_rights_approved": false,
+      "original_source_bytes_committed_or_published": false,
+      "observation": "https://github.com/icfmp/Bible-Resources/actions/runs/44156141772"
+    },
+    "original_authoring_source_paragraph_cases": [
+      {
+        "source_volume": 3,
+        "original_marker_line": 27749,
+        "original_full_reference_sha256": "f9a402dda0436aaed29b311707a672f1057df6e7bba16b58a43e5a1a91ac56a0",
+        "original_body_sha256": "48809f08f932d9d68c4cbc56267a6ffdf973bf9bbafc9401d0916296824fb4ea",
+        "original_paragraph_ordinal": 6,
+        "original_paragraph_visible_word_count": 588,
+        "original_paragraph_word_sha256": "0a733673d3b3cb71dee93dc4c454dfaddee08c9fc87d43d879c9e61ec402f68c",
+        "source_only_unlinked_gap_word_count_per_prior_pinned_stock_audit": 569,
+        "original_source_marker_osisRef": "Bible:Ps.7.1-Ps.7.9"
+      },
+      {
+        "source_volume": 6,
+        "original_marker_line": 23188,
+        "original_full_reference_sha256": "f00b1d632a701e2617522eb9e214b3f6fa6b6547bbe836814a214636556ba06d",
+        "original_body_sha256": "0d3f52a0c7cb4c29694995ecd920d3f4e1f95409e22df3f4025afbe12b51fb7d",
+        "original_paragraph_ordinal": 17,
+        "original_paragraph_visible_word_count": 235,
+        "original_paragraph_word_sha256": "462ec448acf7e29788eeedfbb245ad08ea98faaade8c0dbef7755c042d2779cc",
+        "source_only_unlinked_gap_word_count_per_prior_pinned_stock_audit": 235,
+        "original_source_marker_osisRef": "Bible:Acts.17.22-Acts.17.31"
+      }
+    ],
+    "private_authoring_osis_chapter_samples": [
+      "Gen.1",
+      "Ps.23",
+      "Isa.53",
+      "John.3",
+      "Rev.22",
+      "2Chr.27",
+      "2Chr.28",
+      "2Chr.29"
+    ]
+  },
+  "original_archive_observation": {
+    "date": "2026-11-07",
+    "receipt": "https://github.com/icfmp/Bible-Resources/blob/main/docs/evidence/normalizer-3/real-pilot-source-signals.json",
+    "action": "https://github.com/icfmp/Bible-Resources/actions/runs/42362111699",
+    "original_zip_digest_recheck_pending": false,
+    "original_markup_parity_verified": false,
+    "full_native_corpus_verified": true,
+    "pinned_stock_native_index_run": "https://github.com/icfmp/Bible-Resources/actions/runs/43945404124",
+    "pinned_stock_raw_corpus_run": "https://github.com/icfmp/Bible-Resources/actions/runs/43946314351",
+    "stock_source_native_audit_report": "https://github.com/icfmp/Bible-Resources/blob/feature/mhc-crosswire-intake/docs/evidence/mhc-285/crosswire-mhc-stock-native-audit-2026-11-16.md"
+  },
+  "import_issue": "https://github.com/icfmp/Bible-Resources/issues/285",
+  "initial_pilot_issue": "https://github.com/icfmp/Bible-Resources/issues/12",
+  "native_raw_corpus_sha256": "2c4fe82710165202fdec300ca9636a150a9998f19c7b19ee4e81db5a6b75f5b5",
+  "private_reference_candidate_plan": "config/commentary-reference-plans/mhc-2chronicles.json",
+  "private_reference_endpoint_plans": [
+    "config/commentary-reference-plans/mhc-proverbs31-endpoint.json",
+    "config/commentary-reference-plans/mhc-isaiah7-endpoint.json",
+    "config/commentary-reference-plans/mhc-acts26-endpoint.json"
+  ]
+}

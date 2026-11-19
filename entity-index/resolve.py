@@ -17,9 +17,25 @@ class EntityResolver:
         self.editions = provenance.get("source_editions")
         if not isinstance(self.editions, dict) or not self.editions:
             raise ValueError("Missing corpus edition/prefix provenance")
+        for corpus, metadata in self.editions.items():
+            if (not isinstance(metadata, dict)
+                    or not isinstance(metadata.get("word_id_prefix"), str)
+                    or not metadata["word_id_prefix"]
+                    or not isinstance(metadata.get("word_id_digits"), int)
+                    or isinstance(metadata["word_id_digits"], bool)
+                    or metadata["word_id_digits"] < 8):
+                raise ValueError(f"Invalid pinned original-word ID format: {corpus}")
         self.words = index.get("by_word")
         if not isinstance(self.words, dict):
             raise ValueError("Missing exact-word index")
+        self.unattested_words = index.get("unattested_source_words", {})
+        if not isinstance(self.unattested_words, dict):
+            raise ValueError("Invalid source-unattested word audit")
+        if set(self.unattested_words) & set(self.words):
+            raise ValueError("Source-unattested word must not remain lookup-indexed")
+        self.unattested_verses = index.get("unattested_source_verses", {})
+        if not isinstance(self.unattested_verses, dict):
+            raise ValueError("Invalid pinned source-absent verse inventory")
         entities = index.get("entities")
         if not isinstance(entities, list):
             raise ValueError("Missing entity records")
@@ -50,12 +66,20 @@ class EntityResolver:
         elif not (isinstance(verse_id, str) and len(verse_id) == 8
                   and verse_id.isdigit()):
             result["status"] = "invalid_verse_id"
-        elif not (isinstance(word_id, str) and len(word_id) >= 9
-                  and word_id.startswith(expected.get("word_id_prefix", "\0"))
-                  and word_id[1:9].isdigit()):
+        elif not (isinstance(word_id, str)
+                  and len(word_id) == (len(expected["word_id_prefix"])
+                                       + expected["word_id_digits"])
+                  and word_id.startswith(expected["word_id_prefix"])
+                  and word_id[len(expected["word_id_prefix"]):].isdigit()):
             result["status"] = "invalid_source_word_id"
         elif word_id[1:9] != verse_id:
             result["status"] = "verse_context_mismatch"
+        elif corpus + ":" + verse_id in self.unattested_verses:
+            result["status"] = "verse_not_in_pinned_original_word_inventory"
+            result["source_absence"] = self.unattested_verses[corpus + ":" + verse_id]
+        elif corpus + ":" + word_id in self.unattested_words:
+            result["status"] = "unattested_source_word_id"
+            result["source_absence"] = self.unattested_words[corpus + ":" + word_id]
         else:
             hits = self.words.get(corpus + ":" + word_id, [])
             seen = set()
@@ -91,6 +115,37 @@ class EntityResolver:
                 result["status"] = "source_candidate"
         return result
 
+    def resolve_for_reader(self, *, corpus: str, edition: str,
+                           word_id: str, verse_id: str) -> dict:
+        """Return only exact explicit-word candidates for a reader UI.
+
+        Preserve the raw resolver and every source annotation. A pronominal
+        or implicit-subject link is useful audit evidence, but must never
+        make Bible display a person's card on an unrelated 'we' or 'you'.
+        This presentation policy does not certify any source identity.
+        """
+        result = self.resolve(
+            corpus=corpus, edition=edition, word_id=word_id, verse_id=verse_id)
+        result["lookup_policy"] = "explicit_only"
+        if result["status"] not in (
+                "source_candidate", "ambiguous_source_candidates"):
+            return result
+
+        result["candidates"] = [
+            row for row in result["candidates"]
+            if row["link_type"] == "explicit_instances"
+        ]
+        result["canonical_ids"] = sorted({
+            row["canonical_id"] for row in result["candidates"]
+        })
+        if not result["canonical_ids"]:
+            result["status"] = "no_explicit_entity"
+        elif len(result["canonical_ids"]) > 1:
+            result["status"] = "ambiguous_source_candidates"
+        else:
+            result["status"] = "source_candidate"
+        return result
+
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -101,9 +156,14 @@ def main():
     parser.add_argument("--word-id", required=True)
     parser.add_argument("--verse-id", required=True,
                         help="Eight-digit original ORG book/chapter/verse ID")
+    parser.add_argument("--reader-facing", action="store_true",
+                        help="Only suggest explicit original-word entities; "
+                             "never show pronoun or implied-subject participants")
     args = parser.parse_args()
     index = json.loads(args.index.read_text(encoding="utf-8"))
-    result = EntityResolver(index).resolve(
+    resolver = EntityResolver(index)
+    lookup = resolver.resolve_for_reader if args.reader_facing else resolver.resolve
+    result = lookup(
         corpus=args.corpus, edition=args.edition,
         word_id=args.word_id, verse_id=args.verse_id)
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))

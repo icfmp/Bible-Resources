@@ -313,3 +313,138 @@ class NativeRawRunBoundaryInventory:
             "original_ThML_scripCom_marker_and_stock_SWORD_verse_key_are_not_equivalent_structural_authorities":True,
             "original_content_markup_and_edition_parity_verified":False,
         }
+
+
+def compare_longer_original_source_to_occupied_native_runs(
+        source: dict, native_inventory: NativeRawRunBoundaryInventory,
+        selected_cases: list[tuple[str, dict]]) -> dict:
+    """Reconcile EVERY source-longer-than-stock case to its original native K run.
+
+    Reuse the independently tested native boundary inspector in bounded chunks;
+    a linked SWORD K run and an authorial ThML scripCom range are *different*
+    structural authorities. This is a location/structure observation only:
+    never interpret source-added words as actually omitted original prose.
+    Original words, reference strings, OSIS XML and native raw bytes never
+    leave the private runner. Only line numbers, hashes and closed classes do.
+    """
+    if (not isinstance(source, dict) or not isinstance(native_inventory,
+            NativeRawRunBoundaryInventory) or not isinstance(selected_cases, list)
+            or len(selected_cases) > 500):
+        raise PilotError("Unreviewed source-longer case inventory bound")
+    counters = Counter()
+    by_book = Counter()
+    book_classes = defaultdict(Counter)
+    sibling_tags = Counter()
+    proof_rows = []
+    seen = set()
+    for start, case in selected_cases:
+        if (not isinstance(start, str) or not OSIS_LOC.fullmatch(start)
+                or not isinstance(case, dict)):
+            raise PilotError("Source-longer case lacks canonical original identity")
+        identity = (
+            case.get("original_source_line"),
+            case.get("original_full_reference_sha256"),
+            case.get("original_body_sha256"),
+        )
+        if (type(identity[0]) is not int or identity[0] < 1
+                or not all(isinstance(value, str) and SHA_RE.fullmatch(value)
+                           for value in identity[1:])
+                or identity in seen):
+            raise PilotError("Duplicate or unattested source-longer section")
+        seen.add(identity)
+    for offset in range(0, len(selected_cases), MAX_REVIEW_UNITS):
+        subset = selected_cases[offset:offset + MAX_REVIEW_UNITS]
+        verified = native_inventory.report(source, [case for _, case in subset])
+        rows = verified["original_source_marker_native_run_sha256_and_metadata_only_cases"]
+        by_identity = {
+            (row["source_line"], row["original_full_reference_sha256"],
+             row["original_body_sha256"]): row
+            for row in rows
+        }
+        if (len(rows) != len(subset) or len(by_identity) != len(rows)
+                or verified["source_marker_case_count"] != len(subset)):
+            raise PilotError("Native and original bounded batch did not reconcile")
+        for start, case in subset:
+            identity = (
+                case["original_source_line"], case["original_full_reference_sha256"],
+                case["original_body_sha256"],
+            )
+            row = by_identity.get(identity)
+            if row is None or row["selected_native_raw_sha256"] != case.get(
+                    "stock_raw_sha256"):
+                raise PilotError("Source-longer original K raw did not match pinned slot")
+            book = start.split(".", 1)[0]
+            extends = (
+                row["native_raw_run_K_keys_before_original_range_start"] > 0
+                or row["native_raw_run_K_keys_after_original_range_end"] > 0
+                or row["native_K_run_has_keys_in_another_chapter_same_book"]
+            )
+            if row[
+                    "native_raw_run_occupied_K_keys_equal_occupied_K_keys_within_declared_original_range"]:
+                klass = "same_occupied_K_extent_as_original_declared_source_range"
+            elif extends:
+                klass = "native_shared_raw_K_extent_exceeds_original_declared_range"
+            elif row["original_declared_range_native_K_other_raw_count"] > 0:
+                klass = "original_declared_range_contains_distinct_native_K_raw"
+            else:
+                klass = "native_and_source_extents_differ_without_known_direction"
+            counters[klass] += 1
+            by_book[book] += 1
+            book_classes[book][klass] += 1
+            boundary = row["original_source_marker_boundary"]
+            if not isinstance(boundary, dict):
+                raise PilotError("Original scripCom neighbor boundary missing")
+            following = boundary.get("immediately_following_sibling_after_source_body_tag")
+            if (not isinstance(following, str)
+                    or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_-]{0,63}", following)):
+                raise PilotError("Unreviewed actual authorial sibling tag")
+            sibling_tags[following] += 1
+            proof_rows.append({
+                "source_book": book,
+                "original_source_line": identity[0],
+                "original_full_reference_sha256": identity[1],
+                "original_body_sha256": identity[2],
+                "selected_original_native_raw_sha256": case["stock_raw_sha256"],
+                "original_start_key_sha256": sha256(start.encode("utf-8")).hexdigest(),
+                "source_to_native_occupied_range_class": klass,
+                "declared_source_range_native_occupied_K_count":
+                    row["original_declared_range_native_occupied_K_key_count"],
+                "original_range_native_K_with_different_raw_count":
+                    row["original_declared_range_native_K_other_raw_count"],
+                "same_raw_contiguous_occupied_native_K_run_size":
+                    row["native_K_consecutive_occupied_key_run_length"],
+                "other_source_annotations_starting_in_same_native_K_run":
+                    row["actual_source_annotations_starting_at_K_keys_inside_same_native_raw_run"],
+                "source_division_immediate_child_tag_counts":
+                    boundary["source_body_direct_child_tag_counts"],
+                "next_original_source_sibling_tag": following,
+                "different_editions_not_equated": True,
+                "original_or_native_text_unchanged": True,
+            })
+    expected = len(selected_cases)
+    if (sum(counters.values()) != expected or
+            sum(by_book.values()) != expected or
+            sum(sibling_tags.values()) != expected or
+            len(proof_rows) != expected or
+            any(sum(v.values()) != by_book[book] for book, v in book_classes.items())):
+        raise PilotError("Source-longer original/native run relationship audit incomplete")
+    proof_rows.sort(key=lambda x: (
+        x["source_book"], x["original_source_line"],
+        x["original_full_reference_sha256"]))
+    return {
+        "status": "SOURCE_LONGER_SAME_START_NATIVE_K_SCOPE_RESEARCH_ONLY",
+        "source_longer_same_start_cases": expected,
+        "original_book_case_counts": dict(sorted(by_book.items())),
+        "original_book_native_run_scope_classes": {
+            k: dict(sorted(v.items())) for k, v in sorted(book_classes.items())
+        },
+        "native_run_vs_source_declared_scope_classes": dict(sorted(counters.items())),
+        "original_source_body_next_sibling_tag_classes": dict(sorted(sibling_tags.items())),
+        "all_original_source_longer_cases_have_exact_native_K_SHA_attestation": True,
+        "all_original_source_longer_cases_reviewed_without_sampling": True,
+        "original_source_native_K_run_bounded_sha_only_rows": proof_rows,
+        "same_start_prose_difference_not_equivalent_to_missing_authored_text": True,
+        "original_source_or_stock_binary_modified": False,
+        "original_edition_or_section_layout_parity_proven": False,
+        "published": False,
+    }

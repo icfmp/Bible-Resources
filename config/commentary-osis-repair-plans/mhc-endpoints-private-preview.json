@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "status": "RESEARCH_ONLY_PRIVATE_MILESTONE_CORRECTIONS",
+  "source_sha256": "ded53fe37e83609790433a01b2dabf0ea3a13e929bd3bded39262ce4a5b24016",
+  "source": "MHC authored CrossWire OSIS, after independent 11 empty-style leaf removals; private only",
+  "source_witness_readme": "sources/cleaned/mhc/CLEANUP_STATUS.md",
+  "independent_prior_evidence": "https://github.com/icfmp/Bible-Resources/issues/289",
+  "edits": [
+    {
+      "old_sid": "Prov.31.10-33",
+      "new_end_verse": 31,
+      "original_line": 50701,
+      "source_witness": "https://www.biblegateway.com/resources/matthew-henry/Prov.31.1-Prov.31.31"
+    },
+    {
+      "old_sid": "Isa.7.17-28",
+      "new_end_verse": 25,
+      "original_line": 53493,
+      "source_witness": "https://www.biblegateway.com/resources/matthew-henry/Isa.7.1-Isa.7.25"
+    },
+    {
+      "old_sid": "Acts.26.24-44",
+      "new_end_verse": 32,
+      "original_line": 100757,
+      "source_witness": "https://www.biblegateway.com/resources/matthew-henry/Acts"
+    }
+  ],
+  "authorial_text_changed": false,
+  "remaining_duplicate_verse_ownership_groups": 7,
+  "publication_approved": false
+}

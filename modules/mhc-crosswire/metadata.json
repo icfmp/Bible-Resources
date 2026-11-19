@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "id": "mhc-crosswire",
+  "canonical_edition_id": "matthew-henry-complete-crosswire-2.2",
+  "sword_id": "MHC",
+  "title": {
+    "en": "Matthew Henry's Complete Commentary on the Whole Bible",
+    "fr": "Commentaire complet de Matthew Henry sur toute la Bible"
+  },
+  "category": "commentary",
+  "language": "en",
+  "version": "0.1.0",
+  "versification": "KJV",
+  "origin": {
+    "publisher": "CrossWire / SWORD Project",
+    "url": "https://www.crosswire.org/sword/modules/ModInfo.jsp?modName=MHC",
+    "source_revision": "Official MHC 2.2 (2022-08-29); authoring OSIS Git commit 537591a94c991941877b47a06666b6a7812e05d8"
+  },
+  "rights": {
+    "license": "Public Domain",
+    "evidence_url": "https://www.crosswire.org/sword/modules/ModInfo.jsp?modName=MHC",
+    "redistribution_allowed": true,
+    "derivatives_allowed": true,
+    "reviewed_by": "Bible Resources project owner — 2026-11-19; accepts CrossWire MHC 2.2 Public Domain / Copy Freely declaration and preserves CrossWire, CCEL, Logos attribution"
+  },
+  "quality": {
+    "status": "approved",
+    "edition": "faithful",
+    "smoke_key": "Gen 1:1",
+    "reviewed_by": "Bible Resources project owner — 2026-11-19 final complete MHC publication requested; Romans 4 whole-verse indexing and 2 Chronicles introduction editorially reviewed; 25 source-attested cross-reference target corrections"
+  },
+  "upstreams": [
+    {
+      "provider": "crosswire",
+      "module_id": "MHC",
+      "last_integrated_version": "2.2"
+    }
+  ],
+  "index_audit": {
+    "mode": "reviewed_osis_commentary_rebuild",
+    "manifest": "config/commentary-rebuilds/mhc-crosswire.json"
+  }
+}

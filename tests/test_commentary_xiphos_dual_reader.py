@@ -296,6 +296,105 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
         self.assertEqual(len(pointer), 2)
         self.assertTrue(all("--sync" not in command for command in pointer))
 
+    def test_chapter_intro_witness_requires_distinct_original_intro_prose(self):
+        # Different independently received streams model source-born chapter I
+        # and following verse K; a verse-only copy can never prove I was shown.
+        verse = " ".join("expositionword%03d" % i for i in range(120)).encode()
+        intro = " ".join("prefaceword%03d" % i for i in range(120)).encode()
+        scripture = b"independent test Bible verse only"
+        probe = {"2Chr 1:1": {
+            "commentary": verse,
+            "bible": scripture,
+            "commentary_internal": b"<div/>",
+            "intro_expected": intro,
+        }}
+
+        def observe(copied):
+            with patch("commentary_xiphos_dual_reader._main_xiphos_window",
+                       return_value="101"), \
+                 patch("commentary_xiphos_dual_reader._commentary_pane_focus_points",
+                       return_value=((960, 320),)), \
+                 patch("commentary_xiphos_dual_reader._seed_x11_clipboard"), \
+                 patch("commentary_xiphos_dual_reader._optional_real_rich_xiphos_selection",
+                       return_value=None), \
+                 patch("commentary_xiphos_dual_reader.time.sleep"), \
+                 patch("commentary_xiphos_dual_reader._x11", return_value=copied):
+                return attempt_real_xiphos_passage_copy(
+                    {"DISPLAY": ":91", "GDK_BACKEND": "x11"}, probe)
+
+        verse_only = observe(verse)
+        self.assertTrue(verse_only["commentary_clipboard_match_by_passage"]["2Chr 1:1"])
+        self.assertFalse(verse_only["chapter_intro_prose_clipboard_match_by_passage"]
+                         ["2Chr 1:1"])
+        self.assertEqual(verse_only["bounded_right_commentary_pane_focus_attempts_by_passage"]
+                         ["2Chr 1:1"], 2)
+        with_intro = observe(verse + b" " + intro)
+        self.assertTrue(with_intro["commentary_clipboard_match_by_passage"]["2Chr 1:1"])
+        self.assertTrue(with_intro["chapter_intro_prose_clipboard_match_by_passage"]
+                        ["2Chr 1:1"])
+        self.assertEqual(with_intro["bounded_right_commentary_pane_focus_attempts_by_passage"]
+                         ["2Chr 1:1"], 1)
+
+    def test_inconclusive_gui_copy_is_bounded_and_does_not_invent_prose(self):
+        from commentary_xiphos_dual_reader import attempt_real_xiphos_passage_copy
+        probes={"Isa 63:1":{
+            "commentary":b"confirmed real original commentary "+b"longword "*100,
+            "bible":b"distinct original Bible verse.",
+            "commentary_internal":b'<reference osisRef="Ps.60">Psalm title</reference>',
+        }}
+        with patch("commentary_xiphos_dual_reader._main_xiphos_window",
+                   return_value="101"), \
+             patch("commentary_xiphos_dual_reader._commentary_pane_focus_points",
+                   return_value=((970,320),(1050,500))), \
+             patch("commentary_xiphos_dual_reader._seed_x11_clipboard"), \
+             patch("commentary_xiphos_dual_reader.time.sleep"), \
+             patch("commentary_xiphos_dual_reader._x11",return_value=b"stale or unrelated"):
+            result=attempt_real_xiphos_passage_copy(
+                {"DISPLAY":":91","GDK_BACKEND":"x11"},probes)
+        self.assertTrue(result["actual_passage_commands_accepted"])
+        self.assertEqual(result["independent_gui_commentary_excerpt_match_count"],0)
+        self.assertFalse(result["commentary_clipboard_match_by_passage"]["Isa 63:1"])
+        self.assertEqual(
+            result["bounded_right_commentary_pane_focus_attempts_by_passage"]["Isa 63:1"],
+            4)
+        self.assertFalse(result["real_markup_rendering_observation_by_passage"]
+                         ["Isa 63:1"]["xiphos_link_click_target_and_navigation_verified"])
+
+    @patch("commentary_xiphos_dual_reader.time.sleep")
+    @patch("commentary_xiphos_dual_reader._main_xiphos_window")
+    @patch("commentary_xiphos_dual_reader._x11")
+    def test_transient_real_xiphos_focus_failure_recovers_only_with_real_window(
+            self, x11, main_window, sleep):
+        from commentary_xiphos_dual_reader import _focus_real_xiphos_main_window
+        x11.side_effect=[PilotError("transient X11 change"),b""]
+        main_window.return_value="202"
+        target=_focus_real_xiphos_main_window(
+            {"DISPLAY":":91","GDK_BACKEND":"x11"},"101")
+        self.assertEqual(target,"202")
+        self.assertEqual([call.args[0] for call in x11.call_args_list],[
+            ["xdotool","windowfocus","101"],
+            ["xdotool","windowfocus","202"],
+        ])
+        self.assertTrue(all("--sync" not in c.args[0] for c in x11.call_args_list))
+        main_window.assert_called_once()
+
+    @patch("commentary_xiphos_dual_reader.time.sleep")
+    @patch("commentary_xiphos_dual_reader._main_xiphos_window")
+    @patch("commentary_xiphos_dual_reader._x11")
+    def test_no_real_window_after_focus_failure_does_not_claim_rendering(
+            self, x11, main_window, sleep):
+        from commentary_xiphos_dual_reader import _focus_real_xiphos_main_window
+        x11.side_effect=PilotError("X11 unavailable")
+        main_window.return_value=None
+        with self.assertRaisesRegex(PilotError,"disappeared"):
+            _focus_real_xiphos_main_window(
+                {"DISPLAY":":91","GDK_BACKEND":"x11"},"101")
+        self.assertEqual(x11.call_count,1)
+        main_window.assert_called_once()
+        with self.assertRaisesRegex(PilotError,"Unreviewed"):
+            _focus_real_xiphos_main_window(
+                {"DISPLAY":":91","GDK_BACKEND":"wayland"},"101")
+
     def test_actual_source_heading_and_rich_html_are_measured_without_leaking_text(self):
         from commentary_xiphos_dual_reader import _markup_display_witness
         original = (
@@ -312,11 +411,41 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
         self.assertEqual(report["original_stock_nontrivial_reference_labels_found"], 1)
         self.assertEqual(report["source_reference_labels_observed_as_real_gui_HTML_anchors"], 1)
         self.assertEqual(report["exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations"], 1)
+        self.assertEqual(report["exact_matching_source_target_sha256_in_real_gui_HTML"],
+                         [sha256(b"Gen.2.1").hexdigest()])
         self.assertEqual(report["exact_original_titles_in_copied_gui_rich_html"], 1)
         self.assertEqual(report["real_gui_rich_html_anchor_elements_found"], 1)
         self.assertFalse(report["xiphos_link_click_target_and_navigation_verified"])
         self.assertNotIn("The first creation", str(report))
         self.assertNotIn("Gen.2.1", str(report))
+
+    def test_compound_reference_reports_independent_exact_label_components(self):
+        from commentary_xiphos_dual_reader import _markup_display_witness
+        old=b'<reference osisRef="Ps.60 2Sam.8.13 2Sam.8.14">Psalm 60 title; 2 Samuel 8:13-14</reference>'
+        label=b"Psalm 60 title; 2 Samuel 8:13-14"
+        target=b"Ps.60 2Sam.8.13 2Sam.8.14"
+        digest=sha256(target).hexdigest()
+        for href,count in (
+                (b"sword://Bible/Ps.60",1),
+                (b"sword://Bible/Ps.60%202Sam.8.13",2),
+                (b"sword://Bible/Ps.60%202Sam.8.13%202Sam.8.14",3)):
+            with self.subTest(components=count):
+                rendered=b'<a href="'+href+b'">'+label+b'</a>'
+                report=_markup_display_witness(old,label,rendered)
+                self.assertTrue(report["real_gui_rich_html_selection_available"])
+                self.assertEqual(
+                    report["composite_target_href_progress_by_sha256"][digest]
+                    ["components_found_in_one_same_label_real_GUI_href"],count)
+                self.assertEqual(
+                    report["composite_target_href_progress_by_sha256"][digest]
+                    ["all_components_found_in_one_GUI_href"], count==3)
+        # The same URI without matching displayed citation label proves nothing.
+        forged=b'<a href="sword://Bible/Ps.60%202Sam.8.13%202Sam.8.14">unrelated</a>'
+        report=_markup_display_witness(old,label,forged)
+        self.assertFalse(report["composite_target_href_progress_by_sha256"][digest]
+                         ["source_label_is_an_actual_GUI_anchor"])
+        self.assertEqual(report["composite_target_href_progress_by_sha256"][digest]
+                         ["components_found_in_one_same_label_real_GUI_href"],0)
 
     def test_no_rich_clipboard_or_wrong_heading_never_counts_as_gui_markup(self):
         from commentary_xiphos_dual_reader import _markup_display_witness
@@ -338,6 +467,7 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
         self.assertEqual(result["real_gui_rich_html_anchor_elements_found"],1)
         self.assertEqual(result["source_reference_labels_observed_as_real_gui_HTML_anchors"],0)
         self.assertEqual(result["exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations"],0)
+        self.assertEqual(result["exact_matching_source_target_sha256_in_real_gui_HTML"],[])
         self.assertFalse(result["xiphos_link_click_target_and_navigation_verified"])
 
     def test_lookalike_reference_target_does_not_match_different_original_osisref(self):

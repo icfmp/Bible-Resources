@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "status": "RESEARCH_ONLY_UNAPPROVED_REFERENCE_CANDIDATES",
+  "resource_id": "mhc-crosswire",
+  "source_volume": 6,
+  "source_xml_sha256": "296195d09d4fbb1e7516ea77c100dbc87ce37542c3109f9f570c3cf155b594c1",
+  "stock_raw_corpus_sha256": "2c4fe82710165202fdec300ca9636a150a9998f19c7b19ee4e81db5a6b75f5b5",
+  "note": "Unapproved original out-of-range reference endpoint; original source/stock words unchanged. Issue #289.",
+  "candidate_ranges": [
+    {
+      "original_work_qualified_reference": "Bible:Acts.26.24-Acts.26.44",
+      "proposed_osis_reference": "Acts.26.24-Acts.26.32"
+    }
+  ]
+}

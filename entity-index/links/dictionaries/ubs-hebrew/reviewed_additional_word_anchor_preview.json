@@ -1,0 +1,1223 @@
+{
+  "format": "bsi-ubs-wlc-additional-reviewed-word-headword-overlay",
+  "schema_version": 1,
+  "source_editions": {
+    "macula_revision": "47db250bd55d0d8577f2a94fba114ef16c35b23c",
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8"
+  },
+  "policy": "Individually reviewed exact WLC word IDs only; headword entry-only, zero contextual sense IDs, no family-wide or original source changes",
+  "summary": {
+    "new_individually_approved_original_words": 134,
+    "source_words_preserved_unlinked_as_uncertain": 1,
+    "combined_staged_original_wlc_words": 273,
+    "new_contextual_sense_ids": 0
+  },
+  "by_macula_word": {
+    "o060130200032": {
+      "entry_id": "000731000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אָשֵׁד",
+      "strong": "0798",
+      "lang": "H",
+      "original_sdbh": "000732001001000",
+      "reference": "JOS 13:20!3"
+    },
+    "o150040230121": {
+      "entry_id": "006757000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "רְחוּם",
+      "strong": "7348a",
+      "lang": "A",
+      "original_sdbh": "006752001005000",
+      "reference": "EZR 4:23!12"
+    },
+    "o150050170181": {
+      "entry_id": "003271000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "כּוֹרֶשׁ",
+      "strong": "3567",
+      "lang": "A",
+      "original_sdbh": "003268001001000",
+      "reference": "EZR 5:17!18"
+    },
+    "o150060030032": {
+      "entry_id": "003271000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "כּוֹרֶשׁ",
+      "strong": "3567",
+      "lang": "A",
+      "original_sdbh": "003268001001000",
+      "reference": "EZR 6:3!3"
+    },
+    "o150060030051": {
+      "entry_id": "003271000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "כּוֹרֶשׁ",
+      "strong": "3567",
+      "lang": "A",
+      "original_sdbh": "003268001001000",
+      "reference": "EZR 6:3!5"
+    },
+    "o150060090222": {
+      "entry_id": "002858000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "יוֹם",
+      "strong": "3118",
+      "lang": "A",
+      "original_sdbh": "002854001002000",
+      "reference": "EZR 6:9!22"
+    },
+    "o150060140191": {
+      "entry_id": "003271000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "כּוֹרֶשׁ",
+      "strong": "3567",
+      "lang": "A",
+      "original_sdbh": "003268001001000",
+      "reference": "EZR 6:14!19"
+    },
+    "o150060140212": {
+      "entry_id": "000721000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אַרְתַּחְשַׁשְׂתְּא",
+      "strong": "0783a",
+      "lang": "A",
+      "original_sdbh": "000722001001000",
+      "reference": "EZR 6:14!21"
+    },
+    "o150060150051": {
+      "entry_id": "002858000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "יוֹם",
+      "strong": "3118",
+      "lang": "A",
+      "original_sdbh": "002854001002000",
+      "reference": "EZR 6:15!5"
+    },
+    "o150060160031": {
+      "entry_id": "003192000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "יִשְׂרָאֵל",
+      "strong": "3479",
+      "lang": "A",
+      "original_sdbh": "003188001001000",
+      "reference": "EZR 6:16!3"
+    },
+    "o150060170191": {
+      "entry_id": "003192000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "יִשְׂרָאֵל",
+      "strong": "3479",
+      "lang": "A",
+      "original_sdbh": "003188001001000",
+      "reference": "EZR 6:17!19"
+    },
+    "o150060170241": {
+      "entry_id": "003192000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "יִשְׂרָאֵל",
+      "strong": "3479",
+      "lang": "A",
+      "original_sdbh": "003188001001000",
+      "reference": "EZR 6:17!24"
+    },
+    "o150070120011": {
+      "entry_id": "000721000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אַרְתַּחְשַׁשְׂתְּא",
+      "strong": "0783a",
+      "lang": "A",
+      "original_sdbh": "000722001001000",
+      "reference": "EZR 7:12!1"
+    },
+    "o150070130101": {
+      "entry_id": "003192000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "יִשְׂרָאֵל",
+      "strong": "3479",
+      "lang": "A",
+      "original_sdbh": "003188001001000",
+      "reference": "EZR 7:13!10"
+    },
+    "o150070150091": {
+      "entry_id": "003192000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "יִשְׂרָאֵל",
+      "strong": "3479",
+      "lang": "A",
+      "original_sdbh": "003188001001000",
+      "reference": "EZR 7:15!9"
+    },
+    "o150070210031": {
+      "entry_id": "000721000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אַרְתַּחְשַׁשְׂתְּא",
+      "strong": "0783a",
+      "lang": "A",
+      "original_sdbh": "000722001001000",
+      "reference": "EZR 7:21!3"
+    },
+    "o190430050021": {
+      "entry_id": "007289000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "שׁיח",
+      "strong": "7817a",
+      "lang": "H",
+      "original_sdbh": "",
+      "reference": "PSA 43:5!2"
+    },
+    "o190440260021": {
+      "entry_id": "007289000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "שׁיח",
+      "strong": "7817a",
+      "lang": "H",
+      "original_sdbh": "007237001001000",
+      "reference": "PSA 44:26!2"
+    },
+    "o200120090021": {
+      "entry_id": "006479000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "קָלָה",
+      "strong": "7034",
+      "lang": "H",
+      "original_sdbh": "006473002001000",
+      "reference": "PRO 12:9!2"
+    },
+    "o230030050103": {
+      "entry_id": "006479000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "קָלָה",
+      "strong": "7034",
+      "lang": "H",
+      "original_sdbh": "006473002001000",
+      "reference": "ISA 3:5!10"
+    },
+    "o230160140092": {
+      "entry_id": "006479000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "קָלָה",
+      "strong": "7034",
+      "lang": "H",
+      "original_sdbh": "006473002001000",
+      "reference": "ISA 16:14!9"
+    },
+    "o240020200061": {
+      "entry_id": "003792000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "מֹוסֵרָה",
+      "strong": "4147a",
+      "lang": "H",
+      "original_sdbh": "003789001001000",
+      "reference": "JER 2:20!6"
+    },
+    "o240050050201": {
+      "entry_id": "003792000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "מֹוסֵרָה",
+      "strong": "4147a",
+      "lang": "H",
+      "original_sdbh": "003789001001000",
+      "reference": "JER 5:5!20"
+    },
+    "o240240090032": {
+      "entry_id": "001954000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "זַעֲוָה",
+      "strong": "2189",
+      "lang": "H",
+      "original_sdbh": "001952001001000",
+      "reference": "JER 24:9!3"
+    },
+    "o240270020071": {
+      "entry_id": "003792000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "מֹוסֵרָה",
+      "strong": "4147a",
+      "lang": "H",
+      "original_sdbh": "003789001001000",
+      "reference": "JER 27:2!7"
+    },
+    "o240290180082": {
+      "entry_id": "001954000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "זַעֲוָה",
+      "strong": "2189",
+      "lang": "H",
+      "original_sdbh": "001952001001000",
+      "reference": "JER 29:18!8"
+    },
+    "o240300080112": {
+      "entry_id": "003792000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "מֹוסֵרָה",
+      "strong": "4147a",
+      "lang": "H",
+      "original_sdbh": "003789001001000",
+      "reference": "JER 30:8!11"
+    },
+    "o240340170302": {
+      "entry_id": "001954000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "זַעֲוָה",
+      "strong": "2189",
+      "lang": "H",
+      "original_sdbh": "001952001001000",
+      "reference": "JER 34:17!30"
+    },
+    "o260230460112": {
+      "entry_id": "001954000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "זַעֲוָה",
+      "strong": "2189",
+      "lang": "H",
+      "original_sdbh": "001952001001000",
+      "reference": "EZK 23:46!11"
+    },
+    "o270020160012": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 2:16!1"
+    },
+    "o270020170021": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 2:17!2"
+    },
+    "o270020180131": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 2:18!13"
+    },
+    "o270020190022": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 2:19!2"
+    },
+    "o270020190091": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 2:19!9"
+    },
+    "o270020200021": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 2:20!2"
+    },
+    "o270020240041": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 2:24!4"
+    },
+    "o270020240071": {
+      "entry_id": "000682000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֲרְיוֹךְ",
+      "strong": "0746a",
+      "lang": "A",
+      "original_sdbh": "000683001002000",
+      "reference": "DAN 2:24!7"
+    },
+    "o270020250021": {
+      "entry_id": "000682000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֲרְיוֹךְ",
+      "strong": "0746a",
+      "lang": "A",
+      "original_sdbh": "000683001002000",
+      "reference": "DAN 2:25!2"
+    },
+    "o270020250052": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 2:25!5"
+    },
+    "o270020250181": {
+      "entry_id": "002822000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "יְהוּד",
+      "strong": "3061",
+      "lang": "A",
+      "original_sdbh": "002818001002000",
+      "reference": "DAN 2:25!18"
+    },
+    "o270020260042": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 2:26!4"
+    },
+    "o270020270021": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 2:27!2"
+    },
+    "o270020280141": {
+      "entry_id": "002858000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "יוֹם",
+      "strong": "3118",
+      "lang": "A",
+      "original_sdbh": "002854001006000",
+      "reference": "DAN 2:28!14"
+    },
+    "o270020380061": {
+      "entry_id": "000553000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֱנָשׁ",
+      "strong": "0606",
+      "lang": "A",
+      "original_sdbh": "000554001001000",
+      "reference": "DAN 2:38!6"
+    },
+    "o270020430111": {
+      "entry_id": "000553000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֱנָשׁ",
+      "strong": "0606",
+      "lang": "A",
+      "original_sdbh": "000554001001000",
+      "reference": "DAN 2:43!11"
+    },
+    "o270020440013": {
+      "entry_id": "002858000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "יוֹם",
+      "strong": "3118",
+      "lang": "A",
+      "original_sdbh": "002854001003000",
+      "reference": "DAN 2:44!1"
+    },
+    "o270020460073": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 2:46!7"
+    },
+    "o270020470032": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 2:47!3"
+    },
+    "o270020480032": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 2:48!3"
+    },
+    "o270020490012": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 2:49!1"
+    },
+    "o270020490152": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 2:49!15"
+    },
+    "o270030100081": {
+      "entry_id": "000553000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֱנָשׁ",
+      "strong": "0606",
+      "lang": "A",
+      "original_sdbh": "000554001001000",
+      "reference": "DAN 3:10!8"
+    },
+    "o270040050051": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 4:5!5"
+    },
+    "o270040130041": {
+      "entry_id": "000553000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֱנָשׁ",
+      "strong": "0606",
+      "lang": "A",
+      "original_sdbh": "000554001001000",
+      "reference": "DAN 4:13!4"
+    },
+    "o270040140181": {
+      "entry_id": "000553000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֱנָשׁ",
+      "strong": "0606",
+      "lang": "A",
+      "original_sdbh": "000554001001000",
+      "reference": "DAN 4:14!18"
+    },
+    "o270040140241": {
+      "entry_id": "000553000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֱנָשׁ",
+      "strong": "0606",
+      "lang": "A",
+      "original_sdbh": "000554001001000",
+      "reference": "DAN 4:14!24"
+    },
+    "o270040160021": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 4:16!2"
+    },
+    "o270040220041": {
+      "entry_id": "000553000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֱנָשׁ",
+      "strong": "0606",
+      "lang": "A",
+      "original_sdbh": "000554001001000",
+      "reference": "DAN 4:22!4"
+    },
+    "o270040220112": {
+      "entry_id": "007759000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "תּוֹר",
+      "strong": "8450",
+      "lang": "A",
+      "original_sdbh": "007754005001000",
+      "reference": "DAN 4:22!11"
+    },
+    "o270040220291": {
+      "entry_id": "000553000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֱנָשׁ",
+      "strong": "0606",
+      "lang": "A",
+      "original_sdbh": "000554001001000",
+      "reference": "DAN 4:22!29"
+    },
+    "o270040290021": {
+      "entry_id": "000553000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֱנָשׁ",
+      "strong": "0606",
+      "lang": "A",
+      "original_sdbh": "000554001001000",
+      "reference": "DAN 4:29!2"
+    },
+    "o270040290102": {
+      "entry_id": "007759000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "תּוֹר",
+      "strong": "8450",
+      "lang": "A",
+      "original_sdbh": "007754005001000",
+      "reference": "DAN 4:29!10"
+    },
+    "o270040290251": {
+      "entry_id": "000553000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֱנָשׁ",
+      "strong": "0606",
+      "lang": "A",
+      "original_sdbh": "000554001001000",
+      "reference": "DAN 4:29!25"
+    },
+    "o270040300081": {
+      "entry_id": "000553000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֱנָשׁ",
+      "strong": "0606",
+      "lang": "A",
+      "original_sdbh": "000554001001000",
+      "reference": "DAN 4:30!8"
+    },
+    "o270040300102": {
+      "entry_id": "005704000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "עֲשַׂב",
+      "strong": "6212a",
+      "lang": "A",
+      "original_sdbh": "",
+      "reference": "DAN 4:30!10"
+    },
+    "o270040300112": {
+      "entry_id": "007759000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "תּוֹר",
+      "strong": "8450",
+      "lang": "A",
+      "original_sdbh": "007754005001000",
+      "reference": "DAN 4:30!11"
+    },
+    "o270040310021": {
+      "entry_id": "002858000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "יוֹם",
+      "strong": "3118",
+      "lang": "A",
+      "original_sdbh": "002854001003000",
+      "reference": "DAN 4:31!2"
+    },
+    "o270050050081": {
+      "entry_id": "000553000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֱנָשׁ",
+      "strong": "0606",
+      "lang": "A",
+      "original_sdbh": "000554001001000",
+      "reference": "DAN 5:5!8"
+    },
+    "o270050070161": {
+      "entry_id": "000553000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֱנָשׁ",
+      "strong": "0606",
+      "lang": "A",
+      "original_sdbh": "000554001001000",
+      "reference": "DAN 5:7!16"
+    },
+    "o270050110093": {
+      "entry_id": "002858000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "יוֹם",
+      "strong": "3118",
+      "lang": "A",
+      "original_sdbh": "002854001003000",
+      "reference": "DAN 5:11!9"
+    },
+    "o270050120162": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 5:12!16"
+    },
+    "o270050120231": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 5:12!23"
+    },
+    "o270050130021": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 5:13!2"
+    },
+    "o270050130092": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 5:13!9"
+    },
+    "o270050130131": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 5:13!13"
+    },
+    "o270050130191": {
+      "entry_id": "002822000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "יְהוּד",
+      "strong": "3061",
+      "lang": "A",
+      "original_sdbh": "002818001002000",
+      "reference": "DAN 5:13!19"
+    },
+    "o270050130251": {
+      "entry_id": "002822000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "יְהוּד",
+      "strong": "3061",
+      "lang": "A",
+      "original_sdbh": "002818001002000",
+      "reference": "DAN 5:13!25"
+    },
+    "o270050170031": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 5:17!3"
+    },
+    "o270050210031": {
+      "entry_id": "000553000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֱנָשׁ",
+      "strong": "0606",
+      "lang": "A",
+      "original_sdbh": "000554001001000",
+      "reference": "DAN 5:21!3"
+    },
+    "o270050210131": {
+      "entry_id": "005704000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "עֲשַׂב",
+      "strong": "6212a",
+      "lang": "A",
+      "original_sdbh": "",
+      "reference": "DAN 5:21!13"
+    },
+    "o270050210142": {
+      "entry_id": "007759000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "תּוֹר",
+      "strong": "8450",
+      "lang": "A",
+      "original_sdbh": "007754005001000",
+      "reference": "DAN 5:21!14"
+    },
+    "o270050210291": {
+      "entry_id": "000553000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֱנָשׁ",
+      "strong": "0606",
+      "lang": "A",
+      "original_sdbh": "000554001001000",
+      "reference": "DAN 5:21!29"
+    },
+    "o270050220041": {
+      "entry_id": "001033000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "בֵּלְשַׁאצַּר",
+      "strong": "1113",
+      "lang": "A",
+      "original_sdbh": "001033001001000",
+      "reference": "DAN 5:22!4"
+    },
+    "o270050290031": {
+      "entry_id": "001033000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "בֵּלְשַׁאצַּר",
+      "strong": "1113",
+      "lang": "A",
+      "original_sdbh": "001033001001000",
+      "reference": "DAN 5:29!3"
+    },
+    "o270050290052": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 5:29!5"
+    },
+    "o270050300041": {
+      "entry_id": "001033000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "בֵּלְשַׁאצַּר",
+      "strong": "1113",
+      "lang": "A",
+      "original_sdbh": "001033001001000",
+      "reference": "DAN 5:30!4"
+    },
+    "o270060030061": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 6:3!6"
+    },
+    "o270060040021": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 6:4!2"
+    },
+    "o270060050082": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 6:5!8"
+    },
+    "o270060060082": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 6:6!8"
+    },
+    "o270060080222": {
+      "entry_id": "000553000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֱנָשׁ",
+      "strong": "0606",
+      "lang": "A",
+      "original_sdbh": "000554001001000",
+      "reference": "DAN 6:8!22"
+    },
+    "o270060080241": {
+      "entry_id": "002858000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "יוֹם",
+      "strong": "3118",
+      "lang": "A",
+      "original_sdbh": "002854001002000",
+      "reference": "DAN 6:8!24"
+    },
+    "o270060090111": {
+      "entry_id": "003731000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "מָדַי",
+      "strong": "4076",
+      "lang": "A",
+      "original_sdbh": "003727001002000",
+      "reference": "DAN 6:9!11"
+    },
+    "o270060110012": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 6:11!1"
+    },
+    "o270060110172": {
+      "entry_id": "002858000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "יוֹם",
+      "strong": "3118",
+      "lang": "A",
+      "original_sdbh": "002854001002000",
+      "reference": "DAN 6:11!17"
+    },
+    "o270060120062": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 6:12!6"
+    },
+    "o270060130141": {
+      "entry_id": "000553000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֱנָשׁ",
+      "strong": "0606",
+      "lang": "A",
+      "original_sdbh": "000554001001000",
+      "reference": "DAN 6:13!14"
+    },
+    "o270060130202": {
+      "entry_id": "000553000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֱנָשׁ",
+      "strong": "0606",
+      "lang": "A",
+      "original_sdbh": "000554001001000",
+      "reference": "DAN 6:13!20"
+    },
+    "o270060130221": {
+      "entry_id": "002858000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "יוֹם",
+      "strong": "3118",
+      "lang": "A",
+      "original_sdbh": "002854001002000",
+      "reference": "DAN 6:13!22"
+    },
+    "o270060130361": {
+      "entry_id": "003731000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "מָדַי",
+      "strong": "4076",
+      "lang": "A",
+      "original_sdbh": "003727001002000",
+      "reference": "DAN 6:13!36"
+    },
+    "o270060140071": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 6:14!7"
+    },
+    "o270060140131": {
+      "entry_id": "002822000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "יְהוּד",
+      "strong": "3061",
+      "lang": "A",
+      "original_sdbh": "002818001002000",
+      "reference": "DAN 6:14!13"
+    },
+    "o270060140262": {
+      "entry_id": "002858000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "יוֹם",
+      "strong": "3118",
+      "lang": "A",
+      "original_sdbh": "002854001002000",
+      "reference": "DAN 6:14!26"
+    },
+    "o270060150101": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 6:15!10"
+    },
+    "o270060160132": {
+      "entry_id": "003731000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "מָדַי",
+      "strong": "4076",
+      "lang": "A",
+      "original_sdbh": "003727001002000",
+      "reference": "DAN 6:16!13"
+    },
+    "o270060170052": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 6:17!5"
+    },
+    "o270060170132": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 6:17!13"
+    },
+    "o270060180172": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 6:18!17"
+    },
+    "o270060210032": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 6:21!3"
+    },
+    "o270060210102": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 6:21!10"
+    },
+    "o270060210111": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 6:21!11"
+    },
+    "o270060220021": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 6:22!2"
+    },
+    "o270060240063": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 6:24!6"
+    },
+    "o270060240121": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 6:24!12"
+    },
+    "o270060250101": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 6:25!10"
+    },
+    "o270060270171": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 6:27!17"
+    },
+    "o270060280102": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 6:28!10"
+    },
+    "o270060290012": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 6:29!1"
+    },
+    "o270060290071": {
+      "entry_id": "003271000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "כּוֹרֶשׁ",
+      "strong": "3567",
+      "lang": "A",
+      "original_sdbh": "003268001001000",
+      "reference": "DAN 6:29!7"
+    },
+    "o270070010032": {
+      "entry_id": "001033000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "בֵּלְשַׁאצַּר",
+      "strong": "1113",
+      "lang": "A",
+      "original_sdbh": "001033001001000",
+      "reference": "DAN 7:1!3"
+    },
+    "o270070010061": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 7:1!6"
+    },
+    "o270070020021": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 7:2!2"
+    },
+    "o270070040182": {
+      "entry_id": "000553000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֱנָשׁ",
+      "strong": "0606",
+      "lang": "A",
+      "original_sdbh": "000554001001000",
+      "reference": "DAN 7:4!18"
+    },
+    "o270070040211": {
+      "entry_id": "000553000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֱנָשׁ",
+      "strong": "0606",
+      "lang": "A",
+      "original_sdbh": "000554001001000",
+      "reference": "DAN 7:4!21"
+    },
+    "o270070080231": {
+      "entry_id": "000553000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֱנָשׁ",
+      "strong": "0606",
+      "lang": "A",
+      "original_sdbh": "000554001001000",
+      "reference": "DAN 7:8!23"
+    },
+    "o270070090081": {
+      "entry_id": "002858000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "יוֹם",
+      "strong": "3118",
+      "lang": "A",
+      "original_sdbh": "002854001022000",
+      "reference": "DAN 7:9!8"
+    },
+    "o270070130101": {
+      "entry_id": "000553000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "אֱנָשׁ",
+      "strong": "0606",
+      "lang": "A",
+      "original_sdbh": "000554001001000",
+      "reference": "DAN 7:13!10"
+    },
+    "o270070130151": {
+      "entry_id": "002858000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "יוֹם",
+      "strong": "3118",
+      "lang": "A",
+      "original_sdbh": "002854001022000",
+      "reference": "DAN 7:13!15"
+    },
+    "o270070150041": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 7:15!4"
+    },
+    "o270070200201": {
+      "entry_id": "004070000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "מְלַל",
+      "strong": "4449",
+      "lang": "A",
+      "original_sdbh": "004067002002000",
+      "reference": "DAN 7:20!20"
+    },
+    "o270070220051": {
+      "entry_id": "002858000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "יוֹם",
+      "strong": "3118",
+      "lang": "A",
+      "original_sdbh": "002854001022000",
+      "reference": "DAN 7:22!5"
+    },
+    "o270070250051": {
+      "entry_id": "004070000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "מְלַל",
+      "strong": "4449",
+      "lang": "A",
+      "original_sdbh": "004067002002000",
+      "reference": "DAN 7:25!5"
+    },
+    "o270070280071": {
+      "entry_id": "001695000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "דָּנִיֵּאל",
+      "strong": "1841",
+      "lang": "A",
+      "original_sdbh": "001695001004000",
+      "reference": "DAN 7:28!7"
+    },
+    "o340010130052": {
+      "entry_id": "003792000000000",
+      "match_type": "editorially_reviewed_original_wlc_headword_only",
+      "lemma": "מֹוסֵרָה",
+      "strong": "4147a",
+      "lang": "H",
+      "original_sdbh": "003789001001000",
+      "reference": "NAM 1:13!5"
+    }
+  }
+}

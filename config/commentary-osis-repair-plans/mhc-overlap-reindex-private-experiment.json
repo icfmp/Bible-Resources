@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "status": "RESEARCH_ONLY_PRIVATE_MILESTONE_CORRECTIONS",
+  "source_sha256": "dbf5aedadf7ef4f2f02ddedf8cc22de1ecc51b0b8ee2ece7c29acaf540a8d93c",
+  "source": "Private MHC candidate after 11 empty styling removals and 3 independently evidenced out-of-range endpoint repairs",
+  "purpose": "Experiment: trim only preceding group's shared last machine-verse assignment; keep every original word, note, reference, section body and raw byte outside 4 range-attribute values per group. Intended scope is not editorially approved.",
+  "evidence": "https://github.com/icfmp/Bible-Resources/actions/runs/44279489016",
+  "edits": [
+    {
+      "old_sid": "Ps.95.1-7",
+      "new_end_verse": 6,
+      "original_line": 41426,
+      "source_witness": "https://github.com/icfmp/Bible-Resources/actions/runs/44279489016"
+    },
+    {
+      "old_sid": "Rom.4.9-17",
+      "new_end_verse": 16,
+      "original_line": 101514,
+      "source_witness": "https://github.com/icfmp/Bible-Resources/actions/runs/44279489016"
+    },
+    {
+      "old_sid": "Rom.7.7-14",
+      "new_end_verse": 13,
+      "original_line": 101769,
+      "source_witness": "https://github.com/icfmp/Bible-Resources/actions/runs/44279489016"
+    },
+    {
+      "old_sid": "2Thess.2.1-3",
+      "new_end_verse": 2,
+      "original_line": 107559,
+      "source_witness": "https://github.com/icfmp/Bible-Resources/actions/runs/44279489016"
+    },
+    {
+      "old_sid": "2Pet.2.1-3",
+      "new_end_verse": 2,
+      "original_line": 111776,
+      "source_witness": "https://github.com/icfmp/Bible-Resources/actions/runs/44279489016"
+    },
+    {
+      "old_sid": "Rev.4.1-8",
+      "new_end_verse": 7,
+      "original_line": 113276,
+      "source_witness": "https://github.com/icfmp/Bible-Resources/actions/runs/44279489016"
+    }
+  ],
+  "expected_authorial_overlap_preserved_for_review": "2Chr.1.1 vs 2Chr.1.1-12",
+  "authorial_content_changed": false,
+  "editorial_scope_confirmed": false,
+  "publish": false
+}

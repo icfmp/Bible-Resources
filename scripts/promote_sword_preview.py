@@ -21,6 +21,7 @@ DRIVER_LAYOUT = {
     "RawText": "rawtext",
     "zText": "ztext",
     "zCom": "zcom",
+    "zCom4": "zcom4",
 }
 
 
@@ -33,7 +34,7 @@ def _required_members(driver: str, fields: dict[str, str]) -> tuple[str, ...]:
     """
     if driver == "RawText":
         return ("nt", "nt.vss", "ot", "ot.vss")
-    if driver in ("zText", "zCom"):
+    if driver in ("zText", "zCom", "zCom4"):
         return zcom_member_suffixes(fields["BlockType"])
     raise ValueError("Unsupported SWORD module driver")
 MAX_ARCHIVE_MEMBER_BYTES = 40_000_000
@@ -72,11 +73,13 @@ def _require_config_fields(raw: bytes, *, module_id: str, path: str,
         "Versification": versification,
         "Encoding": "UTF-8",
     }
-    if any(seen.get(k) != v for k, v in expected.items()):
+    if (any(seen.get(k)!=v for k,v in expected.items() if k!="DataPath")
+            or seen.get("DataPath") not in {expected["DataPath"],
+                                            expected["DataPath"].rstrip("/")}):
         raise ValueError("Module driver, path, charset or versification differs")
     if seen.get("CipherKey") is not None:
         raise ValueError("Encrypted SWORD module cannot be promoted")
-    if driver in ("zText", "zCom"):
+    if driver in ("zText", "zCom", "zCom4"):
         if (seen.get("BlockType") not in {"BOOK", "CHAPTER", "VERSE"}
                 or seen.get("CompressType") not in {"ZIP", "LZSS", "BZIP2", "XZ"}):
             raise ValueError("Unknown compressed SWORD block type")
@@ -109,7 +112,7 @@ def promote(source: Path, destination: Path, *, expected_source_sha256: str,
     original = source.read_bytes()
     if digest(original) != expected_source_sha256:
         raise ValueError("SWORD source ZIP SHA-256 changed")
-    category_dir = "comments" if driver == "zCom" else "texts"
+    category_dir = "comments" if driver in ("zCom", "zCom4") else "texts"
     old_dir = f"modules/{category_dir}/{layout}/{source_id.lower()}/"
     new_dir = f"modules/{category_dir}/{layout}/{destination_id.lower()}/"
     original_config = f"mods.d/{source_id.lower()}.conf"
@@ -145,7 +148,7 @@ def promote(source: Path, destination: Path, *, expected_source_sha256: str,
     destination_fields = _require_config_fields(
         revised, module_id=destination_id, path=new_dir,
         driver=driver, versification=versification, final=True)
-    if driver in ("zText", "zCom") and any(
+    if driver in ("zText", "zCom", "zCom4") and any(
             source_fields[k] != destination_fields[k]
             for k in ("BlockType", "CompressType")):
         raise ValueError("Compressed SWORD algorithm or block size changed")

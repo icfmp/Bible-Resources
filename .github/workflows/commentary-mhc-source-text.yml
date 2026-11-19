@@ -1,0 +1,1322 @@
+name: Audit six original MHC volumes against pinned CrossWire raw commentary privately
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/commentary-mhc-source-text.yml'
+      - 'scripts/commentary_private_text_compare.py'
+      - 'tests/test_commentary_private_text_compare.py'
+      - 'scripts/commentary_source_native_boundaries.py'
+      - 'tests/test_commentary_source_native_boundaries.py'
+      - 'scripts/commentary_nonlink_word_alignment.py'
+      - 'tests/test_commentary_nonlink_word_alignment.py'
+      - 'scripts/commentary_nonlink_words.py'
+      - 'tests/test_commentary_nonlink_words.py'
+      - 'scripts/commentary_usfm_title_witness.py'
+      - 'tests/test_commentary_usfm_title_witness.py'
+      - 'scripts/commentary_osis_paragraph_presence.py'
+      - 'tests/test_commentary_osis_paragraph_presence.py'
+      - 'config/commentary-intake/mhc-crosswire.json'
+  workflow_dispatch:
+    inputs:
+      source_volume:
+        description: Exact independently pinned original CCEL volume (1–6)
+        type: choice
+        required: true
+        default: '1'
+        options: ['1', '2', '3', '4', '5', '6']
+permissions:
+  contents: read
+concurrency:
+  group: mhc-original-text-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  observe_upstream_authoring_osis_metadata:
+    name: Observe CrossWire original MHC OSIS and native K text anchors privately
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build existing independent stock native readers for read-only parity probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          # CI mirrors can briefly throttle large recommended GUI packages:
+          # keep only required SWORD headers/library and allow a bounded
+          # network transfer before failing explicitly (never skip the proof).
+          timeout 300s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 \
+            install -y --no-install-recommends libsword-dev
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_index.cpp \
+            -o "${RUNNER_TEMP}/commentary-native-index" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "${RUNNER_TEMP}/commentary-private-raw" -lsword
+      - name: Pin upstream public GitLab revision and observe source bytes only
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt -q
+          python -m unittest discover -s tests -p 'test_commentary_osis_paragraph_presence.py' -v
+          export GIT_TERMINAL_PROMPT=0 GIT_LFS_SKIP_SMUDGE=1
+          upstream=https://gitlab.com/crosswire-bible-society/mhc.git
+          scratch="$(mktemp -d)"
+          trap 'rm -rf "$scratch"' EXIT
+          latest="$(timeout 120s git ls-remote "$upstream" refs/heads/main | awk '{print $1}')"
+          if ! [[ "$latest" =~ ^[0-9a-f]{40}$ ]]; then
+            echo 'Upstream source ref was not verifiable; no source trusted' >&2
+            exit 1
+          fi
+          # Initially confirm the independently observed 2022 publisher revision,
+          # not an unreviewed later commit or arbitrary moving target.
+          if [[ "$latest" != 537591a9* ]]; then
+            echo 'Official CrossWire MHC upstream HEAD changed: require review/re-pin' >&2
+            exit 1
+          fi
+          timeout 240s git -c core.hooksPath=/dev/null clone --depth 1 --branch main \
+            --single-branch --no-tags "$upstream" "$scratch/source" 1>&2
+          actual="$(git -C "$scratch/source" rev-parse HEAD)"
+          if [ "$actual" != "$latest" ]; then
+            echo 'Official CrossWire MHC source ref changed during clone' >&2
+            exit 1
+          fi
+          UPSTREAM_SOURCE="$scratch/source" UPSTREAM_SHA="$actual" python - <<'PY'
+          from hashlib import sha256
+          import os
+          from pathlib import Path
+          import re
+          import xml.parsers.expat as expat
+          import json
+          import sys
+          from urllib.parse import urlsplit
+          from io import BytesIO
+          from urllib.request import Request,urlopen
+          from zipfile import ZipFile
+
+          root=Path(os.environ["UPSTREAM_SOURCE"])
+          manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
+          source_pin=manifest.get("commentary_source",{}).get("original_authoring_osis",{})
+          if (manifest["module_id"]!="MHC" or manifest["version"]!="2.2"
+                  or source_pin.get("observed_upstream_commit_sha")!=os.environ["UPSTREAM_SHA"]):
+              raise SystemExit("Original MHC manifest/upstream source commit pin mismatch")
+          if sorted(p.name for p in root.iterdir() if p.name!=".git") != [
+              "README.md","mhc.conf","mhc.osis.xml","mhcBuild.sh"
+          ]:
+              raise SystemExit("Unreviewed source repository member set")
+          expected={"mhc.osis.xml":180*1024*1024, "mhc.conf":128*1024,
+                    "mhcBuild.sh":128*1024, "README.md":128*1024}
+          metadata={}
+          for name,max_size in expected.items():
+              path=root/name
+              if not path.is_file() or path.is_symlink() or not 0<path.stat().st_size<=max_size:
+                  raise SystemExit("Invalid original upstream source member")
+              digest=sha256()
+              with path.open("rb") as handle:
+                  for block in iter(lambda:handle.read(1024*1024),b""):
+                      digest.update(block)
+              metadata[name]={"sha256":digest.hexdigest(),"size":path.stat().st_size}
+
+          required_pins={
+              "mhc.osis.xml":("authoring_osis_sha256","authoring_osis_bytes"),
+              "mhc.conf":("source_conf_sha256",None),
+              "mhcBuild.sh":("upstream_build_script_sha256",None),
+              "README.md":("readme_sha256",None),
+          }
+          for filename,(hash_field,size_field) in required_pins.items():
+              observed=metadata[filename]
+              if observed["sha256"]!=source_pin.get(hash_field):
+                  raise SystemExit("Official source differs from independently reviewed SHA pin")
+              if size_field and observed["size"]!=source_pin.get(size_field):
+                  raise SystemExit("Official source differs from reviewed byte length")
+          # Parse markup data ONLY; never execute the upstream build script.
+          # Expat rejects DTD/entity extension; streamed events avoid exporting prose.
+          p=expat.ParserCreate()
+          seen={"osis":0,"osisText":0,"div":0,"reference":0}
+          roots=[]
+          depth=0
+          def start(name,attrs):
+              global depth
+              depth+=1
+              tag=name.split(":")[-1]
+              if depth==1: roots.append(tag)
+              if tag in seen: seen[tag]+=1
+          def end(name):
+              global depth
+              depth-=1
+          def reject(*args):
+              raise ValueError("Unreviewed original upstream XML DTD/entity declaration")
+          p.StartElementHandler=start
+          p.EndElementHandler=end
+          p.StartDoctypeDeclHandler=reject
+          p.EntityDeclHandler=reject
+          p.ExternalEntityRefHandler=lambda *args: 0
+          with (root/"mhc.osis.xml").open("rb") as handle:
+              while block:=handle.read(1024*1024):
+                  p.Parse(block,False)
+              p.Parse(b"",True)
+          if roots!=["osis"] or seen["osisText"]<1 or seen["div"]<1:
+              raise SystemExit("Expected original OSIS document structure not confirmed")
+          # Diagnose whether the publisher's source has addressable chapter
+          # structures before any proposed correction. Count *identifiers*,
+          # never output any unreviewed authorial prose or titles.
+          from collections import Counter
+          from lxml import etree
+          source_xml=etree.parse(str(root/"mhc.osis.xml"),etree.XMLParser(
+              resolve_entities=False,no_network=True,load_dtd=False,
+              recover=False,huge_tree=True))
+          div_nodes=[node for node in source_xml.iter()
+                     if isinstance(node.tag,str)
+                     and node.tag.rsplit("}",1)[-1]=="div"]
+          attrs=Counter(key.rsplit("}",1)[-1] for node in div_nodes
+                        for key in node.attrib)
+          types=Counter(node.get("type","UNSPECIFIED") for node in div_nodes)
+          # Derive requested scopes from original CCEL `scripCom` claims,
+          # never hard-code Bible-book/chapter aliases in the source inspector.
+          sample_cases=manifest["commentary_source"][
+              "original_authoring_source_paragraph_cases"]
+          if not 1<=len(sample_cases)<=8:
+              raise SystemExit("Unreviewed source-bound structural scopes")
+          chapter_scopes=[]
+          for case in sample_cases:
+              original_ref=case.get("original_source_marker_osisRef","")
+              if sha256(original_ref.encode("utf-8")).hexdigest()!=case[
+                      "original_full_reference_sha256"]:
+                  raise SystemExit("Source chapter locator differs from pinned marker SHA")
+              match=re.fullmatch(
+                  r"Bible:([1-4]?[A-Za-z][A-Za-z0-9]*)\.([1-9][0-9]*)\.[1-9][0-9]*"
+                  r"(?:-[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*\.[1-9][0-9]*)?",
+                  original_ref)
+              if match is None:
+                  raise SystemExit("Original CCEL section is not an approved verse locator")
+              chapter_scopes.append((match.group(1)+"."+match.group(2),
+                                     case["original_full_reference_sha256"],
+                                     "independent_ccel_marker"))
+          # Extend source-neutral, *read-only* authoring-OSIS sampling from
+          # reviewed manifest chapter IDs; do not invent CCEL witnesses,
+          # section assignments or trust unbounded user-provided keys.
+          additional=manifest["commentary_source"].get(
+              "private_authoring_osis_chapter_samples",[])
+          if (not isinstance(additional,list) or not 1<=len(additional)<=10
+                  or len(set(additional))!=len(additional)):
+              raise SystemExit("Unreviewed additional authoring OSIS chapter samples")
+          for chapter_ref in additional:
+              if (not isinstance(chapter_ref,str) or not re.fullmatch(
+                  r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9][0-9]*",
+                  chapter_ref)):
+                  raise SystemExit("Invalid reviewed authoring OSIS chapter locator")
+              chapter_scopes.append((
+                  chapter_ref,sha256(chapter_ref.encode("ascii")).hexdigest(),
+                  "manifest_authoring_osis_chapter_sample"))
+          if (len(chapter_scopes)>12 or len({row[0] for row in chapter_scopes})
+                  != len(chapter_scopes)):
+              raise SystemExit("Duplicate or unbounded original authoring OSIS chapter scopes")
+          print("Official source OSIS div structural attribute names/counts:",
+                json.dumps(dict(sorted(attrs.items())),sort_keys=True))
+          print("Official source OSIS div type labels/counts (structural only):",
+                json.dumps(dict(sorted(types.items())),sort_keys=True))
+          import sys
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from commentary_osis_paragraph_presence import (
+              original_authoring_chapter_scope_metadata,
+              original_authoring_native_chapter_index_receipt,
+          )
+          book_divisions={node.get("osisID"):node for node in div_nodes
+                          if node.get("type")=="book"}
+          if len(book_divisions)!=66:
+              raise SystemExit("Official source book divisions ambiguous")
+          private_chapter_words={}
+          private_chapter_visible_texts={}
+          private_chapter_reference_targets={}
+          private_book_pre_chapter_words={}
+          for chapter_ref,ref_sha,scope_kind in chapter_scopes:
+              book,chapter=chapter_ref.rsplit(".",1)
+              book_div=book_divisions.get(book)
+              if book_div is None:
+                  raise SystemExit("Pinned CCEL biblical book lacks an OSIS book division")
+              actual_markers=Counter()
+              linked_targets=0
+              descendants=0
+              for node in book_div.iter():
+                  if not isinstance(node.tag,str):
+                      continue
+                  descendants+=1
+                  tag=node.tag.rsplit("}",1)[-1]
+                  marker_values=[
+                      node.get(key,"") for key in ("osisID","sID","eID")
+                  ]
+                  if any(chapter_ref==item or
+                         item.startswith(chapter_ref+".")
+                         for val in marker_values for item in val.split()):
+                      actual_markers[tag]+=1
+                  if tag=="reference" and any(
+                         chapter_ref==item or item.startswith(chapter_ref+".")
+                         for item in node.get("osisRef","").split()):
+                      linked_targets+=1
+              chapter_private_words=[]
+              chapter_private_visible=[]
+              chapter_private_references=[]
+              chapter_prelude=[] if chapter=="1" else None
+              chapter_scope=original_authoring_chapter_scope_metadata(
+                  book_div,chapter_ref,_private_words_sink=chapter_private_words,
+                  _private_visible_text_sink=chapter_private_visible,
+                  _private_reference_targets_sink=chapter_private_references,
+                  _private_before_first_chapter_words_sink=chapter_prelude)
+              if chapter_ref in private_chapter_words or len(chapter_private_visible)!=1:
+                  raise SystemExit("Duplicate or incomplete authenticated CCEL chapter case")
+              private_chapter_words[chapter_ref]=chapter_private_words
+              private_chapter_visible_texts[chapter_ref]=chapter_private_visible[0]
+              private_chapter_reference_targets[chapter_ref]=chapter_private_references
+              if chapter_prelude is not None:
+                  private_book_pre_chapter_words[chapter_ref]=chapter_prelude
+              print("Authenticated source book/chapter structural metadata only:",
+                    json.dumps({
+                      "source_scope_selection_kind":scope_kind,
+                      "source_scope_locator_sha256":ref_sha,
+                      "authentic_bounded_chapter_scope":chapter_scope,
+                      "book_xml_descendant_element_count":descendants,
+                      "local_chapter_addressable_element_tag_counts":
+                          dict(sorted(actual_markers.items())),
+                      "cross_reference_element_count_targeting_chapter_not_scope":
+                          linked_targets,
+                      "source_or_compiled_paragraph_owner_not_inferred":True,
+                    },sort_keys=True))
+          # Single original-authoring witness for the *entire* corpus. This
+          # collection is kept only inside this private job and never exported.
+          # Every chapter is revalidated using its actual start/end milestones,
+          # not guessed from a stock SWORD verse address or fixed list.
+          all_authored_chapter_words={}
+          all_authored_chapter_visible={}
+          all_authored_chapter_references={}
+          for original_book,book_div in book_divisions.items():
+              actual_original_starts=[]
+              for node in book_div.iter():
+                  if not isinstance(node.tag,str) or node.tag.rsplit("}",1)[-1]!="chapter":
+                      continue
+                  start=node.get("sID")
+                  if not start and node.get("osisID") and not node.get("eID"):
+                      start=node.get("osisID")
+                  if start:
+                      actual_original_starts.append(start)
+              for chapter_ref in actual_original_starts:
+                  if chapter_ref in all_authored_chapter_words:
+                      raise SystemExit("Original full authored corpus duplicate chapter")
+                  corpus_words=[]
+                  corpus_visible=[]
+                  corpus_targets=[]
+                  original_authoring_chapter_scope_metadata(
+                      book_div,chapter_ref,_private_words_sink=corpus_words,
+                      _private_visible_text_sink=corpus_visible,
+                      _private_reference_targets_sink=corpus_targets)
+                  if len(corpus_visible)!=1:
+                      raise SystemExit("Original full authored chapter has no visible source")
+                  all_authored_chapter_words[chapter_ref]=corpus_words
+                  all_authored_chapter_visible[chapter_ref]=corpus_visible[0]
+                  all_authored_chapter_references[chapter_ref]=corpus_targets
+          if not 100<=len(all_authored_chapter_words)<=1500:
+              raise SystemExit("Unreviewed actual full authored chapter corpus size")
+          print("Independently milestone-bounded full original authoring",
+                "OSIS chapter scopes prepared privately:",
+                len(all_authored_chapter_words),
+                "(original prose, XML, native keys and links not exported)")
+          del div_nodes,source_xml
+          conf=(root/"mhc.conf").read_text(encoding="utf-8")
+          def confval(key):
+              match=re.findall(r"(?m)^"+re.escape(key)+r"=([^\r\n]*)$",conf)
+              if len(match)!=1: raise SystemExit("Original upstream .conf has ambiguous critical metadata")
+              return match[0].strip()
+          version=confval("Version")
+          driver=confval("ModDrv")
+          source_type=confval("SourceType")
+          if not re.fullmatch(r"[0-9]+(?:\.[0-9]+){1,2}",version):
+              raise SystemExit("Original upstream source version has an unreviewed shape")
+          if not re.fullmatch(r"[A-Za-z][A-Za-z0-9]{1,19}",driver) or not re.fullmatch(
+                  r"[A-Za-z][A-Za-z0-9]{1,19}",source_type):
+              raise SystemExit("Unreviewed upstream build format metadata shape")
+          print("Official .conf driver / source type (observed, NOT normalized):",
+                driver,source_type)
+          # Compare against ACTUAL pinned original published .conf, never
+          # against a guessed driver spelling. Do not execute upstream scripts.
+          req=Request(manifest["sword_zip_url"],
+                      headers={"User-Agent":"BibleResources-OriginalMHCSourceParity/1.0"})
+          with urlopen(req,timeout=90) as response:
+              stock_zip=response.read(40*1024*1024+1)
+          if (not stock_zip or len(stock_zip)>40*1024*1024
+                  or sha256(stock_zip).hexdigest()!=manifest["archive_sha256"]):
+              raise SystemExit("Original public SWORD ZIP changed from pin")
+          with ZipFile(BytesIO(stock_zip)) as package:
+              conf_members=[n for n in package.namelist()
+                            if n.lower().endswith("/mhc.conf")]
+              if len(conf_members)!=1 or package.getinfo(conf_members[0]).file_size>128*1024:
+                  raise SystemExit("Pinned original SWORD configuration missing")
+              stock_conf=package.read(conf_members[0]).decode("utf-8")
+          def stockfield(key):
+              m=re.findall(r"(?m)^"+re.escape(key)+r"=([^\r\n]*)$",stock_conf)
+              if len(m)!=1: raise SystemExit("Original stock .conf critical field ambiguous")
+              return m[0].strip()
+          stock_fields={key:stockfield(key) for key in (
+              "Version","ModDrv","SourceType","DistributionLicense"
+          )}
+          source_fields={
+              "Version":version,
+              "ModDrv":driver,
+              "SourceType":source_type,
+              "DistributionLicense":confval("DistributionLicense"),
+          }
+          print("Pinned official SWORD ZIP SHA256 verified:",sha256(stock_zip).hexdigest())
+          print("Original zipped stock .conf SHA256:",
+                sha256(stock_conf.encode("utf-8")).hexdigest())
+          print("Upstream authoring .conf vs ORIGINAL downloaded .conf metadata:",
+                json.dumps({key:{
+                    "upstream":source_fields[key],
+                    "pinned_stock":stock_fields[key],
+                    "equal":source_fields[key]==stock_fields[key]
+                } for key in ("Version","ModDrv","SourceType","DistributionLicense")},
+                sort_keys=True))
+          print("Published .conf matches independently authenticated source .conf",
+                "on these four fields:",
+                all(source_fields[key]==stock_fields[key] for key in source_fields))
+
+          # Inventory ALL original .conf key/value occurrences, in sequence.
+          # Duplicate keys have ordered values; never collapse them to a dict.
+          # Report key labels and difference classes only, not original prose.
+          from collections import defaultdict
+          def config_occurrences(config_text):
+              fields=defaultdict(list)
+              non_fields=[]
+              for lineno,line in enumerate(config_text.splitlines(),1):
+                  if (not line.strip() or line.lstrip().startswith(("#",";"))
+                          or re.fullmatch(r"\[[^\]\r\n]{1,128}\]",line)):
+                      continue
+                  match=re.fullmatch(r"([A-Za-z][A-Za-z0-9_-]{0,127})=(.*)",line)
+                  if match is None:
+                      non_fields.append(lineno)
+                  else:
+                      fields[match.group(1)].append(match.group(2))
+              return dict(fields),non_fields
+          source_meta,source_nonfields=config_occurrences(conf)
+          stock_meta,stock_nonfields=config_occurrences(stock_conf)
+          if not source_meta or not stock_meta:
+              raise SystemExit("Cannot classify authenticated original configuration")
+          source_names=set(source_meta)
+          stock_names=set(stock_meta)
+          common=source_names & stock_names
+          difference_classification={
+              "exact_ordered_value_fields":sorted(
+                  name for name in common if source_meta[name]==stock_meta[name]),
+              "different_ordered_value_fields":sorted(
+                  name for name in common if source_meta[name]!=stock_meta[name]),
+              "upstream_only_field_names":sorted(source_names-stock_names),
+              "distributed_only_field_names":sorted(stock_names-source_names),
+              "upstream_duplicate_value_field_names":sorted(
+                  name for name,values in source_meta.items() if len(values)>1),
+              "distributed_duplicate_value_field_names":sorted(
+                  name for name,values in stock_meta.items() if len(values)>1),
+              "upstream_unparsed_nonempty_lines":len(source_nonfields),
+              "distributed_unparsed_nonempty_lines":len(stock_nonfields),
+              "no_field_values_exported":True,
+              "not_byte_or_full_metadata_equivalence":True,
+          }
+          # Guard the critical exact fields against a future drift even if
+          # source and package are individually still SHA-pinned.
+          if any(source_fields[key]!=stock_fields[key] for key in source_fields):
+              raise SystemExit("Publisher source and original package diverge on critical .conf fields")
+          print("Source and published original configuration key-level differences",
+                "(values private):",json.dumps(difference_classification,sort_keys=True))
+          print("Full source OSIS/native K/I/TOP paragraph parity is NOT YET tested.")
+
+          # Target cases are SOURCE-HASH-PINNED data, not content-specific
+          # code exceptions or guessed verse mappings. The generic search
+          # reports only bounded token lengths and presence/absence, never
+          # original CrossWire/CCEL XML words or native verse strings.
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from commentary_osis_paragraph_presence import (
+              original_ccel_paragraph_words,
+              exact_original_paragraph_runs_in_osis,
+          )
+          source_cases=manifest["commentary_source"][
+              "original_authoring_source_paragraph_cases"]
+          volumes={v["number"]:v for v in manifest[
+              "commentary_source"]["xml_witness_volumes"]}
+          if (not isinstance(source_cases,list) or not 1<=len(source_cases)<=8
+                  or len({c["source_volume"] for c in source_cases})!=len(source_cases)):
+              raise SystemExit("Unreviewed original CCEL paragraph selection")
+          original_cases=[]
+          for candidate in source_cases:
+              volume=volumes[candidate["source_volume"]]
+              req=Request(volume["url"],
+                          headers={"User-Agent":"BibleResources-MHC-OriginalParagraphStudy/1.0"})
+              with urlopen(req,timeout=90) as response:
+                  if urlsplit(response.url).hostname not in ("ccel.org","www.ccel.org"):
+                      raise SystemExit("Unreviewed original CCEL source origin redirect")
+                  original_xml=response.read(32*1024*1024+1)
+              if (not original_xml or len(original_xml)>32*1024*1024
+                      or sha256(original_xml).hexdigest()!=volume["sha256"]):
+                  raise SystemExit("Original CCEL XML differs from pinned SHA")
+              verified_words=original_ccel_paragraph_words(
+                  original_xml,expected_xml_sha256=volume["sha256"],
+                  case=candidate)
+              original_cases.append((candidate,verified_words))
+          report=exact_original_paragraph_runs_in_osis(
+              (root/"mhc.osis.xml").read_bytes(),
+              expected_osis_sha256=source_pin["authoring_osis_sha256"],
+              original_cases=original_cases)
+          print("Pinned CCEL exact original paragraph vs official original",
+                "authoring OSIS (closed metadata; no prose, no key addresses):",
+                json.dumps(report,sort_keys=True))
+          print("An exact word run ANYWHERE in OSIS does not establish original",
+                "verse ownership, historical edition identity or rights.")
+
+          # Independent *actual compiled stock* readback: every genuine K/I/TOP
+          # frame is reindexed and SHA-pinned. Only selected authentic OSIS
+          # chapter visible 8-word anchors are checked against genuine,
+          # de-duplicated original compiled K payloads in the same chapter.
+          # No raw content, native key or editorial correction leaves runner.
+          from tempfile import TemporaryDirectory
+          from commentary_osis_paragraph_presence import (
+              PrivateOriginalChapterNativeAnchorCoverage,
+              PrivateOriginalNativeWholeCorpusGapSearch,
+          )
+          from commentary_native_raw_inventory import _safe_stock_install
+          from pilot_preflight import inspect_archive
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          from commentary_native_inventory import parse_index
+          import subprocess
+          with TemporaryDirectory(prefix="mhc-authoring-native-private-") as folder:
+              directory=Path(folder)
+              package=directory/"source-authenticated-stock.zip"
+              package.write_bytes(stock_zip)
+              archive=inspect_archive(package,source_kind="sword",
+                  expected_module_id=manifest["module_id"],
+                  expected_category="commentary")
+              installed=directory/"installed-original"
+              _safe_stock_install(package,archive["members"],installed)
+              anchor_census=PrivateOriginalChapterNativeAnchorCoverage(
+                  private_chapter_words,
+                  private_chapter_visible_texts=private_chapter_visible_texts,
+                  private_chapter_reference_targets=private_chapter_reference_targets,
+                  private_book_pre_chapter_words=private_book_pre_chapter_words)
+              full_authoring_census=PrivateOriginalChapterNativeAnchorCoverage(
+                  all_authored_chapter_words,
+                  private_chapter_visible_texts=all_authored_chapter_visible,
+                  private_chapter_reference_targets=all_authored_chapter_references,
+                  full_corpus_mode=True)
+              env=dict(os.environ,SWORD_PATH=str(installed))
+              index_bin=Path(os.environ["RUNNER_TEMP"])/"commentary-native-index"
+              raw_bin=Path(os.environ["RUNNER_TEMP"])/"commentary-private-raw"
+              index_run=subprocess.run(
+                  [str(index_bin),manifest["module_id"]],env=env,
+                  stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,
+                  timeout=90,check=False)
+              if index_run.returncode or len(index_run.stdout)>12*1024*1024:
+                  raise SystemExit("Original commentary native occupancy inspector failed")
+              original_index=parse_index(
+                  index_run.stdout,manifest["module_id"])
+              original_lines=index_run.stdout.decode("ascii").splitlines()[1:-1]
+              original_k=[row.split("\t",1)[1] for row in original_lines
+                          if row.startswith("K\t")]
+              original_i=[row.split("\t",1)[1] for row in original_lines
+                          if row.startswith("I\t")]
+              original_u=[row.split("\t",1)[1] for row in original_lines
+                          if row.startswith("U\t")]
+              process=None
+              try:
+                  process=subprocess.Popen([str(raw_bin),manifest["module_id"]],
+                      env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+                  if process.stdout is None:
+                      raise SystemExit("Original commentary raw stream inaccessible")
+                  native_report,native_k,native_i,native_u=parse_native_raw_corpus(
+                      process.stdout,on_entry=lambda kind,key,raw: (
+                          anchor_census.observe(kind,key,raw),
+                          full_authoring_census.observe(kind,key,raw)))
+                  process.stdout.close()
+                  if process.wait(timeout=360)!=0:
+                      raise SystemExit("Original commentary raw reader failed")
+              except BaseException:
+                  if process is not None and process.poll() is None:
+                      process.kill()
+                      process.wait()
+                  raise
+              if (native_k!=original_k or native_i!=original_i or
+                      native_u!=original_u or
+                      native_report["all_native_raw_entries_ordered_sha256"]!=
+                      manifest["native_raw_corpus_sha256"] or
+                      native_report["all_actual_raw_entries_scanned"]<=0 or
+                      original_index["occupied_numbered_slots"]!=len(native_k) or
+                      original_index["occupied_intro_slots"]!=len(native_i) or
+                      original_index["occupied_anonymous_top_slots"]!=len(native_u) or
+                      original_index["driver"]!=stock_fields["ModDrv"] or
+                      original_index["native_versification"]!=
+                          (stock_meta.get("Versification") or ["KJV"])[0]):
+                  raise SystemExit("Original commentary native full-stream identity or v11n mismatch")
+              chapter_index_receipt=original_authoring_native_chapter_index_receipt(
+                  book_divisions,original_k,original_i)
+              print("Authenticated full 66-book source chapter milestones",
+                    "versus entire actual native occupied K/I index:",
+                    json.dumps(chapter_index_receipt,sort_keys=True))
+              # Exact set equality is independently checked against the
+              # original source/native chapter milestone receipt, not just
+              # equal counts or a preconfigured list of verse keys.
+              digest=sha256()
+              for ref in sorted(all_authored_chapter_words):
+                  raw_ref=ref.encode("ascii")
+                  digest.update(len(raw_ref).to_bytes(4,"big"))
+                  digest.update(raw_ref)
+              if (len(all_authored_chapter_words)!=chapter_index_receipt[
+                      "original_osis_unique_chapters"]
+                      or digest.hexdigest()!=chapter_index_receipt[
+                          "original_chapter_ref_set_sha256"]):
+                  raise SystemExit("Full original chapter source scopes differ from index")
+              original_full_corpus=full_authoring_census.report()
+              # Only unmatched complete genuine native K bodies are privately
+              # tested against the complete *original authored book* word stream.
+              # A unique whole-book match crossing the last chapter milestone
+              # is research evidence, NOT authority to reassign that text.
+              book_wide_unmatched_K=(
+                  full_authoring_census.private_unmatched_native_K_original_book_location(
+                      book_divisions))
+              print("Unmatched genuine original K within original authored whole-book",
+                    "word boundaries (closed metadata only):",
+                    json.dumps(book_wide_unmatched_K,sort_keys=True))
+              original_source_gaps=(
+                  full_authoring_census.private_uncovered_source_gaps_in_other_original_chapters())
+              print("Authenticated original OSIS chapter-uncovered internal or final words",
+                    "versus genuine other same-book original source and native K/I",
+                    "(only chapter hashes/counts/closed match classes):",
+                    json.dumps(original_source_gaps,sort_keys=True))
+              # Second independent complete native replay: search *every*
+              # original raw K/I entry, including unlocated bodies and all
+              # book introductions. Two anonymous opaque TOP/U entries are
+              # counted, not misrepresented as parseable commentary prose.
+              private_original_gaps=(
+                  full_authoring_census.private_authentic_uncovered_source_word_fragments())
+              if len(private_original_gaps)!=original_source_gaps[
+                      "genuine_authored_chapter_uncovered_word_intervals"]:
+                  raise SystemExit("Original source gap identification changed between private probes")
+              if private_original_gaps:
+                  gap_scanner=PrivateOriginalNativeWholeCorpusGapSearch(
+                      private_original_gaps)
+                  second=None
+                  try:
+                      second=subprocess.Popen(
+                          [str(raw_bin),manifest["module_id"]],
+                          env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+                      if second.stdout is None:
+                          raise SystemExit("Second original K/I full raw stream inaccessible")
+                      native_2,k_2,i_2,u_2=parse_native_raw_corpus(
+                          second.stdout,on_entry=gap_scanner.observe)
+                      second.stdout.close()
+                      if second.wait(timeout=360)!=0:
+                          raise SystemExit("Second complete original raw SWORD scan failed")
+                  except BaseException:
+                      if second is not None and second.poll() is None:
+                          second.kill()
+                          second.wait()
+                      raise
+                  if (native_2["all_native_raw_entries_ordered_sha256"]!=
+                          native_report["all_native_raw_entries_ordered_sha256"]
+                          or k_2!=native_k or i_2!=native_i or u_2!=native_u
+                          or native_2["all_actual_raw_entries_scanned"]!=
+                          native_report["all_actual_raw_entries_scanned"]):
+                      raise SystemExit("Original native second whole-corpus replay differs from pinned first scan")
+                  print("Exact authored source gaps versus ALL genuine original",
+                        "native XML K/I full raw bodies, double source SHA verified",
+                        "(closed metadata, not authorial ownership):",
+                        json.dumps(gap_scanner.report(),sort_keys=True))
+                  del gap_scanner,native_2,k_2,i_2,u_2
+              # Source-structure ownership is tested on the *exact six
+              # authenticated word intervals*, not guessed from a title or
+              # invented verse key. Keep all original text and markup private.
+              gap_original_structure=[]
+              for chapter,start,actual_gap_words in private_original_gaps:
+                  original_words_rechecked=[]
+                  original_word_owners=[]
+                  source_scope=original_authoring_chapter_scope_metadata(
+                      book_divisions[chapter.rsplit(".",1)[0]],chapter,
+                      _private_words_sink=original_words_rechecked,
+                      _private_word_owner_classes_sink=original_word_owners)
+                  if (original_words_rechecked!=all_authored_chapter_words[chapter]
+                          or original_words_rechecked[
+                              start:start+len(actual_gap_words)]!=actual_gap_words
+                          or len(original_word_owners)!=len(original_words_rechecked)
+                          or source_scope["private_original_word_ownership_verified"] is not True):
+                      raise SystemExit("Original authenticated source gap owner scope lost identity")
+                  original_owner_counts=Counter(
+                      original_word_owners[start:start+len(actual_gap_words)])
+                  if sum(original_owner_counts.values())!=len(actual_gap_words):
+                      raise SystemExit("Original authored paragraph/note word owner counts incomplete")
+                  gap_original_structure.append({
+                      "original_authored_chapter_ref_sha256":sha256(
+                          chapter.encode("ascii")).hexdigest(),
+                      "original_gap_start_word_offset_not_verse_key":start,
+                      "original_gap_visible_word_tokens":len(actual_gap_words),
+                      "actual_authored_XML_word_owner_classes":
+                          dict(sorted(original_owner_counts.items())),
+                      "source_words_owned_exactly_once":True,
+                      "not_historical_edition_or_paragraph_authorship_proof":True,
+                  })
+              print("Exact original OSIS word intervals missing from compiled K/I",
+                    "and their AUTHENTIC original markup word owner classes",
+                    "(no source words/verse keys):",
+                    json.dumps(gap_original_structure,sort_keys=True))
+              # Independent digital witness: all SIX unchanged original
+              # SHA-pinned CCEL volumes; never silently treat their digital
+              # wording as an edition/redistribution authorization.
+              from commentary_osis_paragraph_presence import (
+                  private_original_osis_gap_against_pinned_ccel_volume)
+              original_ccel_gap_reports=[]
+              for original_ccel_volume in sorted(volumes):
+                  vol=volumes[original_ccel_volume]
+                  request=Request(
+                      vol["url"],
+                      headers={"User-Agent":
+                               "BibleResources-MHC-OriginalDigitalWitness/1.0"})
+                  with urlopen(request,timeout=90) as response:
+                      if (urlsplit(response.url).hostname
+                              not in ("ccel.org","www.ccel.org")):
+                          raise SystemExit(
+                              "CCEL independently pinned original volume redirect changed")
+                      ccel_raw=response.read(32*1024*1024+1)
+                  if (not ccel_raw or len(ccel_raw)>32*1024*1024
+                          or sha256(ccel_raw).hexdigest()!=vol["sha256"]):
+                      raise SystemExit(
+                          "Separately obtained CCEL original differs from its reviewed SHA")
+                  volume_result=private_original_osis_gap_against_pinned_ccel_volume(
+                      ccel_raw,expected_xml_sha256=vol["sha256"],
+                      original_volume_number=original_ccel_volume,
+                      source_fragments=private_original_gaps)
+                  original_ccel_gap_reports.append(volume_result)
+                  del ccel_raw
+              if (len(original_ccel_gap_reports)!=6
+                      or [row["ccel_volume_number"]
+                          for row in original_ccel_gap_reports]!=[1,2,3,4,5,6]
+                      or any(len(row["original_source_gap_cases"])!=
+                             len(private_original_gaps)
+                             for row in original_ccel_gap_reports)):
+                  raise SystemExit("Independent original six-volume CCEL witness incomplete")
+              original_ccel_gap_summary=[]
+              for index,(source_chapter,source_offset,source_gap_words) in enumerate(
+                      private_original_gaps):
+                  by_volume=[
+                      result["original_source_gap_cases"][index]
+                      for result in original_ccel_gap_reports]
+                  if any(
+                      item["source_gap_visible_word_tokens"]!=len(source_gap_words)
+                      or item["source_gap_word_offset_not_verse_key"]!=source_offset
+                      or item["original_authored_chapter_ref_sha256"]!=
+                         sha256(source_chapter.encode("ascii")).hexdigest()
+                      for item in by_volume):
+                      raise SystemExit("Original OSIS/CCEL witness identity mismatch")
+                  original_ccel_gap_summary.append({
+                      "authentic_authoring_chapter_sha256":
+                          sha256(source_chapter.encode("ascii")).hexdigest(),
+                      "authentic_authoring_gap_visible_words":len(source_gap_words),
+                      "original_CCEl_volumes_with_full_exact_whole_prose":
+                          [item["independent_ccel_volume"] for item in by_volume
+                           if item[
+                               "full_exact_word_sequence_occurrences_in_original_volume"]],
+                      "CCEl_original_full_volume_exact_match_occurrences":
+                          sum(item[
+                              "full_exact_word_sequence_occurrences_in_original_volume"]
+                              for item in by_volume),
+                      "original_CCEl_digital_volume_12word_witness_classes":[{
+                          "volume":item["independent_ccel_volume"],
+                          "first_middle_last_12word_anchors":
+                              item["first_middle_last_12word_anchors_in_original_ccel"],
+                          "unique_bounded_ccel_source_word_collation":
+                              item["bounded_original_source_against_ccel_word_collation"],
+                      } for item in by_volume
+                         if item["first_middle_last_12word_anchors_in_original_ccel"]],
+                      "CCEl_original_full_word_match_not_historical_print_or_owner_proof":True,
+                  })
+              print("All SIX SHA-pinned original CCEL volumes independent digital",
+                    "word witnesses for exact original authoring OSIS gaps",
+                    "(wordless volume numbers and hashed source chapter identities only):",
+                    json.dumps({
+                      "original_ccel_volumes_verified":len(original_ccel_gap_reports),
+                      "original_authored_osis_source_gaps":len(original_ccel_gap_summary),
+                      "original_ccel_gap_cases":original_ccel_gap_summary,
+                      "not_historical_print_editorial_attribution_or_rights":True,
+                      "no_original_text_copied_or_transformed":True,
+                    },sort_keys=True))
+              del original_ccel_gap_reports,original_ccel_gap_summary
+              del private_original_gaps
+              all_rows=original_full_corpus["original_chapter_cases"]
+              def cases_failing(field):
+                  return [row for row in all_rows if row[field] is not True]
+              incomplete_K=cases_failing(
+                  "all_distinct_native_K_bodies_have_unique_exact_source_intervals")
+              different_chars=cases_failing(
+                  "complete_source_chapter_nonwhitespace_visible_characters_equal")
+              different_links=cases_failing(
+                  "exact_original_reference_target_sequence_equal_in_source_and_native")
+              def hashed_cases(rows):
+                  return [row["original_chapter_reference_sha256"] for row in rows[:20]]
+              # Only closed source-position/count classes for up to twenty
+              # exceptional scopes. The entire native verse key, original
+              # prose, XML fragment and reference target strings stay private.
+              def summarized_anomaly(row):
+                  return {
+                      "authored_chapter_ref_sha256":
+                          row["original_chapter_reference_sha256"],
+                      "authored_visible_word_count":
+                          row["original_chapter_visible_words"],
+                      "native_K_distinct_bodies":
+                          row["distinct_original_native_raw_payloads"],
+                      "native_K_actual_occupied_slots":
+                          row["actual_occupied_original_numbered_K_slots"],
+                      "native_K_entire_word_relation_classes":
+                          row["native_distinct_whole_body_ordered_word_relation_classes"],
+                      "native_K_exact_source_location_classes":
+                          row["native_distinct_whole_body_exact_source_location_classes"],
+                      "source_words_not_in_K":
+                          row["source_uncovered_word_tokens_after_unique_native_K_body_intervals"],
+                      "source_words_not_in_K_or_chapter_I":
+                          row["source_uncovered_words_after_unique_K_plus_chapter_I_intervals"],
+                      "uncovered_K_source_word_intervals_not_verse_locations":
+                          row["source_uncovered_word_spans_metadata_only"],
+                      "native_I_covers_source_K_prefix":
+                          row["original_source_K_prefix_fully_covered_by_chapter_I"],
+                      "native_K_source_interval_overlap_words":
+                          row["overlap_word_tokens_among_exact_native_K_body_intervals"],
+                      "native_chapter_I_entire_word_location_classes":
+                          row["chapter_I_whole_body_exact_source_location_classes"],
+                      "all_native_K_whole_bodies_uniquely_in_chapter":
+                          row["all_distinct_native_K_bodies_have_unique_exact_source_intervals"],
+                      "complete_visible_nonwhitespace_character_equality":
+                          row["complete_source_chapter_nonwhitespace_visible_characters_equal"],
+                      "complete_visible_nonwhitespace_source_character_count":
+                          row["complete_source_chapter_nonwhitespace_characters"],
+                      "complete_visible_nonwhitespace_native_character_count":
+                          row["complete_native_chapter_nonwhitespace_characters"],
+                      "first_nonwhitespace_character_difference_offset":
+                          row["first_nonwhitespace_character_mismatch_offset_not_verse"],
+                      "source_inline_reference_attribute_count":
+                          row["source_chapter_reference_elements"],
+                      "native_located_inline_reference_attribute_count":
+                          row["native_located_reference_elements"],
+                      "ordered_inline_reference_targets_exact":
+                          row["exact_original_reference_target_sequence_equal_in_source_and_native"],
+                  }
+              exceptional=[row for row in all_rows if (
+                  row["complete_source_chapter_nonwhitespace_visible_characters_equal"]
+                      is not True or
+                  row["exact_original_reference_target_sequence_equal_in_source_and_native"]
+                      is not True or
+                  row["all_distinct_native_K_bodies_have_unique_exact_source_intervals"]
+                      is not True)]
+              if len(exceptional)>20:
+                  print("More than twenty original source/native chapter exceptions;",
+                        "print only counts and compact SHA fingerprints")
+              else:
+                  print("Original complete chapter source/native nontext exception",
+                        "classifications only; no authored prose/verse addresses:",
+                        json.dumps([summarized_anomaly(row) for row in exceptional],
+                                   sort_keys=True))
+              full_summary={
+                  "status":"COMPLETE_AUTHORED_OSIS_ALL_CHAPTERS_NATIVE_TEXT_RESEARCH_ONLY",
+                  "original_chapter_scopes":len(all_rows),
+                  "full_source_visible_word_tokens":sum(
+                      row["original_chapter_visible_words"] for row in all_rows),
+                  "distinct_original_native_K_raw_bodies":sum(
+                      row["distinct_original_native_raw_payloads"] for row in all_rows),
+                  "unique_exact_whole_original_K_chapter_failures":len(incomplete_K),
+                  "first_K_failure_chapter_ref_hashes":hashed_cases(incomplete_K),
+                  "complete_chapter_nonwhitespace_visible_character_matches":
+                      len(all_rows)-len(different_chars),
+                  "complete_chapter_nonwhitespace_visible_character_unverified_or_different":
+                      len(different_chars),
+                  "first_character_failure_chapter_ref_hashes":
+                      hashed_cases(different_chars),
+                  "original_source_inline_osisRef_attributes":sum(
+                      row["source_chapter_reference_elements"] for row in all_rows),
+                  "exact_ordered_native_link_target_chapter_matches":
+                      len(all_rows)-len(different_links),
+                  "link_target_unverified_or_different_chapters":
+                      len(different_links),
+                  "first_link_failure_chapter_ref_hashes":hashed_cases(different_links),
+                  "native_I_and_TOP_editorial_ownership_not_proven":True,
+                  "original_xml_note_paragraph_layout_structure_not_proven":True,
+                  "exact_historic_CCEl_source_equivalence_not_proven":True,
+                  "source_or_original_module_changed":False,
+                  "publication_or_redistribution_approved":False,
+              }
+              print("Full complete authentic original chapter visible text",
+                    "and inline reference original native corpus diagnostic",
+                    "(only closed aggregate metadata):",
+                    json.dumps(full_summary,sort_keys=True))
+              del all_rows,original_full_corpus
+              print("Authenticated original source OSIS authentic chapter versus",
+                    "full authentic original native K exact visible-word anchors",
+                    "(closed metadata only, NOT authorial section/parity proof):",
+                    json.dumps(anchor_census.report(),sort_keys=True))
+              print("Whole original compiled K/I/TOP inventory independently",
+                    "reconciled and SHA-verified:",
+                    native_report["all_native_raw_entries_ordered_sha256"],
+                    native_report["all_actual_raw_entries_scanned"])
+          del private_chapter_words,private_chapter_visible_texts
+          del private_chapter_reference_targets,private_book_pre_chapter_words,stock_zip
+          del all_authored_chapter_words,all_authored_chapter_visible
+          del all_authored_chapter_references,full_authoring_census
+
+          print("Official upstream source commit (not equivalent to compiled ZIP SHA):",
+                os.environ["UPSTREAM_SHA"])
+          print("Authoring-file original bytes and independent SHA256:",
+                json.dumps(metadata,sort_keys=True))
+          print("Original authoring OSIS XML root and closed tag counts:",
+                roots[0],json.dumps(seen,sort_keys=True))
+          print("Upstream .conf version vs pinned downloaded CrossWire 2.2:",
+                version,version==manifest["version"])
+          print("Original build script inspected by SHA only; never executed.")
+          print("Original source OSIS to compiled raw parity: NOT YET TESTED.")
+          print("Electronic rights / CCEL derived layers: NOT AUTHORIZED BY THIS CHECK.")
+          print("Original GitLab source and original ZIP: unmodified and unpublished.")
+          PY
+  observe_kjv_independent_usfm_metadata:
+    name: Observe independent KJV Psalm USFM witness, without importing source text
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Observe independent eBible KJV Psalm USFM title metadata (candidate witness only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from hashlib import sha256
+          from io import BytesIO
+          import os
+          import re
+          import urllib.request
+          from zipfile import ZipFile
+          url = "https://ebible.org/Scriptures/eng-kjv2006_usfm.zip"
+          req=urllib.request.Request(url,headers={"User-Agent":"BibleResources-SourceResearch/1.0"})
+          with urllib.request.urlopen(req,timeout=60) as response:
+              if not response.url.startswith("https://ebible.org/"):
+                  raise SystemExit("Unreviewed eBible redirect; abort observation")
+              data=response.read(16*1024*1024+1)
+          if not data or len(data)>16*1024*1024:
+              raise SystemExit("Unreviewed eBible KJV archive size")
+          print("Independent eBible KJV USFM archive SHA-256 (observation only):",
+                sha256(data).hexdigest())
+          if sha256(data).hexdigest() != "b6faa67117ccaba49df9e7df224a553f11758ae7c5d58f0f7979e2b73ac4480b":
+              raise SystemExit("Independently pinned eBible KJV USFM changed")
+          found=[]
+          seen_book_codes=set()
+          with ZipFile(BytesIO(data)) as archive:
+              files=[n for n in archive.namelist() if n.lower().endswith((".usfm",".sfm"))]
+              if len(files)>100:
+                  raise SystemExit("Unreviewed USFM archive file count")
+              for name in files:
+                  if archive.getinfo(name).file_size>4*1024*1024:
+                      raise SystemExit("Unreviewed USFM file size")
+                  raw=archive.read(name)
+                  text=raw.decode("utf-8-sig")
+                  found_codes=re.findall(r"(?m)^\\id\s+([A-Z0-9]{3})\b",text)
+                  seen_book_codes.update(found_codes)
+                  if "PSA" in found_codes:
+                      found.append({
+                          "psalm_file_sha256":sha256(raw).hexdigest(),
+                          "psalm_file_bytes":len(raw),
+                          "chapter_markers":len(re.findall(r"(?m)^\\c\s+\d+",text)),
+                          "d_title_markers":len(re.findall(r"(?m)^\\d\s+",text)),
+                      })
+          print("Independent USFM observed book codes and Psalm candidate count:",
+                sorted(seen_book_codes),len(found))
+          if len(found)!=1:
+              raise SystemExit("Independent KJV USFM must have exactly one Psalm book")
+          print("Independent eBible KJV USFM candidate ZIP SHA-256:",sha256(data).hexdigest())
+          print("Independent eBible KJV Psalm USFM title-only metadata:",found[0])
+          print("Only observation: no CCEL or CrossWire word comparison yet; no source text published")
+          PY
+  review-one-actual-original-volume:
+    name: Original CCEL volume ${{ matrix.source_volume }} — exact stock text diagnostics
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        source_volume: ${{ fromJSON(github.event_name == 'workflow_dispatch' && format('[{0}]', inputs.source_volume) || '[1,2,3,4,5,6]') }}
+    env:
+      SOURCE_VOLUME: ${{ matrix.source_volume }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify source-neutral one/collection selection and private text comparison
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt
+          python -m unittest discover -s tests -p 'test_commentary_private_text_compare.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_source_native_boundaries.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_nonlink_word_alignment.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_nonlink_words.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_prose_cross_slot.py' -v
+          python -m unittest discover -s tests -p 'test_commentary_usfm_title_witness.py' -v
+      - name: Install real original native SWORD readers
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          # This private text comparison needs only native SWORD headers.
+          # Installing recommended GUI packages dragged in 100 GTK/Xiphos
+          # dependencies and timed out on unrelated Ubuntu mirrors.
+          timeout 300s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 \
+            install -y --no-install-recommends libsword-dev
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_index.cpp \
+            -o "$RUNNER_TEMP/commentary-native-index" -lsword
+          g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "$RUNNER_TEMP/commentary-private-raw" -lsword
+      - name: Compare entire SHA-pinned original volume with complete unchanged CrossWire stock
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/commentary_private_text_compare.py \
+            --resource-id mhc-crosswire \
+            --source-volume "$SOURCE_VOLUME" \
+            --native-index-binary "$RUNNER_TEMP/commentary-native-index" \
+            --native-raw-binary "$RUNNER_TEMP/commentary-private-raw" \
+            --report "$RUNNER_TEMP/mhc-original-volume-text-evidence.json"
+      - name: Report only bounded metadata and explicitly incomplete authorial parity
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          report = json.loads((Path(os.environ["RUNNER_TEMP"]) /
+              "mhc-original-volume-text-evidence.json").read_text(encoding="utf-8"))
+          assert report["resource_id"] == "mhc-crosswire"
+          assert report["source_volume"] == int(os.environ["SOURCE_VOLUME"])
+          assert report["source_is_multivolume_collection"] is True
+          assert report["source_collection_volume_count"] == 6
+          assert report["native_full_corpus_rechecked"] is True
+          assert report["source_text_or_sword_bytes_in_receipt"] is False
+          assert report["original_exact_edition_proven"] is False
+          assert report["original_structure_notes_quotes_and_paragraphs_parity_proven"] is False
+          assert report["copyright_and_redistribution_approved"] is False
+          assert report["editorial_approved"] is False
+          assert report["published"] is False
+          print("MHC volume:", report["source_volume"])
+          print("Original verse/range source units:",
+                report["source_original_verse_and_range_body_evidence"][
+                    "original_verse_or_range_body_count"])
+          print("Original sections without visible source text:",
+                report["source_original_verse_and_range_body_evidence"][
+                    "original_sections_without_visible_text_count"])
+          print("Text comparison diagnostic classes only:",
+                json.dumps(report["text_diagnostic"][
+                    "per_source_marker_text_diagnostic_counts"], sort_keys=True))
+          print("Original chapter-sibling XML review status:",
+                json.dumps({
+                    "reviewed": report["source_original_chapter_neighbor_evidence"][
+                        "original_chapter_siblings_reviewed_count"],
+                    "unreviewed": report["source_original_chapter_neighbor_evidence"][
+                        "original_chapter_siblings_not_reviewed_count"],
+                    "unreviewed_tags": report["source_original_chapter_neighbor_evidence"][
+                        "original_unreviewed_sibling_tag_counts"],
+                }, sort_keys=True))
+          selection = report["source_authorial_word_loss_attention_selection"]
+          assert selection["no_authorial_or_compiled_text_modified"] is True
+          assert selection["source_punctuation_and_markup_parity_not_proven"] is True
+          print("Authorial word-order loss versus stock-only/other differences:",
+                json.dumps(selection["classes"], sort_keys=True))
+          units = report["source_original_verse_and_range_body_evidence"][
+              "original_verse_or_range_body_count"]
+          classes = report["text_diagnostic"][
+              "per_source_marker_text_diagnostic_counts"]
+          allowed = {
+              "exact_unicode_text_match", "edge_whitespace_difference_only",
+              "interior_whitespace_difference_only",
+              "lexical_text_or_punctuation_difference",
+              "missing_original_start_in_native_raw",
+              "stock_raw_fragment_not_strict_xml",
+          }
+          assert set(classes) <= allowed
+          assert all(type(v) is int and v >= 0 for v in classes.values())
+          no_visible = report["source_original_verse_and_range_body_evidence"][
+              "original_sections_without_visible_text_count"]
+          assert sum(classes.values()) + no_visible == units and units > 0
+          assert report["source_original_verse_and_range_body_evidence"][
+              "original_reference_and_adjacent_divisions_not_modified"] is True
+          chapter = report["source_original_chapter_neighbor_evidence"]
+          assert (chapter["original_chapter_siblings_reviewed_count"] +
+                  chapter["original_chapter_siblings_not_reviewed_count"] ==
+                  chapter["explicit_chapter_source_marker_count"])
+          details = report["text_diagnostic"]
+          lexical = details["lexical_disagreement_classification"]
+          relationships = details["different_word_sequence_relationship_subtypes"]
+          punctuation = details["same_words_different_punctuation_subtypes"]
+          locations = details["stock_containment_additional_word_position_counts"]
+          for group in (lexical, relationships, punctuation, locations):
+              assert isinstance(group, dict)
+              assert all(type(key) is str and len(key) <= 100
+                         and key.replace("_", "").isalnum()
+                         and key == key.lower()
+                         and type(count) is int and count >= 0
+                         for key, count in group.items())
+          assert sum(lexical.values()) == classes.get(
+              "lexical_text_or_punctuation_difference", 0)
+          assert sum(punctuation.values()) == lexical.get(
+              "same_unicode_word_tokens_different_punctuation", 0)
+          assert sum(locations.values()) == relationships.get(
+              "source_words_contiguous_inside_longer_stock", 0)
+          print("Closed lexical difference kinds:", json.dumps(lexical, sort_keys=True))
+          print("Closed source/stock word-sequence relationships:",
+                json.dumps(relationships, sort_keys=True))
+          print("Closed punctuation-only subtypes:",
+                json.dumps(punctuation, sort_keys=True))
+          by_book = details["book_counts"]
+          if not isinstance(by_book, dict) or len(by_book) > 66:
+              raise SystemExit("Unbounded original per-book source review data")
+          import re
+          assert all(re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]{1,15}", book)
+                     for book in by_book)
+          assert all(isinstance(kinds, dict)
+                     and set(kinds) <= allowed
+                     and all(type(value) is int and value >= 0
+                             for value in kinds.values())
+                     for kinds in by_book.values())
+          total_book = {}
+          for kinds in by_book.values():
+              for status, n in kinds.items():
+                  total_book[status] = total_book.get(status, 0) + n
+          assert total_book == classes
+          print("Source book identifiers and text-diagnostic counts only:",
+                json.dumps(by_book, sort_keys=True))
+          by_book_relations = details["source_book_word_relationship_subtypes"]
+          if not isinstance(by_book_relations, dict) or len(by_book_relations)>66:
+              raise SystemExit("Unbounded original source-book word relations")
+          assert set(by_book_relations) == set(by_book)
+          assert all(re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]{1,15}", name)
+                     and isinstance(kinds,dict)
+                     and set(kinds) <= set(relationships)
+                     and all(type(n) is int and n>=0 for n in kinds.values())
+                     for name,kinds in by_book_relations.items())
+          summed = {}
+          for kinds in by_book_relations.values():
+              for category,count in kinds.items():
+                  summed[category] = summed.get(category,0) + count
+          assert summed == relationships
+          print("Source book word-order/selection relationship counts:",
+                json.dumps(by_book_relations, sort_keys=True))
+          native_scope=report["source_longer_original_native_run_structural_scope"]
+          expected_longer=relationships.get("stock_words_in_order_with_extra_source_words",0)
+          assert native_scope["source_longer_same_start_cases"] == expected_longer
+          assert native_scope["all_original_source_longer_cases_have_exact_native_K_SHA_attestation"]
+          assert native_scope["all_original_source_longer_cases_reviewed_without_sampling"]
+          assert native_scope["original_source_or_stock_binary_modified"] is False
+          assert native_scope["original_edition_or_section_layout_parity_proven"] is False
+          assert sum(native_scope["native_run_vs_source_declared_scope_classes"].values()) == expected_longer
+          assert len(native_scope["original_source_native_K_run_bounded_sha_only_rows"]) == expected_longer
+          assert native_scope["original_book_case_counts"] == {
+              book:groups["stock_words_in_order_with_extra_source_words"]
+              for book,groups in by_book_relations.items()
+              if groups.get("stock_words_in_order_with_extra_source_words",0)
+          }
+          print("Original longer-source native occupied K-run scope classes:",
+                json.dumps(native_scope["native_run_vs_source_declared_scope_classes"],
+                           sort_keys=True))
+          print("Source-longer original book distribution:",
+                json.dumps(native_scope["original_book_case_counts"], sort_keys=True))
+          link_scope=report["source_longer_original_link_label_word_scope"]
+          assert link_scope["source_longer_case_count"] == expected_longer
+          assert link_scope["all_original_source_longer_cases_included"]
+          assert link_scope["removed_only_source_reference_label_word_positions"]
+          assert link_scope["original_source_or_SWORD_binary_modified"] is False
+          assert link_scope["full_punctuation_markup_paragraph_editional_parity_proven"] is False
+          assert link_scope["original_book_case_counts"] == native_scope["original_book_case_counts"]
+          assert sum(link_scope["source_link_label_exclusion_classes"].values()) == expected_longer
+          assert len(link_scope["original_line_sha_and_closed_link_word_metadata_only_rows"]) == expected_longer
+          print("Source longer word differences after excluding only source scripRef labels:",
+                json.dumps(link_scope["source_link_label_exclusion_classes"],sort_keys=True))
+          dual=report["source_longer_source_and_native_reference_label_word_scope"]
+          assert dual["source_longer_same_start_cases"] == expected_longer
+          assert dual["original_book_case_counts"] == native_scope["original_book_case_counts"]
+          assert dual["excluded_only_original_scripRef_and_real_native_reference_labels"]
+          assert dual["native_reference_offset_and_visible_text_ownership_strictly_verified"]
+          assert dual["original_source_or_native_binary_modified"] is False
+          assert dual["no_unlinked_word_category_implies_authorial_edition_parity_or_missing_text"]
+          assert sum(dual["original_vs_native_unlinked_word_relation_classes"].values()) == expected_longer
+          assert len(dual["original_line_SHA_and_two_sided_link_word_metadata_only_rows"]) == expected_longer
+          extra_classes={
+              "stock_plain_words_contiguous_inside_longer_original_plain_text",
+              "stock_plain_words_in_order_with_extra_original_words",
+          }
+          extra_total=sum(dual["original_vs_native_unlinked_word_relation_classes"].get(
+              name,0) for name in extra_classes)
+          gap_classes=dual["source_extra_unlinked_word_gap_topology_classes"]
+          gap_by_book=dual["original_book_source_extra_word_gap_topology_classes"]
+          assert sum(gap_classes.values())==extra_total
+          assert sum(sum(groups.values()) for groups in gap_by_book.values())==extra_total
+          assert all(isinstance(name,str) and name.islower() and
+                     name.replace("_","").isalnum() and type(count) is int and count>=0
+                     for name,count in gap_classes.items())
+          print("Original and native both-side citation label exclusion, unlinked words:",
+                json.dumps(dual["original_vs_native_unlinked_word_relation_classes"],
+                           sort_keys=True))
+          print("Source-extra unlinked word location uniqueness, no original text:",
+                json.dumps(gap_classes,sort_keys=True))
+          print("Source-extra unlinked word location uniqueness by original book:",
+                json.dumps(gap_by_book,sort_keys=True))
+          p_classes=dual["source_extra_original_p_visible_word_digest_case_classes"]
+          p_books=dual["original_book_source_extra_original_p_digest_case_classes"]
+          p_receipts=dual["source_extra_original_p_digest_source_line_sha_only_rows"]
+          assert sum(p_classes.values())==extra_total
+          assert len(p_receipts)==extra_total
+          assert sum(sum(classes.values()) for classes in p_books.values())==extra_total
+          assert all(set(classes)<=set(p_classes) for classes in p_books.values())
+          assert dual["exact_source_p_digest_match_not_proof_of_biblical_heading_or_authorship"]
+          assert all(isinstance(row["original_source_line"],int)
+                     and len(row["original_body_sha256"])==64
+                     and isinstance(row["all_extra_gap_full_original_p_digest_candidate_classes"],list)
+                     for row in p_receipts)
+          print("Original complete ThML paragraph exact digest source-extra categories:",
+                json.dumps(p_classes,sort_keys=True))
+          print("Original whole paragraph gap digest candidates by source book:",
+                json.dumps(p_books,sort_keys=True))
+          high=report["source_high_extra_unlinked_spans_other_same_chapter_native_location"]
+          selected=high["bounded_cases_selected_for_original_native_replay"]
+          assert 0<=selected<=4
+          assert high["all_genuine_unique_source_extra_span_cases_at_least_100_words"]>=selected
+          assert high["no_source_or_native_text_exported"] is True
+          if selected:
+              assert high["source_extra_outlier_cases_examined"]==selected
+              assert high["complete_original_native_raw_entries_replayed"]>0
+              assert high["no_original_words_or_native_key_strings_exposed"] is True
+              assert high["source_xml_or_original_crosswire_native_binary_modified"] is False
+              assert high["same_chapter_location_not_authorial_section_or_full_edition_parity"]
+              assert len(high["original_source_line_hash_and_native_other_slot_counts_only"])==selected
+          print("Source-extra long original prose same-chapter native exact-span search:",
+                json.dumps(high,sort_keys=True))
+          if selected:
+              structure=high["original_pinned_ccel_extra_gap_paragraph_structure"]
+              assert structure["source_xml_sha256"]==report["source_original_sha256"]
+              assert structure["original_outlier_source_units_reconciled"]==selected
+              assert structure["original_reference_markers_and_section_divisions_not_modified"]
+              assert structure["original_words_or_native_keys_exposed"] is False
+              assert structure["only_original_ccel_source_scripCom_claimed_reference_recorded"]
+              assert structure["ccel_claimed_reference_is_not_native_mapping_or_authorial_edition_proof"]
+
+              assert structure["original_authorial_print_editional_structure_parity_established"] is False
+              items=structure["source_line_hash_and_original_adjacent_paragraph_structure_only"]
+              assert len(items)==selected
+              assert all(len(x["original_extra_word_spans_authentically_within_adjacent_source_div"])>0
+                         and x["original_adjacent_div_unlinked_word_count"]>0
+                         for x in items)
+              print("Pinned CCEL section paragraph structure at extra-word original positions:",
+                    json.dumps(structure,sort_keys=True))
+          evidence = {
+              "status": "SOURCE_STOCK_ONE_VOLUME_LEXICAL_CENSUS_NOT_PARITY",
+              "resource_id": "mhc-crosswire",
+              "source_volume": report["source_volume"],
+              "volume_count": report["source_collection_volume_count"],
+              "source_xml_sha256": report["source_original_sha256"],
+              "original_sword_zip_sha256": report["stock_sword_archive_sha256"],
+              "original_sword_raw_corpus_sha256":
+                  report["stock_full_raw_content_sha256"],
+              "original_source_verse_range_units": units,
+              "original_source_divisions_without_visible_text_count": no_visible,
+              "original_source_divisions_without_visible_text_line_sha_structure":
+                  report["source_original_verse_and_range_body_evidence"][
+                      "bounded_original_sections_without_visible_text_line_sha_structure"],
+              "original_source_divisions_without_visible_text_examples_truncated":
+                  report["source_original_verse_and_range_body_evidence"][
+                      "original_sections_without_visible_text_examples_truncated"],
+              "source_section_text_diagnostic_classes": classes,
+              "source_book_text_diagnostic_classes": by_book,
+              "source_book_word_relationship_subtypes": by_book_relations,
+              "source_longer_original_native_K_run_scope_diagnostics": native_scope,
+              "source_longer_original_scripRef_label_word_scope": link_scope,
+              "source_longer_both_source_and_native_reference_label_word_scope": dual,
+              "source_high_extra_unlinked_spans_other_same_chapter_native_location": high,
+              "source_book_counts_are_not_editorial_content_parity": True,
+              "closed_lexical_difference_types": lexical,
+              "closed_word_sequence_relationship_types": relationships,
+              "closed_same_words_punctuation_difference_types": punctuation,
+              "closed_compiled_extra_word_position_types": locations,
+              "closed_categories_are_diagnostic_not_authorial_edition_parity": True,
+              "source_chapter_marker_count":
+                  chapter["explicit_chapter_source_marker_count"],
+              "source_reviewable_chapter_siblings":
+                  chapter["original_chapter_siblings_reviewed_count"],
+              "source_unreviewed_chapter_siblings":
+                  chapter["original_chapter_siblings_not_reviewed_count"],
+              "source_unreviewed_chapter_sibling_tag_counts":
+                  chapter["original_unreviewed_sibling_tag_counts"],
+              "source_authorial_loss_triage_classes": selection["classes"],
+              "original_vs_compiled_full_text_punctuation_markup_parity": False,
+              "rights_approved": False,
+              "editorial_approved": False,
+              "published": False,
+              "original_source_words_or_binaries_exported": False,
+          }
+          path = (Path(os.environ["RUNNER_TEMP"]) /
+                  "mhc-original-volume-safe-receipt.json")
+          path.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n",
+                          encoding="utf-8")
+          print("An exact source edition/structure proof is NOT established.")
+          PY
+      - name: Compare original Psalm first paragraphs with pinned independent KJV USFM titles
+        if: env.SOURCE_VOLUME == '3'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from hashlib import sha256
+          import os
+          from pathlib import Path
+          import urllib.request
+          url="https://ebible.org/Scriptures/eng-kjv2006_usfm.zip"
+          pinned="b6faa67117ccaba49df9e7df224a553f11758ae7c5d58f0f7979e2b73ac4480b"
+          request=urllib.request.Request(url,headers={
+              "User-Agent":"BibleResources-SourceResearch/1.0"})
+          with urllib.request.urlopen(request,timeout=60) as response:
+              if response.url!="https://ebible.org/Scriptures/eng-kjv2006_usfm.zip":
+                  raise SystemExit("Independent KJV USFM source redirect changed")
+              data=response.read(16*1024*1024+1)
+          if (not data or len(data)>16*1024*1024
+                  or sha256(data).hexdigest()!=pinned):
+              raise SystemExit("Original independent KJV USFM archive changed its pinned SHA-256")
+          path=Path(os.environ["RUNNER_TEMP"])/"original-independent-kjv-usfm.zip"
+          path.write_bytes(data)
+          print("Independent original KJV USFM SHA-256 pin verified:",pinned)
+          PY
+          python scripts/commentary_usfm_title_witness.py \
+            --source-safe-receipt "$RUNNER_TEMP/mhc-original-volume-safe-receipt.json" \
+            --usfm-zip "$RUNNER_TEMP/original-independent-kjv-usfm.zip" \
+            --usfm-archive-sha256 "b6faa67117ccaba49df9e7df224a553f11758ae7c5d58f0f7979e2b73ac4480b" \
+            --usfm-book-id PSA \
+            --source-book Ps \
+            --report "$RUNNER_TEMP/mhc-independent-usfm-psalm-title-evidence.json"
+      - name: Upload only independent, pinned KJV USFM Psalm-title comparison metadata
+        if: env.SOURCE_VOLUME == '3'
+        uses: actions/upload-artifact@v4
+        with:
+          name: mhc-psalm-title-kjv-usfm-metadata-evidence
+          path: ${{ runner.temp }}/mhc-independent-usfm-psalm-title-evidence.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Upload only independent, source-bound metadata-only volume receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: mhc-ccel-volume-${{ matrix.source_volume }}-text-evidence
+          path: ${{ runner.temp }}/mhc-original-volume-safe-receipt.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Explain private content boundaries
+        if: always()
+        run: |
+          {
+            echo '## Original MHC source-to-stock text research'
+            echo 'Exactly one of six independently SHA-pinned CCEL volumes per CI run.'
+            echo 'Private original commentary words, source XML and full SWORD binary are not uploaded.'
+            echo 'A word-count or token match is not edition, punctuation, markup, rights or GUI approval.'
+            echo 'No source or module edits, public catalogue, merge or release.'
+          } >> "$GITHUB_STEP_SUMMARY"

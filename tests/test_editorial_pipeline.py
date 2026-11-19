@@ -76,6 +76,367 @@ class EditorialPipelineTests(unittest.TestCase):
                           osis_policy=self.policy, commentary_policy=self.commentary_policy,
                           diff_path=diff)
 
+    def test_commentary_structural_range_grammar_and_comma_regression(self):
+        from audit_osis import _commentary_ref_tokens
+        valid = {
+            "Gen.8.5": "single_verse",
+            "Gen.8": "chapter_intro",
+            "Gen": "book_intro",
+            "Gen.8.5-Gen.8.6": "continuous_verse_range",
+            "Gen.8.5 Gen.8.6": "discontinuous_list",
+        }
+        for reference,expected in valid.items():
+            with self.subTest(reference=reference):
+                self.assertEqual(_commentary_ref_tokens(reference)[0], expected)
+        invalid = {
+            "Gen.8.5,6": "comma_verse_list_or_range_requires_review",
+            "Gen.8.5-6": "unqualified_or_other_syntax",
+            "Gen.8.6-Gen.8.5": "reversed_or_zero_length_range",
+            "Gen.8.5-Gen.8.5": "reversed_or_zero_length_range",
+            "Gen.8.5-Exod.8.6": "cross_book_range_requires_order_review",
+            "Bible:Gen.8.5": "work_prefix_or_unreviewed_colon",
+        }
+        for reference,expected in invalid.items():
+            with self.subTest(reference=reference):
+                self.assertEqual(_commentary_ref_tokens(reference)[0], expected)
+
+    def test_commentary_structure_reports_bad_machine_range_without_rewriting(self):
+        self.write('<title>8.5,6</title><p>Exact historical exposition.</p>',
+                   kind="commentary")
+        original=self.source.read_bytes()
+        altered=original.replace(b'annotateRef="Gen.1.1"',
+                                 b'annotateRef="Gen.8.5,6"')
+        self.source.write_bytes(altered)
+        result=audit_osis(self.source,kind="commentary")
+        self.assertEqual(result["summary"]["commentary_annotated_section_count"],1)
+        self.assertEqual(result["summary"]["commentary_annotation_scope_shapes"],
+                         {"comma_verse_list_or_range_requires_review":1})
+        self.assertIn("commentary_comma_range_candidate",
+                      result["summary"]["finding_counts"])
+        self.assertIn("commentary_title_numeric_comma_candidate",
+                      result["summary"]["finding_counts"])
+        self.assertEqual(self.source.read_bytes(),altered)
+        self.assertTrue(result["no_content_changes"])
+
+    def test_commentary_sections_check_scope_order_and_book_membership(self):
+        self.write('<p>A source body.</p>',kind="commentary")
+        original=self.source.read_bytes()
+        additional=(b'<div type="section" annotateType="commentary" '
+                    b'annotateRef="Exod.1.3-Exod.1.4"><p>Other book.</p></div>'
+                    b'<div type="section" annotateType="commentary" '
+                    b'annotateRef="Gen.1.2-Gen.1.4"><p>Range.</p></div>'
+                    b'<div type="section" annotateType="commentary" '
+                    b'annotateRef="Gen.1.1"><p>Duplicate scope.</p></div>')
+        self.source.write_bytes(original.replace(
+            b'</div></osisText>',additional+b'</div></osisText>'))
+        result=audit_osis(self.source,kind="commentary")
+        codes=result["summary"]["finding_counts"]
+        self.assertGreaterEqual(codes.get("commentary_book_scope_mismatch",0),1)
+        self.assertGreaterEqual(codes.get("commentary_out_of_order",0),1)
+        self.assertGreaterEqual(codes.get("duplicate_commentary_reference",0),1)
+        self.assertEqual(result["summary"]["commentary_annotated_section_count"],4)
+
+    def test_real_commentary_milestone_ranges_match_native_index(self):
+        from audit_osis import compare_source_milestone_index
+        self.write(
+            '<verse sID="Gen.1.1-2" osisID="Gen.1.1 Gen.1.2" n="1-2"/>'
+            '<p>Two authentic verses, one shared commentary body.</p>'
+            '<verse eID="Gen.1.1-2"/>',kind="commentary")
+        data=self.source.read_bytes().replace(
+            b'<div type="book" osisID="Gen">',
+            b'<div type="book" osisID="Gen">'
+            b'<chapter sID="Gen.1" osisID="Gen.1" n="1"/>'
+        ).replace(b'</div></osisText>',b'<chapter eID="Gen.1"/></div></osisText>')
+        self.source.write_bytes(data)
+        result=compare_source_milestone_index(
+            self.source,numbered_keys=["Gen.1.1","Gen.1.2"],
+            intro_keys=["Gen","Gen.1"],
+            body_sha_by_verse={"Gen.1.1":"a"*64,"Gen.1.2":"a"*64})
+        self.assertEqual(result["status"],"SOURCE_NATIVE_INDEX_AND_MILESTONE_GEOMETRY_MATCH")
+        self.assertTrue(result["all_source_verse_ids_match_occupied_native_keys"])
+        self.assertTrue(result["all_source_book_chapter_ids_match_occupied_native_intros"])
+        self.assertEqual(result["structure_counts"]["native_linked_groups_checked"],1)
+
+    def test_mhc_regression_comma_in_range_misses_native_verse(self):
+        from audit_osis import compare_source_milestone_index
+        self.write(
+            '<verse sID="Gen.8.5,6" osisID="Gen.8.5 Gen.8.6" n="5,6"/>'
+            '<p>Genuine commentary text.</p>'
+            '<verse eID="Gen.8.5,6"/>',kind="commentary")
+        raw=self.source.read_bytes().replace(
+            b'<div type="book" osisID="Gen">',
+            b'<div type="book" osisID="Gen">'
+            b'<chapter sID="Gen.8" osisID="Gen.8" n="8"/>'
+        ).replace(b'</div></osisText>',b'<chapter eID="Gen.8"/></div></osisText>')
+        self.source.write_bytes(raw)
+        result=compare_source_milestone_index(
+            self.source,numbered_keys=["Gen.8.5"],
+            intro_keys=["Gen","Gen.8"])
+        bad=result["anomaly_counts"]
+        self.assertEqual(result["status"],"SOURCE_NATIVE_STRUCTURE_REQUIRES_REVIEW")
+        self.assertEqual(bad["visible_verse_range_label_needs_harmonization"],1)
+        self.assertEqual(bad["verse_start_label_disagrees_with_osisID_list"],1)
+        self.assertEqual(bad["missing_source_verses_in_native"],1)
+        self.assertEqual(self.source.read_bytes(),raw)
+
+    def test_source_native_linked_groups_must_have_identical_compiled_bodies(self):
+        from audit_osis import compare_source_milestone_index
+        self.write(
+            '<verse sID="Gen.1.1-2" osisID="Gen.1.1 Gen.1.2" n="1-2"/>'
+            '<p>Unchanged.</p><verse eID="Gen.1.1-2"/>',kind="commentary")
+        raw=self.source.read_bytes().replace(
+            b'<div type="book" osisID="Gen">',
+            b'<div type="book" osisID="Gen">'
+            b'<chapter sID="Gen.1" osisID="Gen.1" n="1"/>'
+        ).replace(b'</div></osisText>',b'<chapter eID="Gen.1"/></div></osisText>')
+        self.source.write_bytes(raw)
+        result=compare_source_milestone_index(
+            self.source,numbered_keys=["Gen.1.1","Gen.1.2"],
+            intro_keys=["Gen","Gen.1"],
+            body_sha_by_verse={"Gen.1.1":"a"*64,"Gen.1.2":"b"*64})
+        self.assertEqual(result["anomaly_counts"]["native_group_has_different_entry_bodies"],1)
+
+    def test_overlapping_commentary_groups_are_traced_to_actual_native_words(self):
+        from audit_osis import (source_commentary_overlap_witness,
+                                compare_source_overlap_native_bodies)
+        self.write(
+            '<chapter sID="Gen.1" osisID="Gen.1" n="1"/>'
+            '<verse sID="Gen.1.1-2" osisID="Gen.1.1 Gen.1.2" n="1-2"/>'
+            '<p>First authored source comment.</p>'
+            '<verse eID="Gen.1.1-2"/>'
+            '<verse sID="Gen.1.2-3" osisID="Gen.1.2 Gen.1.3" n="2-3"/>'
+            '<p>Second authored source comment.</p>'
+            '<verse eID="Gen.1.2-3"/>'
+            '<chapter eID="Gen.1"/>',kind="commentary")
+        original=self.source.read_bytes()
+        overlap,needed=source_commentary_overlap_witness(self.source)
+        self.assertEqual(set(overlap),{"Gen.1.2"})
+        self.assertEqual(needed,{"Gen.1.1","Gen.1.2","Gen.1.3"})
+        frames={
+            "Gen.1.1":b"<p>First authored source comment.</p>",
+            "Gen.1.2":b"<p>Second authored source comment.</p>",
+            "Gen.1.3":b"<p>Second authored source comment.</p>",
+        }
+        result=compare_source_overlap_native_bodies(overlap,frames)
+        self.assertEqual(result["source_keys_claimed_by_multiple_groups"],1)
+        self.assertEqual(result["source_distinct_overlapping_groups_examined"],2)
+        self.assertEqual(
+            result["classification_counts"]["full_prose_present_in_some_native_keys"],1)
+        self.assertEqual(
+            result["classification_counts"]["full_prose_in_every_original_native_key"],1)
+        self.assertEqual(self.source.read_bytes(),original)
+        self.assertEqual(result["classification_counts"]["source_group_shingles_checked"],2)
+        self.assertEqual(result["classification_counts"]["source_group_shingles_found_in_native"],2)
+        frames["Gen.1.1"]=b"<p>An unrelated commentary.</p>"
+        result=compare_source_overlap_native_bodies(overlap,frames)
+        self.assertEqual(
+            result["classification_counts"][
+                "full_source_word_sequence_not_found_in_group_native_keys"],1)
+        self.assertEqual(
+            result["classification_counts"]["source_groups_with_zero_native_shingle_evidence"],1)
+
+    def test_full_commentary_group_text_is_checked_at_native_first_key(self):
+        from audit_osis import (source_commentary_overlap_witness,
+                                compare_all_commentary_source_group_words)
+        self.write(
+            '<chapter sID="Gen.1" osisID="Gen.1" n="1"/>'
+            '<verse sID="Gen.1.1-2" osisID="Gen.1.1 Gen.1.2" n="1-2"/>'
+            '<p>The first complete commentary paragraph.</p>'
+            '<verse eID="Gen.1.1-2"/>'
+            '<verse sID="Gen.1.3" osisID="Gen.1.3" n="3"/>'
+            '<p>The second full commentary paragraph.</p>'
+            '<verse eID="Gen.1.3"/>'
+            '<chapter eID="Gen.1"/>',kind="commentary")
+        saved=self.source.read_bytes()
+        groups=[]
+        overlapping,needed=source_commentary_overlap_witness(
+            self.source,groups_out=groups)
+        self.assertEqual(len(groups),2)
+        self.assertFalse(overlapping)
+        self.assertFalse(needed)
+        frames={
+            "Gen.1.1":b"<p>The first complete commentary paragraph.</p>",
+            "Gen.1.3":b"<p>The second full commentary paragraph.</p>",
+        }
+        result=compare_all_commentary_source_group_words(groups,frames)
+        self.assertEqual(
+            result["counts"]["groups_with_contiguous_full_source_word_stream"],2)
+        self.assertEqual(result["counts"].get("groups_with_missing_40word_chunks",0),0)
+        frames["Gen.1.3"]=b"<p>Unrelated text that cannot possibly match.</p>"
+        result=compare_all_commentary_source_group_words(groups,frames)
+        self.assertEqual(result["counts"]["groups_with_missing_40word_chunks"],1)
+        self.assertEqual(result["bounded_reference_only_missing_word_cases"][0]["source_section"],
+                         "Gen.1.3")
+        self.assertEqual(saved,self.source.read_bytes())
+
+    def test_private_word_aligned_punctuation_gap_triage(self):
+        from audit_osis import _source_native_interword_punctuation_shape
+        result=_source_native_interword_punctuation_shape(
+            "They trust—Christ! Amen.", "Preamble: They trust-Christ! Amen.")
+        self.assertEqual(result["class"],"punctuation_changes_between_word_anchors")
+        self.assertEqual(result["counts"]["punctuation_codepoints_differ"],1)
+        self.assertEqual(result["word_run_start_native_ordinal"],2)
+        same=_source_native_interword_punctuation_shape(
+            "They  trust Christ.", "They trust Christ.")
+        self.assertEqual(same["class"],"word_internal_gaps_equal_or_whitespace_only")
+        self.assertEqual(same["counts"]["whitespace_only_interword_gaps"],1)
+        repeat=_source_native_interword_punctuation_shape(
+            "This is repeated.", "This is repeated. This is repeated.")
+        self.assertEqual(repeat["class"],"ambiguous_or_unaligned_source_word_window")
+
+    def test_osis_preverse_section_is_not_false_chapter_introduction(self):
+        from audit_osis import source_commentary_introductions
+        self.write(
+            '<chapter sID="Gen.1" osisID="Gen.1" n="1"/>'
+            '<title type="chapter">Authentic chapter introduction.</title>'
+            '<title type="section">Section before the first verse.</title>'
+            '<p>This belongs with verse one, not the chapter introduction.</p>'
+            '<verse sID="Gen.1.1" osisID="Gen.1.1" n="1"/>'
+            '<p>Original verse commentary.</p>'
+            '<verse eID="Gen.1.1"/><chapter eID="Gen.1"/>',
+            kind="commentary")
+        source=source_commentary_introductions(self.source)
+        self.assertIn("Authentic chapter introduction.",source["Gen.1"]["text"])
+        self.assertNotIn("Section before the first verse.",source["Gen.1"]["text"])
+        self.assertNotIn("This belongs with verse one",source["Gen.1"]["text"])
+        self.assertEqual(source["Gen.1"]["preverse_boundary"]["kind"],"title")
+
+    def test_intro_moved_to_book_or_verse_slot_is_not_automatically_called_lost(self):
+        from audit_osis import (source_commentary_introductions,
+                                triage_commentary_introduction_relocation)
+        self.write(
+            '<chapter sID="Gen.1" osisID="Gen.1" n="1"/>'
+            '<p>Original authorial preface and historical references.'
+            '<note type="study" n="1">Note authored with intro.</note>'
+            '<reference osisRef="Gen.1.2">See Genesis.</reference></p>'
+            '<verse sID="Gen.1.1" osisID="Gen.1.1" n="1"/>'
+            '<p>First indexed body.</p>'
+            '<verse eID="Gen.1.1"/><chapter eID="Gen.1"/>',
+            kind="commentary")
+        originals=source_commentary_introductions(self.source)
+        native_i={
+            "Gen":(b'<p>Original authorial preface and historical references.'
+                   b'<note type="study" n="1">Note authored with intro.</note>'
+                   b'<reference osisRef="Gen.1.2">See Genesis.</reference></p>'),
+            "Gen.1":b'<p/>',
+        }
+        nat_k={"Gen.1.1":b"<p>First indexed body.</p>"}
+        outcome=triage_commentary_introduction_relocation(originals,native_i,nat_k)
+        self.assertEqual(
+            outcome["counts"]["intro_word_stream_found_in_book_intro"],1)
+        self.assertEqual(outcome["counts"]["note_metadata_relocated_to_book_intro"],1)
+        self.assertEqual(outcome["counts"]["reference_metadata_relocated_to_book_intro"],1)
+        self.assertEqual(outcome["bounded_source_scope_cases"][0]["source_intro"],"Gen.1")
+        native_i["Gen"]=b"<p>Not the original preface.</p>"
+        outcome=triage_commentary_introduction_relocation(originals,native_i,nat_k)
+        self.assertEqual(
+            outcome["counts"][
+                "intro_word_stream_not_found_contiguously_in_same_book_I_or_first_K"],1)
+
+    def test_book_and_chapter_commentary_intro_note_and_link_parity(self):
+        from audit_osis import (source_commentary_introductions,
+                                compare_commentary_source_native_introductions)
+        self.write(
+            '<title>Authorial book preface.</title>'
+            '<chapter sID="Gen.1" osisID="Gen.1" n="1"/>'
+            '<p>Chapter introduction: essential.'
+            '<note type="study" n="a">Original note text.</note>'
+            '<reference osisRef="Exod.1.1">Exodus cross-reference.</reference>'
+            '</p>'
+            '<verse sID="Gen.1.1" osisID="Gen.1.1" n="1"/>'
+            '<p>Verse commentary.</p><verse eID="Gen.1.1"/>'
+            '<chapter eID="Gen.1"/>',kind="commentary")
+        original=self.source.read_bytes()
+        intros=source_commentary_introductions(self.source)
+        self.assertEqual(set(intros),{"Gen","Gen.1"})
+        native={
+            "Gen":b"<title>Authorial book preface.</title>",
+            "Gen.1":(
+                b'<p>Chapter introduction: essential.'
+                b'<note type="study" n="a">Original note text.</note>'
+                b'<reference osisRef="Exod.1.1">Exodus cross-reference.</reference>'
+                b'</p>'),
+        }
+        good=compare_commentary_source_native_introductions(intros,native)
+        self.assertEqual(good["counts"]["source_intro_records"],2)
+        self.assertEqual(good["counts"]["source_intro_note_elements"],1)
+        self.assertEqual(good["counts"]["source_intro_reference_elements"],1)
+        self.assertEqual(good["counts"]["source_intro_note_body_metadata_missing_from_native"],0)
+        self.assertEqual(good["counts"]["source_intro_reference_body_metadata_missing_from_native"],0)
+        native["Gen.1"]=native["Gen.1"].replace(
+            b'osisRef="Exod.1.1"',b'osisRef="Exod.1.2"')
+        bad=compare_commentary_source_native_introductions(intros,native)
+        self.assertEqual(bad["counts"]["source_intro_reference_body_metadata_missing_from_native"],1)
+        self.assertEqual(self.source.read_bytes(),original)
+
+    def test_commentary_book_end_tail_is_not_mistaken_for_corrupted_verse(self):
+        from audit_osis import (source_commentary_overlap_witness,
+                                source_commentary_book_closing_text,
+                                classify_commentary_native_final_boundary)
+        self.write(
+            '<chapter sID="Gen.1" osisID="Gen.1" n="1"/>'
+            '<verse sID="Gen.1.1" osisID="Gen.1.1" n="1"/>'
+            '<p>Authored final passage.</p>'
+            '<verse eID="Gen.1.1"/>'
+            '<p>AFTERWORD.</p>'
+            '<chapter eID="Gen.1"/>',kind="commentary")
+        before=self.source.read_bytes()
+        groups=[]
+        source_commentary_overlap_witness(self.source,groups_out=groups)
+        closings=source_commentary_book_closing_text(self.source)
+        self.assertEqual(closings["Gen"]["last_source_scope"],"Gen.1.1")
+        self.assertIn("AFTERWORD.",closings["Gen"]["closing_text"])
+        result=classify_commentary_native_final_boundary(
+            groups[0],b"<p>Authored final passage. AFTERWORD.</p>",
+            closings["Gen"]["closing_text"])
+        self.assertIn(result["class"],{
+            "native_suffix_exactly_contains_original_book_closing_text",
+            "native_suffix_matches_authored_closing_without_whitespace",
+        })
+        lost=classify_commentary_native_final_boundary(
+            groups[0],b"<p>Authored final passage. INVALID END.</p>",
+            closings["Gen"]["closing_text"])
+        self.assertEqual(lost["class"],
+                         "native_suffix_not_explained_by_source_book_closing")
+        self.assertEqual(before,self.source.read_bytes())
+
+    def test_commentary_punctuation_notes_and_reference_targets_not_silently_lost(self):
+        from audit_osis import (
+            source_commentary_overlap_witness,
+            compare_all_commentary_source_group_semantics,
+        )
+        body=(
+            '<p>Same—punctuation! '
+            '<note type="explanation" n="a">Note body: preserve punctuation.</note>'
+            ' Linked <reference osisRef="Gen.1.1">Gen. 1:1</reference>.</p>'
+        )
+        self.write(
+            '<chapter sID="Gen.1" osisID="Gen.1" n="1"/>'
+            '<verse sID="Gen.1.1" osisID="Gen.1.1" n="1"/>'
+            +body+
+            '<verse eID="Gen.1.1"/><chapter eID="Gen.1"/>',
+            kind="commentary")
+        before=self.source.read_bytes()
+        groups=[]
+        source_commentary_overlap_witness(self.source,groups_out=groups)
+        raw={"Gen.1.1":body.encode("utf-8")}
+        good=compare_all_commentary_source_group_semantics(groups,raw)
+        self.assertEqual(good["counts"]["source_text_exact_raw_unicode_substring"],1)
+        self.assertEqual(good["counts"]["source_note_bodies_missing_from_native"],0)
+        self.assertEqual(good["counts"]["source_reference_bodies_missing_from_native"],0)
+        self.assertEqual(good["counts"]["source_note_body_and_metadata_not_exactly_in_native"],0)
+        self.assertEqual(good["counts"]["source_reference_body_and_metadata_not_exactly_in_native"],0)
+        changed=body.replace("Same—punctuation!","Same-punctuation!")
+        changed=changed.replace('osisRef="Gen.1.1"','osisRef="Gen.1.2"')
+        changed=changed.replace('Note body: preserve punctuation.',
+                                'Altered note body: preserve punctuation.')
+        bad=compare_all_commentary_source_group_semantics(
+            groups,{"Gen.1.1":changed.encode("utf-8")})
+        self.assertEqual(bad["counts"]["source_group_full_punctuation_or_spacing_needs_review"],1)
+        self.assertEqual(bad["counts"]["source_note_bodies_missing_from_native"],1)
+        self.assertEqual(bad["counts"]["source_reference_body_and_metadata_not_exactly_in_native"],1)
+        self.assertEqual(self.source.read_bytes(),before)
+
     def test_bible_split_preserves_all_text_verse_ids_and_original(self):
         self.write('<verse osisID="Gen.1.1" sID="v1"/><p>First sentence. Second sentence.</p><verse eID="v1"/>')
         node = self.p()
