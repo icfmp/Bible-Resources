@@ -41,7 +41,7 @@ def fixture():
         },
         "coverage_with_word_ids": {
             "additional_entry_only_links": 273,
-            "word_aware_entry_links": 268105,
+            "word_aware_entry_links": 268704,
             "sense_links": 30492,
         },
         "editorial_candidate": {
