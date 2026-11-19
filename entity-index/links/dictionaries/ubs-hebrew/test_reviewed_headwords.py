@@ -15,9 +15,9 @@ REGISTER = json.loads((HERE / "family_register.json").read_text(encoding="utf-8"
 class ReviewedHeadwordTests(unittest.TestCase):
     def test_complete_exact_pinned_five_family_batch(self):
         result = CHECK["verify_register"](LEDGER, REGISTER)
-        self.assertEqual(result["families"], 5)
-        self.assertEqual(result["occurrences"], 107)
-        self.assertEqual(len(result["word_witnesses"]), 15)
+        self.assertEqual(result["families"], 17)
+        self.assertEqual(result["occurrences"], 154)
+        self.assertEqual(len(result["word_witnesses"]), 41)
         self.assertTrue(all(not d["contextual_sense_id_approved"]
                             and not d["index_word_links_applied"]
                             for d in LEDGER["decisions"]))

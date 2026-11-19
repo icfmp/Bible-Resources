@@ -565,3 +565,48 @@ The other **141 families / 458 occurrences** still require review. All
 composite source Strong codes are tracked separately. No source corpus counts,
 generated crosswalk, actual word links or v1 publication status change in this
 documentation-only positive batch.
+
+### Second reviewed-entry batch: twelve Aramaic named entities (no universal aliases)
+
+Twelve more source-identified lexical families have been reviewed against
+original named referents in Ezra or Daniel and the matching UBS 0.9.4
+published headword inventory. They contribute **47 original WLC occurrences**
+to the **editorial headword-identification ledger**, without changing any
+actual generated index link or contextual sense:
+
+| Original Aramaic family | WLC occurrences | Original named referent |
+| --- | ---: | --- |
+| `יִשְׂרָאֵל` A3479 | 8 | Israel, Ezra 5:1 |
+| `כּוֹרֶשׁ` A3567 | 8 | Cyrus, Ezra 5:13 |
+| `יְהוּד` A3061 | 7 | Judah, Ezra 5:1 |
+| `אַרְתַּחְשַׁשְׂתְּא` A0783a | 6 | Artaxerxes, Ezra 4:8 |
+| `מָדַי` A4076 | 6 | Media, Ezra 6:2 |
+| `רְחוּם` A7348a | 4 | Rehum, Ezra 4:8 |
+| `זְכַרְיָה` A2148a | 2 | Zechariah, Ezra 5:1 |
+| `חַגַּי` A2292a | 2 | Haggai, Ezra 5:1 |
+| `מֹשֶׁה` A4873 | 1 | Moses, Ezra 6:18 |
+| `יֵשׁוּעַ` A3443 | 1 | Jeshua, Ezra 5:2 |
+| `יוֹצָדָק` A3136a | 1 | Jozadak, Ezra 5:2 |
+| `חֲנַנְיָה` A2608a | 1 | Hananiah, Daniel 2:17 |
+
+Every record in the existing [positive decision ledger](
+v1_reviewed_headword_dispositions.json) stores its exact UBS `MainId`,
+language + unchanged full original Strong / lemma, class counts, up to three
+original WLC word-ID/reference/SDBH witnesses, a manual contextual
+identity rationale, and the independently searchable dictionary index.
+The read-only original-source verifier continues to check **all** entries,
+now **17 families / 154 occurrences / 41 original witness IDs**, in pinned
+UBS and MACULA snapshots. A name may be shared by multiple biblical figures;
+only the *headword* is reviewed, not all individual sense/identity choices.
+
+The reviewed ledger does not authorize transfer of MACULA SDBH identifiers
+to UBS contextual senses, nor is it a universal Hebrew/Aramaic Strong alias.
+No generated crosswalk coverage should be counted from an unimplemented
+editorial approval.
+
+**Cumulative distinct in-scope dispositions:** 11 negative candidate
+rejections (1,809 occurrences), 40 multi-headword abstentions (275), and
+17 positive headword identities (154) = **68/197 families / 2,238
+occurrences**. Remaining **129 families / 411 occurrences**, excluding
+the separately tracked 5 UBS edition-headword inventory exclusions.
+An independent merge and explicit release gate are still required for v1.0.

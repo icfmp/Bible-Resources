@@ -4,7 +4,7 @@
     "macula_revision": "47db250bd55d0d8577f2a94fba114ef16c35b23c",
     "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8"
   },
-  "policy": "Five independently interpreted UBS Hebrew v0.9.4 headword identities: source-word-specific family approvals for entry-level crosswalk candidates only. Do not treat Strong spelling, H/A prefix, or old SDBH equality alone as equivalence; do not infer contextual sense IDs. These are editorial dispositions, not generated index links. External dictionary web display corroborates sense/context but the pinned original UBS/MACULA metadata is verified by CI.",
+  "policy": "Five independently interpreted UBS Hebrew v0.9.4 headword identities: source-word-specific family approvals for entry-level crosswalk candidates only. Do not treat Strong spelling, H/A prefix, or old SDBH equality alone as equivalence; do not infer contextual sense IDs. These are editorial dispositions, not generated index links. External dictionary web display corroborates sense/context but the pinned original UBS/MACULA metadata is verified by CI. Added twelve distinct named-entity entry reviews grounded in original Ezra/Daniel referents, and preserved context/sense abstention for homonymous names.",
   "decisions": [
     {
       "lang": "A",
@@ -195,6 +195,412 @@
         "ubs_cited_passage": "EZR 6:9"
       },
       "rationale": "The UBS combined headword explicitly distinguishes Form 5 'head of cattle' with citations Ezra 6:9, 6:17, 7:17 and Daniel 4:25. The original Aramaic source uses the cattle noun. Approve only the containing headword, never automatically choose the unrelated Form 1 'dove' or fabricate a contextual sense."
+    },
+    {
+      "lang": "A",
+      "lemma": "יִשְׂרָאֵל",
+      "original_strong": "3479",
+      "original_occurrences": 8,
+      "original_source_classes": {
+        "noun": 8
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "003188001001000",
+          "original_word_id": "o150050010171",
+          "reference": "EZR 5:1!17"
+        },
+        {
+          "original_sdbh": "003188001001000",
+          "original_word_id": "o150050110222",
+          "reference": "EZR 5:11!22"
+        },
+        {
+          "original_sdbh": "003188001001000",
+          "original_word_id": "o150060140171",
+          "reference": "EZR 6:14!17"
+        }
+      ],
+      "ubs_candidate_main_id": "003192000000000",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Israel, the people or nation, as referred to in the Aramaic Ezra 5:1 witness",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZR 5:1"
+      },
+      "rationale": "The source says the God of Israel (Ezra 5:1), and UBS identifies the uniquely written Israel headword. The dictionary headword may also encompass the personal name Jacob/Israel; no individual contextual sense is selected."
+    },
+    {
+      "lang": "A",
+      "lemma": "כּוֹרֶשׁ",
+      "original_strong": "3567",
+      "original_occurrences": 8,
+      "original_source_classes": {
+        "noun": 8
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "003268001001000",
+          "original_word_id": "o150050130042",
+          "reference": "EZR 5:13!4"
+        },
+        {
+          "original_sdbh": "003268001001000",
+          "original_word_id": "o150050130081",
+          "reference": "EZR 5:13!8"
+        },
+        {
+          "original_sdbh": "003268001001000",
+          "original_word_id": "o150050140231",
+          "reference": "EZR 5:14!23"
+        }
+      ],
+      "ubs_candidate_main_id": "003271000000000",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Cyrus, the Persian king responsible for the rebuilding decree",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZR 5:13"
+      },
+      "rationale": "Ezra 5:13 explicitly names Cyrus the king. UBS indexes Cyrus under the same pointed lemma; the different source Strong annotation must not be made a general H/A alias."
+    },
+    {
+      "lang": "A",
+      "lemma": "יְהוּד",
+      "original_strong": "3061",
+      "original_occurrences": 7,
+      "original_source_classes": {
+        "noun": 7
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "002818001002000",
+          "original_word_id": "o150050010132",
+          "reference": "EZR 5:1!13"
+        },
+        {
+          "original_sdbh": "002818001002000",
+          "original_word_id": "o150050080062",
+          "reference": "EZR 5:8!6"
+        },
+        {
+          "original_sdbh": "002818001002000",
+          "original_word_id": "o150070140121",
+          "reference": "EZR 7:14!12"
+        }
+      ],
+      "ubs_candidate_main_id": "002822000000000",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Judah, the region or province referred to in Ezra",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZR 5:1"
+      },
+      "rationale": "Ezra 5:1–8 concerns the province of Judah, not a separate unrelated personal name. UBS groups the named Jehud/Judah location under this exact indexed headword."
+    },
+    {
+      "lang": "A",
+      "lemma": "אַרְתַּחְשַׁשְׂתְּא",
+      "original_strong": "0783a",
+      "original_occurrences": 6,
+      "original_source_classes": {
+        "noun": 6
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "000722001001000",
+          "original_word_id": "o150040080112",
+          "reference": "EZR 4:8!11"
+        },
+        {
+          "original_sdbh": "000722001001000",
+          "original_word_id": "o150040110081",
+          "reference": "EZR 4:11!8"
+        },
+        {
+          "original_sdbh": "000722001001000",
+          "original_word_id": "o150040230081",
+          "reference": "EZR 4:23!8"
+        }
+      ],
+      "ubs_candidate_main_id": "000721000000000",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Artaxerxes, the Persian king addressed in Ezra 4",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZR 4:8"
+      },
+      "rationale": "Ezra 4:8 and 4:11 explicitly address King Artaxerxes; UBS indexes Artaxerxes with this published original alternate spelling. This entry-level identity does not judge which historically distinct royal titulature or source variant applies."
+    },
+    {
+      "lang": "A",
+      "lemma": "מָדַי",
+      "original_strong": "4076",
+      "original_occurrences": 6,
+      "original_source_classes": {
+        "noun": 6
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "003727001002000",
+          "original_word_id": "o150060020052",
+          "reference": "EZR 6:2!5"
+        },
+        {
+          "original_sdbh": "003727001002000",
+          "original_word_id": "o270050280052",
+          "reference": "DAN 5:28!5"
+        },
+        {
+          "original_sdbh": "003727001002000",
+          "original_word_id": "o270060010021",
+          "reference": "DAN 6:1!2"
+        }
+      ],
+      "ubs_candidate_main_id": "003731000000000",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Media / Medes, named geographical-ethnic referent",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZR 6:2"
+      },
+      "rationale": "Ezra 6:2 places the record in Media, and Daniel 5:28 names the Medes. UBS includes Media/Medes under its Madai headword; avoid selecting between person, people and territory senses for the family."
+    },
+    {
+      "lang": "A",
+      "lemma": "רְחוּם",
+      "original_strong": "7348a",
+      "original_occurrences": 4,
+      "original_source_classes": {
+        "noun": 4
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "006752001005000",
+          "original_word_id": "o150040080011",
+          "reference": "EZR 4:8!1"
+        },
+        {
+          "original_sdbh": "006752001005000",
+          "original_word_id": "o150040090021",
+          "reference": "EZR 4:9!2"
+        },
+        {
+          "original_sdbh": "006752001005000",
+          "original_word_id": "o150040170051",
+          "reference": "EZR 4:17!5"
+        }
+      ],
+      "ubs_candidate_main_id": "006757000000000",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Rehum, royal official named in Ezra 4",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZR 4:8"
+      },
+      "rationale": "Rehum is the specifically named official at Ezra 4:8 and 4:9, a referent represented in UBS Rehum's namesake headword. No broader identity merge across other Rehums is approved."
+    },
+    {
+      "lang": "A",
+      "lemma": "זְכַרְיָה",
+      "original_strong": "2148a",
+      "original_occurrences": 2,
+      "original_source_classes": {
+        "noun": 2
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "001985001006000",
+          "original_word_id": "o150050010052",
+          "reference": "EZR 5:1!5"
+        },
+        {
+          "original_sdbh": "001985001006000",
+          "original_word_id": "o150060140092",
+          "reference": "EZR 6:14!9"
+        }
+      ],
+      "ubs_candidate_main_id": "001988000000000",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Zechariah, prophet in Ezra 5:1 and 6:14",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZR 5:1"
+      },
+      "rationale": "The named prophet Zechariah son of Iddo prophesies alongside Haggai in Ezra 5:1; UBS Zechariah headword includes this named prophet among other people with the same name, whose senses remain distinct."
+    },
+    {
+      "lang": "A",
+      "lemma": "חַגַּי",
+      "original_strong": "2292a",
+      "original_occurrences": 2,
+      "original_source_classes": {
+        "noun": 2
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "002121001001000",
+          "original_word_id": "o150050010021",
+          "reference": "EZR 5:1!2"
+        },
+        {
+          "original_sdbh": "002121001001000",
+          "original_word_id": "o150060140061",
+          "reference": "EZR 6:14!6"
+        }
+      ],
+      "ubs_candidate_main_id": "002124000000000",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Haggai, the prophet in Ezra 5:1 and 6:14",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZR 5:1"
+      },
+      "rationale": "The prophet Haggai named beside Zechariah in Ezra 5:1 and 6:14 is the person recorded under the UBS Haggai headword. No contextual sense ID transferred."
+    },
+    {
+      "lang": "A",
+      "lemma": "מֹשֶׁה",
+      "original_strong": "4873",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "004460001001000",
+          "original_word_id": "o150060180131",
+          "reference": "EZR 6:18!13"
+        }
+      ],
+      "ubs_candidate_main_id": "004466000000000",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Moses, associated with priestly duties in Ezra 6:18",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZR 6:18"
+      },
+      "rationale": "Ezra 6:18 refers to the written Law of Moses, the biblical leader; UBS Moses headword identifies this name. Do not infer a contextual sense beyond the dictionary entry."
+    },
+    {
+      "lang": "A",
+      "lemma": "יֵשׁוּעַ",
+      "original_strong": "3443",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "003151001005000",
+          "original_word_id": "o150050020062",
+          "reference": "EZR 5:2!6"
+        }
+      ],
+      "ubs_candidate_main_id": "003155000000000",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Jeshua, son of Jozadak, in Ezra 5:2",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZR 5:2"
+      },
+      "rationale": "Ezra 5:2 names Jeshua together with Zerubbabel and identifies his father Jozadak, supporting the UBS Jeshua headword while preserving distinction from other namesakes."
+    },
+    {
+      "lang": "A",
+      "lemma": "יוֹצָדָק",
+      "original_strong": "3136a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "002836001001000",
+          "original_word_id": "o150050020081",
+          "reference": "EZR 5:2!8"
+        }
+      ],
+      "ubs_candidate_main_id": "002840000000000",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Jozadak, father of Jeshua, in Ezra 5:2",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZR 5:2"
+      },
+      "rationale": "The original Ezra 5:2 occurrence names Jozadak as Jeshua's father; UBS uses the Jozadak/Jehozadak headword for that individual. No conflation with an unrelated similar name."
+    },
+    {
+      "lang": "A",
+      "lemma": "חֲנַנְיָה",
+      "original_strong": "2608a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "002402001010000",
+          "original_word_id": "o270020170053",
+          "reference": "DAN 2:17!5"
+        }
+      ],
+      "ubs_candidate_main_id": "002405000000000",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Hananiah, Daniel's companion, in Daniel 2:17",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "DAN 2:17"
+      },
+      "rationale": "Daniel 2:17 names Hananiah among Daniel's companions, matching UBS Hananiah headword, which can also hold other people with that name; no selection of a contextual sense ID."
     }
   ]
 }
