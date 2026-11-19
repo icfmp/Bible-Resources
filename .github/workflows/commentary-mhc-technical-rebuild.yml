@@ -1678,13 +1678,15 @@ jobs:
           print("Private ZIP deleted; no module bytes or authorial text uploaded")
           PY
       - name: Privately prove final MHC identity, metadata and entire binary corpus (no release)
+        env:
+          MHC_REVIEW_ARTIFACT: ${{ github.event_name == 'pull_request' && github.head_ref == 'release/mhc-evidence-0.1.0' && github.event.pull_request.head.repo.full_name == github.repository }}
         shell: bash
         timeout-minutes: 5
         run: |
           set -euo pipefail
           umask 077
           python - <<'PY'
-          import json,os,subprocess,sys
+          import json,os,subprocess,sys,shutil
           from hashlib import sha256
           from pathlib import Path
           from zipfile import ZipFile
@@ -1796,6 +1798,33 @@ jobs:
                       "module_published":False,
                       "release_authorized":False,
                     },sort_keys=True))
+              if os.environ.get("MHC_REVIEW_ARTIFACT")=="true":
+                  expected=plan["private_validation"]["private_final_MHC_zip_sha256"]
+                  if expected!=promoted["release_zip_sha256"]:
+                      raise SystemExit("Full MHC staging ZIP differs from independently pinned private final-ID source")
+                  output=root/"mhc-reviewed-evidence"
+                  output.mkdir(mode=0o700,exist_ok=True)
+                  final_file=output/"MHC-0.1.0.zip"
+                  shutil.copyfile(candidate_zip,final_file)
+                  (output/"SHA256SUMS.txt").write_text(
+                      expected+"  MHC-0.1.0.zip\n",encoding="ascii")
+                  (output/"SOURCE_PROOF.json").write_text(
+                      json.dumps({
+                          "module_id":"MHC",
+                          "version":plan["proposed_bible_resources_version"],
+                          "source_original_sha256":plan["upstream_module"][
+                              "original_authoring_osis_sha256"],
+                          "package_sha256":expected,
+                          "package_bytes":final_file.stat().st_size,
+                          "full_native_corpus_readback_equal":True,
+                          "source_binary_payload_byte_identical":True,
+                          "review_artifact_only":True,
+                          "catalogue_entry_created":False,
+                          "release_published":False,
+                      },sort_keys=True,indent=2)+"\n",encoding="utf-8")
+                  print("Private release-review copy prepared only after source and final-ID proof:",
+                        {"sha256":expected,"zip_bytes":final_file.stat().st_size,
+                         "stage":"not_published"})
           finally:
               source_zip.unlink(missing_ok=True)
               candidate_zip.unlink(missing_ok=True)
@@ -2272,10 +2301,19 @@ jobs:
           print("Research-only source endpoint and overlap candidate was"
                 " independently checked; original is still immutable")
           PY
-      - name: No distribution or editorial phase in this workflow
+      - name: No public distribution or editorial publication in this workflow
         if: always()
         shell: bash
         run: |
-          echo "Original OSIS, private zCom4 and reports are confined to runner ephemeral storage."
-          echo "No binaries, ZIPs or commentary text are uploaded as artifacts."
-          echo "Historical textual comparison and corrections are a distinct future phase."
+          echo "Source original and temporary private builds remain confined to runner storage."
+          echo "Only the explicitly gated, independently pinned MHC reviewer candidate may be uploaded."
+          echo "No public GitHub Release, Pages catalogue update, or Bible application change here."
+      - name: Preserve final-ID MHC reviewer ZIP for separate publication signoff
+        if: ${{ success() && github.event_name == 'pull_request' && github.head_ref == 'release/mhc-evidence-0.1.0' && github.event.pull_request.head.repo.full_name == github.repository }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: MHC-0.1.0-full-native-source-attested-review-only
+          path: ${{ runner.temp }}/mhc-reviewed-evidence/
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
