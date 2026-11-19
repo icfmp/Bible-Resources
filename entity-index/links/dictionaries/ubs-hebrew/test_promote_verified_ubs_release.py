@@ -134,7 +134,9 @@ class VerifiedUBSPublicReleaseTests(unittest.TestCase):
 
     def test_fail_closed_on_modified_private_artifact(self):
         _, original, auth = fixture()
-        broken = original.replace(b"United Bible Societies", b"Fake Lexicon Provider")
+        broken = bytearray(original)
+        broken[55] ^= 1
+        broken = bytes(broken)
         self.assertNotEqual(original, broken)
         with self.assertRaisesRegex(ValueError, "technical RC2 ZIP changed"):
             MOD["build_public_files"](broken, auth)
@@ -158,7 +160,7 @@ class VerifiedUBSPublicReleaseTests(unittest.TestCase):
         original["coverage_with_word_ids"]["sense_links"] += 1
         raw = MOD["encode"](original)
         auth["approved_private_index_sha256"] = MOD["digest"](raw)
-        with self.assertRaisesRegex(ValueError, "technical RC2 ZIP changed"):
+        with self.assertRaisesRegex(ValueError, "Original technical source candidate manifest changed"):
             _, source, _ = fixture()
             MOD["build_public_files"](source, auth)
 
