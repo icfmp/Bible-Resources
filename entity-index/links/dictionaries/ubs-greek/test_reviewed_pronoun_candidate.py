@@ -80,6 +80,13 @@ class ReviewedGreekPronounTests(unittest.TestCase):
         )
         self.assertEqual(len(groups), 3)
         self.assertEqual(groups["σύ"]["ubs_main_id"], IDS["σύ"])
+        abbreviated = copy.deepcopy(en)
+        abbreviated[0]["BaseForms"][0]["PartsOfSpeech"] = ["pprs."]
+        abbreviated[1]["BaseForms"][0]["PartsOfSpeech"] = ["pprs."]
+        abbreviated[2]["BaseForms"][0]["PartsOfSpeech"] = ["pdem."]
+        self.assertEqual(len(MOD["review_ledger"](
+            LEDGER, {"source_editions": LEDGER["source_editions"]},
+            abbreviated, fr)), 3)
         broken = copy.deepcopy(en)
         broken[0]["BaseForms"][0]["PartsOfSpeech"] = ["verb"]
         with self.assertRaisesRegex(ValueError, "POS classification differs from pronoun expectation"):
