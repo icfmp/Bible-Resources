@@ -138,7 +138,7 @@ def main():
         json.loads(args.english.read_text(encoding="utf-8")),
         args.macula,
     )
-    if result != {"families": 5, "occurrences": 107, "word_witnesses": 15}:
+    if result != {"families": 17, "occurrences": 154, "word_witnesses": 41}:
         raise ValueError("Pinned editorial review counts unexpectedly changed")
     print("UBS_PINNED_REVIEWED_HEADWORDS", json.dumps(result, sort_keys=True))
 
