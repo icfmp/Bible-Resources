@@ -704,3 +704,44 @@ families / 2,512 of 2,649 original occurrences**. The **94 remaining
 families / 137 occurrences** still require their own source review
 before the explicit v1.0 approval gate. Source corpus and generated
 index coverage are unchanged.
+
+### Five reviewed false UBS place/compound candidate identities
+
+Five additional *sole* UBS headword candidates have been explicitly rejected
+as **nonidentical source lexical referents or original compound components**
+(16 original WLC occurrences), with independently checked original verse
+context and published UBS entry definitions:
+
+| Original MACULA lexical family | Original occurrences | UBS headword wrongly suggested by inherited Strong | Why not equivalent |
+| --- | ---: | --- | --- |
+| H `רִמּוֹן` 7417b | 3 | `רִמּוֹנוֹ` H7417, town of Zebulun | The original 2 Kings 5:18 names the **Syrian god** Rimmon, not a Levitical town |
+| H `לַיִשׁ` 3919a | 4 | `לַיְשָׁה` H3919, town in Benjamin | Judges 18 concerns northern **Laish/Dan**, not Benjaminite Laishah |
+| H `שְׁכֶם` 4026b | 3 | `מִגְדָּל` H4026, tower | The original source word is **Shechem**, a separate constituent in “Tower of Shechem” (Judg 9:46–49) |
+| H `גּוֹי` 2800a | 3 | `חֲרֹשֶׁת הַגּוֹיִם` H2800, place | The source segment means **nations**, one constituent of “Harosheth-haggoyim” (Judg 4) |
+| H `עֵמֶק` 0425b | 3 | `אֵלָה` H0425, tree/place/name | The source segment means **valley** in “Valley of Elah” (1 Sam 17:2, 19), not “Elah” itself |
+
+**Important excluded case:** Hebrew `רִמּוֹן` H7417a has **nine**
+occurrences spanning *different* geographical referents: its recorded
+witnesses include both **southern Rimmon** at Joshua 15:32 and **the
+Zebulun Rimmon** at Joshua 19:13. Its sole UBS `רִמּוֹנוֹ` entry
+could legitimately describe at least some of that source family. It
+must **not** be rejected wholesale. This mixed identity needs its own
+source-word-level resolution; a family-wide no-link abstention may be
+recorded without claiming full lexical nonidentity.
+
+The same [source-pinned nonidentity verifier](verify_lexical_nonidentity.py)
+now supports both original different-Strong consonantal candidates and
+original same-Strong numeric families where the word itself is a
+distinct referent or a lexical subcomponent of the candidate's
+compound headword. It verifies exact UBS published lemma/Strong/POS,
+original source witness word ID, reference and SDBH, original
+class counts, and full original source edition pins; previous
+English/POS witnesses remain strictly checked. No original source
+Strong, word, reference, dictionary entry, contextual sense, generated
+lexical link or release is changed.
+
+Together with earlier dispositions, **108/197 in-scope families**
+now carry an explicit decision (**2,528/2,649 occurrences**);
+**89 families / 121 original occurrences remain**. A rejected
+candidate does not mean the original source concept is absent from
+UBS under every possible entry or textual editorial edition.
