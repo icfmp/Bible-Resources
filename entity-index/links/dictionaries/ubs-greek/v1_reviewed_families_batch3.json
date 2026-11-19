@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "status": "source_verified_greek_lexical_headword_batch3_private_not_published",
+  "source_editions": {
+    "ubs_greek_edition": "1.0",
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8",
+    "macula_sblgnt_revision": "8423afe47b9e8f24b7772e808af45c7159a6fe7e"
+  },
+  "editorial_policy": {
+    "exact_original_word_ids": true,
+    "original_nfc_lemma_and_bilingual_ln": true,
+    "original_macula_class_and_ubs_pos": true,
+    "original_strong_unchanged": true,
+    "no_contextual_ubs_sense": true,
+    "no_global_strong_aliases": true,
+    "no_publication": true
+  },
+  "reviewed_families": [
+    {
+      "lemma_nfc": "χρυσοῦς",
+      "ubs_main_id": "005441000000000",
+      "macula_class": "adj",
+      "source_word_count": 17,
+      "editorial_basis": "Pinned source Greek lemma and UBS bilingual MainId lexeme identity, exact original MACULA source word ID, original word class/morphology/Strong, exact source lexical-domain corroboration and compatible UBS source grammatical class. Approve only lexical headword identity of each individual source word; never infer the contextual UBS LEXID or globally alias an inflectional Strong form."
+    },
+    {
+      "lemma_nfc": "Καφαρναούμ",
+      "ubs_main_id": "002758000000000",
+      "macula_class": "noun",
+      "source_word_count": 16,
+      "editorial_basis": "Pinned source Greek lemma and UBS bilingual MainId lexeme identity, exact original MACULA source word ID, original word class/morphology/Strong, exact source lexical-domain corroboration and compatible UBS source grammatical class. Approve only lexical headword identity of each individual source word; never infer the contextual UBS LEXID or globally alias an inflectional Strong form."
+    },
+    {
+      "lemma_nfc": "λοιπός",
+      "ubs_main_id": "003082000000000",
+      "macula_class": "adj",
+      "source_word_count": 15,
+      "editorial_basis": "Pinned source Greek lemma and UBS bilingual MainId lexeme identity, exact original MACULA source word ID, original word class/morphology/Strong, exact source lexical-domain corroboration and compatible UBS source grammatical class. Approve only lexical headword identity of each individual source word; never infer the contextual UBS LEXID or globally alias an inflectional Strong form."
+    },
+    {
+      "lemma_nfc": "μικρός",
+      "ubs_main_id": "003305000000000",
+      "macula_class": "adj",
+      "source_word_count": 13,
+      "editorial_basis": "Pinned source Greek lemma and UBS bilingual MainId lexeme identity, exact original MACULA source word ID, original word class/morphology/Strong, exact source lexical-domain corroboration and compatible UBS source grammatical class. Approve only lexical headword identity of each individual source word; never infer the contextual UBS LEXID or globally alias an inflectional Strong form."
+    },
+    {
+      "lemma_nfc": "ἅγιος",
+      "ubs_main_id": "000040000000000",
+      "macula_class": "adj",
+      "source_word_count": 11,
+      "editorial_basis": "Pinned source Greek lemma and UBS bilingual MainId lexeme identity, exact original MACULA source word ID, original word class/morphology/Strong, exact source lexical-domain corroboration and compatible UBS source grammatical class. Approve only lexical headword identity of each individual source word; never infer the contextual UBS LEXID or globally alias an inflectional Strong form."
+    },
+    {
+      "lemma_nfc": "μέλει",
+      "ubs_main_id": "003205000000000",
+      "macula_class": "verb",
+      "source_word_count": 10,
+      "editorial_basis": "Pinned source Greek lemma and UBS bilingual MainId lexeme identity, exact original MACULA source word ID, original word class/morphology/Strong, exact source lexical-domain corroboration and compatible UBS source grammatical class. Approve only lexical headword identity of each individual source word; never infer the contextual UBS LEXID or globally alias an inflectional Strong form."
+    },
+    {
+      "lemma_nfc": "ἄρσην",
+      "ubs_main_id": "000729000000000",
+      "macula_class": "adj",
+      "source_word_count": 9,
+      "editorial_basis": "Pinned source Greek lemma and UBS bilingual MainId lexeme identity, exact original MACULA source word ID, original word class/morphology/Strong, exact source lexical-domain corroboration and compatible UBS source grammatical class. Approve only lexical headword identity of each individual source word; never infer the contextual UBS LEXID or globally alias an inflectional Strong form."
+    },
+    {
+      "lemma_nfc": "γαμίζω",
+      "ubs_main_id": "001071000000000",
+      "macula_class": "verb",
+      "source_word_count": 7,
+      "editorial_basis": "Pinned source Greek lemma and UBS bilingual MainId lexeme identity, exact original MACULA source word ID, original word class/morphology/Strong, exact source lexical-domain corroboration and compatible UBS source grammatical class. Approve only lexical headword identity of each individual source word; never infer the contextual UBS LEXID or globally alias an inflectional Strong form."
+    },
+    {
+      "lemma_nfc": "ἀπέχω",
+      "ubs_main_id": "000564000000000",
+      "macula_class": "verb",
+      "source_word_count": 7,
+      "editorial_basis": "Pinned source Greek lemma and UBS bilingual MainId lexeme identity, exact original MACULA source word ID, original word class/morphology/Strong, exact source lexical-domain corroboration and compatible UBS source grammatical class. Approve only lexical headword identity of each individual source word; never infer the contextual UBS LEXID or globally alias an inflectional Strong form."
+    },
+    {
+      "lemma_nfc": "ζηλωτής",
+      "ubs_main_id": "002221000000000",
+      "macula_class": "noun",
+      "source_word_count": 6,
+      "editorial_basis": "Pinned source Greek lemma and UBS bilingual MainId lexeme identity, exact original MACULA source word ID, original word class/morphology/Strong, exact source lexical-domain corroboration and compatible UBS source grammatical class. Approve only lexical headword identity of each individual source word; never infer the contextual UBS LEXID or globally alias an inflectional Strong form."
+    },
+    {
+      "lemma_nfc": "ἐγκακέω",
+      "ubs_main_id": "001480000000000",
+      "macula_class": "verb",
+      "source_word_count": 6,
+      "editorial_basis": "Pinned source Greek lemma and UBS bilingual MainId lexeme identity, exact original MACULA source word ID, original word class/morphology/Strong, exact source lexical-domain corroboration and compatible UBS source grammatical class. Approve only lexical headword identity of each individual source word; never infer the contextual UBS LEXID or globally alias an inflectional Strong form."
+    },
+    {
+      "lemma_nfc": "ἐραυνάω",
+      "ubs_main_id": "002055000000000",
+      "macula_class": "verb",
+      "source_word_count": 6,
+      "editorial_basis": "Pinned source Greek lemma and UBS bilingual MainId lexeme identity, exact original MACULA source word ID, original word class/morphology/Strong, exact source lexical-domain corroboration and compatible UBS source grammatical class. Approve only lexical headword identity of each individual source word; never infer the contextual UBS LEXID or globally alias an inflectional Strong form."
+    },
+    {
+      "lemma_nfc": "Μαθθαῖος",
+      "ubs_main_id": "003126000000000",
+      "macula_class": "noun",
+      "source_word_count": 5,
+      "editorial_basis": "Pinned source Greek lemma and UBS bilingual MainId lexeme identity, exact original MACULA source word ID, original word class/morphology/Strong, exact source lexical-domain corroboration and compatible UBS source grammatical class. Approve only lexical headword identity of each individual source word; never infer the contextual UBS LEXID or globally alias an inflectional Strong form."
+    },
+    {
+      "lemma_nfc": "σιδηροῦς",
+      "ubs_main_id": "004504000000000",
+      "macula_class": "adj",
+      "source_word_count": 5,
+      "editorial_basis": "Pinned source Greek lemma and UBS bilingual MainId lexeme identity, exact original MACULA source word ID, original word class/morphology/Strong, exact source lexical-domain corroboration and compatible UBS source grammatical class. Approve only lexical headword identity of each individual source word; never infer the contextual UBS LEXID or globally alias an inflectional Strong form."
+    },
+    {
+      "lemma_nfc": "ἅπτω",
+      "ubs_main_id": "000674000000000",
+      "macula_class": "verb",
+      "source_word_count": 5,
+      "editorial_basis": "Pinned source Greek lemma and UBS bilingual MainId lexeme identity, exact original MACULA source word ID, original word class/morphology/Strong, exact source lexical-domain corroboration and compatible UBS source grammatical class. Approve only lexical headword identity of each individual source word; never infer the contextual UBS LEXID or globally alias an inflectional Strong form."
+    },
+    {
+      "lemma_nfc": "ἔπειμι",
+      "ubs_main_id": "001913000000000",
+      "macula_class": "verb",
+      "source_word_count": 5,
+      "editorial_basis": "Pinned source Greek lemma and UBS bilingual MainId lexeme identity, exact original MACULA source word ID, original word class/morphology/Strong, exact source lexical-domain corroboration and compatible UBS source grammatical class. Approve only lexical headword identity of each individual source word; never infer the contextual UBS LEXID or globally alias an inflectional Strong form."
+    },
+    {
+      "lemma_nfc": "εἴωθα",
+      "ubs_main_id": "001548000000000",
+      "macula_class": "verb",
+      "source_word_count": 4,
+      "editorial_basis": "Pinned source Greek lemma and UBS bilingual MainId lexeme identity, exact original MACULA source word ID, original word class/morphology/Strong, exact source lexical-domain corroboration and compatible UBS source grammatical class. Approve only lexical headword identity of each individual source word; never infer the contextual UBS LEXID or globally alias an inflectional Strong form."
+    },
+    {
+      "lemma_nfc": "οἶδα",
+      "ubs_main_id": "003511000000000",
+      "macula_class": "verb",
+      "source_word_count": 4,
+      "editorial_basis": "Pinned source Greek lemma and UBS bilingual MainId lexeme identity, exact original MACULA source word ID, original word class/morphology/Strong, exact source lexical-domain corroboration and compatible UBS source grammatical class. Approve only lexical headword identity of each individual source word; never infer the contextual UBS LEXID or globally alias an inflectional Strong form."
+    },
+    {
+      "lemma_nfc": "τετραάρχης",
+      "ubs_main_id": "004968000000000",
+      "macula_class": "noun",
+      "source_word_count": 4,
+      "editorial_basis": "Pinned source Greek lemma and UBS bilingual MainId lexeme identity, exact original MACULA source word ID, original word class/morphology/Strong, exact source lexical-domain corroboration and compatible UBS source grammatical class. Approve only lexical headword identity of each individual source word; never infer the contextual UBS LEXID or globally alias an inflectional Strong form."
+    }
+  ],
+  "previous_reviewed_original_words": 7641,
+  "new_reviewed_original_words": 155,
+  "remaining_strict_unapproved_words": 173
+}
