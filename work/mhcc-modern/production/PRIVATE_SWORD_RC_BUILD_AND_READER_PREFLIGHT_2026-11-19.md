@@ -11,7 +11,9 @@ This is the next **release-preparation** checkpoint after the completed *transla
 | Authoritative original | Corrected SWORD **MHCC 0.1.1**, [published original release](https://github.com/icfmp/Bible-Resources/releases/tag/mhcc-0.1.1) |
 | Original release ZIP SHA-256 | `a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746` |
 | Original native corpus SHA-256 | `2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e` |
-| Temporary and isolated native SWORD ID | `MHCCMODRC` (not a commitment to the final public ID) |
+| **Owner-selected complete display name** | **Henry's Modern Concise Commentary** (chosen 2026-11-19) |
+| **Owner-selected short display name** | **HMCC Modern** (chosen 2026-11-19) |
+| Temporary and isolated native SWORD ID | `MHCCMODRC` (kept for CI testing; not yet the approved public SWORD ID) |
 | Candidate version / licensing metadata | `0.0.0` / `DistributionLicense=Private`; **not a redistribution-rights determination** |
 | Native structure | **1,189 chapters / 4,049 K and I-only authored groups / 28,792 indexed verse keys** |
 | Book introductions | **56 original-source-attested introductions** retained, with actual SWORD chapter-I transport proved earlier |
