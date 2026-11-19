@@ -79,6 +79,54 @@ class IntroductionMoveTests(unittest.TestCase):
         self.assertEqual(sha256(revised).hexdigest(),receipt["candidate_sha256"])
         self.assertEqual(repair_private_bytes(SOURCE,plan)[0],revised)
 
+    def test_reviewed_preverse_title_is_chapter_title_without_changing_any_words(self):
+        # Invented chapter rubric reproduces osis2mod's real preverse boundary:
+        # an x-* title otherwise sends all following intro prose to verse 1.
+        raw=SOURCE.replace(
+            b'<chapter sID="Gen.1" osisID="Gen.1" n="1"/>',
+            b'<chapter sID="Gen.1" osisID="Gen.1" n="1"/>'
+            b'<title type="x-ms">Original rubric — unchanged.</title>')
+        root=etree.fromstring(raw)
+        titles=root.xpath("//*[local-name()='title' and @type='x-ms']")
+        self.assertEqual(len(titles),1)
+        plan=reviewed(raw)
+        plan["preverse_title"]={
+            "original_line":titles[0].sourceline,
+            "old_type":"x-ms","new_type":"chapter",
+        }
+        fixed,receipt=repair_private_bytes(raw,plan)
+        parsed=etree.fromstring(fixed)
+        self.assertEqual("".join(parsed.itertext()),"".join(root.itertext()))
+        self.assertEqual(
+            len(parsed.xpath("//*[local-name()='title' and @type='chapter']")),1)
+        self.assertEqual(
+            len(parsed.xpath("//*[local-name()='title' and @type='x-ms']")),0)
+        self.assertTrue(receipt["reviewed_preverse_title_type_reclassified"])
+        self.assertEqual(receipt["reviewed_preverse_title_original_type"],"x-ms")
+        self.assertTrue(
+            receipt["all_original_source_notes_references_and_title_text_identical"])
+        self.assertFalse(receipt["all_original_source_notes_references_and_titles_identical"])
+        self.assertEqual(fixed,repair_private_bytes(raw,plan)[0])
+        # No unreviewed title coercion, wrong line or changed original type.
+        with self.assertRaises(IntroRepairError):
+            repair_private_bytes(raw,reviewed(raw))
+        for change in (
+                dict(plan["preverse_title"],original_line=999),
+                dict(plan["preverse_title"],old_type="x-other"),
+                dict(plan["preverse_title"],new_type="section")):
+            with self.subTest(change=change),self.assertRaises(IntroRepairError):
+                repair_private_bytes(raw,{**plan,"preverse_title":change})
+
+    def test_unrelated_or_multiple_preverse_boundaries_are_not_reclassified(self):
+        raw=SOURCE.replace(
+            b'<chapter sID="Gen.1" osisID="Gen.1" n="1"/>',
+            b'<chapter sID="Gen.1" osisID="Gen.1" n="1"/>'
+            b'<title type="x-ms">Header</title>'
+            b'<div type="section"><p>Other authored source.</p></div>')
+        p=reviewed(raw)
+        with self.assertRaises(IntroRepairError):
+            repair_private_bytes(raw,p)
+
     def test_wrong_checksum_line_or_approval_fails_closed(self):
         good=reviewed()
         cases=[
