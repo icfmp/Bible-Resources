@@ -39,6 +39,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_missing_strong_word_headwords.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_missing_exact_headwords.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_alpha_case_only.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_composite_strong_original_words.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -601,6 +602,33 @@ jobs:
         with:
           name: bsi-ubs-greek-459-source-headword-exceptions-NOT-PUBLISHED
           path: /tmp/bsi-ubs-greek-459-lexeme-source-gaps.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Independently audit five original Greek composite Strong word IDs without splitting
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_composite_strong_original_words.py \
+            --report /tmp/bsi-ubs-greek-original-exceptions-and-ambiguities.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --output /tmp/bsi-ubs-greek-five-original-composites-review.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/bsi-ubs-greek-five-original-composites-review.json').read_text())
+          assert r['original_word_count']==5
+          assert r['original_family_count']==3
+          assert sum(r['source_evidence_disposition_counts'].values())==5
+          assert r['original_strong_components_preserved'] is True
+          assert r['new_source_headword_links_approved']==0
+          assert r['new_contextual_semantic_senses']==0
+          assert r['publication_approved'] is False
+          print('GREEK_SOURCE_FIVE_COMPOSITE_STRONG_WORD_IDS_CLASSIFIED_WITHOUT_ALIAS')
+          PY
+      - name: Upload original Greek composite Strong audit (PRIVATE, NOT approved)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-five-original-composite-strong-evidence-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-five-original-composites-review.json
           if-no-files-found: error
           retention-days: 14
       - name: Upload original Greek lexical exceptions (PRIVATE, UNRESOLVED)
