@@ -386,6 +386,39 @@ jobs:
           assert all("sense_id" not in row for row in c["by_macula_word"].values())
           print("GREEK_1218_ENTRY_ONLY_ORIGINAL_WORD_HEADWORDS_REVIEWED_WITHOUT_INFERRED_CONTEXTUAL_SENSES")
           PY
+      - name: Independently audit 499 exceptional Greek original words and 224 source ambiguities
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_final_exceptions.py \
+            --baseline entity-index/links/dictionaries/ubs-greek/index.json \
+            --source_report /tmp/bsi-ubs-greek-original-gap-review.json \
+            --reviewed /tmp/bsi-ubs-greek-reviewed-no-ln-batch5-private.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --macula macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
+            --output /tmp/bsi-ubs-greek-original-exceptions-and-ambiguities.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          result=json.loads(Path("/tmp/bsi-ubs-greek-original-exceptions-and-ambiguities.json").read_text())
+          assert result["original_exception_counts"]=={
+            "no_nfc_identical_ubs_lemma": 459,
+            "unsupported_original_compound_strong": 5,
+            "multiple_existing_ubs_headwords": 224,
+            "strict_source_evidence_unapproved": 35,
+          }
+          assert result["new_contextual_ubs_senses_inferred"] == 0
+          assert result["new_lexical_headword_links_approved"] == 0
+          assert result["publication_approved"] is False
+          assert result["original_ambiguous_ubs_entries_all_preserved"] is True
+          print("GREEK_ORIGINAL_499_EXCEPTIONS_AND_224_AMBIGUITIES_DOCUMENTED_NO_GUESSES")
+          PY
+      - name: Upload original Greek lexical exceptions (PRIVATE, UNRESOLVED)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-final-unresolved-499-plus-224-PRIVATE-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-original-exceptions-and-ambiguities.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload Greek fifth entry-only lexical batch (PRIVATE, NOT published)
         uses: actions/upload-artifact@v4
         with:
