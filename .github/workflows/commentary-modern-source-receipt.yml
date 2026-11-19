@@ -4043,9 +4043,19 @@ jobs:
                               table_cell_name_hashes=[]
                               heb_mention_cell_count=0
                               selected_sidebar_page_hashes=[]
-                              target_re=re.compile(
-                                  r"\b(?:heb(?:rews)?)[\s.]*11\s*[:.]\s*8\b",
-                                  re.I)
+                              def exact_verse_identity_in_cell(value):
+                                  # Xiphos's localized Sword key rendering
+                                  # may say Heb, Hebrew, Hebrews or Hébreux
+                                  # and use diverse punctuation. Test the
+                                  # ordered canonical book/chapter/verse
+                                  # tokens, *only within an actual GtkTreeView
+                                  # accessible cell*, not unrelated prose.
+                                  words=re.findall(r"[^\W\d_]+|\d+",
+                                      value.casefold(),re.UNICODE)
+                                  return any(
+                                      token.startswith(("heb","héb")) and
+                                      words[i+1:i+3]==["11","8"]
+                                      for i,token in enumerate(words))
                               while todo and seen<2500:
                                   item,parents=todo.pop()
                                   seen+=1
@@ -4070,10 +4080,9 @@ jobs:
                                                   pass
                                           table_cell_name_hashes.append(
                                               hashlib.sha256(text.encode()).hexdigest())
-                                          if re.search(r"heb",text,re.I):
+                                          if re.search(r"(?:heb|héb)",text,re.I):
                                               heb_mention_cell_count+=1
-                                          if target_re.search(text) and any(
-                                                  "table" in p or "list" in p for p in parents):
+                                          if exact_verse_identity_in_cell(text):
                                               listed=True
                                               target_role_hashes.add(
                                                   hashlib.sha256(role.encode()).hexdigest())
@@ -4213,6 +4222,11 @@ jobs:
                                       out["real_post_click_target_verse_selected_in_sidebar"]=(
                                           not sidebar_before["target_verse_appeared_in_real_sidebar_list"]
                                           and sidebar_after["target_verse_selected_in_real_sidebar_list"])
+                                      out["real_post_click_target_verse_appeared_in_sidebar"]=(
+                                          not sidebar_before["target_verse_appeared_in_real_sidebar_list"]
+                                          and sidebar_after["target_verse_appeared_in_real_sidebar_list"]
+                                          and sidebar_after["sidebar_cell_names_combined_sha256"]
+                                          !=sidebar_before["sidebar_cell_names_combined_sha256"])
                           print(json.dumps(out,sort_keys=True))
                       """)
                       attempt=subprocess.run(["/usr/bin/python3","-c",script,valid_labels[0],target_phrase],
@@ -4253,6 +4267,8 @@ jobs:
                               if match else
                               "REAL_XIPHOS_CLICK_TARGET_VERSE_SELECTED_IN_REAL_SIDEBAR"
                               if click_proof.get("real_post_click_target_verse_selected_in_sidebar")
+                              else "REAL_XIPHOS_CLICK_TARGET_VERSE_APPEARED_IN_REAL_SIDEBAR"
+                              if click_proof.get("real_post_click_target_verse_appeared_in_sidebar")
                               else "REAL_XIPHOS_CLICK_TARGET_PROSE_APPEARED_IN_ACCESSIBILITY"
                               if click_proof.get("real_post_click_target_scripture_prose_appeared")
                               else "REAL_XIPHOS_CLICK_DISPATCHED_DESTINATION_NOT_PROVEN")
