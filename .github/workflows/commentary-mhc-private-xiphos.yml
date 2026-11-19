@@ -1,9 +1,11 @@
 name: Real private complete MHC zCom4 candidate in Xiphos (reader research, no release)
 
+# Keep the expensive real-GTK experiment opt-in during this draft PR.
+# The workflow is not yet on the default branch, so PR labeling remains an
+# explicit way to request the probe without triggering it on every push.
 on:
   pull_request:
-    paths:
-      - '.github/workflows/commentary-mhc-private-xiphos.yml'
+    types: [labeled]
   workflow_dispatch:
 
 permissions:
@@ -15,6 +17,7 @@ concurrency:
 
 jobs:
   complete-mhc-real-xiphos-preview:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.label.name == 'run-mhc-xiphos' }}
     name: Pinned original full MHC rebuild + independent real GTK window (not GUI approval)
     runs-on: ubuntu-24.04
     timeout-minutes: 38
