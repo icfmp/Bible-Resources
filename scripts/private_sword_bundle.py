@@ -66,11 +66,14 @@ def _validate_package_files(root:Path,module_id:str) -> list[tuple[str,Path]]:
         raise PilotError("SWORD module configuration identity does not match")
     section=parser[module_id]
     data_path=section.get("DataPath","")
+    # SWORD accepts directory DataPath values with or without a trailing
+    # slash. osis2mod's zCom4 compiler legitimately emits the latter.
+    # Keep the path strictly confined to modules/ and reject traversal.
     if (not data_path.startswith("./modules/")
-            or not data_path.endswith("/")
             or "\\" in data_path
             or any(p in ("","..",".") for p in data_path[2:].strip("/").split("/"))
-            or section.get("ModDrv") not in ("RawText","zText","RawCom","zCom")):
+            or section.get("ModDrv") not in
+               ("RawText","zText","RawCom","zCom","zCom4")):
         raise PilotError("Unsafe/unrecognized SWORD module storage path")
     data_dir=root/data_path[2:]
     if not data_dir.is_dir() or data_dir.is_symlink():
