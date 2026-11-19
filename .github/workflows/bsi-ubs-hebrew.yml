@@ -166,7 +166,7 @@ jobs:
             --decisions entity-index/links/dictionaries/ubs-hebrew/v1_multi_headword_abstentions.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv
-      - name: Source-verify five independently reviewed UBS entry-only identities
+      - name: Source-verify source-reviewed UBS entry-only identities
         run: |
           python3 -I entity-index/links/dictionaries/ubs-hebrew/verify_reviewed_headwords.py \
             --register /tmp/bsi-ubs-hebrew-family-register.json \
