@@ -93,11 +93,13 @@ Sinner, do not curse **this King** even in your most private thought.
 
 Your curse cannot injure him.
 
-But his judgment can bring you down to eternal destruction.
+But **his curse, coming down upon you, can sink you to the lowest hell**.
 
 ---
 
 ## Editorial review — Ecclesiastes 10
+
+**2026-11-19 targeted secondary-witness fidelity repair (unapproved draft):** Ecclesiastes 10:16–20's final warning had been rendered as generic **judgment and eternal destruction**, omitting Henry's express contrasting **his curse** and **lowest hell**. Restored both from [CCEL Ecclesiastes 10](https://ccel.org/ccel/henry/mhcc.xxii.x.html). The same chapter's *Isa.25:8* source reference remains a **separate quarantined original-source digital/printed discrepancy** and has **not** been retargeted or corrected. Native MHCC original and independent semantic acceptance still pending.
 
 **Full original-English secondary witness inspected:** [CCEL, Ecclesiastes 10](https://ccel.org/ccel/henry/mhcc.xxii.x.html). Exact released `MHCC 0.1.1` remains authoritative for native SWORD and independent QA.
 
