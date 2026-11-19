@@ -30,7 +30,7 @@ Animals instinctively seek refuge when a storm comes.
 
 Should humans alone remain without a shelter?
 
-God warns people in many ways to flee from coming judgment.
+God warns people in many ways to flee from **the wrath to come**.
 
 He also invites them to receive his salvation and be happy.
 
@@ -85,6 +85,8 @@ Sooner or later, every human being will fear him.
 ---
 
 ## Editorial review — Job 37
+
+**2026-11-19 secondary-witness fidelity repair (unapproved draft):** Verses 1–13 previously replaced Henry's express *wrath to come* with generic *coming judgment*. Restored the original eschatological language in a modern form against [CCEL Job 37](https://ccel.org/ccel/henry/mhcc.xix.xxxvii.html). No original module, source link or section changes; exact MHCC 0.1.1 native comparison and independent editorial review pending.
 
 **Entire English secondary witness directly read:** [CCEL, Job 37](https://ccel.org/ccel/henry/mhcc.xix.xxxvii.html). Published original `MHCC 0.1.1` remains primary; native SWORD/independent acceptance pending.
 
