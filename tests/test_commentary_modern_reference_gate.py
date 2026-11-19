@@ -20,6 +20,7 @@ from commentary_modern_reference_gate import (SourceReferenceGate,
     _unplaced_original_link_review_ledger,
     build_private_compact_original_crossrefs,
     build_private_owned_K_heading_range_links,
+    build_private_same_chapter_verse_mentions,
     build_private_inline_original_reference_index,
     _source_owned_ordered_alignment,
     _original_source_link_contexts, _source_context_unique_paragraph_anchor,
@@ -1907,6 +1908,109 @@ class OriginalKTargetRangeHeadingLinksTests(unittest.TestCase):
         self.assertEqual(references[0].text,"4–6")
         self.assertEqual(receipt["source_original_partial_ranges_restored_in_K_exposition"],1)
         self.assertEqual("".join(fixed.itertext()),before)
+
+
+
+class OriginalAuthoredSameKVerseNumberTests(unittest.TestCase):
+    @staticmethod
+    def fixture(*, verse_text="The prophet describes verse 7.",
+                label="Gen 8:7",target="Gen.8.7"):
+        from commentary_modern_draft_osis_preview import NS
+        source,ledger,original,native,errata=(
+            OriginalKTargetRangeHeadingLinksTests.fixture(
+                range_literal=target,printed_label=label))
+        root=ET.fromstring(source)
+        section=next(x for x in root.iter()
+                     if x.get("annotateRef")=="Gen.8.4-Gen.8.12")
+        paragraph=section.find(f"./{{{NS}}}p")
+        paragraph.text=verse_text
+        old=original["Gen.8.4"]
+        old[0]=(target,label)
+        ledger["pending"][0]["original_osisRef_sha256"]=hashlib.sha256(
+            target.encode()).hexdigest()
+        ledger["pending"][0]["original_visible_label_sha256"]=hashlib.sha256(
+            label.encode()).hexdigest()
+        return ET.tostring(root),ledger,original,native,errata
+
+    def test_source_pinned_unique_local_verse_label_is_linked_without_edit(self):
+        from commentary_modern_draft_osis_preview import NS
+        xml,ledger,original,native,errata=self.fixture()
+        visible="".join(ET.fromstring(xml).itertext())
+        result,remaining,receipt=build_private_same_chapter_verse_mentions(
+            source_osis=xml,ledger=ledger,original=original,
+            native=native,errata=errata)
+        root=ET.fromstring(result)
+        links=[x for x in root.iter() if x.tag==f"{{{NS}}}reference"]
+        self.assertEqual([(x.text,x.get("osisRef")) for x in links],
+                         [("7","Gen.8.7")])
+        self.assertEqual(receipt["local_verse_references_recovered_in_authored_modern_prose"],1)
+        self.assertEqual(receipt["unplaced_valid_original_links_still_in_source_only_notes"],0)
+        self.assertEqual(len(remaining["pending"]),4)
+        self.assertEqual("".join(root.itertext()),visible)
+
+    def test_partial_implicit_range_does_not_invent_middle_verse(self):
+        from commentary_modern_draft_osis_preview import NS
+        xml,ledger,original,native,errata=self.fixture(
+            verse_text="This concerns verses 5–9.",
+            label="Gen 8:7",target="Gen.8.7")
+        result,remaining,receipt=build_private_same_chapter_verse_mentions(
+            source_osis=xml,ledger=ledger,original=original,
+            native=native,errata=errata)
+        self.assertEqual(receipt["local_verse_references_recovered_in_authored_modern_prose"],0)
+        self.assertEqual(len(remaining["pending"]),5)
+
+    def test_ambiguous_repeated_verse_mentions_not_linked(self):
+        xml,ledger,original,native,errata=self.fixture(
+            verse_text="Verse 7 begins here. Verse 7 ends there.")
+        result,remaining,receipt=build_private_same_chapter_verse_mentions(
+            source_osis=xml,ledger=ledger,original=original,
+            native=native,errata=errata)
+        self.assertEqual(receipt["local_verse_references_recovered_in_authored_modern_prose"],0)
+        self.assertEqual(len(remaining["pending"]),5)
+
+    def test_cross_book_source_target_never_uses_implicit_verse_number(self):
+        xml,ledger,original,native,errata=self.fixture(
+            verse_text="Verse 7 begins here.",
+            label="Job 31:7",target="Job.31.7")
+        _,remaining,receipt=build_private_same_chapter_verse_mentions(
+            source_osis=xml,ledger=ledger,original=original,
+            native=native,errata=errata)
+        self.assertEqual(receipt["local_verse_references_recovered_in_authored_modern_prose"],0)
+        self.assertEqual(len(remaining["pending"]),5)
+
+    def test_original_source_target_sha_disagreement_fails_closed(self):
+        xml,ledger,original,native,errata=self.fixture()
+        ledger["pending"][0]["original_osisRef_sha256"]="0"*64
+        with self.assertRaisesRegex(ValueError,"source label/target"):
+            build_private_same_chapter_verse_mentions(
+                source_osis=xml,ledger=ledger,original=original,
+                native=native,errata=errata)
+
+    def test_underindexed_full_chapter_one_K_still_allows_printed_later_verse(self):
+        from commentary_modern_draft_osis_preview import NS
+        xml,ledger,original,native,errata=self.fixture(
+            verse_text="Verse 5: Moab's devastation.",
+            label="Is 15:5",target="Isa.15.5")
+        root=ET.fromstring(xml)
+        chapter=next(x for x in root.iter() if x.tag==f"{{{NS}}}chapter")
+        chapter.set("osisID","Isa.15")
+        sections=chapter.findall(f"./{{{NS}}}div[@annotateType='commentary']")
+        chapter.remove(sections[1])
+        sections[0].set("annotateRef","Isa.15.1")
+        data=original.pop("Gen.8.4")
+        original["Isa.15.1"]=data
+        for row in ledger["pending"]:
+            row["source_first_key"]="Isa.15.1"
+        for row in errata["cases"]:
+            row["source_first_key"]="Isa.15.1"
+        native["chapters"]={"Isa.15":{"original_units":[
+            {"first_key":"Isa.15.1","keys":["Isa.15.1"]}]}}
+        before="".join(root.itertext())
+        out,remaining,receipt=build_private_same_chapter_verse_mentions(
+            source_osis=ET.tostring(root),ledger=ledger,original=original,
+            native=native,errata=errata)
+        self.assertEqual(receipt["local_verse_references_recovered_in_authored_modern_prose"],1)
+        self.assertEqual("".join(ET.fromstring(out).itertext()),before)
 
 if __name__=="__main__":
     unittest.main()
