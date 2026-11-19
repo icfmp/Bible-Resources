@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "status": "source_reviewed_original_word_specific_greek_ambiguous_Strong_headwords_private",
+  "source_editions": {
+    "ubs_greek_edition": "1.0",
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8",
+    "macula_sblgnt_revision": "8423afe47b9e8f24b7772e808af45c7159a6fe7e"
+  },
+  "editorial_policy": {
+    "original_word_id_required": true,
+    "preserve_all_original_ubs_strong_candidates": true,
+    "require_unique_greek_nfc_headword_and_original_ln": true,
+    "require_compatible_original_source_word_class": true,
+    "no_global_strong_alias": true,
+    "no_contextual_semantic_lexid": true,
+    "no_original_source_mutation": true,
+    "no_publication": true
+  },
+  "source_verified_unique_headword_families": [
+    {
+      "lemma_nfc": "πόλις",
+      "source_strong": "4172",
+      "ubs_main_id": "004075000000000",
+      "macula_class": "noun",
+      "original_word_count": 162,
+      "editorial_basis": "The original Greek word ID is already linked by source Strong to multiple authentic UBS entries. Independently pinned original source Greek lemma and UBS EN/FR lexical domain evidence agree on exactly this one UBS MainId, and the original word grammatical class confirms the lexical headword; keep all historical Strong candidates and approve only this explicit source-word-specific headword identity without inferring one contextual LEXID."
+    },
+    {
+      "lemma_nfc": "ἐλεάω",
+      "source_strong": "1653",
+      "ubs_main_id": "001661000000000",
+      "macula_class": "verb",
+      "original_word_count": 32,
+      "editorial_basis": "The original Greek word ID is already linked by source Strong to multiple authentic UBS entries. Independently pinned original source Greek lemma and UBS EN/FR lexical domain evidence agree on exactly this one UBS MainId, and the original word grammatical class confirms the lexical headword; keep all historical Strong candidates and approve only this explicit source-word-specific headword identity without inferring one contextual LEXID."
+    },
+    {
+      "lemma_nfc": "πάρειμι",
+      "source_strong": "3918",
+      "ubs_main_id": "003819000000000",
+      "macula_class": "verb",
+      "original_word_count": 24,
+      "editorial_basis": "The original Greek word ID is already linked by source Strong to multiple authentic UBS entries. Independently pinned original source Greek lemma and UBS EN/FR lexical domain evidence agree on exactly this one UBS MainId, and the original word grammatical class confirms the lexical headword; keep all historical Strong candidates and approve only this explicit source-word-specific headword identity without inferring one contextual LEXID."
+    },
+    {
+      "lemma_nfc": "κοπρία",
+      "source_strong": "2874",
+      "ubs_main_id": "002888000000000",
+      "macula_class": "noun",
+      "original_word_count": 1,
+      "editorial_basis": "The original Greek word ID is already linked by source Strong to multiple authentic UBS entries. Independently pinned original source Greek lemma and UBS EN/FR lexical domain evidence agree on exactly this one UBS MainId, and the original word grammatical class confirms the lexical headword; keep all historical Strong candidates and approve only this explicit source-word-specific headword identity without inferring one contextual LEXID."
+    },
+    {
+      "lemma_nfc": "κόπριον",
+      "source_strong": "2874",
+      "ubs_main_id": "002889000000000",
+      "macula_class": "noun",
+      "original_word_count": 1,
+      "editorial_basis": "The original Greek word ID is already linked by source Strong to multiple authentic UBS entries. Independently pinned original source Greek lemma and UBS EN/FR lexical domain evidence agree on exactly this one UBS MainId, and the original word grammatical class confirms the lexical headword; keep all historical Strong candidates and approve only this explicit source-word-specific headword identity without inferring one contextual LEXID."
+    }
+  ],
+  "source_reviewed_ambiguous_original_word_headwords": 220,
+  "original_words_still_ambiguous_unreviewed": 4
+}
