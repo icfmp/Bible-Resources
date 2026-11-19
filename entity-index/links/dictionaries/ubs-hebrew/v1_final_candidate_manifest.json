@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "status": "private_v1_candidate_not_published_or_approved",
+  "dictionary_edition": "UBS Hebrew 0.9.4",
+  "source_editions": {
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8",
+    "macula_revision": "47db250bd55d0d8577f2a94fba114ef16c35b23c"
+  },
+  "original_source_lexical_occurrences": 248680,
+  "original_source_linked_lexical_occurrences": 240098,
+  "previous_candidate_index_sha256": "7c2e386a07d0dede3bcb836f64db66a5779b7e4c9d8f6d20ec76e06d156c1b35",
+  "candidate_index_sha256": "42f2ac19d981e924cff760708adeda71e3f2b183e969e11c27fd6df687badf65",
+  "candidate_source_linked_lexical_occurrences": 240373,
+  "original_ubs_indexed_headword_denominator": 242747,
+  "candidate_ubs_indexed_headword_coverage_pct": 99.022,
+  "new_entry_only_word_links": 275,
+  "final_original_source_word_approvals": 2,
+  "remaining_last_original_word_abstentions": 24,
+  "original_source_words_left_unlinked_by_review": 1,
+  "contextual_sense_ids_inferred": 0,
+  "original_index_and_source_unchanged": true,
+  "artifact_name": "bsi-ubs-final-275-word-source-verified-NOT-PUBLISHED",
+  "release_approved": false
+}
