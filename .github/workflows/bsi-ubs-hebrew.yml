@@ -376,6 +376,22 @@ jobs:
           else:
               print("BSI_UBS_HEBREW_INITIAL_INDEX_PENDING_COMMIT")
           PY
+      - name: Audit all 26 final lexically uncertain source words, read-only
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_final_lexical_uncertainties.py \
+            --single entity-index/links/dictionaries/ubs-hebrew/v1_single_candidate_abstentions.json \
+            --additional entity-index/links/dictionaries/ubs-hebrew/v1_additional_word_headword_dispositions.json \
+            --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
+            --french ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-fr.JSON \
+            --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --index /tmp/bsi-ubs-hebrew-index.json \
+            --output /tmp/bsi-ubs-last-26-original-wlc-evidence.json
+      - name: Upload read-only original lexical source-word evidence for final review
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-original-final-26-source-witnesses-REVIEW-ONLY
+          path: /tmp/bsi-ubs-last-26-original-wlc-evidence.json
+          retention-days: 7
       - name: Rebuild private source-word-verified v1 candidate without touching original index
         run: |
           python3 -I entity-index/links/dictionaries/ubs-hebrew/build_private_reviewed_candidate.py \
