@@ -1189,3 +1189,23 @@ the separate GitHub Actions artifact
 Only the independently approved source-word entry anchors are considered;
 no global Strong equivalences, original source changes or semantic
 inferences are introduced.
+
+### Attributed, reproducible v1.0 technical release candidate
+
+The [v1.0 readiness record](V1_RELEASE_READINESS.md) is the publication
+checklist for this **nonpublished** source-pinned crosswalk. The
+[deterministic packaging script](package_reviewed_v1_candidate.py)
+combines the previously full-corpus-verified 273-entry private candidate
+with CC BY-SA 4.0 rights/changes notices, exact original UBS 0.9.4 and
+MACULA WLC revision attributions, a per-file hash manifest and a ZIP SHA-256.
+GitHub Actions uploads this only under
+`bsi-ubs-hebrew-v1-technical-rc-NOT-PUBLISHED`; it is neither a GitHub
+release nor an active application dictionary resource.
+
+The package generator verifies the frozen 99.021% indexed-headword
+scope, exact JSON SHA-256, 273 reviewed entry-only word identities,
+unmodified source edition and all existing sense-link counts. It
+rejects unsupported source editions, contextual sense additions,
+truncated staged words and unauthorized publication status.
+
+**Publication approval is separate from source verification and PR merge.**
