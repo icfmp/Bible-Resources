@@ -266,3 +266,30 @@ still preserved.
 
 The result is a **private, expiring Actions review artifact** only,
 without a public download, SWORD release or Bible application integration.
+
+## Third Greek headword review batch — 155 original words
+
+The [third source-specific editorial ledger](v1_reviewed_families_batch3.json)
+identifies **19** individually documented lexeme families and **155** original
+MACULA SBLGNT word IDs from the exact [remaining-source register](audit_remaining_328.py).
+The [batch-3 verifier](build_reviewed_families_batch3.py) rechecks their
+exact UBS 1.0 bilingual Greek headword IDs, NFC-identical lemmas, independently
+attested original UBS Louw–Nida codes, MACULA morphological classes and
+all unchanged source Strong/verse/word witnesses. Source nouns, verbs and
+adjectives must have compatible original UBS lexical part-of-speech labels.
+
+The original 5,033 reviewed pronouns, 577 prior ordinary Greek headwords,
+2,031 entry-only `εἰμί` source-word links, and the frozen original `index.json`
+remain unchanged. The additional **155** make **7,796** reviewed source-word
+headword approvals. Combined with the original 128,090 Strong-derived
+headword candidates, coverage is **135,886 / 137,741** original Greek words;
+**173** previously strict NFC+LN source preview words remain unapproved.
+The 1,218 other lemma-only/no-LN, 459 no-exact-headword, five composite
+Strong tokens, and 224 pre-existing multiple-headword ambiguities remain
+outside this approval.
+
+This is **lexical entry/headword identity only**, not contextual meaning
+accuracy. No extra `LEXID` has been inferred, no original Strong or
+source Greek text has been changed, and no Bible app or SWORD publication
+has been performed. The CI-generated output is a temporary **private**
+Actions artifact, not a released index.
