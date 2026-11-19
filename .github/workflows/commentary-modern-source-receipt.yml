@@ -16,6 +16,7 @@ on:
       - 'tests/test_commentary_modern_reference_gate.py'
       - 'tests/test_commentary_modern_source_receipt.py'
       - 'tests/test_commentary_modern_ionly_preview.py'
+      - 'tests/java/org/icfmp/research/CommentaryCandidateJSwordParityTest.java'
       - 'work/mhcc-modern/**'
   workflow_dispatch:
 permissions:
@@ -27,7 +28,7 @@ jobs:
   source_metadata:
     # Source-native validation is independent of optional Xiphos display packages.
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 34
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -3542,6 +3543,227 @@ jobs:
                     " (deps="+deps+", GUI="+prose+"); "
                     "source-native SWORD release candidate evidence remains independently gated")
           PY
+      - name: Provision pinned Java 11 for independent AndBible JSword commentary engine
+        id: andbible_java
+        continue-on-error: true
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+      - name: Fetch exact pinned AndBible JSword engine commit (private engine test)
+        id: andbible_checkout
+        if: steps.andbible_java.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 180s git clone --quiet --filter=blob:none --no-checkout \
+            https://github.com/AndBible/jsword.git \
+            "$RUNNER_TEMP/hmcc-pinned-andbible-jsword"
+          timeout 150s git -C "$RUNNER_TEMP/hmcc-pinned-andbible-jsword" \
+            fetch --quiet --depth=1 origin 6ebd10a005fa7761e611c048ececea1430e22546
+          git -C "$RUNNER_TEMP/hmcc-pinned-andbible-jsword" \
+            checkout --quiet --detach FETCH_HEAD
+          test "$(git -C "$RUNNER_TEMP/hmcc-pinned-andbible-jsword" rev-parse HEAD)" = \
+            6ebd10a005fa7761e611c048ececea1430e22546
+          test -f "$RUNNER_TEMP/hmcc-pinned-andbible-jsword/build.gradle.kts"
+      - name: Read real HMCC Modern zCom in separate pinned AndBible JSword engine
+        id: andbible_engine
+        if: steps.andbible_checkout.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,os,re,shutil,subprocess,sys
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+          sys.path.insert(0,"scripts")
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          base=Path(os.environ["RUNNER_TEMP"])
+          candidate=base/"mhcc-modern-rc-root"
+          jsword=base/"hmcc-pinned-andbible-jsword"
+          module="MHCCMODRC"
+          config=candidate/"mods.d/mhccmodrc.conf"
+          proof=json.loads((base/"mhcc-modern-private-rc-metadata-only.json").read_text())
+          if (proof["candidate_sword_id"]!=module or
+                  proof["status"]!="PRIVATE_SWORD_ZCOM_CANDIDATE_BUILT_AND_NATIVE_READER_VERIFIED_NOT_RELEASE"
+                  or proof["source_authored_K_and_I_groups_exactly_preserved"]!=4049
+                  or proof["source_original_numbered_keys_exactly_preserved"]!=28792
+                  or proof["published"] is not False or not config.is_file()):
+              raise ValueError("Private AndBible cannot inspect unpinned candidate")
+          checked=subprocess.run(["git","-C",str(jsword),"rev-parse","HEAD"],
+                  capture_output=True,text=True,timeout=15)
+          if checked.returncode or checked.stdout.strip()!=(
+                  "6ebd10a005fa7761e611c048ececea1430e22546"):
+              raise ValueError("AndBible JSword revision no longer matches pinned stable")
+          sample=["Genesis 1:1","Matthew 3:7","Leviticus 19:1",
+                  "Psalms 95:1","1 Samuel 25:32","Psalms 108:1",
+                  "Revelation 22:2"]
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str(candidate.resolve())
+          for ref in sample:
+              result=subprocess.run(["diatheke","-b",module,"-f","plain","-k",ref],
+                  env=env,capture_output=True,timeout=25)
+              if result.returncode or len(result.stdout.strip())<80:
+                  raise ValueError("Candidate native engine has no substantial sample: "+ref)
+          book_names={"Gen":"Genesis","Exod":"Exodus","Matt":"Matthew",
+                      "Mark":"Mark","Luke":"Luke","John":"John",
+                      "Acts":"Acts","Rom":"Romans","Rev":"Revelation"}
+          specimens={}
+          def witness(kind,key,raw):
+              if kind!="K":
+                  return
+              m=re.fullmatch(r"([1-4]?[A-Za-z]+)\.([1-9][0-9]*)\.([1-9][0-9]*)",key)
+              if m is None or m.group(1) not in book_names:
+                  return
+              book=m.group(1)
+              if book in specimens:
+                  return
+              xml=ET.fromstring(b"<entry>"+raw+b"</entry>")
+              targets=[n.get("osisRef") for n in xml.iter()
+                  if isinstance(n.tag,str) and n.tag.rsplit("}",1)[-1]=="reference"
+                  and n.get("osisRef")]
+              if 1<=len(targets)<=64:
+                  specimens[book]=(book_names[book]+" "+m.group(2)+":"+m.group(3),
+                                   [hashlib.sha256(x.encode()).hexdigest() for x in targets])
+          proc=subprocess.Popen([str((base/"commentary-modern-source-raw").resolve()),
+                                 module],env=env,stdout=subprocess.PIPE,
+                                stderr=subprocess.DEVNULL)
+          try:
+              _,keys,_,_=parse_native_raw_corpus(proc.stdout,on_entry=witness)
+              proc.stdout.close()
+              if proc.wait(timeout=180)!=0 or len(keys)!=28792:
+                  raise ValueError("AndBible witness source native corpus incomplete")
+          finally:
+              if proc.poll() is None:
+                  proc.kill();proc.wait()
+          qualified=[]
+          for book in ["Gen","Matt","Exod","John","Mark","Luke","Acts","Rom","Rev"]:
+              if book not in specimens:
+                  continue
+              ref,hashes=specimens[book]
+              result=subprocess.run(["diatheke","-b",module,"-f","plain","-k",ref],
+                                    env=env,capture_output=True,timeout=25)
+              if result.returncode==0 and len(result.stdout.strip())>80:
+                  qualified.append(ref+"|"+",".join(hashes))
+              if len(qualified)==4:
+                  break
+          if len(qualified)<2:
+              raise ValueError("Fewer than two independent source-linked K specimens")
+          java_name="CommentaryCandidateJSwordParityTest"
+          java_test=Path("tests/java/org/icfmp/research")/(java_name+".java")
+          target=jsword/"src/test/java/org/icfmp/research"/(java_name+".java")
+          if not java_test.is_file() or java_test.is_symlink() or target.exists():
+              raise ValueError("Unreviewed JSword test or upstream file collision")
+          target.parent.mkdir(parents=True,exist_ok=True)
+          shutil.copyfile(java_test,target)
+          home=base/"hmcc-modern-jsword-home"
+          gradle=base/"hmcc-modern-jsword-gradle-cache"
+          home.mkdir(mode=0o700);gradle.mkdir(mode=0o700)
+          java_env={**env,
+              "CANDIDATE_JSWORD_PRIVATE_ROOT":str(candidate.resolve()),
+              "CANDIDATE_JSWORD_MODULE_ID":module,
+              "CANDIDATE_JSWORD_SAMPLES":";".join(sample),
+              "CANDIDATE_JSWORD_NATIVE_LINK_SHA256_WITNESSES":";".join(qualified),
+              "HOME":str(home),"GRADLE_USER_HOME":str(gradle),
+              "JAVA_TOOL_OPTIONS":"-Duser.home="+str(home),
+              "LC_ALL":"C.UTF-8","LANG":"C.UTF-8"}
+          logfile=base/"hmcc-modern-andbible-jsword-private-build.log"
+          with logfile.open("xb") as output:
+              try:
+                  run=subprocess.run(["bash",str(jsword/"gradlew"),
+                      "--no-daemon","--console=plain","test","--tests",
+                      "org.icfmp.research."+java_name],cwd=jsword,env=java_env,
+                      stdout=output,stderr=subprocess.STDOUT,timeout=720)
+              except subprocess.TimeoutExpired:
+                  raise ValueError("Pinned JSword Gradle engine build timed out") from None
+          if logfile.stat().st_size>4_000_000:
+              raise ValueError("Unbounded private Java engine logs")
+          junit=jsword/"build/test-results/test"/(
+              "TEST-org.icfmp.research."+java_name+".xml")
+          if not junit.is_file() or junit.is_symlink() or junit.stat().st_size>500_000:
+              raise ValueError("No bounded actual Java engine JUnit output")
+          suite=ET.parse(junit).getroot()
+          if suite.tag!="testsuite":
+              raise ValueError("Invalid AndBible JSword JUnit report")
+          counts={k:int(suite.get(k,0)) for k in
+                  ("tests","errors","failures","skipped")}
+          if run.returncode or counts!={"tests":4,"errors":0,"failures":0,"skipped":0}:
+              raise ValueError("Real pinned AndBible Java engine parity test failed: "+
+                               json.dumps(counts,sort_keys=True))
+          receipt={
+              "status":"PRIVATE_HMCC_MODERN_PINNED_ANDBIBLE_JSWORD_ENGINE_SUCCESS_NOT_ANDROID_GUI",
+              "candidate_module":module,
+              "selected_full_display_name":"Henry's Modern Concise Commentary",
+              "selected_short_display_name":"HMCC Modern",
+              "pinned_AndBible_JSword_commit":checked.stdout.strip(),
+              "independent_real_native_readback_numbered_keys":len(keys),
+              "native_confirmed_sample_entries_tested_in_JSword":len(sample),
+              "native_link_bearing_groups_with_Jsword_parity":len(qualified),
+              "jsword_junit_counts":counts,
+              "engine_only_not_Android_app":True,
+              "android_GUI_passed":False,
+              "xiphos_GUI_approved":False,
+              "source_text_or_Java_test_log_uploaded":False,
+              "editorial_and_rights_approved":False,
+              "published":False,
+          }
+          (base/"mhcc-modern-private-andbible-jsword-engine-metadata.json").write_text(
+              json.dumps(receipt,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+          print("PRIVATE HMCC MODERN ANDBIBLE JSWORD ENGINE PASS: pinned Java source, "
+                "4 real JUnit tests, 7 source-native passages and "+
+                str(len(qualified))+" original K source link specimens; "
+                "no Android UI or release authorization")
+          PY
+      - name: Preserve exact AndBible Java engine acceptance status independent from original SWORD gates
+        if: always()
+        shell: bash
+        env:
+          JAVA_STEP: ${{ steps.andbible_java.outcome }}
+          ENGINE_CHECKOUT: ${{ steps.andbible_checkout.outcome }}
+          ENGINE_TEST: ${{ steps.andbible_engine.outcome }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          base=Path(os.environ["RUNNER_TEMP"])
+          target=base/"mhcc-modern-private-andbible-jsword-engine-metadata.json"
+          outcomes={name:os.environ.get(var,"unknown") for name,var in {
+              "java_setup":"JAVA_STEP",
+              "pinned_checkout":"ENGINE_CHECKOUT",
+              "real_engine_test":"ENGINE_TEST"}.items()}
+          if target.is_file():
+              receipt=json.loads(target.read_text())
+              if (receipt.get("candidate_module")!="MHCCMODRC" or
+                      receipt.get("pinned_AndBible_JSword_commit")!=
+                      "6ebd10a005fa7761e611c048ececea1430e22546"):
+                  raise ValueError("AndBible Java engine receipt changed identity")
+              if any(v!="success" for v in outcomes.values()):
+                  raise ValueError("AndBible proof claimed pass despite failed workflow stage")
+          else:
+              receipt={
+                  "status":"PRIVATE_HMCC_MODERN_ANDBIBLE_JSWORD_ENGINE_NOT_VERIFIED",
+                  "candidate_module":"MHCCMODRC",
+                  "selected_full_display_name":"Henry's Modern Concise Commentary",
+                  "selected_short_display_name":"HMCC Modern",
+                  "native_java_parity_not_claimed":True,
+              }
+          receipt.update(outcomes)
+          receipt.update({
+              "android_GUI_passed":False,
+              "xiphos_GUI_approved":False,
+              "rights_approved":False,
+              "public_release_authorized":False,
+              "authorial_prose_or_module_uploaded":False,
+          })
+          target.write_text(json.dumps(receipt,indent=2,sort_keys=True)+"\n",
+                            encoding="utf-8")
+          print("PRIVATE HMCC MODERN AND-BIBLE GATE: "+receipt["status"]+
+                " / "+json.dumps(outcomes,sort_keys=True)+
+                " (Android GUI and public release remain unapproved)")
+          PY
       - name: Compile all 51 original-first-K book-prefaces in private SWORD and verify native-I readback
         shell: bash
         run: |
@@ -4734,6 +4956,7 @@ jobs:
             ${{ runner.temp }}/mhcc-modern-private-release-candidate-preflight.json
             ${{ runner.temp }}/mhcc-modern-private-rc-metadata-only.json
             ${{ runner.temp }}/mhcc-modern-private-xiphos-actual-gui-metadata.json
+            ${{ runner.temp }}/mhcc-modern-private-andbible-jsword-engine-metadata.json
             ${{ runner.temp }}/mhcc-modern-strict-primary-only-receipt.json
             ${{ runner.temp }}/mhcc-modern-compiled-body-text-parity-diagnostic.json
             ${{ runner.temp }}/mhcc-modern-source-matched-links-native-SWORD-readback.json
