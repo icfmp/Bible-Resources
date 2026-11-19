@@ -80,15 +80,25 @@ class V1EditorialAuditTests(unittest.TestCase):
         register, scope, ledgers, index = load_full()
         report = COLLECT(register, scope, ledgers, index)
         counts = report["counts"]
-        self.assertEqual(counts["original_unresolved_families"], 202)
-        self.assertEqual(counts["original_unresolved_occurrences"], 8582)
-        self.assertEqual(counts["edition_scope_excluded_occurrences"], 5933)
-        self.assertEqual(counts["in_scope_lexical_family_dispositions"], 151)
-        self.assertEqual(counts["in_scope_lexically_dispositioned_occurrences"], 2592)
-        self.assertEqual(counts["composite_source_syntax_preserved_occurrences"], 2)
-        self.assertEqual(counts["not_yet_dispositioned_original_families"], 44)
-        self.assertEqual(counts["not_yet_dispositioned_original_occurrences"], 55)
-        self.assertEqual(len(report["pending_families"]), 44)
+        snapshot = json.loads(
+            (HERE / "v1_disposition_coverage.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(report, snapshot)
+        self.assertEqual(counts["original_unresolved_families"], len(register["families"]))
+        self.assertEqual(
+            counts["original_unresolved_occurrences"],
+            counts["in_scope_unresolved_occurrences_at_baseline"]
+            + counts["edition_scope_excluded_occurrences"],
+        )
+        self.assertEqual(
+            counts["in_scope_unresolved_occurrences_at_baseline"],
+            counts["in_scope_occurrences_with_any_disposition"]
+            + counts["not_yet_dispositioned_original_occurrences"],
+        )
+        self.assertEqual(
+            len(report["pending_families"]),
+            counts["not_yet_dispositioned_original_families"],
+        )
         self.assertIs(report["policy"]["publication_approved"], False)
 
     def test_synthetic_coverage_and_pending_partition(self):
