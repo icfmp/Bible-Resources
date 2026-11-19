@@ -52,7 +52,7 @@ def verify_metadata(ledger, register, entries):
             raise ValueError("Decision does not concern an unresolved same-consonant family")
         if f["occurrences"] != d["occurrences"]:
             raise ValueError("Original family occurrence count changed")
-        if d["decision"] != "candidate_lexical_nonidentity" or not d["rationale"]:
+        if d.get("decision") != "candidate_lexical_nonidentity" or not d.get("rationale"):
             raise ValueError("Unexplained or unsupported editorial conclusion")
         w = d["source_witness"]
         if (w["word_id"], w["reference"]) not in [

@@ -451,10 +451,39 @@ headword lemma, Strong and POS metadata. It will reject an edition/source
 revision or candidate-list change. The rationale remains an explicit human-
 readable editorial judgment, not an unsafe automatic morphology rule.
 
-**Outstanding:** these 3 families are dispositioned as rejected candidates;
-the other 194 in-scope families still need review (858 original occurrences).
+**Initial three-family checkpoint:** these 3 large families were the first
+rejected candidates (1,791 occurrences), before the subsequent reviewed batch.
 The 5 edition-scope-only exclusions and 2 preserved composite Strong codes
 are tracked separately. A rejected match does **not** create a dictionary
 entry or semantic sense, and full-corpus linked coverage remains 240,098
 out of 248,680. Publication remains subject to the v1 acceptance gate in
 [#366](https://github.com/icfmp/Bible-Resources/issues/366).
+
+### Further source-reviewed false homographs (batch 2)
+
+Eight more **sole** UBS same-consonant candidates have been editorially
+rejected with original language/word ID, contextual original English gloss,
+morphology and exact UBS entry metadata, all checked in the same pinned-source
+CI. They account for **18 additional original WLC occurrences**:
+
+- `H עַל H5920` (6) and `H עַל H5921` (1): source *above/against* vs UBS
+  `עֹל` H5923 *yoke*.
+- `A אַל A0409` (4) and `H אֶל H0408` (1): source prohibitive *not* vs
+  UBS `אֵל` *deity/pronoun*.
+- `H נֶגֶד H5048` (2): spatial *opposite/suitable* vs UBS verbal
+  `נגד` *tell/inform/flow*.
+- `H עֹוד H5750` (2) and `A עוֹד A5751` (1): temporal *still* vs
+  UBS verbal `עוד` H5749 *testify/warn/restore*.
+- `H נָא H4995` (1): *raw* food vs UBS `נֹא` H4996,
+  the named place *No/Thebes*.
+
+**Total now explicitly dispositioned:** 11 rejected false-candidate families,
+**1,809** occurrences. **Remaining in-scope without editorial disposition:
+186 families / 840 occurrences**. The full lexical corpus denominator and
+source-derived dictionary scope are intentionally unchanged; a rejected false
+candidate is not a new UBS headword.
+
+**Not rejected:** Hebrew `קָלָה` H7034 ('be degraded') may share an actual
+meaning with the UBS `קלה` H7033 source entry, which includes a sense
+'be degraded'. Similar Strong differences alone do not justify a negative
+judgment. This remains for positive-identity review rather than a guessed link.
