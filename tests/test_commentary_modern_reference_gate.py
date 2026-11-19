@@ -21,6 +21,7 @@ from commentary_modern_reference_gate import (SourceReferenceGate,
     build_private_compact_original_crossrefs,
     build_private_owned_K_heading_range_links,
     build_private_same_chapter_verse_mentions,
+    build_private_first_K_outline_verse_tokens,
     build_private_inline_original_reference_index,
     _source_owned_ordered_alignment,
     _original_source_link_contexts, _source_context_unique_paragraph_anchor,
@@ -2011,6 +2012,132 @@ class OriginalAuthoredSameKVerseNumberTests(unittest.TestCase):
             native=native,errata=errata)
         self.assertEqual(receipt["local_verse_references_recovered_in_authored_modern_prose"],1)
         self.assertEqual("".join(ET.fromstring(out).itertext()),before)
+
+
+
+class OriginalFirstKOutlineVerseRecoveryTests(unittest.TestCase):
+    @staticmethod
+    def fixture(*, printed="Isa 21:11",source_target="Isa.21.11",
+                verses_cell="11,12"):
+        from commentary_modern_draft_osis_preview import NS, _range
+        root=ET.Element(f"{{{NS}}}osis")
+        chapter=ET.SubElement(root,f"{{{NS}}}chapter",{"osisID":"Isa.21"})
+        intro=ET.SubElement(chapter,f"{{{NS}}}div",{"type":"introduction"})
+        ET.SubElement(intro,f"{{{NS}}}title").text="Original chapter outline"
+        table=ET.SubElement(intro,f"{{{NS}}}table")
+        header=ET.SubElement(table,f"{{{NS}}}row")
+        ET.SubElement(header,f"{{{NS}}}cell").text="Original outline"
+        ET.SubElement(header,f"{{{NS}}}cell").text="Verses"
+        row=ET.SubElement(table,f"{{{NS}}}row")
+        ET.SubElement(row,f"{{{NS}}}cell").text="Edomite watchman"
+        ET.SubElement(row,f"{{{NS}}}cell").text=verses_cell
+        u1={"first_key":"Isa.21.1","keys":["Isa.21.1"]}
+        u2={"first_key":"Isa.21.11","keys":["Isa.21.11","Isa.21.12"]}
+        for u in (u1,u2):
+            sec=ET.SubElement(chapter,f"{{{NS}}}div",{
+                "annotateType":"commentary","annotateRef":_range(u["keys"])})
+            ET.SubElement(sec,f"{{{NS}}}p").text="The Lord addresses all people."
+        originals=[(source_target,printed)]
+        originals.extend([("John.3.16","not applicable")]*4)
+        pending=[{
+            "source_first_key":"Isa.21.1",
+            "source_reference_ordinal":i,
+            "original_osisRef_sha256":hashlib.sha256(t.encode()).hexdigest(),
+            "original_visible_label_sha256":hashlib.sha256(l.encode()).hexdigest(),
+        } for i,(t,l) in enumerate(originals,1)]
+        ledger={
+            "status":"SOURCE_NATIVE_WHOLE_CANON_HYPERLINK_DISPOSITION_QUEUE_NOT_FINAL_APPROVAL",
+            "source_reference_labels_or_literal_targets_exported":False,
+            "original_native_reference_elements":5,
+            "source_link_occurrences_verified_in_derived_osis":0,
+            "source_spurious_link_occurrences_explicitly_omitted":0,
+            "source_original_links_still_requiring_placement_review":5,
+            "publication_authorized":False,
+            "pending":pending}
+        native={
+            "original_compiled_corpus_sha256":FULL_HASH,
+            "source_prose_or_original_markup_exported":False,
+            "chapters":{"Isa.21":{"original_units":[u1,u2]}}}
+        errata={"status":"PINNED_ORIGINAL_LINK_ERRATA_REVIEW_ONLY_NOT_APPLIED",
+                "original_native_corpus_sha256":FULL_HASH,
+                "cases":[{"source_first_key":"Isa.21.1",
+                          "original_reference_ordinal":i,"approval":False}
+                         for i in range(2,6)]}
+        return ET.tostring(root),ledger,{"Isa.21.1":originals},native,errata
+
+    def test_one_explicit_source_original_verse_in_outline_cell(self):
+        from commentary_modern_draft_osis_preview import NS
+        args=self.fixture()
+        before="".join(ET.fromstring(args[0]).itertext())
+        out,ledger,report=build_private_first_K_outline_verse_tokens(
+            source_osis=args[0],ledger=args[1],original=args[2],
+            native=args[3],errata=args[4])
+        root=ET.fromstring(out)
+        refs=[x for x in root.iter() if x.tag==f"{{{NS}}}reference"]
+        self.assertEqual(len(refs),1)
+        self.assertEqual([(x.text,x.get("osisRef")) for x in refs],
+                         [("11","Isa.21.11")])
+        self.assertEqual("".join(root.itertext()),before)
+        self.assertEqual(report["source_first_K_outline_verse_links_recovered"],1)
+        self.assertEqual(report["valid_original_source_references_still_in_separate_K_notes"],0)
+        self.assertEqual(len(ledger["pending"]),4)
+
+    def test_two_source_links_on_same_comma_delimited_outline_row(self):
+        from commentary_modern_draft_osis_preview import NS
+        args=self.fixture()
+        xml,ledger,original,native,errata=args
+        new_target="Isa.21.12"
+        old=original["Isa.21.1"]
+        old[1]=(new_target,"12")
+        row=ledger["pending"][1]
+        row["original_osisRef_sha256"]=hashlib.sha256(new_target.encode()).hexdigest()
+        row["original_visible_label_sha256"]=hashlib.sha256(b"12").hexdigest()
+        # Move original bad-link ordinals away without introducing duplicates.
+        for case in errata["cases"]:
+            case["original_reference_ordinal"]+=1
+        old.append(("John.3.16","not applicable"))
+        ledger["pending"].append({
+            "source_first_key":"Isa.21.1",
+            "source_reference_ordinal":6,
+            "original_osisRef_sha256":hashlib.sha256(b"John.3.16").hexdigest(),
+            "original_visible_label_sha256":hashlib.sha256(b"not applicable").hexdigest(),
+        })
+        ledger["original_native_reference_elements"]=6
+        ledger["source_original_links_still_requiring_placement_review"]=6
+        before="".join(ET.fromstring(xml).itertext())
+        out,revision,report=build_private_first_K_outline_verse_tokens(
+            source_osis=xml,ledger=ledger,original=original,native=native,
+            errata=errata)
+        doc=ET.fromstring(out)
+        refs=[x for x in doc.iter() if x.tag==f"{{{NS}}}reference"]
+        self.assertEqual([(x.text,x.get("osisRef")) for x in refs],
+                         [("11","Isa.21.11"),("12","Isa.21.12")])
+        self.assertEqual("".join(doc.itertext()),before)
+        self.assertEqual(report["source_first_K_outline_verse_links_recovered"],2)
+
+    def test_source_target_or_printed_label_must_match_actual_unique_verse(self):
+        for source,printed,cell in [
+            ("Isa.21.11","Isa.21.12","11,12"),
+            ("Job.21.11","Job.21.11","11,12"),
+            ("Isa.21.11","Isa.21.11","11,11"),
+            ("Isa.21.11","Isa.21.11","11–12"),
+        ]:
+            with self.subTest(target=source,printed=printed,cell=cell):
+                args=self.fixture(printed=printed,source_target=source,
+                                  verses_cell=cell)
+                _,rev,report=build_private_first_K_outline_verse_tokens(
+                    source_osis=args[0],ledger=args[1],original=args[2],
+                    native=args[3],errata=args[4])
+                self.assertEqual(report["source_first_K_outline_verse_links_recovered"],0)
+                self.assertEqual(len(rev["pending"]),5)
+
+    def test_source_target_sha_mismatch_fails_closed(self):
+        args=self.fixture()
+        args[1]["pending"][0]["original_osisRef_sha256"]="0"*64
+        with self.assertRaisesRegex(ValueError,"original link/label"):
+            build_private_first_K_outline_verse_tokens(
+                source_osis=args[0],ledger=args[1],original=args[2],
+                native=args[3],errata=args[4])
 
 if __name__=="__main__":
     unittest.main()
