@@ -3592,6 +3592,172 @@ def build_unapproved_source_errata_notes_preview(
     }
 
 
+def build_private_additional_source_errata_preview(
+        *, prior_private_osis: bytes, manifest: dict,
+        ledger: dict, native: dict) -> tuple[bytes, dict]:
+    """Keep further bad source links in a separate, *unapproved* navigation preview.
+
+    Check each original native K, its literal destination and printed label by
+    SHA before rendering secondary-witness destinations only as marked notes.
+    Neither source notes nor the modern commentator's visible prose are
+    rewritten. This is not editorial or public-distribution approval.
+    """
+    from commentary_modern_draft_osis_preview import NS, _range
+
+    if (manifest.get("status") !=
+            "ORIGINAL_DIGITAL_SOURCE_LINK_DISCREPANCIES_REVIEW_ONLY_NOT_APPLIED"
+            or manifest.get("edition") != "MHCC 0.1.1 pinned compiled SWORD"
+            or manifest.get("original_corpus_sha256") !=
+            native.get("original_compiled_corpus_sha256")
+            or manifest.get("private_review_candidate_only") is not True
+            or manifest.get("private_review_note_status") !=
+            "PRIVATE_PROPOSED_SECONDARY_WITNESS_LINK_NAVIGATION_NOT_SOURCE_OR_RELEASE"
+            or any(manifest.get(k) is not False for k in (
+                "original_source_modified", "modern_chapter_prose_modified",
+                "proposed_navigation_approved", "publication_authorized"))
+            or ledger.get("status") !=
+            "SOURCE_NATIVE_WHOLE_CANON_HYPERLINK_DISPOSITION_QUEUE_NOT_FINAL_APPROVAL"
+            or ledger.get("publication_authorized") is not False):
+        raise ValueError("Additional errata require original source/receipt and private review status")
+
+    cases = manifest.get("cases")
+    if (not isinstance(cases, list) or len(cases) != 11
+            or manifest.get("proposed_navigation_source_links_for_private_review")
+                != len(cases)):
+        raise ValueError("Expected eleven explicit original-link discrepancies")
+
+    pending_rows = ledger.get("pending", [])
+    pending = {(r["source_first_key"], r["source_reference_ordinal"]): r
+               for r in pending_rows}
+    if len(pending) != len(pending_rows):
+        raise ValueError("Ambiguous original K and ordinal identity")
+
+    doc = ET.fromstring(prior_private_osis)
+    original_bytes = ET.tostring(doc, encoding="utf-8")
+    chapters = {ch.get("osisID"): ch for ch in doc.iter()
+                if ch.tag == f"{{{NS}}}chapter"}
+    if set(chapters) != set(native.get("chapters", {})):
+        raise ValueError("Original native chapter census differs from private modern OSIS")
+
+    seen = set()
+    receipts = []
+    total_targets = 0
+    for case in cases:
+        first, ordinal = (case.get("source_first_key"),
+                          case.get("source_reference_ordinal"))
+        key = (first, ordinal)
+        source_row = pending.get(key)
+        if (key in seen or source_row is None or
+                type(ordinal) is not int or case.get("approval") is not False):
+            raise ValueError("Additional source error is duplicated, already placed or unbound")
+        seen.add(key)
+        original_literal = case.get("original_osisRef")
+        original_label = case.get("original_link_label")
+        if (not isinstance(original_literal, str)
+                or not isinstance(original_label, str)
+                or hashlib.sha256(original_literal.encode("utf-8")).hexdigest()
+                    != case.get("original_target_sha256")
+                or hashlib.sha256(original_label.encode("utf-8")).hexdigest()
+                    != case.get("original_label_sha256")
+                or source_row.get("original_osisRef_sha256") !=
+                    case["original_target_sha256"]
+                or source_row.get("original_visible_label_sha256") !=
+                    case["original_label_sha256"]):
+            raise ValueError("Original source-link target/printed-label fingerprints differ")
+
+        chapter = first.rsplit(".", 1)[0]
+        native_units = native["chapters"][chapter]["original_units"]
+        indices = [i for i, u in enumerate(native_units)
+                   if u.get("first_key") == first and
+                   u.get("source_unit_sha256") ==
+                   case.get("original_native_unit_sha256")]
+        if len(indices) != 1:
+            raise ValueError("Additional source-error native authorial K SHA differs")
+        sections = chapters[chapter].findall(
+            f"./{{{NS}}}div[@annotateType='commentary']")
+        if (len(sections) != len(native_units) or
+                sections[indices[0]].get("annotateRef") !=
+                _range(native_units[indices[0]]["keys"])):
+            raise ValueError("Modern section does not retain original K ownership")
+
+        proposals = case.get("proposed_destinations")
+        context = case.get("proposed_navigation_context")
+        allowed_contexts = {
+            "DIGITAL_LINK_TARGET_MISMATCH_VS_PRINTED_SOURCE",
+            "SOURCE_SECTION_NAVIGATION_NOT_AUTHORIAL_SENTENCE",
+            "ORIGINAL_PRINTED_REFERENCE_DISCREPANCY_NOT_SILENTLY_CORRECTED",
+        }
+        if (not isinstance(proposals, list) or not proposals or
+                len(proposals) != len(set(proposals))
+                or any(not isinstance(v, str) or
+                       not _allowed_source_link_target(v) for v in proposals)
+                or context not in allowed_contexts):
+            raise ValueError("Additional preview has unsupported navigation or context")
+        if (first == "Num.29.1") != (
+                context == "ORIGINAL_PRINTED_REFERENCE_DISCREPANCY_NOT_SILENTLY_CORRECTED"):
+            raise ValueError("Printed-source erratum was not distinguished")
+        if first == "Jude.1.8" and context != (
+                "SOURCE_SECTION_NAVIGATION_NOT_AUTHORIAL_SENTENCE"):
+            raise ValueError("Jude's ambiguous printed Jud label must stay a transition")
+
+        note = ET.SubElement(sections[indices[0]], f"{{{NS}}}note", {
+            "type": "crossReference",
+            "resp": "BibleResourcesPrivateUnapprovedAdditionalLinkReview",
+        })
+        note.text = (
+            "Unapproved source-printed citation correction (not the original text): "
+            if context == "ORIGINAL_PRINTED_REFERENCE_DISCREPANCY_NOT_SILENTLY_CORRECTED"
+            else "Unapproved proposed section-navigation correction (not an original in-sentence link): "
+            if context == "SOURCE_SECTION_NAVIGATION_NOT_AUTHORIAL_SENTENCE"
+            else "Unapproved digital-link destination correction (secondary witness): ")
+        candidate_hashes = []
+        for i, target in enumerate(proposals):
+            display = _source_link_supplement_display(target)
+            ref = ET.SubElement(note, f"{{{NS}}}reference", {"osisRef": target})
+            ref.text = display
+            ref.tail = "; " if i < len(proposals) - 1 else "."
+            candidate_hashes.append({
+                "candidate_target_sha256":
+                    hashlib.sha256(target.encode("utf-8")).hexdigest(),
+                "candidate_derived_display_sha256":
+                    hashlib.sha256(display.encode("utf-8")).hexdigest(),
+            })
+            total_targets += 1
+        receipts.append({
+            "source_first_key": first,
+            "source_original_link_ordinal": ordinal,
+            "original_source_literal_target_sha256":
+                case["original_target_sha256"],
+            "original_source_label_sha256": case["original_label_sha256"],
+            "original_source_K_body_sha256":
+                case["original_native_unit_sha256"],
+            "proposed_context": context,
+            "candidate_references": candidate_hashes,
+        })
+
+    if total_targets != manifest.get("proposed_derived_navigation_note_count"):
+        raise ValueError("Proposed review-only destination count changed")
+    output = ET.tostring(doc, encoding="utf-8", xml_declaration=True)
+    restored = ET.fromstring(output)
+    for ch in restored.iter():
+        for note in list(ch):
+            if (note.tag == f"{{{NS}}}note" and note.get("resp") ==
+                    "BibleResourcesPrivateUnapprovedAdditionalLinkReview"):
+                ch.remove(note)
+    if ET.tostring(restored, encoding="utf-8") != original_bytes:
+        raise ValueError("Additional editorial preview changed prior modern/source-notes document")
+    return output, {
+        "status": "PRIVATE_ADDITIONAL_SOURCE_LINK_REVIEW_NOT_EDITED_OR_RELEASED",
+        "original_source_link_occurrences_provisionally_reviewed": len(receipts),
+        "secondary_witness_proposed_navigation_targets": total_targets,
+        "original_and_modern_edition_text_unchanged": True,
+        "prior_private_note_and_link_structure_unchanged": True,
+        "editorial_approval": False,
+        "public_distribution": False,
+        "original_source_K_ordinal_proposed_navigation_hashes": receipts,
+    }
+
+
 def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                                     native: dict, identities: dict,
                                     dispositions: dict, repo_root: Path,
