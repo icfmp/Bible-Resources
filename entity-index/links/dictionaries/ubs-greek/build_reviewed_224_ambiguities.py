@@ -130,7 +130,7 @@ def build(candidate, source, classified, ledger, english, french):
             "original_class": word["original_class"],
             "original_morph": word["original_morph"],
             "original_strong_ubs_main_ids_preserved": word["existing_original_ubs_main_ids"],
-            "original_headword_ln_corrobation": matched,
+            "original_headword_ln_corroboration": matched,
         }
         totals[key] += 1
     if (len(reviewed) != 220 or set(totals) != set(choices)
