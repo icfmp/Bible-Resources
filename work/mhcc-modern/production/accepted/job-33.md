@@ -68,7 +68,7 @@ Job concluded from his illness that God was angry with him.
 
 His friends made the same assumption.
 
-Elihu explained that the Lord often permits **bodily suffering for spiritual good**.
+Elihu explained that **God often afflicts the body for the good of the soul**.
 
 Understanding this can help us respond wisely to sickness as a means by which God speaks.
 
@@ -119,6 +119,8 @@ Those who finally perish are without excuse because they refused the healing off
 ---
 
 ## Editorial review — Job 33
+
+**2026-11-19 follow-up to the targeted fidelity repair:** In verses 19–28, the prior modern phrase said God *permits* bodily suffering, whereas the CCEL source explicitly says God *afflicts the body* for the soul's good. Restored source agency without extrapolating it to a diagnosis of particular contemporary sufferers. Original-native wording and independent review remain pending.
 
 **2026-11-19 secondary-witness fidelity repair (unapproved draft):** The modern verse 14–18 section replaced Henry's explicit claim that being turned from sin *saves from hell* with the more generic “rescues them from final judgment.” Restored the explicit referent against [CCEL Job 33](https://ccel.org/ccel/henry/mhcc.xix.xxxiii.html). This does not resolve the separate CCEL 29–33 lacuna, nor establish exact native-source equivalence or independent approval.
 
