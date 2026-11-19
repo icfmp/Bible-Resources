@@ -76,7 +76,7 @@ He spoke as though God had pushed his judgment to the furthest extreme against h
 
 The Lord will prevail against everyone who tries to contend with him.
 
-God may permit illness and pain, remove the companionship of those we love and take away every earthly hope.
+God may **send disease and pain**, remove the companionship of those we love and take away every earthly hope.
 
 Yet he will receive the believer into eternal happiness.
 
@@ -97,6 +97,8 @@ It is foolish to postpone repentance until a deathbed, when weakness may make th
 ---
 
 ## Editorial review — Job 14
+
+**2026-11-19 secondary-witness fidelity repair (unapproved draft):** The modern Job 14:16–22 had substituted *permit illness and pain* for Henry's direct *send disease and pain*, attenuating the stated divine agency. Restored the English original's claim as found in [CCEL Job 14](https://ccel.org/ccel/henry/mhcc.xix.xiv.html). Native original SWORD and independent approval pending.
 
 **Complete secondary English source checked:** [CCEL, Job 14](https://ccel.org/ccel/henry/mhcc.xix.xiv.html). Released **MHCC 0.1.1** remains original authority, exact native SWORD and independent acceptance pending.
 
