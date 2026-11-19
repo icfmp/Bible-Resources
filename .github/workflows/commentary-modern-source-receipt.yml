@@ -1348,7 +1348,16 @@ jobs:
           def observe(kind,key,raw):
               if kind not in ("K","I"):
                   return
-              chapter=key.rsplit(".",1)[0]
+              if kind=="I":
+                  # Stock SWORD stores original outline tables as a chapter
+                  # introduction. Accepted native I IDs include Book.N and
+                  # Book.N.0; a book preface Book.0.0 is NOT a chapter.
+                  chapter=(key[:-2] if key.endswith(".0") and not
+                           key.endswith(".0.0") else key)
+                  if key.endswith(".0.0"):
+                      return
+              else:
+                  chapter=key.rsplit(".",1)[0]
               if chapter not in expected and key not in note_expected:
                   return
               xml=ET.fromstring(b"<native>"+raw+b"</native>")
