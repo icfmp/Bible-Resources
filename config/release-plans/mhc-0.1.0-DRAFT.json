@@ -52,10 +52,10 @@
     "private_final_MHC_zip_member_count": 7,
     "private_final_MHC_sword_id": "MHC",
     "private_final_MHC_version": "0.1.0",
-    "private_final_MHC_distributon_license": "Public Domain",
     "private_final_MHC_full_raw_corpus_equal_to_preview": true,
     "private_final_MHC_reinstalled_reader_samples_passed": 4,
-    "private_final_MHC_archive_destroyed_without_publication": true
+    "private_final_MHC_archive_destroyed_without_publication": true,
+    "private_final_MHC_distribution_license": "Public Domain"
   },
   "publication": {
     "owner_publication_authorization": false,
