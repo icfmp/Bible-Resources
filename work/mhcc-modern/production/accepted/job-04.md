@@ -86,7 +86,7 @@ These advantages die with us or pass to others.
 
 How can weak, sinful, dying creatures accuse God of injustice or claim to be purer than their Maker?
 
-Instead of quarreling with their suffering, they should be astonished that divine judgment has not already overtaken them completely.
+Instead of quarreling with their suffering, they should **wonder that they are not already in hell**.
 
 Can people cleanse themselves of guilt without their Creator?
 
@@ -101,6 +101,8 @@ Yet careless sinners notice so little that they do not prepare for death or cons
 ---
 
 ## Editorial review — Job 4
+
+**2026-11-19 secondary-witness fidelity repair (unapproved draft):** The 12–21 translation had softened Henry's explicit *wonder that he is out of hell* into generic postponed judgment. Restored the explicit historical statement from [CCEL Job 4](https://ccel.org/ccel/henry/mhcc.xix.iv.html); source 0.1.1 native wording and independent review remain required. No changes to original source K keys, annotations or references.
 
 **Full separate English source read:** [CCEL, Job 4](https://ccel.org/ccel/henry/mhcc.xix.iv.html). The actual released **MHCC 0.1.1** is the primary authority; source-native SWORD and independent review pending.
 
