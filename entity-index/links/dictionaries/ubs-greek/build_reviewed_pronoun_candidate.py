@@ -161,6 +161,13 @@ def make_reviewed(baseline, baseline_raw, source_report, candidate, ledger,
         approved_ids.add(wid)
     if not approved_ids or len(original_by_headword) != len(groups):
         raise ValueError("No original source-bound pronoun evidence for one reviewed group")
+    if (dict(sorted(original_by_headword.items())) !=
+            ledger.get("source_verified_individual_word_counts")
+            or len(approved_ids) !=
+                ledger.get("original_source_word_approvals_total")
+            or 5938 - len(approved_ids) !=
+                ledger.get("remaining_5938_source_candidate_words_unapproved")):
+        raise ValueError("Original Greek source-witnessed pronoun acceptance ledger drift")
     if (len(output["by_macula_word"]) != 5938
             or counts["reviewed_source_pronoun_original_words"] +
                 counts["original_unapproved_other_greek_words"] +
