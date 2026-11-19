@@ -81,9 +81,13 @@ def review_ledger(ledger, source_report, english, french):
             for form in entry.get("BaseForms") or []
             for part in form.get("PartsOfSpeech") or []
         }
-        if not any("pron" in part for part in parts):
+        # UBS Greek v1.0 does not always provide a part-of-speech label.
+        # Absence is not evidence of a different grammatical class. If the
+        # original headword DOES label it, reject a contradictory category;
+        # verify the original MACULA source word is a pronoun separately.
+        if parts and not any("pron" in part for part in parts):
             raise ValueError(
-                "Original UBS entry has no independently attested pronoun class: " + mid
+                "Original UBS entry contradicts the source pronoun class: " + mid
             )
         verified_ln = {
             item.get("LEXEntryCode")
