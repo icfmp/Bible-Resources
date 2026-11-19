@@ -103,3 +103,51 @@ The [automated workflow](../../../../.github/workflows/bsi-ubs-greek.yml)
 verifies the exact upstream revisions and blob IDs, rebuilds against both
 language source files and the full Macula TSV, and structurally compares
 the generated index with the committed version. **No source file is modified.**
+
+## Exact-source Greek gap register (v1 editorial intake)
+
+The original 137,741 SBLGNT word rows are untouched. A source-pinned,
+reproducible [read-only audit](audit_source_gaps.py) and its
+[negative unit tests](test_source_gaps.py) give every currently unmatched
+word a source-specific disposition and verify each original source word ID.
+
+**Editorial intake only, not accepted links or publication:**
+
+| Original source category | Original word occurrences |
+| --- | ---: |
+| Existing matched UBS headwords (unchanged baseline) | 128,090 |
+| One Unicode-NFC-identical UBS headword **plus** matching source Louw–Nida code | **5,938** |
+| One Unicode-NFC-identical UBS headword, **without** matching UBS source semantic code | **3,249** |
+| No Unicode-NFC-identical UBS headword | **459** |
+| Source Strong annotation is composite/unsupported | **5** |
+| **Original MACULA Greek SBLGNT words** | **137,741** |
+
+The 9,651 original words lacking a direct entry occupy **238 families after
+Unicode NFC canonical equivalence**, as opposed to **246 distinct original
+byte-spelled Strong/lemma pairs**. This is a *comparison-only* grouping.
+All original Greek lemmas, token word IDs, morphologies, Louw–Nida codes,
+Strong numbers and source verses are retained in the evidence register.
+
+NFC accepts canonical Unicode equivalents such as `ἐγώ` and `ἐγώ`,
+but **never strips accents** or infers identity from similar transliterations.
+The compatible word-by-word list is an **unapproved candidate inventory**:
+a common Louw–Nida code supports a headword comparison, not a unique
+contextual sense. Rejected/missing/homonymous cases are not secretly
+redirected to a different original Strong code.
+
+**Known source-specific constraint:** UBS Greek v1.0's original `εἰμί`
+headword (`G2258`) has no `LEXMeanings` records. MACULA does
+annotate other inflected forms of `εἰμί` (e.g. `G2076`, `G1510`)
+with Louw–Nida codes. These are *not* independently verified UBS
+contextual sense IDs. Such rows stay outside the strict two-source
+word-link candidate list until reviewed on a separate evidentiary basis.
+
+GitHub Actions regenerates the complete source evidence from the **same
+pinned UBS Greek v1.0 EN/FR and MACULA SBLGNT revisions** used in the
+existing release-compatible index; it verifies exact coverage counts,
+bilingual entry/sense-ID parity, canonical lemma matching and all
+original word IDs. The temporary report is uploaded only as a
+**NOT-PUBLISHED, UNAPPROVED** Actions artifact. The frozen, historical
+[index.json](index.json) remains unchanged.
+
+Editorial follow-up is tracked in [issue #396](https://github.com/icfmp/Bible-Resources/issues/396).
