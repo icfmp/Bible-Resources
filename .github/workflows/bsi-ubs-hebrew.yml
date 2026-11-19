@@ -429,6 +429,22 @@ jobs:
               assert expected["release_approved"] is False
           print("UBS_PRIVATE_CANDIDATE_REVIEW_NOT_PUBLICATION")
           PY
+      - name: Rebuild 275-word final reviewed private candidate, preserve 24 source abstentions
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/build_final_reviewed_candidate.py \
+            --index /tmp/bsi-ubs-v1-private-reviewed-candidate.json \
+            --source_manifest entity-index/links/dictionaries/ubs-hebrew/v1_private_candidate_manifest.json \
+            --decisions entity-index/links/dictionaries/ubs-hebrew/v1_final_word_specific_approvals.json \
+            --source_evidence /tmp/bsi-ubs-last-26-original-wlc-evidence.json \
+            --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
+            --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --output /tmp/bsi-ubs-v1-final-275-word-candidate.json
+      - name: Upload private final UBS v1 original-word-specific candidate (NOT released)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-final-275-word-source-verified-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-v1-final-275-word-candidate.json
+          retention-days: 14
       - name: Verify reproducible, attributed UBS v1.0 technical RC package (NOT a release)
         run: |
           python3 -I entity-index/links/dictionaries/ubs-hebrew/package_reviewed_v1_candidate.py \
