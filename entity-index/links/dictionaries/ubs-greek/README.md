@@ -151,3 +151,51 @@ original word IDs. The temporary report is uploaded only as a
 [index.json](index.json) remains unchanged.
 
 Editorial follow-up is tracked in [issue #396](https://github.com/icfmp/Bible-Resources/issues/396).
+
+
+## First source-reviewed Greek headword batch — three pronouns
+
+The [original-word review ledger](v1_reviewed_pronoun_headwords.json)
+selects the already source-audited pronoun headword identities
+`σύ` (you), `ἐγώ` (I) and `οὗτος` (this/that). These are **word-ID-specific,
+headword-only** decisions: they do not infer an Louw–Nida contextual meaning.
+
+The independent [review builder](build_reviewed_pronoun_candidate.py)
+re-audits the original **137,741** SBLGNT word records and all **5,938**
+previously generated source-preview candidates against original UBS Greek
+1.0 EN/FR. It requires the exact original word ID, source Greek lemma
+under Unicode NFC equivalence, MACULA `class=pron`, source Strong and
+morphology, and an original Louw–Nida code *within the same authentic
+UBS headword*. Greek dictionary POS abbreviations `pprs.` and `pdem.`
+are recognized as personal/demonstrative pronouns, without rewriting them
+or pretending an absent dictionary POS tag is evidence of another class.
+
+| Source-attested original Greek lexeme | Independently reviewed word-ID links |
+| --- | ---: |
+| `σύ` | **1,971** |
+| `ἐγώ` | **2,156** |
+| `οὗτος` | **906** |
+| **Total original-word-only headword approvals** | **5,033** |
+
+**905** of the 5,938 strict original lemma+LN candidates remain explicitly
+**unapproved**. Additionally the original corpus has 3,249 lemma-only/no
+common source LN words, 459 with no NFC-identical UBS 1.0 headword, and
+five unsupported Strong structures, none of which are automatically linked.
+Thus **133,123 / 137,741** original words have an existing source Strong
+entry candidate or a first-batch reviewed individual word-ID headword
+mapping; the extra **905** unapproved preview links are **not included**
+in this editorially approved coverage. Original Strong-only sense
+candidates and original historical indexed `index.json` remain unchanged.
+
+The source-review pipeline records the exact 5,033 original word mappings
+in the private regenerated
+`bsi-ubs-greek-reviewed-pronoun-private-candidate.json` (Actions artifact,
+NOT a release), verifies its SHA-256
+`867d69186e718939ee55ef91403755240972a1e4c31ddc091e4974d1a524fda0`,
+and rejects modified original lemmas, Strong values, LN codes, morphological
+fields, source verses or original word IDs. Semantic sense choices remain
+**0 newly inferred**. It has not been promoted to a public download or
+integrated into the Bible application.
+
+The next editorial batches are tracked in
+[issue #396](https://github.com/icfmp/Bible-Resources/issues/396).

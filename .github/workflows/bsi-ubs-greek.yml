@@ -26,6 +26,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_index.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_source_gaps.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_private_word_candidate.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_pronoun_candidate.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -99,6 +100,52 @@ jobs:
           assert all("sense_id" not in r for r in candidate["by_macula_word"].values())
           print("UBS_GREEK_WORD_SPECIFIC_PREVIEW_VERIFIED_NOT_PUBLISHED")
           PY
+      - name: Review exact Greek first/second-person and demonstrative pronoun headwords
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_pronoun_candidate.py \
+            --baseline entity-index/links/dictionaries/ubs-greek/index.json \
+            --source_report /tmp/bsi-ubs-greek-original-gap-review.json \
+            --candidate /tmp/bsi-ubs-greek-private-word-candidate.json \
+            --review entity-index/links/dictionaries/ubs-greek/v1_reviewed_pronoun_headwords.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --macula macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
+            --output /tmp/bsi-ubs-greek-reviewed-pronoun-private-candidate.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("/tmp/bsi-ubs-greek-reviewed-pronoun-private-candidate.json")
+          index=json.loads(p.read_text(encoding="utf-8"))
+          old=json.loads(Path("entity-index/links/dictionaries/ubs-greek/index.json").read_text(encoding="utf-8"))
+          assert all(index[k]==v for k,v in old.items())
+          assert index["editorial_candidate"]["publication_approved"] is False
+          assert index["word_aware_coverage"]["new_inferred_contextual_lexical_sense_ids"] == 0
+          assert index["editorial_candidate"]["source_pronoun_headword_approvals"] == 5033
+          assert index["editorial_candidate"]["source_specific_approved_headwords"] == {
+              "οὗτος": 906, "σύ": 1971, "ἐγώ": 2156}
+          assert index["editorial_candidate"]["other_original_words_still_unapproved"] == 905
+          assert index["word_aware_coverage"]["original_sblgnt_word_records"] == 137741
+          assert index["word_aware_coverage"]["word_aware_entry_candidate_words"] == 134028
+          import hashlib
+          assert hashlib.sha256(p.read_bytes()).hexdigest() == (
+              "867d69186e718939ee55ef91403755240972a1e4c31ddc091e4974d1a524fda0")
+          assert len(index["by_macula_word"]) == 5938
+          from collections import Counter
+          kinds=Counter(w["match_type"] for w in index["by_macula_word"].values())
+          assert kinds == {
+              "source_reviewed_original_greek_pronoun_headword_only": 5033,
+              "nfc_canonically_identical_lemma_and_original_ln_unapproved_word_candidate": 905,
+          }
+          assert all("sense_id" not in item for item in index["by_macula_word"].values())
+          print("UBS_GREEK_PRONOUN_SOURCE_REVIEW_PRIVATELY_VERIFIED")
+          PY
+      - name: Upload private source-reviewed Greek pronouns (NO public release)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-pronouns-individually-source-reviewed-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-reviewed-pronoun-private-candidate.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload Greek word-aware PRIVATE lexical candidate (unapproved, not released)
         uses: actions/upload-artifact@v4
         with:
