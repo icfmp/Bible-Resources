@@ -65,9 +65,11 @@ Why one evil person enjoys a longer period of prosperity while another suffers e
 
 He is the Judge of the whole earth, and he will act justly.
 
-Time is so brief compared with eternity that differences in earthly circumstances become small before final judgment.
+Time is so brief compared with eternity that earthly differences become small in view of final judgment.
 
-Whether one unrepentant sinner dies in a palace and another in a prison, neither can escape the eternal consequence of continuing in sin.
+If **hell is the final lot of unrepentant sinners**, it makes little difference whether one goes there singing and another sighing.
+
+Whether one dies in a palace and another in a prison, **the worm that does not die and the fire that is not quenched** are the same for both.
 
 We should therefore avoid becoming consumed with questions about why earthly fortunes differ.
 
@@ -100,6 +102,8 @@ That is genuine comfort in the hour of death.
 ---
 
 ## Editorial review — Job 21
+
+**2026-11-19 targeted secondary-witness fidelity correction (draft, not independent approval):** The earlier modern 17–26 unit softened Henry's explicit hell/judgment contrast into a generic “eternal consequence” and omitted both the *singing versus sighing* contrast and the *undying worm/unquenchable fire* images. Restored these three original claims from the [CCEL Concise Job 21 witness](https://ccel.org/ccel/henry/mhcc.xix.xxi.html), with no change to source keys, chapter outlines, printed cross-reference targets or other sections. Original-native MHCC 0.1.1 lexical/semantic confirmation and separate editorial signoff remain required.
 
 **Complete secondary witness directly read:** [CCEL, Job 21](https://ccel.org/ccel/henry/mhcc.xix.xxi.html). Actual original published **MHCC 0.1.1** remains authoritative, source-native SWORD and independent acceptance pending.
 
