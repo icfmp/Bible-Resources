@@ -77,7 +77,14 @@
     "owner_publication_approved": false,
     "pull_request": "https://github.com/icfmp/Bible-Resources/pull/286",
     "pull_request_draft": true,
-    "public_catalog_updated": false
+    "public_catalog_updated": false,
+    "draft_release_plan_path": "config/release-plans/mhc-0.1.0-DRAFT.json",
+    "draft_release_notes_path": "docs/releases/MHC-0.1.0-DRAFT.md",
+    "production_module_identity": "MHC",
+    "production_version_proposed": "0.1.0",
+    "crosswire_upstream_module_identity_collision_documented": true,
+    "private_zcom4_packaging_workflow": "Repackage and independently reinstall final private zCom4 candidate (no export)",
+    "packaging_validation_status": "awaiting_live_GitHub_Actions_result"
   },
   "release_gate": {
     "status": "awaiting_final_reader_and_publication_authorization",
