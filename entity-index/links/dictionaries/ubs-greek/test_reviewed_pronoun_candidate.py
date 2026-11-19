@@ -82,11 +82,17 @@ class ReviewedGreekPronounTests(unittest.TestCase):
         self.assertEqual(groups["σύ"]["ubs_main_id"], IDS["σύ"])
         broken = copy.deepcopy(en)
         broken[0]["BaseForms"][0]["PartsOfSpeech"] = ["verb"]
-        with self.assertRaisesRegex(ValueError, "no independently attested pronoun class"):
+        with self.assertRaisesRegex(ValueError, "contradicts the source pronoun class"):
             MOD["review_ledger"](
                 LEDGER, {"source_editions": LEDGER["source_editions"]},
                 broken, fr
             )
+        unlabeled = copy.deepcopy(en)
+        for headword in unlabeled:
+            headword["BaseForms"][0]["PartsOfSpeech"] = []
+        self.assertEqual(len(MOD["review_ledger"](
+            LEDGER, {"source_editions": LEDGER["source_editions"]},
+            unlabeled, fr)), 3)
         drift = copy.deepcopy(fr)
         drift[1]["Lemma"] = "other"
         with self.assertRaisesRegex(ValueError, "Unattested"):
