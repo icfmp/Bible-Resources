@@ -2337,6 +2337,129 @@
         "original_word_english": "Haqqatan"
       },
       "rationale": "Ezra 8:12 explicitly names Hakkatan/Haqqatan, matching the unique UBS indexed Hakkatan personal headword; do not treat this as an automatic alias for all uses of common adjective small."
+    },
+    {
+      "lang": "H",
+      "lemma": "תָּקְהַת",
+      "original_strong": "8616a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "007908001001000",
+          "original_word_id": "o140340220121",
+          "reference": "2CH 34:22!12"
+        }
+      ],
+      "ubs_candidate_main_id": "007915000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Tokhath, father of Shallum and husband of Huldah in 2 Chronicles 34:22",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "2CH 34:22",
+        "ubs_attested_gloss": "Tikvah",
+        "original_word_english": "Tokhath"
+      },
+      "rationale": "The original named Tokhath at 2 Chronicles 34:22 is the father of Shallum. The UBS תִּקְוָה headword explicitly describes that man as 'also known as Tokhath' in its Tikvah personal-name meaning; a word-anchored headword equivalence is justified without transferring UBS contextual LEXID."
+    },
+    {
+      "lang": "H",
+      "lemma": "רָמָה",
+      "original_strong": "7436",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o090010010052",
+          "reference": "1SA 1:1!5"
+        }
+      ],
+      "ubs_candidate_main_id": "006823000000000",
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Samuel's Ramathaim-Zophim, associated with the UBS Ramah settlement in Ephraim",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "1SA 1:1",
+        "ubs_attested_gloss": "Ramah",
+        "original_word_english": "Ramathaim"
+      },
+      "rationale": "1 Samuel 1:1 identifies Ramathaim Zophim, Samuel's place of origin. A UBS רָמָה location meaning explicitly states that its Ephraim settlement is 'also known as Ramathaim or Ramathaim Zophim'; this accepts only the UBS combined headword, not a generic Strong alias."
+    },
+    {
+      "lang": "H",
+      "lemma": "תַּנִּין",
+      "original_strong": "5886a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "005394001001000",
+          "original_word_id": "o160020130081",
+          "reference": "NEH 2:13!8"
+        }
+      ],
+      "ubs_candidate_main_id": "005401000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "En-Tannin or Dragon Spring outside Jerusalem in Nehemiah 2:13",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "NEH 2:13",
+        "ubs_attested_gloss": "En-Tannin"
+      },
+      "rationale": "The original Nehemiah 2:13 named spring is glossed 'the Well of the Dragons' in pinned WLC, and the UBS entry עֵין הַתַּנִּין explicitly identifies En-Tannin / Dragon Spring at Nehemiah 2:13. The full referent agrees, but the independently segmented morphology and original Strong remain unchanged."
+    },
+    {
+      "lang": "H",
+      "lemma": "שְׁאָלָה",
+      "original_strong": "7585a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o230070110081",
+          "reference": "ISA 7:11!8"
+        }
+      ],
+      "ubs_candidate_main_id": "007130000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Sheol / the realm of the dead in Isaiah 7:11's contrast between depth and height",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "ISA 7:11",
+        "ubs_attested_gloss": "world of the dead",
+        "original_word_english": "sheol"
+      },
+      "rationale": "In Isaiah 7:11 the original WLC English witness is 'sheol' at 'make it deep as Sheol, or high as heaven'. The UBS שְׁאוֹל indexed headword explicitly denotes the world of the dead. The original lemma and textual gloss are preserved; only the entry-level identity is corroborated without contextual LEXID inference."
     }
   ]
 }
