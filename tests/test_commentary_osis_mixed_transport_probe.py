@@ -15,8 +15,43 @@ from commentary_osis_mixed_transport_probe import (
     mixed_transport_checks_pass, _COVERAGE_FIELDS,
     privately_stage_versioned_zcom_zip,
     private_rekey_sword_commentary_conf,
-    verify_private_versioned_commentary_conf_delta
+    verify_private_versioned_commentary_conf_delta,
+    classify_private_gradle_failure,
 )
+
+
+
+class PrivateGradleFailureClassificationTests(unittest.TestCase):
+    """Only invented log text is used; no real commentary or Java log leaks."""
+
+    def test_success_requires_real_junit_counts_and_zero_exit(self):
+        valid = {"tests": 2, "failures": 0, "errors": 0, "skipped": 0}
+        self.assertEqual(classify_private_gradle_failure(b"", 0, valid), "PASS")
+        self.assertEqual(classify_private_gradle_failure(b"", 1, valid), "JUNIT_FAILURE")
+        self.assertEqual(classify_private_gradle_failure(b"", 0, None), "NO_JUNIT_REPORT")
+
+    def test_network_and_compilation_failures_still_fail_closed(self):
+        cases = [
+            (b"Could not resolve dependency for invented fixture", "DEPENDENCY_NETWORK"),
+            (b"Could not download distribution from example.invalid", "DEPENDENCY_NETWORK"),
+            (b"Could not find or load main class org.gradle.wrapper.GradleWrapperMain",
+             "GRADLE_WRAPPER_SETUP"),
+            (b"No tests found for given includes: [Example]", "TEST_SELECTION"),
+            (b":compileTestJava FAILED; invented fixture", "TEST_COMPILATION"),
+        ]
+        for log, expected in cases:
+            with self.subTest(expected=expected):
+                self.assertEqual(classify_private_gradle_failure(log, 1, None), expected)
+
+    def test_logs_never_return_unreviewed_source_text_and_are_bounded(self):
+        self.assertEqual(
+            classify_private_gradle_failure(
+                b"Invented secret commentary paragraph: do not output", 1, None),
+            "NO_JUNIT_REPORT")
+        with self.assertRaises(ValueError):
+            classify_private_gradle_failure(b"x" * 4_000_001, 1, None)
+        with self.assertRaises(ValueError):
+            classify_private_gradle_failure(b"anything", 300, None)
 
 
 class PrivateCommentaryMetadataDeltaTests(unittest.TestCase):
