@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "resource": "Matthew Henry's Complete Commentary on the Whole Bible",
+  "module_id": "MHC",
+  "source_provenance": {
+    "provider": "CrossWire Bible Society",
+    "upstream_module_version": "2.2",
+    "original_authoring_osis_sha256": "3cf367f00c498a3124b339c00896aaef4ef1196a2d5c310ecb20ea42abd130f6",
+    "upstream_git_commit": "537591a94c991941877b47a06666b6a7812e05d8",
+    "original_bytes_committed": false
+  },
+  "technical_proofs": {
+    "source_word_and_structure_census": {
+      "status": "passed",
+      "distinct_source_commentary_groups": 4256,
+      "word_tokens": 7073234,
+      "run": "https://github.com/icfmp/Bible-Resources/actions/runs/44501242523"
+    },
+    "native_integrity": {
+      "status": "passed",
+      "numbered_entries": 31098,
+      "introduction_entries": 1255,
+      "top_entries": 2,
+      "run": "https://github.com/icfmp/Bible-Resources/actions/runs/44517068698"
+    },
+    "corrected_scripture_targets": {
+      "status": "passed_in_native_osis",
+      "target_count": 25
+    },
+    "two_chronicles_chapter_introduction": {
+      "native_status": "passed",
+      "real_gui_preface_status": "not_observed_in_verse_1_clipboard",
+      "verse_1_exposition_gui_status": "passed",
+      "run": "https://github.com/icfmp/Bible-Resources/actions/runs/44528250861"
+    },
+    "xiphos_three_independent_samples": {
+      "status": "passed",
+      "matches": 3,
+      "total": 3,
+      "run": "https://github.com/icfmp/Bible-Resources/actions/runs/44528250861"
+    },
+    "actual_gui_clicked_reference_navigation": {
+      "status": "not_tested"
+    },
+    "full_heading_paragraph_and_note_presentation": {
+      "status": "not_approved"
+    },
+    "independent_android_reader_gui": {
+      "status": "not_tested"
+    }
+  },
+  "legal": {
+    "status": "hold",
+    "upstream_license_claim": "Public Domain",
+    "upstream_license_page": "https://www.crosswire.org/sword/modules/ModInfo.jsp?modName=MHC",
+    "ccel_policy": "https://www.ccel.org/about/copyright.html",
+    "debian_rights_dispute": "https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=883932",
+    "modified_electronic_derivative_rights_cleared": false,
+    "territorial_rights_cleared": false
+  },
+  "delivery": {
+    "candidate_generated_in_ephemeral_ci": true,
+    "candidate_binary_committed": false,
+    "candidate_binary_published": false,
+    "source_original_committed": false,
+    "owner_publication_approved": false,
+    "pull_request": "https://github.com/icfmp/Bible-Resources/pull/286",
+    "pull_request_draft": true,
+    "public_catalog_updated": false
+  },
+  "release_gate": {
+    "status": "hold",
+    "blocking_requirements": [
+      "exact electronic edition digital modification/redistribution rights confirmed",
+      "owner/editorial publication authorization",
+      "final complete reader presentation and navigation acceptance or clearly documented scope decision",
+      "fresh final release candidate integrity and metadata check"
+    ],
+    "prohibited_actions_before_release": [
+      "upload MHC full OSIS or SWORD archive",
+      "mark rights approved",
+      "merge release PR",
+      "publish or add to downloadable catalog"
+    ]
+  },
+  "notes": "Technical evidence is bound to each listed historic successful workflow and the exact pinned source. This is a metadata-only release-readiness receipt, not a downloadable build, checksum of a final production package, or legal determination."
+}
