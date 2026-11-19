@@ -24,7 +24,7 @@ Lay the burden of your concerns upon God, leaving it there in faith and dependen
 
 ## Verse 4 — God overrules the wicked
 
-God uses wicked people as instruments of righteous judgment upon one another; he will receive glory when final justice is done.
+God uses the wicked to **execute righteous vengeance upon one another**, and he will be **glorified by their destruction at last**.
 
 ## Verse 5 — Pride cannot escape judgment
 
@@ -44,7 +44,9 @@ A small possession honestly acquired is more useful and blessed than a large for
 
 ## Verse 9 — The Lord directs our steps
 
-If we make God's glory our goal and his will our rule, he will guide our steps by his **Spirit and grace**. **The CCEL paragraph then continues with an inline “10.”**: rulers and judges on earth must act justly and govern in the fear of God.
+If we make God's glory our goal and his will our rule, he will guide our steps by his **Spirit and grace**.
+
+Henry also exhorts **rulers and judges on earth to act justly and govern in the fear of God**.
 
 ## Verse 11 — Justice in commerce
 
@@ -125,6 +127,10 @@ Whatever God appoints in the matters we have entrusted to him, we should receive
 ---
 
 ## Editorial review — Proverbs 16
+
+**2026-11-19 additional focused fidelity check (draft; exact native-semantic approval pending):** In verse 4 the previous modernization softened Henry's explicit "righteous vengeance" and "destruction at last" into generic *righteous judgment* / *final justice*. Now both distinct claims are retained. Secondary witness: [CCEL Proverbs 16](https://ccel.org/ccel/henry/mhcc.xxi.xvi.html).
+
+**2026-11-19 source-label/editorial-leak cleanup:** The original compiled numbered K exposition at Prov.16.9 has an inline "10." in the CCEL witness introducing an exhortation to rulers and judges, while the released original has no separately occupied original native K body at Prov.16.10. The earlier modern body accidentally printed a translator's explanation ("The CCEL paragraph then continues with an inline '10.'") as though it were Henry's commentary. The reader-facing text now renders the source exhortation without that translator annotation. Its anomalous label and K ownership are documented here, **not silently corrected in the source**, and no original Bible verse or source K entry is manufactured. Full native wording, markup and references are still separate acceptance gates.
 
 **Complete English secondary source read:** [CCEL, Proverbs 16](https://ccel.org/ccel/henry/mhcc.xxi.xvi.html). The released `MHCC 0.1.1` remains authoritative for primary-native SWORD entries, exact annotation placement, independent editorial and compiled output checks.
 
