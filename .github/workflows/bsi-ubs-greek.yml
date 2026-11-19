@@ -37,6 +37,8 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_224_ambiguities.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_taxonomy_headwords.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_missing_strong_word_headwords.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_missing_exact_headwords.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_alpha_case_only.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -540,6 +542,65 @@ jobs:
         with:
           name: bsi-ubs-greek-224-original-ambiguity-dispositions-NOT-PUBLISHED
           path: /tmp/bsi-ubs-greek-224-ambiguity-partition.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Source-audit 459 Greek words with no exact UBS original Greek headword
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_missing_exact_headwords.py \
+            --source /tmp/bsi-ubs-greek-original-exceptions-and-ambiguities.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --output /tmp/bsi-ubs-greek-459-lexeme-source-gaps.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/bsi-ubs-greek-459-lexeme-source-gaps.json').read_text())
+          assert r['original_words']==459
+          assert sum(x['original_word_count'] for x in r['source_word_families'])==459
+          assert sum(r['diagnostic_category_original_word_counts'].values())==459
+          assert r['automatic_lemma_mappings_approved']==0
+          assert r['inferred_contextual_senses']==0
+          assert r['historical_index_modified'] is False
+          assert r['publication_approved'] is False
+          print('GREEK_459_ORIGINAL_SOURCE_HEADWORD_EXCEPTIONS_UNAPPROVED_AND_DOCUMENTED')
+          PY
+      - name: Review three authentic Greek Alpha letter-name word headwords without rewriting capitalization
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_alpha_case_only.py \
+            --candidate /tmp/bsi-ubs-greek-strong-zero-headwords-private.json \
+            --source /tmp/bsi-ubs-greek-459-lexeme-source-gaps.json \
+            --ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_case_only_alpha.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --output /tmp/bsi-ubs-greek-three-alpha-word-headwords-private.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.loads(Path('/tmp/bsi-ubs-greek-three-alpha-word-headwords-private.json').read_text())
+          old=json.loads(Path('entity-index/links/dictionaries/ubs-greek/index.json').read_text())
+          assert all(c[k]==v for k,v in old.items())
+          assert len(c['by_macula_word'])==9190
+          assert len(c['by_macula_ambiguous_word'])==220
+          assert c['editorial_candidate']['reviewed_original_headword_words_total']==9189
+          assert c['editorial_candidate']['other_original_words_still_unapproved']==1
+          assert c['editorial_candidate']['publication_approved'] is False
+          assert c['word_aware_coverage']['word_aware_entry_candidate_words']==137314
+          assert len([x for x in c['by_macula_word'].values() if x['match_type']=='source_reviewed_original_greek_Alpha_case_only_lexical_headword_only'])==3
+          assert all('sense_id' not in x for x in c['by_macula_word'].values())
+          print('ORIGINAL_GREEK_ALPHA_THREE_WORD_HEADWORDS_ONLY_NO_GLOBAL_STRONG_OR_CONTEXTUAL_SENSE')
+          PY
+      - name: Upload Greek three source-reviewed Alpha headwords (PRIVATE, NOT published)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-3-Alpha-original-word-headwords-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-three-alpha-word-headwords-private.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload missing Greek UBS lexical headwords source evidence (PRIVATE)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-459-source-headword-exceptions-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-459-lexeme-source-gaps.json
           if-no-files-found: error
           retention-days: 14
       - name: Upload original Greek lexical exceptions (PRIVATE, UNRESOLVED)

@@ -540,3 +540,54 @@ or publication readiness. All original dictionary resources,
 the SBLGNT TSV, historical `index.json`, and existing ambiguity
 candidate lists remain unchanged. Private, expiring CI artifacts
 are not publicly released data.
+
+## Independent original Greek missing-UBS-headword census
+
+The [source-pinned 459-word audit](audit_missing_exact_headwords.py)
+examines each original SBLGNT word ID for which *no Unicode-NFC-identical
+Greek lexical headword* occurs in the original UBS Greek Dictionary
+v1.0 EN/FR, preserving every Greek source spelling, Strong, LN,
+morphology, word ID and reference. **459 words in 47 original source
+families** have this source-specific disposition. Diagnostic
+case-insensitive headword comparison, exact UBS original Strong code
+presence and merely sharing an Louw–Nida domain code are **not**
+automatically accepted as the same Greek lexeme.
+
+The audit finds **456 words without even an original UBS Greek
+case-only headword spelling or exact source Strong-code identity**.
+The largest such source families are `ἰδού` 200,
+`Ἰερουσαλήμ` 76, `ἱερόν` 30, `ἴδε` 30,
+`ἕνεκεν` 20 and `περισσότερος` 15. This does
+not prove that there can be no related lexical entry under
+a different original UBS lemma. An independent source/editorial
+equivalence would be required; a matching semantic domain is not enough
+to invent an alias.
+
+A small exception consists of **three original MACULA word IDs** for
+`Ἄλφα` (original Strong `1`, noun, LN `61.7`).
+The original UBS English and French lexica have one lower-case original
+headword `ἄλφα`, UBS `MainId=000253000000000`. The
+[explicit three-word editorial ledger](v1_reviewed_case_only_alpha.json)
+and [original-word verifier](build_reviewed_alpha_case_only.py) require
+independent English/French UBS lexical-domain evidence and source
+grammatical class **in addition to** a unique case-only Greek headword.
+The original uppercase source Greek, original Strong `1`, morphology,
+LN and verse reference remain **unchanged**; only those three word-ID
+lexical HEADWORD identities are reviewed. This is not an invented
+global Strong alias or contextual UBS `LEXID` choice.
+
+The resulting private source-reviewed extra original-word headwords
+total **9,189**, plus **128,090** unchanged Strong-based word
+candidates: **137,279 / 137,741** Greek word occurrences have
+a source-supported lexical headword candidate (approximately 99.66%).
+The remaining **462** unmatched original words are the **456** above,
+five untouched composite Strong expressions and one authentic
+`ὁπότε` source grammatical discrepancy still lacking an approved
+source-headword decision. The 220 word-specific resolutions of original
+Strong ambiguities are separately retained; all 224 historical
+multiheadword Strong candidate lists remain unchanged.
+
+This is **lexical entry/headword evidence only, not accuracy of
+contextual semantic senses**. All new evidence is maintained in
+private expiring GitHub Actions artifacts, not SWORD or application
+downloads. No source Greek or historical `index.json` is modified.

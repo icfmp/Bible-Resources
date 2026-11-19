@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "status": "PRIVATE_original_word_specific_greek_case_only_alpha_lexical_headword_review",
+  "source_editions": {
+    "ubs_greek_edition": "1.0",
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8",
+    "macula_sblgnt_revision": "8423afe47b9e8f24b7772e808af45c7159a6fe7e"
+  },
+  "editorial_policy": {
+    "only_attested_original_word_ids": true,
+    "source_greek_spelling_preserved": true,
+    "casefold_diagnostic_only_until_corrobated_by_original_ln": true,
+    "require_unique_original_ubs_en_fr_headword": true,
+    "require_original_ubs_en_fr_lexical_ln_code": true,
+    "require_source_lexical_noun_class": true,
+    "original_source_strong_preserved": true,
+    "no_global_strong_alias": true,
+    "no_contextual_lexid": true,
+    "historical_strong_index_unchanged": true,
+    "publication_approved": false
+  },
+  "reviewed_original_lexeme": {
+    "macula_lemma_original": "Ἄλφα",
+    "ubs_original_lemma_case_only": "ἄλφα",
+    "ubs_main_id": "000253000000000",
+    "macula_original_strong": "1",
+    "macula_original_class": "noun",
+    "macula_original_louw_nida": "61.7",
+    "original_word_count": 3,
+    "editorial_basis": "The three original MACULA Greek word IDs have the original letter-name lemma Ἄλφα, Strong 1, noun classification and Louw–Nida lexical domain 61.7. The pinned original UBS Greek 1.0 EN and FR each contain exactly one lower-case lexical headword ἄλφα with the same independently attested lexical domain; both source original spellings are preserved, and only the individual word-level lexical HEADWORD identity is reviewed. Capitalization is not normalized in the original texts; this does not create a Strong alias or infer a contextual UBS sense."
+  },
+  "other_original_ubs_no_exact_lemma_words_still_unapproved": 456,
+  "remaining_strict_unapproved_source_words": 1,
+  "previous_source_word_headword_reviews": 9186,
+  "new_original_word_headword_reviews": 3
+}
