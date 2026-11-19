@@ -70,9 +70,11 @@ A day of final judgment is coming.
 
 Then what appears wrong will be seen in the light of divine justice, and what is dark or difficult will be understood.
 
-Elihu saw Job's fretful complaints and distrust of Providence as sinful.
+Henry says that if **divine wrath is present in our troubles**, it is because we quarrel with God, grow fretful and distrust his Providence.
 
-His task was to humble Job, because Job had spoken rashly about things beyond his knowledge.
+He applies this diagnosis to Job.
+
+**Elihu was directed by God to humble Job**, because Job had spoken rashly about matters beyond his knowledge.
 
 When we suffer, we should not speak only of **how great our pain is**.
 
@@ -81,6 +83,8 @@ We should also consider and praise **how great God's mercy is**.
 ---
 
 ## Editorial review — Job 35
+
+**2026-11-19 secondary-witness fidelity repair (unapproved draft):** In verses 14–16 the prior modernization omitted Henry's explicit conditional statement about *divine wrath in our troubles* and weakened the claim that Elihu was **directed by God** to humble Job. Restored those as Henry's own claims without presenting them as a universal factual diagnosis of any particular contemporary sufferer. Compared with [CCEL Job 35](https://ccel.org/ccel/henry/mhcc.xix.xxxv.html). Exact published-native text and independent editorial signoff remain pending.
 
 **Entire secondary English text read:** [CCEL, Job 35](https://ccel.org/ccel/henry/mhcc.xix.xxxv.html). Published original `MHCC 0.1.1` remains authoritative for native keys and independent SWORD acceptance.
 
