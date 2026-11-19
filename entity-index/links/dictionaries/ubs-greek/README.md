@@ -464,3 +464,43 @@ changes neither the **137,242 / 137,741** Greek word headword coverage
 nor source semantics; it adds verified original-word specificity.
 The versioned source-reviewed candidate is a **private expiring
 Actions artifact**, not a published SWORD module or Bible app integration.
+
+## Source-verified Greek grammatical taxonomy reconciliation — 32 original words
+
+The [explicit taxonomy ledger](v1_reviewed_taxonomy_headwords.json)
+records **32 exact original SBLGNT word IDs** whose pinned MACULA lexical
+class differs from UBS Greek Dictionary 1.0's *lexicographic* part-of-speech
+classification, while the original Greek NFC lemma, unique UBS bilingual
+headword identity and original exact UBS Louw–Nida domain evidence agree:
+
+| Original Greek lemma | Original MACULA class | Original UBS class | Original words |
+| --- | --- | --- | ---: |
+| `τεσσεράκοντα` | numeral `num` | adjective `adjc.` | 22 |
+| `ἐνενήκοντα` | numeral `num` | adjective `adjc.` | 4 |
+| `ὅστις` | pronoun `pron` | relative pronoun `prel.` | 5 |
+| `ὁ` | determiner `det` | article `artc.` | 1 |
+
+These are **different source editorial grammatical taxonomies, not
+false lexeme matches**. The
+[original-word-specific validator](build_reviewed_taxonomy_headwords.py)
+independently checks each word ID, original Strong/morphology, original
+Greek/reference and both original EN/FR UBS lexical-domain witnesses,
+then modifies **only the private lexical HEADWORD review status**.
+MACULA and UBS source POS labels and every original Strong/LN token
+remain unchanged. No contextual `LEXID` is selected.
+
+Three authentic original-word cases remain unapproved in the same
+original strict-lemma+LN cohort: `ὁπότε` (MACULA conjunction versus
+UBS adverb; requires independent syntactic/editorial review), and
+`ἄμωμον` and `Ἀρνί` (original Strong `0`; no inferred Strong
+equivalence). The 220 previously approved individual-word original
+Strong ambiguity headwords remain intact.
+
+The source-reviewed private overlay now has **9,184** individual-word
+headwords beyond the historical, unchanged **128,090** Strong-derived
+entry candidates: **137,274 / 137,741** (about 99.66%) original Greek
+words have independently source-supported lexical headword identities.
+This does **not** certify contextual lexical sense accuracy and does
+not fill missing UBS entries. The candidate remains **private and
+unpublished**; all original sources and the old `index.json` are
+preserved.
