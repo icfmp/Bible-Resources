@@ -19,7 +19,7 @@ publication_status: "NOT RELEASED — FULL SWORD REBUILD PENDING"
 
 ## Riches, children and long life cannot guarantee happiness (verses 1–6)
 
-A person may possess everything needed for earthly comfort and yet remain so enslaved to **greed or other sinful dispositions** that it becomes impossible to use those gifts wisely or enjoy them peacefully.
+A person may possess everything needed for earthly comfort, yet **the Lord may leave that person to greed or other sinful dispositions**, so that these gifts are neither used wisely nor enjoyed peacefully.
 
 Eventually those possessions pass into the hands of strangers.
 
@@ -68,6 +68,8 @@ Soon we will pass through this troubled world and enter the place where joy is f
 ---
 
 ## Editorial review — Ecclesiastes 6
+
+**2026-11-19 targeted secondary-witness fidelity repair (unapproved draft):** The earlier 1–6 modern exposition preserved bondage to greed but omitted Henry's explicit agency: *the Lord leaves him so to covetousness or evil dispositions*. A modern rendering now restores that as Henry's own providential claim, without extrapolating beyond the source. [CCEL Ecclesiastes 6](https://ccel.org/ccel/henry/mhcc.xxii.vi.html) was checked; exact original SWORD and independent editorial acceptance remain pending.
 
 **Entire English secondary witness read:** [CCEL, Ecclesiastes 6](https://ccel.org/ccel/henry/mhcc.xxii.vi.html). Exact released `MHCC 0.1.1` remains authoritative, native SWORD comparison and independent editorial acceptance pending.
 
