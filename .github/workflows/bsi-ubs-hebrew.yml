@@ -31,6 +31,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_family_register.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_editorial_scope_dispositions.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_lexical_nonidentity.py
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_multi_headword_abstentions.py
       - name: Check out exact UBS Hebrew EN/FR 0.9.4 source
         uses: actions/checkout@v4
         with:
@@ -155,6 +156,13 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-hebrew/verify_lexical_nonidentity.py \
             --register /tmp/bsi-ubs-hebrew-family-register.json \
             --decisions entity-index/links/dictionaries/ubs-hebrew/v1_lexical_nonidentity_dispositions.json \
+            --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
+            --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv
+      - name: Verify all frozen multiple-headword abstentions from pinned UBS and MACULA sources
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/verify_multi_headword_abstentions.py \
+            --register /tmp/bsi-ubs-hebrew-family-register.json \
+            --decisions entity-index/links/dictionaries/ubs-hebrew/v1_multi_headword_abstentions.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv
       - name: Verify all lexical families classified without editorial assumptions
