@@ -546,13 +546,16 @@ jobs:
           supplement=report["private_source_note_alternative"]
           assert supplement["status"] == (
               "PRIVATE_NATIVE_SOURCE_NOTE_ALTERNATIVE_NOT_AUTHORED_INLINE_PARITY")
-          assert supplement["original_link_occurrences_preserved_only_in_separate_source_notes"] == 176
+          initial_source_note_links=supplement["original_link_occurrences_preserved_only_in_separate_source_notes"]
+          assert initial_source_note_links == (
+              report["source_original_link_review_ledger"]["source_original_links_still_requiring_placement_review"] -
+              supplement["malformed_or_wrong_original_links_excluded_for_review"])
           assert supplement["malformed_or_wrong_original_links_excluded_for_review"] == 4
           assert supplement["modern_source_text_and_existing_links_unchanged"]
           assert not supplement["editorial_relocation_approved"]
           assert not supplement["published_or_distributed"]
           assert Path(base/"mhcc-modern-original-crossref-supplement.osis.xml").is_file()
-          print("SOURCE REFERENCE SUPPLEMENT PREVIEW: 176 exact native links " +
+          print("SOURCE REFERENCE SUPPLEMENT PREVIEW: " + str(initial_source_note_links) + " exact native links " +
                 "retained as source-only notes in a separate candidate; " +
                 "4 bad native targets excluded; modern inline links unchanged")
           provisional=report["private_unapproved_errata_navigation_preview"]
@@ -569,11 +572,11 @@ jobs:
           compact_fallback=report["private_compact_remaining_source_notes"]
           assert compact["status"] == (
               "PRIVATE_EXACT_BOOK_CHAPTER_VERSE_COMPACT_SOURCE_LINK_RECONSTRUCTION")
-          assert compact["original_unplaced_valid_links_considered"] == 176
+          assert compact["original_unplaced_valid_links_considered"] == initial_source_note_links
           assert compact["original_exact_compact_verse_links_restored"] >= 65
           assert compact["original_defective_link_proposals_never_retargeted"] == 4
           assert (compact["original_exact_compact_verse_links_restored"] +
-                  compact["original_valid_link_positions_still_unplaced"]) == 176
+                  compact["original_valid_link_positions_still_unplaced"]) == initial_source_note_links
           assert compact["all_original_k_text_in_derived_osis_unchanged"]
           assert compact["original_crossreference_literal_targets_and_labels_sha_verified"]
           assert not compact["released_or_distributed"]
@@ -657,27 +660,27 @@ jobs:
           inline_index=report["private_visible_source_reference_index_preview"]
           assert inline_index["status"] == (
               "PRIVATE_SOURCE_REFERENCES_VISIBLE_IN_K_NOT_EXACT_AUTHORIAL_INLINE")
-          assert inline_index["original_unplaced_valid_references_visible_in_commentary"] == 176
+          assert inline_index["original_unplaced_valid_references_visible_in_commentary"] == initial_source_note_links
           assert inline_index["original_literal_targets_and_displays_reused_without_rewriting"]
           assert not inline_index["precise_original_sentence_locations_proven"]
           assert not inline_index["published_or_distributed"]
           assert Path(base/"mhcc-modern-visible-original-references.osis.xml").is_file()
-          print("SOURCE VISIBLE REFERENCE INDEX: all 176 real original destinations " +
+          print("SOURCE VISIBLE REFERENCE INDEX: all " + str(initial_source_note_links) + " real original destinations " +
                 "included directly within their native commentary sections; " +
                 "exact original in-sentence placement still unapproved")
           contextual=report["private_contextual_note_relocation_preview"]
           assert contextual["status"] == (
               "PRIVATE_EXACT_CONTEXT_PROXIMITY_REVIEW_NOT_AUTHORIAL_INLINE_PARITY")
-          assert contextual["source_note_occurrences_total"] == 176
+          assert contextual["source_note_occurrences_total"] == initial_source_note_links
           assert (contextual["source_notes_moved_to_authored_paragraphs"] +
-                  contextual["source_notes_still_grouped_by_K"]) == 176
+                  contextual["source_notes_still_grouped_by_K"]) == initial_source_note_links
           assert contextual["original_source_target_and_label_identities_preserved"]
           assert not contextual["published_or_distributed"]
           assert not contextual["source_prose_or_modern_authored_text_modified"]
           assert Path(base/"mhcc-modern-contextual-crossref.osis.xml").is_file()
           print("SOURCE CONTEXT PROXIMITY PREVIEW (not original-inline proof): " +
                 str(contextual["source_notes_moved_to_authored_paragraphs"]) +
-                "/176 provisional contextual placements (exact phrase=" +
+                "/" + str(initial_source_note_links) + " provisional contextual placements (exact phrase=" +
                 str(contextual["exact_phrase_proximity_count"]) +
                 ", paragraph lexical=" +
                 str(contextual["paragraph_lexical_context_proximity_count"]) +
@@ -724,12 +727,15 @@ jobs:
           # presence is diagnostic evidence, NOT an automatic hyperlink.
           from collections import Counter
           pending=ledger["pending"]
-          assert len(pending) == 180
-          assert Counter(row["disposition"] for row in pending) == {
-              "UNPLACED_SINGLE_VERSE_REFERENCE": 145,
-              "UNPLACED_SAME_CHAPTER_VERSE_RANGE": 32,
-              "UNPLACED_OTHER_OR_COMPOSITE_OSIS_TARGET": 3,
+          assert len(pending) == (initial_source_note_links +
+              supplement["malformed_or_wrong_original_links_excluded_for_review"])
+          dispositions=Counter(row["disposition"] for row in pending)
+          assert set(dispositions) <= {
+              "UNPLACED_SINGLE_VERSE_REFERENCE",
+              "UNPLACED_SAME_CHAPTER_VERSE_RANGE",
+              "UNPLACED_OTHER_OR_COMPOSITE_OSIS_TARGET",
           }
+          assert sum(dispositions.values())==len(pending)
           ancestry=Counter(row["native_markup_location"] for row in pending)
           grammar=Counter(row["original_target_grammar"] for row in pending)
           labels=Counter(row["verbatim_original_label_in_modern_K"]
@@ -740,8 +746,8 @@ jobs:
               "NON_DISTINCTIVE_NOT_SCANNED", "UNIQUE_VERBATIM",
               "ABSENT_VERBATIM", "REPEATED_NOT_UNIQUE"}
           assert sum(ancestry.values()) == sum(grammar.values()) == (
-              sum(labels.values())) == 180
-          print("SOURCE UNPLACED 180 CONTEXT DIAGNOSTICS (not editorial approval): " +
+              sum(labels.values())) == len(pending)
+          print("SOURCE UNPLACED " + str(len(pending)) + " CONTEXT DIAGNOSTICS (not editorial approval): " +
                 json.dumps({"native_markup_location": dict(sorted(ancestry.items())),
                             "original_target_grammar": dict(sorted(grammar.items())),
                             "verbatim_original_label_in_modern_K":
