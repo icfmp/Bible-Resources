@@ -3439,17 +3439,19 @@ jobs:
       - name: Observe actual HMCC Modern commentary prose inside private Xiphos GUI
         id: xiphos_prose
         if: steps.xiphos_deps.outcome == 'success'
-        timeout-minutes: 3
+        timeout-minutes: 5
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
           import json,os,subprocess,sys
           from pathlib import Path
+          from lxml import etree
           sys.path.insert(0,"scripts")
           from commentary_xiphos_dual_reader import (
               _run_real_gui,verify_and_install_reviewed_bible)
           from pilot_subprocess import present_key,query
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
           base=Path(os.environ["RUNNER_TEMP"])
           root=base/"mhcc-modern-rc-root"
           assert (root/"mods.d/mhccmodrc.conf").is_file()
@@ -3464,11 +3466,48 @@ jobs:
           bible=verify_and_install_reviewed_bible(root)
           if bible["module_id"]!="BRLSG1910" or not bible["all_five_published_bible_files_sha256_attested"]:
               raise ValueError("Xiphos private test needs source-attested published Bible")
-          # Add the two source-authenticated chapter-I-only ranges as
-          # *real* end-of-chapter GUI selections, not merely native K links.
-          # These verses must display the actual source-strict commentary.
+          # Extract modern book prefaces only from the *compiled* candidate
+          # native I entries. Do not infer I text from verse K or manuscripts.
+          # This independent scope is observational: an unreadable Xiphos
+          # heading is not proof the source text is absent.
+          intro_targets={"Exod.1":"Exod 1:1","Rom.1":"Rom 1:1"}
+          compiled_intros={}
+          def collect_intro(kind,key,raw):
+              if kind!="I" or key not in intro_targets:
+                  return
+              if key in compiled_intros or not 1<=len(raw)<=256000:
+                  raise ValueError("Ambiguous modern SWORD I-key introduction")
+              fragment=etree.fromstring(
+                  b"<attested>"+raw+b"</attested>",
+                  parser=etree.XMLParser(
+                      resolve_entities=False,no_network=True,load_dtd=False,
+                      recover=False,huge_tree=False),
+              )
+              visible=" ".join("".join(fragment.itertext()).split())
+              if len(visible.split())<50:
+                  raise ValueError("Expected real compiled book introduction is not substantive")
+              compiled_intros[key]=visible.encode("utf-8")
+          scanner=base/"commentary-modern-source-raw"
+          if not scanner.is_file() or scanner.is_symlink():
+              raise ValueError("Reviewed SWORD raw entry scanner missing")
+          with subprocess.Popen(
+              ["timeout","240s",str(scanner),"MHCCMODRC"],
+              env=dict(os.environ,SWORD_PATH=str(root)),
+              stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,
+          ) as proc:
+              if proc.stdout is None:
+                  raise ValueError("Native SWORD modern intro stream unavailable")
+              native_report,*_=parse_native_raw_corpus(proc.stdout,on_entry=collect_intro)
+              proc.stdout.close()
+              if proc.wait(timeout=30)!=0:
+                  raise ValueError("Native SWORD modern intro scan failed")
+          if set(compiled_intros)!=set(intro_targets):
+              raise ValueError("Private SWORD candidate lacks an expected real book-I intro")
+          intro_expected={intro_targets[key]:value for key,value in compiled_intros.items()}
+          # Two chapter-I-only end verses + one authentic OT and one NT
+          # book preface. All eight ordinary commentary texts must match GUI.
           samples=("Gen 1:1","Matt 3:7","Ps 95:1","Rev 22:2",
-                   "Lev 19:37","Ps 108:13")
+                   "Lev 19:37","Ps 108:13","Exod 1:1","Rom 1:1")
           comparisons={}
           for ref in samples:
               code,commentary=query(
@@ -3483,6 +3522,8 @@ jobs:
                       or len(commentary)<=100 or len(bible_text)<=64):
                   raise ValueError("Xiphos sample not backed by two substantial real SWORD texts: "+ref)
               comparisons[ref]={"commentary":commentary,"bible":bible_text}
+              if ref in intro_expected:
+                  comparisons[ref]["intro_expected"]=intro_expected[ref]
           result=_run_real_gui(root,comparisons,seconds=25,
                                commentary_module_id="MHCCMODRC")
           matches=result.get("commentary_clipboard_match_by_passage",{})
@@ -3495,6 +3536,11 @@ jobs:
           if any(type(x) is not bool for x in matches.values()):
               raise ValueError("Actual GUI clipboard evidence is not boolean")
           positives=sum(matches.values())
+          intro_matches=result.get("chapter_intro_prose_clipboard_match_by_passage",{})
+          if set(intro_matches)!=set(intro_expected):
+              raise ValueError("Private Xiphos book-preface observation missing exact I-key samples")
+          if any(type(v) is not bool for v in intro_matches.values()):
+              raise ValueError("Xiphos book-preface GUI evidence is not boolean")
           receipt={
               "status":(
                   "PRIVATE_MODERN_REAL_XIPHOS_GUI_SUBSTANTIVE_CLIPBOARD_PASS"
@@ -3509,6 +3555,10 @@ jobs:
               "passages_checked":len(samples),
               "actual_commentary_excerpts_matched_to_SWORD_not_Bible":positives,
               "per_passage_substantive_GUI_match":dict(matches),
+              "compiled_source_native_I_preface_samples_checked":len(intro_expected),
+              "separately_observed_book_preface_I_GUI_match_count":sum(intro_matches.values()),
+              "per_book_preface_I_GUI_match":dict(intro_matches),
+              "all_book_prefaces_in_GUI_approved":False,
               "actual_GUI_actions_completed":result.get("actual_passage_commands_accepted") is True,
               "xiphos_link_mouse_click_and_target_verified":False,
               "xiphos_gui_all_pages_approved":False,
@@ -3523,6 +3573,10 @@ jobs:
                 str(len(samples))+" distinct substantive commentary excerpts proven "
                 "in actual GTK pane and clipboard vs independently read SWORD, "
                 "full authorial text not logged; no click-navigation, rights or release claim")
+          print("PRIVATE REAL XIPHOS MODERN BOOK-I INTRO PROSE OBSERVATION: "+
+                str(sum(intro_matches.values()))+"/"+str(len(intro_expected))+
+                " compiled native I-entry prefatory texts matched in GUI; "
+                "a non-match remains inconclusive, never missing source text")
           if positives!=len(samples) or result.get("actual_passage_commands_accepted") is not True:
               raise ValueError(
                   "Actual Xiphos modern commentary GUI did not display every "
