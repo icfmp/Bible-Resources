@@ -85,7 +85,7 @@ class IntroductionMoveTests(unittest.TestCase):
         raw=SOURCE.replace(
             b'<chapter sID="Gen.1" osisID="Gen.1" n="1"/>',
             b'<chapter sID="Gen.1" osisID="Gen.1" n="1"/>'
-            b'<title type="x-ms">Original rubric — unchanged.</title>')
+            b'<title type="x-ms">Original rubric - unchanged.</title>')
         root=etree.fromstring(raw)
         titles=root.xpath("//*[local-name()='title' and @type='x-ms']")
         self.assertEqual(len(titles),1)
