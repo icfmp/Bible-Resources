@@ -3211,7 +3211,7 @@ def build_private_source_preface_verse_links(
                     hashrow["source_original_literal_target_sha256"]
                 or source["source_literal_target_sha256"] !=
                     hashrow["source_original_literal_target_sha256"]
-                or source["original_visible_label_sha256"] !=
+                or hashlib.sha256(source["original_printed_link_label"].encode()).hexdigest()!=
                     source["original_visible_label_sha256"]):
                 raise ValueError("Original book preface link target/label not authenticated")
             try:
