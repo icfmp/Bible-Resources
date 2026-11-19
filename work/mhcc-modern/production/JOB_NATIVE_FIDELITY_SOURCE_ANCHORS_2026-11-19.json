@@ -4,9 +4,73 @@
   "native_module_id": "MHCC",
   "source_zip_sha256": "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746",
   "source_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
-  "purpose": "Read-only exact-authenticated original K-boundary and lexical witness verification of Job 4–6, 21, 24–42 draft fidelity corrections. A found phrase is not full source-to-modern semantic approval.",
+  "purpose": "Read-only exact-authenticated original K-boundary and lexical witness verification of Job 4–6, 12–14, 17, 21, 24–42 draft fidelity corrections. A found phrase is not a semantic translation approval.",
   "source_group_hash_policy": "manifest_exact",
   "source_group_probes": [
+    {
+      "chapter": "Job.12",
+      "first": "Job.12.12",
+      "last": "Job.12.25",
+      "sha": "536727f8d2427df1b1bdb442e07cba01e1428503e2033d737f9f0b63d12867eb",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "the Lord Jesus was crucified by the malice of the Jews"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "this one event was the salvation of the world"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.13",
+      "first": "Job.13.23",
+      "last": "Job.13.28",
+      "sha": "789c1f52e0654a480abb050f5520dc79b3a997955c5bd2e13bb76a3f7ee988e5",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "both body and soul feel his righteous vengeance"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "there is salvation devised provided and made known in Christ"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.14",
+      "first": "Job.14.16",
+      "last": "Job.14.22",
+      "sha": "befe682c90f2a9ccf98f4c592a95e4fec70a82c03c1d51c0d6bb0e81cf428635",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "God may send disease and pain"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "will receive the believer into realms of eternal happiness"
+        }
+      ]
+    },
+    {
+      "chapter": "Job.17",
+      "first": "Job.17.1",
+      "last": "Job.17.9",
+      "sha": "3550bacdb2653f8a4d6efbf51e042ab23a8c2d934470c0ff46a5097f7e72b71d",
+      "anchors": [
+        {
+          "id": "source_claim_1",
+          "words": "from God from enemies and from friends"
+        },
+        {
+          "id": "source_claim_2",
+          "words": "Instead of being discouraged in the service of God"
+        }
+      ]
+    },
     {
       "chapter": "Job.4",
       "first": "Job.4.12",
