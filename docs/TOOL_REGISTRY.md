@@ -90,7 +90,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_usfm_title_witness.py`](../scripts/commentary_usfm_title_witness.py) | UNDECIDED | named test | 2 | source/native audit |
 | [`scripts/commentary_witness.py`](../scripts/commentary_witness.py) | UNDECIDED | not established | 2 | source/native audit |
 | [`scripts/commentary_xiphos_dual_reader.py`](../scripts/commentary_xiphos_dual_reader.py) | GENERALIZE | named test | 12 | not determined |
-| [`scripts/commentary_xiphos_heading_probe.py`](../scripts/commentary_xiphos_heading_probe.py) | UNDECIDED | named test | 3 | source/native audit |
+| [`scripts/commentary_xiphos_heading_probe.py`](../scripts/commentary_xiphos_heading_probe.py) | UNDECIDED | named test | 4 | source/native audit |
 | [`scripts/commentary_xml_witness.py`](../scripts/commentary_xml_witness.py) | UNDECIDED | named test | 12 | source/native audit |
 | [`scripts/compiled_stock_commentary_proof.py`](../scripts/compiled_stock_commentary_proof.py) | KEEP_GENERIC | named test | 6 | not determined |
 | [`scripts/diff_sword_snapshots.py`](../scripts/diff_sword_snapshots.py) | UNDECIDED | named test | 5 | not determined |
@@ -118,7 +118,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/pilot_subprocess.py`](../scripts/pilot_subprocess.py) | UNDECIDED | named test | 14 | not determined |
 | [`scripts/prepare_darby_011_private_release_candidate.py`](../scripts/prepare_darby_011_private_release_candidate.py) | HISTORICAL/ARCHIVE | named test | 3 | publication/release |
 | [`scripts/prepare_place_manifest.py`](../scripts/prepare_place_manifest.py) | UNDECIDED | not established | 1 | not determined |
-| [`scripts/private_sword_bundle.py`](../scripts/private_sword_bundle.py) | UNDECIDED | named test | 3 | not determined |
+| [`scripts/private_sword_bundle.py`](../scripts/private_sword_bundle.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/probe_andbible_android_emulator.py`](../scripts/probe_andbible_android_emulator.py) | UNDECIDED | not established | 6 | source/native audit |
 | [`scripts/probe_andbible_android_private_import.py`](../scripts/probe_andbible_android_private_import.py) | UNDECIDED | named test | 5 | source/native audit |
 | [`scripts/probe_andbible_jsword.py`](../scripts/probe_andbible_jsword.py) | UNDECIDED | not established | 4 | source/native audit |
@@ -126,7 +126,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/probe_lsg_v11n.py`](../scripts/probe_lsg_v11n.py) | HISTORICAL/ARCHIVE | not established | 2 | source/native audit |
 | [`scripts/probe_official_osis.py`](../scripts/probe_official_osis.py) | UNDECIDED | not established | 3 | source/native audit |
 | [`scripts/probe_private_repaired_darby_sword.py`](../scripts/probe_private_repaired_darby_sword.py) | HISTORICAL/ARCHIVE | not established | 6 | source/native audit |
-| [`scripts/promote_sword_preview.py`](../scripts/promote_sword_preview.py) | KEEP_GENERIC | named test | 10 | not determined |
+| [`scripts/promote_sword_preview.py`](../scripts/promote_sword_preview.py) | KEEP_GENERIC | named test | 11 | not determined |
 | [`scripts/propose_upstream_edit.py`](../scripts/propose_upstream_edit.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/publish_reviewed_release.py`](../scripts/publish_reviewed_release.py) | KEEP_GENERIC | not established | 8 | publication/release |
 | [`scripts/published_reference_audit.py`](../scripts/published_reference_audit.py) | UNDECIDED | named test | 3 | publication/release |
@@ -186,7 +186,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/sword_native_raw_corpus.cpp`](../scripts/sword_native_raw_corpus.cpp) | UNDECIDED | not established | 12 | not determined |
 | [`scripts/sword_native_raw_corpus_inventory.py`](../scripts/sword_native_raw_corpus_inventory.py) | KEEP_GENERIC | named test | 28 | source/native audit |
 | [`scripts/sword_native_raw_entry.cpp`](../scripts/sword_native_raw_entry.cpp) | UNDECIDED | not established | 7 | not determined |
-| [`scripts/tool_registry.py`](../scripts/tool_registry.py) | KEEP_GENERIC | named test | 2 | not determined |
+| [`scripts/tool_registry.py`](../scripts/tool_registry.py) | KEEP_GENERIC | named test | 3 | not determined |
 | [`scripts/usfx_schema_gate.py`](../scripts/usfx_schema_gate.py) | UNDECIDED | named test | 3 | not determined |
 | [`scripts/validate.py`](../scripts/validate.py) | KEEP_GENERIC | not established | 25 | not determined |
 | [`scripts/verify_public_catalogue.py`](../scripts/verify_public_catalogue.py) | KEEP_GENERIC | named test | 5 | not determined |

@@ -2663,7 +2663,7 @@
         "xiphos"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "6966180ff7f2e92552aa13c687ec26735945f644937318152d096a5219166ecd",
+      "sha256_at_inventory": "2be88b32e63f30d08ceadd77965b9de9a6101368ade95f97d81eb22d2a2e88ba",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
@@ -2714,9 +2714,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/commentary_private_candidate_xiphos_gui.py",
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/commentary-private-candidate-xiphos-gui.yml",
         "tests/test_commentary_xiphos_heading_probe.py"
       ]
@@ -3892,7 +3893,8 @@
         "RawText",
         "zText",
         "RawCom",
-        "zCom"
+        "zCom",
+        "zCom4"
       ],
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
@@ -3914,12 +3916,13 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "ce8b263ac79bf0a42155001004cb817250c16f0659de1571689bea106f592ad7",
+      "sha256_at_inventory": "87ea31c71182751270f4f5bb9978ad3f03b5b1784412af90f37db840ecfb160a",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
         "docs/LSG_AUDIT_RESEARCH_HANDOFF.md",
         "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
         "tests/test_private_sword_bundle.py"
@@ -4239,7 +4242,8 @@
       "format_signals_not_certified_support": [
         "RawText",
         "zText",
-        "zCom"
+        "zCom",
+        "zCom4"
       ],
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
@@ -4258,16 +4262,17 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "47507d9aa626cb13fce1a5c963efff03827b5bf8d1e9c0d69927047afeb784a0",
+      "sha256_at_inventory": "5bcf3af2bb307e0ddd428690e518411798876eb6f36677eb96995c9ddb8402a3",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 10,
+      "static_reference_count": 11,
       "static_references": [
         "scripts/commentary_stock_candidate.py",
         "scripts/materialize_attested_ztext_release.py",
         "scripts/prepare_darby_011_private_release_candidate.py",
         "scripts/tool_registry.py",
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/commentary-zcom-private-candidate.yml",
         ".github/workflows/lsg-first-release.yml",
         ".github/workflows/private-sword-promotion-proof.yml",
@@ -4779,7 +4784,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "754fc751afa236ef3496a0979f47324a94038d5e23ae55f395d100507260a83e",
+      "sha256_at_inventory": "954ec502ab5648b713351fc06b3ff49921e7fcbd688181850ae9d89a5e1b652b",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
@@ -6725,8 +6730,9 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 2,
+      "static_reference_count": 3,
       "static_references": [
+        ".github/workflows/mhc-registry-sync-once.yml",
         ".github/workflows/tool-registry-maintenance.yml",
         "tests/test_tool_registry.py"
       ]
