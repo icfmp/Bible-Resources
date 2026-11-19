@@ -84,7 +84,21 @@
     "production_version_proposed": "0.1.0",
     "crosswire_upstream_module_identity_collision_documented": true,
     "private_zcom4_packaging_workflow": "Repackage and independently reinstall final private zCom4 candidate (no export)",
-    "packaging_validation_status": "awaiting_live_GitHub_Actions_result"
+    "packaging_validation_status": "passed_private_MHCIntroPreview_zCom4_standard_zip_and_isolated_reinstall",
+    "private_package_proof": {
+      "run": "https://github.com/icfmp/Bible-Resources/actions/runs/44543474861",
+      "module_id": "MHCIntroPreview",
+      "package_member_count": 7,
+      "zip_size_bytes": 16404597,
+      "zip_sha256": "a0fad2c049b650eaf42fbaee37b887f573906d749dc00b2a282163d5be2f227d",
+      "source_package_manifest_sha256": "e3d567d4e3e4d751e8b1d7e069b36afca058a98876b82143099834855e68afc0",
+      "independently_reinstalled_reader_samples_passed": 7,
+      "independently_reinstalled_reader_samples_total": 7,
+      "source_payload_unmodified": true,
+      "private_zip_destroyed": true,
+      "published": false
+    },
+    "final_MHC_id_metadata_only_promotion_status": "awaiting_separate_full_native_identity_proof"
   },
   "release_gate": {
     "status": "awaiting_final_reader_and_publication_authorization",
