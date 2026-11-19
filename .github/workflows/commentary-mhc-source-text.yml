@@ -962,8 +962,12 @@ jobs:
           set -euo pipefail
           timeout 90s sudo apt-get -o Acquire::Retries=0 \
             -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
-          timeout 150s sudo apt-get -o Acquire::Retries=0 \
-            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 install -y libsword-dev
+          # This private text comparison needs only native SWORD headers.
+          # Installing recommended GUI packages dragged in 100 GTK/Xiphos
+          # dependencies and timed out on unrelated Ubuntu mirrors.
+          timeout 300s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 \
+            install -y --no-install-recommends libsword-dev
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_index.cpp \
             -o "$RUNNER_TEMP/commentary-native-index" -lsword
           g++ -std=c++17 -O2 -I/usr/include/sword scripts/sword_native_commentary_raw_corpus.cpp \
