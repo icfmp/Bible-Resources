@@ -1315,7 +1315,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "07aa145cd2e0b98f38e95e12ce70a3f6d1e6d90c51aaba90314693fcbf3f5dce",
+      "sha256_at_inventory": "e866c6ed61d3a20a165430c6dcd958cf4953bf3321b3b5e7ef12e99a44b9aec4",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
