@@ -98,7 +98,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/commentary_usfm_title_witness.py`](../scripts/commentary_usfm_title_witness.py) | UNDECIDED | named test | 2 | source/native audit |
 | [`scripts/commentary_witness.py`](../scripts/commentary_witness.py) | UNDECIDED | not established | 2 | source/native audit |
 | [`scripts/commentary_xiphos_dual_reader.py`](../scripts/commentary_xiphos_dual_reader.py) | GENERALIZE | named test | 13 | not determined |
-| [`scripts/commentary_xiphos_heading_probe.py`](../scripts/commentary_xiphos_heading_probe.py) | UNDECIDED | named test | 4 | source/native audit |
+| [`scripts/commentary_xiphos_heading_probe.py`](../scripts/commentary_xiphos_heading_probe.py) | UNDECIDED | named test | 5 | source/native audit |
 | [`scripts/commentary_xml_witness.py`](../scripts/commentary_xml_witness.py) | UNDECIDED | named test | 12 | source/native audit |
 | [`scripts/compiled_stock_commentary_proof.py`](../scripts/compiled_stock_commentary_proof.py) | KEEP_GENERIC | named test | 6 | not determined |
 | [`scripts/diff_sword_snapshots.py`](../scripts/diff_sword_snapshots.py) | UNDECIDED | named test | 5 | not determined |
