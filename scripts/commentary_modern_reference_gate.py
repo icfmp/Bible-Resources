@@ -3758,6 +3758,122 @@ def build_private_additional_source_errata_preview(
     }
 
 
+def build_private_primary_source_strict_quarantine(
+        *, conservative_osis: bytes, manifest: dict,
+        native: dict) -> tuple[bytes, dict]:
+    """Build an *unreleased* exact-source-only alternative without deleting drafts.
+
+    Exclude only documented CCEL-exclusive *modern leaf blocks* that have no
+    authored equivalent in the published original K body. This is an isolated
+    presentation candidate, not a source correction or publication decision.
+    All original notes, K mappings and Scripture links are preserved.
+    """
+    from commentary_modern_draft_osis_preview import NS, _range
+
+    if (manifest.get("status") !=
+            "PRIVATE_PRIMARY_PUBLISHED_MHCC_0_1_1_ONLY_PREVIEW_NOT_RELEASE"
+            or manifest.get("source_module") != "MHCC 0.1.1"
+            or manifest.get("source_native_corpus_sha256") !=
+            native.get("original_compiled_corpus_sha256")
+            or any(manifest.get(field) is not False for field in (
+                "source_original_changed", "modern_manuscripts_changed",
+                "ccel_only_additions_redistribution_approved",
+                "public_release_authorized"))):
+        raise ValueError("Untrusted primary-source-only preview provenance")
+    cases = manifest.get("cases")
+    if (not isinstance(cases, list) or len(cases) != 2 or
+            {row.get("chapter") for row in cases} != {"1Sam.25", "Ps.95"}):
+        raise ValueError("Source-strict preview only supports two attested source gaps")
+    root = ET.fromstring(conservative_osis)
+    chapters = {node.get("osisID"): node for node in root.iter()
+                if node.tag == f"{{{NS}}}chapter"}
+    if set(chapters) != set(native.get("chapters", {})):
+        raise ValueError("Primary-source strict preview chapter identity changed")
+
+    def existing_links():
+        return [(node.get("osisRef"), "".join(node.itertext()))
+                for node in root.iter() if node.tag == f"{{{NS}}}reference"]
+    originals = existing_links()
+    original_sections = [(node.get("annotateRef"), node.get("annotateType"))
+                         for node in root.iter()
+                         if node.tag == f"{{{NS}}}div" and
+                         node.get("annotateType") == "commentary"]
+    receipts = []
+    for case in cases:
+        chapter = case["chapter"]
+        first = case["original_source_first_K"]
+        last = case["original_source_last_K"]
+        originals_for_chapter = native["chapters"][chapter]["original_units"]
+        indices = [i for i, unit in enumerate(originals_for_chapter)
+                   if unit["first_key"] == first and unit["last_key"] == last
+                   and unit["source_unit_sha256"] ==
+                   case["original_source_K_raw_sha256"]]
+        if len(indices) != 1:
+            raise ValueError("Quarantined section is not owned by exact published source K")
+        sections = chapters[chapter].findall(
+            f"./{{{NS}}}div[@annotateType='commentary']")
+        if len(sections) != len(originals_for_chapter):
+            raise ValueError("Source-strict modern chapter altered original K unit count")
+        section = sections[indices[0]]
+        if section.get("annotateRef") != _range(
+                originals_for_chapter[indices[0]]["keys"]):
+            raise ValueError("Source-strict modern original K linked span changed")
+        children = list(section)
+        subheadings = [(i, child) for i, child in enumerate(children)
+                       if child.tag == f"{{{NS}}}title" and
+                       child.get("type") == "sub"]
+        if (len(subheadings) != 2 or
+                subheadings[0][1].text != case["keep_original_source_matched_heading"]
+                or subheadings[1][1].text != case["quarantined_ccel_only_heading"]):
+            raise ValueError("CCEL-only leaf heading or segment order differs from review")
+        index = subheadings[1][0]
+        removed = 0
+        kept_source_notes = 0
+        for child in children[index:]:
+            if child.tag == f"{{{NS}}}note" and (
+                    child.get("resp") or "").startswith("BibleResources"):
+                kept_source_notes += 1
+                continue
+            if any(node.tag == f"{{{NS}}}reference" for node in child.iter()):
+                raise ValueError("Refuse to discard any Bible link while quarantining text")
+            if child.tag != f"{{{NS}}}title":
+                removed += 1
+            section.remove(child)
+        remaining = [node for node in section
+                     if node.tag == f"{{{NS}}}title" and node.get("type") == "sub"]
+        if removed < 1 or len(remaining) != 1 or (
+                remaining[0].text != case["keep_original_source_matched_heading"]):
+            raise ValueError("Quarantine removed authentic authorial text or no paragraphs")
+        receipts.append({
+            "chapter": chapter,
+            "source_first_K": first,
+            "source_last_K": last,
+            "original_source_K_sha256": case["original_source_K_raw_sha256"],
+            "quarantined_secondary_witness_blocks": 1,
+            "quarantined_modern_reading_elements": removed,
+            "unchanged_authentic_source_note_nodes": kept_source_notes,
+        })
+    if existing_links() != originals:
+        raise ValueError("Source-strict preview lost or retargeted modern or original Bible links")
+    if ([(node.get("annotateRef"), node.get("annotateType"))
+         for node in root.iter()
+         if node.tag == f"{{{NS}}}div" and node.get("annotateType") == "commentary"]
+            != original_sections):
+        raise ValueError("Source-strict preview altered K ownership or chapter topology")
+    output = ET.tostring(root, encoding="utf-8", xml_declaration=True)
+    ET.fromstring(output)
+    return output, {
+        "status": "PRIVATE_PRIMARY_SOURCE_ONLY_TWO_WITNESS_BLOCKS_EXCLUDED_NOT_RELEASE",
+        "source_native_corpus_sha256": manifest["source_native_corpus_sha256"],
+        "original_K_body_groups_and_verse_aliases_unchanged": True,
+        "original_and_authentic_derivative_scripture_links_unchanged": True,
+        "published_source_or_accepted_modern_manuscripts_changed": False,
+        "CCEL_only_modern_blocks_quarantined_in_alternative": len(receipts),
+        "editorial_or_publication_approval": False,
+        "cases": receipts,
+    }
+
+
 def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                                     native: dict, identities: dict,
                                     dispositions: dict, repo_root: Path,
