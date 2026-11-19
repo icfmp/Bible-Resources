@@ -58,7 +58,7 @@ These messages aim to keep people from sin, especially **pride**.
 
 Sinners who indulge sinful plans and pride are moving toward destruction.
 
-Turning them away from sin rescues them from final judgment.
+Turning them away from sin **saves them from hell**.
 
 An awakened conscience that restrains sin is a great mercy.
 
@@ -119,6 +119,8 @@ Those who finally perish are without excuse because they refused the healing off
 ---
 
 ## Editorial review — Job 33
+
+**2026-11-19 secondary-witness fidelity repair (unapproved draft):** The modern verse 14–18 section replaced Henry's explicit claim that being turned from sin *saves from hell* with the more generic “rescues them from final judgment.” Restored the explicit referent against [CCEL Job 33](https://ccel.org/ccel/henry/mhcc.xix.xxxiii.html). This does not resolve the separate CCEL 29–33 lacuna, nor establish exact native-source equivalence or independent approval.
 
 **Complete secondary original-English source compared:** [CCEL, Job 33](https://ccel.org/ccel/henry/mhcc.xix.xxxiii.html). Exact published **MHCC 0.1.1** remains the authoritative original pending native SWORD/independent acceptance.
 
