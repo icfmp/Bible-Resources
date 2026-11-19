@@ -54,13 +54,15 @@ God brings **order, not confusion**.
 
 A faithful person finds refreshment in speaking for God's glory and helping others grow in faith.
 
-The more we contemplate God as our Creator, the majesty of his justice and the seriousness of his judgment, the less we will fear human beings or flatter them.
+The more we contemplate the majesty of **God our Maker**, and the more we fear **his wrath and justice**, the less we will fear or flatter people.
 
-If we keep God's righteous power, mercy and holiness before us, we can remain steady in whatever duty he assigns us.
+If we keep **the Lord's mercy and the terrors of his wrath** before us, we can remain steady in whatever duty he assigns us.
 
 ---
 
 ## Editorial review — Job 32
+
+**2026-11-19 secondary-witness fidelity repair (unapproved draft):** In verses 15–22, the former modern phrasing softened Henry's explicit *wrath and justice* and omitted the contrasting *mercies and terrors*. Restored those claims from [CCEL Job 32](https://ccel.org/ccel/henry/mhcc.xix.xxxii.html). CCEL's concluding reference to the Lord's wrath has unusual wording; this modern rendering is an interpretive wording proposal, **not a silent correction of the published source**. Verify the exact native MHCC 0.1.1 wording before independent approval. No K scopes or references changed.
 
 **Whole CCEL secondary source checked:** [CCEL, Job 32](https://ccel.org/ccel/henry/mhcc.xix.xxxii.html). Actual released **MHCC 0.1.1** remains source authority, full native-SWORD and independent acceptance pending.
 
