@@ -228,10 +228,12 @@ jobs:
           snapshot=json.loads(Path("entity-index/links/dictionaries/ubs-hebrew/v1_disposition_coverage.json").read_text(encoding="utf-8"))
           assert actual == snapshot, "UBS v1 ledger partition differs from pinned original source inventory"
           counts=actual["counts"]
-          assert counts["in_scope_lexical_family_dispositions"] == 151
-          assert counts["in_scope_lexically_dispositioned_occurrences"] == 2592
-          assert counts["not_yet_dispositioned_original_families"] == 44
-          assert counts["not_yet_dispositioned_original_occurrences"] == 55
+          assert (counts["in_scope_occurrences_with_any_disposition"]
+                  + counts["not_yet_dispositioned_original_occurrences"]
+                  == counts["in_scope_unresolved_occurrences_at_baseline"])
+          assert (counts["in_scope_unresolved_occurrences_at_baseline"]
+                  + counts["edition_scope_excluded_occurrences"]
+                  == counts["original_unresolved_occurrences"])
           assert actual["policy"]["publication_approved"] is False
           print("UBS_V1_DISPOSITION_PARTITION_REPRODUCIBLE", counts)
           PY
