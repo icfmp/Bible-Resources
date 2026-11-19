@@ -94,14 +94,16 @@ class ReviewedHeadwordTests(unittest.TestCase):
         d = next(x for x in LEDGER["decisions"]
                  if x["evidence"].get("original_word_english"))
         w = d["original_word_witnesses"][0]
-        header = "xml:id\\tlang\\tlemma\\tstrongnumberx\\tclass\\tref\\tsdbh\\tenglish\\n"
+        header = "\t".join((
+            "xml:id", "lang", "lemma", "strongnumberx", "class",
+            "ref", "sdbh", "english",
+        )) + "\n"
         fields = [w["original_word_id"], d["lang"], d["lemma"],
                   d["original_strong"], next(iter(d["original_source_classes"])),
                   w["reference"], w["original_sdbh"], "changed"]
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "witness.tsv"
-            path.write_text(header.replace("\\\\t", "\\t").replace("\\\\n", "\\n") +
-                            "\\t".join(fields) + "\\n", encoding="utf-8")
+            path.write_text(header + "\t".join(fields) + "\n", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "English witness changed"):
                 CHECK["verify_macula"]({"word_witnesses": {
                     w["original_word_id"]: (d, w)
