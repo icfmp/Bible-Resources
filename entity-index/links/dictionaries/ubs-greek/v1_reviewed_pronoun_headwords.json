@@ -33,5 +33,12 @@
       "ubs_main_id": "003683000000000",
       "rationale": "The original Greek demonstrative οὗτος is compared only to the single canonically identical UBS Greek 1.0 demonstrative headword; each original-word candidate must have its own exactly attested original Louw–Nida code within this UBS entry and be classified as a pronoun in MACULA. No generic Strong alias or contextual sense is approved."
     }
-  ]
+  ],
+  "source_verified_individual_word_counts": {
+    "σύ": 1971,
+    "ἐγώ": 2156,
+    "οὗτος": 906
+  },
+  "original_source_word_approvals_total": 5033,
+  "remaining_5938_source_candidate_words_unapproved": 905
 }
