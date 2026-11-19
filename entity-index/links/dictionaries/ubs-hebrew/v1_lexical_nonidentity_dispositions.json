@@ -993,6 +993,90 @@
       },
       "ubs_attested_gloss": "half (of object or substance)",
       "rationale": "1 Chronicles 2:54 has the named Manahathite(s), a gentilic/people designation, not the noun 'half' in the sole UBS חֲצִי candidate despite the original shared Strong family."
+    },
+    {
+      "lang": "H",
+      "lemma": "לְהָטִים",
+      "original_strong": "3858a",
+      "occurrences": 1,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o020070110112",
+        "reference": "EXO 7:11!11",
+        "english": "secret arts",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "003529001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "003532000000000",
+        "lemma": "לַהַט",
+        "strong_codes": [
+          "H3858"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ]
+      },
+      "ubs_attested_gloss": "blaze",
+      "rationale": "Exodus 7:11 speaks of the Egyptian magicians' secret arts/enchantments. UBS לַהַט describes a physical blaze or fire, not a magical art or incantation. This is a different atomic lexical meaning despite sharing H3858 numeric family."
+    },
+    {
+      "lang": "H",
+      "lemma": "מְקַטְּרֹות",
+      "original_strong": "4729b",
+      "occurrences": 1,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o140300140092",
+        "reference": "2CH 30:14!9",
+        "english": "incense altars",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "004330001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "004334000000000",
+        "lemma": "מִקְטָר",
+        "strong_codes": [
+          "H4729"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ]
+      },
+      "ubs_attested_gloss": "burning",
+      "rationale": "2 Chronicles 30:14 identifies incense altars that are removed and cast into the Kidron; UBS מִקְטָר indexes the action/process of burning sacrificial material, not the altars themselves. The concrete cultic furniture noun is not that UBS action headword."
+    },
+    {
+      "lang": "H",
+      "lemma": "טֹחֲנֹות",
+      "original_strong": "2912a",
+      "occurrences": 1,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o210120030092",
+        "reference": "ECC 12:3!9",
+        "english": "grinders",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "002682001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "002686000000000",
+        "lemma": "טחן",
+        "strong_codes": [
+          "H2912"
+        ],
+        "parts_of_speech": [
+          "verb"
+        ]
+      },
+      "ubs_attested_gloss": "to grind",
+      "rationale": "Ecclesiastes 12:3 speaks of the grinders who cease because they are few. The source form טֹחֲנֹות is a nominalized plural agent, while the only UBS candidate טחן indexes the verbal action 'to grind'. Shared derivation does not establish an identical headword or contextual sense for that standalone noun."
     }
   ]
 }
