@@ -46,6 +46,7 @@ jobs:
           PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_repair_commentary_osis_milestones.py' -v
           PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_commentary_shared_key_retrieval.py' -v
           PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_reclassify_osis_commentary_introduction.py' -v
+          PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_commentary_xiphos_dual_reader.py' -v
       - name: Install stock libSWORD compiler and native reader headers
         shell: bash
         run: |
