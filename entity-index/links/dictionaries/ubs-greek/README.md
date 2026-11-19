@@ -419,3 +419,48 @@ unique contextual lexical sense resolution nor a claim that the
 source UBS lexicon contains every MACULA source word. The detailed
 original-word evidence is stored as a **private, expiring CI review
 artifact**, not a published or application-integrated resource.
+
+## Source-verified original Greek ambiguous Strong headwords (220 of 224)
+
+The [original 224-token ambiguity classification](audit_224_ambiguities.py)
+makes no claim that the historical Strong index should be rewritten.
+The exact pinned Greek MACULA source and UBS 1.0 EN/FR headword evidence
+independently confirms **one NFC-identical original Greek headword
+with a matching original UBS Louw–Nida code for 220 original word IDs**.
+Five original lexical families have explicit
+[source-word decisions](v1_reviewed_ambiguous_headwords.json):
+
+| Source original lemma | Original Strong | Reviewed word IDs | Reviewed UBS lexical MainId |
+| --- | --- | ---: | --- |
+| `πόλις` | `4172` | 162 | `004075000000000` |
+| `ἐλεάω` | `1653` | 32 | `001661000000000` |
+| `πάρειμι` | `3918` | 24 | `003819000000000` |
+| `κοπρία` | `2874` | 1 | `002888000000000` |
+| `κόπριον` | `2874` | 1 | `002889000000000` |
+
+The [individual-word verifier](build_reviewed_224_ambiguities.py)
+requires exact original word ID, unchanged lemma, original Strong,
+morphology, verse reference and LN witness, unique matching UBS Greek
+lexical entry, authentic UBS dictionary POS, and exact source UBS EN/FR
+lexical domain corroboration. It adds a **separate private
+`by_macula_ambiguous_word` headword evidence overlay** while preserving
+every original MainId in the historical Strong index. Neither this
+lexical headword review nor the original LN-domain code determines
+a unique contextual semantic `LEXID`.
+
+**Four original ambiguities remain unapproved:** the
+original capitalized `Πόλις` (Acts 16:11, no canonically identical
+source headword), the separate original `μαράνα` and `θά`
+(1 Corinthians 16:22, source Strong `3134`, no individual matching
+headword), and one original `πάρειμι` (Luke 11:42) whose
+headword matches but lacks source UBS LN corroboration.
+These are not converted by guessing case, splitting/recombining
+words, or assigning one lexicographic meaning artificially.
+
+**220/224 old source Strong ambiguities now have independently reviewed
+original-word headword identities**, but the legacy 224 Strong-derived
+multiple-entry candidates are intentionally all retained. This
+changes neither the **137,242 / 137,741** Greek word headword coverage
+nor source semantics; it adds verified original-word specificity.
+The versioned source-reviewed candidate is a **private expiring
+Actions artifact**, not a published SWORD module or Bible app integration.
