@@ -659,3 +659,50 @@ Strong, LN, morphology, verse, historical `index.json` or original
 lexicon entry is modified. All reviewed word-level results remain
 **private expiring CI artifacts, not a published SWORD resource or
 Bible application integration**.
+
+## Original Greek temporal conjunction/adverb lexical headword review
+
+The [independent original source audit](audit_hopote_original_word.py)
+identifies the single original MACULA Greek word ID
+`n42006003014` in **Luke 6:3**, original Greek
+`ὁπότε`, original Strong `3698`, original Louw–Nida
+`67.30`, source lexical class `conj` and actual
+source morphology **`ADV`**.
+
+The pinned UBS Greek Dictionary 1.0 EN/FR independently records the
+NFC-identical Greek headword (MainId `003605000000000`),
+lexicographic part of speech `advb.` in both editions, and the
+same original Louw–Nida lexical code `67.30`. This reflects
+a **lexical versus syntactic grammatical classification**, not a
+missing or corrupted original Greek word: temporal adverbials can
+introduce clauses. See, as distinct classical grammar background,
+[Dickinson College Commentaries, Goodell's Greek grammar,
+temporal clauses](https://dcc.dickinson.edu/grammar/goodell/clauses-%E1%BD%85%CF%84%CE%B5-%E1%BD%81%CF%80%CF%8C%CF%84%CE%B5-%E1%BC%90%CF%80%CE%B5%CE%AF-%E1%BC%A1%CE%BD%CE%AF%CE%BA%CE%B1-%E1%BD%81%CF%80%CE%B7%CE%BD%CE%AF%CE%BA%CE%B1)
+and [Logeion's Greek lexicon entry](https://logeion.org/%E1%BD%81%CF%80%CF%8C%CF%84%CE%B5).
+
+The [explicit original-word editorial decision](v1_reviewed_hopote_temporal_headword.json)
+and [fail-closed verifier](build_reviewed_hopote_headword.py)
+source-review only this **original-word lexical HEADWORD identity**.
+MACULA original class `conj`, source morphology `ADV`,
+Strong, Greek spelling, LN and verse remain **exactly unchanged**.
+UBS original `advb.` also remains unchanged. The code does
+not infer a contextual UBS `LEXID` or globally equate
+`conj` and `advb.` for other words.
+
+With this individual-word review, **all 9,195 additional distinct
+Greek original-word lexical entry candidate records have been
+editorially reviewed as headword identities**. The unchanged historical
+Strong-based 128,090 word candidates bring source-supported lexical
+entry *candidate* word coverage to **137,285 / 137,741**
+(approximately 99.67%). **456** original SBLGNT words have no
+NFC-identical or case-only original UBS Dictionary 1.0 Greek
+headword and remain **unlinked**, rather than supplying
+speculative synonyms or inflectional Strong aliases. The legacy
+224 multiply headed Strong cases are retained; 220 have separate
+original-word-specific source review and four remain undecided.
+
+These are **source-attested lexical headword identities, not a
+measurement of correct contextual semantic senses**. No contextual
+UBS `LEXID` has been inferred, no original source or historical
+index modified, and no public SWORD or Bible app release has been made.
+Reviewed candidates remain **expiring, private CI artifacts**.
