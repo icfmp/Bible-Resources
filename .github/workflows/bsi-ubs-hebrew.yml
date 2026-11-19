@@ -34,6 +34,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_multi_headword_abstentions.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_reviewed_headwords.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_source_morpheme_abstentions.py
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_v1_disposition_coverage.py
       - name: Check out exact UBS Hebrew EN/FR 0.9.4 source
         uses: actions/checkout@v4
         with:
@@ -208,6 +209,33 @@ jobs:
           if dest.is_file():
               assert json.loads(dest.read_text(encoding="utf-8")) == register, "Family register does not match pinned sources"
           print("UBS_FAMILY_REGISTER_REPRODUCIBLE", summary)
+          PY
+      - name: Audit the entire independent UBS v1 editorial disposition partition
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_v1_disposition_coverage.py \
+            --register /tmp/bsi-ubs-hebrew-family-register.json \
+            --scope entity-index/links/dictionaries/ubs-hebrew/v1_scope_dispositions.json \
+            --nonidentity entity-index/links/dictionaries/ubs-hebrew/v1_lexical_nonidentity_dispositions.json \
+            --ambiguous entity-index/links/dictionaries/ubs-hebrew/v1_multi_headword_abstentions.json \
+            --morphemes entity-index/links/dictionaries/ubs-hebrew/v1_source_morpheme_abstentions.json \
+            --positive entity-index/links/dictionaries/ubs-hebrew/v1_reviewed_headword_dispositions.json \
+            --index /tmp/bsi-ubs-hebrew-index.json \
+            --output /tmp/bsi-ubs-v1-disposition-coverage.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          actual=json.loads(Path("/tmp/bsi-ubs-v1-disposition-coverage.json").read_text(encoding="utf-8"))
+          snapshot=json.loads(Path("entity-index/links/dictionaries/ubs-hebrew/v1_disposition_coverage.json").read_text(encoding="utf-8"))
+          assert actual == snapshot, "UBS v1 ledger partition differs from pinned original source inventory"
+          counts=actual["counts"]
+          assert (counts["in_scope_occurrences_with_any_disposition"]
+                  + counts["not_yet_dispositioned_original_occurrences"]
+                  == counts["in_scope_unresolved_occurrences_at_baseline"])
+          assert (counts["in_scope_unresolved_occurrences_at_baseline"]
+                  + counts["edition_scope_excluded_occurrences"]
+                  == counts["original_unresolved_occurrences"])
+          assert actual["policy"]["publication_approved"] is False
+          print("UBS_V1_DISPOSITION_PARTITION_REPRODUCIBLE", counts)
           PY
       - name: Compare pinned generated index or prepare initial reproducible snapshot
         run: |
