@@ -148,7 +148,7 @@ def promote(source: Path, destination: Path, *, expected_source_sha256: str,
     destination_fields = _require_config_fields(
         revised, module_id=destination_id, path=new_dir,
         driver=driver, versification=versification, final=True)
-    if driver in ("zText", "zCom") and any(
+    if driver in ("zText", "zCom", "zCom4") and any(
             source_fields[k] != destination_fields[k]
             for k in ("BlockType", "CompressType")):
         raise ValueError("Compressed SWORD algorithm or block size changed")
