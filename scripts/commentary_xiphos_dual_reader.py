@@ -629,6 +629,10 @@ def _await_xiphos_visible_window(app, display, env: dict, *, seconds: int) -> No
             # Require the actual full-sized Xiphos reader, not a small splash
             # or modal dialog; clipboard passage checks remain mandatory.
             return
+        # On an empty profile Xiphos can show a small first-run notice
+        # BEFORE its main window exists. Dismissing it only after readiness
+        # deadlocks the probe; handle it while waiting for the main reader.
+        _dismiss_transient_xiphos_notice(env)
         time.sleep(0.5)
     raise PilotError("No independently visible Xiphos window with Bible and commentary")
 
