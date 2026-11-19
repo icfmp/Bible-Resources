@@ -528,6 +528,8 @@ jobs:
             --source-K-heading-range-notes-osis "$RUNNER_TEMP/mhcc-modern-heading-ranges-with-notes.osis.xml" \
             --same-K-implicit-verses-osis "$RUNNER_TEMP/mhcc-modern-local-verses.osis.xml" \
             --same-K-implicit-verse-notes-osis "$RUNNER_TEMP/mhcc-modern-local-verses-with-notes.osis.xml" \
+            --source-first-K-outline-verse-osis "$RUNNER_TEMP/mhcc-modern-original-outline-verse-links.osis.xml" \
+            --source-first-K-outline-verse-notes-osis "$RUNNER_TEMP/mhcc-modern-original-outline-verse-links-with-notes.osis.xml" \
             --source-notes-errata-manifest work/mhcc-modern/production/FOUR_NATIVE_LINK_ERRATA_REVIEW_2026-11-18.json \
             --source-errata-proposals-osis "$RUNNER_TEMP/mhcc-modern-proposed-errata-navigation.osis.xml" \
             --linked-osis "$RUNNER_TEMP/mhcc-modern-complete-bounded-linked.osis.xml" \
@@ -630,6 +632,28 @@ jobs:
                 " additional source-pinned exact printed verse digits linked; " +
                 str(local["unplaced_valid_original_links_still_in_source_only_notes"]) +
                 " remain in separate K notes")
+          outline=report["private_first_K_outline_verse_navigation"]
+          outline_notes=report["private_first_K_outline_verse_remaining_notes"]
+          assert outline["status"] == (
+              "PRIVATE_SOURCE_FIRST_K_EXACT_OUTLINE_VERSE_NAVIGATION_NOT_ORIGINAL_INLINE")
+          assert outline["source_first_K_outline_verse_links_recovered"] >= 12
+          assert (outline["source_first_K_outline_verse_links_recovered"] +
+                  outline["valid_original_source_references_still_in_separate_K_notes"]
+                  ==local["unplaced_valid_original_links_still_in_source_only_notes"])
+          assert outline["original_defective_link_occurrences_remain_excluded"] == 4
+          assert not outline["original_modern_visible_text_modified"]
+          assert not outline["source_K_structure_or_original_link_target_modified"]
+          assert outline["placement_is_editorial_outline_navigation_not_authorial_inline"]
+          assert not outline["publication_authorized"]
+          assert (outline_notes["original_link_occurrences_preserved_only_in_separate_source_notes"]
+                  ==outline["valid_original_source_references_still_in_separate_K_notes"])
+          assert Path(base/"mhcc-modern-original-outline-verse-links.osis.xml").is_file()
+          assert Path(base/"mhcc-modern-original-outline-verse-links-with-notes.osis.xml").is_file()
+          print("SOURCE FIRST-K OUTLINE VERSE NAVIGATION: " +
+                str(outline["source_first_K_outline_verse_links_recovered"]) +
+                " source-verified verse digits linked in original outline tables; " +
+                str(outline["valid_original_source_references_still_in_separate_K_notes"]) +
+                " remain original K notes; no rewording or publication")
           inline_index=report["private_visible_source_reference_index_preview"]
           assert inline_index["status"] == (
               "PRIVATE_SOURCE_REFERENCES_VISIBLE_IN_K_NOT_EXACT_AUTHORIAL_INLINE")
@@ -1275,6 +1299,119 @@ jobs:
                 str(sum(seen.values()))+", source-only notes="+
                 str(sum(seen_fallback.values()))+
                 ", 28792 K keys, diatheke reader output verified; private, unapproved")
+          PY
+      - name: Compile private original-outline first-K verse tokens and independently read back source identities
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/mhcc-outline-verse-root/mods.d"
+          mkdir -p "$RUNNER_TEMP/mhcc-outline-verse-root/modules/comments/zcom/mhccoutline"
+          timeout 240s osis2mod \
+            "$RUNNER_TEMP/mhcc-outline-verse-root/modules/comments/zcom/mhccoutline" \
+            "$RUNNER_TEMP/mhcc-modern-original-outline-verse-links-with-notes.osis.xml" \
+            -z z -b 3 > "$RUNNER_TEMP/mhcc-outline-verse-osis2mod.log" 2>&1
+          cat > "$RUNNER_TEMP/mhcc-outline-verse-root/mods.d/mhccoutline.conf" <<'EOF'
+          [MHCCOUTLINE]
+          Description=Private MHCC exact original source first-K outline verse navigation
+          DataPath=./modules/comments/zcom/mhccoutline/
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          Lang=en
+          Versification=KJV
+          SourceType=OSIS
+          DistributionLicense=Private
+          EOF
+          python - <<'PY'
+          import hashlib,json,os,subprocess,sys
+          from collections import Counter
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+          sys.path.insert(0,"scripts")
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          base=Path(os.environ["RUNNER_TEMP"])
+          doc=json.loads(
+              (base/"mhcc-modern-complete-bounded-linked-osis-structure.json").read_text())
+          report=doc["private_first_K_outline_verse_navigation"]
+          notes=doc["private_first_K_outline_verse_remaining_notes"]
+          expected={}
+          for row in report["placements"]:
+              chapter=row["source_first_key"].rsplit(".",1)[0]
+              expected.setdefault(chapter,[]).append((
+                  row["original_literal_target_sha256"],
+                  row["modern_outline_verse_number_sha256"]))
+          note_expected={
+              row["source_first_key"]:row["original_source_reference_hashes"]
+              for row in notes["note_source_K_reference_hashes_for_private_native_readback"]}
+          observed={}
+          observed_notes={}
+          def observe(kind,key,raw):
+              if kind not in ("K","I"):
+                  return
+              chapter=key.rsplit(".",1)[0]
+              if chapter not in expected and key not in note_expected:
+                  return
+              xml=ET.fromstring(b"<native>"+raw+b"</native>")
+              all_notes=[n for n in xml.iter() if isinstance(n.tag,str)
+                         and n.tag.rsplit("}",1)[-1]=="note"]
+              if chapter in expected:
+                  digest=Counter((
+                      hashlib.sha256(ref.get("osisRef").encode()).hexdigest(),
+                      hashlib.sha256("".join(ref.itertext()).encode()).hexdigest())
+                      for ref in xml.iter() if isinstance(ref.tag,str)
+                      and ref.tag.rsplit("}",1)[-1]=="reference"
+                      and not any(ref in list(note.iter()) for note in all_notes))
+                  old=observed.setdefault(chapter,Counter())
+                  old.update(digest)
+              if kind=="K" and key in note_expected:
+                  candidates=[n for n in all_notes
+                      if "Unplaced links from original edition" in "".join(n.itertext())]
+                  if len(candidates)!=1:
+                      raise ValueError("Original source-only K note lost after outline recovery")
+                  observed_refs=[(
+                      hashlib.sha256(ref.get("osisRef").encode()).hexdigest(),
+                      hashlib.sha256("".join(ref.itertext()).encode()).hexdigest())
+                      for ref in candidates[0].iter() if isinstance(ref.tag,str)
+                      and ref.tag.rsplit("}",1)[-1]=="reference"]
+                  wanted=[(
+                      row["source_original_literal_target_sha256"],
+                      row["supplement_display_sha256"])
+                      for row in note_expected[key]]
+                  if observed_refs!=wanted:
+                      raise ValueError("Original source-only K note destination/order changed")
+                  observed_notes[key]=len(wanted)
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str((base/"mhcc-outline-verse-root").resolve())
+          proc=subprocess.Popen([
+              str((base/"commentary-modern-source-raw").resolve()),"MHCCOUTLINE"],
+              env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+          try:
+              _,keys,_,_=parse_native_raw_corpus(proc.stdout,on_entry=observe)
+              proc.stdout.close()
+              if proc.wait(timeout=120)!=0:
+                  raise ValueError("Original outline source-linked native reader failed")
+          finally:
+              if proc.poll() is None:
+                  proc.kill()
+                  proc.wait()
+          if len(keys)!=28792 or set(note_expected)!=set(observed_notes):
+              raise ValueError("Original outline SWORD key or remaining K notes differ")
+          if sum(observed_notes.values())!=report[
+                  "valid_original_source_references_still_in_separate_K_notes"]:
+              raise ValueError("Original outline SWORD fallback source note total differs")
+          for chapter,links in expected.items():
+              actual=observed.get(chapter,Counter())
+              for link in links:
+                  if actual[link]<1:
+                      raise ValueError("Private original outline verse link was lost: "+chapter)
+          reader=subprocess.run(["diatheke","-b","MHCCOUTLINE","-f","OSIS",
+              "-k","Isaiah 21:1"],env=env,text=True,capture_output=True,timeout=30)
+          if reader.returncode!=0 or len(reader.stdout.strip())<80:
+              raise ValueError("Private original outline module not displayed in reader")
+          print("PRIVATE ORIGINAL FIRST-K OUTLINE SWORD PASS: original outline links="+
+                str(sum(map(len,expected.values())))+
+                ", source-only fallback="+str(sum(observed_notes.values()))+
+                ", native 28792 K keys, real reader check; NOT original inline parity")
           PY
       - name: Compile private visible in-commentary source reference index and verify 176 targets
         shell: bash
