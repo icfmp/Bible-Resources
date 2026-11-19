@@ -1317,6 +1317,28 @@ jobs:
           if sha256(raw).hexdigest()!=plan["private_candidate_before_intro_sha256"]:
               raise SystemExit("Private intro trial input SHA differs from separately pinned exact source")
           plan["source_sha256"]=sha256(raw).hexdigest()
+          # Verify the exact chapter preface boundary from real source.
+          # Only type/line/child-shape metadata is logged; never prose.
+          original_tree=etree.fromstring(raw,etree.XMLParser(
+              resolve_entities=False,load_dtd=False,no_network=True,
+              recover=False,huge_tree=True))
+          book=next(n for n in original_tree.iter()
+                    if isinstance(n.tag,str) and n.tag.rsplit("}",1)[-1]=="div"
+                    and n.get("type")=="book" and n.get("osisID")=="2Chr")
+          chapter=next(n for n in book if isinstance(n.tag,str)
+                       and n.tag.rsplit("}",1)[-1]=="chapter"
+                       and n.get("sID")=="2Chr.1")
+          first_p=next(n for n in book if isinstance(n.tag,str)
+                       and n.tag.rsplit("}",1)[-1]=="p"
+                       and n.sourceline==plan["old_intro_opening_line"]-1)
+          section=list(book)[list(book).index(chapter)+1:list(book).index(first_p)]
+          print("2Chr preverse direct structural children (no source prose):",
+                json.dumps([{"tag":n.tag.rsplit("}",1)[-1],
+                             "type":n.get("type"),"line":n.sourceline,
+                             "children":[{"tag":x.tag.rsplit("}",1)[-1],
+                                          "type":x.get("type"),"line":x.sourceline}
+                                         for x in list(n)[:8] if isinstance(x.tag,str)]}
+                            for n in section if isinstance(n.tag,str)],sort_keys=True))
           changed,receipt=repair_private_bytes(raw,plan)
           output=root/"mhc-chapter-intro-private.osis.xml"
           with output.open("xb") as handle:handle.write(changed)
