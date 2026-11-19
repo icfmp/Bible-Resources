@@ -805,3 +805,42 @@ families / 2,580 of 2,649 original occurrences dispositioned**.
 **57 families / 69 original occurrences** remain (including two
 preserved composite source Strong annotations). The generated
 word-linked index and UBS edition-scope metrics remain unchanged.
+
+### Fifth source-backed lexical review batch: eleven additional positive UBS headwords
+
+**11 more original WLC families / 12 original source occurrences** have a
+specific, independently supported UBS **headword-only** identity based on
+the pinned MACULA lowfat original word witness plus an exact published UBS
+English lexical gloss. These include:
+
+- Hebrew צַר H6887 (two words), *too small/cramped* in 2 Kings 6:1,
+  UBS *to be narrow*.
+- Hebrew גֵּישָׁן H1529, the named Geshan in 1 Chronicles 2:47,
+  UBS *Geshan*; רָפָה H7498a, the named Raphah in 1 Chronicles 8:37,
+  UBS *Raphah*; קָטָן H6997a, *Haqqatan* in Ezra 8:12,
+  UBS *Hakkatan*.
+- Hebrew אָדַשׁ H1759, the threshing in Isaiah 28:28, UBS *to thresh*;
+  הֲנָפָה H5130b, sifting in Isaiah 30:28, UBS *to sift*.
+- Hebrew נָגִיד H5048, noble words in Proverbs 8:6, UBS *noble words*;
+  סָכַר H7936a, hired counsellors at Ezra 4:5, UBS *to hire*;
+  סָלֵק H5559a, ascent in Psalm 139:8, UBS *to ascend*.
+- Hebrew צָרַר H6862, *distress* in Lamentations 1:20, UBS
+  *distress*; צרר H6696a, hostility toward foes in Exodus 23:22,
+  UBS *to attack*.
+
+The existing positive ledger is still independently verified by the
+same source-pinned UBS/MACULA read-only validator; this increment
+raises the totals to **67 positive headword decisions / 260 WLC
+occurrences / 125 pinned original word-ID witnesses**. For every new
+decision the exact first original WLC English field is compared against
+the pinned independent source TSV; all recorded UBS glosses are checked
+as members of the real source edition's lexical meanings.
+
+**Important:** These are reviewed entry identities, **not actual
+generated source-word-to-entry links**, original source rewrites, or
+automatically assigned contextual LEXID senses. The generated index
+remains unchanged. All family review outcomes together now account for
+**151/197 in-scope families / 2,592 of 2,649 original WLC
+occurrences**; **46 families / 57 occurrences** remain (two are source
+composite Strong syntax cases separately preserved as unresolved).
+No v1.0 publication approval has been given.
