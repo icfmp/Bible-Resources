@@ -1313,7 +1313,10 @@
         "sword_native_raw_corpus_inventory",
         "xml"
       ],
-      "reader_tool_signals": [],
+      "reader_tool_signals": [
+        "xiphos",
+        "andbible"
+      ],
       "release_approval": "never inferred from inventory",
       "sha256_at_inventory": "113c0ca6eba38b55a658ac1ed8740d40980bc5acc37fb4b1322f36ee9a4f7051",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
