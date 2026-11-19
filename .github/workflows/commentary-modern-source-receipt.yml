@@ -3464,7 +3464,11 @@ jobs:
           bible=verify_and_install_reviewed_bible(root)
           if bible["module_id"]!="BRLSG1910" or not bible["all_five_published_bible_files_sha256_attested"]:
               raise ValueError("Xiphos private test needs source-attested published Bible")
-          samples=("Gen 1:1","Matt 3:7","Ps 95:1","Rev 22:2")
+          # Add the two source-authenticated chapter-I-only ranges as
+          # *real* end-of-chapter GUI selections, not merely native K links.
+          # These verses must display the actual source-strict commentary.
+          samples=("Gen 1:1","Matt 3:7","Ps 95:1","Rev 22:2",
+                   "Lev 19:37","Ps 108:13")
           comparisons={}
           for ref in samples:
               code,commentary=query(
@@ -3494,7 +3498,7 @@ jobs:
           receipt={
               "status":(
                   "PRIVATE_MODERN_REAL_XIPHOS_GUI_SUBSTANTIVE_CLIPBOARD_PASS"
-                  if positives>=2 else
+                  if positives==len(samples) and result.get("actual_passage_commands_accepted") is True else
                   "PRIVATE_MODERN_REAL_XIPHOS_GUI_OBSERVATION_INCONCLUSIVE"),
               "candidate_sword_id":"MHCCMODRC",
               "full_display_name":"Henry's Modern Concise Commentary",
@@ -3519,8 +3523,10 @@ jobs:
                 str(len(samples))+" distinct substantive commentary excerpts proven "
                 "in actual GTK pane and clipboard vs independently read SWORD, "
                 "full authorial text not logged; no click-navigation, rights or release claim")
-          if positives<2:
-              raise ValueError("Actual Xiphos modern commentary GUI clipboard observation inconclusive")
+          if positives!=len(samples) or result.get("actual_passage_commands_accepted") is not True:
+              raise ValueError(
+                  "Actual Xiphos modern commentary GUI did not display every "
+                  "source-attested passage, including chapter-I-only end verses")
           PY
       - name: Preserve explicit Xiphos acceptance status, never infer GUI pass from source CI
         if: always()
@@ -3541,7 +3547,8 @@ jobs:
               receipt=json.loads(target.read_text(encoding="utf-8"))
               if receipt.get("candidate_sword_id")!="MHCCMODRC":
                   raise ValueError("Xiphos proof comes from unexpected module")
-              if receipt.get("actual_commentary_excerpts_matched_to_SWORD_not_Bible",0)<2:
+              if (receipt.get("actual_commentary_excerpts_matched_to_SWORD_not_Bible",0)
+                  != receipt.get("passages_checked",0) or not receipt.get("actual_GUI_actions_completed")):
                   receipt["status"]="PRIVATE_MODERN_REAL_XIPHOS_GUI_OBSERVATION_INCONCLUSIVE"
               elif prose!="success":
                   receipt["status"]="PRIVATE_MODERN_REAL_XIPHOS_GUI_OBSERVATION_INCONCLUSIVE"
