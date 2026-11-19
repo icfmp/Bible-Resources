@@ -3439,7 +3439,7 @@ jobs:
       - name: Observe actual HMCC Modern commentary prose inside private Xiphos GUI
         id: xiphos_prose
         if: steps.xiphos_deps.outcome == 'success'
-        timeout-minutes: 5
+        timeout-minutes: 6
         shell: bash
         run: |
           set -euo pipefail
@@ -3450,6 +3450,8 @@ jobs:
           sys.path.insert(0,"scripts")
           from commentary_xiphos_dual_reader import (
               _run_real_gui,verify_and_install_reviewed_bible)
+          from commentary_xiphos_heading_probe import (
+              probe_real_xiphos_commentary_heading_menu)
           from pilot_subprocess import present_key,query
           from sword_native_raw_corpus_inventory import parse_native_raw_corpus
           base=Path(os.environ["RUNNER_TEMP"])
@@ -3472,6 +3474,7 @@ jobs:
           # heading is not proof the source text is absent.
           intro_targets={"Exod.1":"Exod 1:1","Rom.1":"Rom 1:1"}
           compiled_intros={}
+          compiled_intro_raw={}
           def collect_intro(kind,key,raw):
               if kind!="I" or key not in intro_targets:
                   return
@@ -3487,6 +3490,7 @@ jobs:
               if len(visible.split())<50:
                   raise ValueError("Expected real compiled book introduction is not substantive")
               compiled_intros[key]=visible.encode("utf-8")
+              compiled_intro_raw[key]=raw
           scanner=base/"commentary-modern-source-raw"
           if not scanner.is_file() or scanner.is_symlink():
               raise ValueError("Reviewed SWORD raw entry scanner missing")
@@ -3524,8 +3528,23 @@ jobs:
               comparisons[ref]={"commentary":commentary,"bible":bible_text}
               if ref in intro_expected:
                   comparisons[ref]["intro_expected"]=intro_expected[ref]
+          def inspect_book_intro_menu(env):
+              proofs={}
+              for key,ref in intro_targets.items():
+                  proof=probe_real_xiphos_commentary_heading_menu(
+                      env,
+                      {"chapter":{
+                          "raw":compiled_intro_raw[key],
+                          "reference":ref,
+                          "ordinary_first_verse":comparisons[ref]["commentary"],
+                      }},
+                      ordinary_first_verse=comparisons[ref]["commentary"],
+                  )
+                  proofs[ref]=proof
+              return {"book_preface_I_menu_GUI_observations":proofs}
           result=_run_real_gui(root,comparisons,seconds=25,
-                               commentary_module_id="MHCCMODRC")
+                               commentary_module_id="MHCCMODRC",
+                               on_gui_ready=inspect_book_intro_menu)
           matches=result.get("commentary_clipboard_match_by_passage",{})
           if set(matches)!=set(samples):
               raise ValueError("Real Xiphos did not inspect every chosen commentary passage")
@@ -3541,6 +3560,15 @@ jobs:
               raise ValueError("Private Xiphos book-preface observation missing exact I-key samples")
           if any(type(v) is not bool for v in intro_matches.values()):
               raise ValueError("Xiphos book-preface GUI evidence is not boolean")
+          menu=result.get("book_preface_I_menu_GUI_observations",{})
+          if set(menu)!=set(intro_expected):
+              raise ValueError("Xiphos native book-I introduction menu probe missing")
+          menu_classes={}
+          ordinary_intro_classes={}
+          for ref in intro_expected:
+              row=menu[ref]["book_and_chapter_menu_observations"]["chapter"]
+              menu_classes[ref]=row["GUI_menu_observation_class"]
+              ordinary_intro_classes[ref]=row["normal_chapter_GUI_observation_class"]
           receipt={
               "status":(
                   "PRIVATE_MODERN_REAL_XIPHOS_GUI_SUBSTANTIVE_CLIPBOARD_PASS"
@@ -3558,6 +3586,8 @@ jobs:
               "compiled_source_native_I_preface_samples_checked":len(intro_expected),
               "separately_observed_book_preface_I_GUI_match_count":sum(intro_matches.values()),
               "per_book_preface_I_GUI_match":dict(intro_matches),
+              "per_compiled_book_I_native_heading_menu_GUI_class":menu_classes,
+              "per_compiled_book_I_normal_GUI_class":ordinary_intro_classes,
               "all_book_prefaces_in_GUI_approved":False,
               "actual_GUI_actions_completed":result.get("actual_passage_commands_accepted") is True,
               "xiphos_link_mouse_click_and_target_verified":False,
@@ -3577,6 +3607,8 @@ jobs:
                 str(sum(intro_matches.values()))+"/"+str(len(intro_expected))+
                 " compiled native I-entry prefatory texts matched in GUI; "
                 "a non-match remains inconclusive, never missing source text")
+          print("PRIVATE REAL XIPHOS BOOK-I HEADING MENU OUTCOMES (no text): "+
+                str(menu_classes)+"; normal chapter classes: "+str(ordinary_intro_classes))
           if positives!=len(samples) or result.get("actual_passage_commands_accepted") is not True:
               raise ValueError(
                   "Actual Xiphos modern commentary GUI did not display every "
