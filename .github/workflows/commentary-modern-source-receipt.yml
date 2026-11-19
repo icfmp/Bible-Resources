@@ -3600,6 +3600,58 @@ jobs:
                   raise ValueError("Private editorial SWORD real-reader sample absent")
           print("PRIVATE EDITORIAL SWORD READBACK PASS: Psalm 95, 1 Samuel 25")
           PY
+      - name: Verify all editorial references and both additions in actual compiled SWORD
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import collections,json,os,subprocess,sys
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+          sys.path.insert(0,"scripts")
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          base=Path(os.environ["RUNNER_TEMP"])
+          manifest=json.loads(Path("work/mhcc-modern/production/OWNER_EDITORIAL_DECISIONS_2026-11-19.json").read_text())
+          root=base/"mhcc-modern-approved-private-root"
+          expectations=collections.defaultdict(collections.Counter)
+          for row in manifest["link_cases"]:
+              expectations[row["source_first_key"]].update(row["approved_derived_destinations"])
+          restored={row["original_source_first_K"]:row["approved_additional_authored_heading"]
+                    for row in manifest["ccel_only_sections"]}
+          seen=set()
+          def check(kind,key,raw):
+              if kind!="K" or key not in expectations and key not in restored:
+                  return
+              if key in seen: raise ValueError("Duplicate source first K in native SWORD")
+              doc=ET.fromstring(b"<doc>"+raw+b"</doc>")
+              if key in expectations:
+                  actual=collections.Counter()
+                  for note in doc.iter():
+                      if note.tag.endswith("note") and note.get("resp")==(
+                          "BibleResourcesApprovedDerivativeEditorialCorrection"):
+                          for ref in note.iter():
+                              if ref.tag.endswith("reference"): actual[ref.get("osisRef")]+=1
+                  if actual!=expectations[key]:
+                      raise ValueError("Corrected native SWORD source link mismatch: "+key)
+              if key in restored and restored[key] not in " ".join("".join(doc.itertext()).split()):
+                  raise ValueError("Restored authorial material absent in native SWORD: "+key)
+              seen.add(key)
+          scan=base/"commentary-modern-source-raw"
+          proc=subprocess.Popen([str(scan),"MHCCMODAP"],stdout=subprocess.PIPE,
+              stderr=subprocess.DEVNULL,env=dict(os.environ,SWORD_PATH=str(root)))
+          try:
+              _,numbered,_,_=parse_native_raw_corpus(proc.stdout,on_entry=check)
+              proc.stdout.close()
+              if proc.wait(timeout=120): raise ValueError("Approved SWORD scan failed")
+          finally:
+              if proc.poll() is None: proc.kill();proc.wait()
+          if seen!=set(expectations)|set(restored) or len(numbered)!=28792:
+              raise ValueError("Approved original K or numbered key coverage changed")
+          print("OWNER-APPROVED EDITORIAL NATIVE SWORD PASS: all 15 source-link cases, "+
+                str(sum(sum(c.values()) for c in expectations.values()))+
+                " compiled reference destinations, two restored secondary-witness sections, "+
+                "28792 original numbered keys, no release")
+          PY
       - name: Install real Xiphos GUI in an isolated virtual display for HMCC Modern
         id: xiphos_deps
         timeout-minutes: 14
@@ -3894,6 +3946,53 @@ jobs:
               raise ValueError(
                   "Actual Xiphos modern commentary GUI did not display every "
                   "source-attested passage, including chapter-I-only end verses")
+          PY
+      - name: Inspect approved source restorations in real isolated Xiphos
+        if: steps.xiphos_deps.outcome == 'success'
+        timeout-minutes: 6
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,sys
+          from pathlib import Path
+          sys.path.insert(0,"scripts")
+          from commentary_xiphos_dual_reader import _run_real_gui,verify_and_install_reviewed_bible
+          from pilot_subprocess import query,present_key
+          base=Path(os.environ["RUNNER_TEMP"])
+          root=base/"mhcc-modern-approved-private-root"
+          receipt=json.loads((base/"mhcc-modern-approved-editorial-receipt.json").read_text())
+          if receipt["status"]!="OWNER_APPROVED_PRIVATE_EDITORIAL_OSIS_OVERLAY_NOT_RELEASE":
+              raise ValueError("Private editorial SWORD source not approved")
+          if verify_and_install_reviewed_bible(root)["module_id"]!="BRLSG1910":
+              raise ValueError("Published independent Bible missing")
+          refs=("Ps 95:11","1 Samuel 25:39","Gen 12:6","Num 29:1")
+          cases={}
+          for ref in refs:
+              c,t=query("MHCCMODAP",ref,fmt="plain",root=root,
+                        exe="diatheke",limit=256*1024,timeout=25)
+              b,v=query("BRLSG1910",ref,fmt="plain",root=root,
+                        exe="diatheke",limit=256*1024,timeout=25)
+              if (c or b or not present_key(ref,t,c) or not present_key(ref,v,b)
+                  or len(t)<100 or len(v)<60):
+                  raise ValueError("Approved modern GUI sample not independently sourced")
+              cases[ref]={"commentary":t,"bible":v}
+          obs=_run_real_gui(root,cases,seconds=25,commentary_module_id="MHCCMODAP")
+          found=obs.get("commentary_clipboard_match_by_passage",{})
+          if (set(found)!=set(refs) or not all(found.values())
+              or obs.get("actual_passage_commands_accepted") is not True):
+              raise ValueError("Actual Xiphos did not prove approved modern excerpts")
+          report={"status":"PRIVATE_APPROVED_EDITORIAL_XIPHOS_EXCERPTS_PASS",
+              "module":"MHCCMODAP","pinned_bible":"BRLSG1910",
+              "actual_GUI_matched":sum(found.values()),"requested_GUI_samples":len(refs),
+              "both_source_witness_restorations_sampled":True,
+              "actual_cross_reference_mouse_click_navigation_accepted":False,
+              "published":False}
+          (base/"mhcc-modern-approved-editorial-gui-receipt.json").write_text(
+              json.dumps(report,sort_keys=True,indent=2)+"\n")
+          print("PRIVATE APPROVED EDITORIAL XIPHOS GUI PASS: "+str(sum(found.values()))+
+                "/"+str(len(refs))+" real commentary excerpts, including both restored "+
+                "authored sections; no click-navigation or publication claim")
           PY
       - name: Preserve explicit Xiphos acceptance status, never infer GUI pass from source CI
         if: always()
