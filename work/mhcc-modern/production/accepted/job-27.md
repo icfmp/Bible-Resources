@@ -56,17 +56,19 @@ For an unrepentant sinner, it is like a **storm driving the person toward destru
 
 During life, such a sinner benefits from God's patient mercy.
 
-But death ends that period of patience, and judgment follows.
+But death ends that period of patience, and **God pours out his wrath**.
 
-When the Lord brings someone down in judgment, there is no fleeing from or resisting his anger.
+When the Lord brings someone down, no one can flee from or withstand his anger.
 
-People who refuse now to flee to **the open arms of divine grace** will not later escape divine judgment.
+Those who refuse now to flee to **the arms of divine grace, stretched out to receive them**, will not escape **the arms of divine wrath, stretched out to destroy them**.
 
 What good is it to gain the entire world and lose one's own soul?
 
 ---
 
 ## Editorial review — Job 27
+
+**2026-11-19 secondary-witness fidelity repair (unapproved draft):** Verses 11–23 previously replaced Henry's explicit divine *wrath* and two-sided image of the outstretched **arms of grace** versus **arms of wrath** with generic judgment. The modern wording restores both, including the finality of patience at death. Compared with [CCEL Job 27](https://ccel.org/ccel/henry/mhcc.xix.xxvii.html). Pending exact original MHCC 0.1.1 K-text and independent editorial acceptance. No source, keys or references altered.
 
 **Full original-English witness read:** [CCEL, Job 27](https://ccel.org/ccel/henry/mhcc.xix.xxvii.html). Exact pinned **MHCC 0.1.1** remains source of record, native SWORD/independent QA pending.
 
