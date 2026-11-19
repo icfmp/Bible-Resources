@@ -48,6 +48,7 @@ jobs:
           PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_reclassify_osis_commentary_introduction.py' -v
           PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_commentary_xiphos_dual_reader.py' -v
           PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_commentary_xiphos_heading_probe.py' -v
+          PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_private_sword_bundle.py' -v
       - name: Install stock libSWORD compiler and native reader headers
         shell: bash
         run: |
@@ -1614,6 +1615,65 @@ jobs:
                      !=new_counts["actual_occupied_anonymous_top_entry_count"]):
               raise SystemExit("OSIS introduction reclassification is not source-faithful in real SWORD")
           print("REAL_OSIS_CHAPTER_INTRO_PROOF_PASS; only verified generated pvN pair renumbering outside 2Chr 1; candidate private and unpublished")
+          PY
+      - name: Repackage and independently reinstall final private zCom4 candidate (no export)
+        shell: bash
+        timeout-minutes: 5
+        run: |
+          set -euo pipefail
+          umask 077
+          python - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from private_sword_bundle import audit_private_sword_installation
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          root=Path(os.environ["RUNNER_TEMP"])
+          work=root/"mhc-chapter-intro-private-sword"
+          module="MHCIntroPreview"
+          scanner=root/"commentary-native-raw"
+          proc=subprocess.Popen(
+              [str(scanner),module],
+              env=dict(os.environ,SWORD_PATH=str(work)),
+              stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+          try:
+              meta,keys,intros,_top=parse_native_raw_corpus(proc.stdout)
+              if proc.wait(timeout=45):
+                  raise SystemExit("Final native module scanner failed")
+          finally:
+              if proc.stdout:proc.stdout.close()
+              if proc.poll() is None:proc.kill()
+              proc.wait()
+          if len(keys)!=31098 or len(intros)!=1255:
+              raise SystemExit("Unexpected final commentary source/native corpus")
+          source_keys=set(keys)
+          books=("Gen","2Chr","Ps","Prov","Rom","Matt","Rev")
+          preferred=("Gen.1.1","2Chr.1.1","Ps.95.7","Prov.31.1",
+                     "Rom.4.17","Matt.28.1","Rev.22.21")
+          chosen=[]
+          for book,wanted in zip(books,preferred):
+              if wanted in source_keys:
+                  chosen.append(wanted)
+              else:
+                  fallback=next((k for k in keys
+                                 if k.startswith(book+".") and k.count(".")==2),None)
+                  if fallback is None:
+                      raise SystemExit("Missing representative occupied source book")
+                  chosen.append(fallback)
+          samples=tuple(k.split(".")[0]+" "+k.split(".")[1]+":"+
+                        k.split(".")[2] for k in chosen)
+          receipt=audit_private_sword_installation(
+              work,module,reader="diatheke",samples=samples)
+          if (receipt["module_id"]!=module
+                  or len(receipt["independent_passage_readbacks"])!=len(books)
+                  or not receipt["all_source_file_bytes_verified_after_extraction"]
+                  or not receipt["packaged_to_standard_mods_d_and_modules_paths"]
+                  or not receipt["zip_discarded_without_upload_or_publication"]
+                  or receipt["published"]):
+              raise SystemExit("Unsafe or incomplete private SWORD package witness")
+          print("Final unpublished zCom4 ZIP/reinstall integrity (metadata only):",
+                json.dumps(receipt,sort_keys=True))
+          print("Private ZIP deleted; no module bytes or authorial text uploaded")
           PY
       - name: Install real Xiphos GUI dependencies in disposable runner
         if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-mhc-final-gui]'))
