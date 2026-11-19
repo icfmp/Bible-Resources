@@ -3973,9 +3973,10 @@ jobs:
                       # A subprocess drives the real X11 pointer only when there
                       # is one visible matching link in the commentary half.
                       script=textwrap.dedent("""
-                          import hashlib,json,subprocess,sys
+                          import hashlib,json,re,subprocess,sys
                           import pyatspi
-                          digest=sys.argv[1]
+                          expected=" ".join(sys.argv[1].split()).casefold()
+                          digest=hashlib.sha256(expected.encode()).hexdigest()
                           out={"status":"REAL_GUI_ATSPI_SOURCE_LABEL_SEARCH",
                                "matching_showing_link_count":0,
                                "x11_actual_click_dispatched":False}
@@ -3987,7 +3988,16 @@ jobs:
                               try:
                                   if item.getRoleName().lower()=="link":
                                       label=" ".join((item.name or "").split()).casefold()
-                                      if hashlib.sha256(label.encode()).hexdigest()==digest:
+                                      equal=(hashlib.sha256(label.encode()).hexdigest()==digest)
+                                      similar=(len(label)>=4 and len(expected)>=4 and
+                                          (label.endswith(expected) or expected.endswith(label)))
+                                      # The visible numeric reference is useful
+                                      # only when it uniquely identifies one
+                                      # right-pane link; the post-click target
+                                      # still needs independent reader proof.
+                                      same_numbers=(len(re.findall(r"\d+",expected))>=2
+                                          and re.findall(r"\d+",label)==re.findall(r"\d+",expected))
+                                      if equal or similar or same_numbers:
                                           ext=item.queryComponent().getExtents(pyatspi.DESKTOP_COORDS)
                                           if ext.width>0 and ext.height>0:
                                               x=ext.x+ext.width//2
@@ -4005,12 +4015,15 @@ jobs:
                               out["x11_actual_click_dispatched"]=click.returncode==0
                           print(json.dumps(out,sort_keys=True))
                       """)
-                      attempt=subprocess.run(["/usr/bin/python3","-c",script,label_sha],
+                      attempt=subprocess.run(["/usr/bin/python3","-c",script,valid_labels[0]],
                           env=probe_env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,
                           text=True,timeout=18,check=False)
                       if attempt.returncode!=0 or len(attempt.stdout)>4096:
                           raise ValueError("Real AT-SPI link activation unavailable")
                       click_proof=json.loads(attempt.stdout)
+                      click_proof["source_valid_HTML_label_sha256"]=label_sha
+                      click_proof["exact_name_found_in_ATSPI"]=(
+                          label_sha in accessibility.get("link_name_sha256",[]))
                       if click_proof.get("x11_actual_click_dispatched") is True:
                           # Real post-click Bible-side copy is independently
                           # compared against exact compiled target Scripture;
