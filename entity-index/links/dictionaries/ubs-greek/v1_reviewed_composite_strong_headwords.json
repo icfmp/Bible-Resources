@@ -35,7 +35,10 @@
       "original_ubs_pos_fr": [
         "prep. (avec gen.), advb."
       ],
-      "editorial_basis": "The three exact original MACULA word IDs have lemma ὑπερεκπερισσοῦ, original composite Strong 5228+1537+4053, source adverb class and original LN 78.34, which uniquely agrees with pinned UBS EN and FR original Greek headword and lexical code. UBS source Strong G4053a is recorded separately and is NOT asserted to be an interchangeable original Strong. Approve only the word-specific lexical headword identity; preserve all source annotation and decline contextual LEXID inference."
+      "editorial_basis": "The three exact original MACULA word IDs have lemma ὑπερεκπερισσοῦ, original composite Strong 5228+1537+4053, source adverb class and original LN 78.34, which uniquely agrees with pinned UBS EN and FR original Greek headword and lexical code. UBS source Strong G4053a is recorded separately and is NOT asserted to be an interchangeable original Strong. Approve only the word-specific lexical headword identity; preserve all source annotation and decline contextual LEXID inference. One original attested occurrence, 1 Thessalonians 5:13 (word ID n52005013004), has no original LN annotation at all. It is authorized for original-word HEADWORD identity ONLY based on its identical exact Greek lemma, same authentic original compound Strong and independent adverb class; its missing LN remains missing and is never borrowed from other source word IDs.",
+      "exact_original_word_ids_with_missing_ln_allowed": [
+        "n52005013004"
+      ]
     },
     {
       "lemma_nfc": "δισμυριάς",
@@ -53,7 +56,8 @@
       "original_ubs_pos_fr": [
         "nom, f."
       ],
-      "editorial_basis": "One exact original Greek source word ID has authentic lemma δισμυριάς, original composite Strong 1417+3461, original noun class and source LN 60.9 corroborated independently by the unique pinned UBS EN and FR original headword. UBS source G1364a is a distinct source annotation, not an invented replacement for the MACULA compound. Approve lexical headword identity only at that original word ID; no contextual semantic LEXID."
+      "editorial_basis": "One exact original Greek source word ID has authentic lemma δισμυριάς, original composite Strong 1417+3461, original noun class and source LN 60.9 corroborated independently by the unique pinned UBS EN and FR original headword. UBS source G1364a is a distinct source annotation, not an invented replacement for the MACULA compound. Approve lexical headword identity only at that original word ID; no contextual semantic LEXID.",
+      "exact_original_word_ids_with_missing_ln_allowed": []
     },
     {
       "lemma_nfc": "ἐκπερισσῶς",
@@ -71,7 +75,8 @@
       "original_ubs_pos_fr": [
         "advb."
       ],
-      "editorial_basis": "One original Greek word ID has the exact source lemma ἐκπερισσῶς, original composite Strong 1537+4053, adverb lexical class and original Louw–Nida 78.31. The original UBS v1.0 English and French lexica independently attest a unique Greek lemma and matching lexical code, despite UBS source Strong G4053b differing from MACULA's original components. Preserve both originals, approve only the exact word-specific headword, and infer no contextual LEXID."
+      "editorial_basis": "One original Greek word ID has the exact source lemma ἐκπερισσῶς, original composite Strong 1537+4053, adverb lexical class and original Louw–Nida 78.31. The original UBS v1.0 English and French lexica independently attest a unique Greek lemma and matching lexical code, despite UBS source Strong G4053b differing from MACULA's original components. Preserve both originals, approve only the exact word-specific headword, and infer no contextual LEXID.",
+      "exact_original_word_ids_with_missing_ln_allowed": []
     }
   ],
   "previous_source_word_headword_reviews": 9189,
