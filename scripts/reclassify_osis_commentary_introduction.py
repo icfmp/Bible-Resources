@@ -128,8 +128,15 @@ def repair_private_bytes(raw: bytes, plan: dict) -> tuple[bytes, dict]:
     # "introduction". Never silently change this authorial title metadata.
     title_plan = plan.get("preverse_title")
     title_node = None
+    # Comments and processing instructions are original editorial metadata,
+    # not OSIS element boundaries. lxml includes them in list(book), while the
+    # original external structure census deliberately reports only elements.
+    # Preserve their exact bytes and order; exclude them from the count of
+    # source heading elements that might change SWORD's introduction scope.
     direct_preverse = list(book)[
         list(book).index(chapter_starts[0])+1:list(book).index(leading_p)]
+    element_preverse = [
+        node for node in direct_preverse if isinstance(node.tag,str)]
     if title_plan is not None:
         # Separate schema validation from the source-shape check: never
         # assume the plan is a dict when building a failure diagnostic.
@@ -143,13 +150,13 @@ def repair_private_bytes(raw: bytes, plan: dict) -> tuple[bytes, dict]:
             "old_type": isinstance(title_plan.get("old_type"),str)
                         and re.fullmatch(r"x-[a-z0-9-]{1,32}",title_plan["old_type"]) is not None,
             "new_type": title_plan.get("new_type")=="chapter",
-            "one_direct_preverse_title": len(direct_preverse)==1,
+            "one_direct_preverse_title": len(element_preverse)==1,
         }
         if not all(checks.values()):
             # Fixed category names only; no original text or attribute values.
             failed=",".join(sorted(k for k,v in checks.items() if not v))
             raise IntroRepairError("Unattested chapter-heading classification plan ("+failed+")")
-        title_node = direct_preverse[0]
+        title_node = element_preverse[0]
         if (not isinstance(title_node.tag,str) or _local(title_node)!="title"
                 or title_node.getparent() is not book
                 or title_node.sourceline != title_plan["original_line"]
@@ -158,7 +165,7 @@ def repair_private_bytes(raw: bytes, plan: dict) -> tuple[bytes, dict]:
             raise IntroRepairError("Source preverse title identity differs from plan")
     if any(not isinstance(n.tag,str) or _local(n)!="title"
            or n.get("type") not in {"main","chapter","sub"}
-           for n in direct_preverse if n is not title_node):
+           for n in element_preverse if n is not title_node):
         raise IntroRepairError("Unreviewed preverse boundary would hide chapter introduction")
 
     positions = {}
