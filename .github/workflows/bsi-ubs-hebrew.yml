@@ -35,6 +35,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_reviewed_headwords.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_source_morpheme_abstentions.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_v1_disposition_coverage.py
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_single_candidate_abstentions.py
       - name: Check out exact UBS Hebrew EN/FR 0.9.4 source
         uses: actions/checkout@v4
         with:
@@ -182,6 +183,13 @@ jobs:
             --decisions entity-index/links/dictionaries/ubs-hebrew/v1_source_morpheme_abstentions.json \
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv
+      - name: Verify source-keyed sole-candidate lexical abstentions without word links
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/verify_single_candidate_abstentions.py \
+            --register /tmp/bsi-ubs-hebrew-family-register.json \
+            --decisions entity-index/links/dictionaries/ubs-hebrew/v1_single_candidate_abstentions.json \
+            --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
+            --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv
       - name: Verify all lexical families classified without editorial assumptions
         run: |
           python3 - <<'PY'
@@ -218,6 +226,7 @@ jobs:
             --nonidentity entity-index/links/dictionaries/ubs-hebrew/v1_lexical_nonidentity_dispositions.json \
             --ambiguous entity-index/links/dictionaries/ubs-hebrew/v1_multi_headword_abstentions.json \
             --morphemes entity-index/links/dictionaries/ubs-hebrew/v1_source_morpheme_abstentions.json \
+            --single entity-index/links/dictionaries/ubs-hebrew/v1_single_candidate_abstentions.json \
             --positive entity-index/links/dictionaries/ubs-hebrew/v1_reviewed_headword_dispositions.json \
             --index /tmp/bsi-ubs-hebrew-index.json \
             --output /tmp/bsi-ubs-v1-disposition-coverage.json
