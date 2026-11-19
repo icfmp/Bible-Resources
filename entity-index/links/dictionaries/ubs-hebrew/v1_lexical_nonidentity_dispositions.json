@@ -309,7 +309,8 @@
         "reference": "1SA 25:22!15",
         "english": "one urinating",
         "pos": "verb",
-        "class": "verb"
+        "class": "verb",
+        "original_sdbh": "007329001001000"
       },
       "ubs_candidate": {
         "main_id": "007333000000000",
@@ -336,7 +337,8 @@
         "reference": "JDG 18:7!5",
         "english": "Laish",
         "pos": "noun",
-        "class": "noun"
+        "class": "noun",
+        "original_sdbh": "003585002001000"
       },
       "ubs_candidate": {
         "main_id": "003590000000000",
@@ -363,7 +365,8 @@
         "reference": "JDG 4:2!16",
         "english": "",
         "pos": "noun",
-        "class": "noun"
+        "class": "noun",
+        "original_sdbh": "002574001001000"
       },
       "ubs_candidate": {
         "main_id": "002577000000000",
@@ -390,7 +393,8 @@
         "reference": "1SA 17:2!6",
         "english": "",
         "pos": "noun",
-        "class": "noun"
+        "class": "noun",
+        "original_sdbh": ""
       },
       "ubs_candidate": {
         "main_id": "000392000000000",
@@ -419,7 +423,8 @@
         "reference": "2KI 5:18!9",
         "english": "Rimmon",
         "pos": "noun",
-        "class": "noun"
+        "class": "noun",
+        "original_sdbh": "006818002005000"
       },
       "ubs_candidate": {
         "main_id": "006826000000000",
@@ -446,7 +451,8 @@
         "reference": "JDG 9:46!5",
         "english": "",
         "pos": "noun",
-        "class": "noun"
+        "class": "noun",
+        "original_sdbh": "007354002002000"
       },
       "ubs_candidate": {
         "main_id": "003689000000000",
@@ -473,7 +479,8 @@
         "reference": "JDG 19:23!18",
         "english": "into",
         "pos": "particle",
-        "class": "adv"
+        "class": "adv",
+        "original_sdbh": ""
       },
       "ubs_candidate": {
         "main_id": "000381000000000",
@@ -505,7 +512,8 @@
         "reference": "2CH 2:12!8",
         "english": "",
         "pos": "noun",
-        "class": "noun"
+        "class": "noun",
+        "original_sdbh": ""
       },
       "ubs_candidate": {
         "main_id": "002180000000000",
@@ -532,7 +540,8 @@
         "reference": "1CH 5:9!4",
         "english": "",
         "pos": "verb",
-        "class": "verb"
+        "class": "verb",
+        "original_sdbh": ""
       },
       "ubs_candidate": {
         "main_id": "003499000000000",
@@ -560,7 +569,8 @@
         "reference": "NEH 3:6!2",
         "english": "",
         "pos": "noun",
-        "class": "noun"
+        "class": "noun",
+        "original_sdbh": "007551001012000"
       },
       "ubs_candidate": {
         "main_id": "003179000000000",
@@ -587,7 +597,8 @@
         "reference": "2CH 1:16!6",
         "english": "Kue",
         "pos": "noun",
-        "class": "noun"
+        "class": "noun",
+        "original_sdbh": "006408001001000"
       },
       "ubs_candidate": {
         "main_id": "006411000000000",
@@ -617,7 +628,8 @@
         "reference": "1KI 10:28!6",
         "english": "Kue",
         "pos": "noun",
-        "class": "noun"
+        "class": "noun",
+        "original_sdbh": "006408001001000"
       },
       "ubs_candidate": {
         "main_id": "006411000000000",
@@ -647,7 +659,8 @@
         "reference": "ISA 15:5!8",
         "english": "",
         "pos": "noun",
-        "class": "noun"
+        "class": "noun",
+        "original_sdbh": "005233001001000"
       },
       "ubs_candidate": {
         "main_id": "005238000000000",
@@ -676,7 +689,8 @@
         "reference": "JOS 18:21!10",
         "english": "",
         "pos": "noun",
-        "class": "noun"
+        "class": "noun",
+        "original_sdbh": "005519001001000"
       },
       "ubs_candidate": {
         "main_id": "005526000000000",
@@ -704,7 +718,8 @@
         "reference": "1SA 14:27!16",
         "english": "honeycomb of",
         "pos": "noun",
-        "class": "noun"
+        "class": "noun",
+        "original_sdbh": "003012002001000"
       },
       "ubs_candidate": {
         "main_id": "003017000000000",
