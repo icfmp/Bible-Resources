@@ -5217,3 +5217,27 @@ jobs:
             ${{ runner.temp }}/mhcc-modern-preview-structure.json
           if-no-files-found: ignore
           retention-days: 60
+
+  # One-shot, feature-branch-only metadata reconciliation.
+  # Remove once generated inventory is committed by Actions.
+  maintain-tool-registry-for-modern-pr:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feature/mhcc-modern-english' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Regenerate exact source-bound tool inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/tool_registry.py --write
+          python scripts/tool_registry.py --check
+          if ! git diff --quiet -- docs/TOOL_REGISTRY.json docs/TOOL_REGISTRY.md; then
+            git config user.name github-actions[bot]
+            git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+            git add docs/TOOL_REGISTRY.json docs/TOOL_REGISTRY.md
+            git commit -m "Refresh source-bound tool inventory after Xiphos negative-href probe"
+            git push origin HEAD:feature/mhcc-modern-english
+          fi
