@@ -4115,9 +4115,24 @@ jobs:
                               if sum(abs(px-x)<10 for px,_ in right)==1:
                                   before=actual_accessible_target_present()
                                   sidebar_before=sidebar_verse_list_target()
-                                  click=subprocess.run(["xdotool","mousemove",str(x),str(y),
-                                      "click","1"],timeout=7,capture_output=True)
-                                  out["x11_actual_click_dispatched"]=click.returncode==0
+                                  # In Xiphos src/webkit/wk-html.c, link
+                                  # activation consults x_uri, which is only
+                                  # populated by mouse-target-changed on
+                                  # *hover*, before button-press-event. A
+                                  # combined mousemove+click may race this
+                                  # callback and click inert text. Dispatch
+                                  # two separate X11 operations with bounded
+                                  # GTK mainloop time between them.
+                                  moved=subprocess.run(
+                                      ["xdotool","mousemove",str(x),str(y)],
+                                      timeout=7,capture_output=True)
+                                  if moved.returncode==0:
+                                      time.sleep(.8)
+                                      click=subprocess.run(
+                                          ["xdotool","click","1"],
+                                          timeout=7,capture_output=True)
+                                      out["x11_actual_click_dispatched"]=click.returncode==0
+                                      out["hover_before_click_seconds"]=0.8
                                   if click.returncode==0:
                                       time.sleep(1.4)
                                       after=actual_accessible_target_present()
