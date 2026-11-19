@@ -542,6 +542,33 @@ jobs:
           path: /tmp/bsi-ubs-greek-224-ambiguity-partition.json
           if-no-files-found: error
           retention-days: 14
+      - name: Source-audit 459 Greek words with no exact UBS original Greek headword
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_missing_exact_headwords.py \
+            --source /tmp/bsi-ubs-greek-original-exceptions-and-ambiguities.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --output /tmp/bsi-ubs-greek-459-lexeme-source-gaps.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/bsi-ubs-greek-459-lexeme-source-gaps.json').read_text())
+          assert r['original_words']==459
+          assert sum(x['original_word_count'] for x in r['source_word_families'])==459
+          assert sum(r['diagnostic_category_original_word_counts'].values())==459
+          assert r['automatic_lemma_mappings_approved']==0
+          assert r['inferred_contextual_senses']==0
+          assert r['historical_index_modified'] is False
+          assert r['publication_approved'] is False
+          print('GREEK_459_ORIGINAL_SOURCE_HEADWORD_EXCEPTIONS_UNAPPROVED_AND_DOCUMENTED')
+          PY
+      - name: Upload missing Greek UBS lexical headwords source evidence (PRIVATE)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-459-source-headword-exceptions-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-459-lexeme-source-gaps.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload original Greek lexical exceptions (PRIVATE, UNRESOLVED)
         uses: actions/upload-artifact@v4
         with:
