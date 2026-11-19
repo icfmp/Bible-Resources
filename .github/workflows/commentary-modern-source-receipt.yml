@@ -3879,9 +3879,29 @@ jobs:
                       print(json.dumps(results,sort_keys=True))
                   """)
                   try:
+                      # dbus-run-session starts Xiphos on a private *child*
+                      # session bus. The outer runner's bus has an empty AT-SPI
+                      # Desktop. Read the GUI child's own DBUS address from its
+                      # process environment, not from a guessed global session.
+                      probe_env=dict(env,NO_AT_BRIDGE="0",GTK_A11Y="1")
+                      candidates=subprocess.run(
+                          ["pgrep","-x","xiphos"],text=True,capture_output=True,
+                          timeout=4,check=False)
+                      for pid in candidates.stdout.splitlines():
+                          if not pid.isdecimal():
+                              continue
+                          try:
+                              variables=Path("/proc/"+pid+"/environ").read_bytes().split(b"\\0")
+                              address=next((v.split(b"=",1)[1] for v in variables
+                                  if v.startswith(b"DBUS_SESSION_BUS_ADDRESS=")),None)
+                              if address and len(address)<2048:
+                                  probe_env["DBUS_SESSION_BUS_ADDRESS"]=address.decode("utf-8")
+                                  break
+                          except (OSError,UnicodeError):
+                              continue
                       observed=subprocess.run(
                           ["/usr/bin/python3","-c",probe],
-                          env=dict(env,NO_AT_BRIDGE="0",GTK_A11Y="1"),
+                          env=probe_env,
                           stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,
                           text=True,timeout=18,check=False)
                       if observed.returncode==0 and len(observed.stdout)<20000:
@@ -3892,6 +3912,9 @@ jobs:
                       pass
               return {"book_preface_I_menu_GUI_observations":proofs,
                       "real_accessibility_link_inventory":accessibility}
+          # Enable real GTK accessibility on the Xiphos child before startup.
+          os.environ["NO_AT_BRIDGE"]="0"
+          os.environ["GTK_A11Y"]="1"
           result=_run_real_gui(root,comparisons,seconds=25,
                                commentary_module_id="MHCCMODRC",
                                on_gui_ready=inspect_book_intro_menu)
