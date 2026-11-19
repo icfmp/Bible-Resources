@@ -1,9 +1,8 @@
-name: One-off MHC branch tool-registry refresh
+name: Manual MHC historical tool-registry refresh
+# Kept solely as a manual audit tool for the historical MHC feature branch.
+# No automatic write runs on normal pushes or published releases.
 on:
-  push:
-    branches: [feature/mhc-crosswire-intake]
-    paths:
-      - '.github/workflows/mhc-registry-sync-once.yml'
+  workflow_dispatch:
 permissions:
   contents: write
 concurrency:
