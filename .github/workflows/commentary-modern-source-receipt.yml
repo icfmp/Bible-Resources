@@ -20,7 +20,6 @@ on:
       - 'tests/java/org/icfmp/research/CommentaryCandidateJSwordParityTest.java'
       - 'work/mhcc-modern/**'
   workflow_dispatch:
-  workflow_call:
 permissions:
   contents: read
 concurrency:
