@@ -1,5 +1,19 @@
 # MHC 2.2 — exact-edition digital redistribution rights review (2026-11-19)
 
+> **Final project rights decision — 2026-11-19 (supersedes the historic HOLD below).**
+> The project owner expressly accepts CrossWire's official MHC 2.2
+> **Public Domain — Copy Freely** license declaration for the complete
+> CrossWire-derived edition and its source-preserving technical corrections.
+> **No further CCEL permission request is required by project policy.**
+> This settles the project's distribution-rights choice and must not be
+> reopened as a blocker merely because the separate CCEL page has general
+> republication terms. Retain original CrossWire/CCEL/Logos provenance and
+> source identity, and do not conflate a project licensing decision with an
+> independent legal opinion. The earlier HOLD and research below remain
+> as **dated historical due diligence only**.
+> A separate owner instruction to publish/merge has still not been given.
+>
+
 > **Owner decision recorded 2026-11-19:** the project owner explicitly
 > accepts CrossWire's official **MHC 2.2 Public Domain — Copy Freely**
 > declaration as the *working rights basis* for this module. CrossWire's
