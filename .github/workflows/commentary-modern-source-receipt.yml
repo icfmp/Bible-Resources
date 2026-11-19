@@ -3967,6 +3967,10 @@ jobs:
                           "heb.11.8" in unquote(unescape(href)).casefold()]
                       if len(matching)!=1:
                           raise ValueError("Exact valid source target not uniquely seen in GUI HTML")
+                      uri=matching[0][1].casefold()
+                      transport=("passagestudy.showRef" if "action=showref" in uri
+                          else "sword" if "sword://" in uri else
+                          "other_real_Xiphos_href")
                       label_sha=hashlib.sha256(
                           " ".join(valid_labels[0].split()).casefold().encode()).hexdigest()
                       # Prepare a distinctive 10-word target-Bible witness
@@ -4036,14 +4040,24 @@ jobs:
                               listed=False
                               candidate_cells=0
                               target_role_hashes=set()
+                              table_cell_name_hashes=[]
+                              heb_mention_cell_count=0
+                              selected_sidebar_page_hashes=[]
                               target_re=re.compile(
-                                  r"\b(?:heb(?:rews)?)\s*11\s*[:.]\s*8\b",
+                                  r"\b(?:heb(?:rews)?)[\s.]*11\s*[:.]\s*8\b",
                                   re.I)
                               while todo and seen<2500:
                                   item,parents=todo.pop()
                                   seen+=1
                                   try:
                                       role=item.getRoleName().lower()
+                                      if role=="page tab":
+                                          try:
+                                              if item.getState().contains(pyatspi.STATE_SELECTED):
+                                                  selected_sidebar_page_hashes.append(
+                                                      hashlib.sha256((item.name or "").encode()).hexdigest())
+                                          except (LookupError,RuntimeError,AttributeError):
+                                              pass
                                       if role in ("table cell","table row","list item"):
                                           candidate_cells+=1
                                           name=(item.name or "")[:250]
@@ -4054,6 +4068,10 @@ jobs:
                                                   text=tx.getText(0,min(tx.characterCount,180))
                                               except (LookupError,RuntimeError,AttributeError):
                                                   pass
+                                          table_cell_name_hashes.append(
+                                              hashlib.sha256(text.encode()).hexdigest())
+                                          if re.search(r"heb",text,re.I):
+                                              heb_mention_cell_count+=1
                                           if target_re.search(text) and any(
                                                   "table" in p or "list" in p for p in parents):
                                               listed=True
@@ -4073,6 +4091,10 @@ jobs:
                                   "target_verse_appeared_in_real_sidebar_list":listed,
                                   "target_verse_selected_in_real_sidebar_list":selected,
                                   "sidebar_real_cell_count":candidate_cells,
+                                  "sidebar_cell_names_combined_sha256":
+                                      hashlib.sha256(",".join(sorted(table_cell_name_hashes)).encode()).hexdigest(),
+                                  "sidebar_cells_with_hebrews_mentions":heb_mention_cell_count,
+                                  "selected_sidebar_page_name_sha256":sorted(selected_sidebar_page_hashes),
                                   "target_accessibility_role_hashes":sorted(target_role_hashes),
                               }
                           out={"status":"REAL_GUI_ATSPI_SOURCE_LABEL_SEARCH",
@@ -4154,6 +4176,7 @@ jobs:
                           raise ValueError("Real AT-SPI link activation unavailable")
                       click_proof=json.loads(attempt.stdout)
                       click_proof["source_valid_HTML_label_sha256"]=label_sha
+                      click_proof["source_href_transport_class"]=transport
                       click_proof["exact_name_found_in_ATSPI"]=(
                           label_sha in accessibility.get("link_name_sha256",[]))
                       if click_proof.get("x11_actual_click_dispatched") is True:
