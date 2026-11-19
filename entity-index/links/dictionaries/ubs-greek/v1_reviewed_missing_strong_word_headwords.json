@@ -23,19 +23,21 @@
       "lemma_nfc": "ἄμωμον",
       "ubs_main_id": "000299000000000",
       "original_macula_class": "noun",
-      "ubs_original_pos_prefix": "noun",
       "original_word_count": 1,
       "original_strong": "0",
-      "editorial_basis": "One original MACULA Greek word has missing Strong annotation 0 but a preserved word ID, exact Greek lemma, original lexical noun class and original Louw–Nida code corroborated independently by the unique original UBS EN and FR Greek noun headword. The lexical headword is reviewed solely at this original word ID; do not fabricate Strong or select contextual meaning."
+      "editorial_basis": "One original MACULA Greek word has missing Strong annotation 0 but a preserved word ID, exact Greek lemma, original lexical noun class and original Louw–Nida code corroborated independently by the unique original UBS EN and FR Greek noun headword. The lexical headword is reviewed solely at this original word ID; do not fabricate Strong or select contextual meaning.",
+      "ubs_original_pos_prefix_en": "noun",
+      "ubs_original_pos_prefix_fr": "nom"
     },
     {
       "lemma_nfc": "Ἀρνί",
       "ubs_main_id": "000717000000000",
       "original_macula_class": "noun",
-      "ubs_original_pos_prefix": "noun-name",
       "original_word_count": 1,
       "original_strong": "0",
-      "editorial_basis": "One original MACULA Greek word has missing Strong annotation 0 but exact original Greek proper-name lemma, preserved word ID, noun class and independently matching source Louw–Nida code in the same original UBS EN and FR proper-name headword. This approves only lexical headword identity at one original word ID, never a guessed Strong number or contextual meaning."
+      "editorial_basis": "One original MACULA Greek word has missing Strong annotation 0 but exact original Greek proper-name lemma, preserved word ID, noun class and independently matching source Louw–Nida code in the same original UBS EN and FR proper-name headword. This approves only lexical headword identity at one original word ID, never a guessed Strong number or contextual meaning.",
+      "ubs_original_pos_prefix_en": "noun-name",
+      "ubs_original_pos_prefix_fr": "nom"
     }
   ],
   "deferred": [
