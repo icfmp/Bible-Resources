@@ -3546,6 +3546,7 @@ jobs:
           PY
       - name: Provision pinned Java 11 for independent AndBible JSword commentary engine
         id: andbible_java
+        if: ${{ false }} # Xiphos-only acceptance requested by owner
         continue-on-error: true
         uses: actions/setup-java@v4
         with:
