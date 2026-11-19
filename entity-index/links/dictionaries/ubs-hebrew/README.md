@@ -523,3 +523,45 @@ dispositions. All **240,098 / 248,680** verified original lexical source
 links and the **98.909%** edition-attested headword coverage remain unchanged.
 Do not label v1.0 as released without the separate approval gate in [#366](
 https://github.com/icfmp/Bible-Resources/issues/366).
+
+### Source-reviewed positive headword identities, without sense inference
+
+The pinned-source [reviewed headword decision ledger](v1_reviewed_headword_dispositions.json)
+records **5 additional original Aramaic families / 107 occurrences** whose
+lexical identity was checked against the UBS dictionary article's distinct
+meaning and the exact original word context. These are **editorial approvals
+of a specific UBS headword identity only**, not yet generated WLC word links
+and **not contextual UBS LEXID/SDBH sense approvals**.
+
+| Original Aramaic MACULA family | Original occurrences | Reviewed UBS headword | Evidence |
+| --- | ---: | --- | --- |
+| `דָּנִיֵּאל` A1841 | 52 | `001695000000000` | Daniel, the book's principal character; UBS explicitly includes Dan 2:13–20 as one of several distinct name senses |
+| `אֱנָשׁ` A0606 | 25 | `000553000000000` | Human/person in Ezra 4:11 and 6:11 |
+| `יוֹם` A3118 | 16 | `002858000000000` | Day/time, including Ezra 4:15 and 4:19 |
+| `בֵּלְשַׁאצַּר` A1113 | 7 | `001033000000000` | Babylonian king Belshazzar at Daniel 5:1 |
+| `תּוֹר` A8450 | 7 | `007759000000000` | Cattle/bulls at Ezra 6:9, 6:17 (UBS Form 5); **not** the dove in the same combined dictionary entry |
+
+The original source word ID, all three family sample references/SDBH IDs,
+full Strong, language, original lexical class counts, candidate UBS MainId,
+and exact pinned source revisions are recorded. Independent public UBS article
+pages provide human-readable contextual corroboration. The
+[read-only validator](verify_reviewed_headwords.py) then cross-checks
+the recorded original word witnesses and the real UBS published main/alternate
+headword forms in the **pinned** UBS 0.9.4 / MACULA source inputs, and CI
+fails on any source or candidate drift.
+
+The family-scoped approval does **not** make e.g. Aramaic A1841 a generic
+Strong alias for every Hebrew H1841 entry, and it does **not** pick an UBS
+sense for every word merely because the UBS entry combines several names or
+meanings. A later separate, audited build change must add and regenerate
+word-ID-specific entry-only links before these can count as linked coverage.
+
+**Current v1 disposition count:** 11 source-backed false candidate rejections
+(1,809 original occurrences) + 40 preserved multiple-headword ambiguities
+(275) + these 5 reviewed positive headword identities (107) =
+**56 / 197 in-scope families**, **2,191 occurrences with dispositions**.
+The other **141 families / 458 occurrences** still require review. All
+5 out-of-indexed-headword-scope families (5,933 original occurrences) and 2
+composite source Strong codes are tracked separately. No source corpus counts,
+generated crosswalk, actual word links or v1 publication status change in this
+documentation-only positive batch.
