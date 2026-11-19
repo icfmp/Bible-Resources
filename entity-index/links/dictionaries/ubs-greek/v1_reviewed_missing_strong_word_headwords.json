@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "status": "PRIVATE_review_original_greek_word_specific_lemma_ln_headwords_without_source_strong",
+  "source_editions": {
+    "ubs_greek_edition": "1.0",
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8",
+    "macula_sblgnt_revision": "8423afe47b9e8f24b7772e808af45c7159a6fe7e"
+  },
+  "editorial_policy": {
+    "original_word_id_required": true,
+    "original_macula_strong_zero_must_remain_zero": true,
+    "unique_ubs_original_greek_lemma_nfc": true,
+    "original_ubs_en_fr_lexical_ln_domain_corroboration": true,
+    "require_matching_original_lexical_pos": true,
+    "do_not_infer_original_strong_code": true,
+    "do_not_infer_contextual_ubs_lexid": true,
+    "do_not_create_global_alias": true,
+    "original_index_and_text_unchanged": true,
+    "publication_approved": false
+  },
+  "reviewed": [
+    {
+      "lemma_nfc": "ἄμωμον",
+      "ubs_main_id": "000299000000000",
+      "original_macula_class": "noun",
+      "original_word_count": 1,
+      "original_strong": "0",
+      "editorial_basis": "One original MACULA Greek word has missing Strong annotation 0 but a preserved word ID, exact Greek lemma, original lexical noun class and original Louw–Nida code corroborated independently by the unique original UBS EN and FR Greek noun headword. The lexical headword is reviewed solely at this original word ID; do not fabricate Strong or select contextual meaning.",
+      "ubs_original_pos_prefix_en": "noun",
+      "ubs_original_pos_prefix_fr": "nom"
+    },
+    {
+      "lemma_nfc": "Ἀρνί",
+      "ubs_main_id": "000717000000000",
+      "original_macula_class": "noun",
+      "original_word_count": 1,
+      "original_strong": "0",
+      "editorial_basis": "One original MACULA Greek word has missing Strong annotation 0 but exact original Greek proper-name lemma, preserved word ID, noun class and independently matching source Louw–Nida code in the same original UBS EN and FR proper-name headword. This approves only lexical headword identity at one original word ID, never a guessed Strong number or contextual meaning.",
+      "ubs_original_pos_prefix_en": "noun-name",
+      "ubs_original_pos_prefix_fr": "nom"
+    }
+  ],
+  "deferred": [
+    {
+      "lemma_nfc": "ὁπότε",
+      "ubs_main_id": "003605000000000",
+      "original_word_count": 1,
+      "reason": "Original MACULA temporal conjunction is classified under UBS adverb; leave unapproved pending distinct lexical editorial evidence."
+    }
+  ],
+  "previous_reviewed_original_word_headwords": 9184,
+  "new_reviewed_source_word_headwords": 2,
+  "strict_source_word_candidates_still_unapproved": 1
+}

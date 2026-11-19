@@ -36,6 +36,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_no_ln_batch5.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_224_ambiguities.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_taxonomy_headwords.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_missing_strong_word_headwords.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -485,6 +486,41 @@ jobs:
           assert all('sense_id' not in v for v in c['by_macula_word'].values())
           print('GREEK_TAXONOMY_32_ORIGINAL_WORD_HEADWORDS_REVIEWED_NO_CONTEXTUAL_LEXID')
           PY
+      - name: Review two Greek source word headwords whose original Strong annotation is missing
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_missing_strong_word_headwords.py \
+            --candidate /tmp/bsi-ubs-greek-32-taxonomy-review-private.json \
+            --ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_missing_strong_word_headwords.json \
+            --residual /tmp/bsi-ubs-greek-173-original-word-evidence.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --output /tmp/bsi-ubs-greek-strong-zero-headwords-private.json
+          python3 - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+          d=json.loads(Path('/tmp/bsi-ubs-greek-strong-zero-headwords-private.json').read_text())
+          b=json.loads(Path('entity-index/links/dictionaries/ubs-greek/index.json').read_text())
+          assert all(d[k]==v for k,v in b.items())
+          assert d['editorial_candidate']['reviewed_original_headword_words_total']==9186
+          assert d['editorial_candidate']['other_original_words_still_unapproved']==1
+          assert d['editorial_candidate']['new_inferred_contextual_lexical_sense_ids']==0
+          assert d['editorial_candidate']['publication_approved'] is False
+          assert len(d['by_macula_ambiguous_word'])==220
+          assert len(d['by_macula_word'])==9187
+          s=Counter(x['match_type'] for x in d['by_macula_word'].values())
+          assert s['source_reviewed_original_greek_word_without_strong_lemma_ln_headword_only']==2
+          assert s['nfc_canonically_identical_lemma_and_original_ln_unapproved_word_candidate']==1
+          assert all(x['original_strong']=='0' for x in d['by_macula_word'].values() if x['match_type']=='source_reviewed_original_greek_word_without_strong_lemma_ln_headword_only')
+          print('GREEK_TWO_SOURCE_STRONG_ZERO_WORD_HEADWORDS_VERIFIED_NO_NEW_STRONG')
+          PY
+      - name: Upload two source-original Greek missing-Strong headwords (PRIVATE)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-2-source-strong-zero-lexical-headwords-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-strong-zero-headwords-private.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload Greek grammatical-taxonomy word headwords (PRIVATE, NOT published)
         uses: actions/upload-artifact@v4
         with:
