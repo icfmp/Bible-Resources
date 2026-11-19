@@ -19,6 +19,15 @@ class ReviewedGreekCompositeSourceTests(unittest.TestCase):
         self.assertTrue(all(MOD["PATTERN"].fullmatch(x["original_macula_strong"])
                             for x in decisions.values()))
 
+    def test_word_specific_absent_original_ln_requires_explicit_approval(self):
+        approved=MOD["review_ledger"](LEDGER,{"source_editions":LEDGER["source_editions"]})
+        missing={x for row in approved.values() for x in row["exact_original_word_ids_with_missing_ln_allowed"]}
+        self.assertEqual(missing,{"n52005013004"})
+        bad=copy.deepcopy(LEDGER)
+        bad["reviewed_families"][0]["exact_original_word_ids_with_missing_ln_allowed"].append("n52005013004")
+        with self.assertRaisesRegex(ValueError,"independent evidence"):
+            MOD["review_ledger"](bad,{"source_editions":LEDGER["source_editions"]})
+
     def test_authentic_bilingual_lexical_classes(self):
         self.assertTrue(MOD["grammar_supported"]("adv",["prep. (with gen.), advb."],
                                                    ["prep. (avec gen.), advb."]))
