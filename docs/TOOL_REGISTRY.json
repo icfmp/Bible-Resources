@@ -2967,7 +2967,7 @@
         "xiphos"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "41a3f8451e7c7762e100850b362d013a89185c28779cc2e40f9013bf61591831",
+      "sha256_at_inventory": "93f4fda13c4e712b3093b4e4595da4e842cf6b3d54cfb1d10a10dfaecd80a19e",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
