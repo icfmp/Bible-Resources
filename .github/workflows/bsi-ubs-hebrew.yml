@@ -376,6 +376,22 @@ jobs:
           else:
               print("BSI_UBS_HEBREW_INITIAL_INDEX_PENDING_COMMIT")
           PY
+      - name: Audit all 26 final lexically uncertain source words, read-only
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_final_lexical_uncertainties.py \
+            --single entity-index/links/dictionaries/ubs-hebrew/v1_single_candidate_abstentions.json \
+            --additional entity-index/links/dictionaries/ubs-hebrew/v1_additional_word_headword_dispositions.json \
+            --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
+            --french ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-fr.JSON \
+            --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --index /tmp/bsi-ubs-hebrew-index.json \
+            --output /tmp/bsi-ubs-last-26-original-wlc-evidence.json
+      - name: Upload read-only original lexical source-word evidence for final review
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-original-final-26-source-witnesses-REVIEW-ONLY
+          path: /tmp/bsi-ubs-last-26-original-wlc-evidence.json
+          retention-days: 7
       - name: Rebuild private source-word-verified v1 candidate without touching original index
         run: |
           python3 -I entity-index/links/dictionaries/ubs-hebrew/build_private_reviewed_candidate.py \
@@ -413,20 +429,36 @@ jobs:
               assert expected["release_approved"] is False
           print("UBS_PRIVATE_CANDIDATE_REVIEW_NOT_PUBLICATION")
           PY
+      - name: Rebuild 275-word final reviewed private candidate, preserve 24 source abstentions
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/build_final_reviewed_candidate.py \
+            --index /tmp/bsi-ubs-v1-private-reviewed-candidate.json \
+            --source_manifest entity-index/links/dictionaries/ubs-hebrew/v1_private_candidate_manifest.json \
+            --decisions entity-index/links/dictionaries/ubs-hebrew/v1_final_word_specific_approvals.json \
+            --source_evidence /tmp/bsi-ubs-last-26-original-wlc-evidence.json \
+            --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
+            --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --output /tmp/bsi-ubs-v1-final-275-word-candidate.json
+      - name: Upload private final UBS v1 original-word-specific candidate (NOT released)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-final-275-word-source-verified-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-v1-final-275-word-candidate.json
+          retention-days: 14
       - name: Verify reproducible, attributed UBS v1.0 technical RC package (NOT a release)
         run: |
           python3 -I entity-index/links/dictionaries/ubs-hebrew/package_reviewed_v1_candidate.py \
-            --index /tmp/bsi-ubs-v1-private-reviewed-candidate.json \
-            --release_manifest entity-index/links/dictionaries/ubs-hebrew/v1_private_candidate_manifest.json \
-            --output /tmp/BSI-UBSHebrew-0.9.4-v1.0-rc1.zip
+            --index /tmp/bsi-ubs-v1-final-275-word-candidate.json \
+            --release_manifest entity-index/links/dictionaries/ubs-hebrew/v1_final_candidate_manifest.json \
+            --output /tmp/BSI-UBSHebrew-0.9.4-v1.0-rc2.zip
           cd /tmp
-          sha256sum -c BSI-UBSHebrew-0.9.4-v1.0-rc1.zip.sha256
+          sha256sum -c BSI-UBSHebrew-0.9.4-v1.0-rc2.zip.sha256
           python3 - <<'PY'
           import hashlib, json, zipfile
           from pathlib import Path
-          archive=Path("/tmp/BSI-UBSHebrew-0.9.4-v1.0-rc1.zip")
+          archive=Path("/tmp/BSI-UBSHebrew-0.9.4-v1.0-rc2.zip")
           with zipfile.ZipFile(archive) as z:
-              root="BSI-UBSHebrew-0.9.4-v1.0-rc1/"
+              root="BSI-UBSHebrew-0.9.4-v1.0-rc2/"
               readme=z.read(root+"README.md").decode("utf-8")
               att=z.read(root+"ATTRIBUTION.md").decode("utf-8")
               license=z.read(root+"LICENSE.txt").decode("utf-8")
@@ -437,17 +469,19 @@ jobs:
               assert "CC BY-SA 4.0" in license
               assert manifest["publication_authorized"] is False
               assert manifest["files"]["index.json"]["sha256"] == hashlib.sha256(payload).hexdigest()
-              assert manifest["reviewed_word_specific_entry_only_links"] == 273
+              assert manifest["reviewed_word_specific_entry_only_links"] == 275
+              assert manifest["last_word_specific_additional_approvals"] == 2
+              assert manifest["retained_unlinked_original_final_word_reviews"] == 24
               assert manifest["inferred_contextual_ubs_sense_ids"] == 0
           print("UBS_V1_RC_BYTE_AND_RIGHTS_GATES_PASSED_NOT_PUBLISHED")
           PY
       - name: Upload NONPUBLISHED UBS 0.9.4 v1.0 technical RC package
         uses: actions/upload-artifact@v4
         with:
-          name: bsi-ubs-hebrew-v1-technical-rc-NOT-PUBLISHED
+          name: bsi-ubs-hebrew-v1-rc2-technical-NOT-PUBLISHED
           path: |
-            /tmp/BSI-UBSHebrew-0.9.4-v1.0-rc1.zip
-            /tmp/BSI-UBSHebrew-0.9.4-v1.0-rc1.zip.sha256
+            /tmp/BSI-UBSHebrew-0.9.4-v1.0-rc2.zip
+            /tmp/BSI-UBSHebrew-0.9.4-v1.0-rc2.zip.sha256
           retention-days: 14
       - name: Upload private UBS 0.9.4 v1 word-level index candidate (NOT released)
         uses: actions/upload-artifact@v4
