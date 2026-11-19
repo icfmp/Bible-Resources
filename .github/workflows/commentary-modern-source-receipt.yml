@@ -3694,6 +3694,17 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # Only this disposable reader session opts into GTK accessibility.
+          # The standard dual-reader harness intentionally defaults to
+          # NO_AT_BRIDGE=1. The Xiphos wrapper changes only the spawned GUI,
+          # not the original source, SWORD, tests or user's GTK environment.
+          mkdir -p "$RUNNER_TEMP/xiphos-accessible-bin"
+          cat > "$RUNNER_TEMP/xiphos-accessible-bin/xiphos" <<'EOF'
+          #!/bin/sh
+          NO_AT_BRIDGE=0 GTK_A11Y=1 exec /usr/bin/xiphos "$@"
+          EOF
+          chmod 0755 "$RUNNER_TEMP/xiphos-accessible-bin/xiphos"
+          export PATH="$RUNNER_TEMP/xiphos-accessible-bin:$PATH"
           python - <<'PY'
           import hashlib,json,os,re,subprocess,sys
           from pathlib import Path
