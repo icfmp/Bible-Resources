@@ -1813,6 +1813,157 @@ jobs:
                 "proposed navigation targets, all " + str(sum(note_seen.values())) + " original source-only notes " +
                 "still exact, 28792 source addresses; UNAPPROVED and NOT RELEASED")
           PY
+      - name: Authenticate and SWORD-readback eleven additional unapproved link proposals
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import copy,json,os,sys
+          from pathlib import Path
+          sys.path.insert(0,"scripts")
+          from commentary_modern_reference_gate import (
+              build_private_additional_source_errata_preview)
+          base=Path(os.environ["RUNNER_TEMP"])
+          report=json.loads((base/"mhcc-modern-complete-bounded-linked-osis-structure.json").read_text())
+          ledger=report["source_original_link_review_ledger"]
+          native=json.loads((base/"mhcc-modern-whole-canon-native-receipt.json").read_text())
+          manifest=json.loads(Path("work/mhcc-modern/production/ADDITIONAL_ORIGINAL_LINK_TARGET_ERRATA_2026-11-18.json").read_text())
+          previous=(base/"mhcc-modern-proposed-errata-navigation.osis.xml").read_bytes()
+          preview,receipt=build_private_additional_source_errata_preview(
+              prior_private_osis=previous,manifest=manifest,ledger=ledger,native=native)
+          assert receipt["status"]=="PRIVATE_ADDITIONAL_SOURCE_LINK_REVIEW_NOT_EDITED_OR_RELEASED"
+          assert receipt["original_source_link_occurrences_provisionally_reviewed"]==11
+          assert receipt["secondary_witness_proposed_navigation_targets"]==15
+          assert receipt["original_and_modern_edition_text_unchanged"]
+          assert receipt["prior_private_note_and_link_structure_unchanged"]
+          assert not receipt["editorial_approval"] and not receipt["public_distribution"]
+          # Demonstrate fail-closed native SHA, linked target, printed label, proposed target and approval checks.
+          for mutation in ("source_sha","literal_target","visible_label","approval","candidate"):
+              corrupted=copy.deepcopy(manifest)
+              case=corrupted["cases"][0]
+              if mutation=="source_sha":
+                  case["original_native_unit_sha256"]="0"*64
+              elif mutation=="literal_target":
+                  case["original_osisRef"]="Gen.1.1"
+              elif mutation=="visible_label":
+                  case["original_link_label"]="unverified"
+              elif mutation=="approval":
+                  case["approval"]=True
+              else:
+                  case["proposed_destinations"]=["Unknown.1.1"]
+              try:
+                  build_private_additional_source_errata_preview(
+                      prior_private_osis=previous,manifest=corrupted,
+                      ledger=ledger,native=native)
+              except ValueError:
+                  pass
+              else:
+                  raise AssertionError("Additional link review accepted untrusted "+mutation)
+          (base/"mhcc-modern-additional-unapproved-links.osis.xml").write_bytes(preview)
+          (base/"mhcc-modern-additional-unapproved-link-receipt.json").write_text(
+              json.dumps(receipt,sort_keys=True,indent=2)+"\\n")
+          print("ELEVEN EXTRA ORIGINAL LINK CANDIDATES SOURCE-PINNED: 11 source K/ordinal, 15 "
+                "secondary-witness destinations in distinct PRIVATE unapproved notes, 5 "
+                "tampering failures; no text or source edits, no publishing")
+          PY
+          mkdir -p "$RUNNER_TEMP/mhcc-additional-link-root/mods.d"
+          mkdir -p "$RUNNER_TEMP/mhcc-additional-link-root/modules/comments/zcom/mhccadditional"
+          timeout 240s osis2mod \\
+            "$RUNNER_TEMP/mhcc-additional-link-root/modules/comments/zcom/mhccadditional" \\
+            "$RUNNER_TEMP/mhcc-modern-additional-unapproved-links.osis.xml" \\
+            -z z -b 3 \\
+            > "$RUNNER_TEMP/mhcc-additional-link-osis2mod.log" 2>&1
+          cat > "$RUNNER_TEMP/mhcc-additional-link-root/mods.d/mhccadditional.conf" <<'EOF'
+          [MHCCADDITIONAL]
+          Description=Private source-pinned eleven additional unapproved link review notes
+          DataPath=./modules/comments/zcom/mhccadditional/
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          Lang=en
+          Versification=KJV
+          SourceType=OSIS
+          DistributionLicense=Private
+          EOF
+          python - <<'PY'
+          import hashlib,json,os,subprocess,sys
+          from collections import defaultdict
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+          sys.path.insert(0,"scripts")
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          base=Path(os.environ["RUNNER_TEMP"])
+          receipt=json.loads((base/"mhcc-modern-additional-unapproved-link-receipt.json").read_text())
+          expected=defaultdict(list)
+          for row in receipt["original_source_K_ordinal_proposed_navigation_hashes"]:
+              expected[row["source_first_key"]].append(row["candidate_references"])
+          assert len(expected)==10 and sum(map(len,expected.values()))==11
+          old=json.loads((base/"mhcc-modern-complete-bounded-linked-osis-structure.json").read_text())[
+              "private_unapproved_errata_navigation_preview"]
+          older=defaultdict(list)
+          for row in old["original_source_K_ordinal_proposed_navigation_hashes"]:
+              older[row["source_first_key"]].append(row["candidate_references"])
+          seen={}
+          seen_older={}
+          def confirm(notes, proposals, key):
+              if len(notes)!=len(proposals):
+                  raise ValueError("Proposed original source K errata notes changed count")
+              count=0
+              for note,ref_rows in zip(notes,proposals):
+                  refs=[node for node in note.iter() if isinstance(node.tag,str)
+                        and node.tag.rsplit("}",1)[-1]=="reference"]
+                  if len(refs)!=len(ref_rows):
+                      raise ValueError("Proposed one-to-many navigation drift")
+                  for ref,expected_row in zip(refs,ref_rows):
+                      literal=ref.get("osisRef") or ""
+                      label="".join(ref.itertext())
+                      if (hashlib.sha256(literal.encode()).hexdigest()!=
+                              expected_row["candidate_target_sha256"]
+                          or hashlib.sha256(label.encode()).hexdigest()!=
+                              expected_row["candidate_derived_display_sha256"]):
+                          raise ValueError("Private additional compiled SWORD link changed")
+                      count+=1
+              return count
+          def observe(kind,key,raw):
+              if kind!="K" or (key not in expected and key not in older):
+                  return
+              node=ET.fromstring(b"<derived>"+raw+b"</derived>")
+              notes=[x for x in node.iter() if isinstance(x.tag,str)
+                     and x.tag.rsplit("}",1)[-1]=="note"]
+              if key in expected:
+                  if key in seen:
+                      raise ValueError("Duplicate additional K in compiled module")
+                  rows=[x for x in notes if x.get("resp")==
+                        "BibleResourcesPrivateUnapprovedAdditionalLinkReview"]
+                  seen[key]=confirm(rows,expected[key],key)
+              if key in older:
+                  if key in seen_older:
+                      raise ValueError("Duplicate original four-link preview K")
+                  rows=[x for x in notes if x.get("resp")==
+                        "BibleResourcesPrivateUnapprovedOriginalErrataPreview"]
+                  seen_older[key]=confirm(rows,older[key],key)
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str((base/"mhcc-additional-link-root").resolve())
+          proc=subprocess.Popen([
+              str((base/"commentary-modern-source-raw").resolve()),
+              "MHCCADDITIONAL"],env=env,stdout=subprocess.PIPE,
+              stderr=subprocess.DEVNULL)
+          try:
+              _,numbered,_,_=parse_native_raw_corpus(proc.stdout,on_entry=observe)
+              proc.stdout.close()
+              if proc.wait(timeout=120)!=0:
+                  raise ValueError("Additional-link private SWORD reader failed")
+          finally:
+              if proc.poll() is None:
+                  proc.kill();proc.wait()
+          assert set(seen)==set(expected) and sum(seen.values())==15
+          assert set(seen_older)==set(older) and sum(seen_older.values())==13
+          assert len(numbered)==28792
+          print("PRIVATE UNAPPROVED ADDITIONAL LINK SWORD READBACK PASS: "
+                "11 additional source-owned notes, 15 matching navigation targets, "
+                "all 4 earlier preview notes/13 proposed targets retained, "
+                "28792 numbered addresses; NO original source edits or release")
+          PY
       - name: Probe actual diatheke rendering of source-notes and proposed-repair alternatives
         shell: bash
         run: |
