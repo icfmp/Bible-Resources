@@ -1,5 +1,15 @@
 # Complete MHC (CrossWire 2.2) — private technical closeout
 
+> **Owner licensing decision (2026-11-19):** CrossWire's official MHC 2.2
+> **Public Domain — Copy Freely** designation is accepted as the working
+> rights basis for this resource. This is an owner's project-level source
+> choice; it is not an independent legal determination about every
+> derivative, territory, or CCEL/Logos contribution, and does **not** grant
+> final publication or PR-merge approval. Any earlier “rights HOLD” text
+> below describes the historical open research and must be read with this
+> superseding decision.
+>
+
 **Status:** SOURCE-FIDELITY TECHNICAL PASS / READER PRESENTATION PARTIAL / PUBLICATION HOLD.  
 **Scope:** [Issue #285](https://github.com/icfmp/Bible-Resources/issues/285), [draft PR #286](https://github.com/icfmp/Bible-Resources/pull/286). No changes to the separate `icfmp/Bible` application.
 
