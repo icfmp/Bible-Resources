@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "status": "PRIVATE_original_Greek_composite_Strong_word_specific_lexical_headword_review",
+  "source_editions": {
+    "ubs_greek_edition": "1.0",
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8",
+    "macula_sblgnt_revision": "8423afe47b9e8f24b7772e808af45c7159a6fe7e"
+  },
+  "editorial_policy": {
+    "original_macula_word_id_required": true,
+    "original_compound_strong_preserved_exactly": true,
+    "original_greek_nfc_headword_exact": true,
+    "require_original_bilingual_ubs_ln_corroboration": true,
+    "require_source_grammatical_class_compatible": true,
+    "preserve_separate_original_ubs_strong_codes": true,
+    "never_alias_macula_composite_to_ubs_strong": true,
+    "no_contextual_ubs_lexid_inferred": true,
+    "old_index_and_word_annotations_unmodified": true,
+    "no_publication": true
+  },
+  "reviewed_families": [
+    {
+      "lemma_nfc": "ὑπερεκπερισσοῦ",
+      "original_macula_strong": "5228+1537+4053",
+      "ubs_main_id": "005125000000000",
+      "original_macula_class": "adv",
+      "original_word_count": 3,
+      "source_original_ln_code": "78.34",
+      "original_ubs_strong_codes": [
+        "G4053a"
+      ],
+      "original_ubs_pos_en": [
+        "prep. (with gen.), advb."
+      ],
+      "original_ubs_pos_fr": [
+        "prep. (avec gen.), advb."
+      ],
+      "editorial_basis": "The three exact original MACULA word IDs have lemma ὑπερεκπερισσοῦ, original composite Strong 5228+1537+4053, source adverb class and original LN 78.34, which uniquely agrees with pinned UBS EN and FR original Greek headword and lexical code. UBS source Strong G4053a is recorded separately and is NOT asserted to be an interchangeable original Strong. Approve only the word-specific lexical headword identity; preserve all source annotation and decline contextual LEXID inference. One original attested occurrence, 1 Thessalonians 5:13 (word ID n52005013004), has no original LN annotation at all. It is authorized for original-word HEADWORD identity ONLY based on its identical exact Greek lemma, same authentic original compound Strong and independent adverb class; its missing LN remains missing and is never borrowed from other source word IDs.",
+      "exact_original_word_ids_with_missing_ln_allowed": [
+        "n52005013004"
+      ]
+    },
+    {
+      "lemma_nfc": "δισμυριάς",
+      "original_macula_strong": "1417+3461",
+      "ubs_main_id": "001382000000000",
+      "original_macula_class": "noun",
+      "original_word_count": 1,
+      "source_original_ln_code": "60.9",
+      "original_ubs_strong_codes": [
+        "G1364a"
+      ],
+      "original_ubs_pos_en": [
+        "noun, f."
+      ],
+      "original_ubs_pos_fr": [
+        "nom, f."
+      ],
+      "editorial_basis": "One exact original Greek source word ID has authentic lemma δισμυριάς, original composite Strong 1417+3461, original noun class and source LN 60.9 corroborated independently by the unique pinned UBS EN and FR original headword. UBS source G1364a is a distinct source annotation, not an invented replacement for the MACULA compound. Approve lexical headword identity only at that original word ID; no contextual semantic LEXID.",
+      "exact_original_word_ids_with_missing_ln_allowed": []
+    },
+    {
+      "lemma_nfc": "ἐκπερισσῶς",
+      "original_macula_strong": "1537+4053",
+      "ubs_main_id": "001612000000000",
+      "original_macula_class": "adv",
+      "original_word_count": 1,
+      "source_original_ln_code": "78.31",
+      "original_ubs_strong_codes": [
+        "G4053b"
+      ],
+      "original_ubs_pos_en": [
+        "advb."
+      ],
+      "original_ubs_pos_fr": [
+        "advb."
+      ],
+      "editorial_basis": "One original Greek word ID has the exact source lemma ἐκπερισσῶς, original composite Strong 1537+4053, adverb lexical class and original Louw–Nida 78.31. The original UBS v1.0 English and French lexica independently attest a unique Greek lemma and matching lexical code, despite UBS source Strong G4053b differing from MACULA's original components. Preserve both originals, approve only the exact word-specific headword, and infer no contextual LEXID.",
+      "exact_original_word_ids_with_missing_ln_allowed": []
+    }
+  ],
+  "previous_source_word_headword_reviews": 9189,
+  "source_word_headword_review_count": 5,
+  "strict_lemma_ln_unapproved_original_words": 1,
+  "other_original_words_without_equivalent_ubs_headword": 456
+}

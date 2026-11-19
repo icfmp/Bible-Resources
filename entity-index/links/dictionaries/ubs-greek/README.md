@@ -591,3 +591,71 @@ This is **lexical entry/headword evidence only, not accuracy of
 contextual semantic senses**. All new evidence is maintained in
 private expiring GitHub Actions artifacts, not SWORD or application
 downloads. No source Greek or historical `index.json` is modified.
+
+## Source-reviewed composite Strong lexical headwords and coverage accounting
+
+The [composite Strong audit](audit_composite_strong_original_words.py)
+identifies **five exact original MACULA word IDs** in three families,
+each with one independently source-attested Greek UBS v1.0 EN/FR
+lexical headword. The
+[explicit source-word review ledger](v1_reviewed_composite_strong_headwords.json)
+and [validator](build_reviewed_composite_strong_headwords.py) accept only
+**headword identity at those original word IDs**:
+
+| Original Greek lemma | Source Strong (unaltered) | Word IDs | UBS headword MainId | Original UBS Strong (separate) |
+| --- | --- | ---: | --- | --- |
+| `ὑπερεκπερισσοῦ` | `5228+1537+4053` | 3 | `005125000000000` | `G4053a` |
+| `δισμυριάς` | `1417+3461` | 1 | `001382000000000` | `G1364a` |
+| `ἐκπερισσῶς` | `1537+4053` | 1 | `001612000000000` | `G4053b` |
+
+Four original word IDs have their own authentic Louw–Nida
+corroboration: `78.34`, `60.9` or `78.31` as applicable.
+**One original occurrence, `n52005013004` at 1 Thessalonians
+5:13, has an empty original LN annotation.** This is explicitly
+recorded as **entry/headword only** using its real exact original
+Greek lemma and original adverb class; its LN remains empty. The
+source LN value must **not** be copied from the other occurrences in
+the family. Neither source Strong nor UBS Strong is rewritten or
+treated as a universal alias, and no contextual UBS `LEXID` is
+inferred.
+
+### Corrected original-word coverage accounting
+
+A source word already present in the review overlay is **not a newly
+covered word** merely because its status is promoted from a preview
+to an editorially reviewed lexical headword. This is checked
+generically by
+[the word-coverage invariant validator](validate_word_coverage_invariants.py)
+and its negative tests across the complete reviewed candidate pipeline.
+
+| Distinct original-word metric | Count |
+| --- | ---: |
+| Original SBLGNT word IDs | 137,741 |
+| Existing historical Strong-based candidate word IDs | 128,090 |
+| Additional **distinct** word-ID lexical entry candidates | 9,195 |
+| Original words with **any** lexical entry candidate | **137,285** |
+| Of the additional candidates: reviewed headword identities | **9,194** |
+| Of the additional candidates: unapproved original preview | **1** (`ὁπότε`) |
+| Original words with source-reviewed lexical headwords, including baseline | **137,284** |
+| Original words without source-reviewed lexical headwords | **457** |
+| Original words without **any** lexical entry candidate | **456** |
+| Historical multiple-entry Strong cases (already in baseline, not added again) | 224 |
+| Original Strong ambiguity cases independently reviewed by word ID | 220 |
+| Original Strong ambiguity cases still unresolved | 4 |
+
+The **456** without any lexical entry candidate have no
+NFC-identical or case-only original UBS headword in the pinned UBS
+dictionary; they remain unchanged. The single strict preview
+`ὁπότε` has a lexicographic taxonomy discrepancy
+(MACULA `conj` versus UBS `advb.`) and is not silently approved.
+The historic baseline's 224 multiply headed Strong entries are
+retained even though 220 have independent original-word lexical
+headword evidence.
+
+This final arithmetic distinguishes *candidate coverage* from
+*editorially reviewed headword support*, and **neither is a measure
+of uniquely determined contextual UBS senses**. No original Greek,
+Strong, LN, morphology, verse, historical `index.json` or original
+lexicon entry is modified. All reviewed word-level results remain
+**private expiring CI artifacts, not a published SWORD resource or
+Bible application integration**.

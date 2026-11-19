@@ -157,8 +157,8 @@ def review(candidate, source, ledger, english, french):
     output["word_aware_coverage"] = {
         **candidate["word_aware_coverage"],
         "editorially_reviewed_original_word_headwords": 9189,
-        "word_aware_entry_candidate_words": 137314,
-        "remaining_no_ubs_headword_candidate_original_words": 427,
+        "word_aware_entry_candidate_words": 137280,
+        "remaining_no_ubs_headword_candidate_original_words": 461,
         "new_source_ubs_case_only_original_word_lexical_headwords": 3,
         "other_unapproved_word_headword_candidates": 1,
         "new_inferred_contextual_lexical_sense_ids": 0,
