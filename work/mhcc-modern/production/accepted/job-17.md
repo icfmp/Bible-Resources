@@ -25,7 +25,7 @@ Our time on earth is coming to an end.
 
 We should use its remaining days wisely, preparing for eternity.
 
-The righteous should learn from Job's troubles, whether they came through God's permission, hostile enemies or unkind friends.
+The righteous should learn from Job's troubles, whether they came **from God, from enemies or from friends**.
 
 Instead of becoming discouraged from serving God because Job, his faithful servant, was treated so severely, believers should become more determined to persevere.
 
@@ -56,6 +56,8 @@ While our bodies rest in the grave, our souls may enjoy **the rest God has reser
 ---
 
 ## Editorial review — Job 17
+
+**2026-11-19 secondary-witness fidelity repair (unapproved draft):** The previous Job 17:1–9 wording recast Henry's three-source enumeration *from God, from enemies, and from friends* as *through God's permission* plus enemy/friend action. Restored the explicit original categories against [CCEL Job 17](https://ccel.org/ccel/henry/mhcc.xix.xvii.html). Exact published-source and independent editorial acceptance remain separate gates.
 
 **Entire secondary original-English witness inspected:** [CCEL, Job 17](https://ccel.org/ccel/henry/mhcc.xix.xvii.html). Released **MHCC 0.1.1** remains original source, native key/markup and independent acceptance pending.
 
