@@ -1623,10 +1623,35 @@ jobs:
           # fetching only part of the WebKit/GTK dependency closure. Use the
           # canonical Ubuntu archive instead of silently increasing timeouts
           # against the same stalled regional mirror.
-          sources=/etc/apt/sources.list.d/ubuntu.sources
-          if sudo test -f "$sources" && sudo grep -q 'us-east-2.ec2.archive.ubuntu.com' "$sources"; then
-            sudo sed -i 's|http://us-east-2.ec2.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' "$sources"
+          # GitHub Ubuntu images may use an EC2 mirror via a traditional
+          # sources.list, Deb822 sources OR an apt-mirrors indirection. An
+          # edit to ubuntu.sources alone did not cover all images; the
+          # preceding real GUI run timed out fetching WebKit from EC2.
+          # Restrict replacement to the specific known slow Ubuntu mirror;
+          # do not overwrite security/third-party package sources.
+          for sources in /etc/apt/sources.list /etc/apt/sources.list.d/ubuntu.sources \
+              /etc/apt/apt-mirrors.txt /etc/apt/mirrors.txt; do
+            if sudo test -f "$sources" && sudo grep -q 'us-east-2.ec2.archive.ubuntu.com' "$sources"; then
+              sudo sed -i \
+                -e 's|http://us-east-2.ec2.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' \
+                -e 's|https://us-east-2.ec2.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' \
+                "$sources"
+            fi
+          done
+          # An apt mirror alias can additionally live under apt/mirrors/.
+          if sudo test -d /etc/apt/mirrors; then
+            for sources in /etc/apt/mirrors/*; do
+              if sudo test -f "$sources" && sudo grep -q 'us-east-2.ec2.archive.ubuntu.com' "$sources"; then
+                sudo sed -i \
+                  's|us-east-2.ec2.archive.ubuntu.com|archive.ubuntu.com|g' "$sources"
+              fi
+            done
           fi
+          # Record only resulting trusted Ubuntu archive hosts.
+          sudo grep -hE '^(URIs:|deb |http)' \
+            /etc/apt/sources.list /etc/apt/sources.list.d/ubuntu.sources \
+            /etc/apt/apt-mirrors.txt /etc/apt/mirrors.txt 2>/dev/null \
+            | sed -E 's|https?://([^/ ]+).*|\\1|' | sort -u || true
           export DEBIAN_FRONTEND=noninteractive
           timeout 120s sudo apt-get -o Acquire::Retries=1 \
             -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 update -qq
