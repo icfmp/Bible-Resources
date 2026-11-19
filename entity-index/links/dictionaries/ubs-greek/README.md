@@ -327,3 +327,51 @@ historical `index.json`, both original dictionaries and all source
 Strong, Greek, morphological and LN annotations remain unchanged.
 All newer outputs remain **private, expiring Actions review artifacts**,
 not published SWORD/Bible resources.
+
+## Fifth Greek source-word lexical headword review — 1,218 lemma-only occurrences
+
+The complete [original-source no-LN audit](audit_remaining_no_ln.py)
+verifies all 137,741 pinned MACULA SBLGNT word IDs against the original
+bilingual UBS Greek NT Dictionary 1.0. Among the original **3,249**
+lexical lemma-only/no-common-UBS-Louw–Nida occurrences, **2,031** original
+`εἰμί` word IDs were already separately reviewed as entry-only
+headwords. The other **1,218** source word IDs belong to exactly eight
+Greek lexical families:
+
+| Original Greek lemma | Source words | Original UBS POS evidence |
+| --- | ---: | --- |
+| `ἑαυτοῦ` | 493 | `prfl.` reflexive pronoun |
+| `σύ` | 445 | `pprs.` personal pronoun |
+| `οὗτος` | 248 | `pdem.` demonstrative pronoun |
+| `ἐγώ` | 17 | `pprs.` personal pronoun |
+| `ῥέω` | 10 | English `verb`, French `verbe` |
+| `ἄρχω` | 3 | English `verb`, French `verbe` |
+| `εἷς` | 1 | `adjc.` |
+| `προοράω` | 1 | English `verb`, French `verbe` |
+
+The [eight-family explicit review ledger](v1_reviewed_no_ln_families_batch5.json)
+and [original-word verifier](build_reviewed_no_ln_batch5.py) confirm
+each source word ID, exact Greek NFC headword, unique UBS original
+bilingual MainId, original source Strong, original morphology/reference,
+part of speech and the **absence of a matching original lexical LN code**.
+This supports **lexical headword identity only**, not a contextual meaning.
+No UBS `LEXID` is chosen, no source LN or Strong is rewritten and no global
+Strong alias is created. It is an explicitly distinct review decision
+from the earlier LN-corroborated word-ID batches.
+
+The resulting additional source-reviewed word-specific headwords total
+**9,152**, alongside the original unchanged **128,090** Strong-derived
+entry candidates: **137,242 / 137,741** original Greek words have
+source-attested lexical entry candidates. The previous **35** explicitly
+unapproved source-POS/Strong conflicts, **459** without an NFC-identical
+UBS source headword and **five** unsupported composite Strong forms
+remain unresolved (499 original source words). The existing 224
+multiply headed Strong-based candidates remain ambiguous and are
+not silently reduced to one entry.
+
+This is **not lexical sense/context accuracy**, and does not imply
+a new downloadable resource or a Bible app integration. The complete
+source-reviewed overlay is built and independently verified in CI as
+a **private, expiring Actions review artifact**, while historical
+`index.json` and all original Greek/Strong/LN/morphological source
+data stay byte-for-byte unchanged.
