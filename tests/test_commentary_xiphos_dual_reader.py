@@ -225,6 +225,45 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
         self.assertEqual(len(pointer), 2)
         self.assertTrue(all("--sync" not in command for command in pointer))
 
+    def test_chapter_intro_witness_requires_distinct_original_intro_prose(self):
+        # Different independently received streams model source-born chapter I
+        # and following verse K; a verse-only copy can never prove I was shown.
+        verse = " ".join("expositionword%03d" % i for i in range(120)).encode()
+        intro = " ".join("prefaceword%03d" % i for i in range(120)).encode()
+        scripture = b"independent test Bible verse only"
+        probe = {"2Chr 1:1": {
+            "commentary": verse,
+            "bible": scripture,
+            "commentary_internal": b"<div/>",
+            "intro_expected": intro,
+        }}
+
+        def observe(copied):
+            with patch("commentary_xiphos_dual_reader._main_xiphos_window",
+                       return_value="101"), \
+                 patch("commentary_xiphos_dual_reader._commentary_pane_focus_points",
+                       return_value=((960, 320),)), \
+                 patch("commentary_xiphos_dual_reader._seed_x11_clipboard"), \
+                 patch("commentary_xiphos_dual_reader._optional_real_rich_xiphos_selection",
+                       return_value=None), \
+                 patch("commentary_xiphos_dual_reader.time.sleep"), \
+                 patch("commentary_xiphos_dual_reader._x11", return_value=copied):
+                return attempt_real_xiphos_passage_copy(
+                    {"DISPLAY": ":91", "GDK_BACKEND": "x11"}, probe)
+
+        verse_only = observe(verse)
+        self.assertTrue(verse_only["commentary_clipboard_match_by_passage"]["2Chr 1:1"])
+        self.assertFalse(verse_only["chapter_intro_prose_clipboard_match_by_passage"]
+                         ["2Chr 1:1"])
+        self.assertEqual(verse_only["bounded_right_commentary_pane_focus_attempts_by_passage"]
+                         ["2Chr 1:1"], 2)
+        with_intro = observe(verse + b" " + intro)
+        self.assertTrue(with_intro["commentary_clipboard_match_by_passage"]["2Chr 1:1"])
+        self.assertTrue(with_intro["chapter_intro_prose_clipboard_match_by_passage"]
+                        ["2Chr 1:1"])
+        self.assertEqual(with_intro["bounded_right_commentary_pane_focus_attempts_by_passage"]
+                         ["2Chr 1:1"], 1)
+
     def test_inconclusive_gui_copy_is_bounded_and_does_not_invent_prose(self):
         from commentary_xiphos_dual_reader import attempt_real_xiphos_passage_copy
         probes={"Isa 63:1":{
