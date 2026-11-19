@@ -206,23 +206,7 @@ jobs:
           rel = Path("entity-index/links/dictionaries/ubs-hebrew/reviewed_word_anchor_preview.json")
           observed = json.loads(Path("/tmp/bsi-ubs-reviewed-word-preview.json").read_text(encoding="utf-8"))
           expected = json.loads(rel.read_text(encoding="utf-8"))
-          if observed != expected:
-              print("REVIEWED_PREVIEW_DIFF_TOP_LEVEL", [
-                  k for k in sorted(set(observed) | set(expected))
-                  if observed.get(k) != expected.get(k)
-              ])
-              aw = observed.get("by_macula_word", {})
-              ew = expected.get("by_macula_word", {})
-              print("REVIEWED_PREVIEW_DIFFERING_WORDS", len([
-                  k for k in set(aw) | set(ew) if aw.get(k) != ew.get(k)
-              ]))
-              mismatches = {
-                  k: aw.get(k) for k in sorted(set(aw) | set(ew))
-                  if aw.get(k) != ew.get(k)
-              }
-              print("REVIEWED_PREVIEW_ALL_SOURCE_MISMATCHES",
-                    json.dumps(mismatches, ensure_ascii=False, sort_keys=True))
-              raise AssertionError("Reviewed anchor preview differs from pinned WLC")
+          assert observed == expected, "Reviewed anchor preview differs from pinned WLC"
           assert observed["summary"] == {
               "reviewed_families": 81,
               "reviewed_family_occurrences_not_automatically_linked": 274,
