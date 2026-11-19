@@ -293,3 +293,37 @@ accuracy. No extra `LEXID` has been inferred, no original Strong or
 source Greek text has been changed, and no Bible app or SWORD publication
 has been performed. The CI-generated output is a temporary **private**
 Actions artifact, not a released index.
+
+## Fourth Greek lexical review batch — 138 source word IDs, seven deferred families
+
+The [fourth explicit source-specific ledger](v1_reviewed_families_batch4.json)
+and [source-word verifier](build_reviewed_families_batch4.py) review
+**138 additional exact original SBLGNT word IDs in 101 lexical families**.
+These families have matching NFC original Greek headwords, exact source
+UBS v1.0 EN/FR Louw–Nida corroboration, compatible original MACULA and
+UBS lexicographic classes (noun, verb, adjective, adverb, preposition,
+conjunction), preserved nonzero original Strong witness and complete
+original reference/morphology/word-ID evidence. No individual word gains a
+contextual UBS `LEXID`, and no Strong number is globally aliased.
+
+The separate ledger explicitly **defers 35 words in seven families**:
+`τεσσεράκοντα` 22 and `ἐνενήκοντα` 4 (MACULA numeral vs UBS
+`adjc.`), `ὅστις` 5 (MACULA pronoun vs UBS `prel.`),
+`ὁ` 1 (MACULA determiner vs UBS `artc.`),
+`ὁπότε` 1 (MACULA conjunction vs UBS `advb.`),
+and `ἄμωμον` and `Ἀρνί` one each (source original Strong `0`).
+These are **source-specific lexical classification and annotation
+differences**, not missing Greek words. None is silently altered to
+satisfy an artificial coverage target.
+
+Source-reviewed new original-word headwords now total **7,934**, plus the
+original unchanged **128,090** Strong-based candidate words: combined
+**136,024 / 137,741** have lexical entry candidates. This is not
+contextual-sense accuracy. The **35** strict candidates above, the other
+1,218 lemma-only/no matching UBS LN, 459 no matching UBS headword and five
+composite Strong cases remain outside the reviewed candidate. The original
+224 multiple-headword entries are still explicitly ambiguous. The
+historical `index.json`, both original dictionaries and all source
+Strong, Greek, morphological and LN annotations remain unchanged.
+All newer outputs remain **private, expiring Actions review artifacts**,
+not published SWORD/Bible resources.

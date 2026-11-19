@@ -32,6 +32,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_eimi_disposition.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_no_ln_headwords.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_families_batch3.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_families_batch4.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -290,6 +291,60 @@ jobs:
           }
           print("GREEK_BATCH3_VERIFIED_155_EXACT_ORIGINAL_WORD_HEADWORDS_PRIVATE_ONLY")
           PY
+      - name: Audit 173 still-unapproved Greek source tokens after third editorial batch
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_remaining_173.py \
+            --residual /tmp/bsi-ubs-greek-328-original-family-evidence.json \
+            --batch3 entity-index/links/dictionaries/ubs-greek/v1_reviewed_families_batch3.json \
+            --output /tmp/bsi-ubs-greek-173-original-word-evidence.json
+      - name: Review 138 source-attested Greek word IDs in 101 exact lexical families
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_families_batch4.py \
+            --candidate /tmp/bsi-ubs-greek-reviewed-batch3-private.json \
+            --residual328 /tmp/bsi-ubs-greek-328-original-family-evidence.json \
+            --third_ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_families_batch3.json \
+            --residual173 /tmp/bsi-ubs-greek-173-original-word-evidence.json \
+            --ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_families_batch4.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --output /tmp/bsi-ubs-greek-reviewed-batch4-private.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          from collections import Counter
+          c=json.loads(Path("/tmp/bsi-ubs-greek-reviewed-batch4-private.json").read_text())
+          base=json.loads(Path("entity-index/links/dictionaries/ubs-greek/index.json").read_text())
+          assert all(c[k]==v for k,v in base.items())
+          assert len(c["by_macula_word"])==7969
+          assert c["editorial_candidate"]["reviewed_original_headword_words_total"]==7934
+          assert c["editorial_candidate"]["other_original_words_still_unapproved"]==35
+          assert c["editorial_candidate"]["new_inferred_contextual_lexical_sense_ids"]==0
+          assert c["editorial_candidate"]["publication_approved"] is False
+          assert Counter(w["match_type"] for w in c["by_macula_word"].values())=={
+            "source_reviewed_original_greek_pronoun_headword_only": 5033,
+            "source_reviewed_original_greek_headword_batch2_only": 577,
+            "source_reviewed_original_greek_entry_only_without_ubs_ln": 2031,
+            "source_reviewed_original_greek_headword_batch3_only": 155,
+            "source_reviewed_original_greek_headword_batch4_only": 138,
+            "nfc_canonically_identical_lemma_and_original_ln_unapproved_word_candidate": 35,
+          }
+          assert all("sense_id" not in w for w in c["by_macula_word"].values())
+          print("UBS_GREEK_138_ADDITIONAL_ORIGINAL_HEADWORDS_REVIEWED_NO_SENSE_NO_PUBLICATION")
+          PY
+      - name: Upload source-reviewed Greek fourth lexical batch (PRIVATE, NOT published)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-138-word-headword-review-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-reviewed-batch4-private.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload 173 still-unapproved Greek word witnesses (PRIVATE ONLY)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-173-unapproved-original-word-families-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-173-original-word-evidence.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload original Greek batch3 headword review (PRIVATE, NOT published)
         uses: actions/upload-artifact@v4
         with:
