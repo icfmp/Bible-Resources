@@ -3943,7 +3943,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 93,
+      "static_reference_count": 94,
       "static_references": [
         "scripts/audit_real_pilot.py",
         "scripts/bible_intake.py",
@@ -3995,6 +3995,7 @@
         "scripts/stage_verified_stock_commentary.py",
         "scripts/tool_registry.py",
         ".github/workflows/commentary-mhc-source-text.yml",
+        ".github/workflows/commentary-modern-source-receipt.yml",
         ".github/workflows/lsg-fidelity.yml",
         ".github/workflows/pilot-preflight.yml",
         "docs/PILOT_SEGOND_MHC.md",

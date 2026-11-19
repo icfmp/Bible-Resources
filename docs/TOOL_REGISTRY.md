@@ -121,7 +121,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/note_whitespace_diagnostics.py`](../scripts/note_whitespace_diagnostics.py) | UNDECIDED | named test | 5 | not determined |
 | [`scripts/osis_semantic_fidelity.py`](../scripts/osis_semantic_fidelity.py) | UNDECIDED | named test | 2 | not determined |
 | [`scripts/pilot_fetch.py`](../scripts/pilot_fetch.py) | KEEP_GENERIC | not established | 23 | not determined |
-| [`scripts/pilot_preflight.py`](../scripts/pilot_preflight.py) | KEEP_GENERIC | named test | 93 | not determined |
+| [`scripts/pilot_preflight.py`](../scripts/pilot_preflight.py) | KEEP_GENERIC | named test | 94 | not determined |
 | [`scripts/pilot_runtime.py`](../scripts/pilot_runtime.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/pilot_subprocess.py`](../scripts/pilot_subprocess.py) | UNDECIDED | named test | 15 | not determined |
 | [`scripts/prepare_darby_011_private_release_candidate.py`](../scripts/prepare_darby_011_private_release_candidate.py) | HISTORICAL/ARCHIVE | named test | 3 | publication/release |
