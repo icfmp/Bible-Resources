@@ -3874,6 +3874,201 @@ def build_private_primary_source_strict_quarantine(
     }
 
 
+def prepare_private_source_strict_release_candidate(
+        *, strict_osis: bytes, native: dict, ledger: dict,
+        erroneous_links: dict, candidate: dict,
+        strict_receipt: dict) -> tuple[bytes, dict]:
+    """Prepare an *unshipped* distinct-ID SWORD work from exact-source draft.
+
+    Suspected original digital/printed links remain visible as unlinked, marked
+    original-reference index text. They may NEVER be silently re-targeted to
+    secondary-witness guesses or propagated as clickable wrong destinations.
+    """
+    from commentary_modern_draft_osis_preview import NS
+
+    corpus = native.get("original_compiled_corpus_sha256")
+    if (candidate.get("status") !=
+            "PRIVATE_SOURCE_STRICT_MODERN_SWORD_CANDIDATE_NOT_APPROVED"
+            or candidate.get("candidate_sword_id") != "MHCCMODRC"
+            or candidate.get("candidate_version") != "0.0.0"
+            or candidate.get("source_module") != "MHCC 0.1.1"
+            or candidate.get("original_native_corpus_sha256") != corpus
+            or strict_receipt.get("status") !=
+            "PRIVATE_PRIMARY_SOURCE_ONLY_TWO_WITNESS_BLOCKS_EXCLUDED_NOT_RELEASE"
+            or strict_receipt.get("source_native_corpus_sha256") != corpus
+            or strict_receipt.get("CCEL_only_modern_blocks_quarantined_in_alternative") != 2
+            or erroneous_links.get("status") !=
+            "ORIGINAL_DIGITAL_SOURCE_LINK_DISCREPANCIES_REVIEW_ONLY_NOT_APPLIED"
+            or erroneous_links.get("original_corpus_sha256") != corpus
+            or ledger.get("status") !=
+            "SOURCE_NATIVE_WHOLE_CANON_HYPERLINK_DISPOSITION_QUEUE_NOT_FINAL_APPROVAL"
+            or any(candidate.get(flag) is not False for flag in (
+                "source_original_edited", "modern_chapter_manuscripts_edited",
+                "unapproved_link_retargeting_applied",
+                "separately_edited_ccel_only_additions_included",
+                "rights_and_redistribution_approved",
+                "independent_editorial_signoff", "xiphos_gui_accepted",
+                "andbible_gui_accepted", "publishing_authorized"))
+            or any(erroneous_links.get(flag) is not False for flag in (
+                "original_source_modified", "modern_chapter_prose_modified",
+                "proposed_navigation_approved", "publication_authorized"))
+            or ledger.get("publication_authorized") is not False):
+        raise ValueError("Private candidate/primary source/rights status is not authenticated")
+    if (candidate.get("expected_chapters") != 1189
+            or candidate.get("expected_compiled_authored_groups") != 4049
+            or candidate.get("expected_numbered_verse_keys") != 28792
+            or candidate.get("expected_source_attested_book_introductions") != 56
+            or candidate.get("source_note_digital_or_printed_wrong_targets_disabled") != 11
+            or candidate.get("ccel_only_leaf_blocks_withheld") != 2
+            or candidate.get("source_native_earlier_malformed_targets_excluded") != 4
+            or candidate.get("source_native_spurious_markup_links_excluded") != 9
+            or candidate.get("candidate_work_id_is_temporary") is not True
+            or candidate.get("candidate_distribution") !=
+            "PRIVATE_CI_TEMPORARY_NO_PUBLIC_ARTIFACT_NO_CATALOGUE"):
+        raise ValueError("Private candidate release policy or structural ledger changed")
+    cases = erroneous_links.get("cases")
+    if (not isinstance(cases, list) or len(cases) != 11
+            or any(c.get("approval") is not False for c in cases)):
+        raise ValueError("Private candidate needs precisely 11 unapproved source links")
+    by_identity = {
+        (row["source_first_key"], row["source_reference_ordinal"]): row
+        for row in ledger.get("pending", [])
+    }
+    if len(by_identity) != len(ledger.get("pending", [])):
+        raise ValueError("Source original K reference ordinal collision")
+
+    root = ET.fromstring(strict_osis)
+    osis_texts = root.findall(f"./{{{NS}}}osisText")
+    if len(osis_texts) != 1:
+        raise ValueError("Private candidate must originate in one canonical OSIS work")
+    osis = osis_texts[0]
+    header = osis.find(f"{{{NS}}}header")
+    work = header.find(f"{{{NS}}}work") if header is not None else None
+    if (work is None or work.get("osisWork") != osis.get("osisIDWork")
+            or not (osis.get("osisIDWork") or "").startswith("MHCC")):
+        raise ValueError("Cannot bind a foreign source work to the private candidate")
+    chap_nodes = {node.get("osisID"): node for node in root.iter()
+                  if node.tag == f"{{{NS}}}chapter"}
+    if len(chap_nodes) != 1189 or set(chap_nodes) != set(native.get("chapters", {})):
+        raise ValueError("Private release candidate has wrong canonical chapter inventory")
+    sections = {
+        chapter: chap.findall(f"./{{{NS}}}div[@annotateType='commentary']")
+        for chapter, chap in chap_nodes.items()
+    }
+    if sum(map(len, sections.values())) != 4049:
+        raise ValueError("Private SWORD candidate lost a source-authored section")
+    chapter_text_before = {
+        name: "".join(chap.itertext()) for name, chap in chap_nodes.items()
+    }
+    references_before = [r for r in root.iter() if r.tag == f"{{{NS}}}reference"]
+    included_before = [(r.get("osisRef"), "".join(r.itertext()))
+                       for r in references_before]
+
+    removed = set()
+    proof = []
+    seen_keys = set()
+    for case in cases:
+        first = case.get("source_first_key")
+        ordinal = case.get("source_reference_ordinal")
+        key = (first, ordinal)
+        source_row = by_identity.get(key)
+        if (key in seen_keys or not isinstance(first, str)
+                or type(ordinal) is not int or source_row is None):
+            raise ValueError("Wrong source hyperlink not in signed original review queue")
+        seen_keys.add(key)
+        target = case.get("original_osisRef")
+        label = case.get("original_link_label")
+        if (not isinstance(target, str) or not isinstance(label, str)
+                or hashlib.sha256(target.encode()).hexdigest() !=
+                    case.get("original_target_sha256")
+                or hashlib.sha256(label.encode()).hexdigest() !=
+                    case.get("original_label_sha256")
+                or source_row.get("original_osisRef_sha256") !=
+                    case.get("original_target_sha256")
+                or source_row.get("original_visible_label_sha256") !=
+                    case.get("original_label_sha256")):
+            raise ValueError("Source original hyperlink target/label SHA drift")
+        chapter = first.rsplit(".", 1)[0]
+        groups = native["chapters"][chapter]["original_units"]
+        positions = [i for i, group in enumerate(groups)
+                     if group["first_key"] == first and
+                     group["source_unit_sha256"] ==
+                     case.get("original_native_unit_sha256")]
+        if len(positions) != 1 or len(groups) != len(sections[chapter]):
+            raise ValueError("Private candidate K ownership or raw native SHA changed")
+        section = sections[chapter][positions[0]]
+        original_note = [child for child in section
+                         if child.tag == f"{{{NS}}}note"
+                         and child.get("resp") ==
+                         "BibleResourcesPrivateSourceOnlyLinkSupplement"]
+        if len(original_note) != 1:
+            raise ValueError("Unreviewed bad source link was moved from its K note")
+        expected_display = _source_link_supplement_display(target)
+        matches = [r for r in original_note[0]
+                   if r.tag == f"{{{NS}}}reference" and
+                   r.get("osisRef") == target and
+                   "".join(r.itertext()) == expected_display]
+        if len(matches) != 1:
+            raise ValueError("Source note target/display not uniquely present at its K")
+        node = matches[0]
+        if id(node) in removed:
+            raise ValueError("Original wrong target was reused by a second ordinal")
+        removed.add(id(node))
+        node.tag = f"{{{NS}}}seg"
+        node.attrib.clear()
+        node.set("type", "x-original-link-target-quarantined")
+        node.set("resp", "BibleResourcesOriginalLinkTargetUnapproved")
+        proof.append({
+            "source_first_K": first,
+            "source_link_ordinal": ordinal,
+            "published_original_K_sha256": case["original_native_unit_sha256"],
+            "original_target_sha256": case["original_target_sha256"],
+            "original_label_sha256": case["original_label_sha256"],
+            "candidate_non_navigable_display_sha256":
+                hashlib.sha256(expected_display.encode()).hexdigest(),
+        })
+
+    expected_refs = [(r.get("osisRef"), "".join(r.itertext()))
+                     for r in references_before if id(r) not in removed]
+    after_refs = [(r.get("osisRef"), "".join(r.itertext()))
+                  for r in root.iter() if r.tag == f"{{{NS}}}reference"]
+    if (len(removed) != 11 or len(included_before) - len(after_refs) != 11
+            or after_refs != expected_refs
+            or {name: "".join(node.itertext()) for name, node in chap_nodes.items()}
+               != chapter_text_before):
+        raise ValueError("Candidate quarantine changed prose or any unrelated reference")
+    osis.set("osisIDWork", "MHCCMODRC")
+    work.set("osisWork", "MHCCMODRC")
+    identifiers = work.findall(f"{{{NS}}}identifier")
+    titles = work.findall(f"{{{NS}}}title")
+    descriptions = work.findall(f"{{{NS}}}description")
+    if len(identifiers) != 1 or len(titles) != 1 or len(descriptions) != 1:
+        raise ValueError("Private candidate source OSIS work metadata incomplete")
+    identifiers[0].text = "MHCCMODRC"
+    titles[0].text = "Matthew Henry's Concise Commentary — Modern English (private proof)"
+    descriptions[0].text = (
+        "Private unpublished source-strict technical release candidate; "
+        "original source-link errors disabled, editorial/rights/reader "
+        "acceptance and public distribution NOT authorized.")
+    serial = ET.tostring(root, encoding="utf-8", xml_declaration=True)
+    ET.fromstring(serial)
+    return serial, {
+        "status": "PRIVATE_MODERN_SWORD_PREFLIGHT_NOT_RELEASE",
+        "candidate_sword_id": "MHCCMODRC",
+        "published_original_corpus_sha256": corpus,
+        "modern_canonical_chapters": len(chap_nodes),
+        "native_K_and_I_only_authored_sections": sum(map(len, sections.values())),
+        "disabled_suspect_original_link_occurrences": len(removed),
+        "nonquarantined_literal_target_and_display_list_unchanged": True,
+        "all_modern_visible_chapter_text_unchanged": True,
+        "CCEL_only_modern_expositions_excluded": 2,
+        "public_distribution": False,
+        "editorial_approval": False,
+        "rights_approval": False,
+        "quarantined_source_K_link_identity_hashes": proof,
+    }
+
+
 def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                                     native: dict, identities: dict,
                                     dispositions: dict, repo_root: Path,
