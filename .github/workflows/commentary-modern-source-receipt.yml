@@ -3033,6 +3033,111 @@ jobs:
                 str(sum(map(len,expected.values())))+" recovered original K citations in intro, "+
                 str(sum(found_notes.values()))+" still K notes, 28792 K keys, real reader PASS; no release")
           PY
+      - name: Compile separate primary-source-strict candidate with CCEL-only material quarantined
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import copy,json,os,sys
+          from pathlib import Path
+          sys.path.insert(0,"scripts")
+          from commentary_modern_reference_gate import (
+              build_private_primary_source_strict_quarantine)
+          base=Path(os.environ["RUNNER_TEMP"])
+          native=json.loads((base/"mhcc-modern-whole-canon-native-receipt.json").read_text())
+          manifest=json.loads(Path("work/mhcc-modern/production/PRIMARY_SOURCE_STRICT_TWO_SECTION_QUARANTINE_2026-11-19.json").read_text())
+          source=(base/"mhcc-modern-private-prefaces-plus-recovered-original-crossrefs.osis.xml").read_bytes()
+          output,receipt=build_private_primary_source_strict_quarantine(
+              conservative_osis=source,manifest=manifest,native=native)
+          assert receipt["status"]=="PRIVATE_PRIMARY_SOURCE_ONLY_TWO_WITNESS_BLOCKS_EXCLUDED_NOT_RELEASE"
+          assert receipt["CCEL_only_modern_blocks_quarantined_in_alternative"]==2
+          assert receipt["original_K_body_groups_and_verse_aliases_unchanged"]
+          assert receipt["original_and_authentic_derivative_scripture_links_unchanged"]
+          assert receipt["published_source_or_accepted_modern_manuscripts_changed"] is False
+          assert receipt["editorial_or_publication_approval"] is False
+          for invalid in ("source_K_SHA", "section_heading", "approval"):
+              changed=copy.deepcopy(manifest)
+              if invalid=="source_K_SHA":
+                  changed["cases"][0]["original_source_K_raw_sha256"]="0"*64
+              elif invalid=="section_heading":
+                  changed["cases"][0]["quarantined_ccel_only_heading"]="Unattested segment"
+              else:
+                  changed["public_release_authorized"]=True
+              try:
+                  build_private_primary_source_strict_quarantine(
+                      conservative_osis=source,manifest=changed,native=native)
+              except ValueError:
+                  pass
+              else:
+                  raise AssertionError("Source-strict preview accepted tampering: "+invalid)
+          (base/"mhcc-modern-strict-primary-only.osis.xml").write_bytes(output)
+          (base/"mhcc-modern-strict-primary-only-receipt.json").write_text(
+              json.dumps(receipt,sort_keys=True,indent=2)+"\n")
+          print("PRIVATE CONSERVATIVE PRIMARY MHCC 0.1.1 PREVIEW: 2 separately verified "
+                "CCEL-only modern blocks excluded from an independent candidate, "
+                "all original K group keys, source links, book prefaces and modern "
+                "draft manuscripts preserved; 3 fail-closed tamper tests")
+          PY
+          mkdir -p "$RUNNER_TEMP/mhcc-primary-strict-root/mods.d"
+          mkdir -p "$RUNNER_TEMP/mhcc-primary-strict-root/modules/comments/zcom/mhccprimary"
+          timeout 240s osis2mod \
+            "$RUNNER_TEMP/mhcc-primary-strict-root/modules/comments/zcom/mhccprimary" \
+            "$RUNNER_TEMP/mhcc-modern-strict-primary-only.osis.xml" \
+            -z z -b 3 > "$RUNNER_TEMP/mhcc-primary-strict-osis2mod.log" 2>&1
+          cat > "$RUNNER_TEMP/mhcc-primary-strict-root/mods.d/mhccprimary.conf" <<'EOF'
+          [MHCCPRIMARY]
+          Description=Private 0.1.1 strict source-only derivative review; CCEL-only text quarantined
+          DataPath=./modules/comments/zcom/mhccprimary/
+          ModDrv=zCom
+          CompressType=ZIP
+          BlockType=CHAPTER
+          Lang=en
+          Versification=KJV
+          SourceType=OSIS
+          DistributionLicense=Private
+          EOF
+          python - <<'PY'
+          import json,os,subprocess,sys
+          from pathlib import Path
+          from xml.etree import ElementTree as ET
+          sys.path.insert(0,"scripts")
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          base=Path(os.environ["RUNNER_TEMP"])
+          receipt=json.loads((base/"mhcc-modern-strict-primary-only-receipt.json").read_text())
+          expected={r["source_first_K"]:r["chapter"] for r in receipt["cases"]}
+          assert len(expected)==2
+          seen=set()
+          manifest=json.loads(Path("work/mhcc-modern/production/PRIMARY_SOURCE_STRICT_TWO_SECTION_QUARANTINE_2026-11-19.json").read_text())
+          by_key={r["original_source_first_K"]:r for r in manifest["cases"]}
+          def observe(kind,key,raw):
+              if kind!="K" or key not in expected:
+                  return
+              if key in seen:
+                  raise ValueError("Private source-strict K duplicate")
+              rendered="".join(ET.fromstring(b"<derived>"+raw+b"</derived>").itertext())
+              case=by_key[key]
+              if (case["keep_original_source_matched_heading"] not in rendered
+                  or case["quarantined_ccel_only_heading"] in rendered):
+                  raise ValueError("Source-strict SWORD readback included witness-only section")
+              seen.add(key)
+          env=os.environ.copy()
+          env["SWORD_PATH"]=str((base/"mhcc-primary-strict-root").resolve())
+          proc=subprocess.Popen([str((base/"commentary-modern-source-raw").resolve()),
+              "MHCCPRIMARY"],env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+          try:
+              _,numbered,_,_=parse_native_raw_corpus(proc.stdout,on_entry=observe)
+              proc.stdout.close()
+              if proc.wait(timeout=120)!=0:
+                  raise ValueError("Source-strict private SWORD native readback incomplete")
+          finally:
+              if proc.poll() is None:
+                  proc.kill();proc.wait()
+          assert seen==set(expected) and len(numbered)==28792
+          print("SOURCE-STRICT WHOLE CANON SWORD PASS: 2 exact-source missing "
+                "digital sections quarantined only in disposable alternative, "
+                "28792 native numbered keys preserved, no authorial source rewrite "
+                "or public module published")
+          PY
       - name: Compile all 51 original-first-K book-prefaces in private SWORD and verify native-I readback
         shell: bash
         run: |
