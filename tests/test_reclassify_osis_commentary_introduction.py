@@ -107,6 +107,32 @@ class IntroductionMoveTests(unittest.TestCase):
             receipt["all_original_source_notes_references_and_title_text_identical"])
         self.assertFalse(receipt["all_original_source_notes_references_and_titles_identical"])
         self.assertEqual(fixed,repair_private_bytes(raw,plan)[0])
+        # lxml exposes XML comments/processing instructions in list(book).
+        # They are not extra heading elements and must survive byte-for-byte.
+        annotated = raw.replace(
+            b'<title type="x-ms">',
+            b'<!-- archival heading note: keep as originally placed -->'
+            b'<?archival original?>'
+            b'<title type="x-ms">',
+        )
+        revised_plan=reviewed(annotated)
+        titled=etree.fromstring(annotated).xpath(
+            "//*[local-name()='title' and @type='x-ms']")[0]
+        revised_plan["preverse_title"]={
+            "original_line":titled.sourceline,
+            "old_type":"x-ms","new_type":"chapter",
+        }
+        annotated_fixed, annotated_receipt=repair_private_bytes(
+            annotated,revised_plan)
+        self.assertIn(
+            b'<!-- archival heading note: keep as originally placed -->',
+            annotated_fixed)
+        self.assertIn(b'<?archival original?>',annotated_fixed)
+        self.assertTrue(
+            annotated_receipt["reviewed_preverse_title_type_reclassified"])
+        self.assertEqual(
+            "".join(etree.fromstring(annotated_fixed).itertext()),
+            "".join(etree.fromstring(annotated).itertext()))
         # No unreviewed title coercion, wrong line or changed original type.
         with self.assertRaises(IntroRepairError):
             repair_private_bytes(raw,reviewed(raw))
