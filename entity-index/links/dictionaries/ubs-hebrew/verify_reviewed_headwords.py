@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify five reviewed cross-Strong UBS headword identities against pinned sources.
+"""Verify manually reviewed UBS headword identities against pinned sources.
 
 Manual lexical entry decisions are distinct from automatic index links. Never
 infer a contextual LEXID/SDBH sense, or a universal H/A Strong equivalence.
@@ -16,6 +16,20 @@ from pathlib import Path
 UBS_STRONG = re.compile(r"^([HA])0*([0-9]+)[a-z]?$")
 ORIGINAL_STRONG = re.compile(r"^[0-9]+[a-z]?$")
 DISPOSITION = "source_reviewed_ubs_headword_entry_only"
+VALID_REASONS = {
+    "different_strong_exact_attested_lemma",
+    "different_strong_same_consonants",
+    "same_strong_family_unresolved",
+}
+
+
+def consonants(text):
+    """Compare Hebrew consonants with original shin/sin identity retained."""
+    decomposed = unicodedata.normalize("NFD", text)
+    return "".join(
+        char for char in decomposed
+        if not unicodedata.combining(char) or char in ("\u05c1", "\u05c2")
+    )
 
 
 def norm(text):
@@ -42,7 +56,8 @@ def verify_register(ledger, register):
         reviewed.add(k)
         f = families.get(k)
         if (f is None
-                or f["reason"] != "different_strong_exact_attested_lemma"
+                or f["reason"] not in VALID_REASONS
+                or d.get("candidate_relation") != f["reason"]
                 or f["ubs_candidate_entries"] != [d["ubs_candidate_main_id"]]):
             raise ValueError("Family absent, ambiguous, or candidate source changed")
         if (f["occurrences"] != d["original_occurrences"]
@@ -60,7 +75,8 @@ def verify_register(ledger, register):
         ev = d.get("evidence", {})
         if (not ev.get("ubs_dictionary_page", "").startswith(
                 "https://freely-given.org/OBD/UBS/Heb/")
-                or not ev.get("ubs_cited_passage")):
+                or not ev.get("ubs_cited_passage")
+                or not ev.get("ubs_attested_gloss")):
             raise ValueError("Missing lexical sense and passage evidence")
         if d["lang"] not in ("H", "A") or not ORIGINAL_STRONG.fullmatch(d["original_strong"]):
             raise ValueError("Malformed original lexical family key")
@@ -82,20 +98,43 @@ def verify_dictionary(ledger, entries):
         entry = by_id.get(d["ubs_candidate_main_id"])
         if entry is None:
             raise ValueError("Reviewed original UBS headword disappeared")
-        form_set = {norm(x) for x in (
-            entry["Lemma"], *(entry.get("AlternateLemmas") or ()))
-            if isinstance(x, str) and x}
-        if norm(d["lemma"]) not in form_set:
-            raise ValueError("UBS published canonical/alternate lemma changed")
-        source_full_code = d["lang"] + d["original_strong"]
-        codes = entry.get("StrongCodes") or []
-        if source_full_code in codes:
-            raise ValueError("Cross-Strong discrepancy no longer exists")
-        # The source code difference is *not* made into a global Strong alias.
-        if not any(UBS_STRONG.fullmatch(str(code)) for code in codes):
-            raise ValueError("Missing valid pinned UBS Strong metadata")
+        forms = [entry["Lemma"], *(entry.get("AlternateLemmas") or ())]
+        form_set = {norm(x) for x in forms if isinstance(x, str) and x}
+        source_number = int(re.match(r"^[0-9]+", d["original_strong"]).group(0))
+        source_family = any(
+            (m := UBS_STRONG.fullmatch(str(code)))
+            and m.group(1) == d["lang"]
+            and int(m.group(2)) == source_number
+            for code in (entry.get("StrongCodes") or [])
+        )
+        relation = d["candidate_relation"]
+        if relation == "same_strong_family_unresolved":
+            if not source_family:
+                raise ValueError("Pinned UBS numeric Strong family changed")
+        else:
+            if source_family:
+                raise ValueError("Different-Strong original family now shares numeric Strong")
+            if relation == "different_strong_exact_attested_lemma":
+                if norm(d["lemma"]) not in form_set:
+                    raise ValueError("UBS published canonical/alternate lemma changed")
+            elif relation == "different_strong_same_consonants":
+                if not any(isinstance(form, str) and
+                           consonants(form) == consonants(d["lemma"])
+                           for form in forms):
+                    raise ValueError("UBS consonantal candidate changed")
+            else:
+                raise ValueError("Unsupported reviewed lexical candidate relation")
         if not entry.get("BaseForms"):
             raise ValueError("UBS headword no longer has lexical form metadata")
+        glosses = {
+            gloss
+            for form in entry["BaseForms"]
+            for sense in (form.get("LEXMeanings") or [])
+            for language in (sense.get("LEXSenses") or [])
+            for gloss in (language.get("Glosses") or [])
+        }
+        if d["evidence"]["ubs_attested_gloss"] not in glosses:
+            raise ValueError("Reviewed meaning absent from pinned UBS lexical source")
 
 
 def verify_macula(review, macula):
@@ -138,7 +177,7 @@ def main():
         json.loads(args.english.read_text(encoding="utf-8")),
         args.macula,
     )
-    if result != {"families": 17, "occurrences": 154, "word_witnesses": 41}:
+    if result != {"families": 34, "occurrences": 218, "word_witnesses": 86}:
         raise ValueError("Pinned editorial review counts unexpectedly changed")
     print("UBS_PINNED_REVIEWED_HEADWORDS", json.dumps(result, sort_keys=True))
 

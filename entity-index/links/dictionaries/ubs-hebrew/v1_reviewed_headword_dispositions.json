@@ -4,7 +4,7 @@
     "macula_revision": "47db250bd55d0d8577f2a94fba114ef16c35b23c",
     "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8"
   },
-  "policy": "Five independently interpreted UBS Hebrew v0.9.4 headword identities: source-word-specific family approvals for entry-level crosswalk candidates only. Do not treat Strong spelling, H/A prefix, or old SDBH equality alone as equivalence; do not infer contextual sense IDs. These are editorial dispositions, not generated index links. External dictionary web display corroborates sense/context but the pinned original UBS/MACULA metadata is verified by CI. Added twelve distinct named-entity entry reviews grounded in original Ezra/Daniel referents, and preserved context/sense abstention for homonymous names.",
+  "policy": "Five independently interpreted UBS Hebrew v0.9.4 headword identities: source-word-specific family approvals for entry-level crosswalk candidates only. Do not treat Strong spelling, H/A prefix, or old SDBH equality alone as equivalence; do not infer contextual sense IDs. These are editorial dispositions, not generated index links. External dictionary web display corroborates sense/context but the pinned original UBS/MACULA metadata is verified by CI. Added twelve distinct named-entity entry reviews grounded in original Ezra/Daniel referents, and preserved context/sense abstention for homonymous names. Published UBS English headword sense glosses are now source-checked as evidence of reviewed *entry* identity, not assigned as any WLC contextual sense; same-Strong and cross-Strong spellings are validated by separate source-bound relations.",
   "decisions": [
     {
       "lang": "A",
@@ -40,9 +40,11 @@
       "editorial_meaning": "Daniel, the protagonist of the book of Daniel",
       "evidence": {
         "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/%D7%93%D6%BC%D6%B8%D7%A0%D6%B4%D7%99%D6%BC%D6%B5%D7%90%D7%9C.htm",
-        "ubs_cited_passage": "DAN 2:13–20"
+        "ubs_cited_passage": "DAN 2:13–20",
+        "ubs_attested_gloss": "Daniel"
       },
-      "rationale": "UBS headword explicitly has a distinct Daniel-the-book protagonist meaning (Form 1, sense 4) and lists Dan 2:13–20. Source Dan 2:13 refers to that same named figure. The headword can be identified while its contextual sense ID remains unassigned; the headword also records other men named Daniel."
+      "rationale": "UBS headword explicitly has a distinct Daniel-the-book protagonist meaning (Form 1, sense 4) and lists Dan 2:13–20. Source Dan 2:13 refers to that same named figure. The headword can be identified while its contextual sense ID remains unassigned; the headword also records other men named Daniel.",
+      "candidate_relation": "different_strong_exact_attested_lemma"
     },
     {
       "lang": "A",
@@ -78,9 +80,11 @@
       "editorial_meaning": "human, human being, man",
       "evidence": {
         "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/%D7%90%D6%B1%D7%A0%D6%B8%D7%A9%D7%81.htm",
-        "ubs_cited_passage": "EZR 4:11"
+        "ubs_cited_passage": "EZR 4:11",
+        "ubs_attested_gloss": "human"
       },
-      "rationale": "UBS expressly treats this form as human/person and cites Ezra 4:11 and 6:11 alongside Dan 2:10. The original Aramaic word denotes a human, not an unrelated equal-spelling Hebrew homograph."
+      "rationale": "UBS expressly treats this form as human/person and cites Ezra 4:11 and 6:11 alongside Dan 2:10. The original Aramaic word denotes a human, not an unrelated equal-spelling Hebrew homograph.",
+      "candidate_relation": "different_strong_exact_attested_lemma"
     },
     {
       "lang": "A",
@@ -116,9 +120,11 @@
       "editorial_meaning": "day, time; days of old",
       "evidence": {
         "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/%D7%99%D7%95%D6%B9%D7%9D.htm",
-        "ubs_cited_passage": "EZR 4:15"
+        "ubs_cited_passage": "EZR 4:15",
+        "ubs_attested_gloss": "day"
       },
-      "rationale": "The UBS entry covers day/time and specifically documents the Aramaic phrase 'day of old' at Ezra 4:15 and 4:19 (sense 8). The exact original word family corresponds to that headword. Do not infer which sense applies to each of the 16 tokens."
+      "rationale": "The UBS entry covers day/time and specifically documents the Aramaic phrase 'day of old' at Ezra 4:15 and 4:19 (sense 8). The exact original word family corresponds to that headword. Do not infer which sense applies to each of the 16 tokens.",
+      "candidate_relation": "different_strong_exact_attested_lemma"
     },
     {
       "lang": "A",
@@ -154,9 +160,11 @@
       "editorial_meaning": "Belshazzar, king of Babylon",
       "evidence": {
         "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/%D7%91%D6%BC%D6%B5%D7%9C%D6%B0%D7%A9%D7%81%D6%B7%D7%90%D7%A6%D6%BC%D6%B7%D7%A8.htm",
-        "ubs_cited_passage": "DAN 5:1"
+        "ubs_cited_passage": "DAN 5:1",
+        "ubs_attested_gloss": "Belshazzar"
       },
-      "rationale": "UBS explicitly identifies the Babylonian king Belshazzar and cites Daniel 5:1–2. The source original token at Daniel 5:1 names that ruler, not Belteshazzar/Daniel."
+      "rationale": "UBS explicitly identifies the Babylonian king Belshazzar and cites Daniel 5:1–2. The source original token at Daniel 5:1 names that ruler, not Belteshazzar/Daniel.",
+      "candidate_relation": "different_strong_exact_attested_lemma"
     },
     {
       "lang": "A",
@@ -192,9 +200,11 @@
       "editorial_meaning": "head of cattle, bull",
       "evidence": {
         "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/%D7%AA%D6%BC%D7%95%D6%B9%D7%A8.htm",
-        "ubs_cited_passage": "EZR 6:9"
+        "ubs_cited_passage": "EZR 6:9",
+        "ubs_attested_gloss": "head of cattle"
       },
-      "rationale": "The UBS combined headword explicitly distinguishes Form 5 'head of cattle' with citations Ezra 6:9, 6:17, 7:17 and Daniel 4:25. The original Aramaic source uses the cattle noun. Approve only the containing headword, never automatically choose the unrelated Form 1 'dove' or fabricate a contextual sense."
+      "rationale": "The UBS combined headword explicitly distinguishes Form 5 'head of cattle' with citations Ezra 6:9, 6:17, 7:17 and Daniel 4:25. The original Aramaic source uses the cattle noun. Approve only the containing headword, never automatically choose the unrelated Form 1 'dove' or fabricate a contextual sense.",
+      "candidate_relation": "different_strong_exact_attested_lemma"
     },
     {
       "lang": "A",
@@ -230,9 +240,11 @@
       "editorial_meaning": "Israel, the people or nation, as referred to in the Aramaic Ezra 5:1 witness",
       "evidence": {
         "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
-        "ubs_cited_passage": "EZR 5:1"
+        "ubs_cited_passage": "EZR 5:1",
+        "ubs_attested_gloss": "Israel"
       },
-      "rationale": "The source says the God of Israel (Ezra 5:1), and UBS identifies the uniquely written Israel headword. The dictionary headword may also encompass the personal name Jacob/Israel; no individual contextual sense is selected."
+      "rationale": "The source says the God of Israel (Ezra 5:1), and UBS identifies the uniquely written Israel headword. The dictionary headword may also encompass the personal name Jacob/Israel; no individual contextual sense is selected.",
+      "candidate_relation": "different_strong_exact_attested_lemma"
     },
     {
       "lang": "A",
@@ -268,9 +280,11 @@
       "editorial_meaning": "Cyrus, the Persian king responsible for the rebuilding decree",
       "evidence": {
         "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
-        "ubs_cited_passage": "EZR 5:13"
+        "ubs_cited_passage": "EZR 5:13",
+        "ubs_attested_gloss": "Cyrus"
       },
-      "rationale": "Ezra 5:13 explicitly names Cyrus the king. UBS indexes Cyrus under the same pointed lemma; the different source Strong annotation must not be made a general H/A alias."
+      "rationale": "Ezra 5:13 explicitly names Cyrus the king. UBS indexes Cyrus under the same pointed lemma; the different source Strong annotation must not be made a general H/A alias.",
+      "candidate_relation": "different_strong_exact_attested_lemma"
     },
     {
       "lang": "A",
@@ -306,9 +320,11 @@
       "editorial_meaning": "Judah, the region or province referred to in Ezra",
       "evidence": {
         "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
-        "ubs_cited_passage": "EZR 5:1"
+        "ubs_cited_passage": "EZR 5:1",
+        "ubs_attested_gloss": "Judah"
       },
-      "rationale": "Ezra 5:1–8 concerns the province of Judah, not a separate unrelated personal name. UBS groups the named Jehud/Judah location under this exact indexed headword."
+      "rationale": "Ezra 5:1–8 concerns the province of Judah, not a separate unrelated personal name. UBS groups the named Jehud/Judah location under this exact indexed headword.",
+      "candidate_relation": "different_strong_exact_attested_lemma"
     },
     {
       "lang": "A",
@@ -344,9 +360,11 @@
       "editorial_meaning": "Artaxerxes, the Persian king addressed in Ezra 4",
       "evidence": {
         "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
-        "ubs_cited_passage": "EZR 4:8"
+        "ubs_cited_passage": "EZR 4:8",
+        "ubs_attested_gloss": "Artaxerxes"
       },
-      "rationale": "Ezra 4:8 and 4:11 explicitly address King Artaxerxes; UBS indexes Artaxerxes with this published original alternate spelling. This entry-level identity does not judge which historically distinct royal titulature or source variant applies."
+      "rationale": "Ezra 4:8 and 4:11 explicitly address King Artaxerxes; UBS indexes Artaxerxes with this published original alternate spelling. This entry-level identity does not judge which historically distinct royal titulature or source variant applies.",
+      "candidate_relation": "different_strong_exact_attested_lemma"
     },
     {
       "lang": "A",
@@ -382,9 +400,11 @@
       "editorial_meaning": "Media / Medes, named geographical-ethnic referent",
       "evidence": {
         "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
-        "ubs_cited_passage": "EZR 6:2"
+        "ubs_cited_passage": "EZR 6:2",
+        "ubs_attested_gloss": "Media"
       },
-      "rationale": "Ezra 6:2 places the record in Media, and Daniel 5:28 names the Medes. UBS includes Media/Medes under its Madai headword; avoid selecting between person, people and territory senses for the family."
+      "rationale": "Ezra 6:2 places the record in Media, and Daniel 5:28 names the Medes. UBS includes Media/Medes under its Madai headword; avoid selecting between person, people and territory senses for the family.",
+      "candidate_relation": "different_strong_exact_attested_lemma"
     },
     {
       "lang": "A",
@@ -420,9 +440,11 @@
       "editorial_meaning": "Rehum, royal official named in Ezra 4",
       "evidence": {
         "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
-        "ubs_cited_passage": "EZR 4:8"
+        "ubs_cited_passage": "EZR 4:8",
+        "ubs_attested_gloss": "Rehum"
       },
-      "rationale": "Rehum is the specifically named official at Ezra 4:8 and 4:9, a referent represented in UBS Rehum's namesake headword. No broader identity merge across other Rehums is approved."
+      "rationale": "Rehum is the specifically named official at Ezra 4:8 and 4:9, a referent represented in UBS Rehum's namesake headword. No broader identity merge across other Rehums is approved.",
+      "candidate_relation": "different_strong_exact_attested_lemma"
     },
     {
       "lang": "A",
@@ -453,9 +475,11 @@
       "editorial_meaning": "Zechariah, prophet in Ezra 5:1 and 6:14",
       "evidence": {
         "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
-        "ubs_cited_passage": "EZR 5:1"
+        "ubs_cited_passage": "EZR 5:1",
+        "ubs_attested_gloss": "Zechariah"
       },
-      "rationale": "The named prophet Zechariah son of Iddo prophesies alongside Haggai in Ezra 5:1; UBS Zechariah headword includes this named prophet among other people with the same name, whose senses remain distinct."
+      "rationale": "The named prophet Zechariah son of Iddo prophesies alongside Haggai in Ezra 5:1; UBS Zechariah headword includes this named prophet among other people with the same name, whose senses remain distinct.",
+      "candidate_relation": "different_strong_exact_attested_lemma"
     },
     {
       "lang": "A",
@@ -486,9 +510,11 @@
       "editorial_meaning": "Haggai, the prophet in Ezra 5:1 and 6:14",
       "evidence": {
         "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
-        "ubs_cited_passage": "EZR 5:1"
+        "ubs_cited_passage": "EZR 5:1",
+        "ubs_attested_gloss": "Haggai"
       },
-      "rationale": "The prophet Haggai named beside Zechariah in Ezra 5:1 and 6:14 is the person recorded under the UBS Haggai headword. No contextual sense ID transferred."
+      "rationale": "The prophet Haggai named beside Zechariah in Ezra 5:1 and 6:14 is the person recorded under the UBS Haggai headword. No contextual sense ID transferred.",
+      "candidate_relation": "different_strong_exact_attested_lemma"
     },
     {
       "lang": "A",
@@ -514,9 +540,11 @@
       "editorial_meaning": "Moses, associated with priestly duties in Ezra 6:18",
       "evidence": {
         "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
-        "ubs_cited_passage": "EZR 6:18"
+        "ubs_cited_passage": "EZR 6:18",
+        "ubs_attested_gloss": "Moses"
       },
-      "rationale": "Ezra 6:18 refers to the written Law of Moses, the biblical leader; UBS Moses headword identifies this name. Do not infer a contextual sense beyond the dictionary entry."
+      "rationale": "Ezra 6:18 refers to the written Law of Moses, the biblical leader; UBS Moses headword identifies this name. Do not infer a contextual sense beyond the dictionary entry.",
+      "candidate_relation": "different_strong_exact_attested_lemma"
     },
     {
       "lang": "A",
@@ -542,9 +570,11 @@
       "editorial_meaning": "Jeshua, son of Jozadak, in Ezra 5:2",
       "evidence": {
         "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
-        "ubs_cited_passage": "EZR 5:2"
+        "ubs_cited_passage": "EZR 5:2",
+        "ubs_attested_gloss": "Jeshua"
       },
-      "rationale": "Ezra 5:2 names Jeshua together with Zerubbabel and identifies his father Jozadak, supporting the UBS Jeshua headword while preserving distinction from other namesakes."
+      "rationale": "Ezra 5:2 names Jeshua together with Zerubbabel and identifies his father Jozadak, supporting the UBS Jeshua headword while preserving distinction from other namesakes.",
+      "candidate_relation": "different_strong_exact_attested_lemma"
     },
     {
       "lang": "A",
@@ -570,9 +600,11 @@
       "editorial_meaning": "Jozadak, father of Jeshua, in Ezra 5:2",
       "evidence": {
         "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
-        "ubs_cited_passage": "EZR 5:2"
+        "ubs_cited_passage": "EZR 5:2",
+        "ubs_attested_gloss": "Jozadak"
       },
-      "rationale": "The original Ezra 5:2 occurrence names Jozadak as Jeshua's father; UBS uses the Jozadak/Jehozadak headword for that individual. No conflation with an unrelated similar name."
+      "rationale": "The original Ezra 5:2 occurrence names Jozadak as Jeshua's father; UBS uses the Jozadak/Jehozadak headword for that individual. No conflation with an unrelated similar name.",
+      "candidate_relation": "different_strong_exact_attested_lemma"
     },
     {
       "lang": "A",
@@ -598,9 +630,661 @@
       "editorial_meaning": "Hananiah, Daniel's companion, in Daniel 2:17",
       "evidence": {
         "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
-        "ubs_cited_passage": "DAN 2:17"
+        "ubs_cited_passage": "DAN 2:17",
+        "ubs_attested_gloss": "Hananiah"
       },
-      "rationale": "Daniel 2:17 names Hananiah among Daniel's companions, matching UBS Hananiah headword, which can also hold other people with that name; no selection of a contextual sense ID."
+      "rationale": "Daniel 2:17 names Hananiah among Daniel's companions, matching UBS Hananiah headword, which can also hold other people with that name; no selection of a contextual sense ID.",
+      "candidate_relation": "different_strong_exact_attested_lemma"
+    },
+    {
+      "lang": "A",
+      "lemma": "אֲרְיוֹךְ",
+      "original_strong": "0746a",
+      "original_occurrences": 5,
+      "original_source_classes": {
+        "noun": 5
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "000683001002000",
+          "original_word_id": "o270020140062",
+          "reference": "DAN 2:14!6"
+        },
+        {
+          "original_sdbh": "000683001002000",
+          "original_word_id": "o270020150032",
+          "reference": "DAN 2:15!3"
+        },
+        {
+          "original_sdbh": "000683001002000",
+          "original_word_id": "o270020150171",
+          "reference": "DAN 2:15!17"
+        }
+      ],
+      "ubs_candidate_main_id": "000682000000000",
+      "candidate_relation": "different_strong_same_consonants",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Arioch, the captain of Nebuchadnezzar's guard in Daniel 2:14",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "DAN 2:14",
+        "ubs_attested_gloss": "Arioch"
+      },
+      "rationale": "The UBS Arioch headword independently distinguishes the guard captain serving Nebuchadnezzar from the earlier king of Ellasar; the original Daniel 2:14 reference names the guard captain. Approve only the containing headword, not a contextual LEXID."
+    },
+    {
+      "lang": "A",
+      "lemma": "מְלַל",
+      "original_strong": "4449",
+      "original_occurrences": 5,
+      "original_source_classes": {
+        "verb": 5
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "004067002002000",
+          "original_word_id": "o270060220051",
+          "reference": "DAN 6:22!5"
+        },
+        {
+          "original_sdbh": "004067002002000",
+          "original_word_id": "o270070080271",
+          "reference": "DAN 7:8!27"
+        },
+        {
+          "original_sdbh": "004067002002000",
+          "original_word_id": "o270070110101",
+          "reference": "DAN 7:11!10"
+        }
+      ],
+      "ubs_candidate_main_id": "004070000000000",
+      "candidate_relation": "different_strong_same_consonants",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "the Aramaic verb for speaking in Daniel 6:22",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "DAN 6:22",
+        "ubs_attested_gloss": "to speak"
+      },
+      "rationale": "The original Daniel 6:22 word refers to speaking, and the UBS combined מלל headword explicitly contains a separate verbal meaning 'to speak'. Related withering or circumcision meanings in the same entry are not imported into the original token."
+    },
+    {
+      "lang": "A",
+      "lemma": "עֲשַׂב",
+      "original_strong": "6212a",
+      "original_occurrences": 5,
+      "original_source_classes": {
+        "noun": 5
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o270040120192",
+          "reference": "DAN 4:12!19"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o270040220102",
+          "reference": "DAN 4:22!10"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o270040290091",
+          "reference": "DAN 4:29!9"
+        }
+      ],
+      "ubs_candidate_main_id": "005704000000000",
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "grass / vegetation in Daniel 4:12",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "DAN 4:12",
+        "ubs_attested_gloss": "grass"
+      },
+      "rationale": "The Aramaic word in Nebuchadnezzar's tree dream at Daniel 4:12 denotes vegetation; UBS's published source headword contains grass/green plants despite a different Strong annotation."
+    },
+    {
+      "lang": "A",
+      "lemma": "אֱסוּר",
+      "original_strong": "0613",
+      "original_occurrences": 3,
+      "original_source_classes": {
+        "noun": 3
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "000560001002000",
+          "original_word_id": "o150070260253",
+          "reference": "EZR 7:26!25"
+        },
+        {
+          "original_sdbh": "000560001001000",
+          "original_word_id": "o270040120063",
+          "reference": "DAN 4:12!6"
+        },
+        {
+          "original_sdbh": "000560001001000",
+          "original_word_id": "o270040200183",
+          "reference": "DAN 4:20!18"
+        }
+      ],
+      "ubs_candidate_main_id": "000559000000000",
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "imprisonment as penalty in Ezra 7:26",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZR 7:26",
+        "ubs_attested_gloss": "imprisonment"
+      },
+      "rationale": "Ezra 7:26 lists judicial penalties including imprisonment, expressly corresponding to UBS's distinct imprisonment meaning within the shared entry, not to an unrelated name."
+    },
+    {
+      "lang": "A",
+      "lemma": "אִמַּר",
+      "original_strong": "0563",
+      "original_occurrences": 3,
+      "original_source_classes": {
+        "noun": 3
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "000514001001000",
+          "original_word_id": "o150060090062",
+          "reference": "EZR 6:9!6"
+        },
+        {
+          "original_sdbh": "000514001001000",
+          "original_word_id": "o150060170101",
+          "reference": "EZR 6:17!10"
+        },
+        {
+          "original_sdbh": "000514001001000",
+          "original_word_id": "o150070170101",
+          "reference": "EZR 7:17!10"
+        }
+      ],
+      "ubs_candidate_main_id": "000513000000000",
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "lamb offered in Ezra 6:9",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZR 6:9",
+        "ubs_attested_gloss": "lamb"
+      },
+      "rationale": "Ezra 6:9 lists sacrificial animals including lambs; UBS indexes the same Aramaic lexical noun with the lamb meaning, notwithstanding different original Strong/H-A metadata."
+    },
+    {
+      "lang": "A",
+      "lemma": "מִדָּה",
+      "original_strong": "4061",
+      "original_occurrences": 2,
+      "original_source_classes": {
+        "noun": 2
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "003715002001000",
+          "original_word_id": "o150040200102",
+          "reference": "EZR 4:20!10"
+        },
+        {
+          "original_sdbh": "003715002001000",
+          "original_word_id": "o150060080181",
+          "reference": "EZR 6:8!18"
+        }
+      ],
+      "ubs_candidate_main_id": "003719000000000",
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "tax / tribute at Ezra 4:20",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZR 4:20",
+        "ubs_attested_gloss": "tax"
+      },
+      "rationale": "Ezra 4:20 discusses tribute and tax payments. UBS's homographic lemma includes a distinct revenue-tax form, not merely measures or giants. The exact dictionary headword can be identified but the individual contextual sense is not assigned."
+    },
+    {
+      "lang": "A",
+      "lemma": "מִדָּה",
+      "original_strong": "4061a",
+      "original_occurrences": 2,
+      "original_source_classes": {
+        "noun": 2
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "003715002001000",
+          "original_word_id": "o150040130121",
+          "reference": "EZR 4:13!12"
+        },
+        {
+          "original_sdbh": "003715002001000",
+          "original_word_id": "o150070240141",
+          "reference": "EZR 7:24!14"
+        }
+      ],
+      "ubs_candidate_main_id": "003719000000000",
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "tax / tribute at Ezra 4:13",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZR 4:13",
+        "ubs_attested_gloss": "tax"
+      },
+      "rationale": "Ezra 4:13 names required taxes; UBS has a separately attested tax meaning in the published entry. Preserve this exact original suffixed Strong family without generalizing aliases."
+    },
+    {
+      "lang": "A",
+      "lemma": "מָזוֹן",
+      "original_strong": "4203",
+      "original_occurrences": 2,
+      "original_source_classes": {
+        "noun": 2
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "003833001001000",
+          "original_word_id": "o270040090052",
+          "reference": "DAN 4:9!5"
+        },
+        {
+          "original_sdbh": "003833001001000",
+          "original_word_id": "o270040180052",
+          "reference": "DAN 4:18!5"
+        }
+      ],
+      "ubs_candidate_main_id": "003837000000000",
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "food/provisions in Daniel 4:9",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "DAN 4:9",
+        "ubs_attested_gloss": "food"
+      },
+      "rationale": "The source in Daniel 4:9 refers to nourishment provided by the tree; UBS has a food/provisions entry for the same lexical family."
+    },
+    {
+      "lang": "A",
+      "lemma": "עִדֹּוא",
+      "original_strong": "5714b",
+      "original_occurrences": 2,
+      "original_source_classes": {
+        "noun": 2
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "005243001004000",
+          "original_word_id": "o150050010071",
+          "reference": "EZR 5:1!7"
+        },
+        {
+          "original_sdbh": "005243001004000",
+          "original_word_id": "o150060140111",
+          "reference": "EZR 6:14!11"
+        }
+      ],
+      "ubs_candidate_main_id": "005250000000000",
+      "candidate_relation": "different_strong_same_consonants",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Iddo, ancestor of the prophet Zechariah in Ezra 5:1",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZR 5:1",
+        "ubs_attested_gloss": "Iddo"
+      },
+      "rationale": "The name at Ezra 5:1 is Iddo, Zechariah's family ancestor; the UBS Iddo headword explicitly includes that grandfather among several namesakes. No universal name merge or contextual sense transfer."
+    },
+    {
+      "lang": "H",
+      "lemma": "מֹוסֵרָה",
+      "original_strong": "4147a",
+      "original_occurrences": 8,
+      "original_source_classes": {
+        "noun": 8
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "003789001001000",
+          "original_word_id": "o180390050052",
+          "reference": "JOB 39:5!5"
+        },
+        {
+          "original_sdbh": "003788001001000 003789001001000",
+          "original_word_id": "o190020030031",
+          "reference": "PSA 2:3!3"
+        },
+        {
+          "original_sdbh": "003789001001000",
+          "original_word_id": "o191070140042",
+          "reference": "PSA 107:14!4"
+        }
+      ],
+      "ubs_candidate_main_id": "003792000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "cord / bond in Job 39:5",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "JOB 39:5",
+        "ubs_attested_gloss": "bond"
+      },
+      "rationale": "Job 39:5 uses bonds of the wild donkey, matching UBS's binding-cord meaning despite the source plural/derived orthography and original suffixed Strong variant. This approves only the lexeme entry."
+    },
+    {
+      "lang": "H",
+      "lemma": "שׁיח",
+      "original_strong": "7817a",
+      "original_occurrences": 5,
+      "original_source_classes": {
+        "verb": 5
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o190420060021",
+          "reference": "PSA 42:6!2"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o190420070041",
+          "reference": "PSA 42:7!4"
+        },
+        {
+          "original_sdbh": "",
+          "original_word_id": "o190420120021",
+          "reference": "PSA 42:12!2"
+        }
+      ],
+      "ubs_candidate_main_id": "007289000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "being cast down in Psalm 42:6",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "PSA 42:6",
+        "ubs_attested_gloss": "to be in distress"
+      },
+      "rationale": "The psalmist's downcast soul at Psalm 42:6 corresponds semantically to UBS's lower/distressed verb form. Related senses remain unselected; different orthography alone is not treated as a reusable rule."
+    },
+    {
+      "lang": "H",
+      "lemma": "רָפָה",
+      "original_strong": "7498b",
+      "original_occurrences": 4,
+      "original_source_classes": {
+        "noun": 4
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "006892001001000",
+          "original_word_id": "o100210160062",
+          "reference": "2SA 21:16!6"
+        },
+        {
+          "original_sdbh": "006892001001000",
+          "original_word_id": "o100210180182",
+          "reference": "2SA 21:18!18"
+        },
+        {
+          "original_sdbh": "006892001001000",
+          "original_word_id": "o100210200213",
+          "reference": "2SA 21:20!21"
+        }
+      ],
+      "ubs_candidate_main_id": "006889000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "ancestor of the giants in 2 Samuel 21:16",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "2SA 21:16",
+        "ubs_attested_gloss": "Raphah"
+      },
+      "rationale": "The source names a descendant of Rapha/Raphah among the giant warriors; UBS separately identifies Raphah as ancestor of giants, distinct from other namesakes. Accept headword identity without choosing a LEXID."
+    },
+    {
+      "lang": "H",
+      "lemma": "נֵרִיָהוּ",
+      "original_strong": "5374a",
+      "original_occurrences": 3,
+      "original_source_classes": {
+        "noun": 3
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "004922001001000",
+          "original_word_id": "o240360140271",
+          "reference": "JER 36:14!27"
+        },
+        {
+          "original_sdbh": "004922001001000",
+          "original_word_id": "o240360320091",
+          "reference": "JER 36:32!9"
+        },
+        {
+          "original_sdbh": "004922001001000",
+          "original_word_id": "o240430060301",
+          "reference": "JER 43:6!30"
+        }
+      ],
+      "ubs_candidate_main_id": "004928000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Baruch's father Neriah in Jeremiah 36:14",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "JER 36:14",
+        "ubs_attested_gloss": "Neriah"
+      },
+      "rationale": "Jeremiah 36:14 identifies Neriah in Baruch's family, matching UBS's Neriah entry that explicitly names Baruch as son. Original longer -yahu form remains untouched."
+    },
+    {
+      "lang": "H",
+      "lemma": "זַעֲוָה",
+      "original_strong": "2189",
+      "original_occurrences": 7,
+      "original_source_classes": {
+        "noun": 7
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "001952001001000",
+          "original_word_id": "o050280250152",
+          "reference": "DEU 28:25!15"
+        },
+        {
+          "original_sdbh": "001952001001000",
+          "original_word_id": "o140290080092",
+          "reference": "2CH 29:8!9"
+        },
+        {
+          "original_sdbh": "001952001001000",
+          "original_word_id": "o240150040032",
+          "reference": "JER 15:4!3"
+        }
+      ],
+      "ubs_candidate_main_id": "001954000000000",
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "dread/horror in Deuteronomy 28:25",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "DEU 28:25",
+        "ubs_attested_gloss": "horror"
+      },
+      "rationale": "The covenant curse in Deuteronomy 28:25 causes horror and dismay; UBS's published lexical meaning is horror, despite the recorded Strong/code and spelling discrepancy."
+    },
+    {
+      "lang": "H",
+      "lemma": "אָשֵׁד",
+      "original_strong": "0798",
+      "original_occurrences": 4,
+      "original_source_classes": {
+        "noun": 4
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "000732001001000",
+          "original_word_id": "o050030170111",
+          "reference": "DEU 3:17!11"
+        },
+        {
+          "original_sdbh": "000732001001000",
+          "original_word_id": "o050040490101",
+          "reference": "DEU 4:49!10"
+        },
+        {
+          "original_sdbh": "000732001001000",
+          "original_word_id": "o060120030171",
+          "reference": "JOS 12:3!17"
+        }
+      ],
+      "ubs_candidate_main_id": "000731000000000",
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "the slopes by Pisgah in Deuteronomy 3:17",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "DEU 3:17",
+        "ubs_attested_gloss": "slope"
+      },
+      "rationale": "Deuteronomy 3:17 uses slope(s) near Pisgah, represented in UBS by a geographical slope/slopes entry. The source word itself is not altered to a different canonical form."
+    },
+    {
+      "lang": "H",
+      "lemma": "נָבַב",
+      "original_strong": "5014a",
+      "original_occurrences": 2,
+      "original_source_classes": {
+        "adj": 2
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "004598001002000",
+          "original_word_id": "o180110120021",
+          "reference": "JOB 11:12!2"
+        },
+        {
+          "original_sdbh": "004598001001000",
+          "original_word_id": "o240520210171",
+          "reference": "JER 52:21!17"
+        }
+      ],
+      "ubs_candidate_main_id": "004604000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "the empty-headed or foolish person in Job 11:12",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "JOB 11:12",
+        "ubs_attested_gloss": "stupid"
+      },
+      "rationale": "Job 11:12 refers to a senseless person, matching UBS's figurative stupid/hollow meaning rather than a distinct proper name. The original lemma remains unmodified."
+    },
+    {
+      "lang": "H",
+      "lemma": "חַטָּאָה",
+      "original_strong": "2402",
+      "original_occurrences": 2,
+      "original_source_classes": {
+        "noun": 2
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "002217001001000",
+          "original_word_id": "o020340070072",
+          "reference": "EXO 34:7!7"
+        },
+        {
+          "original_sdbh": "002217001001000",
+          "original_word_id": "o230050180081",
+          "reference": "ISA 5:18!8"
+        }
+      ],
+      "ubs_candidate_main_id": "002220000000000",
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "sin in Exodus 34:7",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EXO 34:7",
+        "ubs_attested_gloss": "sin"
+      },
+      "rationale": "Exodus 34:7 speaks of the forgiveness of wrongdoing; UBS's same headword includes sin and sin-offering as separate meanings. Accept the word-level headword identity, never automatically assert a contextual LEXID."
     }
   ]
 }

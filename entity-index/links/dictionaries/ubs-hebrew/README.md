@@ -651,3 +651,56 @@ If the other current lexical disposition batches are merged, the
 combined in-scope tally becomes **86/197 families / 2,448 of 2,649
 occurrences**, leaving **111 families / 201 occurrences** for separate
 review. This conditional accounting is not a publication or merge claim.
+
+### Third positive editorial batch: 17 source meaning-correlated headwords
+
+An additional **17 original lexical families / 64 source occurrences**
+have passed lexeme-level manual review against (a) exact source WLC
+lemma/Strong/word-ID witnesses and passage context, and (b) actual
+**pinned UBS Hebrew 0.9.4 published headword meanings**, including
+distinct forms when one headword contains unrelated senses.
+
+| Original lexical family | WLC occurrences | Reviewed UBS entry-level meaning | Representative source |
+| --- | ---: | --- | --- |
+| A `אֲרְיוֹךְ` 0746a | 5 | Arioch, royal guard captain | Dan 2:14 |
+| A `מְלַל` 4449 | 5 | to speak | Dan 6:22 |
+| A `עֲשַׂב` 6212a | 5 | vegetation | Dan 4:12 |
+| A `אֱסוּר` 0613 | 3 | imprisonment | Ezra 7:26 |
+| A `אִמַּר` 0563 | 3 | lamb | Ezra 6:9 |
+| A `מִדָּה` 4061 and 4061a | 2 + 2 | tax | Ezra 4:20; 4:13 |
+| A `מָזוֹן` 4203 | 2 | food | Dan 4:9 |
+| A `עִדֹּוא` 5714b | 2 | Iddo, Zechariah's ancestor | Ezra 5:1 |
+| H `מֹוסֵרָה` 4147a | 8 | bond / cord | Job 39:5 |
+| H `שׁיח` 7817a | 5 | to be in distress | Ps 42:6 |
+| H `רָפָה` 7498b | 4 | ancestor Raphah | 2 Sam 21:16 |
+| H `נֵרִיָהוּ` 5374a | 3 | Neriah, father of Baruch | Jer 36:14 |
+| H `זַעֲוָה` 2189 | 7 | horror | Deut 28:25 |
+| H `אָשֵׁד` 0798 | 4 | slope | Deut 3:17 |
+| H `נָבַב` 5014a | 2 | foolish / empty-headed | Job 11:12 |
+| H `חַטָּאָה` 2402 | 2 | sin | Exod 34:7 |
+
+The [existing positive editorial ledger](v1_reviewed_headword_dispositions.json)
+now records **34 distinct headword-identified families / 218 original
+lexical occurrences / 86 original word witnesses**. Every entry remains
+a source-pinned, **headword-only** decision; no WLC word link is
+actually added to the generated `index.json`, and no contextual UBS
+LEXID or old MACULA SDBH is transferred.
+
+The [read-only validator](verify_reviewed_headwords.py) is now generic
+across three original machine statuses: exact UBS headword lemma under
+different Strong, same-consonant candidate under different Strong, and
+a unique UBS candidate in the original numeric Strong family. It
+requires the actual pinned UBS headword to contain an expressly
+recorded short English lexical gloss as independent meaning evidence,
+and rechecks exact original MACULA WLC word IDs, references, class
+counts and all source revision pins. The *gloss* identifies supporting
+published lexical evidence, **not an assigned contextual sense**.
+Regression tests reject semantic drift, wrong Hebrew consonants or
+language/Strong matches, and any silent source/sense edit.
+
+**Cumulative v1 review after this batch**, including independent
+negative and abstention dispositions: **103 of 197 in-scope lexical
+families / 2,512 of 2,649 original occurrences**. The **94 remaining
+families / 137 occurrences** still require their own source review
+before the explicit v1.0 approval gate. Source corpus and generated
+index coverage are unchanged.

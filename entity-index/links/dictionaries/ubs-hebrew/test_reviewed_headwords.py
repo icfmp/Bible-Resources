@@ -13,11 +13,11 @@ REGISTER = json.loads((HERE / "family_register.json").read_text(encoding="utf-8"
 
 
 class ReviewedHeadwordTests(unittest.TestCase):
-    def test_complete_exact_pinned_five_family_batch(self):
+    def test_all_pinned_source_reviewed_families(self):
         result = CHECK["verify_register"](LEDGER, REGISTER)
-        self.assertEqual(result["families"], 17)
-        self.assertEqual(result["occurrences"], 154)
-        self.assertEqual(len(result["word_witnesses"]), 41)
+        self.assertEqual(result["families"], 34)
+        self.assertEqual(result["occurrences"], 218)
+        self.assertEqual(len(result["word_witnesses"]), 86)
         self.assertTrue(all(not d["contextual_sense_id_approved"]
                             and not d["index_word_links_applied"]
                             for d in LEDGER["decisions"]))
@@ -48,15 +48,56 @@ class ReviewedHeadwordTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Unsafe or undocumented"):
             CHECK["verify_register"](ledger, REGISTER)
 
+    def test_wrong_lexical_relation_and_gloss_evidence_are_rejected(self):
+        ledger = copy.deepcopy(LEDGER)
+        ledger["decisions"][0]["candidate_relation"] = "same_strong_family_unresolved"
+        with self.assertRaisesRegex(ValueError, "candidate source changed"):
+            CHECK["verify_register"](ledger, REGISTER)
+        d = LEDGER["decisions"][0]
+        original = {"MainId": d["ubs_candidate_main_id"], "Lemma": d["lemma"],
+                    "StrongCodes": ["H1841"],
+                    "BaseForms": [{"LEXMeanings": [
+                        {"LEXSenses": [{"Glosses": ["NOT DANIEL"]}]}
+                    ]}]}
+        with self.assertRaisesRegex(ValueError, "meaning absent"):
+            CHECK["verify_dictionary"]({"decisions": [d]}, [original])
+
+    def test_consonantal_and_same_numeric_source_evidence_is_distinct(self):
+        consonantal = next(d for d in LEDGER["decisions"]
+                           if d["candidate_relation"] == "different_strong_same_consonants")
+        similar = {"MainId": consonantal["ubs_candidate_main_id"],
+                   "Lemma": consonantal["lemma"],
+                   "StrongCodes": ["H0746"],
+                   "BaseForms": [{"LEXMeanings": [
+                       {"LEXSenses": [{"Glosses": [consonantal["evidence"]["ubs_attested_gloss"]]}]}
+                   ]}]}
+        CHECK["verify_dictionary"]({"decisions": [consonantal]}, [similar])
+        invalid = copy.deepcopy(similar)
+        invalid["Lemma"] = "UNRELATED"
+        with self.assertRaisesRegex(ValueError, "consonantal candidate changed"):
+            CHECK["verify_dictionary"]({"decisions": [consonantal]}, [invalid])
+        same = next(d for d in LEDGER["decisions"]
+                    if d["candidate_relation"] == "same_strong_family_unresolved")
+        entry = {"MainId": same["ubs_candidate_main_id"],
+                 "Lemma": "DIFFERENT",
+                 "StrongCodes": ["H4147"],
+                 "BaseForms": [{"LEXMeanings": [
+                     {"LEXSenses": [{"Glosses": [same["evidence"]["ubs_attested_gloss"]]}]}
+                 ]}]}
+        CHECK["verify_dictionary"]({"decisions": [same]}, [entry])
+        entry["StrongCodes"] = ["H9999"]
+        with self.assertRaisesRegex(ValueError, "numeric Strong family changed"):
+            CHECK["verify_dictionary"]({"decisions": [same]}, [entry])
+
     def test_original_dictionary_entry_and_cross_strong_invariant(self):
         d = LEDGER["decisions"][0]
         original = {"MainId": d["ubs_candidate_main_id"], "Lemma": d["lemma"],
                     "StrongCodes": ["H1840", "H1841"],
-                    "BaseForms": [{"LEXMeanings": []}]}
+                    "BaseForms": [{"LEXMeanings": [{"LEXSenses": [{"Glosses": ["Daniel"]}]}]}]}
         CHECK["verify_dictionary"]({"decisions": [d]}, [original])
         invalid = copy.deepcopy(original)
         invalid["StrongCodes"] = ["A1841"]
-        with self.assertRaisesRegex(ValueError, "discrepancy"):
+        with self.assertRaisesRegex(ValueError, "now shares numeric Strong"):
             CHECK["verify_dictionary"]({"decisions": [d]}, [invalid])
         invalid = copy.deepcopy(original)
         invalid["Lemma"] = "UNRELATED"
