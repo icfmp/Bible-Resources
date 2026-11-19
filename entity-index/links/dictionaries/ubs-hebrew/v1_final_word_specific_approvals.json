@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "status": "reviewed_last_source_word_specific_ubs_headword_approvals_not_published",
+  "source_editions": {
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8",
+    "macula_revision": "47db250bd55d0d8577f2a94fba114ef16c35b23c"
+  },
+  "policy": {
+    "word_id_specific_only": true,
+    "original_macula_fields_immutable": true,
+    "original_ubs_headword_must_exist": true,
+    "contextual_ubs_sense_inferred": false,
+    "other_samenames_and_textual_variants_unchanged": true,
+    "original_single_candidate_abstentions_historical_and_superseded_only_for_approved_word_ids": true
+  },
+  "approved_word_links": [
+    {
+      "word_id": "o060190130101",
+      "reference": "JOS 19:13!10",
+      "lemma_original": "רִמּוֹן",
+      "strong_original": "7417a",
+      "sdbh_original": "006818002002000",
+      "lang": "H",
+      "class_original": "noun",
+      "pos_original": "noun",
+      "english_original": "Rimmon",
+      "gloss_original": "Rimmon",
+      "ubs_main_id": "006826000000000",
+      "ubs_lemma": "רִמּוֹנוֹ",
+      "ubs_attested_gloss": "Rimmono",
+      "editorial_rationale": "This original token names the Zebulun settlement Rimmon in Joshua 19:13. The independently attested UBS 'Rimmono' headword denotes the same Zebulun Levite town (compare 1 Chronicles 6:77). BDB explicitly links Joshua 19:13 Rimmon with 1 Chronicles 6:77 Rimmono; the distinct Judah/Simeon and rock namesakes in this original family are NOT approved for automatic linking.",
+      "independent_evidence_url": "https://www.studylight.org/lexicons/eng/hebrew/7417.html",
+      "contextual_lexical_sense_id_approved": false,
+      "source_text_modified": false
+    },
+    {
+      "word_id": "o090170390072",
+      "reference": "1SA 17:39!7",
+      "lemma_original": "אלה",
+      "strong_original": "2974a",
+      "sdbh_original": "000391003001000",
+      "lang": "H",
+      "class_original": "verb",
+      "pos_original": "verb",
+      "english_original": "tried",
+      "gloss_original": "he.undertook",
+      "ubs_main_id": "002740000000000",
+      "ubs_lemma": "יאל",
+      "ubs_attested_gloss": "to resolve",
+      "editorial_rationale": "The original WLC verb in 1 Samuel 17:39 is וַיֹּאֶל 'he undertook/tried', Strong H2974a, in the exact original word position. The independent BDB lexicon cites this occurrence under the יאל / H2974 verb meaning 'voluntarily undertake' and UBS 0.9.4 indexes יאל with H2974 and the same willingness/resolve lexeme. Preserve MACULA's original lemma annotation אלה and exact source Strong suffix unchanged; accept only an entry-level cross-edition lookup for this source word without choosing a textual variant or contextual sense ID.",
+      "independent_evidence_url": "https://biblehub.com/hebrew/2974.htm",
+      "contextual_lexical_sense_id_approved": false,
+      "source_text_modified": false
+    }
+  ],
+  "remaining_source_specific_abstentions": 24
+}
