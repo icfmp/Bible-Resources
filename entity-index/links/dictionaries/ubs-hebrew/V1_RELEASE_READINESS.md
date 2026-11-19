@@ -1,6 +1,14 @@
 # UBS Hebrew ↔ MACULA WLC v1.0 — technical release readiness
 
-**Status:** release candidate assembled in GitHub Actions; NOT published or approved as v1.0.
+**Status:** v1.0.0 publication authorized by the project owner after source
+validation. The [exact approved public ZIP manifest](v1_publication_authorization.json)
+pins the reviewed private candidate and deterministic public archive SHA-256.
+An independent GitHub Actions publication job releases **only** on protected
+`main` once all required source/lexical CI checks pass. This readiness
+document is not evidence that a GitHub release has already occurred; verify
+the [actual release tag](https://github.com/icfmp/Bible-Resources/releases/tag/bsi-ubs-hebrew-v1.0.0)
+and its attached ZIP checksum separately. The historical canonical
+`index.json` and Bible application remain unchanged.
 
 ## Final independently reviewed v1.0-rc2 (current technical candidate)
 
@@ -53,7 +61,7 @@ Private final index SHA-256:
 Pinned in [v1_final_candidate_manifest.json](v1_final_candidate_manifest.json).
 GitHub Actions builds **v1.0-rc2** only as a temporary internal/review artifact,
 with exact hash, CC BY-SA 4.0 rights notice and original attribution.
-**No GitHub public release, canonical-index change or app integration is authorized.**
+**Public standalone v1.0.0 release is authorized for the exact final verified bytes.** No unrelated canonical-index change, source rewrite, SWORD catalogue publication or Bible application integration is authorized.
 
 ## Locked edition and source rights
 
@@ -82,10 +90,10 @@ with exact hash, CC BY-SA 4.0 rights notice and original attribution.
 6. The candidate ZIP must be byte-for-byte deterministic, carry original index JSON, source credits, license, full manifest with entry SHA-256, no original content, and a separate ZIP SHA-256. Its manifest must say `publication_authorized=false`.
 7. The repository Validate, UBS source-pinned crosswalk, independent entity index and script registry consistency workflows must all succeed on the actual merging head.
 
-## Remaining nontechnical release gate
+## Publication authorization and independent release verification
 
-Before creating a public GitHub release, moving the canonical index, or adding the module to the application catalogue, the project owner must explicitly validate the **editorial release scope, source rights and v1.0 publication**. The original index stays available and there is no implicit consumer migration.
+The project owner approved the **standalone, exact source-verified UBS Hebrew lexical v1.0.0** publication after the 2026-11-19 editorial closeout. The owner approval is recorded explicitly in [v1_publication_authorization.json](v1_publication_authorization.json). It authorizes neither changes to the original `index.json` nor implicit consumer/application migration.
 
-Once approved, publish only the exact previously source-verified ZIP bytes (or independently rebuild and verify their digest), plus the companion `.sha256`. Preserve the immutable pinned sources, the audit and the candidate SHA. Publishing a release is not the same as merging the code or staging an Actions artifact. Track the release decision in [issue #366](https://github.com/icfmp/Bible-Resources/issues/366).
+The public package contains a **publication metadata-only transformation** of the pinned index, with all original lexical link maps unchanged and independently tested. The public release ZIP SHA-256 is pinned separately: `e448c7e4b6c0cb892789d78b487a3afe3dbe18cfb8c0b13be5fd910deabf640f`. The protected-main job compares the exact archive against this immutable digest, uploads it as a new GitHub Release tag and reads the remote attached bytes back without permitting overwrite. A staging artifact is not a publication; independently check the actual GitHub release URL and issue #366 after the publishing workflow succeeds.
 
 **Known limitation:** Generic `lookup` results based on identical Strong-family corroboration do not independently establish that every contextual SDBH/UBS sense corresponds. Marketing 99.021% as semantic accuracy or 100% lexical completeness would be misleading.
