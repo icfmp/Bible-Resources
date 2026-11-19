@@ -1,0 +1,71 @@
+name: Stage verified MHC release payload from immutable review artifact
+on:
+  push:
+    branches:
+      - release/mhc-0.1.0-publication
+    paths:
+      - .github/workflows/stage-mhc-release-payload.yml
+permissions:
+  contents: write
+  actions: read
+jobs:
+  stage:
+    if: github.repository == 'icfmp/Bible-Resources'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Retrieve exact reviewed source artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/mhc-artifact"
+          gh run download 44554276085 --repo "$GITHUB_REPOSITORY" --name MHC-0.1.0-full-native-source-attested-review-only --dir "$RUNNER_TEMP/mhc-artifact"
+      - name: Verify digest and stage exact seven SWORD members
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          from hashlib import sha256
+          import zipfile, os, json
+          root=Path(os.environ['RUNNER_TEMP'])/'mhc-artifact'
+          inner=root/'MHC-0.1.0.zip'
+          expected='c8d70166dd569674e936874cd9a94809bceb9642a76af7220ef86f2b71af93b2'
+          if inner.stat().st_size != 16404517 or sha256(inner.read_bytes()).hexdigest()!=expected:
+              raise SystemExit('Unverified MHC review package: abort')
+          proof=json.loads((root/'SOURCE_PROOF.json').read_text())
+          if proof.get('package_sha256')!=expected or proof.get('module_id')!='MHC' or not proof.get('source_binary_payload_byte_identical'):
+              raise SystemExit('Artifact source attestation mismatch')
+          members={'mods.d/mhc.conf','modules/comments/zcom4/mhc/nt.czs','modules/comments/zcom4/mhc/nt.czv','modules/comments/zcom4/mhc/nt.czz','modules/comments/zcom4/mhc/ot.czs','modules/comments/zcom4/mhc/ot.czv','modules/comments/zcom4/mhc/ot.czz'}
+          with zipfile.ZipFile(inner) as z:
+              if set(z.namelist())!=members or len(z.infolist())!=7:
+                  raise SystemExit('Unexpected package member set')
+              for info in z.infolist():
+                  if info.file_size>20000000 or info.is_dir():
+                      raise SystemExit('Invalid module member')
+                  target=Path('modules/mhc-crosswire/payload')/info.filename
+                  target.parent.mkdir(parents=True,exist_ok=True)
+                  target.write_bytes(z.read(info))
+          conf=(Path('modules/mhc-crosswire/payload/mods.d/mhc.conf')).read_text()
+          for line in ('[MHC]','Version=0.1.0','ModDrv=zCom4','Versification=KJV','DistributionLicense=Public Domain'):
+              if line not in conf.splitlines():
+                  raise SystemExit('Unexpected MHC config '+line)
+          evidence=Path('modules/mhc-crosswire/RELEASE_ARTIFACT_PROOF.json')
+          evidence.write_text(json.dumps({'schema_version':1,'source_workflow_run':44554276085,'artifact_id':14544781469,'review_zip_sha256':expected,'review_zip_bytes':16404517,'original_authoring_osis_sha256':proof['source_original_sha256'],'source_binary_payload_byte_identical':True,'full_native_corpus_readback_equal':True,'member_sha256':{x:sha256((Path('modules/mhc-crosswire/payload')/x).read_bytes()).hexdigest() for x in sorted(members)}},indent=2)+'\n')
+          print('Verified source-attested package, seven exact staged members')
+          PY
+      - name: Commit retained reviewed native files to release branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add modules/mhc-crosswire/payload modules/mhc-crosswire/RELEASE_ARTIFACT_PROOF.json
+          git diff --cached --check
+          git commit -m "Stage source-attested MHC 0.1.0 native SWORD payload"
+          git push origin HEAD:release/mhc-0.1.0-publication
