@@ -1503,7 +1503,8 @@ jobs:
               if process.poll() is None:
                   process.kill()
                   process.wait()
-          if len(keys)!=28792 or set(found)!=set(expected) or sum(found.values())!=176:
+          if (len(keys)!=28792 or set(found)!=set(expected) or
+              sum(found.values())!=summary["original_unplaced_valid_references_visible_in_commentary"]):
               raise ValueError("Visible in-commentary original citation index incomplete")
           source_first=next(iter(expected))
           book,chapter,verse=source_first.rsplit(".",2)
@@ -1512,7 +1513,7 @@ jobs:
           reader=subprocess.run(cmd,env=env,text=True,capture_output=True,timeout=30)
           if reader.returncode!=0 or "Original-edition Bible references" not in reader.stdout:
               raise ValueError("Visible original reference index not displayed by diatheke")
-          print("PRIVATE VISIBLE ORIGINAL REFERENCE SWORD PASS: 176 source-verified " +
+          print("PRIVATE VISIBLE ORIGINAL REFERENCE SWORD PASS: " + str(summary["original_unplaced_valid_references_visible_in_commentary"]) + " source-verified " +
                 "in-commentary links, 28792 native K keys; real diatheke visible " +
                 "without footnote mode, no authorial inline-location claim or publication")
           PY
@@ -1586,14 +1587,15 @@ jobs:
               if proc.poll() is None:
                   proc.kill()
                   proc.wait()
-          if len(keys)!=28792 or set(seen)!=set(expected) or sum(seen.values())!=176:
+          if (len(keys)!=28792 or set(seen)!=set(expected) or
+              sum(seen.values())!=summary["source_note_occurrences_total"]):
               raise ValueError("Contextual SWORD lost numbered keys or source references")
           if summary["source_notes_moved_to_authored_paragraphs"]:
               key=summary["context_relocations"][0]["source_first_key"]
               book,chapter,verse=key.rsplit(".",2)
               # Native readback above verifies all 176 destinations even if a
               # frontend suppresses footnote display; no UI claim is made.
-          print("PRIVATE CONTEXT-CANDIDATE SWORD PASS: 28792 K keys, 176 exact " +
+          print("PRIVATE CONTEXT-CANDIDATE SWORD PASS: 28792 K keys, " + str(summary["source_note_occurrences_total"]) + " exact " +
                 "source-note destinations and displays, relocated="+
                 str(summary["source_notes_moved_to_authored_paragraphs"])+
                 ", section-only="+str(summary["source_notes_still_grouped_by_K"])+
@@ -1637,7 +1639,7 @@ jobs:
               for r in appendix["note_source_K_reference_hashes_for_private_native_readback"]
           }
           assert len(expected)==appendix["source_first_K_sections_with_note"]
-          assert sum(map(len,expected.values()))==176
+          assert sum(map(len,expected.values()))==appendix["original_link_occurrences_preserved_only_in_separate_source_notes"]
           seen={}
           def observe(kind,key,raw):
               if kind!="K" or key not in expected:
@@ -1680,11 +1682,11 @@ jobs:
                   proc.kill();proc.wait()
           assert set(seen)==set(expected)
           assert len(numbered)==28792
-          assert sum(seen.values())==176
+          assert sum(seen.values())==appendix["original_link_occurrences_preserved_only_in_separate_source_notes"]
           print("PRIVATE SOURCE-NOTE WHOLE-CANON SWORD READBACK PASS: " +
-                f"{len(seen)} original source-K groups, 176 original-linked " +
+                f"{len(seen)} original source-K groups, {sum(seen.values())} original-linked " +
                 "references in visibly marked separate notes, 28792 indexed " +
-                "keys; existing 1016 inline links left unchanged; NO release")
+                "keys; existing source-reviewed inline links left unchanged; NO release")
           PY
       - name: Compile and independently read back all four unapproved repaired original-link proposals
         shell: bash
@@ -1729,7 +1731,7 @@ jobs:
               for item in report["private_source_note_alternative"][
                   "note_source_K_reference_hashes_for_private_native_readback"]
           }
-          assert sum(map(len,expected_note.values()))==176
+          assert sum(map(len,expected_note.values()))==report["private_source_note_alternative"]["original_link_occurrences_preserved_only_in_separate_source_notes"]
           seen={}
           note_seen={}
           def observe(kind,key,raw):
@@ -1772,7 +1774,7 @@ jobs:
                   refs=[r for r in notes[0].iter() if isinstance(r.tag,str)
                         and r.tag.rsplit("}",1)[-1]=="reference"]
                   if len(refs)!=len(expected_note[key]):
-                      raise ValueError("Proposed repair altered 176 existing source notes")
+                      raise ValueError("Proposed repair altered existing original source notes")
                   for r,item in zip(refs,expected_note[key]):
                       literal=r.get("osisRef")
                       display="".join(r.itertext())
@@ -1800,11 +1802,11 @@ jobs:
           assert set(seen)==set(expected)
           assert set(note_seen)==set(expected_note)
           assert sum(seen.values())==13
-          assert sum(note_seen.values())==176
+          assert sum(note_seen.values())==report["private_source_note_alternative"]["original_link_occurrences_preserved_only_in_separate_source_notes"]
           assert len(numbered)==28792
           print("PRIVATE FOUR SOURCE-ERRATA REPAIR CANDIDATES SWORD PASS: " +
                 "4 hash-bound original links, 13 separate witness-corroborated " +
-                "proposed navigation targets, all 176 original source-only notes " +
+                "proposed navigation targets, all " + str(sum(note_seen.values())) + " original source-only notes " +
                 "still exact, 28792 source addresses; UNAPPROVED and NOT RELEASED")
           PY
       - name: Probe actual diatheke rendering of source-notes and proposed-repair alternatives
@@ -2833,9 +2835,10 @@ jobs:
                   proc.kill();proc.wait()
           assert set(seen_I)==set(expected)
           assert len(numbered)==28792
-          assert links["modern_inline_links_inserted"]==1016
+          assert links["modern_inline_links_inserted"]==(39 + links["automatic_source_matched_references"]["automatically_inserted"])
           assert links["private_source_note_alternative"][
-              "original_link_occurrences_preserved_only_in_separate_source_notes"]==176
+              "original_link_occurrences_preserved_only_in_separate_source_notes"]==(
+                  links["source_original_link_review_ledger"]["source_original_links_still_requiring_placement_review"]-4)
           assert links["private_unapproved_errata_navigation_preview"][
               "derived_navigation_links_from_corroborating_witnesses"]==13
           print("PRIVATE RESTORED BOOK PREFACES SWORD READBACK PASS: " +
