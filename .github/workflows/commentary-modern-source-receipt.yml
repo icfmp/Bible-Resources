@@ -5003,17 +5003,7 @@ jobs:
           PY
       - name: Verify source-bound script inventory is current
         shell: bash
-        run: |
-          # Temporary metadata-only recovery of generated inventory after
-          # verified Xiphos GUI success. The strict --check is retained.
-          python scripts/tool_registry.py --write
-          python scripts/tool_registry.py --check
-          echo REGISTRY_JSON_B64_BEGIN
-          base64 -w 64 docs/TOOL_REGISTRY.json
-          echo REGISTRY_JSON_B64_END
-          echo REGISTRY_MD_B64_BEGIN
-          base64 -w 64 docs/TOOL_REGISTRY.md
-          echo REGISTRY_MD_B64_END
+        run: python scripts/tool_registry.py --check
       - name: Upload metadata-only bounded audit receipt
         if: always()
         uses: actions/upload-artifact@v4
@@ -5052,37 +5042,3 @@ jobs:
             ${{ runner.temp }}/mhcc-modern-preview-structure.json
           if-no-files-found: ignore
           retention-days: 60
-
-  # Branch-local maintenance only; never runs on PRs/forks or releases.
-  # GITHUB_TOKEN-authored maintenance pushes do not recursively trigger Actions.
-  maintain-tool-registry-for-modern-pr:
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feature/mhcc-modern-english' }}
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-      - name: Regenerate and commit verified metadata-only tool inventory
-        shell: bash
-        run: |
-          set -euo pipefail
-          python scripts/tool_registry.py --write
-          python scripts/tool_registry.py --check
-          if ! git diff --quiet -- docs/TOOL_REGISTRY.json docs/TOOL_REGISTRY.md; then
-            git config user.name github-actions[bot]
-            git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-            git add docs/TOOL_REGISTRY.json docs/TOOL_REGISTRY.md
-            git commit -m "Refresh source-bound tool registry after Xiphos reader updates"
-            git push origin HEAD:feature/mhcc-modern-english
-          fi
-      - name: Retain exact generated registry when branch push is blocked
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: modern-source-bound-tool-registry
-          path: |
-            docs/TOOL_REGISTRY.json
-            docs/TOOL_REGISTRY.md
-          if-no-files-found: error
-          retention-days: 2
