@@ -29,6 +29,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_pronoun_candidate.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_remaining_headwords.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_families_batch2.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_eimi_disposition.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -78,6 +79,20 @@ jobs:
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
             --macula macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
             --output /tmp/bsi-ubs-greek-original-gap-review.json
+      - name: Classify original Greek εἰμί source word families without inventing UBS senses
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_eimi_disposition.py \
+            --report /tmp/bsi-ubs-greek-original-gap-review.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --output /tmp/bsi-ubs-greek-eimi-original-disposition.json
+      - name: Upload Greek εἰμί source evidence (PRIVATE, NO inferred LEXID)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-eimi-source-disposition-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-eimi-original-disposition.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Independently verify all 5,938 original Greek lexical source-word entry candidates
         run: |
           python3 -I entity-index/links/dictionaries/ubs-greek/build_private_word_candidate.py \
