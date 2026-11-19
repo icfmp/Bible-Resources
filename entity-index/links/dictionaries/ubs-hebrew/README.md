@@ -1084,3 +1084,31 @@ contextual UBS LEXID/SDBH or a universal Strong alias.
 alone.** Final acceptance still requires source-to-index link integration
 for approved word-level cases, independent zero-known-incorrect-link
 audit, full pinned regeneration/CI and owner editorial approval.
+
+### Entry-only preview from explicitly witnessed original MACULA words
+
+The v1 lexical audit now documents each original unresolved family, but its
+**81 positive headword identities / 274 original lexical occurrences** are
+editorial source decisions, not automatically generated word-level links.
+
+The [source-witness anchor preview](reviewed_word_anchor_preview.json) adds an
+**independent, nonpublished and reversible candidate layer** for only the
+**139 original WLC word IDs explicitly enumerated** in the 81 positive
+editorial records. It does **not** assume the other 135 occurrences share an
+identical contextual lexical interpretation. The generated original
+`index.json`, scope and original `family_register.json` are unchanged.
+
+The [stage/verification script](stage_reviewed_word_anchors.py) uses the
+published UBS 0.9.4 source revision, pinned MACULA WLC source revision and
+the existing editorial identity verifier. It verifies every original word
+ID, passage, lemma, full Strong, SDBH, source class, and the dictionary
+headword source, checks each word is not already linked in the original
+index, and proves that an entry-only lookup never returns contextual
+sense IDs. CI compares the staged source-derived JSON with the committed
+preview and refuses drift.
+
+**No new lexical coverage is claimed by this preview**, and no runtime
+application is required to consume it. Subsequent work should review the
+remaining words individually, then explicitly apply only verified original
+word-ID anchored links to a new generated index with full-regeneration
+tests. No global Strong alias or original source correction is licensed.
