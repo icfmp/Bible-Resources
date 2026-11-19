@@ -1861,17 +1861,17 @@ jobs:
                   raise AssertionError("Additional link review accepted untrusted "+mutation)
           (base/"mhcc-modern-additional-unapproved-links.osis.xml").write_bytes(preview)
           (base/"mhcc-modern-additional-unapproved-link-receipt.json").write_text(
-              json.dumps(receipt,sort_keys=True,indent=2)+"\\n")
+              json.dumps(receipt,sort_keys=True,indent=2)+"\n")
           print("ELEVEN EXTRA ORIGINAL LINK CANDIDATES SOURCE-PINNED: 11 source K/ordinal, 15 "
                 "secondary-witness destinations in distinct PRIVATE unapproved notes, 5 "
                 "tampering failures; no text or source edits, no publishing")
           PY
           mkdir -p "$RUNNER_TEMP/mhcc-additional-link-root/mods.d"
           mkdir -p "$RUNNER_TEMP/mhcc-additional-link-root/modules/comments/zcom/mhccadditional"
-          timeout 240s osis2mod \\
-            "$RUNNER_TEMP/mhcc-additional-link-root/modules/comments/zcom/mhccadditional" \\
-            "$RUNNER_TEMP/mhcc-modern-additional-unapproved-links.osis.xml" \\
-            -z z -b 3 \\
+          timeout 240s osis2mod \
+            "$RUNNER_TEMP/mhcc-additional-link-root/modules/comments/zcom/mhccadditional" \
+            "$RUNNER_TEMP/mhcc-modern-additional-unapproved-links.osis.xml" \
+            -z z -b 3 \
             > "$RUNNER_TEMP/mhcc-additional-link-osis2mod.log" 2>&1
           cat > "$RUNNER_TEMP/mhcc-additional-link-root/mods.d/mhccadditional.conf" <<'EOF'
           [MHCCADDITIONAL]
