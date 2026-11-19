@@ -86,11 +86,10 @@ def reviewed_osis_commentary_errors(module_dir, root, metadata, conf):
                 or edit.get("original_conf_sha256")!=original_conf_sha):
             raise ValueError("Missing exact reversible metadata-only .conf edit")
         final_conf=(module_dir/"payload"/"mods.d"/(metadata["sword_id"].lower()+".conf")).read_bytes()
-        added=b"TextSource=https://gitlab.com/crosswire-bible-society/mhc\\n"
         # A single source URL may be added, never alter the attested original config.
         # Its expected value comes from the original official authoring repository.
         original_url=commit["repository_url"].encode("utf-8")
-        added=b"TextSource="+original_url+b"\\n"
+        added=b"TextSource="+original_url+b"\n"
         if final_conf.count(added)!=1 or sha256(final_conf.replace(added,b"")).hexdigest()!=original_conf_sha:
             raise ValueError("Metadata edit is not exactly source-reversible")
         if (conf.get("ModDrv") not in ("zCom","zCom4")
