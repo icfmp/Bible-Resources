@@ -1024,59 +1024,61 @@
     },
     {
       "lang": "H",
-      "lemma": "מְקַטְּרֹות",
-      "original_strong": "4729b",
+      "lemma": "הוּא",
+      "original_strong": "5993",
       "occurrences": 1,
-      "candidate_relation": "same_strong_family_unresolved",
+      "candidate_relation": "different_strong_exact_attested_lemma",
       "decision": "candidate_lexical_nonidentity",
       "source_witness": {
-        "word_id": "o140300140092",
-        "reference": "2CH 30:14!9",
-        "english": "incense altars",
-        "pos": "noun",
+        "word_id": "o220060120062",
+        "reference": "SNG 6:12!6",
+        "english": "",
+        "pos": "suffix",
         "class": "noun",
-        "original_sdbh": "004330001001000"
+        "original_sdbh": ""
       },
       "ubs_candidate": {
-        "main_id": "004334000000000",
-        "lemma": "מִקְטָר",
+        "main_id": "001778000000000",
+        "lemma": "הוּא",
         "strong_codes": [
-          "H4729"
+          "H1931a",
+          "A1932"
         ],
         "parts_of_speech": [
-          "noun m"
+          "pers.pron"
         ]
       },
-      "ubs_attested_gloss": "burning",
-      "rationale": "2 Chronicles 30:14 identifies incense altars that are removed and cast into the Kidron; UBS מִקְטָר indexes the action/process of burning sacrificial material, not the altars themselves. The concrete cultic furniture noun is not that UBS action headword."
+      "ubs_attested_gloss": "he",
+      "rationale": "Song of Songs 6:12 segments the proper name Ammi-nadib into original source morphemes. This original הוּא witness is a name-associated suffix with source gloss 'Ammi-', not the masculine third-person personal pronoun 'he' that is the sole UBS הוּא candidate. Preserve the source segmentation and the full original H5993 annotation; do not link the proper-name fragment to a pronoun."
     },
     {
       "lang": "H",
-      "lemma": "טֹחֲנֹות",
-      "original_strong": "2912a",
+      "lemma": "חֲפֹר",
+      "original_strong": "2661a",
       "occurrences": 1,
       "candidate_relation": "same_strong_family_unresolved",
       "decision": "candidate_lexical_nonidentity",
       "source_witness": {
-        "word_id": "o210120030092",
-        "reference": "ECC 12:3!9",
-        "english": "grinders",
-        "pos": "noun",
+        "word_id": "o230020200152",
+        "reference": "ISA 2:20!15",
+        "english": "",
+        "pos": "verb",
         "class": "noun",
-        "original_sdbh": "002682001001000"
+        "original_sdbh": ""
       },
       "ubs_candidate": {
-        "main_id": "002686000000000",
-        "lemma": "טחן",
+        "main_id": "002457000000000",
+        "lemma": "חֲפַרְפָּרָה",
         "strong_codes": [
-          "H2912"
+          "H2661",
+          "H6512"
         ],
         "parts_of_speech": [
-          "verb"
+          "noun f"
         ]
       },
-      "ubs_attested_gloss": "to grind",
-      "rationale": "Ecclesiastes 12:3 speaks of the grinders who cease because they are few. The source form טֹחֲנֹות is a nominalized plural agent, while the only UBS candidate טחן indexes the verbal action 'to grind'. Shared derivation does not establish an identical headword or contextual sense for that standalone noun."
+      "ubs_attested_gloss": "mole rat",
+      "rationale": "Isaiah 2:20 has the first original segment חֲפֹר of the expression חְפֹּר פֵּרוֹת, glossed in the pinned WLC 'digging' (a verbal infinitive). The sole UBS lexical candidate חֲפַרְפָּרָה designates the *entire* animal mole rat, not this separate verbal segment. No atomic word link is justified."
     }
   ]
 }
