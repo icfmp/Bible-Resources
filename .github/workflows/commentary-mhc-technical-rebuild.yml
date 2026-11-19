@@ -1,3 +1,4 @@
+# Reconciled with main; perform complete private source/SWORD final-ID validation before merge.
 name: Rebuild MHC from pinned original OSIS (private technical phase 1)
 
 on:
