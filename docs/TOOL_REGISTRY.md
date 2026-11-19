@@ -30,7 +30,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/audit_text.py`](../scripts/audit_text.py) | UNDECIDED | not established | 1 | source/native audit |
 | [`scripts/bible_intake.py`](../scripts/bible_intake.py) | KEEP_GENERIC | not established | 9 | intake |
 | [`scripts/bible_stage_runner.py`](../scripts/bible_stage_runner.py) | KEEP_GENERIC | named test | 6 | not determined |
-| [`scripts/build.py`](../scripts/build.py) | KEEP_GENERIC | not established | 22 | publication/release |
+| [`scripts/build.py`](../scripts/build.py) | KEEP_GENERIC | not established | 23 | publication/release |
 | [`scripts/build_place_context.py`](../scripts/build_place_context.py) | UNDECIDED | not established | 4 | publication/release |
 | [`scripts/catalogue_profiles.py`](../scripts/catalogue_profiles.py) | UNDECIDED | named test | 4 | not determined |
 | [`scripts/catalogue_release_coverage.py`](../scripts/catalogue_release_coverage.py) | KEEP_GENERIC | named test | 9 | publication/release |
@@ -189,7 +189,7 @@ The source-bound detailed registry is [TOOL_REGISTRY.json](TOOL_REGISTRY.json). 
 | [`scripts/sword_native_raw_entry.cpp`](../scripts/sword_native_raw_entry.cpp) | UNDECIDED | not established | 7 | not determined |
 | [`scripts/tool_registry.py`](../scripts/tool_registry.py) | KEEP_GENERIC | named test | 2 | not determined |
 | [`scripts/usfx_schema_gate.py`](../scripts/usfx_schema_gate.py) | UNDECIDED | named test | 3 | not determined |
-| [`scripts/validate.py`](../scripts/validate.py) | KEEP_GENERIC | not established | 25 | not determined |
+| [`scripts/validate.py`](../scripts/validate.py) | KEEP_GENERIC | not established | 26 | not determined |
 | [`scripts/verify_public_catalogue.py`](../scripts/verify_public_catalogue.py) | KEEP_GENERIC | named test | 5 | not determined |
 
 ## Safeguards and next steps

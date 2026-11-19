@@ -291,7 +291,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "publication/release",
-      "static_reference_count": 22,
+      "static_reference_count": 23,
       "static_references": [
         "scripts/publish_reviewed_release.py",
         "scripts/release_preflight.py",
@@ -308,6 +308,7 @@
         "docs/COMMENTARY_PIPELINE.md",
         "docs/PUBLISHING.md",
         "docs/RESOURCE_PROFILES.md",
+        "docs/SOURCE_FIRST_EDITORIAL_PIPELINE.md",
         "docs/STABLE_SWORD_REFERENCE_AUDIT.md",
         "docs/evidence/mhcc-274/0.1.1-release-transition-DRAFT.md",
         "docs/evidence/mhcc-274/publication-provenance-readiness.md",
@@ -6843,7 +6844,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 25,
+      "static_reference_count": 26,
       "static_references": [
         "scripts/build.py",
         "scripts/release_preflight.py",
@@ -6862,6 +6863,7 @@
         "docs/COMMENTARY_POLICY.md",
         "docs/NORMALIZATION_POLICY.md",
         "docs/PUBLISHING.md",
+        "docs/SOURCE_FIRST_EDITORIAL_PIPELINE.md",
         "docs/STABLE_SWORD_REFERENCE_AUDIT.md",
         "docs/evidence/mhcc-274/publication-provenance-readiness.md",
         "tests/test_catalogue_update_contract.py",
