@@ -27,6 +27,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_source_gaps.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_private_word_candidate.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_pronoun_candidate.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_remaining_headwords.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -139,6 +140,30 @@ jobs:
           assert all("sense_id" not in item for item in index["by_macula_word"].values())
           print("UBS_GREEK_PRONOUN_SOURCE_REVIEW_PRIVATELY_VERIFIED")
           PY
+      - name: Enumerate all 905 unapproved Greek word witnesses by original lexical family
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_remaining_headwords.py \
+            --candidate /tmp/bsi-ubs-greek-reviewed-pronoun-private-candidate.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --output /tmp/bsi-ubs-greek-905-unapproved-family-evidence.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path("/tmp/bsi-ubs-greek-905-unapproved-family-evidence.json").read_text())
+          assert report["unapproved_words"]==905
+          assert sum(f["original_word_count"] for f in report["families"])==905
+          assert all(f["contextual_sense_ids_selected"] == [] for f in report["families"])
+          assert report["publication_approved"] is False
+          print("GREEK_REMAINING_905_WITNESSES_ALL_EXPLICITLY_UNAPPROVED")
+          PY
+      - name: Upload remaining Greek word witnesses (PRIVATE, NOT approved)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-905-unapproved-source-evidence-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-905-unapproved-family-evidence.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload private source-reviewed Greek pronouns (NO public release)
         uses: actions/upload-artifact@v4
         with:
