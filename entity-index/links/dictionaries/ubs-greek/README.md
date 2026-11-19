@@ -232,3 +232,37 @@ parity, original word-ID-to-entry witnesses, POS alignment, zero modified
 source annotations, zero invented contextual `LEXID`, and preservation of
 the frozen `index.json`. The versioned source-reviewed result remains
 an **expiring private GitHub Actions artifact, NOT a download or release**.
+
+## Original εἰμί headword-only review without UBS lexical senses
+
+The separately source-verified [εἰμί decision ledger](v1_reviewed_no_ln_headwords.json)
+and [original-word builder](build_reviewed_no_ln_headwords.py) cover **2,031**
+previously unlinked exact MACULA original word IDs with original lemma
+`εἰμί` (NFC Greek equivalence), the original grammatical class `verb`,
+real inflectional Strong annotations and morphologies, and an original
+UBS v1.0 EN/FR bilingual-identical headword with source Strong `G2258`.
+The original dictionary grammatical metadata labels it `verb` in English
+and `verbe` in French. These source differences are deliberately preserved.
+
+**This approves a lexical entry/headword, not an UBS contextual sense.**
+The original UBS entry genuinely has zero `LEXMeanings` in both languages;
+no contextual `LEXID`, original LN code or global Strong alias is
+inferred. The 2,031 exact source word IDs are individually rechecked
+against all 137,741 original SBLGNT tokens. The previous 5,610
+original-word headword approvals and frozen original `index.json` remain
+untouched.
+
+The resulting source-reviewed **headword-only** coverage is
+**135,731 / 137,741 (98.541%)**: 128,090 pre-existing Strong headword
+candidates plus 7,641 individually reviewed word headwords. This must
+not be represented as 98.541% contextual sense accuracy or a claim that
+the original dictionary contains missing meanings. Remaining: 328
+strict original lemma+LN previews still unapproved, 1,218 other original
+lemma-only/no UBS LN words not linked, 459 without a canonically equal
+UBS headword, five unsupported composite Strong words, and 224 already
+multiply headed source cases left ambiguous. The original unmodified
+historical index and every source Greek/Strong/morph/LN annotation are
+still preserved.
+
+The result is a **private, expiring Actions review artifact** only,
+without a public download, SWORD release or Bible application integration.

@@ -30,6 +30,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_remaining_headwords.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_families_batch2.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_eimi_disposition.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_no_ln_headwords.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -203,6 +204,46 @@ jobs:
           assert all("sense_id" not in row for row in reviewed["by_macula_word"].values())
           print("UBS_GREEK_FAMILY_BATCH2_PRIVATE_VERIFIED_NOT_PUBLISHED")
           PY
+      - name: Source-review exact Greek εἰμί original word IDs as entry-only without UBS LN senses
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_no_ln_headwords.py \
+            --candidate /tmp/bsi-ubs-greek-reviewed-family-batch2-private.json \
+            --index entity-index/links/dictionaries/ubs-greek/index.json \
+            --report /tmp/bsi-ubs-greek-original-gap-review.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_no_ln_headwords.json \
+            --macula macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
+            --output /tmp/bsi-ubs-greek-eimi-entry-only-private.json
+          python3 - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+          c=json.loads(Path("/tmp/bsi-ubs-greek-eimi-entry-only-private.json").read_text())
+          base=json.loads(Path("entity-index/links/dictionaries/ubs-greek/index.json").read_text())
+          assert all(c[k]==v for k,v in base.items())
+          assert len(c["by_macula_word"]) == 7969
+          assert c["editorial_candidate"]["reviewed_original_headword_words_total"] == 7641
+          assert c["editorial_candidate"]["new_inferred_contextual_lexical_sense_ids"] == 0
+          assert c["editorial_candidate"]["publication_approved"] is False
+          assert c["word_aware_coverage"]["word_aware_entry_candidate_words"] == 136059
+          assert c["word_aware_coverage"]["remaining_no_ubs_headword_candidate_original_words"] == 1682
+          assert Counter(x["match_type"] for x in c["by_macula_word"].values()) == {
+            "source_reviewed_original_greek_pronoun_headword_only": 5033,
+            "source_reviewed_original_greek_headword_batch2_only": 577,
+            "nfc_canonically_identical_lemma_and_original_ln_unapproved_word_candidate": 328,
+            "source_reviewed_original_greek_entry_only_without_ubs_ln": 2031,
+          }
+          assert all("sense_id" not in row for row in c["by_macula_word"].values())
+          print("GREEK_EIMI_ORIGINAL_SOURCE_ENTRY_ONLY_REVIEWED_NO_CONTEXTUAL_SENSES")
+          PY
+      - name: Upload Greek εἰμί reviewed original word-ID headwords (PRIVATE, NOT published)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-eimi-2031-entry-only-reviewed-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-eimi-entry-only-private.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload second Greek editorial family batch (PRIVATE, NOT published)
         uses: actions/upload-artifact@v4
         with:
