@@ -1,5 +1,32 @@
 # MHCC Modern English — exact source reference disposition and final 180-case queue
 
+## Latest 2026-11-19 verified disposition: 165/176 links navigable; 11 source anomalies isolated
+
+The complete modern private candidate and its actual native SWORD readback passed [full-canon CI #44481658491](https://github.com/icfmp/Bible-Resources/actions/runs/44481658491), plus [Validate #44481658412](https://github.com/icfmp/Bible-Resources/actions/runs/44481658412) and [registry #44481658393](https://github.com/icfmp/Bible-Resources/actions/runs/44481658393). **All 28,792 numbered original K keys survive**; no original MHCC 0.1.1 text or source module was rewritten.
+
+| Present original source-link disposition | Occurrences |
+| --- | ---: |
+| Originally represented original-source references after nine modern manuscript citation restorations | 1,021 |
+| Verified compact printed-verse citation references restored on exact original destinations | 86 |
+| Exact K-section ranges relocated to distinguishable modern editorial headings | 25 |
+| Partial source-authenticated chapter ranges in modern authorial prose | 5 |
+| Same-K explicit verse numbers in modern prose | 11 |
+| Exact original-outline row verse digits | 22 |
+| Source-attested original-first-K links in separate modern book introductions | 10 |
+| **Total source links navigable in the private candidate** | **1,180** |
+| Original digital/printed source citation discrepancies still in original-K notes, independently K/ordinal/SHA pinned | 11 |
+| Original source digital list links proven spurious | 9 |
+| Previously identified malformed original source targets excluded and unapproved | 4 |
+| **Total original source link elements accounted for** | **1,204** |
+
+Of the formerly unplaced **176** original occurrences, **165** now have valid navigation (the 1,021 baseline already includes six of the nine newly restored links; the 86 compact links include the other three). **All 11 still unresolved correspond to the source-witnessed digital/printed reference inconsistencies** in `ADDITIONAL_ORIGINAL_LINK_TARGET_ERRATA_2026-11-18.json` — no remaining unreviewed modern-reference placement backlog. These 11 links are preserved in source-owned notes *only*, and their original literal digital destinations must not be treated as editorially approved. The nine recent manuscript citations (Matthew 1; Matthew 3; Hebrews 11) and the restored Matthew 3 statement about the Spirit's present grace are an explicitly **review-pending editorial amendment**, tracked in [ORIGINAL_LINK_RESTORATION_EDITS_2026-11-19.md](ORIGINAL_LINK_RESTORATION_EDITS_2026-11-19.md). All fixes are reversible, with no public release.
+
+The **25** editorial heading and **10** book-introduction locations are justified navigational relocations, **not proofs of Henry's exact original in-sentence link positions**. Real SWORD and `diatheke` checks do not substitute for real GUI-reader tests. The last 11 targets, exact edition/source rights, independent translation-meaning review and publication permission remain separate release gates.
+
+### Historical checkpoint below (156/176)
+
+The earlier dated triage paragraph and older 111/176 history are retained for an auditable change log. They are not the current result.
+
 **2026-11-19 source-link triage update:** The most recent source-pinned private modules on [CI #44479185011](https://github.com/icfmp/Bible-Resources/actions/runs/44479185011) **SUCCESS** (Validate/registry green) have **156/176** previously unresolved original source links navigable (83 compact, 25 K-section headings, 5 partial verse ranges, 11 local verse tokens, 22 original outline digits, 10 in source-verified relocated book introductions), with **20 source notes** retained and **all 28,792 native K keys** intact. **The 20 now split into ten suspect native digital destinations, one printed-original Leviticus reference discrepancy, and nine valid source links whose citations are absent in modern prose.** Source-fidelity review found one substantive omitted original clause in Matthew 3:7–12 concerning the continuing graces and comforts of the Holy Spirit; do not hide this omission with unsafe automatic hyperlinks. [Detailed final triage](REMAINING_20_ORIGINAL_LINK_EDITORIAL_REVIEW_2026-11-19.md). Original source and modern accepted chapter manuscripts are unchanged. The new preface-linked candidate remains separate, private and unapproved.
 
 
