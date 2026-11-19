@@ -38,6 +38,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_single_candidate_abstentions.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_reviewed_word_anchor_preview.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_positive_family_unwitnessed.py
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_additional_word_headwords.py
       - name: Check out exact UBS Hebrew EN/FR 0.9.4 source
         uses: actions/checkout@v4
         with:
@@ -234,6 +235,31 @@ jobs:
           print("UBS_135_PENDING_WORDS_EXACT_SOURCE_PIN_VERIFIED")
           PY
           fi
+      - name: Verify 134 additional exact original WLC headwords and one source uncertainty
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/verify_additional_word_headwords.py \
+            --decisions entity-index/links/dictionaries/ubs-hebrew/v1_additional_word_headword_dispositions.json \
+            --audit /tmp/bsi-ubs-positive-family-pending-original-words.json \
+            --ledger entity-index/links/dictionaries/ubs-hebrew/v1_reviewed_headword_dispositions.json \
+            --preview entity-index/links/dictionaries/ubs-hebrew/reviewed_word_anchor_preview.json \
+            --index /tmp/bsi-ubs-hebrew-index.json \
+            --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
+            --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --output /tmp/bsi-ubs-reviewed-additional-word-headwords.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          observed=json.loads(Path("/tmp/bsi-ubs-reviewed-additional-word-headwords.json").read_text(encoding="utf-8"))
+          expected=json.loads(Path("entity-index/links/dictionaries/ubs-hebrew/reviewed_additional_word_anchor_preview.json").read_text(encoding="utf-8"))
+          assert observed == expected, "Original WLC word-specific editorial overlay differs from source-verified output"
+          assert observed["summary"] == {
+              "new_individually_approved_original_words": 134,
+              "source_words_preserved_unlinked_as_uncertain": 1,
+              "combined_staged_original_wlc_words": 273,
+              "new_contextual_sense_ids": 0,
+          }
+          print("UBS_134_ADDITIONAL_SOURCE_WORD_HEADWORDS_VERIFIED")
+          PY
       - name: Verify all lexical families classified without editorial assumptions
         run: |
           python3 - <<'PY'
