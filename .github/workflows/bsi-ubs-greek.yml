@@ -40,6 +40,8 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_missing_exact_headwords.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_alpha_case_only.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_composite_strong_original_words.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_composite_strong_headwords.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_word_coverage_invariants.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -624,6 +626,52 @@ jobs:
           assert r['publication_approved'] is False
           print('GREEK_SOURCE_FIVE_COMPOSITE_STRONG_WORD_IDS_CLASSIFIED_WITHOUT_ALIAS')
           PY
+      - name: Review five authentic Greek original-word composite Strong lexical headwords
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_composite_strong_headwords.py \
+            --candidate /tmp/bsi-ubs-greek-three-alpha-word-headwords-private.json \
+            --raw_source /tmp/bsi-ubs-greek-original-exceptions-and-ambiguities.json \
+            --report /tmp/bsi-ubs-greek-five-original-composites-review.json \
+            --ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_composite_strong_headwords.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --output /tmp/bsi-ubs-greek-reviewed-five-composite-private.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.loads(Path('/tmp/bsi-ubs-greek-reviewed-five-composite-private.json').read_text())
+          old=json.loads(Path('entity-index/links/dictionaries/ubs-greek/index.json').read_text())
+          assert all(c[k]==v for k,v in old.items())
+          assert len(c['by_macula_word'])==9195
+          assert len(c['by_macula_ambiguous_word'])==220
+          assert c['editorial_candidate']['reviewed_original_headword_words_total']==9194
+          assert c['editorial_candidate']['other_original_words_still_unapproved']==1
+          assert c['editorial_candidate']['publication_approved'] is False
+          assert c['editorial_candidate']['new_inferred_contextual_lexical_sense_ids']==0
+          assert c['word_aware_coverage']['word_aware_entry_candidate_words']==137285
+          verified=[x for x in c['by_macula_word'].values() if x['match_type']=='source_reviewed_original_greek_composite_strong_word_headword_only']
+          assert len(verified)==5
+          assert all('+' in x['original_strong'] and 'sense_id' not in x for x in verified)
+          print('GREEK_COMPOSITE_STRONG_FIVE_ORIGINAL_WORD_HEADWORDS_WITHOUT_STRONG_ALIAS')
+          PY
+      - name: Verify no double counting in all reviewed Greek original-word candidate stages
+        run: |
+          for path in \
+            /tmp/bsi-ubs-greek-32-taxonomy-review-private.json \
+            /tmp/bsi-ubs-greek-strong-zero-headwords-private.json \
+            /tmp/bsi-ubs-greek-three-alpha-word-headwords-private.json \
+            /tmp/bsi-ubs-greek-reviewed-five-composite-private.json; do
+            python3 -I entity-index/links/dictionaries/ubs-greek/validate_word_coverage_invariants.py \
+              --baseline entity-index/links/dictionaries/ubs-greek/index.json \
+              --candidate "$path"
+          done
+      - name: Upload reviewed Greek composite Strong word heads (PRIVATE, NOT published)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-five-composite-Strong-word-headwords-reviewed-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-reviewed-five-composite-private.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload original Greek composite Strong audit (PRIVATE, NOT approved)
         uses: actions/upload-artifact@v4
         with:
