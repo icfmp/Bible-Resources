@@ -83,6 +83,8 @@ def verify_register(ledger, register):
 
 def verify_ubs(ledger, entries):
     by_id = {e["MainId"]: e for e in entries}
+    if len(by_id) != len(entries):
+        raise ValueError("Duplicate pinned UBS MainId")
     for d in ledger["dispositions"]:
         match = SOURCE_STRONG.fullmatch(d["original_strong"])
         if match is None:
