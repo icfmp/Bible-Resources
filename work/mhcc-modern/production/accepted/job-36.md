@@ -21,7 +21,7 @@ publication_status: "NOT RELEASED — FULL SWORD REBUILD PENDING"
 
 ## Elihu asks Job to listen (verses 1–4)
 
-Elihu maintained that Job's suffering had been permitted **to test him**.
+Elihu maintained that Job's affliction had been **sent to test him**.
 
 It continued because Job had not yet been humbled fully under it.
 
@@ -114,6 +114,8 @@ When sins come between us and his countenance, we may no longer perceive the sun
 ---
 
 ## Editorial review — Job 36
+
+**2026-11-19 follow-up secondary-witness agency repair (unapproved draft):** In verses 1–4 restored Henry's explicit claim that Job's affliction was *sent for his trial* rather than merely *permitted*, alongside the 5–14 repairs recorded below. Compared with [CCEL Job 36](https://ccel.org/ccel/henry/mhcc.xix.xxxvi.html); native source collation outstanding.
 
 **2026-11-19 secondary-witness fidelity repair (unapproved draft):** Verses 5–14 previously softened Henry's expected *furnace heated until consumed* to vague intensification of judgment, omitted the statement about dying without knowledge and grace, and replaced *heap up wrath* / *everlasting misery* with generic judgment and misery. Restored each distinct warning from [CCEL Job 36](https://ccel.org/ccel/henry/mhcc.xix.xxxvi.html). The CCEL duplicated phrase in 1–4 and probable omission in 24–33 remain separate source-witness uncertainties; the original module was not amended. Native MHCC 0.1.1 semantic confirmation and independent approval are still required.
 
