@@ -1452,6 +1452,11 @@ jobs:
           by_book=Counter(key.split(".")[0] for _,key in remote)
           by_presence=Counter()
           by_markup=Counter()
+          differing_attributes=Counter()
+          differing_tags=Counter()
+          change_forms=Counter()
+          reference_targets_modified=0
+          note_markup_modified=0
           parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
                                  no_network=True,recover=False,huge_tree=True)
           for kind,key in remote:
@@ -1470,17 +1475,47 @@ jobs:
                   by_markup["exact_unicode_text_identical"]+=1
               else:
                   by_markup["text_changed"]+=1
-              if ([(x.tag,dict(x.attrib)) for x in old_xml.iter() if isinstance(x.tag,str)] ==
-                  [(x.tag,dict(x.attrib)) for x in new_xml.iter() if isinstance(x.tag,str)]):
+              left_nodes=[x for x in old_xml.iter() if isinstance(x.tag,str)]
+              right_nodes=[x for x in new_xml.iter() if isinstance(x.tag,str)]
+              if ([(x.tag,dict(x.attrib)) for x in left_nodes] ==
+                  [(x.tag,dict(x.attrib)) for x in right_nodes]):
                   by_markup["xml_tags_attributes_identical"]+=1
               else:
                   by_markup["xml_tag_or_attribute_changed"]+=1
+                  if len(left_nodes)!=len(right_nodes):
+                      change_forms["element_count_changed"]+=1
+                      continue
+                  for left,right in zip(left_nodes,right_nodes):
+                      left_tag=left.tag.rsplit("}",1)[-1]
+                      right_tag=right.tag.rsplit("}",1)[-1]
+                      if left_tag!=right_tag:
+                          differing_tags[left_tag+"->"+right_tag]+=1
+                      if left_tag in {"reference","note"} and (
+                            left.tag != right.tag or
+                            dict(left.attrib)!=dict(right.attrib) or
+                            left.text!=right.text or left.tail!=right.tail):
+                          if left_tag=="reference":
+                              reference_targets_modified+=1
+                          else:
+                              note_markup_modified+=1
+                      for name in set(left.attrib)|set(right.attrib):
+                          if left.get(name)!=right.get(name):
+                              differing_attributes[name.rsplit("}",1)[-1]]+=1
+                              if left.get(name) is None or right.get(name) is None:
+                                  change_forms["attr_added_or_removed"]+=1
+                              else:
+                                  change_forms["attr_value_changed"]+=1
           # Original prose never appears in this evidence: only the native
           # OSIS address, counts, and structure/text EQUALITY flags.
           print("2Chr title source→native unexpected remote key diagnosis:",
                 json.dumps({"kinds":dict(by_kind),"books":dict(sorted(by_book.items())),
                             "presence":dict(by_presence),
                             "semantic_flags":dict(by_markup),
+                            "differing_attribute_names_and_counts":dict(differing_attributes),
+                            "differing_element_names_and_counts":dict(differing_tags),
+                            "change_forms":dict(change_forms),
+                            "reference_nodes_with_changes":reference_targets_modified,
+                            "note_nodes_with_changes":note_markup_modified,
                             "first_native_addresses":sorted(remote)[:24],
                             "remote_count":len(remote)},sort_keys=True))
           print("Actual private compiled 2Chr 1 intro placement (metadata only):",
