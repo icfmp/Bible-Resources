@@ -3982,6 +3982,7 @@ jobs:
                                "x11_actual_click_dispatched":False}
                           todo=[pyatspi.Registry.getDesktop(0)]
                           matches=[]
+                          matching_names=0
                           seen=0
                           while todo and seen<2500:
                               item=todo.pop();seen+=1
@@ -3991,28 +3992,32 @@ jobs:
                                       equal=(hashlib.sha256(label.encode()).hexdigest()==digest)
                                       similar=(len(label)>=4 and len(expected)>=4 and
                                           (label.endswith(expected) or expected.endswith(label)))
-                                      # The visible numeric reference is useful
-                                      # only when it uniquely identifies one
-                                      # right-pane link; the post-click target
-                                      # still needs independent reader proof.
                                       same_numbers=(len(re.findall(r"\d+",expected))>=2
                                           and re.findall(r"\d+",label)==re.findall(r"\d+",expected))
                                       if equal or similar or same_numbers:
+                                          matching_names+=1
                                           ext=item.queryComponent().getExtents(pyatspi.DESKTOP_COORDS)
                                           if ext.width>0 and ext.height>0:
                                               x=ext.x+ext.width//2
                                               y=ext.y+ext.height//2
-                                              if 660<x<1280 and 0<y<800:
+                                              if 0<x<1280 and 0<y<800:
                                                   matches.append((x,y))
                                   todo.extend(item[i] for i in range(min(item.childCount,100)))
                               except (LookupError,RuntimeError,AttributeError):
                                   continue
-                          out["matching_showing_link_count"]=len(matches)
-                          if len(matches)==1:
-                              x,y=matches[0]
-                              click=subprocess.run(["xdotool","mousemove",str(x),str(y),
-                                  "click","1"],timeout=7,capture_output=True)
-                              out["x11_actual_click_dispatched"]=click.returncode==0
+                          coordinates=sorted(set(matches))
+                          out["matching_accessibility_role_names"]=matching_names
+                          out["matching_screen_coordinates"]=coordinates[:8]
+                          out["matching_showing_link_count"]=len(coordinates)
+                          # Select a unique rightmost source-labelled anchor
+                          # in the commentary half of the 1280-wide Xvfb.
+                          right=[item for item in coordinates if item[0]>480]
+                          if right:
+                              x,y=max(right,key=lambda item:item[0])
+                              if sum(abs(px-x)<10 for px,_ in right)==1:
+                                  click=subprocess.run(["xdotool","mousemove",str(x),str(y),
+                                      "click","1"],timeout=7,capture_output=True)
+                                  out["x11_actual_click_dispatched"]=click.returncode==0
                           print(json.dumps(out,sort_keys=True))
                       """)
                       attempt=subprocess.run(["/usr/bin/python3","-c",script,valid_labels[0]],
