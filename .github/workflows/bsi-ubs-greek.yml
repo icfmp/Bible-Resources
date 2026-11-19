@@ -28,6 +28,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-greek/test_private_word_candidate.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_pronoun_candidate.py
           python3 -I entity-index/links/dictionaries/ubs-greek/test_remaining_headwords.py
+          python3 -I entity-index/links/dictionaries/ubs-greek/test_reviewed_families_batch2.py
       - name: Pin UBS source JSON (English and French edition 1.0)
         uses: actions/checkout@v4
         with:
@@ -157,6 +158,43 @@ jobs:
           assert report["publication_approved"] is False
           print("GREEK_REMAINING_905_WITNESSES_ALL_EXPLICITLY_UNAPPROVED")
           PY
+      - name: Source-review ten more exact Greek lexical headword families (private only)
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/build_reviewed_families_batch2.py \
+            --candidate /tmp/bsi-ubs-greek-reviewed-pronoun-private-candidate.json \
+            --evidence /tmp/bsi-ubs-greek-905-unapproved-family-evidence.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --ledger entity-index/links/dictionaries/ubs-greek/v1_reviewed_families_batch2.json \
+            --output /tmp/bsi-ubs-greek-reviewed-family-batch2-private.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("/tmp/bsi-ubs-greek-reviewed-family-batch2-private.json")
+          reviewed=json.loads(p.read_text(encoding="utf-8"))
+          base=json.loads(Path("entity-index/links/dictionaries/ubs-greek/index.json").read_text(encoding="utf-8"))
+          assert all(reviewed[k]==v for k,v in base.items())
+          assert reviewed["editorial_candidate"]["reviewed_original_headword_words_total"]==5610
+          assert reviewed["editorial_candidate"]["other_original_words_still_unapproved"]==328
+          assert reviewed["editorial_candidate"]["publication_approved"] is False
+          assert reviewed["editorial_candidate"]["new_inferred_contextual_lexical_sense_ids"]==0
+          from collections import Counter
+          kinds=Counter(v["match_type"] for v in reviewed["by_macula_word"].values())
+          assert kinds=={
+              "source_reviewed_original_greek_pronoun_headword_only": 5033,
+              "source_reviewed_original_greek_headword_batch2_only": 577,
+              "nfc_canonically_identical_lemma_and_original_ln_unapproved_word_candidate": 328,
+          }
+          assert all("sense_id" not in row for row in reviewed["by_macula_word"].values())
+          print("UBS_GREEK_FAMILY_BATCH2_PRIVATE_VERIFIED_NOT_PUBLISHED")
+          PY
+      - name: Upload second Greek editorial family batch (PRIVATE, NOT published)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-577-word-families-reviewed-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-reviewed-family-batch2-private.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload remaining Greek word witnesses (PRIVATE, NOT approved)
         uses: actions/upload-artifact@v4
         with:
