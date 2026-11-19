@@ -369,6 +369,7 @@ def audit_word_links(index, macula):
                 "macula_word_consonants_and_source_sdbh_ubs_owner_entry_only",
                 "macula_word_ubs_published_alternate_lemma_same_strong_family",
                 "macula_word_ubs_alternate_lemma_and_source_sdbh_owner_entry_only",
+                "macula_word_editorially_reviewed_headword_only",
             ):
                 results["additional_entry_only_links"] += 1
                 results[new["evidence"]] += 1
