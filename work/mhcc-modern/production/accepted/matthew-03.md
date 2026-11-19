@@ -52,7 +52,7 @@ We must recognize sin and be convinced that **our own righteousness cannot save 
 
 The ways of Satan and sin are crooked.
 
-The path prepared for Christ must be made straight.
+The path prepared for Christ must be made straight (**Hebrews 12:13**).
 
 The secondary witness also includes a reference to **Zechariah 13:1** at this point; the exact original-native placement and relevance of that reference require verification, rather than silent correction.
 
@@ -100,7 +100,9 @@ Only the Spirit's cleansing power can make a heart pure and produce the holy aff
 
 **Christ alone baptizes with the Holy Spirit**.
 
-He did so through the remarkable gifts bestowed upon the apostles.
+He did so through the remarkable gifts bestowed upon the apostles (**Acts 2:4**).
+
+He also grants the Spirit's graces and comforts to those who ask him (**Luke 11:13; John 7:38–39; Acts 11:16**).
 
 The secondary witness prints a reference to **Isaiah 21:10** near this statement; its original source context should be checked separately, without altering the pinned module.
 
@@ -163,6 +165,8 @@ This is the gospel's message, which we must receive cheerfully through faith.
 ---
 
 ## Editorial review — Matthew 3
+
+- **2026-11-19 source-native recovery of omitted Scripture references and content:** Restored original `Matt.3.1` link **Hebrews 12:13** and original `Matt.3.7` links **Acts 2:4; Luke 11:13; John 7:38–39; Acts 11:16**. The original sentence about the Spirit's ongoing *graces and comforts given to those who ask* was absent from the modern manuscript; it is reinstated as a faithful modern-English sentence instead of inventing a citation-only editorial gloss. All originals require full private SWORD source K/ordinal and rendered-text validation before publication.
 
 **Complete original-English secondary Concise witness read:** [Matthew Henry's Concise Commentary, Matthew 3](https://www.christianity.com/bible/commentary/matthew-henry-concise/matthew/3). The exact released `MHCC 0.1.1` remains original authority, source-native SWORD and independent review pending.
 
