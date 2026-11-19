@@ -24,7 +24,7 @@ on:
       - 'work/mhcc-modern/**'
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 concurrency:
   group: modern-source-receipt-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -39,6 +39,19 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Refresh script inventory on this feature branch (temporary maintenance)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/feature/mhcc-modern-english'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/tool_registry.py --write
+          git add docs/TOOL_REGISTRY.json docs/TOOL_REGISTRY.md
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "chore: refresh source-bound tool registry for Xiphos QA"
+            git push origin HEAD:feature/mhcc-modern-english
+          fi
       - name: Test source-native and draft-coverage guards on synthetic fixtures
         run: python -m unittest tests/test_commentary_modern_source_receipt.py tests/test_commentary_modern_ionly_preview.py tests/test_commentary_modern_draft_guard.py tests/test_commentary_modern_draft_osis_preview.py tests/test_commentary_modern_reference_gate.py tests/test_commentary_modern_linked_candidate_preview.py tests/test_commentary_modern_native_witness_probe.py tests/test_commentary_modern_k_scope_preview.py -v
       - name: Test fail-closed real-Xiphos GUI harness before any SWORD build
