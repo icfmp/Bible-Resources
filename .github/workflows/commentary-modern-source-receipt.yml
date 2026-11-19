@@ -3690,6 +3690,35 @@ jobs:
           counts={k:int(suite.get(k,0)) for k in
                   ("tests","errors","failures","skipped")}
           if run.returncode or counts!={"tests":4,"errors":0,"failures":0,"skipped":0}:
+              names=[item.get("name","unknown") for item in suite.iter("testcase")
+                     if item.find("failure") is not None or item.find("error") is not None]
+              messages=[node.get("message","") for node in suite.iter()
+                        if node.tag in ("error","failure")]
+              safe_markers=(
+                  "Pinned JSword did not load real candidate zCom",
+                  "Reader loaded another SWORD module",
+                  "Never read a globally installed commentary",
+                  "Invalid private commentary module ID",
+                  "Must use existing private SWORD_PATH",
+                  "Missing private candidate module configuration",
+                  "At least seven independently native-read sample passages",
+                  "Only 2-6 separately native-attested link specimens",
+                  "Malformed native preselected sample",
+                  "JSword could not parse an existing native K reference",
+                  "JSword cannot address native-occupied commentary",
+                  "JSword returned empty real compiled commentary",
+                  "JSword did not render substantive commentary",
+                  "JSword lost the commentary prose",
+                  "JSword changed or dropped native K Scripture reference targets",
+              )
+              reason=next((marker for marker in safe_markers
+                           if any(marker in message for message in messages)),
+                          "other_or_java_runtime_failure")
+              print("JSWORD_PRIVATE_ASSERTION_DIAGNOSTIC="+json.dumps({
+                  "actual_tests":counts,
+                  "failed_test_names":names[:3],
+                  "matched_reviewed_assertion":reason,
+                  "java_exit":run.returncode},sort_keys=True))
               raise ValueError("Real pinned AndBible Java engine parity test failed: "+
                                json.dumps(counts,sort_keys=True))
           receipt={
