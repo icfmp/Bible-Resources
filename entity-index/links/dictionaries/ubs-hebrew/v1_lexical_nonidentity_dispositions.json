@@ -1079,6 +1079,66 @@
       },
       "ubs_attested_gloss": "mole rat",
       "rationale": "Isaiah 2:20 has the first original segment חֲפֹר of the expression חְפֹּר פֵּרוֹת, glossed in the pinned WLC 'digging' (a verbal infinitive). The sole UBS lexical candidate חֲפַרְפָּרָה designates the *entire* animal mole rat, not this separate verbal segment. No atomic word link is justified."
+    },
+    {
+      "lang": "H",
+      "lemma": "עֶגְלַת שְׁלִשִׁיָּה",
+      "original_strong": "5697a",
+      "occurrences": 2,
+      "candidate_relation": "same_strong_family_unresolved",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o230150050071",
+        "reference": "ISA 15:5!7",
+        "english": "",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "005233001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "005238000000000",
+        "lemma": "עֶגְלָה",
+        "strong_codes": [
+          "H5697",
+          "H5698"
+        ],
+        "parts_of_speech": [
+          "noun f",
+          "name"
+        ]
+      },
+      "ubs_attested_gloss": "Eglah",
+      "rationale": "Isaiah 15:5 and Jeremiah 48:34 name the Moabite locality Eglath-Shelishiyah (the original compound source form). The sole UBS עֶגְלָה candidate denotes a heifer or Eglah, a wife of David, and contains no attested location Eglath-Shelishiyah. This compound place name is not the wife or standalone animal noun merely because its first constituent resembles Eglah."
+    },
+    {
+      "lang": "H",
+      "lemma": "צפה",
+      "original_strong": "7436",
+      "occurrences": 1,
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o090010010061",
+        "reference": "1SA 1:1!6",
+        "english": "Zuphite",
+        "pos": "noun",
+        "class": "noun",
+        "original_sdbh": "006835001001000"
+      },
+      "ubs_candidate": {
+        "main_id": "006285000000000",
+        "lemma": "צפה",
+        "strong_codes": [
+          "H6822",
+          "H6823",
+          "H6839"
+        ],
+        "parts_of_speech": [
+          "verb"
+        ]
+      },
+      "ubs_attested_gloss": "field of Zophim",
+      "rationale": "1 Samuel 1:1 describes Samuel's family as Zuphite / Ramathaim-Zophim in Ephraim. The sole UBS צפה candidate's location 'field of Zophim' lies in Moab (Numbers 23:14), a distinct named place; the remaining UBS verbal meanings watch/cover also do not identify the original Zuphite gentilitial name. No lexical headword identity is approved."
     }
   ]
 }
