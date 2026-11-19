@@ -3050,6 +3050,318 @@ def build_private_first_K_outline_verse_tokens(
     }
 
 
+
+def build_private_source_preface_verse_links(
+        *, preface_osis: bytes, source_note_receipt: dict,
+        source_review_packet: dict, preface_proof: dict,
+        native: dict) -> tuple[bytes,dict]:
+    """Place source-K book-preface citations on exact modern prefaced verse tokens.
+
+    This separate private alternative is a *documented editorial navigation*
+    from authenticated source-first K into separately restored modern book
+    prefaces. It is NOT original authorial inline-location proof. Moving a
+    reference removes its duplicate K source-only note; original K, literal
+    source target, translated prose and metadata are otherwise untouched.
+    """
+    from collections import Counter
+    from commentary_modern_draft_osis_preview import NS
+    corpus=native.get("original_compiled_corpus_sha256")
+    if (corpus is None
+            or source_note_receipt.get("status") !=
+                "PRIVATE_NATIVE_SOURCE_NOTE_ALTERNATIVE_NOT_AUTHORED_INLINE_PARITY"
+            or source_note_receipt.get("original_native_corpus_sha256")!=corpus
+            or source_note_receipt.get("source_link_supplement_not_authorial_or_inline") is not True
+            or source_note_receipt.get("published_or_distributed") is not False
+            or source_review_packet.get("status")!=
+                "EPHEMERAL_EXCERPTS_PRIVATE_EDITORIAL_REVIEW_ONLY"
+            or source_review_packet.get("source_pinned_corpus_sha256")!=corpus
+            or source_review_packet.get("original_full_K_prose_or_markup_exported") is not False
+            or source_review_packet.get("original_link_placement_approved") is not False
+            or preface_proof.get("status") !=
+                "PRIVATE_SOURCE_K_BOOK_PREFACE_RESTORATION_NOT_EDIT_OR_RELEASE"
+            or preface_proof.get("original_native_corpus_sha256")!=corpus
+            or preface_proof.get("original_K_section_and_existing_links_unchanged") is not True
+            or preface_proof.get("publication_authorized") is not False):
+        raise ValueError("Source-linked first-K book prefaces require private pinned receipts")
+    refs_by_K={}
+    for row in source_note_receipt["note_source_K_reference_hashes_for_private_native_readback"]:
+        first=row["source_first_key"]
+        if first in refs_by_K:
+            raise ValueError("Duplicate original first-K notes in receipt")
+        refs_by_K[first]=row["original_source_reference_hashes"]
+    if (sum(len(x) for x in refs_by_K.values()) !=
+            source_note_receipt["original_link_occurrences_preserved_only_in_separate_source_notes"]):
+        raise ValueError("Truncated original K source-only reference receipt")
+    review={}
+    for row in source_review_packet["references"]:
+        key=(row["source_first_key"],row["source_reference_ordinal"])
+        if key in review:
+            raise ValueError("Duplicate original source K/ordinal")
+        review[key]=row
+    proof_by_book={case["book"]:case for case in preface_proof["cases"]}
+    if len(proof_by_book)!=len(preface_proof["cases"]):
+        raise ValueError("Duplicate source book-preface witnesses")
+    root=ET.fromstring(preface_osis)
+    chapters={n.get("osisID"):n for n in root.iter()
+              if n.tag==f"{{{NS}}}chapter"}
+    if set(chapters)!=set(native.get("chapters",{})):
+        raise ValueError("Original source K chapter inventory changed in book preface")
+    source_note_nodes={}
+    for chapter,chapter_node in chapters.items():
+        first_units=native["chapters"][chapter]["original_units"]
+        secs=chapter_node.findall(f"./{{{NS}}}div[@annotateType='commentary']")
+        if len(first_units)!=len(secs):
+            if not first_units:
+                continue
+            raise ValueError("Original K group count changed in modern preface preview")
+        for unit,sec in zip(first_units,secs):
+            first=unit["first_key"]
+            if first not in refs_by_K:
+                continue
+            notes=[n for n in sec if n.tag==f"{{{NS}}}note" and
+                   n.get("resp")=="BibleResourcesPrivateSourceOnlyLinkSupplement"]
+            if len(notes)!=1:
+                raise ValueError("Exact original source K note missing from book-preface candidate")
+            noted=[n for n in notes[0] if n.tag==f"{{{NS}}}reference"]
+            if len(noted)!=len(refs_by_K[first]):
+                raise ValueError("Original source K reference note cardinality drift")
+            for ref,item in zip(noted,refs_by_K[first]):
+                if (hashlib.sha256(ref.get("osisRef").encode()).hexdigest()!=
+                        item["source_original_literal_target_sha256"]
+                    or hashlib.sha256("".join(ref.itertext()).encode()).hexdigest()!=
+                        item["supplement_display_sha256"]):
+                    raise ValueError("Book-preface original source K target/display hash drift")
+            source_note_nodes[first]=(sec,notes[0],noted)
+
+    # The same anchored modern book-preface prose is already authenticated
+    # by the independently validated original native first-K book-preface
+    # passage receipt. Never draw candidate prose from other books/chapters.
+    book_intros={}
+    for book,case in proof_by_book.items():
+        if case["source_K_intro_disposition"] not in (
+                "INSERTED_SEPARATE_MODERN_INTRO_FROM_VERIFIED_ORIGINAL_K",
+                "PRESENT_IN_MODERN_FIRST_CHAPTER_EXACT_NO_DUPLICATION"):
+            continue
+        chapter=book+".1"
+        if chapter not in chapters or not native["chapters"][chapter]["original_units"]:
+            continue
+        first=native["chapters"][chapter]["original_units"][0]["first_key"]
+        if case["original_source_first_K"]!=first or first not in source_note_nodes:
+            continue
+        intros=[d for d in chapters[chapter].findall(
+                    f"./{{{NS}}}div[@type='introduction']")
+                if d.find(f"./{{{NS}}}title") is not None and
+                "book introduction" in (
+                    "".join(d.find(f"./{{{NS}}}title").itertext()).casefold())]
+        if len(intros)!=1:
+            continue
+        book_intros[first]=intros[0]
+
+    def authored_without_supplement(doc):
+        parts=[]
+        def walk(n):
+            if n.tag==f"{{{NS}}}note" and n.get("resp")==(
+                    "BibleResourcesPrivateSourceOnlyLinkSupplement"):
+                if n.tail:
+                    parts.append(n.tail)
+                return
+            if n.text:
+                parts.append(n.text)
+            for child in n:
+                walk(child)
+                if child.tail and not (
+                    child.tag==f"{{{NS}}}note" and child.get("resp")==
+                    "BibleResourcesPrivateSourceOnlyLinkSupplement"):
+                    parts.append(child.tail)
+        walk(doc)
+        return "".join(parts)
+    authored_before=authored_without_supplement(root)
+
+    def projected(p):
+        chunks=[]
+        fragments=[]
+        current=0
+        def emit(node,attr,inside_ref):
+            nonlocal current
+            val=getattr(node,attr)
+            if isinstance(val,str) and val:
+                chunks.append((current,current+len(val),node,attr,inside_ref,val))
+                fragments.append(val)
+                current+=len(val)
+        def walk(node,inside_ref=False):
+            if node.tag==f"{{{NS}}}note":
+                return
+            is_ref=inside_ref or node.tag==f"{{{NS}}}reference"
+            emit(node,"text",is_ref)
+            for child in node:
+                walk(child,is_ref)
+                emit(child,"tail",inside_ref)
+        walk(p)
+        return "".join(fragments),chunks
+
+    chosen={}
+    for first,intro in book_intros.items():
+        for hashrow in refs_by_K[first]:
+            ordinal=hashrow["source_reference_ordinal"]
+            source=review.get((first,ordinal))
+            if source is None:
+                raise ValueError("Original-K note has no authenticated original-source witness")
+            literal=source["original_literal_osisRef"]
+            if (hashlib.sha256(literal.encode()).hexdigest()!=
+                    hashrow["source_original_literal_target_sha256"]
+                or source["source_literal_target_sha256"] !=
+                    hashrow["source_original_literal_target_sha256"]
+                or source["original_visible_label_sha256"] !=
+                    source["original_visible_label_sha256"]):
+                raise ValueError("Original book preface link target/label not authenticated")
+            try:
+                book,chapter,verse=canonical_only_for_comparison(literal).rsplit(".",2)
+            except ValueError:
+                continue
+            if (verse not in re.findall(r"\b\d{1,3}\b",
+                        source["original_printed_link_label"])):
+                continue
+            names=set(_AUTO_ALIASES.get(book,()))
+            names.add(_ENGLISH_NAME_BY_OSIS[book])
+            if not all(isinstance(n,str) and n for n in names):
+                continue
+            aliases="|".join(re.escape(n) for n in sorted(names,key=len,reverse=True))
+            full=re.compile(
+                r"(?<![A-Za-z0-9])(?:"+aliases+r")\s+"
+                r"\d+\s*:\s*\d+(?:\s*[,\u2013\u2014-]\s*\d+)*"
+                r"(?:\s*;\s*\d+\s*:\s*\d+(?:\s*[,\u2013\u2014-]\s*\d+)*)*",
+                re.IGNORECASE)
+            spots=[]
+            for p in intro.findall(f"./{{{NS}}}p"):
+                rendered,chunks=projected(p)
+                for hit in full.finditer(rendered):
+                    printed=hit.group()
+                    for pair in re.finditer(
+                            r"(?<!\d)(\d+)\s*:\s*(\d+)"
+                            r"((?:\s*[,\u2013\u2014-]\s*\d+)*)",printed):
+                        if pair[1]!=chapter:
+                            continue
+                        nums=[(pair[2],pair.start(2),pair.end(2))]
+                        nums.extend((m.group(),pair.start(3)+m.start(),
+                                     pair.start(3)+m.end())
+                                    for m in re.finditer(r"\d+",pair[3]))
+                        for number,a,b in nums:
+                            if number!=verse:
+                                continue
+                            start,end=hit.start()+a,hit.start()+b
+                            spots.extend((node,attr,val,start-offset,end-offset)
+                                for offset,last,node,attr,linked,val in chunks
+                                if not linked and offset<=start and end<=last)
+            if len(spots)!=1:
+                continue
+            node,attr,val,a,b=spots[0]
+            chosen[(first,ordinal)]={
+                "source_first_key":first,"source_reference_ordinal":ordinal,
+                "original_source_literal_target_sha256":
+                    hashrow["source_original_literal_target_sha256"],
+                "source_printed_label_sha256":
+                    source["original_visible_label_sha256"],
+                "original_source_supplement_display_sha256":
+                    hashrow["supplement_display_sha256"],
+                "modern_verse_token_sha256":
+                    hashlib.sha256(val[a:b].encode()).hexdigest(),
+                "target":literal,
+                "node":node,"attr":attr,"value":val,"a":a,"b":b,
+            }
+    overlaps=Counter((id(v["node"]),v["attr"],v["a"],v["b"])
+                     for v in chosen.values())
+    chosen={k:v for k,v in chosen.items()
+            if overlaps[(id(v["node"]),v["attr"],v["a"],v["b"])]==1}
+    slots={}
+    for v in chosen.values():
+        slots.setdefault((id(v["node"]),v["attr"]),[]).append(v)
+    for entries in slots.values():
+        entries.sort(key=lambda x:x["a"])
+        n,attr,val=entries[0]["node"],entries[0]["attr"],entries[0]["value"]
+        if any(v["node"] is not n or v["attr"]!=attr or
+               v["value"]!=val for v in entries):
+            raise ValueError("Unexpected modern preface verse slot drift")
+        pos=0
+        pieces=[]
+        for entry in entries:
+            if entry["a"]<pos:
+                raise ValueError("Overlapping original book-preface citation targets")
+            link=ET.Element(f"{{{NS}}}reference",{
+                "osisRef":entry["target"],
+                "resp":"BibleResourcesOriginalFirstKSourceLinkedModernBookPreface"})
+            link.text=val[entry["a"]:entry["b"]]
+            pieces.append((val[pos:entry["a"]],link))
+            pos=entry["b"]
+        trailing=val[pos:]
+        if attr=="text":
+            n.text=pieces[0][0]
+            for index,(_,link) in enumerate(pieces):
+                link.tail=(pieces[index+1][0] if index+1<len(pieces) else trailing)
+                n.insert(index,link)
+        else:
+            parent=next((p for intro in book_intros.values() for p in intro.iter()
+                         if n in list(p)),None)
+            if parent is None:
+                raise ValueError("No modern preface parent for trailing source token")
+            n.tail=pieces[0][0]
+            index=list(parent).index(n)+1
+            for i,(_,link) in enumerate(pieces):
+                link.tail=(pieces[i+1][0] if i+1<len(pieces) else trailing)
+                parent.insert(index+i,link)
+
+    # The sole original source note is authoritative until its printed
+    # modern-book-preface alternative has been independently pinned.
+    remaining={}
+    for first,(section,note,refs) in source_note_nodes.items():
+        original_hashes=refs_by_K[first]
+        retain=[(ref,h) for ref,h in zip(refs,original_hashes)
+                if (first,h["source_reference_ordinal"]) not in chosen]
+        if len(retain)==len(refs):
+            remaining[first]=original_hashes
+            continue
+        if not retain:
+            section.remove(note)
+            continue
+        note[:]=[]
+        for index,(ref,h) in enumerate(retain):
+            ref.tail="; " if index<len(retain)-1 else "."
+            note.append(ref)
+        remaining[first]=[h for ref,h in retain]
+    if authored_without_supplement(root)!=authored_before:
+        raise ValueError("Private original book-intro citation placement changed modern prose")
+    if sum(map(len,remaining.values()))+len(chosen)!=sum(
+            map(len,refs_by_K.values())):
+        raise ValueError("Private modern book-introduction link inventory changed")
+    output=ET.tostring(root,encoding="utf-8",xml_declaration=True)
+    ET.fromstring(output)
+    return output,{
+        "status":"PRIVATE_SOURCE_FIRST_K_BOOK_INTRO_EXACT_CITATION_RELOCATION_NOT_APPROVED",
+        "original_native_corpus_sha256":corpus,
+        "original_source_link_occurrences_moved_to_modern_book_intro":len(chosen),
+        "original_K_source_only_note_occurrences_remaining":sum(
+            map(len,remaining.values())),
+        "original_K_and_modern_authored_visible_prose_modified":False,
+        "original_source_target_and_label_sha_verified":True,
+        "source_to_modern_book_preface_placement_is_editorial_navigation":True,
+        "no_original_inline_placement_claim":True,
+        "original_source_module_modified":False,
+        "publication_authorized":False,
+        "placements":[{
+            "source_first_key":v["source_first_key"],
+            "source_reference_ordinal":v["source_reference_ordinal"],
+            "source_literal_target_sha256":
+                v["original_source_literal_target_sha256"],
+            "source_original_label_sha256":v["source_printed_label_sha256"],
+            "modern_verse_token_sha256":v["modern_verse_token_sha256"],
+        } for _,v in sorted(chosen.items())],
+        "remaining_notes_by_original_first_K":[{
+            "source_first_key":first,
+            "source_note_reference_hashes":values,
+        } for first,values in sorted(remaining.items())],
+    }
+
+
+
 def build_private_inline_original_reference_index(
         *, source_note_osis: bytes, source_receipt: dict,
         native: dict) -> tuple[bytes,dict]:
