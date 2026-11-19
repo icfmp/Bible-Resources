@@ -1283,8 +1283,9 @@ jobs:
           print("This is native SWORD integrity, NOT clicked Xiphos/AndBible GUI navigation")
           print("No corrected OSIS or SWORD binary uploaded or published")
           PY
-      - name: Private trial of real OSIS chapter introduction at 2 Chronicles 1
-        continue-on-error: true
+      # A verified chapter introduction is part of the source-integrity gate,
+      # never an optional reader experiment.
+      - name: Verify real OSIS chapter introduction at 2 Chronicles 1
         timeout-minutes: 8
         shell: bash
         run: |
@@ -1393,7 +1394,7 @@ jobs:
           removed_keys=[(kind,key) for kind,key in old if
                         (kind,key) not in new]
           remote=[(kind,key) for kind,key in changed_keys+removed_keys
-                  if not (kind=="I" and key=="2Chr.1.0")
+                  if not (kind=="I" and key in {"2Chr.1", "2Chr.1.0"})
                   and not (kind=="K" and key.startswith("2Chr.1."))]
           print("Actual private compiled 2Chr 1 intro placement (metadata only):",
                 {"before_intro_entries":old_counts["actual_occupied_intro_entry_count"],
@@ -1447,7 +1448,7 @@ jobs:
               exit 1
             }
           done
-      - name: Observe real Xiphos with corrected private 25-link MHC (not hyperlink approval)
+      - name: Observe real Xiphos with final private 25-link and chapter-intro MHC (not hyperlink approval)
         if: github.event_name == 'workflow_dispatch' && steps.install_corrected_xiphos.outcome == 'success'
         id: observe_corrected_xiphos
         shell: bash
@@ -1476,8 +1477,10 @@ jobs:
           from pilot_subprocess import query,present_key
           from sword_native_raw_corpus_inventory import parse_native_raw_corpus
           root=Path(os.environ["RUNNER_TEMP"])
-          work=root/"mhc-links-preview-sword"
-          module="MHCLinkPreview"
+          # Inspect the SAME final candidate verified above, not the
+          # earlier pre-introduction 25-link intermediate SWORD module.
+          work=root/"mhc-chapter-intro-private-sword"
+          module="MHCIntroPreview"
           plan=json.loads(Path(
               "config/commentary-osis-repair-plans/mhc-crossreferences-private-preview.json"
           ).read_text())
@@ -1629,7 +1632,7 @@ jobs:
           GUI_TEST: ${{ steps.observe_corrected_xiphos.outcome }}
         run: |
           {
-            echo "## Actual Xiphos on corrected private 25-link MHC"
+            echo "## Actual Xiphos on corrected private MHC (25 links plus 2Chr 1 introduction)"
             echo "Dependency installation: ${GUI_DEPS}"
             echo "Reader GUI experiment: ${GUI_TEST}"
             echo "GUI success is not clicked hyperlink navigation or Psalm 60 title acceptance."
