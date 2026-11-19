@@ -2849,6 +2849,189 @@ def build_private_same_chapter_verse_mentions(
 
 
 
+
+def build_private_first_K_outline_verse_tokens(
+        *, source_osis: bytes, ledger: dict, original: dict, native: dict,
+        errata: dict) -> tuple[bytes,dict,dict]:
+    """Expose exact original source chapter-outline *single-verse* links.
+
+    The original MHCC 0.1.1 first-K owner carries introductory Scripture
+    navigation. Original verse identities and printed labels MUST agree, as
+    must the unique verse number in the structurally preserved "Original
+    chapter outline" *Verses* cell. Adds no fabricated authorial K body,
+    modifies no words, and does not claim original in-sentence placement.
+    """
+    from collections import Counter
+    from commentary_modern_draft_osis_preview import NS, _range
+    if (ledger.get("status") !=
+            "SOURCE_NATIVE_WHOLE_CANON_HYPERLINK_DISPOSITION_QUEUE_NOT_FINAL_APPROVAL"
+            or ledger.get("publication_authorized") is not False
+            or ledger.get("source_reference_labels_or_literal_targets_exported") is not False
+            or native.get("source_prose_or_original_markup_exported") is not False
+            or errata.get("status") !=
+                "PINNED_ORIGINAL_LINK_ERRATA_REVIEW_ONLY_NOT_APPLIED"
+            or errata.get("original_native_corpus_sha256") !=
+                native.get("original_compiled_corpus_sha256")):
+        raise ValueError("Missing original source K metadata for outline navigational links")
+    blocked={(x["source_first_key"],x["original_reference_ordinal"])
+             for x in errata["cases"]}
+    if len(blocked)!=4 or any(x.get("approval") is not False
+                             for x in errata["cases"]):
+        raise ValueError("Bad original source links must not be recovered by outline")
+    root=ET.fromstring(source_osis)
+    authored_before="".join(root.itertext())
+    chapters={x.get("osisID"):x for x in root.iter()
+              if x.tag==f"{{{NS}}}chapter"}
+    if set(chapters)!=set(native.get("chapters",{})):
+        raise ValueError("Original SWORD chapter coverage drift")
+    outline_by_chapter={}
+    for chapter, ch in chapters.items():
+        units=native["chapters"][chapter]["original_units"]
+        if not units:
+            continue
+        sections=ch.findall(f"./{{{NS}}}div[@annotateType='commentary']")
+        if len(sections)!=len(units) or any(
+                section.get("annotateRef")!=_range(unit["keys"])
+                for unit,section in zip(units,sections)):
+            raise ValueError("Original native K section ownership changed")
+        intros=[i for i in ch.findall(f"./{{{NS}}}div[@type='introduction']")
+                if i.find(f"./{{{NS}}}title") is not None and
+                i.find(f"./{{{NS}}}title").text=="Original chapter outline"]
+        if len(intros)!=1:
+            continue
+        tables=intros[0].findall(f"./{{{NS}}}table")
+        if len(tables)!=1:
+            continue
+        rows=tables[0].findall(f"./{{{NS}}}row")
+        if len(rows)<2:
+            continue
+        header=rows[0].findall(f"./{{{NS}}}cell")
+        if len(header)!=2 or [("".join(x.itertext())).strip() for x in header]!=[
+                "Original outline","Verses"]:
+            continue
+        candidate_cells=[]
+        for row in rows[1:]:
+            cells=row.findall(f"./{{{NS}}}cell")
+            if len(cells)!=2:
+                continue
+            cell=cells[1]
+            # Only original unlinked, literal number-list cells are eligible.
+            if len(cell)!=0 or not isinstance(cell.text,str):
+                continue
+            printed=cell.text.strip()
+            if not re.fullmatch(r"\d{1,3}(?:\s*[,;]\s*\d{1,3}){0,12}",printed):
+                continue
+            digits=list(re.finditer(r"\d{1,3}",cell.text))
+            if len({int(m.group()) for m in digits})!=len(digits):
+                continue
+            for m in digits:
+                candidate_cells.append((m.group(),cell,m.start(),m.end()))
+        outline_by_chapter[chapter]=(units,candidate_cells)
+
+    candidates={}
+    for row in ledger["pending"]:
+        first,ordinal=row["source_first_key"],row["source_reference_ordinal"]
+        if (first,ordinal) in blocked:
+            continue
+        if first not in original or not 1<=ordinal<=len(original[first]):
+            raise ValueError("Original source K ordinal is missing from canonical ledger")
+        literal,label=original[first][ordinal-1]
+        if (hashlib.sha256(literal.encode()).hexdigest()!=row["original_osisRef_sha256"]
+                or hashlib.sha256(label.encode()).hexdigest()!=
+                row["original_visible_label_sha256"]):
+            raise ValueError("Source K original link/label identity mismatch")
+        try:
+            book,chapter,verse=canonical_only_for_comparison(literal).rsplit(".",2)
+        except ValueError:
+            continue
+        chapter_id=f"{book}.{chapter}"
+        if first.rsplit(".",1)[0]!=chapter_id or chapter_id not in outline_by_chapter:
+            continue
+        units,cells=outline_by_chapter[chapter_id]
+        if units[0]["first_key"]!=first:
+            continue
+        # Original labels such as 'Is. 21:11', '12' must agree with
+        # exactly the same target verse. Cross-book numeric collisions
+        # are impossible because first owner and target chapter agree.
+        if verse not in re.findall(r"\b\d{1,3}\b",label):
+            continue
+        options=[(cell,a,b) for number,cell,a,b in cells if number==verse]
+        if len(options)!=1:
+            continue
+        cell,a,b=options[0]
+        candidates[(first,ordinal)]={
+            "source_first_key":first,"source_reference_ordinal":ordinal,
+            "source_target":literal,"source_target_sha256":row["original_osisRef_sha256"],
+            "original_label_sha256":row["original_visible_label_sha256"],
+            "cell":cell,"a":a,"b":b,
+        }
+    # Multiple original links cannot claim the same digit in an outline
+    # cell; such collisions are editorially unresolved, not silently linked.
+    counts=Counter((id(x["cell"]),x["a"],x["b"]) for x in candidates.values())
+    candidates={k:x for k,x in candidates.items()
+                if counts[(id(x["cell"]),x["a"],x["b"])]==1}
+    by_cell={}
+    for key,x in candidates.items():
+        by_cell.setdefault(id(x["cell"]),[]).append(x)
+    for elements in by_cell.values():
+        cell=elements[0]["cell"]
+        before=cell.text
+        elements.sort(key=lambda x:x["a"])
+        if any(x["cell"] is not cell for x in elements):
+            raise ValueError("Original outline source cell identity changed")
+        pos=0
+        cell.text=before[:elements[0]["a"]]
+        for i,x in enumerate(elements):
+            if x["a"]<pos:
+                raise ValueError("Overlapping original outline verse link positions")
+            if i>0:
+                elements[i-1]["ref"].tail=before[pos:x["a"]]
+            ref=ET.Element(f"{{{NS}}}reference",{
+                "osisRef":x["source_target"],
+                "resp":"BibleResourcesSourceFirstKOriginalOutlineVerseNavigation"})
+            ref.text=before[x["a"]:x["b"]]
+            x["visible_token_sha256"]=hashlib.sha256(ref.text.encode()).hexdigest()
+            cell.insert(i,ref)
+            x["ref"]=ref
+            pos=x["b"]
+        elements[-1]["ref"].tail=before[pos:]
+    if "".join(root.itertext())!=authored_before:
+        raise ValueError("Original modern outline navigation changed visible manuscript")
+    remaining=[row for row in ledger["pending"]
+               if (row["source_first_key"],row["source_reference_ordinal"])
+                  not in candidates]
+    revised={**ledger,
+        "source_link_occurrences_verified_in_derived_osis":
+            ledger["source_link_occurrences_verified_in_derived_osis"]+len(candidates),
+        "source_original_links_still_requiring_placement_review":len(remaining),
+        "pending":remaining,"publication_authorized":False}
+    if (revised["source_link_occurrences_verified_in_derived_osis"]+
+        ledger["source_spurious_link_occurrences_explicitly_omitted"]+
+        len(remaining)!=ledger["original_native_reference_elements"]):
+        raise ValueError("Reconstructed source outline lost an original hyperlink identity")
+    xml=ET.tostring(root,encoding="utf-8",xml_declaration=True)
+    ET.fromstring(xml)
+    return xml,revised,{
+        "status":"PRIVATE_SOURCE_FIRST_K_EXACT_OUTLINE_VERSE_NAVIGATION_NOT_ORIGINAL_INLINE",
+        "source_native_corpus_sha256":native["original_compiled_corpus_sha256"],
+        "source_first_K_outline_verse_links_recovered":len(candidates),
+        "valid_original_source_references_still_in_separate_K_notes":
+            len(remaining)-len(blocked),
+        "original_defective_link_occurrences_remain_excluded":len(blocked),
+        "original_modern_visible_text_modified":False,
+        "source_K_structure_or_original_link_target_modified":False,
+        "placement_is_editorial_outline_navigation_not_authorial_inline":True,
+        "publication_authorized":False,
+        "placements":[{
+            "source_first_key":v["source_first_key"],
+            "source_reference_ordinal":v["source_reference_ordinal"],
+            "original_literal_target_sha256":v["source_target_sha256"],
+            "original_visible_label_sha256":v["original_label_sha256"],
+            "modern_outline_verse_number_sha256":v["visible_token_sha256"]
+        } for _,v in sorted(candidates.items())]
+    }
+
+
 def build_private_inline_original_reference_index(
         *, source_note_osis: bytes, source_receipt: dict,
         native: dict) -> tuple[bytes,dict]:
@@ -3092,7 +3275,9 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                                     heading_source_osis_output: Path | None = None,
                                     heading_source_notes_output: Path | None = None,
                                     implicit_verses_osis_output: Path | None = None,
-                                    implicit_verses_notes_output: Path | None = None) -> tuple[bytes, dict]:
+                                    implicit_verses_notes_output: Path | None = None,
+                                    outline_verse_osis_output: Path | None = None,
+                                    outline_verse_notes_output: Path | None = None) -> tuple[bytes, dict]:
     """Authenticate and place an explicitly bounded set of source-backed links.
 
     Real original SWORD attributes stay in private memory/isolated new OSIS,
@@ -3129,6 +3314,10 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         raise ValueError("Local source verse links and remainder notes must travel together")
     if implicit_verses_osis_output is not None and heading_source_osis_output is None:
         raise ValueError("Local source verse recovery requires prior heading range candidate")
+    if (outline_verse_osis_output is None) != (outline_verse_notes_output is None):
+        raise ValueError("First K source outline navigation and remaining notes must travel together")
+    if outline_verse_osis_output is not None and implicit_verses_osis_output is None:
+        raise ValueError("Original outline source links require local verse candidate")
     if (placements.get("status") !=
             "PRIVATE_REVIEWED_BOUNDED_LINK_PLACEMENT_NOT_FINAL_EDIT_OR_RELEASE"
             or placements.get("published_source_module") != "MHCC 0.1.1"
@@ -3568,6 +3757,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
             "citation_count":len(rows),
             "references":rows,
         },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    outline_verse_receipt = None
+    outline_notes_receipt = None
     implicit_verse_receipt = None
     implicit_verse_notes_receipt = None
     heading_receipt = None
@@ -3629,6 +3820,21 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                     implicit_verses_notes_output.parent.mkdir(parents=True,exist_ok=True)
                     implicit_verses_osis_output.write_bytes(implicit_osis)
                     implicit_verses_notes_output.write_bytes(implicit_note_osis)
+                    if outline_verse_osis_output is not None:
+                        outline_osis,outline_ledger,outline_verse_receipt=(
+                            build_private_first_K_outline_verse_tokens(
+                                source_osis=implicit_osis,ledger=implicit_ledger,
+                                original=private_original,native=native,
+                                errata=errata_review))
+                        outline_notes_osis,outline_notes_receipt=(
+                            build_private_source_reference_supplement(
+                                linked_osis=outline_osis,ledger=outline_ledger,
+                                original=private_original,native=native,
+                                errata=errata_review))
+                        outline_verse_osis_output.parent.mkdir(parents=True,exist_ok=True)
+                        outline_verse_notes_output.parent.mkdir(parents=True,exist_ok=True)
+                        outline_verse_osis_output.write_bytes(outline_osis)
+                        outline_verse_notes_output.write_bytes(outline_notes_osis)
         if inline_source_index_output is not None:
             inlined,index_receipt=build_private_inline_original_reference_index(
                 source_note_osis=notes_osis,source_receipt=notes_receipt,
@@ -3701,6 +3907,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         "private_heading_range_remaining_source_notes":heading_notes_receipt,
         "private_implicit_original_K_verse_mentions":implicit_verse_receipt,
         "private_implicit_verse_remaining_source_notes":implicit_verse_notes_receipt,
+        "private_first_K_outline_verse_navigation":outline_verse_receipt,
+        "private_first_K_outline_verse_remaining_notes":outline_notes_receipt,
         "private_unapproved_errata_navigation_preview":errata_preview_receipt,
         "modern_SWORD_readback_verified":False,
         "independent_editorial_semantic_signoff":False,
@@ -3740,6 +3948,8 @@ def main():
     p.add_argument("--source-K-heading-range-notes-osis",type=Path)
     p.add_argument("--same-K-implicit-verses-osis",type=Path)
     p.add_argument("--same-K-implicit-verse-notes-osis",type=Path)
+    p.add_argument("--source-first-K-outline-verse-osis",type=Path)
+    p.add_argument("--source-first-K-outline-verse-notes-osis",type=Path)
     p.add_argument("--source-notes-errata-manifest",type=Path)
     p.add_argument("--source-errata-proposals-osis",type=Path)
     p.add_argument("--linked-osis",type=Path)
@@ -3799,7 +4009,9 @@ def main():
             heading_source_osis_output=a.source_K_heading_range_linked_osis,
             heading_source_notes_output=a.source_K_heading_range_notes_osis,
             implicit_verses_osis_output=a.same_K_implicit_verses_osis,
-            implicit_verses_notes_output=a.same_K_implicit_verse_notes_osis)
+            implicit_verses_notes_output=a.same_K_implicit_verse_notes_osis,
+            outline_verse_osis_output=a.source_first_K_outline_verse_osis,
+            outline_verse_notes_output=a.source_first_K_outline_verse_notes_osis)
         a.linked_osis.parent.mkdir(parents=True,exist_ok=True)
         a.report.parent.mkdir(parents=True,exist_ok=True)
         a.linked_osis.write_bytes(osis)
