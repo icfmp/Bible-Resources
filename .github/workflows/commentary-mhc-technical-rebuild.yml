@@ -1457,6 +1457,8 @@ jobs:
           change_forms=Counter()
           reference_targets_modified=0
           note_markup_modified=0
+          sampled_generated_milestones=[]
+          milestone_pairs=Counter()
           parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
                                  no_network=True,recover=False,huge_tree=True)
           for kind,key in remote:
@@ -1500,11 +1502,24 @@ jobs:
                               note_markup_modified+=1
                       for name in set(left.attrib)|set(right.attrib):
                           if left.get(name)!=right.get(name):
-                              differing_attributes[name.rsplit("}",1)[-1]]+=1
+                              attr=name.rsplit("}",1)[-1]
+                              differing_attributes[attr]+=1
                               if left.get(name) is None or right.get(name) is None:
                                   change_forms["attr_added_or_removed"]+=1
                               else:
                                   change_forms["attr_value_changed"]+=1
+                              if attr in {"sID","eID"}:
+                                  old_id=left.get(name)
+                                  new_id=right.get(name)
+                                  milestone_pairs[(old_id,new_id)]+=1
+                                  if len(sampled_generated_milestones)<8:
+                                      sampled_generated_milestones.append({
+                                          "key":key,
+                                          "tag":left_tag,
+                                          "attribute":attr,
+                                          "old":old_id[:120] if isinstance(old_id,str) else None,
+                                          "new":new_id[:120] if isinstance(new_id,str) else None,
+                                      })
           # Original prose never appears in this evidence: only the native
           # OSIS address, counts, and structure/text EQUALITY flags.
           print("2Chr title source→native unexpected remote key diagnosis:",
@@ -1516,6 +1531,8 @@ jobs:
                             "change_forms":dict(change_forms),
                             "reference_nodes_with_changes":reference_targets_modified,
                             "note_nodes_with_changes":note_markup_modified,
+                            "sampled_milestone_identifiers":sampled_generated_milestones,
+                            "unique_old_new_id_pairs":len(milestone_pairs),
                             "first_native_addresses":sorted(remote)[:24],
                             "remote_count":len(remote)},sort_keys=True))
           print("Actual private compiled 2Chr 1 intro placement (metadata only):",
