@@ -3520,6 +3520,7 @@ jobs:
                   or any(x.get("approval") is not False for x in errata["cases"])):
               raise ValueError("Unreviewed source link errata inventory")
           link_samples={}
+          blocked_raw_targets_by_ref={}
           for row in errata["cases"]:
               if len(link_samples)>=3:
                   break
@@ -3537,6 +3538,8 @@ jobs:
                   "published_original_first_K":key,
                   "source_link_ordinal":row["source_reference_ordinal"],
               }
+              # Raw original target never enters logs/receipts.
+              blocked_raw_targets_by_ref[ref]=row["original_osisRef"]
           if len(link_samples)!=3 or proof["source_suspect_links_rendered_non_navigable"]!=11:
               raise ValueError("Source-strict original hyperlink quarantine proof missing")
           samples=("Gen 1:1","Matt 3:7","Ps 95:1","Rev 22:2",
@@ -3563,6 +3566,8 @@ jobs:
                   if icode!=0 or not present_key(ref,imarkup,icode):
                       raise ValueError("Missing genuine SWORD internal markup at link sample")
                   comparisons[ref]["commentary_internal"]=imarkup
+                  comparisons[ref]["blocked_osis_targets"]=(
+                      blocked_raw_targets_by_ref[ref],)
               if ref in intro_expected:
                   comparisons[ref]["intro_expected"]=intro_expected[ref]
           def inspect_book_intro_menu(env):
@@ -3615,9 +3620,11 @@ jobs:
               raise ValueError("Real Xiphos link-bearing GUI inspection omitted")
           for ref,row in link_samples.items():
               m=markup[ref]
-              exact=m.get("exact_matching_source_target_sha256_in_real_gui_HTML",[])
-              if not isinstance(exact,list):
-                  raise ValueError("Malformed real GUI HTML link observation")
+              exact=m.get(
+                  "quarantined_source_target_sha256_exposed_as_real_GUI_HTML_href",[])
+              if (not isinstance(exact,list)
+                      or m.get("quarantined_source_targets_checked_in_real_GUI_HTML")!=1):
+                  raise ValueError("Actual HTML quarantine target was not independently checked")
               link_gui[ref]={
                   **row,
                   "real_gui_rich_HTML_observed":m.get("real_gui_rich_html_selection_available") is True,
@@ -3626,7 +3633,7 @@ jobs:
                       m.get("source_reference_labels_observed_as_real_gui_HTML_anchors",0),
                   "candidate_exact_valid_href_destinations_in_real_GUI_HTML":
                       m.get("exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations",0),
-                  "original_bad_target_observed_as_verified_valid_GUI_href":
+                  "original_bad_target_observed_as_any_real_GUI_HTML_href":
                       row["original_target_sha256"] in exact,
                   "bad_target_mouse_click_not_tested":True,
                   "missing_rich_HTML_is_inconclusive_not_a_negative_link_test":True,
@@ -3676,12 +3683,12 @@ jobs:
                 "a non-match remains inconclusive, never missing source text")
           print("PRIVATE REAL XIPHOS BOOK-I HEADING MENU OUTCOMES (no text): "+
                 str(menu_classes)+"; normal chapter classes: "+str(ordinary_intro_classes))
-          print("PRIVATE REAL XIPHOS SOURCE-STRICT LINK GUI HTML OBSERVATION (counts only): "+
+          print("PRIVATE REAL XIPHOS SOURCE-STRICT LINK GUI HTML OBSERVATION (counts only; blocked hrefs scanned independently): "+
                 str({ref:{
                     "rich":item["real_gui_rich_HTML_observed"],
                     "valid_label_anchors":item["candidate_valid_reference_source_labels_in_real_GUI_HTML"],
                     "valid_target_hrefs":item["candidate_exact_valid_href_destinations_in_real_GUI_HTML"],
-                    "bad_target_verified_href":item["original_bad_target_observed_as_verified_valid_GUI_href"]
+                    "bad_target_exposed_href":item["original_bad_target_observed_as_any_real_GUI_HTML_href"]
                 } for ref,item in link_gui.items()})+
                 "; no mouse click or negative GUI conclusion without positive HTML")
           if positives!=len(samples) or result.get("actual_passage_commands_accepted") is not True:
