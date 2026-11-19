@@ -12,3 +12,5 @@
 - Installation warning: CrossWire upstream also provides `MHC` 2.2. Installation requires explicit provider replacement, and curated 0.1.0 is not numerically newer than upstream 2.2.
 
 **Next:** require green `Validate` and `Tool registry consistency` on the exact release-content PR head; then merge, await official GitHub Release-before-Pages publisher, and independently verify live catalogue/download checksums. Do not mark issue #285 complete before published endpoints are verified.
+
+**Branch-protection note:** After the first successful full PR validation, this release branch was merged with the then-current `main` (the unrelated UBS Hebrew index commit) without dropping either change set. Publication requires new final-head checks after that synchronization.
