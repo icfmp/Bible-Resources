@@ -157,6 +157,10 @@ the source's intended meaning.
 misdirected link is silently classified as working. Genuine source ambiguity
 requires a documented editorial choice.
 
+Reference repairs can reveal a new textual or structural discrepancy. In that
+case, return to phases 2–3 and repeat the relevant full-source checks; the six
+phases are ordered gates, not a ban on iterative corrections.
+
 ## Phase 5 — Compile SWORD and test in real readers
 
 **Goal:** prove that the **final compiled artifact** faithfully represents
