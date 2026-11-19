@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Private, byte-local OSIS repair for a source-authored chapter introduction.
 
-Only move existing XML boundary tokens and remove a redundant, misleading
-verse-milestone pair. All original prose, notes, cross-references, title text,
+Move existing XML boundary tokens and remove a redundant, misleading
+verse-milestone pair. A separately attested preverse title type may be
+reclassified as a chapter heading when required by the documented osis2mod
+intro boundary rules. All original prose, notes, cross-references, title text,
 punctuation and other elements are byte-preserved. No module publication.
 This generic source-layout operation does NOT insert invented Bible verses.
 """
@@ -121,6 +123,35 @@ def repair_private_bytes(raw: bytes, plan: dict) -> tuple[bytes, dict]:
             or list(book).index(chapter_starts[0]) >= list(book).index(leading_p)):
         raise IntroRepairError("No existing chapter boundary for OSIS introduction")
 
+    # A nonchapter title between the chapter opener and first verse ends the
+    # SWORD chapter-introduction scope, even if its following div is typed
+    # "introduction". Never silently change this authorial title metadata.
+    title_plan = plan.get("preverse_title")
+    title_node = None
+    direct_preverse = list(book)[
+        list(book).index(chapter_starts[0])+1:list(book).index(leading_p)]
+    if title_plan is not None:
+        if (not isinstance(title_plan, dict)
+                or set(title_plan) != {"original_line","old_type","new_type"}
+                or type(title_plan["original_line"]) is not int
+                or not 1 <= title_plan["original_line"] <= 1000000
+                or not isinstance(title_plan["old_type"],str)
+                or not re.fullmatch(r"x-[a-z0-9-]{1,32}",title_plan["old_type"])
+                or title_plan["new_type"] != "chapter"
+                or len(direct_preverse) != 1):
+            raise IntroRepairError("Unattested chapter-heading classification plan")
+        title_node = direct_preverse[0]
+        if (not isinstance(title_node.tag,str) or _local(title_node)!="title"
+                or title_node.getparent() is not book
+                or title_node.sourceline != title_plan["original_line"]
+                or title_node.get("type") != title_plan["old_type"]
+                or title_node.get("subType") is not None):
+            raise IntroRepairError("Source preverse title identity differs from plan")
+    if any(not isinstance(n.tag,str) or _local(n)!="title"
+           or n.get("type") not in {"main","chapter","sub"}
+           for n in direct_preverse if n is not title_node):
+        raise IntroRepairError("Unreviewed preverse boundary would hide chapter introduction")
+
     positions = {}
     elements = (node for node in tree.iter() if isinstance(node.tag, str))
     stack = []
@@ -131,7 +162,7 @@ def repair_private_bytes(raw: bytes, plan: dict) -> tuple[bytes, dict]:
         if node is None or node.tag != tag:
             raise IntroRepairError("Lexical/XML parser topology mismatch")
         stack.append(node)
-        if node in (leading_p, intro_div, begin, close, next_open):
+        if node in (leading_p, intro_div, begin, close, next_open, title_node):
             pos = parser.CurrentByteIndex
             end = _xml_tag_end(raw, pos)
             token = raw[pos:end]
@@ -160,7 +191,7 @@ def repair_private_bytes(raw: bytes, plan: dict) -> tuple[bytes, dict]:
         parser.Parse(raw, True)
     except expat.ExpatError as exc:
         raise IntroRepairError("Private source lexical parse failed") from exc
-    if stack or next(elements, None) is not None or len(positions) != 6:
+    if stack or next(elements, None) is not None or len(positions) != 6 + bool(title_node):
         raise IntroRepairError("Partial source lexical marker coverage")
 
     intro_open = positions[("start", intro_div)][2]
@@ -180,6 +211,18 @@ def repair_private_bytes(raw: bytes, plan: dict) -> tuple[bytes, dict]:
     # Move the existing following verse opener OUTSIDE the introduction div.
     patch(positions[("end", intro_div)][1],
           positions[("end", intro_div)][1], next_verse_open)
+    if title_node is not None:
+        # Change ONLY the reviewed source title's type value. This turns
+        # osis2mod's preverse title boundary into a chapter heading. The old
+        # custom type and precise original line remain in the reversible plan.
+        pos, _, token = positions[("start", title_node)]
+        pattern = re.compile(rb'(?<![\w:.-])type\s*=\s*(?P<q>["\x27])(?P<value>[^"\x27]*)(?P=q)')
+        matches = list(pattern.finditer(token))
+        if (len(matches) != 1 or
+                matches[0].group("value").decode("utf-8") != title_plan["old_type"]):
+            raise IntroRepairError("Source title type lexical bytes differ from plan")
+        match = matches[0]
+        patch(pos+match.start("value"), pos+match.end("value"), b"chapter")
 
     edited = bytearray()
     cursor = 0
@@ -198,20 +241,26 @@ def repair_private_bytes(raw: bytes, plan: dict) -> tuple[bytes, dict]:
     revised_text = "".join(candidate.itertext())
     if original_text != revised_text:
         raise IntroRepairError("Authored prose, punctuation or whitespace changed")
-    def metadata(t):
+    def metadata(t, *, reviewed_title_type=False):
         # Tail belongs to the PARENT context, not the note/reference itself.
         # Moving a source div may transfer the same literal tail bytes from
         # one XML owner to another; the full-document character stream above
         # already proves every such byte still exists in identical order.
         # Verify *every* note, citation, title and emphasis body plus all its
         # actual attributes in authorial document order.
-        return [(_local(n), tuple(sorted(n.attrib.items())),
-                 "".join(n.itertext()))
-                for n in t.iter()
-                if isinstance(n.tag, str) and _local(n) in
-                   {"note", "reference", "title", "hi"}]
-    if metadata(tree) != metadata(candidate):
-        raise IntroRepairError("Original source note/citation/title markup changed")
+        records = []
+        for n in t.iter():
+            if not isinstance(n.tag,str) or _local(n) not in {
+                    "note","reference","title","hi"}:
+                continue
+            attrs=dict(n.attrib)
+            if reviewed_title_type and n is title_node:
+                attrs["type"]=title_plan["new_type"]
+            records.append((_local(n),tuple(sorted(attrs.items())),
+                            "".join(n.itertext())))
+        return records
+    if metadata(tree, reviewed_title_type=True) != metadata(candidate):
+        raise IntroRepairError("Unreviewed note/citation/title metadata or text changed")
     new_begin = [x for x in candidate.iter()
                  if isinstance(x.tag, str) and _local(x) == "verse"
                  and x.get("sID") == old]
@@ -244,7 +293,11 @@ def repair_private_bytes(raw: bytes, plan: dict) -> tuple[bytes, dict]:
         "removed_source_verse_milestone_count": 2,
         "moved_original_xml_tokens_count": 2,
         "all_original_source_text_whitespace_and_punctuation_identical": True,
-        "all_original_source_notes_references_and_titles_identical": True,
+        "all_original_source_notes_references_and_titles_identical": title_node is None,
+        "all_original_source_notes_references_and_title_text_identical": True,
+        "reviewed_preverse_title_type_reclassified": title_node is not None,
+        "reviewed_preverse_title_original_type": (
+            title_plan["old_type"] if title_node is not None else None),
         "new_chapter_verse_invented": False,
         "published": False,
     }
