@@ -29,9 +29,13 @@
     },
     "two_chronicles_chapter_introduction": {
       "native_status": "passed",
-      "real_gui_preface_status": "not_observed_in_verse_1_clipboard",
+      "real_gui_preface_status": "observed_in_real_Xiphos_chapter_heading_context_menu",
       "verse_1_exposition_gui_status": "passed",
-      "run": "https://github.com/icfmp/Bible-Resources/actions/runs/44528250861"
+      "run": "https://github.com/icfmp/Bible-Resources/actions/runs/44528250861",
+      "real_gui_normal_verse_clipboard_status": "not_observed",
+      "real_gui_chapter_heading_menu_status": "passed_original_preface_prose_witness",
+      "real_gui_chapter_heading_menu_run": "https://github.com/icfmp/Bible-Resources/actions/runs/44539128176",
+      "real_gui_heading_menu_scope": "Xiphos chapter heading menu only; not a full layout or note presentation proof"
     },
     "xiphos_three_independent_samples": {
       "status": "passed",
@@ -73,7 +77,7 @@
     "blocking_requirements": [
       "exact electronic edition digital modification/redistribution rights confirmed",
       "owner/editorial publication authorization",
-      "final complete reader presentation and navigation acceptance or clearly documented scope decision",
+      "clicked link navigation, representative title/note/paragraph GUI presentation, or explicitly documented partial-reader acceptance",
       "fresh final release candidate integrity and metadata check"
     ],
     "prohibited_actions_before_release": [
