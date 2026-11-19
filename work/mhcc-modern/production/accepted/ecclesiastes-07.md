@@ -81,7 +81,7 @@ Even while pursuing righteousness, do not be carried away by passionate temper�
 
 Avoid being impressed by your own abilities, finding fault with everything or intruding needlessly into other people's affairs.
 
-Some people who are unmoved by fear of God or judgment still avoid sins that might destroy their health, fortune or public reputation.
+Some people who are unmoved by **the fear of God or the dread of hell** still avoid sins that might destroy their health or wealth, or expose them to public justice.
 
 But those who truly fear God have **one great purpose**, so they act more consistently.
 
@@ -138,6 +138,8 @@ Let us thank God for **Jesus Christ** and seek his grace, that we may belong to 
 ---
 
 ## Editorial review — Ecclesiastes 7
+
+**2026-11-19 targeted secondary-witness fidelity repair (unapproved draft):** In verses 11–22, Henry explicitly contrasts *fear of God and dread of hell* with concern over bodily health, estate and public justice; the previous modern draft had weakened *hell* to *judgment* and softened *public justice* to public reputation. Both distinctions are restored from [CCEL Ecclesiastes 7](https://ccel.org/ccel/henry/mhcc.xxii.vii.html). Native original and independent signoff remain pending.
 
 **Complete secondary original-English witness directly inspected:** [CCEL, Ecclesiastes 7](https://ccel.org/ccel/henry/mhcc.xxii.vii.html). The published `MHCC 0.1.1` remains authoritative for native SWORD keys, links and independent review.
 
