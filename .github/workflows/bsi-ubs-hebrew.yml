@@ -6,14 +6,14 @@ on:
       - "entity-index/links/dictionaries/ubs-hebrew/**"
       - ".github/workflows/bsi-ubs-hebrew.yml"
   push:
-    branches: [feat/ubs-hebrew-v1-family-register]
+    branches: [main]
     paths:
       - "entity-index/links/dictionaries/ubs-hebrew/**"
       - ".github/workflows/bsi-ubs-hebrew.yml"
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   verify-lexical-index:
@@ -160,12 +160,19 @@ jobs:
           assert summary["unresolved_occurrences"] == 8582
           assert summary["outside_scope_occurrences"] == 5933
           assert summary["inside_scope_unresolved_occurrences"] == 2649
-          assert summary["unresolved_families"] == len(register["families"])
+          assert summary["unresolved_families"] == 202 == len(register["families"])
+          assert summary["families_by_reason"] == {
+              "different_strong_exact_attested_lemma": 46,
+              "different_strong_same_consonants": 27,
+              "same_strong_family_unresolved": 122,
+              "source_strong_unreadable": 2,
+              "unattested_indexed_headword": 5,
+          }
           assert sum(g["occurrences"] for g in register["families"]) == 8582
           assert summary["families_with_editorial_decision"] == 0
           assert all(g["review_decision"] == "not_editorially_validated" for g in register["families"])
           dest=Path("entity-index/links/dictionaries/ubs-hebrew/family_register.json")
-          if dest.is_file() and not (__import__("os").environ.get("GITHUB_EVENT_NAME")=="push" and __import__("os").environ.get("GITHUB_REF")=="refs/heads/feat/ubs-hebrew-v1-family-register"):
+          if dest.is_file():
               assert json.loads(dest.read_text(encoding="utf-8")) == register, "Family register does not match pinned sources"
           print("UBS_FAMILY_REGISTER_REPRODUCIBLE", summary)
           PY
@@ -227,17 +234,6 @@ jobs:
           else:
               print("BSI_UBS_HEBREW_INITIAL_INDEX_PENDING_COMMIT")
           PY
-      - name: Pin original lexical-family register on isolated branch only
-        if: github.event_name == 'push' && github.ref == 'refs/heads/feat/ubs-hebrew-v1-family-register'
-        run: |
-          cp /tmp/bsi-ubs-hebrew-family-register.json entity-index/links/dictionaries/ubs-hebrew/family_register.json
-          if [ -n "$(git status --porcelain -- entity-index/links/dictionaries/ubs-hebrew/family_register.json)" ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add entity-index/links/dictionaries/ubs-hebrew/family_register.json
-            git commit -m "data(bsi): pin complete classified unresolved lexical families"
-            git push origin HEAD:feat/ubs-hebrew-v1-family-register
-          fi
       - name: Upload generated QA index (not upstream dictionary definitions)
         uses: actions/upload-artifact@v4
         with:
