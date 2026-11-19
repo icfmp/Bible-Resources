@@ -3931,7 +3931,9 @@ jobs:
                       from commentary_xiphos_dual_reader import (
                           _REFERENCE_WITH_ATTRIBUTES,_OSIS_REF_ATTRIBUTE,
                           _BoundedMarkupScanner,_optional_real_rich_xiphos_selection,
-                          _commentary_pane_focus_points,_seed_x11_clipboard)
+                          _commentary_pane_focus_points,_seed_x11_clipboard,
+                          _long_commentary_excerpt_is_on_gui_clipboard)
+                      from pilot_preflight import PilotError
                       from html import unescape
                       from urllib.parse import unquote
                       import hashlib
