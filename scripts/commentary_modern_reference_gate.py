@@ -3892,6 +3892,12 @@ def prepare_private_source_strict_release_candidate(
             or candidate.get("candidate_sword_id") != "MHCCMODRC"
             or candidate.get("candidate_version") != "0.0.0"
             or candidate.get("source_module") != "MHCC 0.1.1"
+            or candidate.get("selected_full_display_name") !=
+                "Henry's Modern Concise Commentary"
+            or candidate.get("selected_short_display_name") != "HMCC Modern"
+            or candidate.get("candidate_sword_abbreviation") != "HMCCModern"
+            or candidate.get("selected_names_approved_by_owner") is not True
+            or candidate.get("final_public_sword_id_approved") is not False
             or candidate.get("original_native_corpus_sha256") != corpus
             or strict_receipt.get("status") !=
             "PRIVATE_PRIMARY_SOURCE_ONLY_TWO_WITNESS_BLOCKS_EXCLUDED_NOT_RELEASE"
@@ -4045,7 +4051,7 @@ def prepare_private_source_strict_release_candidate(
     if len(identifiers) != 1 or len(titles) != 1 or len(descriptions) != 1:
         raise ValueError("Private candidate source OSIS work metadata incomplete")
     identifiers[0].text = "MHCCMODRC"
-    titles[0].text = "Matthew Henry's Concise Commentary — Modern English (private proof)"
+    titles[0].text = candidate["selected_full_display_name"] + " (private proof)"
     descriptions[0].text = (
         "Private unpublished source-strict technical release candidate; "
         "original source-link errors disabled, editorial/rights/reader "
@@ -4055,6 +4061,9 @@ def prepare_private_source_strict_release_candidate(
     return serial, {
         "status": "PRIVATE_MODERN_SWORD_PREFLIGHT_NOT_RELEASE",
         "candidate_sword_id": "MHCCMODRC",
+        "candidate_full_display_name": candidate["selected_full_display_name"],
+        "candidate_short_display_name": candidate["selected_short_display_name"],
+        "candidate_sword_abbreviation": candidate["candidate_sword_abbreviation"],
         "published_original_corpus_sha256": corpus,
         "modern_canonical_chapters": len(chap_nodes),
         "native_K_and_I_only_authored_sections": sum(map(len, sections.values())),
