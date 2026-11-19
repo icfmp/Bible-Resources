@@ -1807,7 +1807,7 @@ jobs:
                   final_file=output/"MHC-0.1.0.zip"
                   shutil.copyfile(candidate_zip,final_file)
                   (output/"SHA256SUMS.txt").write_text(
-                      expected+"  MHC-0.1.0.zip\\n",encoding="ascii")
+                      expected+"  MHC-0.1.0.zip\n",encoding="ascii")
                   (output/"SOURCE_PROOF.json").write_text(
                       json.dumps({
                           "module_id":"MHC",
@@ -1821,7 +1821,7 @@ jobs:
                           "review_artifact_only":True,
                           "catalogue_entry_created":False,
                           "release_published":False,
-                      },sort_keys=True,indent=2)+"\\n",encoding="utf-8")
+                      },sort_keys=True,indent=2)+"\n",encoding="utf-8")
                   print("Private release-review copy prepared only after source and final-ID proof:",
                         {"sha256":expected,"zip_bytes":final_file.stat().st_size,
                          "stage":"not_published"})
