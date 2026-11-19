@@ -1,5 +1,13 @@
 # Modern MHCC — last 20 source hyperlinks: source-vetted editorial triage
 
+## Latest source-vetted outcome — 165 source-linked recoveries, 11 documented original errors
+
+**Nine of the twenty remaining original links from the historical review below have been restored in three modern-English manuscripts** (Matthew 1, Matthew 3 and Hebrews 11). The original Matthew 3 teaching about the Spirit's ongoing graces and comforts was also restored in the modern **draft**, rather than adding misleading links to a sentence that did not exist. These edits are source-collated and tested but still **require explicit editorial approval** before being treated as accepted publication text. See [source-verified change audit](ORIGINAL_LINK_RESTORATION_EDITS_2026-11-19.md).
+
+The latest [private full-canon SWORD check #44481658491](https://github.com/icfmp/Bible-Resources/actions/runs/44481658491) passed, including 28,792 original K keys. **165/176** formerly unplaced original links now have exact original-destination navigation, with editorial heading and book-preface relocations distinguished from historical inline parity. The **remaining 11** are exactly the eleven independently source-hash-identified printed/digital target anomalies in [the anomaly manifest](ADDITIONAL_ORIGINAL_LINK_TARGET_ERRATA_2026-11-18.json) (ten target discrepancies and the Numbers 29:1 printed-reference problem). Their original K, ordinal and literal targets remain preserved; proposed retargeting has **not** been approved. Source-link recovery should not silently overwrite them.
+
+**Historical twenty-case snapshot follows**, preserved so the provenance and the nine corrected omissions remain inspectable. Its references to changes *still needed* reflect the earlier state before this review-pending amendment, not the latest branch.
+
 **2026-11-19. Review-only; no approval, merge, distribution, source rewrite or original-edition retargeting.**
 
 ## Verified private whole-canon state
