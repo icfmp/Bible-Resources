@@ -2617,6 +2617,238 @@ def build_private_owned_K_heading_range_links(
 
 
 
+
+def build_private_same_chapter_verse_mentions(
+        *, source_osis: bytes, ledger: dict, original: dict, native: dict,
+        errata: dict) -> tuple[bytes, dict, dict]:
+    """Recover original one-verse K-local references on exact authored 'verse N'.
+
+    This does NOT match contextual numbers in unrelated Scripture citations.
+    The original source link must resolve to the original commentary chapter,
+    the target verse must lie inside the attested native K range, and exactly
+    one modern paragraph must explicitly print it as 'verse N' or part of
+    'verses N-M' / 'verses N and M'. Only printed numeric tokens are linked,
+    never inferred middle verses or a paraphrased quotation.
+    """
+    from collections import Counter
+    from commentary_modern_draft_osis_preview import NS, _range
+    if (ledger.get("status") !=
+            "SOURCE_NATIVE_WHOLE_CANON_HYPERLINK_DISPOSITION_QUEUE_NOT_FINAL_APPROVAL"
+            or ledger.get("source_reference_labels_or_literal_targets_exported") is not False
+            or ledger.get("publication_authorized") is not False
+            or native.get("source_prose_or_original_markup_exported") is not False
+            or errata.get("status") !=
+               "PINNED_ORIGINAL_LINK_ERRATA_REVIEW_ONLY_NOT_APPLIED"
+            or errata.get("original_native_corpus_sha256") !=
+               native.get("original_compiled_corpus_sha256")):
+        raise ValueError("Source-native K/ordinal proof is required for local verse labels")
+    blocked={(c["source_first_key"],c["original_reference_ordinal"])
+             for c in errata["cases"]}
+    if len(blocked)!=4 or any(c.get("approval") is not False
+                             for c in errata["cases"]):
+        raise ValueError("Unapproved source link errors must stay separate")
+    root=ET.fromstring(source_osis)
+    modern_visible_before="".join(root.itertext())
+    chapters={x.get("osisID"):x for x in root.iter()
+              if x.tag==f"{{{NS}}}chapter"}
+    if set(chapters)!=set(native.get("chapters",{})):
+        raise ValueError("Unexpected source chapter inventory during local verse recovery")
+    sections={}
+    source_units={}
+    for chapter,node in chapters.items():
+        units=native["chapters"][chapter]["original_units"]
+        if not units:
+            continue
+        modern_sections=node.findall(f"./{{{NS}}}div[@annotateType='commentary']")
+        if len(units)!=len(modern_sections):
+            raise ValueError("Original authored K topology changed")
+        for unit,section in zip(units,modern_sections):
+            if section.get("annotateRef")!=_range(unit["keys"]):
+                raise ValueError("Unexpected original native K scope")
+            first=unit["first_key"]
+            sections[first]=section
+            source_units[first]=(unit,len(units))
+
+    # A full reference may already exist inside a <p>; it is a
+    # recognition context but must NEVER be linked again. Source labels
+    # are sought only in authored paragraph visible text, not notes/headings.
+    def paragraph_slots(p):
+        pieces=[]
+        slots=[]
+        index=0
+        def emit(node,field,in_link):
+            nonlocal index
+            value=getattr(node,field)
+            if isinstance(value,str) and value:
+                slots.append((index,index+len(value),node,field,in_link,value))
+                pieces.append(value)
+                index+=len(value)
+        def walk(node,in_link=False):
+            if node.tag==f"{{{NS}}}note":
+                return
+            linked=in_link or node.tag==f"{{{NS}}}reference"
+            emit(node,"text",linked)
+            for child in node:
+                walk(child,linked)
+                emit(child,"tail",in_link)
+        walk(p)
+        return "".join(pieces),slots
+
+    verse_phrase=re.compile(
+        r"\bverses?\s+(\d{1,3})(?:\s*(?:[,;]|and|or|[-–—])"
+        r"\s*\d{1,3}){0,8}(?!\d)",re.I)
+    by_slot={}
+    recoveries={}
+    for row in ledger["pending"]:
+        first,ordinal=row["source_first_key"],row["source_reference_ordinal"]
+        key=(first,ordinal)
+        if key in blocked:
+            continue
+        if first not in sections or first not in original:
+            raise ValueError("Missing original K/ordinal in local verse analysis")
+        if not (1<=ordinal<=len(original[first])):
+            raise ValueError("Original link source ordinal out of bounds")
+        literal,label=original[first][ordinal-1]
+        if (hashlib.sha256(literal.encode()).hexdigest()!=row["original_osisRef_sha256"]
+            or hashlib.sha256(label.encode()).hexdigest()!=
+               row["original_visible_label_sha256"]):
+            raise ValueError("Original single-verse source label/target not preserved")
+        try:
+            book,chapter,verse=canonical_only_for_comparison(literal).rsplit(".",2)
+        except ValueError:
+            continue
+        if first.rsplit(".",1)[0]!=f"{book}.{chapter}":
+            continue
+        unit,count=source_units[first]
+        # A single source K marked as verse 1 is an attested underindexed
+        # chapter-long authorial body (e.g. Isaiah 15). It does NOT justify
+        # synthesizing new K keys.
+        if (f"{book}.{chapter}.{verse}" not in unit["keys"]
+                and not (count==1 and
+                         unit["first_key"]==f"{book}.{chapter}.1")):
+            continue
+        # The printed original link label itself must name the target verse:
+        # e.g. 'Ezek 18:26', '27', 'Is. 15:1'. No silent discrepancy repair.
+        if verse not in re.findall(r"\b\d{1,3}\b",label):
+            continue
+        eligible=[]
+        for p in sections[first].findall(f"./{{{NS}}}p"):
+            visible,slots=paragraph_slots(p)
+            for hit in verse_phrase.finditer(visible):
+                numeric_parts=list(re.finditer(r"\d{1,3}",hit.group()))
+                for num in numeric_parts:
+                    if num.group()!=verse:
+                        continue
+                    a=hit.start()+num.start()
+                    b=hit.start()+num.end()
+                    eligible.extend((node,field,value,a-start,b-start)
+                        for start,end,node,field,in_link,value in slots
+                        if not in_link and start<=a and b<=end)
+        if len(eligible)!=1:
+            continue
+        node,field,value,start,end=eligible[0]
+        slot=(id(node),field)
+        item={
+            "source_first_key":first,"source_reference_ordinal":ordinal,
+            "source_target":literal,"source_original_literal_target_sha256":
+                row["original_osisRef_sha256"],
+            "source_original_label_sha256":row["original_visible_label_sha256"],
+            "modern_visible_verse_token_sha256":
+                hashlib.sha256(value[start:end].encode()).hexdigest(),
+            "node":node,"field":field,"value":value,"start":start,"end":end,
+            "slot":slot}
+        recoveries[key]=item
+        by_slot.setdefault(slot,[]).append(key)
+    # Two original source link occurrences must not claim the very same
+    # visible number. Ambiguous references remain labelled source notes.
+    collision=set()
+    for keys in by_slot.values():
+        intervals=Counter((recoveries[k]["start"],recoveries[k]["end"])
+                          for k in keys)
+        for k in keys:
+            x=recoveries[k]
+            if intervals[(x["start"],x["end"])]>1:
+                collision.add(k)
+    for k in collision:
+        recoveries.pop(k)
+    for slot,keys in by_slot.items():
+        entries=sorted((recoveries[k] for k in keys if k in recoveries),
+                       key=lambda x:x["start"])
+        if not entries:
+            continue
+        node,field,value=entries[0]["node"],entries[0]["field"],entries[0]["value"]
+        if any(x["node"] is not node or x["field"]!=field or
+               x["value"]!=value for x in entries):
+            raise ValueError("Local verse target changed original XML text slot")
+        offsets=[]
+        pos=0
+        for x in entries:
+            if x["start"]<pos:
+                raise ValueError("Overlapping local original source links")
+            ref=ET.Element(f"{{{NS}}}reference",{"osisRef":x["source_target"]})
+            ref.text=value[x["start"]:x["end"]]
+            offsets.append((value[pos:x["start"]],ref))
+            pos=x["end"]
+        leftover=value[pos:]
+        if field=="text":
+            node.text=offsets[0][0]
+            for i,(prefix,ref) in enumerate(offsets):
+                ref.tail=offsets[i+1][0] if i+1<len(offsets) else leftover
+                node.insert(i,ref)
+        else:
+            section=sections[entries[0]["source_first_key"]]
+            parent=next((p for p in section.iter() if node in list(p)),None)
+            if parent is None:
+                raise ValueError("Local verse tail has no OSIS parent")
+            node.tail=offsets[0][0]
+            idx=list(parent).index(node)+1
+            for i,(prefix,ref) in enumerate(offsets):
+                ref.tail=offsets[i+1][0] if i+1<len(offsets) else leftover
+                parent.insert(idx+i,ref)
+    if "".join(root.itertext())!=modern_visible_before:
+        raise ValueError("Reattached local verse links changed modern wording")
+    remaining=[r for r in ledger["pending"]
+               if (r["source_first_key"],r["source_reference_ordinal"])
+                  not in recoveries]
+    revised={**ledger,
+        "source_link_occurrences_verified_in_derived_osis":
+            ledger["source_link_occurrences_verified_in_derived_osis"]+
+            len(recoveries),
+        "source_original_links_still_requiring_placement_review":len(remaining),
+        "pending":remaining,
+        "publication_authorized":False}
+    if (revised["source_link_occurrences_verified_in_derived_osis"]+
+        ledger["source_spurious_link_occurrences_explicitly_omitted"]+
+        len(remaining)!=ledger["original_native_reference_elements"]):
+        raise ValueError("Original native link inventory not conserved")
+    xml=ET.tostring(root,encoding="utf-8",xml_declaration=True)
+    ET.fromstring(xml)
+    return xml,revised,{
+        "status":"PRIVATE_UNIQUE_SOURCE_K_LOCAL_VERSE_NUMBER_LINKS_NOT_RELEASE",
+        "source_native_corpus_sha256":native["original_compiled_corpus_sha256"],
+        "local_verse_references_recovered_in_authored_modern_prose":
+            len(recoveries),
+        "unplaced_valid_original_links_still_in_source_only_notes":
+            len(remaining)-len(blocked),
+        "original_defective_link_occurrences_still_excluded":len(blocked),
+        "modern_authored_visible_text_modified":False,
+        "original_source_or_native_K_scope_modified":False,
+        "independent_editorial_approval":False,
+        "publication_authorized":False,
+        "placements":[{
+           "source_first_key":x["source_first_key"],
+           "source_reference_ordinal":x["source_reference_ordinal"],
+           "source_original_literal_target_sha256":
+               x["source_original_literal_target_sha256"],
+           "original_visible_label_sha256":x["source_original_label_sha256"],
+           "modern_visible_verse_token_sha256":
+               x["modern_visible_verse_token_sha256"],
+           "placement_basis":"UNIQUE_SAME_CHAPTER_AUTHORIAL_K_EXPLICIT_VERSE_NUMBER",
+        } for _,x in sorted(recoveries.items())],
+    }
+
+
+
 def build_private_inline_original_reference_index(
         *, source_note_osis: bytes, source_receipt: dict,
         native: dict) -> tuple[bytes,dict]:
@@ -2858,7 +3090,9 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                                     compact_source_osis_output: Path | None = None,
                                     compact_source_notes_output: Path | None = None,
                                     heading_source_osis_output: Path | None = None,
-                                    heading_source_notes_output: Path | None = None) -> tuple[bytes, dict]:
+                                    heading_source_notes_output: Path | None = None,
+                                    implicit_verses_osis_output: Path | None = None,
+                                    implicit_verses_notes_output: Path | None = None) -> tuple[bytes, dict]:
     """Authenticate and place an explicitly bounded set of source-backed links.
 
     Real original SWORD attributes stay in private memory/isolated new OSIS,
@@ -2891,6 +3125,10 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         raise ValueError("Source heading-links and remaining notes must travel together")
     if heading_source_osis_output is not None and compact_source_osis_output is None:
         raise ValueError("Heading source navigation requires compiled compact candidate")
+    if (implicit_verses_osis_output is None) != (implicit_verses_notes_output is None):
+        raise ValueError("Local source verse links and remainder notes must travel together")
+    if implicit_verses_osis_output is not None and heading_source_osis_output is None:
+        raise ValueError("Local source verse recovery requires prior heading range candidate")
     if (placements.get("status") !=
             "PRIVATE_REVIEWED_BOUNDED_LINK_PLACEMENT_NOT_FINAL_EDIT_OR_RELEASE"
             or placements.get("published_source_module") != "MHCC 0.1.1"
@@ -3330,6 +3568,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
             "citation_count":len(rows),
             "references":rows,
         },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    implicit_verse_receipt = None
+    implicit_verse_notes_receipt = None
     heading_receipt = None
     heading_notes_receipt = None
     compact_receipt = None
@@ -3374,6 +3614,21 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
                 heading_source_notes_output.parent.mkdir(parents=True,exist_ok=True)
                 heading_source_osis_output.write_bytes(heading_osis)
                 heading_source_notes_output.write_bytes(heading_notes_osis)
+                if implicit_verses_osis_output is not None:
+                    implicit_osis,implicit_ledger,implicit_verse_receipt=(
+                        build_private_same_chapter_verse_mentions(
+                            source_osis=heading_osis,ledger=heading_ledger,
+                            original=private_original,native=native,
+                            errata=errata_review))
+                    implicit_note_osis,implicit_verse_notes_receipt=(
+                        build_private_source_reference_supplement(
+                            linked_osis=implicit_osis,ledger=implicit_ledger,
+                            original=private_original,native=native,
+                            errata=errata_review))
+                    implicit_verses_osis_output.parent.mkdir(parents=True,exist_ok=True)
+                    implicit_verses_notes_output.parent.mkdir(parents=True,exist_ok=True)
+                    implicit_verses_osis_output.write_bytes(implicit_osis)
+                    implicit_verses_notes_output.write_bytes(implicit_note_osis)
         if inline_source_index_output is not None:
             inlined,index_receipt=build_private_inline_original_reference_index(
                 source_note_osis=notes_osis,source_receipt=notes_receipt,
@@ -3444,6 +3699,8 @@ def overlay_reviewed_private_links(*, base_osis: bytes, placements: dict,
         "private_compact_remaining_source_notes":compact_notes_receipt,
         "private_source_owned_heading_range_recovery":heading_receipt,
         "private_heading_range_remaining_source_notes":heading_notes_receipt,
+        "private_implicit_original_K_verse_mentions":implicit_verse_receipt,
+        "private_implicit_verse_remaining_source_notes":implicit_verse_notes_receipt,
         "private_unapproved_errata_navigation_preview":errata_preview_receipt,
         "modern_SWORD_readback_verified":False,
         "independent_editorial_semantic_signoff":False,
@@ -3481,6 +3738,8 @@ def main():
     p.add_argument("--compact-source-notes-osis",type=Path)
     p.add_argument("--source-K-heading-range-linked-osis",type=Path)
     p.add_argument("--source-K-heading-range-notes-osis",type=Path)
+    p.add_argument("--same-K-implicit-verses-osis",type=Path)
+    p.add_argument("--same-K-implicit-verse-notes-osis",type=Path)
     p.add_argument("--source-notes-errata-manifest",type=Path)
     p.add_argument("--source-errata-proposals-osis",type=Path)
     p.add_argument("--linked-osis",type=Path)
@@ -3538,7 +3797,9 @@ def main():
             compact_source_osis_output=a.compact_source_linked_osis,
             compact_source_notes_output=a.compact_source_notes_osis,
             heading_source_osis_output=a.source_K_heading_range_linked_osis,
-            heading_source_notes_output=a.source_K_heading_range_notes_osis)
+            heading_source_notes_output=a.source_K_heading_range_notes_osis,
+            implicit_verses_osis_output=a.same_K_implicit_verses_osis,
+            implicit_verses_notes_output=a.same_K_implicit_verse_notes_osis)
         a.linked_osis.parent.mkdir(parents=True,exist_ok=True)
         a.report.parent.mkdir(parents=True,exist_ok=True)
         a.linked_osis.write_bytes(osis)
