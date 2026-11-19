@@ -3968,6 +3968,7 @@ jobs:
               "per_book_preface_I_GUI_match":dict(intro_matches),
               "per_compiled_book_I_native_heading_menu_GUI_class":menu_classes,
               "per_compiled_book_I_normal_GUI_class":ordinary_intro_classes,
+              "real_accessibility_link_inventory":result.get("real_accessibility_link_inventory",{}),
               "all_book_prefaces_in_GUI_approved":False,
               "sampled_original_wrong_target_link_GUI_markup_observations":link_gui,
               "source_strict_eleven_wrong_target_non_navigable_links_proven_natively":True,
@@ -3990,6 +3991,8 @@ jobs:
                 str(sum(intro_matches.values()))+"/"+str(len(intro_expected))+
                 " compiled native I-entry prefatory texts matched in GUI; "
                 "a non-match remains inconclusive, never missing source text")
+          print("PRIVATE REAL XIPHOS AT-SPI LINK INVENTORY (SHA only, NO CLICK): "+
+                str(result.get("real_accessibility_link_inventory",{})))
           print("PRIVATE REAL XIPHOS BOOK-I HEADING MENU OUTCOMES (no text): "+
                 str(menu_classes)+"; normal chapter classes: "+str(ordinary_intro_classes))
           print("PRIVATE REAL XIPHOS SOURCE-STRICT LINK GUI HTML OBSERVATION (counts only; blocked hrefs scanned independently): "+
