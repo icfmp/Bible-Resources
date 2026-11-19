@@ -65,9 +65,13 @@ def verify_metadata(ledger, register, entries):
         if d.get("decision") != "candidate_lexical_nonidentity" or not d.get("rationale"):
             raise ValueError("Unexplained or unsupported editorial conclusion")
         w = d["source_witness"]
-        if (w["word_id"], w["reference"]) not in [
-            (x["original_word_id"], x["reference"]) for x in f["source_witnesses"]
-        ]:
+        if not any(
+            w["word_id"] == x["original_word_id"]
+            and w["reference"] == x["reference"]
+            and ("original_sdbh" not in w
+                 or w["original_sdbh"] == x["original_sdbh"])
+            for x in f["source_witnesses"]
+        ):
             raise ValueError("Witness not in pinned unresolved family")
         candidate = d["ubs_candidate"]
         mid = candidate["main_id"]
@@ -119,6 +123,8 @@ def verify_witness_words(ledger, macula):
                 "pos": w["pos"],
                 "class": w["class"],
             }
+            if "original_sdbh" in w:
+                expected["sdbh"] = w["original_sdbh"]
             for col, wanted in expected.items():
                 actual = row[col]
                 if (norm(actual) if col == "lemma" else actual) != (
