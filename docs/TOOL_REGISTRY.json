@@ -1518,16 +1518,17 @@
         "jsword"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "ec084d46b8c4bfe123d937019b0e10277a05a22db6839cb9e031407d50ab5bab",
+      "sha256_at_inventory": "6f84006571577f856883f4449f7a7464955d49e0d8bc8573129aaf8fcd3183e0",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 5,
+      "static_reference_count": 6,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_source_erratum_compiled_probe.py",
         ".github/workflows/commentary-anchor-parity.yml",
+        ".github/workflows/commentary-mhc-private-jsword.yml",
         "tests/test_commentary_osis_mixed_transport_probe.py"
       ]
     },
