@@ -1209,3 +1209,41 @@ rejects unsupported source editions, contextual sense additions,
 truncated staged words and unauthorized publication status.
 
 **Publication approval is separate from source verification and PR merge.**
+
+### Final individually source-checked lexical uncertainties and v1.0-rc2
+
+The first private v1.0-rc1 candidate (273 links, 99.021%) is retained
+unchanged as a reproducible historical witness. A fresh, independent,
+original-WLC audit of the last **25 single-headword-uncertain words plus
+one original giant/Raphah word** identified **two** more defensible,
+original-word-specific UBS headword correspondences. Exactly eight
+other same-family WLC words were **already linked**; no general
+Strong-family alias is created.
+
+- **Joshua 19:13 Rimmon**, original `o060190130101` maps only that
+  specific Zebulun place token to UBS **Rimmono**; southern towns and the
+  Rock of Rimmon are separate and remain deliberately unlinked.
+- **1 Samuel 17:39**, original `o090170390072` maps its source-attested
+  verbal use 'tried/he undertook' to UBS **יאל**, H2974. Original lemma
+  `אלה`, consonants/diacritics, Strong suffix and source word-ID remain
+  untouched. No proposed source-text emendation is performed.
+
+The [final review decisions](v1_final_word_specific_approvals.json),
+[source-attestation audit](audit_final_lexical_uncertainties.py) and
+[complete-source private rebuild](build_final_reviewed_candidate.py)
+verify these two exact words, preserve all previous links, re-audit
+**475,911** original WLC words and explicitly retain **24** residual
+word-specific abstentions. The final 275-word private candidate,
+[manifest](v1_final_candidate_manifest.json), and deterministic CC BY-SA
+attributed **v1.0-rc2** ZIP are review artifacts **only**. The original
+committed index remains unchanged.
+
+Edition-specific indexed-headword scope: **240,373 / 242,747 = 99.022%**,
+with **2,374** in-scope original lexical words unlinked (1,863 rejected
+nonidentities, 458 multiple-headword ambiguity, 27 grammatical fragments,
+23 single-candidate abstentions, 2 composite annotations and 1 Raphah
+lexical identity). **5,933** additional original source tokens remain
+outside UBS 0.9.4's attested indexed-headword inventory. These are not
+2,374 known fixable errors. Headword coverage is not a contextual
+semantic-accuracy metric; no contextual UBS sense ID is inferred.
+
