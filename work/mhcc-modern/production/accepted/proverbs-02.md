@@ -55,7 +55,7 @@ These are dangers that distress godly people and give thoughtful parents reason 
 
 The suffering of others should serve as a warning.
 
-Our Lord Jesus warned against sinful pleasures by telling us of **the everlasting sufferings that may follow them**.
+Our Lord Jesus warned against sinful pleasures by speaking of **the everlasting torments that follow them**.
 
 People caught in these traps rarely free themselves easily.
 
@@ -76,6 +76,8 @@ Does it not matter to us whether we share the wicked person's end or the everlas
 ---
 
 ## Editorial review — Proverbs 2
+
+**2026-11-19 focused secondary-witness fidelity repair (unapproved draft):** Proverbs 2:10–22's modern sentence replaced Henry's **everlasting torments which follow them** with milder *sufferings that may follow them*, weakening both the severity and the definiteness of the original warning. Restored the specific claim checked against [CCEL Proverbs 2](https://ccel.org/ccel/henry/mhcc.xxi.ii.html). Exact original MHCC 0.1.1 native K check and independent editorial review remain outstanding; no original K scopes, notes or references altered.
 
 **Complete second English witness read:** [CCEL, Proverbs 2](https://ccel.org/ccel/henry/mhcc.xxi.ii.html). Published `MHCC 0.1.1` remains original, native SWORD and independent review pending.
 
