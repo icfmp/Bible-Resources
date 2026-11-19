@@ -25,7 +25,7 @@ It is not a pointless list of ancestors or a display of family greatness such as
 
 It establishes that **Jesus belonged to the nation and family from which the Messiah was promised**.
 
-God promised Abraham that a blessing would come through his descendants.
+God promised Abraham that a blessing would come through his descendants (**Genesis 12:3; 22:18**).
 
 He promised David that the kingdom would be established through his descendants.
 
@@ -88,6 +88,8 @@ That is the safe and comforting course.
 ---
 
 ## Editorial review — Matthew 1
+
+- **2026-11-19 original-source citation recovery:** Restored the two specifically printed, independently native-SWORD-attested Abrahamic promise cross-references **Genesis 12:3; 22:18** immediately after their already-present modern sentence. Original source K `Matt.1.1` links ordinals 1 and 2 remain the authoritative literal navigation targets; no commentary meaning was changed. Separate original K/ordinal hash ledger and full compiled-link test required before release.
 
 **Complete original-English secondary Concise witness directly read:** [Matthew Henry's Concise Commentary, Matthew 1](https://www.christianity.com/bible/commentary/matthew-henry-concise/matthew/1). Published pinned `MHCC 0.1.1` remains authoritative for native-SWORD key/text/markup and independent meaning review.
 
