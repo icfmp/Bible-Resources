@@ -23,7 +23,11 @@
     "distribution_license": "Public Domain",
     "upstream_declaration": "Public Domain--Copy Freely",
     "rights_basis_decision": "Accepted by Bible Resources project owner on 2026-11-19. No separate CCEL approval is a release prerequisite under the owner's source policy.",
-    "preserve_attributions": ["CrossWire / SWORD Project", "Christian Classics Ethereal Library (CCEL)", "Logos Research, Inc."],
+    "preserve_attributions": [
+      "CrossWire / SWORD Project",
+      "Christian Classics Ethereal Library (CCEL)",
+      "Logos Research, Inc."
+    ],
     "public_domain_text_relicensed": false
   },
   "private_validation": {
@@ -37,7 +41,11 @@
     "three_original_xiphos_passage_excerpts": "passed",
     "clicked_xiphos_reference_navigation": "pending",
     "full_reader_title_paragraph_note_acceptance": "pending",
-    "private_zip_reinstall_and_readback": "pending_current_workflow_result"
+    "private_zip_reinstall_and_readback": "passed_seven_of_seven_private_preview",
+    "private_zip_evidence_url": "https://github.com/icfmp/Bible-Resources/actions/runs/44543474861",
+    "private_final_MHC_id_package_and_full_native_corpus": "pending_current_workflow",
+    "private_preview_zip_sha256": "a0fad2c049b650eaf42fbaee37b887f573906d749dc00b2a282163d5be2f227d",
+    "private_preview_zip_published": false
   },
   "publication": {
     "owner_publication_authorization": false,
