@@ -1,5 +1,8 @@
 # MHCC Modern English — exact source reference disposition and final 180-case queue
 
+**2026-11-19 source-link triage update:** The most recent source-pinned private modules on [CI #44479185011](https://github.com/icfmp/Bible-Resources/actions/runs/44479185011) **SUCCESS** (Validate/registry green) have **156/176** previously unresolved original source links navigable (83 compact, 25 K-section headings, 5 partial verse ranges, 11 local verse tokens, 22 original outline digits, 10 in source-verified relocated book introductions), with **20 source notes** retained and **all 28,792 native K keys** intact. **The 20 now split into ten suspect native digital destinations, one printed-original Leviticus reference discrepancy, and nine valid source links whose citations are absent in modern prose.** Source-fidelity review found one substantive omitted original clause in Matthew 3:7–12 concerning the continuing graces and comforts of the Holy Spirit; do not hide this omission with unsafe automatic hyperlinks. [Detailed final triage](REMAINING_20_ORIGINAL_LINK_EDITORIAL_REVIEW_2026-11-19.md). Original source and modern accepted chapter manuscripts are unchanged. The new preface-linked candidate remains separate, private and unapproved.
+
+
 ## 2026-11-18 — source-native bulk reference restoration: 111/176 resolved
 
 Latest real isolated whole-canon runs: [source SWORD / readback #44390972953](https://github.com/icfmp/Bible-Resources/actions/runs/44390972953) **SUCCESS**; [Validate #44390972988](https://github.com/icfmp/Bible-Resources/actions/runs/44390972988) **SUCCESS**; [tool registry #44390972806](https://github.com/icfmp/Bible-Resources/actions/runs/44390972806) **SUCCESS**.
