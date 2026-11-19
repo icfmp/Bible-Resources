@@ -54,7 +54,7 @@ Nevertheless, human learning and wisdom cannot give eternal happiness.
 
 The greatest scholar who dies without knowing **Jesus Christ** is lost just as surely as the person who never received an education.
 
-What value will worldly praise have for the body in the grave or the soul under judgment?
+What value will worldly praise have for **the body in the grave or the soul in hell**?
 
 And those whose spirits have been made perfect in heaven have no need of it either.
 
@@ -91,6 +91,8 @@ Seeking a lasting inheritance **in Christ's love and the blessings that follow f
 ---
 
 ## Editorial review — Ecclesiastes 2
+
+**2026-11-19 targeted secondary-witness fidelity repair (unapproved draft):** The 12–17 exposition had generalized the original's explicit **soul in hell** into *soul under judgment*. The modern text now preserves Henry's stated place of punishment alongside the grave, compared directly to [CCEL Ecclesiastes 2](https://ccel.org/ccel/henry/mhcc.xxii.ii.html). Exact original MHCC 0.1.1 native K check and independent editorial approval pending; no original source, keys or references altered.
 
 **Whole original-English secondary source read:** [CCEL, Ecclesiastes 2](https://ccel.org/ccel/henry/mhcc.xxii.ii.html). Pinned original `MHCC 0.1.1` remains authoritative for native SWORD, references and independent acceptance.
 
