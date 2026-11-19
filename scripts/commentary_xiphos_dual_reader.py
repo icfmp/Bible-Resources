@@ -310,13 +310,22 @@ class _BoundedMarkupScanner(HTMLParser):
 
 
 def _markup_display_witness(internal: bytes, rendered_plain: bytes,
-                            rendered_html: bytes | None) -> dict:
+                            rendered_html: bytes | None,
+                            *, blocked_osis_targets: tuple[str, ...] = ()) -> dict:
     """Compare exact source headings to copied GUI text and count real links."""
     if (not isinstance(internal, bytes) or len(internal) > 256_000
             or not isinstance(rendered_plain, bytes) or len(rendered_plain) > 256_000
             or (rendered_html is not None and
                 (not isinstance(rendered_html, bytes) or len(rendered_html) > 256_000))):
         raise PilotError("Unbounded private Xiphos markup witness")
+    if (not isinstance(blocked_osis_targets, tuple)
+            or len(blocked_osis_targets) > 20
+            or len(set(blocked_osis_targets)) != len(blocked_osis_targets)
+            or any(not isinstance(target, str)
+                   or not 3 <= len(target) <= 160
+                   or not re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9.:-]*", target)
+                   for target in blocked_osis_targets)):
+        raise PilotError("Unreviewed source-link quarantine target list")
     original = internal.decode("utf-8", errors="replace")
     copied = rendered_plain.decode("utf-8", errors="replace")
     extracted_titles = []
@@ -402,7 +411,23 @@ def _markup_display_witness(internal: bytes, rendered_plain: bytes,
                 # This is still NOT an actual click/navigation test.
                 "all_components_found_in_one_GUI_href": best == len(atoms),
             }
+    # Negative source-link observation MUST inspect actual GUI hrefs
+    # independently. A quarantined <seg> is absent from the candidate's
+    # <reference> inventory; checking only valid-source references would
+    # produce a meaningless false "safe" result for every bad target.
+    exposed_blocked_target_hashes = sorted({
+        sha256(target.encode("utf-8")).hexdigest()
+        for target in blocked_osis_targets
+        if any(re.search(
+            r"(?<![a-z0-9])" + re.escape(target.casefold()) + r"(?![a-z0-9])",
+            unquote(unescape(href)).casefold(),
+        ) for _, href in actual_anchor_destinations)
+    })
     return {
+        "quarantined_source_targets_checked_in_real_GUI_HTML":
+            len(blocked_osis_targets),
+        "quarantined_source_target_sha256_exposed_as_real_GUI_HTML_href":
+            exposed_blocked_target_hashes,
         "original_internal_title_elements_found": len(extracted_titles),
         "exact_original_titles_in_copied_gui_text": exact_titles,
         "exact_original_titles_in_copied_gui_rich_html": sum(
@@ -586,7 +611,8 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
                 },
                 "real_markup_rendering_observation_by_passage": {
                     key: _markup_display_witness(
-                        item.get("commentary_internal", b""), b"", None
+                        item.get("commentary_internal", b""), b"", None,
+                        blocked_osis_targets=tuple(item.get("blocked_osis_targets", ())),
                     ) for key, item in comparisons.items()
                 },
                 "chapter_intro_prose_clipboard_match_by_passage": {
@@ -625,7 +651,8 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
             result[ref] = False
             copied_sizes[ref] = 0
             markup_by_passage[ref] = _markup_display_witness(
-                originals.get("commentary_internal", b""), b"", None
+                originals.get("commentary_internal", b""), b"", None,
+                blocked_osis_targets=tuple(originals.get("blocked_osis_targets", ())),
             )
             # Two bounded passes over the same independently checked pane
             # coordinates allow lazy GTK/WebKit repaint after navigation.
@@ -659,6 +686,7 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
                 markup_by_passage[ref] = _markup_display_witness(
                     originals.get("commentary_internal", b""),
                     selected, _optional_real_rich_xiphos_selection(env),
+                    blocked_osis_targets=tuple(originals.get("blocked_osis_targets", ())),
                 )
                 if ref in intro_matches:
                     # The expected chapter preface must originate from the
@@ -679,7 +707,8 @@ def attempt_real_xiphos_passage_copy(env: dict, comparisons: dict[str, dict]) ->
             copied_sizes[ref] = 0
             focus_attempts.setdefault(ref, 0)
             markup_by_passage.setdefault(ref, _markup_display_witness(
-                originals.get("commentary_internal", b""), b"", None
+                originals.get("commentary_internal", b""), b"", None,
+                blocked_osis_targets=tuple(originals.get("blocked_osis_targets", ())),
             ))
             result[ref] = False
     return {
