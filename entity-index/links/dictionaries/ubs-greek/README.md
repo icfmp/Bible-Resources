@@ -375,3 +375,47 @@ source-reviewed overlay is built and independently verified in CI as
 a **private, expiring Actions review artifact**, while historical
 `index.json` and all original Greek/Strong/LN/morphological source
 data stay byte-for-byte unchanged.
+
+## Exact-source unresolved Greek lexical exceptions
+
+The [independent original-token exception census](audit_final_exceptions.py)
+rereads all 137,741 pinned SBLGNT original word IDs and both UBS Greek
+Dictionary 1.0 language editions. It preserves full source witnesses
+and does **not** change historical lexical maps or private source-reviewed
+word-ID entries. Its final bounded original-source cases are:
+
+| Original source disposition | Words | Editorial status |
+| --- | ---: | --- |
+| No NFC-identical UBS source lemma | **459** | No invented headword |
+| Unsupported composite original Strong | **5** | Original compound code preserved |
+| Original strict lemma+LN candidates with source POS/Strong conflict | **35** | Not automatically approved |
+| Pre-existing multiple UBS headwords under one original Strong | **224** | All original candidates retained; not counted among the 499 unmatched |
+
+The largest 459 truly no-exact-headword Greek source families are
+`ἰδού` (200), `Ἰερουσαλήμ` (76), `ἱερόν` (30),
+`ἴδε` (30), `ἕνεκεν` (20) and `περισσότερος` (15).
+These may reflect missing dictionary entries, source lemma spelling
+choices, or editorial distinctions; **none** should be blindly
+redirected to a similarly spelled original UBS entry.
+
+The five composite original Strong instances are
+`ὑπερεκπερισσοῦ` (`5228+1537+4053`, three words),
+`δισμυριάς` (`1417+3461`, one) and
+`ἐκπερισσῶς` (`1537+4053`, one). The source components
+are preserved exactly instead of treating one arbitrary component as
+the original lexical identity.
+
+The **224** previously matched-but-ambiguous original Greek words
+mainly belong to `πόλις` (162, plus one `Πόλις`),
+`ἐλεάω` (32), and `πάρειμι` (25).
+Their source report retains every UBS `MainId`, original Greek lemma,
+original Louw–Nida matches and original word ID. A further independent
+per-word lexical-family decision is required before narrowing any of
+these; the historic Strong-derived ambiguities are left unchanged.
+
+The currently reviewed *headword identity* coverage remains
+**137,242 / 137,741** original SBLGNT Greek words. This is neither
+unique contextual lexical sense resolution nor a claim that the
+source UBS lexicon contains every MACULA source word. The detailed
+original-word evidence is stored as a **private, expiring CI review
+artifact**, not a published or application-integrated resource.
