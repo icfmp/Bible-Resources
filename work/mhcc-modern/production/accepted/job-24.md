@@ -42,9 +42,9 @@ Consider the energy and effort sinners invest in carrying out harmful plans.
 
 Their determination should shame our laziness about doing what is good.
 
-They work hard to prepare opportunities for sinful desires, then labor again to conceal acts that lead to death and final judgment.
+They work hard to indulge sinful desires and then to conceal what will end in **death and hell**.
 
-Less effort devoted to **putting sinful desires to death** would bring life and heaven instead.
+With less effort than they spend pursuing and hiding sin, they could instead **put sinful desires to death and crucify the flesh**—the path leading to life and heaven.
 
 Shame entered the world through sin, and lasting shame awaits those who persist in it.
 
@@ -81,6 +81,8 @@ But when we see **Christ as the sinner's Surety**, bearing the curse we deserved
 ---
 
 ## Editorial review — Job 24
+
+**2026-11-19 secondary-witness fidelity repair (unapproved draft):** In verses 13–17 the previous modernization substituted “final judgment” for the original's explicit **hell** and made the contrast of efforts to pursue versus mortify sin syntactically ambiguous (“Less effort devoted to putting sinful desires to death”). The revised modern wording preserves the original *death and hell* and clarifies that **less effort than the sinner spends committing and hiding sin could be directed to mortifying/crucifying the flesh**, leading to life and heaven. Cross-checked against [CCEL Job 24](https://ccel.org/ccel/henry/mhcc.xix.xxiv.html); exact released MHCC 0.1.1 native-source comparison and independent editorial approval remain pending. No source text, keys, headings, or references changed.
 
 **Complete English secondary witness read:** [CCEL, Job 24](https://ccel.org/ccel/henry/mhcc.xix.xxiv.html). The released source **MHCC 0.1.1** remains authoritative pending native SWORD key/reference mapping and independent acceptance.
 
