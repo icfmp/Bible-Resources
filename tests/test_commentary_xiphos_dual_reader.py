@@ -163,6 +163,56 @@ class ExactDualModuleXiphosReaderTests(unittest.TestCase):
         notice.assert_called_once_with({"DISPLAY": ":91"})
         sleep.assert_called_once_with(0.5)
 
+    @patch("commentary_xiphos_dual_reader._dismiss_transient_xiphos_notice")
+    @patch("commentary_xiphos_dual_reader.time.sleep")
+    @patch("commentary_xiphos_dual_reader.attempt_real_xiphos_passage_copy")
+    def test_real_gui_retries_until_independent_source_text_matches(
+        self, actual_copy, sleep, notice
+    ):
+        from commentary_xiphos_dual_reader import (
+            _observe_real_xiphos_with_bounded_retries,
+        )
+        def observed(count, actions):
+            return {
+                "independent_gui_commentary_excerpt_match_count": count,
+                "actual_passage_commands_accepted": actions,
+            }
+        actual_copy.side_effect = [
+            observed(0, False), observed(2, True), observed(4, True),
+        ]
+        passages = {ref: {} for ref in ("Gen 1:1", "Ps 95:1", "Matt 3:7", "Rev 22:2")}
+        result = _observe_real_xiphos_with_bounded_retries(
+            {"DISPLAY": ":91"}, passages
+        )
+        self.assertEqual(result["independent_gui_commentary_excerpt_match_count"], 4)
+        self.assertTrue(result["actual_passage_commands_accepted"])
+        self.assertEqual(result["independent_excerpt_match_counts_by_real_attempt"],
+                         [0, 2, 4])
+        self.assertEqual(result["bounded_real_gui_selection_attempts"], 3)
+        self.assertEqual(actual_copy.call_count, 3)
+        self.assertEqual(sleep.call_count, 2)
+        self.assertEqual(notice.call_count, 2)
+
+    @patch("commentary_xiphos_dual_reader._dismiss_transient_xiphos_notice")
+    @patch("commentary_xiphos_dual_reader.time.sleep")
+    @patch("commentary_xiphos_dual_reader.attempt_real_xiphos_passage_copy")
+    def test_retries_never_invent_a_gui_match(self, actual_copy, sleep, notice):
+        from commentary_xiphos_dual_reader import (
+            _observe_real_xiphos_with_bounded_retries,
+        )
+        actual_copy.return_value = {
+            "independent_gui_commentary_excerpt_match_count": 0,
+            "actual_passage_commands_accepted": False,
+        }
+        result = _observe_real_xiphos_with_bounded_retries(
+            {"DISPLAY": ":91"}, {"Gen 1:1": {}}
+        )
+        self.assertEqual(result["independent_gui_commentary_excerpt_match_count"], 0)
+        self.assertFalse(result["actual_passage_commands_accepted"])
+        self.assertEqual(result["independent_excerpt_match_counts_by_real_attempt"],
+                         [0, 0, 0])
+        self.assertEqual(actual_copy.call_count, 3)
+
     @patch("commentary_xiphos_dual_reader._x11")
     def test_visible_full_xiphos_window_required_not_tiny_notice(self, command):
         command.side_effect = [
