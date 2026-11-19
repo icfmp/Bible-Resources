@@ -2809,7 +2809,7 @@
         "xiphos"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "578b9ee1a5e9f5942cbc14a0b51acd23b6983ad3b86fe8b052a49cd5f14ee24c",
+      "sha256_at_inventory": "d99871b85bf18c357dad8f629be51835f6318d154f4bd7602d342cc7e4ee271a",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
