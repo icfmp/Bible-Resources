@@ -30,6 +30,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_dictionary_scope.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_family_register.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_editorial_scope_dispositions.py
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_lexical_nonidentity.py
       - name: Check out exact UBS Hebrew EN/FR 0.9.4 source
         uses: actions/checkout@v4
         with:
@@ -149,6 +150,13 @@ jobs:
             --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
             --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
             --output /tmp/bsi-ubs-hebrew-family-register.json
+      - name: Verify editorial nonidentity judgments against pinned UBS and MACULA originals
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/verify_lexical_nonidentity.py \
+            --register /tmp/bsi-ubs-hebrew-family-register.json \
+            --decisions entity-index/links/dictionaries/ubs-hebrew/v1_lexical_nonidentity_dispositions.json \
+            --english ubs/dictionaries/hebrew/JSON/UBSHebrewDic-v0.9.4-en.JSON \
+            --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv
       - name: Verify all lexical families classified without editorial assumptions
         run: |
           python3 - <<'PY'
