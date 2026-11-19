@@ -82,6 +82,22 @@ jobs:
             --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
             --macula macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
             --output /tmp/bsi-ubs-greek-original-gap-review.json
+      - name: Audit 1218 non-εἰμί Greek original words without UBS LN corroboration
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-greek/audit_remaining_no_ln.py \
+            --report /tmp/bsi-ubs-greek-original-gap-review.json \
+            --index entity-index/links/dictionaries/ubs-greek/index.json \
+            --english ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-en.JSON \
+            --french ubs-source/dictionaries/greek/JSON/UBSGreekNTDic-v1.0-fr.JSON \
+            --macula macula-greek/SBLGNT/tsv/macula-greek-SBLGNT.tsv \
+            --output /tmp/bsi-ubs-greek-no-ln-1218-source-review.json
+      - name: Upload Greek no-LN source lexical evidence (PRIVATE, NOT approved)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bsi-ubs-greek-1218-no-ln-original-word-evidence-NOT-PUBLISHED
+          path: /tmp/bsi-ubs-greek-no-ln-1218-source-review.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Classify original Greek εἰμί source word families without inventing UBS senses
         run: |
           python3 -I entity-index/links/dictionaries/ubs-greek/audit_eimi_disposition.py \
