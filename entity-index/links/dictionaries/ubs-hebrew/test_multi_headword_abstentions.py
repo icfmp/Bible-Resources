@@ -15,9 +15,9 @@ REGISTER = json.loads((HERE / "family_register.json").read_text(encoding="utf-8"
 class MultipleHeadwordAbstentionTests(unittest.TestCase):
     def test_exact_pinned_subpopulation_and_counts(self):
         result = VERIFY["verify_register"](LEDGER, REGISTER)
-        self.assertEqual(result["families"], 40)
-        self.assertEqual(result["occurrences"], 275)
-        self.assertEqual(len(result["word_ids"]), 40)
+        self.assertEqual(result["families"], 48)
+        self.assertEqual(result["occurrences"], 458)
+        self.assertEqual(len(result["word_ids"]), 48)
         self.assertTrue(all(not x["lexical_identity_approved"]
                             and not x["contextual_sense_approved"]
                             and not x["source_data_modified"]
@@ -48,6 +48,24 @@ class MultipleHeadwordAbstentionTests(unittest.TestCase):
         changed["source_editions"]["ubs_revision"] = "different"
         with self.assertRaisesRegex(ValueError, "source editions"):
             VERIFY["verify_register"](changed, REGISTER)
+
+    def test_cross_strong_requires_original_consonants_and_no_code_collision(self):
+        witness = next(d for d in LEDGER["dispositions"]
+                       if d["candidate_relation"] == "same_consonants_different_strong_family")
+        entries = [
+            {"MainId": mid, "Lemma": witness["lemma"],
+             "StrongCodes": ["A9999"]}
+            for mid in witness["ubs_candidate_entries"]
+        ]
+        VERIFY["verify_ubs"]({"dispositions": [witness]}, entries)
+        modified = copy.deepcopy(entries)
+        modified[0]["Lemma"] = "DIFFERENT"
+        with self.assertRaisesRegex(ValueError, "consonants no longer match"):
+            VERIFY["verify_ubs"]({"dispositions": [witness]}, modified)
+        modified = copy.deepcopy(entries)
+        modified[0]["StrongCodes"] = [witness["lang"] + witness["original_strong"]]
+        with self.assertRaisesRegex(ValueError, "unexpectedly shares"):
+            VERIFY["verify_ubs"]({"dispositions": [witness]}, modified)
 
     def test_headword_source_strong_family_guard(self):
         witness = LEDGER["dispositions"][0]
