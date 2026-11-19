@@ -35,7 +35,7 @@ Elihu had already explained that God did not intend to harm Job through his suff
 
 Rather, he intended Job's **spiritual good**.
 
-Now Elihu argued that God did him **no wrong** in permitting the affliction.
+Now Elihu argued that God did him **no wrong in afflicting him**.
 
 If knowing God's good purpose did not satisfy Job, remembering God's justice should have silenced his complaints.
 
@@ -100,6 +100,8 @@ A believer may therefore say: *Let my Savior, my wise and loving Lord, choose ev
 ---
 
 ## Editorial review — Job 34
+
+**2026-11-19 targeted secondary-witness fidelity proposal:** In verses 10–15 the modern draft softened Henry's active formulation “God did him no wrong by afflicting him” to *permitting the affliction*. Restored the original agency against [CCEL Job 34](https://ccel.org/ccel/henry/mhcc.xix.xxxiv.html). Published SWORD original remains untouched; exact native wording and independent acceptance pending.
 
 **Full secondary original-English witness directly read:** [CCEL, Job 34](https://ccel.org/ccel/henry/mhcc.xix.xxxiv.html). Published `MHCC 0.1.1` remains definitive; exact original-native/SWORD keys and independent acceptance pending.
 
