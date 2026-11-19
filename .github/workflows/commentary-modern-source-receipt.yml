@@ -3394,7 +3394,7 @@ jobs:
           PY
       - name: Install real Xiphos GUI in an isolated virtual display for HMCC Modern
         id: xiphos_deps
-        continue-on-error: true
+        timeout-minutes: 14
         shell: bash
         run: |
           set -euo pipefail
@@ -3430,7 +3430,7 @@ jobs:
       - name: Observe actual HMCC Modern commentary prose inside private Xiphos GUI
         id: xiphos_prose
         if: steps.xiphos_deps.outcome == 'success'
-        continue-on-error: true
+        timeout-minutes: 3
         shell: bash
         run: |
           set -euo pipefail
