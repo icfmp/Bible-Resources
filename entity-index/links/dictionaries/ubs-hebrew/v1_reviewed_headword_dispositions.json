@@ -4,7 +4,7 @@
     "macula_revision": "47db250bd55d0d8577f2a94fba114ef16c35b23c",
     "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8"
   },
-  "policy": "Five independently interpreted UBS Hebrew v0.9.4 headword identities: source-word-specific family approvals for entry-level crosswalk candidates only. Do not treat Strong spelling, H/A prefix, or old SDBH equality alone as equivalence; do not infer contextual sense IDs. These are editorial dispositions, not generated index links. External dictionary web display corroborates sense/context but the pinned original UBS/MACULA metadata is verified by CI. Added twelve distinct named-entity entry reviews grounded in original Ezra/Daniel referents, and preserved context/sense abstention for homonymous names. Published UBS English headword sense glosses are now source-checked as evidence of reviewed *entry* identity, not assigned as any WLC contextual sense; same-Strong and cross-Strong spellings are validated by separate source-bound relations. Third batch: 22 additional exact original-word anchored Hebrew/Aramaic lexical headwords, using original MACULA English witnesses and exact UBS-published gloss membership where independently available.",
+  "policy": "Five independently interpreted UBS Hebrew v0.9.4 headword identities: source-word-specific family approvals for entry-level crosswalk candidates only. Do not treat Strong spelling, H/A prefix, or old SDBH equality alone as equivalence; do not infer contextual sense IDs. These are editorial dispositions, not generated index links. External dictionary web display corroborates sense/context but the pinned original UBS/MACULA metadata is verified by CI. Added twelve distinct named-entity entry reviews grounded in original Ezra/Daniel referents, and preserved context/sense abstention for homonymous names. Published UBS English headword sense glosses are now source-checked as evidence of reviewed *entry* identity, not assigned as any WLC contextual sense; same-Strong and cross-Strong spellings are validated by separate source-bound relations. Third batch: 22 additional exact original-word anchored Hebrew/Aramaic lexical headwords, using original MACULA English witnesses and exact UBS-published gloss membership where independently available. Fourth source-reviewed batch: eleven additional attested lexical entry-only identities from original WLC source word senses and actual UBS published glosses; no automatic sense inference.",
   "decisions": [
     {
       "lang": "A",
@@ -1991,6 +1991,352 @@
         "original_word_english": "sinning"
       },
       "rationale": "Numbers 15:28 mentions the one sinning unintentionally; UBS חַטָּא includes guilty of/sinful and matches the original moral-culpability headword without selecting a contextual sense ID"
+    },
+    {
+      "lang": "H",
+      "lemma": "צַר",
+      "original_strong": "6887",
+      "original_occurrences": 2,
+      "original_source_classes": {
+        "verb": 2
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "006315001001000",
+          "original_word_id": "o120060010141",
+          "reference": "2KI 6:1!14"
+        },
+        {
+          "original_sdbh": "006315001001000",
+          "original_word_id": "o230490200061",
+          "reference": "ISA 49:20!6"
+        }
+      ],
+      "ubs_candidate_main_id": "006346000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "2 Kings 6:1 says the shared dwelling place is too small or cramped. The UBS צרר headword explicitly includes 'to be narrow', an entry-level lexical match, with no automatic contextual sense assignment.",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "2KI 6:1",
+        "ubs_attested_gloss": "to be narrow",
+        "original_word_english": "small"
+      },
+      "rationale": "2 Kings 6:1 says the shared dwelling place is too small or cramped. The UBS צרר headword explicitly includes 'to be narrow', an entry-level lexical match, with no automatic contextual sense assignment."
+    },
+    {
+      "lang": "H",
+      "lemma": "גֵּישָׁן",
+      "original_strong": "1529",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o130020470052",
+          "reference": "1CH 2:47!5"
+        }
+      ],
+      "ubs_candidate_main_id": "001404000000000",
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "1 Chronicles 2:47 names the original person Geshan, exactly represented by the UBS published proper-name headword despite the source's different H/A Strong formatting.",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "1CH 2:47",
+        "ubs_attested_gloss": "Geshan",
+        "original_word_english": "Geshan"
+      },
+      "rationale": "1 Chronicles 2:47 names the original person Geshan, exactly represented by the UBS published proper-name headword despite the source's different H/A Strong formatting."
+    },
+    {
+      "lang": "H",
+      "lemma": "אָדַשׁ",
+      "original_strong": "1759",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "verb": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "001615001001000",
+          "original_word_id": "o230280280061",
+          "reference": "ISA 28:28!6"
+        }
+      ],
+      "ubs_candidate_main_id": "001615000000000",
+      "candidate_relation": "different_strong_same_consonants",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Isaiah 28:28 describes continuing the threshing of grain. The original WLC gloss 'continually.(thresh)' corresponds to the UBS original-language verb to thresh.",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "ISA 28:28",
+        "ubs_attested_gloss": "to thresh",
+        "original_word_english": "go on"
+      },
+      "rationale": "Isaiah 28:28 describes continuing the threshing of grain. The original WLC gloss 'continually.(thresh)' corresponds to the UBS original-language verb to thresh."
+    },
+    {
+      "lang": "H",
+      "lemma": "הֲנָפָה",
+      "original_strong": "5130b",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "004702001003000",
+          "original_word_id": "o230300280072",
+          "reference": "ISA 30:28!7"
+        }
+      ],
+      "ubs_candidate_main_id": "004708000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Isaiah 30:28 describes shaking/sifting the nations, matching the explicit UBS source sense to sift under the original Strong numeric family.",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "ISA 30:28",
+        "ubs_attested_gloss": "to sift",
+        "original_word_english": "sift"
+      },
+      "rationale": "Isaiah 30:28 describes shaking/sifting the nations, matching the explicit UBS source sense to sift under the original Strong numeric family."
+    },
+    {
+      "lang": "H",
+      "lemma": "נָגִיד",
+      "original_strong": "5048",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "004634001002000",
+          "original_word_id": "o200080060031",
+          "reference": "PRO 8:6!3"
+        }
+      ],
+      "ubs_candidate_main_id": "004640000000000",
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Proverbs 8:6 invites the hearer to listen to noble/excellent things, explicitly indexed as UBS 'noble words' under the same original lemma in a different Strong family.",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "PRO 8:6",
+        "ubs_attested_gloss": "noble words",
+        "original_word_english": "noble things"
+      },
+      "rationale": "Proverbs 8:6 invites the hearer to listen to noble/excellent things, explicitly indexed as UBS 'noble words' under the same original lemma in a different Strong family."
+    },
+    {
+      "lang": "H",
+      "lemma": "סָכַר",
+      "original_strong": "7936a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "verb": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o150040050012",
+          "reference": "EZR 4:5!1"
+        }
+      ],
+      "ubs_candidate_main_id": "007045000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Ezra 4:5 speaks of hired or bribed counsellors; the pinned UBS lexical verb to hire is the original word's corresponding entry, without assuming a particular contextual sense.",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZR 4:5",
+        "ubs_attested_gloss": "to hire",
+        "original_word_english": "bribed"
+      },
+      "rationale": "Ezra 4:5 speaks of hired or bribed counsellors; the pinned UBS lexical verb to hire is the original word's corresponding entry, without assuming a particular contextual sense."
+    },
+    {
+      "lang": "H",
+      "lemma": "סָלֵק",
+      "original_strong": "5559a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "verb": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "005100001003000",
+          "original_word_id": "o191390080021",
+          "reference": "PSA 139:8!2"
+        }
+      ],
+      "ubs_candidate_main_id": "005107000000000",
+      "candidate_relation": "different_strong_same_consonants",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Psalm 139:8 says if I ascend to heaven. The Aramaic/Hebrew UBS verb סלק includes to ascend, matching the exact original word context.",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "PSA 139:8",
+        "ubs_attested_gloss": "to ascend",
+        "original_word_english": "ascend"
+      },
+      "rationale": "Psalm 139:8 says if I ascend to heaven. The Aramaic/Hebrew UBS verb סלק includes to ascend, matching the exact original word context."
+    },
+    {
+      "lang": "H",
+      "lemma": "צָרַר",
+      "original_strong": "6862",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "adj": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "006315001003000 006340001008000",
+          "original_word_id": "o250010200041",
+          "reference": "LAM 1:20!4"
+        }
+      ],
+      "ubs_candidate_main_id": "006321000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Lamentations 1:20 explicitly describes internal distress; UBS's צר distress noun/adjective includes the published gloss distress.",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "LAM 1:20",
+        "ubs_attested_gloss": "distress",
+        "original_word_english": "distress"
+      },
+      "rationale": "Lamentations 1:20 explicitly describes internal distress; UBS's צר distress noun/adjective includes the published gloss distress."
+    },
+    {
+      "lang": "H",
+      "lemma": "צרר",
+      "original_strong": "6696a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "verb": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "006340001009000",
+          "original_word_id": "o020230220132",
+          "reference": "EXO 23:22!13"
+        }
+      ],
+      "ubs_candidate_main_id": "006167000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Exodus 23:22 speaks of God treating Israel's foes as enemies. The UBS source verb צור includes to attack, corresponding to the original hostile action and source verbal classification.",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EXO 23:22",
+        "ubs_attested_gloss": "to attack",
+        "original_word_english": "foe"
+      },
+      "rationale": "Exodus 23:22 speaks of God treating Israel's foes as enemies. The UBS source verb צור includes to attack, corresponding to the original hostile action and source verbal classification."
+    },
+    {
+      "lang": "H",
+      "lemma": "רָפָה",
+      "original_strong": "7498a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "006892001002000",
+          "original_word_id": "o130080370051",
+          "reference": "1CH 8:37!5"
+        }
+      ],
+      "ubs_candidate_main_id": "006889000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "1 Chronicles 8:37 names Raphah as the source person, independently matching the proper-name UBS Raphah/ Rapha headword.",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "1CH 8:37",
+        "ubs_attested_gloss": "Raphah",
+        "original_word_english": "Raphah"
+      },
+      "rationale": "1 Chronicles 8:37 names Raphah as the source person, independently matching the proper-name UBS Raphah/ Rapha headword."
+    },
+    {
+      "lang": "H",
+      "lemma": "קָטָן",
+      "original_strong": "6997a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "001867001001000 006433001005000",
+          "original_word_id": "o150080120052",
+          "reference": "EZR 8:12!5"
+        }
+      ],
+      "ubs_candidate_main_id": "001868000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Ezra 8:12 explicitly names Hakkatan/Haqqatan, matching the unique UBS indexed Hakkatan personal headword; do not treat this as an automatic alias for all uses of common adjective small.",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZR 8:12",
+        "ubs_attested_gloss": "Hakkatan",
+        "original_word_english": "Haqqatan"
+      },
+      "rationale": "Ezra 8:12 explicitly names Hakkatan/Haqqatan, matching the unique UBS indexed Hakkatan personal headword; do not treat this as an automatic alias for all uses of common adjective small."
     }
   ]
 }
