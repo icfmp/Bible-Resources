@@ -46,7 +46,7 @@ A small possession honestly acquired is more useful and blessed than a large for
 
 If we make God's glory our goal and his will our rule, he will guide our steps by his **Spirit and grace**.
 
-Henry also exhorts **rulers and judges on earth to act justly and govern in the fear of God**.
+**Kings and judges on earth must be just and govern in the fear of God.**
 
 ## Verse 11 — Justice in commerce
 
