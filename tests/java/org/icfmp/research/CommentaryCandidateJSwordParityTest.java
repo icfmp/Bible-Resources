@@ -62,7 +62,7 @@ public final class CommentaryCandidateJSwordParityTest {
                    witnesses.length >= 2 && witnesses.length <= 6);
         for (String sample : samples) {
             assertTrue("Malformed native preselected sample",
-                       sample.matches("[1-4]?[A-Za-z][A-Za-z0-9 ]{1,35} [1-9][0-9]{0,2}:[1-9][0-9]{0,2}"));
+                       sample.matches("(?:[1-4] ?)?[A-Za-z][A-Za-z0-9 ]{1,35} [1-9][0-9]{0,2}:[1-9][0-9]{0,2}"));
         }
         SwordBookPath.setAugmentPath(new File[] { root });
         commentary = Books.installed().getBook(name);
@@ -114,7 +114,7 @@ public final class CommentaryCandidateJSwordParityTest {
             String[] parts = witness.split("\\|", -1);
             assertEquals("Native link witness contains key and hashed targets", 2, parts.length);
             assertTrue("Untrusted native reference key",
-                parts[0].matches("[1-4]?[A-Za-z][A-Za-z0-9 ]{1,35} [1-9][0-9]{0,2}:[1-9][0-9]{0,2}"));
+                parts[0].matches("(?:[1-4] ?)?[A-Za-z][A-Za-z0-9 ]{1,35} [1-9][0-9]{0,2}:[1-9][0-9]{0,2}"));
             List<String> expected = new ArrayList<>(Arrays.asList(parts[1].split(",", -1)));
             assertTrue("Native link witness must contain original targets",
                        expected.size() >= 1 && expected.size() <= 256);
