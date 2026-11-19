@@ -85,6 +85,211 @@
         ]
       },
       "rationale": "Original H5750 עוֹד is a temporal adverb ('again/still'); UBS candidate H5749 עוד is a verb ('testify/warn'), a distinct lexeme sharing unvocalized consonants. Do not map the adverb to that verb."
+    },
+    {
+      "lang": "H",
+      "lemma": "עַל",
+      "original_strong": "5920",
+      "occurrences": 6,
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o010270390132",
+        "reference": "GEN 27:39!13",
+        "english": "above",
+        "pos": "noun",
+        "class": "noun"
+      },
+      "ubs_candidate": {
+        "main_id": "005444000000000",
+        "lemma": "עֹל",
+        "strong_codes": [
+          "H5923"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ]
+      },
+      "rationale": "The source means 'above' in Gen 27:39, not an ox-yoke or figurative burden; UBS עֹל H5923 is the latter noun."
+    },
+    {
+      "lang": "A",
+      "lemma": "אַל",
+      "original_strong": "0409",
+      "occurrences": 4,
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o270020240201",
+        "reference": "DAN 2:24!20",
+        "english": "not",
+        "pos": "particle",
+        "class": "adv"
+      },
+      "ubs_candidate": {
+        "main_id": "000381000000000",
+        "lemma": "אֵל",
+        "strong_codes": [
+          "H0410",
+          "H0411",
+          "A0412",
+          "H0415",
+          "H0416"
+        ],
+        "parts_of_speech": [
+          "noun m",
+          "dem.pron"
+        ]
+      },
+      "rationale": "Aramaic prohibitive 'not' (Dan 2:24) is not UBS divine noun/pronoun אֵל."
+    },
+    {
+      "lang": "H",
+      "lemma": "נֶגֶד",
+      "original_strong": "5048",
+      "occurrences": 2,
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o010020180122",
+        "reference": "GEN 2:18!12",
+        "english": "suitable",
+        "pos": "preposition",
+        "class": "Hebrew spatial relation ('before/opposite', Gen 2:18) is not the UBS verb נגד meaning 'to report/tell/flow'."
+      },
+      "ubs_candidate": {
+        "main_id": "004632000000000",
+        "lemma": "נגד",
+        "strong_codes": [
+          "H5046",
+          "A5047"
+        ],
+        "parts_of_speech": [
+          "verb"
+        ]
+      }
+    },
+    {
+      "lang": "H",
+      "lemma": "עֹוד",
+      "original_strong": "5750",
+      "occurrences": 2,
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o190390020092",
+        "reference": "PSA 39:2!9",
+        "english": "long as",
+        "pos": "adverb",
+        "class": "The source temporal adverb ('still', Ps 39:2) does not denote UBS H5749 verbal acts of testifying, warning, surrounding, or restoring."
+      },
+      "ubs_candidate": {
+        "main_id": "005287000000000",
+        "lemma": "עוד",
+        "strong_codes": [
+          "H5749"
+        ],
+        "parts_of_speech": [
+          "verb"
+        ]
+      }
+    },
+    {
+      "lang": "A",
+      "lemma": "עוֹד",
+      "original_strong": "5751",
+      "occurrences": 1,
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o270040280011",
+        "reference": "DAN 4:28!1",
+        "english": "still",
+        "pos": "adverb",
+        "class": "The Aramaic temporal adverb ('still', Dan 4:28) is not the UBS Hebrew verb H5749."
+      },
+      "ubs_candidate": {
+        "main_id": "005287000000000",
+        "lemma": "עוד",
+        "strong_codes": [
+          "H5749"
+        ],
+        "parts_of_speech": [
+          "verb"
+        ]
+      }
+    },
+    {
+      "lang": "H",
+      "lemma": "אֶל",
+      "original_strong": "0408",
+      "occurrences": 1,
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o240510030092",
+        "reference": "JER 51:3!9",
+        "english": "not",
+        "pos": "particle",
+        "class": "Source prohibited/negative 'not' (Jer 51:3) is not UBS אֵל divine noun/demonstrative pronoun."
+      },
+      "ubs_candidate": {
+        "main_id": "000381000000000",
+        "lemma": "אֵל",
+        "strong_codes": [
+          "H0410",
+          "H0411",
+          "A0412",
+          "H0415",
+          "H0416"
+        ],
+        "parts_of_speech": [
+          "noun m",
+          "dem.pron"
+        ]
+      }
+    },
+    {
+      "lang": "H",
+      "lemma": "נָא",
+      "original_strong": "4995",
+      "occurrences": 1,
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o020120090041",
+        "reference": "EXO 12:9!4",
+        "english": "raw",
+        "pos": "particle",
+        "class": "Hebrew uncooked/raw food in Exod 12:9 is not the UBS proper place-name נֹא/Thebes H4996."
+      },
+      "ubs_candidate": {
+        "main_id": "004585000000000",
+        "lemma": "נֹא",
+        "strong_codes": [
+          "H4996"
+        ],
+        "parts_of_speech": [
+          "name"
+        ]
+      }
+    },
+    {
+      "lang": "H",
+      "lemma": "עַל",
+      "original_strong": "5921",
+      "occurrences": 1,
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o090020100061",
+        "reference": "1SA 2:10!6",
+        "english": "against",
+        "pos": "preposition",
+        "class": "The source preposition ('against', 1 Sam 2:10) is not UBS עֹל 'yoke' H5923."
+      },
+      "ubs_candidate": {
+        "main_id": "005444000000000",
+        "lemma": "עֹל",
+        "strong_codes": [
+          "H5923"
+        ],
+        "parts_of_speech": [
+          "noun m"
+        ]
+      }
     }
   ]
 }
