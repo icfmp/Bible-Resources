@@ -1,8 +1,6 @@
 name: Modern commentary source-native receipt (metadata-only)
 on:
   pull_request:
-    # Allow a PR metadata edit to explicitly retrigger this fail-closed GUI gate.
-    types: [opened, synchronize, reopened, edited]
     paths:
       - '.github/workflows/commentary-modern-source-receipt.yml'
       - 'scripts/commentary_modern_source_receipt.py'
