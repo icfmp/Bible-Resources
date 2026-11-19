@@ -4102,6 +4102,7 @@ jobs:
                                "x11_actual_click_dispatched":False}
                           todo=[pyatspi.Registry.getDesktop(0)]
                           matches=[]
+                          matching_states=[]
                           matching_names=0
                           seen=0
                           while todo and seen<2500:
@@ -4116,17 +4117,30 @@ jobs:
                                           and re.findall(r"\d+",label)==re.findall(r"\d+",expected))
                                       if equal or similar or same_numbers:
                                           matching_names+=1
+                                          state=item.getState()
+                                          showing=state.contains(pyatspi.STATE_SHOWING)
+                                          visible=state.contains(pyatspi.STATE_VISIBLE)
+                                          enabled=state.contains(pyatspi.STATE_ENABLED)
                                           ext=item.queryComponent().getExtents(pyatspi.DESKTOP_COORDS)
-                                          if ext.width>0 and ext.height>0:
-                                              x=ext.x+ext.width//2
-                                              y=ext.y+ext.height//2
-                                              if 0<x<1280 and 0<y<800:
-                                                  matches.append((x,y))
+                                          x=ext.x+ext.width//2
+                                          y=ext.y+ext.height//2
+                                          matching_states.append({
+                                              "center":[x,y],
+                                              "actual_accessible_showing":bool(showing),
+                                              "actual_accessible_visible":bool(visible),
+                                              "actual_accessible_enabled":bool(enabled),
+                                              "positive_accessible_extents":
+                                                  ext.width>0 and ext.height>0,
+                                          })
+                                          if (showing and visible and enabled and ext.width>0
+                                              and ext.height>0 and 0<x<1280 and 0<y<800):
+                                              matches.append((x,y))
                                   todo.extend(item[i] for i in range(min(item.childCount,100)))
                               except (LookupError,RuntimeError,AttributeError):
                                   continue
                           coordinates=sorted(set(matches))
                           out["matching_accessibility_role_names"]=matching_names
+                          out["matched_source_link_actual_accessible_states"]=matching_states[:8]
                           out["matching_screen_coordinates"]=coordinates[:8]
                           out["matching_showing_link_count"]=len(coordinates)
                           # Select a unique rightmost source-labelled anchor
