@@ -2460,6 +2460,130 @@
         "original_word_english": "sheol"
       },
       "rationale": "In Isaiah 7:11 the original WLC English witness is 'sheol' at 'make it deep as Sheol, or high as heaven'. The UBS שְׁאוֹל indexed headword explicitly denotes the world of the dead. The original lemma and textual gloss are preserved; only the entry-level identity is corroborated without contextual LEXID inference."
+    },
+    {
+      "lang": "A",
+      "lemma": "יצא",
+      "original_strong": "3319",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "verb": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "003035001012000",
+          "original_word_id": "o150060150012",
+          "reference": "EZR 6:15!1"
+        }
+      ],
+      "ubs_candidate_main_id": "003039000000000",
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "The temple construction was completed in Ezra 6:15",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZR 6:15",
+        "ubs_attested_gloss": "to be completed",
+        "original_word_english": "completed"
+      },
+      "rationale": "Ezra 6:15 explicitly states that the temple was completed. The UBS יצא verb includes its own independently published 'to be completed' lexical meaning. The Aramaic source Strong/word ID remains unchanged, and no universal H/A alias is introduced."
+    },
+    {
+      "lang": "H",
+      "lemma": "יָמַר",
+      "original_strong": "0559a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "verb": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "000512001005000 002959001001000",
+          "original_word_id": "o230610060131",
+          "reference": "ISA 61:6!13"
+        }
+      ],
+      "ubs_candidate_main_id": "000511000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Israel's priests will boast in the riches of the nations (Isaiah 61:6)",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "ISA 61:6",
+        "ubs_attested_gloss": "to boast",
+        "original_word_english": "boast"
+      },
+      "rationale": "Isaiah 61:6 uses the original verb in the sense of boasting. UBS אמר includes an explicit 'to boast' meaning, corroborating the contextual headword without selecting its LEXID."
+    },
+    {
+      "lang": "H",
+      "lemma": "יָצַת",
+      "original_strong": "5327a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "verb": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "003052001001000 004885002001000",
+          "original_word_id": "o240020150111",
+          "reference": "JER 2:15!11"
+        }
+      ],
+      "ubs_candidate_main_id": "004891000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Judah's towns are desolated by young lions in Jeremiah 2:15",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "JER 2:15",
+        "ubs_attested_gloss": "to be desolated",
+        "original_word_english": "destroyed"
+      },
+      "rationale": "Jeremiah 2:15 says the cities have been ruined/desolated. UBS נצה explicitly includes 'to be desolated', so the identity of this particular lexical headword is corroborated; original lemma and composite source SDBH are untouched."
+    },
+    {
+      "lang": "H",
+      "lemma": "מָדוֹן",
+      "original_strong": "4060",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "003720002001000",
+          "original_word_id": "o100210200081",
+          "reference": "2SA 21:20!8"
+        }
+      ],
+      "ubs_candidate_main_id": "003719000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "The giant of great stature in 2 Samuel 21:20",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "2SA 21:20",
+        "ubs_attested_gloss": "man of stature",
+        "original_word_english": "great"
+      },
+      "rationale": "2 Samuel 21:20 speaks of a person of unusual stature with six fingers and toes; UBS מִדָּה specifically has 'man of stature'/'giant' as a published lexical meaning. The source's gloss 'great' is contextually compatible with that entry but no sense ID is transferred."
     }
   ]
 }
