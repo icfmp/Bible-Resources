@@ -15,8 +15,17 @@ import unicodedata
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from audit_dictionary_scope import inventory, consonants, LEXICAL_CLASSES, MACULA_STRONG
-from build_index import lookup_word
+from runpy import run_path
+
+# GitHub workflow executes with python -I: resolve sibling source utilities
+# explicitly rather than relying on an ambient PYTHONPATH.
+_scope = run_path(str(Path(__file__).with_name("audit_dictionary_scope.py")))
+_build = run_path(str(Path(__file__).with_name("build_index.py")))
+inventory = _scope["inventory"]
+consonants = _scope["consonants"]
+LEXICAL_CLASSES = _scope["LEXICAL_CLASSES"]
+MACULA_STRONG = _scope["MACULA_STRONG"]
+lookup_word = _build["lookup_word"]
 
 STATUSES = {
     "unattested_indexed_headword": "excluded_from_ubs_0_9_4_scope_only",
