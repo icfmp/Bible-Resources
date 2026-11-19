@@ -4,6 +4,7 @@ on:
     paths:
       - '.github/workflows/commentary-modern-source-receipt.yml'
       - 'scripts/commentary_modern_source_receipt.py'
+      - 'scripts/commentary_xiphos_dual_reader.py'
       - 'scripts/commentary_modern_native_witness_probe.py'
       - 'tests/test_commentary_modern_native_witness_probe.py'
       - 'scripts/commentary_modern_ionly_preview.py'
