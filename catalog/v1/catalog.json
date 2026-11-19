@@ -65,8 +65,8 @@
       "canonical_edition_id": "matthew-henry-complete-crosswire-2.2",
       "category": "commentary",
       "download": {
-        "sha256": "9cea77ed7652f8a1e8f529819a746b04ef7a30ad87579381bb2bd68a89e046b5",
-        "size_bytes": 16409112,
+        "sha256": "d0d401220ffba3de98dd9e9cab5dfe58030ca38ac7b196291838a472f3f6e07a",
+        "size_bytes": 16409148,
         "url": "https://icfmp.github.io/Bible-Resources/sword/packages/MHC.zip"
       },
       "edition": "faithful",
