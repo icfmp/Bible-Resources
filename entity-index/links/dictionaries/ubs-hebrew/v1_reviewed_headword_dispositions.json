@@ -2584,6 +2584,190 @@
         "original_word_english": "great"
       },
       "rationale": "2 Samuel 21:20 speaks of a person of unusual stature with six fingers and toes; UBS מִדָּה specifically has 'man of stature'/'giant' as a published lexical meaning. The source's gloss 'great' is contextually compatible with that entry but no sense ID is transferred."
+    },
+    {
+      "lang": "A",
+      "lemma": "יְגַר",
+      "original_strong": "3026",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "002785001001000",
+          "original_word_id": "o010310470041",
+          "reference": "GEN 31:47!4"
+        }
+      ],
+      "ubs_candidate_main_id": "002789000000000",
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "The first original Aramaic name element Jegar in Jegar-Sahadutha (Genesis 31:47)",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "GEN 31:47",
+        "ubs_attested_gloss": "Jegar-Sahadutha"
+      },
+      "rationale": "Genesis 31:47 names the memorial Jegar-Sahadutha with the original source segment יְגַר and separately linked second original segment. The pinned UBS edition deliberately indexes יְגַר as its own exact canonical headword with the gloss Jegar-Sahadutha; this permits the specific entry-only identity, not a fabricated contextual sense or a global Strong alias."
+    },
+    {
+      "lang": "A",
+      "lemma": "שָׂהֲדוּ",
+      "original_strong": "3026",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "006990001001000",
+          "original_word_id": "o010310470051",
+          "reference": "GEN 31:47!5"
+        }
+      ],
+      "ubs_candidate_main_id": "006994000000000",
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "The second original Aramaic name element Sahadutha in Jegar-Sahadutha (Genesis 31:47)",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "GEN 31:47",
+        "ubs_attested_gloss": "Jegar-Sahadutha"
+      },
+      "rationale": "Genesis 31:47 supplies the second Aramaic segment שָׂהֲדוּ of the named memorial Jegar-Sahadutha. UBS indexes that same original lemma in a separate published headword glossed Jegar-Sahadutha. No identity between the two distinct UBS entries is inferred; only this segment's specific entry is reviewed."
+    },
+    {
+      "lang": "H",
+      "lemma": "חָלָה",
+      "original_strong": "2490a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "verb": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "002299003002000",
+          "original_word_id": "o190770110021",
+          "reference": "PSA 77:11!2"
+        }
+      ],
+      "ubs_candidate_main_id": "002302000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "The psalmist's grief/affliction in Psalm 77:11",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "PSA 77:11",
+        "ubs_attested_gloss": "to grieve",
+        "original_word_english": "grief"
+      },
+      "rationale": "Psalm 77:11 has the original verbal form with source English grief. UBS חלל includes the published lexical meaning 'to grieve', supporting this word's entry-level identification while its specific contextual UBS sense remains unassigned."
+    },
+    {
+      "lang": "H",
+      "lemma": "ירה",
+      "original_strong": "7297a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "verb": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "003093004001000",
+          "original_word_id": "o230440080041",
+          "reference": "ISA 44:8!4"
+        }
+      ],
+      "ubs_candidate_main_id": "003097000000000",
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Fear in Isaiah 44:8, addressed to the Lord's witnesses",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "ISA 44:8",
+        "ubs_attested_gloss": "to be afraid",
+        "original_word_english": "afraid"
+      },
+      "rationale": "The original Isaiah 44:8 word is 'afraid' in pinned WLC, and UBS ירה explicitly has a sense 'to be afraid'. The original H7297a Strong and source SDBH are preserved, never promoted as global equivalents of UBS H3384."
+    },
+    {
+      "lang": "H",
+      "lemma": "טֹחֲנֹות",
+      "original_strong": "2912a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "002682001001000",
+          "original_word_id": "o210120030092",
+          "reference": "ECC 12:3!9"
+        }
+      ],
+      "ubs_candidate_main_id": "002686000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "The plural grinders who cease in Ecclesiastes 12:3",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "ECC 12:3",
+        "ubs_attested_gloss": "to grind",
+        "original_word_english": "grinders"
+      },
+      "rationale": "Ecclesiastes 12:3 uses טֹחֲנֹות as a substantivized feminine plural grinding agent ('grinders'). The published UBS טחן verbal headword means 'to grind' and shares the original numeric Strong family; this source morphology supports the lexical root at entry level, not a claim that the original noun and dictionary verb have identical POS or contextual sense."
+    },
+    {
+      "lang": "H",
+      "lemma": "אָשׁוּר",
+      "original_strong": "8391a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "007697001001000",
+          "original_word_id": "o260270060091",
+          "reference": "EZK 27:6!9"
+        }
+      ],
+      "ubs_candidate_main_id": "007701000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Cypress/fir wood used in the Tyrian ship fittings in Ezekiel 27:6",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZK 27:6",
+        "ubs_attested_gloss": "cypress",
+        "original_word_english": "daughter of-cypresses"
+      },
+      "rationale": "Ezekiel 27:6 describes wood of 'cypresses' in the original MACULA English witness. UBS תְּאַשּׁוּר includes the source-published gloss 'cypress' under the same numeric Strong family. This confirms the broad lexical tree headword only; species-specific determination is explicitly not inferred."
     }
   ]
 }
