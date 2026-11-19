@@ -3954,13 +3954,20 @@ jobs:
         run: |
           set -euo pipefail
           python - <<'PY'
-          import json,os,sys
+          import json,os,shutil,sys
           from pathlib import Path
           sys.path.insert(0,"scripts")
           from commentary_xiphos_dual_reader import _run_real_gui,verify_and_install_reviewed_bible
           from pilot_subprocess import query,present_key
           base=Path(os.environ["RUNNER_TEMP"])
-          root=base/"mhcc-modern-approved-private-root"
+          # A second real GUI invocation requires its own fresh HOME.
+          # Reuse only the SHA-attested private zCom contents, never the GTK profile.
+          source=base/"mhcc-modern-approved-private-root"
+          session=base/"approved-editorial-xiphos-isolated-session"
+          if session.exists() or not (source/"mods.d/mhccmodap.conf").is_file():
+              raise ValueError("Refuse reused or missing approved Xiphos test session")
+          root=session/"module-root"
+          shutil.copytree(source,root)
           receipt=json.loads((base/"mhcc-modern-approved-editorial-receipt.json").read_text())
           if receipt["status"]!="OWNER_APPROVED_PRIVATE_EDITORIAL_OSIS_OVERLAY_NOT_RELEASE":
               raise ValueError("Private editorial SWORD source not approved")
