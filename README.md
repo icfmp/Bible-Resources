@@ -29,6 +29,7 @@ modules/<slug>/payload/mods.d/     exactly one SWORD .conf file
 modules/<slug>/payload/modules/    compiled SWORD module files
 modules/<slug>/EDITORIAL.md        transformation / review record
 schemas/module.schema.json         machine-readable format contract
+sources/cleaned/<resource-id>/   maintained OSIS/USFM source (rights-cleared only)
 scripts/validate.py               metadata and structure checks
 scripts/audit_text.py              non-destructive editorial warnings
 scripts/guard_osis.py               schema-pinned OSIS structure gate; no rewrites

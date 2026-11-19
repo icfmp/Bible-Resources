@@ -25,6 +25,102 @@ seven source-controlled completion gates. A completed stage is not another
 publication permission, and a published source may still expose separate
 application display bugs.
 
+
+## Provider independence and clean rebuild — decision (2026-11-18)
+
+**CrossWire, eBible and other reviewed sources are inputs, not architectural
+authorities.** Continue to discover and obtain permitted material from them.
+A correct reconstruction need not reproduce their binary layout, module
+identity, incidental verse aliases, broken index, metadata or provider-specific
+workarounds. We do not need upstream cooperation to implement a clean compiler
+using documented standard formats. This choice does **not** relax the fidelity
+requirement for the actual texts, punctuation, intentional divisions, notes,
+cross-references, versification or edition provenance.
+
+Use the **shortest reusable extraction-to-build path** before commissioning
+more bespoke MHC diagnostics:
+
+- **Read:** use a format/provider adapter to get all source-bearing payload,
+  including native SWORD introductions and opaque keys, or read verified
+  source XML/USFM directly. Keep immutable originals and hashes.
+- **Classify:** inventory identifiable content units and original reference
+  scopes independently of the upstream storage keys. Keep multiple sections
+  sharing a start address as separate units. Treat unmapped original content
+  as an explicit blocking discrepancy, not a reason to discard it.
+- **Build:** map reviewed units to standard SWORD semantics and compile new
+  modules from scratch where simpler or more reliable. Do not make an
+  MHC/English-only intermediate file format, nor blindly copy a defective
+  provider index. Document any necessary source correction separately.
+- **Check:** perform complete source-to-output coverage, text, Unicode,
+  structure, notes and references comparison, then test independent readers.
+  Input-to-output content checks, not byte-equivalence with a flawed provider
+  binary, determine the acceptance of a reconstruction.
+- **Prove reuse:** the first extractor/compiler must be tried on at least one
+  actual English and one actual French source with the same core, without
+  hardcoded book labels or English-specific text processing. Additional
+  format adapters should be small, not new pipelines.
+
+**Execution priority:** stop enhancing the private MHC-specific CCEL trial
+except to extract reusable lessons and test fixtures. Inspect the existing
+general SWORD inventory/reader and build helpers first; implement only the
+missing source adapters/conversion step. Rebuild the MHC with this shared
+pipeline when possible. Keep the already verified MHC source hashes and
+collision evidence; these are useful inputs, not blockers mandating loyalty
+to CrossWire's packaging. Do not merge or publish a partial module.
+
+**Important distinction:** a two-minute conversion benchmark measures
+throughput, not semantic fidelity or redistribution rights. Neither a
+YouVersion technical export nor a public-domain author automatically
+authorizes redistribution of a third party's digital edition.
+
+## Source-format and language neutrality — design constraint (2026-11-18)
+
+**The import/reconstruction engine must not be built around English MHC, CCEL,
+a particular commentary, or one book/verse scheme.** Research-only MHC
+experiments under \`research/mhc-ccel/\` are historical feasibility evidence,
+not a new production importer, accepted data model, or instruction to add
+MHC-specific exceptions. The CCEL trial's SWORD CLI success is not a complete
+source-structure or reader-parity proof.
+
+The reusable design should extend existing tooling in this order:
+
+1. **Source acquisition and source-native inventory:** keep exact original
+   bytes, formats, encoding, language metadata, edition and rights provenance;
+   use format-aware adapters for *actual* SWORD, OSIS, USFM or ThML sources.
+   Do not translate, silently normalize Unicode/punctuation or assume English
+   book names. Preserve original labels separately from canonical reference
+   identifiers; use the source's own versification.
+2. **Lossless structural inspection:** represent, in memory, ordered original
+   text nodes, paragraphs, poetry, headings, quotes, notes, hyperlinks,
+   introductions, section identities, original full ranges and source
+   positions. The source markup remains authoritative, not a hand-invented
+   proprietary replacement. Flag structures the chosen standards cannot
+   express without loss rather than dropping them.
+3. **Language-independent mapping and diagnostics:** preserve duplicate-start
+   sections as distinct source identities; classify incompatible SWORD address
+   ownership without selecting a winner, concatenating silently, or inventing
+   first-verse aliases. Use exact text/markup and reference comparisons as
+   baseline. Any optional linguistic tokenization must be language-aware,
+   explicitly configured, advisory, and never a source mutation or release
+   requirement (e.g. no English-only word regex or case heuristics).
+4. **Standard output and reversible build:** choose a supported
+   SWORD/OSIS/USFM conversion route appropriate to the *actual* source;
+   retain evidence for unsupported mappings. Compile only after every
+   independently inventoried source unit has an explicit preserved, mapped
+   or blocked disposition. Audit the compiled SWORD native index, complete
+   text, punctuation, headings, note/reference targets, structure, and
+   introductions against the originals; record every transformation.
+5. **Cross-language acceptance:** validate the same engine with at least one
+   real English and one real French source, including accents, apostrophes,
+   Unicode, names/references and source-specific versification; add other
+   languages without branching the core by language. A passing English
+   example alone is not a generic implementation certificate.
+
+The existing seven-stage, per-edition rights/editorial/reader approval gates
+remain unchanged. MHC is a demanding **fixture** for the reusable pipeline,
+not an architectural dependency. A temporary incomplete MHC experiment must
+not become an automatically required CI job for unrelated resource changes.
+
 ## Commands (metadata-only preflight, no release)
 
 For an existing manifest, source observation performs network access but must

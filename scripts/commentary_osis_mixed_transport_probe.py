@@ -17,6 +17,7 @@ from io import BytesIO
 from pathlib import Path
 import os
 import re
+import shutil
 import subprocess
 import zipfile
 
@@ -33,7 +34,9 @@ from sword_native_raw_corpus_inventory import parse_native_raw_corpus
 def build_mixed_original_transport(chapter: str, book_intro: bytes,
                                    chapter_intro: bytes,
                                    numbered: list[tuple[str, bytes]],
-                                   *, work_id: str) -> tuple[bytes, dict]:
+                                   *, work_id: str,
+                                   provisional_index_aliases: dict[str, dict] | None = None
+                                   ) -> tuple[bytes, dict]:
     if (not WORK.fullmatch(work_id) or
             re.fullmatch(r"[1-4]?[A-Za-z][A-Za-z0-9]*\.[1-9]\d*", chapter) is None
             or not numbered or len(numbered) > 200):
@@ -43,6 +46,8 @@ def build_mixed_original_transport(chapter: str, book_intro: bytes,
         if not isinstance(raw,bytes) or not raw or len(raw)>2*1024*1024:
             raise ValueError("Unverified original I bytes")
         _source_visible_text(raw)
+    aliases = provisional_index_aliases or {}
+    by_master = validate_private_index_alias_preview({chapter: numbered}, aliases)
     grouped = []
     occupied = {}
     last_verse = 0
@@ -59,8 +64,10 @@ def build_mixed_original_transport(chapter: str, book_intro: bytes,
         if (grouped and grouped[-1]["digest"]==digest
                 and grouped[-1]["end"]+1==verse):
             grouped[-1]["end"]=verse
+            grouped[-1]["original_keys"].append(key)
         else:
-            grouped.append({"start":verse,"end":verse,"raw":raw,"digest":digest})
+            grouped.append({"start":verse,"end":verse,"raw":raw,"digest":digest,
+                            "original_keys":[key]})
         last_verse=verse
     parts=[
         b'<?xml version="1.0" encoding="UTF-8"?>',
@@ -78,7 +85,9 @@ def build_mixed_original_transport(chapter: str, book_intro: bytes,
     for group in grouped:
         start=f"{chapter}.{group['start']}"
         end=f"{chapter}.{group['end']}"
-        ref=start if start==end else f"{start}-{end}"
+        extra = [target for key in group["original_keys"]
+                 for target in by_master.get(key, [])]
+        ref = _native_same_chapter_ranges(group["original_keys"] + extra)
         parts.append(
             f'<div type="section" annotateType="commentary" annotateRef="{ref}">'.encode()
         )
@@ -99,6 +108,8 @@ def build_mixed_original_transport(chapter: str, book_intro: bytes,
         "chapter":chapter,
         "numbered_source_keys":len(occupied),
         "numbered_source_groups":len(grouped),
+        "provisional_index_alias_count":len(aliases),
+        "provisional_index_aliases_not_editorially_approved":True,
         "source_intro_raw_modified":False,
         "source_k_raw_modified":False,
         "source_published":False
@@ -150,14 +161,17 @@ def probe_original_mixed_transport(chapter: str, book_intro: bytes,
                                    chapter_intro: bytes,
                                    numbered: list[tuple[str, bytes]], *,
                                    scratch: Path, native_raw_binary: Path,
-                                   osis2mod_binary="osis2mod") -> dict:
+                                   osis2mod_binary="osis2mod",
+                                   provisional_index_aliases: dict[str,dict] | None = None) -> dict:
     if (not scratch.is_dir() or scratch.is_symlink()
             or not native_raw_binary.is_file()
             or native_raw_binary.is_symlink()):
         raise ValueError("Untrusted native mixed original probe path")
     module_id="BRMixedProbe"
+    aliases=provisional_index_aliases or {}
     xml, source=build_mixed_original_transport(
-        chapter,book_intro,chapter_intro,numbered,work_id=module_id
+        chapter,book_intro,chapter_intro,numbered,work_id=module_id,
+        provisional_index_aliases=aliases
     )
     root=scratch/"mixed-private-candidate"
     if root.exists() or root.is_symlink():
@@ -259,8 +273,46 @@ def probe_original_mixed_transport(chapter: str, book_intro: bytes,
         missing_intro_keys=missing_I,
         missing_numbered_keys=missing_K,
         extra_intro_keys=extra_I,
-        extra_numbered_keys=extra_K,
+        extra_numbered_keys=[k for k in extra_K if k not in aliases],
     )
+    exact_extra_keys_only=bool(aliases) and set(extra_K)==set(aliases)
+    aliases_match_original_compiled_master=(
+        exact_extra_keys_only and all(
+            rebuilt_K.get(target) == rebuilt_K.get(claim["link_to"])
+            and rebuilt_K.get(target) is not None
+            for target,claim in aliases.items()
+        )
+    )
+    private_diatheke = []
+    if aliases and checks_passed and aliases_match_original_compiled_master:
+        executable = shutil.which("diatheke")
+        if executable:
+            from pilot_subprocess import query, present_key
+            for target, claim in sorted(aliases.items()):
+                master = claim["link_to"]
+                measurements = []
+                for ref in (target, master):
+                    original_book, original_chapter, original_verse = ref.split(".")
+                    readable = f"{original_book} {original_chapter}:{original_verse}"
+                    code, data = query(
+                        module_id, readable, fmt="internal", root=root,
+                        exe=executable
+                    )
+                    measurements.append({
+                        "original_or_proposed_native_key": ref,
+                        "reader_return_code": code,
+                        "reader_response_bytes": len(data),
+                        "real_commentary_text_was_returned":
+                            present_key(readable, data, code) and len(data) >= 64,
+                    })
+                private_diatheke.append({
+                    "new_alias": target, "existing_master": master,
+                    "both_keys_return_nontrivial_real_diatheke_content":
+                        all(row["real_commentary_text_was_returned"]
+                            for row in measurements),
+                    "readback_evidence": measurements,
+                    "original_reader_response_not_modified": True,
+                })
     return {
         **source,
         "status":"TEMPORARY_MIXED_ORIGINAL_I_K_REBUILT_NOT_EDITION_PARITY",
@@ -275,6 +327,17 @@ def probe_original_mixed_transport(chapter: str, book_intro: bytes,
         "compiled_I_key_count":len(rebuilt_I),
         "compiled_K_key_count":len(rebuilt_K),
         "compiled_TOP_key_count":len(rebuilt_U),
+        "actual_new_private_alias_keys_only":exact_extra_keys_only,
+        "all_provisional_alias_bodies_equal_original_compiled_master":aliases_match_original_compiled_master,
+        "private_alias_candidate_complete_original_K_I_checks_pass":
+            checks_passed and aliases_match_original_compiled_master,
+        "provisional_aliases_editorially_approved":False,
+        "private_diatheke_candidate_available": bool(shutil.which("diatheke")),
+        "private_actual_diatheke_alias_passed":
+            bool(private_diatheke) and all(
+                r["both_keys_return_nontrivial_real_diatheke_content"]
+                for r in private_diatheke),
+        "private_diatheke_references": private_diatheke,
         "raw_source_edition_parity_proven":False,
         "entire_original_native_corpus_preserved":False,
         "published":False,
@@ -896,6 +959,10 @@ def _probe_private_alias_real_xiphos(root: Path, module_id: str, aliases: dict,
             gui["commentary_clipboard_match_by_passage"],
         "independent_gui_commentary_excerpt_match_count":
             gui["independent_gui_commentary_excerpt_match_count"],
+        "bounded_xiphos_ui_failed_action_by_passage":
+            gui["bounded_xiphos_ui_failed_action_by_passage"],
+        "bounded_right_commentary_pane_focus_attempts_by_passage":
+            gui["bounded_right_commentary_pane_focus_attempts_by_passage"],
         "whole_chapter_Xiphos_GTK_proof":
             gui["whole_chapter_Xiphos_GTK_proof"],
         "whole_chapter_commentary_deduplication_proven": False,
@@ -1230,6 +1297,164 @@ def privately_stage_versioned_zcom_zip(
     }
 
 
+
+def probe_private_full_index_alias_jsword(*, candidate_root: Path, module_id: str,
+                                          aliases: dict[str, dict],
+                                          pinned_jsword: Path, scratch: Path) -> dict:
+    """Read actual complete repaired source in AndBible's pinned JSword engine.
+
+    The candidate MUST first pass all original native K/I/TOP and alias checks.
+    No native source, module, Java failure body, HTML or prose is published.
+    This independently tests the engine, not the Android app's GUI.
+    """
+    from xml.etree import ElementTree
+    from probe_andbible_jsword import AND_BIBLE_JSWORD_SHA
+
+    original_test = (Path(__file__).resolve().parents[1] / "tests" / "java"
+                     / "org" / "icfmp" / "research"
+                     / "CommentaryPrivateAliasJSwordProbeTest.java")
+    if (not candidate_root.is_dir() or candidate_root.is_symlink()
+            or not pinned_jsword.is_dir() or pinned_jsword.is_symlink()
+            or not scratch.is_dir() or scratch.is_symlink()
+            or not original_test.is_file() or original_test.is_symlink()
+            or not WORK.fullmatch(module_id)
+            or not isinstance(aliases, dict) or not 1 <= len(aliases) <= 12
+            or not (candidate_root / "mods.d" / (module_id.lower() + ".conf")).is_file()
+            or "commentary-source-native-" not in str(candidate_root)
+            or "complete-original-private-candidate" not in str(candidate_root)
+            or not (pinned_jsword / "gradlew").is_file()
+            or not (pinned_jsword / "build.gradle.kts").is_file()):
+        raise ValueError("Unverified private complete commentary JSword candidate")
+    rows = []
+    for target, claim in sorted(aliases.items()):
+        master = claim.get("link_to") if isinstance(claim, dict) else None
+        if (not isinstance(target, str) or not isinstance(master, str)
+                or KEY.fullmatch(target) is None or KEY.fullmatch(master) is None
+                or target == master
+                or target.rsplit(".", 1)[0] != master.rsplit(".", 1)[0]):
+            raise ValueError("Unverified JSword alias/master pair")
+        rows.append(target + "|" + master)
+    repo = subprocess.run(
+        ["git", "-C", str(pinned_jsword), "rev-parse", "HEAD"],
+        stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=15,
+        check=False,
+    )
+    if repo.returncode or repo.stdout.decode("ascii", errors="replace").strip() != AND_BIBLE_JSWORD_SHA:
+        raise ValueError("JSword engine is not the reviewed AndBible stable revision")
+    destination = (pinned_jsword / "src" / "test" / "java" / "org"
+                   / "icfmp" / "research" / original_test.name)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    if destination.exists() or destination.is_symlink():
+        raise ValueError("Refuse to overwrite a pinned JSword test source")
+    shutil.copyfile(original_test, destination)
+    java_home = scratch / "private-jsword-home"
+    gradle_home = scratch / "private-jsword-gradle"
+    java_home.mkdir(mode=0o700)
+    gradle_home.mkdir(mode=0o700)
+    log = scratch / "private-jsword-build.log"
+    env = dict(
+        os.environ,
+        PRIVATE_COMMENTARY_JSWORD_ROOT=str(candidate_root),
+        PRIVATE_COMMENTARY_JSWORD_ID=module_id,
+        PRIVATE_COMMENTARY_JSWORD_ALIASES=";".join(rows),
+        SWORD_PATH=str(candidate_root),
+        HOME=str(java_home),
+        GRADLE_USER_HOME=str(gradle_home),
+        JAVA_TOOL_OPTIONS="-Duser.home=" + str(java_home),
+        LANG="C.UTF-8", LC_ALL="C.UTF-8",
+    )
+    try:
+        with log.open("xb") as out:
+            proc = subprocess.run(
+                ["bash", str(pinned_jsword / "gradlew"), "--no-daemon",
+                 "--console=plain", "test", "--tests",
+                 "org.icfmp.research.CommentaryPrivateAliasJSwordProbeTest"],
+                cwd=pinned_jsword, env=env, stdout=out,
+                stderr=subprocess.STDOUT, timeout=850, check=False,
+            )
+    except subprocess.TimeoutExpired:
+        return {
+            "status": "PRIVATE_PINNED_JSWORD_TIMEOUT_NOT_READER_PASS",
+            "pinned_jsword_sha256_git_commit": AND_BIBLE_JSWORD_SHA,
+            "sample_aliases": len(rows),
+            "independent_engine_verified": False,
+            "android_gui_tested": False, "published": False,
+        }
+    if log.stat().st_size > 4_000_000:
+        raise ValueError("Private JSword test log exceeded safety bound")
+    junit = (pinned_jsword / "build" / "test-results" / "test"
+             / "TEST-org.icfmp.research.CommentaryPrivateAliasJSwordProbeTest.xml")
+    counts = None
+    if junit.is_file() and not junit.is_symlink() and 0 < junit.stat().st_size <= 500_000:
+        try:
+            root = ElementTree.parse(junit).getroot()
+            if root.tag == "testsuite":
+                counts = {
+                    name: int(root.attrib.get(name, 0))
+                    for name in ("tests", "failures", "errors", "skipped")
+                }
+        except (ValueError, ElementTree.ParseError, OverflowError):
+            counts = None
+    accepted = (proc.returncode == 0 and counts ==
+                {"tests": 2, "failures": 0, "errors": 0, "skipped": 0})
+    # No unreviewed Gradle text, Java diagnostics, URLs or commentary content
+    # may enter CI artifacts. Report only a fixed error category and exit code.
+    diagnosis = classify_private_gradle_failure(
+        log.read_bytes() if not accepted else b"",
+        proc.returncode, counts,
+    )
+    return {
+        "status": ("PRIVATE_PINNED_AND_BIBLE_JSWORD_ALIAS_ENGINE_PASS"
+                   if accepted else "PRIVATE_PINNED_JSWORD_ALIAS_ENGINE_INCONCLUSIVE_OR_FAIL"),
+        "gradle_failure_category": diagnosis,
+        "gradle_exit_code": proc.returncode,
+        "junit_report_present": counts is not None,
+        "pinned_andbible_jsword_commit": AND_BIBLE_JSWORD_SHA,
+        "sample_aliases": len(rows),
+        "junit_counts": counts,
+        "independent_engine_verified": accepted,
+        "android_gui_tested": False,
+        "private_commentary_text_or_java_log_uploaded": False,
+        "published": False,
+    }
+
+
+
+def classify_private_gradle_failure(
+        log_bytes: bytes, exit_code: int, junit_counts: dict | None) -> str:
+    """Return a bounded diagnosis; never expose a private Gradle log.
+
+    This is advisory only: a category cannot make a failed reader test pass.
+    Both source text and private build errors may occur in the log, so return
+    only predeclared codes independent of arbitrary diagnostic contents.
+    """
+    if (not isinstance(log_bytes, bytes) or len(log_bytes) > 4_000_000
+            or type(exit_code) is not int
+            or not -128 <= exit_code <= 255):
+        raise ValueError("Invalid bounded private build diagnostic")
+    if exit_code == 0 and junit_counts == {
+            "tests": 2, "failures": 0, "errors": 0, "skipped": 0}:
+        return "PASS"
+    text = log_bytes.lower()
+    if (b"gradlewrappermain" in text or
+            b"could not install gradle distribution" in text):
+        return "GRADLE_WRAPPER_SETUP"
+    if (b"could not resolve" in text or b"could not download" in text or
+            b"read timed out" in text or b"connection timed out" in text or
+            b"connection reset" in text or b"unable to load maven meta-data" in text):
+        return "DEPENDENCY_NETWORK"
+    if b"no tests found for given includes" in text:
+        return "TEST_SELECTION"
+    if (b"compilation failed" in text or
+            b":compiletestjava failed" in text or
+            b"error: cannot find symbol" in text):
+        return "TEST_COMPILATION"
+    if junit_counts is not None:
+        return "JUNIT_FAILURE"
+    return "NO_JUNIT_REPORT"
+
+
+
 def probe_complete_original_transport(
         original_intros: dict[str, bytes],
         original_numbered: dict[str, list[tuple[str, bytes]]],
@@ -1240,7 +1465,8 @@ def probe_complete_original_transport(
         test_preview_in_xiphos: bool = False,
         original_stock_sword_root: Path | None = None,
         original_stock_module_id: str = "MHCC",
-        native_index_binary: Path | None = None) -> dict:
+        native_index_binary: Path | None = None,
+        pinned_jsword_source_root: Path | None = None) -> dict:
     """Attempt full private SWORD readback and compare EVERY original native key.
 
     This is diagnostic and cannot authorize a release. TOP is separately
@@ -1269,7 +1495,7 @@ def probe_complete_original_transport(
         run = subprocess.run([
             str(osis2mod_binary), str(data),
             str(root / "source-original-private.osis.xml"),
-            "-z", "z", "-b", "3", "-v", "KJV"
+            "-z", "z", "-b", "3", "-s", "4", "-v", "KJV"
         ], cwd=root, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
            timeout=360, check=False)
     except (OSError, subprocess.TimeoutExpired):
@@ -1280,7 +1506,7 @@ def probe_complete_original_transport(
                 "readback_completed": False, "published": False}
     conf.write_text(
         f"[{module_id}]\nDataPath=./modules/comments/zcom/{module_id}\n"
-        "ModDrv=zCom\nCompressType=ZIP\nBlockType=CHAPTER\n"
+        "ModDrv=zCom4\nCompressType=ZIP\nBlockType=CHAPTER\n"
         "SourceType=OSIS\nVersification=KJV\nLang=en\n"
         "Description=Private whole-original text transport only\n",
         encoding="utf-8"
@@ -1381,6 +1607,16 @@ def probe_complete_original_transport(
             original_stock_sword_root, root,
             original_stock_module_id, module_id, aliases
         )
+    independent_jsword = None
+    if pinned_jsword_source_root is not None:
+        if not aliases or not (indexed_checks and alias_identical and top_exact):
+            raise ValueError("Refuse JSword on incomplete original or unverified aliases")
+        java_scratch = scratch / "private-pinned-jsword-check"
+        java_scratch.mkdir()
+        independent_jsword = probe_private_full_index_alias_jsword(
+            candidate_root=root, module_id=module_id, aliases=aliases,
+            pinned_jsword=pinned_jsword_source_root, scratch=java_scratch,
+        )
     gui = None
     if test_preview_in_xiphos:
         if not aliases or not (indexed_checks and alias_identical and top_exact):
@@ -1391,6 +1627,7 @@ def probe_complete_original_transport(
     return {
         **source,
         "private_real_xiphos_alias_navigation_probe": gui,
+        "private_pinned_andbible_jsword_alias_probe": independent_jsword,
         "private_original_vs_alias_cli_chapter_repetition_probe": chapter_repeat,
         "private_native_original_and_provisional_alias_link_identity": link_identity,
         "status": "COMPLETE_ORIGINAL_PRIVATE_I_K_U_COMPILED_READBACK_NOT_APPROVAL",

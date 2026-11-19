@@ -8,7 +8,8 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/"scripts"))
 from lxml import etree
-from repair_osis_source_bytes import patch_exact_original, LexicalPatchError
+from repair_osis_source_bytes import (patch_exact_original, LexicalPatchError,
+                                      patch_reviewed_osis_reference_attributes)
 from repair_osis_note_links import propose as link_propose
 from source_osis_inventory import OSIS, _source_tree
 
@@ -63,6 +64,111 @@ def plans(src=SOURCE):
 
 
 class TestLexicalSourcePatches(unittest.TestCase):
+    def test_private_source_link_target_harmonization_preserves_all_other_bytes(self):
+        root=etree.fromstring(SOURCE)
+        refs=[n for n in root.iter() if n.tag==OSIS+"reference"]
+        self.assertEqual(len(refs),2)
+        edits=[]
+        for node,target in zip(refs,("Exod.2.1","Gen.1.1 Exod.2.1")):
+            original_book=next(
+                a.get("osisID") for a in node.iterancestors()
+                if a.tag==OSIS+"div" and a.get("type")=="book")
+            edits.append({
+                "original_line":node.sourceline,
+                "source_book":original_book,
+                "old_target":node.get("osisRef"),
+                "new_target":target,
+                "visible_label_sha256":sha256(
+                    "".join(node.itertext()).strip().encode("utf-8")).hexdigest(),
+                "evidence_url":"https://example.org/verified-label",
+            })
+        plan={"schema_version":1,
+              "status":"research_only_private_not_release",
+              "source_sha256":sha256(SOURCE).hexdigest(),
+              "edits":edits}
+        before=SOURCE
+        result,receipt=patch_reviewed_osis_reference_attributes(
+            before,plan,{"Gen.1.1","Exod.2.1"})
+        expected=SOURCE.replace(b"osisRef='Gen.9.1'",b"osisRef='Exod.2.1'")
+        expected=expected.replace(b"osisRef='Gen.1.2'",
+                                  b"osisRef='Gen.1.1 Exod.2.1'")
+        self.assertEqual(result,expected)
+        self.assertEqual(receipt["exact_reference_attribute_only_changes"],2)
+        self.assertTrue(receipt["entire_original_commentary_characters_unchanged"])
+        self.assertEqual(before,SOURCE)
+        tampered=dict(plan,edits=[dict(edits[0],original_line=9999),edits[1]])
+        with self.assertRaises(LexicalPatchError):
+            patch_reviewed_osis_reference_attributes(
+                SOURCE,tampered,{"Gen.1.1","Exod.2.1"})
+        tampered=dict(plan,edits=[dict(edits[0],new_target="Exod.2.99"),edits[1]])
+        with self.assertRaises(LexicalPatchError):
+            patch_reviewed_osis_reference_attributes(
+                SOURCE,tampered,{"Gen.1.1","Exod.2.1"})
+        tampered=dict(plan,edits=[dict(edits[0],
+            visible_label_sha256="0"*64),edits[1]])
+        with self.assertRaises(LexicalPatchError):
+            patch_reviewed_osis_reference_attributes(
+                SOURCE,tampered,{"Gen.1.1","Exod.2.1"})
+
+    def test_real_indexed_osis_ranges_are_preserved_and_missing_verses_rejected(self):
+        root=etree.fromstring(SOURCE)
+        refs=[n for n in root.iter(OSIS+"reference")]
+        edit={
+            "original_line":refs[1].sourceline,
+            "source_book":"Gen",
+            "old_target":"Gen.1.2",
+            "new_target":"Gen.1.1-Gen.1.3",
+            "visible_label_sha256":sha256(
+                "".join(refs[1].itertext()).strip().encode()).hexdigest(),
+            "evidence_url":"https://example.org/reviewed-range",
+        }
+        plan={"schema_version":1,"status":"research_only_private_not_release",
+              "source_sha256":sha256(SOURCE).hexdigest(),"edits":[edit]}
+        full={"Gen.1.1","Gen.1.2","Gen.1.3","Exod.2.1"}
+        revised,receipt=patch_reviewed_osis_reference_attributes(SOURCE,plan,full)
+        self.assertEqual(receipt["exact_reference_attribute_only_changes"],1)
+        self.assertEqual(revised,SOURCE.replace(
+            b"osisRef='Gen.1.2'",b"osisRef='Gen.1.1-Gen.1.3'"))
+        self.assertEqual("".join(etree.fromstring(revised).itertext()),
+                         "".join(root.itertext()))
+        # A range may not pretend a missing native verse is included.
+        with self.assertRaises(LexicalPatchError):
+            patch_reviewed_osis_reference_attributes(SOURCE,plan,full-{"Gen.1.2"})
+        for invalid in ("Gen.1.3-Gen.1.1", "Gen.1.1-Exod.2.1",
+                        "Gen.1.1-Gen.2.1", "Gen.1.1-Gen.1.9",
+                        "Gen.1.1-Gen.1.1", "Gen.1.1-Gen.1.3-Gen.1.4",
+                        "Gen.1.1-Gen.1.0", "Gen.1.1-Gen.1.202"):
+            with self.subTest(invalid=invalid),self.assertRaises(LexicalPatchError):
+                patch_reviewed_osis_reference_attributes(
+                    SOURCE,dict(plan,edits=[dict(edit,new_target=invalid)]),full)
+
+    def test_chapter_root_link_is_indexed_navigation_scope_not_title_proof(self):
+        root=etree.fromstring(SOURCE)
+        ref=next(root.iter(OSIS+"reference"))
+        edit={
+            "original_line":ref.sourceline,"source_book":"Gen",
+            "old_target":ref.get("osisRef"),
+            "new_target":"Ps.60 Exod.2.1",
+            "visible_label_sha256":sha256(
+                "".join(ref.itertext()).strip().encode()).hexdigest(),
+            "evidence_url":"https://example.org/printed-psalm-title",
+        }
+        plan={"schema_version":1,"status":"research_only_private_not_release",
+              "source_sha256":sha256(SOURCE).hexdigest(),"edits":[edit]}
+        registry={"Gen.1.1","Ps.60.1","Ps.60.2","Exod.2.1"}
+        output,receipt=patch_reviewed_osis_reference_attributes(
+            SOURCE,plan,registry)
+        self.assertEqual(receipt["exact_reference_attribute_only_changes"],1)
+        self.assertEqual(output,SOURCE.replace(
+            b"osisRef='Gen.9.1'",b"osisRef='Ps.60 Exod.2.1'"))
+        # Chapter roots require a real existing chapter, not guessed verse 0.
+        for invalid in ("Ps.61 Exod.2.1", "Ps.60.0 Exod.2.1",
+                        "Ps Exod.2.1", "Ps.60.1-Ps.61.1 Exod.2.1"):
+            with self.subTest(invalid=invalid),self.assertRaises(LexicalPatchError):
+                patch_reviewed_osis_reference_attributes(
+                    SOURCE,dict(plan,edits=[dict(edit,new_target=invalid)]),
+                    registry)
+
     def test_only_fourteen_original_byte_spans_changed_and_no_wholesale_serialization(self):
         link,inline=plans()
         result,report=patch_exact_original(SOURCE,link,inline)

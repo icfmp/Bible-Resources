@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "status": "research_only_private_not_release",
+  "source_sha256": "95a12ad88decbfe975de747825492abb7944b8de6dd30176cc23afdc9d2daa5d",
+  "edits": [
+    {
+      "original_line": 7237,
+      "source_book": "Exod",
+      "old_target": "15.1",
+      "new_target": "Jer.15.1",
+      "visible_label_sha256": "71d1ca3a55426923d99891ff72a1f46a7bbca23212ff35b6066554c04f20b75e",
+      "evidence_url": "https://ccel.org/h/henry/mhc2/MHC02032.HTM"
+    },
+    {
+      "original_line": 57059,
+      "source_book": "Isa",
+      "old_target": "Ezr 1.7 8.23",
+      "new_target": "Ezra.1.7 Ezra.8.24",
+      "visible_label_sha256": "b5c41088c8e116de627e447d115ccbdf40260cbb968e415feeb4fb26a665ff98",
+      "evidence_url": "https://www.ccel.org/ccel/henry/mhc4.Is.liii.html"
+    },
+    {
+      "original_line": 32130,
+      "source_book": "Job",
+      "old_target": "18.24",
+      "new_target": "Ps.18.24",
+      "visible_label_sha256": "f78d643df7d3402d9c05b112340d6d2b538a82008038417e870777d2ba813f8c",
+      "evidence_url": "https://ccel.org/h/henry/mhc2/MHC18015.HTM"
+    },
+    {
+      "original_line": 58803,
+      "source_book": "Jer",
+      "old_target": "De 4.29 30.2",
+      "new_target": "Deut.4.29 Deut.30.2",
+      "visible_label_sha256": "cccd2aa35125491fa243dc2098c62ab81ace3f9e4539e85737bf8e555d2eaab5",
+      "evidence_url": "https://ccel.org/ccel/henry/mhc4/mhc4.Jer.v.html"
+    },
+    {
+      "original_line": 63871,
+      "source_book": "Ezek",
+      "old_target": "Le 18.19 20.18",
+      "new_target": "Lev.18.19 Lev.20.18",
+      "visible_label_sha256": "91198920836b9fa7553a923ab0847a84b6d6dc6ccf4e9fdb90174283b2ea09b1",
+      "evidence_url": "https://www.ccel.org/h/henry/mhc2/MHC26018.HTM"
+    },
+    {
+      "original_line": 97929,
+      "source_book": "Acts",
+      "old_target": "Ac.23.23 24 25.6",
+      "new_target": "Acts.23.23 Acts.23.24 Acts.25.6",
+      "visible_label_sha256": "eb80963d62ecc60c3cbe12f98ed0722d3cfcb7be249759b908eb676df4bb03da",
+      "evidence_url": "https://www.ccel.org/h/henry/mhc2/MHC44010.HTM"
+    },
+    {
+      "original_line": 98544,
+      "source_book": "Acts",
+      "old_target": "Heb.9.9 10.1 4",
+      "new_target": "Heb.9.9 Heb.10.1 Heb.10.4",
+      "visible_label_sha256": "1ee6ae04b61b4169d42932f305e6651db5c07d67632041ef79752d7e453fd2fd",
+      "evidence_url": "https://ccel.org/h/henry/mhc2/MHC44013.HTM"
+    },
+    {
+      "original_line": 50767,
+      "source_book": "Prov",
+      "old_target": "Pr.10.19 11.12 12.23 13.3 17.27 28 29.11 20",
+      "new_target": "Prov.10.19 Prov.11.12 Prov.12.23 Prov.13.3 Prov.17.27 Prov.17.28 Prov.29.11 Prov.29.20",
+      "visible_label_sha256": "f2a5221bc12b4304be0ab5a80bb0de77fa115c60fc60027ab3798e2b123146b4",
+      "evidence_url": "https://ccel.org/h/henry/mhc2/MHC20031.HTM"
+    },
+    {
+      "original_line": 50794,
+      "source_book": "Prov",
+      "old_target": "Pr.16.3 18.10 23.26 27.1 28.25 29.25",
+      "new_target": "Prov.16.3 Prov.18.10 Prov.23.26 Prov.27.1 Prov.28.25 Prov.29.25",
+      "visible_label_sha256": "54d5410331b0e2b3b1f64ffac3efba4b2e1e2e6ff97904a87ce539e0492a2d7c",
+      "evidence_url": "https://ccel.org/h/henry/mhc2/MHC20031.HTM"
+    },
+    {
+      "original_line": 50803,
+      "source_book": "Prov",
+      "old_target": "Pr.17.17 18.24 27.9 10 14 17",
+      "new_target": "Prov.17.17 Prov.18.24 Prov.27.9 Prov.27.10 Prov.27.14 Prov.27.17",
+      "visible_label_sha256": "a41928126a4bbfa188e0ab514d1e4fc8d4ceecac8cb7f1081d9ae4fb3edb3f5d",
+      "evidence_url": "https://ccel.org/h/henry/mhc2/MHC20031.HTM"
+    },
+    {
+      "original_line": 52749,
+      "source_book": "Isa",
+      "old_target": "2Ki 2.3 4.1 38 5.22 6.1",
+      "new_target": "2Kgs.2.3 2Kgs.4.1 2Kgs.4.38 2Kgs.5.22 2Kgs.6.1",
+      "visible_label_sha256": "6d91396b8e3749505b53c0649581d4b0f09003ade377403e63526f578bd83240",
+      "evidence_url": "https://www.ccel.org/h/henry/mhc2/MHC00004.HTM"
+    },
+    {
+      "original_line": 95558,
+      "source_book": "John",
+      "old_target": "1Jo.1.1 2Pe 1.16",
+      "new_target": "1John.1.1 2Pet.1.16",
+      "visible_label_sha256": "407e93b91f388dfeb592e3a85d73242b0c649205620dbb3ee247e25f916b0bfc",
+      "evidence_url": "https://ccel.org/h/henry/mhc2/MHC43019.HTM"
+    },
+    {
+      "original_line": 109003,
+      "source_book": "Phlm",
+      "old_target": "Col.3.1 2Pe 2.4",
+      "new_target": "Col.3.1 2Pet.2.4",
+      "visible_label_sha256": "b01904e727eb7a3cd1d5aa986937bd96df211eb702310a358133eb14929a062e",
+      "evidence_url": "https://www.ccel.org/h/henry/mhc2/MHC57001.HTM"
+    },
+    {
+      "original_line": 112877,
+      "source_book": "Jude",
+      "old_target": "1Ti.4.1 2Ti 3.1 2Pe 3.3",
+      "new_target": "1Tim.4.1 2Tim.3.1 2Pet.3.3",
+      "visible_label_sha256": "1891daa20a835a752788232beccc02c648652692e97e1b0a5847f0f5e456d036",
+      "evidence_url": "https://www.ccel.org/h/henry/mhc2/MHC65001.HTM"
+    },
+    {
+      "original_line": 62922,
+      "source_book": "Ezek",
+      "old_target": "La 4.3 4 5.10",
+      "new_target": "Lam.4.3 Lam.4.4 Lam.5.10",
+      "visible_label_sha256": "0409f782bfa828b0c0eba8ec5ce2b27c40b760c3e8f25cf90e480ea715bf8d43",
+      "evidence_url": "https://ccel.org/ccel/henry/mhc4/mhc4.Ez.v.html"
+    },
+    {
+      "original_line": 67688,
+      "source_book": "Hos",
+      "old_target": "Ho 4.15 12.11 Am 4.4 5.5",
+      "new_target": "Hos.4.15 Hos.12.11 Amos.4.4 Amos.5.5",
+      "visible_label_sha256": "f753b797b890fb028fdd69d87013ee04e339a3313f120cc1eb6d348f549e5d1c",
+      "evidence_url": "https://www.ccel.org/h/henry/mhc2/MHC28009.HTM"
+    },
+    {
+      "original_line": 98022,
+      "source_book": "Acts",
+      "old_target": "De.7.7 8 9.5 6 Mt 20.10",
+      "new_target": "Deut.7.7 Deut.7.8 Deut.9.5 Deut.9.6 Matt.20.10",
+      "visible_label_sha256": "65e4c70c357a607c1c4640d85777c252afdddbb6b6dce442aa444c884ed2d7d4",
+      "evidence_url": "https://www.ccel.org/h/henry/mhc2/MHC44010.HTM"
+    },
+    {
+      "original_line": 3108,
+      "source_book": "Gen",
+      "old_target": "21.13",
+      "new_target": "Gen.21.13",
+      "visible_label_sha256": "03c5aa5472ef334b4738914ef09e8b5e0d6c66b9a16c80dba7246a526e5d7fc1",
+      "evidence_url": "https://ccel.org/h/henry/mhc2/MHC01025.HTM"
+    },
+    {
+      "original_line": 37835,
+      "source_book": "Ps",
+      "old_target": "10.1-4",
+      "new_target": "Heb.10.1-Heb.10.4",
+      "visible_label_sha256": "d25e75bbcd183bb293061c3193370eee31d32979ac57b06ddeff4005c94247c1",
+      "evidence_url": "https://ccel.org/h/henry/mhc2/MHC19040.HTM"
+    },
+    {
+      "original_line": 41584,
+      "source_book": "Ps",
+      "old_target": "4.4",
+      "new_target": "Phil.4.4",
+      "visible_label_sha256": "243c6e2b4d9a38c7c492c0087d6064396d2eb901f07fa4f81a71b7a5155c159a",
+      "evidence_url": "https://www.ccel.org/ccel/henry/mhc3/mhc3.Ps.xcviii.html"
+    },
+    {
+      "original_line": 47698,
+      "source_book": "Prov",
+      "old_target": "5.7",
+      "new_target": "Neh.5.7",
+      "visible_label_sha256": "feb2c27008f9134cbbe65230e0495633e0ff252ff4265b1142f0eff7ec5f9d6e",
+      "evidence_url": "https://ccel.org/h/henry/mhc2/MHC20015.HTM"
+    },
+    {
+      "original_line": 50772,
+      "source_book": "Prov",
+      "old_target": "Pr.11.14 15.22 18.13 19.2 20.5 18 21.29 22.3 25.8-10",
+      "new_target": "Prov.11.14 Prov.15.22 Prov.18.13 Prov.19.2 Prov.20.5 Prov.20.18 Prov.21.29 Prov.22.3 Prov.25.8-Prov.25.10",
+      "visible_label_sha256": "fa5b073ba636264429ca789fb44f8c238af1f48d0d1a0acf4e1e6944fc560d82",
+      "evidence_url": "https://www.ccel.org/ccel/henry/mhc3/mhc3.Prov.xxxii.html"
+    },
+    {
+      "original_line": 76239,
+      "source_book": "Matt",
+      "old_target": "1Ti.4.1 2Ti 3.1 2 3.3",
+      "new_target": "1Tim.4.1 2Tim.3.1 2Pet.3.3",
+      "visible_label_sha256": "c42db45b282dc6ff326fd1a51c328c0bb7f010aeef95c0afe3c7ab8093f16a8e",
+      "evidence_url": "https://ccel.org/h/henry/mhc2/MHC40015.HTM"
+    },
+    {
+      "original_line": 81529,
+      "source_book": "Matt",
+      "old_target": "Lu.24.6 7-44 Mk 16.7",
+      "new_target": "Luke.24.6 Luke.24.7-Luke.24.44 Mark.16.7",
+      "visible_label_sha256": "7e292c1bbb4a0ac110da2b665b0b45feced44d45ee09668d72df1dd9e69265ba",
+      "evidence_url": "https://ccel.org/h/henry/mhc2/MHC40028.HTM"
+    },
+    {
+      "original_line": 58059,
+      "source_book": "Isa",
+      "old_target": "Ps 60.1 2Sa 8.13 14",
+      "new_target": "Ps.60 2Sam.8.13 2Sam.8.14",
+      "visible_label_sha256": "e1d19a796de5c2db6d9ef6be1b924f145d7002d499c3e041d6d16a73a097da1f",
+      "evidence_url": "https://ccel.org/h/henry/mhc2/MHC23063.HTM"
+    }
+  ]
+}

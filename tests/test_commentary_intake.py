@@ -169,5 +169,27 @@ class CommentaryIntakeTests(unittest.TestCase):
                 inspect_resource("example-commentary", "2", directory=self.manifests)
 
 
+    def test_all_registered_commentary_manifests_pass_offline_stage_one(self):
+        """Check every real resource manifest, without requesting source bytes."""
+        directory = ROOT / "config" / "commentary-intake"
+        registered = []
+        for path in sorted(directory.glob("*.json")):
+            manifest = json.loads(path.read_text(encoding="utf-8"))
+            if manifest.get("category") != "commentary":
+                continue  # Other JSON files are correction/link plans, not imports.
+            with self.subTest(resource_id=path.stem):
+                self.assertEqual(manifest.get("resource_id"), path.stem)
+                with patch("commentary_intake.fetch",
+                           side_effect=AssertionError("Stage 1 fetched a source")):
+                    report = inspect_resource(path.stem, "1",
+                                              directory=directory)
+                registered.append(path.stem)
+                self.assertEqual(report["status"], "metadata_review_required")
+                self.assertFalse(report["download_performed"])
+                self.assertFalse(report["published"])
+                self.assertFalse(report["copyright_and_redistribution_approved"])
+        self.assertTrue(registered, "No registered commentary imports found")
+
+
 if __name__ == "__main__":
     unittest.main()

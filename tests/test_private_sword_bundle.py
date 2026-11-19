@@ -67,6 +67,45 @@ class PrivateSwordBundleTests(unittest.TestCase):
         result=_validate_package_files(self.root,self.id)
         self.assertEqual(len(result),3)
 
+    def test_standard_zcom4_commentary_with_nonterminated_datapath(self):
+        # This is the ordinary source-based osis2mod -s 4 output shape;
+        # do not add a module-specific exception just to pass packaging.
+        self.conf.write_text(
+            "[PrivateExample]\n"
+            "DataPath=./modules/comments/zcom4/privateexample\n"
+            "ModDrv=zCom4\n"
+            "BlockType=CHAPTER\n"
+            "SourceType=OSIS\n"
+            "Lang=en\n",
+            encoding="utf-8")
+        for existing in self.data.iterdir():
+            existing.unlink()
+        self.data.rmdir()
+        self.data=self.root/"modules/comments/zcom4/privateexample"
+        self.data.mkdir(parents=True)
+        for name in ("ot.czs","ot.czv","ot.czz",
+                     "nt.czs","nt.czv","nt.czz"):
+            (self.data/name).write_bytes(b"synthetic-zcom4-"+name.encode())
+        entries=_validate_package_files(self.root,self.id)
+        self.assertEqual(len(entries),7)
+        archive=Path(self.temp.name)/"zcom4.zip"
+        proof=_zip_private_module(self.root,self.id,archive)
+        self.assertEqual(proof["module_file_count"],7)
+        with ZipFile(archive) as z:
+            self.assertEqual(len(z.namelist()),7)
+            self.assertIn("mods.d/privateexample.conf",z.namelist())
+
+    def test_zcom4_data_path_still_rejects_module_traversal(self):
+        for bad in ("./modules/comments/../outside",
+                    "./modules/comments/zcom4/privateexample/../../etc",
+                    "/modules/comments/zcom4/privateexample"):
+            with self.subTest(path=bad):
+                self.conf.write_text(
+                    "[PrivateExample]\nDataPath="+bad+
+                    "\nModDrv=zCom4\n", encoding="utf-8")
+                with self.assertRaises(PilotError):
+                    _validate_package_files(self.root,self.id)
+
     def test_duplicate_critical_config_fields_are_rejected(self):
         self.conf.write_text(
             "[PrivateExample]\n"

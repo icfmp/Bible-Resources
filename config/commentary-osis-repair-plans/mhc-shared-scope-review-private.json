@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "status": "RESEARCH_ONLY_PRIVATE_SCOPE_REVIEW",
+  "original_authoring_osis_sha256": "3cf367f00c498a3124b339c00896aaef4ef1196a2d5c310ecb20ea42abd130f6",
+  "purpose": "Editorial approval (2026-11-18): choose whole-verse navigation for all six earlier source-range overlaps. In Romans 4 the first section ends at 4:16 and the next begins at 4:17, with every original word retained. Retain both distinct 2 Chronicles 1 authored sections, pending standard OSIS chapter-introduction encoding.",
+  "retain_original_overlaps": [],
+  "expected_original_syntactic_shared_verse_count": 7,
+  "expected_rebuilt_source_shared_verse_count": 1,
+  "expected_reader_multiowner_verse_count": 1,
+  "expected_non_reader_shared_source_index_ranges": 6,
+  "source_text_edited": false,
+  "public_repackaging_approved": false,
+  "edition_editorial_decision": "ROMANS_4_9_TO_16_AND_4_17_TO_22_APPROVED_FOR_VERSE_NAVIGATION",
+  "approved_scope_only": true
+}

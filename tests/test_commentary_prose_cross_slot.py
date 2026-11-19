@@ -13,6 +13,7 @@ from commentary_prose_cross_slot import (
     OriginalProseAlternativeNativeSlotProbe,
     strict_native_stock_plain_words,
     longest_contiguous_original_word_run,
+    OriginalExtraGapNativeChapterProbe,
 )
 from pilot_preflight import PilotError
 
@@ -147,6 +148,223 @@ class OriginalLargeProseAlternativeSlotTests(unittest.TestCase):
         self.assertNotIn("w7",encoded)
         self.assertNotIn("Gen.1.2",encoded)
         self.assertIn("original_source_line",encoded)
+
+
+
+class OriginalExtraGapChapterNativeTests(unittest.TestCase):
+    def _original_case(self):
+        from commentary_nonlink_words import compare_words_outside_links
+        first=[f"secretFirst{i}" for i in range(105)]
+        second=[f"secretSecond{i}" for i in range(12)]
+        source=["opening"]+first+["middle"]+second+["closing"]
+        stock=["opening","middle","closing"]
+        original=" ".join(source)
+        raw=b"<p>opening middle closing</p>"
+        item={
+            "original_text":original,
+            "original_source_line":27749,
+            "original_text_sha256":sha256(original.encode()).hexdigest(),
+            "original_full_reference_sha256":sha256(b"authorial source ref").hexdigest(),
+            "private_original_scripRef_word_indices":[],
+        }
+        evidence=compare_words_outside_links(source,stock,[],[])
+        return ("Gen.1.1",item,raw,evidence),first,second
+
+    def test_full_original_extra_spans_located_only_in_distinct_same_chapter_raw(self):
+        sample,first,second=self._original_case()
+        probe=OriginalExtraGapNativeChapterProbe([sample])
+        probe.observe("K","Gen.1.1",sample[2])
+        probe.observe("K","Gen.1.2",sample[2])
+        probe.observe("K","Gen.1.3",("<p>preface "+" ".join(first)+" conclusion</p>").encode())
+        probe.observe("I","Gen.1.0",("<p>preface "+" ".join(second)+" conclusion</p>").encode())
+        probe.observe("K","Gen.2.3",("<p>"+" ".join(first)+"</p>").encode())
+        result=probe.report()
+        self.assertEqual(result["source_extra_outlier_cases_examined"],1)
+        self.assertEqual(result["complete_original_native_raw_entries_replayed"],5)
+        case=result["original_source_line_hash_and_native_other_slot_counts_only"][0]
+        self.assertEqual(case["original_unlinked_extra_word_span_lengths"],[105,12])
+        self.assertEqual(case["extra_spans_tested_with_minimum_six_original_words"],2)
+        self.assertEqual(case["extra_spans_exactly_witnessed_in_distinct_same_chapter_K_raw"],1)
+        self.assertEqual(case["extra_spans_exactly_witnessed_in_distinct_same_chapter_I_raw"],1)
+        self.assertEqual(case["distinct_extra_spans_witnessed_in_any_other_same_chapter_raw"],2)
+        self.assertEqual(case["identical_selected_native_raw_repeat_keys_not_independent"],2)
+        self.assertEqual(case["extra_spans_exactly_witnessed_in_other_chapter_same_book_K_raw"],1)
+        self.assertEqual(case["extra_spans_exactly_witnessed_in_other_chapter_same_book_I_raw"],0)
+        self.assertEqual(case["distinct_extra_spans_witnessed_in_other_chapter_same_book_raw"],1)
+        self.assertEqual(case["same_chapter_max_exact_contiguous_partial_gap_word_run_by_source_gap"],[105,12])
+        self.assertEqual(case["other_chapter_same_book_max_exact_contiguous_partial_gap_word_run_by_source_gap"],[105,0])
+        self.assertEqual(case["same_chapter_distinct_native_raw_payloads_with_six_word_gap_anchor_by_kind"],{"I":1,"K":1})
+        self.assertEqual(case["other_chapter_same_book_distinct_native_raw_payloads_with_six_word_gap_anchor_by_kind"],{"K":1})
+        self.assertTrue(result["same_book_other_chapter_scope_not_a_whole_corpus_absence_proof"])
+        self.assertNotIn("secretFirst",json.dumps(result))
+        self.assertNotIn("Gen.1.3",json.dumps(result))
+
+    def test_partial_six_word_gap_matches_do_not_claim_whole_paragraph(self):
+        sample,first,second=self._original_case()
+        probe=OriginalExtraGapNativeChapterProbe([sample])
+        probe.observe("K","Gen.1.1",sample[2])
+        # Only the original first six consecutive gap words are present,
+        # with a punctuation-boundary equivalent but no full original span.
+        probe.observe("K","Gen.3.2",
+                      ("<p>start "+" ".join(first[:6])+" end</p>").encode())
+        # Five contiguous original words MUST NOT reach the anchor threshold.
+        probe.observe("K","Gen.4.2",
+                      ("<p>start "+" ".join(first[20:25])+" end</p>").encode())
+        report=probe.report()
+        row=report["original_source_line_hash_and_native_other_slot_counts_only"][0]
+        self.assertEqual(row["distinct_extra_spans_witnessed_in_other_chapter_same_book_raw"],0)
+        self.assertEqual(row[
+            "other_chapter_same_book_distinct_native_raw_payloads_with_six_word_gap_anchor_by_kind"
+        ],{"K":1})
+        self.assertEqual(row[
+            "other_chapter_same_book_max_exact_contiguous_partial_gap_word_run_by_source_gap"
+        ],[6,0])
+        self.assertTrue(row["six_word_partial_match_is_not_paragraph_ownership_or_a_proven_omission"])
+        self.assertNotIn("secretFirst",json.dumps(report))
+        self.assertNotIn("Gen.3.2",json.dumps(report))
+
+    def test_an_unsupported_or_wrong_source_span_fails_closed(self):
+        sample,_,_=self._original_case()
+        baditem=dict(sample[1],original_text_sha256="0"*64)
+        with self.assertRaises(PilotError):
+            OriginalExtraGapNativeChapterProbe([(sample[0],baditem,sample[2],sample[3])])
+        badmeta=dict(sample[3],source_extra_unlinked_word_gap_layout=None)
+        with self.assertRaises(PilotError):
+            OriginalExtraGapNativeChapterProbe([(sample[0],sample[1],sample[2],badmeta)])
+
+    def test_exact_source_thml_paragraph_ownership_is_metadata_only(self):
+        sample, first, second=self._original_case()
+        marker=b"Bible:Gen.1.1"
+        body=(
+            "<div><p>opening "+" ".join(first)+" middle</p> "
+            "<p>"+" ".join(second)+" closing</p></div>"
+        )
+        xml=(
+            b"<ThML>\n<div1>\n<scripCom osisRef='Bible:Gen.1.1'/>"
+            +body.encode("utf-8")
+            +b"<scripCom osisRef='Bible:Gen.1.2'/><div><p>next text</p></div>"
+            +b"</div1></ThML>"
+        )
+        item=dict(sample[1],
+                  original_source_line=3,
+                  original_full_reference_sha256=sha256(marker).hexdigest())
+        probe=OriginalExtraGapNativeChapterProbe([
+            (sample[0],item,sample[2],sample[3])
+        ])
+        report=probe.original_thml_extra_gap_structure(
+            xml,expected_source_sha256=sha256(xml).hexdigest())
+        cases=report["source_line_hash_and_original_adjacent_paragraph_structure_only"]
+        self.assertEqual(len(cases),1)
+        row=cases[0]
+        self.assertEqual(row["original_adjacent_div_p_element_total"],2)
+        self.assertEqual(row["original_next_sibling_element_type_only"],"scripCom")
+        spans=row["original_extra_word_spans_authentically_within_adjacent_source_div"]
+        self.assertEqual([x["exact_original_unlinked_extra_word_count"] for x in spans],
+                         [105,12])
+        self.assertEqual([x["original_paragraph_ownership_class"] for x in spans],
+                         ["extra_span_inside_one_original_p"]*2)
+        self.assertEqual([x["distinct_original_p_elements_touched"] for x in spans],[1,1])
+        self.assertEqual([x["partially_covered_original_p_elements"] for x in spans],[1,1])
+        self.assertEqual([x["exact_whole_original_p_document_ordinal_when_unique"]
+                          for x in spans],[None,None])
+        self.assertTrue(all(x["whole_original_p_exact_unicode_word_tokens_sha256_if_unique"]
+                            is None for x in spans))
+        self.assertNotIn("secretFirst",json.dumps(report))
+        self.assertEqual(row["original_ccel_scripCom_osisRef_claim_only"],
+                         "Bible:Gen.1.1")
+        self.assertTrue(report["only_original_ccel_source_scripCom_claimed_reference_recorded"])
+        self.assertFalse(report["original_words_or_native_keys_exposed"])
+        with self.assertRaises(PilotError):
+            probe.original_thml_extra_gap_structure(
+                xml,expected_source_sha256="0"*64)
+
+    def test_whole_original_paragraph_ordinals_are_genuine_source_order(self):
+        sample,first,second=self._original_case()
+        body=(
+            "<div><p>opening</p> <p>"+" ".join(first)+"</p> "
+            "<p>middle</p> <p>"+" ".join(second)+"</p> "
+            "<p>closing</p></div>"
+        )
+        self.assertEqual(
+            __import__("lxml.etree",fromlist=["fromstring"]).fromstring(
+                body.encode()).xpath("string(.)"),sample[1]["original_text"])
+        xml=(
+            b"<ThML>\n<div1>\n<scripCom osisRef='Bible:Gen.1.1'/>"
+            +body.encode()+b"</div1></ThML>"
+        )
+        item=dict(sample[1],original_source_line=3,
+                  original_full_reference_sha256=sha256(b"Bible:Gen.1.1").hexdigest())
+        probe=OriginalExtraGapNativeChapterProbe([
+            (sample[0],item,sample[2],sample[3])
+        ])
+        doc=probe.original_thml_extra_gap_structure(
+            xml,expected_source_sha256=sha256(xml).hexdigest())
+        gaps=doc["source_line_hash_and_original_adjacent_paragraph_structure_only"][0][
+            "original_extra_word_spans_authentically_within_adjacent_source_div"]
+        self.assertEqual([g["original_paragraph_ownership_class"] for g in gaps],
+                         ["extra_span_inside_one_original_p"]*2)
+        self.assertEqual(
+            [g["exact_whole_original_p_document_ordinal_when_unique"] for g in gaps],
+            [2,4])
+        for gap,words in zip(gaps,(first,second)):
+            self.assertEqual(gap["whole_original_p_visible_word_count_if_unique"],
+                             len(words))
+            self.assertEqual(gap["whole_original_p_source_link_word_count_if_unique"],0)
+            self.assertEqual(gap["whole_original_p_exact_unicode_word_tokens_sha256_if_unique"],
+                             sha256(" ".join(words).encode()).hexdigest())
+        self.assertNotIn("secretFirst",json.dumps(doc))
+
+    def test_cross_original_p_gap_is_not_misattributed_to_one_paragraph(self):
+        sample,first,second=self._original_case()
+        first_left=" ".join(first[:60])
+        first_right=" ".join(first[60:])
+        original=sample[1]["original_text"]
+        body=(
+            "<div><p>opening "+first_left+"</p> "
+            "<p>"+first_right+" middle "+" ".join(second)+" closing</p></div>"
+        )
+        self.assertEqual(
+            __import__("lxml.etree",fromlist=["fromstring"]).fromstring(
+                body.encode()).xpath("string(.)"),original)
+        xml=(
+            b"<ThML>\n<div1>\n<scripCom osisRef='Bible:Gen.1.1'/>"
+            +body.encode()+b"</div1></ThML>"
+        )
+        item=dict(sample[1],original_source_line=3,
+                  original_full_reference_sha256=sha256(b"Bible:Gen.1.1").hexdigest())
+        probe=OriginalExtraGapNativeChapterProbe([
+            (sample[0],item,sample[2],sample[3])
+        ])
+        structure=probe.original_thml_extra_gap_structure(
+            xml,expected_source_sha256=sha256(xml).hexdigest())
+        spans=structure[
+            "source_line_hash_and_original_adjacent_paragraph_structure_only"][0][
+            "original_extra_word_spans_authentically_within_adjacent_source_div"]
+        self.assertEqual(spans[0]["original_paragraph_ownership_class"],
+                         "extra_span_crosses_multiple_original_p_elements")
+        self.assertEqual(spans[0]["distinct_original_p_elements_touched"],2)
+        self.assertIsNone(spans[0]["exact_whole_original_p_document_ordinal_when_unique"])
+
+    def test_other_book_is_not_miscounted_as_same_book_other_chapter(self):
+        sample,first,_=self._original_case()
+        probe=OriginalExtraGapNativeChapterProbe([sample])
+        probe.observe("K","Gen.1.1",sample[2])
+        probe.observe("K","Exod.2.1",("<p>"+" ".join(first)+"</p>").encode())
+        report=probe.report()
+        case=report["original_source_line_hash_and_native_other_slot_counts_only"][0]
+        self.assertEqual(case["distinct_extra_spans_witnessed_in_other_chapter_same_book_raw"],0)
+        self.assertEqual(case["other_chapter_same_book_distinct_native_raw_payloads_by_kind"],{})
+        self.assertTrue(case["same_book_no_hit_does_not_prove_absence_other_books_or_authorial_loss"])
+
+    def test_no_hit_in_same_chapter_does_not_claim_text_lost(self):
+        sample,_,_=self._original_case()
+        probe=OriginalExtraGapNativeChapterProbe([sample])
+        probe.observe("K","Gen.1.1",sample[2])
+        probe.observe("K","Gen.1.3",b"<p>other chapter words only</p>")
+        report=probe.report()
+        case=report["original_source_line_hash_and_native_other_slot_counts_only"][0]
+        self.assertEqual(case["distinct_extra_spans_witnessed_in_any_other_same_chapter_raw"],0)
+        self.assertTrue(case["same_chapter_no_hit_does_not_prove_absence_elsewhere_or_authorial_loss"])
 
 
 if __name__=="__main__":

@@ -18,6 +18,7 @@ import re
 from pathlib import Path
 import subprocess
 import tempfile
+import traceback
 import zipfile
 
 from lxml import etree
@@ -28,15 +29,20 @@ from commentary_chapter_cross_slot import ChapterNeighborSameBookAlternativeProb
 from commentary_chapter_paragraph_overlap import OriginalChapterParagraphSpanProbe
 from commentary_chapter_p_boundaries import ChapterParagraphBoundaryProbe
 from commentary_reference_cross_slot import ReferenceCrossSlotTopology
-from commentary_prose_cross_slot import OriginalProseAlternativeNativeSlotProbe
-from commentary_source_native_boundaries import original_marker_boundary, NativeRawRunBoundaryInventory
+from commentary_prose_cross_slot import (OriginalProseAlternativeNativeSlotProbe,
+    OriginalExtraGapNativeChapterProbe)
+from commentary_source_native_boundaries import (original_marker_boundary,
+    NativeRawRunBoundaryInventory, compare_longer_original_source_to_occupied_native_runs)
 from commentary_shared_raw_source_units import inspect_shared_original_units_in_native_runs
 from commentary_original_div1_book_consistency import private_original_div1_book_code_consistency
 from commentary_source_english_osis_alias import original_div1_english_alias_vs_declared_osis
 from commentary_source_identity_lexical_gate import classify_lexical_source_identity
 from commentary_original_bookcode_repair import propose_private_source_bookcode_repair
 from commentary_prose_cross_slot import strict_native_stock_plain_words
-from commentary_nonlink_word_alignment import plain_word_alignment
+from commentary_nonlink_word_alignment import (plain_word_alignment,
+    classify_original_link_label_effect_on_source_longer_words)
+from commentary_nonlink_words import (
+    compare_words_outside_links, _private_unique_original_gap_spans)
 from commentary_unresolved_lexical_triage import WORD
 from commentary_near_prose_unicode_review import classify_same_book_unicode_variants
 from commentary_intake import load_manifest
@@ -49,7 +55,7 @@ from commentary_stock_prefix_topology import (
     stock_prefixed_source_body_concordance, unexplained_word_boundary_census,
     stock_prefix_context_correspondence,
 )
-from commentary_xml_witness import _parse_reference, WORK_REF, OSIS_LOC, xml_structure, MAX_XML
+from commentary_xml_witness import _parse_reference, WORK_REF, OSIS_LOC, xml_structure, MAX_XML, _xml_witness_locations
 from commentary_native_raw_inventory import _safe_stock_install, private_crosscheck
 from pilot_fetch import fetch
 from pilot_preflight import PilotError, inspect_archive
@@ -90,8 +96,11 @@ def _original_thml_neighbor_candidates(marker) -> list[tuple[str,str]]:
     return candidates
 
 
-def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dict]:
+def _original_source_markers(xml_bytes: bytes, *,
+                             on_no_visible_text: str = "block") -> tuple[dict[str,list[dict]],dict]:
     # Must scan the entire actual original with network/entity resolution off.
+    if on_no_visible_text not in {"block", "record"}:
+        raise PilotError("Unreviewed empty original authorial division policy")
     whole=xml_structure(xml_bytes)
     try:
         root=etree.fromstring(xml_bytes,parser=etree.XMLParser(
@@ -113,6 +122,7 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
         raise PilotError("Original document-order ThML div1 inventory differs from whole XML scan")
     sources={}
     counts=Counter()
+    no_visible_text = []
     original_map_digest=sha256()
     for node in root.iter():
         if not isinstance(node.tag,str) or node.tag.rsplit("}",1)[-1]!="scripCom":
@@ -157,7 +167,7 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
         if node.tail and node.tail.strip():
             raise PilotError("Nonwhitespace original source text between marker and body")
         txt="".join(sibling.itertext())
-        if not txt.strip():
+        if not txt.strip() and on_no_visible_text == "block":
             raise PilotError("Empty original source commentary div body")
         text_bytes=txt.encode("utf-8")
         full_ref_bytes=original_ref.encode("utf-8")
@@ -166,7 +176,39 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
             +len(text_bytes).to_bytes(8,"big")
             +sha256(text_bytes).digest()
         )
+        if not txt.strip():
+            # Preserve every original reference/body hash, including an
+            # authored div with no visible text. Exclude only from lexical
+            # comparisons; never call it missing native text or delete it.
+            no_visible_text.append({
+                "original_source_line": node.sourceline,
+                "original_reference_sha256": sha256(full_ref_bytes).hexdigest(),
+                "original_body_sha256": sha256(text_bytes).hexdigest(),
+                "original_adjacent_div_child_tag_counts": dict(sorted(Counter(
+                    child.tag.rsplit("}", 1)[-1]
+                    for child in sibling.iter()
+                    if child is not sibling and isinstance(child.tag, str)
+                ).items())),
+                "source_reference_and_adjacent_div_preserved": True,
+                "no_visible_source_text_not_proof_of_missing_stock": True,
+            })
+            continue
+        original_source_p_word_digests=[]
+        for p in sibling.iter():
+            if p is sibling or not isinstance(p.tag,str) or p.tag.rsplit("}",1)[-1]!="p":
+                continue
+            p_words=WORD.findall("".join(p.itertext()))
+            original_source_p_word_digests.append({
+                "original_p_document_ordinal":len(original_source_p_word_digests)+1,
+                "original_p_visible_word_tokens":len(p_words),
+                "original_p_visible_ordered_word_sha256":
+                    sha256(" ".join(p_words).encode("utf-8")).hexdigest(),
+                "original_p_visible_casefold_word_sha256":
+                    sha256(" ".join(word.casefold() for word in p_words).encode("utf-8")).hexdigest(),
+            })
         sources.setdefault(start,[]).append({
+            "private_original_p_visible_word_digest_inventory":
+                original_source_p_word_digests,
             "original_source_line":node.sourceline,
             "original_full_reference_sha256":sha256(full_ref_bytes).hexdigest(),
             "private_original_declared_range_end_key":original_declared_end,
@@ -204,7 +246,7 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
                 if isinstance(ref.tag,str) and ref.tag.rsplit("}",1)[-1] == "scripRef"
             ],
         })
-    if sum(len(rows) for rows in sources.values()) != (
+    if sum(len(rows) for rows in sources.values()) + len(no_visible_text) != (
         counts["work_qualified_verse"]+counts["work_qualified_same_book_verse_range"]
     ):
         raise PilotError("Original source annotation count diverged from body inventory")
@@ -215,7 +257,16 @@ def _original_source_markers(xml_bytes: bytes) -> tuple[dict[str,list[dict]],dic
     return sources,{
         "source_xml_sha256":whole["xml_sha256"],
         "source_marker_total":whole["element_counts"]["scripCom"],
-        "original_verse_or_range_body_count":sum(map(len,sources.values())),
+        "original_verse_or_range_body_count":
+            sum(map(len,sources.values())) + len(no_visible_text),
+        "original_verse_or_range_body_with_visible_text_count":
+            sum(map(len,sources.values())),
+        "original_sections_without_visible_text_count":len(no_visible_text),
+        "bounded_original_sections_without_visible_text_line_sha_structure":
+            no_visible_text[:20],
+        "original_sections_without_visible_text_examples_truncated":
+            len(no_visible_text) > 20,
+        "original_reference_and_adjacent_divisions_not_modified":True,
         "distinct_original_start_anchors":len(sources),
         "original_ordered_verse_and_range_body_text_sha256":original_map_digest.hexdigest(),
         "chapter_source_markers_not_compared":counts["work_qualified_chapter"],
@@ -240,8 +291,33 @@ def raw_as_strict_xml_text(raw: bytes) -> str | None:
         return None
 
 
+def private_actual_native_reference_word_positions(
+        raw: bytes, expected_visible_text: str) -> list[int]:
+    """Re-parse original native reference elements without trusting a display label.
+
+    This uses the same strict XML and exact text/tail accounting as the native
+    text reader. No source or stock words, links or XML are ever reported.
+    """
+    if (not isinstance(raw, bytes) or not isinstance(expected_visible_text, str)
+            or len(raw) > 2*1024*1024 or b"\x00" in raw):
+        raise PilotError("Original native reference word-offset input outside safe bounds")
+    try:
+        node=etree.fromstring(
+            b"<original>"+raw+b"</original>",
+            parser=etree.XMLParser(
+                resolve_entities=False,no_network=True,load_dtd=False,
+                recover=False,huge_tree=False,remove_blank_text=False))
+    except (ValueError,UnicodeError,etree.XMLSyntaxError):
+        raise PilotError("Original native raw markup cannot certify reference labels") from None
+    if (any(isinstance(child,etree._Entity) for child in node.iter())
+            or "".join(node.itertext()) != expected_visible_text):
+        raise PilotError("Original native reference text/tail or entity safety mismatch")
+    return marked_word_token_indices(node,"reference",expected_visible_text)
+
+
 def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes],
-                          *, on_unresolved_word_case=None) -> dict:
+                          *, on_unresolved_word_case=None,
+                          on_source_longer_stock_case=None) -> dict:
     counters=Counter()
     issues=[]
     lexical_details=Counter()
@@ -280,10 +356,12 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes],
     bounded_priority_examples=[]
     priority_example_counts=Counter()
     per_book={}
+    per_book_word_relationships={}
     tested=0
     for start,items in source.items():
         book=start.split(".")[0]
         book_counts=per_book.setdefault(book,Counter())
+        book_relationship_counts=per_book_word_relationships.setdefault(book,Counter())
         raw=stocked.get(start)
         for item in items:
             tested+=1
@@ -334,54 +412,20 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes],
                         diagnostic=word_relationship(a,b)
                         category=diagnostic["relationship"]
                         word_relationship_subtypes[category]+=1
+                        book_relationship_counts[category]+=1
                         word_overlap_buckets[diagnostic["overlap_bucket"]]+=1
+                        if (category == "stock_words_in_order_with_extra_source_words"
+                                and on_source_longer_stock_case is not None):
+                            on_source_longer_stock_case(start,item,raw)
                         if category=="source_words_contiguous_inside_longer_stock":
                             position=diagnostic["original_words_contiguous_in_stock_location"]
                             stock_containment_locations[position]+=1
-                            topology=source_word_prefix_topology(item["original_text"], raw)
-                            stock_source_boundary_top_level_tags[
-                                topology["source_word_boundary_stock_top_level_owner"]]+=1
-                            previous=topology["top_level_element_types_wholly_before_original_source_words"]
-                            stock_prefix_full_sibling_top_level_tags.update(previous)
-                            if previous:
-                                stock_prefix_has_full_sibling_element+=1
-                            stock_prefix_owners_before_original_body.update(
-                                topology["prefix_text_top_level_owner_types"]
-                            )
-                            suffix_result=stock_prefixed_source_body_concordance(item["original_text"],raw)
-                            if suffix_result["stock_extra_prefix_word_tokens"]!=diagnostic[
-                                "additional_stock_word_tokens_before_source"
-                            ]:
-                                raise PilotError("Original stock suffix does not match independent token-prefix audit")
-                            stock_original_body_suffix_concordance[
-                                suffix_result["original_source_body_to_stock_suffix_class"]
-                            ]+=1
-                            stock_original_body_suffix_glyph_classes.update(
-                                suffix_result["aligned_suffix_gap_class_counts"]
-                            )
-                            stock_original_body_suffix_glyph_replacements.update(
-                                suffix_result["aligned_suffix_one_to_one_numeric_glyph_substitutions"]
-                            )
-                            stock_original_body_suffix_changed_gaps+=suffix_result[
-                                "aligned_suffix_changed_nonword_gaps"
-                            ]
-                            source_context=stock_prefix_context_correspondence(
-                                item["original_text"],raw,item["private_original_neighbor_candidates"]
-                            )
-                            stock_heading_source_covered_entries+=1
-                            stock_heading_source_candidate_types.update(
-                                source_context["authenticated_source_neighbor_candidate_type_counts"]
-                            )
-                            stock_heading_source_match_classes.update(
-                                source_context["source_neighbor_to_stock_element_correspondence_classes"]
-                            )
-                            stock_heading_context_earlier_tag_counts.update(
-                                source_context["preceding_stock_metadata_element_count_by_tag"]
-                            )
-                            if source_context["any_exact_source_neighbor_text_in_stock_metadata"]:
-                                stock_heading_source_any_exact_match_entries+=1
-                            if source_context["any_only_word_token_source_neighbor_in_stock_metadata"]:
-                                stock_heading_source_any_word_only_match_entries+=1
+                            if position not in {
+                                    "extra_stock_words_only_before_original_body",
+                                    "extra_stock_words_before_and_after_original_body",
+                                    "extra_stock_words_only_after_original_body",
+                            }:
+                                raise PilotError("Unexpected original-in-stock word containment scope")
                             for value,bins in (
                                 (diagnostic["additional_stock_word_tokens_before_source"],stock_extra_prefix_token_bins),
                                 (diagnostic["additional_stock_word_tokens_after_source"],stock_extra_suffix_token_bins),
@@ -392,6 +436,55 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes],
                                 elif value<=29: b="10_to_29"
                                 else: b="30_or_more"
                                 bins[b]+=1
+                            # Strict stock-prefix topology only describes a
+                            # complete original body at the END of the native entry.
+                            # Body-in-middle or suffix-only extras have different
+                            # ownership; do not invent a heading/prefix proof.
+                            if position == "extra_stock_words_only_before_original_body":
+                                topology=source_word_prefix_topology(item["original_text"], raw)
+                                stock_source_boundary_top_level_tags[
+                                    topology["source_word_boundary_stock_top_level_owner"]]+=1
+                                previous=topology["top_level_element_types_wholly_before_original_source_words"]
+                                stock_prefix_full_sibling_top_level_tags.update(previous)
+                                if previous:
+                                    stock_prefix_has_full_sibling_element+=1
+                                stock_prefix_owners_before_original_body.update(
+                                    topology["prefix_text_top_level_owner_types"]
+                                )
+                                suffix_result=stock_prefixed_source_body_concordance(item["original_text"],raw)
+                                if suffix_result["stock_extra_prefix_word_tokens"]!=diagnostic[
+                                    "additional_stock_word_tokens_before_source"
+                                ]:
+                                    raise PilotError("Original stock suffix does not match independent token-prefix audit")
+                                stock_original_body_suffix_concordance[
+                                    suffix_result["original_source_body_to_stock_suffix_class"]
+                                ]+=1
+                                stock_original_body_suffix_glyph_classes.update(
+                                    suffix_result["aligned_suffix_gap_class_counts"]
+                                )
+                                stock_original_body_suffix_glyph_replacements.update(
+                                    suffix_result["aligned_suffix_one_to_one_numeric_glyph_substitutions"]
+                                )
+                                stock_original_body_suffix_changed_gaps+=suffix_result[
+                                    "aligned_suffix_changed_nonword_gaps"
+                                ]
+                                source_context=stock_prefix_context_correspondence(
+                                    item["original_text"],raw,item["private_original_neighbor_candidates"]
+                                )
+                                stock_heading_source_covered_entries+=1
+                                stock_heading_source_candidate_types.update(
+                                    source_context["authenticated_source_neighbor_candidate_type_counts"]
+                                )
+                                stock_heading_source_match_classes.update(
+                                    source_context["source_neighbor_to_stock_element_correspondence_classes"]
+                                )
+                                stock_heading_context_earlier_tag_counts.update(
+                                    source_context["preceding_stock_metadata_element_count_by_tag"]
+                                )
+                                if source_context["any_exact_source_neighbor_text_in_stock_metadata"]:
+                                    stock_heading_source_any_exact_match_entries+=1
+                                if source_context["any_only_word_token_source_neighbor_in_stock_metadata"]:
+                                    stock_heading_source_any_word_only_match_entries+=1
                         if category=="different_word_order_or_selection_requires_review":
                             unresolved_lexical_census.observe(item,compiled,raw,book)
                             if on_unresolved_word_case is not None:
@@ -456,6 +549,13 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes],
         +lexical_details["different_unicode_word_token_sequence_or_selection"]
     ):
         raise PilotError("Unequal-word relationships have incomplete full-corpus accounting")
+    if sum(sum(v.values()) for v in per_book_word_relationships.values()) != (
+        sum(word_relationship_subtypes.values())
+    ) or any(
+        sum(v.get(category,0) for v in per_book_word_relationships.values()) != n
+        for category,n in word_relationship_subtypes.items()
+    ):
+        raise PilotError("Original source-book word relation counts do not reconcile")
     if sum(word_overlap_buckets.values())!=sum(word_relationship_subtypes.values()):
         raise PilotError("Word overlap ratio categories have incomplete accounting")
     if sum(stock_containment_locations.values())!=word_relationship_subtypes[
@@ -465,9 +565,11 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes],
     if (sum(stock_extra_prefix_token_bins.values())!=sum(stock_containment_locations.values())
             or sum(stock_extra_suffix_token_bins.values())!=sum(stock_containment_locations.values())):
         raise PilotError("Extra stock word prefix/suffix bins do not account for the complete containment group")
-    if sum(stock_source_boundary_top_level_tags.values())!=sum(stock_containment_locations.values()):
-        raise PilotError("Private XML boundary topology does not account for every stock prefix case")
-    if stock_prefix_has_full_sibling_element>sum(stock_containment_locations.values()):
+    strict_prefix_only_cases = stock_containment_locations[
+        "extra_stock_words_only_before_original_body"]
+    if sum(stock_source_boundary_top_level_tags.values())!=strict_prefix_only_cases:
+        raise PilotError("Private XML boundary topology does not account for each strict stock prefix case")
+    if stock_prefix_has_full_sibling_element>strict_prefix_only_cases:
         raise PilotError("Stock top-level sibling count exceeds prefix cases")
     if punctuation_entries_with_only_one_to_one_glyph_changes>lexical_details[
         "same_unicode_word_tokens_different_punctuation"
@@ -475,8 +577,8 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes],
         raise PilotError("Aligned punctuation entry count exceeds source divergence census")
     if sum(punctuation_aligned_gap_classes.values())!=punctuation_changed_gap_count:
         raise PilotError("Aligned punctuation gaps incomplete")
-    if stock_heading_source_covered_entries!=sum(stock_containment_locations.values()):
-        raise PilotError("Stock metadata/source neighboring context census is incomplete")
+    if stock_heading_source_covered_entries!=strict_prefix_only_cases:
+        raise PilotError("Strict stock-prefix metadata/source context census is incomplete")
     if stock_heading_context_earlier_tag_counts!=Counter({
         kind:number
         for kind,number in stock_prefix_full_sibling_top_level_tags.items()
@@ -486,8 +588,8 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes],
     if (stock_heading_source_any_exact_match_entries>stock_heading_source_covered_entries
             or stock_heading_source_any_word_only_match_entries>stock_heading_source_covered_entries):
         raise PilotError("Source neighbor/title textual match observations exceed stock entries")
-    if sum(stock_original_body_suffix_concordance.values())!=sum(stock_containment_locations.values()):
-        raise PilotError("Unmodified original source body suffix comparison omitted stock-prefixed entries")
+    if sum(stock_original_body_suffix_concordance.values())!=strict_prefix_only_cases:
+        raise PilotError("Unmodified original source body suffix comparison omitted strict stock prefix cases")
     if sum(stock_original_body_suffix_glyph_classes.values())!=stock_original_body_suffix_changed_gaps:
         raise PilotError("Punctuation changes inside stock suffix do not reconcile")
     if divergent_word_boundary_scanned!=word_relationship_subtypes[
@@ -507,6 +609,11 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes],
         "different_word_sequence_relationship_subtypes":dict(sorted(word_relationship_subtypes.items())),
         "different_word_sequence_overlap_buckets":dict(sorted(word_overlap_buckets.items())),
         "stock_containment_additional_word_position_counts":dict(sorted(stock_containment_locations.items())),
+        "strict_original_body_at_stock_suffix_prefix_topology_cases":
+            strict_prefix_only_cases,
+        "original_body_mid_stock_or_at_start_not_assumed_covered_by_prefix_probe":
+            sum(stock_containment_locations.values()) - strict_prefix_only_cases,
+        "word_containment_position_does_not_approve_additional_stock_prose": True,
         "stock_containment_extra_stock_prefix_word_token_bins":dict(sorted(stock_extra_prefix_token_bins.items())),
         "stock_containment_extra_stock_suffix_word_token_bins":dict(sorted(stock_extra_suffix_token_bins.items())),
         "punctuation_nonword_glyph_excess_source_total":sum(source_nonword_glyph_excess.values()),
@@ -571,6 +678,10 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes],
         "disagreement_categories_are_only_exploratory_not_text_parity":True,
         "per_source_marker_text_diagnostic_counts":dict(sorted(counters.items())),
         "book_counts":{name:dict(sorted(counts.items())) for name,counts in sorted(per_book.items())},
+        "source_book_word_relationship_subtypes":{
+            name:dict(sorted(counts.items()))
+            for name,counts in sorted(per_book_word_relationships.items())
+        },
         "bounded_private_content_discrepancy_hash_samples":issues,
         "whitespace_only_status_is_not_exact_text_parity":True,
         "no_autocorrection_or_content_normalization_performed":True,
@@ -580,11 +691,102 @@ def compare_private_texts(source:dict[str,list[dict]], stocked:dict[str,bytes],
     }
 
 
-def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
+def select_authorial_word_loss_attention(cases: list[dict]) -> tuple[list[dict], dict]:
+    """Gate only source words genuinely unmatched; keep other differences visible.
+
+    A stock entry with additional heading/quotation material need not have
+    lost an original authorial word. No equality of editions is inferred.
+    """
+    if not isinstance(cases, list) or len(cases) > 256:
+        raise PilotError("Original source lexical triage cases outside reviewed bound")
+    relevant = []
+    categories = Counter()
+    for case in cases:
+        if not isinstance(case, dict):
+            raise PilotError("Malformed original source lexical case")
+        alignment = case.get("exact_plain_word_alignment")
+        if not isinstance(alignment, dict):
+            raise PilotError("Original lexical case without independent word alignment")
+        missing = alignment.get("original_plain_words_not_matched_in_exact_order")
+        if missing is None:
+            in_order = alignment.get("linear_exact_source_subsequence_in_stock")
+            if in_order is True:
+                categories["over_budget_all_source_words_in_stock_order"] += 1
+            elif in_order is False:
+                categories["over_budget_source_order_not_proven"] += 1
+            elif in_order is None:
+                categories["original_alignment_budget_not_resolved"] += 1
+            else:
+                raise PilotError("Unreviewed original source linear sequence evidence")
+        elif type(missing) is not int or missing < 0:
+            raise PilotError("Unreviewed original source missing-word count")
+        elif missing == 0:
+            categories["original_words_all_found_in_order_but_other_differences_remain"] += 1
+        else:
+            relevant.append(case)
+            categories["original_words_not_all_found_in_order_requires_identity_review"] += 1
+    if sum(categories.values()) != len(cases):
+        raise PilotError("Source/stock lexical attention accounting incomplete")
+    return relevant, {
+        "status": "BOUNDED_AUTHORIAL_WORD_LOSS_SELECTION_NOT_SOURCE_TEXT_PARITY",
+        "bounded_original_lexical_attention_cases_checked": len(cases),
+        "selected_original_word_order_loss_cases": len(relevant),
+        "classes": dict(sorted(categories.items())),
+        "all_original_lexical_cases_remain_in_main_text_diagnostic": True,
+        "no_authorial_or_compiled_text_modified": True,
+        "source_punctuation_and_markup_parity_not_proven": True,
+    }
+
+
+def unreviewed_original_chapter_sibling_receipts(proof: dict) -> tuple[dict, dict, dict, dict]:
+    """Four explicit NOT-TESTED receipts, never misclassify absent source words."""
+    total = proof["explicit_chapter_source_marker_count"]
+    unreviewed = proof["original_chapter_siblings_not_reviewed_count"]
+    if (type(total) is not int or type(unreviewed) is not int
+            or unreviewed < 1 or total != unreviewed
+            or proof["original_chapter_siblings_reviewed_count"] != 0):
+        raise PilotError("Cannot skip a reviewable or incompletely classified chapter sibling")
+    base = {
+        "status": "UNREVIEWED_ORIGINAL_CHAPTER_ADJACENT_XML_STRUCTURE",
+        "original_chapter_markers_not_lexically_compared": total,
+        "source_or_stock_content_unchanged": True,
+        "unreviewed_source_sibling_must_not_be_called_missing_content": True,
+        "authorial_chapter_structure_or_native_introduction_parity": False,
+    }
+    return (
+        {**base, "original_chapter_source_siblings_compared": 0},
+        base.copy(), base.copy(), base.copy(),
+    )
+
+
+def select_pinned_source_volume(manifest: dict, number: int | None = None) -> tuple[int, str, str, bool, int]:
+    """Return exactly one SHA-pinned ThML witness; no implicit multi-volume default.
+
+    A single-source intake retains its historical no-volume argument. Six-volume
+    imports are explicit independent checkpoints; never silently audit only one.
+    """
+    locations, collection = _xml_witness_locations(manifest.get("commentary_source"))
+    if collection:
+        if type(number) is not int:
+            raise PilotError("Multi-volume original requires an explicit source volume")
+        selected = [row for row in locations if row[0] == number]
+        if len(selected) != 1:
+            raise PilotError("Unregistered source volume; original source cannot be guessed")
+    else:
+        if number not in (None, 1):
+            raise PilotError("Single-source edition has no requested volume")
+        selected = locations
+    volume, url, digest = selected[0]
+    if not isinstance(digest, str) or not re.fullmatch(r"[a-f0-9]{64}", digest):
+        raise PilotError("Selected original commentary source is not SHA-256 pinned")
+    return volume, url, digest, collection, len(locations)
+
+
+def run(resource_id: str, index_binary: Path, raw_binary: Path,
+        *, source_volume: int | None = None) -> dict:
     manifest=load_manifest(resource_id)
-    original_config=manifest.get("commentary_source",{})
-    url=original_config.get("xml_witness_url")
-    original_sha=original_config.get("xml_witness_sha256")
+    volume, url, original_sha, is_collection, volume_count = (
+        select_pinned_source_volume(manifest, source_volume))
     stock_sha=manifest.get("archive_sha256")
     if not all(isinstance(v,str) and len(v)==64 for v in (original_sha,stock_sha)):
         raise PilotError("Exact original XML and SWORD SHA-256 pins required")
@@ -603,7 +805,8 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         if obs_xml["bytes"]>MAX_XML:
             raise PilotError("Pinned XML exceeds original-source maximum")
         original_xml=xml_file.read_bytes()
-        source,source_proof=_original_source_markers(original_xml)
+        source,source_proof=_original_source_markers(
+            original_xml, on_no_visible_text="record" if is_collection else "block")
         # A changed in-memory copy is NOT a source/stock repair. It resolves
         # contradictory book markers only when the exact authorial div1 title
         # independently identifies a different known book, with a byte-exact
@@ -611,7 +814,8 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         suggested_xml,source_marker_repair=propose_private_source_bookcode_repair(
             original_xml,expected_source_sha256=original_sha
         )
-        suggested_source,suggested_source_proof=_original_source_markers(suggested_xml)
+        suggested_source,suggested_source_proof=_original_source_markers(
+            suggested_xml, on_no_visible_text="record" if is_collection else "block")
         def by_line_and_hash(items):
             result={}
             for key,units in items.items():
@@ -645,7 +849,8 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         ]:
             raise PilotError("Not all proposed original scripCom book tokens changed anchor books")
         proposed_native_keys={value[2] for value in moved_source_units}
-        chapter_neighbors,chapter_proof=original_chapter_neighbors(original_xml)
+        chapter_neighbors,chapter_proof=original_chapter_neighbors(
+            original_xml, on_unreviewed="record" if is_collection else "block")
         if chapter_proof["explicit_chapter_source_marker_count"]!=source_proof["chapter_source_markers_not_compared"]:
             raise PilotError("Original chapter marker count differs from full independent source audit")
         stock_meta=inspect_archive(stock_file,source_kind="sword",
@@ -669,10 +874,13 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         matches={}
         proposed_original_book_anchor_native_matches={}
         chapter_intros={}
-        numbered_probe=ChapterNeighborNumberedProbe(chapter_neighbors)
-        alternate_probe=ChapterNeighborSameBookAlternativeProbe(chapter_neighbors)
-        source_p_overlap_probe=OriginalChapterParagraphSpanProbe(chapter_neighbors)
-        source_p_boundary_probe=ChapterParagraphBoundaryProbe(chapter_neighbors)
+        if chapter_neighbors:
+            numbered_probe=ChapterNeighborNumberedProbe(chapter_neighbors)
+            alternate_probe=ChapterNeighborSameBookAlternativeProbe(chapter_neighbors)
+            source_p_overlap_probe=OriginalChapterParagraphSpanProbe(chapter_neighbors)
+            source_p_boundary_probe=ChapterParagraphBoundaryProbe(chapter_neighbors)
+        else:
+            numbered_probe=alternate_probe=source_p_overlap_probe=source_p_boundary_probe=None
         reference_cross_slot=ReferenceCrossSlotTopology(source)
         native_run_boundaries=NativeRawRunBoundaryInventory()
         try:
@@ -687,10 +895,11 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
                         matches[ref]=raw
                     if ref in proposed_native_keys:
                         proposed_original_book_anchor_native_matches[ref]=raw
-                numbered_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
-                alternate_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
-                source_p_overlap_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
-                source_p_boundary_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
+                if numbered_probe is not None:
+                    numbered_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
+                    alternate_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
+                    source_p_overlap_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
+                    source_p_boundary_probe.observe(kind,ref,raw,raw_as_strict_xml_text)
                 reference_cross_slot.observe_stock(kind,ref,raw)
                 native_run_boundaries.observe(kind,ref,raw)
                 if kind=="I" and (ref in chapter_neighbors or
@@ -759,14 +968,279 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
             "original_XML_or_stock_SWORD_mutated":False,
             "independent_authorial_edition_identity_established":False,
         }
+        source_longer_cases=[]
+        longer_link_class_counts=Counter()
+        longer_link_original_book_counts={}
+        longer_link_book_classes={}
+        longer_link_rows=[]
+        double_link_class_counts=Counter()
+        double_link_original_book_counts={}
+        double_link_book_classes={}
+        double_link_rows=[]
+        double_link_gap_classes=Counter()
+        double_link_gap_by_original_book={}
+        original_extra_p_digest_case_counts=Counter()
+        original_extra_p_digest_book_counts={}
+        original_extra_p_digest_rows=[]
+        high_source_extra_span_candidates=[]
+        def record_same_start_source_longer(start,item,raw):
+            source_longer_cases.append((start,{
+                "original_source_line":item["original_source_line"],
+                "original_full_reference_sha256":item["original_full_reference_sha256"],
+                "original_body_sha256":item["original_text_sha256"],
+                "stock_raw_sha256":sha256(raw).hexdigest(),
+            }))
+            native_visible=raw_as_strict_xml_text(raw)
+            if native_visible is None:
+                raise PilotError("Original selected native K visible text cannot be reviewed")
+            linked_review=classify_original_link_label_effect_on_source_longer_words(
+                WORD.findall(item["original_text"]),WORD.findall(native_visible),
+                item["private_original_scripRef_word_indices"])
+            label=linked_review["source_original_link_label_exclusion_class"]
+            book=start.split(".",1)[0]
+            longer_link_class_counts[label]+=1
+            longer_link_original_book_counts[book]=(
+                longer_link_original_book_counts.get(book,0)+1)
+            longer_link_book_classes.setdefault(book,Counter())[label]+=1
+            longer_link_rows.append({
+                "source_book":book,
+                "original_source_line":item["original_source_line"],
+                "original_full_reference_sha256":item["original_full_reference_sha256"],
+                "original_body_sha256":item["original_text_sha256"],
+                "selected_native_raw_sha256":sha256(raw).hexdigest(),
+                **linked_review,
+            })
+            native_reference_positions=private_actual_native_reference_word_positions(
+                raw,native_visible)
+            two_sided=compare_words_outside_links(
+                WORD.findall(item["original_text"]),WORD.findall(native_visible),
+                item["private_original_scripRef_word_indices"],native_reference_positions)
+            category=two_sided["outside_link_word_relation"]
+            extra_layout=two_sided["source_extra_unlinked_word_gap_layout"]
+            if extra_layout is not None:
+                layout_class=extra_layout["alignment_topology"]
+                source_words=WORD.findall(item["original_text"])
+                stock_words=WORD.findall(native_visible)
+                source_link_words=set(item["private_original_scripRef_word_indices"])
+                stock_link_words=set(native_reference_positions)
+                source_plain=[word for i,word in enumerate(source_words)
+                              if i not in source_link_words]
+                stock_plain=[word for i,word in enumerate(stock_words)
+                             if i not in stock_link_words]
+                original_gaps=_private_unique_original_gap_spans(
+                    source_plain,stock_plain)
+                p_digests=item["private_original_p_visible_word_digest_inventory"]
+                if len(p_digests)!=item["private_original_body_tag_counts"].get("p",0):
+                    raise PilotError("Original actual paragraph inventory count changed")
+                if original_gaps is None:
+                    p_class="ambiguous_extra_source_words_no_unique_gap_ownership"
+                    paragraph_matches=[]
+                else:
+                    paragraph_matches=[]
+                    for words in original_gaps:
+                        digest=sha256(" ".join(words).encode("utf-8")).hexdigest()
+                        candidates=[
+                            p["original_p_document_ordinal"] for p in p_digests
+                            if p["original_p_visible_word_tokens"]==len(words)
+                            and p["original_p_visible_ordered_word_sha256"]==digest
+                        ]
+                        paragraph_matches.append({
+                            "original_extra_unlinked_word_count":len(words),
+                            "distinct_full_original_p_exact_visible_word_matches":
+                                len(candidates),
+                            "single_matching_original_p_document_ordinal":
+                                candidates[0] if len(candidates)==1 else None,
+                            "single_matching_original_p_exact_unicode_word_sha256":
+                                digest if len(candidates)==1 else None,
+                            "single_matching_original_p_casefold_word_sha256":
+                                next((p["original_p_visible_casefold_word_sha256"]
+                                      for p in p_digests
+                                      if p["original_p_document_ordinal"]==candidates[0]),None)
+                                if len(candidates)==1 else None,
+                            "exact_original_p_identity_not_bible_heading_classification":
+                                True,
+                        })
+                    p_class=(
+                        "at_least_one_unique_entire_original_p_visible_word_match"
+                        if any(r["distinct_full_original_p_exact_visible_word_matches"]==1
+                               for r in paragraph_matches)
+                        else "unique_gap_no_entire_original_p_visible_word_match"
+                    )
+                original_extra_p_digest_case_counts[p_class]+=1
+                original_extra_p_digest_book_counts.setdefault(book,Counter())[p_class]+=1
+                if not re.fullmatch(
+                        r"[1-4]?[A-Za-z][A-Za-z0-9]{1,15}\.[0-9]+\.[0-9]+",start
+                ):
+                    raise PilotError("Original source start reference is not a verified OSIS verse")
+                original_extra_p_digest_rows.append({
+                    "original_book":book,
+                    "original_source_chapter_number_from_actual_osis_start":
+                        int(start.rsplit(".",2)[1]),
+                    "original_source_line":item["original_source_line"],
+                    "original_full_reference_sha256":
+                        item["original_full_reference_sha256"],
+                    "original_body_sha256":item["original_text_sha256"],
+                    "selected_native_raw_sha256":sha256(raw).hexdigest(),
+                    "all_extra_gap_full_original_p_digest_candidate_classes":
+                        paragraph_matches,
+                    "original_opening_p_document_ordinal":
+                        p_digests[0]["original_p_document_ordinal"] if p_digests else None,
+                    "original_opening_p_visible_word_count":
+                        p_digests[0]["original_p_visible_word_tokens"] if p_digests else None,
+                    "original_opening_p_exact_unicode_word_sha256":
+                        p_digests[0]["original_p_visible_ordered_word_sha256"]
+                        if p_digests else None,
+                    "original_opening_p_casefold_unicode_word_sha256":
+                        p_digests[0]["original_p_visible_casefold_word_sha256"]
+                        if p_digests else None,
+                    "source_extra_p_digest_case_class":p_class,
+                })
+                if (layout_class=="unique_alignment_interior_extra_words_only"
+                        and extra_layout["source_extra_nonlink_word_count"]>=100):
+                    high_source_extra_span_candidates.append(
+                        (start,item,raw,two_sided))
+                double_link_gap_classes[layout_class]+=1
+                double_link_gap_by_original_book.setdefault(book,Counter())[layout_class]+=1
+            double_link_class_counts[category]+=1
+            double_link_original_book_counts[book]=(
+                double_link_original_book_counts.get(book,0)+1)
+            double_link_book_classes.setdefault(book,Counter())[category]+=1
+            source_paragraphs=item["private_original_p_visible_word_digest_inventory"]
+            if (source_paragraphs and
+                    source_paragraphs[0]["original_p_document_ordinal"]!=1):
+                raise PilotError("Original source opening paragraph identity changed")
+            first_p=source_paragraphs[0] if source_paragraphs else None
+            double_link_rows.append({
+                "source_book":book,
+                "original_source_chapter_number_from_actual_osis_start":
+                    int(start.rsplit(".",2)[1]),
+                "original_first_p_visible_word_identity_only":({
+                    "original_p_document_ordinal":1,
+                    "visible_words":first_p["original_p_visible_word_tokens"],
+                    "exact_unicode_word_sha256":
+                        first_p["original_p_visible_ordered_word_sha256"],
+                    "casefold_unicode_word_sha256":
+                        first_p["original_p_visible_casefold_word_sha256"],
+                } if first_p is not None else None),
+                "original_source_line":item["original_source_line"],
+                "original_full_reference_sha256":item["original_full_reference_sha256"],
+                "original_body_sha256":item["original_text_sha256"],
+                "selected_native_raw_sha256":sha256(raw).hexdigest(),
+                **two_sided,
+            })
         analysis=compare_private_texts(source,matches,
-            on_unresolved_word_case=reference_cross_slot.observe_unresolved)
+            on_unresolved_word_case=reference_cross_slot.observe_unresolved,
+            on_source_longer_stock_case=record_same_start_source_longer)
+        original_source_longer_native_scope=(
+            compare_longer_original_source_to_occupied_native_runs(
+                source,native_run_boundaries,source_longer_cases))
+        expected_longer=analysis[
+            "different_word_sequence_relationship_subtypes"].get(
+                "stock_words_in_order_with_extra_source_words",0)
+        source_longer_link_label_review={
+            "status":"SOURCE_EXTRA_WORDS_ORIGINAL_LINK_LABEL_OWNERSHIP_RESEARCH_ONLY",
+            "source_longer_case_count":len(longer_link_rows),
+            "source_link_label_exclusion_classes":
+                dict(sorted(longer_link_class_counts.items())),
+            "original_book_case_counts":
+                dict(sorted(longer_link_original_book_counts.items())),
+            "original_book_link_label_exclusion_classes":{
+                k:dict(sorted(v.items())) for k,v in sorted(longer_link_book_classes.items())
+            },
+            "original_line_sha_and_closed_link_word_metadata_only_rows":
+                sorted(longer_link_rows,key=lambda x:(
+                    x["source_book"],x["original_source_line"],
+                    x["original_full_reference_sha256"])),
+            "removed_only_source_reference_label_word_positions":True,
+            "all_original_source_longer_cases_included":True,
+            "original_source_or_SWORD_binary_modified":False,
+            "source_extra_words_not_proof_of_lost_authorial_text":True,
+            "full_punctuation_markup_paragraph_editional_parity_proven":False,
+        }
+        source_stock_both_sides_link_label_review={
+            "status":"ORIGINAL_AND_NATIVE_LINK_LABEL_EXCLUSION_TEXT_SCOPE_RESEARCH_ONLY",
+            "source_longer_same_start_cases":len(double_link_rows),
+            "original_vs_native_unlinked_word_relation_classes":
+                dict(sorted(double_link_class_counts.items())),
+            "original_book_case_counts":
+                dict(sorted(double_link_original_book_counts.items())),
+            "original_book_unlinked_word_relation_classes":{
+                k:dict(sorted(v.items())) for k,v in sorted(double_link_book_classes.items())
+            },
+            "source_extra_unlinked_word_gap_topology_classes":
+                dict(sorted(double_link_gap_classes.items())),
+            "original_book_source_extra_word_gap_topology_classes":{
+                k:dict(sorted(v.items())) for k,v in sorted(
+                    double_link_gap_by_original_book.items())
+            },
+            "source_extra_original_p_visible_word_digest_case_classes":
+                dict(sorted(original_extra_p_digest_case_counts.items())),
+            "original_book_source_extra_original_p_digest_case_classes":{
+                k:dict(sorted(v.items()))
+                for k,v in sorted(original_extra_p_digest_book_counts.items())
+            },
+            "source_extra_original_p_digest_source_line_sha_only_rows":
+                sorted(original_extra_p_digest_rows,key=lambda x:(
+                    x["original_book"],x["original_source_line"],
+                    x["original_full_reference_sha256"])),
+            "exact_source_p_digest_match_not_proof_of_biblical_heading_or_authorship":True,
+            "original_line_SHA_and_two_sided_link_word_metadata_only_rows":
+                sorted(double_link_rows,key=lambda x:(
+                    x["source_book"],x["original_source_line"],
+                    x["original_full_reference_sha256"])),
+            "excluded_only_original_scripRef_and_real_native_reference_labels":True,
+            "native_reference_offset_and_visible_text_ownership_strictly_verified":True,
+            "original_source_or_native_binary_modified":False,
+            "no_unlinked_word_category_implies_authorial_edition_parity_or_missing_text":True,
+            "published":False,
+        }
+        expected_nonlink_extra=(
+            double_link_class_counts.get(
+                "stock_plain_words_contiguous_inside_longer_original_plain_text",0)
+            + double_link_class_counts.get(
+                "stock_plain_words_in_order_with_extra_original_words",0)
+        )
+        if (sum(double_link_gap_classes.values())!=expected_nonlink_extra or
+                sum(sum(group.values()) for group in
+                    double_link_gap_by_original_book.values())!=expected_nonlink_extra):
+            raise PilotError("Source extra word gap topology does not reconcile")
+        if (sum(original_extra_p_digest_case_counts.values())!=expected_nonlink_extra
+                or len(original_extra_p_digest_rows)!=expected_nonlink_extra
+                or sum(sum(g.values()) for g in
+                       original_extra_p_digest_book_counts.values())!=expected_nonlink_extra):
+            raise PilotError("Source-extra actual original paragraph fingerprints do not reconcile")
+        if (len(double_link_rows)!=expected_longer or
+                sum(double_link_class_counts.values())!=expected_longer
+                or sum(double_link_original_book_counts.values())!=expected_longer
+                or any(sum(groups.values())!=double_link_original_book_counts[book]
+                       for book,groups in double_link_book_classes.items())
+                or double_link_original_book_counts!=longer_link_original_book_counts):
+            raise PilotError("Actual source/native double-sided link exclusion audit incomplete")
+        if (len(longer_link_rows)!=expected_longer or
+                sum(longer_link_class_counts.values())!=expected_longer or
+                sum(longer_link_original_book_counts.values())!=expected_longer
+                or any(sum(groups.values()) != longer_link_original_book_counts[book]
+                       for book,groups in longer_link_book_classes.items())):
+            raise PilotError("Original source linked-word disposition is not exhaustive")
+        if (original_source_longer_native_scope[
+                "source_longer_same_start_cases"] != expected_longer
+                or original_source_longer_native_scope[
+                    "original_book_case_counts"] != {
+                        book:groups["stock_words_in_order_with_extra_source_words"]
+                        for book,groups in analysis[
+                            "source_book_word_relationship_subtypes"].items()
+                        if groups.get("stock_words_in_order_with_extra_source_words",0)
+                    }):
+            raise PilotError("Full source-longer original/native evidence differs from lexical census")
         lexical=analysis['unresolved_source_stock_lexical_selection_triage']
         # A ThML div1 can claim a different OSIS book than its own title.
         # Preserve BOTH original values: never join different book texts and
         # call their word differences a CrossWire compiled-content defect.
+        source_word_loss_cases, source_word_loss_selection = (
+            select_authorial_word_loss_attention(
+                lexical.get("bounded_plain_word_nontrivial_differences_line_and_hash_cases", [])))
         source_identity_lexical_gate=classify_lexical_source_identity(
-            source,lexical.get("bounded_plain_word_nontrivial_differences_line_and_hash_cases",[])
+            source, source_word_loss_cases
         )
         source_same_book_unicode_prose_review=classify_same_book_unicode_variants(
             source,matches,source_identity_lexical_gate,
@@ -793,15 +1267,47 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
                 and case["exact_plain_word_alignment"][
                     "original_plain_words_not_matched_in_exact_order"] > 10)
         ]
-        if not large_plain_cases:
+        # Source-neutral, bounded high-impact gap review: no passage special case.
+        # The same fully attested native replay is reused by both independent
+        # probes, never a third download, second edition, or presumed verse join.
+        top_extra_span_cases=sorted(
+            high_source_extra_span_candidates,
+            key=lambda case:(
+                -case[3]["source_extra_unlinked_word_gap_layout"][
+                    "source_extra_nonlink_word_count"],
+                case[1]["original_source_line"],
+                case[1]["original_full_reference_sha256"],
+            ),
+        )[:OriginalExtraGapNativeChapterProbe.MAX_OUTLIER_CASES]
+        high_extra_native_probe=(
+            OriginalExtraGapNativeChapterProbe(top_extra_span_cases)
+            if top_extra_span_cases else None
+        )
+        high_extra_native_review={
+            "all_genuine_unique_source_extra_span_cases_at_least_100_words":
+                len(high_source_extra_span_candidates),
+            "bounded_cases_selected_for_original_native_replay":
+                len(top_extra_span_cases),
+            "original_high_extra_case_sampling_truncated":
+                len(high_source_extra_span_candidates)>len(top_extra_span_cases),
+            "no_source_or_native_text_exported":True,
+        }
+        if high_extra_native_probe is not None:
+            high_extra_native_review[
+                "original_pinned_ccel_extra_gap_paragraph_structure"
+            ]=high_extra_native_probe.original_thml_extra_gap_structure(
+                original_xml,expected_source_sha256=original_sha
+            )
+        alternative_probe=(
+            OriginalProseAlternativeNativeSlotProbe(source,large_plain_cases)
+            if large_plain_cases else None
+        )
+        if alternative_probe is None and high_extra_native_probe is None:
             alternative_prose={
                 "original_source_large_plain_word_cases":0,
                 "no_large_original_plain_word_cases_to_scan":True,
             }
         else:
-            alternative_probe=OriginalProseAlternativeNativeSlotProbe(
-                source,large_plain_cases
-            )
             replay_rows=[]
             replay_process=None
             try:
@@ -813,7 +1319,10 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
                     raise PilotError("Second exact native stock reader cannot stream")
                 def collect_original_prose_alternatives(kind,ref,raw):
                     replay_rows.append((kind,ref))
-                    alternative_probe.observe(kind,ref,raw)
+                    if alternative_probe is not None:
+                        alternative_probe.observe(kind,ref,raw)
+                    if high_extra_native_probe is not None:
+                        high_extra_native_probe.observe(kind,ref,raw)
                 replay_summary,_,_,_=parse_native_raw_corpus(
                     replay_process.stdout,on_entry=collect_original_prose_alternatives
                 )
@@ -830,9 +1339,20 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
                     replay_process.kill()
                     replay_process.wait()
                 raise
-            alternative_prose=alternative_probe.report()
-            if alternative_prose["all_native_raw_entries_replayed"] != len(rows):
+            alternative_prose=(
+                alternative_probe.report() if alternative_probe is not None
+                else {
+                    "original_source_large_plain_word_cases":0,
+                    "no_large_original_plain_word_cases_to_scan":True,
+                }
+            )
+            if (alternative_probe is not None
+                    and alternative_prose["all_native_raw_entries_replayed"] != len(rows)):
                 raise PilotError("Original second native prose scan omitted occupied keys")
+            if high_extra_native_probe is not None:
+                high_extra_native_review.update(high_extra_native_probe.report())
+                if high_extra_native_review["complete_original_native_raw_entries_replayed"]!=len(rows):
+                    raise PilotError("Original high extra-span same-chapter native replay incomplete")
         if large_plain_cases:
             boundary_case_report=native_run_boundaries.report(source,large_plain_cases)
             complete_shared_run_sources=inspect_shared_original_units_in_native_runs(
@@ -854,22 +1374,39 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         original_div1_english_aliases=original_div1_english_alias_vs_declared_osis(
             source,complete_shared_run_sources
         )
-        chapter_analysis=compare_chapter_neighbors(
-            chapter_neighbors,chapter_intros,raw_as_strict_xml_text
-        )
-        chapter_numbered_location=numbered_probe.report()
-        chapter_other_slot_location=alternate_probe.report(numbered_probe)
-        original_p_word_overlap=source_p_overlap_probe.report(chapter_other_slot_location)
-        original_p_boundaries=source_p_boundary_probe.report(
-            chapter_other_slot_location,original_p_word_overlap
-        )
+        if numbered_probe is not None:
+            chapter_analysis=compare_chapter_neighbors(
+                chapter_neighbors,chapter_intros,raw_as_strict_xml_text
+            )
+            chapter_numbered_location=numbered_probe.report()
+            chapter_other_slot_location=alternate_probe.report(numbered_probe)
+            original_p_word_overlap=source_p_overlap_probe.report(chapter_other_slot_location)
+            original_p_boundaries=source_p_boundary_probe.report(
+                chapter_other_slot_location,original_p_word_overlap
+            )
+        else:
+            (chapter_analysis, chapter_numbered_location,
+             chapter_other_slot_location, original_p_word_overlap) = (
+                unreviewed_original_chapter_sibling_receipts(chapter_proof))
+            original_p_boundaries = {
+                **chapter_analysis,
+                "status": "UNREVIEWED_ORIGINAL_CHAPTER_ADJACENT_XML_STRUCTURE",
+            }
         if chapter_analysis["original_chapter_source_siblings_compared"]!=chapter_proof[
-            "explicit_chapter_source_marker_count"
+            "original_chapter_siblings_reviewed_count"
         ]:
-            raise PilotError("Chapter neighbor readback omitted original markers")
+            raise PilotError("Chapter neighbor readback omitted a reviewable source sibling")
+        if (chapter_proof["original_chapter_siblings_reviewed_count"] +
+            chapter_proof["original_chapter_siblings_not_reviewed_count"]
+                != chapter_proof["explicit_chapter_source_marker_count"]):
+            raise PilotError("Original chapter sibling classification did not reconcile")
     return {
         "schema_version":1,
         "resource_id":resource_id,
+        "source_volume":volume,
+        "source_is_multivolume_collection":is_collection,
+        "source_collection_volume_count":volume_count,
+        "source_is_independent_one_volume_checkpoint":True,
         "status":"full_source_verse_and_range_body_to_stock_raw_text_diagnostics_not_release_approval",
         "source_original_sha256":original_sha,
         "stock_sword_archive_sha256":stock_sha,
@@ -881,16 +1418,25 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
         "text_diagnostic":analysis,
         "source_unpaired_reference_cross_native_slots":reference_cross_slot_report,
         "source_nonlink_prose_review_stock_raw_duplicate_topology":plain_payload_topology,
+        "source_longer_original_native_run_structural_scope":original_source_longer_native_scope,
+        "source_longer_original_link_label_word_scope":source_longer_link_label_review,
+        "source_longer_source_and_native_reference_label_word_scope":
+            source_stock_both_sides_link_label_review,
         "source_large_nonlink_prose_native_alternative_locations":alternative_prose,
+        "source_high_extra_unlinked_spans_other_same_chapter_native_location":
+            high_extra_native_review,
         "source_large_prose_marker_to_native_raw_run_boundary_diagnostics":boundary_case_report,
         "source_complete_original_units_within_shared_stock_raw_K_runs":complete_shared_run_sources,
         "source_original_div1_osisRef_book_consistency_census":original_div1_book_consistency,
         "source_original_div1_english_alias_vs_osisRef_book_claim_evidence":original_div1_english_aliases,
         "source_div1_book_identity_safety_gate_for_nonlink_lexical_differences":source_identity_lexical_gate,
+        "source_authorial_word_loss_attention_selection": source_word_loss_selection,
         "original_source_book_marker_private_repair_proposal_stock_review":
             original_source_book_marker_private_repair_stock_review,
         "original_source_same_book_unicode_lexical_witness_review":source_same_book_unicode_prose_review,
         "source_original_chapter_neighbor_evidence":chapter_proof,
+        "original_chapter_introduction_siblings_all_reviewed":
+            chapter_proof["original_chapter_siblings_not_reviewed_count"] == 0,
         "source_chapter_neighbor_to_stock_intro_diagnostics":chapter_analysis,
         "source_chapter_neighbor_to_same_chapter_numbered_location":chapter_numbered_location,
         "source_chapter_neighbor_to_same_book_alternative_slots":chapter_other_slot_location,
@@ -910,15 +1456,31 @@ def run(resource_id: str, index_binary: Path, raw_binary: Path) -> dict:
 def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--resource-id",required=True)
+    p.add_argument("--source-volume",type=int,
+                   help="Required on multi-volume sources; single-source remains the default")
     p.add_argument("--native-index-binary",required=True,type=Path)
     p.add_argument("--native-raw-binary",required=True,type=Path)
     p.add_argument("--report",required=True,type=Path)
     args=p.parse_args(argv)
     try:
-        result=run(args.resource_id,args.native_index_binary,args.native_raw_binary)
+        result=run(args.resource_id,args.native_index_binary,args.native_raw_binary,
+                   source_volume=args.source_volume)
         code=0
     except (ValueError,OSError,RuntimeError,zipfile.BadZipFile) as exc:
+        # This workflow may fail while reading sensitive original commentary.
+        # Only the source-controlled function and line are safe to show:
+        # exception messages and source-body snippets stay in the private receipt.
+        frames = [
+            (Path(f.filename).name, f.name, f.lineno)
+            for f in traceback.extract_tb(exc.__traceback__)
+            if Path(f.filename).name.startswith(("commentary_", "pilot_", "sword_"))
+        ]
+        site = frames[-1] if frames else ("unclassified", "unclassified", 0)
+        print("Private source-text failure location (no exception text): "
+              + "/".join(map(str, site)) + " (" + type(exc).__name__ + ")")
         result={"status":"blocked","resource_id":args.resource_id,"reason":str(exc),
+                "safe_failure_site":list(site),
+                "safe_exception_class":type(exc).__name__,
                 "full_authored_to_stock_parity_verified":False,"published":False}
         code=1
     args.report.parent.mkdir(parents=True,exist_ok=True)

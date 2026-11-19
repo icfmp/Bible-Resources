@@ -163,6 +163,59 @@ class SwordPromotionTests(unittest.TestCase):
             encoding="utf-8"
         )
 
+    def test_zcom4_chapter_preview_promotes_without_changing_binary_payload(self):
+        self.configure_zcom_fixture()
+        original = {}
+        with ZipFile(self.src) as archive:
+            for prefix in ("nt", "ot"):
+                for suffix in ("s", "v", "z"):
+                    key = f"modules/comments/zcom/verifiedpreview/{prefix}.bz{suffix}"
+                    original[f"modules/comments/zcom4/verifiedpreview/{prefix}.cz{suffix}"] = archive.read(key)
+        with ZipFile(self.src, "w", compression=ZIP_DEFLATED) as archive:
+            archive.writestr(
+                "mods.d/verifiedpreview.conf",
+                "[VerifiedPreview]\n"
+                "DataPath=./modules/comments/zcom4/verifiedpreview\n"
+                "ModDrv=zCom4\nBlockType=CHAPTER\nCompressType=ZIP\n"
+                "Encoding=UTF-8\nVersification=KJV\nVersion=0.0.0-research\n"
+            )
+            for name, raw in original.items():
+                archive.writestr(name, raw)
+        self.sha = hashlib.sha256(self.src.read_bytes()).hexdigest()
+        self.conf.write_text(
+            "[PublishedModule]\n"
+            "DataPath=./modules/comments/zcom4/publishedmodule\n"
+            "ModDrv=zCom4\nBlockType=CHAPTER\nCompressType=ZIP\n"
+            "Encoding=UTF-8\nVersification=KJV\n"
+            "DistributionLicense=Public Domain\nVersion=0.1.0\n",
+            encoding="utf-8"
+        )
+        before = self.src.read_bytes()
+        report = self.promote(driver="zCom4", versification="KJV")
+        self.assertTrue(report["data_byte_equal"])
+        self.assertFalse(report["published"])
+        self.assertEqual(report["driver"], "zCom4")
+        with ZipFile(self.out) as actual:
+            self.assertIsNone(actual.testzip())
+            self.assertEqual(len(actual.namelist()), 7)
+            for name, raw in original.items():
+                promoted = name.replace("/verifiedpreview/", "/publishedmodule/")
+                self.assertEqual(actual.read(promoted), raw)
+        self.assertEqual(self.src.read_bytes(), before)
+        digest = report["release_zip_sha256"]
+        self.out.unlink()
+        self.assertEqual(
+            self.promote(driver="zCom4", versification="KJV")["release_zip_sha256"],
+            digest,
+        )
+        # A metadata-only edition must keep its compiled block layout.
+        self.out.unlink()
+        original_conf = self.conf.read_text()
+        self.conf.write_text(original_conf.replace("BlockType=CHAPTER", "BlockType=VERSE"))
+        with self.assertRaises(ValueError):
+            self.promote(driver="zCom4", versification="KJV")
+        self.assertFalse(self.out.exists())
+
     def test_zcom_stock_commentary_six_payloads_preserved_exactly(self):
         self.configure_zcom_fixture()
         source=self.src.read_bytes()

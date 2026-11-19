@@ -52,26 +52,32 @@
         "__future__",
         "argparse",
         "collections",
+        "commentary_nonlink_word_alignment",
         "guard_osis",
         "hashlib",
         "json",
+        "lxml",
         "pathlib",
         "re",
-        "sys"
+        "sys",
+        "unicodedata"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "62a07cca1d2d5a3aaf114cdcfc5ff37703026916d6054ff8cb2d0081bfa5f55c",
+      "sha256_at_inventory": "e7183e5236163fefba7a9cb38d7689e0d5eabbedba728ea4a69a8eaad15ffc2a",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 6,
+      "static_reference_count": 9,
       "static_references": [
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/pilot-source-audit.yml",
         "docs/EDITORIAL_AUDIT_WORKFLOW.md",
         "docs/NORMALIZATION_POLICY.md",
         "docs/QUALITY_POLICY.md",
         "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
+        "docs/evidence/mhc-285/mhc-shared-verse-navigation-2026-11-18.md",
+        "tests/test_commentary_shared_key_retrieval.py",
         "tests/test_editorial_pipeline.py"
       ]
     },
@@ -506,6 +512,43 @@
       "confidence": "low",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [
+        "OSIS"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/clean_source_osis.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Review and conservatively clean source OSIS without altering its edition.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "collections",
+        "hashlib",
+        "json",
+        "lxml",
+        "pathlib",
+        "re",
+        "xml"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "e9174a46bd341aa850211acb464c6b2b3cffb6ac07b0532b2859e5269f0d0511",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 4,
+      "static_references": [
+        "scripts/reclassify_osis_commentary_introduction.py",
+        "scripts/repair_commentary_osis_milestones.py",
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
+        "tests/test_clean_source_osis.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
         "OSIS",
         "ThML"
       ],
@@ -520,6 +563,13 @@
         "collections",
         "commentary_intake",
         "commentary_native_inventory",
+        "commentary_native_raw_inventory",
+        "commentary_navigation_link_plan",
+        "commentary_osis_mixed_transport_probe",
+        "commentary_prose_cross_slot",
+        "commentary_reference_registry_triage",
+        "commentary_text_delta",
+        "commentary_unresolved_lexical_triage",
         "commentary_xml_witness",
         "hashlib",
         "json",
@@ -531,18 +581,24 @@
         "re",
         "shutil",
         "subprocess",
+        "sword_native_raw_corpus_inventory",
         "tempfile",
         "zipfile"
       ],
-      "reader_tool_signals": [],
+      "reader_tool_signals": [
+        "xiphos",
+        "jsword"
+      ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "2ead5904729d8b414c7ef3bc229f518ee82dce0af766ef0b76c01138b8e7cbc7",
+      "sha256_at_inventory": "ebcabe89ba82dce0aee3911ed21921d019534f3754067bc3d9ef9148965d4d27",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 2,
+      "static_reference_count": 4,
       "static_references": [
         ".github/workflows/commentary-anchor-parity.yml",
+        ".github/workflows/commentary-mhc-private-jsword.yml",
+        ".github/workflows/commentary-mhc-private-xiphos.yml",
         "tests/test_commentary_anchor_parity.py"
       ]
     },
@@ -764,7 +820,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "010322eddd6cbe553bd8381cdebee7dea3ffa14fdf55f56bbe8c8d5dc46f8643",
+      "sha256_at_inventory": "2f99bf3ec7976f7fb346b343c89a757e5dcefd6a9ddada643a923272c12a9a21",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
@@ -1106,7 +1162,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 10,
+      "static_reference_count": 11,
       "static_references": [
         "scripts/commentary_anchor_parity.py",
         "scripts/commentary_native_raw_inventory.py",
@@ -1114,6 +1170,7 @@
         ".github/workflows/commentary-anchor-parity.yml",
         ".github/workflows/commentary-evidence.yml",
         ".github/workflows/commentary-intake.yml",
+        ".github/workflows/commentary-mhc-source-text.yml",
         "docs/COMMENTARY_PIPELINE.md",
         "docs/evidence/post-mhcc/toolchain-pilot-2026-11-16.md",
         "tests/test_commentary_stage_evidence.py",
@@ -1160,8 +1217,9 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 11,
+      "static_reference_count": 13,
       "static_references": [
+        "scripts/commentary_anchor_parity.py",
         "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_section_scope_audit.py",
@@ -1170,6 +1228,7 @@
         "scripts/commentary_stock_xiphos_smoke.py",
         "scripts/commentary_xiphos_dual_reader.py",
         "scripts/tool_registry.py",
+        ".github/workflows/commentary-mhc-source-text.yml",
         ".github/workflows/commentary-native-raw-corpus.yml",
         "docs/COMMENTARY_PIPELINE.md",
         "tests/test_commentary_native_raw_inventory.py"
@@ -1202,8 +1261,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 4,
+      "static_reference_count": 5,
       "static_references": [
+        "scripts/commentary_anchor_parity.py",
         "scripts/commentary_section_scope_audit.py",
         "docs/COMMENTARY_POLICY.md",
         "docs/evidence/mhcc-274/editorial-section-scope-audit.md",
@@ -1260,12 +1320,13 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "edd8c1645a0a301d6136a435cbc7abce3452dde34dffed524df837aab5bbeaad",
+      "sha256_at_inventory": "ed3f030008def79d385182468ec643ad5288ce1b2ec1c7a8d3bc712708010e64",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 9,
+      "static_reference_count": 11,
       "static_references": [
+        "scripts/audit_osis.py",
         "scripts/commentary_intro_chapter_text_review.py",
         "scripts/commentary_near_prose_unicode_review.py",
         "scripts/commentary_osis_transport_probe.py",
@@ -1274,6 +1335,7 @@
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_shared_raw_source_units.py",
         "scripts/commentary_unresolved_lexical_triage.py",
+        ".github/workflows/commentary-mhc-source-text.yml",
         "tests/test_commentary_nonlink_word_alignment.py"
       ]
     },
@@ -1296,14 +1358,19 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "b7fd993ef4c6ba119ce94e38b50c6661b7c1d053711f6dd3baeb784de4b7676d",
+      "sha256_at_inventory": "253ee52ee3cd92a6ad55a9fed1e2e27c70455461c10047d08fb1ccd901a40819",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 2,
+      "static_reference_count": 7,
       "static_references": [
+        "scripts/commentary_private_text_compare.py",
+        "scripts/commentary_prose_cross_slot.py",
         "scripts/commentary_unresolved_lexical_triage.py",
-        "tests/test_commentary_nonlink_words.py"
+        ".github/workflows/commentary-mhc-source-text.yml",
+        "tests/test_commentary_nonlink_words.py",
+        "tests/test_commentary_private_text_compare.py",
+        "tests/test_commentary_prose_cross_slot.py"
       ]
     },
     {
@@ -1415,6 +1482,7 @@
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
         "zCom",
+        "zCom4",
         "OSIS"
       ],
       "has_direct_tests_by_filename": true,
@@ -1434,25 +1502,66 @@
         "pathlib",
         "pilot_preflight",
         "pilot_subprocess",
+        "probe_andbible_jsword",
         "re",
+        "shutil",
         "subprocess",
         "sword_native_raw_corpus_inventory",
         "time",
+        "xml",
         "zipfile"
       ],
       "reader_tool_signals": [
-        "xiphos"
+        "xiphos",
+        "andbible",
+        "android",
+        "jsword"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "3d58fe7a0fd7f9a3b51d1bc632344c4f76c4403b54bf85f920040d2c443e2530",
+      "sha256_at_inventory": "6f84006571577f856883f4449f7a7464955d49e0d8bc8573129aaf8fcd3183e0",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 3,
+      "static_reference_count": 6,
       "static_references": [
+        "scripts/commentary_anchor_parity.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_source_erratum_compiled_probe.py",
+        ".github/workflows/commentary-anchor-parity.yml",
+        ".github/workflows/commentary-mhc-private-jsword.yml",
         "tests/test_commentary_osis_mixed_transport_probe.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [
+        "OSIS"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/commentary_osis_paragraph_presence.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Private source-neutral CCEL paragraph versus authenticated authoring OSIS probe.",
+      "python_imports": [
+        "__future__",
+        "collections",
+        "commentary_unresolved_lexical_triage",
+        "hashlib",
+        "lxml",
+        "re"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "ec793a2494d7e591d506ae89e9101a2aa5475cacd8ffa5ad7828c6db32d07713",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 2,
+      "static_references": [
+        ".github/workflows/commentary-mhc-source-text.yml",
+        "tests/test_commentary_osis_paragraph_presence.py"
       ]
     },
     {
@@ -1624,6 +1733,7 @@
         "commentary_native_raw_inventory",
         "commentary_near_prose_unicode_review",
         "commentary_nonlink_word_alignment",
+        "commentary_nonlink_words",
         "commentary_original_bookcode_repair",
         "commentary_original_div1_book_consistency",
         "commentary_prose_cross_slot",
@@ -1647,16 +1757,18 @@
         "subprocess",
         "sword_native_raw_corpus_inventory",
         "tempfile",
+        "traceback",
         "zipfile"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "13d3a98f4e5686b73262d48a7a2cf7a03ff4e9c0cbf30f4d859c4503a6e9fc3e",
+      "sha256_at_inventory": "6250e91ab85ef89c8aaa67a6847713afa2eedccd06df03051c8f02d013631688",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 19,
+      "static_reference_count": 20,
       "static_references": [
+        ".github/workflows/commentary-mhc-source-text.yml",
         ".github/workflows/commentary-private-text-compare.yml",
         "tests/test_commentary_chapter_cross_slot.py",
         "tests/test_commentary_chapter_neighbors.py",
@@ -1682,7 +1794,9 @@
       "classification": "MERGE",
       "confidence": "low",
       "entrypoint_hint": "library, native helper or workflow-invoked",
-      "format_signals_not_certified_support": [],
+      "format_signals_not_certified_support": [
+        "ThML"
+      ],
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
       "path": "scripts/commentary_prose_cross_slot.py",
@@ -1692,6 +1806,7 @@
         "__future__",
         "collections",
         "commentary_nonlink_word_alignment",
+        "commentary_nonlink_words",
         "commentary_unresolved_lexical_triage",
         "hashlib",
         "lxml",
@@ -1700,12 +1815,13 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "36927c8eb25ab39f0bd18faf28c912a4e6dafaebe03131255a35900f4a8119eb",
+      "sha256_at_inventory": "bc2b73370f81857ed21763fa6e48dfdbc1fcf67e33b311073b0f5d596b382202",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
+        "scripts/commentary_anchor_parity.py",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_shared_raw_source_units.py",
         "tests/test_commentary_prose_cross_slot.py"
@@ -1839,8 +1955,9 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 5,
+      "static_reference_count": 6,
       "static_references": [
+        "scripts/commentary_anchor_parity.py",
         "scripts/commentary_literal_erratum_preflight.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_source_erratum_compiled_probe.py",
@@ -2077,6 +2194,7 @@
       "confidence": "low",
       "entrypoint_hint": "library, native helper or workflow-invoked",
       "format_signals_not_certified_support": [
+        "OSIS",
         "ThML"
       ],
       "has_direct_tests_by_filename": true,
@@ -2094,13 +2212,14 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "4518be0512fa5be6674a2cfc5a71a48951840f413987ca74cc5cecac3f34559c",
+      "sha256_at_inventory": "3fd573837e12cabda6dd3a8fe905cd82ef6a19a06329e0161fcd6100931380aa",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/commentary_private_text_compare.py",
+        ".github/workflows/commentary-mhc-source-text.yml",
         "tests/test_commentary_shared_raw_source_units.py",
         "tests/test_commentary_source_native_boundaries.py"
       ]
@@ -2341,8 +2460,9 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 12,
+      "static_reference_count": 13,
       "static_references": [
+        "scripts/commentary_anchor_parity.py",
         "scripts/commentary_chapter_cross_slot.py",
         "scripts/commentary_chapter_neighbors.py",
         "scripts/commentary_chapter_paragraph_overlap.py",
@@ -2418,14 +2538,51 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 6,
+      "static_reference_count": 9,
       "static_references": [
+        "scripts/commentary_anchor_parity.py",
         "scripts/commentary_near_prose_unicode_review.py",
+        "scripts/commentary_osis_paragraph_presence.py",
         "scripts/commentary_private_text_compare.py",
         "scripts/commentary_prose_cross_slot.py",
         "scripts/commentary_section_scope_audit.py",
         "scripts/commentary_shared_raw_source_units.py",
+        "tests/test_commentary_osis_paragraph_presence.py",
         "tests/test_commentary_unresolved_lexical_triage.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
+        "USFM"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/commentary_usfm_title_witness.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Research-only exact original commentary paragraph vs independent USFM title audit.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "collections",
+        "hashlib",
+        "json",
+        "pathlib",
+        "re",
+        "zipfile"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "8f97ce686f38604dbcbe6b6a50cb70492dbd8e1a0cbc58eb6b506d5a6368a13e",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "source/native audit",
+      "static_reference_count": 2,
+      "static_references": [
+        ".github/workflows/commentary-mhc-source-text.yml",
+        "tests/test_commentary_usfm_title_witness.py"
       ]
     },
     {
@@ -2506,11 +2663,11 @@
         "xiphos"
       ],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "578b9ee1a5e9f5942cbc14a0b51acd23b6983ad3b86fe8b052a49cd5f14ee24c",
+      "sha256_at_inventory": "2be88b32e63f30d08ceadd77965b9de9a6101368ade95f97d81eb22d2a2e88ba",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 11,
+      "static_reference_count": 12,
       "static_references": [
         "scripts/commentary_andbible_jsword.py",
         "scripts/commentary_android_text_witness.py",
@@ -2520,6 +2677,7 @@
         "scripts/commentary_source_erratum_compiled_probe.py",
         "scripts/commentary_stock_andbible_android.py",
         "scripts/commentary_xiphos_heading_probe.py",
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/commentary-private-candidate-xiphos-gui.yml",
         ".github/workflows/commentary-xiphos-dual-reader.yml",
         "tests/test_commentary_xiphos_dual_reader.py"
@@ -2556,9 +2714,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/commentary_private_candidate_xiphos_gui.py",
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/commentary-private-candidate-xiphos-gui.yml",
         "tests/test_commentary_xiphos_heading_probe.py"
       ]
@@ -2593,7 +2752,7 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "107f4a7b51d53e0a816851ee52550229d6077d0c7da2aa2dbc07bf37ea51663a",
+      "sha256_at_inventory": "bd43223a34461e98b45903a456ad16489e89e0b99bdd48fe09989d7dd10b8d15",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
@@ -3477,7 +3636,7 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 92,
+      "static_reference_count": 93,
       "static_references": [
         "scripts/audit_real_pilot.py",
         "scripts/bible_intake.py",
@@ -3528,6 +3687,7 @@
         "scripts/probe_lsg_v11n.py",
         "scripts/stage_verified_stock_commentary.py",
         "scripts/tool_registry.py",
+        ".github/workflows/commentary-mhc-source-text.yml",
         ".github/workflows/lsg-fidelity.yml",
         ".github/workflows/pilot-preflight.yml",
         "docs/PILOT_SEGOND_MHC.md",
@@ -3637,7 +3797,7 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 13,
+      "static_reference_count": 14,
       "static_references": [
         "scripts/audit_real_pilot.py",
         "scripts/commentary_andbible_jsword.py",
@@ -3650,6 +3810,7 @@
         "scripts/pilot_runtime.py",
         "scripts/private_sword_bundle.py",
         "scripts/probe_lsg_v11n.py",
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/lsg-fidelity.yml",
         "tests/test_pilot_subprocess.py"
       ]
@@ -3732,7 +3893,8 @@
         "RawText",
         "zText",
         "RawCom",
-        "zCom"
+        "zCom",
+        "zCom4"
       ],
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
@@ -3754,12 +3916,13 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "ce8b263ac79bf0a42155001004cb817250c16f0659de1571689bea106f592ad7",
+      "sha256_at_inventory": "87ea31c71182751270f4f5bb9978ad3f03b5b1784412af90f37db840ecfb160a",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
         "docs/LSG_AUDIT_RESEARCH_HANDOFF.md",
         "docs/RESOURCE_ONBOARDING_PLAYBOOK.md",
         "tests/test_private_sword_bundle.py"
@@ -3879,9 +4042,10 @@
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 3,
+      "static_reference_count": 4,
       "static_references": [
         "scripts/commentary_andbible_jsword.py",
+        "scripts/commentary_osis_mixed_transport_probe.py",
         "scripts/probe_private_repaired_darby_sword.py",
         ".github/workflows/darby-andbible-jsword.yml"
       ]
@@ -4078,7 +4242,8 @@
       "format_signals_not_certified_support": [
         "RawText",
         "zText",
-        "zCom"
+        "zCom",
+        "zCom4"
       ],
       "has_direct_tests_by_filename": true,
       "owner": "Bible Resources maintainers",
@@ -4097,16 +4262,17 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "47507d9aa626cb13fce1a5c963efff03827b5bf8d1e9c0d69927047afeb784a0",
+      "sha256_at_inventory": "5bcf3af2bb307e0ddd428690e518411798876eb6f36677eb96995c9ddb8402a3",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 10,
+      "static_reference_count": 11,
       "static_references": [
         "scripts/commentary_stock_candidate.py",
         "scripts/materialize_attested_ztext_release.py",
         "scripts/prepare_darby_011_private_release_candidate.py",
         "scripts/tool_registry.py",
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/commentary-zcom-private-candidate.yml",
         ".github/workflows/lsg-first-release.yml",
         ".github/workflows/private-sword-promotion-proof.yml",
@@ -4556,6 +4722,79 @@
       ]
     },
     {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
+        "zCom4",
+        "OSIS"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/rebuild_osis_commentary.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Recompile pinned, original OSIS commentary as private native SWORD.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "collections",
+        "hashlib",
+        "json",
+        "os",
+        "pathlib",
+        "re",
+        "shutil",
+        "subprocess",
+        "sword_native_raw_corpus_inventory",
+        "xml"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "d316b2de4824077aba5166b043f703e7bfa1d66005d01bbaf95069e384ad7c5f",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "publication/release",
+      "static_reference_count": 2,
+      "static_references": [
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
+        "tests/test_rebuild_osis_commentary.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [
+        "OSIS"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/reclassify_osis_commentary_introduction.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Private, byte-local OSIS repair for a source-authored chapter introduction.",
+      "python_imports": [
+        "__future__",
+        "clean_source_osis",
+        "hashlib",
+        "itertools",
+        "json",
+        "pathlib",
+        "re",
+        "xml"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "954ec502ab5648b713351fc06b3ff49921e7fcbd688181850ae9d89a5e1b652b",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 2,
+      "static_references": [
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
+        "tests/test_reclassify_osis_commentary_introduction.py"
+      ]
+    },
+    {
       "classification": "KEEP_GENERIC",
       "confidence": "high",
       "entrypoint_hint": "CLI or __main__ present",
@@ -4598,6 +4837,41 @@
         "docs/COMMENTARY_PIPELINE.md",
         "tests/test_release_preflight.py",
         "tests/test_tool_registry.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
+      "entrypoint_hint": "CLI or __main__ present",
+      "format_signals_not_certified_support": [
+        "OSIS"
+      ],
+      "has_direct_tests_by_filename": true,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/repair_commentary_osis_milestones.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Reversible, private, exact-byte repair of verified OSIS verse-group endpoints.",
+      "python_imports": [
+        "__future__",
+        "argparse",
+        "clean_source_osis",
+        "hashlib",
+        "itertools",
+        "json",
+        "pathlib",
+        "re",
+        "xml"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "f5e073d913eea244793e38fa6cb5d7afee2f5fb8dc9630df99f5bfdd032f6df7",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "not determined",
+      "static_reference_count": 2,
+      "static_references": [
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
+        "tests/test_repair_commentary_osis_milestones.py"
       ]
     },
     {
@@ -4780,6 +5054,7 @@
       "python_imports": [
         "__future__",
         "hashlib",
+        "json",
         "lxml",
         "re",
         "repair_osis_inline_markup",
@@ -4789,16 +5064,17 @@
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "dbf14f739b8c57aef10c4c4b963c3e521048b415e371e6ca7da815993f09bdf7",
+      "sha256_at_inventory": "f411a1c6ea58a45cdb463af6db562d20b48d3b27a998d9428a83dfa0b302d384",
       "side_effects": "unknown; inspect CLI and subprocesses before use",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 9,
+      "static_reference_count": 10,
       "static_references": [
         "scripts/probe_private_repaired_darby_sword.py",
         "scripts/repair_osis_division_markers.py",
         "scripts/repair_osis_paragraph_indentation.py",
         "scripts/repair_osis_unlinked_reference_labels.py",
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/darby-0.1.1-preflight.yml",
         ".github/workflows/darby-andbible-jsword.yml",
         ".github/workflows/darby-private-repaired-sword.yml",
@@ -6127,13 +6403,16 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 8,
+      "static_reference_count": 11,
       "static_references": [
         "scripts/tool_registry.py",
         ".github/workflows/commentary-anchor-parity.yml",
         ".github/workflows/commentary-editorial-section-scope.yml",
         ".github/workflows/commentary-evidence.yml",
         ".github/workflows/commentary-intake.yml",
+        ".github/workflows/commentary-mhc-private-jsword.yml",
+        ".github/workflows/commentary-mhc-private-xiphos.yml",
+        ".github/workflows/commentary-mhc-source-text.yml",
         ".github/workflows/commentary-native-raw-corpus.yml",
         ".github/workflows/commentary-private-text-compare.yml",
         "docs/evidence/mhcc-274/editorial-section-scope-audit.md"
@@ -6161,10 +6440,15 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",
-      "static_reference_count": 10,
+      "static_reference_count": 15,
       "static_references": [
         "scripts/tool_registry.py",
+        ".github/workflows/commentary-anchor-parity.yml",
         ".github/workflows/commentary-editorial-section-scope.yml",
+        ".github/workflows/commentary-mhc-private-jsword.yml",
+        ".github/workflows/commentary-mhc-private-xiphos.yml",
+        ".github/workflows/commentary-mhc-source-text.yml",
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/commentary-native-raw-corpus.yml",
         ".github/workflows/commentary-private-candidate-xiphos-gui.yml",
         ".github/workflows/commentary-private-text-compare.yml",
@@ -6340,8 +6624,9 @@
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "source/native audit",
-      "static_reference_count": 24,
+      "static_reference_count": 28,
       "static_references": [
+        "scripts/commentary_anchor_parity.py",
         "scripts/commentary_android_text_witness.py",
         "scripts/commentary_native_raw_inventory.py",
         "scripts/commentary_osis_intro_transport_probe.py",
@@ -6354,9 +6639,12 @@
         "scripts/commentary_xiphos_dual_reader.py",
         "scripts/commentary_xiphos_heading_probe.py",
         "scripts/real_second_bible_probe.py",
+        "scripts/rebuild_osis_commentary.py",
         "scripts/source_native_maintext_probe.py",
         "scripts/tool_registry.py",
         ".github/workflows/commentary-editorial-section-scope.yml",
+        ".github/workflows/commentary-mhc-source-text.yml",
+        ".github/workflows/commentary-mhc-technical-rebuild.yml",
         ".github/workflows/commentary-zcom-andbible-android.yml",
         ".github/workflows/second-bible-proof.yml",
         ".github/workflows/validate.yml",

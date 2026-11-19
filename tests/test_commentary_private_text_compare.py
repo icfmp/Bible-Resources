@@ -14,6 +14,152 @@ from pilot_preflight import PilotError
 
 
 class CommentaryOriginalStockTextTests(unittest.TestCase):
+    def test_real_compiled_reference_markup_exclusion_is_independent_of_text(self):
+        from commentary_private_text_compare import private_actual_native_reference_word_positions
+        from commentary_nonlink_words import compare_words_outside_links
+        raw=b"<p>Alpha <reference osisRef='Gen.2.1'>quoted citation</reference> omega.</p>"
+        visible=raw_as_strict_xml_text(raw)
+        self.assertEqual(visible,"Alpha quoted citation omega.")
+        positions=private_actual_native_reference_word_positions(raw,visible)
+        self.assertEqual(positions,[1,2])
+        checked=compare_words_outside_links(
+            ["Alpha","quoted","citation","omega"],
+            ["Alpha","quoted","citation","omega"],
+            [1,2],positions)
+        self.assertEqual(checked["outside_link_word_relation"],
+                         "same_ordered_case_sensitive_unicode_plain_words")
+        self.assertEqual(checked["stock_reference_word_tokens_removed"],2)
+        self.assertFalse(checked["actual_original_words_or_compiled_content_exposed"])
+        self.assertNotIn('"quoted"',json.dumps(checked))
+
+    def test_compiled_reference_word_positions_block_malformed_markup_or_text_mismatch(self):
+        from commentary_private_text_compare import private_actual_native_reference_word_positions
+        with self.assertRaises(PilotError):
+            private_actual_native_reference_word_positions(
+                b"<p>Unclosed</invalid>","Unclosed")
+        with self.assertRaises(PilotError):
+            private_actual_native_reference_word_positions(
+                b"<p>Original native</p>","Other")
+
+    def test_large_ordered_source_witness_never_claims_exact_content_parity(self):
+        from commentary_private_text_compare import select_authorial_word_loss_attention
+        def case(value):
+            return {"exact_plain_word_alignment": {
+                "original_plain_words_not_matched_in_exact_order": None,
+                "linear_exact_source_subsequence_in_stock": value}}
+        selected,receipt=select_authorial_word_loss_attention(
+            [case(True),case(False),case(None)])
+        self.assertEqual(selected,[])
+        self.assertEqual(receipt["classes"],{
+            "original_alignment_budget_not_resolved":1,
+            "over_budget_all_source_words_in_stock_order":1,
+            "over_budget_source_order_not_proven":1})
+        self.assertTrue(receipt["source_punctuation_and_markup_parity_not_proven"])
+        with self.assertRaises(PilotError):
+            select_authorial_word_loss_attention([case("unsafe")])
+
+    def test_stock_extra_words_around_source_do_not_invoke_suffix_only_prefix_probe(self):
+        original, proof = _original_source_markers(self.source())
+        observed = compare_private_texts(original, {
+            "Gen.1.1": b"<p>Extra opening words. Exact private text; punctuation? "
+                       b"Extra closing words.</p>",
+            "Gen.1.4": b"<p>Original next paragraph.</p>",
+        })
+        locations = observed["stock_containment_additional_word_position_counts"]
+        self.assertEqual(
+            locations.get("extra_stock_words_before_and_after_original_body"), 1)
+        self.assertEqual(observed["source_book_word_relationship_subtypes"],
+                         {"Gen":{"source_words_contiguous_inside_longer_stock":1}})
+        self.assertEqual(
+            observed["original_body_mid_stock_or_at_start_not_assumed_covered_by_prefix_probe"], 1)
+        self.assertEqual(
+            observed["strict_original_body_at_stock_suffix_prefix_topology_cases"], 0)
+        self.assertEqual(
+            observed["source_neighbor_compared_to_stock_prefix_entry_count"], 0)
+        self.assertFalse(observed["all_selected_verse_range_body_text_exact_matches"])
+
+    def test_empty_authorial_div_remains_in_original_marker_census(self):
+        xml = self.source().replace(
+            b"<div><p>Original next paragraph.</p></div>",
+            b"<div><p>  </p></div>")
+        with self.assertRaisesRegex(PilotError, "Empty original source"):
+            _original_source_markers(xml)
+        source, proof = _original_source_markers(xml, on_no_visible_text="record")
+        self.assertEqual(proof["original_verse_or_range_body_count"], 2)
+        self.assertEqual(proof["original_verse_or_range_body_with_visible_text_count"], 1)
+        self.assertEqual(proof["original_sections_without_visible_text_count"], 1)
+        self.assertEqual(sum(map(len, source.values())), 1)
+        self.assertFalse(proof["original_sections_without_visible_text_examples_truncated"])
+        self.assertTrue(proof["original_reference_and_adjacent_divisions_not_modified"])
+        self.assertEqual(
+            proof["bounded_original_sections_without_visible_text_line_sha_structure"][0]
+            ["original_adjacent_div_child_tag_counts"], {"p": 1})
+        self.assertNotIn("Original next paragraph.", json.dumps(proof))
+
+    def test_only_source_words_not_found_are_routed_to_loss_identity_gate(self):
+        from commentary_private_text_compare import select_authorial_word_loss_attention
+        candidate = lambda missing: {
+            "exact_plain_word_alignment": {
+                "original_plain_words_not_matched_in_exact_order": missing}}
+        selected, proof = select_authorial_word_loss_attention(
+            [candidate(0), candidate(3), candidate(None)])
+        self.assertEqual(len(selected), 1)
+        self.assertEqual(
+            selected[0]["exact_plain_word_alignment"][
+                "original_plain_words_not_matched_in_exact_order"], 3)
+        self.assertEqual(proof["bounded_original_lexical_attention_cases_checked"], 3)
+        self.assertEqual(sum(proof["classes"].values()), 3)
+        self.assertTrue(proof["all_original_lexical_cases_remain_in_main_text_diagnostic"])
+        self.assertFalse(proof["source_punctuation_and_markup_parity_not_proven"] is False)
+        with self.assertRaises(PilotError):
+            select_authorial_word_loss_attention([candidate(-1)])
+
+    def test_all_unreviewed_chapter_siblings_produce_explicit_not_tested_receipts(self):
+        from commentary_private_text_compare import unreviewed_original_chapter_sibling_receipts
+        proof = {"explicit_chapter_source_marker_count": 2,
+                 "original_chapter_siblings_reviewed_count": 0,
+                 "original_chapter_siblings_not_reviewed_count": 2}
+        receipts = unreviewed_original_chapter_sibling_receipts(proof)
+        self.assertEqual(len(receipts), 4)
+        self.assertEqual(receipts[0]["original_chapter_source_siblings_compared"], 0)
+        for row in receipts:
+            self.assertFalse(row["authorial_chapter_structure_or_native_introduction_parity"])
+            self.assertTrue(row[
+                "unreviewed_source_sibling_must_not_be_called_missing_content"])
+        with self.assertRaises(PilotError):
+            unreviewed_original_chapter_sibling_receipts({
+                **proof, "original_chapter_siblings_reviewed_count": 1})
+
+    def test_select_six_volume_source_requires_explicit_original_volume(self):
+        from commentary_private_text_compare import select_pinned_source_volume
+        source = {"commentary_source": {"xml_witness_volumes": [
+            {"number": 1, "url": "https://www.ccel.org/ccel/h/henry/mhc1.xml",
+             "sha256": "a"*64},
+            {"number": 2, "url": "https://www.ccel.org/ccel/h/henry/mhc2.xml",
+             "sha256": "b"*64},
+        ]}}
+        with self.assertRaises(PilotError):
+            select_pinned_source_volume(source)
+        self.assertEqual(
+            select_pinned_source_volume(source, 2),
+            (2, "https://www.ccel.org/ccel/h/henry/mhc2.xml", "b"*64, True, 2))
+        with self.assertRaises(PilotError):
+            select_pinned_source_volume(source, 3)
+        with self.assertRaises(PilotError):
+            select_pinned_source_volume(source, 0)
+
+    def test_select_single_source_keeps_existing_legacy_call(self):
+        from commentary_private_text_compare import select_pinned_source_volume
+        source = {"commentary_source": {
+            "xml_witness_url": "https://www.ccel.org/ccel/h/henry/mhcc.xml",
+            "xml_witness_sha256": "d"*64,
+        }}
+        self.assertEqual(
+            select_pinned_source_volume(source),
+            (1, "https://www.ccel.org/ccel/h/henry/mhcc.xml", "d"*64, False, 1))
+        with self.assertRaises(PilotError):
+            select_pinned_source_volume(source, 2)
+
     def source(self):
         return (
             b'<?xml version="1.0" encoding="UTF-8"?>'
@@ -25,6 +171,41 @@ class CommentaryOriginalStockTextTests(unittest.TestCase):
             b"<scripCom osisRef='Bible:Gen.1'/>"
             b"<h2>Chapter heading not a verse unit.</h2>"
             b"</div2></div1></ThML.body></ThML>" + b" " * 1100)
+
+    def test_original_all_p_word_sha_fingerprints_preserve_source_order_without_prose_leak(self):
+        from hashlib import sha256
+        original,_=_original_source_markers(self.source())
+        parts=original["Gen.1.1"][0][
+            "private_original_p_visible_word_digest_inventory"]
+        self.assertEqual(len(parts),1)
+        self.assertEqual(parts[0]["original_p_document_ordinal"],1)
+        self.assertEqual(parts[0]["original_p_visible_word_tokens"],4)
+        self.assertEqual(parts[0]["original_p_visible_ordered_word_sha256"],
+                         sha256(b"Exact private text punctuation").hexdigest())
+        other=original["Gen.1.4"][0][
+            "private_original_p_visible_word_digest_inventory"]
+        self.assertEqual(len(other),1)
+        self.assertEqual(other[0]["original_p_visible_word_tokens"],3)
+        self.assertEqual(other[0]["original_p_visible_ordered_word_sha256"],
+                         sha256(b"Original next paragraph").hexdigest())
+        self.assertNotIn("Exact private text",json.dumps(parts))
+        self.assertNotIn("Original next paragraph",json.dumps(other))
+
+    def test_original_p_sha_keeps_real_inline_reference_label_words(self):
+        from hashlib import sha256
+        xml=self.source().replace(
+            b"<div><p>Exact private text, punctuation!</p></div>",
+            b"<div><p>Opening <scripRef osisRef='Bible:Gen.2.1'>verse label</scripRef> "
+            b"closing prose.</p><p>Second genuine source section.</p></div>")
+        original,_=_original_source_markers(xml)
+        item=original["Gen.1.1"][0]
+        p=item["private_original_p_visible_word_digest_inventory"]
+        self.assertEqual(len(p),2)
+        self.assertEqual([r["original_p_visible_word_tokens"] for r in p],[5,4])
+        self.assertEqual(p[0]["original_p_visible_ordered_word_sha256"],
+                         sha256(b"Opening verse label closing prose").hexdigest())
+        self.assertEqual(item["private_original_scripRef_word_indices"],[1,2])
+        self.assertNotIn("verse label",json.dumps(p))
 
     def test_exact_and_changed_punctuation_are_distinct_and_private(self):
         units,proof=_original_source_markers(self.source())

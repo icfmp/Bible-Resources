@@ -1,0 +1,2281 @@
+# Reconciled with main; perform complete private source/SWORD final-ID validation before merge.
+name: Rebuild MHC from pinned original OSIS (private technical phase 1)
+
+on:
+  pull_request:
+    # Explicit GUI marker in the PR description is evaluated on synchronize
+    # as well as edited events. On GitHub, PR "edited" often does not satisfy
+    # a paths-filtered workflow and must never silently skip the GUI. Remove
+    # the marker from the PR after the one-off GUI run.
+    types: [opened, synchronize, reopened, edited]
+    paths:
+      - "scripts/rebuild_osis_commentary.py"
+      - "scripts/audit_osis.py"
+      - "tests/test_editorial_pipeline.py"
+      - "tests/test_rebuild_osis_commentary.py"
+      - "scripts/clean_source_osis.py"
+      - "scripts/repair_commentary_osis_milestones.py"
+      - "tests/test_repair_commentary_osis_milestones.py"
+      - "config/commentary-osis-repair-plans/mhc-endpoints-private-preview.json"
+      - "config/commentary-osis-repair-plans/mhc-overlap-reindex-private-experiment.json"
+      - "config/commentary-osis-repair-plans/mhc-shared-scope-review-private.json"
+      - "scripts/reclassify_osis_commentary_introduction.py"
+      - "tests/test_reclassify_osis_commentary_introduction.py"
+      - "config/commentary-osis-repair-plans/mhc-chapter-introduction-private.json"
+      - "config/commentary-osis-repair-plans/mhc-crossreferences-private-preview.json"
+      - "tests/test_clean_source_osis.py"
+      - ".github/workflows/commentary-mhc-technical-rebuild.yml"
+      - "config/commentary-intake/mhc-crosswire.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  private-stage1:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unit tests for source identity and safe OSIS reading
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements.txt -q
+          PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_rebuild_osis_commentary.py' -v
+          PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_clean_source_osis.py' -v
+          PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_repair_commentary_osis_milestones.py' -v
+          PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_commentary_shared_key_retrieval.py' -v
+          PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_reclassify_osis_commentary_introduction.py' -v
+          PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_commentary_xiphos_dual_reader.py' -v
+          PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_commentary_xiphos_heading_probe.py' -v
+          PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_private_sword_bundle.py' -v
+          PYTHONPATH=scripts python -m unittest discover -s tests -p 'test_promote_sword_preview.py' -v
+      - name: Install stock libSWORD compiler and native reader headers
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 90s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 update -qq
+          timeout 240s sudo apt-get -o Acquire::Retries=0 \
+            -o Acquire::http::Timeout=12 -o Acquire::https::Timeout=12 \
+            install -y --no-install-recommends libsword-dev libsword-utils diatheke
+          g++ -std=c++17 -O2 -I/usr/include/sword \
+            scripts/sword_native_commentary_raw_corpus.cpp \
+            -o "$RUNNER_TEMP/commentary-native-raw" -lsword
+      - name: Download and verify exact official original authoring OSIS (never execute upstream scripts)
+        shell: bash
+        run: |
+          set -euo pipefail
+          export GIT_TERMINAL_PROMPT=0 GIT_LFS_SKIP_SMUDGE=1
+          timeout 240s git -c core.hooksPath=/dev/null clone \
+            --depth 1 --branch main --single-branch --no-tags \
+            https://gitlab.com/crosswire-bible-society/mhc.git \
+            "$RUNNER_TEMP/original-mhc" >/dev/null 2>&1
+          python - <<'PY'
+          from hashlib import sha256
+          import json, os, subprocess
+          from pathlib import Path
+          original=Path(os.environ["RUNNER_TEMP"])/"original-mhc"
+          manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
+          pin=manifest["commentary_source"]["original_authoring_osis"]
+          assert manifest["language"]=="en" and manifest["module_id"]=="MHC"
+          commit=subprocess.check_output(["git","-C",str(original),"rev-parse","HEAD"],text=True).strip()
+          if commit!=pin["observed_upstream_commit_sha"]:
+              raise SystemExit("Original authoring source Git commit changed; abort")
+          source=original/pin["authoring_osis_file"]
+          if (source.is_symlink() or source.stat().st_size!=pin["authoring_osis_bytes"]
+                  or sha256(source.read_bytes()).hexdigest()!=pin["authoring_osis_sha256"]):
+              raise SystemExit("MHC original OSIS size/SHA mismatch; abort")
+          print("Verified pinned official OSIS commit, exact bytes and checksum")
+          PY
+      - name: Inspect actual original 2 Chronicles introduction structure (metadata only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from lxml import etree
+          from hashlib import sha256
+          src=Path(os.environ["RUNNER_TEMP"])/"original-mhc"/"mhc.osis.xml"
+          parser=etree.XMLParser(resolve_entities=False,no_network=True,load_dtd=False,
+                                 remove_blank_text=False,huge_tree=False)
+          root=etree.parse(str(src),parser)
+          ns={"o":"http://www.bibletechnologies.net/2003/OSIS/namespace"}
+          def local(node):return etree.QName(node).localname
+          def hint(node):
+              keys=("type","subType","annotateType","annotateRef","sID",
+                    "eID","osisID","n","canonical")
+              return {"tag":local(node),"attrs":{k:node.get(k)
+                      for k in keys if node.get(k) is not None},
+                      "line":node.sourceline}
+          begin=root.xpath("//o:verse[@sID='2Chr.1.1']",namespaces=ns)
+          end=root.xpath("//o:verse[@eID='2Chr.1.1']",namespaces=ns)
+          if len(begin)!=1 or len(end)!=1:
+              raise SystemExit("Unattested 2Chr 1 source introduction milestone pair")
+          opener=begin[0];closer=end[0]
+          def context(node):
+              parent=node.getparent()
+              siblings=list(parent) if parent is not None else [node]
+              index=siblings.index(node)
+              return {
+                  "element":hint(node),
+                  "parents":[hint(n) for n in list(node.iterancestors())[:6]],
+                  "preceding_siblings":[hint(n) for n in siblings[max(0,index-3):index]],
+                  "following_siblings":[hint(n) for n in siblings[index+1:index+4]],
+              }
+          print("Original 2Chr chapter introduction markup (no prose):",
+                {"opening":context(opener),"closing":context(closer),
+                 "same_xml_parent":opener.getparent() is closer.getparent(),
+                 "original_introduction_element_count":len(
+                    root.xpath("//o:div[@type='introduction']",namespaces=ns))})
+          # Different XML parents are valid for OSIS verse milestones.
+          # Do not assume that source verses are container elements.
+          second=root.xpath("//o:verse[@sID='2Chr.1.1-12']",namespaces=ns)
+          second_end=root.xpath("//o:verse[@eID='2Chr.1.1-12']",namespaces=ns)
+          if len(second)!=1 or len(second_end)!=1:
+              raise SystemExit("Unattested following section of 2Chr 1")
+          intro=next((node for node in closer.iterancestors()
+                      if local(node)=="div"
+                      and node.get("type")=="introduction"),None)
+          if intro is None:
+              raise SystemExit("Original intro div missing")
+          contained=list(intro.iter())
+          print("Original 2Chr introduction division versus following authored section:",
+                {"intro_div":hint(intro),
+                 "intro_parent":hint(intro.getparent()),
+                 "intro_direct_child_tags":[hint(n) for n in list(intro)[:8]],
+                 "intro_last_direct_children":[hint(n) for n in list(intro)[-5:]],
+                 "intro_contained_section_start_markers":
+                    [hint(n) for n in contained if local(n)=="verse"
+                     and n.get("sID")][:10],
+                 "intro_contained_section_end_markers":
+                    [hint(n) for n in contained if local(n)=="verse"
+                     and n.get("eID")][:10],
+                 "second_start":context(second[0]),
+                 "second_end":context(second_end[0]),
+                 "intro_contains_second_start":second[0] in contained,
+                 "intro_contains_second_end":second_end[0] in contained})
+          # Only structural metadata, no paragraphs or authorial prose.
+          PY
+      - name: Audit and clean original OSIS cosmetic artifacts in isolated storage
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          export ORIGINAL="$RUNNER_TEMP/original-mhc/mhc.osis.xml"
+          export CLEANED="$RUNNER_TEMP/mhc-cleaned.osis.xml"
+          export RECEIPT="$RUNNER_TEMP/mhc-cleanup-receipt.json"
+          python - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
+          source_sha=manifest["commentary_source"]["original_authoring_osis"]["authoring_osis_sha256"]
+          args=[sys.executable,"scripts/clean_source_osis.py",
+                "--source",os.environ["ORIGINAL"],"--sha256",source_sha,
+                "--private-output",os.environ["CLEANED"]]
+          with Path(os.environ["RECEIPT"]).open("xb") as result:
+              subprocess.run(args,stdout=result,check=True,timeout=140)
+          receipt=json.loads(Path(os.environ["RECEIPT"]).read_text())
+          if (receipt["status"]!="PRIVATE_OSIS_COSMETIC_CANDIDATE_NOT_EDITORIALLY_APPROVED"
+                  or receipt["source_sha256"]!=source_sha
+                  or not receipt["all_nonempty_osis_elements_and_attributes_preserved"]
+                  or not receipt["only_verified_inert_display_elements_removed"]
+                  or not receipt["all_source_nonspace_text_preserved"]
+                  or not receipt["original_byte_regions_preserved_except_empty_hi"]
+                  or not receipt["all_note_and_reference_text_preserved"]
+                  or not receipt["asterisks_and_potential_note_markers_unmodified"]
+                  or receipt["published"]):
+              raise SystemExit("Unreviewed OSIS cleanup scope or failure")
+          print("Exact SHA-pinned original OSIS processed as a private cleaned candidate")
+          print("Cleaned source SHA-256:",receipt["cleaned_sha256"])
+          print("Cosmetic operations (text-free):",receipt["cleanup_changes"])
+          print("Text-preservation SHA-256 before/after:",
+                receipt["original_nonspace_text_sha256"],
+                receipt["cleaned_nonspace_text_sha256"])
+          print("Original typographical/spacing candidate census (counts only):",
+                receipt["original_suspicious_token_census"])
+          print("Original text ownership by XML tag (characters only):",
+                receipt["text_character_counts_by_xml_owner"])
+          profile=receipt["original_markup_profile"]
+          print("Emphasis style labels/counts:",profile["hi_emphasis_type_counts"])
+          print("Emphasis text-length bands:",profile["hi_visible_length_band_counts"])
+          print("Truly empty emphasis elements:",profile["truly_empty_hi_leaf_shape_counts"])
+          print("Emphasis immediate XML owners:",profile["hi_direct_parent_counts"])
+          print("NBSP source XML owners:",profile["nonbreaking_spaces_by_xml_owner"])
+          print("Only inert empty hi styling may be removed; all other elements, attributes and note/link bodies retained")
+          PY
+      - name: Run existing commentary OSIS structural audit, report only metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          timeout 180s python scripts/audit_osis.py \
+            "$RUNNER_TEMP/mhc-cleaned.osis.xml" --kind commentary \
+            --report "$RUNNER_TEMP/mhc-structural-private.json" >/dev/null
+          python - <<'PY'
+          from collections import Counter
+          import json, os
+          from pathlib import Path
+          path=Path(os.environ["RUNNER_TEMP"])/"mhc-structural-private.json"
+          report=json.loads(path.read_text())
+          if report.get("status")!="audited_not_normalized" or not report.get("no_content_changes"):
+              raise SystemExit("Structural source audit failed")
+          summary=report["summary"]
+          print("Private MHC OSIS audit structural finding counts:",summary["finding_counts"])
+          print("Private MHC OSIS audit source paragraphs:",summary["paragraphs"])
+          print("Actual source annotated commentary sections:",
+                summary["commentary_annotated_section_count"])
+          print("Full annotation range/section grammar census:",
+                summary["commentary_annotation_scope_shapes"])
+          print("Structural range/order/book diagnostics:",
+                summary["commentary_annotation_structural_counts"])
+          print("Bounded annotated source section cases (no prose):",
+                summary["commentary_nonstandard_scope_examples"][:30])
+          # Exact source text, titles, note bodies and references stay private.
+          findings=report["findings"]
+          print("First structural finding positions (code and XML line only):",
+                [{"code":row["code"],"line":row["original_xml_line"]}
+                 for row in findings[:20]])
+          from collections import Counter
+          from hashlib import sha256
+          import re
+          references=[row for row in findings if row["code"]=="unreviewed_cross_reference"]
+          def classify_target(value):
+              if not value:
+                  return "empty"
+              if ";" in value or "," in value:
+                  return "punctuation_separated"
+              if any(x in value for x in ("–","—","‑")):
+                  return "unicode_dash"
+              if "@" in value or "!" in value:
+                  return "extended_subreference"
+              if ":" in value and not value.startswith("Bible:"):
+                  return "other_work_prefix"
+              if re.search(r"\\.\\d+[A-Za-z]+(?:$|\\s)",value):
+                  return "letter_suffixed_endpoint"
+              if re.search(r"-\\d+(?:$|\\s)",value):
+                  return "abbreviated_range"
+              if re.search(r"\\s",value.strip()):
+                  return "compound_or_whitespace"
+              return "other_unreviewed_osis_syntax"
+          categories=Counter(classify_target(row.get("details",{}).get("osis_ref",""))
+                             for row in references)
+          print("Unreviewed source link-target grammar categories:",
+                dict(sorted(categories.items())))
+          def safe_shape(value):
+              return re.sub(r"9+","9",re.sub(r"A+","A",
+                  "".join("A" if x.isalpha() else "9" if x.isdigit()
+                          else x for x in value)))[:100]
+          print("Unreviewed source link-target locators (line/category/shape/SHA):",
+                [{"line":row["original_xml_line"],
+                  "category":classify_target(row.get("details",{}).get("osis_ref","")),
+                  "shape":safe_shape(row.get("details",{}).get("osis_ref","")),
+                  "sha256":sha256(row.get("details",{}).get("osis_ref","").encode("utf-8")).hexdigest()}
+                 for row in references])
+          # Only short, machine-readable Bible reference IDs are eligible for
+          # diagnostic disclosure. Never expose arbitrary commentary prose.
+          from lxml import etree
+          xml=etree.parse(str(Path(os.environ["RUNNER_TEMP"])/"mhc-cleaned.osis.xml"),
+                          parser=etree.XMLParser(resolve_entities=False,
+                                                 load_dtd=False,no_network=True,
+                                                 recover=False,huge_tree=True))
+          suspicious_lines={row["original_xml_line"] for row in references}
+          expected_sha={
+              row["original_xml_line"]:
+              sha256(row.get("details",{}).get("osis_ref","").encode()).hexdigest()
+              for row in references
+          }
+          detailed=[]
+          for element in xml.iter():
+              if not isinstance(element.tag,str) or not element.tag.endswith("}reference"):
+                  continue
+              if element.sourceline not in suspicious_lines:
+                  continue
+              value=element.get("osisRef","")
+              if sha256(value.encode()).hexdigest()!=expected_sha[element.sourceline]:
+                  # One XML line can contain several different reference tags.
+                  # The audit finding applies to the *specific* hashed target.
+                  continue
+              scope=next((x.get("annotateRef") for x in element.iterancestors()
+                          if x.get("annotateType")=="commentary"),None)
+              book=next((x.get("osisID") for x in element.iterancestors()
+                         if x.get("type")=="book" and x.get("osisID")),None)
+              label="".join(element.itertext()).strip()
+              # No free-form source language is emitted, just grammar class.
+              numeric_label=bool(re.fullmatch(r"\d{1,3}(?:[.:]\d{1,3})?"
+                                               r"(?:[-–]\d{1,3})?",label))
+              literal_target=value if (
+                  len(value)<=120 and
+                  re.fullmatch(r"[A-Za-z0-9_.: \-]{1,120}",value)
+              ) else None
+              detailed.append({
+                  "line":element.sourceline,
+                  "type":element.get("type"),
+                  "source_host":scope,
+                  "source_book":book,
+                  "reference_is_just_numeric_label":numeric_label,
+                  "machine_reference":literal_target,
+                  # Reveal only short Bible-citation labels, never commentary
+                  # paragraphs or source edition prose.
+                  "citation_label_if_short_and_machine_like":(
+                      label if len(label)<=75 and len(label.split())<=6
+                      and any(x.isdigit() for x in label)
+                      and re.fullmatch(r"[A-Za-z0-9 .,:;()\-/]{1,75}",label)
+                      else None),
+                  "visible_label_sha256":sha256(label.encode()).hexdigest(),
+                  "visible_label_characters":len(label),
+              })
+          if len(detailed)!=len(references):
+              raise SystemExit("Source target line/key correspondence incomplete")
+          print("Unreviewed machine references and source scopes (no commentary prose):",
+                detailed)
+          # Only the eight unresolved original machine citations. Record
+          # exact matching citation-only labels and their chapter/verse host
+          # (never commentary exposition), for independent editorial triage.
+          unresolved_original_lines={3108,37835,41584,47698,
+                                     50772,58059,76239,81529}
+          unresolved_old_targets={
+              3108:"21.13",37835:"10.1-4",41584:"4.4",47698:"5.7",
+              50772:"Pr.11.14 15.22 18.13 19.2 20.5 18 21.29 22.3 25.8-10",
+              58059:"Ps 60.1 2Sa 8.13 14",
+              76239:"1Ti.4.1 2Ti 3.1 2 3.3",
+              81529:"Lu.24.6 7-44 Mk 16.7",
+          }
+          host_chapter=None
+          host_group=None
+          still_unresolved=[]
+          for element in xml.iter():
+              if not isinstance(element.tag,str):
+                  continue
+              local=element.tag.rsplit("}",1)[-1]
+              if local=="chapter" and element.get("osisID"):
+                  host_chapter=element.get("osisID")
+                  host_group=None
+              if local=="verse" and element.get("osisID"):
+                  host_group=element.get("osisID")
+              if local=="verse" and element.get("eID"):
+                  host_group=None
+              if local!="reference" or element.sourceline not in unresolved_original_lines:
+                  continue
+              old=unresolved_old_targets[element.sourceline]
+              if element.get("osisRef")!=old:
+                  continue
+              label="".join(element.itertext()).strip()
+              # Citation-only, punctuation+numbers with optional roman numerals.
+              if (not 1<=len(label)<=160 or len(label.split())>48
+                      or not re.fullmatch(r"[-A-Za-z0-9 .,:;()/–]+",label)):
+                  raise SystemExit("Unresolved citation label requires private-only inspection")
+              still_unresolved.append({
+                  "source_line":element.sourceline,
+                  "source_chapter":host_chapter,
+                  "active_source_verse_group":host_group,
+                  "original_machine_reference":old,
+                  "original_visible_citation":label,
+                  "visible_label_sha256":sha256(label.encode()).hexdigest(),
+              })
+          if (len(still_unresolved)!=len(unresolved_original_lines)
+                  or {x["source_line"] for x in still_unresolved}!=unresolved_original_lines):
+              raise SystemExit("Eight source-bound unresolved reference anchors not unique")
+          print("Eight unresolved citation-only source identities:",still_unresolved)
+          # Source here is a Bible-structured OSIS commentary (verse/chapter
+          # elements), NOT annotateRef sections. Inspect the actual index data.
+          import collections
+          attributes=collections.Counter()
+          element_shapes=collections.Counter()
+          examples={"verse":[],"chapter":[],"milestone":[],"div":[]}
+          for el in xml.iter():
+              if not isinstance(el.tag,str):
+                  continue
+              local=el.tag.rsplit("}",1)[-1]
+              if local not in examples:
+                  continue
+              current={k:v for k,v in el.attrib.items()
+                       if k in {"osisID","sID","eID","n","type","subType"}}
+              for name,value in current.items():
+                  attributes[(local,name)]+=1
+                  if name in {"osisID","sID","eID","n"}:
+                      element_shapes[(local,name,
+                                      "comma" if "," in value else
+                                      "whitespace" if len(value.split())>1 else
+                                      "range" if "-" in value else "atomic")]+=1
+              if len(examples[local])<8:
+                  examples[local].append({"line":el.sourceline, "attrs":current})
+          print("Original MHC actual source reference-attribute census:",
+                dict(sorted((str(k),v) for k,v in attributes.items())))
+          print("Original MHC verse/chapter reference syntax counts:",
+                dict(sorted((str(k),v) for k,v in element_shapes.items())))
+          print("Actual OSIS source marker samples (machine attributes only):",
+                examples)
+          # Three independently attested source-range endpoint repair candidates.
+          # Show only machine IDs, exact source line and markers; no MHC prose.
+          attention={"Acts.26.33","Isa.7.26","Prov.31.32"}
+          matching=[]
+          close_ids=collections.Counter(
+              n.get("eID") for n in xml.iter()
+              if isinstance(n.tag,str) and n.tag.endswith("}verse") and n.get("eID"))
+          for n in xml.iter():
+              if (not isinstance(n.tag,str)
+                      or not n.tag.endswith("}verse")
+                      or not n.get("osisID")):
+                  continue
+              ids=n.get("osisID").split()
+              if attention.isdisjoint(ids):
+                  continue
+              matching.append({
+                  "line":n.sourceline,
+                  "original_sid":n.get("sID"),
+                  "original_display_n":n.get("n"),
+                  "original_first_osisID":ids[0],
+                  "original_last_osisID":ids[-1],
+                  "original_assigned_osisID_count":len(ids),
+                  "matching_eID_count":close_ids[n.get("sID")],
+              })
+          if len(matching)!=3:
+              raise SystemExit("Pinned OSIS three known out-of-range groups not located")
+          print("Three source range endpoint candidates (machine attributes only):",
+                matching)
+          print("No editorial changes or historical text correction performed")
+          PY
+      - name: Compile fresh private zCom4, then independently read EVERY occupied key
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          export SWORD_PATH="$RUNNER_TEMP/mhc-stage1-private"
+          python - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
+          source=manifest["commentary_source"]["original_authoring_osis"]
+          root=Path(os.environ["RUNNER_TEMP"])
+          cleanup=json.loads((root/"mhc-cleanup-receipt.json").read_text())
+          cmd=[sys.executable, "scripts/rebuild_osis_commentary.py",
+               "--source",str(root/"mhc-cleaned.osis.xml"),
+               "--sha256",cleanup["cleaned_sha256"],
+               "--private-work",os.environ["SWORD_PATH"],
+               "--module","MHCStage1",
+               "--language",manifest["language"],
+               "--versification",manifest["commentary_source"]["observed_compiled_versification"],
+               "--native-reader",str(root/"commentary-native-raw"),
+               "--min-numbered","20000"]
+          with (root/"rebuild-mhc-stage1-report.json").open("xb") as report:
+              result=subprocess.run(cmd, stdout=report, stderr=subprocess.DEVNULL,
+                                    check=False, timeout=650)
+          if result.returncode:
+              raise SystemExit("Technical rebuild FAILED; no module uploaded or published")
+          data=json.loads((root/"rebuild-mhc-stage1-report.json").read_text())
+          if (data["status"]!="COMPILED_AND_FULL_NATIVE_INDEX_READBACK_ONLY"
+                  or data["editorial_text_changes_performed"] is not False
+                  or data["publication_or_release_performed"] is not False):
+              raise SystemExit("Unreviewed technical reconstruction receipt")
+          print("Private MHC stage 1 compiled with zCom4 and fully enumerated")
+          print("Native numbered entries:",data["native_occupied_numbered_keys"])
+          print("Native introduction entries:",data["native_occupied_introduction_keys"])
+          print("Native TOP entries:",data["native_occupied_opaque_top_keys"])
+          if (data["native_occupied_numbered_keys"]!=31098
+                  or data["native_occupied_introduction_keys"]!=1255
+                  or data["native_occupied_opaque_top_keys"]!=2):
+              raise SystemExit("Cleaned rebuild changed original native key coverage")
+          print("Index key counts exactly match pinned original MHC")
+          print("No historical source collations or editorial corrections performed")
+          print("Full source-to-output textual parity is NOT yet certified")
+          PY
+          if ! timeout 45s diatheke -b MHCStage1 -k "Gen 1:1" >/dev/null 2>&1; then
+            echo "Native CLI invocation failed; no technical acceptance"
+            exit 1
+          fi
+          echo "Private CLI invocation completed"
+      - name: Compare full clean candidate against pristine independent SWORD rebuild
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          python - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          from lxml import etree
+          root=Path(os.environ["RUNNER_TEMP"])
+          manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
+          pinned=manifest["commentary_source"]["original_authoring_osis"]
+          native=root/"commentary-native-raw"
+          pristine_work=root/"mhc-pristine-private"
+          original_source=root/"original-mhc"/pinned["authoring_osis_file"]
+          cmd=[sys.executable,"scripts/rebuild_osis_commentary.py",
+               "--source",str(original_source),
+               "--sha256",pinned["authoring_osis_sha256"],
+               "--private-work",str(pristine_work),
+               "--module","MHCPristine",
+               "--language",manifest["language"],
+               "--versification",manifest["commentary_source"]["observed_compiled_versification"],
+               "--native-reader",str(native),"--min-numbered","20000"]
+          pristine_report=root/"mhc-pristine-report.json"
+          with pristine_report.open("xb") as handle:
+              subprocess.run(cmd,stdout=handle,stderr=subprocess.DEVNULL,
+                             check=True,timeout=650)
+          pristine=json.loads(pristine_report.read_text())
+          clean=json.loads((root/"rebuild-mhc-stage1-report.json").read_text())
+          counts=("native_occupied_numbered_keys",
+                  "native_occupied_introduction_keys",
+                  "native_occupied_opaque_top_keys")
+          if any(pristine[k]!=clean[k] for k in counts):
+              raise SystemExit("MHC clean rebuild differs in native index populations")
+          same_raw=(pristine["native_full_raw_corpus_sha256"]
+                    == clean["native_full_raw_corpus_sha256"])
+          print("Pristine vs cleaned full native raw corpus byte-identical:",same_raw)
+          if same_raw:
+              print("All native bodies and occupied keys exactly match original recompilation")
+              print("This is technical comparison, NOT independent historical edition collation")
+              raise SystemExit(0)
+
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from clean_source_osis import _inert_hi, _remove_empty_hi
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+
+          def read_native(work,module):
+              env=dict(os.environ,SWORD_PATH=str(work.resolve(strict=True)))
+              proc=subprocess.Popen([str(native),module],
+                                    env=env,stdout=subprocess.PIPE,
+                                    stderr=subprocess.DEVNULL)
+              raw_by_key={}
+              def receive(kind,ref,raw):
+                  raw_by_key[(kind,ref)]=raw
+              try:
+                  report,*_=parse_native_raw_corpus(proc.stdout,on_entry=receive)
+                  if proc.wait(timeout=30)!=0:
+                      raise ValueError("Native source reader failed")
+              finally:
+                  if proc.stdout: proc.stdout.close()
+                  if proc.poll() is None: proc.kill()
+                  proc.wait()
+              return raw_by_key,report
+
+          baseline,source_report=read_native(pristine_work,"MHCPristine")
+          cleaned,candidate_report=read_native(root/"mhc-stage1-private","MHCStage1")
+          if baseline.keys()!=cleaned.keys():
+              raise SystemExit("Pristine/cleaned native occupied key sets differ")
+          def authored_content_without_display_styles(raw):
+              parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
+                                     no_network=True,recover=False,huge_tree=False)
+              fragment=etree.fromstring(b"<fragment>"+raw+b"</fragment>",parser)
+              fulltext="".join(fragment.itertext())
+              protected=tuple(
+                  etree.tostring(node,method="c14n",with_comments=True)
+                  for node in fragment.iter()
+                  if isinstance(node.tag,str) and
+                     node.tag.rsplit("}",1)[-1] in {"note","reference"}
+              )
+              # A balanced, exact-text event stream. Only <hi> presentation
+              # containers are transparent, never note/reference boundaries.
+              # Adjacent text is coalesced across transparent hi boundaries.
+              events=[]
+              pending=[]
+              def flush():
+                  if pending:
+                      events.append(("text","".join(pending)))
+                      pending.clear()
+              def walk(node):
+                  if not isinstance(node.tag,str):
+                      flush()
+                      events.append(("other",etree.tostring(node,with_tail=False)))
+                      return
+                  local=node.tag.rsplit("}",1)[-1]
+                  display_only=local=="hi"
+                  if not display_only:
+                      flush()
+                      events.append(("open",node.tag,tuple(sorted(node.attrib.items()))))
+                  if node.text:
+                      pending.append(node.text)
+                  for child in node:
+                      walk(child)
+                      if child.tail:
+                          pending.append(child.tail)
+                  if not display_only:
+                      flush()
+                      events.append(("close",node.tag))
+              walk(fragment)
+              flush()
+              return fulltext,protected,tuple(events)
+
+          from collections import Counter
+          raw_changes=0
+          altered_visible=[]
+          visible_whitespace_only=[]
+          visible_nonwhitespace_changed=[]
+          exact_visible_length_deltas=Counter()
+          deleted_whitespace_contexts=Counter()
+          unsafe_visible_differences=[]
+          altered_notes_or_links=[]
+          altered_nonstyle_structure=[]
+          unreadable=[]
+          for key in baseline:
+              left,right=baseline[key],cleaned[key]
+              if left==right:
+                  continue
+              raw_changes+=1
+              if key[0]=="U":
+                  altered_nonstyle_structure.append(key)
+                  continue
+              try:
+                  before=authored_content_without_display_styles(left)
+                  after=authored_content_without_display_styles(right)
+                  if before[0]!=after[0]:
+                      altered_visible.append(key)
+                      old_text,new_text=before[0],after[0]
+                      exact_visible_length_deltas[len(new_text)-len(old_text)]+=1
+                      old_nonspace="".join(c for c in old_text if not c.isspace())
+                      new_nonspace="".join(c for c in new_text if not c.isspace())
+                      if old_nonspace==new_nonspace:
+                          visible_whitespace_only.append(key)
+                      else:
+                          visible_nonwhitespace_changed.append(key)
+                      # An extra importer-generated space is cosmetic ONLY
+                      # if removing it cannot join two alphanumeric words.
+                      position=0
+                      while (position<len(new_text)
+                             and old_text[position]==new_text[position]):
+                          position+=1
+                      if (len(old_text)!=len(new_text)+1
+                              or old_text[:position]+old_text[position+1:]!=new_text
+                              or not old_text[position].isspace()):
+                          deleted_whitespace_contexts["unexplained_text_delta"]+=1
+                          unsafe_visible_differences.append(key)
+                      else:
+                          left=old_text[position-1] if position else ""
+                          right=old_text[position+1] if position+1<len(old_text) else ""
+                          if left.isalnum() and right.isalnum():
+                              deleted_whitespace_contexts["word_join_risk"]+=1
+                              unsafe_visible_differences.append(key)
+                          elif left.isspace() or right.isspace():
+                              deleted_whitespace_contexts["excess_whitespace_run"]+=1
+                          elif not left or not right:
+                              deleted_whitespace_contexts["entry_boundary"]+=1
+                          else:
+                              deleted_whitespace_contexts["one_space_next_to_punctuation_or_symbol"]+=1
+                              unsafe_visible_differences.append(key)
+                  if before[1]!=after[1]:
+                      altered_notes_or_links.append(key)
+                  baseline_tags=[ev for ev in before[2] if ev[0]!="text"]
+                  candidate_tags=[ev for ev in after[2] if ev[0]!="text"]
+                  if baseline_tags!=candidate_tags:
+                      altered_nonstyle_structure.append(key)
+              except (ValueError,etree.XMLSyntaxError):
+                  unreadable.append(key)
+          print("Native entries differing in raw bytes:",raw_changes)
+          print("Native entries with changed exact visible Unicode:",len(altered_visible))
+          print("Of those, whitespace-only Unicode differences:",
+                len(visible_whitespace_only))
+          print("Of those, nonwhitespace Unicode differences:",
+                len(visible_nonwhitespace_changed))
+          print("Native visible-text length delta histogram (candidate minus original):",
+                dict(sorted(exact_visible_length_deltas.items())))
+          print("Single-space deletion context counts (no words emitted):",
+                dict(sorted(deleted_whitespace_contexts.items())))
+          print("Native entries with unsafe or unexplained text changes:",
+                len(unsafe_visible_differences))
+          print("Native entries with changed note/reference markup:",len(altered_notes_or_links))
+          print("Native entries with changed non-style XML structure/text ownership:",
+                len(altered_nonstyle_structure))
+          print("Native entries unparseable for comparison:",len(unreadable))
+          unresolved=set(unsafe_visible_differences+altered_notes_or_links+
+                         altered_nonstyle_structure+unreadable)
+          from clean_source_osis import _tree, _inert_hi
+          original_root=_tree(original_source.read_bytes())
+          source_empty_hi=[
+              {"line":node.sourceline,"type":node.get("type"),
+               "parent":node.getparent().tag.rsplit("}",1)[-1]}
+              for node in original_root.iter() if _inert_hi(node)
+          ]
+          print("Original empty-hi source locators (markup only):",source_empty_hi)
+          print("Unresolved reference/key samples without commentary text:",
+                [list(x) for x in sorted(unresolved)[:12]])
+          if unresolved:
+              raise SystemExit("Cleaned source changed native content beyond presentation styling")
+          print("FULL candidate-to-pristine parity PASS: same words, punctuation, "
+                "notes, links and non-hi XML structure; only original empty styling "
+                "and harmless importer-generated spaces differ")
+          print("No historical edition collation or public release performed")
+          PY
+      - name: Build private repaired-endpoint preview and independently re-read every key
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          python - <<'PY'
+          import json,os,subprocess,sys
+          from pathlib import Path
+          from hashlib import sha256
+          root=Path(os.environ["RUNNER_TEMP"])
+          plan=Path("config/commentary-osis-repair-plans/mhc-endpoints-private-preview.json")
+          receipt=json.loads((root/"mhc-cleanup-receipt.json").read_text())
+          input_path=root/"mhc-cleaned.osis.xml"
+          output=root/"mhc-repaired-preview.osis.xml"
+          if receipt["cleaned_sha256"]!=json.loads(plan.read_text())["source_sha256"]:
+              raise SystemExit("MHC private repair plan is not pinned to exact cleaned original")
+          command=[sys.executable,"scripts/repair_commentary_osis_milestones.py",
+                   "--source",str(input_path),"--sha256",receipt["cleaned_sha256"],
+                   "--plan",str(plan),"--private-output",str(output)]
+          receipt_path=root/"mhc-range-preview-receipt.json"
+          with receipt_path.open("xb") as out:
+              subprocess.run(command,stdout=out,stderr=subprocess.DEVNULL,
+                             check=True,timeout=120)
+          preview=json.loads(receipt_path.read_text())
+          if (preview["status"]!="PRIVATE_VERIFIED_BYTE_LOCAL_MILESTONE_PREVIEW_NOT_PUBLISHED"
+                  or preview["corrected_source_verse_groups"]!=3
+                  or preview["original_machine_attribute_values_replaced"]!=12
+                  or preview["removed_invalid_verse_assignments"]!=17
+                  or not preview["all_source_text_notes_links_and_other_markup_identical"]):
+              raise SystemExit("Private range repair candidate failed identity proof")
+          print("Private OSIS candidate exact SHA:",preview["candidate_sha256"])
+          print("Machine-only source range patches:",preview["corrected_source_verse_groups"])
+          print("Removed out-of-canon source addresses:",preview["removed_invalid_verse_assignments"])
+          manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
+          cmd=[sys.executable,"scripts/rebuild_osis_commentary.py",
+               "--source",str(output),"--sha256",preview["candidate_sha256"],
+               "--private-work",str(root/"mhc-endpoints-preview-sword"),
+               "--module","MHCEndpointPreview",
+               "--language",manifest["language"],
+               "--versification",manifest["commentary_source"]["observed_compiled_versification"],
+               "--native-reader",str(root/"commentary-native-raw"),
+               "--min-numbered","20000"]
+          with (root/"mhc-endpoints-preview-native.json").open("xb") as out:
+              subprocess.run(cmd,stdout=out,check=True,stderr=subprocess.DEVNULL,timeout=650)
+          native=json.loads((root/"mhc-endpoints-preview-native.json").read_text())
+          print("Preview native numbered keys:",native["native_occupied_numbered_keys"])
+          print("Preview native intro keys:",native["native_occupied_introduction_keys"])
+          print("Preview native opaque top:",native["native_occupied_opaque_top_keys"])
+          if (native["native_occupied_numbered_keys"]!=31098 or
+                  native["native_occupied_introduction_keys"]!=1255 or
+                  native["native_occupied_opaque_top_keys"]!=2):
+              raise SystemExit("Private repaired endpoint preview changed native index coverage")
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from audit_osis import (compare_source_milestone_index,
+                                  source_commentary_overlap_witness,
+                                  compare_source_overlap_native_bodies)
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          overlapping,related_refs=source_commentary_overlap_witness(output)
+          print("Original OSIS distinct overlapping verse-address keys:",len(overlapping))
+          print("Native keys to examine for both authored overlapping comments:",len(related_refs))
+          raw_reader=root/"commentary-native-raw"
+          env=dict(os.environ,SWORD_PATH=str(root/"mhc-endpoints-preview-sword"))
+          process=subprocess.Popen([str(raw_reader),"MHCEndpointPreview"],
+                                   env=env,stdout=subprocess.PIPE,
+                                   stderr=subprocess.DEVNULL)
+          bodies={}
+          related_raw={}
+          def get_body(kind,key,raw):
+              if kind=="K":
+                  bodies[key]=sha256(raw).hexdigest()
+                  if key in related_refs:
+                      related_raw[key]=raw
+          try:
+              _full,keys,intros,_tops=parse_native_raw_corpus(
+                  process.stdout,on_entry=get_body)
+              if process.wait(timeout=30):
+                  raise SystemExit("Private preview native raw readback failed")
+          finally:
+              if process.stdout:process.stdout.close()
+              if process.poll() is None:process.kill()
+              process.wait()
+          audit=compare_source_milestone_index(
+              output,numbered_keys=keys,intro_keys=intros,
+              body_sha_by_verse=bodies)
+          print("Endpoint-only preview full source-native geometry status:",audit["status"])
+          print("Endpoint-only preview integrity categories:",audit["anomaly_counts"])
+          print("Remaining groups needing separate ownership research:",
+                audit["structure_counts"]["same_verse_assigned_more_than_once"])
+          if overlapping:
+              report=compare_source_overlap_native_bodies(overlapping,related_raw)
+              print("Authored source overlap text preservation classes:",
+                    report["classification_counts"])
+              print("Bounded source group/body ownership results (no text):",
+                    report["bounded_source_group_cases"])
+              print("Overlap word presence is a diagnostic, NOT final notes/markup fidelity")
+          if audit["structure_counts"]["missing_source_verses_in_native"] or (
+                  not audit["all_source_verse_ids_match_occupied_native_keys"] or
+                  not audit["all_source_book_chapter_ids_match_occupied_native_intros"]):
+              raise SystemExit("Out-of-range source addresses were not corrected in preview")
+          if audit["status"]=="SOURCE_NATIVE_INDEX_AND_MILESTONE_GEOMETRY_MATCH":
+              print("Preview source-native structural integrity complete")
+          else:
+              print("Source/native overlap remains a SEPARATE research-only blocker; NO release")
+          PY
+      - name: Research-only trial of six overlapping commentary machine ranges
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          python - <<'PY'
+          import json,os,subprocess,sys
+          from hashlib import sha256
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])
+          source=root/"mhc-repaired-preview.osis.xml"
+          plan=Path("config/commentary-osis-repair-plans/mhc-overlap-reindex-private-experiment.json")
+          original_receipt=json.loads((root/"mhc-range-preview-receipt.json").read_text())
+          planned=json.loads(plan.read_text())
+          if planned["source_sha256"]!=original_receipt["candidate_sha256"]:
+              raise SystemExit("Overlap repair research plan is not SHA-pinned to first preview")
+          preview=root/"mhc-overlap-experimental.osis.xml"
+          cmd=[sys.executable,"scripts/repair_commentary_osis_milestones.py",
+               "--source",str(source),"--sha256",planned["source_sha256"],
+               "--plan",str(plan),"--private-output",str(preview)]
+          with (root/"mhc-overlap-patch-receipt.json").open("xb") as out:
+              subprocess.run(cmd,stdout=out,stderr=subprocess.DEVNULL,
+                             check=True,timeout=150)
+          receipt=json.loads((root/"mhc-overlap-patch-receipt.json").read_text())
+          if (receipt["corrected_source_verse_groups"]!=6 or
+                  receipt["original_machine_attribute_values_replaced"]!=24 or
+                  receipt["removed_invalid_verse_assignments"]!=6 or
+                  not receipt["all_source_text_notes_links_and_other_markup_identical"]):
+              raise SystemExit("Six-group research-only scope repair corrupted original witness")
+          print("Experimental overlap repair source SHA:",receipt["candidate_sha256"])
+          print("Edited original machine attribute values:",receipt["original_machine_attribute_values_replaced"])
+          print("Authored content changes: NONE (original text, notes, links unchanged)")
+          manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
+          work=root/"mhc-overlap-experiment-sword"
+          compile_cmd=[sys.executable,"scripts/rebuild_osis_commentary.py",
+               "--source",str(preview),"--sha256",receipt["candidate_sha256"],
+               "--private-work",str(work),"--module","MHCOverlapPreview",
+               "--language",manifest["language"],
+               "--versification",manifest["commentary_source"]["observed_compiled_versification"],
+               "--native-reader",str(root/"commentary-native-raw"),
+               "--min-numbered","20000"]
+          with (root/"mhc-overlap-rebuild.json").open("xb") as out:
+              subprocess.run(compile_cmd,stdout=out,
+                             stderr=subprocess.DEVNULL,check=True,timeout=650)
+          from sys import path as pythonpath
+          pythonpath.insert(0,str(Path.cwd()/"scripts"))
+          from audit_osis import (source_commentary_overlap_witness,
+              compare_source_overlap_native_bodies,compare_source_milestone_index)
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          original_overlap,needed=source_commentary_overlap_witness(source)
+          if not original_overlap or not needed:
+              raise SystemExit("Original overlap witness missing; do not infer repair")
+          body_sha={}
+          related={}
+          env=dict(os.environ,SWORD_PATH=str(work))
+          proc=subprocess.Popen([str(root/"commentary-native-raw"),"MHCOverlapPreview"],
+                                env=env,stdout=subprocess.PIPE,
+                                stderr=subprocess.DEVNULL)
+          def on_entry(kind,key,raw):
+              if kind=="K":
+                  body_sha[key]=sha256(raw).hexdigest()
+                  if key in needed:
+                      related[key]=raw
+          try:
+              _scan,keys,intros,_opaque=parse_native_raw_corpus(
+                  proc.stdout,on_entry=on_entry)
+              if proc.wait(timeout=35):
+                  raise SystemExit("Experimental overlap preview native scan failed")
+          finally:
+              if proc.stdout:proc.stdout.close()
+              if proc.poll() is None:proc.kill()
+              proc.wait()
+          diagnostic=compare_source_overlap_native_bodies(original_overlap,related)
+          print("Experimental overlap source-body preservation class counts:",
+                diagnostic["classification_counts"])
+          print("Experimental overlap per-comment proof (reference metadata only):",
+                diagnostic["bounded_source_group_cases"])
+          audit=compare_source_milestone_index(
+              preview,numbered_keys=keys,intro_keys=intros,body_sha_by_verse=body_sha)
+          print("Experimental reindexed OSIS/native structural state:",audit["status"])
+          print("Experimental remaining structural issue classes:",audit["anomaly_counts"])
+          classes=diagnostic["classification_counts"]
+          if (classes.get("full_source_word_sequence_not_found_in_group_native_keys",0)
+                  or classes.get("full_prose_in_every_original_native_key")!=8
+                  or classes.get("full_prose_present_in_some_native_keys")!=6
+                  or classes.get("source_group_shingles_checked")!=70
+                  or classes.get("source_group_shingles_found_in_native")!=70
+                  or classes.get("source_groups_with_zero_native_shingle_evidence",0)):
+              raise SystemExit("Overlap reindexing failed full-text/shingle rescue criteria")
+          if (audit["anomaly_counts"]!={"same_verse_assigned_more_than_once":1}
+                  or not audit["all_source_verse_ids_match_occupied_native_keys"]
+                  or not audit["all_source_book_chapter_ids_match_occupied_native_intros"]):
+              raise SystemExit("Unexpected index or overlap result after six-group correction")
+          print("PROOF: 6 previously missing group bodies recovered; 70 of 70 "
+                "independent source shingles present; remaining one authored "
+                "2Chr.1.1 overlap has both complete source bodies in SWORD")
+          print("This research candidate is NOT an authorial scope editorial approval.")
+          print("No OSIS transcript or compiled module uploaded or published.")
+          PY
+      - name: Audit all 4256 authored verse groups against private compiled SWORD word streams
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,subprocess,sys
+          from pathlib import Path
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from audit_osis import (source_commentary_overlap_witness,
+                                  source_commentary_shared_key_retrieval_map,
+                                  source_commentary_reviewed_shared_key_plan,
+                                  compare_all_commentary_source_group_words,
+                                  compare_all_commentary_source_group_semantics,
+                                  source_commentary_introductions,
+                                  compare_commentary_source_native_introductions,
+                                  triage_commentary_introduction_relocation,
+                                  source_commentary_book_closing_text,
+                                  classify_commentary_native_final_boundary)
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          root=Path(os.environ["RUNNER_TEMP"])
+          source=root/"mhc-overlap-experimental.osis.xml"
+          groups=[]
+          overlapping,_=source_commentary_overlap_witness(source,groups_out=groups)
+          if len(groups)!=4256 or len(overlapping)!=1:
+              raise SystemExit("Authored source group census changed in private candidate")
+          targets={g["keys"][0] for g in groups if g["keys"]}
+          raws={}
+          intro_raw={}
+          env=dict(os.environ,SWORD_PATH=str(root/"mhc-overlap-experiment-sword"))
+          process=subprocess.Popen([str(root/"commentary-native-raw"),
+                                    "MHCOverlapPreview"],env=env,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.DEVNULL)
+          def collect(kind,key,raw):
+              if kind=="K" and key in targets:
+                  raws[key]=raw
+              elif kind=="I":
+                  intro_raw[key]=raw
+          try:
+              actual,keys,_intros,_tops=parse_native_raw_corpus(
+                  process.stdout,on_entry=collect)
+              if process.wait(timeout=40):
+                  raise SystemExit("Full private SWORD native stream incomplete")
+          finally:
+              if process.stdout:process.stdout.close()
+              if process.poll() is None:process.kill()
+              process.wait()
+          if len(keys)!=31098 or len(raws)!=len(targets):
+              raise SystemExit("Source group's native first keys not fully occupied")
+          evidence=compare_all_commentary_source_group_words(groups,raws)
+          print("All authored MHC source group text proof status:",evidence["status"])
+          print("Authorial group word-stream census:",evidence["counts"])
+          print("Bounded references requiring source/native content review:",
+                evidence["bounded_reference_only_missing_word_cases"])
+          if evidence["status"]!="PRIVATE_ALL_AUTHORED_GROUP_WORD_BLOCKS_PRESENT_NOT_NOTE_PARITY":
+              raise SystemExit("Not every original source group's word blocks survive compilation")
+          print("All authored source group word blocks preserved at their first native keys")
+          # Restore ORIGINAL source scope claims from the pinned first private
+          # preview (before any experimental range trims), without modifying
+          # the compiled SWORD or repeating exposition on every verse.
+          original_groups=[]
+          original_overlaps,_=source_commentary_overlap_witness(
+              root/"mhc-repaired-preview.osis.xml",groups_out=original_groups)
+          if len(original_groups)!=4256 or len(original_overlaps)!=7:
+              raise SystemExit("Original authored section-overlap inventory changed")
+          original_word_proof=compare_all_commentary_source_group_words(
+              original_groups,raws)
+          if original_word_proof["status"]!=(
+                  "PRIVATE_ALL_AUTHORED_GROUP_WORD_BLOCKS_PRESENT_NOT_NOTE_PARITY"):
+              raise SystemExit("Original overlapping source sections lost native first-key access")
+          scope_bridge=source_commentary_shared_key_retrieval_map(
+              original_groups,set(keys))
+          shared=scope_bridge["shared_verses"]
+          by_key={item["bible_verse_key"]:item for item in shared}
+          from collections import Counter
+          categories=Counter(item["presentation_class"] for item in shared)
+          if (scope_bridge["original_shared_verse_keys"]!=7
+                  or scope_bridge["shared_verse_source_sections"]!=14
+                  or categories!={"DISTINCT_FIRST_KEYS_REQUIRE_MULTISECTION_READER":6,
+                                  "SAME_FIRST_KEY_REQUIRES_INNER_SECTION_MARKUP_CHECK":1}
+                  or by_key["Rom.4.17"]["native_retrieval_keys_in_authorial_order"]
+                     !=["Rom.4.9","Rom.4.17"]
+                  or by_key["2Chr.1.1"]["native_retrieval_keys_in_authorial_order"]
+                     !=["2Chr.1.1"]
+                  or scope_bridge["source_groups_rewritten"]
+                  or scope_bridge["original_prose_in_report"]):
+              raise SystemExit("Actual source shared-verse recovery bridge lost its invariants")
+          print("Original-source multiple-section retrieval bridge verified:",
+                {"source_groups":scope_bridge["original_authored_groups"],
+                 "shared_verse_keys":scope_bridge["original_shared_verse_keys"],
+                 "distinct_source_sections":scope_bridge["shared_verse_source_sections"],
+                 "navigation_classes":dict(categories)})
+          print("Real Romans shared-verse first-key retrieval:",
+                by_key["Rom.4.17"]["native_retrieval_keys_in_authorial_order"])
+          print("Real 2 Chronicles shared-verse first-key retrieval:",
+                by_key["2Chr.1.1"]["native_retrieval_keys_in_authorial_order"])
+          print("Source text preserved; no added verse, repeated prose or proprietary published module")
+          # A syntactic overlap is not automatically an authored intra-verse
+          # division. Five of six machine-range fixes agree with published
+          # complete-MHC section boundaries; Romans 4:17a/17b is the
+          # independent exception. The accepted-versus-exception evidence
+          # belongs in a separate private, source-SHA-bound plan.
+          plan=json.loads(Path(
+              "config/commentary-osis-repair-plans/mhc-shared-scope-review-private.json"
+          ).read_text())
+          manifest=json.loads(Path(
+              "config/commentary-intake/mhc-crosswire.json"
+          ).read_text())
+          source_sha=manifest["commentary_source"][
+              "original_authoring_osis"]["authoring_osis_sha256"]
+          candidate_bridge=source_commentary_shared_key_retrieval_map(
+              groups,set(keys))
+          reviewed=source_commentary_reviewed_shared_key_plan(
+              scope_bridge,candidate_bridge,plan,
+              pinned_original_sha256=source_sha)
+          actual={item["bible_verse_key"]:item
+                  for item in reviewed["reader_multiowner_verses"]}
+          if (reviewed["original_syntactic_shared_verses"]
+                  !=plan["expected_original_syntactic_shared_verse_count"]
+                  or reviewed["compiled_source_shared_verses"]
+                  !=plan["expected_rebuilt_source_shared_verse_count"]
+                  or reviewed["reader_multiowner_verse_count"]
+                  !=plan["expected_reader_multiowner_verse_count"]
+                  or reviewed["non_reader_shared_source_index_ranges"]
+                  !=plan["expected_non_reader_shared_source_index_ranges"]
+                  or set(actual)!={"2Chr.1.1"}
+                  or actual["2Chr.1.1"]["native_retrieval_keys_in_authorial_order"]
+                     !=["2Chr.1.1"]
+                  or "Rom.4.17" in actual
+                  or reviewed["source_groups_rewritten"]
+                  or reviewed["original_prose_in_report"]):
+              raise SystemExit("Private editorially narrowed shared-scope reader index failed")
+          # No authorial prose, note or linked Bible text enters this
+          # research-only metadata file. No artifact or public module upload.
+          destination=root/"mhc-shared-section-retrieval-private.json"
+          with destination.open("x",encoding="utf-8") as out:
+              json.dump(reviewed,out,ensure_ascii=False,indent=2,sort_keys=True)
+          assert json.loads(destination.read_text())==reviewed
+          print("Private candidate shared-scope reader proof:",
+                {"original_syntactic_overlap_keys":
+                    reviewed["original_syntactic_shared_verses"],
+                 "reviewed_false_shared_scopes":
+                    reviewed["non_reader_shared_source_index_ranges"],
+                 "required_actual_multiowner_verse_keys":
+                    reviewed["reader_multiowner_verse_count"],
+                 "romans_verse_17_kept_exclusively_in_second_group":
+                    "Rom.4.17" not in actual,
+                 "same_key_double_section_count":
+                    actual["2Chr.1.1"]["original_independent_section_count"],
+                 "no_authorial_prose_exported":True})
+          semantics=compare_all_commentary_source_group_semantics(groups,raws)
+          print("Entire MHC source/native punctuation, note and link-body triage:",
+                semantics["status"])
+          print("Exact original punctuation/notes/links compared by category:",
+                semantics["counts"])
+          print("Bounded original-reference-only semantic review candidates:",
+                semantics["bounded_reference_only_findings"][:30])
+          if semantics["counts"].get("source_groups")!=4256:
+              raise SystemExit("Incomplete source/native punctuation and note-body census")
+          proof=semantics["counts"]
+          for name in ("source_note_bodies_missing_from_native",
+                       "source_note_body_and_metadata_not_exactly_in_native",
+                       "source_reference_bodies_missing_from_native",
+                       "source_reference_body_and_metadata_not_exactly_in_native"):
+              if proof.get(name,0):
+                  raise SystemExit("Authored commentary note/reference metadata regression: "+name)
+          if (proof.get("source_reference_elements")!=61421
+                  or proof.get("source_text_equal_after_nfc_whitespace_folding",0)
+                     +proof.get("source_text_exact_raw_unicode_substring",0)
+                     +proof.get("source_text_equal_after_unicode_casefold",0)
+                     +proof.get("source_group_full_punctuation_or_spacing_needs_review",0)
+                     !=4256):
+              raise SystemExit("Unexpected punctuation/source-link corpus drift")
+          print("This is a complete punctuation/notes triage, NOT blanket editorial approval")
+          closings=source_commentary_book_closing_text(source)
+          last_groups={}
+          for group in groups:
+              last_groups[group["keys"][0].split(".",1)[0]]=group
+          if len(closings)!=66 or set(closings)!=set(last_groups):
+              raise SystemExit("Closing text audit has missing authored books")
+          from collections import Counter
+          tail_classes=Counter()
+          tail_cases=[]
+          for book,closing in closings.items():
+              group=last_groups[book]
+              if closing["last_source_scope"]!=group["sID"]:
+                  raise SystemExit("Book end scope does not match source final verse group")
+              review=classify_commentary_native_final_boundary(
+                  group,raws[group["keys"][0]],closing["closing_text"])
+              tail_classes[review["class"]]+=1
+              if review["class"]!="native_suffix_equals_original_group_boundary":
+                  tail_cases.append({"book":book,"final_scope":group["sID"],
+                                     **review})
+          print("Original book-end versus final-native-verse text classes:",
+                dict(sorted(tail_classes.items())))
+          print("Bounded book-ending source/native diagnostics without prose:",
+                tail_cases[:30])
+          if (sum(tail_classes.values())!=66
+                  or any(key not in {
+                      "native_suffix_equals_original_group_boundary",
+                      "native_suffix_exactly_contains_original_book_closing_text",
+                      "native_suffix_matches_authored_closing_without_whitespace",
+                      "native_suffix_only_spacing_differs_from_original_group"}
+                         for key in tail_classes)
+                  or proof.get("source_group_full_punctuation_or_spacing_needs_review",0)
+                     !=sum(count for key,count in tail_classes.items()
+                            if key!="native_suffix_equals_original_group_boundary")):
+              raise SystemExit("Unexplained native punctuation or book-ending material")
+          print("Book-ending text was not added to the original source or exported")
+          introductions=source_commentary_introductions(source)
+          if (len(introductions)!=1255 or len(intro_raw)!=1255
+                  or set(introductions)!=set(intro_raw)):
+              raise SystemExit("Book/chapter source-native introduction coverage differs")
+          intro_evidence=compare_commentary_source_native_introductions(
+              introductions,intro_raw)
+          print("ALL book/chapter source-native introductions semantic census:",
+                intro_evidence["counts"])
+          print("Bounded introduction source/native discrepancy references:",
+                intro_evidence["bounded_reference_only_cases"][:30])
+          intro_counts=intro_evidence["counts"]
+          if (intro_counts.get("source_intro_records")!=1255
+                  or intro_counts.get("source_intro_no_visible_text")!=144
+                  or intro_counts.get("source_intro_text_equal_after_nfc_whitespace_folding")
+                     +intro_counts.get("source_intro_exact_unicode_text_in_native",0)!=1111
+                  or intro_counts.get("source_intro_reference_elements")!=6710
+                  or intro_evidence["bounded_reference_only_cases"]
+                  or any(value for key,value in intro_counts.items()
+                         if key.endswith("_body_metadata_missing_from_native"))):
+              raise SystemExit("Authorial source intro or source reference data changed")
+          relocation=triage_commentary_introduction_relocation(
+              introductions,intro_raw,raws)
+          print("Original book/chapter introduction SWORD relocation categories:",
+                relocation["counts"])
+          print("Bounded original introduction same-book relocation cases:",
+                relocation["bounded_source_scope_cases"][:45])
+          print("Introduction contents and note bodies remain private")
+          print("Still NOT an independent historical collation or note/markup identity certificate")
+          PY
+      - name: Private preview of twenty-five source-label-attested inline reference destinations
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          python - <<'PY'
+          from pathlib import Path
+          import json,os,subprocess,sys
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from repair_osis_source_bytes import patch_reviewed_osis_reference_attributes
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          root=Path(os.environ["RUNNER_TEMP"])
+          source=root/"mhc-overlap-experimental.osis.xml"
+          plan=json.loads(Path(
+              "config/commentary-osis-repair-plans/mhc-crossreferences-private-preview.json"
+          ).read_text())
+          env=dict(os.environ,SWORD_PATH=str(root/"mhc-overlap-experiment-sword"))
+          proc=subprocess.Popen([str(root/"commentary-native-raw"),
+                                 "MHCOverlapPreview"],env=env,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.DEVNULL)
+          try:
+              _summary,real_keys,_intros,_tops=parse_native_raw_corpus(proc.stdout)
+              if proc.wait(timeout=40)!=0:
+                  raise SystemExit("Cannot independently confirm canonical target keys")
+          finally:
+              if proc.stdout:proc.stdout.close()
+              if proc.poll() is None:proc.kill()
+              proc.wait()
+          original=source.read_bytes()
+          corrected,receipt=patch_reviewed_osis_reference_attributes(
+              original,plan,set(real_keys))
+          if (len(plan["edits"])!=25 or receipt["exact_reference_attribute_only_changes"]!=len(plan["edits"])
+                  or not receipt["entire_original_commentary_characters_unchanged"]
+                  or not receipt["all_other_original_xml_elements_and_attributes_unchanged"]
+                  or not receipt["new_verse_targets_present_in_real_native_index"]):
+              raise SystemExit("Reviewed machine-only citation preview is not proven")
+          output=root/"mhc-links-private-only.osis.xml"
+          with output.open("xb") as file:
+              file.write(corrected)
+          print("Twenty-five independently read source-attested Bible citation links verified")
+          print("Source hash before machine-only reference preview:",
+                receipt["original_sha256"])
+          print("Private source hash after twenty-five source-anchored link edits:",
+                receipt["private_candidate_sha256"])
+          print("Original text, displayed citation labels, notes, verse groups"
+                " and all non-reviewed XML byte spans unchanged")
+          print("Research-only link target trial, NOT printed-edition editorial approval")
+          print("No OSIS or SWORD text uploaded or published")
+          PY
+      - name: Recompile twenty-five-link private OSIS and audit exact native markup changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          python - <<'PY'
+          import json,os,subprocess,sys
+          from collections import Counter
+          from hashlib import sha256
+          from pathlib import Path
+          from lxml import etree
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          root=Path(os.environ["RUNNER_TEMP"])
+          source=root/"mhc-links-private-only.osis.xml"
+          plan=json.loads(Path(
+              "config/commentary-osis-repair-plans/mhc-crossreferences-private-preview.json"
+          ).read_text())
+          manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
+          approved={(e["old_target"],e["new_target"]) for e in plan["edits"]}
+          if len(approved)!=25 or len(plan["edits"])!=25:
+              raise SystemExit("Unexpected private reference change inventory")
+          work=root/"mhc-links-preview-sword"
+          cmd=[sys.executable,"scripts/rebuild_osis_commentary.py",
+               "--source",str(source),"--sha256",sha256(source.read_bytes()).hexdigest(),
+               "--private-work",str(work),"--module","MHCLinkPreview",
+               "--language",manifest["language"],
+               "--versification",manifest["commentary_source"]["observed_compiled_versification"],
+               "--native-reader",str(root/"commentary-native-raw"),
+               "--min-numbered","20000"]
+          with (root/"mhc-links-private-rebuild.json").open("xb") as output:
+              subprocess.run(cmd,stdout=output,stderr=subprocess.DEVNULL,
+                             check=True,timeout=650)
+          outcome=json.loads((root/"mhc-links-private-rebuild.json").read_text())
+          for field,expect in (
+              ("native_occupied_numbered_keys",31098),
+              ("native_occupied_introduction_keys",1255),
+              ("native_occupied_opaque_top_keys",2)):
+              if outcome[field]!=expect:
+                  raise SystemExit("Link-only rebuild changed native key coverage")
+          reader=root/"commentary-native-raw"
+          def read_frames(location,module):
+              env=dict(os.environ,SWORD_PATH=str(location.resolve(strict=True)))
+              proc=subprocess.Popen([str(reader),module],env=env,
+                                    stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+              frames={}
+              def receive(kind,key,raw):
+                  identity=(kind,key)
+                  if identity in frames:
+                      raise ValueError("Duplicate native frame identity")
+                  frames[identity]=raw
+              try:
+                  scan,*_=parse_native_raw_corpus(proc.stdout,on_entry=receive)
+                  if proc.wait(timeout=40):
+                      raise ValueError("Native reader exited unsuccessfully")
+              finally:
+                  if proc.stdout:proc.stdout.close()
+                  if proc.poll() is None:proc.kill()
+                  proc.wait()
+              return frames
+          before=read_frames(root/"mhc-overlap-experiment-sword","MHCOverlapPreview")
+          after=read_frames(work,"MHCLinkPreview")
+          if before.keys()!=after.keys() or len(before)!=32355:
+              raise SystemExit("Link-only build changed original occupied native key set")
+          parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
+                                 no_network=True,recover=False,huge_tree=True)
+          differences=Counter()
+          changed_keys=0
+          for key,old_raw in before.items():
+              new_raw=after[key]
+              if old_raw==new_raw:
+                  continue
+              if key[0] not in {"K","I"}:
+                  raise SystemExit("Link-only rebuild changed opaque native record")
+              left=etree.fromstring(b"<frame>"+old_raw+b"</frame>",parser)
+              right=etree.fromstring(b"<frame>"+new_raw+b"</frame>",parser)
+              old_nodes=list(left.iter())
+              new_nodes=list(right.iter())
+              if len(old_nodes)!=len(new_nodes):
+                  raise SystemExit("Compiled link edit changed native XML element count")
+              for a,b in zip(old_nodes,new_nodes):
+                  if a.tag!=b.tag or a.text!=b.text or a.tail!=b.tail:
+                      raise SystemExit("Compiled link edit changed commentary text or markup")
+                  attrs_a=dict(a.attrib)
+                  attrs_b=dict(b.attrib)
+                  if attrs_a==attrs_b:
+                      continue
+                  if a.tag.rsplit("}",1)[-1]!="reference":
+                      raise SystemExit("Compiled link edit changed a nonreference element")
+                  old_target=attrs_a.pop("osisRef",None)
+                  new_target=attrs_b.pop("osisRef",None)
+                  if attrs_a!=attrs_b or (old_target,new_target) not in approved:
+                      raise SystemExit("Compiled link edit changed an unreviewed XML attribute")
+                  differences[(old_target,new_target)]+=1
+              changed_keys+=1
+          if set(differences)!=approved:
+              raise SystemExit("Not every original reviewed reference survived in the SWORD native body")
+          print("Private SWORD link-only rebuild native keys:",len(before))
+          print("Native entries affected by reviewed reference attributes:",changed_keys)
+          print("Distinct source-reviewed target changes present:",len(differences))
+          print("Each approved reference mapping was found at least once in compiled SWORD")
+          print("Complete native body text, non-link XML, notes, introductions and opaque records unchanged")
+          print("This is native SWORD integrity, NOT clicked Xiphos/AndBible GUI navigation")
+          print("No corrected OSIS or SWORD binary uploaded or published")
+          PY
+      # A verified chapter introduction is part of the source-integrity gate,
+      # never an optional reader experiment.
+      - name: Verify real OSIS chapter introduction at 2 Chronicles 1
+        timeout-minutes: 8
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          python - <<'PY'
+          import json,os,re,subprocess,sys
+          from pathlib import Path
+          from hashlib import sha256
+          from lxml import etree
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from reclassify_osis_commentary_introduction import repair_private_bytes
+          from audit_osis import source_commentary_overlap_witness
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          root=Path(os.environ["RUNNER_TEMP"])
+          manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
+          plan=json.loads(Path(
+              "config/commentary-osis-repair-plans/mhc-chapter-introduction-private.json"
+          ).read_text())
+          if (plan["original_authoring_osis_sha256"]!=
+                  manifest["commentary_source"]["original_authoring_osis"]["authoring_osis_sha256"]
+                  or plan["publication_approved"] or plan["source_text_edit_approved"]):
+              raise SystemExit("Unreviewed OSIS introduction source identity")
+          before=root/"mhc-links-private-only.osis.xml"
+          raw=before.read_bytes()
+          if sha256(raw).hexdigest()!=plan["private_candidate_before_intro_sha256"]:
+              raise SystemExit("Private intro trial input SHA differs from separately pinned exact source")
+          plan["source_sha256"]=sha256(raw).hexdigest()
+          # Verify the exact chapter preface boundary from real source.
+          # Only type/line/child-shape metadata is logged; never prose.
+          original_tree=etree.fromstring(raw,etree.XMLParser(
+              resolve_entities=False,load_dtd=False,no_network=True,
+              recover=False,huge_tree=True))
+          book=next(n for n in original_tree.iter()
+                    if isinstance(n.tag,str) and n.tag.rsplit("}",1)[-1]=="div"
+                    and n.get("type")=="book" and n.get("osisID")=="2Chr")
+          chapter=next(n for n in book if isinstance(n.tag,str)
+                       and n.tag.rsplit("}",1)[-1]=="chapter"
+                       and n.get("sID")=="2Chr.1")
+          first_p=next(n for n in book if isinstance(n.tag,str)
+                       and n.tag.rsplit("}",1)[-1]=="p"
+                       and n.sourceline==plan["old_intro_opening_line"]-1)
+          section=list(book)[list(book).index(chapter)+1:list(book).index(first_p)]
+          print("2Chr preverse direct structural children (no source prose):",
+                json.dumps([{"tag":n.tag.rsplit("}",1)[-1],
+                             "type":n.get("type"),"line":n.sourceline,
+                             "children":[{"tag":x.tag.rsplit("}",1)[-1],
+                                          "type":x.get("type"),"line":x.sourceline}
+                                         for x in list(n)[:8] if isinstance(x.tag,str)]}
+                            for n in section if isinstance(n.tag,str)],sort_keys=True))
+          changed,receipt=repair_private_bytes(raw,plan)
+          output=root/"mhc-chapter-intro-private.osis.xml"
+          with output.open("xb") as handle:handle.write(changed)
+          assert sha256(output.read_bytes()).hexdigest()==receipt["candidate_sha256"]
+          print("Real 2Chr 1 source OSIS introduction move proof (metadata only):",
+                receipt)
+          # Diagnose what osis2mod sees between chapter start and first
+          # exposition milestone. Emit XML element names/types ONLY; never
+          # authorial words, notes or source XML bytes.
+          def preverse_markup_shape(data):
+              tree=etree.fromstring(data,etree.XMLParser(
+                  resolve_entities=False,load_dtd=False,no_network=True,
+                  recover=False,huge_tree=True))
+              nodes=[n for n in tree.iter() if isinstance(n.tag,str)]
+              starts=[i for i,n in enumerate(nodes)
+                      if n.tag.rsplit("}",1)[-1]=="chapter"
+                      and n.get("sID")=="2Chr.1"]
+              ends=[i for i,n in enumerate(nodes)
+                    if n.tag.rsplit("}",1)[-1]=="verse"
+                    and n.get("sID")=="2Chr.1.1-12"]
+              if len(starts)!=1 or len(ends)!=1 or not starts[0]<ends[0]:
+                  raise SystemExit("Unattested preverse diagnostic scope")
+              return [{"tag":n.tag.rsplit("}",1)[-1],
+                       "type":n.get("type"),"subType":n.get("subType"),
+                       "line":n.sourceline}
+                      for n in nodes[starts[0]:ends[0]]
+                      if n.tag.rsplit("}",1)[-1] in
+                         {"chapter","div","title","p","verse"}][:70]
+          print("2Chr 1 preverse lexical topology (types/lines only):",
+                json.dumps({"original":preverse_markup_shape(raw),
+                            "reclassified":preverse_markup_shape(changed)},
+                           sort_keys=True))
+          groups=[]
+          source_commentary_overlap_witness(before,groups_out=groups)
+          intro=next(g for g in groups if g["sID"]=="2Chr.1.1")
+          following=next(g for g in groups if g["sID"]=="2Chr.1.1-12")
+          native_work=root/"mhc-chapter-intro-private-sword"
+          cmd=[sys.executable,"scripts/rebuild_osis_commentary.py",
+               "--source",str(output),"--sha256",receipt["candidate_sha256"],
+               "--private-work",str(native_work),"--module","MHCIntroPreview",
+               "--language",manifest["language"],
+               "--versification",manifest["commentary_source"]["observed_compiled_versification"],
+               "--native-reader",str(root/"commentary-native-raw"),
+               "--min-numbered","20000"]
+          with (root/"mhc-chapter-intro-native.json").open("xb") as output_json:
+              subprocess.run(cmd,stdout=output_json,stderr=subprocess.DEVNULL,
+                             check=True,timeout=450)
+          outcome=json.loads((root/"mhc-chapter-intro-native.json").read_text())
+          def frames(work,name):
+              env=dict(os.environ,SWORD_PATH=str(work))
+              p=subprocess.Popen([str(root/"commentary-native-raw"),name],
+                                 env=env,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+              result={}
+              def on_entry(kind,key,data):
+                  result[(kind,key)]=data
+              try:
+                  counts,*_=parse_native_raw_corpus(p.stdout,on_entry=on_entry)
+                  if p.wait(timeout=45):
+                      raise SystemExit("Full native SWORD preview read failed")
+              finally:
+                  if p.stdout:p.stdout.close()
+                  if p.poll() is None:p.kill()
+                  p.wait()
+              return result,counts
+          old,old_counts=frames(root/"mhc-links-preview-sword","MHCLinkPreview")
+          new,new_counts=frames(native_work,"MHCIntroPreview")
+          # SWORD VerseKey::getOSISRef() omits the trailing .0 for
+          # chapter-introduction native locations; the independent complete
+          # source/native intro census also uses the canonical "2Chr.1" ID.
+          intro_key=("I","2Chr.1")
+          verse_key=("K","2Chr.1.1")
+          if intro_key not in new or verse_key not in new:
+              print("Actual private 2Chr introduction key diagnostic (metadata only):",
+                    {"chapter_I_keys":[key for kind,key in new
+                                       if kind=="I" and key.startswith("2Chr.1")][:12],
+                     "chapter_K_first_keys":[key for kind,key in new
+                                          if kind=="K" and key.startswith("2Chr.1.")][:12],
+                     "chapter_intro_has_entry":intro_key in new,
+                     "exposition_start_has_entry":verse_key in new})
+              raise SystemExit("Source-authored introduction missing from actual chapter intro key")
+          def words(raw):
+              xml=etree.fromstring(b"<fragment>"+raw+b"</fragment>",
+                   etree.XMLParser(resolve_entities=False,load_dtd=False,no_network=True))
+              return " ".join(re.findall(r"\w+","".join(xml.itertext()).casefold()))
+          def source_words(text):
+              return " ".join(re.findall(r"\w+",text.casefold()))
+          original_intro=source_words(intro["text"])
+          original_next=source_words(following["text"])
+          native_intro=words(new[intro_key])
+          native_verse=words(new[verse_key])
+          def shingles(text):
+              tokens=text.split()
+              width=min(30,max(5,len(tokens)//8))
+              return [" ".join(tokens[i:i+width])
+                      for i in sorted(set(
+                          [0,len(tokens)//3,len(tokens)//2,len(tokens)-width]))]
+          intro_pieces=shingles(original_intro)
+          next_pieces=shingles(original_next)
+          intro_found=sum(piece in native_intro for piece in intro_pieces)
+          next_found=sum(piece in native_verse for piece in next_pieces)
+          intro_still_in_verse=sum(piece in native_verse for piece in intro_pieces)
+          changed_keys=[(kind,key) for kind,key in new if
+                        old.get((kind,key))!=new[(kind,key)]]
+          removed_keys=[(kind,key) for kind,key in old if
+                        (kind,key) not in new]
+          remote=[(kind,key) for kind,key in changed_keys+removed_keys
+                  if not (kind=="I" and key in {"2Chr.1", "2Chr.1.0"})
+                  and not (kind=="K" and key.startswith("2Chr.1."))]
+          from collections import Counter
+          by_kind=Counter(kind for kind,_ in remote)
+          by_book=Counter(key.split(".")[0] for _,key in remote)
+          by_presence=Counter()
+          by_markup=Counter()
+          differing_attributes=Counter()
+          differing_tags=Counter()
+          change_forms=Counter()
+          reference_targets_modified=0
+          note_markup_modified=0
+          sampled_generated_milestones=[]
+          milestone_pairs=Counter()
+          # osis2mod generates local `pvN` division milestones. A source
+          # introduction added earlier in the stream can renumber them.
+          # This verification is GENERIC: no book, verse or count exception.
+          remote_marker_only=True
+          generated_old_to_new={}
+          generated_new_to_old={}
+          generated_start_end_balance=Counter()
+          parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
+                                 no_network=True,recover=False,huge_tree=True)
+          for kind,key in remote:
+              pre=old.get((kind,key))
+              post=new.get((kind,key))
+              if pre is None or post is None:
+                  by_presence["changed_presence"]+=1
+                  remote_marker_only=False
+                  continue
+              try:
+                  old_xml=etree.fromstring(b"<fragment>"+pre+b"</fragment>",parser)
+                  new_xml=etree.fromstring(b"<fragment>"+post+b"</fragment>",parser)
+              except etree.XMLSyntaxError:
+                  by_markup["fragment_not_comparable"]+=1
+                  remote_marker_only=False
+                  continue
+              if "".join(old_xml.itertext()) == "".join(new_xml.itertext()):
+                  by_markup["exact_unicode_text_identical"]+=1
+              else:
+                  by_markup["text_changed"]+=1
+              left_nodes=[x for x in old_xml.iter() if isinstance(x.tag,str)]
+              right_nodes=[x for x in new_xml.iter() if isinstance(x.tag,str)]
+              if ([(x.tag,dict(x.attrib)) for x in left_nodes] ==
+                  [(x.tag,dict(x.attrib)) for x in right_nodes]):
+                  by_markup["xml_tags_attributes_identical"]+=1
+              else:
+                  by_markup["xml_tag_or_attribute_changed"]+=1
+                  if len(left_nodes)!=len(right_nodes):
+                      change_forms["element_count_changed"]+=1
+                      remote_marker_only=False
+                      continue
+                  for left,right in zip(left_nodes,right_nodes):
+                      if (left.tag!=right.tag or left.text!=right.text
+                              or left.tail!=right.tail):
+                          remote_marker_only=False
+                      left_tag=left.tag.rsplit("}",1)[-1]
+                      right_tag=right.tag.rsplit("}",1)[-1]
+                      if left_tag!=right_tag:
+                          differing_tags[left_tag+"->"+right_tag]+=1
+                      if left_tag in {"reference","note"} and (
+                            left.tag != right.tag or
+                            dict(left.attrib)!=dict(right.attrib) or
+                            left.text!=right.text or left.tail!=right.tail):
+                          if left_tag=="reference":
+                              reference_targets_modified+=1
+                          else:
+                              note_markup_modified+=1
+                      for name in set(left.attrib)|set(right.attrib):
+                          if left.get(name)!=right.get(name):
+                              attr=name.rsplit("}",1)[-1]
+                              differing_attributes[attr]+=1
+                              if left.get(name) is None or right.get(name) is None:
+                                  change_forms["attr_added_or_removed"]+=1
+                              else:
+                                  change_forms["attr_value_changed"]+=1
+                              if attr in {"sID","eID"}:
+                                  old_id=left.get(name)
+                                  new_id=right.get(name)
+                                  milestone_pairs[(old_id,new_id)]+=1
+                                  if len(sampled_generated_milestones)<8:
+                                      sampled_generated_milestones.append({
+                                          "key":key,
+                                          "tag":left_tag,
+                                          "attribute":attr,
+                                          "old":old_id[:120] if isinstance(old_id,str) else None,
+                                          "new":new_id[:120] if isinstance(new_id,str) else None,
+                                      })
+                              else:
+                                  old_id=left.get(name)
+                                  new_id=right.get(name)
+                              if (left_tag!="div" or attr not in {"sID","eID"}
+                                      or not isinstance(old_id,str)
+                                      or not isinstance(new_id,str)
+                                      or re.fullmatch(r"pv[0-9]+",old_id) is None
+                                      or re.fullmatch(r"pv[0-9]+",new_id) is None
+                                      or old_id==new_id):
+                                  remote_marker_only=False
+                              else:
+                                  # Cross-entry repetitions are expected.
+                                  # The mapping must be bijective WITHIN a book.
+                                  scope=key.split(".",1)[0]
+                                  original=(scope,old_id)
+                                  candidate=(scope,new_id)
+                                  if (original in generated_old_to_new
+                                          and generated_old_to_new[original]!=candidate):
+                                      remote_marker_only=False
+                                  if (candidate in generated_new_to_old
+                                          and generated_new_to_old[candidate]!=original):
+                                      remote_marker_only=False
+                                  generated_old_to_new[original]=candidate
+                                  generated_new_to_old[candidate]=original
+                                  generated_start_end_balance[(scope,old_id,new_id,attr)]+=1
+          # Every generated start delimiter must retain an equally
+          # represented end delimiter; a half-open span is never equivalent.
+          for (scope,old_id,new_id,attribute),count in generated_start_end_balance.items():
+              other="eID" if attribute=="sID" else "sID"
+              if generated_start_end_balance[(scope,old_id,new_id,other)]!=count:
+                  remote_marker_only=False
+          if not generated_start_end_balance and remote:
+              remote_marker_only=False
+          if (by_presence or by_markup["fragment_not_comparable"]
+                  or by_markup["text_changed"] or differing_tags
+                  or reference_targets_modified or note_markup_modified):
+              remote_marker_only=False
+          # Original prose never appears in this evidence: only the native
+          # OSIS address, counts, and structure/text EQUALITY flags.
+          print("2Chr title source→native unexpected remote key diagnosis:",
+                json.dumps({"kinds":dict(by_kind),"books":dict(sorted(by_book.items())),
+                            "presence":dict(by_presence),
+                            "semantic_flags":dict(by_markup),
+                            "differing_attribute_names_and_counts":dict(differing_attributes),
+                            "differing_element_names_and_counts":dict(differing_tags),
+                            "change_forms":dict(change_forms),
+                            "reference_nodes_with_changes":reference_targets_modified,
+                            "note_nodes_with_changes":note_markup_modified,
+                            "sampled_milestone_identifiers":sampled_generated_milestones,
+                            "unique_old_new_id_pairs":len(milestone_pairs),
+                            "generated_div_renumbering_source_equivalent":
+                                remote_marker_only,
+                            "bounded_generated_id_scopes":len(generated_old_to_new),
+                            "first_native_addresses":sorted(remote)[:24],
+                            "remote_count":len(remote)},sort_keys=True))
+          print("Actual private compiled 2Chr 1 intro placement (metadata only):",
+                {"before_intro_entries":old_counts["actual_occupied_intro_entry_count"],
+                 "after_intro_entries":new_counts["actual_occupied_intro_entry_count"],
+                 "all_intro_shingles_found":intro_found==len(intro_pieces),
+                 "source_intro_shingles":len(intro_pieces),
+                 "intro_shingles_in_verse_1":intro_still_in_verse,
+                 "all_1_to_12_commentary_shingles_found":
+                     next_found==len(next_pieces),
+                 "unexpected_modified_other_bible_slots":len(remote),
+                 "changed_native_slots":len(changed_keys),
+                 "new_native_2Chr_chapter_intro_present":True,
+                 "source_text_notes_and_references_unchanged":True})
+          if (intro_found!=len(intro_pieces)
+                  or next_found!=len(next_pieces)
+                  or intro_still_in_verse
+                  or (remote and not remote_marker_only)
+                  or old_counts["actual_occupied_numbered_entry_count"]
+                     !=new_counts["actual_occupied_numbered_entry_count"]
+                  or old_counts["actual_occupied_anonymous_top_entry_count"]
+                     !=new_counts["actual_occupied_anonymous_top_entry_count"]):
+              raise SystemExit("OSIS introduction reclassification is not source-faithful in real SWORD")
+          print("REAL_OSIS_CHAPTER_INTRO_PROOF_PASS; only verified generated pvN pair renumbering outside 2Chr 1; candidate private and unpublished")
+          PY
+      - name: Repackage and independently reinstall final private zCom4 candidate (no export)
+        shell: bash
+        timeout-minutes: 5
+        run: |
+          set -euo pipefail
+          umask 077
+          python - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from private_sword_bundle import audit_private_sword_installation
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          root=Path(os.environ["RUNNER_TEMP"])
+          work=root/"mhc-chapter-intro-private-sword"
+          module="MHCIntroPreview"
+          scanner=root/"commentary-native-raw"
+          proc=subprocess.Popen(
+              [str(scanner),module],
+              env=dict(os.environ,SWORD_PATH=str(work)),
+              stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+          try:
+              meta,keys,intros,_top=parse_native_raw_corpus(proc.stdout)
+              if proc.wait(timeout=45):
+                  raise SystemExit("Final native module scanner failed")
+          finally:
+              if proc.stdout:proc.stdout.close()
+              if proc.poll() is None:proc.kill()
+              proc.wait()
+          if len(keys)!=31098 or len(intros)!=1255:
+              raise SystemExit("Unexpected final commentary source/native corpus")
+          source_keys=set(keys)
+          books=("Gen","2Chr","Ps","Prov","Rom","Matt","Rev")
+          preferred=("Gen.1.1","2Chr.1.1","Ps.95.7","Prov.31.1",
+                     "Rom.4.17","Matt.28.1","Rev.22.21")
+          chosen=[]
+          for book,wanted in zip(books,preferred):
+              if wanted in source_keys:
+                  chosen.append(wanted)
+              else:
+                  fallback=next((k for k in keys
+                                 if k.startswith(book+".") and k.count(".")==2),None)
+                  if fallback is None:
+                      raise SystemExit("Missing representative occupied source book")
+                  chosen.append(fallback)
+          samples=tuple(k.split(".")[0]+" "+k.split(".")[1]+":"+
+                        k.split(".")[2] for k in chosen)
+          receipt=audit_private_sword_installation(
+              work,module,reader="diatheke",samples=samples)
+          if (receipt["module_id"]!=module
+                  or len(receipt["independent_passage_readbacks"])!=len(books)
+                  or not receipt["all_source_file_bytes_verified_after_extraction"]
+                  or not receipt["packaged_to_standard_mods_d_and_modules_paths"]
+                  or not receipt["zip_discarded_without_upload_or_publication"]
+                  or receipt["published"]):
+              raise SystemExit("Unsafe or incomplete private SWORD package witness")
+          print("Final unpublished zCom4 ZIP/reinstall integrity (metadata only):",
+                json.dumps(receipt,sort_keys=True))
+          print("Private ZIP deleted; no module bytes or authorial text uploaded")
+          PY
+      - name: Privately prove final MHC identity, metadata and entire binary corpus (no release)
+        shell: bash
+        timeout-minutes: 5
+        run: |
+          set -euo pipefail
+          umask 077
+          python - <<'PY'
+          import json,os,subprocess,sys
+          from hashlib import sha256
+          from pathlib import Path
+          from zipfile import ZipFile
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from private_sword_bundle import (
+              _zip_private_module,_extract_into_isolated_sword_home
+          )
+          from promote_sword_preview import promote
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          from pilot_subprocess import query,present_key
+          root=Path(os.environ["RUNNER_TEMP"])
+          preview=root/"mhc-chapter-intro-private-sword"
+          provisional="MHCIntroPreview"
+          final="MHC"
+          manifest=json.loads(Path("config/commentary-intake/mhc-crosswire.json").read_text())
+          plan=json.loads(Path("config/release-drafts/mhc-0.1.0.json").read_text())
+          rights=manifest["rights"]
+          if (plan["status"]!="private_candidate_only_not_authorized_for_publication"
+                  or plan["sword_id"]!=final or plan["module_driver"]!="zCom4"
+                  or plan["upstream_module"]["original_authoring_osis_sha256"]!=
+                     manifest["commentary_source"]["original_authoring_osis"]["authoring_osis_sha256"]
+                  or rights["status"]!="research_only"
+                  or rights["owner_approved"] is not False
+                  or "CrossWire MHC 2.2" not in rights.get("rights_review_decision","")
+                  or rights.get("owner_publication_approved") is not False
+                  or plan["publication"]["owner_publication_authorization"]):
+              raise SystemExit("Final private MHC identity/rights metadata not source-attested")
+          title=plan["title"]
+          if "\n" in title or "\r" in title or len(title)>180:
+              raise SystemExit("Unreviewed private final title")
+          source_zip=root/"mhc-preview-identity-temporary.zip"
+          candidate_zip=root/"mhc-private-final-identity-temporary.zip"
+          conf=root/"mhc-final-identity-temp.conf"
+          staged=root/"mhc-final-identity-isolated-sword"
+          staged.mkdir(mode=0o700)
+          conf.write_text(
+              "[MHC]\n"
+              "DataPath=./modules/comments/zcom4/mhc/\n"
+              "ModDrv=zCom4\nBlockType=CHAPTER\nCompressType=ZIP\n"
+              "Encoding=UTF-8\nSourceType=OSIS\nLang=en\nVersification=KJV\n"
+              "Version="+plan["proposed_bible_resources_version"]+"\n"
+              "DistributionLicense=Public Domain\n"
+              "Description="+title+"\n"
+              "About=Source CrossWire MHC 2.2; editorial preparation CCEL and Logos; Bible Resources source-preserving technical edition\n",
+              encoding="utf-8"
+          )
+          source_hashes={}
+          def digest(root_path,identifier):
+              proc=subprocess.Popen(
+                  [str(root/"commentary-native-raw"),identifier],
+                  env=dict(os.environ,SWORD_PATH=str(root_path)),
+                  stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+              try:
+                  meta,numbered,intros,tops=parse_native_raw_corpus(proc.stdout)
+                  if proc.wait(timeout=50):
+                      raise SystemExit("Independent final-ID native reader failed")
+              finally:
+                  if proc.stdout:proc.stdout.close()
+                  if proc.poll() is None:proc.kill()
+                  proc.wait()
+              if not (len(numbered)==31098 and len(intros)==1255 and len(tops)==2):
+                  raise SystemExit("Final-ID SWORD native coverage changed")
+              return meta["all_native_raw_entries_ordered_sha256"],numbered
+          try:
+              src=_zip_private_module(preview,provisional,source_zip)
+              promoted=promote(
+                  source_zip,candidate_zip,
+                  expected_source_sha256=src["zip_sha256"],
+                  source_id=provisional,destination_id=final,config=conf,
+                  driver="zCom4",versification="KJV"
+              )
+              if (not promoted["data_byte_equal"] or promoted["published"]
+                      or len(promoted["per_file_sha256"])!=6):
+                  raise SystemExit("Final identity packaging rewrote authorial source data")
+              with ZipFile(candidate_zip) as archive:
+                  source_hashes={
+                      name:sha256(archive.read(name)).hexdigest()
+                      for name in archive.namelist()
+                  }
+                  if (len(source_hashes)!=7
+                          or "mods.d/mhc.conf" not in source_hashes):
+                      raise SystemExit("Invalid MHC final-ID ZIP native inventory")
+              _extract_into_isolated_sword_home(candidate_zip,staged,source_hashes)
+              before,original_keys=digest(preview,provisional)
+              after,final_keys=digest(staged,final)
+              if before!=after or original_keys!=final_keys:
+                  raise SystemExit("Final module identity promotion changed native authorial corpus")
+              sample=("2Chr 1:1","Rom 4:17","Prov 31:1","Matt 28:1")
+              for reference in sample:
+                  result_code,selection=query(final,reference,fmt="plain",
+                                              root=staged,timeout=30,
+                                              limit=256*1024)
+                  if not present_key(reference,selection,result_code):
+                      raise SystemExit("Final MHC module failed independent installed reader")
+              print("Private MHC final-ID metadata/payload proof:",
+                    json.dumps({
+                      "final_sword_id":final,
+                      "private_edition_version":plan["proposed_bible_resources_version"],
+                      "rights_metadata":plan["rights"]["distribution_license"],
+                      "package_member_count":len(source_hashes),
+                      "entire_native_raw_corpus_sha256_equal":before==after,
+                      "complete_numbered_entries":len(final_keys),
+                      "whole_native_index_and_introductions_preserved":True,
+                      "independent_final_ID_reader_passages":len(sample),
+                      "source_zip_sha256":src["zip_sha256"],
+                      "candidate_zip_sha256":promoted["release_zip_sha256"],
+                      "candidate_zip_size_bytes":promoted["release_zip_bytes"],
+                      "source_binary_data_member_sha256_equal":True,
+                      "module_published":False,
+                      "release_authorized":False,
+                    },sort_keys=True))
+          finally:
+              source_zip.unlink(missing_ok=True)
+              candidate_zip.unlink(missing_ok=True)
+              conf.unlink(missing_ok=True)
+          print("Private final-MHC zip deleted after full identity reinstallation; no public artifact")
+          PY
+      - name: Install real Xiphos GUI dependencies in disposable runner
+        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-mhc-final-gui]'))
+        id: install_corrected_xiphos
+        shell: bash
+        continue-on-error: true
+        timeout-minutes: 13
+        run: |
+          set -euo pipefail
+          # The default EC2 Ubuntu mirror has previously timed out after
+          # fetching only part of the WebKit/GTK dependency closure. Use the
+          # canonical Ubuntu archive instead of silently increasing timeouts
+          # against the same stalled regional mirror.
+          # GitHub Ubuntu images may use an EC2 mirror via a traditional
+          # sources.list, Deb822 sources OR an apt-mirrors indirection. An
+          # edit to ubuntu.sources alone did not cover all images; the
+          # preceding real GUI run timed out fetching WebKit from EC2.
+          # Restrict replacement to the specific known slow Ubuntu mirror;
+          # do not overwrite security/third-party package sources.
+          for sources in /etc/apt/sources.list /etc/apt/sources.list.d/ubuntu.sources \
+              /etc/apt/apt-mirrors.txt /etc/apt/mirrors.txt; do
+            if sudo test -f "$sources" && sudo grep -q 'us-east-2.ec2.archive.ubuntu.com' "$sources"; then
+              sudo sed -i \
+                -e 's|http://us-east-2.ec2.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' \
+                -e 's|https://us-east-2.ec2.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' \
+                "$sources"
+            fi
+          done
+          # An apt mirror alias can additionally live under apt/mirrors/.
+          if sudo test -d /etc/apt/mirrors; then
+            for sources in /etc/apt/mirrors/*; do
+              if sudo test -f "$sources" && sudo grep -q 'us-east-2.ec2.archive.ubuntu.com' "$sources"; then
+                sudo sed -i \
+                  's|us-east-2.ec2.archive.ubuntu.com|archive.ubuntu.com|g' "$sources"
+              fi
+            done
+          fi
+          # Record only resulting trusted Ubuntu archive hosts.
+          sudo grep -hE '^(URIs:|deb |http)' \
+            /etc/apt/sources.list /etc/apt/sources.list.d/ubuntu.sources \
+            /etc/apt/apt-mirrors.txt /etc/apt/mirrors.txt 2>/dev/null \
+            | sed -E 's|https?://([^/ ]+).*|\\1|' | sort -u || true
+          export DEBIAN_FRONTEND=noninteractive
+          timeout 120s sudo apt-get -o Acquire::Retries=1 \
+            -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 update -qq
+          timeout 660s sudo -E apt-get -o Acquire::Retries=1 \
+            -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 \
+            -o DPkg::Lock::Timeout=15 install -y --no-install-recommends \
+              xiphos xvfb xdotool xclip dbus-x11
+          for binary in xiphos Xvfb xdotool xclip dbus-run-session; do
+            command -v "$binary" >/dev/null || {
+              echo "Missing real-Xiphos GUI dependency: $binary" >&2
+              exit 1
+            }
+          done
+      - name: Observe real Xiphos with final private 25-link and chapter-intro MHC (not hyperlink approval)
+        if: (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-mhc-final-gui]'))) && steps.install_corrected_xiphos.outcome == 'success'
+        id: observe_corrected_xiphos
+        shell: bash
+        continue-on-error: true
+        timeout-minutes: 6
+        run: |
+          set -euo pipefail
+          umask 077
+          # An opened Xiphos window and successful keyboard dispatch alone
+          # are never accepted as a commentary rendering or clicked-link proof.
+          for binary in xiphos Xvfb xdotool xclip dbus-run-session; do
+            command -v "$binary" >/dev/null || {
+              echo "Xiphos reader test INCONCLUSIVE: missing $binary" >&2
+              exit 1
+            }
+          done
+          python - <<'PY'
+          import json, os, subprocess, sys
+          from hashlib import sha256
+          from pathlib import Path
+          from lxml import etree
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from commentary_xiphos_dual_reader import (
+              _run_real_gui, verify_and_install_reviewed_bible
+          )
+          from commentary_xiphos_heading_probe import (
+              probe_real_xiphos_commentary_heading_menu
+          )
+          from pilot_subprocess import query,present_key
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          root=Path(os.environ["RUNNER_TEMP"])
+          # Inspect the SAME final candidate verified above, not the
+          # earlier pre-introduction 25-link intermediate SWORD module.
+          work=root/"mhc-chapter-intro-private-sword"
+          module="MHCIntroPreview"
+          plan=json.loads(Path(
+              "config/commentary-osis-repair-plans/mhc-crossreferences-private-preview.json"
+          ).read_text())
+          # Independent categories: an OT multi-link, a full NT verse range,
+          # and the exceptional Psalm superscription/chapter-root citation.
+          audited_lines=(50772,81529,58059)
+          proof={e["original_line"]:e["new_target"] for e in plan["edits"]
+                 if e["original_line"] in audited_lines}
+          if len(proof)!=3 or len(plan["edits"])!=25:
+              raise SystemExit("Original 25-link proof/sample inventory changed")
+          native=root/"commentary-native-raw"
+          env=dict(os.environ,SWORD_PATH=str(work.resolve(strict=True)))
+          proc=subprocess.Popen([str(native),module],env=env,
+                                stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+          native_samples={}
+          intro_native_samples={}
+          parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
+                                 no_network=True,recover=False,huge_tree=True)
+          def capture(kind,key,raw):
+              if kind=="I" and key=="2Chr.1":
+                  intro_native_samples["chapter_intro"]=raw
+                  return
+              if kind=="K" and key=="2Chr.1.1":
+                  intro_native_samples["following_verse"]=raw
+              if kind!="K" or len(native_samples)==len(proof):
+                  return
+              if not any(value.encode() in raw for value in proof.values()):
+                  return
+              fragment=etree.fromstring(b"<fragment>"+raw+b"</fragment>",parser)
+              values={n.get("osisRef") for n in fragment.iter()
+                      if isinstance(n.tag,str) and
+                         n.tag.rsplit("}",1)[-1]=="reference"}
+              for line,target in proof.items():
+                  if target in values and line not in native_samples:
+                      native_samples[line]=(key,raw)
+          try:
+              _meta,*_=parse_native_raw_corpus(proc.stdout,on_entry=capture)
+              if proc.wait(timeout=45):
+                  raise SystemExit("Cannot independently read corrected native module")
+          finally:
+              if proc.stdout:proc.stdout.close()
+              if proc.poll() is None:proc.kill()
+              proc.wait()
+          if set(native_samples)!=set(proof):
+              raise SystemExit("Corrected source targets absent from native GUI test keys")
+          if set(intro_native_samples)!={"chapter_intro","following_verse"}:
+              raise SystemExit("Real chapter-intro and following verse keys not both present")
+          intro_fragment=etree.fromstring(
+              b"<fragment>"+intro_native_samples["chapter_intro"]+b"</fragment>",parser)
+          intro_expected=" ".join(intro_fragment.itertext()).encode("utf-8")
+          if not 128<=len(intro_expected)<=256000:
+              raise SystemExit("Unexpected private chapter-introduction prose length")
+          identity=verify_and_install_reviewed_bible(work)
+          if not identity["all_five_published_bible_files_sha256_attested"]:
+              raise SystemExit("GUI reader Bible identity changed")
+          comparisons={}
+          sample_book_by_anchor={}
+          source_line_by_passage={}
+          for line in audited_lines:
+              key,raw=native_samples[line]
+              book,chapter,verse=key.split(".")
+              passage=f"{book} {chapter}:{verse}"
+              rc,comment=query(module,passage,fmt="plain",root=work,
+                               timeout=30,limit=256*1024)
+              bc,bible=query(identity["module_id"],passage,fmt="plain",root=work,
+                             timeout=30,limit=256*1024)
+              if (not present_key(passage,comment,rc)
+                      or not present_key(passage,bible,bc)
+                      or len(comment)<64):
+                  raise SystemExit("Independent CLI reader lacks one private GUI sample")
+              if passage in comparisons:
+                  raise SystemExit("Different link proof cases share one GUI sample")
+              comparisons[passage]={
+                  "commentary":comment,"bible":bible,
+                  "commentary_internal":raw,
+              }
+              sample_book_by_anchor[line]=book
+              source_line_by_passage[passage]=line
+          if len(set(sample_book_by_anchor.values()))!=3:
+              raise SystemExit("Independent GUI sample books are not distinct")
+          # Add an extra diagnostic passage without changing the three
+          # successful link-bearing GUI witnesses or their acceptance count.
+          # The original chapter preface is taken from the NATIVE SWORD
+          # introduction frame; the following verse is a distinct source.
+          intro_passage="2Chr 1:1"
+          if intro_passage in comparisons:
+              raise SystemExit("Independent introduction witness is not distinct")
+          rc,verse_comment=query(module,intro_passage,fmt="plain",root=work,
+                                 timeout=30,limit=256*1024)
+          bc,verse_bible=query(identity["module_id"],intro_passage,
+                               fmt="plain",root=work,timeout=30,limit=256*1024)
+          if (not present_key(intro_passage,verse_comment,rc)
+                  or not present_key(intro_passage,verse_bible,bc)):
+              raise SystemExit("Independent 2Chr 1:1 GUI probe unavailable")
+          comparisons[intro_passage]={
+              "commentary":verse_comment,
+              "bible":verse_bible,
+              "commentary_internal":intro_native_samples["following_verse"],
+              "intro_expected":intro_expected,
+          }
+          def inspect_real_chapter_intro_context(gui_env):
+              # Source-authenticated native chapter-introduction I frame;
+              # never infer an introduction from ordinary verse K content.
+              observed=probe_real_xiphos_commentary_heading_menu(
+                  gui_env,
+                  {"chapter": {
+                      "raw":intro_native_samples["chapter_intro"],
+                      "reference":"2Chr 1:1",
+                      "ordinary_first_verse":
+                          intro_native_samples["following_verse"],
+                  }},
+                  ordinary_first_verse=intro_native_samples["following_verse"],
+              )
+              return {"private_2Chr_chapter_heading_menu_witness":observed}
+          result=_run_real_gui(work,comparisons,seconds=12,
+                               commentary_module_id=module,
+                               on_gui_ready=inspect_real_chapter_intro_context)
+          matches=sum(result["commentary_clipboard_match_by_passage"].get(p,False)
+                      for p in source_line_by_passage)
+          if not 0<=matches<=3:
+              raise SystemExit("Invalid three original GUI excerpt witnesses")
+          markup=result["real_markup_rendering_observation_by_passage"]
+          if set(markup)!=set(comparisons):
+              raise SystemExit("GUI markup evidence is missing a real reader sample")
+          source_target_href_by_line={}
+          for passage,observation in markup.items():
+              if passage==intro_passage:
+                  continue
+              original_line=source_line_by_passage[passage]
+              expected_digest=sha256(proof[original_line].encode("utf-8")).hexdigest()
+              matches_hrefs=observation["exact_matching_source_target_sha256_in_real_gui_HTML"]
+              if not isinstance(matches_hrefs,list):
+                  raise SystemExit("GUI href source witness has invalid shape")
+              target_progress=observation[
+                  "composite_target_href_progress_by_sha256"
+              ].get(expected_digest)
+              if target_progress is None:
+                  raise SystemExit("Missing source-bound composite href analysis")
+              source_target_href_by_line[str(original_line)]={
+                  "actual_gui_rich_html_selection_available":
+                      bool(observation["real_gui_rich_html_selection_available"]),
+                  "source_href_and_printed_label_matches":
+                      observation["exact_native_source_osisref_encoded_in_real_gui_HTML_link_destinations"],
+                  "this_specific_reviewed_target_in_actual_gui_href":
+                      expected_digest in matches_hrefs,
+                  "specific_source_label_is_real_GUI_anchor":
+                      target_progress["source_label_is_an_actual_GUI_anchor"],
+                  "source_target_components_in_same_label_GUI_href":
+                      target_progress["components_found_in_one_same_label_real_GUI_href"],
+                  "original_source_target_component_count":
+                      target_progress["original_component_count"],
+                  "all_components_in_one_same_label_GUI_href":
+                      target_progress["all_components_found_in_one_GUI_href"],
+              }
+          gui_copy_diagnostics_by_line={}
+          clipboard_bytes=result["copied_gui_clipboard_byte_count_by_passage"]
+          pane_attempts=result["bounded_right_commentary_pane_focus_attempts_by_passage"]
+          for passage in source_line_by_passage:
+              gui_copy_diagnostics_by_line[str(source_line_by_passage[passage])]={
+                  "actual_commentary_pane_copy_attempts":pane_attempts[passage],
+                  "last_clipboard_byte_count":clipboard_bytes[passage],
+                  "independently_verified_original_commentary_excerpt":
+                      result["commentary_clipboard_match_by_passage"][passage],
+              }
+          outcome={
+              "gui_copy_diagnostics_by_line":gui_copy_diagnostics_by_line,
+              "status":("CORRECTED_COMMENTARY_REAL_GUI_EXCERPTS_MATCHED"
+                        if matches==3 else
+                        "INCONCLUSIVE_REAL_GUI_SELECTION_NOT_A_RELEASE_GATE"),
+              "real_xiphos_window":result["real_xiphos_executable_started_and_visible"],
+              "sample_count":len(source_line_by_passage),
+              "additional_independent_chapter_intro_probe":True,
+              "chapter_intro_native_frame_and_following_verse_separate":True,
+              "chapter_intro_prose_found_in_real_GUI_clipboard":
+                  bool(result["chapter_intro_prose_clipboard_match_by_passage"].get(
+                      intro_passage,False)),
+              "2Chr_chapter_heading_real_GUI_observation":
+                  result["private_2Chr_chapter_heading_menu_witness"][
+                      "book_and_chapter_menu_observations"].get(
+                          "chapter",{}),
+              "chapter_intro_found_in_normal_chapter_GUI":
+                  result["private_2Chr_chapter_heading_menu_witness"][
+                      "original_intro_in_normal_chapter_GUI_verified"],
+              "following_2Chr_1_1_exposition_gui_excerpt_matched":
+                  bool(result["commentary_clipboard_match_by_passage"].get(
+                      intro_passage,False)),
+              "sampled_authored_link_source_lines":list(audited_lines),
+              "independent_gui_excerpt_matches":matches,
+              "corrected_source_target_href_evidence_by_line":
+                  source_target_href_by_line,
+              "reviewed_link_targets_in_actual_rich_HTML":
+                  sum(item["this_specific_reviewed_target_in_actual_gui_href"]
+                      for item in source_target_href_by_line.values()),
+              "accepted_passage_commands":result["actual_passage_commands_accepted"],
+              "copy_failure_action_categories":sorted(set(
+                  result["bounded_xiphos_ui_failed_action_by_passage"].values())),
+              "no_original_words_or_screenshots_exposed":True,
+              "clicked_hyperlinks_tested":False,
+              "psalm_60_superscription_click_proven":False,
+              "full_chapter_layout_and_note_presentation_approved":False,
+              "rights_or_publication_approved":False,
+          }
+          print("Corrected private MHC actual Xiphos research (metadata only):",
+                json.dumps(outcome,sort_keys=True),flush=True)
+          # Keep native source integrity a separate blocking gate, but a
+          # green GUI step must never hide zero verified real-window content.
+          if matches!=len(source_line_by_passage) or any(
+              ref in result["bounded_xiphos_ui_failed_action_by_passage"]
+              for ref in source_line_by_passage
+          ):
+              raise SystemExit("INCONCLUSIVE_REAL_GUI_SELECTION: original three commentary excerpts not verified")
+          # The new chapter-introduction probe is observational. Absence of
+          # copied preface from the Xiphos passage pane is NOT proof of an
+          # incorrect native SWORD introduction frame; report it as pending.
+          PY
+      - name: Report corrected-MHC GUI status independently from native-source integrity
+        if: always() && (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '[run-mhc-final-gui]')))
+        shell: bash
+        env:
+          GUI_DEPS: ${{ steps.install_corrected_xiphos.outcome }}
+          GUI_TEST: ${{ steps.observe_corrected_xiphos.outcome }}
+        run: |
+          {
+            echo "## Actual Xiphos on corrected private MHC (25 links plus 2Chr 1 introduction)"
+            echo "Dependency installation: ${GUI_DEPS}"
+            echo "Reader GUI experiment: ${GUI_TEST}"
+            echo "GUI success is not clicked hyperlink navigation or Psalm 60 title acceptance."
+            echo "The separate 2Chr 1 native chapter-heading/menu observer prints metadata-only"
+            echo "normal-pane and context-menu results; GUI success alone is not intro approval."
+            echo "Any dependency/GUI failure is independently unresolved; full native-source integrity remains separate."
+            echo "No source text, corrected module, screenshots or original prose published."
+          } >> "$GITHUB_STEP_SUMMARY"
+          printf 'Corrected-MHC Xiphos dependency=%s GUI experiment=%s\n' "$GUI_DEPS" "$GUI_TEST"
+      - name: Verify all source verse-group boundaries against real compiled SWORD keys and linked bodies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,subprocess,sys
+          from hashlib import sha256
+          from pathlib import Path
+          sys.path.insert(0,str(Path.cwd()/"scripts"))
+          from audit_osis import compare_source_milestone_index
+          from sword_native_raw_corpus_inventory import parse_native_raw_corpus
+          root=Path(os.environ["RUNNER_TEMP"])
+          reader=root/"commentary-native-raw"
+          env=dict(os.environ,SWORD_PATH=str(root/"mhc-stage1-private"))
+          process=subprocess.Popen([str(reader),"MHCStage1"],
+                                   env=env,stdout=subprocess.PIPE,
+                                   stderr=subprocess.DEVNULL)
+          body_hash={}
+          def receive(kind,key,raw):
+              if kind=="K":
+                  body_hash[key]=sha256(raw).hexdigest()
+          try:
+              _report,verses,intros,_opaque=parse_native_raw_corpus(
+                  process.stdout,on_entry=receive)
+              if process.wait(timeout=35)!=0:
+                  raise SystemExit("Native corpus reader returned error")
+          finally:
+              if process.stdout:process.stdout.close()
+              if process.poll() is None:process.kill()
+              process.wait()
+          outcome=compare_source_milestone_index(
+              root/"mhc-cleaned.osis.xml",
+              numbered_keys=verses,intro_keys=intros,body_sha_by_verse=body_hash)
+          print("Source/native complete OSIS milestone structural status:",outcome["status"])
+          print("Source-native verse and chapter marker statistics:",outcome["structure_counts"])
+          print("Source/native structural violations by class:",outcome["anomaly_counts"])
+          print("Bounded reference-only source/native structural cases:",
+                outcome["bounded_reference_only_findings"][:30])
+          # Source-only metadata investigation of the exact machine-address
+          # anomalies. No commentary prose, original XML or extracted notes.
+          from collections import defaultdict
+          from lxml import etree
+          source_bytes=(root/"mhc-cleaned.osis.xml").read_bytes()
+          source_root=etree.fromstring(
+              source_bytes,
+              etree.XMLParser(resolve_entities=False,load_dtd=False,
+                              no_network=True,recover=False,huge_tree=True))
+          seen={}
+          source_groups=[]
+          occurrences=defaultdict(list)
+          active=[None]
+          def walk(node):
+              if not isinstance(node.tag,str):
+                  return
+              is_verse=node.tag.rsplit("}",1)[-1]=="verse"
+              if is_verse and node.get("osisID"):
+                  if active[0] is not None:
+                      raise ValueError("Source overlapping verse scope")
+                  ids=node.get("osisID").split()
+                  record={
+                      "line":node.sourceline,
+                      "sID":node.get("sID"),
+                      "n":node.get("n"),
+                      "first":ids[0],
+                      "last":ids[-1],
+                      "count":len(ids),
+                      "ids":ids,
+                      "chunks":[],
+                  }
+                  source_groups.append(record)
+                  active[0]=record
+                  for ref in ids:
+                      occurrences[ref].append(record)
+              if is_verse and node.get("eID"):
+                  if active[0] is None or active[0]["sID"]!=node.get("eID"):
+                      raise ValueError("Mismatched original verse milestone")
+                  active[0]=None
+              if node.text and active[0] is not None:
+                  active[0]["chunks"].append(node.text)
+              for child in node:
+                  walk(child)
+              if node.tail and active[0] is not None:
+                  active[0]["chunks"].append(node.tail)
+          walk(source_root)
+          if active[0] is not None:
+              raise ValueError("Original source verse group unclosed")
+          if len(source_groups)!=outcome["structure_counts"]["source_verse_group_openers"]:
+              raise ValueError("Source group fingerprints incomplete")
+          for group in source_groups:
+              value="".join(group["chunks"])
+              group["text_sha256"]=sha256(value.encode("utf-8")).hexdigest()
+              group["text_characters"]=len(value)
+              group["words"]=len(value.split())
+              del group["chunks"]
+          actual_refs=set(verses)
+          invalid=[]
+          for group in source_groups:
+              missing=[ref for ref in group["ids"] if ref not in actual_refs]
+              if missing:
+                  invalid.append({
+                      "line":group["line"],"sID":group["sID"],"label":group["n"],
+                      "first":group["first"],"last":group["last"],
+                      "missing_first":missing[0],"missing_last":missing[-1],
+                      "missing_count":len(missing),
+                      "source_text_sha256":group["text_sha256"],
+                      "source_word_count":group["words"],
+                  })
+          print("Out-of-v11n source group machine attributes, no prose:",invalid)
+          collisions=[]
+          for ref,owners in occurrences.items():
+              if len(owners)>1:
+                  pair=(owners[0],owners[-1])
+                  if not any(x["first_line"]==pair[0]["line"]
+                             and x["second_line"]==pair[1]["line"]
+                             for x in collisions):
+                      shared=[k for k in pair[0]["ids"] if k in pair[1]["ids"]]
+                      collisions.append({
+                          "first_line":pair[0]["line"],
+                          "first_sID":pair[0]["sID"],
+                          "first_label":pair[0]["n"],
+                          "first_text_sha256":pair[0]["text_sha256"],
+                          "first_words":pair[0]["words"],
+                          "second_line":pair[1]["line"],
+                          "second_sID":pair[1]["sID"],
+                          "second_label":pair[1]["n"],
+                          "second_text_sha256":pair[1]["text_sha256"],
+                          "second_words":pair[1]["words"],
+                          "common_verse_count":len(shared),
+                          "common_first":shared[0],
+                          "common_last":shared[-1],
+                          "distinct_commentary_prose":pair[0]["text_sha256"]!=pair[1]["text_sha256"],
+                      })
+          print("Original source duplicate-group provenance and text fingerprints:",collisions)
+          # The exact PINNED unmodified source has 17 impossible addresses
+          # and seven overlapping keys. This is a deliberate negative
+          # baseline, not the acceptance test for the repaired research
+          # candidate independently validated in the preceding two steps.
+          if (outcome["anomaly_counts"] != {
+                  "same_verse_assigned_more_than_once":7,
+                  "missing_source_verses_in_native":17}
+                  or not outcome["all_source_book_chapter_ids_match_occupied_native_intros"]):
+              raise SystemExit("Unexpected change in pinned original source anomaly baseline")
+          print("ORIGINAL baseline confirmed: 17 out-of-v11n references and 7"
+                " duplicate verse ownership keys; no false structural approval")
+          print("Research-only source endpoint and overlap candidate was"
+                " independently checked; original is still immutable")
+          PY
+      - name: No distribution or editorial phase in this workflow
+        if: always()
+        shell: bash
+        run: |
+          echo "Original OSIS, private zCom4 and reports are confined to runner ephemeral storage."
+          echo "No binaries, ZIPs or commentary text are uploaded as artifacts."
+          echo "Historical textual comparison and corrections are a distinct future phase."
