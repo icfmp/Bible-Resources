@@ -39,7 +39,7 @@ Job gave striking examples of God's wisdom and power in **creating and preservin
 
 Look around at earth and water and you see divine power.
 
-Think of the unseen depths beneath us and you can understand something of God's authority over them.
+Think of **hell beneath**, though it is hidden from our sight, and consider how God's power is made known even there.
 
 Look up at heaven and you see further displays of his might.
 
@@ -66,6 +66,8 @@ Those complaints showed why the Lord was further humbling him.
 ---
 
 ## Editorial review — Job 26
+
+**2026-11-19 secondary-witness fidelity repair (unapproved draft):** The previous modern 5–14 exposition replaced the original's explicit reference to **hell beneath** with the unspecific “unseen depths beneath us.” Restore Henry's theological referent and retain the claim that God's power is manifest even in what remains unseen. Compared against [CCEL Job 26](https://ccel.org/ccel/henry/mhcc.xix.xxvi.html). Exact original published MHCC 0.1.1 native prose check and independent editorial acceptance remain pending; no changes to source, scope, cross-references, or other authored units.
 
 **Full secondary English witness checked:** [CCEL, Job 26](https://ccel.org/ccel/henry/mhcc.xix.xxvi.html). Published **MHCC 0.1.1** is the original, exact native-SWORD and independent acceptance pending.
 
