@@ -22,6 +22,7 @@ from commentary_modern_reference_gate import (SourceReferenceGate,
     build_private_owned_K_heading_range_links,
     build_private_same_chapter_verse_mentions,
     build_private_first_K_outline_verse_tokens,
+    build_private_source_preface_verse_links,
     build_private_inline_original_reference_index,
     _source_owned_ordered_alignment,
     _original_source_link_contexts, _source_context_unique_paragraph_anchor,
@@ -2205,6 +2206,123 @@ class MixedChapterCitationRecoveryTests(unittest.TestCase):
             native=native,errata=errata)
         self.assertEqual(receipt["original_exact_compact_verse_links_restored"],0)
         self.assertEqual(len(remaining["pending"]),6)
+
+
+class SourceFirstKPrefaceHyperlinkRestorationTests(unittest.TestCase):
+    @staticmethod
+    def fixture(*, repeated=False, corrupt_original=False):
+        from commentary_modern_draft_osis_preview import NS
+        root=ET.Element(f"{{{NS}}}osis")
+        chapter=ET.SubElement(root,f"{{{NS}}}chapter",{"osisID":"Mark.1"})
+        intro=ET.SubElement(chapter,f"{{{NS}}}div",{
+            "type":"introduction",
+            "resp":"BibleResourcesModernRelocatedFirstNativeKBookPreface"})
+        ET.SubElement(intro,f"{{{NS}}}title").text="Mark — Book introduction"
+        para=ET.SubElement(intro,f"{{{NS}}}p")
+        para.text="Mark was related to Barnabas (Colossians "
+        hi=ET.SubElement(para,f"{{{NS}}}hi")
+        hi.text="4:10"
+        hi.tail="), and his mother welcomed the apostles (Acts 12:12)."
+        if repeated:
+            ET.SubElement(intro,f"{{{NS}}}p").text=(
+                "The reference Colossians 4:10 is repeated here.")
+        sec=ET.SubElement(chapter,f"{{{NS}}}div",{
+            "annotateType":"commentary","annotateRef":"Mark.1.1"})
+        ET.SubElement(sec,f"{{{NS}}}p").text=(
+            "John the Baptist prepared the way for Jesus Christ.")
+        note=ET.SubElement(sec,f"{{{NS}}}note",{
+            "resp":"BibleResourcesPrivateSourceOnlyLinkSupplement",
+            "type":"crossReference"})
+        note.text="Unplaced links from original edition (not translated citations): "
+        refs=[("Col.4.10","Col 4:10","Colossians 4:10"),
+              ("Acts.12.12","Ac 12:12","Acts 12:12")]
+        review=[]
+        note_refs=[]
+        for index,(literal,label,display) in enumerate(refs,1):
+            ref=ET.SubElement(note,f"{{{NS}}}reference",{"osisRef":literal})
+            ref.text=display
+            ref.tail="; " if index==1 else "."
+            hashrow={
+                "source_reference_ordinal":index,
+                "source_original_literal_target_sha256":hashlib.sha256(
+                    literal.encode()).hexdigest(),
+                "supplement_display_sha256":hashlib.sha256(
+                    display.encode()).hexdigest()}
+            note_refs.append(hashrow)
+            review.append({
+                "source_first_key":"Mark.1.1",
+                "source_reference_ordinal":index,
+                "original_literal_osisRef":literal,
+                "original_printed_link_label":label,
+                "source_literal_target_sha256":hashrow[
+                    "source_original_literal_target_sha256"],
+                "original_visible_label_sha256":
+                    hashlib.sha256(label.encode()).hexdigest(),
+            })
+        if corrupt_original:
+            review[0]["original_visible_label_sha256"]="0"*64
+        native={
+            "original_compiled_corpus_sha256":FULL_HASH,
+            "chapters":{"Mark.1":{"original_units":[{
+                "first_key":"Mark.1.1","keys":["Mark.1.1"]}]}}}
+        source_receipt={
+            "status":"PRIVATE_NATIVE_SOURCE_NOTE_ALTERNATIVE_NOT_AUTHORED_INLINE_PARITY",
+            "original_native_corpus_sha256":FULL_HASH,
+            "source_link_supplement_not_authorial_or_inline":True,
+            "published_or_distributed":False,
+            "original_link_occurrences_preserved_only_in_separate_source_notes":2,
+            "note_source_K_reference_hashes_for_private_native_readback":[{
+                "source_first_key":"Mark.1.1",
+                "original_source_reference_hashes":note_refs,
+            }]}
+        packet={
+            "status":"EPHEMERAL_EXCERPTS_PRIVATE_EDITORIAL_REVIEW_ONLY",
+            "source_pinned_corpus_sha256":FULL_HASH,
+            "original_full_K_prose_or_markup_exported":False,
+            "original_link_placement_approved":False,
+            "references":review}
+        proof={
+            "status":"PRIVATE_SOURCE_K_BOOK_PREFACE_RESTORATION_NOT_EDIT_OR_RELEASE",
+            "original_native_corpus_sha256":FULL_HASH,
+            "original_K_section_and_existing_links_unchanged":True,
+            "publication_authorized":False,
+            "cases":[{
+                "book":"Mark",
+                "original_source_first_K":"Mark.1.1",
+                "source_K_intro_disposition":
+                    "INSERTED_SEPARATE_MODERN_INTRO_FROM_VERIFIED_ORIGINAL_K"}]}
+        return ET.tostring(root),source_receipt,packet,proof,native
+
+    def test_multiple_original_first_K_links_migrate_into_modern_book_preface(self):
+        from commentary_modern_draft_osis_preview import NS
+        args=self.fixture()
+        result,receipt=build_private_source_preface_verse_links(
+            preface_osis=args[0],source_note_receipt=args[1],
+            source_review_packet=args[2],preface_proof=args[3],native=args[4])
+        root=ET.fromstring(result)
+        links=[r for r in root.iter() if r.tag==f"{{{NS}}}reference"]
+        self.assertEqual([(r.text,r.get("osisRef")) for r in links],
+                         [("10","Col.4.10"),("12","Acts.12.12")])
+        self.assertEqual(receipt["original_source_link_occurrences_moved_to_modern_book_intro"],2)
+        self.assertEqual(receipt["original_K_source_only_note_occurrences_remaining"],0)
+        self.assertEqual(len([r for r in root.iter() if r.tag==f"{{{NS}}}note"]),0)
+        self.assertIn("related to Barnabas", "".join(root.itertext()))
+        self.assertFalse(receipt["publication_authorized"])
+
+    def test_duplicate_intro_citation_keeps_unresolved_original_source_note(self):
+        args=self.fixture(repeated=True)
+        result,receipt=build_private_source_preface_verse_links(
+            preface_osis=args[0],source_note_receipt=args[1],
+            source_review_packet=args[2],preface_proof=args[3],native=args[4])
+        self.assertEqual(receipt["original_source_link_occurrences_moved_to_modern_book_intro"],1)
+        self.assertEqual(receipt["original_K_source_only_note_occurrences_remaining"],1)
+
+    def test_original_historical_label_digest_mismatch_is_fatal(self):
+        args=self.fixture(corrupt_original=True)
+        with self.assertRaisesRegex(ValueError,"target/label"):
+            build_private_source_preface_verse_links(
+                preface_osis=args[0],source_note_receipt=args[1],
+                source_review_packet=args[2],preface_proof=args[3],native=args[4])
 
 if __name__=="__main__":
     unittest.main()
