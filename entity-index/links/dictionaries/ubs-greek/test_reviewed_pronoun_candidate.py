@@ -82,7 +82,7 @@ class ReviewedGreekPronounTests(unittest.TestCase):
         self.assertEqual(groups["σύ"]["ubs_main_id"], IDS["σύ"])
         broken = copy.deepcopy(en)
         broken[0]["BaseForms"][0]["PartsOfSpeech"] = ["verb"]
-        with self.assertRaisesRegex(ValueError, "contradicts the source pronoun class"):
+        with self.assertRaisesRegex(ValueError, "POS classification differs from pronoun expectation"):
             MOD["review_ledger"](
                 LEDGER, {"source_editions": LEDGER["source_editions"]},
                 broken, fr
