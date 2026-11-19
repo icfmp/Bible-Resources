@@ -191,7 +191,7 @@ def repair_private_bytes(raw: bytes, plan: dict) -> tuple[bytes, dict]:
         parser.Parse(raw, True)
     except expat.ExpatError as exc:
         raise IntroRepairError("Private source lexical parse failed") from exc
-    if stack or next(elements, None) is not None or len(positions) != 6 + bool(title_node):
+    if stack or next(elements, None) is not None or len(positions) != 6 + (title_node is not None):
         raise IntroRepairError("Partial source lexical marker coverage")
 
     intro_open = positions[("start", intro_div)][2]
