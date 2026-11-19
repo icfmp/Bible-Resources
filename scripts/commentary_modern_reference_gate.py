@@ -3805,7 +3805,7 @@ def build_private_primary_source_strict_quarantine(
         last = case["original_source_last_K"]
         originals_for_chapter = native["chapters"][chapter]["original_units"]
         indices = [i for i, unit in enumerate(originals_for_chapter)
-                   if unit["first_key"] == first and unit["last_key"] == last
+                   if unit["first_key"] == first and unit["keys"][-1] == last
                    and unit["source_unit_sha256"] ==
                    case["original_source_K_raw_sha256"]]
         if len(indices) != 1:
