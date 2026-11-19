@@ -1323,6 +1323,32 @@ jobs:
           assert sha256(output.read_bytes()).hexdigest()==receipt["candidate_sha256"]
           print("Real 2Chr 1 source OSIS introduction move proof (metadata only):",
                 receipt)
+          # Diagnose what osis2mod sees between chapter start and first
+          # exposition milestone. Emit XML element names/types ONLY; never
+          # authorial words, notes or source XML bytes.
+          def preverse_markup_shape(data):
+              tree=etree.fromstring(data,etree.XMLParser(
+                  resolve_entities=False,load_dtd=False,no_network=True,
+                  recover=False,huge_tree=True))
+              nodes=[n for n in tree.iter() if isinstance(n.tag,str)]
+              starts=[i for i,n in enumerate(nodes)
+                      if n.tag.rsplit("}",1)[-1]=="chapter"
+                      and n.get("sID")=="2Chr.1"]
+              ends=[i for i,n in enumerate(nodes)
+                    if n.tag.rsplit("}",1)[-1]=="verse"
+                    and n.get("sID")=="2Chr.1.1-12"]
+              if len(starts)!=1 or len(ends)!=1 or not starts[0]<ends[0]:
+                  raise SystemExit("Unattested preverse diagnostic scope")
+              return [{"tag":n.tag.rsplit("}",1)[-1],
+                       "type":n.get("type"),"subType":n.get("subType"),
+                       "line":n.sourceline}
+                      for n in nodes[starts[0]:ends[0]]
+                      if n.tag.rsplit("}",1)[-1] in
+                         {"chapter","div","title","p","verse"}][:70]
+          print("2Chr 1 preverse lexical topology (types/lines only):",
+                json.dumps({"original":preverse_markup_shape(raw),
+                            "reclassified":preverse_markup_shape(changed)},
+                           sort_keys=True))
           groups=[]
           source_commentary_overlap_witness(before,groups_out=groups)
           intro=next(g for g in groups if g["sID"]=="2Chr.1.1")
