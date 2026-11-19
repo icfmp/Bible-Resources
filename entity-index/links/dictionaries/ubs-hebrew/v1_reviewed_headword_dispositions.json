@@ -4,7 +4,7 @@
     "macula_revision": "47db250bd55d0d8577f2a94fba114ef16c35b23c",
     "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8"
   },
-  "policy": "Five independently interpreted UBS Hebrew v0.9.4 headword identities: source-word-specific family approvals for entry-level crosswalk candidates only. Do not treat Strong spelling, H/A prefix, or old SDBH equality alone as equivalence; do not infer contextual sense IDs. These are editorial dispositions, not generated index links. External dictionary web display corroborates sense/context but the pinned original UBS/MACULA metadata is verified by CI. Added twelve distinct named-entity entry reviews grounded in original Ezra/Daniel referents, and preserved context/sense abstention for homonymous names. Published UBS English headword sense glosses are now source-checked as evidence of reviewed *entry* identity, not assigned as any WLC contextual sense; same-Strong and cross-Strong spellings are validated by separate source-bound relations.",
+  "policy": "Five independently interpreted UBS Hebrew v0.9.4 headword identities: source-word-specific family approvals for entry-level crosswalk candidates only. Do not treat Strong spelling, H/A prefix, or old SDBH equality alone as equivalence; do not infer contextual sense IDs. These are editorial dispositions, not generated index links. External dictionary web display corroborates sense/context but the pinned original UBS/MACULA metadata is verified by CI. Added twelve distinct named-entity entry reviews grounded in original Ezra/Daniel referents, and preserved context/sense abstention for homonymous names. Published UBS English headword sense glosses are now source-checked as evidence of reviewed *entry* identity, not assigned as any WLC contextual sense; same-Strong and cross-Strong spellings are validated by separate source-bound relations. Third batch: 22 additional exact original-word anchored Hebrew/Aramaic lexical headwords, using original MACULA English witnesses and exact UBS-published gloss membership where independently available.",
   "decisions": [
     {
       "lang": "A",
@@ -1285,6 +1285,712 @@
         "ubs_attested_gloss": "sin"
       },
       "rationale": "Exodus 34:7 speaks of the forgiveness of wrongdoing; UBS's same headword includes sin and sin-offering as separate meanings. Accept the word-level headword identity, never automatically assert a contextual LEXID."
+    },
+    {
+      "lang": "A",
+      "lemma": "אַחְמְתָא",
+      "original_strong": "0307",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "000291001001000",
+          "original_word_id": "o150060020022",
+          "reference": "EZR 6:2!2"
+        }
+      ],
+      "ubs_candidate_main_id": "000290000000000",
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Ecbatana, the city where the scroll was found in Ezra 6:2",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZR 6:2",
+        "ubs_attested_gloss": "Ecbatana",
+        "original_word_english": "Ecbatana"
+      },
+      "rationale": "Ecbatana, the city where the scroll was found in Ezra 6:2"
+    },
+    {
+      "lang": "A",
+      "lemma": "בִּינָה",
+      "original_strong": "0999",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "000926001001000",
+          "original_word_id": "o270020210141",
+          "reference": "DAN 2:21!14"
+        }
+      ],
+      "ubs_candidate_main_id": "000926000000000",
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "The discernment that God gives to the wise in Daniel 2:21",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "DAN 2:21",
+        "ubs_attested_gloss": "understanding",
+        "original_word_english": "understanding"
+      },
+      "rationale": "The discernment that God gives to the wise in Daniel 2:21"
+    },
+    {
+      "lang": "A",
+      "lemma": "חַטָּאָה",
+      "original_strong": "2409",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "verb": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "002217001002000",
+          "original_word_id": "o150060170162",
+          "reference": "EZR 6:17!16"
+        }
+      ],
+      "ubs_candidate_main_id": "002220000000000",
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Ezra 6:17 lists twelve male goats as a sin offering, corresponding to the UBS sin-offering sense, not a contextually assigned LEXID",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZR 6:17",
+        "ubs_attested_gloss": "sin-offering",
+        "original_word_english": "sin offering"
+      },
+      "rationale": "Ezra 6:17 lists twelve male goats as a sin offering, corresponding to the UBS sin-offering sense, not a contextually assigned LEXID"
+    },
+    {
+      "lang": "A",
+      "lemma": "טְלַל",
+      "original_strong": "2927",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "verb": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "002694001001000",
+          "original_word_id": "o270040090091",
+          "reference": "DAN 4:9!9"
+        }
+      ],
+      "ubs_candidate_main_id": "002698000000000",
+      "candidate_relation": "different_strong_same_consonants",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "In Daniel 4:9 the tree's foliage offered shade, matching the published UBS shade-cover sense",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "DAN 4:9",
+        "ubs_attested_gloss": "to find shade",
+        "original_word_english": "found shade"
+      },
+      "rationale": "In Daniel 4:9 the tree's foliage offered shade, matching the published UBS shade-cover sense"
+    },
+    {
+      "lang": "A",
+      "lemma": "כֹּר",
+      "original_strong": "3734a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "003418001001000",
+          "original_word_id": "o150070220071",
+          "reference": "EZR 7:22!7"
+        }
+      ],
+      "ubs_candidate_main_id": "003422000000000",
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Ezra 7:22 names the kor, a dry capacity measure, indexed under the original UBS kor headword",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZR 7:22",
+        "ubs_attested_gloss": "kor",
+        "original_word_english": "cors"
+      },
+      "rationale": "Ezra 7:22 names the kor, a dry capacity measure, indexed under the original UBS kor headword"
+    },
+    {
+      "lang": "A",
+      "lemma": "צִדְקָה",
+      "original_strong": "6665",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "006131001001000",
+          "original_word_id": "o270040240092",
+          "reference": "DAN 4:24!9"
+        }
+      ],
+      "ubs_candidate_main_id": "006138000000000",
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Daniel 4:24 directs the king to do what is right, matching the UBS righteousness/justice lexical entry",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "DAN 4:24",
+        "ubs_attested_gloss": "righteousness",
+        "original_word_english": "righteousness"
+      },
+      "rationale": "Daniel 4:24 directs the king to do what is right, matching the UBS righteousness/justice lexical entry"
+    },
+    {
+      "lang": "H",
+      "lemma": "קָלָה",
+      "original_strong": "7034",
+      "original_occurrences": 6,
+      "original_source_classes": {
+        "verb": 6
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "006473002001000",
+          "original_word_id": "o050250030122",
+          "reference": "DEU 25:3!12"
+        },
+        {
+          "original_sdbh": "006473002002000",
+          "original_word_id": "o050270160021",
+          "reference": "DEU 27:16!2"
+        },
+        {
+          "original_sdbh": "006473002001000",
+          "original_word_id": "o090180230182",
+          "reference": "1SA 18:23!18"
+        }
+      ],
+      "ubs_candidate_main_id": "006479000000000",
+      "candidate_relation": "different_strong_same_consonants",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Deuteronomy 25:3 says a brother may be dishonored by excess punishment; the UBS קלה entry explicitly includes 'to be degraded' rather than only burning/roasting senses",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "DEU 25:3",
+        "ubs_attested_gloss": "to be degraded",
+        "original_word_english": "degraded"
+      },
+      "rationale": "Deuteronomy 25:3 says a brother may be dishonored by excess punishment; the UBS קלה entry explicitly includes 'to be degraded' rather than only burning/roasting senses"
+    },
+    {
+      "lang": "H",
+      "lemma": "נַחֲלָה",
+      "original_strong": "5158a",
+      "original_occurrences": 2,
+      "original_source_classes": {
+        "noun": 2
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "004730002001000",
+          "original_word_id": "o260470190091",
+          "reference": "EZK 47:19!9"
+        },
+        {
+          "original_sdbh": "004730002001000",
+          "original_word_id": "o260480280141",
+          "reference": "EZK 48:28!14"
+        }
+      ],
+      "ubs_candidate_main_id": "004735000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Ezekiel 47:19 describes the Wadi of Egypt; the UBS נחל headword explicitly includes wadi, a geographical streambed",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "EZK 47:19",
+        "ubs_attested_gloss": "wadi",
+        "original_word_english": "Wadi of Egypt"
+      },
+      "rationale": "Ezekiel 47:19 describes the Wadi of Egypt; the UBS נחל headword explicitly includes wadi, a geographical streambed"
+    },
+    {
+      "lang": "H",
+      "lemma": "צֹר",
+      "original_strong": "6697a",
+      "original_occurrences": 2,
+      "original_source_classes": {
+        "noun": 2
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "006316001002000",
+          "original_word_id": "o060050020101",
+          "reference": "JOS 5:2!10"
+        },
+        {
+          "original_sdbh": "006316001002000",
+          "original_word_id": "o060050030051",
+          "reference": "JOS 5:3!5"
+        }
+      ],
+      "ubs_candidate_main_id": "006168000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Joshua 5:2 commands knives of flint; the UBS צור entry includes both rock and blade senses, enough for headword identity without choosing a contextual LEXID",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "JOS 5:2",
+        "ubs_attested_gloss": "rock",
+        "original_word_english": "flint"
+      },
+      "rationale": "Joshua 5:2 commands knives of flint; the UBS צור entry includes both rock and blade senses, enough for headword identity without choosing a contextual LEXID"
+    },
+    {
+      "lang": "H",
+      "lemma": "שֹׁוקֵק",
+      "original_strong": "8264a",
+      "original_occurrences": 2,
+      "original_source_classes": {
+        "verb": 2
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "007621002001000",
+          "original_word_id": "o191070090041",
+          "reference": "PSA 107:9!4"
+        },
+        {
+          "original_sdbh": "007621002001000",
+          "original_word_id": "o230290080191",
+          "reference": "ISA 29:8!19"
+        }
+      ],
+      "ubs_candidate_main_id": "007625000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Psalm 107:9 describes a longing/thirsty soul; UBS שׁקק explicitly includes thirst, independently compatible with this source use",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "PSA 107:9",
+        "ubs_attested_gloss": "to be thirsty",
+        "original_word_english": "longing"
+      },
+      "rationale": "Psalm 107:9 describes a longing/thirsty soul; UBS שׁקק explicitly includes thirst, independently compatible with this source use"
+    },
+    {
+      "lang": "H",
+      "lemma": "טַפְחָה",
+      "original_strong": "2948a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "002713001001000",
+          "original_word_id": "o190390060021",
+          "reference": "PSA 39:6!2"
+        }
+      ],
+      "ubs_candidate_main_id": "002716000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Psalm 39:6 speaks of handbreadth-length days; UBS טֹפַח names the width of a palm",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "PSA 39:6",
+        "ubs_attested_gloss": "handbreadth",
+        "original_word_english": "handbreadths"
+      },
+      "rationale": "Psalm 39:6 speaks of handbreadth-length days; UBS טֹפַח names the width of a palm"
+    },
+    {
+      "lang": "H",
+      "lemma": "טַפְחָה",
+      "original_strong": "2948b",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "002713002001000",
+          "original_word_id": "o110070090132",
+          "reference": "1KI 7:9!13"
+        }
+      ],
+      "ubs_candidate_main_id": "002716000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "In 1 Kings 7:9 the original source uses the handbreadth measurement, matching the UBS breadth-of-palm headword",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "1KI 7:9",
+        "ubs_attested_gloss": "handbreadth"
+      },
+      "rationale": "In 1 Kings 7:9 the original source uses the handbreadth measurement, matching the UBS breadth-of-palm headword"
+    },
+    {
+      "lang": "H",
+      "lemma": "יַעֲרָה",
+      "original_strong": "3295",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "003012001001000",
+          "original_word_id": "o190290090061",
+          "reference": "PSA 29:9!6"
+        }
+      ],
+      "ubs_candidate_main_id": "003016000000000",
+      "candidate_relation": "different_strong_exact_attested_lemma",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Psalm 29:9 concerns the forests stripped bare, matching UBS יער forest/woods and not an unrelated same-spelling personal name",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "PSA 29:9",
+        "ubs_attested_gloss": "forest",
+        "original_word_english": "forests"
+      },
+      "rationale": "Psalm 29:9 concerns the forests stripped bare, matching UBS יער forest/woods and not an unrelated same-spelling personal name"
+    },
+    {
+      "lang": "H",
+      "lemma": "מַעֲנִית",
+      "original_strong": "4618a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "004231001001000",
+          "original_word_id": "o191290030072",
+          "reference": "PSA 129:3!7"
+        }
+      ],
+      "ubs_candidate_main_id": "004236000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Psalm 129:3 compares the oppressors' wounds to long ploughing furrows, matching the source UBS furrow noun",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "PSA 129:3",
+        "ubs_attested_gloss": "furrow",
+        "original_word_english": "furrows"
+      },
+      "rationale": "Psalm 129:3 compares the oppressors' wounds to long ploughing furrows, matching the source UBS furrow noun"
+    },
+    {
+      "lang": "H",
+      "lemma": "מוֹרָה",
+      "original_strong": "4172",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "003809001001000",
+          "original_word_id": "o190090210031",
+          "reference": "PSA 9:21!3"
+        }
+      ],
+      "ubs_candidate_main_id": "003813000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Psalm 9:21 petitions for fear/terror before the Lord; UBS מורא explicitly includes fear, awe and terror",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "PSA 9:21",
+        "ubs_attested_gloss": "terror",
+        "original_word_english": "fear"
+      },
+      "rationale": "Psalm 9:21 petitions for fear/terror before the Lord; UBS מורא explicitly includes fear, awe and terror"
+    },
+    {
+      "lang": "H",
+      "lemma": "קוץ",
+      "original_strong": "6974a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "verb": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "006457001001000",
+          "original_word_id": "o180140120091",
+          "reference": "JOB 14:12!9"
+        }
+      ],
+      "ubs_candidate_main_id": "006463000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Job 14:12 says the dead do not awaken, an exact lexical match to UBS קיץ's awaken/wake-up senses",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "JOB 14:12",
+        "ubs_attested_gloss": "to awaken",
+        "original_word_english": "awake"
+      },
+      "rationale": "Job 14:12 says the dead do not awaken, an exact lexical match to UBS קיץ's awaken/wake-up senses"
+    },
+    {
+      "lang": "H",
+      "lemma": "שַׁחֲטָה",
+      "original_strong": "7821a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o280050020012",
+          "reference": "HOS 5:2!1"
+        }
+      ],
+      "ubs_candidate_main_id": "007292000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Hosea 5:2 describes slaughter in its judgment oracle; UBS שחיטה is the slaughtering noun",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "HOS 5:2",
+        "ubs_attested_gloss": "slaughtering",
+        "original_word_english": "slaughter"
+      },
+      "rationale": "Hosea 5:2 describes slaughter in its judgment oracle; UBS שחיטה is the slaughtering noun"
+    },
+    {
+      "lang": "H",
+      "lemma": "כִּנְעָנִי",
+      "original_strong": "3667b",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "003357001002000",
+          "original_word_id": "o230230080101",
+          "reference": "ISA 23:8!10"
+        }
+      ],
+      "ubs_candidate_main_id": "003359000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Isaiah 23:8 explicitly refers to Tyre's merchants/traders; UBS כנען includes merchants in its separate lexical senses",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "ISA 23:8",
+        "ubs_attested_gloss": "merchants",
+        "original_word_english": "traders"
+      },
+      "rationale": "Isaiah 23:8 explicitly refers to Tyre's merchants/traders; UBS כנען includes merchants in its separate lexical senses"
+    },
+    {
+      "lang": "H",
+      "lemma": "כַּלְנֹו",
+      "original_strong": "3641a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "003335001001000",
+          "original_word_id": "o230100090031",
+          "reference": "ISA 10:9!3"
+        }
+      ],
+      "ubs_candidate_main_id": "003338000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Isaiah 10:9 names Calno/Calneh as a city, represented by the UBS Calneh proper-place headword",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "ISA 10:9",
+        "ubs_attested_gloss": "Calneh",
+        "original_word_english": "Calno"
+      },
+      "rationale": "Isaiah 10:9 names Calno/Calneh as a city, represented by the UBS Calneh proper-place headword"
+    },
+    {
+      "lang": "H",
+      "lemma": "רֹעָה",
+      "original_strong": "7489a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "verb": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o200250190021",
+          "reference": "PRO 25:19!2"
+        }
+      ],
+      "ubs_candidate_main_id": "006883000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Proverbs 25:19 compares misplaced confidence to a broken tooth; UBS רעע includes be broken / be crushed and the source word is not the unrelated evil-doing sense",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "PRO 25:19",
+        "ubs_attested_gloss": "to be broken",
+        "original_word_english": "bad"
+      },
+      "rationale": "Proverbs 25:19 compares misplaced confidence to a broken tooth; UBS רעע includes be broken / be crushed and the source word is not the unrelated evil-doing sense"
+    },
+    {
+      "lang": "H",
+      "lemma": "רעה",
+      "original_strong": "7489a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "verb": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "",
+          "original_word_id": "o230240190011",
+          "reference": "ISA 24:19!1"
+        }
+      ],
+      "ubs_candidate_main_id": "006883000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Isaiah 24:19 describes the earth as utterly broken; UBS רעע explicitly includes be broken and come to ruin",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "ISA 24:19",
+        "ubs_attested_gloss": "to be broken",
+        "original_word_english": "to be broken up"
+      },
+      "rationale": "Isaiah 24:19 describes the earth as utterly broken; UBS רעע explicitly includes be broken and come to ruin"
+    },
+    {
+      "lang": "H",
+      "lemma": "חֶטְאָה",
+      "original_strong": "2400a",
+      "original_occurrences": 1,
+      "original_source_classes": {
+        "noun": 1
+      },
+      "original_word_witnesses": [
+        {
+          "original_sdbh": "002216001001000",
+          "original_word_id": "o040150280062",
+          "reference": "NUM 15:28!6"
+        }
+      ],
+      "ubs_candidate_main_id": "002217000000000",
+      "candidate_relation": "same_strong_family_unresolved",
+      "disposition": "source_reviewed_ubs_headword_entry_only",
+      "headword_identity_reviewed": true,
+      "contextual_sense_id_approved": false,
+      "index_word_links_applied": false,
+      "source_data_modified": false,
+      "editorial_meaning": "Numbers 15:28 mentions the one sinning unintentionally; UBS חַטָּא includes guilty of/sinful and matches the original moral-culpability headword without selecting a contextual sense ID",
+      "evidence": {
+        "ubs_dictionary_page": "https://freely-given.org/OBD/UBS/Heb/index.htm",
+        "ubs_cited_passage": "NUM 15:28",
+        "ubs_attested_gloss": "sinful",
+        "original_word_english": "sinning"
+      },
+      "rationale": "Numbers 15:28 mentions the one sinning unintentionally; UBS חַטָּא includes guilty of/sinful and matches the original moral-culpability headword without selecting a contextual sense ID"
     }
   ]
 }
