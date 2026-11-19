@@ -1459,6 +1459,13 @@ jobs:
           note_markup_modified=0
           sampled_generated_milestones=[]
           milestone_pairs=Counter()
+          # osis2mod generates local `pvN` division milestones. A source
+          # introduction added earlier in the stream can renumber them.
+          # This verification is GENERIC: no book, verse or count exception.
+          remote_marker_only=True
+          generated_old_to_new={}
+          generated_new_to_old={}
+          generated_start_end_balance=Counter()
           parser=etree.XMLParser(resolve_entities=False,load_dtd=False,
                                  no_network=True,recover=False,huge_tree=True)
           for kind,key in remote:
@@ -1466,12 +1473,14 @@ jobs:
               post=new.get((kind,key))
               if pre is None or post is None:
                   by_presence["changed_presence"]+=1
+                  remote_marker_only=False
                   continue
               try:
                   old_xml=etree.fromstring(b"<fragment>"+pre+b"</fragment>",parser)
                   new_xml=etree.fromstring(b"<fragment>"+post+b"</fragment>",parser)
               except etree.XMLSyntaxError:
                   by_markup["fragment_not_comparable"]+=1
+                  remote_marker_only=False
                   continue
               if "".join(old_xml.itertext()) == "".join(new_xml.itertext()):
                   by_markup["exact_unicode_text_identical"]+=1
@@ -1486,8 +1495,12 @@ jobs:
                   by_markup["xml_tag_or_attribute_changed"]+=1
                   if len(left_nodes)!=len(right_nodes):
                       change_forms["element_count_changed"]+=1
+                      remote_marker_only=False
                       continue
                   for left,right in zip(left_nodes,right_nodes):
+                      if (left.tag!=right.tag or left.text!=right.text
+                              or left.tail!=right.tail):
+                          remote_marker_only=False
                       left_tag=left.tag.rsplit("}",1)[-1]
                       right_tag=right.tag.rsplit("}",1)[-1]
                       if left_tag!=right_tag:
@@ -1520,6 +1533,43 @@ jobs:
                                           "old":old_id[:120] if isinstance(old_id,str) else None,
                                           "new":new_id[:120] if isinstance(new_id,str) else None,
                                       })
+                              else:
+                                  old_id=left.get(name)
+                                  new_id=right.get(name)
+                              if (left_tag!="div" or attr not in {"sID","eID"}
+                                      or not isinstance(old_id,str)
+                                      or not isinstance(new_id,str)
+                                      or re.fullmatch(r"pv[0-9]+",old_id) is None
+                                      or re.fullmatch(r"pv[0-9]+",new_id) is None
+                                      or old_id==new_id):
+                                  remote_marker_only=False
+                              else:
+                                  # Cross-entry repetitions are expected.
+                                  # The mapping must be bijective WITHIN a book.
+                                  scope=key.split(".",1)[0]
+                                  original=(scope,old_id)
+                                  candidate=(scope,new_id)
+                                  if (original in generated_old_to_new
+                                          and generated_old_to_new[original]!=candidate):
+                                      remote_marker_only=False
+                                  if (candidate in generated_new_to_old
+                                          and generated_new_to_old[candidate]!=original):
+                                      remote_marker_only=False
+                                  generated_old_to_new[original]=candidate
+                                  generated_new_to_old[candidate]=original
+                                  generated_start_end_balance[(scope,old_id,new_id,attr)]+=1
+          # Every generated start delimiter must retain an equally
+          # represented end delimiter; a half-open span is never equivalent.
+          for (scope,old_id,new_id,attribute),count in generated_start_end_balance.items():
+              other="eID" if attribute=="sID" else "sID"
+              if generated_start_end_balance[(scope,old_id,new_id,other)]!=count:
+                  remote_marker_only=False
+          if not generated_start_end_balance and remote:
+              remote_marker_only=False
+          if (by_presence or by_markup["fragment_not_comparable"]
+                  or by_markup["text_changed"] or differing_tags
+                  or reference_targets_modified or note_markup_modified):
+              remote_marker_only=False
           # Original prose never appears in this evidence: only the native
           # OSIS address, counts, and structure/text EQUALITY flags.
           print("2Chr title source→native unexpected remote key diagnosis:",
@@ -1533,6 +1583,9 @@ jobs:
                             "note_nodes_with_changes":note_markup_modified,
                             "sampled_milestone_identifiers":sampled_generated_milestones,
                             "unique_old_new_id_pairs":len(milestone_pairs),
+                            "generated_div_renumbering_source_equivalent":
+                                remote_marker_only,
+                            "bounded_generated_id_scopes":len(generated_old_to_new),
                             "first_native_addresses":sorted(remote)[:24],
                             "remote_count":len(remote)},sort_keys=True))
           print("Actual private compiled 2Chr 1 intro placement (metadata only):",
@@ -1550,13 +1603,13 @@ jobs:
           if (intro_found!=len(intro_pieces)
                   or next_found!=len(next_pieces)
                   or intro_still_in_verse
-                  or remote
+                  or (remote and not remote_marker_only)
                   or old_counts["actual_occupied_numbered_entry_count"]
                      !=new_counts["actual_occupied_numbered_entry_count"]
                   or old_counts["actual_occupied_anonymous_top_entry_count"]
                      !=new_counts["actual_occupied_anonymous_top_entry_count"]):
               raise SystemExit("OSIS introduction reclassification is not source-faithful in real SWORD")
-          print("REAL_OSIS_CHAPTER_INTRO_PROOF_PASS; candidate private and unpublished")
+          print("REAL_OSIS_CHAPTER_INTRO_PROOF_PASS; only verified generated pvN pair renumbering outside 2Chr 1; candidate private and unpublished")
           PY
       - name: Install real Xiphos GUI dependencies in disposable runner
         if: github.event_name == 'workflow_dispatch' || (github.event.action == 'edited' && contains(github.event.pull_request.body, '[run-mhc-final-gui]'))
