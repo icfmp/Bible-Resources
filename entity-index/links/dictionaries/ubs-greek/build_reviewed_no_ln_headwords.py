@@ -68,11 +68,11 @@ def review_ledger(ledger, report, english, french):
     mid = disposition["original_ubs_main_id"]
     en = next(e for e in english if e["MainId"] == mid)
     fr = next(e for e in french if e["MainId"] == mid)
-    for e in (en, fr):
+    for e, expected in ((en, "verb"), (fr, "verbe")):
         pos = {str(p).lower().rstrip(".") for form in e.get("BaseForms") or []
                for p in form.get("PartsOfSpeech") or []}
-        if "verb" not in pos:
-            raise ValueError("Original UBS Greek lexical POS not attested as verb: " + repr(sorted(pos)))
+        if expected not in pos:
+            raise ValueError("Original UBS Greek lexical POS not attested in source language: " + repr(sorted(pos)))
     return review, mid, disposition
 
 
