@@ -58,9 +58,11 @@ Lust is like a fire burning within.
 
 When people indulge it, it consumes what is good in the soul and leaves the conscience ruined.
 
-It brings God's judgment, which only **Christ's blood** can turn away from eternal destruction.
+It kindles **the fire of God's wrath**, which will consume even to eternal destruction unless quenched by **the blood of Christ**.
 
 It may also destroy the body and waste a person's possessions.
+
+**Burning desires bring burning judgments.**
 
 Job had managed a large household.
 
@@ -139,6 +141,8 @@ May God have mercy on us and write his law upon our hearts.
 ---
 
 ## Editorial review — Job 31
+
+**2026-11-19 secondary-witness fidelity repair (unapproved draft):** The verses 9–15 modern draft had flattened Henry's *fire of God's wrath*, *quenching by Christ's blood* and *burning lusts / burning judgments* into a generic judgment statement. Explicit metaphors and the twofold warning are now restored from [CCEL Job 31](https://ccel.org/ccel/henry/mhcc.xix.xxxi.html), without changing the chapter's original units or references. Exact published MHCC 0.1.1 native source and independent review still pending.
 
 **Entire secondary original-English witness compared:** [CCEL, Job 31](https://ccel.org/ccel/henry/mhcc.xix.xxxi.html). Published **MHCC 0.1.1** remains the exact original pending native SWORD validation and independent review.
 
