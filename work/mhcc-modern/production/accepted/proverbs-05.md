@@ -25,7 +25,7 @@ Some readers understand the adulterous woman as a picture of **idolatry or false
 
 Sexual wrongdoing has also repeatedly become a means by which Satan draws people from the worship of God into false religion.
 
-Consider its terrible consequences. Sin's fruit is bitter, whichever aspect we consider. It wounds the person who follows it and leads toward final judgment.
+Consider its terrible consequences. Sin's fruit is bitter, whichever aspect we consider. It wounds the person who follows it and leads **to the torments of hell**.
 
 Its natural tendency is **to destroy both body and soul**.
 
@@ -64,6 +64,8 @@ Those who foolishly choose a path of sin may justly be left by God to follow the
 ---
 
 ## Editorial review — Proverbs 5
+
+**2026-11-19 focused secondary-witness fidelity repair (unapproved draft):** In Proverbs 5:1–14 the earlier modern text changed Henry's explicit warning that sexual sin *leads to the torments of hell* into the less particular *leads toward final judgment*. The revised draft restores the original theological claim from [CCEL Proverbs 5](https://ccel.org/ccel/henry/mhcc.xxi.v.html). Exact published MHCC 0.1.1 native K and independent semantic approval remain separate requirements; original source, references and K/verse scopes unchanged.
 
 **Complete English source directly checked:** [CCEL, Proverbs 5](https://ccel.org/ccel/henry/mhcc.xxi.v.html). Published `MHCC 0.1.1` remains original authority; native SWORD, independent editorial review and publication are pending.
 
