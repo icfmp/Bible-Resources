@@ -401,10 +401,15 @@ jobs:
           manifest=Path("entity-index/links/dictionaries/ubs-hebrew/v1_private_candidate_manifest.json")
           if manifest.is_file():
               expected=json.loads(manifest.read_text(encoding="utf-8"))
-              assert expected["original_index_sha256"] == hashlib.sha256(original.read_bytes()).hexdigest()
+              assert expected["source_editions"] == candidate["editorial_candidate"]["index_source_revisions"]
+              assert expected["status"] == candidate["editorial_candidate"]["status"]
               assert expected["candidate_index_sha256"] == hashlib.sha256(path.read_bytes()).hexdigest()
               assert expected["new_entry_only_word_links"] == 273
+              assert expected["candidate_source_linked_lexical_occurrences"] == 240371
+              assert expected["candidate_ubs_indexed_headword_coverage_pct"] == 99.021
               assert expected["original_source_words_left_unlinked_by_review"] == 1
+              assert expected["contextual_sense_ids_inferred"] == 0
+              assert expected["release_approved"] is False
           print("UBS_PRIVATE_CANDIDATE_REVIEW_NOT_PUBLICATION")
           PY
       - name: Upload private UBS 0.9.4 v1 word-level index candidate (NOT released)
