@@ -62,7 +62,8 @@ def audit_ledger(ledger, residual):
             or row["original_strong"] != "0"
             or row["original_macula_class"] != "noun"
             or row["original_word_count"] != 1
-            or row["ubs_original_pos_prefix"] not in {"noun", "noun-name"}
+            or row["ubs_original_pos_prefix_en"] not in {"noun", "noun-name"}
+            or row["ubs_original_pos_prefix_fr"] != "nom"
             or len(row["editorial_basis"]) < 200):
             raise ValueError("Missing original Greek Strong=0 word-specific independent lexical decision")
         selected[key] = row
@@ -85,8 +86,6 @@ def build(candidate, ledger, residual, english, french):
     fr = {x["MainId"]: x for x in french}
     if len(en) != len(english) or len(fr) != len(french) or set(en) != set(fr):
         raise ValueError("Greek UBS original English/French lexical inventory changed")
-    for (_lemma, _mid), _decision in selected.items():
-        print("ORIGINAL_UBS_GREEK_BILINGUAL_POS_EVIDENCE", json.dumps({"lemma": _lemma, "main_id": _mid, "en": sorted(source_pos(en[_mid])), "fr": sorted(source_pos(fr[_mid]))}, ensure_ascii=False, sort_keys=True))
     chosen, declined = set(), set()
     output = copy.deepcopy(candidate)
     for family in residual["families"]:
@@ -108,8 +107,8 @@ def build(candidate, ledger, residual, english, french):
             or family["original_classes"] != {"noun": 1}
             or family["original_strong_counts"] != {"0": 1}
             or len(family["all_original_word_witnesses"]) != 1
-            or decision["ubs_original_pos_prefix"] not in source_pos(en[mid])
-            or decision["ubs_original_pos_prefix"] not in source_pos(fr[mid])):
+            or decision["ubs_original_pos_prefix_en"] not in source_pos(en[mid])
+            or decision["ubs_original_pos_prefix_fr"] not in source_pos(fr[mid])):
             raise ValueError("Original Greek Strong=0 lemma, morphology or UBS bilingual POS mismatch: " + repr({"key": key, "family_count": family["original_word_count"], "classes": family["original_classes"], "strong_counts": family["original_strong_counts"], "en_pos": sorted(source_pos(en[mid])) if mid in en else [], "fr_pos": sorted(source_pos(fr[mid])) if mid in fr else [], "original_word_count": len(family["all_original_word_witnesses"])}))
         en_ln, fr_ln = source_ln(en[mid]), source_ln(fr[mid])
         if not en_ln or en_ln != fr_ln:
