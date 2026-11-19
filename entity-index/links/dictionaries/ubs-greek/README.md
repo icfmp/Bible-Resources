@@ -504,3 +504,39 @@ This does **not** certify contextual lexical sense accuracy and does
 not fill missing UBS entries. The candidate remains **private and
 unpublished**; all original sources and the old `index.json` are
 preserved.
+
+## Greek headword identities with an original missing Strong annotation
+
+The [explicit two-word review ledger](v1_reviewed_missing_strong_word_headwords.json)
+and [independent source verifier](build_reviewed_missing_strong_word_headwords.py)
+address two **original SBLGNT word IDs** with MACULA `strong=0`:
+`ἄμωμον` (original noun; original UBS lexical noun) and
+`Ἀρνί` (original proper noun; UBS proper-name lexical entry).
+
+Both preserve their exact original Greek NFC headword and an original
+source Louw–Nida lexical-domain code corroborated independently by the
+pinned UBS 1.0 **English and French** dictionary headwords. The original
+UBS POS labels are `noun` or `noun-name` in English, and `nom`
+in French; these genuine bilingual source labels are intentionally
+**not rewritten or translated in the source data**. The absence of
+MACULA Strong is a missing *Strong annotation*, not a reason to invent
+an original Strong or to map `0` to a universal lexicon key.
+
+These exact two word IDs are source-reviewed for **lexical headword
+identity only**, without any inferred contextual UBS semantic `LEXID`.
+Their original Strong remains the literal `0`; original spelling,
+morphology, LN annotations and references are preserved. The original
+`ὁπότε` (MACULA conjunction versus UBS adverb) remains unapproved,
+rather than forcing grammatical agreement.
+
+The private source-reviewed Greek word-ID headword count becomes
+**9,186**, on top of the historical unchanged **128,090** candidate
+Strong-derived words: **137,276 / 137,741** Greek words have a
+source-evidenced lexical entry candidate. The remaining **465** source
+words comprise this one strict grammar discrepancy, 459 original lemmas
+without an NFC-identical original UBS entry, and five original
+composite Strong annotations. This is not contextual sense accuracy
+or publication readiness. All original dictionary resources,
+the SBLGNT TSV, historical `index.json`, and existing ambiguity
+candidate lists remain unchanged. Private, expiring CI artifacts
+are not publicly released data.
