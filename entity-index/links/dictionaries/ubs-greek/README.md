@@ -199,3 +199,36 @@ integrated into the Bible application.
 
 The next editorial batches are tracked in
 [issue #396](https://github.com/icfmp/Bible-Resources/issues/396).
+
+## Second source-reviewed Greek lexical headword batch — ten non-pronoun families
+
+The separately source-verified [batch-2 decision ledger](v1_reviewed_families_batch2.json)
+covers ten explicit original Greek lexical families: `πρῶτος`, `εἷς`,
+`λέγω`, `ἐσθίω`, `εὐθύς`, `πολύς`, `μέγας`, `ὑπάρχω`,
+`δείκνυμι`, and `πίμπλημι`. Their exact original
+MACULA word IDs, unchanged Greek lemmas, original Strong annotations,
+morphologies, references and original Louw–Nida witnesses are independently
+rechecked against the pinned UBS EN/FR lexicon. UBS source POS
+(`adjc.`/`verb`, including entries listing `advb.` and `adjc.`
+together) must agree with each original MACULA lexical class.
+
+The [private batch-2 builder](build_reviewed_families_batch2.py) uses
+the full [905-word evidence register](audit_remaining_headwords.py) and
+approves **only 577 additional original word-ID/headword identities**, without
+creating a universal Strong alias or selecting any contextual lexical
+sense. Together with the previously reviewed 5,033 source-word pronouns,
+**5,610** additional original Greek words have individually reviewed
+headword candidates. The original **128,090** Strong-based lexical
+candidate words stay unchanged. Editorially reviewed headword coverage is
+therefore **133,700 / 137,741 (97.066%)**; the remaining **328** strict
+lemma+LN word previews remain unapproved. The separate 3,249 source
+lemma-only/no attested UBS LN words, 459 without matching source UBS
+headword, five composite Strong forms and original 224 multiply headed
+Strong cases remain unresolved. These are not contextual-sense accuracy
+figures.
+
+CI separately checks complete source inventory, bilingual dictionary
+parity, original word-ID-to-entry witnesses, POS alignment, zero modified
+source annotations, zero invented contextual `LEXID`, and preservation of
+the frozen `index.json`. The versioned source-reviewed result remains
+an **expiring private GitHub Actions artifact, NOT a download or release**.
