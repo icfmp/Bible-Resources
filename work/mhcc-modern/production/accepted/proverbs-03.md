@@ -106,13 +106,15 @@ Do not envy oppressive people who enjoy prosperity.
 
 A disciple of Christ should not imitate their methods.
 
-Greedy and self-indulgent people may mock such teaching, but their final reward is dishonor.
+Greedy and self-indulgent people may mock such teaching, but their portion is **everlasting contempt**.
 
 **God favors the humble believer**.
 
 ---
 
 ## Editorial review — Proverbs 3
+
+**2026-11-19 focused secondary-witness fidelity repair (unapproved draft):** Proverbs 3:27–35's modern version rendered Henry's **everlasting contempt** as generic final *dishonor*, dropping the enduring duration explicitly in the source. Restored original statement against [CCEL Proverbs 3](https://ccel.org/ccel/henry/mhcc.xxi.iii.html), keeping the adjacent contrast with God's favor to humble believers. Published source and editorial approval remain unaffected.
 
 **Complete original-English source read:** [CCEL, Proverbs 3](https://ccel.org/ccel/henry/mhcc.xxi.iii.html). Published original `MHCC 0.1.1` remains authoritative for native SWORD/independent acceptance.
 
