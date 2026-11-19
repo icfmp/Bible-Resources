@@ -4,7 +4,7 @@
   "native_module_id": "MHCC",
   "source_zip_sha256": "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746",
   "source_native_corpus_sha256": "2d85930f0a69efaf30dbde195e5f9779eaaf849cf0221e85ed46d6ec8bcb025e",
-  "purpose": "Original K body lexical probes for two draft Proverbs fidelity restorations; not independent source-to-modern semantic review.",
+  "purpose": "Original published K-body lexical probes for focused Proverbs 2, 3 and 5 fidelity draft restorations; not independent semantic translation approval.",
   "source_group_hash_policy": "manifest_exact",
   "source_group_probes": [
     {
@@ -36,6 +36,22 @@
         {
           "id": "source_claim_2",
           "words": "Divine favour is shown to the humble believer"
+        }
+      ]
+    },
+    {
+      "chapter": "Prov.5",
+      "first": "Prov.5.1",
+      "last": "Prov.5.14",
+      "sha": "882ba0ba9b5779314c62d2ea8607e7e7c2a29ea7555efc58b3f4f155d8300a58",
+      "anchors": [
+        {
+          "id": "hell_torments",
+          "words": "It leads to the torments of hell"
+        },
+        {
+          "id": "body_soul",
+          "words": "the destruction of body and soul"
         }
       ]
     }
