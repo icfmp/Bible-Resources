@@ -37,6 +37,7 @@ jobs:
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_v1_disposition_coverage.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_single_candidate_abstentions.py
           python3 -I entity-index/links/dictionaries/ubs-hebrew/test_reviewed_word_anchor_preview.py
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/test_positive_family_unwitnessed.py
       - name: Check out exact UBS Hebrew EN/FR 0.9.4 source
         uses: actions/checkout@v4
         with:
@@ -215,6 +216,24 @@ jobs:
           }
           print("UBS_EXPLICIT_WORD_WITNESS_PREVIEW_SOURCE_VERIFIED")
           PY
+      - name: Enumerate every pending original WLC word inside source-reviewed headword families
+        run: |
+          python3 -I entity-index/links/dictionaries/ubs-hebrew/audit_positive_family_unwitnessed.py \
+            --decisions entity-index/links/dictionaries/ubs-hebrew/v1_reviewed_headword_dispositions.json \
+            --preview entity-index/links/dictionaries/ubs-hebrew/reviewed_word_anchor_preview.json \
+            --index /tmp/bsi-ubs-hebrew-index.json \
+            --macula macula-hebrew/WLC/tsv/macula-hebrew.tsv \
+            --output /tmp/bsi-ubs-positive-family-pending-original-words.json
+          if [ -f entity-index/links/dictionaries/ubs-hebrew/positive_family_pending_original_words.json ]; then
+            python3 - <<'PY'
+          import json
+          from pathlib import Path
+          generated=json.loads(Path("/tmp/bsi-ubs-positive-family-pending-original-words.json").read_text(encoding="utf-8"))
+          committed=json.loads(Path("entity-index/links/dictionaries/ubs-hebrew/positive_family_pending_original_words.json").read_text(encoding="utf-8"))
+          assert generated == committed, "Original MACULA word-level positive-family audit has drifted"
+          print("UBS_135_PENDING_WORDS_EXACT_SOURCE_PIN_VERIFIED")
+          PY
+          fi
       - name: Verify all lexical families classified without editorial assumptions
         run: |
           python3 - <<'PY'
