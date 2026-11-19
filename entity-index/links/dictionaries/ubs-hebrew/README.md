@@ -425,3 +425,36 @@ as independent lexical editorial validation.
 by this scope-only review. The **197 in-scope families / 2,649 occurrences**
 still need original source dictionary metadata and lexeme-level adjudication
 under [#366](https://github.com/icfmp/Bible-Resources/issues/366).
+
+## First lexical nonidentity decisions — three high-volume false homographs
+
+The [source-keyed editorial rejection ledger](v1_lexical_nonidentity_dispositions.json)
+records three **verified negative** decisions (1,791 original MACULA WLC
+occurrences). None is a permitted cross-Strong link:
+
+| Original WLC family | Occurrences | Rejected UBS 0.9.4 headword | Independent lexical reason |
+| --- | ---: | --- | --- |
+| Hebrew `אַל` H0408 | 726 | `000381000000000` `אֵל` H0410/H0411/A0412/H0415/H0416 | Original prohibitive *not* (Gen 13:8), UBS deity/noun/pronoun *god* |
+| Hebrew `כֹּה` H3541 | 577 | `003248000000000` `כָּה` A3542 | Original Hebrew *thus/so* (Gen 15:5), UBS Aramaic *here* |
+| Hebrew `עוֹד` H5750 | 488 | `005287000000000` `עוד` H5749 | Original temporal adverb *again/still* (Gen 4:25), UBS verb *testify/warn* |
+
+These are **lexical non-equivalence judgments**, not a claim that the Hebrew
+words are missing from all dictionaries. The parent algorithmic register's
+same-consonant candidates and its coverage denominator are retained unchanged
+for deterministic reproducibility. No original source word, Strong number,
+verse or UBS entry is rewritten; none of these candidates is linked.
+
+The [read-only verifier](verify_lexical_nonidentity.py), synthetic tests and
+CI compare the exact original WLC word ID, reference, lemma, gloss, POS and
+Strong fields against the pinned MACULA TSV and the complete actual UBS 0.9.4
+headword lemma, Strong and POS metadata. It will reject an edition/source
+revision or candidate-list change. The rationale remains an explicit human-
+readable editorial judgment, not an unsafe automatic morphology rule.
+
+**Outstanding:** these 3 families are dispositioned as rejected candidates;
+the other 194 in-scope families still need review (858 original occurrences).
+The 5 edition-scope-only exclusions and 2 preserved composite Strong codes
+are tracked separately. A rejected match does **not** create a dictionary
+entry or semantic sense, and full-corpus linked coverage remains 240,098
+out of 248,680. Publication remains subject to the v1 acceptance gate in
+[#366](https://github.com/icfmp/Bible-Resources/issues/366).

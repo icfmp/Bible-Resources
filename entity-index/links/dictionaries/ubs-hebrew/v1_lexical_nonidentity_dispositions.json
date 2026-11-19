@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "policy": "Reject only the listed UBS 0.9.4 orthographic candidate, never infer a new link or change original WLC words, Strong, refs or textual identity",
+  "source_editions": {
+    "ubs_revision": "a15a96cfaa4ca18a6c0339016645ba1e534db3c8",
+    "macula_revision": "47db250bd55d0d8577f2a94fba114ef16c35b23c"
+  },
+  "decisions": [
+    {
+      "lang": "H",
+      "lemma": "אַל",
+      "original_strong": "0408",
+      "occurrences": 726,
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o010130080051",
+        "reference": "GEN 13:8!5",
+        "english": "not",
+        "pos": "particle",
+        "class": "adv"
+      },
+      "ubs_candidate": {
+        "main_id": "000381000000000",
+        "lemma": "אֵל",
+        "strong_codes": [
+          "H0410",
+          "H0411",
+          "A0412",
+          "H0415",
+          "H0416"
+        ],
+        "parts_of_speech": [
+          "noun m",
+          "dem.pron"
+        ]
+      },
+      "rationale": "Original H0408 is the prohibitive negative particle ('not'); the sole consonant-only UBS candidate is אֵל, a divine-being/common-noun and pronoun entry with unrelated Strong codes. Identical bare consonants do not establish lexical identity."
+    },
+    {
+      "lang": "H",
+      "lemma": "כֹּה",
+      "original_strong": "3541",
+      "occurrences": 577,
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o010150050161",
+        "reference": "GEN 15:5!16",
+        "english": "so",
+        "pos": "adverb",
+        "class": "adv"
+      },
+      "ubs_candidate": {
+        "main_id": "003248000000000",
+        "lemma": "כָּה",
+        "strong_codes": [
+          "A3542"
+        ],
+        "parts_of_speech": [
+          "adv"
+        ]
+      },
+      "rationale": "Original Hebrew H3541 כֹּה means 'thus/so' in Genesis 15:5; the sole indexed same-consonant UBS candidate is Aramaic A3542 כָּה ('here'). Language, lemma and lexical meaning disagree; do not link them."
+    },
+    {
+      "lang": "H",
+      "lemma": "עוֹד",
+      "original_strong": "5750",
+      "occurrences": 488,
+      "decision": "candidate_lexical_nonidentity",
+      "source_witness": {
+        "word_id": "o010040250031",
+        "reference": "GEN 4:25!3",
+        "english": "again",
+        "pos": "adverb",
+        "class": "adv"
+      },
+      "ubs_candidate": {
+        "main_id": "005287000000000",
+        "lemma": "עוד",
+        "strong_codes": [
+          "H5749"
+        ],
+        "parts_of_speech": [
+          "verb"
+        ]
+      },
+      "rationale": "Original H5750 עוֹד is a temporal adverb ('again/still'); UBS candidate H5749 עוד is a verb ('testify/warn'), a distinct lexeme sharing unvocalized consonants. Do not map the adverb to that verb."
+    }
+  ]
+}
