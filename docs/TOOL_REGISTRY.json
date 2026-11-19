@@ -5160,6 +5160,37 @@
     {
       "classification": "UNDECIDED",
       "confidence": "low",
+      "entrypoint_hint": "library, native helper or workflow-invoked",
+      "format_signals_not_certified_support": [
+        "zCom",
+        "zCom4",
+        "OSIS"
+      ],
+      "has_direct_tests_by_filename": false,
+      "owner": "Bible Resources maintainers",
+      "path": "scripts/reviewed_osis_commentary_rebuild.py",
+      "proposed_action": "Review source and callers before changing lifecycle.",
+      "purpose_first_line": "Verify pinned authorial-OSIS rebuilds distributed as native SWORD commentaries.",
+      "python_imports": [
+        "hashlib",
+        "json",
+        "pathlib",
+        "re"
+      ],
+      "reader_tool_signals": [],
+      "release_approval": "never inferred from inventory",
+      "sha256_at_inventory": "0ae8568066bed963619a57b63827c9b7183436efd3dd146d1d55896f037267dd",
+      "side_effects": "unknown; inspect CLI and subprocesses before use",
+      "source_sha_requirement": "must be separately checked; static scan is not proof",
+      "stage_hint": "publication/release",
+      "static_reference_count": 1,
+      "static_references": [
+        "scripts/validate.py"
+      ]
+    },
+    {
+      "classification": "UNDECIDED",
+      "confidence": "low",
       "entrypoint_hint": "CLI or __main__ present",
       "format_signals_not_certified_support": [],
       "has_direct_tests_by_filename": false,
@@ -6802,12 +6833,13 @@
         "published_reference_audit",
         "re",
         "reviewed_compiled_commentary_rebuild",
+        "reviewed_osis_commentary_rebuild",
         "stable_sword_refs",
         "sys"
       ],
       "reader_tool_signals": [],
       "release_approval": "never inferred from inventory",
-      "sha256_at_inventory": "8ccb3aaea1cd8b858797759739bce27e7799103744757d59ba810fc070f04b4e",
+      "sha256_at_inventory": "72104c372712a9071857933413da493658c23853635c079d8d95f8ad80fd7739",
       "side_effects": "consult the documented core tool contract",
       "source_sha_requirement": "must be separately checked; static scan is not proof",
       "stage_hint": "not determined",

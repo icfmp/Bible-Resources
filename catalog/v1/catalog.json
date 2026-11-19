@@ -62,12 +62,31 @@
       "version": "0.1.0"
     },
     {
+      "canonical_edition_id": "matthew-henry-complete-crosswire-2.2",
+      "category": "commentary",
+      "download": {
+        "sha256": "d0d401220ffba3de98dd9e9cab5dfe58030ca38ac7b196291838a472f3f6e07a",
+        "size_bytes": 16409148,
+        "url": "https://icfmp.github.io/Bible-Resources/sword/packages/MHC.zip"
+      },
+      "edition": "faithful",
+      "id": "mhc-crosswire",
+      "language": "en",
+      "sword_id": "MHC",
+      "title": {
+        "en": "Matthew Henry's Complete Commentary on the Whole Bible",
+        "fr": "Commentaire complet de Matthew Henry sur toute la Bible"
+      },
+      "versification": "KJV",
+      "version": "0.1.0"
+    },
+    {
       "canonical_edition_id": "matthew-henry-concise-crosswire-2.0",
       "category": "commentary",
       "download": {
-        "url": "https://icfmp.github.io/Bible-Resources/sword/packages/MHCC.zip",
         "sha256": "a0639201b57b9a6ec843fca70ffc08f75e179a24130a22ce1fd43be8ca42c746",
-        "size_bytes": 2449819
+        "size_bytes": 2449819,
+        "url": "https://icfmp.github.io/Bible-Resources/sword/packages/MHCC.zip"
       },
       "edition": "faithful",
       "id": "mhcc-crosswire",
